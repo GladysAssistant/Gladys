@@ -141,6 +141,8 @@ const { setGrantedDevices } = require('./externalIntegration.setGrantedDevices')
 const { refreshIndex } = require('./store/store.refreshIndex');
 const { getIndex } = require('./store/store.getIndex');
 const { getCatalog } = require('./store/store.getCatalog');
+const { getStoreEntry } = require('./store/store.getStoreEntry');
+const { getStoreIntegration } = require('./store/store.getStoreIntegration');
 const { refreshCatalog } = require('./store/store.refreshCatalog');
 const { getDocsMarkdown } = require('./store/store.getDocsMarkdown');
 const { fetchManifestFromRepo } = require('./store/store.fetchManifestFromRepo');
@@ -266,6 +268,8 @@ const ExternalIntegration = function ExternalIntegration(
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
   this.storeIndexFetchedAt = 0;
+  // last full index entry fetched (complete manifest), see getStoreEntry
+  this.storeEntryCache = null;
   this.storeRefreshInterval = null;
   // storeSlug -> manifest fetched directly from the repo (repo_url installs absent from the index)
   this.repoManifests = new Map();
@@ -419,6 +423,8 @@ ExternalIntegration.prototype.setGrantedDevices = setGrantedDevices;
 ExternalIntegration.prototype.refreshIndex = refreshIndex;
 ExternalIntegration.prototype.getIndex = getIndex;
 ExternalIntegration.prototype.getCatalog = getCatalog;
+ExternalIntegration.prototype.getStoreEntry = getStoreEntry;
+ExternalIntegration.prototype.getStoreIntegration = getStoreIntegration;
 ExternalIntegration.prototype.refreshCatalog = refreshCatalog;
 ExternalIntegration.prototype.getDocsMarkdown = getDocsMarkdown;
 ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;

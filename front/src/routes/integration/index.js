@@ -37,6 +37,9 @@ const SIDEBAR_CATEGORY_MIN_INTEGRATIONS = 3;
 const KNOWN_CATEGORY_KEYS = new Set(catalogCategories.map(category => category.key));
 // a store integration is flagged as new during its first weeks in the index
 const NEW_BADGE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+// hundreds of community integrations: the cards are rendered by pages as the
+// user scrolls, not all at once (a multiple of the 2 and 3 columns of the grid)
+const CATALOG_PAGE_SIZE = 48;
 
 // missing or malformed date = "always been there": those cards sink to the
 // bottom of the "Newest first" sort and never wear the New badge
@@ -69,6 +72,12 @@ class Integration extends Component {
       integrations: [],
       integrationCategories: [],
       totalSize: 0,
+      visibleCount: CATALOG_PAGE_SIZE,
+      // the user the external lists were last loaded for: until they are, the
+      // catalog only knows the native integrations and must not pretend to be
+      // complete (see render)
+      externalLoadedForUserId: null,
+      externalStoreUnavailable: false,
       searchKeyword,
       orderDir,
       origin,
@@ -143,6 +152,7 @@ class Integration extends Component {
     // (to link their own account, like on the native Telegram service), but
     // never the store: installing is an admin gesture
     const isAdmin = user.role === USER_ROLE.ADMIN;
+    const userId = user.id;
     const [externalInstalledResponse, externalStoreResponse] = await Promise.all([
       // null and not []: a failed request means "unknown", not "nothing
       // installed". An empty array would be counted as zero integration to
@@ -150,16 +160,28 @@ class Integration extends Component {
       httpClient.get('/api/v1/external_integration').catch(() => null),
       isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
+    // the user changed while this load was in flight: the load started for
+    // the new one holds the lists to display, this one must not overwrite them
+    if (get(this.props, 'user.id') !== userId) {
+      return;
+    }
     await this.setState({
       // this list is reloaded on a user change and whenever the shared "to
       // update" counter moves: a failed reload must not erase what we already
       // know, or a network hiccup would make the installed cards, their menu
       // entry and their inventory count blink out until the next reload
       externalInstalled: externalInstalledResponse || this.state.externalInstalled || null,
-      externalStore: externalStoreResponse ? externalStoreResponse.integrations : []
+      externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
+      externalLoadedForUserId: userId,
+      // the server answers with its cached catalog when the store is down:
+      // only a catalog never downloaded (or a failed request) leaves the
+      // community integrations out, and the page says so
+      externalStoreUnavailable: isAdmin && !this.isStoreCatalogAvailable(externalStoreResponse)
     });
     this.getIntegrations();
   }
+
+  isStoreCatalogAvailable = storeResponse => !!storeResponse && storeResponse.refreshed_at !== null;
 
   // the server caches the store index, so a integration published since the
   // last refresh is invisible until the next periodic one: this forces the
@@ -181,6 +203,7 @@ class Integration extends Component {
       await this.setState({
         externalInstalled,
         externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
+        externalStoreUnavailable: !this.isStoreCatalogAvailable(externalStoreResponse),
         refreshStoreStale: !externalStoreResponse || externalStoreResponse.refreshed !== true,
         refreshStoreStatus: RequestStatus.Success
       });
@@ -511,7 +534,15 @@ class Integration extends Component {
     // every filter change, so the remembered view is always the current one
     rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir, origin, transports, gladysPlus }));
 
+    // a new view (category, search, sort, facets) starts back on its first
+    // page of cards; the same view recomputed (a favorite toggled, a status
+    // received, the store refreshed) keeps the cards already scrolled through
+    const catalogView = JSON.stringify({ category, searchKeyword, orderDir, origin, transports, gladysPlus });
+    const visibleCount = catalogView === this.state.catalogView ? this.state.visibleCount : CATALOG_PAGE_SIZE;
+
     this.setState({
+      catalogView,
+      visibleCount,
       integrations: selectedIntegrations,
       totalSize,
       integrationCategories,
@@ -570,6 +601,11 @@ class Integration extends Component {
     }
   };
 
+  // more cards as the user scrolls down the list
+  showMoreIntegrations = () => {
+    this.setState(prevState => ({ visibleCount: prevState.visibleCount + CATALOG_PAGE_SIZE }));
+  };
+
   search = async e => {
     const searchKeyword = e.target.value;
     await this.setState({ searchKeyword });
@@ -615,12 +651,26 @@ class Integration extends Component {
     // the store catalog is only loaded for admins (and its refresh route is
     // admin-only), so only they get the refresh control
     const showStoreRefresh = user.role === USER_ROLE.ADMIN;
+    // until the community integrations are loaded, the catalog only holds the
+    // native ones: counting or listing them alone would make Gladys look like
+    // it has a few dozen integrations while hundreds are on their way
+    const catalogLoading = !user.id || state.externalLoadedForUserId !== user.id;
+    // same rule for the sidebar: the categories computed from the native
+    // integrations alone are a partial list, entries would then be inserted
+    // in the middle of it once the store lands. Only the displayed one stays
+    // during the load; the others appear together with the complete catalog
+    const integrationCategories = catalogLoading
+      ? state.integrationCategories.filter(({ key }) => key === props.category)
+      : state.integrationCategories;
     // Combine props and state for the IntegrationPage
     const combinedProps = {
       ...props,
       ...state,
+      integrationCategories,
+      catalogLoading,
       showInstallFromGithub,
       showStoreRefresh,
+      showMoreIntegrations: this.showMoreIntegrations,
       search: this.search,
       changeOrderDir: this.changeOrderDir,
       toggleFavorite: this.toggleFavorite,

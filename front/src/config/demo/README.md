@@ -60,16 +60,19 @@ device of `home.js` rather than inventing a selector.
 ## The community integration store
 
 The catalog of external integrations is the one thing the demo does not invent.
-`store.js` downloads the public store index (`index.json`, rebuilt hourly by
-`GladysAssistant/integration-store`) — the very same file every Gladys instance
-downloads, so **the demo lists the integrations published right now**, with their
-covers, categories, GitHub stars and documentation. A snapshot committed here
-would be out of date the week after.
+`store.js` downloads the public lite store index (`index-lite.json`, rebuilt
+hourly by `GladysAssistant/integration-store`) — the very same file every Gladys
+instance downloads, so **the demo lists the integrations published right now**,
+with their covers, categories, GitHub stars and documentation. A snapshot
+committed here would be out of date the week after. The install page of one
+integration (and its simulated install) needs its complete manifest: the full
+`index.json` is downloaded then, like the server does.
 
-It is therefore the only request of the demo that leaves the browser. It is made
-only when the integrations page is opened, and a failure is not a bug: the last
-index downloaded is kept (empty if none ever was, and the page then shows the
-native integrations alone), exactly like an instance whose store is unreachable.
+These are therefore the only requests of the demo that leave the browser. They
+are made only when the integrations pages are opened, and a failure of the
+catalog is not a bug: the last index downloaded is kept (empty if none ever was,
+and the page then shows the native integrations alone, with its "store
+unreachable" warning), exactly like an instance whose store is unreachable.
 The refresh button reports `refreshed: false` when the download did not happen,
 so the page warns about a stale catalog instead of claiming a fresh one.
 

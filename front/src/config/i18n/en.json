@@ -980,8 +980,15 @@
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
       "subtitleTotal": "{{total}} integrations",
+      "loadingCatalog": "Loading the catalog…",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
+      "showMore": {
+        "one": "Show 1 more integration",
+        "other": "Show more integrations ({{count}} remaining)"
+      },
+      "storeUnavailable": "The community integration store could not be reached: only the native integrations and the ones already installed are shown.",
+      "storeUnavailableRetry": "Retry",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
       "noInstalledIntegrations": "No community integration is installed on this instance yet.",
       "installedSummary": {
@@ -1226,6 +1233,7 @@
       },
       "install": {
         "notFound": "This integration was not found in the store.",
+        "loadError": "This integration could not be loaded from the store. Check the internet connection of your Gladys and try again.",
         "starsLabel": "stars",
         "lastPushLabel": "Last update:",
         "warningTitle": "Community integration",
