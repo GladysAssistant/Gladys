@@ -221,6 +221,97 @@
   font-size: 1.25rem;
 }
 
+/* Loading placeholders of the catalog (IntegrationCatalogSkeleton): neutral
+   translucent tones, readable on the light, dark and glass themes alike */
+.skeleton {
+  display: block;
+  border-radius: 4px;
+  background: linear-gradient(
+    110deg,
+    rgba(98, 105, 118, 0.1) 8%,
+    rgba(98, 105, 118, 0.18) 18%,
+    rgba(98, 105, 118, 0.1) 33%
+  );
+  background-size: 200% 100%;
+  animation: catalogSkeletonShine 1.5s linear infinite;
+}
+
+/* the 800x534 ratio of the store covers (C.1), so the cards keep their
+   height when the real ones replace the placeholders */
+.skeletonCover {
+  width: 100%;
+  padding-bottom: 66.75%;
+  border-radius: 3px 3px 0 0;
+}
+
+.skeletonListImg {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.skeletonTitle {
+  height: 1.1rem;
+  width: 55%;
+  margin-bottom: 0.75rem;
+}
+
+.skeletonText {
+  height: 0.8rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.skeletonTextShort {
+  width: 70%;
+}
+
+.skeletonTag {
+  display: inline-block;
+  height: 1.25rem;
+  width: 5.5rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+}
+
+@keyframes catalogSkeletonShine {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+/* "Loading…" in the header, in place of the integration count */
+.loadingDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background-color: #467fcf;
+  vertical-align: middle;
+  animation: catalogLoadingPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes catalogLoadingPulse {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .loadingDot {
+    animation: none;
+  }
+}
+
+.loadMore {
+  margin-bottom: 1rem;
+}
+
 /* The toggle is a native button for its keyboard semantics, but it must look
    like the banner heading it replaces: only the chevron signals that it opens. */
 .gatewayBannerToggle,
@@ -312,9 +403,14 @@
   border-radius: 12px;
 }
 
-:global(.glass-theme) .externalCoverPlaceholder {
+:global(.glass-theme) .externalCoverPlaceholder,
+:global(.glass-theme) .skeletonCover {
   border-top-left-radius: var(--gl-radius-lg);
   border-top-right-radius: var(--gl-radius-lg);
+}
+
+:global(.glass-theme) .skeletonListImg {
+  border-radius: 12px;
 }
 
 /* The name of a catalog card is a link: it keeps the card's ink, the hover
