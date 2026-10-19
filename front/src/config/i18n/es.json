@@ -6618,6 +6618,11 @@
       "input-index": "Índice de importación de la red",
       "output-index": "Índice de exportación de la red"
     },
+    "thermal-energy-sensor": {
+      "shortCategoryName": "Sensor de energía térmica",
+      "power": "Potencia térmica",
+      "index": "Índice de calor suministrado"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Sensor de salida del hogar",
       "power": "Potencia de salida del hogar",

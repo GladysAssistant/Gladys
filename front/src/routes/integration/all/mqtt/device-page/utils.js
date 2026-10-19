@@ -479,10 +479,14 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
-  // grid-sensor and home-output-sensor share the exact same unit rule
-  // (instantaneous powers, incl. the signed grid power, in watt; cumulative
-  // meter indexes in kWh), so they are handled together.
-  if (category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR || category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR) {
+  // grid-sensor, home-output-sensor and thermal-energy-sensor share the exact
+  // same unit rule (instantaneous powers, incl. the signed grid power, in watt;
+  // cumulative meter indexes in kWh), so they are handled together.
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR
+  ) {
     if (typeof type === 'string' && (type.endsWith('-power') || type === 'power')) {
       return DEVICE_FEATURE_UNITS.WATT;
     }
@@ -567,7 +571,10 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
   }
 
-  if (category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR) {
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR
+  ) {
     if (typeof type === 'string' && (type.endsWith('-power') || type === 'power')) {
       return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
     }
@@ -1002,6 +1009,13 @@ export const getFeaturePreviewValue = (category, type) => {
       return 0;
     }
     return 12.3;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.THERMAL_ENERGY_SENSOR.POWER) {
+      return 3200;
+    }
+    return 15876;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {

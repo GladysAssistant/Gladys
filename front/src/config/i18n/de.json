@@ -6618,6 +6618,11 @@
       "input-index": "Netzbezugszähler",
       "output-index": "Netzeinspeisezähler"
     },
+    "thermal-energy-sensor": {
+      "shortCategoryName": "Wärmeenergiesensor",
+      "power": "Thermische Leistung",
+      "index": "Zähler gelieferte Wärme"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Hausausgangssensor",
       "power": "Leistung zum Haus",
