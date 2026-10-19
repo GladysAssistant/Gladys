@@ -76,6 +76,9 @@ const { getConnectionStatus } = require('./externalIntegration.getConnectionStat
 const { getOAuthAuthorizeUrl } = require('./externalIntegration.getOAuthAuthorizeUrl');
 const { relayOAuthCallback } = require('./externalIntegration.relayOAuthCallback');
 const { runAction } = require('./externalIntegration.runAction');
+const { aiChat } = require('./externalIntegration.aiChat');
+const { getAiProviders } = require('./externalIntegration.getAiProviders');
+const { setAiProvider } = require('./externalIntegration.setAiProvider');
 const { getContainerStartedAt } = require('./externalIntegration.getContainerStartedAt');
 const { runNetworkDiscoveryScan } = require('./networkDiscovery/networkDiscovery.runScan');
 const { scanUdpBroadcast } = require('./networkDiscovery/networkDiscovery.scanUdpBroadcast');
@@ -224,6 +227,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.stateRateLimits = new Map();
   // deviceExternalId -> { count, resetAt } rate limit on POST /camera/image
   this.cameraImageRateLimits = new Map();
+  // requests in flight per AI provider integration (service id -> count), see aiChat
+  this.aiChatInFlight = new Map();
   // serviceId -> timestamp of the last accepted weather freshness nudge
   this.weatherRefreshTimes = new Map();
   // serviceId -> last energy-calendar.refresh nudge (capabilities/energy-contracts.md)
@@ -350,6 +355,9 @@ ExternalIntegration.prototype.getConnectionStatus = getConnectionStatus;
 ExternalIntegration.prototype.getOAuthAuthorizeUrl = getOAuthAuthorizeUrl;
 ExternalIntegration.prototype.relayOAuthCallback = relayOAuthCallback;
 ExternalIntegration.prototype.runAction = runAction;
+ExternalIntegration.prototype.aiChat = aiChat;
+ExternalIntegration.prototype.getAiProviders = getAiProviders;
+ExternalIntegration.prototype.setAiProvider = setAiProvider;
 ExternalIntegration.prototype.getContainerStartedAt = getContainerStartedAt;
 ExternalIntegration.prototype.runNetworkDiscoveryScan = runNetworkDiscoveryScan;
 ExternalIntegration.prototype.scanUdpBroadcast = scanUdpBroadcast;
