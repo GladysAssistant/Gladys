@@ -198,13 +198,7 @@ async function create(device) {
           const keepHistoryBeforeUpdate = deviceFeature.keep_history;
           const featureToUpdate = { ...feature };
           delete featureToUpdate.selector;
-          // The states (DEVICE_FEATURE_STATE_COLUMNS) are written by device.saveState and the
-          // aggregation jobs, never by a save. A caller saving a device sends back the features it
-          // read earlier (the MQTT device page posts the whole device just to append one feature):
-          // letting them through rolled every existing feature back to the value the client had in
-          // hand — null for a feature that had not received anything yet when the page was loaded.
-          // They are only accepted when the feature is created, so an integration can declare a
-          // first value along with a brand new feature (lan-manager does it for presence).
+          // A save never writes the states of an existing feature (see DEVICE_FEATURE_STATE_COLUMNS)
           DEVICE_FEATURE_STATE_COLUMNS.forEach((column) => {
             delete featureToUpdate[column];
           });

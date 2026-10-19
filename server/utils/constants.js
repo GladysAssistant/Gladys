@@ -2308,9 +2308,13 @@ const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {
 
 // Columns of t_device_feature holding the current STATE of a feature, not its definition: they are
 // written by device.saveState / device.saveStringState and by the aggregation jobs, never by a device
-// save. device.create ignores them on a feature that already exists, and the frontend leaves them out
-// of the device it posts back: a camera image alone (camera/image, up to 150 kB of base64) would push
-// the save past the 100 kB JSON bound of the API.
+// save. device.create ignores them on a feature that already exists: a caller saving a device sends back
+// the features it read earlier (the MQTT device page posts the whole device just to append one feature),
+// and letting them through rolled every existing feature back to the value the client had in hand. They
+// are only accepted when the feature is created, so an integration can declare a first value along with
+// a brand new feature (lan-manager does it for presence). The frontend leaves them out of the device it
+// posts back (stripDeviceStatesForSave): a camera image alone (camera/image, up to 150 kB of base64)
+// would push the save past the 100 kB JSON bound of the API.
 const DEVICE_FEATURE_STATE_COLUMNS = [
   'last_value',
   'last_value_string',

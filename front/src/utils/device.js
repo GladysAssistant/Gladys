@@ -82,8 +82,10 @@ const getDeviceName = (device, feature) => {
  * @description Copy of a device without the states of its saved features, to post to POST /api/v1/device.
  * A device read from the API carries the last value of each feature, and a camera image is up to 150 kB
  * of base64: posted back as is, it pushed the save past the 100 kB JSON bound of the API (413). The
- * server never writes those columns from a save on an existing feature anyway (device.create). A
- * feature without an id is new: the first value it declares is kept, the server stores it.
+ * server never writes those columns from a save on an existing feature anyway (device.create).
+ * A feature that carries an id is treated as saved and its states are dropped. A new feature that needs to
+ * declare a first value must be sent without a client-side id (the server stores the first value of a
+ * feature it creates).
  * @param {object} device - The device to save.
  * @returns {object} The device to post.
  * @example
