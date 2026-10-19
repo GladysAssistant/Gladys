@@ -980,8 +980,15 @@
       "title": "Integraciones",
       "subtitle": "{{length}} de {{total}} integraciones",
       "subtitleTotal": "{{total}} integraciones",
+      "loadingCatalog": "Cargando el catálogo…",
       "searchPlaceholder": "Buscar una integración",
       "noIntegrations": "No se encontró ninguna integración",
+      "showMore": {
+        "one": "Mostrar 1 integración más",
+        "other": "Mostrar más integraciones ({{count}} restantes)"
+      },
+      "storeUnavailable": "No se pudo acceder a la tienda de integraciones de la comunidad: solo se muestran las integraciones nativas y las ya instaladas.",
+      "storeUnavailableRetry": "Reintentar",
       "allIntegrationsUpToDate": "Todas sus integraciones están actualizadas.",
       "noInstalledIntegrations": "Aún no hay ninguna integración de la comunidad instalada en esta instancia.",
       "installedSummary": {
@@ -1226,6 +1233,7 @@
       },
       "install": {
         "notFound": "Esta integración no se encontró en la tienda.",
+        "loadError": "No se pudo cargar esta integración desde la tienda. Compruebe la conexión a internet de su Gladys e inténtelo de nuevo.",
         "starsLabel": "estrellas",
         "lastPushLabel": "Última actualización:",
         "warningTitle": "Integración de la comunidad",
