@@ -314,6 +314,14 @@ describe('Device.newStateEvent', () => {
     newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:artwork');
     expect(newDeviceFeature).to.have.property('last_value_string', '');
   });
+  it('should swallow a failing save, logging it', async () => {
+    const stateManager = new StateManager(event);
+    seedMusicFeature(stateManager, 'title');
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    device.saveStringState = sinon.fake.rejects(new Error('db is down'));
+    await device.newStateEvent({ device_feature_external_id: 'music:title', text: 'Blue in Green' });
+    sinon.assert.calledOnce(device.saveStringState);
+  });
   it('should not save state missing device feature', async () => {
     const stateManager = new StateManager(event);
     const device = new Device(event, {}, stateManager, {}, {}, {}, job);

@@ -94,7 +94,7 @@ async function relayMusicCommand(service, type, payload) {
   } catch (e) {
     throw toMusicHttpError(e);
   } finally {
-    this.musicCommandsInFlight.set(service.id, (this.musicCommandsInFlight.get(service.id) || 1) - 1);
+    this.musicCommandsInFlight.set(service.id, this.musicCommandsInFlight.get(service.id) - 1);
   }
 }
 

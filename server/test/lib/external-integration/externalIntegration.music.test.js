@@ -316,6 +316,17 @@ describe('externalIntegration music', () => {
       expect(await first).to.equal(await second);
     });
 
+    it('should translate a pull failure that is not an image refusal, without the refusal log', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedMusicService();
+      const warn = sinon.stub(logger, 'warn');
+      externalIntegration.sendCommand = fake.rejects(new ExternalIntegrationUnavailableError('Sonos: no such track'));
+      const error = await externalIntegration.getMusicArtwork(service, player('art-now'), 'art-now').catch((e) => e);
+      expect(error).to.be.instanceOf(Error400);
+      expect(error.error).to.equal('Sonos: no such track');
+      sinonAssert.notCalled(warn);
+    });
+
     it('should not cache an artwork pulled before a lifecycle clear', async () => {
       const { externalIntegration } = buildSupervisor();
       const service = await seedMusicService();
