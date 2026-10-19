@@ -89,14 +89,18 @@ async function preview(params) {
       throw new BadParameters(`${key}: must be a YYYY-MM-DD date`);
     }
   });
-  // the history kept is the one the contract keeps, widened to the window: the preview prices
-  // the window even when it starts before the contract
-  const windowFrom = getLocalContext(from.getTime(), timezone).date;
-  const windowTo = getLocalContext(to.getTime(), timezone).date;
-  const tariff = validateContractTariff(params.tariff, params.inputs, pricingMode, {
-    valid_from: params.valid_from && params.valid_from < windowFrom ? params.valid_from : windowFrom,
-    valid_to: params.valid_to && params.valid_to > windowTo ? params.valid_to : windowTo,
-  });
+  // the history kept is the one the contract keeps, plus the window's: the preview prices the
+  // window even when it lies outside the contract (`to` is exclusive)
+  const windows = [
+    {
+      valid_from: getLocalContext(from.getTime(), timezone).date,
+      valid_to: getLocalContext(to.getTime() - 1, timezone).date,
+    },
+  ];
+  if (params.valid_from) {
+    windows.push({ valid_from: params.valid_from, valid_to: params.valid_to || undefined });
+  }
+  const tariff = validateContractTariff(params.tariff, params.inputs, pricingMode, windows);
   const billingPeriodStartDay =
     params.billing_period_start_day === undefined || params.billing_period_start_day === null
       ? 1

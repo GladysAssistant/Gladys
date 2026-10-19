@@ -88,7 +88,7 @@ function isValidTimezone(timezone) {
  * @param {object} tariff - Tariff definition.
  * @param {object} inputs - Template inputs to substitute.
  * @param {string} pricingMode - `rules` or `delegated`.
- * @param {object} [validity] - `{ valid_from, valid_to }` of the contract.
+ * @param {object|Array<object>} [validity] - `{ valid_from, valid_to }` of the contract (or several windows).
  * @returns {object} The normalized tariff (inputs substituted, history outside the validity dropped).
  * @example
  * validateContractTariff({ tariff_version: 1, components: [] }, {}, 'delegated');

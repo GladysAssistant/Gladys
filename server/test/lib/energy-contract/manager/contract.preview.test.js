@@ -119,6 +119,23 @@ describe('energyContract: preview and current price', () => {
         valid_to: '2026-12-31',
       });
       expect(longer.components).to.deep.equal({ energy: 12, 'subscription-2025': 0 });
+      // a past contract (the earlier of successive contracts): its own history and the window's,
+      // never the years in between
+      const past = await energyContract.preview({
+        tariff,
+        from: '2026-01-12T00:00:00Z',
+        to: '2026-01-13T00:00:00Z',
+        valid_from: '2006-01-01',
+        valid_to: '2010-12-31',
+      });
+      expect(Object.keys(past.components)).to.deep.equal([
+        'energy',
+        'subscription-2006',
+        'subscription-2007',
+        'subscription-2008',
+        'subscription-2009',
+        'subscription-2010',
+      ]);
       await expect(
         energyContract.preview({
           tariff,
@@ -127,6 +144,19 @@ describe('energyContract: preview and current price', () => {
           valid_from: '2006-01-01',
         }),
       ).to.be.rejectedWith('tariff.components: must contain less than or equal to 16 items');
+    });
+
+    it('should keep only the window history without contract dates, its end being exclusive', async () => {
+      const tariff = {
+        tariff_version: 1,
+        components: [
+          { key: 'energy', kind: 'consumption', fallback: { price: 0.2 } },
+          { key: 'subscription', kind: 'fixed', amount: 10, per: 'month', when: { dates: { from: '2026-01-12' } } },
+          { key: 'next', kind: 'fixed', amount: 10, per: 'month', when: { dates: { from: '2026-01-13' } } },
+        ],
+      };
+      const result = await energyContract.preview({ tariff, from: '2026-01-12T00:00:00Z', to: '2026-01-13T00:00:00Z' });
+      expect(Object.keys(result.components)).to.deep.equal(['energy', 'subscription']);
     });
 
     it('should use a synthetic profile when the meter has no data, and defaults for the window', async () => {

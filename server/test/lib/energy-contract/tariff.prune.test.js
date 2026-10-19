@@ -66,6 +66,23 @@ describe('energy-contract pruneTariffToValidity', () => {
     ]);
   });
 
+  it('should keep the parts overlapping one of several windows', () => {
+    const tariff = {
+      tariff_version: 1,
+      components: [
+        { key: 'energy', kind: 'consumption', fallback: { price: 0.2 } },
+        { key: 'sub-2008', kind: 'fixed', amount: 10, per: 'month', when: dated('2008-01-01', '2008-12-31') },
+        { key: 'sub-2015', kind: 'fixed', amount: 10, per: 'month', when: dated('2015-01-01', '2015-12-31') },
+        { key: 'sub-2026', kind: 'fixed', amount: 10, per: 'month', when: dated('2026-01-01') },
+      ],
+    };
+    const pruned = pruneTariffToValidity(tariff, [
+      { valid_from: '2006-01-01', valid_to: '2010-12-31' },
+      { valid_from: '2026-01-12', valid_to: '2026-01-12' },
+    ]);
+    expect(pruned.components.map((c) => c.key)).to.deep.equal(['energy', 'sub-2008', 'sub-2026']);
+  });
+
   it('should return the tariff itself when nothing is outside the validity or it is malformed', () => {
     const tariff = {
       tariff_version: 1,

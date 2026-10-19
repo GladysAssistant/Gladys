@@ -29,14 +29,15 @@ function isOutsideValidity(when, validFrom, validTo) {
 }
 
 /**
- * @description Drop the consumption rules and the components whose `dates` condition does not
- * overlap the validity window: they can never match an interval the contract prices, so the
+ * @description Drop the consumption rules and the components whose `dates` condition overlaps
+ * none of the validity windows: they can never match an interval the contract prices, so the
  * prices are unchanged. A tax loses the components removed from its `applies_to`, and is
  * removed with them when none is left. The tariff is returned unchanged when nothing is dated
- * outside the window or when it is malformed (the validation reports it).
+ * outside the windows or when it is malformed (the validation reports it).
  * @param {object} tariff - Tariff definition, inputs substituted.
- * @param {object} [validity] - `{ valid_from, valid_to }` local dates, each one open when absent.
- * @returns {object} The tariff without the dated parts outside the window.
+ * @param {object|Array<object>} [validity] - `{ valid_from, valid_to }` local dates, each one open
+ * when absent, or several such windows (a part is kept when it overlaps one of them).
+ * @returns {object} The tariff without the dated parts outside the windows.
  * @example
  * pruneTariffToValidity(tariff, { valid_from: '2026-10-01' });
  */
@@ -44,8 +45,8 @@ function pruneTariffToValidity(tariff, validity = {}) {
   if (!isObject(tariff) || !Array.isArray(tariff.components)) {
     return tariff;
   }
-  const { valid_from: validFrom, valid_to: validTo } = validity;
-  const outside = (when) => isOutsideValidity(when, validFrom, validTo);
+  const windows = Array.isArray(validity) ? validity : [validity];
+  const outside = (when) => windows.every((window) => isOutsideValidity(when, window.valid_from, window.valid_to));
   const removed = new Set();
   let changed = false;
   const components = tariff.components.reduce((kept, component) => {
