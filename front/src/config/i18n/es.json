@@ -1051,7 +1051,18 @@
         "openRawLink": "Abrir en una pestaña nueva"
       },
       "config": {
+        "aiProviderActive": "Esta integración es el proveedor de IA del asistente: las conversaciones con el asistente se le envían.",
+        "aiProviderInactive": "Esta integración está instalada pero el asistente aún no la utiliza: selecciónela como proveedor de IA de la instancia para que el chat, las acciones «Preguntar a la IA» de las escenas y el resumen semanal pasen por ella en lugar de Gladys Plus.",
+        "aiProviderUseButton": "Usar como proveedor de IA",
+        "aiProviderSettingsLink": "Abrir los ajustes de la IA",
+        "aiProviderError": "No se pudo cambiar el proveedor de IA de la instancia. Inténtelo de nuevo.",
+        "aiProviderLoadError": "No se pudo leer el proveedor de IA de la instancia.",
+        "aiProviderChecking": "Comprobando si esta integración es el proveedor de IA del asistente…",
         "title": "Configuración",
+        "ttsVoiceActive": "Esta integración es la voz de su instancia: los anuncios de las escenas y las respuestas del asistente de voz pasan por ella.",
+        "ttsVoiceActiveNotRunning": "Esta integración es la voz de su instancia, pero no está en ejecución: los anuncios de las escenas y las respuestas del asistente de voz fallarán hasta que se reinicie.",
+        "ttsVoiceInactive": "Esta integración no es la voz de su instancia (la voz activa es \"{{name}}\"). Instalarla no basta: selecciónela como voz para usarla.",
+        "ttsVoiceChangeLink": "Cambiar la voz de la instancia",
         "docsLink": "Documentación",
         "loadError": "Ocurrió un error al cargar la configuración.",
         "noConfig": "Esta integración no tiene opciones de configuración.",
@@ -1130,6 +1141,9 @@
         "uninstallWarning": "¿Está seguro de que desea desinstalar esta integración? Se eliminarán su contenedor y su configuración. Los dispositivos creados por esta integración permanecerán en Gladys hasta que usted los elimine.",
         "uninstallCalendarWarning": "¿Está seguro de que desea desinstalar esta integración? Se eliminarán su contenedor y su configuración, y los calendarios que creó se eliminarán con sus eventos para todos los usuarios del hogar, no solo los suyos.",
         "uninstallEnergyWarning": "Esta integración calcula por sí misma el coste de contratos de energía: los contratos que tarifica dejarán de calcularse una vez desinstalada (sus costes existentes se conservan).",
+        "uninstallAiProviderWarning": "Esta integración es el proveedor de IA del asistente: una vez desinstalada, el asistente vuelve a Gladys Plus (o deja de responder hasta que haya un proveedor disponible, sin Gladys Plus).",
+        "uninstallAiProviderUnknownWarning": "Gladys no pudo comprobar si esta integración es el proveedor de IA del asistente: si lo es, el asistente vuelve a Gladys Plus una vez desinstalada (o deja de responder hasta que haya un proveedor disponible, sin Gladys Plus).",
+        "uninstallAiProviderCheckingWarning": "Comprobando si esta integración es el proveedor de IA del asistente…",
         "confirmUninstallButton": "Sí, desinstalar",
         "cancelUninstallButton": "Cancelar",
         "startedAtLabel": "En ejecución desde"
@@ -1239,6 +1253,8 @@
         "notificationWarningText": "Esta integración es un canal de notificación: podrá enviarle mensajes, pero nunca podrá recibir mensajes ni actuar en su nombre (garantía del lado del servidor).",
         "weatherInfoText": "Esta integración es un proveedor meteorológico: una vez instalada, proporcionará el clima que se muestra en Gladys (widget del panel y asistente).",
         "calendarInfoText": "Esta integración es un proveedor de calendarios: una vez instalada, creará calendarios y eventos en Gladys para los usuarios que la activen con su propia cuenta.",
+        "ttsInfoText": "Esta integración es un proveedor de síntesis de voz: una vez instalada, selecciónela como la voz de su instancia en la integración Inteligencia Artificial. Los anuncios se sirven en su red local: los altavoces y navegadores de la misma red pueden reproducirlos.",
+        "ttsInfoLink": "Abrir la integración Inteligencia Artificial",
         "widgetsTitle": "Widgets del panel",
         "widgetsText": "Esta integración proporciona los siguientes widgets, disponibles para todos los usuarios en el editor del panel:",
         "energyContractsTitle": "Contratos de energía",
@@ -1248,6 +1264,7 @@
         "energyContractsDelegatedText": "Una plantilla calculada por la integración calcula por sí misma sus costes de energía: los costes de estos contratos solo se calculan mientras la integración está en funcionamiento, y dejan de calcularse si se desinstala.",
         "providerInfoText": "Esta integración no gestiona ningún dispositivo: proporciona widgets para el panel. Configúrela aquí y luego añada sus widgets desde el editor del panel.",
         "providerEnergyInfoText": "Esta integración no gestiona ningún dispositivo: proporciona plantillas de contratos de energía y calendarios tarifarios. Configúrela aquí y luego elija sus contratos desde la página de seguimiento energético.",
+        "aiWarningText": "Esta integración es un proveedor de IA: si un administrador la selecciona como proveedor de IA de la instancia (Integraciones → Inteligencia artificial → Proveedor de IA, o el botón de la pantalla de configuración de esta integración), recibirá todas las conversaciones con el asistente (mensajes, historial, estados de los dispositivos devueltos por las herramientas, imágenes del chat), y sus respuestas dirigirán las acciones del asistente en su hogar.",
         "sceneDeclarationsTitle": "Activadores y acciones de escenas",
         "sceneDeclarationsText": "Esta integración añade {{triggers}} activador(es) y {{actions}} acción(es) al editor de escenas.",
         "sceneTriggerPrefix": "Activador:",
@@ -3281,6 +3298,7 @@
       "documentation": "Documentación de IA",
       "description": "Otorgue a Gladys el poder de la inteligencia artificial.",
       "firstExplanation": "Gladys puede utilizar la inteligencia artificial (modelos de IA de pesos abiertos a través de Gladys Plus) para ayudarle a comunicarse con su hogar conectado.",
+      "firstExplanationExternalProvider": "Gladys utiliza la inteligencia artificial para ayudarle a comunicarse con su hogar conectado. En esta instancia, el asistente pasa por la integración de proveedor de IA «{{name}}» seleccionada por un administrador, en lugar de Gladys Plus: las conversaciones con el asistente se le envían.",
       "examplesIntro": "Esto es lo que puede hacer con la IA:",
       "examplesChatTitle": "En el chat de Gladys",
       "examplesChatHint": "Acciones disponibles: luces e interruptores por habitación, cámaras, escenas, temperatura, humedad y el clima.",
@@ -3312,6 +3330,20 @@
         "downloadButton": "Descargar contexto JSON para depuración",
         "error": "No se pudo generar el contexto de depuración. Asegúrese de que el servicio MCP esté en ejecución."
       },
+      "aiProvider": {
+        "activeNotice": "El asistente utiliza actualmente el proveedor de IA «{{name}}»: las conversaciones con el asistente se le envían.",
+        "title": "Proveedor de IA",
+        "description": "Gladys utiliza Gladys Plus como proveedor de IA por defecto. Puede hacer pasar el asistente (chat, enrutamiento de intenciones, acciones «Preguntar a la IA» de las escenas, resumen semanal) por una integración de proveedor de IA instalada: Claude, DeepSeek, OpenAI, un modelo local... Los ajustes propios del proveedor (clave de API, modelo) están en la página de su integración.",
+        "selectLabel": "Proveedor utilizado para las solicitudes de IA",
+        "gladysPlusOption": "Gladys Plus (por defecto)",
+        "trustWarning": "Todas las conversaciones con el asistente (mensajes, historial, estados de los dispositivos devueltos por las herramientas, imágenes del chat) se envían a este proveedor, y sus respuestas dirigen las acciones del asistente en su hogar. Si el proveedor no está disponible, las solicitudes de IA fallan: nunca se redirigen a Gladys Plus.",
+        "noProvider": "No hay ninguna integración de proveedor de IA instalada. Instale una desde el catálogo de integraciones para usar otro proveedor distinto de Gladys Plus.",
+        "loadError": "No se pudieron cargar los ajustes del proveedor de IA.",
+        "retry": "Reintentar",
+        "saveError": "No se pudo guardar el proveedor de IA. Inténtelo de nuevo.",
+        "providerNotRunning": "Esta integración de proveedor de IA no está en ejecución: las solicitudes de IA fallarán hasta que se inicie.",
+        "providerNotRunningLink": "Abrir la página de la integración"
+      },
       "weeklyDigest": {
         "title": "Resumen semanal del hogar",
         "description": "Gladys le envía un resumen semanal de su hogar conectado: confort, energía, mantenimiento y consejos útiles.",
@@ -3331,7 +3363,17 @@
       },
       "rateLimit": "Dado que la API de IA no es gratuita, esta integración está limitada a 3000 solicitudes de texto y 500 solicitudes de imagen al mes por cuenta.",
       "notOnGladysPlus": "Dado que la API de IA no es gratuita, esta integración solo está disponible para los usuarios de Gladys Plus.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus.",
+      "ttsProvider": "Voz (proveedor de síntesis de voz)",
+      "ttsProviderText": "El proveedor utilizado para hablar: los anuncios de las escenas en sus altavoces y las respuestas del asistente de voz. Gladys Plus funciona en todas partes (incluido el acceso remoto); una integración de proveedor TTS genera la voz localmente y la sirve en su red local.",
+      "ttsProviderPlusNotConnected": "Gladys Plus no está conectado: los anuncios y las respuestas de voz no se reproducirán.",
+      "ttsProviderPlusSettingsLink": "Conectar Gladys Plus",
+      "ttsProviderPlusNotConnectedOr": "o instale una integración de síntesis de voz y selecciónela aquí:",
+      "ttsProviderNotRunning": "\"{{name}}\" no está en ejecución: los anuncios y las respuestas de voz fallarán hasta que se reinicie.",
+      "ttsProviderUnavailable": "El proveedor seleccionado \"{{provider}}\" ya no está disponible: seleccione otra voz.",
+      "ttsProviderInstallHint": "Solo Gladys Plus está disponible. Una integración de síntesis de voz del catálogo puede generar la voz localmente, sin suscripción.",
+      "ttsProviderOpenIntegration": "Abrir la integración",
+      "ttsProviderBrowseCatalog": "Explorar las integraciones de asistentes de voz"
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -3754,6 +3796,7 @@
       },
       "askAi": {
         "description": "Esta acción enviará un mensaje a la IA a través de Gladys Plus y le responderá con un mensaje. Si adjunta una imagen de cámara, la IA podrá ver lo que aparece en la imagen e incluso actuar en consecuencia.",
+        "descriptionExternalProvider": "Esta acción enviará un mensaje al proveedor de IA «{{name}}» seleccionado en los ajustes de la IA y le responderá con un mensaje. Si adjunta una imagen de cámara, la IA podrá ver lo que aparece en la imagen e incluso actuar en consecuencia.",
         "userLabel": "Gladys responderá a",
         "cameraLabel": "Adjuntar una imagen de cámara (opcional)",
         "textLabel": "Mi pregunta para la IA",
@@ -4003,6 +4046,7 @@
       },
       "playNotification": {
         "description": "Esta acción hará que Gladys hable en el altavoz seleccionado.",
+        "voiceSettingLink": "Elegir la voz de su instancia (integración Inteligencia Artificial)",
         "deviceLabel": "Altavoz",
         "volumeLabel": "Volumen",
         "valueTypeSimple": "Simple",
@@ -5213,6 +5257,8 @@
     },
     "tts": {
       "title": "Esta acción requiere Gladys Plus",
+      "providerTitle": "Esta acción necesita una voz",
+      "providerCompactDescription": "Gladys Plus da a Gladys una voz natural que funciona en todas partes, incluido el acceso remoto. Sin suscripción, también puede instalar una integración de síntesis de voz y seleccionarla como la voz de su instancia.",
       "description": "La acción \"Reproducir en un altavoz\" utiliza las API de conversión de texto a voz a través de Gladys Plus para que Gladys hable en sus altavoces (Sonos, Google Cast, etc.) con una voz natural.",
       "compactDescription": "Esta acción utiliza las API de conversión de texto a voz a través de Gladys Plus.",
       "feature1": "Voces naturales y multilingües",

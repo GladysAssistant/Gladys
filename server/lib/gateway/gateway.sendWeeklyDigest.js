@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const fs = require('fs');
 const path = require('path');
 
@@ -39,15 +40,21 @@ async function sendWeeklyDigest({ force = false } = {}) {
     }
   }
 
-  const status = await this.getStatus();
-  if (!status.configured) {
-    logger.debug('Weekly digest skipped: Gladys Plus is not configured.');
-    return { sent: 0 };
-  }
+  // the digest follows the selected AI provider through aiChat: with an
+  // external provider (capabilities/ai-type.md) it needs no Gladys Plus
+  // account, and a paused Plus subscription does not gate it either
+  const aiProviderSelector = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+  if (!aiProviderSelector) {
+    const status = await this.getStatus();
+    if (!status.configured) {
+      logger.debug('Weekly digest skipped: Gladys Plus is not configured.');
+      return { sent: 0 };
+    }
 
-  if (status.subscription_active === false) {
-    logger.info('Weekly digest skipped: Gladys Plus subscription is not paid.');
-    return { sent: 0 };
+    if (status.subscription_active === false) {
+      logger.info('Weekly digest skipped: Gladys Plus subscription is not paid.');
+      return { sent: 0 };
+    }
   }
 
   if (!this.device || !this.scene) {
@@ -63,38 +70,39 @@ async function sendWeeklyDigest({ force = false } = {}) {
   const digestData = await this.buildWeeklyDigestData();
   let sent = 0;
 
-  await Promise.all(
-    admins.map(async (admin) => {
-      try {
-        const apiResponse = await this.aiChat({
-          messages: [
-            { role: 'system', content: WEEKLY_DIGEST_PROMPT },
-            {
-              role: 'user',
-              content: `Language: ${admin.language}\n\nHome data JSON:\n${JSON.stringify(digestData)}`,
-            },
-          ],
-          max_tokens: 800,
-          purpose: AI_CHAT_PURPOSES.WEEKLY_DIGEST,
-        });
+  // one AI request at a time: an external provider caps its requests in
+  // flight (capabilities/ai-type.md) and a digest is not time-critical, so
+  // the admins' digests never compete with each other nor with the chat
+  await Promise.mapSeries(admins, async (admin) => {
+    try {
+      const apiResponse = await this.aiChat({
+        messages: [
+          { role: 'system', content: WEEKLY_DIGEST_PROMPT },
+          {
+            role: 'user',
+            content: `Language: ${admin.language}\n\nHome data JSON:\n${JSON.stringify(digestData)}`,
+          },
+        ],
+        max_tokens: 800,
+        purpose: AI_CHAT_PURPOSES.WEEKLY_DIGEST,
+      });
 
-        const digestText = extractAssistantText(apiResponse);
-        if (!digestText) {
-          logger.warn(`Weekly digest empty for user ${admin.selector}`);
-          return;
-        }
-
-        await this.message.sendSystemMessage(admin.selector, digestText, null, { messageType: 'notification' });
-        sent += 1;
-      } catch (e) {
-        if (e instanceof Error429) {
-          logger.warn('Weekly digest skipped: AI rate limit reached.');
-          return;
-        }
-        logger.warn(`Weekly digest failed for user ${admin.selector}`, e);
+      const digestText = extractAssistantText(apiResponse);
+      if (!digestText) {
+        logger.warn(`Weekly digest empty for user ${admin.selector}`);
+        return;
       }
-    }),
-  );
+
+      await this.message.sendSystemMessage(admin.selector, digestText, null, { messageType: 'notification' });
+      sent += 1;
+    } catch (e) {
+      if (e instanceof Error429) {
+        logger.warn('Weekly digest skipped: AI rate limit reached.');
+        return;
+      }
+      logger.warn(`Weekly digest failed for user ${admin.selector}`, e);
+    }
+  });
 
   return { sent };
 }

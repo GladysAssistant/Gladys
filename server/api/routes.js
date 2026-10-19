@@ -19,6 +19,7 @@ const ExternalIntegrationController = require('./controllers/externalIntegration
 const IntegrationHostController = require('./controllers/integrationHost.controller');
 const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
+const TtsController = require('./controllers/tts.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 const EnergyPriceController = require('./controllers/energy-price.controller');
@@ -47,6 +48,7 @@ function getRoutes(gladys) {
   const pingController = PingController();
   const gatewayController = GatewayController(gladys);
   const roomController = RoomController(gladys);
+  const ttsController = TtsController(gladys);
   const variableController = VariableController(gladys);
   const sessionController = SessionController(gladys);
   const serviceController = ServiceController(gladys);
@@ -469,8 +471,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
     },
+    // raw completion proxy, the debug-context replay path: with an external
+    // AI provider it reaches a personal API key or a host model with no
+    // bound on the outbound payload, so it is an admin tool like the
+    // debug context itself. Household chat goes through message.create
     'post /api/v1/gateway/aichat/chat': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.aiChat,
     },
     'get /api/v1/gateway/aichat/debug-context': {
@@ -500,6 +507,25 @@ function getRoutes(gladys) {
     'post /api/v1/gateway/tts': {
       authenticated: true,
       controller: gatewayController.getTtsUrl,
+    },
+    // tts (docs/specs/external-integrations/capabilities/tts-type.md)
+    'get /api/v1/tts/provider': {
+      // non-admin read: the scene editor uses it to stop showing the
+      // Gladys Plus upsell when another provider is active
+      authenticated: true,
+      controller: ttsController.getProviderConfiguration,
+    },
+    'post /api/v1/tts/provider': {
+      authenticated: true,
+      admin: true,
+      controller: ttsController.setActiveProvider,
+    },
+    'get /api/v1/tts/audio/:token': {
+      // unauthenticated by design: fetched by LAN speakers (Sonos
+      // trackUri...) that cannot send a JWT — the high-entropy token
+      // minted by gladys.tts.getSpeechUrl is the secret
+      authenticated: false,
+      controller: ttsController.getAudio,
     },
     'post /api/v1/gateway/refresh-latest-gladys-version': {
       authenticated: true,
@@ -585,6 +611,19 @@ function getRoutes(gladys) {
     'get /api/v1/external_integration': {
       authenticated: true,
       controller: externalIntegrationController.getAll,
+    },
+    // AI provider selection (external integrations of type "ai" can serve
+    // the assistant instead of Gladys Plus): read is authenticated (the
+    // chat hides its model selector when an external provider is active),
+    // write is an admin gesture
+    'get /api/v1/ai_provider': {
+      authenticated: true,
+      controller: externalIntegrationController.getAiProvider,
+    },
+    'post /api/v1/ai_provider': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.setAiProvider,
     },
     'get /api/v1/external_integration/store': {
       authenticated: true,

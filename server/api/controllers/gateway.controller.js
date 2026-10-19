@@ -177,9 +177,13 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/aichat/chat Ask the Gladys Plus AI chat
+   * @api {post} /api/v1/gateway/aichat/chat Ask the AI backend (debug replay, admin)
    * @apiName aiChat
    * @apiGroup Gateway
+   * @apiDescription Raw OpenAI-compatible completion against the selected AI
+   * backend (Gladys Plus or the external AI provider), meant to replay the
+   * payload of the debug context. Admin-only: the household chat goes
+   * through message.create and the MCP tool-calling loop.
    */
   async function aiChat(req, res) {
     const response = await gladys.gateway.aiChat(req.body);
