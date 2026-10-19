@@ -34,6 +34,7 @@ export const ACTION_ICON = {
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
+  [ACTIONS.MUSIC.PLAY_MEDIA]: 'fe fe-play-circle',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
   [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
@@ -94,7 +95,13 @@ export const ACTION_CATEGORIES = [
   {
     key: 'messages',
     color: 'pink',
-    items: [ACTIONS.MESSAGE.SEND, ACTIONS.MESSAGE.SEND_CAMERA, ACTIONS.SMS.SEND, ACTIONS.MUSIC.PLAY_NOTIFICATION]
+    items: [
+      ACTIONS.MESSAGE.SEND,
+      ACTIONS.MESSAGE.SEND_CAMERA,
+      ACTIONS.SMS.SEND,
+      ACTIONS.MUSIC.PLAY_NOTIFICATION,
+      ACTIONS.MUSIC.PLAY_MEDIA
+    ]
   },
   {
     key: 'conditions',

@@ -1,0 +1,280 @@
+/* The music box: a "now playing" block (artwork, titles, progress), a transport row, the
+   volume, and two optional panels (queue, catalog). Light colors only: dark mode comes from
+   the app-wide inversion filter. */
+
+.nowPlaying {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.nowPlayingArtwork {
+  flex: 0 0 5rem;
+  width: 5rem;
+}
+
+.nowPlayingText {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitle {
+  font-size: 0.8125rem;
+  color: #667081;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stateLabel {
+  font-size: 0.75rem;
+  color: #667081;
+}
+
+/* --- artwork frames (now playing and list thumbnails) --- */
+
+.artworkFrame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: rgba(0, 40, 100, 0.06);
+}
+
+.artworkImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.artworkPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667081;
+  font-size: 1.5rem;
+}
+
+/* --- progress --- */
+
+.progress {
+  margin-top: 0.75rem;
+}
+
+.progressTrack {
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.1);
+  overflow: hidden;
+  cursor: default;
+}
+
+.progressTrackSeekable {
+  cursor: pointer;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  background-color: var(--gl-accent, #3d6df0);
+  transition: width 0.25s linear;
+}
+
+.progressTimes {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #667081;
+  margin-top: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- transport --- */
+
+.transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.transportButton {
+  min-width: 2.75rem;
+}
+
+.transportActive {
+  color: var(--gl-accent, #3d6df0);
+}
+
+.volumeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.volumeRow input[type='range'] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* --- panels --- */
+
+.panelTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.panel {
+  margin-top: 0.75rem;
+}
+
+.panelMessage {
+  font-size: 0.8125rem;
+  margin: 0.5rem 0;
+}
+
+.searchField {
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  min-width: 0;
+}
+
+.breadcrumbTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loadMore {
+  margin-top: 0.5rem;
+}
+
+.mediaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.mediaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 8px;
+}
+
+.mediaItemCurrent {
+  background-color: rgba(61, 109, 240, 0.1);
+}
+
+.mediaItemMain {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  min-height: 2.75rem;
+  background: none;
+  border: 0;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.mediaItemMain:disabled {
+  cursor: default;
+}
+
+.mediaItemArtwork {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  border-radius: 6px;
+}
+
+.mediaItemText {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mediaItemTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mediaItemSubtitle {
+  font-size: 0.75rem;
+  color: #667081;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mediaItemDuration {
+  font-size: 0.75rem;
+  color: #667081;
+  font-variant-numeric: tabular-nums;
+}
+
+.mediaItemChevron {
+  color: #667081;
+}
+
+.mediaItemPick {
+  font-size: 0.75rem;
+  color: var(--gl-accent, #3d6df0);
+  font-weight: 600;
+}
+
+.mediaItemSecondary {
+  flex: 0 0 auto;
+}
+
+/* Touch targets: the list rows and the progress track reach the 44px floor on fingers */
+@media (pointer: coarse) {
+  .mediaItemMain {
+    min-height: 2.75rem;
+  }
+
+  .progressTrack {
+    height: 0.75rem;
+  }
+}

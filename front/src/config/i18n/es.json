@@ -1,4 +1,12 @@
 {
+  "musicMediaTypes": {
+    "track": "Pista",
+    "album": "Álbum",
+    "artist": "Artista",
+    "playlist": "Lista de reproducción",
+    "radio": "Radio",
+    "folder": "Carpeta"
+  },
   "global": {
     "logoAlt": "Logo de Gladys",
     "needHelpText": "¿Necesita ayuda? Únase a nosotros en <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
@@ -752,7 +760,32 @@
         "cancelAlarmArming": "Cancelar"
       },
       "music": {
-        "selectDeviceLabel": "Seleccionar dispositivo a controlar"
+        "selectDeviceLabel": "Seleccionar dispositivo a controlar",
+        "nothingPlaying": "Nada en reproducción",
+        "unknownTrack": "Pista desconocida",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "play": "Reproducir",
+        "pause": "Pausa",
+        "shuffle": "Aleatorio",
+        "repeat": "Repetir",
+        "mute": "Silencio",
+        "volume": "Volumen",
+        "queue": "Cola",
+        "browse": "Explorar",
+        "search": "Buscar",
+        "searchPlaceholder": "Buscar una pista, un álbum, una lista…",
+        "back": "Atrás",
+        "close": "Cerrar",
+        "playItem": "Reproducir",
+        "playNext": "Reproducir a continuación",
+        "addToQueue": "Añadir a la cola",
+        "emptyQueue": "La cola está vacía",
+        "noResults": "Sin resultados",
+        "loading": "Cargando…",
+        "loadMore": "Cargar más",
+        "unavailable": "La integración no está disponible. Se muestra el último estado conocido.",
+        "error": "Algo salió mal."
       },
       "voice-assistant": {
         "speak": "Hablar",
@@ -4049,6 +4082,19 @@
         "variablesExplanation": "Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta.",
         "messagePlaceholder": "Mi mensaje"
       },
+      "playMedia": {
+        "description": "Esta acción iniciará el contenido seleccionado en el reproductor elegido.",
+        "deviceLabel": "Reproductor",
+        "mediaLabel": "Contenido a reproducir",
+        "selectedMedia": "Selección",
+        "changeMedia": "Cambiar",
+        "noMedia": "Aún no hay contenido seleccionado: explore o busque en el catálogo del reproductor.",
+        "unsupported": "Este reproductor no ofrece catálogo: elija otro reproductor.",
+        "modeLabel": "Modo",
+        "modeReplace": "Reproducir ahora (sustituye la reproducción actual)",
+        "modeNext": "Reproducir a continuación",
+        "modeAppend": "Añadir al final de la cola"
+      },
       "playNotification": {
         "description": "Esta acción hará que Gladys hable en el altavoz seleccionado.",
         "voiceSettingLink": "Elegir la voz de su instancia (integración Inteligencia Artificial)",
@@ -4148,7 +4194,8 @@
         "send": "Enviar mensaje Zigbee2mqtt"
       },
       "music": {
-        "play-notification": "Hablar en un altavoz"
+        "play-notification": "Hablar en un altavoz",
+        "play-media": "Reproducir música en un altavoz"
       },
       "ai": {
         "ask": "Preguntar a la IA"
@@ -4190,7 +4237,8 @@
         "send": "Enviar un mensaje de texto a un teléfono"
       },
       "music": {
-        "play-notification": "Leer un texto en voz alta en un altavoz"
+        "play-notification": "Leer un texto en voz alta en un altavoz",
+        "play-media": "Iniciar una pista, un álbum, una lista o una radio en un altavoz"
       },
       "condition": {
         "if-then-else": "Seguir una ruta diferente según una condición",
@@ -5722,6 +5770,13 @@
           "mop": "Fregar"
         }
       },
+      "music": {
+        "repeat": {
+          "off": "Desactivado",
+          "all": "Todo",
+          "one": "Una pista"
+        }
+      },
       "water-heater": {
         "mode": {
           "off": "Apagado",
@@ -6029,7 +6084,14 @@
       "music": {
         "playback_state": {
           "0": "En pausa",
-          "1": "Reproduciendo"
+          "1": "Reproduciendo",
+          "2": "Detenido",
+          "3": "Cargando"
+        },
+        "repeat": {
+          "0": "Desactivado",
+          "1": "Todo",
+          "2": "Una pista"
         }
       },
       "opening-sensor": {
@@ -6814,7 +6876,16 @@
       "previous": "Botón anterior",
       "next": "Botón siguiente",
       "playback_state": "Estado de reproducción",
-      "play_notification": "Difundir una notificación"
+      "play_notification": "Difundir una notificación",
+      "title": "Título de la pista",
+      "artist": "Artista",
+      "album": "Álbum",
+      "artwork": "Carátula",
+      "duration": "Duración de la pista",
+      "position": "Posición de reproducción",
+      "shuffle": "Reproducción aleatoria",
+      "repeat": "Modo de repetición",
+      "mute": "Silencio"
     },
     "lock": {
       "shortCategoryName": "Cerradura",

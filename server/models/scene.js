@@ -5,6 +5,8 @@ const {
   EVENTS,
   EVENT_LIST,
   ALARM_MODES_LIST,
+  MUSIC_MEDIA_TYPES,
+  MUSIC_PLAY_MODES,
   TRIGGER_OPERATORS,
   COMPARISON_OPERATORS,
   ANY_CHANGE_OPERATOR,
@@ -15,6 +17,9 @@ const {
   MAX_SCENE_DECLARATION_FIELDS,
 } = require('../lib/external-integration/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
+
+const MUSIC_MEDIA_TYPES_LIST = Object.values(MUSIC_MEDIA_TYPES);
+const MUSIC_PLAY_MODES_LIST = Object.values(MUSIC_PLAY_MODES);
 const iconList = require('../config/icons.json');
 
 // Values of the trigger filters / action parameters of an integration-declared
@@ -119,6 +124,20 @@ const actionSchema = Joi.object()
       evaluate_value: Joi.string(),
     }),
     alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
+    // music.play-media: the media reference picked from the player's catalog (the id is
+    // what plays, the title is display only) and the play mode
+    media: Joi.object().keys({
+      id: Joi.string()
+        .max(512)
+        .required(),
+      type: Joi.string()
+        .valid(...MUSIC_MEDIA_TYPES_LIST)
+        .required(),
+      title: Joi.string()
+        .max(200)
+        .allow(''),
+    }),
+    mode: Joi.string().valid(...MUSIC_PLAY_MODES_LIST),
     topic: Joi.string(),
     message: Joi.string().allow(''),
     blinking_time: Joi.number(),

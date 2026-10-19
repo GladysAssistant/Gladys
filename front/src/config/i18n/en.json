@@ -1,4 +1,12 @@
 {
+  "musicMediaTypes": {
+    "track": "Track",
+    "album": "Album",
+    "artist": "Artist",
+    "playlist": "Playlist",
+    "radio": "Radio",
+    "folder": "Folder"
+  },
   "global": {
     "logoAlt": "Gladys logo",
     "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
@@ -752,7 +760,32 @@
         "cancelAlarmArming": "Cancel"
       },
       "music": {
-        "selectDeviceLabel": "Select device to control"
+        "selectDeviceLabel": "Select device to control",
+        "nothingPlaying": "Nothing playing",
+        "unknownTrack": "Unknown track",
+        "previous": "Previous",
+        "next": "Next",
+        "play": "Play",
+        "pause": "Pause",
+        "shuffle": "Shuffle",
+        "repeat": "Repeat",
+        "mute": "Mute",
+        "volume": "Volume",
+        "queue": "Queue",
+        "browse": "Browse",
+        "search": "Search",
+        "searchPlaceholder": "Search a track, an album, a playlist…",
+        "back": "Back",
+        "close": "Close",
+        "playItem": "Play",
+        "playNext": "Play next",
+        "addToQueue": "Add to queue",
+        "emptyQueue": "The queue is empty",
+        "noResults": "No result",
+        "loading": "Loading…",
+        "loadMore": "Load more",
+        "unavailable": "The integration is unavailable. The last known state is shown.",
+        "error": "Something went wrong."
       },
       "voice-assistant": {
         "speak": "Speak",
@@ -4049,6 +4082,19 @@
         "variablesExplanation": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
       },
+      "playMedia": {
+        "description": "This action will start the selected media on the selected player.",
+        "deviceLabel": "Player",
+        "mediaLabel": "Media to play",
+        "selectedMedia": "Selected",
+        "changeMedia": "Change",
+        "noMedia": "No media selected yet: browse or search the catalog of the player below.",
+        "unsupported": "This player exposes no catalog: pick another player.",
+        "modeLabel": "Mode",
+        "modeReplace": "Play now (replaces the current playback)",
+        "modeNext": "Play next",
+        "modeAppend": "Add to the end of the queue"
+      },
       "playNotification": {
         "description": "This action will make Gladys speak on the selected speaker.",
         "voiceSettingLink": "Choose the voice of your instance (Artificial Intelligence integration)",
@@ -4148,7 +4194,8 @@
         "send": "Send Zigbee2mqtt Message"
       },
       "music": {
-        "play-notification": "Talk on a speaker"
+        "play-notification": "Talk on a speaker",
+        "play-media": "Play music on a speaker"
       },
       "ai": {
         "ask": "Ask AI"
@@ -4190,7 +4237,8 @@
         "send": "Send a text message to a phone"
       },
       "music": {
-        "play-notification": "Read a text out loud on a speaker"
+        "play-notification": "Read a text out loud on a speaker",
+        "play-media": "Start a track, an album, a playlist or a radio on a speaker"
       },
       "condition": {
         "if-then-else": "Follow a different path depending on a condition",
@@ -5722,6 +5770,13 @@
           "mop": "Mop"
         }
       },
+      "music": {
+        "repeat": {
+          "off": "Off",
+          "all": "All",
+          "one": "One track"
+        }
+      },
       "water-heater": {
         "mode": {
           "off": "Off",
@@ -6029,7 +6084,14 @@
       "music": {
         "playback_state": {
           "0": "Paused",
-          "1": "Playing"
+          "1": "Playing",
+          "2": "Stopped",
+          "3": "Buffering"
+        },
+        "repeat": {
+          "0": "Off",
+          "1": "All",
+          "2": "One track"
         }
       },
       "opening-sensor": {
@@ -6814,7 +6876,16 @@
       "previous": "Music previous button",
       "next": "Music next button",
       "playback_state": "Music playback state",
-      "play_notification": "Broadcast a notification"
+      "play_notification": "Broadcast a notification",
+      "title": "Track title",
+      "artist": "Artist",
+      "album": "Album",
+      "artwork": "Artwork",
+      "duration": "Track duration",
+      "position": "Playback position",
+      "shuffle": "Shuffle",
+      "repeat": "Repeat mode",
+      "mute": "Mute"
     },
     "lock": {
       "shortCategoryName": "Lock",
