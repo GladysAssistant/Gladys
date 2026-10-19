@@ -176,6 +176,10 @@ const ConfigTab = props => {
                     oauthUseInstanceRedirect={props.oauthUseInstanceRedirect}
                     toggleOAuthUseInstanceRedirect={props.toggleOAuthUseInstanceRedirect}
                     connectOAuth={props.connectOAuth}
+                    disconnectOAuth={props.disconnectOAuth}
+                    oauthDisconnectStatuses={props.oauthDisconnectStatuses}
+                    oauthDisconnectErrorIds={props.oauthDisconnectErrorIds}
+                    connectionStatus={connectionStatus}
                     selector={props.selector || get(integration, 'selector')}
                     dynamicOptions={props.dynamicOptions}
                     placeholderPorts={placeholderPorts}

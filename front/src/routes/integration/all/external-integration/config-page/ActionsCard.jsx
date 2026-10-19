@@ -43,9 +43,12 @@ const ActionsCard = ({
         const running = actionState.status === RequestStatus.Getting;
         const description = getLocalizedText(action.description, language);
         const touchedSecrets = getActionTouchedSecrets(action);
+        const label = getLocalizedText(action.label, language);
         return (
           <div class={cx({ 'mb-5': index < actions.length - 1 })}>
-            <h4>{getLocalizedText(action.label, language) || action.key}</h4>
+            {/* every action keeps its heading: it separates the actions and
+                lists them for screen-reader heading navigation */}
+            <h4>{label || action.key}</h4>
             {description && <p class={cx('text-muted small', integrationText.integrationText)}>{description}</p>}
             {(action.fields || []).map(field => (
               <ConfigField
@@ -69,7 +72,8 @@ const ActionsCard = ({
               onClick={() => runAction(action)}
             >
               <i class="fe fe-play mr-1" />
-              <Text id="integration.externalIntegration.actions.runButton" />
+              {/* the button says what it does; the raw key is never a label */}
+              {label || <Text id="integration.externalIntegration.actions.runButton" />}
             </button>
             {/* the result is a scroll container (its length is whatever the
                 integration decided to return): tabIndex makes it focusable,
