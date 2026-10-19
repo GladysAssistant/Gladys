@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv, transformWithEsbuild } from 'vite';
+import { defineConfig, loadEnv, transformWithOxc } from 'vite';
 import preact from '@preact/preset-vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { patchCssModules } from 'vite-css-modules';
@@ -27,10 +27,12 @@ function treatJsFilesAsJsx() {
         return null;
       }
 
-      return transformWithEsbuild(code, id, {
-        loader: 'jsx',
-        jsx: 'automatic',
-        jsxImportSource: 'preact'
+      return transformWithOxc(code, id, {
+        lang: 'jsx',
+        jsx: {
+          runtime: 'automatic',
+          importSource: 'preact'
+        }
       });
     }
   };
@@ -66,9 +68,10 @@ export default defineConfig(({ mode }) => {
     preact(),
     viteStaticCopy({
       targets: [
-        // Copy static asset contents into build/assets/ (not build/assets/assets/).
-        { src: 'src/assets/**/*', dest: 'assets' },
-        { src: 'src/manifest.json', dest: '.' }
+        // The directory structure is preserved: strip `src/assets/` so files land
+        // in build/assets/<sub-folder>/ (not build/assets/src/assets/).
+        { src: 'src/assets/**/*', dest: 'assets', rename: { stripBase: 2 } },
+        { src: 'src/manifest.json', dest: '.', rename: { stripBase: true } }
       ]
     })
   ];
@@ -115,12 +118,10 @@ export default defineConfig(({ mode }) => {
       // discover it, and a dependency discovered after startup makes the dev server
       // reload every open page (breaks Cypress runs).
       include: ['@preact/async-loader/async.js'],
-      esbuildOptions: {
-        loader: {
+      rolldownOptions: {
+        moduleTypes: {
           '.js': 'jsx'
-        },
-        jsx: 'automatic',
-        jsxImportSource: 'preact'
+        }
       }
     },
     build: {
@@ -130,8 +131,20 @@ export default defineConfig(({ mode }) => {
       // tablets (Safari 13 / old Chromium webviews) keep working.
       target: ['es2019', 'chrome79', 'edge79', 'firefox72', 'safari13'],
       sourcemap: true,
-      rollupOptions: {
+      cssMinify: 'esbuild',
+      rolldownOptions: {
         output: {
+          codeSplitting: {
+            groups: [
+              {
+                // Rolldown moves modules shared with lazy routes into their own chunk, whose CSS is
+                // linked before index.css: keep the theme, the global styles and the dashboard
+                // overrides together so the dashboard overrides still come after Tabler.
+                name: 'app-styles',
+                test: /(@gladysassistant\/theme-optimized\/|\/src\/style\/|\/src\/routes\/dashboard\/style\.css)/
+              }
+            ]
+          },
           chunkFileNames: chunkInfo => {
             // Name route chunks after their route path (like preact-cli did),
             // e.g. src/routes/dashboard/index.js -> assets/route-dashboard.chunk.<hash>.js
@@ -143,15 +156,7 @@ export default defineConfig(({ mode }) => {
             return 'assets/[name].chunk.[hash].js';
           }
         }
-      },
-      commonjsOptions: {
-        include: [/node_modules/, /server\//],
-        transformMixedEsModules: true
       }
-    },
-    esbuild: {
-      jsx: 'automatic',
-      jsxImportSource: 'preact'
     }
   };
 });
