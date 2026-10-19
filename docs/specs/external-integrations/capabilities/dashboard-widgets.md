@@ -278,7 +278,7 @@ Dev mode: with `DEBUG=gladys-integration-sdk`, the SDK validates every content i
 ## 12. Frontend rendering
 
 - **One component**, `front/src/components/boxs/external-widget/`, renders every integration widget: a standard card (title = box `name` or the widget label), natural height, no stretch flag, the Horizon glass variant composed on `.glass-theme` like every widget. Inside, the five slots of the canonical order (section 5) and nothing else: no layout logic reads the content.
-- **Button icon colors**: in the Horizon theme, danger icons use the button's red text color and active device-button icons use its green text color, including active primary buttons. The theme accent must not override this semantic ink. Inactive primary buttons keep white icons. This applies in light and dark mode.
+- **Button icon colors**: semantic button icons inherit the button's text color; the Horizon accent applies only to neutral button icons. Active device state takes precedence over the declared style (including `primary` and `danger`): text and icons use green ink on a green-tinted background; inactive danger buttons use red ink, and inactive primary buttons keep white ink. These are the light-mode colors. In dark mode, the page filter inverts danger and active colors into dark-mode tints, with no extra inversion on their buttons or icons; inactive primary buttons alone counter-invert to preserve their accent fill and white ink. Icons therefore continue to match their labels, not necessarily the literal light-mode red/green.
 - **States**, each translated by the core in every language, driven first by the integration status (from the widget list, live via `STATUS_CHANGED`) and only then by the content request:
 
   | Integration status | The card |
