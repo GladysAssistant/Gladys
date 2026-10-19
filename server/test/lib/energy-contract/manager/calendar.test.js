@@ -270,8 +270,8 @@ describe('energyContract: tariff calendars', () => {
       expect(emitted.firstCall.args[0].from.toISOString()).to.equal('2026-01-11T23:00:00.000Z');
       // within the window: merged into a deferred run, keeping the earliest change
       const state = energyContract.calendarRecalculations.get('tempo');
-      // the window ends in 1 s: room for the two publications below on a loaded CI runner
-      state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 1000;
+      // the window ends in 500 ms: room for the two publications below on a loaded CI runner
+      state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 500;
       await energyContract.publishCalendarEntries('tempo', [{ date: '2026-01-13', value: 'white' }], {
         provider_service_id: TEST_SERVICE_ID,
       });

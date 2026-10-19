@@ -30,8 +30,8 @@ describe('energyContract.requestMeterRecalculation', () => {
     expect(clearCache.callCount).to.equal(1);
     // within the window: merged into one deferred run, keeping the earliest instant
     const state = energyContract.meterRecalculations.get(METER_DEVICE_ID);
-    // the window ends in 1 s: room for the three requests below on a loaded CI runner
-    state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 1000;
+    // the window ends in 500 ms: room for the three requests below on a loaded CI runner
+    state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 500;
     await energyContract.requestMeterRecalculation(METER_DEVICE_ID, new Date('2026-01-13T05:30:00Z'));
     // a later instant never pushes the pending one forward
     await energyContract.requestMeterRecalculation(METER_DEVICE_ID, new Date('2026-01-14T05:30:00Z'));
