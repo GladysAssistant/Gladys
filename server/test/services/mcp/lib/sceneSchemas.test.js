@@ -59,6 +59,58 @@ describe('sceneSchemas helpers', () => {
     expect(result.success).to.equal(false);
   });
 
+  it('should accept user locations with fixed coordinates and scene variables', () => {
+    const schema = createSceneCreateInputSchema([], ['john']);
+    const actions = [
+      [{ type: ACTIONS.USER.SET_LOCATION, user: 'john', latitude: -90, longitude: 180 }],
+      [{ type: ACTIONS.USER.SET_LOCATION, user: 'john', latitude: 90, longitude: -180 }],
+      [{ type: ACTIONS.USER.SET_LOCATION, user: 'john', latitude: 0, longitude: -73.98 }],
+      [
+        {
+          type: ACTIONS.USER.SET_LOCATION,
+          user: 'john',
+          latitude: '{{0.0.value}}',
+          longitude: '{{triggerEvent.data.longitude}}',
+        },
+      ],
+    ];
+    const result = schema.safeParse({
+      name: 'Location',
+      icon: 'map-pin',
+      triggers: [{ type: 'system.start' }],
+      actions,
+    });
+    expect(result.success).to.equal(true);
+    expect(result.data.actions).to.deep.equal(actions);
+  });
+
+  it('should reject invalid user location action fields', () => {
+    const schema = createSceneCreateInputSchema([], ['john']);
+    [
+      { user: 'unknown' },
+      { user: undefined },
+      { latitude: undefined },
+      { longitude: null },
+      { latitude: true },
+      { latitude: 90.01 },
+      { latitude: -90.01 },
+      { longitude: 180.01 },
+      { longitude: -180.01 },
+      { latitude: 'x'.repeat(1001) },
+      { unknown_property: 'nope' },
+    ].forEach((invalid) => {
+      const action = { type: ACTIONS.USER.SET_LOCATION, user: 'john', latitude: 48.1, longitude: 11.2, ...invalid };
+      expect(
+        schema.safeParse({
+          name: 'Location',
+          icon: 'map-pin',
+          triggers: [{ type: 'system.start' }],
+          actions: [[action]],
+        }).success,
+      ).to.equal(false);
+    });
+  });
+
   it('should flatten nested scene actions and ignore invalid entries', () => {
     expect(flattenSceneActions(null)).to.deep.equal([]);
     expect(flattenSceneActions('invalid')).to.deep.equal([]);

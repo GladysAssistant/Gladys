@@ -18,6 +18,7 @@ export const ACTION_ICON = {
   [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
   [ACTIONS.USER.SET_OUT_OF_HOME]: 'fe fe-log-out',
+  [ACTIONS.USER.SET_LOCATION]: 'fe fe-map-pin',
   [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
   [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-user-check',
   [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
@@ -122,7 +123,12 @@ export const ACTION_CATEGORIES = [
   {
     key: 'homeSecurity',
     color: 'orange',
-    items: [ACTIONS.ALARM.SET_ALARM_MODE, ACTIONS.USER.SET_SEEN_AT_HOME, ACTIONS.USER.SET_OUT_OF_HOME]
+    items: [
+      ACTIONS.ALARM.SET_ALARM_MODE,
+      ACTIONS.USER.SET_SEEN_AT_HOME,
+      ACTIONS.USER.SET_OUT_OF_HOME,
+      ACTIONS.USER.SET_LOCATION
+    ]
   },
   {
     key: 'advanced',

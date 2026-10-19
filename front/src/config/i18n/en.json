@@ -525,12 +525,16 @@
         "thresholdsLabel": "Configure custom thresholds"
       },
       "userPresence": {
-        "description": "Display who's at home and who is not. You can change the user presence in scenes, and select here the users displayed.",
-        "left": "Left ({{since}})",
+        "description": "Display who's at home and who is not. You can change the user presence in scenes, and select here the users displayed. Leave the selection empty to display all users.",
+        "away": "Away",
+        "since": "for {{duration}}",
+        "showLastname": "Show last names",
+        "showAwaySince": "Show time away",
+        "showHomeSince": "Show time at home",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
         "error": "There was a network error fetching the list of user. Please refresh.",
-        "emptyText": "There are no users selected. You can edit this box to select the users to display."
+        "emptyText": "No users match the selection. Edit this box to select users, or leave the selection empty to display everyone."
       },
       "camera": {
         "editCameraLabel": "Select the camera you want to display here.",
@@ -3940,6 +3944,14 @@
         "userSeenDescription": "This action set the user as \"at home\".",
         "userLeftHomeDescription": "This action set the user as \"left home\"."
       },
+      "setUserLocation": {
+        "description": "Save a user's GPS coordinates and check area entry and exit. Home/away status is managed separately by scenes.",
+        "latitude": "Latitude (−90 to 90)",
+        "longitude": "Longitude (−180 to 180)",
+        "latitudePlaceholder": "e.g. 48.137154",
+        "longitudePlaceholder": "e.g. 11.576124",
+        "variablesHint": "Enter a coordinate or type {{ to choose a trigger or previous-action variable. Use a decimal point."
+      },
       "checkUserPresence": {
         "description": "When this action is executed, Gladys checks if one of the selected device was seen at home in the last X minutes. If one of the device was seen, the action does nothing more. If no device was seen, the user is marked as \"left home\".",
         "userLabel": "User",
@@ -4122,6 +4134,7 @@
       "user": {
         "set-seen-at-home": "User seen at home",
         "set-out-of-home": "User left home",
+        "set-location": "Set a user's location",
         "check-presence": "Check user presence"
       },
       "http": {
@@ -4201,7 +4214,8 @@
       "user": {
         "check-presence": "Mark a user as away if they haven't been seen recently",
         "set-seen-at-home": "Tell Gladys a user is at home",
-        "set-out-of-home": "Tell Gladys a user has left home"
+        "set-out-of-home": "Tell Gladys a user has left home",
+        "set-location": "Save GPS coordinates from fixed values or scene variables"
       },
       "house": {
         "is-empty": "Only continue if nobody is home",

@@ -84,6 +84,8 @@ const getActionSummary = (action, dictionary) => {
     case ACTIONS.USER.SET_OUT_OF_HOME:
     case ACTIONS.USER.CHECK_PRESENCE:
       return joinParts([action.user, action.house]);
+    case ACTIONS.USER.SET_LOCATION:
+      return joinParts([action.user, action.latitude, action.longitude]);
     case ACTIONS.DEVICE.GET_VALUE:
       return truncate(action.device_feature);
     case ACTIONS.DEVICE.SET_VALUE: {

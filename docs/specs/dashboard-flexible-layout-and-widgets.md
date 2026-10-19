@@ -120,6 +120,20 @@ The **outermost cards of every wrap line stay flush** with the page content thro
 
 **Empty columns are editor scaffolding, not spacers — the viewer skips them.** A column with no widget renders nothing in the viewer and does not count in the weight total: the filled columns share the section on their weights alone (`2|1|1` with the wide column empty renders as an equal `1|1`). Rendering empty columns only produced holes in the middle of a row and, once the row wrapped, orphan cards pushed out of place (the field report behind this rule). This is a **deliberate contract choice with no migration**: a dashboard that used an empty column as a spacer reflows on its next view — holes are not a layout primitive in Gladys ("beautiful by default"), and spacing between sections is the section gap's job. The editor keeps rendering empty columns at their share, since they must stay visible, editable and droppable.
 
+### A.6 User-presence widget
+
+The `user-presence` widget displays all users when `users` is omitted or an empty array; a nonempty selection filters by user selector. Clearing the editor's selection therefore restores all users, including after save/reload. A user is home when `current_house_id` is set (any house). The badge contains only the status; the time since the last house change appears on a separate, muted, right-aligned line below it.
+
+Optional box fields (no migration; omitted fields use the defaults below):
+
+| Field | Default | Meaning |
+| --- | --- | --- |
+| `presence_show_lastname` | `false` | Append the user's last name when available. |
+| `presence_show_home_since` | `false` | Show the time since arrival beneath the home badge. |
+| `presence_show_away_since` | `true` | Show the time since departure beneath the away badge. |
+
+Both time lines use the existing `last_house_changed` timestamp, update every minute and on presence WebSocket messages, and are omitted when the timestamp is missing. An away user with no known house change keeps the localized “Never Seen At Home” badge; toggling duration visibility does not invent a timestamp or change that status. German uses “seit 7 Stunden”, not “seit vor 7 Stunden”, with the correct dative for singular units and days/months/years. Other languages use their own localized duration wrapper. Status labels are fixed localized text, not user-configurable, and wrap rather than overflow narrow widgets; the status group can move below the name on narrow cards. The editor exposes all three options and previews them using the same widget as the viewer.
+
 ## B. New box type: `chips`
 
 A **full-width bar of compact pills**, each pill summarizing one state with an automatic icon and color. One chips box replaces what would otherwise be a pathological "7-column section". Boxes have no span field: a chips bar takes the full dashboard width by living in its own **1-column section**, which is the intended composition.
