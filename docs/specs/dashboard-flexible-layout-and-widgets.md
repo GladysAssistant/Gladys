@@ -124,6 +124,8 @@ The **outermost cards of every wrap line stay flush** with the page content thro
 
 The `user-presence` widget displays all users when `users` is omitted or an empty array; a nonempty selection filters by user selector. Clearing the editor's selection therefore restores all users, including after save/reload. A user is home when `current_house_id` is set (any house). The badge contains only the status; the time since the last house change appears on a separate, muted, right-aligned line below it.
 
+The editor's user picker appends the unique selector when users share a first name, independently of the last-name display option. Selected values remain user selectors; unique first names keep their existing labels.
+
 Optional box fields (no migration; omitted fields use the defaults below):
 
 | Field | Default | Meaning |

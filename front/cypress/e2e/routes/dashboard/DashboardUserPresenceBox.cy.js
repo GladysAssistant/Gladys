@@ -130,26 +130,43 @@ describe('Dashboard user presence box', () => {
       .should('not.exist');
   });
 
-  it('shows all users when the selection is cleared and preserves explicit selections on reload', () => {
+  it('distinguishes matching first names, persists the selected user and shows everyone when cleared', () => {
+    const sharedNameUsers = users.map(user => (user.selector === 'stefan' ? { ...user, firstname: 'Alina' } : user));
+    cy.intercept('GET', '**/api/v1/user', sharedNameUsers);
+    cy.intercept(
+      'GET',
+      '**/api/v1/user?fields=firstname,lastname,role,selector,picture,current_house_id,last_house_changed',
+      sharedNameUsers
+    ).as('sharedNamePresenceUsers');
+    cy.reload();
+    cy.wait('@sharedNamePresenceUsers');
     cy.get('@presence')
       .find('li')
       .should('have.length', 3);
     cy.get('[data-cy="edit-dashboard-button"]').click();
     cy.get('[data-cy="edit-box-0-0"]').click();
     cy.get('[data-cy="edit-panel"] .react-select__control').click();
-    cy.contains('.react-select__option', 'Alina').click({ scrollBehavior: false });
+    cy.contains('.react-select__option', 'Alina (alina)').should('be.visible');
+    cy.contains('.react-select__option', 'Unknown').should('be.visible');
+    cy.contains('.react-select__option', 'Alina (stefan)').click({ scrollBehavior: false });
     cy.get('@presence')
       .find('li')
       .should('have.length', 1)
-      .and('contain', 'Alina');
+      .find('.badge')
+      .should('have.text', labels().atHome);
     cy.contains('button', 'dashboard.editDashboardSaveButton').click();
     cy.get('[data-cy="dashboard-saved-label"]').should('be.visible');
+    cy.request({ method: 'GET', url: `${Cypress.env('serverUrl')}/api/v1/dashboard/${selector}` }).then(({ body }) => {
+      expect(body.boxes[0].columns[0][0].users).to.deep.equal(['stefan']);
+    });
     cy.reload();
     cy.get('@presence')
       .find('li')
       .should('have.length', 1)
-      .and('contain', 'Alina');
+      .find('.badge')
+      .should('have.text', labels().atHome);
     cy.get('[data-cy="edit-box-0-0"]').click();
+    cy.get('[data-cy="edit-panel"] .react-select__multi-value__label').should('have.text', 'Alina (stefan)');
     cy.get('[data-cy="edit-panel"] .react-select__clear-indicator').click();
     cy.get('@presence')
       .find('li')
@@ -162,7 +179,6 @@ describe('Dashboard user presence box', () => {
       .should('have.length', 3);
     cy.get('@presence')
       .should('contain', 'Alina')
-      .and('contain', 'Stefan')
       .and('contain', 'Unknown');
   });
 
