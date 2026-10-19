@@ -1,6 +1,6 @@
 import get from 'get-value';
 import { RequestStatus, LoginStatus } from '../../utils/consts';
-import { validateEmail } from '../../utils/validator';
+import { validateEmail, cleanEmail } from '../../utils/validator';
 import { ERROR_MESSAGES } from '../../../../server/utils/constants';
 import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
@@ -48,9 +48,8 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
-      // phone keyboards may add a space after the email: the Gladys Plus
-      // client trims and lower-cases it before logging in
-      if (!validateEmail((state.gatewayLoginEmail || '').trim())) {
+      const email = cleanEmail(state.gatewayLoginEmail);
+      if (!validateEmail(email)) {
         return store.setState({
           gatewayLoginStatus: LoginStatus.WrongEmailError
         });
@@ -60,10 +59,7 @@ function createActions(store) {
         gatewayLoginError: null
       });
       try {
-        const gatewayLoginResults = await state.session.gatewayClient.login(
-          state.gatewayLoginEmail,
-          state.gatewayLoginPassword
-        );
+        const gatewayLoginResults = await state.session.gatewayClient.login(email, state.gatewayLoginPassword);
         if (gatewayLoginResults.two_factor_token) {
           store.setState({
             gatewayLoginResults,
@@ -100,7 +96,7 @@ function createActions(store) {
       // silently with the credentials still in memory, so they only have to
       // enter a fresh code from their app to finalize the connection.
       const gatewayLoginResults = await state.session.gatewayClient.login(
-        state.gatewayLoginEmail,
+        cleanEmail(state.gatewayLoginEmail),
         state.gatewayLoginPassword
       );
       store.setState({

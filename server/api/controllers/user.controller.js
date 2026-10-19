@@ -202,10 +202,10 @@ module.exports = function UserController(gladys) {
       await gladys.message.sendToUser(user.selector, text);
       await gladys.message.sendToUser(user.selector, secret);
     } catch (e) {
-      logger.error(`Error while sending forgot password message to user ${req.body.email}:`, e);
+      logger.error(`Error while sending forgot password message to user ${user.email}:`, e);
     }
     // Always log the secret so an admin can still recover it if messaging fails.
-    logger.info(`Forgot password initiated for user ${req.body.email}, ${method} = ${secret}`);
+    logger.info(`Forgot password initiated for user ${user.email}, ${method} = ${secret}`);
     res.json({
       success: true,
     });

@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { normalizeEmail } = require('../../utils/email');
+const { BadParameters } = require('../../utils/coreErrors');
 
 describe('normalizeEmail', () => {
   it('should lower case the email', () => {
@@ -8,8 +9,8 @@ describe('normalizeEmail', () => {
   it('should remove surrounding spaces', () => {
     expect(normalizeEmail('  tony.stark@gladysassistant.com ')).to.equal('tony.stark@gladysassistant.com');
   });
-  it('should return a value which is not a string untouched', () => {
-    expect(normalizeEmail(undefined)).to.equal(undefined);
-    expect(normalizeEmail(null)).to.equal(null);
+  it('should reject a value which is not a string', () => {
+    expect(() => normalizeEmail(undefined)).to.throw(BadParameters, 'Email must be a string');
+    expect(() => normalizeEmail(['demo@demo.com', 'Demo@Demo.com'])).to.throw(BadParameters);
   });
 });

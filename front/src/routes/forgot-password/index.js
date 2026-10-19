@@ -4,13 +4,13 @@ import { route } from 'preact-router';
 import get from 'get-value';
 
 import validateEmail from '../../utils/validateEmail';
+import { cleanEmail } from '../../utils/validator';
 import { ForgotPasswordStatus, RequestStatus } from '../../utils/consts';
 import ForgotPasswordPage from './ForgotPasswordPage';
 
 class ForgotPassword extends Component {
   forgotPassword = async e => {
-    // phone keyboards may add a space after the email
-    const forgotPasswordEmail = (this.state.forgotPasswordEmail || '').trim();
+    const forgotPasswordEmail = cleanEmail(this.state.forgotPasswordEmail);
     if (e) {
       e.preventDefault();
     }
@@ -66,7 +66,7 @@ class ForgotPassword extends Component {
 
   verifyCode = async e => {
     const { forgotPasswordCode } = this.state;
-    const forgotPasswordEmail = (this.state.forgotPasswordEmail || '').trim();
+    const forgotPasswordEmail = cleanEmail(this.state.forgotPasswordEmail);
     if (e) {
       e.preventDefault();
     }

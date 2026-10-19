@@ -1,5 +1,5 @@
 import { LoginStatus, RequestStatus } from '../../utils/consts';
-import { validateEmail } from '../../utils/validator';
+import { validateEmail, cleanEmail } from '../../utils/validator';
 import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
 import { isSafeReturnUrl } from '../../utils/url';
@@ -19,8 +19,7 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
-      // phone keyboards may add a space after the email
-      const email = (state.loginFormEmailValue || '').trim();
+      const email = cleanEmail(state.loginFormEmailValue);
       if (!validateEmail(email)) {
         return store.setState({
           loginStatus: LoginStatus.WrongEmailError

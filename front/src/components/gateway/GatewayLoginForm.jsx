@@ -87,9 +87,6 @@ const GatewayLoginForm = ({ children, ...props }) => (
               <Localizer>
                 <input
                   type="email"
-                  autocapitalize="none"
-                  autocorrect="off"
-                  spellcheck={false}
                   class={cx('form-control', {
                     'is-invalid': props.gatewayLoginStatus === LoginStatus.WrongEmailError
                   })}

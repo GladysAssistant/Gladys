@@ -1,3 +1,5 @@
+const { BadParameters } = require('./coreErrors');
+
 /**
  * @description Bring an email typed by a user to the form it is stored in:
  * without surrounding spaces and in lower case. Phone keyboards often
@@ -9,8 +11,10 @@
  * normalizeEmail(' Tony.Stark@Gladysassistant.com '); // 'tony.stark@gladysassistant.com'
  */
 function normalizeEmail(email) {
+  // the email comes straight from the request body: an array or a missing
+  // value must not reach the database query
   if (typeof email !== 'string') {
-    return email;
+    throw new BadParameters('Email must be a string');
   }
   return email.trim().toLowerCase();
 }
