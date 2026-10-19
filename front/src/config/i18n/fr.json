@@ -5816,11 +5816,7 @@
           "101": "Bouton 4 clic simple",
           "102": "Bouton 4 clic double",
           "103": "Bouton 4 clic long",
-          "104": "Bouton 4 clic triple",
-          "105": "Appui bouton 1",
-          "106": "Appui bouton 2",
-          "107": "Appui bouton 3",
-          "108": "Appui bouton 4"
+          "104": "Bouton 4 clic triple"
         }
       },
       "fan": {
