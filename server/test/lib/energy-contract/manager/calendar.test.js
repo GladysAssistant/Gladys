@@ -5,6 +5,7 @@ const { EVENTS } = require('../../../../utils/constants');
 const { buildManager, contractPayload, TEMPO_TARIFF, METER_DEVICE_ID, TEST_SERVICE_ID } = require('./helpers');
 const { RECALCULATION_MIN_INTERVAL_MS } = require('../../../../lib/energy-contract/calendar.publish');
 const { validateCalendarDefinition } = require('../../../../lib/energy-contract/calendar.declare');
+const { waitUntil } = require('../../../helpers/waitUntil');
 
 const OTHER_SERVICE_ID = 'b810b8db-6d04-4697-bed3-c4b72c996280';
 const TEMPO = {
@@ -269,7 +270,8 @@ describe('energyContract: tariff calendars', () => {
       expect(emitted.firstCall.args[0].from.toISOString()).to.equal('2026-01-11T23:00:00.000Z');
       // within the window: merged into a deferred run, keeping the earliest change
       const state = energyContract.calendarRecalculations.get('tempo');
-      state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 50;
+      // the window ends in 500 ms: room for the two publications below on a loaded CI runner
+      state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 500;
       await energyContract.publishCalendarEntries('tempo', [{ date: '2026-01-13', value: 'white' }], {
         provider_service_id: TEST_SERVICE_ID,
       });
@@ -278,10 +280,7 @@ describe('energyContract: tariff calendars', () => {
       });
       expect(emitted.callCount).to.equal(1);
       expect(state.timer).to.not.equal(null);
-      await new Promise((resolve) => {
-        setTimeout(resolve, 150);
-      });
-      expect(emitted.callCount).to.equal(2);
+      await waitUntil(() => emitted.callCount === 2, { timeout: 3000, message: 'the deferred recalculation' });
       expect(emitted.secondCall.args[0].from.toISOString()).to.equal('2026-01-09T23:00:00.000Z');
       // a calendar no contract references: nothing emitted
       await energyContract.publishCalendarEntries('spot-fr', [{ starts_at: '2026-01-12T05:00:00Z', price: 0.1 }], {
