@@ -5,6 +5,7 @@ import debounce from 'debounce';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
 import getZ2mUrl, { shouldShowZ2mUrlWarning } from '../utils/getZ2mUrl';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -109,7 +110,7 @@ function createActions(store) {
     },
     async saveDevice(state, index) {
       const device = state.zigbee2mqttDevices[index];
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
       savedDevice.model = device.model;
       savedDevice.ieee_address = device.ieee_address;
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
