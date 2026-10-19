@@ -14,7 +14,7 @@ import update from 'immutability-helper';
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
-import { getDeviceParam } from '../../../../utils/device';
+import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/device';
 import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 import { buildUsagePointDevicePayload } from './usagePointDeviceBuilder';
@@ -307,7 +307,7 @@ class EnedisWelcomePageComponent extends Component {
     await this.setState({ loading: true });
     try {
       const device = this.state.usagePointsDevices[deviceIndex];
-      await this.props.httpClient.post('/api/v1/device', device);
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     } catch (e) {
       console.error(e);
     }
@@ -339,7 +339,7 @@ class EnedisWelcomePageComponent extends Component {
       existingDevice
     });
 
-    await this.props.httpClient.post('/api/v1/device', device);
+    await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     await this.getCurrentEnedisUsagePoints();
   };
   init = async () => {

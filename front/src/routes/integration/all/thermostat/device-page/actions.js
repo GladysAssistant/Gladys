@@ -2,6 +2,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import debounce from 'debounce';
 import createActionsHouse from '../../../../../actions/house';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
@@ -96,7 +97,7 @@ function createActions(store) {
       // Everything the list added for display only is stripped here: the device
       // route validates its payload, and an unknown field makes the save fail.
       const { active_schedule, thermostat_type, target_feature, external_setpoint_feature, ...deviceToSave } = device;
-      const savedDevice = await state.httpClient.post('/api/v1/device', deviceToSave);
+      const savedDevice = await state.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       // Which schedule a thermostat follows is a relation, not a param: it is
       // written through the schedule's own routes, which also check the device is
       // a thermostat of that schedule's house.
