@@ -220,6 +220,28 @@ const CAMERA_GET_IMAGE_TIMEOUT_MS = 15 * 1000;
 // call from the integration, same exception to the 5s ack rule as the
 // camera image.
 const WEATHER_GET_TIMEOUT_MS = 15 * 1000;
+// AI providers (capabilities/ai-type.md): ai.chat relays a whole chat
+// completion request — reasoning models are slow and one request can carry
+// a full tool-calling context — hence the dedicated ack deadline.
+const AI_CHAT_TIMEOUT_MS = 120 * 1000;
+// The intent router (purpose intent-classification) runs before every chat
+// turn and swallows its own failures (the loop then falls back to all
+// tools): a stuck provider must fail it fast instead of adding a second
+// full deadline in front of the user, and a classification is a short
+// prompt that never needs the reasoning budget above.
+const AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS = 20 * 1000;
+// Requests in flight per AI provider: an ai.ask scene fired on every motion
+// must not flood a CPU-bound local model; beyond the cap the request fails
+// at once instead of queueing behind the others until the ack deadline.
+const MAX_AI_CHAT_IN_FLIGHT = 4;
+// Bounds of the completion accepted from an AI provider: the payload comes
+// from unaudited code and its content drives the tool-calling loop with the
+// user's authority, so only the OpenAI-compatible fields the loop consumes
+// are kept, each bounded (capabilities/ai-type.md).
+const MAX_AI_CHAT_CONTENT_CHARS = 50 * 1000;
+const MAX_AI_CHAT_TOOL_CALLS = 20;
+const MAX_AI_CHAT_TOOL_ARGUMENTS_CHARS = 100 * 1000;
+const AI_CHAT_TOOL_NAME_REGEX = /^[a-zA-Z0-9_-]{1,64}$/;
 // Bounds of the normalized pivot weather format (B.18): the payload comes
 // from unaudited code, everything is whitelisted, coerced and capped
 // before entering the core.
@@ -233,6 +255,29 @@ const MAX_WEATHER_ALERT_DESCRIPTION_LENGTH = 5000;
 // Minimal interval between two accepted freshness nudges of one
 // integration (B.18 point 5); beyond it the nudge is silently dropped.
 const WEATHER_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// TTS providers (capabilities/tts-type.md): tts.synthesize is a documented
+// exception to the 5s ack rule, alongside camera.get-image and action.run
+// (local synthesis on a Pi is slow). The audio comes back in
+// command-result.data as a data-URI; the core validates the content type
+// (what Sonos/Cast/browsers actually play — the served URL extension is
+// derived from it) and the decoded size before serving a byte. The text is
+// capped by the core BEFORE the relay (truncation, not an error: a long AI
+// answer must speak its beginning rather than fail).
+const TTS_SYNTHESIZE_TIMEOUT_MS = 30 * 1000;
+const MAX_TTS_AUDIO_SIZE_BYTES = 5 * 1024 * 1024;
+// base64 encodes 3 bytes in 4 chars: a data-URI longer than this cannot
+// decode under the size cap, and is rejected BEFORE the decode allocates
+// (the normalizeWeatherImage rule — the payload comes from unaudited code).
+// The prefix allowance covers "<content type>;base64," for the longest
+// accepted content type.
+const MAX_TTS_AUDIO_BASE64_LENGTH = Math.ceil(MAX_TTS_AUDIO_SIZE_BYTES / 3) * 4 + 4 + 32;
+const MAX_TTS_TEXT_LENGTH = 2000;
+const TTS_AUDIO_CONTENT_TYPES = {
+  'audio/mpeg': 'mp3',
+  'audio/wav': 'wav',
+  'audio/ogg': 'ogg',
+  'audio/aac': 'aac',
+};
 // Provider images (B.18 point 6): declared as metadata in the pivot
 // payload, bytes fetched on demand and validated before entering the core.
 const MAX_WEATHER_IMAGES = 3;
@@ -630,6 +675,18 @@ module.exports = {
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
+  AI_CHAT_TIMEOUT_MS,
+  AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS,
+  MAX_AI_CHAT_IN_FLIGHT,
+  MAX_AI_CHAT_CONTENT_CHARS,
+  MAX_AI_CHAT_TOOL_CALLS,
+  MAX_AI_CHAT_TOOL_ARGUMENTS_CHARS,
+  AI_CHAT_TOOL_NAME_REGEX,
+  TTS_SYNTHESIZE_TIMEOUT_MS,
+  MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
+  MAX_TTS_TEXT_LENGTH,
+  TTS_AUDIO_CONTENT_TYPES,
   MAX_WEATHER_HOURS,
   MAX_WEATHER_DAYS,
   MAX_WEATHER_ALERTS,
