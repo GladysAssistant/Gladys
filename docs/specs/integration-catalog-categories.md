@@ -115,6 +115,7 @@ Two consequences worth deciding in Phase A rather than discovering later:
 - **Integration page URLs are unchanged** (`/dashboard/integration/{type}/{key}`): `type` is technical (§2.2), so no external doc link, bookmark or "back to integrations" flow breaks.
 - **Uncategorized integrations** (store entries with no declared or fallback categories) appear under `All` and in search only — visible, but not promoted. The indexer warns their author (§6.3); better shelf placement is the author's incentive to declare.
 - A card can appear under several categories (multi-membership); the counts shown anywhere are per-view and may sum to more than the catalog size, which is fine.
+- **Counts are only shown once the catalog is complete.** While the community integrations load, the header says the catalog is loading and the grid shows placeholders, rather than counting and listing the native integrations alone (which read as the whole catalog). The loading, paging and lazy-cover rules of the grid are owned by `external-integrations/core/frontend.md` (B.8); the catalog is fed by the lite store index (`external-integrations/contracts/indexer-formats.md`, C.6).
 
 ## 6. Data contracts
 
