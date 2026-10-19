@@ -69,6 +69,8 @@ const IconButton = ({ icon, labelKey, onClick, active, pressed, children }) => (
 
 class MusicComponent extends Component {
   state = {
+    // the music features of the player by type, empty until the device is loaded
+    features: {},
     isPlaying: null,
     playbackState: null,
     capabilities: null,
@@ -867,71 +869,13 @@ class MusicComponent extends Component {
     );
   }
 
-  // the box as it always rendered for a player without "now playing" metadata
-  renderLegacy(props, { isPlaying, musicDevice, previousFeature, nextFeature, volumeFeature }) {
-    return (
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">{musicDevice && musicDevice.name}</h3>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col">
-              {previousFeature && (
-                <button class="btn btn-block btn-secondary" onClick={this.previous}>
-                  <i class="fe fe-skip-back" />
-                </button>
-              )}
-            </div>
-            <div class="col">
-              {!isPlaying && (
-                <button class="btn btn-block btn-secondary" onClick={this.play}>
-                  <i class="fe fe-play" />
-                </button>
-              )}
-              {isPlaying && (
-                <button class="btn btn-block btn-secondary" onClick={this.pause}>
-                  <i class="fe fe-pause" />
-                </button>
-              )}
-            </div>
-            <div class="col">
-              {nextFeature && (
-                <button class="btn btn-block btn-secondary" onClick={this.next}>
-                  <i class="fe fe-skip-forward" />
-                </button>
-              )}
-            </div>
-          </div>
-          {volumeFeature && (
-            <div class="row mt-4">
-              <div class="col">
-                <input
-                  type="range"
-                  value={volumeFeature.last_value}
-                  onChange={this.changeVolume}
-                  class="form-control"
-                  step="1"
-                  min="0"
-                  max="100"
-                />
-              </div>
-            </div>
-          )}
-          {this.renderCommandError()}
-          {this.renderPanels()}
-          {this.renderSheet(musicDevice && musicDevice.name, null)}
-        </div>
-      </div>
-    );
-  }
-
+  // One layout for every player: each block renders only when the player has its features. A player
+  // without any "now playing" type (a frozen internal Sonos, a bare MQTT player) gets the same
+  // transport and volume in the same style, with no artwork, title or progress block: the box shows
+  // nothing it has no data for.
   render(props, state) {
     const { musicDevice, hasNowPlaying } = state;
-    if (!musicDevice || !hasNowPlaying) {
-      return this.renderLegacy(props, state);
-    }
-    const boxTitle = get(props, 'box.name') || musicDevice.name;
+    const boxTitle = get(props, 'box.name') || (musicDevice && musicDevice.name);
     const text = type => {
       const feature = state.features[type];
       return feature && feature.last_value_string ? feature.last_value_string : '';
@@ -947,16 +891,16 @@ class MusicComponent extends Component {
       <div class="card">
         <div class={cx('card-header', style.header)}>
           <h3 class="card-title">{boxTitle}</h3>
-          {this.renderStatus(hasTrack)}
+          {musicDevice && this.renderStatus(hasTrack)}
         </div>
         <div class="card-body">
-          {this.renderNowPlaying(track)}
-          {this.renderProgress(hasTrack)}
+          {hasNowPlaying && this.renderNowPlaying(track)}
+          {hasNowPlaying && this.renderProgress(hasTrack)}
           {this.renderTransport()}
           {this.renderVolume()}
           {this.renderCommandError()}
           {this.renderPanels()}
-          {this.renderSheet(boxTitle, track)}
+          {this.renderSheet(boxTitle, hasNowPlaying ? track : null)}
         </div>
       </div>
     );
