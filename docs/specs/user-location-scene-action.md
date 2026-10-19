@@ -8,6 +8,8 @@ Users can already write coordinates through `POST /api/v1/user/:user_selector/lo
 
 `user.set-location` has a fixed `user` selector and two fields: `latitude` and `longitude`. Each coordinate accepts either a number or plain text with the scene engine's existing Handlebars variables, for example `{{triggerEvent.data.latitude}}` from an integration trigger or `{{0.0.value}}` from an earlier action. The editor uses the existing variable-aware input so trigger and earlier-action variables can be selected. This action does not introduce a Find My integration, a new trigger or a webhook: location data must already be available to the scene.
 
+The user picker displays first names; when first names are shared, it appends each user's unique selector so editors can distinguish the target users.
+
 Both coordinate fields participate in the scene editor's existing variable-reference rewriting when steps are inserted, deleted or reordered, including inside nested branches. Moving the actions that produce the coordinates must not swap their meaning.
 
 On execution, both coordinates are resolved from the current scene scope and validated **before any write**: nonempty, finite numbers, latitude between −90 and 90, longitude between −180 and 180, inclusive. Zero and negative values are valid. Missing/unresolved variables, blank values and out-of-range coordinates abort the scene without changing a location. Incomplete fields may be saved while configuring a scene, like other native actions, but cannot be executed. Unknown users follow the location manager's existing error behavior.

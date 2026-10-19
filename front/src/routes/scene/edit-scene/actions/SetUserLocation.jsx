@@ -10,7 +10,14 @@ class SetUserLocation extends Component {
   getUsers = async () => {
     try {
       const users = await this.props.httpClient.get('/api/v1/user');
-      this.setState({ users: users.map(user => ({ label: user.firstname, value: user.selector })) });
+      this.setState({
+        users: users.map(user => ({
+          label: users.some(other => other.selector !== user.selector && other.firstname === user.firstname)
+            ? `${user.firstname} (${user.selector})`
+            : user.firstname,
+          value: user.selector
+        }))
+      });
     } catch (e) {
       console.error(e);
     }
