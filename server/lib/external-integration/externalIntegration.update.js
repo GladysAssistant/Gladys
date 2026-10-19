@@ -135,13 +135,11 @@ async function update(selector) {
     // the in-memory index would resolve a release published minutes ago to
     // the *previous* manifest — the same image tag re-pulled, nothing
     // updated, a "Force update" button that looks broken. Both sources are
-    // read (index refreshed on the spot + repo manifest, the source of truth
-    // the indexer itself mirrors) and the most recent pullable one wins.
+    // read (full index entry downloaded on the spot + repo manifest, the
+    // source of truth the indexer itself mirrors) and the most recent
+    // pullable one wins.
     try {
-      const index = await this.getIndex({ refresh: true });
-      const entry = ((index && index.integrations) || []).find(
-        (indexEntry) => indexEntry.store_slug === service.store_slug,
-      );
+      const entry = await this.getStoreEntry(service.store_slug, { refresh: true });
       indexManifest = (entry && entry.manifest) || null;
     } catch (e) {
       logger.warn(`Unable to refresh the store index before updating ${service.store_slug}`, e);
