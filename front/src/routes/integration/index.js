@@ -655,10 +655,18 @@ class Integration extends Component {
     // native ones: counting or listing them alone would make Gladys look like
     // it has a few dozen integrations while hundreds are on their way
     const catalogLoading = !user.id || state.externalLoadedForUserId !== user.id;
+    // same rule for the sidebar: the categories computed from the native
+    // integrations alone are a partial list, entries would then be inserted
+    // in the middle of it once the store lands. Only the displayed one stays
+    // during the load; the others appear together with the complete catalog
+    const integrationCategories = catalogLoading
+      ? state.integrationCategories.filter(({ key }) => key === props.category)
+      : state.integrationCategories;
     // Combine props and state for the IntegrationPage
     const combinedProps = {
       ...props,
       ...state,
+      integrationCategories,
       catalogLoading,
       showInstallFromGithub,
       showStoreRefresh,

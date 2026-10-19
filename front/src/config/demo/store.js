@@ -175,19 +175,28 @@ const refreshStoreCatalog = async (installedBySlug = {}) => {
 // install page and the install button that follows share one download
 let lastFullEntry = null;
 
+// an error the pages read like an HTTP error of the server
+const httpError = (message, status) => {
+  const error = new Error(message);
+  error.response = { status };
+  return error;
+};
+
 /**
  * One store integration with its complete manifest, like the server's
- * store.getStoreIntegration.js: the full index is downloaded for it. Absent
- * from the store, it answers like the server, with a 404.
+ * store.getStoreIntegration.js: the full index is downloaded for it. It
+ * answers like the server: 400 without store_slug, 404 when absent from the
+ * store.
  */
-const getStoreIntegration = async ({ store_slug: storeSlug }, installedBySlug = {}) => {
+const getStoreIntegration = async ({ store_slug: storeSlug } = {}, installedBySlug = {}) => {
+  if (!storeSlug) {
+    throw httpError('store_slug is required', 400);
+  }
   if (!lastFullEntry || lastFullEntry.store_slug !== storeSlug) {
     const entries = await fetchIndexEntries(STORE_INDEX_URL);
     const entry = entries.find(candidate => candidate.store_slug === storeSlug);
     if (!entry) {
-      const error = new Error(`${storeSlug} is not in the store index`);
-      error.response = { status: 404 };
-      throw error;
+      throw httpError(`${storeSlug} is not in the store index`, 404);
     }
     lastFullEntry = entry;
   }
