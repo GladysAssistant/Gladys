@@ -27,28 +27,30 @@ import integrationText from '../integrationText.css';
 import NetworkWakeSummary from '../components/NetworkWakeSummary';
 
 class ExternalIntegrationInstallPage extends Component {
+  // only this integration, with its complete manifest: the catalog carries a
+  // lite manifest for each of the hundreds of store integrations, downloading
+  // all of them to display one would make this page as slow as the store is big
   getStoreIntegration = async () => {
-    this.setState({ loadStatus: RequestStatus.Getting });
+    this.setState({ loadStatus: RequestStatus.Getting, storeIntegration: null });
     try {
       const storeSlug = `${this.props.owner}/${this.props.repo}`;
-      const [{ integrations = [] }, installedIntegrations] = await Promise.all([
-        this.props.httpClient.get('/api/v1/external_integration/store'),
+      const [storeIntegration, installedIntegrations] = await Promise.all([
+        this.props.httpClient.get('/api/v1/external_integration/store/integration', { store_slug: storeSlug }),
         this.props.httpClient.get('/api/v1/external_integration')
       ]);
-      const storeIntegration = integrations.find(integration => integration.store_slug === storeSlug);
       this.setState({
         storeIntegration,
-        duplicateOfInstalled: storeIntegration
-          ? this.findDuplicateOfInstalled(storeIntegration, installedIntegrations)
-          : null,
-        loadStatus: storeIntegration ? RequestStatus.Success : RequestStatus.Error
+        duplicateOfInstalled: this.findDuplicateOfInstalled(storeIntegration, installedIntegrations),
+        loadStatus: RequestStatus.Success
       });
-      if (storeIntegration) {
-        await this.loadHardware(storeIntegration);
-      }
+      await this.loadHardware(storeIntegration);
     } catch (e) {
       console.error(e);
-      this.setState({ loadStatus: RequestStatus.Error });
+      // absent from the store, or a store Gladys could not reach: the first
+      // is final, the second is worth a retry, and the message says which
+      this.setState({
+        loadStatus: get(e, 'response.status') === 404 ? RequestStatus.Error : RequestStatus.NetworkError
+      });
     }
   };
 
@@ -168,6 +170,16 @@ class ExternalIntegrationInstallPage extends Component {
                       {loadStatus === RequestStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.externalIntegration.install.notFound" />
+                        </div>
+                      )}
+                      {loadStatus === RequestStatus.NetworkError && (
+                        <div class="alert alert-danger d-flex align-items-center">
+                          <div class="flex-fill">
+                            <Text id="integration.externalIntegration.install.loadError" />
+                          </div>
+                          <button type="button" class="btn btn-sm btn-danger ml-3" onClick={this.getStoreIntegration}>
+                            <Text id="integration.root.storeUnavailableRetry" />
+                          </button>
                         </div>
                       )}
                       {storeIntegration && (

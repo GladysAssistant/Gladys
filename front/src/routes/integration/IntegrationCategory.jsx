@@ -4,6 +4,9 @@ import StatusBadge from './all/external-integration/components/StatusBadge';
 import { isNoteworthyExternalIntegrationStatus } from './all/external-integration/utils';
 import style from './style.css';
 
+// covers are lazy-loaded: with hundreds of cards (and the mobile list, hidden
+// on desktop, rendered next to the grid), eager images would download tens of
+// megabytes before the first screen is usable
 const getImgClass = integration =>
   `card-img-top ${integration.invertInDarkMode ? 'keep-dark' : ''} ${
     integration.whiteBackground ? 'white-bg' : ''
@@ -127,6 +130,8 @@ export const IntegrationListItem = ({ integration, toggleFavorite, alwaysShowSta
               }`}
               src={integration.img}
               alt={integration.external ? integration.name : <Text id={`integration.${integration.key}.title`} />}
+              loading="lazy"
+              decoding="async"
             />
           </Localizer>
         )}
@@ -162,6 +167,8 @@ const IntegrationCategory = ({ integration, toggleFavorite, alwaysShowStatus }) 
                 class={getImgClass(integration)}
                 src={integration.img}
                 alt={integration.external ? integration.name : <Text id={`integration.${integration.key}.title`} />}
+                loading="lazy"
+                decoding="async"
               />
             </Localizer>
           )}
