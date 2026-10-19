@@ -6,6 +6,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import Modal from '../components/Modal';
+import { TYPES_WITHOUT_DEVICE_SCREENS } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 
@@ -55,7 +56,15 @@ class InstallFromGithubCard extends Component {
     this.setState({ installStatus: RequestStatus.Getting, installError: null, installErrorDetails: null });
     try {
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      route(`/dashboard/integration/device/external/${installed.selector}`);
+      // integrations without device screens, and an integration with
+      // settings needs them filled first: both land on the configuration
+      // screen (same rule as the store install page)
+      const configSchema = get(installed, 'manifest.config_schema') || [];
+      if (TYPES_WITHOUT_DEVICE_SCREENS.includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+        route(`/dashboard/integration/device/external/${installed.selector}/config`);
+      } else {
+        route(`/dashboard/integration/device/external/${installed.selector}`);
+      }
     } catch (e) {
       console.error(e);
       const status = get(e, 'response.status');
