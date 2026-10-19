@@ -254,6 +254,15 @@ class ExternalIntegrationInstallPage extends Component {
                                 <Text id="integration.externalIntegration.install.calendarInfoText" />
                               </div>
                             )}
+                            {manifest.type === 'tts' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-volume-2 mr-1" />
+                                <Text id="integration.externalIntegration.install.ttsInfoText" />{' '}
+                                <Link href="/dashboard/integration/communication/openai">
+                                  <Text id="integration.externalIntegration.install.ttsInfoLink" />
+                                </Link>
+                              </div>
+                            )}
                             {manifest.type === 'provider' && (
                               <div class="alert alert-info">
                                 <i class="fe fe-grid mr-1" />
@@ -262,6 +271,12 @@ class ExternalIntegrationInstallPage extends Component {
                                 ) : (
                                   <Text id="integration.externalIntegration.install.providerInfoText" />
                                 )}
+                              </div>
+                            )}
+                            {manifest.type === 'ai' && (
+                              <div class="alert alert-warning">
+                                <i class="fe fe-cpu mr-1" />
+                                <Text id="integration.externalIntegration.install.aiWarningText" />
                               </div>
                             )}
 

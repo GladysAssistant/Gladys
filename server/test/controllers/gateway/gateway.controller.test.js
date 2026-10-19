@@ -308,6 +308,32 @@ describe('POST /api/v1/gateway/aichat/chat', () => {
   });
 });
 
+describe('POST /api/v1/gateway/aichat/chat (non-admin)', () => {
+  beforeEach(async () => {
+    await db.User.create({
+      id: NON_ADMIN_USER_ID,
+      firstname: 'Pepper',
+      lastname: 'Potts',
+      selector: 'pepper-aichat',
+      email: 'pepper-aichat@pots.com',
+      language: 'en',
+      role: USER_ROLE.HABITANT,
+      password: 'mysuperpassword',
+      birthdate: '1990-12-12',
+    });
+  });
+
+  it('should refuse the raw completion proxy to a non-admin user', async () => {
+    // the debug replay path reaches the selected AI backend with no bound on
+    // the outbound payload: an admin tool, the household chat goes through
+    // message.create
+    await nonAdminRequest
+      .post('/api/v1/gateway/aichat/chat')
+      .send({ messages: [{ role: 'user', content: 'hello' }] })
+      .expect(403);
+  });
+});
+
 describe('GET /api/v1/gateway/aichat/debug-context', () => {
   beforeEach(() => {
     global.TEST_GLADYS_INSTANCE.stateManager.setState('service', 'mcp', {

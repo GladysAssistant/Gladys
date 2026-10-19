@@ -37,7 +37,11 @@ function buildContext(overrides = {}) {
   return {
     stt: overrides.stt || fake.resolves({ text: 'allume la lumière' }),
     forwardMessageToAiChat: overrides.forwardMessageToAiChat || fake.resolves({ answer: 'La lumière est allumée.' }),
-    getTTSApiUrl: overrides.getTTSApiUrl || fake.resolves({ url: 'http://tts.test/audio.mp3' }),
+    tts: {
+      getActiveProvider: fake.resolves('gladys-plus'),
+      getSpeechUrl: fake.resolves({ url: 'http://tts.test/audio.mp3' }),
+      ...overrides.tts,
+    },
     event: overrides.event === null ? null : overrides.event || { emit: fake() },
     message: overrides.message || {
       getPreviousQuestionsForUser: getPreviousQuestionsForUserStub,
@@ -117,7 +121,8 @@ describe('gateway.processVoiceMessage', () => {
     sinonAssert.calledOnce(messageCreate);
     sinonAssert.callOrder(ctx.message.getPreviousQuestionsForUser, messageCreate);
     sinonAssert.calledOnce(ctx.forwardMessageToAiChat);
-    sinonAssert.calledOnce(ctx.getTTSApiUrl);
+    sinonAssert.calledOnce(ctx.tts.getSpeechUrl);
+    sinonAssert.calledWith(ctx.tts.getSpeechUrl, { text: 'La lumière est allumée.', language: 'fr' });
 
     const emittedTypes = eventEmit.getCalls().map((call) => call.args[0]);
     expect(emittedTypes).to.include(EVENTS.WEBSOCKET.SEND);
@@ -163,7 +168,7 @@ describe('gateway.processVoiceMessage', () => {
       answer: '',
       ttsUrl: null,
     });
-    sinonAssert.notCalled(ctx.getTTSApiUrl);
+    sinonAssert.notCalled(ctx.tts.getSpeechUrl);
 
     const responseEvents = eventEmit
       .getCalls()
@@ -185,7 +190,7 @@ describe('gateway.processVoiceMessage', () => {
 
   it('should handle tts response without url', async () => {
     const ctx = buildContext({
-      getTTSApiUrl: fake.resolves({}),
+      tts: { getSpeechUrl: fake.resolves({}) },
     });
 
     const result = await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
@@ -255,7 +260,7 @@ describe('gateway.processVoiceMessage', () => {
       .map((call) => call.args[1])
       .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
     expect(errorPayload.payload.error).to.equal('payment_required');
-    sinonAssert.notCalled(ctx.getTTSApiUrl);
+    sinonAssert.notCalled(ctx.tts.getSpeechUrl);
   });
 
   it('should emit forbidden websocket error and rethrow Error403', async () => {
@@ -296,15 +301,120 @@ describe('gateway.processVoiceMessage', () => {
     const eventEmit = fake();
     const ctx = buildContext({
       event: { emit: eventEmit },
-      getTTSApiUrl: fake.rejects(new Error('tts down')),
+      forwardMessageToAiChat: fake.rejects(new Error('ai down')),
     });
 
-    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), 'tts down');
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), 'ai down');
 
     const errorPayload = eventEmit
       .getCalls()
       .map((call) => call.args[1])
       .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
-    expect(errorPayload.payload).to.deep.equal({ error: 'unknown', message: 'tts down' });
+    expect(errorPayload.payload).to.deep.equal({ error: 'unknown', message: 'ai down' });
+  });
+
+  it('should return a text-only answer when the TTS provider is unavailable', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error('tts down')) },
+    });
+
+    const result = await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
+
+    expect(result).to.deep.equal({
+      transcription: 'allume la lumière',
+      answer: 'La lumière est allumée.',
+      ttsUrl: null,
+    });
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload).to.equal(undefined);
+  });
+
+  it('should emit forbidden websocket error and rethrow Error403 coming from the TTS provider', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error403('no gladys plus')) },
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error403);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload).to.deep.equal({ error: 'forbidden', message: 'no gladys plus' });
+  });
+
+  it('should emit rate limit websocket error and rethrow Error429 coming from the TTS provider', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error429('tts quota reached')) },
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error429);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload).to.deep.equal({ error: 'too_many_requests', message: '' });
+  });
+
+  it('should emit payment_required websocket error and rethrow Error402 coming from Gladys Plus TTS', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error402('payment required')) },
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error402);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload).to.deep.equal({ error: 'payment_required', message: 'payment required' });
+  });
+
+  it('should return a text-only answer on a 402, 403 or 429 thrown by an external TTS provider', async () => {
+    // only Gladys Plus has an upsell: the same status codes thrown by an
+    // integration provider mean nothing to the user and degrade like any
+    // other TTS failure
+    // eslint-disable-next-line no-restricted-syntax
+    for (const providerError of [
+      new Error402('provider wants money'),
+      new Error403('provider refused'),
+      new Error429('provider busy'),
+    ]) {
+      const eventEmit = fake();
+      const ctx = buildContext({
+        event: { emit: eventEmit },
+        tts: {
+          getActiveProvider: fake.resolves('ext-piper-tts'),
+          getSpeechUrl: fake.rejects(providerError),
+        },
+      });
+
+      // eslint-disable-next-line no-await-in-loop
+      const result = await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
+
+      expect(result).to.deep.equal({
+        transcription: 'allume la lumière',
+        answer: 'La lumière est allumée.',
+        ttsUrl: null,
+      });
+      const errorPayload = eventEmit
+        .getCalls()
+        .map((call) => call.args[1])
+        .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+      expect(errorPayload).to.equal(undefined);
+    }
   });
 });
