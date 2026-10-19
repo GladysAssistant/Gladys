@@ -28,10 +28,11 @@
   },
   "devDependencies": {
     "@preact/async-loader": "^3.0.2",
-    "@preact/preset-vite": "^2.10.2",
+    "@preact/preset-vite": "^2.10.6",
     "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
     "cypress": "^10.11.0",
+    "esbuild": "^0.28.2",
     "eslint": "^8.39.0",
     "eslint-config-preact": "^1.3.0",
     "eslint-config-prettier": "^8.5.0",
@@ -43,9 +44,9 @@
     "per-env": "^1.0.2",
     "prettier": "^1.17.1",
     "sirv-cli": "^3.0.1",
-    "vite": "^6.3.5",
+    "vite": "^8.3.4",
     "vite-css-modules": "^1.16.0",
-    "vite-plugin-static-copy": "^2.3.2"
+    "vite-plugin-static-copy": "^4.1.1"
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^4.22.1",
