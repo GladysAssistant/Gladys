@@ -177,12 +177,12 @@ const DashboardPage = ({ children, ...props }) => {
                   </div>
                 )}
                 {props.tabletModeParamError && (
-                  <div class="alert alert-danger">
+                  <div class="alert alert-danger" data-cy="tablet-mode-param-error">
                     <Text id="dashboard.tabletModeParamError" fields={{ value: props.tabletModeParamError }} />
                   </div>
                 )}
                 {props.tabletModeActivationFailed && (
-                  <div class="alert alert-danger">
+                  <div class="alert alert-danger" data-cy="tablet-mode-activation-error">
                     <Text id="dashboard.tabletModeActivationError" />
                   </div>
                 )}
