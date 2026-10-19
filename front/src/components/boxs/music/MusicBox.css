@@ -378,6 +378,14 @@
   transform: scale(0.95);
 }
 
+/* the disc of the sheet's mini player */
+.playButton.miniPlayButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.125rem;
+  box-shadow: none;
+}
+
 /* the play triangle sits optically centered */
 .playIcon {
   margin-left: 3px;
@@ -475,12 +483,202 @@
   }
 }
 
-/* --- panels --- */
+/* --- panels: openers in the card, content in the sheet --- */
 
 .panelTabs {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+/* The sheet of the queue and the catalog: the light panel's shell. Anchored at the bottom and sized
+   in dvh (on iOS a fixed element measured in vh spills past the toolbars). Its height is fixed so a
+   list loading, narrowing or growing never resizes it. */
+.sheetOverlay {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 1060;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-color: rgba(16, 22, 36, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (min-width: 576px) {
+  .sheetOverlay {
+    align-items: center;
+    padding: 1.5rem;
+  }
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 92vh;
+  height: 92dvh;
+  padding: 0.5rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  color: var(--gl-ink, #1c2334);
+  background-color: #fff;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -18px 50px rgba(16, 22, 36, 0.28);
+  outline: none;
+}
+
+@media (min-width: 576px) {
+  .sheet {
+    max-width: 28rem;
+    height: min(40rem, 88vh);
+    height: min(40rem, 88dvh);
+    padding-top: 1rem;
+    border-radius: 28px;
+  }
+}
+
+/* the white surface, which the global inversion would turn pure black: the light panel's gray */
+:global(.dark-mode) .sheet {
+  background-color: #ced8e6;
+}
+
+.sheetHandle {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 0.25rem;
+  margin: 0.25rem auto 0;
+  background-color: rgba(28, 35, 52, 0.18);
+  border-radius: 999px;
+}
+
+@media (min-width: 576px) {
+  .sheetHandle {
+    display: none;
+  }
+}
+
+.sheetHeader {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0 0.75rem;
+}
+
+.sheetTitle {
+  min-width: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.sheetClose {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.07);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.sheetClose:hover {
+  background-color: rgba(28, 35, 52, 0.12);
+}
+
+.sheetTabs {
+  flex: 0 0 auto;
+  margin-bottom: 0.75rem;
+}
+
+/* the list is the part that scrolls: the search field, the folder header and the mini player stay */
+.sheetBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheetBody .panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+}
+
+.sheetBody .mediaList {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
+
+.sheetBody .loadMore {
+  flex: 0 0 auto;
+}
+
+.miniPlayer {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 16px;
+  background-color: rgba(28, 35, 52, 0.05);
+  overflow: hidden;
+}
+
+.miniPlayerArtwork {
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  border-radius: 8px;
+}
+
+.miniPlayerArtwork .artworkPlaceholder {
+  font-size: 1.125rem;
+}
+
+.miniPlayerText {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.miniPlayerTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniPlayerSubtitle {
+  font-size: 0.75rem;
+  color: var(--gl-muted, #667081);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniPlayerProgress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  background-color: var(--gl-ink, #1c2334);
 }
 
 .panel {
@@ -701,6 +899,11 @@
   .playButton {
     width: 3.5rem;
     height: 3.5rem;
+  }
+
+  .playButton.miniPlayButton {
+    width: 2.75rem;
+    height: 2.75rem;
   }
 
   .slider {

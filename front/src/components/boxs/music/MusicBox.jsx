@@ -18,6 +18,7 @@ import LazyArtwork from './LazyArtwork';
 import MediaItemList from './MediaItemList';
 import MediaBrowser from './MediaBrowser';
 import MusicSlider from './MusicSlider';
+import MusicSheet from './MusicSheet';
 import Equalizer from './Equalizer';
 import {
   musicRoute,
@@ -404,17 +405,21 @@ class MusicComponent extends Component {
 
   // --- panels -----------------------------------------------------------
 
-  togglePanel = panel => {
-    const next = this.state.panel === panel ? null : panel;
-    this.setState({ panel: next });
-    if (next === PANELS.QUEUE) {
+  // the queue and the catalog open in a sheet over the dashboard (MusicSheet), never inside the
+  // card: the card keeps its height and no widget under it moves
+  selectPanel = panel => {
+    this.setState({ panel });
+    if (panel === PANELS.QUEUE) {
+      this.queueRefetchedForArtwork = false;
       this.loadQueue();
     }
   };
 
-  toggleQueue = () => this.togglePanel(PANELS.QUEUE);
+  openQueue = () => this.selectPanel(PANELS.QUEUE);
 
-  toggleBrowse = () => this.togglePanel(PANELS.BROWSE);
+  openBrowse = () => this.selectPanel(PANELS.BROWSE);
+
+  closePanel = () => this.setState({ panel: null });
 
   loadQueue = async (offset = 0, followCurrent = true) => {
     const { httpClient } = this.props;
@@ -534,26 +539,35 @@ class MusicComponent extends Component {
     );
   }
 
+  renderPlayButton(className) {
+    const { isPlaying, playbackState } = this.state;
+    const buffering = playbackState === MUSIC_PLAYBACK_STATE.BUFFERING;
+    const showPause = isPlaying || buffering;
+    const playLabel = `dashboard.boxes.music.${showPause ? 'pause' : 'play'}`;
+    return (
+      <Localizer>
+        <button
+          type="button"
+          class={cx(style.playButton, className)}
+          onClick={this.togglePlayPause}
+          title={<Text id={playLabel} />}
+          aria-label={<Text id={playLabel} />}
+        >
+          {buffering && <span class={style.spinner} />}
+          {!buffering && <i class={cx(`fe fe-${showPause ? 'pause' : 'play'}`, { [style.playIcon]: !showPause })} />}
+        </button>
+      </Localizer>
+    );
+  }
+
   renderTransport() {
-    const {
-      isPlaying,
-      playbackState,
-      previousFeature,
-      nextFeature,
-      features,
-      playBackStateFeature,
-      playFeature,
-      pauseFeature
-    } = this.state;
+    const { previousFeature, nextFeature, features, playBackStateFeature, playFeature, pauseFeature } = this.state;
     const shuffleFeature = features[DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE];
     const repeatFeature = features[DEVICE_FEATURE_TYPES.MUSIC.REPEAT];
     const canPlayPause = isWritable(playBackStateFeature) || Boolean(playFeature) || Boolean(pauseFeature);
-    const buffering = playbackState === MUSIC_PLAYBACK_STATE.BUFFERING;
-    const showPause = isPlaying || buffering;
     const shuffleOn = Boolean(shuffleFeature) && Number(shuffleFeature.last_value) === 1;
     const repeatValue = repeatFeature ? Number(repeatFeature.last_value) : null;
     const repeatOn = repeatValue !== null && repeatValue !== MUSIC_REPEAT_MODE.OFF;
-    const playLabel = `dashboard.boxes.music.${showPause ? 'pause' : 'play'}`;
     return (
       <div class={style.transport}>
         {shuffleFeature && isWritable(shuffleFeature) && (
@@ -568,22 +582,7 @@ class MusicComponent extends Component {
         {previousFeature && (
           <IconButton icon="skip-back" labelKey="dashboard.boxes.music.previous" onClick={this.previous} />
         )}
-        {canPlayPause && (
-          <Localizer>
-            <button
-              type="button"
-              class={style.playButton}
-              onClick={this.togglePlayPause}
-              title={<Text id={playLabel} />}
-              aria-label={<Text id={playLabel} />}
-            >
-              {buffering && <span class={style.spinner} />}
-              {!buffering && (
-                <i class={cx(`fe fe-${showPause ? 'pause' : 'play'}`, { [style.playIcon]: !showPause })} />
-              )}
-            </button>
-          </Localizer>
-        )}
+        {canPlayPause && this.renderPlayButton()}
         {nextFeature && <IconButton icon="skip-forward" labelKey="dashboard.boxes.music.next" onClick={this.next} />}
         {repeatFeature && isWritable(repeatFeature) && (
           <IconButton
@@ -767,41 +766,93 @@ class MusicComponent extends Component {
     );
   }
 
-  renderPanels() {
-    const { capabilities, panel } = this.state;
+  // the catalog operations the integration declares, as the tabs of the sheet
+  getPanelTabs() {
+    const { capabilities } = this.state;
+    const tabs = [];
     if (!capabilities) {
-      return null;
+      return tabs;
     }
-    const hasBrowse = Boolean(capabilities.browse || capabilities.search);
-    if (!capabilities.queue && !hasBrowse) {
+    if (capabilities.queue) {
+      tabs.push({ key: PANELS.QUEUE, icon: 'list', labelKey: 'dashboard.boxes.music.queue' });
+    }
+    if (capabilities.browse || capabilities.search) {
+      tabs.push({
+        key: PANELS.BROWSE,
+        icon: capabilities.search ? 'search' : 'folder',
+        labelKey: `dashboard.boxes.music.${capabilities.search ? 'search' : 'browse'}`
+      });
+    }
+    return tabs;
+  }
+
+  renderPanels() {
+    const tabs = this.getPanelTabs();
+    if (tabs.length === 0) {
       return null;
     }
     return (
-      <div>
-        <div class={style.panelTabs}>
-          {capabilities.queue && (
-            <button
-              type="button"
-              class={cx('btn btn-sm', panel === PANELS.QUEUE ? 'btn-primary' : 'btn-secondary')}
-              onClick={this.toggleQueue}
-              aria-expanded={panel === PANELS.QUEUE ? 'true' : 'false'}
-            >
-              <i class="fe fe-list mr-1" />
-              <Text id="dashboard.boxes.music.queue" />
-            </button>
-          )}
-          {hasBrowse && (
-            <button
-              type="button"
-              class={cx('btn btn-sm', panel === PANELS.BROWSE ? 'btn-primary' : 'btn-secondary')}
-              onClick={this.toggleBrowse}
-              aria-expanded={panel === PANELS.BROWSE ? 'true' : 'false'}
-            >
-              <i class={`fe fe-${capabilities.search ? 'search' : 'folder'} mr-1`} />
-              <Text id={`dashboard.boxes.music.${capabilities.search ? 'search' : 'browse'}`} />
-            </button>
-          )}
+      <div class={style.panelTabs}>
+        {tabs.map(tab => (
+          <button
+            key={tab.key}
+            type="button"
+            class="btn btn-sm btn-secondary"
+            onClick={tab.key === PANELS.QUEUE ? this.openQueue : this.openBrowse}
+            aria-haspopup="dialog"
+          >
+            <i class={`fe fe-${tab.icon} mr-1`} />
+            <Text id={tab.labelKey} />
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  // what plays, at the bottom of the sheet: the effect of a tap in the list shows right there, the
+  // card itself being under the backdrop
+  renderMiniPlayer(track) {
+    const { playBackStateFeature, playFeature, pauseFeature } = this.state;
+    const duration = this.getDuration();
+    const position = this.computePosition();
+    const ratio = duration && position !== null ? Math.min(100, Math.max(0, (position / duration) * 100)) : 0;
+    const canPlayPause = isWritable(playBackStateFeature) || Boolean(playFeature) || Boolean(pauseFeature);
+    return (
+      <div class={style.miniPlayer}>
+        <LazyArtwork
+          httpClient={this.props.httpClient}
+          deviceSelector={this.props.box.device}
+          artworkKey={track.artworkKey}
+          className={style.miniPlayerArtwork}
+          alt={track.title}
+        />
+        <div class={style.miniPlayerText}>
+          <span class={cx(style.miniPlayerTitle, { [style.titleIdle]: !track.title })}>
+            {track.title || <Text id="dashboard.boxes.music.nothingPlaying" />}
+          </span>
+          {track.artist && <span class={style.miniPlayerSubtitle}>{track.artist}</span>}
         </div>
+        {canPlayPause && this.renderPlayButton(style.miniPlayButton)}
+        {ratio > 0 && <div class={style.miniPlayerProgress} style={{ width: `${ratio}%` }} />}
+      </div>
+    );
+  }
+
+  renderSheet(title, track) {
+    const { capabilities, panel } = this.state;
+    const tabs = this.getPanelTabs();
+    if (!panel || tabs.length === 0) {
+      return null;
+    }
+    return (
+      <MusicSheet
+        title={title}
+        tabs={tabs}
+        activeTab={panel}
+        onSelectTab={this.selectPanel}
+        onClose={this.closePanel}
+        footer={track ? this.renderMiniPlayer(track) : null}
+      >
         {panel === PANELS.QUEUE && this.renderQueue()}
         {panel === PANELS.BROWSE && (
           <MediaBrowser
@@ -809,9 +860,10 @@ class MusicComponent extends Component {
             deviceSelector={this.props.box.device}
             capabilities={capabilities}
             intl={this.props.intl}
+            autoFocusSearch
           />
         )}
-      </div>
+      </MusicSheet>
     );
   }
 
@@ -868,6 +920,7 @@ class MusicComponent extends Component {
           )}
           {this.renderCommandError()}
           {this.renderPanels()}
+          {this.renderSheet(musicDevice && musicDevice.name, null)}
         </div>
       </div>
     );
@@ -903,6 +956,7 @@ class MusicComponent extends Component {
           {this.renderVolume()}
           {this.renderCommandError()}
           {this.renderPanels()}
+          {this.renderSheet(boxTitle, track)}
         </div>
       </div>
     );

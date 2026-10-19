@@ -43,7 +43,22 @@ class MediaBrowser extends Component {
     if (this.props.capabilities.browse) {
       this.browse([]);
     }
+    // in the music box's sheet the field is ready to type into; not on a touch screen, where the
+    // keyboard would cover the list before the user asked for it
+    if (
+      this.props.autoFocusSearch &&
+      this.searchInput &&
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(pointer: fine)').matches
+    ) {
+      this.searchInput.focus();
+    }
   }
+
+  setSearchInputRef = element => {
+    this.searchInput = element;
+  };
 
   componentWillUnmount() {
     this.unmounted = true;
@@ -190,6 +205,7 @@ class MediaBrowser extends Component {
             </span>
             <Localizer>
               <input
+                ref={this.setSearchInputRef}
                 type="search"
                 class="form-control"
                 value={query}
