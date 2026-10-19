@@ -9,7 +9,8 @@ import ForgotPasswordPage from './ForgotPasswordPage';
 
 class ForgotPassword extends Component {
   forgotPassword = async e => {
-    const { forgotPasswordEmail } = this.state;
+    // phone keyboards may add a space after the email
+    const forgotPasswordEmail = (this.state.forgotPasswordEmail || '').trim();
     if (e) {
       e.preventDefault();
     }
@@ -64,7 +65,8 @@ class ForgotPassword extends Component {
   };
 
   verifyCode = async e => {
-    const { forgotPasswordEmail, forgotPasswordCode } = this.state;
+    const { forgotPasswordCode } = this.state;
+    const forgotPasswordEmail = (this.state.forgotPasswordEmail || '').trim();
     if (e) {
       e.preventDefault();
     }

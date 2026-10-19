@@ -19,7 +19,9 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
-      if (!validateEmail(state.loginFormEmailValue)) {
+      // phone keyboards may add a space after the email
+      const email = (state.loginFormEmailValue || '').trim();
+      if (!validateEmail(email)) {
         return store.setState({
           loginStatus: LoginStatus.WrongEmailError
         });
@@ -30,7 +32,7 @@ function createActions(store) {
       try {
         // Login
         const userFromLogin = await state.httpClient.post('/api/v1/login', {
-          email: state.loginFormEmailValue,
+          email,
           password: state.loginFormPasswordValue
         });
         state.session.saveUser(userFromLogin);

@@ -38,6 +38,19 @@ describe('user.create', () => {
     });
     await user.login('tony.stark@gladysassistant.com', 'testststs');
   });
+  it('should login with an email typed with capitals and spaces (phone keyboard)', async () => {
+    await user.create({
+      firstname: 'Tony',
+      lastname: 'Stark',
+      email: 'tony.stark@gladysassistant.com',
+      password: 'testststs',
+      birthdate: '01/01/2019',
+      language: 'en',
+      role: 'admin',
+    });
+    const loggedUser = await user.login(' Tony.Stark@gladysassistant.com ', 'testststs');
+    expect(loggedUser).to.have.property('email', 'tony.stark@gladysassistant.com');
+  });
   it('should not create user, wrong email', async () => {
     const promise = user.create({
       firstname: 'Tony',

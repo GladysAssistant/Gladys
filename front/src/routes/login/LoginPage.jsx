@@ -28,6 +28,9 @@ const LoginPage = connect(
           <Localizer>
             <input
               type="email"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck={false}
               class={loginStatus === consts.LoginStatus.WrongEmailError ? 'form-control is-invalid' : 'form-control'}
               placeholder={<Text id="login.emailPlaceholder" />}
               value={loginFormEmailValue}
