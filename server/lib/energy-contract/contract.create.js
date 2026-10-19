@@ -78,7 +78,7 @@ async function create(data) {
     valid_to: value.valid_to || null,
     pricing_mode: value.pricing_mode || 'rules',
   };
-  contract.tariff = validateContractTariff(contract.tariff, contract.inputs, contract.pricing_mode);
+  contract.tariff = validateContractTariff(contract.tariff, contract.inputs, contract.pricing_mode, contract);
   await assertNoOverlap(contract);
   // the meter of a consumption contract is a root, priced by it (energy-hierarchy.md, section C.2):
   // detached before the row is written, so a failure leaves no contract a retry would conflict with

@@ -6,6 +6,7 @@ const { priceIntervals } = require('./tariff.priceIntervals');
 const { TARIFF_COMPONENT_KINDS } = require('./tariff.constants');
 const { THIRTY_MINUTES_MS } = require('./meter.intervals');
 const { DATE_REGEX } = require('./tariff.constants');
+const { getLocalContext } = require('./tariff.time');
 
 const MAX_PREVIEW_DAYS = 31;
 const SAMPLE_INTERVALS = 48;
@@ -83,11 +84,18 @@ async function preview(params) {
   if (to.getTime() - from.getTime() > MAX_PREVIEW_DAYS * 24 * 60 * 60 * 1000) {
     throw new BadParameters(`to: the preview window is limited to ${MAX_PREVIEW_DAYS} days`);
   }
-  const tariff = validateContractTariff(params.tariff, params.inputs, pricingMode);
   ['valid_from', 'valid_to'].forEach((key) => {
     if (params[key] && !DATE_REGEX.test(params[key])) {
       throw new BadParameters(`${key}: must be a YYYY-MM-DD date`);
     }
+  });
+  // the history kept is the one the contract keeps, widened to the window: the preview prices
+  // the window even when it starts before the contract
+  const windowFrom = getLocalContext(from.getTime(), timezone).date;
+  const windowTo = getLocalContext(to.getTime(), timezone).date;
+  const tariff = validateContractTariff(params.tariff, params.inputs, pricingMode, {
+    valid_from: params.valid_from && params.valid_from < windowFrom ? params.valid_from : windowFrom,
+    valid_to: params.valid_to && params.valid_to > windowTo ? params.valid_to : windowTo,
   });
   const billingPeriodStartDay =
     params.billing_period_start_day === undefined || params.billing_period_start_day === null

@@ -78,6 +78,57 @@ describe('energyContract: preview and current price', () => {
       expect(result.warnings).to.deep.equal({});
     });
 
+    it('should keep the price history of the contract validity and of the window', async () => {
+      // 20 dated subscriptions from 2006 to 2025: over the 16 components limit unless pruned
+      const history = [];
+      for (let year = 2006; year <= 2025; year += 1) {
+        history.push({
+          key: `subscription-${year}`,
+          kind: 'fixed',
+          amount: 100,
+          per: 'month',
+          when: { dates: { from: `${year}-01-01`, to: `${year}-12-31` } },
+        });
+      }
+      const tariff = {
+        tariff_version: 1,
+        components: [
+          {
+            key: 'energy',
+            kind: 'consumption',
+            rules: [{ when: { dates: { from: '2026-01-01', to: '2026-01-31' } }, price: 0.5 }],
+            fallback: { price: 0.2 },
+          },
+          ...history,
+        ],
+      };
+      // the window starts before the contract: its January price is kept to price it
+      const result = await energyContract.preview({
+        tariff,
+        from: '2026-01-12T00:00:00Z',
+        to: '2026-01-13T00:00:00Z',
+        valid_from: '2026-02-01',
+      });
+      expect(result.components).to.deep.equal({ energy: 12 });
+      // a contract validity reaching back to 2025 keeps the 2025 subscription
+      const longer = await energyContract.preview({
+        tariff,
+        from: '2026-01-12T00:00:00Z',
+        to: '2026-01-13T00:00:00Z',
+        valid_from: '2025-06-01',
+        valid_to: '2026-12-31',
+      });
+      expect(longer.components).to.deep.equal({ energy: 12, 'subscription-2025': 0 });
+      await expect(
+        energyContract.preview({
+          tariff,
+          from: '2026-01-12T00:00:00Z',
+          to: '2026-01-13T00:00:00Z',
+          valid_from: '2006-01-01',
+        }),
+      ).to.be.rejectedWith('tariff.components: must contain less than or equal to 16 items');
+    });
+
     it('should use a synthetic profile when the meter has no data, and defaults for the window', async () => {
       const result = await energyContract.preview({ tariff: BASE_TARIFF, electric_meter_device_id: METER_DEVICE_ID });
       expect(result.synthetic).to.equal(true);
