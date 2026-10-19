@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 
@@ -17,7 +17,17 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import LazyArtwork from './LazyArtwork';
 import MediaItemList from './MediaItemList';
 import MediaBrowser from './MediaBrowser';
-import { musicRoute, getErrorStatus, formatSeconds, QUEUE_PAGE_SIZE, queueOffsetAround } from './musicApi';
+import MusicSlider from './MusicSlider';
+import Equalizer from './Equalizer';
+import {
+  musicRoute,
+  getErrorStatus,
+  formatSeconds,
+  QUEUE_PAGE_SIZE,
+  queueOffsetAround,
+  COMMAND_ERROR_MS,
+  CONFIRMATION_TIMEOUT_MS
+} from './musicApi';
 import style from './MusicBox.css';
 
 const PANELS = { QUEUE: 'queue', BROWSE: 'browse' };
@@ -33,8 +43,28 @@ const NOW_PLAYING_TYPES = [
   DEVICE_FEATURE_TYPES.MUSIC.POSITION
 ];
 
+// a ticking progress moves about one second at a time: anything bigger is a seek or a new sample
+const PROGRESS_SMOOTH_STEP_S = 2;
+
 const isWritable = feature => Boolean(feature) && feature.read_only === false;
 const numberOrNull = value => (value === null || value === undefined ? null : Number(value));
+
+// an icon-only control of the player: the label is the tooltip and the accessible name
+const IconButton = ({ icon, labelKey, onClick, active, pressed, children }) => (
+  <Localizer>
+    <button
+      type="button"
+      class={cx(style.iconButton, { [style.iconButtonActive]: active })}
+      onClick={onClick}
+      title={<Text id={labelKey} />}
+      aria-label={<Text id={labelKey} />}
+      aria-pressed={pressed === undefined ? undefined : String(pressed)}
+    >
+      <i class={`fe fe-${icon}`} />
+      {children}
+    </button>
+  </Localizer>
+);
 
 class MusicComponent extends Component {
   state = {
@@ -51,7 +81,12 @@ class MusicComponent extends Component {
     // the position sampled by the player and the instant it was true (section 2 of the spec)
     position: null,
     positionChangedAt: null,
-    now: Date.now()
+    now: Date.now(),
+    // the value under the finger while the progress or the volume is dragged
+    scrubPosition: null,
+    volumeDraft: null,
+    // the notice of a command the player did not take ('commandFailed' / 'noResponse')
+    commandError: null
   };
 
   getDevice = async () => {
@@ -105,16 +140,49 @@ class MusicComponent extends Component {
     }
   };
 
-  setValueDevice = async (deviceFeature, value) => {
+  // The value route answers before the player acts (the action runs in the background), so a
+  // refused command or a player that went away never shows up as an HTTP error. A write to a
+  // feature with feedback (the player confirms it by publishing its new state) therefore waits
+  // for that state: without it in time, the optimistic state is replaced by the confirmed one and
+  // a short notice says the player did not respond.
+  setValueDevice = async (deviceFeature, value, { expectConfirmation = false } = {}) => {
+    if (expectConfirmation && deviceFeature.has_feedback) {
+      this.awaitConfirmation(deviceFeature.selector);
+    }
     try {
-      await this.setState({ error: false });
       await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
         value
       });
     } catch (e) {
       console.error(e);
-      this.setState({ error: true });
+      this.clearConfirmation(deviceFeature.selector);
+      this.showCommandError('commandFailed');
+      this.getDevice();
     }
+  };
+
+  awaitConfirmation = selector => {
+    this.clearConfirmation(selector);
+    this.pendingConfirmations[selector] = setTimeout(() => {
+      delete this.pendingConfirmations[selector];
+      this.showCommandError('noResponse');
+      this.getDevice();
+    }, CONFIRMATION_TIMEOUT_MS);
+  };
+
+  clearConfirmation = selector => {
+    if (this.pendingConfirmations[selector]) {
+      clearTimeout(this.pendingConfirmations[selector]);
+      delete this.pendingConfirmations[selector];
+    }
+  };
+
+  pendingConfirmations = {};
+
+  showCommandError = key => {
+    clearTimeout(this.commandErrorTimer);
+    this.setState({ commandError: key });
+    this.commandErrorTimer = setTimeout(() => this.setState({ commandError: null }), COMMAND_ERROR_MS);
   };
 
   // --- transport ---------------------------------------------------------
@@ -133,11 +201,15 @@ class MusicComponent extends Component {
     const { playBackStateFeature } = this.state;
     this.applyPlaybackState(value);
     if (isWritable(playBackStateFeature)) {
-      await this.setValueDevice(playBackStateFeature, value);
+      await this.setValueDevice(playBackStateFeature, value, { expectConfirmation: true });
     } else if (legacyFeature) {
       await this.setValueDevice(legacyFeature, 1);
     }
   };
+
+  // buffering is a play that has not started yet: the button pauses it
+  togglePlayPause = () =>
+    this.state.isPlaying || this.state.playbackState === MUSIC_PLAYBACK_STATE.BUFFERING ? this.pause() : this.play();
 
   next = async () => {
     await this.setValueDevice(this.state.nextFeature, 1);
@@ -147,18 +219,24 @@ class MusicComponent extends Component {
     await this.setValueDevice(this.state.previousFeature, 1);
   };
 
+  draftVolume = e => this.setState({ volumeDraft: Number(e.target.value) });
+
   changeVolume = async e => {
     const volume = parseInt(e.target.value, 10);
+    // released where it started: nothing to send, nothing the player would confirm
+    const unchanged = numberOrNull(this.state.volumeFeature.last_value) === volume;
     const newVolumeFeature = { ...this.state.volumeFeature, last_value: volume };
-    await this.setState({ volumeFeature: newVolumeFeature });
-    await this.setValueDevice(this.state.volumeFeature, volume);
+    await this.setState({ volumeFeature: newVolumeFeature, volumeDraft: null });
+    if (!unchanged) {
+      await this.setValueDevice(this.state.volumeFeature, volume, { expectConfirmation: true });
+    }
   };
 
   toggleBinary = async type => {
     const feature = this.state.features[type];
     const value = Number(feature.last_value) === 1 ? 0 : 1;
     this.updateFeatureValue(type, value);
-    await this.setValueDevice(feature, value);
+    await this.setValueDevice(feature, value, { expectConfirmation: true });
   };
 
   toggleShuffle = () => this.toggleBinary(DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE);
@@ -176,19 +254,19 @@ class MusicComponent extends Component {
     const current = options.indexOf(Number(feature.last_value));
     const value = options[(current + 1) % options.length];
     this.updateFeatureValue(DEVICE_FEATURE_TYPES.MUSIC.REPEAT, value);
-    await this.setValueDevice(feature, value);
+    await this.setValueDevice(feature, value, { expectConfirmation: true });
   };
 
+  // dragging the progress shows the time under the finger, releasing it seeks (a click or an
+  // arrow key is a drag of one step)
+  scrub = e => this.setState({ scrubPosition: Number(e.target.value) });
+
+  // a seek waits for no confirmation: a player republishes its position only when it deviates
+  // noticeably from the extrapolated one (section 5 of the spec)
   seek = async e => {
     const feature = this.state.features[DEVICE_FEATURE_TYPES.MUSIC.POSITION];
-    const duration = this.getDuration();
-    if (!isWritable(feature) || !duration) {
-      return;
-    }
-    const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = rect.width > 0 ? Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)) : 0;
-    const value = Math.round(ratio * duration);
-    this.setState({ position: value, positionChangedAt: Date.now(), now: Date.now() });
+    const value = Number(e.target.value);
+    this.setState({ scrubPosition: null, position: value, positionChangedAt: Date.now(), now: Date.now() });
     await this.setValueDevice(feature, value);
   };
 
@@ -284,6 +362,8 @@ class MusicComponent extends Component {
     if (!type) {
       return;
     }
+    // the player answered: whatever the value, it is the truth now
+    this.clearConfirmation(payload.device_feature_selector);
     const value = numberOrNull(payload.last_value);
     this.updateFeatureValue(type, value, payload.last_value_changed);
     if (type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
@@ -407,6 +487,8 @@ class MusicComponent extends Component {
   }
 
   componentWillUnmount() {
+    clearTimeout(this.commandErrorTimer);
+    Object.keys(this.pendingConfirmations).forEach(this.clearConfirmation);
     if (this.ticker) {
       clearInterval(this.ticker);
       this.ticker = null;
@@ -424,9 +506,38 @@ class MusicComponent extends Component {
 
   // --- render -----------------------------------------------------------
 
+  // the state of the player next to its name: moving bars while it plays, a word otherwise
+  // (paused, buffering, or stopped with a track still loaded)
+  renderStatus(hasTrack) {
+    const { playbackState } = this.state;
+    if (playbackState === MUSIC_PLAYBACK_STATE.PLAYING) {
+      return (
+        <Localizer>
+          <span
+            class={style.headerStatus}
+            role="img"
+            aria-label={<Text id="deviceFeatureValue.category.music.playback_state.1" />}
+            title={<Text id="deviceFeatureValue.category.music.playback_state.1" />}
+          >
+            <Equalizer animated />
+          </span>
+        </Localizer>
+      );
+    }
+    if (playbackState === null || (playbackState === MUSIC_PLAYBACK_STATE.IDLE && !hasTrack)) {
+      return null;
+    }
+    return (
+      <span class={style.headerStatus}>
+        <Text id={`deviceFeatureValue.category.music.playback_state.${playbackState}`} />
+      </span>
+    );
+  }
+
   renderTransport() {
     const {
       isPlaying,
+      playbackState,
       previousFeature,
       nextFeature,
       features,
@@ -437,126 +548,98 @@ class MusicComponent extends Component {
     const shuffleFeature = features[DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE];
     const repeatFeature = features[DEVICE_FEATURE_TYPES.MUSIC.REPEAT];
     const canPlayPause = isWritable(playBackStateFeature) || Boolean(playFeature) || Boolean(pauseFeature);
+    const buffering = playbackState === MUSIC_PLAYBACK_STATE.BUFFERING;
+    const showPause = isPlaying || buffering;
+    const shuffleOn = Boolean(shuffleFeature) && Number(shuffleFeature.last_value) === 1;
     const repeatValue = repeatFeature ? Number(repeatFeature.last_value) : null;
+    const repeatOn = repeatValue !== null && repeatValue !== MUSIC_REPEAT_MODE.OFF;
+    const playLabel = `dashboard.boxes.music.${showPause ? 'pause' : 'play'}`;
     return (
       <div class={style.transport}>
         {shuffleFeature && isWritable(shuffleFeature) && (
-          <button
-            type="button"
-            class={cx('btn btn-secondary', style.transportButton, {
-              [style.transportActive]: Number(shuffleFeature.last_value) === 1
-            })}
+          <IconButton
+            icon="shuffle"
+            labelKey="dashboard.boxes.music.shuffle"
             onClick={this.toggleShuffle}
-            title={<Text id="dashboard.boxes.music.shuffle" />}
-          >
-            <i class="fe fe-shuffle" />
-          </button>
+            active={shuffleOn}
+            pressed={shuffleOn}
+          />
         )}
         {previousFeature && (
-          <button
-            type="button"
-            class={cx('btn btn-secondary', style.transportButton)}
-            onClick={this.previous}
-            title={<Text id="dashboard.boxes.music.previous" />}
-          >
-            <i class="fe fe-skip-back" />
-          </button>
+          <IconButton icon="skip-back" labelKey="dashboard.boxes.music.previous" onClick={this.previous} />
         )}
-        {canPlayPause && !isPlaying && (
-          <button
-            type="button"
-            class={cx('btn btn-secondary', style.transportButton)}
-            onClick={this.play}
-            title={<Text id="dashboard.boxes.music.play" />}
-          >
-            <i class="fe fe-play" />
-          </button>
+        {canPlayPause && (
+          <Localizer>
+            <button
+              type="button"
+              class={style.playButton}
+              onClick={this.togglePlayPause}
+              title={<Text id={playLabel} />}
+              aria-label={<Text id={playLabel} />}
+            >
+              {buffering && <span class={style.spinner} />}
+              {!buffering && (
+                <i class={cx(`fe fe-${showPause ? 'pause' : 'play'}`, { [style.playIcon]: !showPause })} />
+              )}
+            </button>
+          </Localizer>
         )}
-        {canPlayPause && isPlaying && (
-          <button
-            type="button"
-            class={cx('btn btn-secondary', style.transportButton)}
-            onClick={this.pause}
-            title={<Text id="dashboard.boxes.music.pause" />}
-          >
-            <i class="fe fe-pause" />
-          </button>
-        )}
-        {nextFeature && (
-          <button
-            type="button"
-            class={cx('btn btn-secondary', style.transportButton)}
-            onClick={this.next}
-            title={<Text id="dashboard.boxes.music.next" />}
-          >
-            <i class="fe fe-skip-forward" />
-          </button>
-        )}
+        {nextFeature && <IconButton icon="skip-forward" labelKey="dashboard.boxes.music.next" onClick={this.next} />}
         {repeatFeature && isWritable(repeatFeature) && (
-          <button
-            type="button"
-            class={cx('btn btn-secondary', style.transportButton, {
-              [style.transportActive]: repeatValue !== null && repeatValue !== MUSIC_REPEAT_MODE.OFF
-            })}
+          <IconButton
+            icon="repeat"
+            labelKey="dashboard.boxes.music.repeat"
             onClick={this.cycleRepeat}
-            title={<Text id="dashboard.boxes.music.repeat" />}
+            active={repeatOn}
+            pressed={repeatOn}
           >
-            <i class="fe fe-repeat" />
-            {repeatValue === MUSIC_REPEAT_MODE.ONE && <small>1</small>}
-          </button>
+            {repeatValue === MUSIC_REPEAT_MODE.ONE && <span class={style.repeatOne}>1</span>}
+          </IconButton>
         )}
       </div>
     );
   }
 
   renderVolume() {
-    const { volumeFeature, features } = this.state;
+    const { volumeFeature, volumeDraft, features } = this.state;
     const muteFeature = features[DEVICE_FEATURE_TYPES.MUSIC.MUTE];
     if (!volumeFeature && !muteFeature) {
       return null;
     }
+    const muted = Boolean(muteFeature) && Number(muteFeature.last_value) === 1;
+    const volume = volumeDraft !== null ? volumeDraft : numberOrNull(volumeFeature && volumeFeature.last_value);
+    let icon = 'volume-2';
+    if (muted || volume === 0) {
+      icon = 'volume-x';
+    } else if (volume !== null && volume < 50) {
+      icon = 'volume-1';
+    }
     return (
       <div class={style.volumeRow}>
-        {muteFeature && isWritable(muteFeature) && (
-          <button
-            type="button"
-            class={cx('btn btn-secondary', style.transportButton, {
-              [style.transportActive]: Number(muteFeature.last_value) === 1
-            })}
-            onClick={this.toggleMute}
-            title={<Text id="dashboard.boxes.music.mute" />}
-          >
-            <i class={`fe fe-${Number(muteFeature.last_value) === 1 ? 'volume-x' : 'volume-2'}`} />
-          </button>
+        {muteFeature && isWritable(muteFeature) ? (
+          <IconButton icon={icon} labelKey="dashboard.boxes.music.mute" onClick={this.toggleMute} pressed={muted} />
+        ) : (
+          <span class={style.volumeIcon}>
+            <i class={`fe fe-${icon}`} />
+          </span>
         )}
         {volumeFeature && (
-          <input
-            type="range"
-            value={volumeFeature.last_value}
+          <MusicSlider
+            value={volume || 0}
+            max={100}
+            onInput={this.draftVolume}
             onChange={this.changeVolume}
-            class="form-control"
-            step="1"
-            min="0"
-            max="100"
-            aria-label={<Text id="dashboard.boxes.music.volume" />}
+            disabled={volumeFeature.read_only === true}
+            muted={muted}
+            label={<Text id="dashboard.boxes.music.volume" />}
+            valueText={`${volume || 0} %`}
           />
         )}
       </div>
     );
   }
 
-  renderNowPlaying() {
-    const { features, playbackState } = this.state;
-    const text = type => {
-      const feature = features[type];
-      return feature && feature.last_value_string ? feature.last_value_string : '';
-    };
-    const title = text(DEVICE_FEATURE_TYPES.MUSIC.TITLE);
-    const artist = text(DEVICE_FEATURE_TYPES.MUSIC.ARTIST);
-    const album = text(DEVICE_FEATURE_TYPES.MUSIC.ALBUM);
-    const artworkKey = text(DEVICE_FEATURE_TYPES.MUSIC.ARTWORK);
-    const idle = playbackState === MUSIC_PLAYBACK_STATE.IDLE || (!title && !artist && !album);
-    const subtitle = [artist, album].filter(Boolean).join(' · ');
+  renderNowPlaying({ title, artist, album, artworkKey }) {
     return (
       <div class={style.nowPlaying}>
         <LazyArtwork
@@ -567,14 +650,23 @@ class MusicComponent extends Component {
           alt={title}
         />
         <div class={style.nowPlayingText}>
-          <span class={style.title}>
-            {idle && !title && <Text id="dashboard.boxes.music.nothingPlaying" />}
-            {title}
-          </span>
-          {subtitle && <span class={style.subtitle}>{subtitle}</span>}
-          {playbackState !== null && (
-            <span class={style.stateLabel}>
-              <Text id={`deviceFeatureValue.category.music.playback_state.${playbackState}`} />
+          {title ? (
+            <span class={style.title} title={title}>
+              {title}
+            </span>
+          ) : (
+            <span class={cx(style.title, style.titleIdle)}>
+              <Text id="dashboard.boxes.music.nothingPlaying" />
+            </span>
+          )}
+          {artist && (
+            <span class={style.subtitle} title={artist}>
+              {artist}
+            </span>
+          )}
+          {album && (
+            <span class={style.album} title={album}>
+              {album}
             </span>
           )}
         </div>
@@ -582,31 +674,59 @@ class MusicComponent extends Component {
     );
   }
 
-  renderProgress() {
+  renderProgress(hasTrack) {
+    const { playbackState, scrubPosition } = this.state;
     const duration = this.getDuration();
+    // no duration while something is loaded: a stream (a radio), nothing to seek
+    if (!duration) {
+      if (!hasTrack || playbackState === null || playbackState === MUSIC_PLAYBACK_STATE.IDLE) {
+        return null;
+      }
+      return (
+        <div class={style.liveRow}>
+          <span class={style.liveBadge}>
+            <span class={style.liveDot} />
+            <Text id="dashboard.boxes.music.live" />
+          </span>
+        </div>
+      );
+    }
     const position = this.computePosition();
-    if (!duration || position === null) {
+    if (position === null) {
       return null;
     }
     const positionFeature = this.state.features[DEVICE_FEATURE_TYPES.MUSIC.POSITION];
-    const seekable = isWritable(positionFeature);
-    const ratio = Math.min(100, Math.max(0, (position / duration) * 100));
+    const shown = scrubPosition !== null ? scrubPosition : Math.min(position, duration);
+    const smooth = scrubPosition === null && playbackState === MUSIC_PLAYBACK_STATE.PLAYING;
     return (
       <div class={style.progress}>
-        <button
-          type="button"
-          class={cx(style.progressTrack, { [style.progressTrackSeekable]: seekable })}
-          onClick={seekable ? this.seek : undefined}
-          disabled={!seekable}
-          aria-label={<Text id="deviceFeatureCategory.music.position" />}
-        >
-          <div class={style.progressFill} style={{ width: `${ratio}%` }} />
-        </button>
+        <MusicSlider
+          value={shown}
+          max={duration}
+          onInput={this.scrub}
+          onChange={this.seek}
+          disabled={!isWritable(positionFeature)}
+          label={<Text id="deviceFeatureCategory.music.position" />}
+          valueText={`${formatSeconds(shown)} / ${formatSeconds(duration)}`}
+          smoothStep={smooth ? PROGRESS_SMOOTH_STEP_S : 0}
+        />
         <div class={style.progressTimes}>
-          <span>{formatSeconds(position)}</span>
+          <span>{formatSeconds(shown)}</span>
           <span>{formatSeconds(duration)}</span>
         </div>
       </div>
+    );
+  }
+
+  renderCommandError() {
+    const { commandError } = this.state;
+    if (!commandError) {
+      return null;
+    }
+    return (
+      <p class={cx('text-danger', style.commandNotice)} role="status">
+        <Text id={`dashboard.boxes.music.${commandError}`} />
+      </p>
     );
   }
 
@@ -636,6 +756,8 @@ class MusicComponent extends Component {
             deviceSelector={this.props.box.device}
             currentIndex={queueCurrentIndex}
             indexOffset={queueOffset}
+            isPlaying={this.state.isPlaying}
+            scrollToCurrent
             onPlay={this.playQueueItem}
             emptyKey="dashboard.boxes.music.emptyQueue"
             onArtworkNotFound={this.onQueueArtworkNotFound}
@@ -662,6 +784,7 @@ class MusicComponent extends Component {
               type="button"
               class={cx('btn btn-sm', panel === PANELS.QUEUE ? 'btn-primary' : 'btn-secondary')}
               onClick={this.toggleQueue}
+              aria-expanded={panel === PANELS.QUEUE ? 'true' : 'false'}
             >
               <i class="fe fe-list mr-1" />
               <Text id="dashboard.boxes.music.queue" />
@@ -672,6 +795,7 @@ class MusicComponent extends Component {
               type="button"
               class={cx('btn btn-sm', panel === PANELS.BROWSE ? 'btn-primary' : 'btn-secondary')}
               onClick={this.toggleBrowse}
+              aria-expanded={panel === PANELS.BROWSE ? 'true' : 'false'}
             >
               <i class={`fe fe-${capabilities.search ? 'search' : 'folder'} mr-1`} />
               <Text id={`dashboard.boxes.music.${capabilities.search ? 'search' : 'browse'}`} />
@@ -742,6 +866,7 @@ class MusicComponent extends Component {
               </div>
             </div>
           )}
+          {this.renderCommandError()}
           {this.renderPanels()}
         </div>
       </div>
@@ -753,17 +878,30 @@ class MusicComponent extends Component {
     if (!musicDevice || !hasNowPlaying) {
       return this.renderLegacy(props, state);
     }
-    const title = get(props, 'box.name') || musicDevice.name;
+    const boxTitle = get(props, 'box.name') || musicDevice.name;
+    const text = type => {
+      const feature = state.features[type];
+      return feature && feature.last_value_string ? feature.last_value_string : '';
+    };
+    const track = {
+      title: text(DEVICE_FEATURE_TYPES.MUSIC.TITLE),
+      artist: text(DEVICE_FEATURE_TYPES.MUSIC.ARTIST),
+      album: text(DEVICE_FEATURE_TYPES.MUSIC.ALBUM),
+      artworkKey: text(DEVICE_FEATURE_TYPES.MUSIC.ARTWORK)
+    };
+    const hasTrack = Boolean(track.title || track.artist || track.album);
     return (
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">{title}</h3>
+        <div class={cx('card-header', style.header)}>
+          <h3 class="card-title">{boxTitle}</h3>
+          {this.renderStatus(hasTrack)}
         </div>
         <div class="card-body">
-          {this.renderNowPlaying()}
-          {this.renderProgress()}
+          {this.renderNowPlaying(track)}
+          {this.renderProgress(hasTrack)}
           {this.renderTransport()}
           {this.renderVolume()}
+          {this.renderCommandError()}
           {this.renderPanels()}
         </div>
       </div>
