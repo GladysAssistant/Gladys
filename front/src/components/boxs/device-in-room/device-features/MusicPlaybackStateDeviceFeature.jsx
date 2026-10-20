@@ -37,6 +37,7 @@ const MusicPlaybackStateDeviceFeature = props => {
             name={`box-${props.x}-${props.y}-${deviceFeature.id}`}
             value="1"
             class="custom-switch-input"
+            aria-label={props.rowName}
             checked={isPlaying}
             onClick={updateValue}
           />
