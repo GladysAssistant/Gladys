@@ -91,6 +91,7 @@
       "unitMismatchWarning": "Esta función tiene una unidad diferente a la de la función de origen: los valores se trasladan sin conversión, por lo que los gráficos pueden volverse incoherentes.",
       "unmappedWarning": "Algunas funciones no tienen coincidencia: su historial se eliminará y las escenas y paneles que las utilicen no se actualizarán.",
       "playNotificationWarning": "El dispositivo de destino no puede reproducir notificaciones: las escenas que \"hablan en\" este altavoz se redirigirán al destino y fallarán al ejecutarse. Elija un destino compatible con las notificaciones o modifique esas escenas después de la migración.",
+      "playMediaWarning": "Las escenas que reproducen música (una lista, un álbum, una pista) en este reproductor conservan referencias de medios que pertenecen a su integración: se redirigirán al destino y solo funcionarán si el destino usa el mismo proveedor de música. Revise esas escenas después de la migración.",
       "noDestinationAvailable": "No se encontró ningún dispositivo de otra integración. Cree primero el dispositivo de destino en su nueva integración y luego vuelva aquí para migrar.",
       "loadError": "No se pudo cargar la lista de dispositivos. Inténtelo de nuevo.",
       "migrateError": "La migración falló. El dispositivo antiguo no se eliminó, pero es posible que parte del historial ya se haya trasladado al destino. Revise la página de tareas y su lista de dispositivos, y luego vuelva a intentarlo: al repetir la operación solo se traslada lo que falta por migrar.",

@@ -39,9 +39,13 @@ async function newStateEvent(event) {
     return;
   }
   try {
-    // A "text" property is a string state, an EMPTY one included: a music player reports
-    // "nothing loaded" as empty title/artist/album/artwork (capabilities/music.md, section 1)
-    if (event.text !== undefined) {
+    // A "text" property is a string state. An EMPTY one only counts on a feature whose state is
+    // a string by type: a music player reports "nothing loaded" as empty title/artist/album/
+    // artwork (capabilities/music.md, section 1), while an empty text on a camera image (also
+    // held in last_value_string) is ignored, as it always was, rather than wiping the last frame.
+    // A null text is not a text either: the state, if any, is saved.
+    const hasText = typeof event.text === 'string' || (event.text !== undefined && event.text !== null);
+    if (hasText && (event.text !== '' || isStringStateFeature(deviceFeature))) {
       const text = normalizeStringState(deviceFeature, event.text);
       if (text === null) {
         logger.warn(`DeviceFeature "${deviceFeature.external_id}": refused string state, skipping state update.`);

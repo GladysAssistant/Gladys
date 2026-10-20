@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert: sinonAssert, fake } = sinon;
 
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
 const {
   buildSupervisor,
   seedExternalService,
@@ -135,9 +135,12 @@ describe('externalIntegration.registerProxyService', () => {
       return { musicService, proxy: stateManager.get('service', service.name) };
     };
 
-    it('should expose the capability on device integrations only, answering the manifest declaration', () => {
-      expect(proxyService.music).to.be.an('object');
-      expect(proxyService.music.getCapabilities()).to.deep.equal({
+    it('should expose the capability only on device integrations that declare the music field', () => {
+      // the fixture manifest declares no `music`: a vacuum or a meter integration gets no capability
+      expect(proxyService.music).to.equal(undefined);
+      // an empty declaration is enough for an artwork-only player
+      const { proxy: artworkOnly } = registerMusic({});
+      expect(artworkOnly.music.getCapabilities()).to.deep.equal({
         browse: false,
         search: false,
         queue: false,
@@ -145,12 +148,13 @@ describe('externalIntegration.registerProxyService', () => {
       });
       const { proxy } = registerMusic({ browse: true, search: true });
       expect(proxy.music.getCapabilities()).to.deep.equal({ browse: true, search: true, queue: false, append: false });
-      externalIntegration.registerProxyService({ ...service, manifest: TEST_COMMUNICATION_MANIFEST });
+      externalIntegration.registerProxyService({ ...service, manifest: { ...TEST_COMMUNICATION_MANIFEST, music: {} } });
       expect(stateManager.get('service', service.name).music).to.equal(undefined);
     });
 
     it('should refuse an undeclared operation without a command', async () => {
       externalIntegration.relayMusicCommand = fake.resolves({});
+      ({ proxy: proxyService } = registerMusic({}));
       await expect(proxyService.music.browse(device, { parentId: null, offset: 0, limit: 50 })).to.be.rejectedWith(
         NotFoundError,
         'MUSIC_OPERATION_NOT_SUPPORTED',
@@ -163,7 +167,8 @@ describe('externalIntegration.registerProxyService', () => {
       // play with replace needs no declaration, next/append need `append`
       await proxyService.music.play(device, { id: 'x', type: 'track' }, 'replace');
       await expect(proxyService.music.play(device, { id: 'x', type: 'track' }, 'append')).to.be.rejectedWith(
-        NotFoundError,
+        BadParameters,
+        'MUSIC_MODE_NOT_SUPPORTED',
       );
       sinonAssert.calledOnce(externalIntegration.relayMusicCommand);
     });

@@ -62,6 +62,8 @@ class MediaBrowser extends Component {
 
   componentWillUnmount() {
     this.unmounted = true;
+    // a search typed just before the sheet closes must not fire after the unmount
+    this.searchDebounced.clear();
     clearTimeout(this.feedbackTimer);
   }
 

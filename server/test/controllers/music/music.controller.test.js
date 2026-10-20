@@ -113,10 +113,25 @@ describe('Music API', () => {
       expect(res.body).to.deep.equal({ browse: true, search: true, queue: true, append: false });
     });
 
-    it('should 404 on an unknown device and on a device of an internal service', async () => {
-      await authenticatedRequest.get('/api/v1/device/nope/music/capabilities').expect(404);
-      const res = await authenticatedRequest.get('/api/v1/device/test-device/music/capabilities').expect(404);
+    it('should 404 on an unknown device', async () => {
+      const res = await authenticatedRequest.get('/api/v1/device/nope/music/capabilities').expect(404);
+      expect(res.body.message).to.equal('Device not found');
+    });
+
+    it('should 404 MUSIC_NOT_SUPPORTED on a device of an internal service', async () => {
+      // a device this file owns, on the seed's internal service: the shared seed devices are
+      // deleted by other files on the same mocha worker
+      const internalPlayer = await gladys.device.create({
+        name: 'Internal speaker',
+        external_id: 'music-test:internal-speaker',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        features: [],
+      });
+      const res = await authenticatedRequest
+        .get(`/api/v1/device/${internalPlayer.selector}/music/capabilities`)
+        .expect(404);
       expect(res.body.message).to.equal('MUSIC_NOT_SUPPORTED');
+      gladys.stateManager.deleteState('device', internalPlayer.selector);
     });
   });
 
@@ -194,12 +209,12 @@ describe('Music API', () => {
         .post(`${base}/queue/play`)
         .send({})
         .expect(400);
-      // append is not declared by the manifest
+      // append is not declared by the manifest: the mode is refused, not the player
       const res = await authenticatedRequest
         .post(`${base}/play`)
         .send({ media: { id: 'x', type: 'track' }, mode: 'append' })
-        .expect(404);
-      expect(res.body.message).to.equal('MUSIC_OPERATION_NOT_SUPPORTED');
+        .expect(400);
+      expect(res.body.message).to.equal('MUSIC_MODE_NOT_SUPPORTED');
       expect(sendCommand.callCount).to.equal(0);
     });
 

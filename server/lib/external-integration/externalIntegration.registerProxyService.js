@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { ExternalIntegrationUnavailableError, NotFoundError } = require('../../utils/coreErrors');
+const { ExternalIntegrationUnavailableError, NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS, MUSIC_PLAY_MODES } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
@@ -240,17 +240,25 @@ function registerProxyService(service) {
   };
   // music players (capabilities/music.md, section 4): the on-demand catalog,
   // queue and artwork of a device integration's players, relayed over the
-  // integration WebSocket and bounded on the way back. The operations the
-  // integration implements are declared in the `music` manifest field: an
-  // undeclared one is refused here without a command. The capabilities are
-  // answered from the stored manifest, whatever the state of the container.
-  const isDeviceIntegration = service.manifest && service.manifest.type === 'device';
-  const musicDeclaration = (service.manifest && service.manifest.music) || {};
+  // integration WebSocket and bounded on the way back. The capability only
+  // exists on an integration that OPTED IN through the `music` manifest field
+  // (`{}` is enough for an artwork-only player): a vacuum or a meter
+  // integration never gets a play command relayed to it. The operations the
+  // integration implements are the field's flags: an undeclared one is refused
+  // here without a command. The capabilities are answered from the stored
+  // manifest, whatever the state of the container.
+  const musicDeclaration = service.manifest && service.manifest.music;
+  const isMusicIntegration =
+    service.manifest &&
+    service.manifest.type === 'device' &&
+    musicDeclaration !== null &&
+    typeof musicDeclaration === 'object' &&
+    !Array.isArray(musicDeclaration);
   const musicSupports = Object.freeze({
-    browse: musicDeclaration.browse === true,
-    search: musicDeclaration.search === true,
-    queue: musicDeclaration.queue === true,
-    append: musicDeclaration.append === true,
+    browse: isMusicIntegration && musicDeclaration.browse === true,
+    search: isMusicIntegration && musicDeclaration.search === true,
+    queue: isMusicIntegration && musicDeclaration.queue === true,
+    append: isMusicIntegration && musicDeclaration.append === true,
   });
   const requireMusicOperation = (operation) => {
     if (!musicSupports[operation]) {
@@ -262,7 +270,7 @@ function registerProxyService(service) {
     selector: device.selector,
     params: device.params,
   });
-  const musicCapability = isDeviceIntegration
+  const musicCapability = isMusicIntegration
     ? {
         music: Object.freeze({
           getCapabilities: () => ({ ...musicSupports }),
@@ -299,8 +307,10 @@ function registerProxyService(service) {
             return result;
           },
           play: async (device, media, mode) => {
-            if (mode !== MUSIC_PLAY_MODES.REPLACE) {
-              requireMusicOperation('append');
+            // next / append need the `append` flag: a 400 names the mode, the
+            // player itself stays a valid target (section 4.3)
+            if (mode !== MUSIC_PLAY_MODES.REPLACE && !musicSupports.append) {
+              throw new BadParameters('MUSIC_MODE_NOT_SUPPORTED');
             }
             await this.relayMusicCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_PLAY, {
               device: devicePayload(device),

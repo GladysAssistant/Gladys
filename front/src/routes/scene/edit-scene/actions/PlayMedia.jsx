@@ -44,15 +44,23 @@ class PlayMedia extends Component {
       this.setState({ capabilities: null });
       return;
     }
+    // the answer of a player the user already switched away from is ignored: the last request
+    // started is the only one allowed to set the capabilities
+    this.requestedDevice = deviceSelector;
     try {
       const capabilities = await this.props.httpClient.get(musicRoute(deviceSelector, 'capabilities'));
+      if (this.requestedDevice !== deviceSelector) {
+        return;
+      }
       const usable = Boolean(capabilities.browse || capabilities.search);
       this.setState({ capabilities: usable ? capabilities : false });
     } catch (e) {
       if (getErrorStatus(e) !== 404) {
         console.error(e);
       }
-      this.setState({ capabilities: false });
+      if (this.requestedDevice === deviceSelector) {
+        this.setState({ capabilities: false });
+      }
     }
   };
 

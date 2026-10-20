@@ -291,6 +291,13 @@ class MigrateDeviceModal extends Component {
       );
     const playNotificationLost =
       destinationDevice && hasPlayNotification(sourceFeatures) && !hasPlayNotification(destinationDevice.features);
+    // A `music.play-media` scene action stores the device selector and a media id owned by the
+    // source player's provider (capabilities/music.md, section 7). The destination always
+    // belongs to another integration (the modal filters the source's service out), so the
+    // re-pointed action can only work when both players share the same provider: a player
+    // being migrated gets a dedicated note.
+    const isMusicPlayer = sourceFeatures.some(feature => feature.category === DEVICE_FEATURE_CATEGORIES.MUSIC);
+    const playMediaAtRisk = Boolean(destinationDevice) && isMusicPlayer;
     const deviceGroups = this.getDeviceOptions();
     const hasDeviceOptions = devices.length > 0;
     // The modal is rendered on <body>: it opens from inside a glass card, whose
@@ -384,6 +391,11 @@ class MigrateDeviceModal extends Component {
                           {playNotificationLost && (
                             <div class="alert alert-warning">
                               <Text id="device.migrate.playNotificationWarning" />
+                            </div>
+                          )}
+                          {playMediaAtRisk && (
+                            <div class="alert alert-warning">
+                              <Text id="device.migrate.playMediaWarning" />
                             </div>
                           )}
                         </div>

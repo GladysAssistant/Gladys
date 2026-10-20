@@ -83,7 +83,7 @@ An integration that implements any of these operations declares them:
 "music": { "browse": true, "search": true, "queue": true, "append": false }
 ```
 
-Each boolean defaults to `false`. `browse`, `search` and `queue` name the three read operations; `append` says the player accepts `mode: "next"` / `"append"` on a play command (section 4.3). The core answers `404 MUSIC_OPERATION_NOT_SUPPORTED` for an undeclared operation **without sending a command**, and the frontend reads the declaration through `GET /api/v1/device/:selector/music/capabilities` (below) to decide which panels to show. The field is accepted on `type: "device"` manifests only (a player is a device), and it is one of the fields the manifest's `structure_changed` ignores (it changes nothing on the user's devices). The `manifest.schema.json` of the store gains the field (canonical copy in `GladysAssistant/integration-store`, vendored copy in the monorepo).
+Each boolean defaults to `false`. `browse`, `search` and `queue` name the three read operations; `append` says the player accepts `mode: "next"` / `"append"` on a play command (section 4.3). The core answers `404 MUSIC_OPERATION_NOT_SUPPORTED` for an undeclared read operation (browse, search, queue) and `400 MUSIC_MODE_NOT_SUPPORTED` for an undeclared play mode (`next` / `append` without `append`) **without sending a command**, and the frontend reads the declaration through `GET /api/v1/device/:selector/music/capabilities` (below) to decide which panels to show. **Declaring the field is the opt-in**: the `music` capability only exists on an integration whose manifest carries it — `"music": {}` is enough for an artwork-only player (a Cast-like integration that publishes now-playing states and serves artwork but has no catalog); an integration without the field (a vacuum, a meter) never gets a play command relayed, its devices answer `404 MUSIC_NOT_SUPPORTED` on the music routes. The field is accepted on `type: "device"` manifests only (a player is a device); it changes nothing on the user's devices (the discovered-device `structure_changed` flag is about features, not the manifest), and like `widgets` or `scene_triggers` it requires `gladys_version` ≥ the first release accepting it. The `manifest.schema.json` of the store gains the field (canonical copy in `GladysAssistant/integration-store`, vendored copy in the monorepo).
 
 ### 4.2 The `MediaItem` object
 
@@ -158,7 +158,7 @@ The SDK carries the convenience so that an integration author never reimplements
 | `onMusicQueueGet(cb)` | `(device, { offset, limit }) => Promise<{ items, currentIndex, total }>` |
 | `onMusicQueuePlay(cb)` | `(device, index) => Promise` |
 
-Handlers follow the automatic-ack rule of C.8 (resolve → `success: true` with the value in `data`, throw → `success: false` with the message, absent → `"not implemented"`). The dev mode of the SDK validates `MediaItem`s and artwork against the bounds of sections 3 and 4 before they leave the integration, and the template shows a player with `publishNowPlaying` on an event and the five handlers.
+Handlers follow the automatic-ack rule of C.8 (resolve → `success: true` with the value in `data`, throw → `success: false` with the message, absent → `"not implemented"`). The dev mode of the SDK validates `MediaItem`s and artwork against the bounds of sections 3 and 4 before they leave the integration, and the template shows a player with `publishNowPlaying` on an event and the six handlers.
 
 ## 6. Frontend: the music box
 
@@ -185,8 +185,8 @@ A new core action `ACTIONS.MUSIC.PLAY_MEDIA` (`music.play-media`), next to `play
 
 - **Editor**: a player select (music devices of external integrations whose manifest declares `browse` or `search`), then the browse / search picker of section 6 reused as is (an opened album or playlist is picked whole through its "Choose" button); the chosen `MediaItem` is stored as `{ id, type, title }` — the title is display only and may age, **the `id` is what plays**. `mode` defaults to `replace`, `next` / `append` offered when the integration declares `append`.
 - **Runtime**: `gladys.device.music.play(device, media, mode)` → the relay of section 4.4; an integration that is stopped, disconnected or refusing makes the action throw, and the scene framework contains and logs the failure as for `play-notification` (there is nothing to degrade to).
-- **Migration**: the action stores the **device** selector, so `device.migrate` rewrites it unconditionally (the `play_notification` precedent of `device-migration.md`); the `media.id` only makes sense on the same provider, so the migration modal warns when the destination device belongs to another integration.
-- The MCP scene schemas (`server/services/mcp/lib/sceneSchemas.js`) expose the action with its `media` reference as free fields; the assistant can fill `id` only from a search it ran through the same routes (a later lead, not part of the first PR).
+- **Migration**: the action stores the **device** selector, so `device.migrate` rewrites it unconditionally (the `play_notification` precedent of `device-migration.md`); the `media.id` only makes sense on the same provider, and the destination of a migration always belongs to another integration (the modal filters the source's service out), so the modal shows a dedicated note whenever the migrated device is a music player: the scenes playing media on it keep provider-owned references and only work when the destination uses the same provider (`device-migration.md` B.5).
+- The MCP scene schemas do not expose the action yet: the assistant could only fill a `media.id` from a search it ran itself through the same routes, which is the MCP lead of the "Later leads" section.
 
 ## 8. Internal services: frozen, and the migration path
 
@@ -228,7 +228,7 @@ A new core action `ACTIONS.MUSIC.PLAY_MEDIA` (`music.play-media`), next to `play
 - **Proxy service / supervisor**: each of the six commands relayed with the right payload, 10 s (15 s for artwork) timeouts honored, `success: false` → `ExternalIntegrationUnavailableError`, in-flight cap, undeclared operation refused without a command; `MediaItem` normalization (unknown fields dropped, caps, bad `type` or missing `id`/`title` dropped with a warning, 100-item cap, `current_index` bounds); artwork allowlist (state key, response key within 1 h, expired key and unknown key `404` without a command), validation codes, cache hit served while the integration is stopped, cache miss `503` while stopped, the image pool shared with widget images.
 - **Controllers** (`server/test/controllers/device/music/`): every route — auth, device access, internal-service device `404`, `capabilities` answered from the stored manifest while the integration is stopped, disconnected integration `503` on the relayed routes, undeclared operation `404`, queue page semantics (`current_index` and `total` on the full queue, `offset` honored), parameter validation (`limit` caps, `q` required, `mode` values, `index` integer), relayed error `400`, timeout `504`, artwork `content-type;base64` shape.
 - **Scene action**: `music.play-media` resolves the device and relays; failure contained and logged; `device.migrate` rewrites the device selector; the modal warning on a cross-integration destination.
-- **Frontend**: the Cypress music box spec covers the legacy layout, the now-playing layout with extrapolated progress, play-pause through a writable `playback_state`, the queue and the search panels against a stubbed API.
+- **Frontend**: validated by `eslint`, `compare-translations`, the production build and the existing Cypress suites (dashboard and scene editor); a dedicated Cypress spec of the music box against a stubbed API is a later lead.
 
 ## 12. Verification (manual e2e, environment with the Docker socket)
 
@@ -248,7 +248,7 @@ Dev-install a player integration built on the template (section 5) → create it
 - Type filter chips under the search field (all, tracks, albums, artists, playlists, radios): the search route already takes `type`, the panel does not offer it yet.
 - Adding to favorites, creating playlists, a global search across every music integration, transferring playback between players (the Spotify Connect gesture).
 - A `radio` root folder for catalog-less players (Cast) listing user-configured streams.
-- The assistant: an MCP tool to search and play through the same routes.
+- The assistant: an MCP tool to search and play through the same routes, and the `music.play-media` action in the MCP scene schemas (`server/services/mcp/lib/sceneSchemas.js`).
 - An "accept a key, serve the thumbnail" default resize step in the SDK (`sharp` optional dependency) for sources without a small variant.
 
 ## Alternatives considered

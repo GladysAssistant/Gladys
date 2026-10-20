@@ -92,7 +92,7 @@ module.exports = function MusicController(gladys) {
    * artwork state, or a key seen in a catalog or queue answer of the last hour), validated and
    * cached by the core. 404 on any other key, nothing sent to the integration.
    * @apiSuccessExample {json} Success-Example
-   * { "image": "image/jpeg;base64,/9j/4AAQ..." }
+   * { "image": "data:image/jpeg;base64,/9j/4AAQ..." }
    */
   async function getArtwork(req, res) {
     const image = await gladys.device.music.getArtwork(req.params.device_selector, req.params.key);

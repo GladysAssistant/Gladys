@@ -652,8 +652,9 @@ export const getFeatureDefaultValues = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
     const musicDefaults = { ...defaults, keep_history: false };
     if (type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
-      // paused / playing / idle / buffering, writable (1 plays, 0 pauses, 2 stops)
-      return applyDefaultUnit({ ...musicDefaults, min: 0, max: 3, read_only: false }, category, type);
+      // paused / playing / idle, writable (1 plays, 0 pauses, 2 stops); buffering (3) is reported
+      // only, never a command, so it stays out of the writable range
+      return applyDefaultUnit({ ...musicDefaults, min: 0, max: 2, read_only: false }, category, type);
     }
     if (type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME) {
       return applyDefaultUnit({ ...musicDefaults, min: 0, max: 100, read_only: false }, category, type);

@@ -314,6 +314,45 @@ describe('Device.newStateEvent', () => {
     newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:artwork');
     expect(newDeviceFeature).to.have.property('last_value_string', '');
   });
+  it('should keep ignoring an empty text on a feature that is not a string state (camera image)', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', 'mqtt:camera:image', {
+      id: 'camera-image-feature',
+      selector: 'test-camera-image',
+      external_id: 'mqtt:camera:image',
+      category: 'camera',
+      type: 'image',
+      last_value_string: 'image/jpg;base64,last-frame',
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+    });
+    stateManager.setState('deviceById', '7f85c2f8-86cc-4600-84db-6c074dadb4e8', { features: [] });
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    device.saveStringState = sinon.fake.resolves(null);
+    device.saveState = sinon.fake.resolves(null);
+    await device.newStateEvent({ device_feature_external_id: 'mqtt:camera:image', text: '' });
+    sinon.assert.notCalled(device.saveStringState);
+    // a non-empty text still reaches the image, as it always did
+    await device.newStateEvent({ device_feature_external_id: 'mqtt:camera:image', text: 'image/jpg;base64,new' });
+    sinon.assert.calledOnce(device.saveStringState);
+  });
+  it('should treat a null text as no text and save the numeric state', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', 'hue:binary:1', {
+      id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      selector: 'test-device-feature',
+      external_id: 'hue:binary:1',
+      category: 'light',
+      type: 'binary',
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+    });
+    stateManager.setState('deviceById', '7f85c2f8-86cc-4600-84db-6c074dadb4e8', {});
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    device.saveStringState = sinon.fake.resolves(null);
+    device.saveState = sinon.fake.resolves(null);
+    await device.newStateEvent({ device_feature_external_id: 'hue:binary:1', text: null, state: 12 });
+    sinon.assert.notCalled(device.saveStringState);
+    sinon.assert.calledOnce(device.saveState);
+  });
   it('should swallow a failing save, logging it', async () => {
     const stateManager = new StateManager(event);
     seedMusicFeature(stateManager, 'title');
