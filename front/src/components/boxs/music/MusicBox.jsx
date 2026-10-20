@@ -51,7 +51,7 @@ const isWritable = feature => Boolean(feature) && feature.read_only === false;
 const numberOrNull = value => (value === null || value === undefined ? null : Number(value));
 
 // an icon-only control of the player: the label is the tooltip and the accessible name
-const IconButton = ({ icon, labelKey, onClick, active, pressed, children }) => (
+const IconButton = ({ icon, labelKey, onClick, active, pressed, opensDialog, children }) => (
   <Localizer>
     <button
       type="button"
@@ -60,6 +60,7 @@ const IconButton = ({ icon, labelKey, onClick, active, pressed, children }) => (
       title={<Text id={labelKey} />}
       aria-label={<Text id={labelKey} />}
       aria-pressed={pressed === undefined ? undefined : String(pressed)}
+      aria-haspopup={opensDialog ? 'dialog' : undefined}
     >
       <i class={`fe fe-${icon}`} />
       {children}
@@ -604,7 +605,8 @@ class MusicComponent extends Component {
   renderVolume() {
     const { volumeFeature, volumeDraft, features } = this.state;
     const muteFeature = features[DEVICE_FEATURE_TYPES.MUSIC.MUTE];
-    if (!volumeFeature && !muteFeature) {
+    const panelTabs = this.getPanelTabs();
+    if (!volumeFeature && !muteFeature && panelTabs.length === 0) {
       return null;
     }
     const muted = Boolean(muteFeature) && Number(muteFeature.last_value) === 1;
@@ -617,25 +619,30 @@ class MusicComponent extends Component {
     }
     return (
       <div class={style.volumeRow}>
-        {muteFeature && isWritable(muteFeature) ? (
-          <IconButton icon={icon} labelKey="dashboard.boxes.music.mute" onClick={this.toggleMute} pressed={muted} />
-        ) : (
-          <span class={style.volumeIcon}>
-            <i class={`fe fe-${icon}`} />
-          </span>
+        {(volumeFeature || muteFeature) && (
+          <div class={style.volumeControl}>
+            {muteFeature && isWritable(muteFeature) ? (
+              <IconButton icon={icon} labelKey="dashboard.boxes.music.mute" onClick={this.toggleMute} pressed={muted} />
+            ) : (
+              <span class={style.volumeIcon}>
+                <i class={`fe fe-${icon}`} />
+              </span>
+            )}
+            {volumeFeature && (
+              <MusicSlider
+                value={volume || 0}
+                max={100}
+                onInput={this.draftVolume}
+                onChange={this.changeVolume}
+                disabled={volumeFeature.read_only === true}
+                muted={muted}
+                label={<Text id="dashboard.boxes.music.volume" />}
+                valueText={`${volume || 0} %`}
+              />
+            )}
+          </div>
         )}
-        {volumeFeature && (
-          <MusicSlider
-            value={volume || 0}
-            max={100}
-            onInput={this.draftVolume}
-            onChange={this.changeVolume}
-            disabled={volumeFeature.read_only === true}
-            muted={muted}
-            label={<Text id="dashboard.boxes.music.volume" />}
-            valueText={`${volume || 0} %`}
-          />
-        )}
+        {panelTabs.length > 0 && this.renderPanelButtons(panelTabs)}
       </div>
     );
   }
@@ -788,24 +795,19 @@ class MusicComponent extends Component {
     return tabs;
   }
 
-  renderPanels() {
-    const tabs = this.getPanelTabs();
-    if (tabs.length === 0) {
-      return null;
-    }
+  // the queue and the catalog are opened from two quiet icons at the end of the volume row (where a
+  // player app puts its queue button), never from labelled pills under the card
+  renderPanelButtons(tabs) {
     return (
-      <div class={style.panelTabs}>
+      <div class={style.panelButtons}>
         {tabs.map(tab => (
-          <button
+          <IconButton
             key={tab.key}
-            type="button"
-            class="btn btn-sm btn-secondary"
+            icon={tab.icon}
+            labelKey={tab.labelKey}
             onClick={tab.key === PANELS.QUEUE ? this.openQueue : this.openBrowse}
-            aria-haspopup="dialog"
-          >
-            <i class={`fe fe-${tab.icon} mr-1`} />
-            <Text id={tab.labelKey} />
-          </button>
+            opensDialog
+          />
         ))}
       </div>
     );
@@ -899,7 +901,6 @@ class MusicComponent extends Component {
           {this.renderTransport()}
           {this.renderVolume()}
           {this.renderCommandError()}
-          {this.renderPanels()}
           {this.renderSheet(boxTitle, hasNowPlaying ? track : null)}
         </div>
       </div>

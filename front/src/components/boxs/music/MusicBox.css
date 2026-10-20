@@ -31,8 +31,9 @@
 }
 
 .nowPlayingArtwork {
-  flex: 0 0 5.5rem;
-  width: 5.5rem;
+  /* a third of a narrow card at most: the title keeps room on a 5- or 6-column dashboard */
+  flex: 0 0 min(5.5rem, 32%);
+  width: min(5.5rem, 32%);
   box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
 }
 
@@ -281,8 +282,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  /* a narrow card (a 5- or 6-column dashboard) closes the gaps, then narrows the icon buttons,
+     instead of letting shuffle and repeat spill out of the card */
+  gap: clamp(0.125rem, 4%, 0.75rem);
   margin-top: 0.5rem;
+}
+
+.transport .iconButton {
+  flex: 0 1 auto;
+  min-width: 1.75rem;
+  border-radius: 999px;
 }
 
 .iconButton {
@@ -391,11 +400,29 @@
   margin-left: 3px;
 }
 
+/* the volume, then the queue / search icons at the end of the row; on a narrow card the icons wrap
+   under the volume (right-aligned) instead of squeezing the slider */
 .volumeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.volumeControl {
+  flex: 1 1 10rem;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+}
+
+.panelButtons {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 0.125rem;
+  margin-left: auto;
 }
 
 .volumeIcon {
@@ -483,13 +510,7 @@
   }
 }
 
-/* --- panels: openers in the card, content in the sheet --- */
-
-.panelTabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
+/* --- panels: the content of the sheet --- */
 
 /* The sheet of the queue and the catalog: the light panel's shell. Anchored at the bottom and sized
    in dvh (on iOS a fixed element measured in vh spills past the toolbars). Its height is fixed so a
