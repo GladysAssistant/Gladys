@@ -1714,9 +1714,10 @@
   margin: 4px 0;
 }
 
-/* the dark-mode selector outweighs `.dark-mode .glass-theme .card
-   .btn-secondary`, which would tint each segment of a btn-secondary group
-   (shutter buttons in the scene editor) */
+/* the dark-mode selector has the same weight (0,4,0) as `.dark-mode
+   .glass-theme .card .btn-secondary`, which would tint each segment of a
+   btn-secondary group (shutter buttons in the scene editor): it wins by
+   source order only, keep these segment rules after the card button rules */
 :global(.glass-theme .device-list-table .btn-group .btn),
 :global(.glass-theme .hz-segmented .btn),
 :global(.dark-mode .glass-theme .hz-segmented .btn) {
@@ -1737,8 +1738,13 @@
   }
 }
 
+/* the card button hover tint must not paint a segment: same weight as
+   `.glass-theme .card .btn-secondary:hover` (0,4,0) and its dark-mode
+   variant (0,5,0), winning by source order */
 :global(.glass-theme .device-list-table .btn-group .btn:hover),
-:global(.glass-theme .hz-segmented .btn:hover) {
+:global(.glass-theme .hz-segmented .btn:hover),
+:global(.dark-mode .glass-theme .hz-segmented .btn:hover) {
+  background: transparent !important;
   color: var(--gl-ink);
 }
 
@@ -1749,7 +1755,8 @@
 
 :global(.glass-theme .device-list-table .btn-group .btn.active),
 :global(.glass-theme .device-list-table .btn-group .btn.active:disabled),
-:global(.glass-theme .hz-segmented .btn.active) {
+:global(.glass-theme .hz-segmented .btn.active),
+:global(.dark-mode .glass-theme .hz-segmented .btn.active) {
   background-color: #fff !important;
   color: var(--gl-ink);
   box-shadow: 0 2px 8px rgba(28, 35, 52, 0.18);
