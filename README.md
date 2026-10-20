@@ -18,6 +18,7 @@
 <p align="center">
   <a href="#-try-gladys-assistant">Try It</a> •
   <a href="#-getting-started">Getting Started</a> •
+  <a href="#-one-click-deploy">Deploy</a> •
   <a href="#-contribute-to-gladys">Contribute</a> •
   <a href="#-contributors">Contributors</a> •
   <a href="#-license">License</a>
@@ -61,6 +62,10 @@ Prefer using Docker Compose? Check out our [Docker Compose installation guide](h
 To install Gladys Assistant on your smart home setup, head over to our [official website](https://gladysassistant.com) for a step-by-step guide.
 
 Whether you're installing on a mini-PC, a NAS or a Raspberry Pi, we've got you covered with clear instructions tailored to your setup.
+
+## 📦 One-Click Deploy
+
+[![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploylobe.svg)](https://repocloud.io/details/Gladys%20Assistant/)
 
 ---
 
