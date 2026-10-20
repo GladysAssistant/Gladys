@@ -51,16 +51,17 @@ const isWritable = feature => Boolean(feature) && feature.read_only === false;
 const numberOrNull = value => (value === null || value === undefined ? null : Number(value));
 
 // an icon-only control of the player: the label is the tooltip and the accessible name
-const IconButton = ({ icon, labelKey, onClick, active, pressed, opensDialog, children }) => (
+const IconButton = ({ icon, labelKey, onClick, active, pressed, opensDialog, expanded, className, children }) => (
   <Localizer>
     <button
       type="button"
-      class={cx(style.iconButton, { [style.iconButtonActive]: active })}
+      class={cx(style.iconButton, className, { [style.iconButtonActive]: active })}
       onClick={onClick}
       title={<Text id={labelKey} />}
       aria-label={<Text id={labelKey} />}
       aria-pressed={pressed === undefined ? undefined : String(pressed)}
       aria-haspopup={opensDialog ? 'dialog' : undefined}
+      aria-expanded={expanded === undefined ? undefined : String(expanded)}
     >
       <i class={`fe fe-${icon}`} />
       {children}
@@ -94,6 +95,9 @@ class MusicComponent extends Component {
   };
 
   getDevice = async () => {
+    // the device read now is the confirmed state: a confirmation still awaited is void (a websocket
+    // reconnection, another player picked in the editor), its deadline must not report anything
+    this.clearAllConfirmations();
     try {
       await this.setState({ error: false });
       const musicDevice = await this.props.httpClient.get(`/api/v1/device/${this.props.box.device}`, {});
@@ -150,18 +154,19 @@ class MusicComponent extends Component {
   // for that state: without it in time, the optimistic state is replaced by the confirmed one and
   // a short notice says the player did not respond.
   setValueDevice = async (deviceFeature, value, { expectConfirmation = false } = {}) => {
-    if (expectConfirmation && deviceFeature.has_feedback) {
-      this.awaitConfirmation(deviceFeature.selector);
-    }
     try {
       await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
         value
       });
     } catch (e) {
       console.error(e);
-      this.clearConfirmation(deviceFeature.selector);
       this.showCommandError('commandFailed');
       this.getDevice();
+      return;
+    }
+    // the deadline starts once the core took the command
+    if (expectConfirmation && deviceFeature.has_feedback) {
+      this.awaitConfirmation(deviceFeature.selector);
     }
   };
 
@@ -180,6 +185,8 @@ class MusicComponent extends Component {
       delete this.pendingConfirmations[selector];
     }
   };
+
+  clearAllConfirmations = () => Object.keys(this.pendingConfirmations).forEach(this.clearConfirmation);
 
   pendingConfirmations = {};
 
@@ -496,7 +503,7 @@ class MusicComponent extends Component {
 
   componentWillUnmount() {
     clearTimeout(this.commandErrorTimer);
-    Object.keys(this.pendingConfirmations).forEach(this.clearConfirmation);
+    this.clearAllConfirmations();
     if (this.ticker) {
       clearInterval(this.ticker);
       this.ticker = null;
@@ -571,33 +578,40 @@ class MusicComponent extends Component {
     const shuffleOn = Boolean(shuffleFeature) && Number(shuffleFeature.last_value) === 1;
     const repeatValue = repeatFeature ? Number(repeatFeature.last_value) : null;
     const repeatOn = repeatValue !== null && repeatValue !== MUSIC_REPEAT_MODE.OFF;
+    // a narrow card on a touch screen puts the modes (shuffle, repeat) on a second line under
+    // previous / play / next, through the break element (MusicBox.css)
     return (
-      <div class={style.transport}>
-        {shuffleFeature && isWritable(shuffleFeature) && (
-          <IconButton
-            icon="shuffle"
-            labelKey="dashboard.boxes.music.shuffle"
-            onClick={this.toggleShuffle}
-            active={shuffleOn}
-            pressed={shuffleOn}
-          />
-        )}
-        {previousFeature && (
-          <IconButton icon="skip-back" labelKey="dashboard.boxes.music.previous" onClick={this.previous} />
-        )}
-        {canPlayPause && this.renderPlayButton()}
-        {nextFeature && <IconButton icon="skip-forward" labelKey="dashboard.boxes.music.next" onClick={this.next} />}
-        {repeatFeature && isWritable(repeatFeature) && (
-          <IconButton
-            icon="repeat"
-            labelKey="dashboard.boxes.music.repeat"
-            onClick={this.cycleRepeat}
-            active={repeatOn}
-            pressed={repeatOn}
-          >
-            {repeatValue === MUSIC_REPEAT_MODE.ONE && <span class={style.repeatOne}>1</span>}
-          </IconButton>
-        )}
+      <div class={style.transportFrame}>
+        <div class={style.transport}>
+          {shuffleFeature && isWritable(shuffleFeature) && (
+            <IconButton
+              icon="shuffle"
+              labelKey="dashboard.boxes.music.shuffle"
+              onClick={this.toggleShuffle}
+              active={shuffleOn}
+              pressed={shuffleOn}
+              className={style.transportMode}
+            />
+          )}
+          {previousFeature && (
+            <IconButton icon="skip-back" labelKey="dashboard.boxes.music.previous" onClick={this.previous} />
+          )}
+          {canPlayPause && this.renderPlayButton()}
+          {nextFeature && <IconButton icon="skip-forward" labelKey="dashboard.boxes.music.next" onClick={this.next} />}
+          {repeatFeature && isWritable(repeatFeature) && (
+            <IconButton
+              icon="repeat"
+              labelKey="dashboard.boxes.music.repeat"
+              onClick={this.cycleRepeat}
+              active={repeatOn}
+              pressed={repeatOn}
+              className={style.transportMode}
+            >
+              {repeatValue === MUSIC_REPEAT_MODE.ONE && <span class={style.repeatOne}>1</span>}
+            </IconButton>
+          )}
+          <span class={style.transportBreak} />
+        </div>
       </div>
     );
   }
@@ -807,6 +821,7 @@ class MusicComponent extends Component {
             labelKey={tab.labelKey}
             onClick={tab.key === PANELS.QUEUE ? this.openQueue : this.openBrowse}
             opensDialog
+            expanded={this.state.panel === tab.key}
           />
         ))}
       </div>
@@ -855,7 +870,12 @@ class MusicComponent extends Component {
         activeTab={panel}
         onSelectTab={this.selectPanel}
         onClose={this.closePanel}
-        footer={track ? this.renderMiniPlayer(track) : null}
+        footer={
+          <div class={style.sheetFooter}>
+            {this.renderCommandError()}
+            {track && this.renderMiniPlayer(track)}
+          </div>
+        }
       >
         {panel === PANELS.QUEUE && this.renderQueue()}
         {panel === PANELS.BROWSE && (
@@ -900,7 +920,7 @@ class MusicComponent extends Component {
           {hasNowPlaying && this.renderProgress(hasTrack)}
           {this.renderTransport()}
           {this.renderVolume()}
-          {this.renderCommandError()}
+          {!state.panel && this.renderCommandError()}
           {this.renderSheet(boxTitle, hasNowPlaying ? track : null)}
         </div>
       </div>

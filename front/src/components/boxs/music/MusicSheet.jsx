@@ -8,8 +8,8 @@ import style from './MusicBox.css';
 // The queue and the catalog of a player open over the dashboard, never inside the card: a card that
 // grows pushes every widget under it. Same shell as the light panel: a bottom sheet on a phone, a
 // centered dialog from 576px, rendered on <body> (the cards' backdrop filters would clip a fixed
-// overlay nested in them), closing on Escape / backdrop / ×, the page scroll locked while open. Its
-// height is fixed, so a search narrowing its results never resizes it either.
+// overlay nested in them), closing on Escape / backdrop / ×, the page scroll locked and the focus
+// kept inside while open. Its height is fixed, so a search narrowing its results never resizes it.
 class MusicSheet extends Component {
   constructor(props) {
     super(props);
@@ -40,8 +40,38 @@ class MusicSheet extends Component {
   };
 
   handleKeyDown = event => {
+    // a search field with text takes the first Escape to clear itself (MediaBrowser stops it there)
     if (event.key === 'Escape') {
       this.props.onClose();
+    } else if (event.key === 'Tab') {
+      this.keepFocusInside(event);
+    }
+  };
+
+  // a modal dialog: Tab and Shift+Tab cycle through the sheet's controls, never into the dashboard
+  // under the backdrop
+  keepFocusInside = event => {
+    if (!this.sheet) {
+      return;
+    }
+    const focusables = Array.from(
+      this.sheet.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+      )
+    );
+    if (focusables.length === 0) {
+      event.preventDefault();
+      return;
+    }
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || active === this.sheet || !this.sheet.contains(active))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (active === last || !this.sheet.contains(active))) {
+      event.preventDefault();
+      first.focus();
     }
   };
 

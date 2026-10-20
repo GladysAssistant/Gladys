@@ -119,6 +119,18 @@ class MediaBrowser extends Component {
 
   searchDebounced = debounce(this.search, SEARCH_DEBOUNCE_MS);
 
+  // Escape clears a typed search first (like a native search field, in every browser), and only
+  // then reaches the sheet, which closes on it
+  clearQueryOnEscape = e => {
+    if (e.key === 'Escape' && this.state.query.length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.setState({ query: '' });
+      this.searchDebounced.clear();
+      this.search('');
+    }
+  };
+
   updateQuery = e => {
     const query = e.target.value;
     this.setState({ query });
@@ -210,6 +222,7 @@ class MediaBrowser extends Component {
                 class="form-control"
                 value={query}
                 onInput={this.updateQuery}
+                onKeyDown={this.clearQueryOnEscape}
                 placeholder={searchPlaceholder}
                 aria-label={<Text id="dashboard.boxes.music.search" />}
               />

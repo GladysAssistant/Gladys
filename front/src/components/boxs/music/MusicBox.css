@@ -282,9 +282,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* a narrow card (a 5- or 6-column dashboard) closes the gaps, then narrows the icon buttons,
-     instead of letting shuffle and repeat spill out of the card */
-  gap: clamp(0.125rem, 4%, 0.75rem);
+  /* the gaps share what the five controls (4 × 2.5rem + 3.25rem) leave, up to 0.75rem; a narrow
+     card (a 5- or 6-column dashboard) then narrows the icon buttons instead of letting shuffle and
+     repeat spill out of the card */
+  gap: clamp(0.125rem, calc((100% - 13.25rem) / 4), 0.75rem);
   margin-top: 0.5rem;
 }
 
@@ -292,6 +293,15 @@
   flex: 0 1 auto;
   min-width: 1.75rem;
   border-radius: 999px;
+}
+
+/* the transport's width is what decides its layout on a touch screen (see the coarse block) */
+.transportFrame {
+  container-type: inline-size;
+}
+
+.transportBreak {
+  display: none;
 }
 
 .iconButton {
@@ -648,6 +658,14 @@
   flex: 0 0 auto;
 }
 
+.sheetFooter {
+  flex: 0 0 auto;
+}
+
+.sheetFooter .commandNotice {
+  margin-top: 0.75rem;
+}
+
 .miniPlayer {
   position: relative;
   flex: 0 0 auto;
@@ -920,6 +938,33 @@
   .playButton {
     width: 3.5rem;
     height: 3.5rem;
+  }
+
+  /* a finger keeps its 44px floor on a narrow card: the controls wrap instead of shrinking */
+  .transport {
+    flex-wrap: wrap;
+    /* the same sharing with the touch sizes (4 × 2.75rem + 3.5rem) */
+    gap: clamp(0.125rem, calc((100% - 14.5rem) / 4), 0.75rem);
+    row-gap: 0.25rem;
+  }
+
+  .transport .iconButton {
+    min-width: 2.75rem;
+  }
+
+  /* too narrow for the five controls on one line: previous / play / next stay on the first one,
+     shuffle and repeat go centered on the second */
+  @container (max-width: 15rem) {
+    .transportBreak {
+      display: block;
+      flex-basis: 100%;
+      height: 0;
+      order: 1;
+    }
+
+    .transportMode {
+      order: 2;
+    }
   }
 
   .playButton.miniPlayButton {
