@@ -160,6 +160,15 @@ addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_4, 'double_button_4');
 addMapping('action', BUTTON_STATUS.LONG_BUTTON_4, 'long_button_4');
 addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_4, 'triple_button_4');
 
+// Philips Hue tap switch (old round, battery-less model)
+// https://www.zigbee2mqtt.io/devices/8718696743133.html
+// A "press_N" is a single press on button N. The action is read-only, so overwriting the
+// write side of SINGLE_BUTTON_N is harmless (same as "on-press" / "on_press" above).
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_1, 'press_1');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_2, 'press_2');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_3, 'press_3');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_4, 'press_4');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');

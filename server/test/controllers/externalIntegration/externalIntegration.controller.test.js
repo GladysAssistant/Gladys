@@ -67,6 +67,7 @@ describe('External integration admin API', () => {
     gladys.externalIntegration.connections.clear();
     gladys.externalIntegration.storeIndex = null;
     gladys.externalIntegration.storeIndexFetchedAt = 0;
+    gladys.externalIntegration.storeEntryCache = null;
   });
 
   describe('GET /api/v1/external_integration', () => {
@@ -327,6 +328,40 @@ describe('External integration admin API', () => {
       expect(res.body).to.have.property('integrations');
       expect(res.body.integrations).to.have.lengthOf(1);
       expect(res.body.integrations[0]).to.include({ installed: false, compatible: true });
+    });
+  });
+
+  describe('GET /api/v1/external_integration/store/integration', () => {
+    it('should return one store integration with its complete manifest, not the :selector handler (route order)', async () => {
+      gladys.externalIntegration.storeEntryCache = {
+        entry: {
+          store_slug: 'john/gladys-open-meteo-demo',
+          repo_url: 'https://github.com/john/gladys-open-meteo-demo',
+          manifest: TEST_MANIFEST,
+          cover_url: null,
+          github: { stars: 12, pushed_at: '2026-07-10T12:00:00.000Z' },
+        },
+        fetchedAt: Date.now(),
+      };
+      const res = await authenticatedRequest
+        .get('/api/v1/external_integration/store/integration')
+        .query({ store_slug: 'john/gladys-open-meteo-demo' })
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body.manifest).to.deep.equal(TEST_MANIFEST);
+      expect(res.body).to.include({ store_slug: 'john/gladys-open-meteo-demo', installed: false, compatible: true });
+    });
+
+    it('should return 404 for an integration absent from the store', async () => {
+      stubInstance(gladys.externalIntegration, 'getStoreEntry', fake.resolves(null));
+      await authenticatedRequest
+        .get('/api/v1/external_integration/store/integration')
+        .query({ store_slug: 'nobody/gladys-unknown' })
+        .expect(404);
+    });
+
+    it('should return 400 without store_slug', async () => {
+      await authenticatedRequest.get('/api/v1/external_integration/store/integration').expect(400);
     });
   });
 

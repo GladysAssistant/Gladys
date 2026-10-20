@@ -4,6 +4,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { connect } from 'unistore/preact';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class GoogleCastDeviceBox extends Component {
   componentWillMount() {
@@ -43,7 +44,10 @@ class GoogleCastDeviceBox extends Component {
     });
     try {
       let deviceDidNotExist = this.state.device.id === undefined;
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(this.state.device)
+      );
       if (deviceDidNotExist) {
         savedDevice.alreadyExist = true;
       }

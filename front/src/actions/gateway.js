@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 import { route } from 'preact-router';
 import QRCode from 'qrcode';
 import { RequestStatus, LoginStatus } from '../utils/consts';
-import { validateEmail } from '../utils/validator';
+import { validateEmail, cleanEmail } from '../utils/validator';
 import { ERROR_MESSAGES, SYSTEM_VARIABLE_NAMES } from '../../../server/utils/constants';
 
 function createActions(store) {
@@ -51,7 +51,8 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
-      if (!validateEmail(state.gatewayLoginEmail)) {
+      const email = cleanEmail(state.gatewayLoginEmail);
+      if (!validateEmail(email)) {
         return store.setState({
           gatewayLoginStatus: LoginStatus.WrongEmailError
         });
@@ -61,7 +62,7 @@ function createActions(store) {
       });
       try {
         const gatewayLoginResults = await state.httpClient.post('/api/v1/gateway/login', {
-          email: state.gatewayLoginEmail,
+          email,
           password: state.gatewayLoginPassword
         });
         if (gatewayLoginResults.two_factor_token) {
@@ -145,7 +146,7 @@ function createActions(store) {
         // to get a two_factor_token, and let the user finalize the connection with
         // a fresh code from their 2FA app.
         const gatewayLoginResults = await state.httpClient.post('/api/v1/gateway/login', {
-          email: state.gatewayLoginEmail,
+          email: cleanEmail(state.gatewayLoginEmail),
           password: state.gatewayLoginPassword
         });
         store.setState({

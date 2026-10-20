@@ -5,6 +5,26 @@ const { EVENTS, ENERGY_CONTRACT_STATUS } = require('../../../../utils/constants'
 const { buildManager, contractPayload, BASE_TARIFF, TEMPO_TARIFF, METER_DEVICE_ID } = require('./helpers');
 const { getStatus } = require('../../../../lib/energy-contract/contract.getStatus');
 const { validateContract, isValidTimezone } = require('../../../../lib/energy-contract/contract.validate');
+const { buildVariantTariff } = require('../../../../lib/energy-contract/template.catalogue');
+
+/**
+ * @description Price rows of a v1 catalogue peak-off-peak variant changing price every year
+ * since 2007: the EDF regulated tariffs carry about twenty such validity ranges.
+ * @returns {Array<object>} Price rows.
+ * @example
+ * historyRows();
+ */
+function historyRows() {
+  const rows = [];
+  for (let year = 2007; year <= 2026; year += 1) {
+    const range = { start_date: `${year}-02-01`, end_date: year === 2026 ? null : `${year + 1}-01-31` };
+    const common = { contract: 'peak-off-peak', currency: 'euro', day_type: null, ...range };
+    rows.push({ ...common, price_type: 'consumption', price: 1000 + year, hour_slots: 'TO_REPLACE_OFF_PEAK' });
+    rows.push({ ...common, price_type: 'consumption', price: 2000 + year, hour_slots: 'TO_REPLACE_PEAK' });
+    rows.push({ ...common, price_type: 'subscription', price: 100000 + year, hour_slots: null });
+  }
+  return rows;
+}
 
 describe('energyContract: contracts CRUD', () => {
   let energyContract;
@@ -264,6 +284,38 @@ describe('energyContract: contracts CRUD', () => {
     expect(validateContract({ tariff: TEMPO_TARIFF, inputs: { a: 1 } }, { partial: true }).inputs).to.deep.equal({
       a: 1,
     });
+  });
+
+  it('should only keep the price history of a template overlapping the contract validity', async () => {
+    // forum topic 11307: a template with 20 dated subscriptions exceeds the 16 components limit
+    const { tariff } = buildVariantTariff(historyRows());
+    expect(tariff.components).to.have.lengthOf(21);
+    const inputs = { off_peak_slots: [['22:30', '06:30']] };
+    await expect(
+      energyContract.create(contractPayload({ tariff, inputs, valid_from: '2007-02-01' })),
+    ).to.be.rejectedWith('tariff.components: must contain less than or equal to 16 items');
+    const emitted = sinon.fake();
+    event.on(EVENTS.ENERGY_CONTRACT.RECALCULATE, emitted);
+    const contract = await energyContract.create(contractPayload({ tariff, inputs, valid_from: '2026-10-01' }));
+    expect(contract.tariff.components.map((c) => c.key)).to.deep.equal(['energy', 'subscription']);
+    expect(contract.tariff.components[0].rules).to.deep.equal([
+      { label: 'off-peak', when: { time: [['22:30', '06:30']] }, price: 0.3026 },
+    ]);
+    expect(contract.tariff.components[0].fallback).to.include({ price: 0.4026 });
+    expect(contract.tariff.components[1]).to.include({ amount: 10.2026, per: 'month' });
+    expect(emitted.callCount).to.equal(1);
+    // a contract started in 2025 keeps the 2025 prices, as dated rules and component
+    const older = await energyContract.update('edf-base', { tariff, valid_from: '2025-03-01' });
+    expect(older.tariff.components.map((c) => c.key)).to.deep.equal([
+      'energy',
+      'subscription',
+      'subscription-2025-02-01',
+    ]);
+    expect(older.tariff.components[0].rules.map((r) => r.when.dates)).to.deep.equal([
+      { from: '2025-02-01', to: '2026-01-31' },
+      { from: '2025-02-01', to: '2026-01-31' },
+      undefined,
+    ]);
   });
 
   it('should keep the inputs and substitute them in the tariff on create', async () => {
