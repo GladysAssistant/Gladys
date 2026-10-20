@@ -30,5 +30,12 @@ export const QUEUE_ITEMS_BEFORE_CURRENT = 10;
 export const BROWSE_PAGE_SIZE = 50;
 export const SEARCH_LIMIT = 20;
 export const SEARCH_DEBOUNCE_MS = 300;
+// how long a row shows that its item was started or enqueued, and a failed command its notice
+export const ITEM_FEEDBACK_MS = 2500;
+export const COMMAND_ERROR_MS = 5000;
+// a write to a feature with feedback is confirmed by the player's new state, counted from the
+// value route's answer: the 5 s set-value ack, plus the next poll of a cloud player (a few seconds,
+// up to ~10 s for a Spotify-like API)
+export const CONFIRMATION_TIMEOUT_MS = 15000;
 
 export const queueOffsetAround = currentIndex => Math.max(0, currentIndex - QUEUE_ITEMS_BEFORE_CURRENT);

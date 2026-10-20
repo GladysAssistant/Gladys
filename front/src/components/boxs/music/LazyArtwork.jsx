@@ -1,18 +1,29 @@
 import { Component } from 'preact';
 import cx from 'classnames';
 
+import { MUSIC_MEDIA_TYPES } from '../../../../../server/utils/constants';
 import { musicRoute, getErrorStatus } from './musicApi';
 import style from './MusicBox.css';
+
+// The placeholder of an item without artwork tells what it is, like a player app does
+const PLACEHOLDER_ICONS = {
+  [MUSIC_MEDIA_TYPES.FOLDER]: 'folder',
+  [MUSIC_MEDIA_TYPES.RADIO]: 'radio',
+  [MUSIC_MEDIA_TYPES.PLAYLIST]: 'list',
+  [MUSIC_MEDIA_TYPES.ALBUM]: 'disc',
+  [MUSIC_MEDIA_TYPES.ARTIST]: 'user'
+};
 
 // An artwork served by the proxy route of the player's integration (section 3 of the music
 // spec): the browser never loads a third-party URL. Loaded lazily, the bytes are requested once
 // the frame enters the viewport, so a long queue or a browse grid costs nothing below the fold.
-// A missing key, a refused image or a stale key shows a neutral placeholder.
+// A missing key, a refused image or a stale key shows a neutral placeholder. On a key change the
+// current image stays until the next one is loaded, then the next one fades in over it: a track
+// change never flashes the placeholder.
 class LazyArtwork extends Component {
-  state = { src: null, error: false };
+  state = { src: null, previousSrc: null, error: false };
 
-  // another key: the frame empties and the new image loads; the answer of a previous key, if
-  // still pending, is ignored
+  // another key: the answer of a previous key, if still pending, is ignored
   imageGeneration = 0;
 
   componentDidMount() {
@@ -42,8 +53,6 @@ class LazyArtwork extends Component {
       previousProps.deviceSelector !== this.props.deviceSelector
     ) {
       this.disconnect();
-      // the frame empties and the new key loads (the pending answer of the old key is ignored
-      // through imageGeneration); an empty key keeps the placeholder
       this.reload();
     }
   }
@@ -60,13 +69,16 @@ class LazyArtwork extends Component {
     }
   }
 
+  // an empty key shows the placeholder at once; another key keeps the current image on screen
+  // until the new one is there
   reload = () => {
     this.imageGeneration += 1;
-    // eslint-disable-next-line react/no-did-update-set-state
-    this.setState({ src: null, error: false });
-    if (this.props.artworkKey) {
-      this.load();
+    if (!this.props.artworkKey) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ src: null, previousSrc: null, error: false });
+      return;
     }
+    this.load();
   };
 
   load = async () => {
@@ -76,11 +88,15 @@ class LazyArtwork extends Component {
     try {
       const { image } = await httpClient.get(musicRoute(deviceSelector, `artwork/${encodeURIComponent(artworkKey)}`));
       if (!this.unmounted && generation === this.imageGeneration) {
-        this.setState({ src: image, error: false });
+        this.setState(previous => ({
+          src: image,
+          previousSrc: previous.src && previous.src !== image ? previous.src : null,
+          error: false
+        }));
       }
     } catch (e) {
       if (!this.unmounted && generation === this.imageGeneration) {
-        this.setState({ error: true });
+        this.setState({ src: null, previousSrc: null, error: true });
         // a key the core no longer allows: the list that carried it is stale
         if (getErrorStatus(e) === 404 && onNotFound) {
           onNotFound();
@@ -89,7 +105,14 @@ class LazyArtwork extends Component {
     }
   };
 
-  render({ className, alt }, { src }) {
+  // the new image has faded in: the one underneath can go
+  dropPreviousImage = () => {
+    if (this.state.previousSrc) {
+      this.setState({ previousSrc: null });
+    }
+  };
+
+  render({ className, alt, mediaType }, { src, previousSrc }) {
     return (
       <div
         class={cx(style.artworkFrame, className)}
@@ -97,10 +120,19 @@ class LazyArtwork extends Component {
           this.frame = element;
         }}
       >
-        {src && <img src={src} alt={alt || ''} class={style.artworkImage} />}
+        {previousSrc && <img src={previousSrc} alt="" class={style.artworkImage} />}
+        {src && (
+          <img
+            key={src}
+            src={src}
+            alt={alt || ''}
+            class={cx(style.artworkImage, { [style.artworkImageFadeIn]: Boolean(previousSrc) })}
+            onAnimationEnd={this.dropPreviousImage}
+          />
+        )}
         {!src && (
           <div class={style.artworkPlaceholder}>
-            <i class="fe fe-music" />
+            <i class={`fe fe-${PLACEHOLDER_ICONS[mediaType] || 'music'}`} />
           </div>
         )}
       </div>

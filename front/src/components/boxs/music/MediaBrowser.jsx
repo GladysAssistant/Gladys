@@ -5,12 +5,21 @@ import debounce from 'debounce';
 
 import { MUSIC_PLAY_MODES } from '../../../../../server/utils/constants';
 import MediaItemList from './MediaItemList';
-import { musicRoute, getErrorStatus, BROWSE_PAGE_SIZE, SEARCH_LIMIT, SEARCH_DEBOUNCE_MS } from './musicApi';
+import {
+  musicRoute,
+  getErrorStatus,
+  BROWSE_PAGE_SIZE,
+  SEARCH_LIMIT,
+  SEARCH_DEBOUNCE_MS,
+  ITEM_FEEDBACK_MS
+} from './musicApi';
 import style from './MusicBox.css';
 
 // The catalog panel of a player: a search field over the root folders of the integration's
 // catalog (section 4.3 of the music spec). Used by the music box (a playable item plays) and by
-// the "play music" scene action (a playable item is picked), through `onPlay` / `onPick`.
+// the "play music" scene action (a playable item is picked), through `onPlay` / `onPick`. An
+// opened folder that is itself playable (an album, a playlist) offers to play — or pick — it
+// whole.
 class MediaBrowser extends Component {
   state = {
     query: '',
@@ -20,7 +29,11 @@ class MediaBrowser extends Component {
     total: null,
     loading: false,
     error: null,
-    unavailable: false
+    unavailable: false,
+    // the item a play command is in flight for, the one just enqueued, the one just started
+    pendingId: null,
+    addedId: null,
+    startedId: null
   };
 
   // a request landing after another one was started is ignored
@@ -30,10 +43,26 @@ class MediaBrowser extends Component {
     if (this.props.capabilities.browse) {
       this.browse([]);
     }
+    // in the music box's sheet the field is ready to type into; not on a touch screen, where the
+    // keyboard would cover the list before the user asked for it
+    if (
+      this.props.autoFocusSearch &&
+      this.searchInput &&
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(pointer: fine)').matches
+    ) {
+      this.searchInput.focus();
+    }
   }
+
+  setSearchInputRef = element => {
+    this.searchInput = element;
+  };
 
   componentWillUnmount() {
     this.unmounted = true;
+    clearTimeout(this.feedbackTimer);
   }
 
   request = async (fn, onResult) => {
@@ -90,6 +119,18 @@ class MediaBrowser extends Component {
 
   searchDebounced = debounce(this.search, SEARCH_DEBOUNCE_MS);
 
+  // Escape clears a typed search first (like a native search field, in every browser), and only
+  // then reaches the sheet, which closes on it
+  clearQueryOnEscape = e => {
+    if (e.key === 'Escape' && this.state.query.length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.setState({ query: '' });
+      this.searchDebounced.clear();
+      this.search('');
+    }
+  };
+
   updateQuery = e => {
     const query = e.target.value;
     this.setState({ query });
@@ -119,35 +160,54 @@ class MediaBrowser extends Component {
     this.refetch();
   };
 
-  play = async (item, mode = MUSIC_PLAY_MODES.REPLACE) => {
+  // the list calls onPlay(item, index): the index is the queue's business, a catalog item always
+  // replaces the current playback
+  play = item => this.start(item, MUSIC_PLAY_MODES.REPLACE);
+
+  enqueue = item => this.start(item, MUSIC_PLAY_MODES.APPEND);
+
+  playOpenedFolder = () => this.play(this.state.path[this.state.path.length - 1]);
+
+  start = async (item, mode) => {
     if (this.props.onPick) {
       this.props.onPick(item);
       return;
     }
     const { httpClient, deviceSelector } = this.props;
     try {
-      this.setState({ error: null, unavailable: false });
+      this.setState({ error: null, unavailable: false, pendingId: item.id });
       await httpClient.post(musicRoute(deviceSelector, 'play'), {
         media: { id: item.id, type: item.type },
         mode
       });
+      if (!this.unmounted) {
+        // a short confirmation on the row: started (replace) or added to the queue (append)
+        clearTimeout(this.feedbackTimer);
+        this.setState(
+          mode === MUSIC_PLAY_MODES.REPLACE
+            ? { pendingId: null, startedId: item.id, addedId: null }
+            : { pendingId: null, addedId: item.id, startedId: null }
+        );
+        this.feedbackTimer = setTimeout(() => this.setState({ addedId: null, startedId: null }), ITEM_FEEDBACK_MS);
+      }
       if (this.props.onPlayed) {
         this.props.onPlayed(item, mode);
       }
     } catch (e) {
-      this.setState({ unavailable: getErrorStatus(e) === 503, error: e });
+      if (!this.unmounted) {
+        this.setState({ pendingId: null, unavailable: getErrorStatus(e) === 503, error: e });
+      }
     }
   };
 
-  enqueue = (item, mode) => this.play(item, mode);
-
   render(
     { capabilities, httpClient, deviceSelector, onPick, intl },
-    { query, path, items, total, loading, error, unavailable }
+    { query, path, items, total, loading, error, unavailable, pendingId, addedId, startedId }
   ) {
     const canLoadMore = query.length === 0 && total !== null && items && items.length < total;
     const searchPlaceholder =
       (intl && intl.dictionary && intl.dictionary.dashboard.boxes.music.searchPlaceholder) || '';
+    const openedFolder = path.length > 0 && query.length === 0 ? path[path.length - 1] : null;
     return (
       <div class={style.panel}>
         {capabilities.search && (
@@ -157,22 +217,50 @@ class MediaBrowser extends Component {
             </span>
             <Localizer>
               <input
+                ref={this.setSearchInputRef}
                 type="search"
                 class="form-control"
                 value={query}
                 onInput={this.updateQuery}
+                onKeyDown={this.clearQueryOnEscape}
                 placeholder={searchPlaceholder}
                 aria-label={<Text id="dashboard.boxes.music.search" />}
               />
             </Localizer>
+            {loading && query.length > 0 && <span class={cx(style.spinner, style.searchSpinner)} />}
           </div>
         )}
-        {path.length > 0 && query.length === 0 && (
+        {openedFolder && (
           <div class={style.breadcrumb}>
-            <button type="button" class="btn btn-secondary btn-sm" onClick={this.back}>
-              <i class="fe fe-chevron-left" /> <Text id="dashboard.boxes.music.back" />
-            </button>
-            <span class={style.breadcrumbTitle}>{path[path.length - 1].title}</span>
+            <Localizer>
+              <button
+                type="button"
+                class={style.iconButton}
+                onClick={this.back}
+                title={<Text id="dashboard.boxes.music.back" />}
+                aria-label={<Text id="dashboard.boxes.music.back" />}
+              >
+                <i class="fe fe-chevron-left" />
+              </button>
+            </Localizer>
+            <span class={style.breadcrumbTitle} title={openedFolder.title}>
+              {openedFolder.title}
+            </span>
+            {openedFolder.playable && (
+              <button
+                type="button"
+                class={cx('btn btn-sm btn-primary', style.playAllButton)}
+                onClick={this.playOpenedFolder}
+                disabled={pendingId === openedFolder.id}
+              >
+                {pendingId === openedFolder.id ? (
+                  <span class={cx(style.spinner, style.playAllSpinner)} />
+                ) : (
+                  <i class={`fe fe-${startedId === openedFolder.id ? 'check' : 'play'}`} />
+                )}
+                <Text id={onPick ? 'dashboard.boxes.music.pickThis' : 'dashboard.boxes.music.playAll'} />
+              </button>
+            )}
           </div>
         )}
         {unavailable && (
@@ -199,8 +287,11 @@ class MediaBrowser extends Component {
             onPlay={this.play}
             onEnqueue={onPick ? null : this.enqueue}
             canEnqueue={!onPick && Boolean(capabilities.append)}
-            pickLabelKey={onPick ? 'dashboard.boxes.music.playItem' : null}
+            pickLabelKey={onPick ? 'dashboard.boxes.music.pickThis' : null}
             onArtworkNotFound={this.onArtworkNotFound}
+            pendingId={pendingId}
+            addedId={addedId}
+            startedId={startedId}
           />
         )}
         {canLoadMore && (
