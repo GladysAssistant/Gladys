@@ -6,7 +6,8 @@ import {
   WEBSOCKET_MESSAGE_TYPES,
   DEVICE_FEATURE_UNITS,
   THERMOSTAT_MODE,
-  THERMOSTAT_PRESET
+  THERMOSTAT_PRESET,
+  PILOT_WIRE_MODE
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 import {
@@ -49,6 +50,15 @@ const PRESET_VALUES = {
   comfort: THERMOSTAT_PRESET.COMFORT
 };
 const PRESET_NAMES = Object.keys(PRESET_VALUES).reduce((acc, name) => ({ ...acc, [PRESET_VALUES[name]]: name }), {});
+// The pilot-wire orders, keyed as the device page already names them.
+const PILOT_WIRE_ORDER_KEYS = {
+  [PILOT_WIRE_MODE.OFF]: 'off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost-protection',
+  [PILOT_WIRE_MODE.ECO]: 'eco',
+  [PILOT_WIRE_MODE.COMFORT_2]: 'comfort_-2',
+  [PILOT_WIRE_MODE.COMFORT_1]: 'comfort_-1',
+  [PILOT_WIRE_MODE.COMFORT]: 'comfort'
+};
 // Sentinel: hold every incoming setpoint, whatever its value
 const HOLD_ANY_SETPOINT = Symbol('hold-any-setpoint');
 
@@ -80,6 +90,9 @@ class ThermostatBox extends Component {
     // the server holds the current state, and that memory cannot be re-derived
     // from the temperature alone.
     isSwitchOn: null,
+    // The order a pilot-wire heater carries, shown when it regulates alone: it is
+    // all the card knows of what the heater does.
+    pilotWireOrder: null,
     // A mode this card has written and no reload of the device has carried yet
     // (see writeMode). Read before the device's own mode, so a tap on Off or on
     // a way out of it shows at once, and a reload already in flight when the
@@ -115,15 +128,25 @@ class ThermostatBox extends Component {
   // the widget estimates the state from the setpoint instead.
   //
   // A pilot-wire heater has no contact to read, and the order it carries says
-  // nothing of whether it draws current: the server decides, on the room sensor
-  // when there is one, and says so on the thermostat's own operating-state
-  // feature. Without a sensor it reads idle rather than guess.
+  // nothing of whether it draws current. When Gladys regulates it, the server
+  // decides on the room sensor and says so on the thermostat's own
+  // operating-state feature. When the heater regulates, nothing tells: the card
+  // shows the order sent instead (see isHeaterRegulated).
   getRunningStateFeature = () => {
     const cfg = this.state.remoteConfig;
     if (!cfg) return null;
     if (this.isExternal()) return cfg.state_feature || null;
-    if (cfg.pilot_wire_feature) return cfg.operatingStateFeature || null;
+    if (cfg.pilot_wire_feature) return this.isHeaterRegulated() ? null : cfg.operatingStateFeature || null;
     return cfg.switch_feature || null;
+  };
+
+  // A pilot-wire heater left to its own thermostat (spec C.1.1): Gladys only
+  // hands it the preset's order. Gladys regulates on a room sensor only, so
+  // without one the heater does, whatever the param says.
+  isHeaterRegulated = () => {
+    const cfg = this.state.remoteConfig;
+    if (!cfg || this.isExternal() || !cfg.pilot_wire_feature) return false;
+    return !(cfg.pilot_wire_regulation === 'gladys' && cfg.temperature_feature);
   };
   getMinTemp = () => {
     // Device feature native min has top priority
@@ -423,6 +446,7 @@ class ThermostatBox extends Component {
     // thermostat, and from the real device's state feature on an external one.
     // Both end up in `isSwitchOn`, which is what draws the heating halo.
     const switchFeature = this.getRunningStateFeature();
+    const pilotWireFeature = this.isHeaterRegulated() ? this.state.remoteConfig.pilot_wire_feature : null;
     if (!thermostatFeature && !temperatureFeature) {
       this.setState({ noConfig: true });
       return;
@@ -433,8 +457,16 @@ class ThermostatBox extends Component {
     if (!humidityFeature) stateUpdate.humidity = null;
     if (!windowFeature) stateUpdate.isWindowOpen = false;
     if (!switchFeature) stateUpdate.isSwitchOn = null;
+    if (!pilotWireFeature) stateUpdate.pilotWireOrder = null;
     this.setState(stateUpdate);
-    const selectors = [thermostatFeature, temperatureFeature, humidityFeature, windowFeature, switchFeature]
+    const selectors = [
+      thermostatFeature,
+      temperatureFeature,
+      humidityFeature,
+      windowFeature,
+      switchFeature,
+      pilotWireFeature
+    ]
       .filter(Boolean)
       .join(',');
     if (!selectors) return;
@@ -506,6 +538,9 @@ class ThermostatBox extends Component {
               this.stateFeature = feat;
               this.setState({ isSwitchOn: isRunningFromStateFeature(feat, feat.last_value) });
             }
+            if (pilotWireFeature && feat.selector === pilotWireFeature) {
+              this.setState({ pilotWireOrder: feat.last_value });
+            }
           });
         });
       }
@@ -570,6 +605,14 @@ class ThermostatBox extends Component {
       // NEW_STATE carries no category/type, so the shape cached from the initial
       // GET /api/v1/device is what the value is normalised against.
       this.setState({ isSwitchOn: isRunningFromStateFeature(this.stateFeature, payload.last_value) });
+    }
+    const remoteConfig = this.state.remoteConfig;
+    if (
+      this.isHeaterRegulated() &&
+      remoteConfig &&
+      payload.device_feature_selector === remoteConfig.pilot_wire_feature
+    ) {
+      this.setState({ pilotWireOrder: payload.last_value });
     }
   };
 
@@ -1286,6 +1329,7 @@ class ThermostatBox extends Component {
       manualSetpointOverride,
       isWindowOpen,
       isSwitchOn,
+      pilotWireOrder,
       activeSchedule
     }
   ) {
@@ -1351,8 +1395,13 @@ class ThermostatBox extends Component {
     })();
     // The switch is the actuator the server drives, so its state is the truth:
     // the flame then matches what the heater is really doing, neutral zone included.
+    // A pilot-wire heater regulating on its own setpoint: nothing tells whether
+    // it heats, and estimating from Gladys's setpoint would light a flame on a
+    // decision Gladys does not make. The order sent is shown instead.
+    const heaterRegulated = this.isHeaterRegulated();
+    const orderKey = heaterRegulated ? PILOT_WIRE_ORDER_KEYS[pilotWireOrder] : undefined;
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
-    const showActive = !isWindowOpen && mode !== 'off' && isRunning;
+    const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
 
     // Convert temperatures for display
     const displaySetpoint = this.toDisplayTemp(setpoint);
@@ -1406,6 +1455,13 @@ class ThermostatBox extends Component {
                   />
                 </div>
               </div>
+
+              {orderKey && (
+                <div class={style.pilotWireOrder}>
+                  <Text id="dashboard.boxes.thermostat.pilotWireOrder" />{' '}
+                  <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+                </div>
+              )}
 
               {isWindowOpen && (
                 <div class={style.windowBanner}>

@@ -795,6 +795,7 @@
         "cancelManual": "Manuellen Modus beenden",
         "windowOpen": "Fenster offen — Heizung ausgesetzt",
         "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
+        "pilotWireOrder": "Gesendeter Befehl:",
         "a11ySetpoint": "Sollwert",
         "a11yCurrentTemp": "Gemessene Temperatur",
         "a11yHumidity": "Luftfeuchtigkeit",
@@ -3676,8 +3677,18 @@
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
         },
         "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
-        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Mit einem Temperatursensor regelt Gladys selbst: unter dem Sollwert den Befehl der Voreinstellung, darüber Frostschutz, mit den Hysterese-Schwellen. Ohne Sensor erhält der Heizkörper den Befehl der Voreinstellung und regelt allein auf seinen eigenen Sollwert. Die Auswahl leert den Schalter und umgekehrt: Ein Heizkörper wird auf die eine oder die andere Weise gesteuert. TPI wird mit einer Steuerleitung nicht angeboten: Die Befehle werden nie innerhalb eines Zyklus getaktet. Schalten Sie zuerst das eigene Programm des Moduls aus.",
+        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Die Auswahl leert den Schalter und umgekehrt: Ein Heizkörper wird auf die eine oder die andere Weise gesteuert. Schalten Sie zuerst das eigene Programm des Moduls aus.",
         "pilotWireProgrammeWarning": "Schalten Sie das eigene Programm oder den Thermostatmodus des Moduls aus (Heatzy-Zeitplan, Tuya-Programm…), bevor Sie es mit Gladys steuern. Sonst wird jeder vom Programm geschriebene Befehl als Änderung am Modul gewertet, und Modul und Gladys schreiben den Befehl abwechselnd.",
+        "pilotWireRegulationLabel": "Wer regelt die Temperatur?",
+        "pilotWireRegulation": {
+          "heater": "Der Heizkörper",
+          "gladys": "Gladys, mit dem Raumsensor"
+        },
+        "pilotWireRegulationHelp": {
+          "heater": "Jede Voreinstellung sendet ihren Befehl (Eco → Eco, Komfort → Komfort, Frostschutz → Frostschutz), und der Heizkörper heizt nach seinem eigenen Thermostat. Der Raumsensor, falls vorhanden, dient nur der Anzeige.",
+          "gladys": "Gladys misst den Raum mit dem Raumsensor und nutzt die Steuerleitung als Schalter: Komfort zum Heizen, Frostschutz, sobald der Sollwert der Voreinstellung erreicht ist, mit den Hysterese-Schwellen. Stellen Sie den Komfort-Sollwert am Heizkörper selbst hoch genug ein (zum Beispiel 24 °C): Er gehorcht dann Gladys statt seinem eigenen Thermometer, und dieser Wert bleibt eine Sicherheitsobergrenze, falls Gladys ausfällt."
+        },
+        "pilotWireRegulationNeedsSensor": "Wählen Sie einen Temperatursensor, damit Gladys regeln kann.",
         "windowFeatureLabel": "Fensterkontakt",
         "windowFeatureHelp": {
           "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",

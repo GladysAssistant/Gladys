@@ -6,6 +6,8 @@ const PARAM_FIELDS = [
   ['humidity_feature', 'THERMOSTAT_HUMIDITY_FEATURE'],
   ['switch_feature', 'THERMOSTAT_SWITCH_FEATURE'],
   ['pilot_wire_feature', 'THERMOSTAT_PILOT_WIRE_FEATURE'],
+  // Who regulates that heater: `heater` (absent on older devices) or `gladys`.
+  ['pilot_wire_regulation', 'THERMOSTAT_PILOT_WIRE_REGULATION'],
   // External thermostats: the real device regulates itself, and these point at
   // features owned by another integration (Netatmo, Zigbee, Matter, MQTT...).
   ['thermostat_type', 'THERMOSTAT_TYPE'],

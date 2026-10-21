@@ -157,6 +157,7 @@ function createActions(store) {
           thermostatEditHumidityFeature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || '',
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
           thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
+          thermostatEditPilotWireRegulation: getParam('THERMOSTAT_PILOT_WIRE_REGULATION') || 'heater',
           thermostatEditType: getParam('THERMOSTAT_TYPE') || 'virtual',
           thermostatEditTargetFeature: getParam('THERMOSTAT_TARGET_FEATURE') || '',
           thermostatEditStateFeature: getParam('THERMOSTAT_STATE_FEATURE') || '',
@@ -266,6 +267,12 @@ function createActions(store) {
         // clears one when the other is picked, and the save holds to it for a
         // device that already carried both.
         const switchFeature = pilotWireFeature ? '' : state.thermostatEditSwitchFeature || '';
+        // Gladys regulates a pilot wire on a room sensor only: without one, the
+        // heater does, whatever was picked before the sensor was removed.
+        const pilotWireRegulation =
+          pilotWireFeature && temperatureFeature && state.thermostatEditPilotWireRegulation === 'gladys'
+            ? 'gladys'
+            : 'heater';
         const windowFeature = state.thermostatEditWindowFeature || '';
         // `|| default` would discard an explicitly entered 0, which the preset
         // inputs accept: toNumber only falls back when the value is not a number.
@@ -352,6 +359,7 @@ function createActions(store) {
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
             { name: 'THERMOSTAT_SWITCH_FEATURE', value: isExternalThermostat ? '' : switchFeature },
             { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: isExternalThermostat ? '' : pilotWireFeature },
+            { name: 'THERMOSTAT_PILOT_WIRE_REGULATION', value: pilotWireRegulation },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on an external thermostat, and cleared otherwise so
             // switching a device back to virtual cannot leave it driving a real
@@ -431,6 +439,7 @@ function createActions(store) {
           thermostatEditHumidityFeature: '',
           thermostatEditSwitchFeature: '',
           thermostatEditPilotWireFeature: '',
+          thermostatEditPilotWireRegulation: 'heater',
           thermostatEditType: 'virtual',
           thermostatEditTargetFeature: '',
           thermostatEditStateFeature: '',

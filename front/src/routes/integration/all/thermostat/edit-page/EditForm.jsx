@@ -36,6 +36,11 @@ const EditForm = ({ ...props }) => {
   // A pilot-wire heater only heats (spec C.1.1): cooling is neither offered nor
   // shown while one is picked on a virtual thermostat.
   const hasPilotWire = props.thermostatEditType !== 'external' && !!props.thermostatEditPilotWireFeature;
+  // Who regulates that heater (spec C.1.1). Gladys only can on a room sensor:
+  // without one the heater regulates, whatever was picked before.
+  const hasSensor = !!props.thermostatEditTemperatureFeature;
+  const gladysRegulates = hasPilotWire && hasSensor && props.thermostatEditPilotWireRegulation === 'gladys';
+  const pilotWireRegulation = gladysRegulates ? 'gladys' : 'heater';
   const pickedMode = props.thermostatEditMode || 'heating';
   const mode = hasPilotWire ? 'heating' : pickedMode;
   // The control rules read the other way round in cooling: the switch turns on
@@ -429,6 +434,37 @@ const EditForm = ({ ...props }) => {
               </div>
             )}
 
+            {/* Qui régule le radiateur à fil pilote : son propre thermostat, ou
+                Gladys sur le capteur d'ambiance (spec C.1.1). */}
+            {hasPilotWire && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.pilotWireRegulationLabel" />
+                </label>
+                <select
+                  class="form-control"
+                  value={pilotWireRegulation}
+                  onChange={e => props.updateThermostatField('thermostatEditPilotWireRegulation', e.target.value)}
+                >
+                  <option value="heater">
+                    <Text id="integration.thermostat.edit.pilotWireRegulation.heater" />
+                  </option>
+                  <option value="gladys" disabled={!hasSensor}>
+                    <Text id="integration.thermostat.edit.pilotWireRegulation.gladys" />
+                  </option>
+                </select>
+                <small class="form-text text-muted">
+                  <Text id={`integration.thermostat.edit.pilotWireRegulationHelp.${pilotWireRegulation}`} />
+                  {!hasSensor && (
+                    <span>
+                      {' '}
+                      <Text id="integration.thermostat.edit.pilotWireRegulationNeedsSensor" />
+                    </span>
+                  )}
+                </small>
+              </div>
+            )}
+
             {/* Capteur d'ouverture de fenêtre */}
             <div class="form-group">
               <label class="form-label">
@@ -451,11 +487,12 @@ const EditForm = ({ ...props }) => {
                 all have working defaults, and putting them ahead of the sensor
                 and the actuator buried the two fields that decide whether the
                 thermostat regulates at all. A real thermostat runs its own
-                heuristic, so none of this applies to it.
+                heuristic, so none of this applies to it — nor to a pilot-wire
+                heater left to regulate on its own.
 
                 The unit and the bounds stay out of the fold below: they are the
                 thermostat's own, external ones included. */}
-            {!isExternalThermostat && (
+            {!isExternalThermostat && (!hasPilotWire || gladysRegulates) && (
               <details class={cx('mb-3', style.tuningDetails)}>
                 {/* With a chevron: styled as a form-label alone, the summary
                     looked like a plain heading and nothing said it opened. */}
