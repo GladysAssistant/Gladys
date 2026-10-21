@@ -1484,9 +1484,24 @@ class ThermostatBox extends Component {
                 </div>
               </div>
 
+              {/* Drawn like the card's other banners. Heating carries comfort's
+                  flame and colour, the order the module then carries; standby
+                  carries frost's snowflake and colour, for the same reason. */}
               {pilotWireStatus && (
-                <div class={style.pilotWireStatus}>
-                  <Text id={`dashboard.boxes.thermostat.${pilotWireStatus}`} />
+                <div
+                  class={style.scheduleBanner}
+                  style={`--banner-color:${this.getPresetColor(
+                    pilotWireStatus === 'pilotWireHeating' ? 'comfort' : 'frost'
+                  )}`}
+                >
+                  <i
+                    class={`fe ${pilotWireStatus === 'pilotWireHeating' ? COMFORT_ICON.heating : PRESET_ICONS.frost} ${
+                      style.scheduleBannerIcon
+                    }`}
+                  />
+                  <span class={style.scheduleBannerText}>
+                    <Text id={`dashboard.boxes.thermostat.${pilotWireStatus}`} />
+                  </span>
                 </div>
               )}
 

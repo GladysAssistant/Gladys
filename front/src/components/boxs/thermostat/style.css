@@ -595,15 +595,6 @@
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
-/* A pilot-wire heater Gladys regulates: why the module carries comfort or frost
-   protection whatever the preset, said quietly under the gauge. */
-.pilotWireStatus {
-  text-align: center;
-  color: #9aa0ac;
-  font-size: 0.8125rem;
-  margin: -0.5rem 0 1rem;
-}
-
 .windowBannerIcon {
   font-size: 0.9rem;
   flex-shrink: 0;
