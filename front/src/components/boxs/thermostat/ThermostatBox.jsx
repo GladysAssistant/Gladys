@@ -117,9 +117,12 @@ class ThermostatBox extends Component {
 
   getConfig = () => ({ ...this.props.box, ...(this.state.remoteConfig || {}) });
 
+  // A real thermostat driven by its setpoint. A pilot-wire heater never is,
+  // whichever type it carries (spec C.1.1): it owns its setpoint feature like a
+  // virtual thermostat, and the type only says who regulates it.
   isExternal = () => {
     const cfg = this.getConfig();
-    return cfg.thermostat_type === 'external';
+    return cfg.thermostat_type === 'external' && !cfg.pilot_wire_feature;
   };
 
   // Which feature tells the widget the equipment is running: the switch Gladys
@@ -140,13 +143,19 @@ class ThermostatBox extends Component {
     return cfg.switch_feature || null;
   };
 
-  // A pilot-wire heater left to its own thermostat (spec C.1.1): Gladys only
-  // hands it the preset's order. Gladys regulates on a room sensor only, so
-  // without one the heater does, whatever the param says.
+  // A pilot-wire heater left to its own thermostat (spec C.1.1): a real
+  // thermostat, or a virtual one with no room sensor to regulate on. Gladys only
+  // hands it the order of the preset: there is no setpoint to turn.
   isHeaterRegulated = () => {
     const cfg = this.state.remoteConfig;
-    if (!cfg || this.isExternal() || !cfg.pilot_wire_feature) return false;
-    return !(cfg.pilot_wire_regulation === 'gladys' && cfg.temperature_feature);
+    if (!cfg || !cfg.pilot_wire_feature) return false;
+    return cfg.thermostat_type === 'external' || !cfg.temperature_feature;
+  };
+
+  // A pilot-wire heater Gladys regulates on the room sensor.
+  isGladysRegulatedPilotWire = () => {
+    const cfg = this.state.remoteConfig;
+    return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
   };
   getMinTemp = () => {
     // Device feature native min has top priority
@@ -1397,11 +1406,29 @@ class ThermostatBox extends Component {
     // the flame then matches what the heater is really doing, neutral zone included.
     // A pilot-wire heater regulating on its own setpoint: nothing tells whether
     // it heats, and estimating from Gladys's setpoint would light a flame on a
-    // decision Gladys does not make. The order sent is shown instead.
+    // decision Gladys does not make. There is no setpoint to turn either: the
+    // gauge shows the order the heater carries in its place, and the presets
+    // below are the only control.
     const heaterRegulated = this.isHeaterRegulated();
-    const orderKey = heaterRegulated ? PILOT_WIRE_ORDER_KEYS[pilotWireOrder] : undefined;
+    const orderLabels =
+      (props.intl &&
+        props.intl.dictionary &&
+        props.intl.dictionary.deviceFeatureAction &&
+        props.intl.dictionary.deviceFeatureAction.category.heater['pilot-wire-mode']) ||
+      {};
+    const orderLabel = orderLabels[PILOT_WIRE_ORDER_KEYS[pilotWireOrder]] || '—';
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
+    // When Gladys regulates a pilot-wire heater, the module only ever carries
+    // comfort or frost protection, whatever the preset: eco at 18 °C in a room at
+    // 20 °C shows frost protection on the heater. Saying why, under the gauge,
+    // is what keeps that from looking like a wrong order.
+    const pilotWireStatus =
+      this.isGladysRegulatedPilotWire() && !isWindowOpen && mode !== 'off' && isSwitchOn !== null
+        ? isSwitchOn
+          ? 'pilotWireHeating'
+          : 'pilotWireStandby'
+        : null;
 
     // Convert temperatures for display
     const displaySetpoint = this.toDisplayTemp(setpoint);
@@ -1442,24 +1469,24 @@ class ThermostatBox extends Component {
                     setpoint={displaySetpoint}
                     currentTemp={displayCurrentTemp}
                     humidity={humidity}
-                    onPointerDown={this.onPointerDown}
-                    onIncrement={this.increment}
-                    onDecrement={this.decrement}
+                    onPointerDown={heaterRegulated ? undefined : this.onPointerDown}
+                    onIncrement={heaterRegulated ? undefined : this.increment}
+                    onDecrement={heaterRegulated ? undefined : this.decrement}
                     minTemp={displayMinTemp}
                     maxTemp={displayMaxTemp}
                     mode={mode}
                     isActive={showActive}
                     isWindowOpen={isWindowOpen}
                     tempUnit={tempUnit}
+                    centerLabel={heaterRegulated ? orderLabel : null}
                     a11yLabels={a11yLabels}
                   />
                 </div>
               </div>
 
-              {orderKey && (
-                <div class={style.pilotWireOrder}>
-                  <Text id="dashboard.boxes.thermostat.pilotWireOrder" />{' '}
-                  <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+              {pilotWireStatus && (
+                <div class={style.pilotWireStatus}>
+                  <Text id={`dashboard.boxes.thermostat.${pilotWireStatus}`} />
                 </div>
               )}
 

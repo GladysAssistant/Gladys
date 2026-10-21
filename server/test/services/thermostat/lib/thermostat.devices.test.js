@@ -354,34 +354,31 @@ describe('thermostat.createDevice', () => {
     expect(paramValue(created, 'THERMOSTAT_CONTROL_TYPE')).to.equal('hysteresis');
   });
 
-  // Gladys regulates a pilot-wire heater on a room sensor only (C.1.1).
-  const savePilotWire = (regulation, temperatureFeature) =>
-    buildHandler().createDevice({
+  it('should keep the order each preset sends', async () => {
+    const handler = buildHandler();
+
+    const created = await handler.createDevice({
       name: 'Bureau',
       features: [setpointFeature],
       params: [
+        { name: 'THERMOSTAT_TYPE', value: 'external' },
         { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
-        { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
-        { name: 'THERMOSTAT_PILOT_WIRE_REGULATION', value: regulation },
+        { name: 'THERMOSTAT_PILOT_WIRE_ORDER_NIGHT', value: '2' },
       ],
     });
 
-  it('should keep Gladys regulating a pilot-wire heater with a room sensor', async () => {
-    const created = await savePilotWire('gladys', 'temp-sensor');
-
-    expect(paramValue(created, 'THERMOSTAT_PILOT_WIRE_REGULATION')).to.equal('gladys');
+    expect(paramValue(created, 'THERMOSTAT_PILOT_WIRE_ORDER_NIGHT')).to.equal('2');
   });
 
-  it('should hand the regulation back to the heater without a room sensor', async () => {
-    const created = await savePilotWire('gladys', '');
+  it('should leave the payload it was given untouched', async () => {
+    const params = [
+      { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+      { name: 'THERMOSTAT_MODE', value: 'cooling' },
+    ];
 
-    expect(paramValue(created, 'THERMOSTAT_PILOT_WIRE_REGULATION')).to.equal('heater');
-  });
+    await buildHandler().createDevice({ name: 'Bureau', features: [setpointFeature], params });
 
-  it('should save an unknown regulation as the heater regulating', async () => {
-    const created = await savePilotWire('boiler', 'temp-sensor');
-
-    expect(paramValue(created, 'THERMOSTAT_PILOT_WIRE_REGULATION')).to.equal('heater');
+    expect(params[1].value).to.equal('cooling');
   });
 
   it('should drop the cached window selectors', async () => {
@@ -434,21 +431,41 @@ describe('thermostat.createDevice - external', () => {
     expect(featureTypes(created)).to.deep.equal(['preset', 'mode']);
   });
 
-  it('should ignore a pilot-wire param on an external thermostat', async () => {
-    // The loop never takes the pilot-wire branch on an external thermostat, so
-    // its mode is not the pilot wire's to change.
-    const handler = buildHandler();
+  // A real thermostat with a pilot wire is a heater regulating itself (C.1.1):
+  // driven by its order, it owns its setpoint feature and drives no real one.
+  const pilotWireHeater = (extra = []) => ({
+    name: 'Bureau',
+    features: [
+      {
+        external_id: 'thermostat:bureau:target-temperature',
+        category: 'thermostat',
+        type: 'target-temperature',
+      },
+    ],
+    params: [
+      { name: 'THERMOSTAT_TYPE', value: 'external' },
+      { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+      ...extra,
+    ],
+  });
 
-    const created = await handler.createDevice({
-      name: 'Clim',
-      params: [
-        ...externalParams,
-        { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+  it('should save a heater regulating itself without a real setpoint to drive', async () => {
+    const created = await buildHandler().createDevice(pilotWireHeater());
+
+    expect(featureTypes(created)).to.include('target-temperature');
+    expect(featureTypes(created)).to.include('operating-state');
+  });
+
+  it('should drop the real-thermostat params of a heater regulating itself', async () => {
+    const created = await buildHandler().createDevice(
+      pilotWireHeater([
+        { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
         { name: 'THERMOSTAT_MODE', value: 'cooling' },
-      ],
-    });
+      ]),
+    );
 
-    expect(created.params.find((param) => param.name === 'THERMOSTAT_MODE').value).to.equal('cooling');
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_TARGET_FEATURE').value).to.equal('');
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_MODE').value).to.equal('heating');
   });
 
   it('should keep the external params', async () => {

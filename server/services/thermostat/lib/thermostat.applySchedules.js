@@ -474,27 +474,28 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
 }
 
 // A pilot-wire heater is not driven by a temperature but by one of six orders,
-// carried on the wire itself. The thermostat's presets map onto them almost one
-// for one — which is unsurprising: both vocabularies come from the same French
-// heating tradition (confort / éco / hors-gel).
-//
-// `away` has no order of its own: the wire offers no "nobody home", and eco is
-// what an absence actually asks for. Comfort -1 and -2 are the orders a heater
-// derives itself from comfort; Gladys does not pick them, it lets the appliance.
-const PILOT_WIRE_ORDER_BY_PRESET = {
-  off: PILOT_WIRE_MODE.OFF,
-  frost: PILOT_WIRE_MODE.FROST_PROTECTION,
-  away: PILOT_WIRE_MODE.ECO,
-  eco: PILOT_WIRE_MODE.ECO,
-  night: PILOT_WIRE_MODE.ECO,
-  comfort: PILOT_WIRE_MODE.COMFORT,
-};
+// carried on the wire itself. When the heater regulates, each preset sends the
+// order it is set to (`config.pilot_wire_orders`, C.1.1); `off` always sends off.
+/**
+ * @description The order a preset sends a pilot-wire heater that regulates itself.
+ * @param {string} preset - The preset in force.
+ * @param {object} config - Thermostat config object.
+ * @returns {number|undefined} A PILOT_WIRE_MODE value, or undefined for a preset
+ * that names no order (`schedule`, or one that no longer exists).
+ * @example
+ * pilotWireOrderForPreset('eco', config); // PILOT_WIRE_MODE.ECO
+ */
+function pilotWireOrderForPreset(preset, config) {
+  if (preset === 'off') {
+    return PILOT_WIRE_MODE.OFF;
+  }
+  return (config.pilot_wire_orders || {})[preset];
+}
 
-// The way back: the preset an order stands for, used when the order was changed
-// on the module itself and is taken as that preset picked by hand. The derived
-// comforts are comfort chosen on the heater — a variant of the same preset, not
-// a temperature Gladys knows. Off is absent: it is no preset, and pressed on the
-// module it stops the thermostat instead.
+// When Gladys regulates, the module only ever carries comfort or frost from it:
+// any other order read back was chosen on the module, and is taken as the
+// preset it stands for in that vocabulary. The derived comforts are comfort
+// chosen on the heater, not a temperature Gladys knows.
 const PRESET_BY_PILOT_WIRE_ORDER = {
   [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost',
   [PILOT_WIRE_MODE.ECO]: 'eco',
@@ -502,6 +503,35 @@ const PRESET_BY_PILOT_WIRE_ORDER = {
   [PILOT_WIRE_MODE.COMFORT_1]: 'comfort',
   [PILOT_WIRE_MODE.COMFORT]: 'comfort',
 };
+
+// Which preset wins when several send the same order: the one named after it
+// first, so frost protection pressed on the module reads `frost`, not `away`.
+const PRESETS_BY_PRIORITY = ['frost', 'eco', 'comfort', 'night', 'away'];
+
+/**
+ * @description The preset an order stands for, used when the order was changed
+ * on the module itself and is taken as that preset picked by hand (C.1.1).
+ *
+ * When the heater regulates, it is the preset set to send that order, so a
+ * press of comfort -2 reads as night when night sends comfort -2. An order no
+ * preset sends falls back on the fixed vocabulary — a derived comfort is still
+ * comfort. Off is no preset: pressed on the module it stops the thermostat.
+ * @param {number} order - The PILOT_WIRE_MODE value the module now carries.
+ * @param {object} config - Thermostat config object.
+ * @returns {string|undefined} The preset, or undefined for off or an unknown order.
+ * @example
+ * presetForPilotWireOrder(PILOT_WIRE_MODE.ECO, config); // 'eco'
+ */
+function presetForPilotWireOrder(order, config) {
+  if (config.pilot_wire_regulation !== PILOT_WIRE_REGULATIONS.GLADYS) {
+    const orders = config.pilot_wire_orders || {};
+    const preset = PRESETS_BY_PRIORITY.find((candidate) => orders[candidate] === order);
+    if (preset) {
+      return preset;
+    }
+  }
+  return PRESET_BY_PILOT_WIRE_ORDER[order];
+}
 
 /**
  * @description Whether an order keeps a heater on standby.
@@ -575,12 +605,13 @@ async function writePilotWireOrder(gladys, pilotWireSelector, order, logContext,
  * @description Drive a pilot-wire heater: write the order Gladys decided, then
  * say on the thermostat's operating state what it knows of it.
  *
- * Who regulates is a setting of the thermostat (C.1.1):
+ * Who regulates is said by the thermostat type (C.1.1):
  *
- * - The heater (`heater`, the default). Each preset is sent as its own order —
- *   eco is eco — and the heater heats on a setpoint of its own, set on its body.
- *   Whether it then draws current is unknown, so the state is left alone.
- * - Gladys (`gladys`, only with a room sensor). The wire is used as a switch,
+ * - The heater (a real thermostat, `heater`). Each preset sends the order it is
+ *   set to — eco is eco — and the heater heats on a setpoint of its own, set on
+ *   its body. Whether it then draws current is unknown, so the state is left
+ *   alone.
+ * - Gladys (a virtual one with a room sensor, `gladys`). The wire is used as a switch,
  *   with the same hysteresis as one: below the setpoint comfort, above it frost
  *   protection — the standby that still guards the room against frost. Comfort
  *   whatever the preset: the heater's own setpoint is set high, and eco would
@@ -648,7 +679,7 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
     order = heating ? PILOT_WIRE_MODE.COMFORT : PILOT_WIRE_MODE.FROST_PROTECTION;
     context = `${logContext}, temp=${currentTemp}, setpoint=${setpoint}`;
   } else {
-    order = PILOT_WIRE_ORDER_BY_PRESET[preset];
+    order = pilotWireOrderForPreset(preset, config);
     if (order === undefined) {
       logger.debug(`Thermostat schedule: no pilot-wire order for preset "${preset}", the heater keeps its order`);
       return;
@@ -707,10 +738,7 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
  * pilotWirePresetForHold({ setpoint: 20 }, 'schedule', config); // 'comfort'
  */
 function pilotWirePresetForHold(hold, currentPreset, config) {
-  if (
-    PILOT_WIRE_ORDER_BY_PRESET[currentPreset] !== undefined &&
-    getSetpointForPreset(currentPreset, config) === hold.setpoint
-  ) {
+  if (PRESETS_BY_PRIORITY.includes(currentPreset) && getSetpointForPreset(currentPreset, config) === hold.setpoint) {
     return currentPreset;
   }
   let nearest = null;
@@ -1236,7 +1264,8 @@ module.exports = {
   drivePilotWire,
   driveHeldPilotWire,
   pilotWirePresetForHold,
-  PRESET_BY_PILOT_WIRE_ORDER,
+  presetForPilotWireOrder,
+  pilotWireOrderForPreset,
   getRunningMode,
   readTemperatureInThermostatUnit,
   phaseOffset,

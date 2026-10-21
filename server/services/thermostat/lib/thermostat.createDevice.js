@@ -6,12 +6,11 @@ const {
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
 } = require('../../../utils/constants');
-const {
-  THERMOSTAT_TYPES,
-  DEFAULT_THERMOSTAT_TYPE,
-  PILOT_WIRE_REGULATIONS,
-  DEFAULT_PILOT_WIRE_REGULATION,
-} = require('../../../utils/thermostatConstants');
+const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
+
+// The params that make an external thermostat drive a real device's setpoint.
+// A pilot-wire heater has none: it takes an order (C.1.1).
+const EXTERNAL_SETPOINT_PARAMS = ['THERMOSTAT_TARGET_FEATURE', 'THERMOSTAT_STATE_FEATURE', 'THERMOSTAT_MODE_FEATURE'];
 
 // Runtime state kept as params rather than features: a hold, and a stop the
 // programme made, are bookkeeping of the regulation loop, not properties of the
@@ -28,8 +27,12 @@ const ALLOWED_PARAMS = [
   // A pilot-wire heater takes an order rather than a contact: the same actuator
   // slot, driven with six orders instead of on/off.
   'THERMOSTAT_PILOT_WIRE_FEATURE',
-  // Who regulates that heater: its own thermostat, or Gladys on the room sensor.
-  'THERMOSTAT_PILOT_WIRE_REGULATION',
+  // The order each preset sends that heater when it regulates itself.
+  'THERMOSTAT_PILOT_WIRE_ORDER_FROST',
+  'THERMOSTAT_PILOT_WIRE_ORDER_AWAY',
+  'THERMOSTAT_PILOT_WIRE_ORDER_ECO',
+  'THERMOSTAT_PILOT_WIRE_ORDER_NIGHT',
+  'THERMOSTAT_PILOT_WIRE_ORDER_COMFORT',
   'THERMOSTAT_TYPE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
@@ -154,7 +157,11 @@ function buildStateFeatures(device, external) {
 async function createDevice(device) {
   logger.info(`Thermostat: Creating device "${device.name}"`);
 
-  const params = (device.params || []).filter((param) => ALLOWED_PARAMS.includes(param.name));
+  // Copies: the rules below rewrite some values, and the caller's payload is
+  // not theirs to change.
+  const params = (device.params || [])
+    .filter((param) => ALLOWED_PARAMS.includes(param.name))
+    .map((param) => ({ ...param }));
 
   // `device.create` deletes every param the payload leaves out. The hold is
   // runtime state the edit form knows nothing about, so saving the form would
@@ -178,24 +185,22 @@ async function createDevice(device) {
 
   const typeParam = params.find((param) => param.name === 'THERMOSTAT_TYPE');
   const thermostatType = (typeParam && typeParam.value) || DEFAULT_THERMOSTAT_TYPE;
-  const external = thermostatType === THERMOSTAT_TYPES.EXTERNAL;
+  const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
+  const pilotWire = !!(pilotWireParam && pilotWireParam.value);
+  // A pilot-wire heater is driven by an order whichever type it is (C.1.1): the
+  // type only says who regulates it. It owns its setpoint feature and carries
+  // the state features of a virtual thermostat, and none of a real device's.
+  const external = thermostatType === THERMOSTAT_TYPES.EXTERNAL && !pilotWire;
 
   // A pilot-wire heater only heats, and its orders are never pulsed within a
   // cycle (C.1.1): a cooling mode or TPI saved with one would describe a
   // thermostat the loop does not run. Held here as well as in the form, so a
-  // client writing the params directly cannot save one either.
-  const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
-  if (!external && pilotWireParam && pilotWireParam.value) {
-    // Gladys regulates on a room sensor, so asking it to without one saves the
-    // heater's own regulation — what the loop would run anyway.
-    const temperatureParam = params.find((param) => param.name === 'THERMOSTAT_TEMPERATURE_FEATURE');
-    const hasSensor = !!(temperatureParam && temperatureParam.value);
+  // client writing the params directly cannot save one either. A real device's
+  // setpoint left behind would be written to by nothing, and is cleared.
+  if (pilotWire) {
     params.forEach((param) => {
-      if (
-        param.name === 'THERMOSTAT_PILOT_WIRE_REGULATION' &&
-        (param.value !== PILOT_WIRE_REGULATIONS.GLADYS || !hasSensor)
-      ) {
-        param.value = DEFAULT_PILOT_WIRE_REGULATION;
+      if (EXTERNAL_SETPOINT_PARAMS.includes(param.name)) {
+        param.value = '';
       }
       if (param.name === 'THERMOSTAT_MODE' && param.value === 'cooling') {
         param.value = 'heating';

@@ -595,9 +595,9 @@
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
-/* A pilot-wire heater regulating on its own: the order it was sent is all the
-   card knows, so it is said quietly under the gauge instead of a flame. */
-.pilotWireOrder {
+/* A pilot-wire heater Gladys regulates: why the module carries comfort or frost
+   protection whatever the preset, said quietly under the gauge. */
+.pilotWireStatus {
   text-align: center;
   color: #9aa0ac;
   font-size: 0.8125rem;

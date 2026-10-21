@@ -224,15 +224,34 @@ describe('thermostat pilot wire: an order changed on the module', () => {
   });
 
   it('should not take again a comfort it already holds', async () => {
-    // Comfort -1 then comfort -2 is the same choice twice: taking it again would
-    // only push the hold's expiry forward.
+    // Comfort then comfort -1, which no preset sends: the same choice twice,
+    // and taking it again would only push the hold's expiry forward.
     const mod = loadListener();
     const handler = buildHandler(thermostat({ preset: 'comfort', params: { THERMOSTAT_MANUAL_SETPOINT: '21' } }));
-    handler.observedSetpoints.set('heater-pilot-wire', PILOT_WIRE_MODE.COMFORT_1);
+    handler.observedSetpoints.set('heater-pilot-wire', PILOT_WIRE_MODE.COMFORT);
+
+    await press(mod, handler, PILOT_WIRE_MODE.COMFORT_1);
+
+    assert.notCalled(handler.setValue);
+  });
+
+  it('should take an order as the preset set to send it', async () => {
+    // Night sends comfort -2 by default: pressed on the module, it is night.
+    const mod = loadListener();
+    const handler = buildHandler(thermostat({ preset: 'comfort' }));
 
     await press(mod, handler, PILOT_WIRE_MODE.COMFORT_2);
 
-    assert.notCalled(handler.setValue);
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_PRESET.NIGHT);
+  });
+
+  it('should take frost protection as frost, not as away', async () => {
+    const mod = loadListener();
+    const handler = buildHandler(thermostat({ preset: 'comfort' }));
+
+    await press(mod, handler, PILOT_WIRE_MODE.FROST_PROTECTION);
+
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_PRESET.FROST);
   });
 
   it('should take a preset it carries with no hold on it', async () => {
@@ -264,18 +283,14 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     assert.notCalled(handler.setValue);
   });
 
-  it('should ignore the pilot-wire param of an external thermostat', async () => {
-    // The loop drives an external thermostat by its setpoint and never reads
-    // that param: an order reported there means nothing to it.
+  it('should take an order changed on a heater that regulates itself', async () => {
+    // A real thermostat with a pilot wire is still driven by its order (C.1.1).
     const mod = loadListener();
-    const handler = buildHandler(
-      thermostat({ params: { THERMOSTAT_TYPE: 'external', THERMOSTAT_TARGET_FEATURE: 'netatmo-setpoint' } }),
-    );
+    const handler = buildHandler(thermostat({ params: { THERMOSTAT_TYPE: 'external' } }));
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
-    assert.notCalled(handler.setValue);
-    assert.notCalled(handler.gladys.device.setParam);
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_PRESET.ECO);
   });
 
   it('should seed the order reference at start, like a setpoint', async () => {

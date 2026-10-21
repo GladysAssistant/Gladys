@@ -44,6 +44,10 @@ const CircularGauge = ({
   isActive,
   isWindowOpen,
   tempUnit,
+  // A word shown in place of the setpoint, on a thermostat that has none to
+  // offer — a pilot-wire heater regulating itself shows the order it carries.
+  // The gauge then draws no setpoint arc, no knob, and takes no input.
+  centerLabel = null,
   a11yLabels = {}
 }) => {
   const cx = 110;
@@ -84,13 +88,21 @@ const CircularGauge = ({
   // and the arc keeps showing where that fallback sits.
   const isOff = mode === 'off';
   const offLabel = a11yLabels.off || 'Off';
+  const hasSetpoint = centerLabel === null || centerLabel === undefined;
+  // The word in the middle, when there is no setpoint to draw there.
+  let centerWord = null;
+  if (isOff) {
+    centerWord = offLabel;
+  } else if (!hasSetpoint) {
+    centerWord = centerLabel;
+  }
 
   // One sentence for a screen reader, instead of the raw SVG texts being read
   // one fragment at a time ("21", ".0", "\u00b0", "C"). The individual <text>
   // nodes are hidden from the tree for the same reason.
   const unit = `\u00b0${tempUnit || 'C'}`;
   const label = [
-    isOff ? offLabel : `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`,
+    centerWord || `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`,
     hasCurrentTemp
       ? `${a11yLabels.currentTemp || 'Current temperature'} ${Number(currentTemp).toFixed(1)} ${unit}`
       : null,
@@ -116,13 +128,13 @@ const CircularGauge = ({
     }
   };
 
-  const interactive = !!(onIncrement || onDecrement || onPointerDown);
+  const interactive = hasSetpoint && !!(onIncrement || onDecrement || onPointerDown);
 
   return (
     <svg
       viewBox="0 0 220 220"
       class={style.gaugeSvg}
-      onPointerDown={onPointerDown}
+      onPointerDown={interactive ? onPointerDown : undefined}
       onKeyDown={interactive ? onKeyDown : undefined}
       tabindex={interactive ? '0' : undefined}
       role={interactive ? 'slider' : 'img'}
@@ -142,17 +154,21 @@ const CircularGauge = ({
           a blurred copy under the stroke softens the stroke's own edges, which on
           this pale background turned the blue arc into a grey smear. A shadow
           leaves the stroke untouched and only casts colour around it. */}
-      <path
-        key={`${mode}-${arcColor}`}
-        class={isActive ? `${style.arcGlow} ${style.gaugeArc}` : style.gaugeArc}
-        style={isActive ? `color:${arcColor}` : undefined}
-        d={fgPath}
-        fill="none"
-        stroke={arcColor}
-        strokeWidth={sw}
-        strokeLinecap="round"
-      />
-      <circle class={style.gaugeArc} cx={knob.x} cy={knob.y} r="9" fill="white" stroke={arcColor} strokeWidth="2.5" />
+      {hasSetpoint && (
+        <path
+          key={`${mode}-${arcColor}`}
+          class={isActive ? `${style.arcGlow} ${style.gaugeArc}` : style.gaugeArc}
+          style={isActive ? `color:${arcColor}` : undefined}
+          d={fgPath}
+          fill="none"
+          stroke={arcColor}
+          strokeWidth={sw}
+          strokeLinecap="round"
+        />
+      )}
+      {hasSetpoint && (
+        <circle class={style.gaugeArc} cx={knob.x} cy={knob.y} r="9" fill="white" stroke={arcColor} strokeWidth="2.5" />
+      )}
 
       {/* Current temp + humidity: above setpoint */}
       {hasCurrentTemp && (
@@ -197,9 +213,9 @@ const CircularGauge = ({
 
       {/* Setpoint: integer + decimal + unit split (° above dot, C above decimal),
           replaced by the word "off" when the thermostat is stopped. */}
-      {isOff ? (
+      {centerWord ? (
         <text aria-hidden="true" x={cx} y={cy + 18} textAnchor="middle" dominantBaseline="auto" class={style.offText}>
-          {offLabel}
+          {centerWord}
         </text>
       ) : (
         <g>
@@ -278,7 +294,7 @@ const CircularGauge = ({
           out of the tab order and out of the accessibility tree: exposing them
           as two more controls would make a reader announce three ways to change
           one value. They keep their pointer behaviour. */}
-      {onIncrement && (
+      {hasSetpoint && onIncrement && (
         <g onClick={onIncrement} onPointerDown={e => e.stopPropagation()} class={style.arcBtnGroup} aria-hidden="true">
           {/* Transparent and wider than the visible circle: the button keeps
               its 30px look while the tap area reaches the recommended size. */}
@@ -296,7 +312,7 @@ const CircularGauge = ({
           </text>
         </g>
       )}
-      {onDecrement && (
+      {hasSetpoint && onDecrement && (
         <g onClick={onDecrement} onPointerDown={e => e.stopPropagation()} class={style.arcBtnGroup} aria-hidden="true">
           <circle cx="180" cy="180" r="24" class={style.arcBtnHitArea} />
           <circle cx="180" cy="180" r="15" class={style.arcBtnCircle} />
