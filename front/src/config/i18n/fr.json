@@ -3683,7 +3683,7 @@
         "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie un ordre (confort, éco, hors-gel, arrêt…) au lieu de couper son alimentation. Désactivez d’abord le programme propre au module.",
         "pilotWireProgrammeWarning": "Désactivez le programme ou le mode thermostat propre au module (planning Heatzy, programme Tuya…) avant de le piloter depuis Gladys. Sinon, chaque ordre écrit par ce programme est pris pour un changement fait sur le module, et le module et Gladys écrivent l’ordre à tour de rôle.",
         "pilotWireRegulationHelp": {
-          "heater": "Chaque preset envoie l’ordre choisi dans le tableau des presets (éco → éco, nuit → confort -2…). Le capteur d’ambiance, s’il y en a un, sert seulement à l’affichage.",
+          "heater": "Chaque preset envoie l’ordre choisi dans le tableau des presets (éco → éco, absence → hors-gel…). Le capteur d’ambiance, s’il y en a un, sert seulement à l’affichage.",
           "gladys": "Gladys mesure la pièce avec le capteur d’ambiance et se sert du fil pilote comme d’un interrupteur — confort pour chauffer, hors-gel une fois la consigne du preset atteinte. Réglez la consigne confort du radiateur lui-même assez haut (24 °C par exemple) : il obéit alors à Gladys plutôt qu’à son propre thermomètre, et cette valeur reste un plafond de sécurité si Gladys s’arrête. Pour que le radiateur régule seul, choisissez le type « Radiateur à fil pilote »."
         },
         "windowFeatureLabel": "Capteur d'ouverture de fenêtre",

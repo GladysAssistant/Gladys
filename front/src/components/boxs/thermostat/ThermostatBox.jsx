@@ -1418,6 +1418,8 @@ class ThermostatBox extends Component {
         props.intl.dictionary.deviceFeatureAction.category.heater['pilot-wire-mode']) ||
       {};
     const orderLabel = orderLabels[PILOT_WIRE_ORDER_KEYS[pilotWireOrder]] || '—';
+    // The ring and the order take the lit preset's colour, as its button does.
+    const orderColor = heaterRegulated && isStartPreset(activePreset) ? this.getPresetColor(activePreset) : null;
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
     // When Gladys regulates a pilot-wire heater, the module only ever carries
@@ -1480,6 +1482,7 @@ class ThermostatBox extends Component {
                     isWindowOpen={isWindowOpen}
                     tempUnit={tempUnit}
                     centerLabel={heaterRegulated ? orderLabel : null}
+                    centerColor={orderColor}
                     a11yLabels={a11yLabels}
                   />
                 </div>

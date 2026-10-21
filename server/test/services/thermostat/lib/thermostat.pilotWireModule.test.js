@@ -236,13 +236,27 @@ describe('thermostat pilot wire: an order changed on the module', () => {
   });
 
   it('should take an order as the preset set to send it', async () => {
-    // Night sends comfort -2 by default: pressed on the module, it is night.
+    // Night set to comfort -2: pressed on the module, comfort -2 is night.
     const mod = loadListener();
-    const handler = buildHandler(thermostat({ preset: 'comfort' }));
+    const handler = buildHandler(
+      thermostat({
+        preset: 'comfort',
+        params: { THERMOSTAT_PILOT_WIRE_ORDER_NIGHT: String(PILOT_WIRE_MODE.COMFORT_2) },
+      }),
+    );
 
     await press(mod, handler, PILOT_WIRE_MODE.COMFORT_2);
 
     expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_PRESET.NIGHT);
+  });
+
+  it('should take eco as eco, not as night, when both send it', async () => {
+    const mod = loadListener();
+    const handler = buildHandler(thermostat({ preset: 'comfort' }));
+
+    await press(mod, handler, PILOT_WIRE_MODE.ECO);
+
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_PRESET.ECO);
   });
 
   it('should take frost protection as frost, not as away', async () => {
