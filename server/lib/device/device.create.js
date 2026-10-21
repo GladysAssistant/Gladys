@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const { Transaction } = require('sequelize');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
 const { EVENTS, DEVICE_FEATURE_STATE_COLUMNS } = require('../../utils/constants');
@@ -88,8 +89,11 @@ async function create(device) {
 
   const deviceFeaturesIdsToPurge = [];
 
-  // we execute the whole insert in a transaction to avoid inconsistent state
-  await db.sequelize.transaction(async (transaction) => {
+  // we execute the whole insert in a transaction to avoid inconsistent state.
+  // The transaction is IMMEDIATE so the SQLite write lock is taken at BEGIN (where the
+  // SQLITE_BUSY retry can wait for it) instead of failing when a deferred transaction
+  // tries to upgrade its lock at the INSERT while another connection is writing.
+  await db.sequelize.transaction({ type: Transaction.TYPES.IMMEDIATE }, async (transaction) => {
     // external_id is a required parameter
     if (!device.external_id) {
       throw new BadParameters('A device must have an external_id.');

@@ -22,6 +22,23 @@ const brain = {
 };
 
 describe('Device', () => {
+  it('should create device in an IMMEDIATE transaction', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const transactionSpy = sinon.spy(db.sequelize, 'transaction');
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Immediate device',
+        external_id: 'philips-hue-immediate',
+      });
+      assert.calledOnce(transactionSpy);
+      expect(transactionSpy.firstCall.args[0]).to.deep.equal({ type: 'IMMEDIATE' });
+    } finally {
+      transactionSpy.restore();
+    }
+  });
   it('should create device alone', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
