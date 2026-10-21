@@ -389,28 +389,30 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     expect(devices[0].params).to.have.lengthOf(1);
     expect(devices[0].params[0].name).to.equal('ENERGY_INDEX_LAST_PROCESSED');
   });
-  it('should derive the consumption of the Tuya SPM02V3 indexes, not of its production indexes', async () => {
+  const numericExpose = (name, unit) => ({ type: 'numeric', name, property: name, unit, access: 1 });
+  const spm02v3 = {
+    friendly_name: 'three_phase_meter',
+    supported: true,
+    definition: {
+      model: 'SPM02V3',
+      exposes: [
+        ...['voltage_a', 'voltage_b', 'voltage_c'].map((name) => numericExpose(name, 'V')),
+        ...['power_a', 'power_b', 'power_c', 'power'].map((name) => numericExpose(name, 'W')),
+        ...['current_a', 'current_b', 'current_c'].map((name) => numericExpose(name, 'A')),
+        ...['energy', 'energy_a', 'energy_b', 'energy_c'].map((name) => numericExpose(name, 'kWh')),
+        ...['produced_energy', 'energy_produced_a', 'energy_produced_b', 'energy_produced_c'].map((name) =>
+          numericExpose(name, 'kWh'),
+        ),
+      ],
+    },
+  };
+  const featureByProperty = (device, category, type, property) =>
+    device.features.find((f) => f.category === category && f.type === type && f.external_id.split(':')[4] === property);
+
+  it('should map the Tuya SPM02V3 phases under its totals and derive its consumption and production', async () => {
     // PREPARE
     gladys.stateManager.get.returns(null);
-    const numericExpose = (name, unit) => ({ type: 'numeric', name, property: name, unit, access: 1 });
-    zigbee2MqttService.device.discoveredDevices = {
-      three_phase_meter: {
-        friendly_name: 'three_phase_meter',
-        supported: true,
-        definition: {
-          model: 'SPM02V3',
-          exposes: [
-            ...['voltage_a', 'voltage_b', 'voltage_c'].map((name) => numericExpose(name, 'V')),
-            ...['power_a', 'power_b', 'power_c', 'power'].map((name) => numericExpose(name, 'W')),
-            ...['current_a', 'current_b', 'current_c'].map((name) => numericExpose(name, 'A')),
-            ...['energy', 'energy_a', 'energy_b', 'energy_c'].map((name) => numericExpose(name, 'kWh')),
-            ...['produced_energy', 'energy_produced_a', 'energy_produced_b', 'energy_produced_c'].map((name) =>
-              numericExpose(name, 'kWh'),
-            ),
-          ],
-        },
-      },
-    };
+    zigbee2MqttService.device.discoveredDevices = { three_phase_meter: spm02v3 };
 
     // EXECUTE
     const [device] = zigbee2MqttService.device.getDiscoveredDevices({}, 'main-meter-feature-id');
@@ -442,14 +444,129 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
         DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
       ),
     ).to.deep.equal(['Produced energy', 'Energy produced a', 'Energy produced b', 'Energy produced c']);
-    // the indexes hang under the main meter, the production indexes are never attached to it
+
+    // only the total index hangs under the main meter, the phases hang under the total
+    const { SWITCH, ENERGY_PRODUCTION_SENSOR } = DEVICE_FEATURE_CATEGORIES;
+    const total = featureByProperty(device, SWITCH, DEVICE_FEATURE_TYPES.SWITCH.ENERGY, 'energy');
+    expect(total.energy_parent_id).to.equal('main-meter-feature-id');
+    ['energy_a', 'energy_b', 'energy_c'].forEach((property) =>
+      expect(featureByProperty(device, SWITCH, DEVICE_FEATURE_TYPES.SWITCH.ENERGY, property).energy_parent_id).to.equal(
+        total.id,
+      ),
+    );
+
+    // the production indexes are never attached to the main meter, their phases hang under the total
+    const productionIndexType = DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX;
+    const totalProduction = featureByProperty(device, ENERGY_PRODUCTION_SENSOR, productionIndexType, 'produced_energy');
+    expect(totalProduction.energy_parent_id).to.equal(undefined);
+    const productionIndexes = [
+      totalProduction,
+      ...['energy_produced_a', 'energy_produced_b', 'energy_produced_c'].map((property) =>
+        featureByProperty(device, ENERGY_PRODUCTION_SENSOR, productionIndexType, property),
+      ),
+    ];
+    productionIndexes
+      .slice(1)
+      .forEach((productionIndex) => expect(productionIndex.energy_parent_id).to.equal(totalProduction.id));
+
+    // every production index gets the thirty-minutes production the production job fills
+    const productions = device.features.filter(
+      (f) =>
+        f.category === ENERGY_PRODUCTION_SENSOR &&
+        f.type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+    );
+    expect(productions.map((f) => f.energy_parent_id)).to.deep.equal(productionIndexes.map((f) => f.id));
+    expect(productions.map((f) => f.name)).to.deep.equal([
+      'Produced energy (production)',
+      'Energy produced a (production)',
+      'Energy produced b (production)',
+      'Energy produced c (production)',
+    ]);
+  });
+
+  it('should keep on the main meter the per-channel indexes of a device without a total index', async () => {
+    // PREPARE
+    gladys.stateManager.get.returns(null);
+    zigbee2MqttService.device.discoveredDevices = {
+      two_clamps_meter: {
+        friendly_name: 'two_clamps_meter',
+        supported: true,
+        definition: {
+          model: 'PJ-1203A',
+          exposes: ['energy_a', 'energy_b'].map((name) => numericExpose(name, 'kWh')),
+        },
+      },
+    };
+
+    // EXECUTE
+    const [device] = zigbee2MqttService.device.getDiscoveredDevices({}, 'main-meter-feature-id');
+
+    // ASSERT
     const energyIndexes = device.features.filter(
       (f) => f.category === DEVICE_FEATURE_CATEGORIES.SWITCH && f.type === DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
     );
-    expect(energyIndexes.map((f) => f.energy_parent_id)).to.deep.equal(new Array(4).fill('main-meter-feature-id'));
-    const productionIndexes = device.features.filter(
-      (f) => f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    expect(energyIndexes.map((f) => f.energy_parent_id)).to.deep.equal([
+      'main-meter-feature-id',
+      'main-meter-feature-id',
+    ]);
+  });
+
+  it('should keep the production features of an existing SPM02V3 and move its phases under the total', async () => {
+    // PREPARE
+    const externalId = (category, type, property) => `zigbee2mqtt:three_phase_meter:${category}:${type}:${property}`;
+    const energyExternalId = (property) =>
+      externalId(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.ENERGY, property);
+    const producedExternalId = externalId(
+      DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+      DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+      'produced_energy',
     );
-    productionIndexes.forEach((f) => expect(f.energy_parent_id).to.equal(undefined));
+    gladys.stateManager.get.returns({
+      id: 'existing-device-id',
+      external_id: 'zigbee2mqtt:three_phase_meter',
+      features: [
+        {
+          id: 'energy-id',
+          external_id: energyExternalId('energy'),
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+          energy_parent_id: 'main-meter-feature-id',
+        },
+        {
+          // saved before the phases were attached to the total
+          id: 'energy-a-id',
+          external_id: energyExternalId('energy_a'),
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+          energy_parent_id: 'main-meter-feature-id',
+        },
+        {
+          id: 'produced-energy-id',
+          external_id: producedExternalId,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+        },
+        {
+          id: 'production-id',
+          external_id: `${producedExternalId}_production`,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+          energy_parent_id: 'produced-energy-id',
+        },
+      ],
+    });
+    zigbee2MqttService.device.discoveredDevices = { three_phase_meter: spm02v3 };
+
+    // EXECUTE
+    const [device] = zigbee2MqttService.device.getDiscoveredDevices({}, 'main-meter-feature-id');
+
+    // ASSERT
+    const energyA = device.features.find((f) => f.external_id === energyExternalId('energy_a'));
+    expect(energyA.id).to.equal('energy-a-id');
+    expect(energyA.energy_parent_id).to.equal('energy-id');
+    const productions = device.features.filter((f) => f.external_id === `${producedExternalId}_production`);
+    expect(productions).to.have.lengthOf(1);
+    expect(productions[0].id).to.equal('production-id');
+    expect(productions[0].energy_parent_id).to.equal('produced-energy-id');
   });
 });

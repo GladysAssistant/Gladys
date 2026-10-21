@@ -50,7 +50,9 @@ the installation has several meters.
   `daily-consumption-cost`) 1, anything else 0. A derived link always goes from a lower rank to a
   higher or equal one (cost → consumption → index; Enedis: 30-minute load curve → daily
   consumption).
-- **Derived link**: a link whose child and parent are on the **same device**.
+- **Derived link**: a link whose child and parent are on the **same device**. Besides index →
+  consumption → cost, a breakdown index hangs under the total index of its device (the phases of
+  a three-phase meter, section F): a link of equal rank, so a phase is not an attachment feature.
 - **Attachment link**: a link whose child and parent are on **different devices**.
 - **Attachment features of a device**: its energy source features that are not the child of a
   derived link (parent `null` or on another device). They are what attaches the device to a
@@ -176,6 +178,13 @@ the new parent would close a cycle (as before).
 ## F. Integrations
 
 - Zigbee2mqtt, Tasmota, MQTT, Enedis and the external integrations keep their derivation.
+- **Zigbee2mqtt** hangs the per-phase indexes of a meter exposing a total under that total
+  (`energy_a/b/c` under `energy`, `energy_produced_a/b/c` under `produced_energy`, e.g. Tuya
+  SPM02V3), a phase saved under the main meter included; without a total (the two clamps of a Tuya
+  PJ-1203A), each index is attached like any other. The weekly digest leaves out the consumption of
+  a phase: its total already counts it. Zigbee2mqtt also derives the 30-minute production of every
+  production index (`addProductionFeatures`, `<index>_production`, filled by the production job),
+  never attached to a meter.
 - **Matter** derives the energy features of a published cumulative index at discovery (the
   paired devices of `GET /api/v1/service/matter/paired-device`), like Zigbee2mqtt: the features
   already in Gladys keep their id and their parent — **a root included**: `addEnergyFeatures`
@@ -208,4 +217,7 @@ the new parent would close a cycle (as before).
   uniqueness, nothing written on a sound hierarchy.
 - Matter: derived features added, ids and parents of existing features kept, derived features
   re-injected, no bogus selector.
+- Zigbee2mqtt: the phases of a three-phase meter under its totals (a phase saved under the main
+  meter moved), the per-channel indexes of a device without a total on the main meter, the
+  production features derived and kept on rediscovery; the digest leaving out the phases.
 - Front: Cypress spec of the page (meters, unattached devices, meter select).

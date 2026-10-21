@@ -2,6 +2,7 @@ const dayjs = require('dayjs');
 
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { isSensorFeature } = require('../../services/mcp/lib/selectFeature');
+const { isEnergyIndexFeature } = require('../../utils/energyHierarchy');
 
 const DEFAULT_DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED = 48;
 
@@ -186,7 +187,25 @@ function findCostFeatureForConsumption(device, consumptionFeature) {
 }
 
 /**
- * @description Get leaf consumption features, excluding empty intermediate parents.
+ * @description Tell whether a consumption is derived from an index that breaks down another index
+ * of the same device (a phase of a three-phase meter under its total): the total already counts it.
+ * @param {object} device - Device with features.
+ * @param {object} feature - Consumption feature of the device.
+ * @returns {boolean} True for the consumption of a breakdown index.
+ * @example
+ * isBreakdownIndexConsumption(device, feature);
+ */
+function isBreakdownIndexConsumption(device, feature) {
+  const index = device.features.find((f) => f.id === feature.energy_parent_id);
+  if (!index || !isEnergyIndexFeature(index)) {
+    return false;
+  }
+  return device.features.some((f) => f.id === index.energy_parent_id && isEnergyIndexFeature(f));
+}
+
+/**
+ * @description Get leaf consumption features, excluding empty intermediate parents and the
+ * breakdowns of an index already counted by its total.
  * @param {Array<object>} devices - Devices with features.
  * @param {string|null} [mainMeterDeviceId] - Main electric meter device id.
  * @returns {Array<object>} Leaf consumption candidates.
@@ -195,7 +214,10 @@ function findCostFeatureForConsumption(device, consumptionFeature) {
  */
 function getConsumptionFeaturesForDigest(devices, mainMeterDeviceId = null) {
   const consumptionFeatures = devices.flatMap((device) =>
-    device.features.filter(isConsumptionFeature).map((feature) => ({ device, feature })),
+    device.features
+      .filter(isConsumptionFeature)
+      .filter((feature) => !isBreakdownIndexConsumption(device, feature))
+      .map((feature) => ({ device, feature })),
   );
 
   const intermediateParentIds = new Set(
