@@ -280,10 +280,10 @@ Under `heater`, a heater takes no temperature, so the presets table of the edit 
 | `frost`   | `FROST_PROTECTION` |
 | `away`    | `FROST_PROTECTION` |
 | `eco`     | `ECO`              |
-| `night`   | `COMFORT_2`        |
+| `night`   | `ECO`              |
 | `comfort` | `COMFORT`          |
 
-`away` is frost protection, as Home Assistant's pilot-wire climate does: nobody is home. `night` is comfort -2, so that it differs from eco and the derived comforts get a use; a user who wants eco at night picks it. The preset setpoints stay stored — a hold is still keyed by them, below — but the form does not show them.
+`away` is frost protection, as Home Assistant's pilot-wire climate does: nobody is home. `night` is eco, the order a heater's own programme gives the night. Comfort -1 and -2 stay on offer in the table; a user who wants night to differ from eco picks one. The preset setpoints stay stored — a hold is still keyed by them, below — but the form does not show them. The presets themselves stay Gladys's, not the six orders: a schedule belongs to the house and is shared by every thermostat in it, virtual, real or pilot-wire, and scenes pick presets too. The widget shows the order a preset sent in the middle of the gauge, which is what links the two vocabularies.
 
 **The widget** has no setpoint to offer under `heater`: the gauge draws no setpoint arc and no knob, takes no drag, arrow key or + / − press, and shows the order the module carries in their place, read on the pilot-wire feature. The room temperature stays above it. The presets are the only control, each sending its order.
 

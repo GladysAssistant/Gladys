@@ -144,12 +144,11 @@ describe('thermostat pilot wire', () => {
   });
 
   it('should send each preset its default order', async () => {
-    // Away is frost protection, as nobody is home; night is comfort -2, so that
-    // it differs from eco.
+    // Away is frost protection, as nobody is home; night is eco.
     const cases = [
       ['away', PILOT_WIRE_MODE.FROST_PROTECTION],
       ['eco', PILOT_WIRE_MODE.ECO],
-      ['night', PILOT_WIRE_MODE.COMFORT_2],
+      ['night', PILOT_WIRE_MODE.ECO],
     ];
     await Promise.all(
       cases.map(async ([preset, order]) => {

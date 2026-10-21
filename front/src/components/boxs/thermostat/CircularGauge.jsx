@@ -48,6 +48,9 @@ const CircularGauge = ({
   // offer — a pilot-wire heater regulating itself shows the order it carries.
   // The gauge then draws no setpoint arc, no knob, and takes no input.
   centerLabel = null,
+  // The colour that word and the whole ring take: the lit preset's, so the
+  // gauge reads as that preset rather than as an empty dial.
+  centerColor = null,
   a11yLabels = {}
 }) => {
   const cx = 110;
@@ -96,6 +99,13 @@ const CircularGauge = ({
   } else if (!hasSetpoint) {
     centerWord = centerLabel;
   }
+  // An order is drawn smaller than "Off", in the preset's colour, and a long
+  // one ("Confort -2°C") on two lines: on one, at the size of "Off", it ran
+  // past the ring on both sides.
+  const showsOrder = !hasSetpoint && !isOff;
+  const orderSplit = showsOrder && centerWord.length > 8 ? centerWord.lastIndexOf(' ') : -1;
+  const orderLines =
+    orderSplit > 0 ? [centerWord.slice(0, orderSplit), centerWord.slice(orderSplit + 1)] : [centerWord];
 
   // One sentence for a screen reader, instead of the raw SVG texts being read
   // one fragment at a time ("21", ".0", "\u00b0", "C"). The individual <text>
@@ -169,6 +179,17 @@ const CircularGauge = ({
       {hasSetpoint && (
         <circle class={style.gaugeArc} cx={knob.x} cy={knob.y} r="9" fill="white" stroke={arcColor} strokeWidth="2.5" />
       )}
+      {/* No setpoint to mark: the whole ring takes the preset's colour. */}
+      {showsOrder && centerColor && (
+        <path
+          class={style.gaugeArc}
+          d={bgPath}
+          fill="none"
+          stroke={centerColor}
+          strokeWidth={sw}
+          strokeLinecap="round"
+        />
+      )}
 
       {/* Current temp + humidity: above setpoint */}
       {hasCurrentTemp && (
@@ -213,11 +234,29 @@ const CircularGauge = ({
 
       {/* Setpoint: integer + decimal + unit split (° above dot, C above decimal),
           replaced by the word "off" when the thermostat is stopped. */}
-      {centerWord ? (
+      {showsOrder && (
+        <text
+          aria-hidden="true"
+          x={cx}
+          y={orderLines.length > 1 ? cy + 6 : cy + 16}
+          textAnchor="middle"
+          dominantBaseline="auto"
+          class={style.orderText}
+          style={centerColor ? `fill:${centerColor}` : undefined}
+        >
+          {orderLines.map((text, index) => (
+            <tspan key={text} x={cx} dy={index === 0 ? 0 : 28} class={index === 0 ? undefined : style.orderTextSecond}>
+              {text}
+            </tspan>
+          ))}
+        </text>
+      )}
+      {centerWord && !showsOrder && (
         <text aria-hidden="true" x={cx} y={cy + 18} textAnchor="middle" dominantBaseline="auto" class={style.offText}>
           {centerWord}
         </text>
-      ) : (
+      )}
+      {!centerWord && (
         <g>
           <text
             aria-hidden="true"

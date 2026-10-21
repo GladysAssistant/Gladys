@@ -3552,7 +3552,7 @@
         "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off…) instead of cutting its supply. Turn the module’s own programme off first.",
         "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
         "pilotWireRegulationHelp": {
-          "heater": "Each preset sends the order picked in the presets table (eco → eco, night → comfort -2…). The room sensor, if any, is only displayed.",
+          "heater": "Each preset sends the order picked in the presets table (eco → eco, away → frost protection…). The room sensor, if any, is only displayed.",
           "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
         },
         "windowFeatureLabel": "Window opening sensor",

@@ -95,13 +95,13 @@ const PILOT_WIRE_REGULATIONS = {
 // thermostat by a THERMOSTAT_PILOT_WIRE_ORDER_<PRESET> param. A heater takes no
 // temperature, so these replace the preset setpoints there. Away is frost
 // protection, as Home Assistant's pilot-wire climate does: nobody is home.
-// Night is comfort -2, so that it differs from eco and the derived comforts
-// get a use; both can be changed.
+// Night is eco, the order a heater's own programme gives the night; comfort -1
+// and -2 stay on offer for whoever wants them.
 const DEFAULT_PILOT_WIRE_ORDERS = {
   frost: PILOT_WIRE_MODE.FROST_PROTECTION,
   away: PILOT_WIRE_MODE.FROST_PROTECTION,
   eco: PILOT_WIRE_MODE.ECO,
-  night: PILOT_WIRE_MODE.COMFORT_2,
+  night: PILOT_WIRE_MODE.ECO,
   comfort: PILOT_WIRE_MODE.COMFORT,
 };
 

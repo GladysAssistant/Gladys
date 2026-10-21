@@ -3552,7 +3552,7 @@
         "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus…), statt die Stromzufuhr zu unterbrechen. Schalten Sie zuerst das eigene Programm des Moduls aus.",
         "pilotWireProgrammeWarning": "Schalten Sie das eigene Programm oder den Thermostatmodus des Moduls aus (Heatzy-Zeitplan, Tuya-Programm…), bevor Sie es mit Gladys steuern. Sonst wird jeder vom Programm geschriebene Befehl als Änderung am Modul gewertet, und Modul und Gladys schreiben den Befehl abwechselnd.",
         "pilotWireRegulationHelp": {
-          "heater": "Jede Voreinstellung sendet den in der Tabelle der Voreinstellungen gewählten Befehl (Eco → Eco, Nacht → Komfort -2…). Der Raumsensor, falls vorhanden, dient nur der Anzeige.",
+          "heater": "Jede Voreinstellung sendet den in der Tabelle der Voreinstellungen gewählten Befehl (Eco → Eco, Abwesend → Frostschutz…). Der Raumsensor, falls vorhanden, dient nur der Anzeige.",
           "gladys": "Gladys misst den Raum mit dem Raumsensor und nutzt die Steuerleitung als Schalter — Komfort zum Heizen, Frostschutz, sobald der Sollwert der Voreinstellung erreicht ist. Stellen Sie den Komfort-Sollwert am Heizkörper selbst hoch genug ein (zum Beispiel 24 °C): Er gehorcht dann Gladys statt seinem eigenen Thermometer, und dieser Wert bleibt eine Sicherheitsobergrenze, falls Gladys ausfällt. Damit der Heizkörper selbst regelt, wählen Sie den Typ „Heizkörper mit Steuerleitung“."
         },
         "windowFeatureLabel": "Fensterkontakt",
