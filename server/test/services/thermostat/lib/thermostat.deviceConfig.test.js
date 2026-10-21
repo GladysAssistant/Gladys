@@ -8,6 +8,7 @@ const {
   buildParamsConfig,
   getDeviceConfig,
   getFeatureBySelector,
+  isExternal,
 } = require('../../../../services/thermostat/lib/thermostat.deviceConfig');
 
 const deviceWithParams = (params) => ({
@@ -70,20 +71,48 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
     expect(config.preset_frost).to.equal(0);
   });
 
-  it('should let the heater regulate a pilot wire by default', () => {
+  // Who regulates a pilot-wire heater is said by the thermostat type (C.1.1).
+  it('should let Gladys regulate a pilot wire on a virtual thermostat with a room sensor', () => {
     const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }));
+
+    expect(config.pilot_wire_regulation).to.equal('gladys');
+  });
+
+  it('should let the heater regulate a pilot wire on a real thermostat, sensor or not', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TYPE: 'external', THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }),
+    );
 
     expect(config.pilot_wire_regulation).to.equal('heater');
   });
 
-  it('should let Gladys regulate a pilot wire on a room sensor only', () => {
-    const withSensor = buildParamsConfig(
-      deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp', THERMOSTAT_PILOT_WIRE_REGULATION: 'gladys' }),
-    );
-    const withoutSensor = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_REGULATION: 'gladys' }));
+  it('should let the heater regulate a pilot wire with no room sensor to regulate on', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }));
 
-    expect(withSensor.pilot_wire_regulation).to.equal('gladys');
-    expect(withoutSensor.pilot_wire_regulation).to.equal('heater');
+    expect(config.pilot_wire_regulation).to.equal('heater');
+  });
+
+  it('should read the order each preset sends, falling back on the defaults', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({
+        THERMOSTAT_TEMPERATURE_FEATURE: 'temp',
+        THERMOSTAT_PILOT_WIRE_ORDER_NIGHT: '2',
+        // Not one of the six orders: ignored rather than sent.
+        THERMOSTAT_PILOT_WIRE_ORDER_ECO: '9',
+      }),
+    );
+
+    expect(config.pilot_wire_orders).to.deep.equal({ frost: 1, away: 1, eco: 2, night: 2, comfort: 5 });
+  });
+});
+
+describe('thermostat.deviceConfig - isExternal', () => {
+  it('should never take a pilot-wire heater for a real thermostat driven by its setpoint', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TYPE: 'external', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }),
+    );
+
+    expect(isExternal(config)).to.equal(false);
   });
 });
 

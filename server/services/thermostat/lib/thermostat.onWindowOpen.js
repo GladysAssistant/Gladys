@@ -5,7 +5,7 @@ const {
   stopExternalThermostat,
   drivePilotWire,
   getSetpointForPreset,
-  PRESET_BY_PILOT_WIRE_ORDER,
+  presetForPilotWireOrder,
 } = require('./thermostat.applySchedules');
 const { buildParamsConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
 const { holdExpiry } = require('./thermostat.setValue');
@@ -211,7 +211,7 @@ async function onPilotWireOrderChanged(device, config, order) {
     }
   }
   const stop = order === PILOT_WIRE_MODE.OFF;
-  const name = PRESET_BY_PILOT_WIRE_ORDER[order];
+  const name = presetForPilotWireOrder(order, config);
   // Comfort -1 then comfort -2 is the same choice twice: re-taking it would only
   // push the hold's expiry forward.
   const hold = getManualHold(device);
@@ -270,16 +270,16 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     }
     // Found through its params, so it has some, and the config is never null.
     const config = buildParamsConfig(device);
-    // A pilot-wire order counts only on a virtual thermostat: an external one
-    // ignores that param (the loop takes the external branch first), and its
-    // setpoint is the only thing a second writer can change there.
+    // A pilot-wire heater is never external (isExternal): whichever type says
+    // who regulates it, it is driven by its order, and its order is what a
+    // second writer — the module's button — can change.
     const pilotWire = !isExternal(config) && config.pilot_wire_feature === changedSelector;
     if (!pilotWire && config.target_feature !== changedSelector) {
       return;
     }
     // An order that is no PILOT_WIRE_MODE value means nothing to the thermostat,
     // and must not become the reference the next report is compared against.
-    if (pilotWire && newValue !== PILOT_WIRE_MODE.OFF && PRESET_BY_PILOT_WIRE_ORDER[newValue] === undefined) {
+    if (pilotWire && newValue !== PILOT_WIRE_MODE.OFF && presetForPilotWireOrder(newValue, config) === undefined) {
       return;
     }
     // Our own write, reported back. The mark is *kept* rather than consumed: a

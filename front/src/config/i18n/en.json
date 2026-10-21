@@ -903,7 +903,8 @@
         "cancelManual": "Cancel manual mode",
         "windowOpen": "Window open — heating suspended",
         "windowOpenCooling": "Window open — cooling suspended",
-        "pilotWireOrder": "Order sent:",
+        "pilotWireHeating": "Heating",
+        "pilotWireStandby": "Standby: setpoint reached",
         "a11ySetpoint": "Setpoint",
         "a11yCurrentTemp": "Current temperature",
         "a11yHumidity": "Humidity",
@@ -3507,7 +3508,7 @@
         "vendorProgrammeWarning": "Turn the vendor programme off on this device (the Netatmo or Tado app…) before driving it from Gladys. Otherwise the device’s programme and Gladys’s take turns writing the setpoint, and the thermostat follows whichever wrote last.",
         "typeHelp": {
           "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) or a pilot-wire heater to reach the setpoint.",
-          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state."
+          "external": "The thermostat runs its own regulation and heating. Gladys only sends it the schedule’s setpoint — or, for a pilot-wire heater, the preset’s order — and displays its state."
         },
         "targetFeatureLabel": "Setpoint of the real thermostat",
         "targetFeatureHelp": "The feature Gladys writes the target temperature on. Some devices expose several (heating/cooling, occupied/unoccupied): pick the one that actually drives your heating.",
@@ -3546,18 +3547,12 @@
           "cooling": "The switch that will be turned on and off to cool the room."
         },
         "pilotWireFeatureLabel": "Pilot wire (actuator)",
-        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off) instead of cutting its supply. Picking it empties the switch, and the reverse: a heater is driven one way or the other. Turn the module’s own programme off first.",
+        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off…) instead of cutting its supply. Turn the module’s own programme off first.",
         "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
-        "pilotWireRegulationLabel": "Who regulates the temperature?",
-        "pilotWireRegulation": {
-          "heater": "The heater",
-          "gladys": "Gladys, with the room sensor"
-        },
         "pilotWireRegulationHelp": {
-          "heater": "Each preset sends its order (eco → eco, comfort → comfort, frost → frost protection) and the heater heats on its own thermostat. The room sensor, if any, is only displayed.",
-          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch: comfort to heat, frost protection once the preset’s setpoint is reached, with the hysteresis thresholds. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop."
+          "heater": "Real thermostat: the heater regulates on its own thermostat, and each preset sends it the order picked in the presets table (eco → eco, night → comfort -2…). The room sensor, if any, is only displayed.",
+          "gladys": "Virtual thermostat: Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick “Real thermostat”."
         },
-        "pilotWireRegulationNeedsSensor": "Pick a temperature sensor to let Gladys regulate.",
         "windowFeatureLabel": "Window opening sensor",
         "windowFeatureHelp": {
           "heating": "Optional. If a window is open, the heating is automatically cut off.",
@@ -3580,6 +3575,7 @@
         "presetsLabel": "Temperature presets",
         "presetColNameLabel": "Preset",
         "presetColTempLabel": "Setpoint",
+        "presetColOrderLabel": "Order sent",
         "preset": {
           "off": "Off",
           "frost": "Frost protection",
@@ -3591,8 +3587,8 @@
         "saveButton": "Save",
         "cancelButton": "Cancel",
         "saveError": "Error while saving.",
-        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and a switch — reading one and actuating the other is how it regulates — or a pilot wire, which needs no sensor.",
-        "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
+        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
+        "incompleteExternalError": "A real thermostat needs the setpoint of the thermostat to drive, or a pilot wire.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",

@@ -3,6 +3,8 @@
 // them here avoids the drift where the form offered one default and the
 // regulation applied another.
 
+const { PILOT_WIRE_MODE } = require('./constants');
+
 const DEFAULT_PRESET_TEMPS = {
   frost: 7,
   away: 16,
@@ -69,19 +71,34 @@ const THERMOSTAT_TYPES = {
 // param, and they are all virtual ones.
 const DEFAULT_THERMOSTAT_TYPE = THERMOSTAT_TYPES.VIRTUAL;
 
-// Who regulates a pilot-wire heater (C.1.1).
-// - `heater`: the heater's own thermostat. Each preset is sent as its order —
-//   eco is eco — and the room sensor, if any, is only displayed.
-// - `gladys`: Gladys, on the room sensor. The wire is used as a switch: comfort
-//   to heat, frost protection to stop, whatever the preset. The heater's own
-//   comfort setpoint is set high, so its thermometer never has the last word.
+// Who regulates a pilot-wire heater (C.1.1). Not a param of its own: the
+// thermostat type already says it.
+// - `heater`, on a real thermostat (`external`): the heater's own thermostat.
+//   Each preset is sent as the order it is set to — eco is eco — and the room
+//   sensor, if any, is only displayed.
+// - `gladys`, on a virtual one: Gladys, on the room sensor. The wire is used as
+//   a switch: comfort to heat, frost protection to stop, whatever the preset.
+//   The heater's own comfort setpoint is set high, so its thermometer never has
+//   the last word. Without a sensor there is nothing to regulate on, and the
+//   heater regulates instead.
 const PILOT_WIRE_REGULATIONS = {
   HEATER: 'heater',
   GLADYS: 'gladys',
 };
 
-// The choice nobody is surprised by: the order picked is the order sent.
-const DEFAULT_PILOT_WIRE_REGULATION = PILOT_WIRE_REGULATIONS.HEATER;
+// The order each preset sends a heater that regulates itself, each one set per
+// thermostat by a THERMOSTAT_PILOT_WIRE_ORDER_<PRESET> param. A heater takes no
+// temperature, so these replace the preset setpoints there. Away is frost
+// protection, as Home Assistant's pilot-wire climate does: nobody is home.
+// Night is comfort -2, so that it differs from eco and the derived comforts
+// get a use; both can be changed.
+const DEFAULT_PILOT_WIRE_ORDERS = {
+  frost: PILOT_WIRE_MODE.FROST_PROTECTION,
+  away: PILOT_WIRE_MODE.FROST_PROTECTION,
+  eco: PILOT_WIRE_MODE.ECO,
+  night: PILOT_WIRE_MODE.COMFORT_2,
+  comfort: PILOT_WIRE_MODE.COMFORT,
+};
 
 module.exports = {
   DEFAULT_PRESET_TEMPS,
@@ -106,5 +123,5 @@ module.exports = {
   THERMOSTAT_TYPES,
   DEFAULT_THERMOSTAT_TYPE,
   PILOT_WIRE_REGULATIONS,
-  DEFAULT_PILOT_WIRE_REGULATION,
+  DEFAULT_PILOT_WIRE_ORDERS,
 };

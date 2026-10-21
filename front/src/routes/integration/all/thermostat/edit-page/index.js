@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import ThermostatPage from '../ThermostatPage';
 import EditForm from './EditForm';
+import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
 
 class ThermostatEditPage extends Component {
   // Extracted so a selector change on a reused route reloads the form. Doing this
@@ -25,7 +26,7 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditHumidityFeature', '');
     this.props.updateThermostatField('thermostatEditSwitchFeature', '');
     this.props.updateThermostatField('thermostatEditPilotWireFeature', '');
-    this.props.updateThermostatField('thermostatEditPilotWireRegulation', 'heater');
+    this.props.updateThermostatField('thermostatEditPilotWireOrders', DEFAULT_PILOT_WIRE_ORDERS);
     this.props.updateThermostatField('thermostatEditType', 'virtual');
     this.props.updateThermostatField('thermostatEditTargetFeature', '');
     this.props.updateThermostatField('thermostatEditStateFeature', '');
@@ -70,6 +71,6 @@ class ThermostatEditPage extends Component {
 }
 
 export default connect(
-  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeature,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditPilotWireFeature,thermostatEditPilotWireRegulation,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditWindowFeature,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,pilotWireFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures',
+  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeature,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditPilotWireFeature,thermostatEditPilotWireOrders,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditWindowFeature,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,pilotWireFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures',
   actions
 )(ThermostatEditPage);
