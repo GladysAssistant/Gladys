@@ -103,8 +103,8 @@ const pilotWireDevice = (preset, extra = {}) => ({
 
 // A virtual thermostat with a room sensor: Gladys regulates on it (C.1.1).
 const gladysRegulates = { THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor' };
-// A real thermostat: the heater regulates, and the sensor is only displayed.
-const heaterRegulates = { ...gladysRegulates, THERMOSTAT_TYPE: 'external' };
+// A pilot-wire thermostat: the heater regulates, and the sensor is only displayed.
+const heaterRegulates = { ...gladysRegulates, THERMOSTAT_TYPE: 'pilot-wire' };
 
 // A manual hold, as setValue arms it: picking a preset by hand holds that
 // preset's setpoint, and a turn of the dial holds any value.
@@ -311,7 +311,7 @@ describe('thermostat pilot wire', () => {
     );
   });
 
-  it('should send eco for eco on a real thermostat, room sensor or not', async () => {
+  it('should send eco for eco on a pilot-wire thermostat, room sensor or not', async () => {
     // The room at 20 °C is above eco's 18 °C: Gladys regulating would send
     // frost protection, but the heater regulates here.
     const mod = load(null);
@@ -321,6 +321,16 @@ describe('thermostat pilot wire', () => {
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
     expect(savedOperatingStates(gladys)).to.deep.equal([]);
+  });
+
+  it('should read a real thermostat given a pilot wire as a heater regulating itself', async () => {
+    // How such a heater was saved before it had a type of its own.
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 20 });
+
+    await regulate(mod, gladys, pilotWireDevice('eco', { ...gladysRegulates, THERMOSTAT_TYPE: 'external' }));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
   });
 
   it('should report idle once stopped', async () => {

@@ -57,14 +57,19 @@ const TRANSITION_PRESETS = [...PRESETS, 'off'];
 
 // How a thermostat device is regulated.
 // - `virtual`: Gladys is the thermostat. It reads a room sensor, applies
-//   hysteresis or TPI, and drives a switch (a relay, a plug, a boiler contact).
+//   hysteresis or TPI, and drives a switch (a relay, a plug, a boiler contact)
+//   or a pilot-wire heater, used as a switch (C.1.1).
 // - `external`: a real thermostat regulates on its own. Gladys only writes the
 //   setpoint its schedule resolves, and reads back whether the device is
 //   currently heating. There is no switch and no heuristic to run: the device
 //   already does that, and a second control loop would fight it.
+// - `pilot-wire`: a pilot-wire heater regulates on its own thermostat. Gladys
+//   only sends it the order each preset is set to (C.1.1). It drives no real
+//   setpoint, and owns its setpoint feature like a virtual thermostat.
 const THERMOSTAT_TYPES = {
   VIRTUAL: 'virtual',
   EXTERNAL: 'external',
+  PILOT_WIRE: 'pilot-wire',
 };
 
 // Devices created before the external type existed carry no THERMOSTAT_TYPE
@@ -73,8 +78,8 @@ const DEFAULT_THERMOSTAT_TYPE = THERMOSTAT_TYPES.VIRTUAL;
 
 // Who regulates a pilot-wire heater (C.1.1). Not a param of its own: the
 // thermostat type already says it.
-// - `heater`, on a real thermostat (`external`): the heater's own thermostat.
-//   Each preset is sent as the order it is set to — eco is eco — and the room
+// - `heater`, on a `pilot-wire` thermostat: the heater's own thermostat. Each
+//   preset is sent as the order it is set to — eco is eco — and the room
 //   sensor, if any, is only displayed.
 // - `gladys`, on a virtual one: Gladys, on the room sensor. The wire is used as
 //   a switch: comfort to heat, frost protection to stop, whatever the preset.

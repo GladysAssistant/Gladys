@@ -47,7 +47,13 @@ function buildParamsConfig(device) {
     const p = device.params.find((x) => x.name === name);
     return p ? p.value : null;
   };
-  const thermostatType = getParam('THERMOSTAT_TYPE') || DEFAULT_THERMOSTAT_TYPE;
+  const storedType = getParam('THERMOSTAT_TYPE') || DEFAULT_THERMOSTAT_TYPE;
+  // A real thermostat given a pilot wire was how a heater regulating itself was
+  // saved before it had a type of its own: it is read as one.
+  const thermostatType =
+    storedType === THERMOSTAT_TYPES.EXTERNAL && getParam('THERMOSTAT_PILOT_WIRE_FEATURE')
+      ? THERMOSTAT_TYPES.PILOT_WIRE
+      : storedType;
   // The order a preset sends a heater that regulates itself: the param when it
   // names one of the six orders, the default otherwise.
   const pilotWireOrder = (preset) => {
@@ -61,9 +67,9 @@ function buildParamsConfig(device) {
     pilot_wire_feature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || null,
     // Who regulates the pilot-wire heater (C.1.1): the thermostat type says it.
     // A virtual one is Gladys, on its room sensor — without one there is nothing
-    // to regulate on, and the heater regulates instead.
+    // to regulate on, and the heater regulates instead, as on a `pilot-wire` one.
     pilot_wire_regulation:
-      thermostatType !== THERMOSTAT_TYPES.EXTERNAL && getParam('THERMOSTAT_TEMPERATURE_FEATURE')
+      thermostatType === THERMOSTAT_TYPES.VIRTUAL && getParam('THERMOSTAT_TEMPERATURE_FEATURE')
         ? PILOT_WIRE_REGULATIONS.GLADYS
         : PILOT_WIRE_REGULATIONS.HEATER,
     pilot_wire_orders: Object.keys(DEFAULT_PILOT_WIRE_ORDERS).reduce(
@@ -120,16 +126,16 @@ function getDeviceConfig(device) {
  * @description Whether a thermostat device is driven by a real external device
  * through its setpoint.
  *
- * A pilot-wire heater is never: it takes an order, not a setpoint, and owns its
- * setpoint feature like a virtual thermostat, whichever type says who
- * regulates it (C.1.1). Every pilot-wire branch hangs off `!isExternal`.
+ * A pilot-wire heater never is, on either of its types (`virtual` or
+ * `pilot-wire`, C.1.1): it takes an order, not a setpoint, and owns its
+ * setpoint feature. Every pilot-wire branch hangs off `!isExternal`.
  * @param {object|null} config - Config built by getDeviceConfig.
  * @returns {boolean} True when the device regulates itself on a setpoint Gladys writes.
  * @example
  * if (isExternal(config)) { ... }
  */
 function isExternal(config) {
-  return Boolean(config) && config.thermostat_type === THERMOSTAT_TYPES.EXTERNAL && !config.pilot_wire_feature;
+  return Boolean(config) && config.thermostat_type === THERMOSTAT_TYPES.EXTERNAL;
 }
 
 /**

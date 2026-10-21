@@ -9,7 +9,8 @@ const {
 const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
 
 // The params that make an external thermostat drive a real device's setpoint.
-// A pilot-wire heater has none: it takes an order (C.1.1).
+// A pilot-wire heater has none: it takes an order (C.1.1). A real thermostat
+// never carries a pilot wire: given one, it is a `pilot-wire` thermostat.
 const EXTERNAL_SETPOINT_PARAMS = ['THERMOSTAT_TARGET_FEATURE', 'THERMOSTAT_STATE_FEATURE', 'THERMOSTAT_MODE_FEATURE'];
 
 // Runtime state kept as params rather than features: a hold, and a stop the
@@ -184,13 +185,23 @@ async function createDevice(device) {
   }
 
   const typeParam = params.find((param) => param.name === 'THERMOSTAT_TYPE');
-  const thermostatType = (typeParam && typeParam.value) || DEFAULT_THERMOSTAT_TYPE;
   const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
   const pilotWire = !!(pilotWireParam && pilotWireParam.value);
-  // A pilot-wire heater is driven by an order whichever type it is (C.1.1): the
-  // type only says who regulates it. It owns its setpoint feature and carries
-  // the state features of a virtual thermostat, and none of a real device's.
-  const external = thermostatType === THERMOSTAT_TYPES.EXTERNAL && !pilotWire;
+  // A real thermostat given a pilot wire was how a heater regulating itself was
+  // saved before it had a type of its own: it is saved as one now.
+  if (typeParam && typeParam.value === THERMOSTAT_TYPES.EXTERNAL && pilotWire) {
+    typeParam.value = THERMOSTAT_TYPES.PILOT_WIRE;
+  }
+  const thermostatType = (typeParam && typeParam.value) || DEFAULT_THERMOSTAT_TYPE;
+  // A pilot-wire heater is driven by an order on either of its types (C.1.1):
+  // the type only says who regulates it. It owns its setpoint feature and
+  // carries the state features of a virtual thermostat, and none of a real
+  // device's.
+  const external = thermostatType === THERMOSTAT_TYPES.EXTERNAL;
+  const heaterRegulates = thermostatType === THERMOSTAT_TYPES.PILOT_WIRE;
+  if (heaterRegulates && !pilotWire) {
+    throw new Error('Thermostat: a pilot-wire thermostat needs a THERMOSTAT_PILOT_WIRE_FEATURE param');
+  }
 
   // A pilot-wire heater only heats, and its orders are never pulsed within a
   // cycle (C.1.1): a cooling mode or TPI saved with one would describe a
@@ -199,7 +210,8 @@ async function createDevice(device) {
   // setpoint left behind would be written to by nothing, and is cleared.
   if (pilotWire) {
     params.forEach((param) => {
-      if (EXTERNAL_SETPOINT_PARAMS.includes(param.name)) {
+      // A switch alongside would be a second actuator for the same heater.
+      if (EXTERNAL_SETPOINT_PARAMS.includes(param.name) || param.name === 'THERMOSTAT_SWITCH_FEATURE') {
         param.value = '';
       }
       if (param.name === 'THERMOSTAT_MODE' && param.value === 'cooling') {
