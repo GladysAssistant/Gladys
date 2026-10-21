@@ -89,16 +89,17 @@ async function create(device) {
 
   const deviceFeaturesIdsToPurge = [];
 
+  // external_id is a required parameter. It is checked before the transaction
+  // so an invalid request never takes the SQLite write lock.
+  if (!device.external_id) {
+    throw new BadParameters('A device must have an external_id.');
+  }
+
   // we execute the whole insert in a transaction to avoid inconsistent state.
   // The transaction is IMMEDIATE so the SQLite write lock is taken at BEGIN (where the
   // SQLITE_BUSY retry can wait for it) instead of failing when a deferred transaction
   // tries to upgrade its lock at the INSERT while another connection is writing.
   await db.sequelize.transaction({ type: Transaction.TYPES.IMMEDIATE }, async (transaction) => {
-    // external_id is a required parameter
-    if (!device.external_id) {
-      throw new BadParameters('A device must have an external_id.');
-    }
-
     // first verify that device doesn't already exist
     let deviceInDb = await getDeviceInDb(device);
 
