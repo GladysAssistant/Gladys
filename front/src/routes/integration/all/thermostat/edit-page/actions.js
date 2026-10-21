@@ -174,7 +174,12 @@ function createActions(store) {
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
           thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
           thermostatEditPilotWireOrders: readPilotWireOrders(getParam),
-          thermostatEditType: getParam('THERMOSTAT_TYPE') || 'virtual',
+          // A real thermostat given a pilot wire was how a heater regulating
+          // itself was saved before it had a type of its own: it is shown as one.
+          thermostatEditType:
+            getParam('THERMOSTAT_TYPE') === 'external' && getParam('THERMOSTAT_PILOT_WIRE_FEATURE')
+              ? 'pilot-wire'
+              : getParam('THERMOSTAT_TYPE') || 'virtual',
           thermostatEditTargetFeature: getParam('THERMOSTAT_TARGET_FEATURE') || '',
           thermostatEditStateFeature: getParam('THERMOSTAT_STATE_FEATURE') || '',
           thermostatEditModeFeature: getParam('THERMOSTAT_MODE_FEATURE') || '',
@@ -284,7 +289,17 @@ function createActions(store) {
         const tempUnit = state.thermostatEditTempUnit || 'C';
         const temperatureFeature = state.thermostatEditTemperatureFeature || '';
         const humidityFeature = state.thermostatEditHumidityFeature || '';
-        const pilotWireFeature = state.thermostatEditPilotWireFeature || '';
+        // Three types (spec A.1, C.1.1): `virtual`, regulated by Gladys through a
+        // switch or a pilot wire; `external`, a real thermostat driven by its
+        // setpoint; `pilot-wire`, a heater regulating itself on the orders sent.
+        const thermostatType = ['external', 'pilot-wire'].includes(state.thermostatEditType)
+          ? state.thermostatEditType
+          : 'virtual';
+        const isExternalThermostat = thermostatType === 'external';
+        const isPilotWireThermostat = thermostatType === 'pilot-wire';
+        // A real thermostat never carries a pilot wire: one left in the form from
+        // another type is dropped rather than saved.
+        const pilotWireFeature = isExternalThermostat ? '' : state.thermostatEditPilotWireFeature || '';
         // A pilot wire is regulated on hysteresis only: a TPI saved before it was
         // picked would be offered nowhere in the form and ignored by the loop.
         const pickedControlType = state.thermostatEditControlType || 'hysteresis';
@@ -292,7 +307,8 @@ function createActions(store) {
         // A heater is driven by one actuator or the other, never both: the form
         // clears one when the other is picked, and the save holds to it for a
         // device that already carried both.
-        const switchFeature = pilotWireFeature ? '' : state.thermostatEditSwitchFeature || '';
+        const switchFeature =
+          thermostatType !== 'virtual' || pilotWireFeature ? '' : state.thermostatEditSwitchFeature || '';
         const pilotWireOrders = state.thermostatEditPilotWireOrders || DEFAULT_PILOT_WIRE_ORDERS;
         const windowFeature = state.thermostatEditWindowFeature || '';
         // `|| default` would discard an explicitly entered 0, which the preset
@@ -313,14 +329,9 @@ function createActions(store) {
         const slugName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
         const newExternalId = `thermostat:${slugName}-${timestamp}`;
 
-        const thermostatType = state.thermostatEditType === 'external' ? 'external' : 'virtual';
-        const isExternalThermostat = thermostatType === 'external';
         // A pilot-wire heater only heats: a cooling mode picked before it would
         // show cooling while the loop heats (spec C.1.1).
-        const savedMode = pilotWireFeature ? 'heating' : mode;
-        // A real thermostat is driven by its setpoint, or — a pilot-wire heater
-        // regulating itself — by its order instead.
-        const drivesRealSetpoint = isExternalThermostat && !pilotWireFeature;
+        const savedMode = pilotWireFeature || isPilotWireThermostat ? 'heating' : mode;
 
         // Saving an empty form used to create a thermostat with no room, no
         // sensor and no actuator: it appeared in the list, regulated nothing, and
@@ -329,14 +340,21 @@ function createActions(store) {
         // thermostat — so that is what is required, named in the error rather
         // than reported as a generic failure. On a virtual thermostat the
         // actuator is a switch or a pilot wire, and either way Gladys regulates on
-        // the sensor; a real one is driven by its setpoint or by a pilot wire.
-        const missingConfig = isExternalThermostat
-          ? !state.thermostatEditTargetFeature && !pilotWireFeature
-          : !temperatureFeature || (!switchFeature && !pilotWireFeature);
+        // the sensor; a real one is driven by its setpoint, and a pilot-wire
+        // heater regulating itself needs only its pilot wire.
+        const missingConfig = {
+          external: !state.thermostatEditTargetFeature,
+          'pilot-wire': !pilotWireFeature,
+          virtual: !temperatureFeature || (!switchFeature && !pilotWireFeature)
+        }[thermostatType];
         if (missingConfig) {
           store.setState({
             thermostatCreateStatus: RequestStatus.Error,
-            thermostatEditError: isExternalThermostat ? 'incompleteExternal' : 'incompleteVirtual'
+            thermostatEditError: {
+              external: 'incompleteExternal',
+              'pilot-wire': 'incompletePilotWire',
+              virtual: 'incompleteVirtual'
+            }[thermostatType]
           });
           return;
         }
@@ -350,7 +368,7 @@ function createActions(store) {
           // setpoint is the real device's, named by THERMOSTAT_TARGET_FEATURE.
           // Creating a second one here would give the house two setpoints that
           // drift apart. A pilot-wire heater has no real setpoint, and owns one.
-          features: drivesRealSetpoint
+          features: isExternalThermostat
             ? []
             : [
                 {
@@ -382,27 +400,27 @@ function createActions(store) {
             { name: 'THERMOSTAT_CONTROL_TYPE', value: controlType },
             { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
-            { name: 'THERMOSTAT_SWITCH_FEATURE', value: isExternalThermostat ? '' : switchFeature },
+            { name: 'THERMOSTAT_SWITCH_FEATURE', value: switchFeature },
             { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: pilotWireFeature },
             ...Object.keys(DEFAULT_PILOT_WIRE_ORDERS).map(preset => ({
               name: PILOT_WIRE_ORDER_PARAM(preset),
               value: String(pilotWireOrders[preset])
             })),
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
-            // Only meaningful on a real thermostat driven by its setpoint, and
-            // cleared otherwise so switching a device back to virtual, or to a
-            // pilot wire, cannot leave it driving a real one through a stale param.
+            // Only meaningful on a real thermostat, and cleared otherwise so
+            // switching a device to another type cannot leave it driving a real
+            // one through a stale param.
             {
               name: 'THERMOSTAT_TARGET_FEATURE',
-              value: drivesRealSetpoint ? state.thermostatEditTargetFeature || '' : ''
+              value: isExternalThermostat ? state.thermostatEditTargetFeature || '' : ''
             },
             {
               name: 'THERMOSTAT_STATE_FEATURE',
-              value: drivesRealSetpoint ? state.thermostatEditStateFeature || '' : ''
+              value: isExternalThermostat ? state.thermostatEditStateFeature || '' : ''
             },
             {
               name: 'THERMOSTAT_MODE_FEATURE',
-              value: drivesRealSetpoint ? state.thermostatEditModeFeature || '' : ''
+              value: isExternalThermostat ? state.thermostatEditModeFeature || '' : ''
             },
             { name: 'THERMOSTAT_WINDOW_FEATURE', value: windowFeature },
             { name: 'THERMOSTAT_PRESET_FROST', value: presetFrost },

@@ -8,6 +8,9 @@ import { DEVICE_FEATURE_UNITS, PILOT_WIRE_MODE } from '../../../../../../../serv
 import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
 
 // The six orders, warmest last, keyed as the device page already names them.
+// The help text of each thermostat type, keyed by its value.
+const TYPE_KEYS = { virtual: 'virtual', external: 'external', 'pilot-wire': 'pilotWire' };
+
 const PILOT_WIRE_ORDER_OPTIONS = [
   [PILOT_WIRE_MODE.OFF, 'off'],
   [PILOT_WIRE_MODE.FROST_PROTECTION, 'frost-protection'],
@@ -37,6 +40,7 @@ const SaveError = ({ status, reason }) =>
     <div class="alert alert-danger">
       {reason === 'incompleteVirtual' && <Text id="integration.thermostat.edit.incompleteVirtualError" />}
       {reason === 'incompleteExternal' && <Text id="integration.thermostat.edit.incompleteExternalError" />}
+      {reason === 'incompletePilotWire' && <Text id="integration.thermostat.edit.incompletePilotWireError" />}
       {!reason && <Text id="integration.thermostat.edit.saveError" />}
     </div>
   );
@@ -44,10 +48,19 @@ const SaveError = ({ status, reason }) =>
 const EditForm = ({ ...props }) => {
   const saving = props.thermostatCreateStatus === RequestStatus.Getting;
   const isEdit = !!(props.thermostatEditDevice && props.thermostatEditDevice.selector);
-  // A pilot-wire heater, on either type: the type says who regulates it (spec
-  // C.1.1) — Gladys on its room sensor for a virtual thermostat, the heater
-  // itself for a real one. It only heats: cooling is neither offered nor shown.
-  const hasPilotWire = !!props.thermostatEditPilotWireFeature;
+  // Three types, each with its own settings (spec A.1, C.1.1): a virtual
+  // thermostat regulated by Gladys (switch or pilot wire), a real one driven by
+  // its setpoint (a connected thermostat, a heat pump…), and a pilot-wire heater
+  // regulating itself, which takes an order per preset.
+  const thermostatType = ['external', 'pilot-wire'].includes(props.thermostatEditType)
+    ? props.thermostatEditType
+    : 'virtual';
+  const isExternalThermostat = thermostatType === 'external';
+  const isPilotWireThermostat = thermostatType === 'pilot-wire';
+  const isVirtualThermostat = thermostatType === 'virtual';
+  // A pilot-wire heater only heats, on either of its types: cooling is neither
+  // offered nor shown.
+  const hasPilotWire = isPilotWireThermostat || (isVirtualThermostat && !!props.thermostatEditPilotWireFeature);
   const pickedMode = props.thermostatEditMode || 'heating';
   const mode = hasPilotWire ? 'heating' : pickedMode;
   // The control rules read the other way round in cooling: the switch turns on
@@ -102,16 +115,13 @@ const EditForm = ({ ...props }) => {
   // only writes the setpoint its schedule resolves. Hysteresis, TPI and the
   // switch are therefore hidden — offering them would suggest Gladys regulates
   // a device that regulates itself.
-  const isExternalThermostat = props.thermostatEditType === 'external';
-  // A real thermostat driven by its setpoint, as opposed to a pilot-wire heater
-  // regulating itself, which takes an order instead.
-  const drivesRealSetpoint = isExternalThermostat && !hasPilotWire;
-  // That heater takes no temperature: each preset sends an order instead.
-  const presetsAreOrders = isExternalThermostat && hasPilotWire;
+  // A pilot-wire heater regulating itself takes no temperature: each preset
+  // sends an order instead.
+  const presetsAreOrders = isPilotWireThermostat;
   const pilotWireOrders = props.thermostatEditPilotWireOrders || DEFAULT_PILOT_WIRE_ORDERS;
 
-  // The pilot-wire picker: in the heating section of a virtual thermostat, in
-  // place of the real setpoint on a real one.
+  // The pilot-wire picker: in the heating section of a virtual thermostat, next
+  // to the switch, and first thing on a pilot-wire one.
   const pilotWirePicker = (
     <div class="form-group">
       <label class="form-label">
@@ -128,13 +138,13 @@ const EditForm = ({ ...props }) => {
       <small class="form-text text-muted">
         <Text id="integration.thermostat.edit.pilotWireFeatureHelp" />{' '}
         <Text
-          id={`integration.thermostat.edit.pilotWireRegulationHelp.${isExternalThermostat ? 'heater' : 'gladys'}`}
+          id={`integration.thermostat.edit.pilotWireRegulationHelp.${isPilotWireThermostat ? 'heater' : 'gladys'}`}
         />
       </small>
       {/* Promised by the spec (G): a module that keeps its own programme
           writes orders that are taken as presses of its button, and Gladys
           and the programme take turns. */}
-      {hasPilotWire && (
+      {props.thermostatEditPilotWireFeature && (
         <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
           <Text id="integration.thermostat.edit.pilotWireProgrammeWarning" />
         </div>
@@ -277,7 +287,7 @@ const EditForm = ({ ...props }) => {
               </label>
               <select
                 class="form-control"
-                value={props.thermostatEditType || 'virtual'}
+                value={thermostatType}
                 onChange={e => props.updateThermostatField('thermostatEditType', e.target.value)}
               >
                 <option value="virtual">
@@ -286,9 +296,12 @@ const EditForm = ({ ...props }) => {
                 <option value="external">
                   <Text id="integration.thermostat.edit.typeExternal" />
                 </option>
+                <option value="pilot-wire">
+                  <Text id="integration.thermostat.edit.typePilotWire" />
+                </option>
               </select>
               <small class="form-text text-muted">
-                <Text id={`integration.thermostat.edit.typeHelp.${isExternalThermostat ? 'external' : 'virtual'}`} />
+                <Text id={`integration.thermostat.edit.typeHelp.${TYPE_KEYS[thermostatType]}`} />
               </small>
             </div>
 
@@ -325,12 +338,11 @@ const EditForm = ({ ...props }) => {
               </small>
             </div>
 
-            {/* Un thermostat réel est piloté soit par sa consigne, soit — radiateur
-                à fil pilote qui régule seul — par un ordre. */}
-            {isExternalThermostat && pilotWirePicker}
+            {/* Radiateur à fil pilote qui régule seul : piloté par un ordre. */}
+            {isPilotWireThermostat && pilotWirePicker}
 
-            {/* Thermostat réel piloté */}
-            {drivesRealSetpoint && (
+            {/* Thermostat réel piloté par sa consigne */}
+            {isExternalThermostat && (
               <div>
                 {/* Promised by the spec (G) and owed to the user: while the
                     appliance keeps its own programme, that programme and Gladys
@@ -435,7 +447,7 @@ const EditForm = ({ ...props }) => {
             </div>
 
             {/* Commutateur : seul un thermostat virtuel pilote un interrupteur. */}
-            {!isExternalThermostat && (
+            {isVirtualThermostat && (
               <div class="form-group">
                 <label class="form-label">
                   <Text id="integration.thermostat.edit.switchFeatureLabel" />
@@ -457,7 +469,7 @@ const EditForm = ({ ...props }) => {
             {/* Fil pilote : l'autre façon de piloter un radiateur, par un ordre
                 sur son fil de commande plutôt que par une coupure. Gladys le
                 régule alors sur le capteur d'ambiance. */}
-            {!isExternalThermostat && pilotWirePicker}
+            {isVirtualThermostat && pilotWirePicker}
 
             {/* Capteur d'ouverture de fenêtre */}
             <div class="form-group">
@@ -486,7 +498,7 @@ const EditForm = ({ ...props }) => {
 
                 The unit and the bounds stay out of the fold below: they are the
                 thermostat's own, external ones included. */}
-            {!isExternalThermostat && (
+            {isVirtualThermostat && (
               <details class={cx('mb-3', style.tuningDetails)}>
                 {/* With a chevron: styled as a form-label alone, the summary
                     looked like a plain heading and nothing said it opened. */}

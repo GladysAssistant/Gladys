@@ -117,9 +117,10 @@ class ThermostatBox extends Component {
 
   getConfig = () => ({ ...this.props.box, ...(this.state.remoteConfig || {}) });
 
-  // A real thermostat driven by its setpoint. A pilot-wire heater never is,
-  // whichever type it carries (spec C.1.1): it owns its setpoint feature like a
-  // virtual thermostat, and the type only says who regulates it.
+  // A real thermostat driven by its setpoint. A pilot-wire heater never is (spec
+  // C.1.1): it owns its setpoint feature like a virtual thermostat. `external`
+  // with a pilot wire is how one regulating itself was saved before the
+  // `pilot-wire` type existed.
   isExternal = () => {
     const cfg = this.getConfig();
     return cfg.thermostat_type === 'external' && !cfg.pilot_wire_feature;
@@ -143,13 +144,13 @@ class ThermostatBox extends Component {
     return cfg.switch_feature || null;
   };
 
-  // A pilot-wire heater left to its own thermostat (spec C.1.1): a real
+  // A pilot-wire heater left to its own thermostat (spec C.1.1): a `pilot-wire`
   // thermostat, or a virtual one with no room sensor to regulate on. Gladys only
   // hands it the order of the preset: there is no setpoint to turn.
   isHeaterRegulated = () => {
     const cfg = this.state.remoteConfig;
     if (!cfg || !cfg.pilot_wire_feature) return false;
-    return cfg.thermostat_type === 'external' || !cfg.temperature_feature;
+    return cfg.thermostat_type === 'pilot-wire' || cfg.thermostat_type === 'external' || !cfg.temperature_feature;
   };
 
   // A pilot-wire heater Gladys regulates on the room sensor.

@@ -361,7 +361,7 @@ describe('thermostat.createDevice', () => {
       name: 'Bureau',
       features: [setpointFeature],
       params: [
-        { name: 'THERMOSTAT_TYPE', value: 'external' },
+        { name: 'THERMOSTAT_TYPE', value: 'pilot-wire' },
         { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
         { name: 'THERMOSTAT_PILOT_WIRE_ORDER_NIGHT', value: '2' },
       ],
@@ -431,9 +431,9 @@ describe('thermostat.createDevice - external', () => {
     expect(featureTypes(created)).to.deep.equal(['preset', 'mode']);
   });
 
-  // A real thermostat with a pilot wire is a heater regulating itself (C.1.1):
-  // driven by its order, it owns its setpoint feature and drives no real one.
-  const pilotWireHeater = (extra = []) => ({
+  // A pilot-wire thermostat is a heater regulating itself (C.1.1): driven by
+  // its order, it owns its setpoint feature and drives no real one.
+  const pilotWireHeater = (extra = [], type = 'pilot-wire') => ({
     name: 'Bureau',
     features: [
       {
@@ -443,7 +443,7 @@ describe('thermostat.createDevice - external', () => {
       },
     ],
     params: [
-      { name: 'THERMOSTAT_TYPE', value: 'external' },
+      { name: 'THERMOSTAT_TYPE', value: type },
       { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
       ...extra,
     ],
@@ -456,16 +456,44 @@ describe('thermostat.createDevice - external', () => {
     expect(featureTypes(created)).to.include('operating-state');
   });
 
-  it('should drop the real-thermostat params of a heater regulating itself', async () => {
+  it('should drop the real-thermostat params and the switch of a heater regulating itself', async () => {
     const created = await buildHandler().createDevice(
       pilotWireHeater([
         { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+        { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'heater-switch' },
         { name: 'THERMOSTAT_MODE', value: 'cooling' },
       ]),
     );
 
     expect(created.params.find((param) => param.name === 'THERMOSTAT_TARGET_FEATURE').value).to.equal('');
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_SWITCH_FEATURE').value).to.equal('');
     expect(created.params.find((param) => param.name === 'THERMOSTAT_MODE').value).to.equal('heating');
+  });
+
+  it('should save a real thermostat given a pilot wire as a pilot-wire thermostat', async () => {
+    // How such a heater was saved before it had a type of its own.
+    const created = await buildHandler().createDevice(pilotWireHeater([], 'external'));
+
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_TYPE').value).to.equal('pilot-wire');
+    expect(featureTypes(created)).to.include('target-temperature');
+  });
+
+  it('should refuse a pilot-wire thermostat with no pilot wire', async () => {
+    const handler = buildHandler();
+
+    let error = null;
+    try {
+      await handler.createDevice({
+        name: 'Bureau',
+        features: [setpointFeature],
+        params: [{ name: 'THERMOSTAT_TYPE', value: 'pilot-wire' }],
+      });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.an('error');
+    assert.notCalled(handler.gladys.device.create);
   });
 
   it('should keep the external params', async () => {

@@ -284,9 +284,9 @@ describe('thermostat pilot wire: an order changed on the module', () => {
   });
 
   it('should take an order changed on a heater that regulates itself', async () => {
-    // A real thermostat with a pilot wire is still driven by its order (C.1.1).
+    // A heater regulating itself is still driven by its order (C.1.1).
     const mod = loadListener();
-    const handler = buildHandler(thermostat({ params: { THERMOSTAT_TYPE: 'external' } }));
+    const handler = buildHandler(thermostat({ params: { THERMOSTAT_TYPE: 'pilot-wire' } }));
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 

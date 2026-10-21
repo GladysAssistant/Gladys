@@ -3636,10 +3636,12 @@
         "tuningSection": "Fine tuning",
         "typeVirtual": "Virtual thermostat (Gladys regulates)",
         "typeExternal": "Real thermostat (the appliance regulates itself)",
+        "typePilotWire": "Pilot-wire heater (the heater regulates itself)",
         "vendorProgrammeWarning": "Turn the vendor programme off on this device (the Netatmo or Tado app…) before driving it from Gladys. Otherwise the device’s programme and Gladys’s take turns writing the setpoint, and the thermostat follows whichever wrote last.",
         "typeHelp": {
           "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) or a pilot-wire heater to reach the setpoint.",
-          "external": "The thermostat runs its own regulation and heating. Gladys only sends it the schedule’s setpoint — or, for a pilot-wire heater, the preset’s order — and displays its state."
+          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state.",
+          "pilotWire": "The heater regulates on its own thermostat. Gladys only sends it the order of each preset (eco, comfort, frost protection…) over the pilot wire."
         },
         "targetFeatureLabel": "Setpoint of the real thermostat",
         "targetFeatureHelp": "The feature Gladys writes the target temperature on. Some devices expose several (heating/cooling, occupied/unoccupied): pick the one that actually drives your heating.",
@@ -3681,8 +3683,8 @@
         "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off…) instead of cutting its supply. Turn the module’s own programme off first.",
         "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
         "pilotWireRegulationHelp": {
-          "heater": "Real thermostat: the heater regulates on its own thermostat, and each preset sends it the order picked in the presets table (eco → eco, night → comfort -2…). The room sensor, if any, is only displayed.",
-          "gladys": "Virtual thermostat: Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick “Real thermostat”."
+          "heater": "Each preset sends the order picked in the presets table (eco → eco, night → comfort -2…). The room sensor, if any, is only displayed.",
+          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
         },
         "windowFeatureLabel": "Window opening sensor",
         "windowFeatureHelp": {
@@ -3719,7 +3721,8 @@
         "cancelButton": "Cancel",
         "saveError": "Error while saving.",
         "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
-        "incompleteExternalError": "A real thermostat needs the setpoint of the thermostat to drive, or a pilot wire.",
+        "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
+        "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",

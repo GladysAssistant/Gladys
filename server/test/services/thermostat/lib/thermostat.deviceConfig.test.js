@@ -78,11 +78,21 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
     expect(config.pilot_wire_regulation).to.equal('gladys');
   });
 
-  it('should let the heater regulate a pilot wire on a real thermostat, sensor or not', () => {
+  it('should let the heater regulate a pilot wire on a pilot-wire thermostat, sensor or not', () => {
     const config = buildParamsConfig(
-      deviceWithParams({ THERMOSTAT_TYPE: 'external', THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }),
+      deviceWithParams({ THERMOSTAT_TYPE: 'pilot-wire', THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }),
     );
 
+    expect(config.pilot_wire_regulation).to.equal('heater');
+  });
+
+  it('should read a real thermostat given a pilot wire as a pilot-wire thermostat', () => {
+    // How such a heater was saved before it had a type of its own.
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TYPE: 'external', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }),
+    );
+
+    expect(config.thermostat_type).to.equal('pilot-wire');
     expect(config.pilot_wire_regulation).to.equal('heater');
   });
 
@@ -107,12 +117,20 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
 });
 
 describe('thermostat.deviceConfig - isExternal', () => {
-  it('should never take a pilot-wire heater for a real thermostat driven by its setpoint', () => {
-    const config = buildParamsConfig(
-      deviceWithParams({ THERMOSTAT_TYPE: 'external', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }),
-    );
+  it('should take a real thermostat for one', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_TYPE: 'external' }));
 
-    expect(isExternal(config)).to.equal(false);
+    expect(isExternal(config)).to.equal(true);
+  });
+
+  it('should never take a pilot-wire heater for a real thermostat driven by its setpoint', () => {
+    const cases = [
+      { THERMOSTAT_TYPE: 'pilot-wire', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' },
+      { THERMOSTAT_TYPE: 'external', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' },
+    ];
+    cases.forEach((params) => {
+      expect(isExternal(buildParamsConfig(deviceWithParams(params))), params.THERMOSTAT_TYPE).to.equal(false);
+    });
   });
 });
 
