@@ -1218,6 +1218,7 @@ describe('Device', () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
     const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const transactionSpy = sinon.spy(db.sequelize, 'transaction');
 
     try {
       await device.create({
@@ -1229,6 +1230,10 @@ describe('Device', () => {
     } catch (error) {
       expect(error).to.be.instanceOf(BadParameters);
       expect(error.message).to.equal('A device must have an external_id.');
+      // an invalid request never opens the transaction, so it never takes the write lock
+      assert.notCalled(transactionSpy);
+    } finally {
+      transactionSpy.restore();
     }
   });
   it('should preserve supported_options when feature payload omits them', async () => {
