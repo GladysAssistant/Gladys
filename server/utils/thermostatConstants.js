@@ -69,6 +69,20 @@ const THERMOSTAT_TYPES = {
 // param, and they are all virtual ones.
 const DEFAULT_THERMOSTAT_TYPE = THERMOSTAT_TYPES.VIRTUAL;
 
+// Who regulates a pilot-wire heater (C.1.1).
+// - `heater`: the heater's own thermostat. Each preset is sent as its order —
+//   eco is eco — and the room sensor, if any, is only displayed.
+// - `gladys`: Gladys, on the room sensor. The wire is used as a switch: comfort
+//   to heat, frost protection to stop, whatever the preset. The heater's own
+//   comfort setpoint is set high, so its thermometer never has the last word.
+const PILOT_WIRE_REGULATIONS = {
+  HEATER: 'heater',
+  GLADYS: 'gladys',
+};
+
+// The choice nobody is surprised by: the order picked is the order sent.
+const DEFAULT_PILOT_WIRE_REGULATION = PILOT_WIRE_REGULATIONS.HEATER;
+
 module.exports = {
   DEFAULT_PRESET_TEMPS,
   FALLBACK_SETPOINT,
@@ -91,4 +105,6 @@ module.exports = {
   TRANSITION_PRESETS,
   THERMOSTAT_TYPES,
   DEFAULT_THERMOSTAT_TYPE,
+  PILOT_WIRE_REGULATIONS,
+  DEFAULT_PILOT_WIRE_REGULATION,
 };

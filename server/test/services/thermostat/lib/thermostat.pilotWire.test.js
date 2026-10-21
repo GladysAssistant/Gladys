@@ -101,8 +101,10 @@ const pilotWireDevice = (preset, extra = {}) => ({
   }),
 });
 
-// A room sensor: Gladys then regulates the heater itself (C.1.1).
+// A room sensor alone: displayed, but the heater still regulates (C.1.1).
 const sensor = { THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor' };
+// Gladys asked to regulate, on that sensor.
+const gladysRegulates = { ...sensor, THERMOSTAT_PILOT_WIRE_REGULATION: 'gladys' };
 
 // A manual hold, as setValue arms it: picking a preset by hand holds that
 // preset's setpoint, and a turn of the dial holds any value.
@@ -235,7 +237,7 @@ describe('thermostat pilot wire', () => {
     assert.notCalled(gladys.device.setValue);
   });
 
-  it('should survive a write that fails, and report the heater idle', async () => {
+  it('should survive a write that fails', async () => {
     const mod = load(null);
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.OFF });
     gladys.device.setValue = fake.rejects(new Error('offline'));
@@ -244,8 +246,7 @@ describe('thermostat pilot wire', () => {
     await regulate(mod, gladys, pilotWireDevice('comfort'));
 
     assert.calledOnce(gladys.device.setValue);
-    // Comfort never reached it, and nothing says the heater heats.
-    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
   });
 
   it('should leave the operating state alone when the order cannot be read', async () => {
@@ -280,7 +281,7 @@ describe('thermostat pilot wire', () => {
     expect(savedOperatingStates(gladys)).to.deep.equal([]);
   });
 
-  it('should report idle without a room sensor, whatever the order', async () => {
+  it('should leave the operating state alone while the heater regulates', async () => {
     // The wire gives no feedback, and the heater regulates on a setpoint of its
     // own: whether it draws current is unknown, and the state does not guess.
     await Promise.all(
@@ -290,9 +291,39 @@ describe('thermostat pilot wire', () => {
 
         await regulate(mod, gladys, pilotWireDevice(preset));
 
-        expect(savedOperatingStates(gladys), preset).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+        expect(savedOperatingStates(gladys), preset).to.deep.equal([]);
       }),
     );
+  });
+
+  it('should send eco for eco with a room sensor, as long as the heater regulates', async () => {
+    // The room at 20 °C is above eco's 18 °C: Gladys regulating would send
+    // frost protection, but nobody asked it to.
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 20 });
+
+    await regulate(mod, gladys, pilotWireDevice('eco', { ...sensor, ...held(18) }));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
+  });
+
+  it('should let the heater regulate when Gladys is asked to without a sensor', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+
+    await regulate(mod, gladys, pilotWireDevice('eco', { THERMOSTAT_PILOT_WIRE_REGULATION: 'gladys' }));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
+  });
+
+  it('should report idle once stopped', async () => {
+    const mod = load(fullDaySchedule('off'));
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+
+    await regulate(mod, gladys, pilotWireDevice('schedule'));
+
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
 
   it('should send the order of a preset picked by hand', async () => {
@@ -334,7 +365,6 @@ describe('thermostat pilot wire', () => {
     await regulate(mod, gladys, pilotWireDevice('schedule', held(8)));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
-    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
 
   it('should keep the order it carries when the programme has no point in force', async () => {
@@ -352,36 +382,33 @@ describe('thermostat pilot wire', () => {
   });
 });
 
-describe('thermostat pilot wire: regulated on a room sensor', () => {
+describe('thermostat pilot wire: regulated by Gladys on a room sensor', () => {
   afterEach(() => {
     sinon.restore();
   });
 
   it('should hold frost protection while the room is above the setpoint', async () => {
-    // Away at 16 °C in a room at 19.4 °C: eco would let the heater warm up to
-    // its own setpoint, set on its body, whatever Gladys shows.
+    // Eco at 18 °C in a room at 19.4 °C: the heater has nothing to do.
     const mod = load(null);
-    const gladys = buildGladys({ order: PILOT_WIRE_MODE.ECO, temp: 19.4 });
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 19.4 });
 
-    await regulate(mod, gladys, pilotWireDevice('away', sensor));
+    await regulate(mod, gladys, pilotWireDevice('eco', gladysRegulates));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
 
-  it("should send the preset's order while the room is below the setpoint", async () => {
-    const cases = [
-      ['comfort', PILOT_WIRE_MODE.COMFORT],
-      ['away', PILOT_WIRE_MODE.ECO],
-    ];
+  it('should send comfort while the room is below the setpoint, whatever the preset', async () => {
+    // The wire is a switch here: eco would hand the decision back to the
+    // heater's own thermometer, three and a half degrees below its comfort.
     await Promise.all(
-      cases.map(async ([preset, order]) => {
+      ['comfort', 'eco', 'away'].map(async (preset) => {
         const mod = load(null);
         const gladys = buildGladys({ order: PILOT_WIRE_MODE.FROST_PROTECTION, temp: 15 });
 
-        await regulate(mod, gladys, pilotWireDevice(preset, sensor));
+        await regulate(mod, gladys, pilotWireDevice(preset, gladysRegulates));
 
-        expect(gladys.device.setValue.firstCall.args[2], preset).to.equal(order);
+        expect(gladys.device.setValue.firstCall.args[2], preset).to.equal(PILOT_WIRE_MODE.COMFORT);
         expect(savedOperatingStates(gladys), preset).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
       }),
     );
@@ -398,7 +425,7 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
         const mod = load(null);
         const gladys = buildGladys({ order, temp: 21.2 });
 
-        await regulate(mod, gladys, pilotWireDevice('comfort', sensor));
+        await regulate(mod, gladys, pilotWireDevice('comfort', gladysRegulates));
 
         assert.notCalled(gladys.device.setValue);
         expect(savedOperatingStates(gladys), String(order)).to.deep.equal([state]);
@@ -412,29 +439,41 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
     const mod = load(null);
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 20.2 });
 
-    await regulate(mod, gladys, pilotWireDevice('schedule', { ...sensor, ...held(19.5) }));
+    await regulate(mod, gladys, pilotWireDevice('schedule', { ...gladysRegulates, ...held(19.5) }));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
   });
 
-  it('should keep a derived comfort while the room needs heating', async () => {
+  it('should write comfort over a derived comfort: the temperature is Gladys’s to decide', async () => {
     const mod = load(null);
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT_1, temp: 18 });
 
-    await regulate(mod, gladys, pilotWireDevice('comfort', { ...sensor, ...held(21) }));
+    await regulate(mod, gladys, pilotWireDevice('comfort', { ...gladysRegulates, ...held(21) }));
 
-    assert.notCalled(gladys.device.setValue);
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.COMFORT);
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
+  });
+
+  it('should regulate on the setpoint it kept when the programme has no point in force', async () => {
+    const mod = load({ selector: 'my-schedule', transitions: [] });
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.FROST_PROTECTION, temp: 18 });
+    const device = pilotWireDevice('schedule', gladysRegulates);
+    device.features[0].last_value = 20;
+
+    await regulate(mod, gladys, device);
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.COMFORT);
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
   });
 
   it('should not report heating when frost protection cannot be written', async () => {
-    // The broker is down: the heater keeps eco, but the room is above the
+    // The broker is down: the heater keeps comfort, but the room is above the
     // setpoint, so nothing says it heats — a stale flame would stay lit.
     const mod = load(null);
-    const gladys = buildGladys({ order: PILOT_WIRE_MODE.ECO, temp: 19.4 });
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 19.4 });
     gladys.device.setValue = fake.rejects(new Error('MQTT not configured'));
 
-    await regulate(mod, gladys, pilotWireDevice('away', sensor));
+    await regulate(mod, gladys, pilotWireDevice('eco', gladysRegulates));
 
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
@@ -444,7 +483,7 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.ECO, temp: 15 });
     gladys.device.setValue = fake.rejects(new Error('offline'));
 
-    await regulate(mod, gladys, pilotWireDevice('comfort', sensor));
+    await regulate(mod, gladys, pilotWireDevice('comfort', gladysRegulates));
 
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
   });
@@ -454,7 +493,7 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.FROST_PROTECTION, temp: 15 });
     gladys.device.setValue = fake.rejects(new Error('offline'));
 
-    await regulate(mod, gladys, pilotWireDevice('comfort', sensor));
+    await regulate(mod, gladys, pilotWireDevice('comfort', gladysRegulates));
 
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
@@ -463,7 +502,7 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
     const mod = load(null);
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.FROST_PROTECTION, temp: null });
 
-    await regulate(mod, gladys, pilotWireDevice('away', sensor));
+    await regulate(mod, gladys, pilotWireDevice('away', gladysRegulates));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
@@ -477,7 +516,7 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
       query && query.device_feature_selectors === 'temp-sensor' ? Promise.reject(new Error('locked')) : get(query),
     );
 
-    await regulate(mod, gladys, pilotWireDevice('away', sensor));
+    await regulate(mod, gladys, pilotWireDevice('away', gladysRegulates));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
   });
@@ -486,7 +525,11 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
     const mod = load(null);
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.FROST_PROTECTION });
 
-    await regulate(mod, gladys, pilotWireDevice('away', { THERMOSTAT_TEMPERATURE_FEATURE: 'removed-sensor' }));
+    await regulate(
+      mod,
+      gladys,
+      pilotWireDevice('away', { ...gladysRegulates, THERMOSTAT_TEMPERATURE_FEATURE: 'removed-sensor' }),
+    );
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
   });
@@ -495,7 +538,7 @@ describe('thermostat pilot wire: regulated on a room sensor', () => {
     const mod = load(fullDaySchedule('off'));
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 15 });
 
-    await regulate(mod, gladys, pilotWireDevice('schedule', sensor));
+    await regulate(mod, gladys, pilotWireDevice('schedule', gladysRegulates));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.OFF);
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);

@@ -9,7 +9,6 @@ const {
   DEVICE_FEATURE_TYPES,
   PILOT_WIRE_MODE,
   THERMOSTAT_MODE,
-  THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
@@ -390,8 +389,9 @@ describe('thermostat pilot wire: holds and marks in the regulation loop', () => 
         await regulate(mod, gladys, device('comfort', 21), new Map());
 
         assert.notCalled(gladys.device.setValue);
-        // No room sensor here: the heater decides alone, and the state does not guess.
-        expect(savedOperatingStates(gladys), String(order)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+        // The heater regulates here: whether it draws current is unknown, and the
+        // state is left alone rather than guessed.
+        expect(savedOperatingStates(gladys), String(order)).to.deep.equal([]);
       }),
     );
   });

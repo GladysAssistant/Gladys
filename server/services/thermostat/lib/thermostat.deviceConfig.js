@@ -11,6 +11,8 @@ const {
   DEFAULT_TEMP_UNIT,
   DEFAULT_THERMOSTAT_TYPE,
   THERMOSTAT_TYPES,
+  PILOT_WIRE_REGULATIONS,
+  DEFAULT_PILOT_WIRE_REGULATION,
 } = require('../../../utils/thermostatConstants');
 const { THERMOSTAT_MODE } = require('../../../utils/constants');
 
@@ -48,6 +50,13 @@ function buildParamsConfig(device) {
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
     switch_feature: getParam('THERMOSTAT_SWITCH_FEATURE') || null,
     pilot_wire_feature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || null,
+    // Who regulates the pilot-wire heater (C.1.1). Gladys only does it on a
+    // room sensor: without one, the heater regulates whatever the param says.
+    pilot_wire_regulation:
+      getParam('THERMOSTAT_PILOT_WIRE_REGULATION') === PILOT_WIRE_REGULATIONS.GLADYS &&
+      getParam('THERMOSTAT_TEMPERATURE_FEATURE')
+        ? PILOT_WIRE_REGULATIONS.GLADYS
+        : DEFAULT_PILOT_WIRE_REGULATION,
     // External thermostats: the real device regulates itself. `target_feature`
     // is the setpoint Gladys writes, `state_feature` the heating state it reads
     // back, `mode_feature` the optional operating mode. All three point at

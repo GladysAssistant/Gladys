@@ -69,6 +69,22 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
 
     expect(config.preset_frost).to.equal(0);
   });
+
+  it('should let the heater regulate a pilot wire by default', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }));
+
+    expect(config.pilot_wire_regulation).to.equal('heater');
+  });
+
+  it('should let Gladys regulate a pilot wire on a room sensor only', () => {
+    const withSensor = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp', THERMOSTAT_PILOT_WIRE_REGULATION: 'gladys' }),
+    );
+    const withoutSensor = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_REGULATION: 'gladys' }));
+
+    expect(withSensor.pilot_wire_regulation).to.equal('gladys');
+    expect(withoutSensor.pilot_wire_regulation).to.equal('heater');
+  });
 });
 
 describe('thermostat.deviceConfig - getDeviceConfig', () => {

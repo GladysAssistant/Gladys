@@ -6,7 +6,12 @@ const {
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
 } = require('../../../utils/constants');
-const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
+const {
+  THERMOSTAT_TYPES,
+  DEFAULT_THERMOSTAT_TYPE,
+  PILOT_WIRE_REGULATIONS,
+  DEFAULT_PILOT_WIRE_REGULATION,
+} = require('../../../utils/thermostatConstants');
 
 // Runtime state kept as params rather than features: a hold, and a stop the
 // programme made, are bookkeeping of the regulation loop, not properties of the
@@ -23,6 +28,8 @@ const ALLOWED_PARAMS = [
   // A pilot-wire heater takes an order rather than a contact: the same actuator
   // slot, driven with six orders instead of on/off.
   'THERMOSTAT_PILOT_WIRE_FEATURE',
+  // Who regulates that heater: its own thermostat, or Gladys on the room sensor.
+  'THERMOSTAT_PILOT_WIRE_REGULATION',
   'THERMOSTAT_TYPE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
@@ -179,7 +186,17 @@ async function createDevice(device) {
   // client writing the params directly cannot save one either.
   const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
   if (!external && pilotWireParam && pilotWireParam.value) {
+    // Gladys regulates on a room sensor, so asking it to without one saves the
+    // heater's own regulation — what the loop would run anyway.
+    const temperatureParam = params.find((param) => param.name === 'THERMOSTAT_TEMPERATURE_FEATURE');
+    const hasSensor = !!(temperatureParam && temperatureParam.value);
     params.forEach((param) => {
+      if (
+        param.name === 'THERMOSTAT_PILOT_WIRE_REGULATION' &&
+        (param.value !== PILOT_WIRE_REGULATIONS.GLADYS || !hasSensor)
+      ) {
+        param.value = DEFAULT_PILOT_WIRE_REGULATION;
+      }
       if (param.name === 'THERMOSTAT_MODE' && param.value === 'cooling') {
         param.value = 'heating';
       }

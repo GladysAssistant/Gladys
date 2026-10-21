@@ -354,6 +354,36 @@ describe('thermostat.createDevice', () => {
     expect(paramValue(created, 'THERMOSTAT_CONTROL_TYPE')).to.equal('hysteresis');
   });
 
+  // Gladys regulates a pilot-wire heater on a room sensor only (C.1.1).
+  const savePilotWire = (regulation, temperatureFeature) =>
+    buildHandler().createDevice({
+      name: 'Bureau',
+      features: [setpointFeature],
+      params: [
+        { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+        { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
+        { name: 'THERMOSTAT_PILOT_WIRE_REGULATION', value: regulation },
+      ],
+    });
+
+  it('should keep Gladys regulating a pilot-wire heater with a room sensor', async () => {
+    const created = await savePilotWire('gladys', 'temp-sensor');
+
+    expect(paramValue(created, 'THERMOSTAT_PILOT_WIRE_REGULATION')).to.equal('gladys');
+  });
+
+  it('should hand the regulation back to the heater without a room sensor', async () => {
+    const created = await savePilotWire('gladys', '');
+
+    expect(paramValue(created, 'THERMOSTAT_PILOT_WIRE_REGULATION')).to.equal('heater');
+  });
+
+  it('should save an unknown regulation as the heater regulating', async () => {
+    const created = await savePilotWire('boiler', 'temp-sensor');
+
+    expect(paramValue(created, 'THERMOSTAT_PILOT_WIRE_REGULATION')).to.equal('heater');
+  });
+
   it('should drop the cached window selectors', async () => {
     const handler = buildHandler();
 
