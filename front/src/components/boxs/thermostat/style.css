@@ -228,20 +228,6 @@
    number it replaces: a word set at 50px overflows the gauge in the languages
    that spell it out ("Arrêt", "Ausgeschaltet"), and the muted grey matches the
    arc, which goes grey in that mode too. */
-/* The order a pilot-wire heater carries, in place of a setpoint it does not
-   have: smaller than "Off" so that "Confort -2°C" fits inside the ring, its
-   second line smaller still. The fill is the lit preset's, set inline. */
-.orderText {
-  font-size: 26px;
-  font-weight: 600;
-  fill: #868e96;
-}
-
-.orderTextSecond {
-  font-size: 20px;
-  font-weight: 500;
-}
-
 .offText {
   font-size: 32px;
   fill: #868e96;

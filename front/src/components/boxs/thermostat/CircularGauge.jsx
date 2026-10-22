@@ -44,13 +44,13 @@ const CircularGauge = ({
   isActive,
   isWindowOpen,
   tempUnit,
-  // A word shown in place of the setpoint, on a thermostat that has none to
-  // offer — a pilot-wire heater regulating itself shows the order it carries.
-  // The gauge then draws no setpoint arc, no knob, and takes no input.
-  centerLabel = null,
-  // The colour that word and the whole ring take: the lit preset's, so the
-  // gauge reads as that preset rather than as an empty dial.
-  centerColor = null,
+  // A thermostat with no setpoint to offer — a pilot-wire heater regulating
+  // itself. The gauge then draws no setpoint arc, no knob, takes no input, and
+  // shows the room temperature in the middle, where the setpoint would be.
+  readOnly = false,
+  // The colour the whole ring takes when read-only: the order the heater
+  // carries, so the dial says what it is doing rather than staying empty.
+  ringColor = null,
   a11yLabels = {}
 }) => {
   const cx = 110;
@@ -68,10 +68,14 @@ const CircularGauge = ({
   // being held off, which is the one thing the gauge must not misreport.
   const baseArcColor = mode === 'cooling' ? '#3b82f6' : mode === 'off' ? '#adb5bd' : '#f97316';
   const arcColor = isWindowOpen ? '#adb5bd' : baseArcColor;
+  const hasCurrentTemp = currentTemp !== null && currentTemp !== undefined;
+  const hasHumidity = humidity !== null && humidity !== undefined;
+  // The big number: the setpoint, or the room temperature on a read-only gauge.
+  const shownValue = readOnly ? Number(currentTemp) : setpoint;
   // Derive both halves from one rounded value: splitting the raw setpoint made
   // 20.96 render as "20.10" (the decimal carried to 10) and -3.5 as "-4.5"
   // (floor rounds away from zero for negatives).
-  const roundedSetpoint = Math.round(setpoint * 10) / 10;
+  const roundedSetpoint = Math.round(shownValue * 10) / 10;
   const truncated = Math.trunc(roundedSetpoint);
   const decPart = Math.round(Math.abs(roundedSetpoint - truncated) * 10);
   // Math.trunc(-0.5) is -0, which renders as "0": a setpoint between -1 and 0
@@ -81,9 +85,6 @@ const CircularGauge = ({
   const intX = cx - intW / 2 - 18;
   const suffixX = intX + intW;
 
-  const hasCurrentTemp = currentTemp !== null && currentTemp !== undefined;
-  const hasHumidity = humidity !== null && humidity !== undefined;
-
   // A stopped thermostat has no setpoint to show. The number the gauge would
   // otherwise draw is the frost-protection fallback the server writes to stop a
   // real device — 7 °C under a lit Off button reads as "it is aiming at 7 °C",
@@ -91,28 +92,21 @@ const CircularGauge = ({
   // and the arc keeps showing where that fallback sits.
   const isOff = mode === 'off';
   const offLabel = a11yLabels.off || 'Off';
-  const hasSetpoint = centerLabel === null || centerLabel === undefined;
-  // The word in the middle, when there is no setpoint to draw there.
+  const hasSetpoint = !readOnly;
+  // The word in the middle, when there is no number to draw there.
   let centerWord = null;
   if (isOff) {
     centerWord = offLabel;
-  } else if (!hasSetpoint) {
-    centerWord = centerLabel;
+  } else if (readOnly && !hasCurrentTemp) {
+    centerWord = '—';
   }
-  // An order is drawn smaller than "Off", in the preset's colour, and a long
-  // one ("Confort -2°C") on two lines: on one, at the size of "Off", it ran
-  // past the ring on both sides.
-  const showsOrder = !hasSetpoint && !isOff;
-  const orderSplit = showsOrder && centerWord.length > 8 ? centerWord.lastIndexOf(' ') : -1;
-  const orderLines =
-    orderSplit > 0 ? [centerWord.slice(0, orderSplit), centerWord.slice(orderSplit + 1)] : [centerWord];
 
   // One sentence for a screen reader, instead of the raw SVG texts being read
   // one fragment at a time ("21", ".0", "\u00b0", "C"). The individual <text>
   // nodes are hidden from the tree for the same reason.
   const unit = `\u00b0${tempUnit || 'C'}`;
   const label = [
-    centerWord || `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`,
+    centerWord || (readOnly ? null : `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`),
     hasCurrentTemp
       ? `${a11yLabels.currentTemp || 'Current temperature'} ${Number(currentTemp).toFixed(1)} ${unit}`
       : null,
@@ -185,13 +179,28 @@ const CircularGauge = ({
       {hasSetpoint && (
         <circle class={style.gaugeArc} cx={knob.x} cy={knob.y} r="9" fill="white" stroke={arcColor} strokeWidth="2.5" />
       )}
-      {/* No setpoint to mark: the whole ring takes the preset's colour. */}
-      {showsOrder && centerColor && (
-        <circle class={style.gaugeArc} cx={cx} cy={cy} r={r} fill="none" stroke={centerColor} strokeWidth={sw} />
+      {/* No setpoint to mark: the whole ring takes the colour of the order. */}
+      {readOnly && ringColor && (
+        <circle class={style.gaugeArc} cx={cx} cy={cy} r={r} fill="none" stroke={ringColor} strokeWidth={sw} />
+      )}
+
+      {/* Read-only, the room temperature is the big number below: the
+          thermometer alone says so, where the reading would otherwise sit. */}
+      {readOnly && hasCurrentTemp && !isOff && (
+        <text
+          aria-hidden="true"
+          x={cx}
+          y={hasHumidity ? cy - 46 : cy - 38}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          class={`${style.currentTempText} ${style.gaugeIconGlyph} ${style.currentTempIcon}`}
+        >
+          {ICONS.thermometer}
+        </text>
       )}
 
       {/* Current temp + humidity: above setpoint */}
-      {hasCurrentTemp && (
+      {hasCurrentTemp && (!readOnly || isOff) && (
         <text
           aria-hidden="true"
           x={cx}
@@ -233,24 +242,7 @@ const CircularGauge = ({
 
       {/* Setpoint: integer + decimal + unit split (° above dot, C above decimal),
           replaced by the word "off" when the thermostat is stopped. */}
-      {showsOrder && (
-        <text
-          aria-hidden="true"
-          x={cx}
-          y={orderLines.length > 1 ? cy + 6 : cy + 16}
-          textAnchor="middle"
-          dominantBaseline="auto"
-          class={style.orderText}
-          style={centerColor ? `fill:${centerColor}` : undefined}
-        >
-          {orderLines.map((text, index) => (
-            <tspan key={text} x={cx} dy={index === 0 ? 0 : 28} class={index === 0 ? undefined : style.orderTextSecond}>
-              {text}
-            </tspan>
-          ))}
-        </text>
-      )}
-      {centerWord && !showsOrder && (
+      {centerWord && (
         <text aria-hidden="true" x={cx} y={cy + 18} textAnchor="middle" dominantBaseline="auto" class={style.offText}>
           {centerWord}
         </text>

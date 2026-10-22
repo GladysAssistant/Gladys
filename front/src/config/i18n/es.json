@@ -905,6 +905,8 @@
         "windowOpenCooling": "Ventana abierta — refrigeración suspendida",
         "pilotWireHeating": "Calentando",
         "pilotWireStandby": "En espera: consigna alcanzada",
+        "pilotWireOrderCurrent": "Orden: {{order}}",
+        "pilotWireOrderPending": "Enviando la orden {{order}}…",
         "a11ySetpoint": "Consigna",
         "a11yCurrentTemp": "Temperatura actual",
         "a11yHumidity": "Humedad",

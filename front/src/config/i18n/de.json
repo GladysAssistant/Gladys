@@ -757,6 +757,8 @@
         "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
         "pilotWireHeating": "Heizt",
         "pilotWireStandby": "Bereitschaft: Sollwert erreicht",
+        "pilotWireOrderCurrent": "Befehl: {{order}}",
+        "pilotWireOrderPending": "Befehl {{order}} wird gesendet…",
         "a11ySetpoint": "Sollwert",
         "a11yCurrentTemp": "Gemessene Temperatur",
         "a11yHumidity": "Luftfeuchtigkeit",
