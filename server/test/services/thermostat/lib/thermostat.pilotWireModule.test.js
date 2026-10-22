@@ -250,6 +250,25 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_PRESET.NIGHT);
   });
 
+  it('should take a derived comfort as comfort when Gladys regulates, whatever night sends', async () => {
+    // Under Gladys the module only carries comfort or frost from it: the table
+    // of orders is the heater's, and does not apply.
+    const mod = loadListener();
+    const handler = buildHandler(
+      thermostat({
+        preset: 'eco',
+        params: {
+          THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
+          THERMOSTAT_PILOT_WIRE_ORDER_NIGHT: String(PILOT_WIRE_MODE.COMFORT_2),
+        },
+      }),
+    );
+
+    await press(mod, handler, PILOT_WIRE_MODE.COMFORT_2);
+
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_PRESET.COMFORT);
+  });
+
   it('should take eco as eco, not as night, when both send it', async () => {
     const mod = loadListener();
     const handler = buildHandler(thermostat({ preset: 'comfort' }));

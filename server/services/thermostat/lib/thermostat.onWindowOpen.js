@@ -270,13 +270,12 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     }
     // Found through its params, so it has some, and the config is never null.
     const config = buildParamsConfig(device);
-    // A pilot-wire heater is never external (isExternal): whichever type says
-    // who regulates it, it is driven by its order, and its order is what a
-    // second writer — the module's button — can change.
-    const pilotWire = !isExternal(config) && config.pilot_wire_feature === changedSelector;
-    if (!pilotWire && config.target_feature !== changedSelector) {
-      return;
-    }
+    // Found through one of the two params, so the changed feature is either the
+    // real thermostat's setpoint or a pilot-wire heater's order. A pilot-wire
+    // heater is never external — a real thermostat given a wire is read as
+    // `pilot-wire` — and its order is what a second writer, the module's
+    // button, can change.
+    const pilotWire = config.pilot_wire_feature === changedSelector;
     // An order that is no PILOT_WIRE_MODE value means nothing to the thermostat,
     // and must not become the reference the next report is compared against.
     if (pilotWire && newValue !== PILOT_WIRE_MODE.OFF && presetForPilotWireOrder(newValue, config) === undefined) {

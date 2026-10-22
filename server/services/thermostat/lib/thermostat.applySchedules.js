@@ -21,6 +21,7 @@ const {
 const { followsSchedule } = require('./thermostat.scheduleDevice');
 const {
   isStopped,
+  getFeature,
   getPreset,
   savePreset,
   announcePreset,
@@ -489,7 +490,8 @@ function pilotWireOrderForPreset(preset, config) {
   if (preset === 'off') {
     return PILOT_WIRE_MODE.OFF;
   }
-  return (config.pilot_wire_orders || {})[preset];
+  // buildParamsConfig always fills the table in, defaults included.
+  return config.pilot_wire_orders[preset];
 }
 
 // When Gladys regulates, the module only ever carries comfort or frost from it:
@@ -524,8 +526,7 @@ const PRESETS_BY_PRIORITY = ['frost', 'eco', 'comfort', 'night', 'away'];
  */
 function presetForPilotWireOrder(order, config) {
   if (config.pilot_wire_regulation !== PILOT_WIRE_REGULATIONS.GLADYS) {
-    const orders = config.pilot_wire_orders || {};
-    const preset = PRESETS_BY_PRIORITY.find((candidate) => orders[candidate] === order);
+    const preset = PRESETS_BY_PRIORITY.find((candidate) => config.pilot_wire_orders[candidate] === order);
     if (preset) {
       return preset;
     }
@@ -710,7 +711,21 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
   // A heater regulating on its own setpoint may or may not be drawing current:
   // nothing Gladys reads tells, so it says nothing rather than guess. Stopped,
   // it is idle either way.
+  //
+  // One claim is retracted, once: a flame left by a pass under Gladys, before
+  // the thermostat was turned into one the heater regulates. The widget no
+  // longer reads it then, but scenes, MQTT and HomeKit would keep seeing a
+  // heating Gladys no longer stands behind. Idle is written over it a single
+  // time, and the state is left alone after that.
   if (!regulated && !stop) {
+    const stateFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE);
+    const claimsRunning =
+      stateFeature &&
+      (stateFeature.last_value === THERMOSTAT_OPERATING_STATE.HEATING ||
+        stateFeature.last_value === THERMOSTAT_OPERATING_STATE.COOLING);
+    if (claimsRunning) {
+      await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
+    }
     return;
   }
   // A write that failed leaves the previous order in force: the heater heats
