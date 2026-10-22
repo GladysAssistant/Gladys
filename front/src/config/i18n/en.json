@@ -5752,6 +5752,16 @@
             "1": "Start boost"
           }
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "auto": "Auto",
+          "charge": "Charge",
+          "discharge": "Discharge",
+          "standby": "Standby",
+          "timeOfUse": "Time of use",
+          "backup": "Backup"
+        }
       }
     }
   },
@@ -6253,6 +6263,16 @@
           "0": "Idle",
           "1": "Heating"
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "0": "Auto",
+          "1": "Charge",
+          "2": "Discharge",
+          "3": "Standby",
+          "4": "Time of use",
+          "5": "Backup"
+        }
       }
     }
   },
@@ -6618,6 +6638,10 @@
       "input-index": "Grid import index",
       "output-index": "Grid export index"
     },
+    "home-output": {
+      "shortCategoryName": "Home output",
+      "power-limit": "Output power limit"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Home output sensor",
       "power": "Home output power",
@@ -6632,7 +6656,13 @@
       "discharge-power": "Discharge power",
       "charge-index": "Charge index",
       "discharge-index": "Discharge index",
-      "battery-energy-remaining": "Battery energy remaining"
+      "battery-energy-remaining": "Battery energy remaining",
+      "charge-power-limit": "Charge power limit",
+      "discharge-power-limit": "Discharge power limit",
+      "target-charge-limit": "Target charge level",
+      "target-discharge-limit": "Discharge reserve",
+      "mode": "Mode",
+      "grid-charge-power-limit": "Grid charge power limit"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

@@ -18,6 +18,7 @@ import style from './DeviceSetValue.css';
 import ShutterButtons from '../../../../components/device/ShutterButtons';
 import SelectPilotWireMode from '../../../../components/device/SelectPilotWireMode';
 import SelectWaterHeaterMode from '../../../../components/device/SelectWaterHeaterMode';
+import SelectBatteryStorageMode from '../../../../components/device/SelectBatteryStorageMode';
 import SelectFanMode from '../../../../components/device/SelectFanMode';
 import SelectFanFeatureValue from '../../../../components/device/SelectFanFeatureValue';
 
@@ -261,8 +262,21 @@ class DeviceSetValue extends Component {
       );
     }
 
-    // The category matters as much as the type here: `mode` is the type of five
-    // categories (cube, air conditioning, fan, thermostat, water heater), so
+    if (
+      this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE &&
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE
+    ) {
+      return (
+        <SelectBatteryStorageMode
+          deviceFeature={this.state.deviceFeature}
+          updateValue={this.handleNewPureValue}
+          value={this.props.action.value}
+        />
+      );
+    }
+
+    // The category matters as much as the type here: `mode` is the type of six
+    // categories (cube, air conditioning, fan, thermostat, water heater, battery storage), so
     // testing the type alone handed every one of them the fan's speeds.
     if (
       this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.FAN &&

@@ -5752,6 +5752,16 @@
             "1": "Iniciar refuerzo"
           }
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "auto": "Auto",
+          "charge": "Carga",
+          "discharge": "Descarga",
+          "standby": "En espera",
+          "timeOfUse": "Franjas horarias",
+          "backup": "Respaldo"
+        }
       }
     }
   },
@@ -6253,6 +6263,16 @@
           "0": "Inactivo",
           "1": "Calentando"
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "0": "Auto",
+          "1": "Carga",
+          "2": "Descarga",
+          "3": "En espera",
+          "4": "Franjas horarias",
+          "5": "Respaldo"
+        }
       }
     }
   },
@@ -6618,6 +6638,10 @@
       "input-index": "Índice de importación de la red",
       "output-index": "Índice de exportación de la red"
     },
+    "home-output": {
+      "shortCategoryName": "Salida del hogar",
+      "power-limit": "Límite de potencia de salida"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Sensor de salida del hogar",
       "power": "Potencia de salida del hogar",
@@ -6632,7 +6656,13 @@
       "discharge-power": "Potencia de descarga",
       "charge-index": "Índice de carga",
       "discharge-index": "Índice de descarga",
-      "battery-energy-remaining": "Energía restante de la batería"
+      "battery-energy-remaining": "Energía restante de la batería",
+      "charge-power-limit": "Límite de potencia de carga",
+      "discharge-power-limit": "Límite de potencia de descarga",
+      "target-charge-limit": "Nivel de carga objetivo",
+      "target-discharge-limit": "Reserva de descarga",
+      "mode": "Modo",
+      "grid-charge-power-limit": "Límite de potencia de carga desde la red"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformación",

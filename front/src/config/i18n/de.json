@@ -5752,6 +5752,16 @@
             "1": "Boost starten"
           }
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "auto": "Auto",
+          "charge": "Laden",
+          "discharge": "Entladen",
+          "standby": "Standby",
+          "timeOfUse": "Zeitplan / Nebentarif",
+          "backup": "Notstrom"
+        }
       }
     }
   },
@@ -6253,6 +6263,16 @@
           "0": "Bereit",
           "1": "Heizt"
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "0": "Auto",
+          "1": "Laden",
+          "2": "Entladen",
+          "3": "Standby",
+          "4": "Zeitplan / Nebentarif",
+          "5": "Notstrom"
+        }
       }
     }
   },
@@ -6618,6 +6638,10 @@
       "input-index": "Netzbezugszähler",
       "output-index": "Netzeinspeisezähler"
     },
+    "home-output": {
+      "shortCategoryName": "Hausausgang",
+      "power-limit": "Ausgangsleistungsgrenze"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Hausausgangssensor",
       "power": "Leistung zum Haus",
@@ -6632,7 +6656,13 @@
       "discharge-power": "Entladeleistung",
       "charge-index": "Lade-Index",
       "discharge-index": "Entlade-Index",
-      "battery-energy-remaining": "Verbleibende Batterieenergie"
+      "battery-energy-remaining": "Verbleibende Batterieenergie",
+      "charge-power-limit": "Ladeleistungsgrenze",
+      "discharge-power-limit": "Entladeleistungsgrenze",
+      "target-charge-limit": "Ziel-Ladestand",
+      "target-discharge-limit": "Entladereserve",
+      "mode": "Modus",
+      "grid-charge-power-limit": "Netzladeleistungsgrenze"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

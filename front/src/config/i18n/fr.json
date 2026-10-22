@@ -5752,6 +5752,16 @@
             "1": "Lancer le boost"
           }
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "auto": "Auto",
+          "charge": "Charge",
+          "discharge": "Décharge",
+          "standby": "Veille",
+          "timeOfUse": "Heures creuses / programme",
+          "backup": "Secours"
+        }
       }
     }
   },
@@ -6253,6 +6263,16 @@
           "0": "Au repos",
           "1": "En chauffe"
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "0": "Auto",
+          "1": "Charge",
+          "2": "Décharge",
+          "3": "Veille",
+          "4": "Heures creuses / programme",
+          "5": "Secours"
+        }
       }
     }
   },
@@ -6618,6 +6638,10 @@
       "input-index": "Index import réseau électrique",
       "output-index": "Index export réseau électrique"
     },
+    "home-output": {
+      "shortCategoryName": "Sortie maison",
+      "power-limit": "Limite de puissance de sortie"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Capteur de sortie maison",
       "power": "Puissance vers la maison",
@@ -6632,7 +6656,13 @@
       "discharge-power": "Puissance de décharge",
       "charge-index": "Index de charge",
       "discharge-index": "Index de décharge",
-      "battery-energy-remaining": "Énergie restante en batterie"
+      "battery-energy-remaining": "Énergie restante en batterie",
+      "charge-power-limit": "Limite de puissance de charge",
+      "discharge-power-limit": "Limite de puissance de décharge",
+      "target-charge-limit": "Niveau de charge cible",
+      "target-discharge-limit": "Réserve de décharge",
+      "mode": "Mode",
+      "grid-charge-power-limit": "Limite de puissance de charge réseau"
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
