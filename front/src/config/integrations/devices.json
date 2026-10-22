@@ -38,6 +38,7 @@
     "key": "tasmota",
     "img": "/assets/integrations/cover/tasmota.jpg",
     "local": true,
+    "deprecated": true,
     "categories": ["lighting", "energy"]
   },
   {

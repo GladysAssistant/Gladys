@@ -5,6 +5,7 @@ import { Link } from 'preact-router';
 import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 
 class TasmotaDeviceBox extends Component {
   updateName = e => {
@@ -334,6 +335,10 @@ class TasmotaDeviceBox extends Component {
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.tasmota.saveButton" />
                     </button>
+                  )}
+
+                  {validModel && props.deleteButton && (
+                    <MigrateDeviceButton device={device} onMigrated={props.getTasmotaDevices} />
                   )}
 
                   {validModel && props.deleteButton && (
