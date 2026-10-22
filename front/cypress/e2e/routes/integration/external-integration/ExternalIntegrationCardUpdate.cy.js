@@ -85,4 +85,54 @@ describe('External integration - update from the catalog card', () => {
     });
     cy.wait('@updateLinky');
   });
+
+  it('brings the button back when a newer version is published after the update', () => {
+    cy.visit('/dashboard/integration/installed');
+    cy.wait('@getInstalled');
+
+    getCard('Daikin Onecta').within(() => {
+      cy.contains('button', 'integration.root.updateButton').click();
+    });
+    cy.wait('@updateDaikin');
+    getCard('Daikin Onecta')
+      .find('.text-success')
+      .should('contain', 'v1.0.0');
+
+    // the store refresh finds a version published in the meantime
+    const newer = { ...DAIKIN, version: '1.0.0', latest_version: '1.1.0', update_available: true };
+    cy.intercept('GET', '**/api/v1/external_integration', [newer, LINKY]).as('getInstalledNewer');
+    cy.intercept('POST', '**/api/v1/external_integration/store/refresh', { ...STORE, refreshed: true });
+    cy.contains('button', 'integration.root.refreshStore.button').click();
+    cy.wait('@getInstalledNewer');
+
+    getCard('Daikin Onecta').within(() => {
+      cy.get('.text-success').should('not.exist');
+      cy.contains('v1.1.0').should('exist');
+      cy.contains('button', 'integration.root.updateButton').should('be.visible');
+    });
+  });
+
+  it('keeps an updated card in "To update" only until the user leaves the view', () => {
+    cy.visit('/dashboard/integration/updates');
+    cy.wait('@getInstalled');
+
+    getCard('Daikin Onecta').within(() => {
+      cy.contains('button', 'integration.root.updateButton').click();
+    });
+    cy.wait('@updateDaikin');
+    // the result stays readable on the view the update ran in
+    getCard('Daikin Onecta')
+      .find('.text-success')
+      .should('contain', 'v1.0.0');
+
+    cy.get('.col-lg-3')
+      .contains('a', 'integration.root.menu.installed')
+      .click();
+    cy.get('.col-lg-3')
+      .contains('a', 'integration.root.menu.updates')
+      .click();
+
+    getCard('Linky Teleinfo').should('exist');
+    getCard('Daikin Onecta').should('not.exist');
+  });
 });

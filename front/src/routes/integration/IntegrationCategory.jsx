@@ -101,7 +101,8 @@ const UpdateFooter = ({ integration, updateIntegration, bordered }) => {
   if (!updateIntegration || !integration.selector || !(integration.updateAvailable || updateState)) {
     return null;
   }
-  const succeeded = !!updateState && updateState.status === RequestStatus.Success;
+  // a version published after this update brings the button back
+  const succeeded = !!updateState && updateState.status === RequestStatus.Success && !integration.updateAvailable;
   const updating = !!updateState && updateState.status === RequestStatus.Getting;
   const failed = !!updateState && updateState.status === RequestStatus.Error;
   return (

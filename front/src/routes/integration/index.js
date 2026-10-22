@@ -153,6 +153,10 @@ class Integration extends Component {
     // never the store: installing is an admin gesture
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const userId = user.id;
+    // two cards updated at the same time each reload the list on success: the
+    // first reload can answer last, with the flag of the second card still up
+    this.externalLoadRequest = (this.externalLoadRequest || 0) + 1;
+    const request = this.externalLoadRequest;
     const [externalInstalledResponse, externalStoreResponse] = await Promise.all([
       // null and not []: a failed request means "unknown", not "nothing
       // installed". An empty array would be counted as zero integration to
@@ -160,9 +164,10 @@ class Integration extends Component {
       httpClient.get('/api/v1/external_integration').catch(() => null),
       isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
-    // the user changed while this load was in flight: the load started for
-    // the new one holds the lists to display, this one must not overwrite them
-    if (get(this.props, 'user.id') !== userId) {
+    // the user changed while this load was in flight, or a newer load has
+    // started since: that one holds the lists to display, this one must not
+    // overwrite them
+    if (get(this.props, 'user.id') !== userId || request !== this.externalLoadRequest) {
       return;
     }
     await this.setState({
@@ -241,6 +246,7 @@ class Integration extends Component {
       // the category links carry no filter: keep the ones already applied in
       // the URL of the newly displayed category
       this.updateURL();
+      this.dropFinishedUpdates();
     }
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
@@ -634,6 +640,27 @@ class Integration extends Component {
       console.error(e);
       await this.setUpdateState(selector, { status: RequestStatus.Error });
     }
+  };
+
+  // the result of an update is read on the view it ran in: carried to another
+  // one, it would keep an up-to-date card in "To update" and hide the "all up
+  // to date" state. An update still running, or failed, keeps its card state
+  dropFinishedUpdates = async () => {
+    const updateStates = this.state.updateStates || {};
+    const isFinished = selector => updateStates[selector].status === RequestStatus.Success;
+    if (!Object.keys(updateStates).some(isFinished)) {
+      return;
+    }
+    await this.setState(prevState => {
+      const remaining = { ...prevState.updateStates };
+      Object.keys(remaining).forEach(selector => {
+        if (remaining[selector].status === RequestStatus.Success) {
+          delete remaining[selector];
+        }
+      });
+      return { updateStates: remaining };
+    });
+    this.getIntegrations();
   };
 
   // more cards as the user scrolls down the list
