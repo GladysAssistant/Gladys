@@ -28,6 +28,7 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS
 } from '../../../../../../../../server/utils/constants';
+import { stripDeviceStatesForSave } from '../../../../../../utils/device';
 
 class MqttDeviceSetupPage extends Component {
   toggleFeatureCatalog() {
@@ -553,7 +554,7 @@ class MqttDeviceSetupPage extends Component {
           $splice: paramsToDelete.map(index => [index, 1]).reverse()
         }
       });
-      const device = await this.props.httpClient.post('/api/v1/device', deviceToPost);
+      const device = await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToPost));
       this.setState({
         saveStatus: RequestStatus.Success,
         loading: false,

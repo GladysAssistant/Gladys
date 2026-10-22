@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const passwordUtils = require('../utils/password');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
+const { normalizeEmail } = require('../utils/email');
 const { AVAILABLE_LANGUAGES_LIST, USER_ROLE_LIST } = require('../utils/constants');
 
 const MAX_SIZE_PROFILE_PICTURE = 80 * 1024; // 80 ko
@@ -123,9 +124,9 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  // ensure email is in lowercase
+  // store the email the way lookups normalize it (lower case, no surrounding spaces)
   User.beforeValidate((user, options) => {
-    user.email = String(user.email).toLowerCase();
+    user.email = normalizeEmail(String(user.email));
     if (!user.selector) {
       user.name = user.firstname;
       addSelectorBeforeValidateHook(user);

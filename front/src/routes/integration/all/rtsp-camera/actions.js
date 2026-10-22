@@ -8,6 +8,16 @@ import {
   DEVICE_FEATURE_TYPES
 } from '../../../../../../server/utils/constants';
 import createActionsIntegration from '../../../../actions/integration';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
+
+// The body posted for a camera, to save it or to test it. On top of the states of its features (the stored
+// image, up to 150 kB of base64), the camera carries the image of the last "Test connection" in
+// cameraImage: displayed only, no device column, but posted back it alone could push the body past the
+// 100 kB JSON bound of the API.
+function toCameraPayload(camera) {
+  const { cameraImage, ...cameraToPost } = stripDeviceStatesForSave(camera);
+  return cameraToPost;
+}
 
 function sortRoomsInHouses(houses) {
   houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
@@ -78,18 +88,6 @@ function createActions(store) {
           housesGetStatus: RequestStatus.Error
         });
       }
-    },
-    async createOrUpdateCamera(state, index) {
-      let camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
-      camera = actions.complete(camera);
-      const rtspCameras = update(state.rtspCameras, {
-        [index]: {
-          $set: camera
-        }
-      });
-      store.setState({
-        rtspCameras
-      });
     },
     async addCamera(state) {
       const uniqueId = uuid.v4();
@@ -216,14 +214,13 @@ function createActions(store) {
     },
     async saveCamera(state, index) {
       const camera = state.rtspCameras[index];
-      // Features are matched by type, never by index: a camera also carries the "enabled"
-      // feature, and the order the API returns them in is not guaranteed.
-      const imageFeature = camera.features.find(feature => feature.type === DEVICE_FEATURE_TYPES.CAMERA.IMAGE);
-      camera.features.forEach(feature => {
-        feature.name = camera.name;
+      // the features are renamed in the body only: the camera held in the store stays as it is until the
+      // server answers, a failed save leaves nothing half-written
+      const payload = toCameraPayload({
+        ...camera,
+        features: camera.features.map(feature => ({ ...feature, name: camera.name }))
       });
-      delete imageFeature.last_value_string;
-      let newCamera = await state.httpClient.post(`/api/v1/device`, camera);
+      let newCamera = await state.httpClient.post(`/api/v1/device`, payload);
       newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
@@ -248,7 +245,10 @@ function createActions(store) {
     },
     async testConnection(state, index) {
       const camera = state.rtspCameras[index];
-      const cameraImage = await state.httpClient.post(`/api/v1/service/rtsp-camera/camera/test`, camera);
+      const cameraImage = await state.httpClient.post(
+        `/api/v1/service/rtsp-camera/camera/test`,
+        toCameraPayload(camera)
+      );
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           cameraImage: {

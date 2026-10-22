@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, DEVICE_FEATURE_STATE_COLUMNS } = require('../../utils/constants');
 const { buildUniqueSelector } = require('../../utils/addSelector');
 const { resolveEnergyParentId } = require('../../utils/resolveEnergyParentId');
 const { enforceEnergyHierarchy } = require('../../utils/enforceEnergyHierarchy');
@@ -37,23 +37,6 @@ const getDeviceInDb = async (device) => {
   const deviceByExternalId = await getByExternalId(device.external_id);
   return deviceByExternalId;
 };
-
-// Those columns hold the current STATE of a feature, not its definition: they are
-// written by device.saveState / device.saveStringState and by the aggregation jobs.
-// A caller saving a device sends back the features it read earlier (the MQTT device
-// page posts the whole device just to append one feature), so letting them through
-// rolled every existing feature back to the value the client had in hand — null for
-// a feature that had not received anything yet when the page was loaded. They are
-// only accepted when the feature is created, so an integration can declare a first
-// value along with a brand new feature (lan-manager does it for presence).
-const DEVICE_FEATURE_STATE_COLUMNS = [
-  'last_value',
-  'last_value_string',
-  'last_value_changed',
-  'last_hourly_aggregate',
-  'last_daily_aggregate',
-  'last_monthly_aggregate',
-];
 
 const matchFeatureInList = (existingFeature, features) => {
   // We are matching on both external_id and id, so we can match a device that changed external_id but kept the same id
@@ -215,6 +198,7 @@ async function create(device) {
           const keepHistoryBeforeUpdate = deviceFeature.keep_history;
           const featureToUpdate = { ...feature };
           delete featureToUpdate.selector;
+          // A save never writes the states of an existing feature (see DEVICE_FEATURE_STATE_COLUMNS)
           DEVICE_FEATURE_STATE_COLUMNS.forEach((column) => {
             delete featureToUpdate[column];
           });

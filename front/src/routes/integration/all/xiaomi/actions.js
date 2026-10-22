@@ -3,6 +3,7 @@ import update from 'immutability-helper';
 import createActionsHouse from '../../../../actions/house';
 import createActionsIntegration from '../../../../actions/integration';
 import debounce from 'debounce';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
@@ -62,7 +63,7 @@ function createActions(store) {
       }
     },
     async createDevice(state, device, sensorIndex) {
-      await state.httpClient.post('/api/v1/device', device);
+      await state.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       await actions.getXiaomiDevices(store.getState());
       const newState = update(store.getState(), {
         xiaomiSensors: {
@@ -72,7 +73,7 @@ function createActions(store) {
       store.setState(newState);
     },
     async saveDevice(state, device) {
-      await state.httpClient.post('/api/v1/device', device);
+      await state.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     },
     async deleteDevice(state, device, index) {
       await state.httpClient.delete(`/api/v1/device/${device.selector}`);

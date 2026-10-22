@@ -36,6 +36,11 @@ describe('user.verifyForgotPasswordCode', () => {
     expect(result).to.have.property('access_token');
   });
 
+  it('should accept the email typed with capitals and spaces (phone keyboard)', async () => {
+    const result = await user.verifyForgotPasswordCode(' Demo@Demo.com ', code, 'chrome');
+    expect(result).to.have.property('access_token');
+  });
+
   it('should reject a wrong code and keep the pending code', async () => {
     const promise = user.verifyForgotPasswordCode('demo@demo.com', 'AAAA-AAAA', 'chrome');
     await assert.isRejected(promise, 'Invalid or expired code');
