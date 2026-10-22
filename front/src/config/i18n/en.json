@@ -990,6 +990,10 @@
       "storeUnavailable": "The community integration store could not be reached: only the native integrations and the ones already installed are shown.",
       "storeUnavailableRetry": "Retry",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
+      "updateButton": "Update",
+      "updateRetryButton": "Retry",
+      "updateError": "The update failed. Check the integration logs, then retry.",
+      "updatedTo": "Updated to v{{version}}",
       "noInstalledIntegrations": "No community integration is installed on this instance yet.",
       "installedSummary": {
         "title": {
@@ -1033,7 +1037,6 @@
       }
     },
     "externalIntegration": {
-      "updateAvailable": "Update available",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "configTab": "Configuration",

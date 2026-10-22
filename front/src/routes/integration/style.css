@@ -185,6 +185,12 @@
   flex-shrink: 0;
 }
 
+/* lined up with the name and the tags of the item: the artwork width plus the
+   gap of .integrationListRow */
+.integrationListUpdate {
+  padding-left: calc(48px + 12px);
+}
+
 .integrationListItem :global(.integration-tags) {
   margin-top: 4px;
 }

@@ -1,7 +1,9 @@
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 import ScrollToTopLink from '../../components/router/ScrollToTopLink';
 import StatusBadge from './all/external-integration/components/StatusBadge';
 import { isNoteworthyExternalIntegrationStatus } from './all/external-integration/utils';
+import { RequestStatus } from '../../utils/consts';
 import style from './style.css';
 
 // covers are lazy-loaded: with hundreds of cards (and the mobile list, hidden
@@ -36,22 +38,6 @@ const IntegrationTags = ({ integration, alwaysShowStatus }) => (
     )}
     {integration.external && (alwaysShowStatus || isNoteworthyExternalIntegrationStatus(integration.status)) && (
       <StatusBadge status={integration.status} className="integration-tag" />
-    )}
-    {/* icon only: the label is the longest of the whole row, and the catalog
-        just needs to signal the update — the wording is in the tooltip, and
-        the integration page carries the full update section. aria-label as
-        well as title: on a non-interactive span, title alone is not reliably
-        announced by screen readers, and the icon carries no text */}
-    {integration.external && integration.updateAvailable && (
-      <Localizer>
-        <span
-          class="badge badge-primary integration-tag"
-          title={<Text id="integration.externalIntegration.updateAvailable" />}
-          aria-label={<Text id="integration.externalIntegration.updateAvailable" />}
-        >
-          <i class="fe fe-arrow-up-circle" />
-        </span>
-      </Localizer>
     )}
     {integration.deprecated && (
       <span class="badge badge-danger integration-tag">
@@ -104,6 +90,65 @@ const FavoriteButton = ({ integration, toggleFavorite }) => {
   );
 };
 
+// the update is started from the card itself: going to the Supervision tab of
+// each integration, one after the other, was the only way before. The footer
+// stays after the update to say how it went — the card would otherwise just
+// lose its button, which reads the same as a click that did nothing.
+// `bordered`: on a grid card, the footer is pushed to the bottom so it lines up
+// across a row of cards whatever the length of their description
+const UpdateFooter = ({ integration, updateIntegration, bordered }) => {
+  const { updateState } = integration;
+  if (!updateIntegration || !integration.selector || !(integration.updateAvailable || updateState)) {
+    return null;
+  }
+  const succeeded = !!updateState && updateState.status === RequestStatus.Success;
+  const updating = !!updateState && updateState.status === RequestStatus.Getting;
+  const failed = !!updateState && updateState.status === RequestStatus.Error;
+  return (
+    <div class={bordered ? 'mt-auto pt-3' : `mt-2 ${style.integrationListUpdate}`}>
+      <div class={cx({ 'border-top pt-3': bordered })}>
+        {succeeded ? (
+          <div class="text-success small">
+            <i class="fe fe-check-circle mr-1" />
+            <Text id="integration.root.updatedTo" fields={{ version: updateState.version }} />
+          </div>
+        ) : (
+          <div class="d-flex align-items-center">
+            {/* the latest version is unknown until the store index has been
+                read: the button alone still says there is something to install */}
+            <span class="flex-fill text-muted small">
+              {integration.version && integration.latestVersion && (
+                <span>
+                  v{integration.version} <i class="fe fe-arrow-right" />{' '}
+                  <strong class="text-body">v{integration.latestVersion}</strong>
+                </span>
+              )}
+            </span>
+            {/* flex: the theme sizes a button icon to 1rem, above the text of a
+                small button, so baseline alignment pushed the label down */}
+            <button
+              type="button"
+              class={cx('btn btn-sm d-inline-flex align-items-center', failed ? 'btn-outline-danger' : 'btn-dark', {
+                'btn-loading': updating
+              })}
+              onClick={() => updateIntegration(integration.selector)}
+              disabled={updating}
+            >
+              <i class={cx('fe mr-1', failed ? 'fe-rotate-ccw' : 'fe-arrow-up-circle')} />
+              <Text id={failed ? 'integration.root.updateRetryButton' : 'integration.root.updateButton'} />
+            </button>
+          </div>
+        )}
+        {failed && (
+          <div class="text-danger small mt-2">
+            <Text id="integration.root.updateError" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const IntegrationName = ({ integration }) =>
   integration.external ? <span>{integration.name}</span> : <Text id={`integration.${integration.key}.title`} />;
 
@@ -114,7 +159,7 @@ const IntegrationDescription = ({ integration }) =>
     <Text id={`integration.${integration.key}.description`} />
   );
 
-export const IntegrationListItem = ({ integration, toggleFavorite, alwaysShowStatus }) => (
+export const IntegrationListItem = ({ integration, toggleFavorite, alwaysShowStatus, updateIntegration }) => (
   <div class={`list-group-item ${style.integrationListItem}`}>
     <div class={style.integrationListRow}>
       <ScrollToTopLink href={integration.url}>
@@ -149,10 +194,11 @@ export const IntegrationListItem = ({ integration, toggleFavorite, alwaysShowSta
         <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
       </div>
     </div>
+    <UpdateFooter integration={integration} updateIntegration={updateIntegration} />
   </div>
 );
 
-const IntegrationCategory = ({ integration, toggleFavorite, alwaysShowStatus }) => (
+const IntegrationCategory = ({ integration, toggleFavorite, alwaysShowStatus, updateIntegration }) => (
   <div class="col-sm-6 col-lg-4">
     <div class="card">
       <div class="card-img-container">
@@ -185,6 +231,7 @@ const IntegrationCategory = ({ integration, toggleFavorite, alwaysShowStatus }) 
           <IntegrationDescription integration={integration} />
         </div>
         <IntegrationTags integration={integration} alwaysShowStatus={alwaysShowStatus} />
+        <UpdateFooter integration={integration} updateIntegration={updateIntegration} bordered />
       </div>
     </div>
   </div>

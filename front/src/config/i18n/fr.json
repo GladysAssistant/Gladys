@@ -990,6 +990,10 @@
       "storeUnavailable": "Le store des intégrations de la communauté est injoignable : seules les intégrations natives et celles déjà installées sont affichées.",
       "storeUnavailableRetry": "Réessayer",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
+      "updateButton": "Mettre à jour",
+      "updateRetryButton": "Réessayer",
+      "updateError": "La mise à jour a échoué. Consultez les logs de l'intégration, puis réessayez.",
+      "updatedTo": "Mis à jour en v{{version}}",
       "noInstalledIntegrations": "Aucune intégration de la communauté n'est encore installée sur cette instance.",
       "installedSummary": {
         "title": {
@@ -1033,7 +1037,6 @@
       }
     },
     "externalIntegration": {
-      "updateAvailable": "Mise à jour disponible",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte",
       "configTab": "Configuration",

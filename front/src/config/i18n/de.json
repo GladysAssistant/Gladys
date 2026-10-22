@@ -990,6 +990,10 @@
       "storeUnavailable": "Der Store der Community-Integrationen ist nicht erreichbar: Es werden nur die nativen und die bereits installierten Integrationen angezeigt.",
       "storeUnavailableRetry": "Erneut versuchen",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
+      "updateButton": "Aktualisieren",
+      "updateRetryButton": "Erneut versuchen",
+      "updateError": "Die Aktualisierung ist fehlgeschlagen. Prüfen Sie die Logs der Integration und versuchen Sie es erneut.",
+      "updatedTo": "Auf v{{version}} aktualisiert",
       "noInstalledIntegrations": "Auf dieser Instanz ist noch keine Community-Integration installiert.",
       "installedSummary": {
         "title": {
@@ -1033,7 +1037,6 @@
       }
     },
     "externalIntegration": {
-      "updateAvailable": "Update verfügbar",
       "deviceTab": "Geräte",
       "discoverTab": "Entdecken",
       "configTab": "Konfiguration",
