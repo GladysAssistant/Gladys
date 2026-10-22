@@ -157,7 +157,13 @@ const CircularGauge = ({
       {/* The track's colour lives in the stylesheet rather than here: inverted by
           the dark theme, #e9ecef came back as a near-black that vanished into the
           card, so it needs a value of its own there. */}
-      <path class={style.gaugeTrack} d={bgPath} fill="none" strokeWidth={sw} strokeLinecap="round" />
+      {/* With no setpoint to turn, the gap at the bottom of the dial — where its
+          range starts and ends — means nothing: the ring is drawn whole. */}
+      {hasSetpoint ? (
+        <path class={style.gaugeTrack} d={bgPath} fill="none" strokeWidth={sw} strokeLinecap="round" />
+      ) : (
+        <circle class={style.gaugeTrack} cx={cx} cy={cy} r={r} fill="none" strokeWidth={sw} />
+      )}
       {/* The glow marks "running right now", which is just as true of a running
           air conditioner as of a running heater, so it applies in both modes.
           It is a drop-shadow rather than a feGaussianBlur/feMerge filter: merging
@@ -181,14 +187,7 @@ const CircularGauge = ({
       )}
       {/* No setpoint to mark: the whole ring takes the preset's colour. */}
       {showsOrder && centerColor && (
-        <path
-          class={style.gaugeArc}
-          d={bgPath}
-          fill="none"
-          stroke={centerColor}
-          strokeWidth={sw}
-          strokeLinecap="round"
-        />
+        <circle class={style.gaugeArc} cx={cx} cy={cy} r={r} fill="none" stroke={centerColor} strokeWidth={sw} />
       )}
 
       {/* Current temp + humidity: above setpoint */}
