@@ -1,4 +1,4 @@
-# Thermostat: weekly schedules, virtual or on a real thermostat
+# Thermostat: weekly schedules, virtual, on a real thermostat or on a pilot-wire heater
 
 ## Context
 
@@ -9,6 +9,8 @@ Gladys can already _read and command_ real thermostats (Netatmo, Matter, Zigbee,
 **It cannot _programme_ the thermostats it already reads.** A Netatmo or a Zigbee thermostat regulates itself perfectly well, but nothing in Gladys drives its setpoint on a weekly schedule: the programme lives in the vendor's app, out of reach of scenes and of the rest of the house.
 
 The two needs share everything except the last step. The schedule, the presets, the manual override, the widget and the window handling are the same; only the final act differs — Gladys either actuates a switch itself, or writes a setpoint onto a device that actuates its own. Hence one integration with **two device types**, `virtual` and `external`, and a single code path that branches once, at the end of the regulation pass.
+
+A third, `pilot-wire`, came with the French pilot-wire heaters (C.1.1): a heater that regulates on its own thermostat and takes an order rather than a setpoint. It drives no real setpoint, so it runs the virtual thermostat's path, and stops at step 4 like an external one.
 
 ## A. Device model
 
@@ -171,7 +173,7 @@ These two features, and no others, are what an external thermostat carries.
 
 A single `setInterval` in the service ticks every 60 s and calls `applySchedules`, which regulates every thermostat device in parallel and isolates a failing device from the others.
 
-**Order of decisions**, per device. Steps 1 to 3 are identical for both device types — that is the whole point of the design; only steps 4 and 5 differ.
+**Order of decisions**, per device. Steps 1 to 3 are identical for every device type — that is the whole point of the design; only steps 4 and 5 differ.
 
 1. **Window open** — if a window sensor is configured and reads `0`, the pass stops after suspending the heating: the switch is cut or the pilot-wire heater is sent `OFF` (virtual, C.1.1), or the device is stopped (external — `OFF` on its mode feature when it has one, then the frost-protection setpoint). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, on every kind of thermostat: it **stops an external one too**, through the same external branch as the pass. An external thermostat carries no switch and no local setpoint feature, so the listener must not require either — one that did would skip it and leave the heating running until the next tick.
 2. **Manual hold** — if a hold is armed and has not expired, the loop regulates on the held setpoint. On expiry it clears the hold, writes `schedule` back on the `preset` feature and falls through to the schedule.
@@ -181,7 +183,7 @@ A single `setInterval` in the service ticks every 60 s and calls `applySchedules
 
 ### C.0 An external thermostat stops at step 4
 
-There is no step 5, and no hysteresis or TPI computation at all: the real thermostat runs its own heuristic off the setpoint it was given, and a second control loop would fight it. This is the entire difference between the two types.
+There is no step 5, and no hysteresis or TPI computation at all: the real thermostat runs its own heuristic off the setpoint it was given, and a second control loop would fight it. This is the entire difference between a virtual and an external thermostat; a `pilot-wire` one stops at step 4 for the same reason (C.1.1).
 
 Stopping has no setpoint of its own. On an external device it is expressed two ways at once, and which one the thermostat actually obeys depends on the device:
 
@@ -316,7 +318,7 @@ A report that takes a preset the thermostat already carries, with a hold already
 
 **`schedule` with no point in force** names no order, just as it names no temperature (C.1): under `heater`, the heater keeps the order it carries, and nothing is written. Under `gladys`, Gladys regulates on the setpoint the thermostat kept, as it does for a switch.
 
-**The operating state** says what Gladys decided. Under `gladys` it reads `heating` when the loop asks for heat, `idle` otherwise, and `idle` on a pass that fell back for want of a reading. Under `heater` it is not written: the wire gives no feedback, the heater regulates on a temperature Gladys does not know, and reading `ECO` as heating lit the flame in a room already 3 °C above the setpoint. `OFF` reads `idle` either way. The state follows the order the heater carries afterwards. A write that fails leaves the previous order in force, so the heater is said to heat only if the loop asks for heat **and** that order is neither `OFF` nor `FROST_PROTECTION`; otherwise it reads `idle`, which also clears a state left by an earlier pass. An order that cannot be read leaves the state untouched. The widget's heating halo reads this `operating-state` when Gladys regulates, with a line under the gauge saying heating or standby. When the heater does, the widget lights no halo and names the order in a banner instead (above). One claim is retracted there, once: a `heating` left by a pass under Gladys, before the thermostat was turned into one the heater regulates, is written over with `idle` — scenes, MQTT and HomeKit would otherwise keep seeing a flame Gladys no longer stands behind — and the state is left alone after that.
+**The operating state** says what Gladys decided. Under `gladys` it reads `heating` when the loop asks for heat, `idle` otherwise, and `idle` on a pass that fell back for want of a reading. Under `heater` it is not written: the wire gives no feedback, the heater regulates on a temperature Gladys does not know, and reading `ECO` as heating lit the flame in a room already 3 °C above the setpoint. `OFF` reads `idle` either way. The state follows the order the heater carries afterwards. A write that fails leaves the previous order in force, so the heater is said to heat only if the loop asks for heat **and** that order is neither `OFF` nor `FROST_PROTECTION`; otherwise it reads `idle`, which also clears a state left by an earlier pass. An order that cannot be read leaves the state untouched. The widget's heating halo reads this `operating-state` when Gladys regulates, with a line under the gauge saying heating or standby. When the heater does, the widget lights no halo and names the order in a banner instead (above). One claim is retracted there, once: a `heating` left by a pass under Gladys, before the thermostat was turned into one the heater regulates, is written over with `idle` — scenes, MQTT and HomeKit would otherwise keep seeing a flame Gladys no longer stands behind — and the state is left alone after that — on every pass that writes nothing else, `schedule` with no point in force included.
 
 A heater is driven by one actuator or the other, never both. The edit form empties the switch when a pilot wire is picked and the reverse, and saves the switch empty whenever a pilot wire is set; the loop, the window listener and the hold all take the pilot-wire branch first.
 
