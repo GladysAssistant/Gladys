@@ -968,6 +968,23 @@ const DEVICE_FEATURE_CATEGORIES = {
   // category name mirrors that cluster's own grid-first naming, so adding it renames nothing.
   GRID_CARBON_SENSOR: 'grid-carbon-sensor',
   GRID_SENSOR: 'grid-sensor',
+  // Measures of a person's body, one category per quantity whatever the device (smart scale, blood
+  // pressure monitor, oximeter, watch, bed sensor...). See docs/specs/health-sensors.md. A person is
+  // not a room: none of them feeds a room aggregate. Body and skin temperatures are temperatures and
+  // stay in `temperature-sensor` (type `probe`).
+  // Body composition, as a scale (with or without bioimpedance) reports it: the body weight and its
+  // components. Masses are in kg or lb, `body-fat-percentage` is the share of fat in the body weight
+  // (0-100), `body-water` is a mass (kg, lb) or a share of the body weight (%), whichever the device
+  // reports. An integration publishes the form its device natively reports; a device reporting both
+  // the fat mass and the fat percentage publishes both. Brand scores with no shared scale (visceral
+  // fat rating, metabolic age...) are not body composition values and do not belong here.
+  BODY_COMPOSITION_SENSOR: 'body-composition-sensor',
+  // Arterial blood pressure, in mmHg (non-negative), one feature per value of the reading.
+  BLOOD_PRESSURE_SENSOR: 'blood-pressure-sensor',
+  // Heart rate (pulse), in beats per minute (non-negative), whatever the device measuring it.
+  HEART_RATE_SENSOR: 'heart-rate-sensor',
+  // Blood oxygen saturation (SpO2), in % (0-100).
+  BLOOD_OXYGEN_SENSOR: 'blood-oxygen-sensor',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
   HOME_OUTPUT_SENSOR: 'home-output-sensor',
@@ -1171,6 +1188,25 @@ const DEVICE_FEATURE_TYPES = {
     AIRFLOW_DIRECTION: 'airflow-direction',
     ROCK_SETTING: 'rock-setting',
     WIND_SETTING: 'wind-setting',
+  },
+  BODY_COMPOSITION_SENSOR: {
+    WEIGHT: 'weight', // body weight, kg or lb (decimal - sensor)
+    FAT_MASS: 'fat-mass', // kg or lb (decimal - sensor)
+    FAT_FREE_MASS: 'fat-free-mass', // kg or lb (decimal - sensor)
+    MUSCLE_MASS: 'muscle-mass', // kg or lb (decimal - sensor)
+    BONE_MASS: 'bone-mass', // kg or lb (decimal - sensor)
+    BODY_WATER: 'body-water', // water in the body, kg or lb, or % 0-100 of the body weight (decimal - sensor)
+    BODY_FAT_PERCENTAGE: 'body-fat-percentage', // share of fat in the body weight, % 0-100 (decimal - sensor)
+  },
+  BLOOD_PRESSURE_SENSOR: {
+    SYSTOLIC: 'systolic', // mmHg (integer - sensor)
+    DIASTOLIC: 'diastolic', // mmHg (integer - sensor)
+  },
+  HEART_RATE_SENSOR: {
+    INTEGER: 'integer', // beats per minute
+  },
+  BLOOD_OXYGEN_SENSOR: {
+    INTEGER: 'integer', // SpO2, % 0-100
   },
   HEATER: {
     PILOT_WIRE_MODE: 'pilot-wire-mode',
@@ -1714,6 +1750,11 @@ const DEVICE_FEATURE_UNITS = {
   BECQUEREL_PER_CUBIC_METER: 'becquerel-per-cubic-meter',
   // Noise units
   DECIBEL: 'decibel',
+  // Health units
+  KILOGRAM: 'kilogram',
+  POUND: 'pound',
+  MILLIMETER_OF_MERCURY: 'millimeter-of-mercury',
+  BEATS_PER_MINUTE: 'beats-per-minute',
 };
 
 const WEATHER_UNITS = {
@@ -1975,12 +2016,47 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.SQUARE_METER,
     DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
   ],
+  [DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR]: [
+    DEVICE_FEATURE_UNITS.KILOGRAM,
+    DEVICE_FEATURE_UNITS.POUND,
+    DEVICE_FEATURE_UNITS.PERCENT,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.BLOOD_PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.MILLIMETER_OF_MERCURY],
+  [DEVICE_FEATURE_CATEGORIES.HEART_RATE_SENSOR]: [DEVICE_FEATURE_UNITS.BEATS_PER_MINUTE],
+  [DEVICE_FEATURE_CATEGORIES.BLOOD_OXYGEN_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
 };
 
 // Restricts the selectable units to the ones relevant for a given feature type,
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR]: {
+    // Masses, the fat percentage, and body water as a mass or a percentage: each type gets its own units.
+    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.WEIGHT]: [DEVICE_FEATURE_UNITS.KILOGRAM, DEVICE_FEATURE_UNITS.POUND],
+    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.FAT_MASS]: [
+      DEVICE_FEATURE_UNITS.KILOGRAM,
+      DEVICE_FEATURE_UNITS.POUND,
+    ],
+    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.FAT_FREE_MASS]: [
+      DEVICE_FEATURE_UNITS.KILOGRAM,
+      DEVICE_FEATURE_UNITS.POUND,
+    ],
+    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.MUSCLE_MASS]: [
+      DEVICE_FEATURE_UNITS.KILOGRAM,
+      DEVICE_FEATURE_UNITS.POUND,
+    ],
+    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BONE_MASS]: [
+      DEVICE_FEATURE_UNITS.KILOGRAM,
+      DEVICE_FEATURE_UNITS.POUND,
+    ],
+    // Scales publish the body water either as a mass or as a share of the body weight.
+    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_WATER]: [
+      DEVICE_FEATURE_UNITS.KILOGRAM,
+      DEVICE_FEATURE_UNITS.POUND,
+      DEVICE_FEATURE_UNITS.PERCENT,
+    ],
+    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
+  },
   [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: {
     // The intensity is a mass per energy, the two shares are percentages: without this entry
     // both would offer the whole category list.

@@ -5443,7 +5443,11 @@
     "square-centimeter": "Centimètre carré (cm²)",
     "square-meter": "Mètre carré (m²)",
     "square-kilometer": "Kilomètre carré (km²)",
-    "decibel": "Décibel (dB)"
+    "decibel": "Décibel (dB)",
+    "kilogram": "Kilogramme (kg)",
+    "pound": "Livre (lb)",
+    "millimeter-of-mercury": "Millimètre de mercure (mmHg)",
+    "beats-per-minute": "Battements par minute (bpm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5541,7 +5545,11 @@
     "square-centimeter": "cm²",
     "square-meter": "m²",
     "square-kilometer": "km²",
-    "decibel": "dB"
+    "decibel": "dB",
+    "kilogram": "kg",
+    "pound": "lb",
+    "millimeter-of-mercury": "mmHg",
+    "beats-per-minute": "bpm"
   },
   "lightControl": {
     "openPanel": "Ouvrir les réglages de la lumière",
@@ -6538,6 +6546,29 @@
       "odometer": "Odomètre",
       "tire-pressure": "Pression des pneus",
       "window-opened": "Fenêtre ouverte"
+    },
+    "body-composition-sensor": {
+      "shortCategoryName": "Composition corporelle",
+      "weight": "Poids",
+      "fat-mass": "Masse grasse",
+      "fat-free-mass": "Masse maigre",
+      "muscle-mass": "Masse musculaire",
+      "bone-mass": "Masse osseuse",
+      "body-water": "Eau corporelle",
+      "body-fat-percentage": "Pourcentage de masse grasse"
+    },
+    "blood-pressure-sensor": {
+      "shortCategoryName": "Tension artérielle",
+      "systolic": "Tension systolique",
+      "diastolic": "Tension diastolique"
+    },
+    "heart-rate-sensor": {
+      "shortCategoryName": "Fréquence cardiaque",
+      "integer": "Fréquence cardiaque"
+    },
+    "blood-oxygen-sensor": {
+      "shortCategoryName": "Oxygène sanguin",
+      "integer": "Oxygène sanguin (SpO2)"
     },
     "heater": {
       "shortCategoryName": "Chauffage",

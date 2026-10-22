@@ -5443,7 +5443,11 @@
     "square-centimeter": "Quadratzentimeter (cm²)",
     "square-meter": "Quadratmeter (m²)",
     "square-kilometer": "Quadratkilometer (km²)",
-    "decibel": "Dezibel (dB)"
+    "decibel": "Dezibel (dB)",
+    "kilogram": "Kilogramm (kg)",
+    "pound": "Pfund (lb)",
+    "millimeter-of-mercury": "Millimeter Quecksilbersäule (mmHg)",
+    "beats-per-minute": "Schläge pro Minute (bpm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5541,7 +5545,11 @@
     "square-centimeter": "cm²",
     "square-meter": "m²",
     "square-kilometer": "km²",
-    "decibel": "dB"
+    "decibel": "dB",
+    "kilogram": "kg",
+    "pound": "lb",
+    "millimeter-of-mercury": "mmHg",
+    "beats-per-minute": "bpm"
   },
   "lightControl": {
     "openPanel": "Lichteinstellungen öffnen",
@@ -6538,6 +6546,29 @@
       "odometer": "Kilometerzähler",
       "tire-pressure": "Reifendruck",
       "window-opened": "Fenster geöffnet"
+    },
+    "body-composition-sensor": {
+      "shortCategoryName": "Körperzusammensetzung",
+      "weight": "Gewicht",
+      "fat-mass": "Fettmasse",
+      "fat-free-mass": "Fettfreie Masse",
+      "muscle-mass": "Muskelmasse",
+      "bone-mass": "Knochenmasse",
+      "body-water": "Körperwasser",
+      "body-fat-percentage": "Körperfett (%)"
+    },
+    "blood-pressure-sensor": {
+      "shortCategoryName": "Blutdruck",
+      "systolic": "Systolischer Blutdruck",
+      "diastolic": "Diastolischer Blutdruck"
+    },
+    "heart-rate-sensor": {
+      "shortCategoryName": "Herzfrequenz",
+      "integer": "Herzfrequenz"
+    },
+    "blood-oxygen-sensor": {
+      "shortCategoryName": "Blutsauerstoff",
+      "integer": "Blutsauerstoff (SpO2)"
     },
     "heater": {
       "shortCategoryName": "Heizung",
