@@ -57,6 +57,43 @@ function fromCelsius(celsius, unit) {
 }
 
 /**
+ * @description Adapt a HomeKit temperature control to the bounds and precision declared by its features.
+ * @param {Array} features - Setpoint features backing this characteristic.
+ * @param {object} characteristicProps - Existing HomeKit characteristic props.
+ * @returns {object} Declared bounds and step in Celsius, or no overrides for invalid metadata.
+ * @example
+ * buildSetpointProps([{ min: 5, max: 15, setpoint_step: 0.5 }], characteristic.props);
+ */
+function buildSetpointProps(features, characteristicProps) {
+  const validFeatures = features.filter(
+    (feature) => !(Number.isFinite(feature.min) && Number.isFinite(feature.max) && feature.min > feature.max),
+  );
+  const minimums = validFeatures
+    .filter((feature) => Number.isFinite(feature.min))
+    .map((feature) => toCelsius(feature.min, feature.unit));
+  const maximums = validFeatures
+    .filter((feature) => Number.isFinite(feature.max))
+    .map((feature) => toCelsius(feature.max, feature.unit));
+  const steps = validFeatures
+    .filter((feature) => Number.isFinite(feature.setpoint_step) && feature.setpoint_step > 0)
+    .map((feature) => Number((toCelsius(feature.setpoint_step, feature.unit) - toCelsius(0, feature.unit)).toFixed(6)))
+    .filter((step) => step > 0);
+  const props = {};
+  if (minimums.length > 0) {
+    props.minValue = Math.min(...minimums);
+  }
+  if (maximums.length > 0) {
+    props.maxValue = Math.max(...maximums);
+  }
+  if (steps.length > 0) {
+    props.minStep = Math.min(...steps);
+  }
+  const minValue = props.minValue ?? characteristicProps.minValue;
+  const maxValue = props.maxValue ?? characteristicProps.maxValue;
+  return minValue > maxValue ? {} : props;
+}
+
+/**
  * @description Keep a temperature inside the bounds of a HomeKit characteristic.
  * @param {number} value - Temperature in Celsius.
  * @param {object} props - Props of the HomeKit characteristic receiving the value.
@@ -165,6 +202,7 @@ function buildValidTargetStates(thermostatFeatures) {
 function bindThresholdCharacteristic(service, characteristicType, feature, helpers) {
   const { CharacteristicEventTypes } = this.hap;
   const characteristic = service.getCharacteristic(characteristicType);
+  characteristic.setProps(buildSetpointProps([feature], characteristic.props));
 
   characteristic.on(
     CharacteristicEventTypes.GET,
@@ -425,6 +463,12 @@ function buildThermostatService(service, device, features) {
   // the characteristic is left with its HAP default instead.
   if (heatingSetpointFeature || coolingSetpointFeature) {
     const targetTemperatureCharacteristic = service.getCharacteristic(Characteristic.TargetTemperature);
+    targetTemperatureCharacteristic.setProps(
+      buildSetpointProps(
+        [heatingSetpointFeature, coolingSetpointFeature].filter(Boolean),
+        targetTemperatureCharacteristic.props,
+      ),
+    );
     targetTemperatureCharacteristic.on(
       CharacteristicEventTypes.GET,
       handleRequest(async (callback) => {
@@ -438,7 +482,8 @@ function buildThermostatService(service, device, features) {
       CharacteristicEventTypes.SET,
       handleRequest(async (value, callback) => {
         const setpointFeature = activeSetpointFeature();
-        emitValue(setpointFeature, fromCelsius(value, setpointFeature.unit));
+        const props = buildSetpointProps([setpointFeature], targetTemperatureCharacteristic.props);
+        emitValue(setpointFeature, fromCelsius(clampToCharacteristic(value, props), setpointFeature.unit));
         callback();
       }, 1),
     );
@@ -472,6 +517,7 @@ function buildThermostatService(service, device, features) {
 }
 
 module.exports = {
+  buildSetpointProps,
   buildThermostatService,
   buildValidTargetStates,
   listSupportedModes,
