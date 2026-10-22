@@ -123,6 +123,13 @@
   fill: #868e96;
 }
 
+/* The thermometer beside the room temperature of a read-only gauge, sized to
+   the number rather than to the small reading line. */
+.roomTempIcon {
+  font-size: 28px;
+  fill: #868e96;
+}
+
 /* The droplet keeps its own colour: the reading beside it stays grey like the
    other secondary text. */
 .humidityIcon {

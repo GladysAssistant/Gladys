@@ -82,7 +82,9 @@ const CircularGauge = ({
   // would lose its sign, so the minus is restored explicitly.
   const intPart = truncated === 0 && roundedSetpoint < 0 ? '-0' : String(truncated);
   const intW = intPart.length * 30;
-  const intX = cx - intW / 2 - 18;
+  // Read-only, a thermometer sits left of the number to say it is the room's:
+  // the whole group shifts right by half its width to stay centred.
+  const intX = cx - intW / 2 - 18 + (readOnly ? 12 : 0);
   const suffixX = intX + intW;
 
   // A stopped thermostat has no setpoint to show. The number the gauge would
@@ -184,16 +186,17 @@ const CircularGauge = ({
         <circle class={style.gaugeArc} cx={cx} cy={cy} r={r} fill="none" stroke={ringColor} strokeWidth={sw} />
       )}
 
-      {/* Read-only, the room temperature is the big number below: the
-          thermometer alone says so, where the reading would otherwise sit. */}
+      {/* Read-only, the room temperature is the big number: a thermometer at
+          its left, sized to it, says so. Alone above the humidity it read as a
+          stray glyph. */}
       {readOnly && hasCurrentTemp && !isOff && (
         <text
           aria-hidden="true"
-          x={cx}
-          y={hasHumidity ? cy - 46 : cy - 38}
-          textAnchor="middle"
+          x={intX - 4}
+          y={cy + 12}
+          textAnchor="end"
           dominantBaseline="middle"
-          class={`${style.currentTempText} ${style.gaugeIconGlyph} ${style.currentTempIcon}`}
+          class={`${style.gaugeIconGlyph} ${style.roomTempIcon}`}
         >
           {ICONS.thermometer}
         </text>
@@ -225,7 +228,7 @@ const CircularGauge = ({
         <text
           aria-hidden="true"
           x={cx}
-          y={hasCurrentTemp ? cy - 28 : cy - 38}
+          y={hasCurrentTemp && (!readOnly || isOff) ? cy - 28 : cy - 38}
           textAnchor="middle"
           dominantBaseline="middle"
           class={style.humidityText}
