@@ -64,9 +64,60 @@ module.exports = function HouseController(gladys) {
     res.send(image);
   }
 
+  /**
+   * @api {post} /api/v1/camera/:camera_selector/webrtc/start Start a WebRTC live view
+   * @apiName startWebRtc
+   * @apiGroup Camera
+   * @apiDescription For a camera declaring the GLADYS_CAMERA_STREAM_PROTOCOL=webrtc param. Gladys
+   * relays the browser's SDP offer to the camera's service and gives its answer back; the media
+   * goes from the camera's cloud to the browser. The offer must carry every ICE candidate (no
+   * trickle). Ping the session every 10s, it ends 30s after the last ping.
+   * @apiParam {string} sdp The SDP offer, every ICE candidate included
+   * @apiParamExample {json} Request-Example:
+   * {
+   *   "sdp": "v=0\r\no=- 4611731400430051336 2 IN IP4 127.0.0.1\r\n..."
+   * }
+   * @apiSuccessExample {json} Success-Response:
+   * {
+   *   "session_id": "0c2d7f7e-4b5e-4d55-9f39-0b8e8d8c2a51",
+   *   "sdp_answer": "v=0\r\no=- 1 2 IN IP4 0.0.0.0\r\n..."
+   * }
+   */
+  async function startWebRtc(req, res) {
+    const answer = await gladys.device.camera.startWebRtc(req.params.camera_selector, req.body.sdp);
+    res.json(answer);
+  }
+
+  /**
+   * @api {post} /api/v1/camera/:camera_selector/webrtc/ping Keep a WebRTC live view alive
+   * @apiName pingWebRtc
+   * @apiGroup Camera
+   * @apiParam {string} session_id The session id the start returned
+   * @apiError (404) CAMERA_WEBRTC_SESSION_NOT_FOUND The session is over (expired, camera turned off): stop
+   * the video
+   */
+  async function pingWebRtc(req, res) {
+    await gladys.device.camera.pingWebRtc(req.params.camera_selector, req.body.session_id);
+    res.json({ success: true });
+  }
+
+  /**
+   * @api {post} /api/v1/camera/:camera_selector/webrtc/stop Stop a WebRTC live view
+   * @apiName stopWebRtc
+   * @apiGroup Camera
+   * @apiParam {string} session_id The session id the start returned
+   */
+  async function stopWebRtc(req, res) {
+    await gladys.device.camera.stopWebRtc(req.params.camera_selector, req.body.session_id);
+    res.json({ success: true });
+  }
+
   return Object.freeze({
     setImage: asyncMiddleware(setImage),
     getImage: asyncMiddleware(getImage),
     get: asyncMiddleware(get),
+    startWebRtc: asyncMiddleware(startWebRtc),
+    pingWebRtc: asyncMiddleware(pingWebRtc),
+    stopWebRtc: asyncMiddleware(stopWebRtc),
   });
 };

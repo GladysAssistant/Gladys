@@ -2050,6 +2050,17 @@ const DEVICE_ROTATION = {
   DEGREES_270: '270',
 };
 
+// How a camera's live view is negotiated when it is not the HLS stream rtsp-camera builds from
+// CAMERA_URL. A device declares it with the CAMERA_STREAM_PROTOCOL_PARAM device param; without it
+// the live view stays on rtsp-camera. WEBRTC: the browser negotiates the stream itself and Gladys
+// only relays the SDP offer and answer to the device's service (service.device.startWebRtc). The
+// media goes straight from the camera's cloud to the browser, never through Gladys nor Gladys Plus.
+// The param name is in the reserved GLADYS_* namespace of external integrations (spec C.3).
+const CAMERA_STREAM_PROTOCOL_PARAM = 'GLADYS_CAMERA_STREAM_PROTOCOL';
+const CAMERA_STREAM_PROTOCOLS = {
+  WEBRTC: 'webrtc',
+};
+
 const WEBSOCKET_MESSAGE_TYPES = {
   ALARM: {
     ARMING: 'alarm.arming',
@@ -2207,6 +2218,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ACTION_RUN: 'external-integration.action.run',
     AI_CHAT: 'external-integration.ai.chat',
     CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
+    // live view negotiated by the browser (CAMERA_STREAM_PROTOCOLS.WEBRTC): SDP offer in, SDP answer out
+    CAMERA_WEBRTC_OFFER: 'external-integration.camera.webrtc-offer',
+    CAMERA_WEBRTC_STOP: 'external-integration.camera.webrtc-stop',
     WEATHER_GET: 'external-integration.weather.get',
     WEATHER_GET_IMAGE: 'external-integration.weather.get-image',
     WEATHER_REFRESH: 'external-integration.weather.refresh',
@@ -2600,6 +2614,8 @@ module.exports.DEVICE_POLL_FREQUENCIES = DEVICE_POLL_FREQUENCIES;
 module.exports.DEVICE_POLL_FREQUENCIES_LIST = createList(DEVICE_POLL_FREQUENCIES);
 
 module.exports.DEVICE_ROTATION = DEVICE_ROTATION;
+module.exports.CAMERA_STREAM_PROTOCOL_PARAM = CAMERA_STREAM_PROTOCOL_PARAM;
+module.exports.CAMERA_STREAM_PROTOCOLS = CAMERA_STREAM_PROTOCOLS;
 
 module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 

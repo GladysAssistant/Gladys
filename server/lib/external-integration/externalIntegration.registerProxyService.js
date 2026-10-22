@@ -1,4 +1,5 @@
 const db = require('../../models');
+const logger = require('../../utils/logger');
 const { ExternalIntegrationUnavailableError, NotFoundError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
@@ -6,6 +7,9 @@ const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
 const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
 const {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
+  CAMERA_WEBRTC_OFFER_TIMEOUT_MS,
+  MAX_WEBRTC_SDP_LENGTH,
+  MAX_WEBRTC_ID_LENGTH,
   WEATHER_GET_TIMEOUT_MS,
   WEATHER_IMAGE_CACHE_TTL_MS,
   WEATHER_IMAGE_CACHE_PREFIX,
@@ -15,6 +19,11 @@ const {
   MAX_TTS_TEXT_LENGTH,
   TTS_AUDIO_CONTENT_TYPES,
 } = require('./constants');
+
+// The integration's answer to a WebRTC offer reaches the browser as is: it is bounded and typed
+// here, unaudited code never hands an arbitrary payload to the front.
+const isOptionalWebRtcId = (value) =>
+  value === undefined || value === null || (typeof value === 'string' && value.length <= MAX_WEBRTC_ID_LENGTH);
 
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
@@ -300,6 +309,65 @@ function registerProxyService(service) {
           throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_CAMERA_IMAGE');
         }
         return image;
+      },
+      startWebRtc: async (device, { sessionId, sdp }) => {
+        // live view negotiated by the browser (CAMERA_STREAM_PROTOCOLS.WEBRTC): the
+        // integration relays the offer to the camera's cloud, a third-party round
+        // trip, hence the 15s ack deadline. Only the signalling goes through Gladys:
+        // the media flows from the camera's cloud to the browser.
+        const devicePayload = {
+          external_id: device.external_id,
+          selector: device.selector,
+          params: device.params,
+        };
+        const result = await this.sendCommand(
+          service,
+          WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_OFFER,
+          { device: devicePayload, session_id: sessionId, sdp },
+          { timeoutMs: CAMERA_WEBRTC_OFFER_TIMEOUT_MS },
+        );
+        const data = (result && result.data) || {};
+        const { sdp_answer: sdpAnswer, session_id: integrationSessionId, stream_id: streamId } = data;
+        if (
+          typeof sdpAnswer !== 'string' ||
+          sdpAnswer.length === 0 ||
+          sdpAnswer.length > MAX_WEBRTC_SDP_LENGTH ||
+          !isOptionalWebRtcId(integrationSessionId) ||
+          !isOptionalWebRtcId(streamId)
+        ) {
+          // the vendor may have opened the stream already: end it with the ids it gave, best
+          // effort, or the cloud keeps it until its own idle timeout
+          if (typeof integrationSessionId === 'string' || typeof streamId === 'string') {
+            try {
+              await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_STOP, {
+                device: devicePayload,
+                session_id: typeof integrationSessionId === 'string' ? integrationSessionId : sessionId,
+                stream_id: typeof streamId === 'string' ? streamId : null,
+              });
+            } catch (e) {
+              logger.warn(`Camera ${device.selector}: unable to stop the WebRTC session: ${e.message}`);
+            }
+          }
+          throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_WEBRTC_ANSWER');
+        }
+        // the vendor may name the session itself (Netatmo answers with its own
+        // session id): that is the one the stop must carry
+        return {
+          sdpAnswer,
+          sessionId: integrationSessionId || sessionId,
+          streamId: streamId || null,
+        };
+      },
+      stopWebRtc: async (device, { sessionId, streamId }) => {
+        await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_STOP, {
+          device: {
+            external_id: device.external_id,
+            selector: device.selector,
+            params: device.params,
+          },
+          session_id: sessionId,
+          stream_id: streamId,
+        });
       },
       postCreate: async (device) => {
         this.sendMessage(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_CREATED, { device });
