@@ -603,6 +603,31 @@ async function writePilotWireOrder(gladys, pilotWireSelector, order, logContext,
 }
 
 /**
+ * @description Retract, once, a running state Gladys no longer stands behind.
+ *
+ * A heater regulating itself is never said to heat or to idle: nothing Gladys
+ * reads tells. But a pass under Gladys, before the thermostat was turned into
+ * one the heater regulates, may have left `heating`. The widget no longer reads
+ * it then; scenes, MQTT and HomeKit would keep seeing a flame. Idle is written
+ * over it a single time, and the state is left alone after that.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} device - The thermostat device.
+ * @returns {Promise<void>}
+ * @example
+ * await retractStaleRunningState(gladys, device);
+ */
+async function retractStaleRunningState(gladys, device) {
+  const stateFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE);
+  const claimsRunning =
+    stateFeature &&
+    (stateFeature.last_value === THERMOSTAT_OPERATING_STATE.HEATING ||
+      stateFeature.last_value === THERMOSTAT_OPERATING_STATE.COOLING);
+  if (claimsRunning) {
+    await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
+  }
+}
+
+/**
  * @description Drive a pilot-wire heater: write the order Gladys decided, then
  * say on the thermostat's operating state what it knows of it.
  *
@@ -683,6 +708,11 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
     order = pilotWireOrderForPreset(preset, config);
     if (order === undefined) {
       logger.debug(`Thermostat schedule: no pilot-wire order for preset "${preset}", the heater keeps its order`);
+      // `schedule` with no point in force writes nothing, but a stale flame is
+      // no truer for it.
+      if (!regulated) {
+        await retractStaleRunningState(gladys, device);
+      }
       return;
     }
     if (regulated) {
@@ -709,23 +739,10 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
     return;
   }
   // A heater regulating on its own setpoint may or may not be drawing current:
-  // nothing Gladys reads tells, so it says nothing rather than guess. Stopped,
-  // it is idle either way.
-  //
-  // One claim is retracted, once: a flame left by a pass under Gladys, before
-  // the thermostat was turned into one the heater regulates. The widget no
-  // longer reads it then, but scenes, MQTT and HomeKit would keep seeing a
-  // heating Gladys no longer stands behind. Idle is written over it a single
-  // time, and the state is left alone after that.
+  // nothing Gladys reads tells, so it says nothing rather than guess — beyond
+  // retracting a stale flame. Stopped, it is idle either way.
   if (!regulated && !stop) {
-    const stateFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE);
-    const claimsRunning =
-      stateFeature &&
-      (stateFeature.last_value === THERMOSTAT_OPERATING_STATE.HEATING ||
-        stateFeature.last_value === THERMOSTAT_OPERATING_STATE.COOLING);
-    if (claimsRunning) {
-      await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
-    }
+    await retractStaleRunningState(gladys, device);
     return;
   }
   // A write that failed leaves the previous order in force: the heater heats

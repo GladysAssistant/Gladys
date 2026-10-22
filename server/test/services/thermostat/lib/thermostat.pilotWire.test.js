@@ -420,6 +420,21 @@ describe('thermostat pilot wire', () => {
     assert.notCalled(gladys.device.setValue);
     expect(savedOperatingStates(gladys)).to.deep.equal([]);
   });
+
+  it('should retract a stale flame even when the programme has no point in force', async () => {
+    // No order is sent on that path, but a flame left from when Gladys
+    // regulated is no truer for it.
+    const mod = load({ selector: 'my-schedule', transitions: [] });
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.ECO });
+    const device = pilotWireDevice('schedule', heaterRegulates);
+    device.features[0].last_value = 20;
+    device.features[2].last_value = THERMOSTAT_OPERATING_STATE.HEATING;
+
+    await regulate(mod, gladys, device);
+
+    assert.notCalled(gladys.device.setValue);
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+  });
 });
 
 describe('thermostat pilot wire: regulated by Gladys on a room sensor', () => {
@@ -504,6 +519,20 @@ describe('thermostat pilot wire: regulated by Gladys on a room sensor', () => {
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.COMFORT);
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
+  });
+
+  it('should leave the heater and its state alone with no point in force and no reading', async () => {
+    // Nothing to regulate on, and `schedule` names no order to fall back on.
+    const mod = load({ selector: 'my-schedule', transitions: [] });
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: null });
+    const device = pilotWireDevice('schedule', gladysRegulates);
+    device.features[0].last_value = 20;
+    device.features[2].last_value = THERMOSTAT_OPERATING_STATE.HEATING;
+
+    await regulate(mod, gladys, device);
+
+    assert.notCalled(gladys.device.setValue);
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
   });
 
   it('should not report heating when frost protection cannot be written', async () => {
