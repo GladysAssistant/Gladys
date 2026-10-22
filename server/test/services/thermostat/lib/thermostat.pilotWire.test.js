@@ -310,6 +310,31 @@ describe('thermostat pilot wire', () => {
     );
   });
 
+  it('should retract, once, a flame left from when Gladys regulated', async () => {
+    // The thermostat was virtual with a sensor, last saved on heating, then
+    // turned into one the heater regulates: scenes and HomeKit would keep
+    // reading heating.
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+    const device = pilotWireDevice('comfort', heaterRegulates);
+    device.features[2].last_value = THERMOSTAT_OPERATING_STATE.HEATING;
+
+    await regulate(mod, gladys, device);
+
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+  });
+
+  it('should leave an idle state alone while the heater regulates', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+    const device = pilotWireDevice('comfort', heaterRegulates);
+    device.features[2].last_value = THERMOSTAT_OPERATING_STATE.IDLE;
+
+    await regulate(mod, gladys, device);
+
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
+  });
+
   it('should send eco for eco on a pilot-wire thermostat, room sensor or not', async () => {
     // The room at 20 °C is above eco's 18 °C: Gladys regulating would send
     // frost protection, but the heater regulates here.
