@@ -114,6 +114,9 @@ function createActions(store) {
         actions.refreshGatewaySubscriptionState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
+          store.setState({
+            gatewayUserRole: gatewayUser.role
+          });
           const now = new Date();
           if (new Date(gatewayUser.current_period_end) < now) {
             store.setState({

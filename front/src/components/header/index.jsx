@@ -299,7 +299,10 @@ class Header extends Component {
               <a class="dropdown-item" href="/dashboard/profile">
                 <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
               </a>
-              <a class="dropdown-item" href="/dashboard/settings/house">
+              <a
+                class="dropdown-item"
+                href={props.user.role === USER_ROLE.ADMIN ? '/dashboard/settings/house' : '/dashboard/settings/session'}
+              >
                 <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
               </a>
               <div class="dropdown-divider" />
