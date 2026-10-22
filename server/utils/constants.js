@@ -153,6 +153,26 @@ const SIREN_MODE = {
   SOUND_AND_LIGHT: 3,
 };
 
+// Who decides whether a light is lit (LIGHT.OPERATING_MODE): the user (OFF / ON, forced), the light
+// itself from its own sensors (AUTO: motion, presence or ambient light — a floodlight, a camera
+// spotlight, a detector-driven outdoor light, a relay with an auto mode), or the light's own
+// timetable (SCHEDULE: the programme stored in the appliance, not a Gladys scene).
+// This is not LIGHT.BINARY: binary is whether the lamp is lit right now, the operating mode is the
+// policy that drives it: a light in AUTO is off most of the time, and its binary says so. A device
+// reporting both publishes both features; a device whose only control is this mode publishes it
+// alone, never a binary mirroring ON / OFF.
+// Neither Matter nor Zigbee models it (an occupancy-controlled light is a binding between an
+// occupancy sensor and a light, with no mode attribute on the light), hence a Gladys enum.
+// The full generic set: a light supporting only some modes declares its subset through
+// supported_options. Values are append-only: an existing integer never changes meaning, because it
+// is stored in device states and hard-coded in users' scenes.
+const LIGHT_OPERATING_MODE = {
+  OFF: 0,
+  ON: 1,
+  AUTO: 2,
+  SCHEDULE: 3,
+};
+
 const AC_MODE = {
   AUTO: 0,
   COOLING: 1,
@@ -1050,6 +1070,7 @@ const DEVICE_FEATURE_TYPES = {
     POWER: 'power',
     EFFECT_MODE: 'effect-mode',
     EFFECT_SPEED: 'effect-speed',
+    OPERATING_MODE: 'operating-mode', // who decides whether the light is lit, LIGHT_OPERATING_MODE (command)
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -2545,6 +2566,7 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.SIREN_MODE = SIREN_MODE;
+module.exports.LIGHT_OPERATING_MODE = LIGHT_OPERATING_MODE;
 module.exports.AC_MODE = AC_MODE;
 module.exports.CAMERA_MOVE = CAMERA_MOVE;
 module.exports.THERMOSTAT_MODE = THERMOSTAT_MODE;

@@ -7,7 +7,8 @@ import {
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
   WATER_HEATER_MODE,
-  SIREN_MODE
+  SIREN_MODE,
+  LIGHT_OPERATING_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
@@ -759,6 +760,11 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 20, read_only: false }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.LIGHT && type === DEVICE_FEATURE_TYPES.LIGHT.OPERATING_MODE) {
+    // LIGHT_OPERATING_MODE: OFF/ON/AUTO/SCHEDULE
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CUBE) {
     if (type === DEVICE_FEATURE_TYPES.CUBE.ROTATION) {
       return applyDefaultUnit(
@@ -1060,6 +1066,10 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.EFFECT_MODE) {
     return 3;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.LIGHT && type === DEVICE_FEATURE_TYPES.LIGHT.OPERATING_MODE) {
+    return LIGHT_OPERATING_MODE.AUTO;
   }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.POWER) {

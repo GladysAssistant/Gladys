@@ -5752,6 +5752,14 @@
             "1": "Boost starten"
           }
         }
+      },
+      "light": {
+        "operating-mode": {
+          "off": "Aus",
+          "on": "Ein",
+          "auto": "Auto",
+          "schedule": "Zeitplan"
+        }
       }
     }
   },
@@ -6253,6 +6261,14 @@
           "0": "Bereit",
           "1": "Heizt"
         }
+      },
+      "light": {
+        "operating-mode": {
+          "0": "Aus",
+          "1": "Ein",
+          "2": "Auto",
+          "3": "Zeitplan"
+        }
       }
     }
   },
@@ -6267,7 +6283,8 @@
       "temperature": "Licht: Temperatur",
       "power": "Licht: Leistungsverbrauch",
       "effect-mode": "Effektmodus",
-      "effect-speed": "Effektgeschwindigkeit"
+      "effect-speed": "Effektgeschwindigkeit",
+      "operating-mode": "Licht: Betriebsmodus"
     },
     "battery": {
       "shortCategoryName": "Batterie",

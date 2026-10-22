@@ -5752,6 +5752,14 @@
             "1": "Start boost"
           }
         }
+      },
+      "light": {
+        "operating-mode": {
+          "off": "Off",
+          "on": "On",
+          "auto": "Auto",
+          "schedule": "Schedule"
+        }
       }
     }
   },
@@ -6253,6 +6261,14 @@
           "0": "Idle",
           "1": "Heating"
         }
+      },
+      "light": {
+        "operating-mode": {
+          "0": "Off",
+          "1": "On",
+          "2": "Auto",
+          "3": "Schedule"
+        }
       }
     }
   },
@@ -6267,7 +6283,8 @@
       "temperature": "Light Temperature",
       "power": "Light Power consumption",
       "effect-mode": "Effect mode",
-      "effect-speed": "Effect speed"
+      "effect-speed": "Effect speed",
+      "operating-mode": "Light operating mode"
     },
     "battery": {
       "shortCategoryName": "Battery",

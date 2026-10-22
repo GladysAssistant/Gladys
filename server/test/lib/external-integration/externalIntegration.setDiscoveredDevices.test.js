@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert: sinonAssert } = sinon;
 
 const { BadParameters } = require('../../../utils/coreErrors');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, LIGHT_OPERATING_MODE } = require('../../../utils/constants');
 const { buildSupervisor, seedExternalService } = require('./testUtils.test');
 
 const buildDiscoveredDevice = (selector, suffix = 'paris') => ({
@@ -233,6 +233,47 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     const device = buildDiscoveredDevice(service.selector);
     device.features[0].supported_options = [{ value: 'high', label: 'High' }];
     await expectBadParameters([device], 'features[0].supported_options');
+  });
+
+  // light / operating-mode: the full generic set is OFF / ON / AUTO / SCHEDULE, a light without a
+  // timetable of its own (a floodlight) declares its subset as integer options
+  const floodlightMode = (supportedOptions) => ({
+    name: 'Floodlight',
+    external_id: `ext:${service.selector}:paris:floodlight`,
+    category: 'light',
+    type: 'operating-mode',
+    read_only: false,
+    has_feedback: true,
+    keep_history: true,
+    min: LIGHT_OPERATING_MODE.OFF,
+    max: LIGHT_OPERATING_MODE.SCHEDULE,
+    supported_options: supportedOptions,
+  });
+
+  it('should accept a light operating mode declaring its subset of modes', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features.push(
+      floodlightMode([
+        { value: LIGHT_OPERATING_MODE.OFF, label: 'Off' },
+        { value: LIGHT_OPERATING_MODE.ON, label: 'On' },
+        { value: LIGHT_OPERATING_MODE.AUTO, label: 'Auto' },
+      ]),
+    );
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[1]).to.include({ category: 'light', type: 'operating-mode' });
+    expect(devices[0].features[1].supported_options).to.deep.equal([
+      { value: 0, label: 'Off', sort_order: 0 },
+      { value: 1, label: 'On', sort_order: 1 },
+      { value: 2, label: 'Auto', sort_order: 2 },
+    ]);
+  });
+
+  it('should reject the vendor strings as light operating mode options', async () => {
+    // the mode is a standard enum, not a text/select: 'auto' must be mapped to AUTO (2)
+    const device = buildDiscoveredDevice(service.selector);
+    device.features.push(floodlightMode([{ value: 'auto', label: 'Auto' }]));
+    await expectBadParameters([device], 'features[1].supported_options');
   });
 
   it('should reject invalid supported_options', async () => {
