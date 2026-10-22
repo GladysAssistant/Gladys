@@ -6253,6 +6253,18 @@
           "0": "Bereit",
           "1": "Heizt"
         }
+      },
+      "airquality-sensor": {
+        "level": {
+          "0": "Unbekannt",
+          "1": "Gut",
+          "2": "Akzeptabel",
+          "3": "Mäßig",
+          "4": "Schlecht",
+          "5": "Sehr schlecht",
+          "6": "Extrem schlecht",
+          "unknown": "{{value}} (unbekannt)"
+        }
       }
     }
   },
@@ -6787,7 +6799,8 @@
     },
     "airquality-sensor": {
       "shortCategoryName": "Luftqualität",
-      "aqi": "Luftqualitätsindex"
+      "aqi": "Luftqualitätsindex",
+      "level": "Luftqualitätsstufe"
     },
     "ph-sensor": {
       "shortCategoryName": "pH-Sensor",

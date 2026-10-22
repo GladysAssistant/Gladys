@@ -28,6 +28,7 @@ import ChargingStationChargingStateDeviceValue from './ChargingStationChargingSt
 import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
 import SmokeSensorContaminationDeviceValue from './SmokeSensorContaminationDeviceValue';
 import SmokeSensorMutedDeviceValue from './SmokeSensorMutedDeviceValue';
+import AirQualityLevelDeviceValue from './AirQualityLevelDeviceValue';
 
 // Checked before the category map: a category whose renderer only makes sense for one of its
 // types needs an escape hatch. presence-sensor is historically a "push" category rendered as a
@@ -35,6 +36,10 @@ import SmokeSensorMutedDeviceValue from './SmokeSensorMutedDeviceValue';
 const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
+  },
+  // the category's index keeps the numeric badge, its level is a word
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL]: AirQualityLevelDeviceValue
   }
 };
 

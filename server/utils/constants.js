@@ -333,6 +333,22 @@ const WATER_HEATER_MODE = {
   PROGRAM: 6, // follows the schedule stored in the appliance
 };
 
+// Overall air quality as a named level, AIRQUALITY_SENSOR.LEVEL. Values and order are
+// Matter's AirQualityEnum (Air Quality cluster), so the Matter mapping is one to one; a sensor
+// with fewer levels maps each of its own onto the closest one (e.g. a 5-level indoor monitor
+// uses GOOD to VERY_POOR). UNKNOWN is a reported value (the sensor is warming up, or cannot
+// tell), not an absence of value: it stays part of the value range so scenes can match it, and
+// a 0 in history charts reads as "no verdict", not as the best air on the scale.
+const AIR_QUALITY_LEVEL = {
+  UNKNOWN: 0,
+  GOOD: 1,
+  FAIR: 2,
+  MODERATE: 3,
+  POOR: 4,
+  VERY_POOR: 5,
+  EXTREMELY_POOR: 6,
+};
+
 const LEVEL_MATTER_STATE = {
   LOW: 1,
   MEDIUM: 2,
@@ -1417,7 +1433,15 @@ const DEVICE_FEATURE_TYPES = {
     PRESET: 'preset', // which temperature to aim for, THERMOSTAT_PRESET (command)
   },
   AIRQUALITY_SENSOR: {
+    // A numeric air quality index (unit AQI), the scale the dashboard colours and the
+    // HomeKit bridge read as the US EPA one (0-500).
     AQI: 'aqi',
+    // The overall air quality as a named level, AIR_QUALITY_LEVEL (integer - sensor): what
+    // Matter's Air Quality cluster reports, and what indoor monitors show as words rather than
+    // a number. Both types describe the same measurement: an integration publishes the form its
+    // device natively reports — an index, or a level — never both, and never a level converted
+    // into a made-up index value.
+    LEVEL: 'level',
   },
   PH_SENSOR: {
     DECIMAL: 'decimal',
@@ -1995,6 +2019,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: [],
     [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: [],
     [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: [],
+  },
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: {
+    // The category unit is the AQI, but a level is an enum and carries no unit.
+    [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL]: [],
   },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
     // The whole BATTERY category is a percent (the charge level), but a charging flag is a
@@ -2689,3 +2717,4 @@ module.exports.TARIFF_CALENDAR_GRANULARITIES = TARIFF_CALENDAR_GRANULARITIES;
 module.exports.TARIFF_CALENDAR_GRANULARITIES_LIST = TARIFF_CALENDAR_GRANULARITIES_LIST;
 
 module.exports.LEVEL_MATTER_STATE = LEVEL_MATTER_STATE;
+module.exports.AIR_QUALITY_LEVEL = AIR_QUALITY_LEVEL;
