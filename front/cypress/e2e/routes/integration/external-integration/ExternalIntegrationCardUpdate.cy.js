@@ -53,11 +53,19 @@ describe('External integration - update from the catalog card', () => {
     cy.visit('/dashboard/integration/installed');
     cy.wait('@getInstalled');
 
+    // the reload that follows the update answers late: the card must not offer
+    // the update again in between
+    cy.intercept('GET', '**/api/v1/external_integration', req =>
+      req.reply({ delay: 1000, body: [{ ...DAIKIN, version: '1.0.0', update_available: false }, LINKY] })
+    ).as('getInstalledAfterUpdate');
     getCard('Daikin Onecta').within(() => {
       cy.contains('button', 'integration.root.updateButton').click();
     });
     cy.wait('@updateDaikin');
-    cy.wait('@getInstalled');
+    getCard('Daikin Onecta')
+      .find('button.btn-loading')
+      .should('be.disabled');
+    cy.wait('@getInstalledAfterUpdate');
 
     getCard('Daikin Onecta').within(() => {
       // interpolated sentence: the version it carries is what is checked
@@ -94,6 +102,7 @@ describe('External integration - update from the catalog card', () => {
       cy.contains('button', 'integration.root.updateButton').click();
     });
     cy.wait('@updateDaikin');
+    cy.wait('@getInstalled');
     getCard('Daikin Onecta')
       .find('.text-success')
       .should('contain', 'v1.0.0');

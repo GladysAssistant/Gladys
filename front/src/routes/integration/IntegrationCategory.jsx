@@ -101,8 +101,14 @@ const UpdateFooter = ({ integration, updateIntegration, bordered }) => {
   if (!updateIntegration || !integration.selector || !(integration.updateAvailable || updateState)) {
     return null;
   }
-  // a version published after this update brings the button back
-  const succeeded = !!updateState && updateState.status === RequestStatus.Success && !integration.updateAvailable;
+  // only a version newer than the one just installed brings the button back:
+  // a list that could not be reloaded still carries the flag of the update
+  // that just ran
+  const newerVersionOffered =
+    integration.updateAvailable &&
+    !!integration.latestVersion &&
+    integration.latestVersion !== (updateState || {}).version;
+  const succeeded = !!updateState && updateState.status === RequestStatus.Success && !newerVersionOffered;
   const updating = !!updateState && updateState.status === RequestStatus.Getting;
   const failed = !!updateState && updateState.status === RequestStatus.Error;
   return (

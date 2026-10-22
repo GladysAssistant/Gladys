@@ -632,10 +632,11 @@ class Integration extends Component {
     await this.setUpdateState(selector, { status: RequestStatus.Getting });
     try {
       const integration = await this.props.httpClient.post(`/api/v1/external_integration/${selector}/update`);
-      await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
       // the reload clears the update flag of this card and feeds the header
-      // counter with the new count
+      // counter with the new count. The spinner stays up until it has landed:
+      // with the flag still set, the card would offer the update again
       await this.loadExternalIntegrations();
+      await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
     } catch (e) {
       console.error(e);
       await this.setUpdateState(selector, { status: RequestStatus.Error });
