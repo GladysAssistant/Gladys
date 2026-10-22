@@ -945,6 +945,8 @@
         "windowOpenCooling": "Window open — cooling suspended",
         "pilotWireHeating": "Heating",
         "pilotWireStandby": "Standby: setpoint reached",
+        "pilotWireOrderCurrent": "Order: {{order}}",
+        "pilotWireOrderPending": "Sending the {{order}} order…",
         "a11ySetpoint": "Setpoint",
         "a11yCurrentTemp": "Current temperature",
         "a11yHumidity": "Humidity",

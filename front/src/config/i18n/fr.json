@@ -797,6 +797,8 @@
         "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",
         "pilotWireHeating": "Chauffe en cours",
         "pilotWireStandby": "En veille : consigne atteinte",
+        "pilotWireOrderCurrent": "Ordre : {{order}}",
+        "pilotWireOrderPending": "Envoi de l’ordre {{order}}…",
         "a11ySetpoint": "Consigne",
         "a11yCurrentTemp": "Température mesurée",
         "a11yHumidity": "Humidité",

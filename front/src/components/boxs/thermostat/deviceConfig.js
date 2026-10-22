@@ -6,6 +6,13 @@ const PARAM_FIELDS = [
   ['humidity_feature', 'THERMOSTAT_HUMIDITY_FEATURE'],
   ['switch_feature', 'THERMOSTAT_SWITCH_FEATURE'],
   ['pilot_wire_feature', 'THERMOSTAT_PILOT_WIRE_FEATURE'],
+  // The order each preset sends a pilot-wire heater regulating itself: the
+  // widget compares it with the order the module confirms.
+  ['pilot_wire_order_frost', 'THERMOSTAT_PILOT_WIRE_ORDER_FROST', v => parseInt(v, 10)],
+  ['pilot_wire_order_away', 'THERMOSTAT_PILOT_WIRE_ORDER_AWAY', v => parseInt(v, 10)],
+  ['pilot_wire_order_eco', 'THERMOSTAT_PILOT_WIRE_ORDER_ECO', v => parseInt(v, 10)],
+  ['pilot_wire_order_night', 'THERMOSTAT_PILOT_WIRE_ORDER_NIGHT', v => parseInt(v, 10)],
+  ['pilot_wire_order_comfort', 'THERMOSTAT_PILOT_WIRE_ORDER_COMFORT', v => parseInt(v, 10)],
   // External thermostats: the real device regulates itself, and these point at
   // features owned by another integration (Netatmo, Zigbee, Matter, MQTT...).
   ['thermostat_type', 'THERMOSTAT_TYPE'],

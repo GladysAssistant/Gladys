@@ -14,7 +14,8 @@ import {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
-  DEFAULT_HYSTERESIS_START
+  DEFAULT_HYSTERESIS_START,
+  DEFAULT_PILOT_WIRE_ORDERS
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -61,6 +62,16 @@ const PILOT_WIRE_ORDER_KEYS = {
   [PILOT_WIRE_MODE.ECO]: 'eco',
   [PILOT_WIRE_MODE.COMFORT_2]: 'comfort_-2',
   [PILOT_WIRE_MODE.COMFORT_1]: 'comfort_-1',
+  [PILOT_WIRE_MODE.COMFORT]: 'comfort'
+};
+// The preset whose colour and icon an order takes on the card. The derived
+// comforts are comfort chosen on the heater, and look like it.
+const PRESET_OF_PILOT_WIRE_ORDER = {
+  [PILOT_WIRE_MODE.OFF]: 'off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost',
+  [PILOT_WIRE_MODE.ECO]: 'eco',
+  [PILOT_WIRE_MODE.COMFORT_2]: 'comfort',
+  [PILOT_WIRE_MODE.COMFORT_1]: 'comfort',
   [PILOT_WIRE_MODE.COMFORT]: 'comfort'
 };
 // Sentinel: hold every incoming setpoint, whatever its value
@@ -1416,7 +1427,8 @@ class ThermostatBox extends Component {
     // A pilot-wire heater regulating on its own setpoint: nothing tells whether
     // it heats, and estimating from Gladys's setpoint would light a flame on a
     // decision Gladys does not make. There is no setpoint to turn either: the
-    // gauge shows the order the heater carries in its place, and the presets
+    // gauge shows the room temperature in its place, ringed in the colour of the
+    // order the module confirms, a banner names that order, and the presets
     // below are the only control.
     const heaterRegulated = this.isHeaterRegulated();
     const orderLabels =
@@ -1425,11 +1437,31 @@ class ThermostatBox extends Component {
         props.intl.dictionary.deviceFeatureAction &&
         props.intl.dictionary.deviceFeatureAction.category.heater['pilot-wire-mode']) ||
       {};
-    const orderLabel = orderLabels[PILOT_WIRE_ORDER_KEYS[pilotWireOrder]] || '—';
-    // The ring and the order take the lit preset's colour, as its button does —
-    // through the dark theme's inversion too, as the button's pill does.
-    const presetColor = heaterRegulated && isStartPreset(activePreset) ? this.getPresetColor(activePreset) : null;
-    const orderColor = presetColor && this.isDarkTheme() ? counterDarkModeInvert(presetColor) : presetColor;
+    const orderLabel = order => orderLabels[PILOT_WIRE_ORDER_KEYS[order]] || '—';
+    const confirmedPreset = heaterRegulated ? PRESET_OF_PILOT_WIRE_ORDER[pilotWireOrder] : undefined;
+    // The ring takes that order's colour — through the dark theme's inversion
+    // too, as the preset buttons' pills do.
+    const confirmedColor = confirmedPreset ? this.getPresetColor(confirmedPreset) : null;
+    const ringColor = confirmedColor && this.isDarkTheme() ? counterDarkModeInvert(confirmedColor) : confirmedColor;
+    // The order the module should carry, from what the card shows: off when
+    // stopped or with the window open, otherwise the order the lit preset is set
+    // to. A setpoint turned by a scene names no preset, and is not second-guessed.
+    let expectedOrder = null;
+    if (heaterRegulated && (isWindowOpen || mode === 'off')) {
+      expectedOrder = PILOT_WIRE_MODE.OFF;
+    } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
+      const configured = cfg[`pilot_wire_order_${activePreset}`];
+      expectedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
+    }
+    // Until the module confirms it — a few seconds on Z-Wave — the banner says
+    // the order is on its way rather than showing a ring and a preset that
+    // disagree. A derived comfort the heater keeps is comfort, as the server
+    // holds it.
+    const derivedComfort =
+      expectedOrder === PILOT_WIRE_MODE.COMFORT &&
+      (pilotWireOrder === PILOT_WIRE_MODE.COMFORT_1 || pilotWireOrder === PILOT_WIRE_MODE.COMFORT_2);
+    const orderPending =
+      expectedOrder !== null && pilotWireOrder !== null && pilotWireOrder !== expectedOrder && !derivedComfort;
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
     // When Gladys regulates a pilot-wire heater, the module only ever carries
@@ -1491,12 +1523,45 @@ class ThermostatBox extends Component {
                     isActive={showActive}
                     isWindowOpen={isWindowOpen}
                     tempUnit={tempUnit}
-                    centerLabel={heaterRegulated ? orderLabel : null}
-                    centerColor={orderColor}
+                    readOnly={heaterRegulated}
+                    ringColor={ringColor}
                     a11yLabels={a11yLabels}
                   />
                 </div>
               </div>
+
+              {/* The order a pilot-wire heater regulating itself carries, drawn
+                  like the card's other banners in that order's colour and icon;
+                  greyed while one is on its way. */}
+              {confirmedPreset && (
+                <div
+                  class={style.scheduleBanner}
+                  style={`--banner-color:${orderPending ? this.getPresetColor('off') : confirmedColor}`}
+                >
+                  <i
+                    class={`fe ${
+                      orderPending
+                        ? 'fe-loader'
+                        : confirmedPreset === 'comfort'
+                        ? COMFORT_ICON.heating
+                        : PRESET_ICONS[confirmedPreset]
+                    } ${style.scheduleBannerIcon}`}
+                  />
+                  <span class={style.scheduleBannerText}>
+                    {orderPending ? (
+                      <Text
+                        id="dashboard.boxes.thermostat.pilotWireOrderPending"
+                        fields={{ order: orderLabel(expectedOrder) }}
+                      />
+                    ) : (
+                      <Text
+                        id="dashboard.boxes.thermostat.pilotWireOrderCurrent"
+                        fields={{ order: orderLabel(pilotWireOrder) }}
+                      />
+                    )}
+                  </span>
+                </div>
+              )}
 
               {/* Drawn like the card's other banners. Heating carries comfort's
                   flame and colour, the order the module then carries; standby
