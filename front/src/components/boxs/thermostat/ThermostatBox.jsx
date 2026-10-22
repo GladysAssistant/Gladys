@@ -18,7 +18,11 @@ import {
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
-import { getPresetColor as presetColorForMode, readableTextOn } from '../../../utils/thermostatPresetColors';
+import {
+  getPresetColor as presetColorForMode,
+  readableTextOn,
+  counterDarkModeInvert
+} from '../../../utils/thermostatPresetColors';
 import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
 import { loadDeviceConfig } from './deviceConfig';
@@ -421,6 +425,10 @@ class ThermostatBox extends Component {
 
   // Comfort is amber when heating and blue when cooling, like the arc and the
   // preset icon: an air conditioner labelled in the colour of heat reads wrong.
+  isDarkTheme = () =>
+    (typeof document !== 'undefined' && document.documentElement.classList.contains('dark-mode')) ||
+    Boolean(this.props.darkMode);
+
   getPresetColor = presetKey => {
     const cfg = this.getConfig();
     return presetColorForMode(presetKey, cfg.default_mode);
@@ -1418,8 +1426,10 @@ class ThermostatBox extends Component {
         props.intl.dictionary.deviceFeatureAction.category.heater['pilot-wire-mode']) ||
       {};
     const orderLabel = orderLabels[PILOT_WIRE_ORDER_KEYS[pilotWireOrder]] || '—';
-    // The ring and the order take the lit preset's colour, as its button does.
-    const orderColor = heaterRegulated && isStartPreset(activePreset) ? this.getPresetColor(activePreset) : null;
+    // The ring and the order take the lit preset's colour, as its button does —
+    // through the dark theme's inversion too, as the button's pill does.
+    const presetColor = heaterRegulated && isStartPreset(activePreset) ? this.getPresetColor(activePreset) : null;
+    const orderColor = presetColor && this.isDarkTheme() ? counterDarkModeInvert(presetColor) : presetColor;
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
     // When Gladys regulates a pilot-wire heater, the module only ever carries
@@ -1752,4 +1762,4 @@ class ThermostatBox extends Component {
   }
 }
 
-export default connect('httpClient,session,user', {})(withIntlAsProp(ThermostatBox));
+export default connect('httpClient,session,user,darkMode', {})(withIntlAsProp(ThermostatBox));
