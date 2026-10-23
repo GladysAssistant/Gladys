@@ -73,6 +73,8 @@ async function integrationConnected(service, ws) {
     pingInterval.unref();
   }
   ws.integrationPingInterval = pingInterval;
+  // the designated device features whose new states are pushed to it
+  await this.refreshDeviceFeatureGrant(service);
   await db.Service.update({ last_heartbeat: new Date() }, { where: { id: service.id } });
   await this.setRunning(service);
 }

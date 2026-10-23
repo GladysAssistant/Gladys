@@ -100,6 +100,43 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {get} /api/integration/v1/device_feature/state getDeviceFeatureStates
+   * @apiName getDeviceFeatureStates
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Current state of device features of other integrations
+   * that the user designated for this one (capabilities/device-feature-
+   * read.md). Requires `device_features_read: true`; 403 for any selector
+   * the user did not designate.
+   * @apiParam {string} selectors Comma-separated device feature selectors.
+   */
+  async function getDeviceFeatureStates(req, res) {
+    const states = await gladys.externalIntegration.getDesignatedDeviceFeatureStates(
+      req.externalIntegrationService,
+      req.query.selectors,
+    );
+    res.json(states);
+  }
+
+  /**
+   * @api {get} /api/integration/v1/device_feature/aggregate getDeviceFeatureAggregates
+   * @apiName getDeviceFeatureAggregates
+   * @apiGroup IntegrationHostApi
+   * @apiDescription History of one designated device feature, aggregated by
+   * 30m, 1h or 1d buckets (capabilities/device-feature-read.md).
+   * @apiParam {string} selector Device feature selector.
+   * @apiParam {string} from ISO 8601 start (inclusive).
+   * @apiParam {string} to ISO 8601 end (exclusive).
+   * @apiParam {string} interval 30m, 1h or 1d.
+   */
+  async function getDeviceFeatureAggregates(req, res) {
+    const aggregates = await gladys.externalIntegration.getDesignatedDeviceFeatureAggregates(
+      req.externalIntegrationService,
+      req.query,
+    );
+    res.json(aggregates);
+  }
+
+  /**
    * @api {post} /api/integration/v1/state publishStates
    * @apiName publishStates
    * @apiGroup IntegrationHostApi
@@ -501,6 +538,8 @@ module.exports = function IntegrationHostController(gladys) {
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
     getDevices: asyncMiddleware(getDevices),
     getHouses: asyncMiddleware(getHouses),
+    getDeviceFeatureStates: asyncMiddleware(getDeviceFeatureStates),
+    getDeviceFeatureAggregates: asyncMiddleware(getDeviceFeatureAggregates),
     publishStates: asyncMiddleware(publishStates),
     publishSceneEvent: asyncMiddleware(publishSceneEvent),
     getConfig: asyncMiddleware(getConfig),

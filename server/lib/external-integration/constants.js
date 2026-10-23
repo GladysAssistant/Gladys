@@ -384,8 +384,49 @@ const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
 // known at runtime. "devices": the already-created devices of the integration
 // (label = device name, value = external_id), scoped to its t_service.
 // "houses": the houses of Gladys (label = house name, value = selector, the
-// identifier GET /house returns).
-const DYNAMIC_SOURCES = ['devices', 'houses'];
+// identifier GET /house returns). "device_features": device features of
+// ANY integration the user designates for this one (label = device and
+// feature names, value = feature selector), config_schema only, behind the
+// `device_features_read: true` manifest gate
+// (capabilities/device-feature-read.md).
+const DYNAMIC_SOURCES = ['devices', 'houses', 'device_features'];
+// Designated device features (capabilities/device-feature-read.md): the
+// REQUIRED `feature_filters` of a `source: "device_features"` field narrow
+// the picker to some categories/types, a multi_select designates at most
+// MAX_DEVICE_FEATURE_SELECTIONS features.
+const DEVICE_FEATURES_SOURCE = 'device_features';
+const MAX_FEATURE_FILTERS = 20;
+const FEATURE_FILTER_FIELDS = ['category', 'type'];
+const MAX_DEVICE_FEATURE_SELECTIONS = 20;
+// Never designatable, whatever the filters: a camera image is a JPEG frame
+// that every other serving path withholds in private mode and expires after
+// an hour (docs/specs/camera-enable-disable.md), it must not leak through a
+// designation into a container with open egress.
+const DEVICE_FEATURES_EXCLUDED_CATEGORIES = ['camera'];
+const DEVICE_FEATURES_EXCLUDED_TYPES = ['image'];
+// A text state above this size (in UTF-8 bytes) is never handed over, by
+// GET /device_feature/state nor by the push: `last_value_string` is null.
+// The read capability serves meter-like values, not payloads.
+const MAX_DEVICE_FEATURE_STRING_VALUE_BYTES = 1024;
+// The designations the USER saved from the Configuration screen, by field
+// key: a core-owned record (GLADYS_* keys are read-only for the integration,
+// and never returned by GET /config), the only scope of the read endpoints.
+// The config value alone cannot be trusted as a user choice: a key that was
+// free storage of the integration in an older manifest may become a
+// `device_features` field in a newer one.
+const DEVICE_FEATURES_GRANT_KEY = 'GLADYS_DEVICE_FEATURES_GRANT';
+// GET /device_feature/state and GET /device_feature/aggregate: bounds and
+// fixed one-minute window rate limits per integration (the push event is the
+// low-latency path, polling stays an occasional resync)
+const MAX_DEVICE_FEATURE_STATE_SELECTORS = 50;
+const MAX_DEVICE_FEATURE_STATE_READS_PER_MINUTE = 120;
+const MAX_DEVICE_FEATURE_AGGREGATE_READS_PER_MINUTE = 30;
+const DEVICE_FEATURE_AGGREGATE_INTERVALS = {
+  '30m': { sql: '30 minutes', ms: 30 * 60 * 1000 },
+  '1h': { sql: '1 hour', ms: 60 * 60 * 1000 },
+  '1d': { sql: '1 day', ms: 24 * 60 * 60 * 1000 },
+};
+const MAX_DEVICE_FEATURE_AGGREGATE_BUCKETS = 2000;
 // Optional `categories` manifest field: browse categories of the integration
 // catalog (docs/specs/integration-catalog-categories.md). More than 3 means
 // the assignment is lazy, not the vocabulary too narrow.
@@ -735,6 +776,19 @@ module.exports = {
   PREFER_LOCAL_CONFIG_KEY,
   ACCOUNT_FIELD_TYPES,
   DYNAMIC_SOURCES,
+  DEVICE_FEATURES_SOURCE,
+  MAX_FEATURE_FILTERS,
+  FEATURE_FILTER_FIELDS,
+  MAX_DEVICE_FEATURE_SELECTIONS,
+  DEVICE_FEATURES_EXCLUDED_CATEGORIES,
+  DEVICE_FEATURES_EXCLUDED_TYPES,
+  MAX_DEVICE_FEATURE_STRING_VALUE_BYTES,
+  DEVICE_FEATURES_GRANT_KEY,
+  MAX_DEVICE_FEATURE_STATE_SELECTORS,
+  MAX_DEVICE_FEATURE_STATE_READS_PER_MINUTE,
+  MAX_DEVICE_FEATURE_AGGREGATE_READS_PER_MINUTE,
+  DEVICE_FEATURE_AGGREGATE_INTERVALS,
+  MAX_DEVICE_FEATURE_AGGREGATE_BUCKETS,
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,

@@ -2,7 +2,11 @@ const semver = require('semver');
 
 const logger = require('../../utils/logger');
 const { Error422 } = require('../../utils/httpErrors');
-const { INTEGRATION_CATALOG_CATEGORIES } = require('../../utils/constants');
+const {
+  INTEGRATION_CATALOG_CATEGORIES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+} = require('../../utils/constants');
 const {
   SUPPORTED_MANIFEST_VERSION,
   MAX_SUB_CONTAINERS,
@@ -31,6 +35,11 @@ const {
   WEBHOOK_MODES,
   ACCOUNT_FIELD_TYPES,
   DYNAMIC_SOURCES,
+  DEVICE_FEATURES_SOURCE,
+  MAX_FEATURE_FILTERS,
+  FEATURE_FILTER_FIELDS,
+  DEVICE_FEATURES_EXCLUDED_CATEGORIES,
+  DEVICE_FEATURES_EXCLUDED_TYPES,
   MAX_WIDGETS,
   WIDGET_KEY_REGEX,
   WIDGET_LABEL_MIN_LENGTH,
@@ -76,6 +85,7 @@ const MANIFEST_FIELDS = [
   'containers',
   'location',
   'network_wake',
+  'device_features_read',
   'network_discovery',
   'actions',
   'transports',
@@ -191,6 +201,7 @@ const CONFIG_FIELD_FIELDS = [
   'max',
   'options',
   'source',
+  'feature_filters',
   'display',
   'links',
 ];
@@ -199,6 +210,16 @@ const PLACEHOLDER_FIELD_TYPES = ['string', 'number', 'secret'];
 const OPTION_FIELDS = ['value', 'label'];
 const LANGUAGE_KEY_REGEX = /^[a-z]{2}(-[A-Z]{2})?$/;
 const CONFIG_KEY_REGEX = /^[a-z0-9_]+$/;
+// `feature_filters` entries name a category / type of the device feature
+// taxonomy: the shape is checked here (and by the canonical schema), the
+// vocabulary only warns — an entry naming a category this core does not know
+// yet simply matches no feature, so a manifest written against a newer
+// taxonomy still installs (capabilities/device-feature-read.md)
+const FEATURE_FILTER_VALUE_REGEX = /^[a-z0-9-]+$/;
+const KNOWN_FEATURE_CATEGORIES = new Set(Object.values(DEVICE_FEATURE_CATEGORIES));
+const KNOWN_FEATURE_TYPES = new Set(
+  Object.values(DEVICE_FEATURE_TYPES).reduce((types, categoryTypes) => types.concat(Object.values(categoryTypes)), []),
+);
 
 // Grammar from the OCI distribution reference specification, restricted to a
 // well-formed name with an EXPLICIT tag or digest (same as the indexer — an
@@ -380,6 +401,52 @@ function rejectPerUserSchemaPortPlaceholders(value, path, errors, schemaLabel) {
 }
 
 /**
+ * @description Validate the required `feature_filters` of a `source:
+ * "device_features"` field: 1-20 `{ category, type? }` entries narrowing the
+ * picker, never a camera image. Unknown vocabulary is only logged (see
+ * FEATURE_FILTER_VALUE_REGEX).
+ * @param {any} filters - The declared filters.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateFeatureFilters([{ category: 'energy-sensor', type: 'power' }], 'config_schema[0]', errors);
+ */
+function validateFeatureFilters(filters, path, errors) {
+  if (!Array.isArray(filters) || filters.length === 0 || filters.length > MAX_FEATURE_FILTERS) {
+    errors.push(`${path}.feature_filters: must be a list of 1-${MAX_FEATURE_FILTERS} filters`);
+    return;
+  }
+  filters.forEach((filter, filterIndex) => {
+    const filterPath = `${path}.feature_filters[${filterIndex}]`;
+    if (filter === null || typeof filter !== 'object' || Array.isArray(filter)) {
+      errors.push(`${filterPath}: must be an object`);
+      return;
+    }
+    Object.keys(filter).forEach((key) => {
+      if (!FEATURE_FILTER_FIELDS.includes(key)) {
+        errors.push(`${filterPath}.${key}: unknown field`);
+      }
+    });
+    if (typeof filter.category !== 'string' || !FEATURE_FILTER_VALUE_REGEX.test(filter.category)) {
+      errors.push(`${filterPath}.category: must be a non-empty string matching [a-z0-9-]`);
+    } else if (DEVICE_FEATURES_EXCLUDED_CATEGORIES.includes(filter.category)) {
+      errors.push(`${filterPath}.category: ${filter.category} features can never be designated`);
+    } else if (!KNOWN_FEATURE_CATEGORIES.has(filter.category)) {
+      logger.warn(`validateManifest: ${filterPath}.category "${filter.category}" is unknown, it matches no feature`);
+    }
+    if (filter.type !== undefined) {
+      if (typeof filter.type !== 'string' || !FEATURE_FILTER_VALUE_REGEX.test(filter.type)) {
+        errors.push(`${filterPath}.type: must be a non-empty string matching [a-z0-9-]`);
+      } else if (DEVICE_FEATURES_EXCLUDED_TYPES.includes(filter.type)) {
+        errors.push(`${filterPath}.type: ${filter.type} features can never be designated`);
+      } else if (!KNOWN_FEATURE_TYPES.has(filter.type)) {
+        logger.warn(`validateManifest: ${filterPath}.type "${filter.type}" is unknown, it matches no feature`);
+      }
+    }
+  });
+}
+
+/**
  * @description Validate one entry of the config_schema flat list.
  * @param {object} field - The field to validate.
  * @param {number} index - Index of the field in the list.
@@ -496,6 +563,11 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
       errors.push(`${path}.source: only allowed on select and multi_select fields`);
     } else if (!DYNAMIC_SOURCES.includes(field.source)) {
       errors.push(`${path}.source: must be one of ${DYNAMIC_SOURCES.join(', ')}`);
+    } else if (field.source === DEVICE_FEATURES_SOURCE && basePath !== 'config_schema') {
+      // the read scope is what the user saved in the integration config: a
+      // designation made anywhere else (an action run, a widget, a scene)
+      // would reach the integration without ever granting anything
+      errors.push(`${path}.source: ${DEVICE_FEATURES_SOURCE} is only allowed in the config_schema`);
     }
     if (field.options !== undefined) {
       errors.push(`${path}.options: mutually exclusive with source`);
@@ -522,6 +594,13 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
     }
   } else if (field.options !== undefined) {
     errors.push(`${path}.options: only allowed on select and multi_select fields`);
+  }
+  if (field.source === DEVICE_FEATURES_SOURCE) {
+    // required: a picker of every feature of the instance (locks, presence,
+    // text...) is exactly what this contract refuses
+    validateFeatureFilters(field.feature_filters, path, errors);
+  } else if (field.feature_filters !== undefined) {
+    errors.push(`${path}.feature_filters: only allowed with source ${DEVICE_FEATURES_SOURCE}`);
   }
 }
 
@@ -1162,6 +1241,18 @@ function validateManifest(manifest) {
   }
   if (manifest.network_wake !== undefined && typeof manifest.network_wake !== 'boolean') {
     errors.push('network_wake: must be a boolean');
+  }
+  if (manifest.device_features_read !== undefined && typeof manifest.device_features_read !== 'boolean') {
+    errors.push('device_features_read: must be a boolean');
+  }
+  if (Array.isArray(manifest.config_schema) && manifest.device_features_read !== true) {
+    // designating other integrations' features is the authorization
+    // contract shown on the install screen: no picker without it
+    manifest.config_schema.forEach((field, index) => {
+      if (field && field.source === DEVICE_FEATURES_SOURCE) {
+        errors.push(`config_schema[${index}].source: ${DEVICE_FEATURES_SOURCE} requires device_features_read: true`);
+      }
+    });
   }
   if (manifest.network_discovery !== undefined) {
     if (
