@@ -1987,6 +1987,7 @@
         "usagePointName": "Meter",
         "lastRefresh": "Latest data :",
         "usagePointId": "Meter ID",
+        "usagePointDeviceName": "Name",
         "contractType": "Contract type",
         "contracts": {
           "hc-hp": "Off-peak/peak hours",
