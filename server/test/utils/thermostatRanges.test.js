@@ -1,6 +1,11 @@
 const { expect } = require('chai');
 
-const { transitionsToRanges, rangesToTransitions } = require('../../utils/thermostatRanges');
+const {
+  transitionsToRanges,
+  rangesToTransitions,
+  isAllDayRange,
+  mergeTouchingRanges,
+} = require('../../utils/thermostatRanges');
 
 describe('thermostatRanges: ranges to transitions', () => {
   it('should close a lone range with a stop', () => {
@@ -273,5 +278,123 @@ describe('thermostatRanges: round trip', () => {
     const twice = rangesToTransitions(transitionsToRanges(once));
 
     expect(twice).to.deep.equal(once);
+  });
+});
+
+describe('thermostatRanges: all day', () => {
+  it('should store a whole Monday as one point and its stop', () => {
+    // 00:00 → 00:00 reads as crossing midnight, and once got a stop at Monday
+    // 00:00 as well as its own point there: two points on one minute, which the
+    // unique index refuses.
+    const transitions = rangesToTransitions([
+      { day_of_week: 0, start_time: '00:00', end_time: '00:00', preset: 'frost' },
+    ]);
+
+    expect(transitions).to.deep.equal([
+      { day_of_week: 0, time: '00:00', preset: 'frost' },
+      { day_of_week: 1, time: '00:00', preset: 'off' },
+    ]);
+  });
+
+  it('should store a whole Wednesday between two stops', () => {
+    const transitions = rangesToTransitions([
+      { day_of_week: 2, start_time: '00:00', end_time: '00:00', preset: 'comfort' },
+    ]);
+
+    expect(transitions).to.deep.equal([
+      { day_of_week: 0, time: '00:00', preset: 'off' },
+      { day_of_week: 2, time: '00:00', preset: 'comfort' },
+      { day_of_week: 3, time: '00:00', preset: 'off' },
+    ]);
+  });
+
+  it('should tell a whole day from any other range', () => {
+    expect(isAllDayRange({ start_time: '00:00', end_time: '00:00' })).to.equal(true);
+    expect(isAllDayRange({ start_time: '00:00', end_time: '23:59' })).to.equal(false);
+    // 24 hours too, but from 08:00 to the next morning: not "the day".
+    expect(isAllDayRange({ start_time: '08:00', end_time: '08:00' })).to.equal(false);
+    expect(isAllDayRange(null)).to.equal(false);
+  });
+
+  it('should keep a whole weekend through a save and a reload', () => {
+    const ranges = [
+      { day_of_week: 5, start_time: '00:00', end_time: '00:00', preset: 'frost' },
+      { day_of_week: 6, start_time: '00:00', end_time: '00:00', preset: 'frost' },
+    ];
+
+    const back = mergeTouchingRanges(transitionsToRanges(rangesToTransitions(mergeTouchingRanges(ranges)))).filter(
+      (range) => range.preset !== 'off',
+    );
+
+    expect(back).to.have.lengthOf(2);
+    expect(back[0]).to.include({ day_of_week: 5, start_time: '00:00', end_time: '00:00' });
+    expect(back[1]).to.include({ day_of_week: 6, start_time: '00:00', end_time: '00:00' });
+  });
+});
+
+describe('thermostatRanges: merging touching ranges', () => {
+  it('should merge two ranges of the same preset that meet', () => {
+    const merged = mergeTouchingRanges([
+      { day_of_week: 0, start_time: '09:00', end_time: '12:00', preset: 'comfort' },
+      { day_of_week: 0, start_time: '06:00', end_time: '09:00', preset: 'comfort' },
+    ]);
+
+    expect(merged).to.deep.equal([{ day_of_week: 0, start_time: '06:00', end_time: '12:00', preset: 'comfort' }]);
+  });
+
+  it('should not merge two presets', () => {
+    const ranges = [
+      { day_of_week: 0, start_time: '06:00', end_time: '09:00', preset: 'comfort' },
+      { day_of_week: 0, start_time: '09:00', end_time: '12:00', preset: 'eco' },
+    ];
+
+    expect(mergeTouchingRanges(ranges)).to.deep.equal(ranges);
+  });
+
+  it('should follow a night into the next morning', () => {
+    const merged = mergeTouchingRanges([
+      { day_of_week: 0, start_time: '22:00', end_time: '00:00', preset: 'night' },
+      { day_of_week: 1, start_time: '00:00', end_time: '06:00', preset: 'night' },
+    ]);
+
+    expect(merged).to.deep.equal([{ day_of_week: 0, start_time: '22:00', end_time: '06:00', preset: 'night' }]);
+  });
+
+  it('should merge Sunday night into Monday morning', () => {
+    const merged = mergeTouchingRanges([
+      { day_of_week: 0, start_time: '00:00', end_time: '06:00', preset: 'night' },
+      { day_of_week: 6, start_time: '22:00', end_time: '00:00', preset: 'night' },
+    ]);
+
+    expect(merged).to.deep.equal([{ day_of_week: 6, start_time: '22:00', end_time: '06:00', preset: 'night' }]);
+  });
+
+  it('should not merge past 24 hours', () => {
+    // Merged, Monday 08:00 → Tuesday 20:00 could only be written 08:00 → 20:00,
+    // and the whole of Tuesday was lost on save.
+    const ranges = [
+      { day_of_week: 0, start_time: '08:00', end_time: '00:00', preset: 'comfort' },
+      { day_of_week: 1, start_time: '00:00', end_time: '20:00', preset: 'comfort' },
+    ];
+
+    expect(mergeTouchingRanges(ranges)).to.deep.equal(ranges);
+  });
+
+  it('should not merge two whole days, Sunday into Monday included', () => {
+    const ranges = [
+      { day_of_week: 0, start_time: '00:00', end_time: '00:00', preset: 'frost' },
+      { day_of_week: 6, start_time: '00:00', end_time: '00:00', preset: 'frost' },
+    ];
+
+    expect(mergeTouchingRanges(ranges)).to.deep.equal(ranges);
+  });
+
+  it('should merge up to exactly 24 hours', () => {
+    const merged = mergeTouchingRanges([
+      { day_of_week: 0, start_time: '20:00', end_time: '00:00', preset: 'comfort' },
+      { day_of_week: 1, start_time: '00:00', end_time: '20:00', preset: 'comfort' },
+    ]);
+
+    expect(merged).to.deep.equal([{ day_of_week: 0, start_time: '20:00', end_time: '20:00', preset: 'comfort' }]);
   });
 });

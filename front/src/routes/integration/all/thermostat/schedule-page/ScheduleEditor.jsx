@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import { Component, Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import style from './style.css';
@@ -15,7 +15,12 @@ import {
 // and no overlap representable. It is edited as ranges, because that is how a
 // heating programme is thought about. The conversion lives here, at the two
 // boundaries: points become ranges on load, ranges become points on save.
-import { transitionsToRanges, rangesToTransitions } from '../../../../../../../server/utils/thermostatRanges';
+import {
+  transitionsToRanges,
+  rangesToTransitions,
+  isAllDayRange,
+  mergeTouchingRanges
+} from '../../../../../../../server/utils/thermostatRanges';
 
 const DAYS = [0, 1, 2, 3, 4, 5, 6];
 const PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
@@ -40,52 +45,18 @@ function followersFromSchedule(schedule) {
   return (schedule.devices || []).map(device => device.selector);
 }
 
-// The ranges an editor holds, from the points a schedule stores.
-// Ranges of the same preset that touch are one range. Two of them show as two
-// identical lines — 06:30-17:00 Comfort, then 17:00-22:30 Comfort — while the
-// points model stores a single stretch, so the editor would be saying something
-// the schedule does not. Applied after every operation, not only after a
+// The ranges an editor holds, from the points a schedule stores. Ranges of the
+// same preset that touch are merged after every operation, not only after a
 // deletion: an edit can bring two together just as well, and a schedule loaded
 // from the server may already hold a pair.
-//
-// Walks the week in order so a chain of three merges in one pass, and follows a
-// range across midnight onto the next day — the night and the morning that
-// continue it are one stretch.
-function mergeTouching(ranges) {
-  const openAt = range => range.day_of_week * DAY_MINUTES + timeToMinutes(range.start_time);
-  const closeAt = range => {
-    const start = openAt(range);
-    const end = range.day_of_week * DAY_MINUTES + timeToMinutes(range.end_time);
-    return end <= start ? end + DAY_MINUTES : end;
-  };
-  const sorted = [...ranges].sort((a, b) => openAt(a) - openAt(b));
-  const merged = [];
-  sorted.forEach(range => {
-    const previous = merged[merged.length - 1];
-    // The week wraps, so a range opening exactly where the previous one closes
-    // is its continuation — including the one that closes past midnight.
-    if (previous && previous.preset === range.preset && closeAt(previous) === openAt(range)) {
-      merged[merged.length - 1] = { ...previous, end_time: range.end_time };
-      return;
-    }
-    merged.push(range);
-  });
-  // The last range of the week may run into the first, which the pass above
-  // cannot see: they are at the two ends of the list.
-  if (merged.length > 1) {
-    const last = merged[merged.length - 1];
-    const first = merged[0];
-    if (last.preset === first.preset && closeAt(last) % (7 * DAY_MINUTES) === openAt(first)) {
-      merged[0] = { ...last, end_time: first.end_time };
-      merged.pop();
-    }
-  }
-  return merged;
+function rangesFromSchedule(schedule) {
+  return ensureKeys(mergeTouchingRanges(transitionsToRanges(schedule ? schedule.transitions || [] : [])));
 }
 
-function rangesFromSchedule(schedule) {
-  return ensureKeys(mergeTouching(transitionsToRanges(schedule ? schedule.transitions || [] : [])));
-}
+// The times a form stands for. "All day" hides the two inputs rather than
+// clearing them, so unticking it gives back the hours that were typed.
+const ALL_DAY = { start_time: '00:00', end_time: '00:00' };
+const formTimes = form => (form.all_day ? ALL_DAY : { start_time: form.start_time, end_time: form.end_time });
 
 const byStart = (a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time);
 
@@ -302,7 +273,8 @@ class ScheduleEditor extends Component {
         [day]: {
           start_time: minutesToTime(startMins),
           end_time: endMins === DAY_MINUTES ? '00:00' : minutesToTime(endMins),
-          preset: 'comfort'
+          preset: 'comfort',
+          all_day: false
         }
       }
     }));
@@ -324,28 +296,32 @@ class ScheduleEditor extends Component {
 
   confirmNewForm = day => {
     const form = this.state.newForms[day];
-    if (!form || !form.start_time || !form.end_time) return;
-    if (form.start_time === form.end_time) {
+    if (!form) return;
+    const { start_time: startTime, end_time: endTime } = formTimes(form);
+    if (!startTime || !endTime) return;
+    // An end equal to the start covers 24 hours. Asked for with "All day", it is
+    // the day itself; typed by hand, it was almost always a slip.
+    if (!form.all_day && startTime === endTime) {
       this.setState(prev => ({
         newForms: { ...prev.newForms, [day]: { ...prev.newForms[day], rowError: 'same-time' } }
       }));
       return;
     }
-    const candidate = { day_of_week: day, start_time: form.start_time, end_time: form.end_time };
+    const candidate = { day_of_week: day, start_time: startTime, end_time: endTime };
     // Two ranges starting at the same moment would give one point: replace
     // rather than add, so the second entry is the one that stands.
     const withoutSameStart = this.trimForRange(this.state.ranges, candidate).filter(
-      r => !(r.day_of_week === day && r.start_time === form.start_time)
+      r => !(r.day_of_week === day && r.start_time === startTime)
     );
     this.setState(prev => ({
       error: null,
-      ranges: mergeTouching([
+      ranges: mergeTouchingRanges([
         ...withoutSameStart,
         {
           key: Date.now() + Math.random(),
           day_of_week: day,
-          start_time: form.start_time,
-          end_time: form.end_time,
+          start_time: startTime,
+          end_time: endTime,
           preset: form.preset
         }
       ]),
@@ -363,7 +339,12 @@ class ScheduleEditor extends Component {
     this.setState(prev => ({
       editForms: {
         ...prev.editForms,
-        [range.key]: { start_time: range.start_time, end_time: range.end_time, preset: range.preset }
+        [range.key]: {
+          start_time: range.start_time,
+          end_time: range.end_time,
+          preset: range.preset,
+          all_day: isAllDayRange(range)
+        }
       }
     }));
   };
@@ -384,27 +365,27 @@ class ScheduleEditor extends Component {
 
   confirmEdit = key => {
     const form = this.state.editForms[key];
-    if (!form || !form.start_time || !form.end_time) return;
-    if (form.start_time === form.end_time) {
+    if (!form) return;
+    const { start_time: startTime, end_time: endTime } = formTimes(form);
+    if (!startTime || !endTime) return;
+    if (!form.all_day && startTime === endTime) {
       this.setState(prev => ({
         editForms: { ...prev.editForms, [key]: { ...prev.editForms[key], rowError: 'same-time' } }
       }));
       return;
     }
     const edited = this.state.ranges.find(r => r.key === key);
-    const candidate = { day_of_week: edited.day_of_week, start_time: form.start_time, end_time: form.end_time };
+    const candidate = { day_of_week: edited.day_of_week, start_time: startTime, end_time: endTime };
     this.setState(prev => {
       const edited = prev.ranges.find(r => r.key === key);
       const ranges = this.trimForRange(prev.ranges, candidate, key)
         // A move onto another range's start replaces it: two ranges starting at
         // the same moment would collapse into one point anyway.
-        .filter(r => r.key === key || !(r.day_of_week === edited.day_of_week && r.start_time === form.start_time))
-        .map(r =>
-          r.key === key ? { ...r, start_time: form.start_time, end_time: form.end_time, preset: form.preset } : r
-        );
+        .filter(r => r.key === key || !(r.day_of_week === edited.day_of_week && r.start_time === startTime))
+        .map(r => (r.key === key ? { ...r, start_time: startTime, end_time: endTime, preset: form.preset } : r));
       const forms = { ...prev.editForms };
       delete forms[key];
-      return { ranges: mergeTouching(ranges), editForms: forms, error: null };
+      return { ranges: mergeTouchingRanges(ranges), editForms: forms, error: null };
     });
   };
 
@@ -463,7 +444,7 @@ class ScheduleEditor extends Component {
       let stretched = remaining.map(range =>
         range.key === predecessor.key ? { ...range, end_time: removed.end_time } : range
       );
-      return { ranges: mergeTouching(stretched), editForms: forms };
+      return { ranges: mergeTouchingRanges(stretched), editForms: forms };
     });
   };
 
@@ -496,7 +477,7 @@ class ScheduleEditor extends Component {
       }))
     );
     this.setState({
-      ranges: mergeTouching([...kept, ...copies]),
+      ranges: mergeTouchingRanges([...kept, ...copies]),
       copySourceDay: null,
       copyTargetDays: []
     });
@@ -620,7 +601,11 @@ class ScheduleEditor extends Component {
       return carried || (dictionary && dictionary.noSlots) || '';
     }
     const ownRanges = dayRanges
-      .map(range => `${range.start_time} - ${range.end_time} ${presetLabel(range.preset)}`)
+      .map(range =>
+        isAllDayRange(range)
+          ? `${(dictionary && dictionary.allDay) || ''} ${presetLabel(range.preset)}`
+          : `${range.start_time} - ${range.end_time} ${presetLabel(range.preset)}`
+      )
       .join(', ');
     return carried ? `${carried}, ${ownRanges}` : ownRanges;
   };
@@ -685,30 +670,48 @@ class ScheduleEditor extends Component {
     <div class={style.slotFormWrapper}>
       <div class={isEdit ? style.editSlotForm : style.newSlotForm}>
         <div class={style.slotColorDot} style={`--dot-color:${PRESET_COLORS[form.preset] || PRESET_COLORS.comfort}`} />
-        <label class={style.slotTimeField}>
-          <span class={style.slotFieldLabel}>
-            <Text id="integration.thermostat.schedule.startLabel" />
-          </span>
+        {!form.all_day && (
+          <label class={style.slotTimeField}>
+            <span class={style.slotFieldLabel}>
+              <Text id="integration.thermostat.schedule.startLabel" />
+            </span>
+            <input
+              type="time"
+              class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
+              value={form.start_time}
+              onClick={openNativePicker}
+              onChange={e => onChange('start_time', e.target.value)}
+            />
+          </label>
+        )}
+        {!form.all_day && <span class={style.slotArrow}>→</span>}
+        {!form.all_day && (
+          <label class={style.slotTimeField}>
+            <span class={style.slotFieldLabel}>
+              <Text id="integration.thermostat.schedule.endLabel" />
+            </span>
+            <input
+              type="time"
+              class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
+              value={form.end_time}
+              onClick={openNativePicker}
+              onChange={e => onChange('end_time', e.target.value)}
+            />
+          </label>
+        )}
+        {/* 00:00 → 23:59 left a minute uncovered, which the schedule then stored
+            as a stop. The whole day is 00:00 → 00:00, which can't be typed: an
+            end equal to the start is refused as a slip (sameTimeError). */}
+        <label class={cx('custom-control', 'custom-checkbox', style.slotAllDay)}>
           <input
-            type="time"
-            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-            value={form.start_time}
-            onClick={openNativePicker}
-            onChange={e => onChange('start_time', e.target.value)}
+            type="checkbox"
+            class="custom-control-input"
+            checked={Boolean(form.all_day)}
+            onChange={e => onChange('all_day', e.target.checked)}
           />
-        </label>
-        <span class={style.slotArrow}>→</span>
-        <label class={style.slotTimeField}>
-          <span class={style.slotFieldLabel}>
-            <Text id="integration.thermostat.schedule.endLabel" />
+          <span class="custom-control-label">
+            <Text id="integration.thermostat.schedule.allDay" />
           </span>
-          <input
-            type="time"
-            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-            value={form.end_time}
-            onClick={openNativePicker}
-            onChange={e => onChange('end_time', e.target.value)}
-          />
         </label>
         <select
           class={cx('form-control', 'form-control-sm', style.slotPresetSelect)}
@@ -963,8 +966,11 @@ class ScheduleEditor extends Component {
                             </div>
                           );
                         }
-                        // An end at or before the start runs past midnight.
-                        const crossesMidnight = timeToMinutes(range.end_time) <= timeToMinutes(range.start_time);
+                        const allDay = isAllDayRange(range);
+                        // An end at or before the start runs past midnight —
+                        // except a whole day, whose end is the next midnight.
+                        const crossesMidnight =
+                          !allDay && timeToMinutes(range.end_time) <= timeToMinutes(range.start_time);
                         return (
                           <div
                             key={range.key || `${day}-${idx}`}
@@ -983,9 +989,17 @@ class ScheduleEditor extends Component {
                               class={style.slotColorDot}
                               style={`--dot-color:${PRESET_COLORS[range.preset] || PRESET_COLORS.comfort}`}
                             />
-                            <span class={style.slotTimeDisplay}>{range.start_time}</span>
-                            <span class={style.slotArrow}>→</span>
-                            <span class={style.slotTimeDisplay}>{range.end_time}</span>
+                            {allDay ? (
+                              <span class={style.slotTimeDisplay}>
+                                <Text id="integration.thermostat.schedule.allDay" />
+                              </span>
+                            ) : (
+                              <Fragment>
+                                <span class={style.slotTimeDisplay}>{range.start_time}</span>
+                                <span class={style.slotArrow}>→</span>
+                                <span class={style.slotTimeDisplay}>{range.end_time}</span>
+                              </Fragment>
+                            )}
                             {crossesMidnight && (
                               <span class={style.slotNextDay}>
                                 <Text id="integration.thermostat.schedule.nextDay" />
