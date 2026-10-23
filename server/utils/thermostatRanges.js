@@ -297,13 +297,19 @@ function trimRangesAround(ranges, candidate, ignoredKey = null) {
       result.push(range);
       return;
     }
-    // Where the new range falls inside this one's own timeline.
-    const cutStart = candidateSpans.reduce((acc, span) => {
-      const absolute = span.day === range.day_of_week ? span.start : span.start + DAY_MINUTES;
+    // Where the new range falls inside this one's own timeline, which spans its
+    // own day and the next. A span on any other day is outside it: offset by one
+    // day regardless, the Wednesday end of a Tuesday 05:00 → 03:00 range cut
+    // Monday's night at midnight instead of Tuesday 05:00.
+    const onTimeline = candidateSpans
+      .map((span) => ({ span, offset: (span.day - range.day_of_week + 7) % 7 }))
+      .filter(({ offset }) => offset <= 1);
+    const cutStart = onTimeline.reduce((acc, { span, offset }) => {
+      const absolute = span.start + offset * DAY_MINUTES;
       return absolute > start && absolute < end ? Math.min(acc, absolute) : acc;
     }, Infinity);
-    const cutEnd = candidateSpans.reduce((acc, span) => {
-      const absolute = span.day === range.day_of_week ? span.end : span.end + DAY_MINUTES;
+    const cutEnd = onTimeline.reduce((acc, { span, offset }) => {
+      const absolute = span.end + offset * DAY_MINUTES;
       return absolute > start && absolute < end ? Math.max(acc, absolute) : acc;
     }, -Infinity);
 
