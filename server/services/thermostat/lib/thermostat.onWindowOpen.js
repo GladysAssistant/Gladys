@@ -388,7 +388,14 @@ async function onExternalPowerChanged(changedSelector, newValue) {
           logger.info(`Thermostat: ${changedSelector} powered on from the device itself, starting ${device.selector}`);
           // Before the start: it triggers the regulation pass, which must find
           // the hold rather than write the preset's setpoint over the unit's.
-          await holdUnitSetpoint.call(this, device);
+          // The hold is best effort, like the missing-mark cases above: a lookup
+          // that fails must not cost the start, or the next pass would find the
+          // thermostat still stopped and cut the power the user just turned on.
+          try {
+            await holdUnitSetpoint.call(this, device);
+          } catch (e) {
+            logger.warn(`Thermostat: could not hold the setpoint ${device.selector} carries: ${e.message}`);
+          }
           await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
         }
       }),
