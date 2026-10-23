@@ -194,6 +194,7 @@ const EditScenePage = ({ children, ...props }) => {
                       triggersVariables={props.triggersVariables}
                       setVariables={props.setVariables}
                       sceneIntegrations={props.sceneIntegrations}
+                      deviceFeatures={props.deviceFeatures}
                     />
                   </div>
 
