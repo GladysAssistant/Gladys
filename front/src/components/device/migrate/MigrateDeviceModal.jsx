@@ -9,6 +9,7 @@ import get from 'get-value';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import normalizeSearchText from '../../../utils/normalizeSearchText';
+import createBackdropDismiss from '../../../utils/backdropDismiss';
 import { getDeviceIntegration, disambiguateIntegrationNames } from '../../../routes/devices/integrationLinks';
 import style from './style.css';
 
@@ -40,11 +41,7 @@ class MigrateDeviceModal extends Component {
     }
   };
 
-  handleOverlayClick = e => {
-    if (e.target === e.currentTarget) {
-      this.close();
-    }
-  };
+  backdropDismiss = createBackdropDismiss(() => this.close());
 
   close = () => {
     // Covers all close paths (X, Escape, overlay, Cancel): while a migration
@@ -305,7 +302,7 @@ class MigrateDeviceModal extends Component {
     // stacking context (same reason the light control panel is portaled).
     // glass-theme keeps the dialog on the theme's glass surface out there.
     return createPortal(
-      <div class={cx('glass-theme', style.modalOverlay)} onClick={this.handleOverlayClick}>
+      <div class={cx('glass-theme', style.modalOverlay)} {...this.backdropDismiss}>
         <div class={style.modalDialog}>
           <div class="card mb-0">
             <div class="card-header">
