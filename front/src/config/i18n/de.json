@@ -1383,7 +1383,10 @@
         "nameLabel": "Name",
         "imageLabel": "Image",
         "limitsLabel": "Limits",
-        "portsLabel": "Veröffentlichte Ports"
+        "portsLabel": "Veröffentlichte Ports",
+        "pidsLimitValue": "max. {{count}} Prozesse und Threads",
+        "tmpSizeValue": "{{size}} MB /tmp",
+        "capabilitiesLabel": "Linux-Capabilities:"
       },
       "hardware": {
         "title": "Hardware",
@@ -1398,6 +1401,28 @@
           "coral-pcie": "Coral PCIe",
           "gpu": "GPU (Grafikbeschleunigung)",
           "video": "Kameras (Videogeräte)"
+        }
+      },
+      "capabilities": {
+        "title": "Linux-Capabilities",
+        "installDescription": "Einige Container dieser Integration starten als root und benötigen einen Teil der Rechte, die ein normaler Docker-Container standardmäßig hat (zum Beispiel, um ihre eigenen Dateien dem Benutzer zu übergeben, unter dem sie danach laufen). Gladys entzieht standardmäßig alle diese Rechte und gewährt keines, solange du es nicht aktivierst: Sie stammen aus einer kurzen, für diesen Bedarf vorgesehenen Liste, immer innerhalb dessen, was Docker einem Standard-Container gewährt. Du kannst dies nach der Installation jederzeit ändern.",
+        "configDescription": "Den Containern dieser Integration gewährte Linux-Capabilities (eine kurze Liste, immer aus dem Standardsatz von Docker). Eine Änderung erstellt die betroffenen Container neu und benachrichtigt die Integration.",
+        "grantAll": {
+          "one": "Die von diesen Containern angeforderte Linux-Capability gewähren",
+          "other": "Die {{count}} von diesen Containern angeforderten Linux-Capabilities gewähren"
+        },
+        "requiredWarning": "Die Container, die sie anfordern, starten ohne sie nicht.",
+        "descriptions": {
+          "CHOWN": "Den Eigentümer von Dateien ändern (z. B. seine Log- oder Konfigurationsordner dem Benutzer des Dienstes übergeben).",
+          "DAC_OVERRIDE": "Dateien unabhängig von ihren Berechtigungen lesen und schreiben, innerhalb des Containers.",
+          "FSETID": "Die speziellen Berechtigungsbits der von ihm geänderten Dateien beibehalten.",
+          "FOWNER": "Berechtigungen von Dateien ändern, die ihm nicht gehören, innerhalb des Containers.",
+          "SETGID": "Zu einer anderen Gruppe wechseln (Rechte nach dem Start als root abgeben).",
+          "SETUID": "Zu einem anderen Benutzer wechseln (Rechte nach dem Start als root abgeben).",
+          "SETPCAP": "Seine eigenen Capabilities an gestartete Prozesse weitergeben oder abgeben.",
+          "NET_BIND_SERVICE": "Im Container auf Netzwerkports unter 1024 lauschen (z. B. ein Webserver auf Port 80).",
+          "SYS_CHROOT": "Sein Wurzelverzeichnis wechseln (von manchen Dienst-Supervisoren genutzt).",
+          "KILL": "Signale an seine eigenen Prozesse senden (überwachte Dienste stoppen und neu starten)."
         }
       },
       "webhooks": {

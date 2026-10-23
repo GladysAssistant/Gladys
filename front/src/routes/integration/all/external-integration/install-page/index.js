@@ -10,11 +10,13 @@ import {
   getLocalizedText,
   getGithubRepoUrl,
   getRequestedHardwareClasses,
+  getRequestedCapabilities,
   TYPES_WITHOUT_DEVICE_SCREENS
 } from '../utils';
 import BackToIntegrationsLink from '../../../../../components/integration/BackToIntegrationsLink';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
+import CapabilitySwitches from '../components/CapabilitySwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
 import WidgetsSummary from '../components/WidgetsSummary';
@@ -86,6 +88,26 @@ class ExternalIntegrationInstallPage extends Component {
     });
   };
 
+  toggleCapability = capability => {
+    const { grantedCapabilities = [] } = this.state;
+    this.setState({
+      grantedCapabilities: grantedCapabilities.includes(capability)
+        ? grantedCapabilities.filter(grantedCapability => grantedCapability !== capability)
+        : grantedCapabilities.concat([capability])
+    });
+  };
+
+  // the one deliberate gesture granting every requested capability: the
+  // switches start off (an explicit grant, never pre-checked), unlike the
+  // detected hardware classes
+  toggleAllCapabilities = grantAll => {
+    this.setState({
+      grantedCapabilities: grantAll
+        ? getRequestedCapabilities(get(this.state.storeIntegration, 'manifest.containers') || [])
+        : []
+    });
+  };
+
   // two instances of the same integration (a dev build next to the prod
   // one) may fight over the same cloud account or devices: warn, but let
   // the user install anyway — it is a supported workflow
@@ -112,6 +134,12 @@ class ExternalIntegrationInstallPage extends Component {
       );
       if (requestedClasses.length > 0) {
         body.granted_devices = this.state.grantedDevices || [];
+      }
+      const requestedCapabilities = getRequestedCapabilities(
+        get(this.state.storeIntegration, 'manifest.containers') || []
+      );
+      if (requestedCapabilities.length > 0) {
+        body.granted_capabilities = this.state.grantedCapabilities || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
       // integrations without device screens (communication, weather,
@@ -142,7 +170,15 @@ class ExternalIntegrationInstallPage extends Component {
 
   render(
     props,
-    { storeIntegration, loadStatus, installStatus, detectedClasses = {}, grantedDevices = [], duplicateOfInstalled }
+    {
+      storeIntegration,
+      loadStatus,
+      installStatus,
+      detectedClasses = {},
+      grantedDevices = [],
+      grantedCapabilities = [],
+      duplicateOfInstalled
+    }
   ) {
     const language = get(props, 'user.language') || 'en';
     const manifest = (storeIntegration && storeIntegration.manifest) || {};
@@ -152,6 +188,7 @@ class ExternalIntegrationInstallPage extends Component {
     const installing = installStatus === RequestStatus.Getting;
     const containers = manifest.containers || [];
     const requestedClasses = getRequestedHardwareClasses(containers);
+    const requestedCapabilities = getRequestedCapabilities(containers);
     return (
       <div class="page">
         <div class="page-main">
@@ -309,6 +346,25 @@ class ExternalIntegrationInstallPage extends Component {
                                   detectedClasses={detectedClasses}
                                   granted={grantedDevices}
                                   onToggle={this.toggleHardwareClass}
+                                  disabled={installing}
+                                />
+                              </div>
+                            )}
+
+                            {requestedCapabilities.length > 0 && (
+                              <div class="mb-4">
+                                <h4>
+                                  <Text id="integration.externalIntegration.capabilities.title" />
+                                </h4>
+                                <p class="text-muted small">
+                                  <Text id="integration.externalIntegration.capabilities.installDescription" />
+                                </p>
+                                <CapabilitySwitches
+                                  containers={containers}
+                                  requestedCapabilities={requestedCapabilities}
+                                  granted={grantedCapabilities}
+                                  onToggle={this.toggleCapability}
+                                  onToggleAll={this.toggleAllCapabilities}
                                   disabled={installing}
                                 />
                               </div>
