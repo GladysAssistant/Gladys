@@ -123,6 +123,17 @@ function createActions(store) {
         });
         // save user
         state.session.saveUser(user);
+        // the app is not remounted after login, so checkSession will not run:
+        // the Gladys Plus role (which settings tabs show Billing) is read here.
+        // A failure only hides Billing until the next reload, not the login.
+        try {
+          const gatewayUser = await state.session.getGatewayUser();
+          store.setState({
+            gatewayUserRole: gatewayUser.role
+          });
+        } catch (e) {
+          console.error(e);
+        }
         // get profile picture
         await actionsProfilePicture.loadProfilePicture(store.getState());
         // verify if we need to redirect to the previous page

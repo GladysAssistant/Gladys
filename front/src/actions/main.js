@@ -114,6 +114,13 @@ function createActions(store) {
         actions.refreshGatewaySubscriptionState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
+          // logout swaps the session object out of the store: the role of the
+          // session being closed must not land in the next one
+          if (store.getState().session === state.session) {
+            store.setState({
+              gatewayUserRole: gatewayUser.role
+            });
+          }
           const now = new Date();
           if (new Date(gatewayUser.current_period_end) < now) {
             store.setState({
