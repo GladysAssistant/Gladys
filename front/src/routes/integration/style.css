@@ -476,8 +476,8 @@
   color: inherit;
 }
 
-/* "Update all" panel of the Installed and To update views: icon, text and
-   button on one line, the button dropping below the text on a phone */
+/* "Update all" panel of the To update view: icon, text and button on one
+   line, the button dropping below the text on a phone */
 .updateAllBody {
   display: flex;
   flex-wrap: wrap;
@@ -513,6 +513,30 @@
 .updateAllCount {
   color: inherit;
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* dark mode inverts the page, then inverts every .badge back; the glass
+   button is not inverted back, so the pill must follow the button rather
+   than the other badges or it renders white on white */
+:global(.dark-mode) .updateAllCount {
+  filter: none;
+}
+
+/* the run in progress: the icon turns while a pull can take minutes */
+.updateAllSpinner {
+  animation: updateAllSpin 1.2s linear infinite;
+}
+
+@keyframes updateAllSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .updateAllSpinner {
+    animation: none;
+  }
 }
 
 @media (max-width: 575.98px) {

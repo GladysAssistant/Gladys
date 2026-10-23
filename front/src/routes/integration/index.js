@@ -20,8 +20,7 @@ import {
   getRememberedCatalogPosition,
   getUrlFromCatalog,
   rememberCatalogUrl,
-  rememberCatalogVisibleCount,
-  rememberSearchFocus
+  rememberCatalogVisibleCount
 } from './catalog-url';
 import { buildSearchIndex, getSearchRank, getSearchTokens } from './catalog-search';
 import {
@@ -247,7 +246,9 @@ class Integration extends Component {
     // the user changed while this load was in flight, or a newer load has
     // started since: that one holds the lists to display, this one must not
     // overwrite them
-    if (get(this.props, 'user.id') !== userId || request !== this.externalLoadRequest) {
+    // or the catalog was left meanwhile: an unmounted page never applies its
+    // state, so it would feed the header counter from the list it held before
+    if (this.unmounted || get(this.props, 'user.id') !== userId || request !== this.externalLoadRequest) {
       return;
     }
     await this.setState({
@@ -327,6 +328,7 @@ class Integration extends Component {
       // the URL of the newly displayed category
       this.updateURL();
       this.dropFinishedUpdates();
+      this.dropUpdateAllResult(prevCategory);
     }
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
@@ -796,10 +798,11 @@ class Integration extends Component {
     return integrationsToUpdate;
   }
 
-  // the installed community integrations having a newer version, in the
-  // alphabetical order the catalog displays them in, minus the ones whose card
-  // update is already running, or already went through: a list that could not
-  // be reloaded after it still carries the flag, and only a version newer than
+  // the cards of the To update view still offering their update, in the order
+  // they are displayed: "Update all" runs on what the user sees, so a search,
+  // a facet or the sort narrows or orders the run as it does the list. A card
+  // whose update already went through is left out — a list that could not be
+  // reloaded after it still carries the flag, and only a version newer than
   // the one just installed is to update again (the rule of the card footer).
   // Admin-only: the server does not send the update_available flag to the
   // other users
@@ -807,35 +810,35 @@ class Integration extends Component {
     if (get(this.props, 'user.role') !== USER_ROLE.ADMIN) {
       return [];
     }
-    const updateStates = this.state.updateStates || {};
-    const isStillToUpdate = integration => {
-      const updateState = updateStates[integration.selector] || {};
-      if (updateState.status === RequestStatus.Getting) {
-        return false;
-      }
+    const isStillToUpdate = card => {
+      const updateState = card.updateState || {};
       if (updateState.status === RequestStatus.Success) {
-        return !!integration.latest_version && integration.latest_version !== updateState.version;
+        return !!card.latestVersion && card.latestVersion !== updateState.version;
       }
       return true;
     };
-    return (this.state.externalInstalled || [])
-      .filter(integration => integration.update_available)
+    return (this.state.integrations || [])
+      .filter(card => card.externalInstalled && card.selector && card.updateAvailable)
       .filter(isStillToUpdate)
-      .map(integration => ({
-        selector: integration.selector,
-        name: get(integration, 'manifest.name') || integration.name || integration.selector
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .map(card => ({ selector: card.selector, name: card.name }));
+  }
+
+  // a card update in flight: "Update all" waits for it rather than starting a
+  // second pull alongside it
+  isCardUpdateRunning() {
+    const updateStates = this.state.updateStates || {};
+    return Object.keys(updateStates).some(selector => updateStates[selector].status === RequestStatus.Getting);
   }
 
   // "Update all": the card update is run for each integration, one after the
   // other — one image pull and one container restart at a time, the card
-  // buttons waiting for the run, and a failure does not stop the others.
+  // buttons waiting for the run (and the run for a card update already in
+  // flight), and a failure does not stop the others.
   // Going through the card update keeps each card's spinner and outcome in
   // step with the run, and reloads the installed list (cards, "To update"
   // list, header counter) after every success
   updateAllIntegrations = async () => {
-    if (this.state.updateAllStatus === RequestStatus.Getting) {
+    if (this.state.updateAllStatus === RequestStatus.Getting || this.isCardUpdateRunning()) {
       return;
     }
     const integrationsToUpdate = this.getIntegrationsToUpdate();
@@ -902,6 +905,12 @@ class Integration extends Component {
     await this.setUpdateState(selector, { status: RequestStatus.Getting });
     try {
       const integration = await this.props.httpClient.post(`/api/v1/external_integration/${selector}/update`);
+      if (this.unmounted) {
+        // the catalog was left during the update: there is no card left to
+        // update, only the header counter, read again from the server
+        this.props.refreshExternalIntegrationsToUpdate();
+        return RequestStatus.Success;
+      }
       // the reload clears the update flag of this card and feeds the header
       // counter with the new count. The spinner stays up until it has landed:
       // with the flag still set, the card would offer the update again
@@ -919,6 +928,11 @@ class Integration extends Component {
   // one, it would keep an up-to-date card in "To update" and hide the "all up
   // to date" state. An update still running, or failed, keeps its card state
   dropFinishedUpdates = async () => {
+    // a running "Update all" keeps the cards it already went through: coming
+    // back to To update, its outcome must still match the cards it names
+    if (this.state.updateAllStatus === RequestStatus.Getting) {
+      return;
+    }
     const updateStates = this.state.updateStates || {};
     const isFinished = selector => updateStates[selector].status === RequestStatus.Success;
     if (!Object.keys(updateStates).some(isFinished)) {
@@ -936,6 +950,18 @@ class Integration extends Component {
     this.getIntegrations();
   };
 
+  // the outcome of "Update all" is read on To update, like the card results:
+  // it goes once the user leaves that view after the run has ended
+  dropUpdateAllResult = prevCategory => {
+    if (
+      prevCategory === 'updates' &&
+      this.state.updateAllResult &&
+      this.state.updateAllStatus !== RequestStatus.Getting
+    ) {
+      this.setState({ updateAllResult: null });
+    }
+  };
+
   // more cards as the user scrolls down the list
   showMoreIntegrations = () => {
     this.setState(prevState => ({ visibleCount: prevState.visibleCount + CATALOG_PAGE_SIZE }));
@@ -950,11 +976,8 @@ class Integration extends Component {
     // update) keep their scope: searching "my installed Sonos" makes sense
     const leavesCategory =
       searchKeyword.length > 0 && this.props.category && !VIRTUAL_CATEGORIES.includes(this.props.category);
-    if (leavesCategory) {
-      // the other view is another route: the page is mounted again and the
-      // field would lose the focus after this first letter
-      rememberSearchFocus();
-    }
+    // "All integrations" is the same page as the shelf (app.jsx): it is not
+    // mounted again, so the search field keeps the focus as the user types
     this.updateURL(leavesCategory ? { searchKeyword, category: null } : { searchKeyword });
     await this.getIntegrationsDebounced();
   };
@@ -1035,6 +1058,7 @@ class Integration extends Component {
       showInstallFromGithub,
       showStoreRefresh,
       updatableIntegrationsCount: this.getIntegrationsToUpdate().length,
+      cardUpdateRunning: this.isCardUpdateRunning(),
       updateAllIntegrations: this.updateAllIntegrations,
       showMoreIntegrations: this.showMoreIntegrations,
       search: this.search,

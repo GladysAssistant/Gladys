@@ -1051,6 +1051,7 @@
         "button": "Tout mettre à jour",
         "progress": "Mise à jour de {{name}} ({{current}} sur {{total}})…",
         "keepPageOpen": "Gardez le catalogue des intégrations ouvert jusqu'à la fin : vous pouvez changer de vue, mais quitter le catalogue arrête les mises à jour restantes.",
+        "waitCardUpdate": "Une intégration est en cours de mise à jour depuis sa carte : « Tout mettre à jour » sera disponible une fois celle-ci terminée.",
         "success": {
           "one": "L'intégration a été mise à jour.",
           "other": "Les {{total}} intégrations ont été mises à jour."

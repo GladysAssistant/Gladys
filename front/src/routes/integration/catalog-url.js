@@ -157,23 +157,6 @@ export const getRememberedCatalogPosition = url => {
   return { scrollY: catalogPosition.scrollY, visibleCount: catalogPosition.visibleCount };
 };
 
-// Typing on a shelf leaves it for "All integrations" (the search looks through
-// the whole catalog): the two views are different routes, so the page is
-// mounted again and the browser drops the focus of the search field after the
-// first letter. The search remembers that it was being typed in, and the
-// field of the view that mounts next takes the focus back, caret at the end.
-let searchFocusPending = false;
-
-export const rememberSearchFocus = () => {
-  searchFocusPending = true;
-};
-
-export const hasPendingSearchFocus = () => searchFocusPending;
-
-export const forgetSearchFocus = () => {
-  searchFocusPending = false;
-};
-
 // a remembered URL carries its filters in the query string, so only its path
 // is compared to the known catalog views. It is written from getCatalogUrl()
 // alone today: checking it keeps the guarantee held by the "from" parameter,

@@ -1051,6 +1051,7 @@
         "button": "Alle aktualisieren",
         "progress": "{{name}} wird aktualisiert ({{current}} von {{total}})…",
         "keepPageOpen": "Lassen Sie den Integrationskatalog bis zum Ende geöffnet: Sie können die Ansicht wechseln, aber wenn Sie den Katalog verlassen, werden die restlichen Updates abgebrochen.",
+        "waitCardUpdate": "Eine Integration wird gerade über ihre Karte aktualisiert: „Alle aktualisieren“ ist verfügbar, sobald dies abgeschlossen ist.",
         "success": {
           "one": "Die Integration wurde aktualisiert.",
           "other": "Die {{total}} Integrationen wurden aktualisiert."

@@ -144,6 +144,7 @@ const IntegrationPage = ({
   installedStatusCounts,
   installedInventoryKnown,
   updatableIntegrationsCount,
+  cardUpdateRunning,
   updateAllIntegrations,
   updateAllStatus,
   updateAllProgress,
@@ -214,6 +215,7 @@ const IntegrationPage = ({
                 {!catalogLoading && category === 'updates' && (
                   <UpdateAllIntegrations
                     integrationsToUpdateCount={updatableIntegrationsCount}
+                    cardUpdateRunning={cardUpdateRunning}
                     status={updateAllStatus}
                     progress={updateAllProgress}
                     result={updateAllResult}

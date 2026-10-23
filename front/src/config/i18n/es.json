@@ -1051,6 +1051,7 @@
         "button": "Actualizar todo",
         "progress": "Actualizando {{name}} ({{current}} de {{total}})…",
         "keepPageOpen": "Mantenga abierto el catálogo de integraciones hasta el final: puede cambiar de vista, pero salir del catálogo detiene las actualizaciones restantes.",
+        "waitCardUpdate": "Se está actualizando una integración desde su tarjeta: «Actualizar todo» estará disponible cuando termine.",
         "success": {
           "one": "La integración se ha actualizado.",
           "other": "Las {{total}} integraciones se han actualizado."

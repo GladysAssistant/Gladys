@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import { useEffect, useRef } from 'preact/hooks';
 
 import { RequestStatus } from '../../utils/consts';
 import style from './style.css';
@@ -37,43 +38,66 @@ const UpdateAllResult = ({ result }) => {
   );
 };
 
-// one-click update of every installed community integration having a newer
-// version: the existing per-integration update is called for each of them,
-// one after the other, so that a single image pull and container restart
-// runs at a time and each failure is reported on its own integration
-const UpdateAllIntegrations = ({ integrationsToUpdateCount, status, progress, result, onUpdateAll }) => {
+// the run in progress. Started from the keyboard, the button that had the
+// focus is gone: the focus moves onto this card, which announces each step
+// (aria-live) — but only when it was lost, never taken from another control
+// on a return to the view. The integration in flight counts as half done, so
+// the bar moves from the first update on, a single one included
+const UpdateAllProgress = ({ progress }) => {
+  const card = useRef(null);
+  useEffect(() => {
+    if (card.current && (!document.activeElement || document.activeElement === document.body)) {
+      card.current.focus();
+    }
+  }, []);
+  const done = progress.current - 0.5;
+  return (
+    <div class="card" ref={card} tabIndex={-1} role="status" aria-live="polite">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <i class={`fe fe-refresh-cw text-primary mr-2 ${style.updateAllSpinner}`} />
+          <strong>
+            <Text
+              id="integration.root.updateAll.progress"
+              fields={{ name: progress.name, current: progress.current, total: progress.total }}
+            />
+          </strong>
+        </div>
+        <div class="progress progress-sm">
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+            style={{ width: `${Math.round((done / progress.total) * 100)}%` }}
+            role="progressbar"
+            aria-valuenow={done}
+            aria-valuemin="0"
+            aria-valuemax={progress.total}
+          />
+        </div>
+        <div class="text-muted small mt-2">
+          <Text id="integration.root.updateAll.keepPageOpen" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// one-click update of every installed community integration displayed in the
+// To update view: the card update is run for each of them, one after the
+// other, so that a single image pull and container restart runs at a time and
+// each failure is reported on its own integration
+const UpdateAllIntegrations = ({
+  integrationsToUpdateCount,
+  cardUpdateRunning,
+  status,
+  progress,
+  result,
+  onUpdateAll
+}) => {
   const running = status === RequestStatus.Getting && progress;
   return (
     <div>
       {!running && result && <UpdateAllResult result={result} />}
-      {running && (
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex align-items-center mb-3">
-              <i class="fe fe-refresh-cw text-primary mr-2" />
-              <strong>
-                <Text
-                  id="integration.root.updateAll.progress"
-                  fields={{ name: progress.name, current: progress.current, total: progress.total }}
-                />
-              </strong>
-            </div>
-            <div class="progress progress-sm">
-              <div
-                class="progress-bar bg-primary"
-                style={{ width: `${Math.round(((progress.current - 1) / progress.total) * 100)}%` }}
-                role="progressbar"
-                aria-valuenow={progress.current - 1}
-                aria-valuemin="0"
-                aria-valuemax={progress.total}
-              />
-            </div>
-            <div class="text-muted small mt-2">
-              <Text id="integration.root.updateAll.keepPageOpen" />
-            </div>
-          </div>
-        </div>
-      )}
+      {running && <UpdateAllProgress progress={progress} />}
       {!running && integrationsToUpdateCount > 0 && (
         <div class="card">
           <div class={`card-body ${style.updateAllBody}`}>
@@ -89,10 +113,22 @@ const UpdateAllIntegrations = ({ integrationsToUpdateCount, status, progress, re
                 />
               </strong>
               <div class="text-muted small">
-                <Text id="integration.root.updateAll.description" />
+                {/* a card update in flight: the run would pull alongside it */}
+                <Text
+                  id={
+                    cardUpdateRunning
+                      ? 'integration.root.updateAll.waitCardUpdate'
+                      : 'integration.root.updateAll.description'
+                  }
+                />
               </div>
             </div>
-            <button type="button" class={`btn btn-primary ${style.updateAllButton}`} onClick={onUpdateAll}>
+            <button
+              type="button"
+              class={`btn btn-primary ${style.updateAllButton}`}
+              onClick={onUpdateAll}
+              disabled={cardUpdateRunning}
+            >
               <i class="fe fe-download-cloud mr-2" />
               <Text id="integration.root.updateAll.button" />
               <span class={`badge ml-2 ${style.updateAllCount}`}>{integrationsToUpdateCount}</span>

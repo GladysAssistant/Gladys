@@ -1051,6 +1051,7 @@
         "button": "Update all",
         "progress": "Updating {{name}} ({{current}} of {{total}})…",
         "keepPageOpen": "Keep the Integrations catalog open until the end: you can switch views, but leaving the catalog stops the remaining updates.",
+        "waitCardUpdate": "An integration is being updated from its card: \"Update all\" is available once it ends.",
         "success": {
           "one": "The integration has been updated.",
           "other": "The {{total}} integrations have been updated."

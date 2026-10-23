@@ -164,4 +164,63 @@ describe('External integration - update all from the "To update" view', () => {
     cy.get('.alert-success').should('exist');
     cy.then(() => expect(daikinUpdates).to.equal(1));
   });
+  it('keeps running when the user opens "All integrations" meanwhile', () => {
+    cy.intercept('POST', `**/api/v1/external_integration/${LINKY.selector}/update`, req => {
+      installed.linky = { ...LINKY, version: '2.1.3', update_available: false };
+      req.reply(installed.linky);
+    }).as('updateLinky');
+
+    cy.visit('/dashboard/integration/updates');
+    cy.wait('@getInstalled');
+    cy.contains('button', UPDATE_ALL_BUTTON).click();
+    // Daikin is still being updated: the catalog root is opened, then To update again
+    cy.get('.col-lg-3')
+      .contains('a', 'integration.root.menu.all')
+      .click();
+    cy.location('pathname').should('eq', '/dashboard/integration');
+    cy.wait('@updateDaikin');
+    cy.wait('@updateLinky');
+    cy.get('.col-lg-3')
+      .contains('a', 'integration.root.menu.updates')
+      .click();
+
+    cy.get('.alert-success').should('exist');
+  });
+
+  it('waits for an update already running from a card', () => {
+    cy.visit('/dashboard/integration/updates');
+    cy.wait('@getInstalled');
+    getCard('Daikin Onecta').within(() => {
+      cy.contains('button', 'integration.root.updateButton').click();
+    });
+    // the run would pull alongside the card update: it is offered again once that one ends
+    cy.contains('button', UPDATE_ALL_BUTTON)
+      .should('be.disabled')
+      .and('contain', '2');
+    cy.wait('@updateDaikin');
+    cy.contains('button', UPDATE_ALL_BUTTON)
+      .should('not.be.disabled')
+      .and('contain', '1');
+  });
+
+  it('runs on the integrations the search leaves on screen', () => {
+    cy.intercept('POST', `**/api/v1/external_integration/${LINKY.selector}/update`, req => {
+      installed.linky = { ...LINKY, version: '2.1.3', update_available: false };
+      req.reply(installed.linky);
+    }).as('updateLinky');
+
+    cy.visit('/dashboard/integration/updates');
+    cy.wait('@getInstalled');
+    cy.get('input.form-control:visible')
+      .first()
+      .type('Linky');
+    cy.contains('button', UPDATE_ALL_BUTTON)
+      .should('contain', '1')
+      .click();
+    cy.wait('@updateLinky');
+
+    cy.get('.alert-success').should('exist');
+    // the hidden one was left alone
+    cy.get('@updateDaikin.all').should('have.length', 0);
+  });
 });
