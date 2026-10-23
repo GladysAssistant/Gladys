@@ -534,12 +534,16 @@
         "thresholdsLabel": "Configurar umbrales personalizados"
       },
       "userPresence": {
-        "description": "Muestra quién está en casa y quién no. Puede cambiar la presencia de los usuarios en las escenas y seleccionar aquí los usuarios que se muestran.",
-        "left": "Salió ({{since}})",
+        "description": "Muestra quién está en casa y quién no. Puede cambiar la presencia de los usuarios en las escenas y seleccionar aquí los usuarios que se muestran. Deje la selección vacía para mostrar a todos los usuarios.",
+        "away": "Ausente",
+        "since": "desde hace {{duration}}",
+        "showLastname": "Mostrar apellidos",
+        "showAwaySince": "Mostrar el tiempo de ausencia",
+        "showHomeSince": "Mostrar el tiempo en casa",
         "atHome": "En casa",
         "neverSeenAtHome": "Nunca visto en casa",
         "error": "Ocurrió un error de red al obtener la lista de usuarios. Actualice la página.",
-        "emptyText": "No hay usuarios seleccionados. Puede editar este widget para seleccionar los usuarios que se mostrarán."
+        "emptyText": "Ningún usuario coincide con la selección. Edite este widget para seleccionar usuarios o deje la selección vacía para mostrarlos a todos."
       },
       "camera": {
         "editCameraLabel": "Seleccione la cámara que desea mostrar aquí.",
@@ -3983,6 +3987,14 @@
         "userSeenDescription": "Esta acción establece al usuario como \"en casa\".",
         "userLeftHomeDescription": "Esta acción establece al usuario como \"fuera de casa\"."
       },
+      "setUserLocation": {
+        "description": "Guarda las coordenadas GPS de un usuario y comprueba las entradas y salidas de zonas. La presencia en casa sigue gestionándose por separado mediante escenas.",
+        "latitude": "Latitud (−90 a 90)",
+        "longitude": "Longitud (−180 a 180)",
+        "latitudePlaceholder": "p. ej. 48.137154",
+        "longitudePlaceholder": "p. ej. 11.576124",
+        "variablesHint": "Introduzca una coordenada o escriba {{ para elegir una variable de un disparador o una acción anterior. Use un punto decimal."
+      },
       "checkUserPresence": {
         "description": "Cuando se ejecuta esta acción, Gladys comprueba si alguno de los dispositivos seleccionados se vio en casa en los últimos X minutos. Si se vio alguno de los dispositivos, la acción no hace nada más. Si no se vio ningún dispositivo, el usuario se marca como \"fuera de casa\".",
         "userLabel": "Usuario",
@@ -4178,6 +4190,7 @@
       "user": {
         "set-seen-at-home": "Usuario visto en casa",
         "set-out-of-home": "Usuario fuera de casa",
+        "set-location": "Establecer la ubicación de un usuario",
         "check-presence": "Comprobar presencia del usuario"
       },
       "http": {
@@ -4259,7 +4272,8 @@
       "user": {
         "check-presence": "Marcar a un usuario como ausente si no se le ha visto recientemente",
         "set-seen-at-home": "Indicar a Gladys que un usuario está en casa",
-        "set-out-of-home": "Indicar a Gladys que un usuario ha salido de casa"
+        "set-out-of-home": "Indicar a Gladys que un usuario ha salido de casa",
+        "set-location": "Guardar coordenadas GPS fijas o de variables de escena"
       },
       "house": {
         "is-empty": "Continuar solo si no hay nadie en casa",

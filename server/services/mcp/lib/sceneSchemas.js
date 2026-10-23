@@ -318,6 +318,31 @@ function createSceneCreateInputSchema(
         house: houseSelectorSchema,
         user: userSelectorSchema,
       }),
+      actionSchemaByType(ACTIONS.USER.SET_LOCATION, {
+        user: userSelectorSchema,
+        latitude: z
+          .union([
+            z
+              .number()
+              .min(-90)
+              .max(90),
+            z.string().max(1000),
+          ])
+          .describe(
+            'Latitude from -90 to 90, as a number or a Handlebars template such as {{0.0.value}} or {{triggerEvent.data.latitude}}.',
+          ),
+        longitude: z
+          .union([
+            z
+              .number()
+              .min(-180)
+              .max(180),
+            z.string().max(1000),
+          ])
+          .describe(
+            'Longitude from -180 to 180, as a number or a Handlebars template such as {{1.0.value}} or {{triggerEvent.data.longitude}}. Saves location and checks areas, without directly setting home/away status.',
+          ),
+      }),
       actionSchemaByType(ACTIONS.HTTP.REQUEST, {
         method: z.enum(['get', 'post', 'patch', 'put', 'delete']),
         url: z.string(),

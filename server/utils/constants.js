@@ -872,6 +872,7 @@ const ACTIONS = {
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
     SET_OUT_OF_HOME: 'user.set-out-of-home',
+    SET_LOCATION: 'user.set-location',
     CHECK_PRESENCE: 'user.check-presence',
   },
   HOUSE: {

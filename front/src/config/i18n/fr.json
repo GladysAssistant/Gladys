@@ -534,12 +534,16 @@
         "thresholdsLabel": "Configurer des seuils personnalisés"
       },
       "userPresence": {
-        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes, et sélectionner ici quels utilisateurs afficher.",
-        "left": "Absent ({{since}})",
+        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes, et sélectionner ici quels utilisateurs afficher. Laissez la sélection vide pour afficher tous les utilisateurs.",
+        "away": "Absent",
+        "since": "depuis {{duration}}",
+        "showLastname": "Afficher les noms de famille",
+        "showAwaySince": "Afficher la durée d'absence",
+        "showHomeSince": "Afficher la durée de présence",
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
         "error": "Une erreur réseau s'est produite lors de la récupération de la liste des utilisateurs. Merci de rafraîchir la page.",
-        "emptyText": "Il n'y a aucun utilisateur sélectionné. Vous pouvez éditer cette box pour sélectionner des utilisateurs à afficher."
+        "emptyText": "Aucun utilisateur ne correspond à la sélection. Modifiez cette box pour sélectionner des utilisateurs, ou laissez la sélection vide pour tous les afficher."
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
@@ -3983,6 +3987,14 @@
         "userSeenDescription": "Cette action marque l'utilisateur comme présent à la maison.",
         "userLeftHomeDescription": "Cette action indique que l'utilisateur a quitté la maison."
       },
+      "setUserLocation": {
+        "description": "Enregistre les coordonnées GPS d'un utilisateur et vérifie les entrées et sorties de zones. La présence à la maison reste gérée séparément par les scènes.",
+        "latitude": "Latitude (−90 à 90)",
+        "longitude": "Longitude (−180 à 180)",
+        "latitudePlaceholder": "p. ex. 48.137154",
+        "longitudePlaceholder": "p. ex. 11.576124",
+        "variablesHint": "Saisir une coordonnée ou taper {{ pour choisir une variable d'un déclencheur ou d'une action précédente. Utiliser un point décimal."
+      },
       "checkUserPresence": {
         "description": "Lorsque cette action est exécutée, Gladys va regarder si les appareils sélectionnés ont été détectés dans les dernières minutes ( selon le nombre de minutes sélectionné ci-dessous ). Si un appareil a été détecté, Gladys ne fera rien. Si aucun n'appareil n'a été détecté, Gladys marquera l'utilisateur comme hors de la maison.",
         "userLabel": "Utilisateur",
@@ -4178,6 +4190,7 @@
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
         "set-out-of-home": "Utilisateur parti de la maison",
+        "set-location": "Définir la position d'un utilisateur",
         "check-presence": "Vérifier la présence"
       },
       "http": {
@@ -4259,7 +4272,8 @@
       "user": {
         "check-presence": "Marquer un utilisateur absent s'il n'a pas été vu récemment",
         "set-seen-at-home": "Indiquer à Gladys qu'un utilisateur est à la maison",
-        "set-out-of-home": "Indiquer à Gladys qu'un utilisateur a quitté la maison"
+        "set-out-of-home": "Indiquer à Gladys qu'un utilisateur a quitté la maison",
+        "set-location": "Enregistrer des coordonnées GPS fixes ou issues des variables de scène"
       },
       "house": {
         "is-empty": "Continuer seulement si personne n'est à la maison",
