@@ -840,9 +840,7 @@ class Integration extends Component {
     await this.setState({
       updateAllStatus: failed.length > 0 ? RequestStatus.Error : RequestStatus.Success,
       updateAllProgress: null,
-      // the outcome belongs to the view the run ended in: it is not carried
-      // over to the next view the user opens
-      updateAllResult: { total, failed, category: this.props.category }
+      updateAllResult: { total, failed }
     });
     // the reload refreshes the cards, the "to update" list and the header
     // counter: what is left is what failed

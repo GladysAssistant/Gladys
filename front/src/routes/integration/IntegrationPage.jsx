@@ -208,19 +208,18 @@ const IntegrationPage = ({
                     installedStatusCounts={installedStatusCounts}
                   />
                 )}
-                {/* "Update all" lives in the two views where updates are looked
-                    for; a run in progress stays on screen whatever view the
-                    user moves to meanwhile, its outcome in the view it ended in */}
-                {!catalogLoading &&
-                  (['installed', 'updates'].includes(category) || updateAllStatus === RequestStatus.Getting) && (
-                    <UpdateAllIntegrations
-                      integrationsToUpdateCount={updatableIntegrationsCount}
-                      status={updateAllStatus}
-                      progress={updateAllProgress}
-                      result={updateAllResult && updateAllResult.category === category ? updateAllResult : null}
-                      onUpdateAll={updateAllIntegrations}
-                    />
-                  )}
+                {/* "Update all" lives in the view listing what is to update. A
+                    run keeps going if the user browses another view meanwhile:
+                    coming back here shows its progress, or its outcome */}
+                {!catalogLoading && category === 'updates' && (
+                  <UpdateAllIntegrations
+                    integrationsToUpdateCount={updatableIntegrationsCount}
+                    status={updateAllStatus}
+                    progress={updateAllProgress}
+                    result={updateAllResult}
+                    onUpdateAll={updateAllIntegrations}
+                  />
+                )}
                 {!catalogLoading && countryScopeApplicable && (
                   <CountryScopeLine
                     instanceCountry={instanceCountry}
