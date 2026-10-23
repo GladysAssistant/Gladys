@@ -28,6 +28,12 @@ module.exports = function ThermostatService(gladys, serviceId) {
       clearTimeout(thermostatHandler.applyTimer);
       thermostatHandler.applyTimer = null;
     }
+    thermostatHandler.windowTimers.forEach(({ timer }) => clearTimeout(timer));
+    thermostatHandler.windowTimers.clear();
+    // A window may close and open again while the service is stopped: an opening
+    // kept from before would cut the heating early on the first pass after a start.
+    // Forgotten, it is read again from the sensor's own `last_value_changed`.
+    thermostatHandler.windowOpenedAt.clear();
   }
 
   /**
@@ -42,6 +48,7 @@ module.exports = function ThermostatService(gladys, serviceId) {
     // previous interval and listener running, and the house would get two
     // regulation loops actuating the same heaters.
     clearHandles();
+    thermostatHandler.stopped = false;
     // Apply schedules every minute
     scheduleInterval = setInterval(async () => {
       await thermostatHandler.applySchedules();
@@ -73,6 +80,7 @@ module.exports = function ThermostatService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping thermostat service');
+    thermostatHandler.stopped = true;
     clearHandles();
   }
 

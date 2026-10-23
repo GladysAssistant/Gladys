@@ -17,6 +17,8 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     onDeviceNewState: fake.resolves(null),
     primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
+    windowTimers: new Map(),
+    windowOpenedAt: new Map(),
   };
   const controllers = { 'get /api/v1/service/thermostat/device': {} };
   const ThermostatService = proxyquire('../../../services/thermostat/index', {
@@ -133,6 +135,42 @@ describe('ThermostatService', () => {
     assert.calledWith(gladys.event.removeListener, EVENTS.DEVICE.NEW_STATE);
     assert.notCalled(handler.applySchedules);
     expect(handler.applyTimer).to.equal(null);
+  });
+
+  it('should clear the pending checks of an opening delay on stop', async () => {
+    const clock = sinon.useFakeTimers();
+    const { service, handler } = buildService();
+    const check = fake();
+    handler.windowTimers.set('thermostat-living-room', { timer: setTimeout(check, 10000), window: 'window-sensor' });
+
+    await service.stop();
+    await clock.tickAsync(10000);
+
+    assert.notCalled(check);
+    expect(handler.windowTimers.size).to.equal(0);
+  });
+
+  // A window closed and opened again while the service was stopped must count
+  // from its new opening, not from the one kept before the stop.
+  it('should forget the openings it recorded on stop', async () => {
+    const { service, handler } = buildService();
+    handler.windowOpenedAt.set('window-sensor', 1000);
+
+    await service.stop();
+
+    expect(handler.windowOpenedAt.size).to.equal(0);
+  });
+
+  // A state change still in flight reads this to know the service has stopped.
+  it('should mark the handler stopped on stop and running again on start', async () => {
+    const { service, handler } = buildService();
+
+    await service.start();
+    expect(handler.stopped).to.equal(false);
+    await service.stop();
+    expect(handler.stopped).to.equal(true);
+    await service.start();
+    expect(handler.stopped).to.equal(false);
   });
 
   it('should be safe to stop a service that was never started', async () => {

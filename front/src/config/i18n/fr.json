@@ -3639,6 +3639,12 @@
           "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",
           "cooling": "Optionnel. Si une fenêtre est ouverte, la climatisation est automatiquement coupée."
         },
+        "windowDelayLabel": "Délai avant coupure",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que le chauffage soit coupé. Une porte ouverte pour rentrer et refermée aussitôt ne le coupe pas. 0 le coupe immédiatement.",
+          "cooling": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que la climatisation soit coupée. Une porte ouverte pour rentrer et refermée aussitôt ne la coupe pas. 0 la coupe immédiatement."
+        },
         "hysteresisStartLabel": "Seuil de démarrage",
         "hysteresisStartHelp": {
           "heating": "Le chauffage démarre lorsque la température est inférieure à (consigne − seuil de démarrage). Ex. : consigne 21 °C, seuil 0,5 °C → démarre sous 20,5 °C.",
