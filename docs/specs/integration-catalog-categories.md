@@ -42,7 +42,7 @@ Sixteen category keys. Keys are stable English identifiers (they appear in manif
 |---|---|---|---|
 | `climate` | `thermometer` | Heating & cooling / Chauffage & climatisation | Heaters, boilers, AC, thermostats, HVAC zones |
 | `lighting` | `zap` | Lighting, plugs & covers / Éclairage, prises & volets | Lights, smart plugs, wall switches, relays, and covers: shutters, blinds, awnings, garage doors |
-| `energy` | `battery-charging` | Energy / Énergie | Meters (electricity, gas), solar & batteries, EV charging, consumption tracking |
+| `energy` | `battery-charging` | Energy / Énergie | Meters (electricity, gas, water), solar & batteries, tariffs, consumption tracking. EV chargers and cars live under `vehicles`, which they combine with `energy` when the charger matters for the house balance |
 | `security` | `shield` | Cameras & security / Caméras & sécurité | Cameras, doorbells, locks, alarm-related sensors |
 | `multimedia` | `speaker` | Multimedia / Multimédia | Speakers, TVs, streaming, casting, media remotes |
 | `appliances` | `coffee` | Appliances & garden / Électroménager & jardin | Vacuums, kitchen & laundry appliances, mowers, watering |
