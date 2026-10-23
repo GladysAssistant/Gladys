@@ -3431,6 +3431,7 @@
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus.",
       "ttsProvider": "Voz (proveedor de síntesis de voz)",
       "ttsProviderText": "El proveedor utilizado para hablar: los anuncios de las escenas en sus altavoces y las respuestas del asistente de voz. Gladys Plus funciona en todas partes (incluido el acceso remoto); una integración de proveedor TTS genera la voz localmente y la sirve en su red local.",
+      "ttsProviderSelectLabel": "Proveedor utilizado para hablar",
       "ttsProviderPlusNotConnected": "Gladys Plus no está conectado: los anuncios y las respuestas de voz no se reproducirán.",
       "ttsProviderPlusSettingsLink": "Conectar Gladys Plus",
       "ttsProviderPlusNotConnectedOr": "o instale una integración de síntesis de voz y selecciónela aquí:",
