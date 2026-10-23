@@ -52,6 +52,13 @@ describe('External integration - update from the catalog card', () => {
   it('updates an integration from its card and says so', () => {
     cy.visit('/dashboard/integration/installed');
     cy.wait('@getInstalled');
+    // the page loads the list several times (header counter, then the catalog once the
+    // user is known) and only displays the last one: '@getInstalled' is only the first.
+    // The button shows the last load got the list before the update, so none is left
+    // to pick up the stub below
+    getCard('Daikin Onecta').within(() => {
+      cy.contains('button', 'integration.root.updateButton').should('be.visible');
+    });
 
     // the reload that follows the update answers late: the card must not offer
     // the update again in between
