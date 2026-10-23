@@ -1050,7 +1050,7 @@
         "description": "Les intégrations sont mises à jour l'une après l'autre : chaque conteneur redémarre sur sa nouvelle version.",
         "button": "Tout mettre à jour",
         "progress": "Mise à jour de {{name}} ({{current}} sur {{total}})…",
-        "keepPageOpen": "Gardez cette page ouverte jusqu'à la fin : la quitter arrête les mises à jour restantes.",
+        "keepPageOpen": "Gardez le catalogue des intégrations ouvert jusqu'à la fin : vous pouvez changer de vue, mais quitter le catalogue arrête les mises à jour restantes.",
         "success": {
           "one": "L'intégration a été mise à jour.",
           "other": "Les {{total}} intégrations ont été mises à jour."

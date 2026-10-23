@@ -380,6 +380,9 @@ class Integration extends Component {
     );
     const store = isAdmin ? this.state.externalStore || [] : [];
     const updateStates = this.state.updateStates || {};
+    // an "Update all" run updates one integration at a time: the card buttons
+    // wait for it, or a click would start a second pull alongside it
+    const updateLocked = this.state.updateAllStatus === RequestStatus.Getting;
 
     const storeBySlug = new Map();
     store.forEach(storeIntegration => {
@@ -466,6 +469,7 @@ class Integration extends Component {
         latestVersion: integration.latest_version,
         updateAvailable: integration.update_available,
         updateState: updateStates[integration.selector],
+        updateLocked,
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: (storeIntegration && storeIntegration.first_seen_at) || null,
         updatedAt: get(storeIntegration, 'github.pushed_at') || null,
@@ -505,6 +509,7 @@ class Integration extends Component {
         selector: isInstalled ? storeIntegration.installed_selector : null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false,
         updateState: isInstalled ? updateStates[storeIntegration.installed_selector] : undefined,
+        updateLocked,
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: storeIntegration.first_seen_at || null,
         updatedAt: get(storeIntegration, 'github.pushed_at') || null,
@@ -811,10 +816,11 @@ class Integration extends Component {
   }
 
   // "Update all": the card update is run for each integration, one after the
-  // other — one image pull and one container restart at a time, and a failure
-  // does not stop the others. Going through the card update keeps each card's
-  // spinner and outcome in step with the run, and reloads the installed list
-  // (cards, "To update" list, header counter) after every success
+  // other — one image pull and one container restart at a time, the card
+  // buttons waiting for the run, and a failure does not stop the others.
+  // Going through the card update keeps each card's spinner and outcome in
+  // step with the run, and reloads the installed list (cards, "To update"
+  // list, header counter) after every success
   updateAllIntegrations = async () => {
     if (this.state.updateAllStatus === RequestStatus.Getting) {
       return;
@@ -825,20 +831,16 @@ class Integration extends Component {
       return;
     }
     await this.setState({ updateAllStatus: RequestStatus.Getting, updateAllResult: null });
+    this.getIntegrations();
     const failed = [];
     for (let index = 0; index < total && !this.unmounted; index += 1) {
       const integration = integrationsToUpdate[index];
       await this.setState({ updateAllProgress: { name: integration.name, current: index + 1, total } });
-      // the cards keep their own update button during the run: one updated
-      // (or being updated) from its card meanwhile is not updated twice
-      const stillToUpdate = this.getIntegrationsToUpdate().some(({ selector }) => selector === integration.selector);
-      if (stillToUpdate) {
-        // the outcome is the one returned by the card update, not read back
-        // from the state, which preact only applies on its next render
-        const outcome = await this.updateIntegration(integration.selector);
-        if (outcome === RequestStatus.Error) {
-          failed.push(integration);
-        }
+      // the outcome is the one returned by the card update, not read back
+      // from the state, which preact only applies on its next render
+      const outcome = await this.updateIntegration(integration.selector);
+      if (outcome === RequestStatus.Error) {
+        failed.push(integration);
       }
     }
     if (this.unmounted) {
@@ -849,6 +851,7 @@ class Integration extends Component {
       updateAllProgress: null,
       updateAllResult: { total, failed }
     });
+    this.getIntegrations();
   };
 
   toggleFavorite = async integrationKey => {

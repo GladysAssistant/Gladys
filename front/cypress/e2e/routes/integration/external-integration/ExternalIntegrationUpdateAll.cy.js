@@ -20,6 +20,8 @@ const NETATMO = buildIntegration('ext-netatmo', 'Netatmo', '1.2.0', '1.2.0');
 const STORE = { integrations: [], refreshed_at: '2026-10-22T08:00:00.000Z' };
 
 const UPDATE_ALL_BUTTON = 'integration.root.updateAll.button';
+// by its title: the progress panel above the cards is a card too, naming the integration being updated
+const getCard = name => cy.contains('.card h4', name).closest('.card');
 const DAIKIN_UPDATE_DELAY_MS = 1000;
 
 describe('External integration - update all from the "To update" view', () => {
@@ -45,7 +47,7 @@ describe('External integration - update all from the "To update" view', () => {
   it('is offered on the "To update" view only', () => {
     cy.visit('/dashboard/integration/installed');
     cy.wait('@getInstalled');
-    cy.contains('.card', 'Daikin Onecta').should('exist');
+    getCard('Daikin Onecta').should('exist');
     cy.contains('button', UPDATE_ALL_BUTTON).should('not.exist');
 
     cy.get('.col-lg-3')
@@ -83,10 +85,10 @@ describe('External integration - update all from the "To update" view', () => {
       cy.contains('Daikin Onecta').should('not.exist');
     });
     // each card says how its own update went
-    cy.contains('.card', 'Daikin Onecta')
+    getCard('Daikin Onecta')
       .find('.text-success')
       .should('contain', 'v1.0.0');
-    cy.contains('.card', 'Linky Teleinfo').within(() => {
+    getCard('Linky Teleinfo').within(() => {
       cy.contains('integration.root.updateError').should('exist');
     });
     // what failed is still offered
@@ -110,10 +112,8 @@ describe('External integration - update all from the "To update" view', () => {
     cy.contains('button', UPDATE_ALL_BUTTON).should('not.exist');
   });
 
-  it('does not update again an integration updated from its card during the run', () => {
-    let linkyUpdates = 0;
+  it('holds the card buttons while it runs', () => {
     cy.intercept('POST', `**/api/v1/external_integration/${LINKY.selector}/update`, req => {
-      linkyUpdates += 1;
       installed.linky = { ...LINKY, version: '2.1.3', update_available: false };
       req.reply(installed.linky);
     }).as('updateLinky');
@@ -121,14 +121,16 @@ describe('External integration - update all from the "To update" view', () => {
     cy.visit('/dashboard/integration/updates');
     cy.wait('@getInstalled');
     cy.contains('button', UPDATE_ALL_BUTTON).click();
-    // Daikin is still being updated: Linky is updated from its own card meanwhile
-    cy.contains('.card', 'Linky Teleinfo').within(() => {
-      cy.contains('button', 'integration.root.updateButton').click();
+    // Daikin is still being updated: Linky's turn has not come, its card cannot start it
+    getCard('Daikin Onecta')
+      .find('button.btn-loading')
+      .should('be.disabled');
+    getCard('Linky Teleinfo').within(() => {
+      cy.contains('button', 'integration.root.updateButton').should('be.disabled');
     });
-    cy.wait('@updateLinky');
     cy.wait('@updateDaikin');
+    cy.wait('@updateLinky');
 
     cy.get('.alert-success').should('exist');
-    cy.then(() => expect(linkyUpdates).to.equal(1));
   });
 });

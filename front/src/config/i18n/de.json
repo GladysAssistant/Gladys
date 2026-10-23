@@ -1050,7 +1050,7 @@
         "description": "Die Integrationen werden nacheinander aktualisiert: Jeder Container startet mit seiner neuen Version neu.",
         "button": "Alle aktualisieren",
         "progress": "{{name}} wird aktualisiert ({{current}} von {{total}})…",
-        "keepPageOpen": "Lassen Sie diese Seite bis zum Ende geöffnet: Wenn Sie sie verlassen, werden die restlichen Updates abgebrochen.",
+        "keepPageOpen": "Lassen Sie den Integrationskatalog bis zum Ende geöffnet: Sie können die Ansicht wechseln, aber wenn Sie den Katalog verlassen, werden die restlichen Updates abgebrochen.",
         "success": {
           "one": "Die Integration wurde aktualisiert.",
           "other": "Die {{total}} Integrationen wurden aktualisiert."

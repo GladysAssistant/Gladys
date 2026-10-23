@@ -1050,7 +1050,7 @@
         "description": "Integrations are updated one after the other: each container restarts on its new version.",
         "button": "Update all",
         "progress": "Updating {{name}} ({{current}} of {{total}})…",
-        "keepPageOpen": "Keep this page open until the end: leaving it stops the remaining updates.",
+        "keepPageOpen": "Keep the Integrations catalog open until the end: you can switch views, but leaving the catalog stops the remaining updates.",
         "success": {
           "one": "The integration has been updated.",
           "other": "The {{total}} integrations have been updated."
