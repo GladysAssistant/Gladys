@@ -792,14 +792,17 @@ class Integration extends Component {
   }
 
   // the installed community integrations having a newer version, in the
-  // alphabetical order the catalog displays them in. Admin-only: the server
-  // does not send the update_available flag to the other users
+  // alphabetical order the catalog displays them in, minus the ones whose card
+  // update is already running. Admin-only: the server does not send the
+  // update_available flag to the other users
   getIntegrationsToUpdate() {
     if (get(this.props, 'user.role') !== USER_ROLE.ADMIN) {
       return [];
     }
+    const updateStates = this.state.updateStates || {};
     return (this.state.externalInstalled || [])
       .filter(integration => integration.update_available)
+      .filter(integration => (updateStates[integration.selector] || {}).status !== RequestStatus.Getting)
       .map(integration => ({
         selector: integration.selector,
         name: get(integration, 'manifest.name') || integration.name || integration.selector
@@ -807,9 +810,11 @@ class Integration extends Component {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  // "Update all": the per-integration update route is called for each
-  // integration, one after the other — one image pull and one container
-  // restart at a time, and a failure does not stop the others
+  // "Update all": the card update is run for each integration, one after the
+  // other — one image pull and one container restart at a time, and a failure
+  // does not stop the others. Going through the card update keeps each card's
+  // spinner and outcome in step with the run, and reloads the installed list
+  // (cards, "To update" list, header counter) after every success
   updateAllIntegrations = async () => {
     if (this.state.updateAllStatus === RequestStatus.Getting) {
       return;
@@ -824,17 +829,19 @@ class Integration extends Component {
     for (let index = 0; index < total && !this.unmounted; index += 1) {
       const integration = integrationsToUpdate[index];
       await this.setState({ updateAllProgress: { name: integration.name, current: index + 1, total } });
-      try {
-        await this.props.httpClient.post(`/api/v1/external_integration/${integration.selector}/update`);
-      } catch (e) {
-        console.error(e);
-        failed.push(integration);
+      // the cards keep their own update button during the run: one updated
+      // (or being updated) from its card meanwhile is not updated twice
+      const stillToUpdate = this.getIntegrationsToUpdate().some(({ selector }) => selector === integration.selector);
+      if (stillToUpdate) {
+        // the outcome is the one returned by the card update, not read back
+        // from the state, which preact only applies on its next render
+        const outcome = await this.updateIntegration(integration.selector);
+        if (outcome === RequestStatus.Error) {
+          failed.push(integration);
+        }
       }
     }
     if (this.unmounted) {
-      // the page was left mid-run: the header counter must still reflect the
-      // updates that went through
-      this.props.refreshExternalIntegrationsToUpdate();
       return;
     }
     await this.setState({
@@ -842,9 +849,6 @@ class Integration extends Component {
       updateAllProgress: null,
       updateAllResult: { total, failed }
     });
-    // the reload refreshes the cards, the "to update" list and the header
-    // counter: what is left is what failed
-    await this.loadExternalIntegrations();
   };
 
   toggleFavorite = async integrationKey => {
@@ -877,7 +881,7 @@ class Integration extends Component {
   updateIntegration = async selector => {
     const updateState = (this.state.updateStates || {})[selector];
     if (updateState && updateState.status === RequestStatus.Getting) {
-      return;
+      return null;
     }
     await this.setUpdateState(selector, { status: RequestStatus.Getting });
     try {
@@ -887,9 +891,11 @@ class Integration extends Component {
       // with the flag still set, the card would offer the update again
       await this.loadExternalIntegrations();
       await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
+      return RequestStatus.Success;
     } catch (e) {
       console.error(e);
       await this.setUpdateState(selector, { status: RequestStatus.Error });
+      return RequestStatus.Error;
     }
   };
 
