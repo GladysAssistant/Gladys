@@ -407,12 +407,20 @@ class Integration extends Component {
     // language of the description, the search-only keywords of the manifest,
     // the author — and the countries the integration is declared for, which
     // the country filter reads too
-    const getSearchFields = (manifest, storeSlug) => ({
-      descriptions: Object.values(manifest.description || {}).filter(text => typeof text === 'string'),
-      keywords: Array.isArray(manifest.keywords) ? manifest.keywords : [],
-      author: getStoreOwner(storeSlug),
-      countries: Array.isArray(manifest.countries) ? manifest.countries : []
-    });
+    // An installed card carries the manifest of its running image, which may
+    // predate the store listing (or the fallback mapping of the indexer): the
+    // lite index entry is read too, like getCardCategories does, so a brand
+    // keyword published since still finds the card the user actually has
+    const unionOf = (...lists) => Array.from(new Set(lists.flatMap(list => (Array.isArray(list) ? list : []))));
+    const getSearchFields = (manifest, storeSlug, storeIntegration) => {
+      const storeManifest = (storeIntegration && storeIntegration.manifest) || {};
+      return {
+        descriptions: Object.values(manifest.description || {}).filter(text => typeof text === 'string'),
+        keywords: unionOf(manifest.keywords, storeManifest.keywords),
+        author: getStoreOwner(storeSlug),
+        countries: unionOf(manifest.countries, storeManifest.countries)
+      };
+    };
 
     // communication, weather, calendar and provider integrations have no device
     // screens: their card lands straight on the configuration screen
@@ -445,7 +453,7 @@ class Integration extends Component {
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: (storeIntegration && storeIntegration.first_seen_at) || null,
         updatedAt: get(storeIntegration, 'github.pushed_at') || null,
-        ...getSearchFields(manifest, integration.store_slug),
+        ...getSearchFields(manifest, integration.store_slug, storeIntegration),
         ...getTransportTags(manifest)
       });
     });
@@ -484,7 +492,7 @@ class Integration extends Component {
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: storeIntegration.first_seen_at || null,
         updatedAt: get(storeIntegration, 'github.pushed_at') || null,
-        ...getSearchFields(manifest, storeIntegration.store_slug),
+        ...getSearchFields(manifest, storeIntegration.store_slug, storeIntegration),
         ...getTransportTags(manifest)
       });
     });
@@ -562,20 +570,35 @@ class Integration extends Component {
     // this user. "42 of 810 integrations" says how much the view narrows it
     const catalogSize = catalog.length;
 
-    // a category earns its sidebar entry with enough visible integrations
-    // (spec §5). Like the "Updates" entry, the category being displayed stays
-    // visible below the bar, so the menu never loses the current view
-    const integrationCategories = catalogCategories.filter(
-      ({ key }) =>
-        key === category ||
-        catalog.filter(integration => integration.categories.includes(key)).length >= SIDEBAR_CATEGORY_MIN_INTEGRATIONS
-    );
-
-    let selectedIntegrations = catalog;
-
     const searchTokens = getSearchTokens(searchKeyword);
     const searching = searchTokens.length > 0;
     const isVirtualView = VIRTUAL_CATEGORIES.includes(category);
+
+    // the country filter (spec §4) is a discovery tool: an integration
+    // declared for other countries than the instance's is hidden from the
+    // browse views, until the user asks for all countries. An installed
+    // integration is never hidden — it is the user's, whatever country it
+    // was published for, and disappearing from "All" would read as
+    // uninstalled. Nothing is hidden when the country is unknown
+    const isVisibleInCountry = integration =>
+      integration.externalInstalled || isAvailableInCountry(integration.countries, instanceCountry);
+    const countryScopeApplicable = !isVirtualView && !searching && !!instanceCountry;
+    const countryFiltered = countryScopeApplicable && !allCountries;
+
+    // a category earns its sidebar entry with enough integrations visible to
+    // the current user (spec §5): counted on what the browse views actually
+    // show, so a shelf never appears only to look empty behind the country
+    // filter. Like the "Updates" entry, the category being displayed stays
+    // visible below the bar, so the menu never loses the current view
+    const browsableCatalog = countryFiltered ? catalog.filter(isVisibleInCountry) : catalog;
+    const integrationCategories = catalogCategories.filter(
+      ({ key }) =>
+        key === category ||
+        browsableCatalog.filter(integration => integration.categories.includes(key)).length >=
+          SIDEBAR_CATEGORY_MIN_INTEGRATIONS
+    );
+
+    let selectedIntegrations = catalog;
 
     // Filter on the browse category of the view. Not while searching: the
     // search looks through the whole catalog, since the user knows what they
@@ -587,17 +610,11 @@ class Integration extends Component {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.categories.includes(category));
     }
 
-    // the country filter (spec §4): on the browse views, an integration
-    // declared for other countries than the instance's is hidden, until the
-    // user asks for all countries. Never while searching, never on the
-    // inventories — and nothing is hidden when the country is unknown
-    const countryScopeApplicable = !isVirtualView && !searching && !!instanceCountry;
+    // never while searching, never on the inventories (above)
     let hiddenByCountry = 0;
-    if (countryScopeApplicable && !allCountries) {
+    if (countryFiltered) {
       const beforeCountry = selectedIntegrations.length;
-      selectedIntegrations = selectedIntegrations.filter(integration =>
-        isAvailableInCountry(integration.countries, instanceCountry)
-      );
+      selectedIntegrations = selectedIntegrations.filter(isVisibleInCountry);
       hiddenByCountry = beforeCountry - selectedIntegrations.length;
     }
 
@@ -638,6 +655,10 @@ class Integration extends Component {
     if (gladysPlus) {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.gladysPlus);
     }
+
+    // the size of an inventory (favorites, installed, to update) before the
+    // search narrows it: the reference its count is compared to ("2 of 10")
+    const viewSize = selectedIntegrations.length;
 
     // Search: every word is required, in any order, accents and case folded
     // on both sides (catalog-search.js). A keyword made of accents only folds
@@ -710,8 +731,8 @@ class Integration extends Component {
       integrations: selectedIntegrations,
       // the browse views are compared to the whole catalog ("42 of 810"); an
       // inventory (favorites, installed, to update) is its own total — "3 of
-      // 810" would say nothing about what is mine
-      totalSize: isVirtualView ? selectedIntegrations.length : catalogSize,
+      // 810" would say nothing about what is mine, "2 of 10" does
+      totalSize: isVirtualView ? viewSize : catalogSize,
       // anything that narrows the catalog below its size, and that one link
       // releases at once: a shelf, a facet, a search
       hasActiveFilters:
@@ -840,10 +861,13 @@ class Integration extends Component {
   };
 
   // the one link that releases every filter at once (shelf, facets, search),
-  // the sort being a preference and not a filter
+  // the sort being a preference and not a filter. An inventory (favorites,
+  // installed, to update) is not a filter either: clearing from one keeps
+  // the user on it, with its search and facets released
   clearFilters = async () => {
+    const category = VIRTUAL_CATEGORIES.includes(this.props.category) ? this.props.category : null;
     await this.setState({ searchKeyword: '', origin: null, transports: [], gladysPlus: false });
-    this.updateURL({ searchKeyword: '', origin: null, transports: [], gladysPlus: false, category: null });
+    this.updateURL({ searchKeyword: '', origin: null, transports: [], gladysPlus: false, category });
     await this.getIntegrations();
   };
 
