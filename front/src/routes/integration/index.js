@@ -20,8 +20,7 @@ import {
   getRememberedCatalogPosition,
   getUrlFromCatalog,
   rememberCatalogUrl,
-  rememberCatalogVisibleCount,
-  rememberSearchFocus
+  rememberCatalogVisibleCount
 } from './catalog-url';
 import { buildSearchIndex, getSearchRank, getSearchTokens } from './catalog-search';
 import {
@@ -179,6 +178,9 @@ class Integration extends Component {
   }
 
   componentWillUnmount() {
+    // a running "Update all" stops after the update in flight: there is no
+    // screen left to report on the next ones
+    this.unmounted = true;
     if (this.props.session && this.props.session.dispatcher) {
       this.props.session.dispatcher.removeListener(
         WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
@@ -244,7 +246,9 @@ class Integration extends Component {
     // the user changed while this load was in flight, or a newer load has
     // started since: that one holds the lists to display, this one must not
     // overwrite them
-    if (get(this.props, 'user.id') !== userId || request !== this.externalLoadRequest) {
+    // or the catalog was left meanwhile: an unmounted page never applies its
+    // state, so it would feed the header counter from the list it held before
+    if (this.unmounted || get(this.props, 'user.id') !== userId || request !== this.externalLoadRequest) {
       return;
     }
     await this.setState({
@@ -324,6 +328,7 @@ class Integration extends Component {
       // the URL of the newly displayed category
       this.updateURL();
       this.dropFinishedUpdates();
+      this.dropUpdateAllResult(prevCategory);
     }
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
@@ -377,6 +382,9 @@ class Integration extends Component {
     );
     const store = isAdmin ? this.state.externalStore || [] : [];
     const updateStates = this.state.updateStates || {};
+    // an "Update all" run updates one integration at a time: the card buttons
+    // wait for it, or a click would start a second pull alongside it
+    const updateLocked = this.state.updateAllStatus === RequestStatus.Getting;
 
     const storeBySlug = new Map();
     store.forEach(storeIntegration => {
@@ -463,6 +471,7 @@ class Integration extends Component {
         latestVersion: integration.latest_version,
         updateAvailable: integration.update_available,
         updateState: updateStates[integration.selector],
+        updateLocked,
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: (storeIntegration && storeIntegration.first_seen_at) || null,
         updatedAt: get(storeIntegration, 'github.pushed_at') || null,
@@ -502,6 +511,7 @@ class Integration extends Component {
         selector: isInstalled ? storeIntegration.installed_selector : null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false,
         updateState: isInstalled ? updateStates[storeIntegration.installed_selector] : undefined,
+        updateLocked,
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: storeIntegration.first_seen_at || null,
         updatedAt: get(storeIntegration, 'github.pushed_at') || null,
@@ -788,6 +798,78 @@ class Integration extends Component {
     return integrationsToUpdate;
   }
 
+  // the cards of the To update view still offering their update, in the order
+  // they are displayed: "Update all" runs on what the user sees, so a search,
+  // a facet or the sort narrows or orders the run as it does the list. A card
+  // whose update already went through is left out — a list that could not be
+  // reloaded after it still carries the flag, and only a version newer than
+  // the one just installed is to update again (the rule of the card footer).
+  // Admin-only: the server does not send the update_available flag to the
+  // other users
+  getIntegrationsToUpdate() {
+    if (get(this.props, 'user.role') !== USER_ROLE.ADMIN) {
+      return [];
+    }
+    const isStillToUpdate = card => {
+      const updateState = card.updateState || {};
+      if (updateState.status === RequestStatus.Success) {
+        return !!card.latestVersion && card.latestVersion !== updateState.version;
+      }
+      return true;
+    };
+    return (this.state.integrations || [])
+      .filter(card => card.externalInstalled && card.selector && card.updateAvailable)
+      .filter(isStillToUpdate)
+      .map(card => ({ selector: card.selector, name: card.name }));
+  }
+
+  // a card update in flight: "Update all" waits for it rather than starting a
+  // second pull alongside it
+  isCardUpdateRunning() {
+    const updateStates = this.state.updateStates || {};
+    return Object.keys(updateStates).some(selector => updateStates[selector].status === RequestStatus.Getting);
+  }
+
+  // "Update all": the card update is run for each integration, one after the
+  // other — one image pull and one container restart at a time, the card
+  // buttons waiting for the run (and the run for a card update already in
+  // flight), and a failure does not stop the others.
+  // Going through the card update keeps each card's spinner and outcome in
+  // step with the run, and reloads the installed list (cards, "To update"
+  // list, header counter) after every success
+  updateAllIntegrations = async () => {
+    if (this.state.updateAllStatus === RequestStatus.Getting || this.isCardUpdateRunning()) {
+      return;
+    }
+    const integrationsToUpdate = this.getIntegrationsToUpdate();
+    const total = integrationsToUpdate.length;
+    if (total === 0) {
+      return;
+    }
+    await this.setState({ updateAllStatus: RequestStatus.Getting, updateAllResult: null });
+    this.getIntegrations();
+    const failed = [];
+    for (let index = 0; index < total && !this.unmounted; index += 1) {
+      const integration = integrationsToUpdate[index];
+      await this.setState({ updateAllProgress: { name: integration.name, current: index + 1, total } });
+      // the outcome is the one returned by the card update, not read back
+      // from the state, which preact only applies on its next render
+      const outcome = await this.updateIntegration(integration.selector);
+      if (outcome === RequestStatus.Error) {
+        failed.push(integration);
+      }
+    }
+    if (this.unmounted) {
+      return;
+    }
+    await this.setState({
+      updateAllStatus: failed.length > 0 ? RequestStatus.Error : RequestStatus.Success,
+      updateAllProgress: null,
+      updateAllResult: { total, failed }
+    });
+    this.getIntegrations();
+  };
+
   toggleFavorite = async integrationKey => {
     const favorites = this.state.favorites || [];
     const newFavorites = favorites.includes(integrationKey)
@@ -818,7 +900,7 @@ class Integration extends Component {
   updateIntegration = async selector => {
     const updateState = (this.state.updateStates || {})[selector];
     if (updateState && updateState.status === RequestStatus.Getting) {
-      return;
+      return null;
     }
     await this.setUpdateState(selector, { status: RequestStatus.Getting });
     try {
@@ -826,11 +908,22 @@ class Integration extends Component {
       // the reload clears the update flag of this card and feeds the header
       // counter with the new count. The spinner stays up until it has landed:
       // with the flag still set, the card would offer the update again
-      await this.loadExternalIntegrations();
+      if (!this.unmounted) {
+        await this.loadExternalIntegrations();
+      }
+      if (this.unmounted) {
+        // the catalog was left during the update or the reload after it: there
+        // is no card left to update, and an unmounted page drops its reload,
+        // so the header counter is read again from the server
+        this.props.refreshExternalIntegrationsToUpdate();
+        return RequestStatus.Success;
+      }
       await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
+      return RequestStatus.Success;
     } catch (e) {
       console.error(e);
       await this.setUpdateState(selector, { status: RequestStatus.Error });
+      return RequestStatus.Error;
     }
   };
 
@@ -838,6 +931,11 @@ class Integration extends Component {
   // one, it would keep an up-to-date card in "To update" and hide the "all up
   // to date" state. An update still running, or failed, keeps its card state
   dropFinishedUpdates = async () => {
+    // a running "Update all" keeps the cards it already went through: coming
+    // back to To update, its outcome must still match the cards it names
+    if (this.state.updateAllStatus === RequestStatus.Getting) {
+      return;
+    }
     const updateStates = this.state.updateStates || {};
     const isFinished = selector => updateStates[selector].status === RequestStatus.Success;
     if (!Object.keys(updateStates).some(isFinished)) {
@@ -855,6 +953,18 @@ class Integration extends Component {
     this.getIntegrations();
   };
 
+  // the outcome of "Update all" is read on To update, like the card results:
+  // it goes once the user leaves that view after the run has ended
+  dropUpdateAllResult = prevCategory => {
+    if (
+      prevCategory === 'updates' &&
+      this.state.updateAllResult &&
+      this.state.updateAllStatus !== RequestStatus.Getting
+    ) {
+      this.setState({ updateAllResult: null });
+    }
+  };
+
   // more cards as the user scrolls down the list
   showMoreIntegrations = () => {
     this.setState(prevState => ({ visibleCount: prevState.visibleCount + CATALOG_PAGE_SIZE }));
@@ -869,11 +979,8 @@ class Integration extends Component {
     // update) keep their scope: searching "my installed Sonos" makes sense
     const leavesCategory =
       searchKeyword.length > 0 && this.props.category && !VIRTUAL_CATEGORIES.includes(this.props.category);
-    if (leavesCategory) {
-      // the other view is another route: the page is mounted again and the
-      // field would lose the focus after this first letter
-      rememberSearchFocus();
-    }
+    // "All integrations" is the same page as the shelf (app.jsx): it is not
+    // mounted again, so the search field keeps the focus as the user types
     this.updateURL(leavesCategory ? { searchKeyword, category: null } : { searchKeyword });
     await this.getIntegrationsDebounced();
   };
@@ -953,6 +1060,9 @@ class Integration extends Component {
       catalogLoading,
       showInstallFromGithub,
       showStoreRefresh,
+      updatableIntegrationsCount: this.getIntegrationsToUpdate().length,
+      cardUpdateRunning: this.isCardUpdateRunning(),
+      updateAllIntegrations: this.updateAllIntegrations,
       showMoreIntegrations: this.showMoreIntegrations,
       search: this.search,
       clearFilters: this.clearFilters,

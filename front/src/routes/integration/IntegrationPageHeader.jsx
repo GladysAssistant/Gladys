@@ -4,7 +4,6 @@ import CardFilter from '../../components/layout/CardFilter';
 import SortSelect from '../../components/layout/SortSelect';
 import InstallFromGithubCard from './all/external-integration/install-from-github/InstallFromGithubCard';
 import withIntlAsProp from '../../utils/withIntlAsProp';
-import { forgetSearchFocus, hasPendingSearchFocus } from './catalog-url';
 import style from './style.css';
 
 // the count is always compared to the whole catalog: "42 of 810 integrations"
@@ -52,24 +51,6 @@ const ORDER_DIR_OPTIONS = [
   { value: 'updated', labelId: 'integration.root.orderDirUpdated' }
 ];
 
-// gives the focus back to the search field when the view the user was typing
-// in was just replaced by "All integrations" (catalog-url.js): the field of
-// the header that is displayed, desktop or mobile, the other one being hidden
-// by CSS. Module-level so that the ref is stable: called on mount only
-const restoreSearchFocus = root => {
-  if (!root || !hasPendingSearchFocus()) {
-    return;
-  }
-  const input = Array.from(root.querySelectorAll('input.form-control')).find(element => element.offsetParent !== null);
-  if (!input) {
-    return;
-  }
-  forgetSearchFocus();
-  input.focus();
-  const caret = input.value.length;
-  input.setSelectionRange(caret, caret);
-};
-
 const IntegrationPageHeader = ({
   intl,
   orderDir,
@@ -98,7 +79,7 @@ const IntegrationPageHeader = ({
 
   return (
     <>
-      <div class={style.headerDesktop} ref={restoreSearchFocus}>
+      <div class={style.headerDesktop}>
         <div class="page-header">
           {/* the count sits under the title, not next to it: as a second
               column item it never pushes the sort and search controls to a
@@ -140,7 +121,7 @@ const IntegrationPageHeader = ({
         </div>
       </div>
 
-      <div class={style.headerMobile} ref={restoreSearchFocus}>
+      <div class={style.headerMobile}>
         <div class={style.mobileHeaderTop}>
           <h1 class={style.mobileTitle}>
             <Text id="integration.root.title" />

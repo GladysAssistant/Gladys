@@ -1042,6 +1042,25 @@
           "other": "{{count}} Community-Integrationen auf dieser Instanz installiert."
         }
       },
+      "updateAll": {
+        "title": {
+          "one": "1 Update verfügbar",
+          "other": "{{count}} Updates verfügbar"
+        },
+        "description": "Die Integrationen werden nacheinander aktualisiert: Jeder Container startet mit seiner neuen Version neu.",
+        "button": "Alle aktualisieren",
+        "progress": "{{name}} wird aktualisiert ({{current}} von {{total}})…",
+        "keepPageOpen": "Lassen Sie den Integrationskatalog bis zum Ende geöffnet: Sie können die Ansicht wechseln, aber wenn Sie den Katalog verlassen, werden die restlichen Updates abgebrochen.",
+        "waitCardUpdate": "Eine Integration wird gerade über ihre Karte aktualisiert: „Alle aktualisieren“ ist verfügbar, sobald dies abgeschlossen ist.",
+        "success": {
+          "one": "Die Integration wurde aktualisiert.",
+          "other": "Die {{total}} Integrationen wurden aktualisiert."
+        },
+        "failed": {
+          "one": "1 von {{total}} Updates ist fehlgeschlagen. Öffnen Sie die Integration, um ihre Logs zu prüfen und es erneut zu versuchen:",
+          "other": "{{failed}} von {{total}} Updates sind fehlgeschlagen. Öffnen Sie jede Integration, um ihre Logs zu prüfen und es erneut zu versuchen:"
+        }
+      },
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Dein Gerät wird vielleicht von einer externen <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">Community-Integration</a> unterstützt – dem empfohlenen Weg, neue Kompatibilitäten hinzuzufügen. Und wenn es sie noch nicht gibt, kannst du ganz einfach <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">deine eigene erstellen</a>!",
       "refreshStore": {
