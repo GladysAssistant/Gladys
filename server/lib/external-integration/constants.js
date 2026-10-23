@@ -390,6 +390,16 @@ const DYNAMIC_SOURCES = ['devices', 'houses'];
 // catalog (docs/specs/integration-catalog-categories.md). More than 3 means
 // the assignment is lazy, not the vocabulary too narrow.
 const MAX_MANIFEST_CATEGORIES = 3;
+// Optional `keywords` manifest field: search-only terms of the catalog
+// (brands, synonyms, cities…), never displayed. Bounded so the field stays a
+// handful of terms and not a dump of the documentation.
+const MAX_MANIFEST_KEYWORDS = 10;
+const MANIFEST_KEYWORD_MIN_LENGTH = 2;
+const MANIFEST_KEYWORD_MAX_LENGTH = 30;
+// Optional `countries` manifest field: ISO 3166-1 alpha-2 codes of the
+// countries where the integration is usable; absent = worldwide.
+const MAX_MANIFEST_COUNTRIES = 20;
+const MANIFEST_COUNTRY_CODE_REGEX = /^[A-Z]{2}$/;
 // Inbound webhooks via Gladys Plus (B.17): the gateway relays third-party
 // webhook calls to the instance under a single integration-agnostic action;
 // the supervisor routes them to the declared integration. Two modes exist
@@ -542,6 +552,32 @@ const MAX_WIDGET_ACTION_VALUE_LENGTH = 1000;
 // bounded free-form texts an integration hands back outside the content
 // vocabulary: the action result message and the `error` of a failed command
 const MAX_WIDGET_MESSAGE_LENGTH = 200;
+// Music players (capabilities/music.md, section 4): the queue, the catalog and
+// search are read on demand through the integration, never stored. A search
+// is a third-party API call: 10 s ack, a documented exception to the 5 s rule.
+const MUSIC_COMMAND_TIMEOUT_MS = 10 * 1000;
+// relayed music commands in flight per integration (browse, search, play,
+// queue): beyond, the request fails at once with 429 rather than queueing
+// behind the others until the ack deadline (the AI chat rule). Artwork has
+// its own queued pool, shared with the widget images.
+const MAX_MUSIC_COMMANDS_IN_FLIGHT = 4;
+// bounds of a MediaItem list answered by an integration: unknown fields are
+// dropped, strings truncated, invalid items dropped with a warning
+const MAX_MUSIC_ITEMS_PER_RESPONSE = 100;
+const MAX_MUSIC_MEDIA_ID_LENGTH = 512;
+const MAX_MUSIC_ITEM_TEXT_LENGTH = 200;
+const MAX_MUSIC_SEARCH_QUERY_LENGTH = 200;
+const MUSIC_BROWSE_DEFAULT_LIMIT = 50;
+const MUSIC_BROWSE_MAX_LIMIT = 100;
+const MUSIC_SEARCH_DEFAULT_LIMIT = 20;
+const MUSIC_SEARCH_MAX_LIMIT = 50;
+// artwork keys seen in the music responses of an integration stay servable
+// as long as the image cache would still serve them (1 h), bounded per
+// integration in LRU order
+const MAX_MUSIC_ARTWORK_KEYS_PER_INTEGRATION = 1000;
+const MUSIC_ARTWORK_KEY_TTL_MS = WIDGET_IMAGE_CACHE_TTL_MS;
+// the operations an integration declares in the `music` manifest field
+const MUSIC_MANIFEST_FIELDS = ['browse', 'search', 'queue', 'append'];
 // the content vocabulary enums (section 4 of the capability spec) — the
 // frontend maps them to theme colors, icons and layouts, never a free value
 const WIDGET_COLORS = ['neutral', 'primary', 'success', 'warning', 'danger', 'info'];
@@ -710,6 +746,11 @@ module.exports = {
   ACCOUNT_FIELD_TYPES,
   DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
+  MAX_MANIFEST_KEYWORDS,
+  MANIFEST_KEYWORD_MIN_LENGTH,
+  MANIFEST_KEYWORD_MAX_LENGTH,
+  MAX_MANIFEST_COUNTRIES,
+  MANIFEST_COUNTRY_CODE_REGEX,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   WEBHOOK_DEFAULT_MODE,
@@ -768,6 +809,19 @@ module.exports = {
   WIDGET_ACTION_FIELD_TYPES,
   MAX_WIDGET_ACTION_VALUE_LENGTH,
   MAX_WIDGET_MESSAGE_LENGTH,
+  MUSIC_COMMAND_TIMEOUT_MS,
+  MAX_MUSIC_COMMANDS_IN_FLIGHT,
+  MAX_MUSIC_ITEMS_PER_RESPONSE,
+  MAX_MUSIC_MEDIA_ID_LENGTH,
+  MAX_MUSIC_ITEM_TEXT_LENGTH,
+  MAX_MUSIC_SEARCH_QUERY_LENGTH,
+  MUSIC_BROWSE_DEFAULT_LIMIT,
+  MUSIC_BROWSE_MAX_LIMIT,
+  MUSIC_SEARCH_DEFAULT_LIMIT,
+  MUSIC_SEARCH_MAX_LIMIT,
+  MAX_MUSIC_ARTWORK_KEYS_PER_INTEGRATION,
+  MUSIC_ARTWORK_KEY_TTL_MS,
+  MUSIC_MANIFEST_FIELDS,
   WIDGET_COLORS,
   WIDGET_TEXT_VARIANTS,
   WIDGET_CHART_TYPES,

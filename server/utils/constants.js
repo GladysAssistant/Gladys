@@ -280,9 +280,41 @@ const PILOT_WIRE_MODE = {
   COMFORT: 5,
 };
 
+// Playback state of a music player (capabilities/music.md, section 1). PAUSED/PLAYING predate
+// the two others and are kept as published; IDLE = nothing loaded or playback stopped,
+// BUFFERING is reported only. Writing 0/1/2 pauses/plays/stops when the feature is writable.
 const MUSIC_PLAYBACK_STATE = {
   PLAYING: 1,
   PAUSED: 0,
+  IDLE: 2,
+  BUFFERING: 3,
+};
+
+// Repeat mode of a music player: OFF, ALL (the queue), ONE (the current track).
+const MUSIC_REPEAT_MODE = {
+  OFF: 0,
+  ALL: 1,
+  ONE: 2,
+};
+
+// Types of the MediaItem objects served by the on-demand music catalog
+// (capabilities/music.md, section 4.2): never a vendor label.
+const MUSIC_MEDIA_TYPES = {
+  TRACK: 'track',
+  ALBUM: 'album',
+  ARTIST: 'artist',
+  PLAYLIST: 'playlist',
+  RADIO: 'radio',
+  FOLDER: 'folder',
+};
+
+// Playback modes of a music play command: REPLACE replaces the current
+// playback (every integration), NEXT/APPEND enqueue (integrations declaring
+// `music.append` in their manifest).
+const MUSIC_PLAY_MODES = {
+  REPLACE: 'replace',
+  NEXT: 'next',
+  APPEND: 'append',
 };
 
 const OPENING_SENSOR_STATE = {
@@ -488,6 +520,10 @@ const INTEGRATION_CATALOG_CATEGORIES = [
   'notifications',
   'assistants',
   'services',
+  'transport',
+  'vehicles',
+  'servers',
+  'leisure',
 ];
 
 // The timezone of the instance when the TIMEZONE system setting is not set: the
@@ -867,6 +903,8 @@ const ACTIONS = {
   },
   MUSIC: {
     PLAY_NOTIFICATION: 'music.play-notification',
+    // start a MediaItem (id + type from the integration's catalog) on a player
+    PLAY_MEDIA: 'music.play-media',
   },
   SMS: {
     SEND: 'sms.send',
@@ -1212,14 +1250,34 @@ const DEVICE_FEATURE_TYPES = {
     FORWARD: 'forward',
     RECORD: 'record',
   },
+  // A music player (capabilities/music.md). The whole category is live: no state history
+  // whatever the integration or the user asks (keep_history is forced off at creation).
   MUSIC: {
     VOLUME: 'volume',
     PLAY: 'play',
     PAUSE: 'pause',
     PREVIOUS: 'previous',
     NEXT: 'next',
+    // MUSIC_PLAYBACK_STATE; writable on players that accept play/pause/stop as one feature
     PLAYBACK_STATE: 'playback_state',
     PLAY_NOTIFICATION: 'play_notification',
+    // String states (last_value_string), ≤ 200 characters, empty when nothing is loaded
+    TITLE: 'title',
+    ARTIST: 'artist',
+    ALBUM: 'album',
+    // String state: an image KEY (^[a-z0-9][a-z0-9-]{0,63}$) served by the artwork proxy
+    // route of the player's integration — never a URL
+    ARTWORK: 'artwork',
+    // Seconds; 0 = unknown or live stream
+    DURATION: 'duration',
+    // Seconds, the position sampled at last_value_changed (the frontend extrapolates);
+    // writing seeks
+    POSITION: 'position',
+    SHUFFLE: 'shuffle',
+    // MUSIC_REPEAT_MODE
+    REPEAT: 'repeat',
+    // Independent from volume: a muted player keeps its level
+    MUTE: 'mute',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',
@@ -2021,7 +2079,27 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_VOLUME]: [DEVICE_FEATURE_UNITS.LITER],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.DAILY_IRRIGATION_VOLUME]: [DEVICE_FEATURE_UNITS.LITER],
   },
+  [DEVICE_FEATURE_CATEGORIES.MUSIC]: {
+    // the two time values of a player are seconds; the rest of the category carries no unit
+    // except the volume percent
+    [DEVICE_FEATURE_TYPES.MUSIC.DURATION]: [DEVICE_FEATURE_UNITS.SECONDS],
+    [DEVICE_FEATURE_TYPES.MUSIC.POSITION]: [DEVICE_FEATURE_UNITS.SECONDS],
+  },
 };
+
+// The music types whose state is a string (last_value_string): the core routes them to
+// saveStringState by category + type, whatever the shape of the event, exactly like
+// text/text (capabilities/music.md, section 1).
+const MUSIC_STRING_FEATURE_TYPES = [
+  DEVICE_FEATURE_TYPES.MUSIC.TITLE,
+  DEVICE_FEATURE_TYPES.MUSIC.ARTIST,
+  DEVICE_FEATURE_TYPES.MUSIC.ALBUM,
+  DEVICE_FEATURE_TYPES.MUSIC.ARTWORK,
+];
+// a title, an artist or an album is truncated at this length by the core
+const MAX_MUSIC_TEXT_LENGTH = 200;
+// an artwork state is an image key served by the player's integration, never a URL
+const MUSIC_ARTWORK_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
 const MEASUREMENT_UNITS = {
   US: 'us',
@@ -2227,6 +2305,13 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ENERGY_CONTRACT_PRICE: 'external-integration.energy-contract.price',
     ENERGY_CONTRACT_CURRENT: 'external-integration.energy-contract.current',
     ENERGY_CALENDAR_REFRESH: 'external-integration.energy-calendar.refresh',
+    // music players: on-demand catalog, queue and artwork (capabilities/music.md)
+    MUSIC_BROWSE: 'external-integration.music.browse',
+    MUSIC_SEARCH: 'external-integration.music.search',
+    MUSIC_PLAY: 'external-integration.music.play',
+    MUSIC_QUEUE_GET: 'external-integration.music.queue-get',
+    MUSIC_QUEUE_PLAY: 'external-integration.music.queue-play',
+    MUSIC_GET_ARTWORK: 'external-integration.music.get-artwork',
   },
 };
 
@@ -2305,6 +2390,24 @@ const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {
   DAILY: 'daily',
   HOURLY: 'hourly',
 };
+
+// Columns of t_device_feature holding the current STATE of a feature, not its definition: they are
+// written by device.saveState / device.saveStringState and by the aggregation jobs, never by a device
+// save. device.create ignores them on a feature that already exists: a caller saving a device sends back
+// the features it read earlier (the MQTT device page posts the whole device just to append one feature),
+// and letting them through rolled every existing feature back to the value the client had in hand. They
+// are only accepted when the feature is created, so an integration can declare a first value along with
+// a brand new feature (lan-manager does it for presence). The frontend leaves them out of the device it
+// posts back (stripDeviceStatesForSave): a camera image alone (camera/image, up to 150 kB of base64)
+// would push the save past the 100 kB JSON bound of the API.
+const DEVICE_FEATURE_STATE_COLUMNS = [
+  'last_value',
+  'last_value_string',
+  'last_value_changed',
+  'last_hourly_aggregate',
+  'last_daily_aggregate',
+  'last_monthly_aggregate',
+];
 
 const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.HOURLY]: 6 * 30,
@@ -2624,6 +2727,7 @@ module.exports.WEATHER_UNITS = WEATHER_UNITS;
 
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
+module.exports.DEVICE_FEATURE_STATE_COLUMNS = DEVICE_FEATURE_STATE_COLUMNS;
 module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
 
 module.exports.SYSTEM_UPGRADE_ERROR_CODES = SYSTEM_UPGRADE_ERROR_CODES;
@@ -2647,6 +2751,12 @@ module.exports.AI_CHAT_PURPOSES = AI_CHAT_PURPOSES;
 module.exports.AI_GENERATED_SCENE_TAG = AI_GENERATED_SCENE_TAG;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
+module.exports.MUSIC_REPEAT_MODE = MUSIC_REPEAT_MODE;
+module.exports.MUSIC_MEDIA_TYPES = MUSIC_MEDIA_TYPES;
+module.exports.MUSIC_PLAY_MODES = MUSIC_PLAY_MODES;
+module.exports.MUSIC_STRING_FEATURE_TYPES = MUSIC_STRING_FEATURE_TYPES;
+module.exports.MAX_MUSIC_TEXT_LENGTH = MAX_MUSIC_TEXT_LENGTH;
+module.exports.MUSIC_ARTWORK_KEY_REGEX = MUSIC_ARTWORK_KEY_REGEX;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;
 
 module.exports.ENERGY_CONTRACT_TYPES = ENERGY_CONTRACT_TYPES;

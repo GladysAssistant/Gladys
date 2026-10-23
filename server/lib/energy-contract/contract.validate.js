@@ -10,6 +10,7 @@ const {
 } = require('../../utils/constants');
 const { validateTariff } = require('./tariff.validate');
 const { substituteInputs } = require('./tariff.compile');
+const { pruneTariffToValidity } = require('./tariff.prune');
 const { TARIFF_COMPONENT_KINDS, DATE_REGEX } = require('./tariff.constants');
 
 const MAX_INPUT_KEYS = 32;
@@ -82,14 +83,17 @@ function isValidTimezone(timezone) {
  * @description Validate the tariff of a contract according to its pricing mode: the
  * full grammar in `rules` mode, only `fixed` components in `delegated` mode (the
  * integration prices the energy, the core adds the subscription at display time).
+ * The dated rules and components outside the contract's validity are dropped first
+ * (a template carrying years of price history then fits the limits).
  * @param {object} tariff - Tariff definition.
  * @param {object} inputs - Template inputs to substitute.
  * @param {string} pricingMode - `rules` or `delegated`.
- * @returns {object} The normalized tariff (inputs substituted).
+ * @param {object|Array<object>} [validity] - `{ valid_from, valid_to }` of the contract (or several windows).
+ * @returns {object} The normalized tariff (inputs substituted, history outside the validity dropped).
  * @example
  * validateContractTariff({ tariff_version: 1, components: [] }, {}, 'delegated');
  */
-function validateContractTariff(tariff, inputs, pricingMode) {
+function validateContractTariff(tariff, inputs, pricingMode, validity) {
   const delegated = pricingMode === ENERGY_CONTRACT_PRICING_MODES.DELEGATED;
   if (tariff === undefined || tariff === null) {
     if (!delegated) {
@@ -97,7 +101,7 @@ function validateContractTariff(tariff, inputs, pricingMode) {
     }
     return { ...EMPTY_TARIFF };
   }
-  const substituted = substituteInputs(tariff, inputs || {});
+  const substituted = pruneTariffToValidity(substituteInputs(tariff, inputs || {}), validity);
   const components = Array.isArray(substituted.components) ? substituted.components : [];
   if (delegated) {
     const other = components.find((c) => c && c.kind !== TARIFF_COMPONENT_KINDS.FIXED);

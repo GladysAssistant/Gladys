@@ -22,10 +22,16 @@ const {
   MAX_NETWORK_DISCOVERY_ENTRIES,
   MAX_UDP_BROADCAST_PORTS,
   MAX_ACTIONS,
+  MUSIC_MANIFEST_FIELDS,
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,
   MANIFEST_TRANSPORTS,
   MAX_MANIFEST_CATEGORIES,
+  MAX_MANIFEST_KEYWORDS,
+  MANIFEST_KEYWORD_MIN_LENGTH,
+  MANIFEST_KEYWORD_MAX_LENGTH,
+  MAX_MANIFEST_COUNTRIES,
+  MANIFEST_COUNTRY_CODE_REGEX,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   ACCOUNT_FIELD_TYPES,
@@ -79,6 +85,8 @@ const MANIFEST_FIELDS = [
   'actions',
   'transports',
   'categories',
+  'keywords',
+  'countries',
   'webhooks',
   'messaging',
   'contact_schema',
@@ -87,6 +95,7 @@ const MANIFEST_FIELDS = [
   'scene_triggers',
   'scene_actions',
   'energy_contracts',
+  'music',
 ];
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
@@ -1301,6 +1310,24 @@ function validateManifest(manifest) {
   if (manifest.energy_contracts !== undefined) {
     validateEnergyContractsField(manifest.energy_contracts, errors, validateMultiLanguageText);
   }
+  if (manifest.music !== undefined) {
+    // the on-demand music operations a player integration implements
+    // (capabilities/music.md, section 4.1): a flat object of booleans, on
+    // device integrations only — a player is a device
+    if (manifest.type !== 'device') {
+      errors.push('music: only allowed on device integrations');
+    } else if (manifest.music === null || typeof manifest.music !== 'object' || Array.isArray(manifest.music)) {
+      errors.push('music: must be an object');
+    } else {
+      Object.keys(manifest.music).forEach((key) => {
+        if (!MUSIC_MANIFEST_FIELDS.includes(key)) {
+          errors.push(`music.${key}: unknown field`);
+        } else if (typeof manifest.music[key] !== 'boolean') {
+          errors.push(`music.${key}: must be a boolean`);
+        }
+      });
+    }
+  }
   if (manifest.type === PROVIDER_TYPE) {
     // a provider providing nothing has no contract at all: explicit error
     const declaresCapability = CAPABILITY_MANIFEST_FIELDS.some((field) => manifest[field] !== undefined);
@@ -1320,6 +1347,46 @@ function validateManifest(manifest) {
       new Set(manifest.transports).size !== manifest.transports.length
     ) {
       errors.push(`transports: must be a non-empty subset of ${MANIFEST_TRANSPORTS.join(', ')}`);
+    }
+  }
+  // search-only terms of the catalog (C.1): plain non-empty strings, bounded
+  // in number and length, unique once trimmed and lowercased — "WiiM" and
+  // "wiim" are the same term for a search that ignores case
+  if (manifest.keywords !== undefined) {
+    const keywordsValid =
+      Array.isArray(manifest.keywords) &&
+      manifest.keywords.length > 0 &&
+      manifest.keywords.length <= MAX_MANIFEST_KEYWORDS &&
+      manifest.keywords.every(
+        (keyword) =>
+          typeof keyword === 'string' &&
+          keyword.trim().length >= MANIFEST_KEYWORD_MIN_LENGTH &&
+          keyword.trim().length <= MANIFEST_KEYWORD_MAX_LENGTH,
+      );
+    if (
+      !keywordsValid ||
+      new Set(manifest.keywords.map((keyword) => keyword.trim().toLowerCase())).size !== manifest.keywords.length
+    ) {
+      errors.push(
+        `keywords: must be 1-${MAX_MANIFEST_KEYWORDS} unique strings of ${MANIFEST_KEYWORD_MIN_LENGTH}-${MANIFEST_KEYWORD_MAX_LENGTH} characters`,
+      );
+    }
+  }
+  // countries where the integration is usable (C.1): ISO 3166-1 alpha-2
+  // codes, upper case. The shape is all the core checks — the list of real
+  // codes belongs to the indexer, and an unknown code only ever hides the
+  // integration from the country filter of the catalog, never from the search
+  if (manifest.countries !== undefined) {
+    if (
+      !Array.isArray(manifest.countries) ||
+      manifest.countries.length === 0 ||
+      manifest.countries.length > MAX_MANIFEST_COUNTRIES ||
+      !manifest.countries.every(
+        (country) => typeof country === 'string' && MANIFEST_COUNTRY_CODE_REGEX.test(country),
+      ) ||
+      new Set(manifest.countries).size !== manifest.countries.length
+    ) {
+      errors.push(`countries: must be 1-${MAX_MANIFEST_COUNTRIES} unique ISO 3166-1 alpha-2 codes (upper case)`);
     }
   }
   if (manifest.categories !== undefined) {

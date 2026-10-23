@@ -2,7 +2,7 @@ import { catalogCategories } from '../../config/integrations';
 
 const CATALOG_BASE_URL = '/dashboard/integration';
 const DEFAULT_ORDER_DIR = 'asc';
-const ORDER_DIRS = ['asc', 'desc', 'newest'];
+const ORDER_DIRS = ['asc', 'desc', 'newest', 'updated'];
 // cumulative facet filters (spec §4): technical attributes, orthogonal to the
 // browse categories — they live in the query string like the other filters
 const FACET_ORIGINS = ['native', 'community'];
@@ -28,7 +28,7 @@ export const getCatalogPath = category => (category ? `${CATALOG_BASE_URL}/${cat
 const normalizeTransports = transports =>
   FACET_TRANSPORTS.filter(value => (Array.isArray(transports) ? transports.includes(value) : false));
 
-const buildFilterParams = ({ searchKeyword, orderDir, origin, transports, gladysPlus }) => {
+const buildFilterParams = ({ searchKeyword, orderDir, origin, transports, gladysPlus, allCountries }) => {
   const urlParams = new URLSearchParams();
   if (searchKeyword) {
     urlParams.set('search', searchKeyword);
@@ -47,6 +47,11 @@ const buildFilterParams = ({ searchKeyword, orderDir, origin, transports, gladys
   if (gladysPlus) {
     urlParams.set('plus', '1');
   }
+  // the country filter is on by default (the instance's country); only the
+  // choice to look beyond it is worth carrying around
+  if (allCountries) {
+    urlParams.set('country', 'all');
+  }
   return urlParams;
 };
 
@@ -58,8 +63,11 @@ const withQuery = (path, urlParams) => {
 // the filters live in the URL so that coming back to the catalog (with the
 // browser back button or with a "back to integrations" link) restores the
 // exact view the user left
-export const getCatalogUrl = ({ category, searchKeyword, orderDir, origin, transports, gladysPlus }) =>
-  withQuery(getCatalogPath(category), buildFilterParams({ searchKeyword, orderDir, origin, transports, gladysPlus }));
+export const getCatalogUrl = ({ category, searchKeyword, orderDir, origin, transports, gladysPlus, allCountries }) =>
+  withQuery(
+    getCatalogPath(category),
+    buildFilterParams({ searchKeyword, orderDir, origin, transports, gladysPlus, allCountries })
+  );
 
 export const getCatalogFilters = (queryString = window.location.search) => {
   const urlParams = new URLSearchParams(queryString);
@@ -74,15 +82,19 @@ export const getCatalogFilters = (queryString = window.location.search) => {
     // same rule for the facets: an unknown value means "no filter"
     origin: FACET_ORIGINS.includes(origin) ? origin : null,
     transports: normalizeTransports(transportParam ? transportParam.split(',') : []),
-    gladysPlus: urlParams.get('plus') === '1'
+    gladysPlus: urlParams.get('plus') === '1',
+    allCountries: urlParams.get('country') === 'all'
   };
 };
 
 // an integration page opened from the catalog keeps the catalog it comes from
 // ("from") and the filters that were applied, so that it can send the user
 // back to where they were
-export const getUrlFromCatalog = (path, { category, searchKeyword, orderDir, origin, transports, gladysPlus }) => {
-  const urlParams = buildFilterParams({ searchKeyword, orderDir, origin, transports, gladysPlus });
+export const getUrlFromCatalog = (
+  path,
+  { category, searchKeyword, orderDir, origin, transports, gladysPlus, allCountries }
+) => {
+  const urlParams = buildFilterParams({ searchKeyword, orderDir, origin, transports, gladysPlus, allCountries });
   urlParams.set('from', getCatalogPath(category));
   return withQuery(path, urlParams);
 };
@@ -98,6 +110,68 @@ let lastCatalogUrl = null;
 
 export const rememberCatalogUrl = url => {
   lastCatalogUrl = url;
+};
+
+// Where the user was in the catalog when they opened an integration from a
+// card: the pages of cards already rendered and the scroll position, so that
+// coming back lands on the same card and not on the top of the list. Kept per
+// catalog URL: another view (category, search, sort…) starts from its first
+// page. Only a card click leaves a position to come back to — leaving the
+// catalog any other way (the main menu, a sidebar link) forgets it, so the
+// next visit starts from the top like any page. In memory only: a reload
+// forgets it, like the remembered URL above.
+const catalogPosition = { url: null, scrollY: 0, visibleCount: null, pending: false };
+
+// called as a card is clicked, before the page scrolls to the top of the
+// integration screen. A modified click (new tab, new window) keeps the
+// catalog mounted: it leaves no position to come back to
+export const rememberCatalogScroll = e => {
+  if (e && (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey)) {
+    return;
+  }
+  catalogPosition.url = lastCatalogUrl;
+  catalogPosition.scrollY = window.scrollY;
+  catalogPosition.pending = true;
+};
+
+// called as the catalog unmounts: completes the position a card click just
+// started, or forgets it when the user left by another way
+export const rememberCatalogVisibleCount = visibleCount => {
+  if (!catalogPosition.pending) {
+    catalogPosition.url = null;
+    return;
+  }
+  catalogPosition.visibleCount = visibleCount;
+};
+
+// the position is consumed by the first catalog that mounts, whatever its
+// URL: a catalog opened on another view after the card click must not leave
+// a stale position for a later visit, and the next time the user leaves, a
+// card click has to start a new one
+export const getRememberedCatalogPosition = url => {
+  const { pending } = catalogPosition;
+  catalogPosition.pending = false;
+  if (!pending || catalogPosition.url !== url || !catalogPosition.visibleCount) {
+    return null;
+  }
+  return { scrollY: catalogPosition.scrollY, visibleCount: catalogPosition.visibleCount };
+};
+
+// Typing on a shelf leaves it for "All integrations" (the search looks through
+// the whole catalog): the two views are different routes, so the page is
+// mounted again and the browser drops the focus of the search field after the
+// first letter. The search remembers that it was being typed in, and the
+// field of the view that mounts next takes the focus back, caret at the end.
+let searchFocusPending = false;
+
+export const rememberSearchFocus = () => {
+  searchFocusPending = true;
+};
+
+export const hasPendingSearchFocus = () => searchFocusPending;
+
+export const forgetSearchFocus = () => {
+  searchFocusPending = false;
 };
 
 // a remembered URL carries its filters in the query string, so only its path

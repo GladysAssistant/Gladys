@@ -1008,6 +1008,12 @@ const actionsFunc = {
     // Play TTS Notification on device
     await self.device.setValue(device, deviceFeature, url, { volume });
   },
+  [ACTIONS.MUSIC.PLAY_MEDIA]: async (self, action) => {
+    // the media id is opaque to the core and flows back to the integration that
+    // produced it (capabilities/music.md, section 7); a stopped or refusing
+    // integration makes the action throw, the scene framework logs it
+    await self.device.music.play(action.device, action.media, action.mode);
+  },
   [ACTIONS.SMS.SEND]: async (self, action, scope) => {
     const freeMobileService = self.service.getService('free-mobile');
 

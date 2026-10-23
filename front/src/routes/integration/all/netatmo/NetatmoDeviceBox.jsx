@@ -14,6 +14,7 @@ import {
   SUPPORTED_CATEGORY_TYPE
 } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import styles from './style.css';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 const createGithubUrl = device => {
   const title = encodeURIComponent(`Netatmo: Add device ${device.model}`);
@@ -59,7 +60,10 @@ class NetatmoDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(this.state.device)
+      );
       this.setState({
         device: savedDevice,
         isSaving: true

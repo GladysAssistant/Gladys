@@ -14,7 +14,7 @@ import update from 'immutability-helper';
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
-import { getDeviceParam } from '../../../../utils/device';
+import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/device';
 import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 import { buildUsagePointDevicePayload } from './usagePointDeviceBuilder';
@@ -23,6 +23,7 @@ const UsagePointDevice = ({
   device,
   language = 'fr',
   deviceIndex,
+  updateDeviceName,
   saveDevice,
   destroyDevice,
   reCreateUsagePointDevice,
@@ -71,6 +72,18 @@ const UsagePointDevice = ({
           </h3>
         </div>
         <div class="card-body">
+          <div class="form-group">
+            <label for={`name_${deviceIndex}`}>
+              <Text id="integration.enedis.usagePoints.usagePointDeviceName" />
+            </label>
+            <input
+              id={`name_${deviceIndex}`}
+              type="text"
+              class="form-control"
+              value={device.name}
+              onInput={e => updateDeviceName(deviceIndex, e.target.value)}
+            />
+          </div>
           <div class="form-group">
             <label>
               <Text id="integration.enedis.usagePoints.usagePointId" />
@@ -175,6 +188,7 @@ const EnedisUsagePoints = ({
   errored,
   loading,
   usagePointsDevices,
+  updateDeviceName,
   updateDeviceParam,
   saveDevice,
   destroyDevice,
@@ -230,6 +244,7 @@ const EnedisUsagePoints = ({
                 <UsagePointDevice
                   device={usagePointDevice}
                   deviceIndex={index}
+                  updateDeviceName={updateDeviceName}
                   updateDeviceParam={updateDeviceParam}
                   saveDevice={saveDevice}
                   destroyDevice={destroyDevice}
@@ -285,6 +300,12 @@ class EnedisWelcomePageComponent extends Component {
     }
     await this.setState({ usagePointsDevices: newUsagePointsDevices });
   };
+  updateDeviceName = (deviceIndex, name) => {
+    const usagePointsDevices = update(this.state.usagePointsDevices, {
+      [deviceIndex]: { name: { $set: name } }
+    });
+    this.setState({ usagePointsDevices });
+  };
   getCurrentSync = async () => {
     try {
       const syncs = await this.props.session.gatewayClient.enedisGetSync();
@@ -307,7 +328,7 @@ class EnedisWelcomePageComponent extends Component {
     await this.setState({ loading: true });
     try {
       const device = this.state.usagePointsDevices[deviceIndex];
-      await this.props.httpClient.post('/api/v1/device', device);
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     } catch (e) {
       console.error(e);
     }
@@ -339,7 +360,7 @@ class EnedisWelcomePageComponent extends Component {
       existingDevice
     });
 
-    await this.props.httpClient.post('/api/v1/device', device);
+    await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     await this.getCurrentEnedisUsagePoints();
   };
   init = async () => {
@@ -365,6 +386,7 @@ class EnedisWelcomePageComponent extends Component {
           sync={this.sync}
           syncs={syncs}
           language={user.language}
+          updateDeviceName={this.updateDeviceName}
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
           destroyDevice={this.destroyDevice}

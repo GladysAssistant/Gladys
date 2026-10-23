@@ -63,6 +63,12 @@ describe('user.forgotPassword', () => {
     expect(resetSessions).to.have.lengthOf(1); // the seeded one only
   });
 
+  it('should find the user when the email is typed with capitals and spaces (phone keyboard)', async () => {
+    const result = await user.forgotPassword(' Demo@Demo.com ', 'chrome', KNOWN_ORIGIN);
+    expect(result.method).to.equal('link');
+    expect(result.user).to.have.property('selector', 'john');
+  });
+
   it('should send a code when the origin is missing or malformed', async () => {
     const noOrigin = await user.forgotPassword('demo@demo.com', 'chrome');
     expect(noOrigin.method).to.equal('code');

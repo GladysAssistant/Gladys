@@ -1,4 +1,12 @@
 {
+  "musicMediaTypes": {
+    "track": "Morceau",
+    "album": "Album",
+    "artist": "Artiste",
+    "playlist": "Playlist",
+    "radio": "Radio",
+    "folder": "Dossier"
+  },
   "global": {
     "logoAlt": "Logo Gladys",
     "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
@@ -83,6 +91,7 @@
       "unitMismatchWarning": "Cette fonctionnalité a une unité différente de la fonctionnalité source : les valeurs sont déplacées sans conversion, les graphiques risquent de devenir incohérents.",
       "unmappedWarning": "Certaines fonctionnalités n'ont pas de correspondance : leur historique sera supprimé, et les scènes et tableaux de bord qui les utilisent ne seront pas mis à jour.",
       "playNotificationWarning": "L'appareil de destination ne peut pas jouer de notifications : les scènes qui « parlent sur » cette enceinte seront re-pointées vers la destination, et échoueront à l'exécution. Choisissez une destination compatible, ou modifiez ces scènes après la migration.",
+      "playMediaWarning": "Les scènes qui lancent de la musique (une playlist, un album, un morceau) sur ce lecteur conservent des références de médias qui appartiennent à son intégration : elles seront re-pointées vers la destination et ne fonctionneront que si celle-ci utilise le même fournisseur de musique. Vérifiez ces scènes après la migration.",
       "noDestinationAvailable": "Aucun appareil d'une autre intégration n'a été trouvé. Créez d'abord l'appareil de destination dans sa nouvelle intégration, puis revenez ici pour migrer.",
       "loadError": "Impossible de charger la liste des appareils. Veuillez réessayer.",
       "migrateError": "La migration a échoué. L'ancien appareil n'a pas été supprimé, mais une partie de l'historique a pu être déjà déplacée vers la destination. Vérifiez la page des tâches et votre liste d'appareils, puis réessayez : une nouvelle tentative ne migre que ce qu'il reste à migrer.",
@@ -718,7 +727,38 @@
         "cancelAlarmArming": "Annuler"
       },
       "music": {
-        "selectDeviceLabel": "Sélectionner l'appareil à contrôler"
+        "selectDeviceLabel": "Sélectionner l'appareil à contrôler",
+        "nothingPlaying": "Aucune lecture en cours",
+        "unknownTrack": "Morceau inconnu",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "play": "Lecture",
+        "pause": "Pause",
+        "shuffle": "Lecture aléatoire",
+        "repeat": "Répétition",
+        "mute": "Sourdine",
+        "volume": "Volume",
+        "queue": "File d'attente",
+        "browse": "Parcourir",
+        "search": "Rechercher",
+        "searchPlaceholder": "Titres, artistes, playlists…",
+        "back": "Retour",
+        "close": "Fermer",
+        "playItem": "Lire",
+        "playNext": "Lire ensuite",
+        "addToQueue": "Ajouter à la file",
+        "added": "Ajouté à la file",
+        "playAll": "Lire",
+        "pickThis": "Choisir",
+        "live": "En direct",
+        "commandFailed": "Le lecteur n'a pas pu exécuter la commande.",
+        "noResponse": "Le lecteur n'a pas répondu.",
+        "emptyQueue": "La file d'attente est vide",
+        "noResults": "Aucun résultat",
+        "loading": "Chargement…",
+        "loadMore": "Charger la suite",
+        "unavailable": "L'intégration est indisponible. Le dernier état connu est affiché.",
+        "error": "Une erreur est survenue."
       },
       "gauge": {
         "description": "Ce widget affichera une jauge avec la valeur de la fonctionnalité sélectionnée entre sa valeur minimale et maximale.",
@@ -974,7 +1014,8 @@
       "external": "Communauté",
       "native": "Natif",
       "deprecated": "Bientôt dépréciée",
-      "new": "Nouveau"
+      "new": "Nouveau",
+      "installed": "Installée"
     },
     "root": {
       "title": "Intégrations",
@@ -990,6 +1031,10 @@
       "storeUnavailable": "Le store des intégrations de la communauté est injoignable : seules les intégrations natives et celles déjà installées sont affichées.",
       "storeUnavailableRetry": "Réessayer",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
+      "updateButton": "Mettre à jour",
+      "updateRetryButton": "Réessayer",
+      "updateError": "La mise à jour a échoué. Consultez les logs de l'intégration, puis réessayez.",
+      "updatedTo": "Mis à jour en v{{version}}",
       "noInstalledIntegrations": "Aucune intégration de la communauté n'est encore installée sur cette instance.",
       "installedSummary": {
         "title": {
@@ -1013,6 +1058,17 @@
         "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel). Votre appareil peut aussi être pris en charge par une <b>intégration externe</b> de la communauté : chacun peut en créer une et la publier dans le store, elle apparaît alors dans cette liste. Consultez la <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">documentation des intégrations externes</a>."
       },
       "orderDirNewest": "Nouveautés d'abord",
+      "orderDirUpdated": "Dernière mise à jour",
+      "clearFilters": "Effacer les filtres",
+      "countryFilter": {
+        "scoped": {
+          "one": "Pays : {{country}}. 1 intégration d'un autre pays est masquée.",
+          "other": "Pays : {{country}}. {{count}} intégrations d'autres pays sont masquées."
+        },
+        "showAll": "Voir tous les pays",
+        "all": "Tous les pays sont affichés.",
+        "showOnly": "Limiter au pays : {{country}}"
+      },
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
@@ -1029,11 +1085,14 @@
         "network": "Réseau & présence",
         "notifications": "Messages & notifications",
         "assistants": "Assistants vocaux & IA",
-        "services": "Services"
+        "services": "Services",
+        "transport": "Transports & mobilité",
+        "vehicles": "Véhicules & recharge",
+        "servers": "Serveurs & auto-hébergement",
+        "leisure": "Loisirs, sport & jeux"
       }
     },
     "externalIntegration": {
-      "updateAvailable": "Mise à jour disponible",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte",
       "configTab": "Configuration",
@@ -2250,6 +2309,7 @@
         "usagePointName": "Compteur",
         "lastRefresh": "Dernières données :",
         "usagePointId": "Identifiant du compteur",
+        "usagePointDeviceName": "Nom",
         "contractType": "Type de contrat",
         "contracts": {
           "hc-hp": "Heures creuses/heures pleines",
@@ -4049,6 +4109,19 @@
         "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
+      "playMedia": {
+        "description": "Cette action lancera le média sélectionné sur le lecteur choisi.",
+        "deviceLabel": "Lecteur",
+        "mediaLabel": "Média à lire",
+        "selectedMedia": "Sélection",
+        "changeMedia": "Modifier",
+        "noMedia": "Aucun média sélectionné : parcourez ou recherchez dans le catalogue du lecteur ci-dessous.",
+        "unsupported": "Ce lecteur ne propose pas de catalogue : choisissez un autre lecteur.",
+        "modeLabel": "Mode",
+        "modeReplace": "Lire maintenant (remplace la lecture en cours)",
+        "modeNext": "Lire ensuite",
+        "modeAppend": "Ajouter à la fin de la file"
+      },
       "playNotification": {
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "voiceSettingLink": "Choisir la voix de votre instance (intégration Intelligence Artificielle)",
@@ -4148,7 +4221,8 @@
         "send": "Envoyer un message Zigbee2mqtt"
       },
       "music": {
-        "play-notification": "Parler sur une enceinte"
+        "play-notification": "Parler sur une enceinte",
+        "play-media": "Lancer une musique sur une enceinte"
       },
       "ai": {
         "ask": "Demander à l'IA"
@@ -4190,7 +4264,8 @@
         "send": "Envoyer un SMS sur un téléphone"
       },
       "music": {
-        "play-notification": "Faire lire un texte à voix haute sur une enceinte"
+        "play-notification": "Faire lire un texte à voix haute sur une enceinte",
+        "play-media": "Lancer un morceau, un album, une playlist ou une radio sur une enceinte"
       },
       "condition": {
         "if-then-else": "Suivre un chemin différent selon une condition",
@@ -5722,6 +5797,13 @@
           "mop": "Serpillère"
         }
       },
+      "music": {
+        "repeat": {
+          "off": "Désactivée",
+          "all": "Toute la file",
+          "one": "Un morceau"
+        }
+      },
       "water-heater": {
         "mode": {
           "off": "Arrêt",
@@ -6029,7 +6111,14 @@
       "music": {
         "playback_state": {
           "0": "En pause",
-          "1": "En lecture"
+          "1": "En lecture",
+          "2": "Arrêté",
+          "3": "Chargement"
+        },
+        "repeat": {
+          "0": "Désactivée",
+          "1": "Toute la file",
+          "2": "Un morceau"
         }
       },
       "opening-sensor": {
@@ -6814,7 +6903,16 @@
       "previous": "Bouton précédent musique",
       "next": "Bouton suivant musique",
       "playback_state": "Etat de la lecture musique",
-      "play_notification": "Diffuser une notification"
+      "play_notification": "Diffuser une notification",
+      "title": "Titre du morceau",
+      "artist": "Artiste",
+      "album": "Album",
+      "artwork": "Pochette",
+      "duration": "Durée du morceau",
+      "position": "Position de lecture",
+      "shuffle": "Lecture aléatoire",
+      "repeat": "Mode de répétition",
+      "mute": "Sourdine"
     },
     "lock": {
       "shortCategoryName": "Serrure",

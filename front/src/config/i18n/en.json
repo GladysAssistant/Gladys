@@ -1,4 +1,12 @@
 {
+  "musicMediaTypes": {
+    "track": "Track",
+    "album": "Album",
+    "artist": "Artist",
+    "playlist": "Playlist",
+    "radio": "Radio",
+    "folder": "Folder"
+  },
   "global": {
     "logoAlt": "Gladys logo",
     "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
@@ -83,6 +91,7 @@
       "unitMismatchWarning": "This feature has a different unit than the source feature: values are moved without conversion, so charts may become inconsistent.",
       "unmappedWarning": "Some features are not matched: their history will be deleted, and the scenes and dashboards using them will not be updated.",
       "playNotificationWarning": "The destination device cannot play notifications: the scenes that \"talk on\" this speaker will be re-pointed to the destination, and will fail when they run. Pick a destination that supports notifications, or edit those scenes after the migration.",
+      "playMediaWarning": "The scenes that play music (a playlist, an album, a track) on this player keep media references that belong to its integration: they will be re-pointed to the destination and will only work if the destination uses the same music provider. Check those scenes after the migration.",
       "noDestinationAvailable": "No device from another integration was found. Create the destination device in its new integration first, then come back here to migrate.",
       "loadError": "Unable to load the list of devices. Please try again.",
       "migrateError": "The migration failed. The old device was not deleted, but some history may already have been moved to the destination. Check the jobs page and your device list, then try again: re-running only moves what remains to migrate.",
@@ -752,7 +761,38 @@
         "cancelAlarmArming": "Cancel"
       },
       "music": {
-        "selectDeviceLabel": "Select device to control"
+        "selectDeviceLabel": "Select device to control",
+        "nothingPlaying": "Nothing playing",
+        "unknownTrack": "Unknown track",
+        "previous": "Previous",
+        "next": "Next",
+        "play": "Play",
+        "pause": "Pause",
+        "shuffle": "Shuffle",
+        "repeat": "Repeat",
+        "mute": "Mute",
+        "volume": "Volume",
+        "queue": "Queue",
+        "browse": "Browse",
+        "search": "Search",
+        "searchPlaceholder": "Songs, artists, playlists…",
+        "back": "Back",
+        "close": "Close",
+        "playItem": "Play",
+        "playNext": "Play next",
+        "addToQueue": "Add to queue",
+        "added": "Added to queue",
+        "playAll": "Play",
+        "pickThis": "Choose",
+        "live": "Live",
+        "commandFailed": "The player could not run this command.",
+        "noResponse": "The player did not respond.",
+        "emptyQueue": "The queue is empty",
+        "noResults": "No results",
+        "loading": "Loading…",
+        "loadMore": "Load more",
+        "unavailable": "The integration is unavailable. The last known state is shown.",
+        "error": "Something went wrong."
       },
       "voice-assistant": {
         "speak": "Speak",
@@ -974,7 +1014,8 @@
       "external": "Community",
       "native": "Native",
       "deprecated": "Soon deprecated",
-      "new": "New"
+      "new": "New",
+      "installed": "Installed"
     },
     "root": {
       "title": "Integrations",
@@ -990,6 +1031,10 @@
       "storeUnavailable": "The community integration store could not be reached: only the native integrations and the ones already installed are shown.",
       "storeUnavailableRetry": "Retry",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
+      "updateButton": "Update",
+      "updateRetryButton": "Retry",
+      "updateError": "The update failed. Check the integration logs, then retry.",
+      "updatedTo": "Updated to v{{version}}",
       "noInstalledIntegrations": "No community integration is installed on this instance yet.",
       "installedSummary": {
         "title": {
@@ -1013,6 +1058,17 @@
         "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol). Your device can also be supported by a community <b>external integration</b>: anyone can create one and publish it in the store, it then appears in this list. See the <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">external integrations documentation</a>."
       },
       "orderDirNewest": "Newest first",
+      "orderDirUpdated": "Last updated",
+      "clearFilters": "Clear filters",
+      "countryFilter": {
+        "scoped": {
+          "one": "Country: {{country}}. 1 integration from another country is hidden.",
+          "other": "Country: {{country}}. {{count}} integrations from other countries are hidden."
+        },
+        "showAll": "Show all countries",
+        "all": "All countries are shown.",
+        "showOnly": "Limit to {{country}}"
+      },
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
@@ -1029,11 +1085,14 @@
         "network": "Network & presence",
         "notifications": "Messaging & notifications",
         "assistants": "Voice assistants & AI",
-        "services": "Services"
+        "services": "Services",
+        "transport": "Transport & mobility",
+        "vehicles": "Vehicles & EV charging",
+        "servers": "Servers & self-hosting",
+        "leisure": "Leisure, sport & games"
       }
     },
     "externalIntegration": {
-      "updateAvailable": "Update available",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "configTab": "Configuration",
@@ -1944,6 +2003,7 @@
         "usagePointName": "Meter",
         "lastRefresh": "Latest data :",
         "usagePointId": "Meter ID",
+        "usagePointDeviceName": "Name",
         "contractType": "Contract type",
         "contracts": {
           "hc-hp": "Off-peak/peak hours",
@@ -4049,6 +4109,19 @@
         "variablesExplanation": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
       },
+      "playMedia": {
+        "description": "This action will start the selected media on the selected player.",
+        "deviceLabel": "Player",
+        "mediaLabel": "Media to play",
+        "selectedMedia": "Selected",
+        "changeMedia": "Change",
+        "noMedia": "No media selected yet: browse or search the catalog of the player below.",
+        "unsupported": "This player exposes no catalog: pick another player.",
+        "modeLabel": "Mode",
+        "modeReplace": "Play now (replaces the current playback)",
+        "modeNext": "Play next",
+        "modeAppend": "Add to the end of the queue"
+      },
       "playNotification": {
         "description": "This action will make Gladys speak on the selected speaker.",
         "voiceSettingLink": "Choose the voice of your instance (Artificial Intelligence integration)",
@@ -4148,7 +4221,8 @@
         "send": "Send Zigbee2mqtt Message"
       },
       "music": {
-        "play-notification": "Talk on a speaker"
+        "play-notification": "Talk on a speaker",
+        "play-media": "Play music on a speaker"
       },
       "ai": {
         "ask": "Ask AI"
@@ -4190,7 +4264,8 @@
         "send": "Send a text message to a phone"
       },
       "music": {
-        "play-notification": "Read a text out loud on a speaker"
+        "play-notification": "Read a text out loud on a speaker",
+        "play-media": "Start a track, an album, a playlist or a radio on a speaker"
       },
       "condition": {
         "if-then-else": "Follow a different path depending on a condition",
@@ -5722,6 +5797,13 @@
           "mop": "Mop"
         }
       },
+      "music": {
+        "repeat": {
+          "off": "Off",
+          "all": "All",
+          "one": "One track"
+        }
+      },
       "water-heater": {
         "mode": {
           "off": "Off",
@@ -6029,7 +6111,14 @@
       "music": {
         "playback_state": {
           "0": "Paused",
-          "1": "Playing"
+          "1": "Playing",
+          "2": "Stopped",
+          "3": "Buffering"
+        },
+        "repeat": {
+          "0": "Off",
+          "1": "All",
+          "2": "One track"
         }
       },
       "opening-sensor": {
@@ -6814,7 +6903,16 @@
       "previous": "Music previous button",
       "next": "Music next button",
       "playback_state": "Music playback state",
-      "play_notification": "Broadcast a notification"
+      "play_notification": "Broadcast a notification",
+      "title": "Track title",
+      "artist": "Artist",
+      "album": "Album",
+      "artwork": "Artwork",
+      "duration": "Track duration",
+      "position": "Playback position",
+      "shuffle": "Shuffle",
+      "repeat": "Repeat mode",
+      "mute": "Mute"
     },
     "lock": {
       "shortCategoryName": "Lock",

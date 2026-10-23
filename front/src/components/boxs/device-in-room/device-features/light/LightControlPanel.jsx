@@ -17,6 +17,7 @@ import {
 } from './lightFeatures';
 import LightSlider from './LightSlider';
 import LightColorWheel from './LightColorWheel';
+import createBackdropDismiss from '../../../../../utils/backdropDismiss';
 import style from './style.css';
 
 // One-tap colors, so picking a warm white or a red does not require aiming at the wheel.
@@ -81,12 +82,9 @@ class LightControlPanel extends Component {
     }
   };
 
-  handleOverlayClick = event => {
-    // Only a click on the backdrop itself closes the panel, not one bubbling up from a control.
-    if (event.target === event.currentTarget) {
-      this.props.onClose();
-    }
-  };
+  // Only a press on the backdrop itself closes the panel: not a click bubbling up from a control,
+  // nor the release of a slider or wheel drag that left the sheet.
+  backdropDismiss = createBackdropDismiss(() => this.props.onClose());
 
   selectColorTab = () => this.setState({ tab: TABS.COLOR });
 
@@ -263,7 +261,7 @@ class LightControlPanel extends Component {
     // The panel is rendered on <body>: the widget cards carry backdrop filters, which would turn a
     // fixed overlay nested inside them into a box clipped to the card.
     return createPortal(
-      <div class={cx('glass-theme', style.overlay)} onClick={this.handleOverlayClick}>
+      <div class={cx('glass-theme', style.overlay)} {...this.backdropDismiss}>
         <div
           class={style.sheet}
           role="dialog"

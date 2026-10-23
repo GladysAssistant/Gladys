@@ -6,6 +6,7 @@ import { connect } from 'unistore/preact';
 import actions from '../../actions/edit-device';
 import { RequestStatus } from '../../utils/consts';
 import UpdateDevice from './UpdateDevice';
+import { stripDeviceStatesForSave } from '../../utils/device';
 
 class EditDevicePage extends Component {
   selectFeature(e) {
@@ -95,7 +96,7 @@ class EditDevicePage extends Component {
       loading: true
     });
     try {
-      const device = await this.props.httpClient.post('/api/v1/device', this.state.device);
+      const device = await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(this.state.device));
       this.setState({
         saveStatus: RequestStatus.Success,
         loading: false,
