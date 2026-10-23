@@ -3608,6 +3608,8 @@
         "nameLabel": "Name",
         "namePlaceholder": "e.g. Living Room Thermostat",
         "roomLabel": "Room",
+        "showAllRoomsLabel": "Show the devices of every room",
+        "showAllRoomsHelp": "The lists below only offer the devices of this room. Widen them when the heated area spans several rooms, such as an open-plan living room and kitchen.",
         "modeLabel": "Use",
         "typeLabel": "Thermostat type",
         "tuningSection": "Fine tuning",
@@ -3623,7 +3625,9 @@
         "stateFeatureLabel": "Heating state (optional)",
         "stateFeatureHelp": "Used to show whether the device is currently running. Accepted either as an operating state or as a boiler contact. Leave empty if your thermostat does not report it.",
         "modeFeatureLabel": "Operating mode (optional)",
-        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one. Gladys switches it to Off when the thermostat is stopped or an Off slot applies, and hands it back as soon as a setpoint takes over again.",
+        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one — an air conditioner's mode works too. On a thermostat, Gladys switches it to Off when the thermostat is stopped or an Off slot applies, and hands it back as soon as a setpoint takes over again. An air conditioner's mode has no Off: it is stopped through its Power, which then has to be set.",
+        "powerFeatureLabel": "Power (optional)",
+        "powerFeatureHelp": "The switch that turns the real device on and off, such as the power of an air conditioner or a heat pump. Gladys turns it off when the thermostat is stopped, a window opens or an Off slot applies, and back on as soon as a setpoint takes over again. Needed for an air conditioner, whose mode has no Off.",
         "mode": {
           "heating": "Heating",
           "cooling": "Cooling"
@@ -3645,8 +3649,9 @@
         "minTempPlaceholder": "e.g. 5",
         "maxTempLabel": "Max temp",
         "maxTempPlaceholder": "e.g. 35",
-        "temperatureFeatureLabel": "Temperature sensor",
-        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
+        "temperatureFeatureLabel": "Temperature sensors",
+        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature, or several: the thermostat then uses their average. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
+        "addTemperatureFeature": "Add a temperature sensor",
         "humidityFeatureLabel": "Humidity sensor",
         "humidityFeatureHelp": "Optional. Displayed in the thermostat widget.",
         "switchFeatureLabel": "Switch (actuator)",
@@ -3654,11 +3659,13 @@
           "heating": "The switch that will be turned on and off to heat the room.",
           "cooling": "The switch that will be turned on and off to cool the room."
         },
-        "windowFeatureLabel": "Window opening sensor",
+        "windowFeatureLabel": "Window opening sensors",
         "windowFeatureHelp": {
-          "heating": "Optional. If a window is open, the heating is automatically cut off.",
-          "cooling": "Optional. If a window is open, the cooling is automatically cut off."
+          "heating": "Optional. As soon as one of the selected windows is open, the heating is automatically cut off.",
+          "cooling": "Optional. As soon as one of the selected windows is open, the cooling is automatically cut off."
         },
+        "addWindowFeature": "Add an opening sensor",
+        "removeFeature": "Remove",
         "hysteresisStartLabel": "Start threshold",
         "hysteresisStartHelp": {
           "heating": "The heating turns on when the temperature is below (setpoint − start threshold). E.g. setpoint 21°C, threshold 0.5°C → turns on below 20.5°C.",
@@ -6071,6 +6078,15 @@
           "4": "Night",
           "5": "Comfort"
         },
+        "active-preset": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Off",
+          "1": "Frost protection",
+          "2": "Away",
+          "3": "Eco",
+          "4": "Night",
+          "5": "Comfort"
+        },
         "operating-state": {
           "unknown": "{{value}} (unknown)",
           "0": "Idle",
@@ -6872,6 +6888,7 @@
       "target-temperature": "Thermostat Temperature",
       "mode": "Thermostat Mode",
       "preset": "Thermostat Preset",
+      "active-preset": "Thermostat Active Preset",
       "operating-state": "Thermostat Operating State"
     },
     "airquality-sensor": {

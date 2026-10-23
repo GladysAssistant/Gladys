@@ -2,11 +2,27 @@ import { RequestStatus } from '../../../../../utils/consts';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
+import { parseSelectorList, serializeSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
 
 const TEMPERATURE_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR];
 const HUMIDITY_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR];
 const SWITCH_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.SWITCH];
 const OPENING_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR];
+// The setpoint, mode and power an external thermostat is driven through. A heat
+// pump or an air conditioner publishes them in the air-conditioning category,
+// not in the thermostat one (spec A.0.3).
+const AC = DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING;
+const isTargetFeature = feature =>
+  (feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE) ||
+  (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE);
+const isModeFeature = feature =>
+  (feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) ||
+  (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE);
+const isPowerFeature = feature =>
+  (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY) ||
+  (SWITCH_CATEGORIES.includes(feature.category) && feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY);
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
@@ -30,6 +46,7 @@ function createActions(store) {
         const targetFeatures = [];
         const stateFeatures = [];
         const modeFeatures = [];
+        const powerFeatures = [];
         devices.forEach(device => {
           // A thermostat this integration created is not a real thermostat to
           // drive: pointing an external thermostat at one would make Gladys
@@ -40,12 +57,18 @@ function createActions(store) {
             // accepts (Netatmo 5-30, Zigbee 5-40), and picking it as the setpoint
             // feature adopts those bounds rather than leaving the 5-35 default,
             // which promised a setpoint the device would refuse or clamp.
+            // The room narrows each picker to the thermostat's own room (spec A.3);
+            // the device selector lets an air-conditioning target suggest the mode
+            // and the power of the same unit.
             const entry = {
               selector: feature.selector,
               label: `${device.name} - ${feature.name}`,
               min: feature.min,
               max: feature.max,
-              unit: feature.unit
+              unit: feature.unit,
+              roomId: device.room_id || null,
+              deviceSelector: device.selector,
+              category: feature.category
             };
             if (TEMPERATURE_CATEGORIES.includes(feature.category)) {
               temperatureFeatures.push(entry);
@@ -71,18 +94,26 @@ function createActions(store) {
             if (OPENING_CATEGORIES.includes(feature.category)) {
               openingFeatures.push(entry);
             }
-            if (!isOwnThermostat && feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT) {
-              if (feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE && !feature.read_only) {
+            if (!isOwnThermostat) {
+              if (isTargetFeature(feature) && !feature.read_only) {
                 // Zigbee, Matter and MQTT expose several setpoints on one device
                 // (heating/cooling, occupied/unoccupied): only the user knows
                 // which one drives their heating, so all of them are offered.
                 targetFeatures.push(entry);
               }
-              if (feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
+              if (
+                feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+                feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE
+              ) {
                 stateFeatures.push(entry);
               }
-              if (feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
+              if (isModeFeature(feature) && !feature.read_only) {
                 modeFeatures.push(entry);
+              }
+              // The power is written, so it has to be writable: a read-only boiler
+              // contact is a state feature, not a way to stop anything.
+              if (isPowerFeature(feature) && !feature.read_only) {
+                powerFeatures.push(entry);
               }
             }
           });
@@ -94,7 +125,8 @@ function createActions(store) {
           openingFeatures,
           targetFeatures,
           stateFeatures,
-          modeFeatures
+          modeFeatures,
+          powerFeatures
         });
       } catch (e) {
         store.setState({
@@ -104,7 +136,8 @@ function createActions(store) {
           openingFeatures: [],
           targetFeatures: [],
           stateFeatures: [],
-          modeFeatures: []
+          modeFeatures: [],
+          powerFeatures: []
         });
       }
     },
@@ -139,14 +172,18 @@ function createActions(store) {
           thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || '35',
           thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C',
           thermostatEditControlType: getParam('THERMOSTAT_CONTROL_TYPE') || 'hysteresis',
-          thermostatEditTemperatureFeature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || '',
+          // One sensor or several (spec A.1.1).
+          thermostatEditTemperatureFeatures: parseSelectorList(getParam('THERMOSTAT_TEMPERATURE_FEATURE')),
           thermostatEditHumidityFeature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || '',
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
           thermostatEditType: getParam('THERMOSTAT_TYPE') || 'virtual',
           thermostatEditTargetFeature: getParam('THERMOSTAT_TARGET_FEATURE') || '',
           thermostatEditStateFeature: getParam('THERMOSTAT_STATE_FEATURE') || '',
           thermostatEditModeFeature: getParam('THERMOSTAT_MODE_FEATURE') || '',
-          thermostatEditWindowFeature: getParam('THERMOSTAT_WINDOW_FEATURE') || '',
+          thermostatEditPowerFeature: getParam('THERMOSTAT_POWER_FEATURE') || '',
+          thermostatEditWindowFeatures: parseSelectorList(getParam('THERMOSTAT_WINDOW_FEATURE')),
+          // A display choice, never saved: every thermostat opens on its own room.
+          thermostatEditShowAllRooms: false,
           thermostatEditPresetFrost: getParam('THERMOSTAT_PRESET_FROST') || '7',
           thermostatEditPresetAway: getParam('THERMOSTAT_PRESET_AWAY') || '16',
           thermostatEditPresetEco: getParam('THERMOSTAT_PRESET_ECO') || '18',
@@ -223,10 +260,10 @@ function createActions(store) {
         const maxTemp = toNumber(state.thermostatEditMaxTemp, 35);
         const tempUnit = state.thermostatEditTempUnit || 'C';
         const controlType = state.thermostatEditControlType || 'hysteresis';
-        const temperatureFeature = state.thermostatEditTemperatureFeature || '';
+        const temperatureFeature = serializeSelectorList(state.thermostatEditTemperatureFeatures);
         const humidityFeature = state.thermostatEditHumidityFeature || '';
         const switchFeature = state.thermostatEditSwitchFeature || '';
-        const windowFeature = state.thermostatEditWindowFeature || '';
+        const windowFeature = serializeSelectorList(state.thermostatEditWindowFeatures);
         // `|| default` would discard an explicitly entered 0, which the preset
         // inputs accept: toNumber only falls back when the value is not a number.
         const presetFrost = String(toNumber(state.thermostatEditPresetFrost, 7));
@@ -323,6 +360,10 @@ function createActions(store) {
               name: 'THERMOSTAT_MODE_FEATURE',
               value: isExternalThermostat ? state.thermostatEditModeFeature || '' : ''
             },
+            {
+              name: 'THERMOSTAT_POWER_FEATURE',
+              value: isExternalThermostat ? state.thermostatEditPowerFeature || '' : ''
+            },
             { name: 'THERMOSTAT_WINDOW_FEATURE', value: windowFeature },
             { name: 'THERMOSTAT_PRESET_FROST', value: presetFrost },
             { name: 'THERMOSTAT_PRESET_AWAY', value: presetAway },
@@ -382,14 +423,16 @@ function createActions(store) {
           thermostatEditMaxTemp: '35',
           thermostatEditTempUnit: 'C',
           thermostatEditControlType: 'hysteresis',
-          thermostatEditTemperatureFeature: '',
+          thermostatEditTemperatureFeatures: [],
           thermostatEditHumidityFeature: '',
           thermostatEditSwitchFeature: '',
           thermostatEditType: 'virtual',
           thermostatEditTargetFeature: '',
           thermostatEditStateFeature: '',
           thermostatEditModeFeature: '',
-          thermostatEditWindowFeature: '',
+          thermostatEditPowerFeature: '',
+          thermostatEditWindowFeatures: [],
+          thermostatEditShowAllRooms: false,
           thermostatEditActiveSchedule: '',
           thermostatEditPresetFrost: '7',
           thermostatEditPresetAway: '16',

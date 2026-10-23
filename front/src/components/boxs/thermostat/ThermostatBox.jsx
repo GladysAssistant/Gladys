@@ -89,7 +89,12 @@ class ThermostatBox extends Component {
 
   svgRef = null;
   timezone = null;
-  sensorUnit = null;
+  // Per sensor, since a thermostat may average several probes (spec A.1.1), each
+  // with its own unit: the unit from the initial GET, the last reading in the
+  // thermostat's unit, and whether each opening sensor reads open.
+  sensorUnits = {};
+  temperatureReadings = {};
+  openWindows = {};
   thermostatUnit = null;
   savingPreset = false;
   // True while selectPreset writes: the hold it may arm is the widget's own, so
@@ -156,9 +161,8 @@ class ThermostatBox extends Component {
   // Everything downstream (the gauge, the "is it heating" hint) works in the
   // thermostat's unit, so the reading is brought into it here. The sensor unit
   // comes from the initial GET; websocket state events do not carry it.
-  toThermostatUnit = temp => {
+  toThermostatUnit = (temp, sensorUnit) => {
     if (temp === null || temp === undefined) return temp;
-    const sensorUnit = this.sensorUnit;
     if (!sensorUnit) return temp;
     // Read from the instance field, not from getEffectiveUnit(): the thermostat
     // unit is stored through setState in the same pass and would still be stale.
@@ -179,6 +183,30 @@ class ThermostatBox extends Component {
   // Get the temperature unit symbol
   getTempUnit = () => {
     return this.getEffectiveUnit() === DEVICE_FEATURE_UNITS.FAHRENHEIT ? 'F' : 'C';
+  };
+
+  getTemperatureFeatures = () => (this.state.remoteConfig && this.state.remoteConfig.temperature_features) || [];
+
+  getWindowFeatures = () => (this.state.remoteConfig && this.state.remoteConfig.window_features) || [];
+
+  // The room temperature is the average of the probes that have a value, the same
+  // figure the server regulates on (spec A.1.1); a silent probe is left out
+  // rather than counted as 0.
+  setTemperatureReading = (selector, value) => {
+    this.temperatureReadings[selector] =
+      value === null || value === undefined ? null : this.toThermostatUnit(value, this.sensorUnits[selector]);
+    const readings = this.getTemperatureFeatures()
+      .map(feature => this.temperatureReadings[feature])
+      .filter(reading => reading !== null && reading !== undefined);
+    this.setState({
+      currentTemp: readings.length ? readings.reduce((sum, reading) => sum + reading, 0) / readings.length : null
+    });
+  };
+
+  // Any of the opening sensors open suspends the heating, as on the server.
+  setWindowReading = (selector, value) => {
+    this.openWindows[selector] = value === 0;
+    this.setState({ isWindowOpen: this.getWindowFeatures().some(feature => this.openWindows[feature]) });
   };
 
   loadConfig = async () => {
@@ -409,25 +437,27 @@ class ThermostatBox extends Component {
     const { box } = this.props;
     const thermostatFeature = box.thermostat_feature;
     // temperature/humidity/window features come from integration config (remoteConfig), not box props
-    const temperatureFeature = (this.state.remoteConfig && this.state.remoteConfig.temperature_feature) || null;
+    const temperatureFeatures = this.getTemperatureFeatures();
     const humidityFeature = (this.state.remoteConfig && this.state.remoteConfig.humidity_feature) || null;
-    const windowFeature = (this.state.remoteConfig && this.state.remoteConfig.window_feature) || null;
+    const windowFeatures = this.getWindowFeatures();
     // The running state comes from the switch Gladys drives on a virtual
     // thermostat, and from the real device's state feature on an external one.
     // Both end up in `isSwitchOn`, which is what draws the heating halo.
     const switchFeature = this.getRunningStateFeature();
-    if (!thermostatFeature && !temperatureFeature) {
+    if (!thermostatFeature && temperatureFeatures.length === 0) {
       this.setState({ noConfig: true });
       return;
     }
     // Reset features that have been removed
     const stateUpdate = { noConfig: false, error: false };
-    if (!temperatureFeature) stateUpdate.currentTemp = null;
+    if (temperatureFeatures.length === 0) stateUpdate.currentTemp = null;
     if (!humidityFeature) stateUpdate.humidity = null;
-    if (!windowFeature) stateUpdate.isWindowOpen = false;
+    if (windowFeatures.length === 0) stateUpdate.isWindowOpen = false;
+    this.temperatureReadings = {};
+    this.openWindows = {};
     if (!switchFeature) stateUpdate.isSwitchOn = null;
     this.setState(stateUpdate);
-    const selectors = [thermostatFeature, temperatureFeature, humidityFeature, windowFeature, switchFeature]
+    const selectors = [thermostatFeature, ...temperatureFeatures, humidityFeature, ...windowFeatures, switchFeature]
       .filter(Boolean)
       .join(',');
     if (!selectors) return;
@@ -445,10 +475,12 @@ class ThermostatBox extends Component {
         if (thermostatUnitFeature && thermostatUnitFeature.unit) {
           this.thermostatUnit = thermostatUnitFeature.unit;
         }
-        const sensorUnitFeature = temperatureFeature
-          ? allFeatures.find(feat => feat.selector === temperatureFeature)
-          : null;
-        this.sensorUnit = (sensorUnitFeature && sensorUnitFeature.unit) || null;
+        this.sensorUnits = {};
+        allFeatures
+          .filter(feat => temperatureFeatures.includes(feat.selector))
+          .forEach(feat => {
+            this.sensorUnits[feat.selector] = feat.unit || null;
+          });
 
         devices.forEach(device => {
           device.features.forEach(feat => {
@@ -466,13 +498,8 @@ class ThermostatBox extends Component {
               if (feat.max !== undefined && feat.max !== null) this.setState({ featureMax: feat.max });
               if (feat.unit) this.setState({ featureUnit: feat.unit });
             }
-            if (
-              temperatureFeature &&
-              feat.selector === temperatureFeature &&
-              feat.last_value !== null &&
-              feat.last_value !== undefined
-            ) {
-              this.setState({ currentTemp: this.toThermostatUnit(feat.last_value) });
+            if (temperatureFeatures.includes(feat.selector)) {
+              this.setTemperatureReading(feat.selector, feat.last_value);
             }
             if (
               humidityFeature &&
@@ -482,13 +509,8 @@ class ThermostatBox extends Component {
             ) {
               this.setState({ humidity: feat.last_value });
             }
-            if (
-              windowFeature &&
-              feat.selector === windowFeature &&
-              feat.last_value !== null &&
-              feat.last_value !== undefined
-            ) {
-              this.setState({ isWindowOpen: feat.last_value === 0 });
+            if (windowFeatures.includes(feat.selector) && feat.last_value !== null && feat.last_value !== undefined) {
+              this.setWindowReading(feat.selector, feat.last_value);
             }
             if (
               switchFeature &&
@@ -511,7 +533,6 @@ class ThermostatBox extends Component {
   handleWebsocketMessage = payload => {
     const { box } = this.props;
     const thermostatFeature = box.thermostat_feature;
-    const temperatureFeature = (this.state.remoteConfig && this.state.remoteConfig.temperature_feature) || null;
     const humidityFeature = (this.state.remoteConfig && this.state.remoteConfig.humidity_feature) || null;
     if (thermostatFeature && payload.device_feature_selector === thermostatFeature) {
       // Don't overwrite a setpoint the user is holding here. `isManualMode` is
@@ -543,16 +564,15 @@ class ThermostatBox extends Component {
         }
       }
     }
-    if (temperatureFeature && payload.device_feature_selector === temperatureFeature) {
-      this.setState({ currentTemp: this.toThermostatUnit(payload.last_value) });
+    if (this.getTemperatureFeatures().includes(payload.device_feature_selector)) {
+      this.setTemperatureReading(payload.device_feature_selector, payload.last_value);
     }
     if (humidityFeature && payload.device_feature_selector === humidityFeature) {
       this.setState({ humidity: payload.last_value });
     }
-    const windowFeature = (this.state.remoteConfig && this.state.remoteConfig.window_feature) || null;
-    if (windowFeature && payload.device_feature_selector === windowFeature) {
+    if (this.getWindowFeatures().includes(payload.device_feature_selector)) {
       // The server (onDeviceNewState) cuts the switch; the widget only reflects the state
-      this.setState({ isWindowOpen: payload.last_value === 0 });
+      this.setWindowReading(payload.device_feature_selector, payload.last_value);
     }
     const modeFeature = this.state.remoteConfig && this.state.remoteConfig.modeFeature;
     if (modeFeature && payload.device_feature_selector === modeFeature.selector) {
@@ -872,6 +892,21 @@ class ThermostatBox extends Component {
         candidate.temp !== null &&
         this.toSetpointFeatureUnit(candidate.temp) === setpoint
     );
+  };
+
+  // The preset whose temperature a setpoint lands on, or null. Asked on the forum:
+  // a temperature set by hand that is exactly Comfort's reads as Comfort, so the
+  // button lights instead of the bar going dark under "Manual mode". Display
+  // only — the server still holds a manual setpoint, which expires like any
+  // other. Two presets on the same temperature light the first in bar order.
+  presetMatchingSetpoint = setpoint => {
+    if (setpoint === null || setpoint === undefined) {
+      return null;
+    }
+    const match = this.getPresets().find(
+      candidate => candidate.temp !== null && this.toSetpointFeatureUnit(candidate.temp) === setpoint
+    );
+    return match ? match.key : null;
   };
 
   // Same rounding as the server's convertSetpointToFeatureUnit: a whole degree
@@ -1429,6 +1464,10 @@ class ThermostatBox extends Component {
                 // below stays reachable whatever it says. Replacing the bar
                 // with the banner meant "I am away for the weekend -> Frost"
                 // required detaching the programme on the integration page.
+                // A setpoint set by hand on a preset's temperature shows as
+                // that preset, on the bar and in the banner alike.
+                const matchedPreset =
+                  manualSetpointOverride && !this.isStopped() ? this.presetMatchingSetpoint(setpoint) : null;
                 const banner = (() => {
                   // The window banner above already says what the thermostat
                   // is doing, and it replaces this one.
@@ -1456,10 +1495,13 @@ class ThermostatBox extends Component {
                     // preset — so the banner names the preset whenever one is
                     // still highlighted, and keeps "Manual mode" for a
                     // setpoint that no preset carries.
-                    const heldPreset =
+                    let heldPreset =
                       !manualSetpointOverride && [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
                         ? presets.find(candidate => candidate.key === activePreset)
                         : null;
+                    if (matchedPreset) {
+                      heldPreset = presets.find(candidate => candidate.key === matchedPreset);
+                    }
                     const i18nHeldPresets =
                       props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
                     const label = heldPreset
@@ -1602,7 +1644,9 @@ class ThermostatBox extends Component {
                           props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
                             ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
                             : preset.key;
-                        const isActive = resolvedActivePreset === preset.key && !manualSetpointOverride;
+                        const isActive =
+                          (resolvedActivePreset === preset.key && !manualSetpointOverride) ||
+                          matchedPreset === preset.key;
                         const isPending = pendingPreset === preset.key;
                         const presetColor = this.getPresetColor(preset.key);
                         return (

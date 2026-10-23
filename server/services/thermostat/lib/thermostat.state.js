@@ -6,6 +6,7 @@ const {
   WEBSOCKET_MESSAGE_TYPES,
   THERMOSTAT_MODE,
   THERMOSTAT_PRESET,
+  THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
 const { PRESETS } = require('../../../utils/thermostatConstants');
 
@@ -71,6 +72,26 @@ function presetValue(name) {
   }
   const value = PRESET_VALUE_BY_NAME[name];
   return value === undefined ? null : value;
+}
+
+/**
+ * @description The active-preset value for what is in force: a preset name, or
+ * `off` for a stopped thermostat. Null for `schedule`, which is never in force —
+ * one of its points is — and for an unknown name.
+ * @param {string|null} name - The preset in force, or `off`.
+ * @returns {number|null} The THERMOSTAT_ACTIVE_PRESET value.
+ * @example
+ * activePresetValue('off'); // 0
+ */
+function activePresetValue(name) {
+  if (name === 'off') {
+    return THERMOSTAT_ACTIVE_PRESET.OFF;
+  }
+  if (name === 'schedule') {
+    return null;
+  }
+  // The other values are THERMOSTAT_PRESET's own, by construction.
+  return presetValue(name);
 }
 
 /**
@@ -208,6 +229,28 @@ function announcePreset(device, name) {
 }
 
 /**
+ * @description Write the preset in force on the thermostat's active-preset
+ * feature. Unlike the preset feature, which keeps reading `schedule` while the
+ * programme runs, this one moves with every point of the programme — and,
+ * written through `saveState`, it is what a scene trigger sees change. Nothing
+ * is written when the value is the one already held, so the minute loop emits
+ * no state, and starts no scene, until the preset in force really changes.
+ * @param {object} device - The thermostat device.
+ * @param {string} name - The preset in force, or `off` for a stopped thermostat.
+ * @returns {Promise<void>}
+ * @example
+ * await saveActivePreset.call(this, device, 'comfort');
+ */
+async function saveActivePreset(device, name) {
+  const feature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET);
+  const value = activePresetValue(name);
+  if (!feature || value === null || alreadyHolds(feature, value)) {
+    return;
+  }
+  await this.gladys.device.saveState(feature, value);
+}
+
+/**
  * @description Write the operating state of a virtual thermostat, so the house
  * can see whether it is heating without inferring it from a switch.
  * @param {object} device - The thermostat device.
@@ -331,6 +374,8 @@ module.exports = {
   getPreset,
   savePreset,
   announcePreset,
+  saveActivePreset,
+  activePresetValue,
   saveOperatingState,
   getManualHold,
   setManualHold,

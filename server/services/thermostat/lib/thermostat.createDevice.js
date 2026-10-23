@@ -5,6 +5,7 @@ const {
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
+  THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
 const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
 
@@ -24,6 +25,7 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
   'THERMOSTAT_MODE_FEATURE',
+  'THERMOSTAT_POWER_FEATURE',
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_MODE',
   'THERMOSTAT_CONTROL_TYPE',
@@ -80,6 +82,21 @@ function buildStateFeatures(device, external) {
     category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
     type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
   };
+  const activePreset = {
+    // Written by the regulation loop, never by a client: the preset feature says
+    // what the thermostat was asked to follow — `schedule` for a programme —
+    // while this one says what is in force, and changes when the programme moves
+    // on. It is the one a scene starts on when the preset changes (B.4).
+    name: 'Active preset',
+    external_id: `${base}:active-preset`,
+    selector: `${base}:active-preset`,
+    read_only: true,
+    has_feedback: false,
+    min: THERMOSTAT_ACTIVE_PRESET.OFF,
+    max: THERMOSTAT_ACTIVE_PRESET.COMFORT,
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET,
+  };
   const mode = {
     name: 'Mode',
     external_id: `${base}:mode`,
@@ -95,17 +112,18 @@ function buildStateFeatures(device, external) {
     // The real device owns its setpoint and its running state, and mirroring
     // them here would give the house two of each, drifting apart.
     //
-    // The preset and the mode are the exceptions, because they are Gladys's own
+    // The presets and the mode are the exceptions, because they are Gladys's own
     // state rather than the appliance's. No thermostat publishes Gladys's preset
     // vocabulary; and "stopped by Gladys" is a decision this service takes — it
     // is what tells the regulation loop to leave the device alone, and a real
     // thermostat may not even expose a mode of its own (Netatmo does not).
     // Stopping the appliance is a separate act, done through
     // THERMOSTAT_MODE_FEATURE when it has one, plus the frost setpoint.
-    return [preset, mode];
+    return [preset, activePreset, mode];
   }
   return [
     preset,
+    activePreset,
     mode,
     {
       // Written by the regulation loop, never by a client: a virtual thermostat
