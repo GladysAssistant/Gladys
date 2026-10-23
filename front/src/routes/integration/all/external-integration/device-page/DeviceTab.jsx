@@ -94,6 +94,7 @@ const DeviceTab = ({
                     key={device.id || device.external_id}
                     device={device}
                     deviceIndex={index}
+                    selector={selector}
                     houses={houses}
                     language={language}
                     updateDeviceField={updateDeviceField}

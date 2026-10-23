@@ -143,6 +143,13 @@ export const getDeviceTransport = device => {
   return transportParam ? transportParam.value : null;
 };
 
+// Image key of the device photo, published by the integration through the
+// reserved GLADYS_DEVICE_IMAGE param and served by the image route, or null.
+export const getDeviceImageKey = device => {
+  const imageParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_DEVICE_IMAGE');
+  return imageParam && imageParam.value ? imageParam.value : null;
+};
+
 // Degraded transport state, orthogonal to the transport value ("which
 // channel is used" vs "is it the nominal state"): the device works, but
 // not in its nominal mode — e.g. local detected but sessions refused,

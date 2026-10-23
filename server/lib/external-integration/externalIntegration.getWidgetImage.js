@@ -1,3 +1,4 @@
+const db = require('../../models');
 const logger = require('../../utils/logger');
 const { NotFoundError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
@@ -7,6 +8,7 @@ const {
   WIDGET_IMAGE_CACHE_TTL_MS,
   MAX_WIDGET_IMAGE_CACHE_ENTRIES,
   MAX_WIDGET_IMAGE_IN_FLIGHT,
+  DEVICE_IMAGE_PARAM,
 } = require('./constants');
 const { normalizeWidgetImage, WIDGET_IMAGE_ERROR_CODES } = require('./externalIntegration.normalizeWidgetImage');
 const {
@@ -65,10 +67,33 @@ async function pullWidgetImage(supervisor, service, imageKey) {
 }
 
 /**
+ * @description Whether an image key is the device photo (GLADYS_DEVICE_IMAGE
+ * param) of a device of this integration — one targeted query (t_device by
+ * service_id, then t_device_param by device_id and name, both indexed),
+ * scoped to the service so a key published by another integration is never
+ * served. Only reached when no cached widget content declares the key.
+ * @param {object} service - The external integration service.
+ * @param {string} imageKey - The shape-checked image key.
+ * @returns {Promise<boolean>} Resolve with true when a device declares it.
+ * @example
+ * const declared = await isDeviceImage(service, 'model-nacamera');
+ */
+async function isDeviceImage(service, imageKey) {
+  const param = await db.DeviceParam.findOne({
+    attributes: ['id'],
+    where: { name: DEVICE_IMAGE_PARAM, value: imageKey },
+    include: [{ model: db.Device, as: 'device', attributes: [], where: { service_id: service.id } }],
+  });
+  return param !== null;
+}
+
+/**
  * @description Serve an image declared by a widget content of an
- * integration (section 6 of capabilities/dashboard-widgets.md). Image keys
- * are integration-scoped: the allowlist is the union of the keys declared in
- * the integration's currently cached contents — a key declared nowhere 404s
+ * integration, or the photo of one of its devices (section 6 of
+ * capabilities/dashboard-widgets.md). Image keys are integration-scoped: the
+ * allowlist is the union of the keys declared in the integration's currently
+ * cached contents and of the GLADYS_DEVICE_IMAGE params of its devices — a
+ * key declared nowhere 404s
  * without a single byte sent to the integration, and the key is shape-checked
  * before anything is looked up. Validated images (PNG/JPEG/WebP, ≤ 300 KB) are
  * served from the Gladys origin and cached 1 h; concurrent requests for one
@@ -85,8 +110,8 @@ async function getWidgetImage(selector, imageKey) {
   }
   const service = await this.getBySelector(selector);
   const contents = this.widgetContentCache.get(service.id);
-  const declared = contents && [...contents.values()].some((entry) => entry.imageKeys.includes(imageKey));
-  if (!declared) {
+  const declaredByWidget = contents && [...contents.values()].some((entry) => entry.imageKeys.includes(imageKey));
+  if (!declaredByWidget && !(await isDeviceImage(service, imageKey))) {
     throw new NotFoundError('EXTERNAL_INTEGRATION_WIDGET_IMAGE_NOT_DECLARED');
   }
   const cached = lruGet(getServiceMap(this.widgetImageCache, service.id), imageKey);
