@@ -119,6 +119,9 @@ class Integration extends Component {
       visibleCount: rememberedPosition ? rememberedPosition.visibleCount : CATALOG_PAGE_SIZE,
       hiddenByCountry: 0,
       instanceCountry: null,
+      // null is a valid final value (no country could be derived): a separate
+      // flag says when the derivation is done
+      instanceCountryLoaded: false,
       // the user the external lists were last loaded for: until they are, the
       // catalog only knows the native integrations and must not pretend to be
       // complete (see render)
@@ -200,7 +203,7 @@ class Integration extends Component {
       }
     }
     const instanceCountry = getCountryFromTimezone(timezone) || getCountryFromTimezone(getBrowserTimezone());
-    await this.setState({ instanceCountry });
+    await this.setState({ instanceCountry, instanceCountryLoaded: true });
     this.getIntegrations();
   }
 
@@ -339,14 +342,20 @@ class Integration extends Component {
     }
   }
 
-  // back from an integration page: once the catalog is complete and its
-  // remembered pages of cards are rendered, the list is scrolled back to where
-  // the user was. The covers have a fixed ratio, so the layout does not move
-  // under the scroll as they load
+  // back from an integration page: once the catalog is complete, the country
+  // filter known (it removes cards, so scrolling before it lands would miss
+  // the target) and the remembered pages of cards rendered, the list is
+  // scrolled back to where the user was. The covers have a fixed ratio, so the
+  // layout does not move under the scroll as they load
   restoreScrollPosition() {
     const { user = {} } = this.props;
     const catalogLoading = !user.id || this.state.externalLoadedForUserId !== user.id;
-    if (this.pendingScrollY === null || catalogLoading || this.state.integrations.length === 0) {
+    if (
+      this.pendingScrollY === null ||
+      catalogLoading ||
+      !this.state.instanceCountryLoaded ||
+      this.state.integrations.length === 0
+    ) {
       return;
     }
     const { pendingScrollY } = this;

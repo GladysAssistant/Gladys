@@ -112,33 +112,47 @@ export const rememberCatalogUrl = url => {
   lastCatalogUrl = url;
 };
 
-// Where the user was in the catalog when they opened an integration: the
-// pages of cards already rendered and the scroll position, so that coming back
-// lands on the same card and not on the top of the list. Kept per catalog URL:
-// another view (category, search, sort…) starts from its first page. In
-// memory only — a page reload forgets it, like the remembered URL above.
-const catalogPosition = { url: null, scrollY: 0, visibleCount: null };
+// Where the user was in the catalog when they opened an integration from a
+// card: the pages of cards already rendered and the scroll position, so that
+// coming back lands on the same card and not on the top of the list. Kept per
+// catalog URL: another view (category, search, sort…) starts from its first
+// page. Only a card click leaves a position to come back to — leaving the
+// catalog any other way (the main menu, a sidebar link) forgets it, so the
+// next visit starts from the top like any page. In memory only: a reload
+// forgets it, like the remembered URL above.
+const catalogPosition = { url: null, scrollY: 0, visibleCount: null, pending: false };
 
 // called as a card is clicked, before the page scrolls to the top of the
-// integration screen
-export const rememberCatalogScroll = () => {
+// integration screen. A modified click (new tab, new window) keeps the
+// catalog mounted: it leaves no position to come back to
+export const rememberCatalogScroll = e => {
+  if (e && (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey)) {
+    return;
+  }
   catalogPosition.url = lastCatalogUrl;
   catalogPosition.scrollY = window.scrollY;
+  catalogPosition.pending = true;
 };
 
-// called as the catalog unmounts, whatever took the user away from it
+// called as the catalog unmounts: completes the position a card click just
+// started, or forgets it when the user left by another way
 export const rememberCatalogVisibleCount = visibleCount => {
-  if (catalogPosition.url !== lastCatalogUrl) {
-    catalogPosition.url = lastCatalogUrl;
-    catalogPosition.scrollY = window.scrollY;
+  if (!catalogPosition.pending) {
+    catalogPosition.url = null;
+    return;
   }
   catalogPosition.visibleCount = visibleCount;
 };
 
-export const getRememberedCatalogPosition = url =>
-  catalogPosition.url === url && catalogPosition.visibleCount
-    ? { scrollY: catalogPosition.scrollY, visibleCount: catalogPosition.visibleCount }
-    : null;
+// the position is consumed by the catalog that restores it: the next time the
+// user leaves, a card click has to start a new one
+export const getRememberedCatalogPosition = url => {
+  if (!catalogPosition.pending || catalogPosition.url !== url || !catalogPosition.visibleCount) {
+    return null;
+  }
+  catalogPosition.pending = false;
+  return { scrollY: catalogPosition.scrollY, visibleCount: catalogPosition.visibleCount };
+};
 
 // a remembered URL carries its filters in the query string, so only its path
 // is compared to the known catalog views. It is written from getCatalogUrl()
