@@ -1023,6 +1023,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   TELEINFORMATION: 'teleinformation',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
+  THERMAL_ENERGY_SENSOR: 'thermal-energy-sensor',
   THERMOSTAT: 'thermostat',
   UNKNOWN: 'unknown',
   UV_SENSOR: 'uv-sensor',
@@ -1292,6 +1293,24 @@ const DEVICE_FEATURE_TYPES = {
     INDEX: 'index', // cumulative delivered-energy meter index, kWh (>= 0)
     OFF_GRID_POWER: 'off-grid-power', // instantaneous power on the backup/off-grid output, W (>= 0)
     OFF_GRID_INDEX: 'off-grid-index', // cumulative backup-output energy meter index, kWh (>= 0)
+  },
+  // Heat (thermal energy) delivered to the installation by a heat generator -
+  // a heat pump, a boiler, a solar thermal collector - or through a heat
+  // meter (district heating, hydronic loop). It is the heat itself, not the
+  // electricity or the fuel spent to make it: that consumption stays in
+  // energy-sensor, so the electricity views, costs and contracts never count
+  // heat as electricity, and a heat pump publishes both (their ratio is its
+  // efficiency, the COP). Electricity a device generates goes to
+  // energy-production-sensor. Reference: the Zigbee Metering cluster, whose
+  // heat and thermal metering device types count kWh (Matter measures
+  // electrical energy only).
+  // Value conventions: both values are >= 0 and count heat delivered for
+  // heating (space heating and hot water). A device reporting a single
+  // counter for heating and cooling maps it to these types; separate cooling
+  // types can be added the day a device reports cooling energy apart.
+  THERMAL_ENERGY_SENSOR: {
+    POWER: 'power', // instantaneous thermal power delivered, W (>= 0)
+    INDEX: 'index', // cumulative heat delivered meter index, kWh (>= 0)
   },
   BATTERY_STORAGE: {
     BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
@@ -1813,6 +1832,13 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.WATT_HOUR,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   ],
+  [DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
+  ],
   [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: [
     DEVICE_FEATURE_UNITS.PERCENT,
     DEVICE_FEATURE_UNITS.WATT,
@@ -1995,6 +2021,15 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: [],
     [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: [],
     [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: [],
+  },
+  [DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR]: {
+    // A power and an energy index: without this entry each would offer the other's units.
+    [DEVICE_FEATURE_TYPES.THERMAL_ENERGY_SENSOR.POWER]: [DEVICE_FEATURE_UNITS.WATT, DEVICE_FEATURE_UNITS.KILOWATT],
+    [DEVICE_FEATURE_TYPES.THERMAL_ENERGY_SENSOR.INDEX]: [
+      DEVICE_FEATURE_UNITS.WATT_HOUR,
+      DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
+    ],
   },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
     // The whole BATTERY category is a percent (the charge level), but a charging flag is a
