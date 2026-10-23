@@ -7,6 +7,7 @@ import DeviceFeatureValueText from '../../device/DeviceFeatureValueText';
 import ApexChartComponent from '../chart/ApexChartComponent';
 import Modal from '../../../routes/integration/all/external-integration/components/Modal';
 import { ConfigField } from '../../integration/ConfigSchemaForm';
+import { getVisibleFields } from '../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import {
   text,
   formatNumber,
@@ -629,7 +630,7 @@ export const WidgetActionForm = ({
         <i class={`fe fe-${component.icon || 'play'}`} />
         <span>{text(component.label, language)}</span>
       </div>
-      {fields.map(field => (
+      {getVisibleFields(fields, values).map(field => (
         <div key={field.key} class={cx({ [style.actionFormFieldRefused]: refusedField === field })}>
           <ConfigField
             field={field}
