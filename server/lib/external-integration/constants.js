@@ -37,7 +37,9 @@ const RECENTLY_PULLED_PROTECTION_MS = 60 * 60 * 1000;
 // Bounds of the `containers` manifest field (same rules as the indexer).
 const MAX_SUB_CONTAINERS = 5;
 const MAX_SUB_CONTAINER_VOLUMES = 5;
-const MAX_SUB_CONTAINER_PORTS = 3;
+// 4: Frigate publishes its UI, the RTSP restream and WebRTC over tcp AND udp
+// (one entry per protocol).
+const MAX_SUB_CONTAINER_PORTS = 4;
 const SUB_CONTAINER_NAME_REGEX = /^[a-z0-9-]{2,20}$/;
 // Optional stable identifier of a declared port, unique across the whole
 // manifest: referenced by the {{port:<name>}} placeholder of the section
@@ -52,6 +54,18 @@ const SUB_CONTAINER_CPU_DEFAULT = 0.5;
 const SUB_CONTAINER_SHM_MIN_MB = 64;
 const SUB_CONTAINER_SHM_MAX_MB = 512;
 const SUB_CONTAINER_SHM_DEFAULT_MB = 64;
+// PidsLimit counts threads too: the main container's fixed 100 fits a
+// Node.js integration, not Frigate (Python multiprocessing + one ffmpeg per
+// camera + go2rtc + nginx). The ceiling keeps the anti fork-bomb role.
+const SUB_CONTAINER_PIDS_MIN = 50;
+const SUB_CONTAINER_PIDS_MAX = 2048;
+const SUB_CONTAINER_PIDS_DEFAULT = 100;
+// Size of the /tmp tmpfs (flags stay rw,noexec,nosuid): Frigate caches its
+// recording segments in /tmp/cache. A tmpfs is charged to the container's
+// memory cgroup, so it never takes more RAM than memory_mb.
+const SUB_CONTAINER_TMP_MIN_MB = 64;
+const SUB_CONTAINER_TMP_MAX_MB = 2048;
+const SUB_CONTAINER_TMP_DEFAULT_MB = 64;
 const SUB_CONTAINER_START_MODES = ['auto', 'manual'];
 // Named hardware access classes (curated list, never a free /dev path).
 // `path`: the class is a fixed path relative to /dev; `prefix`: every /dev
@@ -634,6 +648,12 @@ module.exports = {
   SUB_CONTAINER_SHM_MIN_MB,
   SUB_CONTAINER_SHM_MAX_MB,
   SUB_CONTAINER_SHM_DEFAULT_MB,
+  SUB_CONTAINER_PIDS_MIN,
+  SUB_CONTAINER_PIDS_MAX,
+  SUB_CONTAINER_PIDS_DEFAULT,
+  SUB_CONTAINER_TMP_MIN_MB,
+  SUB_CONTAINER_TMP_MAX_MB,
+  SUB_CONTAINER_TMP_DEFAULT_MB,
   SUB_CONTAINER_START_MODES,
   HARDWARE_CLASSES,
   SUB_CONTAINER_PORTS_VARIABLE,

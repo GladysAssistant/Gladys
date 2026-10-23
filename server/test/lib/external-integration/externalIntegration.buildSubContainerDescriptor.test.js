@@ -74,6 +74,8 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
     expect(descriptor.HostConfig.Memory).to.equal(128 * 1024 * 1024);
     expect(descriptor.HostConfig.NanoCpus).to.equal(500000000);
     expect(descriptor.HostConfig.ShmSize).to.equal(64 * 1024 * 1024);
+    expect(descriptor.HostConfig.PidsLimit).to.equal(100);
+    expect(descriptor.HostConfig.Tmpfs).to.deep.equal({ '/tmp': 'rw,noexec,nosuid,size=64m' });
     expect(descriptor.HostConfig).to.not.have.property('Devices');
     expect(descriptor.HostConfig).to.not.have.property('PortBindings');
     expect(descriptor).to.not.have.property('ExposedPorts');
@@ -82,6 +84,48 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
       '/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo/containers/mqtt/mosquitto/config:/mosquitto/config',
       '/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo/containers/mqtt/mosquitto/data:/mosquitto/data',
     ]);
+  });
+
+  it('should apply the declared task and /tmp limits, the tmpfs flags staying fixed', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], pids_limit: 512, tmp_mb: 1024 };
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.PidsLimit).to.equal(512);
+    expect(descriptor.HostConfig.Tmpfs).to.deep.equal({ '/tmp': 'rw,noexec,nosuid,size=1024m' });
+  });
+
+  it('should publish the 4 declared ports of a sub-container', async () => {
+    const { externalIntegration, variable } = buildSupervisor();
+    const ports = [
+      { container_port: 8971, label: { en: 'Frigate UI' } },
+      { container_port: 8554, label: { en: 'RTSP' }, browsable: false },
+      { container_port: 8555, protocol: 'tcp', label: { en: 'WebRTC (TCP)' }, browsable: false },
+      { container_port: 8555, protocol: 'udp', label: { en: 'WebRTC (UDP)' }, browsable: false },
+    ];
+    const manifest = {
+      ...TEST_CONTAINERS_MANIFEST,
+      containers: [{ ...TEST_CONTAINERS_MANIFEST.containers[1], ports }],
+    };
+    const service = await seedExternalService({ manifest });
+    await variable.setValue(
+      SUB_CONTAINER_PORTS_VARIABLE,
+      JSON.stringify({
+        'frigate/8971/tcp': 42001,
+        'frigate/8554/tcp': 42002,
+        'frigate/8555/tcp': 42003,
+        'frigate/8555/udp': 42004,
+      }),
+      service.id,
+    );
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, manifest.containers[0]);
+    expect(descriptor.ExposedPorts).to.deep.equal({ '8971/tcp': {}, '8554/tcp': {}, '8555/tcp': {}, '8555/udp': {} });
+    expect(descriptor.HostConfig.PortBindings).to.deep.equal({
+      '8971/tcp': [{ HostIp: '0.0.0.0', HostPort: '42001' }],
+      '8554/tcp': [{ HostIp: '0.0.0.0', HostPort: '42002' }],
+      '8555/tcp': [{ HostIp: '0.0.0.0', HostPort: '42003' }],
+      '8555/udp': [{ HostIp: '0.0.0.0', HostPort: '42004' }],
+    });
   });
 
   it('should omit NanoCpus when the kernel has no CPU CFS support', async () => {

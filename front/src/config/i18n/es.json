@@ -1383,7 +1383,9 @@
         "nameLabel": "Nombre",
         "imageLabel": "Imagen",
         "limitsLabel": "Límites",
-        "portsLabel": "Puertos expuestos"
+        "portsLabel": "Puertos expuestos",
+        "pidsLimitValue": "{{count}} procesos máx.",
+        "tmpSizeValue": "{{size}} MB /tmp"
       },
       "hardware": {
         "title": "Hardware",

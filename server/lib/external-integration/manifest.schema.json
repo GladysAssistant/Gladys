@@ -697,8 +697,8 @@
         },
         "ports": {
           "type": "array",
-          "maxItems": 3,
-          "description": "Published ports. The host port is chosen by Gladys (free, persisted across recreations), never declared. Publishing a port exposes a third-party interface on the LAN: it is shown on the install screen.",
+          "maxItems": 4,
+          "description": "Published ports, one entry per protocol (Frigate: UI, RTSP restream, WebRTC over tcp and udp). The host port is chosen by Gladys (free, persisted across recreations), never declared. Publishing a port exposes a third-party interface on the LAN: it is shown on the install screen.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -764,6 +764,20 @@
           "maximum": 512,
           "default": 64,
           "description": "/dev/shm size in MB, useful for video processing."
+        },
+        "pids_limit": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 2048,
+          "default": 100,
+          "description": "PidsLimit of the container, threads included (anti fork-bomb), shown on the install screen."
+        },
+        "tmp_mb": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 2048,
+          "default": 64,
+          "description": "Size in MB of the /tmp tmpfs, which stays rw,noexec,nosuid; charged to the container memory, so it stays within memory_mb. Shown on the install screen."
         },
         "command": {
           "type": "array",

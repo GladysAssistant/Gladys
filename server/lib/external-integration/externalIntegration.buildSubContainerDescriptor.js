@@ -6,20 +6,23 @@ const {
   SUB_CONTAINER_MEMORY_DEFAULT_MB,
   SUB_CONTAINER_CPU_DEFAULT,
   SUB_CONTAINER_SHM_DEFAULT_MB,
+  SUB_CONTAINER_PIDS_DEFAULT,
+  SUB_CONTAINER_TMP_DEFAULT_MB,
 } = require('./constants');
 
 const BYTES_PER_MB = 1024 * 1024;
-// anti fork-bomb, same value as the main container
-const PIDS_LIMIT = 100;
 
 /**
  * @description Build the Docker descriptor of a declared sub-container, with
  * the same lockdown as the main container (CapDrop ALL, no-new-privileges,
- * supervisor-driven restart, bounded logs, tmpfs /tmp) except: only the
- * private network of the integration (never `gladys-integrations`: no token,
- * no host API access), volumes derived from the integration data folder
- * (the manifest never chooses a host path), host ports chosen by Gladys,
- * devices = requested (manifest) ∩ granted (user) ∩ present (detection).
+ * supervisor-driven restart, bounded logs, PidsLimit, noexec tmpfs /tmp)
+ * except: only the private network of the integration (never
+ * `gladys-integrations`: no token, no host API access), volumes derived from
+ * the integration data folder (the manifest never chooses a host path), host
+ * ports chosen by Gladys,
+ * devices = requested (manifest) ∩ granted (user) ∩ present (detection),
+ * and limits sized by the manifest within the validated bounds (memory, CPU,
+ * /dev/shm, tasks, /tmp size — never the flags).
  * @param {object} service - The external integration service (plain object).
  * @param {object} entry - The sub-container declaration from the manifest.
  * @param {object} [options] - Options.
@@ -94,9 +97,11 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
       // the daemon would reject the creation with an HTTP 400
       ...(cpuCfsSupported ? { NanoCpus: Math.round((entry.cpu || SUB_CONTAINER_CPU_DEFAULT) * 1e9) } : {}),
       ShmSize: (entry.shm_mb || SUB_CONTAINER_SHM_DEFAULT_MB) * BYTES_PER_MB,
-      PidsLimit: PIDS_LIMIT,
+      // anti fork-bomb, threads included: the ceiling is validated (C.1)
+      PidsLimit: entry.pids_limit || SUB_CONTAINER_PIDS_DEFAULT,
       ...(binds.length > 0 ? { Binds: binds } : {}),
-      Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=64m' },
+      // only the size is declarable: /tmp is never an execution path
+      Tmpfs: { '/tmp': `rw,noexec,nosuid,size=${entry.tmp_mb || SUB_CONTAINER_TMP_DEFAULT_MB}m` },
       LogConfig: { Type: 'json-file', Config: { 'max-size': '10m', 'max-file': '2' } },
       ...(devices.length > 0 ? { Devices: devices } : {}),
       ...(Object.keys(portBindings).length > 0 ? { PortBindings: portBindings } : {}),

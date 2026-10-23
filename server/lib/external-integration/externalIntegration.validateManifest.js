@@ -16,6 +16,10 @@ const {
   SUB_CONTAINER_CPU_MAX,
   SUB_CONTAINER_SHM_MIN_MB,
   SUB_CONTAINER_SHM_MAX_MB,
+  SUB_CONTAINER_PIDS_MIN,
+  SUB_CONTAINER_PIDS_MAX,
+  SUB_CONTAINER_TMP_MIN_MB,
+  SUB_CONTAINER_TMP_MAX_MB,
   SUB_CONTAINER_START_MODES,
   HARDWARE_CLASSES,
   NETWORK_DISCOVERY_TYPES,
@@ -119,6 +123,8 @@ const SUB_CONTAINER_FIELDS = [
   'memory_mb',
   'cpu',
   'shm_mb',
+  'pids_limit',
+  'tmp_mb',
   'command',
 ];
 const PORT_FIELDS = ['container_port', 'protocol', 'label', 'name', 'browsable'];
@@ -1070,6 +1076,26 @@ function validateSubContainer(entry, index, seenNames, errors, seenPortNames) {
   ) {
     errors.push(
       `${path}.shm_mb: must be an integer between ${SUB_CONTAINER_SHM_MIN_MB} and ${SUB_CONTAINER_SHM_MAX_MB}`,
+    );
+  }
+  if (
+    entry.pids_limit !== undefined &&
+    (!Number.isInteger(entry.pids_limit) ||
+      entry.pids_limit < SUB_CONTAINER_PIDS_MIN ||
+      entry.pids_limit > SUB_CONTAINER_PIDS_MAX)
+  ) {
+    errors.push(
+      `${path}.pids_limit: must be an integer between ${SUB_CONTAINER_PIDS_MIN} and ${SUB_CONTAINER_PIDS_MAX}`,
+    );
+  }
+  if (
+    entry.tmp_mb !== undefined &&
+    (!Number.isInteger(entry.tmp_mb) ||
+      entry.tmp_mb < SUB_CONTAINER_TMP_MIN_MB ||
+      entry.tmp_mb > SUB_CONTAINER_TMP_MAX_MB)
+  ) {
+    errors.push(
+      `${path}.tmp_mb: must be an integer between ${SUB_CONTAINER_TMP_MIN_MB} and ${SUB_CONTAINER_TMP_MAX_MB}`,
     );
   }
   if (entry.command !== undefined) {

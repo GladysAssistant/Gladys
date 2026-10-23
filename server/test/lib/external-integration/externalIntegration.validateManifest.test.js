@@ -1019,15 +1019,19 @@ describe('externalIntegration.validateManifest', () => {
           name: 'frigate',
           docker_image: 'ghcr.io/blakeblackshear/frigate:0.14.1',
           read_only: false,
-          memory_mb: 1024,
+          memory_mb: 2048,
           shm_mb: 128,
+          pids_limit: 512,
+          tmp_mb: 1024,
           cpu: 1,
           env: { LIBVA_DRIVER_NAME: 'i965' },
           command: ['python3', '-m', 'frigate'],
+          // 4 ports, the Frigate case: UI, RTSP restream, WebRTC tcp + udp
           ports: [
-            { container_port: 5000, protocol: 'tcp', label: { en: 'Frigate UI' } },
-            // WebSocket endpoint for devices (the OCPP case): no "Open" link
-            { container_port: 9000, label: { en: 'OCPP WebSocket' }, browsable: false },
+            { container_port: 8971, protocol: 'tcp', label: { en: 'Frigate UI' } },
+            { container_port: 8554, label: { en: 'RTSP' }, browsable: false },
+            { container_port: 8555, protocol: 'tcp', label: { en: 'WebRTC (TCP)' }, browsable: false },
+            { container_port: 8555, protocol: 'udp', label: { en: 'WebRTC (UDP)' }, browsable: false },
           ],
           devices: ['coral-usb', 'gpu'],
         },
@@ -1107,8 +1111,8 @@ describe('externalIntegration.validateManifest', () => {
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, ports: {} }] }, 'containers[0].ports');
     const port = { container_port: 80, label: { en: 'UI' } };
     expect422(
-      { ...TEST_MANIFEST, containers: [{ ...base, ports: [port, port, port, port] }] },
-      'containers[0].ports: must be an array of at most 3',
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [port, port, port, port, port] }] },
+      'containers[0].ports: must be an array of at most 4 entries',
     );
     expect422(
       { ...TEST_MANIFEST, containers: [{ ...base, ports: [null] }] },
@@ -1187,6 +1191,17 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept the bounds of the sub-container task and /tmp limits', () => {
+    const base = { name: 'frigate', docker_image: 'img:1.0.0' };
+    [
+      { pids_limit: 50, tmp_mb: 64 },
+      { pids_limit: 2048, tmp_mb: 2048 },
+    ].forEach((limits) => {
+      const manifest = { ...TEST_MANIFEST, containers: [{ ...base, ...limits }] };
+      expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    });
+  });
+
   it('should reject out-of-bounds sub-container limits', () => {
     const base = { name: 'mqtt', docker_image: 'img:1.0.0' };
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, read_only: 'yes' }] }, 'containers[0].read_only');
@@ -1196,6 +1211,19 @@ describe('externalIntegration.validateManifest', () => {
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, cpu: '1' }] }, 'containers[0].cpu');
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, shm_mb: 32 }] }, 'containers[0].shm_mb');
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, shm_mb: 1024 }] }, 'containers[0].shm_mb');
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, pids_limit: 49 }] },
+      'containers[0].pids_limit: must be an integer between 50 and 2048',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, pids_limit: 4096 }] }, 'containers[0].pids_limit');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, pids_limit: 100.5 }] }, 'containers[0].pids_limit');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, pids_limit: '512' }] }, 'containers[0].pids_limit');
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, tmp_mb: 32 }] },
+      'containers[0].tmp_mb: must be an integer between 64 and 2048',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, tmp_mb: 4096 }] }, 'containers[0].tmp_mb');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, tmp_mb: '1024' }] }, 'containers[0].tmp_mb');
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, command: 'mosquitto' }] }, 'containers[0].command');
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, command: [1] }] }, 'containers[0].command');
   });
