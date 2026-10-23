@@ -1,7 +1,11 @@
 import { createElement } from 'preact';
 import get from 'get-value';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  MUSIC_STRING_FEATURE_TYPES
+} from '../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
 import BatteryLevelFeature from './BatteryLevelFeature';
@@ -35,7 +39,13 @@ import SmokeSensorMutedDeviceValue from './SmokeSensorMutedDeviceValue';
 const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
-  }
+  },
+  // The "now playing" metadata of a music player are string states (capabilities/music.md):
+  // displayed raw, the artwork one being an image key the music box resolves
+  [DEVICE_FEATURE_CATEGORIES.MUSIC]: MUSIC_STRING_FEATURE_TYPES.reduce(
+    (acc, type) => ({ ...acc, [type]: TextDeviceValue }),
+    {}
+  )
 };
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
@@ -92,7 +102,9 @@ const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
   DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
   DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
   DEVICE_FEATURE_CATEGORIES.BUTTON,
-  DEVICE_FEATURE_CATEGORIES.TEXT
+  DEVICE_FEATURE_CATEGORIES.TEXT,
+  // a player that stays on one track for an hour has no stale value
+  DEVICE_FEATURE_CATEGORIES.MUSIC
 ];
 
 const SensorDeviceType = ({ children, ...props }) => {

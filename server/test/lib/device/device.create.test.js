@@ -842,6 +842,48 @@ describe('Device', () => {
     await device.create({ ...deviceToSave, room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5' });
     assert.neverCalledWith(fakeEvent.emit, EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE);
   });
+  it('should force keep_history off on every music feature, whatever was published', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const fakeEvent = {
+      emit: fake.returns(null),
+      on: fake.returns(null),
+    };
+    const device = new Device(fakeEvent, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const createdDevice = await device.create({
+      name: 'Kitchen speaker',
+      external_id: 'music:kitchen',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      features: [
+        {
+          name: 'Volume',
+          external_id: 'music:kitchen:volume',
+          category: 'music',
+          type: 'volume',
+          keep_history: true,
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+        {
+          name: 'Title',
+          external_id: 'music:kitchen:title',
+          category: 'music',
+          type: 'title',
+          keep_history: true,
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 0,
+        },
+      ],
+    });
+    expect(createdDevice.features).to.have.lengthOf(2);
+    createdDevice.features.forEach((feature) => {
+      expect(feature).to.have.property('keep_history', false);
+    });
+  });
   it('should ignore invalid energy_parent_id when updating a device', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);

@@ -22,6 +22,7 @@ const {
   MAX_NETWORK_DISCOVERY_ENTRIES,
   MAX_UDP_BROADCAST_PORTS,
   MAX_ACTIONS,
+  MUSIC_MANIFEST_FIELDS,
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,
   MANIFEST_TRANSPORTS,
@@ -87,6 +88,7 @@ const MANIFEST_FIELDS = [
   'scene_triggers',
   'scene_actions',
   'energy_contracts',
+  'music',
 ];
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
@@ -1300,6 +1302,24 @@ function validateManifest(manifest) {
   });
   if (manifest.energy_contracts !== undefined) {
     validateEnergyContractsField(manifest.energy_contracts, errors, validateMultiLanguageText);
+  }
+  if (manifest.music !== undefined) {
+    // the on-demand music operations a player integration implements
+    // (capabilities/music.md, section 4.1): a flat object of booleans, on
+    // device integrations only — a player is a device
+    if (manifest.type !== 'device') {
+      errors.push('music: only allowed on device integrations');
+    } else if (manifest.music === null || typeof manifest.music !== 'object' || Array.isArray(manifest.music)) {
+      errors.push('music: must be an object');
+    } else {
+      Object.keys(manifest.music).forEach((key) => {
+        if (!MUSIC_MANIFEST_FIELDS.includes(key)) {
+          errors.push(`music.${key}: unknown field`);
+        } else if (typeof manifest.music[key] !== 'boolean') {
+          errors.push(`music.${key}: must be a boolean`);
+        }
+      });
+    }
   }
   if (manifest.type === PROVIDER_TYPE) {
     // a provider providing nothing has no contract at all: explicit error
