@@ -129,6 +129,7 @@ const toCatalogEntry = (entry, installedBySlug) => {
     categories: Array.isArray(entry.categories)
       ? entry.categories.filter(category => KNOWN_CATEGORIES.includes(category))
       : [],
+    countries: Array.isArray(entry.countries) ? entry.countries.filter(code => /^[A-Z]{2}$/.test(code)) : [],
     first_seen_at: typeof entry.first_seen_at === 'string' ? entry.first_seen_at : null,
     installed: installed !== undefined,
     installed_selector: installed ? installed.selector : null,
@@ -151,7 +152,13 @@ const getStoreCatalog = async ({ search, refresh } = {}, installedBySlug = {}) =
       const descriptions = Object.values(entry.manifest.description || {})
         .join(' ')
         .toLowerCase();
-      return name.includes(keyword) || descriptions.includes(keyword) || entry.store_slug.includes(keyword);
+      const keywords = (entry.manifest.keywords || []).join(' ').toLowerCase();
+      return (
+        name.includes(keyword) ||
+        descriptions.includes(keyword) ||
+        keywords.includes(keyword) ||
+        entry.store_slug.includes(keyword)
+      );
     });
   }
   return { refreshed_at: fetchedAt, integrations };

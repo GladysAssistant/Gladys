@@ -24,6 +24,8 @@ const STORE_INDEX_LITE_MANIFEST_FIELDS = [
   'docker_image',
   'gladys_version',
   'transports',
+  'keywords',
+  'countries',
 ];
 // Local persistent cache of the index (t_variable), so the catalog stays
 // available offline.

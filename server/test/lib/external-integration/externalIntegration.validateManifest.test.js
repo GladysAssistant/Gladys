@@ -1215,6 +1215,48 @@ describe('externalIntegration.validateManifest', () => {
     });
   });
 
+  it('should accept a valid keywords declaration', () => {
+    const manifest = { ...TEST_MANIFEST, keywords: ['WiiM', 'Arylic', 'Audio Pro'] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed keywords declaration', () => {
+    // not an array, empty, more than 10 terms, a term too short or too long,
+    // a non-string term, and duplicates once trimmed and lowercased
+    [
+      'wiim',
+      [],
+      ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'].map((letter) => `${letter}${letter}`),
+      ['x'],
+      [' x '],
+      ['a'.repeat(31)],
+      [42],
+      ['WiiM', ' wiim'],
+    ].forEach((keywords) => {
+      expect422({ ...TEST_MANIFEST, keywords }, 'keywords: must be 1-10 unique strings of 2-30 characters');
+    });
+  });
+
+  it('should accept a valid countries declaration', () => {
+    const manifest = { ...TEST_MANIFEST, countries: ['FR', 'BE'] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed countries declaration', () => {
+    // not an array, empty, more than 20 codes, lower case, not alpha-2,
+    // non-string items and duplicates
+    const tooMany = Array.from(
+      { length: 21 },
+      (value, i) => `${String.fromCharCode(65 + (i % 26))}${String.fromCharCode(65 + Math.floor(i / 26))}`,
+    );
+    ['FR', [], tooMany, ['fr'], ['FRA'], ['F1'], [null], ['FR', 'FR']].forEach((countries) => {
+      expect422(
+        { ...TEST_MANIFEST, countries },
+        'countries: must be 1-20 unique ISO 3166-1 alpha-2 codes (upper case)',
+      );
+    });
+  });
+
   it('should accept a valid categories declaration', () => {
     const manifest = { ...TEST_MANIFEST, categories: ['climate', 'energy'] };
     expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);

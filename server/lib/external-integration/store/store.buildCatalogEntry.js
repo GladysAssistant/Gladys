@@ -3,6 +3,8 @@ const semver = require('semver');
 const { INTEGRATION_CATALOG_CATEGORIES } = require('../../../utils/constants');
 
 const KNOWN_CATEGORIES = new Set(INTEGRATION_CATALOG_CATEGORIES);
+// ISO 3166-1 alpha-2, the shape of the `countries` entries (C.1 / C.6)
+const COUNTRY_CODE_REGEX = /^[A-Z]{2}$/;
 
 /**
  * @description Build a store catalog entry for the frontend from an index
@@ -35,6 +37,13 @@ function buildCatalogEntry(entry, installedService, gladysVersion) {
     // dropped, never a reason to hide the integration
     categories: Array.isArray(entry.categories)
       ? entry.categories.filter((category) => KNOWN_CATEGORIES.has(category))
+      : [],
+    // countries the integration is usable in, resolved by the indexer like
+    // the categories (manifest, else fallback mapping, else worldwide):
+    // feeds the country filter of the catalog. Malformed codes are dropped,
+    // an index predating the field reads as worldwide
+    countries: Array.isArray(entry.countries)
+      ? entry.countries.filter((code) => typeof code === 'string' && COUNTRY_CODE_REGEX.test(code))
       : [],
     // first indexing date of the store_slug, persisted by the indexer
     // across rebuilds: powers the "Newest first" sort of the catalog

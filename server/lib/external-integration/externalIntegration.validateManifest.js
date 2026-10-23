@@ -27,6 +27,11 @@ const {
   ACTION_MAX_TIMEOUT_SECONDS,
   MANIFEST_TRANSPORTS,
   MAX_MANIFEST_CATEGORIES,
+  MAX_MANIFEST_KEYWORDS,
+  MANIFEST_KEYWORD_MIN_LENGTH,
+  MANIFEST_KEYWORD_MAX_LENGTH,
+  MAX_MANIFEST_COUNTRIES,
+  MANIFEST_COUNTRY_CODE_REGEX,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   ACCOUNT_FIELD_TYPES,
@@ -80,6 +85,8 @@ const MANIFEST_FIELDS = [
   'actions',
   'transports',
   'categories',
+  'keywords',
+  'countries',
   'webhooks',
   'messaging',
   'contact_schema',
@@ -1340,6 +1347,46 @@ function validateManifest(manifest) {
       new Set(manifest.transports).size !== manifest.transports.length
     ) {
       errors.push(`transports: must be a non-empty subset of ${MANIFEST_TRANSPORTS.join(', ')}`);
+    }
+  }
+  // search-only terms of the catalog (C.1): plain non-empty strings, bounded
+  // in number and length, unique once trimmed and lowercased — "WiiM" and
+  // "wiim" are the same term for a search that ignores case
+  if (manifest.keywords !== undefined) {
+    const keywordsValid =
+      Array.isArray(manifest.keywords) &&
+      manifest.keywords.length > 0 &&
+      manifest.keywords.length <= MAX_MANIFEST_KEYWORDS &&
+      manifest.keywords.every(
+        (keyword) =>
+          typeof keyword === 'string' &&
+          keyword.trim().length >= MANIFEST_KEYWORD_MIN_LENGTH &&
+          keyword.trim().length <= MANIFEST_KEYWORD_MAX_LENGTH,
+      );
+    if (
+      !keywordsValid ||
+      new Set(manifest.keywords.map((keyword) => keyword.trim().toLowerCase())).size !== manifest.keywords.length
+    ) {
+      errors.push(
+        `keywords: must be 1-${MAX_MANIFEST_KEYWORDS} unique strings of ${MANIFEST_KEYWORD_MIN_LENGTH}-${MANIFEST_KEYWORD_MAX_LENGTH} characters`,
+      );
+    }
+  }
+  // countries where the integration is usable (C.1): ISO 3166-1 alpha-2
+  // codes, upper case. The shape is all the core checks — the list of real
+  // codes belongs to the indexer, and an unknown code only ever hides the
+  // integration from the country filter of the catalog, never from the search
+  if (manifest.countries !== undefined) {
+    if (
+      !Array.isArray(manifest.countries) ||
+      manifest.countries.length === 0 ||
+      manifest.countries.length > MAX_MANIFEST_COUNTRIES ||
+      !manifest.countries.every(
+        (country) => typeof country === 'string' && MANIFEST_COUNTRY_CODE_REGEX.test(country),
+      ) ||
+      new Set(manifest.countries).size !== manifest.countries.length
+    ) {
+      errors.push(`countries: must be 1-${MAX_MANIFEST_COUNTRIES} unique ISO 3166-1 alpha-2 codes (upper case)`);
     }
   }
   if (manifest.categories !== undefined) {

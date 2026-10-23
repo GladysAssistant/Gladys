@@ -45,6 +45,57 @@
   margin-top: 8px;
 }
 
+/* desktop header: the title and the count stack in one column so the count
+   never widens the row; the controls on the right never wrap */
+.headerTitleBlock {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  margin-right: 1rem;
+}
+
+/* from 1200 px the header never wraps: the title block takes the width the
+   controls leave, and a long count wraps inside its own column instead of
+   pushing the controls under the title (the theme's .page-header wraps by
+   default, which moved the search field down by 51 px between 1200 and
+   1319 px as soon as the count grew while typing). Top-aligned, so a count
+   growing from one line to two does not recentre the controls either.
+   Below 1200 px the controls do not leave the title block any width: the
+   header keeps its two lines, where nothing moves */
+@media (min-width: 1200px) {
+  .headerDesktop :global(.page-header) {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+  }
+}
+
+.headerSubtitle {
+  margin-left: 0;
+  line-height: 1.25rem;
+}
+
+.headerOptions {
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+/* the "clear filters" link sits inside the count sentence: same size, no
+   button chrome */
+.clearFilters {
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+  /* the theme's button border adds 2 px to the count line as the link
+     appears: no line of the header may move with the count */
+  border: 0;
+}
+
+.countryScope :global(.btn-link) {
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .mobileCategoryNav {
   display: block;
   margin-bottom: 1rem;

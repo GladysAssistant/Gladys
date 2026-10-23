@@ -1014,7 +1014,8 @@
       "external": "Community",
       "native": "Native",
       "deprecated": "Soon deprecated",
-      "new": "New"
+      "new": "New",
+      "installed": "Installed"
     },
     "root": {
       "title": "Integrations",
@@ -1057,6 +1058,17 @@
         "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol). Your device can also be supported by a community <b>external integration</b>: anyone can create one and publish it in the store, it then appears in this list. See the <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">external integrations documentation</a>."
       },
       "orderDirNewest": "Newest first",
+      "orderDirUpdated": "Last updated",
+      "clearFilters": "Clear filters",
+      "countryFilter": {
+        "scoped": {
+          "one": "Country: {{country}}. 1 integration from another country is hidden.",
+          "other": "Country: {{country}}. {{count}} integrations from other countries are hidden."
+        },
+        "showAll": "Show all countries",
+        "all": "All countries are shown.",
+        "showOnly": "Limit to {{country}}"
+      },
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
@@ -1073,7 +1085,11 @@
         "network": "Network & presence",
         "notifications": "Messaging & notifications",
         "assistants": "Voice assistants & AI",
-        "services": "Services"
+        "services": "Services",
+        "transport": "Transport & mobility",
+        "vehicles": "Vehicles & EV charging",
+        "servers": "Servers & self-hosting",
+        "leisure": "Leisure, sport & games"
       }
     },
     "externalIntegration": {
