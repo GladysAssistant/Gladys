@@ -86,6 +86,9 @@
   font-size: inherit;
   line-height: inherit;
   vertical-align: baseline;
+  /* the theme's button border adds 2 px to the count line as the link
+     appears: no line of the header may move with the count */
+  border: 0;
 }
 
 .countryScope :global(.btn-link) {
