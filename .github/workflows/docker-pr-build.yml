@@ -215,7 +215,7 @@ jobs:
         run: |
           npm ci && npm run install-server:dev
       - name: ✅ Cypress run
-        uses: cypress-io/github-action@c662a784116e1a26360c4e1fc0a90feedb4b5ed3 # v3.1.0
+        uses: cypress-io/github-action@c541a95ea92d9239347a2355f2e895cd4b3f8060 # v7.4.6
         with:
           install: false
           start: npm run start:cypress

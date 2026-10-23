@@ -9,12 +9,24 @@ import style from './style.css';
 // while no search narrows the list down, the displayed count and the total of
 // the current view are the same number: showing "75 of 75 integrations" is
 // noise, the total alone says everything
-const IntegrationCount = ({ searching, integrationsLength, totalSize }) =>
-  searching ? (
+// while the community integrations load, the only count we could give is the
+// one of the native integrations: a small number that would read as the size
+// of the whole catalog. The header says the catalog is loading instead.
+const IntegrationCount = ({ loading, searching, integrationsLength, totalSize }) => {
+  if (loading) {
+    return (
+      <span role="status">
+        <span class={style.loadingDot} aria-hidden="true" />
+        <Text id="integration.root.loadingCatalog" />
+      </span>
+    );
+  }
+  return searching ? (
     <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
   ) : (
     <Text id="integration.root.subtitleTotal" fields={{ total: totalSize }} />
   );
+};
 
 const IntegrationPageHeader = ({
   intl,
@@ -24,6 +36,7 @@ const IntegrationPageHeader = ({
   searchKeyword,
   integrationsLength,
   totalSize,
+  loading,
   showInstallFromGithub
 }) => {
   const hasSearch = searchKeyword.length > 0;
@@ -32,7 +45,7 @@ const IntegrationPageHeader = ({
   const searchNarrowsView = hasSearch && integrationsLength < totalSize;
   // an empty view (the catalog still loading, no favorite yet) already displays
   // a message in the page body, "0 integrations" on top of it says nothing more
-  const showCount = hasSearch || totalSize > 0;
+  const showCount = loading || hasSearch || totalSize > 0;
   const searchPlaceholder = get(intl.dictionary, 'integration.root.searchPlaceholder', {
     default: ''
   });
@@ -47,6 +60,7 @@ const IntegrationPageHeader = ({
           {showCount && (
             <div class="page-subtitle">
               <IntegrationCount
+                loading={loading}
                 searching={searchNarrowsView}
                 integrationsLength={integrationsLength}
                 totalSize={totalSize}
@@ -109,6 +123,7 @@ const IntegrationPageHeader = ({
         {showCount && (
           <div class={style.mobileResultCount}>
             <IntegrationCount
+              loading={loading}
               searching={searchNarrowsView}
               integrationsLength={integrationsLength}
               totalSize={totalSize}
