@@ -153,6 +153,10 @@ class Integration extends Component {
     // never the store: installing is an admin gesture
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const userId = user.id;
+    // two cards updated at the same time each reload the list on success: the
+    // first reload can answer last, with the flag of the second card still up
+    this.externalLoadRequest = (this.externalLoadRequest || 0) + 1;
+    const request = this.externalLoadRequest;
     const [externalInstalledResponse, externalStoreResponse] = await Promise.all([
       // null and not []: a failed request means "unknown", not "nothing
       // installed". An empty array would be counted as zero integration to
@@ -160,9 +164,10 @@ class Integration extends Component {
       httpClient.get('/api/v1/external_integration').catch(() => null),
       isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
-    // the user changed while this load was in flight: the load started for
-    // the new one holds the lists to display, this one must not overwrite them
-    if (get(this.props, 'user.id') !== userId) {
+    // the user changed while this load was in flight, or a newer load has
+    // started since: that one holds the lists to display, this one must not
+    // overwrite them
+    if (get(this.props, 'user.id') !== userId || request !== this.externalLoadRequest) {
       return;
     }
     await this.setState({
@@ -241,6 +246,7 @@ class Integration extends Component {
       // the category links carry no filter: keep the ones already applied in
       // the URL of the newly displayed category
       this.updateURL();
+      this.dropFinishedUpdates();
     }
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
@@ -270,6 +276,7 @@ class Integration extends Component {
       integration => isAdmin || ['communication', 'calendar'].includes(get(integration, 'manifest.type'))
     );
     const store = isAdmin ? this.state.externalStore || [] : [];
+    const updateStates = this.state.updateStates || {};
 
     const storeBySlug = new Map();
     store.forEach(storeIntegration => {
@@ -329,7 +336,11 @@ class Integration extends Component {
         url: getInstalledUrl(integration.selector, manifest),
         img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
+        selector: integration.selector,
+        version: integration.version,
+        latestVersion: integration.latest_version,
         updateAvailable: integration.update_available,
+        updateState: updateStates[integration.selector],
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: (storeIntegration && storeIntegration.first_seen_at) || null,
         ...getTransportTags(manifest)
@@ -363,7 +374,9 @@ class Integration extends Component {
               gladysPlus: this.state.gladysPlus
             }),
         img: storeIntegration.cover_url || manifest.cover_image || null,
+        selector: isInstalled ? storeIntegration.installed_selector : null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false,
+        updateState: isInstalled ? updateStates[storeIntegration.installed_selector] : undefined,
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: storeIntegration.first_seen_at || null,
         ...getTransportTags(manifest)
@@ -441,9 +454,12 @@ class Integration extends Component {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
     }
 
-    // If we are in updates view, only display the integrations to update
+    // If we are in updates view, only display the integrations to update. One
+    // just updated from its card stays, so its card can say how it went
     if (category === 'updates') {
-      selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
+      selectedIntegrations = selectedIntegrations.filter(
+        integration => integration.updateAvailable || integration.updateState
+      );
     }
 
     // If we are in the installed view, only display what actually runs on this
@@ -601,6 +617,53 @@ class Integration extends Component {
     }
   };
 
+  setUpdateState = async (selector, updateState) => {
+    // functional form: several cards can be updated at the same time, each
+    // answer must keep the state the others left
+    await this.setState(prevState => ({ updateStates: { ...prevState.updateStates, [selector]: updateState } }));
+    this.getIntegrations();
+  };
+
+  updateIntegration = async selector => {
+    const updateState = (this.state.updateStates || {})[selector];
+    if (updateState && updateState.status === RequestStatus.Getting) {
+      return;
+    }
+    await this.setUpdateState(selector, { status: RequestStatus.Getting });
+    try {
+      const integration = await this.props.httpClient.post(`/api/v1/external_integration/${selector}/update`);
+      // the reload clears the update flag of this card and feeds the header
+      // counter with the new count. The spinner stays up until it has landed:
+      // with the flag still set, the card would offer the update again
+      await this.loadExternalIntegrations();
+      await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
+    } catch (e) {
+      console.error(e);
+      await this.setUpdateState(selector, { status: RequestStatus.Error });
+    }
+  };
+
+  // the result of an update is read on the view it ran in: carried to another
+  // one, it would keep an up-to-date card in "To update" and hide the "all up
+  // to date" state. An update still running, or failed, keeps its card state
+  dropFinishedUpdates = async () => {
+    const updateStates = this.state.updateStates || {};
+    const isFinished = selector => updateStates[selector].status === RequestStatus.Success;
+    if (!Object.keys(updateStates).some(isFinished)) {
+      return;
+    }
+    await this.setState(prevState => {
+      const remaining = { ...prevState.updateStates };
+      Object.keys(remaining).forEach(selector => {
+        if (remaining[selector].status === RequestStatus.Success) {
+          delete remaining[selector];
+        }
+      });
+      return { updateStates: remaining };
+    });
+    this.getIntegrations();
+  };
+
   // more cards as the user scrolls down the list
   showMoreIntegrations = () => {
     this.setState(prevState => ({ visibleCount: prevState.visibleCount + CATALOG_PAGE_SIZE }));
@@ -674,6 +737,7 @@ class Integration extends Component {
       search: this.search,
       changeOrderDir: this.changeOrderDir,
       toggleFavorite: this.toggleFavorite,
+      updateIntegration: this.updateIntegration,
       refreshStore: this.refreshStore,
       setOriginFacet: this.setOriginFacet,
       setTransportFacet: this.setTransportFacet,
