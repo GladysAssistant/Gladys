@@ -198,6 +198,17 @@
         "$ref": "#/definitions/sceneTrigger"
       }
     },
+    "music": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Music players capability (capabilities/music.md): the on-demand operations the integration implements for its players, relayed over the integration WebSocket — browse (the catalog tree: favorites, playlists, library...), search, queue (read and jump), and append (the play command accepts the next/append modes on top of replace). Device integrations only. An undeclared operation is refused by the core without a command. Declaring the field requires gladys_version >= the first release accepting it.",
+      "properties": {
+        "browse": { "type": "boolean", "default": false },
+        "search": { "type": "boolean", "default": false },
+        "queue": { "type": "boolean", "default": false },
+        "append": { "type": "boolean", "default": false }
+      }
+    },
     "energy_contracts": {
       "type": "object",
       "description": "Energy contracts capability (capabilities/energy-contracts.md): contract templates (a tariff definition of the core rule engine, validated against tariff.schema.json, or a delegated pricing computed by the integration over energy-contract.price) and tariff calendars the integration feeds through POST /api/integration/v1/energy/calendar (day colours, spot prices, critical peak days). Calendar keys are global per Gladys instance and owned by the first installed integration declaring them. Shown on the install screen. Declaring the field requires gladys_version >= the first release accepting it.",
@@ -257,6 +268,19 @@
                 "const": false
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "music only makes sense on device integrations (a player is a device)",
+      "if": {
+        "required": ["music"]
+      },
+      "then": {
+        "properties": {
+          "type": {
+            "const": "device"
           }
         }
       }

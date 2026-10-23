@@ -76,7 +76,7 @@ Facets are cumulative filter chips displayed above the grid, combinable with the
 | Origin | Native / Community | `external` flag, already computed by the front | Data already available |
 | Transport | Local / Cloud | `local`/`cloud` fields (native JSONs) and `manifest.transports`, normalized as below | Data already available, **quality gap**: several store manifests have no `transports` (SMTP, CallMeBot, MELCloud, Roborock…), and several native entries declare neither `local` nor `cloud` (OwnTracks…). Entries without the data match neither chip; a completion pass on existing manifests is listed in §8 |
 | Gladys Plus | Requires Gladys Plus | `gladysPlus` field (native JSONs) | Native only today; extending it to the manifest is an open question (§9) |
-| Updates | Update available | existing `updateAvailable` | Already shipped as the conditional "Updates" sidebar entry; unchanged |
+| Updates | Update available | existing `updateAvailable` | Already shipped as the conditional "Updates" sidebar entry; also keeps a card just updated from its footer until the user leaves the view (`external-integrations/core/frontend.md`, B.8) |
 
 **Transport normalization.** The two sources have different shapes — native JSONs carry two independent booleans (`"local": true`, `"cloud": true`), manifests carry an array (`"transports": ["local", "cloud"]`, 1..2 unique values from that enum, per §C.1 of `external-integrations/contracts/manifest.md`). The front normalizes both into the same set before filtering, so that equivalent integrations always produce the same facet result:
 

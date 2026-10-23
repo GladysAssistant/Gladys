@@ -1,6 +1,7 @@
 const AreaController = require('./controllers/area.controller');
 const CalendarController = require('./controllers/calendar.controller');
 const CameraController = require('./controllers/camera.controller');
+const MusicController = require('./controllers/music.controller');
 const DashboardController = require('./controllers/dashboard.controller');
 const DeviceController = require('./controllers/device.controller');
 const UserController = require('./controllers/user.controller');
@@ -36,6 +37,7 @@ function getRoutes(gladys) {
   const areaController = AreaController(gladys);
   const calendarController = CalendarController(gladys);
   const cameraController = CameraController(gladys);
+  const musicController = MusicController(gladys);
   const dashboardController = DashboardController(gladys);
   const deviceController = DeviceController(gladys);
   const lightController = LightController(gladys);
@@ -179,6 +181,35 @@ function getRoutes(gladys) {
     'post /api/v1/camera/:camera_selector/image': {
       authenticated: true,
       controller: cameraController.setImage,
+    },
+    // music players (capabilities/music.md): on-demand catalog, queue and artwork
+    'get /api/v1/device/:device_selector/music/capabilities': {
+      authenticated: true,
+      controller: musicController.getCapabilities,
+    },
+    'get /api/v1/device/:device_selector/music/browse': {
+      authenticated: true,
+      controller: musicController.browse,
+    },
+    'get /api/v1/device/:device_selector/music/search': {
+      authenticated: true,
+      controller: musicController.search,
+    },
+    'post /api/v1/device/:device_selector/music/play': {
+      authenticated: true,
+      controller: musicController.play,
+    },
+    'get /api/v1/device/:device_selector/music/queue': {
+      authenticated: true,
+      controller: musicController.getQueue,
+    },
+    'post /api/v1/device/:device_selector/music/queue/play': {
+      authenticated: true,
+      controller: musicController.playQueueItem,
+    },
+    'get /api/v1/device/:device_selector/music/artwork/:key': {
+      authenticated: true,
+      controller: musicController.getArtwork,
     },
     // dashboard
     'get /api/v1/dashboard': {

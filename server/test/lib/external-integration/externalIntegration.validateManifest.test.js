@@ -732,6 +732,24 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept the music capability field on device integrations, booleans only', () => {
+    const manifest = { ...TEST_MANIFEST, music: { browse: true, search: false, queue: true, append: false } };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    expect(externalIntegration.validateManifest({ ...TEST_MANIFEST, music: {} })).to.deep.equal({
+      ...TEST_MANIFEST,
+      music: {},
+    });
+    expect422(
+      { ...TEST_MANIFEST, type: 'communication', music: { browse: true } },
+      'music: only allowed on device integrations',
+    );
+    expect422({ ...TEST_MANIFEST, music: 'yes' }, 'music: must be an object');
+    expect422({ ...TEST_MANIFEST, music: null }, 'music: must be an object');
+    expect422({ ...TEST_MANIFEST, music: [true] }, 'music: must be an object');
+    expect422({ ...TEST_MANIFEST, music: { lyrics: true } }, 'music.lyrics: unknown field');
+    expect422({ ...TEST_MANIFEST, music: { browse: 'yes' } }, 'music.browse: must be a boolean');
+  });
+
   it('should accept a valid actions list', () => {
     const manifest = {
       ...TEST_MANIFEST,

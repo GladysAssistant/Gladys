@@ -542,6 +542,32 @@ const MAX_WIDGET_ACTION_VALUE_LENGTH = 1000;
 // bounded free-form texts an integration hands back outside the content
 // vocabulary: the action result message and the `error` of a failed command
 const MAX_WIDGET_MESSAGE_LENGTH = 200;
+// Music players (capabilities/music.md, section 4): the queue, the catalog and
+// search are read on demand through the integration, never stored. A search
+// is a third-party API call: 10 s ack, a documented exception to the 5 s rule.
+const MUSIC_COMMAND_TIMEOUT_MS = 10 * 1000;
+// relayed music commands in flight per integration (browse, search, play,
+// queue): beyond, the request fails at once with 429 rather than queueing
+// behind the others until the ack deadline (the AI chat rule). Artwork has
+// its own queued pool, shared with the widget images.
+const MAX_MUSIC_COMMANDS_IN_FLIGHT = 4;
+// bounds of a MediaItem list answered by an integration: unknown fields are
+// dropped, strings truncated, invalid items dropped with a warning
+const MAX_MUSIC_ITEMS_PER_RESPONSE = 100;
+const MAX_MUSIC_MEDIA_ID_LENGTH = 512;
+const MAX_MUSIC_ITEM_TEXT_LENGTH = 200;
+const MAX_MUSIC_SEARCH_QUERY_LENGTH = 200;
+const MUSIC_BROWSE_DEFAULT_LIMIT = 50;
+const MUSIC_BROWSE_MAX_LIMIT = 100;
+const MUSIC_SEARCH_DEFAULT_LIMIT = 20;
+const MUSIC_SEARCH_MAX_LIMIT = 50;
+// artwork keys seen in the music responses of an integration stay servable
+// as long as the image cache would still serve them (1 h), bounded per
+// integration in LRU order
+const MAX_MUSIC_ARTWORK_KEYS_PER_INTEGRATION = 1000;
+const MUSIC_ARTWORK_KEY_TTL_MS = WIDGET_IMAGE_CACHE_TTL_MS;
+// the operations an integration declares in the `music` manifest field
+const MUSIC_MANIFEST_FIELDS = ['browse', 'search', 'queue', 'append'];
 // the content vocabulary enums (section 4 of the capability spec) — the
 // frontend maps them to theme colors, icons and layouts, never a free value
 const WIDGET_COLORS = ['neutral', 'primary', 'success', 'warning', 'danger', 'info'];
@@ -768,6 +794,19 @@ module.exports = {
   WIDGET_ACTION_FIELD_TYPES,
   MAX_WIDGET_ACTION_VALUE_LENGTH,
   MAX_WIDGET_MESSAGE_LENGTH,
+  MUSIC_COMMAND_TIMEOUT_MS,
+  MAX_MUSIC_COMMANDS_IN_FLIGHT,
+  MAX_MUSIC_ITEMS_PER_RESPONSE,
+  MAX_MUSIC_MEDIA_ID_LENGTH,
+  MAX_MUSIC_ITEM_TEXT_LENGTH,
+  MAX_MUSIC_SEARCH_QUERY_LENGTH,
+  MUSIC_BROWSE_DEFAULT_LIMIT,
+  MUSIC_BROWSE_MAX_LIMIT,
+  MUSIC_SEARCH_DEFAULT_LIMIT,
+  MUSIC_SEARCH_MAX_LIMIT,
+  MAX_MUSIC_ARTWORK_KEYS_PER_INTEGRATION,
+  MUSIC_ARTWORK_KEY_TTL_MS,
+  MUSIC_MANIFEST_FIELDS,
   WIDGET_COLORS,
   WIDGET_TEXT_VARIANTS,
   WIDGET_CHART_TYPES,
