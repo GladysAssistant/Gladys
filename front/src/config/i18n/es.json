@@ -1062,12 +1062,12 @@
       "clearFilters": "Borrar filtros",
       "countryFilter": {
         "scoped": {
-          "one": "Mostrando para {{country}}: 1 integración de otro país está oculta.",
-          "other": "Mostrando para {{country}}: {{count}} integraciones de otros países están ocultas."
+          "one": "País: {{country}}. 1 integración de otro país está oculta.",
+          "other": "País: {{country}}. {{count}} integraciones de otros países están ocultas."
         },
         "showAll": "Ver todos los países",
         "all": "Se muestran todos los países.",
-        "showOnly": "Mostrar solo {{country}}"
+        "showOnly": "Limitar a {{country}}"
       },
       "menu": {
         "all": "Todas las integraciones",

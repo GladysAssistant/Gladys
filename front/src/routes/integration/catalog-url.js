@@ -144,14 +144,34 @@ export const rememberCatalogVisibleCount = visibleCount => {
   catalogPosition.visibleCount = visibleCount;
 };
 
-// the position is consumed by the catalog that restores it: the next time the
-// user leaves, a card click has to start a new one
+// the position is consumed by the first catalog that mounts, whatever its
+// URL: a catalog opened on another view after the card click must not leave
+// a stale position for a later visit, and the next time the user leaves, a
+// card click has to start a new one
 export const getRememberedCatalogPosition = url => {
-  if (!catalogPosition.pending || catalogPosition.url !== url || !catalogPosition.visibleCount) {
+  const { pending } = catalogPosition;
+  catalogPosition.pending = false;
+  if (!pending || catalogPosition.url !== url || !catalogPosition.visibleCount) {
     return null;
   }
-  catalogPosition.pending = false;
   return { scrollY: catalogPosition.scrollY, visibleCount: catalogPosition.visibleCount };
+};
+
+// Typing on a shelf leaves it for "All integrations" (the search looks through
+// the whole catalog): the two views are different routes, so the page is
+// mounted again and the browser drops the focus of the search field after the
+// first letter. The search remembers that it was being typed in, and the
+// field of the view that mounts next takes the focus back, caret at the end.
+let searchFocusPending = false;
+
+export const rememberSearchFocus = () => {
+  searchFocusPending = true;
+};
+
+export const hasPendingSearchFocus = () => searchFocusPending;
+
+export const forgetSearchFocus = () => {
+  searchFocusPending = false;
 };
 
 // a remembered URL carries its filters in the query string, so only its path

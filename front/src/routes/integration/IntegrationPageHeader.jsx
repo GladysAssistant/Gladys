@@ -4,6 +4,7 @@ import CardFilter from '../../components/layout/CardFilter';
 import SortSelect from '../../components/layout/SortSelect';
 import InstallFromGithubCard from './all/external-integration/install-from-github/InstallFromGithubCard';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import { forgetSearchFocus, hasPendingSearchFocus } from './catalog-url';
 import style from './style.css';
 
 // the count is always compared to the whole catalog: "42 of 810 integrations"
@@ -49,6 +50,24 @@ const ORDER_DIR_OPTIONS = [
   { value: 'updated', labelId: 'integration.root.orderDirUpdated' }
 ];
 
+// gives the focus back to the search field when the view the user was typing
+// in was just replaced by "All integrations" (catalog-url.js): the field of
+// the header that is displayed, desktop or mobile, the other one being hidden
+// by CSS. Module-level so that the ref is stable: called on mount only
+const restoreSearchFocus = root => {
+  if (!root || !hasPendingSearchFocus()) {
+    return;
+  }
+  const input = Array.from(root.querySelectorAll('input.form-control')).find(element => element.offsetParent !== null);
+  if (!input) {
+    return;
+  }
+  forgetSearchFocus();
+  input.focus();
+  const caret = input.value.length;
+  input.setSelectionRange(caret, caret);
+};
+
 const IntegrationPageHeader = ({
   intl,
   orderDir,
@@ -63,8 +82,11 @@ const IntegrationPageHeader = ({
   clearFilters
 }) => {
   const hasSearch = searchKeyword.length > 0;
-  // a view as large as the catalog (nothing hidden) is not a case for "X of Y"
-  const narrowed = integrationsLength < totalSize;
+  // "X of Y" only when a filter the user chose narrows the view: the country
+  // scope alone shows the bare count of what is displayed, and the line under
+  // the header says what it hides — "797 of 809" with no filter and nothing
+  // to clear would read as a filter the user cannot find
+  const narrowed = hasActiveFilters && integrationsLength < totalSize;
   // an empty view (the catalog still loading, no favorite yet) already displays
   // a message in the page body, "0 integrations" on top of it says nothing more
   const showCount = loading || hasSearch || totalSize > 0;
@@ -74,24 +96,31 @@ const IntegrationPageHeader = ({
 
   return (
     <>
-      <div class={style.headerDesktop}>
+      <div class={style.headerDesktop} ref={restoreSearchFocus}>
         <div class="page-header">
-          <h1 class="page-title">
-            <Text id="integration.root.title" />
-          </h1>
-          {showCount && (
-            <div class="page-subtitle">
-              <IntegrationCount
-                loading={loading}
-                narrowed={narrowed}
-                integrationsLength={integrationsLength}
-                totalSize={totalSize}
-                hasActiveFilters={hasActiveFilters}
-                clearFilters={clearFilters}
-              />
-            </div>
-          )}
-          <div class="page-options d-flex align-items-center">
+          {/* the count sits under the title, not next to it: as a second
+              column item it never pushes the sort and search controls to a
+              second line, whatever its length ("130 of 809 integrations ·
+              Clear filters" on every large shelf) — and the search field no
+              longer moves under the cursor as the count changes while typing */}
+          <div class={style.headerTitleBlock}>
+            <h1 class="page-title">
+              <Text id="integration.root.title" />
+            </h1>
+            {showCount && (
+              <div class={`page-subtitle ${style.headerSubtitle}`}>
+                <IntegrationCount
+                  loading={loading}
+                  narrowed={narrowed}
+                  integrationsLength={integrationsLength}
+                  totalSize={totalSize}
+                  hasActiveFilters={hasActiveFilters}
+                  clearFilters={clearFilters}
+                />
+              </div>
+            )}
+          </div>
+          <div class={`page-options d-flex align-items-center ${style.headerOptions}`}>
             {showInstallFromGithub && (
               <div class="mr-3">
                 <InstallFromGithubCard button />
@@ -109,7 +138,7 @@ const IntegrationPageHeader = ({
         </div>
       </div>
 
-      <div class={style.headerMobile}>
+      <div class={style.headerMobile} ref={restoreSearchFocus}>
         <div class={style.mobileHeaderTop}>
           <h1 class={style.mobileTitle}>
             <Text id="integration.root.title" />

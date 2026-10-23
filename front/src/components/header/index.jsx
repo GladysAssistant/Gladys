@@ -55,7 +55,9 @@ const isDashboardView = url => {
   if (!url.startsWith('/dashboard/')) {
     return false;
   }
-  return !NON_DASHBOARD_SECTIONS.includes(url.split('/')[2]);
+  // the section is read from the path alone: "/dashboard/integration?search=x"
+  // is the integrations page, not a dashboard named "integration?search=x"
+  return !NON_DASHBOARD_SECTIONS.includes(url.split('?')[0].split('/')[2]);
 };
 
 // App-level navigation, in the left sidebar: the top of the screen stays

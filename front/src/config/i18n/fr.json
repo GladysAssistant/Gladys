@@ -1062,12 +1062,12 @@
       "clearFilters": "Effacer les filtres",
       "countryFilter": {
         "scoped": {
-          "one": "Affichage pour {{country}} : 1 intégration d'un autre pays est masquée.",
-          "other": "Affichage pour {{country}} : {{count}} intégrations d'autres pays sont masquées."
+          "one": "Pays : {{country}}. 1 intégration d'un autre pays est masquée.",
+          "other": "Pays : {{country}}. {{count}} intégrations d'autres pays sont masquées."
         },
         "showAll": "Voir tous les pays",
         "all": "Tous les pays sont affichés.",
-        "showOnly": "Afficher seulement {{country}}"
+        "showOnly": "Limiter au pays : {{country}}"
       },
       "menu": {
         "all": "Toutes les intégrations",

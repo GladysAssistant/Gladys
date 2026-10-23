@@ -20,7 +20,8 @@ import {
   getRememberedCatalogPosition,
   getUrlFromCatalog,
   rememberCatalogUrl,
-  rememberCatalogVisibleCount
+  rememberCatalogVisibleCount,
+  rememberSearchFocus
 } from './catalog-url';
 import { buildSearchIndex, getSearchRank, getSearchTokens } from './catalog-search';
 import {
@@ -868,6 +869,11 @@ class Integration extends Component {
     // update) keep their scope: searching "my installed Sonos" makes sense
     const leavesCategory =
       searchKeyword.length > 0 && this.props.category && !VIRTUAL_CATEGORIES.includes(this.props.category);
+    if (leavesCategory) {
+      // the other view is another route: the page is mounted again and the
+      // field would lose the focus after this first letter
+      rememberSearchFocus();
+    }
     this.updateURL(leavesCategory ? { searchKeyword, category: null } : { searchKeyword });
     await this.getIntegrationsDebounced();
   };
