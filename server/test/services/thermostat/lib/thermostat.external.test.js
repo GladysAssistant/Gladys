@@ -1477,6 +1477,24 @@ describe('thermostat.onExternalPowerChanged', () => {
       assert.calledOnce(handler.setValue);
     });
 
+    it('should still start the thermostat when the setpoint lookup fails', async () => {
+      // The hold is best effort: left stopped, the next pass would cut the
+      // power the user just turned on from the remote.
+      const mod = loadListener();
+      const handler = startingHandler();
+      handler.gladys.device.get = fake((query) =>
+        query.device_feature_selectors
+          ? Promise.reject(new Error('database locked'))
+          : Promise.resolve([acThermostat({ mode: THERMOSTAT_MODE.OFF })]),
+      );
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+      expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.HEATING);
+    });
+
     it('should not re-arm a hold already on that setpoint', async () => {
       const mod = loadListener();
       const handler = startingHandler({ extraParams: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' }] });
