@@ -1,4 +1,12 @@
 {
+  "musicMediaTypes": {
+    "track": "Titel",
+    "album": "Album",
+    "artist": "Künstler",
+    "playlist": "Playlist",
+    "radio": "Radio",
+    "folder": "Ordner"
+  },
   "global": {
     "logoAlt": "Gladys-Logo",
     "needHelpText": "Brauchst du Hilfe? Tritt unserer <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys-Community</a> (Englisch) bei.",
@@ -83,6 +91,7 @@
       "unitMismatchWarning": "Diese Funktion hat eine andere Einheit als die Quellfunktion: die Werte werden ohne Umrechnung übernommen, die Diagramme können dadurch inkonsistent werden.",
       "unmappedWarning": "Einige Funktionen sind nicht zugeordnet: ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, werden nicht aktualisiert.",
       "playNotificationWarning": "Das Zielgerät kann keine Benachrichtigungen abspielen: die Szenen, die über diesen Lautsprecher „sprechen“, werden auf das Zielgerät umgeleitet und schlagen bei der Ausführung fehl. Wähle ein kompatibles Zielgerät oder passe diese Szenen nach der Migration an.",
+      "playMediaWarning": "Die Szenen, die Musik (eine Playlist, ein Album, einen Titel) auf diesem Player abspielen, behalten Medienverweise, die zu seiner Integration gehören: sie werden auf das Zielgerät umgeleitet und funktionieren nur, wenn das Zielgerät denselben Musikanbieter verwendet. Überprüfe diese Szenen nach der Migration.",
       "noDestinationAvailable": "Es wurde kein Gerät einer anderen Integration gefunden. Erstelle zuerst das Zielgerät in seiner neuen Integration und komme dann hierher zurück, um zu migrieren.",
       "loadError": "Die Geräteliste konnte nicht geladen werden. Bitte versuche es erneut.",
       "migrateError": "Die Migration ist fehlgeschlagen. Das alte Gerät wurde nicht gelöscht, aber ein Teil des Verlaufs wurde möglicherweise bereits zum Zielgerät verschoben. Überprüfe die Aufgaben-Seite und deine Geräteliste und versuche es dann erneut: ein neuer Versuch migriert nur, was noch übrig ist.",
@@ -733,7 +742,38 @@
         "cancelAlarmArming": "Abbrechen"
       },
       "music": {
-        "selectDeviceLabel": "Wähle das zu steuernde Gerät aus"
+        "selectDeviceLabel": "Wähle das zu steuernde Gerät aus",
+        "nothingPlaying": "Keine Wiedergabe",
+        "unknownTrack": "Unbekannter Titel",
+        "previous": "Zurück",
+        "next": "Weiter",
+        "play": "Abspielen",
+        "pause": "Pause",
+        "shuffle": "Zufallswiedergabe",
+        "repeat": "Wiederholen",
+        "mute": "Stumm",
+        "volume": "Lautstärke",
+        "queue": "Warteschlange",
+        "browse": "Durchsuchen",
+        "search": "Suchen",
+        "searchPlaceholder": "Titel, Künstler, Playlists…",
+        "back": "Zurück",
+        "close": "Schließen",
+        "playItem": "Abspielen",
+        "playNext": "Als Nächstes abspielen",
+        "addToQueue": "Zur Warteschlange hinzufügen",
+        "added": "Zur Warteschlange hinzugefügt",
+        "playAll": "Abspielen",
+        "pickThis": "Auswählen",
+        "live": "Live",
+        "commandFailed": "Der Player konnte den Befehl nicht ausführen.",
+        "noResponse": "Der Player hat nicht geantwortet.",
+        "emptyQueue": "Die Warteschlange ist leer",
+        "noResults": "Keine Ergebnisse",
+        "loading": "Wird geladen…",
+        "loadMore": "Mehr laden",
+        "unavailable": "Die Integration ist nicht verfügbar. Der letzte bekannte Zustand wird angezeigt.",
+        "error": "Etwas ist schiefgelaufen."
       },
       "thermostat": {
         "defaultTitle": "Thermostat",
@@ -990,6 +1030,10 @@
       "storeUnavailable": "Der Store der Community-Integrationen ist nicht erreichbar: Es werden nur die nativen und die bereits installierten Integrationen angezeigt.",
       "storeUnavailableRetry": "Erneut versuchen",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
+      "updateButton": "Aktualisieren",
+      "updateRetryButton": "Erneut versuchen",
+      "updateError": "Die Aktualisierung ist fehlgeschlagen. Prüfen Sie die Logs der Integration und versuchen Sie es erneut.",
+      "updatedTo": "Auf v{{version}} aktualisiert",
       "noInstalledIntegrations": "Auf dieser Instanz ist noch keine Community-Integration installiert.",
       "installedSummary": {
         "title": {
@@ -1033,7 +1077,6 @@
       }
     },
     "externalIntegration": {
-      "updateAvailable": "Update verfügbar",
       "deviceTab": "Geräte",
       "discoverTab": "Entdecken",
       "configTab": "Konfiguration",
@@ -4049,6 +4092,19 @@
         "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
       },
+      "playMedia": {
+        "description": "Diese Aktion startet das ausgewählte Medium auf dem gewählten Player.",
+        "deviceLabel": "Player",
+        "mediaLabel": "Abzuspielendes Medium",
+        "selectedMedia": "Auswahl",
+        "changeMedia": "Ändern",
+        "noMedia": "Noch kein Medium ausgewählt: durchsuchen Sie den Katalog des Players unten.",
+        "unsupported": "Dieser Player bietet keinen Katalog: wählen Sie einen anderen Player.",
+        "modeLabel": "Modus",
+        "modeReplace": "Jetzt abspielen (ersetzt die aktuelle Wiedergabe)",
+        "modeNext": "Als Nächstes abspielen",
+        "modeAppend": "Ans Ende der Warteschlange anhängen"
+      },
       "playNotification": {
         "description": "Diese Aktion lässt Gladys auf dem ausgewählten Lautsprecher sprechen.",
         "voiceSettingLink": "Die Stimme Ihrer Instanz wählen (Integration Künstliche Intelligenz)",
@@ -4148,7 +4204,8 @@
         "send": "Zigbee2mqtt-Message senden"
       },
       "music": {
-        "play-notification": "Auf einem Lautsprecher sprechen"
+        "play-notification": "Auf einem Lautsprecher sprechen",
+        "play-media": "Musik auf einem Lautsprecher abspielen"
       },
       "ai": {
         "ask": "Frage die KI"
@@ -4190,7 +4247,8 @@
         "send": "Eine SMS an ein Telefon senden"
       },
       "music": {
-        "play-notification": "Einen Text über einen Lautsprecher vorlesen lassen"
+        "play-notification": "Einen Text über einen Lautsprecher vorlesen lassen",
+        "play-media": "Einen Titel, ein Album, eine Playlist oder einen Sender auf einem Lautsprecher starten"
       },
       "condition": {
         "if-then-else": "Je nach Bedingung einem anderen Pfad folgen",
@@ -5722,6 +5780,13 @@
           "mop": "Wischen"
         }
       },
+      "music": {
+        "repeat": {
+          "off": "Aus",
+          "all": "Alle",
+          "one": "Ein Titel"
+        }
+      },
       "water-heater": {
         "mode": {
           "off": "Aus",
@@ -6029,7 +6094,14 @@
       "music": {
         "playback_state": {
           "0": "Pausiert",
-          "1": "Wird abgespielt"
+          "1": "Wird abgespielt",
+          "2": "Gestoppt",
+          "3": "Lädt"
+        },
+        "repeat": {
+          "0": "Aus",
+          "1": "Alle",
+          "2": "Ein Titel"
         }
       },
       "opening-sensor": {
@@ -6814,7 +6886,16 @@
       "previous": "Musik: Vorheriger Titel",
       "next": "Musik: Nächster Titel",
       "playback_state": "Musik: Wiedergabestatus",
-      "play_notification": "Benachrichtigung senden"
+      "play_notification": "Benachrichtigung senden",
+      "title": "Titel",
+      "artist": "Künstler",
+      "album": "Album",
+      "artwork": "Cover",
+      "duration": "Titeldauer",
+      "position": "Wiedergabeposition",
+      "shuffle": "Zufallswiedergabe",
+      "repeat": "Wiederholungsmodus",
+      "mute": "Stumm"
     },
     "lock": {
       "shortCategoryName": "Schloss",

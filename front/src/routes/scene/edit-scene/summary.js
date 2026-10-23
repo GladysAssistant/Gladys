@@ -63,6 +63,8 @@ const getActionSummary = (action, dictionary) => {
       return joinParts([action.user, truncate(action.text)]);
     case ACTIONS.MUSIC.PLAY_NOTIFICATION:
       return truncate(action.text);
+    case ACTIONS.MUSIC.PLAY_MEDIA:
+      return joinParts([action.device, action.media ? truncate(action.media.title || action.media.id) : null]);
     case ACTIONS.MQTT.SEND:
     case ACTIONS.ZIGBEE2MQTT.SEND:
       return truncate(action.topic);

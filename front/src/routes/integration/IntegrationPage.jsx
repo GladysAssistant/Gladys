@@ -33,7 +33,14 @@ const StoreUnavailableAlert = ({ refreshStore, refreshStoreStatus }) => (
   </div>
 );
 
-const IntegrationList = ({ integrations, visibleCount, showMoreIntegrations, toggleFavorite, category }) => {
+const IntegrationList = ({
+  integrations,
+  visibleCount,
+  showMoreIntegrations,
+  toggleFavorite,
+  updateIntegration,
+  category
+}) => {
   const visibleIntegrations = integrations.slice(0, visibleCount);
   return (
     <div>
@@ -43,6 +50,7 @@ const IntegrationList = ({ integrations, visibleCount, showMoreIntegrations, tog
             key={integration.key}
             integration={integration}
             toggleFavorite={toggleFavorite}
+            updateIntegration={updateIntegration}
             alwaysShowStatus={category === 'installed'}
           />
         ))}
@@ -54,6 +62,7 @@ const IntegrationList = ({ integrations, visibleCount, showMoreIntegrations, tog
               key={integration.key}
               integration={integration}
               toggleFavorite={toggleFavorite}
+              updateIntegration={updateIntegration}
               alwaysShowStatus={category === 'installed'}
             />
           ))}
@@ -83,6 +92,7 @@ const IntegrationPage = ({
   search,
   integrationCategories,
   toggleFavorite,
+  updateIntegration,
   showInstallFromGithub,
   showStoreRefresh,
   refreshStore,
@@ -164,6 +174,7 @@ const IntegrationPage = ({
                     visibleCount={visibleCount}
                     showMoreIntegrations={showMoreIntegrations}
                     toggleFavorite={toggleFavorite}
+                    updateIntegration={updateIntegration}
                     category={category}
                   />
                 )}

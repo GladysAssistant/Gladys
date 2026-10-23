@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const { Transaction } = require('sequelize');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
-const { EVENTS, DEVICE_FEATURE_STATE_COLUMNS } = require('../../utils/constants');
+const { EVENTS, DEVICE_FEATURE_STATE_COLUMNS, DEVICE_FEATURE_CATEGORIES } = require('../../utils/constants');
 const { buildUniqueSelector } = require('../../utils/addSelector');
 const { resolveEnergyParentId } = require('../../utils/resolveEnergyParentId');
 const { enforceEnergyHierarchy } = require('../../utils/enforceEnergyHierarchy');
@@ -157,6 +157,12 @@ async function create(device) {
       const featureToSave = { ...feature };
       delete featureToSave.energy_parent_id;
       delete featureToSave.supported_options;
+      // The whole music category is live (capabilities/music.md, section 2): no state history
+      // whatever the integration published or the user chose, the exception text features
+      // already have. An existing history is purged below like any feature switched off.
+      if (featureToSave.category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+        featureToSave.keep_history = false;
+      }
       return featureToSave;
     });
 
