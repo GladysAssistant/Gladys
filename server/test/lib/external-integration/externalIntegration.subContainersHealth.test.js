@@ -41,6 +41,15 @@ describe('externalIntegration.checkSubContainersHealth', () => {
     assert.calledOnce(externalIntegration.scheduleSubContainerRestart);
   });
 
+  it('should skip a container whose image is downloading', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const service = await seedMultiContainerService();
+    externalIntegration.scheduleSubContainerRestart = fake.resolves(null);
+    externalIntegration.subContainerPulls.set(`${service.id}:frigate`, { progress: 12, detail: '1/4 layers' });
+    await externalIntegration.checkSubContainersHealth(service);
+    assert.notCalled(externalIntegration.scheduleSubContainerRestart);
+  });
+
   it('should skip a healthy container, a pending restart and a transient inspect failure', async () => {
     const { externalIntegration } = buildSupervisor({
       system: { getContainers: fake.resolves([{ id: 'frigate-1' }]) },

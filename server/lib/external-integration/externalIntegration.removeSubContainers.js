@@ -7,6 +7,8 @@ const { PRIVATE_NETWORK_PREFIX } = require('./constants');
  * @description Remove every sub-container of an integration, and its
  * private network (uninstall). On update the network is kept: the new
  * containers are recreated on it from the new manifest at the next start.
+ * An image download in progress is aborted first: its container must not be
+ * created after the removal.
  * @param {object} service - The external integration service (plain object).
  * @param {object} [options] - Options.
  * @param {boolean} [options.removeNetwork] - Also remove the private network.
@@ -16,6 +18,7 @@ const { PRIVATE_NETWORK_PREFIX } = require('./constants');
  */
 async function removeSubContainers(service, { removeNetwork = true } = {}) {
   await Promise.each(this.getManifestContainers(service), async (entry) => {
+    this.cancelSubContainerPull(service, entry.name);
     const container = await this.findSubContainer(service, entry.name);
     if (container) {
       try {

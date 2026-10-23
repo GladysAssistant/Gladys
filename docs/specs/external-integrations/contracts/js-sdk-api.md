@@ -64,10 +64,10 @@ await gladys.connect(); // resolves once authenticated
 | `getConfig()` / `setConfig(partialConfig)` | `GET` / `POST /config`; `getConfig` also updates `gladys.config` |
 | `getStatus()` | `GET /status` |
 | `setConnectionStatus(connected, message?)` | `POST /connection_status` — application-level status displayed in the UI (C.3); optional multi-language `message` |
-| `getContainers()` | `GET /container` → declared sub-containers, state, desired state, assigned host ports (C.3) |
-| `startContainer(name, { env }?)` | `POST /container/:name/start` — typically after generating its config files in `/data` (the Mosquitto pattern, see B.2); optional `env` for values computed at runtime |
+| `getContainers()` | `GET /container` → declared sub-containers, state (`running` / `stopped` / `pulling`, with the `pull` progress and the `last_error` of the last asynchronous start), desired state, assigned host ports (C.3) |
+| `startContainer(name, { env }?)` | `POST /container/:name/start` — typically after generating its config files in `/data` (the Mosquitto pattern, see B.2); optional `env` for values computed at runtime. Resolves `{ success: true }`, or `{ success: true, status: 'pulling' }` when the image has to be downloaded first (first start of a `manual` entry, `202`): poll `getContainers()` until the entry is `running` (or `stopped` with `last_error`) |
 | `stopContainer(name)` | `POST /container/:name/stop` — the supervisor will not restart it |
-| `restartContainer(name)` | `POST /container/:name/restart` — after rewriting its config via `/data` (the Frigate pattern, see B.2) |
+| `restartContainer(name)` | `POST /container/:name/restart` — after rewriting its config via `/data` (the Frigate pattern, see B.2); same `status: 'pulling'` answer as `startContainer` |
 
 **Handlers** (registered before `connect()`; **automatic ack** for commands: the handler resolves → `command-result success:true` — and if the resolved value is not `undefined`, it goes into `data` (C.4) —, it throws → `success:false` with `error.message`, handler absent → `success:false "not implemented"`):
 
