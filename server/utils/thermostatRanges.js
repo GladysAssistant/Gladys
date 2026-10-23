@@ -1,4 +1,4 @@
-const { timeToMinutes } = require('./thermostatSchedule');
+const { timeToMinutes, DAY_MINUTES } = require('./thermostatSchedule');
 
 // A range whose preset is this one is not a temperature to reach but the absence
 // of one: it is stored as a transition point that stops the thermostat, and read
@@ -129,13 +129,21 @@ function rangesToTransitions(ranges) {
   // Whether Monday morning is covered is decided by the ranges, not by the last
   // point: a Sunday night ending Monday at 06:30 covers it and needs no stop,
   // even though its own point is the last of the week and opens a range.
+  //
+  // A range opening Monday at midnight covers it whatever its end: a whole Monday
+  // (`00:00 → 00:00`) reads as crossing midnight, and once added a stop at the
+  // same moment as its own point — two points on one minute, which the unique
+  // index refuses.
   const coversMondayMorning = ranges.some((range) => {
+    if (range.day_of_week === 0 && timeToMinutes(range.start_time) === 0) {
+      return true;
+    }
     const crossesMidnight = timeToMinutes(range.end_time) <= timeToMinutes(range.start_time);
     if (crossesMidnight) {
       // Sunday's night reaches into Monday; any other day's reaches the day after.
       return range.day_of_week === 6;
     }
-    return range.day_of_week === 0 && timeToMinutes(range.start_time) === 0;
+    return false;
   });
   if (!coversMondayMorning) {
     sorted.unshift({ day_of_week: 0, time: '00:00', preset: STOP_PRESET });
@@ -144,4 +152,83 @@ function rangesToTransitions(ranges) {
   return sorted;
 }
 
-module.exports = { transitionsToRanges, rangesToTransitions, STOP_PRESET };
+/**
+ * @description Whether a range covers its whole day, from midnight to the next
+ * midnight. An end equal to the start runs 24 hours, so `00:00 → 00:00` is the
+ * day itself — what the editor's "All day" option writes, and how it reads one
+ * back.
+ * @param {object} range - A range: { start_time, end_time }.
+ * @returns {boolean} True for a range covering its day entirely.
+ * @example
+ * isAllDayRange({ start_time: '00:00', end_time: '00:00' }); // true
+ */
+function isAllDayRange(range) {
+  return Boolean(range) && range.start_time === '00:00' && range.end_time === '00:00';
+}
+
+/**
+ * @description Merge the ranges of the same preset that touch into one.
+ *
+ * Two of them show as two identical lines — 06:30-17:00 Comfort, then
+ * 17:00-22:30 Comfort — while the points model stores a single stretch, so the
+ * editor would be saying something the schedule does not.
+ *
+ * Walks the week in order so a chain of three merges in one pass, and follows a
+ * range across midnight onto the next day — the night and the morning that
+ * continue it are one stretch.
+ *
+ * **Never past 24 hours.** A range has a start and an end on a clock, so it can
+ * say at most one full day: a merged Monday 08:00 → Tuesday 20:00 could only be
+ * written `08:00 → 20:00`, which reads as twelve hours, and the whole of Tuesday
+ * was lost on save. Two all-day frost ranges on Saturday and Sunday are the
+ * common case. Such neighbours stay two ranges, one under each day.
+ * @param {Array} ranges - Ranges: { day_of_week, start_time, end_time, preset }.
+ * @returns {Array} The ranges, touching ones of the same preset merged.
+ * @example
+ * mergeTouchingRanges([
+ *   { day_of_week: 0, start_time: '06:00', end_time: '09:00', preset: 'comfort' },
+ *   { day_of_week: 0, start_time: '09:00', end_time: '12:00', preset: 'comfort' },
+ * ]);
+ */
+function mergeTouchingRanges(ranges) {
+  const WEEK = 7 * DAY_MINUTES;
+  const openAt = (range) => range.day_of_week * DAY_MINUTES + timeToMinutes(range.start_time);
+  const closeAt = (range) => {
+    const start = openAt(range);
+    const end = range.day_of_week * DAY_MINUTES + timeToMinutes(range.end_time);
+    return end <= start ? end + DAY_MINUTES : end;
+  };
+  // The two may only be one range if, together, they still fit in a day.
+  const fitsInADay = (first, second) =>
+    closeAt(second) + (closeAt(second) < openAt(first) ? WEEK : 0) - openAt(first) <= DAY_MINUTES;
+  const sorted = [...ranges].sort((a, b) => openAt(a) - openAt(b));
+  const merged = [];
+  sorted.forEach((range) => {
+    const previous = merged[merged.length - 1];
+    // The week wraps, so a range opening exactly where the previous one closes
+    // is its continuation — including the one that closes past midnight.
+    if (
+      previous &&
+      previous.preset === range.preset &&
+      closeAt(previous) === openAt(range) &&
+      fitsInADay(previous, range)
+    ) {
+      merged[merged.length - 1] = { ...previous, end_time: range.end_time };
+      return;
+    }
+    merged.push(range);
+  });
+  // The last range of the week may run into the first, which the pass above
+  // cannot see: they are at the two ends of the list.
+  if (merged.length > 1) {
+    const last = merged[merged.length - 1];
+    const first = merged[0];
+    if (last.preset === first.preset && closeAt(last) % WEEK === openAt(first) && fitsInADay(last, first)) {
+      merged[0] = { ...last, end_time: first.end_time };
+      merged.pop();
+    }
+  }
+  return merged;
+}
+
+module.exports = { transitionsToRanges, rangesToTransitions, isAllDayRange, mergeTouchingRanges, STOP_PRESET };

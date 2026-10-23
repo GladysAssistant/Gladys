@@ -278,6 +278,14 @@
   min-width: 80px;
 }
 
+/* Between the times and the preset. Its height is the inputs', so the box sits
+   on their line rather than on top of it. */
+.slotAllDay {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
 /* Declared before the phone block below on purpose: at equal specificity the
    later rule wins, and these `display: none` once overrode the phone layout.
    A time and its name, as one field. Side by side on a phone, and on a desktop row
@@ -314,8 +322,11 @@
     flex-wrap: wrap;
   }
 
-  /* The preset takes its own full row, under the two times. */
-  .slotPresetSelect {
+  /* The preset takes its own full row, under the two times, and "All day" one of
+     its own between them: squeezed beside the times, it pushed the end time onto
+     a line of its own. */
+  .slotPresetSelect,
+  .slotAllDay {
     flex: 1 1 100%;
     min-width: 0;
   }
