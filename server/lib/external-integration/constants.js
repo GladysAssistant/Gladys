@@ -492,6 +492,13 @@ const ENERGY_CALENDAR_REFRESH_LOOKBACK_MS = 2 * 24 * 60 * 60 * 1000;
 // batch size as a calendar publication (contracts/host-api-endpoints.md)
 const MAX_ENERGY_CONSUMPTION_INTERVALS_PER_CALL = 2000;
 const ENERGY_CONSUMPTION_PAST_WINDOW_MS = 5 * 365 * 24 * 60 * 60 * 1000;
+// GET /energy/price (capabilities/energy-prices.md): a window of at most 7 days, from one
+// year ago to 48 hours ahead (the horizon of the current price scan and of the day-ahead
+// markets), read at most 30 times per minute per integration
+const ENERGY_PRICE_MAX_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+const ENERGY_PRICE_PAST_WINDOW_MS = 365 * 24 * 60 * 60 * 1000;
+const ENERGY_PRICE_FUTURE_WINDOW_MS = 48 * 60 * 60 * 1000;
+const MAX_ENERGY_PRICE_READS_PER_MINUTE = 30;
 // widget.get / widget.get-image typically call a third-party API: the same
 // exception to the 5s ack rule as camera.get-image and weather.get
 const WIDGET_GET_TIMEOUT_MS = 15 * 1000;
@@ -771,6 +778,10 @@ module.exports = {
   ENERGY_CALENDAR_REFRESH_LOOKBACK_MS,
   MAX_ENERGY_CONSUMPTION_INTERVALS_PER_CALL,
   ENERGY_CONSUMPTION_PAST_WINDOW_MS,
+  ENERGY_PRICE_MAX_WINDOW_MS,
+  ENERGY_PRICE_PAST_WINDOW_MS,
+  ENERGY_PRICE_FUTURE_WINDOW_MS,
+  MAX_ENERGY_PRICE_READS_PER_MINUTE,
   WIDGET_GET_TIMEOUT_MS,
   WIDGET_CONTENT_TTL_MIN_SECONDS,
   WIDGET_CONTENT_TTL_MAX_SECONDS,

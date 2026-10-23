@@ -55,6 +55,7 @@ const {
   handleEnergyCalendarRefresh,
 } = require('./externalIntegration.energyCalendar');
 const { publishEnergyConsumption, recalculateConsumptionCosts } = require('./externalIntegration.energyConsumption');
+const { getEnergyPrices } = require('./externalIntegration.getEnergyPrices');
 const { getWidgets } = require('./externalIntegration.getWidgets');
 const { getWidgetContent } = require('./externalIntegration.getWidgetContent');
 const { getWidgetImage } = require('./externalIntegration.getWidgetImage');
@@ -245,6 +246,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.weatherRefreshTimes = new Map();
   // serviceId -> last energy-calendar.refresh nudge (capabilities/energy-contracts.md)
   this.energyCalendarRefreshTimes = new Map();
+  // serviceId -> { count, resetAt } rate limit on GET /energy/price (capabilities/energy-prices.md)
+  this.energyPriceRateLimits = new Map();
   // serviceId -> { count, resetAt } rate limit on POST /scene/event, a
   // counter separate from the states'
   this.sceneEventRateLimits = new Map();
@@ -349,6 +352,7 @@ ExternalIntegration.prototype.getEnergyCalendar = getEnergyCalendar;
 ExternalIntegration.prototype.getEnergyContracts = getEnergyContracts;
 ExternalIntegration.prototype.handleEnergyCalendarRefresh = handleEnergyCalendarRefresh;
 ExternalIntegration.prototype.publishEnergyConsumption = publishEnergyConsumption;
+ExternalIntegration.prototype.getEnergyPrices = getEnergyPrices;
 ExternalIntegration.prototype.recalculateConsumptionCosts = recalculateConsumptionCosts;
 ExternalIntegration.prototype.getWidgets = getWidgets;
 ExternalIntegration.prototype.getWidgetContent = getWidgetContent;

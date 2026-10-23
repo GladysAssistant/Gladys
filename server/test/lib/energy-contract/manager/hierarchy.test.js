@@ -193,6 +193,47 @@ describe('EnergyContract energy hierarchy (docs/specs/energy-hierarchy.md)', () 
     });
   });
 
+  describe('getDeviceElectricMeterId', () => {
+    it('should walk up the attachment of a device to its root meter', async () => {
+      await energyContract.create(contractPayload());
+      await savePlug(device, { index: { energy_parent_id: METER_FEATURE_ID } });
+      const plug = stateManager.get('deviceById', PLUG_DEVICE_ID);
+      expect(await energyContract.getDeviceElectricMeterId(plug)).to.equal(METER_DEVICE_ID);
+      // the meter is its own root
+      expect(await energyContract.getDeviceElectricMeterId(stateManager.get('deviceById', METER_DEVICE_ID))).to.equal(
+        METER_DEVICE_ID,
+      );
+    });
+
+    it('should give an unattached device itself, and null on a broken hierarchy', async () => {
+      await energyContract.create(contractPayload());
+      await savePlug(device);
+      const plug = stateManager.get('deviceById', PLUG_DEVICE_ID);
+      // an unattached device is its own root: it is not on the meter
+      expect(await energyContract.getDeviceElectricMeterId(plug)).to.equal(PLUG_DEVICE_ID);
+      sinon.stub(device.energySensorManager, 'getRootElectricMeterDevice').returns(null);
+      expect(await energyContract.getDeviceElectricMeterId(plug)).to.equal(null);
+    });
+
+    it('should put a device without energy source feature on the main meter', async () => {
+      const battery = {
+        id: 'battery',
+        features: [{ id: 'level', category: DEVICE_FEATURE_CATEGORIES.BATTERY, type: 'integer' }],
+      };
+      expect(await energyContract.getDeviceElectricMeterId(battery)).to.equal(null);
+      await energyContract.create(contractPayload());
+      await savePlug(device);
+      // a production contract created later never makes its meter the main meter
+      await db.EnergyContract.create({
+        ...contractPayload({ name: 'Solar', electric_meter_device_id: PLUG_DEVICE_ID }),
+        direction: 'production',
+        timezone: 'Europe/Paris',
+      });
+      expect(await energyContract.getDeviceElectricMeterId(battery)).to.equal(METER_DEVICE_ID);
+      expect(await energyContract.getDeviceElectricMeterId({ id: 'no-features' })).to.equal(METER_DEVICE_ID);
+    });
+  });
+
   describe('contracts (C.2)', () => {
     it('should make the meter of a new or updated consumption contract a root', async () => {
       await savePlug(device);

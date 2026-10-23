@@ -1433,6 +1433,13 @@ describe('externalIntegration.validateManifest', () => {
       'config_schema[0].options[0].icon: unknown field',
     );
   });
+  it('should accept the energy_prices boolean', () => {
+    const manifest = { ...TEST_MANIFEST, energy_prices: true };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+  it('should reject energy_prices when it is not a boolean', () => {
+    expect422({ ...TEST_MANIFEST, energy_prices: 'true' }, 'energy_prices: must be a boolean');
+  });
   it('should accept network_wake boolean', () => {
     const manifest = {
       ...TEST_MANIFEST,

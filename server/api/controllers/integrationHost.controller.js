@@ -486,12 +486,45 @@ module.exports = function IntegrationHostController(gladys) {
     res.json(contracts);
   }
 
+  /**
+   * @api {get} /api/integration/v1/energy/price getEnergyPrices
+   * @apiName getEnergyPrices
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The energy price per kWh applying to one of the integration's devices
+   * (device_external_id, from, to: a window of at most 7 days), read on the active contract
+   * of its root electric meter: energy only, one slot per 30 minutes (15 minutes for a tariff
+   * reading a 15-minute calendar), `price` null when unknown. Only available to integrations
+   * declaring `energy_prices: true` in their manifest, 403 otherwise; never the meter, the
+   * consumption nor the contract.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "currency": "EUR",
+   *   "slots": [
+   *     {
+   *       "starts_at": "2026-01-12T05:00:00.000Z",
+   *       "ends_at": "2026-01-12T05:30:00.000Z",
+   *       "price": 0.1296,
+   *       "label": "Blue off-peak"
+   *     }
+   *   ]
+   * }
+   */
+  async function getEnergyPrices(req, res) {
+    const prices = await gladys.externalIntegration.getEnergyPrices(req.externalIntegrationService, {
+      device_external_id: req.query.device_external_id,
+      from: req.query.from,
+      to: req.query.to,
+    });
+    res.json(prices);
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     publishEnergyCalendar: asyncMiddleware(publishEnergyCalendar),
     publishEnergyConsumption: asyncMiddleware(publishEnergyConsumption),
     getEnergyCalendar: asyncMiddleware(getEnergyCalendar),
     getEnergyContracts: asyncMiddleware(getEnergyContracts),
+    getEnergyPrices: asyncMiddleware(getEnergyPrices),
     heartbeat: asyncMiddleware(heartbeat),
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),

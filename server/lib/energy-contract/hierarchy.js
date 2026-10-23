@@ -304,9 +304,38 @@ async function repairHierarchy() {
   return changes.size;
 }
 
+/**
+ * @description The electric meter whose contract applies to a device (docs/specs/energy-hierarchy.md,
+ * section B): the root reached by walking up the parents of its first attachment feature that
+ * resolves (the device itself when it is a root, a meter or an unattached device). A device with no
+ * energy source feature at all (a home battery publishing only power and battery indexes) can never
+ * be attached to a meter: it is on the main meter, the one new energy devices are attached to.
+ * @param {object} device - The device, with its features.
+ * @returns {Promise<string|null>} The meter device id, or null when the hierarchy does not resolve
+ * (a broken parent, a cycle) or the device has no attachment feature and no main meter exists.
+ * @example
+ * await energyContract.getDeviceElectricMeterId(battery);
+ */
+async function getDeviceElectricMeterId(device) {
+  const attachments = getAttachmentFeatures(device);
+  if (attachments.length === 0) {
+    const mainContract = await db.EnergyContract.findOne({
+      where: { direction: ENERGY_CONTRACT_DIRECTIONS.CONSUMPTION },
+      order: [['created_at', 'DESC']],
+      attributes: ['electric_meter_device_id'],
+    });
+    return mainContract === null ? null : mainContract.electric_meter_device_id;
+  }
+  const root = attachments
+    .map((feature) => this.device.energySensorManager.getRootElectricMeterDevice(feature))
+    .find((feature) => feature !== null);
+  return root === undefined ? null : root.device_id;
+}
+
 module.exports = {
   getDescendantDeviceIds,
   getMeterRootFeatureId,
+  getDeviceElectricMeterId,
   detachElectricMeter,
   setDeviceElectricMeter,
   repairHierarchy,
