@@ -752,6 +752,37 @@ describe('energy digest helpers', () => {
   });
 });
 
+describe('getConsumptionFeaturesForDigest with a three-phase meter', () => {
+  it('should keep the consumption of the total index, not the one of its phases', () => {
+    const index = (id, energyParentId) => ({
+      id,
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+      energy_parent_id: energyParentId,
+    });
+    const consumption = (id, energyParentId) => ({
+      id,
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      energy_parent_id: energyParentId,
+    });
+    const candidates = getConsumptionFeaturesForDigest([
+      {
+        id: 'three-phase-meter',
+        name: 'SPM02V3',
+        features: [
+          index('energy', 'main-meter-feature'),
+          index('energy-a', 'energy'),
+          consumption('energy-consumption', 'energy'),
+          consumption('energy-a-consumption', 'energy-a'),
+        ],
+      },
+    ]);
+
+    expect(candidates.map((candidate) => candidate.feature.id)).to.deep.equal(['energy-consumption']);
+  });
+});
+
 describe('sumConsumptionValues', () => {
   it('should sum non-subscription values', () => {
     const total = sumConsumptionValues([
