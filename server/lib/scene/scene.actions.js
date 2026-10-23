@@ -940,6 +940,25 @@ const actionsFunc = {
       zigbee2mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
+  [ACTIONS.THERMOSTAT.SET_SCHEDULE]: async (self, action) => {
+    const thermostatService = self.service.getService('thermostat');
+    if (!thermostatService) {
+      logger.warn(`Scene: the thermostat service is not running, schedule "${action.schedule}" not applied`);
+      return;
+    }
+    // One thermostat failing (deleted, moved to another house) leaves the others
+    // switched, like the light and switch actions. A card saved before any
+    // thermostat was picked has no list: nothing to switch.
+    await Promise.map(action.devices || [], async (deviceSelector) => {
+      try {
+        await thermostatService.device.attachScheduleToDevice(action.schedule, deviceSelector);
+      } catch (e) {
+        logger.warn(
+          `Scene: thermostat "${deviceSelector}" not switched to schedule "${action.schedule}": ${e.message}`,
+        );
+      }
+    });
+  },
   [ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION]: async (self, action, scope, path) => {
     // the proxy service of the integration, registered under its selector in
     // the stateManager (the exact path mqtt.send takes). Absent = uninstalled;

@@ -4069,6 +4069,11 @@
         "houseLabel": "House",
         "alarmModeLabel": "Alarm Mode"
       },
+      "thermostatSetSchedule": {
+        "description": "This action makes the selected thermostats follow another schedule, for instance to switch from the usual schedule to the school holidays one. The thermostat follows the schedule right away: a manual setpoint in progress is cancelled, but a thermostat stopped by hand stays stopped.",
+        "scheduleLabel": "Schedule",
+        "thermostatsLabel": "Thermostats"
+      },
       "alarmSetMode": {
         "description": "This action will set the selected house to the selected alarm mode.",
         "houseLabel": "House",
@@ -4194,6 +4199,9 @@
         "check-alarm-mode": "If the alarm is in mode",
         "set-alarm-mode": "Set alarm mode to"
       },
+      "thermostat": {
+        "set-schedule": "Change the thermostats' schedule"
+      },
       "mqtt": {
         "send": "Send MQTT Message"
       },
@@ -4282,6 +4290,9 @@
       },
       "http": {
         "request": "Call an external API or service"
+      },
+      "thermostat": {
+        "set-schedule": "Make thermostats follow another weekly schedule"
       },
       "mqtt": {
         "send": "Publish a message on the MQTT broker"

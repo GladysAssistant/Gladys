@@ -4069,6 +4069,11 @@
         "houseLabel": "Maison",
         "alarmModeLabel": "Mode de l'alarme"
       },
+      "thermostatSetSchedule": {
+        "description": "Cette action fait suivre un autre planning aux thermostats sélectionnés, par exemple pour passer du planning habituel à celui des vacances scolaires. Le thermostat reprend le planning tout de suite : une consigne manuelle en cours est annulée, mais un thermostat arrêté à la main reste arrêté.",
+        "scheduleLabel": "Planning",
+        "thermostatsLabel": "Thermostats"
+      },
       "alarmSetMode": {
         "description": "Cette action passera la maison sélectionnée dans le mode d'alarme sélectionné.",
         "houseLabel": "Maison",
@@ -4194,6 +4199,9 @@
         "check-alarm-mode": "Si l'alarme est en mode",
         "set-alarm-mode": "Passer l'alarme en mode"
       },
+      "thermostat": {
+        "set-schedule": "Changer le planning des thermostats"
+      },
       "mqtt": {
         "send": "Envoyer un message MQTT"
       },
@@ -4282,6 +4290,9 @@
       },
       "http": {
         "request": "Appeler une API ou un service externe"
+      },
+      "thermostat": {
+        "set-schedule": "Faire suivre un autre planning hebdomadaire à des thermostats"
       },
       "mqtt": {
         "send": "Publier un message sur le broker MQTT"

@@ -4069,6 +4069,11 @@
         "houseLabel": "Vivienda",
         "alarmModeLabel": "Modo de alarma"
       },
+      "thermostatSetSchedule": {
+        "description": "Esta acción hace que los termostatos seleccionados sigan otro horario, por ejemplo para pasar del horario habitual al de las vacaciones escolares. El termostato sigue el horario de inmediato: se cancela una consigna manual en curso, pero un termostato apagado a mano sigue apagado.",
+        "scheduleLabel": "Horario",
+        "thermostatsLabel": "Termostatos"
+      },
       "alarmSetMode": {
         "description": "Esta acción establecerá la vivienda seleccionada en el modo de alarma seleccionado.",
         "houseLabel": "Vivienda",
@@ -4194,6 +4199,9 @@
         "check-alarm-mode": "Si la alarma está en el modo",
         "set-alarm-mode": "Establecer el modo de alarma a"
       },
+      "thermostat": {
+        "set-schedule": "Cambiar el horario de los termostatos"
+      },
       "mqtt": {
         "send": "Enviar mensaje MQTT"
       },
@@ -4282,6 +4290,9 @@
       },
       "http": {
         "request": "Llamar a una API o servicio externo"
+      },
+      "thermostat": {
+        "set-schedule": "Hacer que los termostatos sigan otro horario semanal"
       },
       "mqtt": {
         "send": "Publicar un mensaje en el broker MQTT"
