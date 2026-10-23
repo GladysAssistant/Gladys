@@ -7,6 +7,7 @@ import IntegrationPageHeader from './IntegrationPageHeader';
 import InstalledIntegrationsSummary from './InstalledIntegrationsSummary';
 import IntegrationCatalogSkeleton from './IntegrationCatalogSkeleton';
 import IntegrationLoadMore from './IntegrationLoadMore';
+import UpdateAllIntegrations from './UpdateAllIntegrations';
 import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import { RequestStatus } from '../../utils/consts';
 import { getCountryName } from './catalog-country';
@@ -142,6 +143,11 @@ const IntegrationPage = ({
   installedIntegrationsCount,
   installedStatusCounts,
   installedInventoryKnown,
+  updatableIntegrationsCount,
+  updateAllIntegrations,
+  updateAllStatus,
+  updateAllProgress,
+  updateAllResult,
   category,
   origin,
   transports,
@@ -202,6 +208,19 @@ const IntegrationPage = ({
                     installedStatusCounts={installedStatusCounts}
                   />
                 )}
+                {/* "Update all" lives in the two views where updates are looked
+                    for; a run in progress stays on screen whatever view the
+                    user moves to meanwhile, its outcome in the view it ended in */}
+                {!catalogLoading &&
+                  (['installed', 'updates'].includes(category) || updateAllStatus === RequestStatus.Getting) && (
+                    <UpdateAllIntegrations
+                      integrationsToUpdateCount={updatableIntegrationsCount}
+                      status={updateAllStatus}
+                      progress={updateAllProgress}
+                      result={updateAllResult && updateAllResult.category === category ? updateAllResult : null}
+                      onUpdateAll={updateAllIntegrations}
+                    />
+                  )}
                 {!catalogLoading && countryScopeApplicable && (
                   <CountryScopeLine
                     instanceCountry={instanceCountry}

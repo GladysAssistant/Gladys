@@ -179,6 +179,9 @@ class Integration extends Component {
   }
 
   componentWillUnmount() {
+    // a running "Update all" stops after the update in flight: there is no
+    // screen left to report on the next ones
+    this.unmounted = true;
     if (this.props.session && this.props.session.dispatcher) {
       this.props.session.dispatcher.removeListener(
         WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
@@ -788,6 +791,64 @@ class Integration extends Component {
     return integrationsToUpdate;
   }
 
+  // the installed community integrations having a newer version, in the
+  // alphabetical order the catalog displays them in. Admin-only: the server
+  // does not send the update_available flag to the other users
+  getIntegrationsToUpdate() {
+    if (get(this.props, 'user.role') !== USER_ROLE.ADMIN) {
+      return [];
+    }
+    return (this.state.externalInstalled || [])
+      .filter(integration => integration.update_available)
+      .map(integration => ({
+        selector: integration.selector,
+        name: get(integration, 'manifest.name') || integration.name || integration.selector
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  // "Update all": the per-integration update route is called for each
+  // integration, one after the other — one image pull and one container
+  // restart at a time, and a failure does not stop the others
+  updateAllIntegrations = async () => {
+    if (this.state.updateAllStatus === RequestStatus.Getting) {
+      return;
+    }
+    const integrationsToUpdate = this.getIntegrationsToUpdate();
+    const total = integrationsToUpdate.length;
+    if (total === 0) {
+      return;
+    }
+    await this.setState({ updateAllStatus: RequestStatus.Getting, updateAllResult: null });
+    const failed = [];
+    for (let index = 0; index < total && !this.unmounted; index += 1) {
+      const integration = integrationsToUpdate[index];
+      await this.setState({ updateAllProgress: { name: integration.name, current: index + 1, total } });
+      try {
+        await this.props.httpClient.post(`/api/v1/external_integration/${integration.selector}/update`);
+      } catch (e) {
+        console.error(e);
+        failed.push(integration);
+      }
+    }
+    if (this.unmounted) {
+      // the page was left mid-run: the header counter must still reflect the
+      // updates that went through
+      this.props.refreshExternalIntegrationsToUpdate();
+      return;
+    }
+    await this.setState({
+      updateAllStatus: failed.length > 0 ? RequestStatus.Error : RequestStatus.Success,
+      updateAllProgress: null,
+      // the outcome belongs to the view the run ended in: it is not carried
+      // over to the next view the user opens
+      updateAllResult: { total, failed, category: this.props.category }
+    });
+    // the reload refreshes the cards, the "to update" list and the header
+    // counter: what is left is what failed
+    await this.loadExternalIntegrations();
+  };
+
   toggleFavorite = async integrationKey => {
     const favorites = this.state.favorites || [];
     const newFavorites = favorites.includes(integrationKey)
@@ -953,6 +1014,8 @@ class Integration extends Component {
       catalogLoading,
       showInstallFromGithub,
       showStoreRefresh,
+      updatableIntegrationsCount: this.getIntegrationsToUpdate().length,
+      updateAllIntegrations: this.updateAllIntegrations,
       showMoreIntegrations: this.showMoreIntegrations,
       search: this.search,
       clearFilters: this.clearFilters,

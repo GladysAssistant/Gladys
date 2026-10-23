@@ -475,3 +475,48 @@
 :global(.glass-theme .card h4 a) {
   color: inherit;
 }
+
+/* "Update all" panel of the Installed and To update views: icon, text and
+   button on one line, the button dropping below the text on a phone */
+.updateAllBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.updateAllIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  color: #467fcf;
+  background-color: rgba(70, 127, 207, 0.12);
+}
+
+.updateAllText {
+  flex: 1;
+  min-width: 0;
+}
+
+.updateAllButton {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* the count rides on the button: a translucent pill readable on its fill,
+   whatever the theme */
+.updateAllCount {
+  color: inherit;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 575.98px) {
+  .updateAllButton {
+    width: 100%;
+  }
+}

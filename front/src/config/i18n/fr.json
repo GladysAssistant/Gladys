@@ -1042,6 +1042,24 @@
           "other": "{{count}} intégrations de la communauté installées sur cette instance."
         }
       },
+      "updateAll": {
+        "title": {
+          "one": "1 mise à jour disponible",
+          "other": "{{count}} mises à jour disponibles"
+        },
+        "description": "Les intégrations sont mises à jour l'une après l'autre : chaque conteneur redémarre sur sa nouvelle version.",
+        "button": "Tout mettre à jour",
+        "progress": "Mise à jour de {{name}} ({{current}} sur {{total}})…",
+        "keepPageOpen": "Gardez cette page ouverte jusqu'à la fin : la quitter arrête les mises à jour restantes.",
+        "success": {
+          "one": "L'intégration a été mise à jour.",
+          "other": "Les {{total}} intégrations ont été mises à jour."
+        },
+        "failed": {
+          "one": "1 mise à jour sur {{total}} a échoué. Ouvrez l'intégration pour consulter ses logs et réessayer :",
+          "other": "{{failed}} mises à jour sur {{total}} ont échoué. Ouvrez chaque intégration pour consulter ses logs et réessayer :"
+        }
+      },
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
       "noSearchResultsSuggestion": "Votre appareil est peut-être pris en charge par une <a href=\"https://gladysassistant.com/fr/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">intégration externe</a> de la communauté : c'est la façon recommandée d'ajouter de nouvelles compatibilités. Et si elle n'existe pas encore, vous pouvez <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">créer la vôtre très simplement</a> !",
       "refreshStore": {

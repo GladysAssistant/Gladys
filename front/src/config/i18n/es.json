@@ -1042,6 +1042,24 @@
           "other": "{{count}} integraciones de la comunidad instaladas en esta instancia."
         }
       },
+      "updateAll": {
+        "title": {
+          "one": "1 actualización disponible",
+          "other": "{{count}} actualizaciones disponibles"
+        },
+        "description": "Las integraciones se actualizan una tras otra: cada contenedor se reinicia con su nueva versión.",
+        "button": "Actualizar todo",
+        "progress": "Actualizando {{name}} ({{current}} de {{total}})…",
+        "keepPageOpen": "Mantenga esta página abierta hasta el final: salir de ella detiene las actualizaciones restantes.",
+        "success": {
+          "one": "La integración se ha actualizado.",
+          "other": "Las {{total}} integraciones se han actualizado."
+        },
+        "failed": {
+          "one": "1 de {{total}} actualizaciones ha fallado. Abra la integración para consultar sus registros y volver a intentarlo:",
+          "other": "{{failed}} de {{total}} actualizaciones han fallado. Abra cada integración para consultar sus registros y volver a intentarlo:"
+        }
+      },
       "noSearchResults": "No se encontró ninguna integración que coincida con \"{{searchKeyword}}\".",
       "noSearchResultsSuggestion": "Es posible que su dispositivo sea compatible mediante una <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">integración externa</a> de la comunidad, la forma recomendada de agregar nuevas compatibilidades. Y si aún no existe, ¡puede <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">crear fácilmente la suya</a>!",
       "refreshStore": {
