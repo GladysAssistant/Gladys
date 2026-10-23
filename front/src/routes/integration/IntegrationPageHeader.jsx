@@ -10,8 +10,10 @@ import style from './style.css';
 // the count is always compared to the whole catalog: "42 of 810 integrations"
 // says at a glance how much the shelf, the facets or the search narrow it.
 // While nothing does, the two numbers are the same and "810 of 810" is noise:
-// the total alone says everything. Next to a narrowed count, one link releases
-// every filter at once.
+// the count of what is displayed alone says everything — and under the
+// country scope, which is not a filter the user chose, it is the only honest
+// number ("797", not the "810" that counts the hidden cards). Next to a
+// narrowed count, one link releases every filter at once.
 // while the community integrations load, the only count we could give is the
 // one of the native integrations: a small number that would read as the size
 // of the whole catalog. The header says the catalog is loading instead.
@@ -29,7 +31,7 @@ const IntegrationCount = ({ loading, narrowed, integrationsLength, totalSize, ha
       {narrowed ? (
         <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
       ) : (
-        <Text id="integration.root.subtitleTotal" fields={{ total: totalSize }} />
+        <Text id="integration.root.subtitleTotal" fields={{ total: integrationsLength }} />
       )}
       {hasActiveFilters && clearFilters && (
         <span>
