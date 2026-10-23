@@ -187,6 +187,31 @@ describe('External integration - update all from the "To update" view', () => {
     cy.get('.alert-success').should('exist');
   });
 
+  it('stops when the catalog is left, the header counter read again from the server', () => {
+    cy.intercept('POST', `**/api/v1/external_integration/${LINKY.selector}/update`, () => {
+      throw new Error('the run stops after the update in flight');
+    });
+
+    cy.visit('/dashboard/integration/updates');
+    cy.wait('@getInstalled');
+    cy.get('a[href="/dashboard/integration"] .badge-danger').should('contain', '2');
+    // the reload that follows Daikin's update answers late: the catalog is left before it lands
+    let reloadSent = false;
+    cy.intercept('GET', '**/api/v1/external_integration', req => {
+      const delay = reloadSent ? 0 : 3000;
+      reloadSent = true;
+      req.reply({ delay, body: [installed.daikin, installed.linky, NETATMO] });
+    });
+    cy.contains('button', UPDATE_ALL_BUTTON).click();
+    cy.wait('@updateDaikin');
+    cy.wrap(null).should(() => expect(reloadSent, 'reload sent').to.equal(true));
+    cy.contains('a', 'header.home').click({ force: true });
+    cy.location('pathname').should('not.include', '/dashboard/integration');
+
+    // the page that was left drops its reload: the counter no longer counts Daikin all the same
+    cy.get('a[href="/dashboard/integration"] .badge-danger', { timeout: 10000 }).should('contain', '1');
+  });
+
   it('waits for an update already running from a card', () => {
     cy.visit('/dashboard/integration/updates');
     cy.wait('@getInstalled');

@@ -905,16 +905,19 @@ class Integration extends Component {
     await this.setUpdateState(selector, { status: RequestStatus.Getting });
     try {
       const integration = await this.props.httpClient.post(`/api/v1/external_integration/${selector}/update`);
-      if (this.unmounted) {
-        // the catalog was left during the update: there is no card left to
-        // update, only the header counter, read again from the server
-        this.props.refreshExternalIntegrationsToUpdate();
-        return RequestStatus.Success;
-      }
       // the reload clears the update flag of this card and feeds the header
       // counter with the new count. The spinner stays up until it has landed:
       // with the flag still set, the card would offer the update again
-      await this.loadExternalIntegrations();
+      if (!this.unmounted) {
+        await this.loadExternalIntegrations();
+      }
+      if (this.unmounted) {
+        // the catalog was left during the update or the reload after it: there
+        // is no card left to update, and an unmounted page drops its reload,
+        // so the header counter is read again from the server
+        this.props.refreshExternalIntegrationsToUpdate();
+        return RequestStatus.Success;
+      }
       await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
       return RequestStatus.Success;
     } catch (e) {
