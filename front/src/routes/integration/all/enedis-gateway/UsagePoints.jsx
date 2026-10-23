@@ -73,10 +73,11 @@ const UsagePointDevice = ({
         </div>
         <div class="card-body">
           <div class="form-group">
-            <label>
+            <label for={`name_${deviceIndex}`}>
               <Text id="integration.enedis.usagePoints.usagePointDeviceName" />
             </label>
             <input
+              id={`name_${deviceIndex}`}
               type="text"
               class="form-control"
               value={device.name}
