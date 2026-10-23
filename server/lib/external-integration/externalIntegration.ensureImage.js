@@ -18,7 +18,9 @@ const { BadParameters } = require('../../utils/coreErrors');
  * image when the pull fails (dev installs only).
  * @param {Function} [options.onProgress] - Called with every Docker progress
  * event of the download (first start of a `manual` sub-container).
- * @param {AbortSignal} [options.abortSignal] - Aborting it stops the download.
+ * @param {AbortSignal} [options.abortSignal] - Aborting it stops the download;
+ * an aborted download rejects with its own error, never falls back on a local
+ * image.
  * @returns {Promise} Resolves when the image is available on the machine.
  * @example
  * await gladys.externalIntegration.ensureImage('my-integration:dev', { allowLocal: true });
@@ -29,6 +31,11 @@ async function ensureImage(image, { allowLocal = false, onProgress, abortSignal 
     await this.system.pull(image, onProgress, { abortSignal });
     return;
   } catch (e) {
+    if (abortSignal && abortSignal.aborted) {
+      // a cancelled download is not a failed one: no local fallback (a
+      // leftover local tag would turn it into a success) and no warning
+      throw e;
+    }
     let existsLocally = false;
     if (allowLocal) {
       try {

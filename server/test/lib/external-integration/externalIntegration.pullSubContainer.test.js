@@ -18,12 +18,15 @@ const seedFrigateService = (overrides = {}) =>
 
 /**
  * @description A system.pull whose download the test drives: progress events,
- * resolution, rejection.
+ * resolution, rejection. Like Docker, an abort rejects the download by
+ * default; `onAbort: 'resolve'` simulates the last bytes arriving with it.
+ * @param {object} [options] - Options.
+ * @param {string} [options.onAbort] - 'reject' (default) or 'resolve'.
  * @returns {object} The pull fake and its controls.
  * @example
  * const download = buildControlledPull();
  */
-function buildControlledPull() {
+function buildControlledPull({ onAbort = 'reject' } = {}) {
   const download = {};
   download.pull = sinon.stub().callsFake((image, onProgress, { abortSignal }) => {
     download.onProgress = onProgress;
@@ -31,9 +34,69 @@ function buildControlledPull() {
     return new Promise((resolve, reject) => {
       download.resolve = resolve;
       download.reject = reject;
+      abortSignal.addEventListener('abort', () => {
+        if (onAbort === 'resolve') {
+          resolve([]);
+        } else {
+          const abortError = new Error('The operation was aborted');
+          abortError.name = 'AbortError';
+          reject(abortError);
+        }
+      });
     });
   });
   return download;
+}
+
+/**
+ * @description A Docker daemon reduced to the containers it holds, whose
+ * restart (the start of startSubContainer) the test releases: what is left
+ * once the concurrent gestures are over is what the assertions read.
+ * @returns {object} The system overrides and their controls.
+ * @example
+ * const docker = buildControlledDocker();
+ */
+function buildControlledDocker() {
+  const docker = { containers: [], restartCalled: null, restartSettle: null };
+  let created = 0;
+  docker.restartCalled = new Promise((resolveCalled) => {
+    docker.system = {
+      createContainer: sinon.stub().callsFake(async () => {
+        created += 1;
+        const container = { id: `mqtt-${created}` };
+        docker.containers.push(container);
+        return container;
+      }),
+      removeContainer: sinon.stub().callsFake(async (containerId) => {
+        docker.containers = docker.containers.filter((container) => container.id !== containerId);
+      }),
+      getContainers: sinon.stub().callsFake(async () => docker.containers.map((container) => ({ ...container }))),
+      restartContainer: sinon.stub().callsFake(
+        () =>
+          new Promise((resolve, reject) => {
+            docker.restartSettle = { resolve, reject };
+            resolveCalled();
+          }),
+      ),
+    };
+  });
+  return docker;
+}
+
+/**
+ * @description Let the pending callbacks run until a condition holds.
+ * @param {Function} condition - Returns true once the state is reached.
+ * @returns {Promise} Resolve when the condition holds.
+ * @example
+ * await waitUntil(() => system.restartContainer.callCount === 2);
+ */
+async function waitUntil(condition) {
+  while (!condition()) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+  }
 }
 
 const containerUpdates = (event) =>
@@ -225,7 +288,6 @@ describe('externalIntegration.pullAndStartSubContainer', () => {
     const { externalIntegration, system, event } = buildSupervisor({ system: { pull: download.pull } });
     const service = await seedFrigateService();
     await externalIntegration.controlSubContainer(service, 'mqtt', 'start');
-    const { promise } = externalIntegration.subContainerPulls.get(`${service.id}:mqtt`);
     const result = await externalIntegration.controlSubContainer(service, 'mqtt', 'stop');
     expect(result).to.deep.equal({ status: 'stopped' });
     expect(download.abortSignal.aborted).to.equal(true);
@@ -233,11 +295,19 @@ describe('externalIntegration.pullAndStartSubContainer', () => {
     expect(mqtt).to.include({ status: 'stopped', last_error: null });
     const updates = containerUpdates(event);
     expect(updates[updates.length - 1]).to.include({ status: 'stopped', last_error: null });
-    // the last bytes arrive after the stop: the stop wins
-    download.resolve([]);
-    await promise;
     assert.notCalled(system.createContainer);
-    expect(containerUpdates(event)).to.have.lengthOf(updates.length);
+    expect(externalIntegration.cancelledSubContainerPulls.size).to.equal(0);
+  });
+
+  it('should not create the container when the last bytes arrive with the stop', async () => {
+    const download = buildControlledPull({ onAbort: 'resolve' });
+    const { externalIntegration, system, event } = buildSupervisor({ system: { pull: download.pull } });
+    const service = await seedFrigateService();
+    await externalIntegration.controlSubContainer(service, 'mqtt', 'start');
+    await externalIntegration.controlSubContainer(service, 'mqtt', 'stop');
+    assert.notCalled(system.createContainer);
+    // only the stop pushed the end of the download
+    expect(containerUpdates(event).map((payload) => payload.status)).to.deep.equal(['pulling', 'stopped']);
   });
 
   it('should abort the downloads when the integration stops or is removed', async () => {
@@ -248,8 +318,7 @@ describe('externalIntegration.pullAndStartSubContainer', () => {
     const { promise } = externalIntegration.subContainerPulls.get(`${service.id}:mqtt`);
     await externalIntegration.stopSubContainers(service);
     expect(download.abortSignal.aborted).to.equal(true);
-    // the aborted download rejects: not an error to report
-    download.reject(new Error('aborted'));
+    // the aborted download rejected before the stop resolved: not an error to report
     await promise;
     const [mqtt] = await externalIntegration.getSubContainersState(service);
     expect(mqtt).to.include({ status: 'stopped', last_error: null });
@@ -270,5 +339,159 @@ describe('externalIntegration.pullAndStartSubContainer', () => {
     expect(result).to.deep.equal({ status: 'running' });
     assert.notCalled(system.pull);
     assert.calledWith(system.restartContainer, 'mqtt-1');
+  });
+
+  it('should remove the container a stop overtook while it was being started', async () => {
+    const docker = buildControlledDocker();
+    const download = buildControlledPull();
+    const { externalIntegration, variable, event } = buildSupervisor({
+      system: { pull: download.pull, ...docker.system },
+    });
+    const service = await seedFrigateService();
+    await externalIntegration.controlSubContainer(service, 'mqtt', 'start');
+    download.resolve([]);
+    // the image is on the disk, the container created, its start in progress
+    await docker.restartCalled;
+    expect(docker.containers).to.deep.equal([{ id: 'mqtt-1' }]);
+    let stopped = false;
+    const stop = (async () => {
+      const result = await externalIntegration.controlSubContainer(service, 'mqtt', 'stop');
+      stopped = true;
+      return result;
+    })();
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    // the stop waits for the start it cancelled
+    expect(stopped).to.equal(false);
+    docker.restartSettle.resolve();
+    expect(await stop).to.deep.equal({ status: 'stopped' });
+    assert.calledWith(docker.system.removeContainer, 'mqtt-1', { force: true });
+    expect(docker.containers).to.deep.equal([]);
+    expect(JSON.parse(await variable.getValue(SUB_CONTAINER_DESIRED_VARIABLE, service.id))).to.deep.equal({
+      mqtt: 'stopped',
+    });
+    const [mqtt] = await externalIntegration.getSubContainersState(service);
+    expect(mqtt).to.include({ status: 'stopped', desired: 'stopped', last_error: null });
+    expect(containerUpdates(event).map((payload) => payload.status)).to.deep.equal(['pulling', 'stopped']);
+  });
+
+  it('should leave nothing behind when the integration is uninstalled while the container starts', async () => {
+    const docker = buildControlledDocker();
+    const download = buildControlledPull();
+    const { externalIntegration, variable } = buildSupervisor({
+      system: { pull: download.pull, ...docker.system },
+    });
+    const service = await seedFrigateService();
+    await externalIntegration.controlSubContainer(service, 'mqtt', 'start');
+    download.resolve([]);
+    await docker.restartCalled;
+    const removal = externalIntegration.removeSubContainers(service);
+    await waitUntil(() => externalIntegration.subContainerPulls.size === 0);
+    docker.restartSettle.resolve();
+    await removal;
+    expect(docker.containers).to.deep.equal([]);
+    expect(await variable.getValue(SUB_CONTAINER_DESIRED_VARIABLE, service.id)).to.equal(null);
+    expect(externalIntegration.subContainerPulls.size).to.equal(0);
+  });
+
+  it('should keep going when the overtaken container cannot be removed', async () => {
+    const docker = buildControlledDocker();
+    docker.system.removeContainer = sinon.stub().rejects(new Error('DOCKER_DOWN'));
+    const download = buildControlledPull();
+    const { externalIntegration, variable } = buildSupervisor({
+      system: { pull: download.pull, ...docker.system },
+    });
+    const service = await seedFrigateService();
+    await externalIntegration.controlSubContainer(service, 'mqtt', 'start');
+    download.resolve([]);
+    await docker.restartCalled;
+    const stop = externalIntegration.controlSubContainer(service, 'mqtt', 'stop');
+    docker.restartSettle.resolve();
+    expect(await stop).to.deep.equal({ status: 'stopped' });
+    expect(JSON.parse(await variable.getValue(SUB_CONTAINER_DESIRED_VARIABLE, service.id))).to.deep.equal({
+      mqtt: 'stopped',
+    });
+  });
+
+  it('should not record a start failure that follows a stop', async () => {
+    const docker = buildControlledDocker();
+    const download = buildControlledPull();
+    const { externalIntegration, system } = buildSupervisor({ system: { pull: download.pull, ...docker.system } });
+    const service = await seedFrigateService();
+    await externalIntegration.controlSubContainer(service, 'mqtt', 'start');
+    download.resolve([]);
+    await docker.restartCalled;
+    const stop = externalIntegration.controlSubContainer(service, 'mqtt', 'stop');
+    docker.restartSettle.reject(new Error('CANNOT_START'));
+    await stop;
+    const [mqtt] = await externalIntegration.getSubContainersState(service);
+    expect(mqtt).to.include({ desired: 'stopped', last_error: null });
+    // the created container is the stop's to handle: stopped, not removed
+    assert.calledWith(system.stopContainer, 'mqtt-1');
+    assert.notCalled(docker.system.removeContainer);
+  });
+
+  it('should make a start wait for the download a stop is cancelling', async () => {
+    const docker = buildControlledDocker();
+    const download = buildControlledPull();
+    const { externalIntegration } = buildSupervisor({
+      system: { pull: download.pull, imageExists: fake.resolves(true), ...docker.system },
+    });
+    const service = await seedFrigateService();
+    // the image is on the disk: only a pull already in flight runs in the background
+    externalIntegration.pullAndStartSubContainer(service, TEST_CONTAINERS_MANIFEST.containers[0]);
+    download.resolve([]);
+    await docker.restartCalled;
+    const stop = externalIntegration.controlSubContainer(service, 'mqtt', 'stop');
+    const start = externalIntegration.controlSubContainer(service, 'mqtt', 'start');
+    docker.restartSettle.resolve();
+    await stop;
+    // the second start reaches the daemon after the discard of the first container
+    await waitUntil(() => docker.system.restartContainer.callCount === 2);
+    docker.restartSettle.resolve();
+    expect(await start).to.deep.equal({ status: 'running' });
+    const [removal] = docker.system.removeContainer.getCalls();
+    expect(removal.calledBefore(docker.system.createContainer.secondCall)).to.equal(true);
+    expect(docker.containers).to.deep.equal([{ id: 'mqtt-2' }]);
+  });
+});
+
+describe('externalIntegration.ensureImage', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should fall back on a local image when the pull fails (dev install)', async () => {
+    const { externalIntegration } = buildSupervisor({
+      system: { pull: fake.rejects(new Error('NOT_FOUND')), imageExists: fake.resolves(true) },
+    });
+    await externalIntegration.ensureImage('my-integration:dev', { allowLocal: true });
+  });
+
+  it('should rethrow an aborted download, even with a local image', async () => {
+    const abortController = new AbortController();
+    const abortError = new Error('The operation was aborted');
+    const imageExists = fake.resolves(true);
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        pull: fake(async () => {
+          abortController.abort();
+          throw abortError;
+        }),
+        imageExists,
+      },
+    });
+    let thrown = null;
+    try {
+      await externalIntegration.ensureImage('my-integration:dev', {
+        allowLocal: true,
+        abortSignal: abortController.signal,
+      });
+    } catch (e) {
+      thrown = e;
+    }
+    expect(thrown).to.equal(abortError);
+    assert.notCalled(imageExists);
   });
 });

@@ -99,6 +99,30 @@ function emitSubContainerUpdate(service, name, status = 'stopped') {
 }
 
 /**
+ * @description Remove the container a download started after losing the
+ * ownership of its key (stop, uninstall, update or ERROR while the container
+ * was being created or started): the gesture that cancelled it wins, so
+ * nothing it stopped or removed may be left running. The forced removal
+ * stops it first; the next start recreates it, the image is there.
+ * @param {object} service - The external integration service (plain object).
+ * @param {string} name - The sub-container name.
+ * @param {string} containerId - The container the cancelled start created.
+ * @returns {Promise} Resolve when the container is gone; never rejects.
+ * @example
+ * await gladys.externalIntegration.discardSubContainer(service, 'frigate', container.id);
+ */
+async function discardSubContainer(service, name, containerId) {
+  try {
+    await this.system.removeContainer(containerId, { force: true });
+  } catch (e) {
+    logger.warn(
+      `Unable to remove sub-container ${name} of integration ${service.selector} after its cancelled start`,
+      e,
+    );
+  }
+}
+
+/**
  * @description Download the image of a declared sub-container in the
  * background, then create and start it and put it in the "running" desired
  * state — what POST /container/:name/start does synchronously when the image
@@ -108,6 +132,12 @@ function emitSubContainerUpdate(service, name, status = 'stopped') {
  * the container absent with a `last_error` and never touches failure_count:
  * a deliberate start that could not download is not a crash. A second call
  * while the download runs joins it (its env, if any, replaces the previous one).
+ * The entry of `subContainerPulls` is the source of truth of the ownership:
+ * a stop, an uninstall or an update removes it (cancelSubContainerPull) and
+ * a newer download may take the key, so it is checked before AND after the
+ * start — a container created by a download that lost it is removed, the
+ * desired state is never set to `running` on its behalf, and a cancelled
+ * download never records an error.
  * @param {object} service - The external integration service (plain object).
  * @param {object} entry - The sub-container declaration from the manifest.
  * @param {object} [options] - Options of startSubContainer ({ env }).
@@ -143,6 +173,7 @@ function pullAndStartSubContainer(service, entry, options = {}) {
       this.emitSubContainerUpdate(service, entry.name);
     }
   };
+  const owned = () => this.subContainerPulls.get(key) === pull;
   const run = async () => {
     try {
       await this.ensureImage(entry.docker_image, {
@@ -151,22 +182,32 @@ function pullAndStartSubContainer(service, entry, options = {}) {
         abortSignal: abortController.signal,
       });
     } catch (e) {
-      if (!abortController.signal.aborted) {
+      if (owned()) {
         this.subContainerErrors.set(key, SUB_CONTAINER_ERRORS.PULL_FAILED);
       }
       return 'stopped';
     }
     // stopped while the last bytes arrived: the stop wins
-    if (abortController.signal.aborted) {
+    if (!owned()) {
       return 'stopped';
     }
     try {
-      await this.startSubContainer(service, entry, pull.options);
+      const container = await this.startSubContainer(service, entry, pull.options);
+      if (!owned()) {
+        // stopped or removed while the container was being created or
+        // started: it must not outlive that gesture
+        await this.discardSubContainer(service, entry.name, container.id);
+        return 'stopped';
+      }
       await this.setDesiredContainer(service, entry.name, 'running');
       return 'running';
     } catch (e) {
-      logger.warn(`Unable to start sub-container ${entry.name} of integration ${service.selector}`, e);
-      this.subContainerErrors.set(key, SUB_CONTAINER_ERRORS.START_FAILED);
+      // a start that failed after a stop is not an error to report: the
+      // canceller deals with whatever container is left (not running)
+      if (owned()) {
+        logger.warn(`Unable to start sub-container ${entry.name} of integration ${service.selector}`, e);
+        this.subContainerErrors.set(key, SUB_CONTAINER_ERRORS.START_FAILED);
+      }
       return 'stopped';
     }
   };
@@ -174,7 +215,7 @@ function pullAndStartSubContainer(service, entry, options = {}) {
     const status = await run();
     // a stop (cancelSubContainerPull) already cleared and pushed this
     // download; a newer one may even have taken the key since
-    if (this.subContainerPulls.get(key) === pull) {
+    if (owned()) {
       this.subContainerPulls.delete(key);
       this.emitSubContainerUpdate(service, entry.name, status);
     }
@@ -186,14 +227,16 @@ function pullAndStartSubContainer(service, entry, options = {}) {
 /**
  * @description Abort the image download of a sub-container, if one runs
  * (POST /container/:name/stop, stop of the whole integration, update,
- * uninstall): the container is not created.
+ * uninstall, ERROR), and wait until it has settled: when this resolves, the
+ * download no longer creates nor starts anything, and a container it had
+ * already created is gone — the caller can inspect or remove the containers.
  * @param {object} service - The external integration service (plain object).
  * @param {string} name - The sub-container name.
- * @returns {boolean} True if a download was aborted.
+ * @returns {Promise<boolean>} Resolve with true if a download was aborted.
  * @example
- * gladys.externalIntegration.cancelSubContainerPull(service, 'frigate');
+ * await gladys.externalIntegration.cancelSubContainerPull(service, 'frigate');
  */
-function cancelSubContainerPull(service, name) {
+async function cancelSubContainerPull(service, name) {
   const key = `${service.id}:${name}`;
   const pull = this.subContainerPulls.get(key);
   if (!pull) {
@@ -203,6 +246,13 @@ function cancelSubContainerPull(service, name) {
   this.subContainerPulls.delete(key);
   pull.abortController.abort();
   this.emitSubContainerUpdate(service, name);
+  // a start arriving meanwhile waits for it (controlSubContainer): the
+  // cancelled download must not remove or reuse the container it creates
+  this.cancelledSubContainerPulls.set(key, pull.promise);
+  // never rejects (runAndClear); no newer download can take the key before
+  // it settles, since the starts wait for it
+  await pull.promise;
+  this.cancelledSubContainerPulls.delete(key);
   return true;
 }
 
@@ -210,6 +260,7 @@ module.exports = {
   trackLayer,
   summarizePullProgress,
   emitSubContainerUpdate,
+  discardSubContainer,
   pullAndStartSubContainer,
   cancelSubContainerPull,
 };

@@ -142,6 +142,7 @@ const { cleanImages } = require('./externalIntegration.cleanImages');
 const { controlSubContainer } = require('./externalIntegration.controlSubContainer');
 const {
   emitSubContainerUpdate,
+  discardSubContainer,
   pullAndStartSubContainer,
   cancelSubContainerPull,
 } = require('./externalIntegration.pullSubContainer');
@@ -236,6 +237,9 @@ const ExternalIntegration = function ExternalIntegration(
   // promise } of the sub-container image downloads started by
   // POST /container/:name/start (first start of a `manual` entry)
   this.subContainerPulls = new Map();
+  // `${serviceId}:${name}` -> settlement promise of a download being
+  // cancelled: a start waits for it before creating the container
+  this.cancelledSubContainerPulls = new Map();
   // `${serviceId}:${name}` -> last_error code of the last failed
   // asynchronous sub-container start (GET /container), in memory only
   this.subContainerErrors = new Map();
@@ -443,6 +447,7 @@ ExternalIntegration.prototype.removeImages = removeImages;
 ExternalIntegration.prototype.cleanImages = cleanImages;
 ExternalIntegration.prototype.controlSubContainer = controlSubContainer;
 ExternalIntegration.prototype.emitSubContainerUpdate = emitSubContainerUpdate;
+ExternalIntegration.prototype.discardSubContainer = discardSubContainer;
 ExternalIntegration.prototype.pullAndStartSubContainer = pullAndStartSubContainer;
 ExternalIntegration.prototype.cancelSubContainerPull = cancelSubContainerPull;
 ExternalIntegration.prototype.getSubContainersState = getSubContainersState;

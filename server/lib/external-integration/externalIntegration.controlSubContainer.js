@@ -52,7 +52,7 @@ async function controlSubContainer(service, name, action, { env } = {}) {
   if (action === 'stop') {
     // a stop also aborts the download a start left running, and clears
     // what that start may have failed on
-    this.cancelSubContainerPull(service, name);
+    await this.cancelSubContainerPull(service, name);
     this.subContainerErrors.delete(key);
     const container = await this.findSubContainer(service, name);
     if (container) {
@@ -64,6 +64,9 @@ async function controlSubContainer(service, name, action, { env } = {}) {
   // start and restart both end up with a running container in the desired
   // state; start is the one accepting a runtime env
   const options = action === 'start' && env !== undefined ? { env } : {};
+  // a stop is cancelling a download of this entry: let it settle first, so
+  // it cannot remove nor reuse the container this start creates
+  await this.cancelledSubContainerPulls.get(key);
   if (this.subContainerPulls.has(key)) {
     // the download of a previous start is still running: join it
     this.pullAndStartSubContainer(service, entry, options);
