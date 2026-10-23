@@ -68,7 +68,6 @@ class TtsProviderSettings extends Component {
           <p>
             <Text id="integration.openai.ttsProviderText" />
           </p>
-          {/* a native select, like the other settings cards of this page */}
           <div class="form-group mb-0">
             <label class="form-label" for="tts-provider-select">
               <Text id="integration.openai.ttsProviderSelectLabel" />
@@ -80,16 +79,11 @@ class TtsProviderSettings extends Component {
               onChange={this.updateProvider}
               disabled={!active || isUpdatingProvider}
             >
-              {/* the API provides a display name per provider (the
-                  integration's manifest name), so the select matches the
-                  Integrations UI */}
               {providers.map(({ provider, name }) => (
                 <option key={provider} value={provider}>
                   {name || provider}
                 </option>
               ))}
-              {/* keeps the stored selection visible instead of silently
-                  showing the first provider; the warning below explains it */}
               {activeIsUnavailable && (
                 <option value={active} disabled>
                   {active}
