@@ -390,6 +390,16 @@ const DYNAMIC_SOURCES = ['devices', 'houses'];
 // catalog (docs/specs/integration-catalog-categories.md). More than 3 means
 // the assignment is lazy, not the vocabulary too narrow.
 const MAX_MANIFEST_CATEGORIES = 3;
+// Optional `keywords` manifest field: search-only terms of the catalog
+// (brands, synonyms, cities…), never displayed. Bounded so the field stays a
+// handful of terms and not a dump of the documentation.
+const MAX_MANIFEST_KEYWORDS = 10;
+const MANIFEST_KEYWORD_MIN_LENGTH = 2;
+const MANIFEST_KEYWORD_MAX_LENGTH = 30;
+// Optional `countries` manifest field: ISO 3166-1 alpha-2 codes of the
+// countries where the integration is usable; absent = worldwide.
+const MAX_MANIFEST_COUNTRIES = 20;
+const MANIFEST_COUNTRY_CODE_REGEX = /^[A-Z]{2}$/;
 // Inbound webhooks via Gladys Plus (B.17): the gateway relays third-party
 // webhook calls to the instance under a single integration-agnostic action;
 // the supervisor routes them to the declared integration. Two modes exist
@@ -736,6 +746,11 @@ module.exports = {
   ACCOUNT_FIELD_TYPES,
   DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
+  MAX_MANIFEST_KEYWORDS,
+  MANIFEST_KEYWORD_MIN_LENGTH,
+  MANIFEST_KEYWORD_MAX_LENGTH,
+  MAX_MANIFEST_COUNTRIES,
+  MANIFEST_COUNTRY_CODE_REGEX,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   WEBHOOK_DEFAULT_MODE,

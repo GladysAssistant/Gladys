@@ -1014,7 +1014,8 @@
       "external": "Communauté",
       "native": "Natif",
       "deprecated": "Bientôt dépréciée",
-      "new": "Nouveau"
+      "new": "Nouveau",
+      "installed": "Installée"
     },
     "root": {
       "title": "Intégrations",
@@ -1057,6 +1058,17 @@
         "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel). Votre appareil peut aussi être pris en charge par une <b>intégration externe</b> de la communauté : chacun peut en créer une et la publier dans le store, elle apparaît alors dans cette liste. Consultez la <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">documentation des intégrations externes</a>."
       },
       "orderDirNewest": "Nouveautés d'abord",
+      "orderDirUpdated": "Dernière mise à jour",
+      "clearFilters": "Effacer les filtres",
+      "countryFilter": {
+        "scoped": {
+          "one": "Affichage pour {{country}} : 1 intégration d'un autre pays est masquée.",
+          "other": "Affichage pour {{country}} : {{count}} intégrations d'autres pays sont masquées."
+        },
+        "showAll": "Voir tous les pays",
+        "all": "Tous les pays sont affichés.",
+        "showOnly": "Afficher seulement {{country}}"
+      },
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
@@ -1073,7 +1085,11 @@
         "network": "Réseau & présence",
         "notifications": "Messages & notifications",
         "assistants": "Assistants vocaux & IA",
-        "services": "Services"
+        "services": "Services",
+        "transport": "Transports & mobilité",
+        "vehicles": "Véhicules & recharge",
+        "servers": "Serveurs & auto-hébergement",
+        "leisure": "Loisirs, sport & jeux"
       }
     },
     "externalIntegration": {

@@ -45,6 +45,19 @@
   margin-top: 8px;
 }
 
+/* the "clear filters" link sits inside the count sentence: same size, no
+   button chrome */
+.clearFilters {
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.countryScope :global(.btn-link) {
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .mobileCategoryNav {
   display: block;
   margin-bottom: 1rem;

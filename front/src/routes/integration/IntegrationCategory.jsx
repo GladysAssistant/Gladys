@@ -4,6 +4,7 @@ import ScrollToTopLink from '../../components/router/ScrollToTopLink';
 import StatusBadge from './all/external-integration/components/StatusBadge';
 import { isNoteworthyExternalIntegrationStatus } from './all/external-integration/utils';
 import { RequestStatus } from '../../utils/consts';
+import { rememberCatalogScroll } from './catalog-url';
 import style from './style.css';
 
 // covers are lazy-loaded: with hundreds of cards (and the mobile list, hidden
@@ -38,6 +39,15 @@ const IntegrationTags = ({ integration, alwaysShowStatus }) => (
     )}
     {integration.external && (alwaysShowStatus || isNoteworthyExternalIntegrationStatus(integration.status)) && (
       <StatusBadge status={integration.status} className="integration-tag" />
+    )}
+    {/* what is already installed here, at a glance in every browse view. The
+        "Installed" view shows the live status of every card instead: there,
+        a second badge saying the same thing would be noise */}
+    {integration.externalInstalled && !alwaysShowStatus && (
+      <span class="badge badge-success integration-tag">
+        <i class="fe fe-check mr-1" />
+        <Text id="integration.tags.installed" />
+      </span>
     )}
     {integration.deprecated && (
       <span class="badge badge-danger integration-tag">
@@ -169,7 +179,7 @@ const IntegrationDescription = ({ integration }) =>
 export const IntegrationListItem = ({ integration, toggleFavorite, alwaysShowStatus, updateIntegration }) => (
   <div class={`list-group-item ${style.integrationListItem}`}>
     <div class={style.integrationListRow}>
-      <ScrollToTopLink href={integration.url}>
+      <ScrollToTopLink href={integration.url} onClick={rememberCatalogScroll}>
         {integration.external && !integration.img ? (
           <span class={style.externalListImgPlaceholder}>
             <i class="fe fe-package" />
@@ -188,7 +198,7 @@ export const IntegrationListItem = ({ integration, toggleFavorite, alwaysShowSta
           </Localizer>
         )}
       </ScrollToTopLink>
-      <ScrollToTopLink href={integration.url} class={style.integrationListContent}>
+      <ScrollToTopLink href={integration.url} onClick={rememberCatalogScroll} class={style.integrationListContent}>
         <div class="font-weight-bold">
           <IntegrationName integration={integration} />
         </div>
@@ -209,7 +219,7 @@ const IntegrationCategory = ({ integration, toggleFavorite, alwaysShowStatus, up
   <div class="col-sm-6 col-lg-4">
     <div class="card">
       <div class="card-img-container">
-        <ScrollToTopLink href={integration.url}>
+        <ScrollToTopLink href={integration.url} onClick={rememberCatalogScroll}>
           {integration.external && !integration.img ? (
             <div class={style.externalCoverPlaceholder}>
               <i class="fe fe-package" />
@@ -229,7 +239,7 @@ const IntegrationCategory = ({ integration, toggleFavorite, alwaysShowStatus, up
       </div>
       <div class="card-body d-flex flex-column">
         <h4 class="d-flex align-items-center">
-          <ScrollToTopLink href={integration.url} class="flex-fill">
+          <ScrollToTopLink href={integration.url} onClick={rememberCatalogScroll} class="flex-fill">
             <IntegrationName integration={integration} />
           </ScrollToTopLink>
           <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />

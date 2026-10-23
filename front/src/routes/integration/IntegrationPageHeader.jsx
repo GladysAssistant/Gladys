@@ -6,13 +6,15 @@ import InstallFromGithubCard from './all/external-integration/install-from-githu
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './style.css';
 
-// while no search narrows the list down, the displayed count and the total of
-// the current view are the same number: showing "75 of 75 integrations" is
-// noise, the total alone says everything
+// the count is always compared to the whole catalog: "42 of 810 integrations"
+// says at a glance how much the shelf, the facets or the search narrow it.
+// While nothing does, the two numbers are the same and "810 of 810" is noise:
+// the total alone says everything. Next to a narrowed count, one link releases
+// every filter at once.
 // while the community integrations load, the only count we could give is the
 // one of the native integrations: a small number that would read as the size
 // of the whole catalog. The header says the catalog is loading instead.
-const IntegrationCount = ({ loading, searching, integrationsLength, totalSize }) => {
+const IntegrationCount = ({ loading, narrowed, integrationsLength, totalSize, hasActiveFilters, clearFilters }) => {
   if (loading) {
     return (
       <span role="status">
@@ -21,12 +23,31 @@ const IntegrationCount = ({ loading, searching, integrationsLength, totalSize })
       </span>
     );
   }
-  return searching ? (
-    <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
-  ) : (
-    <Text id="integration.root.subtitleTotal" fields={{ total: totalSize }} />
+  return (
+    <span>
+      {narrowed ? (
+        <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
+      ) : (
+        <Text id="integration.root.subtitleTotal" fields={{ total: totalSize }} />
+      )}
+      {hasActiveFilters && clearFilters && (
+        <span>
+          {' · '}
+          <button type="button" class={`btn btn-link p-0 align-baseline ${style.clearFilters}`} onClick={clearFilters}>
+            <Text id="integration.root.clearFilters" />
+          </button>
+        </span>
+      )}
+    </span>
   );
 };
+
+const ORDER_DIR_OPTIONS = [
+  { value: 'asc', labelId: 'global.orderDirAsc' },
+  { value: 'desc', labelId: 'global.orderDirDesc' },
+  { value: 'newest', labelId: 'integration.root.orderDirNewest' },
+  { value: 'updated', labelId: 'integration.root.orderDirUpdated' }
+];
 
 const IntegrationPageHeader = ({
   intl,
@@ -37,12 +58,13 @@ const IntegrationPageHeader = ({
   integrationsLength,
   totalSize,
   loading,
-  showInstallFromGithub
+  showInstallFromGithub,
+  hasActiveFilters,
+  clearFilters
 }) => {
   const hasSearch = searchKeyword.length > 0;
-  // a search matching every integration of the view leaves the list untouched,
-  // so it is not a case for "X of Y" either
-  const searchNarrowsView = hasSearch && integrationsLength < totalSize;
+  // a view as large as the catalog (nothing hidden) is not a case for "X of Y"
+  const narrowed = integrationsLength < totalSize;
   // an empty view (the catalog still loading, no favorite yet) already displays
   // a message in the page body, "0 integrations" on top of it says nothing more
   const showCount = loading || hasSearch || totalSize > 0;
@@ -61,9 +83,11 @@ const IntegrationPageHeader = ({
             <div class="page-subtitle">
               <IntegrationCount
                 loading={loading}
-                searching={searchNarrowsView}
+                narrowed={narrowed}
                 integrationsLength={integrationsLength}
                 totalSize={totalSize}
+                hasActiveFilters={hasActiveFilters}
+                clearFilters={clearFilters}
               />
             </div>
           )}
@@ -79,7 +103,7 @@ const IntegrationPageHeader = ({
               search={search}
               searchValue={searchKeyword}
               searchPlaceHolder={searchPlaceholder}
-              extraOrderDirs={[{ value: 'newest', labelId: 'integration.root.orderDirNewest' }]}
+              extraOrderDirs={ORDER_DIR_OPTIONS.slice(2)}
             />
           </div>
         </div>
@@ -94,11 +118,7 @@ const IntegrationPageHeader = ({
             value={orderDir}
             onChange={changeOrderDir}
             selectClass={style.mobileSort}
-            options={[
-              { value: 'asc', labelId: 'global.orderDirAsc' },
-              { value: 'desc', labelId: 'global.orderDirDesc' },
-              { value: 'newest', labelId: 'integration.root.orderDirNewest' }
-            ]}
+            options={ORDER_DIR_OPTIONS}
           />
         </div>
         <div class={style.mobileSearch}>
@@ -124,9 +144,11 @@ const IntegrationPageHeader = ({
           <div class={style.mobileResultCount}>
             <IntegrationCount
               loading={loading}
-              searching={searchNarrowsView}
+              narrowed={narrowed}
               integrationsLength={integrationsLength}
               totalSize={totalSize}
+              hasActiveFilters={hasActiveFilters}
+              clearFilters={clearFilters}
             />
           </div>
         )}

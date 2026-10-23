@@ -520,6 +520,10 @@ const INTEGRATION_CATALOG_CATEGORIES = [
   'notifications',
   'assistants',
   'services',
+  'transport',
+  'vehicles',
+  'servers',
+  'leisure',
 ];
 
 // The timezone of the instance when the TIMEZONE system setting is not set: the
