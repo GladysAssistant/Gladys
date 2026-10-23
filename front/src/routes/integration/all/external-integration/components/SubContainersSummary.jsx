@@ -4,7 +4,7 @@ import { getLocalizedText } from '../utils';
 
 // Install screen summary of the `containers` authorization contract: the
 // user sees everything that will run (images, limits — memory, CPU, tasks,
-// /tmp size) and everything that will be exposed on the LAN (published
+// /tmp size —, requested Linux capabilities) and everything that will be exposed on the LAN (published
 // ports) before approving.
 const SubContainersSummary = ({ containers, language }) => (
   <div class="mb-4">
@@ -53,6 +53,14 @@ const SubContainersSummary = ({ containers, language }) => (
                     fields={{ size: container.tmp_mb || 64 }}
                   />
                 </small>
+                {(container.capabilities || []).length > 0 && (
+                  <div>
+                    <small class="text-muted">
+                      <Text id="integration.externalIntegration.subContainers.capabilitiesLabel" />{' '}
+                      {container.capabilities.join(', ')}
+                    </small>
+                  </div>
+                )}
               </td>
               <td>
                 {(container.ports || []).length === 0 ? (

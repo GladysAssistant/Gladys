@@ -1034,6 +1034,8 @@ describe('externalIntegration.validateManifest', () => {
             { container_port: 8555, protocol: 'udp', label: { en: 'WebRTC (UDP)' }, browsable: false },
           ],
           devices: ['coral-usb', 'gpu'],
+          // s6-overlay init: chown as root, then s6-setuidgid
+          capabilities: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'FSETID', 'SETGID', 'SETUID', 'KILL', 'NET_BIND_SERVICE'],
         },
       ],
     };
@@ -1200,6 +1202,50 @@ describe('externalIntegration.validateManifest', () => {
       const manifest = { ...TEST_MANIFEST, containers: [{ ...base, ...limits }] };
       expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
     });
+  });
+
+  it('should accept the whole capability allowlist — Docker default set — in a sub-container', () => {
+    const capabilities = [
+      'CHOWN',
+      'DAC_OVERRIDE',
+      'FSETID',
+      'FOWNER',
+      'MKNOD',
+      'NET_RAW',
+      'SETGID',
+      'SETUID',
+      'SETFCAP',
+      'SETPCAP',
+      'NET_BIND_SERVICE',
+      'SYS_CHROOT',
+      'KILL',
+      'AUDIT_WRITE',
+    ];
+    const manifest = { ...TEST_MANIFEST, containers: [{ name: 'frigate', docker_image: 'img:1.0.0', capabilities }] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject capabilities outside the allowlist, duplicated or too many', () => {
+    const base = { name: 'frigate', docker_image: 'img:1.0.0' };
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, capabilities: 'CHOWN' }] },
+      'containers[0].capabilities: must be an array of at most 14 Linux capabilities',
+    );
+    // beyond Docker's default set: the sandbox would no longer mean anything
+    ['SYS_ADMIN', 'NET_ADMIN', 'SYS_PTRACE', 'ALL', 'chown', 'CAP_CHOWN', 42].forEach((capability) => {
+      expect422(
+        { ...TEST_MANIFEST, containers: [{ ...base, capabilities: ['CHOWN', capability] }] },
+        'containers[0].capabilities[1]: must be one of CHOWN, DAC_OVERRIDE',
+      );
+    });
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, capabilities: ['CHOWN', 'CHOWN'] }] },
+      'containers[0].capabilities[1]: duplicate capability "CHOWN"',
+    );
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, capabilities: new Array(15).fill('CHOWN') }] },
+      'containers[0].capabilities: must be an array of at most 14',
+    );
   });
 
   it('should reject out-of-bounds sub-container limits', () => {

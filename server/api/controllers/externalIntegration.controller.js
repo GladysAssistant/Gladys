@@ -207,16 +207,18 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @api {post} /api/v1/external_integration/:selector/hardware setHardware
    * @apiName setHardware
    * @apiGroup ExternalIntegration
-   * @apiDescription Complete list of granted hardware classes (replaces the
-   * previous one; classes not requested by the manifest -> 422). The
-   * affected sub-containers are recreated and the integration is notified
-   * (hardware-updated).
+   * @apiDescription Complete list of granted hardware classes
+   * (`granted_devices`) and/or of granted Linux capabilities
+   * (`granted_capabilities`); each sent list replaces the previous one, an
+   * omitted one is left unchanged; items not requested by the manifest ->
+   * 422. The affected sub-containers are recreated and the integration is
+   * notified (hardware-updated).
    */
   async function setHardware(req, res) {
-    const integration = await gladys.externalIntegration.setGrantedDevices(
-      req.params.selector,
-      req.body.granted_devices,
-    );
+    const integration = await gladys.externalIntegration.setHardwareGrants(req.params.selector, {
+      grantedDevices: req.body.granted_devices,
+      grantedCapabilities: req.body.granted_capabilities,
+    });
     const containers = await gladys.externalIntegration.getSubContainersState(integration);
     res.json({
       ...integration,
@@ -240,14 +242,26 @@ module.exports = function ExternalIntegrationController(gladys) {
       docker_image: dockerImage,
       manifest,
       granted_devices: grantedDevices,
+      granted_capabilities: grantedCapabilities,
     } = req.body;
     let integration;
     if (storeSlug) {
-      integration = await gladys.externalIntegration.installFromStore(storeSlug, { grantedDevices });
+      integration = await gladys.externalIntegration.installFromStore(storeSlug, {
+        grantedDevices,
+        grantedCapabilities,
+      });
     } else if (repoUrl) {
-      integration = await gladys.externalIntegration.installFromRepoUrl(repoUrl, { grantedDevices });
+      integration = await gladys.externalIntegration.installFromRepoUrl(repoUrl, {
+        grantedDevices,
+        grantedCapabilities,
+      });
     } else if (dockerImage) {
-      integration = await gladys.externalIntegration.install({ dockerImage, manifest, grantedDevices });
+      integration = await gladys.externalIntegration.install({
+        dockerImage,
+        manifest,
+        grantedDevices,
+        grantedCapabilities,
+      });
     } else {
       throw new BadParameters('store_slug, repo_url or docker_image is required');
     }

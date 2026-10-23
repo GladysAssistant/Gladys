@@ -21,6 +21,7 @@ const {
   SUB_CONTAINER_TMP_MIN_MB,
   SUB_CONTAINER_TMP_MAX_MB,
   SUB_CONTAINER_START_MODES,
+  SUB_CONTAINER_CAPABILITIES,
   HARDWARE_CLASSES,
   NETWORK_DISCOVERY_TYPES,
   MAX_NETWORK_DISCOVERY_ENTRIES,
@@ -119,6 +120,7 @@ const SUB_CONTAINER_FIELDS = [
   'volumes',
   'ports',
   'devices',
+  'capabilities',
   'read_only',
   'memory_mb',
   'cpu',
@@ -1045,6 +1047,27 @@ function validateSubContainer(entry, index, seenNames, errors, seenPortNames) {
           errors.push(`${path}.devices[${classIndex}]: duplicate class "${hardwareClass}"`);
         } else {
           seenClasses.add(hardwareClass);
+        }
+      });
+    }
+  }
+  if (entry.capabilities !== undefined) {
+    if (!Array.isArray(entry.capabilities) || entry.capabilities.length > SUB_CONTAINER_CAPABILITIES.length) {
+      errors.push(
+        `${path}.capabilities: must be an array of at most ${SUB_CONTAINER_CAPABILITIES.length} Linux capabilities`,
+      );
+    } else {
+      const seenCapabilities = new Set();
+      entry.capabilities.forEach((capability, capabilityIndex) => {
+        if (!SUB_CONTAINER_CAPABILITIES.includes(capability)) {
+          // closed allowlist = Docker's default set: SYS_ADMIN & co. never
+          errors.push(
+            `${path}.capabilities[${capabilityIndex}]: must be one of ${SUB_CONTAINER_CAPABILITIES.join(', ')}`,
+          );
+        } else if (seenCapabilities.has(capability)) {
+          errors.push(`${path}.capabilities[${capabilityIndex}]: duplicate capability "${capability}"`);
+        } else {
+          seenCapabilities.add(capability);
         }
       });
     }

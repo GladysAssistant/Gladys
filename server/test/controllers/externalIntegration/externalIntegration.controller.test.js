@@ -513,9 +513,16 @@ describe('External integration admin API', () => {
       );
       const res = await authenticatedRequest
         .post('/api/v1/external_integration')
-        .send({ store_slug: 'john/gladys-open-meteo-demo' })
+        .send({ store_slug: 'john/gladys-open-meteo-demo', granted_devices: ['gpu'], granted_capabilities: ['CHOWN'] })
         .expect(201);
       expect(res.body).to.have.property('selector', 'ext-john-gladys-open-meteo-demo');
+      // the grants of the install screen are relayed as they are
+      expect(
+        gladys.externalIntegration.installFromStore.calledWith('john/gladys-open-meteo-demo', {
+          grantedDevices: ['gpu'],
+          grantedCapabilities: ['CHOWN'],
+        }),
+      ).to.equal(true);
     });
 
     it('should install from a GitHub repo URL', async () => {
@@ -871,6 +878,34 @@ describe('External integration admin API', () => {
       expect(serviceInDb.granted_devices).to.deep.equal(['coral-usb']);
     });
 
+    it('should persist the granted capabilities, leaving the hardware grants unchanged', async () => {
+      const service = await seedExternalService({
+        manifest: {
+          ...TEST_MANIFEST,
+          containers: [{ name: 'frigate', docker_image: 'img:1.0.0', capabilities: ['CHOWN', 'SETUID'] }],
+        },
+      });
+      stubInstance(gladys.system, 'detectHardwareClasses', fake.resolves([]));
+      const res = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/hardware`)
+        .send({ granted_capabilities: ['CHOWN', 'SETUID'] })
+        .expect(200);
+      expect(res.body.granted_capabilities).to.deep.equal(['CHOWN', 'SETUID']);
+      expect(res.body.granted_devices).to.equal(null);
+      expect(res.body.containers[0].capabilities).to.deep.equal([
+        { name: 'CHOWN', granted: true },
+        { name: 'SETUID', granted: true },
+      ]);
+    });
+
+    it('should return 422 on capabilities not requested by the manifest', async () => {
+      const service = await seedExternalService();
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/hardware`)
+        .send({ granted_capabilities: ['CHOWN'] })
+        .expect(422);
+    });
+
     it('should return 422 on classes not requested by the manifest', async () => {
       const service = await seedExternalService();
       await authenticatedRequest
@@ -1019,6 +1054,7 @@ describe('External integration admin API', () => {
             },
           ],
           devices: [],
+          capabilities: [],
         },
       ]);
     });

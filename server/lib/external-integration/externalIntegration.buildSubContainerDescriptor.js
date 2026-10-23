@@ -21,6 +21,7 @@ const BYTES_PER_MB = 1024 * 1024;
  * the integration data folder (the manifest never chooses a host path), host
  * ports chosen by Gladys,
  * devices = requested (manifest) ∩ granted (user) ∩ present (detection),
+ * CapAdd = requested ∩ granted Linux capabilities (on top of CapDrop ALL),
  * and limits sized by the manifest within the validated bounds (memory, CPU,
  * /dev/shm, tasks, /tmp size — never the flags).
  * @param {object} service - The external integration service (plain object).
@@ -50,6 +51,10 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
         devices.push({ PathOnHost: path, PathInContainer: path, CgroupPermissions: 'rwm' });
       });
     });
+  // capabilities: requested ∩ granted, added back on top of CapDrop ALL —
+  // the manifest allowlist is Docker's default set, never beyond it (C.1)
+  const grantedCapabilities = Array.isArray(service.granted_capabilities) ? service.granted_capabilities : [];
+  const capAdd = (entry.capabilities || []).filter((capability) => grantedCapabilities.includes(capability));
   // each volume is mounted from a host path DERIVED by the supervisor: a
   // sub-container cannot write outside the folder of its integration; the
   // main container sees these volumes under /data/containers/<name>/...
@@ -90,6 +95,7 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
       RestartPolicy: { Name: 'no' },
       ReadonlyRootfs: entry.read_only !== false,
       CapDrop: ['ALL'],
+      ...(capAdd.length > 0 ? { CapAdd: capAdd } : {}),
       SecurityOpt: ['no-new-privileges'],
       Memory: memoryInBytes,
       MemorySwap: memoryInBytes,

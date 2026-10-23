@@ -20,6 +20,7 @@
 | `token_version` | INTEGER default 0 | integration JWT invalidation (see B.3) |
 | `store_slug` | STRING nullable | link to the store index entry (`owner/repo`) for update detection; null for dev installs |
 | `granted_devices` | JSON nullable | hardware access classes **granted by the user** (subset of the classes requested by the manifest, see B.2); null = none |
+| `granted_capabilities` | JSON nullable | Linux capabilities **granted by the user** (subset of the `capabilities` requested by the manifest sub-containers, flat list of names like `granted_devices`, see B.2); null = none; migration `20261023000000-add-external-integration-granted-capabilities` |
 
 All nullable/defaulted for existing internal services. **Derivation of the `selector`** (and the `name`): `ext-` prefix to avoid any collision with a future native service (`service.load` looks up by `(pod_id: null, name)`), then — store or `repo_url` install: `ext-<owner>-<repo>` slugified, **unique by construction** (it is the `store_slug`); dev install by image: `ext-dev-<slugified manifest name>`, numeric suffix on collision.
 

@@ -67,6 +67,28 @@ const SUB_CONTAINER_TMP_MIN_MB = 64;
 const SUB_CONTAINER_TMP_MAX_MB = 2048;
 const SUB_CONTAINER_TMP_DEFAULT_MB = 64;
 const SUB_CONTAINER_START_MODES = ['auto', 'manual'];
+// Linux capabilities a sub-container may request on top of `CapDrop ALL`:
+// a closed allowlist that is exactly Docker's default capability set, so a
+// granted request can at most restore what a plain `docker run` gives —
+// never SYS_ADMIN, NET_ADMIN, SYS_PTRACE... Field need: upstream images
+// whose init runs as root and drops privileges itself (Frigate's s6-overlay
+// chowns /dev/shm/logs, then switches users with s6-setuidgid).
+const SUB_CONTAINER_CAPABILITIES = [
+  'CHOWN',
+  'DAC_OVERRIDE',
+  'FSETID',
+  'FOWNER',
+  'MKNOD',
+  'NET_RAW',
+  'SETGID',
+  'SETUID',
+  'SETFCAP',
+  'SETPCAP',
+  'NET_BIND_SERVICE',
+  'SYS_CHROOT',
+  'KILL',
+  'AUDIT_WRITE',
+];
 // Named hardware access classes (curated list, never a free /dev path).
 // `path`: the class is a fixed path relative to /dev; `prefix`: every /dev
 // entry starting with the prefix belongs to the class (e.g. /dev/video0...).
@@ -655,6 +677,7 @@ module.exports = {
   SUB_CONTAINER_TMP_MAX_MB,
   SUB_CONTAINER_TMP_DEFAULT_MB,
   SUB_CONTAINER_START_MODES,
+  SUB_CONTAINER_CAPABILITIES,
   HARDWARE_CLASSES,
   SUB_CONTAINER_PORTS_VARIABLE,
   SUB_CONTAINER_DESIRED_VARIABLE,

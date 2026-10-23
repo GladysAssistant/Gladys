@@ -4,7 +4,7 @@ import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
-import { getRequestedHardwareClasses } from '../utils';
+import { getRequestedHardwareClasses, getRequestedCapabilities } from '../utils';
 import { hasDynamicSource, fetchDynamicOptions } from '../../../../../components/integration/dynamicOptions';
 import { RequestStatus } from '../../../../../utils/consts';
 import {
@@ -49,6 +49,7 @@ class ExternalIntegrationConfigPage extends Component {
         touchedSecrets: {},
         actionFieldValues: this.buildActionFieldValues(integration),
         grantedDevices: integration.granted_devices || [],
+        grantedCapabilities: integration.granted_capabilities || [],
         loadStatus: RequestStatus.Success
       });
       if (get(integration, 'manifest.type') === 'communication') {
@@ -552,16 +553,40 @@ class ExternalIntegrationConfigPage extends Component {
     });
   };
 
+  toggleCapability = capability => {
+    const { grantedCapabilities = [] } = this.state;
+    this.setState({
+      grantedCapabilities: grantedCapabilities.includes(capability)
+        ? grantedCapabilities.filter(grantedCapability => grantedCapability !== capability)
+        : grantedCapabilities.concat([capability]),
+      hardwareStatus: null
+    });
+  };
+
   saveHardware = async () => {
     this.setState({ hardwareStatus: RequestStatus.Getting });
     try {
+      // only what the current manifest requests: an update may have dropped
+      // a request still present in the stored grants (the server answers 422
+      // on a grant the manifest does not request)
+      const containers = get(this.state.integration, 'manifest.containers') || [];
+      const requestedClasses = getRequestedHardwareClasses(containers);
+      const requestedCapabilities = getRequestedCapabilities(containers);
       const integration = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/hardware`,
-        { granted_devices: this.state.grantedDevices || [] }
+        {
+          granted_devices: (this.state.grantedDevices || []).filter(hardwareClass =>
+            requestedClasses.includes(hardwareClass)
+          ),
+          granted_capabilities: (this.state.grantedCapabilities || []).filter(capability =>
+            requestedCapabilities.includes(capability)
+          )
+        }
       );
       this.setState({
         integration,
         grantedDevices: integration.granted_devices || [],
+        grantedCapabilities: integration.granted_capabilities || [],
         hardwareStatus: RequestStatus.Success
       });
     } catch (e) {
@@ -796,6 +821,7 @@ class ExternalIntegrationConfigPage extends Component {
           disableCalendarAccount={this.disableCalendarAccount}
           toggleUserCalendar={this.toggleUserCalendar}
           toggleHardwareClass={this.toggleHardwareClass}
+          toggleCapability={this.toggleCapability}
           saveHardware={this.saveHardware}
         />
       </ExternalIntegrationPage>

@@ -749,6 +749,7 @@ describe('Integration host API', () => {
           docker_image: 'ghcr.io/blakeblackshear/frigate:0.14.1',
           ports: [{ container_port: 5000, label: { en: 'Frigate UI' } }],
           devices: ['coral-usb'],
+          capabilities: ['CHOWN', 'SETUID'],
         },
       ],
     };
@@ -760,7 +761,11 @@ describe('Integration host API', () => {
 
     beforeEach(async () => {
       await db.Service.destroy({ where: { id: service.id } });
-      service = await seedExternalService({ manifest: CONTAINERS_MANIFEST, granted_devices: ['coral-usb'] });
+      service = await seedExternalService({
+        manifest: CONTAINERS_MANIFEST,
+        granted_devices: ['coral-usb'],
+        granted_capabilities: ['CHOWN'],
+      });
       token = generateIntegrationToken(service.id, 1, 'secret');
       gladys.externalIntegration.available = true;
       stubSystem('detectHardwareClasses', () =>
@@ -792,6 +797,12 @@ describe('Integration host API', () => {
       expect(res.body.containers[0].desired).to.equal('stopped');
       expect(res.body.containers[1].desired).to.equal('running');
       expect(res.body.containers[1].devices).to.deep.equal([{ class: 'coral-usb', granted: true, available: true }]);
+      // what is missing, for the integration to tell the user
+      expect(res.body.containers[0].capabilities).to.deep.equal([]);
+      expect(res.body.containers[1].capabilities).to.deep.equal([
+        { name: 'CHOWN', granted: true },
+        { name: 'SETUID', granted: false },
+      ]);
     });
 
     it('should start, stop and restart a declared sub-container', async () => {

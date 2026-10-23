@@ -1385,7 +1385,8 @@
         "limitsLabel": "Limites",
         "portsLabel": "Ports exposés",
         "pidsLimitValue": "{{count}} processus max",
-        "tmpSizeValue": "{{size}} Mo /tmp"
+        "tmpSizeValue": "{{size}} Mo /tmp",
+        "capabilitiesLabel": "Capacités Linux :"
       },
       "hardware": {
         "title": "Matériel",
@@ -1400,6 +1401,27 @@
           "coral-pcie": "Coral PCIe",
           "gpu": "GPU (accélération graphique)",
           "video": "Caméras (périphériques vidéo)"
+        }
+      },
+      "capabilities": {
+        "title": "Capacités Linux",
+        "installDescription": "Certains conteneurs de cette intégration démarrent en root et ont besoin d'une partie des droits qu'un conteneur Docker classique a par défaut (par exemple pour donner leurs propres fichiers à l'utilisateur sous lequel ils tournent ensuite). Gladys retire tous ces droits par défaut ; chacun ci-dessous n'est accordé que si vous le laissez coché, et ne va jamais au-delà de ce que Docker accorde à un conteneur standard. Un conteneur privé d'une capacité dont il a besoin peut ne pas démarrer. Vous pourrez modifier ce choix à tout moment après l'installation.",
+        "configDescription": "Capacités Linux accordées aux conteneurs de cette intégration (toutes dans le jeu par défaut de Docker). En modifier une recrée les conteneurs concernés et prévient l'intégration.",
+        "descriptions": {
+          "CHOWN": "Changer le propriétaire de fichiers (par exemple donner ses dossiers de logs ou de configuration à l'utilisateur du service).",
+          "DAC_OVERRIDE": "Lire et écrire des fichiers quelles que soient leurs permissions, dans le conteneur.",
+          "FSETID": "Conserver les bits de permission spéciaux des fichiers qu'il modifie.",
+          "FOWNER": "Modifier les permissions de fichiers dont il n'est pas propriétaire, dans le conteneur.",
+          "MKNOD": "Créer des fichiers spéciaux de périphérique (cela ne donne aucun accès au matériel de votre machine).",
+          "NET_RAW": "Utiliser des sockets réseau bruts (par exemple ping).",
+          "SETGID": "Passer sous un autre groupe (abandonner ses privilèges après un démarrage en root).",
+          "SETUID": "Passer sous un autre utilisateur (abandonner ses privilèges après un démarrage en root).",
+          "SETFCAP": "Poser des capacités sur des fichiers.",
+          "SETPCAP": "Transmettre ses propres capacités aux processus qu'il lance, ou les abandonner.",
+          "NET_BIND_SERVICE": "Écouter sur des ports réseau inférieurs à 1024 dans le conteneur (par exemple un serveur web sur le port 80).",
+          "SYS_CHROOT": "Changer son répertoire racine (utilisé par certains superviseurs de services).",
+          "KILL": "Envoyer des signaux à ses propres processus (arrêter et relancer les services qu'il supervise).",
+          "AUDIT_WRITE": "Écrire dans le journal d'audit du noyau."
         }
       },
       "webhooks": {

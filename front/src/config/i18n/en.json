@@ -1385,7 +1385,8 @@
         "limitsLabel": "Limits",
         "portsLabel": "Exposed ports",
         "pidsLimitValue": "{{count}} processes max",
-        "tmpSizeValue": "{{size}} MB /tmp"
+        "tmpSizeValue": "{{size}} MB /tmp",
+        "capabilitiesLabel": "Linux capabilities:"
       },
       "hardware": {
         "title": "Hardware",
@@ -1400,6 +1401,27 @@
           "coral-pcie": "Coral PCIe",
           "gpu": "GPU (graphics acceleration)",
           "video": "Cameras (video devices)"
+        }
+      },
+      "capabilities": {
+        "title": "Linux capabilities",
+        "installDescription": "Some containers of this integration start as root and need part of the rights a plain Docker container has by default (for example to give their own files to the user they then switch to). Gladys removes all these rights by default; each one below is granted only if you leave it checked, and it never goes beyond what Docker grants a standard container. A container without a capability it needs may fail to start. You can change this at any time after the install.",
+        "configDescription": "Linux capabilities granted to the containers of this integration (all within Docker's default set). Changing one recreates the affected containers and notifies the integration.",
+        "descriptions": {
+          "CHOWN": "Change the owner of files (e.g. hand its log or config folders to the user the service runs as).",
+          "DAC_OVERRIDE": "Read and write files regardless of their permissions, inside the container.",
+          "FSETID": "Keep the special permission bits of files it modifies.",
+          "FOWNER": "Change the permissions of files it does not own, inside the container.",
+          "MKNOD": "Create special device files (it gives no access to the hardware of your machine).",
+          "NET_RAW": "Use raw network sockets (e.g. ping).",
+          "SETGID": "Switch to another group (drop privileges after starting as root).",
+          "SETUID": "Switch to another user (drop privileges after starting as root).",
+          "SETFCAP": "Set capabilities on files.",
+          "SETPCAP": "Pass its own capabilities on to the processes it starts, or drop them.",
+          "NET_BIND_SERVICE": "Listen on network ports below 1024 inside the container (e.g. a web server on port 80).",
+          "SYS_CHROOT": "Change its root directory (used by some service supervisors).",
+          "KILL": "Send signals to its own processes (stop and restart the services it supervises).",
+          "AUDIT_WRITE": "Write to the kernel audit log."
         }
       },
       "webhooks": {

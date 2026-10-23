@@ -136,6 +136,20 @@ export const getRequestedHardwareClasses = containers => {
   return requestedClasses;
 };
 
+// Union of the Linux capabilities requested by the sub-container
+// declarations of a manifest, in declaration order.
+export const getRequestedCapabilities = containers => {
+  const requestedCapabilities = [];
+  (containers || []).forEach(container => {
+    (container.capabilities || []).forEach(capability => {
+      if (!requestedCapabilities.includes(capability)) {
+        requestedCapabilities.push(capability);
+      }
+    });
+  });
+  return requestedCapabilities;
+};
+
 // Effective transport of a device, reported by the integration through the
 // reserved GLADYS_TRANSPORT param (local | cloud | unreachable), or null.
 export const getDeviceTransport = device => {

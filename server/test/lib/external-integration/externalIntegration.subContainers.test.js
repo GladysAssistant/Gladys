@@ -464,11 +464,29 @@ describe('externalIntegration.getSubContainersState', () => {
         inspectContainer: fake.resolves({ State: { Running: true, StartedAt: '2026-07-13T08:00:00.000Z' } }),
       },
     });
-    const service = await seedMultiContainerService();
+    // frigate requests two capabilities, the user granted one of them
+    const service = await seedMultiContainerService({
+      manifest: {
+        ...TEST_CONTAINERS_MANIFEST,
+        containers: [
+          TEST_CONTAINERS_MANIFEST.containers[0],
+          { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN', 'SETUID'] },
+        ],
+      },
+      granted_capabilities: ['CHOWN'],
+    });
     await variable.setValue(SUB_CONTAINER_PORTS_VARIABLE, JSON.stringify({ 'frigate/5000/tcp': 42115 }), service.id);
     const state = await externalIntegration.getSubContainersState(service);
     expect(state).to.deep.equal([
-      { name: 'mqtt', status: 'stopped', desired: 'stopped', started_at: null, ports: [], devices: [] },
+      {
+        name: 'mqtt',
+        status: 'stopped',
+        desired: 'stopped',
+        started_at: null,
+        ports: [],
+        devices: [],
+        capabilities: [],
+      },
       {
         name: 'frigate',
         status: 'running',
@@ -487,6 +505,10 @@ describe('externalIntegration.getSubContainersState', () => {
         devices: [
           { class: 'coral-usb', granted: true, available: true },
           { class: 'gpu', granted: false, available: true },
+        ],
+        capabilities: [
+          { name: 'CHOWN', granted: true },
+          { name: 'SETUID', granted: false },
         ],
       },
     ]);

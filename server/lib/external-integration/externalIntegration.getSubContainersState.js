@@ -9,7 +9,9 @@ const { SUB_CONTAINER_PORTS_VARIABLE } = require('./constants');
  * status, desired state, start date, assigned host ports and, per requested
  * hardware class, the granted/available flags — this is how the integration
  * knows what to put in its own config (e.g. `edgetpu` vs `cpu` detector for
- * Frigate). Also feeds the supervision block of the frontend.
+ * Frigate) — and, per requested Linux capability, the granted flag (so the
+ * integration can tell the user what is missing). Also feeds the
+ * supervision block of the frontend.
  * @param {object} service - The external integration service (plain object).
  * @returns {Promise<Array>} Resolve with the list of sub-container states.
  * @example
@@ -37,6 +39,7 @@ async function getSubContainersState(service) {
     logger.debug('Unable to detect hardware classes', e);
   }
   const grantedClasses = Array.isArray(service.granted_devices) ? service.granted_devices : [];
+  const grantedCapabilities = Array.isArray(service.granted_capabilities) ? service.granted_capabilities : [];
   return Promise.map(entries, async (entry) => {
     let status = 'stopped';
     let startedAt = null;
@@ -76,6 +79,10 @@ async function getSubContainersState(service) {
         available: Boolean(detected && detected.detected),
       };
     });
+    const capabilities = (entry.capabilities || []).map((capability) => ({
+      name: capability,
+      granted: grantedCapabilities.includes(capability),
+    }));
     return {
       name: entry.name,
       status,
@@ -83,6 +90,7 @@ async function getSubContainersState(service) {
       started_at: startedAt,
       ports,
       devices,
+      capabilities,
     };
   });
 }

@@ -95,6 +95,31 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
     expect(descriptor.HostConfig.Tmpfs).to.deep.equal({ '/tmp': 'rw,noexec,nosuid,size=1024m' });
   });
 
+  it('should add back the requested and granted capabilities only, on top of CapDrop ALL', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // the user granted CHOWN and SETUID, plus KILL which this entry does
+    // not request (another sub-container may)
+    const service = await seedExternalService({
+      manifest: TEST_CONTAINERS_MANIFEST,
+      granted_capabilities: ['CHOWN', 'SETUID', 'KILL'],
+    });
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN', 'SETGID', 'SETUID'] };
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.CapDrop).to.deep.equal(['ALL']);
+    expect(descriptor.HostConfig.CapAdd).to.deep.equal(['CHOWN', 'SETUID']);
+    expect(descriptor.HostConfig.SecurityOpt).to.deep.equal(['no-new-privileges']);
+  });
+
+  it('should omit CapAdd when nothing requested is granted', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN'] };
+    // requested but never granted (null column: install without grant)
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.CapDrop).to.deep.equal(['ALL']);
+    expect(descriptor.HostConfig).to.not.have.property('CapAdd');
+  });
+
   it('should publish the 4 declared ports of a sub-container', async () => {
     const { externalIntegration, variable } = buildSupervisor();
     const ports = [
