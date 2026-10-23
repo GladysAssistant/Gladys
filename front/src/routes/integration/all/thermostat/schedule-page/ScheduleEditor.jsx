@@ -19,7 +19,9 @@ import {
   transitionsToRanges,
   rangesToTransitions,
   isAllDayRange,
-  mergeTouchingRanges
+  mergeTouchingRanges,
+  trimRangesAround,
+  removeRangeAndFill
 } from '../../../../../../../server/utils/thermostatRanges';
 
 const DAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -150,86 +152,6 @@ class ScheduleEditor extends Component {
 
   dayRanges = (ranges, day) => ranges.filter(r => r.day_of_week === day).sort(byStart);
 
-  // Two ranges covering the same minute have no meaning: only one preset can be
-  // in force at a time, and the points they convert to would silently drop the
-  // overlap rather than honour it. The one being added wins, and what it covers
-  // is trimmed around it (`trimForRange`).
-  //
-  // The day/minute stretches a range occupies. One for a range inside its day, two
-  // for one crossing midnight: the tail of its own day, then the head of the next.
-  rangeSpans = range => {
-    const start = timeToMinutes(range.start_time);
-    const end = timeToMinutes(range.end_time);
-    if (end > start) {
-      return [{ day: range.day_of_week, start, end }];
-    }
-    const spans = [{ day: range.day_of_week, start, end: DAY_MINUTES }];
-    if (end > 0) {
-      spans.push({ day: (range.day_of_week + 1) % 7, start: 0, end });
-    }
-    return spans;
-  };
-
-  // Make room for a new range by trimming what it covers, rather than refusing it.
-  //
-  // On a real schedule every day is already covered — the night runs to the next
-  // morning — so there is no free gap to add into, and "comfort from 12 to 14"
-  // was refused as an overlap. The user had to shorten the eco range first, then
-  // add. Trimming is the gesture they meant: what the new range covers gives way.
-  //
-  // A range the new one sits inside is split in two; one it merely clips is
-  // shortened on that side; one it swallows entirely disappears. A range crossing
-  // midnight is handled through the same day/minute spans as the overlap check,
-  // so a night is trimmed on the day it is stored on.
-  trimForRange = (ranges, candidate, ignoredKey = null) => {
-    const candidateSpans = this.rangeSpans(candidate);
-    const covers = (day, start, end) =>
-      candidateSpans.some(span => span.day === day && span.start < end && start < span.end);
-
-    const result = [];
-    ranges.forEach(range => {
-      if (range.key === ignoredKey) {
-        result.push(range);
-        return;
-      }
-      const start = timeToMinutes(range.start_time);
-      const rawEnd = timeToMinutes(range.end_time);
-      // An overnight range is measured past midnight, so a single interval
-      // describes it; the covering test below maps it back onto its days.
-      const end = rawEnd <= start ? rawEnd + DAY_MINUTES : rawEnd;
-      const spans = this.rangeSpans(range);
-      if (!spans.some(span => covers(span.day, span.start, span.end))) {
-        result.push(range);
-        return;
-      }
-      // Where the new range falls inside this one's own timeline.
-      const cutStart = candidateSpans.reduce((acc, span) => {
-        const absolute = span.day === range.day_of_week ? span.start : span.start + DAY_MINUTES;
-        return absolute > start && absolute < end ? Math.min(acc, absolute) : acc;
-      }, Infinity);
-      const cutEnd = candidateSpans.reduce((acc, span) => {
-        const absolute = span.day === range.day_of_week ? span.end : span.end + DAY_MINUTES;
-        return absolute > start && absolute < end ? Math.max(acc, absolute) : acc;
-      }, -Infinity);
-
-      const keepsHead = cutStart !== Infinity && cutStart > start;
-      const keepsTail = cutEnd !== -Infinity && cutEnd < end;
-      if (keepsHead) {
-        result.push({ ...range, end_time: minutesToTime(cutStart) });
-      }
-      if (keepsTail) {
-        result.push({
-          ...range,
-          key: `${range.key}-tail-${cutEnd}`,
-          start_time: minutesToTime(cutEnd),
-          end_time: range.end_time
-        });
-      }
-      // Neither head nor tail survives: the new range swallows this one whole.
-    });
-    return result;
-  };
-
   // ── Adding a point ────────────────────────────────────────────────────────
 
   openNewForm = day => {
@@ -310,7 +232,7 @@ class ScheduleEditor extends Component {
     const candidate = { day_of_week: day, start_time: startTime, end_time: endTime };
     // Two ranges starting at the same moment would give one point: replace
     // rather than add, so the second entry is the one that stands.
-    const withoutSameStart = this.trimForRange(this.state.ranges, candidate).filter(
+    const withoutSameStart = trimRangesAround(this.state.ranges, candidate).filter(
       r => !(r.day_of_week === day && r.start_time === startTime)
     );
     this.setState(prev => ({
@@ -368,17 +290,20 @@ class ScheduleEditor extends Component {
     if (!form) return;
     const { start_time: startTime, end_time: endTime } = formTimes(form);
     if (!startTime || !endTime) return;
-    if (!form.all_day && startTime === endTime) {
+    const edited = this.state.ranges.find(r => r.key === key);
+    // A 24-hour range already there — two neighbours merged into 20:00 → 20:00 —
+    // can still have its preset changed: only typing equal times is a slip.
+    const keepsItsTimes = edited && startTime === edited.start_time && endTime === edited.end_time;
+    if (!form.all_day && startTime === endTime && !keepsItsTimes) {
       this.setState(prev => ({
         editForms: { ...prev.editForms, [key]: { ...prev.editForms[key], rowError: 'same-time' } }
       }));
       return;
     }
-    const edited = this.state.ranges.find(r => r.key === key);
     const candidate = { day_of_week: edited.day_of_week, start_time: startTime, end_time: endTime };
     this.setState(prev => {
       const edited = prev.ranges.find(r => r.key === key);
-      const ranges = this.trimForRange(prev.ranges, candidate, key)
+      const ranges = trimRangesAround(prev.ranges, candidate, key)
         // A move onto another range's start replaces it: two ranges starting at
         // the same moment would collapse into one point anyway.
         .filter(r => r.key === key || !(r.day_of_week === edited.day_of_week && r.start_time === startTime))
@@ -389,62 +314,13 @@ class ScheduleEditor extends Component {
     });
   };
 
-  // Deleting a range leaves nothing running in its place: the points it opened
-  // and closed both go, and the thermostat keeps whatever the range before it
-  // set — exactly what the stored programme then says.
-  // Deleting a range hands its time to the range before it, rather than leaving a
-  // gap. A gap is not nothing: `rangesToTransitions` stores it as an Off point, so
-  // deleting the 08:30-17:00 eco range used to write `08:30 off` and cut the
-  // heating until 17:00 — while the editor drew hatching and the legend promised
-  // the previous preset carried on. Stopping the heating is something the user
-  // asks for with the Off preset; it is never a side effect of a deletion.
-  //
-  // The predecessor is found on the week's own timeline, so it may sit on an
-  // earlier day — the night before, or Sunday for a Monday morning range. When
-  // there is none (the only range of the week), the gap stands and the schedule
-  // is simply empty.
+  // Deleting a range hands its time to the range before it, rather than leaving
+  // a gap that would be stored as a stop (`removeRangeAndFill`).
   removeRange = key => {
     this.setState(prev => {
       const forms = { ...prev.editForms };
       delete forms[key];
-      const removed = prev.ranges.find(r => r.key === key);
-      const remaining = prev.ranges.filter(r => r.key !== key);
-      if (!removed || remaining.length === 0) {
-        return { ranges: remaining, editForms: forms };
-      }
-      // Minutes of the week each range opens and closes at, the end carried past
-      // the week's end when it wraps so "ends where the removed one starts" can be
-      // compared on one line.
-      const WEEK = 7 * DAY_MINUTES;
-      const openAt = range => range.day_of_week * DAY_MINUTES + timeToMinutes(range.start_time);
-      const closeAt = range => {
-        const start = openAt(range);
-        const rawEnd = timeToMinutes(range.end_time);
-        const end = range.day_of_week * DAY_MINUTES + rawEnd;
-        return end <= start ? end + DAY_MINUTES : end;
-      };
-      const removedStart = openAt(removed);
-      // The range that ends where this one starts, or the closest one ending
-      // before it — measured round the week, so Sunday night precedes Monday.
-      let predecessor = null;
-      let smallestDistance = Infinity;
-      remaining.forEach(range => {
-        const distance = (removedStart - closeAt(range) + WEEK) % WEEK;
-        if (distance < smallestDistance) {
-          smallestDistance = distance;
-          predecessor = range;
-        }
-      });
-      if (!predecessor) {
-        return { ranges: remaining, editForms: forms };
-      }
-      // It now runs to where the removed range ended. Its own end_time is written
-      // as typed: the ranges model reads an end at or before the start as running
-      // past midnight, which is exactly what a stretched range may now do.
-      let stretched = remaining.map(range =>
-        range.key === predecessor.key ? { ...range, end_time: removed.end_time } : range
-      );
-      return { ranges: mergeTouchingRanges(stretched), editForms: forms };
+      return { ranges: removeRangeAndFill(prev.ranges, key), editForms: forms };
     });
   };
 
