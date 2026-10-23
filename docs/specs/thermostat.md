@@ -1,4 +1,4 @@
-# Thermostat: weekly schedules, virtual or on a real thermostat
+# Thermostat: weekly schedules, virtual, on a real thermostat or on a pilot-wire heater
 
 ## Context
 
@@ -10,9 +10,11 @@ Gladys can already _read and command_ real thermostats (Netatmo, Matter, Zigbee,
 
 The two needs share everything except the last step. The schedule, the presets, the manual override, the widget and the window handling are the same; only the final act differs — Gladys either actuates a switch itself, or writes a setpoint onto a device that actuates its own. Hence one integration with **two device types**, `virtual` and `external`, and a single code path that branches once, at the end of the regulation pass.
 
+A third, `pilot-wire`, came with the French pilot-wire heaters (C.1.1): a heater that regulates on its own thermostat and takes an order rather than a setpoint. It drives no real setpoint, so it runs the virtual thermostat's path, and stops at step 4 like an external one.
+
 ## A. Device model
 
-One device per heating zone, created by the integration. `THERMOSTAT_TYPE` says which of the two kinds it is; a device saved before the param existed has none, and is a virtual one — so **no migration is needed**.
+One device per heating zone, created by the integration. `THERMOSTAT_TYPE` says which of the three kinds it is; a device saved before the param existed has none, and is a virtual one — so **no migration is needed**.
 
 ### A.0 Virtual and external
 
@@ -21,6 +23,8 @@ A **virtual** thermostat carries four features, in the `DEVICE_FEATURE_CATEGORIE
 A virtual thermostat is a thermostat, and must be indistinguishable from a Netatmo one to the rest of Gladys (scenes, MQTT, Gladys Plus, the device pages). One new **type** is introduced, `preset`, for a notion the branded integrations already have and could not express (B.2); no new category.
 
 Every feature is resolved **by category and type**, never by `device.features[0]`: feature order is not a contract, and with four features an index would be a silent mis-target of the regulation loop.
+
+A **pilot-wire** thermostat (`pilot-wire`) is a heater on a French pilot wire that regulates on its own thermostat: Gladys only sends it the order each preset is set to (C.1.1). It drives no real setpoint, so it carries the four features of a virtual thermostat. A pilot-wire heater regulated by Gladys is a virtual thermostat whose actuator is a pilot wire.
 
 An **external** thermostat carries **two features of its own, `preset` and `mode`** (B.3), and nothing else: its setpoint and its operating state belong to the real device. The setpoint is a feature of the real device — a Netatmo, a Zigbee TRV, a Matter thermostat, an MQTT climate entity — named by `THERMOSTAT_TARGET_FEATURE`. Creating a mirror feature here would give the house two setpoints that drift apart, and the whole point is that the real device stays the authority on its own state. The widget's `thermostat_feature` therefore names that **external** selector, and a client writing a setpoint writes it on the real feature, through the same generic route as anywhere else (D).
 
@@ -51,10 +55,12 @@ Everything the control loop needs is a `THERMOSTAT_*` device param:
 
 | Param                                              | Meaning                                                                                                                                                                           |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `THERMOSTAT_TYPE`                                  | `virtual` or `external`; absent means `virtual`                                                                                                                                   |
+| `THERMOSTAT_TYPE`                                  | `virtual`, `external` or `pilot-wire`; absent means `virtual`; `external` with a pilot wire reads `pilot-wire`                                                                    |
 | `THERMOSTAT_TEMPERATURE_FEATURE`                   | the sensor the loop regulates on (virtual); displayed only (external)                                                                                                             |
 | `THERMOSTAT_HUMIDITY_FEATURE`                      | optional, displayed only                                                                                                                                                          |
 | `THERMOSTAT_SWITCH_FEATURE`                        | **virtual only** — the actuator the loop drives                                                                                                                                   |
+| `THERMOSTAT_PILOT_WIRE_FEATURE`                    | **virtual or pilot-wire** — a writable `heater` / `pilot-wire-mode` feature, driven by an order (C.1.1)                                                                           |
+| `THERMOSTAT_PILOT_WIRE_ORDER_<PRESET>`             | **pilot-wire only** — the order the preset sends (a `PILOT_WIRE_MODE`), default in C.1.1                                                                                          |
 | `THERMOSTAT_TARGET_FEATURE`                        | **external only** — the real device's setpoint, written by the loop. Required                                                                                                     |
 | `THERMOSTAT_STATE_FEATURE`                         | **external only**, optional — `operating-state` or a binary boiler contact, read to show whether the equipment runs                                                               |
 | `THERMOSTAT_MODE_FEATURE`                          | **external only**, optional — the real device's operating mode, if it has one                                                                                                     |
@@ -167,17 +173,17 @@ These two features, and no others, are what an external thermostat carries.
 
 A single `setInterval` in the service ticks every 60 s and calls `applySchedules`, which regulates every thermostat device in parallel and isolates a failing device from the others.
 
-**Order of decisions**, per device. Steps 1 to 3 are identical for both device types — that is the whole point of the design; only steps 4 and 5 differ.
+**Order of decisions**, per device. Steps 1 to 3 are identical for every device type — that is the whole point of the design; only steps 4 and 5 differ.
 
-1. **Window open** — if a window sensor is configured and reads `0`, the pass stops after suspending the heating: the switch is cut (virtual), or the device is stopped (external — `OFF` on its mode feature when it has one, then the frost-protection setpoint). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, and takes the **same external branch**: an external thermostat carries no switch and no local setpoint feature, so a listener that requires either skips it entirely and leaves the heating running until the next tick.
+1. **Window open** — if a window sensor is configured and reads `0`, the pass stops after suspending the heating: the switch is cut or the pilot-wire heater is sent `OFF` (virtual, C.1.1), or the device is stopped (external — `OFF` on its mode feature when it has one, then the frost-protection setpoint). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, on every kind of thermostat: it **stops an external one too**, through the same external branch as the pass. An external thermostat carries no switch and no local setpoint feature, so the listener must not require either — one that did would skip it and leave the heating running until the next tick.
 2. **Manual hold** — if a hold is armed and has not expired, the loop regulates on the held setpoint. On expiry it clears the hold, writes `schedule` back on the `preset` feature and falls through to the schedule.
 3. **Target preset** — when the `preset` feature reads `schedule`, the last transition point at or before now (E.3), which is broadcast to the dashboards without being written on the feature (E.3); otherwise the preset the feature carries. With the feature on `schedule` and **no point in force** — no schedule followed, or one with no point — the thermostat keeps the setpoint it has: a virtual one regulates on its setpoint feature, nothing is written to an external one, and the preset is still pushed to the widgets when a hold has just ended. Resolving `schedule` as a preset fell back on the 20 °C default and heated a room nobody had asked to heat.
-4. **Setpoint** — on a virtual thermostat, saved on this service's own `target-temperature` feature when it changed, alongside `operating-state`. On an external one, **written onto the real device** through the core, which routes it to the owning integration, preceded by the **mode** when the device exposes one (section C.0).
-5. **Switch** — **virtual only**, actuated only when its state differs from the computed one.
+4. **Setpoint** — on a virtual thermostat, saved on this service's own `target-temperature` feature when it changed, alongside `operating-state`. On an external one, **written onto the real device** through the core, which routes it to the owning integration, preceded by the **mode** when the device exposes one (section C.0). A pilot-wire heater that regulates itself (a `pilot-wire` thermostat) stops here too, like an external thermostat: it is handed the preset's order and regulates alone (C.1.1).
+5. **Actuator** — **virtual only**: the switch, actuated only when its state differs from the computed one, or a pilot-wire heater Gladys regulates, sent comfort or frost protection on the same hysteresis — never TPI (C.1.1).
 
 ### C.0 An external thermostat stops at step 4
 
-There is no step 5, and no hysteresis or TPI computation at all: the real thermostat runs its own heuristic off the setpoint it was given, and a second control loop would fight it. This is the entire difference between the two types.
+There is no step 5, and no hysteresis or TPI computation at all: the real thermostat runs its own heuristic off the setpoint it was given, and a second control loop would fight it. This is the entire difference between a virtual and an external thermostat; a `pilot-wire` one stops at step 4 for the same reason (C.1.1).
 
 Stopping has no setpoint of its own. On an external device it is expressed two ways at once, and which one the thermostat actually obeys depends on the device:
 
@@ -218,15 +224,15 @@ The observed value is recorded **before** the written-value check, not after: a 
 
 **The reference is seeded at service start from the setpoint feature's own `last_value`**, before the `NEW_STATE` listener is attached. That stored value is what Gladys last knew the device to be at, which is exactly what a report has to be compared against. It is seeded again whenever a thermostat is updated (`postUpdate`): a target re-pointed in the edit form, or by a device migration, would otherwise have no reference, and the first turn of the new appliance's dial would only establish one — the next pass then wrote the scheduled setpoint back over it. The references of a selector no thermostat targets any more are dropped at the same time.
 
-Treating an absent reference as "record this report and arm nothing" is not enough, and is a bug of its own: the first genuine change after a restart *is* that first report. A setpoint turned on the thermostat seconds after a restart was then dropped, and the next regulation pass overwrote it. On a device that only reports its changes — as Zigbee ones do — no further report would ever come to establish the reference, so the first change after **every** restart was lost.
+Treating an absent reference as "record this report and arm nothing" is not enough, and is a bug of its own: the first genuine change after a restart _is_ that first report. A setpoint turned on the thermostat seconds after a restart was then dropped, and the next regulation pass overwrote it. On a device that only reports its changes — as Zigbee ones do — no further report would ever come to establish the reference, so the first change after **every** restart was lost.
 
-Seeding covers both restart cases the marks exist for: an appliance still at the scheduled value reports that same value and arms nothing, and one left on an older value while Gladys was down reports the value the database also holds, so nothing is held and the minute loop writes the scheduled setpoint back. A change made *during* the downtime does differ from the stored value and is adopted as a hold, which is the right answer — nobody else asked for it.
+Seeding covers both restart cases the marks exist for: an appliance still at the scheduled value reports that same value and arms nothing, and one left on an older value while Gladys was down reports the value the database also holds, so nothing is held and the minute loop writes the scheduled setpoint back. A change made _during_ the downtime does differ from the stored value and is adopted as a hold, which is the right answer — nobody else asked for it.
 
 It has to be seeded rather than read when a report arrives: `device.saveState` persists that report on the same event, so a read from the listener races the write and may come back already carrying the new value, which would compare equal to itself and never arm a hold. A thermostat added after the service started has no seeded reference, and its first report establishes one.
 
 **Holding a change costs nothing on the wire.** The hold is armed directly — the param is written and the websocket sent — rather than routed through the setpoint write path. The device already carries this value, since it is what it just reported: writing it back would be a cloud call or a Zigbee message per turn of the dial, and the write path hands the running mode back first (C.0), kicking a thermostat that was in `auto`, `off` or its own vendor programme (G) into heating or cooling. The value is stored in the feature's own unit, which is the unit a hold on an external thermostat is stored in (C.3).
 
-This applies to external thermostats only. A virtual one has no second writer — Gladys owns its setpoint feature — so its own writes must never arm a hold.
+This applies to external thermostats, and to the order of a pilot-wire heater (C.1.1), which has a button and often an app of its own. A virtual thermostat otherwise has no second writer — Gladys owns its setpoint feature — so its own writes must never arm a hold.
 
 The selectors driven by this service are cached and rejected cheaply, in the same pass that builds the window-sensor set: `NEW_STATE` fires for every feature in the house, and neither check may cost a query.
 
@@ -243,6 +249,80 @@ Schedules are wall-clock times **in the house**. `getCurrentDayAndMinutes` there
 The matching lives on the **server only**. The widget is handed `current` and `next` already computed (E.5) and never reads the timezone, so there is nothing to keep in agreement between two implementations — and no reason for a schedule helper to be importable from the frontend build. The interval algebra that used to be shared (`applySlotToDay`, `mergeIntoSlots`) does not survive the move to transition points (E.0); what is left is "the last point at or before now", which the loop does once per tick.
 
 This is also what removes the class of bug where a phone abroad, or a laptop left on another zone, displayed a preset other than the one actually heating the house.
+
+### C.1.1 Pilot-wire heaters
+
+A French pilot-wire heater is the most common case after the relay, and it is not a switch: it keeps its own thermostat and takes **one of six orders** on a command wire — off, frost protection, eco, comfort, and the two derived comforts a heater computes itself. Cutting its supply is not how it is stopped.
+
+It is therefore a second kind of actuator in the same slot. An order carries no temperature: on eco or comfort the heater regulates on a setpoint of its own, set on its body, and ignores the one Gladys shows.
+
+**Who regulates is said by the thermostat type** (A.0), and each type shows its own settings: a virtual thermostat offers a switch **or** a pilot wire as its actuator, and a `pilot-wire` thermostat its pilot wire and an order per preset. A real thermostat (`external`) stays what it was — a setpoint, a state, a mode — and never carries a pilot wire: a connected thermostat or a heat pump is not a pilot-wire heater.
+
+Two earlier attempts were dropped. A separate "who regulates?" setting repeated the type. Offering the pilot wire on a real thermostat, in place of its setpoint, hid the setpoint fields as soon as a pilot wire was left in the form, with no word of why. Before both, a room sensor configured meant Gladys regulated — but a sensor may be wanted for display alone. A real thermostat saved with a pilot wire during those attempts is read, shown and saved again as `pilot-wire`.
+
+**A `pilot-wire` thermostat — the heater regulates (`heater`).** The thermostat stops at step 4 like an external thermostat (C.0): each preset sends the order it is set to (table below), and the heater regulates alone on its own setpoint. A room sensor, if any, is only displayed. Eco is eco. It is not "external" for the rest of this spec (`isExternal` is false): it drives no real setpoint, owns its `target-temperature` feature and carries the state features of a virtual thermostat. `createDevice` clears `THERMOSTAT_TARGET_FEATURE`, `THERMOSTAT_STATE_FEATURE`, `THERMOSTAT_MODE_FEATURE` and the switch on it, and requires its pilot wire and the setpoint feature a virtual thermostat requires.
+
+**A virtual thermostat with a pilot wire — Gladys regulates (`gladys`).** It needs a room sensor, as any virtual thermostat does: the form requires a sensor and an actuator, a switch or a pilot wire. Gladys regulates at step 5 like a switch, on the setpoint the thermostat carries (or the held one, below), and **the wire is used as a switch**:
+
+- below `setpoint − THERMOSTAT_HYSTERESIS_START`, `COMFORT` is sent, whatever the preset — `off` aside, which has no setpoint and always sends `OFF`;
+- above `setpoint + THERMOSTAT_HYSTERESIS_STOP`, `FROST_PROTECTION` is sent — the standby that still guards the room against frost;
+- in between, the heater keeps doing what it does: it counts as heating when it carries an order other than `OFF` or `FROST_PROTECTION`.
+
+Comfort whatever the preset: the preset only sets the temperature Gladys aims for. Sending `ECO` to heat would hand the decision back to the heater's own thermometer — the one this mode exists to set aside — three and a half degrees below its comfort, and a room under eco's setpoint could stay cold. The heater's own comfort setpoint is set high (24 °C, say): the heater then obeys Gladys, and that value remains a safety ceiling should Gladys stop while comfort is sent. The edit form says so. This is how Versatile Thermostat drives a pilot wire in Home Assistant (`over_switch`: comfort on, frost protection off), and it means eco picked in a room above 18 °C puts the module on frost protection: the widget says why in a banner under the gauge ("Standby: setpoint reached" / "Heating").
+
+A virtual thermostat saved without a sensor (through the API — the form refuses it) has nothing to regulate on, and is read as `heater`. A sensor that is gone, cannot be read or has no reading falls back on the preset's order for that pass, rather than leaving the room unheated.
+
+A pilot-wire heater only heats, so the bands are always the heating ones, whatever `THERMOSTAT_MODE` says. TPI is not used: switching orders within a cycle is Zigbee traffic for a heater whose own thermostat already smooths the output. The edit form does not offer it once a pilot wire is picked, switches a TPI already chosen back to hysteresis, and saves hysteresis for a pilot-wire thermostat; it hides the tuning section on a `pilot-wire` thermostat, as it does on a real one. **Cooling is held the same way**: the form does not offer it with a pilot wire, switches a cooling mode back to heating, and saves `heating`. `createDevice` applies both rules to any thermostat carrying a pilot wire, so a client writing the params directly cannot save a cooling or TPI pilot-wire thermostat either.
+
+Under `heater`, a heater takes no temperature, so the presets table of the edit form sets an **order** per preset instead of a temperature, saved as `THERMOSTAT_PILOT_WIRE_ORDER_<PRESET>`. A value that is not a `PILOT_WIRE_MODE` falls back on the default:
+
+| Preset    | Default order      |
+| --------- | ------------------ |
+| `off`     | `OFF` (fixed)      |
+| `frost`   | `FROST_PROTECTION` |
+| `away`    | `FROST_PROTECTION` |
+| `eco`     | `ECO`              |
+| `night`   | `ECO`              |
+| `comfort` | `COMFORT`          |
+
+`away` is frost protection, as Home Assistant's pilot-wire climate does: nobody is home. `night` is eco, the order a heater's own programme gives the night. Comfort -1 and -2 stay on offer in the table; a user who wants night to differ from eco picks one. The preset setpoints stay stored — a hold is still keyed by them, below — but the form does not show them. The presets themselves stay Gladys's, not the six orders: a schedule belongs to the house and is shared by every thermostat in it, virtual, real or pilot-wire, and scenes pick presets too. The banner under the widget's gauge names the order the module carries, which is what links the two vocabularies (below).
+
+**The widget** has no setpoint to offer under `heater`: the gauge draws no setpoint arc and no knob, and takes no drag, arrow key or + / − press. The room temperature takes the middle, where the setpoint would be, and the ring is drawn whole, in the colour of the order the module confirms (the derived comforts in comfort's). Under it, a banner drawn like the card's others names that order ("Order: Comfort"). Until the module confirms the order the lit preset is set to — a few seconds on Z-Wave — the banner says it is on its way instead, greyed ("Sending the Comfort order…"): a ring in one preset's colour under another preset's lit button read as a wrong order. The presets are the only control, each sending its order.
+
+Like every other write, an order already carried is skipped: several of these heaters are Zigbee, and re-sending an unchanged order once a minute is traffic for nothing. A window opening, or a stop by hand, sends `OFF` rather than actuating a switch the thermostat does not hold — on a window, at once from the `NEW_STATE` listener as well as on the next pass, like the switch and external paths.
+
+**A manual hold** (D) is a setpoint, and the wire takes no temperature. Under `gladys`, the hold is regulated on the held setpoint itself, so a turn of the dial to 19.5 °C means 19.5 °C rather than the nearest preset's. Under `heater`, the hold is turned into the order of the preset it stands for. Picking a preset by hand holds that preset's own setpoint, so the preset the thermostat carries is the answer whenever its setpoint equals the held one — even when another preset shares that value. A setpoint held from a scene (the widget offers no dial there) becomes the order of the nearest of `frost`, `eco` and `comfort`, a tie going to the warmer one: 19.5 °C between eco at 18 and comfort at 21 asks for warmth. `off` is never held (it stores no setpoint), so it goes through the preset path.
+
+**A derived comfort the heater carries is kept while comfort is held**, under `heater`. `COMFORT_1` and `COMFORT_2` are comfort chosen on the module itself (below). Writing plain `COMFORT` over them would undo that choice within a minute. Under `gladys`, comfort only means "heat" and the temperature is Gladys's to decide: plain `COMFORT` is written.
+
+**An order changed on the module is taken as that preset picked by hand.** The change can come from the heater's button, the vendor app or the module's own scene. It is a decision by whoever made it, and the loop would otherwise undo it at the next pass. It goes through the same write path as the widget (D.0): the preset is saved on the `preset` feature and a hold is armed on its setpoint. Which preset an order stands for depends on who regulates (`presetForPilotWireOrder`):
+
+- under `heater`, it is **the preset set to send that order** in the presets table. When several send it, the one named after it wins, in this order: `frost`, `eco`, `comfort`, `night`, `away` — frost protection is `frost` rather than `away`, eco is `eco` rather than `night`. With night set to `COMFORT_2`, a press of comfort -2 is `night`;
+- an order no preset sends, and every order under `gladys` — where the module only ever carries comfort or frost protection from Gladys, and comfort only means "heat" — falls back on the fixed vocabulary: `FROST_PROTECTION` is `frost`, `ECO` is `eco`, and `COMFORT`, `COMFORT_1` and `COMFORT_2` are `comfort`. A derived comfort is a heater-side variant of comfort, not a temperature Gladys knows. The hold expires like every hold: after `THERMOSTAT_MANUAL_DURATION` when the device sets it, otherwise at the next transition point, and never without a schedule (D).
+
+Holding the setpoint alone is not enough. A pilot-wire heater's eco and comfort temperatures are set on the heater itself, and Gladys's preset setpoints are nominal values. With eco and comfort at the same value, the loop could not tell which order was pressed, and a preset picked earlier in the widget would win over the module. Saving the preset is what makes the press stick.
+
+The detection is the one of C.0.1, keyed by the pilot-wire selector:
+
+- the **two marks**: the last order this service wrote, kept rather than consumed, and the last order observed. The "already carried" branch of the write records its order too, and a failed write drops its mark. A report counts as a change only when it differs from the previous report and is not the order Gladys stands behind;
+- the observed reference is **seeded from the feature's `last_value`** at service start and on `postUpdate`, for the same restart reasons;
+- the pilot-wire selectors join the cached set of driven selectors, so `NEW_STATE` still rejects every other feature without a query.
+
+A report that takes a preset the thermostat already carries, with a hold already on its setpoint, is not taken again: `COMFORT_1` then `COMFORT_2` is the same choice twice, and taking it again would only push the hold's expiry forward.
+
+**`OFF` on the module is a stop, not a preset.** It is applied as a stop by hand: `THERMOSTAT_MODE.OFF` written on the thermostat's own `mode` feature, which holds until someone starts the thermostat again, exactly as the widget's stop button does. Holding the frost setpoint instead would write `FROST_PROTECTION` over the `OFF` that was just pressed.
+
+**Nothing is taken while the thermostat is stopped or a window is open.** Both outrank a hold in the order of decisions (C, step 1 and the stop). The module already carries the order pressed then, so the listener writes `OFF` over it at once — marked as this service's own, so its echo is not taken for another press — rather than leaving the heater on until the next pass, and a hold armed behind them would resurface later as a manual mode nobody remembers. An order that is not a `PILOT_WIRE_MODE` value is ignored.
+
+**No periodic resend.** An order already carried is never written again, and nothing re-sends it on a timer. A module that says it carries an order it does not actually carry is therefore never corrected. That can be a module that reports nothing by itself, or an integration that updates the state before the module confirms it. Fixing it with a resend every few minutes would add traffic to every heater to cover a fault in a few of them. The requirement is on the integrations instead: a `pilot-wire-mode` feature **reports the order confirmed by the module, never the one requested**. A module that cannot confirm is polled by its integration.
+
+**`schedule` with no point in force** names no order, just as it names no temperature (C.1): under `heater`, the heater keeps the order it carries, and nothing is written. Under `gladys`, Gladys regulates on the setpoint the thermostat kept, as it does for a switch.
+
+**The operating state** says what Gladys decided. Under `gladys` it reads `heating` when the loop asks for heat, `idle` otherwise, and `idle` on a pass that fell back for want of a reading. Under `heater` it is not written: the wire gives no feedback, the heater regulates on a temperature Gladys does not know, and reading `ECO` as heating lit the flame in a room already 3 °C above the setpoint. `OFF` reads `idle` either way. The state follows the order the heater carries afterwards. A write that fails leaves the previous order in force, so the heater is said to heat only if the loop asks for heat **and** that order is neither `OFF` nor `FROST_PROTECTION`; otherwise it reads `idle`, which also clears a state left by an earlier pass. An order that cannot be read leaves the state untouched. The widget's heating halo reads this `operating-state` when Gladys regulates, with a line under the gauge saying heating or standby. When the heater does, the widget lights no halo and names the order in a banner instead (above). One claim is retracted there, once: a `heating` left by a pass under Gladys, before the thermostat was turned into one the heater regulates, is written over with `idle` — scenes, MQTT and HomeKit would otherwise keep seeing a flame Gladys no longer stands behind — and the state is left alone after that — on every pass that writes nothing else, `schedule` with no point in force included.
+
+A heater is driven by one actuator or the other, never both. The edit form empties the switch when a pilot wire is picked and the reverse, and saves the switch empty whenever a pilot wire is set; the loop, the window listener and the hold all take the pilot-wire branch first.
+
+`THERMOSTAT_PILOT_WIRE_FEATURE` names another device's feature, so a device migration rewrites it like the other `THERMOSTAT_*_FEATURE` params (`device-migration.md` B.3).
 
 ### C.2 Hysteresis and TPI
 
@@ -379,11 +459,11 @@ Migration `20260823000000` creates these tables. It has never run in production 
 
 The loop reads the schedule of every thermostat whose `preset` feature reads `schedule`, takes the **last transition at or before now** — in the Gladys timezone (C.1) — and applies its preset. When no point of the week precedes now, the last point of the week applies: the programme wraps, which is what removes the gap.
 
-**A preset resolved from the programme is broadcast, never stored on the `preset` feature.** The feature keeps reading `schedule`, because that is the standing intention; the resolved point is what that intention currently means, and it is already served by `current` (E.5), which is what the widget reads. Storing it would make the next pass read a deliberate choice, take the thermostat off its programme (B.2) and freeze it on the first point it ever applied. The `preset` feature is written only when a preset is *chosen* — by the widget, a scene, or the loop handing the thermostat back to `schedule` when a hold expires.
+**A preset resolved from the programme is broadcast, never stored on the `preset` feature.** The feature keeps reading `schedule`, because that is the standing intention; the resolved point is what that intention currently means, and it is already served by `current` (E.5), which is what the widget reads. Storing it would make the next pass read a deliberate choice, take the thermostat off its programme (B.2) and freeze it on the first point it ever applied. The `preset` feature is written only when a preset is _chosen_ — by the widget, a scene, or the loop handing the thermostat back to `schedule` when a hold expires.
 
 **The broadcast is sent when the point in force changes, not on every pass.** While the feature reads `schedule` it never equals the resolved preset, so comparing the two announced — and logged — the same preset once a minute for every thermostat on a programme. The service keeps, in memory, the preset it last announced for each thermostat, and broadcasts only when the resolved point differs from it, or when a hold has just expired. Leaving the programme forgets the entry, so following it again announces its point. After a restart the map is empty and each thermostat's point is announced once, which is harmless.
 
-**A day with no point of its own is not an idle day, and the UI must say so.** The rule above is what the editor's day bars, the week miniature on the schedule list and the screen-reader summary all have to draw: a day starts on the last point before it, and that point may be **several days** earlier. A schedule whose only point is Saturday 08:00 Comfort applies Comfort all week, and an office schedule with no weekend point keeps its Friday evening preset through Sunday. Showing those days as empty, hatched or "Off" says the opposite of what the heating does. The wrap can land on the day's *own* point, and that is still an inheritance: on a schedule whose only point is Saturday 08:00, Saturday midnight runs on that very point, carried from the week before — which is what the server applies at Saturday 03:00. Rejecting it because the day numbers matched drew those first eight hours blank. Only a schedule with **no point at all** is genuinely empty — and even then a thermostat following it keeps the setpoint it already has (C, step 3), which is what the empty-schedule warning states. Looking back a single day is not enough, and one shared helper answers this for both views so they cannot disagree.
+**A day with no point of its own is not an idle day, and the UI must say so.** The rule above is what the editor's day bars, the week miniature on the schedule list and the screen-reader summary all have to draw: a day starts on the last point before it, and that point may be **several days** earlier. A schedule whose only point is Saturday 08:00 Comfort applies Comfort all week, and an office schedule with no weekend point keeps its Friday evening preset through Sunday. Showing those days as empty, hatched or "Off" says the opposite of what the heating does. The wrap can land on the day's _own_ point, and that is still an inheritance: on a schedule whose only point is Saturday 08:00, Saturday midnight runs on that very point, carried from the week before — which is what the server applies at Saturday 03:00. Rejecting it because the day numbers matched drew those first eight hours blank. Only a schedule with **no point at all** is genuinely empty — and even then a thermostat following it keeps the setpoint it already has (C, step 3), which is what the empty-schedule warning states. Looking back a single day is not enough, and one shared helper answers this for both views so they cannot disagree.
 
 A `PATCH` replacing a schedule's points, or a thermostat newly attached to one, triggers a regulation pass through the existing debounce. There is no dedicated route for it (D).
 
@@ -446,7 +526,7 @@ Returned by every route that returns a schedule:
 
 `transitions` is sorted by day then time. `current` and `next` are computed **by the server**, in the Gladys timezone, read-only, and are `null` on a schedule with no point. The widget therefore no longer reads the timezone, and no longer recomputes the active point: it renders "Éco until 08:30" straight from `next`. That removes the last reason for the schedule-matching helper to be shared between the server and the frontend build (C.1).
 
-**Deleting a range extends the one before it.** A gap between two ranges is not an absence: `rangesToTransitions` stores it as an `off` point, and the heating really stops there. Deleting a range therefore used to cut the heating for its whole span — removing a 08:30–17:00 eco range wrote `08:30 off` and left the house cold until 17:00 — while the editor drew hatching and the legend claimed the previous preset carried on. Stopping the heating is something the user asks for with the Off preset; it is never a side effect of a deletion, and that is the behaviour E.0 names (*"deleting a point extends the previous one"*) and that Tado has. The predecessor is found on the week's own timeline, so it may sit on an earlier day.
+**Deleting a range extends the one before it.** A gap between two ranges is not an absence: `rangesToTransitions` stores it as an `off` point, and the heating really stops there. Deleting a range therefore used to cut the heating for its whole span — removing a 08:30–17:00 eco range wrote `08:30 off` and left the house cold until 17:00 — while the editor drew hatching and the legend claimed the previous preset carried on. Stopping the heating is something the user asks for with the Off preset; it is never a side effect of a deletion, and that is the behaviour E.0 names (_"deleting a point extends the previous one"_) and that Tado has. The predecessor is found on the week's own timeline, so it may sit on an earlier day.
 
 **Ranges of the same preset that touch are one range.** Two of them show as two identical rows — 06:30–17:00 Comfort, then 17:00–22:30 Comfort — while the points model stores a single stretch, so the editor would be saying something the schedule does not. The merge runs after every operation and on loading, not only after a deletion: an edit can bring two together just as well, and a schedule already stored may hold a pair. A chain of three merges in one pass, and a range is followed across midnight onto the next day.
 
@@ -515,9 +595,9 @@ The dial bounds come from the target feature's own `min`/`max` when it declares 
 
 ## G. Out of scope
 
-- Fil pilote heaters (`heater` / `pilot-wire-mode`): the actuator picker is `switch` / `binary` only. Additive when it comes, and the most common French case after the relay.
 - **House modes**: away tied to presence, holiday until a date, a global frost setting. A schedule owned by a house (E.1) is what makes an active schedule per house — followed by thermostats that made no explicit choice — expressible later with no schema change.
 - **The gauge widget on any `thermostat` / `target-temperature` feature**, the schedule being an optional layer on top. Today, showing a Netatmo on a dashboard means creating an "external" thermostat device for it.
 - **An external thermostat that keeps its own vendor programme.** Gladys's hold and the device's programme then take turns writing the setpoint (C.0.1). Until that is handled, the edit form says to disable the programme on the vendor side.
+- **A pilot-wire module that keeps its own programme or thermostat mode** (Tuya's `program` / `thermostat` modes, Heatzy's `timer_switch`). As with an external thermostat's vendor programme, the module and Gladys then take turns writing the order, and every order the programme writes is taken as a change made on the module (C.1.1). Until that is handled, the edit form says to disable the programme on the module side, under the pilot-wire picker.
 - Multi-zone grouping, open-window _detection_ by temperature drop (as opposed to a sensor).
 - **Driving a second setpoint on an external thermostat.** A reversible Matter or Zigbee device exposes a heating _and_ a cooling setpoint; one `THERMOSTAT_TARGET_FEATURE` is written, and a house wanting both creates two thermostats. Additive.

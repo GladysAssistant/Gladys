@@ -11,8 +11,12 @@ const {
   DEFAULT_TEMP_UNIT,
   DEFAULT_THERMOSTAT_TYPE,
   THERMOSTAT_TYPES,
+  PILOT_WIRE_REGULATIONS,
+  DEFAULT_PILOT_WIRE_ORDERS,
 } = require('../../../utils/thermostatConstants');
-const { THERMOSTAT_MODE } = require('../../../utils/constants');
+const { THERMOSTAT_MODE, PILOT_WIRE_MODE } = require('../../../utils/constants');
+
+const PILOT_WIRE_ORDERS = Object.values(PILOT_WIRE_MODE);
 
 /**
  * @description Parse a value as a finite number, falling back to a default.
@@ -43,15 +47,40 @@ function buildParamsConfig(device) {
     const p = device.params.find((x) => x.name === name);
     return p ? p.value : null;
   };
+  const storedType = getParam('THERMOSTAT_TYPE') || DEFAULT_THERMOSTAT_TYPE;
+  // A real thermostat given a pilot wire was how a heater regulating itself was
+  // saved before it had a type of its own: it is read as one.
+  const thermostatType =
+    storedType === THERMOSTAT_TYPES.EXTERNAL && getParam('THERMOSTAT_PILOT_WIRE_FEATURE')
+      ? THERMOSTAT_TYPES.PILOT_WIRE
+      : storedType;
+  // The order a preset sends a heater that regulates itself: the param when it
+  // names one of the six orders, the default otherwise.
+  const pilotWireOrder = (preset) => {
+    const value = toNumber(getParam(`THERMOSTAT_PILOT_WIRE_ORDER_${preset.toUpperCase()}`), null);
+    return PILOT_WIRE_ORDERS.includes(value) ? value : DEFAULT_PILOT_WIRE_ORDERS[preset];
+  };
   return {
     temperature_feature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || null,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
     switch_feature: getParam('THERMOSTAT_SWITCH_FEATURE') || null,
+    pilot_wire_feature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || null,
+    // Who regulates the pilot-wire heater (C.1.1): the thermostat type says it.
+    // A virtual one is Gladys, on its room sensor — without one there is nothing
+    // to regulate on, and the heater regulates instead, as on a `pilot-wire` one.
+    pilot_wire_regulation:
+      thermostatType === THERMOSTAT_TYPES.VIRTUAL && getParam('THERMOSTAT_TEMPERATURE_FEATURE')
+        ? PILOT_WIRE_REGULATIONS.GLADYS
+        : PILOT_WIRE_REGULATIONS.HEATER,
+    pilot_wire_orders: Object.keys(DEFAULT_PILOT_WIRE_ORDERS).reduce(
+      (orders, preset) => ({ ...orders, [preset]: pilotWireOrder(preset) }),
+      {},
+    ),
     // External thermostats: the real device regulates itself. `target_feature`
     // is the setpoint Gladys writes, `state_feature` the heating state it reads
     // back, `mode_feature` the optional operating mode. All three point at
     // features owned by another integration (Netatmo, Zigbee, Matter, MQTT...).
-    thermostat_type: getParam('THERMOSTAT_TYPE') || DEFAULT_THERMOSTAT_TYPE,
+    thermostat_type: thermostatType,
     target_feature: getParam('THERMOSTAT_TARGET_FEATURE') || null,
     state_feature: getParam('THERMOSTAT_STATE_FEATURE') || null,
     mode_feature: getParam('THERMOSTAT_MODE_FEATURE') || null,
@@ -94,9 +123,14 @@ function getDeviceConfig(device) {
 }
 
 /**
- * @description Whether a thermostat device is driven by a real external device.
+ * @description Whether a thermostat device is driven by a real external device
+ * through its setpoint.
+ *
+ * A pilot-wire heater never is, on either of its types (`virtual` or
+ * `pilot-wire`, C.1.1): it takes an order, not a setpoint, and owns its
+ * setpoint feature. Every pilot-wire branch hangs off `!isExternal`.
  * @param {object|null} config - Config built by getDeviceConfig.
- * @returns {boolean} True when the device regulates itself.
+ * @returns {boolean} True when the device regulates itself on a setpoint Gladys writes.
  * @example
  * if (isExternal(config)) { ... }
  */

@@ -1,8 +1,15 @@
 const logger = require('../../../utils/logger');
-const { getThermostatFeature, stopExternalThermostat } = require('./thermostat.applySchedules');
+const { DEVICE_FEATURE_TYPES, PILOT_WIRE_MODE, THERMOSTAT_MODE } = require('../../../utils/constants');
+const {
+  getThermostatFeature,
+  stopExternalThermostat,
+  drivePilotWire,
+  getSetpointForPreset,
+  presetForPilotWireOrder,
+} = require('./thermostat.applySchedules');
 const { buildParamsConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
 const { holdExpiry } = require('./thermostat.setValue');
-const { getManualHold, setManualHold } = require('./thermostat.state');
+const { getFeature, getPreset, getManualHold, setManualHold, isStopped, presetValue } = require('./thermostat.state');
 
 /**
  * @description Invalidate the caches derived from this service's devices: the
@@ -55,7 +62,9 @@ async function getWindowSelectors() {
   const selectors = new Set();
   // The setpoints of the external thermostats are collected in the same pass:
   // both sets answer a NEW_STATE, which fires for every feature in the house, so
-  // a second query here would double the cost of every state change.
+  // a second query here would double the cost of every state change. The orders
+  // of the pilot-wire heaters join them: a module has a button of its own, and
+  // an order changed there is held like a turn of a real thermostat's dial.
   const targets = new Set();
   (devices || []).forEach((device) => {
     const config = buildParamsConfig(device);
@@ -64,6 +73,9 @@ async function getWindowSelectors() {
     }
     if (config && config.target_feature) {
       targets.add(config.target_feature);
+    }
+    if (config && config.pilot_wire_feature) {
+      targets.add(config.pilot_wire_feature);
     }
   });
   this.windowSelectorsCache = selectors;
@@ -152,6 +164,73 @@ async function primeObservedSetpoints() {
 }
 
 /**
+ * @description Take an order changed on a pilot-wire module itself — its
+ * button, the vendor app, its own scene (C.1.1).
+ *
+ * The change is a decision by whoever made it, and the loop would undo it at the
+ * next pass. It is applied as if that preset had been picked in the widget,
+ * through the same write path: the preset is saved and a hold is armed on its
+ * setpoint. Holding the setpoint alone was not enough — with eco and comfort at
+ * the same temperature the loop could not tell which order was pressed, and a
+ * preset picked earlier by hand would have won over the module. Off has no
+ * preset: pressed on the module it stops the thermostat, exactly like the
+ * widget's stop button.
+ *
+ * Nothing is taken while the thermostat is stopped or a window is open: both
+ * outrank a hold, so OFF is written over the order at once, and a hold armed
+ * behind them would resurface later as a manual mode nobody remembers.
+ * @param {object} device - The thermostat device.
+ * @param {object} config - Its params config.
+ * @param {number} order - The PILOT_WIRE_MODE value the module now carries.
+ * @returns {Promise<void>}
+ * @example
+ * await onPilotWireOrderChanged.call(handler, device, config, PILOT_WIRE_MODE.ECO);
+ */
+async function onPilotWireOrderChanged(device, config, order) {
+  // The module already carries the order it was given: waiting for the next
+  // pass would let it heat for up to a minute. OFF is written back at once,
+  // marked as this service's own so its echo is not taken for another press.
+  if (isStopped(device)) {
+    logger.info(`Thermostat: order ${order} pressed on a stopped heater (${device.selector}), sending OFF`);
+    await drivePilotWire(this.gladys, device, config, 'off', `stopped, ${device.selector}`, this.selfWrittenSetpoints);
+    return;
+  }
+  if (config.window_feature) {
+    const win = await getFeatureBySelector(this.gladys, config.window_feature);
+    if (win && win.feature.last_value === 0) {
+      logger.info(`Thermostat: order ${order} pressed with the window open (${device.selector}), sending OFF`);
+      await drivePilotWire(
+        this.gladys,
+        device,
+        config,
+        'off',
+        `window open, ${device.selector}`,
+        this.selfWrittenSetpoints,
+      );
+      return;
+    }
+  }
+  const stop = order === PILOT_WIRE_MODE.OFF;
+  const name = presetForPilotWireOrder(order, config);
+  // Comfort -1 then comfort -2 is the same choice twice: re-taking it would only
+  // push the hold's expiry forward.
+  const hold = getManualHold(device);
+  if (!stop && getPreset(device) === name && hold && hold.setpoint === getSetpointForPreset(name, config)) {
+    return;
+  }
+  const feature = getFeature(
+    device,
+    stop ? DEVICE_FEATURE_TYPES.THERMOSTAT.MODE : DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+  );
+  if (!feature) {
+    logger.warn(`Thermostat: order ${order} changed on the module, but ${device.selector} cannot take it`);
+    return;
+  }
+  logger.info(`Thermostat: order ${order} changed on the module for ${device.selector}, taking it`);
+  await this.setValue(device, feature, stop ? THERMOSTAT_MODE.OFF : presetValue(name));
+}
+
+/**
  * @description Hold a setpoint changed on the real thermostat itself.
  *
  * Only for external thermostats: a virtual one has no second source of truth,
@@ -180,9 +259,26 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     // built that cache from the params of these very devices.
     const devices = await this.gladys.device.get({ service: 'thermostat' });
     const device = devices.find((candidate) =>
-      candidate.params.some((param) => param.name === 'THERMOSTAT_TARGET_FEATURE' && param.value === changedSelector),
+      candidate.params.some(
+        (param) =>
+          (param.name === 'THERMOSTAT_TARGET_FEATURE' || param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE') &&
+          param.value === changedSelector,
+      ),
     );
     if (!device) {
+      return;
+    }
+    // Found through its params, so it has some, and the config is never null.
+    const config = buildParamsConfig(device);
+    // Found through one of the two params, so the changed feature is either the
+    // real thermostat's setpoint or a pilot-wire heater's order. A pilot-wire
+    // heater is never external — a real thermostat given a wire is read as
+    // `pilot-wire` — and its order is what a second writer, the module's
+    // button, can change.
+    const pilotWire = config.pilot_wire_feature === changedSelector;
+    // An order that is no PILOT_WIRE_MODE value means nothing to the thermostat,
+    // and must not become the reference the next report is compared against.
+    if (pilotWire && newValue !== PILOT_WIRE_MODE.OFF && presetForPilotWireOrder(newValue, config) === undefined) {
       return;
     }
     // Our own write, reported back. The mark is *kept* rather than consumed: a
@@ -221,6 +317,10 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     // added since the service started. There is nothing to call a change
     // against, so this report only establishes the reference.
     if (previouslyObserved === undefined || previouslyObserved === newValue) {
+      return;
+    }
+    if (pilotWire) {
+      await onPilotWireOrderChanged.call(this, device, config, newValue);
       return;
     }
     // Already held at this value, which is the same reasoning one step further:
@@ -321,6 +421,21 @@ async function onDeviceNewState(event) {
           } catch (e) {
             logger.warn(`Thermostat: Failed to stop an external thermostat on window open: ${e.message}`);
           }
+          return;
+        }
+        // A pilot-wire heater is stopped by the order, like the minute loop does:
+        // it holds no switch, and waiting for the next tick left it on comfort
+        // for up to a minute with the window open.
+        if (paramsConfig.pilot_wire_feature) {
+          logger.info(`Thermostat: window opened (${changedSelector}) for ${device.selector}, sending OFF`);
+          await drivePilotWire(
+            this.gladys,
+            device,
+            paramsConfig,
+            'off',
+            `window open, ${device.selector}`,
+            this.selfWrittenSetpoints,
+          );
           return;
         }
         const thermostatFeature = getThermostatFeature(device);

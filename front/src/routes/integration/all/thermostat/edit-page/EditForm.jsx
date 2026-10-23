@@ -4,7 +4,21 @@ import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import stickyStyle from '../stickyActions.css';
 import { getPresetColor } from '../../../../../utils/thermostatPresetColors';
-import { DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_UNITS, PILOT_WIRE_MODE } from '../../../../../../../server/utils/constants';
+import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
+
+// The six orders, warmest last, keyed as the device page already names them.
+// The help text of each thermostat type, keyed by its value.
+const TYPE_KEYS = { virtual: 'virtual', external: 'external', 'pilot-wire': 'pilotWire' };
+
+const PILOT_WIRE_ORDER_OPTIONS = [
+  [PILOT_WIRE_MODE.OFF, 'off'],
+  [PILOT_WIRE_MODE.FROST_PROTECTION, 'frost-protection'],
+  [PILOT_WIRE_MODE.ECO, 'eco'],
+  [PILOT_WIRE_MODE.COMFORT_2, 'comfort_-2'],
+  [PILOT_WIRE_MODE.COMFORT_1, 'comfort_-1'],
+  [PILOT_WIRE_MODE.COMFORT, 'comfort']
+];
 
 const FeatureSelect = ({ value, features, onChange, emptyLabel }) => (
   <select class="form-control" value={value} onChange={onChange}>
@@ -26,6 +40,7 @@ const SaveError = ({ status, reason }) =>
     <div class="alert alert-danger">
       {reason === 'incompleteVirtual' && <Text id="integration.thermostat.edit.incompleteVirtualError" />}
       {reason === 'incompleteExternal' && <Text id="integration.thermostat.edit.incompleteExternalError" />}
+      {reason === 'incompletePilotWire' && <Text id="integration.thermostat.edit.incompletePilotWireError" />}
       {!reason && <Text id="integration.thermostat.edit.saveError" />}
     </div>
   );
@@ -33,7 +48,21 @@ const SaveError = ({ status, reason }) =>
 const EditForm = ({ ...props }) => {
   const saving = props.thermostatCreateStatus === RequestStatus.Getting;
   const isEdit = !!(props.thermostatEditDevice && props.thermostatEditDevice.selector);
-  const mode = props.thermostatEditMode || 'heating';
+  // Three types, each with its own settings (spec A.1, C.1.1): a virtual
+  // thermostat regulated by Gladys (switch or pilot wire), a real one driven by
+  // its setpoint (a connected thermostat, a heat pump…), and a pilot-wire heater
+  // regulating itself, which takes an order per preset.
+  const thermostatType = ['external', 'pilot-wire'].includes(props.thermostatEditType)
+    ? props.thermostatEditType
+    : 'virtual';
+  const isExternalThermostat = thermostatType === 'external';
+  const isPilotWireThermostat = thermostatType === 'pilot-wire';
+  const isVirtualThermostat = thermostatType === 'virtual';
+  // A pilot-wire heater only heats, on either of its types: cooling is neither
+  // offered nor shown.
+  const hasPilotWire = isPilotWireThermostat || (isVirtualThermostat && !!props.thermostatEditPilotWireFeature);
+  const pickedMode = props.thermostatEditMode || 'heating';
+  const mode = hasPilotWire ? 'heating' : pickedMode;
   // The control rules read the other way round in cooling: the switch turns on
   // when the room is too warm. The help texts are therefore per-mode, not a
   // heating text with the word swapped.
@@ -78,12 +107,50 @@ const EditForm = ({ ...props }) => {
     comfort: 'thermostatEditPresetComfort'
   };
 
-  const controlType = props.thermostatEditControlType || 'hysteresis';
+  // A pilot wire is regulated on hysteresis only (spec C.1.1): TPI is neither
+  // offered nor shown while one is picked.
+  const pickedControlType = props.thermostatEditControlType || 'hysteresis';
+  const controlType = hasPilotWire && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
   // A real thermostat runs its own heuristic and drives its own heater: Gladys
   // only writes the setpoint its schedule resolves. Hysteresis, TPI and the
   // switch are therefore hidden — offering them would suggest Gladys regulates
   // a device that regulates itself.
-  const isExternalThermostat = props.thermostatEditType === 'external';
+  // A pilot-wire heater regulating itself takes no temperature: each preset
+  // sends an order instead.
+  const presetsAreOrders = isPilotWireThermostat;
+  const pilotWireOrders = props.thermostatEditPilotWireOrders || DEFAULT_PILOT_WIRE_ORDERS;
+
+  // The pilot-wire picker: in the heating section of a virtual thermostat, next
+  // to the switch, and first thing on a pilot-wire one.
+  const pilotWirePicker = (
+    <div class="form-group">
+      <label class="form-label">
+        <Text id="integration.thermostat.edit.pilotWireFeatureLabel" />
+      </label>
+      <Localizer>
+        <FeatureSelect
+          value={props.thermostatEditPilotWireFeature || ''}
+          features={props.pilotWireFeatures}
+          onChange={e => props.updateThermostatActuator('thermostatEditPilotWireFeature', e.target.value)}
+          emptyLabel={<Text id="global.emptySelectOption" />}
+        />
+      </Localizer>
+      <small class="form-text text-muted">
+        <Text id="integration.thermostat.edit.pilotWireFeatureHelp" />{' '}
+        <Text
+          id={`integration.thermostat.edit.pilotWireRegulationHelp.${isPilotWireThermostat ? 'heater' : 'gladys'}`}
+        />
+      </small>
+      {/* Promised by the spec (G): a module that keeps its own programme
+          writes orders that are taken as presses of its button, and Gladys
+          and the programme take turns. */}
+      {props.thermostatEditPilotWireFeature && (
+        <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
+          <Text id="integration.thermostat.edit.pilotWireProgrammeWarning" />
+        </div>
+      )}
+    </div>
+  );
 
   // Picking the real thermostat's setpoint feature adopts the range it
   // advertises. A Netatmo says 5-30, and the 5-35 default then offered the user
@@ -220,7 +287,7 @@ const EditForm = ({ ...props }) => {
               </label>
               <select
                 class="form-control"
-                value={props.thermostatEditType || 'virtual'}
+                value={thermostatType}
                 onChange={e => props.updateThermostatField('thermostatEditType', e.target.value)}
               >
                 <option value="virtual">
@@ -229,9 +296,12 @@ const EditForm = ({ ...props }) => {
                 <option value="external">
                   <Text id="integration.thermostat.edit.typeExternal" />
                 </option>
+                <option value="pilot-wire">
+                  <Text id="integration.thermostat.edit.typePilotWire" />
+                </option>
               </select>
               <small class="form-text text-muted">
-                <Text id={`integration.thermostat.edit.typeHelp.${isExternalThermostat ? 'external' : 'virtual'}`} />
+                <Text id={`integration.thermostat.edit.typeHelp.${TYPE_KEYS[thermostatType]}`} />
               </small>
             </div>
 
@@ -257,16 +327,21 @@ const EditForm = ({ ...props }) => {
                 <option value="heating">
                   <Text id="integration.thermostat.edit.mode.heating" />
                 </option>
-                <option value="cooling">
-                  <Text id="integration.thermostat.edit.mode.cooling" />
-                </option>
+                {!hasPilotWire && (
+                  <option value="cooling">
+                    <Text id="integration.thermostat.edit.mode.cooling" />
+                  </option>
+                )}
               </select>
               <small class="form-text text-muted">
                 <Text id="integration.thermostat.edit.modeHelp" />
               </small>
             </div>
 
-            {/* Thermostat réel piloté */}
+            {/* Radiateur à fil pilote qui régule seul : piloté par un ordre. */}
+            {isPilotWireThermostat && pilotWirePicker}
+
+            {/* Thermostat réel piloté par sa consigne */}
             {isExternalThermostat && (
               <div>
                 {/* Promised by the spec (G) and owed to the user: while the
@@ -372,7 +447,7 @@ const EditForm = ({ ...props }) => {
             </div>
 
             {/* Commutateur : seul un thermostat virtuel pilote un interrupteur. */}
-            {!isExternalThermostat && (
+            {isVirtualThermostat && (
               <div class="form-group">
                 <label class="form-label">
                   <Text id="integration.thermostat.edit.switchFeatureLabel" />
@@ -381,7 +456,7 @@ const EditForm = ({ ...props }) => {
                   <FeatureSelect
                     value={props.thermostatEditSwitchFeature || ''}
                     features={props.switchFeatures}
-                    onChange={e => props.updateThermostatField('thermostatEditSwitchFeature', e.target.value)}
+                    onChange={e => props.updateThermostatActuator('thermostatEditSwitchFeature', e.target.value)}
                     emptyLabel={<Text id="global.emptySelectOption" />}
                   />
                 </Localizer>
@@ -390,6 +465,11 @@ const EditForm = ({ ...props }) => {
                 </small>
               </div>
             )}
+
+            {/* Fil pilote : l'autre façon de piloter un radiateur, par un ordre
+                sur son fil de commande plutôt que par une coupure. Gladys le
+                régule alors sur le capteur d'ambiance. */}
+            {isVirtualThermostat && pilotWirePicker}
 
             {/* Capteur d'ouverture de fenêtre */}
             <div class="form-group">
@@ -413,11 +493,12 @@ const EditForm = ({ ...props }) => {
                 all have working defaults, and putting them ahead of the sensor
                 and the actuator buried the two fields that decide whether the
                 thermostat regulates at all. A real thermostat runs its own
-                heuristic, so none of this applies to it.
+                heuristic, so none of this applies to it — nor to a pilot-wire
+                heater left to regulate on its own.
 
                 The unit and the bounds stay out of the fold below: they are the
                 thermostat's own, external ones included. */}
-            {!isExternalThermostat && (
+            {isVirtualThermostat && (
               <details class={cx('mb-3', style.tuningDetails)}>
                 {/* With a chevron: styled as a form-label alone, the summary
                     looked like a plain heading and nothing said it opened. */}
@@ -440,7 +521,7 @@ const EditForm = ({ ...props }) => {
                       </option>
                       {/* TPI modulates the on-time over a cycle, which only makes sense
                     for heating: a compressor cannot be pulsed that way */}
-                      {mode !== 'cooling' && (
+                      {mode !== 'cooling' && !hasPilotWire && (
                         <option value="tpi">
                           <Text id="integration.thermostat.edit.controlType.tpi" />
                         </option>
@@ -705,7 +786,15 @@ const EditForm = ({ ...props }) => {
                       <Text id="integration.thermostat.edit.presetColNameLabel" />
                     </th>
                     <th>
-                      <Text id="integration.thermostat.edit.presetColTempLabel" />
+                      {/* A heater regulating itself takes no temperature: each
+                          preset sends an order instead (spec C.1.1). */}
+                      <Text
+                        id={
+                          presetsAreOrders
+                            ? 'integration.thermostat.edit.presetColOrderLabel'
+                            : 'integration.thermostat.edit.presetColTempLabel'
+                        }
+                      />
                     </th>
                   </tr>
                 </thead>
@@ -717,7 +806,23 @@ const EditForm = ({ ...props }) => {
                         <Text id={`integration.thermostat.edit.preset.${key}`} />
                       </td>
                       <td class="align-middle">
-                        {presetFields[key] ? (
+                        {presetsAreOrders && key === 'off' && (
+                          <Text id="deviceFeatureAction.category.heater.pilot-wire-mode.off" />
+                        )}
+                        {presetsAreOrders && key !== 'off' && (
+                          <select
+                            class="form-control form-control-sm"
+                            value={pilotWireOrders[key]}
+                            onChange={e => props.updateThermostatPilotWireOrder(key, Number(e.target.value))}
+                          >
+                            {PILOT_WIRE_ORDER_OPTIONS.map(([value, orderKey]) => (
+                              <option value={value} selected={value === pilotWireOrders[key]}>
+                                <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        {presetsAreOrders ? null : presetFields[key] ? (
                           <div class={cx('input-group', 'input-group-sm', style.presetTempGroup)}>
                             <input
                               type="number"
