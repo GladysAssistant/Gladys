@@ -133,4 +133,35 @@ describe('External integration - update all from the "To update" view', () => {
 
     cy.get('.alert-success').should('exist');
   });
+  it('leaves out an integration already updated from its card whose list could not be reloaded', () => {
+    let daikinUpdates = 0;
+    cy.intercept('POST', `**/api/v1/external_integration/${DAIKIN.selector}/update`, req => {
+      daikinUpdates += 1;
+      // the update goes through, but the list reloaded after it still carries the flag
+      req.reply({ ...DAIKIN, version: '1.0.0' });
+    }).as('updateDaikinStale');
+    cy.intercept('POST', `**/api/v1/external_integration/${LINKY.selector}/update`, req => {
+      installed.linky = { ...LINKY, version: '2.1.3', update_available: false };
+      req.reply(installed.linky);
+    }).as('updateLinky');
+
+    cy.visit('/dashboard/integration/updates');
+    cy.wait('@getInstalled');
+    cy.contains('button', UPDATE_ALL_BUTTON).should('contain', '2');
+    getCard('Daikin Onecta').within(() => {
+      cy.contains('button', 'integration.root.updateButton').click();
+    });
+    cy.wait('@updateDaikinStale');
+    getCard('Daikin Onecta')
+      .find('.text-success')
+      .should('contain', 'v1.0.0');
+
+    // the card says it is up to date: the panel no longer counts it
+    cy.contains('button', UPDATE_ALL_BUTTON)
+      .should('contain', '1')
+      .click();
+    cy.wait('@updateLinky');
+    cy.get('.alert-success').should('exist');
+    cy.then(() => expect(daikinUpdates).to.equal(1));
+  });
 });

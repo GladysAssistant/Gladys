@@ -798,16 +798,29 @@ class Integration extends Component {
 
   // the installed community integrations having a newer version, in the
   // alphabetical order the catalog displays them in, minus the ones whose card
-  // update is already running. Admin-only: the server does not send the
-  // update_available flag to the other users
+  // update is already running, or already went through: a list that could not
+  // be reloaded after it still carries the flag, and only a version newer than
+  // the one just installed is to update again (the rule of the card footer).
+  // Admin-only: the server does not send the update_available flag to the
+  // other users
   getIntegrationsToUpdate() {
     if (get(this.props, 'user.role') !== USER_ROLE.ADMIN) {
       return [];
     }
     const updateStates = this.state.updateStates || {};
+    const isStillToUpdate = integration => {
+      const updateState = updateStates[integration.selector] || {};
+      if (updateState.status === RequestStatus.Getting) {
+        return false;
+      }
+      if (updateState.status === RequestStatus.Success) {
+        return !!integration.latest_version && integration.latest_version !== updateState.version;
+      }
+      return true;
+    };
     return (this.state.externalInstalled || [])
       .filter(integration => integration.update_available)
-      .filter(integration => (updateStates[integration.selector] || {}).status !== RequestStatus.Getting)
+      .filter(isStillToUpdate)
       .map(integration => ({
         selector: integration.selector,
         name: get(integration, 'manifest.name') || integration.name || integration.selector
