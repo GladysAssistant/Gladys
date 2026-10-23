@@ -76,7 +76,8 @@ It follows the rules above:
   all publish the same notion. A device supporting only some of them declares
   that through `supported_options`;
 - **no unit** (`DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE`): the category is a
-  temperature, but a preset, a mode and an operating state are enums.
+  temperature, but a preset, an active preset, a mode and an operating state
+  are enums.
 
 `off` is deliberately **not** a preset: stopping is a mode, and
 `THERMOSTAT_MODE.OFF` already carries it. A schedule transition may still say
@@ -93,6 +94,12 @@ programme" onto this value has to decide whether it means the appliance's
 schedule or Gladys's, and the two are not interchangeable. An integration that
 cannot answer that question simply leaves `schedule` out of its
 `supported_options`.
+
+Because `schedule` is a standing choice, the `preset` feature does not change
+when the programme moves from one point to the next, and a scene cannot start on
+it then. The read-only `active-preset` type (`THERMOSTAT_ACTIVE_PRESET`) carries
+the preset in force instead: the same integers, with `0` meaning stopped rather
+than `schedule` — a programme is never in force, one of its points is.
 
 Consequence for reviews: "brand X only supports 3 of the 5 modes" is **never** a reason to create a narrower category, a brand-specific type, or a stripped-down enum. Keep the generic value set and let the integration declare what each device supports. The air-conditioning features are the reference example: the Matter service builds the `supported_options` of the AC mode feature from the Thermostat cluster's capability flags (heating/cooling/autoMode).
 

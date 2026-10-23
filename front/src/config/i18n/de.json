@@ -5941,6 +5941,15 @@
           "4": "Nacht",
           "5": "Komfort"
         },
+        "active-preset": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Aus",
+          "1": "Frostschutz",
+          "2": "Abwesend",
+          "3": "Eco",
+          "4": "Nacht",
+          "5": "Komfort"
+        },
         "operating-state": {
           "unknown": "{{value}} (unbekannt)",
           "0": "Inaktiv",
@@ -6735,6 +6744,7 @@
       "target-temperature": "Thermostat: Temperatur",
       "mode": "Thermostat: Modus",
       "preset": "Thermostat: Voreinstellung",
+      "active-preset": "Thermostat: Aktive Voreinstellung",
       "operating-state": "Thermostat: Betriebszustand"
     },
     "airquality-sensor": {

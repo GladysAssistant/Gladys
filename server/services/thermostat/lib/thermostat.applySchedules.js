@@ -24,6 +24,7 @@ const {
   getPreset,
   savePreset,
   announcePreset,
+  saveActivePreset,
   saveOperatingState,
   getManualHold,
   setManualHold,
@@ -690,6 +691,7 @@ async function regulateDevice(
   // itself. It holds until a mode is written back.
   if (isStopped(device)) {
     logger.debug(`Thermostat schedule: ${selector} is stopped, leaving it alone`);
+    await saveActivePreset.call({ gladys }, device, 'off');
     if (external) {
       await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten, selfWrittenPowers);
     } else if (config.switch_feature) {
@@ -740,6 +742,9 @@ async function regulateDevice(
       // Fall through — the schedule/preset is applied below
     } else {
       const manualSetpoint = hold.setpoint;
+      // A preset picked by hand is held this way, and it is the one in force. A
+      // hold taken on the dial names no preset: the feature keeps the last one.
+      await saveActivePreset.call({ gladys }, device, currentPreset);
       if (external) {
         // The real thermostat regulates itself: hand it the held setpoint and
         // let it decide when to fire. There is no room sensor to read and no
@@ -906,6 +911,11 @@ async function regulateDevice(
       logger.info(`Thermostat schedule: preset "${targetPreset}" applied to ${selector}`);
     }
   }
+
+  // What is in force, on a feature a scene can start on: the announcement above
+  // only reaches the dashboards, and the preset feature keeps reading
+  // `schedule`. `schedule` itself writes nothing — no point is in force.
+  await saveActivePreset.call({ gladys }, device, targetPreset);
 
   if (keepsItsSetpoint && !hasSetpoint) {
     logger.debug(`Thermostat schedule: no point in force for ${selector}, it keeps its setpoint`);

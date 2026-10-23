@@ -5941,6 +5941,15 @@
           "4": "Noche",
           "5": "Confort"
         },
+        "active-preset": {
+          "unknown": "{{value}} (desconocido)",
+          "0": "Apagado",
+          "1": "Antihielo",
+          "2": "Ausencia",
+          "3": "Eco",
+          "4": "Noche",
+          "5": "Confort"
+        },
         "operating-state": {
           "unknown": "{{value}} (desconocido)",
           "0": "Inactivo",
@@ -6735,6 +6744,7 @@
       "target-temperature": "Temperatura del termostato",
       "mode": "Modo del termostato",
       "preset": "Preajuste del termostato",
+      "active-preset": "Preajuste activo del termostato",
       "operating-state": "Estado de funcionamiento del termostato"
     },
     "airquality-sensor": {

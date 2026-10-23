@@ -12,6 +12,7 @@ const {
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
+  THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../../utils/constants');
 
 const state = proxyquire('../../../../services/thermostat/lib/thermostat.state', {
@@ -38,6 +39,13 @@ const operatingStateFeature = (lastValue) => ({
   selector: 'living-room:operating-state',
   category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
   type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+  last_value: lastValue,
+});
+
+const activePresetFeature = (lastValue) => ({
+  selector: 'living-room:active-preset',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET,
   last_value: lastValue,
 });
 
@@ -211,6 +219,69 @@ describe('thermostat.state operating state', () => {
     const handler = buildHandler();
 
     await state.saveOperatingState.call(handler, { features: [] }, THERMOSTAT_OPERATING_STATE.HEATING);
+
+    assert.notCalled(handler.gladys.device.saveState);
+  });
+});
+
+describe('thermostat.state active preset', () => {
+  afterEach(() => sinon.restore());
+
+  it('should map what is in force to its value', () => {
+    expect(state.activePresetValue('comfort')).to.equal(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+    expect(state.activePresetValue('frost')).to.equal(THERMOSTAT_ACTIVE_PRESET.FROST);
+    expect(state.activePresetValue('off')).to.equal(THERMOSTAT_ACTIVE_PRESET.OFF);
+  });
+
+  it('should have no value for the programme itself, nor for an unknown name', () => {
+    // `schedule` is never in force: one of its points is.
+    expect(state.activePresetValue('schedule')).to.equal(null);
+    expect(state.activePresetValue('boost')).to.equal(null);
+    expect(state.activePresetValue(null)).to.equal(null);
+  });
+
+  it('should write the preset in force through saveState, so scenes see it change', async () => {
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT)] };
+
+    await state.saveActivePreset.call(handler, device, 'frost');
+
+    assert.calledOnceWithExactly(handler.gladys.device.saveState, device.features[0], THERMOSTAT_ACTIVE_PRESET.FROST);
+  });
+
+  it('should write off on a feature never written', async () => {
+    // `Number(null)` is off: the first stop was taken for the stored value.
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(null)] };
+
+    await state.saveActivePreset.call(handler, device, 'off');
+
+    assert.calledWith(handler.gladys.device.saveState, device.features[0], THERMOSTAT_ACTIVE_PRESET.OFF);
+  });
+
+  it('should skip the preset already in force, so the minute loop starts no scene', async () => {
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO)] };
+
+    await state.saveActivePreset.call(handler, device, 'eco');
+
+    assert.notCalled(handler.gladys.device.saveState);
+  });
+
+  it('should write nothing for the programme with no point in force', async () => {
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO)] };
+
+    await state.saveActivePreset.call(handler, device, 'schedule');
+
+    assert.notCalled(handler.gladys.device.saveState);
+  });
+
+  it('should do nothing on a device with no active-preset feature', async () => {
+    // A thermostat saved before the feature existed, until the migration runs.
+    const handler = buildHandler();
+
+    await state.saveActivePreset.call(handler, { features: [] }, 'comfort');
 
     assert.notCalled(handler.gladys.device.saveState);
   });

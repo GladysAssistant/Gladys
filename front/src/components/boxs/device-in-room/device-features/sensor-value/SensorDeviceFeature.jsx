@@ -23,6 +23,7 @@ import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 import FanSensorDeviceValue from './FanSensorDeviceValue';
 import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
 import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDeviceValue';
+import ThermostatActivePresetDeviceValue from './ThermostatActivePresetDeviceValue';
 import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
 import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
@@ -81,6 +82,7 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: PressureSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue,
   [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: ThermostatOperatingStateDeviceValue,
+  [DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET]: ThermostatActivePresetDeviceValue,
   [DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS]: ChargingStationConnectorStatusDeviceValue,
   [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: ChargingStationChargingStateDeviceValue,
   // Registered by type, not by category: the category map is checked first and would force one
