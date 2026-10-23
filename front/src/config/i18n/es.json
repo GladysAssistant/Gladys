@@ -1944,6 +1944,7 @@
         "usagePointName": "Contador",
         "lastRefresh": "Últimos datos:",
         "usagePointId": "ID del contador",
+        "usagePointDeviceName": "Nombre",
         "contractType": "Tipo de contrato",
         "contracts": {
           "hc-hp": "Horas valle/horas punta",

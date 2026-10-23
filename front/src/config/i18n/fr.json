@@ -2250,6 +2250,7 @@
         "usagePointName": "Compteur",
         "lastRefresh": "Dernières données :",
         "usagePointId": "Identifiant du compteur",
+        "usagePointDeviceName": "Nom",
         "contractType": "Type de contrat",
         "contracts": {
           "hc-hp": "Heures creuses/heures pleines",

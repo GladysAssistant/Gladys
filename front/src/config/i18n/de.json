@@ -2135,6 +2135,7 @@
         "usagePointName": "Zähler",
         "lastRefresh": "Letzte Daten: ",
         "usagePointId": "Zähler-ID",
+        "usagePointDeviceName": "Name",
         "contractType": "Vertragstyp",
         "contracts": {
           "hc-hp": "Niedrigtarif/Hochtarif",

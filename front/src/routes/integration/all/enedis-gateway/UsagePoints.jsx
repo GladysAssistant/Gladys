@@ -23,6 +23,7 @@ const UsagePointDevice = ({
   device,
   language = 'fr',
   deviceIndex,
+  updateDeviceName,
   saveDevice,
   destroyDevice,
   reCreateUsagePointDevice,
@@ -71,6 +72,17 @@ const UsagePointDevice = ({
           </h3>
         </div>
         <div class="card-body">
+          <div class="form-group">
+            <label>
+              <Text id="integration.enedis.usagePoints.usagePointDeviceName" />
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              value={device.name}
+              onInput={e => updateDeviceName(deviceIndex, e.target.value)}
+            />
+          </div>
           <div class="form-group">
             <label>
               <Text id="integration.enedis.usagePoints.usagePointId" />
@@ -175,6 +187,7 @@ const EnedisUsagePoints = ({
   errored,
   loading,
   usagePointsDevices,
+  updateDeviceName,
   updateDeviceParam,
   saveDevice,
   destroyDevice,
@@ -230,6 +243,7 @@ const EnedisUsagePoints = ({
                 <UsagePointDevice
                   device={usagePointDevice}
                   deviceIndex={index}
+                  updateDeviceName={updateDeviceName}
                   updateDeviceParam={updateDeviceParam}
                   saveDevice={saveDevice}
                   destroyDevice={destroyDevice}
@@ -284,6 +298,12 @@ class EnedisWelcomePageComponent extends Component {
       });
     }
     await this.setState({ usagePointsDevices: newUsagePointsDevices });
+  };
+  updateDeviceName = (deviceIndex, name) => {
+    const usagePointsDevices = update(this.state.usagePointsDevices, {
+      [deviceIndex]: { name: { $set: name } }
+    });
+    this.setState({ usagePointsDevices });
   };
   getCurrentSync = async () => {
     try {
@@ -365,6 +385,7 @@ class EnedisWelcomePageComponent extends Component {
           sync={this.sync}
           syncs={syncs}
           language={user.language}
+          updateDeviceName={this.updateDeviceName}
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
           destroyDevice={this.destroyDevice}
