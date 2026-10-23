@@ -12,6 +12,7 @@ const {
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
+  THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
 
@@ -1323,5 +1324,138 @@ describe('thermostat.regulateDevice - several sensors', () => {
 
     expect(gladys.device.setValue.firstCall.args[1].selector).to.equal('heater-switch');
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
+  });
+});
+
+describe('thermostat.regulateDevice - active preset', () => {
+  // The preset feature keeps reading `schedule` while the programme runs, so a
+  // scene listening to it never started when the programme moved on. The preset
+  // in force goes on its own feature, written through saveState, which is what
+  // a scene trigger sees.
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const activePresetFeature = (value = null) => ({
+    selector: 'thermostat-living-room:active-preset',
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET,
+    last_value: value,
+  });
+
+  const activeWrites = (gladys, feature) =>
+    gladys.device.saveState
+      .getCalls()
+      .filter((call) => call.args[0] === feature)
+      .map((call) => call.args[1]);
+
+  const thermostat = (features, extraParams = {}) => ({
+    id: 'device-id',
+    selector: 'living-room',
+    features: [setpointFeature(), ...features],
+    params: baseParams({ THERMOSTAT_PRESET_ECO: '18', ...extraParams }),
+  });
+
+  it('should write the point of the programme in force', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const preset = presetFeature('schedule');
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+
+    await regulate(mod, gladys, thermostat([preset, active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.ECO]);
+    // The standing choice is untouched: the thermostat keeps following its programme.
+    expect(activeWrites(gladys, preset)).to.deep.equal([]);
+  });
+
+  it('should write nothing while the same point stays in force', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(mod, gladys, thermostat([presetFeature('schedule'), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([]);
+  });
+
+  it('should write off on an Off point of the programme', async () => {
+    const mod = load(fullDaySchedule('off'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(mod, gladys, thermostat([presetFeature('schedule'), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.OFF]);
+  });
+
+  it('should write the preset a user picked', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(null);
+
+    await regulate(mod, gladys, thermostat([presetFeature('comfort'), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.COMFORT]);
+  });
+
+  it('should write the preset a hold was armed on', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(
+      mod,
+      gladys,
+      thermostat([presetFeature('comfort'), active], {
+        THERMOSTAT_MANUAL_SETPOINT: '21',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 3600 * 1000),
+      }),
+    );
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.COMFORT]);
+  });
+
+  it('should keep the last preset on a hold taken on the dial', async () => {
+    // The dial names no preset: the thermostat still reads `schedule`.
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(
+      mod,
+      gladys,
+      thermostat([presetFeature('schedule'), active], {
+        THERMOSTAT_MANUAL_SETPOINT: '22.5',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 3600 * 1000),
+      }),
+    );
+
+    expect(activeWrites(gladys, active)).to.deep.equal([]);
+  });
+
+  it('should write off on a thermostat stopped by hand', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+
+    await regulate(mod, gladys, thermostat([presetFeature('schedule'), modeFeature(THERMOSTAT_MODE.OFF), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.OFF]);
+  });
+
+  it('should keep the preset in force while a window is open', async () => {
+    // The window only interrupts the heating: the preset comes back with it.
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15, windowOpen: true }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+
+    await regulate(
+      mod,
+      gladys,
+      thermostat([presetFeature('schedule'), active], { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+    );
+
+    expect(activeWrites(gladys, active)).to.deep.equal([]);
   });
 });

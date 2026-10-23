@@ -173,12 +173,13 @@ The values are **append-only**, for the reason `WATER_HEATER_MODE` gives: an int
 
 ### B.3 What a virtual thermostat carries
 
-A virtual thermostat therefore carries **four** features, not one:
+A virtual thermostat therefore carries **five** features, not one:
 
 | Type                 | Unit                     | Written by                                              | Read by                   |
 | -------------------- | ------------------------ | ------------------------------------------------------- | ------------------------- |
 | `target-temperature` | `celsius` / `fahrenheit` | the loop, the widget, scenes                            | everything                |
 | `preset`             | —                        | the widget, scenes, the loop (on a schedule transition) | everything                |
+| `active-preset`      | —                        | the loop                                                | scenes, everything        |
 | `mode`               | —                        | the widget, scenes                                      | everything                |
 | `operating-state`    | —                        | the loop                                                | the widget's heating halo |
 
@@ -188,10 +189,25 @@ An **external** thermostat mirrors **none of the real device's features** (A.0):
 
 Two exceptions prove the rule, and both are Gladys's own state rather than the appliance's:
 
-- its **`preset`** — no real thermostat publishes Gladys's preset vocabulary, and the preset is genuinely this integration's state, not the device's;
+- its **`preset`** and **`active-preset`** — no real thermostat publishes Gladys's preset vocabulary, and the preset is genuinely this integration's state, not the device's;
 - its **`mode`**, which carries one decision: whether Gladys has stopped this thermostat. "Stopped by Gladys" is not something the appliance knows — an external thermostat that heats on its own is doing what it was built to do, and `THERMOSTAT_MODE.OFF` here is what tells the loop to stop writing to it and the widget to show it stopped. It is distinct from `THERMOSTAT_MODE_FEATURE`, which names the **real device's** mode on the real device, and which this service writes when one exists (C.0). A device may have both, one, or neither.
 
-These two features, and no others, are what an external thermostat carries.
+These three features, and no others, are what an external thermostat carries.
+
+### B.4 The preset in force
+
+The `preset` feature is the standing choice, and while the thermostat follows its programme it reads `schedule` whatever the current point is. It has to: storing the point the loop resolved would read as a deliberate choice on the next pass, and the thermostat would stop following its programme for good (C). The consequence is that the feature does not change when the programme moves from `comfort` to `frost`, so no `NEW_STATE` is emitted and **a scene listening to it never starts on a programme change** — only on a preset picked by hand. The dashboards were never affected, because the loop announces the point in force over the WebSocket (`thermostat.preset-updated`), but that message does not reach the scene engine.
+
+`DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET` carries the preset in force instead, read-only and written by the loop through `saveState`, so a scene trigger sees it change. Its `THERMOSTAT_ACTIVE_PRESET` enum takes `THERMOSTAT_PRESET`'s integers for the five temperatures, and `0` — `schedule` there, which is never in force — means stopped:
+
+| Value   | Name                | Written when                                                                                          |
+| ------- | ------------------- | ----------------------------------------------------------------------------------------------------- |
+| `0`     | `OFF`               | the mode is `off` (stopped by hand), or the programme's point is `off`                                |
+| `1`–`5` | `FROST` … `COMFORT` | that preset is in force: the programme's point, or a preset picked by hand (with or without its hold) |
+
+It is written only when its value changes, so the minute loop starts no scene on its own. Three cases leave it as it is: an open window, which interrupts the heating but not the preset; a hold taken on the dial, which names no preset; and a programme with no point in force, which keeps its setpoint (C).
+
+Thermostats created before this feature get it from the migration `20261023000000-add-thermostat-active-preset-feature`, with the external_id `createDevice` builds (`<external_id>:active-preset`), so their next save from the edit form matches it rather than adding a second one. It is created without a value, and the loop writes it within the minute.
 
 ## C. Regulation loop
 

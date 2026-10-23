@@ -6099,6 +6099,15 @@
           "4": "Nuit",
           "5": "Confort"
         },
+        "active-preset": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Arrêt",
+          "1": "Hors-gel",
+          "2": "Absence",
+          "3": "Éco",
+          "4": "Nuit",
+          "5": "Confort"
+        },
         "operating-state": {
           "unknown": "{{value}} (inconnu)",
           "0": "Inactif",
@@ -6900,6 +6909,7 @@
       "target-temperature": "Température de consigne",
       "mode": "Mode du thermostat",
       "preset": "Preset du thermostat",
+      "active-preset": "Preset actif du thermostat",
       "operating-state": "État de fonctionnement du thermostat"
     },
     "airquality-sensor": {
