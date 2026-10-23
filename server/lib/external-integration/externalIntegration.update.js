@@ -104,6 +104,28 @@ async function pullFirstAvailable(supervisor, candidates, { allowLocal }) {
 }
 
 /**
+ * @description Whether one of the given images is on the disk. A Docker
+ * error answers true: the caller then attempts the pull, which reports the
+ * real failure instead of silently skipping an image the user may need.
+ * @param {object} supervisor - The external integration service.
+ * @param {Array} images - Image references.
+ * @returns {Promise<boolean>} Resolve with true if one of them is present.
+ * @example
+ * const present = await isAnyImagePresent(this, ['eclipse-mosquitto:2.0.18']);
+ */
+async function isAnyImagePresent(supervisor, images) {
+  const presence = await Promise.map(images, async (image) => {
+    try {
+      return await supervisor.system.imageExists(image);
+    } catch (e) {
+      logger.debug(`Unable to check the local presence of the image ${image}`, e);
+      return true;
+    }
+  });
+  return presence.includes(true);
+}
+
+/**
  * @description Update an external integration: resolve the latest manifest
  * (store index refreshed on the spot *and* manifest of the repo, most recent
  * first, falling back on the running image), pull the first image that can
@@ -196,7 +218,23 @@ async function update(selector) {
       logger.warn(`Unable to read the image labels of ${image}, keeping the stored manifest`, e);
     }
   }
+  // `auto` sub-containers start without being asked for: their image is made
+  // available now. A `manual` one is re-pulled only when it is already on the
+  // disk — the new tag, or the one the previous version declared for the same
+  // entry: whoever runs it gets the new version, whoever never started it
+  // (the remote-mode Frigate user) still downloads nothing (B.2)
+  const previousEntries = this.getManifestContainers(service);
   await Promise.each((manifest && manifest.containers) || [], async (entry) => {
+    if (entry.start === 'manual') {
+      const previousEntry = previousEntries.find((declared) => declared.name === entry.name);
+      const images = [entry.docker_image];
+      if (previousEntry && previousEntry.docker_image !== entry.docker_image) {
+        images.push(previousEntry.docker_image);
+      }
+      if (!(await isAnyImagePresent(this, images))) {
+        return;
+      }
+    }
     await this.ensureImage(entry.docker_image, { allowLocal });
   });
   // captured before the row is rewritten: what the integration ran *until now*.
