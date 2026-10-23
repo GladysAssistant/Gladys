@@ -1384,6 +1384,7 @@ class ThermostatBox extends Component {
                   <CircularGauge
                     key={`gauge-${mode}`}
                     setpoint={displaySetpoint}
+                    animate={!this.state.isDragging}
                     currentTemp={displayCurrentTemp}
                     humidity={humidity}
                     onPointerDown={this.onPointerDown}
