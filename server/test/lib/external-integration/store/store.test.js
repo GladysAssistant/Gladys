@@ -43,6 +43,9 @@ const TEST_INDEX = {
         keywords: ['Wiim', 'Arylic'],
         countries: ['FR', 'BE'],
       },
+      // resolved by the indexer (manifest, else its fallback mapping): a
+      // malformed code is dropped by the projection
+      countries: ['FR', 'BE', 'bad', 42],
       cover_url: null,
       github: { stars: 1, pushed_at: '2026-07-01T12:00:00.000Z' },
     },
@@ -350,6 +353,9 @@ describe('externalIntegration store', () => {
       expect(catalog.integrations[0].first_seen_at).to.equal('2026-08-01T00:00:00.000Z');
       expect(catalog.integrations[1].categories).to.deep.equal([]);
       expect(catalog.integrations[1].first_seen_at).to.equal(null);
+      // an index predating the countries field reads as worldwide
+      expect(catalog.integrations[0].countries).to.deep.equal([]);
+      expect(catalog.integrations[1].countries).to.deep.equal([]);
     });
 
     it('should treat a malformed gladys_version range as incompatible', async () => {
@@ -386,6 +392,15 @@ describe('externalIntegration store', () => {
       const catalog = await externalIntegration.getCatalog({ search: 'arylic' });
       expect(catalog.integrations).to.have.lengthOf(1);
       expect(catalog.integrations[0].store_slug).to.equal('jane/gladys-incompatible');
+    });
+
+    it('should project the indexer countries, dropping malformed codes', async () => {
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.storeIndex = TEST_INDEX;
+      externalIntegration.storeIndexFetchedAt = Date.now();
+      const catalog = await externalIntegration.getCatalog();
+      expect(catalog.integrations[0].countries).to.deep.equal([]);
+      expect(catalog.integrations[1].countries).to.deep.equal(['FR', 'BE']);
     });
 
     it('should search the repository owner (the author) too', async () => {

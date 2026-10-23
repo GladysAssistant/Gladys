@@ -419,7 +419,10 @@ class Integration extends Component {
     // An installed card carries the manifest of its running image, which may
     // predate the store listing (or the fallback mapping of the indexer): the
     // lite index entry is read too, like getCardCategories does, so a brand
-    // keyword published since still finds the card the user actually has
+    // keyword published since still finds the card the user actually has.
+    // The countries come first from the entry-level field the indexer
+    // resolves (manifest, else its fallback mapping — spec C.6), like the
+    // categories, then from the manifests
     const unionOf = (...lists) => Array.from(new Set(lists.flatMap(list => (Array.isArray(list) ? list : []))));
     const getSearchFields = (manifest, storeSlug, storeIntegration) => {
       const storeManifest = (storeIntegration && storeIntegration.manifest) || {};
@@ -427,7 +430,7 @@ class Integration extends Component {
         descriptions: Object.values(manifest.description || {}).filter(text => typeof text === 'string'),
         keywords: unionOf(manifest.keywords, storeManifest.keywords),
         author: getStoreOwner(storeSlug),
-        countries: unionOf(manifest.countries, storeManifest.countries)
+        countries: unionOf(storeIntegration && storeIntegration.countries, manifest.countries, storeManifest.countries)
       };
     };
 
