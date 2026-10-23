@@ -476,6 +476,14 @@ describe('thermostatRanges: trimming around a new range', () => {
     ]);
   });
 
+  it('should ignore the part of a new range two days after the night', () => {
+    // Tuesday 05:00 → 03:00 ends on Wednesday: read as Tuesday, that end cut the
+    // night at midnight and left a tail overlapping the new range.
+    expect(trimRangesAround([night], { day_of_week: 1, start_time: '05:00', end_time: '03:00' })).to.deep.equal([
+      { ...night, end_time: '05:00' },
+    ]);
+  });
+
   it('should carry Sunday night onto Monday', () => {
     const sundayNight = { ...night, day_of_week: 6 };
     expect(trimRangesAround([sundayNight], { day_of_week: 6, start_time: '00:00', end_time: '00:00' })).to.deep.equal([
