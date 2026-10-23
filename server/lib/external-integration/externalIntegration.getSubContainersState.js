@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const get = require('get-value');
 
 const logger = require('../../utils/logger');
-const { SUB_CONTAINER_PORTS_VARIABLE } = require('./constants');
+const { SUB_CONTAINER_PORTS_VARIABLE, SUB_CONTAINER_CAPABILITIES } = require('./constants');
 
 /**
  * @description Build the state of every declared sub-container: Docker
@@ -79,9 +79,10 @@ async function getSubContainersState(service) {
         available: Boolean(detected && detected.detected),
       };
     });
+    // granted = effectively added (fail-closed allowlist, like the CapAdd)
     const capabilities = (entry.capabilities || []).map((capability) => ({
       name: capability,
-      granted: grantedCapabilities.includes(capability),
+      granted: grantedCapabilities.includes(capability) && SUB_CONTAINER_CAPABILITIES.includes(capability),
     }));
     return {
       name: entry.name,

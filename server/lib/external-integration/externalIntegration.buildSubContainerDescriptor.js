@@ -2,6 +2,7 @@ const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const {
   EXTERNAL_INTEGRATION_LABEL,
   SUB_CONTAINER_LABEL,
+  SUB_CONTAINER_GRANTS_LABEL,
   PRIVATE_NETWORK_PREFIX,
   SUB_CONTAINER_MEMORY_DEFAULT_MB,
   SUB_CONTAINER_CPU_DEFAULT,
@@ -21,7 +22,9 @@ const BYTES_PER_MB = 1024 * 1024;
  * the integration data folder (the manifest never chooses a host path), host
  * ports chosen by Gladys,
  * devices = requested (manifest) ∩ granted (user) ∩ present (detection),
- * CapAdd = requested ∩ granted Linux capabilities (on top of CapDrop ALL),
+ * CapAdd = requested ∩ granted ∩ allowlisted Linux capabilities (on top of
+ * CapDrop ALL, fail-closed: a name outside the allowlist produces nothing),
+ * a label fingerprinting these effective grants,
  * and limits sized by the manifest within the validated bounds (memory, CPU,
  * /dev/shm, tasks, /tmp size — never the flags).
  * @param {object} service - The external integration service (plain object).
@@ -38,23 +41,9 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
   const cpuCfsSupported = await this.system.hasCpuCfsSupport();
   const networkName = `${PRIVATE_NETWORK_PREFIX}${service.selector}`;
   const finalEnv = { ...(entry.env || {}), ...env, TZ: timezone };
-  // devices: requested ∩ granted ∩ present, resolved at every creation —
-  // plugging a Coral then recreating the container is enough
-  const grantedClasses = Array.isArray(service.granted_devices) ? service.granted_devices : [];
-  const detectedClasses = await this.system.detectHardwareClasses();
-  const devices = [];
-  (entry.devices || [])
-    .filter((hardwareClass) => grantedClasses.includes(hardwareClass))
-    .forEach((hardwareClass) => {
-      const detected = detectedClasses.find((detectedClass) => detectedClass.class === hardwareClass);
-      ((detected && detected.paths) || []).forEach((path) => {
-        devices.push({ PathOnHost: path, PathInContainer: path, CgroupPermissions: 'rwm' });
-      });
-    });
-  // capabilities: requested ∩ granted, added back on top of CapDrop ALL —
-  // the manifest allowlist is Docker's default set, never beyond it (C.1)
-  const grantedCapabilities = Array.isArray(service.granted_capabilities) ? service.granted_capabilities : [];
-  const capAdd = (entry.capabilities || []).filter((capability) => grantedCapabilities.includes(capability));
+  // devices = requested ∩ granted ∩ present, CapAdd = requested ∩ granted ∩
+  // allowlist (fail-closed), fingerprinted for the start-time reconciliation
+  const { capAdd, devices, fingerprint } = await this.getEffectiveSubContainerGrants(service, entry);
   // each volume is mounted from a host path DERIVED by the supervisor: a
   // sub-container cannot write outside the folder of its integration; the
   // main container sees these volumes under /data/containers/<name>/...
@@ -83,6 +72,9 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
       // the whole group, even orphans after a crash mid-operation
       [EXTERNAL_INTEGRATION_LABEL]: service.selector,
       [SUB_CONTAINER_LABEL]: entry.name,
+      // effective grants it was created with: a start recreates the
+      // container when they no longer match (revocation, allowlist change)
+      [SUB_CONTAINER_GRANTS_LABEL]: fingerprint,
       // updates are driven by the supervisor: Watchtower must never
       // recreate this container behind Gladys' back
       'com.centurylinklabs.watchtower.enable': 'false',

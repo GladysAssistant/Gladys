@@ -45,11 +45,6 @@ class ExternalIntegrationInstallPage extends Component {
         duplicateOfInstalled: this.findDuplicateOfInstalled(storeIntegration, installedIntegrations),
         loadStatus: RequestStatus.Success
       });
-      // pre-checked: the manifest only requests capabilities of Docker's
-      // default set, which the image needs to start at all (Frigate's init)
-      this.setState({
-        grantedCapabilities: getRequestedCapabilities(get(storeIntegration, 'manifest.containers') || [])
-      });
       await this.loadHardware(storeIntegration);
     } catch (e) {
       console.error(e);
@@ -99,6 +94,17 @@ class ExternalIntegrationInstallPage extends Component {
       grantedCapabilities: grantedCapabilities.includes(capability)
         ? grantedCapabilities.filter(grantedCapability => grantedCapability !== capability)
         : grantedCapabilities.concat([capability])
+    });
+  };
+
+  // the one deliberate gesture granting every requested capability: the
+  // switches start off (an explicit grant, never pre-checked), unlike the
+  // detected hardware classes
+  toggleAllCapabilities = grantAll => {
+    this.setState({
+      grantedCapabilities: grantAll
+        ? getRequestedCapabilities(get(this.state.storeIntegration, 'manifest.containers') || [])
+        : []
     });
   };
 
@@ -358,6 +364,7 @@ class ExternalIntegrationInstallPage extends Component {
                                   requestedCapabilities={requestedCapabilities}
                                   granted={grantedCapabilities}
                                   onToggle={this.toggleCapability}
+                                  onToggleAll={this.toggleAllCapabilities}
                                   disabled={installing}
                                 />
                               </div>

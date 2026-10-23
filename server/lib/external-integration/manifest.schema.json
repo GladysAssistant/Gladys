@@ -741,26 +741,22 @@
         },
         "capabilities": {
           "type": "array",
-          "maxItems": 14,
+          "maxItems": 10,
           "uniqueItems": true,
-          "description": "Requested Linux capabilities, added back on top of CapDrop ALL — a closed allowlist that is exactly Docker's default set (never SYS_ADMIN, NET_ADMIN...). Requesting is not obtaining: the user grants them in the UI; the effective CapAdd is requested ∩ granted. Needed by images whose init runs as root and drops privileges itself (e.g. Frigate's s6-overlay).",
+          "description": "Requested Linux capabilities, added back on top of CapDrop ALL — a closed, need-based allowlist: the init-as-root subset an upstream image needs (Frigate's s6-overlay), strictly inside Docker's default set (never SYS_ADMIN, NET_ADMIN, NET_RAW...). Requesting is not obtaining: the user grants them in the UI; the effective CapAdd is requested ∩ granted ∩ allowlist.",
           "items": {
             "type": "string",
             "enum": [
               "CHOWN",
               "DAC_OVERRIDE",
-              "FSETID",
               "FOWNER",
-              "MKNOD",
-              "NET_RAW",
+              "FSETID",
               "SETGID",
               "SETUID",
-              "SETFCAP",
               "SETPCAP",
-              "NET_BIND_SERVICE",
-              "SYS_CHROOT",
               "KILL",
-              "AUDIT_WRITE"
+              "NET_BIND_SERVICE",
+              "SYS_CHROOT"
             ]
           }
         },

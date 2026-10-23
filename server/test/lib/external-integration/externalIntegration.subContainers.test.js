@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert } = sinon;
 
 const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
-const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, grantsLabels, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 const {
   EXTERNAL_INTEGRATION_LABEL,
   SUB_CONTAINER_LABEL,
@@ -202,7 +202,7 @@ describe('externalIntegration.startSubContainer', () => {
 
   it('should just start an existing container when the env is unchanged', async () => {
     const { externalIntegration, system, variable } = buildSupervisor({
-      system: { getContainers: fake.resolves([{ id: 'sub-1' }]) },
+      system: { getContainers: fake.resolves([{ id: 'sub-1', labels: grantsLabels() }]) },
     });
     const service = await seedMultiContainerService();
     await variable.setValue(SUB_CONTAINER_ENV_VARIABLE, JSON.stringify({ mqtt: { KEY: 'value' } }), service.id);
@@ -215,7 +215,7 @@ describe('externalIntegration.startSubContainer', () => {
   it('should recreate the container when the provided env differs', async () => {
     const { externalIntegration, system } = buildSupervisor({
       system: {
-        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        getContainers: fake.resolves([{ id: 'sub-1', labels: grantsLabels() }]),
         createContainer: fake.resolves({ id: 'sub-2' }),
       },
     });
@@ -238,7 +238,7 @@ describe('externalIntegration.startSubContainer', () => {
     restartContainer.onSecondCall().resolves(true);
     const { externalIntegration, system } = buildSupervisor({
       system: {
-        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        getContainers: fake.resolves([{ id: 'sub-1', labels: grantsLabels() }]),
         createContainer: fake.resolves({ id: 'sub-2' }),
         restartContainer,
       },
@@ -270,7 +270,7 @@ describe('externalIntegration.startSubContainer', () => {
     restartContainer.onSecondCall().resolves(true);
     const { externalIntegration, system } = buildSupervisor({
       system: {
-        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        getContainers: fake.resolves([{ id: 'sub-1', labels: grantsLabels() }]),
         createContainer: fake.resolves({ id: 'sub-2' }),
         restartContainer,
       },
@@ -284,11 +284,42 @@ describe('externalIntegration.startSubContainer', () => {
     assert.calledWith(restartContainer.secondCall, 'sub-2');
   });
 
+  it('should recreate an existing container whose effective grants changed (revocation)', async () => {
+    // created with CHOWN + SETUID, the user revoked SETUID since (and the
+    // recreation of the grant change failed, or Gladys restarted)
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'sub-1', labels: grantsLabels({ capAdd: ['CHOWN', 'SETUID'] }) }]),
+        createContainer: fake.resolves({ id: 'sub-2' }),
+      },
+    });
+    const service = await seedMultiContainerService({ granted_capabilities: ['CHOWN'] });
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[0], capabilities: ['CHOWN', 'SETUID'] };
+    await externalIntegration.startSubContainer(service, entry);
+    assert.calledWith(system.removeContainer, 'sub-1', { force: true });
+    assert.calledOnce(system.createContainer);
+    expect(system.createContainer.firstCall.args[0].HostConfig.CapAdd).to.deep.equal(['CHOWN']);
+    assert.calledWith(system.restartContainer, 'sub-2');
+  });
+
+  it('should recreate an existing container created without the grants label', async () => {
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        createContainer: fake.resolves({ id: 'sub-2' }),
+      },
+    });
+    const service = await seedMultiContainerService();
+    await externalIntegration.startSubContainer(service, TEST_CONTAINERS_MANIFEST.containers[0]);
+    assert.calledOnce(system.createContainer);
+    assert.calledWith(system.restartContainer, 'sub-2');
+  });
+
   it('should not recreate the container on another start failure', async () => {
     const error = new Error('DOCKER_DAEMON_DOWN');
     const { externalIntegration, system } = buildSupervisor({
       system: {
-        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        getContainers: fake.resolves([{ id: 'sub-1', labels: grantsLabels() }]),
         restartContainer: fake.rejects(error),
       },
     });
@@ -314,6 +345,21 @@ describe('externalIntegration.ensureSubContainers', () => {
     // frigate is auto (desired running), mqtt is manual (desired stopped)
     assert.calledOnce(system.createContainer);
     expect(system.createContainer.firstCall.args[0].name).to.equal('gladys-ext-dev-open-meteo-demo-frigate');
+  });
+
+  it('should recreate an existing auto container whose device grant was revoked', async () => {
+    // frigate was created with the Coral mounted, the user revoked it
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'frigate-1', labels: grantsLabels({ devices: ['/dev/bus/usb'] }) }]),
+        createContainer: fake.resolves({ id: 'frigate-2' }),
+      },
+    });
+    const service = await seedMultiContainerService({ granted_devices: [] });
+    await externalIntegration.ensureSubContainers(service);
+    assert.calledOnce(system.createContainer);
+    expect(system.createContainer.firstCall.args[0].HostConfig).to.not.have.property('Devices');
+    assert.calledWith(system.restartContainer, 'frigate-2');
   });
 
   it('should do nothing without declared containers', async () => {
@@ -437,7 +483,9 @@ describe('externalIntegration.controlSubContainer', () => {
 
   it('should restart an existing container', async () => {
     const { externalIntegration, system } = buildSupervisor({
-      system: { getContainers: fake.resolves([{ id: 'frigate-1' }]) },
+      system: {
+        getContainers: fake.resolves([{ id: 'frigate-1', labels: grantsLabels({ devices: ['/dev/bus/usb'] }) }]),
+      },
     });
     const service = await seedMultiContainerService();
     await externalIntegration.controlSubContainer(service, 'frigate', 'restart');

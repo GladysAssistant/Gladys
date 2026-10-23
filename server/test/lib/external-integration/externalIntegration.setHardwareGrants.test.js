@@ -148,4 +148,60 @@ describe('externalIntegration.setHardwareGrants', () => {
       { name: 'SETUID', granted: true },
     ]);
   });
+
+  it('should never grant a capability outside the allowlist, even requested by a stale stored manifest', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // stored before the allowlist was narrowed (or tampered with): the
+    // validator would reject it today, the grant check filters it too
+    await seedExternalService({
+      manifest: {
+        ...TEST_CONTAINERS_MANIFEST,
+        containers: [{ ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN', 'NET_RAW'] }],
+      },
+    });
+    try {
+      await externalIntegration.setHardwareGrants('ext-dev-open-meteo-demo', {
+        grantedCapabilities: ['CHOWN', 'NET_RAW'],
+      });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.equal('granted_capabilities: NET_RAW not requested by the manifest');
+    }
+  });
+
+  it('should attempt every affected recreation, notify, then report the first error', async () => {
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        // both sub-containers exist
+        getContainers: fake.resolves([{ id: 'old' }]),
+        createContainer: sinon
+          .stub()
+          .onFirstCall()
+          .rejects(new Error('MQTT_RECREATION_FAILED'))
+          .onSecondCall()
+          .resolves({ id: 'frigate-new' }),
+      },
+    });
+    // both entries request capabilities: both are affected
+    await seedExternalService({
+      manifest: {
+        ...TEST_CONTAINERS_MANIFEST,
+        containers: [
+          { ...TEST_CONTAINERS_MANIFEST.containers[0], capabilities: ['CHOWN'] },
+          { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN'] },
+        ],
+      },
+    });
+    externalIntegration.sendMessage = fake.returns(true);
+    await expect(
+      externalIntegration.setHardwareGrants('ext-dev-open-meteo-demo', { grantedCapabilities: [] }),
+    ).to.be.rejectedWith('MQTT_RECREATION_FAILED');
+    // the failure of mqtt did not leave frigate on the previous grants
+    assert.calledTwice(system.createContainer);
+    assert.calledWith(system.restartContainer, 'frigate-new');
+    assert.calledOnce(externalIntegration.sendMessage);
+    const inDb = await db.Service.findOne({ where: { selector: 'ext-dev-open-meteo-demo' } });
+    expect(inDb.granted_capabilities).to.deep.equal([]);
+  });
 });

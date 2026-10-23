@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 
 const db = require('../../models');
+const logger = require('../../utils/logger');
 const { Error422 } = require('../../utils/httpErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
@@ -11,7 +12,9 @@ const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
  * granting is a user gesture — the effective mount is requested ∩ granted ∩
  * present, the effective CapAdd requested ∩ granted. The affected
  * sub-containers (the ones requesting what changed) are recreated so the
- * change applies immediately, and the integration is notified through WS
+ * change applies immediately — each one attempted even if a previous one
+ * failed, the first error thrown after the notification —, and the
+ * integration is notified through WS
  * (hardware-updated) so it can regenerate its configs and restart what it
  * needs.
  * @param {string} selector - The selector of the external integration.
@@ -37,6 +40,7 @@ async function setHardwareGrants(selector, { grantedDevices, grantedCapabilities
   );
   const updatedService = await this.getBySelector(selector);
   // recreate the sub-containers requesting what changed, keeping their state
+  const recreationErrors = [];
   if (this.available) {
     const affectedEntries = this.getManifestContainers(updatedService).filter(
       (entry) =>
@@ -45,17 +49,25 @@ async function setHardwareGrants(selector, { grantedDevices, grantedCapabilities
     );
     const desired = await this.getDesiredContainers(updatedService);
     const storedEnvs = await this.getStoredSubContainerEnvs(updatedService);
+    // every affected entry is attempted before reporting: one failed
+    // recreation must not leave the next ones on the previous grants (the
+    // failed one is reconciled at its next start, grants fingerprint)
     await Promise.each(affectedEntries, async (entry) => {
-      const existing = await this.findSubContainer(updatedService, entry.name);
-      if (!existing) {
-        // never created: nothing to recreate
-        return;
-      }
-      const container = await this.createSubContainer(updatedService, entry, {
-        env: storedEnvs[entry.name] || {},
-      });
-      if (desired[entry.name] === 'running') {
-        await this.system.restartContainer(container.id);
+      try {
+        const existing = await this.findSubContainer(updatedService, entry.name);
+        if (!existing) {
+          // never created: nothing to recreate
+          return;
+        }
+        const container = await this.createSubContainer(updatedService, entry, {
+          env: storedEnvs[entry.name] || {},
+        });
+        if (desired[entry.name] === 'running') {
+          await this.system.restartContainer(container.id);
+        }
+      } catch (e) {
+        logger.warn(`Unable to recreate sub-container ${entry.name} of integration ${selector}`, e);
+        recreationErrors.push(e);
       }
     });
   }
@@ -63,6 +75,11 @@ async function setHardwareGrants(selector, { grantedDevices, grantedCapabilities
   this.sendMessage(updatedService, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.HARDWARE_UPDATED, {
     containers: containersState.map(({ name, devices, capabilities }) => ({ name, devices, capabilities })),
   });
+  // the grants are saved and the integration notified either way: the
+  // first error is reported, every one of them was logged above
+  if (recreationErrors.length > 0) {
+    throw recreationErrors[0];
+  }
   return updatedService;
 }
 

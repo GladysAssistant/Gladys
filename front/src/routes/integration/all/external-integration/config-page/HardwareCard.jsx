@@ -6,9 +6,10 @@ import CapabilitySwitches from '../components/CapabilitySwitches';
 import { RequestStatus } from '../../../../../utils/consts';
 
 // Same switches as the install screen — hardware classes and Linux
-// capabilities —, editable at any time (admin): a change recreates the
-// affected sub-containers and notifies the integration (hardware-updated) so
-// it adapts its configuration.
+// capabilities —, editable at any time (admin): a save posts only the grant
+// list(s) that changed, so it recreates only the sub-containers requesting
+// what changed, and notifies the integration (hardware-updated) so it adapts
+// its configuration.
 const HardwareCard = ({
   containers,
   requestedClasses,
@@ -19,6 +20,7 @@ const HardwareCard = ({
   hardwareStatus,
   onToggle,
   onToggleCapability,
+  onToggleAllCapabilities,
   onSave
 }) => {
   const saving = hardwareStatus === RequestStatus.Getting;
@@ -60,6 +62,7 @@ const HardwareCard = ({
               requestedCapabilities={requestedCapabilities}
               granted={grantedCapabilities}
               onToggle={onToggleCapability}
+              onToggleAll={onToggleAllCapabilities}
               disabled={saving}
             />
           </div>

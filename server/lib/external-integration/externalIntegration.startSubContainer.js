@@ -1,10 +1,14 @@
 const { isCpuCfsError } = require('../system/system.createContainer');
+const { SUB_CONTAINER_GRANTS_LABEL } = require('./constants');
 
 /**
  * @description Start a declared sub-container: create it if it doesn't
  * exist yet, recreate it first when the provided runtime env differs from
- * the one of the existing container (destroy + create, the /data volumes
- * persist), then start it.
+ * the one of the existing container, or when its effective grants (CapAdd +
+ * devices, fingerprinted in a label) differ from the current ones — a
+ * revoked capability or device, a failed recreation after a grant change,
+ * a narrowed allowlist never stay active across a restart — (destroy +
+ * create, the /data volumes persist), then start it.
  * @param {object} service - The external integration service (plain object).
  * @param {object} entry - The sub-container declaration from the manifest.
  * @param {object} [options] - Options.
@@ -20,7 +24,14 @@ async function startSubContainer(service, entry, { env } = {}) {
   const effectiveEnv = env === undefined ? storedEnv : env;
   const envChanged = env !== undefined && JSON.stringify(storedEnv) !== JSON.stringify(env);
   let container = await this.findSubContainer(service, entry.name);
-  if (!container || envChanged) {
+  let grantsChanged = false;
+  if (container && !envChanged) {
+    // the labels come with the container listing: no extra inspect call; a
+    // container created before the label existed is recreated once
+    const { fingerprint } = await this.getEffectiveSubContainerGrants(service, entry);
+    grantsChanged = (container.labels || {})[SUB_CONTAINER_GRANTS_LABEL] !== fingerprint;
+  }
+  if (!container || envChanged || grantsChanged) {
     container = await this.createSubContainer(service, entry, { env: effectiveEnv });
   }
   try {

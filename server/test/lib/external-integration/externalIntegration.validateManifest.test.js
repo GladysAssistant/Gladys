@@ -1204,22 +1204,18 @@ describe('externalIntegration.validateManifest', () => {
     });
   });
 
-  it('should accept the whole capability allowlist — Docker default set — in a sub-container', () => {
+  it('should accept the whole need-based capability allowlist in a sub-container', () => {
     const capabilities = [
       'CHOWN',
       'DAC_OVERRIDE',
-      'FSETID',
       'FOWNER',
-      'MKNOD',
-      'NET_RAW',
+      'FSETID',
       'SETGID',
       'SETUID',
-      'SETFCAP',
       'SETPCAP',
+      'KILL',
       'NET_BIND_SERVICE',
       'SYS_CHROOT',
-      'KILL',
-      'AUDIT_WRITE',
     ];
     const manifest = { ...TEST_MANIFEST, containers: [{ name: 'frigate', docker_image: 'img:1.0.0', capabilities }] };
     expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
@@ -1229,10 +1225,23 @@ describe('externalIntegration.validateManifest', () => {
     const base = { name: 'frigate', docker_image: 'img:1.0.0' };
     expect422(
       { ...TEST_MANIFEST, containers: [{ ...base, capabilities: 'CHOWN' }] },
-      'containers[0].capabilities: must be an array of at most 14 Linux capabilities',
+      'containers[0].capabilities: must be an array of at most 10 Linux capabilities',
     );
-    // beyond Docker's default set: the sandbox would no longer mean anything
-    ['SYS_ADMIN', 'NET_ADMIN', 'SYS_PTRACE', 'ALL', 'chown', 'CAP_CHOWN', 42].forEach((capability) => {
+    // beyond Docker's default set, or inside it without a documented image
+    // need (NET_RAW: packet injection on the private network)
+    [
+      'SYS_ADMIN',
+      'NET_ADMIN',
+      'SYS_PTRACE',
+      'ALL',
+      'chown',
+      'CAP_CHOWN',
+      42,
+      'NET_RAW',
+      'MKNOD',
+      'SETFCAP',
+      'AUDIT_WRITE',
+    ].forEach((capability) => {
       expect422(
         { ...TEST_MANIFEST, containers: [{ ...base, capabilities: ['CHOWN', capability] }] },
         'containers[0].capabilities[1]: must be one of CHOWN, DAC_OVERRIDE',
@@ -1243,8 +1252,8 @@ describe('externalIntegration.validateManifest', () => {
       'containers[0].capabilities[1]: duplicate capability "CHOWN"',
     );
     expect422(
-      { ...TEST_MANIFEST, containers: [{ ...base, capabilities: new Array(15).fill('CHOWN') }] },
-      'containers[0].capabilities: must be an array of at most 14',
+      { ...TEST_MANIFEST, containers: [{ ...base, capabilities: new Array(11).fill('CHOWN') }] },
+      'containers[0].capabilities: must be an array of at most 10',
     );
   });
 

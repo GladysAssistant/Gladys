@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
@@ -25,6 +26,11 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
       Labels: {
         'io.gladysassistant.external-integration': 'ext-dev-open-meteo-demo',
         'io.gladysassistant.container': 'frigate',
+        // fingerprint of the effective grants: no CapAdd, the two devices
+        'io.gladysassistant.grants': crypto
+          .createHash('sha256')
+          .update(JSON.stringify({ capAdd: [], devices: ['/dev/bus/usb', '/dev/dri'] }))
+          .digest('hex'),
         'com.centurylinklabs.watchtower.enable': 'false',
       },
       Env: ['LIBVA_DRIVER_NAME=i965', 'FRIGATE_MQTT_PASSWORD=s3cr3t', 'TZ=Europe/Paris'],
@@ -108,6 +114,40 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
     expect(descriptor.HostConfig.CapDrop).to.deep.equal(['ALL']);
     expect(descriptor.HostConfig.CapAdd).to.deep.equal(['CHOWN', 'SETUID']);
     expect(descriptor.HostConfig.SecurityOpt).to.deep.equal(['no-new-privileges']);
+  });
+
+  it('should fail closed: a requested and granted capability outside the allowlist is never added', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // stale or tampered stored manifest (or an allowlist narrowed by a
+    // later Gladys): only the allowlisted names reach CapAdd
+    const service = await seedExternalService({
+      manifest: TEST_CONTAINERS_MANIFEST,
+      granted_capabilities: ['CHOWN', 'NET_RAW', 'SYS_ADMIN'],
+    });
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['NET_RAW', 'CHOWN', 'SYS_ADMIN'] };
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.CapAdd).to.deep.equal(['CHOWN']);
+  });
+
+  it('should fingerprint the effective grants, independently of their order', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['SETUID', 'CHOWN'] };
+    const service = await seedExternalService({
+      manifest: TEST_CONTAINERS_MANIFEST,
+      granted_capabilities: ['CHOWN', 'SETUID'],
+    });
+    const reordered = await externalIntegration.getEffectiveSubContainerGrants(
+      { ...service, granted_capabilities: ['SETUID', 'CHOWN'] },
+      { ...entry, capabilities: ['CHOWN', 'SETUID'] },
+    );
+    const revoked = await externalIntegration.getEffectiveSubContainerGrants(
+      { ...service, granted_capabilities: ['CHOWN'] },
+      entry,
+    );
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.Labels['io.gladysassistant.grants']).to.equal(reordered.fingerprint);
+    expect(revoked.fingerprint).to.not.equal(reordered.fingerprint);
+    expect(revoked.capAdd).to.deep.equal(['CHOWN']);
   });
 
   it('should omit CapAdd when nothing requested is granted', async () => {

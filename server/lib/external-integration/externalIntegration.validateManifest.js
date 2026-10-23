@@ -1060,7 +1060,8 @@ function validateSubContainer(entry, index, seenNames, errors, seenPortNames) {
       const seenCapabilities = new Set();
       entry.capabilities.forEach((capability, capabilityIndex) => {
         if (!SUB_CONTAINER_CAPABILITIES.includes(capability)) {
-          // closed allowlist = Docker's default set: SYS_ADMIN & co. never
+          // closed need-based allowlist, strictly inside Docker's default
+          // set: SYS_ADMIN, NET_RAW & co. never
           errors.push(
             `${path}.capabilities[${capabilityIndex}]: must be one of ${SUB_CONTAINER_CAPABILITIES.join(', ')}`,
           );

@@ -4,7 +4,7 @@ import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
-import { getRequestedHardwareClasses, getRequestedCapabilities } from '../utils';
+import { getRequestedHardwareClasses, getRequestedCapabilities, sameGrants } from '../utils';
 import { hasDynamicSource, fetchDynamicOptions } from '../../../../../components/integration/dynamicOptions';
 import { RequestStatus } from '../../../../../utils/consts';
 import {
@@ -563,6 +563,16 @@ class ExternalIntegrationConfigPage extends Component {
     });
   };
 
+  // the one deliberate gesture granting every requested capability (or
+  // revoking them all when they are all granted)
+  toggleAllCapabilities = grantAll => {
+    const requestedCapabilities = getRequestedCapabilities(get(this.state.integration, 'manifest.containers') || []);
+    this.setState({
+      grantedCapabilities: grantAll ? requestedCapabilities : [],
+      hardwareStatus: null
+    });
+  };
+
   saveHardware = async () => {
     this.setState({ hardwareStatus: RequestStatus.Getting });
     try {
@@ -572,16 +582,29 @@ class ExternalIntegrationConfigPage extends Component {
       const containers = get(this.state.integration, 'manifest.containers') || [];
       const requestedClasses = getRequestedHardwareClasses(containers);
       const requestedCapabilities = getRequestedCapabilities(containers);
+      const grantedDevices = (this.state.grantedDevices || []).filter(hardwareClass =>
+        requestedClasses.includes(hardwareClass)
+      );
+      const grantedCapabilities = (this.state.grantedCapabilities || []).filter(capability =>
+        requestedCapabilities.includes(capability)
+      );
+      // only the list(s) that changed: the server recreates every
+      // sub-container requesting a sent list, a hardware toggle must not
+      // recreate the containers that only request capabilities
+      const body = {};
+      if (!sameGrants(grantedDevices, get(this.state.integration, 'granted_devices') || [])) {
+        body.granted_devices = grantedDevices;
+      }
+      if (!sameGrants(grantedCapabilities, get(this.state.integration, 'granted_capabilities') || [])) {
+        body.granted_capabilities = grantedCapabilities;
+      }
+      if (Object.keys(body).length === 0) {
+        this.setState({ hardwareStatus: RequestStatus.Success });
+        return;
+      }
       const integration = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/hardware`,
-        {
-          granted_devices: (this.state.grantedDevices || []).filter(hardwareClass =>
-            requestedClasses.includes(hardwareClass)
-          ),
-          granted_capabilities: (this.state.grantedCapabilities || []).filter(capability =>
-            requestedCapabilities.includes(capability)
-          )
-        }
+        body
       );
       this.setState({
         integration,
@@ -822,6 +845,7 @@ class ExternalIntegrationConfigPage extends Component {
           toggleUserCalendar={this.toggleUserCalendar}
           toggleHardwareClass={this.toggleHardwareClass}
           toggleCapability={this.toggleCapability}
+          toggleAllCapabilities={this.toggleAllCapabilities}
           saveHardware={this.saveHardware}
         />
       </ExternalIntegrationPage>

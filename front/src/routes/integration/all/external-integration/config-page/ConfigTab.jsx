@@ -280,6 +280,7 @@ const ConfigTab = props => {
           hardwareStatus={props.hardwareStatus}
           onToggle={props.toggleHardwareClass}
           onToggleCapability={props.toggleCapability}
+          onToggleAllCapabilities={props.toggleAllCapabilities}
           onSave={props.saveHardware}
         />
       )}

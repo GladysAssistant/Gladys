@@ -150,6 +150,10 @@ export const getRequestedCapabilities = containers => {
   return requestedCapabilities;
 };
 
+// Same grant list, order aside (the hardware save posts only the lists
+// that changed).
+export const sameGrants = (left, right) => left.length === right.length && left.every(item => right.includes(item));
+
 // Effective transport of a device, reported by the integration through the
 // reserved GLADYS_TRANSPORT param (local | cloud | unreachable), or null.
 export const getDeviceTransport = device => {
