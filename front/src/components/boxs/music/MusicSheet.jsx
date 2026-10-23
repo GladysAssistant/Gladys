@@ -3,6 +3,7 @@ import { createPortal } from 'preact/compat';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
+import createBackdropDismiss from '../../../utils/backdropDismiss';
 import style from './MusicBox.css';
 
 // The queue and the catalog of a player open over the dashboard, never inside the card: a card that
@@ -75,16 +76,13 @@ class MusicSheet extends Component {
     }
   };
 
-  handleOverlayClick = event => {
-    // only a click on the backdrop itself closes the sheet, not one bubbling up from a control
-    if (event.target === event.currentTarget) {
-      this.props.onClose();
-    }
-  };
+  // only a press on the backdrop itself closes the sheet: not a click bubbling up from a control,
+  // nor the release of a slider drag that left the sheet
+  backdropDismiss = createBackdropDismiss(() => this.props.onClose());
 
   render({ title, tabs, activeTab, onSelectTab, onClose, footer, children }) {
     return createPortal(
-      <div class={cx('glass-theme', style.sheetOverlay)} onClick={this.handleOverlayClick}>
+      <div class={cx('glass-theme', style.sheetOverlay)} {...this.backdropDismiss}>
         <div
           class={style.sheet}
           role="dialog"
