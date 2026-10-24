@@ -250,8 +250,38 @@ describe('thermostat schedules CRUD', () => {
         // 05:00 UTC is 07:00 in Paris, on Monday.
         expect(schedule.current.preset).to.equal('comfort');
         expect(schedule.next.time).to.equal('07:30');
+        expect(schedule.next.days_ahead).to.equal(0);
       } finally {
         clock.restore();
+      }
+    });
+
+    // The banner names the day of the next point from this count: taken from the
+    // phone's own today, a phone in another timezone named the wrong one.
+    it("should count the days to the next point from the house's today", async () => {
+      await db.Variable.create({ name: 'TIMEZONE', value: 'Europe/Paris' });
+      // Monday 23:30 in UTC is already Tuesday 01:30 in Paris.
+      const clock = sinon.useFakeTimers({ now: new Date('2026-08-24T23:30:00Z'), toFake: ['Date'] });
+      try {
+        const { selector } = await handler.createSchedule(HOUSE_SELECTOR, {
+          name: 'Days ahead',
+          transitions: [
+            { day_of_week: 1, time: '06:30', preset: 'comfort' },
+            { day_of_week: 3, time: '06:30', preset: 'eco' },
+          ],
+        });
+
+        const later = await handler.getScheduleBySelector(selector);
+        expect(later.next.day_of_week).to.equal(1);
+        expect(later.next.days_ahead).to.equal(0);
+
+        clock.setSystemTime(new Date('2026-08-25T05:00:00Z'));
+        const tomorrow = await handler.getScheduleBySelector(selector);
+        expect(tomorrow.next.day_of_week).to.equal(3);
+        expect(tomorrow.next.days_ahead).to.equal(2);
+      } finally {
+        clock.restore();
+        await db.Variable.destroy({ where: { name: 'TIMEZONE' } });
       }
     });
 

@@ -399,7 +399,7 @@ Because a transition point has a known successor, a manual hold can offer **"unt
 
 **The expiry lands on the point's wall-clock time across a change of the clocks.** The distance to the next point is counted in minutes of the week, which are wall-clock minutes; elapsed time differs from them by an hour across the night the clocks change. Added to now as they were, a hold taken on Saturday noon ended at 13:00 on the Sunday the clocks go back, for a point at 14:00 — and at 15:00 in March. `nextTransitionTimestamp` moves the result by the change of the timezone's offset between now and then. A point inside the hour skipped in March has no instant of its own: the later of the two candidates is kept, so the hold never ends before the point is in force.
 
-**The banners name the day of a return that is not today.** "Comfort until 13:00" for a hold ending at 13:00 tomorrow read as today. The hold banner and the programme banner both say "until tomorrow 13:00", or the weekday further ahead (`calendarDaysAhead`, `daysUntilPoint`).
+**The banners name the day of a return that is not today.** "Comfort until 13:00" for a hold ending at 13:00 tomorrow read as today. The hold banner and the programme banner both say "until tomorrow 13:00", or the weekday further ahead. The programme banner takes the count from `next.days_ahead` (E.5), worked out by the server from the house's today (`daysUntilPoint`): counted from the phone's, a phone in another timezone named the wrong day. The hold banner shows the expiry instant in the phone's own time, and names the day in that same time (`calendarDaysAhead`).
 
 ### E.4 API
 
@@ -444,11 +444,11 @@ Returned by every route that returns a schedule:
     }
   ],
   "current": { "day_of_week": 0, "time": "06:30", "preset": "comfort" },
-  "next": { "day_of_week": 0, "time": "08:30", "preset": "eco" }
+  "next": { "day_of_week": 0, "time": "08:30", "preset": "eco", "days_ahead": 0 }
 }
 ```
 
-`transitions` is sorted by day then time. `current` and `next` are computed **by the server**, in the Gladys timezone, read-only, and are `null` on a schedule with no point. The widget therefore no longer reads the timezone, and no longer recomputes the active point: it renders "Éco until 08:30" straight from `next`. That removes the last reason for the schedule-matching helper to be shared between the server and the frontend build (C.1).
+`transitions` is sorted by day then time. `current` and `next` are computed **by the server**, in the Gladys timezone, read-only, and are `null` on a schedule with no point. The widget therefore no longer reads the timezone, and no longer recomputes the active point: it renders "Éco until 08:30" straight from `next`. `next.days_ahead` counts the days from the house's today to that point (0 to 7), so the widget names its day without reading the phone's date. That removes the last reason for the schedule-matching helper to be shared between the server and the frontend build (C.1).
 
 **Deleting a range extends the one before it.** A gap between two ranges is not an absence: `rangesToTransitions` stores it as an `off` point, and the heating really stops there. Deleting a range therefore used to cut the heating for its whole span — removing a 08:30–17:00 eco range wrote `08:30 off` and left the house cold until 17:00 — while the editor drew hatching and the legend claimed the previous preset carried on. Stopping the heating is something the user asks for with the Off preset; it is never a side effect of a deletion, and that is the behaviour E.0 names (*"deleting a point extends the previous one"*) and that Tado has. The predecessor is found on the week's own timeline, so it may sit on an earlier day.
 

@@ -4,6 +4,7 @@ const {
   findCurrentTransition,
   findNextTransition,
   getCurrentDayAndMinutes,
+  daysUntilPoint,
 } = require('../../../utils/thermostatSchedule');
 
 const TRANSITION_ORDER = [
@@ -35,7 +36,8 @@ const SCHEDULE_INCLUDE = [
  * `current` and `next` are computed here rather than by the client: they are
  * wall-clock times in the house, so resolving them in the browser would show a
  * phone abroad a different point than the one actually heating the house. The
- * widget renders "Eco until 08:30" straight from `next`.
+ * widget renders "Eco until 08:30" straight from `next`, and names its day from
+ * `next.days_ahead` — counted from the house's today, not the phone's.
  * @param {object} schedule - Schedule row, with its transitions, house and thermostats loaded.
  * @param {string} [timezone] - The Gladys timezone the points are resolved in.
  * @returns {object} The schedule as the API returns it.
@@ -50,6 +52,7 @@ function formatSchedule(schedule, timezone) {
     preset,
   }));
   const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
+  const next = findNextTransition(transitions, dayOfWeek, currentMinutes);
   return {
     id: plain.id,
     selector: plain.selector,
@@ -59,7 +62,7 @@ function formatSchedule(schedule, timezone) {
     house: plain.house.selector,
     transitions,
     current: findCurrentTransition(transitions, dayOfWeek, currentMinutes),
-    next: findNextTransition(transitions, dayOfWeek, currentMinutes),
+    next: next && { ...next, days_ahead: daysUntilPoint(next, dayOfWeek, currentMinutes) },
     devices: plain.thermostats.map((link) => ({
       selector: link.device.selector,
       name: link.device.name,

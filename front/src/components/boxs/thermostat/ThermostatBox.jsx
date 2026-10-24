@@ -9,7 +9,7 @@ import {
   THERMOSTAT_PRESET
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
-import { calendarDaysAhead, daysUntilPoint } from '../../../../../server/utils/thermostatSchedule';
+import { calendarDaysAhead } from '../../../../../server/utils/thermostatSchedule';
 import {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_MIN_TEMP,
@@ -1516,15 +1516,11 @@ class ThermostatBox extends Component {
                   const bannerColor = this.getPresetColor(resolvedPresetKey);
                   const t2 = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
                   const untilLabel = (t2 && t2.scheduleUntil) || '';
-                  const today = new Date();
+                  // Counted by the server from the house's today: the phone's
+                  // may already be tomorrow, or still yesterday.
                   const nextPoint = activeSchedule && activeSchedule.next;
                   const nextWhen = nextPoint
-                    ? untilText(
-                        daysUntilPoint(nextPoint, (today.getDay() + 6) % 7, today.getHours() * 60 + today.getMinutes()),
-                        nextPoint.day_of_week,
-                        nextPoint.time,
-                        t2
-                      )
+                    ? untilText(nextPoint.days_ahead, nextPoint.day_of_week, nextPoint.time, t2)
                     : null;
 
                   // A stopped thermostat is not waiting for the next point:
