@@ -391,6 +391,13 @@ describe('thermostat schedule <-> device link', () => {
         sinonMatchSelector(modeFeature.selector),
         THERMOSTAT_MODE.OFF,
       );
+      // The hold it dropped is not armed again for the shared duration.
+      assert.neverCalledWith(
+        handler.gladys.device.setParam,
+        sinonMatchSelector(thermostat.selector),
+        'THERMOSTAT_MANUAL_UNTIL',
+        match((value) => value !== ''),
+      );
     });
 
     it('should leave a stopped follower of a programme emptied on an Off point alone', async () => {
@@ -557,6 +564,30 @@ describe('thermostat schedule <-> device link', () => {
         await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
 
         expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      // Its end is past, and the pass that follows is the one to clear it: a new
+      // end would aim past the new points and keep the hold through them.
+      it('should leave a hold whose end is already past for the pass to clear', async () => {
+        const programme = await holdOnProgramme(String(Date.now() - 30 * 1000));
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+        assert.called(handler.triggerApplySchedules);
+      });
+
+      it('should give it the shared duration when the programme is left with no point', async () => {
+        const programme = await holdOnProgramme(String(Date.now() + 6 * 24 * 3600 * 1000));
+        const before = Date.now();
+
+        await handler.updateSchedule(programme.selector, { transitions: [] });
+
+        const writes = untilWrites();
+        expect(writes).to.have.lengthOf(1);
+        const until = Number(writes[0].args[2]);
+        expect(until).to.be.at.least(before + 30 * 60 * 1000);
+        expect(until).to.be.at.most(Date.now() + 30 * 60 * 1000);
       });
 
       it('should leave the hold alone on a rename', async () => {

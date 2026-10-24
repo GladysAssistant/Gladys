@@ -18,7 +18,8 @@ const {
  * when it was taken: a point added before it afterwards was skipped, the widget
  * kept announcing the old time, and the programme took over later than it says
  * (forum 11074). A hold of a fixed duration, and a permanent one, are left as
- * they are — neither names a point.
+ * they are — neither names a point. On a programme left with no point, it gets
+ * the shared duration, as a hold taken on it would.
  * @param {object} device - The thermostat, features and params included.
  * @returns {Promise<void>}
  * @example
@@ -27,6 +28,12 @@ const {
 async function rearmHoldOnNextPoint(device) {
   const hold = getManualHold(device);
   if (!hold || !hold.until || buildParamsConfig(device).manual_duration !== null) {
+    return;
+  }
+  // Already over: the regulation pass that follows clears it and applies the new
+  // points. Re-armed, it would aim past them, and hold on through the slot it
+  // was meant to end on.
+  if (Date.now() > hold.until) {
     return;
   }
   const until = await holdExpiry.call(this, device);
@@ -166,8 +173,12 @@ async function updateSchedule(selector, scheduleData) {
         async (deviceId) => liftScheduleStop.call(this, await loadThermostat(deviceId)),
         'start a follower of the programme again',
       );
-      // A hold running to the next point has to run to the new one. Only the
-      // followers holding something are loaded.
+    }
+    // A hold running to the next point has to run to the new one — or, with no
+    // point left, for the shared duration. The stop of an emptied Off point has
+    // already dropped the holds it found. Only the followers holding something
+    // are loaded.
+    if (!emptied || !pointBefore || pointBefore.preset !== 'off') {
       const holding = await db.DeviceParam.findAll({
         where: { device_id: followerIds, name: MANUAL_UNTIL_PARAM },
         attributes: ['device_id', 'value'],

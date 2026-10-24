@@ -397,7 +397,7 @@ Because a transition point has a known successor, a manual hold can offer **"unt
 
 **Resolving that next point is subject to C.1 like every other read of the week**: the points are wall-clock times in the house, so `holdExpiry` reads them in the Gladys timezone rather than the one the process runs in — UTC in the official image. Reading them in the process timezone armed the expiry on the wrong point, an hour or two off, or on the other side of midnight.
 
-**A hold running to the next point follows the points when they change.** Its expiry is the time of the next point when the hold was taken: saving the programme's points afterwards (`updateSchedule`) moves it onto the new next point — a point added before the old one is no longer skipped, and the widget announces its time (`MANUAL_MODE_UPDATED`). A hold of a fixed `THERMOSTAT_MANUAL_DURATION`, and a permanent one, name no point and are left as they are; a rename touches no hold.
+**A hold running to the next point follows the points when they change.** Its expiry is the time of the next point when the hold was taken: saving the programme's points afterwards (`updateSchedule`) moves it onto the new next point — a point added before the old one is no longer skipped, and the widget announces its time (`MANUAL_MODE_UPDATED`). A hold of a fixed `THERMOSTAT_MANUAL_DURATION`, and a permanent one, name no point and are left as they are; a rename touches no hold. A hold whose end is already past is left to the regulation pass that follows, which clears it and applies the new points: re-armed, it would aim past them. A programme left with no point gives the hold the shared duration, as a hold taken on it would get — unless its last point was Off, whose stop has already dropped the hold.
 
 ### E.4 API
 
