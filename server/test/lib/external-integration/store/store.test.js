@@ -36,7 +36,16 @@ const TEST_INDEX = {
     {
       store_slug: 'jane/gladys-incompatible',
       repo_url: 'https://github.com/jane/gladys-incompatible',
-      manifest: { ...TEST_MANIFEST, name: 'Incompatible', gladys_version: '>=99.0.0' },
+      manifest: {
+        ...TEST_MANIFEST,
+        name: 'Incompatible',
+        gladys_version: '>=99.0.0',
+        keywords: ['Wiim', 'Arylic'],
+        countries: ['FR', 'BE'],
+      },
+      // resolved by the indexer (manifest, else its fallback mapping): a
+      // malformed code is dropped by the projection
+      countries: ['FR', 'BE', 'bad', 42],
       cover_url: null,
       github: { stars: 1, pushed_at: '2026-07-01T12:00:00.000Z' },
     },
@@ -73,6 +82,10 @@ describe('externalIntegration store', () => {
       expect(configSchema).to.be.an('array');
       expect(coverImage).to.be.a('string');
       expect(index.integrations[0].manifest).to.deep.equal(liteManifest);
+      // the search-only keywords and the countries are read by the catalog
+      // list: they belong to the lite manifest (C.6)
+      expect(index.integrations[1].manifest.keywords).to.deep.equal(['Wiim', 'Arylic']);
+      expect(index.integrations[1].manifest.countries).to.deep.equal(['FR', 'BE']);
       expect(index.integrations[0].docs).to.deep.equal(TEST_INDEX.integrations[0].docs);
       expect(index.integrations[0].github).to.deep.equal(TEST_INDEX.integrations[0].github);
       const cached = JSON.parse(await variable.getValue('EXTERNAL_INTEGRATION_STORE_INDEX_CACHE'));
@@ -340,6 +353,9 @@ describe('externalIntegration store', () => {
       expect(catalog.integrations[0].first_seen_at).to.equal('2026-08-01T00:00:00.000Z');
       expect(catalog.integrations[1].categories).to.deep.equal([]);
       expect(catalog.integrations[1].first_seen_at).to.equal(null);
+      // an index predating the countries field reads as worldwide
+      expect(catalog.integrations[0].countries).to.deep.equal([]);
+      expect(catalog.integrations[1].countries).to.deep.equal([]);
     });
 
     it('should treat a malformed gladys_version range as incompatible', async () => {
@@ -365,6 +381,35 @@ describe('externalIntegration store', () => {
       const catalog = await externalIntegration.getCatalog({ search: 'meteo' });
       expect(catalog.integrations).to.have.lengthOf(1);
       expect(catalog.integrations[0].store_slug).to.equal('john/gladys-open-meteo-demo');
+    });
+
+    it('should search the keywords of the manifest too', async () => {
+      // a brand supported by the integration without appearing in its name
+      // or description: the search-only terms of the manifest (C.1)
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.storeIndex = TEST_INDEX;
+      externalIntegration.storeIndexFetchedAt = Date.now();
+      const catalog = await externalIntegration.getCatalog({ search: 'arylic' });
+      expect(catalog.integrations).to.have.lengthOf(1);
+      expect(catalog.integrations[0].store_slug).to.equal('jane/gladys-incompatible');
+    });
+
+    it('should project the indexer countries, dropping malformed codes', async () => {
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.storeIndex = TEST_INDEX;
+      externalIntegration.storeIndexFetchedAt = Date.now();
+      const catalog = await externalIntegration.getCatalog();
+      expect(catalog.integrations[0].countries).to.deep.equal([]);
+      expect(catalog.integrations[1].countries).to.deep.equal(['FR', 'BE']);
+    });
+
+    it('should search the repository owner (the author) too', async () => {
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.storeIndex = TEST_INDEX;
+      externalIntegration.storeIndexFetchedAt = Date.now();
+      const catalog = await externalIntegration.getCatalog({ search: 'jane' });
+      expect(catalog.integrations).to.have.lengthOf(1);
+      expect(catalog.integrations[0].store_slug).to.equal('jane/gladys-incompatible');
     });
 
     it('should return an empty catalog when no index is available', async () => {

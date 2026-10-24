@@ -71,6 +71,41 @@ describe('SceneManager', () => {
     });
     expect(scene).to.have.property('selector');
   });
+  it('should create one scene with a music.play-media action, and refuse a malformed media', async () => {
+    const scene = await sceneManager.create({
+      name: 'Morning playlist',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.MUSIC.PLAY_MEDIA,
+            device: 'kitchen-speaker',
+            media: { id: 'spotify:playlist:1', type: 'playlist', title: 'Morning' },
+            mode: 'replace',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    expect(scene).to.have.property('selector');
+    const promise = sceneManager.create({
+      name: 'Bad media',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.MUSIC.PLAY_MEDIA,
+            device: 'kitchen-speaker',
+            media: { id: 'spotify:podcast:1', type: 'podcast' },
+          },
+        ],
+      ],
+      tags: [],
+    });
+    await assert.isRejected(promise);
+  });
   it('should return validation error, invalid actions', async () => {
     const promise = sceneManager.create({
       name: 'My living room',

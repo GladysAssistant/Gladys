@@ -5,12 +5,31 @@ import { route } from 'preact-router';
 
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
-import normalizeSearchText from '../../utils/normalizeSearchText';
-import { SERVICE_STATUS, USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
+import {
+  SERVICE_STATUS,
+  SYSTEM_VARIABLE_NAMES,
+  USER_ROLE,
+  WEBSOCKET_MESSAGE_TYPES
+} from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, catalogCategories } from '../../config/integrations';
 import { getLocalizedText, TYPES_WITHOUT_DEVICE_SCREENS } from './all/external-integration/utils';
-import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog, rememberCatalogUrl } from './catalog-url';
+import {
+  getCatalogFilters,
+  getCatalogUrl,
+  getRememberedCatalogPosition,
+  getUrlFromCatalog,
+  rememberCatalogUrl,
+  rememberCatalogVisibleCount,
+  rememberSearchFocus
+} from './catalog-url';
+import { buildSearchIndex, getSearchRank, getSearchTokens } from './catalog-search';
+import {
+  getBrowserTimezone,
+  getCountryFromTimezone,
+  getCountrySearchTerms,
+  isAvailableInCountry
+} from './catalog-country';
 import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
@@ -48,6 +67,23 @@ const getFirstSeenTimestamp = card => {
   return Number.isNaN(timestamp) ? 0 : timestamp;
 };
 
+// same rule for the "Last updated" sort: the store index carries the date of
+// the last push on the repository of each community integration, the natives
+// have none and sink below as an undated block
+const getUpdatedTimestamp = card => {
+  const timestamp = card.updatedAt ? Date.parse(card.updatedAt) : NaN;
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+// the repository owner is the author of a community integration: searchable,
+// never a filter
+const getStoreOwner = storeSlug => (typeof storeSlug === 'string' ? storeSlug.split('/')[0] : '');
+
+// the view the list is computed for: a new one starts back on its first page
+// of cards, the same one recomputed keeps the cards already scrolled through
+const getCatalogViewKey = ({ category, searchKeyword, orderDir, origin, transports, gladysPlus, allCountries }) =>
+  JSON.stringify({ category, searchKeyword, orderDir, origin, transports, gladysPlus, allCountries });
+
 // Breakdown of the live states of the installed community integrations
 // ({ RUNNING: 3, ERROR: 1 }), feeding the summary of the "Installed" view.
 // An installed integration whose status is not known yet is counted as
@@ -67,12 +103,26 @@ class Integration extends Component {
     super(props);
     // the filters are read back from the URL: landing here from a "back to
     // integrations" link or with the browser back button restores the view
-    const { searchKeyword, orderDir, origin, transports, gladysPlus } = getCatalogFilters();
+    const { searchKeyword, orderDir, origin, transports, gladysPlus, allCountries } = getCatalogFilters();
+    const filters = { category: props.category, searchKeyword, orderDir, origin, transports, gladysPlus, allCountries };
+    // coming back to the view the user left from a card: the same pages of
+    // cards are rendered again, and the list is scrolled back to the same
+    // place once the catalog has loaded (componentDidUpdate)
+    const rememberedPosition = getRememberedCatalogPosition(getCatalogUrl(filters));
+    this.pendingScrollY = rememberedPosition ? rememberedPosition.scrollY : null;
     this.state = {
       integrations: [],
       integrationCategories: [],
       totalSize: 0,
-      visibleCount: CATALOG_PAGE_SIZE,
+      // the view key of the initial filters: the first list computed for them
+      // must keep the remembered page count instead of starting over
+      catalogView: getCatalogViewKey(filters),
+      visibleCount: rememberedPosition ? rememberedPosition.visibleCount : CATALOG_PAGE_SIZE,
+      hiddenByCountry: 0,
+      instanceCountry: null,
+      // null is a valid final value (no country could be derived): a separate
+      // flag says when the derivation is done
+      instanceCountryLoaded: false,
       // the user the external lists were last loaded for: until they are, the
       // catalog only knows the native integrations and must not pretend to be
       // complete (see render)
@@ -82,7 +132,8 @@ class Integration extends Component {
       orderDir,
       origin,
       transports,
-      gladysPlus
+      gladysPlus,
+      allCountries
     };
     this.getIntegrationsDebounced = debounce(this.getIntegrations, 300);
   }
@@ -91,14 +142,18 @@ class Integration extends Component {
   // state: setState() only schedules a render, the new value is not readable
   // in the state right away
   updateURL(filters = {}) {
-    const { searchKeyword, orderDir, origin, transports, gladysPlus } = { ...this.state, ...filters };
+    const { searchKeyword, orderDir, origin, transports, gladysPlus, allCountries } = { ...this.state, ...filters };
+    // a handler may also change the view (the search leaves the browse
+    // category, "clear filters" goes back to the whole catalog)
+    const category = filters.category !== undefined ? filters.category : this.props.category;
     const url = getCatalogUrl({
-      category: this.props.category,
+      category,
       searchKeyword,
       orderDir,
       origin,
       transports,
-      gladysPlus
+      gladysPlus,
+      allCountries
     });
     // the list is only reloaded 300ms later (the search is debounced): without
     // this, opening an integration in between would send its back link to the
@@ -111,6 +166,7 @@ class Integration extends Component {
   componentWillMount() {
     this.loadFavorites();
     this.loadExternalIntegrations();
+    this.loadInstanceCountry();
   }
 
   componentDidMount() {
@@ -129,6 +185,27 @@ class Integration extends Component {
         this.onExternalIntegrationStatusChanged
       );
     }
+    // the pages of cards rendered so far, for the way back (catalog-url.js)
+    rememberCatalogVisibleCount(this.state.visibleCount);
+  }
+
+  // the country of the instance, from the time zone Gladys is configured with
+  // (an admin setting, like the store itself), else from the browser's. No
+  // country at all is a supported state: nothing is hidden then
+  async loadInstanceCountry() {
+    const { user = {}, httpClient } = this.props;
+    let timezone = null;
+    if (httpClient && user.role === USER_ROLE.ADMIN) {
+      try {
+        const { value } = await httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.TIMEZONE}`);
+        timezone = value;
+      } catch (e) {
+        timezone = null;
+      }
+    }
+    const instanceCountry = getCountryFromTimezone(timezone) || getCountryFromTimezone(getBrowserTimezone());
+    await this.setState({ instanceCountry, instanceCountryLoaded: true });
+    this.getIntegrations();
   }
 
   onExternalIntegrationStatusChanged = async payload => {
@@ -153,6 +230,10 @@ class Integration extends Component {
     // never the store: installing is an admin gesture
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const userId = user.id;
+    // two cards updated at the same time each reload the list on success: the
+    // first reload can answer last, with the flag of the second card still up
+    this.externalLoadRequest = (this.externalLoadRequest || 0) + 1;
+    const request = this.externalLoadRequest;
     const [externalInstalledResponse, externalStoreResponse] = await Promise.all([
       // null and not []: a failed request means "unknown", not "nothing
       // installed". An empty array would be counted as zero integration to
@@ -160,9 +241,10 @@ class Integration extends Component {
       httpClient.get('/api/v1/external_integration').catch(() => null),
       isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
-    // the user changed while this load was in flight: the load started for
-    // the new one holds the lists to display, this one must not overwrite them
-    if (get(this.props, 'user.id') !== userId) {
+    // the user changed while this load was in flight, or a newer load has
+    // started since: that one holds the lists to display, this one must not
+    // overwrite them
+    if (get(this.props, 'user.id') !== userId || request !== this.externalLoadRequest) {
       return;
     }
     await this.setState({
@@ -241,10 +323,13 @@ class Integration extends Component {
       // the category links carry no filter: keep the ones already applied in
       // the URL of the newly displayed category
       this.updateURL();
+      this.dropFinishedUpdates();
     }
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
+      this.loadInstanceCountry();
     }
+    this.restoreScrollPosition();
     // the periodic poll only refreshes the global counter: on a catalog left
     // open, the menu entry and the "to update" list would keep showing the
     // state of the last load while the header already says otherwise
@@ -256,6 +341,27 @@ class Integration extends Component {
     ) {
       this.loadExternalIntegrations();
     }
+  }
+
+  // back from an integration page: once the catalog is complete, the country
+  // filter known (it removes cards, so scrolling before it lands would miss
+  // the target) and the remembered pages of cards rendered, the list is
+  // scrolled back to where the user was. The covers have a fixed ratio, so the
+  // layout does not move under the scroll as they load
+  restoreScrollPosition() {
+    const { user = {} } = this.props;
+    const catalogLoading = !user.id || this.state.externalLoadedForUserId !== user.id;
+    if (
+      this.pendingScrollY === null ||
+      catalogLoading ||
+      !this.state.instanceCountryLoaded ||
+      this.state.integrations.length === 0
+    ) {
+      return;
+    }
+    const { pendingScrollY } = this;
+    this.pendingScrollY = null;
+    window.requestAnimationFrame(() => window.scrollTo(0, pendingScrollY));
   }
 
   buildExternalIntegrationCards() {
@@ -270,6 +376,7 @@ class Integration extends Component {
       integration => isAdmin || ['communication', 'calendar'].includes(get(integration, 'manifest.type'))
     );
     const store = isAdmin ? this.state.externalStore || [] : [];
+    const updateStates = this.state.updateStates || {};
 
     const storeBySlug = new Map();
     store.forEach(storeIntegration => {
@@ -306,6 +413,28 @@ class Integration extends Component {
       return manifestCategories.filter(key => KNOWN_CATEGORY_KEYS.has(key));
     };
 
+    // what the search reads beyond the card (catalog-search.js): every
+    // language of the description, the search-only keywords of the manifest,
+    // the author — and the countries the integration is declared for, which
+    // the country filter reads too
+    // An installed card carries the manifest of its running image, which may
+    // predate the store listing (or the fallback mapping of the indexer): the
+    // lite index entry is read too, like getCardCategories does, so a brand
+    // keyword published since still finds the card the user actually has.
+    // The countries come first from the entry-level field the indexer
+    // resolves (manifest, else its fallback mapping — spec C.6), like the
+    // categories, then from the manifests
+    const unionOf = (...lists) => Array.from(new Set(lists.flatMap(list => (Array.isArray(list) ? list : []))));
+    const getSearchFields = (manifest, storeSlug, storeIntegration) => {
+      const storeManifest = (storeIntegration && storeIntegration.manifest) || {};
+      return {
+        descriptions: Object.values(manifest.description || {}).filter(text => typeof text === 'string'),
+        keywords: unionOf(manifest.keywords, storeManifest.keywords),
+        author: getStoreOwner(storeSlug),
+        countries: unionOf(storeIntegration && storeIntegration.countries, manifest.countries, storeManifest.countries)
+      };
+    };
+
     // communication, weather, calendar and provider integrations have no device
     // screens: their card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
@@ -329,9 +458,15 @@ class Integration extends Component {
         url: getInstalledUrl(integration.selector, manifest),
         img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
+        selector: integration.selector,
+        version: integration.version,
+        latestVersion: integration.latest_version,
         updateAvailable: integration.update_available,
+        updateState: updateStates[integration.selector],
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: (storeIntegration && storeIntegration.first_seen_at) || null,
+        updatedAt: get(storeIntegration, 'github.pushed_at') || null,
+        ...getSearchFields(manifest, integration.store_slug, storeIntegration),
         ...getTransportTags(manifest)
       });
     });
@@ -360,12 +495,17 @@ class Integration extends Component {
               orderDir: this.state.orderDir,
               origin: this.state.origin,
               transports: this.state.transports,
-              gladysPlus: this.state.gladysPlus
+              gladysPlus: this.state.gladysPlus,
+              allCountries: this.state.allCountries
             }),
         img: storeIntegration.cover_url || manifest.cover_image || null,
+        selector: isInstalled ? storeIntegration.installed_selector : null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false,
+        updateState: isInstalled ? updateStates[storeIntegration.installed_selector] : undefined,
         categories: getCardCategories(manifest, storeIntegration),
         firstSeenAt: storeIntegration.first_seen_at || null,
+        updatedAt: get(storeIntegration, 'github.pushed_at') || null,
+        ...getSearchFields(manifest, storeIntegration.store_slug, storeIntegration),
         ...getTransportTags(manifest)
       });
     });
@@ -377,7 +517,16 @@ class Integration extends Component {
 
   async getIntegrations() {
     const { user = {}, intl, category } = this.props;
-    const { searchKeyword = '', orderDir = 'asc', origin = null, transports = [], gladysPlus = false } = this.state;
+    const {
+      searchKeyword = '',
+      orderDir = 'asc',
+      origin = null,
+      transports = [],
+      gladysPlus = false,
+      allCountries = false,
+      instanceCountry = null
+    } = this.state;
+    const language = user.language || 'en';
 
     // Filter integrations according to user role
     let nativeIntegrations = integrations;
@@ -417,23 +566,69 @@ class Integration extends Component {
     const catalog = nativeIntegrations.concat(externalCards).map(card => ({
       ...card,
       categories: card.categories || [],
-      isNew: getFirstSeenTimestamp(card) > 0 && now - getFirstSeenTimestamp(card) < NEW_BADGE_MAX_AGE_MS
+      isNew: getFirstSeenTimestamp(card) > 0 && now - getFirstSeenTimestamp(card) < NEW_BADGE_MAX_AGE_MS,
+      // folded once here, not on every keystroke. A native card is searched
+      // through its translated name and description and its key; a community
+      // card through everything the manifest says, plus the names of the
+      // countries it is declared for ("Canada" finds the Canadian ones)
+      searchIndex: buildSearchIndex({
+        name: card.name,
+        descriptions: card.descriptions || [card.description],
+        keywords: card.keywords,
+        author: card.author,
+        extra: card.external ? getCountrySearchTerms(card.countries || [], language) : [card.key]
+      })
     }));
+    // the reference every count is compared to: the whole catalog visible to
+    // this user. "42 of 810 integrations" says how much the view narrows it
+    const catalogSize = catalog.length;
 
-    // a category earns its sidebar entry with enough visible integrations
-    // (spec §5). Like the "Updates" entry, the category being displayed stays
+    const searchTokens = getSearchTokens(searchKeyword);
+    const searching = searchTokens.length > 0;
+    const isVirtualView = VIRTUAL_CATEGORIES.includes(category);
+
+    // the country filter (spec §4) is a discovery tool: an integration
+    // declared for other countries than the instance's is hidden from the
+    // browse views, until the user asks for all countries. An installed
+    // integration is never hidden — it is the user's, whatever country it
+    // was published for, and disappearing from "All" would read as
+    // uninstalled. Nothing is hidden when the country is unknown
+    const isVisibleInCountry = integration =>
+      integration.externalInstalled || isAvailableInCountry(integration.countries, instanceCountry);
+    const countryScopeApplicable = !isVirtualView && !searching && !!instanceCountry;
+    const countryFiltered = countryScopeApplicable && !allCountries;
+
+    // a category earns its sidebar entry with enough integrations visible to
+    // the current user (spec §5): counted on what the browse views actually
+    // show, so a shelf never appears only to look empty behind the country
+    // filter. Like the "Updates" entry, the category being displayed stays
     // visible below the bar, so the menu never loses the current view
+    const browsableCatalog = countryFiltered ? catalog.filter(isVisibleInCountry) : catalog;
     const integrationCategories = catalogCategories.filter(
       ({ key }) =>
         key === category ||
-        catalog.filter(integration => integration.categories.includes(key)).length >= SIDEBAR_CATEGORY_MIN_INTEGRATIONS
+        browsableCatalog.filter(integration => integration.categories.includes(key)).length >=
+          SIDEBAR_CATEGORY_MIN_INTEGRATIONS
     );
 
     let selectedIntegrations = catalog;
 
-    // Filter on the browse category of the view
-    if (category && !VIRTUAL_CATEGORIES.includes(category)) {
+    // Filter on the browse category of the view. Not while searching: the
+    // search looks through the whole catalog, since the user knows what they
+    // are looking for and a category is only a shelf to browse — the search
+    // handler already left the shelf, this keeps the two consistent for a
+    // hand-written URL. The virtual views are inventories (what is mine) and
+    // keep their scope
+    if (category && !isVirtualView && !searching) {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.categories.includes(category));
+    }
+
+    // never while searching, never on the inventories (above)
+    let hiddenByCountry = 0;
+    if (countryFiltered) {
+      const beforeCountry = selectedIntegrations.length;
+      selectedIntegrations = selectedIntegrations.filter(isVisibleInCountry);
+      hiddenByCountry = beforeCountry - selectedIntegrations.length;
     }
 
     // If we are in favorites view, only display favorites
@@ -441,9 +636,12 @@ class Integration extends Component {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
     }
 
-    // If we are in updates view, only display the integrations to update
+    // If we are in updates view, only display the integrations to update. One
+    // just updated from its card stays, so its card can say how it went
     if (category === 'updates') {
-      selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
+      selectedIntegrations = selectedIntegrations.filter(
+        integration => integration.updateAvailable || integration.updateState
+      );
     }
 
     // If we are in the installed view, only display what actually runs on this
@@ -471,49 +669,48 @@ class Integration extends Component {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.gladysPlus);
     }
 
-    // the total is the size of the view the user is currently looking at, once
-    // every filter that defines this view has been applied (role, category,
-    // favorites, updates) but before the search: it is the reference the search
-    // result count is compared to. Computing it any earlier would mix scopes,
-    // e.g. counting the integrations of every type while displaying only one
-    const totalSize = selectedIntegrations.length;
+    // the size of an inventory (favorites, installed, to update) before the
+    // search narrows it: the reference its count is compared to ("2 of 10")
+    const viewSize = selectedIntegrations.length;
 
-    // Filter
+    // Search: every word is required, in any order, accents and case folded
+    // on both sides (catalog-search.js). A keyword made of accents only folds
+    // down to nothing and matches nothing, rather than the whole catalog
+    const searchRanks = new Map();
     if (searchKeyword && searchKeyword.length > 0) {
-      // both sides are stripped of their accents: "meteo" has to find "Météo",
-      // and typing "Météo" has to keep finding it
-      const normalizedSearchKeyword = normalizeSearchText(searchKeyword);
-      // a keyword made of accents only folds down to nothing, and every string
-      // contains the empty string: without this, such a search would display
-      // the whole catalog as if the field were empty
-      selectedIntegrations = normalizedSearchKeyword.length
+      selectedIntegrations = searching
         ? selectedIntegrations.filter(integration => {
-            const { name, description } = integration;
-            return (
-              normalizeSearchText(name).includes(normalizedSearchKeyword) ||
-              normalizeSearchText(description).includes(normalizedSearchKeyword)
-            );
+            const rank = getSearchRank(integration.searchIndex, searchTokens);
+            if (rank === null) {
+              return false;
+            }
+            searchRanks.set(integration.key, rank);
+            return true;
           })
         : [];
     }
 
-    // Sort
-    if (orderDir === 'asc') {
-      selectedIntegrations.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (orderDir === 'desc') {
-      selectedIntegrations.sort((a, b) => b.name.localeCompare(a.name));
+    // Sort. Ties fall back to the name, then to the stable key, so the order
+    // never shuffles across catalog refreshes (spec §4)
+    const byName = (a, b) => a.name.localeCompare(b.name) || a.key.localeCompare(b.key);
+    let compare = byName;
+    if (orderDir === 'desc') {
+      compare = (a, b) => b.name.localeCompare(a.name) || b.key.localeCompare(a.key);
     } else if (orderDir === 'newest') {
       // the store index says when each community integration was first seen;
       // everything without the date (the natives, an older index) sinks below
-      // as an undated block. Ties fall back to the name, then to the stable
-      // key, so the order never shuffles across catalog refreshes (spec §4)
-      selectedIntegrations.sort(
-        (a, b) =>
-          getFirstSeenTimestamp(b) - getFirstSeenTimestamp(a) ||
-          a.name.localeCompare(b.name) ||
-          a.key.localeCompare(b.key)
-      );
+      // as an undated block
+      compare = (a, b) => getFirstSeenTimestamp(b) - getFirstSeenTimestamp(a) || byName(a, b);
+    } else if (orderDir === 'updated') {
+      // same block rule for the date of the last push on the repository
+      compare = (a, b) => getUpdatedTimestamp(b) - getUpdatedTimestamp(a) || byName(a, b);
     }
+    // a search puts the cards named after the keyword before the ones that
+    // only mention it; the chosen sort then orders each group
+    const compareWithRank = searching
+      ? (a, b) => searchRanks.get(a.key) - searchRanks.get(b.key) || compare(a, b)
+      : compare;
+    selectedIntegrations.sort(compareWithRank);
 
     // the counter is computed from the installed integrations, not from the
     // cards being displayed: it must stay the same in every category
@@ -532,19 +729,29 @@ class Integration extends Component {
 
     // the integration pages send the user back here: this runs on mount and on
     // every filter change, so the remembered view is always the current one
-    rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir, origin, transports, gladysPlus }));
+    const filters = { category, searchKeyword, orderDir, origin, transports, gladysPlus, allCountries };
+    rememberCatalogUrl(getCatalogUrl(filters));
 
     // a new view (category, search, sort, facets) starts back on its first
     // page of cards; the same view recomputed (a favorite toggled, a status
     // received, the store refreshed) keeps the cards already scrolled through
-    const catalogView = JSON.stringify({ category, searchKeyword, orderDir, origin, transports, gladysPlus });
+    const catalogView = getCatalogViewKey(filters);
     const visibleCount = catalogView === this.state.catalogView ? this.state.visibleCount : CATALOG_PAGE_SIZE;
 
     this.setState({
       catalogView,
       visibleCount,
       integrations: selectedIntegrations,
-      totalSize,
+      // the browse views are compared to the whole catalog ("42 of 810"); an
+      // inventory (favorites, installed, to update) is its own total — "3 of
+      // 810" would say nothing about what is mine, "2 of 10" does
+      totalSize: isVirtualView ? viewSize : catalogSize,
+      // anything that narrows the catalog below its size, and that one link
+      // releases at once: a shelf, a facet, a search
+      hasActiveFilters:
+        searching || (!!category && !isVirtualView) || origin !== null || transports.length > 0 || gladysPlus,
+      hiddenByCountry,
+      countryScopeApplicable,
       integrationCategories,
       integrationsToUpdate,
       installedIntegrationsCount: installedIntegrations.length,
@@ -601,6 +808,53 @@ class Integration extends Component {
     }
   };
 
+  setUpdateState = async (selector, updateState) => {
+    // functional form: several cards can be updated at the same time, each
+    // answer must keep the state the others left
+    await this.setState(prevState => ({ updateStates: { ...prevState.updateStates, [selector]: updateState } }));
+    this.getIntegrations();
+  };
+
+  updateIntegration = async selector => {
+    const updateState = (this.state.updateStates || {})[selector];
+    if (updateState && updateState.status === RequestStatus.Getting) {
+      return;
+    }
+    await this.setUpdateState(selector, { status: RequestStatus.Getting });
+    try {
+      const integration = await this.props.httpClient.post(`/api/v1/external_integration/${selector}/update`);
+      // the reload clears the update flag of this card and feeds the header
+      // counter with the new count. The spinner stays up until it has landed:
+      // with the flag still set, the card would offer the update again
+      await this.loadExternalIntegrations();
+      await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
+    } catch (e) {
+      console.error(e);
+      await this.setUpdateState(selector, { status: RequestStatus.Error });
+    }
+  };
+
+  // the result of an update is read on the view it ran in: carried to another
+  // one, it would keep an up-to-date card in "To update" and hide the "all up
+  // to date" state. An update still running, or failed, keeps its card state
+  dropFinishedUpdates = async () => {
+    const updateStates = this.state.updateStates || {};
+    const isFinished = selector => updateStates[selector].status === RequestStatus.Success;
+    if (!Object.keys(updateStates).some(isFinished)) {
+      return;
+    }
+    await this.setState(prevState => {
+      const remaining = { ...prevState.updateStates };
+      Object.keys(remaining).forEach(selector => {
+        if (remaining[selector].status === RequestStatus.Success) {
+          delete remaining[selector];
+        }
+      });
+      return { updateStates: remaining };
+    });
+    this.getIntegrations();
+  };
+
   // more cards as the user scrolls down the list
   showMoreIntegrations = () => {
     this.setState(prevState => ({ visibleCount: prevState.visibleCount + CATALOG_PAGE_SIZE }));
@@ -609,8 +863,37 @@ class Integration extends Component {
   search = async e => {
     const searchKeyword = e.target.value;
     await this.setState({ searchKeyword });
-    this.updateURL({ searchKeyword });
+    // a search looks through the whole catalog: typing on a browse category
+    // leaves the shelf for "All integrations", where the results are counted
+    // against the whole catalog. The inventories (favorites, installed, to
+    // update) keep their scope: searching "my installed Sonos" makes sense
+    const leavesCategory =
+      searchKeyword.length > 0 && this.props.category && !VIRTUAL_CATEGORIES.includes(this.props.category);
+    if (leavesCategory) {
+      // the other view is another route: the page is mounted again and the
+      // field would lose the focus after this first letter
+      rememberSearchFocus();
+    }
+    this.updateURL(leavesCategory ? { searchKeyword, category: null } : { searchKeyword });
     await this.getIntegrationsDebounced();
+  };
+
+  // the one link that releases every filter at once (shelf, facets, search),
+  // the sort being a preference and not a filter. An inventory (favorites,
+  // installed, to update) is not a filter either: clearing from one keeps
+  // the user on it, with its search and facets released
+  clearFilters = async () => {
+    const category = VIRTUAL_CATEGORIES.includes(this.props.category) ? this.props.category : null;
+    await this.setState({ searchKeyword: '', origin: null, transports: [], gladysPlus: false });
+    this.updateURL({ searchKeyword: '', origin: null, transports: [], gladysPlus: false, category });
+    await this.getIntegrations();
+  };
+
+  toggleAllCountries = async () => {
+    const allCountries = !this.state.allCountries;
+    await this.setState({ allCountries });
+    this.updateURL({ allCountries });
+    await this.getIntegrations();
   };
 
   changeOrderDir = async e => {
@@ -672,8 +955,11 @@ class Integration extends Component {
       showStoreRefresh,
       showMoreIntegrations: this.showMoreIntegrations,
       search: this.search,
+      clearFilters: this.clearFilters,
+      toggleAllCountries: this.toggleAllCountries,
       changeOrderDir: this.changeOrderDir,
       toggleFavorite: this.toggleFavorite,
+      updateIntegration: this.updateIntegration,
       refreshStore: this.refreshStore,
       setOriginFacet: this.setOriginFacet,
       setTransportFacet: this.setTransportFacet,

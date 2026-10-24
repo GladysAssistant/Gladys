@@ -8,7 +8,8 @@ const Device = require('../../../lib/device');
 
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, MUSIC_PLAYBACK_STATE } = require('../../../utils/constants');
+const { BadParameters } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -208,5 +209,70 @@ describe('Device', () => {
     await device.setValue({ service: { name: 'my-service' } }, deviceFeature, 'http://example.com/notification.mp3');
     sinonAssert.notCalled(device.saveStringState);
     sinonAssert.notCalled(device.saveState);
+  });
+  it('should save string state when setting a value on a music string feature', async () => {
+    const stateManager = new StateManager(event);
+    const service = {
+      getService: () => ({
+        device: {
+          setValue: fake.resolves(null),
+        },
+      }),
+    };
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    device.saveState = fake.resolves(null);
+    device.saveStringState = fake.resolves(null);
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.MUSIC,
+      type: DEVICE_FEATURE_TYPES.MUSIC.TITLE,
+      has_feedback: false,
+    };
+    await device.setValue({ service: { name: 'my-service' } }, deviceFeature, 'Blue in Green');
+    sinonAssert.calledWith(device.saveStringState, { service: { name: 'my-service' } }, deviceFeature, 'Blue in Green');
+    sinonAssert.notCalled(device.saveState);
+  });
+  it('should not save a refused music artwork value', async () => {
+    const stateManager = new StateManager(event);
+    const service = {
+      getService: () => ({
+        device: {
+          setValue: fake.resolves(null),
+        },
+      }),
+    };
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    device.saveState = fake.resolves(null);
+    device.saveStringState = fake.resolves(null);
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.MUSIC,
+      type: DEVICE_FEATURE_TYPES.MUSIC.ARTWORK,
+      has_feedback: false,
+    };
+    await device.setValue({ service: { name: 'my-service' } }, deviceFeature, 'https://cdn.example/a.jpg');
+    sinonAssert.notCalled(device.saveStringState);
+    sinonAssert.notCalled(device.saveState);
+  });
+  it('should refuse writing the buffering playback state', async () => {
+    const stateManager = new StateManager(event);
+    const serviceSetValue = fake.resolves(null);
+    const service = {
+      getService: () => ({
+        device: {
+          setValue: serviceSetValue,
+        },
+      }),
+    };
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    device.saveState = fake.resolves(null);
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.MUSIC,
+      type: DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE,
+      has_feedback: false,
+    };
+    const promise = device.setValue({ service: { name: 'my-service' } }, deviceFeature, MUSIC_PLAYBACK_STATE.BUFFERING);
+    await assert.isRejected(promise, BadParameters);
+    sinonAssert.notCalled(serviceSetValue);
+    await device.setValue({ service: { name: 'my-service' } }, deviceFeature, MUSIC_PLAYBACK_STATE.IDLE);
+    sinonAssert.calledWith(device.saveState, deviceFeature, MUSIC_PLAYBACK_STATE.IDLE);
   });
 });

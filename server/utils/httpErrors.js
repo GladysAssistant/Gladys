@@ -87,6 +87,24 @@ class Error429 extends HttpError {
   }
 }
 
+class Error503 extends HttpError {
+  constructor(message) {
+    super();
+    this.status = 503;
+    this.code = 'SERVICE_UNAVAILABLE';
+    this.message = message;
+  }
+}
+
+class Error504 extends HttpError {
+  constructor(message) {
+    super();
+    this.status = 504;
+    this.code = 'GATEWAY_TIMEOUT';
+    this.message = message;
+  }
+}
+
 class Error500 extends HttpError {
   constructor(error) {
     super();
@@ -111,4 +129,6 @@ module.exports = {
   Error422,
   Error429,
   Error500,
+  Error503,
+  Error504,
 };

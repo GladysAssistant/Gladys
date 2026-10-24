@@ -45,6 +45,7 @@ import SetAlarmMode from './actions/SetAlarmMode';
 import SendMqttMessage from './actions/SendMqttMessage';
 import SendZigbee2MqttMessage from './actions/SendZigbee2MqttMessage';
 import PlayNotification from './actions/PlayNotification';
+import PlayMedia from './actions/PlayMedia';
 import EdfTempoCondition from './actions/EdfTempoCondition';
 import EnergyCurrentPriceCondition from './actions/EnergyCurrentPriceCondition';
 import AskAI from './actions/AskAI';
@@ -89,6 +90,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MQTT.SEND]: SendMqttMessage,
   [ACTIONS.ZIGBEE2MQTT.SEND]: SendZigbee2MqttMessage,
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
+  [ACTIONS.MUSIC.PLAY_MEDIA]: PlayMedia,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
   [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
