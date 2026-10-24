@@ -940,6 +940,16 @@
         "scheduleLabel": "Schedule:",
         "scheduleUntil": "until",
         "manualUntil": "until",
+        "untilTomorrow": "tomorrow",
+        "untilDays": {
+          "0": "Monday",
+          "1": "Tuesday",
+          "2": "Wednesday",
+          "3": "Thursday",
+          "4": "Friday",
+          "5": "Saturday",
+          "6": "Sunday"
+        },
         "cancelManual": "Cancel manual mode",
         "windowOpen": "Window open — heating suspended",
         "windowOpenCooling": "Window open — cooling suspended",

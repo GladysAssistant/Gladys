@@ -9,6 +9,7 @@ import {
   THERMOSTAT_PRESET
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
+import { calendarDaysAhead, daysUntilPoint } from '../../../../../server/utils/thermostatSchedule';
 import {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_MIN_TEMP,
@@ -51,6 +52,15 @@ const PRESET_VALUES = {
 const PRESET_NAMES = Object.keys(PRESET_VALUES).reduce((acc, name) => ({ ...acc, [PRESET_VALUES[name]]: name }), {});
 // Sentinel: hold every incoming setpoint, whatever its value
 const HOLD_ANY_SETPOINT = Symbol('hold-any-setpoint');
+
+// The time a banner hands back at, with its day when it is not today: "until
+// 13:00" read as today for a hold ending at 13:00 tomorrow (forum 11074).
+// `weekday` is 0 for Monday, as in a schedule.
+const untilText = (days, weekday, time, t) => {
+  if (days === 0) return time;
+  if (days === 1) return `${(t && t.untilTomorrow) || ''} ${time}`;
+  return `${(t && t.untilDays && t.untilDays[weekday]) || ''} ${time}`;
+};
 
 // Parse a value as a finite number with a fallback — unlike `Number(x) || d`, a legitimate 0 is kept
 const numOr = (value, fallback) => {
@@ -1446,6 +1456,12 @@ class ThermostatBox extends Component {
                       untilDate.getMinutes()
                     ).padStart(2, '0')}`;
                     const t = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
+                    const untilWhen = untilText(
+                      calendarDaysAhead(manualUntil),
+                      (untilDate.getDay() + 6) % 7,
+                      untilTime,
+                      t
+                    );
                     const manualUntilLabel = (t && t.manualUntil) || '';
                     const cancelLabel = (t && t.cancelManual) || '';
                     // A hold is not always a hand-set temperature: picking a
@@ -1475,7 +1491,7 @@ class ThermostatBox extends Component {
                           {label}
                           <span class={style.manualBannerUntil}>
                             {' '}
-                            {manualUntilLabel} {untilTime}
+                            {manualUntilLabel} {untilWhen}
                           </span>
                         </span>
                         <button class={style.manualBannerCancel} onClick={this.cancelManualMode} title={cancelLabel}>
@@ -1500,6 +1516,16 @@ class ThermostatBox extends Component {
                   const bannerColor = this.getPresetColor(resolvedPresetKey);
                   const t2 = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
                   const untilLabel = (t2 && t2.scheduleUntil) || '';
+                  const today = new Date();
+                  const nextPoint = activeSchedule && activeSchedule.next;
+                  const nextWhen = nextPoint
+                    ? untilText(
+                        daysUntilPoint(nextPoint, (today.getDay() + 6) % 7, today.getHours() * 60 + today.getMinutes()),
+                        nextPoint.day_of_week,
+                        nextPoint.time,
+                        t2
+                      )
+                    : null;
 
                   // A stopped thermostat is not waiting for the next point:
                   // the programme does not start it again, only a mode does.
@@ -1532,7 +1558,7 @@ class ThermostatBox extends Component {
                         {!stopped && activeSchedule && activeSchedule.next && (
                           <span class={style.scheduleBannerUntil}>
                             {' '}
-                            {untilLabel} {activeSchedule.next.time}
+                            {untilLabel} {nextWhen}
                           </span>
                         )}
                       </span>

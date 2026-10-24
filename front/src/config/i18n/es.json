@@ -940,6 +940,16 @@
         "scheduleLabel": "Programación:",
         "scheduleUntil": "hasta",
         "manualUntil": "hasta",
+        "untilTomorrow": "mañana",
+        "untilDays": {
+          "0": "el lunes",
+          "1": "el martes",
+          "2": "el miércoles",
+          "3": "el jueves",
+          "4": "el viernes",
+          "5": "el sábado",
+          "6": "el domingo"
+        },
         "cancelManual": "Cancelar el modo manual",
         "windowOpen": "Ventana abierta — calefacción suspendida",
         "windowOpenCooling": "Ventana abierta — refrigeración suspendida",
