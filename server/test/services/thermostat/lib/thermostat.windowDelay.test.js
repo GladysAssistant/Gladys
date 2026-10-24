@@ -142,6 +142,7 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
       targetSelectorsCache: new Set(),
       windowOpenedAt: new Map(),
       windowTimers: new Map(),
+      lifecycle: 0,
       triggerApplySchedules: fake(),
     };
   };
@@ -251,7 +252,7 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     handler.windowSelectorsCache = new Set(['window-sensor']);
     const { get } = handler.gladys.device;
     handler.gladys.device.get = fake(async (query) => {
-      handler.stopped = true;
+      handler.lifecycle += 1;
       return get(query);
     });
 
@@ -268,7 +269,7 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     const handler = buildHandler(60);
     const { get } = handler.gladys.device;
     handler.gladys.device.get = fake(async (query) => {
-      handler.stopped = true;
+      handler.lifecycle += 1;
       return get(query);
     });
 
@@ -277,6 +278,26 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     expect(handler.windowOpenedAt.size).to.equal(0);
     expect(handler.windowTimers.size).to.equal(0);
     assert.calledOnce(handler.gladys.device.get);
+  });
+
+  // A stop and a start during the lookup: the change belongs to the run that
+  // ended, and must not arm a check in the new one.
+  it('should not arm a check when the service restarts during the device lookup', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(60);
+    handler.windowSelectorsCache = new Set(['window-sensor']);
+    const { get } = handler.gladys.device;
+    handler.gladys.device.get = fake(async (query) => {
+      handler.lifecycle += 2;
+      return get(query);
+    });
+
+    await opens(mod, handler);
+    await clock.tickAsync(60 * 1000);
+
+    expect(handler.windowTimers.size).to.equal(0);
+    assert.notCalled(handler.triggerApplySchedules);
+    assert.notCalled(handler.gladys.device.setValue);
   });
 
   it('should cut at once with no delay', async () => {

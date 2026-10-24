@@ -298,6 +298,9 @@ async function onDeviceNewState(event) {
   if (!changedSelector) {
     return;
   }
+  // The run of the service this change arrived in: a stop, or a stop and a start,
+  // during one of the awaits below makes it stale (see `lifecycle`).
+  const { lifecycle } = this;
 
   // A setpoint changed on a real thermostat — its own dial, the vendor app, its
   // internal programme — is a decision by whoever made it, and Gladys must not
@@ -312,9 +315,9 @@ async function onDeviceNewState(event) {
   try {
     // Cheap rejection first: most events in a house are not a configured window.
     const windowSelectors = await getWindowSelectors.call(this);
-    // The service may have stopped during the await: its timers and openings are
+    // The service may have stopped during the awaits: its timers and openings are
     // already cleared, and nothing recorded now would ever be cleared again.
-    if (this.stopped || !windowSelectors.has(changedSelector)) {
+    if (this.lifecycle !== lifecycle || !windowSelectors.has(changedSelector)) {
       return;
     }
     if (newValue !== 0) {
@@ -337,7 +340,7 @@ async function onDeviceNewState(event) {
     const openedAt = this.windowOpenedAt.get(changedSelector);
 
     const thermostatDevices = await this.gladys.device.get({ service: 'thermostat' });
-    if (this.stopped || !thermostatDevices || thermostatDevices.length === 0) {
+    if (this.lifecycle !== lifecycle || !thermostatDevices || thermostatDevices.length === 0) {
       return;
     }
     await Promise.all(

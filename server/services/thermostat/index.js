@@ -16,6 +16,8 @@ module.exports = function ThermostatService(gladys, serviceId) {
    * clearHandles();
    */
   function clearHandles() {
+    // Whatever was in flight belongs to the run that ends here (see `lifecycle`).
+    thermostatHandler.lifecycle += 1;
     if (scheduleInterval) {
       clearInterval(scheduleInterval);
       scheduleInterval = null;
@@ -48,7 +50,6 @@ module.exports = function ThermostatService(gladys, serviceId) {
     // previous interval and listener running, and the house would get two
     // regulation loops actuating the same heaters.
     clearHandles();
-    thermostatHandler.stopped = false;
     // Apply schedules every minute
     scheduleInterval = setInterval(async () => {
       await thermostatHandler.applySchedules();
@@ -80,7 +81,6 @@ module.exports = function ThermostatService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping thermostat service');
-    thermostatHandler.stopped = true;
     clearHandles();
   }
 

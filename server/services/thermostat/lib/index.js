@@ -61,9 +61,11 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // heating is suspended when the delay ends rather than at the next minute tick.
   // Each one keeps the sensor it waits on, so that closing it drops the check.
   this.windowTimers = new Map();
-  // Set by the service's stop(): a state change already in flight when the
-  // service stops must not record an opening or arm a check once it resumes.
-  this.stopped = false;
+  // Moved on by every start() and stop() of the service. A state change already
+  // in flight when the service stops must not record an opening or arm a check
+  // once it resumes — nor when the service has started again meanwhile, which a
+  // stopped flag alone, set back on the start, would let through.
+  this.lifecycle = 0;
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;
