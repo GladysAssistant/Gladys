@@ -1,7 +1,9 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { validateSchedule } = require('../../../utils/thermostatValidateSchedule');
-const { SCHEDULE_STOP_PARAM } = require('./thermostat.state');
+const { SCHEDULE_STOP_PARAM, MANUAL_UNTIL_PARAM, getManualHold, setManualHold } = require('./thermostat.state');
+const { buildParamsConfig } = require('./thermostat.deviceConfig');
+const { holdExpiry } = require('./thermostat.setValue');
 const { getScheduleBySelector, getCurrentPoint } = require('./thermostat.getSchedules');
 const {
   stopForEmptiedProgramme,
@@ -9,6 +11,31 @@ const {
   loadThermostat,
   forEachFollower,
 } = require('./thermostat.scheduleDevice');
+
+/**
+ * @description Move the end of a follower's hold onto the programme's new next
+ * point. A hold running "until the next point" was given the time of that point
+ * when it was taken: a point added before it afterwards was skipped, the widget
+ * kept announcing the old time, and the programme took over later than it says
+ * (forum 11074). A hold of a fixed duration, and a permanent one, are left as
+ * they are — neither names a point.
+ * @param {object} device - The thermostat, features and params included.
+ * @returns {Promise<void>}
+ * @example
+ * await rearmHoldOnNextPoint.call(thermostatHandler, device);
+ */
+async function rearmHoldOnNextPoint(device) {
+  const hold = getManualHold(device);
+  if (!hold || !hold.until || buildParamsConfig(device).manual_duration !== null) {
+    return;
+  }
+  const until = await holdExpiry.call(this, device);
+  if (until === hold.until) {
+    return;
+  }
+  await setManualHold.call(this, device, hold.setpoint, until);
+  logger.info(`Thermostat: "${device.selector}" hold now ends on the new next point, ${new Date(until).toISOString()}`);
+}
 
 /**
  * @description Update a thermostat schedule: rename it, replace its transition
@@ -139,6 +166,19 @@ async function updateSchedule(selector, scheduleData) {
         async (deviceId) => liftScheduleStop.call(this, await loadThermostat(deviceId)),
         'start a follower of the programme again',
       );
+      // A hold running to the next point has to run to the new one. Only the
+      // followers holding something are loaded.
+      const holding = await db.DeviceParam.findAll({
+        where: { device_id: followerIds, name: MANUAL_UNTIL_PARAM },
+        attributes: ['device_id', 'value'],
+        raw: true,
+      });
+      await forEachFollower.call(
+        this,
+        holding.filter((param) => param.value).map((param) => param.device_id),
+        async (deviceId) => rearmHoldOnNextPoint.call(this, await loadThermostat(deviceId)),
+        "move a follower's hold onto the next point",
+      );
     }
     this.triggerApplySchedules();
   }
@@ -146,4 +186,4 @@ async function updateSchedule(selector, scheduleData) {
   return getScheduleBySelector(selector);
 }
 
-module.exports = { updateSchedule };
+module.exports = { updateSchedule, rearmHoldOnNextPoint };

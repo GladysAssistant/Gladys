@@ -490,6 +490,84 @@ describe('thermostat schedule <-> device link', () => {
       assert.notCalled(handler.gladys.device.saveState);
     });
 
+    describe('a hold running to the next point, when the points change', () => {
+      // It was given the time of the next point when it was taken: a point added
+      // before it afterwards was skipped, and the widget kept announcing the old
+      // time (forum 11074).
+      const nextMidnightUtc = () => {
+        const now = new Date();
+        return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+      };
+      const untilWrites = () =>
+        handler.gladys.device.setParam.getCalls().filter((call) => call.args[1] === 'THERMOSTAT_MANUAL_UNTIL');
+
+      const holdOnProgramme = async (until, extraParams = {}) => {
+        handler.gladys.variable = { getValue: fake.resolves('UTC') };
+        // A single point, a week away at most: the hold runs far past midnight.
+        const programme = await handler.createSchedule(HOUSE_SELECTOR, {
+          name: 'Programme',
+          transitions: [{ day_of_week: 0, time: '00:00', preset: 'eco' }],
+        });
+        await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+        await addParam('THERMOSTAT_MANUAL_SETPOINT', '21');
+        await addParam('THERMOSTAT_MANUAL_UNTIL', until);
+        await Promise.all(Object.keys(extraParams).map((name) => addParam(name, extraParams[name])));
+        resetFakes();
+        return programme;
+      };
+
+      it('should move it onto a point added before the one it was aimed at', async () => {
+        const programme = await holdOnProgramme(String(Date.now() + 6 * 24 * 3600 * 1000));
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        const writes = untilWrites();
+        expect(writes).to.have.lengthOf(1);
+        expect(writes[0].args[2]).to.equal(String(nextMidnightUtc()));
+        // The setpoint held is kept: only its end moves.
+        assert.calledWith(
+          handler.gladys.device.setParam,
+          sinonMatchSelector(thermostat.selector),
+          'THERMOSTAT_MANUAL_SETPOINT',
+          '21',
+        );
+      });
+
+      it('should write nothing when the next point did not move', async () => {
+        const programme = await holdOnProgramme(String(nextMidnightUtc()));
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      it('should leave a hold of a fixed duration alone', async () => {
+        const programme = await holdOnProgramme(String(Date.now() + 6 * 24 * 3600 * 1000), {
+          THERMOSTAT_MANUAL_DURATION: '30',
+        });
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      it('should leave a permanent hold alone', async () => {
+        const programme = await holdOnProgramme('');
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      it('should leave the hold alone on a rename', async () => {
+        const programme = await holdOnProgramme(String(Date.now() + 6 * 24 * 3600 * 1000));
+
+        await handler.updateSchedule(programme.selector, { name: 'Renamed' });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+    });
+
     it('should tell no widget anything when a schedule nobody followed is deleted', async () => {
       const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions: allDay('eco') });
 
