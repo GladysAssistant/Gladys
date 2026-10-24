@@ -17,6 +17,7 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     onDeviceNewState: fake.resolves(null),
     primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
+    lifecycle: 0,
     windowTimers: new Map(),
     windowOpenedAt: new Map(),
   };
@@ -167,14 +168,11 @@ describe('ThermostatService', () => {
     const { service, handler } = buildService();
 
     await service.start();
-    const started = handler.lifecycle;
+    expect(handler.lifecycle).to.equal(1);
     await service.stop();
-    const stopped = handler.lifecycle;
+    expect(handler.lifecycle).to.equal(2);
     await service.start();
-
-    expect(stopped).to.not.equal(started);
-    expect(handler.lifecycle).to.not.equal(stopped);
-    expect(handler.lifecycle).to.not.equal(started);
+    expect(handler.lifecycle).to.equal(3);
   });
 
   it('should be safe to stop a service that was never started', async () => {

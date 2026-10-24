@@ -300,6 +300,33 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     assert.notCalled(handler.gladys.device.setValue);
   });
 
+  // Closed and opened again during the lookup: the first opening is over, and its
+  // old time must not replace the check armed for the new one.
+  it('should not arm a check for an opening that ended during the device lookup', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(60);
+    handler.windowSelectorsCache = new Set(['window-sensor']);
+    const { get } = handler.gladys.device;
+    let reopened = false;
+    handler.gladys.device.get = fake(async (query) => {
+      if (!reopened && query && query.service === 'thermostat') {
+        reopened = true;
+        clock.tick(5 * 1000);
+        await closes(mod, handler);
+        await opens(mod, handler);
+      }
+      return get(query);
+    });
+
+    await opens(mod, handler);
+    await clock.tickAsync(55 * 1000);
+    assert.notCalled(handler.triggerApplySchedules);
+    await clock.tickAsync(5 * 1000);
+
+    assert.calledOnce(handler.triggerApplySchedules);
+    assert.notCalled(handler.gladys.device.setValue);
+  });
+
   it('should cut at once with no delay', async () => {
     const mod = loadModule();
     const handler = buildHandler(0);

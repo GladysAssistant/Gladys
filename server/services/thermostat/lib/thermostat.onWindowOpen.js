@@ -340,7 +340,14 @@ async function onDeviceNewState(event) {
     const openedAt = this.windowOpenedAt.get(changedSelector);
 
     const thermostatDevices = await this.gladys.device.get({ service: 'thermostat' });
-    if (this.lifecycle !== lifecycle || !thermostatDevices || thermostatDevices.length === 0) {
+    // The window may also have closed, or closed and opened again, during the
+    // lookup: this opening is then over, and must not arm a check on its old time.
+    if (
+      this.lifecycle !== lifecycle ||
+      this.windowOpenedAt.get(changedSelector) !== openedAt ||
+      !thermostatDevices ||
+      thermostatDevices.length === 0
+    ) {
       return;
     }
     await Promise.all(
