@@ -9,6 +9,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   THERMOSTAT_MODE,
+  THERMOSTAT_PRESET,
   AC_MODE,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
@@ -1323,9 +1324,13 @@ describe('thermostat.onExternalPowerChanged', () => {
     sinon.restore();
   });
 
-  const loadListener = () =>
+  // `point`: the point in force on the programme the thermostat follows, null
+  // for a thermostat that follows none.
+  const loadListener = ({ point = null } = {}) =>
     proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
       './thermostat.setValue': { holdExpiry: fake.resolves(null) },
+      './thermostat.scheduleDevice': { getScheduleOfDevice: fake.resolves(point ? { id: 'programme-id' } : null) },
+      './thermostat.getSchedules': { getCurrentPoint: fake.resolves(point) },
       '../../../utils/logger': {
         debug: fake.returns(null),
         info: fake.returns(null),
@@ -1503,6 +1508,125 @@ describe('thermostat.onExternalPowerChanged', () => {
 
       assert.notCalled(handler.gladys.device.setParam);
       assert.calledOnce(handler.setValue);
+    });
+  });
+
+  describe('a unit switched on from its remote during an Off point of the programme', () => {
+    // The thermostat is not stopped, it follows its programme, whose point is
+    // Off: the next pass powered the unit off again within the minute.
+    const offPoint = { day_of_week: 5, time: '10:00', preset: 'off' };
+
+    const onOffPoint = ({ setpoint = 22, windowOpen = false, extraParams = [], features } = {}) => {
+      const thermostat = acThermostat({ features });
+      thermostat.params.push(...extraParams);
+      const owners = {
+        'ac-setpoint': { selector: 'ac', features: [{ selector: 'ac-setpoint', last_value: setpoint }] },
+        'living-room-window': {
+          selector: 'window',
+          features: [{ selector: 'living-room-window', last_value: windowOpen ? 0 : 1 }],
+        },
+      };
+      const handler = buildHandler({ devices: [thermostat], previous: 0 });
+      handler.gladys.device.get = fake((query) =>
+        Promise.resolve(query.device_feature_selectors ? [owners[query.device_feature_selectors]] : [thermostat]),
+      );
+      handler.gladys.device.setParam = fake.resolves(null);
+      handler.gladys.event = { emit: fake.returns(null) };
+      handler.triggerApplySchedules = fake();
+      return handler;
+    };
+
+    it('should hold the setpoint the unit carries until the next point', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint();
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '22');
+      // The pass runs on the hold now, rather than cutting the unit within the minute.
+      assert.calledOnce(handler.triggerApplySchedules);
+      // It is not a start: the thermostat was never stopped.
+      assert.notCalled(handler.setValue);
+    });
+
+    it('should leave the unit to the programme on any other point', async () => {
+      const mod = loadListener({ point: { ...offPoint, preset: 'eco' } });
+      const handler = onOffPoint();
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+    });
+
+    it('should leave it to the open window, which still wins', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint({
+        windowOpen: true,
+        extraParams: [{ name: 'THERMOSTAT_WINDOW_FEATURE', value: 'living-room-window' }],
+      });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+    });
+
+    it('should hold it when the window is closed', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint({ extraParams: [{ name: 'THERMOSTAT_WINDOW_FEATURE', value: 'living-room-window' }] });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '22');
+    });
+
+    it('should leave a hold already armed as it is', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint({ extraParams: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '19' }] });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+    });
+
+    it('should leave a preset picked by hand alone, which the programme does not drive', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint({
+        features: [
+          thermostatModeFeature(THERMOSTAT_MODE.HEATING),
+          {
+            selector: 'ac-thermostat-preset',
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+            last_value: THERMOSTAT_PRESET.COMFORT,
+          },
+        ],
+      });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+    });
+
+    it('should hold nothing when the unit reports no setpoint', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint({ setpoint: null });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.notCalled(handler.triggerApplySchedules);
+    });
+
+    it('should hold nothing when the setpoint feature is gone', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint();
+      handler.gladys.device.get = fake((query) =>
+        Promise.resolve(query.device_feature_selectors ? [] : [acThermostat()]),
+      );
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
     });
   });
 

@@ -1,9 +1,11 @@
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE } = require('../../../utils/constants');
-const { getThermostatFeature, stopExternalThermostat } = require('./thermostat.applySchedules');
+const { getThermostatFeature, stopExternalThermostat, findOpenWindow } = require('./thermostat.applySchedules');
 const { buildParamsConfig, getFeatureBySelector, getRunningMode, isExternal } = require('./thermostat.deviceConfig');
 const { holdExpiry } = require('./thermostat.setValue');
-const { getFeature, getManualHold, isStopped, setManualHold } = require('./thermostat.state');
+const { getFeature, getManualHold, getPreset, isStopped, setManualHold } = require('./thermostat.state');
+const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
+const { getCurrentPoint } = require('./thermostat.getSchedules');
 
 /**
  * @description Invalidate the caches derived from this service's devices: the
@@ -333,6 +335,51 @@ async function holdUnitSetpoint(device) {
 }
 
 /**
+ * @description Keep a unit switched on from its remote during an Off point of
+ * the programme on, until the next point.
+ *
+ * The thermostat is not stopped then — it follows its programme, whose point is
+ * Off — so the start of a stopped thermostat does not apply, and the next pass
+ * powered the unit off again within the minute (forum 11074). Switching it on by
+ * hand is a decision, like turning its dial: it is held, on the setpoint the
+ * unit carries, until the programme's next point, exactly as a setpoint changed
+ * on the device is. An open window still wins, a hold already armed is left as
+ * it is, and so is a preset picked by hand, which the programme does not drive.
+ * @param {object} device - The thermostat the unit belongs to.
+ * @returns {Promise<void>}
+ * @example
+ * await holdRemoteStartOnOffPoint.call(handler, device);
+ */
+async function holdRemoteStartOnOffPoint(device) {
+  const preset = getPreset(device);
+  if (getManualHold(device) || (preset !== null && preset !== 'schedule')) {
+    return;
+  }
+  const schedule = await getScheduleOfDevice(device.id);
+  const point = schedule ? await getCurrentPoint(schedule.id) : null;
+  if (!point || point.preset !== 'off') {
+    return;
+  }
+  // Found by its params, which always build a config.
+  const config = buildParamsConfig(device);
+  if (config.window_features.length > 0 && (await findOpenWindow(this.gladys, config.window_features))) {
+    return;
+  }
+  const target = await getFeatureBySelector(this.gladys, config.target_feature);
+  const value = target ? target.feature.last_value : null;
+  if (value === null) {
+    logger.info(`Thermostat: ${device.selector} switched on during an Off point, but its unit reports no setpoint`);
+    return;
+  }
+  logger.info(
+    `Thermostat: ${device.selector} switched on from the device during an Off point, holding ${value} until the next point`,
+  );
+  // Stored in the feature's own unit, which is what the unit reported (C.3).
+  await setManualHold.call(this, device, Number(value), await holdExpiry.call(this, device));
+  this.triggerApplySchedules();
+}
+
+/**
  * @description Follow a power switched on the real device itself — an air
  * conditioner's remote, its vendor app.
  *
@@ -397,6 +444,8 @@ async function onExternalPowerChanged(changedSelector, newValue) {
             logger.warn(`Thermostat: could not hold the setpoint ${device.selector} carries: ${e.message}`);
           }
           await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
+        } else if (value !== 0) {
+          await holdRemoteStartOnOffPoint.call(this, device);
         }
       }),
     );
