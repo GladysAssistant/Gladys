@@ -3431,11 +3431,13 @@
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren.",
       "ttsProvider": "Stimme (Sprachsynthese-Anbieter)",
       "ttsProviderText": "Der Anbieter, der zum Sprechen verwendet wird: Szenen-Ansagen auf Ihren Lautsprechern und die Antworten des Sprachassistenten. Gladys Plus funktioniert überall (auch beim Fernzugriff); eine TTS-Anbieter-Integration erzeugt die Stimme lokal und stellt sie über Ihr lokales Netzwerk bereit.",
+      "ttsProviderSelectLabel": "Anbieter für die Sprachausgabe",
       "ttsProviderPlusNotConnected": "Gladys Plus ist nicht verbunden: Ansagen und Sprachantworten werden nicht abgespielt.",
       "ttsProviderPlusSettingsLink": "Gladys Plus verbinden",
       "ttsProviderPlusNotConnectedOr": "oder installieren Sie eine Sprachsynthese-Integration und wählen Sie sie hier aus:",
       "ttsProviderNotRunning": "„{{name}}“ läuft nicht: Ansagen und Sprachantworten schlagen fehl, bis sie wieder gestartet ist.",
       "ttsProviderUnavailable": "Der ausgewählte Anbieter „{{provider}}“ ist nicht mehr verfügbar: Wählen Sie eine andere Stimme.",
+      "ttsProviderUnavailableOption": "{{provider}} (nicht mehr verfügbar)",
       "ttsProviderInstallHint": "Nur Gladys Plus ist verfügbar. Eine Sprachsynthese-Integration aus dem Katalog kann die Stimme lokal erzeugen, ohne Abonnement.",
       "ttsProviderOpenIntegration": "Integration öffnen",
       "ttsProviderBrowseCatalog": "Sprachassistenten-Integrationen durchsuchen"
