@@ -163,7 +163,7 @@ const ActionCard = ({ children, ...props }) => {
     [isCondition, isSequentialStep, path, groupPath, moveCard, moveCardGroup]
   );
 
-  const summary = !isExpanded ? getActionSummary(props.action, props.intl.dictionary) : null;
+  const summary = !isExpanded ? getActionSummary(props.action, props.intl.dictionary, props.deviceFeatures) : null;
   // an action declared by an external integration is titled by its manifest
   // label; an orphan one (uninstalled, key removed) keeps the generic label
   const declarationTitle =
@@ -275,7 +275,8 @@ const ActionCard = ({ children, ...props }) => {
               moveCard: props.moveCard,
               moveCardGroup: props.moveCardGroup,
               scene: props.scene,
-              sceneIntegrations: props.sceneIntegrations
+              sceneIntegrations: props.sceneIntegrations,
+              deviceFeatures: props.deviceFeatures
             };
 
             return <Component {...commonProps} />;
