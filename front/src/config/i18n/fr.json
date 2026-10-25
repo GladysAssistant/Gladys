@@ -3437,6 +3437,7 @@
       "ttsProviderPlusNotConnectedOr": "ou installez une intégration de synthèse vocale et sélectionnez-la ici :",
       "ttsProviderNotRunning": "« {{name}} » n'est pas démarrée : les annonces et les réponses vocales échoueront tant qu'elle ne sera pas redémarrée.",
       "ttsProviderUnavailable": "Le fournisseur sélectionné « {{provider}} » n'est plus disponible : sélectionnez une autre voix.",
+      "ttsProviderUnavailableOption": "{{provider}} (plus disponible)",
       "ttsProviderInstallHint": "Seul Gladys Plus est disponible. Une intégration de synthèse vocale du catalogue peut générer la voix localement, sans abonnement.",
       "ttsProviderOpenIntegration": "Ouvrir l'intégration",
       "ttsProviderBrowseCatalog": "Parcourir les intégrations d'assistants vocaux"

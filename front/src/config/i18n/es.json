@@ -3437,6 +3437,7 @@
       "ttsProviderPlusNotConnectedOr": "o instale una integración de síntesis de voz y selecciónela aquí:",
       "ttsProviderNotRunning": "\"{{name}}\" no está en ejecución: los anuncios y las respuestas de voz fallarán hasta que se reinicie.",
       "ttsProviderUnavailable": "El proveedor seleccionado \"{{provider}}\" ya no está disponible: seleccione otra voz.",
+      "ttsProviderUnavailableOption": "{{provider}} (ya no disponible)",
       "ttsProviderInstallHint": "Solo Gladys Plus está disponible. Una integración de síntesis de voz del catálogo puede generar la voz localmente, sin suscripción.",
       "ttsProviderOpenIntegration": "Abrir la integración",
       "ttsProviderBrowseCatalog": "Explorar las integraciones de asistentes de voz"

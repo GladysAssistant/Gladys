@@ -84,9 +84,13 @@ class TtsProviderSettings extends Component {
                   {name || provider}
                 </option>
               ))}
+              {/* not disabled: a disabled option is not a legal selected
+                  value, and a browser falling back to the first enabled one
+                  (Gladys Plus) would fire onChange and replace the stored
+                  provider without the admin choosing it */}
               {activeIsUnavailable && (
-                <option value={active} disabled>
-                  {active}
+                <option key={active} value={active}>
+                  <Text id="integration.openai.ttsProviderUnavailableOption" fields={{ provider: active }} />
                 </option>
               )}
             </select>

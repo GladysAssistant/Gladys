@@ -3437,6 +3437,7 @@
       "ttsProviderPlusNotConnectedOr": "or install a text-to-speech integration and select it here:",
       "ttsProviderNotRunning": "\"{{name}}\" is not running: announcements and voice replies will fail until it is started again.",
       "ttsProviderUnavailable": "The selected provider \"{{provider}}\" is no longer available: select another voice.",
+      "ttsProviderUnavailableOption": "{{provider}} (no longer available)",
       "ttsProviderInstallHint": "Only Gladys Plus is available. A text-to-speech integration from the catalog can generate the voice locally, without a subscription.",
       "ttsProviderOpenIntegration": "Open the integration",
       "ttsProviderBrowseCatalog": "Browse the voice assistant integrations"

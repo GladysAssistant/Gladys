@@ -3437,6 +3437,7 @@
       "ttsProviderPlusNotConnectedOr": "oder installieren Sie eine Sprachsynthese-Integration und wählen Sie sie hier aus:",
       "ttsProviderNotRunning": "„{{name}}“ läuft nicht: Ansagen und Sprachantworten schlagen fehl, bis sie wieder gestartet ist.",
       "ttsProviderUnavailable": "Der ausgewählte Anbieter „{{provider}}“ ist nicht mehr verfügbar: Wählen Sie eine andere Stimme.",
+      "ttsProviderUnavailableOption": "{{provider}} (nicht mehr verfügbar)",
       "ttsProviderInstallHint": "Nur Gladys Plus ist verfügbar. Eine Sprachsynthese-Integration aus dem Katalog kann die Stimme lokal erzeugen, ohne Abonnement.",
       "ttsProviderOpenIntegration": "Integration öffnen",
       "ttsProviderBrowseCatalog": "Sprachassistenten-Integrationen durchsuchen"
