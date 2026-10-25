@@ -83,6 +83,15 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
     expect(config.window_delay).to.equal(0);
   });
 
+  // 3,000,000 s overflowed setTimeout, which then fired after 1 ms.
+  it('should read an opening delay past an hour as an hour', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp', THERMOSTAT_WINDOW_DELAY: '3000000' }),
+    );
+
+    expect(config.window_delay).to.equal(3600);
+  });
+
   it('should read a negative opening delay as no delay', () => {
     const config = buildParamsConfig(
       deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp', THERMOSTAT_WINDOW_DELAY: '-30' }),

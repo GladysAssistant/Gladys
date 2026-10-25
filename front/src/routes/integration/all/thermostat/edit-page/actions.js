@@ -1,5 +1,6 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import { MAX_WINDOW_DELAY_SECONDS } from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 
@@ -242,7 +243,8 @@ function createActions(store) {
         const tpiCycleTime = toInt(state.thermostatEditTpiCycleTime, 30);
         const tpiProportionalBand = toNumber(state.thermostatEditTpiProportionalBand, 2);
         const manualDuration = toInt(state.thermostatEditManualDuration, 30);
-        const windowDelay = Math.max(0, toInt(state.thermostatEditWindowDelay, 60));
+        // There is no form submit, so the input's own bounds never apply.
+        const windowDelay = Math.min(MAX_WINDOW_DELAY_SECONDS, Math.max(0, toInt(state.thermostatEditWindowDelay, 60)));
 
         const isEdit = !!(state.thermostatEditDevice && state.thermostatEditDevice.selector);
         const timestamp = Date.now();

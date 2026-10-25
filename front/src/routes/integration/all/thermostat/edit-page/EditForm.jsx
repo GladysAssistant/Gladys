@@ -5,6 +5,7 @@ import style from './style.css';
 import stickyStyle from '../stickyActions.css';
 import { getPresetColor } from '../../../../../utils/thermostatPresetColors';
 import { DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
+import { MAX_WINDOW_DELAY_SECONDS } from '../../../../../../../server/utils/thermostatConstants';
 
 const FeatureSelect = ({ value, features, onChange, emptyLabel }) => (
   <select class="form-control" value={value} onChange={onChange}>
@@ -422,7 +423,7 @@ const EditForm = ({ ...props }) => {
                     type="number"
                     class="form-control"
                     min="0"
-                    max="3600"
+                    max={MAX_WINDOW_DELAY_SECONDS}
                     step="1"
                     value={props.thermostatEditWindowDelay}
                     onInput={e => props.updateThermostatField('thermostatEditWindowDelay', e.target.value)}
