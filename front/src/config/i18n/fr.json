@@ -3616,6 +3616,8 @@
         "activeScheduleLabel": "Planning actif",
         "noSchedule": "Aucun planning",
         "setpointLabel": "Consigne",
+        "regulationLabel": "Régulation",
+        "heaterRegulates": "Par le radiateur",
         "noSetpoint": "—",
         "saveButton": "Sauvegarder",
         "editButton": "Éditer",
@@ -5799,7 +5801,7 @@
           "comfort": "Confort",
           "eco": "Eco",
           "off": "Off",
-          "frost-protection": "Hors Gel",
+          "frost-protection": "Hors-gel",
           "comfort_-1": "Confort -1°C",
           "comfort_-2": "Confort -2°C"
         }
@@ -6025,7 +6027,7 @@
       "heater": {
         "pilot-wire-mode": {
           "0": "Off",
-          "1": "Hors Gel",
+          "1": "Hors-gel",
           "2": "Eco",
           "3": "Confort -1°C",
           "4": "Confort -2°C",

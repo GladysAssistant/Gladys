@@ -105,6 +105,32 @@ const DEFAULT_PILOT_WIRE_ORDERS = {
   comfort: PILOT_WIRE_MODE.COMFORT,
 };
 
+const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
+
+/**
+ * @description The order a module can actually be sent, from the options its
+ * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
+ * the order was refused, written again on every pass, and the widget said it was
+ * on its way for ever. Comfort -1 or -2 falls back on comfort when the module
+ * takes it; any other order it does not take is not sent at all. A feature that
+ * declares no option is sent the order as it is.
+ * @param {number} order - A PILOT_WIRE_MODE value.
+ * @param {Array} [supportedOptions] - The feature's `supported_options`.
+ * @returns {number|null} The order to send, or null when the module takes none.
+ * @example
+ * supportedPilotWireOrder(PILOT_WIRE_MODE.COMFORT_1, [{ value: 0 }, { value: 1 }, { value: 2 }, { value: 5 }]); // 5
+ */
+function supportedPilotWireOrder(order, supportedOptions) {
+  const supported = (supportedOptions || []).map((option) => option.value);
+  if (supported.length === 0 || supported.includes(order)) {
+    return order;
+  }
+  if (COMFORT_ORDERS.includes(order) && supported.includes(PILOT_WIRE_MODE.COMFORT)) {
+    return PILOT_WIRE_MODE.COMFORT;
+  }
+  return null;
+}
+
 module.exports = {
   DEFAULT_PRESET_TEMPS,
   FALLBACK_SETPOINT,
@@ -129,4 +155,5 @@ module.exports = {
   DEFAULT_THERMOSTAT_TYPE,
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
+  supportedPilotWireOrder,
 };

@@ -89,6 +89,11 @@ class ThermostatDeviceBox extends Component {
       modeFeature.last_value !== null &&
       modeFeature.last_value !== undefined &&
       Number(modeFeature.last_value) === THERMOSTAT_MODE.OFF;
+    // A pilot-wire heater regulating itself takes no setpoint: its presets send
+    // orders, and its form hides the temperatures. The card read "Setpoint
+    // 21 °C" all the same, from the feature it keeps as any thermostat does.
+    const typeParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TYPE');
+    const heaterRegulated = !!typeParam && typeParam.value === 'pilot-wire';
     const unitParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TEMP_UNIT');
     // The real device declares the unit it works in, and it is the one the value
     // read above is expressed in: a celsius thermostat pointing at a fahrenheit
@@ -159,11 +164,19 @@ class ThermostatDeviceBox extends Component {
                   </div>
                   <div class={style.summaryItem}>
                     <span class={style.summaryLabel}>
-                      <Text id="integration.thermostat.device.setpointLabel" />
+                      <Text
+                        id={
+                          heaterRegulated
+                            ? 'integration.thermostat.device.regulationLabel'
+                            : 'integration.thermostat.device.setpointLabel'
+                        }
+                      />
                     </span>
                     <span class={style.summaryValue}>
                       {isStopped ? (
                         <Text id="integration.thermostat.device.stoppedState" />
+                      ) : heaterRegulated ? (
+                        <Text id="integration.thermostat.device.heaterRegulates" />
                       ) : setpoint === null ? (
                         <Text id="integration.thermostat.device.noSetpoint" />
                       ) : (

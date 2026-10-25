@@ -7,7 +7,7 @@ const {
   getSetpointForPreset,
   presetForPilotWireOrder,
 } = require('./thermostat.applySchedules');
-const { buildParamsConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
+const { buildParamsConfig, getFeatureBySelector, getRunningMode, isExternal } = require('./thermostat.deviceConfig');
 const { holdExpiry } = require('./thermostat.setValue');
 const { getFeature, getPreset, getManualHold, setManualHold, isStopped, presetValue } = require('./thermostat.state');
 
@@ -176,9 +176,13 @@ async function primeObservedSetpoints() {
  * preset: pressed on the module it stops the thermostat, exactly like the
  * widget's stop button.
  *
- * Nothing is taken while the thermostat is stopped or a window is open: both
- * outrank a hold, so OFF is written over the order at once, and a hold armed
- * behind them would resurface later as a manual mode nobody remembers.
+ * Another order pressed on a stopped thermostat starts it again, on that
+ * preset: the module's button is how the heater is switched on in the room, and
+ * writing OFF back over it left only the Gladys widget able to start it — with
+ * nothing on the module to say why. Nothing but off is taken while a window is
+ * open: it outranks a press, so frost protection is written over the order at
+ * once, and a hold armed behind it would resurface later as a manual mode
+ * nobody remembers.
  * @param {object} device - The thermostat device.
  * @param {object} config - Its params config.
  * @param {number} order - The PILOT_WIRE_MODE value the module now carries.
@@ -187,18 +191,17 @@ async function primeObservedSetpoints() {
  * await onPilotWireOrderChanged.call(handler, device, config, PILOT_WIRE_MODE.ECO);
  */
 async function onPilotWireOrderChanged(device, config, order) {
+  const stop = order === PILOT_WIRE_MODE.OFF;
   // The module already carries the order it was given: waiting for the next
-  // pass would let it heat for up to a minute. OFF is written back at once,
-  // marked as this service's own so its echo is not taken for another press.
-  if (isStopped(device)) {
-    logger.info(`Thermostat: order ${order} pressed on a stopped heater (${device.selector}), sending OFF`);
-    await drivePilotWire(this.gladys, device, config, 'off', `stopped, ${device.selector}`, this.selfWrittenSetpoints);
-    return;
-  }
-  if (config.window_feature) {
+  // pass would let it heat for up to a minute. The window's frost protection is
+  // written back at once, marked as this service's own so its echo is not taken
+  // for another press. Off pressed is still a stop, taken below.
+  if (config.window_feature && !stop) {
     const win = await getFeatureBySelector(this.gladys, config.window_feature);
     if (win && win.feature.last_value === 0) {
-      logger.info(`Thermostat: order ${order} pressed with the window open (${device.selector}), sending OFF`);
+      logger.info(
+        `Thermostat: order ${order} pressed with the window open (${device.selector}), sending frost protection`,
+      );
       await drivePilotWire(
         this.gladys,
         device,
@@ -206,12 +209,30 @@ async function onPilotWireOrderChanged(device, config, order) {
         'off',
         `window open, ${device.selector}`,
         this.selfWrittenSetpoints,
+        { order: PILOT_WIRE_MODE.FROST_PROTECTION },
       );
       return;
     }
   }
-  const stop = order === PILOT_WIRE_MODE.OFF;
   const name = presetForPilotWireOrder(order, config);
+  if (isStopped(device)) {
+    // Off pressed on a heater already stopped changes nothing.
+    if (stop) {
+      return;
+    }
+    const presetFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
+    const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+    if (!presetFeature || !modeFeature) {
+      logger.warn(`Thermostat: order ${order} pressed on the module, but ${device.selector} cannot be started`);
+      return;
+    }
+    logger.info(`Thermostat: order ${order} pressed on the module of stopped ${device.selector}, starting it`);
+    // The preset first: the start triggers the regulation pass, which has to
+    // find the preset pressed and its hold rather than the programme's point.
+    await this.setValue(device, presetFeature, presetValue(name));
+    await this.setValue(device, modeFeature, getRunningMode(config));
+    return;
+  }
   // Comfort -1 then comfort -2 is the same choice twice: re-taking it would only
   // push the hold's expiry forward.
   const hold = getManualHold(device);
@@ -423,11 +444,13 @@ async function onDeviceNewState(event) {
           }
           return;
         }
-        // A pilot-wire heater is stopped by the order, like the minute loop does:
-        // it holds no switch, and waiting for the next tick left it on comfort
-        // for up to a minute with the window open.
+        // A pilot-wire heater is put on frost protection, like the minute loop
+        // does: it holds no switch, and waiting for the next tick left it on
+        // comfort for up to a minute with the window open.
         if (paramsConfig.pilot_wire_feature) {
-          logger.info(`Thermostat: window opened (${changedSelector}) for ${device.selector}, sending OFF`);
+          logger.info(
+            `Thermostat: window opened (${changedSelector}) for ${device.selector}, sending frost protection`,
+          );
           await drivePilotWire(
             this.gladys,
             device,
@@ -435,6 +458,7 @@ async function onDeviceNewState(event) {
             'off',
             `window open, ${device.selector}`,
             this.selfWrittenSetpoints,
+            { order: PILOT_WIRE_MODE.FROST_PROTECTION },
           );
           return;
         }

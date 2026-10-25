@@ -302,7 +302,9 @@ describe('thermostat.onDeviceNewState (window open, pilot-wire heater)', () => {
     };
   };
 
-  it('should send the off order at once, with no switch to look for', async () => {
+  // Frost protection rather than off: off also turns the heater's own frost
+  // guard off, for a window left open on a winter night.
+  it('should send frost protection at once, with no switch to look for', async () => {
     const mod = loadModule();
     const handler = buildPilotWireHandler();
 
@@ -310,10 +312,10 @@ describe('thermostat.onDeviceNewState (window open, pilot-wire heater)', () => {
 
     const [, feature, value] = handler.gladys.device.setValue.firstCall.args;
     expect(feature.selector).to.equal('heater-pilot-wire');
-    expect(value).to.equal(PILOT_WIRE_MODE.OFF);
+    expect(value).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
     assert.calledWith(handler.gladys.device.saveState, handler.operatingState, THERMOSTAT_OPERATING_STATE.IDLE);
     // Marked as its own: the module's report of it is no press of its button.
-    expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.OFF);
+    expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
   });
 });
 

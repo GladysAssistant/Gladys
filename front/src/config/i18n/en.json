@@ -3616,6 +3616,8 @@
         "activeScheduleLabel": "Active schedule",
         "noSchedule": "No schedule",
         "setpointLabel": "Setpoint",
+        "regulationLabel": "Regulation",
+        "heaterRegulates": "By the heater",
         "noSetpoint": "—",
         "saveButton": "Save",
         "editButton": "Edit",
@@ -5799,7 +5801,7 @@
           "comfort": "Comfort",
           "eco": "Eco",
           "off": "Off",
-          "frost-protection": "Frost Protection",
+          "frost-protection": "Frost protection",
           "comfort_-1": "Comfort -1°C",
           "comfort_-2": "Comfort -2°C"
         }
@@ -6025,7 +6027,7 @@
       "heater": {
         "pilot-wire-mode": {
           "0": "Off",
-          "1": "Frost Protection",
+          "1": "Frost protection",
           "2": "Eco",
           "3": "Comfort -1°C",
           "4": "Comfort -2°C",

@@ -49,6 +49,7 @@ const {
   MAX_TPI_PROPORTIONAL_BAND,
   DEFAULT_MANUAL_DURATION_MINUTES,
   PILOT_WIRE_REGULATIONS,
+  supportedPilotWireOrder,
 } = require('../../../utils/thermostatConstants');
 
 /**
@@ -550,6 +551,19 @@ function isStandbyOrder(order) {
 }
 
 /**
+ * @description Whether an order is one of the three comforts.
+ * @param {number} order - A PILOT_WIRE_MODE value.
+ * @returns {boolean} True for comfort, comfort -1 and comfort -2.
+ * @example
+ * isComfortOrder(PILOT_WIRE_MODE.COMFORT_1); // true
+ */
+function isComfortOrder(order) {
+  return (
+    order === PILOT_WIRE_MODE.COMFORT || order === PILOT_WIRE_MODE.COMFORT_1 || order === PILOT_WIRE_MODE.COMFORT_2
+  );
+}
+
+/**
  * @description Write an order on a pilot-wire heater.
  *
  * An order already carried is skipped: several of these heaters are Zigbee, and
@@ -560,7 +574,7 @@ function isStandbyOrder(order) {
  * be taken for an order changed on the module and arm a hold (C.1.1).
  * @param {object} gladys - Gladys instance.
  * @param {string} pilotWireSelector - The heater's pilot-wire-mode feature.
- * @param {number} order - The PILOT_WIRE_MODE value to write.
+ * @param {number} wanted - The PILOT_WIRE_MODE value to write.
  * @param {string} logContext - What this write is for, for the log line.
  * @param {Map<string, number>} selfWritten - Marks of the values this service wrote.
  * @returns {Promise<number|null|undefined>} The order the heater carries
@@ -569,7 +583,7 @@ function isStandbyOrder(order) {
  * @example
  * await writePilotWireOrder(gladys, 'heater-pilot-wire', PILOT_WIRE_MODE.COMFORT, 'schedule', new Map());
  */
-async function writePilotWireOrder(gladys, pilotWireSelector, order, logContext, selfWritten) {
+async function writePilotWireOrder(gladys, pilotWireSelector, wanted, logContext, selfWritten) {
   let found = null;
   let marked = false;
   try {
@@ -577,6 +591,12 @@ async function writePilotWireOrder(gladys, pilotWireSelector, order, logContext,
     if (!found) {
       logger.warn(`Thermostat schedule: pilot-wire feature not found for selector="${pilotWireSelector}"`);
       return null;
+    }
+    // Only an order the module declares it takes (supportedPilotWireOrder).
+    const order = supportedPilotWireOrder(wanted, found.feature.supported_options);
+    if (order === null) {
+      logger.warn(`Thermostat schedule: the module takes no order ${wanted}, nothing sent (${logContext})`);
+      return found.feature.last_value;
     }
     // Marked in both branches: nothing goes on the wire when the order is
     // already carried, but it is still the order Gladys stands behind, and a
@@ -662,13 +682,14 @@ async function retractStaleRunningState(gladys, device) {
  * @param {Map<string, number>|null} selfWritten - Marks of the values this service wrote, if kept.
  * @param {object} [options] - Regulation options.
  * @param {number|null} [options.setpoint] - The setpoint to regulate on, in the thermostat's unit.
- * @param {boolean} [options.keepDerivedComfort] - Keep comfort -1 or -2 when comfort is asked.
+ * @param {boolean} [options.keepDerivedComfort] - Keep the comfort the module carries when comfort is asked.
+ * @param {number} [options.order] - The order to send whatever the preset, with `off`: frost for a window.
  * @returns {Promise<void>}
  * @example
  * await drivePilotWire(gladys, device, config, 'comfort', 'schedule', handler.selfWrittenSetpoints, { setpoint: 21 });
  */
 async function drivePilotWire(gladys, device, config, preset, logContext, selfWritten, options = {}) {
-  const { setpoint = null, keepDerivedComfort = false } = options;
+  const { setpoint = null, keepDerivedComfort = false, order: forcedOrder = null } = options;
   const stop = preset === 'off';
   const regulated = !stop && setpoint !== null && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.GLADYS;
   let carriedBefore = null;
@@ -705,7 +726,7 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
     order = heating ? PILOT_WIRE_MODE.COMFORT : PILOT_WIRE_MODE.FROST_PROTECTION;
     context = `${logContext}, temp=${currentTemp}, setpoint=${setpoint}`;
   } else {
-    order = pilotWireOrderForPreset(preset, config);
+    order = forcedOrder !== null ? forcedOrder : pilotWireOrderForPreset(preset, config);
     if (order === undefined) {
       logger.debug(`Thermostat schedule: no pilot-wire order for preset "${preset}", the heater keeps its order`);
       // `schedule` with no point in force writes nothing, but a stale flame is
@@ -718,13 +739,14 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
     if (regulated) {
       logger.info(`Thermostat schedule: room temperature unknown, the heater regulates alone (${logContext})`);
     }
-    // Comfort -1 and -2 are comfort chosen on the module itself, which holds
-    // them as comfort (C.1.1): writing plain comfort over them would undo that
-    // choice within a minute. Only when the heater regulates: under Gladys,
-    // comfort is just "heat", and the temperature is Gladys's to decide.
-    const derived = carriedBefore === PILOT_WIRE_MODE.COMFORT_1 || carriedBefore === PILOT_WIRE_MODE.COMFORT_2;
-    if (keepDerivedComfort && order === PILOT_WIRE_MODE.COMFORT && derived) {
-      logger.debug(`Thermostat schedule: pilot-wire keeps the derived comfort ${carriedBefore} (${context})`);
+    // Comfort, comfort -1 and -2 are all comfort chosen on the module itself,
+    // which holds them as comfort (C.1.1): writing the order comfort is set to
+    // over them would undo that choice within a minute — plain comfort over a
+    // -1 pressed, or -1 over a plain comfort pressed when comfort sends -1.
+    // Only when the heater regulates: under Gladys, comfort is just "heat", and
+    // the temperature is Gladys's to decide.
+    if (keepDerivedComfort && isComfortOrder(order) && isComfortOrder(carriedBefore) && order !== carriedBefore) {
+      logger.debug(`Thermostat schedule: pilot-wire keeps the comfort ${carriedBefore} pressed (${context})`);
       order = carriedBefore;
     }
   }
@@ -871,8 +893,13 @@ async function regulateDevice(
           await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten);
         } else if (config.pilot_wire_feature) {
           // A pilot-wire heater is stopped by the order, not by cutting its
-          // supply: the wire is a command line, not the power feed.
-          await drivePilotWire(gladys, device, config, 'off', `window open, ${selector}`, selfWritten);
+          // supply: the wire is a command line, not the power feed. Frost
+          // protection rather than off, as the external path writes the frost
+          // setpoint: off also turns the heater's own frost guard off, for a
+          // window left open on a winter night.
+          await drivePilotWire(gladys, device, config, 'off', `window open, ${selector}`, selfWritten, {
+            order: PILOT_WIRE_MODE.FROST_PROTECTION,
+          });
         } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `window open, ${selector}`);
           await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);

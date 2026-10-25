@@ -169,28 +169,68 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     expect(handler.observedSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.COMFORT);
   });
 
-  // The module already carries the order pressed: OFF is written back at once
-  // rather than at the next pass, and marked so its echo is not another press.
-  const offWritten = (handler) => {
+  // The module already carries the order pressed: the window's frost
+  // protection is written back at once rather than at the next pass, and marked
+  // so its echo is not another press.
+  const frostWritten = (handler) => {
     const [, feature, value] = handler.gladys.device.setValue.firstCall.args;
     expect(feature.selector).to.equal('heater-pilot-wire');
-    expect(value).to.equal(PILOT_WIRE_MODE.OFF);
-    expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.OFF);
+    expect(value).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
+    expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
   };
 
-  it('should take nothing while the thermostat is stopped, and write off back at once', async () => {
-    // The stop outranks a hold, and a hold armed behind it would resurface later
-    // as a manual mode nobody remembers.
+  // Writing OFF back left only the Gladys widget able to start a heater stopped
+  // from its module, with nothing on the module to say why.
+  it('should start a stopped thermostat on the order pressed on the module', async () => {
     const mod = loadListener();
-    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF }), { carried: PILOT_WIRE_MODE.ECO });
+    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF }));
+
+    await press(mod, handler, PILOT_WIRE_MODE.ECO);
+
+    const writes = handler.setValue.getCalls().map((call) => [call.args[1].type, call.args[2]]);
+    // The preset first, so that the pass the start triggers finds it.
+    expect(writes).to.deep.equal([
+      [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET, THERMOSTAT_PRESET.ECO],
+      [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE, THERMOSTAT_MODE.HEATING],
+    ]);
+    // Nothing goes back to the module: it already carries the order.
+    assert.notCalled(handler.gladys.device.setValue);
+  });
+
+  it('should leave a stopped thermostat stopped when off is pressed again', async () => {
+    const mod = loadListener();
+    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF }));
+    handler.observedSetpoints.set('heater-pilot-wire', PILOT_WIRE_MODE.ECO);
+
+    await press(mod, handler, PILOT_WIRE_MODE.OFF);
+
+    assert.notCalled(handler.setValue);
+    assert.notCalled(handler.gladys.device.setValue);
+  });
+
+  it('should not start a stopped thermostat with no preset or mode feature to start it on', async () => {
+    const mod = loadListener();
+    const handler = buildHandler(thermostat({ features: [modeFeature(THERMOSTAT_MODE.OFF)] }));
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
     assert.notCalled(handler.setValue);
-    offWritten(handler);
   });
 
-  it('should take nothing while a window is open, and write off back at once', async () => {
+  it('should still write frost protection back over a press on a stopped thermostat while a window is open', async () => {
+    const mod = loadListener();
+    const handler = buildHandler(
+      thermostat({ mode: THERMOSTAT_MODE.OFF, params: { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' } }),
+      { window: 0, carried: PILOT_WIRE_MODE.ECO },
+    );
+
+    await press(mod, handler, PILOT_WIRE_MODE.ECO);
+
+    assert.notCalled(handler.setValue);
+    frostWritten(handler);
+  });
+
+  it('should take nothing while a window is open, and write frost protection back at once', async () => {
     const mod = loadListener();
     const handler = buildHandler(thermostat({ params: { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' } }), {
       window: 0,
@@ -200,7 +240,7 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
     assert.notCalled(handler.setValue);
-    offWritten(handler);
+    frostWritten(handler);
   });
 
   it('should take the order once the window is closed', async () => {
@@ -365,12 +405,22 @@ describe('thermostat pilot wire: holds and marks in the regulation loop', () => 
       '../../../utils/logger': logger(),
     });
 
-  const buildGladys = (order, { found = true } = {}) => ({
+  // `supported`: the orders the module's feature declares, none by default.
+  const buildGladys = (order, { found = true, supported = [] } = {}) => ({
     device: {
       get: fake((query) => {
         if (found && query && query.device_feature_selectors === 'heater-pilot-wire') {
           return Promise.resolve([
-            { selector: 'heater', features: [{ selector: 'heater-pilot-wire', last_value: order }] },
+            {
+              selector: 'heater',
+              features: [
+                {
+                  selector: 'heater-pilot-wire',
+                  last_value: order,
+                  supported_options: supported.map((value) => ({ value })),
+                },
+              ],
+            },
           ]);
         }
         return Promise.resolve([]);
@@ -383,7 +433,7 @@ describe('thermostat pilot wire: holds and marks in the regulation loop', () => 
     event: { emit: fake.returns(null) },
   });
 
-  const device = (preset, hold = null) => ({
+  const device = (preset, hold = null, extra = []) => ({
     id: 'device-id',
     selector: 'living-room',
     features: [
@@ -408,6 +458,7 @@ describe('thermostat pilot wire: holds and marks in the regulation loop', () => 
     params: [
       { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
       { name: 'THERMOSTAT_MODE', value: 'heating' },
+      ...extra,
       ...(hold === null
         ? []
         : [
@@ -442,6 +493,70 @@ describe('thermostat pilot wire: holds and marks in the regulation loop', () => 
         expect(savedOperatingStates(gladys), String(order)).to.deep.equal([]);
       }),
     );
+  });
+
+  // Comfort set to send comfort -1: a plain comfort pressed on the module is
+  // comfort too, and writing -1 over it undid the press within a minute.
+  it('should keep a plain comfort pressed on the module while comfort is held on another comfort', async () => {
+    const mod = load();
+    const gladys = buildGladys(PILOT_WIRE_MODE.COMFORT);
+    const comfortSendsMinusOne = [
+      { name: 'THERMOSTAT_TYPE', value: 'pilot-wire' },
+      { name: 'THERMOSTAT_PILOT_WIRE_ORDER_COMFORT', value: String(PILOT_WIRE_MODE.COMFORT_1) },
+    ];
+
+    await regulate(mod, gladys, device('comfort', 21, comfortSendsMinusOne), new Map());
+
+    assert.notCalled(gladys.device.setValue);
+  });
+
+  // A 4-order module rejects comfort -1 and -2: written anyway, the order was
+  // refused and written again on every pass.
+  describe('on a module that declares the orders it takes', () => {
+    const fourOrders = [
+      PILOT_WIRE_MODE.OFF,
+      PILOT_WIRE_MODE.FROST_PROTECTION,
+      PILOT_WIRE_MODE.ECO,
+      PILOT_WIRE_MODE.COMFORT,
+    ];
+    const pilotWireType = (orders) => [
+      { name: 'THERMOSTAT_TYPE', value: 'pilot-wire' },
+      ...Object.entries(orders).map(([preset, order]) => ({
+        name: `THERMOSTAT_PILOT_WIRE_ORDER_${preset.toUpperCase()}`,
+        value: String(order),
+      })),
+    ];
+
+    it('should send comfort for a comfort -1 the module does not take', async () => {
+      const mod = load();
+      const gladys = buildGladys(PILOT_WIRE_MODE.ECO, { supported: fourOrders });
+      const marks = new Map();
+
+      await regulate(mod, gladys, device('comfort', 21, pilotWireType({ comfort: PILOT_WIRE_MODE.COMFORT_1 })), marks);
+
+      expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.COMFORT);
+      expect(marks.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.COMFORT);
+    });
+
+    it('should send nothing for an order the module does not take at all', async () => {
+      const mod = load();
+      const gladys = buildGladys(PILOT_WIRE_MODE.COMFORT, {
+        supported: [PILOT_WIRE_MODE.OFF, PILOT_WIRE_MODE.FROST_PROTECTION, PILOT_WIRE_MODE.COMFORT],
+      });
+
+      await regulate(mod, gladys, device('eco', 17), new Map());
+
+      assert.notCalled(gladys.device.setValue);
+    });
+
+    it('should send an order the module takes as it is', async () => {
+      const mod = load();
+      const gladys = buildGladys(PILOT_WIRE_MODE.COMFORT, { supported: fourOrders });
+
+      await regulate(mod, gladys, device('eco', 17), new Map());
+
+      expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
+    });
   });
 
   it('should still write comfort while comfort is held over another order', async () => {

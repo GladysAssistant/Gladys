@@ -8,6 +8,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   PILOT_WIRE_MODE,
+  THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
 } = require('../../../../utils/constants');
@@ -193,11 +194,30 @@ describe('thermostat pilot wire', () => {
     assert.notCalled(gladys.device.setValue);
   });
 
-  it('should stop the heater when a window opens', async () => {
+  // Frost protection rather than off, as the external path writes the frost
+  // setpoint: off also turns the heater's own frost guard off.
+  it('should put the heater on frost protection when a window opens', async () => {
     const mod = load(null);
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, windowOpen: true });
 
     await regulate(mod, gladys, pilotWireDevice('comfort', { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
+  });
+
+  it('should still stop the heater with off when it is stopped', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+
+    const stopped = pilotWireDevice('comfort');
+    stopped.features.push({
+      selector: 'living-room-mode',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+      last_value: THERMOSTAT_MODE.OFF,
+    });
+
+    await regulate(mod, gladys, stopped);
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.OFF);
   });

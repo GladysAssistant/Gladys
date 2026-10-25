@@ -7,10 +7,10 @@ import { getPresetColor } from '../../../../../utils/thermostatPresetColors';
 import { DEVICE_FEATURE_UNITS, PILOT_WIRE_MODE } from '../../../../../../../server/utils/constants';
 import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
 
-// The six orders, warmest last, keyed as the device page already names them.
 // The help text of each thermostat type, keyed by its value.
 const TYPE_KEYS = { virtual: 'virtual', external: 'external', 'pilot-wire': 'pilotWire' };
 
+// The six orders, warmest last, keyed as the device page already names them.
 const PILOT_WIRE_ORDER_OPTIONS = [
   [PILOT_WIRE_MODE.OFF, 'off'],
   [PILOT_WIRE_MODE.FROST_PROTECTION, 'frost-protection'],
@@ -119,6 +119,20 @@ const EditForm = ({ ...props }) => {
   // sends an order instead.
   const presetsAreOrders = isPilotWireThermostat;
   const pilotWireOrders = props.thermostatEditPilotWireOrders || DEFAULT_PILOT_WIRE_ORDERS;
+  // A module that declares the orders it takes is only offered those: a
+  // 4-order one refuses comfort -1 and -2. The order a preset already sends
+  // stays listed, so the select never shows another one.
+  const pickedPilotWire = (props.pilotWireFeatures || []).find(
+    feature => feature.selector === props.thermostatEditPilotWireFeature
+  );
+  const supportedOrders =
+    pickedPilotWire && pickedPilotWire.supportedOrders && pickedPilotWire.supportedOrders.length > 0
+      ? pickedPilotWire.supportedOrders
+      : null;
+  const orderOptionsFor = key =>
+    PILOT_WIRE_ORDER_OPTIONS.filter(
+      ([value]) => !supportedOrders || supportedOrders.includes(value) || value === pilotWireOrders[key]
+    );
 
   // The pilot-wire picker: in the heating section of a virtual thermostat, next
   // to the switch, and first thing on a pilot-wire one.
@@ -308,35 +322,39 @@ const EditForm = ({ ...props }) => {
             {/* Usage: what this thermostat drives. Directly under the type,
                 and no longer called "Mode": it used to sit right after the
                 device's own "Operating mode (optional)", and two fields named
-                Mode in a row read as the same question asked twice. */}
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="integration.thermostat.edit.modeLabel" />
-              </label>
-              <select
-                class="form-control"
-                value={mode}
-                onChange={e => {
-                  props.updateThermostatField('thermostatEditMode', e.target.value);
-                  // TPI is heating-only: switching to cooling falls back to hysteresis
-                  if (e.target.value === 'cooling' && controlType === 'tpi') {
-                    props.updateThermostatField('thermostatEditControlType', 'hysteresis');
-                  }
-                }}
-              >
-                <option value="heating">
-                  <Text id="integration.thermostat.edit.mode.heating" />
-                </option>
-                {!hasPilotWire && (
-                  <option value="cooling">
-                    <Text id="integration.thermostat.edit.mode.cooling" />
+                Mode in a row read as the same question asked twice. A
+                pilot-wire heater regulating itself only heats: there is no
+                question to ask, and it is saved as heating. */}
+            {!isPilotWireThermostat && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.modeLabel" />
+                </label>
+                <select
+                  class="form-control"
+                  value={mode}
+                  onChange={e => {
+                    props.updateThermostatField('thermostatEditMode', e.target.value);
+                    // TPI is heating-only: switching to cooling falls back to hysteresis
+                    if (e.target.value === 'cooling' && controlType === 'tpi') {
+                      props.updateThermostatField('thermostatEditControlType', 'hysteresis');
+                    }
+                  }}
+                >
+                  <option value="heating">
+                    <Text id="integration.thermostat.edit.mode.heating" />
                   </option>
-                )}
-              </select>
-              <small class="form-text text-muted">
-                <Text id="integration.thermostat.edit.modeHelp" />
-              </small>
-            </div>
+                  {!hasPilotWire && (
+                    <option value="cooling">
+                      <Text id="integration.thermostat.edit.mode.cooling" />
+                    </option>
+                  )}
+                </select>
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.edit.modeHelp" />
+                </small>
+              </div>
+            )}
 
             {/* Radiateur à fil pilote qui régule seul : piloté par un ordre. */}
             {isPilotWireThermostat && pilotWirePicker}
@@ -698,78 +716,82 @@ const EditForm = ({ ...props }) => {
                 about three and a half screens before Save on a phone, and these are
                 the two fields least often touched. The unit stays out of the fold:
                 it decides how every other temperature on the page reads. */}
-            <details class={cx('mb-3', style.tuningDetails)}>
-              <summary class={cx('form-label', style.tuningSummary)}>
-                <i class={`fe fe-chevron-right ${style.tuningChevron}`} aria-hidden="true" />
-                <Text id="integration.thermostat.edit.rangeSection" />
-              </summary>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.thermostat.edit.minTempLabel" />
-                    </label>
-                    <div class="input-group">
-                      <Localizer>
-                        <input
-                          type="number"
-                          class="form-control"
-                          placeholder={<Text id="integration.thermostat.edit.minTempPlaceholder" />}
-                          value={props.thermostatEditMinTemp}
-                          onInput={e => props.updateThermostatField('thermostatEditMinTemp', e.target.value)}
-                        />
-                      </Localizer>
-                      <div class="input-group-append">
-                        <span class="input-group-text">
-                          {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                        </span>
+            {/* A heater regulating itself takes no setpoint: there is nothing
+                for the bounds to bound. */}
+            {!isPilotWireThermostat && (
+              <details class={cx('mb-3', style.tuningDetails)}>
+                <summary class={cx('form-label', style.tuningSummary)}>
+                  <i class={`fe fe-chevron-right ${style.tuningChevron}`} aria-hidden="true" />
+                  <Text id="integration.thermostat.edit.rangeSection" />
+                </summary>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="integration.thermostat.edit.minTempLabel" />
+                      </label>
+                      <div class="input-group">
+                        <Localizer>
+                          <input
+                            type="number"
+                            class="form-control"
+                            placeholder={<Text id="integration.thermostat.edit.minTempPlaceholder" />}
+                            value={props.thermostatEditMinTemp}
+                            onInput={e => props.updateThermostatField('thermostatEditMinTemp', e.target.value)}
+                          />
+                        </Localizer>
+                        <div class="input-group-append">
+                          <span class="input-group-text">
+                            {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="integration.thermostat.edit.maxTempLabel" />
+                      </label>
+                      <div class="input-group">
+                        <Localizer>
+                          <input
+                            type="number"
+                            class="form-control"
+                            placeholder={<Text id="integration.thermostat.edit.maxTempPlaceholder" />}
+                            value={props.thermostatEditMaxTemp}
+                            onInput={e => props.updateThermostatField('thermostatEditMaxTemp', e.target.value)}
+                          />
+                        </Localizer>
+                        <div class="input-group-append">
+                          <span class="input-group-text">
+                            {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.thermostat.edit.maxTempLabel" />
-                    </label>
-                    <div class="input-group">
-                      <Localizer>
-                        <input
-                          type="number"
-                          class="form-control"
-                          placeholder={<Text id="integration.thermostat.edit.maxTempPlaceholder" />}
-                          value={props.thermostatEditMaxTemp}
-                          onInput={e => props.updateThermostatField('thermostatEditMaxTemp', e.target.value)}
-                        />
-                      </Localizer>
-                      <div class="input-group-append">
-                        <span class="input-group-text">
-                          {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* What the appliance says it accepts, inside the fold with the two
+                {/* What the appliance says it accepts, inside the fold with the two
                   fields it is about. Adopting it on picking the setpoint feature
                   covers the usual path, but not a thermostat edited later or a
                   setpoint chosen before the unit was settled — and a Netatmo left
                   at 5-35 promises two degrees it will refuse or silently clamp. */}
-              {rangeDiffers && (
-                <div class="form-group">
-                  <small class="form-text text-muted">
-                    <Text
-                      id="integration.thermostat.edit.deviceRangeHint"
-                      fields={{ min: targetRange.min, max: targetRange.max, unit: formUnit }}
-                    />{' '}
-                    <button type="button" class="btn btn-link btn-sm p-0 align-baseline" onClick={applyDeviceRange}>
-                      <Text id="integration.thermostat.edit.deviceRangeApply" />
-                    </button>
-                  </small>
-                </div>
-              )}
-            </details>
+                {rangeDiffers && (
+                  <div class="form-group">
+                    <small class="form-text text-muted">
+                      <Text
+                        id="integration.thermostat.edit.deviceRangeHint"
+                        fields={{ min: targetRange.min, max: targetRange.max, unit: formUnit }}
+                      />{' '}
+                      <button type="button" class="btn btn-link btn-sm p-0 align-baseline" onClick={applyDeviceRange}>
+                        <Text id="integration.thermostat.edit.deviceRangeApply" />
+                      </button>
+                    </small>
+                  </div>
+                )}
+              </details>
+            )}
 
             {/* Folded like the range above: six rows of temperatures with working
                 defaults, and the longest block on a form that already runs about
@@ -815,7 +837,7 @@ const EditForm = ({ ...props }) => {
                             value={pilotWireOrders[key]}
                             onChange={e => props.updateThermostatPilotWireOrder(key, Number(e.target.value))}
                           >
-                            {PILOT_WIRE_ORDER_OPTIONS.map(([value, orderKey]) => (
+                            {orderOptionsFor(key).map(([value, orderKey]) => (
                               <option value={value} selected={value === pilotWireOrders[key]}>
                                 <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
                               </option>

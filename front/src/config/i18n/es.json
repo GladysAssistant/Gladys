@@ -3616,6 +3616,8 @@
         "activeScheduleLabel": "Programación activa",
         "noSchedule": "Sin programación",
         "setpointLabel": "Consigna",
+        "regulationLabel": "Regulación",
+        "heaterRegulates": "Por el radiador",
         "noSetpoint": "—",
         "saveButton": "Guardar",
         "editButton": "Editar",

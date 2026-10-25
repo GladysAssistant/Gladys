@@ -15,7 +15,8 @@ import {
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
   DEFAULT_HYSTERESIS_START,
-  DEFAULT_PILOT_WIRE_ORDERS
+  DEFAULT_PILOT_WIRE_ORDERS,
+  supportedPilotWireOrder
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -108,6 +109,8 @@ class ThermostatBox extends Component {
     // The order a pilot-wire heater carries, shown when it regulates alone: it is
     // all the card knows of what the heater does.
     pilotWireOrder: null,
+    // The orders its module declares, when it does (supportedPilotWireOrder).
+    pilotWireSupportedOptions: null,
     // A mode this card has written and no reload of the device has carried yet
     // (see writeMode). Read before the device's own mode, so a tap on Off or on
     // a way out of it shows at once, and a reload already in flight when the
@@ -568,7 +571,10 @@ class ThermostatBox extends Component {
               this.setState({ isSwitchOn: isRunningFromStateFeature(feat, feat.last_value) });
             }
             if (pilotWireFeature && feat.selector === pilotWireFeature) {
-              this.setState({ pilotWireOrder: feat.last_value });
+              this.setState({
+                pilotWireOrder: feat.last_value,
+                pilotWireSupportedOptions: feat.supported_options || null
+              });
             }
           });
         });
@@ -1359,6 +1365,7 @@ class ThermostatBox extends Component {
       isWindowOpen,
       isSwitchOn,
       pilotWireOrder,
+      pilotWireSupportedOptions,
       activeSchedule
     }
   ) {
@@ -1443,25 +1450,41 @@ class ThermostatBox extends Component {
     // too, as the preset buttons' pills do.
     const confirmedColor = confirmedPreset ? this.getPresetColor(confirmedPreset) : null;
     const ringColor = confirmedColor && this.isDarkTheme() ? counterDarkModeInvert(confirmedColor) : confirmedColor;
-    // The order the module should carry, from what the card shows: off when
-    // stopped or with the window open, otherwise the order the lit preset is set
-    // to. A setpoint turned by a scene names no preset, and is not second-guessed.
-    let expectedOrder = null;
-    if (heaterRegulated && (isWindowOpen || mode === 'off')) {
-      expectedOrder = PILOT_WIRE_MODE.OFF;
+    // The order the module should carry, from what the card shows: frost
+    // protection with the window open, off when stopped, otherwise the order the
+    // lit preset is set to. A setpoint turned by a scene names no preset, and is
+    // not second-guessed.
+    let wantedOrder = null;
+    if (heaterRegulated && isWindowOpen) {
+      wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
+    } else if (heaterRegulated && mode === 'off') {
+      wantedOrder = PILOT_WIRE_MODE.OFF;
     } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
       const configured = cfg[`pilot_wire_order_${activePreset}`];
-      expectedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
+      wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
     }
+    // The order actually sent, as the server picks it: one the module does not
+    // take is sent as comfort, or not at all — and is then on its way for ever.
+    const expectedOrder = wantedOrder === null ? null : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
     // Until the module confirms it — a few seconds on Z-Wave — the banner says
     // the order is on its way rather than showing a ring and a preset that
-    // disagree. A derived comfort the heater keeps is comfort, as the server
-    // holds it.
-    const derivedComfort =
-      expectedOrder === PILOT_WIRE_MODE.COMFORT &&
-      (pilotWireOrder === PILOT_WIRE_MODE.COMFORT_1 || pilotWireOrder === PILOT_WIRE_MODE.COMFORT_2);
+    // disagree. Any comfort the heater keeps is comfort, as the server holds it.
+    const comfortOrders = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
+    const keptComfort = comfortOrders.includes(expectedOrder) && comfortOrders.includes(pilotWireOrder);
     const orderPending =
-      expectedOrder !== null && pilotWireOrder !== null && pilotWireOrder !== expectedOrder && !derivedComfort;
+      expectedOrder !== null && pilotWireOrder !== null && pilotWireOrder !== expectedOrder && !keptComfort;
+    // A preset held on the card has its own banner, "Comfort until 06:30", and
+    // "Order: Comfort" above it said the same thing twice. The order banner
+    // only stays when it tells more: an order on its way, or one other than the
+    // preset's own (a comfort -1 pressed on the module).
+    const holdNamesOrder =
+      isManualMode &&
+      !!manualUntil &&
+      !manualSetpointOverride &&
+      !!activeSchedule &&
+      !orderPending &&
+      pilotWireOrder === expectedOrder &&
+      confirmedPreset === activePreset;
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
     // When Gladys regulates a pilot-wire heater, the module only ever carries
@@ -1533,7 +1556,7 @@ class ThermostatBox extends Component {
               {/* The order a pilot-wire heater regulating itself carries, drawn
                   like the card's other banners in that order's colour and icon;
                   greyed while one is on its way. */}
-              {confirmedPreset && (
+              {confirmedPreset && !holdNamesOrder && (
                 <div
                   class={style.scheduleBanner}
                   style={`--banner-color:${orderPending ? this.getPresetColor('off') : confirmedColor}`}

@@ -3616,6 +3616,8 @@
         "activeScheduleLabel": "Aktiver Zeitplan",
         "noSchedule": "Kein Zeitplan",
         "setpointLabel": "Sollwert",
+        "regulationLabel": "Regelung",
+        "heaterRegulates": "Durch den Heizkörper",
         "noSetpoint": "—",
         "saveButton": "Speichern",
         "editButton": "Bearbeiten",

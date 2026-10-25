@@ -74,12 +74,17 @@ function createActions(store) {
             // rather than a contact: the same actuator slot, a different way of
             // driving it. Like the switch, it has to be writable — a module
             // that only publishes its status would refuse every order.
+            // The orders it declares, when it does: a 4-order module refuses
+            // comfort -1 and -2, which the presets table then does not offer.
             if (
               feature.category === DEVICE_FEATURE_CATEGORIES.HEATER &&
               feature.type === DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE &&
               !feature.read_only
             ) {
-              pilotWireFeatures.push(entry);
+              pilotWireFeatures.push({
+                ...entry,
+                supportedOrders: (feature.supported_options || []).map(option => option.value)
+              });
             }
             if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === 'binary') {
               // The actuator has to be writable: a read-only switch — Netatmo's
@@ -402,9 +407,12 @@ function createActions(store) {
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
             { name: 'THERMOSTAT_SWITCH_FEATURE', value: switchFeature },
             { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: pilotWireFeature },
+            // The order each preset sends, on a heater regulating itself only:
+            // the other types send none, and cleared there like the real
+            // thermostat's params below (spec A.1).
             ...Object.keys(DEFAULT_PILOT_WIRE_ORDERS).map(preset => ({
               name: PILOT_WIRE_ORDER_PARAM(preset),
-              value: String(pilotWireOrders[preset])
+              value: isPilotWireThermostat ? String(pilotWireOrders[preset]) : ''
             })),
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on a real thermostat, and cleared otherwise so
