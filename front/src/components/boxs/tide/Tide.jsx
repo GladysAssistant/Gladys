@@ -1,14 +1,8 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezonePlugin from 'dayjs/plugin/timezone';
 
 import style from './style.css';
-
-dayjs.extend(utc);
-dayjs.extend(timezonePlugin);
 
 const REFRESH_INTERVAL_MS = 60 * 1000;
 
@@ -23,9 +17,52 @@ const FORECAST_DAYS = 7;
 /**
  * Read a date in the timezone the values were computed in. The browser may sit
  * in another one: without this, a dashboard opened from abroad would shift the
- * tide times by the difference.
+ * tide times by the difference. Read with Intl rather than dayjs's timezone
+ * plugin, which would switch the shared dayjs over to `dayjs.tz` for every
+ * other user of it (react-big-calendar among them).
  */
-const inHouseTimezone = (date, timezone) => (timezone ? dayjs(date).tz(timezone) : dayjs(date));
+const inHouseTimezone = (date, timezone) => {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+    ...(timezone ? { timeZone: timezone } : {})
+  }).formatToParts(new Date(date));
+  const read = type => Number(parts.find(part => part.type === type).value);
+  return {
+    year: read('year'),
+    month: read('month'),
+    day: read('day'),
+    hour: read('hour'),
+    minute: read('minute'),
+    second: read('second')
+  };
+};
+
+/** How far the house's clock is ahead of UTC at an instant, in milliseconds. */
+const timezoneOffset = (instant, timezone) => {
+  const local = inHouseTimezone(instant, timezone);
+  const wholeSecond = Math.floor(instant / 1000) * 1000;
+  return Date.UTC(local.year, local.month - 1, local.day, local.hour, local.minute, local.second) - wholeSecond;
+};
+
+/**
+ * The instant a wall clock hour of a local day falls on in the house. The
+ * offset is read twice, the second time at the first guess, so an hour on the
+ * day the clocks change lands on the offset in force at that hour.
+ */
+const houseWallClock = ({ year, month, day }, hour, timezone) => {
+  if (!timezone) {
+    return new Date(year, month - 1, day, hour).getTime();
+  }
+  const asUtc = Date.UTC(year, month - 1, day, hour);
+  const firstGuess = asUtc - timezoneOffset(asUtc, timezone);
+  return asUtc - timezoneOffset(firstGuess, timezone);
+};
 
 /**
  * Tide times in the reader's own convention: "22:22" in France and Germany,
@@ -181,22 +218,20 @@ const TideClock = ({ tideState, gradientId }) => {
  * tides into a few hundred pixels, where nothing can be read any more.
  */
 const TideDayTabs = ({ dayOffset, onSelectDay, timezone, language }) => {
+  // The house's today, otherwise a dashboard opened from another timezone
+  // would label the tabs with the previous or the next day. Each tab is then a
+  // calendar day, written from noon UTC of that date so no clock change can
+  // move it onto its neighbour.
   const today = inHouseTimezone(new Date(), timezone);
   const days = [];
   for (let offset = 0; offset < FORECAST_DAYS; offset += 1) {
-    const day = today.add(offset, 'day').locale(language || 'en');
+    const day = new Date(Date.UTC(today.year, today.month - 1, today.day + offset, 12));
     days.push({
       offset,
-      weekday: offset === 0 ? null : day.format('ddd'),
+      weekday: offset === 0 ? null : day.toLocaleDateString(language || 'en', { weekday: 'short', timeZone: 'UTC' }),
       // Day and month in the reader's own order: "09/12" is the 9th of
       // December in France and the 12th of September in the United States.
-      // The house timezone is passed on, otherwise a dashboard opened from
-      // another one would label the tab with the previous or the next day.
-      date: day.toDate().toLocaleDateString(language || 'en', {
-        day: '2-digit',
-        month: '2-digit',
-        ...(timezone ? { timeZone: timezone } : {})
-      })
+      date: day.toLocaleDateString(language || 'en', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })
     });
   }
   return (
@@ -265,14 +300,13 @@ const TideCurve = ({ tideState, timezone, language }) => {
   // on round hours across a daylight saving change, and are written in the
   // reader's own convention.
   const hourMarks = [];
-  const markDay = inHouseTimezone(firstTime, timezone).format('YYYY-MM-DD');
+  const markDay = inHouseTimezone(firstTime, timezone);
   for (let hour = 0; hour <= 24; hour += 6) {
-    // Each mark is re-parsed as a wall clock time on the local day, the way the
+    // Each mark is re-read as a wall clock time on the local day, the way the
     // server builds both midnights: adding six hours four times would drift by
     // an hour when the clocks change, putting the "18:00" label at 17:00.
-    const label = `${String(hour % 24).padStart(2, '0')}:00:00`;
-    const day = hour === 24 ? inHouseTimezone(lastTime, timezone).format('YYYY-MM-DD') : markDay;
-    const markTime = (timezone ? dayjs.tz(`${day} ${label}`, timezone) : dayjs(`${day} ${label}`)).valueOf();
+    const day = hour === 24 ? inHouseTimezone(lastTime, timezone) : markDay;
+    const markTime = houseWallClock(day, hour % 24, timezone);
     if (markTime >= firstTime && markTime <= lastTime) {
       hourMarks.push({
         x: toX(markTime),
