@@ -131,6 +131,13 @@ describe('energyContract: contracts CRUD', () => {
     ).to.be.rejectedWith(/already covers this meter from 2025-01-01 to 2025-06-30/);
   });
 
+  it('should give a unique selector to a successive contract carrying the same name', async () => {
+    const first = await energyContract.create(contractPayload({ valid_from: '2025-01-01', valid_to: '2025-12-31' }));
+    const second = await energyContract.create(contractPayload({ valid_from: '2026-01-01' }));
+    expect(first.selector).to.equal('edf-base');
+    expect(second).to.include({ name: 'EDF Base', selector: 'edf-base-2' });
+  });
+
   it('should list, filter and read contracts with their status and provider', async () => {
     await energyContract.create(contractPayload({ valid_from: '2020-01-01', valid_to: '2020-12-31' }));
     await energyContract.create(contractPayload({ name: 'Current', valid_from: '2021-01-01', valid_to: '2098-12-31' }));

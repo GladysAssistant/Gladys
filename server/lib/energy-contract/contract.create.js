@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
 const { ConflictError, NotFoundError } = require('../../utils/coreErrors');
+const { buildUniqueSelector } = require('../../utils/addSelector');
 const { EVENTS, SYSTEM_VARIABLE_NAMES, ENERGY_CONTRACT_DIRECTIONS } = require('../../utils/constants');
 const { validateContract, validateContractTariff } = require('./contract.validate');
 const { localToUtcMs } = require('./tariff.time');
@@ -83,6 +84,8 @@ async function create(data) {
   // the meter of a consumption contract is a root, priced by it (energy-hierarchy.md, section C.2):
   // detached before the row is written, so a failure leaves no contract a retry would conflict with
   await this.detachElectricMeter(contract);
+  // successive contracts of a meter often share their name (a renewed Tempo contract)
+  contract.selector = await buildUniqueSelector(db.EnergyContract, contract.name);
   const row = await db.EnergyContract.create(contract);
   const created = await this.getBySelector(row.selector);
   this.requestRecalculation(created, created.valid_from);

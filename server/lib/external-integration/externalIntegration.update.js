@@ -135,7 +135,7 @@ async function update(selector) {
     // the in-memory index would resolve a release published minutes ago to
     // the *previous* manifest — the same image tag re-pulled, nothing
     // updated, a "Force update" button that looks broken. Both sources are
-    // read (full index entry downloaded on the spot + repo manifest, the
+    // read (store entry downloaded on the spot + repo manifest, the
     // source of truth the indexer itself mirrors) and the most recent
     // pullable one wins.
     try {
