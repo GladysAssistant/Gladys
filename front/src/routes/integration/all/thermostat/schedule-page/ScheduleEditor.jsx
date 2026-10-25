@@ -21,6 +21,7 @@ import {
   isAllDayRange,
   mergeTouchingRanges,
   trimRangesAround,
+  copyDayRanges,
   removeRangeAndFill
 } from '../../../../../../../server/utils/thermostatRanges';
 
@@ -337,23 +338,13 @@ class ScheduleEditor extends Component {
     }));
   };
 
-  // Copying a day is copying its ranges — no algebra, no overflow to propagate.
+  // Copying a day is copying its ranges, and what they cover gives way — the
+  // night before a target included (`copyDayRanges`).
   applyCopy = () => {
     const { copySourceDay, copyTargetDays, ranges } = this.state;
     if (copySourceDay === null || copyTargetDays.length === 0) return;
-    const source = this.dayRanges(ranges, copySourceDay);
-    const kept = ranges.filter(r => !copyTargetDays.includes(r.day_of_week));
-    const copies = copyTargetDays.flatMap(day =>
-      source.map(r => ({
-        key: Date.now() + Math.random(),
-        day_of_week: day,
-        start_time: r.start_time,
-        end_time: r.end_time,
-        preset: r.preset
-      }))
-    );
     this.setState({
-      ranges: mergeTouchingRanges([...kept, ...copies]),
+      ranges: copyDayRanges(ranges, copySourceDay, copyTargetDays, () => Date.now() + Math.random()),
       copySourceDay: null,
       copyTargetDays: []
     });

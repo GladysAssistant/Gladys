@@ -231,26 +231,22 @@ function mergeTouchingRanges(ranges) {
   return merged;
 }
 
+const WEEK_MINUTES = 7 * DAY_MINUTES;
+
 /**
- * @description The day/minute stretches a range occupies. One for a range inside
- * its day, two for one crossing midnight: the tail of its own day, then the head
- * of the next.
+ * @description The stretch of the week a range covers, as minutes from Monday
+ * 00:00: one interval whatever midnight it crosses. Its end may pass the end of
+ * the week, for a Sunday night.
  * @param {object} range - A range: { day_of_week, start_time, end_time }.
- * @returns {Array} Spans: { day, start, end }, in minutes of that day.
+ * @returns {Array<number>} [start, end), in minutes of the week.
  * @example
- * rangeSpans({ day_of_week: 0, start_time: '22:30', end_time: '06:30' });
+ * weekInterval({ day_of_week: 0, start_time: '22:30', end_time: '06:30' }); // [1350, 1830]
  */
-function rangeSpans(range) {
-  const start = timeToMinutes(range.start_time);
-  const end = timeToMinutes(range.end_time);
-  if (end > start) {
-    return [{ day: range.day_of_week, start, end }];
-  }
-  const spans = [{ day: range.day_of_week, start, end: DAY_MINUTES }];
-  if (end > 0) {
-    spans.push({ day: (range.day_of_week + 1) % 7, start: 0, end });
-  }
-  return spans;
+function weekInterval(range) {
+  const start = range.day_of_week * DAY_MINUTES + timeToMinutes(range.start_time);
+  const length = (timeToMinutes(range.end_time) - timeToMinutes(range.start_time) + DAY_MINUTES) % DAY_MINUTES;
+  // An end equal to the start is a whole day (isAllDayRange), never nothing.
+  return [start, start + (length === 0 ? DAY_MINUTES : length)];
 }
 
 /**
@@ -263,13 +259,14 @@ function rangeSpans(range) {
  * range covers gives way.
  *
  * A range the new one sits inside is split in two; one it merely clips is
- * shortened on that side; one it swallows entirely disappears. A range crossing
- * midnight is handled through its day/minute spans, so a night is trimmed on the
- * day it is stored on — and what is left of it past midnight is put back on the
- * day it falls on. Kept on the night's own day, a Tuesday 04:00 → 06:30 tail was
- * written as Monday 04:00 → 06:30, and an all-day Monday turned the Tuesday
- * morning into a Monday 00:00 range that the editor then dropped as a duplicate
- * start.
+ * shortened on that side; one it swallows entirely disappears. Both are taken
+ * as one interval of the week each, the new one tried a week earlier and later
+ * too, so a night crosses midnight as one stretch. Cut through their day/minute
+ * pieces, the new range's own midnight read as an edge: a Tuesday 22:30 → 06:30
+ * frost left Wednesday's 00:00 → 06:30 night in place, so frost lasted until
+ * midnight. What is left of a range past midnight is put back on the day it falls
+ * on: kept on the night's own day, a Tuesday 04:00 → 06:30 tail was written as
+ * Monday 04:00 → 06:30.
  * @param {Array} ranges - The ranges in place: { key, day_of_week, start_time, end_time, preset }.
  * @param {object} candidate - The range being added: { day_of_week, start_time, end_time }.
  * @param {string|number|null} [ignoredKey] - The range being edited, which never trims itself.
@@ -278,9 +275,8 @@ function rangeSpans(range) {
  * trimRangesAround(ranges, { day_of_week: 0, start_time: '12:00', end_time: '14:00' });
  */
 function trimRangesAround(ranges, candidate, ignoredKey = null) {
-  const candidateSpans = rangeSpans(candidate);
-  const covers = (day, start, end) =>
-    candidateSpans.some((span) => span.day === day && span.start < end && start < span.end);
+  const [candidateStart, candidateEnd] = weekInterval(candidate);
+  const cuts = [-WEEK_MINUTES, 0, WEEK_MINUTES].map((shift) => [candidateStart + shift, candidateEnd + shift]);
 
   const result = [];
   ranges.forEach((range) => {
@@ -288,48 +284,80 @@ function trimRangesAround(ranges, candidate, ignoredKey = null) {
       result.push(range);
       return;
     }
-    const start = timeToMinutes(range.start_time);
-    const rawEnd = timeToMinutes(range.end_time);
-    // An overnight range is measured past midnight, so a single interval
-    // describes it; the covering test below maps it back onto its days.
-    const end = rawEnd <= start ? rawEnd + DAY_MINUTES : rawEnd;
-    if (!rangeSpans(range).some((span) => covers(span.day, span.start, span.end))) {
+    const [start, end] = weekInterval(range);
+    let pieces = [[start, end]];
+    cuts.forEach(([cutStart, cutEnd]) => {
+      pieces = pieces.flatMap(([from, to]) => {
+        if (cutEnd <= from || to <= cutStart) {
+          return [[from, to]];
+        }
+        return [
+          [from, Math.min(to, cutStart)],
+          [Math.max(from, cutEnd), to],
+        ].filter(([a, b]) => a < b);
+      });
+    });
+    if (pieces.length === 1 && pieces[0][0] === start && pieces[0][1] === end) {
       result.push(range);
       return;
     }
-    // Where the new range falls inside this one's own timeline, which spans its
-    // own day and the next. A span on any other day is outside it: offset by one
-    // day regardless, the Wednesday end of a Tuesday 05:00 → 03:00 range cut
-    // Monday's night at midnight instead of Tuesday 05:00.
-    const onTimeline = candidateSpans
-      .map((span) => ({ span, offset: (span.day - range.day_of_week + 7) % 7 }))
-      .filter(({ offset }) => offset <= 1);
-    const cutStart = onTimeline.reduce((acc, { span, offset }) => {
-      const absolute = span.start + offset * DAY_MINUTES;
-      return absolute > start && absolute < end ? Math.min(acc, absolute) : acc;
-    }, Infinity);
-    const cutEnd = onTimeline.reduce((acc, { span, offset }) => {
-      const absolute = span.end + offset * DAY_MINUTES;
-      return absolute > start && absolute < end ? Math.max(acc, absolute) : acc;
-    }, -Infinity);
-
-    if (cutStart !== Infinity && cutStart > start) {
-      // An end at or before the start reads as the next day, so the head of a
-      // night cut after midnight is written as typed.
-      result.push({ ...range, end_time: minutesToTime(cutStart) });
-    }
-    if (cutEnd !== -Infinity && cutEnd < end) {
-      result.push({
+    // Neither head nor tail survives when the new range swallows this one whole.
+    const dayStart = range.day_of_week * DAY_MINUTES;
+    pieces.forEach(([from, to]) => {
+      // An end at or before the start reads as the next day, so a piece ending
+      // past midnight is written as typed.
+      const piece = {
         ...range,
-        key: `${range.key}-tail-${cutEnd}`,
-        day_of_week: cutEnd >= DAY_MINUTES ? (range.day_of_week + 1) % 7 : range.day_of_week,
-        start_time: minutesToTime(cutEnd),
-        end_time: range.end_time,
+        start_time: minutesToTime(from % DAY_MINUTES),
+        end_time: minutesToTime(to % DAY_MINUTES),
+      };
+      if (from === start) {
+        result.push(piece);
+        return;
+      }
+      result.push({
+        ...piece,
+        key: `${range.key}-tail-${from - dayStart}`,
+        day_of_week: Math.floor((from % WEEK_MINUTES) / DAY_MINUTES),
       });
-    }
-    // Neither head nor tail survives: the new range swallows this one whole.
+    });
   });
   return result;
+}
+
+/**
+ * @description Copy the ranges of a day onto other days, in place of theirs.
+ *
+ * What the copies cover gives way, as for a range added by hand: the night of
+ * the day before a target ran into it, and was left there. Copying an all-day
+ * frost Saturday onto Wednesday kept Tuesday's 22:30 → 06:30 night, which
+ * rangesToTransitions closed at 06:30 with a stop — the heating was off from
+ * Wednesday 06:30 to Thursday 06:30. A copied night likewise takes the next
+ * morning it runs into.
+ * @param {Array} ranges - The ranges in place: { key, day_of_week, start_time, end_time, preset }.
+ * @param {number} sourceDay - The day copied, 0 = Monday.
+ * @param {Array<number>} targetDays - The days it is copied onto.
+ * @param {Function} [makeKey] - The key of a copy, from its day and its index in the source.
+ * @returns {Array} The ranges, merged.
+ * @example
+ * copyDayRanges(ranges, 5, [2]);
+ */
+function copyDayRanges(ranges, sourceDay, targetDays, makeKey = (day, index) => `copy-${day}-${index}`) {
+  const source = ranges.filter((range) => range.day_of_week === sourceDay);
+  let result = ranges.filter((range) => !targetDays.includes(range.day_of_week));
+  targetDays.forEach((day) => {
+    source.forEach((range, index) => {
+      const copy = {
+        key: makeKey(day, index),
+        day_of_week: day,
+        start_time: range.start_time,
+        end_time: range.end_time,
+        preset: range.preset,
+      };
+      result = [...trimRangesAround(result, copy), copy];
+    });
+  });
+  return mergeTouchingRanges(result);
 }
 
 /**
@@ -349,6 +377,11 @@ function trimRangesAround(ranges, candidate, ignoredKey = null) {
  * the merge then joins to it. Stretching the predecessor itself could take it past
  * 24 hours — deleting Tuesday after an all-day Monday wrote Monday `00:00 →
  * 00:00`, and Tuesday came out stopped.
+ *
+ * A gap right before the removed range is that predecessor: what is not covered
+ * is a stop, and the stop is what extends. Filling with the range before the gap
+ * turned Tuesday 10:00 → 12:00 eco into comfort after a Monday 06:00 → 22:00
+ * comfort, while 22:00 → 10:00 stayed off.
  * @param {Array} ranges - The ranges in place: { key, day_of_week, start_time, end_time, preset }.
  * @param {string|number} key - The key of the range to delete.
  * @returns {Array} The remaining ranges, merged.
@@ -383,15 +416,12 @@ function removeRangeAndFill(ranges, key) {
       predecessor = range;
     }
   });
-  // A gap before the removed range, if there was one, is closed by the
-  // predecessor — as long as that keeps it within a day.
-  const closesGap =
-    smallestDistance > 0 && smallestDistance + closeAt(predecessor) - openAt(predecessor) <= DAY_MINUTES;
-  const kept = remaining.map((range) =>
-    closesGap && range.key === predecessor.key ? { ...range, end_time: removed.start_time } : range,
-  );
+  // A gap before it: the stop extends, and the removed stretch is left uncovered.
+  if (smallestDistance > 0) {
+    return mergeTouchingRanges(remaining);
+  }
   const filler = { ...removed, key: `${predecessor.key}-fill-${removed.key}`, preset: predecessor.preset };
-  return mergeTouchingRanges([...kept, filler]);
+  return mergeTouchingRanges([...remaining, filler]);
 }
 
 module.exports = {
@@ -399,8 +429,8 @@ module.exports = {
   rangesToTransitions,
   isAllDayRange,
   mergeTouchingRanges,
-  rangeSpans,
   trimRangesAround,
+  copyDayRanges,
   removeRangeAndFill,
   STOP_PRESET,
 };

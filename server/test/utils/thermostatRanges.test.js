@@ -5,8 +5,8 @@ const {
   rangesToTransitions,
   isAllDayRange,
   mergeTouchingRanges,
-  rangeSpans,
   trimRangesAround,
+  copyDayRanges,
   removeRangeAndFill,
 } = require('../../utils/thermostatRanges');
 
@@ -402,30 +402,6 @@ describe('thermostatRanges: merging touching ranges', () => {
   });
 });
 
-describe('thermostatRanges: spans of a range', () => {
-  it('should give one span for a range inside its day', () => {
-    expect(rangeSpans({ day_of_week: 2, start_time: '06:00', end_time: '09:00' })).to.deep.equal([
-      { day: 2, start: 360, end: 540 },
-    ]);
-  });
-
-  it('should give two spans for a night, Sunday onto Monday', () => {
-    expect(rangeSpans({ day_of_week: 6, start_time: '22:30', end_time: '06:30' })).to.deep.equal([
-      { day: 6, start: 1350, end: 1440 },
-      { day: 0, start: 0, end: 390 },
-    ]);
-  });
-
-  it('should give one span for a range ending at midnight, and for a whole day', () => {
-    expect(rangeSpans({ day_of_week: 0, start_time: '20:00', end_time: '00:00' })).to.deep.equal([
-      { day: 0, start: 1200, end: 1440 },
-    ]);
-    expect(rangeSpans({ day_of_week: 0, start_time: '00:00', end_time: '00:00' })).to.deep.equal([
-      { day: 0, start: 0, end: 1440 },
-    ]);
-  });
-});
-
 describe('thermostatRanges: trimming around a new range', () => {
   const night = { key: 'n', day_of_week: 0, start_time: '22:30', end_time: '06:30', preset: 'night' };
   const day = { key: 'd', day_of_week: 0, start_time: '06:30', end_time: '22:30', preset: 'eco' };
@@ -492,6 +468,113 @@ describe('thermostatRanges: trimming around a new range', () => {
   });
 });
 
+describe('thermostatRanges: a new range crossing midnight', () => {
+  // Monday to Sunday: 06:30 comfort, 08:30 eco, 17:00 comfort, 22:30 night.
+  const week = [0, 1, 2, 3, 4, 5, 6].flatMap((day) => [
+    { key: `c1-${day}`, day_of_week: day, start_time: '06:30', end_time: '08:30', preset: 'comfort' },
+    { key: `e-${day}`, day_of_week: day, start_time: '08:30', end_time: '17:00', preset: 'eco' },
+    { key: `c2-${day}`, day_of_week: day, start_time: '17:00', end_time: '22:30', preset: 'comfort' },
+    { key: `n-${day}`, day_of_week: day, start_time: '22:30', end_time: '06:30', preset: 'night' },
+  ]);
+  const onDays = (ranges, days) =>
+    ranges.filter((range) => days.includes(range.day_of_week)).map(({ key, ...range }) => range);
+
+  // Its own midnight was taken for an edge: Wednesday still opened on night, and
+  // the frost only lasted until midnight.
+  it('should take the whole of a night it covers, past its own midnight', () => {
+    const trimmed = trimRangesAround(week, { day_of_week: 1, start_time: '22:30', end_time: '06:30' });
+
+    expect(trimmed.find((range) => range.key === 'n-1')).to.equal(undefined);
+    expect(onDays(trimmed, [2]).map((range) => range.start_time)).to.deep.equal(['06:30', '08:30', '17:00', '22:30']);
+  });
+
+  it('should cut the range before and after a night that runs past both', () => {
+    const trimmed = trimRangesAround(week, { day_of_week: 1, start_time: '20:00', end_time: '07:00' });
+
+    expect(onDays(trimmed, [1, 2])).to.deep.include.members([
+      { day_of_week: 1, start_time: '17:00', end_time: '20:00', preset: 'comfort' },
+      { day_of_week: 2, start_time: '07:00', end_time: '08:30', preset: 'comfort' },
+    ]);
+    // Neither the night nor the next morning's comfort runs under it any more.
+    expect(trimmed.find((range) => range.key === 'n-1')).to.equal(undefined);
+    expect(onDays(trimmed, [2]).some((range) => range.start_time === '06:30')).to.equal(false);
+  });
+
+  it('should take a Sunday night onto the Monday morning', () => {
+    const trimmed = trimRangesAround(week, { day_of_week: 6, start_time: '22:00', end_time: '07:00' });
+
+    expect(onDays(trimmed, [6]).find((range) => range.start_time === '17:00').end_time).to.equal('22:00');
+    expect(
+      onDays(trimmed, [0]).find((range) => range.preset === 'comfort' && range.end_time === '08:30'),
+    ).to.deep.equal({
+      day_of_week: 0,
+      start_time: '07:00',
+      end_time: '08:30',
+      preset: 'comfort',
+    });
+  });
+});
+
+describe('thermostatRanges: copying a day', () => {
+  const night = (day) => ({
+    key: `n-${day}`,
+    day_of_week: day,
+    start_time: '22:30',
+    end_time: '06:30',
+    preset: 'night',
+  });
+  const comfort = (day) => ({
+    key: `c-${day}`,
+    day_of_week: day,
+    start_time: '06:30',
+    end_time: '22:30',
+    preset: 'comfort',
+  });
+  const weekdays = [0, 1, 2, 3, 4].flatMap((day) => [comfort(day), night(day)]);
+  const frostSaturday = { key: 'sat', day_of_week: 5, start_time: '00:00', end_time: '00:00', preset: 'frost' };
+
+  // The night before was left running into the copied day: rangesToTransitions
+  // closed it at 06:30 with a stop, and the heating was off for a whole day.
+  it('should cut the night before a day copied whole', () => {
+    const copied = copyDayRanges([...weekdays, frostSaturday], 5, [2]);
+    const points = rangesToTransitions(copied);
+
+    expect(copied.find((range) => range.key === 'n-1')).to.deep.include({ start_time: '22:30', end_time: '00:00' });
+    expect(points.filter((point) => point.day_of_week === 2)).to.deep.equal([
+      { day_of_week: 2, time: '00:00', preset: 'frost' },
+    ]);
+    expect(points.filter((point) => point.day_of_week === 3)[0]).to.deep.equal({
+      day_of_week: 3,
+      time: '00:00',
+      preset: 'off',
+    });
+  });
+
+  it('should replace the ranges of every target day', () => {
+    const copied = copyDayRanges([...weekdays, frostSaturday], 5, [0, 1], (day, index) => `x-${day}-${index}`);
+
+    expect(copied.filter((range) => range.day_of_week === 0)).to.deep.equal([
+      { key: 'x-0-0', day_of_week: 0, start_time: '00:00', end_time: '00:00', preset: 'frost' },
+    ]);
+    expect(copied.filter((range) => range.day_of_week === 1)).to.deep.equal([
+      { key: 'x-1-0', day_of_week: 1, start_time: '00:00', end_time: '00:00', preset: 'frost' },
+    ]);
+  });
+
+  it('should let a copied night take the next morning', () => {
+    const lateSaturday = { key: 'sat-night', day_of_week: 5, start_time: '22:30', end_time: '08:00', preset: 'eco' };
+    const copied = copyDayRanges([...weekdays, lateSaturday], 5, [1]);
+
+    expect(copied.filter((range) => range.day_of_week === 1)).to.deep.equal([
+      { key: 'copy-1-0', day_of_week: 1, start_time: '22:30', end_time: '08:00', preset: 'eco' },
+    ]);
+    // Wednesday's comfort gives way until the copied night ends.
+    expect(copied.filter((range) => range.day_of_week === 2)).to.deep.include.members([
+      { key: 'c-2-tail-480', day_of_week: 2, start_time: '08:00', end_time: '22:30', preset: 'comfort' },
+    ]);
+  });
+});
+
 describe('thermostatRanges: removing a range', () => {
   it('should do nothing for an unknown key', () => {
     const ranges = [{ key: 'a', day_of_week: 0, start_time: '06:00', end_time: '09:00', preset: 'comfort' }];
@@ -532,15 +615,15 @@ describe('thermostatRanges: removing a range', () => {
     ]);
   });
 
-  it('should close a gap before the removed range', () => {
+  // A gap is a stop (rangesToTransitions): it is the range in force before the
+  // removed one, and it is what extends.
+  it('should leave the stop before the removed range to extend over it', () => {
     const ranges = [
       { key: 'a', day_of_week: 0, start_time: '06:00', end_time: '08:00', preset: 'comfort' },
       { key: 'b', day_of_week: 0, start_time: '10:00', end_time: '12:00', preset: 'eco' },
     ];
 
-    expect(removeRangeAndFill(ranges, 'b')).to.deep.equal([
-      { key: 'a', day_of_week: 0, start_time: '06:00', end_time: '12:00', preset: 'comfort' },
-    ]);
+    expect(removeRangeAndFill(ranges, 'b')).to.deep.equal([ranges[0]]);
   });
 
   it('should keep the removed day covered after a whole day', () => {
@@ -556,15 +639,24 @@ describe('thermostatRanges: removing a range', () => {
     ]);
   });
 
-  it('should not stretch a range past a day to close a gap', () => {
+  // Filled with comfort, Tuesday 10:00 → 12:00 heated after a night that stayed off.
+  it('should not fill across a stop that runs overnight', () => {
     const ranges = [
       { key: 'a', day_of_week: 0, start_time: '06:00', end_time: '22:00', preset: 'comfort' },
       { key: 'b', day_of_week: 1, start_time: '10:00', end_time: '12:00', preset: 'eco' },
     ];
 
+    expect(removeRangeAndFill(ranges, 'b')).to.deep.equal([ranges[0]]);
+  });
+
+  it('should fill from an off range like from any other', () => {
+    const ranges = [
+      { key: 'a', day_of_week: 0, start_time: '22:00', end_time: '10:00', preset: 'off' },
+      { key: 'b', day_of_week: 1, start_time: '10:00', end_time: '12:00', preset: 'eco' },
+    ];
+
     expect(removeRangeAndFill(ranges, 'b')).to.deep.equal([
-      ranges[0],
-      { key: 'a-fill-b', day_of_week: 1, start_time: '10:00', end_time: '12:00', preset: 'comfort' },
+      { key: 'a', day_of_week: 0, start_time: '22:00', end_time: '12:00', preset: 'off' },
     ]);
   });
 
