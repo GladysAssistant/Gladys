@@ -149,7 +149,7 @@ const UpdateFooter = ({ integration, updateIntegration, bordered }) => {
                 'btn-loading': updating
               })}
               onClick={() => updateIntegration(integration.selector)}
-              disabled={updating}
+              disabled={updating || integration.updateLocked}
             >
               <i class={cx('fe mr-1', failed ? 'fe-rotate-ccw' : 'fe-arrow-up-circle')} />
               <Text id={failed ? 'integration.root.updateRetryButton' : 'integration.root.updateButton'} />
