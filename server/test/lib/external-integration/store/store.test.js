@@ -7,16 +7,24 @@ const { fake } = sinon;
 const { NotFoundError, BadParameters, ConflictError } = require('../../../../utils/coreErrors');
 const { Error422 } = require('../../../../utils/httpErrors');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('../testUtils.test');
-const { STORE_INDEX_TTL_MS } = require('../../../../lib/external-integration/store/store.constants');
-const { getStoreIndexUrls } = require('../../../../lib/external-integration/store/store.downloadIndex');
+const {
+  STORE_INDEX_TTL_MS,
+  MAX_STORE_ENTRY_BYTES,
+} = require('../../../../lib/external-integration/store/store.constants');
+const {
+  getStoreIndexUrls,
+  getStoreEntryUrl,
+} = require('../../../../lib/external-integration/store/store.downloadIndex');
 const {
   buildCatalogEntry,
   coerceGladysVersion,
 } = require('../../../../lib/external-integration/store/store.buildCatalogEntry');
 
 const INDEX_URL_ORIGIN = 'https://integration-store-storage.gladysassistant.com';
-const INDEX_URL_PATH = '/index.json';
 const LITE_INDEX_URL_PATH = '/index-lite.json';
+// per-integration file of the store: the complete entry, a few kilobytes
+const ENTRY_URL_PATH = '/integrations/john--gladys-open-meteo-demo.json';
+const OTHER_ENTRY_URL_PATH = '/integrations/jane--gladys-incompatible.json';
 
 const TEST_INDEX = {
   index_format: 1,
@@ -25,6 +33,7 @@ const TEST_INDEX = {
     {
       store_slug: 'john/gladys-open-meteo-demo',
       repo_url: 'https://github.com/john/gladys-open-meteo-demo',
+      entry_url: `${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`,
       manifest: TEST_MANIFEST,
       cover_url: 'https://integration-store-storage.gladysassistant.com/covers/john--gladys-open-meteo-demo.jpg',
       github: { stars: 12, pushed_at: '2026-07-10T12:00:00.000Z' },
@@ -36,6 +45,7 @@ const TEST_INDEX = {
     {
       store_slug: 'jane/gladys-incompatible',
       repo_url: 'https://github.com/jane/gladys-incompatible',
+      entry_url: `${INDEX_URL_ORIGIN}${OTHER_ENTRY_URL_PATH}`,
       manifest: {
         ...TEST_MANIFEST,
         name: 'Incompatible',
@@ -50,6 +60,16 @@ const TEST_INDEX = {
       github: { stars: 1, pushed_at: '2026-07-01T12:00:00.000Z' },
     },
   ],
+};
+
+// a supervisor whose lite index is already in memory (fresh), like after
+// the periodic refresh: resolving a store entry then costs one download of
+// the per-integration file, never of an index
+const buildSupervisorWithIndex = () => {
+  const built = buildSupervisor();
+  built.externalIntegration.storeIndex = TEST_INDEX;
+  built.externalIntegration.storeIndexFetchedAt = Date.now();
+  return built;
 };
 
 describe('externalIntegration store', () => {
@@ -237,13 +257,6 @@ describe('externalIntegration store', () => {
   });
 
   describe('getDocsMarkdown', () => {
-    const buildSupervisorWithIndex = () => {
-      const built = buildSupervisor();
-      built.externalIntegration.storeIndex = TEST_INDEX;
-      built.externalIntegration.storeIndexFetchedAt = Date.now();
-      return built;
-    };
-
     it('should download the doc in the requested language', async () => {
       nock(INDEX_URL_ORIGIN)
         .get('/docs/john--gladys-open-meteo-demo/fr.md')
@@ -596,9 +609,8 @@ describe('externalIntegration store', () => {
       });
     });
 
-    it('should default to the official full and lite indexes', () => {
+    it('should default to the official lite index', () => {
       expect(getStoreIndexUrls()).to.deep.equal({
-        indexUrl: `${INDEX_URL_ORIGIN}${INDEX_URL_PATH}`,
         liteIndexUrl: `${INDEX_URL_ORIGIN}${LITE_INDEX_URL_PATH}`,
       });
     });
@@ -606,39 +618,127 @@ describe('externalIntegration store', () => {
     it('should serve the catalog from an alternative full index without lite variant', () => {
       process.env.EXTERNAL_INTEGRATION_STORE_INDEX_URL = 'https://fork.example.com/index.json';
       expect(getStoreIndexUrls()).to.deep.equal({
-        indexUrl: 'https://fork.example.com/index.json',
         liteIndexUrl: 'https://fork.example.com/index.json',
       });
     });
 
     it('should use the alternative lite index when set', () => {
       process.env.EXTERNAL_INTEGRATION_STORE_INDEX_URL = 'https://fork.example.com/index.json';
-      process.env.EXTERNAL_INTEGRATION_STORE_INDEX_LITE_URL = 'https://fork.example.com/index-lite.json';
+      process.env.EXTERNAL_INTEGRATION_STORE_INDEX_LITE_URL = 'https://fork.example.com/store/index-lite.json';
       expect(getStoreIndexUrls()).to.deep.equal({
-        indexUrl: 'https://fork.example.com/index.json',
-        liteIndexUrl: 'https://fork.example.com/index-lite.json',
+        liteIndexUrl: 'https://fork.example.com/store/index-lite.json',
       });
+    });
+
+    it('should derive the per-integration file URL from the store layout, next to the lite index', () => {
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo')).to.equal(`${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`);
+      process.env.EXTERNAL_INTEGRATION_STORE_INDEX_LITE_URL = 'https://fork.example.com/store/index-lite.json';
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo')).to.equal(
+        'https://fork.example.com/store/integrations/john--gladys-open-meteo-demo.json',
+      );
+    });
+
+    it('should refuse a value that is not an owner/repo slug', () => {
+      // `a/../../b` would otherwise derive a URL outside integrations/
+      ['a/../../b', 'john', 'john/repo/extra', 'john/re po', '', 42, null, undefined].forEach((slug) => {
+        expect(() => getStoreEntryUrl(slug)).to.throw('INVALID_STORE_SLUG');
+      });
+      expect(getStoreEntryUrl('John-Doe/gladys_open.meteo-demo')).to.equal(
+        `${INDEX_URL_ORIGIN}/integrations/John-Doe--gladys_open.meteo-demo.json`,
+      );
+    });
+
+    it('should honour an entry_url on the origin of the lite index only', () => {
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', `${INDEX_URL_ORIGIN}/elsewhere/john.json`)).to.equal(
+        `${INDEX_URL_ORIGIN}/elsewhere/john.json`,
+      );
+      // the index is unmoderated external data: another host (a LAN
+      // endpoint, a link-local address...) is never fetched
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', 'http://169.254.169.254/latest/meta-data')).to.equal(
+        `${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`,
+      );
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', 'not a url')).to.equal(
+        `${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`,
+      );
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', 42)).to.equal(`${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`);
     });
   });
 
   describe('getStoreEntry', () => {
-    it('should download the full index and return the complete entry', async () => {
+    it('should download the per-integration file at the entry_url of the lite entry', async () => {
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
       const entry = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
       expect(entry).to.deep.equal(TEST_INDEX.integrations[0]);
       expect(entry.manifest.config_schema).to.deep.equal(TEST_MANIFEST.config_schema);
+      expect(nock.isDone()).to.equal(true);
+    });
+
+    it('should derive the file URL when the lite entry has no entry_url', async () => {
+      // a lite index written by an older indexer: same store layout
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
+      externalIntegration.storeIndex = {
+        ...TEST_INDEX,
+        integrations: TEST_INDEX.integrations.map(({ entry_url: ignored, ...entry }) => entry),
+      };
+      const entry = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+      expect(entry.manifest.config_schema).to.deep.equal(TEST_MANIFEST.config_schema);
+      expect(nock.isDone()).to.equal(true);
+    });
+
+    it('should ignore an entry_url pointing at another origin', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
+      externalIntegration.storeIndex = {
+        ...TEST_INDEX,
+        integrations: TEST_INDEX.integrations.map((entry) => ({
+          ...entry,
+          entry_url: 'http://192.168.1.10:1443/api/v1/dashboard',
+        })),
+      };
+      const entry = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+      expect(entry.manifest.config_schema).to.deep.equal(TEST_MANIFEST.config_schema);
+      expect(nock.isDone()).to.equal(true);
+    });
+
+    it('should derive the file URL when the lite index does not know the integration yet', async () => {
+      // published minutes ago: its file exists, the cached lite index lags
+      nock(INDEX_URL_ORIGIN)
+        .get('/integrations/new--gladys-fresh.json')
+        .reply(200, { ...TEST_INDEX.integrations[0], store_slug: 'new/gladys-fresh' });
+      const { externalIntegration } = buildSupervisorWithIndex();
+      const entry = await externalIntegration.getStoreEntry('new/gladys-fresh');
+      expect(entry.store_slug).to.equal('new/gladys-fresh');
+      expect(nock.isDone()).to.equal(true);
+    });
+
+    it('should still resolve the entry when no lite index is available', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get(LITE_INDEX_URL_PATH)
+        .reply(500);
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisor();
+      const entry = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+      expect(entry).to.deep.equal(TEST_INDEX.integrations[0]);
+      expect(nock.isDone()).to.equal(true);
     });
 
     it('should serve the last entry fetched from memory, until the TTL', async () => {
       // one download for the install page, none for the install click
       const scope = nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
+        .get(ENTRY_URL_PATH)
         .once()
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
       const first = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
       expect(scope.isDone()).to.equal(true);
       // the very same object: a new download would parse a new one
@@ -646,21 +746,21 @@ describe('externalIntegration store', () => {
 
       externalIntegration.storeEntryCache.fetchedAt = Date.now() - (STORE_INDEX_TTL_MS + 60 * 1000);
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, {
-          ...TEST_INDEX,
-          integrations: [{ ...TEST_INDEX.integrations[0], manifest: { ...TEST_MANIFEST, version: '2.0.0' } }],
-        });
+        .get(ENTRY_URL_PATH)
+        .reply(200, { ...TEST_INDEX.integrations[0], manifest: { ...TEST_MANIFEST, version: '2.0.0' } });
       const refreshed = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
       expect(refreshed.manifest.version).to.equal('2.0.0');
     });
 
     it('should re-download for another integration or when asked to refresh', async () => {
-      const { externalIntegration } = buildSupervisor();
+      const { externalIntegration } = buildSupervisorWithIndex();
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .times(3)
-        .reply(200, TEST_INDEX);
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      nock(INDEX_URL_ORIGIN)
+        .get(OTHER_ENTRY_URL_PATH)
+        .times(2)
+        .reply(200, TEST_INDEX.integrations[1]);
       await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
       const other = await externalIntegration.getStoreEntry('jane/gladys-incompatible');
       expect(other.manifest.name).to.equal('Incompatible');
@@ -669,26 +769,91 @@ describe('externalIntegration store', () => {
       expect(nock.isDone()).to.equal(true);
     });
 
-    it('should return null for an integration absent from the index, without caching anything', async () => {
+    it('should return null for an integration absent from the store, without caching anything', async () => {
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get('/integrations/nobody--gladys-unknown.json')
+        .reply(404);
+      const { externalIntegration } = buildSupervisorWithIndex();
       const entry = await externalIntegration.getStoreEntry('nobody/gladys-unknown');
       expect(entry).to.equal(null);
       expect(externalIntegration.storeEntryCache).to.equal(null);
     });
 
-    it('should reject an invalid full index', async () => {
+    it('should resolve a value that is not an owner/repo slug to "not in the store", without any request', async () => {
+      const { externalIntegration } = buildSupervisorWithIndex();
+      expect(await externalIntegration.getStoreEntry('a/../../b')).to.equal(null);
+      expect(await externalIntegration.getStoreEntry(42)).to.equal(null);
+      expect(externalIntegration.storeEntryCache).to.equal(null);
+    });
+
+    it('should rethrow a store failure other than a 404', async () => {
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, { index_format: 99 });
-      const { externalIntegration } = buildSupervisor();
+        .get(ENTRY_URL_PATH)
+        .reply(503);
+      const { externalIntegration } = buildSupervisorWithIndex();
       try {
         await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
         throw new Error('should have thrown');
       } catch (e) {
-        expect(e.message).to.equal('INVALID_STORE_INDEX');
+        expect(e.response.status).to.equal(503);
+      }
+      expect(externalIntegration.storeEntryCache).to.equal(null);
+    });
+
+    it('should refuse a per-integration file above the size cap before buffering it', async () => {
+      // the full index served at the entry URL: refused as a size error,
+      // never parsed
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, { ...TEST_INDEX.integrations[0], padding: 'x'.repeat(MAX_STORE_ENTRY_BYTES) });
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e.message).to.include('maxContentLength');
+      }
+      expect(externalIntegration.storeEntryCache).to.equal(null);
+    });
+
+    it('should not follow a redirect of the per-integration file', async () => {
+      // the URL was accepted for its origin: a redirect would bypass it
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(302, undefined, { Location: 'http://192.168.1.10:1443/api/v1/dashboard' });
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e.response.status).to.equal(302);
+      }
+      expect(externalIntegration.storeEntryCache).to.equal(null);
+    });
+
+    it('should reject a per-integration file describing another integration', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[1]);
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e.message).to.equal('INVALID_STORE_ENTRY');
+      }
+    });
+
+    it('should reject a per-integration file without manifest', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, { ...TEST_INDEX.integrations[0], manifest: 'nope' });
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e.message).to.equal('INVALID_STORE_ENTRY');
       }
     });
   });
@@ -702,9 +867,9 @@ describe('externalIntegration store', () => {
         name: 'ext-john-gladys-open-meteo-demo',
       });
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
       const integration = await externalIntegration.getStoreIntegration('john/gladys-open-meteo-demo');
       expect(integration.manifest).to.deep.equal(TEST_MANIFEST);
       expect(integration).to.include({
@@ -718,18 +883,18 @@ describe('externalIntegration store', () => {
 
     it('should flag an incompatible integration not installed', async () => {
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get(OTHER_ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[1]);
+      const { externalIntegration } = buildSupervisorWithIndex();
       const integration = await externalIntegration.getStoreIntegration('jane/gladys-incompatible');
       expect(integration).to.include({ installed: false, installed_selector: null, compatible: false });
     });
 
-    it('should throw a NotFoundError for an integration absent from the index', async () => {
+    it('should throw a NotFoundError for an integration absent from the store', async () => {
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get('/integrations/nobody--gladys-unknown.json')
+        .reply(404);
+      const { externalIntegration } = buildSupervisorWithIndex();
       try {
         await externalIntegration.getStoreIntegration('nobody/gladys-unknown');
         throw new Error('should have thrown');
@@ -741,11 +906,11 @@ describe('externalIntegration store', () => {
   });
 
   describe('installFromStore', () => {
-    it('should install an integration listed in the index, with its complete manifest', async () => {
+    it('should install an integration listed in the store, with its complete manifest', async () => {
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
       const integration = await externalIntegration.installFromStore('john/gladys-open-meteo-demo');
       expect(integration).to.have.property('selector', 'ext-john-gladys-open-meteo-demo');
       expect(integration).to.have.property('store_slug', 'john/gladys-open-meteo-demo');
@@ -755,9 +920,9 @@ describe('externalIntegration store', () => {
 
     it('should throw a 404 on unknown store_slug', async () => {
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get('/integrations/unknown--slug.json')
+        .reply(404);
+      const { externalIntegration } = buildSupervisorWithIndex();
       try {
         await externalIntegration.installFromStore('unknown/slug');
         throw new Error('should have thrown');
@@ -769,9 +934,9 @@ describe('externalIntegration store', () => {
     it('should refuse to install twice', async () => {
       await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo' });
       nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
-      const { externalIntegration } = buildSupervisor();
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
       try {
         await externalIntegration.installFromStore('john/gladys-open-meteo-demo');
         throw new Error('should have thrown');

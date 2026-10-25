@@ -65,8 +65,10 @@ hourly by `GladysAssistant/integration-store`) — the very same file every Glad
 instance downloads, so **the demo lists the integrations published right now**,
 with their covers, categories, GitHub stars and documentation. A snapshot
 committed here would be out of date the week after. The install page of one
-integration (and its simulated install) needs its complete manifest: the full
-`index.json` is downloaded then, like the server does.
+integration (and its simulated install) needs its complete manifest: its
+per-integration file (`integrations/<owner>--<repo>.json`, the `entry_url` of
+the lite entry) is downloaded then, like the server does — never the full
+`index.json`, tens of megabytes.
 
 These are therefore the only requests of the demo that leave the browser. They
 are made only when the integrations pages are opened, and a failure of the

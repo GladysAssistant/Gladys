@@ -10,7 +10,7 @@ Community RFC (topic 10343): open Gladys to integrations developed and published
 
 Scoping decisions validated with the maintainer:
 - **Scope**: overall architecture + executable detail of **phase 1** (host API + Docker supervisor + PoC + **store**).
-- **Decentralized, zero-approval store**: the source of truth is the GitHub topic `gladys-assistant-integration` (publishing = tagging your public repo); a 100% automatic indexer (public GitHub Action) mechanically validates manifests and publishes a static `index.json` that Gladys instances consume. The maintainer approves nothing and is never a bottleneck. Docker images on **any public registry**; **no moderation in v1** (the Docker sandbox is the defense — assumed and documented).
+- **Decentralized, zero-approval store**: the source of truth is the GitHub topic `gladys-assistant-integration` (publishing = tagging your public repo); a 100% automatic indexer (public GitHub Action) mechanically validates manifests and publishes static files that Gladys instances consume: a lite index (`index-lite.json`, the catalog) and one file per integration (its complete manifest); the full `index.json` is published too, for tooling, but Gladys never downloads it: too heavy, and a complete manifest is never read from any full index. The maintainer approves nothing and is never a bottleneck. Docker images on **any public registry**; **no moderation in v1** (the Docker sandbox is the defense — assumed and documented).
 - **Core→integration return channel**: outbound WebSocket from the integration (no HTTP server in the container).
 - **SDK v1**: REST/WS host API documented and open to all languages; official SDK + template in Node.js only.
 - **No device creation by the integration**: it publishes discovered devices, the user creates/edits/deletes from the interface (the internal-integration pattern).
@@ -48,7 +48,7 @@ The section C contracts decouple five repos; the `manifest.schema.json` has a **
 | Repo | Role | Sections |
 |---|---|---|
 | `GladysAssistant/Gladys` (monorepo) | Supervisor, host API, WS, server-side store, frontend — **and this spec** | B.1–B.9, B.13, C.2–C.5, C.7 |
-| `GladysAssistant/integration-store` | Indexer (GitHub Action) + `index.json` on Pages; canonical manifest schema | B.9, C.1, C.6 |
+| `GladysAssistant/integration-store` | Indexer (GitHub Action) + `index.json`, `index-lite.json` and the per-integration files on Pages; canonical manifest schema | B.9, C.1, C.6 |
 | `GladysAssistant/integration-sdk-js` | npm package `@gladysassistant/integration-sdk` — depends only on the C contracts, no monorepo import | B.10, C.8 |
 | `GladysAssistant/integration-template-js` | Official template repository + PoC of the e2e journey (published in the store as a third-party dev would) | B.11, C.1, C.7 |
 | `GladysAssistant/v4-website` | Public documentation fr + en (transposition of sections B/C — the spec remains the source of truth) | B.12 |

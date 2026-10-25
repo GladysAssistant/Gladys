@@ -2,7 +2,8 @@ const { NotFoundError } = require('../../../utils/coreErrors');
 
 /**
  * @description Install an integration from the store: the server resolves
- * the image and the complete manifest from the full index entry, then
+ * the image and the complete manifest from the store entry of the
+ * integration (its per-integration file), then
  * follows the standard install path.
  * @param {string} storeSlug - The `owner/repo` slug of the store entry.
  * @param {object} [options] - Install options (grantedDevices...).
