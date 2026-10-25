@@ -22,7 +22,7 @@ const {
   buttonEventMapping,
 } = require('./deviceMappings');
 const { toCelsius } = require('./buildThermostatService');
-const { findFeatureService } = require('./featureServices');
+const { findFeatureService, findFeatureServices } = require('./featureServices');
 
 /**
  * @description Recompute a thermostat characteristic through the GET handler built by buildService
@@ -194,24 +194,26 @@ function sendState(hkAccessory, feature, event) {
       } else if (feature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
         currentTemp = fahrenheitToCelsius(currentTemp);
       }
-      // On a heating or cooling device the temperature sensor is merged into the Thermostat or the
-      // HeaterCooler service.
-      const service =
-        serviceFor() || hkAccessory.getService(Service.Thermostat) || hkAccessory.getService(Service.HeaterCooler);
-      // Clamped like the GET path: HAP throws on a value outside the characteristic bounds, and a
-      // sensor reporting an out-of-range reading must not take the bridge down.
-      service.updateCharacteristic(
-        Characteristic.CurrentTemperature,
-        clampToCharacteristic(currentTemp, service.getCharacteristic(Characteristic.CurrentTemperature).props),
-      );
-      // In AUTO, whether the device is heating or cooling depends on the room temperature.
-      refreshCharacteristic(
-        this.hap,
-        service,
-        isHeaterCooler(this.hap, service)
-          ? Characteristic.CurrentHeaterCoolerState
-          : Characteristic.CurrentHeatingCoolingState,
-      );
+      const services = findFeatureServices(hkAccessory, feature);
+      if (services.length === 0) {
+        services.push(
+          serviceFor() || hkAccessory.getService(Service.Thermostat) || hkAccessory.getService(Service.HeaterCooler),
+        );
+      }
+      services.forEach((service) => {
+        service.updateCharacteristic(
+          Characteristic.CurrentTemperature,
+          clampToCharacteristic(currentTemp, service.getCharacteristic(Characteristic.CurrentTemperature).props),
+        );
+        // Every preset card depends on the same measured temperature, including its AUTO state.
+        refreshCharacteristic(
+          this.hap,
+          service,
+          isHeaterCooler(this.hap, service)
+            ? Characteristic.CurrentHeaterCoolerState
+            : Characteristic.CurrentHeatingCoolingState,
+        );
+      });
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.THERMOSTAT}:${DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE}`:
