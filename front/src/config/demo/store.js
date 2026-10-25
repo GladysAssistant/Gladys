@@ -192,8 +192,21 @@ const httpError = (message, status) => {
   return error;
 };
 
-const getStoreEntryUrl = storeSlug =>
-  new URL(`${STORE_ENTRY_PATH}${storeSlug.replace('/', '--')}.json`, STORE_INDEX_LITE_URL).href;
+// Like the server's getStoreEntryUrl: the entry_url of the lite entry when it
+// is on the origin of the lite index (the index is external data, it must not
+// send the browser to an arbitrary host), else the store layout
+const getStoreEntryUrl = (storeSlug, entryUrl) => {
+  if (typeof entryUrl === 'string') {
+    try {
+      if (new URL(entryUrl).origin === new URL(STORE_INDEX_LITE_URL).origin) {
+        return entryUrl;
+      }
+    } catch (e) {
+      // malformed entry_url: the derived URL below
+    }
+  }
+  return new URL(`${STORE_ENTRY_PATH}${storeSlug.replace('/', '--')}.json`, STORE_INDEX_LITE_URL).href;
+};
 
 /**
  * The complete entry of one store integration, like the server's
@@ -204,7 +217,7 @@ const getStoreEntryUrl = storeSlug =>
 const fetchStoreEntry = async storeSlug => {
   const entries = await getIndex();
   const liteEntry = entries.find(candidate => candidate.store_slug === storeSlug);
-  const url = (liteEntry && liteEntry.entry_url) || getStoreEntryUrl(storeSlug);
+  const url = getStoreEntryUrl(storeSlug, liteEntry ? liteEntry.entry_url : null);
   const response = await fetchWithTimeout(url);
   if (response.status === 404) {
     throw httpError(`${storeSlug} is not in the store`, 404);

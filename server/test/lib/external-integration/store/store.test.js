@@ -7,7 +7,10 @@ const { fake } = sinon;
 const { NotFoundError, BadParameters, ConflictError } = require('../../../../utils/coreErrors');
 const { Error422 } = require('../../../../utils/httpErrors');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('../testUtils.test');
-const { STORE_INDEX_TTL_MS } = require('../../../../lib/external-integration/store/store.constants');
+const {
+  STORE_INDEX_TTL_MS,
+  MAX_STORE_ENTRY_BYTES,
+} = require('../../../../lib/external-integration/store/store.constants');
 const {
   getStoreIndexUrls,
   getStoreEntryUrl,
@@ -634,6 +637,21 @@ describe('externalIntegration store', () => {
         'https://fork.example.com/store/integrations/john--gladys-open-meteo-demo.json',
       );
     });
+
+    it('should honour an entry_url on the origin of the lite index only', () => {
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', `${INDEX_URL_ORIGIN}/elsewhere/john.json`)).to.equal(
+        `${INDEX_URL_ORIGIN}/elsewhere/john.json`,
+      );
+      // the index is unmoderated external data: another host (a LAN
+      // endpoint, a link-local address...) is never fetched
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', 'http://169.254.169.254/latest/meta-data')).to.equal(
+        `${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`,
+      );
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', 'not a url')).to.equal(
+        `${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`,
+      );
+      expect(getStoreEntryUrl('john/gladys-open-meteo-demo', 42)).to.equal(`${INDEX_URL_ORIGIN}${ENTRY_URL_PATH}`);
+    });
   });
 
   describe('getStoreEntry', () => {
@@ -657,6 +675,23 @@ describe('externalIntegration store', () => {
       externalIntegration.storeIndex = {
         ...TEST_INDEX,
         integrations: TEST_INDEX.integrations.map(({ entry_url: ignored, ...entry }) => entry),
+      };
+      const entry = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+      expect(entry.manifest.config_schema).to.deep.equal(TEST_MANIFEST.config_schema);
+      expect(nock.isDone()).to.equal(true);
+    });
+
+    it('should ignore an entry_url pointing at another origin', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, TEST_INDEX.integrations[0]);
+      const { externalIntegration } = buildSupervisorWithIndex();
+      externalIntegration.storeIndex = {
+        ...TEST_INDEX,
+        integrations: TEST_INDEX.integrations.map((entry) => ({
+          ...entry,
+          entry_url: 'http://192.168.1.10:1443/api/v1/dashboard',
+        })),
       };
       const entry = await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
       expect(entry.manifest.config_schema).to.deep.equal(TEST_MANIFEST.config_schema);
@@ -744,6 +779,22 @@ describe('externalIntegration store', () => {
         throw new Error('should have thrown');
       } catch (e) {
         expect(e.response.status).to.equal(503);
+      }
+      expect(externalIntegration.storeEntryCache).to.equal(null);
+    });
+
+    it('should refuse a per-integration file above the size cap before buffering it', async () => {
+      // the full index served at the entry URL: refused as a size error,
+      // never parsed
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(200, { ...TEST_INDEX.integrations[0], padding: 'x'.repeat(MAX_STORE_ENTRY_BYTES) });
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e.message).to.include('maxContentLength');
       }
       expect(externalIntegration.storeEntryCache).to.equal(null);
     });

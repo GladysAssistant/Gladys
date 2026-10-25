@@ -3,6 +3,7 @@ const axios = require('axios');
 const {
   DEFAULT_STORE_INDEX_LITE_URL,
   STORE_ENTRY_PATH,
+  MAX_STORE_ENTRY_BYTES,
   STORE_INDEX_LITE_MANIFEST_FIELDS,
   SUPPORTED_INDEX_FORMAT,
   STORE_HTTP_TIMEOUT_MS,
@@ -27,16 +28,28 @@ function getStoreIndexUrls() {
 }
 
 /**
- * @description URL of the per-integration file of a store entry, derived
- * from the store layout (`integrations/<owner>--<repo>.json` next to the
- * index) for a lite entry that does not carry its `entry_url`.
+ * @description URL of the per-integration file of a store entry: the
+ * `entry_url` of its lite entry when it points at the origin of the
+ * configured lite index — the index is unmoderated external data, it must not
+ * send the core to an arbitrary host — else derived from the store layout
+ * (`integrations/<owner>--<repo>.json` next to the index).
  * @param {string} storeSlug - The `owner/repo` slug of the store entry.
+ * @param {string} [entryUrl] - The `entry_url` of the lite entry, if any.
  * @returns {string} The URL of the per-integration file.
  * @example
- * const url = getStoreEntryUrl('john/gladys-open-meteo-demo');
+ * const url = getStoreEntryUrl('john/gladys-open-meteo-demo', liteEntry.entry_url);
  */
-function getStoreEntryUrl(storeSlug) {
+function getStoreEntryUrl(storeSlug, entryUrl = null) {
   const { liteIndexUrl } = getStoreIndexUrls();
+  if (typeof entryUrl === 'string') {
+    try {
+      if (new URL(entryUrl).origin === new URL(liteIndexUrl).origin) {
+        return entryUrl;
+      }
+    } catch (e) {
+      // malformed entry_url: the derived URL below
+    }
+  }
   return new URL(`${STORE_ENTRY_PATH}${storeSlug.replace('/', '--')}.json`, liteIndexUrl).href;
 }
 
@@ -58,7 +71,9 @@ async function downloadIndex(url) {
 /**
  * @description Download the per-integration file of a store entry (the same
  * entry as in the full index, complete manifest included) and check it is
- * the one asked for.
+ * the one asked for. The body is capped at MAX_STORE_ENTRY_BYTES: a complete
+ * entry is a few kilobytes, a bigger file is not one (the full index served
+ * at the wrong URL, a rogue file) and is refused before being buffered.
  * @param {string} url - The URL of the per-integration file.
  * @param {string} storeSlug - The `owner/repo` slug the file must describe.
  * @returns {Promise<object|null>} Resolve with the entry, or null when the
@@ -69,7 +84,7 @@ async function downloadIndex(url) {
 async function downloadStoreEntry(url, storeSlug) {
   let data;
   try {
-    ({ data } = await axios.get(url, { timeout: STORE_HTTP_TIMEOUT_MS }));
+    ({ data } = await axios.get(url, { timeout: STORE_HTTP_TIMEOUT_MS, maxContentLength: MAX_STORE_ENTRY_BYTES }));
   } catch (e) {
     if (e.response && e.response.status === 404) {
       return null;

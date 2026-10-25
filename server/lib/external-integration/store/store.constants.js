@@ -13,9 +13,12 @@
 // megabytes) is never downloaded by Gladys.
 const DEFAULT_STORE_INDEX_LITE_URL = 'https://integration-store-storage.gladysassistant.com/index-lite.json';
 // Path of the per-integration file, relative to the lite index, when a lite
-// entry does not carry its `entry_url` (a cache written by an older indexer
-// or core, an integration not crawled yet).
+// entry does not carry a usable `entry_url` (a cache written by an older
+// indexer or core, an integration not crawled yet, a URL on another origin).
 const STORE_ENTRY_PATH = 'integrations/';
+// A complete entry is a few kilobytes: the cap only protects against a
+// mis-pointed URL (the full index again) or a rogue file.
+const MAX_STORE_ENTRY_BYTES = 1024 * 1024;
 // Manifest fields of a lite index entry. Anything else is dropped when an
 // index is kept as the catalog index, so a full index (cached before the lite
 // one existed, or served by a fork without a lite variant) never weighs on
@@ -48,6 +51,7 @@ const MAX_DOCS_MARKDOWN_BYTES = 1024 * 1024;
 module.exports = {
   DEFAULT_STORE_INDEX_LITE_URL,
   STORE_ENTRY_PATH,
+  MAX_STORE_ENTRY_BYTES,
   STORE_INDEX_LITE_MANIFEST_FIELDS,
   STORE_INDEX_CACHE_VARIABLE,
   STORE_INDEX_TTL_MS,
