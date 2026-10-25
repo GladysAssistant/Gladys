@@ -80,21 +80,30 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
-  it('should re-download the store index instead of trusting the in-memory cache', async () => {
-    // the index is cached 30 min client-side and rebuilt hourly by the
+  it('should re-download the store entry instead of trusting the in-memory cache', async () => {
+    // the entry is cached 30 min client-side and rebuilt hourly by the
     // indexer: a fresh cache must never hide a release published since
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
+    externalIntegration.storeIndex = {
+      index_format: 1,
+      integrations: [
+        {
+          store_slug: 'john/gladys-open-meteo-demo',
+          entry_url:
+            'https://integration-store-storage.gladysassistant.com/integrations/john--gladys-open-meteo-demo.json',
+          manifest: { ...TEST_MANIFEST, version: '1.2.0' },
+        },
+      ],
+    };
+    externalIntegration.storeIndexFetchedAt = Date.now();
     externalIntegration.storeEntryCache = {
       entry: { store_slug: 'john/gladys-open-meteo-demo', manifest: TEST_MANIFEST },
       fetchedAt: Date.now(),
     };
     nock('https://integration-store-storage.gladysassistant.com')
-      .get('/index.json')
-      .reply(200, {
-        index_format: 1,
-        integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: '2.0.0' } }],
-      });
+      .get('/integrations/john--gladys-open-meteo-demo.json')
+      .reply(200, { store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: '2.0.0' } });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
     const integration = await externalIntegration.update(service.selector);
     expect(nock.isDone()).to.equal(true);

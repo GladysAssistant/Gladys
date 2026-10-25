@@ -1,16 +1,21 @@
-// Static indexes rebuilt hourly by the public indexer
+// Static files rebuilt hourly by the public indexer
 // (GladysAssistant/integration-store) and served from the store storage.
-// Overridable by env variables, useful for tests and to point to an
-// alternative index (e.g. a self-hosted fork), see store.downloadIndex.js.
-// The full index carries the complete manifest of every integration (config
-// schema, widgets, scene declarations...): with hundreds of integrations it
-// weighs megabytes, so it is only downloaded when one complete manifest is
-// needed (install page, install, update).
-const DEFAULT_STORE_INDEX_URL = 'https://integration-store-storage.gladysassistant.com/index.json';
-// The lite index carries the same entries with the manifest reduced to what
-// the catalog list, the compatibility check and the update detection read:
-// this is the one refreshed periodically, kept in memory and in the cache.
+// Overridable by env variable, useful for tests and to point to an
+// alternative store (e.g. a self-hosted fork), see store.downloadIndex.js.
+// The lite index carries every entry with the manifest reduced to what the
+// catalog list, the compatibility check and the update detection read: this
+// is the one refreshed periodically, kept in memory and in the cache. The
+// complete manifest of one integration (config schema, widgets, scene
+// declarations...) comes from its own file, `integrations/<owner>--<repo>.json`
+// next to the index (its URL is the `entry_url` of the lite entry), downloaded
+// only when needed (install page, install, update). The full index
+// `index.json` the indexer also publishes (every complete manifest, tens of
+// megabytes) is never downloaded by Gladys.
 const DEFAULT_STORE_INDEX_LITE_URL = 'https://integration-store-storage.gladysassistant.com/index-lite.json';
+// Path of the per-integration file, relative to the lite index, when a lite
+// entry does not carry its `entry_url` (a cache written by an older indexer
+// or core, an integration not crawled yet).
+const STORE_ENTRY_PATH = 'integrations/';
 // Manifest fields of a lite index entry. Anything else is dropped when an
 // index is kept as the catalog index, so a full index (cached before the lite
 // one existed, or served by a fork without a lite variant) never weighs on
@@ -27,7 +32,7 @@ const STORE_INDEX_LITE_MANIFEST_FIELDS = [
   'keywords',
   'countries',
 ];
-// Local persistent cache of the index (t_variable), so the catalog stays
+// Local persistent cache of the lite index (t_variable), so the catalog stays
 // available offline.
 const STORE_INDEX_CACHE_VARIABLE = 'EXTERNAL_INTEGRATION_STORE_INDEX_CACHE';
 // The index is refreshed every 30 minutes: the public indexer rebuilds it
@@ -41,8 +46,8 @@ const STORE_HTTP_TIMEOUT_MS = 30 * 1000;
 const MAX_DOCS_MARKDOWN_BYTES = 1024 * 1024;
 
 module.exports = {
-  DEFAULT_STORE_INDEX_URL,
   DEFAULT_STORE_INDEX_LITE_URL,
+  STORE_ENTRY_PATH,
   STORE_INDEX_LITE_MANIFEST_FIELDS,
   STORE_INDEX_CACHE_VARIABLE,
   STORE_INDEX_TTL_MS,

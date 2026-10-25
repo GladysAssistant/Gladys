@@ -13,8 +13,10 @@ import { version as GLADYS_VERSION } from '../../../../package.json';
  * browser, so the demo catalog *is* the live catalog: a snapshot committed
  * here would be a week out of date and would show integrations that no longer
  * exist (or, worse, hide the ones published since). The complete manifest of
- * one integration (its install page, its install) comes from the full
- * `index.json`, downloaded only then, like the server does.
+ * one integration (its install page, its install) comes from its own file in
+ * the store (`integrations/<owner>--<repo>.json`, the `entry_url` of the lite
+ * entry), downloaded only then, like the server does — never from the full
+ * `index.json`, tens of megabytes.
  *
  * These are therefore the only requests of the demo that leave the browser.
  * They are public, CORS-open, CDN-cached files, they are only made when the
@@ -24,8 +26,9 @@ import { version as GLADYS_VERSION } from '../../../../package.json';
  * whose store is unreachable.
  */
 
-const STORE_INDEX_URL = 'https://integration-store-storage.gladysassistant.com/index.json';
 const STORE_INDEX_LITE_URL = 'https://integration-store-storage.gladysassistant.com/index-lite.json';
+// per-integration file, next to the index, for a lite entry without entry_url
+const STORE_ENTRY_PATH = 'integrations/';
 // Index format this file knows how to read, like the server's
 // SUPPORTED_INDEX_FORMAT: a future breaking format must not be displayed wrong
 const SUPPORTED_INDEX_FORMAT = 1;
@@ -189,23 +192,45 @@ const httpError = (message, status) => {
   return error;
 };
 
+const getStoreEntryUrl = storeSlug =>
+  new URL(`${STORE_ENTRY_PATH}${storeSlug.replace('/', '--')}.json`, STORE_INDEX_LITE_URL).href;
+
+/**
+ * The complete entry of one store integration, like the server's
+ * store.getStoreEntry.js: its per-integration file, at the `entry_url` of the
+ * lite entry (derived from the store layout when the lite index does not
+ * know the integration yet). A 404 means "not in the store".
+ */
+const fetchStoreEntry = async storeSlug => {
+  const entries = await getIndex();
+  const liteEntry = entries.find(candidate => candidate.store_slug === storeSlug);
+  const url = (liteEntry && liteEntry.entry_url) || getStoreEntryUrl(storeSlug);
+  const response = await fetchWithTimeout(url);
+  if (response.status === 404) {
+    throw httpError(`${storeSlug} is not in the store`, 404);
+  }
+  if (!response.ok) {
+    throw new Error(`Store entry responded ${response.status}`);
+  }
+  const entry = await response.json();
+  if (!entry || entry.store_slug !== storeSlug || !entry.manifest || typeof entry.manifest !== 'object') {
+    throw new Error(`Invalid store entry for ${storeSlug}`);
+  }
+  return entry;
+};
+
 /**
  * One store integration with its complete manifest, like the server's
- * store.getStoreIntegration.js: the full index is downloaded for it. It
- * answers like the server: 400 without store_slug, 404 when absent from the
- * store.
+ * store.getStoreIntegration.js: its per-integration file is downloaded for
+ * it. It answers like the server: 400 without store_slug, 404 when absent
+ * from the store.
  */
 const getStoreIntegration = async ({ store_slug: storeSlug } = {}, installedBySlug = {}) => {
   if (!storeSlug) {
     throw httpError('store_slug is required', 400);
   }
   if (!lastFullEntry || lastFullEntry.store_slug !== storeSlug) {
-    const entries = await fetchIndexEntries(STORE_INDEX_URL);
-    const entry = entries.find(candidate => candidate.store_slug === storeSlug);
-    if (!entry) {
-      throw httpError(`${storeSlug} is not in the store index`, 404);
-    }
-    lastFullEntry = entry;
+    lastFullEntry = await fetchStoreEntry(storeSlug);
   }
   return toCatalogEntry(lastFullEntry, installedBySlug);
 };
@@ -230,11 +255,4 @@ const getStoreDocs = async ({ store_slug: storeSlug, lang }) => {
   return { content: await response.text(), url };
 };
 
-export {
-  getStoreCatalog,
-  getStoreIntegration,
-  refreshStoreCatalog,
-  getStoreDocs,
-  STORE_INDEX_URL,
-  STORE_INDEX_LITE_URL
-};
+export { getStoreCatalog, getStoreIntegration, refreshStoreCatalog, getStoreDocs, STORE_INDEX_LITE_URL };
