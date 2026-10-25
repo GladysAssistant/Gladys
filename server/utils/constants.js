@@ -872,7 +872,6 @@ const ACTIONS = {
   },
   SCENE: {
     START: 'scene.start',
-    IN_TIME_RANGE: 'scene.in-time-range',
   },
   MESSAGE: {
     SEND: 'message.send',
@@ -883,6 +882,7 @@ const ACTIONS = {
     CHECK_TIME: 'condition.check-time',
     IF_THEN_ELSE: 'condition.if-then-else',
     WHILE: 'condition.while',
+    IN_TIME_RANGE: 'condition.in-time-range',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
@@ -942,7 +942,7 @@ const CONDITION_ACTIONS = [
   ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE,
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
-  ACTIONS.SCENE.IN_TIME_RANGE,
+  ACTIONS.CONDITION.IN_TIME_RANGE,
 ];
 
 const INTENTS = {

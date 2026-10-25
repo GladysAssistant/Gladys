@@ -55,31 +55,36 @@ const nodeScheduleDaysOfWeek = {
  */
 function scheduleTimeRangeJobs(self, trigger) {
   const jobs = [];
-  // The days of the week are configured once for the whole trigger; a scene saved by an
-  // earlier version has them on each range instead.
   const timeRanges = resolveTriggerTimeRanges(trigger);
 
+  // Every range is checked before any job is scheduled: a throw half-way left the jobs of
+  // the ranges before it running, with no trigger left in the store to cancel them.
   timeRanges.forEach((range, rangeIndex) => {
     // A range covering nothing would fire its start and its end at the same second,
     // leaving the scene with two contradictory executions.
     if (timeToMinutes(range.start) === timeToMinutes(range.end)) {
       throw new BadParameters(`Time range ${rangeIndex}: start and end cannot be equal`);
     }
-
-    const startDays = daysOfTheWeekToNumbers(range.days_of_the_week);
-    if (startDays.length === 0) {
+    if (daysOfTheWeekToNumbers(range.days_of_the_week).length === 0) {
       throw new BadParameters(`Time range ${rangeIndex}: no valid day of the week`);
     }
+  });
+
+  timeRanges.forEach((range, rangeIndex) => {
+    const startDays = daysOfTheWeekToNumbers(range.days_of_the_week);
     // For an overnight range, the end happens on the next day.
     const endDays = isOvernightRange(range) ? startDays.map((day) => (day + 1) % 7) : startDays;
 
     const scheduleOne = (time, days, rangeEvent) => {
+      // A cron rule rather than a RecurrenceRule: on the night the clocks go forward, a
+      // RecurrenceRule at 02:30 skips the day — the end of a 22:00 -> 02:30 range never
+      // came, and the device it drives ran on for a day — and on the night they go back it
+      // fires twice. The cron rule fires once, at 03:30 in March.
       const rule = {
         tz: self.timezone,
-        dayOfWeek: days,
-        hour: parseInt(time.substr(0, 2), 10),
-        minute: parseInt(time.substr(3, 2), 10),
-        second: 0,
+        rule: `0 ${parseInt(time.substr(3, 2), 10)} ${parseInt(time.substr(0, 2), 10)} * * ${[...days]
+          .sort()
+          .join(',')}`,
       };
       // Only the identity of the trigger is emitted, never the trigger object itself: it
       // holds the scheduled jobs, which would then travel through the event bus and end up
@@ -93,6 +98,9 @@ function scheduleTimeRangeJobs(self, trigger) {
           scheduler_type: trigger.scheduler_type,
           range_event: rangeEvent,
           range_index: rangeIndex,
+          // When the boundary fired: `condition.in-time-range` only trusts the side it carries
+          // for a moment, not for a whole run that waits or loops past the boundary.
+          fired_at: Date.now(),
         }),
       );
     };

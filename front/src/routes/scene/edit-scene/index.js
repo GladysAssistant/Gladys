@@ -10,6 +10,7 @@ import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
 import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { findMissingRequiredField, hasIntegrationSteps } from './sceneIntegrations';
+import { sortRanges } from './triggers/TimeRangesTrigger';
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -479,13 +480,26 @@ class EditScene extends Component {
     // state afterwards would display "saved" for data this request never sent
     const sceneSnapshotBeforeSave = JSON.stringify(this.state.scene);
     const sceneToSave = JSON.parse(sceneSnapshotBeforeSave);
-    // A "time-range" trigger starts with an empty range for the user to fill in. One left
-    // incomplete is dropped here rather than sent: the schema requires both times, so it
-    // would fail the whole save instead of just being ignored.
-    (sceneToSave.triggers || []).forEach(trigger => {
-      if (trigger.time_ranges) {
-        trigger.time_ranges = trigger.time_ranges.filter(range => range.start && range.end);
-      }
+    // A "time-range" trigger is checked here, where the message can be translated: an
+    // incomplete range was dropped without a word, and one starting and ending at the same
+    // time reached the user as the server's English refusal. The ranges are sorted on the
+    // way out only (sortRanges).
+    const timeRangeTriggers = (sceneToSave.triggers || []).filter(trigger => trigger.time_ranges);
+    if (
+      timeRangeTriggers.some(trigger =>
+        trigger.time_ranges.some(range => !range.start || !range.end || range.start === range.end)
+      )
+    ) {
+      this.setState({
+        error: true,
+        errorMessage: null,
+        errorMessageId: 'editScene.triggersCard.scheduledTrigger.invalidRangesError',
+        errorMessageFields: {}
+      });
+      return;
+    }
+    timeRangeTriggers.forEach(trigger => {
+      trigger.time_ranges = sortRanges(trigger.time_ranges);
     });
     // the declaration catalog is still unknown (request pending or failed):
     // an integration card cannot be validated, so the save retries the

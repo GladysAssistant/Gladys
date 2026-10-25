@@ -171,31 +171,31 @@ describe('models/scene', () => {
       }).validate();
     });
 
-    // Fields written by earlier iterations of this feature. The trigger schema rejects
-    // anything it does not know, so a scene holding them could no longer be saved nor
-    // duplicated: they must stay accepted (and stripped) rather than break the scene.
-    const legacyProperties = [
+    // Shapes of earlier iterations of this feature, never released: a range carrying its
+    // own days could be saved with none, then refused by addScene after the save.
+    [
       { key: 'trigger_start', value: true },
       { key: 'trigger_end', value: false },
-    ];
-    legacyProperties.forEach(({ key, value }) => {
-      it(`should still accept a time-range trigger holding a legacy "${key}"`, async () => {
-        await buildScene({
+    ].forEach(({ key, value }) => {
+      it(`should reject a time-range trigger holding "${key}"`, async () => {
+        const promise = buildScene({
           type: EVENTS.TIME.CHANGED,
           scheduler_type: 'time-range',
           days_of_the_week: ['monday'],
           time_ranges: [{ start: '12:00', end: '14:30' }],
           [key]: value,
         }).validate();
+        await assert.isRejected(promise, `"[0].${key}" is not allowed`);
       });
     });
 
-    it('should still accept days of the week carried by a range', async () => {
-      await buildScene({
+    it('should reject days of the week carried by a range', async () => {
+      const promise = buildScene({
         type: EVENTS.TIME.CHANGED,
         scheduler_type: 'time-range',
-        time_ranges: [{ start: '12:00', end: '14:30', days_of_the_week: ['monday'] }],
+        time_ranges: [{ start: '12:00', end: '14:30', days_of_the_week: [] }],
       }).validate();
+      await assert.isRejected(promise, '"[0].time_ranges[0].days_of_the_week" is not allowed');
     });
 
     it('should reject a range without an end', async () => {

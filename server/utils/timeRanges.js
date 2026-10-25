@@ -110,28 +110,15 @@ function isInTimeRanges(timeRanges, now) {
 
 /**
  * @description Build the ranges of a time-range trigger, with the days of the week resolved.
- *
- * The days are configured once for the whole trigger. Ranges saved by an earlier version
- * carried their own list instead, and two of them could run on different days: without days
- * on the trigger, every range therefore keeps its own, so such a scene keeps running on the
- * days it was configured with rather than falling back to "every day".
+ * The days are configured once for the whole trigger; an absent list means every day
+ * (daysOfTheWeekToNumbers).
  * @param {object} trigger - A "time-range" scheduled trigger.
  * @returns {object[]} The ranges, each one carrying the days of the week to apply.
  * @example
  * resolveTriggerTimeRanges(trigger);
  */
 function resolveTriggerTimeRanges(trigger) {
-  const timeRanges = trigger.time_ranges || [];
-  // An explicitly empty list means the user unselected every day: the UI warns the trigger
-  // will never fire, and it must not be turned into "every day" behind their back. Only an
-  // absent list falls back to the days each range carries on its own, then to every day.
-  if (trigger.days_of_the_week) {
-    return timeRanges.map((range) => ({ ...range, days_of_the_week: trigger.days_of_the_week }));
-  }
-  // Legacy shape: every range kept its own list, and two ranges could run on different days.
-  // Each one keeps the days it was configured with, instead of the whole trigger adopting
-  // those of its first range.
-  return timeRanges.map((range) => ({ ...range }));
+  return (trigger.time_ranges || []).map((range) => ({ ...range, days_of_the_week: trigger.days_of_the_week }));
 }
 
 module.exports = {

@@ -13,6 +13,10 @@ const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErr
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
+
+// How long the side a time-range trigger fired with is trusted, from the moment its job
+// fired: past it, the condition computes the state from the ranges again.
+const TIME_RANGE_TRUST_MS = 60 * 1000;
 const logger = require('../../utils/logger');
 const executeActionsFactory = require('./scene.executeActions');
 const { evaluate } = require('./scene.formula');
@@ -1083,7 +1087,7 @@ const actionsFunc = {
     /* eslint-enable no-await-in-loop */
     logger.warn(`While loop: max number of iterations reached (${maxIterations}), stopping the loop.`);
   },
-  [ACTIONS.SCENE.IN_TIME_RANGE]: async (self, action, scope) => {
+  [ACTIONS.CONDITION.IN_TIME_RANGE]: async (self, action, scope) => {
     const scene = self.scenes[scope.sceneSelector];
     const triggers = (scene && scene.triggers) || [];
 
@@ -1094,10 +1098,17 @@ const actionsFunc = {
     // The key check matters: `scene.start` hands the child scene a clone of the scope, so a
     // scene called by another one sees the `triggerEvent` of its caller. Without it, the
     // child would answer for the ranges of the parent instead of its own.
+    // Only for a moment, though: the side the trigger carries is the state at the boundary,
+    // and the condition may run long after it — behind a delay, or on every iteration of a
+    // "while", which kept a 12:00 -> 13:00 pump loop running past 13:00 until
+    // max_iterations. Past that moment, the state is computed like any other.
     const triggerEventKey = get(scope, 'triggerEvent.key', { default: undefined });
+    const firedAt = get(scope, 'triggerEvent.fired_at', { default: undefined });
     const firedByThisScene =
       triggerEventKey !== undefined && triggers.some((trigger) => trigger.key === triggerEventKey);
-    let inRange = firedByThisScene ? get(scope, 'triggerEvent.in_range', { default: undefined }) : undefined;
+    const stillAtTheBoundary = typeof firedAt === 'number' && Date.now() - firedAt < TIME_RANGE_TRUST_MS;
+    let inRange =
+      firedByThisScene && stillAtTheBoundary ? get(scope, 'triggerEvent.in_range', { default: undefined }) : undefined;
 
     // Started another way (manually, by another trigger of the same scene, or by another
     // scene): the state is computed from the ranges of the scene's time-range triggers, so

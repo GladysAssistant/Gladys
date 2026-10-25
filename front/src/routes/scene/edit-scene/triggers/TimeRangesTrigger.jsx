@@ -6,7 +6,7 @@ import style from './style.css';
 const DAYS_OF_THE_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 // A new range starts empty: the user types the times they want, instead of clearing a
-// pre-filled slot first. An incomplete range is dropped when the scene is saved.
+// pre-filled slot first. The scene is not saved while a range is incomplete.
 const DEFAULT_RANGE = {
   start: '',
   end: ''
@@ -36,13 +36,16 @@ const durationInMinutes = range => {
 };
 
 /**
- * Sort the ranges by start time, then by end time, so the list always reads like a
- * planning: a range added or moved to 10:15 shows up before the one starting at 12:00.
+ * Sort the ranges by start time, then by end time, so the list reads like a planning: a
+ * range moved to 10:15 shows up before the one starting at 12:00. Done when the scene is
+ * saved, never while a time is edited: the rows are keyed by position, so sorting on
+ * leaving a field moved the next field under the cursor onto another range — 08:00-09:00
+ * turned into 11:00 then Tab gave 10:00-13:00 and 11:00-09:00 (+1 day).
  *
  * @param {object[]} ranges - The time ranges.
  * @returns {object[]} A new sorted array.
  */
-const sortRanges = ranges =>
+export const sortRanges = ranges =>
   [...ranges].sort((a, b) => {
     // A range still being filled in stays at the bottom, where it was added, instead of
     // jumping to the top because an empty string sorts before every time.
@@ -91,13 +94,6 @@ class TimeRangesTrigger extends Component {
 
   handleEndChange = (rangeIndex, e) => {
     this.updateRange(rangeIndex, 'end', e.target.value);
-  };
-
-  // A time input fires "change" on every valid intermediate value: typing "10:00" goes
-  // through "01:00" first. Sorting there would move the row out from under the cursor
-  // mid-typing, so the list is only re-ordered once the field is left.
-  handleTimeBlur = () => {
-    this.updateRanges(sortRanges(this.getRanges()));
   };
 
   toggleDay = day => {
@@ -187,7 +183,6 @@ class TimeRangesTrigger extends Component {
                           class="form-control"
                           value={range.start}
                           onChange={e => this.handleStartChange(rangeIndex, e)}
-                          onBlur={this.handleTimeBlur}
                         />
                       </td>
                       <td>
@@ -196,7 +191,6 @@ class TimeRangesTrigger extends Component {
                           class="form-control"
                           value={range.end}
                           onChange={e => this.handleEndChange(rangeIndex, e)}
-                          onBlur={this.handleTimeBlur}
                         />
                       </td>
                       <td class="align-middle">

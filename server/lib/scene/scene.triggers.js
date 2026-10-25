@@ -192,7 +192,7 @@ const triggersFunc = {
         // The whole planning of the scene answers, not just the ranges of the trigger which
         // fired: the days are configured per trigger, so a "weekdays + weekend" planning is
         // necessarily two triggers, and the end of one of them must not report the scene as
-        // outside while the other one still covers this minute. `scene.in-time-range` trusts
+        // outside while the other one still covers this minute. `condition.in-time-range` trusts
         // this flag as soon as the key belongs to the scene, so the union has to be computed
         // here rather than left to the condition.
         const scene = self.scenes && self.scenes[sceneSelector];

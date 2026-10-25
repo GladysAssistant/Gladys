@@ -4175,7 +4175,8 @@
         "label": "Only continue if",
         "inRange": "We are inside a time range",
         "outOfRange": "We are outside the time ranges",
-        "description": "This condition uses the time ranges of the scene's “Time ranges” trigger. Put it in an “If… Then… Else” block to turn a device on at the start of a range and off at its end, with a single scene."
+        "description": "This condition uses the time ranges of the scene's “Time ranges” trigger. Put it in an “If… Then… Else” block to turn a device on at the start of a range and off at its end, with a single scene.",
+        "noTrigger": "This scene has no \"time ranges\" scheduled trigger: this condition will stop it every time."
       }
     },
     "actions": {
@@ -4207,8 +4208,7 @@
         "toggle": "Toggle the Switches"
       },
       "scene": {
-        "start": "Start scene",
-        "in-time-range": "Time planning"
+        "start": "Start scene"
       },
       "service": {
         "start": "Start service",
@@ -4218,7 +4218,8 @@
         "only-continue-if": "Condition on variables",
         "check-time": "Time condition",
         "if-then-else": "Condition: If...then...else...",
-        "while": "Loop: As long as... repeat..."
+        "while": "Loop: As long as... repeat...",
+        "in-time-range": "Time planning"
       },
       "user": {
         "set-seen-at-home": "User seen at home",
@@ -4299,7 +4300,8 @@
         "if-then-else": "Follow a different path depending on a condition",
         "only-continue-if": "Stop the scene here if the condition is not met",
         "while": "Repeat actions as long as a condition is true",
-        "check-time": "Only continue at certain times or on certain days"
+        "check-time": "Only continue at certain times or on certain days",
+        "in-time-range": "Only continue if we are inside one of the trigger's time ranges"
       },
       "user": {
         "check-presence": "Mark a user as away if they haven't been seen recently",
@@ -4326,8 +4328,7 @@
       },
       "delay": "Pause before the next step",
       "scene": {
-        "start": "Start another scene",
-        "in-time-range": "Only continue if we are inside one of the trigger's time ranges"
+        "start": "Start another scene"
       },
       "http": {
         "request": "Call an external API or service"
@@ -4578,7 +4579,8 @@
           "saturday": "SA",
           "sunday": "SU"
         },
-        "lastDayLocked": "At least one day must stay selected."
+        "lastDayLocked": "At least one day must stay selected.",
+        "invalidRangesError": "Complete or remove the time ranges of the scene: each one needs a start and an end, and they cannot be the same time."
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."

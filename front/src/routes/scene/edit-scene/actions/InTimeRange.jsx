@@ -9,6 +9,11 @@ import { Text } from 'preact-i18n';
  */
 const InTimeRange = props => {
   const inRange = props.action.in_range !== false;
+  // Without a time-range trigger there is nothing to be inside: the scene stops at this
+  // step every time it runs, which the card said nothing about.
+  const hasTimeRangeTrigger = ((props.scene && props.scene.triggers) || []).some(
+    trigger => trigger.scheduler_type === 'time-range'
+  );
 
   const handleChange = e => {
     props.updateActionProperty(props.path, 'in_range', e.target.value === 'true');
@@ -29,6 +34,11 @@ const InTimeRange = props => {
           </option>
         </select>
       </div>
+      {!hasTimeRangeTrigger && (
+        <div class="alert alert-warning">
+          <Text id="editScene.actionsCard.inTimeRange.noTrigger" />
+        </div>
+      )}
       <div class="alert alert-info">
         <Text id="editScene.actionsCard.inTimeRange.description" />
       </div>

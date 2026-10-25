@@ -15,7 +15,7 @@ dayjs.extend(timezonePlugin);
 const TIMEZONE = 'Europe/Paris';
 
 describe('scene.action.inTimeRange', () => {
-  const inTimeRange = actionsFunc[ACTIONS.SCENE.IN_TIME_RANGE];
+  const inTimeRange = actionsFunc[ACTIONS.CONDITION.IN_TIME_RANGE];
 
   // A scene driven by a time-range trigger: 12:00 -> 14:30 every day.
   const buildSelf = (triggers) => ({
@@ -37,29 +37,70 @@ describe('scene.action.inTimeRange', () => {
 
   describe('started by its own trigger', () => {
     it('should continue at the start of a range', async () => {
-      const scope = { sceneSelector: 'my-scene', triggerEvent: { key: 'my-trigger-key', in_range: true } };
-      await inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope);
+      const scope = {
+        sceneSelector: 'my-scene',
+        triggerEvent: { key: 'my-trigger-key', in_range: true, fired_at: Date.now() },
+      };
+      await inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope);
     });
 
     it('should abort at the end of a range', async () => {
-      const scope = { sceneSelector: 'my-scene', triggerEvent: { key: 'my-trigger-key', in_range: false } };
+      const scope = {
+        sceneSelector: 'my-scene',
+        triggerEvent: { key: 'my-trigger-key', in_range: false, fired_at: Date.now() },
+      };
       await chaiAssert.isRejected(
-        inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope),
+        inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope),
         AbortScene,
       );
     });
 
     it('should continue at the end of a range when the condition is inverted', async () => {
-      const scope = { sceneSelector: 'my-scene', triggerEvent: { key: 'my-trigger-key', in_range: false } };
-      await inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE, in_range: false }, scope);
+      const scope = {
+        sceneSelector: 'my-scene',
+        triggerEvent: { key: 'my-trigger-key', in_range: false, fired_at: Date.now() },
+      };
+      await inTimeRange(
+        buildSelf([timeRangeTrigger]),
+        { type: ACTIONS.CONDITION.IN_TIME_RANGE, in_range: false },
+        scope,
+      );
     });
 
     it('should trust the trigger rather than the clock', async () => {
       // The clock says we are outside the range, but the trigger fired a "start":
       // the trigger wins, otherwise a job firing a few milliseconds early would be lost.
       useFakeTimers(dayjs.tz('2026-08-24 20:00', TIMEZONE).valueOf());
+      const scope = {
+        sceneSelector: 'my-scene',
+        triggerEvent: { key: 'my-trigger-key', in_range: true, fired_at: Date.now() },
+      };
+      await inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope);
+    });
+  });
+
+  // Behind a delay or in a "while", the condition runs long after the boundary: a
+  // 12:00 -> 13:00 pump loop kept running past 13:00 on the side the trigger fired with.
+  describe('past the boundary its trigger fired at', () => {
+    it('should compute the state again a minute after the trigger fired', async () => {
+      useFakeTimers(dayjs.tz('2026-08-24 20:00', TIMEZONE).valueOf());
+      const scope = {
+        sceneSelector: 'my-scene',
+        triggerEvent: { key: 'my-trigger-key', in_range: true, fired_at: Date.now() - 2 * 60 * 1000 },
+      };
+      await chaiAssert.isRejected(
+        inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope),
+        AbortScene,
+      );
+    });
+
+    it('should compute the state again for a trigger event that says nothing of when it fired', async () => {
+      useFakeTimers(dayjs.tz('2026-08-24 20:00', TIMEZONE).valueOf());
       const scope = { sceneSelector: 'my-scene', triggerEvent: { key: 'my-trigger-key', in_range: true } };
-      await inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope);
+      await chaiAssert.isRejected(
+        inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope),
+        AbortScene,
+      );
     });
   });
 
@@ -74,8 +115,11 @@ describe('scene.action.inTimeRange', () => {
         scheduler_type: 'time-range',
         time_ranges: [{ start: '08:00', end: '20:00' }],
       };
-      const scope = { sceneSelector: 'my-scene', triggerEvent: { key: 'parent-trigger-key', in_range: false } };
-      await inTimeRange(buildSelf([childTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope);
+      const scope = {
+        sceneSelector: 'my-scene',
+        triggerEvent: { key: 'parent-trigger-key', in_range: false, fired_at: Date.now() },
+      };
+      await inTimeRange(buildSelf([childTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope);
     });
 
     it('should abort when the child scene is outside its own ranges', async () => {
@@ -85,9 +129,12 @@ describe('scene.action.inTimeRange', () => {
         scheduler_type: 'time-range',
         time_ranges: [{ start: '08:00', end: '20:00' }],
       };
-      const scope = { sceneSelector: 'my-scene', triggerEvent: { key: 'parent-trigger-key', in_range: true } };
+      const scope = {
+        sceneSelector: 'my-scene',
+        triggerEvent: { key: 'parent-trigger-key', in_range: true, fired_at: Date.now() },
+      };
       await chaiAssert.isRejected(
-        inTimeRange(buildSelf([childTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope),
+        inTimeRange(buildSelf([childTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope),
         AbortScene,
       );
     });
@@ -97,14 +144,14 @@ describe('scene.action.inTimeRange', () => {
     it('should continue when the current time is inside a range', async () => {
       useFakeTimers(dayjs.tz('2026-08-24 13:00', TIMEZONE).valueOf());
       const scope = { sceneSelector: 'my-scene' };
-      await inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope);
+      await inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope);
     });
 
     it('should abort when the current time is outside the ranges', async () => {
       useFakeTimers(dayjs.tz('2026-08-24 20:00', TIMEZONE).valueOf());
       const scope = { sceneSelector: 'my-scene' };
       await chaiAssert.isRejected(
-        inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope),
+        inTimeRange(buildSelf([timeRangeTrigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope),
         AbortScene,
       );
     });
@@ -115,7 +162,7 @@ describe('scene.action.inTimeRange', () => {
       const scope = { sceneSelector: 'my-scene' };
       const trigger = { ...timeRangeTrigger, days_of_the_week: ['tuesday'] };
       await chaiAssert.isRejected(
-        inTimeRange(buildSelf([trigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope),
+        inTimeRange(buildSelf([trigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope),
         AbortScene,
       );
     });
@@ -124,7 +171,7 @@ describe('scene.action.inTimeRange', () => {
       const scope = { sceneSelector: 'my-scene' };
       const trigger = { scheduler_type: 'every-day', time: '09:00' };
       await chaiAssert.isRejected(
-        inTimeRange(buildSelf([trigger]), { type: ACTIONS.SCENE.IN_TIME_RANGE }, scope),
+        inTimeRange(buildSelf([trigger]), { type: ACTIONS.CONDITION.IN_TIME_RANGE }, scope),
         AbortScene,
       );
     });

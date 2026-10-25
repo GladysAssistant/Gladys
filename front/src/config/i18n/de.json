@@ -4175,7 +4175,8 @@
         "label": "Nur fortfahren, wenn",
         "inRange": "Wir befinden uns in einem Zeitfenster",
         "outOfRange": "Wir befinden uns außerhalb der Zeitfenster",
-        "description": "Diese Bedingung nutzt die Zeitfenster des Auslösers „Zeitfenster“ der Szene. Verwenden Sie sie in einem „Wenn… Dann… Sonst“-Block, um ein Gerät zu Beginn eines Zeitfensters einzuschalten und am Ende auszuschalten – mit einer einzigen Szene."
+        "description": "Diese Bedingung nutzt die Zeitfenster des Auslösers „Zeitfenster“ der Szene. Verwenden Sie sie in einem „Wenn… Dann… Sonst“-Block, um ein Gerät zu Beginn eines Zeitfensters einzuschalten und am Ende auszuschalten – mit einer einzigen Szene.",
+        "noTrigger": "Diese Szene hat keinen geplanten Auslöser „Zeitfenster“: Diese Bedingung wird sie jedes Mal stoppen."
       }
     },
     "actions": {
@@ -4207,8 +4208,7 @@
         "toggle": "Schalter umschalten"
       },
       "scene": {
-        "start": "Szene starten",
-        "in-time-range": "Zeitplan"
+        "start": "Szene starten"
       },
       "service": {
         "start": "Dienst starten",
@@ -4218,7 +4218,8 @@
         "only-continue-if": "Nur fortsetzen, wenn",
         "check-time": "Zeitbedingung",
         "if-then-else": "Bedingung: \"Wenn...dann...sonst...\"",
-        "while": "Schleife: \"Solange... wiederholen...\""
+        "while": "Schleife: \"Solange... wiederholen...\"",
+        "in-time-range": "Zeitplan"
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",
@@ -4299,7 +4300,8 @@
         "if-then-else": "Je nach Bedingung einem anderen Pfad folgen",
         "only-continue-if": "Die Szene hier stoppen, wenn die Bedingung nicht erfüllt ist",
         "while": "Aktionen wiederholen, solange eine Bedingung erfüllt ist",
-        "check-time": "Nur zu bestimmten Uhrzeiten oder Tagen fortfahren"
+        "check-time": "Nur zu bestimmten Uhrzeiten oder Tagen fortfahren",
+        "in-time-range": "Nur fortfahren, wenn wir uns in einem Zeitfenster des Auslösers befinden"
       },
       "user": {
         "check-presence": "Einen Benutzer als abwesend markieren, wenn er länger nicht gesehen wurde",
@@ -4326,8 +4328,7 @@
       },
       "delay": "Vor dem nächsten Schritt eine Pause einlegen",
       "scene": {
-        "start": "Eine andere Szene starten",
-        "in-time-range": "Nur fortfahren, wenn wir uns in einem Zeitfenster des Auslösers befinden"
+        "start": "Eine andere Szene starten"
       },
       "http": {
         "request": "Eine externe API oder einen Dienst aufrufen"
@@ -4578,7 +4579,8 @@
           "saturday": "SA",
           "sunday": "SO"
         },
-        "lastDayLocked": "Mindestens ein Tag muss ausgewählt bleiben."
+        "lastDayLocked": "Mindestens ein Tag muss ausgewählt bleiben.",
+        "invalidRangesError": "Vervollständigen oder entfernen Sie die Zeitfenster der Szene: Jedes braucht einen Beginn und ein Ende, die nicht zur selben Uhrzeit liegen dürfen."
       },
       "warning": {
         "houseWithoutCoordinate": "Dein Zuhause hat keine Koordinaten. Dieser Auslöser funktioniert nicht ohne Koordinaten. Bitte gehe zu Einstellungen -> Zuhause und klicke auf die Karte, um die Koordinaten des Zuhauses festzulegen."

@@ -4175,7 +4175,8 @@
         "label": "Continuer seulement si",
         "inRange": "On est dans une plage horaire",
         "outOfRange": "On est en dehors des plages horaires",
-        "description": "Cette condition s'appuie sur les plages horaires du déclencheur « Plages horaires » de la scène. Placez-la dans un bloc « Si… Alors… Sinon » pour allumer un équipement au début d'une plage et l'éteindre à la fin, avec une seule scène."
+        "description": "Cette condition s'appuie sur les plages horaires du déclencheur « Plages horaires » de la scène. Placez-la dans un bloc « Si… Alors… Sinon » pour allumer un équipement au début d'une plage et l'éteindre à la fin, avec une seule scène.",
+        "noTrigger": "Cette scène n'a pas de déclencheur planifié « plages horaires » : cette condition l'arrêtera à chaque fois."
       }
     },
     "actions": {
@@ -4207,8 +4208,7 @@
         "toggle": "Inverser les prises"
       },
       "scene": {
-        "start": "Démarrer la scène",
-        "in-time-range": "Planning horaire"
+        "start": "Démarrer la scène"
       },
       "service": {
         "start": "Démarrer le service",
@@ -4218,7 +4218,8 @@
         "only-continue-if": "Condition sur variables",
         "check-time": "Condition temporelle",
         "if-then-else": "Condition \"Si... Alors... Sinon...\"",
-        "while": "Boucle \"Tant que... Répéter...\""
+        "while": "Boucle \"Tant que... Répéter...\"",
+        "in-time-range": "Planning horaire"
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
@@ -4299,7 +4300,8 @@
         "if-then-else": "Suivre un chemin différent selon une condition",
         "only-continue-if": "Arrêter la scène ici si la condition n'est pas remplie",
         "while": "Répéter des actions tant qu'une condition est vraie",
-        "check-time": "Continuer seulement à certaines heures ou certains jours"
+        "check-time": "Continuer seulement à certaines heures ou certains jours",
+        "in-time-range": "Continuer seulement si l'on est dans une plage horaire du déclencheur"
       },
       "user": {
         "check-presence": "Marquer un utilisateur absent s'il n'a pas été vu récemment",
@@ -4326,8 +4328,7 @@
       },
       "delay": "Faire une pause avant l'étape suivante",
       "scene": {
-        "start": "Démarrer une autre scène",
-        "in-time-range": "Continuer seulement si l'on est dans une plage horaire du déclencheur"
+        "start": "Démarrer une autre scène"
       },
       "http": {
         "request": "Appeler une API ou un service externe"
@@ -4578,7 +4579,8 @@
           "saturday": "SA",
           "sunday": "DI"
         },
-        "lastDayLocked": "Au moins un jour doit rester sélectionné."
+        "lastDayLocked": "Au moins un jour doit rester sélectionné.",
+        "invalidRangesError": "Complétez ou supprimez les plages horaires de la scène : chacune a besoin d'un début et d'une fin, qui ne peuvent pas être à la même heure."
       },
       "warning": {
         "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."

@@ -56,6 +56,7 @@ function resumeTimeRangeTriggers() {
       key: triggerToResume.key,
       scheduler_type: triggerToResume.scheduler_type,
       range_event: TIME_RANGE_EVENTS.RESUME,
+      fired_at: Date.now(),
     });
   });
 }

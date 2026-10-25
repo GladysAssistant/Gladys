@@ -316,7 +316,7 @@ function createSceneCreateInputSchema(
           .optional(),
         days_of_the_week: z.array(weekDaysSchema).optional(),
       }),
-      actionSchemaByType(ACTIONS.SCENE.IN_TIME_RANGE, {
+      actionSchemaByType(ACTIONS.CONDITION.IN_TIME_RANGE, {
         in_range: z
           .boolean()
           .optional()
@@ -564,23 +564,13 @@ function createSceneCreateInputSchema(
         .boolean()
         .optional()
         .describe('Also run the scene when Gladys starts, to re-apply the state of the planning.'),
-      date: z.string().optional(),
-      time: z
-        .string()
-        .regex(hhmmPattern)
-        .optional(),
-      interval: z.number().optional(),
-      unit: z.string().optional(),
+      // Only what a planning means: the date, time, interval, unit and day of the month of
+      // the other scheduler types do nothing here.
       days_of_the_week: z
         .array(weekDaysSchema)
         .min(1)
         .optional()
         .describe('Days the ranges start on. Absent means every day; an empty list is refused.'),
-      day_of_the_month: z
-        .number()
-        .min(1)
-        .max(31)
-        .optional(),
       key: z.string().optional(),
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
