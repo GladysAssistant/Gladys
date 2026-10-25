@@ -11,10 +11,12 @@ const {
 
 /**
  * @description URL of the lite store index. `EXTERNAL_INTEGRATION_STORE_INDEX_LITE_URL`
- * points at an alternative one (a self-hosted fork); the older
- * `EXTERNAL_INTEGRATION_STORE_INDEX_URL` is still honoured for a fork that
- * only serves its full index: a full index is a valid lite index, only
- * heavier.
+ * points at an alternative store (a self-hosted fork, which must publish the
+ * same layout: a lite index and the per-integration files next to it); the
+ * older `EXTERNAL_INTEGRATION_STORE_INDEX_URL` is honoured as an alias of it:
+ * whatever it points at is read as the lite index, reduced to the lite fields
+ * when kept (a full index is a valid lite index, only heavier — but never a
+ * source of complete manifests).
  * @returns {object} The { liteIndexUrl } URL.
  * @example
  * const { liteIndexUrl } = getStoreIndexUrls();

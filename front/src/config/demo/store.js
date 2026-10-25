@@ -29,6 +29,8 @@ import { version as GLADYS_VERSION } from '../../../../package.json';
 const STORE_INDEX_LITE_URL = 'https://integration-store-storage.gladysassistant.com/index-lite.json';
 // per-integration file, next to the index, for a lite entry without entry_url
 const STORE_ENTRY_PATH = 'integrations/';
+// a complete entry is a few kilobytes, like the server's MAX_STORE_ENTRY_BYTES
+const MAX_STORE_ENTRY_BYTES = 1024 * 1024;
 // Index format this file knows how to read, like the server's
 // SUPPORTED_INDEX_FORMAT: a future breaking format must not be displayed wrong
 const SUPPORTED_INDEX_FORMAT = 1;
@@ -212,20 +214,28 @@ const getStoreEntryUrl = (storeSlug, entryUrl) => {
  * The complete entry of one store integration, like the server's
  * store.getStoreEntry.js: its per-integration file, at the `entry_url` of the
  * lite entry (derived from the store layout when the lite index does not
- * know the integration yet). A 404 means "not in the store".
+ * know the integration yet), no redirect followed and the body capped like
+ * the server does. A 404 means "not in the store".
  */
 const fetchStoreEntry = async storeSlug => {
   const entries = await getIndex();
   const liteEntry = entries.find(candidate => candidate.store_slug === storeSlug);
   const url = getStoreEntryUrl(storeSlug, liteEntry ? liteEntry.entry_url : null);
-  const response = await fetchWithTimeout(url);
+  const response = await fetchWithTimeout(url, { redirect: 'error' });
   if (response.status === 404) {
     throw httpError(`${storeSlug} is not in the store`, 404);
   }
   if (!response.ok) {
     throw new Error(`Store entry responded ${response.status}`);
   }
-  const entry = await response.json();
+  if (Number(response.headers.get('content-length')) > MAX_STORE_ENTRY_BYTES) {
+    throw new Error(`Store entry of ${storeSlug} is too large`);
+  }
+  const body = await response.text();
+  if (body.length > MAX_STORE_ENTRY_BYTES) {
+    throw new Error(`Store entry of ${storeSlug} is too large`);
+  }
+  const entry = JSON.parse(body);
   if (!entry || entry.store_slug !== storeSlug || !entry.manifest || typeof entry.manifest !== 'object') {
     throw new Error(`Invalid store entry for ${storeSlug}`);
   }
