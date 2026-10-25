@@ -4170,6 +4170,12 @@
           "inferior": "menor que",
           "inferiorOrEqual": "menor o igual que"
         }
+      },
+      "inTimeRange": {
+        "label": "Continuar solo si",
+        "inRange": "Estamos dentro de una franja horaria",
+        "outOfRange": "Estamos fuera de las franjas horarias",
+        "description": "Esta condición usa las franjas horarias del disparador «Franjas horarias» de la escena. Colócala en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final, con una sola escena."
       }
     },
     "actions": {
@@ -4201,7 +4207,8 @@
         "toggle": "Alternar los interruptores"
       },
       "scene": {
-        "start": "Iniciar escena"
+        "start": "Iniciar escena",
+        "in-time-range": "Planificación horaria"
       },
       "service": {
         "start": "Iniciar servicio",
@@ -4319,7 +4326,8 @@
       },
       "delay": "Pausa antes del siguiente paso",
       "scene": {
-        "start": "Iniciar otra escena"
+        "start": "Iniciar otra escena",
+        "in-time-range": "Continuar solo si estamos dentro de una de las franjas horarias del disparador"
       },
       "http": {
         "request": "Llamar a una API o servicio externo"
@@ -4547,7 +4555,30 @@
           "saturday": "Sábado",
           "sunday": "Domingo"
         },
-        "house": "Vivienda"
+        "house": "Vivienda",
+        "timeRange": "Franjas horarias",
+        "timeRangesLabel": "Franjas horarias",
+        "noTimeRange": "Todavía no hay ninguna franja horaria. Añade una para definir la planificación.",
+        "addRange": "Añadir una franja",
+        "deleteRange": "Eliminar la franja",
+        "rangeStart": "Inicio",
+        "rangeEnd": "Fin",
+        "rangeDuration": "Duración",
+        "rangeDays": "Días",
+        "overnight": "+1d",
+        "emptyRange": "Franja no válida",
+        "resumeOnStartup": "Reevaluar al iniciar Gladys",
+        "timeRangesHelp": "La escena se ejecuta al inicio y al final de cada franja. Usa la acción «Planificación horaria» en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final. Si «Reevaluar al iniciar Gladys» está marcado, la escena también se ejecuta al arrancar con el estado real de la planificación, para que tus dispositivos vuelvan al estado correcto tras un corte.",
+        "daysOfTheWeekShort": {
+          "monday": "LU",
+          "tuesday": "MA",
+          "wednesday": "MI",
+          "thursday": "JU",
+          "friday": "VI",
+          "saturday": "SÁ",
+          "sunday": "DO"
+        },
+        "lastDayLocked": "Debe quedar al menos un día seleccionado."
       },
       "warning": {
         "houseWithoutCoordinate": "Su vivienda no tiene coordenadas. Este activador no puede funcionar sin estos datos. Vaya a Configuración / Viviendas y haga clic en el mapa para establecer las coordenadas de la vivienda."
