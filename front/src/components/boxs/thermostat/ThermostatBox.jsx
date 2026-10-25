@@ -763,11 +763,13 @@ class ThermostatBox extends Component {
       const schedule = (schedules || []).find(candidate =>
         (candidate.devices || []).some(device => device.selector === deviceSelector)
       );
+      // A schedule deleted behind the widget's back is missing from the list,
+      // and degrades to "no schedule" rather than leaving a stale banner.
       this.setState({ activeSchedule: schedule || null });
     } catch (e) {
-      // A schedule deleted behind the widget's back degrades to "no schedule"
-      // rather than leaving a stale banner.
-      this.setState({ activeSchedule: null });
+      // A failed request says nothing about the schedule: the last one loaded
+      // stays, and with it its `next.refresh_at`, so the minute tick tries again
+      // instead of dropping the banner for good.
     }
   };
 
