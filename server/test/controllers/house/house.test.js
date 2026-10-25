@@ -256,6 +256,9 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
         const dayLength = new Date(curve[curve.length - 1].time).getTime() - new Date(curve[0].time).getTime();
         expect([23, 24, 25].map((hours) => hours * 60 * 60 * 1000)).to.include(dayLength);
         expect(curve).to.have.lengthOf(dayLength / (20 * 60 * 1000) + 1);
+        curve.slice(1).forEach((point, index) => {
+          expect(new Date(point.time).getTime() - new Date(curve[index].time).getTime()).to.equal(20 * 60 * 1000);
+        });
       });
   });
   it('should return 400 when the house has no coordinates', async () => {
