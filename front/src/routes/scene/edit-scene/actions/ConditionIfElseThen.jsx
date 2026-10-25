@@ -183,6 +183,7 @@ class ConditionIfElseThen extends Component {
                   scene={props.scene}
                   sceneIntegrations={props.sceneIntegrations}
                   deviceFeatures={props.deviceFeatures}
+                  thermostatSchedules={props.thermostatSchedules}
                   lastActionGroup={index === props.action.then.length - 1}
                 />
               ))}
@@ -239,6 +240,7 @@ class ConditionIfElseThen extends Component {
                   scene={props.scene}
                   sceneIntegrations={props.sceneIntegrations}
                   deviceFeatures={props.deviceFeatures}
+                  thermostatSchedules={props.thermostatSchedules}
                   lastActionGroup={index === props.action.else.length - 1}
                 />
               ))}

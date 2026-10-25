@@ -22,6 +22,7 @@ describe('scene.thermostat-set-schedule', () => {
     const stateManager = new StateManager(event);
     const thermostatService = {
       device: {
+        running: true,
         attachScheduleToDevice: fake.resolves(null),
       },
     };
@@ -53,7 +54,7 @@ describe('scene.thermostat-set-schedule', () => {
     attachScheduleToDevice.withArgs('school-holidays', 'deleted-thermostat').rejects(new Error('Device not found'));
     attachScheduleToDevice.resolves(null);
     const service = {
-      getService: fake.returns({ device: { attachScheduleToDevice } }),
+      getService: fake.returns({ device: { running: true, attachScheduleToDevice } }),
     };
     await executeActions(
       { stateManager, event, service },
@@ -71,7 +72,7 @@ describe('scene.thermostat-set-schedule', () => {
     assert.calledWith(attachScheduleToDevice, 'school-holidays', 'bedroom-thermostat');
   });
 
-  it('should do nothing when the thermostat service is not running', async () => {
+  it('should do nothing when the thermostat service is not loaded', async () => {
     const stateManager = new StateManager(event);
     const service = {
       getService: fake.returns(null),
@@ -94,10 +95,42 @@ describe('scene.thermostat-set-schedule', () => {
     assert.calledWith(service.getService, 'thermostat');
   });
 
+  // Every in-tree service sits in the stateManager whatever its status: a stopped
+  // one is still found, and only `running` says it runs.
+  it('should do nothing when the thermostat service is stopped', async () => {
+    const stateManager = new StateManager(event);
+    const thermostatService = {
+      device: {
+        running: false,
+        attachScheduleToDevice: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(thermostatService),
+    };
+    await executeActions(
+      { stateManager, event, service },
+      [
+        [
+          {
+            type: ACTIONS.THERMOSTAT.SET_SCHEDULE,
+            schedule: 'school-holidays',
+            devices: ['living-room-thermostat'],
+          },
+        ],
+      ],
+      {},
+      null,
+      { throwUnknownError: true },
+    );
+    assert.notCalled(thermostatService.device.attachScheduleToDevice);
+  });
+
   it('should do nothing when no thermostat was picked', async () => {
     const stateManager = new StateManager(event);
     const thermostatService = {
       device: {
+        running: true,
         attachScheduleToDevice: fake.resolves(null),
       },
     };

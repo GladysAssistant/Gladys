@@ -195,6 +195,7 @@ const EditScenePage = ({ children, ...props }) => {
                       setVariables={props.setVariables}
                       sceneIntegrations={props.sceneIntegrations}
                       deviceFeatures={props.deviceFeatures}
+                      thermostatSchedules={props.thermostatSchedules}
                     />
                   </div>
 

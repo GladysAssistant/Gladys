@@ -26,6 +26,7 @@ const renderActionCard = (props, action, index) => (
     scene={props.scene}
     sceneIntegrations={props.sceneIntegrations}
     deviceFeatures={props.deviceFeatures}
+    thermostatSchedules={props.thermostatSchedules}
     allActions={props.allActions}
     columnIndex={props.index}
     index={index}

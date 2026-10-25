@@ -303,8 +303,9 @@ async function getThermostatScheduleSelectors(gladys, thermostatDeviceSelectors)
   if (thermostatDeviceSelectors.length === 0) {
     return [];
   }
+  // Found in the stateManager whatever its status: `running` is what says it runs.
   const thermostatService = gladys.service.getService('thermostat');
-  if (!thermostatService) {
+  if (!thermostatService || !thermostatService.device.running) {
     return [];
   }
   const schedules = await thermostatService.device.getSchedules();

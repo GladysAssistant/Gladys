@@ -2361,7 +2361,10 @@ describe('build schemas', () => {
 
     it('should only accept the Gladys thermostats and the existing schedules', async () => {
       const thermostatService = {
-        device: { getSchedules: stub().resolves([{ selector: 'school-term' }, { selector: 'school-holidays' }]) },
+        device: {
+          running: true,
+          getSchedules: stub().resolves([{ selector: 'school-term' }, { selector: 'school-holidays' }]),
+        },
       };
       const mcpHandler = buildHandler([thermostat, climateDevice], thermostatService);
       const tools = await mcpHandler.getAllTools();
@@ -2401,6 +2404,17 @@ describe('build schemas', () => {
       const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
       await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
       expect(mcpHandler.gladys.service.getService.calledWith('thermostat')).to.equal(true);
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
+    // A stopped service is still in the stateManager: only `running` says it runs.
+    it('should not read the schedules of a thermostat service that is stopped', async () => {
+      const thermostatService = { device: { running: false, getSchedules: stub().resolves([]) } };
+      const mcpHandler = buildHandler([thermostat], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(thermostatService.device.getSchedules.called).to.equal(false);
       expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
     });
   });

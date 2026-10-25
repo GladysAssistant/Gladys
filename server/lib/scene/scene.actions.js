@@ -941,8 +941,9 @@ const actionsFunc = {
     }
   },
   [ACTIONS.THERMOSTAT.SET_SCHEDULE]: async (self, action) => {
+    // Found in the stateManager whatever its status: `running` is what says it runs.
     const thermostatService = self.service.getService('thermostat');
-    if (!thermostatService) {
+    if (!thermostatService || !thermostatService.device.running) {
       logger.warn(`Scene: the thermostat service is not running, schedule "${action.schedule}" not applied`);
       return;
     }
