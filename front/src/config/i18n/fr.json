@@ -802,6 +802,15 @@
           "5": "samedi",
           "6": "dimanche"
         },
+        "untilNextDays": {
+          "0": "lundi prochain",
+          "1": "mardi prochain",
+          "2": "mercredi prochain",
+          "3": "jeudi prochain",
+          "4": "vendredi prochain",
+          "5": "samedi prochain",
+          "6": "dimanche prochain"
+        },
         "cancelManual": "Annuler le mode manuel",
         "windowOpen": "Fenêtre ouverte — chauffage suspendu",
         "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",

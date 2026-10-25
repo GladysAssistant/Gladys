@@ -507,10 +507,26 @@ const nextTransitionTimestamp = (transitions, now = new Date(), timezone = null)
   const moved = (instant) => sameOffset + (offsetNow - timezoneOffsetMinutes(instant, timezone)) * 60 * 1000;
   const first = moved(sameOffset);
   const second = moved(first);
+  if (first === second) {
+    return first;
+  }
   // Both agree everywhere but on a point inside the hour the clocks skip in
-  // March, which has no instant of its own: the later one is kept, so the hold
-  // never hands back before the point is in force.
-  return Math.max(first, second);
+  // March, which has no instant of its own. It is in force from the jump — the
+  // wall clock reads 03:00 there, past a 02:30 point — so the hold ends then:
+  // the later candidate, 03:30, held up to 59 minutes past it. The jump lies
+  // between the two candidates, the offset is found on either side of it.
+  let before = Math.min(first, second);
+  let after = Math.max(first, second);
+  const offsetAfter = timezoneOffsetMinutes(after, timezone);
+  while (after - before > 60 * 1000) {
+    const middle = before + Math.floor((after - before) / (2 * 60 * 1000)) * 60 * 1000;
+    if (timezoneOffsetMinutes(middle, timezone) === offsetAfter) {
+      after = middle;
+    } else {
+      before = middle;
+    }
+  }
+  return after;
 };
 
 /**

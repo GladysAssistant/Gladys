@@ -795,15 +795,28 @@ describe('thermostatSchedule transition points', () => {
         expect(new Date(timestamp).toISOString()).to.equal('2026-10-25T00:30:00.000Z');
       });
 
-      it('should never end before a point inside the hour the clocks skip', () => {
+      it('should end on the jump for a point inside the hour the clocks skip', () => {
         // 02:30 does not exist on that night: the clock jumps from 02:00 to 03:00,
-        // and the point is in force from then on.
+        // and the point is in force from then on — not from 03:30.
         const atHalfPastTwo = [{ day_of_week: 6, time: '02:30', preset: 'comfort' }];
 
         const timestamp = nextTransitionTimestamp(atHalfPastTwo, new Date('2027-03-27T11:00:00.000Z'), 'Europe/Paris');
 
-        expect(timestamp).to.be.at.least(Date.parse('2027-03-28T01:00:00.000Z'));
-        expect(parisTime(timestamp)).to.equal('28/03/2027, 03:30:00');
+        expect(new Date(timestamp).toISOString()).to.equal('2027-03-28T01:00:00.000Z');
+        expect(parisTime(timestamp)).to.equal('28/03/2027, 03:00:00');
+      });
+
+      it('should find the jump of a timezone whose clocks move by half an hour', () => {
+        // Lord Howe Island goes from 02:00 to 02:30 on the first Sunday of October.
+        const atQuarterPastTwo = [{ day_of_week: 6, time: '02:15', preset: 'comfort' }];
+
+        const timestamp = nextTransitionTimestamp(
+          atQuarterPastTwo,
+          new Date('2026-10-03T03:00:00.000Z'),
+          'Australia/Lord_Howe',
+        );
+
+        expect(new Date(timestamp).toISOString()).to.equal('2026-10-03T15:30:00.000Z');
       });
 
       it('should measure in the process timezone without a timezone, or with an unknown one', () => {
@@ -896,8 +909,21 @@ describe('thermostatSchedule.carriedPresetByDay', () => {
 });
 
 describe('thermostatSchedule.calendarDaysAhead', () => {
-  // Built on the runtime clock, like the widget that reads it.
-  const at = (day, hour, minute = 0) => new Date(2026, 9, day, hour, minute);
+  // Built on the runtime clock, like the widget that reads it. CI runs in UTC,
+  // where no clock ever changes: the process is moved to Paris for these.
+  const originalTimezone = process.env.TZ;
+  before(() => {
+    process.env.TZ = 'Europe/Paris';
+  });
+  after(() => {
+    if (originalTimezone === undefined) {
+      delete process.env.TZ;
+    } else {
+      process.env.TZ = originalTimezone;
+    }
+  });
+
+  const at = (day, hour, minute = 0, month = 9, year = 2026) => new Date(year, month, day, hour, minute);
 
   it('should count today as 0, whatever the hour', () => {
     expect(calendarDaysAhead(at(24, 23, 59).getTime(), at(24, 0, 1))).to.equal(0);
@@ -909,7 +935,14 @@ describe('thermostatSchedule.calendarDaysAhead', () => {
   });
 
   it('should count across the night the clocks go back', () => {
+    // 49 hours between the two midnights.
+    expect(new Date(2026, 9, 25, 12).getTimezoneOffset()).to.equal(-60);
     expect(calendarDaysAhead(at(26, 8).getTime(), at(24, 12))).to.equal(2);
+  });
+
+  it('should count across the night the clocks go forward', () => {
+    // 47 hours between the two midnights.
+    expect(calendarDaysAhead(at(29, 8, 0, 2, 2027).getTime(), at(27, 12, 0, 2, 2027))).to.equal(2);
   });
 });
 

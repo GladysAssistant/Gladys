@@ -54,12 +54,14 @@ const PRESET_NAMES = Object.keys(PRESET_VALUES).reduce((acc, name) => ({ ...acc,
 const HOLD_ANY_SETPOINT = Symbol('hold-any-setpoint');
 
 // The time a banner hands back at, with its day when it is not today: "until
-// 13:00" read as today for a hold ending at 13:00 tomorrow (forum 11074).
+// 13:00" read as today for a hold ending at 13:00 tomorrow (forum 11074). A
+// week ahead falls on today's weekday, which "next" tells apart from today.
 // `weekday` is 0 for Monday, as in a schedule.
 const untilText = (days, weekday, time, t) => {
   if (days === 0) return time;
   if (days === 1) return `${(t && t.untilTomorrow) || ''} ${time}`;
-  return `${(t && t.untilDays && t.untilDays[weekday]) || ''} ${time}`;
+  const names = days === 7 ? t && t.untilNextDays : t && t.untilDays;
+  return `${(names && names[weekday]) || ''} ${time}`;
 };
 
 // Parse a value as a finite number with a fallback — unlike `Number(x) || d`, a legitimate 0 is kept
@@ -84,6 +86,8 @@ class ThermostatBox extends Component {
     featureUnit: null,
     activeSchedule: null,
     manualUntil: null,
+    // The phone's day the hold banner was last drawn on (see refreshClock)
+    today: new Date().toDateString(),
     isWindowOpen: false,
     // Real state of the actuator, as reported by the switch feature. The widget
     // reflects it rather than recomputing it: hysteresis has a neutral zone where
@@ -997,11 +1001,22 @@ class ThermostatBox extends Component {
 
   // Local minute tick. The current point is resolved by the server, so this only
   // clears the countdown when it visually expires; the server's own event is
-  // what actually ends the hold.
+  // what actually ends the hold. The days the banners name go stale on their
+  // own, with nothing else to draw the card again: a wall panel still said
+  // "until tomorrow 06:30" at 03:00. The hold banner counts in the phone's day,
+  // drawn again when that day changes; the programme banner's count is the
+  // server's, loaded again once it says it no longer holds.
   refreshClock = () => {
-    const { manualUntil } = this.state;
-    if (manualUntil && Date.now() > manualUntil) {
+    const { manualUntil, activeSchedule, today } = this.state;
+    const now = Date.now();
+    if (manualUntil && now > manualUntil) {
       this.setState({ manualUntil: null });
+    } else if (manualUntil && today !== new Date(now).toDateString()) {
+      this.setState({ today: new Date(now).toDateString() });
+    }
+    const next = activeSchedule && activeSchedule.next;
+    if (next && next.refresh_at && now >= next.refresh_at) {
+      this.loadSchedule();
     }
   };
 

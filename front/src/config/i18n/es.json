@@ -950,6 +950,15 @@
           "5": "el sábado",
           "6": "el domingo"
         },
+        "untilNextDays": {
+          "0": "el próximo lunes",
+          "1": "el próximo martes",
+          "2": "el próximo miércoles",
+          "3": "el próximo jueves",
+          "4": "el próximo viernes",
+          "5": "el próximo sábado",
+          "6": "el próximo domingo"
+        },
         "cancelManual": "Cancelar el modo manual",
         "windowOpen": "Ventana abierta — calefacción suspendida",
         "windowOpenCooling": "Ventana abierta — refrigeración suspendida",

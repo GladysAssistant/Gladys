@@ -950,6 +950,15 @@
           "5": "Saturday",
           "6": "Sunday"
         },
+        "untilNextDays": {
+          "0": "next Monday",
+          "1": "next Tuesday",
+          "2": "next Wednesday",
+          "3": "next Thursday",
+          "4": "next Friday",
+          "5": "next Saturday",
+          "6": "next Sunday"
+        },
         "cancelManual": "Cancel manual mode",
         "windowOpen": "Window open — heating suspended",
         "windowOpenCooling": "Window open — cooling suspended",

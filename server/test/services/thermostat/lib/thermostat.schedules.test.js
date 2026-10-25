@@ -274,11 +274,15 @@ describe('thermostat schedules CRUD', () => {
         const later = await handler.getScheduleBySelector(selector);
         expect(later.next.day_of_week).to.equal(1);
         expect(later.next.days_ahead).to.equal(0);
+        // Valid until the point itself, Tuesday 06:30 in Paris.
+        expect(new Date(later.next.refresh_at).toISOString()).to.equal('2026-08-25T04:30:00.000Z');
 
         clock.setSystemTime(new Date('2026-08-25T05:00:00Z'));
         const tomorrow = await handler.getScheduleBySelector(selector);
         expect(tomorrow.next.day_of_week).to.equal(3);
         expect(tomorrow.next.days_ahead).to.equal(2);
+        // Valid until the house's next midnight, when Thursday becomes tomorrow.
+        expect(new Date(tomorrow.next.refresh_at).toISOString()).to.equal('2026-08-25T22:00:00.000Z');
       } finally {
         clock.restore();
         await db.Variable.destroy({ where: { name: 'TIMEZONE' } });
