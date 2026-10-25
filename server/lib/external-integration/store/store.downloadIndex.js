@@ -73,7 +73,9 @@ async function downloadIndex(url) {
  * entry as in the full index, complete manifest included) and check it is
  * the one asked for. The body is capped at MAX_STORE_ENTRY_BYTES: a complete
  * entry is a few kilobytes, a bigger file is not one (the full index served
- * at the wrong URL, a rogue file) and is refused before being buffered.
+ * at the wrong URL, a rogue file) and is refused before being buffered. No
+ * redirect is followed: the URL was accepted for its origin (getStoreEntryUrl),
+ * a redirect would send the core elsewhere.
  * @param {string} url - The URL of the per-integration file.
  * @param {string} storeSlug - The `owner/repo` slug the file must describe.
  * @returns {Promise<object|null>} Resolve with the entry, or null when the
@@ -84,7 +86,11 @@ async function downloadIndex(url) {
 async function downloadStoreEntry(url, storeSlug) {
   let data;
   try {
-    ({ data } = await axios.get(url, { timeout: STORE_HTTP_TIMEOUT_MS, maxContentLength: MAX_STORE_ENTRY_BYTES }));
+    ({ data } = await axios.get(url, {
+      timeout: STORE_HTTP_TIMEOUT_MS,
+      maxContentLength: MAX_STORE_ENTRY_BYTES,
+      maxRedirects: 0,
+    }));
   } catch (e) {
     if (e.response && e.response.status === 404) {
       return null;

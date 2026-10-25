@@ -799,6 +799,21 @@ describe('externalIntegration store', () => {
       expect(externalIntegration.storeEntryCache).to.equal(null);
     });
 
+    it('should not follow a redirect of the per-integration file', async () => {
+      // the URL was accepted for its origin: a redirect would bypass it
+      nock(INDEX_URL_ORIGIN)
+        .get(ENTRY_URL_PATH)
+        .reply(302, undefined, { Location: 'http://192.168.1.10:1443/api/v1/dashboard' });
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e.response.status).to.equal(302);
+      }
+      expect(externalIntegration.storeEntryCache).to.equal(null);
+    });
+
     it('should reject a per-integration file describing another integration', async () => {
       nock(INDEX_URL_ORIGIN)
         .get(ENTRY_URL_PATH)
