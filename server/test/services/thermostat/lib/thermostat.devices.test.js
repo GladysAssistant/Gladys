@@ -204,6 +204,20 @@ describe('thermostat.createDevice', () => {
     expect(created.params.find((param) => param.name === 'THERMOSTAT_MANUAL_SETPOINT').value).to.equal('21.5');
   });
 
+  // Wiped by a save, a stop made on the unit was never lifted at the next point.
+  it('should carry the end of a stop made on the unit over a save', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([
+      { selector: 'living-room', params: [{ name: 'THERMOSTAT_REMOTE_STOP_UNTIL', value: '1792000000000' }] },
+    ]);
+
+    const created = await handler.createDevice({ name: 'Salon', selector: 'living-room', features: [setpointFeature] });
+
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_REMOTE_STOP_UNTIL').value).to.equal(
+      '1792000000000',
+    );
+  });
+
   it('should let the caller clear a hold explicitly', async () => {
     const handler = buildHandler();
     handler.gladys.device.get = fake.resolves([

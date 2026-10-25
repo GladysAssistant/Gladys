@@ -1,9 +1,17 @@
 const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE } = require('../../../utils/constants');
+const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE, THERMOSTAT_PRESET } = require('../../../utils/constants');
 const { getThermostatFeature, stopExternalThermostat, findOpenWindow } = require('./thermostat.applySchedules');
 const { buildParamsConfig, getFeatureBySelector, getRunningMode, isExternal } = require('./thermostat.deviceConfig');
-const { holdExpiry } = require('./thermostat.setValue');
-const { getFeature, getManualHold, getPreset, isStopped, setManualHold } = require('./thermostat.state');
+const { holdExpiry, nextPointTimestamp } = require('./thermostat.setValue');
+const {
+  getFeature,
+  getManualHold,
+  getPreset,
+  isStopped,
+  setManualHold,
+  clearManualHold,
+  REMOTE_STOP_UNTIL_PARAM,
+} = require('./thermostat.state');
 const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
 const { getCurrentPoint } = require('./thermostat.getSchedules');
 
@@ -119,11 +127,12 @@ async function getPowerSelectors() {
  * @param {Set<string>} selectors - The selectors driven now.
  * @param {Map<string, number>} observed - The last value observed on each selector.
  * @param {Map<string, number>} selfWritten - The last value this service wrote on each selector.
+ * @param {boolean} [seed] - False to only forget the marks, and seed nothing.
  * @returns {Promise<void>}
  * @example
  * await seedObservedValues(gladys, targetSelectors, observedSetpoints, selfWrittenSetpoints);
  */
-async function seedObservedValues(gladys, selectors, observed, selfWritten) {
+async function seedObservedValues(gladys, selectors, observed, selfWritten, seed = true) {
   // A selector no thermostat drives any more has nothing left to compare
   // against, and its marks would only accumulate.
   [...observed.keys()]
@@ -132,6 +141,9 @@ async function seedObservedValues(gladys, selectors, observed, selfWritten) {
       observed.delete(selector);
       selfWritten.delete(selector);
     });
+  if (!seed) {
+    return;
+  }
   await Promise.all(
     [...selectors].map(async (selector) => {
       // A thermostat driven since the service started already has a reference,
@@ -175,9 +187,12 @@ async function seedObservedValues(gladys, selectors, observed, selfWritten) {
  * persists that report on the same event, so a read from the listener races the
  * write and may come back already carrying the new value.
  *
- * The power of an air conditioner needs the same reference, for the same
- * reason: a unit re-reporting after a restart the power the programme had cut
- * must not read as a unit switched off from its remote.
+ * The power of an air conditioner is not seeded, only pruned: its first report
+ * after a start establishes the reference. A whole house losing power restarts
+ * Gladys and the unit together, and the unit comes back off: compared with the
+ * stored `1`, that report read as the unit switched off from its remote, and
+ * stopped the heating. Missing a remote press made while Gladys was down costs
+ * one pass powering the unit on again; that stop cost the heating.
  * @returns {Promise<void>}
  * @example
  * await thermostatHandler.primeObservedSetpoints();
@@ -187,7 +202,7 @@ async function primeObservedSetpoints() {
     const targetSelectors = await getTargetSelectors.call(this);
     const powerSelectors = await getPowerSelectors.call(this);
     await seedObservedValues(this.gladys, targetSelectors, this.observedSetpoints, this.selfWrittenSetpoints);
-    await seedObservedValues(this.gladys, powerSelectors, this.observedPowers, this.selfWrittenPowers);
+    await seedObservedValues(this.gladys, powerSelectors, this.observedPowers, this.selfWrittenPowers, false);
   } catch (e) {
     // Never block the service from starting: without a reference the listener
     // simply establishes one on the first report, which is the previous
@@ -380,13 +395,66 @@ async function holdRemoteStartOnOffPoint(device) {
 }
 
 /**
+ * @description Follow a unit switched off from its remote, or its vendor app.
+ *
+ * - **During an Off point** of the programme the thermostat follows, the unit
+ *   was only on because someone switched it on (holdRemoteStartOnOffPoint) or
+ *   picked a preset: that decision is undone, the hold and the preset go, and
+ *   the Off point keeps the unit off until the next point. Stopping the
+ *   thermostat there left it stopped past that point: Comfort at 06:00 never
+ *   started, then or on any day after.
+ * - **On any other point**, the thermostat is stopped until the programme's
+ *   next point, which starts it again (regulateDevice). A report of a power cut
+ *   is also what a write that timed out after the unit obeyed, or a unit coming
+ *   back off after a power cut, looks like: kept like the widget's Off, that
+ *   stop left the house without heating until someone noticed.
+ * - **Without a programme**, or on one with no point, there is no next point to
+ *   start it again: it is stopped like the widget's Off, until the remote or
+ *   Gladys starts it.
+ * @param {object} device - The thermostat the unit belongs to.
+ * @param {object} modeFeature - Its mode feature.
+ * @returns {Promise<void>}
+ * @example
+ * await stopFromUnit.call(handler, device, modeFeature);
+ */
+async function stopFromUnit(device, modeFeature) {
+  const schedule = await getScheduleOfDevice(device.id);
+  const point = schedule ? await getCurrentPoint(schedule.id) : null;
+  if (point && point.preset === 'off') {
+    const presetFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
+    const preset = getPreset(device);
+    if (presetFeature && preset !== null && preset !== 'schedule') {
+      logger.info(`Thermostat: ${device.selector} switched off from the device during an Off point, back to it`);
+      // Back to the programme, which drops the hold with the preset.
+      await this.setValue(device, presetFeature, THERMOSTAT_PRESET.SCHEDULE);
+    } else if (getManualHold(device)) {
+      logger.info(`Thermostat: ${device.selector} switched off from the device during an Off point, hold dropped`);
+      await clearManualHold.call(this, device);
+      this.triggerApplySchedules();
+    }
+    return;
+  }
+  const until = schedule ? await nextPointTimestamp.call(this, schedule.transitions) : null;
+  logger.info(
+    `Thermostat: ${device.selector} powered off from the device itself, stopped ` +
+      `${until ? `until ${new Date(until).toISOString()}` : 'until started again'}`,
+  );
+  await this.setValue(device, modeFeature, THERMOSTAT_MODE.OFF);
+  // After the stop, which lifts any end a previous stop had.
+  if (until !== null) {
+    await this.gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, String(until));
+  }
+}
+
+/**
  * @description Follow a power switched on the real device itself — an air
  * conditioner's remote, its vendor app.
  *
  * Without this the minute loop powers a unit switched off from its remote back
  * on within a minute, for as long as a preset or a hold is in force. A power cut
- * on the device stops the thermostat exactly like its Off button in the widget,
- * and powering a stopped unit on from its remote starts the thermostat again.
+ * on the device stops the thermostat until the programme's next point
+ * (stopFromUnit), and powering a stopped unit on from its remote starts the
+ * thermostat again.
  * A change is told apart from the reports of the powers this service wrote by
  * the same two marks as a setpoint (C.0.1).
  * @param {string} changedSelector - Selector of the feature that changed.
@@ -429,8 +497,7 @@ async function onExternalPowerChanged(changedSelector, newValue) {
         // the start then follow the one path the widget and the scenes take
         // (D.0) — the hold dropped on a stop, the programme's own stop lifted.
         if (value === 0 && !isStopped(device)) {
-          logger.info(`Thermostat: ${changedSelector} powered off from the device itself, stopping ${device.selector}`);
-          await this.setValue(device, modeFeature, THERMOSTAT_MODE.OFF);
+          await stopFromUnit.call(this, device, modeFeature);
         } else if (value !== 0 && isStopped(device)) {
           logger.info(`Thermostat: ${changedSelector} powered on from the device itself, starting ${device.selector}`);
           // Before the start: it triggers the regulation pass, which must find

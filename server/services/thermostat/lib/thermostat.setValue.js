@@ -5,11 +5,12 @@ const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = requir
 const {
   startExternalThermostat,
   stopExternalThermostat,
+  runningPowerFeatures,
   getSetpointForPreset,
   convertSetpointToFeatureUnit,
   DEFAULT_TIMEZONE,
 } = require('./thermostat.applySchedules');
-const { getScheduleOfDevice, clearScheduleStop } = require('./thermostat.scheduleDevice');
+const { getScheduleOfDevice, clearScheduleStop, clearRemoteStop } = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
 const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
 
@@ -98,6 +99,23 @@ async function writeSetpoint(device, deviceFeature, value) {
 }
 
 /**
+ * @description When a programme's next point falls, read in the Gladys timezone.
+ * A schedule's points are wall-clock times in the house (C.1), so the next one
+ * has to be found there — not in the timezone the process happens to run in,
+ * which is UTC in the official image. Reading them there put the expiry two
+ * hours off in Paris, and on the wrong point entirely across midnight.
+ * @param {Array} transitions - The programme's points.
+ * @returns {Promise<number|null>} The timestamp of the next point, or null with no point.
+ * @example
+ * await nextPointTimestamp.call(this, link.transitions);
+ */
+async function nextPointTimestamp(transitions) {
+  const timezone =
+    (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
+  return nextTransitionTimestamp(transitions, new Date(), timezone);
+}
+
+/**
  * @description When a manual hold ends, or null when it is permanent.
  *
  * A hold expires only on a thermostat that follows a schedule: that is the only
@@ -125,14 +143,7 @@ async function holdExpiry(device) {
   if (configuredDuration !== null) {
     return Date.now() + configuredDuration * 60 * 1000;
   }
-  // A schedule's points are wall-clock times in the house (C.1), so the next one
-  // has to be found in the Gladys timezone — not in the one the process happens
-  // to run in, which is UTC in the official image. Reading them there put the
-  // expiry two hours off in Paris, and on the wrong point entirely across
-  // midnight.
-  const timezone =
-    (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
-  const nextTransition = nextTransitionTimestamp(link.transitions, new Date(), timezone);
+  const nextTransition = await nextPointTimestamp.call(this, link.transitions);
   if (nextTransition !== null) {
     return nextTransition;
   }
@@ -195,13 +206,21 @@ async function setValue(device, deviceFeature, value, manual = true) {
     const starting = isStopped(device) && Number(value) !== THERMOSTAT_MODE.OFF;
     await this.gladys.device.saveState(deviceFeature, value);
     // Whoever writes the mode now owns the stop, or the start: a stop the
-    // programme left behind is no longer the programme's to lift.
+    // programme, or the unit's remote, left behind is no longer theirs to lift.
     await clearScheduleStop(device.id);
+    await clearRemoteStop(device.id);
     const config = buildParamsConfig(device) || {};
     if (Number(value) === THERMOSTAT_MODE.OFF) {
       // Stopping is not a preset with a setpoint: it cuts the switch on a
       // virtual thermostat, and stops the real one on an external device.
-      if (isExternal(config)) {
+      // A unit another thermostat runs is left to it (runningPowerFeatures).
+      const sharedPower =
+        isExternal(config) &&
+        config.power_feature &&
+        runningPowerFeatures(await this.gladys.device.get({ service: 'thermostat' }), device.id).has(
+          config.power_feature,
+        );
+      if (isExternal(config) && !sharedPower) {
         await stopExternalThermostat(
           this.gladys,
           config,
@@ -243,4 +262,4 @@ async function setValue(device, deviceFeature, value, manual = true) {
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry, presetHoldSetpoint };
+module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint };

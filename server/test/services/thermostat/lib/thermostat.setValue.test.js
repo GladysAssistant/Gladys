@@ -23,11 +23,13 @@ const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 // thermostat that follows none, whose hold is permanent.
 // Cleared in the database, which the scheduleDevice tests exercise for real.
 const clearScheduleStop = fake.resolves(null);
+const clearRemoteStop = fake.resolves(null);
 
 const load = (follows = true) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
     './thermostat.scheduleDevice': {
       clearScheduleStop,
+      clearRemoteStop,
       followsSchedule: fake.resolves(follows),
       getScheduleOfDevice: fake.resolves(
         follows ? { transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }] } : null,
@@ -433,6 +435,53 @@ describe('thermostat.setValue', () => {
       expect(writes).to.deep.equal([THERMOSTAT_MODE.OFF, 7]);
     });
 
+    // One thermostat per mode on the same unit: stopping the heating one in
+    // summer must not switch off the unit the cooling one runs.
+    describe('on a unit another thermostat runs', () => {
+      const powered = (power) =>
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+          { name: 'THERMOSTAT_POWER_FEATURE', value: power },
+        ]);
+      const other = (mode) => ({
+        id: 'other-id',
+        selector: 'other-thermostat',
+        features: [{ ...modeFeature, last_value: mode }],
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+        ],
+      });
+      const withOther = (handler, mode) => {
+        const { get } = handler.gladys.device;
+        handler.gladys.device.get = fake((query) =>
+          query && query.service === 'thermostat' ? Promise.resolve([other(mode)]) : get(query),
+        );
+        return handler;
+      };
+
+      it('should leave the unit to the running thermostat', async () => {
+        const handler = withOther(buildHandler(true, THERMOSTAT_MODE.HEATING), THERMOSTAT_MODE.COOLING);
+
+        await handler.setValue(powered('netatmo-power'), modeFeature, THERMOSTAT_MODE.OFF);
+
+        assert.notCalled(handler.gladys.device.setValue);
+        assert.calledWith(handler.gladys.device.saveState, modeFeature, THERMOSTAT_MODE.OFF);
+      });
+
+      it('should stop the unit when the other thermostat is stopped too', async () => {
+        const handler = withOther(buildHandler(true, THERMOSTAT_MODE.HEATING), THERMOSTAT_MODE.OFF);
+
+        await handler.setValue(powered('netatmo-power'), modeFeature, THERMOSTAT_MODE.OFF);
+
+        const writes = handler.gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+        expect(writes).to.deep.include(['netatmo-mode', THERMOSTAT_MODE.OFF]);
+      });
+    });
+
     it('should stop a cooling thermostat from the top of its range', async () => {
       // The frost setpoint asked an air conditioner to cool as hard as it can,
       // which it did whenever the mode write did not land.
@@ -548,10 +597,13 @@ describe('thermostat.setValue', () => {
       // in-memory one, whose params do not carry the mark.
       const handler = buildHandler();
       clearScheduleStop.resetHistory();
+      clearRemoteStop.resetHistory();
 
       await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
 
       assert.calledOnceWithExactly(clearScheduleStop, 'device-id');
+      // A stop made on the unit, too: it no longer ends on the next point.
+      assert.calledOnceWithExactly(clearRemoteStop, 'device-id');
     });
   });
 

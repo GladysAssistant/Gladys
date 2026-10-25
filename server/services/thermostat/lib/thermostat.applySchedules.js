@@ -21,6 +21,8 @@ const {
 const { followsSchedule } = require('./thermostat.scheduleDevice');
 const {
   isStopped,
+  getRemoteStopUntil,
+  getFeature,
   getPreset,
   savePreset,
   announcePreset,
@@ -29,6 +31,7 @@ const {
   getManualHold,
   setManualHold,
   clearManualHold,
+  REMOTE_STOP_UNTIL_PARAM,
 } = require('./thermostat.state');
 const {
   parseEnd,
@@ -413,10 +416,12 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext,
     }
     return true;
   } catch (e) {
-    // The write never reached the device, so no echo will come back to match.
-    if (selfWritten) {
-      selfWritten.delete(switchSelector);
-    }
+    // The mark stays: a failed write may still have reached the unit — the core
+    // gives up after 5 s, and a cloud like MELCloud obeys after that — and its
+    // report must still read as this service's. Dropped, a stop that had worked
+    // came back as a unit switched off from its remote. A write that really got
+    // nowhere leaves the unit as it was, whose reports then match the reference
+    // and arm nothing.
     logger.warn(`Thermostat schedule: Failed to actuate switch: ${e.message}`);
     return false;
   }
@@ -620,6 +625,55 @@ function computeSwitchActive(currentTemp, setpoint, mode, config, currentSwitchO
 }
 
 /**
+ * @description The power features of the external thermostats that are not
+ * stopped. Two thermostats may drive one unit — one per mode, or one per
+ * setpoint of a reversible device (G) — and a stopped one cut, on every pass,
+ * the power the running one handed back: the unit switched off and on once a
+ * minute. A power in this set is the running thermostat's to switch.
+ * @param {Array} devices - The thermostats.
+ * @param {string} [exceptId] - A thermostat to leave out.
+ * @returns {Set<string>} The power selectors.
+ * @example
+ * runningPowerFeatures(await gladys.device.get({ service: 'thermostat' }), device.id);
+ */
+function runningPowerFeatures(devices, exceptId = null) {
+  const powers = new Set();
+  (devices || []).forEach((device) => {
+    const config = getDeviceConfig(device);
+    if (device.id !== exceptId && isExternal(config) && config.power_feature && !isStopped(device)) {
+      powers.add(config.power_feature);
+    }
+  });
+  return powers;
+}
+
+/**
+ * @description Start a thermostat again once the stop made on its unit has run
+ * to the programme's next point (C.0.1): the programme then takes it over, as it
+ * would have without the stop.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} device - The thermostat device.
+ * @param {object} config - Its config.
+ * @returns {Promise<boolean>} True when the thermostat was started again.
+ * @example
+ * await liftRemoteStop(gladys, device, config);
+ */
+async function liftRemoteStop(gladys, device, config) {
+  const until = getRemoteStopUntil(device);
+  if (until === null || Date.now() < until) {
+    return false;
+  }
+  await gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, '');
+  const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+  if (!modeFeature || !isStopped(device)) {
+    return false;
+  }
+  await gladys.device.saveState(modeFeature, getRunningMode(config));
+  logger.info(`Thermostat schedule: ${device.selector} started again, the stop made on its unit ran to the next point`);
+  return true;
+}
+
+/**
  * @description Regulate a single thermostat device: window check, manual mode,
  * schedule/preset resolution and switch actuation.
  * @param {object} gladys - Gladys instance.
@@ -630,6 +684,7 @@ function computeSwitchActive(currentTemp, setpoint, mode, config, currentSwitchO
  * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
  * @param {Map<string, string>} [announced] - The programme preset last announced for each thermostat.
  * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
+ * @param {Set<string>} [runningPowers] - The powers a running thermostat switches (runningPowerFeatures).
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
@@ -643,6 +698,7 @@ async function regulateDevice(
   selfWritten = null,
   announced = null,
   selfWrittenPowers = null,
+  runningPowers = null,
 ) {
   const config = getDeviceConfig(device);
   if (!config) {
@@ -688,11 +744,16 @@ async function regulateDevice(
   // Stopped by hand: the machine is off, which outranks the programme. Without
   // this the pass triggered by the stop itself would resolve the schedule's
   // preset and start the heating again within seconds — the stop would undo
-  // itself. It holds until a mode is written back.
-  if (isStopped(device)) {
+  // itself. It holds until a mode is written back, or for a stop made on the
+  // unit, until the programme's next point.
+  const lifted = await liftRemoteStop(gladys, device, config);
+  if (!lifted && isStopped(device)) {
     logger.debug(`Thermostat schedule: ${selector} is stopped, leaving it alone`);
     await saveActivePreset.call({ gladys }, device, 'off');
-    if (external) {
+    if (external && runningPowers && runningPowers.has(config.power_feature)) {
+      // Another thermostat runs this unit: it is the one to switch it.
+      logger.debug(`Thermostat schedule: ${selector} is stopped, its unit is another thermostat's to run`);
+    } else if (external) {
       await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten, selfWrittenPowers);
     } else if (config.switch_feature) {
       await actuateSwitch(gladys, config.switch_feature, false, `mode=off, ${selector}`);
@@ -1028,6 +1089,8 @@ async function applySchedules() {
       (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
     const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
 
+    const runningPowers = runningPowerFeatures(thermostatDevices);
+
     await Promise.all(
       thermostatDevices.map(async (device) => {
         try {
@@ -1041,6 +1104,7 @@ async function applySchedules() {
             selfWrittenSetpoints,
             announcedPresets,
             selfWrittenPowers,
+            runningPowers,
           );
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);
@@ -1061,6 +1125,7 @@ module.exports = {
   writeExternalMode,
   stopExternalThermostat,
   startExternalThermostat,
+  runningPowerFeatures,
   getRunningMode,
   readTemperatureInThermostatUnit,
   readAverageTemperature,

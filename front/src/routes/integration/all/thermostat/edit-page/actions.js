@@ -76,7 +76,7 @@ function createActions(store) {
             if (HUMIDITY_CATEGORIES.includes(feature.category)) {
               humidityFeatures.push(entry);
             }
-            if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === 'binary') {
+            if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
               // The actuator has to be writable: a read-only switch — Netatmo's
               // boiler contact, for one — was offered as something to drive, and
               // every write onto it would be refused. It stays eligible as a

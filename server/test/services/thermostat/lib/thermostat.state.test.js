@@ -128,6 +128,22 @@ describe('thermostat.state isScheduleStop', () => {
   });
 });
 
+describe('thermostat.state getRemoteStopUntil', () => {
+  it('should read when a stop made on the unit ends', () => {
+    expect(
+      state.getRemoteStopUntil({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value: '1792000000000' }] }),
+    ).to.equal(1792000000000);
+  });
+
+  it('should be null when there is no such stop, or no readable end', () => {
+    expect(state.getRemoteStopUntil({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value: '' }] })).to.equal(null);
+    expect(state.getRemoteStopUntil({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value: 'soon' }] })).to.equal(
+      null,
+    );
+    expect(state.getRemoteStopUntil({})).to.equal(null);
+  });
+});
+
 describe('thermostat.state savePreset', () => {
   afterEach(() => sinon.restore());
 

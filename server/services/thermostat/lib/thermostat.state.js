@@ -26,6 +26,14 @@ const MANUAL_UNTIL_PARAM = 'THERMOSTAT_MANUAL_UNTIL';
 // the stop, or the start, the writer's own.
 const SCHEDULE_STOP_PARAM = 'THERMOSTAT_SCHEDULE_STOP';
 
+// A stop made on the unit itself — its remote, its vendor app — on a thermostat
+// following a programme: when it ends, as a timestamp, the programme's next
+// point. A stop that nobody made looks the same from here (a write that timed
+// out after the unit obeyed, a unit coming back off after a power cut), and
+// kept like the widget's it left the house without heating until someone
+// noticed (C.0.1). Any mode written on the thermostat lifts it sooner.
+const REMOTE_STOP_UNTIL_PARAM = 'THERMOSTAT_REMOTE_STOP_UNTIL';
+
 // THERMOSTAT_PRESET is an integer enum on the feature, while a schedule
 // transition and the THERMOSTAT_PRESET_* params name their preset. This is the
 // one place that maps between the two.
@@ -177,6 +185,21 @@ function alreadyHolds(feature, value) {
 function isScheduleStop(device) {
   const params = (device && device.params) || [];
   return params.some((param) => param.name === SCHEDULE_STOP_PARAM && param.value === 'true');
+}
+
+/**
+ * @description When a stop made on the unit itself ends, or null when the stop
+ * is not one, or is kept until someone starts the thermostat again.
+ * @param {object} device - The thermostat device.
+ * @returns {number|null} The timestamp the stop ends at, or null.
+ * @example
+ * getRemoteStopUntil(device);
+ */
+function getRemoteStopUntil(device) {
+  const params = (device && device.params) || [];
+  const param = params.find((candidate) => candidate.name === REMOTE_STOP_UNTIL_PARAM);
+  const until = param && param.value ? Number(param.value) : null;
+  return Number.isFinite(until) ? until : null;
 }
 
 /**
@@ -371,6 +394,7 @@ module.exports = {
   getFeature,
   isStopped,
   isScheduleStop,
+  getRemoteStopUntil,
   getPreset,
   savePreset,
   announcePreset,
@@ -388,4 +412,5 @@ module.exports = {
   MANUAL_SETPOINT_PARAM,
   MANUAL_UNTIL_PARAM,
   SCHEDULE_STOP_PARAM,
+  REMOTE_STOP_UNTIL_PARAM,
 };
