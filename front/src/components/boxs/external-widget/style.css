@@ -486,7 +486,6 @@
   color: #fff;
 }
 
-.buttonPrimary .buttonIcon,
 .buttonPrimary .buttonDomain {
   color: #fff;
 }
@@ -497,18 +496,16 @@
   color: #d4593f;
 }
 
-.buttonDanger .buttonIcon {
-  color: #d4593f;
-}
-
 .buttonActive {
   background-color: #def0e2;
   border-color: transparent;
   color: #2e8f5b;
 }
 
+.buttonPrimary .buttonIcon,
+.buttonDanger .buttonIcon,
 .buttonActive .buttonIcon {
-  color: #2e8f5b;
+  color: inherit;
 }
 
 /* only the loader of a pending request spins: a device button disabled
@@ -606,7 +603,7 @@
 }
 
 :global(.glass-theme) .tileIcon,
-:global(.glass-theme) .buttonIcon,
+:global(.glass-theme) .button:not(.buttonPrimary):not(.buttonDanger):not(.buttonActive) .buttonIcon,
 :global(.glass-theme) .actionFormTitle :global(.fe),
 :global(.glass-theme) .colorPrimary {
   color: var(--gl-accent);
@@ -654,18 +651,15 @@
   color: #fff;
 }
 
-:global(.glass-theme) .buttonPrimary .buttonIcon {
-  color: #fff;
-}
-
-:global(.glass-theme) .buttonActive {
-  background-color: #def0e2;
-  color: #2e8f5b;
-}
-
 :global(.glass-theme) .buttonDanger {
   background-color: #fbe3de;
   color: #d4593f;
+}
+
+/* Active device state takes precedence over the declared button style. */
+:global(.glass-theme) .buttonActive {
+  background-color: #def0e2;
+  color: #2e8f5b;
 }
 
 :global(.glass-theme) .imageFrame,
