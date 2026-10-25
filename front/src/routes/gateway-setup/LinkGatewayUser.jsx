@@ -23,11 +23,11 @@ const UserNotAcceptedLocally = props => {
       <p>
         <Text id={`gatewayLinkUser.${texts.intro}`} />
       </p>
-      {!props.isGatewayAdmin && (
-        <div class="alert alert-info">
-          <Text id="gatewayLinkUser.notAcceptedAskAdmin" />
-        </div>
-      )}
+      {/* shown to everyone: the Gladys Plus role says nothing about the role on the instance,
+          and the instance does not tell a rejected user their local role */}
+      <div class="alert alert-info">
+        <Text id="gatewayLinkUser.notAcceptedAskAdmin" />
+      </div>
       <ol class="pl-4">
         <li class="mb-2">
           <MarkupText id="gatewayLinkUser.noInstanceFoundStepOpenLocalInstance" />

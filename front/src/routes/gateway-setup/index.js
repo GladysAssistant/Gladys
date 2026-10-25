@@ -66,11 +66,6 @@ class LinkGatewayUser extends Component {
     try {
       // We get the gateway user to check if they are already linked to a Gladys local user
       const gatewayUser = await this.props.session.gatewayClient.getMyself();
-      if (gatewayUser) {
-        // only an admin of the instance can authorize a user: the page tells the other
-        // members of the household to ask them
-        this.setState({ gatewayUserRole: gatewayUser.role });
-      }
 
       // If the gateway gladys_4_user_id is defined and is equal to a local user, we redirect
       // automatically to the dashboard, as it's not necessary to select a user again
@@ -127,15 +122,7 @@ class LinkGatewayUser extends Component {
   }
   render(
     props,
-    {
-      savingUserLoading,
-      error,
-      errorNotAcceptedLocally,
-      notAcceptedLocallyReason,
-      stillNotAcceptedLocally,
-      gatewayUserRole,
-      retrying
-    }
+    { savingUserLoading, error, errorNotAcceptedLocally, notAcceptedLocallyReason, stillNotAcceptedLocally, retrying }
   ) {
     const loading = savingUserLoading || retrying || props.usersGetStatus === RequestStatus.Getting;
     // While retrying, we keep displaying the step-by-step guide (under the loading
@@ -152,7 +139,6 @@ class LinkGatewayUser extends Component {
         errorNotAcceptedLocally={errorNotAcceptedLocally}
         notAcceptedLocallyReason={notAcceptedLocallyReason}
         stillNotAcceptedLocally={stillNotAcceptedLocally}
-        isGatewayAdmin={gatewayUserRole === 'admin'}
         keysFingerprints={props.session.getKeysFingerprints()}
         selectUser={this.selectUser}
         saveUser={this.saveUser}
