@@ -31,6 +31,9 @@ const STORE_INDEX_LITE_URL = 'https://integration-store-storage.gladysassistant.
 const STORE_ENTRY_PATH = 'integrations/';
 // a complete entry is a few kilobytes, like the server's MAX_STORE_ENTRY_BYTES
 const MAX_STORE_ENTRY_BYTES = 1024 * 1024;
+// an `owner/repo` slug, like the server's STORE_SLUG_REGEX: one path segment
+// each, so a slug never derives a URL outside integrations/
+const STORE_SLUG_REGEX = /^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+$/;
 // Index format this file knows how to read, like the server's
 // SUPPORTED_INDEX_FORMAT: a future breaking format must not be displayed wrong
 const SUPPORTED_INDEX_FORMAT = 1;
@@ -218,6 +221,9 @@ const getStoreEntryUrl = (storeSlug, entryUrl) => {
  * the server does. A 404 means "not in the store".
  */
 const fetchStoreEntry = async storeSlug => {
+  if (!STORE_SLUG_REGEX.test(storeSlug)) {
+    throw httpError(`${storeSlug} is not in the store`, 404);
+  }
   const entries = await getIndex();
   const liteEntry = entries.find(candidate => candidate.store_slug === storeSlug);
   const url = getStoreEntryUrl(storeSlug, liteEntry ? liteEntry.entry_url : null);

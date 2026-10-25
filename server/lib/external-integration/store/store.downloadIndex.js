@@ -4,6 +4,7 @@ const {
   DEFAULT_STORE_INDEX_LITE_URL,
   STORE_ENTRY_PATH,
   MAX_STORE_ENTRY_BYTES,
+  STORE_SLUG_REGEX,
   STORE_INDEX_LITE_MANIFEST_FIELDS,
   SUPPORTED_INDEX_FORMAT,
   STORE_HTTP_TIMEOUT_MS,
@@ -34,7 +35,9 @@ function getStoreIndexUrls() {
  * `entry_url` of its lite entry when it points at the origin of the
  * configured lite index — the index is unmoderated external data, it must not
  * send the core to an arbitrary host — else derived from the store layout
- * (`integrations/<owner>--<repo>.json` next to the index).
+ * (`integrations/<owner>--<repo>.json` next to the index). The slug must be
+ * an `owner/repo` pair (STORE_SLUG_REGEX): anything else is refused before
+ * any URL is built from it.
  * @param {string} storeSlug - The `owner/repo` slug of the store entry.
  * @param {string} [entryUrl] - The `entry_url` of the lite entry, if any.
  * @returns {string} The URL of the per-integration file.
@@ -42,6 +45,9 @@ function getStoreIndexUrls() {
  * const url = getStoreEntryUrl('john/gladys-open-meteo-demo', liteEntry.entry_url);
  */
 function getStoreEntryUrl(storeSlug, entryUrl = null) {
+  if (typeof storeSlug !== 'string' || !STORE_SLUG_REGEX.test(storeSlug)) {
+    throw new Error('INVALID_STORE_SLUG');
+  }
   const { liteIndexUrl } = getStoreIndexUrls();
   if (typeof entryUrl === 'string') {
     try {

@@ -638,6 +638,16 @@ describe('externalIntegration store', () => {
       );
     });
 
+    it('should refuse a value that is not an owner/repo slug', () => {
+      // `a/../../b` would otherwise derive a URL outside integrations/
+      ['a/../../b', 'john', 'john/repo/extra', 'john/re po', '', 42, null, undefined].forEach((slug) => {
+        expect(() => getStoreEntryUrl(slug)).to.throw('INVALID_STORE_SLUG');
+      });
+      expect(getStoreEntryUrl('John-Doe/gladys_open.meteo-demo')).to.equal(
+        `${INDEX_URL_ORIGIN}/integrations/John-Doe--gladys_open.meteo-demo.json`,
+      );
+    });
+
     it('should honour an entry_url on the origin of the lite index only', () => {
       expect(getStoreEntryUrl('john/gladys-open-meteo-demo', `${INDEX_URL_ORIGIN}/elsewhere/john.json`)).to.equal(
         `${INDEX_URL_ORIGIN}/elsewhere/john.json`,
@@ -766,6 +776,13 @@ describe('externalIntegration store', () => {
       const { externalIntegration } = buildSupervisorWithIndex();
       const entry = await externalIntegration.getStoreEntry('nobody/gladys-unknown');
       expect(entry).to.equal(null);
+      expect(externalIntegration.storeEntryCache).to.equal(null);
+    });
+
+    it('should resolve a value that is not an owner/repo slug to "not in the store", without any request', async () => {
+      const { externalIntegration } = buildSupervisorWithIndex();
+      expect(await externalIntegration.getStoreEntry('a/../../b')).to.equal(null);
+      expect(await externalIntegration.getStoreEntry(42)).to.equal(null);
       expect(externalIntegration.storeEntryCache).to.equal(null);
     });
 

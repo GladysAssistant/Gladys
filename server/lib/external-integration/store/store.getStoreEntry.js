@@ -1,4 +1,4 @@
-const { STORE_INDEX_TTL_MS } = require('./store.constants');
+const { STORE_INDEX_TTL_MS, STORE_SLUG_REGEX } = require('./store.constants');
 const { getStoreEntryUrl, downloadStoreEntry } = require('./store.downloadIndex');
 
 /**
@@ -15,11 +15,15 @@ const { getStoreEntryUrl, downloadStoreEntry } = require('./store.downloadIndex'
  * @param {object} [options] - Options.
  * @param {boolean} [options.refresh] - Ignore the cached entry.
  * @returns {Promise<object|null>} Resolve with the entry, or null when the
- * integration is not in the store.
+ * integration is not in the store (a value that is not an `owner/repo` slug
+ * names nothing there either).
  * @example
  * const entry = await gladys.externalIntegration.getStoreEntry('john/gladys-open-meteo-demo');
  */
 async function getStoreEntry(storeSlug, { refresh = false } = {}) {
+  if (typeof storeSlug !== 'string' || !STORE_SLUG_REGEX.test(storeSlug)) {
+    return null;
+  }
   const cached = this.storeEntryCache;
   if (
     !refresh &&

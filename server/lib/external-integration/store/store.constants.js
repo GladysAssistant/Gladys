@@ -16,6 +16,9 @@ const DEFAULT_STORE_INDEX_LITE_URL = 'https://integration-store-storage.gladysas
 // entry does not carry a usable `entry_url` (a cache written by an older
 // indexer or core, an integration not crawled yet, a URL on another origin).
 const STORE_ENTRY_PATH = 'integrations/';
+// Shape of a store slug (`owner/repo`, the GitHub repository): one path
+// segment each, so a slug can never derive a URL outside `integrations/`.
+const STORE_SLUG_REGEX = /^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+$/;
 // A complete entry is a few kilobytes: the cap only protects against a
 // mis-pointed URL (the full index again) or a rogue file.
 const MAX_STORE_ENTRY_BYTES = 1024 * 1024;
@@ -52,6 +55,7 @@ module.exports = {
   DEFAULT_STORE_INDEX_LITE_URL,
   STORE_ENTRY_PATH,
   MAX_STORE_ENTRY_BYTES,
+  STORE_SLUG_REGEX,
   STORE_INDEX_LITE_MANIFEST_FIELDS,
   STORE_INDEX_CACHE_VARIABLE,
   STORE_INDEX_TTL_MS,
