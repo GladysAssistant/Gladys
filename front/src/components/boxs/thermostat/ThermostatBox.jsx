@@ -84,7 +84,12 @@ class ThermostatBox extends Component {
     // (see writeMode). Read before the device's own mode, so a tap on Off or on
     // a way out of it shows at once, and a reload already in flight when the
     // user tapped cannot bring the old mode back.
-    pendingMode: null
+    pendingMode: null,
+    // Whether the first load has settled the setpoint. Until then the gauge
+    // jumps rather than glides: on a °F feature under a °C thermostat it is
+    // first drawn on the unconverted value, then corrected once the feature's
+    // unit is read, and that correction is no change of setpoint.
+    setpointLoaded: false
   };
 
   svgRef = null;
@@ -965,6 +970,7 @@ class ThermostatBox extends Component {
       this.setState({ setpoint: this.toSetpointFeatureUnit(scheduledTemp) });
     }
     this.applyFallbackSetpoint();
+    this.setState({ setpointLoaded: true });
   };
 
   // A thermostat that has never been driven has no setpoint anywhere: its
@@ -1384,7 +1390,7 @@ class ThermostatBox extends Component {
                   <CircularGauge
                     key={`gauge-${mode}`}
                     setpoint={displaySetpoint}
-                    animate={!this.state.isDragging}
+                    animate={!this.state.isDragging && this.state.setpointLoaded}
                     currentTemp={displayCurrentTemp}
                     humidity={humidity}
                     onPointerDown={this.onPointerDown}

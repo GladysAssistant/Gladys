@@ -38,10 +38,22 @@ const SETPOINT_ANIMATION_MS = 450;
 
 const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
 
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' &&
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// One query for every gauge, created on first use: its `matches` follows the
+// system setting live, and evaluating a new one on each render ran it about 27
+// times per animation per gauge.
+let reducedMotionQuery = null;
+const prefersReducedMotion = () => {
+  if (reducedMotionQuery === null) {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return false;
+    }
+    reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  }
+  return reducedMotionQuery.matches;
+};
+
+// The step a setpoint is set in, from the widget's + and − buttons.
+const SETPOINT_STEP = 0.5;
 
 /**
  * The setpoint the gauge draws, travelling to a new value instead of jumping to
@@ -56,6 +68,9 @@ const prefersReducedMotion = () =>
  * When there is nothing to animate, the target is returned on the very render
  * that carries it: applied only in the effect, after paint, the knob drew the
  * previous temperature first and trailed the finger by a frame on every move.
+ * The value drawn lives in a ref, read on every render; the state is only what
+ * asks for the next frame. A skipped change therefore costs no second render:
+ * setting the state there drew the gauge twice on every move of a drag.
  * @param {number} target - The setpoint to show.
  * @param {boolean} animate - Whether a change may be animated.
  * @returns {number} The setpoint to draw on this render.
@@ -63,7 +78,7 @@ const prefersReducedMotion = () =>
  * const shown = useAnimatedValue(setpoint, !isDragging);
  */
 const useAnimatedValue = (target, animate) => {
-  const [value, setValue] = useState(target);
+  const [, setFrame] = useState(0);
   const shownRef = useRef(target);
   const frameRef = useRef(null);
   const skip = !animate || !Number.isFinite(target) || !Number.isFinite(shownRef.current) || prefersReducedMotion();
@@ -72,12 +87,10 @@ const useAnimatedValue = (target, animate) => {
     const from = shownRef.current;
     const show = next => {
       shownRef.current = next;
-      setValue(next);
+      setFrame(frame => frame + 1);
     };
-    // The state still follows a skipped change, so that the render which turns
-    // the animation back on — the dial released — draws where the finger left it.
+    // Already drawn by the render that carries it, which also left the ref there.
     if (skip || from === target) {
-      show(target);
       return undefined;
     }
     const start = Date.now();
@@ -96,12 +109,12 @@ const useAnimatedValue = (target, animate) => {
   }, [target, animate]);
 
   if (skip) {
-    // Kept in step here too: the next animation starts from the finger, not
-    // from a frame interpolated before the drag began.
+    // The next animation starts from the finger, not from a frame interpolated
+    // before the drag began, and the release draws where the finger left it.
     shownRef.current = target;
     return target;
   }
-  return value;
+  return shownRef.current;
 };
 
 const CircularGauge = ({
@@ -139,7 +152,11 @@ const CircularGauge = ({
   // Derive both halves from one rounded value: splitting the raw setpoint made
   // 20.96 render as "20.10" (the decimal carried to 10) and -3.5 as "-4.5"
   // (floor rounds away from zero for negatives).
-  const roundedSetpoint = Math.round(setpoint * 10) / 10;
+  // On its way, the number counts in the step a setpoint is set in: 21.1 to
+  // 21.4 on one + tap, and forty tenths on a preset change, were values the user
+  // can never set. The arc and the knob glide; the number lands on the target.
+  const displayed = setpoint === targetSetpoint ? setpoint : Math.round(setpoint / SETPOINT_STEP) * SETPOINT_STEP;
+  const roundedSetpoint = Math.round(displayed * 10) / 10;
   const truncated = Math.trunc(roundedSetpoint);
   const decPart = Math.round(Math.abs(roundedSetpoint - truncated) * 10);
   // Math.trunc(-0.5) is -0, which renders as "0": a setpoint between -1 and 0
