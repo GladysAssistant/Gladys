@@ -360,6 +360,10 @@ function createActions(store) {
         [userIndex]: {
           accepted: {
             $set: value
+          },
+          // the server forgets it too once the user is accepted again
+          keys_changed: {
+            $set: false
           }
         }
       });

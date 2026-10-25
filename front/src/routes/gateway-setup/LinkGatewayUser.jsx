@@ -2,6 +2,77 @@ import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../utils/consts';
 import AuthLayout from '../../components/auth/AuthLayout';
+import style from './style.css';
+
+const NOT_ACCEPTED_LOCALLY_TEXTS = {
+  // the user was authorized with other keys: they reset their Gladys Plus password
+  KEYS_CHANGED: { title: 'keysChangedTitle', intro: 'keysChangedIntro' },
+  // never authorized, or revoked by an admin of the instance
+  NOT_ACCEPTED: { title: 'notAcceptedTitle', intro: 'notAcceptedIntro' },
+  // instances older than the reason sent with the error: both cases are possible
+  UNKNOWN: { title: 'notAcceptedTitle', intro: 'notAcceptedUnknownReasonIntro' }
+};
+
+const UserNotAcceptedLocally = props => {
+  const texts = NOT_ACCEPTED_LOCALLY_TEXTS[props.notAcceptedLocallyReason] || NOT_ACCEPTED_LOCALLY_TEXTS.UNKNOWN;
+  return (
+    <div>
+      <h4>
+        <Text id={`gatewayLinkUser.${texts.title}`} />
+      </h4>
+      <p>
+        <Text id={`gatewayLinkUser.${texts.intro}`} />
+      </p>
+      {!props.isGatewayAdmin && (
+        <div class="alert alert-info">
+          <Text id="gatewayLinkUser.notAcceptedAskAdmin" />
+        </div>
+      )}
+      <ol class="pl-4">
+        <li class="mb-2">
+          <MarkupText id="gatewayLinkUser.noInstanceFoundStepOpenLocalInstance" />
+        </li>
+        <li class="mb-2">
+          <MarkupText id="gatewayLinkUser.noInstanceFoundStepGoToSettings" />
+        </li>
+        <li class="mb-2">
+          <MarkupText id="gatewayLinkUser.notAcceptedStepAcceptUser" />
+        </li>
+        <li class="mb-2">
+          <Text id="gatewayLinkUser.noInstanceFoundStepComeBack" />
+        </li>
+      </ol>
+      {props.keysFingerprints && (
+        <div class="mb-4 small">
+          <div class="text-muted mb-1">
+            <Text id="gatewayLinkUser.notAcceptedFingerprintsLabel" />
+          </div>
+          <div>
+            <Text id="gatewayLinkUser.rsaKeyFingerprint" />{' '}
+            <code class={style.fingerprint}>{props.keysFingerprints.rsaPublicKey}</code>
+          </div>
+          <div>
+            <Text id="gatewayLinkUser.ecdsaKeyFingerprint" />{' '}
+            <code class={style.fingerprint}>{props.keysFingerprints.ecdsaPublicKey}</code>
+          </div>
+        </div>
+      )}
+      {props.stillNotAcceptedLocally && (
+        <div class="alert alert-warning">
+          <Text id="gatewayLinkUser.stillNotAccepted" />
+        </div>
+      )}
+      <div class="form-group">
+        <button onClick={props.retry} class="btn btn-primary">
+          <i class="fe fe-refresh-cw" /> <Text id="gatewayLinkUser.notAcceptedRetryButton" />
+        </button>
+      </div>
+      <p class="mb-0">
+        <MarkupText id="gatewayLinkUser.noInstanceFoundTutorialLink" />
+      </p>
+    </div>
+  );
+};
 
 const LinkGatewayUser = ({ children, ...props }) => (
   <AuthLayout size="medium">
@@ -62,17 +133,15 @@ const LinkGatewayUser = ({ children, ...props }) => (
                 <Text id="gatewayLinkUser.error" />
               </div>
             )}
-            {props.errorNotAcceptedLocally && (
-              <div class="alert alert-danger">
-                <Text id="gatewayLinkUser.errorNotAcceptedLocally" />
-              </div>
+            {props.errorNotAcceptedLocally && props.usersGetStatus !== RequestStatus.GatewayNoInstanceFound && (
+              <UserNotAcceptedLocally {...props} />
             )}
             {props.usersGetStatus === RequestStatus.Error && (
               <div class="alert alert-danger">
                 <Text id="httpErrors.unknownError" />
               </div>
             )}
-            {props.usersGetStatus !== RequestStatus.GatewayNoInstanceFound && (
+            {props.usersGetStatus !== RequestStatus.GatewayNoInstanceFound && !props.errorNotAcceptedLocally && (
               <>
                 <p>
                   <Text id="gatewayLinkUser.description" />

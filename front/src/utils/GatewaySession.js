@@ -113,6 +113,17 @@ class GatewaySession {
     keyValueStore.set(GATEWAY_ECDSA_PUBLIC_KEY_FINGERPRINT, data.ecdsaPublicKeyFingerprint);
   }
 
+  // Fingerprints of the keys of this Gladys Plus user, as the "Remote users" list of the
+  // local instance displays them: comparing both is what protects against a man-in-the-middle
+  getKeysFingerprints() {
+    const rsaPublicKey = keyValueStore.get(GATEWAY_RSA_PUBLIC_KEY_FINGERPRINT);
+    const ecdsaPublicKey = keyValueStore.get(GATEWAY_ECDSA_PUBLIC_KEY_FINGERPRINT);
+    if (!rsaPublicKey || !ecdsaPublicKey) {
+      return null;
+    }
+    return { rsaPublicKey, ecdsaPublicKey };
+  }
+
   getRefreshToken() {
     if (this.user) {
       return this.user.refresh_token;
