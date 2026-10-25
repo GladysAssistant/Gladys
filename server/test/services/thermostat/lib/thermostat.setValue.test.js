@@ -197,6 +197,20 @@ describe('thermostat.setValue', () => {
       expect(until).to.equal(mondayAt5Utc + 30 * 60 * 1000);
     });
 
+    it('should fall back on the default timezone when it cannot be read', async () => {
+      // A failed read of the variable must not fail the hold: the same Paris
+      // default applies, and the 06:30 point is half an hour away.
+      const mondayAt5Utc = Date.UTC(2024, 0, 1, 5, 0, 0);
+      sinon.useFakeTimers(mondayAt5Utc);
+      const handler = buildHandler();
+      handler.gladys.variable.getValue = fake.rejects(new Error('database locked'));
+
+      await handler.setValue(device(), setpointFeature, 20);
+
+      const until = Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2]);
+      expect(until).to.equal(mondayAt5Utc + 30 * 60 * 1000);
+    });
+
     it('should hold for the duration configured on the device', async () => {
       sinon.useFakeTimers(1_700_000_000_000);
       const handler = buildHandler();
