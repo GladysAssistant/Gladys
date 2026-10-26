@@ -590,6 +590,47 @@
   color: #c24a33;
 }
 
+/* On a phone the footer must hold on one line: the two columns sit side by
+   side without their gutters, duplicate / delete become round icon buttons and
+   the pills lose most of their side padding. Otherwise "Démarrer" + "Sauvegarder" wrap under the
+   icons. The row may still wrap as a last resort (e.g. a running scene on a
+   320px screen) rather than push "Sauvegarder" off-screen. */
+@media (max-width: 575.98px) {
+  .editFooterRow {
+    margin-left: 0;
+    margin-right: 0;
+    row-gap: 0.5rem;
+  }
+
+  .editFooterRow > :global(.col-auto) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .editFooterRow :global(.btn) {
+    white-space: nowrap;
+  }
+
+  :global(.glass-theme) .editFooter .editFooterRow :global(.btn) {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+
+  /* Without side padding, Tabler's .btn min-width makes them circles */
+  :global(.glass-theme) .editFooter .editFooterRow .editFooterIconButton {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* Below 360px even the tightened labels do not fit: Start keeps its icon, its
+   name stays in the aria-label. */
+@media (max-width: 359.98px) {
+  .editFooterStartLabel {
+    display: none;
+  }
+}
+
 /* These pills must invert with the theme in dark mode, not keep their
    authored colors through the double-inversion list of dark-mode.css */
 :global(.dark-mode .glass-theme) .editFooter :global(.btn-success),
