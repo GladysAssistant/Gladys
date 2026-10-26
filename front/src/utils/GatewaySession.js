@@ -4,6 +4,7 @@ import gatewayRequest from '@gladysassistant/gladys-gateway-js/lib/request';
 import config from '../config';
 import { Dispatcher } from './Dispatcher';
 import keyValueStore from './keyValueStore';
+import { hasPasswordFields, omitPasswordFields } from './omitPasswordFields';
 
 const GATEWAY_USER_KEY = 'gateway_user';
 const GATEWAY_PROFILE_PICTURE_KEY = 'gateway_profile_picture';
@@ -76,7 +77,13 @@ class GatewaySession {
     }
     const data = keyValueStore.get(GATEWAY_USER_KEY);
     if (data) {
-      this.user = JSON.parse(data);
+      const user = JSON.parse(data);
+      if (hasPasswordFields(user)) {
+        // older versions of the profile page stored the new password here
+        this.saveUser(user);
+      } else {
+        this.user = user;
+      }
     }
     return this.user;
   }
@@ -158,7 +165,7 @@ class GatewaySession {
   }
 
   saveUser(user) {
-    const mergedUser = Object.assign({}, this.user, user);
+    const mergedUser = omitPasswordFields(Object.assign({}, this.user, user));
     this.user = mergedUser;
     keyValueStore.set(GATEWAY_USER_KEY, JSON.stringify(mergedUser));
   }
