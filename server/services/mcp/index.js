@@ -28,7 +28,7 @@ module.exports = function MCPService(gladys, serviceId) {
   async function start() {
     logger.info('Starting MCP service');
 
-    await mcpHandler.createServer();
+    await mcpHandler.loadSchemas();
   }
 
   /**
