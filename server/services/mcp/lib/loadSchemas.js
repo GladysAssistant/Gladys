@@ -7,9 +7,10 @@ const { EVENTS } = require('../../../utils/constants');
  * loadSchemas()
  */
 async function loadSchemas() {
-  if (!this.schemas) {
+  if (!this.listening) {
     this.gladys.event.on(EVENTS.DEVICE.CREATE, this.reloadCb);
     this.gladys.event.on(EVENTS.DEVICE.UPDATE, this.reloadCb);
+    this.listening = true;
   }
 
   this.schemas = {

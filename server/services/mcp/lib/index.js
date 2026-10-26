@@ -33,6 +33,7 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp, toon, levenshtein
   this.toon = toon;
   this.levenshtein = levenshtein;
   this.schemas = null;
+  this.listening = false;
   this.transports = {};
 
   this.reloadCb = eventFunctionWrapper(this.loadSchemas.bind(this));

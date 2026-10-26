@@ -13,6 +13,7 @@ describe('Stop server', () => {
       stopServer,
       reloadCb,
       schemas: { resources: [], tools: [] },
+      listening: true,
       gladys: {
         event: {
           removeListener: stub(),
@@ -28,6 +29,7 @@ describe('Stop server', () => {
     expect(mcpHandler.gladys.event.removeListener.secondCall.args[0]).to.eq('device.update');
     expect(mcpHandler.gladys.event.removeListener.secondCall.args[1]).to.eq(reloadCb);
 
+    expect(mcpHandler.listening).to.eq(false);
     expect(mcpHandler.schemas).to.eq(null);
   });
 });

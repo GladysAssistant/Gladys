@@ -12,6 +12,7 @@ async function stopServer() {
     this.gladys.event.removeListener(EVENTS.DEVICE.UPDATE, this.reloadCb);
   }
 
+  this.listening = false;
   this.schemas = null;
 }
 
