@@ -127,6 +127,64 @@ describe('session.revoke', () => {
   });
 });
 
+describe('session.revokeLoginSessions', () => {
+  const getRevokedStates = async () => {
+    const sessions = await db.Session.findAll({ attributes: ['id', 'revoked'] });
+    return sessions.reduce((states, oneSession) => ({ ...states, [oneSession.id]: oneSession.revoked }), {});
+  };
+  it('should revoke the login sessions of the user, except the current one', async () => {
+    const cache = new Cache();
+    const session = new Session('secret', cache);
+    const otherUserSession = await session.create('7a137a56-069e-4996-8816-36558174b727', ['dashboard:write'], 60);
+    const accessToken = await session.getAccessToken('refresh-token-test', ['dashboard:write']);
+    const revokedSessionIds = await session.revokeLoginSessions(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      'baf1fa89-153b-4f2e-adf3-787e410ec291',
+    );
+    expect(revokedSessionIds).to.have.members([
+      'ada07710-5f25-4510-ac63-b002aca3bd32',
+      '91f656b4-48df-4cd0-89fd-c187c83a0427',
+    ]);
+    const revokedStates = await getRevokedStates();
+    // login sessions of the user
+    expect(revokedStates['ada07710-5f25-4510-ac63-b002aca3bd32']).to.equal(true);
+    expect(revokedStates['91f656b4-48df-4cd0-89fd-c187c83a0427']).to.equal(true);
+    // current session
+    expect(revokedStates['baf1fa89-153b-4f2e-adf3-787e410ec291']).to.equal(false);
+    // api key
+    expect(revokedStates['77e0823e-17cd-42d2-b825-c386f5ce6f23']).to.equal(false);
+    // session of another user
+    expect(revokedStates[otherUserSession.session_id]).to.equal(false);
+    // the access tokens already given are refused
+    expect(() => session.validateAccessToken(accessToken.access_token, 'dashboard:write')).to.throw(
+      'Session was revoked',
+    );
+    expect(cache.get('revoked_session:baf1fa89-153b-4f2e-adf3-787e410ec291')).to.equal(undefined);
+    // and the refresh token cannot give new ones
+    const promise = session.getAccessToken('refresh-token-test', ['dashboard:write']);
+    return assert.isRejected(promise, 'Session was revoked');
+  });
+  it('should revoke all login sessions of the user', async () => {
+    const cache = new Cache();
+    const session = new Session('secret', cache);
+    const revokedSessionIds = await session.revokeLoginSessions('0cd30aef-9c4e-4a23-88e3-3547971296e5');
+    expect(revokedSessionIds).to.have.members([
+      'ada07710-5f25-4510-ac63-b002aca3bd32',
+      'baf1fa89-153b-4f2e-adf3-787e410ec291',
+      '91f656b4-48df-4cd0-89fd-c187c83a0427',
+    ]);
+    expect(cache.get('revoked_session:baf1fa89-153b-4f2e-adf3-787e410ec291')).to.equal(true);
+    const revokedStates = await getRevokedStates();
+    expect(revokedStates['baf1fa89-153b-4f2e-adf3-787e410ec291']).to.equal(true);
+    expect(revokedStates['77e0823e-17cd-42d2-b825-c386f5ce6f23']).to.equal(false);
+  });
+  it('should do nothing when the user has no login session', async () => {
+    const session = new Session('secret', new Cache());
+    const revokedSessionIds = await session.revokeLoginSessions('7a137a56-069e-4996-8816-36558174b727');
+    expect(revokedSessionIds).to.deep.equal([]);
+  });
+});
+
 describe('session.validateAccessToken', () => {
   it('should return error, tablet is locked', async () => {
     const cache = new Cache();
