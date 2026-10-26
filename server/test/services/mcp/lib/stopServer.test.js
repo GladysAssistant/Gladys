@@ -7,15 +7,12 @@ const { stopServer } = require('../../../../services/mcp/lib/stopServer');
 describe('Stop server', () => {
   it('should stop a server and remove event listeners', async () => {
     const reloadCb = fake();
-    const serverInstance = {
-      close: fake(),
-    };
 
     const mcpHandler = {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
       stopServer,
       reloadCb,
-      server: serverInstance,
+      schemas: { resources: [], tools: [] },
       gladys: {
         event: {
           removeListener: stub(),
@@ -31,7 +28,6 @@ describe('Stop server', () => {
     expect(mcpHandler.gladys.event.removeListener.secondCall.args[0]).to.eq('device.update');
     expect(mcpHandler.gladys.event.removeListener.secondCall.args[1]).to.eq(reloadCb);
 
-    expect(serverInstance.close.callCount).to.eq(1);
-    expect(mcpHandler.server).to.eq(null);
+    expect(mcpHandler.schemas).to.eq(null);
   });
 });

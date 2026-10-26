@@ -1,7 +1,7 @@
 const { EVENTS } = require('../../../utils/constants');
 
 /**
- * @description Stop MCP server.
+ * @description Stop MCP server. The servers created per request are closed with their response.
  * @returns {Promise<void>} Resolves when the server has been stopped.
  * @example
  * stopServer()
@@ -12,10 +12,7 @@ async function stopServer() {
     this.gladys.event.removeListener(EVENTS.DEVICE.UPDATE, this.reloadCb);
   }
 
-  if (this.server) {
-    await this.server.close();
-    this.server = null;
-  }
+  this.schemas = null;
 }
 
 module.exports = {

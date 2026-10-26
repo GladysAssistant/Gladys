@@ -1,3 +1,4 @@
+const { loadSchemas } = require('./loadSchemas');
 const { createServer } = require('./createServer');
 const { stopServer } = require('./stopServer');
 const { getAllResources, getAllTools } = require('./buildSchemas');
@@ -31,12 +32,13 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp, toon, levenshtein
   this.mcp = mcp;
   this.toon = toon;
   this.levenshtein = levenshtein;
-  this.server = null;
+  this.schemas = null;
   this.transports = {};
 
-  this.reloadCb = eventFunctionWrapper(this.createServer.bind(this));
+  this.reloadCb = eventFunctionWrapper(this.loadSchemas.bind(this));
 };
 
+MCPHandler.prototype.loadSchemas = loadSchemas;
 MCPHandler.prototype.createServer = createServer;
 MCPHandler.prototype.stopServer = stopServer;
 MCPHandler.prototype.getAllResources = getAllResources;
