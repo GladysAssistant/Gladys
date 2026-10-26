@@ -25,7 +25,10 @@ describe('thermostat schedules CRUD', () => {
   let handler;
 
   beforeEach(() => {
-    handler = new ThermostatHandler({ event: { emit: () => null } }, 'service-id');
+    handler = new ThermostatHandler(
+      { event: { emit: () => null }, variable: { getValue: () => Promise.resolve('UTC') } },
+      'service-id',
+    );
     // No regulation pass from these tests: the handler has no Gladys to regulate with.
     handler.triggerApplySchedules = () => {};
   });
