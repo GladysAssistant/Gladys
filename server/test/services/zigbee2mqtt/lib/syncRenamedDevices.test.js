@@ -142,6 +142,40 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     ]);
   });
 
+  it('should follow the new hardware of a device replaced under the same name', async () => {
+    const gladysDevice = buildGladysDevice();
+    gladys.device.get = fake.resolves([gladysDevice]);
+    const ramDevice = { ...gladysDevice, params: [{ ...gladysDevice.params[0] }] };
+    gladys.stateManager.get = fake.returns(ramDevice);
+    // EXECUTE: the stored hardware left the network, a new one was paired as "old-name"
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'old-name', ieee_address: '0xreplacement', type: 'Router' },
+    ]);
+    // ASSERT: the stored IEEE address follows the new hardware, so its next rename is matched
+    assert.notCalled(gladys.device.create);
+    assert.calledOnceWithExactly(gladys.device.setParam, gladysDevice, 'IEEE_ADDRESS', '0xreplacement');
+    expect(ramDevice.params).to.have.lengthOf(1);
+    expect(ramDevice.params[0].value).to.equal('0xreplacement');
+  });
+
+  it('should not give a removed device the IEEE address of a known device renamed into its name', async () => {
+    // The outlet left the Zigbee network but is still in Gladys, then the motion sensor
+    // (known to Gladys) was renamed "old-name": it is not a new hardware for the outlet
+    const removedOutlet = buildGladysDevice();
+    const motionSensor = buildGladysDevice();
+    motionSensor.id = 'motion-id';
+    motionSensor.external_id = 'zigbee2mqtt:motion';
+    motionSensor.params = [{ id: 'param-motion', name: 'IEEE_ADDRESS', value: '0xmotion', device_id: 'motion-id' }];
+    gladys.device.get = fake.resolves([removedOutlet, motionSensor]);
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'old-name', ieee_address: '0xmotion', type: 'Router' },
+    ]);
+    // ASSERT: the outlet keeps its IEEE address, and the motion sensor rename is blocked by it
+    assert.notCalled(gladys.device.setParam);
+    assert.notCalled(gladys.device.create);
+  });
+
   it('should remember the last inventory received from Zigbee2mqtt', async () => {
     const inventory = [{ friendly_name: 'old-name', ieee_address: '0x00158d00045b2740', type: 'Router' }];
     // EXECUTE

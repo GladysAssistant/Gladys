@@ -83,9 +83,9 @@ async function applyRename(gladys, gladysDevice, currentName, newName, newDispla
 }
 
 /**
- * @description Apply the planned renames. external_id is unique in DB, so a rename whose
+ * @description Apply the planned renames. The external_id is unique in DB, so a rename whose
  * destination is still owned by another device cannot be written directly. Devices whose
- * current name is the destination of another rename (cyclic renames, e.g. an A<->B swap)
+ * current name is the destination of another rename (cyclic renames, such as an A<->B swap)
  * are staged through a temporary external_id first; a destination owned by a device that
  * is not being renamed (a stale duplicate left by the old behavior) is skipped with a log.
  * @param {object} gladys - Gladys instance.
@@ -196,6 +196,12 @@ async function reconcileDevices(manager, z2mDevices) {
       });
 
     const gladysDevices = await self.gladys.device.get({ service: 'zigbee2mqtt' });
+    const storedIeeeAddresses = new Set(
+      gladysDevices
+        .map(getIeeeAddressParam)
+        .filter((param) => param !== undefined)
+        .map((param) => param.value),
+    );
 
     const renames = [];
     await Promise.each(gladysDevices, async (gladysDevice) => {
@@ -207,22 +213,37 @@ async function reconcileDevices(manager, z2mDevices) {
         const ieeeAddressParam = getIeeeAddressParam(gladysDevice);
         const sameNameZ2mDevice = z2mDeviceByName.get(currentName);
 
+        // The stored hardware left the Zigbee network and a new one was paired under the same
+        // name (a replaced device): the name-based link already routes its states here. Only
+        // when the stored IEEE address is gone (otherwise this is a cross-rename) and the
+        // newcomer is unknown to Gladys (otherwise it is another device renamed into this name).
+        const replacedUnderSameName =
+          sameNameZ2mDevice &&
+          ieeeAddressParam &&
+          !z2mDeviceByIeeeAddress.has(ieeeAddressParam.value) &&
+          !storedIeeeAddresses.has(sameNameZ2mDevice.ieee_address);
         const linkIntact =
-          sameNameZ2mDevice && (!ieeeAddressParam || ieeeAddressParam.value === sameNameZ2mDevice.ieee_address);
+          sameNameZ2mDevice &&
+          (!ieeeAddressParam || ieeeAddressParam.value === sameNameZ2mDevice.ieee_address || replacedUnderSameName);
         if (linkIntact) {
-          if (!ieeeAddressParam) {
-            // Backfill the IEEE address on devices added before this param existed,
-            // so their next rename can be matched.
+          if (!ieeeAddressParam || ieeeAddressParam.value !== sameNameZ2mDevice.ieee_address) {
+            // Backfill the IEEE address on devices added before this param existed, or follow
+            // the new hardware of a replaced device, so their next rename can be matched.
             await self.gladys.device.setParam(gladysDevice, DEVICE_PARAMS.IEEE_ADDRESS, sameNameZ2mDevice.ieee_address);
             // setParam only writes in DB: patch the RAM copy so the discover page
             // doesn't flag the device as needing an update.
             const ramDevice = self.gladys.stateManager.get('deviceByExternalId', gladysDevice.external_id);
-            if (ramDevice && Array.isArray(ramDevice.params) && !getIeeeAddressParam(ramDevice)) {
-              ramDevice.params.push({
-                name: DEVICE_PARAMS.IEEE_ADDRESS,
-                value: sameNameZ2mDevice.ieee_address,
-                device_id: gladysDevice.id,
-              });
+            if (ramDevice && Array.isArray(ramDevice.params)) {
+              const ramIeeeAddressParam = getIeeeAddressParam(ramDevice);
+              if (ramIeeeAddressParam) {
+                ramIeeeAddressParam.value = sameNameZ2mDevice.ieee_address;
+              } else {
+                ramDevice.params.push({
+                  name: DEVICE_PARAMS.IEEE_ADDRESS,
+                  value: sameNameZ2mDevice.ieee_address,
+                  device_id: gladysDevice.id,
+                });
+              }
             }
           }
           return;
