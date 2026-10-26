@@ -31,8 +31,8 @@ const EditActions = props => (
                 className={cx('btn btn-outline-primary', style.editFooterIconButton)}
               >
                 <span class="d-none d-lg-inline-block" aria-hidden="true">
-                  <Text id="editScene.duplicateButton" />
-                </span>{' '}
+                  <Text id="editScene.duplicateButton" />{' '}
+                </span>
                 <i class="fe fe-copy" />
               </button>
             </Localizer>
@@ -43,8 +43,8 @@ const EditActions = props => (
                 className={cx('btn btn-outline-danger ml-2', style.editFooterIconButton)}
               >
                 <span class="d-none d-lg-inline-block" aria-hidden="true">
-                  <Text id="editScene.deleteButton" />
-                </span>{' '}
+                  <Text id="editScene.deleteButton" />{' '}
+                </span>
                 <i class="fe fe-trash" />
               </button>
             </Localizer>
@@ -74,8 +74,8 @@ const EditActions = props => (
                   className="btn btn-primary"
                 >
                   <span class={style.editFooterStartLabel} aria-hidden="true">
-                    <Text id="editScene.startButton" />
-                  </span>{' '}
+                    <Text id="editScene.startButton" />{' '}
+                  </span>
                   <i class="fe fe-play" />
                 </button>
               </Localizer>

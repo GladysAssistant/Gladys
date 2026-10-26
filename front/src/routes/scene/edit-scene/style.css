@@ -616,10 +616,20 @@
     padding-right: 0.625rem;
   }
 
-  /* Without side padding, Tabler's .btn min-width makes them circles */
+  /* An explicit square, like .backButton: Tabler's .btn min-width only sets
+     the width, the height would follow the icon's line height */
   :global(.glass-theme) .editFooter .editFooterRow .editFooterIconButton {
-    padding-left: 0;
-    padding-right: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.375rem;
+    height: 2.375rem;
+    padding: 0;
+  }
+
+  /* Room for the footer even when it wraps onto two lines */
+  .pageContainer {
+    padding-bottom: 9rem;
   }
 }
 
