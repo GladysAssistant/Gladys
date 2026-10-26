@@ -4580,7 +4580,8 @@
           "sunday": "SO"
         },
         "lastDayLocked": "Mindestens ein Tag muss ausgewählt bleiben.",
-        "invalidRangesError": "Vervollständigen oder entfernen Sie die Zeitfenster der Szene: Jedes braucht einen Beginn und ein Ende, die nicht zur selben Uhrzeit liegen dürfen."
+        "invalidRangesError": "Vervollständigen oder entfernen Sie die Zeitfenster der Szene: Jedes braucht einen Beginn und ein Ende, die nicht zur selben Uhrzeit liegen dürfen.",
+        "noRangeError": "Fügen Sie dem Auslöser „Zeitfenster“ mindestens ein Zeitfenster hinzu oder entfernen Sie den Auslöser."
       },
       "warning": {
         "houseWithoutCoordinate": "Dein Zuhause hat keine Koordinaten. Dieser Auslöser funktioniert nicht ohne Koordinaten. Bitte gehe zu Einstellungen -> Zuhause und klicke auf die Karte, um die Koordinaten des Zuhauses festzulegen."

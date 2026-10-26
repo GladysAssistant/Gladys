@@ -33,7 +33,8 @@ function timeToMinutes(time) {
 
 /**
  * @description Convert the days of the week of a range to the numbers expected by node-schedule.
- * An empty or missing list means "every day", like the "every-week" scheduler type.
+ * A missing list means "every day", like the "every-week" scheduler type; an empty list
+ * means no day at all.
  * @param {string[]} [daysOfTheWeek] - Days of the week, as lowercase english names.
  * @returns {number[]} Days of the week as numbers, Sunday being 0.
  * @example

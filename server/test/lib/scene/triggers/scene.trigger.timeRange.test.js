@@ -36,9 +36,30 @@ describe('Scene.triggers.timeRange', () => {
   });
 
   it('should match the start of a range and be in range', () => {
-    const event = { key: 'trigger-key', range_event: 'start' };
+    sinon.useFakeTimers(dayjs.tz('2026-08-24 12:00', TIMEZONE).valueOf());
+    const event = { key: 'trigger-key', range_event: 'start', range_index: 0 };
     expect(check(event)).to.equal(true);
     expect(event.in_range).to.equal(true);
+  });
+
+  // On the spring-forward night cron moves a 02:30 edge to 03:30 but leaves a 03:15 one
+  // where it is: the start fires after the end, and must not switch the device on until the
+  // next day's end.
+  it('should be out of range on a start fired after its own end, on the spring-forward night', () => {
+    sinon.useFakeTimers(dayjs.tz('2027-03-28 03:30', TIMEZONE).valueOf());
+    const event = { key: 'trigger-key', range_event: 'start', range_index: 0 };
+    const springTrigger = { ...trigger, time_ranges: [{ start: '02:30', end: '03:15' }] };
+    expect(triggersFunc[EVENTS.TIME.CHANGED](self, 'a-scene', event, springTrigger)).to.equal(true);
+    expect(event.in_range).to.equal(false);
+  });
+
+  it('should be out of range on a start fired with its own end, on the spring-forward night', () => {
+    // 02:00 -> 03:00: both edges land on 03:00, which the range excludes.
+    sinon.useFakeTimers(dayjs.tz('2027-03-28 03:00', TIMEZONE).valueOf());
+    const event = { key: 'trigger-key', range_event: 'start', range_index: 0 };
+    const springTrigger = { ...trigger, time_ranges: [{ start: '02:00', end: '03:00' }] };
+    expect(triggersFunc[EVENTS.TIME.CHANGED](self, 'a-scene', event, springTrigger)).to.equal(true);
+    expect(event.in_range).to.equal(false);
   });
 
   it('should match the end of a range and be out of range', () => {

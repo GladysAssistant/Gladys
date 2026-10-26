@@ -4580,7 +4580,8 @@
           "sunday": "SU"
         },
         "lastDayLocked": "At least one day must stay selected.",
-        "invalidRangesError": "Complete or remove the time ranges of the scene: each one needs a start and an end, and they cannot be the same time."
+        "invalidRangesError": "Complete or remove the time ranges of the scene: each one needs a start and an end, and they cannot be the same time.",
+        "noRangeError": "Add at least one time range to the \"Time ranges\" trigger, or remove the trigger."
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."

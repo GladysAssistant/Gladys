@@ -41,7 +41,8 @@ and only offers the fields above.
   the week apply to the **start**: configured on Monday, that range runs from Monday 22:00 to
   Tuesday 06:00, and its end job is scheduled on the day after each selected day.
 - **One job per boundary.** Each range schedules a start job and an end job. An end falling at the
-  same minute, on the same day, as the start of another range is not scheduled: the start carries
+  same minute, on the same day, as the start of another range of the same trigger is not
+  scheduled: the start carries
   the state the planning continues with, and both would run the scene twice at the same second.
 - **Every range is checked before any job is scheduled.** A throw half-way left the jobs of the
   ranges before it running, with no trigger in the store to cancel them.
@@ -50,7 +51,8 @@ and only offers the fields above.
   Europe/Paris, a `RecurrenceRule` skipped the night the clocks go forward — the end of a
   `22:00 → 02:30` range never came, and the device it drives ran on for a day — and fired twice the
   night they go back. The cron rule fires once each night, at 03:30 on the night of the jump. Tests
-  pin both nights.
+  pin both nights. Cron only moves the edges that fall in the skipped hour: a `02:30 → 03:15` range
+  then starts at 03:30, after its own end — see D for why it does not switch anything on.
 - Jobs are cancelled on update, delete and disable (`scene.cancelTriggers.js`).
 
 ## D. What the scene is told
@@ -65,9 +67,11 @@ which holds the jobs — plus:
 | `in_range`    | whether the scene's **whole planning** covers this minute — set by `scene.triggers.js` |
 | `fired_at`    | when the boundary fired, as a timestamp                                                |
 
-`in_range` is `true` on a start. On an end it is computed over every time-range trigger of the
-scene, without the range that just ended: two consecutive ranges, or a weekend trigger next to a
-weekday one, keep the scene inside.
+`in_range` is computed on the current minute, over every time-range trigger of the scene. On an
+end, the range that just ended is left out: two consecutive ranges, or a weekend trigger next to a
+weekday one, keep the scene inside. A start is computed too rather than taken as `true`: on any
+night its minute is inside the range, but on the spring-forward night a `02:30 → 03:15` range starts
+at 03:30, after its end, and a `true` there switched the device on until the next day's end.
 
 With `resume_on_startup`, the scene runs once at startup (`range_event: 'resume'`) with `in_range`
 telling whether the planning covers that minute: a range that started or ended while Gladys was down
@@ -98,8 +102,8 @@ catches to run its other branch.
   by position, and sorting on leaving a field moved the next field under the cursor onto another
   range.
 - The save is refused with a translated message while a range is incomplete or starts and ends at
-  the same time; it used to drop the first silently and pass the second to the server, whose
-  refusal was in English.
+  the same time, or while the trigger has no range at all; it used to drop the first silently and
+  pass the others to the server, whose refusal was in English.
 - The collapsed card shows the ranges and the days.
 
 ## G. Out of scope
@@ -108,4 +112,9 @@ catches to run its other branch.
   `10:00 → 11:00` ranges run each edge twice.
 - **`resume_on_startup` repeats the "Gladys starts" trigger**, which can be added to the scene with
   the same result. It stays as the planning's own switch.
+- **Clocks changing at midnight.** Some timezones change their clocks at midnight
+  (America/Santiago, 06/09/2026): an edge at 00:xx on that night does not exist, and cron does not
+  run it. Europe and North America change theirs at night, between 01:00 and 03:00.
+- **Overlap across triggers.** The redundant end is only dropped inside one trigger: a weekday
+  trigger ending at 06:00 next to a weekend trigger starting at 06:00 runs both edges.
 - No Cypress coverage of the editor yet.

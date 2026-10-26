@@ -4580,7 +4580,8 @@
           "sunday": "DI"
         },
         "lastDayLocked": "Au moins un jour doit rester sélectionné.",
-        "invalidRangesError": "Complétez ou supprimez les plages horaires de la scène : chacune a besoin d'un début et d'une fin, qui ne peuvent pas être à la même heure."
+        "invalidRangesError": "Complétez ou supprimez les plages horaires de la scène : chacune a besoin d'un début et d'une fin, qui ne peuvent pas être à la même heure.",
+        "noRangeError": "Ajoutez au moins une plage horaire au déclencheur « Plages horaires », ou supprimez ce déclencheur."
       },
       "warning": {
         "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."

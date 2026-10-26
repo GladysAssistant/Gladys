@@ -115,10 +115,10 @@ function scheduleTimeRangeJobs(self, trigger) {
     // "if/else" as the scene queue is not serialized. The start wins: it carries the state the
     // planning continues with, so the redundant end is not scheduled.
     //
-    // Two ranges sharing a boundary may run on different days (a range saved by an earlier
-    // version carries its own days), so the redundant days are removed one by one: a range
-    // ending on monday and tuesday, followed by one starting at the same time on monday only,
-    // still needs its end job on tuesday.
+    // The days are the trigger's, but the end of an overnight range falls on the next day,
+    // so the redundant days are removed one by one: a 22:00 -> 06:00 range on monday ends on
+    // tuesday, and a 06:00 -> 08:00 range on monday only does not start then, so that end
+    // job is still needed on tuesday.
     const daysStartedByAnotherRange = new Set();
     timeRanges.forEach((other, otherIndex) => {
       if (otherIndex === rangeIndex || timeToMinutes(other.start) !== timeToMinutes(range.end)) {

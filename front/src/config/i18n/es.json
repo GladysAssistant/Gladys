@@ -4580,7 +4580,8 @@
           "sunday": "DO"
         },
         "lastDayLocked": "Debe quedar al menos un día seleccionado.",
-        "invalidRangesError": "Complete o elimine las franjas horarias de la escena: cada una necesita un inicio y un fin, que no pueden ser a la misma hora."
+        "invalidRangesError": "Complete o elimine las franjas horarias de la escena: cada una necesita un inicio y un fin, que no pueden ser a la misma hora.",
+        "noRangeError": "Añada al menos una franja horaria al disparador «Franjas horarias», o elimine el disparador."
       },
       "warning": {
         "houseWithoutCoordinate": "Su vivienda no tiene coordenadas. Este activador no puede funcionar sin estos datos. Vaya a Configuración / Viviendas y haga clic en el mapa para establecer las coordenadas de la vivienda."

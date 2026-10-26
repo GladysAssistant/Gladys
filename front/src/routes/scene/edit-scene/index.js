@@ -485,6 +485,17 @@ class EditScene extends Component {
     // time reached the user as the server's English refusal. The ranges are sorted on the
     // way out only (sortRanges).
     const timeRangeTriggers = (sceneToSave.triggers || []).filter(trigger => trigger.time_ranges);
+    // A trigger whose every row was deleted shows the "no range" box: the server refuses it
+    // too, in English only.
+    if (timeRangeTriggers.some(trigger => trigger.time_ranges.length === 0)) {
+      this.setState({
+        error: true,
+        errorMessage: null,
+        errorMessageId: 'editScene.triggersCard.scheduledTrigger.noRangeError',
+        errorMessageFields: {}
+      });
+      return;
+    }
     if (
       timeRangeTriggers.some(trigger =>
         trigger.time_ranges.some(range => !range.start || !range.end || range.start === range.end)
@@ -541,12 +552,12 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false, errorMessage: null, errorMessageId: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
-      // The snapshot is the payload actually sent, not the state it was built from: an
-      // incomplete range was dropped on the way, and comparing against the unfiltered state
-      // would leave the editor thinking it has unsaved changes forever. The state itself is
-      // realigned on what was persisted, so the dropped range does not stay on screen until
-      // a reload — unless the user edited the scene while the request was in flight, in
-      // which case their edits win and only the snapshot moves.
+      // The snapshot is the payload actually sent, not the state it was built from: the
+      // ranges were sorted on the way, and comparing against the unsorted state would leave
+      // the editor thinking it has unsaved changes forever. The state itself is realigned on
+      // what was persisted, so the rows take their saved order — unless the user edited the
+      // scene while the request was in flight, in which case their edits win and only the
+      // snapshot moves.
       this.setState(prevState => {
         const savedScene = { ...sceneToSave };
         // "active" has its own route: the switch may have been flipped, and persisted, while
