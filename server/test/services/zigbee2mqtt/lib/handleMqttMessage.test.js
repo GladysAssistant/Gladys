@@ -7,6 +7,7 @@ const zigbeeDevices = require('./payloads/mqtt_devices_get.json');
 const expectedDevicesPayload = require('./payloads/event_device_result.json');
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const logger = require('../../../../utils/logger');
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -42,7 +43,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   });
 
   afterEach(() => {
-    sinon.reset();
+    sinon.restore();
   });
 
   it('should set at connected / exist / running', async () => {
@@ -171,11 +172,103 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   });
 
   it('should get bad topic', async () => {
+    // PREPARE
+    const debugStub = sinon.stub(logger, 'debug');
+    zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/anytopic/wrongtopic', `anymessage`);
     // ASSERT
+    assert.calledOnceWithExactly(
+      zigbee2mqttManager.gladys.stateManager.get,
+      'deviceByExternalId',
+      'zigbee2mqtt:anytopic/wrongtopic',
+    );
+    assert.calledOnceWithExactly(debugStub, 'Zigbee2mqtt topic zigbee2mqtt/anytopic/wrongtopic not handled.');
     assert.notCalled(gladys.event.emit);
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
+  });
+
+  describe('device with "/" in its friendly name', () => {
+    const lightDevice = {
+      friendly_name: 'salon/lampe',
+      supported: true,
+      definition: {
+        exposes: [
+          {
+            type: 'light',
+            features: [
+              {
+                type: 'binary',
+                name: 'state',
+                property: 'state',
+                value_on: 'ON',
+                value_off: 'OFF',
+              },
+            ],
+          },
+        ],
+      },
+    };
+    const gladysDevice = {
+      external_id: 'zigbee2mqtt:salon/lampe',
+      features: [
+        {
+          external_id: 'zigbee2mqtt:salon/lampe:light:binary:state',
+          type: 'binary',
+        },
+      ],
+    };
+
+    beforeEach(() => {
+      zigbee2mqttManager.discoveredDevices['salon/lampe'] = lightDevice;
+      zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
+      zigbee2mqttManager.gladys.stateManager.get
+        .withArgs('deviceByExternalId', 'zigbee2mqtt:salon/lampe')
+        .returns(gladysDevice);
+    });
+
+    it('should handle the state of a device whose name contains "/"', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"state":"OFF","linkquality":120}`);
+      // ASSERT
+      assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: 'zigbee2mqtt:salon/lampe:light:binary:state',
+        state: 0,
+      });
+    });
+
+    [
+      ['zigbee2mqtt/salon/lampe/set', `{"state":"ON"}`],
+      ['zigbee2mqtt/salon/lampe/get', `{"state":""}`],
+      ['zigbee2mqtt/salon/lampe/availability', `{"state":"online"}`],
+      ['zigbee2mqtt/bridge/state', `{"state":"online"}`],
+    ].forEach(([topic, message]) => {
+      it(`should not mistake ${topic} for a device state`, async () => {
+        // PREPARE
+        const debugStub = sinon.stub(logger, 'debug');
+        // EXECUTE
+        await zigbee2mqttManager.handleMqttMessage(topic, message);
+        // ASSERT
+        assert.calledOnceWithExactly(
+          zigbee2mqttManager.gladys.stateManager.get,
+          'deviceByExternalId',
+          `zigbee2mqtt:${topic.substring('zigbee2mqtt/'.length)}`,
+        );
+        assert.calledOnceWithExactly(debugStub, `Zigbee2mqtt topic ${topic} not handled.`);
+        assert.notCalled(gladys.event.emit);
+      });
+    });
+
+    it('should warn when the device is known by Zigbee2mqtt but not configured in Gladys', async () => {
+      // PREPARE
+      const warnStub = sinon.stub(logger, 'warn');
+      zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"state":"OFF"}`);
+      // ASSERT
+      assert.calledOnceWithExactly(warnStub, 'Zigbee2mqtt device salon/lampe not configured in Gladys.');
+      assert.notCalled(gladys.event.emit);
+    });
   });
 
   it('should get good topic', async () => {
