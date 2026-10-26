@@ -127,6 +127,15 @@ describe('session.revoke', () => {
   });
 });
 
+describe('session.isRevoked', () => {
+  it('should tell if a session was revoked', async () => {
+    const session = new Session('secret', new Cache());
+    expect(session.isRevoked('ada07710-5f25-4510-ac63-b002aca3bd32')).to.equal(false);
+    await session.revoke('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'ada07710-5f25-4510-ac63-b002aca3bd32');
+    expect(session.isRevoked('ada07710-5f25-4510-ac63-b002aca3bd32')).to.equal(true);
+  });
+});
+
 describe('session.revokeLoginSessions', () => {
   const getRevokedStates = async () => {
     const sessions = await db.Session.findAll({ attributes: ['id', 'revoked'] });
