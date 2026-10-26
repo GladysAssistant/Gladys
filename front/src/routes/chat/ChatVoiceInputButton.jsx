@@ -55,6 +55,9 @@ function getVoiceInputErrorKey(error) {
   if (serverMessage === 'EMPTY_TRANSCRIPTION') {
     return 'errorNoTranscription';
   }
+  if (serverMessage === 'GLADYS_PLUS_PAYMENT_REQUIRED') {
+    return 'errorPaymentRequired';
+  }
   return 'error';
 }
 

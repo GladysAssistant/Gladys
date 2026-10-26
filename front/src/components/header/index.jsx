@@ -8,6 +8,7 @@ import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
+import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import style from './style.css';
 
@@ -54,7 +55,9 @@ const isDashboardView = url => {
   if (!url.startsWith('/dashboard/')) {
     return false;
   }
-  return !NON_DASHBOARD_SECTIONS.includes(url.split('/')[2]);
+  // the section is read from the path alone: "/dashboard/integration?search=x"
+  // is the integrations page, not a dashboard named "integration?search=x"
+  return !NON_DASHBOARD_SECTIONS.includes(url.split('?')[0].split('/')[2]);
 };
 
 // App-level navigation, in the left sidebar: the top of the screen stays
@@ -196,7 +199,9 @@ class Header extends Component {
             {/* on mobile the notice lives in the closed menu: this dot is
                 what tells the user there is something to open it for. Screen
                 readers get the notice content itself, in the menu. */}
-            {showInstanceUpdateNotice && <span class={style.mobileTogglerDot} aria-hidden="true" />}
+            {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
+              <span class={style.mobileTogglerDot} aria-hidden="true" />
+            )}
           </button>
           <a class={style.mobileBrand} href="/dashboard">
             <Localizer>
@@ -270,6 +275,7 @@ class Header extends Component {
               onDismiss={this.handleInstanceNoticeDismiss}
             />
           )}
+          {props.gatewayPaymentRequired && <GatewaySubscriptionNotice user={props.user} />}
           {Number.isInteger(props.gatewayTrialDaysLeft) && (
             <GatewayTrialIndicator
               daysLeft={props.gatewayTrialDaysLeft}
@@ -295,11 +301,12 @@ class Header extends Component {
               <a class="dropdown-item" href="/dashboard/profile">
                 <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
               </a>
-              {props.user.role === USER_ROLE.ADMIN && (
-                <a class="dropdown-item" href="/dashboard/settings/house">
-                  <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
-                </a>
-              )}
+              <a
+                class="dropdown-item"
+                href={props.user.role === USER_ROLE.ADMIN ? '/dashboard/settings/house' : '/dashboard/settings/session'}
+              >
+                <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
+              </a>
               <div class="dropdown-divider" />
               <a class="dropdown-item" href={forumUrl} target="_blank" rel="noopener noreferrer">
                 <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />

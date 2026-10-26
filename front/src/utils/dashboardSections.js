@@ -27,7 +27,13 @@ export const getSectionWidths = section =>
 // because their height is fixed by the chart library options.
 // Media boxes stretch by letting their image absorb the extra height,
 // tile boxes stretch by vertically centering their content in the card.
-const MEDIA_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.CAMERA, DASHBOARD_BOX_TYPE.PHOTO];
+// The camera is deliberately NOT stretchable (forum 10737): a snapshot is
+// information at a fixed aspect ratio, and every way of stretching its card
+// was rejected in field testing — cover cropped the view, contain padded it
+// with letterbox bands, and capping the card at the image ratio left the
+// absorbed leftover as holes between the widgets of the column. A camera
+// card keeps its natural height; the column simply ends earlier.
+const MEDIA_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.PHOTO];
 const TILE_STRETCH_BOX_TYPES = [
   DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM,
   DASHBOARD_BOX_TYPE.HUMIDITY_IN_ROOM,
@@ -58,6 +64,22 @@ export const isTileStretchBox = box => box && TILE_STRETCH_BOX_TYPES.includes(bo
 const VALUE_TILE_BOX_TYPES = [DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM, DASHBOARD_BOX_TYPE.HUMIDITY_IN_ROOM];
 
 export const isValueTileBox = box => box && VALUE_TILE_BOX_TYPES.includes(box.type);
+
+// Whether the box absorbs leftover column height, given the whole column.
+// Value tiles share leftover height only in all-tile columns — the design's
+// target: a row or stack of tiles equalizing with its neighbors (A.4). In a
+// MIXED column (tiles above device lists, forum 10753) the tile kept
+// absorbing too, but whether that absorption crosses the big-tile threshold
+// hangs on the exact height balance of the section's columns — a balance the
+// editor canvas cannot reproduce, since every widget wears ~4rem of edit
+// chrome there and a column's height is therefore shifted by its widget
+// count: the tile validated compact on the canvas came out as a big tile on
+// the dashboard. Reserving the sharing for all-tile columns turns the
+// decision into a structural one that the canvas applies identically without
+// measuring anything: in a mixed column the tile keeps the compact card the
+// editor showed and the column simply ends earlier, per the cap principle.
+export const canBoxStretchInColumn = (box, column, isLastInColumn) =>
+  canBoxStretchAt(box, isLastInColumn) && (!isValueTileBox(box) || column.every(isValueTileBox));
 
 // The editor works on a flat list of columns (so drag & drop coordinates stay
 // global) plus the number of columns of each section. Column widths flatten

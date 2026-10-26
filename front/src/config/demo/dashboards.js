@@ -266,6 +266,11 @@ const ENERGY_SECTIONS = [
       ],
       [
         {
+          type: 'energy-price',
+          energy_contract: 'edf-tempo-9-kva',
+          name: 'Electricity price'
+        },
+        {
           type: 'gauge',
           device_feature: 'home-power',
           name: 'Home consumption',

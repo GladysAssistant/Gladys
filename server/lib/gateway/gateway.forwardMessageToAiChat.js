@@ -5,6 +5,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
 const logger = require('../../utils/logger');
+const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const {
   EVENTS,
   WEBSOCKET_MESSAGE_TYPES,
@@ -12,12 +13,13 @@ const {
   AI_CHAT_PURPOSES,
   AI_CHAT_TOOL_CATEGORIES,
 } = require('../../utils/constants');
-const { Error429 } = require('../../utils/httpErrors');
+const { Error402, Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
 const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
 const { resolveAiChatModel } = require('../../utils/aiChatModels');
 const { filterMcpToolsByCategories } = require('./gateway.classifyAiChatToolCategories');
+const { describeAiChatError } = require('./gateway.aiChat');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
 const MAX_TOOL_RESULT_CHARS = 4000;
@@ -802,10 +804,21 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     return { answer: finalAnswer || '', imagesSent: imagesSentToUser.length };
   } catch (e) {
-    const requestErrorMessage = e && e.message ? e.message : e;
-    logger.warn(`[AI_CHAT] Request failed: ${requestErrorMessage}`);
-    logger.warn(e);
-    if (e instanceof Error429) {
+    logger.warn(`[AI_CHAT] Request failed: ${describeAiChatError(e)}`);
+    if (e instanceof Error402) {
+      await this.message.replyByIntent(message, 'gateway.payment-required', context);
+      // the voice assistant needs the signal too, on top of the chat reply
+      return { answer: '', imagesSent: 0, paymentRequired: true };
+    }
+    if (e instanceof ExternalIntegrationUnavailableError) {
+      // the selected AI provider integration did not answer (stopped,
+      // disconnected, too slow, invalid completion, stale selection) or is
+      // saturated: "please try again" is not actionable there, the reply
+      // names the cause and where to fix it (capabilities/ai-type.md)
+      const intent =
+        e.message === 'EXTERNAL_INTEGRATION_AI_PROVIDER_BUSY' ? 'openai.provider-busy' : 'openai.provider-unavailable';
+      await this.message.replyByIntent(message, intent, context);
+    } else if (e instanceof Error429) {
       await this.message.replyByIntent(message, 'openai.request.tooManyRequests', context);
     } else {
       await this.message.replyByIntent(message, 'openai.request.fail', context);

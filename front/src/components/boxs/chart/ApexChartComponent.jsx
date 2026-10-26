@@ -4,6 +4,7 @@ import ApexCharts from 'apexcharts';
 import fr from 'apexcharts/dist/locales/fr.json';
 import en from 'apexcharts/dist/locales/en.json';
 import de from 'apexcharts/dist/locales/de.json';
+import es from 'apexcharts/dist/locales/es.json';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -115,7 +116,7 @@ class ApexChartComponent extends Component {
       hideLegend: this.props.hide_legend,
       series: this.props.series,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
-      locales: [fr, en, de],
+      locales: [fr, en, de, es],
       defaultLocale: this.props.user.language,
       yAxisFormatter: this.props.y_axis_formatter,
       yAxisUnit: this.props.y_axis_unit,
@@ -150,7 +151,7 @@ class ApexChartComponent extends Component {
       series: this.props.series,
       displayAxes: this.props.display_axes,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
-      locales: [fr, en, de],
+      locales: [fr, en, de, es],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -171,7 +172,7 @@ class ApexChartComponent extends Component {
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en, de],
+      locales: [fr, en, de, es],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -191,7 +192,7 @@ class ApexChartComponent extends Component {
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en, de],
+      locales: [fr, en, de, es],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -212,7 +213,7 @@ class ApexChartComponent extends Component {
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en, de],
+      locales: [fr, en, de, es],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatterRangeBar(options);
@@ -233,7 +234,14 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    this.addHiddenSeriesEvents(options);
     this.tooltipPositioning.addToOptions(options);
+    // markers a caller draws on the chart (ApexCharts `annotations`: xaxis
+    // lines and points), built by the caller so the options stay generic.
+    // Always assigned: `updateOptions` merges into the live config, so a
+    // missing key would keep the previous markers on the instance; empty
+    // arrays do replace them
+    options.annotations = this.props.annotations || { xaxis: [], points: [] };
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
@@ -242,6 +250,39 @@ class ApexChartComponent extends Component {
       this.chart.render();
     }
   };
+  // Tell the parent which series are hidden (collapsed through the legend) each time the
+  // chart is drawn: after a legend click, after a data refresh (ApexCharts keeps the
+  // collapsed series) and when the chart is (re)created (all series visible again).
+  // Reading the state of the chart itself, rather than mirroring the legend clicks, keeps
+  // the parent in sync whatever ApexCharts did with the click.
+  addHiddenSeriesEvents(options) {
+    if (!this.props.onHiddenSeriesChange) {
+      return;
+    }
+    const reportHiddenSeries = chartContext => {
+      const { collapsedSeriesIndices, ancillaryCollapsedSeriesIndices } = chartContext.w.globals;
+      const hiddenSeriesIndexes = [...collapsedSeriesIndices, ...ancillaryCollapsedSeriesIndices].sort((a, b) => a - b);
+      this.props.onHiddenSeriesChange(hiddenSeriesIndexes);
+    };
+    // Chain the handlers already registered by the chart options (e.g. the y-axis
+    // styles of the timeline chart), don't replace them
+    const existingEvents = options.chart.events || {};
+    options.chart.events = {
+      ...existingEvents,
+      mounted(chartContext, config) {
+        if (typeof existingEvents.mounted === 'function') {
+          existingEvents.mounted(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      },
+      updated(chartContext, config) {
+        if (typeof existingEvents.updated === 'function') {
+          existingEvents.updated(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      }
+    };
+  }
   componentDidMount() {
     this.displayChart();
   }
@@ -256,6 +297,7 @@ class ApexChartComponent extends Component {
     const yAxisFormatterDifferent = nextProps.y_axis_formatter !== this.props.y_axis_formatter;
     const yAxisUnitDifferent = nextProps.y_axis_unit !== this.props.y_axis_unit;
     const colorsDifferent = nextProps.colors !== this.props.colors;
+    const annotationsDifferent = nextProps.annotations !== this.props.annotations;
     if (
       seriesDifferent ||
       chartTypeDifferent ||
@@ -266,7 +308,8 @@ class ApexChartComponent extends Component {
       additionalHeightDifferent ||
       yAxisFormatterDifferent ||
       yAxisUnitDifferent ||
-      colorsDifferent
+      colorsDifferent ||
+      annotationsDifferent
     ) {
       this.displayChart();
     }

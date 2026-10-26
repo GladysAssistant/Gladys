@@ -5,6 +5,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { MESSAGE_GLADYS_ONLY_SERVICE } from '../../../../../../server/utils/constants';
 
 const ALL_SERVICES_VALUE = '__all__';
 
@@ -24,12 +25,21 @@ const EXTERNAL_SERVICE_TYPE = 'external';
 const toI18nKey = name => name.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 
 /**
- * Channel selector of the "send message" scene actions.
+ * Channel selector of the "send message" scene actions and of the system
+ * messages setting. Controlled: `value` is the channel (null when none is
+ * set), `onChange` receives the new one. The caller owns the copy around the
+ * select: the optional `label` above it and the optional help text below it
+ * (children), so the settings card can rely on its own title instead.
  *
- * An action without a `service` property keeps the historical behaviour:
- * the message is broadcast to every messaging channel the user configured.
- * That case is represented by the first option, so an existing scene opened
- * in the editor shows "All configured services" without being rewritten.
+ * An empty value keeps the historical behaviour: the message is broadcast to
+ * every messaging channel the user configured. That case is represented by
+ * the first option, so an existing scene opened in the editor shows "All
+ * configured services" without being rewritten.
+ *
+ * The second option is the opposite choice: keep the message in the Gladys
+ * conversation only. It is the only way to write a message that installing a
+ * messaging integration later cannot turn into a text message, and it stays
+ * available even when the user has no messaging channel at all.
  */
 class MessageServiceSelector extends Component {
   buildName = service => {
@@ -90,51 +100,59 @@ class MessageServiceSelector extends Component {
   handleChange = selectedOption => {
     const value = selectedOption && selectedOption.value !== ALL_SERVICES_VALUE ? selectedOption.value : null;
     // keep a local copy: the parent rebuilds the action object on every
-    // update, and a re-render arriving before the new action prop is
+    // update, and a re-render arriving before the new value prop is
     // propagated must not make the select fall back to "all services"
     this.setState({ selectedService: value });
-    this.props.updateActionProperty(this.props.path, 'service', value);
+    this.props.onChange(value);
   };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
       serviceOptions: [],
-      selectedService: props.action.service || null
+      selectedService: props.value || null
     };
   }
   componentDidMount() {
     this.getOptions();
   }
   componentWillReceiveProps(nextProps) {
-    // the action being edited changed under us (scene reloaded, card moved):
-    // follow it, but ignore the transient re-renders where the parent has
-    // not applied our own update yet
-    if (nextProps.action.service !== this.props.action.service) {
-      this.setState({ selectedService: nextProps.action.service || null });
+    // the value changed under us (scene reloaded, card moved, setting
+    // loaded): follow it, but ignore the transient re-renders where the
+    // parent has not applied our own update yet
+    if (nextProps.value !== this.props.value) {
+      this.setState({ selectedService: nextProps.value || null });
     }
   }
-  render({ action }, { serviceOptions, selectedService }) {
-    const currentService = action.service || selectedService;
+  render({ value, label, children }, { serviceOptions, selectedService }) {
+    const currentService = value || selectedService;
     const allServicesOption = {
       label: <Text id="editScene.actionsCard.messageSend.allServicesLabel" />,
       value: ALL_SERVICES_VALUE
     };
-    const options = [allServicesOption, ...serviceOptions];
-    const selectedOption = currentService
-      ? // a channel saved in the scene but no longer listed (service removed
-        // or uninstalled) still needs to be readable: translate what we can
-        // and mark it unavailable, rather than showing a raw technical name
-        serviceOptions.find(option => option.value === currentService) || {
-          label: this.buildLabel({ name: currentService, status: null }),
-          value: currentService
-        }
-      : allServicesOption;
+    const gladysOnlyOption = {
+      label: <Text id="editScene.actionsCard.messageSend.gladysOnlyLabel" />,
+      value: MESSAGE_GLADYS_ONLY_SERVICE
+    };
+    const options = [allServicesOption, gladysOnlyOption, ...serviceOptions];
+    let selectedOption;
+    if (!currentService) {
+      selectedOption = allServicesOption;
+    } else if (currentService === MESSAGE_GLADYS_ONLY_SERVICE) {
+      // not a service name: it never appears in the list returned by the server
+      selectedOption = gladysOnlyOption;
+    } else {
+      // a channel saved in the scene but no longer listed (service removed
+      // or uninstalled) still needs to be readable: translate what we can
+      // and mark it unavailable, rather than showing a raw technical name
+      selectedOption = serviceOptions.find(option => option.value === currentService) || {
+        label: this.buildLabel({ name: currentService, status: null }),
+        value: currentService
+      };
+    }
     return (
       <div class="form-group">
-        <label class="form-label">
-          <Text id="editScene.actionsCard.messageSend.serviceLabel" />
-        </label>
+        {label && <label class="form-label">{label}</label>}
         <Select
           styles={{
             // Fixes the overlapping problem of the component
@@ -146,9 +164,7 @@ class MessageServiceSelector extends Component {
           className="react-select-container"
           classNamePrefix="react-select"
         />
-        <div class="mt-1 small text-muted">
-          <Text id="editScene.actionsCard.messageSend.serviceExplanation" />
-        </div>
+        {children && <div class="mt-1 small text-muted">{children}</div>}
       </div>
     );
   }

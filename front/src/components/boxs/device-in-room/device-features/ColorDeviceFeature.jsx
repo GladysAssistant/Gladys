@@ -25,12 +25,12 @@ class ColorDeviceType extends Component {
 
   setColorPickerState = (open, fromEvent) => {
     if (!open) {
-      document.removeEventListener('click', this.blur, true);
+      document.removeEventListener('pointerdown', this.blur, true);
     }
 
     this.setState({ open, fromEvent }, () => {
       if (this.state.open) {
-        document.addEventListener('click', this.blur, true);
+        document.addEventListener('pointerdown', this.blur, true);
       }
     });
   };
@@ -64,7 +64,7 @@ class ColorDeviceType extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.blur, true);
+    document.removeEventListener('pointerdown', this.blur, true);
   }
 
   render({ rowName, deviceFeature }, { open }) {
@@ -89,7 +89,10 @@ class ColorDeviceType extends Component {
             </div>
           </td>
         </tr>
-        <tr>
+        {/* device-color-picker-row: structural row, not a feature pill — the
+            dashboard's compact card mode paints the pill on the row and must
+            skip this one (routes/dashboard/style.css) */}
+        <tr class="device-color-picker-row">
           <td colSpan="3" class="border-0 p-0">
             <div
               class={cx('fade', 'w-100', 'mw-100', style.deviceRowPopover, {

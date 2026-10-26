@@ -7,6 +7,9 @@ const { calculateCostFromDate } = require('./energy-monitoring.calculateCostFrom
 const { calculateCostFromYesterday } = require('./energy-monitoring.calculateCostFromYesterday');
 const { calculateCostFromBeginning } = require('./energy-monitoring.calculateCostFromBeginning');
 const { getContracts } = require('./energy-monitoring.getContracts');
+const { recalculateForContracts } = require('./energy-monitoring.recalculateForContracts');
+const { closeBillingPeriods } = require('./energy-monitoring.closeBillingPeriods');
+const { delegatedCatchUp, catchUpDelegatedFrom } = require('./energy-monitoring.delegatedCatchUp');
 const { calculateEnergyFromIndex } = require('./energy-monitoring.calculateEnergyFromIndex');
 const { calculateEnergyFromIndexFromBeginning } = require('./energy-monitoring.calculateEnergyFromIndexFromBeginning');
 const { calculateEnergyFromIndexThirtyMinutes } = require('./energy-monitoring.calculateEnergyFromIndexThirtyMinutes');
@@ -63,6 +66,19 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     JOB_TYPES.ENERGY_MONITORING_PRODUCTION_FROM_INDEX_BEGINNING,
     this.calculateProductionFromIndexFromBeginning.bind(this),
   );
+  this.recalculateForContracts = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_CONTRACT,
+    this.recalculateForContracts.bind(this),
+  );
+  this.closeBillingPeriods = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_BILLING_PERIOD_END,
+    this.closeBillingPeriods.bind(this),
+  );
+  // the catch-up scan runs every 30 minutes, the job only exists when it has something to recompute
+  this.catchUpDelegatedFrom = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_DELEGATED_CATCH_UP,
+    this.catchUpDelegatedFrom.bind(this),
+  );
 };
 
 EnergyMonitoringHandler.prototype.init = init;
@@ -72,6 +88,10 @@ EnergyMonitoringHandler.prototype.calculateCostFromDate = calculateCostFromDate;
 EnergyMonitoringHandler.prototype.calculateCostFromYesterday = calculateCostFromYesterday;
 EnergyMonitoringHandler.prototype.calculateCostFromBeginning = calculateCostFromBeginning;
 EnergyMonitoringHandler.prototype.getContracts = getContracts;
+EnergyMonitoringHandler.prototype.recalculateForContracts = recalculateForContracts;
+EnergyMonitoringHandler.prototype.closeBillingPeriods = closeBillingPeriods;
+EnergyMonitoringHandler.prototype.delegatedCatchUp = delegatedCatchUp;
+EnergyMonitoringHandler.prototype.catchUpDelegatedFrom = catchUpDelegatedFrom;
 EnergyMonitoringHandler.prototype.calculateEnergyFromIndex = calculateEnergyFromIndex;
 EnergyMonitoringHandler.prototype.calculateEnergyFromIndexFromBeginning = calculateEnergyFromIndexFromBeginning;
 EnergyMonitoringHandler.prototype.calculateEnergyFromIndexThirtyMinutes = calculateEnergyFromIndexThirtyMinutes;

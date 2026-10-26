@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs/promises');
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { findOwnContainer } = require('../../../utils/dockerContainers');
 
 const matterbridgeContainerDescriptor = require('../docker/gladys-matterbridge-container.json');
 const { DEFAULT } = require('./constants');
@@ -12,27 +13,25 @@ const { DEFAULT } = require('./constants');
  * disconnect();
  */
 async function disconnect() {
-  let container;
-
   // Stop Matterbridge container
   try {
-    const dockerContainer = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [matterbridgeContainerDescriptor.name] },
-    });
-    [container] = dockerContainer;
-    await this.gladys.system.stopContainer(container.id);
-    await this.gladys.system.removeContainer(container.id);
+    // A user container carrying our name is never stopped nor removed: it is reported as absent
+    const container = await findOwnContainer(this.gladys.system, matterbridgeContainerDescriptor);
+    if (container) {
+      await this.gladys.system.stopContainer(container.id);
+      await this.gladys.system.removeContainer(container.id);
 
-    const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
+      const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
 
-    const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
+      const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
 
-    await fs.rm(configFilepath, { recursive: true });
+      await fs.rm(configFilepath, { recursive: true });
+    }
 
+    // Whether it was ours or not, our Matterbridge is not running anymore
     this.matterbridgeRunning = false;
   } catch (e) {
-    logger.warn(`Matterbridge: failed to stop container ${container.id}:`, e);
+    logger.warn(`Matterbridge: failed to stop container ${matterbridgeContainerDescriptor.name}:`, e);
   }
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

@@ -38,7 +38,11 @@ const DeviceFeatureModel = require('./device_feature');
 const DeviceFeatureSupportedOptionModel = require('./device_feature_supported_option');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
+const EnergyContractModel = require('./energy_contract');
 const EnergyPriceModel = require('./energy_price');
+const ThermostatScheduleModel = require('./thermostat_schedule');
+const ThermostatScheduleTransitionModel = require('./thermostat_schedule_transition');
+const ThermostatScheduleDeviceModel = require('./thermostat_schedule_device');
 const HouseModel = require('./house');
 const JobModel = require('./job');
 const LifeEventModel = require('./life_event');
@@ -51,6 +55,8 @@ const ScriptModel = require('./script');
 const ServiceModel = require('./service');
 const SessionModel = require('./session');
 const TagScene = require('./tag_scene');
+const TariffCalendarModel = require('./tariff_calendar');
+const TariffCalendarEntryModel = require('./tariff_calendar_entry');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
 
@@ -66,7 +72,11 @@ const models = {
   DeviceFeatureSupportedOption: DeviceFeatureSupportedOptionModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
+  EnergyContract: EnergyContractModel(sequelize, Sequelize),
   EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
+  ThermostatSchedule: ThermostatScheduleModel(sequelize, Sequelize),
+  ThermostatScheduleTransition: ThermostatScheduleTransitionModel(sequelize, Sequelize),
+  ThermostatScheduleDevice: ThermostatScheduleDeviceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
   LifeEvent: LifeEventModel(sequelize, Sequelize),
@@ -79,6 +89,8 @@ const models = {
   Service: ServiceModel(sequelize, Sequelize),
   Session: SessionModel(sequelize, Sequelize),
   TagScene: TagScene(sequelize, Sequelize),
+  TariffCalendar: TariffCalendarModel(sequelize, Sequelize),
+  TariffCalendarEntry: TariffCalendarEntryModel(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
 };
@@ -154,6 +166,17 @@ if (mainMemoryLimitMB === null) {
   defaultBackupMemoryLimit = '1024MB';
 }
 const duckDbBackupMemoryLimit = process.env.DUCKDB_BACKUP_MEMORY_LIMIT || defaultBackupMemoryLimit;
+
+// The main buffer pool fills up to its memory_limit on the first big scans and
+// DuckDB keeps it as a cache: it never hands that memory back on its own, so
+// the backup instance pool comes on top of a full main pool. While the export
+// runs, the main limit is lowered to this value (see duckDbRunWithReducedMemoryLimit):
+// DuckDB evicts the cached blocks down to it and gives the memory back to the
+// OS, which makes room for the export. Only done when the main limit is
+// parseable and above this value, so the limit is never raised.
+const DUCKDB_MEMORY_LIMIT_DURING_BACKUP = '512MB';
+const reduceMemoryLimitDuringBackup =
+  mainMemoryLimitMB !== null && mainMemoryLimitMB > parseMemoryLimitMB(DUCKDB_MEMORY_LIMIT_DURING_BACKUP);
 
 // An explicit DUCKDB_MEMORY_LIMIT is applied as-is: warn when it exceeds the
 // memory this process can actually use (as far as it is detectable), because
@@ -354,22 +377,58 @@ const duckDbUpdateState = async (deviceFeatureId, value, createdAt) => {
   );
 };
 
+const buildInsertStatesStatement = (deviceFeatureId, states) => {
+  let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
+  const queryParams = [];
+  states.forEach((state, index) => {
+    if (index > 0) {
+      queryString += `,`;
+    }
+    queryString += '(?, ?, ?)';
+    queryParams.push(deviceFeatureId);
+    queryParams.push(state.value);
+    queryParams.push(formatDateInUTC(state.created_at));
+  });
+  return { queryString, queryParams };
+};
+
 const duckDbBatchInsertState = async (deviceFeatureId, states) => {
   const chunks = chunk(states, 10000);
   await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
-    let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
-    const queryParams = [];
-    oneStatesChunk.forEach((state, index) => {
-      if (index > 0) {
-        queryString += `,`;
-      }
-      queryString += '(?, ?, ?)';
-      queryParams.push(deviceFeatureId);
-      queryParams.push(state.value);
-      queryParams.push(formatDateInUTC(state.created_at));
-    });
+    const { queryString, queryParams } = buildInsertStatesStatement(deviceFeatureId, oneStatesChunk);
     logger.info(`DuckDB : Inserting chunk ${chunkIndex} for deviceFeature = ${deviceFeatureId}.`);
     await duckDbWriteConnectionAllAsync(queryString, ...queryParams);
+  });
+};
+
+// Replace the states of a feature from a date in ONE transaction: the previous states are
+// kept when the insert fails or the process dies between the delete and the insert (the
+// energy cost history is rewritten this way). The statements run back to back on the
+// write connection as a single queued task, so no other write interleaves in the
+// transaction (a dedicated connection is not an option: the instance may have been
+// closed by a backup restore while the existing connections keep working).
+const duckDbReplaceStatesFrom = async (deviceFeatureId, from, states) => {
+  await ensureDuckDbInitialized();
+  return duckDbWriteQueue(async () => {
+    const run = async (query, params = []) => {
+      const mappedParams = normalizeParams(params).map(toDuckDbParam);
+      await duckDbWriteConnection.runAndReadAll(query, mappedParams);
+    };
+    try {
+      await run('BEGIN TRANSACTION');
+      await run('DELETE FROM t_device_feature_state WHERE device_feature_id = ? AND created_at >= ?::TIMESTAMPTZ', [
+        deviceFeatureId,
+        formatDateInUTC(from),
+      ]);
+      await Promise.each(chunk(states, 10000), async (oneStatesChunk) => {
+        const { queryString, queryParams } = buildInsertStatesStatement(deviceFeatureId, oneStatesChunk);
+        await run(queryString, queryParams);
+      });
+      await run('COMMIT');
+    } catch (e) {
+      await run('ROLLBACK').catch((rollbackError) => logger.warn(`DuckDB rollback failed: ${rollbackError.message}`));
+      throw e;
+    }
   });
 };
 
@@ -429,6 +488,59 @@ const duckDbCreateBackupInstance = async () => {
   return { allAsync, close };
 };
 
+/**
+ * @description Run a task with the memory limit of the main DuckDB instance lowered,
+ * then restore it. Lowering the limit evicts the cached blocks of the main buffer
+ * pool, so the memory the task needs (the backup export) does not add up to it.
+ * When the limit cannot be lowered (the blocks are pinned by running queries), the
+ * task still runs, with the full limit.
+ * @param {Function} task - Async function to run with the lowered limit.
+ * @returns {Promise<any>} Resolve with the task result.
+ * @example
+ * await duckDbRunWithReducedMemoryLimit(async () => {
+ *   const backupDb = await duckDbCreateBackupInstance();
+ *   try {
+ *     await backupDb.allAsync('EXPORT DATABASE ...');
+ *   } finally {
+ *     await backupDb.close();
+ *   }
+ * });
+ */
+const duckDbRunWithReducedMemoryLimit = async (task) => {
+  let reduced = false;
+  if (reduceMemoryLimitDuringBackup) {
+    try {
+      // A running query pins the buffer pool blocks it reads, and DuckDB refuses
+      // to lower the limit below the pinned memory. So the SET runs while both
+      // connections are idle: queued on the write connection, it then waits for
+      // the queries already queued on the read connection.
+      await ensureDuckDbInitialized();
+      await duckDbWriteQueue(() =>
+        duckDbReadQueue(() =>
+          duckDbWriteConnection.runAndReadAll(`SET memory_limit='${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}'`),
+        ),
+      );
+      reduced = true;
+      logger.info(`DuckDB: memory_limit lowered from ${duckDbMemoryLimit} to ${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}`);
+    } catch (e) {
+      logger.warn(`DuckDB: unable to lower memory_limit to ${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}: ${e.message}`);
+    }
+  }
+  try {
+    return await task();
+  } finally {
+    if (reduced) {
+      try {
+        // Only reached with a parseable limit, which cannot contain a quote.
+        await duckDbWriteConnectionAllAsync(`SET memory_limit='${duckDbMemoryLimit}'`);
+        logger.info(`DuckDB: memory_limit restored to ${duckDbMemoryLimit}`);
+      } catch (e) {
+        logger.error(`DuckDB: unable to restore memory_limit to ${duckDbMemoryLimit}: ${e.message}`);
+      }
+    }
+  }
+};
+
 const db = {
   ...models,
   sequelize,
@@ -451,9 +563,11 @@ const db = {
   duckDbInsertState,
   duckDbUpdateState,
   duckDbBatchInsertState,
+  duckDbReplaceStatesFrom,
   duckDbShowVersion,
   duckDbSetTimezone,
   duckDbCreateBackupInstance,
+  duckDbRunWithReducedMemoryLimit,
 };
 
 // Start opening the DuckDB database right away so it is ready as soon as possible.

@@ -1,19 +1,32 @@
 const db = require('../../models');
-const { ExternalIntegrationUnavailableError, NotFoundError } = require('../../utils/coreErrors');
-const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
+const { ExternalIntegrationUnavailableError, NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS, MUSIC_PLAY_MODES } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
 const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
+const {
+  normalizeBrowseResult,
+  normalizeSearchResult,
+  normalizeQueueResult,
+} = require('./externalIntegration.normalizeMusic');
 const {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
   WEATHER_IMAGE_CACHE_TTL_MS,
   WEATHER_IMAGE_CACHE_PREFIX,
+  TTS_SYNTHESIZE_TIMEOUT_MS,
+  MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
+  MAX_TTS_TEXT_LENGTH,
+  TTS_AUDIO_CONTENT_TYPES,
 } = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
 const POLLABLE_STATUSES = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
+// strict base64 alphabet with optional padding: what a TTS data-URI must
+// carry after its ";base64," separator
+const BASE64_REGEX = /^[A-Za-z0-9+/]+={0,2}$/;
 
 /**
  * @description Register the proxy service of an external integration in the
@@ -146,6 +159,187 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // AI provider integrations expose ai.chat(request): gateway.aiChat routes
+  // every OpenAI-compatible request (chat loop, intent router, weekly
+  // digest) here when the integration is the selected AI provider
+  // (AI_PROVIDER variable, capabilities/ai-type.md) instead of Gladys Plus.
+  // The completion is bounded before it enters the loop (aiChat).
+  const isAiProvider = service.manifest && service.manifest.type === 'ai';
+  const aiCapability = isAiProvider
+    ? {
+        ai: Object.freeze({
+          chat: async (request) => this.aiChat(service, request),
+        }),
+      }
+    : {};
+  // TTS provider integrations (capabilities/tts-type.md) expose the generic
+  // provider interface tts.synthesize: the core tts manager dispatches to any
+  // service exposing it, without knowing any engine by name. The audio comes
+  // back in the command-result as a data-URI, validated here (curated content
+  // types, decoded size bound) before a single byte is served to a speaker.
+  const isTts = service.manifest && service.manifest.type === 'tts';
+  const ttsCapability = isTts
+    ? {
+        tts: Object.freeze({
+          synthesize: async ({ text, language = null }) => {
+            // cap applied by the core before the relay: a long AI answer
+            // must speak its beginning rather than fail
+            const cappedText = String(text).substring(0, MAX_TTS_TEXT_LENGTH);
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.TTS_SYNTHESIZE,
+              { text: cappedText, language },
+              { timeoutMs: TTS_SYNTHESIZE_TIMEOUT_MS },
+            );
+            const audio = result && result.data && result.data.audio;
+            // the string length is bounded before anything is decoded: a
+            // data-URI that cannot fit under the size cap never allocates
+            if (typeof audio !== 'string' || audio.length === 0 || audio.length > MAX_TTS_AUDIO_BASE64_LENGTH) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            // the contract is "<content type>;base64,<payload>" (the camera
+            // convention); a standard data URI with its "data:" scheme is
+            // accepted too rather than failing with an opaque error
+            const dataUri = audio.startsWith('data:') ? audio.substring('data:'.length) : audio;
+            const separatorIndex = dataUri.indexOf(';base64,');
+            const contentType = separatorIndex === -1 ? null : dataUri.substring(0, separatorIndex);
+            // own-key lookup only: a content type like "constructor" must
+            // not match an inherited Object.prototype property
+            const extension = Object.prototype.hasOwnProperty.call(TTS_AUDIO_CONTENT_TYPES, contentType)
+              ? TTS_AUDIO_CONTENT_TYPES[contentType]
+              : undefined;
+            if (!extension) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            // Buffer.from skips invalid characters instead of throwing: a
+            // malformed payload would otherwise decode to a partial clip
+            const encoded = dataUri.substring(separatorIndex + ';base64,'.length);
+            if (!BASE64_REGEX.test(encoded)) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            const buffer = Buffer.from(encoded, 'base64');
+            if (buffer.length === 0 || buffer.length > MAX_TTS_AUDIO_SIZE_BYTES) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            return { buffer, contentType, extension };
+          },
+        }),
+      }
+    : {};
+  // every external integration exposes the generic scene capability, like
+  // device.setValue: the scene engine relays a reached action through it
+  // (scene.actions.js, the exact path mqtt.send takes) and the supervisor
+  // reads the CURRENT manifest on every run (runSceneAction) — gating the
+  // capability on the manifest known here would freeze the declarations at
+  // registration time, and a scene action added by an update would fail
+  // until the next restart
+  const sceneCapability = {
+    scene: Object.freeze({
+      runAction: async (actionKey, fields, options) => this.runSceneAction(service, actionKey, fields, options),
+    }),
+  };
+  // music players (capabilities/music.md, section 4): the on-demand catalog,
+  // queue and artwork of a device integration's players, relayed over the
+  // integration WebSocket and bounded on the way back. The capability only
+  // exists on an integration that OPTED IN through the `music` manifest field
+  // (`{}` is enough for an artwork-only player): a vacuum or a meter
+  // integration never gets a play command relayed to it. The operations the
+  // integration implements are the field's flags: an undeclared one is refused
+  // here without a command. The capabilities are answered from the stored
+  // manifest, whatever the state of the container.
+  const musicDeclaration = service.manifest && service.manifest.music;
+  const isMusicIntegration =
+    service.manifest &&
+    service.manifest.type === 'device' &&
+    musicDeclaration !== null &&
+    typeof musicDeclaration === 'object' &&
+    !Array.isArray(musicDeclaration);
+  const musicSupports = Object.freeze({
+    browse: isMusicIntegration && musicDeclaration.browse === true,
+    search: isMusicIntegration && musicDeclaration.search === true,
+    queue: isMusicIntegration && musicDeclaration.queue === true,
+    append: isMusicIntegration && musicDeclaration.append === true,
+  });
+  const requireMusicOperation = (operation) => {
+    if (!musicSupports[operation]) {
+      throw new NotFoundError('MUSIC_OPERATION_NOT_SUPPORTED');
+    }
+  };
+  const devicePayload = (device) => ({
+    external_id: device.external_id,
+    selector: device.selector,
+    params: device.params,
+  });
+  const musicCapability = isMusicIntegration
+    ? {
+        music: Object.freeze({
+          getCapabilities: () => ({ ...musicSupports }),
+          browse: async (device, { parentId, offset, limit }) => {
+            requireMusicOperation('browse');
+            const data = await this.relayMusicCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_BROWSE,
+              {
+                device: devicePayload(device),
+                parent_id: parentId,
+                offset,
+                limit,
+              },
+            );
+            const result = normalizeBrowseResult(data, service.selector);
+            this.rememberMusicArtworkKeys(service, result.items);
+            return result;
+          },
+          search: async (device, { query, type, limit }) => {
+            requireMusicOperation('search');
+            const data = await this.relayMusicCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_SEARCH,
+              {
+                device: devicePayload(device),
+                query,
+                type,
+                limit,
+              },
+            );
+            const result = normalizeSearchResult(data, service.selector);
+            this.rememberMusicArtworkKeys(service, result.items);
+            return result;
+          },
+          play: async (device, media, mode) => {
+            // next / append need the `append` flag: a 400 names the mode, the
+            // player itself stays a valid target (section 4.3)
+            if (mode !== MUSIC_PLAY_MODES.REPLACE && !musicSupports.append) {
+              throw new BadParameters('MUSIC_MODE_NOT_SUPPORTED');
+            }
+            await this.relayMusicCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_PLAY, {
+              device: devicePayload(device),
+              media: { id: media.id, type: media.type },
+              mode,
+            });
+          },
+          getQueue: async (device, { offset, limit }) => {
+            requireMusicOperation('queue');
+            const data = await this.relayMusicCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_QUEUE_GET,
+              { device: devicePayload(device), offset, limit },
+            );
+            const result = normalizeQueueResult(data, service.selector);
+            this.rememberMusicArtworkKeys(service, result.items);
+            return result;
+          },
+          playQueueItem: async (device, index) => {
+            requireMusicOperation('queue');
+            await this.relayMusicCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_QUEUE_PLAY, {
+              device: devicePayload(device),
+              index,
+            });
+          },
+          getArtwork: async (device, key) => this.getMusicArtwork(service, device, key),
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -155,6 +349,10 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...aiCapability,
+    ...ttsCapability,
+    ...sceneCapability,
+    ...musicCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {
@@ -222,6 +420,13 @@ function registerProxyService(service) {
       },
     }),
   });
+  // registering must be idempotent: init() registers every installed
+  // integration at boot and update() registers the updated row again.
+  // stateManager.setState() MERGES into the existing Store, and the proxy is
+  // frozen, so a second registration would throw "Cannot assign to read only
+  // property 'start'" — the entry is dropped first, exactly as uninstall does.
+  this.stateManager.deleteState('service', service.name);
+  this.stateManager.deleteState('serviceById', service.id);
   this.stateManager.setState('service', service.name, proxyService);
   this.stateManager.setState('serviceById', service.id, proxyService);
 }

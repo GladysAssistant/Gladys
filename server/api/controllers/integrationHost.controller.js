@@ -112,6 +112,27 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/scene/event publishSceneEvent
+   * @apiName publishSceneEvent
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Fire a scene trigger declared in the manifest
+   * (scene_triggers[].key): the core matches the flat `data` against the
+   * filters configured in the scenes and starts the matching ones,
+   * exposing the declared variables to their actions. 404 on an
+   * undeclared key, 400 on nested data (one primitive per key, 30 keys,
+   * strings of 1000 characters max), 429 past 300 events/minute (a counter
+   * separate from the states). 200 means accepted and evaluated once —
+   * never "a scene ran". A scene event is a trigger, never a state: a
+   * value goes through POST /state, a picture through POST /camera/image.
+   * @apiParamExample {json} Request-Example
+   * { "key": "object_detected", "data": { "camera": "ext:frigate:front", "label": "person", "score": 0.92 } }
+   */
+  async function publishSceneEvent(req, res) {
+    gladys.externalIntegration.publishSceneEvent(req.externalIntegrationService, req.body);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {post} /api/integration/v1/network_discovery/scan networkDiscoveryScan
    * @apiName networkDiscoveryScan
    * @apiGroup IntegrationHostApi
@@ -246,6 +267,78 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {get} /api/integration/v1/calendar/account getCalendarAccounts
+   * @apiName getCalendarAccounts
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The users who enabled this calendar integration, with
+   * their account values (secrets included: this is the integration side).
+   * Calendar integrations only (403 otherwise).
+   */
+  async function getCalendarAccounts(req, res) {
+    const accounts = await gladys.externalIntegration.getCalendarAccounts(req.externalIntegrationService);
+    res.json(accounts);
+  }
+
+  /**
+   * @api {get} /api/integration/v1/calendar getIntegrationCalendars
+   * @apiName getIntegrationCalendars
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The integration's calendars, with the user-owned sync
+   * flag telling which to skip; ?user=<selector> restricts to one user,
+   * without it every enabled user's calendars come back (startup resync).
+   */
+  async function getIntegrationCalendars(req, res) {
+    const calendars = await gladys.externalIntegration.getIntegrationCalendars(
+      req.externalIntegrationService,
+      req.query.user,
+    );
+    res.json(calendars);
+  }
+
+  /**
+   * @api {post} /api/integration/v1/calendar publishCalendars
+   * @apiName publishCalendars
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Upsert of the calendars of one enabled user, keyed by
+   * external_id (user-scoped prefix enforced). Integration-owned fields
+   * (name, description, color) are overwritten, user-owned ones (sync,
+   * shared, selector) never touched.
+   */
+  async function publishCalendars(req, res) {
+    const result = await gladys.externalIntegration.publishCalendars(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
+   * @api {delete} /api/integration/v1/calendar deleteIntegrationCalendar
+   * @apiName deleteIntegrationCalendar
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Destroy one of the integration's calendars and its
+   * events (?external_id=...) — how a provider-side deletion propagates.
+   */
+  async function deleteIntegrationCalendar(req, res) {
+    const result = await gladys.externalIntegration.deleteIntegrationCalendar(
+      req.externalIntegrationService,
+      req.query.external_id,
+    );
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/integration/v1/calendar/event publishCalendarEvents
+   * @apiName publishCalendarEvents
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Upsert of a batch of events in one of the integration's
+   * calendars, keyed by external_id; with a window ({ from, to }), the
+   * integration's events overlapping the window and absent from the list
+   * are pruned (manually created events never are).
+   */
+  async function publishCalendarEvents(req, res) {
+    const result = await gladys.externalIntegration.publishCalendarEvents(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
    * @api {get} /api/integration/v1/webhook getWebhooks
    * @apiName getWebhooks
    * @apiGroup IntegrationHostApi
@@ -322,8 +415,83 @@ module.exports = function IntegrationHostController(gladys) {
     res.json({ success: true });
   }
 
+  /**
+   * @api {post} /api/integration/v1/energy/calendar publishEnergyCalendar
+   * @apiName publishEnergyCalendar
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Upsert the entries of a tariff calendar declared in the manifest
+   * (energy_contracts.calendars[].key, 403 otherwise): at most 2,000 entries per call,
+   * values within the declared enum, starts_at aligned on the granularity, within
+   * 5 years back and 7 days ahead (400 otherwise). Queues a bounded cost recalculation.
+   * @apiParamExample {json} Request-Example
+   * { "calendar_key": "tempo", "entries": [{ "starts_at": "2026-01-11T23:00:00Z", "value": "red" }] }
+   */
+  async function publishEnergyCalendar(req, res) {
+    const result = await gladys.externalIntegration.publishEnergyCalendar(req.externalIntegrationService, req.body);
+    res.json({ success: true, count: result.count, changed_from: result.changed_from });
+  }
+
+  /**
+   * @api {post} /api/integration/v1/energy/consumption publishEnergyConsumption
+   * @apiName publishEnergyConsumption
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Publish dated consumption intervals on a 30-minute or daily consumption
+   * feature of this integration (a supplier whose data arrives after the fact): at most 2,000
+   * intervals per call, starts_at aligned on the 30-minute slot (or the local midnight) of the
+   * Gladys timezone, elapsed and at most 5 years old, kwh finite and positive (400 otherwise);
+   * 404 when the device is not created, 400 on a consumption the core derives from an index.
+   * Upserts the states and queues a bounded cost recalculation of the meter from the earliest
+   * interval whose value changed.
+   * @apiParamExample {json} Request-Example
+   * { "device_feature_external_id": "ext:hq:m:c", "intervals": [{ "starts_at": "2026-01-12T05:00:00Z", "kwh": 0.4 }] }
+   */
+  async function publishEnergyConsumption(req, res) {
+    const result = await gladys.externalIntegration.publishEnergyConsumption(req.externalIntegrationService, req.body);
+    res.json({ success: true, count: result.count, changed_from: result.changed_from });
+  }
+
+  /**
+   * @api {get} /api/integration/v1/energy/calendar/:key getEnergyCalendar
+   * @apiName getEnergyCalendar
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Read back a calendar declared by this integration (from, to, limit).
+   */
+  async function getEnergyCalendar(req, res) {
+    const options = {};
+    ['from', 'to'].forEach((key) => {
+      if (req.query[key]) {
+        options[key] = req.query[key];
+      }
+    });
+    if (req.query.limit) {
+      options.limit = Number(req.query.limit);
+    }
+    const entries = await gladys.externalIntegration.getEnergyCalendar(
+      req.externalIntegrationService,
+      req.params.key,
+      options,
+    );
+    res.json(entries);
+  }
+
+  /**
+   * @api {get} /api/integration/v1/energy/contract getEnergyContracts
+   * @apiName getEnergyContracts
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The users' contracts referencing a template of this integration
+   * (identity, inputs, validity, timezone, currency): never the meter nor the consumption.
+   */
+  async function getEnergyContracts(req, res) {
+    const contracts = await gladys.externalIntegration.getEnergyContracts(req.externalIntegrationService);
+    res.json(contracts);
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
+    publishEnergyCalendar: asyncMiddleware(publishEnergyCalendar),
+    publishEnergyConsumption: asyncMiddleware(publishEnergyConsumption),
+    getEnergyCalendar: asyncMiddleware(getEnergyCalendar),
+    getEnergyContracts: asyncMiddleware(getEnergyContracts),
     heartbeat: asyncMiddleware(heartbeat),
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),
@@ -334,11 +502,17 @@ module.exports = function IntegrationHostController(gladys) {
     getDevices: asyncMiddleware(getDevices),
     getHouses: asyncMiddleware(getHouses),
     publishStates: asyncMiddleware(publishStates),
+    publishSceneEvent: asyncMiddleware(publishSceneEvent),
     getConfig: asyncMiddleware(getConfig),
     saveConfig: asyncMiddleware(saveConfig),
     publishMessage: asyncMiddleware(publishMessage),
     linkContact: asyncMiddleware(linkContact),
     getContacts: asyncMiddleware(getContacts),
+    getCalendarAccounts: asyncMiddleware(getCalendarAccounts),
+    getIntegrationCalendars: asyncMiddleware(getIntegrationCalendars),
+    publishCalendars: asyncMiddleware(publishCalendars),
+    deleteIntegrationCalendar: asyncMiddleware(deleteIntegrationCalendar),
+    publishCalendarEvents: asyncMiddleware(publishCalendarEvents),
     getWebhooks: asyncMiddleware(getWebhooks),
     getContainers: asyncMiddleware(getContainers),
     startContainer: asyncMiddleware(startContainer),

@@ -5,6 +5,7 @@ import LoginPage from './LoginPage';
 
 class Login extends Component {
   componentWillMount() {
+    this.props.init(this.props.return_url);
     this.props.checkIfInstanceIsConfigured();
   }
 

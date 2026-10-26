@@ -25,8 +25,9 @@ function buildPeripheral(broadlinkDevice) {
   };
 
   if (features.length !== 0) {
-    // poll configuration
-    const shouldPoll = features.findIndex((feature) => feature.read_only) !== -1;
+    // poll configuration: devices are polled as soon as their mapper is able to read values back,
+    // even when all their features are writable (a smart plug state for example).
+    const shouldPoll = typeof deviceMapper.poll === 'function';
 
     const params = [
       {

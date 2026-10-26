@@ -6,7 +6,7 @@ const { assert, fake } = sinon;
 const { MockedMqttClient } = require('../mocks.test');
 const { CONFIGURATION, DEFAULT } = require('../../../../services/mqtt/lib/constants');
 const { SERVICE_STATUS } = require('../../../../utils/constants');
-const { NotFoundError, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { ConflictError, NotFoundError, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const saveConfiguration = proxyquire('../../../../services/mqtt/lib/saveConfiguration', {
   util: {
@@ -113,14 +113,9 @@ describe('mqttHandler.saveConfiguration', () => {
       assert.fail('Should have fail');
     } catch (e) {
       expect(e).to.be.instanceOf(NotFoundError);
-      assert.callCount(gladys.variable.destroy, 2);
-      assert.callCount(gladys.variable.setValue, 2);
-      assert.calledWith(
-        gladys.variable.setValue,
-        CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
-        config.useEmbeddedBroker,
-        serviceId,
-      );
+      // a configuration that cannot be applied is not persisted
+      assert.notCalled(gladys.variable.destroy);
+      assert.notCalled(gladys.variable.setValue);
 
       assert.calledOnce(gladys.system.getContainers);
       assert.notCalled(gladys.system.exec);
@@ -128,7 +123,7 @@ describe('mqttHandler.saveConfiguration', () => {
     }
   });
 
-  it('should saveConfiguration: init docker container no present (no user)', async () => {
+  it('should saveConfiguration: never reconfigure a user container carrying our name', async () => {
     const gladys = {
       service: {
         getLocalServiceByName: fake.resolves(null),
@@ -141,9 +136,12 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
+            id: 'user-container',
+            name: '/eclipse-mosquitto',
             image: 'another-image',
           },
         ]),
+        inspectContainer: fake.resolves({ Config: { Image: 'another-image' } }),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
       },
@@ -155,27 +153,18 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
-    await mqttHandler.saveConfiguration(config);
-
-    assert.callCount(gladys.variable.destroy, 2);
-    assert.callCount(gladys.variable.setValue, 3);
-    assert.calledWith(gladys.variable.setValue, CONFIGURATION.MQTT_URL_KEY, config.mqttUrl, serviceId);
-    assert.calledWith(
-      gladys.variable.setValue,
-      CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
-      config.useEmbeddedBroker,
-      serviceId,
-    );
-    assert.calledWith(
-      gladys.variable.setValue,
-      CONFIGURATION.MQTT_MOSQUITTO_VERSION,
-      DEFAULT.MOSQUITTO_VERSION,
-      serviceId,
-    );
-
-    assert.calledOnce(gladys.system.getContainers);
-    assert.calledOnce(gladys.system.exec);
-    assert.calledTwice(gladys.system.restartContainer);
+    try {
+      await mqttHandler.saveConfiguration(config);
+      assert.fail('Should have fail');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ConflictError);
+      assert.calledOnce(gladys.system.getContainers);
+      assert.notCalled(gladys.system.exec);
+      assert.notCalled(gladys.system.restartContainer);
+      // the embedded-broker configuration is not persisted against a foreign broker
+      assert.notCalled(gladys.variable.destroy);
+      assert.notCalled(gladys.variable.setValue);
+    }
   });
 
   it('should saveConfiguration: init docker container not running (no user)', async () => {
@@ -191,7 +180,9 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
-            image: DEFAULT.MQTT_IMAGE,
+            name: '/eclipse-mosquitto',
+            image: 'eclipse-mosquitto:2.0.15',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
           },
         ]),
         exec: fake.resolves(true),
@@ -241,7 +232,9 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
-            image: DEFAULT.MQTT_IMAGE,
+            name: '/eclipse-mosquitto',
+            image: 'eclipse-mosquitto:2.0.15',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
             state: 'running',
           },
         ]),
@@ -292,7 +285,9 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
-            image: DEFAULT.MQTT_IMAGE,
+            name: '/eclipse-mosquitto',
+            image: 'eclipse-mosquitto:2.0.15',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
             state: 'running',
           },
         ]),
@@ -422,6 +417,49 @@ describe('mqttHandler.saveConfiguration', () => {
       assert.notCalled(gladys.service.getLocalServiceByName);
       assert.notCalled(serviceInDb.set);
       assert.notCalled(serviceInDb.save);
+    }
+  });
+
+  it('should saveConfiguration: never reconfigure an unlabeled broker Gladys never configured', async () => {
+    const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
+      variable: {
+        destroy: fake.resolves('value'),
+        setValue: fake.resolves('value'),
+        // no stored Mosquitto version: Gladys never configured a broker
+        getValue: fake.resolves(null),
+      },
+      system: {
+        getContainers: fake.resolves([
+          {
+            id: 'user-broker',
+            name: '/eclipse-mosquitto',
+            image: 'eclipse-mosquitto:2',
+          },
+        ]),
+        inspectContainer: fake.resolves({ Config: { Image: 'eclipse-mosquitto:2' } }),
+        exec: fake.resolves(true),
+        restartContainer: fake.resolves(true),
+      },
+    };
+
+    const config = {
+      mqttUrl: 'mqttUrl',
+      useEmbeddedBroker: true,
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    try {
+      await mqttHandler.saveConfiguration(config);
+      assert.fail('Should have fail');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ConflictError);
+      assert.notCalled(gladys.system.exec);
+      assert.notCalled(gladys.system.restartContainer);
+      assert.notCalled(gladys.variable.destroy);
+      assert.notCalled(gladys.variable.setValue);
     }
   });
 });

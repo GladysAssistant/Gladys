@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import SettingsLayout from '../SettingsLayout';
 import GatewayRecoveryCodes from '../../../components/gateway/GatewayRecoveryCodes';
@@ -24,7 +24,11 @@ const SecurityPage = ({ children, ...props }) => (
                   </p>
                   {props.status === RequestStatus.Error && (
                     <div class="alert alert-danger" role="alert">
-                      <Text id="gatewayRecoveryCodes.generationError" />
+                      {props.wrongTwoFactorCode ? (
+                        <Text id="gatewayLogin.invalidTwoFactorCode" />
+                      ) : (
+                        <Text id="gatewayRecoveryCodes.generationError" />
+                      )}
                     </div>
                   )}
                   {props.confirming ? (
@@ -34,8 +38,35 @@ const SecurityPage = ({ children, ...props }) => (
                       <div class="alert alert-warning" role="alert">
                         <Text id="gatewayRecoveryCodes.rotationWarning" />
                       </div>
+                      {/* the Gateway requires a current code from the two-factor app */}
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="gatewayLogin.twoFactorCodeLabel" />
+                        </label>
+                        <Localizer>
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
+                            value={props.twoFactorCode}
+                            onInput={props.updateTwoFactorCode}
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            maxlength="6"
+                            autofocus
+                          />
+                        </Localizer>
+                        <small class="form-text text-muted">
+                          <Text id="gatewayRecoveryCodes.twoFactorCodeRequired" />
+                        </small>
+                      </div>
                       <div class="btn-list">
-                        <button type="button" class="btn btn-primary" onClick={props.generateRecoveryCodes}>
+                        <button
+                          type="button"
+                          class="btn btn-primary"
+                          onClick={props.generateRecoveryCodes}
+                          disabled={!props.twoFactorCode || props.twoFactorCode.length < 6}
+                        >
                           <Text id="gatewayRecoveryCodes.confirmGenerateButton" />
                         </button>
                         <button type="button" class="btn btn-secondary" onClick={props.cancelGenerate}>

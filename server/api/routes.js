@@ -1,6 +1,7 @@
 const AreaController = require('./controllers/area.controller');
 const CalendarController = require('./controllers/calendar.controller');
 const CameraController = require('./controllers/camera.controller');
+const MusicController = require('./controllers/music.controller');
 const DashboardController = require('./controllers/dashboard.controller');
 const DeviceController = require('./controllers/device.controller');
 const UserController = require('./controllers/user.controller');
@@ -19,9 +20,11 @@ const ExternalIntegrationController = require('./controllers/externalIntegration
 const IntegrationHostController = require('./controllers/integrationHost.controller');
 const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
+const TtsController = require('./controllers/tts.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 const EnergyPriceController = require('./controllers/energy-price.controller');
+const EnergyContractController = require('./controllers/energy-contract.controller');
 
 /**
  * @description Return object of routes.
@@ -34,6 +37,7 @@ function getRoutes(gladys) {
   const areaController = AreaController(gladys);
   const calendarController = CalendarController(gladys);
   const cameraController = CameraController(gladys);
+  const musicController = MusicController(gladys);
   const dashboardController = DashboardController(gladys);
   const deviceController = DeviceController(gladys);
   const lightController = LightController(gladys);
@@ -46,6 +50,7 @@ function getRoutes(gladys) {
   const pingController = PingController();
   const gatewayController = GatewayController(gladys);
   const roomController = RoomController(gladys);
+  const ttsController = TtsController(gladys);
   const variableController = VariableController(gladys);
   const sessionController = SessionController(gladys);
   const serviceController = ServiceController(gladys);
@@ -55,6 +60,7 @@ function getRoutes(gladys) {
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
   const energyPriceController = EnergyPriceController(gladys);
+  const energyContractController = EnergyContractController(gladys);
 
   const routes = {};
 
@@ -88,6 +94,11 @@ function getRoutes(gladys) {
       authenticated: false,
       rateLimit: true,
       controller: userController.forgotPassword,
+    },
+    'post /api/v1/forgot_password/code': {
+      authenticated: false,
+      rateLimit: true,
+      controller: userController.verifyForgotPasswordCode,
     },
     'post /api/v1/reset_password': {
       authenticated: false,
@@ -171,6 +182,35 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: cameraController.setImage,
     },
+    // music players (capabilities/music.md): on-demand catalog, queue and artwork
+    'get /api/v1/device/:device_selector/music/capabilities': {
+      authenticated: true,
+      controller: musicController.getCapabilities,
+    },
+    'get /api/v1/device/:device_selector/music/browse': {
+      authenticated: true,
+      controller: musicController.browse,
+    },
+    'get /api/v1/device/:device_selector/music/search': {
+      authenticated: true,
+      controller: musicController.search,
+    },
+    'post /api/v1/device/:device_selector/music/play': {
+      authenticated: true,
+      controller: musicController.play,
+    },
+    'get /api/v1/device/:device_selector/music/queue': {
+      authenticated: true,
+      controller: musicController.getQueue,
+    },
+    'post /api/v1/device/:device_selector/music/queue/play': {
+      authenticated: true,
+      controller: musicController.playQueueItem,
+    },
+    'get /api/v1/device/:device_selector/music/artwork/:key': {
+      authenticated: true,
+      controller: musicController.getArtwork,
+    },
     // dashboard
     'get /api/v1/dashboard': {
       authenticated: true,
@@ -224,6 +264,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDuckDbMigrationState,
     },
+    'get /api/v1/device/states_stats': {
+      authenticated: true,
+      controller: deviceController.getStatesStats,
+    },
     'post /api/v1/device/purge_all_sqlite_state': {
       authenticated: true,
       controller: deviceController.purgeAllSqliteStates,
@@ -235,6 +279,10 @@ function getRoutes(gladys) {
     'get /api/v1/service/:service_name/device': {
       authenticated: true,
       controller: deviceController.getDevicesByService,
+    },
+    'get /api/v1/device/:device_selector/states_size': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesSize,
     },
     'get /api/v1/device/:device_selector': {
       authenticated: true,
@@ -352,10 +400,20 @@ function getRoutes(gladys) {
     // flow can restore a Gladys Plus backup without creating a local account.
     // The "admin" flag is kept on those routes because it is also used by
     // setupGateway to protect API calls done through the Gladys Plus tunnel.
+    // The status route is the exception: it only returns two booleans (is the
+    // instance linked to Gladys Plus, is it currently connected), and every
+    // user needs it, not just admins. The front-end uses it to know whether a
+    // Gladys Plus feature (AI chat, voice assistant, camera live) is available:
+    // when it is denied, a user invited on the Plus account is wrongly invited
+    // to start a free trial for a subscription the instance already has.
     'get /api/v1/gateway/status': {
       authenticatedOrNotConfigured: true,
-      admin: true,
       controller: gatewayController.getStatus,
+    },
+    'post /api/v1/gateway/subscription/refresh': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.refreshSubscriptionStatus,
     },
     'post /api/v1/gateway/login': {
       authenticatedOrNotConfigured: true,
@@ -389,8 +447,11 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getUsersKeys,
     },
+    // the list of Gladys Plus users allowed to control the instance remotely:
+    // only an admin can accept, revoke or replace it
     'patch /api/v1/gateway/key': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.saveUsersKeys,
     },
     'get /api/v1/gateway/backup': {
@@ -409,9 +470,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.createBackup,
     },
+    // reachable without authentication while the instance has no user (signup
+    // restore flow), and it makes the server download and unpack a remote file:
+    // rate limited like the other pre-authentication routes
     'post /api/v1/gateway/backup/restore': {
       authenticatedOrNotConfigured: true,
       admin: true,
+      rateLimit: true,
       controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
@@ -424,8 +489,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
     },
+    // raw completion proxy, the debug-context replay path: with an external
+    // AI provider it reaches a personal API key or a host model with no
+    // bound on the outbound payload, so it is an admin tool like the
+    // debug context itself. Household chat goes through message.create
     'post /api/v1/gateway/aichat/chat': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.aiChat,
     },
     'get /api/v1/gateway/aichat/debug-context': {
@@ -455,6 +525,25 @@ function getRoutes(gladys) {
     'post /api/v1/gateway/tts': {
       authenticated: true,
       controller: gatewayController.getTtsUrl,
+    },
+    // tts (docs/specs/external-integrations/capabilities/tts-type.md)
+    'get /api/v1/tts/provider': {
+      // non-admin read: the scene editor uses it to stop showing the
+      // Gladys Plus upsell when another provider is active
+      authenticated: true,
+      controller: ttsController.getProviderConfiguration,
+    },
+    'post /api/v1/tts/provider': {
+      authenticated: true,
+      admin: true,
+      controller: ttsController.setActiveProvider,
+    },
+    'get /api/v1/tts/audio/:token': {
+      // unauthenticated by design: fetched by LAN speakers (Sonos
+      // trackUri...) that cannot send a JWT — the high-entropy token
+      // minted by gladys.tts.getSpeechUrl is the secret
+      authenticated: false,
+      controller: ttsController.getAudio,
     },
     'post /api/v1/gateway/refresh-latest-gladys-version': {
       authenticated: true,
@@ -541,6 +630,19 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.getAll,
     },
+    // AI provider selection (external integrations of type "ai" can serve
+    // the assistant instead of Gladys Plus): read is authenticated (the
+    // chat hides its model selector when an external provider is active),
+    // write is an admin gesture
+    'get /api/v1/ai_provider': {
+      authenticated: true,
+      controller: externalIntegrationController.getAiProvider,
+    },
+    'post /api/v1/ai_provider': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.setAiProvider,
+    },
     'get /api/v1/external_integration/store': {
       authenticated: true,
       admin: true,
@@ -556,15 +658,32 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.getStoreDocs,
     },
+    'get /api/v1/external_integration/store/integration': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.getStoreIntegration,
+    },
     'post /api/v1/external_integration/store/refresh': {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.refreshStore,
     },
+    // dashboard widgets declared by integrations: every authenticated user
+    // (the dashboard's audience) — the literal `widget` route before `:selector`
+    'get /api/v1/external_integration/widget': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgets,
+    },
     'post /api/v1/external_integration': {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.install,
+    },
+    // scene editor catalog, every authenticated user (a literal route, before
+    // `:selector` like `store`)
+    'get /api/v1/external_integration/scene': {
+      authenticated: true,
+      controller: externalIntegrationController.getSceneDeclarations,
     },
     'get /api/v1/external_integration/:selector': {
       authenticated: true,
@@ -628,6 +747,24 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.deleteOwnContactProfile,
     },
+    // calendar integrations (capabilities/calendar-type.md): each user enables their OWN account and
+    // manages their OWN calendars (sync/shared toggles, no admin flag either)
+    'get /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.getOwnCalendarAccount,
+    },
+    'post /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.saveOwnCalendarAccount,
+    },
+    'delete /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.disableOwnCalendarAccount,
+    },
+    'patch /api/v1/external_integration/:selector/calendar/:calendar_selector': {
+      authenticated: true,
+      controller: externalIntegrationController.updateOwnCalendar,
+    },
     'get /api/v1/external_integration/:selector/discovered_device': {
       authenticated: true,
       admin: true,
@@ -662,6 +799,21 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.runAction,
+    },
+    'get /api/v1/external_integration/:selector/widget/:key/content': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgetContent,
+    },
+    // images are integration-scoped and sit directly under `:selector`: a
+    // nested `widget/image/:image_key` would share its shape with
+    // `widget/:key/content` (`image` is a reserved widget key for the same reason)
+    'get /api/v1/external_integration/:selector/image/:image_key': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgetImage,
+    },
+    'post /api/v1/external_integration/:selector/widget/:key/action/:action_key': {
+      authenticated: true,
+      controller: externalIntegrationController.runWidgetAction,
     },
     'delete /api/v1/external_integration/:selector': {
       authenticated: true,
@@ -726,6 +878,32 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.publishStates,
     },
+    'post /api/integration/v1/scene/event': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishSceneEvent,
+    },
+    // energy contracts capability (capabilities/energy-contracts.md, section 2)
+    'post /api/integration/v1/energy/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishEnergyCalendar,
+    },
+    'post /api/integration/v1/energy/consumption': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishEnergyConsumption,
+    },
+    'get /api/integration/v1/energy/calendar/:key': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getEnergyCalendar,
+    },
+    'get /api/integration/v1/energy/contract': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getEnergyContracts,
+    },
     'get /api/integration/v1/config': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -750,6 +928,33 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.getContacts,
+    },
+    // calendar integrations (capabilities/calendar-type.md): the integration syncs, the core stores.
+    // User-scoped external_id prefix enforced, 30 writes/min per integration.
+    'get /api/integration/v1/calendar/account': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getCalendarAccounts,
+    },
+    'get /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getIntegrationCalendars,
+    },
+    'post /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishCalendars,
+    },
+    'delete /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.deleteIntegrationCalendar,
+    },
+    'post /api/integration/v1/calendar/event': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishCalendarEvents,
     },
     'get /api/integration/v1/webhook': {
       authenticated: false,
@@ -825,12 +1030,18 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: variableController.getByLocalService,
     },
+    // global variables hold instance-wide secrets (Gladys Plus keys, backup
+    // keys...): reading and writing them is reserved to admins. Per-user
+    // settings go through /api/v1/user/variable below, which stays open to
+    // every authenticated user.
     'post /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.setValue,
     },
     'get /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.getValue,
     },
     'post /api/v1/user/variable/:variable_key': {
@@ -981,22 +1192,82 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: weatherController.getImage,
     },
-    // energy price
+    // energy contracts (docs/specs/energy-contracts.md, section 8.1)
+    'get /api/v1/energy_contract': {
+      authenticated: true,
+      controller: energyContractController.get,
+    },
+    'post /api/v1/energy_contract': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.create,
+    },
+    'post /api/v1/energy_contract/preview': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.preview,
+    },
+    'post /api/v1/energy_contract/recalculate': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.recalculate,
+    },
+    'get /api/v1/energy_contract/template': {
+      authenticated: true,
+      controller: energyContractController.getTemplates,
+    },
+    'get /api/v1/energy_contract/template/:provider/:key': {
+      authenticated: true,
+      controller: energyContractController.getTemplate,
+    },
+    'get /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      controller: energyContractController.getBySelector,
+    },
+    'get /api/v1/energy_contract/:selector/current': {
+      authenticated: true,
+      controller: energyContractController.getCurrent,
+    },
+    'patch /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.update,
+    },
+    'delete /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.destroy,
+    },
+    // energy hierarchy: attach a device to an electric meter (docs/specs/energy-hierarchy.md, D.1)
+    'patch /api/v1/device/:device_selector/electric_meter': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.setDeviceElectricMeter,
+    },
+    'get /api/v1/energy_calendar': {
+      authenticated: true,
+      controller: energyContractController.getCalendars,
+    },
+    'get /api/v1/energy_calendar/:key': {
+      authenticated: true,
+      controller: energyContractController.getCalendarEntries,
+    },
+    // energy price: read-only compatibility window (section 9.4)
     'get /api/v1/energy_price': {
       authenticated: true,
       controller: energyPriceController.get,
     },
     'post /api/v1/energy_price': {
       authenticated: true,
-      controller: energyPriceController.create,
+      controller: energyPriceController.gone,
     },
     'patch /api/v1/energy_price/:selector': {
       authenticated: true,
-      controller: energyPriceController.update,
+      controller: energyPriceController.gone,
     },
     'delete /api/v1/energy_price/:selector': {
       authenticated: true,
-      controller: energyPriceController.destroy,
+      controller: energyPriceController.gone,
     },
     'get /api/v1/energy_price/default_electric_meter_feature_id': {
       authenticated: true,

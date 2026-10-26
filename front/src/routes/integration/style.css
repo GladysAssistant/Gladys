@@ -45,6 +45,57 @@
   margin-top: 8px;
 }
 
+/* desktop header: the title and the count stack in one column so the count
+   never widens the row; the controls on the right never wrap */
+.headerTitleBlock {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  margin-right: 1rem;
+}
+
+/* from 1200 px the header never wraps: the title block takes the width the
+   controls leave, and a long count wraps inside its own column instead of
+   pushing the controls under the title (the theme's .page-header wraps by
+   default, which moved the search field down by 51 px between 1200 and
+   1319 px as soon as the count grew while typing). Top-aligned, so a count
+   growing from one line to two does not recentre the controls either.
+   Below 1200 px the controls do not leave the title block any width: the
+   header keeps its two lines, where nothing moves */
+@media (min-width: 1200px) {
+  .headerDesktop :global(.page-header) {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+  }
+}
+
+.headerSubtitle {
+  margin-left: 0;
+  line-height: 1.25rem;
+}
+
+.headerOptions {
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+/* the "clear filters" link sits inside the count sentence: same size, no
+   button chrome */
+.clearFilters {
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+  /* the theme's button border adds 2 px to the count line as the link
+     appears: no line of the header may move with the count */
+  border: 0;
+}
+
+.countryScope :global(.btn-link) {
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .mobileCategoryNav {
   display: block;
   margin-bottom: 1rem;
@@ -185,6 +236,12 @@
   flex-shrink: 0;
 }
 
+/* lined up with the name and the tags of the item: the artwork width plus the
+   gap of .integrationListRow */
+.integrationListUpdate {
+  padding-left: calc(48px + 12px);
+}
+
 .integrationListItem :global(.integration-tags) {
   margin-top: 4px;
 }
@@ -219,6 +276,97 @@
   background: linear-gradient(135deg, #467fcf 0%, #316cbe 100%);
   color: #fff;
   font-size: 1.25rem;
+}
+
+/* Loading placeholders of the catalog (IntegrationCatalogSkeleton): neutral
+   translucent tones, readable on the light, dark and glass themes alike */
+.skeleton {
+  display: block;
+  border-radius: 4px;
+  background: linear-gradient(
+    110deg,
+    rgba(98, 105, 118, 0.1) 8%,
+    rgba(98, 105, 118, 0.18) 18%,
+    rgba(98, 105, 118, 0.1) 33%
+  );
+  background-size: 200% 100%;
+  animation: catalogSkeletonShine 1.5s linear infinite;
+}
+
+/* the 800x534 ratio of the store covers (C.1), so the cards keep their
+   height when the real ones replace the placeholders */
+.skeletonCover {
+  width: 100%;
+  padding-bottom: 66.75%;
+  border-radius: 3px 3px 0 0;
+}
+
+.skeletonListImg {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.skeletonTitle {
+  height: 1.1rem;
+  width: 55%;
+  margin-bottom: 0.75rem;
+}
+
+.skeletonText {
+  height: 0.8rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.skeletonTextShort {
+  width: 70%;
+}
+
+.skeletonTag {
+  display: inline-block;
+  height: 1.25rem;
+  width: 5.5rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+}
+
+@keyframes catalogSkeletonShine {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+/* "Loading…" in the header, in place of the integration count */
+.loadingDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background-color: #467fcf;
+  vertical-align: middle;
+  animation: catalogLoadingPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes catalogLoadingPulse {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .loadingDot {
+    animation: none;
+  }
+}
+
+.loadMore {
+  margin-bottom: 1rem;
 }
 
 /* The toggle is a native button for its keyboard semantics, but it must look
@@ -312,13 +460,87 @@
   border-radius: 12px;
 }
 
-:global(.glass-theme) .externalCoverPlaceholder {
+:global(.glass-theme) .externalCoverPlaceholder,
+:global(.glass-theme) .skeletonCover {
   border-top-left-radius: var(--gl-radius-lg);
   border-top-right-radius: var(--gl-radius-lg);
+}
+
+:global(.glass-theme) .skeletonListImg {
+  border-radius: 12px;
 }
 
 /* The name of a catalog card is a link: it keeps the card's ink, the hover
    underline stays as the affordance */
 :global(.glass-theme .card h4 a) {
   color: inherit;
+}
+
+/* "Update all" panel of the To update view: icon, text and button on one
+   line, the button dropping below the text on a phone */
+.updateAllBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.updateAllIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  color: #467fcf;
+  background-color: rgba(70, 127, 207, 0.12);
+}
+
+.updateAllText {
+  flex: 1;
+  min-width: 0;
+}
+
+.updateAllButton {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* the count rides on the button: a translucent pill readable on its fill,
+   whatever the theme */
+.updateAllCount {
+  color: inherit;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* dark mode inverts the page, then inverts every .badge back; the glass
+   button is not inverted back, so the pill must follow the button rather
+   than the other badges or it renders white on white */
+:global(.dark-mode) .updateAllCount {
+  filter: none;
+}
+
+/* the run in progress: the icon turns while a pull can take minutes */
+.updateAllSpinner {
+  animation: updateAllSpin 1.2s linear infinite;
+}
+
+@keyframes updateAllSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .updateAllSpinner {
+    animation: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .updateAllButton {
+    width: 100%;
+  }
 }

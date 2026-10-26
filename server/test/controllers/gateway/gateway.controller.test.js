@@ -1,7 +1,10 @@
 const nock = require('nock');
 const { expect } = require('chai');
+const sinon = require('sinon').createSandbox();
 const getConfig = require('../../../utils/getConfig');
-const { authenticatedRequest } = require('../request.test');
+const db = require('../../../models');
+const { authenticatedRequest, nonAdminRequest, NON_ADMIN_USER_ID } = require('../request.test');
+const { USER_ROLE, EVENTS } = require('../../../utils/constants');
 
 const config = getConfig();
 
@@ -60,6 +63,81 @@ describe('GET /api/v1/gateway/key', () => {
   });
 });
 
+// The users keys are the list of Gladys Plus users allowed to control the
+// instance remotely. Its read was reserved to admins, but any authenticated
+// user (guests included) could accept, revoke or replace it.
+describe('PATCH /api/v1/gateway/key', () => {
+  const usersKeys = [
+    {
+      id: '9233e553-90a0-4d04-9d69-f38fb8ccbc72',
+      name: 'User 2',
+      rsa_public_key: '51:89:e6:91:4f:da:f8:d6:b6:f6:1e:15:54:c4:c0:fd:cc:69:70:81:d4:a8:ea:26:8b:02:4b:b9:ff:97:64:1a',
+      ecdsa_public_key:
+        '2e:e9:ee:a0:b3:22:46:62:f8:22:9b:52:9d:f4:3f:65:70:62:59:76:d1:85:ad:3b:9f:65:4e:61:4c:26:89:7e',
+      accepted: true,
+    },
+  ];
+  const nonAdminUser = {
+    id: NON_ADMIN_USER_ID,
+    firstname: 'Pepper',
+    lastname: 'Potts',
+    selector: 'pepper-gateway-key',
+    email: 'pepper-gateway-key@pots.com',
+    language: 'en',
+    role: USER_ROLE.HABITANT,
+  };
+  const getStoredUsersKeys = () =>
+    db.Variable.findOne({
+      where: { name: 'GLADYS_GATEWAY_USERS_KEYS', service_id: null, user_id: null },
+    });
+
+  beforeEach(async () => {
+    await db.User.create({ ...nonAdminUser, password: 'mysuperpassword', birthdate: '1990-12-12' });
+  });
+
+  it('should save users keys as an admin', async () => {
+    await authenticatedRequest
+      .patch('/api/v1/gateway/key')
+      .send(usersKeys)
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({ success: true });
+      });
+    const variable = await getStoredUsersKeys();
+    expect(JSON.parse(variable.value)).to.deep.equal(usersKeys);
+  });
+
+  it('should not let a non-admin save users keys', async () => {
+    await nonAdminRequest
+      .patch('/api/v1/gateway/key')
+      .send(usersKeys)
+      .expect('Content-Type', /json/)
+      .expect(403);
+    const variable = await getStoredUsersKeys();
+    expect(variable).to.equal(null);
+  });
+
+  it('should not let a non-admin save users keys through the Gladys Plus gateway', async () => {
+    const response = await new Promise((resolve) => {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.event.emit(
+        EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+        nonAdminUser,
+        'PATCH',
+        '/api/v1/gateway/key',
+        {},
+        usersKeys,
+        resolve,
+      );
+    });
+    expect(response).to.have.property('status', 403);
+    expect(response).to.have.property('code', 'FORBIDDEN');
+    const variable = await getStoredUsersKeys();
+    expect(variable).to.equal(null);
+  });
+});
+
 describe('GET /api/v1/gateway/status', () => {
   it('should get gateway status', async () => {
     await authenticatedRequest
@@ -70,6 +148,35 @@ describe('GET /api/v1/gateway/status', () => {
         expect(res.body).to.have.property('connected');
         expect(res.body).to.have.property('configured');
       });
+  });
+  it('should get gateway status as a non-admin user', async () => {
+    // Every user needs to know if the instance is linked to Gladys Plus:
+    // it's what tells the front-end that the AI chat, the voice assistant
+    // and the camera live are available, instead of offering a free trial
+    // for a subscription the instance already has.
+    await db.User.create({
+      id: NON_ADMIN_USER_ID,
+      firstname: 'Pepper',
+      lastname: 'Potts',
+      selector: 'pepper-gateway-status',
+      email: 'pepper-gateway-status@pots.com',
+      password: 'mysuperpassword',
+      role: USER_ROLE.HABITANT,
+      language: 'en',
+      birthdate: '1990-12-12',
+    });
+    try {
+      await nonAdminRequest
+        .get('/api/v1/gateway/status')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('connected');
+          expect(res.body).to.have.property('configured');
+        });
+    } finally {
+      await db.User.destroy({ where: { id: NON_ADMIN_USER_ID } });
+    }
   });
 });
 
@@ -201,6 +308,32 @@ describe('POST /api/v1/gateway/aichat/chat', () => {
   });
 });
 
+describe('POST /api/v1/gateway/aichat/chat (non-admin)', () => {
+  beforeEach(async () => {
+    await db.User.create({
+      id: NON_ADMIN_USER_ID,
+      firstname: 'Pepper',
+      lastname: 'Potts',
+      selector: 'pepper-aichat',
+      email: 'pepper-aichat@pots.com',
+      language: 'en',
+      role: USER_ROLE.HABITANT,
+      password: 'mysuperpassword',
+      birthdate: '1990-12-12',
+    });
+  });
+
+  it('should refuse the raw completion proxy to a non-admin user', async () => {
+    // the debug replay path reaches the selected AI backend with no bound on
+    // the outbound payload: an admin tool, the household chat goes through
+    // message.create
+    await nonAdminRequest
+      .post('/api/v1/gateway/aichat/chat')
+      .send({ messages: [{ role: 'user', content: 'hello' }] })
+      .expect(403);
+  });
+});
+
 describe('GET /api/v1/gateway/aichat/debug-context', () => {
   beforeEach(() => {
     global.TEST_GLADYS_INSTANCE.stateManager.setState('service', 'mcp', {
@@ -318,7 +451,19 @@ describe('POST /api/v1/gateway/voice', () => {
 });
 
 describe('POST /api/v1/gateway/refresh-latest-gladys-version', () => {
+  let isOfficialReleaseImageStub;
+
+  beforeEach(() => {
+    isOfficialReleaseImageStub = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'isOfficialReleaseImage');
+  });
+
+  afterEach(() => {
+    isOfficialReleaseImageStub.restore();
+    nock.cleanAll();
+  });
+
   it('should refresh latest gladys version', async () => {
+    isOfficialReleaseImageStub.returns(true);
     nock(config.gladysGatewayServerUrl)
       .post('/v1/api/gladys/version', (body) => true)
       .reply(200, {
@@ -330,5 +475,21 @@ describe('POST /api/v1/gateway/refresh-latest-gladys-version', () => {
       .expect('Content-Type', /json/)
       .expect(200);
     expect(response.body).to.have.property('message', 'Refresh finished');
+  });
+
+  it('should not call Gladys Plus when the instance is not an official release image', async () => {
+    isOfficialReleaseImageStub.returns(false);
+    const gladysPlusCall = nock(config.gladysGatewayServerUrl)
+      .post('/v1/api/gladys/version', (body) => true)
+      .reply(200, {
+        name: 'v4.56.1',
+        created_at: '2025-03-31T08:17:48.202Z',
+      });
+    const response = await authenticatedRequest
+      .post('/api/v1/gateway/refresh-latest-gladys-version')
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(response.body).to.have.property('message', 'Refresh finished');
+    expect(gladysPlusCall.isDone()).to.equal(false);
   });
 });

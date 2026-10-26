@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const db = require('../../../models');
 const { authenticatedRequest } = require('../request.test');
 
 describe('PATCH /api/v1/user/:user_selector', () => {
@@ -23,5 +24,17 @@ describe('PATCH /api/v1/user/:user_selector', () => {
       })
       .expect('Content-Type', /json/)
       .expect(404);
+  });
+  it('should return 400 when the last administrator removes their own admin role', async () => {
+    await db.User.update({ role: 'habitant' }, { where: { selector: 'pepper' } });
+    await authenticatedRequest
+      .patch('/api/v1/user/john')
+      .send({
+        role: 'habitant',
+      })
+      .expect('Content-Type', /json/)
+      .expect(400);
+    const john = await db.User.findOne({ where: { selector: 'john' } });
+    expect(john).to.have.property('role', 'admin');
   });
 });

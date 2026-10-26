@@ -24,6 +24,15 @@ class Error401 extends HttpError {
   }
 }
 
+class Error402 extends HttpError {
+  constructor(message) {
+    super();
+    this.status = 402;
+    this.code = 'PAYMENT_REQUIRED';
+    this.message = message;
+  }
+}
+
 class Error403 extends HttpError {
   constructor(message) {
     super();
@@ -78,6 +87,24 @@ class Error429 extends HttpError {
   }
 }
 
+class Error503 extends HttpError {
+  constructor(message) {
+    super();
+    this.status = 503;
+    this.code = 'SERVICE_UNAVAILABLE';
+    this.message = message;
+  }
+}
+
+class Error504 extends HttpError {
+  constructor(message) {
+    super();
+    this.status = 504;
+    this.code = 'GATEWAY_TIMEOUT';
+    this.message = message;
+  }
+}
+
 class Error500 extends HttpError {
   constructor(error) {
     super();
@@ -94,6 +121,7 @@ module.exports = {
   HttpError,
   Error400,
   Error401,
+  Error402,
   Error403,
   Error404,
   Error409,
@@ -101,4 +129,6 @@ module.exports = {
   Error422,
   Error429,
   Error500,
+  Error503,
+  Error504,
 };

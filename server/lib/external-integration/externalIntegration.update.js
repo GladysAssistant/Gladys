@@ -135,13 +135,11 @@ async function update(selector) {
     // the in-memory index would resolve a release published minutes ago to
     // the *previous* manifest — the same image tag re-pulled, nothing
     // updated, a "Force update" button that looks broken. Both sources are
-    // read (index refreshed on the spot + repo manifest, the source of truth
-    // the indexer itself mirrors) and the most recent pullable one wins.
+    // read (store entry downloaded on the spot + repo manifest, the
+    // source of truth the indexer itself mirrors) and the most recent
+    // pullable one wins.
     try {
-      const index = await this.getIndex({ refresh: true });
-      const entry = ((index && index.integrations) || []).find(
-        (indexEntry) => indexEntry.store_slug === service.store_slug,
-      );
+      const entry = await this.getStoreEntry(service.store_slug, { refresh: true });
       indexManifest = (entry && entry.manifest) || null;
     } catch (e) {
       logger.warn(`Unable to refresh the store index before updating ${service.store_slug}`, e);
@@ -224,7 +222,14 @@ async function update(selector) {
     logger.warn(`Unable to remove sub-containers of integration ${selector} before update`, e);
   }
   await db.Service.update({ version: manifest.version, manifest, docker_image: image }, { where: { id: service.id } });
+  // the new manifest may declare other widgets, other settings: no content
+  // produced under the previous version survives the update
+  this.clearWidgetCaches(service);
   service = await this.getBySelector(selector);
+  // the proxy closes over the service object it was registered with: the
+  // updated row (manifest, version, image) replaces the boot-time snapshot
+  this.registerProxyService(service);
+  await this.declareEnergyCalendars(service);
   await this.createIntegrationContainer(service);
   const started = await this.start(selector);
   // only once start() has gone through: it resolves on LOADING, not RUNNING, so

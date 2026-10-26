@@ -73,12 +73,15 @@ module.exports = function NukiController(nukiHandler) {
       authenticated: true,
       controller: asyncMiddleware(connect),
     },
+    // returns the Nuki API key in clear
     'get /api/v1/service/nuki/config': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(getConfiguration),
     },
     'post /api/v1/service/nuki/config': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(saveConfiguration),
     },
     'get /api/v1/service/nuki/discover/:protocol': {

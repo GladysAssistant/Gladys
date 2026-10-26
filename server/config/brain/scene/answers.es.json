@@ -1,0 +1,11 @@
+[
+  {
+    "label": "scene.start.success",
+    "answers": ["¡Escena iniciada con éxito!"]
+  },
+
+  {
+    "label": "scene.start.fail",
+    "answers": ["No se pudo iniciar la escena."]
+  }
+]

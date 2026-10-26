@@ -1,19 +1,55 @@
 import get from 'get-value';
 import { Text } from 'preact-i18n';
 import CardFilter from '../../components/layout/CardFilter';
+import SortSelect from '../../components/layout/SortSelect';
 import InstallFromGithubCard from './all/external-integration/install-from-github/InstallFromGithubCard';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './style.css';
 
-// while no search narrows the list down, the displayed count and the total of
-// the current view are the same number: showing "75 of 75 integrations" is
-// noise, the total alone says everything
-const IntegrationCount = ({ searching, integrationsLength, totalSize }) =>
-  searching ? (
-    <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
-  ) : (
-    <Text id="integration.root.subtitleTotal" fields={{ total: totalSize }} />
+// the count is always compared to the whole catalog: "42 of 810 integrations"
+// says at a glance how much the shelf, the facets or the search narrow it.
+// While nothing does, the two numbers are the same and "810 of 810" is noise:
+// the count of what is displayed alone says everything — and under the
+// country scope, which is not a filter the user chose, it is the only honest
+// number ("797", not the "810" that counts the hidden cards). Next to a
+// narrowed count, one link releases every filter at once.
+// while the community integrations load, the only count we could give is the
+// one of the native integrations: a small number that would read as the size
+// of the whole catalog. The header says the catalog is loading instead.
+const IntegrationCount = ({ loading, narrowed, integrationsLength, totalSize, hasActiveFilters, clearFilters }) => {
+  if (loading) {
+    return (
+      <span role="status">
+        <span class={style.loadingDot} aria-hidden="true" />
+        <Text id="integration.root.loadingCatalog" />
+      </span>
+    );
+  }
+  return (
+    <span>
+      {narrowed ? (
+        <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
+      ) : (
+        <Text id="integration.root.subtitleTotal" fields={{ total: integrationsLength }} />
+      )}
+      {hasActiveFilters && clearFilters && (
+        <span>
+          {' · '}
+          <button type="button" class={`btn btn-link p-0 align-baseline ${style.clearFilters}`} onClick={clearFilters}>
+            <Text id="integration.root.clearFilters" />
+          </button>
+        </span>
+      )}
+    </span>
   );
+};
+
+const ORDER_DIR_OPTIONS = [
+  { value: 'asc', labelId: 'global.orderDirAsc' },
+  { value: 'desc', labelId: 'global.orderDirDesc' },
+  { value: 'newest', labelId: 'integration.root.orderDirNewest' },
+  { value: 'updated', labelId: 'integration.root.orderDirUpdated' }
+];
 
 const IntegrationPageHeader = ({
   intl,
@@ -23,15 +59,20 @@ const IntegrationPageHeader = ({
   searchKeyword,
   integrationsLength,
   totalSize,
-  showInstallFromGithub
+  loading,
+  showInstallFromGithub,
+  hasActiveFilters,
+  clearFilters
 }) => {
   const hasSearch = searchKeyword.length > 0;
-  // a search matching every integration of the view leaves the list untouched,
-  // so it is not a case for "X of Y" either
-  const searchNarrowsView = hasSearch && integrationsLength < totalSize;
+  // "X of Y" only when a filter the user chose narrows the view: the country
+  // scope alone shows the bare count of what is displayed, and the line under
+  // the header says what it hides — "797 of 809" with no filter and nothing
+  // to clear would read as a filter the user cannot find
+  const narrowed = hasActiveFilters && integrationsLength < totalSize;
   // an empty view (the catalog still loading, no favorite yet) already displays
   // a message in the page body, "0 integrations" on top of it says nothing more
-  const showCount = hasSearch || totalSize > 0;
+  const showCount = loading || hasSearch || totalSize > 0;
   const searchPlaceholder = get(intl.dictionary, 'integration.root.searchPlaceholder', {
     default: ''
   });
@@ -40,19 +81,29 @@ const IntegrationPageHeader = ({
     <>
       <div class={style.headerDesktop}>
         <div class="page-header">
-          <h1 class="page-title">
-            <Text id="integration.root.title" />
-          </h1>
-          {showCount && (
-            <div class="page-subtitle">
-              <IntegrationCount
-                searching={searchNarrowsView}
-                integrationsLength={integrationsLength}
-                totalSize={totalSize}
-              />
-            </div>
-          )}
-          <div class="page-options d-flex align-items-center">
+          {/* the count sits under the title, not next to it: as a second
+              column item it never pushes the sort and search controls to a
+              second line, whatever its length ("130 of 809 integrations ·
+              Clear filters" on every large shelf) — and the search field no
+              longer moves under the cursor as the count changes while typing */}
+          <div class={style.headerTitleBlock}>
+            <h1 class="page-title">
+              <Text id="integration.root.title" />
+            </h1>
+            {showCount && (
+              <div class={`page-subtitle ${style.headerSubtitle}`}>
+                <IntegrationCount
+                  loading={loading}
+                  narrowed={narrowed}
+                  integrationsLength={integrationsLength}
+                  totalSize={totalSize}
+                  hasActiveFilters={hasActiveFilters}
+                  clearFilters={clearFilters}
+                />
+              </div>
+            )}
+          </div>
+          <div class={`page-options d-flex align-items-center ${style.headerOptions}`}>
             {showInstallFromGithub && (
               <div class="mr-3">
                 <InstallFromGithubCard button />
@@ -64,7 +115,7 @@ const IntegrationPageHeader = ({
               search={search}
               searchValue={searchKeyword}
               searchPlaceHolder={searchPlaceholder}
-              extraOrderDirs={[{ value: 'newest', labelId: 'integration.root.orderDirNewest' }]}
+              extraOrderDirs={ORDER_DIR_OPTIONS.slice(2)}
             />
           </div>
         </div>
@@ -75,17 +126,12 @@ const IntegrationPageHeader = ({
           <h1 class={style.mobileTitle}>
             <Text id="integration.root.title" />
           </h1>
-          <select onChange={changeOrderDir} class={`form-control custom-select ${style.mobileSort}`} value={orderDir}>
-            <option value="asc">
-              <Text id="global.orderDirAsc" />
-            </option>
-            <option value="desc">
-              <Text id="global.orderDirDesc" />
-            </option>
-            <option value="newest">
-              <Text id="integration.root.orderDirNewest" />
-            </option>
-          </select>
+          <SortSelect
+            value={orderDir}
+            onChange={changeOrderDir}
+            selectClass={style.mobileSort}
+            options={ORDER_DIR_OPTIONS}
+          />
         </div>
         <div class={style.mobileSearch}>
           <div class="input-icon">
@@ -109,9 +155,12 @@ const IntegrationPageHeader = ({
         {showCount && (
           <div class={style.mobileResultCount}>
             <IntegrationCount
-              searching={searchNarrowsView}
+              loading={loading}
+              narrowed={narrowed}
               integrationsLength={integrationsLength}
               totalSize={totalSize}
+              hasActiveFilters={hasActiveFilters}
+              clearFilters={clearFilters}
             />
           </div>
         )}

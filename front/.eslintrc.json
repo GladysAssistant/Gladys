@@ -71,6 +71,10 @@
       {
         "selector": "Decorator[expression.callee.name='connect']",
         "message": "The @connect decorator is not allowed anymore. Please use connect() function instead. See doc: https://github.com/developit/unistore"
+      },
+      {
+        "selector": "ImportDeclaration[source.value='dayjs/plugin/timezone']",
+        "message": "dayjs is a shared singleton: extending it with the timezone plugin switches react-big-calendar's localizer over to dayjs.tz, which shifts the calendar time grid and duplicates days around DST. Use Intl.DateTimeFormat({ timeZone }) instead, as front/src/components/boxs/edf-tempo/EdfTempo.jsx does."
       }
       /* { FOR LATER
         "selector": "CallExpression[callee.object.name='store'][callee.property.name='setState']",

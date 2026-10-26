@@ -247,8 +247,13 @@ class EditDashboard extends Component {
     });
   };
 
-  updateNewSelectedBox = (x, y, type) => {
+  updateNewSelectedBox = (x, y, type, initialConfig = {}) => {
     const defaultBoxData = { type: { $set: type } };
+    // an integration widget tile carries the integration and the widget key
+    // it stands for, on top of the box type
+    Object.keys(initialConfig).forEach(key => {
+      defaultBoxData[key] = { $set: initialConfig[key] };
+    });
 
     if (type === 'photo') {
       defaultBoxData.photos = { $set: [{ url: '', caption: '' }] };

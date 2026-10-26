@@ -14,7 +14,20 @@ const CHAT_UPSELL_FEATURES = [
 
 class EmptyChat extends Component {
   state = {
-    gladysPlusConfigured: null
+    gladysPlusConfigured: null,
+    externalProviderActive: null
+  };
+
+  // with an external AI provider selected (capabilities/ai-type.md) the chat
+  // answers without Gladys Plus: the upsell only shows once the absence of
+  // a provider is confirmed (null = unknown)
+  fetchAiProvider = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      this.setState({ externalProviderActive: Boolean(response.selector) });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   fetchStatus = async () => {
@@ -24,21 +37,23 @@ class EmptyChat extends Component {
         gladysPlusConfigured: gatewayStatus.configured === true
       });
     } catch (e) {
+      // A failed call doesn't mean the instance has no Gladys Plus: it can
+      // simply be a network error. Staying unknown keeps the regular empty
+      // state instead of upselling a subscription the instance may already have.
       console.error(e);
-      this.setState({
-        gladysPlusConfigured: false
-      });
     }
   };
 
   componentDidMount() {
     this.fetchStatus();
+    this.fetchAiProvider();
   }
 
-  render({}, { gladysPlusConfigured }) {
-    // Without Gladys Plus the chat can't answer at all: instead of a dead end,
-    // show what the AI chat makes possible and how to unlock it.
-    if (gladysPlusConfigured === false) {
+  render({}, { gladysPlusConfigured, externalProviderActive }) {
+    // Without Gladys Plus nor an external AI provider the chat can't answer
+    // at all: instead of a dead end, show what the AI chat makes possible and
+    // how to unlock it.
+    if (gladysPlusConfigured === false && externalProviderActive === false) {
       return (
         <div class={style.emptyChatUpsellScroll}>
           <div class={style.emptyChatUpsell}>

@@ -7,7 +7,10 @@ import {
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
   WATER_HEATER_MODE,
-  SIREN_MODE
+  SIREN_MODE,
+  MUSIC_PLAYBACK_STATE,
+  MUSIC_REPEAT_MODE,
+  MUSIC_STRING_FEATURE_TYPES
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
@@ -88,6 +91,12 @@ const CATEGORIES_WITHOUT_UNIT = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.MODE),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST),
+  // the music category only carries the volume percent and the two time values in seconds
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.MUSIC, DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.MUSIC, DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.MUSIC, DEVICE_FEATURE_TYPES.MUSIC.REPEAT),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.MUSIC, DEVICE_FEATURE_TYPES.MUSIC.MUTE),
+  ...MUSIC_STRING_FEATURE_TYPES.map(type => categoryTypeKey(DEVICE_FEATURE_CATEGORIES.MUSIC, type)),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'decimal'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.FAN, DEVICE_FEATURE_TYPES.FAN.SPEED),
@@ -159,6 +168,8 @@ export const groupDevicesByRoom = (devices, houses) => {
 const flattenUnit = unit => (Array.isArray(unit) ? unit[0] : unit);
 
 const FEATURE_UNIT_BY_CATEGORY_TYPE = {
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.MUSIC, DEVICE_FEATURE_TYPES.MUSIC.DURATION)]: DEVICE_FEATURE_UNITS.SECONDS,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.MUSIC, DEVICE_FEATURE_TYPES.MUSIC.POSITION)]: DEVICE_FEATURE_UNITS.SECONDS,
   [categoryTypeKey(
     DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
     DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE
@@ -166,6 +177,18 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
   [categoryTypeKey(
     DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
     DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY
+  )]: DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE
   )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
@@ -282,12 +305,15 @@ const TELEINFORMATION_POWER_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3
 ]);
@@ -306,6 +332,7 @@ const TELEINFORMATION_CURRENT_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX3
 ]);
@@ -620,12 +647,35 @@ export const getFeatureDefaultValues = (category, type) => {
     }
   }
 
-  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC && type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
-    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC && type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME) {
-    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
+  // A music player is live: no history on any of its features, whatever the type
+  // (docs/specs/external-integrations/capabilities/music.md, section 2)
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+    const musicDefaults = { ...defaults, keep_history: false };
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
+      // paused / playing / idle, writable (1 plays, 0 pauses, 2 stops); buffering (3) is reported
+      // only, never a command, so it stays out of the writable range
+      return applyDefaultUnit({ ...musicDefaults, min: 0, max: 2, read_only: false }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME) {
+      return applyDefaultUnit({ ...musicDefaults, min: 0, max: 100, read_only: false }, category, type);
+    }
+    if (MUSIC_STRING_FEATURE_TYPES.includes(type)) {
+      // the "now playing" metadata: string states reported by the player
+      return { ...musicDefaults, min: 0, max: 0, read_only: true };
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.DURATION) {
+      return applyDefaultUnit({ ...musicDefaults, min: 0, max: 86400, read_only: true }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.POSITION) {
+      // writing the position seeks
+      return applyDefaultUnit({ ...musicDefaults, min: 0, max: 86400, read_only: false }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE || type === DEVICE_FEATURE_TYPES.MUSIC.MUTE) {
+      return { ...musicDefaults, min: 0, max: 1, read_only: false };
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.REPEAT) {
+      return { ...musicDefaults, min: 0, max: 2, read_only: false };
+    }
   }
 
   if (isCatalogPushButtonFeature(category, type)) {
@@ -634,6 +684,14 @@ export const getFeatureDefaultValues = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED) {
     // On/off gate: Gladys stops polling, streaming and displaying the camera when it is 0
+    return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
+  }
+
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE
+  ) {
+    // Command silencing the detector's siren: written, not measured
     return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
   }
 
@@ -694,6 +752,11 @@ export const getFeatureDefaultValues = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
     // THERMOSTAT_MODE: OFF/HEATING/COOLING/AUTO
     return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET) {
+    // THERMOSTAT_PRESET: SCHEDULE/FROST/AWAY/ECO/NIGHT/COMFORT
+    return applyDefaultUnit({ ...defaults, min: 0, max: 5, read_only: false }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
@@ -780,6 +843,15 @@ export const getFeatureDefaultValues = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
     return { ...defaults, min: 0, max: 1000000, read_only: true };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY) {
+      // The dirtiest grids sit around 900 gCO2eq/kWh: 1500 leaves headroom without
+      // flattening the usual range on a chart.
+      return applyDefaultUnit({ ...defaults, min: 0, max: 1500, read_only: true }, category, type);
+    }
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
@@ -917,6 +989,27 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 export const getFeaturePreviewValue = (category, type) => {
   // Category-specific blocks first: some of their types ('power', 'index', 'target-temperature',
   // 'mode') also exist in other categories matched below by type only.
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
+      return MUSIC_PLAYBACK_STATE.PLAYING;
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.DURATION) {
+      return 215;
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.POSITION) {
+      return 42;
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.REPEAT) {
+      return MUSIC_REPEAT_MODE.OFF;
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME) {
+      return 35;
+    }
+    if (MUSIC_STRING_FEATURE_TYPES.includes(type)) {
+      return null;
+    }
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED) {
     // A camera is enabled by default, the preview shows the toggle in that position
     return 1;
@@ -1072,6 +1165,16 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
     return 42;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY) {
+      return 57;
+    }
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE) {
+      return 92;
+    }
+    return 28;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
@@ -1336,6 +1439,20 @@ export const getFeaturePreviewValue = (category, type) => {
 export const getFeaturePreviewStringValue = (category, type) => {
   if (type === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
     return 'Hello Gladys';
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.TITLE) {
+      return 'Clair de lune';
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.ARTIST) {
+      return 'Claude Debussy';
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.ALBUM) {
+      return 'Suite bergamasque';
+    }
+    if (type === DEVICE_FEATURE_TYPES.MUSIC.ARTWORK) {
+      return 'art-3f9a2c1b7e4d';
+    }
   }
   if (category === DEVICE_FEATURE_CATEGORIES.TEXT && type === DEVICE_FEATURE_TYPES.TEXT.SELECT) {
     return 'option-1';

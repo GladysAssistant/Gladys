@@ -102,9 +102,12 @@ describe('Device.migrate', function Describe() {
 
   afterEach(async () => {
     await db.EnergyPrice.destroy({ where: { selector: 'migration-energy-price' } });
+    await db.EnergyContract.destroy({ where: { selector: 'migration-energy-contract' } });
     await db.Scene.destroy({ where: { selector: ['migration-scene', 'migration-scene-untouched'] } });
     await db.Dashboard.destroy({ where: { selector: 'migration-dashboard' } });
-    await db.Device.destroy({ where: { selector: ['migration-source', 'migration-destination', 'migration-child'] } });
+    await db.Device.destroy({
+      where: { selector: ['migration-source', 'migration-destination', 'migration-child', 'migration-thermostat'] },
+    });
     await db.Service.destroy({ where: { id: destinationService.id } });
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
   });
@@ -143,6 +146,19 @@ describe('Device.migrate', function Describe() {
       price_type: 'consumption',
       price: 2000,
       currency: 'EUR',
+      electric_meter_device_id: sourceDevice.id,
+    });
+    // Energy contract using the source device as electric meter
+    const energyContract = await db.EnergyContract.create({
+      name: 'Migration energy contract',
+      selector: 'migration-energy-contract',
+      valid_from: '2024-01-01',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      tariff: {
+        tariff_version: 1,
+        components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.2 } }],
+      },
       electric_meter_device_id: sourceDevice.id,
     });
     const scene = await db.Scene.create({
@@ -212,6 +228,7 @@ describe('Device.migrate', function Describe() {
             type: 'actions',
             actions: [{ action_type: 'device-feature', device_feature: 'migration-source-temp', value: 1 }],
           },
+          { type: 'thermostat', thermostat_feature: 'migration-source-temp' },
         ],
       ],
     });
@@ -252,6 +269,9 @@ describe('Device.migrate', function Describe() {
     // Energy price contract re-pointed to the destination device
     const refreshedEnergyPrice = await db.EnergyPrice.findOne({ where: { id: energyPrice.id } });
     expect(refreshedEnergyPrice.electric_meter_device_id).to.equal(destinationDevice.id);
+    // Energy contract re-pointed to the destination device (its FK cascades on delete)
+    const refreshedEnergyContract = await db.EnergyContract.findOne({ where: { id: energyContract.id } });
+    expect(refreshedEnergyContract.electric_meter_device_id).to.equal(destinationDevice.id);
     // Scene rewritten through the scene manager (RAM resync path)
     sinonAssert.calledOnceWithExactly(sceneManagerFake.update, 'migration-scene', {
       actions: [
@@ -307,6 +327,10 @@ describe('Device.migrate', function Describe() {
               type: 'actions',
               actions: [{ action_type: 'device-feature', device_feature: 'migration-destination-temp', value: 1 }],
             },
+            // thermostat_feature is a device-referencing box field: it must follow
+            // the migrated feature, otherwise the widget and the regulation loop
+            // keep pointing at a selector that no longer exists.
+            { type: 'thermostat', thermostat_feature: 'migration-destination-temp' },
           ],
         ],
       },
@@ -586,6 +610,45 @@ describe('Device.migrate', function Describe() {
     expect(migrationJob.data.states_migrated).to.equal(0);
   });
 
+  it('should re-point the thermostat params naming a migrated feature', async () => {
+    // A thermostat regulating on the source sensor, and switching a feature the
+    // mapping leaves out.
+    const thermostat = await db.Device.create(
+      {
+        name: 'Migration thermostat',
+        selector: 'migration-thermostat',
+        external_id: 'thermostat:migration',
+        service_id: SEEDED_SERVICE_ID,
+        params: [
+          { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: 'migration-source-temp' },
+          { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'migration-source-binary' },
+          // Same value under a name that does not reference a feature: left alone.
+          { name: 'THERMOSTAT_MODE', value: 'migration-source-temp' },
+        ],
+      },
+      { include: [{ model: db.DeviceParam, as: 'params' }] },
+    );
+    const notify = sinon.spy(deviceManager, 'notify');
+
+    await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+    });
+
+    const params = await db.DeviceParam.findAll({ where: { device_id: thermostat.id }, raw: true });
+    const valueOf = (name) => params.find((param) => param.name === name).value;
+    expect(valueOf('THERMOSTAT_TEMPERATURE_FEATURE')).to.equal('migration-destination-temp');
+    expect(valueOf('THERMOSTAT_SWITCH_FEATURE')).to.equal('migration-source-binary');
+    expect(valueOf('THERMOSTAT_MODE')).to.equal('migration-source-temp');
+    // Refreshed in the cache, and its service told, so it drops what it cached.
+    const cached = deviceManager.stateManager.get('device', 'migration-thermostat');
+    expect(cached.params.find((param) => param.name === 'THERMOSTAT_TEMPERATURE_FEATURE').value).to.equal(
+      'migration-destination-temp',
+    );
+    sinonAssert.calledWith(notify, sinon.match({ selector: 'migration-thermostat' }), 'device.update');
+    notify.restore();
+  });
+
   it('should migrate a device without features and with an empty mapping', async () => {
     await db.DeviceFeature.destroy({ where: { device_id: sourceDevice.id } });
     const result = await deviceManager.migrate('migration-source', {
@@ -607,6 +670,62 @@ describe('Device.migrate', function Describe() {
     await assert.isRejected(promise, 'destination_device_selector is required');
     // The in-flight guard must be released even after a failed run
     expect(deviceManager.migrationsInProgress.size).to.equal(0);
+  });
+
+  it('should reject the migration when the energy contracts of both devices overlap', async () => {
+    await db.EnergyContract.create({
+      name: 'Migration energy contract',
+      selector: 'migration-energy-contract',
+      valid_from: '2024-01-01',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      tariff: {
+        tariff_version: 1,
+        components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.2 } }],
+      },
+      electric_meter_device_id: sourceDevice.id,
+    });
+    await db.EnergyContract.create({
+      name: 'Destination energy contract',
+      selector: 'migration-energy-contract-destination',
+      valid_from: '2025-01-01',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      tariff: {
+        tariff_version: 1,
+        components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.2 } }],
+      },
+      electric_meter_device_id: destinationDevice.id,
+    });
+    await db.duckDbBatchInsertState(sourceTempFeature.id, [
+      { value: 20, created_at: new Date('2024-01-01T00:00:00.000Z') },
+      { value: 21, created_at: new Date('2024-01-02T00:00:00.000Z') },
+    ]);
+    try {
+      const promise = deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+      await assert.isRejected(
+        promise,
+        'Energy contract "Migration energy contract" overlaps "Destination energy contract" on the destination device',
+      );
+      // refused before any write: the history and the contracts are untouched
+      expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(2);
+      expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(0);
+      const sourceContracts = await db.EnergyContract.count({ where: { electric_meter_device_id: sourceDevice.id } });
+      expect(sourceContracts).to.equal(1);
+      // a destination contract ended before the source one starts is not an overlap
+      await db.EnergyContract.update(
+        { valid_from: '2023-01-01', valid_to: '2023-12-31' },
+        { where: { selector: 'migration-energy-contract-destination' } },
+      );
+      await deviceManager.migrate('migration-source', { destination_device_selector: 'migration-destination' });
+      const moved = await db.EnergyContract.count({ where: { electric_meter_device_id: destinationDevice.id } });
+      expect(moved).to.equal(2);
+    } finally {
+      await db.EnergyContract.destroy({ where: { selector: 'migration-energy-contract-destination' } });
+    }
   });
 
   it('should reject a concurrent migration of the same source device', async () => {

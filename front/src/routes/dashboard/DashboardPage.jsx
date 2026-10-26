@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import { useEffect, useRef } from 'preact/hooks';
+import { Link } from 'preact-router/match';
 import DashboardTabs from './DashboardTabs';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
@@ -71,8 +72,10 @@ const DashboardPage = ({ children, ...props }) => {
                     dock belongs to the dock, not to the page swipe gesture */}
                 <div class={cx('page-header', style.dashboardHeader)} ref={dockRef} data-dashboard-swipe-ignore>
                   <div class={style.dashboardHeaderTabs}>
-                    {/* One-tap pills in every mode; pills that don't fit on one
-                        row collapse behind a "…" button opening the full list */}
+                    {/* One-tap pills in every mode. Desktop: pills that don't
+                        fit on one row collapse behind a "…" button opening the
+                        full list. Mobile dock: the pill track scrolls sideways
+                        instead, and a list button opens the full named list. */}
                     {!props.dashboardListEmpty && (
                       <DashboardTabs
                         dashboards={props.dashboards}
@@ -105,8 +108,11 @@ const DashboardPage = ({ children, ...props }) => {
                         </button>
                       </Localizer>
                     )}
-                    {/* fullscreen is pointless on a phone: hidden below tablet width */}
-                    {!props.dashboardNotConfigured &&
+                    {/* fullscreen is pointless on a phone: hidden below tablet width.
+                        Only for a loaded dashboard with widgets — not while the
+                        configuration is still being fetched */}
+                    {props.currentDashboard &&
+                      !props.dashboardNotConfigured &&
                       props.browserFullScreenCompatible &&
                       !props.hideExitFullScreenButton && (
                         <Localizer>
@@ -139,6 +145,31 @@ const DashboardPage = ({ children, ...props }) => {
                       </Localizer>
                     )}
                   </div>
+                </div>
+                {/* Gladys Plus only: not dismissible, it stays as long as the
+                    Gateway reports no recovery codes for this user. The banner
+                    lands after the Gateway answers, so it is announced through a
+                    live region rendered from the start (screen readers ignore a
+                    live region inserted together with its content) */}
+                <div aria-live="polite">
+                  {props.gatewayRecoveryCodesMissing && (
+                    <div
+                      class="alert alert-warning d-md-flex align-items-center"
+                      data-cy="gateway-recovery-codes-banner"
+                    >
+                      <div class="flex-fill">
+                        <i class="fe fe-shield mr-2" />
+                        <Text id="dashboard.gatewayRecoveryCodesMissing" />
+                      </div>
+                      {/* stacked under the text on phones, at its right from tablet width */}
+                      <Link
+                        href="/dashboard/settings/security"
+                        class={cx('btn btn-sm mt-2 mt-md-0 ml-md-3', style.recoveryCodesBannerButton)}
+                      >
+                        <Text id="dashboard.gatewayRecoveryCodesMissingButton" />
+                      </Link>
+                    </div>
+                  )}
                 </div>
                 {props.gatewayInstanceNotFound && (
                   <div class="alert alert-warning">

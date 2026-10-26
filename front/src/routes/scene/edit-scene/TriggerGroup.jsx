@@ -56,6 +56,7 @@ const TriggerGroup = ({ children, ...props }) => (
                     updateTriggerProperty={props.updateTriggerProperty}
                     variables={props.variables}
                     setVariablesTrigger={props.setVariablesTrigger}
+                    sceneIntegrations={props.sceneIntegrations}
                   />
                 </div>
               ))}

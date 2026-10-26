@@ -1,9 +1,11 @@
 const Promise = require('bluebird');
+const { Transaction } = require('sequelize');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, DEVICE_FEATURE_STATE_COLUMNS, DEVICE_FEATURE_CATEGORIES } = require('../../utils/constants');
 const { buildUniqueSelector } = require('../../utils/addSelector');
 const { resolveEnergyParentId } = require('../../utils/resolveEnergyParentId');
+const { enforceEnergyHierarchy } = require('../../utils/enforceEnergyHierarchy');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const logger = require('../../utils/logger');
 const { syncFeatureSupportedOptions } = require('./device.syncFeatureSupportedOptions');
@@ -36,23 +38,6 @@ const getDeviceInDb = async (device) => {
   const deviceByExternalId = await getByExternalId(device.external_id);
   return deviceByExternalId;
 };
-
-// Those columns hold the current STATE of a feature, not its definition: they are
-// written by device.saveState / device.saveStringState and by the aggregation jobs.
-// A caller saving a device sends back the features it read earlier (the MQTT device
-// page posts the whole device just to append one feature), so letting them through
-// rolled every existing feature back to the value the client had in hand — null for
-// a feature that had not received anything yet when the page was loaded. They are
-// only accepted when the feature is created, so an integration can declare a first
-// value along with a brand new feature (lan-manager does it for presence).
-const DEVICE_FEATURE_STATE_COLUMNS = [
-  'last_value',
-  'last_value_string',
-  'last_value_changed',
-  'last_hourly_aggregate',
-  'last_daily_aggregate',
-  'last_monthly_aggregate',
-];
 
 const matchFeatureInList = (existingFeature, features) => {
   // We are matching on both external_id and id, so we can match a device that changed external_id but kept the same id
@@ -104,13 +89,17 @@ async function create(device) {
 
   const deviceFeaturesIdsToPurge = [];
 
-  // we execute the whole insert in a transaction to avoid inconsistent state
-  await db.sequelize.transaction(async (transaction) => {
-    // external_id is a required parameter
-    if (!device.external_id) {
-      throw new BadParameters('A device must have an external_id.');
-    }
+  // external_id is a required parameter. It is checked before the transaction
+  // so an invalid request never takes the SQLite write lock.
+  if (!device.external_id) {
+    throw new BadParameters('A device must have an external_id.');
+  }
 
+  // we execute the whole insert in a transaction to avoid inconsistent state.
+  // The transaction is IMMEDIATE so the SQLite write lock is taken at BEGIN (where the
+  // SQLITE_BUSY retry can wait for it) instead of failing when a deferred transaction
+  // tries to upgrade its lock at the INSERT while another connection is writing.
+  await db.sequelize.transaction({ type: Transaction.TYPES.IMMEDIATE }, async (transaction) => {
     // first verify that device doesn't already exist
     let deviceInDb = await getDeviceInDb(device);
 
@@ -169,6 +158,12 @@ async function create(device) {
       const featureToSave = { ...feature };
       delete featureToSave.energy_parent_id;
       delete featureToSave.supported_options;
+      // The whole music category is live (capabilities/music.md, section 2): no state history
+      // whatever the integration published or the user chose, the exception text features
+      // already have. An existing history is purged below like any feature switched off.
+      if (featureToSave.category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+        featureToSave.keep_history = false;
+      }
       return featureToSave;
     });
 
@@ -214,6 +209,7 @@ async function create(device) {
           const keepHistoryBeforeUpdate = deviceFeature.keep_history;
           const featureToUpdate = { ...feature };
           delete featureToUpdate.selector;
+          // A save never writes the states of an existing feature (see DEVICE_FEATURE_STATE_COLUMNS)
           DEVICE_FEATURE_STATE_COLUMNS.forEach((column) => {
             delete featureToUpdate[column];
           });
@@ -262,6 +258,10 @@ async function create(device) {
       );
       savedFeature.energy_parent_id = validParentId;
     });
+
+    // whatever the integration sent: no cycle, an electric meter stays a root
+    // (docs/specs/energy-hierarchy.md, section C.1)
+    await enforceEnergyHierarchy(deviceToReturn.id, newFeatures, { transaction });
 
     deviceToReturn.features = await Promise.map(newFeatures, async (savedFeature) => {
       const payloadFeature = matchFeatureInList(savedFeature, features);

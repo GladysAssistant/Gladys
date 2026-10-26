@@ -23,12 +23,14 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 .removeNumberArrow::-webkit-outer-spin-button,
 .removeNumberArrow::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 
 /* Firefox */
 .removeNumberArrow {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .setpointHorizontalControls {
@@ -36,20 +38,16 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   min-width: 7rem;
 }
 
-.setpointVerticalControls {
-  display: none;
-}
-
-/* Stacked +/value/− only where the CARD is narrow (3+ desktop columns);
-   phones keep the horizontal capsule — a full-width row fits it fine */
-@media (min-width: 992px) and (max-width: 1300px) {
-  .setpointVerticalControls {
-    display: block;
-    min-width: 5rem;
-  }
-  .setpointHorizontalControls {
-    display: none;
-  }
+/* The value input takes what is left of the capsule once the − and + buttons
+   have taken theirs, and .form-control's 0.75rem of side padding ate almost
+   all of it: on a phone a decimal setpoint (`20.5`) was cut down to two
+   glyphs, the rest hidden behind the buttons. The input keeps room for a
+   signed decimal value and drops the wide padding it does not need between
+   two buttons, so the capsule grows instead of clipping the value. */
+.setpointHorizontalControls .setpointValue {
+  min-width: 3.75rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 
 /* Horizon capsule stepper: − value + on a soft rounded track, white
@@ -79,23 +77,6 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   font-weight: 600;
   color: var(--gl-ink, #1c2334);
 }
-
-/* narrow-card stacked variant: quiet rounded buttons, no track */
-:global(.glass-theme) .setpointVerticalControls :global(.btn) {
-  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
-  background-color: #fff;
-  color: var(--gl-ink, #1c2334);
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-:global(.glass-theme) .setpointVerticalControls :global(.form-control) {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  font-weight: 600;
-  color: var(--gl-ink, #1c2334);
-}
 .btnLoading {
   &::after {
     border: 2px solid #5eba00;
@@ -104,4 +85,9 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 
 .rangeInput {
   flex: 1;
+  /* The slider is the widget's one elastic control: its cell may shrink for
+     a long device name (see .device-widget-table in routes/dashboard), and
+     this floor is where it stops — below ~6rem the thumb is no longer
+     usable on a phone. */
+  min-width: 6rem;
 }

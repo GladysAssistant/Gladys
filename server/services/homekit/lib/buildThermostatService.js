@@ -1,3 +1,4 @@
+const { handleRequest, readFeatureValue } = require('./characteristicHandlers');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -53,6 +54,43 @@ function fromCelsius(celsius, unit) {
     return celsiusToFahrenheit(celsius);
   }
   return celsius;
+}
+
+/**
+ * @description Adapt a HomeKit temperature control to the bounds and precision declared by its features.
+ * @param {Array} features - Setpoint features backing this characteristic.
+ * @param {object} characteristicProps - Existing HomeKit characteristic props.
+ * @returns {object} Declared bounds and step in Celsius, or no overrides for invalid metadata.
+ * @example
+ * buildSetpointProps([{ min: 5, max: 15, setpoint_step: 0.5 }], characteristic.props);
+ */
+function buildSetpointProps(features, characteristicProps) {
+  const validFeatures = features.filter(
+    (feature) => !(Number.isFinite(feature.min) && Number.isFinite(feature.max) && feature.min > feature.max),
+  );
+  const minimums = validFeatures
+    .filter((feature) => Number.isFinite(feature.min))
+    .map((feature) => toCelsius(feature.min, feature.unit));
+  const maximums = validFeatures
+    .filter((feature) => Number.isFinite(feature.max))
+    .map((feature) => toCelsius(feature.max, feature.unit));
+  const steps = validFeatures
+    .filter((feature) => Number.isFinite(feature.setpoint_step) && feature.setpoint_step > 0)
+    .map((feature) => Number((toCelsius(feature.setpoint_step, feature.unit) - toCelsius(0, feature.unit)).toFixed(6)))
+    .filter((step) => step > 0);
+  const props = {};
+  if (minimums.length > 0) {
+    props.minValue = Math.min(...minimums);
+  }
+  if (maximums.length > 0) {
+    props.maxValue = Math.max(...maximums);
+  }
+  if (steps.length > 0) {
+    props.minStep = Math.min(...steps);
+  }
+  const minValue = props.minValue ?? characteristicProps.minValue;
+  const maxValue = props.maxValue ?? characteristicProps.maxValue;
+  return minValue > maxValue ? {} : props;
 }
 
 /**
@@ -164,14 +202,21 @@ function buildValidTargetStates(thermostatFeatures) {
 function bindThresholdCharacteristic(service, characteristicType, feature, helpers) {
   const { CharacteristicEventTypes } = this.hap;
   const characteristic = service.getCharacteristic(characteristicType);
+  characteristic.setProps(buildSetpointProps([feature], characteristic.props));
 
-  characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-    callback(undefined, clampToCharacteristic(helpers.readCelsius(feature), characteristic.props));
-  });
-  characteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-    helpers.emitValue(feature, fromCelsius(value, feature.unit));
-    callback();
-  });
+  characteristic.on(
+    CharacteristicEventTypes.GET,
+    handleRequest(async (callback) => {
+      callback(undefined, clampToCharacteristic(helpers.readCelsius(feature), characteristic.props));
+    }),
+  );
+  characteristic.on(
+    CharacteristicEventTypes.SET,
+    handleRequest(async (value, callback) => {
+      helpers.emitValue(feature, fromCelsius(value, feature.unit));
+      callback();
+    }, 1),
+  );
 }
 
 /**
@@ -179,6 +224,10 @@ function bindThresholdCharacteristic(service, characteristicType, feature, helpe
  * Unlike the other categories, a thermostat is built from features of several Gladys categories at
  * once (the setpoints, the mode, the on/off command and the temperature sensor of the same device),
  * so the whole service is wired here instead of feature by feature.
+ * The air conditioning features are handled here only on a device carrying thermostat features next
+ * to them, such as a Matter heat pump. An air conditioner on its own is a HeaterCooler, see
+ * buildHeaterCoolerService: a Thermostat is only ever on by being in a mode, and the mode Siri picks
+ * for "turn on" is Auto, which on an air conditioner can mean heating.
  * @param {object} service - HomeKit Thermostat service to fill.
  * @param {object} device - Gladys device exposed as this thermostat.
  * @param {object} features - Device features merged into the thermostat service.
@@ -217,7 +266,7 @@ function buildThermostatService(service, device, features) {
     DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
   );
 
-  const readValue = (feature) => this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+  const readValue = (feature) => readFeatureValue(this.gladys.stateManager, feature);
   const readCelsius = (feature) => toCelsius(readValue(feature), feature.unit);
   const emitValue = (feature, value) => {
     const action = {
@@ -318,23 +367,27 @@ function buildThermostatService(service, device, features) {
   };
 
   // HomeKit only ever exchanges Celsius, this characteristic is the unit shown in the Home app.
-  service
-    .getCharacteristic(Characteristic.TemperatureDisplayUnits)
-    .on(CharacteristicEventTypes.GET, async (callback) => {
+  service.getCharacteristic(Characteristic.TemperatureDisplayUnits).on(
+    CharacteristicEventTypes.GET,
+    handleRequest(async (callback) => {
       callback(undefined, Characteristic.TemperatureDisplayUnits.CELSIUS);
-    });
+    }),
+  );
 
   // CurrentTemperature is required. Without a temperature sensor on the device, the setpoint is the
   // closest thing to the room temperature we can report.
   const temperatureSourceFeature = currentTemperatureFeature || heatingSetpointFeature || coolingSetpointFeature;
   if (temperatureSourceFeature) {
     const currentTemperatureCharacteristic = service.getCharacteristic(Characteristic.CurrentTemperature);
-    currentTemperatureCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-      callback(
-        undefined,
-        clampToCharacteristic(readCelsius(temperatureSourceFeature), currentTemperatureCharacteristic.props),
-      );
-    });
+    currentTemperatureCharacteristic.on(
+      CharacteristicEventTypes.GET,
+      handleRequest(async (callback) => {
+        callback(
+          undefined,
+          clampToCharacteristic(readCelsius(temperatureSourceFeature), currentTemperatureCharacteristic.props),
+        );
+      }),
+    );
   }
 
   // A mode the device never declared must not be written to it, whichever enum it is expressed in.
@@ -357,57 +410,83 @@ function buildThermostatService(service, device, features) {
   if (validTargetStates.length > 0) {
     targetStateCharacteristic.setProps({ validValues: validTargetStates });
   }
-  targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-    callback(undefined, readTargetHeatingCoolingState());
-  });
-  targetStateCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-    if (value === HOMEKIT_HEATING_COOLING_STATE.OFF) {
-      if (powerFeature) {
-        emitValue(powerFeature, 0);
+  targetStateCharacteristic.on(
+    CharacteristicEventTypes.GET,
+    handleRequest(async (callback) => {
+      callback(undefined, readTargetHeatingCoolingState());
+    }),
+  );
+  targetStateCharacteristic.on(
+    CharacteristicEventTypes.SET,
+    handleRequest(async (value, callback) => {
+      if (value === HOMEKIT_HEATING_COOLING_STATE.OFF) {
+        if (powerFeature) {
+          emitValue(powerFeature, 0);
+        }
+        // A thermostat driven by its mode is switched off through that mode: it has no on/off command.
+        // Behind the air conditioning mode, which stays the authority, that mode is not written.
+        if (!modeFeature && thermostatModeFeature) {
+          writeMode(thermostatModeFeature, THERMOSTAT_MODE.OFF, thermostatModeToHeatingCoolingState);
+        }
+        callback();
+        return;
       }
-      // A thermostat driven by its mode is switched off through that mode: it has no on/off command.
-      // Behind the air conditioning mode, which stays the authority, that mode is not written.
-      if (!modeFeature && thermostatModeFeature) {
-        writeMode(thermostatModeFeature, THERMOSTAT_MODE.OFF, thermostatModeToHeatingCoolingState);
+
+      if (powerFeature) {
+        emitValue(powerFeature, 1);
+      }
+      if (modeFeature) {
+        // Dry and fan are reported to HomeKit as Auto, so Auto has to stay selectable even on a
+        // device that has no auto mode — but writing AC_MODE.AUTO there would push a mode it never
+        // declared. The device is left in whatever mode it was running in; powering it on is enough.
+        writeMode(modeFeature, heatingCoolingStateToAcMode[value], acModeToHeatingCoolingState);
+      } else if (thermostatModeFeature) {
+        writeMode(
+          thermostatModeFeature,
+          heatingCoolingStateToThermostatMode[value],
+          thermostatModeToHeatingCoolingState,
+        );
       }
       callback();
-      return;
-    }
+    }, 1),
+  );
 
-    if (powerFeature) {
-      emitValue(powerFeature, 1);
-    }
-    if (modeFeature) {
-      // Dry and fan are reported to HomeKit as Auto, so Auto has to stay selectable even on a
-      // device that has no auto mode — but writing AC_MODE.AUTO there would push a mode it never
-      // declared. The device is left in whatever mode it was running in; powering it on is enough.
-      writeMode(modeFeature, heatingCoolingStateToAcMode[value], acModeToHeatingCoolingState);
-    } else if (thermostatModeFeature) {
-      writeMode(thermostatModeFeature, heatingCoolingStateToThermostatMode[value], thermostatModeToHeatingCoolingState);
-    }
-    callback();
-  });
-
-  service.getCharacteristic(Characteristic.CurrentHeatingCoolingState).on(CharacteristicEventTypes.GET, (callback) => {
-    callback(undefined, readCurrentHeatingCoolingState());
-  });
+  service.getCharacteristic(Characteristic.CurrentHeatingCoolingState).on(
+    CharacteristicEventTypes.GET,
+    handleRequest((callback) => {
+      callback(undefined, readCurrentHeatingCoolingState());
+    }),
+  );
 
   // TargetTemperature is required by HomeKit, but a device exposing only a mode or an on/off
   // command has no setpoint to back it. Binding handlers there would throw on the first poll, so
   // the characteristic is left with its HAP default instead.
   if (heatingSetpointFeature || coolingSetpointFeature) {
     const targetTemperatureCharacteristic = service.getCharacteristic(Characteristic.TargetTemperature);
-    targetTemperatureCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-      callback(
-        undefined,
-        clampToCharacteristic(readCelsius(activeSetpointFeature()), targetTemperatureCharacteristic.props),
-      );
-    });
-    targetTemperatureCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-      const setpointFeature = activeSetpointFeature();
-      emitValue(setpointFeature, fromCelsius(value, setpointFeature.unit));
-      callback();
-    });
+    targetTemperatureCharacteristic.setProps(
+      buildSetpointProps(
+        [heatingSetpointFeature, coolingSetpointFeature].filter(Boolean),
+        targetTemperatureCharacteristic.props,
+      ),
+    );
+    targetTemperatureCharacteristic.on(
+      CharacteristicEventTypes.GET,
+      handleRequest(async (callback) => {
+        callback(
+          undefined,
+          clampToCharacteristic(readCelsius(activeSetpointFeature()), targetTemperatureCharacteristic.props),
+        );
+      }),
+    );
+    targetTemperatureCharacteristic.on(
+      CharacteristicEventTypes.SET,
+      handleRequest(async (value, callback) => {
+        const setpointFeature = activeSetpointFeature();
+        const props = buildSetpointProps([setpointFeature], targetTemperatureCharacteristic.props);
+        emitValue(setpointFeature, fromCelsius(clampToCharacteristic(value, props), setpointFeature.unit));
+        callback();
+      }, 1),
+    );
   }
 
   // A device exposing both setpoints can be driven as a range in the Home app.
@@ -438,8 +517,10 @@ function buildThermostatService(service, device, features) {
 }
 
 module.exports = {
+  buildSetpointProps,
   buildThermostatService,
   buildValidTargetStates,
+  listSupportedModes,
   toCelsius,
   fromCelsius,
 };

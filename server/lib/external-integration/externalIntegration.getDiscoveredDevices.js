@@ -1,16 +1,26 @@
-const { addEnergyFeatures } = require('../../services/energy-monitoring/utils/addEnergyFeatures');
+const {
+  addEnergyFeatures,
+  addConsumptionCostFeatures,
+  isConsumptionFeature,
+  CONSUMPTION_COST_TYPES,
+} = require('../../services/energy-monitoring/utils/addEnergyFeatures');
 const {
   ENERGY_INDEX_FEATURE_TYPES,
   ENERGY_FROM_INDEX_KINDS,
 } = require('../../services/energy-monitoring/utils/constants');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 
-// The two features the core derives from a cumulative meter index, with the
-// deterministic `<index external_id><suffix>` naming of addEnergyFeatures.
+// The features the core derives from a published energy source, with the
+// deterministic `<source external_id><suffix>` naming of addEnergyFeatures
+// (a cumulative index gives a 30-minutes consumption and its cost) and of
+// addConsumptionCostFeatures (a consumption the integration feeds itself,
+// 30-minutes or daily, gives its cost).
 const DERIVED_ENERGY_FEATURES = [
   { type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION, suffix: '_consumption' },
   { type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST, suffix: '_cost' },
+  { type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST, suffix: '_cost' },
 ];
+const COST_SUFFIX = '_cost';
 
 // The cursors of the "index delta -> thirty-minutes state" pipelines, stored
 // as device params by the core (one per kind, plus one per index feature:
@@ -48,40 +58,76 @@ function isEnergyIndexFeature(feature) {
 }
 
 /**
- * @description Tell whether a device published by an integration carries at
- * least one cumulative energy index the core can derive energy tracking from.
+ * @description The consumption features an integration feeds itself
+ * (30-minutes or daily consumption published as such, fed through
+ * POST /energy/consumption), by external id, with the type of the cost
+ * feature the core derives from each. A consumption named like the one
+ * derived from a published index is the index pipeline's, not one of them.
  * @param {object} device - The device published by the integration.
- * @returns {boolean} True when the device carries an energy index feature.
+ * @returns {Map<string, string>} external id -> derived cost feature type.
  * @example
- * const hasIndex = hasEnergyIndexFeature(device);
+ * const costTypes = getPublishedConsumptionCostTypes(device);
  */
-function hasEnergyIndexFeature(device) {
-  return device.features.some(isEnergyIndexFeature);
+function getPublishedConsumptionCostTypes(device) {
+  const indexConsumptionExternalIds = new Set(
+    device.features.filter(isEnergyIndexFeature).map((feature) => `${feature.external_id}_consumption`),
+  );
+  return new Map(
+    device.features
+      .filter((feature) => isConsumptionFeature(feature) && !indexConsumptionExternalIds.has(feature.external_id))
+      .map((feature) => [feature.external_id, CONSUMPTION_COST_TYPES[feature.type]]),
+  );
 }
 
 /**
- * @description Find the still-published cumulative index a derived feature
- * already in DB hangs off. The deterministic `<index external_id><suffix>`
- * naming answers it directly for a feature the core derived itself; one an
- * integration derived on its own (what this behavior makes unnecessary) named
- * it as it wanted, and is only found back through its parent link — a
- * consumption feature hangs off the index, a cost feature off the consumption.
+ * @description Tell whether a device published by an integration carries at
+ * least one energy source the core can derive energy tracking from: a
+ * cumulative energy index, or a consumption the integration feeds itself.
+ * @param {object} device - The device published by the integration.
+ * @returns {boolean} True when the device carries an energy source feature.
+ * @example
+ * const hasSource = hasEnergySourceFeature(device);
+ */
+function hasEnergySourceFeature(device) {
+  return device.features.some(isEnergyIndexFeature) || getPublishedConsumptionCostTypes(device).size > 0;
+}
+
+/**
+ * @description Find the still-published energy source a derived feature
+ * already in DB hangs off: a cumulative index, or a consumption the
+ * integration feeds itself (whose cost is the only derived feature). The
+ * deterministic `<source external_id><suffix>` naming answers it directly for
+ * a feature the core derived itself; one an integration derived on its own
+ * (what this behavior makes unnecessary) named it as it wanted, and is only
+ * found back through its parent link — a consumption feature hangs off the
+ * index, a cost feature off the consumption.
  * @param {object} createdFeature - The derived feature already in DB.
  * @param {object} derived - Its derived feature descriptor.
  * @param {object} lookups - The lookups shared by the whole device.
  * @param {Set} lookups.publishedIndexExternalIds - External ids of the published index features.
+ * @param {Map} lookups.publishedConsumptionCostTypes - External id -> cost type of the published consumption features.
  * @param {Map} lookups.createdFeatureById - The features already in DB, by id.
- * @returns {object|null} The index external_id and how it was matched, if any.
+ * @returns {object|null} The source external_id and how it was matched, if any.
  * @example
- * const match = matchPublishedIndex(createdFeature, derived, lookups);
+ * const match = matchPublishedSource(createdFeature, derived, lookups);
  */
-function matchPublishedIndex(createdFeature, derived, { publishedIndexExternalIds, createdFeatureById }) {
+function matchPublishedSource(
+  createdFeature,
+  derived,
+  { publishedIndexExternalIds, publishedConsumptionCostTypes, createdFeatureById },
+) {
+  // a cost feature only matches a published consumption of its own duration:
+  // a consumption republished as daily instead of 30-minutes (or the reverse)
+  // drops its old cost, like an index that stopped being an index
+  const matchesConsumption = (externalId) =>
+    derived.suffix === COST_SUFFIX && publishedConsumptionCostTypes.get(externalId) === createdFeature.type;
   if (createdFeature.external_id.endsWith(derived.suffix)) {
-    const indexExternalId = createdFeature.external_id.slice(0, -derived.suffix.length);
-    // the source feature must STILL be a cumulative index: one that changed
-    // type keeps no energy tracking, its derived features are obsolete
-    if (publishedIndexExternalIds.has(indexExternalId)) {
-      return { indexExternalId, viaSuffix: true };
+    const sourceExternalId = createdFeature.external_id.slice(0, -derived.suffix.length);
+    // the source feature must STILL be a cumulative index (or a published
+    // consumption of the same duration): one that changed type keeps no
+    // energy tracking, its derived features are obsolete
+    if (publishedIndexExternalIds.has(sourceExternalId) || matchesConsumption(sourceExternalId)) {
+      return { sourceExternalId, viaSuffix: true };
     }
   }
   const parent = createdFeatureById.get(createdFeature.energy_parent_id);
@@ -89,22 +135,26 @@ function matchPublishedIndex(createdFeature, derived, { publishedIndexExternalId
     return null;
   }
   if (publishedIndexExternalIds.has(parent.external_id)) {
-    return { indexExternalId: parent.external_id, viaSuffix: false };
+    return { sourceExternalId: parent.external_id, viaSuffix: false };
+  }
+  if (matchesConsumption(parent.external_id)) {
+    return { sourceExternalId: parent.external_id, viaSuffix: false };
   }
   const grandParent = createdFeatureById.get(parent.energy_parent_id);
   if (grandParent && publishedIndexExternalIds.has(grandParent.external_id)) {
-    return { indexExternalId: grandParent.external_id, viaSuffix: false };
+    return { sourceExternalId: grandParent.external_id, viaSuffix: false };
   }
   return null;
 }
 
 /**
- * @description Derive the energy-tracking features (30-minutes consumption and
- * its cost) of a published device, exactly as Zigbee2mqtt and Tasmota do on
- * their own discoveries: the integration declares its meter index only, the
- * core adds the rest, so energy monitoring works with no extra work in the
- * container. The published list stays untouched (it is the supervisor's
- * in-memory source of truth): the derivation works on a copy.
+ * @description Derive the energy-tracking features of a published device,
+ * exactly as Zigbee2mqtt and Tasmota do on their own discoveries: the
+ * integration declares its meter index only (30-minutes consumption and cost
+ * derived), or the consumption it feeds itself (cost derived), the core adds
+ * the rest, so energy monitoring works with no extra work in the container.
+ * The published list stays untouched (it is the supervisor's in-memory source
+ * of truth): the derivation works on a copy.
  * @param {object} device - The device published by the integration.
  * @param {object} createdDevice - The device already created in DB, or null.
  * @param {string} defaultElectricMeterDeviceFeatureId - Feature id of the main electric meter.
@@ -140,6 +190,7 @@ function withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFea
     publishedIndexExternalIds: new Set(
       device.features.filter(isEnergyIndexFeature).map((feature) => feature.external_id),
     ),
+    publishedConsumptionCostTypes: getPublishedConsumptionCostTypes(device),
     createdFeatureById: new Map(createdFeatures.map((createdFeature) => [createdFeature.id, createdFeature])),
   };
   const featuresToReinject = [];
@@ -148,7 +199,7 @@ function withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFea
     if (!derived) {
       return;
     }
-    const match = matchPublishedIndex(createdFeature, derived, lookups);
+    const match = matchPublishedSource(createdFeature, derived, lookups);
     if (match) {
       featuresToReinject.push({ createdFeature, derived, ...match });
     }
@@ -159,12 +210,12 @@ function withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFea
   const reinjectedExternalIds = new Set();
   featuresToReinject
     .sort((a, b) => Number(b.viaSuffix) - Number(a.viaSuffix))
-    .forEach(({ createdFeature, derived, indexExternalId }) => {
+    .forEach(({ createdFeature, derived, sourceExternalId }) => {
       // the deterministic name is what addEnergyFeatures looks for: a feature
       // an integration derived itself is re-injected UNDER THAT NAME, keeping
       // its DB id, so the "Update" renames the existing row instead of
       // replacing it — its history is kept
-      const externalId = `${indexExternalId}${derived.suffix}`;
+      const externalId = `${sourceExternalId}${derived.suffix}`;
       // the integration may publish the derived features itself (which this
       // derivation makes unnecessary): the published entry already carries the
       // DB identity, re-injecting would duplicate that very row
@@ -191,7 +242,10 @@ function withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFea
         ...(createdFeature.energy_parent_id ? { energy_parent_id: createdFeature.energy_parent_id } : {}),
       });
     });
-  const deviceWithEnergyFeatures = addEnergyFeatures({ ...device, features }, defaultElectricMeterDeviceFeatureId);
+  const deviceWithEnergyFeatures = addConsumptionCostFeatures(
+    addEnergyFeatures({ ...device, features }, defaultElectricMeterDeviceFeatureId),
+    defaultElectricMeterDeviceFeatureId,
+  );
   // the selector remains the core's business, as for every published feature
   // (see setDiscoveredDevices): addEnergyFeatures derives one from the index
   // feature's selector, which an external integration never publishes
@@ -304,7 +358,8 @@ function structureDiffers(publishedFeatures, createdFeatures) {
  * re-published features differ from the created device: the Discovery
  * screen offers an Update button). A device publishing a cumulative energy
  * index also gets its energy-tracking features (30-minutes consumption and
- * cost) added by the core. The "keep history" choice made by the user on an
+ * cost) added by the core, and one publishing a consumption it feeds itself
+ * gets its cost feature. The "keep history" choice made by the user on an
  * already-created device wins over the published one.
  * @param {string} selector - The selector of the external integration.
  * @returns {Promise<Array>} Resolve with the list of discovered devices.
@@ -315,12 +370,12 @@ async function getDiscoveredDevices(selector) {
   const service = await this.getBySelector(selector);
   const devices = this.discoveredDevices.get(service.id) || [];
   // a single lookup for the whole list, and only when a device needs it
-  const defaultElectricMeterDeviceFeatureId = devices.some(hasEnergyIndexFeature)
-    ? await this.energyPrice.getDefaultElectricMeterFeatureId()
+  const defaultElectricMeterDeviceFeatureId = devices.some(hasEnergySourceFeature)
+    ? await this.energyContract.getDefaultElectricMeterFeatureId()
     : null;
   return devices.map((device) => {
     const createdDevice = this.stateManager.get('deviceByExternalId', device.external_id);
-    const deviceWithEnergyFeatures = hasEnergyIndexFeature(device)
+    const deviceWithEnergyFeatures = hasEnergySourceFeature(device)
       ? withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFeatureId)
       : device;
     const deviceToReturn = withUserKeepHistory(

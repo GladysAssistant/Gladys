@@ -124,6 +124,34 @@ const ACTION_DEFAULT_TIMEOUT_SECONDS = 30;
 const MAX_DISCOVERED_DEVICES = 2000;
 const MAX_STATES_PER_REQUEST = 100;
 const MAX_STATES_PER_MINUTE = 300;
+// Scene triggers and actions declared by the manifest (scene_triggers /
+// scene_actions): the scene editor renders them with the config_schema
+// form engine, the core matches the events and relays the actions. One
+// trigger type and one action type in the scene engine, nothing per
+// integration.
+const MAX_SCENE_DECLARATIONS = 20;
+const MAX_SCENE_DECLARATION_KEY_LENGTH = 40;
+const MAX_SCENE_DECLARATION_FIELDS = 10;
+const MAX_SCENE_DECLARATION_VARIABLES = 20;
+// a trigger filter must be able to express "any": a boolean toggle has no
+// empty state, so it is an action parameter only
+const SCENE_TRIGGER_FIELD_TYPES = ['string', 'number', 'select', 'multi_select', 'section'];
+const SCENE_ACTION_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'section'];
+// the data an event exposes to the scene (variables) and the values an
+// action returns to it (outputs): scalars only, never an image or a file
+const SCENE_VARIABLE_TYPES = ['string', 'number', 'boolean'];
+// POST /scene/event payload bounds: flat, one primitive per key
+const MAX_SCENE_EVENT_DATA_KEYS = 30;
+const MAX_SCENE_EVENT_STRING_LENGTH = 1000;
+// same constant and window as the states, on a SEPARATE counter (an
+// integration publishing both never sees them compete)
+const MAX_SCENE_EVENTS_PER_MINUTE = MAX_STATES_PER_MINUTE;
+// scene actions pending on one integration, counted from the slot
+// reservation (before any connection wait) to the terminal outcome: a slow
+// or disconnected container never accumulates 120s commands
+const MAX_PENDING_SCENE_ACTIONS = 10;
+// bound of a string output returned by a scene action
+const MAX_SCENE_ACTION_OUTPUT_LENGTH = 10000;
 // Communication integrations: user <-> contact link. The link itself is a
 // variable scoped (service_id, user_id) — no migration needed; the short
 // link codes live in the in-memory cache with a 15 minutes TTL.
@@ -138,6 +166,23 @@ const LINK_CODE_CACHE_PREFIX = 'external-integration-link-code';
 const LINK_CODE_TTL_MS = 15 * 60 * 1000;
 const LINK_CODE_LENGTH = 8;
 const MAX_MESSAGE_TEXT_LENGTH = 4096;
+
+// Calendar integrations (capabilities/calendar-type.md): per-user account variable (one JSON object
+// per (service_id, user_id), the CONTACT_PROFILE pattern — its presence is
+// the enablement marker, so "enabled with zero fields" is a first-class
+// state), and the normalization bounds of the calendar host endpoints.
+const CALENDAR_ACCOUNT_VARIABLE = 'EXTERNAL_INTEGRATION_CALENDAR_ACCOUNT';
+const MAX_CALENDARS_PER_USER = 50;
+const MAX_CALENDAR_EVENTS_PER_REQUEST = 500;
+const MAX_CALENDAR_WRITES_PER_MINUTE = 30;
+const MAX_CALENDAR_NAME_LENGTH = 100;
+const MAX_CALENDAR_DESCRIPTION_LENGTH = 500;
+const CALENDAR_COLOR_REGEX = /^#[0-9a-f]{6}$/;
+const MAX_CALENDAR_EVENT_NAME_LENGTH = 200;
+const MAX_CALENDAR_EVENT_LOCATION_LENGTH = 500;
+const MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH = 1000;
+const MAX_CALENDAR_EVENT_URL_LENGTH = 500;
+const MAX_CALENDAR_EXTERNAL_ID_LENGTH = 255;
 // Mediated network discovery (B.16): the core captures and emits from
 // its network=host position, the integration interprets and forges (it
 // knows the protocol, the core never parses nor builds a payload).
@@ -175,6 +220,28 @@ const CAMERA_GET_IMAGE_TIMEOUT_MS = 15 * 1000;
 // call from the integration, same exception to the 5s ack rule as the
 // camera image.
 const WEATHER_GET_TIMEOUT_MS = 15 * 1000;
+// AI providers (capabilities/ai-type.md): ai.chat relays a whole chat
+// completion request — reasoning models are slow and one request can carry
+// a full tool-calling context — hence the dedicated ack deadline.
+const AI_CHAT_TIMEOUT_MS = 120 * 1000;
+// The intent router (purpose intent-classification) runs before every chat
+// turn and swallows its own failures (the loop then falls back to all
+// tools): a stuck provider must fail it fast instead of adding a second
+// full deadline in front of the user, and a classification is a short
+// prompt that never needs the reasoning budget above.
+const AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS = 20 * 1000;
+// Requests in flight per AI provider: an ai.ask scene fired on every motion
+// must not flood a CPU-bound local model; beyond the cap the request fails
+// at once instead of queueing behind the others until the ack deadline.
+const MAX_AI_CHAT_IN_FLIGHT = 4;
+// Bounds of the completion accepted from an AI provider: the payload comes
+// from unaudited code and its content drives the tool-calling loop with the
+// user's authority, so only the OpenAI-compatible fields the loop consumes
+// are kept, each bounded (capabilities/ai-type.md).
+const MAX_AI_CHAT_CONTENT_CHARS = 50 * 1000;
+const MAX_AI_CHAT_TOOL_CALLS = 20;
+const MAX_AI_CHAT_TOOL_ARGUMENTS_CHARS = 100 * 1000;
+const AI_CHAT_TOOL_NAME_REGEX = /^[a-zA-Z0-9_-]{1,64}$/;
 // Bounds of the normalized pivot weather format (B.18): the payload comes
 // from unaudited code, everything is whitelisted, coerced and capped
 // before entering the core.
@@ -188,6 +255,29 @@ const MAX_WEATHER_ALERT_DESCRIPTION_LENGTH = 5000;
 // Minimal interval between two accepted freshness nudges of one
 // integration (B.18 point 5); beyond it the nudge is silently dropped.
 const WEATHER_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// TTS providers (capabilities/tts-type.md): tts.synthesize is a documented
+// exception to the 5s ack rule, alongside camera.get-image and action.run
+// (local synthesis on a Pi is slow). The audio comes back in
+// command-result.data as a data-URI; the core validates the content type
+// (what Sonos/Cast/browsers actually play — the served URL extension is
+// derived from it) and the decoded size before serving a byte. The text is
+// capped by the core BEFORE the relay (truncation, not an error: a long AI
+// answer must speak its beginning rather than fail).
+const TTS_SYNTHESIZE_TIMEOUT_MS = 30 * 1000;
+const MAX_TTS_AUDIO_SIZE_BYTES = 5 * 1024 * 1024;
+// base64 encodes 3 bytes in 4 chars: a data-URI longer than this cannot
+// decode under the size cap, and is rejected BEFORE the decode allocates
+// (the normalizeWeatherImage rule — the payload comes from unaudited code).
+// The prefix allowance covers "<content type>;base64," for the longest
+// accepted content type.
+const MAX_TTS_AUDIO_BASE64_LENGTH = Math.ceil(MAX_TTS_AUDIO_SIZE_BYTES / 3) * 4 + 4 + 32;
+const MAX_TTS_TEXT_LENGTH = 2000;
+const TTS_AUDIO_CONTENT_TYPES = {
+  'audio/mpeg': 'mp3',
+  'audio/wav': 'wav',
+  'audio/ogg': 'ogg',
+  'audio/aac': 'aac',
+};
 // Provider images (B.18 point 6): declared as metadata in the pivot
 // payload, bytes fetched on demand and validated before entering the core.
 const MAX_WEATHER_IMAGES = 3;
@@ -288,10 +378,28 @@ const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
 // app, a pairing confirmed on a device — so it has no redirect URI, no anti-CSRF
 // state and no callback, and the integration reports the approval itself.
 const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
+// Dynamic options of a select/multi_select field (`source`): a reserved enum
+// defined by the core — never a URL nor an expression, nothing arbitrary
+// enters the rendering — whose options, and therefore valid values, are only
+// known at runtime. "devices": the already-created devices of the integration
+// (label = device name, value = external_id), scoped to its t_service.
+// "houses": the houses of Gladys (label = house name, value = selector, the
+// identifier GET /house returns).
+const DYNAMIC_SOURCES = ['devices', 'houses'];
 // Optional `categories` manifest field: browse categories of the integration
 // catalog (docs/specs/integration-catalog-categories.md). More than 3 means
 // the assignment is lazy, not the vocabulary too narrow.
 const MAX_MANIFEST_CATEGORIES = 3;
+// Optional `keywords` manifest field: search-only terms of the catalog
+// (brands, synonyms, cities…), never displayed. Bounded so the field stays a
+// handful of terms and not a dump of the documentation.
+const MAX_MANIFEST_KEYWORDS = 10;
+const MANIFEST_KEYWORD_MIN_LENGTH = 2;
+const MANIFEST_KEYWORD_MAX_LENGTH = 30;
+// Optional `countries` manifest field: ISO 3166-1 alpha-2 codes of the
+// countries where the integration is usable; absent = worldwide.
+const MAX_MANIFEST_COUNTRIES = 20;
+const MANIFEST_COUNTRY_CODE_REGEX = /^[A-Z]{2}$/;
 // Inbound webhooks via Gladys Plus (B.17): the gateway relays third-party
 // webhook calls to the instance under a single integration-agnostic action;
 // the supervisor routes them to the declared integration. Two modes exist
@@ -311,6 +419,197 @@ const MAX_WEBHOOK_RESPONSE_BODY_BYTES = 64 * 1024;
 // (5xx would let the integration make Gladys Plus look broken)
 const WEBHOOK_RESPONSE_MIN_STATUS = 200;
 const WEBHOOK_RESPONSE_MAX_STATUS = 499;
+
+// Dashboard widgets declared by integrations (capabilities/dashboard-widgets.md).
+// The `widgets` manifest field: identity of each widget (key, label, icon,
+// per-instance settings), validated by the indexer and the server alike.
+const MAX_WIDGETS = 5;
+const WIDGET_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
+const WIDGET_LABEL_MIN_LENGTH = 3;
+const WIDGET_LABEL_MAX_LENGTH = 30;
+const WIDGET_DESCRIPTION_MAX_LENGTH = 100;
+// a Feather icon name (the set the box picker already uses); an unknown
+// name renders the generic widget icon, never an error
+const WIDGET_ICON_REGEX = /^[a-z0-9-]{1,40}$/;
+// widget settings live in the dashboard JSON, readable by every user of a
+// public dashboard: nothing sensitive (secret / oauth2 / account_link) and no
+// {{port:<name>}} placeholder (the editor is reachable by non-admins)
+const MAX_WIDGET_SETTINGS = 10;
+const WIDGET_SETTINGS_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'section'];
+// the settings of one box instance travel URL-encoded in the content route
+// query string: an HTTP request-line budget as much as a storage one
+const MAX_WIDGET_SETTING_STRING_LENGTH = 100;
+const MAX_WIDGET_SETTINGS_BYTES = 1024;
+// The type of an integration made only of capabilities (no device surface,
+// none of the core-consumed interfaces of the other types): it must declare
+// at least one of these manifest fields. The list grows with capabilities/.
+const CAPABILITY_MANIFEST_FIELDS = ['widgets', 'scene_triggers', 'scene_actions', 'energy_contracts'];
+
+// Energy contracts capability (capabilities/energy-contracts.md): contract templates,
+// tariff calendars and delegated pricing.
+const MAX_ENERGY_TEMPLATES = 20;
+const MAX_ENERGY_CALENDARS = 10;
+const MAX_ENERGY_TEMPLATE_INPUTS = 16;
+const ENERGY_TEMPLATE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const ENERGY_INPUT_KEY_REGEX = /^[a-z0-9_]{1,64}$/;
+const ENERGY_INPUT_TYPES = ['number', 'select', 'string', 'time_intervals'];
+const ENERGY_PRICING_MODES = ['rules', 'delegated'];
+// delegated pricing of up to 31 days of 30-minute intervals: 30s ack deadline
+const ENERGY_CONTRACT_PRICE_TIMEOUT_MS = 30 * 1000;
+const ENERGY_CONTRACT_CURRENT_TIMEOUT_MS = 5 * 1000;
+const MAX_ENERGY_INTERVALS_PER_REQUEST = 1488;
+// a delegated cost above this many currency units per kWh is refused (normalizeEnergyCosts):
+// a hostile-payload guard, orders of magnitude above any tariff, raised for the currencies
+// whose unit is worth much less than a euro (JPY, KRW, HUF, IDR...)
+const MAX_ENERGY_PRICE_PER_KWH = 10;
+const MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY = {
+  JPY: 2000,
+  KRW: 20000,
+  HUF: 5000,
+  CZK: 500,
+  PLN: 100,
+  SEK: 200,
+  NOK: 200,
+  DKK: 200,
+  ISK: 2000,
+  TRY: 500,
+  RUB: 1000,
+  UAH: 500,
+  INR: 500,
+  PKR: 2000,
+  BDT: 1000,
+  LKR: 2000,
+  IDR: 200000,
+  VND: 300000,
+  PHP: 500,
+  THB: 500,
+  TWD: 500,
+  KZT: 5000,
+  MXN: 500,
+  BRL: 100,
+  ARS: 10000,
+  CLP: 20000,
+  COP: 50000,
+  ZAR: 500,
+  NGN: 10000,
+  EGP: 500,
+  CNY: 100,
+};
+const ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// the refresh nudge carries no date: the costs of the last two days are recomputed
+const ENERGY_CALENDAR_REFRESH_LOOKBACK_MS = 2 * 24 * 60 * 60 * 1000;
+// POST /energy/consumption: dated consumption intervals published after the fact, the same
+// batch size as a calendar publication (contracts/host-api-endpoints.md)
+const MAX_ENERGY_CONSUMPTION_INTERVALS_PER_CALL = 2000;
+const ENERGY_CONSUMPTION_PAST_WINDOW_MS = 5 * 365 * 24 * 60 * 60 * 1000;
+// widget.get / widget.get-image typically call a third-party API: the same
+// exception to the 5s ack rule as camera.get-image and weather.get
+const WIDGET_GET_TIMEOUT_MS = 15 * 1000;
+// content freshness declared by the integration (ttl_seconds), clamped
+const WIDGET_CONTENT_TTL_MIN_SECONDS = 10;
+const WIDGET_CONTENT_TTL_MAX_SECONDS = 3600;
+const WIDGET_CONTENT_TTL_DEFAULT_SECONDS = 60;
+// a raw content above this size is an invalid payload, never parsed further
+const MAX_WIDGET_CONTENT_BYTES = 256 * 1024;
+// highest content `version` this Gladys renders; a higher one is refused as a
+// whole with the dedicated WIDGET_CONTENT_VERSION_UNSUPPORTED code
+const SUPPORTED_WIDGET_CONTENT_VERSION = 1;
+// in-memory content cache: per integration, LRU, one entry per
+// (widget, settings, language, units); dropped in full on stop/update/uninstall
+const MAX_WIDGET_CONTENT_CACHE_ENTRIES = 50;
+// bounded pulls: at most this many widget.get commands in flight per
+// integration (further misses queue), and this many cache-miss commands per
+// minute per integration beyond which the route answers 429
+const MAX_WIDGET_GET_IN_FLIGHT = 2;
+const MAX_WIDGET_GET_MISSES_PER_MINUTE = 30;
+// freshness nudge (widget.refresh): 1 per 10 s per (integration, widget key),
+// silently dropped beyond — fire-and-forget has no error path
+const WIDGET_REFRESH_MIN_INTERVAL_MS = 10 * 1000;
+// images: keys declared in the content, bytes served by the integration on
+// demand (never a third-party URL loaded by the browser, never fetched by the
+// core), validated by magic numbers, cached 1 h per (integration, key)
+const WIDGET_IMAGE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const MAX_WIDGET_IMAGE_BYTES = 300 * 1024;
+// the pixel bound, read from the image header before the bytes are cached or
+// served: a 300 KB file can decode to a gigantic bitmap in the browser
+const MAX_WIDGET_IMAGE_DIMENSION = 4096;
+const WIDGET_IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
+const MAX_WIDGET_IMAGE_CACHE_ENTRIES = 100;
+const MAX_WIDGET_IMAGE_IN_FLIGHT = 4;
+// widget actions (button component): allowlisted from the integration's own
+// last normalized content, rate-limited per integration
+const WIDGET_ACTION_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
+const MAX_WIDGET_ACTION_PARAMS_BYTES = 1024;
+const MAX_WIDGET_ACTIONS_PER_MINUTE = 30;
+// the form behind a widget action button (section 7): a short form of the
+// config_schema grammar, without sections, sensitive types or core sources —
+// the content is produced at runtime, so the options and defaults are too
+const MAX_WIDGET_ACTION_FIELDS = 4;
+const WIDGET_ACTION_FIELD_TYPES = ['string', 'number', 'boolean', 'select'];
+// a typed string value of an action form (a delivery note): the route is open
+// to every authenticated user, so what they type is bounded like the rest
+const MAX_WIDGET_ACTION_VALUE_LENGTH = 1000;
+// bounded free-form texts an integration hands back outside the content
+// vocabulary: the action result message and the `error` of a failed command
+const MAX_WIDGET_MESSAGE_LENGTH = 200;
+// Music players (capabilities/music.md, section 4): the queue, the catalog and
+// search are read on demand through the integration, never stored. A search
+// is a third-party API call: 10 s ack, a documented exception to the 5 s rule.
+const MUSIC_COMMAND_TIMEOUT_MS = 10 * 1000;
+// relayed music commands in flight per integration (browse, search, play,
+// queue): beyond, the request fails at once with 429 rather than queueing
+// behind the others until the ack deadline (the AI chat rule). Artwork has
+// its own queued pool, shared with the widget images.
+const MAX_MUSIC_COMMANDS_IN_FLIGHT = 4;
+// bounds of a MediaItem list answered by an integration: unknown fields are
+// dropped, strings truncated, invalid items dropped with a warning
+const MAX_MUSIC_ITEMS_PER_RESPONSE = 100;
+const MAX_MUSIC_MEDIA_ID_LENGTH = 512;
+const MAX_MUSIC_ITEM_TEXT_LENGTH = 200;
+const MAX_MUSIC_SEARCH_QUERY_LENGTH = 200;
+const MUSIC_BROWSE_DEFAULT_LIMIT = 50;
+const MUSIC_BROWSE_MAX_LIMIT = 100;
+const MUSIC_SEARCH_DEFAULT_LIMIT = 20;
+const MUSIC_SEARCH_MAX_LIMIT = 50;
+// artwork keys seen in the music responses of an integration stay servable
+// as long as the image cache would still serve them (1 h), bounded per
+// integration in LRU order
+const MAX_MUSIC_ARTWORK_KEYS_PER_INTEGRATION = 1000;
+const MUSIC_ARTWORK_KEY_TTL_MS = WIDGET_IMAGE_CACHE_TTL_MS;
+// the operations an integration declares in the `music` manifest field
+const MUSIC_MANIFEST_FIELDS = ['browse', 'search', 'queue', 'append'];
+// the content vocabulary enums (section 4 of the capability spec) — the
+// frontend maps them to theme colors, icons and layouts, never a free value
+const WIDGET_COLORS = ['neutral', 'primary', 'success', 'warning', 'danger', 'info'];
+const WIDGET_TEXT_VARIANTS = ['heading', 'body', 'caption'];
+const WIDGET_CHART_TYPES = ['line', 'area', 'bar', 'stepline'];
+// the chart box's interval enum, reused as-is for live device_features series
+const WIDGET_CHART_INTERVALS = [
+  'last-hour',
+  'last-twelve-hours',
+  'last-day',
+  'last-three-days',
+  'last-week',
+  'last-month',
+  'last-three-months',
+  'last-year',
+];
+const WIDGET_CARD_LIST_DISPLAYS = ['grid', 'list'];
+const WIDGET_IMAGE_FITS = ['cover', 'contain'];
+const WIDGET_BUTTON_STYLES = ['primary', 'secondary', 'danger'];
+const MAX_WIDGET_URL_LENGTH = 2048;
+// The content budget (section 5): components beyond a cap are dropped in
+// content order, never the whole content. Tiles = value/gauge; focal =
+// chart/card-list/image; the budget is what keeps every widget card-shaped.
+const WIDGET_CONTENT_BUDGET = {
+  components: 8,
+  focal: 1,
+  tiles: 6,
+  texts: 2,
+  bodyTexts: 1,
+  status: 1,
+  buttons: 4,
+};
 
 module.exports = {
   EXTERNAL_INTEGRATION_LABEL,
@@ -365,8 +664,32 @@ module.exports = {
   MAX_DISCOVERED_DEVICES,
   MAX_STATES_PER_REQUEST,
   MAX_STATES_PER_MINUTE,
+  MAX_SCENE_DECLARATIONS,
+  MAX_SCENE_DECLARATION_KEY_LENGTH,
+  MAX_SCENE_DECLARATION_FIELDS,
+  MAX_SCENE_DECLARATION_VARIABLES,
+  SCENE_TRIGGER_FIELD_TYPES,
+  SCENE_ACTION_FIELD_TYPES,
+  SCENE_VARIABLE_TYPES,
+  MAX_SCENE_EVENT_DATA_KEYS,
+  MAX_SCENE_EVENT_STRING_LENGTH,
+  MAX_SCENE_EVENTS_PER_MINUTE,
+  MAX_PENDING_SCENE_ACTIONS,
+  MAX_SCENE_ACTION_OUTPUT_LENGTH,
   CONTACT_VARIABLE,
   CONTACT_PROFILE_VARIABLE,
+  CALENDAR_ACCOUNT_VARIABLE,
+  MAX_CALENDARS_PER_USER,
+  MAX_CALENDAR_EVENTS_PER_REQUEST,
+  MAX_CALENDAR_WRITES_PER_MINUTE,
+  MAX_CALENDAR_NAME_LENGTH,
+  MAX_CALENDAR_DESCRIPTION_LENGTH,
+  CALENDAR_COLOR_REGEX,
+  MAX_CALENDAR_EVENT_NAME_LENGTH,
+  MAX_CALENDAR_EVENT_LOCATION_LENGTH,
+  MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH,
+  MAX_CALENDAR_EVENT_URL_LENGTH,
+  MAX_CALENDAR_EXTERNAL_ID_LENGTH,
   LINK_CODE_CACHE_PREFIX,
   LINK_CODE_TTL_MS,
   LINK_CODE_LENGTH,
@@ -384,6 +707,18 @@ module.exports = {
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
+  AI_CHAT_TIMEOUT_MS,
+  AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS,
+  MAX_AI_CHAT_IN_FLIGHT,
+  MAX_AI_CHAT_CONTENT_CHARS,
+  MAX_AI_CHAT_TOOL_CALLS,
+  MAX_AI_CHAT_TOOL_ARGUMENTS_CHARS,
+  AI_CHAT_TOOL_NAME_REGEX,
+  TTS_SYNTHESIZE_TIMEOUT_MS,
+  MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
+  MAX_TTS_TEXT_LENGTH,
+  TTS_AUDIO_CONTENT_TYPES,
   MAX_WEATHER_HOURS,
   MAX_WEATHER_DAYS,
   MAX_WEATHER_ALERTS,
@@ -409,7 +744,13 @@ module.exports = {
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
   ACCOUNT_FIELD_TYPES,
+  DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
+  MAX_MANIFEST_KEYWORDS,
+  MANIFEST_KEYWORD_MIN_LENGTH,
+  MANIFEST_KEYWORD_MAX_LENGTH,
+  MAX_MANIFEST_COUNTRIES,
+  MANIFEST_COUNTRY_CODE_REGEX,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   WEBHOOK_DEFAULT_MODE,
@@ -418,4 +759,76 @@ module.exports = {
   MAX_WEBHOOK_RESPONSE_BODY_BYTES,
   WEBHOOK_RESPONSE_MIN_STATUS,
   WEBHOOK_RESPONSE_MAX_STATUS,
+  MAX_WIDGETS,
+  WIDGET_KEY_REGEX,
+  WIDGET_LABEL_MIN_LENGTH,
+  WIDGET_LABEL_MAX_LENGTH,
+  WIDGET_DESCRIPTION_MAX_LENGTH,
+  WIDGET_ICON_REGEX,
+  MAX_WIDGET_SETTINGS,
+  WIDGET_SETTINGS_FIELD_TYPES,
+  MAX_WIDGET_SETTING_STRING_LENGTH,
+  MAX_WIDGET_SETTINGS_BYTES,
+  CAPABILITY_MANIFEST_FIELDS,
+  MAX_ENERGY_TEMPLATES,
+  MAX_ENERGY_CALENDARS,
+  MAX_ENERGY_TEMPLATE_INPUTS,
+  ENERGY_TEMPLATE_KEY_REGEX,
+  ENERGY_INPUT_KEY_REGEX,
+  ENERGY_INPUT_TYPES,
+  ENERGY_PRICING_MODES,
+  ENERGY_CONTRACT_PRICE_TIMEOUT_MS,
+  ENERGY_CONTRACT_CURRENT_TIMEOUT_MS,
+  MAX_ENERGY_INTERVALS_PER_REQUEST,
+  MAX_ENERGY_PRICE_PER_KWH,
+  MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY,
+  ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS,
+  ENERGY_CALENDAR_REFRESH_LOOKBACK_MS,
+  MAX_ENERGY_CONSUMPTION_INTERVALS_PER_CALL,
+  ENERGY_CONSUMPTION_PAST_WINDOW_MS,
+  WIDGET_GET_TIMEOUT_MS,
+  WIDGET_CONTENT_TTL_MIN_SECONDS,
+  WIDGET_CONTENT_TTL_MAX_SECONDS,
+  WIDGET_CONTENT_TTL_DEFAULT_SECONDS,
+  MAX_WIDGET_CONTENT_BYTES,
+  SUPPORTED_WIDGET_CONTENT_VERSION,
+  MAX_WIDGET_CONTENT_CACHE_ENTRIES,
+  MAX_WIDGET_GET_IN_FLIGHT,
+  MAX_WIDGET_GET_MISSES_PER_MINUTE,
+  WIDGET_REFRESH_MIN_INTERVAL_MS,
+  WIDGET_IMAGE_KEY_REGEX,
+  MAX_WIDGET_IMAGE_BYTES,
+  MAX_WIDGET_IMAGE_DIMENSION,
+  WIDGET_IMAGE_CACHE_TTL_MS,
+  MAX_WIDGET_IMAGE_CACHE_ENTRIES,
+  MAX_WIDGET_IMAGE_IN_FLIGHT,
+  WIDGET_ACTION_KEY_REGEX,
+  MAX_WIDGET_ACTION_PARAMS_BYTES,
+  MAX_WIDGET_ACTIONS_PER_MINUTE,
+  MAX_WIDGET_ACTION_FIELDS,
+  WIDGET_ACTION_FIELD_TYPES,
+  MAX_WIDGET_ACTION_VALUE_LENGTH,
+  MAX_WIDGET_MESSAGE_LENGTH,
+  MUSIC_COMMAND_TIMEOUT_MS,
+  MAX_MUSIC_COMMANDS_IN_FLIGHT,
+  MAX_MUSIC_ITEMS_PER_RESPONSE,
+  MAX_MUSIC_MEDIA_ID_LENGTH,
+  MAX_MUSIC_ITEM_TEXT_LENGTH,
+  MAX_MUSIC_SEARCH_QUERY_LENGTH,
+  MUSIC_BROWSE_DEFAULT_LIMIT,
+  MUSIC_BROWSE_MAX_LIMIT,
+  MUSIC_SEARCH_DEFAULT_LIMIT,
+  MUSIC_SEARCH_MAX_LIMIT,
+  MAX_MUSIC_ARTWORK_KEYS_PER_INTEGRATION,
+  MUSIC_ARTWORK_KEY_TTL_MS,
+  MUSIC_MANIFEST_FIELDS,
+  WIDGET_COLORS,
+  WIDGET_TEXT_VARIANTS,
+  WIDGET_CHART_TYPES,
+  WIDGET_CHART_INTERVALS,
+  WIDGET_CARD_LIST_DISPLAYS,
+  WIDGET_IMAGE_FITS,
+  WIDGET_BUTTON_STYLES,
+  MAX_WIDGET_URL_LENGTH,
+  WIDGET_CONTENT_BUDGET,
 };

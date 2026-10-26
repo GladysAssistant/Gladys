@@ -2,13 +2,13 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import DeviceExportCsvButton from './DeviceExportCsvButton';
-import { DeviceStamp, FeatureIcons, IntegrationName } from './helpers';
+import { DeviceStamp, FeatureIcons, IntegrationName, VerboseBadge } from './helpers';
 import style from './style.css';
 
 // One tappable list item: the whole row opens the device in its
 // integration, like a native mobile app list. The export button sits outside
 // that tap target so it can be reached without navigating away.
-const DeviceMobileItem = ({ device, integration }) => {
+const DeviceMobileItem = ({ device, integration, statesStats, periodInHours }) => {
   const content = [
     <DeviceStamp device={device} integration={integration} />,
     <div class={style.mobileItemBody}>
@@ -16,6 +16,7 @@ const DeviceMobileItem = ({ device, integration }) => {
       <div class={cx('small', 'text-muted', style.mobileItemDetails)}>
         {device.room && <span class="tag">{device.room.name}</span>}
         <IntegrationName integration={integration} link={false} />
+        <VerboseBadge device={device} statesStats={statesStats} periodInHours={periodInHours} />
       </div>
       <FeatureIcons device={device} />
     </div>

@@ -9,7 +9,7 @@ import { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHisto
 import { demoLanguage, uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
 import integrations from './integrations';
 import { translate } from './i18n';
-import { getStoreCatalog, refreshStoreCatalog, getStoreDocs } from './store';
+import { getStoreCatalog, getStoreIntegration, refreshStoreCatalog, getStoreDocs } from './store';
 import system from './system';
 
 /**
@@ -184,11 +184,9 @@ const installFromStore = async ({ store_slug: storeSlug }) => {
   if (installedBySlug[storeSlug]) {
     return installedBySlug[storeSlug];
   }
-  const { integrations: catalog } = await getStoreCatalog({}, installedBySlug);
-  const entry = catalog.find(candidate => candidate.store_slug === storeSlug);
-  if (!entry) {
-    throw new Error(`${storeSlug} is not in the store index`);
-  }
+  // the complete manifest (configuration screen, widgets...), not the lite
+  // one of the catalog
+  const entry = await getStoreIntegration({ store_slug: storeSlug }, installedBySlug);
   const version = entry.manifest.version || '1.0.0';
   const integration = {
     id: uuid(`external-${storeSlug}`),
@@ -279,6 +277,43 @@ const getDevices = (query = {}) => {
     return devices.filter(device => device.room_id === query.room_id);
   }
   return devices;
+};
+
+/**
+ * `GET /device/states_stats`: the states each device saved in its history over
+ * the last 24 hours. The two kitchen plugs report their power every few
+ * seconds, so the devices list has verbose devices to flag.
+ */
+const VERBOSE_DEMO_FEATURE_STATES = {
+  'kitchen-dishwasher-power': 17280,
+  'kitchen-coffee-power': 10800
+};
+const VERBOSE_DEVICE_FEATURE_MIN_STATES = 8640;
+const getStatesStats = () => {
+  const statsDevices = devices
+    .map(device => {
+      const features = device.features
+        .filter(feature => feature.keep_history)
+        .map(feature => {
+          const states = VERBOSE_DEMO_FEATURE_STATES[feature.selector] || 96;
+          return { device_feature_id: feature.id, states, is_verbose: states >= VERBOSE_DEVICE_FEATURE_MIN_STATES };
+        })
+        .sort((a, b) => b.states - a.states);
+      return {
+        device_id: device.id,
+        states: features.reduce((sum, feature) => sum + feature.states, 0),
+        is_verbose: features.some(feature => feature.is_verbose),
+        features
+      };
+    })
+    .filter(deviceStats => deviceStats.features.length > 0)
+    .sort((a, b) => b.states - a.states);
+  return {
+    period_in_hours: 24,
+    verbose_device_feature_min_states: VERBOSE_DEVICE_FEATURE_MIN_STATES,
+    total_states: statsDevices.reduce((sum, deviceStats) => sum + deviceStats.states, 0),
+    devices: statsDevices
+  };
 };
 
 /** `GET /scene`, with the filters of the scene list and of the scene widget. */
@@ -383,7 +418,8 @@ const VARIABLE_VALUES = {
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: '15',
   AI_WEEKLY_DIGEST_ENABLED: 'false',
   AI_WEEKLY_DIGEST_DAY: '1',
-  AI_WEEKLY_DIGEST_HOUR: '9'
+  AI_WEEKLY_DIGEST_HOUR: '9',
+  SYSTEM_MESSAGE_SERVICE: ''
 };
 
 const variables = {};
@@ -476,6 +512,8 @@ const home = {
   'post /api/v1/service/mqtt/debug_mode': { success: true },
   ...devicesByService,
   'get /api/v1/external_integration': () => externalIntegrations.concat(simulatedInstalls),
+  // dashboard widgets declared by installed integrations: none in the demo
+  'get /api/v1/external_integration/widget': [],
   // The community store is the live one: these fixtures are functions, so the
   // public store index is only downloaded when a page actually asks for the
   // catalog, and the demo lists the integrations published right now, with
@@ -486,6 +524,7 @@ const home = {
   // stale-catalog warning instead of claiming a fresh one
   'post /api/v1/external_integration/store/refresh': () => refreshStoreCatalog(installedBySlug),
   'get /api/v1/external_integration/store/docs': query => getStoreDocs(query),
+  'get /api/v1/external_integration/store/integration': query => getStoreIntegration(query, installedBySlug),
   'post /api/v1/external_integration': body => installFromStore(body),
   // Hardware access classes offered by the install screen of an integration
   // that asks for one: what a normal Linux host reports.
@@ -508,6 +547,7 @@ const home = {
   'get /api/v1/room?expand=devices': roomsWithDevices,
   ...roomBySelector,
   'get /api/v1/device': getDevices,
+  'get /api/v1/device/states_stats': getStatesStats(),
   ...deviceBySelector,
   ...deviceFeatureValues,
   'post /api/v1/device': devices[0],
@@ -557,6 +597,36 @@ const data = translate({
   ...home,
   ...integrations,
   ...system
+});
+
+// `GET /device/:selector/states_size`: the device pages show how much history
+// each feature holds, so every device the fixtures return gets one. The power
+// of a plug is reported every few seconds: it holds most of the history.
+const getDemoFeatureStates = feature => {
+  if (!feature.keep_history) {
+    return 0;
+  }
+  return feature.type === 'power' ? 518400 : 8640;
+};
+Object.values(data).forEach(response => {
+  (Array.isArray(response) ? response : [response]).forEach(device => {
+    if (!device || !device.selector || !Array.isArray(device.features)) {
+      return;
+    }
+    data[`get /api/v1/device/${device.selector}/states_size`] = {
+      device_selector: device.selector,
+      features: device.features
+        .filter(feature => feature && feature.selector)
+        .map(feature => {
+          const states = getDemoFeatureStates(feature);
+          return {
+            device_feature_selector: feature.selector,
+            states,
+            estimated_size_in_bytes: states * 6
+          };
+        })
+    };
+  });
 });
 
 export default data;

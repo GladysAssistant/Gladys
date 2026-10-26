@@ -9,6 +9,7 @@ const {
   PILOT_WIRE_MODE,
   LIQUID_STATE,
   WATER_VALVE_CURRENT_DEVICE_STATUS,
+  CONTAMINATION_STATE,
   STATE,
 } = require('../../../utils/constants');
 
@@ -159,6 +160,15 @@ addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_4, 'double_button_4');
 addMapping('action', BUTTON_STATUS.LONG_BUTTON_4, 'long_button_4');
 addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_4, 'triple_button_4');
 
+// Philips Hue tap switch (old round, battery-less model)
+// https://www.zigbee2mqtt.io/devices/8718696743133.html
+// A "press_N" is a single press on button N. The action is read-only, so overwriting the
+// write side of SINGLE_BUTTON_N is harmless (same as "on-press" / "on_press" above).
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_1, 'press_1');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_2, 'press_2');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_3, 'press_3');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_4, 'press_4');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
@@ -213,6 +223,14 @@ addMapping('alarm_state', SIREN_MODE.SOUND_AND_LIGHT, 'alarm_sound_light');
 addMapping('trigger_selftest', BUTTON_PUSH.PRESSED, 'test');
 addMapping('siren_for_automation_only', STATE.OFF, 'stop');
 addMapping('siren_for_automation_only', STATE.ON, 'smoke_siren');
+
+// Contamination of the sensing chamber, e.g. Heiman HS1SA-E-PLUS. The detector names its
+// levels its own way: they are mapped onto the standard contamination states.
+// https://www.zigbee2mqtt.io/devices/HS1SA-E-PLUS.html
+addMapping('chamber_contamination', CONTAMINATION_STATE.NORMAL, 'normal');
+addMapping('chamber_contamination', CONTAMINATION_STATE.LOW, 'light_contamination');
+addMapping('chamber_contamination', CONTAMINATION_STATE.WARNING, 'medium_contamination');
+addMapping('chamber_contamination', CONTAMINATION_STATE.CRITICAL, 'critical_contamination');
 
 module.exports = {
   type: 'enum',
@@ -353,6 +371,15 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    },
+    chamber_contamination: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CONTAMINATION_STATE,
+        min: 0,
+        max: 3,
+        forceOverride: true,
       },
     },
   },

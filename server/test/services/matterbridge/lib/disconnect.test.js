@@ -20,6 +20,8 @@ const MatterbridgeManager = proxyquire('../../../../services/matterbridge/lib', 
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-matterbridge',
+  labels: { 'io.gladysassistant.service': 'matterbridge' },
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -37,6 +39,7 @@ describe('Matterbridge disconnect', () => {
       },
       system: {
         getContainers: fake.resolves([container]),
+        inspectContainer: fake.resolves({ Config: { Image: 'nginx:alpine' } }),
         stopContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
         getGladysBasePath: fake.resolves({
@@ -98,5 +101,39 @@ describe('Matterbridge disconnect', () => {
 
     expect(matterbridgeManager.matterbridgeRunning).to.equal(true);
     expect(matterbridgeManager.matterbridgeExist).to.equal(true);
+  });
+
+  it('no container to stop', async () => {
+    gladys.system.getContainers = fake.resolves([]);
+
+    await matterbridgeManager.disconnect();
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MATTERBRIDGE.STATUS_CHANGE,
+    });
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(fsMock.rm);
+
+    // our Matterbridge is not running anymore, whether a container was found or not
+    expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
+  });
+
+  it('our name is taken by a user container -> it is left untouched', async () => {
+    gladys.system.getContainers = fake.resolves([
+      { id: 'user-container', name: '/gladys-matterbridge', image: 'nginx' },
+    ]);
+
+    await matterbridgeManager.disconnect();
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MATTERBRIDGE.STATUS_CHANGE,
+    });
+    assert.calledOnceWithExactly(gladys.system.inspectContainer, 'user-container');
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(fsMock.rm);
+
+    expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
   });
 });

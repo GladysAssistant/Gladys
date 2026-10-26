@@ -8,6 +8,7 @@ import {
 } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
+import FeatureHistorySize from './FeatureHistorySize';
 
 const DEVICE_FEATURE_COMPATIBLE_CATEGORY = {
   [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: [DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_CATEGORIES.SWITCH],
@@ -165,31 +166,37 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
-            <div class="page-options d-flex">
-              <div class="form-group">
-                <div class="form-label">
-                  <Text id="editDeviceForm.keepHistoryLabel" />
+            {/* a music player is live: the core forces keep_history off on the whole
+                category (capabilities/music.md, section 2), so the switch would promise a
+                history that never exists */}
+            {feature.category !== DEVICE_FEATURE_CATEGORIES.MUSIC && (
+              <div class="page-options d-flex">
+                <div class="form-group">
+                  <div class="form-label">
+                    <Text id="editDeviceForm.keepHistoryLabel" />
+                  </div>
+                  <label class="custom-switch">
+                    <input
+                      id={`keep_history_${featureIndex}`}
+                      type="checkbox"
+                      checked={feature.keep_history}
+                      onClick={this.updateKeepHistory}
+                      class="custom-switch-input"
+                    />
+                    <span class="custom-switch-indicator" />
+                    <span class="custom-switch-description">
+                      <Text id="editDeviceForm.keepHistorySmallDescription" />
+                    </span>
+                  </label>
+                  <FeatureHistorySize device={device} feature={feature} class="mt-2" />
+                  <p class="mt-2">
+                    <small>
+                      <MarkupText id="editDeviceForm.keepHistoryDescription" />
+                    </small>
+                  </p>
                 </div>
-                <label class="custom-switch">
-                  <input
-                    id={`keep_history_${featureIndex}`}
-                    type="checkbox"
-                    checked={feature.keep_history}
-                    onClick={this.updateKeepHistory}
-                    class="custom-switch-input"
-                  />
-                  <span class="custom-switch-indicator" />
-                  <span class="custom-switch-description">
-                    <Text id="editDeviceForm.keepHistorySmallDescription" />
-                  </span>
-                </label>
-                <p class="mt-2">
-                  <small>
-                    <MarkupText id="editDeviceForm.keepHistoryDescription" />
-                  </small>
-                </p>
               </div>
-            </div>
+            )}
             {props.allowModifyFeatures && (
               <div class="form-group">
                 <button onClick={props.deleteFeature} class="btn btn-outline-danger">

@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const db = require('../../models');
 const logger = require('../../utils/logger');
+const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Uninstall an external integration. Removes everything:
@@ -52,17 +53,56 @@ async function uninstall(selector) {
   } catch (e) {
     logger.warn(`Unable to remove data folder of integration ${selector}`, e);
   }
+  // uninstalling the selected TTS provider returns the instance to the Gladys
+  // Plus default: no dangling selector in the system variable failing every
+  // announcement until an admin notices (capabilities/tts-type.md)
+  const selectedTtsProvider = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER);
+  if (selectedTtsProvider === service.name) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER);
+  }
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));
+  // Calendars of a calendar-type integration are removed explicitly (all
+  // users), never left to the service_id FK cascade (capabilities/calendar-type.md) —
+  // and their viewers are notified, or a shared calendar would stay
+  // displayed on other users' calendar views until a manual refresh.
+  const calendars = await db.Calendar.findAll({
+    where: { service_id: service.id },
+    attributes: ['selector', 'shared', 'user_id'],
+  });
+  await db.Calendar.destroy({ where: { service_id: service.id } });
+  // partitioned by prior visibility, per owner: broadcasting a user's whole
+  // set as soon as one calendar is shared would leak the selectors of their
+  // private calendars to every connected user
+  const calendarsByUser = new Map();
+  calendars.forEach((calendar) => {
+    calendarsByUser.set(calendar.user_id, [...(calendarsByUser.get(calendar.user_id) || []), calendar]);
+  });
+  calendarsByUser.forEach((userCalendars, userId) => this.notifyCalendarsUpdated(userId, userCalendars));
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });
+  // uninstalling the selected AI provider silently returns the instance to
+  // the Gladys Plus default: no dangling selector in the variable. Read
+  // after the row deletion: a selection written while this uninstall was
+  // running (setAiProvider validated the row before it went) is caught
+  // here, and one written after it is rolled back by setAiProvider's own
+  // re-check of the row — both interleavings end on Gladys Plus
+  const selectedAiProvider = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+  if (selectedAiProvider === service.selector) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+  }
   this.stateManager.deleteState('service', service.name);
   this.stateManager.deleteState('serviceById', service.id);
   this.discoveredDevices.delete(service.id);
   this.connectionStatuses.delete(service.id);
+  this.clearWidgetCaches(service);
   this.startedAt.delete(service.id);
   this.stateRateLimits.delete(service.id);
+  this.aiChatInFlight.delete(service.id);
+  this.calendarWriteRateLimits.delete(service.id);
   this.networkDiscoveryActiveScanTimes.delete(service.id);
+  // its contracts stay (provider_service_id nulled by the FK), its calendars are orphaned
+  this.energyCalendarRefreshTimes.delete(service.id);
   const externalIdPrefix = `ext:${service.selector}:`;
   [...this.cameraImageRateLimits.keys()]
     .filter((externalId) => externalId.startsWith(externalIdPrefix))

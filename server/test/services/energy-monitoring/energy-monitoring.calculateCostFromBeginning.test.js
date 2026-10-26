@@ -15,7 +15,6 @@ const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
-const EnergyPrice = require('../../../lib/energy-price');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -37,17 +36,15 @@ describe('EnergyMonitoring.calculateCostFromBeginning', () => {
   let stateManager;
   let serviceManager;
   let device;
-  let energyPrice;
   let gladys;
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
     device = new Device(event, {}, stateManager, serviceManager, {}, variable, job, brain);
-    energyPrice = new EnergyPrice();
     gladys = {
       variable,
       device,
-      energyPrice,
+      energyContract: {},
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,

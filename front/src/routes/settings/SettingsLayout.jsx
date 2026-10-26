@@ -1,18 +1,20 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import config from '../../config';
+import { USER_ROLE } from '../../../../server/utils/constants';
 
 import ChipsScroll from '../../components/chips-scroll';
 import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
 
 const MENU_ITEMS = [
-  { href: '/dashboard/settings/house', icon: 'home', textId: 'settings.housesTab' },
-  { href: '/dashboard/settings/user', icon: 'user', textId: 'settings.usersTab', matchPrefix: true },
+  { href: '/dashboard/settings/house', icon: 'home', textId: 'settings.housesTab', adminOnly: true },
+  { href: '/dashboard/settings/user', icon: 'user', textId: 'settings.usersTab', matchPrefix: true, adminOnly: true },
   { href: '/dashboard/settings/session', icon: 'smartphone', textId: 'settings.sessionsTab' },
   { href: '/dashboard/settings/security', icon: 'shield', textId: 'settings.securityTab', gatewayOnly: true },
-  { href: '/dashboard/settings/gateway', icon: 'globe', textId: 'settings.gatewayTab' },
+  { href: '/dashboard/settings/gateway', icon: 'globe', textId: 'settings.gatewayTab', adminOnly: true },
   { href: '/dashboard/settings/gateway-users', icon: 'user', textId: 'settings.gatewayUsersTab', gatewayOnly: true },
   {
     href: '/dashboard/settings/gateway-open-api',
@@ -20,13 +22,29 @@ const MENU_ITEMS = [
     textId: 'settings.gatewayOpenApiTab',
     gatewayOnly: true
   },
-  { href: '/dashboard/settings/billing', icon: 'credit-card', textId: 'settings.billingTab', gatewayOnly: true },
-  { href: '/dashboard/settings/backup', icon: 'database', textId: 'settings.backupTab' },
-  { href: '/dashboard/settings/jobs', icon: 'cpu', textId: 'settings.jobsTab' },
-  { href: '/dashboard/settings/service', icon: 'grid', textId: 'settings.serviceTab' },
-  { href: '/dashboard/settings/system', icon: 'power', textId: 'settings.systemTab' }
+  {
+    href: '/dashboard/settings/billing',
+    icon: 'credit-card',
+    textId: 'settings.billingTab',
+    gatewayOnly: true,
+    gatewayAdminOnly: true
+  },
+  { href: '/dashboard/settings/backup', icon: 'database', textId: 'settings.backupTab', adminOnly: true },
+  { href: '/dashboard/settings/jobs', icon: 'cpu', textId: 'settings.jobsTab', adminOnly: true },
+  { href: '/dashboard/settings/service', icon: 'grid', textId: 'settings.serviceTab', adminOnly: true },
+  { href: '/dashboard/settings/system', icon: 'power', textId: 'settings.systemTab', adminOnly: true }
 ];
 
+// `adminOnly` marks the tabs whose API is reserved to admins: the system
+// settings and the backup key are instance-wide, the Gladys Plus status and the
+// background jobs are admin routes of their own. Houses, users and services can
+// be read by anyone, but every action on them is admin-only (and the house form
+// carries the alarm code). A non-admin used to reach them and land on error
+// states. Hiding the entry mirrors the app nav (components/header), the server
+// stays the authority on a deep link.
+// `gatewayAdminOnly` goes by the role in the Gladys Plus account, not on the
+// instance: billing belongs to the admin of the Plus account (same rule as the
+// trial card in the header, see refreshGatewayTrialState).
 // The settings live on the same Horizon glass scene as the dashboard: the
 // global .glass-theme class gates the shared theme layer (cards, alerts,
 // badges, buttons), .settings-page scopes the settings-only pass (style.css
@@ -68,7 +86,12 @@ const DashboardSettings = ({ children, ...props }) => (
             activeSelector={`.${style.tabLinkActive}`}
             activeKey={props.currentUrl}
           >
-            {MENU_ITEMS.filter(item => !item.gatewayOnly || config.gatewayMode).map(item => (
+            {MENU_ITEMS.filter(
+              item =>
+                (!item.gatewayOnly || config.gatewayMode) &&
+                (!item.adminOnly || (props.user && props.user.role === USER_ROLE.ADMIN)) &&
+                (!item.gatewayAdminOnly || props.gatewayUserRole === 'admin')
+            ).map(item => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -92,4 +115,6 @@ const DashboardSettings = ({ children, ...props }) => (
   </div>
 );
 
-export default DashboardSettings;
+// connected rather than fed by its callers: the layout is rendered from sixteen
+// settings pages, none of which pass the user down
+export default connect('user,gatewayUserRole', {})(DashboardSettings);

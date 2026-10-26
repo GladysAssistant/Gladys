@@ -19,23 +19,36 @@ class TypePicker extends Component {
   };
 
   getVisibleCategories = () => {
-    const { categories, filter, labelPrefix, descriptionPrefix, intl } = this.props;
+    const { categories, filter, labelPrefix, descriptionPrefix, deprecated, intl } = this.props;
     const { query } = this.state;
     const normalizedQuery = normalizeSearchText(query.trim());
 
     return categories
       .map(category => {
         const items = category.items
-          .filter(type => !filter || filter.includes(type))
-          .map(type => {
-            const label = get(intl.dictionary, `${labelPrefix}.${type}`, { default: type });
-            const description = get(intl.dictionary, `${descriptionPrefix}.${type}`, { default: '' });
-            return { type, label, description };
+          // a core type is a string translated from the dictionary; an entry
+          // declared by an external integration is an object carrying its own
+          // (manifest) label, subtitle, description and icon
+          .filter(item => typeof item !== 'string' || !filter || filter.includes(item))
+          .map(item => {
+            if (typeof item !== 'string') {
+              return { ...item, type: item.value, deprecated: false };
+            }
+            const label = get(intl.dictionary, `${labelPrefix}.${item}`, { default: item });
+            const description = get(intl.dictionary, `${descriptionPrefix}.${item}`, { default: '' });
+            return {
+              type: item,
+              value: item,
+              label,
+              description,
+              deprecated: Boolean(deprecated && deprecated.includes(item))
+            };
           })
           .filter(
             item =>
               normalizedQuery === '' ||
               normalizeSearchText(item.label).includes(normalizedQuery) ||
+              normalizeSearchText(item.subtitle || '').includes(normalizedQuery) ||
               normalizeSearchText(item.description).includes(normalizedQuery)
           );
         return { ...category, items };
@@ -82,15 +95,23 @@ class TypePicker extends Component {
                     type="button"
                     class={style.typePickerOption}
                     data-cy="type-picker-option"
-                    data-value={item.type}
+                    data-value={item.value}
                     onClick={this.selectType}
-                    key={item.type}
+                    key={item.value}
                   >
                     <span class={cx(style.typePickerIcon, style[COLOR_CLASS[category.color]])}>
-                      <i class={icons[item.type]} />
+                      <i class={item.icon || icons[item.type]} />
                     </span>
                     <span class={style.typePickerOptionText}>
-                      <span class={style.typePickerOptionLabel}>{item.label}</span>
+                      <span class={style.typePickerOptionLabel}>
+                        {item.label}
+                        {item.deprecated && (
+                          <span class={cx('badge', 'badge-danger', style.typePickerOptionBadge)}>
+                            <Text id="editScene.deprecatedActionBadge" />
+                          </span>
+                        )}
+                      </span>
+                      {item.subtitle && <span class={style.typePickerOptionSubtitle}>{item.subtitle}</span>}
                       {item.description && <span class={style.typePickerOptionDescription}>{item.description}</span>}
                     </span>
                   </button>

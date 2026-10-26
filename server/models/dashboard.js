@@ -2,12 +2,19 @@ const Joi = require('joi');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const { normalizeDashboardBoxes, MAX_COLUMN_WIDTH } = require('../utils/dashboardSections');
 const {
+  DASHBOARD_BOX_TYPE,
   DASHBOARD_BOX_TYPE_LIST,
   DASHBOARD_TYPE_LIST,
   DASHBOARD_VISIBILITY_LIST,
   DASHBOARD_WIDTH_LIST,
   DASHBOARD_BACKGROUND_SCENE_LIST,
 } = require('../utils/constants');
+const {
+  WIDGET_KEY_REGEX,
+  MAX_WIDGET_SETTINGS,
+  MAX_WIDGET_SETTING_STRING_LENGTH,
+  MAX_WIDGET_SETTINGS_BYTES,
+} = require('../lib/external-integration/constants');
 
 const MAX_COLUMNS_PER_SECTION = 6;
 
@@ -40,6 +47,7 @@ const boxSchema = Joi.object().keys({
   clock_display_second: Joi.boolean(),
   camera_latency: Joi.string(),
   camera_live_auto_start: Joi.boolean(),
+  camera_ptz_controls: Joi.boolean(),
   scenes: Joi.array().items(Joi.string()),
   // scene box: optional live status subtitle per scene button (scene selector -> device feature selector)
   scene_status_features: Joi.object().pattern(Joi.string(), Joi.string()),
@@ -57,6 +65,8 @@ const boxSchema = Joi.object().keys({
   gauge_color_high: Joi.string(),
   colors: Joi.array().items(Joi.string()),
   show_subscription_prices: Joi.boolean(),
+  // energy-price box: the selector of the contract whose current price is shown
+  energy_contract: Joi.string(),
   period_start_day: Joi.number()
     .integer()
     .min(1)
@@ -131,12 +141,43 @@ const boxSchema = Joi.object().keys({
       }),
     )
     .max(20),
+  // external-widget box: a widget declared by an installed external
+  // integration. `settings` is bounded in size but NOT validated against the
+  // manifest here — the box schema is static and manifest-independent, the
+  // render-time validation of the content route is the one that must exist.
+  integration: Joi.string().when('type', { is: DASHBOARD_BOX_TYPE.EXTERNAL_WIDGET, then: Joi.required() }),
+  widget: Joi.string()
+    .pattern(WIDGET_KEY_REGEX)
+    .when('type', { is: DASHBOARD_BOX_TYPE.EXTERNAL_WIDGET, then: Joi.required() }),
+  settings: Joi.object()
+    .pattern(
+      Joi.string(),
+      Joi.alternatives().try(
+        Joi.string()
+          .max(MAX_WIDGET_SETTING_STRING_LENGTH)
+          .allow(''),
+        Joi.number(),
+        Joi.boolean(),
+        Joi.array().items(Joi.string().max(MAX_WIDGET_SETTING_STRING_LENGTH)),
+      ),
+    )
+    .max(MAX_WIDGET_SETTINGS)
+    .custom((value, helpers) => {
+      if (Buffer.byteLength(JSON.stringify(value), 'utf8') > MAX_WIDGET_SETTINGS_BYTES) {
+        return helpers.message(`"settings" must be at most ${MAX_WIDGET_SETTINGS_BYTES} bytes serialized`);
+      }
+      return value;
+    }),
   photo_fit: Joi.string().valid('cover', 'contain'),
   photo_slideshow_interval: Joi.number()
     .integer()
     .min(0)
     .max(3600),
   photo_show_caption: Joi.boolean(),
+  // thermostat box: the widget only chooses which thermostat to display.
+  // Every regulation setting (presets, hysteresis, TPI, switch, active schedule)
+  // lives on the device, so a dashboard can never drive the heating of the house.
+  thermostat_feature: Joi.string().allow(null),
 });
 
 // A dashboard is a stack of sections, each section holding its own columns

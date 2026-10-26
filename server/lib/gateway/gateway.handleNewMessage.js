@@ -23,10 +23,16 @@ async function handleNewMessage(data, rawMessage, cb) {
     );
 
     if ((!found || !found.accepted) && get(data, 'options.url') !== '/api/v1/user') {
+      // Tell the user why, so the Gladys Plus UI can explain it: a user accepted with other
+      // keys (or revoked because their keys changed) got new keys, typically after resetting
+      // their Gladys Plus password. Otherwise, they were never accepted or were revoked.
+      const knownUser = this.usersKeys.find((user) => user.id === rawMessage.sender_id);
+      const keysChanged = knownUser !== undefined && (knownUser.accepted === true || knownUser.keys_changed === true);
       cb({
         status: 403,
         error: 'USER_NOT_ACCEPTED_LOCALLY',
         message: 'User not allowed to control this Gladys instance',
+        reason: keysChanged ? 'KEYS_CHANGED' : 'NOT_ACCEPTED',
       });
       return;
     }

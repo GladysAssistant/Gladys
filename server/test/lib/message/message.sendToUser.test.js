@@ -6,6 +6,7 @@ const assertChai = require('chai').assert;
 const EventEmitter = require('events');
 const MessageHandler = require('../../../lib/message');
 const StateManager = require('../../../lib/state');
+const { MESSAGE_GLADYS_ONLY_SERVICE } = require('../../../utils/constants');
 
 // the outbound channels are enumerated from the stateManager: every service
 // exposing message.sendToUser is called, whatever its name
@@ -97,6 +98,27 @@ describe('message.sendToUser', () => {
     assert.notCalled(telegramSendToUser);
     assert.calledOnce(smsSendToUser);
     assert.calledWith(smsSendToUser, user);
+  });
+
+  it('should keep the message in the Gladys conversation only', async () => {
+    const event = new EventEmitter();
+    const stateManager = new StateManager();
+    const telegramSendToUser = fake.resolves(true);
+    const smsSendToUser = fake.resolves(true);
+    stateManager.setState('service', 'telegram', { message: { sendToUser: telegramSendToUser } });
+    stateManager.setState('service', 'ext-john-free-mobile', { message: { sendToUser: smsSendToUser } });
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
+    stateManager.setState('user', 'test-user', {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+    });
+    const message = await messageHandler.sendToUser('test-user', 'coucou', null, {
+      service: MESSAGE_GLADYS_ONLY_SERVICE,
+    });
+    // the message still exists in the conversation: only the forward is skipped
+    expect(message).to.have.property('id');
+    expect(message).to.have.property('text', 'coucou');
+    assert.notCalled(telegramSendToUser);
+    assert.notCalled(smsSendToUser);
   });
 
   it('should not broadcast when the requested service does not exist', async () => {

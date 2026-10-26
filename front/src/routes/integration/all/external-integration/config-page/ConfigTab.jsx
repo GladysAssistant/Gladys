@@ -2,13 +2,16 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 
-import ConfigSchemaForm from './ConfigSchemaForm';
+import ConfigSchemaForm from '../../../../../components/integration/ConfigSchemaForm';
 import DocsLink from '../components/DocsLink';
 import ActionsCard from './ActionsCard';
 import LinkAccountCard from './LinkAccountCard';
 import ContactProfileCard from './ContactProfileCard';
+import CalendarAccountCard from './CalendarAccountCard';
 import WebhooksCard from './WebhooksCard';
+import TtsVoiceCard from './TtsVoiceCard';
 import HardwareCard from './HardwareCard';
+import AiProviderCard from './AiProviderCard';
 import { getAssignedPortsByName, getLocalizedText, getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../../server/utils/constants';
@@ -31,6 +34,16 @@ const ConfigTab = props => {
   // notification channels expose the per-user "My account" block instead
   const isReceivingChannel = isCommunication && get(integration, 'manifest.messaging.receive') !== false;
   const contactSchema = get(integration, 'manifest.contact_schema') || [];
+  // calendar integrations: the per-user "My calendars" block, for
+  // every user — enable/disable, account values, sync/shared toggles
+  const isCalendar = get(integration, 'manifest.type') === 'calendar';
+  // AI providers: the selection as the AI provider of the instance is the
+  // step after install, the card below says where it stands
+  const isAiProvider = get(integration, 'manifest.type') === 'ai';
+  // tts integrations: whether this one is the voice of the instance, and
+  // where to change it — the setting lives on the Artificial Intelligence page
+  const isTts = get(integration, 'manifest.type') === 'tts';
+  const accountSchema = get(integration, 'manifest.account_schema') || [];
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
   // host ports assigned to the manifest-named declared ports, for the
   // {{port:<name>}} placeholders of the section texts
@@ -49,6 +62,10 @@ const ConfigTab = props => {
         <div class="alert alert-danger">
           <Text id="integration.externalIntegration.config.loadError" />
         </div>
+      )}
+
+      {isAdmin && isAiProvider && integration && integration.selector && (
+        <AiProviderCard integration={integration} httpClient={props.httpClient} />
       )}
 
       {isAdmin && (
@@ -190,10 +207,33 @@ const ConfigTab = props => {
           touchedSecrets={props.contactProfileTouchedSecrets}
           profileStatus={props.contactProfileStatus}
           updateValue={props.updateContactProfileValue}
+          dynamicOptions={props.dynamicOptions}
           onSave={props.saveContactProfile}
           onClear={props.clearContactProfile}
         />
       )}
+
+      {isCalendar && integration && (
+        <CalendarAccountCard
+          accountSchema={accountSchema}
+          language={language}
+          account={props.calendarAccount}
+          values={props.calendarAccountValues}
+          touchedSecrets={props.calendarAccountTouchedSecrets}
+          accountStatus={props.calendarAccountStatus}
+          disableConfirming={props.calendarDisableConfirming}
+          calendarToggleStatus={props.calendarToggleStatus}
+          updateValue={props.updateCalendarAccountValue}
+          dynamicOptions={props.dynamicOptions}
+          onSave={props.saveCalendarAccount}
+          onDisable={props.armDisableCalendarAccount}
+          onDisableConfirm={props.disableCalendarAccount}
+          onDisableCancel={props.cancelDisableCalendarAccount}
+          onToggleCalendar={props.toggleUserCalendar}
+        />
+      )}
+
+      {isTts && integration && <TtsVoiceCard serviceName={integration.name} httpClient={props.httpClient} />}
 
       {isAdmin && integration && manifestWebhooks.length > 0 && (
         <WebhooksCard
@@ -209,7 +249,8 @@ const ConfigTab = props => {
         />
       )}
 
-      {isAdmin && integration && actions.length > 0 && (
+      {/* hidden while another integration loads: its forms would post to the new selector */}
+      {isAdmin && integration && loadStatus === RequestStatus.Success && actions.length > 0 && (
         <ActionsCard
           actions={actions}
           language={language}

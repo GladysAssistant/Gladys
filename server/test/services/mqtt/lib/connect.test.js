@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const { assert, fake } = sinon;
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-const { MockedMqttClient } = require('../mocks.test');
+const { MockedMqttClient, mqttApi } = require('../mocks.test');
 
 const MqttHandler = require('../../../../services/mqtt/lib');
 
@@ -146,5 +146,43 @@ describe('mqttHandler.connect', () => {
       Buffer.from('19.8'),
     );
     assert.calledOnce(mqttHandler.handleNewMessage);
+  });
+
+  it('should subscribe to the custom topics of the devices loaded before the connection', async () => {
+    const gladys = {
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+
+    // Devices are loaded in RAM before the services are started, so the custom
+    // topics are registered while there is no MQTT client yet
+    await mqttHandler.listenToCustomMqttTopicIfNeeded({
+      selector: 'my-device',
+      features: [{ id: 'b42d3688-4403-479a-9376-9f5227ab543a' }, { id: '8bd23b1b-b8f5-4b31-9c0e-2b23b1a06c26' }],
+      params: [
+        {
+          name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
+          value: 'custom_mqtt_topic/temperature',
+        },
+        {
+          name: 'mqtt_custom_topic_feature:8bd23b1b-b8f5-4b31-9c0e-2b23b1a06c26',
+          value: 'custom_mqtt_topic/temperature',
+        },
+      ],
+    });
+    assert.notCalled(mqttApi.subscribe);
+
+    await mqttHandler.connect({ mqttUrl: 'url' });
+    mqttHandler.mqttClient.emit('connect');
+
+    assert.calledWith(mqttApi.subscribe, 'custom_mqtt_topic/temperature');
+    // The two features share the same topic: only one subscription is sent
+    const subscriptionsToCustomTopic = mqttApi.subscribe
+      .getCalls()
+      .filter((call) => call.args[0] === 'custom_mqtt_topic/temperature');
+    expect(subscriptionsToCustomTopic).to.have.lengthOf(1);
   });
 });

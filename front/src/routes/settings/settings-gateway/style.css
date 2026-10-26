@@ -3,6 +3,12 @@
   overflow-x: scroll;
 }
 
+/* fingerprints are compared with the ones the user sees on Gladys Plus: they must be fully visible */
+.userKeyFingerprint {
+  white-space: normal;
+  word-break: break-all;
+}
+
 .pricingPage h1 {
   font-size: 2.2rem;
   font-weight: 700;
@@ -41,6 +47,11 @@
   background: #eef3fa;
   color: #467fcf;
   font-size: 1.4rem;
+}
+
+/* In the row layout, a long description must not squeeze the icon */
+.newFeatureCard .featureIcon {
+  flex-shrink: 0;
 }
 
 .planCard {

@@ -1,0 +1,27 @@
+/* The control keeps its natural width in the flex rows of the page headers
+   (.page-options) — it is a pill sized by its longest option, not a field
+   that should stretch or be squeezed. */
+.sortSelect {
+  flex-shrink: 0;
+}
+
+.sortIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* The sort mode is a label, not typed-in content: it takes the ink and the
+   weight of the neighbouring page-option pills (the tag filter, the buttons)
+   rather than the page ink of a filled-in field.
+
+   The stacked selector and the !important go together: the two themes that
+   turn these headers into frosted pills (routes/scene/style.css and
+   components/layout/horizonIntegrations.css) paint .form-control with
+   four-class selectors, in dark mode with !important. The look of this
+   shared control belongs here, in one place, rather than being re-stated
+   in every header that uses it. (The dropdown caret is not here: every
+   .custom-select of the app gets it back in style/index.css.) */
+select.select:global(.form-control):global(.custom-select) {
+  font-weight: 600 !important;
+  color: var(--gl-muted, #7c8396) !important;
+}

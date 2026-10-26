@@ -619,6 +619,47 @@ describe('GET /api/v1/device/duckdb_migration_state', () => {
   });
 });
 
+describe('GET /api/v1/device/:device_selector/states_size', () => {
+  it('should get the size of the history of each feature of a device', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device/test-camera/states_size')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('device_selector', 'test-camera');
+        expect(res.body.features[0]).to.have.property('device_feature_selector', 'test-camera-image');
+        expect(res.body.features[0])
+          .to.have.property('states')
+          .that.is.a('number');
+        expect(res.body.features[0])
+          .to.have.property('estimated_size_in_bytes')
+          .that.is.a('number');
+      });
+  });
+  it('should return 404 on an unknown device', async () => {
+    await authenticatedRequest.get('/api/v1/device/unknown-device/states_size').expect(404);
+  });
+});
+
+describe('GET /api/v1/device/states_stats', () => {
+  it('should get the states saved per device over the last 24 hours', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device/states_stats')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('period_in_hours', 24);
+        expect(res.body).to.have.property('verbose_device_feature_min_states', 8640);
+        expect(res.body)
+          .to.have.property('total_states')
+          .that.is.a('number');
+        expect(res.body)
+          .to.have.property('devices')
+          .that.is.an('array');
+      });
+  });
+});
+
 describe('POST /api/v1/device/purge_all_sqlite_state', () => {
   it('should delete all sqlite states', async () => {
     await authenticatedRequest
@@ -665,34 +706,49 @@ describe('GET /api/v1/service/:service_name/device', () => {
 });
 
 describe('PATCH /api/v1/device_feature/:device_feature_selector', () => {
-  it('should update device feature energy_parent_id', async () => {
-    const childSelector = 'test-device-feature';
-    const parentSelector = 'test-device-feature-2';
-
-    // Get the actual parent ID from the database
-    const parent = await db.DeviceFeature.findOne({ where: { selector: parentSelector } });
-
-    await authenticatedRequest
-      .patch(`/api/v1/device_feature/${childSelector}`)
-      .send({ energy_parent_id: parent.id })
-      .expect('Content-Type', /json/)
-      .expect(200)
-      .then((res) => {
-        expect(res.body).to.have.property('selector', childSelector);
-        expect(res.body).to.have.property('energy_parent_id', parent.id);
+  let meterIndex;
+  let plugIndex;
+  beforeEach(async () => {
+    const gladys = global.TEST_GLADYS_INSTANCE;
+    const saveDevice = (name) =>
+      gladys.device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name,
+        external_id: name,
+        selector: name,
+        features: [
+          {
+            external_id: `${name}-index`,
+            selector: `${name}-index`,
+            name: 'Index',
+            read_only: true,
+            has_feedback: false,
+            min: 0,
+            max: 100000,
+            category: 'energy-sensor',
+            type: 'index',
+          },
+        ],
       });
+    [meterIndex] = (await saveDevice('api-meter')).features;
+    [plugIndex] = (await saveDevice('api-plug')).features;
   });
 
-  it('should clear device feature energy_parent_id when set to null', async () => {
-    const childSelector = 'test-device-feature';
-
+  it('should attach a device to another one, then detach it', async () => {
     await authenticatedRequest
-      .patch(`/api/v1/device_feature/${childSelector}`)
-      .send({ energy_parent_id: null })
+      .patch(`/api/v1/device_feature/${plugIndex.selector}`)
+      .send({ energy_parent_id: meterIndex.id })
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.property('selector', childSelector);
+        expect(res.body).to.have.property('selector', plugIndex.selector);
+        expect(res.body).to.have.property('energy_parent_id', meterIndex.id);
+      });
+    await authenticatedRequest
+      .patch(`/api/v1/device_feature/${plugIndex.selector}`)
+      .send({ energy_parent_id: null })
+      .expect(200)
+      .then((res) => {
         expect(res.body).to.have.property('energy_parent_id', null);
       });
   });
@@ -706,23 +762,21 @@ describe('PATCH /api/v1/device_feature/:device_feature_selector', () => {
   });
 
   it('should return 400 when trying to create circular dependency', async () => {
-    const aSelector = 'test-device-feature';
-    const bSelector = 'test-device-feature-2';
-
-    // Get the actual IDs from the database
-    const a = await db.DeviceFeature.findOne({ where: { selector: aSelector } });
-    const b = await db.DeviceFeature.findOne({ where: { selector: bSelector } });
-
-    // First set B's parent to A
     await authenticatedRequest
-      .patch(`/api/v1/device_feature/${bSelector}`)
-      .send({ energy_parent_id: a.id })
+      .patch(`/api/v1/device_feature/${plugIndex.selector}`)
+      .send({ energy_parent_id: meterIndex.id })
       .expect(200);
-
-    // Now try to set A's parent to B (should fail with circular dependency)
     await authenticatedRequest
-      .patch(`/api/v1/device_feature/${aSelector}`)
-      .send({ energy_parent_id: b.id })
+      .patch(`/api/v1/device_feature/${meterIndex.selector}`)
+      .send({ energy_parent_id: plugIndex.id })
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+
+  it('should return 400 on a feature that does not attach a device to a meter', async () => {
+    await authenticatedRequest
+      .patch('/api/v1/device_feature/test-device-feature')
+      .send({ energy_parent_id: null })
       .expect('Content-Type', /json/)
       .expect(400);
   });

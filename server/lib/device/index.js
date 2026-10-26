@@ -3,6 +3,7 @@ const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 // Categories of DeviceFeatures
 const CameraManager = require('./camera');
+const MusicManager = require('./music');
 const LightManager = require('./light');
 const TemperatureSensorManager = require('./temperature-sensor');
 const HumiditySensorManager = require('./humidity-sensor');
@@ -40,10 +41,13 @@ const { notify } = require('./device.notify');
 const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
+const { getDeviceStatesSize } = require('./device.getDeviceStatesSize');
+const { getStatesStats } = require('./device.getStatesStats');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
 const { purgeOrphanedDuckDbStates } = require('./device.purgeOrphanedDuckDbStates');
 const { updateFeature } = require('./device.updateFeature');
 const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistoricalStates');
+const { replaceHistoricalStatesFrom } = require('./device.replaceHistoricalStatesFrom');
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
 const { destroyParam } = require('./device.destroyParam');
 const { destroyStatesFrom } = require('./device.destroyStatesFrom');
@@ -108,9 +112,25 @@ const DeviceManager = function DeviceManager(
   this.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 1;
   this.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 100;
   this.DUCKDB_STATES_MIGRATE_MAX_PAUSE_IN_MS = 5000;
+  // The size of the history of each feature, shown on the device pages, needs a full
+  // scan of the history: its result is kept this long, and corrected on a purge.
+  this.FEATURES_STATES_SIZE_CACHE_DURATION_IN_MS = 60 * 60 * 1000;
+  this.featuresStatesSizeCache = null;
+  this.featuresStatesSizeInFlight = null;
+  this.featuresStatesSizeGeneration = 0;
+  // The devices list flags the verbose devices from the states saved in their history
+  // over this period. A feature is verbose when it saved at least this many states in
+  // the period: one every 10 seconds on average over 24 hours. One per minute is the
+  // normal pace of an energy meter (e.g. a Linky TIC module) and weighs little.
+  this.STATES_STATS_PERIOD_IN_HOURS = 24;
+  this.VERBOSE_DEVICE_FEATURE_MIN_STATES = 24 * 60 * 6;
+  this.STATES_STATS_CACHE_DURATION_IN_MS = 5 * 60 * 1000;
+  this.statesStatsCache = null;
+  this.statesStatsInFlight = null;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
+  this.music = new MusicManager(this.stateManager, serviceManager);
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);
@@ -199,10 +219,13 @@ DeviceManager.prototype.notify = notify;
 DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
+DeviceManager.prototype.getDeviceStatesSize = getDeviceStatesSize;
+DeviceManager.prototype.getStatesStats = getStatesStats;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
 DeviceManager.prototype.purgeOrphanedDuckDbStates = purgeOrphanedDuckDbStates;
 DeviceManager.prototype.updateFeature = updateFeature;
 DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalStates;
+DeviceManager.prototype.replaceHistoricalStatesFrom = replaceHistoricalStatesFrom;
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
 DeviceManager.prototype.destroyParam = destroyParam;
 DeviceManager.prototype.destroyStatesFrom = destroyStatesFrom;

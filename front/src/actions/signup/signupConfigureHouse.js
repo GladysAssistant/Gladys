@@ -3,6 +3,7 @@ import { route } from 'preact-router';
 import update from 'immutability-helper';
 import leaflet from 'leaflet';
 import JSConfetti from 'js-confetti';
+import { addMapTileLayer } from '../../utils/mapTileLayer';
 
 const jsConfetti = new JSConfetti();
 
@@ -31,24 +32,7 @@ function createActions(store) {
       const leafletMap = leaflet.map('select-house-location-map').setView([48.8583, 2.2945], 2);
 
       // Use the global dark mode state
-      const isDarkMode = store.getState().darkMode;
-
-      // Use dark tiles if dark mode is active, otherwise use light tiles
-      // Force new tile layer by adding timestamp to URL to prevent caching
-      const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
-      const timestamp = new Date().getTime();
-
-      const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
-
-      leaflet
-        .tileLayer(tileUrl, {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-          noCache: true
-        })
-        .addTo(leafletMap);
+      addMapTileLayer(leafletMap, store.getState().darkMode);
       leafletMap.on('click', e => {
         if (store.getState().signupNewHouseMarker) {
           store.getState().signupNewHouseMarker.setLatLng(e.latlng);

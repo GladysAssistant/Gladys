@@ -1,5 +1,7 @@
 import { Fragment } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Localizer } from 'preact-i18n';
+
+import SortSelect from './SortSelect';
 
 const SearchInput = ({ searchPlaceHolder, search, searchValue }) => {
   const input = (
@@ -15,19 +17,15 @@ const SearchInput = ({ searchPlaceHolder, search, searchValue }) => {
 
 const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, searchPlaceHolder, extraOrderDirs }) => (
   <Fragment>
-    <select onChange={changeOrderDir} class="form-control custom-select w-auto">
-      <option value="asc" selected={orderValue === 'asc'}>
-        <Text id="global.orderDirAsc" />
-      </option>
-      <option value="desc" selected={orderValue === 'desc'}>
-        <Text id="global.orderDirDesc" />
-      </option>
-      {(extraOrderDirs || []).map(({ value, labelId }) => (
-        <option key={value} value={value} selected={orderValue === value}>
-          <Text id={labelId} />
-        </option>
-      ))}
-    </select>
+    <SortSelect
+      value={orderValue}
+      onChange={changeOrderDir}
+      options={[
+        { value: 'asc', labelId: 'global.orderDirAsc' },
+        { value: 'desc', labelId: 'global.orderDirDesc' },
+        ...(extraOrderDirs || [])
+      ]}
+    />
 
     <div class="input-icon ml-2">
       <span class="input-icon-addon">

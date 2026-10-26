@@ -76,7 +76,8 @@ const SettingsSystemOperations = ({
                       fields={{
                         image: upgradeError.image,
                         recommendedImage: upgradeError.recommended_image,
-                        statusCode: upgradeError.status_code
+                        statusCode: upgradeError.status_code,
+                        message: upgradeError.message
                       }}
                     />
                   </div>

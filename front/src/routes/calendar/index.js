@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -13,6 +14,19 @@ import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
 
 const localizer = dayjsLocalizer(dayjs);
+
+/**
+ * The day/week views size their grid from `getTotalMin()`, which returns the
+ * elapsed minutes between both ends of the day. On a DST day that is 1500 or
+ * 1380 minutes instead of 1440, so the grid gets 25 rows in autumn and 23 in
+ * spring. Event placement doesn't follow: it goes through `getDstOffset()`,
+ * which already folds the shift away and keeps working on a 1440 minute scale
+ * — a 2pm event landed at 1:26pm on the October change, 2:36pm on the March
+ * one. Applying the same offset here puts the grid back on clock hours, so
+ * both agree again.
+ */
+const getTotalMin = localizer.getTotalMin;
+localizer.getTotalMin = (start, end) => getTotalMin(start, end) + localizer.getDstOffset(start, end);
 
 class CalendarPage extends Component {
   onRangeChange = range => {
@@ -26,7 +40,15 @@ class CalendarPage extends Component {
       from = dayjs(range.start).toDate();
       to = dayjs(range.end).toDate();
     }
+    // remembered so a calendar.updated push can refetch the displayed range
+    this.currentRange = { from, to };
     this.props.getEventsInRange(from, to);
+  };
+
+  onCalendarUpdated = () => {
+    if (this.currentRange) {
+      this.props.getEventsInRange(this.currentRange.from, this.currentRange.to);
+    }
   };
 
   eventPropGetter = event =>
@@ -79,7 +101,20 @@ class CalendarPage extends Component {
           .toDate();
         break;
     }
+    this.currentRange = { from, to };
     this.props.getEventsInRange(from, to);
+  }
+
+  componentDidMount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.onCalendarUpdated);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.onCalendarUpdated);
+    }
   }
 
   render(props, {}) {
@@ -128,4 +163,4 @@ class CalendarPage extends Component {
   }
 }
 
-export default connect('eventsFormated,calendars,user', actions, dayjs)(withIntlAsProp(CalendarPage));
+export default connect('eventsFormated,calendars,user,session', actions, dayjs)(withIntlAsProp(CalendarPage));

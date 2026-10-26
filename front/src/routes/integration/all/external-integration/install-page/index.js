@@ -6,12 +6,20 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
+import {
+  getLocalizedText,
+  getGithubRepoUrl,
+  getRequestedHardwareClasses,
+  TYPES_WITHOUT_DEVICE_SCREENS
+} from '../utils';
 import BackToIntegrationsLink from '../../../../../components/integration/BackToIntegrationsLink';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
+import WidgetsSummary from '../components/WidgetsSummary';
+import EnergyContractsSummary from '../components/EnergyContractsSummary';
+import SceneDeclarationsSummary from '../components/SceneDeclarationsSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
@@ -19,28 +27,30 @@ import integrationText from '../integrationText.css';
 import NetworkWakeSummary from '../components/NetworkWakeSummary';
 
 class ExternalIntegrationInstallPage extends Component {
+  // only this integration, with its complete manifest: the catalog carries a
+  // lite manifest for each of the hundreds of store integrations, downloading
+  // all of them to display one would make this page as slow as the store is big
   getStoreIntegration = async () => {
-    this.setState({ loadStatus: RequestStatus.Getting });
+    this.setState({ loadStatus: RequestStatus.Getting, storeIntegration: null });
     try {
       const storeSlug = `${this.props.owner}/${this.props.repo}`;
-      const [{ integrations = [] }, installedIntegrations] = await Promise.all([
-        this.props.httpClient.get('/api/v1/external_integration/store'),
+      const [storeIntegration, installedIntegrations] = await Promise.all([
+        this.props.httpClient.get('/api/v1/external_integration/store/integration', { store_slug: storeSlug }),
         this.props.httpClient.get('/api/v1/external_integration')
       ]);
-      const storeIntegration = integrations.find(integration => integration.store_slug === storeSlug);
       this.setState({
         storeIntegration,
-        duplicateOfInstalled: storeIntegration
-          ? this.findDuplicateOfInstalled(storeIntegration, installedIntegrations)
-          : null,
-        loadStatus: storeIntegration ? RequestStatus.Success : RequestStatus.Error
+        duplicateOfInstalled: this.findDuplicateOfInstalled(storeIntegration, installedIntegrations),
+        loadStatus: RequestStatus.Success
       });
-      if (storeIntegration) {
-        await this.loadHardware(storeIntegration);
-      }
+      await this.loadHardware(storeIntegration);
     } catch (e) {
       console.error(e);
-      this.setState({ loadStatus: RequestStatus.Error });
+      // absent from the store, or a store Gladys could not reach: the first
+      // is final, the second is worth a retry, and the message says which
+      this.setState({
+        loadStatus: get(e, 'response.status') === 404 ? RequestStatus.Error : RequestStatus.NetworkError
+      });
     }
   };
 
@@ -104,12 +114,12 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // communication and weather integrations have no device screens, and
-      // an integration with settings needs them filled before any device
-      // can be discovered: all land on the configuration screen after
-      // install
+      // integrations without device screens (communication, weather,
+      // calendar, provider), and an integration with settings needs them
+      // filled before any device can be discovered: all land on the
+      // configuration screen after install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+      if (TYPES_WITHOUT_DEVICE_SCREENS.includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -160,6 +170,16 @@ class ExternalIntegrationInstallPage extends Component {
                       {loadStatus === RequestStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.externalIntegration.install.notFound" />
+                        </div>
+                      )}
+                      {loadStatus === RequestStatus.NetworkError && (
+                        <div class="alert alert-danger d-flex align-items-center">
+                          <div class="flex-fill">
+                            <Text id="integration.externalIntegration.install.loadError" />
+                          </div>
+                          <button type="button" class="btn btn-sm btn-danger ml-3" onClick={this.getStoreIntegration}>
+                            <Text id="integration.root.storeUnavailableRetry" />
+                          </button>
                         </div>
                       )}
                       {storeIntegration && (
@@ -240,6 +260,37 @@ class ExternalIntegrationInstallPage extends Component {
                                 <Text id="integration.externalIntegration.install.weatherInfoText" />
                               </div>
                             )}
+                            {manifest.type === 'calendar' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-calendar mr-1" />
+                                <Text id="integration.externalIntegration.install.calendarInfoText" />
+                              </div>
+                            )}
+                            {manifest.type === 'tts' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-volume-2 mr-1" />
+                                <Text id="integration.externalIntegration.install.ttsInfoText" />{' '}
+                                <Link href="/dashboard/integration/communication/openai">
+                                  <Text id="integration.externalIntegration.install.ttsInfoLink" />
+                                </Link>
+                              </div>
+                            )}
+                            {manifest.type === 'provider' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-grid mr-1" />
+                                {manifest.energy_contracts && !(manifest.widgets && manifest.widgets.length > 0) ? (
+                                  <Text id="integration.externalIntegration.install.providerEnergyInfoText" />
+                                ) : (
+                                  <Text id="integration.externalIntegration.install.providerInfoText" />
+                                )}
+                              </div>
+                            )}
+                            {manifest.type === 'ai' && (
+                              <div class="alert alert-warning">
+                                <i class="fe fe-cpu mr-1" />
+                                <Text id="integration.externalIntegration.install.aiWarningText" />
+                              </div>
+                            )}
 
                             {containers.length > 0 && (
                               <SubContainersSummary containers={containers} language={language} />
@@ -274,6 +325,14 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
+
+                            <WidgetsSummary widgets={manifest.widgets} language={language} />
+                            <EnergyContractsSummary energyContracts={manifest.energy_contracts} language={language} />
+                            <SceneDeclarationsSummary
+                              sceneTriggers={manifest.scene_triggers}
+                              sceneActions={manifest.scene_actions}
+                              language={language}
+                            />
 
                             {duplicateOfInstalled && (
                               <div class="alert alert-warning">

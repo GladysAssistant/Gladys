@@ -2,13 +2,21 @@ import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import FormulaFunctionsHelp from '../../../../components/scene/FormulaFunctionsHelp';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 import style from './PlayNotification.css';
+// The Simple/Computed selector is the one already used by the other actions.
+import valueTypeStyle from './DeviceSetValue.css';
+
+// The volume the slider falls back to when leaving the computed mode without a usable
+// number: the midpoint of the slider.
+const DEFAULT_VOLUME = 50;
 
 class PlayNotification extends Component {
   getOptions = async () => {
@@ -29,13 +37,52 @@ class PlayNotification extends Component {
       console.error(e);
     }
   };
+  // Switching the volume type clears the value of the other type, so the action never keeps both
+  // a "volume" and an "evaluate_volume": the server evaluates the formula as soon as it is there,
+  // and the fixed volume would be silently ignored.
+  selectVolumeType = computedVolume => {
+    if (computedVolume === this.state.computedVolume) {
+      return;
+    }
+    this.setState({ computedVolume });
+    if (computedVolume) {
+      // The formula starts from the volume currently selected, so switching to computed does not
+      // lose the value shown by the slider.
+      const { volume } = this.props.action;
+      const evaluateVolume = volume !== undefined && volume !== null && volume !== '' ? `${volume}` : undefined;
+      this.props.updateActionProperty(this.props.path, 'evaluate_volume', evaluateVolume);
+      this.props.updateActionProperty(this.props.path, 'volume', undefined);
+    } else {
+      // Coming back to the fixed volume restores a number: the formula is dropped, and leaving
+      // "volume" undefined would save an action with no volume at all. A formula that is already
+      // a plain number is kept, others fall back to the midpoint of the slider.
+      const formula = `${this.props.action.evaluate_volume || ''}`.trim();
+      const parsedVolume = Number(formula);
+      const volume =
+        formula.length > 0 && Number.isFinite(parsedVolume)
+          ? Math.min(100, Math.max(0, Math.round(parsedVolume)))
+          : DEFAULT_VOLUME;
+      this.props.updateActionProperty(this.props.path, 'volume', volume);
+      this.props.updateActionProperty(this.props.path, 'evaluate_volume', undefined);
+    }
+  };
+
+  selectSimpleType = () => this.selectVolumeType(false);
+
+  selectComputedType = () => this.selectVolumeType(true);
+
   // A range input only fires `change` when the pointer is released: the fill and the
   // value pill follow the drag through a local draft, the action is updated on release
   updateVolumeDraft = e => {
     this.setState({ volumeDraft: e.target.value });
   };
   updateVolume = e => {
-    this.props.updateActionProperty(this.props.path, 'volume', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'volume', parseInt(e.target.value, 10));
+    this.props.updateActionProperty(this.props.path, 'evaluate_volume', undefined);
+  };
+  updateEvaluateVolume = text => {
+    this.props.updateActionProperty(this.props.path, 'volume', undefined);
+    this.props.updateActionProperty(this.props.path, 'evaluate_volume', text.length > 0 ? text : undefined);
   };
   updateText = text => {
     this.props.updateActionProperty(this.props.path, 'text', text);
@@ -45,6 +92,20 @@ class PlayNotification extends Component {
       this.props.updateActionProperty(this.props.path, 'device', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'device', null);
+    }
+  };
+
+  // null while the request is in flight: the Gladys Plus upsell must not
+  // flash before the active provider is known (the unknown-state pattern of
+  // the Artificial Intelligence page). On failure the instance is assumed
+  // to speak through Gladys Plus, the default.
+  getTtsProvider = async () => {
+    try {
+      const { active } = await this.props.httpClient.get('/api/v1/tts/provider');
+      this.setState({ ttsProvider: active });
+    } catch (e) {
+      console.error(e);
+      this.setState({ ttsProvider: 'gladys-plus' });
     }
   };
 
@@ -63,11 +124,14 @@ class PlayNotification extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedDeviceFeatureOption: ''
+      selectedDeviceFeatureOption: '',
+      computedVolume: props.action.evaluate_volume !== undefined,
+      ttsProvider: null
     };
   }
   componentDidMount() {
     this.getOptions();
+    this.getTtsProvider();
   }
   componentWillReceiveProps(nextProps) {
     // The committed volume is authoritative again as soon as it moves, whether the
@@ -77,18 +141,74 @@ class PlayNotification extends Component {
     }
     this.refreshSelectedOptions(nextProps);
   }
-  render(props, { selectedDeviceFeatureOption, devicesOptions, volumeDraft }) {
+  getVolumeInput = (volume, volumeIsSet) => {
+    if (this.state.computedVolume) {
+      return (
+        <div>
+          <div className={valueTypeStyle.explanationText}>
+            <Text id="editScene.actionsCard.playNotification.computedExplanationText" />
+          </div>
+          <FormulaFunctionsHelp />
+          <div class="input-group">
+            <TextWithVariablesInjected
+              text={this.props.action.evaluate_volume || ''}
+              path={this.props.path}
+              triggersVariables={this.props.triggersVariables}
+              actionsGroupsBefore={this.props.actionsGroupsBefore}
+              variables={this.props.variables}
+              updateText={this.updateEvaluateVolume}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      /* No accent fill until a volume is actually committed: the action still saves
+         `volume: undefined` until the slider is touched, and each speaker then applies
+         its own default, so a half-filled track would read as a 50% that is never sent. */
+      <input
+        type="range"
+        value={volume}
+        onInput={this.updateVolumeDraft}
+        onChange={this.updateVolume}
+        class={style.volumeRange}
+        style={{ '--volume-fill': `${volumeIsSet ? volume : 0}%` }}
+        step="1"
+        min={0}
+        max={100}
+      />
+    );
+  };
+
+  render(props, { selectedDeviceFeatureOption, devicesOptions, volumeDraft, computedVolume, ttsProvider }) {
     const volume = volumeDraft !== undefined ? volumeDraft : props.action.volume;
     const volumeIsSet = volume !== undefined && volume !== null && volume !== '';
     return (
       <div>
-        <GladysPlusUpsell
-          compact
-          icon="fe-volume-2"
-          utmCampaign="scene_action_tts"
-          titleKey="gladysPlusUpsell.tts.title"
-          descriptionKey="gladysPlusUpsell.tts.compactDescription"
-        />
+        {/* the Gladys Plus upsell only makes sense when the instance speaks
+            through Gladys Plus: with a TTS provider integration active, the
+            action works without any Plus subscription. Its wording names
+            the alternative (a text-to-speech integration) rather than
+            claiming the action requires Gladys Plus, and the voice setting
+            is one click away. */}
+        {ttsProvider === 'gladys-plus' && (
+          <div>
+            <GladysPlusUpsell
+              compact
+              icon="fe-volume-2"
+              utmCampaign="scene_action_tts"
+              titleKey="gladysPlusUpsell.tts.providerTitle"
+              descriptionKey="gladysPlusUpsell.tts.providerCompactDescription"
+            />
+            <p class="small text-muted">
+              <i class="fe fe-mic mr-1" />
+              <Link href="/dashboard/integration/communication/openai">
+                <Text id="editScene.actionsCard.playNotification.voiceSettingLink" />
+              </Link>
+            </p>
+          </div>
+        )}
         <p>
           <Text id="editScene.actionsCard.playNotification.description" />
         </p>
@@ -119,22 +239,26 @@ class PlayNotification extends Component {
                 <Text id="global.requiredField" />
               </span>
             </span>
-            {volumeIsSet && <span class={style.volumeValue}>{`${volume}%`}</span>}
+            {/* The pill reads the slider: in computed mode the volume is only known at runtime. */}
+            {!computedVolume && volumeIsSet && <span class={style.volumeValue}>{`${volume}%`}</span>}
           </label>
-          {/* No accent fill until a volume is actually committed: the action still saves
-              `volume: undefined` until the slider is touched, and each speaker then applies
-              its own default, so a half-filled track would read as a 50% that is never sent. */}
-          <input
-            type="range"
-            value={volume}
-            onInput={this.updateVolumeDraft}
-            onChange={this.updateVolume}
-            class={style.volumeRange}
-            style={{ '--volume-fill': `${volumeIsSet ? volume : 0}%` }}
-            step="1"
-            min={0}
-            max={100}
-          />
+          <div className={cx('nav-tabs', valueTypeStyle.valueTypeTab)}>
+            <button
+              type="button"
+              class={cx('nav-link', valueTypeStyle.valueTypeLink, { active: !computedVolume })}
+              onClick={this.selectSimpleType}
+            >
+              <Text id="editScene.actionsCard.playNotification.valueTypeSimple" />
+            </button>
+            <button
+              type="button"
+              class={cx('nav-link', valueTypeStyle.valueTypeLink, { active: computedVolume })}
+              onClick={this.selectComputedType}
+            >
+              <Text id="editScene.actionsCard.playNotification.valueTypeComputed" />
+            </button>
+          </div>
+          {this.getVolumeInput(volume, volumeIsSet)}
         </div>
         <div class="form-group">
           <label class="form-label">

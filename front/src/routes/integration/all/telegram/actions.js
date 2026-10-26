@@ -11,10 +11,31 @@ const actions = store => ({
       telegramGetApiKeyStatus: RequestStatus.Getting
     });
     try {
-      const variable = await state.httpClient.get('/api/v1/service/telegram/variable/TELEGRAM_API_KEY');
-      store.setState({
-        telegramApiKey: variable.value
-      });
+      // The bot API key is a service-wide secret: the server answers 403 to a
+      // non-admin, and only an admin is shown the form to change it. Its own
+      // failure must not abort the load: every user comes to this page for
+      // their linking link, which is per-user.
+      // The role is deliberately not read from the store here. On a hard page
+      // load this action runs during the first render, before checkSession()
+      // has filled in the user, so an admin would be treated as a non-admin
+      // and never see the key.
+      try {
+        const variable = await state.httpClient.get('/api/v1/service/telegram/variable/TELEGRAM_API_KEY');
+        store.setState({
+          telegramApiKey: variable.value
+        });
+      } catch (e) {
+        // only the expected answers are swallowed: 403 for a non-admin, 404 when
+        // no key is set yet. Anything else (a 500, a network failure) is a real
+        // error and must not leave an admin in front of a silently empty field.
+        const status = e && e.response && e.response.status;
+        if (status !== 403 && status !== 404) {
+          throw e;
+        }
+        store.setState({
+          telegramApiKey: ''
+        });
+      }
       const { link } = await state.httpClient.get('/api/v1/service/telegram/link');
       store.setState({
         telegramCustomLink: link,

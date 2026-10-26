@@ -1,4 +1,4 @@
-const { isNanoCpusError } = require('../system/system.createContainer');
+const { isCpuCfsError } = require('../system/system.createContainer');
 
 /**
  * @description Start a declared sub-container: create it if it doesn't
@@ -26,11 +26,12 @@ async function startSubContainer(service, entry, { env } = {}) {
   try {
     await this.system.restartContainer(container.id);
   } catch (e) {
-    // Docker re-validates the stored HostConfig at every start: a container
-    // created with a CPU limit on a kernel that no longer supports CFS
-    // (Synology DSM update) can never start again — recreate it without
-    // the CPU limit
-    if (!isNanoCpusError(e)) {
+    // A container created with a CPU limit on a kernel that cannot apply it
+    // can never start: Docker re-validates the stored HostConfig at every
+    // start (Synology DSM update), and cgroup v2 kernels without CFS
+    // bandwidth control only fail here, in runc, on the missing cpu.max
+    // file (Khadas among others) — recreate it without the CPU limit
+    if (!isCpuCfsError(e)) {
       throw e;
     }
     // the daemon just told us CPU limits are rejected: remember it so the

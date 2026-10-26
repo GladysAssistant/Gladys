@@ -1,7 +1,11 @@
 import { createElement } from 'preact';
 import get from 'get-value';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  MUSIC_STRING_FEATURE_TYPES
+} from '../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
 import BatteryLevelFeature from './BatteryLevelFeature';
@@ -26,6 +30,8 @@ import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDevic
 import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
 import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
+import SmokeSensorContaminationDeviceValue from './SmokeSensorContaminationDeviceValue';
+import SmokeSensorMutedDeviceValue from './SmokeSensorMutedDeviceValue';
 
 // Checked before the category map: a category whose renderer only makes sense for one of its
 // types needs an escape hatch. presence-sensor is historically a "push" category rendered as a
@@ -33,7 +39,13 @@ import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
 const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
-  }
+  },
+  // The "now playing" metadata of a music player are string states (capabilities/music.md):
+  // displayed raw, the artwork one being an image key the music box resolves
+  [DEVICE_FEATURE_CATEGORIES.MUSIC]: MUSIC_STRING_FEATURE_TYPES.reduce(
+    (acc, type) => ({ ...acc, [type]: TextDeviceValue }),
+    {}
+  )
 };
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
@@ -58,6 +70,8 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE]: LevelSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: WaterValveDeviceValue,
+  [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CONTAMINATION_STATE]: SmokeSensorContaminationDeviceValue,
+  [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.MUTED]: SmokeSensorMutedDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS]: BinaryDeviceValue,
@@ -88,7 +102,9 @@ const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
   DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
   DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
   DEVICE_FEATURE_CATEGORIES.BUTTON,
-  DEVICE_FEATURE_CATEGORIES.TEXT
+  DEVICE_FEATURE_CATEGORIES.TEXT,
+  // a player that stays on one track for an hour has no stale value
+  DEVICE_FEATURE_CATEGORIES.MUSIC
 ];
 
 const SensorDeviceType = ({ children, ...props }) => {
@@ -118,7 +134,7 @@ const SensorDeviceType = ({ children, ...props }) => {
   return (
     <tr>
       <td>
-        <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`)}`} />
+        <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`)}`} />
       </td>
       <td>{props.rowName}</td>
       <td class="text-right">{createElement(elementType, props)}</td>

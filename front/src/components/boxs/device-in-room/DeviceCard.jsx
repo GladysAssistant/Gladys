@@ -54,7 +54,7 @@ const DeviceCard = ({ children, ...props }) => {
       )}
       <div>
         <div class="loader py-3" />
-        <div class="table-responsive">
+        <div class={`table-responsive ${style.deviceWidgetContainer}`}>
           {/* device-list-table: Horizon restyle hook — the glass theme turns
               these rows into soft pills (see routes/dashboard/style.css).
               device-widget-table narrows the rules that only make sense for

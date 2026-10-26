@@ -1,6 +1,7 @@
 const { assert, expect } = require('chai');
 
 const EventEmitter = require('events');
+const db = require('../../../models');
 const User = require('../../../lib/user');
 const StateManager = require('../../../lib/state');
 
@@ -58,6 +59,39 @@ describe('user.updateBySelector', () => {
       picture: tooLongImage.picture,
     });
     return assert.isRejected(promise, 'Validation error: Profile picture too big');
+  });
+  it('should remove the admin role when another administrator remains', async () => {
+    const updatedUser = await user.updateBySelector('pepper', {
+      role: 'habitant',
+    });
+    expect(updatedUser).to.have.property('role', 'habitant');
+    const john = await db.User.findOne({ where: { selector: 'john' } });
+    expect(john).to.have.property('role', 'admin');
+  });
+  it('should return error, the last administrator cannot lose the admin role', async () => {
+    await db.User.update({ role: 'habitant' }, { where: { selector: 'john' } });
+    const promise = user.updateBySelector('pepper', {
+      role: 'user',
+    });
+    await assert.isRejected(promise, 'The last administrator of the instance cannot lose the admin role');
+    const pepper = await db.User.findOne({ where: { selector: 'pepper' } });
+    expect(pepper).to.have.property('role', 'admin');
+  });
+  it('should update the last administrator when the admin role is kept', async () => {
+    await db.User.update({ role: 'habitant' }, { where: { selector: 'john' } });
+    const updatedUser = await user.updateBySelector('pepper', {
+      firstname: 'Virginia',
+      role: 'admin',
+    });
+    expect(updatedUser).to.have.property('firstname', 'Virginia');
+    expect(updatedUser).to.have.property('role', 'admin');
+  });
+  it('should give the admin role back to a user when there is no administrator', async () => {
+    await db.User.update({ role: 'habitant' }, { where: {} });
+    const updatedUser = await user.updateBySelector('pepper', {
+      role: 'admin',
+    });
+    expect(updatedUser).to.have.property('role', 'admin');
   });
   it('should return error, user not found', async () => {
     const promise = user.updateBySelector('USER_NOT_FOUND', {

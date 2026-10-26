@@ -2,24 +2,34 @@ const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { ADAPTER_MODE } = require('./constants');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
 const sleep = promisify(setTimeout);
 
+// Fallback when the user has not set a timezone yet: this is the timezone the container would
+// have used anyway, so it never makes the clock of a device worse than it already is.
+const DEFAULT_TIMEZONE = 'UTC';
+
 /**
  * @description Build the Zigbee2mqtt container descriptor to create.
  * @param {string} containerPath - Path of the Z2M data folder on the host.
  * @param {string} z2mDriverPath - Path of the Zigbee USB dongle on the host.
  * @param {boolean} networkAdapter - Is the Zigbee coordinator reached over the network?
+ * @param {string} timezone - Timezone of the Gladys instance, as configured by the user.
  * @returns {object} The container descriptor.
  * @example
- * const descriptor = buildContainerDescriptor('/var/lib/gladysassistant/zigbee2mqtt/z2m', '/dev/ttyUSB0', false);
+ * const descriptor = buildContainerDescriptor('/data/z2m', '/dev/ttyUSB0', false, 'Europe/Paris');
  */
-function buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter) {
+function buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter, timezone) {
   const containerDescriptorToMutate = cloneDeep(containerDescriptor);
   containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
+  // The container shares neither /etc/localtime nor the TZ of the host, so without this it runs in
+  // UTC. Zigbee2mqtt answers the time requests of the devices with its own local time, so a clock
+  // displaying device (a Tuya sensor with a LCD, a thermostat...) would be off by the UTC offset.
+  containerDescriptorToMutate.Env.push(`TZ=${timezone || DEFAULT_TIMEZONE}`);
   if (networkAdapter) {
     // A network coordinator is reached over TCP, there is no USB device to pass through
     containerDescriptorToMutate.HostConfig.Devices = [];
@@ -37,22 +47,29 @@ function buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter) 
  * await z2m.installZ2mContainer(config);
  */
 async function installZ2mContainer(config, setupMode = false) {
-  const { z2mDriverPath, z2mAdapterMode } = config;
+  const { z2mDriverPath, z2mAdapterMode, timezone } = config;
   const networkAdapter = z2mAdapterMode === ADAPTER_MODE.NETWORK;
   const expectedDevicePath = networkAdapter ? null : z2mDriverPath;
   let creationNeeded = false;
 
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
-  let [container] = dockerContainers;
+  let container;
+  try {
+    // Throws if the name is taken by a container that is not ours: it is never adopted nor removed
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  } catch (e) {
+    this.zigbee2mqttExist = false;
+    // Shown as is by the setup page, so the user reads which container to rename
+    this.z2mContainerError = { code: null, message: e.message };
+    logger.error('Zigbee2mqtt: failed to look up its Docker container:', e);
+    this.emitStatusEvent();
+    throw e;
+  }
 
   /*
    * Manage case where Zigbee coordinator has changed (USB dongle path, or switch from/to a network
    * coordinator) by removing the container. It will be created with good config later
    */
-  if (dockerContainers.length > 0) {
+  if (container) {
     const containerDescription = await this.gladys.system.inspectContainer(container.id);
     const [currentDevice] = containerDescription.HostConfig.Devices || [];
     const currentDevicePath = currentDevice ? currentDevice.PathOnHost : null;
@@ -90,7 +107,7 @@ async function installZ2mContainer(config, setupMode = false) {
 
   const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
   const containerPath = `${basePathOnHost}/zigbee2mqtt/z2m`;
-  if (dockerContainers.length === 0 || creationNeeded) {
+  if (!container || creationNeeded) {
     // Restore backup only in case of new installation
     await this.restoreZ2mBackup(containerPath);
 
@@ -100,7 +117,12 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.pull(containerDescriptor.Image);
 
       logger.info(`Configuration of Device ${networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath}`);
-      const containerDescriptorToMutate = buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter);
+      const containerDescriptorToMutate = buildContainerDescriptor(
+        containerPath,
+        z2mDriverPath,
+        networkAdapter,
+        timezone,
+      );
 
       logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
@@ -119,26 +141,23 @@ async function installZ2mContainer(config, setupMode = false) {
   const { configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode);
 
   try {
-    dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerDescriptor.name] },
-    });
-    [container] = dockerContainers;
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
 
     // If adapter type changed, remove and recreate container for clean state and fresh logs
-    if (adapterChanged && !creationNeeded && dockerContainers.length > 0) {
+    if (adapterChanged && !creationNeeded && container) {
       logger.info('Zigbee2mqtt adapter type changed, recreating container...');
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
 
-      const containerDescriptorToMutate = buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter);
+      const containerDescriptorToMutate = buildContainerDescriptor(
+        containerPath,
+        z2mDriverPath,
+        networkAdapter,
+        timezone,
+      );
       await this.gladys.system.createContainer(containerDescriptorToMutate);
 
-      dockerContainers = await this.gladys.system.getContainers({
-        all: true,
-        filters: { name: [containerDescriptor.name] },
-      });
-      [container] = dockerContainers;
+      container = await findManagedContainer(this.gladys.system, containerDescriptor);
     }
 
     // Check if we need to restart the container (container is not running / config changed)

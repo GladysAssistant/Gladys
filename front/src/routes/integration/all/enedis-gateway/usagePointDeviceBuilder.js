@@ -98,7 +98,7 @@ export const buildUsagePointDevicePayload = ({ usagePointId, serviceId, intlDict
   );
 
   return {
-    name: (existingDevice && existingDevice.name) || 'Enedis',
+    name: (existingDevice && existingDevice.name) || `Enedis ${usagePointId}`,
     selector: `enedis-${usagePointId}`,
     external_id: `enedis:${usagePointId}`,
     service_id: serviceId,

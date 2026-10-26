@@ -1,4 +1,5 @@
 const { mappings, mergedServiceCategories } = require('./deviceMappings');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const { indexFeatureService } = require('./featureServices');
 const { sanitizeName } = require('./sanitizeName');
 
@@ -135,6 +136,12 @@ function buildAccessory(device) {
       serviceConfigs.push([cat]);
     });
 
+    const temperatureFeature = categories[category].find(
+      (feature) =>
+        feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR &&
+        feature.type === DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    );
+
     serviceConfigs.forEach((config, i) => {
       const { service: serviceName } = mappings[category];
       // A category giving several services numbers them as it always has; that subtype already
@@ -147,10 +154,17 @@ function buildAccessory(device) {
         subtype = category;
       }
 
-      const service = this.buildService(device, config, mappings[category], subtype);
+      // Keep each preset's identity and target, while sharing the radiator's measured sensor.
+      // Extra physical sensors remain independent services created by mergeCategories.
+      const sharesTemperature = serviceName === 'Thermostat' || serviceName === 'HeaterCooler';
+      const features =
+        sharesTemperature && temperatureFeature && !config.includes(temperatureFeature)
+          ? [...config, temperatureFeature]
+          : config;
+      const service = this.buildService(device, features, mappings[category], subtype);
       // Which features went into which service is only known here. sendState reads it back to
       // update the service the feature belongs to instead of the first one of its type.
-      indexFeatureService(accessory, service, [...config, ...(droppedTwins.get(config) || [])]);
+      indexFeatureService(accessory, service, [...features, ...(droppedTwins.get(config) || [])]);
       accessory.addService(service);
     });
   });

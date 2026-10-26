@@ -46,6 +46,10 @@ const { getAiChatDebugContext } = require('./gateway.getAiChatDebugContext');
 const { buildWeeklyDigestData } = require('./gateway.buildWeeklyDigestData');
 const { sendWeeklyDigest } = require('./gateway.sendWeeklyDigest');
 const { scheduleWeeklyDigest } = require('./gateway.scheduleWeeklyDigest');
+const { setSubscriptionActive } = require('./gateway.setSubscriptionActive');
+const { callPlanGatedApi } = require('./gateway.callPlanGatedApi');
+const { throwIfPaymentRequired } = require('./gateway.throwIfPaymentRequired');
+const { refreshSubscriptionStatus } = require('./gateway.refreshSubscriptionStatus');
 
 // Enedis API
 const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
@@ -82,6 +86,15 @@ const Gateway = function Gateway(
   this.device = device;
   this.scene = null;
   this.connected = false;
+  // false while Gladys Plus answers "payment required": plan-gated features
+  // (backups, Enedis, AI) are paused locally, see gateway.setSubscriptionActive
+  this.subscriptionActive = true;
+  this.subscriptionPaymentRequiredSince = null;
+  // pending subscription transition, see gateway.setSubscriptionActive
+  this.subscriptionTransition = null;
+  // bumped when the Gladys Plus account is unlinked: a transition asked by a
+  // call made for the previous account is dropped instead of applied
+  this.subscriptionLinkGeneration = 0;
   this.restoreInProgress = false;
   this.restoreErrored = false;
   this.usersKeys = [];
@@ -153,6 +166,10 @@ Gateway.prototype.getAiChatDebugContext = getAiChatDebugContext;
 Gateway.prototype.buildWeeklyDigestData = buildWeeklyDigestData;
 Gateway.prototype.sendWeeklyDigest = sendWeeklyDigest;
 Gateway.prototype.scheduleWeeklyDigest = scheduleWeeklyDigest;
+Gateway.prototype.setSubscriptionActive = setSubscriptionActive;
+Gateway.prototype.callPlanGatedApi = callPlanGatedApi;
+Gateway.prototype.throwIfPaymentRequired = throwIfPaymentRequired;
+Gateway.prototype.refreshSubscriptionStatus = refreshSubscriptionStatus;
 
 // Enedis API
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;

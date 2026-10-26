@@ -66,7 +66,7 @@ module.exports = function CalendarController(gladys) {
    * }
    */
   async function update(req, res) {
-    const calendar = await gladys.calendar.update(req.params.calendar_selector, req.body);
+    const calendar = await gladys.calendar.update(req.params.calendar_selector, req.body, req.user.id);
     res.json(calendar);
   }
 
@@ -76,7 +76,7 @@ module.exports = function CalendarController(gladys) {
    * @apiGroup Calendar
    */
   async function destroy(req, res) {
-    await gladys.calendar.destroy(req.params.calendar_selector);
+    await gladys.calendar.destroy(req.params.calendar_selector, req.user.id);
     res.json({
       success: true,
     });
@@ -101,7 +101,7 @@ module.exports = function CalendarController(gladys) {
    * }
    */
   async function createEvent(req, res) {
-    const calendarEvent = await gladys.calendar.createEvent(req.params.calendar_selector, req.body);
+    const calendarEvent = await gladys.calendar.createEvent(req.params.calendar_selector, req.body, req.user.id);
     res.status(201).json(calendarEvent);
   }
 
@@ -124,7 +124,7 @@ module.exports = function CalendarController(gladys) {
    * }
    */
   async function updateEvent(req, res) {
-    const calendarEvent = await gladys.calendar.updateEvent(req.params.calendar_event_selector, req.body);
+    const calendarEvent = await gladys.calendar.updateEvent(req.params.calendar_event_selector, req.body, req.user.id);
     res.json(calendarEvent);
   }
 
@@ -134,7 +134,7 @@ module.exports = function CalendarController(gladys) {
    * @apiGroup Calendar
    */
   async function destroyEvent(req, res) {
-    await gladys.calendar.destroyEvent(req.params.calendar_event_selector);
+    await gladys.calendar.destroyEvent(req.params.calendar_event_selector, req.user.id);
     res.json({
       success: true,
     });

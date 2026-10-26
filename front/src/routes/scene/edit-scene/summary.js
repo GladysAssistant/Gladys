@@ -1,6 +1,9 @@
 import get from 'get-value';
 
 import { ACTIONS, EVENTS } from '../../../../../server/utils/constants';
+import { isWildcardValue } from './sceneIntegrations';
+import getDeviceFeatureValueOptions from '../../../utils/deviceFeatureValueOptions';
+import { getDeviceFeatureName } from '../../../utils/device';
 
 const truncate = (text, maxLength = 60) => {
   if (typeof text !== 'string') {
@@ -18,6 +21,18 @@ const joinParts = parts => {
   return filtered.length > 0 ? filtered.join(' · ') : null;
 };
 
+// The filled parameters of an integration-declared step ("camera: front,
+// label: person, car"), the wildcards left out
+const listDeclaredFields = fields => {
+  if (!fields || typeof fields !== 'object') {
+    return null;
+  }
+  const parts = Object.keys(fields)
+    .filter(key => !isWildcardValue(fields[key]))
+    .map(key => `${key}: ${Array.isArray(fields[key]) ? fields[key].join(', ') : fields[key]}`);
+  return parts.length > 0 ? truncate(parts.join(' · ')) : null;
+};
+
 const listSelectors = selectors => {
   if (!Array.isArray(selectors) || selectors.length === 0) {
     return null;
@@ -25,10 +40,18 @@ const listSelectors = selectors => {
   return truncate(selectors.join(', '));
 };
 
+// The device name of a feature selector once the devices are loaded, the raw
+// selector until then (or if the feature was deleted)
+const getFeatureLabel = (selector, dictionary, deviceFeatures) => {
+  const { device, feature } = (deviceFeatures && deviceFeatures[selector]) || {};
+  return truncate(device ? getDeviceFeatureName(dictionary, device, feature) : selector);
+};
+
 // Builds a short human-readable summary of a configured action, displayed when
 // its card is collapsed. Returns null when there is nothing meaningful to show:
-// the card then only displays the action type label.
-const getActionSummary = (action, dictionary) => {
+// the card then only displays the action type label. deviceFeatures maps a
+// feature selector to its { device, feature }, null while loading.
+const getActionSummary = (action, dictionary, deviceFeatures) => {
   if (!action || !action.type) {
     return null;
   }
@@ -50,9 +73,13 @@ const getActionSummary = (action, dictionary) => {
       return joinParts([action.user, truncate(action.text)]);
     case ACTIONS.MUSIC.PLAY_NOTIFICATION:
       return truncate(action.text);
+    case ACTIONS.MUSIC.PLAY_MEDIA:
+      return joinParts([action.device, action.media ? truncate(action.media.title || action.media.id) : null]);
     case ACTIONS.MQTT.SEND:
     case ACTIONS.ZIGBEE2MQTT.SEND:
       return truncate(action.topic);
+    case ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION:
+      return listDeclaredFields(action.fields);
     case ACTIONS.HTTP.REQUEST:
       return joinParts([action.method ? String(action.method).toUpperCase() : null, truncate(action.url)]);
     case ACTIONS.SCENE.START:
@@ -70,15 +97,25 @@ const getActionSummary = (action, dictionary) => {
     case ACTIONS.USER.CHECK_PRESENCE:
       return joinParts([action.user, action.house]);
     case ACTIONS.DEVICE.GET_VALUE:
-      return truncate(action.device_feature);
+      return getFeatureLabel(action.device_feature, dictionary, deviceFeatures);
     case ACTIONS.DEVICE.SET_VALUE: {
-      const value =
-        action.evaluate_value !== undefined && action.evaluate_value !== null && action.evaluate_value !== ''
-          ? action.evaluate_value
-          : action.value;
+      const hasEvaluateValue =
+        action.evaluate_value !== undefined && action.evaluate_value !== null && action.evaluate_value !== '';
+      const value = hasEvaluateValue ? action.evaluate_value : action.value;
+      // Until the devices are loaded (or if the feature was deleted), the raw selector and value are shown
+      const { feature } = (deviceFeatures && deviceFeatures[action.device_feature]) || {};
+      let valueLabel = value !== undefined && value !== null && value !== '' ? String(value) : null;
+      if (feature && valueLabel !== null && !hasEvaluateValue) {
+        const valueOption = (getDeviceFeatureValueOptions(dictionary, feature) || []).find(
+          option => `${option.value}` === valueLabel
+        );
+        if (valueOption) {
+          valueLabel = valueOption.label;
+        }
+      }
       return joinParts([
-        truncate(action.device_feature),
-        value !== undefined && value !== null && value !== '' ? truncate(String(value), 20) : null
+        getFeatureLabel(action.device_feature, dictionary, deviceFeatures),
+        valueLabel !== null ? truncate(valueLabel, 20) : null
       ]);
     }
     case ACTIONS.LIGHT.TURN_ON:
@@ -139,6 +176,13 @@ const getActionSummary = (action, dictionary) => {
           : null
       ]);
     }
+    case ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE:
+      return joinParts([
+        truncate(action.energy_contract),
+        action.operator && action.value !== undefined && action.value !== null && action.value !== ''
+          ? `${action.operator} ${action.value}`
+          : null
+      ]);
     case ACTIONS.CONDITION.CHECK_TIME: {
       const days = Array.isArray(action.days_of_the_week)
         ? action.days_of_the_week
@@ -205,6 +249,10 @@ const getTriggerSummary = (trigger, dictionary) => {
     case EVENTS.WEATHER.ALERT_RAISED:
     case EVENTS.WEATHER.ALERT_ENDED:
       return joinParts([trigger.house, trigger.weather_alert_type]);
+    case EVENTS.ENERGY_CONTRACT.PRICE_CHANGED:
+      return truncate(trigger.energy_contract);
+    case EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT:
+      return listDeclaredFields(trigger.fields);
     default:
       return null;
   }

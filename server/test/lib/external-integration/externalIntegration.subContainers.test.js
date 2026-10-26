@@ -254,6 +254,36 @@ describe('externalIntegration.startSubContainer', () => {
     assert.calledWith(restartContainer.secondCall, 'sub-2');
   });
 
+  it('should recreate the container on the cgroup v2 cpu.max start error', async () => {
+    // cgroup v2 kernel without CFS bandwidth control (Khadas among others):
+    // the creation passed, runc fails at start on the missing cpu.max file
+    const cpuMaxError = Object.assign(
+      new Error(
+        '(HTTP code 500) server error - failed to create task for container: ' +
+          'error setting cgroup config for procHooks process: ' +
+          'openat2 /sys/fs/cgroup/system.slice/docker-abc123.scope/cpu.max: no such file or directory: unknown',
+      ),
+      { statusCode: 500 },
+    );
+    const restartContainer = sinon.stub();
+    restartContainer.onFirstCall().rejects(cpuMaxError);
+    restartContainer.onSecondCall().resolves(true);
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        createContainer: fake.resolves({ id: 'sub-2' }),
+        restartContainer,
+      },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    const container = await externalIntegration.startSubContainer(service, entry);
+    expect(container).to.deep.equal({ id: 'sub-2' });
+    expect(system.cpuCfsSupport).to.equal(false);
+    assert.calledOnce(system.createContainer);
+    assert.calledWith(restartContainer.secondCall, 'sub-2');
+  });
+
   it('should not recreate the container on another start failure', async () => {
     const error = new Error('DOCKER_DAEMON_DOWN');
     const { externalIntegration, system } = buildSupervisor({

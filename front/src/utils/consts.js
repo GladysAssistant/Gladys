@@ -1,4 +1,8 @@
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  MUSIC_STRING_FEATURE_TYPES
+} from '../../../server/utils/constants';
 
 export const LoginStatus = {
   Processing: 'Processing',
@@ -19,7 +23,8 @@ export const CreateUserErrors = {
 
 export const ForgotPasswordStatus = {
   WrongEmailError: 'WrongEmailError',
-  UserNotFound: 'UserNotFound'
+  UserNotFound: 'UserNotFound',
+  InvalidCode: 'InvalidCode'
 };
 
 export const ResetPasswordStatus = {
@@ -81,7 +86,6 @@ export const RequestStatus = {
   ServiceDisconnected: 'ServiceDisconnected',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
-  UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
   RoomValidationError: 'RoomValidationError'
@@ -164,7 +168,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'thermometer',
     [DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN]: 'thermometer',
     [DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX]: 'thermometer',
-    [DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.AVERAGE]: 'thermometer'
+    [DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.AVERAGE]: 'thermometer',
+    [DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE]: 'thermometer'
   },
   [DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'cpu'
@@ -261,7 +266,10 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'alarm-smoke',
-    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'wind'
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'wind',
+    [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CONTAMINATION_STATE]: 'filter',
+    [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.MUTED]: 'bell-off',
+    [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE]: 'volume-x'
   },
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'sun',
@@ -389,6 +397,11 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION]: 'zap',
     [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION_REVENUE]: 'dollar-sign'
   },
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY]: 'cloud',
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE]: 'leaf',
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE]: 'wind'
+  },
   [DEVICE_FEATURE_CATEGORIES.GRID_SENSOR]: {
     [DEVICE_FEATURE_TYPES.GRID_SENSOR.INPUT_POWER]: 'download',
     [DEVICE_FEATURE_TYPES.GRID_SENSOR.OUTPUT_POWER]: 'upload',
@@ -445,16 +458,20 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN_1]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN]: 'zap',
+    [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS]: 'zap',
+    [DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS1]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1]: 'zap',
+    [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1_1]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2_1]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.HHPHC]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX]: 'zap',
+    [DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX1]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.ADPS]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX2]: 'zap',
     [DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX3]: 'zap',
@@ -505,6 +522,7 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: 'thermometer',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: 'settings',
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: 'sliders',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: 'power'
   },
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: {
@@ -544,7 +562,16 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.MUSIC.PREVIOUS]: 'rewind',
     [DEVICE_FEATURE_TYPES.MUSIC.NEXT]: 'fast-forward',
     [DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE]: 'bar-chart-2',
-    [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'bell'
+    [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'bell',
+    [DEVICE_FEATURE_TYPES.MUSIC.TITLE]: 'music',
+    [DEVICE_FEATURE_TYPES.MUSIC.ARTIST]: 'user',
+    [DEVICE_FEATURE_TYPES.MUSIC.ALBUM]: 'disc',
+    [DEVICE_FEATURE_TYPES.MUSIC.ARTWORK]: 'image',
+    [DEVICE_FEATURE_TYPES.MUSIC.DURATION]: 'clock',
+    [DEVICE_FEATURE_TYPES.MUSIC.POSITION]: 'clock',
+    [DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE]: 'shuffle',
+    [DEVICE_FEATURE_TYPES.MUSIC.REPEAT]: 'repeat',
+    [DEVICE_FEATURE_TYPES.MUSIC.MUTE]: 'volume-x'
   },
   [DEVICE_FEATURE_CATEGORIES.RISK]: {
     [DEVICE_FEATURE_TYPES.RISK.INTEGER]: 'alert-circle'
@@ -610,7 +637,19 @@ export const DeviceFeatureCategoriesIcon = {
   }
 };
 
-export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT, DEVICE_FEATURE_TYPES.TEXT.SELECT];
+// The music metadata types hold a string state too (title, artist, album, artwork key): the
+// core routes them to last_value_string by category + type, exactly like text/text
+// (docs/specs/external-integrations/capabilities/music.md, section 1)
+export const DeviceFeatureTypesString = [
+  DEVICE_FEATURE_TYPES.TEXT.TEXT,
+  DEVICE_FEATURE_TYPES.TEXT.SELECT,
+  ...MUSIC_STRING_FEATURE_TYPES
+];
+
+export const isStringFeature = (category, type) =>
+  (category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+    (type === DEVICE_FEATURE_TYPES.TEXT.TEXT || type === DEVICE_FEATURE_TYPES.TEXT.SELECT)) ||
+  (category === DEVICE_FEATURE_CATEGORIES.MUSIC && MUSIC_STRING_FEATURE_TYPES.includes(type));
 
 // Television and music features come in two flavours: continuous controls, which carry a value the
 // user reads and adjusts, and remote-control orders, which are one-shot commands with no meaningful
@@ -626,7 +665,14 @@ export const TelevisionContinuousControlFeatureTypes = new Set([
 
 export const MusicContinuousControlFeatureTypes = new Set([
   DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
-  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
+  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE,
+  DEVICE_FEATURE_TYPES.MUSIC.DURATION,
+  DEVICE_FEATURE_TYPES.MUSIC.POSITION,
+  DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE,
+  DEVICE_FEATURE_TYPES.MUSIC.REPEAT,
+  DEVICE_FEATURE_TYPES.MUSIC.MUTE,
+  // the string "now playing" types carry a value to read, never a key to press
+  ...MUSIC_STRING_FEATURE_TYPES
 ]);
 
 export const isPushButtonFeature = (category, type) => {

@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 import { route } from 'preact-router';
 import QRCode from 'qrcode';
 import { RequestStatus, LoginStatus } from '../utils/consts';
-import { validateEmail } from '../utils/validator';
+import { validateEmail, cleanEmail } from '../utils/validator';
 import { ERROR_MESSAGES, SYSTEM_VARIABLE_NAMES } from '../../../server/utils/constants';
 
 function createActions(store) {
@@ -16,6 +16,9 @@ function createActions(store) {
         const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
         store.setState({
           gatewayStatus,
+          // the header notice reads this flag: kept in step with the status
+          // wherever it is loaded (after a disconnect, for instance)
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
           gatewayGetStatusStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -24,11 +27,32 @@ function createActions(store) {
         });
       }
     },
+    // "Check again" of the Gladys Plus settings, once the payment method has
+    // been updated: asks the instance to check the subscription with Gladys
+    // Plus right now, instead of waiting for its daily check
+    async refreshSubscriptionStatus(state) {
+      store.setState({
+        gatewayRefreshSubscriptionStatus: RequestStatus.Getting
+      });
+      try {
+        const gatewayStatus = await state.httpClient.post('/api/v1/gateway/subscription/refresh');
+        store.setState({
+          gatewayStatus,
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
+          gatewayRefreshSubscriptionStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          gatewayRefreshSubscriptionStatus: RequestStatus.Error
+        });
+      }
+    },
     async login(state, e) {
       if (e) {
         e.preventDefault();
       }
-      if (!validateEmail(state.gatewayLoginEmail)) {
+      const email = cleanEmail(state.gatewayLoginEmail);
+      if (!validateEmail(email)) {
         return store.setState({
           gatewayLoginStatus: LoginStatus.WrongEmailError
         });
@@ -38,7 +62,7 @@ function createActions(store) {
       });
       try {
         const gatewayLoginResults = await state.httpClient.post('/api/v1/gateway/login', {
-          email: state.gatewayLoginEmail,
+          email,
           password: state.gatewayLoginPassword
         });
         if (gatewayLoginResults.two_factor_token) {
@@ -122,7 +146,7 @@ function createActions(store) {
         // to get a two_factor_token, and let the user finalize the connection with
         // a fresh code from their 2FA app.
         const gatewayLoginResults = await state.httpClient.post('/api/v1/gateway/login', {
-          email: state.gatewayLoginEmail,
+          email: cleanEmail(state.gatewayLoginEmail),
           password: state.gatewayLoginPassword
         });
         store.setState({
@@ -336,6 +360,10 @@ function createActions(store) {
         [userIndex]: {
           accepted: {
             $set: value
+          },
+          // the server forgets it too once the user is accepted again
+          keys_changed: {
+            $set: false
           }
         }
       });
@@ -349,7 +377,10 @@ function createActions(store) {
           gatewaySwitchUserKeyStatus: RequestStatus.Success
         });
       } catch (e) {
+        // the instance did not save it: the switch and the status badge go back to
+        // what the instance actually enforces
         store.setState({
+          gatewayUsersKeys: state.gatewayUsersKeys,
           gatewaySwitchUserKeyStatus: RequestStatus.Error
         });
       }

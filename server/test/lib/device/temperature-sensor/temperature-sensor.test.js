@@ -238,6 +238,37 @@ describe('TemperatureSensor.command', () => {
       unit: '°C',
     });
   });
+  it('should exclude external probes from average calculation', async () => {
+    const stateManager = new StateManager(event);
+    const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
+
+    // An external probe measures a fridge, a tank or the outside, not the room it sits in
+    await db.DeviceFeature.create({
+      id: 'd8a55f7b-4e1c-7d6f-2c5a-9b0d1e4f5a6b',
+      name: 'Test temperature probe',
+      selector: 'test-temperature-sensor-probe',
+      external_id: 'temperature-sensor:probe',
+      category: 'temperature-sensor',
+      type: 'probe',
+      unit: 'celsius',
+      read_only: true,
+      has_feedback: false,
+      min: -100,
+      max: 150,
+      last_value: 4,
+      last_value_changed: new Date(),
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+    });
+    const result = await deviceManager.temperatureSensorManager.getTemperatureInRoom(
+      '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      {
+        unit: 'celsius',
+      },
+    );
+    // The probe (4°C) is ignored: only the ambient sensors (20°C and 100°F = 37.78°C) count
+    expect(result.temperature).to.be.closeTo(28.89, 0.01);
+    expect(result.unit).to.equal('celsius');
+  });
   it('should return room not found', async () => {
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);

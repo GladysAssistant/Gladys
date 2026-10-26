@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { authenticatedRequest } = require('../request.test');
+const { authenticatedRequest, nonAdminRequest, NON_ADMIN_USER_ID } = require('../request.test');
+const db = require('../../../models');
+const { USER_ROLE } = require('../../../utils/constants');
 
 describe('POST /api/v1/house', () => {
   it('should create house', async () => {
@@ -181,6 +183,55 @@ describe('POST /api/v1/house/:user_selector/user/:user_selector/seen', () => {
         expect(res.body).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
       });
   });
+
+  // Marking a user as seen changes their presence and can start presence
+  // scenes: a non-admin user can only do it for themselves, while an admin can
+  // still do it for the whole household.
+  describe('access control', () => {
+    beforeEach(async () => {
+      await db.User.create({
+        id: NON_ADMIN_USER_ID,
+        firstname: 'Pepper',
+        lastname: 'Potts',
+        selector: 'pepper-habitant',
+        email: 'pepper-habitant@pots.com',
+        password: 'mysuperpassword',
+        role: USER_ROLE.HABITANT,
+        language: 'en',
+        birthdate: '1990-12-12',
+      });
+    });
+
+    it('should let a non-admin mark themselves as seen', async () => {
+      await nonAdminRequest
+        .post('/api/v1/house/test-house/user/pepper-habitant/seen')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
+        });
+    });
+
+    it('should not let a non-admin mark another user as seen', async () => {
+      const johnBefore = await db.User.findOne({ where: { selector: 'john' } });
+      await nonAdminRequest
+        .post('/api/v1/house/test-house/user/john/seen')
+        .expect('Content-Type', /json/)
+        .expect(403);
+      const johnAfter = await db.User.findOne({ where: { selector: 'john' } });
+      expect(johnAfter.current_house_id).to.equal(johnBefore.current_house_id);
+    });
+
+    it('should let an admin mark another user as seen', async () => {
+      await authenticatedRequest
+        .post('/api/v1/house/test-house/user/pepper-habitant/seen')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
+        });
+    });
+  });
 });
 
 describe('GET /api/v1/house/:house_selector/sun', () => {
@@ -198,7 +249,16 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
         expect(res.body.azimuth).to.be.a('number');
         expect(res.body.elevation).to.be.a('number');
         expect(res.body.curve).to.be.an('array');
-        expect(res.body.curve).to.have.lengthOf(73);
+        // One point every 20 minutes from local midnight to the next one included. The
+        // request runs on today, so the day lasts 23 or 25 hours when the clocks change:
+        // 73 points then became 70 or 76, and the test failed twice a year.
+        const { curve } = res.body;
+        const dayLength = new Date(curve[curve.length - 1].time).getTime() - new Date(curve[0].time).getTime();
+        expect([23, 24, 25].map((hours) => hours * 60 * 60 * 1000)).to.include(dayLength);
+        expect(curve).to.have.lengthOf(dayLength / (20 * 60 * 1000) + 1);
+        curve.slice(1).forEach((point, index) => {
+          expect(new Date(point.time).getTime() - new Date(curve[index].time).getTime()).to.equal(20 * 60 * 1000);
+        });
       });
   });
   it('should return 400 when the house has no coordinates', async () => {

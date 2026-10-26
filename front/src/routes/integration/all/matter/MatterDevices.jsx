@@ -12,7 +12,7 @@ import MatterDeviceBox from './MatterDeviceBox';
 import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
-import { getDeviceParam } from '../../../../utils/device';
+import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/device';
 import style from './style.css';
 
 const compareDevices = (deviceA, deviceB) => {
@@ -243,7 +243,7 @@ class MatterDevices extends Component {
     this.setPairedDeviceLoading(externalId, true);
     this.setPairedDeviceError(externalId, null);
     try {
-      await this.props.httpClient.post('/api/v1/device', device);
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {
@@ -284,6 +284,9 @@ class MatterDevices extends Component {
       device.name = gladysDevice.name;
       device.room = gladysDevice.room;
 
+      // the energy features derived by the server point to the ids of the paired features:
+      // their parents follow the ids taken over from the existing device
+      const replacedFeatureIds = new Map();
       device.features = device.features.map(f => {
         // try to find match feature to replace the external_id
         const gladysFeature = gladysDevice.features.find(gladysF => {
@@ -291,12 +294,23 @@ class MatterDevices extends Component {
         });
         // If a matching feature is found, give the id of the feature
         if (gladysFeature) {
+          if (f.id) {
+            replacedFeatureIds.set(f.id, gladysFeature.id);
+          }
           f.id = gladysFeature.id;
           f.selector = gladysFeature.selector;
+          // the server could not see the existing device (new node id): its index fell back on the
+          // main meter, the meter the user chose (or none, for a root) is kept
+          f.energy_parent_id = gladysFeature.energy_parent_id || null;
         }
         return f;
       });
-      await this.props.httpClient.post('/api/v1/device', device);
+      device.features.forEach(f => {
+        if (f.energy_parent_id && replacedFeatureIds.has(f.energy_parent_id)) {
+          f.energy_parent_id = replacedFeatureIds.get(f.energy_parent_id);
+        }
+      });
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {

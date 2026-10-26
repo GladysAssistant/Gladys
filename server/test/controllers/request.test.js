@@ -67,6 +67,12 @@ const nonAdminRequest = {
       .set('Accept', 'application/json')
       .set('Authorization', nonAdminHeader),
   // @ts-ignore
+  patch: (url) =>
+    request(TEST_BACKEND_APP)
+      .patch(url)
+      .set('Accept', 'application/json')
+      .set('Authorization', nonAdminHeader),
+  // @ts-ignore
   delete: (url) =>
     request(TEST_BACKEND_APP)
       .delete(url)

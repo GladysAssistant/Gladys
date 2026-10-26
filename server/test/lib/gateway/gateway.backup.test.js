@@ -8,6 +8,7 @@ const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const db = require('../../../models');
 const getConfig = require('../../../utils/getConfig');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { Error402 } = require('../../../utils/httpErrors');
 
 const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
@@ -73,7 +74,7 @@ describe('gateway.backup', async function describe() {
       { language: 'en', selector: 'toto-en' },
     ]);
 
-    message.sendToUser = fake.returns(null);
+    message.sendSystemMessage = fake.returns(null);
     brain.getReply = fake.returns('Backup failed!');
 
     gateway = new Gateway(variable, event, system, sequelize, config, user, {}, {}, job, scheduler, message, brain);
@@ -109,6 +110,47 @@ describe('gateway.backup', async function describe() {
     expect(compressions.every((compression) => compression === 'ZSTD')).to.equal(true);
   });
 
+  it('should export DuckDB while the main memory limit is reduced, then restore it', async () => {
+    const getMemoryLimit = async () => {
+      const [row] = await db.duckDbReadConnectionAllAsync("SELECT current_setting('memory_limit') AS memory_limit");
+      return row.memory_limit;
+    };
+    const memoryLimitBefore = await getMemoryLimit();
+    let memoryLimitDuringExport;
+    const steps = [];
+    const runWithReducedMemoryLimit = db.duckDbRunWithReducedMemoryLimit;
+    const createBackupInstance = db.duckDbCreateBackupInstance;
+    const runStub = sinon.stub(db, 'duckDbRunWithReducedMemoryLimit').callsFake(async (task) => {
+      steps.push('reduce');
+      try {
+        return await runWithReducedMemoryLimit(task);
+      } finally {
+        steps.push('restore');
+      }
+    });
+    const createStub = sinon.stub(db, 'duckDbCreateBackupInstance').callsFake(async () => {
+      steps.push('create backup instance');
+      memoryLimitDuringExport = await getMemoryLimit();
+      return createBackupInstance();
+    });
+    try {
+      await gateway.backup();
+    } finally {
+      runStub.restore();
+      createStub.restore();
+    }
+
+    expect(steps).to.deep.equal(['reduce', 'create backup instance', 'restore']);
+    // The limit is lowered only when it is above 512MB, which DuckDB reports as
+    // "488.2 MiB" (it counts 1MB as 1000^2 bytes). The default limit, 30% of the
+    // RAM, is above it on any machine with more than ~1.7GB of RAM.
+    const [value, unit] = memoryLimitBefore.split(' ');
+    const bytesBefore = parseFloat(value) * 1024 ** ['KiB', 'MiB', 'GiB', 'TiB'].indexOf(unit) * 1024;
+    const expectedDuringExport = bytesBefore > 512 * 1000 * 1000 ? '488.2 MiB' : memoryLimitBefore;
+    expect(memoryLimitDuringExport).to.equal(expectedDuringExport);
+    expect(await getMemoryLimit()).to.equal(memoryLimitBefore);
+  });
+
   it('should start and abort backup', async () => {
     gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects(new Error('error'));
 
@@ -130,8 +172,39 @@ describe('gateway.backup', async function describe() {
     assert.calledWith(brain.getReply, 'en', 'backup.fail', {
       errorMessage: 'Error: error',
     });
-    assert.calledWith(message.sendToUser, 'toto-fr', 'Backup failed!');
-    assert.calledWith(message.sendToUser, 'toto-en', 'Backup failed!');
+    assert.calledWithExactly(message.sendSystemMessage, 'toto-fr', 'Backup failed!', null, {
+      messageType: 'notification',
+    });
+    assert.calledWithExactly(message.sendSystemMessage, 'toto-en', 'Backup failed!', null, {
+      messageType: 'notification',
+    });
+  });
+
+  it('should rethrow the backup error when warning one admin fails', async () => {
+    const backupError = new Error('upload failed');
+    gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects(backupError);
+    const sentTo = [];
+    // resolves later: sentTo is only filled when backup waits for the sends
+    message.sendSystemMessage = sinon.stub().callsFake(async (selector) => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10);
+      });
+      if (selector === 'toto-fr') {
+        throw new NotFoundError(`User ${selector} not found`);
+      }
+      sentTo.push(selector);
+    });
+
+    let thrownError;
+    try {
+      await gateway.backup();
+    } catch (e) {
+      thrownError = e;
+    }
+
+    expect(thrownError).to.equal(backupError);
+    assert.calledTwice(message.sendSystemMessage);
+    expect(sentTo).to.deep.equal(['toto-en']);
   });
 
   it('should backup gladys with lots of insert at the same time', async () => {
@@ -164,6 +237,19 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
     assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
+  });
+
+  it('should not backup while the Gladys Plus subscription is not paid', async () => {
+    gateway.subscriptionActive = false;
+
+    try {
+      await gateway.backup();
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(Error402);
+    }
+    assert.notCalled(gateway.gladysGatewayClient.initializeMultiPartBackup);
+    assert.notCalled(message.sendSystemMessage);
   });
 
   it('should not backup, no backup key found', async () => {

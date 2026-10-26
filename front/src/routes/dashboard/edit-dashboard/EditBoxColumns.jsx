@@ -7,7 +7,7 @@ import EmptyColumnDropZone from './EmptyColumnDropZone';
 import {
   DEFAULT_COLUMN_WIDTH,
   WIDE_COLUMN_WIDTH,
-  canBoxStretchAt,
+  canBoxStretchInColumn,
   getSectionOffsets,
   isTileStretchBox,
   isValueTileBox,
@@ -201,7 +201,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                             // preview the viewer's vertical stretch (see
                             // .stretchPreview): a stretchable widget absorbs
                             // the free height of its column on the canvas too
-                            const stretch = canBoxStretchAt(box, y === column.length - 1);
+                            const stretch = canBoxStretchInColumn(box, column, y === column.length - 1);
                             return (
                               <div
                                 key={`box-container-${x}-${y}`}
@@ -209,9 +209,11 @@ const EditBoxColumns = ({ children, ...props }) => (
                                   [style.stretchPreview]: stretch,
                                   [style.stretchTilePreview]: stretch && isTileStretchBox(box),
                                   [style.adaptiveTilePreview]: stretch && isValueTileBox(box),
-                                  // global marker so media widgets fill their
-                                  // stretched card from their own stylesheet
-                                  'dashboard-stretched-media': stretch && !isTileStretchBox(box)
+                                  // global markers so widgets adapt their content
+                                  // to their stretched card from their own
+                                  // stylesheet, like the viewer's BoxColumns
+                                  'dashboard-stretched-media': stretch && !isTileStretchBox(box),
+                                  'dashboard-stretched-tile': stretch && isTileStretchBox(box)
                                 })}
                               >
                                 <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />

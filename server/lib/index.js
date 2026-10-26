@@ -28,8 +28,9 @@ const Variable = require('./variable');
 const services = require('../services');
 const Weather = require('./weather');
 const { EVENTS } = require('../utils/constants');
-const EnergyPrice = require('./energy-price');
+const EnergyContract = require('./energy-contract');
 const ExternalIntegration = require('./external-integration');
+const Tts = require('./tts');
 
 /**
  * @description Start a new Gladys instance.
@@ -77,7 +78,10 @@ function Gladys(params = {}) {
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
-  const energyPrice = new EnergyPrice(stateManager);
+  const energyContract = new EnergyContract(event, stateManager, service, device, variable);
+  // `energyPrice` is the name of the manager before the energy contracts: kept as an
+  // alias for one release (docs/specs/energy-contracts.md, section 9.4)
+  const energyPrice = energyContract;
   const externalIntegration = new ExternalIntegration(
     event,
     system,
@@ -85,10 +89,12 @@ function Gladys(params = {}) {
     stateManager,
     device,
     variable,
-    energyPrice,
+    energyContract,
     params.jwtSecret,
     cache,
+    calendar,
   );
+  energyContract.externalIntegration = externalIntegration;
   const gateway = new Gateway(
     variable,
     event,
@@ -104,6 +110,7 @@ function Gladys(params = {}) {
     brain,
     device,
   );
+  const tts = new Tts(variable, service, stateManager, gateway, system, user);
   const scene = new Scene(
     stateManager,
     event,
@@ -117,9 +124,16 @@ function Gladys(params = {}) {
     scheduler,
     brain,
     service,
+    tts,
   );
   gateway.scene = scene;
-  gateway.energyPrice = energyPrice;
+  gateway.energyPrice = energyContract;
+  // the voice assistant reply (gateway.processVoiceMessage) speaks through
+  // the active TTS provider; attached post-construction like gateway.scene
+  gateway.tts = tts;
+  // the energy-contract.current-price scene condition reads the current price of a
+  // contract: the manager is created before the scene manager, attached post-construction
+  scene.energyContract = energyContract;
   // The device migration (device.migrate) rewrites scenes: the scene manager
   // is created after the device manager, so it is attached post-construction
   // (same pattern as gateway.scene above). Dashboards have no RAM cache and
@@ -153,8 +167,10 @@ function Gladys(params = {}) {
     system,
     variable,
     weather,
+    energyContract,
     energyPrice,
     externalIntegration,
+    tts,
     start: async () => {
       // set wal mode
       await db.sequelize.query('PRAGMA journal_mode=WAL;');
@@ -169,6 +185,10 @@ function Gladys(params = {}) {
       await db.duckDbCreateTableIfNotExist();
 
       await system.init();
+
+      // before the server listens: access tokens of sessions revoked or of
+      // tablets locked before a restart must stay refused
+      await session.init();
 
       // this should be before device.init
       if (!params.disableJobInit) {
@@ -198,6 +218,8 @@ function Gladys(params = {}) {
         // boot sequence, see below
         await device.init(!params.disableDuckDbMigration);
       }
+      // after the devices are in RAM: the conversion of the legacy prices reads the meters
+      await energyContract.init();
       if (!params.disableUserLoading) {
         await user.init();
       }

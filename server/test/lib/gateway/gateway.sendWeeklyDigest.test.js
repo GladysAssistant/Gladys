@@ -4,12 +4,8 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert } = sinon;
 
 const { Error429 } = require('../../../utils/httpErrors');
-const { USER_ROLE, AI_CHAT_PURPOSES } = require('../../../utils/constants');
-const {
-  sendWeeklyDigest,
-  isSystemVariableEnabled,
-  extractAssistantText,
-} = require('../../../lib/gateway/gateway.sendWeeklyDigest');
+const { USER_ROLE, AI_CHAT_PURPOSES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { sendWeeklyDigest, extractAssistantText } = require('../../../lib/gateway/gateway.sendWeeklyDigest');
 
 describe('gateway.sendWeeklyDigest', () => {
   let gateway;
@@ -17,7 +13,8 @@ describe('gateway.sendWeeklyDigest', () => {
   beforeEach(() => {
     gateway = {
       variable: {
-        getValue: fake.resolves('1'),
+        // digest enabled, no external AI provider selected
+        getValue: fake(async (name) => (name === SYSTEM_VARIABLE_NAMES.AI_PROVIDER ? null : '1')),
       },
       getStatus: fake.resolves({ configured: true }),
       device: {},
@@ -38,7 +35,7 @@ describe('gateway.sendWeeklyDigest', () => {
         choices: [{ message: { content: 'Bonjour, voici votre bilan.' } }],
       }),
       message: {
-        sendToUser: fake.resolves({}),
+        sendSystemMessage: fake.resolves({}),
       },
     };
   });
@@ -61,6 +58,60 @@ describe('gateway.sendWeeklyDigest', () => {
     assert.notCalled(gateway.buildWeeklyDigestData);
   });
 
+  it('should skip when the Gladys Plus subscription is not paid', async () => {
+    gateway.getStatus = fake.resolves({ configured: true, subscription_active: false });
+
+    const result = await sendWeeklyDigest.call(gateway);
+
+    expect(result).to.deep.equal({ sent: 0 });
+    assert.notCalled(gateway.buildWeeklyDigestData);
+    assert.notCalled(gateway.aiChat);
+  });
+
+  it('should send the digest through an external AI provider without Gladys Plus', async () => {
+    // the digest follows the selected provider (gateway.aiChat): neither a
+    // Plus account nor an active subscription gates it then
+    gateway.variable.getValue = fake(async (name) =>
+      name === SYSTEM_VARIABLE_NAMES.AI_PROVIDER ? 'ext-dev-claude-provider-demo' : '1',
+    );
+    gateway.getStatus = fake.resolves({ configured: false, subscription_active: false });
+
+    const result = await sendWeeklyDigest.call(gateway);
+
+    expect(result).to.deep.equal({ sent: 1 });
+    assert.notCalled(gateway.getStatus);
+    assert.calledOnce(gateway.aiChat);
+  });
+
+  it('should ask the AI for one admin at a time', async () => {
+    // the digests of several admins must never overlap: a provider has a
+    // cap on requests in flight, and a digest is not time-critical
+    gateway.user.getByRole = fake.resolves(
+      Array.from({ length: 6 }, (unused, index) => ({
+        id: `user-${index}`,
+        selector: `admin-${index}`,
+        language: 'fr',
+      })),
+    );
+    let inFlight = 0;
+    let maxInFlight = 0;
+    gateway.aiChat = fake(async () => {
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1);
+      });
+      inFlight -= 1;
+      return { choices: [{ message: { content: 'Digest OK' } }] };
+    });
+
+    const result = await sendWeeklyDigest.call(gateway);
+
+    expect(result).to.deep.equal({ sent: 6 });
+    expect(gateway.aiChat.callCount).to.equal(6);
+    expect(maxInFlight).to.equal(1);
+  });
+
   it('should send digest to admins', async () => {
     const result = await sendWeeklyDigest.call(gateway);
 
@@ -68,7 +119,7 @@ describe('gateway.sendWeeklyDigest', () => {
     assert.calledOnceWithExactly(gateway.user.getByRole, USER_ROLE.ADMIN);
     assert.calledOnce(gateway.aiChat);
     expect(gateway.aiChat.getCall(0).args[0].purpose).to.equal(AI_CHAT_PURPOSES.WEEKLY_DIGEST);
-    assert.calledOnceWithExactly(gateway.message.sendToUser, 'tony', 'Bonjour, voici votre bilan.', null, {
+    assert.calledOnceWithExactly(gateway.message.sendSystemMessage, 'tony', 'Bonjour, voici votre bilan.', null, {
       messageType: 'notification',
     });
   });
@@ -108,7 +159,7 @@ describe('gateway.sendWeeklyDigest', () => {
     const result = await sendWeeklyDigest.call(gateway);
 
     expect(result).to.deep.equal({ sent: 0 });
-    assert.notCalled(gateway.message.sendToUser);
+    assert.notCalled(gateway.message.sendSystemMessage);
   });
 
   it('should skip when AI rate limit is reached', async () => {
@@ -117,7 +168,7 @@ describe('gateway.sendWeeklyDigest', () => {
     const result = await sendWeeklyDigest.call(gateway);
 
     expect(result).to.deep.equal({ sent: 0 });
-    assert.notCalled(gateway.message.sendToUser);
+    assert.notCalled(gateway.message.sendSystemMessage);
   });
 
   it('should continue when digest fails for one admin', async () => {
@@ -139,20 +190,9 @@ describe('gateway.sendWeeklyDigest', () => {
     const result = await sendWeeklyDigest.call(gateway);
 
     expect(result).to.deep.equal({ sent: 1 });
-    assert.calledOnceWithExactly(gateway.message.sendToUser, 'pierre', 'Digest OK', null, {
+    assert.calledOnceWithExactly(gateway.message.sendSystemMessage, 'pierre', 'Digest OK', null, {
       messageType: 'notification',
     });
-  });
-});
-
-describe('isSystemVariableEnabled', () => {
-  it('should detect enabled values', () => {
-    expect(isSystemVariableEnabled('1')).to.equal(true);
-    expect(isSystemVariableEnabled(true)).to.equal(true);
-    expect(isSystemVariableEnabled(1)).to.equal(true);
-    expect(isSystemVariableEnabled('true')).to.equal(true);
-    expect(isSystemVariableEnabled('0')).to.equal(false);
-    expect(isSystemVariableEnabled(false)).to.equal(false);
   });
 });
 

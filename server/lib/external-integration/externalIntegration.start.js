@@ -1,5 +1,6 @@
 const db = require('../../models');
 const logger = require('../../utils/logger');
+const { isCpuCfsError } = require('../system/system.createContainer');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
 const { SERVICE_STATUS } = require('../../utils/constants');
 const { STARTUP_TIMEOUT_MS } = require('./constants');
@@ -50,6 +51,13 @@ async function start(selector, { resetFailureCount = true } = {}) {
         await this.system.restartContainer(service.container_id);
         started = true;
       } catch (e) {
+        // the kernel cannot apply the stored CPU limit (cgroup v2 without
+        // CFS bandwidth control fails only here, at start): remember it so
+        // the recreation below builds a descriptor without NanoCpus
+        if (isCpuCfsError(e)) {
+          logger.warn(`Integration ${selector}: kernel without CPU CFS support, recreating without CPU limit`);
+          this.system.cpuCfsSupport = false;
+        }
         logger.info(`Container of integration ${selector} not found or not startable, recreating it`, e);
       }
     } else {
@@ -58,8 +66,22 @@ async function start(selector, { resetFailureCount = true } = {}) {
   }
   if (!started) {
     try {
-      const container = await this.createIntegrationContainer(service);
-      await this.system.restartContainer(container.id);
+      try {
+        const container = await this.createIntegrationContainer(service);
+        await this.system.restartContainer(container.id);
+      } catch (e) {
+        // fresh container whose CPU limit passed the creation but is
+        // rejected at start (cgroup v2 kernel without CFS bandwidth
+        // control): recreate it once without the limit
+        if (!isCpuCfsError(e) || this.system.cpuCfsSupport === false) {
+          throw e;
+        }
+        logger.warn(`Integration ${selector}: kernel without CPU CFS support, recreating without CPU limit`);
+        this.system.cpuCfsSupport = false;
+        const updatedService = await this.getBySelector(selector);
+        const container = await this.createIntegrationContainer(updatedService);
+        await this.system.restartContainer(container.id);
+      }
     } catch (e) {
       logger.warn(`Unable to start integration ${selector}`, e);
       await this.saveStatus(service, SERVICE_STATUS.ERROR);

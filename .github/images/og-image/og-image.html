@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1280px;
+    height: 640px;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #1c2334;
+    position: relative;
+    /* Horizon glass scene: same recipe as the app's default dashboard theme */
+    background-image:
+      radial-gradient(76% 78% at 12% -10%, rgba(126, 166, 233, 0.55), transparent 60%),
+      radial-gradient(62% 72% at 95% 8%, rgba(244, 190, 148, 0.5), transparent 55%),
+      radial-gradient(69% 89% at 85% 100%, rgba(187, 160, 228, 0.42), transparent 60%),
+      radial-gradient(62% 78% at 10% 105%, rgba(150, 212, 195, 0.4), transparent 55%),
+      linear-gradient(160deg, #eef3fb 0%, #eeeaf7 48%, #f7efe6 100%);
+  }
+
+  /* ---------------- Left column ---------------- */
+  .copy {
+    position: absolute;
+    left: 72px;
+    top: 0;
+    height: 640px;
+    width: 560px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .brand img {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    box-shadow: 0 10px 26px rgba(44, 62, 118, 0.18);
+  }
+
+  .brand .name {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: 47px;
+    line-height: 1.14;
+    font-weight: 800;
+    letter-spacing: -0.033em;
+    margin-bottom: 20px;
+  }
+
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, #3d6df0 0%, #7a5af0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  p.sub {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 450;
+    color: #5c6478;
+    max-width: 470px;
+    margin-bottom: 30px;
+  }
+
+  .chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 17px 10px 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 999px;
+    color: #2a3348;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 16px rgba(44, 62, 118, 0.09);
+  }
+
+  .chip svg {
+    width: 18px;
+    height: 18px;
+    stroke: #3d6df0;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ---------------- Right: the v5 dashboard ---------------- */
+  .stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 640px;
+    perspective: 1700px;
+    z-index: 1;
+  }
+
+  .window {
+    position: absolute;
+    left: 656px;
+    top: 50px;
+    width: 950px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    transform: rotateY(-16deg) rotateX(4deg) rotateZ(-1.2deg);
+    transform-origin: left center;
+    box-shadow:
+      0 44px 90px rgba(44, 62, 118, 0.28),
+      0 10px 26px rgba(44, 62, 118, 0.14);
+  }
+
+  .window img {
+    display: block;
+    width: 100%;
+  }
+
+  /* glass sheen over the screenshot */
+  .window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 42%);
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="window">
+      <img src="../gladys-dashboard-en.webp" alt="">
+    </div>
+  </div>
+
+  <div class="copy">
+    <div class="brand">
+      <img src="../../../front/src/assets/icons/android-icon-512x512.png" alt="">
+      <span class="name">Gladys Assistant</span>
+    </div>
+    <h1>A smart home<br>that <em>stays yours.</em></h1>
+    <p class="sub">Open-source, local smart home. Integrations install in one click,
+      and anyone can create one.</p>
+    <div class="chips">
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Open source
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>
+        Self-hosted
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><path d="M12 19h8"/></svg>
+        One Docker command
+      </div>
+    </div>
+  </div>
+</body>
+</html>

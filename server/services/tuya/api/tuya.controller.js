@@ -101,6 +101,7 @@ module.exports = function TuyaController(tuyaManager) {
     },
     'post /api/v1/service/tuya/configuration': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(saveConfiguration),
     },
     'post /api/v1/service/tuya/disconnect': {

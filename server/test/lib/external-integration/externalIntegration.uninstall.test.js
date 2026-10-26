@@ -11,7 +11,7 @@ const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_CONTAINERS_MAN
 describe('externalIntegration.uninstall', () => {
   it('should remove container, devices, variables and the service row', async () => {
     const service = await seedExternalService();
-    const { externalIntegration, system, device, stateManager, variable } = buildSupervisor();
+    const { externalIntegration, system, device, stateManager, variable, event } = buildSupervisor();
     externalIntegration.registerProxyService(service);
     externalIntegration.discoveredDevices.set(service.id, []);
     const connection = { terminate: fake.returns(null) };
@@ -23,6 +23,21 @@ describe('externalIntegration.uninstall', () => {
       external_id: `ext:${service.selector}:test`,
     });
     await variable.setValue('LATITUDE', '48.85', service.id);
+    const calendar = await db.Calendar.create({
+      name: 'Integration calendar',
+      description: '',
+      selector: 'ext-test-integration-calendar',
+      user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      service_id: service.id,
+      external_id: `ext:${service.selector}:john:primary`,
+    });
+    await db.CalendarEvent.create({
+      name: 'Integration event',
+      selector: 'ext-test-integration-event',
+      calendar_id: calendar.id,
+      start: '2026-08-14T09:00:00.000Z',
+      external_id: `ext:${service.selector}:john:uid-1`,
+    });
 
     await externalIntegration.uninstall(service.selector);
 
@@ -31,11 +46,64 @@ describe('externalIntegration.uninstall', () => {
     sinonAssert.calledWith(device.destroy, 'ext-test-device');
     const variables = await db.Variable.findAll({ where: { service_id: service.id } });
     expect(variables).to.have.lengthOf(0);
+    // calendars are removed explicitly, and their events with them
+    const calendars = await db.Calendar.findAll({ where: { service_id: service.id } });
+    expect(calendars).to.have.lengthOf(0);
+    const events = await db.CalendarEvent.findAll({ where: { calendar_id: calendar.id } });
+    expect(events).to.have.lengthOf(0);
+    // and their previous viewers are notified
+    const calendarPushes = event.emit
+      .getCalls()
+      .filter((call) => call.args[0] === 'websocket.send')
+      .filter((call) => call.args[1].type === 'calendar.updated');
+    expect(calendarPushes).to.have.lengthOf(1);
+    expect(calendarPushes[0].args[1].payload).to.deep.equal({
+      calendar_selectors: ['ext-test-integration-calendar'],
+    });
     const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     expect(serviceInDb).to.equal(null);
     expect(stateManager.get('service', service.name)).to.equal(null);
     expect(stateManager.get('serviceById', service.id)).to.equal(null);
     expect(externalIntegration.discoveredDevices.has(service.id)).to.equal(false);
+  });
+
+  it('should keep the private calendars of the uninstalled integration out of the broadcast', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, event } = buildSupervisor();
+    const userId = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
+    await db.Calendar.create({
+      name: 'Shared calendar',
+      description: '',
+      selector: 'ext-test-shared-calendar',
+      user_id: userId,
+      service_id: service.id,
+      shared: true,
+      external_id: `ext:${service.selector}:john:shared`,
+    });
+    await db.Calendar.create({
+      name: 'Private calendar',
+      description: '',
+      selector: 'ext-test-private-calendar',
+      user_id: userId,
+      service_id: service.id,
+      external_id: `ext:${service.selector}:john:private`,
+    });
+
+    await externalIntegration.uninstall(service.selector);
+
+    const updatedCalls = (channel) =>
+      event.emit
+        .getCalls()
+        .filter((call) => call.args[0] === channel)
+        .filter((call) => call.args[1].type === 'calendar.updated');
+    // the shared one goes to everyone, the private one only to its owner
+    const sendAllCalls = updatedCalls('websocket.send-all');
+    expect(sendAllCalls).to.have.lengthOf(1);
+    expect(sendAllCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['ext-test-shared-calendar'] });
+    const sendCalls = updatedCalls('websocket.send');
+    expect(sendCalls).to.have.lengthOf(1);
+    expect(sendCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['ext-test-private-calendar'] });
+    expect(sendCalls[0].args[1].userId).to.equal(userId);
   });
 
   it('should uninstall even when the container cannot be removed', async () => {

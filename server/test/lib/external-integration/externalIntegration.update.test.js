@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const nock = require('nock');
 const sinon = require('sinon').createSandbox();
 
 const { assert: sinonAssert, fake } = sinon;
@@ -18,12 +19,20 @@ describe('externalIntegration.update', () => {
     });
     const newManifest = { ...TEST_MANIFEST, version: '2.0.0', docker_image: 'ghcr.io/john/demo:2.0.0' };
     const { externalIntegration, system } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: newManifest }],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: newManifest,
     });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    const registerProxyService = sinon.spy(externalIntegration, 'registerProxyService');
+    const declareEnergyCalendars = sinon.spy(externalIntegration, 'declareEnergyCalendars');
     const integration = await externalIntegration.update(service.selector);
+    // the proxy is re-registered on the updated row, never left on the
+    // boot-time snapshot of the manifest; the energy calendars follow the new manifest
+    sinonAssert.calledOnce(registerProxyService);
+    expect(registerProxyService.firstCall.args[0].manifest.version).to.equal('2.0.0');
+    sinonAssert.calledOnce(declareEnergyCalendars);
+    expect(declareEnergyCalendars.firstCall.args[0].manifest.version).to.equal('2.0.0');
     expect(integration).to.have.property('version', '2.0.0');
     expect(integration).to.have.property('docker_image', 'ghcr.io/john/demo:2.0.0');
     expect(integration.manifest.version).to.equal('2.0.0');
@@ -35,23 +44,69 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
-  it('should re-download the store index instead of trusting the in-memory cache', async () => {
-    // the index is cached 30 min client-side and rebuilt hourly by the
+  it('should update an integration whose proxy is already registered', async () => {
+    // what really happens in production: init() registered the proxy for every
+    // installed integration at boot, so update() registers it a SECOND time.
+    // The proxy is frozen and stateManager.setState() merges, so this used to
+    // throw "Cannot assign to read only property 'start'" at
+    // registerProxyService() — after the row was rewritten but BEFORE the
+    // container was recreated, leaving the new version in DB and the old image
+    // running.
+    const service = await seedExternalService({
+      store_slug: 'john/gladys-open-meteo-demo',
+      version: '1.2.0',
+    });
+    const newManifest = { ...TEST_MANIFEST, version: '2.0.0', docker_image: 'ghcr.io/john/demo:2.0.0' };
+    const { externalIntegration, system, stateManager } = buildSupervisor();
+    externalIntegration.registerProxyService(service);
+    const bootProxy = stateManager.get('service', service.name);
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: newManifest,
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration).to.have.property('version', '2.0.0');
+    // the container is recreated from the NEW image, which is the whole point
+    // of an update: everything after registerProxyService() must still run
+    sinonAssert.calledWith(system.pull, 'ghcr.io/john/demo:2.0.0');
+    sinonAssert.calledWith(system.removeContainer, 'container-1', { force: true });
+    sinonAssert.called(system.createContainer);
+    expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
+    // and the proxy now closes over the updated row, not the boot snapshot
+    const updatedProxy = stateManager.get('service', service.name);
+    expect(updatedProxy).to.not.equal(bootProxy);
+    expect(stateManager.get('serviceById', service.id)).to.equal(updatedProxy);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should re-download the store entry instead of trusting the in-memory cache', async () => {
+    // the entry is cached 30 min client-side and rebuilt hourly by the
     // indexer: a fresh cache must never hide a release published since
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
     externalIntegration.storeIndex = {
       index_format: 1,
-      integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: TEST_MANIFEST }],
+      integrations: [
+        {
+          store_slug: 'john/gladys-open-meteo-demo',
+          entry_url:
+            'https://integration-store-storage.gladysassistant.com/integrations/john--gladys-open-meteo-demo.json',
+          manifest: { ...TEST_MANIFEST, version: '1.2.0' },
+        },
+      ],
     };
     externalIntegration.storeIndexFetchedAt = Date.now();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: '2.0.0' } }],
-    });
+    externalIntegration.storeEntryCache = {
+      entry: { store_slug: 'john/gladys-open-meteo-demo', manifest: TEST_MANIFEST },
+      fetchedAt: Date.now(),
+    };
+    nock('https://integration-store-storage.gladysassistant.com')
+      .get('/integrations/john--gladys-open-meteo-demo.json')
+      .reply(200, { store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: '2.0.0' } });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
     const integration = await externalIntegration.update(service.selector);
-    sinonAssert.calledOnce(externalIntegration.refreshIndex);
+    expect(nock.isDone()).to.equal(true);
     expect(integration.version).to.equal('2.0.0');
     externalIntegration.clearTimers(service.id);
   });
@@ -62,9 +117,9 @@ describe('externalIntegration.update', () => {
     // (the source the indexer mirrors) already has the new one
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration, system } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: TEST_MANIFEST }],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: TEST_MANIFEST,
     });
     externalIntegration.fetchManifestFromRepo = fake.resolves({
       ...TEST_MANIFEST,
@@ -91,14 +146,9 @@ describe('externalIntegration.update', () => {
     pullStub.withArgs('ghcr.io/john/gladys-open-meteo-demo:1.4.0').rejects(new Error('NO_MATCHING_MANIFEST'));
     pullStub.resolves(true);
     const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [
-        {
-          store_slug: 'john/gladys-open-meteo-demo',
-          manifest: { ...TEST_MANIFEST, version: '1.3.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0' },
-        },
-      ],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '1.3.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0' },
     });
     externalIntegration.fetchManifestFromRepo = fake.resolves({
       ...TEST_MANIFEST,
@@ -119,7 +169,7 @@ describe('externalIntegration.update', () => {
     pullStub.withArgs('ghcr.io/john/gladys-open-meteo-demo:1.4.0').rejects(new Error('NO_MATCHING_MANIFEST'));
     pullStub.resolves(true);
     const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
-    externalIntegration.getIndex = fake.resolves(null);
+    externalIntegration.getStoreEntry = fake.resolves(null);
     externalIntegration.fetchManifestFromRepo = fake.resolves({
       ...TEST_MANIFEST,
       version: '1.4.0',
@@ -137,11 +187,9 @@ describe('externalIntegration.update', () => {
     // make the button throw a 422 in the user's face
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [
-        { store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: 'not-semver' } },
-      ],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: 'not-semver' },
     });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
     const integration = await externalIntegration.update(service.selector);
@@ -152,7 +200,7 @@ describe('externalIntegration.update', () => {
   it('should update from the repo when the index cannot be read at all', async () => {
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.getIndex = fake.rejects(new Error('CACHE_UNREADABLE'));
+    externalIntegration.getStoreEntry = fake.rejects(new Error('STORE_UNREACHABLE'));
     externalIntegration.fetchManifestFromRepo = fake.resolves({ ...TEST_MANIFEST, version: '3.0.0' });
     const integration = await externalIntegration.update(service.selector);
     expect(integration.version).to.equal('3.0.0');
@@ -164,11 +212,9 @@ describe('externalIntegration.update', () => {
     // manifest read from the repo
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [
-        { store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: 'not-semver' } },
-      ],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: 'not-semver' },
     });
     externalIntegration.fetchManifestFromRepo = fake.resolves({ ...TEST_MANIFEST, version: '1.3.0' });
     const integration = await externalIntegration.update(service.selector);
@@ -179,9 +225,9 @@ describe('externalIntegration.update', () => {
   it('should ignore a non-semver version published by the repo', async () => {
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: '2.0.0' } }],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '2.0.0' },
     });
     externalIntegration.fetchManifestFromRepo = fake.resolves({ ...TEST_MANIFEST, version: 'not-semver' });
     const integration = await externalIntegration.update(service.selector);
@@ -194,9 +240,9 @@ describe('externalIntegration.update', () => {
     // behind the indexed one, the highest version always wins
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: '2.0.0' } }],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '2.0.0' },
     });
     externalIntegration.fetchManifestFromRepo = fake.resolves({ ...TEST_MANIFEST, version: '1.1.0' });
     const integration = await externalIntegration.update(service.selector);
@@ -224,7 +270,7 @@ describe('externalIntegration.update', () => {
         imageExists: fake.resolves(true),
       },
     });
-    externalIntegration.getIndex = fake.resolves(null);
+    externalIntegration.getStoreEntry = fake.resolves(null);
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
     try {
       await externalIntegration.update(service.selector);
@@ -337,7 +383,7 @@ describe('externalIntegration.update', () => {
   it('should fetch the manifest directly from the repo when absent from the index', async () => {
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo' });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.getIndex = fake.resolves(null);
+    externalIntegration.getStoreEntry = fake.resolves(null);
     externalIntegration.fetchManifestFromRepo = fake.resolves({ ...TEST_MANIFEST, version: '3.0.0' });
     const integration = await externalIntegration.update(service.selector);
     expect(integration.version).to.equal('3.0.0');
@@ -350,7 +396,7 @@ describe('externalIntegration.update', () => {
   it('should fall back to the stored manifest when the repo is unreachable', async () => {
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo' });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.getIndex = fake.resolves(null);
+    externalIntegration.getStoreEntry = fake.resolves(null);
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
     const integration = await externalIntegration.update(service.selector);
     expect(integration.version).to.equal('1.2.0');
@@ -424,14 +470,9 @@ describe('externalIntegration.update', () => {
   it('should remove the images of the replaced version once the new one runs', async () => {
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration, system } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [
-        {
-          store_slug: 'john/gladys-open-meteo-demo',
-          manifest: { ...TEST_MANIFEST, version: '2.0.0', docker_image: 'ghcr.io/john/demo:2.0.0' },
-        },
-      ],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '2.0.0', docker_image: 'ghcr.io/john/demo:2.0.0' },
     });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
 
@@ -447,20 +488,15 @@ describe('externalIntegration.update', () => {
       manifest: TEST_CONTAINERS_MANIFEST,
     });
     const { externalIntegration, system } = buildSupervisor();
-    externalIntegration.refreshIndex = fake.resolves({
-      index_format: 1,
-      integrations: [
-        {
-          store_slug: 'john/gladys-frigate',
-          manifest: {
-            ...TEST_CONTAINERS_MANIFEST,
-            version: '2.0.0',
-            docker_image: 'ghcr.io/john/demo:2.0.0',
-            // the Frigate sub-container is dropped, Mosquitto is kept as-is
-            containers: [TEST_CONTAINERS_MANIFEST.containers[0]],
-          },
-        },
-      ],
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-frigate',
+      manifest: {
+        ...TEST_CONTAINERS_MANIFEST,
+        version: '2.0.0',
+        docker_image: 'ghcr.io/john/demo:2.0.0',
+        // the Frigate sub-container is dropped, Mosquitto is kept as-is
+        containers: [TEST_CONTAINERS_MANIFEST.containers[0]],
+      },
     });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
 

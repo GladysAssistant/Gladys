@@ -1,22 +1,6 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
 const cloneDeep = require('lodash.clonedeep');
-const {
-  create,
-  addDependencies,
-  divideDependencies,
-  evaluateDependencies,
-  largerDependencies,
-  largerEqDependencies,
-  modDependencies,
-  multiplyDependencies,
-  roundDependencies,
-  smallerDependencies,
-  smallerEqDependencies,
-  subtractDependencies,
-  unaryMinusDependencies,
-  randomDependencies,
-} = require('mathjs');
 const set = require('set-value');
 const get = require('get-value');
 const dayjs = require('dayjs');
@@ -25,34 +9,15 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { AbortScene, SceneStopped } = require('../../utils/coreErrors');
+const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
 const executeActionsFactory = require('./scene.executeActions');
+const { evaluate } = require('./scene.formula');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
-// Every operator the formula engine supports must be listed explicitly here.
-// mathjs only exposes in the "math" namespace what is passed to create(), so an operator
-// that is only pulled in transitively by another factory (multiply through divide, for example)
-// is not guaranteed to stay available across mathjs releases.
-const { evaluate } = create({
-  addDependencies,
-  divideDependencies,
-  evaluateDependencies,
-  largerDependencies,
-  smallerDependencies,
-  largerEqDependencies,
-  modDependencies,
-  multiplyDependencies,
-  smallerEqDependencies,
-  subtractDependencies,
-  unaryMinusDependencies,
-  roundDependencies,
-  randomDependencies,
-});
 
 // Formats of the "date" variable of the "get date" action, by precision.
 // The date/time is truncated to the chosen precision, so a scene displaying "it's 14:30"
@@ -129,14 +94,25 @@ const actionsFunc = {
     }
 
     if (action.evaluate_value !== undefined) {
-      value = evaluate(
-        Handlebars.compile(action.evaluate_value, {
-          noEscape: true,
-        })(scope).replace(/\s/g, ''),
-      );
+      // A formula which cannot be evaluated (unknown function, wrong number of arguments)
+      // must not let the scene continue with the previous value: like the other formula
+      // actions, we abort the scene.
+      try {
+        value = evaluate(
+          Handlebars.compile(action.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Device set value: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
     }
 
-    if (Number.isNaN(Number(value))) {
+    // Infinity is rejected like NaN: a formula can overflow to it (exp(1000)) or reach it
+    // through a logarithm of zero (log(0)), and a device cannot be set to an infinite value.
+    if (!Number.isFinite(Number(value))) {
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
 
@@ -301,7 +277,10 @@ const actionsFunc = {
       }
     }
 
-    if (Number.isNaN(Number(value))) {
+    // Infinity is rejected like NaN: a formula can overflow to it (exp(1000)) or reach it
+    // through a logarithm of zero (log(0)), and Node fires a timer of an infinite delay after
+    // 1 ms, so the wait would be silently skipped instead of failing the scene.
+    if (!Number.isFinite(Number(value))) {
       logger.warn(`Delay: Value is not a number: ${value}`);
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
@@ -404,13 +383,24 @@ const actionsFunc = {
       },
       language: user.language,
       text: textWithVariables,
+      // where the answer is delivered, like the "send message" actions: the
+      // Gladys conversation only, a single channel, or — without a `service`
+      // on the action — every channel of the user, the historical behaviour.
+      // Read by message.reply, never sent to the chat API.
+      service: action.service || null,
     };
-    const { answer } = await self.gateway.forwardMessageToAiChat({
+    const result = await self.gateway.forwardMessageToAiChat({
       message,
       image,
       context: {},
     });
-    set(scope, path, { answer }, { merge: true });
+    // the chat loop resolves null when the request failed (provider down or
+    // timed out, no usable answer): the user already got the failure reply,
+    // the scene stops here with an explicit reason instead of a TypeError
+    if (result === null) {
+      throw new AbortScene('AI_REQUEST_FAILED');
+    }
+    set(scope, path, { answer: result.answer }, { merge: true });
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, path) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
@@ -521,9 +511,12 @@ const actionsFunc = {
         }
       }
 
-      // For numeric comparison operators (>, >=, <, <=), value must be a number
+      // For numeric comparison operators (>, >=, <, <=), value must be a number.
+      // Infinity is rejected like NaN, as in the three other formula actions: a formula
+      // overflowing to it (exp(1000)) or reaching it through log(0) would otherwise make
+      // the comparison silently always true or always false instead of failing the scene.
       const numericOperators = ['>', '>=', '<', '<='];
-      if (numericOperators.includes(condition.operator) && Number.isNaN(Number(value))) {
+      if (numericOperators.includes(condition.operator) && !Number.isFinite(Number(value))) {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
 
@@ -887,6 +880,24 @@ const actionsFunc = {
       throw new AbortScene(e.message);
     }
   },
+  [ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE]: async (self, action) => {
+    // current unit price of the contract (spec 8.2) compared with the threshold; an
+    // unknown price (null, spec 7.7) never validates the condition
+    const threshold = parseFloat(action.value);
+    if (Number.isNaN(threshold)) {
+      throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
+    }
+    let current;
+    try {
+      current = await self.energyContract.getCurrent(action.energy_contract);
+    } catch (e) {
+      // a contract that cannot be read (deleted, integration down) never validates
+      throw new AbortScene(e.message);
+    }
+    if (current.price === null || !compare(action.operator, current.price, threshold)) {
+      throw new AbortScene('ENERGY_PRICE_CONDITION_NOT_MET');
+    }
+  },
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
     const house = await self.house.getBySelector(action.house);
     if (house.alarm_mode !== action.alarm_mode) {
@@ -929,6 +940,30 @@ const actionsFunc = {
       zigbee2mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
+  [ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION]: async (self, action, scope, path) => {
+    // the proxy service of the integration, registered under its selector in
+    // the stateManager (the exact path mqtt.send takes). Absent = uninstalled;
+    // without a scene capability = a manifest declaring no scene_actions.
+    const integrationService = self.service.getService(action.integration);
+    if (!integrationService) {
+      throw new NotFoundError(`EXTERNAL_INTEGRATION_NOT_FOUND: ${action.integration}`);
+    }
+    // every external integration carries the scene capability; a selector
+    // pointing at a core service does not
+    if (!integrationService.scene || typeof integrationService.scene.runAction !== 'function') {
+      throw new NotFoundError(`SCENE_ACTION_NOT_DECLARED: ${action.integration} exposes no scene action`);
+    }
+    // the stored fields travel untouched; the supervisor renders the declared
+    // string fields through this callback, bound to the scope of the scene
+    const render = (value) =>
+      Handlebars.compile(value, {
+        noEscape: true,
+      })(scope);
+    const outputs = await integrationService.scene.runAction(action.action_key, action.fields || {}, { render });
+    // replaced, never merged: an action running again at the same path (a
+    // loop) must not leave the outputs of a previous run behind
+    set(scope, path, outputs);
+  },
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: async (self, action, scope) => {
     // Get device
     const device = self.stateManager.get('device', action.device);
@@ -939,10 +974,45 @@ const actionsFunc = {
     );
     // replace variable in text
     const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
-    // Get TTS URL
-    const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
+
+    let { volume } = action;
+
+    // The volume can also be a formula based on scene variables, so an announcement can be
+    // played quieter in the evening for example.
+    if (action.evaluate_volume !== undefined) {
+      try {
+        volume = evaluate(
+          Handlebars.compile(action.evaluate_volume, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Play notification: Error evaluating volume: ${action.evaluate_volume}`);
+        logger.warn(e);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
+      // mathjs can return something which is not a usable number: a string, a matrix, or
+      // Infinity when the formula overflows. The speaker services expect a real number.
+      if (typeof volume !== 'number' || !Number.isFinite(volume)) {
+        logger.warn(`Play notification: Volume is not a number: ${volume}`);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
+      // The volume is a percentage: a formula going out of bounds is clamped instead of
+      // being sent as-is to the speaker.
+      volume = Math.min(100, Math.max(0, Math.round(volume)));
+    }
+
+    // Get the TTS URL from the active provider (Gladys Plus by default, or
+    // any TTS provider integration — see gladys.tts)
+    const { url } = await self.tts.getSpeechUrl({ text: messageWithVariables });
     // Play TTS Notification on device
-    await self.device.setValue(device, deviceFeature, url, { volume: action.volume });
+    await self.device.setValue(device, deviceFeature, url, { volume });
+  },
+  [ACTIONS.MUSIC.PLAY_MEDIA]: async (self, action) => {
+    // the media id is opaque to the core and flows back to the integration that
+    // produced it (capabilities/music.md, section 7); a stopped or refusing
+    // integration makes the action throw, the scene framework logs it
+    await self.device.music.play(action.device, action.media, action.mode);
   },
   [ACTIONS.SMS.SEND]: async (self, action, scope) => {
     const freeMobileService = self.service.getService('free-mobile');

@@ -82,6 +82,23 @@ class Dashboard extends Component {
     }
   };
 
+  // Gladys Plus: without recovery codes, a user who loses their two-factor app
+  // is locked out of their account. The banner stays on the dashboard until
+  // the Gateway reports a set of codes for this user: fetched on every mount,
+  // so it is gone as soon as the user comes back from generating them.
+  getGatewayRecoveryCodesState = async () => {
+    if (!this.state.isGladysPlus) {
+      return;
+    }
+    try {
+      const gatewayUser = await this.props.session.getGatewayUser();
+      // strict check: a Gateway that does not return the field shows nothing
+      this.setState({ gatewayRecoveryCodesMissing: gatewayUser.has_recovery_codes === false });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   jobUpdated = payload => {
     const { duckDbMigrationJob } = this.state;
     if (payload.id === duckDbMigrationJob.id) {
@@ -102,12 +119,13 @@ class Dashboard extends Component {
       // alone cannot catch a route change to a DIFFERENT dashboard
       const stillCurrent = currentDashboard && this.state.currentDashboardSelector === selector;
       this.setState({
-        ...(stillCurrent ? { currentDashboard } : {}),
+        ...(stillCurrent ? { currentDashboard, currentDashboardLoadFailed: false } : {}),
         loading: false
       });
     } catch (e) {
       this.setState({
-        loading: false
+        loading: false,
+        currentDashboardLoadFailed: true
       });
       console.error(e);
     }
@@ -282,6 +300,9 @@ class Dashboard extends Component {
       dashboardEditMode: false,
       showReorderDashboard: false,
       browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
+      // the page always starts by fetching the dashboard list
+      loading: true,
+      currentDashboardLoadFailed: false,
       dashboards: [],
       dashboardConfigsBySelector: {},
       newSelectedBoxType: {},
@@ -291,6 +312,7 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.init();
+    this.getGatewayRecoveryCodesState();
     document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
@@ -374,7 +396,9 @@ class Dashboard extends Component {
       currentDashboardSelector,
       dashboardEditMode,
       gatewayInstanceNotFound,
+      gatewayRecoveryCodesMissing,
       loading,
+      currentDashboardLoadFailed,
       browserFullScreenCompatible,
       duckDbMigrationJob
     }
@@ -384,7 +408,17 @@ class Dashboard extends Component {
       currentDashboard.boxes &&
       currentDashboard.boxes.some(section => section.columns && section.columns.some(column => column.length > 0));
     const dashboardListEmpty = !(dashboards && dashboards.length > 0);
-    const dashboardNotConfigured = !dashboardConfigured;
+    // "Not configured" means the current dashboard is KNOWN to have no
+    // widget — not "its configuration hasn't arrived yet". On first load the
+    // list and then the configuration are fetched behind the loading dimmer:
+    // during that time nothing is known, and the first-run checklist must
+    // not show through the dimmer only to vanish when the real dashboard
+    // lands. The state is known once nothing is loading AND either there is
+    // no dashboard to fetch (empty list), or the fetch settled (config here,
+    // or failed).
+    const currentDashboardResolved =
+      !loading && (dashboardListEmpty || Boolean(currentDashboard) || currentDashboardLoadFailed);
+    const dashboardNotConfigured = currentDashboardResolved && !dashboardConfigured;
     if (props.gatewayAccountExpired === true) {
       return <GatewayAccountExpired />;
     }
@@ -400,6 +434,7 @@ class Dashboard extends Component {
         currentDashboard={currentDashboard}
         currentDashboardSelector={currentDashboardSelector}
         gatewayInstanceNotFound={gatewayInstanceNotFound}
+        gatewayRecoveryCodesMissing={gatewayRecoveryCodesMissing}
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
         browserFullScreenCompatible={browserFullScreenCompatible}

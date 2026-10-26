@@ -1,0 +1,77 @@
+/* Electricity price widget: a compact stat card — the title row with the
+   tier as a pill, the price as the figure, the next change under it. Light
+   colors only, the app-wide dark mode inversion handles the rest. */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tierBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+.price {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--gl-ink, #1c2334);
+  margin-bottom: 0.25rem;
+}
+
+.unknownPrice {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 0.25rem;
+}
+
+.muted {
+  font-size: 0.875rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+/* Service unreachable: a quiet tinted notice, not a shouting alert */
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 14px;
+  background-color: #fbe3de;
+  color: #c24a33;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.errorState .fe {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}

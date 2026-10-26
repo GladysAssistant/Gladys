@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { assertNotReservedExternalId } = require('./calendar.reservedExternalId');
 
 /**
  * @description Create a calendar.
@@ -12,6 +13,8 @@ const db = require('../../models');
  * })
  */
 async function create(calendar) {
+  // the external integrations write through upsertCalendars, never here
+  assertNotReservedExternalId(calendar.external_id);
   const createdCalendar = await db.Calendar.create(calendar);
   return createdCalendar.get({ plain: true });
 }

@@ -4,6 +4,7 @@ const path = require('path');
 const fse = require('fs-extra');
 
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 
@@ -16,13 +17,20 @@ const sleep = promisify(setTimeout);
  * await z2m.installMqttContainer(config);
  */
 async function installMqttContainer(config) {
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
-  let [container] = dockerContainers;
+  let container;
+  try {
+    // Throws if the name is taken by a container that is not ours: it is never adopted
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  } catch (e) {
+    this.mqttExist = false;
+    // Shown as is by the setup page, so the user reads which container to rename
+    this.z2mContainerError = { code: null, message: e.message };
+    logger.error('MQTT broker: failed to look up its Docker container:', e);
+    this.emitStatusEvent();
+    throw e;
+  }
 
-  if (dockerContainers.length === 0) {
+  if (!container) {
     let containerMqtt;
     try {
       logger.info('MQTT broker is being installed as Docker container...');
@@ -99,11 +107,6 @@ async function installMqttContainer(config) {
   } else {
     this.mqttExist = true;
     try {
-      dockerContainers = await this.gladys.system.getContainers({
-        all: true,
-        filters: { name: [containerDescriptor.name] },
-      });
-      [container] = dockerContainers;
       if (container.state !== 'running') {
         logger.info('MQTT broker is starting...');
         await this.gladys.system.restartContainer(container.id);

@@ -76,9 +76,17 @@ class TextWithVariablesInjected extends Component {
       }
     });
 
-    // Triggers variables
+    // Triggers variables. Several triggers of a scene all resolve to the single
+    // trigger event that fired, so a variable name declared by several triggers
+    // (the same integration event bound twice with different filters) is
+    // listed once, under the first trigger declaring it.
+    const seenTriggerVariables = new Set();
     nextProps.triggersVariables.forEach((triggerVariables, index) => {
       triggerVariables.forEach(triggerVariable => {
+        if (seenTriggerVariables.has(triggerVariable.name)) {
+          return;
+        }
+        seenTriggerVariables.add(triggerVariable.name);
         if (triggerVariable.ready && variableReady === null) {
           variableReady = true;
         }
