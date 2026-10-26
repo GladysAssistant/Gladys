@@ -52,7 +52,8 @@ const prefersReducedMotion = () => {
   return reducedMotionQuery.matches;
 };
 
-// The step a setpoint is set in, from the widget's + and − buttons.
+// The step a setpoint is set in, from the widget's + and − buttons, in the unit
+// the gauge is drawn in.
 const SETPOINT_STEP = 0.5;
 
 /**
@@ -131,6 +132,7 @@ const CircularGauge = ({
   isActive,
   isWindowOpen,
   tempUnit,
+  step = SETPOINT_STEP,
   a11yLabels = {}
 }) => {
   const cx = 110;
@@ -155,7 +157,11 @@ const CircularGauge = ({
   // On its way, the number counts in the step a setpoint is set in: 21.1 to
   // 21.4 on one + tap, and forty tenths on a preset change, were values the user
   // can never set. The arc and the knob glide; the number lands on the target.
-  const displayed = setpoint === targetSetpoint ? setpoint : Math.round(setpoint / SETPOINT_STEP) * SETPOINT_STEP;
+  // The steps are counted back from the target rather than from zero: a 0.5 °C
+  // step drawn in °F is 0.9 °F, whose multiples (70.2, 71.1) are not the values
+  // the user sets either, and the count started backwards (70.7 → 70.5 → 71.0).
+  const displayed =
+    setpoint === targetSetpoint ? setpoint : targetSetpoint + Math.round((setpoint - targetSetpoint) / step) * step;
   const roundedSetpoint = Math.round(displayed * 10) / 10;
   const truncated = Math.trunc(roundedSetpoint);
   const decPart = Math.round(Math.abs(roundedSetpoint - truncated) * 10);

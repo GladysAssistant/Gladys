@@ -970,7 +970,13 @@ class ThermostatBox extends Component {
       this.setState({ setpoint: this.toSetpointFeatureUnit(scheduledTemp) });
     }
     this.applyFallbackSetpoint();
-    this.setState({ setpointLoaded: true });
+    if (!this.state.setpointLoaded) {
+      // The corrections above, and getDeviceData's, are drawn first, still jumping: set
+      // in the same turn, the flag was flushed in the same render, and the gauge glided
+      // 21 → 70 on a °F feature all the same.
+      await new Promise(resolve => this.setState({}, resolve));
+      this.setState({ setpointLoaded: true });
+    }
   };
 
   // A thermostat that has never been driven has no setpoint anywhere: its
@@ -1402,6 +1408,7 @@ class ThermostatBox extends Component {
                     isActive={showActive}
                     isWindowOpen={isWindowOpen}
                     tempUnit={tempUnit}
+                    step={this.needsFahrenheitConversion() ? 0.9 : 0.5}
                     a11yLabels={a11yLabels}
                   />
                 </div>
