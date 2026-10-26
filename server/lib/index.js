@@ -186,6 +186,10 @@ function Gladys(params = {}) {
 
       await system.init();
 
+      // before the server listens: access tokens of tablets locked before a
+      // restart must stay restricted to the alarm
+      await session.init();
+
       // this should be before device.init
       if (!params.disableJobInit) {
         await job.init();
