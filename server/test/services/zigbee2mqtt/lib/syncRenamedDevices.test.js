@@ -142,6 +142,14 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     ]);
   });
 
+  it('should remember the last inventory received from Zigbee2mqtt', async () => {
+    const inventory = [{ friendly_name: 'old-name', ieee_address: '0x00158d00045b2740', type: 'Router' }];
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices(inventory);
+    // ASSERT
+    expect(zigbee2mqttManager.lastBridgeDevices).to.equal(inventory);
+  });
+
   it('should not rename a device without stored IEEE address', async () => {
     const gladysDevice = buildGladysDevice();
     delete gladysDevice.params;

@@ -271,6 +271,9 @@ async function reconcileDevices(manager, z2mDevices) {
  * await zigbee2mqttManager.syncRenamedDevices(devices);
  */
 async function syncRenamedDevices(z2mDevices) {
+  // Kept so that deleting the Gladys device blocking a rename can apply it right away (postDelete)
+  this.lastBridgeDevices = z2mDevices;
+
   // MQTT messages are handled without being awaited, so two "bridge/devices" messages can
   // overlap: running both would plan the same renames from the same DB snapshot and fight
   // over the same rows. The newer inventory is not dropped though, it supersedes any other
