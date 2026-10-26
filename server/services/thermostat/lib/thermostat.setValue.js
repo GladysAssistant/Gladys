@@ -105,6 +105,23 @@ async function writeSetpoint(device, deviceFeature, value) {
 }
 
 /**
+ * @description When a programme's next point falls, read in the Gladys timezone.
+ * A schedule's points are wall-clock times in the house (C.1), so the next one
+ * has to be found there — not in the timezone the process happens to run in,
+ * which is UTC in the official image. Reading them there put the expiry two
+ * hours off in Paris, and on the wrong point entirely across midnight.
+ * @param {Array} transitions - The programme's points.
+ * @returns {Promise<number|null>} The timestamp of the next point, or null with no point.
+ * @example
+ * await nextPointTimestamp.call(this, link.transitions);
+ */
+async function nextPointTimestamp(transitions) {
+  const timezone =
+    (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
+  return nextTransitionTimestamp(transitions, new Date(), timezone);
+}
+
+/**
  * @description When a manual hold ends, or null when it is permanent.
  *
  * A hold expires only on a thermostat that follows a schedule: that is the only
@@ -132,14 +149,7 @@ async function holdExpiry(device) {
   if (configuredDuration !== null) {
     return Date.now() + configuredDuration * 60 * 1000;
   }
-  // A schedule's points are wall-clock times in the house (C.1), so the next one
-  // has to be found in the Gladys timezone — not in the one the process happens
-  // to run in, which is UTC in the official image. Reading them there put the
-  // expiry two hours off in Paris, and on the wrong point entirely across
-  // midnight.
-  const timezone =
-    (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
-  const nextTransition = nextTransitionTimestamp(link.transitions, new Date(), timezone);
+  const nextTransition = await nextPointTimestamp.call(this, link.transitions);
   if (nextTransition !== null) {
     return nextTransition;
   }
@@ -249,4 +259,4 @@ async function setValue(device, deviceFeature, value, manual = true) {
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry, presetHoldSetpoint };
+module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint };

@@ -792,6 +792,25 @@
         "scheduleLabel": "Zeitplan:",
         "scheduleUntil": "bis",
         "manualUntil": "bis",
+        "untilTomorrow": "morgen",
+        "untilDays": {
+          "0": "Montag",
+          "1": "Dienstag",
+          "2": "Mittwoch",
+          "3": "Donnerstag",
+          "4": "Freitag",
+          "5": "Samstag",
+          "6": "Sonntag"
+        },
+        "untilNextDays": {
+          "0": "nächsten Montag",
+          "1": "nächsten Dienstag",
+          "2": "nächsten Mittwoch",
+          "3": "nächsten Donnerstag",
+          "4": "nächsten Freitag",
+          "5": "nächsten Samstag",
+          "6": "nächsten Sonntag"
+        },
         "cancelManual": "Manuellen Modus beenden",
         "windowOpen": "Fenster offen — Heizung ausgesetzt",
         "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
