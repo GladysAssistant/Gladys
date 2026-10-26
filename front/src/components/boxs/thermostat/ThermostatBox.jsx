@@ -825,11 +825,24 @@ class ThermostatBox extends Component {
     await this.loadSchedule();
     await this.loadConfig();
     const { activePreset } = this.loadMode();
-    this.setState({ activePreset });
+    // Every setpoint was dropped since the tap, the server's own included: it
+    // lands within a second or two, so the card kept the held 20 °C under
+    // "Comfort" until a reload (forum 11074). The point's setpoint is shown now,
+    // and only the value it writes lifts the hold — or nothing, on a point that
+    // writes none.
+    const preset = this.getPresets().find(candidate => candidate.key === activePreset);
+    if (preset && preset.temp !== null && preset.temp !== undefined) {
+      const setpoint = this.toSetpointFeatureUnit(preset.temp);
+      this.holdSetpointUntilApplied(setpoint);
+      this.setState({ activePreset, setpoint });
+    } else {
+      this.releaseSetpointHold();
+      this.setState({ activePreset });
+    }
   };
 
   // Ignore incoming device setpoints until the one we are about to apply lands.
-  // Passing no value holds every value until applyPlanningPreset knows the target.
+  // Passing no value holds every value until the target is known.
   holdSetpointUntilApplied = (value = undefined) => {
     this.expectedSetpoint = value === undefined ? HOLD_ANY_SETPOINT : value;
     if (this.expectedSetpointTimer) {
@@ -1467,8 +1480,14 @@ class ThermostatBox extends Component {
                 // required detaching the programme on the integration page.
                 // A setpoint set by hand on a preset's temperature shows as
                 // that preset, on the bar and in the banner alike.
+                // Not over an Off point, though: no preset is in force there, so a
+                // unit switched on from its remote at Comfort's 21 °C read as
+                // "Comfort until…" although it holds over the programme's Off
+                // (forum 11074). It is a manual setpoint, and says so.
                 const matchedPreset =
-                  manualSetpointOverride && !this.isStopped() ? this.presetMatchingSetpoint(setpoint) : null;
+                  manualSetpointOverride && !this.isStopped() && activePreset !== 'off'
+                    ? this.presetMatchingSetpoint(setpoint)
+                    : null;
                 const banner = (() => {
                   // The window banner above already says what the thermostat
                   // is doing, and it replaces this one.
