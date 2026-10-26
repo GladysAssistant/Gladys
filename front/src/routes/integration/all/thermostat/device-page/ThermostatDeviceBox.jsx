@@ -92,8 +92,15 @@ class ThermostatDeviceBox extends Component {
     // A pilot-wire heater regulating itself takes no setpoint: its presets send
     // orders, and its form hides the temperatures. The card read "Setpoint
     // 21 °C" all the same, from the feature it keeps as any thermostat does.
-    const typeParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TYPE');
-    const heaterRegulated = !!typeParam && typeParam.value === 'pilot-wire';
+    // Read as the server does: any pilot-wire heater but a virtual thermostat
+    // with a room sensor — a real one given a wire in the early versions too.
+    const paramValue = name => {
+      const param = (device.params || []).find(p => p.name === name);
+      return param && param.value ? param.value : null;
+    };
+    const heaterRegulated =
+      !!paramValue('THERMOSTAT_PILOT_WIRE_FEATURE') &&
+      !((paramValue('THERMOSTAT_TYPE') || 'virtual') === 'virtual' && paramValue('THERMOSTAT_TEMPERATURE_FEATURE'));
     const unitParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TEMP_UNIT');
     // The real device declares the unit it works in, and it is the one the value
     // read above is expressed in: a celsius thermostat pointing at a fahrenheit

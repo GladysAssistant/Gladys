@@ -108,6 +108,18 @@ describe('thermostat.state isStopped', () => {
   });
 });
 
+describe('thermostat.state isModuleStop', () => {
+  it('should read a stop pressed on the module', () => {
+    expect(state.isModuleStop({ params: [{ name: state.MODULE_STOP_PARAM, value: 'true' }] })).to.equal(true);
+  });
+
+  it('should read a stop made from Gladys, or a mark cleared since, as no module stop', () => {
+    expect(state.isModuleStop({ params: [{ name: state.MODULE_STOP_PARAM, value: '' }] })).to.equal(false);
+    expect(state.isModuleStop({ params: [] })).to.equal(false);
+    expect(state.isModuleStop({})).to.equal(false);
+  });
+});
+
 describe('thermostat.state isScheduleStop', () => {
   it('should read a stop the programme made', () => {
     expect(state.isScheduleStop({ params: [{ name: state.SCHEDULE_STOP_PARAM, value: 'true' }] })).to.equal(true);

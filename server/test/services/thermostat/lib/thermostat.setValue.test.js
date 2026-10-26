@@ -23,11 +23,13 @@ const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 // thermostat that follows none, whose hold is permanent.
 // Cleared in the database, which the scheduleDevice tests exercise for real.
 const clearScheduleStop = fake.resolves(null);
+const clearModuleStop = fake.resolves(null);
 
 const load = (follows = true) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
     './thermostat.scheduleDevice': {
       clearScheduleStop,
+      clearModuleStop,
       followsSchedule: fake.resolves(follows),
       getScheduleOfDevice: fake.resolves(
         follows ? { transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }] } : null,
@@ -516,6 +518,17 @@ describe('thermostat.setValue', () => {
       await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
 
       assert.calledOnceWithExactly(clearScheduleStop, 'device-id');
+    });
+
+    it("should make a stop pressed on the module the writer's own", async () => {
+      // A start or a stop from the widget is no longer the module's: a report
+      // of the module must not lift a stop made from Gladys (C.1.1).
+      const handler = buildHandler();
+      clearModuleStop.resetHistory();
+
+      await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
+
+      assert.calledOnceWithExactly(clearModuleStop, 'device-id');
     });
   });
 

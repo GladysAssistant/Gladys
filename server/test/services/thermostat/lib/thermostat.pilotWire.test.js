@@ -59,7 +59,7 @@ const presetFeature = (preset) => ({
   last_value: THERMOSTAT_PRESET[preset.toUpperCase()],
 });
 
-const buildGladys = ({ order = PILOT_WIRE_MODE.OFF, windowOpen = false, temp = 18 } = {}) => {
+const buildGladys = ({ order = PILOT_WIRE_MODE.OFF, windowOpen = false, temp = 18, supported = undefined } = {}) => {
   const setValue = fake.resolves(null);
   return {
     device: {
@@ -67,7 +67,10 @@ const buildGladys = ({ order = PILOT_WIRE_MODE.OFF, windowOpen = false, temp = 1
         const selector = query && query.device_feature_selectors;
         if (selector === 'heater-pilot-wire') {
           return Promise.resolve([
-            { selector: 'heater', features: [{ selector: 'heater-pilot-wire', last_value: order }] },
+            {
+              selector: 'heater',
+              features: [{ selector: 'heater-pilot-wire', last_value: order, supported_options: supported }],
+            },
           ]);
         }
         if (selector === 'window-sensor') {
@@ -203,6 +206,53 @@ describe('thermostat pilot wire', () => {
     await regulate(mod, gladys, pilotWireDevice('comfort', { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
+  });
+
+  // Stopped, the heater carries off: frost protection would only raise it,
+  // then the closing drop it back to off.
+  it('should keep a stopped heater on off when a window opens', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, windowOpen: true });
+    const stopped = pilotWireDevice('comfort', { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' });
+    stopped.features.push({
+      selector: 'living-room-mode',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+      last_value: THERMOSTAT_MODE.OFF,
+    });
+
+    await regulate(mod, gladys, stopped);
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.OFF);
+  });
+
+  // A module that cannot hold frost protection would otherwise be left on the
+  // comfort it carries, window open.
+  it('should send off to a module that takes no frost protection when a window opens', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({
+      order: PILOT_WIRE_MODE.COMFORT,
+      windowOpen: true,
+      supported: [PILOT_WIRE_MODE.OFF, PILOT_WIRE_MODE.ECO, PILOT_WIRE_MODE.COMFORT].map((value) => ({ value })),
+    });
+
+    await regulate(mod, gladys, pilotWireDevice('comfort', { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.OFF);
+  });
+
+  it('should send off above the setpoint to a module that takes no frost protection', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({
+      order: PILOT_WIRE_MODE.COMFORT,
+      temp: 24,
+      supported: [PILOT_WIRE_MODE.OFF, PILOT_WIRE_MODE.ECO, PILOT_WIRE_MODE.COMFORT].map((value) => ({ value })),
+    });
+
+    await regulate(mod, gladys, pilotWireDevice('comfort', gladysRegulates));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.OFF);
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
 
   it('should still stop the heater with off when it is stopped', async () => {

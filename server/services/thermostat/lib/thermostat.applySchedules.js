@@ -896,10 +896,18 @@ async function regulateDevice(
           // supply: the wire is a command line, not the power feed. Frost
           // protection rather than off, as the external path writes the frost
           // setpoint: off also turns the heater's own frost guard off, for a
-          // window left open on a winter night.
-          await drivePilotWire(gladys, device, config, 'off', `window open, ${selector}`, selfWritten, {
-            order: PILOT_WIRE_MODE.FROST_PROTECTION,
-          });
+          // window left open on a winter night. A heater stopped already keeps
+          // its off: the window must not raise it to frost protection, then
+          // drop it back to off once closed.
+          await drivePilotWire(
+            gladys,
+            device,
+            config,
+            'off',
+            `window open, ${selector}`,
+            selfWritten,
+            isStopped(device) ? {} : { order: PILOT_WIRE_MODE.FROST_PROTECTION },
+          );
         } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `window open, ${selector}`);
           await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);

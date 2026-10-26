@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
-const { fake, assert } = sinon;
+const { fake, assert, match } = sinon;
 
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -80,6 +80,7 @@ describe('thermostat pilot wire: an order changed on the module', () => {
       event: { emit: fake.returns(null) },
     },
     setValue: fake.resolves(null),
+    triggerApplySchedules: fake.returns(null),
     windowSelectorsCache: null,
     targetSelectorsCache: null,
     selfWrittenSetpoints: new Map(),
@@ -135,6 +136,10 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     const [, feature, value] = handler.setValue.firstCall.args;
     expect(feature.type).to.equal(DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
     expect(value).to.equal(THERMOSTAT_MODE.OFF);
+    // Marked as the module's, after the write that clears any mark: only this
+    // stop is lifted by another order pressed on the module.
+    assert.calledOnceWithExactly(handler.gladys.device.setParam, match.any, 'THERMOSTAT_MODULE_STOP', 'true');
+    assert.callOrder(handler.setValue, handler.gladys.device.setParam);
   });
 
   it('should not take the order it wrote itself, reported back', async () => {
@@ -181,9 +186,9 @@ describe('thermostat pilot wire: an order changed on the module', () => {
 
   // Writing OFF back left only the Gladys widget able to start a heater stopped
   // from its module, with nothing on the module to say why.
-  it('should start a stopped thermostat on the order pressed on the module', async () => {
+  it('should start a thermostat stopped from the module on the order pressed there', async () => {
     const mod = loadListener();
-    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF }));
+    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF, params: { THERMOSTAT_MODULE_STOP: 'true' } }));
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
@@ -195,6 +200,19 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     ]);
     // Nothing goes back to the module: it already carries the order.
     assert.notCalled(handler.gladys.device.setValue);
+  });
+
+  // A module that reboots and reports comfort, or a vendor programme left on,
+  // must not start a heater someone stopped from the widget: the pass writes
+  // OFF back instead.
+  it('should not start a thermostat stopped from Gladys on an order the module reports', async () => {
+    const mod = loadListener();
+    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF }));
+
+    await press(mod, handler, PILOT_WIRE_MODE.ECO);
+
+    assert.notCalled(handler.setValue);
+    assert.calledOnce(handler.triggerApplySchedules);
   });
 
   it('should leave a stopped thermostat stopped when off is pressed again', async () => {
@@ -210,24 +228,34 @@ describe('thermostat pilot wire: an order changed on the module', () => {
 
   it('should not start a stopped thermostat with no preset or mode feature to start it on', async () => {
     const mod = loadListener();
-    const handler = buildHandler(thermostat({ features: [modeFeature(THERMOSTAT_MODE.OFF)] }));
+    const handler = buildHandler(
+      thermostat({ features: [modeFeature(THERMOSTAT_MODE.OFF)], params: { THERMOSTAT_MODULE_STOP: 'true' } }),
+    );
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
     assert.notCalled(handler.setValue);
   });
 
-  it('should still write frost protection back over a press on a stopped thermostat while a window is open', async () => {
+  // Stopped, the heater carries off: frost protection would only raise it,
+  // then the closing drop it back to off.
+  it('should write off back over a press on a stopped thermostat while a window is open', async () => {
     const mod = loadListener();
     const handler = buildHandler(
-      thermostat({ mode: THERMOSTAT_MODE.OFF, params: { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' } }),
+      thermostat({
+        mode: THERMOSTAT_MODE.OFF,
+        params: { THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_MODULE_STOP: 'true' },
+      }),
       { window: 0, carried: PILOT_WIRE_MODE.ECO },
     );
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
     assert.notCalled(handler.setValue);
-    frostWritten(handler);
+    const [, feature, value] = handler.gladys.device.setValue.firstCall.args;
+    expect(feature.selector).to.equal('heater-pilot-wire');
+    expect(value).to.equal(PILOT_WIRE_MODE.OFF);
+    expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.OFF);
   });
 
   it('should take nothing while a window is open, and write frost protection back at once', async () => {

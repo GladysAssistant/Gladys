@@ -14,10 +14,15 @@ const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/th
 const EXTERNAL_SETPOINT_PARAMS = ['THERMOSTAT_TARGET_FEATURE', 'THERMOSTAT_STATE_FEATURE', 'THERMOSTAT_MODE_FEATURE'];
 
 // Runtime state kept as params rather than features: a hold, and a stop the
-// programme made, are bookkeeping of the regulation loop, not properties of the
+// programme or a pilot-wire module made, are bookkeeping of the regulation loop, not properties of the
 // equipment. No form sends them, so they are carried over on save instead of
 // being wiped.
-const RUNTIME_PARAMS = ['THERMOSTAT_MANUAL_SETPOINT', 'THERMOSTAT_MANUAL_UNTIL', 'THERMOSTAT_SCHEDULE_STOP'];
+const RUNTIME_PARAMS = [
+  'THERMOSTAT_MANUAL_SETPOINT',
+  'THERMOSTAT_MANUAL_UNTIL',
+  'THERMOSTAT_SCHEDULE_STOP',
+  'THERMOSTAT_MODULE_STOP',
+];
 
 // Params the integration owns. Anything else sent by a client is dropped rather
 // than persisted, so the device never carries unknown regulation settings.
@@ -45,12 +50,13 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_MAX_TEMP',
   'THERMOSTAT_TEMP_UNIT',
   'THERMOSTAT_MANUAL_DURATION',
-  // The manual hold and the programme's stop. Not settings the edit form
-  // offers, but params all the same: they have to survive a save, see
-  // RUNTIME_PARAMS above.
+  // The manual hold, and the stops of the programme and of the module. Not
+  // settings the edit form offers, but params all the same: they have to
+  // survive a save, see RUNTIME_PARAMS above.
   'THERMOSTAT_MANUAL_SETPOINT',
   'THERMOSTAT_MANUAL_UNTIL',
   'THERMOSTAT_SCHEDULE_STOP',
+  'THERMOSTAT_MODULE_STOP',
   'THERMOSTAT_PRESET_FROST',
   'THERMOSTAT_PRESET_AWAY',
   'THERMOSTAT_PRESET_ECO',

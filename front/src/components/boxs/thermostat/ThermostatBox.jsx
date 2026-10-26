@@ -1450,15 +1450,15 @@ class ThermostatBox extends Component {
     // too, as the preset buttons' pills do.
     const confirmedColor = confirmedPreset ? this.getPresetColor(confirmedPreset) : null;
     const ringColor = confirmedColor && this.isDarkTheme() ? counterDarkModeInvert(confirmedColor) : confirmedColor;
-    // The order the module should carry, from what the card shows: frost
-    // protection with the window open, off when stopped, otherwise the order the
-    // lit preset is set to. A setpoint turned by a scene names no preset, and is
-    // not second-guessed.
+    // The order the module should carry, from what the card shows: off when
+    // stopped, window open or not, frost protection with the window open,
+    // otherwise the order the lit preset is set to. A setpoint turned by a scene
+    // names no preset, and is not second-guessed.
     let wantedOrder = null;
-    if (heaterRegulated && isWindowOpen) {
-      wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
-    } else if (heaterRegulated && mode === 'off') {
+    if (heaterRegulated && mode === 'off') {
       wantedOrder = PILOT_WIRE_MODE.OFF;
+    } else if (heaterRegulated && isWindowOpen) {
+      wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
     } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
       const configured = cfg[`pilot_wire_order_${activePreset}`];
       wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];

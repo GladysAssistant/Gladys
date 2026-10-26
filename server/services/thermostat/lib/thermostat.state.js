@@ -25,6 +25,14 @@ const MANUAL_UNTIL_PARAM = 'THERMOSTAT_MANUAL_UNTIL';
 // the stop, or the start, the writer's own.
 const SCHEDULE_STOP_PARAM = 'THERMOSTAT_SCHEDULE_STOP';
 
+// A stop pressed on a pilot-wire heater's module: OFF on its own button, its
+// app or its scene (C.1.1). Only such a stop is lifted by another order the
+// module reports. A stop made from Gladys stays one: a module that reboots
+// and reports comfort, or a vendor programme left on, must not start a heater
+// someone stopped from the widget. Any mode written on the thermostat
+// afterwards makes the stop, or the start, the writer's own.
+const MODULE_STOP_PARAM = 'THERMOSTAT_MODULE_STOP';
+
 // THERMOSTAT_PRESET is an integer enum on the feature, while a schedule
 // transition and the THERMOSTAT_PRESET_* params name their preset. This is the
 // one place that maps between the two.
@@ -156,6 +164,19 @@ function alreadyHolds(feature, value) {
 function isScheduleStop(device) {
   const params = (device && device.params) || [];
   return params.some((param) => param.name === SCHEDULE_STOP_PARAM && param.value === 'true');
+}
+
+/**
+ * @description Whether the thermostat was stopped from its pilot-wire module
+ * (MODULE_STOP_PARAM).
+ * @param {object} device - The thermostat device, params included.
+ * @returns {boolean} True when the stop was pressed on the module.
+ * @example
+ * isModuleStop(device);
+ */
+function isModuleStop(device) {
+  const params = (device && device.params) || [];
+  return params.some((param) => param.name === MODULE_STOP_PARAM && param.value === 'true');
 }
 
 /**
@@ -328,6 +349,7 @@ module.exports = {
   getFeature,
   isStopped,
   isScheduleStop,
+  isModuleStop,
   getPreset,
   savePreset,
   announcePreset,
@@ -343,4 +365,5 @@ module.exports = {
   MANUAL_SETPOINT_PARAM,
   MANUAL_UNTIL_PARAM,
   SCHEDULE_STOP_PARAM,
+  MODULE_STOP_PARAM,
 };

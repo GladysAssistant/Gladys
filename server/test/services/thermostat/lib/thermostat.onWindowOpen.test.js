@@ -8,6 +8,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   PILOT_WIRE_MODE,
+  THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
 } = require('../../../../utils/constants');
 const ThermostatHandler = require('../../../../services/thermostat/lib');
@@ -75,7 +76,7 @@ describe('thermostat.onDeviceNewState (window open)', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: true });
     await mod.onDeviceNewState.call(
-      { gladys },
+      { gladys, openWindows: new Set() },
       {
         device_feature_external_id: 'zigbee2mqtt:window:contact',
         state: 0,
@@ -89,7 +90,7 @@ describe('thermostat.onDeviceNewState (window open)', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: true });
     await mod.onDeviceNewState.call(
-      { gladys },
+      { gladys, openWindows: new Set() },
       {
         device_feature: 'window-sensor',
         last_value: 0,
@@ -103,7 +104,7 @@ describe('thermostat.onDeviceNewState (window open)', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: true });
     await mod.onDeviceNewState.call(
-      { gladys },
+      { gladys, openWindows: new Set() },
       {
         device_feature_external_id: 'zigbee2mqtt:window:contact',
         state: 1,
@@ -116,7 +117,7 @@ describe('thermostat.onDeviceNewState (window open)', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: true });
     await mod.onDeviceNewState.call(
-      { gladys },
+      { gladys, openWindows: new Set() },
       {
         device_feature: 'some-other-sensor',
         last_value: 0,
@@ -129,7 +130,7 @@ describe('thermostat.onDeviceNewState (window open)', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: false });
     await mod.onDeviceNewState.call(
-      { gladys },
+      { gladys, openWindows: new Set() },
       {
         device_feature_external_id: 'zigbee2mqtt:window:contact',
         state: 0,
@@ -186,6 +187,7 @@ describe('thermostat.onDeviceNewState (window open, external thermostat)', () =>
       setValue,
       selfWrittenSetpoints: new Map(),
       observedSetpoints: new Map(),
+      openWindows: new Set(),
     };
   };
 
@@ -257,7 +259,7 @@ describe('thermostat.onDeviceNewState (window open, pilot-wire heater)', () => {
     sinon.restore();
   });
 
-  const buildPilotWireHandler = () => {
+  const buildPilotWireHandler = ({ mode = null } = {}) => {
     const operatingState = {
       selector: 'living-room:operating-state',
       category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -266,7 +268,19 @@ describe('thermostat.onDeviceNewState (window open, pilot-wire heater)', () => {
     };
     const thermostat = {
       selector: 'living-room',
-      features: [operatingState],
+      features: [
+        operatingState,
+        ...(mode === null
+          ? []
+          : [
+              {
+                selector: 'living-room:mode',
+                category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+                type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+                last_value: mode,
+              },
+            ]),
+      ],
       params: [
         { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
         { name: 'THERMOSTAT_WINDOW_FEATURE', value: 'window-sensor' },
@@ -299,6 +313,7 @@ describe('thermostat.onDeviceNewState (window open, pilot-wire heater)', () => {
       targetSelectorsCache: new Set(),
       selfWrittenSetpoints: new Map(),
       observedSetpoints: new Map(),
+      openWindows: new Set(),
     };
   };
 
@@ -317,6 +332,79 @@ describe('thermostat.onDeviceNewState (window open, pilot-wire heater)', () => {
     // Marked as its own: the module's report of it is no press of its button.
     expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
   });
+
+  // Stopped, the heater carries off: frost protection would only raise it,
+  // then the closing drop it back to off.
+  it('should send off to a stopped heater', async () => {
+    const mod = loadModule();
+    const handler = buildPilotWireHandler({ mode: THERMOSTAT_MODE.OFF });
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+
+    const [, feature, value] = handler.gladys.device.setValue.firstCall.args;
+    expect(feature.selector).to.equal('heater-pilot-wire');
+    expect(value).to.equal(PILOT_WIRE_MODE.OFF);
+  });
+});
+
+// Waiting for the next tick left the heating off for up to a minute once the
+// window was closed, and a pilot-wire card said its order was on its way.
+describe('thermostat.onDeviceNewState (window closed)', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const buildHandler = () => ({
+    ...buildGladys({ switchOn: false }),
+    triggerApplySchedules: fake.returns(null),
+    windowSelectorsCache: null,
+    targetSelectorsCache: null,
+    openWindows: new Set(),
+  });
+
+  it('should run a pass at once when a window seen open closes', async () => {
+    const mod = loadModule();
+    const handler = buildHandler();
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+    assert.notCalled(handler.triggerApplySchedules);
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 1 });
+
+    assert.calledOnce(handler.triggerApplySchedules);
+    expect(handler.openWindows.has('window-sensor')).to.equal(false);
+  });
+
+  // A contact re-reports its state: a window closed for hours must not run a
+  // pass on every report.
+  it('should not run a pass for a window that stays closed', async () => {
+    const mod = loadModule();
+    const handler = buildHandler();
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 1 });
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 1 });
+
+    assert.calledOnce(handler.triggerApplySchedules);
+  });
+
+  it('should not run a pass for a sensor that is no configured window', async () => {
+    const mod = loadModule();
+    const handler = buildHandler();
+    handler.openWindows.add('some-other-sensor');
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'some-other-sensor', last_value: 1 });
+
+    assert.notCalled(handler.triggerApplySchedules);
+  });
+
+  it('should ignore a report with no value', async () => {
+    const mod = loadModule();
+    const handler = buildHandler();
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: null });
+
+    assert.notCalled(handler.gladys.device.get);
+  });
 });
 
 describe('thermostat.onDeviceNewState - ignored events', () => {
@@ -328,7 +416,7 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys();
 
-    await mod.onDeviceNewState.call({ gladys }, null);
+    await mod.onDeviceNewState.call({ gladys, openWindows: new Set() }, null);
 
     expect(setValue.called).to.equal(false);
     expect(gladys.device.get.called).to.equal(false);
@@ -341,7 +429,7 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
   it('should not act on a non-zero value that is not a driven setpoint', async () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys();
-    const handler = { gladys, windowSelectorsCache: null, targetSelectorsCache: null };
+    const handler = { gladys, windowSelectorsCache: null, targetSelectorsCache: null, openWindows: new Set() };
 
     await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 1 });
     await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 1 });
@@ -354,7 +442,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     const mod = loadModule();
     const { gladys } = buildGladys();
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature_external_id: 'unknown:device', state: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature_external_id: 'unknown:device', state: 0 },
+    );
 
     expect(gladys.device.get.called).to.equal(false);
   });
@@ -363,7 +454,7 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     const mod = loadModule();
     const { gladys } = buildGladys();
 
-    await mod.onDeviceNewState.call({ gladys }, { state: 0 });
+    await mod.onDeviceNewState.call({ gladys, openWindows: new Set() }, { state: 0 });
 
     expect(gladys.device.get.called).to.equal(false);
   });
@@ -372,7 +463,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: true });
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature_selector: 'window-sensor', state: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature_selector: 'window-sensor', state: 0 },
+    );
 
     expect(setValue.calledOnce).to.equal(true);
   });
@@ -385,7 +479,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
       stateManager: { get: fake.returns({ selector: 'window-sensor' }) },
     };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -398,7 +495,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
       stateManager: { get: fake.returns({ selector: 'window-sensor' }) },
     };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -414,7 +514,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
       stateManager: { get: fake.returns({ selector: 'window-sensor' }) },
     };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -423,7 +526,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: true });
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'another-window', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'another-window', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -450,7 +556,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
       stateManager: { get: fake.returns({ selector: 'window-sensor' }) },
     };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -459,7 +568,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: false });
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -469,7 +581,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     const { gladys } = buildGladys({ switchOn: true });
     gladys.device.setValue = fake.rejects(new Error('switch offline'));
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(gladys.device.setValue.calledOnce).to.equal(true);
   });
@@ -482,7 +597,10 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
       stateManager: { get: fake.returns({ selector: 'window-sensor' }) },
     };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -510,7 +628,7 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
   it('should still cut the switch for a cached window selector', async () => {
     const mod = loadModule();
     const { gladys, setValue } = buildGladys({ switchOn: true });
-    const handler = { gladys, windowSelectorsCache: null };
+    const handler = { gladys, windowSelectorsCache: null, openWindows: new Set() };
 
     await mod.onDeviceNewState.call(handler, { device_feature: 'some-other-sensor', last_value: 0 });
     await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
@@ -638,7 +756,10 @@ describe('thermostat.onDeviceNewState - per-device rejection after the cache hit
     const mod = loadModule();
     const { gladys, setValue } = buildTwoThermostats({ features: [], params: [] });
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     // The other thermostat is still regulated
     expect(setValue.calledOnce).to.equal(true);
@@ -660,7 +781,10 @@ describe('thermostat.onDeviceNewState - per-device rejection after the cache hit
       ],
     });
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.calledOnce).to.equal(true);
     expect(setValue.firstCall.args[1].selector).to.equal('heater-switch');
@@ -679,7 +803,10 @@ describe('thermostat.onDeviceNewState - per-device rejection after the cache hit
       params: [{ name: 'THERMOSTAT_WINDOW_FEATURE', value: 'window-sensor' }],
     });
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.calledOnce).to.equal(true);
   });
@@ -719,7 +846,10 @@ describe('thermostat.onDeviceNewState - per-device rejection after the cache hit
       stateManager: { get: fake.returns(null) },
     };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });
@@ -742,7 +872,10 @@ describe('thermostat.onDeviceNewState - per-device rejection after the cache hit
       stateManager: { get: fake.returns(null) },
     };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 0 });
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'window-sensor', last_value: 0 },
+    );
 
     expect(setValue.called).to.equal(false);
   });

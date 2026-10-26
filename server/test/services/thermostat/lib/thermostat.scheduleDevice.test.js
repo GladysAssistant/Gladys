@@ -16,6 +16,7 @@ const ThermostatHandler = require('../../../../services/thermostat/lib');
 const {
   followsSchedule,
   getScheduleOfDevice,
+  clearModuleStop,
 } = require('../../../../services/thermostat/lib/thermostat.scheduleDevice');
 
 const HOUSE_SELECTOR = 'test-house';
@@ -652,6 +653,16 @@ describe('thermostat schedule <-> device link', () => {
         sinonMatchSelector(modeFeature.selector),
         THERMOSTAT_MODE.COOLING,
       );
+    });
+
+    it('should clear the mark of a stop pressed on the module, and only that one', async () => {
+      const moduleMark = await addParam('THERMOSTAT_MODULE_STOP', 'true');
+      const scheduleMark = await addParam('THERMOSTAT_SCHEDULE_STOP', 'true');
+
+      await clearModuleStop(thermostat.id);
+
+      expect((await moduleMark.reload()).value).to.equal('');
+      expect((await scheduleMark.reload()).value).to.equal('true');
     });
   });
 

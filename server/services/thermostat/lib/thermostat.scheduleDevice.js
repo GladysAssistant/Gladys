@@ -12,6 +12,7 @@ const {
   clearManualHold,
   savePreset,
   SCHEDULE_STOP_PARAM,
+  MODULE_STOP_PARAM,
 } = require('./thermostat.state');
 const { getCurrentPoint } = require('./thermostat.getSchedules');
 
@@ -48,6 +49,21 @@ async function clearScheduleStop(deviceId) {
   await db.DeviceParam.update(
     { value: '' },
     { where: { device_id: deviceId, name: SCHEDULE_STOP_PARAM, value: 'true' } },
+  );
+}
+
+/**
+ * @description Clear the mark of a stop pressed on a pilot-wire module, read
+ * and written in the database for the reason given in clearScheduleStop.
+ * @param {string} deviceId - The thermostat's id.
+ * @returns {Promise<void>}
+ * @example
+ * await clearModuleStop(device.id);
+ */
+async function clearModuleStop(deviceId) {
+  await db.DeviceParam.update(
+    { value: '' },
+    { where: { device_id: deviceId, name: MODULE_STOP_PARAM, value: 'true' } },
   );
 }
 
@@ -355,6 +371,7 @@ module.exports = {
   stopForEmptiedProgramme,
   liftScheduleStop,
   clearScheduleStop,
+  clearModuleStop,
   loadThermostat,
   forEachFollower,
   resolveScheduleAndDevice,

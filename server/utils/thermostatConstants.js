@@ -112,8 +112,11 @@ const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILO
  * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
  * the order was refused, written again on every pass, and the widget said it was
  * on its way for ever. Comfort -1 or -2 falls back on comfort when the module
- * takes it; any other order it does not take is not sent at all. A feature that
- * declares no option is sent the order as it is.
+ * takes it. Frost protection falls back on off: both are standby, and a module
+ * that cannot hold frost protection would otherwise be left heating on the order
+ * it carries — on comfort with a window open, or above the setpoint when Gladys
+ * regulates. Any other order it does not take is not sent at all. A feature
+ * that declares no option is sent the order as it is.
  * @param {number} order - A PILOT_WIRE_MODE value.
  * @param {Array} [supportedOptions] - The feature's `supported_options`.
  * @returns {number|null} The order to send, or null when the module takes none.
@@ -127,6 +130,9 @@ function supportedPilotWireOrder(order, supportedOptions) {
   }
   if (COMFORT_ORDERS.includes(order) && supported.includes(PILOT_WIRE_MODE.COMFORT)) {
     return PILOT_WIRE_MODE.COMFORT;
+  }
+  if (order === PILOT_WIRE_MODE.FROST_PROTECTION && supported.includes(PILOT_WIRE_MODE.OFF)) {
+    return PILOT_WIRE_MODE.OFF;
   }
   return null;
 }
