@@ -1475,6 +1475,22 @@ class EditScene extends Component {
     }
   };
 
+  getThermostatSchedules = async () => {
+    // selector -> name: a collapsed "Change the thermostats' schedule" card
+    // showed the selector, a slug plus a timestamp plus a random suffix. Without
+    // the thermostat integration the request fails, and the selector stays.
+    try {
+      const schedules = await this.props.httpClient.get('/api/v1/service/thermostat/schedule');
+      const thermostatSchedules = {};
+      (schedules || []).forEach(schedule => {
+        thermostatSchedules[schedule.selector] = schedule.name;
+      });
+      this.setState({ thermostatSchedules });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getTags = async () => {
     try {
       const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
@@ -1494,6 +1510,7 @@ class EditScene extends Component {
       triggersVariables: [],
       sceneIntegrations: null,
       deviceFeatures: null,
+      thermostatSchedules: null,
       runningScenes: [],
       now: Date.now()
     };
@@ -1504,6 +1521,7 @@ class EditScene extends Component {
     this.getSceneBySelector();
     this.getSceneIntegrations();
     this.getDeviceFeatures();
+    this.getThermostatSchedules();
     this.getTags();
     this.getRunningScenes();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
@@ -1544,6 +1562,7 @@ class EditScene extends Component {
       triggersVariables,
       sceneIntegrations,
       deviceFeatures,
+      thermostatSchedules,
       tags,
       askDeleteScene,
       runningScenes,
@@ -1579,6 +1598,7 @@ class EditScene extends Component {
             triggersVariables={triggersVariables}
             sceneIntegrations={sceneIntegrations}
             deviceFeatures={deviceFeatures}
+            thermostatSchedules={thermostatSchedules}
             setVariables={this.setVariables}
             setVariablesTrigger={this.setVariablesTrigger}
             switchActiveScene={this.switchActiveScene}

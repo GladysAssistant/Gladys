@@ -17,6 +17,8 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     onDeviceNewState: fake.resolves(null),
     primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
+    // As the real handler is built: not running until start().
+    running: false,
   };
   const controllers = { 'get /api/v1/service/thermostat/device': {} };
   const ThermostatService = proxyquire('../../../services/thermostat/index', {
@@ -133,6 +135,19 @@ describe('ThermostatService', () => {
     assert.calledWith(gladys.event.removeListener, EVENTS.DEVICE.NEW_STATE);
     assert.notCalled(handler.applySchedules);
     expect(handler.applyTimer).to.equal(null);
+  });
+
+  // What the scene action and MCP read: the service is in the stateManager
+  // whatever its status.
+  it('should say whether the service runs', async () => {
+    const { service, handler } = buildService();
+    expect(handler.running).to.equal(false);
+
+    await service.start();
+    expect(handler.running).to.equal(true);
+
+    await service.stop();
+    expect(handler.running).to.equal(false);
   });
 
   it('should be safe to stop a service that was never started', async () => {

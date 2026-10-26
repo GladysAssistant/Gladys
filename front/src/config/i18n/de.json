@@ -4129,6 +4129,11 @@
         "houseLabel": "Zuhause",
         "alarmModeLabel": "Alarmmodus"
       },
+      "thermostatSetSchedule": {
+        "description": "Diese Aktion lässt die ausgewählten Thermostate einem anderen Zeitplan folgen, zum Beispiel um vom üblichen Zeitplan auf den der Schulferien zu wechseln. Der Thermostat folgt dem Zeitplan sofort: Ein laufender manueller Sollwert wird aufgehoben, ein von Hand ausgeschalteter Thermostat bleibt jedoch aus.",
+        "scheduleLabel": "Zeitplan",
+        "thermostatsLabel": "Thermostate"
+      },
       "alarmSetMode": {
         "description": "Diese Aktion setzt das ausgewählte Zuhause in den ausgewählten Alarmmodus.",
         "houseLabel": "Zuhause",
@@ -4254,6 +4259,9 @@
         "check-alarm-mode": "Wenn der Alarm im Modus ist",
         "set-alarm-mode": "Alarmmodus setzen auf"
       },
+      "thermostat": {
+        "set-schedule": "Zeitplan der Thermostate ändern"
+      },
       "mqtt": {
         "send": "MQTT-Message senden"
       },
@@ -4342,6 +4350,9 @@
       },
       "http": {
         "request": "Eine externe API oder einen Dienst aufrufen"
+      },
+      "thermostat": {
+        "set-schedule": "Thermostate einem anderen Wochenzeitplan folgen lassen"
       },
       "mqtt": {
         "send": "Eine Nachricht auf dem MQTT-Broker veröffentlichen"

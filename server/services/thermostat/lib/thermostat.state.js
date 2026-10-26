@@ -310,6 +310,11 @@ function broadcastConfigUpdated() {
  */
 function triggerApplySchedules() {
   const handler = this;
+  // A stopped service regulates nothing: a write through its API still lands,
+  // but no pass runs behind it, with no minute loop to undo what it switched.
+  if (!handler.running) {
+    return;
+  }
   if (handler.applyTimer) {
     clearTimeout(handler.applyTimer);
   }
