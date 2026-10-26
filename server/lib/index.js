@@ -186,8 +186,8 @@ function Gladys(params = {}) {
 
       await system.init();
 
-      // before the server listens: access tokens of sessions revoked before
-      // a restart must stay refused until they expire
+      // before the server listens: access tokens of sessions revoked or of
+      // tablets locked before a restart must stay refused
       await session.init();
 
       // this should be before device.init
