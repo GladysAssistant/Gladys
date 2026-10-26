@@ -3643,12 +3643,13 @@
         },
         "targetFeatureLabel": "Sollwert des echten Thermostats",
         "targetFeatureHelp": "Die Funktion, auf die Gladys die Zieltemperatur schreibt. Manche Geräte bieten mehrere an (Heizen/Kühlen, anwesend/abwesend): Wählen Sie diejenige, die Ihre Heizung tatsächlich steuert.",
-        "stateFeatureLabel": "Heizzustand (optional)",
+        "stateFeatureLabel": "Betriebszustand (optional)",
         "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
         "modeFeatureLabel": "Betriebsmodus (optional)",
         "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden — der Modus einer Klimaanlage funktioniert ebenfalls. Bei einem Thermostat schaltet Gladys ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt. Der Modus einer Klimaanlage kennt kein Aus: Sie wird über ihre Stromversorgung gestoppt, die dann angegeben werden muss.",
         "powerFeatureLabel": "Stromversorgung (optional)",
         "powerFeatureHelp": "Der Schalter, der das echte Gerät ein- und ausschaltet, etwa die Stromversorgung einer Klimaanlage oder Wärmepumpe. Gladys schaltet ihn aus, wenn das Thermostat gestoppt wird, ein Fenster geöffnet wird oder ein Aus-Zeitfenster greift, und wieder ein, sobald ein Sollwert übernimmt. Für eine Klimaanlage nötig, deren Modus kein Aus kennt.",
+        "powerFeatureNeeded": "Der Modus einer Klimaanlage kennt kein Aus: Wählen Sie hier ihre Stromversorgung, sonst kann Gladys sie nicht ausschalten, wenn ein Fenster geöffnet wird, ein Aus-Zeitfenster greift oder das Thermostat gestoppt wird.",
         "mode": {
           "heating": "Heizen",
           "cooling": "Kühlen"
@@ -3679,6 +3680,10 @@
         "switchFeatureHelp": {
           "heating": "Der Schalter, der zum Heizen des Raums ein- und ausgeschaltet wird.",
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
+        },
+        "noSwitchHint": {
+          "heating": "Hier steht kein Schalter zur Auswahl. Zeigen Sie oben die Geräte aller Räume an oder wählen Sie für ein Thermostat oder eine Wärmepumpe, die sich selbst regelt, den Typ „Echtes Thermostat“.",
+          "cooling": "Hier steht kein Schalter zur Auswahl. Eine Klimaanlage regelt sich selbst: Wählen Sie den Typ „Echtes Thermostat“ und dann ihren Sollwert. Ein Ventilator oder ein Luftkühler an einer Steckdose kann ein virtuelles Thermostat bleiben."
         },
         "windowFeatureLabel": "Fensterkontakte",
         "windowFeatureHelp": {
@@ -3729,7 +3734,10 @@
         "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird.",
         "modeHelp": "Was dieses Thermostat steuert: Heizung oder Kühlung.",
         "sectionDevice": "Gerät",
-        "sectionHeating": "Heizung",
+        "section": {
+          "heating": "Heizung",
+          "cooling": "Kühlung"
+        },
         "sectionProgramming": "Programmierung",
         "deviceRangeHint": "Das Gerät meldet {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Diese Werte übernehmen",

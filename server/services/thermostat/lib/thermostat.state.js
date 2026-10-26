@@ -32,7 +32,11 @@ const SCHEDULE_STOP_PARAM = 'THERMOSTAT_SCHEDULE_STOP';
 // out after the unit obeyed, a unit coming back off after a power cut), and
 // kept like the widget's it left the house without heating until someone
 // noticed (C.0.1). Any mode written on the thermostat lifts it sooner.
+// Without a programme the stop has no end, and the param reads
+// REMOTE_STOP_NO_END: it still says the unit made it, which is what lets the
+// remote start this thermostat again and not one stopped from Gladys.
 const REMOTE_STOP_UNTIL_PARAM = 'THERMOSTAT_REMOTE_STOP_UNTIL';
+const REMOTE_STOP_NO_END = 'unit';
 
 // THERMOSTAT_PRESET is an integer enum on the feature, while a schedule
 // transition and the THERMOSTAT_PRESET_* params name their preset. This is the
@@ -203,6 +207,20 @@ function getRemoteStopUntil(device) {
 }
 
 /**
+ * @description Whether the thermostat was stopped from its unit (stopFromUnit),
+ * with or without an end: only such a stop is the remote's to lift when the
+ * unit is switched back on. A stop made from Gladys carries no mark.
+ * @param {object} device - The thermostat device.
+ * @returns {boolean} True when the stop came from the unit.
+ * @example
+ * isRemoteStop(device);
+ */
+function isRemoteStop(device) {
+  const params = (device && device.params) || [];
+  return params.some((param) => param.name === REMOTE_STOP_UNTIL_PARAM && !!param.value);
+}
+
+/**
  * @description Write a preset on the thermostat's preset feature.
  * @param {object} device - The thermostat device.
  * @param {string} name - A preset name, `schedule` included.
@@ -270,7 +288,13 @@ async function saveActivePreset(device, name) {
   if (!feature || value === null || alreadyHolds(feature, value)) {
     return;
   }
-  await this.gladys.device.saveState(feature, value);
+  // Written before the actuation on each path, and only a report: a failure
+  // here must not cost the heating its switch or its setpoint.
+  try {
+    await this.gladys.device.saveState(feature, value);
+  } catch (e) {
+    logger.warn(`Thermostat: could not save the active preset of ${device.selector}: ${e.message}`);
+  }
 }
 
 /**
@@ -399,6 +423,7 @@ module.exports = {
   savePreset,
   announcePreset,
   saveActivePreset,
+  isRemoteStop,
   activePresetValue,
   saveOperatingState,
   getManualHold,
@@ -413,4 +438,5 @@ module.exports = {
   MANUAL_UNTIL_PARAM,
   SCHEDULE_STOP_PARAM,
   REMOTE_STOP_UNTIL_PARAM,
+  REMOTE_STOP_NO_END,
 };

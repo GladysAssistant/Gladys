@@ -5,7 +5,8 @@ const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = requir
 const {
   startExternalThermostat,
   stopExternalThermostat,
-  runningPowerFeatures,
+  runningUnitFeatures,
+  unitFeature,
   getSetpointForPreset,
   convertSetpointToFeatureUnit,
   DEFAULT_TIMEZONE,
@@ -213,14 +214,13 @@ async function setValue(device, deviceFeature, value, manual = true) {
     if (Number(value) === THERMOSTAT_MODE.OFF) {
       // Stopping is not a preset with a setpoint: it cuts the switch on a
       // virtual thermostat, and stops the real one on an external device.
-      // A unit another thermostat runs is left to it (runningPowerFeatures).
-      const sharedPower =
-        isExternal(config) &&
-        config.power_feature &&
-        runningPowerFeatures(await this.gladys.device.get({ service: 'thermostat' }), device.id).has(
-          config.power_feature,
+      // A unit another thermostat runs is left to it (runningUnitFeatures).
+      const sharedUnit =
+        unitFeature(config) !== null &&
+        runningUnitFeatures(await this.gladys.device.get({ service: 'thermostat' }), device.id).has(
+          unitFeature(config),
         );
-      if (isExternal(config) && !sharedPower) {
+      if (isExternal(config) && !sharedUnit) {
         await stopExternalThermostat(
           this.gladys,
           config,

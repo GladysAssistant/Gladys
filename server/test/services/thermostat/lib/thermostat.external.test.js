@@ -892,6 +892,52 @@ describe('thermostat.regulateDevice - external', () => {
         );
         // And the programme takes it over in the same pass.
         expect(writtenOn(gladys, 'ac-power')).to.equal(1);
+        // The mode before the end is forgotten.
+        assert.callOrder(gladys.device.saveState, gladys.device.setParam);
+      });
+
+      // Comfort picked in the widget, then the unit switched off from its remote:
+      // the stop dropped the hold, and the preset left behind read as a standing
+      // choice — the next Off point powered the unit on at 21 °C.
+      it('should hand a preset picked by hand back to the programme', async () => {
+        const mod = load(fullDaySchedule('off'));
+        const gladys = buildGladys({ features: acFeatures({ power: 0 }) });
+        const device = stoppedAc({ THERMOSTAT_REMOTE_STOP_UNTIL: String(Date.now() - 1000) });
+        device.features.push({
+          selector: 'ac-thermostat-preset',
+          category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+          type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+          last_value: THERMOSTAT_PRESET.COMFORT,
+        });
+
+        await regulate(mod, gladys, device);
+
+        assert.calledWith(
+          gladys.device.saveState,
+          sinon.match.has('selector', 'ac-thermostat-preset'),
+          THERMOSTAT_PRESET.SCHEDULE,
+        );
+        // The Off point applies, not the Comfort left on the feature.
+        expect(writtenOn(gladys, 'ac-power')).to.equal(undefined);
+        expect(writtenOn(gladys, 'ac-setpoint')).to.equal(undefined);
+      });
+
+      // Cleared first, a failed write left the thermostat stopped with nothing left to
+      // start it: the sticky stop the end exists to prevent.
+      it('should keep the end when the thermostat cannot be started again', async () => {
+        const mod = load(fullDaySchedule('comfort'));
+        const gladys = buildGladys({ features: acFeatures({ power: 0 }) });
+        gladys.device.saveState = fake.rejects(new Error('database locked'));
+
+        let thrown = null;
+        try {
+          await regulate(mod, gladys, stoppedAc({ THERMOSTAT_REMOTE_STOP_UNTIL: String(Date.now() - 1000) }));
+        } catch (e) {
+          thrown = e;
+        }
+
+        expect(thrown).to.be.an('error');
+        assert.notCalled(gladys.device.setParam);
       });
 
       it('should keep it stopped until then', async () => {
@@ -935,10 +981,33 @@ describe('thermostat.regulateDevice - external', () => {
           { ...acDevice({ THERMOSTAT_POWER_FEATURE: 'left-out-power' }), id: 'left-out' },
           { ...acDevice({ THERMOSTAT_TYPE: 'virtual', THERMOSTAT_POWER_FEATURE: 'virtual-power' }), id: 'virtual' },
           { ...acDevice({ THERMOSTAT_POWER_FEATURE: '' }), id: 'no-power' },
+          { ...acDevice({ THERMOSTAT_POWER_FEATURE: '', THERMOSTAT_MODE_FEATURE: '' }), id: 'neither' },
         ];
 
-        expect([...mod.runningPowerFeatures(devices, 'left-out')]).to.deep.equal(['ac-power']);
-        expect([...mod.runningPowerFeatures(null)]).to.deep.equal([]);
+        expect([...mod.runningUnitFeatures(devices, 'left-out')]).to.deep.equal(['ac-power', 'ac-mode']);
+        expect([...mod.runningUnitFeatures(null)]).to.deep.equal([]);
+        expect(mod.unitFeature(null)).to.equal(null);
+      });
+
+      // A reversible thermostat with a shared mode and no power (A.0.3): the
+      // stopped one wrote mode off, and the running one its mode back, every pass.
+      it('should leave a shared mode with no power to the running thermostat', async () => {
+        const mod = load(fullDaySchedule('comfort'));
+        const gladys = buildGladys({ features: acFeatures() });
+
+        await mod.regulateDevice(
+          gladys,
+          stoppedAc({ THERMOSTAT_POWER_FEATURE: '' }),
+          todayDow,
+          12 * 60,
+          null,
+          null,
+          null,
+          null,
+          new Set(['ac-mode']),
+        );
+
+        assert.notCalled(gladys.device.setValue);
       });
     });
   });
@@ -1469,8 +1538,26 @@ describe('thermostat.onExternalPowerChanged', () => {
     assert.calledOnce(handler.setValue);
     expect(handler.setValue.firstCall.args[1].selector).to.equal('ac-thermostat-mode');
     expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.OFF);
-    // Nothing would start it again: it stays stopped until someone does.
-    assert.notCalled(handler.gladys.device.setParam);
+    // Nothing would start it again: it stays stopped until someone does, but
+    // the mark says the unit stopped it, for the remote to start it again.
+    assert.calledOnceWithExactly(
+      handler.gladys.device.setParam,
+      sinon.match.any,
+      'THERMOSTAT_REMOTE_STOP_UNTIL',
+      'unit',
+    );
+  });
+
+  it('should keep it stopped when the mark cannot be recorded', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+    handler.gladys.device.setParam = fake.rejects(new Error('database locked'));
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.calledTwice(handler.gladys.device.setParam);
+    assert.calledOnce(handler.setValue);
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.OFF);
   });
 
   describe('a unit switched off from its remote, on a programme', () => {
@@ -1508,6 +1595,31 @@ describe('thermostat.onExternalPowerChanged', () => {
       assert.callOrder(handler.setValue, handler.gladys.device.setParam);
     });
 
+    it('should record the end on a second try when the first one fails', async () => {
+      const mod = loadListener({ point: comfortPoint, nextPoint: NEXT_POINT });
+      const handler = onProgramme();
+      handler.gladys.device.setParam = sinon.stub();
+      handler.gladys.device.setParam.onFirstCall().rejects(new Error('database locked'));
+      handler.gladys.device.setParam.resolves(null);
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+      assert.calledTwice(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+    });
+
+    // Off with no end recorded is a stop kept for good.
+    it('should start the thermostat again when the end cannot be recorded', async () => {
+      const mod = loadListener({ point: comfortPoint, nextPoint: NEXT_POINT });
+      const handler = onProgramme();
+      handler.gladys.device.setParam = fake.rejects(new Error('database locked'));
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+      const modes = handler.setValue.getCalls().map((call) => call.args[2]);
+      expect(modes).to.deep.equal([THERMOSTAT_MODE.OFF, THERMOSTAT_MODE.HEATING]);
+    });
+
     it('should keep it stopped on a programme with no point', async () => {
       const mod = loadListener({ point: comfortPoint, nextPoint: null });
       const handler = onProgramme();
@@ -1515,7 +1627,7 @@ describe('thermostat.onExternalPowerChanged', () => {
       await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
 
       expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.OFF);
-      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_REMOTE_STOP_UNTIL', 'unit');
     });
 
     // Switched on from its remote during the Off point, then off again the same
@@ -1571,6 +1683,40 @@ describe('thermostat.onExternalPowerChanged', () => {
 
     assert.calledOnce(handler.setValue);
     expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
+  });
+
+  // One thermostat per mode on the same unit, the heating one stopped by hand
+  // for the season: the remote starts the cooling one it stopped, and only it.
+  describe('a unit two thermostats drive, switched on from its remote', () => {
+    const twoOnOneUnit = (heatingParams = []) => {
+      const cooling = acThermostat({ mode: THERMOSTAT_MODE.OFF, running: 'cooling' });
+      cooling.selector = 'cooling-thermostat';
+      cooling.params.push({ name: 'THERMOSTAT_REMOTE_STOP_UNTIL', value: 'unit' });
+      const heating = acThermostat({ mode: THERMOSTAT_MODE.OFF, running: 'heating' });
+      heating.selector = 'heating-thermostat';
+      heating.params.push(...heatingParams);
+      return buildHandler({ devices: [cooling, heating], previous: 0 });
+    };
+
+    it('should only start the thermostat the unit stopped', async () => {
+      const mod = loadListener();
+      const handler = twoOnOneUnit();
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledOnce(handler.setValue);
+      expect(handler.setValue.firstCall.args[0].selector).to.equal('cooling-thermostat');
+      expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
+    });
+
+    it('should start both when the unit stopped both', async () => {
+      const mod = loadListener();
+      const handler = twoOnOneUnit([{ name: 'THERMOSTAT_REMOTE_STOP_UNTIL', value: String(Date.now() + 1000) }]);
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledTwice(handler.setValue);
+    });
   });
 
   describe('a unit switched on carrying a setpoint of its own', () => {

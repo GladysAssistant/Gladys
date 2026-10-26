@@ -1,5 +1,5 @@
 const {
-  DEFAULT_PRESET_TEMPS,
+  defaultPresetTemps,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_HYSTERESIS_STOP,
   DEFAULT_TPI_CYCLE_TIME,
@@ -44,6 +44,8 @@ function buildParamsConfig(device) {
     const p = device.params.find((x) => x.name === name);
     return p ? p.value : null;
   };
+  // A thermostat that cools aims higher: its presets default accordingly.
+  const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE') || DEFAULT_MODE);
   return {
     // One sensor or several (A.1.1): the loop regulates on their average.
     temperature_features: parseSelectorList(getParam('THERMOSTAT_TEMPERATURE_FEATURE')),
@@ -73,11 +75,11 @@ function buildParamsConfig(device) {
     // that unreachable, since `holdExpiry` can then never see the absence. The
     // callers that need a number apply the default themselves.
     manual_duration: toNumber(getParam('THERMOSTAT_MANUAL_DURATION'), null),
-    preset_frost: toNumber(getParam('THERMOSTAT_PRESET_FROST'), DEFAULT_PRESET_TEMPS.frost),
-    preset_away: toNumber(getParam('THERMOSTAT_PRESET_AWAY'), DEFAULT_PRESET_TEMPS.away),
-    preset_eco: toNumber(getParam('THERMOSTAT_PRESET_ECO'), DEFAULT_PRESET_TEMPS.eco),
-    preset_night: toNumber(getParam('THERMOSTAT_PRESET_NIGHT'), DEFAULT_PRESET_TEMPS.night),
-    preset_comfort: toNumber(getParam('THERMOSTAT_PRESET_COMFORT'), DEFAULT_PRESET_TEMPS.comfort),
+    preset_frost: toNumber(getParam('THERMOSTAT_PRESET_FROST'), presetDefaults.frost),
+    preset_away: toNumber(getParam('THERMOSTAT_PRESET_AWAY'), presetDefaults.away),
+    preset_eco: toNumber(getParam('THERMOSTAT_PRESET_ECO'), presetDefaults.eco),
+    preset_night: toNumber(getParam('THERMOSTAT_PRESET_NIGHT'), presetDefaults.night),
+    preset_comfort: toNumber(getParam('THERMOSTAT_PRESET_COMFORT'), presetDefaults.comfort),
     hysteresis_start: toNumber(getParam('THERMOSTAT_HYSTERESIS_START'), DEFAULT_HYSTERESIS_START),
     hysteresis_stop: toNumber(getParam('THERMOSTAT_HYSTERESIS_STOP'), DEFAULT_HYSTERESIS_STOP),
     tpi_cycle_time: toNumber(getParam('THERMOSTAT_TPI_CYCLE_TIME'), DEFAULT_TPI_CYCLE_TIME),

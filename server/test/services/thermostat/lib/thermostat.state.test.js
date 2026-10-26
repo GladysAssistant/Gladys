@@ -144,6 +144,17 @@ describe('thermostat.state getRemoteStopUntil', () => {
   });
 });
 
+describe('thermostat.state isRemoteStop', () => {
+  // Only a stop the unit made is the remote's to lift, with or without an end.
+  it('should tell a stop made on the unit from one made from Gladys', () => {
+    const marked = (value) => ({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value }] });
+    expect(state.isRemoteStop(marked('1792000000000'))).to.equal(true);
+    expect(state.isRemoteStop(marked(state.REMOTE_STOP_NO_END))).to.equal(true);
+    expect(state.isRemoteStop(marked(''))).to.equal(false);
+    expect(state.isRemoteStop(null)).to.equal(false);
+  });
+});
+
 describe('thermostat.state savePreset', () => {
   afterEach(() => sinon.restore());
 
@@ -291,6 +302,17 @@ describe('thermostat.state active preset', () => {
     await state.saveActivePreset.call(handler, device, 'schedule');
 
     assert.notCalled(handler.gladys.device.saveState);
+  });
+
+  // Only a report, written before the actuation: a failure must not stop the pass.
+  it('should survive a failing write', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.saveState = fake.rejects(new Error('database locked'));
+    const device = { selector: 'salon', features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO)] };
+
+    await state.saveActivePreset.call(handler, device, 'comfort');
+
+    assert.calledOnce(handler.gladys.device.saveState);
   });
 
   it('should do nothing on a device with no active-preset feature', async () => {

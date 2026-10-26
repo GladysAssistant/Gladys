@@ -3,6 +3,7 @@ import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 import { parseSelectorList, serializeSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
+import { defaultPresetTemps } from '../../../../../../../server/utils/thermostatConstants';
 
 const TEMPERATURE_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR];
 const HUMIDITY_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR];
@@ -20,6 +21,14 @@ const isModeFeature = feature =>
   (feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
     feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) ||
   (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE);
+// The preset fields of the form, with the preset each one sets.
+const PRESET_FIELDS = [
+  ['thermostatEditPresetFrost', 'frost'],
+  ['thermostatEditPresetAway', 'away'],
+  ['thermostatEditPresetEco', 'eco'],
+  ['thermostatEditPresetNight', 'night'],
+  ['thermostatEditPresetComfort', 'comfort']
+];
 const isPowerFeature = feature =>
   (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY) ||
   (SWITCH_CATEGORIES.includes(feature.category) && feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY);
@@ -162,6 +171,7 @@ function createActions(store) {
         } catch (e) {
           activeSchedule = '';
         }
+        const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE'));
         store.setState({
           thermostatEditActiveSchedule: activeSchedule,
           thermostatEditDeviceSchedule: activeSchedule,
@@ -184,11 +194,11 @@ function createActions(store) {
           thermostatEditWindowFeatures: parseSelectorList(getParam('THERMOSTAT_WINDOW_FEATURE')),
           // A display choice, never saved: every thermostat opens on its own room.
           thermostatEditShowAllRooms: false,
-          thermostatEditPresetFrost: getParam('THERMOSTAT_PRESET_FROST') || '7',
-          thermostatEditPresetAway: getParam('THERMOSTAT_PRESET_AWAY') || '16',
-          thermostatEditPresetEco: getParam('THERMOSTAT_PRESET_ECO') || '18',
-          thermostatEditPresetNight: getParam('THERMOSTAT_PRESET_NIGHT') || '17',
-          thermostatEditPresetComfort: getParam('THERMOSTAT_PRESET_COMFORT') || '21',
+          thermostatEditPresetFrost: getParam('THERMOSTAT_PRESET_FROST') || String(presetDefaults.frost),
+          thermostatEditPresetAway: getParam('THERMOSTAT_PRESET_AWAY') || String(presetDefaults.away),
+          thermostatEditPresetEco: getParam('THERMOSTAT_PRESET_ECO') || String(presetDefaults.eco),
+          thermostatEditPresetNight: getParam('THERMOSTAT_PRESET_NIGHT') || String(presetDefaults.night),
+          thermostatEditPresetComfort: getParam('THERMOSTAT_PRESET_COMFORT') || String(presetDefaults.comfort),
           thermostatEditHysteresisStart: getParam('THERMOSTAT_HYSTERESIS_START') || '0.5',
           thermostatEditHysteresisStop: getParam('THERMOSTAT_HYSTERESIS_STOP') || '0.5',
           thermostatEditTpiCycleTime: getParam('THERMOSTAT_TPI_CYCLE_TIME') || '30',
@@ -208,6 +218,26 @@ function createActions(store) {
 
     updateThermostatField(state, field, value) {
       store.setState({ [field]: value });
+    },
+
+    // Switching the use carries the presets along while they still hold the
+    // previous use's defaults: an air conditioner set up from a blank form kept
+    // Comfort at 21 °C. A temperature someone typed is theirs, and stays.
+    updateThermostatMode(state, mode) {
+      const previous = state.thermostatEditMode || 'heating';
+      const update = { thermostatEditMode: mode };
+      if (previous !== mode) {
+        const fahrenheit = state.thermostatEditTempUnit === 'F';
+        const inUnit = celsius => (fahrenheit ? Math.round(((celsius * 9) / 5 + 32) * 2) / 2 : celsius);
+        const from = defaultPresetTemps(previous);
+        const to = defaultPresetTemps(mode);
+        PRESET_FIELDS.forEach(([field, preset]) => {
+          if (parseFloat(state[field]) === inUnit(from[preset])) {
+            update[field] = String(inUnit(to[preset]));
+          }
+        });
+      }
+      store.setState(update);
     },
 
     updateThermostatUnit(state, newUnit) {

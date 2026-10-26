@@ -10,7 +10,9 @@ const {
   isStopped,
   setManualHold,
   clearManualHold,
+  isRemoteStop,
   REMOTE_STOP_UNTIL_PARAM,
+  REMOTE_STOP_NO_END,
 } = require('./thermostat.state');
 const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
 const { getCurrentPoint } = require('./thermostat.getSchedules');
@@ -440,9 +442,26 @@ async function stopFromUnit(device, modeFeature) {
       `${until ? `until ${new Date(until).toISOString()}` : 'until started again'}`,
   );
   await this.setValue(device, modeFeature, THERMOSTAT_MODE.OFF);
-  // After the stop, which lifts any end a previous stop had.
-  if (until !== null) {
-    await this.gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, String(until));
+  // After the stop, which lifts any mark a previous stop left. The mark says the
+  // unit made this stop, so that the remote is the one to lift it (N1), and when
+  // the programme's next point does. A stop whose end could not be recorded
+  // would be kept for good: tried once more, then the thermostat is started
+  // again rather than left off with nothing to start it. Without an end, a lost
+  // mark only costs the remote's restart of a unit shared by several thermostats.
+  const mark = until !== null ? String(until) : REMOTE_STOP_NO_END;
+  try {
+    await this.gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, mark);
+  } catch (e) {
+    try {
+      await this.gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, mark);
+    } catch (retryError) {
+      if (until === null) {
+        logger.warn(`Thermostat: could not record that ${device.selector} was stopped from its unit`);
+        return;
+      }
+      logger.warn(`Thermostat: could not record when ${device.selector} starts again, starting it now`);
+      await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
+    }
   }
 }
 
@@ -487,6 +506,13 @@ async function onExternalPowerChanged(changedSelector, newValue) {
     const driven = devices.filter((device) =>
       device.params.some((param) => param.name === 'THERMOSTAT_POWER_FEATURE' && param.value === changedSelector),
     );
+    // A unit switched on starts the thermostats it stopped itself, never one
+    // stopped from Gladys: a heating thermostat stopped for the season would
+    // otherwise start on every remote press, and fight the cooling one for the
+    // unit's mode on every pass. A unit only one thermostat drives is the
+    // exception: the press can only be for it, and left stopped it would switch
+    // the unit straight back off.
+    const startsAny = driven.length === 1;
     await Promise.all(
       driven.map(async (device) => {
         const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
@@ -499,6 +525,10 @@ async function onExternalPowerChanged(changedSelector, newValue) {
         if (value === 0 && !isStopped(device)) {
           await stopFromUnit.call(this, device, modeFeature);
         } else if (value !== 0 && isStopped(device)) {
+          if (!startsAny && !isRemoteStop(device)) {
+            logger.info(`Thermostat: ${changedSelector} powered on from the device, ${device.selector} stays stopped`);
+            return;
+          }
           logger.info(`Thermostat: ${changedSelector} powered on from the device itself, starting ${device.selector}`);
           // Before the start: it triggers the regulation pass, which must find
           // the hold rather than write the preset's setpoint over the unit's.

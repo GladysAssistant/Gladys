@@ -3643,12 +3643,13 @@
         },
         "targetFeatureLabel": "Consigne du thermostat réel",
         "targetFeatureHelp": "La fonctionnalité sur laquelle Gladys écrit la température de consigne. Certains appareils en exposent plusieurs (chauffage/refroidissement, présent/absent) : choisissez celle qui pilote réellement votre chauffage.",
-        "stateFeatureLabel": "État de chauffe (facultatif)",
-        "stateFeatureHelp": "Permet d'afficher si l'appareil est en train de chauffer. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
+        "stateFeatureLabel": "État de fonctionnement (facultatif)",
+        "stateFeatureHelp": "Permet d'afficher si l'appareil est en marche. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
         "modeFeatureLabel": "Mode de fonctionnement (facultatif)",
         "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un — le mode d'une climatisation convient aussi. Sur un thermostat, Gladys le bascule sur Arrêt lorsque le thermostat est arrêté ou qu'un créneau Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main. Le mode d'une climatisation n'a pas d'Arrêt : elle s'arrête par son Alimentation, qu'il faut alors renseigner.",
         "powerFeatureLabel": "Alimentation (facultatif)",
         "powerFeatureHelp": "L'interrupteur qui allume et éteint l'appareil réel, comme l'alimentation d'une climatisation ou d'une pompe à chaleur. Gladys l'éteint quand le thermostat est arrêté, qu'une fenêtre s'ouvre ou qu'un créneau Arrêt s'applique, et le rallume dès qu'une consigne reprend la main. Nécessaire pour une climatisation, dont le mode n'a pas d'arrêt.",
+        "powerFeatureNeeded": "Le mode d'une climatisation n'a pas d'arrêt : choisissez ici son alimentation, sinon Gladys ne peut pas l'arrêter quand une fenêtre s'ouvre, qu'un créneau Arrêt s'applique ou que le thermostat est arrêté.",
         "mode": {
           "heating": "Chauffage",
           "cooling": "Climatisation"
@@ -3679,6 +3680,10 @@
         "switchFeatureHelp": {
           "heating": "Interrupteur qui sera allumé et éteint pour chauffer la pièce.",
           "cooling": "Interrupteur qui sera allumé et éteint pour rafraîchir la pièce."
+        },
+        "noSwitchHint": {
+          "heating": "Aucun interrupteur à choisir ici. Affichez les appareils de toutes les pièces plus haut ou, pour un thermostat ou une pompe à chaleur qui se régule seul, choisissez le type « Thermostat réel ».",
+          "cooling": "Aucun interrupteur à choisir ici. Une climatisation se régule seule : choisissez le type « Thermostat réel », puis sa consigne. Un ventilateur ou un rafraîchisseur sur une prise peut rester un thermostat virtuel."
         },
         "windowFeatureLabel": "Capteurs d'ouverture de fenêtre",
         "windowFeatureHelp": {
@@ -3729,7 +3734,10 @@
         "manualDurationHelp": "Durée en minutes avant de revenir automatiquement au planning après une action manuelle.",
         "modeHelp": "Ce que ce thermostat commande : le chauffage ou la climatisation.",
         "sectionDevice": "Appareil",
-        "sectionHeating": "Chauffage",
+        "section": {
+          "heating": "Chauffage",
+          "cooling": "Climatisation"
+        },
         "sectionProgramming": "Programmation",
         "deviceRangeHint": "L’appareil annonce {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Utiliser ces valeurs",

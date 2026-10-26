@@ -31,6 +31,15 @@ describe('thermostat.deviceConfig - toNumber', () => {
 });
 
 describe('thermostat.deviceConfig - buildParamsConfig', () => {
+  it('should default the presets by use', () => {
+    const cooling = buildParamsConfig(deviceWithParams({ THERMOSTAT_MODE: 'cooling' }));
+    expect(cooling.preset_comfort).to.equal(24);
+    expect(cooling.preset_frost).to.equal(30);
+    const heating = buildParamsConfig(deviceWithParams({ THERMOSTAT_MIN_TEMP: '5' }));
+    expect(heating.preset_comfort).to.equal(21);
+    expect(heating.preset_frost).to.equal(7);
+  });
+
   it('should return null when the device has no params', () => {
     expect(buildParamsConfig({ params: [] })).to.equal(null);
     expect(buildParamsConfig({})).to.equal(null);

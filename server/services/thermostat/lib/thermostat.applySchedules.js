@@ -40,7 +40,7 @@ const {
   getCurrentDayAndMinutes,
 } = require('../../../utils/thermostatSchedule');
 const {
-  DEFAULT_PRESET_TEMPS,
+  defaultPresetTemps,
   FALLBACK_SETPOINT,
   DEFAULT_TPI_CYCLE_TIME,
   DEFAULT_TPI_PROPORTIONAL_BAND,
@@ -300,13 +300,18 @@ function readTemperatureInThermostatUnit(feature, thermostatUnit) {
   return value;
 }
 
+// How old a probe's reading may be before the average leaves it out, while a
+// fresher probe is there: the core's room average uses the same hour.
+const TEMPERATURE_MAX_AGE_MS = 60 * 60 * 1000;
+
 /**
  * @description Read the room temperature from one sensor or several.
  * A large room, or two rooms heated as one, has several probes: regulating on
  * one corner is regulating on the wrong number, so the loop uses their average
  * (A.1.1). Each reading is converted into the thermostat's unit before it is
  * averaged, and a sensor with no value, or that cannot be read, is left out
- * rather than counted as 0.
+ * rather than counted as 0. So is one that stopped reporting, while
+ * another still does.
  * @param {object} gladys - Gladys instance.
  * @param {Array<string>} selectors - Temperature feature selectors.
  * @param {string} thermostatUnit - Thermostat unit param, 'C' or 'F'.
@@ -327,9 +332,24 @@ async function readAverageTemperature(gladys, selectors, thermostatUnit) {
       }
     }),
   );
-  const readings = found
-    .map((sensor) => (sensor ? readTemperatureInThermostatUnit(sensor.feature, thermostatUnit) : null))
-    .filter((value) => value !== null && value !== undefined);
+  const read = found.filter((sensor) => {
+    if (!sensor) {
+      return false;
+    }
+    const value = readTemperatureInThermostatUnit(sensor.feature, thermostatUnit);
+    return value !== null && value !== undefined;
+  });
+  // A probe that stopped reporting — a flat battery, a lost Zigbee route — keeps
+  // its last value for ever, and pulled the average towards a temperature the
+  // room left long ago. One older than the core's room average accepts (an
+  // hour, getTemperatureInRoom) is left out while a fresher one is there; when
+  // every probe is that old, they are all kept, as a single probe always was:
+  // a stale reading still beats regulating on nothing.
+  const freshAfter = Date.now() - TEMPERATURE_MAX_AGE_MS;
+  const fresh = read.filter((sensor) => new Date(sensor.feature.last_value_changed).getTime() > freshAfter);
+  const readings = (fresh.length > 0 ? fresh : read).map((sensor) =>
+    readTemperatureInThermostatUnit(sensor.feature, thermostatUnit),
+  );
   if (readings.length === 0) {
     return null;
   }
@@ -379,7 +399,8 @@ function getSetpointForPreset(preset, config) {
   if (configValue !== null) {
     return configValue;
   }
-  return DEFAULT_PRESET_TEMPS[preset] !== undefined ? DEFAULT_PRESET_TEMPS[preset] : FALLBACK_SETPOINT;
+  const defaults = defaultPresetTemps(config && config.default_mode);
+  return defaults[preset] !== undefined ? defaults[preset] : FALLBACK_SETPOINT;
 }
 
 /**
@@ -625,26 +646,44 @@ function computeSwitchActive(currentTemp, setpoint, mode, config, currentSwitchO
 }
 
 /**
- * @description The power features of the external thermostats that are not
- * stopped. Two thermostats may drive one unit — one per mode, or one per
+ * @description The feature that switches the unit an external thermostat
+ * drives: its power, or its mode when it has no power (a reversible thermostat
+ * whose mode says off, A.0.3).
+ * @param {object} config - The thermostat's config.
+ * @returns {string|null} The selector, or null on a virtual thermostat.
+ * @example
+ * unitFeature(config); // 'ac-power'
+ */
+function unitFeature(config) {
+  if (!config || !isExternal(config)) {
+    return null;
+  }
+  return config.power_feature || config.mode_feature || null;
+}
+
+/**
+ * @description The unit features (unitFeature) of the external thermostats that
+ * are not stopped. Two thermostats may drive one unit — one per mode, or one per
  * setpoint of a reversible device (G) — and a stopped one cut, on every pass,
  * the power the running one handed back: the unit switched off and on once a
- * minute. A power in this set is the running thermostat's to switch.
+ * minute. On a unit with no power, the stopped one wrote its mode off, and the
+ * running one its mode back, the same way. A feature in this set is the running
+ * thermostat's to switch.
  * @param {Array} devices - The thermostats.
  * @param {string} [exceptId] - A thermostat to leave out.
- * @returns {Set<string>} The power selectors.
+ * @returns {Set<string>} The power, or mode, selectors.
  * @example
- * runningPowerFeatures(await gladys.device.get({ service: 'thermostat' }), device.id);
+ * runningUnitFeatures(await gladys.device.get({ service: 'thermostat' }), device.id);
  */
-function runningPowerFeatures(devices, exceptId = null) {
-  const powers = new Set();
+function runningUnitFeatures(devices, exceptId = null) {
+  const features = new Set();
   (devices || []).forEach((device) => {
-    const config = getDeviceConfig(device);
-    if (device.id !== exceptId && isExternal(config) && config.power_feature && !isStopped(device)) {
-      powers.add(config.power_feature);
+    const feature = unitFeature(getDeviceConfig(device));
+    if (device.id !== exceptId && feature && !isStopped(device)) {
+      features.add(feature);
     }
   });
-  return powers;
+  return features;
 }
 
 /**
@@ -663,12 +702,25 @@ async function liftRemoteStop(gladys, device, config) {
   if (until === null || Date.now() < until) {
     return false;
   }
-  await gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, '');
   const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
   if (!modeFeature || !isStopped(device)) {
+    // Started by hand already: the end has nothing left to lift.
+    await gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, '');
     return false;
   }
+  // The mode before the end is forgotten: cleared first, a failed write left the
+  // thermostat stopped with nothing left to start it — the sticky stop this end
+  // exists to prevent. Kept, the next pass tries again.
   await gladys.device.saveState(modeFeature, getRunningMode(config));
+  // A preset picked by hand before the stop lost its hold with it: left on the
+  // feature, it read as a standing choice, and the thermostat never followed its
+  // programme again. The stop ran to the next point, where that hold would have
+  // ended too: the programme takes the thermostat back, as it would have.
+  if (getPreset(device) !== 'schedule' && (await followsSchedule(device.id))) {
+    await clearManualHold.call({ gladys }, device);
+    await savePreset.call({ gladys }, device, 'schedule');
+  }
+  await gladys.device.setParam(device, REMOTE_STOP_UNTIL_PARAM, '');
   logger.info(`Thermostat schedule: ${device.selector} started again, the stop made on its unit ran to the next point`);
   return true;
 }
@@ -684,7 +736,7 @@ async function liftRemoteStop(gladys, device, config) {
  * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
  * @param {Map<string, string>} [announced] - The programme preset last announced for each thermostat.
  * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
- * @param {Set<string>} [runningPowers] - The powers a running thermostat switches (runningPowerFeatures).
+ * @param {Set<string>} [runningUnits] - The units a running thermostat switches (runningUnitFeatures).
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
@@ -698,7 +750,7 @@ async function regulateDevice(
   selfWritten = null,
   announced = null,
   selfWrittenPowers = null,
-  runningPowers = null,
+  runningUnits = null,
 ) {
   const config = getDeviceConfig(device);
   if (!config) {
@@ -750,7 +802,7 @@ async function regulateDevice(
   if (!lifted && isStopped(device)) {
     logger.debug(`Thermostat schedule: ${selector} is stopped, leaving it alone`);
     await saveActivePreset.call({ gladys }, device, 'off');
-    if (external && runningPowers && runningPowers.has(config.power_feature)) {
+    if (external && runningUnits && runningUnits.has(unitFeature(config))) {
       // Another thermostat runs this unit: it is the one to switch it.
       logger.debug(`Thermostat schedule: ${selector} is stopped, its unit is another thermostat's to run`);
     } else if (external) {
@@ -765,8 +817,11 @@ async function regulateDevice(
   // The preset the thermostat carries, and the hold armed on it: both are on the
   // device now — the preset as a feature, the hold as params — so neither costs
   // a variable round-trip, and a scene can read and write them.
-  let currentPreset = getPreset(device);
-  const hold = getManualHold(device);
+  // A lift hands a thermostat on a programme back to it, which the device read
+  // before the lift does not say yet.
+  const handedBack = lifted && (await followsSchedule(device.id));
+  let currentPreset = handedBack ? 'schedule' : getPreset(device);
+  const hold = handedBack ? null : getManualHold(device);
 
   // Manual hold: regulate on the held setpoint until it expires.
   let manualJustExpired = false;
@@ -1089,7 +1144,7 @@ async function applySchedules() {
       (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
     const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
 
-    const runningPowers = runningPowerFeatures(thermostatDevices);
+    const runningUnits = runningUnitFeatures(thermostatDevices);
 
     await Promise.all(
       thermostatDevices.map(async (device) => {
@@ -1104,7 +1159,7 @@ async function applySchedules() {
             selfWrittenSetpoints,
             announcedPresets,
             selfWrittenPowers,
-            runningPowers,
+            runningUnits,
           );
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);
@@ -1125,7 +1180,8 @@ module.exports = {
   writeExternalMode,
   stopExternalThermostat,
   startExternalThermostat,
-  runningPowerFeatures,
+  runningUnitFeatures,
+  unitFeature,
   getRunningMode,
   readTemperatureInThermostatUnit,
   readAverageTemperature,

@@ -10,7 +10,7 @@ import {
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 import {
-  DEFAULT_PRESET_TEMPS,
+  defaultPresetTemps,
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
   DEFAULT_HYSTERESIS_START
@@ -418,17 +418,18 @@ class ThermostatBox extends Component {
     const cfg = this.getConfig();
     const mode = cfg.default_mode || 'heating';
     const keys = mode === 'cooling' ? COOLING_PRESETS : HEATING_PRESETS;
+    const defaults = defaultPresetTemps(mode);
     const allPresets = {
       off: { key: 'off', icon: PRESET_ICONS.off, temp: null },
-      frost: { key: 'frost', icon: PRESET_ICONS.frost, temp: numOr(cfg.preset_frost, DEFAULT_PRESET_TEMPS.frost) },
-      away: { key: 'away', icon: PRESET_ICONS.away, temp: numOr(cfg.preset_away, DEFAULT_PRESET_TEMPS.away) },
+      frost: { key: 'frost', icon: PRESET_ICONS.frost, temp: numOr(cfg.preset_frost, defaults.frost) },
+      away: { key: 'away', icon: PRESET_ICONS.away, temp: numOr(cfg.preset_away, defaults.away) },
       comfort: {
         key: 'comfort',
         icon: mode === 'cooling' ? COMFORT_ICON.cooling : COMFORT_ICON.heating,
-        temp: numOr(cfg.preset_comfort, DEFAULT_PRESET_TEMPS.comfort)
+        temp: numOr(cfg.preset_comfort, defaults.comfort)
       },
-      eco: { key: 'eco', icon: PRESET_ICONS.eco, temp: numOr(cfg.preset_eco, DEFAULT_PRESET_TEMPS.eco) },
-      night: { key: 'night', icon: PRESET_ICONS.night, temp: numOr(cfg.preset_night, DEFAULT_PRESET_TEMPS.night) }
+      eco: { key: 'eco', icon: PRESET_ICONS.eco, temp: numOr(cfg.preset_eco, defaults.eco) },
+      night: { key: 'night', icon: PRESET_ICONS.night, temp: numOr(cfg.preset_night, defaults.night) }
     };
     return keys.map(k => allPresets[k]);
   };
@@ -1013,7 +1014,7 @@ class ThermostatBox extends Component {
     if (setpoint !== null && setpoint !== undefined) return;
     if (noConfig || error || !this.props.box.thermostat_feature) return;
     const cfg = this.getConfig();
-    const comfort = numOr(cfg.preset_comfort, DEFAULT_PRESET_TEMPS.comfort);
+    const comfort = numOr(cfg.preset_comfort, defaultPresetTemps(cfg.default_mode).comfort);
     // The comfort preset can sit outside the device's own range, which would
     // put the needle off the arc.
     const fallback = Math.min(this.getMaxTemp(), Math.max(this.getMinTemp(), comfort));

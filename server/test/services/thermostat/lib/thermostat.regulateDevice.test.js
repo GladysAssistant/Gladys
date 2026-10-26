@@ -1275,6 +1275,38 @@ describe('thermostat.regulateDevice - several sensors', () => {
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
   });
 
+  // A probe that stopped reporting keeps its last value for ever.
+  describe('a probe that stopped reporting', () => {
+    const ago = (minutes) => new Date(Date.now() - minutes * 60 * 1000).toISOString();
+    const probes = (salonAge, kitchenAge) => ({
+      'salon-temp': { selector: 'salon-temp', last_value: 22, last_value_changed: ago(salonAge) },
+      'kitchen-temp': { selector: 'kitchen-temp', last_value: 10, last_value_changed: ago(kitchenAge) },
+      'heater-switch': { selector: 'heater-switch', last_value: 1 },
+    });
+
+    it('should be left out while a fresher probe reports', async () => {
+      // The kitchen probe died at 10 °C two days ago: averaged, 16 would heat.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: probes(5, 48 * 60) });
+
+      await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+      expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
+    });
+
+    it('should still be counted when every probe is as old', async () => {
+      // 22 and 10 average to 16: heat, rather than regulate on nothing.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: { ...probes(3 * 60, 48 * 60), 'heater-switch': { selector: 'heater-switch', last_value: 0 } },
+      });
+
+      await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+      expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+    });
+  });
+
   it('should regulate a manual hold on the average too', async () => {
     // 24 and 18 average to 21, below 23 minus the band: heat, although the
     // first probe alone reads warm enough.

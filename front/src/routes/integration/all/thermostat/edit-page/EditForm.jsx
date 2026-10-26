@@ -161,6 +161,7 @@ const EditForm = ({ ...props }) => {
   // switch are therefore hidden — offering them would suggest Gladys regulates
   // a device that regulates itself.
   const isExternalThermostat = props.thermostatEditType === 'external';
+  const switchChoices = pickable(props.switchFeatures, keep(props.thermostatEditSwitchFeature));
 
   // Picking the real thermostat's setpoint feature adopts the range it
   // advertises. A Netatmo says 5-30, and the 5-35 default then offered the user
@@ -174,6 +175,12 @@ const EditForm = ({ ...props }) => {
   const pickedTarget = isExternalThermostat
     ? (props.targetFeatures || []).find(feature => feature.selector === props.thermostatEditTargetFeature)
     : null;
+  // An air conditioner's mode has no Off: without its power, nothing stops it
+  // (spec A.0.3). The field stays optional for a thermostat, which a mode stops.
+  const needsPower =
+    !!pickedTarget &&
+    pickedTarget.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+    !props.thermostatEditPowerFeature;
   const formUnit = props.thermostatEditTempUnit || 'C';
   const targetRange =
     pickedTarget &&
@@ -385,7 +392,7 @@ const EditForm = ({ ...props }) => {
                 class="form-control"
                 value={mode}
                 onChange={e => {
-                  props.updateThermostatField('thermostatEditMode', e.target.value);
+                  props.updateThermostatMode(e.target.value);
                   // TPI is heating-only: switching to cooling falls back to hysteresis
                   if (e.target.value === 'cooling' && controlType === 'tpi') {
                     props.updateThermostatField('thermostatEditControlType', 'hysteresis');
@@ -479,6 +486,11 @@ const EditForm = ({ ...props }) => {
                       emptyLabel={<Text id="global.emptySelectOption" />}
                     />
                   </Localizer>
+                  {needsPower && (
+                    <div class="alert alert-warning mt-2 mb-0">
+                      <Text id="integration.thermostat.edit.powerFeatureNeeded" />
+                    </div>
+                  )}
                   <small class="form-text text-muted">
                     <Text id="integration.thermostat.edit.powerFeatureHelp" />
                   </small>
@@ -487,7 +499,7 @@ const EditForm = ({ ...props }) => {
             )}
 
             <h4 class={style.formSection}>
-              <Text id="integration.thermostat.edit.sectionHeating" />
+              <Text id={`integration.thermostat.edit.section.${modeSuffix}`} />
             </h4>
 
             {/* Capteur de température */}
@@ -537,11 +549,16 @@ const EditForm = ({ ...props }) => {
                 <Localizer>
                   <FeatureSelect
                     value={props.thermostatEditSwitchFeature || ''}
-                    features={pickable(props.switchFeatures, keep(props.thermostatEditSwitchFeature))}
+                    features={switchChoices}
                     onChange={e => props.updateThermostatField('thermostatEditSwitchFeature', e.target.value)}
                     emptyLabel={<Text id="global.emptySelectOption" />}
                   />
                 </Localizer>
+                {switchChoices.length === 0 && (
+                  <div class="alert alert-info mt-2 mb-0">
+                    <Text id={`integration.thermostat.edit.noSwitchHint.${modeSuffix}`} />
+                  </div>
+                )}
                 <small class="form-text text-muted">
                   <Text id={`integration.thermostat.edit.switchFeatureHelp.${modeSuffix}`} />
                 </small>
