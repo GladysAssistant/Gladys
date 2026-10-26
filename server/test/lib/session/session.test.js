@@ -173,6 +173,17 @@ describe('session.revokeLoginSessions', () => {
     const promise = session.getAccessToken('refresh-token-test', ['dashboard:write']);
     return assert.isRejected(promise, 'Session was revoked');
   });
+  it('should still refuse the revoked sessions after a restart', async () => {
+    const session = new Session('secret', new Cache());
+    const accessToken = await session.getAccessToken('refresh-token-test', ['dashboard:write']);
+    await session.revokeLoginSessions('0cd30aef-9c4e-4a23-88e3-3547971296e5');
+    // a restart starts with an empty cache, filled again from the database
+    const sessionAfterRestart = new Session('secret', new Cache());
+    await sessionAfterRestart.init();
+    expect(() => sessionAfterRestart.validateAccessToken(accessToken.access_token, 'dashboard:write')).to.throw(
+      'Session was revoked',
+    );
+  });
   it('should revoke all login sessions of the user', async () => {
     const cache = new Cache();
     const session = new Session('secret', cache);

@@ -177,6 +177,28 @@ describe('Websockets', () => {
     websocketManager.sendMessageUser({ ...message, userId: 'aa0eaee9-5b90-4287-841a-0237f9d75832' });
     assert.calledWith(client.send, JSON.stringify(message));
   });
+  it('should keep the last session a connection authenticated with', () => {
+    const wss = new EventEmitter();
+    const gladys = {
+      event: new EventEmitter(),
+      session: {
+        isRevoked: (sessionId) => sessionId === 'b7f1c1e2-3d4a-4f5b-8c6d-7e8f9a0b1c2d',
+      },
+    };
+    const websocketManager = new WebsocketManager(wss, gladys);
+    const client = {
+      readyState: WebSocket.OPEN,
+      send: fake.returns(0),
+      close: fake.returns(0),
+    };
+    const user = { id: 'aa0eaee9-5b90-4287-841a-0237f9d75832' };
+    websocketManager.userConnected(user, client, 'a0bd2a19-60e1-4d4c-9a37-39c4b8a2dbd8');
+    // authenticated again on the same socket, with a session that is revoked since
+    websocketManager.userConnected(user, client, 'b7f1c1e2-3d4a-4f5b-8c6d-7e8f9a0b1c2d');
+    expect(websocketManager.connections[user.id]).to.have.lengthOf(1);
+    expect(websocketManager.connections[user.id][0].sessionId).to.equal('b7f1c1e2-3d4a-4f5b-8c6d-7e8f9a0b1c2d');
+    assert.calledWith(client.close, 4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
+  });
   it('should close the connection of a revoked session instead of sending it a message', () => {
     const wss = new EventEmitter();
     const gladys = {

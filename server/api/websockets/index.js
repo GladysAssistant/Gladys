@@ -89,6 +89,9 @@ function userConnected(user, client, sessionId = null) {
       client,
       sessionId,
     });
+  } else {
+    // the client authenticated again on the same socket: it now uses this session
+    this.connections[user.id][connectionIndex].sessionId = sessionId;
   }
 
   // Send a message to the frontend to tell it's connected
