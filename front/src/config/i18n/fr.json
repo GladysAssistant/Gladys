@@ -3677,14 +3677,14 @@
         },
         "windowFeatureLabel": "Capteur d'ouverture de fenêtre",
         "windowFeatureHelp": {
-          "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",
-          "cooling": "Optionnel. Si une fenêtre est ouverte, la climatisation est automatiquement coupée."
+          "heating": "Optionnel. Si une fenêtre reste ouverte plus longtemps que le délai ci-dessous, le chauffage est automatiquement coupé.",
+          "cooling": "Optionnel. Si une fenêtre reste ouverte plus longtemps que le délai ci-dessous, la climatisation est automatiquement coupée."
         },
         "windowDelayLabel": "Délai avant coupure",
         "windowDelayUnit": "s",
         "windowDelayHelp": {
-          "heating": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que le chauffage soit coupé. Une porte ouverte pour rentrer et refermée aussitôt ne le coupe pas. 0 le coupe immédiatement.",
-          "cooling": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que la climatisation soit coupée. Une porte ouverte pour rentrer et refermée aussitôt ne la coupe pas. 0 la coupe immédiatement."
+          "heating": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que le chauffage soit coupé. Une porte ouverte pour rentrer et refermée aussitôt ne le coupe pas. 0 le coupe immédiatement ; 3600 s (une heure) au maximum.",
+          "cooling": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que la climatisation soit coupée. Une porte ouverte pour rentrer et refermée aussitôt ne la coupe pas. 0 la coupe immédiatement ; 3600 s (une heure) au maximum."
         },
         "hysteresisStartLabel": "Seuil de démarrage",
         "hysteresisStartHelp": {

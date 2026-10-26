@@ -3677,14 +3677,14 @@
         },
         "windowFeatureLabel": "Window opening sensor",
         "windowFeatureHelp": {
-          "heating": "Optional. If a window is open, the heating is automatically cut off.",
-          "cooling": "Optional. If a window is open, the cooling is automatically cut off."
+          "heating": "Optional. If a window stays open longer than the delay below, the heating is automatically cut off.",
+          "cooling": "Optional. If a window stays open longer than the delay below, the cooling is automatically cut off."
         },
         "windowDelayLabel": "Delay before cutting off",
         "windowDelayUnit": "s",
         "windowDelayHelp": {
-          "heating": "How long the window has to stay open before the heating is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once.",
-          "cooling": "How long the window has to stay open before the cooling is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once."
+          "heating": "How long the window has to stay open before the heating is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour).",
+          "cooling": "How long the window has to stay open before the cooling is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour)."
         },
         "hysteresisStartLabel": "Start threshold",
         "hysteresisStartHelp": {

@@ -3677,14 +3677,14 @@
         },
         "windowFeatureLabel": "Sensor de apertura de ventana",
         "windowFeatureHelp": {
-          "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",
-          "cooling": "Opcional. Si una ventana está abierta, la refrigeración se corta automáticamente."
+          "heating": "Opcional. Si una ventana permanece abierta más tiempo que el retardo de abajo, la calefacción se corta automáticamente.",
+          "cooling": "Opcional. Si una ventana permanece abierta más tiempo que el retardo de abajo, la refrigeración se corta automáticamente."
         },
         "windowDelayLabel": "Retardo antes del corte",
         "windowDelayUnit": "s",
         "windowDelayHelp": {
-          "heating": "Tiempo que la ventana debe permanecer abierta antes de cortar la calefacción. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato.",
-          "cooling": "Tiempo que la ventana debe permanecer abierta antes de cortar la refrigeración. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato."
+          "heating": "Tiempo que la ventana debe permanecer abierta antes de cortar la calefacción. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo.",
+          "cooling": "Tiempo que la ventana debe permanecer abierta antes de cortar la refrigeración. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo."
         },
         "hysteresisStartLabel": "Umbral de arranque",
         "hysteresisStartHelp": {

@@ -14,7 +14,8 @@ import {
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
   DEFAULT_HYSTERESIS_START,
-  DEFAULT_WINDOW_DELAY_SECONDS
+  DEFAULT_WINDOW_DELAY_SECONDS,
+  MAX_WINDOW_DELAY_SECONDS
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -425,7 +426,12 @@ class ThermostatBox extends Component {
     if (this.windowOpenedAt === null || this.windowOpenedAt === undefined) {
       this.windowOpenedAt = Math.min(since, Date.now());
     }
-    const delay = Math.max(0, numOr(this.getConfig().window_delay, DEFAULT_WINDOW_DELAY_SECONDS));
+    // Bounded like the server's: a value stored through another route, or before the
+    // bound existed, overflowed the timer and showed the banner at once.
+    const delay = Math.min(
+      MAX_WINDOW_DELAY_SECONDS,
+      Math.max(0, numOr(this.getConfig().window_delay, DEFAULT_WINDOW_DELAY_SECONDS))
+    );
     const remaining = this.windowOpenedAt + delay * 1000 - Date.now();
     if (remaining <= 0) {
       this.setState({ isWindowOpen: true });

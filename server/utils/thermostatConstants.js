@@ -48,9 +48,10 @@ const MANUAL_DURATION_MS = DEFAULT_MANUAL_DURATION_MINUTES * 60 * 1000;
 // as soon as it opens.
 const DEFAULT_WINDOW_DELAY_SECONDS = 60;
 // And at most an hour. Beyond 2^31 - 1 ms (about 24.8 days) `setTimeout` fires
-// after 1 ms instead: 3,000,000 s cut the heating at once, while the widget
-// already said so and the server logged a TimeoutOverflowWarning. A window left
-// open for more than an hour is no door opened to come in.
+// after 1 ms instead: with 3,000,000 s the widget showed the banner at once and
+// the server logged a TimeoutOverflowWarning, its early pass finding the delay
+// not elapsed. A window left open for more than an hour is no door opened to
+// come in.
 const MAX_WINDOW_DELAY_SECONDS = 3600;
 
 // The preset names, as they are stored in a schedule transition and used to key
