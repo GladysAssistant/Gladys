@@ -1,23 +1,14 @@
-const { EVENTS } = require('../../../utils/constants');
 const { toolNameFromIntent } = require('./mcpToolsToChatApiFormat');
 
 /**
- * @description Create MCP server.
- * @returns {Promise} MCP server to expose.
+ * @description Create an MCP server exposing the loaded resources and tools.
+ * An MCP server can only be connected to one transport (GHSA-345p-7cg4-v4c7), so a new one is created per request.
+ * @returns {object} MCP server to connect to a transport.
  * @example
- * createServer()
+ * const server = createServer();
  */
-async function createServer() {
-  if (!this.server) {
-    this.gladys.event.on(EVENTS.DEVICE.CREATE, this.reloadCb);
-    this.gladys.event.on(EVENTS.DEVICE.UPDATE, this.reloadCb);
-  }
-
-  if (this.server) {
-    await this.server.close();
-  }
-
-  this.server = new this.mcp.McpServer(
+function createServer() {
+  const server = new this.mcp.McpServer(
     {
       name: 'Gladys',
       title: 'Gladys',
@@ -31,12 +22,14 @@ async function createServer() {
     },
   );
 
-  (await this.getAllResources()).map(({ name, uri, config, cb }) => {
-    return this.server.registerResource(name, uri, config, cb);
+  this.schemas.resources.forEach(({ name, uri, config, cb }) => {
+    server.registerResource(name, uri, config, cb);
   });
-  (await this.getAllTools()).map(({ intent, config, cb }) => {
-    return this.server.registerTool(toolNameFromIntent(intent), config, cb);
+  this.schemas.tools.forEach(({ intent, config, cb }) => {
+    server.registerTool(toolNameFromIntent(intent), config, cb);
   });
+
+  return server;
 }
 
 module.exports = {
