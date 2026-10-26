@@ -68,6 +68,19 @@ describe('zigbee2mqtt postDelete', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should leave the device list publication to the running synchronization', async () => {
+    const inventory = [{ friendly_name: 'outlet', ieee_address: '0xbbb', type: 'EndDevice' }];
+    zigbee2mqttManager.lastBridgeDevices = inventory;
+    zigbee2mqttManager.syncRenamedDevicesRunning = true;
+    // EXECUTE
+    await zigbee2mqttManager.postDelete(buildGladysDevice('outlet-id', 'outlet', '0xaaa'));
+    // ASSERT: the inventory is queued for the running pass, which publishes the list once it is
+    // reconciled; publishing now would send the list from before the rename
+    expect(zigbee2mqttManager.pendingSyncRenamedDevices).to.equal(inventory);
+    assert.notCalled(gladys.device.get);
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should apply a rename once the device owning the new name is deleted', async () => {
     // "motion" was renamed "outlet" in Zigbee2mqtt, but "outlet" is still owned in Gladys
     // by a device removed from the Zigbee network: the rename is skipped

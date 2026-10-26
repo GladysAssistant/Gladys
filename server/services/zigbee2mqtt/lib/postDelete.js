@@ -16,7 +16,13 @@ async function postDelete(device) {
   if (!this.lastBridgeDevices) {
     return;
   }
+  // A running pass only queues this inventory, and publishes the device list itself once it is
+  // reconciled: publishing it here would send the list from before the rename.
+  const queued = this.syncRenamedDevicesRunning;
   await this.syncRenamedDevices(this.lastBridgeDevices);
+  if (queued) {
+    return;
+  }
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
     payload: this.getDiscoveredDevices(),
