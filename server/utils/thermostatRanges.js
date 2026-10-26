@@ -326,14 +326,23 @@ function trimRangesAround(ranges, candidate, ignoredKey = null) {
 }
 
 /**
- * @description Copy the ranges of a day onto other days, in place of theirs.
+ * @description Copy a day onto other days, in place of theirs: each target then
+ * reads as the source does in the editor, from its midnight to the next one.
  *
- * What the copies cover gives way, as for a range added by hand: the night of
- * the day before a target ran into it, and was left there. Copying an all-day
- * frost Saturday onto Wednesday kept Tuesday's 22:30 → 06:30 night, which
- * rangesToTransitions closed at 06:30 with a stop — the heating was off from
- * Wednesday 06:30 to Thursday 06:30. A copied night likewise takes the next
- * morning it runs into.
+ * - **The night the source inherits is copied too.** A copy only took the source
+ *   day's own ranges, so "undoing" a holiday by copying Friday onto Saturday left
+ *   Saturday 00:00 → 06:30 off, where Friday shows Thursday's night.
+ * - **A target's own night keeps its morning.** Its ranges were all dropped,
+ *   past-midnight half included: copying an all-day frost Saturday onto
+ *   Wednesday left Thursday 00:00 → 06:30 off, which a range added by hand never
+ *   did. What runs past the target's midnight stays on the next day.
+ * - **What the copies cover gives way**, as for a range added by hand: the night
+ *   before a target is cut where the copied day starts, and a copied night takes
+ *   the next morning it runs into.
+ * - **The order the days were ticked does not matter.** Each target's copies
+ *   trimmed the earlier ones, so a copied night beat the next target's own
+ *   morning or not depending on the clicks. Nights now go first and every day's
+ *   own ranges after, so a day always keeps what was copied onto it.
  * @param {Array} ranges - The ranges in place: { key, day_of_week, start_time, end_time, preset }.
  * @param {number} sourceDay - The day copied, 0 = Monday.
  * @param {Array<number>} targetDays - The days it is copied onto.
@@ -343,19 +352,49 @@ function trimRangesAround(ranges, candidate, ignoredKey = null) {
  * copyDayRanges(ranges, 5, [2]);
  */
 function copyDayRanges(ranges, sourceDay, targetDays, makeKey = (day, index) => `copy-${day}-${index}`) {
-  const source = ranges.filter((range) => range.day_of_week === sourceDay);
-  let result = ranges.filter((range) => !targetDays.includes(range.day_of_week));
-  targetDays.forEach((day) => {
-    source.forEach((range, index) => {
-      const copy = {
-        key: makeKey(day, index),
-        day_of_week: day,
-        start_time: range.start_time,
-        end_time: range.end_time,
-        preset: range.preset,
-      };
-      result = [...trimRangesAround(result, copy), copy];
-    });
+  const targets = [...new Set(targetDays)].filter((day) => day !== sourceDay).sort((a, b) => a - b);
+  const own = ranges.filter((range) => range.day_of_week === sourceDay);
+  // The stretch of the previous day's night that the source shows before its own
+  // first range.
+  const firstOwnStart = Math.min(DAY_MINUTES, ...own.map((range) => timeToMinutes(range.start_time)));
+  const previousDay = (sourceDay + 6) % 7;
+  const pastMidnight = (range) => weekInterval(range)[1] - (range.day_of_week + 1) * DAY_MINUTES;
+  const inherited = ranges
+    .filter((range) => range.day_of_week === previousDay && pastMidnight(range) > 0)
+    .map((range) => ({
+      start_time: '00:00',
+      end_time: minutesToTime(Math.min(firstOwnStart, pastMidnight(range))),
+      preset: range.preset,
+    }))
+    .filter((range) => range.end_time !== '00:00');
+  // Copies of the source's own ranges keep their index in it as before.
+  const source = [...own, ...inherited];
+
+  // A target's own ranges go, but for what runs past its midnight.
+  let result = [];
+  ranges.forEach((range) => {
+    if (!targets.includes(range.day_of_week)) {
+      result.push(range);
+      return;
+    }
+    result = [
+      ...result,
+      ...trimRangesAround([range], { day_of_week: range.day_of_week, start_time: '00:00', end_time: '00:00' }),
+    ];
+  });
+
+  const copies = targets.flatMap((day) =>
+    source.map((range, index) => ({
+      key: makeKey(day, index),
+      day_of_week: day,
+      start_time: range.start_time,
+      end_time: range.end_time,
+      preset: range.preset,
+    })),
+  );
+  const crossesMidnight = (range) => pastMidnight(range) > 0;
+  [...copies.filter(crossesMidnight), ...copies.filter((range) => !crossesMidnight(range))].forEach((copy) => {
+    result = [...trimRangesAround(result, copy), copy];
   });
   return mergeTouchingRanges(result);
 }

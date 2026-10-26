@@ -338,8 +338,8 @@ class ScheduleEditor extends Component {
     }));
   };
 
-  // Copying a day is copying its ranges, and what they cover gives way — the
-  // night before a target included (`copyDayRanges`).
+  // Copying a day makes each target read as the source does, from midnight to
+  // midnight, whatever order the days were ticked in (`copyDayRanges`).
   applyCopy = () => {
     const { copySourceDay, copyTargetDays, ranges } = this.state;
     if (copySourceDay === null || copyTargetDays.length === 0) return;
