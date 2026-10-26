@@ -9,6 +9,7 @@ import {
   THERMOSTAT_PRESET
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
+import { calendarDaysAhead } from '../../../../../server/utils/thermostatSchedule';
 import {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_MIN_TEMP,
@@ -52,6 +53,17 @@ const PRESET_NAMES = Object.keys(PRESET_VALUES).reduce((acc, name) => ({ ...acc,
 // Sentinel: hold every incoming setpoint, whatever its value
 const HOLD_ANY_SETPOINT = Symbol('hold-any-setpoint');
 
+// The time a banner hands back at, with its day when it is not today: "until
+// 13:00" read as today for a hold ending at 13:00 tomorrow (forum 11074). A
+// week ahead falls on today's weekday, which "next" tells apart from today.
+// `weekday` is 0 for Monday, as in a schedule.
+const untilText = (days, weekday, time, t) => {
+  if (days === 0) return time;
+  if (days === 1) return `${(t && t.untilTomorrow) || ''} ${time}`;
+  const names = days === 7 ? t && t.untilNextDays : t && t.untilDays;
+  return `${(names && names[weekday]) || ''} ${time}`;
+};
+
 // Parse a value as a finite number with a fallback — unlike `Number(x) || d`, a legitimate 0 is kept
 const numOr = (value, fallback) => {
   if (value === null || value === undefined || value === '') return fallback;
@@ -74,6 +86,8 @@ class ThermostatBox extends Component {
     featureUnit: null,
     activeSchedule: null,
     manualUntil: null,
+    // The phone's day the hold banner was last drawn on (see refreshClock)
+    today: new Date().toDateString(),
     isWindowOpen: false,
     // Real state of the actuator, as reported by the switch feature. The widget
     // reflects it rather than recomputing it: hysteresis has a neutral zone where
@@ -749,11 +763,13 @@ class ThermostatBox extends Component {
       const schedule = (schedules || []).find(candidate =>
         (candidate.devices || []).some(device => device.selector === deviceSelector)
       );
+      // A schedule deleted behind the widget's back is missing from the list,
+      // and degrades to "no schedule" rather than leaving a stale banner.
       this.setState({ activeSchedule: schedule || null });
     } catch (e) {
-      // A schedule deleted behind the widget's back degrades to "no schedule"
-      // rather than leaving a stale banner.
-      this.setState({ activeSchedule: null });
+      // A failed request says nothing about the schedule: the last one loaded
+      // stays, and with it its `next.refresh_at`, so the minute tick tries again
+      // instead of dropping the banner for good.
     }
   };
 
@@ -987,11 +1003,22 @@ class ThermostatBox extends Component {
 
   // Local minute tick. The current point is resolved by the server, so this only
   // clears the countdown when it visually expires; the server's own event is
-  // what actually ends the hold.
+  // what actually ends the hold. The days the banners name go stale on their
+  // own, with nothing else to draw the card again: a wall panel still said
+  // "until tomorrow 06:30" at 03:00. The hold banner counts in the phone's day,
+  // drawn again when that day changes; the programme banner's count is the
+  // server's, loaded again once it says it no longer holds.
   refreshClock = () => {
-    const { manualUntil } = this.state;
-    if (manualUntil && Date.now() > manualUntil) {
+    const { manualUntil, activeSchedule, today } = this.state;
+    const now = Date.now();
+    if (manualUntil && now > manualUntil) {
       this.setState({ manualUntil: null });
+    } else if (manualUntil && today !== new Date(now).toDateString()) {
+      this.setState({ today: new Date(now).toDateString() });
+    }
+    const next = activeSchedule && activeSchedule.next;
+    if (next && next.refresh_at && now >= next.refresh_at) {
+      this.loadSchedule();
     }
   };
 
@@ -1446,6 +1473,12 @@ class ThermostatBox extends Component {
                       untilDate.getMinutes()
                     ).padStart(2, '0')}`;
                     const t = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
+                    const untilWhen = untilText(
+                      calendarDaysAhead(manualUntil),
+                      (untilDate.getDay() + 6) % 7,
+                      untilTime,
+                      t
+                    );
                     const manualUntilLabel = (t && t.manualUntil) || '';
                     const cancelLabel = (t && t.cancelManual) || '';
                     // A hold is not always a hand-set temperature: picking a
@@ -1475,7 +1508,7 @@ class ThermostatBox extends Component {
                           {label}
                           <span class={style.manualBannerUntil}>
                             {' '}
-                            {manualUntilLabel} {untilTime}
+                            {manualUntilLabel} {untilWhen}
                           </span>
                         </span>
                         <button class={style.manualBannerCancel} onClick={this.cancelManualMode} title={cancelLabel}>
@@ -1500,6 +1533,12 @@ class ThermostatBox extends Component {
                   const bannerColor = this.getPresetColor(resolvedPresetKey);
                   const t2 = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
                   const untilLabel = (t2 && t2.scheduleUntil) || '';
+                  // Counted by the server from the house's today: the phone's
+                  // may already be tomorrow, or still yesterday.
+                  const nextPoint = activeSchedule && activeSchedule.next;
+                  const nextWhen = nextPoint
+                    ? untilText(nextPoint.days_ahead, nextPoint.day_of_week, nextPoint.time, t2)
+                    : null;
 
                   // A stopped thermostat is not waiting for the next point:
                   // the programme does not start it again, only a mode does.
@@ -1532,7 +1571,7 @@ class ThermostatBox extends Component {
                         {!stopped && activeSchedule && activeSchedule.next && (
                           <span class={style.scheduleBannerUntil}>
                             {' '}
-                            {untilLabel} {activeSchedule.next.time}
+                            {untilLabel} {nextWhen}
                           </span>
                         )}
                       </span>
