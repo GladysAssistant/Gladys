@@ -183,7 +183,8 @@ const triggersFunc = {
     // is only safe because the key guard above lets at most one trigger through: keys are
     // uuid v4, assigned per trigger in addScene. Keep that guard before this branch.
     if (trigger.scheduler_type === 'time-range') {
-      const now = dayjs.tz(dayjs(), self.timezone);
+      const instant = dayjs();
+      const now = dayjs.tz(instant, self.timezone);
       // A start is computed on the current minute too, not taken as "inside": on the
       // spring-forward night, cron moves a 02:30 edge to 03:30 but leaves a 03:15 one where
       // it is, so a 02:30 -> 03:15 range starts after its own end. Taken as inside, that
@@ -191,7 +192,9 @@ const triggersFunc = {
       // other night the start minute is inside the range (its start is included). A job a
       // few milliseconds early lands in the minute before its start, so a start also tries
       // the next minute: 11:59 still answers for a 12:00 start, while 03:31 stays outside
-      // both spring-forward cases.
+      // both spring-forward cases. The next minute is taken from the instant, not with
+      // now.add(): across a DST change, add() keeps the old offset when the system runs in
+      // UTC, and 01:59 + 1 minute became 02:00, a minute that does not exist that night.
       //
       // The whole planning of the scene answers, not just the ranges of the trigger which
       // fired: the days are configured per trigger, so a "weekdays + weekend" planning is
@@ -219,7 +222,8 @@ const triggersFunc = {
         );
       event.in_range =
         isInTimeRanges(timeRanges, now) ||
-        (event.range_event === TIME_RANGE_EVENTS.START && isInTimeRanges(timeRanges, now.add(1, 'minute')));
+        (event.range_event === TIME_RANGE_EVENTS.START &&
+          isInTimeRanges(timeRanges, dayjs.tz(instant.add(1, 'minute'), self.timezone)));
       logger.debug(`Scene trigger time-range: ${event.range_event} event, in_range = ${event.in_range}.`);
     }
     return true;
