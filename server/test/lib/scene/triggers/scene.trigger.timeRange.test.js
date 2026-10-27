@@ -62,6 +62,48 @@ describe('Scene.triggers.timeRange', () => {
     expect(event.in_range).to.equal(false);
   });
 
+  it('should be in range on a start, even if the tick is early', () => {
+    // A job firing a few milliseconds early lands in the minute before the start.
+    sinon.useFakeTimers(dayjs.tz('2026-08-24 11:59', TIMEZONE).valueOf() + 59990);
+    const event = { key: 'trigger-key', range_event: 'start', range_index: 0 };
+    expect(check(event)).to.equal(true);
+    expect(event.in_range).to.equal(true);
+  });
+
+  it('should stay out of range on an early start fired after its own end, on the spring-forward night', () => {
+    // 02:30 -> 03:15 starts at 03:30: an early tick at 03:29 is checked at 03:29 and 03:30.
+    sinon.useFakeTimers(dayjs.tz('2027-03-28 03:29', TIMEZONE).valueOf() + 59990);
+    const event = { key: 'trigger-key', range_event: 'start', range_index: 0 };
+    const springTrigger = { ...trigger, time_ranges: [{ start: '02:30', end: '03:15' }] };
+    expect(triggersFunc[EVENTS.TIME.CHANGED](self, 'a-scene', event, springTrigger)).to.equal(true);
+    expect(event.in_range).to.equal(false);
+  });
+
+  it('should stay out of range on an early start fired with its own end, on the spring-forward night', () => {
+    // 02:00 -> 03:00: both edges fire at 03:00, so an early tick is at 01:59 that night
+    // (02:xx does not exist), and the next minute is 03:00, which the range excludes.
+    sinon.useFakeTimers(dayjs.tz('2027-03-28 03:00', TIMEZONE).valueOf() - 10);
+    const event = { key: 'trigger-key', range_event: 'start', range_index: 0 };
+    const springTrigger = { ...trigger, time_ranges: [{ start: '02:00', end: '03:00' }] };
+    expect(triggersFunc[EVENTS.TIME.CHANGED](self, 'a-scene', event, springTrigger)).to.equal(true);
+    expect(event.in_range).to.equal(false);
+  });
+
+  it('should not look at the next minute on an end', () => {
+    // A range starting one minute after the end of the previous one: the gap is outside.
+    sinon.useFakeTimers(dayjs.tz('2026-08-24 12:00', TIMEZONE).valueOf());
+    const event = { key: 'trigger-key', range_event: 'end', range_index: 0 };
+    const gapTrigger = {
+      ...trigger,
+      time_ranges: [
+        { start: '10:00', end: '12:00' },
+        { start: '12:01', end: '14:00' },
+      ],
+    };
+    expect(triggersFunc[EVENTS.TIME.CHANGED](self, 'a-scene', event, gapTrigger)).to.equal(true);
+    expect(event.in_range).to.equal(false);
+  });
+
   it('should match the end of a range and be out of range', () => {
     sinon.useFakeTimers(dayjs.tz('2026-08-24 14:30', TIMEZONE).valueOf());
     const event = { key: 'trigger-key', range_event: 'end', range_index: 0 };

@@ -71,7 +71,10 @@ which holds the jobs — plus:
 end, the range that just ended is left out: two consecutive ranges, or a weekend trigger next to a
 weekday one, keep the scene inside. A start is computed too rather than taken as `true`: on any
 night its minute is inside the range, but on the spring-forward night a `02:30 → 03:15` range starts
-at 03:30, after its end, and a `true` there switched the device on until the next day's end.
+at 03:30, after its end, and a `true` there switched the device on until the next day's end. A
+start also tries the next minute when the current one is outside: a job a few milliseconds early
+lands in the minute before its start (12:00 fired at 11:59:59.9), while 03:31 is still outside on
+the spring-forward night. An end never does, so a one-minute gap between two ranges stays outside.
 
 With `resume_on_startup`, the scene runs once at startup (`range_event: 'resume'`) with `in_range`
 telling whether the planning covers that minute: a range that started or ended while Gladys was down
