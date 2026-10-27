@@ -32,6 +32,7 @@ describe('energyContract: tariff calendars', () => {
   });
   afterEach(() => {
     energyContract.calendarRecalculations.forEach((state) => clearTimeout(state.timer));
+    sinon.restore();
   });
 
   describe('declareCalendar', () => {
@@ -256,6 +257,9 @@ describe('energyContract: tariff calendars', () => {
     });
 
     it('should queue a recalculation of the meters referencing the calendar, bounded to one per 10 minutes', async () => {
+      // The publication only takes dates from the last 5 years: a fixed clock keeps 2022-01-01
+      // inside that window whatever day the test runs. It still advances, for the deferred run.
+      sinon.useFakeTimers({ now: new Date('2026-01-12T12:00:00Z'), toFake: ['Date'], shouldAdvanceTime: true });
       await energyContract.create(contractPayload({ name: 'Tempo', tariff: TEMPO_TARIFF, timezone: 'Europe/Paris' }));
       const emitted = sinon.fake();
       event.on(EVENTS.ENERGY_CONTRACT.RECALCULATE, emitted);
