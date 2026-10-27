@@ -33,6 +33,9 @@ async function getUsersKeys() {
           found.rsa_public_key !== onlineUser.rsa_public_key ||
           found.ecdsa_public_key !== onlineUser.ecdsa_public_key
         ) {
+          // remember that this user was authorized with other keys, so the UI
+          // can explain why they need to be authorized again
+          found.keys_changed = found.accepted === true || found.keys_changed === true;
           found.accepted = false;
           found.rsa_public_key = onlineUser.rsa_public_key;
           found.ecdsa_public_key = onlineUser.ecdsa_public_key;

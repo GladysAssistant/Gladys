@@ -5,6 +5,7 @@ import get from 'get-value';
 import { route } from 'preact-router';
 import { fileToBase64, getCropperBase64Image } from '../utils/picture';
 import { getYearsMonthsAndDays } from '../utils/date';
+import { omitPasswordFields } from '../utils/omitPasswordFields';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -219,9 +220,13 @@ function createActions(store) {
             profilePicture: data.picture
           });
         }
-        state.session.saveUser(data);
+        // the new password is only sent to the server: it is kept neither in the
+        // session user (persisted in localStorage) nor in the form
+        const savedUser = omitPasswordFields(data);
+        state.session.saveUser(savedUser);
         store.setState({
-          user: data,
+          user: savedUser,
+          newUser: omitPasswordFields(store.getState().newUser),
           ProfileGetStatus: RequestStatus.Getting,
           ProfilePatchStatus: RequestStatus.Success
         });

@@ -1,13 +1,35 @@
 import { Component } from 'preact';
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import KeepHistoryFeature, { isHistorizableFeature } from './KeepHistoryFeature';
 import DeviceParams from '../components/DeviceParams';
 import TransportBadge from '../components/TransportBadge';
 import { getDeviceTransport, getDeviceTransportMessage, isDeviceTransportDegraded } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+
+/**
+ * @description Last battery level reported for the device, like the native
+ * integration device pages show it in the card header.
+ * @param {object} device - The device, with its features.
+ * @returns {number|null} The battery percentage, null when none is known yet.
+ * @example
+ * getBatteryLevel({ features: [{ category: 'battery', type: 'integer', last_value: 76 }] }); // 76
+ */
+const getBatteryLevel = device => {
+  // the battery category also holds the binary charging state: only the
+  // percent level is the badge
+  const batteryFeature = (device.features || []).find(
+    feature =>
+      feature.category === DEVICE_FEATURE_CATEGORIES.BATTERY && feature.type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER
+  );
+  const batteryLevel = get(batteryFeature, 'last_value');
+  return typeof batteryLevel === 'number' ? batteryLevel : null;
+};
 
 class DeviceBox extends Component {
   updateName = e => {
@@ -52,18 +74,26 @@ class DeviceBox extends Component {
     const historizableFeatures = (device.features || [])
       .map((feature, featureIndex) => ({ feature, featureIndex }))
       .filter(({ feature }) => isHistorizableFeature(feature));
+    const batteryLevel = getBatteryLevel(device);
     return (
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
             {device.name}
-            {getDeviceTransport(device) && (
-              <div class="page-options d-flex">
-                <TransportBadge
-                  transport={getDeviceTransport(device)}
-                  degraded={isDeviceTransportDegraded(device)}
-                  message={getDeviceTransportMessage(device, language)}
-                />
+            {(batteryLevel !== null || getDeviceTransport(device)) && (
+              <div class="page-options d-flex align-items-center">
+                {batteryLevel !== null && (
+                  <div class={cx({ 'mr-2': getDeviceTransport(device) })}>
+                    <BatteryLevelFeature batteryLevel={batteryLevel} />
+                  </div>
+                )}
+                {getDeviceTransport(device) && (
+                  <TransportBadge
+                    transport={getDeviceTransport(device)}
+                    degraded={isDeviceTransportDegraded(device)}
+                    message={getDeviceTransportMessage(device, language)}
+                  />
+                )}
               </div>
             )}
           </div>

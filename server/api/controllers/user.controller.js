@@ -114,7 +114,7 @@ module.exports = function UserController(gladys) {
    * @apiGroup User
    */
   async function update(req, res) {
-    const user = await gladys.user.updateBySelector(req.params.user_selector, req.body);
+    const user = await gladys.user.updateBySelector(req.params.user_selector, req.body, req.session_id);
     res.json(user);
   }
 
@@ -160,7 +160,7 @@ module.exports = function UserController(gladys) {
    */
   async function updateMySelf(req, res, next) {
     delete req.body.role;
-    const newUser = await gladys.user.update(req.user.id, req.body);
+    const newUser = await gladys.user.update(req.user.id, req.body, req.session_id);
     res.json(newUser);
   }
 
@@ -234,8 +234,8 @@ module.exports = function UserController(gladys) {
    * @apiGroup User
    */
   async function resetPassword(req, res) {
+    // also revokes the reset password session
     const user = await gladys.user.updatePassword(req.user.id, req.body.password);
-    await gladys.session.revoke(req.user.id, req.session_id);
     res.json(user);
   }
 

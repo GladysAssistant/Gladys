@@ -20,6 +20,8 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     lifecycle: 0,
     windowTimers: new Map(),
     windowOpenedAt: new Map(),
+    // As the real handler is built: not running until start().
+    running: false,
   };
   const controllers = { 'get /api/v1/service/thermostat/device': {} };
   const ThermostatService = proxyquire('../../../services/thermostat/index', {
@@ -173,6 +175,19 @@ describe('ThermostatService', () => {
     expect(handler.lifecycle).to.equal(2);
     await service.start();
     expect(handler.lifecycle).to.equal(3);
+  });
+
+  // What the scene action and MCP read: the service is in the stateManager
+  // whatever its status.
+  it('should say whether the service runs', async () => {
+    const { service, handler } = buildService();
+    expect(handler.running).to.equal(false);
+
+    await service.start();
+    expect(handler.running).to.equal(true);
+
+    await service.stop();
+    expect(handler.running).to.equal(false);
   });
 
   it('should be safe to stop a service that was never started', async () => {

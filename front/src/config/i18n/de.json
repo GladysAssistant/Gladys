@@ -792,6 +792,25 @@
         "scheduleLabel": "Zeitplan:",
         "scheduleUntil": "bis",
         "manualUntil": "bis",
+        "untilTomorrow": "morgen",
+        "untilDays": {
+          "0": "Montag",
+          "1": "Dienstag",
+          "2": "Mittwoch",
+          "3": "Donnerstag",
+          "4": "Freitag",
+          "5": "Samstag",
+          "6": "Sonntag"
+        },
+        "untilNextDays": {
+          "0": "nächsten Montag",
+          "1": "nächsten Dienstag",
+          "2": "nächsten Mittwoch",
+          "3": "nächsten Donnerstag",
+          "4": "nächsten Freitag",
+          "5": "nächsten Samstag",
+          "6": "nächsten Sonntag"
+        },
         "cancelManual": "Manuellen Modus beenden",
         "windowOpen": "Fenster offen — Heizung ausgesetzt",
         "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
@@ -4116,6 +4135,11 @@
         "houseLabel": "Zuhause",
         "alarmModeLabel": "Alarmmodus"
       },
+      "thermostatSetSchedule": {
+        "description": "Diese Aktion lässt die ausgewählten Thermostate einem anderen Zeitplan folgen, zum Beispiel um vom üblichen Zeitplan auf den der Schulferien zu wechseln. Der Thermostat folgt dem Zeitplan sofort: Ein laufender manueller Sollwert wird aufgehoben, ein von Hand ausgeschalteter Thermostat bleibt jedoch aus.",
+        "scheduleLabel": "Zeitplan",
+        "thermostatsLabel": "Thermostate"
+      },
       "alarmSetMode": {
         "description": "Diese Aktion setzt das ausgewählte Zuhause in den ausgewählten Alarmmodus.",
         "houseLabel": "Zuhause",
@@ -4241,6 +4265,9 @@
         "check-alarm-mode": "Wenn der Alarm im Modus ist",
         "set-alarm-mode": "Alarmmodus setzen auf"
       },
+      "thermostat": {
+        "set-schedule": "Zeitplan der Thermostate ändern"
+      },
       "mqtt": {
         "send": "MQTT-Message senden"
       },
@@ -4329,6 +4356,9 @@
       },
       "http": {
         "request": "Eine externe API oder einen Dienst aufrufen"
+      },
+      "thermostat": {
+        "set-schedule": "Thermostate einem anderen Wochenzeitplan folgen lassen"
       },
       "mqtt": {
         "send": "Eine Nachricht auf dem MQTT-Broker veröffentlichen"
@@ -5164,9 +5194,12 @@
     "statusColumn": "Status",
     "userRsaKey": "RSA-Schlüssel:",
     "userEcdsaKey": "ECDSA-Schlüssel:",
+    "userAccepted": "Autorisiert",
+    "userKeysChanged": "Schlüssel geändert",
+    "userWaitingForAuthorization": "Wartet auf Autorisierung",
     "usersListDescription": "Diese Liste wird mit deinen Gladys-Plus-Benutzern synchronisiert. Damit ein Benutzer (auch du selbst) aus der Ferne auf deine Instanz zugreifen kann, musst du ihn hier autorisieren, indem du den Schalter neben seinem Namen aktivierst.",
     "usersListWhyAcceptDescription": "<b>Warum dieser Schritt?</b> Jeder Gladys-Plus-Benutzer besitzt eigene Verschlüsselungsschlüssel, deren Fingerabdrücke unten angezeigt werden. Indem du einen Benutzer autorisierst, bestätigst du lokal auf deiner Instanz, dass seine Schlüssel akzeptiert werden: Diese lokale Validierung schützt dein Zuhause vor Man-in-the-Middle-Angriffen. Niemand, nicht einmal die Gladys-Plus-Server, kann ohne diese bei dir zu Hause durchgeführte Validierung Zugriff auf deine Instanz gewähren.",
-    "usersListRevokedDescription": "Wenn sich die Schlüssel eines Benutzers ändern (zum Beispiel wenn seine Zwei-Faktor-Authentifizierung zurückgesetzt wurde), wird sein Zugriff aus Sicherheitsgründen automatisch widerrufen: Du musst ihn hier erneut autorisieren. Um einen Benutzer zu entfernen, gehe zur Gladys-Plus-Benutzerverwaltung.",
+    "usersListRevokedDescription": "Die Schlüssel eines Benutzers ändern sich, wenn er sein Gladys-Plus-Passwort zurücksetzt. Sein Zugriff wird dann aus Sicherheitsgründen automatisch widerrufen und er wird als \"Schlüssel geändert\" angezeigt: Prüfe mit ihm, dass die neuen Fingerabdrücke mit denen auf seiner Gladys-Plus-Seite übereinstimmen, und autorisiere ihn dann hier erneut. Um einen Benutzer zu entfernen, gehe zur Gladys-Plus-Benutzerverwaltung.",
     "disconnectTitle": "Trenne deinen Plus-Account",
     "disconnectButton": "Trennen",
     "gatewayConnectedSuccessTitle": "Erfolgreich mit Gladys Plus verbunden!",
@@ -5384,7 +5417,6 @@
     "wrongCredentials": "Die Kombination aus E-Mail-Adresse und Passwort ist falsch.",
     "invalidEmail": "Die E-Mail-Adresse ist ungültig",
     "networkError": "Netzwerkfehler: Bist du sicher, dass dein Gladys mit dem Internet verbunden ist?",
-    "userNotAcceptedLocally": "Dein Benutzer wird lokal nicht akzeptiert. Bitte gehe zurück zu dein Gladys und erlaube den Zugriff auf diesen Benutzer in den Einstellungen.",
     "gatewayNoInstanceFound": "Keine Instanz gefunden. Du musst zuerst deine Instanz mit Gladys verbinden.",
     "gatewayAccessBilling": "Um auf die Abrechnung zuzugreifen, klicke hier.",
     "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte kontaktiere uns für weitere Informationen.",
@@ -7133,7 +7165,18 @@
     "noInstanceFoundTutorialLink": "Brauchst du eine Schritt-für-Schritt-Anleitung mit Screenshots? <a href=\"https://gladysassistant.com/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Schau dir das Tutorial in unserer Dokumentation an</a>.",
     "noInstanceFoundNote": "Hast du diesen Schritt in der Vergangenheit bereits durchgeführt? Manchmal muss er wiederholt werden, zum Beispiel wenn deine Zwei-Faktor-Authentifizierung (2FA) zurückgesetzt wurde: Melde dich einfach erneut im Tab \"Gladys Plus\" deiner Instanz an. Brauchst du Hilfe? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Ein Fehler ist aufgetreten. Ist dein Benutzer lokal in deiner Gladys-Instanz akzeptiert?",
-    "errorNotAcceptedLocally": "Der Benutzer wurde in der Gladys-Instanz noch nicht lokal autorisiert. Gehe in deiner lokalen Instanz in die Einstellungen, Tab \"Gladys Plus\", Abschnitt \"Remote-Benutzer\", und aktiviere den Schalter neben seinem Namen.",
+    "keysChangedTitle": "Dein Zugriff muss erneut autorisiert werden",
+    "keysChangedIntro": "Deine Gladys-Plus-Verschlüsselungsschlüssel haben sich geändert, seit deine Gladys-Instanz sie autorisiert hat. Das ist normal, nachdem du dein Gladys-Plus-Passwort zurückgesetzt hast (\"Passwort vergessen\"): Dabei werden neue Schlüssel erzeugt. Aus Sicherheitsgründen lehnt deine Instanz jeden Schlüssel ab, den sie nicht selbst validiert hat. Nichts ist kaputt: Du musst deinen Benutzer nur erneut autorisieren, von zu Hause aus.",
+    "notAcceptedTitle": "Dein Zugriff muss autorisiert werden",
+    "notAcceptedIntro": "Dein Gladys-Plus-Konto ist mit deiner Gladys-Instanz verbunden, aber dein Benutzer ist (noch nicht oder nicht mehr) für den Fernzugriff autorisiert. Aus Sicherheitsgründen muss jeder Gladys-Plus-Benutzer über die Instanz selbst, bei dir zu Hause, autorisiert werden: Niemand, nicht einmal die Gladys-Plus-Server, kann ohne diese Validierung auf dein Zuhause zugreifen.",
+    "notAcceptedUnknownReasonIntro": "Deine Gladys-Instanz hat deinen Benutzer (noch nicht oder nicht mehr) für den Fernzugriff autorisiert. Das ist beim ersten Mal normal, aber auch nachdem du dein Gladys-Plus-Passwort zurückgesetzt hast: Dabei werden neue Verschlüsselungsschlüssel erzeugt, die deine Instanz erneut validieren muss. Aus Sicherheitsgründen kann diese Autorisierung nur über die Instanz selbst, bei dir zu Hause, erfolgen.",
+    "notAcceptedAskAdmin": "Nur ein Administrator deiner Gladys-Instanz kann deinen Zugriff autorisieren. Wenn du keiner bist, bitte die Person, die Gladys bei dir zu Hause verwaltet, diese Schritte auszuführen.",
+    "notAcceptedStepAcceptUser": "Prüfe im Abschnitt \"<b>Remote-Benutzer</b>\", dass die neben deinem Namen angezeigten Schlüssel-Fingerabdrücke mit den unten stehenden übereinstimmen, und <b>aktiviere dann den Schalter</b>.",
+    "notAcceptedFingerprintsLabel": "Fingerabdrücke deiner Verschlüsselungsschlüssel:",
+    "rsaKeyFingerprint": "RSA-Schlüssel:",
+    "ecdsaKeyFingerprint": "ECDSA-Schlüssel:",
+    "stillNotAccepted": "Dein Benutzer ist immer noch nicht autorisiert. Prüfe, ob der Schalter neben deinem Namen in deiner Instanz aktiviert ist, und versuche es dann erneut.",
+    "notAcceptedRetryButton": "Mein Benutzer ist autorisiert, erneut versuchen",
     "saveButton": "Speichern",
     "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
     "logoutButton": "Abmelden"

@@ -44,6 +44,7 @@ import CheckAlarmMode from './actions/CheckAlarmMode';
 import SetAlarmMode from './actions/SetAlarmMode';
 import SendMqttMessage from './actions/SendMqttMessage';
 import SendZigbee2MqttMessage from './actions/SendZigbee2MqttMessage';
+import ThermostatSetSchedule from './actions/ThermostatSetSchedule';
 import PlayNotification from './actions/PlayNotification';
 import PlayMedia from './actions/PlayMedia';
 import EdfTempoCondition from './actions/EdfTempoCondition';
@@ -89,6 +90,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.ALARM.SET_ALARM_MODE]: SetAlarmMode,
   [ACTIONS.MQTT.SEND]: SendMqttMessage,
   [ACTIONS.ZIGBEE2MQTT.SEND]: SendZigbee2MqttMessage,
+  [ACTIONS.THERMOSTAT.SET_SCHEDULE]: ThermostatSetSchedule,
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.MUSIC.PLAY_MEDIA]: PlayMedia,
   [ACTIONS.AI.ASK]: AskAI,
@@ -163,7 +165,9 @@ const ActionCard = ({ children, ...props }) => {
     [isCondition, isSequentialStep, path, groupPath, moveCard, moveCardGroup]
   );
 
-  const summary = !isExpanded ? getActionSummary(props.action, props.intl.dictionary, props.deviceFeatures) : null;
+  const summary = !isExpanded
+    ? getActionSummary(props.action, props.intl.dictionary, props.deviceFeatures, props.thermostatSchedules)
+    : null;
   // an action declared by an external integration is titled by its manifest
   // label; an orphan one (uninstalled, key removed) keeps the generic label
   const declarationTitle =
@@ -276,7 +280,8 @@ const ActionCard = ({ children, ...props }) => {
               moveCardGroup: props.moveCardGroup,
               scene: props.scene,
               sceneIntegrations: props.sceneIntegrations,
-              deviceFeatures: props.deviceFeatures
+              deviceFeatures: props.deviceFeatures,
+              thermostatSchedules: props.thermostatSchedules
             };
 
             return <Component {...commonProps} />;
