@@ -5442,6 +5442,21 @@
     "continueButton": "Weiter",
     "twoFactorCodeRequired": "Gib einen Code aus deiner Zwei-Faktor-App ein: Das Gateway verlangt ihn, um Wiederherstellungscodes zu erzeugen."
   },
+  "gatewayTwoFactorApp": {
+    "cardTitle": "Deine Zwei-Faktor-App",
+    "description": "Neues Handy oder neue Zwei-Faktor-App? Registriere darin ein neues Geheimnis: Dein Gladys Plus Konto akzeptiert danach nur noch die Codes dieser neuen App.",
+    "changeButton": "Meine Zwei-Faktor-App wechseln",
+    "replaceWarning": "Nach der Bestätigung werden die Codes deiner aktuellen App nicht mehr akzeptiert. Deine Wiederherstellungscodes bleiben gültig.",
+    "newCodeLabel": "Von deiner neuen App angezeigter Code",
+    "currentCodeLabel": "Von deiner aktuellen App angezeigter Code",
+    "currentCodeHelp": "Das Gateway verlangt einen Code der aktuell registrierten App, um sie zu ersetzen.",
+    "confirmButton": "Meine Zwei-Faktor-App ersetzen",
+    "replacedSuccess": "Deine Zwei-Faktor-App wurde ersetzt. Melde dich ab jetzt mit deiner neuen App bei Gladys Plus an.",
+    "invalidCode": "Einer der Codes ist ungültig oder abgelaufen. Versuche es erneut mit neuen Codes aus deinen Apps.",
+    "tooManyAttempts": "Zu viele fehlgeschlagene Versuche. Warte ein paar Minuten, bevor du es erneut versuchst.",
+    "loadError": "Wir konnten kein neues Geheimnis erzeugen. Prüfe deine Verbindung und versuche es erneut.",
+    "updateError": "Wir konnten deine Zwei-Faktor-App nicht ersetzen. Versuche es erneut."
+  },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Zwei-Faktor-Authentifizierung (2FA) konfigurieren",
     "twoFactorNotConfigured": "Die Zwei-Faktor-Authentifizierung (2FA) ist auf deinem Gladys-Plus-Account noch nicht konfiguriert. Sie ist erforderlich, um deine Instanz zu verbinden.",

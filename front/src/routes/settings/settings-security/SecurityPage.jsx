@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import SettingsLayout from '../SettingsLayout';
 import GatewayRecoveryCodes from '../../../components/gateway/GatewayRecoveryCodes';
+import GatewayTwoFactorApp from './GatewayTwoFactorApp';
 import { RequestStatus } from '../../../utils/consts';
 
 const SecurityPage = ({ children, ...props }) => (
@@ -84,6 +85,7 @@ const SecurityPage = ({ children, ...props }) => (
             </div>
           </div>
         )}
+        <GatewayTwoFactorApp session={props.session} />
       </div>
     </div>
   </SettingsLayout>
