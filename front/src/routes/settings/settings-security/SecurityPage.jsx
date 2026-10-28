@@ -85,7 +85,8 @@ const SecurityPage = ({ children, ...props }) => (
             </div>
           </div>
         )}
-        <GatewayTwoFactorApp session={props.session} />
+        {/* not while the one-time recovery codes are on screen: the user saves them first */}
+        {!props.recoveryCodes && <GatewayTwoFactorApp session={props.session} />}
       </div>
     </div>
   </SettingsLayout>

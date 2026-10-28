@@ -19,13 +19,24 @@ class GatewayTwoFactorApp extends Component {
     configuring: false,
     replaced: false,
     dataUrl: null,
+    // the value an authenticator app enrolls (the `secret` query param of the otpauth
+    // URL, same as the QR code): shown for manual entry
+    manualEntryKey: null,
+    // the value the Gateway stores and verifies against: sent back on replacement.
+    // It is not the manual entry key (the URL carries its base32 encoding).
     secret: null,
     twoFactorCode: '',
     currentTwoFactorCode: '',
     error: null
   };
 
+  // Incremented on every start and cancel: a secret that arrives after the user
+  // cancelled is dropped instead of being shown by the next attempt.
+  attempt = 0;
+
   startConfiguration = async () => {
+    this.attempt += 1;
+    const { attempt } = this;
     this.setState({
       configuring: true,
       replaced: false,
@@ -35,31 +46,44 @@ class GatewayTwoFactorApp extends Component {
       currentTwoFactorCode: ''
     });
     try {
-      const { otpauth_url: otpauthUrl } = await this.props.session.getNewTwoFactorSecret();
-      const secret = new URL(otpauthUrl).searchParams.get('secret');
+      const { otpauth_url: otpauthUrl, secret } = await this.props.session.getNewTwoFactorSecret();
+      if (!secret) {
+        // a Gateway that does not return the persistable secret yet: the URL secret
+        // would be refused (or worse, stored as is), so we do not go further
+        throw new Error('The Gateway did not return the secret to register');
+      }
+      const manualEntryKey = new URL(otpauthUrl).searchParams.get('secret');
       const dataUrl = await QRCode.toDataURL(otpauthUrl);
-      this.setState({ secret, dataUrl, status: RequestStatus.Success });
+      if (attempt !== this.attempt) {
+        return;
+      }
+      this.setState({ secret, manualEntryKey, dataUrl, status: RequestStatus.Success });
     } catch (e) {
-      console.error(e);
+      console.error('Could not get a new two-factor secret', get(e, 'response.status') || e.message);
+      if (attempt !== this.attempt) {
+        return;
+      }
       this.setState({ configuring: false, status: RequestStatus.Error, error: 'load' });
     }
   };
 
   cancel = () => {
+    this.attempt += 1;
     this.setState({
       configuring: false,
       status: null,
       error: null,
       dataUrl: null,
+      manualEntryKey: null,
       secret: null,
       twoFactorCode: '',
       currentTwoFactorCode: ''
     });
   };
 
-  copySecret = async () => {
+  copyManualEntryKey = async () => {
     try {
-      await navigator.clipboard.writeText(this.state.secret);
+      await navigator.clipboard.writeText(this.state.manualEntryKey);
     } catch (e) {
       console.error(e);
     }
@@ -75,6 +99,11 @@ class GatewayTwoFactorApp extends Component {
 
   replaceTwoFactorApp = async e => {
     e.preventDefault();
+    // a second submit (Enter key) while the first one is pending would be refused by
+    // the Gateway once the first one replaced the secret, and shown as an error
+    if (this.state.status === RequestStatus.Getting) {
+      return;
+    }
     this.setState({ status: RequestStatus.Getting, error: null });
     try {
       await this.props.session.updateTwoFactor({
@@ -87,13 +116,15 @@ class GatewayTwoFactorApp extends Component {
         replaced: true,
         status: RequestStatus.Success,
         dataUrl: null,
+        manualEntryKey: null,
         secret: null,
         twoFactorCode: '',
         currentTwoFactorCode: ''
       });
     } catch (err) {
-      console.error(err);
       const status = get(err, 'response.status');
+      // the request body holds the new secret and both codes: never log the whole error
+      console.error('Could not replace the two-factor app', status || err.message);
       let error = 'update';
       if (status === 403) {
         // one of the codes is wrong or expired: the new secret is still valid, the
@@ -111,13 +142,14 @@ class GatewayTwoFactorApp extends Component {
     }
   };
 
-  render({}, { status, configuring, replaced, dataUrl, secret, twoFactorCode, currentTwoFactorCode, error }) {
+  render({}, { status, configuring, replaced, dataUrl, manualEntryKey, twoFactorCode, currentTwoFactorCode, error }) {
+    const pending = status === RequestStatus.Getting;
     const codesFilled =
       twoFactorCode.length === TWO_FACTOR_CODE_LENGTH && currentTwoFactorCode.length === TWO_FACTOR_CODE_LENGTH;
     return (
       <div class="card">
         <div class="card-body p-6">
-          <div class={cx('dimmer', { active: status === RequestStatus.Getting })}>
+          <div class={cx('dimmer', { active: pending })}>
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-title">
@@ -150,24 +182,31 @@ class GatewayTwoFactorApp extends Component {
                   </p>
                   <div class="form-group">{dataUrl && <img class="mx-auto d-block mb-5" src={dataUrl} alt="" />}</div>
                   <div class="form-group">
-                    <label class="form-label">
+                    <label class="form-label" htmlFor="gateway-two-factor-manual-entry-key">
                       <Text id="gatewayConfigureTwoFactor.secretLabel" />
                     </label>
                     <div class="input-group">
-                      <input type="text" class="form-control" disabled value={secret} />
+                      <input
+                        id="gateway-two-factor-manual-entry-key"
+                        type="text"
+                        class="form-control"
+                        disabled
+                        value={manualEntryKey}
+                      />
                       <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onClick={this.copySecret}>
+                        <button class="btn btn-outline-secondary" type="button" onClick={this.copyManualEntryKey}>
                           <Text id="gatewayConfigureTwoFactor.copy" />
                         </button>
                       </div>
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="form-label">
+                    <label class="form-label" htmlFor="gateway-two-factor-new-code">
                       <Text id="gatewayTwoFactorApp.newCodeLabel" />
                     </label>
                     <Localizer>
                       <input
+                        id="gateway-two-factor-new-code"
                         type="text"
                         class="form-control"
                         placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
@@ -180,11 +219,12 @@ class GatewayTwoFactorApp extends Component {
                     </Localizer>
                   </div>
                   <div class="form-group">
-                    <label class="form-label">
+                    <label class="form-label" htmlFor="gateway-two-factor-current-code">
                       <Text id="gatewayTwoFactorApp.currentCodeLabel" />
                     </label>
                     <Localizer>
                       <input
+                        id="gateway-two-factor-current-code"
                         type="text"
                         class="form-control"
                         placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
@@ -200,16 +240,18 @@ class GatewayTwoFactorApp extends Component {
                     </small>
                   </div>
                   <div class="btn-list">
-                    <button type="submit" class="btn btn-primary" disabled={!codesFilled}>
+                    <button type="submit" class="btn btn-primary" disabled={!codesFilled || pending}>
                       <Text id="gatewayTwoFactorApp.confirmButton" />
                     </button>
-                    <button type="button" class="btn btn-secondary" onClick={this.cancel}>
+                    {/* a replacement already sent cannot be cancelled: the button goes away
+                        with it rather than suggesting otherwise */}
+                    <button type="button" class="btn btn-secondary" onClick={this.cancel} disabled={pending}>
                       <Text id="global.cancel" />
                     </button>
                   </div>
                 </form>
               ) : (
-                <button type="button" class="btn btn-primary" onClick={this.startConfiguration}>
+                <button type="button" class="btn btn-primary" onClick={this.startConfiguration} disabled={pending}>
                   <Text id="gatewayTwoFactorApp.changeButton" />
                 </button>
               )}
