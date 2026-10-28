@@ -184,6 +184,54 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     expect(costFeature.id).to.equal('cost-feature-id');
   });
 
+  it('should mark device as updatable when energy consumption/cost features are missing', async () => {
+    // PREPARE
+    // Device created before energy monitoring: it has the energy index but no consumption/cost features
+    const existingDeviceWithoutEnergyFeatures = {
+      id: 'existing-device-id',
+      external_id: 'zigbee2mqtt:my_device',
+      room_id: 'room_id',
+      name: 'Existing Device',
+      features: [
+        {
+          id: 'feature-1',
+          external_id: 'zigbee2mqtt:my_device:switch:energy:energy',
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+      ],
+    };
+
+    gladys.stateManager.get.returns(existingDeviceWithoutEnergyFeatures);
+
+    zigbee2MqttService.device.discoveredDevices = {
+      my_device: {
+        friendly_name: 'my_device',
+        supported: true,
+        definition: {
+          model: 'Test Model',
+          exposes: [{ type: 'numeric', name: 'energy', property: 'energy', unit: 'kWh', access: 1 }],
+        },
+      },
+    };
+
+    // EXECUTE
+    const devices = zigbee2MqttService.device.getDiscoveredDevices();
+
+    // ASSERT
+    expect(devices).to.have.lengthOf(1);
+    expect(devices[0].updatable).to.equal(true);
+    const consumptionFeature = devices[0].features.find(
+      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    );
+    const costFeature = devices[0].features.find(
+      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+    );
+    expect(consumptionFeature.energy_parent_id).to.equal('feature-1');
+    expect(costFeature.energy_parent_id).to.equal(consumptionFeature.id);
+  });
+
   it('should mark device as updatable when a real feature is added', async () => {
     // PREPARE
     // Existing device has 2 features
