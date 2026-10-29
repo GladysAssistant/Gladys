@@ -31,7 +31,15 @@ async function getCatalog({ search, refresh = false } = {}) {
       const descriptions = Object.values(entry.manifest.description || {})
         .join(' ')
         .toLowerCase();
-      return name.includes(keyword) || descriptions.includes(keyword) || entry.store_slug.includes(keyword);
+      // the search-only terms of the manifest (C.1), like the catalog search
+      // of the frontend
+      const keywords = (entry.manifest.keywords || []).join(' ').toLowerCase();
+      return (
+        name.includes(keyword) ||
+        descriptions.includes(keyword) ||
+        keywords.includes(keyword) ||
+        entry.store_slug.includes(keyword)
+      );
     });
   }
   return {

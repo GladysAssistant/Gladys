@@ -24,7 +24,7 @@ function validateAccessToken(accessToken, scope) {
   }
 
   // we verify that the session is not revoked
-  if (this.cache.get(`revoked_session:${decoded.session_id}`) === true) {
+  if (this.isRevoked(decoded.session_id)) {
     throw new Error401('AuthMiddleware: Session was revoked');
   }
 

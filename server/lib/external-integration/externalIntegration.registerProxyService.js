@@ -1,9 +1,14 @@
 const db = require('../../models');
-const { ExternalIntegrationUnavailableError, NotFoundError } = require('../../utils/coreErrors');
-const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
+const { ExternalIntegrationUnavailableError, NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS, MUSIC_PLAY_MODES } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
 const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
+const {
+  normalizeBrowseResult,
+  normalizeSearchResult,
+  normalizeQueueResult,
+} = require('./externalIntegration.normalizeMusic');
 const {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
@@ -233,6 +238,108 @@ function registerProxyService(service) {
       runAction: async (actionKey, fields, options) => this.runSceneAction(service, actionKey, fields, options),
     }),
   };
+  // music players (capabilities/music.md, section 4): the on-demand catalog,
+  // queue and artwork of a device integration's players, relayed over the
+  // integration WebSocket and bounded on the way back. The capability only
+  // exists on an integration that OPTED IN through the `music` manifest field
+  // (`{}` is enough for an artwork-only player): a vacuum or a meter
+  // integration never gets a play command relayed to it. The operations the
+  // integration implements are the field's flags: an undeclared one is refused
+  // here without a command. The capabilities are answered from the stored
+  // manifest, whatever the state of the container.
+  const musicDeclaration = service.manifest && service.manifest.music;
+  const isMusicIntegration =
+    service.manifest &&
+    service.manifest.type === 'device' &&
+    musicDeclaration !== null &&
+    typeof musicDeclaration === 'object' &&
+    !Array.isArray(musicDeclaration);
+  const musicSupports = Object.freeze({
+    browse: isMusicIntegration && musicDeclaration.browse === true,
+    search: isMusicIntegration && musicDeclaration.search === true,
+    queue: isMusicIntegration && musicDeclaration.queue === true,
+    append: isMusicIntegration && musicDeclaration.append === true,
+  });
+  const requireMusicOperation = (operation) => {
+    if (!musicSupports[operation]) {
+      throw new NotFoundError('MUSIC_OPERATION_NOT_SUPPORTED');
+    }
+  };
+  const devicePayload = (device) => ({
+    external_id: device.external_id,
+    selector: device.selector,
+    params: device.params,
+  });
+  const musicCapability = isMusicIntegration
+    ? {
+        music: Object.freeze({
+          getCapabilities: () => ({ ...musicSupports }),
+          browse: async (device, { parentId, offset, limit }) => {
+            requireMusicOperation('browse');
+            const data = await this.relayMusicCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_BROWSE,
+              {
+                device: devicePayload(device),
+                parent_id: parentId,
+                offset,
+                limit,
+              },
+            );
+            const result = normalizeBrowseResult(data, service.selector);
+            this.rememberMusicArtworkKeys(service, result.items);
+            return result;
+          },
+          search: async (device, { query, type, limit }) => {
+            requireMusicOperation('search');
+            const data = await this.relayMusicCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_SEARCH,
+              {
+                device: devicePayload(device),
+                query,
+                type,
+                limit,
+              },
+            );
+            const result = normalizeSearchResult(data, service.selector);
+            this.rememberMusicArtworkKeys(service, result.items);
+            return result;
+          },
+          play: async (device, media, mode) => {
+            // next / append need the `append` flag: a 400 names the mode, the
+            // player itself stays a valid target (section 4.3)
+            if (mode !== MUSIC_PLAY_MODES.REPLACE && !musicSupports.append) {
+              throw new BadParameters('MUSIC_MODE_NOT_SUPPORTED');
+            }
+            await this.relayMusicCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_PLAY, {
+              device: devicePayload(device),
+              media: { id: media.id, type: media.type },
+              mode,
+            });
+          },
+          getQueue: async (device, { offset, limit }) => {
+            requireMusicOperation('queue');
+            const data = await this.relayMusicCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_QUEUE_GET,
+              { device: devicePayload(device), offset, limit },
+            );
+            const result = normalizeQueueResult(data, service.selector);
+            this.rememberMusicArtworkKeys(service, result.items);
+            return result;
+          },
+          playQueueItem: async (device, index) => {
+            requireMusicOperation('queue');
+            await this.relayMusicCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MUSIC_QUEUE_PLAY, {
+              device: devicePayload(device),
+              index,
+            });
+          },
+          getArtwork: async (device, key) => this.getMusicArtwork(service, device, key),
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -245,6 +352,7 @@ function registerProxyService(service) {
     ...aiCapability,
     ...ttsCapability,
     ...sceneCapability,
+    ...musicCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

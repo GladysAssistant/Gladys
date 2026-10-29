@@ -1,4 +1,8 @@
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  MUSIC_STRING_FEATURE_TYPES
+} from '../../../server/utils/constants';
 
 export const LoginStatus = {
   Processing: 'Processing',
@@ -82,7 +86,6 @@ export const RequestStatus = {
   ServiceDisconnected: 'ServiceDisconnected',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
-  UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
   RoomValidationError: 'RoomValidationError'
@@ -520,6 +523,7 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: 'thermometer',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: 'settings',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: 'sliders',
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET]: 'sliders',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: 'power'
   },
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: {
@@ -559,7 +563,16 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.MUSIC.PREVIOUS]: 'rewind',
     [DEVICE_FEATURE_TYPES.MUSIC.NEXT]: 'fast-forward',
     [DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE]: 'bar-chart-2',
-    [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'bell'
+    [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'bell',
+    [DEVICE_FEATURE_TYPES.MUSIC.TITLE]: 'music',
+    [DEVICE_FEATURE_TYPES.MUSIC.ARTIST]: 'user',
+    [DEVICE_FEATURE_TYPES.MUSIC.ALBUM]: 'disc',
+    [DEVICE_FEATURE_TYPES.MUSIC.ARTWORK]: 'image',
+    [DEVICE_FEATURE_TYPES.MUSIC.DURATION]: 'clock',
+    [DEVICE_FEATURE_TYPES.MUSIC.POSITION]: 'clock',
+    [DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE]: 'shuffle',
+    [DEVICE_FEATURE_TYPES.MUSIC.REPEAT]: 'repeat',
+    [DEVICE_FEATURE_TYPES.MUSIC.MUTE]: 'volume-x'
   },
   [DEVICE_FEATURE_CATEGORIES.RISK]: {
     [DEVICE_FEATURE_TYPES.RISK.INTEGER]: 'alert-circle'
@@ -625,7 +638,19 @@ export const DeviceFeatureCategoriesIcon = {
   }
 };
 
-export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT, DEVICE_FEATURE_TYPES.TEXT.SELECT];
+// The music metadata types hold a string state too (title, artist, album, artwork key): the
+// core routes them to last_value_string by category + type, exactly like text/text
+// (docs/specs/external-integrations/capabilities/music.md, section 1)
+export const DeviceFeatureTypesString = [
+  DEVICE_FEATURE_TYPES.TEXT.TEXT,
+  DEVICE_FEATURE_TYPES.TEXT.SELECT,
+  ...MUSIC_STRING_FEATURE_TYPES
+];
+
+export const isStringFeature = (category, type) =>
+  (category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+    (type === DEVICE_FEATURE_TYPES.TEXT.TEXT || type === DEVICE_FEATURE_TYPES.TEXT.SELECT)) ||
+  (category === DEVICE_FEATURE_CATEGORIES.MUSIC && MUSIC_STRING_FEATURE_TYPES.includes(type));
 
 // Television and music features come in two flavours: continuous controls, which carry a value the
 // user reads and adjusts, and remote-control orders, which are one-shot commands with no meaningful
@@ -641,7 +666,14 @@ export const TelevisionContinuousControlFeatureTypes = new Set([
 
 export const MusicContinuousControlFeatureTypes = new Set([
   DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
-  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
+  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE,
+  DEVICE_FEATURE_TYPES.MUSIC.DURATION,
+  DEVICE_FEATURE_TYPES.MUSIC.POSITION,
+  DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE,
+  DEVICE_FEATURE_TYPES.MUSIC.REPEAT,
+  DEVICE_FEATURE_TYPES.MUSIC.MUTE,
+  // the string "now playing" types carry a value to read, never a key to press
+  ...MUSIC_STRING_FEATURE_TYPES
 ]);
 
 export const isPushButtonFeature = (category, type) => {

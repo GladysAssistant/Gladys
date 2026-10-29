@@ -114,7 +114,7 @@ module.exports = function UserController(gladys) {
    * @apiGroup User
    */
   async function update(req, res) {
-    const user = await gladys.user.updateBySelector(req.params.user_selector, req.body);
+    const user = await gladys.user.updateBySelector(req.params.user_selector, req.body, req.session_id);
     res.json(user);
   }
 
@@ -160,7 +160,7 @@ module.exports = function UserController(gladys) {
    */
   async function updateMySelf(req, res, next) {
     delete req.body.role;
-    const newUser = await gladys.user.update(req.user.id, req.body);
+    const newUser = await gladys.user.update(req.user.id, req.body, req.session_id);
     res.json(newUser);
   }
 
@@ -197,10 +197,11 @@ module.exports = function UserController(gladys) {
     );
     const secret = method === FORGOT_PASSWORD_METHODS.LINK ? link : code;
     const text = getForgotPasswordReply(user.language, method);
-    // Try to send the link or the code to the user if he has configured an external service like Telegram
+    // Try to send the link or the code to the user if he has configured an external service like Telegram.
+    // One message: a channel like email sends each message on its own, and a mail holding nothing
+    // but a link is easily dropped as spam, leaving the user with the text and no link.
     try {
-      await gladys.message.sendToUser(user.selector, text);
-      await gladys.message.sendToUser(user.selector, secret);
+      await gladys.message.sendToUser(user.selector, `${text}\n${secret}`);
     } catch (e) {
       logger.error(`Error while sending forgot password message to user ${user.email}:`, e);
     }
@@ -234,8 +235,8 @@ module.exports = function UserController(gladys) {
    * @apiGroup User
    */
   async function resetPassword(req, res) {
+    // also revokes the reset password session
     const user = await gladys.user.updatePassword(req.user.id, req.body.password);
-    await gladys.session.revoke(req.user.id, req.session_id);
     res.json(user);
   }
 

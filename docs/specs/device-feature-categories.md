@@ -76,7 +76,8 @@ It follows the rules above:
   all publish the same notion. A device supporting only some of them declares
   that through `supported_options`;
 - **no unit** (`DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE`): the category is a
-  temperature, but a preset, a mode and an operating state are enums.
+  temperature, but a preset, an active preset, a mode and an operating state
+  are enums.
 
 `off` is deliberately **not** a preset: stopping is a mode, and
 `THERMOSTAT_MODE.OFF` already carries it. A schedule transition may still say
@@ -93,6 +94,37 @@ programme" onto this value has to decide whether it means the appliance's
 schedule or Gladys's, and the two are not interchangeable. An integration that
 cannot answer that question simply leaves `schedule` out of its
 `supported_options`.
+
+Because `schedule` is a standing choice, the `preset` feature does not change
+when the programme moves from one point to the next, and a scene cannot start on
+it then. The read-only `active-preset` type (`THERMOSTAT_ACTIVE_PRESET`) carries
+the preset in force instead: the same integers, with `0` meaning stopped rather
+than `schedule` — a programme is never in force, one of its points is.
+
+Matter models the same notion, and rule 3 asks for the comparison. Since 1.4 the
+Thermostat cluster's Presets feature has an `ActivePresetHandle` attribute: an
+opaque handle into the device's own `Presets` list, each entry of which carries
+a `PresetScenarioEnum` (`Occupied`, `Unoccupied`, `Sleep`, `Wake`, `Vacation`,
+`GoingToSleep`, `UserDefined`) and its own setpoints. `active-preset` keeps the
+Gladys integers instead, for two reasons:
+
+- **a handle is not a value a scene can name.** It is meaningful only against one
+  device's list, which differs from one thermostat to the next, while a scene
+  trigger has to say "when Comfort starts" for any thermostat. The scenario is
+  the stable part, and it maps onto the generic set: `Occupied` and `Wake` →
+  `comfort`, `Sleep` and `GoingToSleep` → `night`, `Unoccupied` → `away`,
+  `Vacation` → `frost`. A future Matter integration reads the scenario of the
+  active entry and writes that integer; `UserDefined` has no generic meaning and
+  leaves the feature as it is.
+- **`0` means stopped**, where Matter keeps the stop on `SystemMode` and leaves
+  the handle null. A scene that starts when the heating stops is the most asked
+  for, and on one feature it needs no second trigger on the mode. A Matter
+  integration maps `SystemMode` `Off` to `0`, and a null handle with the system
+  running leaves the feature as it is.
+
+Matter also has `ActiveScheduleHandle` for the device's own weekly schedule:
+that is the appliance's programme, not Gladys's, for the reason given on
+`schedule` above, and it has no counterpart here.
 
 Consequence for reviews: "brand X only supports 3 of the 5 modes" is **never** a reason to create a narrower category, a brand-specific type, or a stripped-down enum. Keep the generic value set and let the integration declare what each device supports. The air-conditioning features are the reference example: the Matter service builds the `supported_options` of the AC mode feature from the Thermostat cluster's capability flags (heating/cooling/autoMode).
 

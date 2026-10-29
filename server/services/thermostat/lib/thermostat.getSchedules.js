@@ -4,6 +4,8 @@ const {
   findCurrentTransition,
   findNextTransition,
   getCurrentDayAndMinutes,
+  daysUntilPoint,
+  nextTransitionTimestamp,
 } = require('../../../utils/thermostatSchedule');
 
 const TRANSITION_ORDER = [
@@ -35,7 +37,11 @@ const SCHEDULE_INCLUDE = [
  * `current` and `next` are computed here rather than by the client: they are
  * wall-clock times in the house, so resolving them in the browser would show a
  * phone abroad a different point than the one actually heating the house. The
- * widget renders "Eco until 08:30" straight from `next`.
+ * widget renders "Eco until 08:30" straight from `next`, and names its day from
+ * `next.days_ahead` — counted from the house's today, not the phone's. That
+ * count holds until `next.refresh_at`, the house's next midnight or the point
+ * itself, whichever comes first: a wall panel reloads the schedule then, or
+ * "until tomorrow 06:30" was still on screen at 03:00, when the point is today.
  * @param {object} schedule - Schedule row, with its transitions, house and thermostats loaded.
  * @param {string} [timezone] - The Gladys timezone the points are resolved in.
  * @returns {object} The schedule as the API returns it.
@@ -49,7 +55,11 @@ function formatSchedule(schedule, timezone) {
     time,
     preset,
   }));
-  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
+  const now = new Date();
+  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(now, timezone);
+  const next = findNextTransition(transitions, dayOfWeek, currentMinutes);
+  // The house's next midnight is the next "point" at 00:00 tomorrow.
+  const nextMidnight = nextTransitionTimestamp([{ day_of_week: (dayOfWeek + 1) % 7, time: '00:00' }], now, timezone);
   return {
     id: plain.id,
     selector: plain.selector,
@@ -59,7 +69,11 @@ function formatSchedule(schedule, timezone) {
     house: plain.house.selector,
     transitions,
     current: findCurrentTransition(transitions, dayOfWeek, currentMinutes),
-    next: findNextTransition(transitions, dayOfWeek, currentMinutes),
+    next: next && {
+      ...next,
+      days_ahead: daysUntilPoint(next, dayOfWeek, currentMinutes),
+      refresh_at: Math.min(nextTransitionTimestamp(transitions, now, timezone), nextMidnight),
+    },
     devices: plain.thermostats.map((link) => ({
       selector: link.device.selector,
       name: link.device.name,

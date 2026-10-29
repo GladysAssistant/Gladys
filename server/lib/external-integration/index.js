@@ -77,6 +77,12 @@ const { getOAuthAuthorizeUrl } = require('./externalIntegration.getOAuthAuthoriz
 const { relayOAuthCallback } = require('./externalIntegration.relayOAuthCallback');
 const { runAction } = require('./externalIntegration.runAction');
 const { aiChat } = require('./externalIntegration.aiChat');
+const {
+  relayMusicCommand,
+  rememberMusicArtworkKeys,
+  isMusicArtworkKeyAllowed,
+  getMusicArtwork,
+} = require('./externalIntegration.music');
 const { getAiProviders } = require('./externalIntegration.getAiProviders');
 const { setAiProvider } = require('./externalIntegration.setAiProvider');
 const { getContainerStartedAt } = require('./externalIntegration.getContainerStartedAt');
@@ -231,6 +237,10 @@ const ExternalIntegration = function ExternalIntegration(
   this.cameraImageRateLimits = new Map();
   // requests in flight per AI provider integration (service id -> count), see aiChat
   this.aiChatInFlight = new Map();
+  // music commands in flight per integration (service id -> count), see relayMusicCommand
+  this.musicCommandsInFlight = new Map();
+  // serviceId -> LRU Map of artwork key -> expiry of its allowlisting (capabilities/music.md, section 3)
+  this.musicArtworkKeys = new Map();
   // serviceId -> timestamp of the last accepted weather freshness nudge
   this.weatherRefreshTimes = new Map();
   // serviceId -> last energy-calendar.refresh nudge (capabilities/energy-contracts.md)
@@ -268,7 +278,7 @@ const ExternalIntegration = function ExternalIntegration(
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
   this.storeIndexFetchedAt = 0;
-  // last full index entry fetched (complete manifest), see getStoreEntry
+  // last complete store entry fetched (per-integration file), see getStoreEntry
   this.storeEntryCache = null;
   this.storeRefreshInterval = null;
   // storeSlug -> manifest fetched directly from the repo (repo_url installs absent from the index)
@@ -360,6 +370,10 @@ ExternalIntegration.prototype.getOAuthAuthorizeUrl = getOAuthAuthorizeUrl;
 ExternalIntegration.prototype.relayOAuthCallback = relayOAuthCallback;
 ExternalIntegration.prototype.runAction = runAction;
 ExternalIntegration.prototype.aiChat = aiChat;
+ExternalIntegration.prototype.relayMusicCommand = relayMusicCommand;
+ExternalIntegration.prototype.rememberMusicArtworkKeys = rememberMusicArtworkKeys;
+ExternalIntegration.prototype.isMusicArtworkKeyAllowed = isMusicArtworkKeyAllowed;
+ExternalIntegration.prototype.getMusicArtwork = getMusicArtwork;
 ExternalIntegration.prototype.getAiProviders = getAiProviders;
 ExternalIntegration.prototype.setAiProvider = setAiProvider;
 ExternalIntegration.prototype.getContainerStartedAt = getContainerStartedAt;

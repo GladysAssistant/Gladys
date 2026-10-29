@@ -7,9 +7,43 @@ import IntegrationPageHeader from './IntegrationPageHeader';
 import InstalledIntegrationsSummary from './InstalledIntegrationsSummary';
 import IntegrationCatalogSkeleton from './IntegrationCatalogSkeleton';
 import IntegrationLoadMore from './IntegrationLoadMore';
+import UpdateAllIntegrations from './UpdateAllIntegrations';
 import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import { RequestStatus } from '../../utils/consts';
+import { getCountryName } from './catalog-country';
 import style from './style.css';
+
+// the country filter is set by nobody: the browse views show the worldwide
+// integrations and the ones declared for the country of the instance. This
+// line only appears when that actually hides something (or when the user
+// asked for every country), and says how to switch — one link, no selector
+const CountryScopeLine = ({ instanceCountry, allCountries, hiddenByCountry, language, toggleAllCountries }) => {
+  if (!allCountries && hiddenByCountry === 0) {
+    return null;
+  }
+  const country = getCountryName(instanceCountry, language);
+  return (
+    <div class={`text-muted small mb-3 ${style.countryScope}`}>
+      <i class="fe fe-map-pin mr-1" />
+      {allCountries ? (
+        <Text id="integration.root.countryFilter.all" />
+      ) : (
+        <Text
+          id="integration.root.countryFilter.scoped"
+          plural={hiddenByCountry}
+          fields={{ country, count: hiddenByCountry }}
+        />
+      )}{' '}
+      <button type="button" class="btn btn-link btn-sm p-0 align-baseline" onClick={toggleAllCountries}>
+        {allCountries ? (
+          <Text id="integration.root.countryFilter.showOnly" fields={{ country }} />
+        ) : (
+          <Text id="integration.root.countryFilter.showAll" />
+        )}
+      </button>
+    </div>
+  );
+};
 
 // the community store could not be downloaded (and Gladys has no cached copy
 // of it): the catalog holds the native integrations only, which must be said
@@ -33,7 +67,14 @@ const StoreUnavailableAlert = ({ refreshStore, refreshStoreStatus }) => (
   </div>
 );
 
-const IntegrationList = ({ integrations, visibleCount, showMoreIntegrations, toggleFavorite, category }) => {
+const IntegrationList = ({
+  integrations,
+  visibleCount,
+  showMoreIntegrations,
+  toggleFavorite,
+  updateIntegration,
+  category
+}) => {
   const visibleIntegrations = integrations.slice(0, visibleCount);
   return (
     <div>
@@ -43,6 +84,7 @@ const IntegrationList = ({ integrations, visibleCount, showMoreIntegrations, tog
             key={integration.key}
             integration={integration}
             toggleFavorite={toggleFavorite}
+            updateIntegration={updateIntegration}
             alwaysShowStatus={category === 'installed'}
           />
         ))}
@@ -54,6 +96,7 @@ const IntegrationList = ({ integrations, visibleCount, showMoreIntegrations, tog
               key={integration.key}
               integration={integration}
               toggleFavorite={toggleFavorite}
+              updateIntegration={updateIntegration}
               alwaysShowStatus={category === 'installed'}
             />
           ))}
@@ -81,8 +124,16 @@ const IntegrationPage = ({
   orderDir,
   changeOrderDir,
   search,
+  clearFilters,
+  hasActiveFilters,
+  instanceCountry,
+  allCountries,
+  hiddenByCountry,
+  countryScopeApplicable,
+  toggleAllCountries,
   integrationCategories,
   toggleFavorite,
+  updateIntegration,
   showInstallFromGithub,
   showStoreRefresh,
   refreshStore,
@@ -92,6 +143,12 @@ const IntegrationPage = ({
   installedIntegrationsCount,
   installedStatusCounts,
   installedInventoryKnown,
+  updatableIntegrationsCount,
+  cardUpdateRunning,
+  updateAllIntegrations,
+  updateAllStatus,
+  updateAllProgress,
+  updateAllResult,
   category,
   origin,
   transports,
@@ -114,6 +171,8 @@ const IntegrationPage = ({
               totalSize={totalSize}
               loading={catalogLoading}
               showInstallFromGithub={showInstallFromGithub}
+              hasActiveFilters={hasActiveFilters}
+              clearFilters={clearFilters}
             />
             <IntegrationMenuMobile
               integrationCategories={integrationCategories}
@@ -150,6 +209,28 @@ const IntegrationPage = ({
                     installedStatusCounts={installedStatusCounts}
                   />
                 )}
+                {/* "Update all" lives in the view listing what is to update. A
+                    run keeps going if the user browses another view meanwhile:
+                    coming back here shows its progress, or its outcome */}
+                {!catalogLoading && category === 'updates' && (
+                  <UpdateAllIntegrations
+                    integrationsToUpdateCount={updatableIntegrationsCount}
+                    cardUpdateRunning={cardUpdateRunning}
+                    status={updateAllStatus}
+                    progress={updateAllProgress}
+                    result={updateAllResult}
+                    onUpdateAll={updateAllIntegrations}
+                  />
+                )}
+                {!catalogLoading && countryScopeApplicable && (
+                  <CountryScopeLine
+                    instanceCountry={instanceCountry}
+                    allCountries={allCountries}
+                    hiddenByCountry={hiddenByCountry}
+                    language={user.language}
+                    toggleAllCountries={toggleAllCountries}
+                  />
+                )}
                 {!catalogLoading && externalStoreUnavailable && (
                   <StoreUnavailableAlert
                     refreshStore={showStoreRefresh ? refreshStore : null}
@@ -164,6 +245,7 @@ const IntegrationPage = ({
                     visibleCount={visibleCount}
                     showMoreIntegrations={showMoreIntegrations}
                     toggleFavorite={toggleFavorite}
+                    updateIntegration={updateIntegration}
                     category={category}
                   />
                 )}
