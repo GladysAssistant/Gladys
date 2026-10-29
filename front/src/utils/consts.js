@@ -86,7 +86,6 @@ export const RequestStatus = {
   ServiceDisconnected: 'ServiceDisconnected',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
-  UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
   RoomValidationError: 'RoomValidationError'
@@ -524,6 +523,7 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: 'thermometer',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: 'settings',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: 'sliders',
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET]: 'sliders',
     [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: 'power'
   },
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: {

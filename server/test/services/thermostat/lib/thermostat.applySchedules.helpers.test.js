@@ -82,6 +82,12 @@ describe('thermostat.applySchedules - getSetpointForPreset', () => {
     expect(getSetpointForPreset('eco', {})).to.equal(18);
   });
 
+  // A thermostat that cools aims higher: Comfort at 21 °C was a cold surprise.
+  it('should fall back on the cooling defaults for a thermostat that cools', () => {
+    expect(getSetpointForPreset('comfort', { default_mode: 'cooling' })).to.equal(24);
+    expect(getSetpointForPreset('eco', { default_mode: 'cooling' })).to.equal(26);
+  });
+
   it('should fall back to default when config is null', () => {
     expect(getSetpointForPreset('frost', null)).to.equal(7);
   });

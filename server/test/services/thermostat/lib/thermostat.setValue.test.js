@@ -23,11 +23,13 @@ const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 // thermostat that follows none, whose hold is permanent.
 // Cleared in the database, which the scheduleDevice tests exercise for real.
 const clearScheduleStop = fake.resolves(null);
+const clearRemoteStop = fake.resolves(null);
 
 const load = (follows = true) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
     './thermostat.scheduleDevice': {
       clearScheduleStop,
+      clearRemoteStop,
       followsSchedule: fake.resolves(follows),
       getScheduleOfDevice: fake.resolves(
         follows ? { transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }] } : null,
@@ -71,6 +73,15 @@ const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF, targetUn
         // The mode lives on that same device, and is looked up the same way.
         get: fake((query) => {
           const selector = query && query.device_feature_selectors;
+          if (selector === 'netatmo-power') {
+            return Promise.resolve([
+              {
+                selector: 'netatmo-device',
+                service: { name: 'netatmo' },
+                features: [{ selector: 'netatmo-power', last_value: 0 }],
+              },
+            ]);
+          }
           if (selector === 'netatmo-mode') {
             return Promise.resolve([
               {
@@ -190,6 +201,20 @@ describe('thermostat.setValue', () => {
       const mondayAt5Utc = Date.UTC(2024, 0, 1, 5, 0, 0);
       sinon.useFakeTimers(mondayAt5Utc);
       const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 20);
+
+      const until = Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2]);
+      expect(until).to.equal(mondayAt5Utc + 30 * 60 * 1000);
+    });
+
+    it('should fall back on the default timezone when it cannot be read', async () => {
+      // A failed read of the variable must not fail the hold: the same Paris
+      // default applies, and the 06:30 point is half an hour away.
+      const mondayAt5Utc = Date.UTC(2024, 0, 1, 5, 0, 0);
+      sinon.useFakeTimers(mondayAt5Utc);
+      const handler = buildHandler();
+      handler.gladys.variable.getValue = fake.rejects(new Error('database locked'));
 
       await handler.setValue(device(), setpointFeature, 20);
 
@@ -424,6 +449,53 @@ describe('thermostat.setValue', () => {
       expect(writes).to.deep.equal([THERMOSTAT_MODE.OFF, 7]);
     });
 
+    // One thermostat per mode on the same unit: stopping the heating one in
+    // summer must not switch off the unit the cooling one runs.
+    describe('on a unit another thermostat runs', () => {
+      const powered = (power) =>
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+          { name: 'THERMOSTAT_POWER_FEATURE', value: power },
+        ]);
+      const other = (mode) => ({
+        id: 'other-id',
+        selector: 'other-thermostat',
+        features: [{ ...modeFeature, last_value: mode }],
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+        ],
+      });
+      const withOther = (handler, mode) => {
+        const { get } = handler.gladys.device;
+        handler.gladys.device.get = fake((query) =>
+          query && query.service === 'thermostat' ? Promise.resolve([other(mode)]) : get(query),
+        );
+        return handler;
+      };
+
+      it('should leave the unit to the running thermostat', async () => {
+        const handler = withOther(buildHandler(true, THERMOSTAT_MODE.HEATING), THERMOSTAT_MODE.COOLING);
+
+        await handler.setValue(powered('netatmo-power'), modeFeature, THERMOSTAT_MODE.OFF);
+
+        assert.notCalled(handler.gladys.device.setValue);
+        assert.calledWith(handler.gladys.device.saveState, modeFeature, THERMOSTAT_MODE.OFF);
+      });
+
+      it('should stop the unit when the other thermostat is stopped too', async () => {
+        const handler = withOther(buildHandler(true, THERMOSTAT_MODE.HEATING), THERMOSTAT_MODE.OFF);
+
+        await handler.setValue(powered('netatmo-power'), modeFeature, THERMOSTAT_MODE.OFF);
+
+        const writes = handler.gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+        expect(writes).to.deep.include(['netatmo-mode', THERMOSTAT_MODE.OFF]);
+      });
+    });
+
     it('should stop a cooling thermostat from the top of its range', async () => {
       // The frost setpoint asked an air conditioner to cool as hard as it can,
       // which it did whenever the mode write did not land.
@@ -466,6 +538,33 @@ describe('thermostat.setValue', () => {
 
       const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
       expect(writes).to.deep.equal([THERMOSTAT_MODE.HEATING]);
+    });
+
+    // A unit powered off ignores its mode as surely as a setpoint: an air
+    // conditioner is started by its power first (A.0.3).
+    it('should power a real thermostat on before its mode when it is started', async () => {
+      const handler = buildHandler(true, THERMOSTAT_MODE.OFF);
+      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+            { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+          ],
+          [presetFeature, stoppedMode],
+        ),
+        stoppedMode,
+        THERMOSTAT_MODE.HEATING,
+      );
+
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+      expect(writes).to.deep.equal([
+        ['netatmo-power', 1],
+        ['netatmo-mode', THERMOSTAT_MODE.HEATING],
+      ]);
     });
 
     it('should leave a running real thermostat to the next pass when its mode is written again', async () => {
@@ -512,10 +611,13 @@ describe('thermostat.setValue', () => {
       // in-memory one, whose params do not carry the mark.
       const handler = buildHandler();
       clearScheduleStop.resetHistory();
+      clearRemoteStop.resetHistory();
 
       await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
 
       assert.calledOnceWithExactly(clearScheduleStop, 'device-id');
+      // A stop made on the unit, too: it no longer ends on the next point.
+      assert.calledOnceWithExactly(clearRemoteStop, 'device-id');
     });
   });
 
@@ -578,6 +680,29 @@ describe('thermostat.setValue', () => {
       // A thermostat left switched off ignores a setpoint.
       const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
       expect(writes).to.deep.equal([THERMOSTAT_MODE.HEATING, 21]);
+    });
+
+    it('should power the unit on before writing the setpoint', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+          ],
+          [presetFeature],
+        ),
+        externalFeature,
+        21,
+      );
+
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+      expect(writes).to.deep.equal([
+        ['netatmo-power', 1],
+        ['netatmo-setpoint', 21],
+      ]);
     });
 
     it('should write only the setpoint when no mode feature is configured', async () => {

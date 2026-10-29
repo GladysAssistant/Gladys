@@ -12,6 +12,7 @@ const {
   clearManualHold,
   savePreset,
   SCHEDULE_STOP_PARAM,
+  REMOTE_STOP_UNTIL_PARAM,
 } = require('./thermostat.state');
 const { getCurrentPoint } = require('./thermostat.getSchedules');
 
@@ -49,6 +50,19 @@ async function clearScheduleStop(deviceId) {
     { value: '' },
     { where: { device_id: deviceId, name: SCHEDULE_STOP_PARAM, value: 'true' } },
   );
+}
+
+/**
+ * @description Clear the end of a stop made on the unit itself, read and written
+ * in the database for the reason given on clearScheduleStop: whoever writes a
+ * mode afterwards owns the stop, or the start.
+ * @param {string} deviceId - The thermostat's id.
+ * @returns {Promise<void>}
+ * @example
+ * await clearRemoteStop(device.id);
+ */
+async function clearRemoteStop(deviceId) {
+  await db.DeviceParam.update({ value: '' }, { where: { device_id: deviceId, name: REMOTE_STOP_UNTIL_PARAM } });
 }
 
 /**
@@ -355,6 +369,7 @@ module.exports = {
   stopForEmptiedProgramme,
   liftScheduleStop,
   clearScheduleStop,
+  clearRemoteStop,
   loadThermostat,
   forEachFollower,
   resolveScheduleAndDevice,

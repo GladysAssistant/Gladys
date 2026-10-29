@@ -792,6 +792,25 @@
         "scheduleLabel": "Zeitplan:",
         "scheduleUntil": "bis",
         "manualUntil": "bis",
+        "untilTomorrow": "morgen",
+        "untilDays": {
+          "0": "Montag",
+          "1": "Dienstag",
+          "2": "Mittwoch",
+          "3": "Donnerstag",
+          "4": "Freitag",
+          "5": "Samstag",
+          "6": "Sonntag"
+        },
+        "untilNextDays": {
+          "0": "nächsten Montag",
+          "1": "nächsten Dienstag",
+          "2": "nächsten Mittwoch",
+          "3": "nächsten Donnerstag",
+          "4": "nächsten Freitag",
+          "5": "nächsten Samstag",
+          "6": "nächsten Sonntag"
+        },
         "cancelManual": "Manuellen Modus beenden",
         "windowOpen": "Fenster offen — Heizung ausgesetzt",
         "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
@@ -3629,6 +3648,8 @@
         "nameLabel": "Name",
         "namePlaceholder": "z.B. Wohnzimmer Thermostat",
         "roomLabel": "Raum",
+        "showAllRoomsLabel": "Geräte aller Räume anzeigen",
+        "showAllRoomsHelp": "Die Listen unten bieten nur die Geräte dieses Raums an. Erweitere sie, wenn der beheizte Bereich mehrere Räume umfasst, etwa ein offenes Wohnzimmer mit Küche.",
         "modeLabel": "Verwendung",
         "typeLabel": "Thermostattyp",
         "tuningSection": "Feineinstellung",
@@ -3641,10 +3662,13 @@
         },
         "targetFeatureLabel": "Sollwert des echten Thermostats",
         "targetFeatureHelp": "Die Funktion, auf die Gladys die Zieltemperatur schreibt. Manche Geräte bieten mehrere an (Heizen/Kühlen, anwesend/abwesend): Wählen Sie diejenige, die Ihre Heizung tatsächlich steuert.",
-        "stateFeatureLabel": "Heizzustand (optional)",
+        "stateFeatureLabel": "Betriebszustand (optional)",
         "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
         "modeFeatureLabel": "Betriebsmodus (optional)",
-        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden. Gladys schaltet ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden — der Modus einer Klimaanlage funktioniert ebenfalls. Bei einem Thermostat schaltet Gladys ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt. Der Modus einer Klimaanlage kennt kein Aus: Sie wird über ihre Stromversorgung gestoppt, die dann angegeben werden muss.",
+        "powerFeatureLabel": "Stromversorgung (optional)",
+        "powerFeatureHelp": "Der Schalter, der das echte Gerät ein- und ausschaltet, etwa die Stromversorgung einer Klimaanlage oder Wärmepumpe. Gladys schaltet ihn aus, wenn das Thermostat gestoppt wird, ein Fenster geöffnet wird oder ein Aus-Zeitfenster greift, und wieder ein, sobald ein Sollwert übernimmt. Für eine Klimaanlage nötig, deren Modus kein Aus kennt.",
+        "powerFeatureNeeded": "Der Modus einer Klimaanlage kennt kein Aus: Wählen Sie hier ihre Stromversorgung, sonst kann Gladys sie nicht ausschalten, wenn ein Fenster geöffnet wird, ein Aus-Zeitfenster greift oder das Thermostat gestoppt wird.",
         "mode": {
           "heating": "Heizen",
           "cooling": "Kühlen"
@@ -3666,8 +3690,9 @@
         "minTempPlaceholder": "z.B. 5",
         "maxTempLabel": "Max. Temperatur",
         "maxTempPlaceholder": "z.B. 35",
-        "temperatureFeatureLabel": "Temperatursensor",
-        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst. Ein Sensor, der eine andere Einheit als das Thermostat meldet, wird automatisch umgerechnet; bei einem Sensor ohne angegebene Einheit wird die Einheit des Thermostats angenommen.",
+        "temperatureFeatureLabel": "Temperatursensoren",
+        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst, oder mehrere: Das Thermostat verwendet dann ihren Durchschnitt. Ein Sensor, der eine andere Einheit als das Thermostat meldet, wird automatisch umgerechnet; bei einem Sensor ohne angegebene Einheit wird die Einheit des Thermostats angenommen.",
+        "addTemperatureFeature": "Temperatursensor hinzufügen",
         "humidityFeatureLabel": "Feuchtigkeitssensor",
         "humidityFeatureHelp": "Optional. Wird im Thermostat-Widget angezeigt.",
         "switchFeatureLabel": "Schalter (Aktor)",
@@ -3675,11 +3700,17 @@
           "heating": "Der Schalter, der zum Heizen des Raums ein- und ausgeschaltet wird.",
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
         },
-        "windowFeatureLabel": "Fensterkontakt",
-        "windowFeatureHelp": {
-          "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
-          "cooling": "Optional. Wenn ein Fenster geöffnet ist, wird die Kühlung automatisch abgeschaltet."
+        "noSwitchHint": {
+          "heating": "Hier steht kein Schalter zur Auswahl. Zeigen Sie oben die Geräte aller Räume an oder wählen Sie für ein Thermostat oder eine Wärmepumpe, die sich selbst regelt, den Typ „Echtes Thermostat“.",
+          "cooling": "Hier steht kein Schalter zur Auswahl. Eine Klimaanlage regelt sich selbst: Wählen Sie den Typ „Echtes Thermostat“ und dann ihren Sollwert. Ein Ventilator oder ein Luftkühler an einer Steckdose kann ein virtuelles Thermostat bleiben."
         },
+        "windowFeatureLabel": "Fensterkontakte",
+        "windowFeatureHelp": {
+          "heating": "Optional. Sobald eines der ausgewählten Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
+          "cooling": "Optional. Sobald eines der ausgewählten Fenster geöffnet ist, wird die Kühlung automatisch abgeschaltet."
+        },
+        "addWindowFeature": "Öffnungssensor hinzufügen",
+        "removeFeature": "Entfernen",
         "hysteresisStartLabel": "Einschaltschwelle",
         "hysteresisStartHelp": {
           "heating": "Die Heizung schaltet ein, wenn die Temperatur unter (Sollwert − Einschaltschwelle) liegt. Z. B. Sollwert 21 °C, Schwelle 0,5 °C → schaltet unter 20,5 °C ein.",
@@ -3722,7 +3753,10 @@
         "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird.",
         "modeHelp": "Was dieses Thermostat steuert: Heizung oder Kühlung.",
         "sectionDevice": "Gerät",
-        "sectionHeating": "Heizung",
+        "section": {
+          "heating": "Heizung",
+          "cooling": "Kühlung"
+        },
         "sectionProgramming": "Programmierung",
         "deviceRangeHint": "Das Gerät meldet {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Diese Werte übernehmen",
@@ -4110,6 +4144,11 @@
         "houseLabel": "Zuhause",
         "alarmModeLabel": "Alarmmodus"
       },
+      "thermostatSetSchedule": {
+        "description": "Diese Aktion lässt die ausgewählten Thermostate einem anderen Zeitplan folgen, zum Beispiel um vom üblichen Zeitplan auf den der Schulferien zu wechseln. Der Thermostat folgt dem Zeitplan sofort: Ein laufender manueller Sollwert wird aufgehoben, ein von Hand ausgeschalteter Thermostat bleibt jedoch aus.",
+        "scheduleLabel": "Zeitplan",
+        "thermostatsLabel": "Thermostate"
+      },
       "alarmSetMode": {
         "description": "Diese Aktion setzt das ausgewählte Zuhause in den ausgewählten Alarmmodus.",
         "houseLabel": "Zuhause",
@@ -4170,6 +4209,13 @@
           "inferior": "kleiner als",
           "inferiorOrEqual": "kleiner oder gleich"
         }
+      },
+      "inTimeRange": {
+        "label": "Nur fortfahren, wenn",
+        "inRange": "Wir befinden uns in einem Zeitfenster",
+        "outOfRange": "Wir befinden uns außerhalb der Zeitfenster",
+        "description": "Diese Bedingung nutzt die Zeitfenster des Auslösers „Zeitfenster“ der Szene. Verwenden Sie sie in einem „Wenn… Dann… Sonst“-Block, um ein Gerät zu Beginn eines Zeitfensters einzuschalten und am Ende auszuschalten – mit einer einzigen Szene.",
+        "noTrigger": "Diese Szene hat keinen geplanten Auslöser „Zeitfenster“: Diese Bedingung wird sie jedes Mal stoppen."
       }
     },
     "actions": {
@@ -4211,7 +4257,8 @@
         "only-continue-if": "Nur fortsetzen, wenn",
         "check-time": "Zeitbedingung",
         "if-then-else": "Bedingung: \"Wenn...dann...sonst...\"",
-        "while": "Schleife: \"Solange... wiederholen...\""
+        "while": "Schleife: \"Solange... wiederholen...\"",
+        "in-time-range": "Zeitplan"
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",
@@ -4234,6 +4281,9 @@
       "alarm": {
         "check-alarm-mode": "Wenn der Alarm im Modus ist",
         "set-alarm-mode": "Alarmmodus setzen auf"
+      },
+      "thermostat": {
+        "set-schedule": "Zeitplan der Thermostate ändern"
       },
       "mqtt": {
         "send": "MQTT-Message senden"
@@ -4292,7 +4342,8 @@
         "if-then-else": "Je nach Bedingung einem anderen Pfad folgen",
         "only-continue-if": "Die Szene hier stoppen, wenn die Bedingung nicht erfüllt ist",
         "while": "Aktionen wiederholen, solange eine Bedingung erfüllt ist",
-        "check-time": "Nur zu bestimmten Uhrzeiten oder Tagen fortfahren"
+        "check-time": "Nur zu bestimmten Uhrzeiten oder Tagen fortfahren",
+        "in-time-range": "Nur fortfahren, wenn wir uns in einem Zeitfenster des Auslösers befinden"
       },
       "user": {
         "check-presence": "Einen Benutzer als abwesend markieren, wenn er länger nicht gesehen wurde",
@@ -4323,6 +4374,9 @@
       },
       "http": {
         "request": "Eine externe API oder einen Dienst aufrufen"
+      },
+      "thermostat": {
+        "set-schedule": "Thermostate einem anderen Wochenzeitplan folgen lassen"
       },
       "mqtt": {
         "send": "Eine Nachricht auf dem MQTT-Broker veröffentlichen"
@@ -4547,7 +4601,32 @@
           "saturday": "Samstag",
           "sunday": "Sonntag"
         },
-        "house": "Zuhause"
+        "house": "Zuhause",
+        "timeRange": "Zeitfenster",
+        "timeRangesLabel": "Zeitfenster",
+        "noTimeRange": "Noch kein Zeitfenster. Fügen Sie eines hinzu, um den Zeitplan festzulegen.",
+        "addRange": "Zeitfenster hinzufügen",
+        "deleteRange": "Zeitfenster löschen",
+        "rangeStart": "Beginn",
+        "rangeEnd": "Ende",
+        "rangeDuration": "Dauer",
+        "rangeDays": "Tage",
+        "overnight": "+1T",
+        "emptyRange": "Ungültiger Zeitraum",
+        "resumeOnStartup": "Beim Start von Gladys neu auswerten",
+        "timeRangesHelp": "Die Szene wird zu Beginn und am Ende jedes Zeitfensters ausgeführt. Verwenden Sie die Aktion „Zeitplan“ in einem „Wenn… Dann… Sonst“-Block, um ein Gerät zu Beginn eines Zeitfensters einzuschalten und am Ende auszuschalten. Wenn „Beim Start von Gladys neu auswerten“ aktiviert ist, wird die Szene auch beim Start mit dem tatsächlichen Zustand des Zeitplans ausgeführt, sodass Ihre Geräte nach einem Ausfall wieder den richtigen Zustand annehmen.",
+        "daysOfTheWeekShort": {
+          "monday": "MO",
+          "tuesday": "DI",
+          "wednesday": "MI",
+          "thursday": "DO",
+          "friday": "FR",
+          "saturday": "SA",
+          "sunday": "SO"
+        },
+        "lastDayLocked": "Mindestens ein Tag muss ausgewählt bleiben.",
+        "invalidRangesError": "Vervollständigen oder entfernen Sie die Zeitfenster der Szene: Jedes braucht einen Beginn und ein Ende, die nicht zur selben Uhrzeit liegen dürfen.",
+        "noRangeError": "Fügen Sie dem Auslöser „Zeitfenster“ mindestens ein Zeitfenster hinzu oder entfernen Sie den Auslöser."
       },
       "warning": {
         "houseWithoutCoordinate": "Dein Zuhause hat keine Koordinaten. Dieser Auslöser funktioniert nicht ohne Koordinaten. Bitte gehe zu Einstellungen -> Zuhause und klicke auf die Karte, um die Koordinaten des Zuhauses festzulegen."
@@ -5158,9 +5237,12 @@
     "statusColumn": "Status",
     "userRsaKey": "RSA-Schlüssel:",
     "userEcdsaKey": "ECDSA-Schlüssel:",
+    "userAccepted": "Autorisiert",
+    "userKeysChanged": "Schlüssel geändert",
+    "userWaitingForAuthorization": "Wartet auf Autorisierung",
     "usersListDescription": "Diese Liste wird mit deinen Gladys-Plus-Benutzern synchronisiert. Damit ein Benutzer (auch du selbst) aus der Ferne auf deine Instanz zugreifen kann, musst du ihn hier autorisieren, indem du den Schalter neben seinem Namen aktivierst.",
     "usersListWhyAcceptDescription": "<b>Warum dieser Schritt?</b> Jeder Gladys-Plus-Benutzer besitzt eigene Verschlüsselungsschlüssel, deren Fingerabdrücke unten angezeigt werden. Indem du einen Benutzer autorisierst, bestätigst du lokal auf deiner Instanz, dass seine Schlüssel akzeptiert werden: Diese lokale Validierung schützt dein Zuhause vor Man-in-the-Middle-Angriffen. Niemand, nicht einmal die Gladys-Plus-Server, kann ohne diese bei dir zu Hause durchgeführte Validierung Zugriff auf deine Instanz gewähren.",
-    "usersListRevokedDescription": "Wenn sich die Schlüssel eines Benutzers ändern (zum Beispiel wenn seine Zwei-Faktor-Authentifizierung zurückgesetzt wurde), wird sein Zugriff aus Sicherheitsgründen automatisch widerrufen: Du musst ihn hier erneut autorisieren. Um einen Benutzer zu entfernen, gehe zur Gladys-Plus-Benutzerverwaltung.",
+    "usersListRevokedDescription": "Die Schlüssel eines Benutzers ändern sich, wenn er sein Gladys-Plus-Passwort zurücksetzt. Sein Zugriff wird dann aus Sicherheitsgründen automatisch widerrufen und er wird als \"Schlüssel geändert\" angezeigt: Prüfe mit ihm, dass die neuen Fingerabdrücke mit denen auf seiner Gladys-Plus-Seite übereinstimmen, und autorisiere ihn dann hier erneut. Um einen Benutzer zu entfernen, gehe zur Gladys-Plus-Benutzerverwaltung.",
     "disconnectTitle": "Trenne deinen Plus-Account",
     "disconnectButton": "Trennen",
     "gatewayConnectedSuccessTitle": "Erfolgreich mit Gladys Plus verbunden!",
@@ -5378,7 +5460,6 @@
     "wrongCredentials": "Die Kombination aus E-Mail-Adresse und Passwort ist falsch.",
     "invalidEmail": "Die E-Mail-Adresse ist ungültig",
     "networkError": "Netzwerkfehler: Bist du sicher, dass dein Gladys mit dem Internet verbunden ist?",
-    "userNotAcceptedLocally": "Dein Benutzer wird lokal nicht akzeptiert. Bitte gehe zurück zu dein Gladys und erlaube den Zugriff auf diesen Benutzer in den Einstellungen.",
     "gatewayNoInstanceFound": "Keine Instanz gefunden. Du musst zuerst deine Instanz mit Gladys verbinden.",
     "gatewayAccessBilling": "Um auf die Abrechnung zuzugreifen, klicke hier.",
     "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte kontaktiere uns für weitere Informationen.",
@@ -6086,6 +6167,15 @@
         },
         "preset": {
           "0": "Zeitplan",
+          "1": "Frostschutz",
+          "2": "Abwesend",
+          "3": "Eco",
+          "4": "Nacht",
+          "5": "Komfort"
+        },
+        "active-preset": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Aus",
           "1": "Frostschutz",
           "2": "Abwesend",
           "3": "Eco",
@@ -6893,6 +6983,7 @@
       "target-temperature": "Thermostat: Temperatur",
       "mode": "Thermostat: Modus",
       "preset": "Thermostat: Voreinstellung",
+      "active-preset": "Thermostat: Aktive Voreinstellung",
       "operating-state": "Thermostat: Betriebszustand"
     },
     "airquality-sensor": {
@@ -7127,7 +7218,18 @@
     "noInstanceFoundTutorialLink": "Brauchst du eine Schritt-für-Schritt-Anleitung mit Screenshots? <a href=\"https://gladysassistant.com/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Schau dir das Tutorial in unserer Dokumentation an</a>.",
     "noInstanceFoundNote": "Hast du diesen Schritt in der Vergangenheit bereits durchgeführt? Manchmal muss er wiederholt werden, zum Beispiel wenn deine Zwei-Faktor-Authentifizierung (2FA) zurückgesetzt wurde: Melde dich einfach erneut im Tab \"Gladys Plus\" deiner Instanz an. Brauchst du Hilfe? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Ein Fehler ist aufgetreten. Ist dein Benutzer lokal in deiner Gladys-Instanz akzeptiert?",
-    "errorNotAcceptedLocally": "Der Benutzer wurde in der Gladys-Instanz noch nicht lokal autorisiert. Gehe in deiner lokalen Instanz in die Einstellungen, Tab \"Gladys Plus\", Abschnitt \"Remote-Benutzer\", und aktiviere den Schalter neben seinem Namen.",
+    "keysChangedTitle": "Dein Zugriff muss erneut autorisiert werden",
+    "keysChangedIntro": "Deine Gladys-Plus-Verschlüsselungsschlüssel haben sich geändert, seit deine Gladys-Instanz sie autorisiert hat. Das ist normal, nachdem du dein Gladys-Plus-Passwort zurückgesetzt hast (\"Passwort vergessen\"): Dabei werden neue Schlüssel erzeugt. Aus Sicherheitsgründen lehnt deine Instanz jeden Schlüssel ab, den sie nicht selbst validiert hat. Nichts ist kaputt: Du musst deinen Benutzer nur erneut autorisieren, von zu Hause aus.",
+    "notAcceptedTitle": "Dein Zugriff muss autorisiert werden",
+    "notAcceptedIntro": "Dein Gladys-Plus-Konto ist mit deiner Gladys-Instanz verbunden, aber dein Benutzer ist (noch nicht oder nicht mehr) für den Fernzugriff autorisiert. Aus Sicherheitsgründen muss jeder Gladys-Plus-Benutzer über die Instanz selbst, bei dir zu Hause, autorisiert werden: Niemand, nicht einmal die Gladys-Plus-Server, kann ohne diese Validierung auf dein Zuhause zugreifen.",
+    "notAcceptedUnknownReasonIntro": "Deine Gladys-Instanz hat deinen Benutzer (noch nicht oder nicht mehr) für den Fernzugriff autorisiert. Das ist beim ersten Mal normal, aber auch nachdem du dein Gladys-Plus-Passwort zurückgesetzt hast: Dabei werden neue Verschlüsselungsschlüssel erzeugt, die deine Instanz erneut validieren muss. Aus Sicherheitsgründen kann diese Autorisierung nur über die Instanz selbst, bei dir zu Hause, erfolgen.",
+    "notAcceptedAskAdmin": "Nur ein Administrator deiner Gladys-Instanz kann deinen Zugriff autorisieren. Wenn du keiner bist, bitte die Person, die Gladys bei dir zu Hause verwaltet, diese Schritte auszuführen.",
+    "notAcceptedStepAcceptUser": "Prüfe im Abschnitt \"<b>Remote-Benutzer</b>\", dass die neben deinem Namen angezeigten Schlüssel-Fingerabdrücke mit den unten stehenden übereinstimmen, und <b>aktiviere dann den Schalter</b>.",
+    "notAcceptedFingerprintsLabel": "Fingerabdrücke deiner Verschlüsselungsschlüssel:",
+    "rsaKeyFingerprint": "RSA-Schlüssel:",
+    "ecdsaKeyFingerprint": "ECDSA-Schlüssel:",
+    "stillNotAccepted": "Dein Benutzer ist immer noch nicht autorisiert. Prüfe, ob der Schalter neben deinem Namen in deiner Instanz aktiviert ist, und versuche es dann erneut.",
+    "notAcceptedRetryButton": "Mein Benutzer ist autorisiert, erneut versuchen",
     "saveButton": "Speichern",
     "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
     "logoutButton": "Abmelden"
