@@ -360,18 +360,64 @@ async function readAverageTemperature(gladys, selectors, thermostatUnit) {
 }
 
 /**
- * @description Whether any of the thermostat's opening sensors is open.
+ * @description Whether a window sensor has been open long enough to suspend the
+ * heating: THERMOSTAT_WINDOW_DELAY seconds, so that a door opened to come in and
+ * closed right behind does not cut it.
+ *
+ * The opening time is the one the `NEW_STATE` listener recorded. A sensor found
+ * open with none recorded — the service has just started, or the opening event
+ * was missed — is taken as open since its `last_value_changed`, and that time is
+ * recorded so that the next reports, which move `last_value_changed`, do not
+ * restart the count.
+ * @param {object} feature - The window sensor feature.
+ * @param {string} windowSelector - Its selector.
+ * @param {number} delaySeconds - THERMOSTAT_WINDOW_DELAY.
+ * @param {Map<string, number>|null} openedAt - When each sensor was seen opening.
+ * @param {number} [now] - The current time, in ms.
+ * @returns {boolean} True when the heating has to be suspended.
+ * @example
+ * isWindowOpenLongEnough(feature, 'window-sensor', 60, handler.windowOpenedAt);
+ */
+function isWindowOpenLongEnough(feature, windowSelector, delaySeconds, openedAt, now = Date.now()) {
+  if (feature.last_value !== 0) {
+    // Closed: the next opening starts a new count.
+    if (openedAt) {
+      openedAt.delete(windowSelector);
+    }
+    return false;
+  }
+  let since = openedAt ? openedAt.get(windowSelector) : undefined;
+  if (since === undefined) {
+    // `new Date(null)` is the epoch, not an invalid date: a sensor that never
+    // dated a change would read as open for ever and cut at once.
+    const changed =
+      feature.last_value_changed === null || feature.last_value_changed === undefined
+        ? NaN
+        : new Date(feature.last_value_changed).getTime();
+    since = Number.isFinite(changed) ? Math.min(changed, now) : now;
+    if (openedAt) {
+      openedAt.set(windowSelector, since);
+    }
+  }
+  return now - since >= delaySeconds * 1000;
+}
+
+/**
+ * @description Whether any of the thermostat's opening sensors is open, and has
+ * been for THERMOSTAT_WINDOW_DELAY seconds when a delay is given.
  * A living room has several windows, and an open-plan floor is heated as one
  * volume: one of them open is enough to suspend the heating (A.1.1). A sensor
  * that cannot be read is not taken as open — on a flat battery, that would stop
  * the heating for good.
  * @param {object} gladys - Gladys instance.
  * @param {Array<string>} selectors - Opening sensor selectors.
+ * @param {number} [delaySeconds] - How long a sensor has to stay open; 0 for at once.
+ * @param {Map<string, number>|null} [openedAt] - When each sensor was seen opening.
  * @returns {Promise<string|null>} The selector of an open sensor, or null.
  * @example
  * const open = await findOpenWindow(gladys, ['salon-window', 'kitchen-door']);
  */
-async function findOpenWindow(gladys, selectors) {
+async function findOpenWindow(gladys, selectors, delaySeconds = 0, openedAt = null) {
   const found = await Promise.all(
     selectors.map(async (selector) => {
       try {
@@ -382,8 +428,12 @@ async function findOpenWindow(gladys, selectors) {
       }
     }),
   );
-  const open = found.find((sensor) => sensor && sensor.feature.last_value === 0);
-  return open ? open.feature.selector : null;
+  // Every sensor is weighed, not only up to the first open one: each keeps its own
+  // opening time, which a closed one forgets (isWindowOpenLongEnough).
+  const open = found.filter(
+    (sensor, index) => sensor && isWindowOpenLongEnough(sensor.feature, selectors[index], delaySeconds, openedAt),
+  );
+  return open.length > 0 ? open[0].feature.selector : null;
 }
 
 /**
@@ -1096,6 +1146,7 @@ async function driveHeldPilotWire(gladys, device, config, hold, currentPreset, l
  * @param {Map<string, string>} [announced] - The programme preset last announced for each thermostat.
  * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
  * @param {Set<string>} [runningUnits] - The units a running thermostat switches (runningUnitFeatures).
+ * @param {Map<string, number>} [windowOpenedAt] - When each window sensor was seen opening.
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
@@ -1110,6 +1161,7 @@ async function regulateDevice(
   announced = null,
   selfWrittenPowers = null,
   runningUnits = null,
+  windowOpenedAt = null,
 ) {
   const config = getDeviceConfig(device);
   if (!config) {
@@ -1131,9 +1183,11 @@ async function regulateDevice(
   // getDeviceConfig always fills this in from THERMOSTAT_MODE or the shared default.
   const { default_mode: mode } = config;
 
-  // Window open check: if any configured window sensor is open, cut the switch and stop here.
+  // Window open check: if any configured window sensor has been open for
+  // THERMOSTAT_WINDOW_DELAY seconds, cut the switch and stop here. Until then the
+  // thermostat regulates as if it were closed.
   if (config.window_features.length > 0) {
-    const openWindow = await findOpenWindow(gladys, config.window_features);
+    const openWindow = await findOpenWindow(gladys, config.window_features, config.window_delay, windowOpenedAt);
     if (openWindow) {
       logger.info(`Thermostat schedule: window open (${openWindow}) for ${selector}`);
       if (external) {
@@ -1554,7 +1608,7 @@ async function applySchedules() {
     await Promise.all(
       thermostatDevices.map(async (device) => {
         try {
-          const { serviceId, selfWrittenSetpoints, announcedPresets, selfWrittenPowers } = this;
+          const { serviceId, selfWrittenSetpoints, announcedPresets, selfWrittenPowers, windowOpenedAt } = this;
           await regulateDevice(
             this.gladys,
             device,
@@ -1565,6 +1619,7 @@ async function applySchedules() {
             announcedPresets,
             selfWrittenPowers,
             runningUnits,
+            windowOpenedAt,
           );
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);
@@ -1602,4 +1657,5 @@ module.exports = {
   findMatchingPreset,
   getSetpointForPreset,
   computeSwitchActive,
+  isWindowOpenLongEnough,
 };

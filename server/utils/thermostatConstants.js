@@ -66,6 +66,18 @@ const DEFAULT_TEMP_UNIT = 'C';
 const DEFAULT_MANUAL_DURATION_MINUTES = 30;
 const MANUAL_DURATION_MS = DEFAULT_MANUAL_DURATION_MINUTES * 60 * 1000;
 
+// How long an opening sensor has to stay open before the heating is suspended,
+// in seconds. A door opened to come in and closed right behind should not cut
+// the heating. Configurable per device through THERMOSTAT_WINDOW_DELAY; 0 cuts
+// as soon as it opens.
+const DEFAULT_WINDOW_DELAY_SECONDS = 60;
+// And at most an hour. Beyond 2^31 - 1 ms (about 24.8 days) `setTimeout` fires
+// after 1 ms instead: with 3,000,000 s the widget showed the banner at once and
+// the server logged a TimeoutOverflowWarning, its early pass finding the delay
+// not elapsed. A window left open for more than an hour is no door opened to
+// come in.
+const MAX_WINDOW_DELAY_SECONDS = 3600;
+
 // The preset names, as they are stored in a schedule transition and used to key
 // DEFAULT_PRESET_TEMPS. `schedule` is not one of them: it is a state of the
 // thermostat ("follow the programme"), carried by the preset feature, and a
@@ -179,6 +191,8 @@ module.exports = {
   DEFAULT_TEMP_UNIT,
   DEFAULT_MANUAL_DURATION_MINUTES,
   MANUAL_DURATION_MS,
+  DEFAULT_WINDOW_DELAY_SECONDS,
+  MAX_WINDOW_DELAY_SECONDS,
   PRESETS,
   TRANSITION_PRESETS,
   THERMOSTAT_TYPES,

@@ -49,7 +49,12 @@ describe('thermostat pilot wire: an order changed on the module', () => {
   const thermostat = ({ preset = 'schedule', mode = THERMOSTAT_MODE.HEATING, params = {}, features = null } = {}) => ({
     selector: 'living-room',
     features: features || [presetFeature(preset), modeFeature(mode)],
-    params: Object.entries({ THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire', ...params }).map(([name, value]) => ({
+    // The window wins at once in these tests: the delay has its own (windowDelay).
+    params: Object.entries({
+      THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire',
+      THERMOSTAT_WINDOW_DELAY: '0',
+      ...params,
+    }).map(([name, value]) => ({
       name,
       value,
     })),

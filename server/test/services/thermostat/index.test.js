@@ -17,6 +17,9 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     onDeviceNewState: fake.resolves(null),
     primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
+    lifecycle: 0,
+    windowTimers: new Map(),
+    windowOpenedAt: new Map(),
     // As the real handler is built: not running until start().
     running: false,
   };
@@ -135,6 +138,43 @@ describe('ThermostatService', () => {
     assert.calledWith(gladys.event.removeListener, EVENTS.DEVICE.NEW_STATE);
     assert.notCalled(handler.applySchedules);
     expect(handler.applyTimer).to.equal(null);
+  });
+
+  it('should clear the pending checks of an opening delay on stop', async () => {
+    const clock = sinon.useFakeTimers();
+    const { service, handler } = buildService();
+    const check = fake();
+    handler.windowTimers.set('thermostat-living-room', { timer: setTimeout(check, 10000), window: 'window-sensor' });
+
+    await service.stop();
+    await clock.tickAsync(10000);
+
+    assert.notCalled(check);
+    expect(handler.windowTimers.size).to.equal(0);
+  });
+
+  // A window closed and opened again while the service was stopped must count
+  // from its new opening, not from the one kept before the stop.
+  it('should forget the openings it recorded on stop', async () => {
+    const { service, handler } = buildService();
+    handler.windowOpenedAt.set('window-sensor', 1000);
+
+    await service.stop();
+
+    expect(handler.windowOpenedAt.size).to.equal(0);
+  });
+
+  // A state change still in flight compares this to the run it arrived in: a
+  // stop, then a start, must both move it on.
+  it('should move the lifecycle on at every stop and start', async () => {
+    const { service, handler } = buildService();
+
+    await service.start();
+    expect(handler.lifecycle).to.equal(1);
+    await service.stop();
+    expect(handler.lifecycle).to.equal(2);
+    await service.start();
+    expect(handler.lifecycle).to.equal(3);
   });
 
   // What the scene action and MCP read: the service is in the stateManager

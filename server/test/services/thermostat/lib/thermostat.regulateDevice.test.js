@@ -178,7 +178,7 @@ describe('thermostat.regulateDevice', () => {
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
     });
 
     // Regulation continued despite the sensor error
@@ -191,11 +191,58 @@ describe('thermostat.regulateDevice', () => {
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
     });
 
     const [, , value] = gladys.device.setValue.firstCall.args;
     expect(value).to.equal(0);
+  });
+
+  // A door opened to come in and closed right behind must not cut the heating.
+  it('should keep regulating while the window has not been open for the delay', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const features = standardFeatures({ temp: 18, switchOn: false, windowOpen: true });
+    features['window-sensor'].last_value_changed = new Date();
+    const gladys = buildGladys({ features });
+    const openedAt = new Map();
+
+    await mod.regulateDevice(
+      gladys,
+      { features: [setpointFeature()], params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }) },
+      todayDow,
+      12 * 60,
+      null,
+      null,
+      null,
+      null,
+      null,
+      openedAt,
+    );
+
+    // 18 °C under a 21 °C comfort: the heating starts, the window notwithstanding.
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+    expect(openedAt.has('window-sensor')).to.equal(true);
+  });
+
+  it('should cut the switch once the window has been open for the delay', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 18, switchOn: true, windowOpen: true }) });
+    const openedAt = new Map([['window-sensor', Date.now() - 61 * 1000]]);
+
+    await mod.regulateDevice(
+      gladys,
+      { features: [setpointFeature()], params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }) },
+      todayDow,
+      12 * 60,
+      null,
+      null,
+      null,
+      null,
+      null,
+      openedAt,
+    );
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
   });
 
   it('should not try to actuate on an open window without a switch', async () => {
@@ -207,6 +254,7 @@ describe('thermostat.regulateDevice', () => {
       params: params({
         THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
         THERMOSTAT_WINDOW_FEATURE: 'window-sensor',
+        THERMOSTAT_WINDOW_DELAY: '0',
       }),
     });
 
@@ -714,7 +762,7 @@ describe('thermostat.regulateDevice - resilience', () => {
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
     });
 
     assert.notCalled(gladys.device.setValue);
@@ -1351,7 +1399,10 @@ describe('thermostat.regulateDevice - several sensors', () => {
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]' }),
+      params: baseParams({
+        THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]',
+        THERMOSTAT_WINDOW_DELAY: '0',
+      }),
     });
 
     expect(gladys.device.setValue.firstCall.args[1].selector).to.equal('heater-switch');
@@ -1485,7 +1536,10 @@ describe('thermostat.regulateDevice - active preset', () => {
     await regulate(
       mod,
       gladys,
-      thermostat([presetFeature('schedule'), active], { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+      thermostat([presetFeature('schedule'), active], {
+        THERMOSTAT_WINDOW_FEATURE: 'window-sensor',
+        THERMOSTAT_WINDOW_DELAY: '0',
+      }),
     );
 
     expect(activeWrites(gladys, active)).to.deep.equal([]);

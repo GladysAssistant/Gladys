@@ -16,6 +16,8 @@ import {
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
   DEFAULT_HYSTERESIS_START,
+  DEFAULT_WINDOW_DELAY_SECONDS,
+  MAX_WINDOW_DELAY_SECONDS,
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder
 } from '../../../../../server/utils/thermostatConstants';
@@ -284,10 +286,15 @@ class ThermostatBox extends Component {
     });
   };
 
-  // Any of the opening sensors open suspends the heating, as on the server.
-  setWindowReading = (selector, value) => {
-    this.openWindows[selector] = value === 0;
-    this.setState({ isWindowOpen: this.getWindowFeatures().some(feature => this.openWindows[feature]) });
+  // When each opening sensor opened, or null while it is closed. A contact
+  // re-reporting "open" keeps the first time: the delay runs from the opening.
+  setWindowReading = (selector, value, since = Date.now()) => {
+    if (value !== 0) {
+      this.openWindows[selector] = null;
+    } else if (this.openWindows[selector] === null || this.openWindows[selector] === undefined) {
+      this.openWindows[selector] = Math.min(since, Date.now());
+    }
+    this.showWindowBanner();
   };
 
   loadConfig = async () => {
@@ -519,6 +526,39 @@ class ThermostatBox extends Component {
     return keys.map(k => allPresets[k]);
   };
 
+  // An opening only suspends the heating once it has stayed open
+  // THERMOSTAT_WINDOW_DELAY seconds, and the banner says so no sooner: shown at
+  // the opening, it announced a cut that a door closed right behind never got.
+  // The count runs from the opening this card knows of — the feature's
+  // `last_value_changed` on load, the NEW_STATE afterwards. Any of the sensors
+  // open long enough suspends the heating, as on the server (spec A.1.1), and
+  // the card checks again when the first one still counting gets there.
+  showWindowBanner = () => {
+    if (this.windowTimer) {
+      clearTimeout(this.windowTimer);
+      this.windowTimer = null;
+    }
+    // Bounded like the server's: a value stored through another route, or before the
+    // bound existed, overflowed the timer and showed the banner at once.
+    const delay = Math.min(
+      MAX_WINDOW_DELAY_SECONDS,
+      Math.max(0, numOr(this.getConfig().window_delay, DEFAULT_WINDOW_DELAY_SECONDS))
+    );
+    const now = Date.now();
+    const remaining = this.getWindowFeatures()
+      .map(feature => this.openWindows[feature])
+      .filter(openedAt => openedAt !== null && openedAt !== undefined)
+      .map(openedAt => openedAt + delay * 1000 - now);
+    const isWindowOpen = remaining.some(left => left <= 0);
+    this.setState({ isWindowOpen });
+    if (!isWindowOpen && remaining.length > 0) {
+      this.windowTimer = setTimeout(() => {
+        this.windowTimer = null;
+        this.showWindowBanner();
+      }, Math.min(...remaining));
+    }
+  };
+
   getDeviceData = async () => {
     const { box } = this.props;
     const thermostatFeature = box.thermostat_feature;
@@ -539,9 +579,17 @@ class ThermostatBox extends Component {
     const stateUpdate = { noConfig: false, error: false };
     if (temperatureFeatures.length === 0) stateUpdate.currentTemp = null;
     if (!humidityFeature) stateUpdate.humidity = null;
-    if (windowFeatures.length === 0) stateUpdate.isWindowOpen = false;
     this.temperatureReadings = {};
-    this.openWindows = {};
+    // A sensor still configured keeps the time it opened: `last_value_changed`
+    // moves on every report, and read again here it would restart the count.
+    this.openWindows = windowFeatures.reduce(
+      (kept, feature) => ({ ...kept, [feature]: this.openWindows[feature] }),
+      {}
+    );
+    if (windowFeatures.length === 0) {
+      // No sensor left: no banner, nor a check still waiting to show one.
+      this.showWindowBanner();
+    }
     if (!switchFeature) stateUpdate.isSwitchOn = null;
     if (!pilotWireFeature) stateUpdate.pilotWireOrder = null;
     this.setState(stateUpdate);
@@ -605,7 +653,13 @@ class ThermostatBox extends Component {
               this.setState({ humidity: feat.last_value });
             }
             if (windowFeatures.includes(feat.selector) && feat.last_value !== null && feat.last_value !== undefined) {
-              this.setWindowReading(feat.selector, feat.last_value);
+              // `new Date(null)` is the epoch: an undated change would show the
+              // banner at once.
+              const changed =
+                feat.last_value_changed === null || feat.last_value_changed === undefined
+                  ? NaN
+                  : new Date(feat.last_value_changed).getTime();
+              this.setWindowReading(feat.selector, feat.last_value, Number.isFinite(changed) ? changed : Date.now());
             }
             if (
               switchFeature &&
@@ -1201,6 +1255,10 @@ class ThermostatBox extends Component {
     if (this.expectedSetpointTimer) {
       clearTimeout(this.expectedSetpointTimer);
       this.expectedSetpointTimer = null;
+    }
+    if (this.windowTimer) {
+      clearTimeout(this.windowTimer);
+      this.windowTimer = null;
     }
     this.forgetExpectedMode();
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.handleWebsocketMessage);

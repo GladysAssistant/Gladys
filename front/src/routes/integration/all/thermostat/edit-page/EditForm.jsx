@@ -9,7 +9,10 @@ import {
   DEVICE_FEATURE_UNITS,
   PILOT_WIRE_MODE
 } from '../../../../../../../server/utils/constants';
-import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
+import {
+  DEFAULT_PILOT_WIRE_ORDERS,
+  MAX_WINDOW_DELAY_SECONDS
+} from '../../../../../../../server/utils/thermostatConstants';
 
 // The help text of each thermostat type, keyed by its value.
 const TYPE_KEYS = { virtual: 'virtual', external: 'external', 'pilot-wire': 'pilotWire' };
@@ -689,6 +692,36 @@ const EditForm = ({ ...props }) => {
                 <Text id={`integration.thermostat.edit.windowFeatureHelp.${modeSuffix}`} />
               </small>
             </div>
+
+            {/* How long the sensor has to stay open before the heating is
+                suspended: a door opened to come in and closed right behind
+                should not cut it. Pointless without a sensor. */}
+            {(props.thermostatEditWindowFeatures || []).length > 0 && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.windowDelayLabel" />
+                </label>
+                <div class={cx('input-group', style.shortNumberField)}>
+                  <input
+                    type="number"
+                    class="form-control"
+                    min="0"
+                    max={MAX_WINDOW_DELAY_SECONDS}
+                    step="1"
+                    value={props.thermostatEditWindowDelay}
+                    onInput={e => props.updateThermostatField('thermostatEditWindowDelay', e.target.value)}
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <Text id="integration.thermostat.edit.windowDelayUnit" />
+                    </span>
+                  </div>
+                </div>
+                <small class="form-text text-muted">
+                  <Text id={`integration.thermostat.edit.windowDelayHelp.${modeSuffix}`} />
+                </small>
+              </div>
+            )}
 
             {/* Folded away: the control type and its hysteresis or TPI figures
                 all have working defaults, and putting them ahead of the sensor

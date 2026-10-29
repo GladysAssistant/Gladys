@@ -4,7 +4,11 @@ import {
   DEVICE_FEATURE_TYPES,
   PILOT_WIRE_MODE
 } from '../../../../../../../server/utils/constants';
-import { DEFAULT_PILOT_WIRE_ORDERS, defaultPresetTemps } from '../../../../../../../server/utils/thermostatConstants';
+import {
+  DEFAULT_PILOT_WIRE_ORDERS,
+  MAX_WINDOW_DELAY_SECONDS,
+  defaultPresetTemps
+} from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 import { parseSelectorList, serializeSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
@@ -251,6 +255,9 @@ function createActions(store) {
           thermostatEditModeFeature: getParam('THERMOSTAT_MODE_FEATURE') || '',
           thermostatEditPowerFeature: getParam('THERMOSTAT_POWER_FEATURE') || '',
           thermostatEditWindowFeatures: parseSelectorList(getParam('THERMOSTAT_WINDOW_FEATURE')),
+          // A thermostat saved before the delay existed has none: the server
+          // waits its default minute, which is what the field shows.
+          thermostatEditWindowDelay: getParam('THERMOSTAT_WINDOW_DELAY') || '60',
           // A display choice, never saved: every thermostat opens on its own room.
           thermostatEditShowAllRooms: false,
           thermostatEditPresetFrost: getParam('THERMOSTAT_PRESET_FROST') || String(presetDefaults.frost),
@@ -398,6 +405,8 @@ function createActions(store) {
         const tpiCycleTime = toInt(state.thermostatEditTpiCycleTime, 30);
         const tpiProportionalBand = toNumber(state.thermostatEditTpiProportionalBand, 2);
         const manualDuration = toInt(state.thermostatEditManualDuration, 30);
+        // There is no form submit, so the input's own bounds never apply.
+        const windowDelay = Math.min(MAX_WINDOW_DELAY_SECONDS, Math.max(0, toInt(state.thermostatEditWindowDelay, 60)));
 
         const isEdit = !!(state.thermostatEditDevice && state.thermostatEditDevice.selector);
         const timestamp = Date.now();
@@ -505,6 +514,7 @@ function createActions(store) {
               value: isExternalThermostat ? state.thermostatEditPowerFeature || '' : ''
             },
             { name: 'THERMOSTAT_WINDOW_FEATURE', value: windowFeature },
+            { name: 'THERMOSTAT_WINDOW_DELAY', value: String(windowDelay) },
             { name: 'THERMOSTAT_PRESET_FROST', value: presetFrost },
             { name: 'THERMOSTAT_PRESET_AWAY', value: presetAway },
             { name: 'THERMOSTAT_PRESET_ECO', value: presetEco },
@@ -574,6 +584,7 @@ function createActions(store) {
           thermostatEditModeFeature: '',
           thermostatEditPowerFeature: '',
           thermostatEditWindowFeatures: [],
+          thermostatEditWindowDelay: '60',
           thermostatEditShowAllRooms: false,
           thermostatEditActiveSchedule: '',
           thermostatEditPresetFrost: '7',
