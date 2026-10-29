@@ -12,6 +12,11 @@ const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
+const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
+
+// How long the side a time-range trigger fired with is trusted, from the moment its job
+// fired: past it, the condition computes the state from the ranges again.
+const TIME_RANGE_TRUST_MS = 60 * 1000;
 const logger = require('../../utils/logger');
 const executeActionsFactory = require('./scene.executeActions');
 const { evaluate } = require('./scene.formula');
@@ -1101,6 +1106,52 @@ const actionsFunc = {
     }
     /* eslint-enable no-await-in-loop */
     logger.warn(`While loop: max number of iterations reached (${maxIterations}), stopping the loop.`);
+  },
+  [ACTIONS.CONDITION.IN_TIME_RANGE]: async (self, action, scope) => {
+    const scene = self.scenes[scope.sceneSelector];
+    const triggers = (scene && scene.triggers) || [];
+
+    // The scene was started by one of ITS OWN time-range jobs: the trigger already told us
+    // which side of the range fired, and we trust it rather than re-computing. A job firing
+    // exactly at the end of a range would otherwise be re-evaluated a few milliseconds
+    // later and could still be seen as "inside" it.
+    // The key check matters: `scene.start` hands the child scene a clone of the scope, so a
+    // scene called by another one sees the `triggerEvent` of its caller. Without it, the
+    // child would answer for the ranges of the parent instead of its own.
+    // Only for a moment, though: the side the trigger carries is the state at the boundary,
+    // and the condition may run long after it — behind a delay, or on every iteration of a
+    // "while", which kept a 12:00 -> 13:00 pump loop running past 13:00 until
+    // max_iterations. Past that moment, the state is computed like any other.
+    const triggerEventKey = get(scope, 'triggerEvent.key', { default: undefined });
+    const firedAt = get(scope, 'triggerEvent.fired_at', { default: undefined });
+    const firedByThisScene =
+      triggerEventKey !== undefined && triggers.some((trigger) => trigger.key === triggerEventKey);
+    const stillAtTheBoundary = typeof firedAt === 'number' && Date.now() - firedAt < TIME_RANGE_TRUST_MS;
+    let inRange =
+      firedByThisScene && stillAtTheBoundary ? get(scope, 'triggerEvent.in_range', { default: undefined }) : undefined;
+
+    // Started another way (manually, by another trigger of the same scene, or by another
+    // scene): the state is computed from the ranges of the scene's time-range triggers, so
+    // the condition still answers "are we inside the planning right now?".
+    if (inRange === undefined) {
+      const timeRanges = triggers
+        .filter((trigger) => trigger.scheduler_type === 'time-range')
+        .flatMap((trigger) => resolveTriggerTimeRanges(trigger));
+      if (timeRanges.length === 0) {
+        logger.warn('Time range condition: the scene has no time-range trigger.');
+        throw new AbortScene('NO_TIME_RANGE_TRIGGER');
+      }
+      inRange = isInTimeRanges(timeRanges, dayjs.tz(dayjs(), self.timezone));
+    }
+
+    // The action is used both as a "if/else" condition and as a "only continue if":
+    // being outside the range aborts the scene, which the if/else catches to run its
+    // "else" branch.
+    const shouldBeInRange = action.in_range !== false;
+    if (inRange !== shouldBeInRange) {
+      logger.debug(`Time range condition not verified: in_range = ${inRange}.`);
+      throw new AbortScene('TIME_RANGE_CONDITION_NOT_VERIFIED');
+    }
   },
   [ACTIONS.CONDITION.IF_THEN_ELSE]: async (self, action, scope, path) => {
     const { if: ifActions, then: thenActions, else: elseActions } = action;
