@@ -326,23 +326,73 @@ function trimRangesAround(ranges, candidate, ignoredKey = null) {
 }
 
 /**
+ * @description The minutes of the week a set of ranges covers, as [start, end)
+ * intervals inside the week: a Sunday night is split at the week's end.
+ * @param {Array} ranges - Ranges: { day_of_week, start_time, end_time }.
+ * @returns {Array<Array<number>>} The intervals, in minutes of the week.
+ * @example
+ * weekCoverage([{ day_of_week: 6, start_time: '22:30', end_time: '06:30' }]); // [[9990, 10080], [0, 390]]
+ */
+function weekCoverage(ranges) {
+  return ranges.flatMap((range) => {
+    const [start, end] = weekInterval(range);
+    return end > WEEK_MINUTES
+      ? [
+          [start, WEEK_MINUTES],
+          [0, end - WEEK_MINUTES],
+        ]
+      : [[start, end]];
+  });
+}
+
+/**
+ * @description Remove a set of intervals from another.
+ * @param {Array<Array<number>>} intervals - The [start, end) intervals to cut.
+ * @param {Array<Array<number>>} cuts - The [start, end) intervals removed from them.
+ * @returns {Array<Array<number>>} What is left of the intervals.
+ * @example
+ * subtractIntervals([[0, 100]], [[20, 30]]); // [[0, 20], [30, 100]]
+ */
+function subtractIntervals(intervals, cuts) {
+  return cuts.reduce(
+    (pieces, [cutStart, cutEnd]) =>
+      pieces.flatMap(([from, to]) =>
+        cutEnd <= from || to <= cutStart
+          ? [[from, to]]
+          : [
+              [from, Math.min(to, cutStart)],
+              [Math.max(from, cutEnd), to],
+            ].filter(([a, b]) => a < b),
+      ),
+    intervals,
+  );
+}
+
+/**
  * @description Copy a day onto other days, in place of theirs: each target then
  * reads as the source does in the editor, from its midnight to the next one.
  *
- * - **The night the source inherits is copied too.** A copy only took the source
- *   day's own ranges, so "undoing" a holiday by copying Friday onto Saturday left
- *   Saturday 00:00 → 06:30 off, where Friday shows Thursday's night.
  * - **A target's own night keeps its morning.** Its ranges were all dropped,
  *   past-midnight half included: copying an all-day frost Saturday onto
  *   Wednesday left Thursday 00:00 → 06:30 off, which a range added by hand never
- *   did. What runs past the target's midnight stays on the next day.
+ *   did. What runs past the target's midnight stays on the next day — unless
+ *   that day is a target too, and is rewritten as well.
  * - **What the copies cover gives way**, as for a range added by hand: the night
  *   before a target is cut where the copied day starts, and a copied night takes
  *   the next morning it runs into.
+ * - **The night the source inherits fills what the copy left empty.** A copy
+ *   only took the source day's own ranges, so "undoing" a holiday by copying
+ *   Friday onto Saturday left Saturday 00:00 → 06:30 off, where Friday shows
+ *   Thursday's night. It only fills a morning the target's own ranges covered,
+ *   or one after another target: added like a copy, it replaced the night of the
+ *   day before, which is no target — Sunday's frost spread onto every weekday
+ *   morning a Monday was copied to. A gap before a target is a stop, and stays
+ *   one, whether the editor still shows it as a gap or, reopened, as off.
  * - **The order the days were ticked does not matter.** Each target's copies
  *   trimmed the earlier ones, so a copied night beat the next target's own
- *   morning or not depending on the clicks. Nights now go first and every day's
- *   own ranges after, so a day always keeps what was copied onto it.
+ *   morning or not depending on the clicks. Nights go first, the inherited
+ *   mornings next, and every day's own ranges last, so a day always keeps what
+ *   was copied onto it.
  * @param {Array} ranges - The ranges in place: { key, day_of_week, start_time, end_time, preset }.
  * @param {number} sourceDay - The day copied, 0 = Monday.
  * @param {Array<number>} targetDays - The days it is copied onto.
@@ -357,34 +407,25 @@ function copyDayRanges(ranges, sourceDay, targetDays, makeKey = (day, index) => 
   // The stretch of the previous day's night that the source shows before its own
   // first range.
   const firstOwnStart = Math.min(DAY_MINUTES, ...own.map((range) => timeToMinutes(range.start_time)));
-  const previousDay = (sourceDay + 6) % 7;
+  const previousDay = (day) => (day + 6) % 7;
   const pastMidnight = (range) => weekInterval(range)[1] - (range.day_of_week + 1) * DAY_MINUTES;
   const inherited = ranges
-    .filter((range) => range.day_of_week === previousDay && pastMidnight(range) > 0)
-    .map((range) => ({
-      start_time: '00:00',
-      end_time: minutesToTime(Math.min(firstOwnStart, pastMidnight(range))),
-      preset: range.preset,
-    }))
-    .filter((range) => range.end_time !== '00:00');
-  // Copies of the source's own ranges keep their index in it as before.
-  const source = [...own, ...inherited];
+    .filter((range) => range.day_of_week === previousDay(sourceDay) && pastMidnight(range) > 0)
+    .map((range) => ({ length: Math.min(firstOwnStart, pastMidnight(range)), preset: range.preset }));
 
-  // A target's own ranges go, but for what runs past its midnight.
+  // A target's own ranges go, but for what runs past its midnight onto a day kept.
   let result = [];
   ranges.forEach((range) => {
     if (!targets.includes(range.day_of_week)) {
       result.push(range);
       return;
     }
-    result = [
-      ...result,
-      ...trimRangesAround([range], { day_of_week: range.day_of_week, start_time: '00:00', end_time: '00:00' }),
-    ];
+    const tails = trimRangesAround([range], { day_of_week: range.day_of_week, start_time: '00:00', end_time: '00:00' });
+    result = [...result, ...tails.filter((tail) => !targets.includes(tail.day_of_week))];
   });
 
   const copies = targets.flatMap((day) =>
-    source.map((range, index) => ({
+    own.map((range, index) => ({
       key: makeKey(day, index),
       day_of_week: day,
       start_time: range.start_time,
@@ -393,9 +434,44 @@ function copyDayRanges(ranges, sourceDay, targetDays, makeKey = (day, index) => 
     })),
   );
   const crossesMidnight = (range) => pastMidnight(range) > 0;
-  [...copies.filter(crossesMidnight), ...copies.filter((range) => !crossesMidnight(range))].forEach((copy) => {
-    result = [...trimRangesAround(result, copy), copy];
+  const addCopies = (list) =>
+    list.forEach((copy) => {
+      result = [...trimRangesAround(result, copy), copy];
+    });
+  addCopies(copies.filter(crossesMidnight));
+
+  // A stop running into the target from the day before is that day's, and stays: the
+  // gap the editor shows in a session is the off range it reads back after a save.
+  // A gap starting at the target's midnight is the target's own, and goes with it.
+  const gaps = subtractIntervals([[0, WEEK_MINUTES]], weekCoverage(ranges));
+  const isGap = (minute) => gaps.some(([from, to]) => from <= minute && minute < to);
+  targets.forEach((day) => {
+    const midnight = day * DAY_MINUTES;
+    let free = subtractIntervals([[midnight, midnight + firstOwnStart]], weekCoverage(result));
+    if (!targets.includes(previousDay(day)) && isGap((midnight + WEEK_MINUTES - 1) % WEEK_MINUTES)) {
+      free = subtractIntervals(
+        free,
+        gaps.filter(([from, to]) => from <= midnight && midnight < to),
+      );
+    }
+    // What is left is one stretch: the night before covers the target from its
+    // midnight, and nothing else reaches into its morning.
+    inherited.forEach((night, index) => {
+      free
+        .filter(([from]) => from < midnight + night.length)
+        .forEach(([from, to]) => {
+          result.push({
+            key: makeKey(day, own.length + index),
+            day_of_week: day,
+            start_time: minutesToTime(from - midnight),
+            end_time: minutesToTime(Math.min(to, midnight + night.length) - midnight),
+            preset: night.preset,
+          });
+        });
+    });
   });
+
+  addCopies(copies.filter((range) => !crossesMidnight(range)));
   return mergeTouchingRanges(result);
 }
 

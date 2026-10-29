@@ -620,6 +620,69 @@ describe('thermostatRanges: copying a day', () => {
       expect(rangesToTransitions(copied)).to.deep.equal(rangesToTransitions(week));
     });
 
+    // The inherited night was added like a copy, so it took the target's morning from
+    // the night of the day before, which is no target.
+    it('should keep the night of the day before a target', () => {
+      const sundayFrost = [
+        ...trimRangesAround(week, { day_of_week: 6, start_time: '22:30', end_time: '06:30' }),
+        { key: 'frost', day_of_week: 6, start_time: '22:30', end_time: '06:30', preset: 'frost' },
+      ];
+      const copied = copyDayRanges(sundayFrost, 0, [1]);
+
+      expect(pointsOn(copied, 0)).to.deep.equal(['06:30 comfort', '08:30 eco', '17:00 comfort', '22:30 night']);
+      expect(pointsOn(copied, 1)).to.deep.equal(['06:30 comfort', '08:30 eco', '17:00 comfort', '22:30 night']);
+    });
+
+    // Tuesday's night ends at 23:00: Wednesday inherits a stop, the gap in a session and
+    // an off range once reopened. Neither may cut Thursday's night.
+    it('should keep the night before a target whether the source inherits a gap or an off range', () => {
+      const shortTuesday = week.map((range) => (range.key === 'd-1' ? { ...range, end_time: '23:00' } : range));
+      const reopened = transitionsToRanges(rangesToTransitions(shortTuesday)).map((range, index) => ({
+        ...range,
+        key: `r-${index}`,
+      }));
+
+      [shortTuesday, reopened].forEach((ranges) => {
+        const copied = copyDayRanges(ranges, 2, [4]);
+        expect(pointsOn(copied, 4)).to.deep.equal(['06:30 comfort', '08:30 eco', '17:00 comfort', '22:30 night']);
+        expect(rangesToTransitions(copied).filter((point) => point.preset === 'off')).to.deep.equal([
+          { day_of_week: 1, time: '23:00', preset: 'off' },
+        ]);
+      });
+    });
+
+    it('should leave a stop running into the target from the day before', () => {
+      const stoppedThursday = week.filter((range) => range.key !== 'd-3');
+      const copied = copyDayRanges(stoppedThursday, 1, [4]);
+
+      // Thursday stops at 22:30 until Friday 06:30: that stop is Thursday's, so the
+      // night Tuesday inherits does not fill it.
+      expect(pointsOn(copied, 3)).to.deep.equal(['06:30 comfort', '08:30 eco', '17:00 comfort', '22:30 off']);
+      expect(pointsOn(copied, 4)).to.deep.equal(['06:30 comfort', '08:30 eco', '17:00 comfort', '22:30 night']);
+    });
+
+    it('should fill a gap starting at the midnight of a target, which is its own', () => {
+      const midnightGap = trimRangesAround(week, { day_of_week: 4, start_time: '00:00', end_time: '06:30' });
+      const copied = copyDayRanges(midnightGap, 1, [4]);
+
+      // Filled with the night Tuesday inherits, it joins Thursday's: no stop at midnight.
+      expect(pointsOn(copied, 4)).to.deep.equal(['06:30 comfort', '08:30 eco', '17:00 comfort', '22:30 night']);
+      expect(rangesToTransitions(copied).filter((point) => point.preset === 'off')).to.deep.equal([]);
+    });
+
+    // Tuesday ends at midnight and inherits Monday's night. Wednesday's own eco night,
+    // kept on Thursday as a tail, would have hidden the night Thursday inherits.
+    it('should drop the tail of a target running onto another target', () => {
+      const ranges = week
+        .filter((range) => range.key !== 'd-1')
+        .map((range) => (range.key === 'c-1' ? { ...range, end_time: '00:00' } : range))
+        .map((range) => (range.key === 'd-2' ? { ...range, preset: 'eco' } : range));
+      const copied = copyDayRanges(ranges, 1, [2, 3]);
+
+      expect(pointsOn(copied, 2)[0]).to.equal('00:00 night');
+      expect(pointsOn(copied, 3)[0]).to.equal('00:00 night');
+    });
+
     it('should copy across the end of the week', () => {
       const copied = copyDayRanges(withAllDayFrost(2), 2, [6]);
 
