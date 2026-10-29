@@ -142,6 +142,7 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
       targetSelectorsCache: new Set(),
       windowOpenedAt: new Map(),
       windowTimers: new Map(),
+      openWindows: new Set(),
       lifecycle: 0,
       triggerApplySchedules: fake(),
     };
@@ -219,11 +220,46 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     expect([...handler.windowTimers.keys()]).to.deep.equal(['other-thermostat']);
   });
 
+  // Open past its delay, the window did cut the heating: its closing brings it
+  // back at once (#3201) rather than at the next minute tick.
+  it('should run a pass when a window closes after its delay ran out', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(30);
+
+    await opens(mod, handler);
+    await clock.tickAsync(30 * 1000);
+    assert.calledOnce(handler.triggerApplySchedules);
+    await closes(mod, handler);
+
+    assert.calledTwice(handler.triggerApplySchedules);
+  });
+
+  // An open-plan floor has several windows (A.1.1): each has its own check, and
+  // closing one leaves the other's in place.
+  it('should keep the check of a window still open when another one closes', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(60);
+    const thermostat = (await handler.gladys.device.get({ service: 'thermostat' }))[0];
+    thermostat.params[0].value = '["window-sensor","kitchen-door"]';
+
+    await opens(mod, handler);
+    await clock.tickAsync(20 * 1000);
+    await mod.onDeviceNewState.call(handler, { device_feature: 'kitchen-door', state: 0 });
+    await mod.onDeviceNewState.call(handler, { device_feature: 'kitchen-door', state: 1 });
+
+    expect([...handler.windowTimers.keys()]).to.deep.equal(['thermostat-living-room window-sensor']);
+    await clock.tickAsync(40 * 1000);
+    assert.calledOnce(handler.triggerApplySchedules);
+  });
+
   it('should replace the pending check of a thermostat when it is armed again', async () => {
     const mod = loadModule();
     const handler = buildHandler(60);
     const stale = fake();
-    handler.windowTimers.set('thermostat-living-room', { timer: setTimeout(stale, 5 * 1000), window: 'window-sensor' });
+    handler.windowTimers.set('thermostat-living-room window-sensor', {
+      timer: setTimeout(stale, 5 * 1000),
+      window: 'window-sensor',
+    });
 
     await opens(mod, handler);
     await clock.tickAsync(60 * 1000);

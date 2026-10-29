@@ -190,6 +190,43 @@ describe('ThermostatService', () => {
     expect(handler.running).to.equal(false);
   });
 
+  // Stopped while the start still waited on the references: resuming, it attached the
+  // listener and ran a regulation pass on a stopped service.
+  it('should not finish a start that a stop overtook', async () => {
+    const { service, gladys, handler } = buildService();
+    let releasePrime;
+    handler.primeObservedSetpoints = () =>
+      new Promise((resolve) => {
+        releasePrime = resolve;
+      });
+
+    const starting = service.start();
+    await service.stop();
+    releasePrime();
+    await starting;
+
+    assert.notCalled(gladys.event.on);
+    assert.notCalled(handler.applySchedules);
+    expect(handler.running).to.equal(false);
+  });
+
+  it('should only finish the latest of two overlapping starts', async () => {
+    const { service, gladys, handler } = buildService();
+    const releases = [];
+    handler.primeObservedSetpoints = () =>
+      new Promise((resolve) => {
+        releases.push(resolve);
+      });
+
+    const first = service.start();
+    const second = service.start();
+    releases.forEach((release) => release());
+    await Promise.all([first, second]);
+
+    assert.calledOnce(gladys.event.on);
+    expect(handler.running).to.equal(true);
+  });
+
   it('should be safe to stop a service that was never started', async () => {
     const { service, gladys } = buildService();
 

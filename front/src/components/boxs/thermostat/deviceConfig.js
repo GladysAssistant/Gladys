@@ -1,17 +1,30 @@
+import { parseSelectorList } from '../../../../../server/utils/thermostatSelectorList';
+
 // How each THERMOSTAT_* device param maps onto the config the widget reads.
 // Declaring it once removes the ninety lines of near-identical ternaries this
 // used to be, and keeps the param names in a single place.
 const PARAM_FIELDS = [
-  ['temperature_feature', 'THERMOSTAT_TEMPERATURE_FEATURE'],
+  // One sensor or several (spec A.1.1): the widget shows their average.
+  ['temperature_features', 'THERMOSTAT_TEMPERATURE_FEATURE', parseSelectorList],
   ['humidity_feature', 'THERMOSTAT_HUMIDITY_FEATURE'],
   ['switch_feature', 'THERMOSTAT_SWITCH_FEATURE'],
+  ['pilot_wire_feature', 'THERMOSTAT_PILOT_WIRE_FEATURE'],
+  // The order each preset sends a pilot-wire heater regulating itself: the
+  // widget compares it with the order the module confirms.
+  ['pilot_wire_order_frost', 'THERMOSTAT_PILOT_WIRE_ORDER_FROST', v => parseInt(v, 10)],
+  ['pilot_wire_order_away', 'THERMOSTAT_PILOT_WIRE_ORDER_AWAY', v => parseInt(v, 10)],
+  ['pilot_wire_order_eco', 'THERMOSTAT_PILOT_WIRE_ORDER_ECO', v => parseInt(v, 10)],
+  ['pilot_wire_order_night', 'THERMOSTAT_PILOT_WIRE_ORDER_NIGHT', v => parseInt(v, 10)],
+  ['pilot_wire_order_comfort', 'THERMOSTAT_PILOT_WIRE_ORDER_COMFORT', v => parseInt(v, 10)],
   // External thermostats: the real device regulates itself, and these point at
   // features owned by another integration (Netatmo, Zigbee, Matter, MQTT...).
   ['thermostat_type', 'THERMOSTAT_TYPE'],
   ['target_feature', 'THERMOSTAT_TARGET_FEATURE'],
   ['state_feature', 'THERMOSTAT_STATE_FEATURE'],
   ['mode_feature', 'THERMOSTAT_MODE_FEATURE'],
-  ['window_feature', 'THERMOSTAT_WINDOW_FEATURE'],
+  ['power_feature', 'THERMOSTAT_POWER_FEATURE'],
+  // Any of several opening sensors open suspends the heating (spec A.1.1).
+  ['window_features', 'THERMOSTAT_WINDOW_FEATURE', parseSelectorList],
   // Seconds an opening has to last before the heating is suspended.
   ['window_delay', 'THERMOSTAT_WINDOW_DELAY', parseFloat],
   // The manual hold: the setpoint held by hand, and when it gives the thermostat
@@ -82,7 +95,8 @@ export const buildStateFromFeatures = device => {
     modeFeature: mode,
     preset: preset ? preset.last_value : null,
     mode: mode ? mode.last_value : null,
-    operatingState: operatingState ? operatingState.last_value : null
+    operatingState: operatingState ? operatingState.last_value : null,
+    operatingStateFeature: operatingState ? operatingState.selector : null
   };
 };
 

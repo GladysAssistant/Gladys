@@ -10,6 +10,7 @@ const {
   WEATHER_UNITS,
 } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const logger = require('../../../utils/logger');
 const { normalize } = require('../../../utils/device');
 const { hexToInt, kelvinToMired } = require('../../../utils/colors');
 const {
@@ -308,8 +309,16 @@ async function getThermostatScheduleSelectors(gladys, thermostatDeviceSelectors)
   if (!thermostatService || !thermostatService.device.running) {
     return [];
   }
-  const schedules = await thermostatService.device.getSchedules();
-  return schedules.map(({ selector }) => selector);
+  // A lookup that fails must not cost the MCP server its tools: getAllTools would reject,
+  // and no tool would be registered at all. The schedule is then any string, as with no
+  // service.
+  try {
+    const schedules = await thermostatService.device.getSchedules();
+    return schedules.map(({ selector }) => selector);
+  } catch (e) {
+    logger.warn(`MCP: could not list the thermostat schedules: ${e.message}`);
+    return [];
+  }
 }
 
 /**

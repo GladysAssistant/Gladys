@@ -962,6 +962,10 @@
         "cancelManual": "Cancelar el modo manual",
         "windowOpen": "Ventana abierta — calefacción suspendida",
         "windowOpenCooling": "Ventana abierta — refrigeración suspendida",
+        "pilotWireHeating": "Calentando",
+        "pilotWireStandby": "En espera: consigna alcanzada",
+        "pilotWireOrderCurrent": "Orden: {{order}}",
+        "pilotWireOrderPending": "Enviando la orden {{order}}…",
         "a11ySetpoint": "Consigna",
         "a11yCurrentTemp": "Temperatura actual",
         "a11yHumidity": "Humedad",
@@ -3631,6 +3635,8 @@
         "activeScheduleLabel": "Programación activa",
         "noSchedule": "Sin programación",
         "setpointLabel": "Consigna",
+        "regulationLabel": "Regulación",
+        "heaterRegulates": "Por el radiador",
         "noSetpoint": "—",
         "saveButton": "Guardar",
         "editButton": "Editar",
@@ -3648,22 +3654,29 @@
         "nameLabel": "Nombre",
         "namePlaceholder": "ej. Termostato del salón",
         "roomLabel": "Habitación",
+        "showAllRoomsLabel": "Mostrar los dispositivos de todas las habitaciones",
+        "showAllRoomsHelp": "Las listas de abajo solo ofrecen los dispositivos de esta habitación. Amplíalas cuando la zona calefactada abarca varias habitaciones, como un salón y una cocina abiertos.",
         "modeLabel": "Uso",
         "typeLabel": "Tipo de termostato",
         "tuningSection": "Ajuste fino",
         "typeVirtual": "Termostato virtual (Gladys regula)",
         "typeExternal": "Termostato real (el aparato regula por sí mismo)",
+        "typePilotWire": "Radiador con hilo piloto (el radiador regula por sí mismo)",
         "vendorProgrammeWarning": "Desactiva el programa del fabricante en este aparato (aplicación Netatmo, Tado…) antes de controlarlo desde Gladys. Si no, el programa del aparato y el de Gladys escriben la consigna por turnos, y el termostato sigue al que haya escrito el último.",
         "typeHelp": {
-          "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) para alcanzar la consigna.",
-          "external": "El termostato gestiona su propia regulación y su propio calefactor. Gladys solo escribe la consigna que resuelve su programación y muestra el estado del dispositivo."
+          "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) o un radiador con hilo piloto para alcanzar la consigna.",
+          "external": "El termostato gestiona su propia regulación y su propio calefactor. Gladys solo escribe la consigna que resuelve su programación y muestra el estado del dispositivo.",
+          "pilotWire": "El radiador regula con su propio termostato. Gladys solo le envía la orden de cada preajuste (eco, confort, antihielo…) por el hilo piloto."
         },
         "targetFeatureLabel": "Consigna del termostato real",
         "targetFeatureHelp": "La función en la que Gladys escribe la temperatura de consigna. Algunos dispositivos exponen varias (calefacción/refrigeración, ocupado/desocupado): elige la que realmente controla tu calefacción.",
-        "stateFeatureLabel": "Estado de calefacción (opcional)",
+        "stateFeatureLabel": "Estado de funcionamiento (opcional)",
         "stateFeatureHelp": "Se usa para mostrar si el dispositivo está funcionando. Se acepta como estado de funcionamiento o como contacto de caldera. Déjalo vacío si tu termostato no lo informa.",
         "modeFeatureLabel": "Modo de funcionamiento (opcional)",
-        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno. Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
+        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno — el modo de un aire acondicionado también sirve. En un termostato, Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo. El modo de un aire acondicionado no tiene Apagado: se detiene mediante su Alimentación, que entonces hay que indicar.",
+        "powerFeatureLabel": "Alimentación (opcional)",
+        "powerFeatureHelp": "El interruptor que enciende y apaga el dispositivo real, como la alimentación de un aire acondicionado o de una bomba de calor. Gladys lo apaga cuando el termostato se detiene, se abre una ventana o se aplica un tramo Apagado, y lo vuelve a encender en cuanto una consigna toma el relevo. Necesario para un aire acondicionado, cuyo modo no tiene apagado.",
+        "powerFeatureNeeded": "El modo de un aire acondicionado no tiene apagado: elige aquí su alimentación, o Gladys no podrá apagarlo cuando se abra una ventana, se aplique una franja Apagado o se detenga el termostato.",
         "mode": {
           "heating": "Calefacción",
           "cooling": "Refrigeración"
@@ -3685,8 +3698,9 @@
         "minTempPlaceholder": "ej. 5",
         "maxTempLabel": "Temp. máx.",
         "maxTempPlaceholder": "ej. 35",
-        "temperatureFeatureLabel": "Sensor de temperatura",
-        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "temperatureFeatureLabel": "Sensores de temperatura",
+        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente, o varios: el termostato usa entonces su media. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "addTemperatureFeature": "Añadir un sensor de temperatura",
         "humidityFeatureLabel": "Sensor de humedad",
         "humidityFeatureHelp": "Opcional. Se muestra en el widget del termostato.",
         "switchFeatureLabel": "Interruptor (actuador)",
@@ -3694,10 +3708,21 @@
           "heating": "El interruptor que se encenderá y apagará para calentar la habitación.",
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
         },
-        "windowFeatureLabel": "Sensor de apertura de ventana",
+        "noSwitchHint": {
+          "heating": "No hay ningún interruptor para elegir. Muestra arriba los dispositivos de todas las habitaciones o, para un termostato o una bomba de calor que se regula sola, elige el tipo «Termostato real».",
+          "cooling": "No hay ningún interruptor para elegir. Un aire acondicionado se regula solo: elige el tipo «Termostato real» y luego su consigna. Un ventilador o un climatizador en un enchufe puede seguir siendo un termostato virtual."
+        },
+        "pilotWireFeatureLabel": "Hilo piloto (actuador)",
+        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado…) en lugar de cortar su alimentación. Desactive primero el programa propio del módulo.",
+        "pilotWireProgrammeWarning": "Desactive el programa o el modo termostato propio del módulo (programación de Heatzy, programa de Tuya…) antes de controlarlo desde Gladys. Si no, cada orden que escribe ese programa se toma por un cambio hecho en el módulo, y el módulo y Gladys escriben la orden por turnos.",
+        "pilotWireRegulationHelp": {
+          "heater": "Cada preajuste envía la orden elegida en la tabla de preajustes (eco → eco, ausencia → antihielo…). El sensor de ambiente, si lo hay, solo sirve para mostrar la temperatura.",
+          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar, antihielo una vez alcanzada la consigna del preajuste. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
+        },
+        "windowFeatureLabel": "Sensores de apertura de ventana",
         "windowFeatureHelp": {
-          "heating": "Opcional. Si una ventana permanece abierta más tiempo que el retardo de abajo, la calefacción se corta automáticamente.",
-          "cooling": "Opcional. Si una ventana permanece abierta más tiempo que el retardo de abajo, la refrigeración se corta automáticamente."
+          "heating": "Opcional. En cuanto una de las ventanas seleccionadas permanece abierta más tiempo que el retardo de abajo, la calefacción se corta automáticamente.",
+          "cooling": "Opcional. En cuanto una de las ventanas seleccionadas permanece abierta más tiempo que el retardo de abajo, la refrigeración se corta automáticamente."
         },
         "windowDelayLabel": "Retardo antes del corte",
         "windowDelayUnit": "s",
@@ -3705,6 +3730,8 @@
           "heating": "Tiempo que la ventana debe permanecer abierta antes de cortar la calefacción. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo.",
           "cooling": "Tiempo que la ventana debe permanecer abierta antes de cortar la refrigeración. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo."
         },
+        "addWindowFeature": "Añadir un sensor de apertura",
+        "removeFeature": "Quitar",
         "hysteresisStartLabel": "Umbral de arranque",
         "hysteresisStartHelp": {
           "heating": "La calefacción se enciende cuando la temperatura está por debajo de (consigna − umbral de arranque). Ej. consigna 21 °C, umbral 0,5 °C → se enciende por debajo de 20,5 °C.",
@@ -3722,6 +3749,7 @@
         "presetsLabel": "Preajustes de temperatura",
         "presetColNameLabel": "Preajuste",
         "presetColTempLabel": "Consigna",
+        "presetColOrderLabel": "Orden enviada",
         "preset": {
           "off": "Apagado",
           "frost": "Antihielo",
@@ -3733,8 +3761,9 @@
         "saveButton": "Guardar",
         "cancelButton": "Cancelar",
         "saveError": "Error al guardar.",
-        "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un conmutador: regula leyendo uno y accionando el otro.",
+        "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un actuador (conmutador o hilo piloto): regula leyendo uno y accionando el otro.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
+        "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",
         "noActiveSchedule": "Sin programación (control manual)",
@@ -3747,7 +3776,10 @@
         "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual.",
         "modeHelp": "Lo que controla este termostato: calefacción o climatización.",
         "sectionDevice": "Dispositivo",
-        "sectionHeating": "Calefacción",
+        "section": {
+          "heating": "Calefacción",
+          "cooling": "Refrigeración"
+        },
         "sectionProgramming": "Programación",
         "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Usar estos valores",
@@ -4200,6 +4232,13 @@
           "inferior": "menor que",
           "inferiorOrEqual": "menor o igual que"
         }
+      },
+      "inTimeRange": {
+        "label": "Continuar solo si",
+        "inRange": "Estamos dentro de una franja horaria",
+        "outOfRange": "Estamos fuera de las franjas horarias",
+        "description": "Esta condición usa las franjas horarias del disparador «Franjas horarias» de la escena. Colócala en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final, con una sola escena.",
+        "noTrigger": "Esta escena no tiene un disparador programado «franjas horarias»: esta condición la detendrá cada vez."
       }
     },
     "actions": {
@@ -4241,7 +4280,8 @@
         "only-continue-if": "Condición sobre variables",
         "check-time": "Condición de hora",
         "if-then-else": "Condición: Si...entonces...si no...",
-        "while": "Bucle: Mientras... repetir..."
+        "while": "Bucle: Mientras... repetir...",
+        "in-time-range": "Planificación horaria"
       },
       "user": {
         "set-seen-at-home": "Usuario visto en casa",
@@ -4325,7 +4365,8 @@
         "if-then-else": "Seguir una ruta diferente según una condición",
         "only-continue-if": "Detener la escena aquí si no se cumple la condición",
         "while": "Repetir acciones mientras una condición sea verdadera",
-        "check-time": "Continuar solo en determinados horarios o días"
+        "check-time": "Continuar solo en determinados horarios o días",
+        "in-time-range": "Continuar solo si estamos dentro de una de las franjas horarias del disparador"
       },
       "user": {
         "check-presence": "Marcar a un usuario como ausente si no se le ha visto recientemente",
@@ -4583,7 +4624,32 @@
           "saturday": "Sábado",
           "sunday": "Domingo"
         },
-        "house": "Vivienda"
+        "house": "Vivienda",
+        "timeRange": "Franjas horarias",
+        "timeRangesLabel": "Franjas horarias",
+        "noTimeRange": "Todavía no hay ninguna franja horaria. Añade una para definir la planificación.",
+        "addRange": "Añadir una franja",
+        "deleteRange": "Eliminar la franja",
+        "rangeStart": "Inicio",
+        "rangeEnd": "Fin",
+        "rangeDuration": "Duración",
+        "rangeDays": "Días",
+        "overnight": "+1d",
+        "emptyRange": "Franja no válida",
+        "resumeOnStartup": "Reevaluar al iniciar Gladys",
+        "timeRangesHelp": "La escena se ejecuta al inicio y al final de cada franja. Usa la acción «Planificación horaria» en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final. Si «Reevaluar al iniciar Gladys» está marcado, la escena también se ejecuta al arrancar con el estado real de la planificación, para que tus dispositivos vuelvan al estado correcto tras un corte.",
+        "daysOfTheWeekShort": {
+          "monday": "LU",
+          "tuesday": "MA",
+          "wednesday": "MI",
+          "thursday": "JU",
+          "friday": "VI",
+          "saturday": "SÁ",
+          "sunday": "DO"
+        },
+        "lastDayLocked": "Debe quedar al menos un día seleccionado.",
+        "invalidRangesError": "Complete o elimine las franjas horarias de la escena: cada una necesita un inicio y un fin, que no pueden ser a la misma hora.",
+        "noRangeError": "Añada al menos una franja horaria al disparador «Franjas horarias», o elimine el disparador."
       },
       "warning": {
         "houseWithoutCoordinate": "Su vivienda no tiene coordenadas. Este activador no puede funcionar sin estos datos. Vaya a Configuración / Viviendas y haga clic en el mapa para establecer las coordenadas de la vivienda."
@@ -6130,6 +6196,15 @@
           "4": "Noche",
           "5": "Confort"
         },
+        "active-preset": {
+          "unknown": "{{value}} (desconocido)",
+          "0": "Apagado",
+          "1": "Antihielo",
+          "2": "Ausencia",
+          "3": "Eco",
+          "4": "Noche",
+          "5": "Confort"
+        },
         "operating-state": {
           "unknown": "{{value}} (desconocido)",
           "0": "Inactivo",
@@ -6931,6 +7006,7 @@
       "target-temperature": "Temperatura del termostato",
       "mode": "Modo del termostato",
       "preset": "Preajuste del termostato",
+      "active-preset": "Preajuste activo del termostato",
       "operating-state": "Estado de funcionamiento del termostato"
     },
     "airquality-sensor": {

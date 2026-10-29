@@ -8,6 +8,7 @@ const {
   buildParamsConfig,
   getDeviceConfig,
   getFeatureBySelector,
+  isExternal,
 } = require('../../../../services/thermostat/lib/thermostat.deviceConfig');
 
 const deviceWithParams = (params) => ({
@@ -31,9 +32,40 @@ describe('thermostat.deviceConfig - toNumber', () => {
 });
 
 describe('thermostat.deviceConfig - buildParamsConfig', () => {
+  it('should default the presets by use', () => {
+    const cooling = buildParamsConfig(deviceWithParams({ THERMOSTAT_MODE: 'cooling' }));
+    expect(cooling.preset_comfort).to.equal(24);
+    expect(cooling.preset_frost).to.equal(30);
+    const heating = buildParamsConfig(deviceWithParams({ THERMOSTAT_MIN_TEMP: '5' }));
+    expect(heating.preset_comfort).to.equal(21);
+    expect(heating.preset_frost).to.equal(7);
+  });
+
   it('should return null when the device has no params', () => {
     expect(buildParamsConfig({ params: [] })).to.equal(null);
     expect(buildParamsConfig({})).to.equal(null);
+  });
+
+  it('should read several window and temperature sensors, and the power feature', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({
+        THERMOSTAT_TEMPERATURE_FEATURE: '["salon-temp","kitchen-temp"]',
+        THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]',
+        THERMOSTAT_POWER_FEATURE: 'ac-power',
+      }),
+    );
+
+    expect(config.temperature_features).to.deep.equal(['salon-temp', 'kitchen-temp']);
+    expect(config.window_features).to.deep.equal(['salon-window', 'kitchen-door']);
+    expect(config.power_feature).to.equal('ac-power');
+  });
+
+  it('should read no sensor and no power when the params are absent', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_MODE: 'heating' }));
+
+    expect(config.temperature_features).to.deep.equal([]);
+    expect(config.window_features).to.deep.equal([]);
+    expect(config.power_feature).to.equal(null);
   });
 
   it('should read features and mode from params', () => {
@@ -46,7 +78,7 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
       }),
     );
 
-    expect(config.temperature_feature).to.equal('temp-sensor');
+    expect(config.temperature_features).to.deep.equal(['temp-sensor']);
     expect(config.switch_feature).to.equal('heater-switch');
     expect(config.default_mode).to.equal('cooling');
     expect(config.control_type).to.equal('tpi');
@@ -99,6 +131,85 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
 
     expect(config.window_delay).to.equal(0);
   });
+
+  // Who regulates a pilot-wire heater is said by the thermostat type (C.1.1).
+  it('should let Gladys regulate a pilot wire on a virtual thermostat with a room sensor', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }));
+
+    expect(config.pilot_wire_regulation).to.equal('gladys');
+  });
+
+  it('should let the heater regulate a pilot wire on a pilot-wire thermostat, sensor or not', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TYPE: 'pilot-wire', THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }),
+    );
+
+    expect(config.pilot_wire_regulation).to.equal('heater');
+  });
+
+  it('should read a real thermostat given a pilot wire as a pilot-wire thermostat', () => {
+    // How such a heater was saved before it had a type of its own.
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TYPE: 'external', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }),
+    );
+
+    expect(config.thermostat_type).to.equal('pilot-wire');
+    expect(config.pilot_wire_regulation).to.equal('heater');
+  });
+
+  it('should let the heater regulate a pilot wire with no room sensor to regulate on', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }));
+
+    expect(config.pilot_wire_regulation).to.equal('heater');
+  });
+
+  it('should let the heater regulate a pilot wire whose sensor list is empty', () => {
+    // A list saved with every probe removed names no sensor to regulate on.
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire', THERMOSTAT_TEMPERATURE_FEATURE: '[]' }),
+    );
+
+    expect(config.pilot_wire_regulation).to.equal('heater');
+  });
+
+  it('should let Gladys regulate a pilot wire on several room sensors', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: '["salon-temp","kitchen-temp"]' }),
+    );
+
+    expect(config.pilot_wire_regulation).to.equal('gladys');
+  });
+
+  it('should read the order each preset sends, falling back on the defaults', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({
+        THERMOSTAT_TEMPERATURE_FEATURE: 'temp',
+        THERMOSTAT_PILOT_WIRE_ORDER_NIGHT: '2',
+        // Not one of the six orders: ignored rather than sent.
+        THERMOSTAT_PILOT_WIRE_ORDER_ECO: '9',
+      }),
+    );
+
+    expect(config.pilot_wire_orders).to.deep.equal({ frost: 1, away: 1, eco: 2, night: 2, comfort: 5 });
+  });
+});
+
+describe('thermostat.deviceConfig - isExternal', () => {
+  it('should take a real thermostat for one', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_TYPE: 'external' }));
+
+    expect(isExternal(config)).to.equal(true);
+  });
+
+  it('should never take a pilot-wire heater for a real thermostat driven by its setpoint', () => {
+    const cases = [
+      { THERMOSTAT_TYPE: 'pilot-wire', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' },
+      { THERMOSTAT_TYPE: 'external', THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' },
+    ];
+    cases.forEach((params) => {
+      expect(isExternal(buildParamsConfig(deviceWithParams(params))), params.THERMOSTAT_TYPE).to.equal(false);
+    });
+  });
 });
 
 describe('thermostat.deviceConfig - getDeviceConfig', () => {
@@ -107,7 +218,7 @@ describe('thermostat.deviceConfig - getDeviceConfig', () => {
 
     const config = getDeviceConfig(device);
 
-    expect(config.temperature_feature).to.equal('temp-sensor');
+    expect(config.temperature_features).to.deep.equal(['temp-sensor']);
   });
 
   it('should return null when the device carries no params', () => {

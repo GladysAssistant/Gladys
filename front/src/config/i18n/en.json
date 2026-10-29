@@ -962,6 +962,10 @@
         "cancelManual": "Cancel manual mode",
         "windowOpen": "Window open — heating suspended",
         "windowOpenCooling": "Window open — cooling suspended",
+        "pilotWireHeating": "Heating",
+        "pilotWireStandby": "Standby: setpoint reached",
+        "pilotWireOrderCurrent": "Order: {{order}}",
+        "pilotWireOrderPending": "Sending the {{order}} order…",
         "a11ySetpoint": "Setpoint",
         "a11yCurrentTemp": "Current temperature",
         "a11yHumidity": "Humidity",
@@ -3631,6 +3635,8 @@
         "activeScheduleLabel": "Active schedule",
         "noSchedule": "No schedule",
         "setpointLabel": "Setpoint",
+        "regulationLabel": "Regulation",
+        "heaterRegulates": "By the heater",
         "noSetpoint": "—",
         "saveButton": "Save",
         "editButton": "Edit",
@@ -3648,22 +3654,29 @@
         "nameLabel": "Name",
         "namePlaceholder": "e.g. Living Room Thermostat",
         "roomLabel": "Room",
+        "showAllRoomsLabel": "Show the devices of every room",
+        "showAllRoomsHelp": "The lists below only offer the devices of this room. Widen them when the heated area spans several rooms, such as an open-plan living room and kitchen.",
         "modeLabel": "Use",
         "typeLabel": "Thermostat type",
         "tuningSection": "Fine tuning",
         "typeVirtual": "Virtual thermostat (Gladys regulates)",
         "typeExternal": "Real thermostat (the appliance regulates itself)",
+        "typePilotWire": "Pilot-wire heater (the heater regulates itself)",
         "vendorProgrammeWarning": "Turn the vendor programme off on this device (the Netatmo or Tado app…) before driving it from Gladys. Otherwise the device’s programme and Gladys’s take turns writing the setpoint, and the thermostat follows whichever wrote last.",
         "typeHelp": {
-          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) to reach the setpoint.",
-          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state."
+          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) or a pilot-wire heater to reach the setpoint.",
+          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state.",
+          "pilotWire": "The heater regulates on its own thermostat. Gladys only sends it the order of each preset (eco, comfort, frost protection…) over the pilot wire."
         },
         "targetFeatureLabel": "Setpoint of the real thermostat",
         "targetFeatureHelp": "The feature Gladys writes the target temperature on. Some devices expose several (heating/cooling, occupied/unoccupied): pick the one that actually drives your heating.",
-        "stateFeatureLabel": "Heating state (optional)",
+        "stateFeatureLabel": "Operating state (optional)",
         "stateFeatureHelp": "Used to show whether the device is currently running. Accepted either as an operating state or as a boiler contact. Leave empty if your thermostat does not report it.",
         "modeFeatureLabel": "Operating mode (optional)",
-        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one. Gladys switches it to Off when the thermostat is stopped or an Off slot applies, and hands it back as soon as a setpoint takes over again.",
+        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one — an air conditioner's mode works too. On a thermostat, Gladys switches it to Off when the thermostat is stopped or an Off slot applies, and hands it back as soon as a setpoint takes over again. An air conditioner's mode has no Off: it is stopped through its Power, which then has to be set.",
+        "powerFeatureLabel": "Power (optional)",
+        "powerFeatureHelp": "The switch that turns the real device on and off, such as the power of an air conditioner or a heat pump. Gladys turns it off when the thermostat is stopped, a window opens or an Off slot applies, and back on as soon as a setpoint takes over again. Needed for an air conditioner, whose mode has no Off.",
+        "powerFeatureNeeded": "An air conditioner's mode has no Off: pick its power here, or Gladys cannot stop it when a window opens, an Off slot applies or the thermostat is stopped.",
         "mode": {
           "heating": "Heating",
           "cooling": "Cooling"
@@ -3685,8 +3698,9 @@
         "minTempPlaceholder": "e.g. 5",
         "maxTempLabel": "Max temp",
         "maxTempPlaceholder": "e.g. 35",
-        "temperatureFeatureLabel": "Temperature sensor",
-        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
+        "temperatureFeatureLabel": "Temperature sensors",
+        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature, or several: the thermostat then uses their average. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
+        "addTemperatureFeature": "Add a temperature sensor",
         "humidityFeatureLabel": "Humidity sensor",
         "humidityFeatureHelp": "Optional. Displayed in the thermostat widget.",
         "switchFeatureLabel": "Switch (actuator)",
@@ -3694,10 +3708,21 @@
           "heating": "The switch that will be turned on and off to heat the room.",
           "cooling": "The switch that will be turned on and off to cool the room."
         },
-        "windowFeatureLabel": "Window opening sensor",
+        "noSwitchHint": {
+          "heating": "No switch to pick here. Show the devices of every room above, or, for a thermostat or a heat pump that regulates itself, choose “Real thermostat” as the type.",
+          "cooling": "No switch to pick here. An air conditioner regulates itself: choose “Real thermostat” as the type, then pick its setpoint. A fan or a plug-in cooler on a switch can stay a virtual thermostat."
+        },
+        "pilotWireFeatureLabel": "Pilot wire (actuator)",
+        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off…) instead of cutting its supply. Turn the module’s own programme off first.",
+        "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
+        "pilotWireRegulationHelp": {
+          "heater": "Each preset sends the order picked in the presets table (eco → eco, away → frost protection…). The room sensor, if any, is only displayed.",
+          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
+        },
+        "windowFeatureLabel": "Window opening sensors",
         "windowFeatureHelp": {
-          "heating": "Optional. If a window stays open longer than the delay below, the heating is automatically cut off.",
-          "cooling": "Optional. If a window stays open longer than the delay below, the cooling is automatically cut off."
+          "heating": "Optional. As soon as one of the selected windows stays open longer than the delay below, the heating is automatically cut off.",
+          "cooling": "Optional. As soon as one of the selected windows stays open longer than the delay below, the cooling is automatically cut off."
         },
         "windowDelayLabel": "Delay before cutting off",
         "windowDelayUnit": "s",
@@ -3705,6 +3730,8 @@
           "heating": "How long the window has to stay open before the heating is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour).",
           "cooling": "How long the window has to stay open before the cooling is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour)."
         },
+        "addWindowFeature": "Add an opening sensor",
+        "removeFeature": "Remove",
         "hysteresisStartLabel": "Start threshold",
         "hysteresisStartHelp": {
           "heating": "The heating turns on when the temperature is below (setpoint − start threshold). E.g. setpoint 21°C, threshold 0.5°C → turns on below 20.5°C.",
@@ -3722,6 +3749,7 @@
         "presetsLabel": "Temperature presets",
         "presetColNameLabel": "Preset",
         "presetColTempLabel": "Setpoint",
+        "presetColOrderLabel": "Order sent",
         "preset": {
           "off": "Off",
           "frost": "Frost protection",
@@ -3733,8 +3761,9 @@
         "saveButton": "Save",
         "cancelButton": "Cancel",
         "saveError": "Error while saving.",
-        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and a switch: reading one and actuating the other is how it regulates.",
+        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
+        "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",
@@ -3747,7 +3776,10 @@
         "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action.",
         "modeHelp": "What this thermostat drives: heating or cooling.",
         "sectionDevice": "Device",
-        "sectionHeating": "Heating",
+        "section": {
+          "heating": "Heating",
+          "cooling": "Cooling"
+        },
         "sectionProgramming": "Programming",
         "deviceRangeHint": "The device advertises {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Use these values",
@@ -4200,6 +4232,13 @@
           "inferior": "lower than",
           "inferiorOrEqual": "lower than or equal to"
         }
+      },
+      "inTimeRange": {
+        "label": "Only continue if",
+        "inRange": "We are inside a time range",
+        "outOfRange": "We are outside the time ranges",
+        "description": "This condition uses the time ranges of the scene's “Time ranges” trigger. Put it in an “If… Then… Else” block to turn a device on at the start of a range and off at its end, with a single scene.",
+        "noTrigger": "This scene has no \"time ranges\" scheduled trigger: this condition will stop it every time."
       }
     },
     "actions": {
@@ -4241,7 +4280,8 @@
         "only-continue-if": "Condition on variables",
         "check-time": "Time condition",
         "if-then-else": "Condition: If...then...else...",
-        "while": "Loop: As long as... repeat..."
+        "while": "Loop: As long as... repeat...",
+        "in-time-range": "Time planning"
       },
       "user": {
         "set-seen-at-home": "User seen at home",
@@ -4325,7 +4365,8 @@
         "if-then-else": "Follow a different path depending on a condition",
         "only-continue-if": "Stop the scene here if the condition is not met",
         "while": "Repeat actions as long as a condition is true",
-        "check-time": "Only continue at certain times or on certain days"
+        "check-time": "Only continue at certain times or on certain days",
+        "in-time-range": "Only continue if we are inside one of the trigger's time ranges"
       },
       "user": {
         "check-presence": "Mark a user as away if they haven't been seen recently",
@@ -4583,7 +4624,32 @@
           "saturday": "Saturday",
           "sunday": "Sunday"
         },
-        "house": "House"
+        "house": "House",
+        "timeRange": "Time ranges",
+        "timeRangesLabel": "Time ranges",
+        "noTimeRange": "No time range yet. Add one to define the planning.",
+        "addRange": "Add a range",
+        "deleteRange": "Delete range",
+        "rangeStart": "Start",
+        "rangeEnd": "End",
+        "rangeDuration": "Duration",
+        "rangeDays": "Days",
+        "overnight": "+1d",
+        "emptyRange": "Invalid range",
+        "resumeOnStartup": "Re-evaluate when Gladys starts",
+        "timeRangesHelp": "The scene runs at the start and at the end of each range. Use the “Time planning” action in an “If… Then… Else” block to turn a device on at the start of a range and off at its end. If “Re-evaluate when Gladys starts” is checked, the scene also runs at startup with the real state of the planning, so your devices go back to the right state after an outage.",
+        "daysOfTheWeekShort": {
+          "monday": "MO",
+          "tuesday": "TU",
+          "wednesday": "WE",
+          "thursday": "TH",
+          "friday": "FR",
+          "saturday": "SA",
+          "sunday": "SU"
+        },
+        "lastDayLocked": "At least one day must stay selected.",
+        "invalidRangesError": "Complete or remove the time ranges of the scene: each one needs a start and an end, and they cannot be the same time.",
+        "noRangeError": "Add at least one time range to the \"Time ranges\" trigger, or remove the trigger."
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
@@ -5822,7 +5888,7 @@
           "comfort": "Comfort",
           "eco": "Eco",
           "off": "Off",
-          "frost-protection": "Frost Protection",
+          "frost-protection": "Frost protection",
           "comfort_-1": "Comfort -1°C",
           "comfort_-2": "Comfort -2°C"
         }
@@ -6048,7 +6114,7 @@
       "heater": {
         "pilot-wire-mode": {
           "0": "Off",
-          "1": "Frost Protection",
+          "1": "Frost protection",
           "2": "Eco",
           "3": "Comfort -1°C",
           "4": "Comfort -2°C",
@@ -6124,6 +6190,15 @@
         },
         "preset": {
           "0": "Schedule",
+          "1": "Frost protection",
+          "2": "Away",
+          "3": "Eco",
+          "4": "Night",
+          "5": "Comfort"
+        },
+        "active-preset": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Off",
           "1": "Frost protection",
           "2": "Away",
           "3": "Eco",
@@ -6931,6 +7006,7 @@
       "target-temperature": "Thermostat Temperature",
       "mode": "Thermostat Mode",
       "preset": "Thermostat Preset",
+      "active-preset": "Thermostat Active Preset",
       "operating-state": "Thermostat Operating State"
     },
     "airquality-sensor": {

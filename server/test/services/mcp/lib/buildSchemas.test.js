@@ -2407,6 +2407,18 @@ describe('build schemas', () => {
       expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
     });
 
+    // Rejected, the lookup took every MCP tool down with it.
+    it('should accept any schedule when the schedules cannot be read', async () => {
+      const thermostatService = {
+        device: { running: true, getSchedules: stub().rejects(new Error('database locked')) },
+      };
+      const mcpHandler = buildHandler([thermostat], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
     // A stopped service is still in the stateManager: only `running` says it runs.
     it('should not read the schedules of a thermostat service that is stopped', async () => {
       const thermostatService = { device: { running: false, getSchedules: stub().resolves([]) } };
