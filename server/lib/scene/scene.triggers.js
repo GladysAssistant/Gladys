@@ -6,7 +6,11 @@ const timezonePlugin = require('dayjs/plugin/timezone');
 const logger = require('../../utils/logger');
 const { EVENTS, ANY_CHANGE_OPERATOR, TIME_RANGE_EVENTS } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
+const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
 const { getVisibleFields } = require('../external-integration/externalIntegration.fieldVisibility');
+
+dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
 
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
