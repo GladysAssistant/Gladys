@@ -12,6 +12,23 @@ const WebsocketManager = function WebsocketManager(wss, gladys) {
 };
 
 /**
+ * @description Send a websocket message on one connection of a user. The
+ * connection of a revoked session (logged out, password changed) is closed
+ * instead, so it stops receiving the user's data.
+ * @param {object} userConnection - The connection of the user.
+ * @param {string} message - The formatted message to send.
+ * @example
+ * sendToConnection(userConnection, message);
+ */
+function sendToConnection(userConnection, message) {
+  if (userConnection.sessionId && this.gladys.session.isRevoked(userConnection.sessionId)) {
+    userConnection.client.close(4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
+  } else {
+    userConnection.client.send(message);
+  }
+}
+
+/**
  * @description Send a websocket message to the user.
  * @param {object} event - The event to send.
  * @param {string} event.type - The type of event to send.
@@ -26,7 +43,7 @@ function sendMessageUser({ type, payload, userId }) {
   }
   this.connections[userId].forEach((userConnection) => {
     if (userConnection && userConnection.client && userConnection.client.readyState === WebSocket.OPEN) {
-      userConnection.client.send(formatWebsocketMessage(type, payload));
+      this.sendToConnection(userConnection, formatWebsocketMessage(type, payload));
     }
   });
 }
@@ -44,7 +61,7 @@ function sendMessageAllUsers({ type, payload }) {
   usersIds.forEach((userId) => {
     this.connections[userId].forEach((userConnection) => {
       if (userConnection && userConnection.client && userConnection.client.readyState === WebSocket.OPEN) {
-        userConnection.client.send(formatWebsocketMessage(type, payload));
+        this.sendToConnection(userConnection, formatWebsocketMessage(type, payload));
       }
     });
   });
@@ -54,11 +71,12 @@ function sendMessageAllUsers({ type, payload }) {
  * @description When a user is connected.
  * @param {object} user - User Object.
  * @param {object} client - Websocket client.
+ * @param {string} [sessionId] - Session the client authenticated with.
  * @returns {null} Return when finished.
  * @example
- * userConnected(user, ws);
+ * userConnected(user, ws, '0a5f7305-4faf-42b3-aeb2-fbc0217c4855');
  */
-function userConnected(user, client) {
+function userConnected(user, client, sessionId = null) {
   logger.debug(`User ${user.firstname} connected in websocket`);
   if (!this.connections[user.id]) {
     this.connections[user.id] = [];
@@ -69,7 +87,11 @@ function userConnected(user, client) {
     this.connections[user.id].push({
       user,
       client,
+      sessionId,
     });
+  } else {
+    // the client authenticated again on the same socket: it now uses this session
+    this.connections[user.id][connectionIndex].sessionId = sessionId;
   }
 
   // Send a message to the frontend to tell it's connected
@@ -138,7 +160,7 @@ function init() {
             }
             user = await this.gladys.user.getById(payload.user_id);
             authenticated = true;
-            this.userConnected(user, ws);
+            this.userConnected(user, ws, payload.session_id);
           } catch (e) {
             ws.close(4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
           }
@@ -198,6 +220,7 @@ WebsocketManager.prototype.init = init;
 WebsocketManager.prototype.userConnected = userConnected;
 WebsocketManager.prototype.userDisconnected = userDisconnected;
 WebsocketManager.prototype.sendMessageUser = sendMessageUser;
+WebsocketManager.prototype.sendToConnection = sendToConnection;
 WebsocketManager.prototype.sendMessageAllUsers = sendMessageAllUsers;
 
 module.exports = WebsocketManager;

@@ -53,6 +53,7 @@ describe('thermostat schedule <-> device link', () => {
       {
         event: { emit: fake() },
         device: { saveState: fake.resolves(null), setParam: fake.resolves(null) },
+        variable: { getValue: fake.resolves('UTC') },
       },
       'service-id',
     );
@@ -391,6 +392,13 @@ describe('thermostat schedule <-> device link', () => {
         sinonMatchSelector(modeFeature.selector),
         THERMOSTAT_MODE.OFF,
       );
+      // The hold it dropped is not armed again for the shared duration.
+      assert.neverCalledWith(
+        handler.gladys.device.setParam,
+        sinonMatchSelector(thermostat.selector),
+        'THERMOSTAT_MANUAL_UNTIL',
+        match((value) => value !== ''),
+      );
     });
 
     it('should leave a stopped follower of a programme emptied on an Off point alone', async () => {
@@ -488,6 +496,143 @@ describe('thermostat schedule <-> device link', () => {
       await handler.updateSchedule(programme.selector, { transitions: [] });
 
       assert.notCalled(handler.gladys.device.saveState);
+    });
+
+    describe('a hold running to the next point, when the points change', () => {
+      // It was given the time of the next point when it was taken: a point added
+      // before it afterwards was skipped, and the widget kept announcing the old
+      // time (forum 11074). The clock is pinned on a Wednesday, 10:00 UTC.
+      const NOW = Date.UTC(2026, 9, 14, 10, 0);
+      // The programme's single point, Monday 00:00, and the next midnight.
+      const NEXT_MONDAY = Date.UTC(2026, 9, 19);
+      const NEXT_MIDNIGHT = Date.UTC(2026, 9, 15);
+      const SHARED_DURATION = 30 * 60 * 1000;
+      const MONDAY_ECO = [{ day_of_week: 0, time: '00:00', preset: 'eco' }];
+
+      let clock;
+      beforeEach(() => {
+        clock = sinon.useFakeTimers({ now: NOW, toFake: ['Date'] });
+      });
+      afterEach(() => {
+        clock.restore();
+      });
+
+      const untilWrites = () =>
+        handler.gladys.device.setParam.getCalls().filter((call) => call.args[1] === 'THERMOSTAT_MANUAL_UNTIL');
+
+      const holdOnProgramme = async (until, extraParams = {}, transitions = MONDAY_ECO) => {
+        const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions });
+        await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+        await addParam('THERMOSTAT_MANUAL_SETPOINT', '21');
+        await addParam('THERMOSTAT_MANUAL_UNTIL', until);
+        await Promise.all(Object.keys(extraParams).map((name) => addParam(name, extraParams[name])));
+        resetFakes();
+        return programme;
+      };
+
+      it('should move it onto a point added before the one it was aimed at', async () => {
+        const programme = await holdOnProgramme(String(NEXT_MONDAY));
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        const writes = untilWrites();
+        expect(writes).to.have.lengthOf(1);
+        expect(writes[0].args[2]).to.equal(String(NEXT_MIDNIGHT));
+        // The setpoint held is kept: only its end moves.
+        assert.calledWith(
+          handler.gladys.device.setParam,
+          sinonMatchSelector(thermostat.selector),
+          'THERMOSTAT_MANUAL_SETPOINT',
+          '21',
+        );
+      });
+
+      it('should write nothing when the next point did not move', async () => {
+        const programme = await holdOnProgramme(String(NEXT_MONDAY));
+
+        await handler.updateSchedule(programme.selector, {
+          transitions: [{ day_of_week: 0, time: '00:00', preset: 'comfort' }],
+        });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      it('should leave a hold of a fixed duration alone', async () => {
+        const programme = await holdOnProgramme(String(NEXT_MONDAY), { THERMOSTAT_MANUAL_DURATION: '30' });
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      it('should leave a permanent hold alone', async () => {
+        const programme = await holdOnProgramme('');
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      // Taken while the programme had no point, it runs for the shared duration
+      // and names none: aimed at the new next point, it could run for days.
+      it('should leave a hold taken on a programme with no point alone', async () => {
+        const programme = await holdOnProgramme(String(NOW + SHARED_DURATION), {}, []);
+
+        await handler.updateSchedule(programme.selector, { transitions: MONDAY_ECO });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      it('should not renew that hold when the programme is saved with no point again', async () => {
+        const programme = await holdOnProgramme(String(NOW - 10 * 60 * 1000 + SHARED_DURATION), {}, []);
+
+        await handler.updateSchedule(programme.selector, { transitions: [] });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
+
+      // Its end is past, and the pass that follows is the one to clear it: a new
+      // end would aim past the new points and keep the hold through them.
+      it('should leave a hold whose end is already past for the pass to clear', async () => {
+        const programme = await holdOnProgramme(String(NOW - 30 * 1000));
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+        assert.called(handler.triggerApplySchedules);
+      });
+
+      it('should give it the shared duration when the programme is left with no point', async () => {
+        const programme = await holdOnProgramme(String(NEXT_MONDAY));
+
+        await handler.updateSchedule(programme.selector, { transitions: [] });
+
+        const writes = untilWrites();
+        expect(writes).to.have.lengthOf(1);
+        expect(writes[0].args[2]).to.equal(String(NOW + SHARED_DURATION));
+      });
+
+      // Stopped beforehand, it is not stopped again, and its hold is not dropped:
+      // started again later, it must not aim at a point that is gone.
+      it("should give a stopped follower's hold the shared duration when an Off programme is emptied", async () => {
+        const programme = await holdOnProgramme(String(NEXT_MIDNIGHT), {}, allDay('off'));
+        await modeFeature.update({ last_value: THERMOSTAT_MODE.OFF });
+
+        await handler.updateSchedule(programme.selector, { transitions: [] });
+
+        assert.notCalled(handler.gladys.device.saveState);
+        const writes = untilWrites();
+        expect(writes).to.have.lengthOf(1);
+        expect(writes[0].args[2]).to.equal(String(NOW + SHARED_DURATION));
+      });
+
+      it('should leave the hold alone on a rename', async () => {
+        const programme = await holdOnProgramme(String(NEXT_MONDAY));
+
+        await handler.updateSchedule(programme.selector, { name: 'Renamed' });
+
+        expect(untilWrites()).to.have.lengthOf(0);
+      });
     });
 
     it('should tell no widget anything when a schedule nobody followed is deleted', async () => {

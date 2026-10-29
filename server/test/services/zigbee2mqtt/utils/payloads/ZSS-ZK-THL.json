@@ -234,7 +234,13 @@
       }
     ],
     "should_poll": false,
-    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a"
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a",
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0xe0798dfffedeae2b"
+      }
+    ]
   },
   "values": [
     {

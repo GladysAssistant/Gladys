@@ -32,6 +32,12 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.applyTimer = null;
+  // Whether the service runs, set by its start() and stop(). Every in-tree
+  // service sits in the stateManager whatever its status, so finding it there
+  // says nothing: a scene switching schedules while the integration was stopped
+  // went through, and its regulation pass could switch a relay on with no
+  // minute loop left to switch it off.
+  this.running = false;
   // Derived from this service's devices, rebuilt lazily and dropped whenever a
   // thermostat device is created, updated or deleted.
   this.windowSelectorsCache = null;

@@ -86,7 +86,6 @@ export const RequestStatus = {
   ServiceDisconnected: 'ServiceDisconnected',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
-  UserNotAcceptedLocally: 'UserNotAcceptedLocally',
   PhilipsHueBridgeButtonNotPressed: 'PhilipsHueBridgeButtonNotPressed',
   RoomConflictError: 'RoomConflictError',
   RoomValidationError: 'RoomValidationError'

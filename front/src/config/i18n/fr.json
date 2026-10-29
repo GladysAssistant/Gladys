@@ -792,6 +792,25 @@
         "scheduleLabel": "Planning :",
         "scheduleUntil": "jusqu'à",
         "manualUntil": "jusqu'à",
+        "untilTomorrow": "demain",
+        "untilDays": {
+          "0": "lundi",
+          "1": "mardi",
+          "2": "mercredi",
+          "3": "jeudi",
+          "4": "vendredi",
+          "5": "samedi",
+          "6": "dimanche"
+        },
+        "untilNextDays": {
+          "0": "lundi prochain",
+          "1": "mardi prochain",
+          "2": "mercredi prochain",
+          "3": "jeudi prochain",
+          "4": "vendredi prochain",
+          "5": "samedi prochain",
+          "6": "dimanche prochain"
+        },
         "cancelManual": "Annuler le mode manuel",
         "windowOpen": "Fenêtre ouverte — chauffage suspendu",
         "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",
@@ -4125,6 +4144,11 @@
         "houseLabel": "Maison",
         "alarmModeLabel": "Mode de l'alarme"
       },
+      "thermostatSetSchedule": {
+        "description": "Cette action fait suivre un autre planning aux thermostats sélectionnés, par exemple pour passer du planning habituel à celui des vacances scolaires. Le thermostat reprend le planning tout de suite : une consigne manuelle en cours est annulée, mais un thermostat arrêté à la main reste arrêté.",
+        "scheduleLabel": "Planning",
+        "thermostatsLabel": "Thermostats"
+      },
       "alarmSetMode": {
         "description": "Cette action passera la maison sélectionnée dans le mode d'alarme sélectionné.",
         "houseLabel": "Maison",
@@ -4250,6 +4274,9 @@
         "check-alarm-mode": "Si l'alarme est en mode",
         "set-alarm-mode": "Passer l'alarme en mode"
       },
+      "thermostat": {
+        "set-schedule": "Changer le planning des thermostats"
+      },
       "mqtt": {
         "send": "Envoyer un message MQTT"
       },
@@ -4338,6 +4365,9 @@
       },
       "http": {
         "request": "Appeler une API ou un service externe"
+      },
+      "thermostat": {
+        "set-schedule": "Faire suivre un autre planning hebdomadaire à des thermostats"
       },
       "mqtt": {
         "send": "Publier un message sur le broker MQTT"
@@ -5173,9 +5203,12 @@
     "statusColumn": "Etat",
     "userRsaKey": "Clé RSA",
     "userEcdsaKey": "Clé ECDSA",
+    "userAccepted": "Autorisé",
+    "userKeysChanged": "Clés modifiées",
+    "userWaitingForAuthorization": "En attente d'autorisation",
     "usersListDescription": "Cette liste est synchronisée avec vos utilisateurs Gladys Plus. Pour qu'un utilisateur (y compris vous-même) puisse accéder à votre instance à distance, vous devez l'autoriser ici en activant l'interrupteur en face de son nom.",
     "usersListWhyAcceptDescription": "<b>Pourquoi cette étape ?</b> Chaque utilisateur Gladys Plus possède ses propres clés de chiffrement, dont les empreintes sont affichées ci-dessous. En autorisant un utilisateur, vous validez localement, sur votre instance, que ses clés sont acceptées : c'est cette validation locale qui protège votre maison des attaques « de l'homme du milieu » (man-in-the-middle). Personne, pas même les serveurs Gladys Plus, ne peut donner accès à votre instance sans cette validation faite chez vous.",
-    "usersListRevokedDescription": "Si les clés d'un utilisateur changent (par exemple lorsque sa double authentification a été réinitialisée), son accès est automatiquement révoqué par sécurité : il faudra l'autoriser à nouveau ici. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
+    "usersListRevokedDescription": "Les clés d'un utilisateur changent lorsqu'il réinitialise son mot de passe Gladys Plus. Son accès est alors automatiquement révoqué par sécurité et il apparaît comme « Clés modifiées » : vérifiez avec lui que les nouvelles empreintes correspondent à celles affichées sur sa page Gladys Plus, puis autorisez-le à nouveau ici. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
     "disconnectTitle": "Déconnectez votre compte Gladys Plus",
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
@@ -5393,7 +5426,6 @@
     "wrongCredentials": "E-mail / mot de passe incorrect.",
     "invalidEmail": "E-mail invalide",
     "networkError": "Erreur réseau: êtes-vous sûr que votre instance Gladys est connectée à Internet ?",
-    "userNotAcceptedLocally": "Votre utilisateur n'est pas accepté localement, veuillez revenir à votre instance Gladys et autoriser l'accès à cet utilisateur dans les paramètres.",
     "gatewayNoInstanceFound": "Aucune instance connectée à Gladys Plus. Vous devez d'abord connecter votre instance Gladys à Gladys Plus avant de pouvoir l'utiliser ici.",
     "gatewayAccessBilling": "Pour accéder à la facturation, cliquez ici.",
     "unknownError": "Une erreur inconnue est survenue. Veuillez nous contacter pour plus d'informations.",
@@ -7152,7 +7184,18 @@
     "noInstanceFoundTutorialLink": "Besoin d'un guide pas à pas avec des captures d'écran ? <a href=\"https://gladysassistant.com/fr/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Consultez le tutoriel dans notre documentation</a>.",
     "noInstanceFoundNote": "Vous aviez déjà fait cette étape par le passé ? Il faut parfois la refaire, par exemple lorsque votre double authentification (2FA) a été réinitialisée : reconnectez-vous simplement dans l'onglet « Gladys Plus » de votre instance. Besoin d'aide ? Écrivez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
-    "errorNotAcceptedLocally": "L'utilisateur n'a pas encore été autorisé localement dans l'instance Gladys. Dans votre instance locale, allez dans les paramètres, onglet « Gladys Plus », section « Utilisateurs distants », et activez l'interrupteur en face de son nom.",
+    "keysChangedTitle": "Votre accès doit être autorisé à nouveau",
+    "keysChangedIntro": "Vos clés de chiffrement Gladys Plus ont changé depuis que votre instance Gladys les a autorisées. C'est normal après une réinitialisation de votre mot de passe Gladys Plus (« Mot de passe oublié ») : de nouvelles clés sont alors générées. Par sécurité, votre instance refuse toute clé qu'elle n'a pas validée elle-même. Rien n'est cassé : il suffit d'autoriser à nouveau votre utilisateur, depuis chez vous.",
+    "notAcceptedTitle": "Votre accès doit être autorisé",
+    "notAcceptedIntro": "Votre compte Gladys Plus est bien relié à votre instance Gladys, mais votre utilisateur n'est pas (ou plus) autorisé à y accéder à distance. Par sécurité, chaque utilisateur Gladys Plus doit être autorisé depuis l'instance elle-même, chez vous : personne, pas même les serveurs Gladys Plus, ne peut accéder à votre maison sans cette validation.",
+    "notAcceptedUnknownReasonIntro": "Votre instance Gladys n'autorise pas (ou plus) votre utilisateur à y accéder à distance. C'est normal la première fois, mais aussi après une réinitialisation de votre mot de passe Gladys Plus : de nouvelles clés de chiffrement sont alors générées, et votre instance doit les valider à nouveau. Par sécurité, cette autorisation se fait uniquement depuis l'instance elle-même, chez vous.",
+    "notAcceptedAskAdmin": "Seul un administrateur de votre instance Gladys peut autoriser votre accès. Si ce n'est pas votre cas, demandez à la personne qui gère Gladys chez vous de suivre ces étapes.",
+    "notAcceptedStepAcceptUser": "Dans la section <b>« Utilisateurs distants »</b>, vérifiez que les empreintes des clés affichées en face de votre nom sont identiques à celles ci-dessous, puis <b>activez l'interrupteur</b>.",
+    "notAcceptedFingerprintsLabel": "Empreintes de vos clés de chiffrement :",
+    "rsaKeyFingerprint": "Clé RSA :",
+    "ecdsaKeyFingerprint": "Clé ECDSA :",
+    "stillNotAccepted": "Votre utilisateur n'est toujours pas autorisé. Vérifiez que l'interrupteur en face de votre nom est bien activé dans votre instance, puis réessayez.",
+    "notAcceptedRetryButton": "Mon utilisateur est autorisé, réessayer",
     "saveButton": "Sauvegarder",
     "manageBillingLink": "Gérer mon abonnement et mes factures",
     "logoutButton": "Se déconnecter"

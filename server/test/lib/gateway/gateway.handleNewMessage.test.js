@@ -73,6 +73,7 @@ describe('gateway.handleNewMessage', () => {
     assert.calledOnceWithExactly(callback, {
       error: 'USER_NOT_ACCEPTED_LOCALLY',
       message: 'User not allowed to control this Gladys instance',
+      reason: 'NOT_ACCEPTED',
       status: 403,
     });
   });
@@ -108,6 +109,122 @@ describe('gateway.handleNewMessage', () => {
     assert.calledOnceWithExactly(callback, {
       error: 'USER_NOT_ACCEPTED_LOCALLY',
       message: 'User not allowed to control this Gladys instance',
+      reason: 'NOT_ACCEPTED',
+      status: 403,
+    });
+  });
+
+  it('should reject a known user who was never accepted, without saying their keys changed', async () => {
+    gateway.usersKeys = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        accepted: false,
+      },
+    ];
+
+    const callback = fake.returns(true);
+
+    await gateway.handleNewMessage(
+      {
+        type: 'gladys-api-call',
+        options: {
+          method: 'get',
+          url: '/api/v1/house',
+        },
+      },
+      {
+        sender_id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        rsaPublicKeyRaw: 'key',
+        ecdsaPublicKeyRaw: 'key',
+        local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+      callback,
+    );
+
+    assert.notCalled(event.emit);
+    assert.calledOnceWithExactly(callback, {
+      error: 'USER_NOT_ACCEPTED_LOCALLY',
+      message: 'User not allowed to control this Gladys instance',
+      reason: 'NOT_ACCEPTED',
+      status: 403,
+    });
+  });
+
+  it('should reject a user accepted with other keys, and say their keys changed', async () => {
+    gateway.usersKeys = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        rsa_public_key: 'old-fingerprint',
+        ecdsa_public_key: 'old-fingerprint',
+        accepted: true,
+      },
+    ];
+
+    const callback = fake.returns(true);
+
+    await gateway.handleNewMessage(
+      {
+        type: 'gladys-api-call',
+        options: {
+          method: 'get',
+          url: '/api/v1/house',
+        },
+      },
+      {
+        sender_id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        rsaPublicKeyRaw: 'key',
+        ecdsaPublicKeyRaw: 'key',
+        local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+      callback,
+    );
+
+    assert.notCalled(event.emit);
+    assert.calledOnceWithExactly(callback, {
+      error: 'USER_NOT_ACCEPTED_LOCALLY',
+      message: 'User not allowed to control this Gladys instance',
+      reason: 'KEYS_CHANGED',
+      status: 403,
+    });
+  });
+
+  it('should reject a user revoked because their keys changed, and say their keys changed', async () => {
+    gateway.usersKeys = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        accepted: false,
+        keys_changed: true,
+      },
+    ];
+
+    const callback = fake.returns(true);
+
+    await gateway.handleNewMessage(
+      {
+        type: 'gladys-api-call',
+        options: {
+          method: 'get',
+          url: '/api/v1/house',
+        },
+      },
+      {
+        sender_id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        rsaPublicKeyRaw: 'key',
+        ecdsaPublicKeyRaw: 'key',
+        local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+      callback,
+    );
+
+    assert.notCalled(event.emit);
+    assert.calledOnceWithExactly(callback, {
+      error: 'USER_NOT_ACCEPTED_LOCALLY',
+      message: 'User not allowed to control this Gladys instance',
+      reason: 'KEYS_CHANGED',
       status: 403,
     });
   });

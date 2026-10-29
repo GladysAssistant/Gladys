@@ -417,7 +417,7 @@ describe('thermostat.state broadcasts', () => {
 
   it('should run a debounced regulation pass', async () => {
     const clock = sinon.useFakeTimers();
-    const handler = { applyTimer: null, applySchedules: fake.resolves(null) };
+    const handler = { running: true, applyTimer: null, applySchedules: fake.resolves(null) };
 
     state.triggerApplySchedules.call(handler);
     await clock.tickAsync(2000);
@@ -428,7 +428,7 @@ describe('thermostat.state broadcasts', () => {
 
   it('should collapse a burst of calls into a single run', async () => {
     const clock = sinon.useFakeTimers();
-    const handler = { applyTimer: null, applySchedules: fake.resolves(null) };
+    const handler = { running: true, applyTimer: null, applySchedules: fake.resolves(null) };
 
     state.triggerApplySchedules.call(handler);
     state.triggerApplySchedules.call(handler);
@@ -438,9 +438,21 @@ describe('thermostat.state broadcasts', () => {
     assert.calledOnce(handler.applySchedules);
   });
 
+  // A stopped service regulates nothing, whatever its API is asked to write.
+  it('should run no pass while the service is stopped', async () => {
+    const clock = sinon.useFakeTimers();
+    const handler = { running: false, applyTimer: null, applySchedules: fake.resolves(null) };
+
+    state.triggerApplySchedules.call(handler);
+    await clock.tickAsync(2000);
+
+    assert.notCalled(handler.applySchedules);
+    expect(handler.applyTimer).to.equal(null);
+  });
+
   it('should swallow a failing regulation pass', async () => {
     const clock = sinon.useFakeTimers();
-    const handler = { applyTimer: null, applySchedules: fake.rejects(new Error('boom')) };
+    const handler = { running: true, applyTimer: null, applySchedules: fake.rejects(new Error('boom')) };
 
     state.triggerApplySchedules.call(handler);
 

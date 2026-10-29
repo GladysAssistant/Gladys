@@ -93,6 +93,7 @@ describe('gateway.getUsersKeys', () => {
         gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
         connected: false,
         accepted: false,
+        keys_changed: true,
       },
     ]);
   });
@@ -120,8 +121,46 @@ describe('gateway.getUsersKeys', () => {
         gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
         connected: false,
         accepted: false,
+        keys_changed: true,
       },
     ]);
+  });
+  it('should not flag the keys as changed for a user who was never accepted', async () => {
+    const oldUsers = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        name: 'Tony',
+        rsa_public_key: 'not-the-fingerprint',
+        ecdsa_public_key: 'not-the-fingerprint',
+        gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+        connected: false,
+        accepted: false,
+      },
+    ];
+    variable.getValue = fake.resolves(JSON.stringify(oldUsers));
+
+    const users = await gateway.getUsersKeys();
+    expect(users).to.have.lengthOf(1);
+    expect(users[0]).to.include({ rsa_public_key: 'fingerprint', accepted: false, keys_changed: false });
+  });
+  it('should keep the keys flagged as changed when they change again before being accepted', async () => {
+    const oldUsers = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        name: 'Tony',
+        rsa_public_key: 'not-the-fingerprint',
+        ecdsa_public_key: 'not-the-fingerprint',
+        gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+        connected: false,
+        accepted: false,
+        keys_changed: true,
+      },
+    ];
+    variable.getValue = fake.resolves(JSON.stringify(oldUsers));
+
+    const users = await gateway.getUsersKeys();
+    expect(users).to.have.lengthOf(1);
+    expect(users[0]).to.include({ rsa_public_key: 'fingerprint', accepted: false, keys_changed: true });
   });
   it('should remove users deleted from Gladys Plus', async () => {
     const oldUsers = [
