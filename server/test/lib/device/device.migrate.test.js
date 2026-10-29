@@ -649,6 +649,29 @@ describe('Device.migrate', function Describe() {
     notify.restore();
   });
 
+  it('should re-point the pilot wire a thermostat drives', async () => {
+    const thermostat = await db.Device.create(
+      {
+        name: 'Migration pilot-wire thermostat',
+        selector: 'migration-pilot-wire-thermostat',
+        external_id: 'thermostat:migration-pilot-wire',
+        service_id: SEEDED_SERVICE_ID,
+        params: [{ name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'migration-source-binary' }],
+      },
+      { include: [{ model: db.DeviceParam, as: 'params' }] },
+    );
+
+    await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-binary': 'migration-destination-binary' },
+    });
+
+    const param = await db.DeviceParam.findOne({
+      where: { device_id: thermostat.id, name: 'THERMOSTAT_PILOT_WIRE_FEATURE' },
+    });
+    expect(param.value).to.equal('migration-destination-binary');
+  });
+
   // A thermostat may watch several windows and average several probes, stored as
   // a JSON array (thermostat.md A.1.1): only the migrated entry is replaced.
   it('should re-point the migrated entry of a thermostat sensor list in place', async () => {

@@ -3,6 +3,8 @@
 // them here avoids the drift where the form offered one default and the
 // regulation applied another.
 
+const { PILOT_WIRE_MODE } = require('./constants');
+
 const DEFAULT_PRESET_TEMPS = {
   frost: 7,
   away: 16,
@@ -77,19 +79,85 @@ const TRANSITION_PRESETS = [...PRESETS, 'off'];
 
 // How a thermostat device is regulated.
 // - `virtual`: Gladys is the thermostat. It reads a room sensor, applies
-//   hysteresis or TPI, and drives a switch (a relay, a plug, a boiler contact).
+//   hysteresis or TPI, and drives a switch (a relay, a plug, a boiler contact)
+//   or a pilot-wire heater, used as a switch (C.1.1).
 // - `external`: a real thermostat regulates on its own. Gladys only writes the
 //   setpoint its schedule resolves, and reads back whether the device is
 //   currently heating. There is no switch and no heuristic to run: the device
 //   already does that, and a second control loop would fight it.
+// - `pilot-wire`: a pilot-wire heater regulates on its own thermostat. Gladys
+//   only sends it the order each preset is set to (C.1.1). It drives no real
+//   setpoint, and owns its setpoint feature like a virtual thermostat.
 const THERMOSTAT_TYPES = {
   VIRTUAL: 'virtual',
   EXTERNAL: 'external',
+  PILOT_WIRE: 'pilot-wire',
 };
 
 // Devices created before the external type existed carry no THERMOSTAT_TYPE
 // param, and they are all virtual ones.
 const DEFAULT_THERMOSTAT_TYPE = THERMOSTAT_TYPES.VIRTUAL;
+
+// Who regulates a pilot-wire heater (C.1.1). Not a param of its own: the
+// thermostat type already says it.
+// - `heater`, on a `pilot-wire` thermostat: the heater's own thermostat. Each
+//   preset is sent as the order it is set to — eco is eco — and the room
+//   sensor, if any, is only displayed.
+// - `gladys`, on a virtual one: Gladys, on the room sensor. The wire is used as
+//   a switch: comfort to heat, frost protection to stop, whatever the preset.
+//   The heater's own comfort setpoint is set high, so its thermometer never has
+//   the last word. Without a sensor there is nothing to regulate on, and the
+//   heater regulates instead.
+const PILOT_WIRE_REGULATIONS = {
+  HEATER: 'heater',
+  GLADYS: 'gladys',
+};
+
+// The order each preset sends a heater that regulates itself, each one set per
+// thermostat by a THERMOSTAT_PILOT_WIRE_ORDER_<PRESET> param. A heater takes no
+// temperature, so these replace the preset setpoints there. Away is frost
+// protection, as Home Assistant's pilot-wire climate does: nobody is home.
+// Night is eco, the order a heater's own programme gives the night; comfort -1
+// and -2 stay on offer for whoever wants them.
+const DEFAULT_PILOT_WIRE_ORDERS = {
+  frost: PILOT_WIRE_MODE.FROST_PROTECTION,
+  away: PILOT_WIRE_MODE.FROST_PROTECTION,
+  eco: PILOT_WIRE_MODE.ECO,
+  night: PILOT_WIRE_MODE.ECO,
+  comfort: PILOT_WIRE_MODE.COMFORT,
+};
+
+const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
+
+/**
+ * @description The order a module can actually be sent, from the options its
+ * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
+ * the order was refused, written again on every pass, and the widget said it was
+ * on its way for ever. Comfort -1 or -2 falls back on comfort when the module
+ * takes it. Frost protection falls back on off: both are standby, and a module
+ * that cannot hold frost protection would otherwise be left heating on the order
+ * it carries — on comfort with a window open, or above the setpoint when Gladys
+ * regulates. Any other order it does not take is not sent at all. A feature
+ * that declares no option is sent the order as it is.
+ * @param {number} order - A PILOT_WIRE_MODE value.
+ * @param {Array} [supportedOptions] - The feature's `supported_options`.
+ * @returns {number|null} The order to send, or null when the module takes none.
+ * @example
+ * supportedPilotWireOrder(PILOT_WIRE_MODE.COMFORT_1, [{ value: 0 }, { value: 1 }, { value: 2 }, { value: 5 }]); // 5
+ */
+function supportedPilotWireOrder(order, supportedOptions) {
+  const supported = (supportedOptions || []).map((option) => option.value);
+  if (supported.length === 0 || supported.includes(order)) {
+    return order;
+  }
+  if (COMFORT_ORDERS.includes(order) && supported.includes(PILOT_WIRE_MODE.COMFORT)) {
+    return PILOT_WIRE_MODE.COMFORT;
+  }
+  if (order === PILOT_WIRE_MODE.FROST_PROTECTION && supported.includes(PILOT_WIRE_MODE.OFF)) {
+    return PILOT_WIRE_MODE.OFF;
+  }
+  return null;
+}
 
 module.exports = {
   DEFAULT_PRESET_TEMPS,
@@ -115,4 +183,7 @@ module.exports = {
   TRANSITION_PRESETS,
   THERMOSTAT_TYPES,
   DEFAULT_THERMOSTAT_TYPE,
+  PILOT_WIRE_REGULATIONS,
+  DEFAULT_PILOT_WIRE_ORDERS,
+  supportedPilotWireOrder,
 };

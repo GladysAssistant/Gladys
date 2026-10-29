@@ -59,4 +59,31 @@ export const readableTextOn = hex => {
   return against('#212529') >= against('#ffffff') ? '#212529' : '#ffffff';
 };
 
+// CSS hue-rotate(180deg), as the filter spec defines it.
+const HUE_ROTATE_180 = [
+  [-0.574, 1.43, 0.144],
+  [0.426, 0.43, 0.144],
+  [0.426, 1.43, -0.856]
+];
+
+/**
+ * The colour to paint so that the dark theme shows `hex` itself. That theme runs
+ * the whole page through `invert(100%) hue-rotate(180deg)`, which swaps light and
+ * dark: frost's light blue came out as a deep blue and night's deep blue as a
+ * light one. HTML elements cancel it with the same filter applied once more
+ * (`dark-mode-no-invert`); an SVG stroke or fill cannot rely on CSS filters, so
+ * the same transform is applied to the colour instead. Applied twice it gives
+ * the colour back, clamped exactly as the preset buttons' own counter-inversion
+ * clamps it, so both match.
+ * @param {string} hex - The colour to show, as #rrggbb.
+ * @returns {string} The colour to paint under the dark theme, as #rrggbb.
+ */
+export const counterDarkModeInvert = hex => {
+  const inverted = [1, 3, 5].map(i => 255 - parseInt(hex.slice(i, i + 2), 16));
+  const rotated = HUE_ROTATE_180.map(row =>
+    Math.max(0, Math.min(255, Math.round(row[0] * inverted[0] + row[1] * inverted[1] + row[2] * inverted[2])))
+  );
+  return `#${rotated.map(value => value.toString(16).padStart(2, '0')).join('')}`;
+};
+
 export default PRESET_COLORS;

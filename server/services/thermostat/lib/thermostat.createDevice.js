@@ -9,15 +9,27 @@ const {
 } = require('../../../utils/constants');
 const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
 
+// The params that make an external thermostat drive a real device: its
+// setpoint, its running state, its mode and its power. A pilot-wire heater has
+// none: it takes an order (C.1.1). A real thermostat never carries a pilot wire:
+// given one, it is a `pilot-wire` thermostat.
+const EXTERNAL_SETPOINT_PARAMS = [
+  'THERMOSTAT_TARGET_FEATURE',
+  'THERMOSTAT_STATE_FEATURE',
+  'THERMOSTAT_MODE_FEATURE',
+  'THERMOSTAT_POWER_FEATURE',
+];
+
 // Runtime state kept as params rather than features: a hold, a stop the
-// programme made, and the end of one made on the unit are bookkeeping of the
-// regulation loop, not properties of the equipment. No form sends them, so they
-// are carried over on save instead of being wiped.
+// programme or a pilot-wire module made, and the end of one made on the unit
+// are bookkeeping of the regulation loop, not properties of the equipment. No
+// form sends them, so they are carried over on save instead of being wiped.
 const RUNTIME_PARAMS = [
   'THERMOSTAT_MANUAL_SETPOINT',
   'THERMOSTAT_MANUAL_UNTIL',
   'THERMOSTAT_SCHEDULE_STOP',
   'THERMOSTAT_REMOTE_STOP_UNTIL',
+  'THERMOSTAT_MODULE_STOP',
 ];
 
 // Params the integration owns. Anything else sent by a client is dropped rather
@@ -26,6 +38,15 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_TEMPERATURE_FEATURE',
   'THERMOSTAT_HUMIDITY_FEATURE',
   'THERMOSTAT_SWITCH_FEATURE',
+  // A pilot-wire heater takes an order rather than a contact: the same actuator
+  // slot, driven with six orders instead of on/off.
+  'THERMOSTAT_PILOT_WIRE_FEATURE',
+  // The order each preset sends that heater when it regulates itself.
+  'THERMOSTAT_PILOT_WIRE_ORDER_FROST',
+  'THERMOSTAT_PILOT_WIRE_ORDER_AWAY',
+  'THERMOSTAT_PILOT_WIRE_ORDER_ECO',
+  'THERMOSTAT_PILOT_WIRE_ORDER_NIGHT',
+  'THERMOSTAT_PILOT_WIRE_ORDER_COMFORT',
   'THERMOSTAT_TYPE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
@@ -38,12 +59,14 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_MAX_TEMP',
   'THERMOSTAT_TEMP_UNIT',
   'THERMOSTAT_MANUAL_DURATION',
-  // The manual hold and the stops. Not settings the edit form offers, but
-  // params all the same: they have to survive a save, see RUNTIME_PARAMS above.
+  // The manual hold and the stops — of the programme, of the unit and of the
+  // module. Not settings the edit form offers, but params all the same: they
+  // have to survive a save, see RUNTIME_PARAMS above.
   'THERMOSTAT_MANUAL_SETPOINT',
   'THERMOSTAT_MANUAL_UNTIL',
   'THERMOSTAT_SCHEDULE_STOP',
   'THERMOSTAT_REMOTE_STOP_UNTIL',
+  'THERMOSTAT_MODULE_STOP',
   'THERMOSTAT_PRESET_FROST',
   'THERMOSTAT_PRESET_AWAY',
   'THERMOSTAT_PRESET_ECO',
@@ -167,7 +190,11 @@ function buildStateFeatures(device, external) {
 async function createDevice(device) {
   logger.info(`Thermostat: Creating device "${device.name}"`);
 
-  const params = (device.params || []).filter((param) => ALLOWED_PARAMS.includes(param.name));
+  // Copies: the rules below rewrite some values, and the caller's payload is
+  // not theirs to change.
+  const params = (device.params || [])
+    .filter((param) => ALLOWED_PARAMS.includes(param.name))
+    .map((param) => ({ ...param }));
 
   // `device.create` deletes every param the payload leaves out. The hold is
   // runtime state the edit form knows nothing about, so saving the form would
@@ -190,8 +217,43 @@ async function createDevice(device) {
   }
 
   const typeParam = params.find((param) => param.name === 'THERMOSTAT_TYPE');
+  const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
+  const pilotWire = !!(pilotWireParam && pilotWireParam.value);
+  // A real thermostat given a pilot wire was how a heater regulating itself was
+  // saved before it had a type of its own: it is saved as one now.
+  if (typeParam && typeParam.value === THERMOSTAT_TYPES.EXTERNAL && pilotWire) {
+    typeParam.value = THERMOSTAT_TYPES.PILOT_WIRE;
+  }
   const thermostatType = (typeParam && typeParam.value) || DEFAULT_THERMOSTAT_TYPE;
+  // A pilot-wire heater is driven by an order on either of its types (C.1.1):
+  // the type only says who regulates it. It owns its setpoint feature and
+  // carries the state features of a virtual thermostat, and none of a real
+  // device's.
   const external = thermostatType === THERMOSTAT_TYPES.EXTERNAL;
+  const heaterRegulates = thermostatType === THERMOSTAT_TYPES.PILOT_WIRE;
+  if (heaterRegulates && !pilotWire) {
+    throw new Error('Thermostat: a pilot-wire thermostat needs a THERMOSTAT_PILOT_WIRE_FEATURE param');
+  }
+
+  // A pilot-wire heater only heats, and its orders are never pulsed within a
+  // cycle (C.1.1): a cooling mode or TPI saved with one would describe a
+  // thermostat the loop does not run. Held here as well as in the form, so a
+  // client writing the params directly cannot save one either. A real device's
+  // setpoint left behind would be written to by nothing, and is cleared.
+  if (pilotWire) {
+    params.forEach((param) => {
+      // A switch alongside would be a second actuator for the same heater.
+      if (EXTERNAL_SETPOINT_PARAMS.includes(param.name) || param.name === 'THERMOSTAT_SWITCH_FEATURE') {
+        param.value = '';
+      }
+      if (param.name === 'THERMOSTAT_MODE' && param.value === 'cooling') {
+        param.value = 'heating';
+      }
+      if (param.name === 'THERMOSTAT_CONTROL_TYPE' && param.value === 'tpi') {
+        param.value = 'hysteresis';
+      }
+    });
+  }
 
   const features = (device.features || []).filter(
     (feature) =>
