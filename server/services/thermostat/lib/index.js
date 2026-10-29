@@ -65,6 +65,10 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // The programme preset last announced to the dashboards, by thermostat
   // selector: the minute loop pushes one only when the point in force changes.
   this.announcedPresets = new Map();
+  // The window sensors the listener saw open, so that only their closing runs
+  // a regulation pass straight away — not every periodic report of a window
+  // that stayed closed.
+  this.openWindows = new Set();
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;

@@ -13,7 +13,7 @@ const { parseSelectorList, serializeSelectorList } = require('../../utils/thermo
 const FEATURE_STRING_FIELDS = ['device_feature', 'thermostat_feature'];
 // Device params that name a feature of another device by its selector. The
 // thermostat integration keeps its configuration on its own device
-// (docs/specs/thermostat.md A.1): the sensors it reads, the switch it drives and,
+// (docs/specs/thermostat.md A.1): the sensors it reads, the switch or pilot wire it drives and,
 // on an external thermostat, the real device's features. Left on a migrated
 // selector, the regulation loop finds none of them, and the dashboard widget no
 // longer finds its thermostat.
@@ -21,6 +21,7 @@ const FEATURE_PARAM_NAMES = [
   'THERMOSTAT_TEMPERATURE_FEATURE',
   'THERMOSTAT_HUMIDITY_FEATURE',
   'THERMOSTAT_SWITCH_FEATURE',
+  'THERMOSTAT_PILOT_WIRE_FEATURE',
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
