@@ -22,7 +22,7 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditTempUnit', 'C');
     this.props.updateThermostatField('thermostatEditControlType', 'hysteresis');
     this.props.updateThermostatField('thermostatEditActiveSchedule', '');
-    this.props.updateThermostatField('thermostatEditTemperatureFeature', '');
+    this.props.updateThermostatField('thermostatEditTemperatureFeatures', []);
     this.props.updateThermostatField('thermostatEditHumidityFeature', '');
     this.props.updateThermostatField('thermostatEditSwitchFeature', '');
     this.props.updateThermostatField('thermostatEditPilotWireFeature', '');
@@ -31,7 +31,9 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditTargetFeature', '');
     this.props.updateThermostatField('thermostatEditStateFeature', '');
     this.props.updateThermostatField('thermostatEditModeFeature', '');
-    this.props.updateThermostatField('thermostatEditWindowFeature', '');
+    this.props.updateThermostatField('thermostatEditPowerFeature', '');
+    this.props.updateThermostatField('thermostatEditWindowFeatures', []);
+    this.props.updateThermostatField('thermostatEditShowAllRooms', false);
     this.props.updateThermostatField('thermostatEditPresetFrost', '7');
     this.props.updateThermostatField('thermostatEditPresetAway', '16');
     this.props.updateThermostatField('thermostatEditPresetEco', '18');
@@ -71,6 +73,6 @@ class ThermostatEditPage extends Component {
 }
 
 export default connect(
-  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeature,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditPilotWireFeature,thermostatEditPilotWireOrders,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditWindowFeature,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,pilotWireFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures',
+  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeatures,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditPilotWireFeature,thermostatEditPilotWireOrders,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditPowerFeature,thermostatEditWindowFeatures,thermostatEditShowAllRooms,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,pilotWireFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures,powerFeatures',
   actions
 )(ThermostatEditPage);

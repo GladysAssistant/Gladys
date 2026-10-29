@@ -47,11 +47,26 @@ const getFeatureLabel = (selector, dictionary, deviceFeatures) => {
   return truncate(device ? getDeviceFeatureName(dictionary, device, feature) : selector);
 };
 
+// The device names of device selectors once the devices are loaded, the raw
+// selector until then (or if the device was deleted)
+const listDeviceNames = (selectors, deviceFeatures) => {
+  if (!Array.isArray(selectors) || selectors.length === 0) {
+    return null;
+  }
+  const entries = deviceFeatures ? Object.values(deviceFeatures) : [];
+  const names = selectors.map(selector => {
+    const entry = entries.find(({ device }) => device.selector === selector);
+    return entry ? entry.device.name : selector;
+  });
+  return truncate(names.join(', '));
+};
+
 // Builds a short human-readable summary of a configured action, displayed when
 // its card is collapsed. Returns null when there is nothing meaningful to show:
 // the card then only displays the action type label. deviceFeatures maps a
-// feature selector to its { device, feature }, null while loading.
-const getActionSummary = (action, dictionary, deviceFeatures) => {
+// feature selector to its { device, feature }, and thermostatSchedules a
+// schedule selector to its name, both null while loading.
+const getActionSummary = (action, dictionary, deviceFeatures, thermostatSchedules) => {
   if (!action || !action.type) {
     return null;
   }
@@ -127,6 +142,13 @@ const getActionSummary = (action, dictionary, deviceFeatures) => {
     case ACTIONS.SWITCH.TURN_OFF:
     case ACTIONS.SWITCH.TOGGLE:
       return listSelectors(action.devices || action.device_features);
+    case ACTIONS.THERMOSTAT.SET_SCHEDULE:
+      // A schedule selector is a slug plus a timestamp plus a random suffix
+      // (school-holidays-1792941482500-tk5w): its name reads.
+      return joinParts([
+        truncate((thermostatSchedules && thermostatSchedules[action.schedule]) || action.schedule),
+        listDeviceNames(action.devices, deviceFeatures)
+      ]);
     case ACTIONS.CONDITION.ONLY_CONTINUE_IF: {
       if (!Array.isArray(action.conditions) || action.conditions.length === 0) {
         return null;
@@ -217,6 +239,14 @@ const getTriggerSummary = (trigger, dictionary) => {
           : null
       ]);
     case EVENTS.TIME.CHANGED:
+      if (trigger.scheduler_type === 'time-range') {
+        // The days alone said nothing of the planning itself.
+        const ranges = (trigger.time_ranges || [])
+          .filter(range => range.start && range.end)
+          .map(range => `${range.start}–${range.end}`)
+          .join(', ');
+        return joinParts([truncate(ranges), translateDays(trigger.days_of_the_week)]);
+      }
       return joinParts([
         trigger.time,
         trigger.date,

@@ -24,6 +24,10 @@ function execute(sceneSelector, scope = {}) {
 
     scope.alreadyExecutedScenes = scope.alreadyExecutedScenes || new Set();
     scope.alreadyExecutedScenes.add(sceneSelector);
+    // Which scene is running, so an action can read its own definition back (the
+    // "time range" condition needs the ranges of the scene's triggers). A scene started
+    // by another one gets a clone of the scope, so overwriting the key here is safe.
+    scope.sceneSelector = sceneSelector;
 
     const executionId = uuid.v4();
 

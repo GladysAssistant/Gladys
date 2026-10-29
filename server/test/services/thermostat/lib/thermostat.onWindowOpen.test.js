@@ -22,7 +22,7 @@ const loadModule = () =>
     },
   });
 
-const buildGladys = ({ switchOn = true } = {}) => {
+const buildGladys = ({ switchOn = true, windowParam = 'window-sensor' } = {}) => {
   const switchDevice = {
     features: [{ selector: 'heater-switch', last_value: switchOn ? 1 : 0 }],
   };
@@ -35,7 +35,7 @@ const buildGladys = ({ switchOn = true } = {}) => {
       },
     ],
     params: [
-      { name: 'THERMOSTAT_WINDOW_FEATURE', value: 'window-sensor' },
+      { name: 'THERMOSTAT_WINDOW_FEATURE', value: windowParam },
       { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'heater-switch' },
     ],
   };
@@ -697,6 +697,29 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
     const selectors = await mod.getWindowSelectors.call({ gladys, windowSelectorsCache: null });
 
     expect([...selectors]).to.deep.equal(['window-sensor']);
+  });
+
+  it('should expose every window of a thermostat watching several', async () => {
+    const mod = loadModule();
+    const { gladys } = buildGladys({ windowParam: '["salon-window","kitchen-door"]' });
+
+    const selectors = await mod.getWindowSelectors.call({ gladys, windowSelectorsCache: null });
+
+    expect([...selectors]).to.deep.equal(['salon-window', 'kitchen-door']);
+  });
+
+  // Any of the openings of an open-plan floor stops its heating (A.1.1).
+  it('should cut the switch when any of several windows opens', async () => {
+    const mod = loadModule();
+    const { gladys, setValue } = buildGladys({ windowParam: '["salon-window","kitchen-door"]' });
+
+    await mod.onDeviceNewState.call(
+      { gladys, openWindows: new Set() },
+      { device_feature: 'kitchen-door', last_value: 0 },
+    );
+
+    assert.calledOnce(setValue);
+    expect(setValue.firstCall.args[2]).to.equal(0);
   });
 
   it('should return an empty set when no thermostat configures a window', async () => {

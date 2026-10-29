@@ -673,6 +673,28 @@ describe('thermostat pilot wire: regulated by Gladys on a room sensor', () => {
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
   });
 
+  it('should regulate on the average of its room probes', async () => {
+    // 15 °C by the window and 23 °C by the stove: 19 °C on average, above eco's
+    // 18 °C (A.1.1). The first probe alone would have asked for comfort.
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 15 });
+    const { get } = gladys.device;
+    gladys.device.get = fake((query) =>
+      query && query.device_feature_selectors === 'stove-temp-sensor'
+        ? Promise.resolve([{ selector: 'stove', features: [{ selector: 'stove-temp-sensor', last_value: 23 }] }])
+        : get(query),
+    );
+
+    await regulate(
+      mod,
+      gladys,
+      pilotWireDevice('eco', { THERMOSTAT_TEMPERATURE_FEATURE: '["temp-sensor","stove-temp-sensor"]' }),
+    );
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+  });
+
   it('should send off without reading the sensor', async () => {
     const mod = load(fullDaySchedule('off'));
     const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 15 });

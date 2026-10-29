@@ -9,6 +9,7 @@ const { applySchedules } = require('./thermostat.applySchedules');
 const {
   onDeviceNewState,
   onExternalSetpointChanged,
+  onExternalPowerChanged,
   primeObservedSetpoints,
   getTargetSelectors,
   getWindowSelectors,
@@ -31,10 +32,17 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.applyTimer = null;
+  // Whether the service runs, set by its start() and stop(). Every in-tree
+  // service sits in the stateManager whatever its status, so finding it there
+  // says nothing: a scene switching schedules while the integration was stopped
+  // went through, and its regulation pass could switch a relay on with no
+  // minute loop left to switch it off.
+  this.running = false;
   // Derived from this service's devices, rebuilt lazily and dropped whenever a
   // thermostat device is created, updated or deleted.
   this.windowSelectorsCache = null;
   this.targetSelectorsCache = null;
+  this.powerSelectorsCache = null;
   // The last setpoint this service wrote on each real thermostat, by selector.
   // The write is reported back as a NEW_STATE, and without this mark that report
   // would be taken for a change made on the device and arm a manual hold — so a
@@ -49,6 +57,11 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // setpoint the schedule had already set, and without this map that unchanged
   // value would be taken for someone turning the dial (section D).
   this.observedSetpoints = new Map();
+  // The same two marks for the power of the real devices (C.0.1): a unit switched
+  // off or on from its own remote stops or starts the thermostat, while the
+  // reports of the powers this service wrote are its own.
+  this.selfWrittenPowers = new Map();
+  this.observedPowers = new Map();
   // The programme preset last announced to the dashboards, by thermostat
   // selector: the minute loop pushes one only when the point in force changes.
   this.announcedPresets = new Map();
@@ -70,6 +83,7 @@ ThermostatHandler.prototype.detachScheduleFromDevice = detachScheduleFromDevice;
 ThermostatHandler.prototype.applySchedules = applySchedules;
 ThermostatHandler.prototype.onDeviceNewState = onDeviceNewState;
 ThermostatHandler.prototype.onExternalSetpointChanged = onExternalSetpointChanged;
+ThermostatHandler.prototype.onExternalPowerChanged = onExternalPowerChanged;
 ThermostatHandler.prototype.primeObservedSetpoints = primeObservedSetpoints;
 ThermostatHandler.prototype.getTargetSelectors = getTargetSelectors;
 ThermostatHandler.prototype.getWindowSelectors = getWindowSelectors;

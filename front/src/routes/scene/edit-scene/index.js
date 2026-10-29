@@ -10,6 +10,7 @@ import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
 import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { findMissingRequiredField, hasIntegrationSteps } from './sceneIntegrations';
+import { sortRanges } from './triggers/TimeRangesTrigger';
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -477,8 +478,40 @@ class EditScene extends Component {
     // Serialize the scene before the request: the local state can change while it is in
     // flight (and the "active" switch patches the scene on its own), so snapshotting the
     // state afterwards would display "saved" for data this request never sent
-    const savedSceneSnapshot = JSON.stringify(this.state.scene);
-    const sceneToSave = JSON.parse(savedSceneSnapshot);
+    const sceneSnapshotBeforeSave = JSON.stringify(this.state.scene);
+    const sceneToSave = JSON.parse(sceneSnapshotBeforeSave);
+    // A "time-range" trigger is checked here, where the message can be translated: an
+    // incomplete range was dropped without a word, and one starting and ending at the same
+    // time reached the user as the server's English refusal. The ranges are sorted on the
+    // way out only (sortRanges).
+    const timeRangeTriggers = (sceneToSave.triggers || []).filter(trigger => trigger.time_ranges);
+    // A trigger whose every row was deleted shows the "no range" box: the server refuses it
+    // too, in English only.
+    if (timeRangeTriggers.some(trigger => trigger.time_ranges.length === 0)) {
+      this.setState({
+        error: true,
+        errorMessage: null,
+        errorMessageId: 'editScene.triggersCard.scheduledTrigger.noRangeError',
+        errorMessageFields: {}
+      });
+      return;
+    }
+    if (
+      timeRangeTriggers.some(trigger =>
+        trigger.time_ranges.some(range => !range.start || !range.end || range.start === range.end)
+      )
+    ) {
+      this.setState({
+        error: true,
+        errorMessage: null,
+        errorMessageId: 'editScene.triggersCard.scheduledTrigger.invalidRangesError',
+        errorMessageFields: {}
+      });
+      return;
+    }
+    timeRangeTriggers.forEach(trigger => {
+      trigger.time_ranges = sortRanges(trigger.time_ranges);
+    });
     // the declaration catalog is still unknown (request pending or failed):
     // an integration card cannot be validated, so the save retries the
     // request once and refuses rather than persisting an unchecked required
@@ -519,7 +552,27 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false, errorMessage: null, errorMessageId: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
-      this.setState({ savedSceneSnapshot });
+      // The snapshot is the payload actually sent, not the state it was built from: the
+      // ranges were sorted on the way, and comparing against the unsorted state would leave
+      // the editor thinking it has unsaved changes forever. The state itself is realigned on
+      // what was persisted, so the rows take their saved order — unless the user edited the
+      // scene while the request was in flight, in which case their edits win and only the
+      // snapshot moves.
+      this.setState(prevState => {
+        const savedScene = { ...sceneToSave };
+        // "active" has its own route: the switch may have been flipped, and persisted, while
+        // this request was in flight. Our payload then carries the value from before the
+        // flip, and writing it to the snapshot would show an unsaved change although both
+        // requests succeeded. The snapshot always holds what the server last acknowledged,
+        // so that value is the one kept.
+        if (prevState.savedSceneSnapshot) {
+          savedScene.active = JSON.parse(prevState.savedSceneSnapshot).active;
+        }
+        const savedSceneSnapshot = JSON.stringify(savedScene);
+        return JSON.stringify(prevState.scene) === sceneSnapshotBeforeSave
+          ? { scene: savedScene, savedSceneSnapshot }
+          : { savedSceneSnapshot };
+      });
     } catch (e) {
       console.error(e);
       let errorMessage = null;
@@ -1475,6 +1528,22 @@ class EditScene extends Component {
     }
   };
 
+  getThermostatSchedules = async () => {
+    // selector -> name: a collapsed "Change the thermostats' schedule" card
+    // showed the selector, a slug plus a timestamp plus a random suffix. Without
+    // the thermostat integration the request fails, and the selector stays.
+    try {
+      const schedules = await this.props.httpClient.get('/api/v1/service/thermostat/schedule');
+      const thermostatSchedules = {};
+      (schedules || []).forEach(schedule => {
+        thermostatSchedules[schedule.selector] = schedule.name;
+      });
+      this.setState({ thermostatSchedules });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getTags = async () => {
     try {
       const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
@@ -1494,6 +1563,7 @@ class EditScene extends Component {
       triggersVariables: [],
       sceneIntegrations: null,
       deviceFeatures: null,
+      thermostatSchedules: null,
       runningScenes: [],
       now: Date.now()
     };
@@ -1504,6 +1574,7 @@ class EditScene extends Component {
     this.getSceneBySelector();
     this.getSceneIntegrations();
     this.getDeviceFeatures();
+    this.getThermostatSchedules();
     this.getTags();
     this.getRunningScenes();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
@@ -1544,6 +1615,7 @@ class EditScene extends Component {
       triggersVariables,
       sceneIntegrations,
       deviceFeatures,
+      thermostatSchedules,
       tags,
       askDeleteScene,
       runningScenes,
@@ -1579,6 +1651,7 @@ class EditScene extends Component {
             triggersVariables={triggersVariables}
             sceneIntegrations={sceneIntegrations}
             deviceFeatures={deviceFeatures}
+            thermostatSchedules={thermostatSchedules}
             setVariables={this.setVariables}
             setVariablesTrigger={this.setVariablesTrigger}
             switchActiveScene={this.switchActiveScene}

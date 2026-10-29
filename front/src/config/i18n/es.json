@@ -940,6 +940,25 @@
         "scheduleLabel": "Programación:",
         "scheduleUntil": "hasta",
         "manualUntil": "hasta",
+        "untilTomorrow": "mañana",
+        "untilDays": {
+          "0": "el lunes",
+          "1": "el martes",
+          "2": "el miércoles",
+          "3": "el jueves",
+          "4": "el viernes",
+          "5": "el sábado",
+          "6": "el domingo"
+        },
+        "untilNextDays": {
+          "0": "el próximo lunes",
+          "1": "el próximo martes",
+          "2": "el próximo miércoles",
+          "3": "el próximo jueves",
+          "4": "el próximo viernes",
+          "5": "el próximo sábado",
+          "6": "el próximo domingo"
+        },
         "cancelManual": "Cancelar el modo manual",
         "windowOpen": "Ventana abierta — calefacción suspendida",
         "windowOpenCooling": "Ventana abierta — refrigeración suspendida",
@@ -3635,6 +3654,8 @@
         "nameLabel": "Nombre",
         "namePlaceholder": "ej. Termostato del salón",
         "roomLabel": "Habitación",
+        "showAllRoomsLabel": "Mostrar los dispositivos de todas las habitaciones",
+        "showAllRoomsHelp": "Las listas de abajo solo ofrecen los dispositivos de esta habitación. Amplíalas cuando la zona calefactada abarca varias habitaciones, como un salón y una cocina abiertos.",
         "modeLabel": "Uso",
         "typeLabel": "Tipo de termostato",
         "tuningSection": "Ajuste fino",
@@ -3649,10 +3670,13 @@
         },
         "targetFeatureLabel": "Consigna del termostato real",
         "targetFeatureHelp": "La función en la que Gladys escribe la temperatura de consigna. Algunos dispositivos exponen varias (calefacción/refrigeración, ocupado/desocupado): elige la que realmente controla tu calefacción.",
-        "stateFeatureLabel": "Estado de calefacción (opcional)",
+        "stateFeatureLabel": "Estado de funcionamiento (opcional)",
         "stateFeatureHelp": "Se usa para mostrar si el dispositivo está funcionando. Se acepta como estado de funcionamiento o como contacto de caldera. Déjalo vacío si tu termostato no lo informa.",
         "modeFeatureLabel": "Modo de funcionamiento (opcional)",
-        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno. Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
+        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno — el modo de un aire acondicionado también sirve. En un termostato, Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo. El modo de un aire acondicionado no tiene Apagado: se detiene mediante su Alimentación, que entonces hay que indicar.",
+        "powerFeatureLabel": "Alimentación (opcional)",
+        "powerFeatureHelp": "El interruptor que enciende y apaga el dispositivo real, como la alimentación de un aire acondicionado o de una bomba de calor. Gladys lo apaga cuando el termostato se detiene, se abre una ventana o se aplica un tramo Apagado, y lo vuelve a encender en cuanto una consigna toma el relevo. Necesario para un aire acondicionado, cuyo modo no tiene apagado.",
+        "powerFeatureNeeded": "El modo de un aire acondicionado no tiene apagado: elige aquí su alimentación, o Gladys no podrá apagarlo cuando se abra una ventana, se aplique una franja Apagado o se detenga el termostato.",
         "mode": {
           "heating": "Calefacción",
           "cooling": "Refrigeración"
@@ -3674,14 +3698,19 @@
         "minTempPlaceholder": "ej. 5",
         "maxTempLabel": "Temp. máx.",
         "maxTempPlaceholder": "ej. 35",
-        "temperatureFeatureLabel": "Sensor de temperatura",
-        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "temperatureFeatureLabel": "Sensores de temperatura",
+        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente, o varios: el termostato usa entonces su media. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "addTemperatureFeature": "Añadir un sensor de temperatura",
         "humidityFeatureLabel": "Sensor de humedad",
         "humidityFeatureHelp": "Opcional. Se muestra en el widget del termostato.",
         "switchFeatureLabel": "Interruptor (actuador)",
         "switchFeatureHelp": {
           "heating": "El interruptor que se encenderá y apagará para calentar la habitación.",
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
+        },
+        "noSwitchHint": {
+          "heating": "No hay ningún interruptor para elegir. Muestra arriba los dispositivos de todas las habitaciones o, para un termostato o una bomba de calor que se regula sola, elige el tipo «Termostato real».",
+          "cooling": "No hay ningún interruptor para elegir. Un aire acondicionado se regula solo: elige el tipo «Termostato real» y luego su consigna. Un ventilador o un climatizador en un enchufe puede seguir siendo un termostato virtual."
         },
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
         "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado…) en lugar de cortar su alimentación. Desactive primero el programa propio del módulo.",
@@ -3690,11 +3719,13 @@
           "heater": "Cada preajuste envía la orden elegida en la tabla de preajustes (eco → eco, ausencia → antihielo…). El sensor de ambiente, si lo hay, solo sirve para mostrar la temperatura.",
           "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar, antihielo una vez alcanzada la consigna del preajuste. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
         },
-        "windowFeatureLabel": "Sensor de apertura de ventana",
+        "windowFeatureLabel": "Sensores de apertura de ventana",
         "windowFeatureHelp": {
-          "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",
-          "cooling": "Opcional. Si una ventana está abierta, la refrigeración se corta automáticamente."
+          "heating": "Opcional. En cuanto una de las ventanas seleccionadas está abierta, la calefacción se corta automáticamente.",
+          "cooling": "Opcional. En cuanto una de las ventanas seleccionadas está abierta, la refrigeración se corta automáticamente."
         },
+        "addWindowFeature": "Añadir un sensor de apertura",
+        "removeFeature": "Quitar",
         "hysteresisStartLabel": "Umbral de arranque",
         "hysteresisStartHelp": {
           "heating": "La calefacción se enciende cuando la temperatura está por debajo de (consigna − umbral de arranque). Ej. consigna 21 °C, umbral 0,5 °C → se enciende por debajo de 20,5 °C.",
@@ -3739,7 +3770,10 @@
         "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual.",
         "modeHelp": "Lo que controla este termostato: calefacción o climatización.",
         "sectionDevice": "Dispositivo",
-        "sectionHeating": "Calefacción",
+        "section": {
+          "heating": "Calefacción",
+          "cooling": "Refrigeración"
+        },
         "sectionProgramming": "Programación",
         "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Usar estos valores",
@@ -4127,6 +4161,11 @@
         "houseLabel": "Vivienda",
         "alarmModeLabel": "Modo de alarma"
       },
+      "thermostatSetSchedule": {
+        "description": "Esta acción hace que los termostatos seleccionados sigan otro horario, por ejemplo para pasar del horario habitual al de las vacaciones escolares. El termostato sigue el horario de inmediato: se cancela una consigna manual en curso, pero un termostato apagado a mano sigue apagado.",
+        "scheduleLabel": "Horario",
+        "thermostatsLabel": "Termostatos"
+      },
       "alarmSetMode": {
         "description": "Esta acción establecerá la vivienda seleccionada en el modo de alarma seleccionado.",
         "houseLabel": "Vivienda",
@@ -4187,6 +4226,13 @@
           "inferior": "menor que",
           "inferiorOrEqual": "menor o igual que"
         }
+      },
+      "inTimeRange": {
+        "label": "Continuar solo si",
+        "inRange": "Estamos dentro de una franja horaria",
+        "outOfRange": "Estamos fuera de las franjas horarias",
+        "description": "Esta condición usa las franjas horarias del disparador «Franjas horarias» de la escena. Colócala en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final, con una sola escena.",
+        "noTrigger": "Esta escena no tiene un disparador programado «franjas horarias»: esta condición la detendrá cada vez."
       }
     },
     "actions": {
@@ -4228,7 +4274,8 @@
         "only-continue-if": "Condición sobre variables",
         "check-time": "Condición de hora",
         "if-then-else": "Condición: Si...entonces...si no...",
-        "while": "Bucle: Mientras... repetir..."
+        "while": "Bucle: Mientras... repetir...",
+        "in-time-range": "Planificación horaria"
       },
       "user": {
         "set-seen-at-home": "Usuario visto en casa",
@@ -4251,6 +4298,9 @@
       "alarm": {
         "check-alarm-mode": "Si la alarma está en el modo",
         "set-alarm-mode": "Establecer el modo de alarma a"
+      },
+      "thermostat": {
+        "set-schedule": "Cambiar el horario de los termostatos"
       },
       "mqtt": {
         "send": "Enviar mensaje MQTT"
@@ -4309,7 +4359,8 @@
         "if-then-else": "Seguir una ruta diferente según una condición",
         "only-continue-if": "Detener la escena aquí si no se cumple la condición",
         "while": "Repetir acciones mientras una condición sea verdadera",
-        "check-time": "Continuar solo en determinados horarios o días"
+        "check-time": "Continuar solo en determinados horarios o días",
+        "in-time-range": "Continuar solo si estamos dentro de una de las franjas horarias del disparador"
       },
       "user": {
         "check-presence": "Marcar a un usuario como ausente si no se le ha visto recientemente",
@@ -4340,6 +4391,9 @@
       },
       "http": {
         "request": "Llamar a una API o servicio externo"
+      },
+      "thermostat": {
+        "set-schedule": "Hacer que los termostatos sigan otro horario semanal"
       },
       "mqtt": {
         "send": "Publicar un mensaje en el broker MQTT"
@@ -4564,7 +4618,32 @@
           "saturday": "Sábado",
           "sunday": "Domingo"
         },
-        "house": "Vivienda"
+        "house": "Vivienda",
+        "timeRange": "Franjas horarias",
+        "timeRangesLabel": "Franjas horarias",
+        "noTimeRange": "Todavía no hay ninguna franja horaria. Añade una para definir la planificación.",
+        "addRange": "Añadir una franja",
+        "deleteRange": "Eliminar la franja",
+        "rangeStart": "Inicio",
+        "rangeEnd": "Fin",
+        "rangeDuration": "Duración",
+        "rangeDays": "Días",
+        "overnight": "+1d",
+        "emptyRange": "Franja no válida",
+        "resumeOnStartup": "Reevaluar al iniciar Gladys",
+        "timeRangesHelp": "La escena se ejecuta al inicio y al final de cada franja. Usa la acción «Planificación horaria» en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final. Si «Reevaluar al iniciar Gladys» está marcado, la escena también se ejecuta al arrancar con el estado real de la planificación, para que tus dispositivos vuelvan al estado correcto tras un corte.",
+        "daysOfTheWeekShort": {
+          "monday": "LU",
+          "tuesday": "MA",
+          "wednesday": "MI",
+          "thursday": "JU",
+          "friday": "VI",
+          "saturday": "SÁ",
+          "sunday": "DO"
+        },
+        "lastDayLocked": "Debe quedar al menos un día seleccionado.",
+        "invalidRangesError": "Complete o elimine las franjas horarias de la escena: cada una necesita un inicio y un fin, que no pueden ser a la misma hora.",
+        "noRangeError": "Añada al menos una franja horaria al disparador «Franjas horarias», o elimine el disparador."
       },
       "warning": {
         "houseWithoutCoordinate": "Su vivienda no tiene coordenadas. Este activador no puede funcionar sin estos datos. Vaya a Configuración / Viviendas y haga clic en el mapa para establecer las coordenadas de la vivienda."
@@ -5175,9 +5254,12 @@
     "statusColumn": "Estado",
     "userRsaKey": "Clave RSA:",
     "userEcdsaKey": "Clave ECDSA:",
+    "userAccepted": "Autorizado",
+    "userKeysChanged": "Claves modificadas",
+    "userWaitingForAuthorization": "Pendiente de autorización",
     "usersListDescription": "Esta lista está sincronizada con sus usuarios de Gladys Plus. Para que un usuario (incluido usted mismo) pueda acceder a su instancia de forma remota, debe autorizarlo aquí activando el interruptor junto a su nombre.",
     "usersListWhyAcceptDescription": "<b>¿Por qué este paso?</b> Cada usuario de Gladys Plus tiene sus propias claves de cifrado, cuyas huellas se muestran a continuación. Al autorizar a un usuario, usted valida localmente, en su instancia, que sus claves son aceptadas: esta validación local es lo que protege su hogar contra ataques de intermediario (man-in-the-middle). Nadie, ni siquiera los servidores de Gladys Plus, puede conceder acceso a su instancia sin esta validación realizada en su hogar.",
-    "usersListRevokedDescription": "Si las claves de un usuario cambian (por ejemplo, cuando se restablece su autenticación de dos factores), su acceso se revoca automáticamente por seguridad: deberá volver a autorizarlo aquí. Para eliminar a un usuario, vaya a la página de gestión de usuarios de Gladys Plus.",
+    "usersListRevokedDescription": "Las claves de un usuario cambian cuando restablece su contraseña de Gladys Plus. Su acceso se revoca entonces automáticamente por seguridad y aparece como \"Claves modificadas\": compruebe con él que las nuevas huellas coinciden con las mostradas en su página de Gladys Plus y vuelva a autorizarlo aquí. Para eliminar a un usuario, vaya a la página de gestión de usuarios de Gladys Plus.",
     "disconnectTitle": "Desconectar su cuenta Plus",
     "disconnectButton": "Desconectar",
     "gatewayConnectedSuccessTitle": "¡Gladys Plus conectado correctamente!",
@@ -5395,7 +5477,6 @@
     "wrongCredentials": "Correo electrónico o contraseña incorrectos.",
     "invalidEmail": "Correo electrónico no válido",
     "networkError": "Error de red: ¿está seguro de que su instancia de Gladys está conectada a Internet?",
-    "userNotAcceptedLocally": "Su usuario no está aceptado localmente; vuelva a su instancia de Gladys y permita el acceso a este usuario en la configuración.",
     "gatewayNoInstanceFound": "No se encontró ninguna instancia. Primero debe conectar su instancia a Gladys.",
     "gatewayAccessBilling": "Para acceder a la facturación, haga clic aquí.",
     "unknownError": "Se produjo un error desconocido. Póngase en contacto con nosotros para obtener más información.",
@@ -6103,6 +6184,15 @@
         },
         "preset": {
           "0": "Programación",
+          "1": "Antihielo",
+          "2": "Ausencia",
+          "3": "Eco",
+          "4": "Noche",
+          "5": "Confort"
+        },
+        "active-preset": {
+          "unknown": "{{value}} (desconocido)",
+          "0": "Apagado",
           "1": "Antihielo",
           "2": "Ausencia",
           "3": "Eco",
@@ -6910,6 +7000,7 @@
       "target-temperature": "Temperatura del termostato",
       "mode": "Modo del termostato",
       "preset": "Preajuste del termostato",
+      "active-preset": "Preajuste activo del termostato",
       "operating-state": "Estado de funcionamiento del termostato"
     },
     "airquality-sensor": {
@@ -7144,7 +7235,18 @@
     "noInstanceFoundTutorialLink": "¿Necesita una guía paso a paso con capturas de pantalla? <a href=\"https://gladysassistant.com/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Consulte el tutorial en nuestra documentación</a>.",
     "noInstanceFoundNote": "¿Ya completó este paso anteriormente? A veces es necesario repetirlo, por ejemplo cuando se restableció su autenticación de doble factor (2FA): simplemente vuelva a iniciar sesión en la pestaña \"Gladys Plus\" de su instancia. ¿Necesita ayuda? Contáctenos en <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Se produjo un error. ¿Está seguro de que su usuario está aceptado localmente en su instancia de Gladys?",
-    "errorNotAcceptedLocally": "El usuario todavía no ha sido autorizado localmente en la instancia de Gladys. En su instancia local, vaya a la configuración, pestaña \"Gladys Plus\", sección \"Usuarios remotos\", y active el interruptor junto a su nombre.",
+    "keysChangedTitle": "Su acceso debe autorizarse de nuevo",
+    "keysChangedIntro": "Sus claves de cifrado de Gladys Plus han cambiado desde que su instancia de Gladys las autorizó. Es normal después de restablecer su contraseña de Gladys Plus (\"Olvidé mi contraseña\"): se generan nuevas claves. Por seguridad, su instancia rechaza cualquier clave que no haya validado ella misma. No hay nada roto: solo tiene que volver a autorizar a su usuario, desde su domicilio.",
+    "notAcceptedTitle": "Su acceso debe ser autorizado",
+    "notAcceptedIntro": "Su cuenta de Gladys Plus está vinculada a su instancia de Gladys, pero su usuario no está (o ya no está) autorizado para acceder a ella a distancia. Por seguridad, cada usuario de Gladys Plus debe ser autorizado desde la propia instancia, en su domicilio: nadie, ni siquiera los servidores de Gladys Plus, puede acceder a su hogar sin esta validación.",
+    "notAcceptedUnknownReasonIntro": "Su instancia de Gladys no ha autorizado (o ya no autoriza) a su usuario a acceder a ella a distancia. Es normal la primera vez, pero también después de restablecer su contraseña de Gladys Plus: se generan nuevas claves de cifrado y su instancia debe validarlas de nuevo. Por seguridad, esta autorización solo puede hacerse desde la propia instancia, en su domicilio.",
+    "notAcceptedAskAdmin": "Solo un administrador de su instancia de Gladys puede autorizar su acceso. Si usted no lo es, pida a la persona que gestiona Gladys en su domicilio que siga estos pasos.",
+    "notAcceptedStepAcceptUser": "En la sección \"<b>Usuarios remotos</b>\", compruebe que las huellas de las claves mostradas junto a su nombre coinciden con las de abajo y, a continuación, <b>active el interruptor</b>.",
+    "notAcceptedFingerprintsLabel": "Huellas de sus claves de cifrado:",
+    "rsaKeyFingerprint": "Clave RSA:",
+    "ecdsaKeyFingerprint": "Clave ECDSA:",
+    "stillNotAccepted": "Su usuario todavía no está autorizado. Compruebe que el interruptor junto a su nombre está activado en su instancia y vuelva a intentarlo.",
+    "notAcceptedRetryButton": "Mi usuario está autorizado, volver a intentarlo",
     "saveButton": "Guardar",
     "manageBillingLink": "Gestionar mi suscripción y facturas",
     "logoutButton": "Cerrar sesión"

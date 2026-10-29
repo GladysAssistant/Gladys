@@ -1,8 +1,11 @@
+import { parseSelectorList } from '../../../../../server/utils/thermostatSelectorList';
+
 // How each THERMOSTAT_* device param maps onto the config the widget reads.
 // Declaring it once removes the ninety lines of near-identical ternaries this
 // used to be, and keeps the param names in a single place.
 const PARAM_FIELDS = [
-  ['temperature_feature', 'THERMOSTAT_TEMPERATURE_FEATURE'],
+  // One sensor or several (spec A.1.1): the widget shows their average.
+  ['temperature_features', 'THERMOSTAT_TEMPERATURE_FEATURE', parseSelectorList],
   ['humidity_feature', 'THERMOSTAT_HUMIDITY_FEATURE'],
   ['switch_feature', 'THERMOSTAT_SWITCH_FEATURE'],
   ['pilot_wire_feature', 'THERMOSTAT_PILOT_WIRE_FEATURE'],
@@ -19,7 +22,9 @@ const PARAM_FIELDS = [
   ['target_feature', 'THERMOSTAT_TARGET_FEATURE'],
   ['state_feature', 'THERMOSTAT_STATE_FEATURE'],
   ['mode_feature', 'THERMOSTAT_MODE_FEATURE'],
-  ['window_feature', 'THERMOSTAT_WINDOW_FEATURE'],
+  ['power_feature', 'THERMOSTAT_POWER_FEATURE'],
+  // Any of several opening sensors open suspends the heating (spec A.1.1).
+  ['window_features', 'THERMOSTAT_WINDOW_FEATURE', parseSelectorList],
   // The manual hold: the setpoint held by hand, and when it gives the thermostat
   // back to its programme. Empty expiry means a permanent hold, which is what a
   // thermostat that follows no schedule gets.

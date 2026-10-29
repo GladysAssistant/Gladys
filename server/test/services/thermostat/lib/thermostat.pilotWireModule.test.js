@@ -271,6 +271,21 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     frostWritten(handler);
   });
 
+  it('should take nothing while any of its windows is open', async () => {
+    // Several openings may stop one heater (A.1.1): the kitchen door, which
+    // cannot be found, is closed for all the loop knows, but the window is open.
+    const mod = loadListener();
+    const handler = buildHandler(
+      thermostat({ params: { THERMOSTAT_WINDOW_FEATURE: '["kitchen-door","window-sensor"]' } }),
+      { window: 0, carried: PILOT_WIRE_MODE.ECO },
+    );
+
+    await press(mod, handler, PILOT_WIRE_MODE.ECO);
+
+    assert.notCalled(handler.setValue);
+    frostWritten(handler);
+  });
+
   it('should take the order once the window is closed', async () => {
     const mod = loadListener();
     const handler = buildHandler(thermostat({ params: { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' } }), {

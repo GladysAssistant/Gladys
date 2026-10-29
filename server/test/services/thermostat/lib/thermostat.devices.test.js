@@ -59,7 +59,7 @@ describe('thermostat.getDevices', () => {
 });
 
 // A thermostat now carries its state on features: the setpoint plus preset,
-// mode and operating-state, built by the integration rather than taken from the
+// active preset, mode and operating-state, built by the integration rather than taken from the
 // payload.
 const featureTypes = (created) => created.features.map((feature) => feature.type);
 
@@ -96,6 +96,25 @@ describe('thermostat.createDevice', () => {
 
     const presetFeature = created.features.find((f) => f.type === DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
     expect(presetFeature.external_id).to.equal('thermostat:salon-1790516383228:preset');
+  });
+
+  it('should carry the preset in force on a read-only feature', async () => {
+    // The external_id is the one the migration gives the thermostats created
+    // before this feature existed: their next save matches it instead of adding
+    // a second one.
+    const handler = buildHandler();
+
+    const created = await handler.createDevice({
+      name: 'Salon',
+      external_id: 'thermostat:salon',
+      features: [setpointFeature],
+    });
+
+    const activePreset = created.features.find((f) => f.type === DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET);
+    expect(activePreset.external_id).to.equal('thermostat:salon:active-preset');
+    expect(activePreset.read_only).to.equal(true);
+    expect(activePreset.min).to.equal(0);
+    expect(activePreset.max).to.equal(5);
   });
 
   it('should keep the same state feature ids once the device has a selector', async () => {
@@ -141,7 +160,13 @@ describe('thermostat.createDevice', () => {
       features: [{ category: 'light', type: 'binary' }, setpointFeature],
     });
 
-    expect(featureTypes(created)).to.deep.equal(['target-temperature', 'preset', 'mode', 'operating-state']);
+    expect(featureTypes(created)).to.deep.equal([
+      'target-temperature',
+      'preset',
+      'active-preset',
+      'mode',
+      'operating-state',
+    ]);
   });
 
   it('should keep a single setpoint feature', async () => {
@@ -177,6 +202,20 @@ describe('thermostat.createDevice', () => {
     expect(names).to.include('THERMOSTAT_MANUAL_SETPOINT');
     expect(names).to.include('THERMOSTAT_MANUAL_UNTIL');
     expect(created.params.find((param) => param.name === 'THERMOSTAT_MANUAL_SETPOINT').value).to.equal('21.5');
+  });
+
+  // Wiped by a save, a stop made on the unit was never lifted at the next point.
+  it('should carry the end of a stop made on the unit over a save', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([
+      { selector: 'living-room', params: [{ name: 'THERMOSTAT_REMOTE_STOP_UNTIL', value: '1792000000000' }] },
+    ]);
+
+    const created = await handler.createDevice({ name: 'Salon', selector: 'living-room', features: [setpointFeature] });
+
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_REMOTE_STOP_UNTIL').value).to.equal(
+      '1792000000000',
+    );
   });
 
   it('should let the caller clear a hold explicitly', async () => {
@@ -405,7 +444,7 @@ describe('thermostat.createDevice - external', () => {
     { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
   ];
 
-  it('should carry the preset and the mode, and nothing else of its own', async () => {
+  it('should carry the presets and the mode, and nothing else of its own', async () => {
     const handler = buildHandler();
 
     const created = await handler.createDevice({ name: 'Netatmo', params: externalParams });
@@ -414,7 +453,7 @@ describe('thermostat.createDevice - external', () => {
     // the mode are Gladys's own: no thermostat publishes Gladys's presets, and
     // "stopped by Gladys" is a decision this service takes — a Netatmo does not
     // even expose a mode of its own.
-    expect(featureTypes(created)).to.deep.equal(['preset', 'mode']);
+    expect(featureTypes(created)).to.deep.equal(['preset', 'active-preset', 'mode']);
     expect(created.service_id).to.equal('service-id');
   });
 
@@ -428,7 +467,7 @@ describe('thermostat.createDevice - external', () => {
       params: externalParams,
     });
 
-    expect(featureTypes(created)).to.deep.equal(['preset', 'mode']);
+    expect(featureTypes(created)).to.deep.equal(['preset', 'active-preset', 'mode']);
   });
 
   // A pilot-wire thermostat is a heater regulating itself (C.1.1): driven by
@@ -460,12 +499,14 @@ describe('thermostat.createDevice - external', () => {
     const created = await buildHandler().createDevice(
       pilotWireHeater([
         { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+        { name: 'THERMOSTAT_POWER_FEATURE', value: 'ac-power' },
         { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'heater-switch' },
         { name: 'THERMOSTAT_MODE', value: 'cooling' },
       ]),
     );
 
     expect(created.params.find((param) => param.name === 'THERMOSTAT_TARGET_FEATURE').value).to.equal('');
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_POWER_FEATURE').value).to.equal('');
     expect(created.params.find((param) => param.name === 'THERMOSTAT_SWITCH_FEATURE').value).to.equal('');
     expect(created.params.find((param) => param.name === 'THERMOSTAT_MODE').value).to.equal('heating');
   });

@@ -97,6 +97,29 @@ describe('zigbee2mqtt setValue', () => {
     }
   });
 
+  it('set value on a device whose name contains "/"', async () => {
+    // PREPARE
+    zigbee2MqttManager.discoveredDevices['salon/lampe'] = {
+      friendly_name: 'salon/lampe',
+      definition: {
+        exposes: [
+          {
+            type: 'light',
+            features: [{ type: 'binary', name: 'state', property: 'state', value_on: 'ON', value_off: 'OFF' }],
+          },
+        ],
+      },
+    };
+    // EXECUTE
+    await zigbee2MqttManager.setValue(
+      { external_id: 'zigbee2mqtt:salon/lampe' },
+      { external_id: 'zigbee2mqtt:salon/lampe:light:binary:state', type: 'binary' },
+      0,
+    );
+    // ASSERT
+    assert.calledOnceWithExactly(mqttClient.publish, 'zigbee2mqtt/salon/lampe/set', '{"state":"OFF"}');
+  });
+
   it('set value bad topic', async () => {
     // EXECUTE
     try {

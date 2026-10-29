@@ -8,13 +8,14 @@ const passwordUtils = require('../../utils/password');
  * @description Update a user by his selector.
  * @param {string} selector - The user selector.
  * @param {object} newUser - The new user.
+ * @param {string} [currentSessionId] - Session the update comes from, kept when the password changes.
  * @returns {Promise} Return the updated user.
  * @example
  * gladys.user.updateBySelector('tony', {
  *    picture: 'xxx'
  * });
  */
-async function updateBySelector(selector, newUser) {
+async function updateBySelector(selector, newUser, currentSessionId = null) {
   const user = await db.User.findOne({
     where: {
       selector,
@@ -50,6 +51,12 @@ async function updateBySelector(selector, newUser) {
   }
 
   await user.update(newUser);
+
+  // a new password logs out every session of the user but the one it was changed from
+  if (newUser.password) {
+    await this.session.revokeLoginSessions(user.id, currentSessionId);
+  }
+
   const userPlain = user.get({ plain: true });
   this.stateManager.setState('user', user.selector, userPlain);
   const userPlainCopied = { ...userPlain };

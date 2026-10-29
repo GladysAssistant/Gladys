@@ -13,6 +13,28 @@ const DEFAULT_PRESET_TEMPS = {
   comfort: 21,
 };
 
+// The same presets for a thermostat that cools: Comfort at 21 °C was a cold
+// surprise on the first tap of an air conditioner. Frost protection becomes the
+// heat it must never let the room reach.
+const DEFAULT_COOLING_PRESET_TEMPS = {
+  frost: 30,
+  away: 28,
+  eco: 26,
+  night: 25,
+  comfort: 24,
+};
+
+/**
+ * @description The default preset temperatures for a thermostat's use.
+ * @param {string} mode - `heating` or `cooling` (THERMOSTAT_MODE param).
+ * @returns {object} The defaults, keyed by preset name, in °C.
+ * @example
+ * defaultPresetTemps('cooling').comfort; // 24
+ */
+function defaultPresetTemps(mode) {
+  return mode === 'cooling' ? DEFAULT_COOLING_PRESET_TEMPS : DEFAULT_PRESET_TEMPS;
+}
+
 // Fallback setpoint for a preset that is neither known nor configured.
 const FALLBACK_SETPOINT = 20;
 
@@ -139,6 +161,8 @@ function supportedPilotWireOrder(order, supportedOptions) {
 
 module.exports = {
   DEFAULT_PRESET_TEMPS,
+  DEFAULT_COOLING_PRESET_TEMPS,
+  defaultPresetTemps,
   FALLBACK_SETPOINT,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_HYSTERESIS_STOP,

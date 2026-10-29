@@ -360,6 +360,10 @@ function createActions(store) {
         [userIndex]: {
           accepted: {
             $set: value
+          },
+          // the server forgets it too once the user is accepted again
+          keys_changed: {
+            $set: false
           }
         }
       });
@@ -373,7 +377,10 @@ function createActions(store) {
           gatewaySwitchUserKeyStatus: RequestStatus.Success
         });
       } catch (e) {
+        // the instance did not save it: the switch and the status badge go back to
+        // what the instance actually enforces
         store.setState({
+          gatewayUsersKeys: state.gatewayUsersKeys,
           gatewaySwitchUserKeyStatus: RequestStatus.Error
         });
       }

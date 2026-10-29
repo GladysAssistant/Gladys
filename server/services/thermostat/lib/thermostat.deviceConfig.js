@@ -1,5 +1,5 @@
 const {
-  DEFAULT_PRESET_TEMPS,
+  defaultPresetTemps,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_HYSTERESIS_STOP,
   DEFAULT_TPI_CYCLE_TIME,
@@ -15,6 +15,7 @@ const {
   DEFAULT_PILOT_WIRE_ORDERS,
 } = require('../../../utils/thermostatConstants');
 const { THERMOSTAT_MODE, PILOT_WIRE_MODE } = require('../../../utils/constants');
+const { parseSelectorList } = require('../../../utils/thermostatSelectorList');
 
 const PILOT_WIRE_ORDERS = Object.values(PILOT_WIRE_MODE);
 
@@ -60,8 +61,12 @@ function buildParamsConfig(device) {
     const value = toNumber(getParam(`THERMOSTAT_PILOT_WIRE_ORDER_${preset.toUpperCase()}`), null);
     return PILOT_WIRE_ORDERS.includes(value) ? value : DEFAULT_PILOT_WIRE_ORDERS[preset];
   };
+  // A thermostat that cools aims higher: its presets default accordingly.
+  const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE') || DEFAULT_MODE);
+  // One sensor or several (A.1.1): the loop regulates on their average.
+  const temperatureFeatures = parseSelectorList(getParam('THERMOSTAT_TEMPERATURE_FEATURE'));
   return {
-    temperature_feature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || null,
+    temperature_features: temperatureFeatures,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
     switch_feature: getParam('THERMOSTAT_SWITCH_FEATURE') || null,
     pilot_wire_feature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || null,
@@ -69,7 +74,7 @@ function buildParamsConfig(device) {
     // A virtual one is Gladys, on its room sensor — without one there is nothing
     // to regulate on, and the heater regulates instead, as on a `pilot-wire` one.
     pilot_wire_regulation:
-      thermostatType === THERMOSTAT_TYPES.VIRTUAL && getParam('THERMOSTAT_TEMPERATURE_FEATURE')
+      thermostatType === THERMOSTAT_TYPES.VIRTUAL && temperatureFeatures.length > 0
         ? PILOT_WIRE_REGULATIONS.GLADYS
         : PILOT_WIRE_REGULATIONS.HEATER,
     pilot_wire_orders: Object.keys(DEFAULT_PILOT_WIRE_ORDERS).reduce(
@@ -78,13 +83,17 @@ function buildParamsConfig(device) {
     ),
     // External thermostats: the real device regulates itself. `target_feature`
     // is the setpoint Gladys writes, `state_feature` the heating state it reads
-    // back, `mode_feature` the optional operating mode. All three point at
-    // features owned by another integration (Netatmo, Zigbee, Matter, MQTT...).
+    // back, `mode_feature` the optional operating mode and `power_feature` the
+    // optional power of the appliance — how an air conditioner, whose mode has no
+    // off, is stopped. All of them point at features owned by another
+    // integration (Netatmo, Zigbee, Matter, MQTT, an air conditioner...).
     thermostat_type: thermostatType,
     target_feature: getParam('THERMOSTAT_TARGET_FEATURE') || null,
     state_feature: getParam('THERMOSTAT_STATE_FEATURE') || null,
     mode_feature: getParam('THERMOSTAT_MODE_FEATURE') || null,
-    window_feature: getParam('THERMOSTAT_WINDOW_FEATURE') || null,
+    power_feature: getParam('THERMOSTAT_POWER_FEATURE') || null,
+    // One opening sensor or several (A.1.1): any of them open stops the heating.
+    window_features: parseSelectorList(getParam('THERMOSTAT_WINDOW_FEATURE')),
     default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
     temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),
@@ -96,11 +105,11 @@ function buildParamsConfig(device) {
     // that unreachable, since `holdExpiry` can then never see the absence. The
     // callers that need a number apply the default themselves.
     manual_duration: toNumber(getParam('THERMOSTAT_MANUAL_DURATION'), null),
-    preset_frost: toNumber(getParam('THERMOSTAT_PRESET_FROST'), DEFAULT_PRESET_TEMPS.frost),
-    preset_away: toNumber(getParam('THERMOSTAT_PRESET_AWAY'), DEFAULT_PRESET_TEMPS.away),
-    preset_eco: toNumber(getParam('THERMOSTAT_PRESET_ECO'), DEFAULT_PRESET_TEMPS.eco),
-    preset_night: toNumber(getParam('THERMOSTAT_PRESET_NIGHT'), DEFAULT_PRESET_TEMPS.night),
-    preset_comfort: toNumber(getParam('THERMOSTAT_PRESET_COMFORT'), DEFAULT_PRESET_TEMPS.comfort),
+    preset_frost: toNumber(getParam('THERMOSTAT_PRESET_FROST'), presetDefaults.frost),
+    preset_away: toNumber(getParam('THERMOSTAT_PRESET_AWAY'), presetDefaults.away),
+    preset_eco: toNumber(getParam('THERMOSTAT_PRESET_ECO'), presetDefaults.eco),
+    preset_night: toNumber(getParam('THERMOSTAT_PRESET_NIGHT'), presetDefaults.night),
+    preset_comfort: toNumber(getParam('THERMOSTAT_PRESET_COMFORT'), presetDefaults.comfort),
     hysteresis_start: toNumber(getParam('THERMOSTAT_HYSTERESIS_START'), DEFAULT_HYSTERESIS_START),
     hysteresis_stop: toNumber(getParam('THERMOSTAT_HYSTERESIS_STOP'), DEFAULT_HYSTERESIS_STOP),
     tpi_cycle_time: toNumber(getParam('THERMOSTAT_TPI_CYCLE_TIME'), DEFAULT_TPI_CYCLE_TIME),

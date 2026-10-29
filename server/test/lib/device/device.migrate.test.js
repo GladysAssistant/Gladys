@@ -672,6 +672,58 @@ describe('Device.migrate', function Describe() {
     expect(param.value).to.equal('migration-destination-binary');
   });
 
+  // A thermostat may watch several windows and average several probes, stored as
+  // a JSON array (thermostat.md A.1.1): only the migrated entry is replaced.
+  it('should re-point the migrated entry of a thermostat sensor list in place', async () => {
+    const thermostat = await db.Device.create(
+      {
+        name: 'Migration thermostat',
+        selector: 'migration-thermostat',
+        external_id: 'thermostat:migration',
+        service_id: SEEDED_SERVICE_ID,
+        params: [
+          { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: '["other-probe","migration-source-temp"]' },
+          // A list that names no migrated feature is left untouched.
+          { name: 'THERMOSTAT_WINDOW_FEATURE', value: '["salon-window","kitchen-door"]' },
+        ],
+      },
+      { include: [{ model: db.DeviceParam, as: 'params' }] },
+    );
+
+    await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+    });
+
+    const params = await db.DeviceParam.findAll({ where: { device_id: thermostat.id }, raw: true });
+    const valueOf = (name) => params.find((param) => param.name === name).value;
+    expect(valueOf('THERMOSTAT_TEMPERATURE_FEATURE')).to.equal('["other-probe","migration-destination-temp"]');
+    expect(valueOf('THERMOSTAT_WINDOW_FEATURE')).to.equal('["salon-window","kitchen-door"]');
+  });
+
+  it('should re-point a sensor list padded with whitespace', async () => {
+    // Written through the API, the array may not start the value: it is still a
+    // list the thermostat reads, and the migrated entry must not be lost.
+    const thermostat = await db.Device.create(
+      {
+        name: 'Migration thermostat',
+        selector: 'migration-thermostat',
+        external_id: 'thermostat:migration',
+        service_id: SEEDED_SERVICE_ID,
+        params: [{ name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: ' ["other-probe","migration-source-temp"]' }],
+      },
+      { include: [{ model: db.DeviceParam, as: 'params' }] },
+    );
+
+    await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+    });
+
+    const [param] = await db.DeviceParam.findAll({ where: { device_id: thermostat.id }, raw: true });
+    expect(param.value).to.equal('["other-probe","migration-destination-temp"]');
+  });
+
   it('should migrate a device without features and with an empty mapping', async () => {
     await db.DeviceFeature.destroy({ where: { device_id: sourceDevice.id } });
     const result = await deviceManager.migrate('migration-source', {

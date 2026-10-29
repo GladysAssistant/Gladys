@@ -1,21 +1,22 @@
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES, THERMOSTAT_MODE } = require('../../../utils/constants');
 const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
+const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const {
-  buildParamsConfig,
-  toNumber,
-  isExternal,
-  getFeatureBySelector,
-  getRunningMode,
-} = require('./thermostat.deviceConfig');
-const {
-  writeExternalMode,
+  startExternalThermostat,
   stopExternalThermostat,
+  runningUnitFeatures,
+  unitFeature,
   getSetpointForPreset,
   convertSetpointToFeatureUnit,
   DEFAULT_TIMEZONE,
 } = require('./thermostat.applySchedules');
-const { getScheduleOfDevice, clearScheduleStop, clearModuleStop } = require('./thermostat.scheduleDevice');
+const {
+  getScheduleOfDevice,
+  clearScheduleStop,
+  clearRemoteStop,
+  clearModuleStop,
+} = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
 const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
 
@@ -78,16 +79,15 @@ async function writeSetpoint(device, deviceFeature, value) {
     return;
   }
   // A thermostat left switched off ignores a setpoint: asking for 21 °C on a
-  // device whose mode is OFF changes the number on its screen and nothing else.
-  // Hand the mode back first, so the setpoint this write carries means something.
-  if (config.mode_feature) {
-    await writeExternalMode(
-      this.gladys,
-      config.mode_feature,
-      getRunningMode(config),
-      `setValue ${value}, ${deviceFeature.selector}`,
-    );
-  }
+  // device whose mode is OFF, or whose power is off, changes the number on its
+  // screen and nothing else. Hand both back first, so the setpoint this write
+  // carries means something.
+  await startExternalThermostat(
+    this.gladys,
+    config,
+    `setValue ${value}, ${deviceFeature.selector}`,
+    this.selfWrittenPowers,
+  );
   // Mark it before writing: the device echoes the new value back as a NEW_STATE,
   // and the listener must not mistake our own write for a change made on the
   // thermostat itself.
@@ -102,6 +102,23 @@ async function writeSetpoint(device, deviceFeature, value) {
     this.selfWrittenSetpoints.delete(deviceFeature.selector);
     throw e;
   }
+}
+
+/**
+ * @description When a programme's next point falls, read in the Gladys timezone.
+ * A schedule's points are wall-clock times in the house (C.1), so the next one
+ * has to be found there — not in the timezone the process happens to run in,
+ * which is UTC in the official image. Reading them there put the expiry two
+ * hours off in Paris, and on the wrong point entirely across midnight.
+ * @param {Array} transitions - The programme's points.
+ * @returns {Promise<number|null>} The timestamp of the next point, or null with no point.
+ * @example
+ * await nextPointTimestamp.call(this, link.transitions);
+ */
+async function nextPointTimestamp(transitions) {
+  const timezone =
+    (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
+  return nextTransitionTimestamp(transitions, new Date(), timezone);
 }
 
 /**
@@ -132,14 +149,7 @@ async function holdExpiry(device) {
   if (configuredDuration !== null) {
     return Date.now() + configuredDuration * 60 * 1000;
   }
-  // A schedule's points are wall-clock times in the house (C.1), so the next one
-  // has to be found in the Gladys timezone — not in the one the process happens
-  // to run in, which is UTC in the official image. Reading them there put the
-  // expiry two hours off in Paris, and on the wrong point entirely across
-  // midnight.
-  const timezone =
-    (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
-  const nextTransition = nextTransitionTimestamp(link.transitions, new Date(), timezone);
+  const nextTransition = await nextPointTimestamp.call(this, link.transitions);
   if (nextTransition !== null) {
     return nextTransition;
   }
@@ -202,27 +212,35 @@ async function setValue(device, deviceFeature, value, manual = true) {
     const starting = isStopped(device) && Number(value) !== THERMOSTAT_MODE.OFF;
     await this.gladys.device.saveState(deviceFeature, value);
     // Whoever writes the mode now owns the stop, or the start: a stop the
-    // programme left behind is no longer the programme's to lift.
+    // programme, or the unit's remote, left behind is no longer theirs to lift.
     await clearScheduleStop(device.id);
+    await clearRemoteStop(device.id);
     await clearModuleStop(device.id);
     const config = buildParamsConfig(device) || {};
     if (Number(value) === THERMOSTAT_MODE.OFF) {
       // Stopping is not a preset with a setpoint: it cuts the switch on a
       // virtual thermostat, and stops the real one on an external device.
-      if (isExternal(config)) {
-        await stopExternalThermostat(this.gladys, config, `mode=off, ${device.selector}`, this.selfWrittenSetpoints);
+      // A unit another thermostat runs is left to it (runningUnitFeatures).
+      const sharedUnit =
+        unitFeature(config) !== null &&
+        runningUnitFeatures(await this.gladys.device.get({ service: 'thermostat' }), device.id).has(
+          unitFeature(config),
+        );
+      if (isExternal(config) && !sharedUnit) {
+        await stopExternalThermostat(
+          this.gladys,
+          config,
+          `mode=off, ${device.selector}`,
+          this.selfWrittenSetpoints,
+          this.selfWrittenPowers,
+        );
       }
       await clearManualHold.call(this, device);
-    } else if (starting && isExternal(config) && config.mode_feature) {
-      // The mode goes first in this direction too. Left to the next pass, it
-      // reached the appliance two seconds after the setpoint the widget sends
-      // right behind a start: a thermostat still off was handed a target to ignore.
-      await writeExternalMode(
-        this.gladys,
-        config.mode_feature,
-        getRunningMode(config),
-        `mode=${value}, ${device.selector}`,
-      );
+    } else if (starting && isExternal(config)) {
+      // The power and the mode go first in this direction too. Left to the next
+      // pass, they reached the appliance two seconds after the setpoint the widget
+      // sends right behind a start: a thermostat still off was handed a target to ignore.
+      await startExternalThermostat(this.gladys, config, `mode=${value}, ${device.selector}`, this.selfWrittenPowers);
     }
     logger.info(`Thermostat: mode ${value} set on ${device.selector}`);
     this.triggerApplySchedules();
@@ -250,4 +268,4 @@ async function setValue(device, deviceFeature, value, manual = true) {
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry, presetHoldSetpoint };
+module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint };

@@ -4,7 +4,11 @@ import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import stickyStyle from '../stickyActions.css';
 import { getPresetColor } from '../../../../../utils/thermostatPresetColors';
-import { DEVICE_FEATURE_UNITS, PILOT_WIRE_MODE } from '../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_UNITS,
+  PILOT_WIRE_MODE
+} from '../../../../../../../server/utils/constants';
 import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
 
 // The help text of each thermostat type, keyed by its value.
@@ -20,8 +24,8 @@ const PILOT_WIRE_ORDER_OPTIONS = [
   [PILOT_WIRE_MODE.COMFORT, 'comfort']
 ];
 
-const FeatureSelect = ({ value, features, onChange, emptyLabel }) => (
-  <select class="form-control" value={value} onChange={onChange}>
+const FeatureSelect = ({ value, features, onChange, emptyLabel, ariaLabel }) => (
+  <select class="form-control" value={value} onChange={onChange} aria-label={ariaLabel}>
     <option value="">{emptyLabel}</option>
     {features &&
       features.map(f => (
@@ -31,6 +35,62 @@ const FeatureSelect = ({ value, features, onChange, emptyLabel }) => (
       ))}
   </select>
 );
+
+// Several sensors for one thermostat (spec A.1.1): one select per sensor chosen,
+// and a last, empty one to add another. A chosen sensor leaves the lists of the
+// others, so the same window cannot be picked twice.
+const FeatureListSelect = ({ values, features, onChange, emptyLabel, addLabel, removeLabel }) => {
+  const selected = values || [];
+  const others = index => (features || []).filter(f => !selected.some((v, i) => i !== index && v === f.selector));
+  const replace = (index, selector) => {
+    const next = selected.slice();
+    if (selector) {
+      next[index] = selector;
+    } else {
+      next.splice(index, 1);
+    }
+    onChange(next);
+  };
+  // Each row is named after its sensor, so a screen reader can tell which one a
+  // remove button removes.
+  const labelOf = selector => {
+    const feature = (features || []).find(f => f.selector === selector);
+    return feature ? feature.label : selector;
+  };
+  return (
+    <div>
+      {selected.map((value, index) => (
+        <div class={cx('input-group', style.featureListRow)} key={index}>
+          <FeatureSelect
+            value={value}
+            features={others(index)}
+            onChange={e => replace(index, e.target.value)}
+            emptyLabel={emptyLabel}
+            ariaLabel={labelOf(value)}
+          />
+          <span class="input-group-append">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              title={`${removeLabel} : ${labelOf(value)}`}
+              aria-label={`${removeLabel} : ${labelOf(value)}`}
+              onClick={() => replace(index, '')}
+            >
+              <i class="fe fe-x" />
+            </button>
+          </span>
+        </div>
+      ))}
+      <FeatureSelect
+        value=""
+        features={others(-1)}
+        onChange={e => e.target.value && onChange([...selected, e.target.value])}
+        emptyLabel={selected.length === 0 ? emptyLabel : addLabel}
+        ariaLabel={addLabel}
+      />
+    </div>
+  );
+};
 
 // Rendered by the Save button rather than at the top of the form: it answers a
 // press on that button, and the form runs to several screens — at the top it was
@@ -95,6 +155,27 @@ const EditForm = ({ ...props }) => {
     return house ? `${schedule.name} (${house.name})` : schedule.name;
   };
 
+  // The pickers start from the thermostat's room (spec A.3): a house has hundreds
+  // of features, and choosing the salon's sensor meant scrolling past every other
+  // room's. A switch widens them all at once — an open-plan salon and kitchen
+  // heated as one, a heat pump whose device sits in another room. A feature
+  // already chosen stays listed whatever its room, or opening the form would
+  // silently blank it. Such a feature keeps its room in its label, so it cannot
+  // be mistaken for one of this room's.
+  const roomId = props.thermostatEditRoomId || '';
+  const narrowed = Boolean(roomId) && !props.thermostatEditShowAllRooms;
+  const roomNames = {};
+  (props.houses || []).forEach(house => (house.rooms || []).forEach(room => (roomNames[room.id] = room.name)));
+  const pickable = (features, kept) =>
+    (features || [])
+      .filter(feature => !narrowed || feature.roomId === roomId || kept.includes(feature.selector))
+      .map(feature =>
+        (!narrowed || feature.roomId !== roomId) && roomNames[feature.roomId]
+          ? { ...feature, label: `${roomNames[feature.roomId]} - ${feature.label}` }
+          : feature
+      );
+  const keep = value => (value ? [value] : []);
+
   const heatingPresets = ['frost', 'away', 'eco', 'night', 'comfort'];
   const coolingPresets = ['comfort'];
   const activePresets = mode === 'cooling' ? coolingPresets : heatingPresets;
@@ -115,6 +196,8 @@ const EditForm = ({ ...props }) => {
   // only writes the setpoint its schedule resolves. Hysteresis, TPI and the
   // switch are therefore hidden — offering them would suggest Gladys regulates
   // a device that regulates itself.
+  const switchChoices = pickable(props.switchFeatures, keep(props.thermostatEditSwitchFeature));
+  const pilotWireChoices = pickable(props.pilotWireFeatures, keep(props.thermostatEditPilotWireFeature));
   // A pilot-wire heater regulating itself takes no temperature: each preset
   // sends an order instead.
   const presetsAreOrders = isPilotWireThermostat;
@@ -144,7 +227,7 @@ const EditForm = ({ ...props }) => {
       <Localizer>
         <FeatureSelect
           value={props.thermostatEditPilotWireFeature || ''}
-          features={props.pilotWireFeatures}
+          features={pilotWireChoices}
           onChange={e => props.updateThermostatActuator('thermostatEditPilotWireFeature', e.target.value)}
           emptyLabel={<Text id="global.emptySelectOption" />}
         />
@@ -178,6 +261,12 @@ const EditForm = ({ ...props }) => {
   const pickedTarget = isExternalThermostat
     ? (props.targetFeatures || []).find(feature => feature.selector === props.thermostatEditTargetFeature)
     : null;
+  // An air conditioner's mode has no Off: without its power, nothing stops it
+  // (spec A.0.3). The field stays optional for a thermostat, which a mode stops.
+  const needsPower =
+    !!pickedTarget &&
+    pickedTarget.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+    !props.thermostatEditPowerFeature;
   const formUnit = props.thermostatEditTempUnit || 'C';
   const targetRange =
     pickedTarget &&
@@ -200,10 +289,52 @@ const EditForm = ({ ...props }) => {
 
   const chooseTargetFeature = event => {
     const selector = event.target.value;
+    const previous = (props.targetFeatures || []).find(
+      feature => feature.selector === props.thermostatEditTargetFeature
+    );
     props.updateThermostatField('thermostatEditTargetFeature', selector);
     const picked = (props.targetFeatures || []).find(feature => feature.selector === selector);
+    // The mode and power belong to the unit whose setpoint was picked: moving to
+    // another unit drops those of the previous one, or every pass would keep
+    // switching a unit the thermostat no longer drives.
+    let modeFeature = props.thermostatEditModeFeature;
+    let powerFeature = props.thermostatEditPowerFeature;
+    if (previous && (!picked || picked.deviceSelector !== previous.deviceSelector)) {
+      const ofPrevious = (features, value) =>
+        (features || []).some(
+          feature => feature.selector === value && feature.deviceSelector === previous.deviceSelector
+        );
+      if (ofPrevious(props.modeFeatures, modeFeature)) {
+        modeFeature = '';
+        props.updateThermostatField('thermostatEditModeFeature', '');
+      }
+      if (ofPrevious(props.powerFeatures, powerFeature)) {
+        powerFeature = '';
+        props.updateThermostatField('thermostatEditPowerFeature', '');
+      }
+    }
     if (!picked) {
       return;
+    }
+    // An air conditioner has one mode and one power, on the same device as its
+    // setpoint: they are suggested when the fields are still empty (spec A.0.3).
+    // Without the power, a heat pump can only be "stopped" by a setpoint it
+    // clamps to its own minimum and keeps heating to.
+    if (picked.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING) {
+      const sameUnit = features =>
+        (features || []).find(
+          feature =>
+            feature.deviceSelector === picked.deviceSelector &&
+            feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING
+        );
+      const unitMode = sameUnit(props.modeFeatures);
+      const unitPower = sameUnit(props.powerFeatures);
+      if (unitMode && !modeFeature) {
+        props.updateThermostatField('thermostatEditModeFeature', unitMode.selector);
+      }
+      if (unitPower && !powerFeature) {
+        props.updateThermostatField('thermostatEditPowerFeature', unitPower.selector);
+      }
     }
     // Only when the device reports in the unit this form is in: a Fahrenheit
     // feature's 41-86 written into a Celsius field would read as a range no house
@@ -292,6 +423,25 @@ const EditForm = ({ ...props }) => {
                     </optgroup>
                   ))}
               </select>
+              {roomId && (
+                <label class={cx('custom-switch', style.showAllRooms)}>
+                  <input
+                    type="checkbox"
+                    class="custom-switch-input"
+                    checked={!!props.thermostatEditShowAllRooms}
+                    onChange={e => props.updateThermostatField('thermostatEditShowAllRooms', e.target.checked)}
+                  />
+                  <span class="custom-switch-indicator" />
+                  <span class="custom-switch-description">
+                    <Text id="integration.thermostat.edit.showAllRoomsLabel" />
+                  </span>
+                </label>
+              )}
+              {roomId && (
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.edit.showAllRoomsHelp" />
+                </small>
+              )}
             </div>
 
             {/* Type de thermostat */}
@@ -334,7 +484,7 @@ const EditForm = ({ ...props }) => {
                   class="form-control"
                   value={mode}
                   onChange={e => {
-                    props.updateThermostatField('thermostatEditMode', e.target.value);
+                    props.updateThermostatMode(e.target.value);
                     // TPI is heating-only: switching to cooling falls back to hysteresis
                     if (e.target.value === 'cooling' && controlType === 'tpi') {
                       props.updateThermostatField('thermostatEditControlType', 'hysteresis');
@@ -378,7 +528,7 @@ const EditForm = ({ ...props }) => {
                   <Localizer>
                     <FeatureSelect
                       value={props.thermostatEditTargetFeature || ''}
-                      features={props.targetFeatures}
+                      features={pickable(props.targetFeatures, keep(props.thermostatEditTargetFeature))}
                       onChange={chooseTargetFeature}
                       emptyLabel={<Text id="global.emptySelectOption" />}
                     />
@@ -395,7 +545,7 @@ const EditForm = ({ ...props }) => {
                   <Localizer>
                     <FeatureSelect
                       value={props.thermostatEditStateFeature || ''}
-                      features={props.stateFeatures}
+                      features={pickable(props.stateFeatures, keep(props.thermostatEditStateFeature))}
                       onChange={e => props.updateThermostatField('thermostatEditStateFeature', e.target.value)}
                       emptyLabel={<Text id="global.emptySelectOption" />}
                     />
@@ -412,7 +562,7 @@ const EditForm = ({ ...props }) => {
                   <Localizer>
                     <FeatureSelect
                       value={props.thermostatEditModeFeature || ''}
-                      features={props.modeFeatures}
+                      features={pickable(props.modeFeatures, keep(props.thermostatEditModeFeature))}
                       onChange={e => props.updateThermostatField('thermostatEditModeFeature', e.target.value)}
                       emptyLabel={<Text id="global.emptySelectOption" />}
                     />
@@ -421,11 +571,33 @@ const EditForm = ({ ...props }) => {
                     <Text id="integration.thermostat.edit.modeFeatureHelp" />
                   </small>
                 </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.thermostat.edit.powerFeatureLabel" />
+                  </label>
+                  <Localizer>
+                    <FeatureSelect
+                      value={props.thermostatEditPowerFeature || ''}
+                      features={pickable(props.powerFeatures, keep(props.thermostatEditPowerFeature))}
+                      onChange={e => props.updateThermostatField('thermostatEditPowerFeature', e.target.value)}
+                      emptyLabel={<Text id="global.emptySelectOption" />}
+                    />
+                  </Localizer>
+                  {needsPower && (
+                    <div class="alert alert-warning mt-2 mb-0">
+                      <Text id="integration.thermostat.edit.powerFeatureNeeded" />
+                    </div>
+                  )}
+                  <small class="form-text text-muted">
+                    <Text id="integration.thermostat.edit.powerFeatureHelp" />
+                  </small>
+                </div>
               </div>
             )}
 
             <h4 class={style.formSection}>
-              <Text id="integration.thermostat.edit.sectionHeating" />
+              <Text id={`integration.thermostat.edit.section.${modeSuffix}`} />
             </h4>
 
             {/* Capteur de température */}
@@ -434,11 +606,13 @@ const EditForm = ({ ...props }) => {
                 <Text id="integration.thermostat.edit.temperatureFeatureLabel" />
               </label>
               <Localizer>
-                <FeatureSelect
-                  value={props.thermostatEditTemperatureFeature || ''}
-                  features={props.temperatureFeatures}
-                  onChange={e => props.updateThermostatField('thermostatEditTemperatureFeature', e.target.value)}
+                <FeatureListSelect
+                  values={props.thermostatEditTemperatureFeatures}
+                  features={pickable(props.temperatureFeatures, props.thermostatEditTemperatureFeatures || [])}
+                  onChange={values => props.updateThermostatField('thermostatEditTemperatureFeatures', values)}
                   emptyLabel={<Text id="global.emptySelectOption" />}
+                  addLabel={<Text id="integration.thermostat.edit.addTemperatureFeature" />}
+                  removeLabel={<Text id="integration.thermostat.edit.removeFeature" />}
                 />
               </Localizer>
               <small class="form-text text-muted">
@@ -454,7 +628,7 @@ const EditForm = ({ ...props }) => {
               <Localizer>
                 <FeatureSelect
                   value={props.thermostatEditHumidityFeature || ''}
-                  features={props.humidityFeatures}
+                  features={pickable(props.humidityFeatures, keep(props.thermostatEditHumidityFeature))}
                   onChange={e => props.updateThermostatField('thermostatEditHumidityFeature', e.target.value)}
                   emptyLabel={<Text id="global.emptySelectOption" />}
                 />
@@ -473,11 +647,18 @@ const EditForm = ({ ...props }) => {
                 <Localizer>
                   <FeatureSelect
                     value={props.thermostatEditSwitchFeature || ''}
-                    features={props.switchFeatures}
+                    features={switchChoices}
                     onChange={e => props.updateThermostatActuator('thermostatEditSwitchFeature', e.target.value)}
                     emptyLabel={<Text id="global.emptySelectOption" />}
                   />
                 </Localizer>
+                {/* A pilot wire on offer is the other actuator, picked just below:
+                    sending the user to the real-thermostat type would mislead. */}
+                {switchChoices.length === 0 && pilotWireChoices.length === 0 && (
+                  <div class="alert alert-info mt-2 mb-0">
+                    <Text id={`integration.thermostat.edit.noSwitchHint.${modeSuffix}`} />
+                  </div>
+                )}
                 <small class="form-text text-muted">
                   <Text id={`integration.thermostat.edit.switchFeatureHelp.${modeSuffix}`} />
                 </small>
@@ -495,11 +676,13 @@ const EditForm = ({ ...props }) => {
                 <Text id="integration.thermostat.edit.windowFeatureLabel" />
               </label>
               <Localizer>
-                <FeatureSelect
-                  value={props.thermostatEditWindowFeature || ''}
-                  features={props.openingFeatures}
-                  onChange={e => props.updateThermostatField('thermostatEditWindowFeature', e.target.value)}
+                <FeatureListSelect
+                  values={props.thermostatEditWindowFeatures}
+                  features={pickable(props.openingFeatures, props.thermostatEditWindowFeatures || [])}
+                  onChange={values => props.updateThermostatField('thermostatEditWindowFeatures', values)}
                   emptyLabel={<Text id="global.emptySelectOption" />}
+                  addLabel={<Text id="integration.thermostat.edit.addWindowFeature" />}
+                  removeLabel={<Text id="integration.thermostat.edit.removeFeature" />}
                 />
               </Localizer>
               <small class="form-text text-muted">
