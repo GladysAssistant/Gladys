@@ -24,12 +24,14 @@ const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 // Cleared in the database, which the scheduleDevice tests exercise for real.
 const clearScheduleStop = fake.resolves(null);
 const clearRemoteStop = fake.resolves(null);
+const clearModuleStop = fake.resolves(null);
 
 const load = (follows = true) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
     './thermostat.scheduleDevice': {
       clearScheduleStop,
       clearRemoteStop,
+      clearModuleStop,
       followsSchedule: fake.resolves(follows),
       getScheduleOfDevice: fake.resolves(
         follows ? { transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }] } : null,
@@ -618,6 +620,17 @@ describe('thermostat.setValue', () => {
       assert.calledOnceWithExactly(clearScheduleStop, 'device-id');
       // A stop made on the unit, too: it no longer ends on the next point.
       assert.calledOnceWithExactly(clearRemoteStop, 'device-id');
+    });
+
+    it("should make a stop pressed on the module the writer's own", async () => {
+      // A start or a stop from the widget is no longer the module's: a report
+      // of the module must not lift a stop made from Gladys (C.1.1).
+      const handler = buildHandler();
+      clearModuleStop.resetHistory();
+
+      await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
+
+      assert.calledOnceWithExactly(clearModuleStop, 'device-id');
     });
   });
 

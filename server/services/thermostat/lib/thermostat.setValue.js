@@ -11,7 +11,12 @@ const {
   convertSetpointToFeatureUnit,
   DEFAULT_TIMEZONE,
 } = require('./thermostat.applySchedules');
-const { getScheduleOfDevice, clearScheduleStop, clearRemoteStop } = require('./thermostat.scheduleDevice');
+const {
+  getScheduleOfDevice,
+  clearScheduleStop,
+  clearRemoteStop,
+  clearModuleStop,
+} = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
 const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
 
@@ -210,6 +215,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
     // programme, or the unit's remote, left behind is no longer theirs to lift.
     await clearScheduleStop(device.id);
     await clearRemoteStop(device.id);
+    await clearModuleStop(device.id);
     const config = buildParamsConfig(device) || {};
     if (Number(value) === THERMOSTAT_MODE.OFF) {
       // Stopping is not a preset with a setpoint: it cuts the switch on a

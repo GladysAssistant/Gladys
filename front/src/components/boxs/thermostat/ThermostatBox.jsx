@@ -6,7 +6,8 @@ import {
   WEBSOCKET_MESSAGE_TYPES,
   DEVICE_FEATURE_UNITS,
   THERMOSTAT_MODE,
-  THERMOSTAT_PRESET
+  THERMOSTAT_PRESET,
+  PILOT_WIRE_MODE
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 import { calendarDaysAhead } from '../../../../../server/utils/thermostatSchedule';
@@ -14,11 +15,17 @@ import {
   defaultPresetTemps,
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
-  DEFAULT_HYSTERESIS_START
+  DEFAULT_HYSTERESIS_START,
+  DEFAULT_PILOT_WIRE_ORDERS,
+  supportedPilotWireOrder
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
-import { getPresetColor as presetColorForMode, readableTextOn } from '../../../utils/thermostatPresetColors';
+import {
+  getPresetColor as presetColorForMode,
+  readableTextOn,
+  counterDarkModeInvert
+} from '../../../utils/thermostatPresetColors';
 import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
 import { loadDeviceConfig } from './deviceConfig';
@@ -50,6 +57,25 @@ const PRESET_VALUES = {
   comfort: THERMOSTAT_PRESET.COMFORT
 };
 const PRESET_NAMES = Object.keys(PRESET_VALUES).reduce((acc, name) => ({ ...acc, [PRESET_VALUES[name]]: name }), {});
+// The pilot-wire orders, keyed as the device page already names them.
+const PILOT_WIRE_ORDER_KEYS = {
+  [PILOT_WIRE_MODE.OFF]: 'off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost-protection',
+  [PILOT_WIRE_MODE.ECO]: 'eco',
+  [PILOT_WIRE_MODE.COMFORT_2]: 'comfort_-2',
+  [PILOT_WIRE_MODE.COMFORT_1]: 'comfort_-1',
+  [PILOT_WIRE_MODE.COMFORT]: 'comfort'
+};
+// The preset whose colour and icon an order takes on the card. The derived
+// comforts are comfort chosen on the heater, and look like it.
+const PRESET_OF_PILOT_WIRE_ORDER = {
+  [PILOT_WIRE_MODE.OFF]: 'off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost',
+  [PILOT_WIRE_MODE.ECO]: 'eco',
+  [PILOT_WIRE_MODE.COMFORT_2]: 'comfort',
+  [PILOT_WIRE_MODE.COMFORT_1]: 'comfort',
+  [PILOT_WIRE_MODE.COMFORT]: 'comfort'
+};
 // Sentinel: hold every incoming setpoint, whatever its value
 const HOLD_ANY_SETPOINT = Symbol('hold-any-setpoint');
 
@@ -94,6 +120,11 @@ class ThermostatBox extends Component {
     // the server holds the current state, and that memory cannot be re-derived
     // from the temperature alone.
     isSwitchOn: null,
+    // The order a pilot-wire heater carries, shown when it regulates alone: it is
+    // all the card knows of what the heater does.
+    pilotWireOrder: null,
+    // The orders its module declares, when it does (supportedPilotWireOrder).
+    pilotWireSupportedOptions: null,
     // A mode this card has written and no reload of the device has carried yet
     // (see writeMode). Read before the device's own mode, so a tap on Off or on
     // a way out of it shows at once, and a reload already in flight when the
@@ -123,19 +154,50 @@ class ThermostatBox extends Component {
 
   getConfig = () => ({ ...this.props.box, ...(this.state.remoteConfig || {}) });
 
+  // A real thermostat driven by its setpoint. A pilot-wire heater never is (spec
+  // C.1.1): it owns its setpoint feature like a virtual thermostat. `external`
+  // with a pilot wire is how one regulating itself was saved before the
+  // `pilot-wire` type existed.
   isExternal = () => {
     const cfg = this.getConfig();
-    return cfg.thermostat_type === 'external';
+    return cfg.thermostat_type === 'external' && !cfg.pilot_wire_feature;
   };
 
   // Which feature tells the widget the equipment is running: the switch Gladys
   // drives on a virtual thermostat, the real device's state feature on an
   // external one. An external thermostat that exposes neither returns null, and
   // the widget estimates the state from the setpoint instead.
+  //
+  // A pilot-wire heater has no contact to read, and the order it carries says
+  // nothing of whether it draws current. When Gladys regulates it, the server
+  // decides on the room sensor and says so on the thermostat's own
+  // operating-state feature. When the heater regulates, nothing tells: the card
+  // shows the order sent instead (see isHeaterRegulated).
   getRunningStateFeature = () => {
     const cfg = this.state.remoteConfig;
     if (!cfg) return null;
-    return (this.isExternal() ? cfg.state_feature : cfg.switch_feature) || null;
+    if (this.isExternal()) return cfg.state_feature || null;
+    if (cfg.pilot_wire_feature) return this.isHeaterRegulated() ? null : cfg.operatingStateFeature || null;
+    return cfg.switch_feature || null;
+  };
+
+  // A pilot-wire heater left to its own thermostat (spec C.1.1): a `pilot-wire`
+  // thermostat, or a virtual one with no room sensor to regulate on. Gladys only
+  // hands it the order of the preset: there is no setpoint to turn.
+  isHeaterRegulated = () => {
+    const cfg = this.state.remoteConfig;
+    if (!cfg || !cfg.pilot_wire_feature) return false;
+    return (
+      cfg.thermostat_type === 'pilot-wire' ||
+      cfg.thermostat_type === 'external' ||
+      this.getTemperatureFeatures().length === 0
+    );
+  };
+
+  // A pilot-wire heater Gladys regulates on the room sensor.
+  isGladysRegulatedPilotWire = () => {
+    const cfg = this.state.remoteConfig;
+    return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
   };
   getMinTemp = () => {
     // Device feature native min has top priority
@@ -423,6 +485,10 @@ class ThermostatBox extends Component {
 
   // Comfort is amber when heating and blue when cooling, like the arc and the
   // preset icon: an air conditioner labelled in the colour of heat reads wrong.
+  isDarkTheme = () =>
+    (typeof document !== 'undefined' && document.documentElement.classList.contains('dark-mode')) ||
+    Boolean(this.props.darkMode);
+
   getPresetColor = presetKey => {
     const cfg = this.getConfig();
     return presetColorForMode(presetKey, cfg.default_mode);
@@ -459,6 +525,7 @@ class ThermostatBox extends Component {
     // thermostat, and from the real device's state feature on an external one.
     // Both end up in `isSwitchOn`, which is what draws the heating halo.
     const switchFeature = this.getRunningStateFeature();
+    const pilotWireFeature = this.isHeaterRegulated() ? this.state.remoteConfig.pilot_wire_feature : null;
     if (!thermostatFeature && temperatureFeatures.length === 0) {
       this.setState({ noConfig: true });
       return;
@@ -471,8 +538,16 @@ class ThermostatBox extends Component {
     this.temperatureReadings = {};
     this.openWindows = {};
     if (!switchFeature) stateUpdate.isSwitchOn = null;
+    if (!pilotWireFeature) stateUpdate.pilotWireOrder = null;
     this.setState(stateUpdate);
-    const selectors = [thermostatFeature, ...temperatureFeatures, humidityFeature, ...windowFeatures, switchFeature]
+    const selectors = [
+      thermostatFeature,
+      ...temperatureFeatures,
+      humidityFeature,
+      ...windowFeatures,
+      switchFeature,
+      pilotWireFeature
+    ]
       .filter(Boolean)
       .join(',');
     if (!selectors) return;
@@ -536,6 +611,12 @@ class ThermostatBox extends Component {
               this.stateFeature = feat;
               this.setState({ isSwitchOn: isRunningFromStateFeature(feat, feat.last_value) });
             }
+            if (pilotWireFeature && feat.selector === pilotWireFeature) {
+              this.setState({
+                pilotWireOrder: feat.last_value,
+                pilotWireSupportedOptions: feat.supported_options || null
+              });
+            }
           });
         });
       }
@@ -598,6 +679,14 @@ class ThermostatBox extends Component {
       // NEW_STATE carries no category/type, so the shape cached from the initial
       // GET /api/v1/device is what the value is normalised against.
       this.setState({ isSwitchOn: isRunningFromStateFeature(this.stateFeature, payload.last_value) });
+    }
+    const remoteConfig = this.state.remoteConfig;
+    if (
+      this.isHeaterRegulated() &&
+      remoteConfig &&
+      payload.device_feature_selector === remoteConfig.pilot_wire_feature
+    ) {
+      this.setState({ pilotWireOrder: payload.last_value });
     }
   };
 
@@ -1355,6 +1444,8 @@ class ThermostatBox extends Component {
       manualSetpointOverride,
       isWindowOpen,
       isSwitchOn,
+      pilotWireOrder,
+      pilotWireSupportedOptions,
       activeSchedule
     }
   ) {
@@ -1420,8 +1511,72 @@ class ThermostatBox extends Component {
     })();
     // The switch is the actuator the server drives, so its state is the truth:
     // the flame then matches what the heater is really doing, neutral zone included.
+    // A pilot-wire heater regulating on its own setpoint: nothing tells whether
+    // it heats, and estimating from Gladys's setpoint would light a flame on a
+    // decision Gladys does not make. There is no setpoint to turn either: the
+    // gauge shows the room temperature in its place, ringed in the colour of the
+    // order the module confirms, a banner names that order, and the presets
+    // below are the only control.
+    const heaterRegulated = this.isHeaterRegulated();
+    const orderLabels =
+      (props.intl &&
+        props.intl.dictionary &&
+        props.intl.dictionary.deviceFeatureAction &&
+        props.intl.dictionary.deviceFeatureAction.category.heater['pilot-wire-mode']) ||
+      {};
+    const orderLabel = order => orderLabels[PILOT_WIRE_ORDER_KEYS[order]] || '—';
+    const confirmedPreset = heaterRegulated ? PRESET_OF_PILOT_WIRE_ORDER[pilotWireOrder] : undefined;
+    // The ring takes that order's colour — through the dark theme's inversion
+    // too, as the preset buttons' pills do.
+    const confirmedColor = confirmedPreset ? this.getPresetColor(confirmedPreset) : null;
+    const ringColor = confirmedColor && this.isDarkTheme() ? counterDarkModeInvert(confirmedColor) : confirmedColor;
+    // The order the module should carry, from what the card shows: off when
+    // stopped, window open or not, frost protection with the window open,
+    // otherwise the order the lit preset is set to. A setpoint turned by a scene
+    // names no preset, and is not second-guessed.
+    let wantedOrder = null;
+    if (heaterRegulated && mode === 'off') {
+      wantedOrder = PILOT_WIRE_MODE.OFF;
+    } else if (heaterRegulated && isWindowOpen) {
+      wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
+    } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
+      const configured = cfg[`pilot_wire_order_${activePreset}`];
+      wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
+    }
+    // The order actually sent, as the server picks it: one the module does not
+    // take is sent as comfort, or not at all — and is then on its way for ever.
+    const expectedOrder = wantedOrder === null ? null : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
+    // Until the module confirms it — a few seconds on Z-Wave — the banner says
+    // the order is on its way rather than showing a ring and a preset that
+    // disagree. Any comfort the heater keeps is comfort, as the server holds it.
+    const comfortOrders = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
+    const keptComfort = comfortOrders.includes(expectedOrder) && comfortOrders.includes(pilotWireOrder);
+    const orderPending =
+      expectedOrder !== null && pilotWireOrder !== null && pilotWireOrder !== expectedOrder && !keptComfort;
+    // A preset held on the card has its own banner, "Comfort until 06:30", and
+    // "Order: Comfort" above it said the same thing twice. The order banner
+    // only stays when it tells more: an order on its way, or one other than the
+    // preset's own (a comfort -1 pressed on the module).
+    const holdNamesOrder =
+      isManualMode &&
+      !!manualUntil &&
+      !manualSetpointOverride &&
+      !!activeSchedule &&
+      !orderPending &&
+      pilotWireOrder === expectedOrder &&
+      confirmedPreset === activePreset;
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
-    const showActive = !isWindowOpen && mode !== 'off' && isRunning;
+    const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
+    // When Gladys regulates a pilot-wire heater, the module only ever carries
+    // comfort or frost protection, whatever the preset: eco at 18 °C in a room at
+    // 20 °C shows frost protection on the heater. Saying why, under the gauge,
+    // is what keeps that from looking like a wrong order.
+    const pilotWireStatus =
+      this.isGladysRegulatedPilotWire() && !isWindowOpen && mode !== 'off' && isSwitchOn !== null
+        ? isSwitchOn
+          ? 'pilotWireHeating'
+          : 'pilotWireStandby'
+        : null;
 
     // Convert temperatures for display
     const displaySetpoint = this.toDisplayTemp(setpoint);
@@ -1462,19 +1617,75 @@ class ThermostatBox extends Component {
                     setpoint={displaySetpoint}
                     currentTemp={displayCurrentTemp}
                     humidity={humidity}
-                    onPointerDown={this.onPointerDown}
-                    onIncrement={this.increment}
-                    onDecrement={this.decrement}
+                    onPointerDown={heaterRegulated ? undefined : this.onPointerDown}
+                    onIncrement={heaterRegulated ? undefined : this.increment}
+                    onDecrement={heaterRegulated ? undefined : this.decrement}
                     minTemp={displayMinTemp}
                     maxTemp={displayMaxTemp}
                     mode={mode}
                     isActive={showActive}
                     isWindowOpen={isWindowOpen}
                     tempUnit={tempUnit}
+                    readOnly={heaterRegulated}
+                    ringColor={ringColor}
                     a11yLabels={a11yLabels}
                   />
                 </div>
               </div>
+
+              {/* The order a pilot-wire heater regulating itself carries, drawn
+                  like the card's other banners in that order's colour and icon;
+                  greyed while one is on its way. */}
+              {confirmedPreset && !holdNamesOrder && (
+                <div
+                  class={style.scheduleBanner}
+                  style={`--banner-color:${orderPending ? this.getPresetColor('off') : confirmedColor}`}
+                >
+                  <i
+                    class={`fe ${
+                      orderPending
+                        ? 'fe-loader'
+                        : confirmedPreset === 'comfort'
+                        ? COMFORT_ICON.heating
+                        : PRESET_ICONS[confirmedPreset]
+                    } ${style.scheduleBannerIcon}`}
+                  />
+                  <span class={style.scheduleBannerText}>
+                    {orderPending ? (
+                      <Text
+                        id="dashboard.boxes.thermostat.pilotWireOrderPending"
+                        fields={{ order: orderLabel(expectedOrder) }}
+                      />
+                    ) : (
+                      <Text
+                        id="dashboard.boxes.thermostat.pilotWireOrderCurrent"
+                        fields={{ order: orderLabel(pilotWireOrder) }}
+                      />
+                    )}
+                  </span>
+                </div>
+              )}
+
+              {/* Drawn like the card's other banners. Heating carries comfort's
+                  flame and colour, the order the module then carries; standby
+                  carries frost's snowflake and colour, for the same reason. */}
+              {pilotWireStatus && (
+                <div
+                  class={style.scheduleBanner}
+                  style={`--banner-color:${this.getPresetColor(
+                    pilotWireStatus === 'pilotWireHeating' ? 'comfort' : 'frost'
+                  )}`}
+                >
+                  <i
+                    class={`fe ${pilotWireStatus === 'pilotWireHeating' ? COMFORT_ICON.heating : PRESET_ICONS.frost} ${
+                      style.scheduleBannerIcon
+                    }`}
+                  />
+                  <span class={style.scheduleBannerText}>
+                    <Text id={`dashboard.boxes.thermostat.${pilotWireStatus}`} />
+                  </span>
+                </div>
+              )}
 
               {isWindowOpen && (
                 <div class={style.windowBanner}>
@@ -1746,4 +1957,4 @@ class ThermostatBox extends Component {
   }
 }
 
-export default connect('httpClient,session,user', {})(withIntlAsProp(ThermostatBox));
+export default connect('httpClient,session,user,darkMode', {})(withIntlAsProp(ThermostatBox));
