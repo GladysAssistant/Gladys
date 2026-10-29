@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'preact/hooks';
 import style from './style.css';
 
 // The gauge is drawn as an SVG arc spanning ARC_DEGREES, opening at the bottom:
@@ -31,8 +32,95 @@ function describeArc(cx, cy, r, startAngle, endAngle) {
   return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y}`;
 }
 
+// How long the arc takes to travel to a new setpoint. Long enough to be seen
+// going up or down, short enough that a preset still feels applied at once.
+const SETPOINT_ANIMATION_MS = 450;
+
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+// One query for every gauge, created on first use: its `matches` follows the
+// system setting live, and evaluating a new one on each render ran it about 27
+// times per animation per gauge.
+let reducedMotionQuery = null;
+const prefersReducedMotion = () => {
+  if (reducedMotionQuery === null) {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return false;
+    }
+    reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  }
+  return reducedMotionQuery.matches;
+};
+
+// The step a setpoint is set in, from the widget's + and − buttons, in the unit
+// the gauge is drawn in.
+const SETPOINT_STEP = 0.5;
+
+/**
+ * The setpoint the gauge draws, travelling to a new value instead of jumping to
+ * it: a preset picked, a hold expiring or a scene writing the setpoint moved the
+ * arc from one temperature to the other in a single frame.
+ *
+ * A new target mid-way starts from where the arc is, so a burst of + clicks is
+ * one continuous movement. Nothing is animated while `animate` is false — the
+ * dial being dragged must stay under the finger — nor for a user who asked the
+ * system for less motion, nor from or to a value that is not a number.
+ *
+ * When there is nothing to animate, the target is returned on the very render
+ * that carries it: applied only in the effect, after paint, the knob drew the
+ * previous temperature first and trailed the finger by a frame on every move.
+ * The value drawn lives in a ref, read on every render; the state is only what
+ * asks for the next frame. A skipped change therefore costs no second render:
+ * setting the state there drew the gauge twice on every move of a drag.
+ * @param {number} target - The setpoint to show.
+ * @param {boolean} animate - Whether a change may be animated.
+ * @returns {number} The setpoint to draw on this render.
+ * @example
+ * const shown = useAnimatedValue(setpoint, !isDragging);
+ */
+const useAnimatedValue = (target, animate) => {
+  const [, setFrame] = useState(0);
+  const shownRef = useRef(target);
+  const frameRef = useRef(null);
+  const skip = !animate || !Number.isFinite(target) || !Number.isFinite(shownRef.current) || prefersReducedMotion();
+
+  useEffect(() => {
+    const from = shownRef.current;
+    const show = next => {
+      shownRef.current = next;
+      setFrame(frame => frame + 1);
+    };
+    // Already drawn by the render that carries it, which also left the ref there.
+    if (skip || from === target) {
+      return undefined;
+    }
+    const start = Date.now();
+    const step = () => {
+      const progress = Math.min(1, (Date.now() - start) / SETPOINT_ANIMATION_MS);
+      show(progress === 1 ? target : from + (target - from) * easeOutCubic(progress));
+      frameRef.current = progress === 1 ? null : requestAnimationFrame(step);
+    };
+    frameRef.current = requestAnimationFrame(step);
+    return () => {
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+  }, [target, animate]);
+
+  if (skip) {
+    // The next animation starts from the finger, not from a frame interpolated
+    // before the drag began, and the release draws where the finger left it.
+    shownRef.current = target;
+    return target;
+  }
+  return shownRef.current;
+};
+
 const CircularGauge = ({
-  setpoint,
+  setpoint: targetSetpoint,
+  animate = true,
   currentTemp,
   humidity,
   onPointerDown,
@@ -44,6 +132,7 @@ const CircularGauge = ({
   isActive,
   isWindowOpen,
   tempUnit,
+  step = SETPOINT_STEP,
   // A thermostat with no setpoint to offer — a pilot-wire heater regulating
   // itself. The gauge then draws no setpoint arc, no knob, takes no input, and
   // shows the room temperature in the middle, where the setpoint would be.
@@ -57,6 +146,7 @@ const CircularGauge = ({
   const cy = 110;
   const r = 88;
   const sw = 11;
+  const setpoint = useAnimatedValue(targetSetpoint, animate);
   const range = maxTemp - minTemp;
   const pct = range === 0 ? 0.5 : Math.min(1, Math.max(0, (setpoint - minTemp) / range));
   const arcEnd = ARC_START_ANGLE + Math.max(pct, 0.001) * ARC_DEGREES;
@@ -75,12 +165,26 @@ const CircularGauge = ({
   // Derive both halves from one rounded value: splitting the raw setpoint made
   // 20.96 render as "20.10" (the decimal carried to 10) and -3.5 as "-4.5"
   // (floor rounds away from zero for negatives).
-  const roundedSetpoint = Math.round(shownValue * 10) / 10;
+  // On its way, the number counts in the step a setpoint is set in: 21.1 to
+  // 21.4 on one + tap, and forty tenths on a preset change, were values the user
+  // can never set. The arc and the knob glide; the number lands on the target.
+  // The steps are counted back from the target rather than from zero: a 0.5 °C
+  // step drawn in °F is 0.9 °F, whose multiples (70.2, 71.1) are not the values
+  // the user sets either, and the count started backwards (70.7 → 70.5 → 71.0).
+  // A read-only gauge shows the room temperature, which does not travel.
+  const displayed =
+    readOnly || setpoint === targetSetpoint
+      ? shownValue
+      : targetSetpoint + Math.round((setpoint - targetSetpoint) / step) * step;
+  const roundedSetpoint = Math.round(displayed * 10) / 10;
   const truncated = Math.trunc(roundedSetpoint);
   const decPart = Math.round(Math.abs(roundedSetpoint - truncated) * 10);
   // Math.trunc(-0.5) is -0, which renders as "0": a setpoint between -1 and 0
   // would lose its sign, so the minus is restored explicitly.
   const intPart = truncated === 0 && roundedSetpoint < 0 ? '-0' : String(truncated);
+  // What a screen reader announces is where the setpoint is going, not the
+  // frames of the arc on its way there.
+  const roundedTarget = Math.round(targetSetpoint * 10) / 10;
   const intW = intPart.length * 30;
   // Read-only, a thermometer sits left of the number to say it is the room's:
   // the whole group shifts right by half its width to stay centred.
@@ -108,7 +212,7 @@ const CircularGauge = ({
   // nodes are hidden from the tree for the same reason.
   const unit = `\u00b0${tempUnit || 'C'}`;
   const label = [
-    centerWord || (readOnly ? null : `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`),
+    centerWord || (readOnly ? null : `${a11yLabels.setpoint || 'Setpoint'} ${roundedTarget} ${unit}`),
     hasCurrentTemp
       ? `${a11yLabels.currentTemp || 'Current temperature'} ${Number(currentTemp).toFixed(1)} ${unit}`
       : null,
@@ -147,8 +251,8 @@ const CircularGauge = ({
       aria-label={label}
       aria-valuemin={interactive ? minTemp : undefined}
       aria-valuemax={interactive ? maxTemp : undefined}
-      aria-valuenow={interactive ? roundedSetpoint : undefined}
-      aria-valuetext={interactive ? (isOff ? offLabel : `${roundedSetpoint} ${unit}`) : undefined}
+      aria-valuenow={interactive ? roundedTarget : undefined}
+      aria-valuetext={interactive ? (isOff ? offLabel : `${roundedTarget} ${unit}`) : undefined}
     >
       {/* The track's colour lives in the stylesheet rather than here: inverted by
           the dark theme, #e9ecef came back as a near-black that vanished into the
