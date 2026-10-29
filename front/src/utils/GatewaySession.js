@@ -111,6 +111,30 @@ class GatewaySession {
     );
   }
 
+  // Replacing the two-factor app of the Gladys Plus account is a user operation
+  // (user-scoped routes): it is only possible from the Gladys Plus interface, where
+  // the Gladys Plus user is the one logged in. The client library has no method for
+  // it yet, so the requests go through its request helper (access token of the
+  // session, refreshed on 401).
+  async getNewTwoFactorSecret() {
+    return gatewayRequest.get(`${this.gladysGatewayApiUrl}/users/two-factor/new`, this.gatewayClient);
+  }
+
+  // The Gateway only replaces the secret with a valid code from the NEW app (the
+  // secret was registered correctly) and a valid code from the CURRENT app (the
+  // request comes from someone who holds the current second factor).
+  async updateTwoFactor({ twoFactorSecret, twoFactorCode, currentTwoFactorCode }) {
+    return gatewayRequest.patch(
+      `${this.gladysGatewayApiUrl}/users/two-factor`,
+      {
+        two_factor_secret: twoFactorSecret,
+        two_factor_code: twoFactorCode,
+        current_two_factor_code: currentTwoFactorCode
+      },
+      this.gatewayClient
+    );
+  }
+
   saveLoginInformations(data) {
     keyValueStore.set(GATEWAY_REFRESH_TOKEN_KEY, data.refreshToken);
     keyValueStore.set(GATEWAY_ACCESS_TOKEN_KEY, data.accessToken);

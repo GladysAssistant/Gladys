@@ -5514,6 +5514,21 @@
     "continueButton": "Continuar",
     "twoFactorCodeRequired": "Introduzca un código de su aplicación de doble factor: la pasarela lo requiere para generar códigos de recuperación."
   },
+  "gatewayTwoFactorApp": {
+    "cardTitle": "Su aplicación de doble factor",
+    "description": "¿Nuevo teléfono o nueva aplicación de doble factor? Registre en ella un nuevo secreto: su cuenta de Gladys Plus solo aceptará a partir de entonces los códigos de esta nueva aplicación.",
+    "changeButton": "Cambiar mi aplicación de doble factor",
+    "replaceWarning": "Una vez confirmado, los códigos de su aplicación actual dejarán de aceptarse. Sus códigos de recuperación siguen siendo válidos.",
+    "newCodeLabel": "Código mostrado por su nueva aplicación",
+    "currentCodeLabel": "Código mostrado por su aplicación actual",
+    "currentCodeHelp": "La pasarela requiere un código de la aplicación registrada actualmente para reemplazarla.",
+    "confirmButton": "Reemplazar mi aplicación de doble factor",
+    "replacedSuccess": "Su aplicación de doble factor ha sido reemplazada. A partir de ahora, use su nueva aplicación para iniciar sesión en Gladys Plus.",
+    "invalidCode": "Uno de los códigos no es válido o ha caducado. Vuelva a intentarlo con nuevos códigos generados por sus aplicaciones.",
+    "tooManyAttempts": "Demasiados intentos fallidos. Espere unos minutos antes de volver a intentarlo.",
+    "loadError": "No pudimos generar un nuevo secreto. Compruebe su conexión y vuelva a intentarlo.",
+    "updateError": "No pudimos reemplazar su aplicación de doble factor. Vuelva a intentarlo."
+  },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configurar la autenticación de doble factor (2FA)",
     "twoFactorNotConfigured": "La autenticación de doble factor (2FA) todavía no está configurada en su cuenta de Gladys Plus. Es necesaria para conectar su instancia.",
