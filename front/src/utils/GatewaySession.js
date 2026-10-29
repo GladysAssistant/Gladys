@@ -4,6 +4,7 @@ import gatewayRequest from '@gladysassistant/gladys-gateway-js/lib/request';
 import config from '../config';
 import { Dispatcher } from './Dispatcher';
 import keyValueStore from './keyValueStore';
+import { hasPasswordFields, omitPasswordFields } from './omitPasswordFields';
 
 const GATEWAY_USER_KEY = 'gateway_user';
 const GATEWAY_PROFILE_PICTURE_KEY = 'gateway_profile_picture';
@@ -76,7 +77,13 @@ class GatewaySession {
     }
     const data = keyValueStore.get(GATEWAY_USER_KEY);
     if (data) {
-      this.user = JSON.parse(data);
+      const user = JSON.parse(data);
+      if (hasPasswordFields(user)) {
+        // older versions of the profile page stored the new password here
+        this.saveUser(user);
+      } else {
+        this.user = user;
+      }
     }
     return this.user;
   }
@@ -104,6 +111,30 @@ class GatewaySession {
     );
   }
 
+  // Replacing the two-factor app of the Gladys Plus account is a user operation
+  // (user-scoped routes): it is only possible from the Gladys Plus interface, where
+  // the Gladys Plus user is the one logged in. The client library has no method for
+  // it yet, so the requests go through its request helper (access token of the
+  // session, refreshed on 401).
+  async getNewTwoFactorSecret() {
+    return gatewayRequest.get(`${this.gladysGatewayApiUrl}/users/two-factor/new`, this.gatewayClient);
+  }
+
+  // The Gateway only replaces the secret with a valid code from the NEW app (the
+  // secret was registered correctly) and a valid code from the CURRENT app (the
+  // request comes from someone who holds the current second factor).
+  async updateTwoFactor({ twoFactorSecret, twoFactorCode, currentTwoFactorCode }) {
+    return gatewayRequest.patch(
+      `${this.gladysGatewayApiUrl}/users/two-factor`,
+      {
+        two_factor_secret: twoFactorSecret,
+        two_factor_code: twoFactorCode,
+        current_two_factor_code: currentTwoFactorCode
+      },
+      this.gatewayClient
+    );
+  }
+
   saveLoginInformations(data) {
     keyValueStore.set(GATEWAY_REFRESH_TOKEN_KEY, data.refreshToken);
     keyValueStore.set(GATEWAY_ACCESS_TOKEN_KEY, data.accessToken);
@@ -111,6 +142,17 @@ class GatewaySession {
     keyValueStore.set(GATEWAY_SERIALIZED_KEYS_KEY, data.serializedKeys);
     keyValueStore.set(GATEWAY_RSA_PUBLIC_KEY_FINGERPRINT, data.rsaPublicKeyFingerprint);
     keyValueStore.set(GATEWAY_ECDSA_PUBLIC_KEY_FINGERPRINT, data.ecdsaPublicKeyFingerprint);
+  }
+
+  // Fingerprints of the keys of this Gladys Plus user, as the "Remote users" list of the
+  // local instance displays them: comparing both is what protects against a man-in-the-middle
+  getKeysFingerprints() {
+    const rsaPublicKey = keyValueStore.get(GATEWAY_RSA_PUBLIC_KEY_FINGERPRINT);
+    const ecdsaPublicKey = keyValueStore.get(GATEWAY_ECDSA_PUBLIC_KEY_FINGERPRINT);
+    if (!rsaPublicKey || !ecdsaPublicKey) {
+      return null;
+    }
+    return { rsaPublicKey, ecdsaPublicKey };
   }
 
   getRefreshToken() {
@@ -147,7 +189,7 @@ class GatewaySession {
   }
 
   saveUser(user) {
-    const mergedUser = Object.assign({}, this.user, user);
+    const mergedUser = omitPasswordFields(Object.assign({}, this.user, user));
     this.user = mergedUser;
     keyValueStore.set(GATEWAY_USER_KEY, JSON.stringify(mergedUser));
   }

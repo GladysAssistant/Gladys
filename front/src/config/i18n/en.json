@@ -940,9 +940,32 @@
         "scheduleLabel": "Schedule:",
         "scheduleUntil": "until",
         "manualUntil": "until",
+        "untilTomorrow": "tomorrow",
+        "untilDays": {
+          "0": "Monday",
+          "1": "Tuesday",
+          "2": "Wednesday",
+          "3": "Thursday",
+          "4": "Friday",
+          "5": "Saturday",
+          "6": "Sunday"
+        },
+        "untilNextDays": {
+          "0": "next Monday",
+          "1": "next Tuesday",
+          "2": "next Wednesday",
+          "3": "next Thursday",
+          "4": "next Friday",
+          "5": "next Saturday",
+          "6": "next Sunday"
+        },
         "cancelManual": "Cancel manual mode",
         "windowOpen": "Window open — heating suspended",
         "windowOpenCooling": "Window open — cooling suspended",
+        "pilotWireHeating": "Heating",
+        "pilotWireStandby": "Standby: setpoint reached",
+        "pilotWireOrderCurrent": "Order: {{order}}",
+        "pilotWireOrderPending": "Sending the {{order}} order…",
         "a11ySetpoint": "Setpoint",
         "a11yCurrentTemp": "Current temperature",
         "a11yHumidity": "Humidity",
@@ -3612,6 +3635,8 @@
         "activeScheduleLabel": "Active schedule",
         "noSchedule": "No schedule",
         "setpointLabel": "Setpoint",
+        "regulationLabel": "Regulation",
+        "heaterRegulates": "By the heater",
         "noSetpoint": "—",
         "saveButton": "Save",
         "editButton": "Edit",
@@ -3629,22 +3654,29 @@
         "nameLabel": "Name",
         "namePlaceholder": "e.g. Living Room Thermostat",
         "roomLabel": "Room",
+        "showAllRoomsLabel": "Show the devices of every room",
+        "showAllRoomsHelp": "The lists below only offer the devices of this room. Widen them when the heated area spans several rooms, such as an open-plan living room and kitchen.",
         "modeLabel": "Use",
         "typeLabel": "Thermostat type",
         "tuningSection": "Fine tuning",
         "typeVirtual": "Virtual thermostat (Gladys regulates)",
         "typeExternal": "Real thermostat (the appliance regulates itself)",
+        "typePilotWire": "Pilot-wire heater (the heater regulates itself)",
         "vendorProgrammeWarning": "Turn the vendor programme off on this device (the Netatmo or Tado app…) before driving it from Gladys. Otherwise the device’s programme and Gladys’s take turns writing the setpoint, and the thermostat follows whichever wrote last.",
         "typeHelp": {
-          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) to reach the setpoint.",
-          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state."
+          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) or a pilot-wire heater to reach the setpoint.",
+          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state.",
+          "pilotWire": "The heater regulates on its own thermostat. Gladys only sends it the order of each preset (eco, comfort, frost protection…) over the pilot wire."
         },
         "targetFeatureLabel": "Setpoint of the real thermostat",
         "targetFeatureHelp": "The feature Gladys writes the target temperature on. Some devices expose several (heating/cooling, occupied/unoccupied): pick the one that actually drives your heating.",
-        "stateFeatureLabel": "Heating state (optional)",
+        "stateFeatureLabel": "Operating state (optional)",
         "stateFeatureHelp": "Used to show whether the device is currently running. Accepted either as an operating state or as a boiler contact. Leave empty if your thermostat does not report it.",
         "modeFeatureLabel": "Operating mode (optional)",
-        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one. Gladys switches it to Off when the thermostat is stopped or an Off slot applies, and hands it back as soon as a setpoint takes over again.",
+        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one — an air conditioner's mode works too. On a thermostat, Gladys switches it to Off when the thermostat is stopped or an Off slot applies, and hands it back as soon as a setpoint takes over again. An air conditioner's mode has no Off: it is stopped through its Power, which then has to be set.",
+        "powerFeatureLabel": "Power (optional)",
+        "powerFeatureHelp": "The switch that turns the real device on and off, such as the power of an air conditioner or a heat pump. Gladys turns it off when the thermostat is stopped, a window opens or an Off slot applies, and back on as soon as a setpoint takes over again. Needed for an air conditioner, whose mode has no Off.",
+        "powerFeatureNeeded": "An air conditioner's mode has no Off: pick its power here, or Gladys cannot stop it when a window opens, an Off slot applies or the thermostat is stopped.",
         "mode": {
           "heating": "Heating",
           "cooling": "Cooling"
@@ -3666,8 +3698,9 @@
         "minTempPlaceholder": "e.g. 5",
         "maxTempLabel": "Max temp",
         "maxTempPlaceholder": "e.g. 35",
-        "temperatureFeatureLabel": "Temperature sensor",
-        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
+        "temperatureFeatureLabel": "Temperature sensors",
+        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature, or several: the thermostat then uses their average. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
+        "addTemperatureFeature": "Add a temperature sensor",
         "humidityFeatureLabel": "Humidity sensor",
         "humidityFeatureHelp": "Optional. Displayed in the thermostat widget.",
         "switchFeatureLabel": "Switch (actuator)",
@@ -3675,11 +3708,30 @@
           "heating": "The switch that will be turned on and off to heat the room.",
           "cooling": "The switch that will be turned on and off to cool the room."
         },
-        "windowFeatureLabel": "Window opening sensor",
-        "windowFeatureHelp": {
-          "heating": "Optional. If a window is open, the heating is automatically cut off.",
-          "cooling": "Optional. If a window is open, the cooling is automatically cut off."
+        "noSwitchHint": {
+          "heating": "No switch to pick here. Show the devices of every room above, or, for a thermostat or a heat pump that regulates itself, choose “Real thermostat” as the type.",
+          "cooling": "No switch to pick here. An air conditioner regulates itself: choose “Real thermostat” as the type, then pick its setpoint. A fan or a plug-in cooler on a switch can stay a virtual thermostat."
         },
+        "pilotWireFeatureLabel": "Pilot wire (actuator)",
+        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off…) instead of cutting its supply. Turn the module’s own programme off first.",
+        "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
+        "pilotWireRegulationHelp": {
+          "heater": "Each preset sends the order picked in the presets table (eco → eco, away → frost protection…). The room sensor, if any, is only displayed.",
+          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
+        },
+        "windowFeatureLabel": "Window opening sensors",
+        "windowFeatureHelp": {
+          "heating": "Optional. As soon as one of the selected windows stays open longer than the delay below, the heating is automatically cut off.",
+          "cooling": "Optional. As soon as one of the selected windows stays open longer than the delay below, the cooling is automatically cut off."
+        },
+        "windowDelayLabel": "Delay before cutting off",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "How long the window has to stay open before the heating is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour).",
+          "cooling": "How long the window has to stay open before the cooling is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour)."
+        },
+        "addWindowFeature": "Add an opening sensor",
+        "removeFeature": "Remove",
         "hysteresisStartLabel": "Start threshold",
         "hysteresisStartHelp": {
           "heating": "The heating turns on when the temperature is below (setpoint − start threshold). E.g. setpoint 21°C, threshold 0.5°C → turns on below 20.5°C.",
@@ -3697,6 +3749,7 @@
         "presetsLabel": "Temperature presets",
         "presetColNameLabel": "Preset",
         "presetColTempLabel": "Setpoint",
+        "presetColOrderLabel": "Order sent",
         "preset": {
           "off": "Off",
           "frost": "Frost protection",
@@ -3708,8 +3761,9 @@
         "saveButton": "Save",
         "cancelButton": "Cancel",
         "saveError": "Error while saving.",
-        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and a switch: reading one and actuating the other is how it regulates.",
+        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
+        "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",
@@ -3722,7 +3776,10 @@
         "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action.",
         "modeHelp": "What this thermostat drives: heating or cooling.",
         "sectionDevice": "Device",
-        "sectionHeating": "Heating",
+        "section": {
+          "heating": "Heating",
+          "cooling": "Cooling"
+        },
         "sectionProgramming": "Programming",
         "deviceRangeHint": "The device advertises {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Use these values",
@@ -4111,6 +4168,11 @@
         "houseLabel": "House",
         "alarmModeLabel": "Alarm Mode"
       },
+      "thermostatSetSchedule": {
+        "description": "This action makes the selected thermostats follow another schedule, for instance to switch from the usual schedule to the school holidays one. The thermostat follows the schedule right away: a manual setpoint in progress is cancelled, but a thermostat stopped by hand stays stopped.",
+        "scheduleLabel": "Schedule",
+        "thermostatsLabel": "Thermostats"
+      },
       "alarmSetMode": {
         "description": "This action will set the selected house to the selected alarm mode.",
         "houseLabel": "House",
@@ -4171,6 +4233,13 @@
           "inferior": "lower than",
           "inferiorOrEqual": "lower than or equal to"
         }
+      },
+      "inTimeRange": {
+        "label": "Only continue if",
+        "inRange": "We are inside a time range",
+        "outOfRange": "We are outside the time ranges",
+        "description": "This condition uses the time ranges of the scene's “Time ranges” trigger. Put it in an “If… Then… Else” block to turn a device on at the start of a range and off at its end, with a single scene.",
+        "noTrigger": "This scene has no \"time ranges\" scheduled trigger: this condition will stop it every time."
       }
     },
     "actions": {
@@ -4212,7 +4281,8 @@
         "only-continue-if": "Condition on variables",
         "check-time": "Time condition",
         "if-then-else": "Condition: If...then...else...",
-        "while": "Loop: As long as... repeat..."
+        "while": "Loop: As long as... repeat...",
+        "in-time-range": "Time planning"
       },
       "user": {
         "set-seen-at-home": "User seen at home",
@@ -4235,6 +4305,9 @@
       "alarm": {
         "check-alarm-mode": "If the alarm is in mode",
         "set-alarm-mode": "Set alarm mode to"
+      },
+      "thermostat": {
+        "set-schedule": "Change the thermostats' schedule"
       },
       "mqtt": {
         "send": "Send MQTT Message"
@@ -4293,7 +4366,8 @@
         "if-then-else": "Follow a different path depending on a condition",
         "only-continue-if": "Stop the scene here if the condition is not met",
         "while": "Repeat actions as long as a condition is true",
-        "check-time": "Only continue at certain times or on certain days"
+        "check-time": "Only continue at certain times or on certain days",
+        "in-time-range": "Only continue if we are inside one of the trigger's time ranges"
       },
       "user": {
         "check-presence": "Mark a user as away if they haven't been seen recently",
@@ -4324,6 +4398,9 @@
       },
       "http": {
         "request": "Call an external API or service"
+      },
+      "thermostat": {
+        "set-schedule": "Make thermostats follow another weekly schedule"
       },
       "mqtt": {
         "send": "Publish a message on the MQTT broker"
@@ -4548,7 +4625,32 @@
           "saturday": "Saturday",
           "sunday": "Sunday"
         },
-        "house": "House"
+        "house": "House",
+        "timeRange": "Time ranges",
+        "timeRangesLabel": "Time ranges",
+        "noTimeRange": "No time range yet. Add one to define the planning.",
+        "addRange": "Add a range",
+        "deleteRange": "Delete range",
+        "rangeStart": "Start",
+        "rangeEnd": "End",
+        "rangeDuration": "Duration",
+        "rangeDays": "Days",
+        "overnight": "+1d",
+        "emptyRange": "Invalid range",
+        "resumeOnStartup": "Re-evaluate when Gladys starts",
+        "timeRangesHelp": "The scene runs at the start and at the end of each range. Use the “Time planning” action in an “If… Then… Else” block to turn a device on at the start of a range and off at its end. If “Re-evaluate when Gladys starts” is checked, the scene also runs at startup with the real state of the planning, so your devices go back to the right state after an outage.",
+        "daysOfTheWeekShort": {
+          "monday": "MO",
+          "tuesday": "TU",
+          "wednesday": "WE",
+          "thursday": "TH",
+          "friday": "FR",
+          "saturday": "SA",
+          "sunday": "SU"
+        },
+        "lastDayLocked": "At least one day must stay selected.",
+        "invalidRangesError": "Complete or remove the time ranges of the scene: each one needs a start and an end, and they cannot be the same time.",
+        "noRangeError": "Add at least one time range to the \"Time ranges\" trigger, or remove the trigger."
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
@@ -5159,9 +5261,12 @@
     "statusColumn": "Status",
     "userRsaKey": "RSA key:",
     "userEcdsaKey": "ECDSA key:",
+    "userAccepted": "Authorized",
+    "userKeysChanged": "Keys changed",
+    "userWaitingForAuthorization": "Pending authorization",
     "usersListDescription": "This list is synchronized with your Gladys Plus users. For a user (including yourself) to access your instance remotely, you need to authorize them here by turning on the switch next to their name.",
     "usersListWhyAcceptDescription": "<b>Why this step?</b> Each Gladys Plus user has their own encryption keys, whose fingerprints are displayed below. By authorizing a user, you validate locally, on your instance, that their keys are accepted: this local validation is what protects your home against man-in-the-middle attacks. Nobody, not even the Gladys Plus servers, can grant access to your instance without this validation done at your home.",
-    "usersListRevokedDescription": "If a user's keys change (for example when their two-factor authentication was reset), their access is automatically revoked for security: you will need to authorize them again here. To remove a user, go to the Gladys Plus user management page.",
+    "usersListRevokedDescription": "A user's keys change when they reset their Gladys Plus password. Their access is then automatically revoked for security and they show up as \"Keys changed\": check with them that the new fingerprints match the ones displayed on their Gladys Plus page, then authorize them again here. To remove a user, go to the Gladys Plus user management page.",
     "disconnectTitle": "Disconnect your Plus account",
     "disconnectButton": "Disconnect",
     "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
@@ -5379,7 +5484,6 @@
     "wrongCredentials": "Wrong email/password.",
     "invalidEmail": "Invalid email",
     "networkError": "Network Error: Are you sure your Gladys instance is connected to the internet?",
-    "userNotAcceptedLocally": "Your user is not accepted locally, please go back to your Gladys instance and allow access to this user in settings.",
     "gatewayNoInstanceFound": "No Instance found. You need to first connect your instance to Gladys.",
     "gatewayAccessBilling": "To access billing, click here.",
     "unknownError": "An unknown error occurred. Please contact us for more information.",
@@ -5410,6 +5514,21 @@
     "rotationWarning": "Generating a new set immediately invalidates the recovery codes you may already have. Only the new ones will work.",
     "continueButton": "Continue",
     "twoFactorCodeRequired": "Enter a code from your two-factor app: the Gateway requires it to generate recovery codes."
+  },
+  "gatewayTwoFactorApp": {
+    "cardTitle": "Your two-factor app",
+    "description": "New phone or new two-factor app? Register a new secret in it: your Gladys Plus account will then only accept the codes of this new app.",
+    "changeButton": "Change my two-factor app",
+    "replaceWarning": "Once confirmed, the codes of your current app will no longer be accepted. Your recovery codes stay valid.",
+    "newCodeLabel": "Code displayed by your new app",
+    "currentCodeLabel": "Code displayed by your current app",
+    "currentCodeHelp": "The Gateway requires a code from the app currently registered to replace it.",
+    "confirmButton": "Replace my two-factor app",
+    "replacedSuccess": "Your two-factor app has been replaced. From now on, use your new app to log in to Gladys Plus.",
+    "invalidCode": "One of the codes is invalid or expired. Try again with new codes generated by your apps.",
+    "tooManyAttempts": "Too many failed attempts. Wait a few minutes before trying again.",
+    "loadError": "We could not generate a new secret. Check your connection and try again.",
+    "updateError": "We could not replace your two-factor app. Try again."
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configure two-factor authentication (2FA)",
@@ -5785,7 +5904,7 @@
           "comfort": "Comfort",
           "eco": "Eco",
           "off": "Off",
-          "frost-protection": "Frost Protection",
+          "frost-protection": "Frost protection",
           "comfort_-1": "Comfort -1°C",
           "comfort_-2": "Comfort -2°C"
         }
@@ -6011,7 +6130,7 @@
       "heater": {
         "pilot-wire-mode": {
           "0": "Off",
-          "1": "Frost Protection",
+          "1": "Frost protection",
           "2": "Eco",
           "3": "Comfort -1°C",
           "4": "Comfort -2°C",
@@ -6087,6 +6206,15 @@
         },
         "preset": {
           "0": "Schedule",
+          "1": "Frost protection",
+          "2": "Away",
+          "3": "Eco",
+          "4": "Night",
+          "5": "Comfort"
+        },
+        "active-preset": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Off",
           "1": "Frost protection",
           "2": "Away",
           "3": "Eco",
@@ -6894,6 +7022,7 @@
       "target-temperature": "Thermostat Temperature",
       "mode": "Thermostat Mode",
       "preset": "Thermostat Preset",
+      "active-preset": "Thermostat Active Preset",
       "operating-state": "Thermostat Operating State"
     },
     "airquality-sensor": {
@@ -7128,7 +7257,18 @@
     "noInstanceFoundTutorialLink": "Need a step-by-step guide with screenshots? <a href=\"https://gladysassistant.com/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Check out the tutorial in our documentation</a>.",
     "noInstanceFoundNote": "Already completed this step in the past? It sometimes needs to be done again, for example when your two-factor authentication (2FA) was reset: simply log in again in the \"Gladys Plus\" tab of your instance. Need help? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
-    "errorNotAcceptedLocally": "The user has not been authorized locally in the Gladys instance yet. In your local instance, go to the settings, \"Gladys Plus\" tab, \"Remote users\" section, and turn on the switch next to their name.",
+    "keysChangedTitle": "Your access needs to be authorized again",
+    "keysChangedIntro": "Your Gladys Plus encryption keys have changed since your Gladys instance authorized them. This is expected after resetting your Gladys Plus password (\"Forgot password\"): new keys are generated. For security, your instance refuses any key it has not validated itself. Nothing is broken: you just need to authorize your user again, from your home.",
+    "notAcceptedTitle": "Your access needs to be authorized",
+    "notAcceptedIntro": "Your Gladys Plus account is linked to your Gladys instance, but your user is not (or no longer) authorized to access it remotely. For security, each Gladys Plus user must be authorized from the instance itself, at your home: nobody, not even the Gladys Plus servers, can access your home without this validation.",
+    "notAcceptedUnknownReasonIntro": "Your Gladys instance has not authorized your user to access it remotely, or no longer does. This is expected the first time, but also after resetting your Gladys Plus password: new encryption keys are generated, and your instance needs to validate them again. For security, this authorization can only be done from the instance itself, at your home.",
+    "notAcceptedAskAdmin": "Only an administrator of your Gladys instance can authorize your access. If you are not one, ask the person who manages Gladys at your home to follow these steps.",
+    "notAcceptedStepAcceptUser": "In the \"<b>Remote users</b>\" section, check that the key fingerprints displayed next to your name match the ones below, then <b>turn on the switch</b>.",
+    "notAcceptedFingerprintsLabel": "Your encryption key fingerprints:",
+    "rsaKeyFingerprint": "RSA key:",
+    "ecdsaKeyFingerprint": "ECDSA key:",
+    "stillNotAccepted": "Your user is still not authorized. Check that the switch next to your name is turned on in your instance, then try again.",
+    "notAcceptedRetryButton": "My user is authorized, try again",
     "saveButton": "Save",
     "manageBillingLink": "Manage my subscription and invoices",
     "logoutButton": "Log out"

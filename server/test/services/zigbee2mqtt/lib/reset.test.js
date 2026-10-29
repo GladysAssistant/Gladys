@@ -78,6 +78,7 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.z2mContainerError = { message: 'some error' };
     zigbee2MqttManager.mqttConnectionError = { code: 'BAD_CREDENTIALS', message: null };
     zigbee2MqttManager.discoveredDevices = { '0x1234': { friendly_name: 'lamp' } };
+    zigbee2MqttManager.lastBridgeDevices = [{ friendly_name: 'lamp', ieee_address: '0x1234' }];
     zigbee2MqttManager.topicBinds = { 'zigbee2mqtt/#': () => {} };
   });
 
@@ -117,6 +118,7 @@ describe('zigbee2mqtt reset', () => {
 
     // Should reset in-memory state
     expect(zigbee2MqttManager.discoveredDevices).to.deep.equal({});
+    expect(zigbee2MqttManager.lastBridgeDevices).to.equal(null);
     expect(zigbee2MqttManager.topicBinds).to.deep.equal({});
     expect(zigbee2MqttManager.usbConfigured).to.equal(false);
     expect(zigbee2MqttManager.networkAdapterConfigured).to.equal(false);

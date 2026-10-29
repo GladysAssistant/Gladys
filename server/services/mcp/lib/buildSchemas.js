@@ -10,6 +10,7 @@ const {
   WEATHER_UNITS,
 } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const logger = require('../../../utils/logger');
 const { normalize } = require('../../../utils/device');
 const { hexToInt, kelvinToMired } = require('../../../utils/colors');
 const {
@@ -291,6 +292,36 @@ async function getAllResources() {
 }
 
 /**
+ * @description The selectors of the thermostat schedules, asked of the
+ * thermostat service only when the house has a thermostat to switch.
+ * @param {object} gladys - Gladys instance.
+ * @param {Array<string>} thermostatDeviceSelectors - Selectors of the thermostat devices.
+ * @returns {Promise<Array<string>>} The schedule selectors, empty without a thermostat or the service.
+ * @example
+ * await getThermostatScheduleSelectors(gladys, ['living-room-thermostat']);
+ */
+async function getThermostatScheduleSelectors(gladys, thermostatDeviceSelectors) {
+  if (thermostatDeviceSelectors.length === 0) {
+    return [];
+  }
+  // Found in the stateManager whatever its status: `running` is what says it runs.
+  const thermostatService = gladys.service.getService('thermostat');
+  if (!thermostatService || !thermostatService.device.running) {
+    return [];
+  }
+  // A lookup that fails must not cost the MCP server its tools: getAllTools would reject,
+  // and no tool would be registered at all. The schedule is then any string, as with no
+  // service.
+  try {
+    const schedules = await thermostatService.device.getSchedules();
+    return schedules.map(({ selector }) => selector);
+  } catch (e) {
+    logger.warn(`MCP: could not list the thermostat schedules: ${e.message}`);
+    return [];
+  }
+}
+
+/**
  * @description Get all tools available in the MCP service.
  * @param {string} [userId] - Optional user id used to scope private calendars.
  * @returns {Promise<Array>} Array of tools with their intent and configuration.
@@ -416,6 +447,12 @@ async function getAllTools(userId) {
       device.features.some((feature) => feature.category === 'music' && feature.type === 'play_notification'),
     )
     .map((device) => device.selector);
+  // The Gladys thermostats only: the climate device a thermostat drives is not
+  // one, and switching it to a schedule fails.
+  const thermostatDeviceSelectors = allDevices
+    .filter((device) => device.service && device.service.name === 'thermostat')
+    .map((device) => device.selector);
+  const thermostatScheduleSelectors = await getThermostatScheduleSelectors(this.gladys, thermostatDeviceSelectors);
   const sceneCreateInputSchema = createSceneCreateInputSchema(
     scenes.map(({ selector }) => selector),
     users.map(({ selector }) => selector),
@@ -426,6 +463,8 @@ async function getAllTools(userId) {
     deviceFeatureSelectors,
     calendars.map(({ selector }) => selector),
     areas.map(({ selector }) => selector),
+    thermostatDeviceSelectors,
+    thermostatScheduleSelectors,
   );
 
   const historyDevices = allDevices

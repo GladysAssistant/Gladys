@@ -27,6 +27,9 @@ async function updatePassword(userId, newPassword) {
 
   await user.update({ password: hashedPassword });
 
+  // the password was reset: every session of the user is logged out
+  await this.session.revokeLoginSessions(userId);
+
   const plainUser = user.get({ plain: true });
 
   this.stateManager.setState('user', plainUser.selector, plainUser);

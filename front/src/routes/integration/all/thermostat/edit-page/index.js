@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import ThermostatPage from '../ThermostatPage';
 import EditForm from './EditForm';
+import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
 
 class ThermostatEditPage extends Component {
   // Extracted so a selector change on a reused route reloads the form. Doing this
@@ -21,14 +22,19 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditTempUnit', 'C');
     this.props.updateThermostatField('thermostatEditControlType', 'hysteresis');
     this.props.updateThermostatField('thermostatEditActiveSchedule', '');
-    this.props.updateThermostatField('thermostatEditTemperatureFeature', '');
+    this.props.updateThermostatField('thermostatEditTemperatureFeatures', []);
     this.props.updateThermostatField('thermostatEditHumidityFeature', '');
     this.props.updateThermostatField('thermostatEditSwitchFeature', '');
+    this.props.updateThermostatField('thermostatEditPilotWireFeature', '');
+    this.props.updateThermostatField('thermostatEditPilotWireOrders', DEFAULT_PILOT_WIRE_ORDERS);
     this.props.updateThermostatField('thermostatEditType', 'virtual');
     this.props.updateThermostatField('thermostatEditTargetFeature', '');
     this.props.updateThermostatField('thermostatEditStateFeature', '');
     this.props.updateThermostatField('thermostatEditModeFeature', '');
-    this.props.updateThermostatField('thermostatEditWindowFeature', '');
+    this.props.updateThermostatField('thermostatEditPowerFeature', '');
+    this.props.updateThermostatField('thermostatEditWindowFeatures', []);
+    this.props.updateThermostatField('thermostatEditWindowDelay', '60');
+    this.props.updateThermostatField('thermostatEditShowAllRooms', false);
     this.props.updateThermostatField('thermostatEditPresetFrost', '7');
     this.props.updateThermostatField('thermostatEditPresetAway', '16');
     this.props.updateThermostatField('thermostatEditPresetEco', '18');
@@ -68,6 +74,6 @@ class ThermostatEditPage extends Component {
 }
 
 export default connect(
-  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeature,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditWindowFeature,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures',
+  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeatures,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditPilotWireFeature,thermostatEditPilotWireOrders,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditPowerFeature,thermostatEditWindowFeatures,thermostatEditWindowDelay,thermostatEditShowAllRooms,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,pilotWireFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures,powerFeatures',
   actions
 )(ThermostatEditPage);

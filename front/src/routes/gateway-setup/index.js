@@ -59,7 +59,10 @@ class LinkGatewayUser extends Component {
     }
     this.setState({ savingUserLoading: false });
   };
+  // Resolves with true when the instance does not accept this Gladys Plus user
   checkIfGladysUserIsLinkedToExistingUser = async () => {
+    let notAcceptedLocally = false;
+    let notAcceptedLocallyReason = null;
     try {
       // We get the gateway user to check if they are already linked to a Gladys local user
       const gatewayUser = await this.props.session.gatewayClient.getMyself();
@@ -78,28 +81,35 @@ class LinkGatewayUser extends Component {
             console.error(e);
             const error = get(e, 'response.data.error');
             if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
-              this.setState({ errorNotAcceptedLocally: true });
+              notAcceptedLocally = true;
+              // KEYS_CHANGED or NOT_ACCEPTED, missing on instances older than this page
+              notAcceptedLocallyReason = get(e, 'response.data.reason') || null;
             }
           }
-          return;
         }
       }
     } catch (e) {
       console.error(e);
       this.setState({ error: true });
     }
+    this.setState({ errorNotAcceptedLocally: notAcceptedLocally, notAcceptedLocallyReason });
+    return notAcceptedLocally;
   };
   init = async () => {
     await Promise.all([this.props.getUsers(), this.getSetupState()]);
-    await this.checkIfGladysUserIsLinkedToExistingUser();
+    return this.checkIfGladysUserIsLinkedToExistingUser();
   };
   retry = async e => {
     if (e) {
       e.preventDefault();
     }
-    this.setState({ error: false, errorNotAcceptedLocally: false, retrying: true });
+    // errorNotAcceptedLocally is kept during the retry, so the page keeps displaying
+    // the same guide under the loading dimmer
+    this.setState({ error: false, stillNotAcceptedLocally: false, retrying: true });
     try {
-      await this.init();
+      const notAcceptedLocally = await this.init();
+      // without this, a retry that fails again looks like a button that does nothing
+      this.setState({ stillNotAcceptedLocally: notAcceptedLocally });
     } catch (err) {
       console.error(err);
       this.setState({ error: true });
@@ -110,12 +120,15 @@ class LinkGatewayUser extends Component {
   componentWillMount() {
     this.init();
   }
-  render(props, { savingUserLoading, error, errorNotAcceptedLocally, retrying }) {
-    const loading = savingUserLoading || props.usersGetStatus === RequestStatus.Getting;
+  render(
+    props,
+    { savingUserLoading, error, errorNotAcceptedLocally, notAcceptedLocallyReason, stillNotAcceptedLocally, retrying }
+  ) {
+    const loading = savingUserLoading || retrying || props.usersGetStatus === RequestStatus.Getting;
     // While retrying, we keep displaying the step-by-step guide (under the loading
     // dimmer) instead of flashing the user-select form during the "Getting" state.
     const usersGetStatus =
-      retrying && props.usersGetStatus === RequestStatus.Getting
+      retrying && !errorNotAcceptedLocally && props.usersGetStatus === RequestStatus.Getting
         ? RequestStatus.GatewayNoInstanceFound
         : props.usersGetStatus;
     return (
@@ -124,6 +137,9 @@ class LinkGatewayUser extends Component {
         usersGetStatus={usersGetStatus}
         error={error}
         errorNotAcceptedLocally={errorNotAcceptedLocally}
+        notAcceptedLocallyReason={notAcceptedLocallyReason}
+        stillNotAcceptedLocally={stillNotAcceptedLocally}
+        keysFingerprints={props.session.getKeysFingerprints()}
         selectUser={this.selectUser}
         saveUser={this.saveUser}
         retry={this.retry}
