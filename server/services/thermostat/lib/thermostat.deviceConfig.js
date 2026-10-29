@@ -10,6 +10,8 @@ const {
   DEFAULT_MAX_TEMP,
   DEFAULT_TEMP_UNIT,
   DEFAULT_THERMOSTAT_TYPE,
+  DEFAULT_WINDOW_DELAY_SECONDS,
+  MAX_WINDOW_DELAY_SECONDS,
   THERMOSTAT_TYPES,
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
@@ -94,6 +96,13 @@ function buildParamsConfig(device) {
     power_feature: getParam('THERMOSTAT_POWER_FEATURE') || null,
     // One opening sensor or several (A.1.1): any of them open stops the heating.
     window_features: parseSelectorList(getParam('THERMOSTAT_WINDOW_FEATURE')),
+    // Seconds the sensor has to stay open before the heating is suspended. A
+    // negative value means nothing more than 0: cut at once.
+    // Bounded both ways: the generic device routes and MCP write it unchecked.
+    window_delay: Math.min(
+      MAX_WINDOW_DELAY_SECONDS,
+      Math.max(0, toNumber(getParam('THERMOSTAT_WINDOW_DELAY'), DEFAULT_WINDOW_DELAY_SECONDS)),
+    ),
     default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
     temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),

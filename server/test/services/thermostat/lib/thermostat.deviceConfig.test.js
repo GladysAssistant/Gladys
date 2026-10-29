@@ -102,6 +102,36 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
     expect(config.preset_frost).to.equal(0);
   });
 
+  // A door opened to come in must not cut the heating: one minute unless set.
+  it('should wait a minute before suspending the heating on an opening', () => {
+    expect(buildParamsConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' })).window_delay).to.equal(60);
+  });
+
+  it('should read the opening delay, 0 included', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp', THERMOSTAT_WINDOW_DELAY: '0' }),
+    );
+
+    expect(config.window_delay).to.equal(0);
+  });
+
+  // 3,000,000 s overflowed setTimeout, which then fired after 1 ms.
+  it('should read an opening delay past an hour as an hour', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp', THERMOSTAT_WINDOW_DELAY: '3000000' }),
+    );
+
+    expect(config.window_delay).to.equal(3600);
+  });
+
+  it('should read a negative opening delay as no delay', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp', THERMOSTAT_WINDOW_DELAY: '-30' }),
+    );
+
+    expect(config.window_delay).to.equal(0);
+  });
+
   // Who regulates a pilot-wire heater is said by the thermostat type (C.1.1).
   it('should let Gladys regulate a pilot wire on a virtual thermostat with a room sensor', () => {
     const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }));

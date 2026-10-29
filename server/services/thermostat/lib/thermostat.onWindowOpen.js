@@ -271,7 +271,13 @@ async function onPilotWireOrderChanged(device, config, order) {
   // written back at once, marked as this service's own so its echo is not taken
   // for another press — or off, on a heater stopped already, as the pass does.
   // Off pressed is still a stop, taken below.
-  if (!stop && config.window_features.length > 0 && (await findOpenWindow(this.gladys, config.window_features))) {
+  // Only once the window has suspended the heating (THERMOSTAT_WINDOW_DELAY):
+  // until then the press is taken, as the pass would regulate.
+  if (
+    !stop &&
+    config.window_features.length > 0 &&
+    (await findOpenWindow(this.gladys, config.window_features, config.window_delay, this.windowOpenedAt))
+  ) {
     logger.info(`Thermostat: order ${order} pressed with the window open (${device.selector}), sending it back`);
     await drivePilotWire(
       this.gladys,
@@ -519,7 +525,11 @@ async function holdRemoteStartOnOffPoint(device) {
   }
   // Found by its params, which always build a config.
   const config = buildParamsConfig(device);
-  if (config.window_features.length > 0 && (await findOpenWindow(this.gladys, config.window_features))) {
+  // The window wins only once it has suspended the heating (THERMOSTAT_WINDOW_DELAY).
+  if (
+    config.window_features.length > 0 &&
+    (await findOpenWindow(this.gladys, config.window_features, config.window_delay, this.windowOpenedAt))
+  ) {
     return;
   }
   const target = await getFeatureBySelector(this.gladys, config.target_feature);
@@ -692,10 +702,52 @@ async function onExternalPowerChanged(changedSelector, newValue) {
 }
 
 /**
+ * @description The key of the pending check of one window for one thermostat
+ * (scheduleWindowCheck). Selectors are slugs, so a space cannot occur in either.
+ * @param {string} thermostatSelector - The thermostat waiting on the opening.
+ * @param {string} windowSelector - The sensor that opened.
+ * @returns {string} The key in `windowTimers`.
+ * @example
+ * windowTimerKey('thermostat-living-room', 'window-sensor'); // 'thermostat-living-room window-sensor'
+ */
+function windowTimerKey(thermostatSelector, windowSelector) {
+  return `${thermostatSelector} ${windowSelector}`;
+}
+
+/**
+ * @description Check a thermostat again once the delay of an opening has run
+ * out, rather than at the next minute tick. The regulation pass decides: it
+ * suspends the heating if the window is still open, and leaves it alone if it
+ * was closed in the meantime. A thermostat watching several windows (A.1.1)
+ * waits on each of them apart: keyed by the thermostat alone, a second opening
+ * replaced the first one's check, and its closing dropped a check the first
+ * window still needed.
+ * @param {string} thermostatSelector - The thermostat waiting on the opening.
+ * @param {string} windowSelector - The sensor that opened.
+ * @param {number} delayMs - Time left before the delay runs out.
+ * @returns {undefined}
+ * @example
+ * scheduleWindowCheck.call(handler, 'thermostat-living-room', 'window-sensor', 60000);
+ */
+function scheduleWindowCheck(thermostatSelector, windowSelector, delayMs) {
+  const key = windowTimerKey(thermostatSelector, windowSelector);
+  const pending = this.windowTimers.get(key);
+  if (pending) {
+    clearTimeout(pending.timer);
+  }
+  const timer = setTimeout(() => {
+    this.windowTimers.delete(key);
+    this.triggerApplySchedules();
+  }, delayMs);
+  this.windowTimers.set(key, { timer, window: windowSelector });
+}
+
+/**
  * @description Called when a device feature state changes.
  * If the feature is a configured window sensor and the window is now open,
- * immediately turn off the associated heating switch. Once it closes again, a
- * regulation pass is run straight away rather than at the next minute tick.
+ * turn off the associated heating switch — at once, or once it has stayed open
+ * THERMOSTAT_WINDOW_DELAY seconds. Once it closes again, a regulation pass is
+ * run straight away rather than at the next minute tick.
  * Services emit EVENTS.DEVICE.NEW_STATE with { device_feature_external_id, state };
  * the legacy { device_feature, last_value } shape is also accepted.
  * @param {object} event - The device new-state event payload.
@@ -716,6 +768,9 @@ async function onDeviceNewState(event) {
   if (!changedSelector) {
     return;
   }
+  // The run of the service this change arrived in: a stop, or a stop and a start,
+  // during one of the awaits below makes it stale (see `lifecycle`).
+  const { lifecycle } = this;
 
   // A setpoint changed on a real thermostat — its own dial, the vendor app, its
   // internal programme — is a decision by whoever made it, and Gladys must not
@@ -732,25 +787,52 @@ async function onDeviceNewState(event) {
   try {
     // Cheap rejection first: most events in a house are not a configured window.
     const windowSelectors = await getWindowSelectors.call(this);
-    if (!windowSelectors.has(changedSelector)) {
+    // The service may have stopped during the awaits: its timers and openings are
+    // already cleared, and nothing recorded now would ever be cleared again.
+    if (this.lifecycle !== lifecycle || !windowSelectors.has(changedSelector)) {
       return;
     }
     if (newValue !== 0) {
-      // Closed: the heating comes back now, as it was cut — waiting for the next
+      // Closed: the next opening starts a new count, and the checks waiting on
+      // this one have nothing left to cut.
+      this.windowOpenedAt.delete(changedSelector);
+      let dropped = 0;
+      this.windowTimers.forEach(({ timer, window }, key) => {
+        if (window === changedSelector) {
+          clearTimeout(timer);
+          this.windowTimers.delete(key);
+          dropped += 1;
+        }
+      });
+      // The heating comes back now, as it was cut — waiting for the next
       // tick left it off for up to a minute, and a pilot-wire card said its
       // order was on its way all that time. Only on a closing this listener saw
       // open: a contact re-reports its state, and every report of a window
-      // closed for hours would otherwise run a pass.
-      if (this.openWindows.delete(changedSelector)) {
+      // closed for hours would otherwise run a pass. Nor when a check was still
+      // waiting on it: closed before its delay ran out, it cut nothing.
+      if (this.openWindows.delete(changedSelector) && dropped === 0) {
         logger.info(`Thermostat: window closed (${changedSelector}), regulating again`);
         this.triggerApplySchedules();
       }
       return;
     }
     this.openWindows.add(changedSelector);
+    // A contact re-reporting an opening already seen keeps its first time: the
+    // delay runs from when the window opened, not from its latest report.
+    if (!this.windowOpenedAt.has(changedSelector)) {
+      this.windowOpenedAt.set(changedSelector, Date.now());
+    }
+    const openedAt = this.windowOpenedAt.get(changedSelector);
 
     const thermostatDevices = await this.gladys.device.get({ service: 'thermostat' });
-    if (!thermostatDevices || thermostatDevices.length === 0) {
+    // The window may also have closed, or closed and opened again, during the
+    // lookup: this opening is then over, and must not arm a check on its old time.
+    if (
+      this.lifecycle !== lifecycle ||
+      this.windowOpenedAt.get(changedSelector) !== openedAt ||
+      !thermostatDevices ||
+      thermostatDevices.length === 0
+    ) {
       return;
     }
     await Promise.all(
@@ -763,6 +845,18 @@ async function onDeviceNewState(event) {
         // opening is enough.
         const { window_features: windowFeatures = [], switch_feature: switchFeature } = paramsConfig;
         if (!windowFeatures.includes(changedSelector)) {
+          return;
+        }
+        // A door opened to come in and closed right behind must not cut the
+        // heating: the cut waits for the delay, and is left to the regulation
+        // pass that runs when it ends.
+        const remaining = openedAt + paramsConfig.window_delay * 1000 - Date.now();
+        if (remaining > 0) {
+          logger.info(
+            `Thermostat: window opened (${changedSelector}) for ${device.selector},` +
+              ` suspending the heating in ${Math.ceil(remaining / 1000)} s if it stays open`,
+          );
+          scheduleWindowCheck.call(this, device.selector, changedSelector, remaining);
           return;
         }
         // An external thermostat carries no setpoint feature and no switch: it is

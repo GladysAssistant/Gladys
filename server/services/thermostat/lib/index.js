@@ -69,6 +69,20 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // a regulation pass straight away — not every periodic report of a window
   // that stayed closed.
   this.openWindows = new Set();
+  // When each opening sensor was seen opening, by selector. The heating is only
+  // suspended once it has stayed open THERMOSTAT_WINDOW_DELAY seconds, and the
+  // feature's `last_value_changed` cannot say since when: it moves on every
+  // report, and a contact re-reporting "open" would restart the count each time.
+  this.windowOpenedAt = new Map();
+  // The pending checks of an opening's delay, by thermostat selector, so that the
+  // heating is suspended when the delay ends rather than at the next minute tick.
+  // Each one keeps the sensor it waits on, so that closing it drops the check.
+  this.windowTimers = new Map();
+  // Moved on by every start() and stop() of the service. A state change already
+  // in flight when the service stops must not record an opening or arm a check
+  // once it resumes — nor when the service has started again meanwhile, which a
+  // stopped flag alone, set back on the start, would let through.
+  this.lifecycle = 0;
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;

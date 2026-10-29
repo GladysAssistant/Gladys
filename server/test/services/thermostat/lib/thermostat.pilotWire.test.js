@@ -101,6 +101,8 @@ const pilotWireDevice = (preset, extra = {}) => ({
   params: params({
     THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire',
     THERMOSTAT_MODE: 'heating',
+    // The window cuts at once in these tests: the delay has its own (windowDelay).
+    THERMOSTAT_WINDOW_DELAY: '0',
     ...extra,
   }),
 });

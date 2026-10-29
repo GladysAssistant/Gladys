@@ -3721,8 +3721,14 @@
         },
         "windowFeatureLabel": "Capteurs d'ouverture de fenêtre",
         "windowFeatureHelp": {
-          "heating": "Optionnel. Dès qu'une des fenêtres sélectionnées est ouverte, le chauffage est automatiquement coupé.",
-          "cooling": "Optionnel. Dès qu'une des fenêtres sélectionnées est ouverte, la climatisation est automatiquement coupée."
+          "heating": "Optionnel. Dès qu'une des fenêtres sélectionnées reste ouverte plus longtemps que le délai ci-dessous, le chauffage est automatiquement coupé.",
+          "cooling": "Optionnel. Dès qu'une des fenêtres sélectionnées reste ouverte plus longtemps que le délai ci-dessous, la climatisation est automatiquement coupée."
+        },
+        "windowDelayLabel": "Délai avant coupure",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que le chauffage soit coupé. Une porte ouverte pour rentrer et refermée aussitôt ne le coupe pas. 0 le coupe immédiatement ; 3600 s (une heure) au maximum.",
+          "cooling": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que la climatisation soit coupée. Une porte ouverte pour rentrer et refermée aussitôt ne la coupe pas. 0 la coupe immédiatement ; 3600 s (une heure) au maximum."
         },
         "addWindowFeature": "Ajouter un capteur d'ouverture",
         "removeFeature": "Retirer",

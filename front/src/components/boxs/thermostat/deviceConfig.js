@@ -25,6 +25,8 @@ const PARAM_FIELDS = [
   ['power_feature', 'THERMOSTAT_POWER_FEATURE'],
   // Any of several opening sensors open suspends the heating (spec A.1.1).
   ['window_features', 'THERMOSTAT_WINDOW_FEATURE', parseSelectorList],
+  // Seconds an opening has to last before the heating is suspended.
+  ['window_delay', 'THERMOSTAT_WINDOW_DELAY', parseFloat],
   // The manual hold: the setpoint held by hand, and when it gives the thermostat
   // back to its programme. Empty expiry means a permanent hold, which is what a
   // thermostat that follows no schedule gets.

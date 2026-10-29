@@ -363,7 +363,8 @@ describe('thermostat.regulateDevice - external', () => {
   });
 
   describe('window open', () => {
-    const withWindow = (overrides = {}) => externalDevice({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', ...overrides });
+    const withWindow = (overrides = {}) =>
+      externalDevice({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0', ...overrides });
 
     // Nothing to cut: the real thermostat holds the contact. Writing the frost
     // setpoint is what stops it heating, and every thermostat accepting a
@@ -537,7 +538,11 @@ describe('thermostat.regulateDevice - external', () => {
         features: modeFeatures({ 'window-sensor': { selector: 'window-sensor', last_value: 0 } }),
       });
 
-      await regulate(mod, gladys, withMode({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+      await regulate(
+        mod,
+        gladys,
+        withMode({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
+      );
 
       expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.OFF);
     });
@@ -713,7 +718,11 @@ describe('thermostat.regulateDevice - external', () => {
         features: { ...acFeatures(), 'window-sensor': { selector: 'window-sensor', last_value: 0 } },
       });
 
-      await regulate(mod, gladys, acDevice({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+      await regulate(
+        mod,
+        gladys,
+        acDevice({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
+      );
 
       expect(writtenOn(gladys, 'ac-power')).to.equal(0);
     });
@@ -1883,12 +1892,30 @@ describe('thermostat.onExternalPowerChanged', () => {
       const mod = loadListener({ point: offPoint });
       const handler = onOffPoint({
         windowOpen: true,
-        extraParams: [{ name: 'THERMOSTAT_WINDOW_FEATURE', value: 'living-room-window' }],
+        extraParams: [
+          { name: 'THERMOSTAT_WINDOW_FEATURE', value: 'living-room-window' },
+          { name: 'THERMOSTAT_WINDOW_DELAY', value: '0' },
+        ],
       });
 
       await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
 
       assert.notCalled(handler.gladys.device.setParam);
+    });
+
+    // The window only wins once it has suspended the unit: until its delay has
+    // run out, the pass regulates as if it were closed, and the press is followed.
+    it('should hold it while the window has not been open for its delay', async () => {
+      const mod = loadListener({ point: offPoint });
+      const handler = onOffPoint({
+        windowOpen: true,
+        extraParams: [{ name: 'THERMOSTAT_WINDOW_FEATURE', value: 'living-room-window' }],
+      });
+      handler.windowOpenedAt = new Map([['living-room-window', Date.now()]]);
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '22');
     });
 
     it('should hold it when the window is closed', async () => {

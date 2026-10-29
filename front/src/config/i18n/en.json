@@ -3721,8 +3721,14 @@
         },
         "windowFeatureLabel": "Window opening sensors",
         "windowFeatureHelp": {
-          "heating": "Optional. As soon as one of the selected windows is open, the heating is automatically cut off.",
-          "cooling": "Optional. As soon as one of the selected windows is open, the cooling is automatically cut off."
+          "heating": "Optional. As soon as one of the selected windows stays open longer than the delay below, the heating is automatically cut off.",
+          "cooling": "Optional. As soon as one of the selected windows stays open longer than the delay below, the cooling is automatically cut off."
+        },
+        "windowDelayLabel": "Delay before cutting off",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "How long the window has to stay open before the heating is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour).",
+          "cooling": "How long the window has to stay open before the cooling is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour)."
         },
         "addWindowFeature": "Add an opening sensor",
         "removeFeature": "Remove",
