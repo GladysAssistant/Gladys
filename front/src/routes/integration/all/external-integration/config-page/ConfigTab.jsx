@@ -11,6 +11,7 @@ import CalendarAccountCard from './CalendarAccountCard';
 import WebhooksCard from './WebhooksCard';
 import TtsVoiceCard from './TtsVoiceCard';
 import HardwareCard from './HardwareCard';
+import AiProviderCard from './AiProviderCard';
 import { getAssignedPortsByName, getLocalizedText, getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../../server/utils/constants';
@@ -36,6 +37,9 @@ const ConfigTab = props => {
   // calendar integrations: the per-user "My calendars" block, for
   // every user — enable/disable, account values, sync/shared toggles
   const isCalendar = get(integration, 'manifest.type') === 'calendar';
+  // AI providers: the selection as the AI provider of the instance is the
+  // step after install, the card below says where it stands
+  const isAiProvider = get(integration, 'manifest.type') === 'ai';
   // tts integrations: whether this one is the voice of the instance, and
   // where to change it — the setting lives on the Artificial Intelligence page
   const isTts = get(integration, 'manifest.type') === 'tts';
@@ -58,6 +62,10 @@ const ConfigTab = props => {
         <div class="alert alert-danger">
           <Text id="integration.externalIntegration.config.loadError" />
         </div>
+      )}
+
+      {isAdmin && isAiProvider && integration && integration.selector && (
+        <AiProviderCard integration={integration} httpClient={props.httpClient} />
       )}
 
       {isAdmin && (

@@ -732,6 +732,24 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept the music capability field on device integrations, booleans only', () => {
+    const manifest = { ...TEST_MANIFEST, music: { browse: true, search: false, queue: true, append: false } };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    expect(externalIntegration.validateManifest({ ...TEST_MANIFEST, music: {} })).to.deep.equal({
+      ...TEST_MANIFEST,
+      music: {},
+    });
+    expect422(
+      { ...TEST_MANIFEST, type: 'communication', music: { browse: true } },
+      'music: only allowed on device integrations',
+    );
+    expect422({ ...TEST_MANIFEST, music: 'yes' }, 'music: must be an object');
+    expect422({ ...TEST_MANIFEST, music: null }, 'music: must be an object');
+    expect422({ ...TEST_MANIFEST, music: [true] }, 'music: must be an object');
+    expect422({ ...TEST_MANIFEST, music: { lyrics: true } }, 'music.lyrics: unknown field');
+    expect422({ ...TEST_MANIFEST, music: { browse: 'yes' } }, 'music.browse: must be a boolean');
+  });
+
   it('should accept a valid actions list', () => {
     const manifest = {
       ...TEST_MANIFEST,
@@ -1194,6 +1212,48 @@ describe('externalIntegration.validateManifest', () => {
   it('should reject an invalid transports declaration', () => {
     [[], ['satellite'], ['local', 'local'], 'local'].forEach((transports) => {
       expect422({ ...TEST_MANIFEST, transports }, 'transports: must be a non-empty subset of local, cloud');
+    });
+  });
+
+  it('should accept a valid keywords declaration', () => {
+    const manifest = { ...TEST_MANIFEST, keywords: ['WiiM', 'Arylic', 'Audio Pro'] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed keywords declaration', () => {
+    // not an array, empty, more than 10 terms, a term too short or too long,
+    // a non-string term, and duplicates once trimmed and lowercased
+    [
+      'wiim',
+      [],
+      ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'].map((letter) => `${letter}${letter}`),
+      ['x'],
+      [' x '],
+      ['a'.repeat(31)],
+      [42],
+      ['WiiM', ' wiim'],
+    ].forEach((keywords) => {
+      expect422({ ...TEST_MANIFEST, keywords }, 'keywords: must be 1-10 unique strings of 2-30 characters');
+    });
+  });
+
+  it('should accept a valid countries declaration', () => {
+    const manifest = { ...TEST_MANIFEST, countries: ['FR', 'BE'] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed countries declaration', () => {
+    // not an array, empty, more than 20 codes, lower case, not alpha-2,
+    // non-string items and duplicates
+    const tooMany = Array.from(
+      { length: 21 },
+      (value, i) => `${String.fromCharCode(65 + (i % 26))}${String.fromCharCode(65 + Math.floor(i / 26))}`,
+    );
+    ['FR', [], tooMany, ['fr'], ['FRA'], ['F1'], [null], ['FR', 'FR']].forEach((countries) => {
+      expect422(
+        { ...TEST_MANIFEST, countries },
+        'countries: must be 1-20 unique ISO 3166-1 alpha-2 codes (upper case)',
+      );
     });
   });
 

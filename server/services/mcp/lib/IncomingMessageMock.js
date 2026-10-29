@@ -13,6 +13,17 @@ class IncomingMessageMock {
     this.listeners[event] = cb;
   }
 
+  off(event) {
+    delete this.listeners[event];
+  }
+
+  resume() {
+    // The body is already parsed, nothing is left to read
+    this.listeners.end?.();
+
+    return this;
+  }
+
   json() {
     return JSON.parse(this.body);
   }

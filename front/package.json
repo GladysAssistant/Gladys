@@ -18,7 +18,7 @@
     "compare-translations": "comparejson -e ./src/config/i18n/*.json && comparejson -e ./src/config/i18n/icon-keywords/*.json && node ./cli/check_translations.js",
     "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
-    "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 vite build --minify false --sourcemap false && sirv build --port 1444 --cors --single",
+    "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 vite build --minify false --sourcemap false && node cypress/serve-build.js",
     "start:cypress:dev": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm start",
     "cypress:open": "cypress open --config-file cypress/cypress.config.js",
     "cypress:run": "cypress run --config-file cypress/cypress.config.js"
@@ -28,10 +28,11 @@
   },
   "devDependencies": {
     "@preact/async-loader": "^3.0.2",
-    "@preact/preset-vite": "^2.10.2",
+    "@preact/preset-vite": "^2.10.6",
     "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
     "cypress": "^10.11.0",
+    "esbuild": "^0.28.2",
     "eslint": "^8.39.0",
     "eslint-config-preact": "^1.3.0",
     "eslint-config-prettier": "^8.5.0",
@@ -42,10 +43,11 @@
     "eslint-plugin-react": "^7.32.2",
     "per-env": "^1.0.2",
     "prettier": "^1.17.1",
+    "sirv": "^3.0.2",
     "sirv-cli": "^3.0.1",
-    "vite": "^6.3.5",
+    "vite": "^8.3.4",
     "vite-css-modules": "^1.16.0",
-    "vite-plugin-static-copy": "^2.3.2"
+    "vite-plugin-static-copy": "^4.1.1"
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^4.22.1",
@@ -60,7 +62,7 @@
     "date-fns": "^2.22.1",
     "dayjs": "^1.10.6",
     "debounce": "^1.2.1",
-    "dompurify": "^3.4.12",
+    "dompurify": "^3.4.17",
     "dotenv": "^6.2.0",
     "eslint-plugin-i18n-json": "^4.0.0",
     "get-value": "^3.0.1",

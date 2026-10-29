@@ -261,6 +261,106 @@ describe('Device.newStateEvent', () => {
     const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'mqtt:camera:image');
     expect(newDeviceFeature).to.have.property('last_value_string', 'image/png;base64,new-image');
   });
+  const seedMusicFeature = (stateManager, type, extra = {}) => {
+    stateManager.setState('deviceFeatureByExternalId', `music:${type}`, {
+      id: `music-feature-${type}`,
+      name: `Test music ${type}`,
+      selector: `test-music-${type}`,
+      external_id: `music:${type}`,
+      category: 'music',
+      type,
+      read_only: true,
+      has_feedback: false,
+      keep_history: false,
+      min: 0,
+      max: 0,
+      last_value_string: null,
+      last_value_changed: '2019-02-12 07:49:07.556 +00:00',
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      ...extra,
+    });
+    stateManager.setState('deviceById', '7f85c2f8-86cc-4600-84db-6c074dadb4e8', {});
+  };
+  it('should save an empty text as a string state (nothing loaded on a music player)', async () => {
+    const stateManager = new StateManager(event);
+    seedMusicFeature(stateManager, 'title', { last_value_string: 'Previous track' });
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    await device.newStateEvent({ device_feature_external_id: 'music:title', text: '' });
+    const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:title');
+    expect(newDeviceFeature).to.have.property('last_value_string', '');
+  });
+  it('should save a music string state by type, truncated at 200 characters', async () => {
+    const stateManager = new StateManager(event);
+    seedMusicFeature(stateManager, 'artist');
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    await device.newStateEvent({ device_feature_external_id: 'music:artist', state: 'a'.repeat(250) });
+    const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:artist');
+    expect(newDeviceFeature).to.have.property('last_value_string', 'a'.repeat(200));
+  });
+  it('should save an artwork key and refuse an artwork that is not a key', async () => {
+    const stateManager = new StateManager(event);
+    seedMusicFeature(stateManager, 'artwork');
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    await device.newStateEvent({ device_feature_external_id: 'music:artwork', text: 'art-3f9a2c1b7e4d' });
+    let newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:artwork');
+    expect(newDeviceFeature).to.have.property('last_value_string', 'art-3f9a2c1b7e4d');
+    await device.newStateEvent({ device_feature_external_id: 'music:artwork', text: 'https://cdn.example/a.jpg' });
+    newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:artwork');
+    expect(newDeviceFeature).to.have.property('last_value_string', 'art-3f9a2c1b7e4d');
+    await device.newStateEvent({ device_feature_external_id: 'music:artwork', state: 'Art-Upper' });
+    newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:artwork');
+    expect(newDeviceFeature).to.have.property('last_value_string', 'art-3f9a2c1b7e4d');
+    await device.newStateEvent({ device_feature_external_id: 'music:artwork', text: '' });
+    newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'music:artwork');
+    expect(newDeviceFeature).to.have.property('last_value_string', '');
+  });
+  it('should keep ignoring an empty text on a feature that is not a string state (camera image)', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', 'mqtt:camera:image', {
+      id: 'camera-image-feature',
+      selector: 'test-camera-image',
+      external_id: 'mqtt:camera:image',
+      category: 'camera',
+      type: 'image',
+      last_value_string: 'image/jpg;base64,last-frame',
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+    });
+    stateManager.setState('deviceById', '7f85c2f8-86cc-4600-84db-6c074dadb4e8', { features: [] });
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    device.saveStringState = sinon.fake.resolves(null);
+    device.saveState = sinon.fake.resolves(null);
+    await device.newStateEvent({ device_feature_external_id: 'mqtt:camera:image', text: '' });
+    sinon.assert.notCalled(device.saveStringState);
+    // a non-empty text still reaches the image, as it always did
+    await device.newStateEvent({ device_feature_external_id: 'mqtt:camera:image', text: 'image/jpg;base64,new' });
+    sinon.assert.calledOnce(device.saveStringState);
+  });
+  it('should treat a null text as no text and save the numeric state', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', 'hue:binary:1', {
+      id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      selector: 'test-device-feature',
+      external_id: 'hue:binary:1',
+      category: 'light',
+      type: 'binary',
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+    });
+    stateManager.setState('deviceById', '7f85c2f8-86cc-4600-84db-6c074dadb4e8', {});
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    device.saveStringState = sinon.fake.resolves(null);
+    device.saveState = sinon.fake.resolves(null);
+    await device.newStateEvent({ device_feature_external_id: 'hue:binary:1', text: null, state: 12 });
+    sinon.assert.notCalled(device.saveStringState);
+    sinon.assert.calledOnce(device.saveState);
+  });
+  it('should swallow a failing save, logging it', async () => {
+    const stateManager = new StateManager(event);
+    seedMusicFeature(stateManager, 'title');
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    device.saveStringState = sinon.fake.rejects(new Error('db is down'));
+    await device.newStateEvent({ device_feature_external_id: 'music:title', text: 'Blue in Green' });
+    sinon.assert.calledOnce(device.saveStringState);
+  });
   it('should not save state missing device feature', async () => {
     const stateManager = new StateManager(event);
     const device = new Device(event, {}, stateManager, {}, {}, {}, job);

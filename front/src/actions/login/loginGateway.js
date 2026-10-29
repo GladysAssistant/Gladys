@@ -1,10 +1,22 @@
 import get from 'get-value';
 import { RequestStatus, LoginStatus } from '../../utils/consts';
-import { validateEmail } from '../../utils/validator';
+import { validateEmail, cleanEmail } from '../../utils/validator';
 import { ERROR_MESSAGES } from '../../../../server/utils/constants';
 import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
 import { isSafeReturnUrl } from '../../utils/url';
+
+// Resolves with null when the instance does not accept this Gladys Plus user
+async function getLinkedUserAcceptedLocally(httpClient) {
+  try {
+    return await httpClient.get('/api/v1/me');
+  } catch (e) {
+    if (get(e, 'response.data.error') === 'USER_NOT_ACCEPTED_LOCALLY') {
+      return null;
+    }
+    throw e;
+  }
+}
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
@@ -48,7 +60,8 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
-      if (!validateEmail(state.gatewayLoginEmail)) {
+      const email = cleanEmail(state.gatewayLoginEmail);
+      if (!validateEmail(email)) {
         return store.setState({
           gatewayLoginStatus: LoginStatus.WrongEmailError
         });
@@ -58,10 +71,7 @@ function createActions(store) {
         gatewayLoginError: null
       });
       try {
-        const gatewayLoginResults = await state.session.gatewayClient.login(
-          state.gatewayLoginEmail,
-          state.gatewayLoginPassword
-        );
+        const gatewayLoginResults = await state.session.gatewayClient.login(email, state.gatewayLoginPassword);
         if (gatewayLoginResults.two_factor_token) {
           store.setState({
             gatewayLoginResults,
@@ -98,7 +108,7 @@ function createActions(store) {
       // silently with the credentials still in memory, so they only have to
       // enter a fresh code from their app to finalize the connection.
       const gatewayLoginResults = await state.session.gatewayClient.login(
-        state.gatewayLoginEmail,
+        cleanEmail(state.gatewayLoginEmail),
         state.gatewayLoginPassword
       );
       store.setState({
@@ -116,21 +126,31 @@ function createActions(store) {
       state.session.saveLoginInformations(data);
       // connect
       await state.session.connect();
-      let nextUrl;
-      if (data.gladysUserId) {
-        // get user
-        const user = await state.httpClient.get('/api/v1/me');
+      let nextUrl = '/link-gateway-user';
+      // get user, unless the instance does not accept this Gladys Plus user (yet):
+      // the link page explains why and how to authorize them
+      const user = data.gladysUserId ? await getLinkedUserAcceptedLocally(state.httpClient) : null;
+      if (user) {
         store.setState({
           user
         });
         // save user
         state.session.saveUser(user);
+        // the app is not remounted after login, so checkSession will not run:
+        // the Gladys Plus role (which settings tabs show Billing) is read here.
+        // A failure only hides Billing until the next reload, not the login.
+        try {
+          const gatewayUser = await state.session.getGatewayUser();
+          store.setState({
+            gatewayUserRole: gatewayUser.role
+          });
+        } catch (e) {
+          console.error(e);
+        }
         // get profile picture
         await actionsProfilePicture.loadProfilePicture(store.getState());
         // verify if we need to redirect to the previous page
         nextUrl = state.gatewayLoginReturnUrl || '/dashboard';
-      } else {
-        nextUrl = '/link-gateway-user';
       }
       // The user just enabled two-factor: we generate their recovery codes and
       // display them once (only hashes are stored server side) before finishing
@@ -190,10 +210,6 @@ function createActions(store) {
       if (error === 'LINKED_USER_NOT_FOUND') {
         await state.session.gatewayClient.updateUserIdInGladys(null);
         route('/link-gateway-user');
-      } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
-        store.setState({
-          gatewayLoginStatus: RequestStatus.UserNotAcceptedLocally
-        });
       } else if (errorMessage === 'NO_INSTANCE_FOUND') {
         store.setState({
           gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound

@@ -56,6 +56,11 @@ describe('zigbee2mqtt action enumType', () => {
     assert.deepEqual(result, []);
   });
 
+  it('should have no indexes for Hue tap action values', () => {
+    const result = enumType.getFeatureIndexes(['press_1', 'press_2', 'press_3', 'press_4']);
+    assert.deepEqual(result, []);
+  });
+
   it('should have no indexes for SNZB-01M action values', () => {
     const result = enumType.getFeatureIndexes([
       'single_button_1',
@@ -106,6 +111,14 @@ describe('zigbee2mqtt action enumType', () => {
       };
       const result = enumType.readValue(snzb01mExpose, enumValue);
       assert.equal(result, intValue);
+    });
+  });
+
+  [1, 2, 3, 4].forEach((n) => {
+    it(`should read Hue tap action "press_${n}" as BUTTON_STATUS.SINGLE_BUTTON_${n}`, () => {
+      const hueTapExpose = { name: 'action', values: ['press_1', 'press_2', 'press_3', 'press_4'] };
+      const result = enumType.readValue(hueTapExpose, `press_${n}`);
+      assert.equal(result, BUTTON_STATUS[`SINGLE_BUTTON_${n}`]);
     });
   });
 });

@@ -249,7 +249,16 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
         expect(res.body.azimuth).to.be.a('number');
         expect(res.body.elevation).to.be.a('number');
         expect(res.body.curve).to.be.an('array');
-        expect(res.body.curve).to.have.lengthOf(73);
+        // One point every 20 minutes from local midnight to the next one included. The
+        // request runs on today, so the day lasts 23 or 25 hours when the clocks change:
+        // 73 points then became 70 or 76, and the test failed twice a year.
+        const { curve } = res.body;
+        const dayLength = new Date(curve[curve.length - 1].time).getTime() - new Date(curve[0].time).getTime();
+        expect([23, 24, 25].map((hours) => hours * 60 * 60 * 1000)).to.include(dayLength);
+        expect(curve).to.have.lengthOf(dayLength / (20 * 60 * 1000) + 1);
+        curve.slice(1).forEach((point, index) => {
+          expect(new Date(point.time).getTime() - new Date(curve[index].time).getTime()).to.equal(20 * 60 * 1000);
+        });
       });
   });
   it('should return 400 when the house has no coordinates', async () => {

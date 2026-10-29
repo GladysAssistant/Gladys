@@ -17,6 +17,11 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     onDeviceNewState: fake.resolves(null),
     primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
+    lifecycle: 0,
+    windowTimers: new Map(),
+    windowOpenedAt: new Map(),
+    // As the real handler is built: not running until start().
+    running: false,
   };
   const controllers = { 'get /api/v1/service/thermostat/device': {} };
   const ThermostatService = proxyquire('../../../services/thermostat/index', {
@@ -133,6 +138,93 @@ describe('ThermostatService', () => {
     assert.calledWith(gladys.event.removeListener, EVENTS.DEVICE.NEW_STATE);
     assert.notCalled(handler.applySchedules);
     expect(handler.applyTimer).to.equal(null);
+  });
+
+  it('should clear the pending checks of an opening delay on stop', async () => {
+    const clock = sinon.useFakeTimers();
+    const { service, handler } = buildService();
+    const check = fake();
+    handler.windowTimers.set('thermostat-living-room', { timer: setTimeout(check, 10000), window: 'window-sensor' });
+
+    await service.stop();
+    await clock.tickAsync(10000);
+
+    assert.notCalled(check);
+    expect(handler.windowTimers.size).to.equal(0);
+  });
+
+  // A window closed and opened again while the service was stopped must count
+  // from its new opening, not from the one kept before the stop.
+  it('should forget the openings it recorded on stop', async () => {
+    const { service, handler } = buildService();
+    handler.windowOpenedAt.set('window-sensor', 1000);
+
+    await service.stop();
+
+    expect(handler.windowOpenedAt.size).to.equal(0);
+  });
+
+  // A state change still in flight compares this to the run it arrived in: a
+  // stop, then a start, must both move it on.
+  it('should move the lifecycle on at every stop and start', async () => {
+    const { service, handler } = buildService();
+
+    await service.start();
+    expect(handler.lifecycle).to.equal(1);
+    await service.stop();
+    expect(handler.lifecycle).to.equal(2);
+    await service.start();
+    expect(handler.lifecycle).to.equal(3);
+  });
+
+  // What the scene action and MCP read: the service is in the stateManager
+  // whatever its status.
+  it('should say whether the service runs', async () => {
+    const { service, handler } = buildService();
+    expect(handler.running).to.equal(false);
+
+    await service.start();
+    expect(handler.running).to.equal(true);
+
+    await service.stop();
+    expect(handler.running).to.equal(false);
+  });
+
+  // Stopped while the start still waited on the references: resuming, it attached the
+  // listener and ran a regulation pass on a stopped service.
+  it('should not finish a start that a stop overtook', async () => {
+    const { service, gladys, handler } = buildService();
+    let releasePrime;
+    handler.primeObservedSetpoints = () =>
+      new Promise((resolve) => {
+        releasePrime = resolve;
+      });
+
+    const starting = service.start();
+    await service.stop();
+    releasePrime();
+    await starting;
+
+    assert.notCalled(gladys.event.on);
+    assert.notCalled(handler.applySchedules);
+    expect(handler.running).to.equal(false);
+  });
+
+  it('should only finish the latest of two overlapping starts', async () => {
+    const { service, gladys, handler } = buildService();
+    const releases = [];
+    handler.primeObservedSetpoints = () =>
+      new Promise((resolve) => {
+        releases.push(resolve);
+      });
+
+    const first = service.start();
+    const second = service.start();
+    releases.forEach((release) => release());
+    await Promise.all([first, second]);
+
+    assert.calledOnce(gladys.event.on);
+    expect(handler.running).to.equal(true);
   });
 
   it('should be safe to stop a service that was never started', async () => {

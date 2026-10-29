@@ -5,13 +5,12 @@ const { stub, fake } = sinon;
 const { createServer } = require('../../../../services/mcp/lib/createServer');
 
 describe('Create server', () => {
-  it('should create a server', async () => {
-    const mcpServerInstance = {
-      registerResource: fake(),
-      registerTool: fake(),
-    };
+  let mcpHandler;
+  let resources;
+  let tools;
 
-    const resources = [
+  beforeEach(() => {
+    resources = [
       {
         name: 'resource1',
         uri: 'uri://resource1',
@@ -20,7 +19,7 @@ describe('Create server', () => {
       },
     ];
 
-    const tools = [
+    tools = [
       {
         intent: 'device.turn-on-off',
         config: { description: 'Turn on/off device' },
@@ -28,95 +27,21 @@ describe('Create server', () => {
       },
     ];
 
-    const mcpHandler = {
+    mcpHandler = {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
       createServer,
-      getAllResources: stub().resolves(resources),
-      getAllTools: stub().resolves(tools),
+      schemas: { resources, tools },
       mcp: {
-        McpServer: stub().returns(mcpServerInstance),
+        McpServer: stub().callsFake(() => ({
+          registerResource: fake(),
+          registerTool: fake(),
+        })),
       },
-      server: null,
-      gladys: { event: { on: stub() } },
     };
-
-    await mcpHandler.createServer();
-
-    expect(mcpHandler.gladys.event.on.callCount).to.eq(2);
-    expect(mcpHandler.gladys.event.on.firstCall.args[0]).to.eq('device.create');
-    expect(mcpHandler.gladys.event.on.secondCall.args[0]).to.eq('device.update');
-
-    expect(mcpHandler.mcp.McpServer.callCount).to.eq(1);
-    expect(mcpHandler.mcp.McpServer.firstCall.args[0]).to.deep.equal({
-      name: 'Gladys',
-      title: 'Gladys',
-      version: '1.0.0',
-    });
-    expect(mcpHandler.mcp.McpServer.firstCall.args[1]).to.deep.equal({
-      capabilities: {
-        resources: {},
-        tools: {},
-      },
-    });
-
-    expect(mcpHandler.getAllResources.callCount).to.eq(1);
-    expect(mcpHandler.getAllTools.callCount).to.eq(1);
-
-    expect(mcpServerInstance.registerResource.callCount).to.eq(1);
-    expect(mcpServerInstance.registerResource.firstCall.args).to.deep.equal([
-      'resource1',
-      'uri://resource1',
-      { description: 'Resource 1' },
-      resources[0].cb,
-    ]);
-
-    expect(mcpServerInstance.registerTool.callCount).to.eq(1);
-    expect(mcpServerInstance.registerTool.firstCall.args).to.deep.equal([
-      'device_turn_on_off',
-      { description: 'Turn on/off device' },
-      tools[0].cb,
-    ]);
-
-    expect(mcpHandler.server).to.eq(mcpServerInstance);
   });
 
-  it('should recreate a server', async () => {
-    const mcpServerInstance = {
-      registerResource: fake(),
-      registerTool: fake(),
-    };
-
-    const resources = [
-      {
-        name: 'resource1',
-        uri: 'uri://resource1',
-        config: { description: 'Resource 1' },
-        cb: fake(),
-      },
-    ];
-
-    const tools = [
-      {
-        intent: 'device.turn-on-off',
-        config: { description: 'Turn on/off device' },
-        cb: fake(),
-      },
-    ];
-
-    const mcpHandler = {
-      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
-      createServer,
-      getAllResources: stub().resolves(resources),
-      getAllTools: stub().resolves(tools),
-      mcp: {
-        McpServer: stub().returns(mcpServerInstance),
-      },
-      server: {
-        close: fake(),
-      },
-    };
-
-    await mcpHandler.createServer();
+  it('should create a server exposing the loaded resources and tools', () => {
+    const server = mcpHandler.createServer();
 
     expect(mcpHandler.mcp.McpServer.callCount).to.eq(1);
     expect(mcpHandler.mcp.McpServer.firstCall.args[0]).to.deep.equal({
@@ -130,25 +55,31 @@ describe('Create server', () => {
         tools: {},
       },
     });
+    expect(server).to.eq(mcpHandler.mcp.McpServer.firstCall.returnValue);
 
-    expect(mcpHandler.getAllResources.callCount).to.eq(1);
-    expect(mcpHandler.getAllTools.callCount).to.eq(1);
-
-    expect(mcpServerInstance.registerResource.callCount).to.eq(1);
-    expect(mcpServerInstance.registerResource.firstCall.args).to.deep.equal([
+    expect(server.registerResource.callCount).to.eq(1);
+    expect(server.registerResource.firstCall.args).to.deep.equal([
       'resource1',
       'uri://resource1',
       { description: 'Resource 1' },
       resources[0].cb,
     ]);
 
-    expect(mcpServerInstance.registerTool.callCount).to.eq(1);
-    expect(mcpServerInstance.registerTool.firstCall.args).to.deep.equal([
+    expect(server.registerTool.callCount).to.eq(1);
+    expect(server.registerTool.firstCall.args).to.deep.equal([
       'device_turn_on_off',
       { description: 'Turn on/off device' },
       tools[0].cb,
     ]);
+  });
 
-    expect(mcpHandler.server).to.eq(mcpServerInstance);
+  it('should create a new server on each call', () => {
+    const firstServer = mcpHandler.createServer();
+    const secondServer = mcpHandler.createServer();
+
+    expect(mcpHandler.mcp.McpServer.callCount).to.eq(2);
+    expect(firstServer).to.not.eq(secondServer);
+    expect(secondServer.registerResource.callCount).to.eq(1);
+    expect(secondServer.registerTool.callCount).to.eq(1);
   });
 });

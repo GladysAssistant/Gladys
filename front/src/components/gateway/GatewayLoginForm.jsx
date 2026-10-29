@@ -56,11 +56,6 @@ const GatewayLoginForm = ({ children, ...props }) => (
               <Text id="gatewayLogin.twoFactorEnabledSuccess" />
             </div>
           )}
-          {props.gatewayLoginStatus === RequestStatus.UserNotAcceptedLocally && (
-            <div class="alert alert-danger" role="alert">
-              <Text id="gatewayLogin.userNotAcceptedLocally" />
-            </div>
-          )}
           {props.gatewayLoginStatus === RequestStatus.GatewayNoInstanceFound && (
             <div class="alert alert-danger" role="alert">
               <Text id="gatewayLogin.gatewayNoInstanceFound" />{' '}

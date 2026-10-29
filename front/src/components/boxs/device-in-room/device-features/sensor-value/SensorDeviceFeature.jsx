@@ -1,7 +1,11 @@
 import { createElement } from 'preact';
 import get from 'get-value';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  MUSIC_STRING_FEATURE_TYPES
+} from '../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
 import BatteryLevelFeature from './BatteryLevelFeature';
@@ -23,6 +27,7 @@ import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 import FanSensorDeviceValue from './FanSensorDeviceValue';
 import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
 import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDeviceValue';
+import ThermostatActivePresetDeviceValue from './ThermostatActivePresetDeviceValue';
 import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
 import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
@@ -35,7 +40,13 @@ import SmokeSensorMutedDeviceValue from './SmokeSensorMutedDeviceValue';
 const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
-  }
+  },
+  // The "now playing" metadata of a music player are string states (capabilities/music.md):
+  // displayed raw, the artwork one being an image key the music box resolves
+  [DEVICE_FEATURE_CATEGORIES.MUSIC]: MUSIC_STRING_FEATURE_TYPES.reduce(
+    (acc, type) => ({ ...acc, [type]: TextDeviceValue }),
+    {}
+  )
 };
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
@@ -81,6 +92,7 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: PressureSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue,
   [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: ThermostatOperatingStateDeviceValue,
+  [DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET]: ThermostatActivePresetDeviceValue,
   [DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS]: ChargingStationConnectorStatusDeviceValue,
   [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: ChargingStationChargingStateDeviceValue,
   // Registered by type, not by category: the category map is checked first and would force one
@@ -92,7 +104,9 @@ const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
   DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
   DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
   DEVICE_FEATURE_CATEGORIES.BUTTON,
-  DEVICE_FEATURE_CATEGORIES.TEXT
+  DEVICE_FEATURE_CATEGORIES.TEXT,
+  // a player that stays on one track for an hour has no stale value
+  DEVICE_FEATURE_CATEGORIES.MUSIC
 ];
 
 const SensorDeviceType = ({ children, ...props }) => {

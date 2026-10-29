@@ -2304,6 +2304,133 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.scene.create.getCall(3).args[0].tags).to.deep.equal([{ name: AI_GENERATED_SCENE_TAG }]);
   });
 
+  describe('thermostat.set-schedule in scene.create', () => {
+    const thermostat = {
+      selector: 'living-room-thermostat',
+      name: 'Living room',
+      room: { name: 'Salon', selector: 'salon' },
+      service: { name: 'thermostat' },
+      features: [],
+    };
+    const climateDevice = {
+      selector: 'netatmo-living-room',
+      name: 'Netatmo',
+      room: { name: 'Salon', selector: 'salon' },
+      service: { name: 'netatmo' },
+      features: [],
+    };
+    const buildHandler = (devices, thermostatService) => ({
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isBatteryFeature,
+      isWritableSensorFeature,
+      formatValue: stub(),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: {
+          get: stub().resolves([]),
+          create: stub().resolves({ id: 'scene-id', name: 'Scene', selector: 'scene' }),
+        },
+        device: {
+          get: stub().resolves(devices),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        service: { getService: stub().returns(thermostatService) },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('toonmockdata'),
+    });
+    const createScene = (sceneCreateTool, action) =>
+      sceneCreateTool.cb({
+        name: 'Holidays',
+        icon: 'bell',
+        triggers: [{ type: 'system.start' }],
+        actions: [[{ type: 'thermostat.set-schedule', ...action }]],
+      });
+
+    it('should only accept the Gladys thermostats and the existing schedules', async () => {
+      const thermostatService = {
+        device: {
+          running: true,
+          getSchedules: stub().resolves([{ selector: 'school-term' }, { selector: 'school-holidays' }]),
+        },
+      };
+      const mcpHandler = buildHandler([thermostat, climateDevice], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'school-holidays' });
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+
+      const rejected = [
+        { devices: ['netatmo-living-room'], schedule: 'school-holidays' },
+        { devices: ['living-room-thermostat'], schedule: 'invented-schedule' },
+      ];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const action of rejected) {
+        let thrown = null;
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          await createScene(sceneCreateTool, action);
+        } catch (e) {
+          thrown = e;
+        }
+        expect(thrown).to.be.an('error');
+        expect(thrown.message).to.contain('scene.create validation failed (422)');
+      }
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
+    it('should not ask for schedules when there is no thermostat', async () => {
+      const mcpHandler = buildHandler([climateDevice], null);
+      await mcpHandler.getAllTools();
+      expect(mcpHandler.gladys.service.getService.called).to.equal(false);
+    });
+
+    it('should accept any schedule when the thermostat service is not running', async () => {
+      const mcpHandler = buildHandler([thermostat], null);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(mcpHandler.gladys.service.getService.calledWith('thermostat')).to.equal(true);
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
+    // Rejected, the lookup took every MCP tool down with it.
+    it('should accept any schedule when the schedules cannot be read', async () => {
+      const thermostatService = {
+        device: { running: true, getSchedules: stub().rejects(new Error('database locked')) },
+      };
+      const mcpHandler = buildHandler([thermostat], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
+    // A stopped service is still in the stateManager: only `running` says it runs.
+    it('should not read the schedules of a thermostat service that is stopped', async () => {
+      const thermostatService = { device: { running: false, getSchedules: stub().resolves([]) } };
+      const mcpHandler = buildHandler([thermostat], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(thermostatService.device.getSchedules.called).to.equal(false);
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+  });
+
   it('should reject scene.create when http.request action misses headers', async () => {
     const mcpHandler = {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',

@@ -5,6 +5,7 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { Error402, Error429 } = require('../../../utils/httpErrors');
+const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const z = require('../../../services/mcp/node_modules/zod/v4');
 
@@ -685,6 +686,45 @@ describe('gateway.forwardMessageToAiChat', () => {
     expect(result).to.equal(null);
     assert.notCalled(reply);
     assert.calledWith(replyByIntent, message, 'openai.request.tooManyRequests', context);
+  });
+
+  it('should name the unavailable AI provider instead of asking to retry', async () => {
+    // a stopped, disconnected, stale or misbehaving external AI provider:
+    // the dedicated reply points at the integration page and the AI settings
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.rejects(new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_NOT_CONNECTED'));
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'hello', user: { id: 'user-id' } };
+    const context = { user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context,
+    });
+
+    expect(result).to.equal(null);
+    assert.notCalled(reply);
+    assert.calledWith(replyByIntent, message, 'openai.provider-unavailable', context);
+  });
+
+  it('should tell the user the AI provider is busy when its in-flight cap is reached', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.rejects(new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_AI_PROVIDER_BUSY'));
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'hello', user: { id: 'user-id' } };
+    const context = { user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context,
+    });
+
+    expect(result).to.equal(null);
+    assert.calledWith(replyByIntent, message, 'openai.provider-busy', context);
   });
 
   it('should reply with generic failure on non-429 errors', async () => {

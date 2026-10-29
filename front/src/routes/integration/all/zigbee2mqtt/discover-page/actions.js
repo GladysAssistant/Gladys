@@ -2,6 +2,7 @@ import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
 import getZ2mUrl, { shouldShowZ2mUrlWarning } from '../utils/getZ2mUrl';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -117,7 +118,7 @@ function createActions(store) {
           feature.name = featureName;
         }
       });
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
       const zigbee2mqttDevices = state.zigbee2mqttDevices.filter(d => d.external_id !== savedDevice.external_id);
       store.setState({
         zigbee2mqttDevices

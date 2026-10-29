@@ -21,10 +21,12 @@ export const ACTION_ICON = {
   [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
   [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-user-check',
   [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
+  [ACTIONS.CONDITION.IN_TIME_RANGE]: 'fe fe-calendar',
   [ACTIONS.SCENE.START]: 'fe fe-fast-forward',
   [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
+  [ACTIONS.THERMOSTAT.SET_SCHEDULE]: 'fe fe-thermometer',
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
   [ACTIONS.CALENDAR.GET_EVENTS]: 'fe fe-calendar',
   [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
@@ -34,6 +36,7 @@ export const ACTION_ICON = {
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
+  [ACTIONS.MUSIC.PLAY_MEDIA]: 'fe fe-play-circle',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
   [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
@@ -88,13 +91,20 @@ export const ACTION_CATEGORIES = [
       ACTIONS.SWITCH.TURN_OFF,
       ACTIONS.SWITCH.TOGGLE,
       ACTIONS.DEVICE.SET_VALUE,
-      ACTIONS.DEVICE.GET_VALUE
+      ACTIONS.DEVICE.GET_VALUE,
+      ACTIONS.THERMOSTAT.SET_SCHEDULE
     ]
   },
   {
     key: 'messages',
     color: 'pink',
-    items: [ACTIONS.MESSAGE.SEND, ACTIONS.MESSAGE.SEND_CAMERA, ACTIONS.SMS.SEND, ACTIONS.MUSIC.PLAY_NOTIFICATION]
+    items: [
+      ACTIONS.MESSAGE.SEND,
+      ACTIONS.MESSAGE.SEND_CAMERA,
+      ACTIONS.SMS.SEND,
+      ACTIONS.MUSIC.PLAY_NOTIFICATION,
+      ACTIONS.MUSIC.PLAY_MEDIA
+    ]
   },
   {
     key: 'conditions',
@@ -104,6 +114,7 @@ export const ACTION_CATEGORIES = [
       ACTIONS.CONDITION.ONLY_CONTINUE_IF,
       ACTIONS.CONDITION.WHILE,
       ACTIONS.CONDITION.CHECK_TIME,
+      ACTIONS.CONDITION.IN_TIME_RANGE,
       ACTIONS.USER.CHECK_PRESENCE,
       ACTIONS.HOUSE.IS_EMPTY,
       ACTIONS.HOUSE.IS_NOT_EMPTY,
