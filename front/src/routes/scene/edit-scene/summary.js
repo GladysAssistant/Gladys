@@ -239,6 +239,14 @@ const getTriggerSummary = (trigger, dictionary) => {
           : null
       ]);
     case EVENTS.TIME.CHANGED:
+      if (trigger.scheduler_type === 'time-range') {
+        // The days alone said nothing of the planning itself.
+        const ranges = (trigger.time_ranges || [])
+          .filter(range => range.start && range.end)
+          .map(range => `${range.start}–${range.end}`)
+          .join(', ');
+        return joinParts([truncate(ranges), translateDays(trigger.days_of_the_week)]);
+      }
       return joinParts([
         trigger.time,
         trigger.date,
