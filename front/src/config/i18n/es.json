@@ -3648,6 +3648,8 @@
         "nameLabel": "Nombre",
         "namePlaceholder": "ej. Termostato del salón",
         "roomLabel": "Habitación",
+        "showAllRoomsLabel": "Mostrar los dispositivos de todas las habitaciones",
+        "showAllRoomsHelp": "Las listas de abajo solo ofrecen los dispositivos de esta habitación. Amplíalas cuando la zona calefactada abarca varias habitaciones, como un salón y una cocina abiertos.",
         "modeLabel": "Uso",
         "typeLabel": "Tipo de termostato",
         "tuningSection": "Ajuste fino",
@@ -3660,10 +3662,13 @@
         },
         "targetFeatureLabel": "Consigna del termostato real",
         "targetFeatureHelp": "La función en la que Gladys escribe la temperatura de consigna. Algunos dispositivos exponen varias (calefacción/refrigeración, ocupado/desocupado): elige la que realmente controla tu calefacción.",
-        "stateFeatureLabel": "Estado de calefacción (opcional)",
+        "stateFeatureLabel": "Estado de funcionamiento (opcional)",
         "stateFeatureHelp": "Se usa para mostrar si el dispositivo está funcionando. Se acepta como estado de funcionamiento o como contacto de caldera. Déjalo vacío si tu termostato no lo informa.",
         "modeFeatureLabel": "Modo de funcionamiento (opcional)",
-        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno. Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
+        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno — el modo de un aire acondicionado también sirve. En un termostato, Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo. El modo de un aire acondicionado no tiene Apagado: se detiene mediante su Alimentación, que entonces hay que indicar.",
+        "powerFeatureLabel": "Alimentación (opcional)",
+        "powerFeatureHelp": "El interruptor que enciende y apaga el dispositivo real, como la alimentación de un aire acondicionado o de una bomba de calor. Gladys lo apaga cuando el termostato se detiene, se abre una ventana o se aplica un tramo Apagado, y lo vuelve a encender en cuanto una consigna toma el relevo. Necesario para un aire acondicionado, cuyo modo no tiene apagado.",
+        "powerFeatureNeeded": "El modo de un aire acondicionado no tiene apagado: elige aquí su alimentación, o Gladys no podrá apagarlo cuando se abra una ventana, se aplique una franja Apagado o se detenga el termostato.",
         "mode": {
           "heating": "Calefacción",
           "cooling": "Refrigeración"
@@ -3685,8 +3690,9 @@
         "minTempPlaceholder": "ej. 5",
         "maxTempLabel": "Temp. máx.",
         "maxTempPlaceholder": "ej. 35",
-        "temperatureFeatureLabel": "Sensor de temperatura",
-        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "temperatureFeatureLabel": "Sensores de temperatura",
+        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente, o varios: el termostato usa entonces su media. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "addTemperatureFeature": "Añadir un sensor de temperatura",
         "humidityFeatureLabel": "Sensor de humedad",
         "humidityFeatureHelp": "Opcional. Se muestra en el widget del termostato.",
         "switchFeatureLabel": "Interruptor (actuador)",
@@ -3694,11 +3700,17 @@
           "heating": "El interruptor que se encenderá y apagará para calentar la habitación.",
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
         },
-        "windowFeatureLabel": "Sensor de apertura de ventana",
-        "windowFeatureHelp": {
-          "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",
-          "cooling": "Opcional. Si una ventana está abierta, la refrigeración se corta automáticamente."
+        "noSwitchHint": {
+          "heating": "No hay ningún interruptor para elegir. Muestra arriba los dispositivos de todas las habitaciones o, para un termostato o una bomba de calor que se regula sola, elige el tipo «Termostato real».",
+          "cooling": "No hay ningún interruptor para elegir. Un aire acondicionado se regula solo: elige el tipo «Termostato real» y luego su consigna. Un ventilador o un climatizador en un enchufe puede seguir siendo un termostato virtual."
         },
+        "windowFeatureLabel": "Sensores de apertura de ventana",
+        "windowFeatureHelp": {
+          "heating": "Opcional. En cuanto una de las ventanas seleccionadas está abierta, la calefacción se corta automáticamente.",
+          "cooling": "Opcional. En cuanto una de las ventanas seleccionadas está abierta, la refrigeración se corta automáticamente."
+        },
+        "addWindowFeature": "Añadir un sensor de apertura",
+        "removeFeature": "Quitar",
         "hysteresisStartLabel": "Umbral de arranque",
         "hysteresisStartHelp": {
           "heating": "La calefacción se enciende cuando la temperatura está por debajo de (consigna − umbral de arranque). Ej. consigna 21 °C, umbral 0,5 °C → se enciende por debajo de 20,5 °C.",
@@ -3741,7 +3753,10 @@
         "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual.",
         "modeHelp": "Lo que controla este termostato: calefacción o climatización.",
         "sectionDevice": "Dispositivo",
-        "sectionHeating": "Calefacción",
+        "section": {
+          "heating": "Calefacción",
+          "cooling": "Refrigeración"
+        },
         "sectionProgramming": "Programación",
         "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Usar estos valores",
@@ -6158,6 +6173,15 @@
           "4": "Noche",
           "5": "Confort"
         },
+        "active-preset": {
+          "unknown": "{{value}} (desconocido)",
+          "0": "Apagado",
+          "1": "Antihielo",
+          "2": "Ausencia",
+          "3": "Eco",
+          "4": "Noche",
+          "5": "Confort"
+        },
         "operating-state": {
           "unknown": "{{value}} (desconocido)",
           "0": "Inactivo",
@@ -6959,6 +6983,7 @@
       "target-temperature": "Temperatura del termostato",
       "mode": "Modo del termostato",
       "preset": "Preajuste del termostato",
+      "active-preset": "Preajuste activo del termostato",
       "operating-state": "Estado de funcionamiento del termostato"
     },
     "airquality-sensor": {

@@ -6,6 +6,7 @@ const {
   WEBSOCKET_MESSAGE_TYPES,
   THERMOSTAT_MODE,
   THERMOSTAT_PRESET,
+  THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
 const { PRESETS } = require('../../../utils/thermostatConstants');
 
@@ -24,6 +25,18 @@ const MANUAL_UNTIL_PARAM = 'THERMOSTAT_MANUAL_UNTIL';
 // until a person lifts it. Any mode written on the thermostat afterwards makes
 // the stop, or the start, the writer's own.
 const SCHEDULE_STOP_PARAM = 'THERMOSTAT_SCHEDULE_STOP';
+
+// A stop made on the unit itself — its remote, its vendor app — on a thermostat
+// following a programme: when it ends, as a timestamp, the programme's next
+// point. A stop that nobody made looks the same from here (a write that timed
+// out after the unit obeyed, a unit coming back off after a power cut), and
+// kept like the widget's it left the house without heating until someone
+// noticed (C.0.1). Any mode written on the thermostat lifts it sooner.
+// Without a programme the stop has no end, and the param reads
+// REMOTE_STOP_NO_END: it still says the unit made it, which is what lets the
+// remote start this thermostat again and not one stopped from Gladys.
+const REMOTE_STOP_UNTIL_PARAM = 'THERMOSTAT_REMOTE_STOP_UNTIL';
+const REMOTE_STOP_NO_END = 'unit';
 
 // THERMOSTAT_PRESET is an integer enum on the feature, while a schedule
 // transition and the THERMOSTAT_PRESET_* params name their preset. This is the
@@ -71,6 +84,26 @@ function presetValue(name) {
   }
   const value = PRESET_VALUE_BY_NAME[name];
   return value === undefined ? null : value;
+}
+
+/**
+ * @description The active-preset value for what is in force: a preset name, or
+ * `off` for a stopped thermostat. Null for `schedule`, which is never in force —
+ * one of its points is — and for an unknown name.
+ * @param {string|null} name - The preset in force, or `off`.
+ * @returns {number|null} The THERMOSTAT_ACTIVE_PRESET value.
+ * @example
+ * activePresetValue('off'); // 0
+ */
+function activePresetValue(name) {
+  if (name === 'off') {
+    return THERMOSTAT_ACTIVE_PRESET.OFF;
+  }
+  if (name === 'schedule') {
+    return null;
+  }
+  // The other values are THERMOSTAT_PRESET's own, by construction.
+  return presetValue(name);
 }
 
 /**
@@ -159,6 +192,35 @@ function isScheduleStop(device) {
 }
 
 /**
+ * @description When a stop made on the unit itself ends, or null when the stop
+ * is not one, or is kept until someone starts the thermostat again.
+ * @param {object} device - The thermostat device.
+ * @returns {number|null} The timestamp the stop ends at, or null.
+ * @example
+ * getRemoteStopUntil(device);
+ */
+function getRemoteStopUntil(device) {
+  const params = (device && device.params) || [];
+  const param = params.find((candidate) => candidate.name === REMOTE_STOP_UNTIL_PARAM);
+  const until = param && param.value ? Number(param.value) : null;
+  return Number.isFinite(until) ? until : null;
+}
+
+/**
+ * @description Whether the thermostat was stopped from its unit (stopFromUnit),
+ * with or without an end: only such a stop is the remote's to lift when the
+ * unit is switched back on. A stop made from Gladys carries no mark.
+ * @param {object} device - The thermostat device.
+ * @returns {boolean} True when the stop came from the unit.
+ * @example
+ * isRemoteStop(device);
+ */
+function isRemoteStop(device) {
+  const params = (device && device.params) || [];
+  return params.some((param) => param.name === REMOTE_STOP_UNTIL_PARAM && !!param.value);
+}
+
+/**
  * @description Write a preset on the thermostat's preset feature.
  * @param {object} device - The thermostat device.
  * @param {string} name - A preset name, `schedule` included.
@@ -205,6 +267,34 @@ function announcePreset(device, name) {
     type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.PRESET_UPDATED,
     payload: { device: device.selector, preset: name },
   });
+}
+
+/**
+ * @description Write the preset in force on the thermostat's active-preset
+ * feature. Unlike the preset feature, which keeps reading `schedule` while the
+ * programme runs, this one moves with every point of the programme — and,
+ * written through `saveState`, it is what a scene trigger sees change. Nothing
+ * is written when the value is the one already held, so the minute loop emits
+ * no state, and starts no scene, until the preset in force really changes.
+ * @param {object} device - The thermostat device.
+ * @param {string} name - The preset in force, or `off` for a stopped thermostat.
+ * @returns {Promise<void>}
+ * @example
+ * await saveActivePreset.call(this, device, 'comfort');
+ */
+async function saveActivePreset(device, name) {
+  const feature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET);
+  const value = activePresetValue(name);
+  if (!feature || value === null || alreadyHolds(feature, value)) {
+    return;
+  }
+  // Written before the actuation on each path, and only a report: a failure
+  // here must not cost the heating its switch or its setpoint.
+  try {
+    await this.gladys.device.saveState(feature, value);
+  } catch (e) {
+    logger.warn(`Thermostat: could not save the active preset of ${device.selector}: ${e.message}`);
+  }
 }
 
 /**
@@ -333,9 +423,13 @@ module.exports = {
   getFeature,
   isStopped,
   isScheduleStop,
+  getRemoteStopUntil,
   getPreset,
   savePreset,
   announcePreset,
+  saveActivePreset,
+  isRemoteStop,
+  activePresetValue,
   saveOperatingState,
   getManualHold,
   setManualHold,
@@ -348,4 +442,6 @@ module.exports = {
   MANUAL_SETPOINT_PARAM,
   MANUAL_UNTIL_PARAM,
   SCHEDULE_STOP_PARAM,
+  REMOTE_STOP_UNTIL_PARAM,
+  REMOTE_STOP_NO_END,
 };
