@@ -197,10 +197,11 @@ module.exports = function UserController(gladys) {
     );
     const secret = method === FORGOT_PASSWORD_METHODS.LINK ? link : code;
     const text = getForgotPasswordReply(user.language, method);
-    // Try to send the link or the code to the user if he has configured an external service like Telegram
+    // Try to send the link or the code to the user if he has configured an external service like Telegram.
+    // One message: a channel like email sends each message on its own, and a mail holding nothing
+    // but a link is easily dropped as spam, leaving the user with the text and no link.
     try {
-      await gladys.message.sendToUser(user.selector, text);
-      await gladys.message.sendToUser(user.selector, secret);
+      await gladys.message.sendToUser(user.selector, `${text}\n${secret}`);
     } catch (e) {
       logger.error(`Error while sending forgot password message to user ${user.email}:`, e);
     }
