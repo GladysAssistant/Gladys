@@ -88,8 +88,24 @@ describe('ServerResponseMock', () => {
     response.on('close', closeListener);
     response.on('error', errorListener);
 
-    expect(response.listeners.close).to.eq(closeListener);
-    expect(response.listeners.error).to.eq(errorListener);
+    expect(response.listeners.close).to.deep.equal([closeListener]);
+    expect(response.listeners.error).to.deep.equal([errorListener]);
+  });
+
+  it('should trigger every close event listener when sending response', () => {
+    const callback = fake();
+    const response = new ServerResponseMock(callback);
+
+    const firstCloseListener = fake();
+    const secondCloseListener = fake();
+    response.on('close', firstCloseListener);
+    response.on('close', secondCloseListener);
+
+    response.end();
+
+    expect(firstCloseListener.callCount).to.eq(1);
+    expect(secondCloseListener.callCount).to.eq(1);
+    expect(callback.callCount).to.eq(1);
   });
 
   it('should trigger close event listener when sending response', () => {
@@ -140,16 +156,18 @@ describe('ServerResponseMock', () => {
     const closeListener = fake();
     const errorListener = fake();
 
+    const otherCloseListener = fake();
+
     response.on('close', closeListener);
+    response.on('close', otherCloseListener);
     response.on('error', errorListener);
 
-    expect(response.listeners.close).to.eq(closeListener);
-    expect(response.listeners.error).to.eq(errorListener);
+    response.off('close', closeListener);
+    response.off('finish', closeListener);
 
-    response.off('close');
-
-    expect(response.listeners.close).to.eq(undefined);
-    expect(response.listeners.error).to.eq(errorListener);
+    expect(response.listeners.close).to.deep.equal([otherCloseListener]);
+    expect(response.listeners.error).to.deep.equal([errorListener]);
+    expect(response.listeners.finish).to.deep.equal([]);
   });
 
   it('should write chunk data and call callback with write() method', () => {

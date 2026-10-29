@@ -920,6 +920,10 @@ const ACTIONS = {
   SMS: {
     SEND: 'sms.send',
   },
+  THERMOSTAT: {
+    // make thermostats follow another weekly schedule (school term, holidays...)
+    SET_SCHEDULE: 'thermostat.set-schedule',
+  },
   EXTERNAL_INTEGRATION: {
     // scene action declared by an external integration (scene_actions of
     // the manifest), relayed to its container over WebSocket

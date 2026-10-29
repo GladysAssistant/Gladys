@@ -171,6 +171,8 @@ function selectorSchema(selectors) {
  * @param {Array<string>} [deviceFeatureSelectors] - Allowed device feature selectors.
  * @param {Array<string>} [calendarSelectors] - Allowed calendar selectors.
  * @param {Array<string>} [areaSelectors] - Allowed area selectors.
+ * @param {Array<string>} [thermostatDeviceSelectors] - Allowed thermostat device selectors.
+ * @param {Array<string>} [thermostatScheduleSelectors] - Allowed thermostat schedule selectors.
  * @returns {object} Scene creation Zod schema.
  * @example
  * createSceneCreateInputSchema(['scene-a'], ['john'], ['main-house']);
@@ -185,6 +187,8 @@ function createSceneCreateInputSchema(
   deviceFeatureSelectors = [],
   calendarSelectors = [],
   areaSelectors = [],
+  thermostatDeviceSelectors = [],
+  thermostatScheduleSelectors = [],
 ) {
   const sceneSelectorSchema = selectorSchema(sceneSelectors);
   const userSelectorSchema = selectorSchema(userSelectors);
@@ -195,6 +199,8 @@ function createSceneCreateInputSchema(
   const deviceFeatureSelectorSchema = selectorSchema(deviceFeatureSelectors);
   const calendarSelectorSchema = selectorSchema(calendarSelectors);
   const areaSelectorSchema = selectorSchema(areaSelectors);
+  const thermostatDevicesSchema = z.array(selectorSchema(thermostatDeviceSelectors));
+  const thermostatScheduleSelectorSchema = selectorSchema(thermostatScheduleSelectors);
   const messageServiceSchema = z
     .string()
     .nullish()
@@ -394,6 +400,10 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.ZIGBEE2MQTT.SEND, {
         topic: z.string(),
         message: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.THERMOSTAT.SET_SCHEDULE, {
+        devices: thermostatDevicesSchema.describe('Thermostats created by the Thermostat integration.'),
+        schedule: thermostatScheduleSelectorSchema.describe('Weekly schedule the thermostats follow from now on.'),
       }),
       actionSchemaByType(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, {
         integration: z.string(),

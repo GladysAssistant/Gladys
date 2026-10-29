@@ -429,6 +429,39 @@ const findNextTransition = (transitions, dayOfWeek, currentMinutes) => {
 };
 
 /**
+ * @description How far a timezone's wall clock is ahead of UTC at an instant, in
+ * minutes: 120 in Paris in summer, 60 in winter. Without a timezone, or with one
+ * the runtime does not know, it is the process's own, as in
+ * getCurrentDayAndMinutes.
+ * @param {number} instant - The instant, as a timestamp.
+ * @param {string} [timezone] - The Gladys timezone.
+ * @returns {number} The offset in minutes.
+ * @example
+ * timezoneOffsetMinutes(Date.parse('2026-07-01T12:00:00Z'), 'Europe/Paris'); // 120
+ */
+const timezoneOffsetMinutes = (instant, timezone = null) => {
+  if (timezone) {
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hourCycle: 'h23',
+      }).formatToParts(new Date(instant));
+      const get = (type) => parseInt(parts.find((part) => part.type === type).value, 10);
+      const wallClock = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'));
+      return Math.round((wallClock - (instant - (instant % (60 * 1000)))) / (60 * 1000));
+    } catch (e) {
+      // Unknown timezone: fall back to the process timezone below
+    }
+  }
+  return -new Date(instant).getTimezoneOffset();
+};
+
+/**
  * @description When the next transition point falls, as a timestamp. A manual
  * hold runs until then by default, which is what Tado and Netatmo do: a
  * temperature set at 3pm holds until the evening point rather than lapsing after
@@ -438,6 +471,12 @@ const findNextTransition = (transitions, dayOfWeek, currentMinutes) => {
  * wraps onto the first point of the week without a special case. A schedule with
  * a single point gives a full week, which is the honest answer: that point is
  * indeed the next one.
+ *
+ * Those are minutes of the wall clock, not of elapsed time: across a change of
+ * the clocks they differ by an hour. Added to now as they are, a hold taken on
+ * Saturday noon ended at 13:00 on the Sunday the clocks go back, for a point at
+ * 14:00 — and at 15:00 in March. The result is moved by the change of offset
+ * between now and then, so it lands on the point's own wall-clock time.
  * @param {Array} transitions - Every transition of the schedule.
  * @param {Date} [now] - The moment to measure from.
  * @param {string} [timezone] - The Gladys timezone the points are resolved in.
@@ -463,7 +502,64 @@ const nextTransitionTimestamp = (transitions, now = new Date(), timezone = null)
   // 08:30. With a 60 s loop that delayed the return to the programme by up to
   // another minute, and the widget displayed the point's own time all along.
   const startOfMinute = now.getTime() - (now.getTime() % (60 * 1000));
-  return startOfMinute + minutesAway * 60 * 1000;
+  const sameOffset = startOfMinute + minutesAway * 60 * 1000;
+  const offsetNow = timezoneOffsetMinutes(startOfMinute, timezone);
+  const moved = (instant) => sameOffset + (offsetNow - timezoneOffsetMinutes(instant, timezone)) * 60 * 1000;
+  const first = moved(sameOffset);
+  const second = moved(first);
+  if (first === second) {
+    return first;
+  }
+  // Both agree everywhere but on a point inside the hour the clocks skip in
+  // March, which has no instant of its own. It is in force from the jump — the
+  // wall clock reads 03:00 there, past a 02:30 point — so the hold ends then:
+  // the later candidate, 03:30, held up to 59 minutes past it. The jump lies
+  // between the two candidates, the offset is found on either side of it.
+  let before = Math.min(first, second);
+  let after = Math.max(first, second);
+  const offsetAfter = timezoneOffsetMinutes(after, timezone);
+  while (after - before > 60 * 1000) {
+    const middle = before + Math.floor((after - before) / (2 * 60 * 1000)) * 60 * 1000;
+    if (timezoneOffsetMinutes(middle, timezone) === offsetAfter) {
+      after = middle;
+    } else {
+      before = middle;
+    }
+  }
+  return after;
+};
+
+/**
+ * @description How many calendar days ahead of `now` an instant falls, on the
+ * clock of the runtime: 0 today, 1 tomorrow. The widget's banners name the day
+ * of a return that is not today — "until 13:00" read as today for a hold ending
+ * tomorrow at 13:00 (forum 11074).
+ * @param {number} instant - The instant, as a timestamp.
+ * @param {Date} [now] - The moment to count from.
+ * @returns {number} The number of midnights between now and the instant.
+ * @example
+ * calendarDaysAhead(Date.now() + 24 * 3600 * 1000); // 1
+ */
+const calendarDaysAhead = (instant, now = new Date()) => {
+  const midnight = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  // Rounded: a day the clocks change on lasts 23 or 25 hours.
+  return Math.round((midnight(new Date(instant)) - midnight(now)) / (24 * 60 * 60 * 1000));
+};
+
+/**
+ * @description How many days ahead a transition point falls, from a day of the
+ * week and a minute of that day. A point at or before now on the same day is next
+ * week's: a schedule with a single point comes back to it in seven days.
+ * @param {object} point - A transition, `{ day_of_week, time }`.
+ * @param {number} dayOfWeek - Today, 0 = Monday.
+ * @param {number} currentMinutes - Minutes since midnight.
+ * @returns {number} 0 for today, 1 for tomorrow, up to 7.
+ * @example
+ * daysUntilPoint({ day_of_week: 6, time: '14:00' }, 5, 720); // 1
+ */
+const daysUntilPoint = (point, dayOfWeek, currentMinutes) => {
+  const days = (point.day_of_week - dayOfWeek + 7) % 7;
+  return days === 0 && timeToMinutes(point.time) <= currentMinutes ? 7 : days;
 };
 
 /**
@@ -535,6 +631,8 @@ module.exports = {
   findNextTransition,
   carriedPresetByDay,
   nextTransitionTimestamp,
+  calendarDaysAhead,
+  daysUntilPoint,
   applySlotToDay,
   mergeIntoSlots,
   readDayAsEntered,

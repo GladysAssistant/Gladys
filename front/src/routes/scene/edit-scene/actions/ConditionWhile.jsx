@@ -222,6 +222,7 @@ class ConditionWhile extends Component {
                   scene={props.scene}
                   sceneIntegrations={props.sceneIntegrations}
                   deviceFeatures={props.deviceFeatures}
+                  thermostatSchedules={props.thermostatSchedules}
                   lastActionGroup={index === props.action.then.length - 1}
                 />
               ))}

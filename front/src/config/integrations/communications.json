@@ -10,6 +10,7 @@
     "key": "nextcloudTalk",
     "img": "/assets/integrations/cover/nextcloud-talk.jpg",
     "local": true,
+    "deprecated": true,
     "categories": ["notifications"]
   },
   {

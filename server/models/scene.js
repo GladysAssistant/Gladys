@@ -58,6 +58,8 @@ const actionSchema = Joi.object()
     user: Joi.string(),
     house: Joi.string(),
     scene: Joi.string(),
+    // selector of the thermostat schedule a "thermostat.set-schedule" action switches to
+    schedule: Joi.string(),
     camera: Joi.string(),
     // messaging channel of a "send message" action: null/absent means
     // broadcast to every channel the user configured
