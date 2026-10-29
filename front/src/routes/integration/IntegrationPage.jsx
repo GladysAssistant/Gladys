@@ -7,6 +7,7 @@ import IntegrationPageHeader from './IntegrationPageHeader';
 import InstalledIntegrationsSummary from './InstalledIntegrationsSummary';
 import IntegrationCatalogSkeleton from './IntegrationCatalogSkeleton';
 import IntegrationLoadMore from './IntegrationLoadMore';
+import UpdateAllIntegrations from './UpdateAllIntegrations';
 import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import { RequestStatus } from '../../utils/consts';
 import { getCountryName } from './catalog-country';
@@ -142,6 +143,12 @@ const IntegrationPage = ({
   installedIntegrationsCount,
   installedStatusCounts,
   installedInventoryKnown,
+  updatableIntegrationsCount,
+  cardUpdateRunning,
+  updateAllIntegrations,
+  updateAllStatus,
+  updateAllProgress,
+  updateAllResult,
   category,
   origin,
   transports,
@@ -200,6 +207,19 @@ const IntegrationPage = ({
                   <InstalledIntegrationsSummary
                     installedIntegrationsCount={installedIntegrationsCount}
                     installedStatusCounts={installedStatusCounts}
+                  />
+                )}
+                {/* "Update all" lives in the view listing what is to update. A
+                    run keeps going if the user browses another view meanwhile:
+                    coming back here shows its progress, or its outcome */}
+                {!catalogLoading && category === 'updates' && (
+                  <UpdateAllIntegrations
+                    integrationsToUpdateCount={updatableIntegrationsCount}
+                    cardUpdateRunning={cardUpdateRunning}
+                    status={updateAllStatus}
+                    progress={updateAllProgress}
+                    result={updateAllResult}
+                    onUpdateAll={updateAllIntegrations}
                   />
                 )}
                 {!catalogLoading && countryScopeApplicable && (

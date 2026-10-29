@@ -9,6 +9,8 @@ const {
   findCurrentTransition,
   findNextTransition,
   nextTransitionTimestamp,
+  calendarDaysAhead,
+  daysUntilPoint,
   parseEnd,
   getCurrentDayAndMinutes,
   findMatchingSlot,
@@ -759,6 +761,73 @@ describe('thermostatSchedule transition points', () => {
 
       expect(new Date(timestamp).toISOString()).to.equal('2026-09-21T08:30:00.000Z');
     });
+
+    // Points are wall-clock times, and a change of the clocks moves elapsed time
+    // away from them by an hour. Adding the wall-clock distance to now ended a
+    // hold taken on Saturday noon at 13:00 on the Sunday the clocks go back, for
+    // a point at 14:00 (forum 11074).
+    describe('across a change of the clocks', () => {
+      const sundayAt14 = [{ day_of_week: 6, time: '14:00', preset: 'comfort' }];
+      const parisTime = (timestamp) =>
+        new Date(timestamp).toLocaleString('en-GB', { timeZone: 'Europe/Paris', hour12: false });
+
+      it('should land on the point when the clocks go back', () => {
+        // Saturday 2026-10-24, 12:00 in Paris (summer time).
+        const timestamp = nextTransitionTimestamp(sundayAt14, new Date('2026-10-24T10:00:00.000Z'), 'Europe/Paris');
+
+        expect(parisTime(timestamp)).to.equal('25/10/2026, 14:00:00');
+        expect(new Date(timestamp).toISOString()).to.equal('2026-10-25T13:00:00.000Z');
+      });
+
+      it('should land on the point when the clocks go forward', () => {
+        // Saturday 2027-03-27, 12:00 in Paris (winter time).
+        const timestamp = nextTransitionTimestamp(sundayAt14, new Date('2027-03-27T11:00:00.000Z'), 'Europe/Paris');
+
+        expect(parisTime(timestamp)).to.equal('28/03/2027, 14:00:00');
+      });
+
+      it('should take the first of the two 02:30 of the night the clocks go back', () => {
+        const atHalfPastTwo = [{ day_of_week: 6, time: '02:30', preset: 'comfort' }];
+
+        const timestamp = nextTransitionTimestamp(atHalfPastTwo, new Date('2026-10-24T10:00:00.000Z'), 'Europe/Paris');
+
+        // 02:30 summer time, the hour before the clocks go back.
+        expect(new Date(timestamp).toISOString()).to.equal('2026-10-25T00:30:00.000Z');
+      });
+
+      it('should end on the jump for a point inside the hour the clocks skip', () => {
+        // 02:30 does not exist on that night: the clock jumps from 02:00 to 03:00,
+        // and the point is in force from then on — not from 03:30.
+        const atHalfPastTwo = [{ day_of_week: 6, time: '02:30', preset: 'comfort' }];
+
+        const timestamp = nextTransitionTimestamp(atHalfPastTwo, new Date('2027-03-27T11:00:00.000Z'), 'Europe/Paris');
+
+        expect(new Date(timestamp).toISOString()).to.equal('2027-03-28T01:00:00.000Z');
+        expect(parisTime(timestamp)).to.equal('28/03/2027, 03:00:00');
+      });
+
+      it('should find the jump of a timezone whose clocks move by half an hour', () => {
+        // Lord Howe Island goes from 02:00 to 02:30 on the first Sunday of October.
+        const atQuarterPastTwo = [{ day_of_week: 6, time: '02:15', preset: 'comfort' }];
+
+        const timestamp = nextTransitionTimestamp(
+          atQuarterPastTwo,
+          new Date('2026-10-03T03:00:00.000Z'),
+          'Australia/Lord_Howe',
+        );
+
+        expect(new Date(timestamp).toISOString()).to.equal('2026-10-03T15:30:00.000Z');
+      });
+
+      it('should measure in the process timezone without a timezone, or with an unknown one', () => {
+        const now = new Date('2026-09-21T08:00:00.000Z');
+        const transitions = [{ day_of_week: 0, time: '22:30', preset: 'night' }];
+
+        expect(nextTransitionTimestamp(transitions, now, 'Not/AZone')).to.equal(
+          nextTransitionTimestamp(transitions, now, null),
+        );
+      });
+    });
   });
 });
 
@@ -836,5 +905,58 @@ describe('thermostatSchedule.carriedPresetByDay', () => {
   it('should inherit nothing from an empty schedule', () => {
     expect(carriedPresetByDay([])[3]).to.equal(null);
     expect(carriedPresetByDay(null)[3]).to.equal(null);
+  });
+});
+
+describe('thermostatSchedule.calendarDaysAhead', () => {
+  // Built on the runtime clock, like the widget that reads it. CI runs in UTC,
+  // where no clock ever changes: the process is moved to Paris for these.
+  const originalTimezone = process.env.TZ;
+  before(() => {
+    process.env.TZ = 'Europe/Paris';
+  });
+  after(() => {
+    if (originalTimezone === undefined) {
+      delete process.env.TZ;
+    } else {
+      process.env.TZ = originalTimezone;
+    }
+  });
+
+  const at = (day, hour, minute = 0, month = 9, year = 2026) => new Date(year, month, day, hour, minute);
+
+  it('should count today as 0, whatever the hour', () => {
+    expect(calendarDaysAhead(at(24, 23, 59).getTime(), at(24, 0, 1))).to.equal(0);
+  });
+
+  it('should count tomorrow as 1, even less than a day away', () => {
+    // A hold taken at 12:00 ending at 01:00 the next day.
+    expect(calendarDaysAhead(at(25, 1).getTime(), at(24, 12))).to.equal(1);
+  });
+
+  it('should count across the night the clocks go back', () => {
+    // 49 hours between the two midnights.
+    expect(new Date(2026, 9, 25, 12).getTimezoneOffset()).to.equal(-60);
+    expect(calendarDaysAhead(at(26, 8).getTime(), at(24, 12))).to.equal(2);
+  });
+
+  it('should count across the night the clocks go forward', () => {
+    // 47 hours between the two midnights.
+    expect(calendarDaysAhead(at(29, 8, 0, 2, 2027).getTime(), at(27, 12, 0, 2, 2027))).to.equal(2);
+  });
+});
+
+describe('thermostatSchedule.daysUntilPoint', () => {
+  it('should be 0 for a point later today', () => {
+    expect(daysUntilPoint({ day_of_week: 5, time: '14:00' }, 5, 12 * 60)).to.equal(0);
+  });
+
+  it('should count the days to a point later in the week', () => {
+    expect(daysUntilPoint({ day_of_week: 6, time: '14:00' }, 5, 12 * 60)).to.equal(1);
+    expect(daysUntilPoint({ day_of_week: 1, time: '06:00' }, 5, 12 * 60)).to.equal(3);
+  });
+
+  it("should take a point already past today for next week's", () => {
+    expect(daysUntilPoint({ day_of_week: 5, time: '12:00' }, 5, 12 * 60)).to.equal(7);
   });
 });

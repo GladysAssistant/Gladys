@@ -318,7 +318,7 @@ const Profile = ({ children, ...props }) => {
                 'is-invalid': get(props, 'errors.password'),
                 'is-valid': props.validPassword && !get(props, 'errors.password')
               })}
-              value={props.newUser.password}
+              value={props.newUser.password || ''}
               onInput={props.updatePassword}
               placeholder={
                 props.editingOtherUser ? (
@@ -350,7 +350,7 @@ const Profile = ({ children, ...props }) => {
                 'is-invalid': get(props, 'errors.passwordRepeat'),
                 'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
               })}
-              value={props.newUser.passwordRepeat}
+              value={props.newUser.passwordRepeat || ''}
               onInput={props.updatePasswordRepeat}
               placeholder={
                 props.editingOtherUser ? (

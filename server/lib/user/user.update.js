@@ -6,13 +6,14 @@ const passwordUtils = require('../../utils/password');
  * @description Update a user.
  * @param {string} userId - The user id to update.
  * @param {object} newUser - The new user.
+ * @param {string} [currentSessionId] - Session the update comes from, kept when the password changes.
  * @returns {Promise} Return the updated user.
  * @example
  * gladys.user.update('184515e8-27c0-45c3-97f5-f5e7d14aecce', {
  *    picture: 'xxx'
  * });
  */
-async function update(userId, newUser) {
+async function update(userId, newUser, currentSessionId = null) {
   const user = await db.User.findByPk(userId);
 
   if (user === null) {
@@ -28,6 +29,11 @@ async function update(userId, newUser) {
   }
 
   await user.update(newUser);
+
+  // a new password logs out every session of the user but the one it was changed from
+  if (newUser.password) {
+    await this.session.revokeLoginSessions(userId, currentSessionId);
+  }
 
   const plainUser = user.get({ plain: true });
 

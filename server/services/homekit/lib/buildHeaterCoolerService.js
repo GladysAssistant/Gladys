@@ -1,3 +1,4 @@
+const { handleRequest, readFeatureValue } = require('./characteristicHandlers');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -117,7 +118,7 @@ function buildHeaterCoolerService(service, device, features) {
     DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
   );
 
-  const readValue = (feature) => this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+  const readValue = (feature) => readFeatureValue(this.gladys.stateManager, feature);
   const readCelsius = (feature) => toCelsius(readValue(feature), feature.unit);
   const emitValue = (feature, value) => {
     const action = {
@@ -222,15 +223,21 @@ function buildHeaterCoolerService(service, device, features) {
     // it is off until the next read says otherwise.
     activeCharacteristic.setProps({ validValues: [HOMEKIT_ACTIVE.ACTIVE] });
   }
-  activeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-    callback(undefined, isOn() ? HOMEKIT_ACTIVE.ACTIVE : HOMEKIT_ACTIVE.INACTIVE);
-  });
-  activeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-    if (powerFeature) {
-      emitValue(powerFeature, value === HOMEKIT_ACTIVE.ACTIVE ? 1 : 0);
-    }
-    callback();
-  });
+  activeCharacteristic.on(
+    CharacteristicEventTypes.GET,
+    handleRequest(async (callback) => {
+      callback(undefined, isOn() ? HOMEKIT_ACTIVE.ACTIVE : HOMEKIT_ACTIVE.INACTIVE);
+    }),
+  );
+  activeCharacteristic.on(
+    CharacteristicEventTypes.SET,
+    handleRequest(async (value, callback) => {
+      if (powerFeature) {
+        emitValue(powerFeature, value === HOMEKIT_ACTIVE.ACTIVE ? 1 : 0);
+      }
+      callback();
+    }, 1),
+  );
 
   const targetStateCharacteristic = service.getCharacteristic(Characteristic.TargetHeaterCoolerState);
   // An integration declaring only modes HomeKit has no equivalent for would leave the list empty,
@@ -238,30 +245,40 @@ function buildHeaterCoolerService(service, device, features) {
   if (validTargetStates.length > 0) {
     targetStateCharacteristic.setProps({ validValues: validTargetStates });
   }
-  targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-    callback(undefined, readTargetState());
-  });
-  targetStateCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-    // Only the mode is written: switching the device on is Active's job, and HomeKit writes both
-    // when it means both. Dry and fan are reported as auto, so auto has to stay selectable even on
-    // a device that has no auto mode — but writing AC_MODE.AUTO there would push a mode it never
-    // declared. The device is left in whatever mode it was running in.
-    if (modeFeature) {
-      writeMode(heaterCoolerStateToAcMode[value]);
-    }
-    callback();
-  });
+  targetStateCharacteristic.on(
+    CharacteristicEventTypes.GET,
+    handleRequest(async (callback) => {
+      callback(undefined, readTargetState());
+    }),
+  );
+  targetStateCharacteristic.on(
+    CharacteristicEventTypes.SET,
+    handleRequest(async (value, callback) => {
+      // Only the mode is written: switching the device on is Active's job, and HomeKit writes both
+      // when it means both. Dry and fan are reported as auto, so auto has to stay selectable even on
+      // a device that has no auto mode — but writing AC_MODE.AUTO there would push a mode it never
+      // declared. The device is left in whatever mode it was running in.
+      if (modeFeature) {
+        writeMode(heaterCoolerStateToAcMode[value]);
+      }
+      callback();
+    }, 1),
+  );
 
-  service.getCharacteristic(Characteristic.CurrentHeaterCoolerState).on(CharacteristicEventTypes.GET, (callback) => {
-    callback(undefined, readCurrentState());
-  });
+  service.getCharacteristic(Characteristic.CurrentHeaterCoolerState).on(
+    CharacteristicEventTypes.GET,
+    handleRequest((callback) => {
+      callback(undefined, readCurrentState());
+    }),
+  );
 
   // HomeKit only ever exchanges Celsius, this characteristic is the unit shown in the Home app.
-  service
-    .getCharacteristic(Characteristic.TemperatureDisplayUnits)
-    .on(CharacteristicEventTypes.GET, async (callback) => {
+  service.getCharacteristic(Characteristic.TemperatureDisplayUnits).on(
+    CharacteristicEventTypes.GET,
+    handleRequest(async (callback) => {
       callback(undefined, Characteristic.TemperatureDisplayUnits.CELSIUS);
-    });
+    }),
+  );
 
   // CurrentTemperature is required. Without a temperature sensor on the device, the setpoint is the
   // closest thing to the room temperature we can report; a device with neither is left with the HAP
@@ -269,12 +286,15 @@ function buildHeaterCoolerService(service, device, features) {
   const temperatureSourceFeature = currentTemperatureFeature || setpointFeature;
   if (temperatureSourceFeature) {
     const currentTemperatureCharacteristic = service.getCharacteristic(Characteristic.CurrentTemperature);
-    currentTemperatureCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-      callback(
-        undefined,
-        clampToCharacteristic(readCelsius(temperatureSourceFeature), currentTemperatureCharacteristic.props),
-      );
-    });
+    currentTemperatureCharacteristic.on(
+      CharacteristicEventTypes.GET,
+      handleRequest(async (callback) => {
+        callback(
+          undefined,
+          clampToCharacteristic(readCelsius(temperatureSourceFeature), currentTemperatureCharacteristic.props),
+        );
+      }),
+    );
   }
 
   // A HeaterCooler has no TargetTemperature: the Home app shows the heating threshold in heat mode,
@@ -301,13 +321,19 @@ function buildHeaterCoolerService(service, device, features) {
       const characteristic = service.getCharacteristic(characteristicType);
       characteristic.setProps(thresholdProps);
 
-      characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-        callback(undefined, clampToCharacteristic(readCelsius(setpointFeature), characteristic.props));
-      });
-      characteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-        emitValue(setpointFeature, fromCelsius(value, setpointFeature.unit));
-        callback();
-      });
+      characteristic.on(
+        CharacteristicEventTypes.GET,
+        handleRequest(async (callback) => {
+          callback(undefined, clampToCharacteristic(readCelsius(setpointFeature), characteristic.props));
+        }),
+      );
+      characteristic.on(
+        CharacteristicEventTypes.SET,
+        handleRequest(async (value, callback) => {
+          emitValue(setpointFeature, fromCelsius(value, setpointFeature.unit));
+          callback();
+        }, 1),
+      );
     });
   }
 

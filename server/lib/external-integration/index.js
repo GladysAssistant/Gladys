@@ -278,7 +278,7 @@ const ExternalIntegration = function ExternalIntegration(
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
   this.storeIndexFetchedAt = 0;
-  // last full index entry fetched (complete manifest), see getStoreEntry
+  // last complete store entry fetched (per-integration file), see getStoreEntry
   this.storeEntryCache = null;
   this.storeRefreshInterval = null;
   // storeSlug -> manifest fetched directly from the repo (repo_url installs absent from the index)

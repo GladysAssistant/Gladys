@@ -44,6 +44,7 @@ async function reset() {
 
   // 4. Reset in-memory state
   this.discoveredDevices = {};
+  this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
   this.networkAdapterConfigured = false;

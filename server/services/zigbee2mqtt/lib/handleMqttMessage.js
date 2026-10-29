@@ -35,6 +35,10 @@ async function handleMqttMessage(topic, message) {
           this.discoveredDevices[device.friendly_name] = device;
         });
 
+      // Re-attach Gladys devices renamed in Zigbee2mqtt (matched by IEEE address)
+      // before publishing the discovered devices, so they merge with the right device.
+      await this.syncRenamedDevices(devices);
+
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
         payload: this.getDiscoveredDevices(),
@@ -99,36 +103,39 @@ async function handleMqttMessage(topic, message) {
       break;
     }
     default: {
-      const splittedTopic = topic.split('/');
+      // The device name is everything after the base topic: a Zigbee2mqtt friendly
+      // name can contain "/" (e.g. "salon/lampe"). Device sub-topics ("<name>/set",
+      // "<name>/availability"...) end with a segment that is not part of the name,
+      // so a topic is a device state only when its remainder names a known device.
+      const deviceName = topic.substring(topic.indexOf('/') + 1);
       if (!message) {
         logger.warn(`Zigbee2mqtt topic ${topic} empty message.`);
-      } else if (splittedTopic.length === 2) {
-        const deviceName = splittedTopic[1];
+        break;
+      }
+      // Fetch device from name
+      const device = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${deviceName}`);
+      if (device) {
         const incomingFeatures = JSON.parse(message);
-        // Fetch device from name
-        const device = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${deviceName}`);
-        if (device) {
-          Object.keys(incomingFeatures).forEach((zigbeeFeatureField) => {
-            // Find the feature regarding the field name
-            const value = incomingFeatures[zigbeeFeatureField];
-            const feature = convertFeature(device.features, zigbeeFeatureField, value);
-            if (feature) {
-              try {
-                const newState = {
-                  device_feature_external_id: `${feature.external_id}`,
-                  state: this.readValue(deviceName, zigbeeFeatureField, value),
-                };
-                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
-              } catch (e) {
-                logger.error(`Failed to convert value for device ${deviceName}:`, e);
-              }
-            } else {
-              logger.debug(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
+        Object.keys(incomingFeatures).forEach((zigbeeFeatureField) => {
+          // Find the feature regarding the field name
+          const value = incomingFeatures[zigbeeFeatureField];
+          const feature = convertFeature(device.features, zigbeeFeatureField, value);
+          if (feature) {
+            try {
+              const newState = {
+                device_feature_external_id: `${feature.external_id}`,
+                state: this.readValue(deviceName, zigbeeFeatureField, value),
+              };
+              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+            } catch (e) {
+              logger.error(`Failed to convert value for device ${deviceName}:`, e);
             }
-          });
-        } else {
-          logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
-        }
+          } else {
+            logger.debug(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
+          }
+        });
+      } else if (this.discoveredDevices[deviceName]) {
+        logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
       } else {
         logger.debug(`Zigbee2mqtt topic ${topic} not handled.`);
       }

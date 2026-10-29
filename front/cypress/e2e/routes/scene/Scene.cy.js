@@ -132,6 +132,9 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
+    // the editor loads all devices on mount (collapsed step summaries): consume
+    // that call so the wait below matches the one of the device select
+    cy.wait('@loadAllDevices');
     cy.contains('editScene.addStepButton')
       .should('have.class', 'btn-outline-primary')
       .click();
