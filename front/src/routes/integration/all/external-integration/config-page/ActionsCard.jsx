@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { ConfigField } from '../../../../../components/integration/ConfigSchemaForm';
 import { getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import { getVisibleFields } from '../../../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import integrationText from '../integrationText.css';
 
 // An action form has no stored secret to mask (unlike the config_schema,
@@ -47,7 +48,7 @@ const ActionsCard = ({
           <div class={cx({ 'mb-5': index < actions.length - 1 })}>
             <h4>{getLocalizedText(action.label, language) || action.key}</h4>
             {description && <p class={cx('text-muted small', integrationText.integrationText)}>{description}</p>}
-            {(action.fields || []).map(field => (
+            {getVisibleFields(action.fields || [], actionFieldValues[action.key] || {}).map(field => (
               <ConfigField
                 key={field.key}
                 field={field}

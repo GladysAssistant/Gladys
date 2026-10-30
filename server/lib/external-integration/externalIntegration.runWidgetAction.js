@@ -11,6 +11,7 @@ const { findWidgetAction } = require('./externalIntegration.normalizeWidgetConte
 const { findDeclaredWidget, validateWidgetSettings } = require('./externalIntegration.validateWidgetSettings');
 const { countPerMinute } = require('./externalIntegration.widgetCache');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
+const { getVisibleFields } = require('./externalIntegration.fieldVisibility');
 const { toWidgetHttpError } = require('./externalIntegration.widgetErrors');
 
 const LANGUAGE_KEY_REGEX = /^[a-z]{2}(-[A-Z]{2})?$/;
@@ -80,7 +81,11 @@ function validateActionValues(action, rawValues = {}) {
     if (values[field.key] === undefined && field.default !== undefined) {
       values[field.key] = field.default;
     }
-    if (field.required && values[field.key] === undefined) {
+  });
+  // a field hidden by its visible_if condition is never required
+  const visibleKeys = new Set(getVisibleFields(declaredFields, values).map((field) => field.key));
+  declaredFields.forEach((field) => {
+    if (field.required && visibleKeys.has(field.key) && values[field.key] === undefined) {
       throw new Error422(`values.${field.key}: required`);
     }
   });
@@ -157,4 +162,5 @@ async function runWidgetAction(selector, widgetKey, actionKey, rawSettings, { la
 
 module.exports = {
   runWidgetAction,
+  validateActionValues,
 };

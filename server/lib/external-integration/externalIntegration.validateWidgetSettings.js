@@ -1,6 +1,7 @@
 const { Error422 } = require('../../utils/httpErrors');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
+const { getVisibleFields } = require('./externalIntegration.fieldVisibility');
 const { MAX_WIDGET_SETTINGS, MAX_WIDGET_SETTING_STRING_LENGTH, MAX_WIDGET_SETTINGS_BYTES } = require('./constants');
 
 /**
@@ -106,7 +107,11 @@ async function validateWidgetSettings(service, widget, rawSettings = {}) {
     if (settings[field.key] === undefined && field.default !== undefined) {
       settings[field.key] = field.default;
     }
-    if (field.required && settings[field.key] === undefined) {
+  });
+  // a setting hidden by its visible_if condition is never required
+  const visibleKeys = new Set(getVisibleFields(declaredFields, settings).map((field) => field.key));
+  declaredFields.forEach((field) => {
+    if (field.required && visibleKeys.has(field.key) && settings[field.key] === undefined) {
       throw new Error422(`settings.${field.key}: required`);
     }
   });
