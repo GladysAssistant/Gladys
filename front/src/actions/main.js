@@ -85,6 +85,20 @@ function createActions(store) {
         console.error(e);
       }
     },
+    // Writes the current browser session's tablet mode server-side, then syncs
+    // the store and the per-session house selector. Shared by the "Tablet Mode"
+    // menu (SetTabletMode.jsx) and the ?tablet_mode_house= URL param
+    // (routes/dashboard/index.js) so the two activation paths cannot drift.
+    // houseSelector === null disables tablet mode. Errors are left to the
+    // caller (both call sites already wrap this in their own try/catch).
+    async setTabletMode(state, houseSelector) {
+      await state.httpClient.post('/api/v1/session/tablet_mode', {
+        tablet_mode: houseSelector !== null,
+        house: houseSelector
+      });
+      await actions.refreshTabletMode(state);
+      state.session.setTabletModeCurrentHouseSelector(houseSelector);
+    },
     async checkSession(state) {
       actionsDarkMode.initDarkMode(state);
       if (isUrlInArray(state.currentUrl, OPEN_PAGES)) {
