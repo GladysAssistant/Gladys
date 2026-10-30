@@ -13,6 +13,9 @@ const STATUS = {
   PROCESSING: 'processing'
 };
 
+/** Clicks right after stopping the dictation are ignored, so a double tap does not cancel it. */
+const STOP_DOUBLE_TAP_GUARD_MS = 500;
+
 /**
  * @description Returns true when the error comes from an aborted recording or request.
  * @param {Error} error - Caught error.
@@ -110,6 +113,9 @@ class ChatVoiceInputButton extends Component {
 
   /** Ends the running recording and keeps the audio, when the user presses the button. */
   activeStopController = null;
+
+  /** Clicks before this timestamp are ignored (see STOP_DOUBLE_TAP_GUARD_MS). */
+  ignoreClicksUntil = 0;
 
   /** Last locked state reported to the parent, which freezes the input while true. */
   reportedBusy = false;
@@ -255,6 +261,7 @@ class ChatVoiceInputButton extends Component {
       this.activeStopController.abort();
       this.activeStopController = null;
     }
+    this.ignoreClicksUntil = Date.now() + STOP_DOUBLE_TAP_GUARD_MS;
     this.setStatus(STATUS.PROCESSING);
   };
 
@@ -274,6 +281,9 @@ class ChatVoiceInputButton extends Component {
   };
 
   handleClick = () => {
+    if (Date.now() < this.ignoreClicksUntil) {
+      return;
+    }
     if (this.currentStatus === STATUS.IDLE) {
       this.startListening();
     } else if (this.currentStatus === STATUS.LISTENING) {

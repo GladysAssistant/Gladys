@@ -526,10 +526,10 @@ async function recordWithAudioWorklet(stream, options) {
       recorderNode.port.postMessage({ type: 'flush' });
     };
 
+    // Also runs after a stop, while waiting for the flushed samples: a cancel
+    // must release the microphone without depending on the worklet reply. The
+    // listener is removed once the recording arrives, so it runs at most once.
     const abort = () => {
-      if (finished) {
-        return;
-      }
       finished = true;
       const rejectAbort = async () => {
         await cleanup();
