@@ -79,10 +79,11 @@ function extractTranscription(sttResponse) {
 
 /**
  * Microphone button dictating what the user says in the chat message input.
- * The audio is recorded by the browser until the user stops speaking, then
- * transcribed by the Gladys Plus STT API — the same path as the dashboard
- * voice assistant widget. The message is not sent automatically: the
- * transcription fills the input and the user reviews it before pressing send.
+ * The audio is recorded by the browser until the user stops speaking or
+ * presses the button again, then transcribed by the Gladys Plus STT API —
+ * the same path as the dashboard voice assistant widget. The message is not
+ * sent automatically: the transcription fills the input and the user reviews
+ * it before pressing send.
  */
 class ChatVoiceInputButton extends Component {
   state = {
@@ -106,6 +107,9 @@ class ChatVoiceInputButton extends Component {
   sessionGeneration = 0;
 
   activeAbortController = null;
+
+  /** Ends the running recording and keeps the audio, when the user presses the button. */
+  activeStopController = null;
 
   /** Last locked state reported to the parent, which freezes the input while true. */
   reportedBusy = false;
@@ -183,10 +187,15 @@ class ChatVoiceInputButton extends Component {
     const generation = this.sessionGeneration;
     const abortController = new AbortController();
     this.activeAbortController = abortController;
+    const stopController = new AbortController();
+    this.activeStopController = stopController;
     this.setStatus(STATUS.LISTENING, generation);
 
     try {
-      const recordedBlob = await recordUntilSilence({ signal: abortController.signal });
+      const recordedBlob = await recordUntilSilence({
+        signal: abortController.signal,
+        stopSignal: stopController.signal
+      });
       if (!this.isSessionActive(generation)) {
         return;
       }
@@ -231,7 +240,22 @@ class ChatVoiceInputButton extends Component {
       if (this.activeAbortController === abortController) {
         this.activeAbortController = null;
       }
+      if (this.activeStopController === stopController) {
+        this.activeStopController = null;
+      }
     }
+  };
+
+  /**
+   * @description End the recording now and transcribe what was said so far,
+   * in case the end of speech is not detected (background noise).
+   */
+  stopListening = () => {
+    if (this.activeStopController) {
+      this.activeStopController.abort();
+      this.activeStopController = null;
+    }
+    this.setStatus(STATUS.PROCESSING);
   };
 
   /**
@@ -241,6 +265,7 @@ class ChatVoiceInputButton extends Component {
    */
   cancelListening = () => {
     this.sessionGeneration += 1;
+    this.activeStopController = null;
     if (this.activeAbortController) {
       this.activeAbortController.abort();
       this.activeAbortController = null;
@@ -251,13 +276,20 @@ class ChatVoiceInputButton extends Component {
   handleClick = () => {
     if (this.currentStatus === STATUS.IDLE) {
       this.startListening();
+    } else if (this.currentStatus === STATUS.LISTENING) {
+      this.stopListening();
     } else {
       this.cancelListening();
     }
   };
 
   render(props, { status }) {
-    const labelKey = status === STATUS.IDLE ? 'chat.voiceInput.startListening' : 'chat.voiceInput.stopListening';
+    let labelKey = 'chat.voiceInput.startListening';
+    if (status === STATUS.LISTENING) {
+      labelKey = 'chat.voiceInput.stopListening';
+    } else if (status === STATUS.PROCESSING) {
+      labelKey = 'chat.voiceInput.cancelListening';
+    }
 
     return (
       <Localizer>

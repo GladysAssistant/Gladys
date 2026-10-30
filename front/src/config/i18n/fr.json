@@ -856,8 +856,9 @@
       "voice-assistant": {
         "speak": "Parler",
         "stop": "Arrêter",
+        "send": "Envoyer",
         "listening": "J'écoute...",
-        "listeningHint": "Parlez, j'arrête d'enregistrer quand vous vous taisez.",
+        "listeningHint": "Parlez, j'arrête d'enregistrer quand vous vous taisez ou quand vous appuyez sur Envoyer.",
         "processing": "Traitement...",
         "speaking": "Réponse...",
         "transcriptionLabel": "Vous avez dit",
@@ -7125,6 +7126,7 @@
     "voiceInput": {
       "startListening": "Dicter un message",
       "stopListening": "Arrêter la dictée",
+      "cancelListening": "Annuler la dictée",
       "error": "La dictée a échoué. Vérifiez que Gladys Plus est connecté, puis réessayez.",
       "errorNoSpeech": "Aucune voix détectée. Vérifiez que votre micro est activé, puis réessayez.",
       "errorPermissionDenied": "L'accès au micro a été refusé. Autorisez-le dans les réglages de votre navigateur pour dicter un message.",

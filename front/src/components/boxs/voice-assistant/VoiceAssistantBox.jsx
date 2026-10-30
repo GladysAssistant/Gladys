@@ -165,6 +165,9 @@ class VoiceAssistantBox extends Component {
 
   activeVoiceAbortController = null;
 
+  /** Ends the running recording and keeps the audio, when the user presses "Send". */
+  activeVoiceStopController = null;
+
   probeMicrophone = async () => {
     const reason = await probeMicrophoneAvailability();
     if (!this._isMounted) {
@@ -244,6 +247,7 @@ class VoiceAssistantBox extends Component {
 
   cancelActiveVoiceSession = () => {
     this.voiceSessionGeneration += 1;
+    this.activeVoiceStopController = null;
     if (this.activeVoiceAbortController) {
       this.activeVoiceAbortController.abort();
       this.activeVoiceAbortController = null;
@@ -380,8 +384,20 @@ class VoiceAssistantBox extends Component {
     }
   };
 
+  stopActiveVoiceRecording = () => {
+    this.activeVoiceStopController.abort();
+    this.activeVoiceStopController = null;
+    this.setState({ uiState: STATE.PROCESSING });
+  };
+
   handleSpeakClick = async () => {
     const { uiState } = this.state;
+    // While listening, the button sends what was said so far, in case the
+    // end of speech is not detected (background noise).
+    if (uiState === STATE.LISTENING && this.activeVoiceStopController) {
+      this.stopActiveVoiceRecording();
+      return;
+    }
     if (uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING) {
       this.cancelActiveVoiceSession();
       this.setState({
@@ -399,6 +415,8 @@ class VoiceAssistantBox extends Component {
     const voiceSessionGeneration = this.voiceSessionGeneration;
     const abortController = new AbortController();
     this.activeVoiceAbortController = abortController;
+    const stopController = new AbortController();
+    this.activeVoiceStopController = stopController;
 
     this.clearMessagesClearTimeout();
     if (!isSpeechRecordingSupported()) {
@@ -433,6 +451,7 @@ class VoiceAssistantBox extends Component {
     try {
       const recordedBlob = await recordUntilSilence({
         signal: abortController.signal,
+        stopSignal: stopController.signal,
         onReady: () => {
           this.safeSetState({ uiState: STATE.LISTENING }, voiceSessionGeneration);
         }
@@ -516,12 +535,18 @@ class VoiceAssistantBox extends Component {
       if (this.activeVoiceAbortController === abortController) {
         this.activeVoiceAbortController = null;
       }
+      if (this.activeVoiceStopController === stopController) {
+        this.activeVoiceStopController = null;
+      }
     }
   };
 
   getButtonLabelKey = () => {
     const { uiState } = this.state;
-    if (uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING) {
+    if (uiState === STATE.LISTENING) {
+      return 'dashboard.boxes.voice-assistant.send';
+    }
+    if (uiState === STATE.PROCESSING || uiState === STATE.SPEAKING) {
       return 'dashboard.boxes.voice-assistant.stop';
     }
     return 'dashboard.boxes.voice-assistant.speak';
