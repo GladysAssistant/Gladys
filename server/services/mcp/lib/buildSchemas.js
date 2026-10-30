@@ -336,6 +336,19 @@ async function getAllTools(userId) {
     house_id: houseId,
   }));
   rooms.push(noRoom);
+  // "No room" is the sentinel holding the devices that were never assigned to a room.
+  // Smaller models read it as "no room filter" and pick it for a question about the
+  // whole home, which then only covers the devices of no room. The read-only tools
+  // cover the whole home when the room is left empty, so they do not offer it. The
+  // camera and control tools keep it, it is how they reach the devices of no room by
+  // room: a command or a camera image must not widen to the whole home on a guess, so
+  // their description says what it targets instead. A home without any room gets a
+  // string instead of an empty enum, which would match nothing.
+  const realRoomNames = rooms.filter(({ selector }) => selector !== noRoom.selector).map(({ name }) => name);
+  const realRoomSchema = realRoomNames.length > 0 ? z.enum(realRoomNames) : z.string();
+  const noRoomDescription = `"${noRoom.name}" only targets the devices that are not assigned to a room, never the whole home.`;
+  // "No room", or anything close to it (see the room of device.get-state).
+  const isNoRoom = (room) => this.findBySimilarity(rooms, room).selector === noRoom.selector;
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const allHouses = await this.gladys.house.get();
@@ -524,7 +537,7 @@ async function getAllTools(userId) {
         description: 'Get image from camera in specific room.',
         categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
-          room: z.enum(rooms.map(({ name }) => name)).describe('Room to get image from.'),
+          room: z.enum(rooms.map(({ name }) => name)).describe(`Room to get image from. ${noRoomDescription}`),
         },
       },
       cb: async ({ room }) => {
@@ -627,8 +640,7 @@ async function getAllTools(userId) {
           AI_CHAT_TOOL_CATEGORIES.OTHER,
         ],
         inputSchema: {
-          room: z
-            .enum(rooms.map(({ name }) => name))
+          room: realRoomSchema
             .optional()
             .describe(
               'Room to get information from. Only a room name from the list is accepted, ' +
@@ -651,7 +663,12 @@ async function getAllTools(userId) {
         // makes it pass the house as a room: that used to resolve to no selector at
         // all, filter every device out, and the empty result then reads as "no
         // temperature sensor is configured at home".
-        if (room && room !== '') {
+        // "No room", or anything close to it, is read as the whole home too: it is what
+        // a model taking it for "no room filter" means, and narrowing to the devices of
+        // no room answered "there is no humidity sensor in the house". Reading more than
+        // asked is harmless, and every state keeps the room of its device, "No room"
+        // included, for a model that did mean the devices of no room.
+        if (room && room !== '' && !isNoRoom(room)) {
           const selectedRoom = this.findBySimilarity(rooms, room);
 
           if (selectedRoom?.selector) {
@@ -679,12 +696,7 @@ async function getAllTools(userId) {
                     type: 'text',
                     text:
                       `device.get-state: "${room}" is not a room of this home, no state was read. ` +
-                      // "No room" is the sentinel holding the devices that were never assigned
-                      // to a room, not a room the model should be invited to retry with.
-                      `Available rooms: ${rooms
-                        .filter(({ selector }) => selector !== noRoom.selector)
-                        .map(({ name }) => name)
-                        .join(', ')}. ` +
+                      `Available rooms: ${realRoomNames.join(', ')}. ` +
                       'Call this tool again with one of them, or without the room parameter to cover the whole home.',
                   },
                 ],
@@ -772,7 +784,9 @@ async function getAllTools(userId) {
             .optional(),
           room: z
             .enum(rooms.map(({ name }) => name))
-            .describe('Room name. Required together with device_category when device is not specified.')
+            .describe(
+              `Room name. Required together with device_category when device is not specified. ${noRoomDescription}`,
+            )
             .optional(),
           device_category: z
             .enum(availableSwitchableFeatureCategories)
@@ -871,10 +885,7 @@ async function getAllTools(userId) {
         description: 'Get history states of specific device.',
         categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
-          room: z
-            .enum(rooms.map(({ name }) => name))
-            .describe('Room to get information from.')
-            .optional(),
+          room: realRoomSchema.describe('Room to get information from.').optional(),
           device: z
             .enum([...new Set(historyDevices.map(({ name }) => name))])
             .describe('Device name to get history.')
@@ -892,7 +903,8 @@ async function getAllTools(userId) {
       cb: async ({ room, device, feature, interval }) => {
         let selectedDevices = historyDevices;
 
-        if (room && room !== '') {
+        // Same reasoning as device.get-state: "No room" is read as the whole home.
+        if (room && room !== '' && !isNoRoom(room)) {
           const { selector } = this.findBySimilarity(rooms, room);
           selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
         }
@@ -998,7 +1010,7 @@ async function getAllTools(userId) {
             .optional(),
           room: z
             .enum(rooms.map(({ name }) => name))
-            .describe("Device's room if specified, required if device_category is specified.")
+            .describe(`Device's room if specified, required if device_category is specified. ${noRoomDescription}`)
             .optional(),
           device_category: z
             .enum(availableShutterFeatureCategories)
@@ -1165,7 +1177,7 @@ async function getAllTools(userId) {
             .optional(),
           room: z
             .enum(rooms.map(({ name }) => name))
-            .describe('Room name, to control all lights of the room when device is not specified.')
+            .describe(`Room name, to control all lights of the room when device is not specified. ${noRoomDescription}`)
             .optional(),
         },
       },
@@ -1435,8 +1447,7 @@ async function getAllTools(userId) {
             .enum([...new Set(batteryDevices.map(({ name }) => name))])
             .describe('Battery powered device name, to get the battery level of this device only.')
             .optional(),
-          room: z
-            .enum(rooms.map(({ name }) => name))
+          room: realRoomSchema
             .describe('Room name, to get the battery levels of this room only. Leave empty to cover the whole home.')
             .optional(),
         },
@@ -1448,8 +1459,9 @@ async function getAllTools(userId) {
         // Same reasoning as device.get-state: the chat gateway calls this callback with
         // the raw arguments of the model, which is not bound by the enums above. "État
         // des piles de la maison" makes it pass the house as a room, and the whole-home
-        // question is precisely the primary one for this tool.
-        if (room && room !== '') {
+        // question is precisely the primary one for this tool, so "No room" is read as
+        // the whole home too.
+        if (room && room !== '' && !isNoRoom(room)) {
           const selectedRoom = this.findBySimilarity(rooms, room);
 
           if (selectedRoom?.selector) {
@@ -1477,12 +1489,7 @@ async function getAllTools(userId) {
                     type: 'text',
                     text:
                       `device.get-battery-levels: "${room}" is not a room of this home, no battery level was read. ` +
-                      // "No room" is the sentinel holding the devices that were never assigned
-                      // to a room, not a room the model should be invited to retry with.
-                      `Available rooms: ${rooms
-                        .filter(({ selector }) => selector !== noRoom.selector)
-                        .map(({ name }) => name)
-                        .join(', ')}. ` +
+                      `Available rooms: ${realRoomNames.join(', ')}. ` +
                       'Call this tool again with one of them, or without the room parameter to cover the whole home.',
                   },
                 ],

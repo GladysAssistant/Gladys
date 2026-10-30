@@ -1971,6 +1971,51 @@ describe('build schemas', () => {
     ]);
   });
 
+  it('should read device.get-battery-levels of the whole home when the model passes "No room"', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const batteryApiTool = mcpToolsToChatApiFormat(tools).find(
+      (tool) => tool.function.name === 'device_get_battery_levels',
+    );
+    expect(batteryApiTool.function.parameters.properties.room.enum).to.deep.equal(['Salon', 'Chambre', 'Cuisine']);
+
+    // "État des piles de la maison" with "No room" taken for "no room filter": every
+    // battery of the home, and the device of no room still labelled "No room".
+    const result = await batteryTool.cb({ room: 'No room' });
+    expect(result.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].batteries.map(({ room, device }) => ({ room, device }))).to.deep.equal([
+      { room: 'Chambre', device: 'Capteur porte chambre' },
+      { room: 'Salon', device: 'Capteur humidité salon' },
+      { room: 'Salon', device: 'Capteur température salon' },
+      { room: 'No room', device: 'Détecteur de fumée' },
+      { room: 'Chambre', device: 'Télécommande chambre' },
+    ]);
+  });
+
+  it('should offer any room name to device.get-battery-levels of a home without rooms', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    mcpHandler.gladys.room.getAll = stub().resolves([]);
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    // An enum without "No room" would be empty, and match nothing.
+    const batteryApiTool = mcpToolsToChatApiFormat(tools).find(
+      (tool) => tool.function.name === 'device_get_battery_levels',
+    );
+    expect(batteryApiTool.function.parameters.properties.room).to.deep.equal({
+      type: 'string',
+      description: 'Room name, to get the battery levels of this room only. Leave empty to cover the whole home.',
+    });
+
+    const result = await batteryTool.cb({ room: 'No room' });
+    expect(result.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].batteries.length).to.eq(5);
+  });
+
   it('should flag device.get-battery-levels levels below the battery warning threshold', async () => {
     const mcpHandler = buildBatteryMcpHandler();
     mcpHandler.gladys.variable.getValue = stub().resolves('20');
@@ -4371,6 +4416,125 @@ describe('build schemas', () => {
         'No measurement exists for this query, do not report any value.',
     );
   });
+
+  it('should read the whole home when the model passes "No room" to device.get-state or device.get-history', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon', house_id: 'house-1' },
+      { id: 'room-2', name: 'Chambre', selector: 'chambre', house_id: 'house-1' },
+    ];
+
+    const buildSensor = (suffix, roomSelector, roomName, category, value) => ({
+      selector: `capteur-${suffix}`,
+      name: `Capteur ${suffix}`,
+      room: roomSelector ? { selector: roomSelector, name: roomName } : null,
+      features: [
+        {
+          id: `feature-${suffix}`,
+          selector: `capteur-${suffix}-${category}`,
+          name: category,
+          category,
+          type: 'decimal',
+          unit: category === 'humidity-sensor' ? 'percent' : 'celsius',
+          last_value: value,
+          keep_history: true,
+        },
+      ],
+    });
+
+    // Every humidity sensor is in a room: the only device that was never assigned to
+    // a room is a temperature sensor.
+    const sensors = [
+      buildSensor('salon', 'salon', 'Salon', 'humidity-sensor', 52),
+      buildSensor('chambre', 'chambre', 'Chambre', 'humidity-sensor', 48),
+      buildSensor('garage', null, null, 'temperature-sensor', 17),
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isBatteryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({ value: feature.last_value, unit: feature.unit, age: '2min' })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Maison', selector: 'maison' }]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(sensors),
+          getBySelector: stub().callsFake(async (selector) => sensors.find((s) => s.selector === selector)),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      // Only "no-room" is close to a name of the home: "no room".
+      levenshtein: { distance: stub().callsFake((a, b) => (a === 'no room' && b === 'no-room' ? 1 : 10)) },
+      toon: stub().callsFake((data) => JSON.stringify(data)),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+    const getHistoryTool = tools.find((tool) => tool.intent === 'device.get-history');
+
+    // The read-only tools do not offer "No room" as a room any more.
+    const apiTools = mcpToolsToChatApiFormat(tools);
+    const roomParameterOf = (name) =>
+      apiTools.find((tool) => tool.function.name === name).function.parameters.properties.room;
+    expect(roomParameterOf('device_get_state').enum).to.deep.equal(['Salon', 'Chambre']);
+    expect(roomParameterOf('device_get_history').enum).to.deep.equal(['Salon', 'Chambre']);
+    // The camera and the control tools keep it, and say what it targets.
+    expect(roomParameterOf('camera_get_image').enum).to.deep.equal(['Salon', 'Chambre', 'No room']);
+    expect(roomParameterOf('camera_get_image').description).to.eq(
+      'Room to get image from. "No room" only targets the devices that are not assigned to a room, never the whole home.',
+    );
+    expect(roomParameterOf('device_turn_on_off').enum).to.deep.equal(['Salon', 'Chambre', 'No room']);
+    expect(roomParameterOf('device_turn_on_off').description).to.contain('"No room" only targets the devices');
+
+    // "Quels taux d'humidité dans la maison ?": the call of the forum report, which used
+    // to answer that no humidity sensor is configured in room "No room".
+    const humidity = await getStateTool.cb({ device_type: 'humidity-sensor', room: 'No room' });
+    expect(
+      JSON.parse(humidity.content[0].text).map(({ room, device, value }) => ({ room, device, value })),
+    ).to.deep.equal([
+      { room: 'Salon', device: 'Capteur salon', value: 52 },
+      { room: 'Chambre', device: 'Capteur chambre', value: 48 },
+    ]);
+
+    // A name close to it reads the whole home too, and the device of no room is still
+    // part of it, labelled "No room".
+    const everything = await getStateTool.cb({ room: 'no-room' });
+    expect(JSON.parse(everything.content[0].text).map(({ room, device }) => ({ room, device }))).to.deep.equal([
+      { room: 'Salon', device: 'Capteur salon' },
+      { room: 'Chambre', device: 'Capteur chambre' },
+      { room: 'No room', device: 'Capteur garage' },
+    ]);
+
+    // Nothing of that type at home: the answer is about the whole home, not "No room".
+    const noCo2 = await getStateTool.cb({ device_type: 'co2-sensor', room: 'No room' });
+    expect(noCo2.content[0].text).to.eq(
+      'device.get-state: no device of type "co2-sensor" is configured. ' +
+        'No measurement exists for this query, do not report any value.',
+    );
+
+    // The history of the humidity of the home: the first humidity sensor of the home,
+    // instead of "no device or feature found" among the devices of no room.
+    const history = await getHistoryTool.cb({ room: 'No room', feature: 'humidity-sensor:decimal' });
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[0]).to.eq(
+      'capteur-salon-humidity-sensor',
+    );
+    expect(JSON.parse(history.content[0].text)).to.include({ room: 'Salon', device: 'Capteur salon' });
+  });
+
   describe('weather.get tool', () => {
     const houses = [
       { id: 'house-1', name: 'Maison', selector: 'maison', latitude: 48.8566, longitude: 2.3522 },
