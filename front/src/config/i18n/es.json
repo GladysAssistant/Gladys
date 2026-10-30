@@ -980,7 +980,11 @@
         },
         "backToSchedule": "Volver a la programación",
         "resumeFromStopped": "Encender el termostato",
-        "presetPending": "{{preset}} (se aplicará al encender)"
+        "presetPending": "{{preset}} (se aplicará al encender)",
+        "use": {
+          "heating": "Calefacción",
+          "cooling": "Refrigeración"
+        }
       }
     },
     "editDashboardBackgroundLabel": "Ambiente de fondo",
@@ -3775,6 +3779,8 @@
         "manualDurationUnit": "min",
         "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual.",
         "modeHelp": "Lo que controla este termostato: calefacción o climatización.",
+        "reversibleLabel": "Bomba de calor reversible (calefacción y refrigeración)",
+        "reversibleHelp": "El uso de arriba es el que está en curso: se cambia desde el widget del panel, una escena o el mando del aparato. Cada preset tiene una consigna de calefacción y otra de refrigeración, y la misma programación sirve en ambos casos.",
         "sectionDevice": "Dispositivo",
         "section": {
           "heating": "Calefacción",

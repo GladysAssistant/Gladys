@@ -832,7 +832,11 @@
         },
         "backToSchedule": "Zurück zum Zeitplan",
         "resumeFromStopped": "Thermostat starten",
-        "presetPending": "{{preset}} (wird beim Neustart angewendet)"
+        "presetPending": "{{preset}} (wird beim Neustart angewendet)",
+        "use": {
+          "heating": "Heizen",
+          "cooling": "Kühlen"
+        }
       },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
@@ -3775,6 +3779,8 @@
         "manualDurationUnit": "Min.",
         "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird.",
         "modeHelp": "Was dieses Thermostat steuert: Heizung oder Kühlung.",
+        "reversibleLabel": "Reversible Wärmepumpe (Heizen und Kühlen)",
+        "reversibleHelp": "Die obige Nutzung ist die aktuelle: Sie wird im Dashboard-Widget, in einer Szene oder mit der Fernbedienung des Geräts umgeschaltet. Jedes Preset hat einen Heiz- und einen Kühlsollwert, und derselbe Zeitplan gilt in beiden Fällen.",
         "sectionDevice": "Gerät",
         "section": {
           "heating": "Heizung",

@@ -20,6 +20,47 @@ const {
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
 const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
 
+// The use each value of the thermostat's own `mode` feature switches a
+// reversible heat pump to (spec A.4). `off` and `auto` switch nothing.
+const USE_OF_MODE = {
+  [THERMOSTAT_MODE.HEATING]: 'heating',
+  [THERMOSTAT_MODE.COOLING]: 'cooling',
+};
+
+/**
+ * @description Switch a reversible heat pump between heating and cooling.
+ *
+ * The use is the `THERMOSTAT_MODE` param, which everything that depends on it
+ * already reads: the preset setpoints, the direction of the hysteresis, the stop
+ * setpoint, the mode written to the unit. Saving the new use there is the whole
+ * switch, and a thermostat stopped meanwhile starts again in it later. A manual hold
+ * goes with the old use: 21 °C held in winter means nothing to a unit now
+ * cooling, and would keep it heating-cold. The preset in force stays — Comfort
+ * in summer is Comfort's cooling setpoint.
+ * @param {object} device - The thermostat device; its params are updated in place.
+ * @param {string} use - `heating` or `cooling`.
+ * @returns {Promise<boolean>} True when the use changed.
+ * @example
+ * await switchUse.call(handler, device, 'cooling');
+ */
+async function switchUse(device, use) {
+  const config = buildParamsConfig(device) || {};
+  if (!config.reversible || config.default_mode === use) {
+    return false;
+  }
+  await this.gladys.device.setParam(device, 'THERMOSTAT_MODE', use);
+  // The caller builds its config from this same object right after.
+  device.params = [
+    ...device.params.filter((param) => param.name !== 'THERMOSTAT_MODE'),
+    { name: 'THERMOSTAT_MODE', value: use },
+  ];
+  await clearManualHold.call(this, device);
+  // The widgets read the presets of the use from the params: they reload them.
+  this.broadcastConfigUpdated();
+  logger.info(`Thermostat: ${device.selector} switched to ${use}`);
+  return true;
+}
+
 /**
  * @description The setpoint a preset arms its hold on, in the unit the hold is
  * read back in.
@@ -210,6 +251,13 @@ async function setValue(device, deviceFeature, value, manual = true) {
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
     // Read before the write, which may update the very feature object passed in.
     const starting = isStopped(device) && Number(value) !== THERMOSTAT_MODE.OFF;
+    // On a reversible heat pump, heating or cooling also says which use to run in.
+    if (USE_OF_MODE[Number(value)] && (await switchUse.call(this, device, USE_OF_MODE[Number(value)])) && starting) {
+      // A stopped one only takes the use: switching to cooling for the summer is
+      // not starting it, and a scene doing so on the first of May would start a
+      // heat pump stopped for the season. Its own use written again starts it.
+      return;
+    }
     await this.gladys.device.saveState(deviceFeature, value);
     // Whoever writes the mode now owns the stop, or the start: a stop the
     // programme, or the unit's remote, left behind is no longer theirs to lift.
@@ -268,4 +316,12 @@ async function setValue(device, deviceFeature, value, manual = true) {
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint };
+module.exports = {
+  setValue,
+  switchUse,
+  writeSetpoint,
+  holdExpiry,
+  nextPointTimestamp,
+  presetHoldSetpoint,
+  USE_OF_MODE,
+};

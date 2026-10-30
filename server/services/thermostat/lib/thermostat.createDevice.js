@@ -55,6 +55,14 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_WINDOW_DELAY',
   'THERMOSTAT_MODE',
+  // A heat pump that heats and cools, and the setpoints of its cooling presets
+  // (spec A.4): the heating ones are THERMOSTAT_PRESET_* below.
+  'THERMOSTAT_REVERSIBLE',
+  'THERMOSTAT_PRESET_COOLING_FROST',
+  'THERMOSTAT_PRESET_COOLING_AWAY',
+  'THERMOSTAT_PRESET_COOLING_ECO',
+  'THERMOSTAT_PRESET_COOLING_NIGHT',
+  'THERMOSTAT_PRESET_COOLING_COMFORT',
   'THERMOSTAT_CONTROL_TYPE',
   'THERMOSTAT_MIN_TEMP',
   'THERMOSTAT_MAX_TEMP',
@@ -249,6 +257,9 @@ async function createDevice(device) {
       }
       if (param.name === 'THERMOSTAT_MODE' && param.value === 'cooling') {
         param.value = 'heating';
+      }
+      if (param.name === 'THERMOSTAT_REVERSIBLE') {
+        param.value = '';
       }
       if (param.name === 'THERMOSTAT_CONTROL_TYPE' && param.value === 'tpi') {
         param.value = 'hysteresis';

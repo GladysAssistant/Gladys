@@ -980,7 +980,11 @@
         },
         "backToSchedule": "Back to the schedule",
         "resumeFromStopped": "Start the thermostat",
-        "presetPending": "{{preset}} (applied when it starts again)"
+        "presetPending": "{{preset}} (applied when it starts again)",
+        "use": {
+          "heating": "Heating",
+          "cooling": "Cooling"
+        }
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -3775,6 +3779,8 @@
         "manualDurationUnit": "min",
         "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action.",
         "modeHelp": "What this thermostat drives: heating or cooling.",
+        "reversibleLabel": "Reversible heat pump (heating and cooling)",
+        "reversibleHelp": "The use above is the one in force: switch it from the dashboard widget, a scene or the unit's remote. Each preset has a heating and a cooling setpoint, and the same schedule runs in both.",
         "sectionDevice": "Device",
         "section": {
           "heating": "Heating",

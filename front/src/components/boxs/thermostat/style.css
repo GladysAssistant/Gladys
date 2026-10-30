@@ -303,6 +303,39 @@
   color: #467fcf;
 }
 
+/* Heating or cooling, on a reversible heat pump only: a small two-way switch
+   above the presets, which follow the use it picks. */
+.useSwitch {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto 8px;
+}
+
+.useSwitchBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 999px;
+  background: transparent;
+  color: #495057;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.useSwitchBtn:focus-visible {
+  outline: 2px solid #206bc4;
+  outline-offset: 2px;
+}
+
+.useSwitchBtnActive {
+  border-color: #206bc4;
+  background: #206bc4;
+  color: #fff;
+}
+
 /* Segmented Control */
 /* Columns capped rather than stretched: a cooling thermostat has three buttons,
    and in a third of the card each the active pill ran across half of it. */

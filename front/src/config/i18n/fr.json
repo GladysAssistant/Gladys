@@ -832,7 +832,11 @@
         },
         "backToSchedule": "Revenir au planning",
         "resumeFromStopped": "Redémarrer le thermostat",
-        "presetPending": "{{preset}} (appliqué au redémarrage)"
+        "presetPending": "{{preset}} (appliqué au redémarrage)",
+        "use": {
+          "heating": "Chauffage",
+          "cooling": "Climatisation"
+        }
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
@@ -3775,6 +3779,8 @@
         "manualDurationUnit": "min",
         "manualDurationHelp": "Durée en minutes avant de revenir automatiquement au planning après une action manuelle.",
         "modeHelp": "Ce que ce thermostat commande : le chauffage ou la climatisation.",
+        "reversibleLabel": "PAC réversible (chauffage et climatisation)",
+        "reversibleHelp": "L'usage ci-dessus est celui en cours : il se change depuis le widget du tableau de bord, une scène ou la télécommande de l'appareil. Chaque preset a une consigne de chauffage et une de climatisation, et le même planning sert dans les deux cas.",
         "sectionDevice": "Appareil",
         "section": {
           "heating": "Chauffage",

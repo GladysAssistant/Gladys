@@ -377,6 +377,24 @@ class ThermostatBox extends Component {
   getRunningMode = () =>
     this.getConfig().default_mode === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
 
+  // Heating or cooling on a reversible heat pump (spec A.4) is a mode write, like
+  // a start: the server saves the use and the presets of that use, drops a hold
+  // taken in the other one, and the card reloads them on CONFIG_UPDATED. On a
+  // stopped thermostat it only switches the use and leaves it stopped: the start
+  // stays the power button's, so nothing is held as a pending start here.
+  switchUse = async use => {
+    if (this.getConfig().default_mode === use) {
+      return;
+    }
+    const value = use === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
+    if (this.isStopped()) {
+      const cfg = this.state.remoteConfig;
+      await this.writeFeature(cfg && cfg.modeFeature, value);
+      return;
+    }
+    await this.writeMode(value);
+  };
+
   // Leaving a stop takes a mode write: the regulation loop skips a stopped
   // thermostat, so a setpoint or a preset written alone would be stored and
   // never applied. Every way out of Off goes through here.
@@ -509,7 +527,9 @@ class ThermostatBox extends Component {
   getPresets = () => {
     const cfg = this.getConfig();
     const mode = cfg.default_mode || 'heating';
-    const keys = mode === 'cooling' ? COOLING_PRESETS : HEATING_PRESETS;
+    // A reversible heat pump follows one programme in both uses, so every preset
+    // its points name is offered in summer too, on its cooling setpoint.
+    const keys = mode === 'cooling' && !cfg.reversible ? COOLING_PRESETS : HEATING_PRESETS;
     const defaults = defaultPresetTemps(mode);
     const allPresets = {
       off: { key: 'off', icon: PRESET_ICONS.off, temp: null },
@@ -1967,6 +1987,24 @@ class ThermostatBox extends Component {
                 return (
                   <div>
                     {banner}
+                    {cfg.reversible && (
+                      <div class={style.useSwitch} role="group">
+                        {['heating', 'cooling'].map(use => (
+                          <button
+                            type="button"
+                            key={use}
+                            class={cx(style.useSwitchBtn, {
+                              [style.useSwitchBtnActive]: configMode === use
+                            })}
+                            aria-pressed={configMode === use ? 'true' : 'false'}
+                            onClick={() => this.switchUse(use)}
+                          >
+                            <i class={`fe ${COMFORT_ICON[use]}`} />
+                            <Text id={`dashboard.boxes.thermostat.use.${use}`} />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     {/* Dimmed rather than removed while a window is open: the
                             bar used to disappear, and the card lost 56px of height
                             — every widget beside it on the dashboard shifted, and

@@ -35,6 +35,27 @@ function defaultPresetTemps(mode) {
   return mode === 'cooling' ? DEFAULT_COOLING_PRESET_TEMPS : DEFAULT_PRESET_TEMPS;
 }
 
+/**
+ * @description The param that holds a preset's setpoint for the thermostat's
+ * current use.
+ *
+ * A thermostat has one set of preset setpoints, `THERMOSTAT_PRESET_<PRESET>`, in
+ * the use it was configured for. A reversible heat pump (`THERMOSTAT_REVERSIBLE`)
+ * needs two — Comfort is 21 °C in winter and 24 °C in summer — and keeps its
+ * cooling ones in `THERMOSTAT_PRESET_COOLING_<PRESET>`, so the heating ones stay
+ * where every thermostat saved so far has them and no migration is needed.
+ * @param {string} preset - A preset name (`frost` … `comfort`).
+ * @param {string} mode - The use, `heating` or `cooling`.
+ * @param {boolean} reversible - Whether the thermostat heats and cools.
+ * @returns {string} The param name.
+ * @example
+ * presetParamName('comfort', 'cooling', true); // 'THERMOSTAT_PRESET_COOLING_COMFORT'
+ */
+function presetParamName(preset, mode, reversible) {
+  const use = reversible && mode === 'cooling' ? 'COOLING_' : '';
+  return `THERMOSTAT_PRESET_${use}${preset.toUpperCase()}`;
+}
+
 // Fallback setpoint for a preset that is neither known nor configured.
 const FALLBACK_SETPOINT = 20;
 
@@ -175,6 +196,7 @@ module.exports = {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_COOLING_PRESET_TEMPS,
   defaultPresetTemps,
+  presetParamName,
   FALLBACK_SETPOINT,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_HYSTERESIS_STOP,
