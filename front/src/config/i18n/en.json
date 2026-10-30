@@ -962,6 +962,7 @@
         "cancelManual": "Cancel manual mode",
         "windowOpen": "Window open — heating suspended",
         "windowOpenCooling": "Window open — cooling suspended",
+        "presenceAbsent": "Nobody seen since {{time}} — {{preset}}",
         "pilotWireHeating": "Heating",
         "pilotWireStandby": "Standby: setpoint reached",
         "pilotWireOrderCurrent": "Order: {{order}}",
@@ -3729,6 +3730,26 @@
         "windowDelayHelp": {
           "heating": "How long the window has to stay open before the heating is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour).",
           "cooling": "How long the window has to stay open before the cooling is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once; at most 3600 s (one hour)."
+        },
+        "presenceFeatureLabel": "Presence sensors",
+        "addPresenceFeature": "Add a presence sensor",
+        "presenceFeatureHelp": {
+          "heating": "Optional. Motion or presence sensors of the room. Once none of them has seen anyone for the delay below, the heating is lowered to the absence preset, and comes back as soon as someone is seen.",
+          "cooling": "Optional. Motion or presence sensors of the room. Once none of them has seen anyone for the delay below, the cooling is eased to the absence preset, and comes back as soon as someone is seen."
+        },
+        "presenceDelayLabel": "Empty room after",
+        "presenceDelayUnit": "min",
+        "presenceDelayHelp": "How long every sensor has to see nobody before the room is taken as empty. A motion sensor does not see someone sitting still: leave it a quarter of an hour at least. From 1 to 1440 minutes.",
+        "presencePresetLabel": "Preset when the room is empty",
+        "presencePreset": {
+          "eco": "Eco",
+          "night": "Night",
+          "away": "Away",
+          "frost": "Frost protection"
+        },
+        "presencePresetHelp": {
+          "heating": "Only applied when it is cooler than the preset in force: a night already on frost protection stays there. A setpoint set by hand is kept until it ends.",
+          "cooling": "Only applied when it is warmer than the preset in force. A setpoint set by hand is kept until it ends."
         },
         "addWindowFeature": "Add an opening sensor",
         "removeFeature": "Remove",

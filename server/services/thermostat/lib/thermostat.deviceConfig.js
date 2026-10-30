@@ -12,6 +12,11 @@ const {
   DEFAULT_THERMOSTAT_TYPE,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
+  DEFAULT_PRESENCE_DELAY_MINUTES,
+  MIN_PRESENCE_DELAY_MINUTES,
+  MAX_PRESENCE_DELAY_MINUTES,
+  DEFAULT_PRESENCE_PRESET,
+  PRESENCE_PRESETS,
   THERMOSTAT_TYPES,
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
@@ -103,6 +108,22 @@ function buildParamsConfig(device) {
       MAX_WINDOW_DELAY_SECONDS,
       Math.max(0, toNumber(getParam('THERMOSTAT_WINDOW_DELAY'), DEFAULT_WINDOW_DELAY_SECONDS)),
     ),
+    // One presence or motion sensor or several (A.1.1, A.4): every one of them
+    // reading nobody for the delay lowers the thermostat to the absence preset.
+    presence_features: parseSelectorList(getParam('THERMOSTAT_PRESENCE_FEATURE')),
+    // Minutes, bounded both ways like the window delay: the generic routes write it unchecked.
+    presence_delay: Math.min(
+      MAX_PRESENCE_DELAY_MINUTES,
+      Math.max(
+        MIN_PRESENCE_DELAY_MINUTES,
+        toNumber(getParam('THERMOSTAT_PRESENCE_DELAY'), DEFAULT_PRESENCE_DELAY_MINUTES),
+      ),
+    ),
+    // A preset outside the list (comfort, off, a typo) would raise the heating or
+    // stop it: the default is used instead.
+    presence_preset: PRESENCE_PRESETS.includes(getParam('THERMOSTAT_PRESENCE_PRESET'))
+      ? getParam('THERMOSTAT_PRESENCE_PRESET')
+      : DEFAULT_PRESENCE_PRESET,
     default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
     temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),

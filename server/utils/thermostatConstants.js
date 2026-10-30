@@ -78,6 +78,21 @@ const DEFAULT_WINDOW_DELAY_SECONDS = 60;
 // come in.
 const MAX_WINDOW_DELAY_SECONDS = 3600;
 
+// How long every presence sensor has to read "nobody" before the room is taken
+// as empty, in minutes. A motion sensor only sees someone who moves: someone
+// reading on the sofa goes unseen for a quarter of an hour, so the default
+// leaves room for that. Configurable per device through THERMOSTAT_PRESENCE_DELAY.
+const DEFAULT_PRESENCE_DELAY_MINUTES = 30;
+// Bounded both ways: under a minute every still moment is an absence, and a day
+// is already what a house-wide presence or a scene says better. A day also keeps
+// the pending check within what `setTimeout` takes (see MAX_WINDOW_DELAY_SECONDS).
+const MIN_PRESENCE_DELAY_MINUTES = 1;
+const MAX_PRESENCE_DELAY_MINUTES = 1440;
+// The preset an empty room is lowered to, through THERMOSTAT_PRESENCE_PRESET, and
+// the ones it may name. Comfort is no saving, and off is a stop, not a preset.
+const DEFAULT_PRESENCE_PRESET = 'eco';
+const PRESENCE_PRESETS = ['eco', 'night', 'away', 'frost'];
+
 // The preset names, as they are stored in a schedule transition and used to key
 // DEFAULT_PRESET_TEMPS. `schedule` is not one of them: it is a state of the
 // thermostat ("follow the programme"), carried by the preset feature, and a
@@ -193,6 +208,11 @@ module.exports = {
   MANUAL_DURATION_MS,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
+  DEFAULT_PRESENCE_DELAY_MINUTES,
+  MIN_PRESENCE_DELAY_MINUTES,
+  MAX_PRESENCE_DELAY_MINUTES,
+  DEFAULT_PRESENCE_PRESET,
+  PRESENCE_PRESETS,
   PRESETS,
   TRANSITION_PRESETS,
   THERMOSTAT_TYPES,

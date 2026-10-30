@@ -53,6 +53,7 @@ const {
   MAX_TPI_PROPORTIONAL_BAND,
   DEFAULT_MANUAL_DURATION_MINUTES,
   PILOT_WIRE_REGULATIONS,
+  PRESETS: TEMPERATURE_PRESETS,
   supportedPilotWireOrder,
 } = require('../../../utils/thermostatConstants');
 
@@ -360,6 +361,46 @@ async function readAverageTemperature(gladys, selectors, thermostatUnit) {
 }
 
 /**
+ * @description Since when a binary sensor has read `0`, or null while it reads
+ * anything else: an opening sensor open, a presence sensor seeing nobody.
+ *
+ * The time is the one the `NEW_STATE` listener recorded. A sensor found on `0`
+ * with none recorded — the service has just started, or the event was missed —
+ * is taken as on `0` since its `last_value_changed`, and that time is recorded
+ * so that the next reports, which move `last_value_changed`, do not restart the
+ * count. Any other value forgets it: the next `0` starts a new count.
+ * @param {object} feature - The sensor feature.
+ * @param {string} selector - Its selector.
+ * @param {Map<string, number>|null} recorded - When each sensor was seen going to `0`.
+ * @param {number} [now] - The current time, in ms.
+ * @returns {number|null} Since when it reads `0`, in ms, or null.
+ * @example
+ * readsZeroSince(feature, 'window-sensor', handler.windowOpenedAt);
+ */
+function readsZeroSince(feature, selector, recorded, now = Date.now()) {
+  if (feature.last_value !== 0) {
+    if (recorded) {
+      recorded.delete(selector);
+    }
+    return null;
+  }
+  let since = recorded ? recorded.get(selector) : undefined;
+  if (since === undefined) {
+    // `new Date(null)` is the epoch, not an invalid date: a sensor that never
+    // dated a change would read as on `0` for ever, and count as elapsed at once.
+    const changed =
+      feature.last_value_changed === null || feature.last_value_changed === undefined
+        ? NaN
+        : new Date(feature.last_value_changed).getTime();
+    since = Number.isFinite(changed) ? Math.min(changed, now) : now;
+    if (recorded) {
+      recorded.set(selector, since);
+    }
+  }
+  return since;
+}
+
+/**
  * @description Whether a window sensor has been open long enough to suspend the
  * heating: THERMOSTAT_WINDOW_DELAY seconds, so that a door opened to come in and
  * closed right behind does not cut it.
@@ -379,27 +420,8 @@ async function readAverageTemperature(gladys, selectors, thermostatUnit) {
  * isWindowOpenLongEnough(feature, 'window-sensor', 60, handler.windowOpenedAt);
  */
 function isWindowOpenLongEnough(feature, windowSelector, delaySeconds, openedAt, now = Date.now()) {
-  if (feature.last_value !== 0) {
-    // Closed: the next opening starts a new count.
-    if (openedAt) {
-      openedAt.delete(windowSelector);
-    }
-    return false;
-  }
-  let since = openedAt ? openedAt.get(windowSelector) : undefined;
-  if (since === undefined) {
-    // `new Date(null)` is the epoch, not an invalid date: a sensor that never
-    // dated a change would read as open for ever and cut at once.
-    const changed =
-      feature.last_value_changed === null || feature.last_value_changed === undefined
-        ? NaN
-        : new Date(feature.last_value_changed).getTime();
-    since = Number.isFinite(changed) ? Math.min(changed, now) : now;
-    if (openedAt) {
-      openedAt.set(windowSelector, since);
-    }
-  }
-  return now - since >= delaySeconds * 1000;
+  const since = readsZeroSince(feature, windowSelector, openedAt, now);
+  return since !== null && now - since >= delaySeconds * 1000;
 }
 
 /**
@@ -437,6 +459,51 @@ async function findOpenWindow(gladys, selectors, delaySeconds = 0, openedAt = nu
 }
 
 /**
+ * @description Whether the room is empty: every presence sensor of the thermostat
+ * that can be read has seen nobody for THERMOSTAT_PRESENCE_DELAY minutes (A.4).
+ *
+ * The reverse of the windows: one sensor seeing someone is enough for the room to
+ * be occupied, and the delay runs from the *last* one to go quiet. A sensor that
+ * cannot be read, or has never reported, is left out — and with none left the
+ * room is never taken as empty: a motion sensor on a flat battery must not leave
+ * the house on eco for good.
+ * @param {object} gladys - Gladys instance.
+ * @param {Array<string>} selectors - Presence sensor selectors.
+ * @param {number} delayMinutes - How long they have to see nobody.
+ * @param {Map<string, number>|null} [vacatedAt] - When each sensor was seen going to `0`.
+ * @param {number} [now] - The current time, in ms.
+ * @returns {Promise<number|null>} Since when the room has been empty, or null.
+ * @example
+ * const since = await findAbsence(gladys, ['salon-motion'], 30, handler.presenceVacatedAt);
+ */
+async function findAbsence(gladys, selectors, delayMinutes, vacatedAt = null, now = Date.now()) {
+  const found = await Promise.all(
+    selectors.map(async (selector) => {
+      try {
+        return await getFeatureBySelector(gladys, selector);
+      } catch (e) {
+        logger.warn(`Thermostat schedule: Failed to read presence sensor ${selector}: ${e.message}`);
+        return null;
+      }
+    }),
+  );
+  // Every sensor is weighed, as for the windows: each keeps its own time, which
+  // one seeing someone forgets (readsZeroSince).
+  const readings = found
+    .map((sensor, index) =>
+      sensor && sensor.feature.last_value !== null && sensor.feature.last_value !== undefined
+        ? readsZeroSince(sensor.feature, selectors[index], vacatedAt, now)
+        : undefined,
+    )
+    .filter((since) => since !== undefined);
+  if (readings.length === 0 || readings.includes(null)) {
+    return null;
+  }
+  const emptySince = Math.max(...readings);
+  return now - emptySince >= delayMinutes * 60 * 1000 ? emptySince : null;
+}
+
+/**
  * @description Get setpoint temperature for a preset from config.
  * @param {string} preset - Preset name.
  * @param {object} config - Thermostat config object.
@@ -454,6 +521,59 @@ function getSetpointForPreset(preset, config) {
   }
   const defaults = defaultPresetTemps(config && config.default_mode);
   return defaults[preset] !== undefined ? defaults[preset] : FALLBACK_SETPOINT;
+}
+
+/**
+ * @description The preset an empty room is regulated on: the absence preset
+ * (THERMOSTAT_PRESENCE_PRESET) when it saves energy over the one in force, the
+ * one in force otherwise (A.4).
+ *
+ * Only ever a saving: with eco at 18 °C as the absence preset, a programme
+ * already on frost protection at night must stay there, not be raised to 18 °C
+ * because the bedroom is empty. Lower is a saving when heating, higher when
+ * cooling; a pilot-wire heater only heats. `off` and `schedule` name no
+ * temperature, and are left alone.
+ * @param {string} preset - The preset in force.
+ * @param {object} config - Thermostat config object.
+ * @returns {string} The preset to regulate on.
+ * @example
+ * presetForEmptyRoom('comfort', config); // 'eco'
+ */
+function presetForEmptyRoom(preset, config) {
+  if (!TEMPERATURE_PRESETS.includes(preset) || preset === config.presence_preset) {
+    return preset;
+  }
+  const cooling = config.default_mode === 'cooling' && !config.pilot_wire_feature;
+  const inForce = getSetpointForPreset(preset, config);
+  const empty = getSetpointForPreset(config.presence_preset, config);
+  const saves = cooling ? empty > inForce : empty < inForce;
+  return saves ? config.presence_preset : preset;
+}
+
+/**
+ * @description Whether a manual hold is a preset picked by hand rather than a
+ * setpoint set on the dial: it holds that preset's own setpoint, in the unit the
+ * hold is stored in (C.3) — the real feature's on an external thermostat.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} config - Thermostat config object.
+ * @param {{ setpoint: number }} hold - The manual hold.
+ * @param {string|null} preset - The preset the thermostat carries.
+ * @returns {Promise<boolean>} True for a preset picked by hand.
+ * @example
+ * await holdsPickedPreset(gladys, config, { setpoint: 21 }, 'comfort');
+ */
+async function holdsPickedPreset(gladys, config, hold, preset) {
+  if (!TEMPERATURE_PRESETS.includes(preset)) {
+    return false;
+  }
+  let setpoint = getSetpointForPreset(preset, config);
+  if (isExternal(config)) {
+    const target = await getFeatureBySelector(gladys, config.target_feature);
+    if (target) {
+      setpoint = convertSetpointToFeatureUnit(setpoint, config.temp_unit, target.feature.unit);
+    }
+  }
+  return hold.setpoint === setpoint;
 }
 
 /**
@@ -1147,6 +1267,7 @@ async function driveHeldPilotWire(gladys, device, config, hold, currentPreset, l
  * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
  * @param {Set<string>} [runningUnits] - The units a running thermostat switches (runningUnitFeatures).
  * @param {Map<string, number>} [windowOpenedAt] - When each window sensor was seen opening.
+ * @param {Map<string, number>} [presenceVacatedAt] - When each presence sensor was seen going quiet.
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
@@ -1162,6 +1283,7 @@ async function regulateDevice(
   selfWrittenPowers = null,
   runningUnits = null,
   windowOpenedAt = null,
+  presenceVacatedAt = null,
 ) {
   const config = getDeviceConfig(device);
   if (!config) {
@@ -1255,6 +1377,13 @@ async function regulateDevice(
   let currentPreset = handedBack ? 'schedule' : getPreset(device);
   const hold = handedBack ? null : getManualHold(device);
 
+  // An empty room (A.4): read after the window and the stop, which both outrank
+  // it, and before the hold, which it may lower when it is a preset picked by hand.
+  const emptySince =
+    config.presence_features.length > 0
+      ? await findAbsence(gladys, config.presence_features, config.presence_delay, presenceVacatedAt)
+      : null;
+
   // Manual hold: regulate on the held setpoint until it expires.
   let manualJustExpired = false;
   if (hold) {
@@ -1277,6 +1406,14 @@ async function regulateDevice(
           `expiry armed until ${new Date(manualUntil).toISOString()}`,
       );
     }
+    // A preset picked by hand is lowered like the programme's point once the room
+    // is empty: Comfort picked for the evening keeps nobody warm once everybody
+    // has gone to bed. A setpoint set on the dial is never touched — someone just
+    // asked for that temperature, in the room — and it lapses on its own.
+    const pickedPresetLowered =
+      emptySince !== null &&
+      presetForEmptyRoom(currentPreset, config) !== currentPreset &&
+      (await holdsPickedPreset(gladys, config, hold, currentPreset));
     if (manualUntil && Date.now() > manualUntil) {
       logger.info(`Thermostat schedule: manual hold expired for ${selector}, reverting to schedule`);
       await clearManualHold.call({ gladys }, device);
@@ -1288,7 +1425,7 @@ async function regulateDevice(
       currentPreset = 'schedule';
       manualJustExpired = true;
       // Fall through — the schedule/preset is applied below
-    } else {
+    } else if (!pickedPresetLowered) {
       const manualSetpoint = hold.setpoint;
       // A preset picked by hand is held this way, and it is the one in force. A
       // hold taken on the dial names no preset: the feature keeps the last one.
@@ -1410,6 +1547,18 @@ async function regulateDevice(
     logger.debug(`Thermostat schedule: no preset resolved for ${selector}, nothing to regulate`);
     return;
   }
+  // The preset regulated on: the one resolved above, or the absence preset when
+  // the room is empty and that saves energy. Only what is regulated changes — the
+  // preset feature, and what the dashboards are told the programme says, stay
+  // the resolved preset, so the programme takes over again as soon as someone
+  // comes back. `active-preset` says what is really in force.
+  const inForce = emptySince !== null ? presetForEmptyRoom(targetPreset, config) : targetPreset;
+  if (inForce !== targetPreset) {
+    logger.debug(
+      `Thermostat schedule: nobody seen in the room of ${selector} since ` +
+        `${new Date(emptySince).toISOString()}, "${inForce}" in place of "${targetPreset}"`,
+    );
+  }
 
   // `schedule` with no point in force: a schedule with no point, or none followed
   // any more — an empty programme, a scene writing Schedule, a hold expiring on
@@ -1429,7 +1578,7 @@ async function regulateDevice(
   // through the core to the owning integration.
   let newSetpoint = null;
   if (!keepsItsSetpoint) {
-    newSetpoint = getSetpointForPreset(targetPreset, config);
+    newSetpoint = getSetpointForPreset(inForce, config);
   } else if (hasSetpoint) {
     newSetpoint = thermostatFeature.last_value;
   }
@@ -1479,7 +1628,7 @@ async function regulateDevice(
   // What is in force, on a feature a scene can start on: the announcement above
   // only reaches the dashboards, and the preset feature keeps reading
   // `schedule`. `schedule` itself writes nothing — no point is in force.
-  await saveActivePreset.call({ gladys }, device, targetPreset);
+  await saveActivePreset.call({ gladys }, device, inForce);
 
   if (keepsItsSetpoint && !hasSetpoint) {
     logger.debug(`Thermostat schedule: no point in force for ${selector}, it keeps its setpoint`);
@@ -1498,14 +1647,14 @@ async function regulateDevice(
     }
     // Coming back from an `off` slot, the device is still switched off: the
     // power and the mode have to be handed back before the setpoint means anything.
-    await startExternalThermostat(gladys, config, `preset="${targetPreset}", ${selector}`, selfWrittenPowers);
+    await startExternalThermostat(gladys, config, `preset="${inForce}", ${selector}`, selfWrittenPowers);
     if (newSetpoint !== null) {
       await writeExternalSetpoint(
         gladys,
         config.target_feature,
         newSetpoint,
         config.temp_unit,
-        `preset="${targetPreset}", ${selector}`,
+        `preset="${inForce}", ${selector}`,
         selfWritten,
       );
     }
@@ -1517,7 +1666,7 @@ async function regulateDevice(
   // `schedule` with no point in force names no order: the heater keeps the one
   // it carries, unless Gladys regulates on the setpoint it kept.
   if (config.pilot_wire_feature) {
-    await drivePilotWire(gladys, device, config, targetPreset, `preset="${targetPreset}", ${selector}`, selfWritten, {
+    await drivePilotWire(gladys, device, config, inForce, `preset="${inForce}", ${selector}`, selfWritten, {
       setpoint: newSetpoint,
     });
     return;
@@ -1567,7 +1716,7 @@ async function regulateDevice(
     gladys,
     config.switch_feature,
     shouldBeActive,
-    `preset="${targetPreset}", temp=${currentTemp}, setpoint=${newSetpoint}, ${selector}`,
+    `preset="${inForce}", temp=${currentTemp}, setpoint=${newSetpoint}, ${selector}`,
   );
   // Say on a standard feature what the loop just decided, rather than leaving
   // every client to infer it from the switch: a virtual thermostat knows whether
@@ -1608,7 +1757,14 @@ async function applySchedules() {
     await Promise.all(
       thermostatDevices.map(async (device) => {
         try {
-          const { serviceId, selfWrittenSetpoints, announcedPresets, selfWrittenPowers, windowOpenedAt } = this;
+          const {
+            serviceId,
+            selfWrittenSetpoints,
+            announcedPresets,
+            selfWrittenPowers,
+            windowOpenedAt,
+            presenceVacatedAt,
+          } = this;
           await regulateDevice(
             this.gladys,
             device,
@@ -1620,6 +1776,7 @@ async function applySchedules() {
             selfWrittenPowers,
             runningUnits,
             windowOpenedAt,
+            presenceVacatedAt,
           );
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);
@@ -1651,6 +1808,10 @@ module.exports = {
   readTemperatureInThermostatUnit,
   readAverageTemperature,
   findOpenWindow,
+  findAbsence,
+  presetForEmptyRoom,
+  holdsPickedPreset,
+  readsZeroSince,
   phaseOffset,
   regulateDevice,
   parseEnd,

@@ -814,6 +814,7 @@
         "cancelManual": "Annuler le mode manuel",
         "windowOpen": "Fenêtre ouverte — chauffage suspendu",
         "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",
+        "presenceAbsent": "Personne vu depuis {{time}} — {{preset}}",
         "pilotWireHeating": "Chauffe en cours",
         "pilotWireStandby": "En veille : consigne atteinte",
         "pilotWireOrderCurrent": "Ordre : {{order}}",
@@ -3729,6 +3730,26 @@
         "windowDelayHelp": {
           "heating": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que le chauffage soit coupé. Une porte ouverte pour rentrer et refermée aussitôt ne le coupe pas. 0 le coupe immédiatement ; 3600 s (une heure) au maximum.",
           "cooling": "Durée pendant laquelle l'ouvrant doit rester ouvert avant que la climatisation soit coupée. Une porte ouverte pour rentrer et refermée aussitôt ne la coupe pas. 0 la coupe immédiatement ; 3600 s (une heure) au maximum."
+        },
+        "presenceFeatureLabel": "Capteurs de présence",
+        "addPresenceFeature": "Ajouter un capteur de présence",
+        "presenceFeatureHelp": {
+          "heating": "Optionnel. Capteurs de mouvement ou de présence de la pièce. Quand aucun n’a vu personne pendant le délai ci-dessous, le chauffage passe sur le preset d’absence, et reprend dès que quelqu’un est vu.",
+          "cooling": "Optionnel. Capteurs de mouvement ou de présence de la pièce. Quand aucun n’a vu personne pendant le délai ci-dessous, la climatisation passe sur le preset d’absence, et reprend dès que quelqu’un est vu."
+        },
+        "presenceDelayLabel": "Pièce vide après",
+        "presenceDelayUnit": "min",
+        "presenceDelayHelp": "Combien de temps tous les capteurs doivent ne voir personne avant que la pièce soit considérée vide. Un capteur de mouvement ne voit pas quelqu’un d’immobile : laissez au moins un quart d’heure. De 1 à 1440 minutes.",
+        "presencePresetLabel": "Preset quand la pièce est vide",
+        "presencePreset": {
+          "eco": "Éco",
+          "night": "Nuit",
+          "away": "Absent",
+          "frost": "Hors-gel"
+        },
+        "presencePresetHelp": {
+          "heating": "Appliqué seulement s’il est plus froid que le preset en cours : une nuit déjà en hors-gel y reste. Une consigne réglée à la main est gardée jusqu’à sa fin.",
+          "cooling": "Appliqué seulement s’il est plus chaud que le preset en cours. Une consigne réglée à la main est gardée jusqu’à sa fin."
         },
         "addWindowFeature": "Ajouter un capteur d'ouverture",
         "removeFeature": "Retirer",
