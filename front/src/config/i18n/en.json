@@ -797,8 +797,9 @@
       "voice-assistant": {
         "speak": "Speak",
         "stop": "Stop",
+        "send": "Send",
         "listening": "Listening...",
-        "listeningHint": "Speak now. Recording stops when you are silent.",
+        "listeningHint": "Speak now. Recording stops when you are silent, or press Send.",
         "processing": "Processing...",
         "speaking": "Speaking...",
         "transcriptionLabel": "You said",
@@ -7125,6 +7126,7 @@
     "voiceInput": {
       "startListening": "Dictate a message",
       "stopListening": "Stop dictation",
+      "cancelListening": "Cancel dictation",
       "error": "Dictation failed. Check that Gladys Plus is connected, then try again.",
       "errorNoSpeech": "No voice detected. Check that your microphone is enabled, then try again.",
       "errorPermissionDenied": "Microphone access was denied. Allow it in your browser settings to dictate a message.",

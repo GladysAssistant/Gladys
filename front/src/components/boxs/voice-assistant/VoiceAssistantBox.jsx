@@ -28,6 +28,9 @@ const STATE = {
 /** Delay after a completed turn before hiding transcription and response. */
 const MESSAGES_CLEAR_DELAY_MS = 6000;
 
+/** Clicks right after "Send" are ignored, so a double tap does not cancel the take. */
+const SEND_DOUBLE_TAP_GUARD_MS = 500;
+
 const VOICE_ASSISTANT_UPSELL_PROPS = {
   compact: true,
   icon: 'fe-mic',
@@ -165,6 +168,12 @@ class VoiceAssistantBox extends Component {
 
   activeVoiceAbortController = null;
 
+  /** Ends the running recording and keeps the audio, when the user presses "Send". */
+  activeVoiceStopController = null;
+
+  /** Clicks before this timestamp are ignored (see SEND_DOUBLE_TAP_GUARD_MS). */
+  ignoreClicksUntil = 0;
+
   probeMicrophone = async () => {
     const reason = await probeMicrophoneAvailability();
     if (!this._isMounted) {
@@ -244,6 +253,7 @@ class VoiceAssistantBox extends Component {
 
   cancelActiveVoiceSession = () => {
     this.voiceSessionGeneration += 1;
+    this.activeVoiceStopController = null;
     if (this.activeVoiceAbortController) {
       this.activeVoiceAbortController.abort();
       this.activeVoiceAbortController = null;
@@ -380,9 +390,28 @@ class VoiceAssistantBox extends Component {
     }
   };
 
+  stopActiveVoiceRecording = () => {
+    this.activeVoiceStopController.abort();
+    this.activeVoiceStopController = null;
+    this.ignoreClicksUntil = Date.now() + SEND_DOUBLE_TAP_GUARD_MS;
+    this.setState({ uiState: STATE.PROCESSING });
+  };
+
   handleSpeakClick = async () => {
+    if (Date.now() < this.ignoreClicksUntil) {
+      return;
+    }
     const { uiState } = this.state;
-    if (uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING) {
+    // While listening, the button sends what was said so far, in case the
+    // end of speech is not detected (background noise). It never cancels:
+    // `this.state` can still read LISTENING after a first click on "Send".
+    if (uiState === STATE.LISTENING) {
+      if (this.activeVoiceStopController) {
+        this.stopActiveVoiceRecording();
+      }
+      return;
+    }
+    if (uiState === STATE.PROCESSING || uiState === STATE.SPEAKING) {
       this.cancelActiveVoiceSession();
       this.setState({
         uiState: STATE.IDLE,
@@ -399,6 +428,8 @@ class VoiceAssistantBox extends Component {
     const voiceSessionGeneration = this.voiceSessionGeneration;
     const abortController = new AbortController();
     this.activeVoiceAbortController = abortController;
+    const stopController = new AbortController();
+    this.activeVoiceStopController = stopController;
 
     this.clearMessagesClearTimeout();
     if (!isSpeechRecordingSupported()) {
@@ -433,6 +464,7 @@ class VoiceAssistantBox extends Component {
     try {
       const recordedBlob = await recordUntilSilence({
         signal: abortController.signal,
+        stopSignal: stopController.signal,
         onReady: () => {
           this.safeSetState({ uiState: STATE.LISTENING }, voiceSessionGeneration);
         }
@@ -516,12 +548,18 @@ class VoiceAssistantBox extends Component {
       if (this.activeVoiceAbortController === abortController) {
         this.activeVoiceAbortController = null;
       }
+      if (this.activeVoiceStopController === stopController) {
+        this.activeVoiceStopController = null;
+      }
     }
   };
 
   getButtonLabelKey = () => {
     const { uiState } = this.state;
-    if (uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING) {
+    if (uiState === STATE.LISTENING) {
+      return 'dashboard.boxes.voice-assistant.send';
+    }
+    if (uiState === STATE.PROCESSING || uiState === STATE.SPEAKING) {
       return 'dashboard.boxes.voice-assistant.stop';
     }
     return 'dashboard.boxes.voice-assistant.speak';

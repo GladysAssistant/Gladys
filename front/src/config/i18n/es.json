@@ -797,8 +797,9 @@
       "voice-assistant": {
         "speak": "Hablar",
         "stop": "Detener",
+        "send": "Enviar",
         "listening": "Escuchando...",
-        "listeningHint": "Hable ahora. La grabación se detiene cuando guarda silencio.",
+        "listeningHint": "Hable ahora. La grabación se detiene cuando guarda silencio o al pulsar Enviar.",
         "processing": "Procesando...",
         "speaking": "Hablando...",
         "transcriptionLabel": "Usted dijo",
@@ -7125,6 +7126,7 @@
     "voiceInput": {
       "startListening": "Dictar un mensaje",
       "stopListening": "Detener el dictado",
+      "cancelListening": "Cancelar el dictado",
       "error": "El dictado falló. Compruebe que Gladys Plus esté conectado y vuelva a intentarlo.",
       "errorNoSpeech": "No se detectó voz. Compruebe que su micrófono esté activado y vuelva a intentarlo.",
       "errorPermissionDenied": "Se denegó el acceso al micrófono. Permítalo en la configuración de su navegador para dictar un mensaje.",

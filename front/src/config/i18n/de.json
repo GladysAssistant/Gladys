@@ -856,8 +856,9 @@
       "voice-assistant": {
         "speak": "Sprechen",
         "stop": "Stoppen",
+        "send": "Senden",
         "listening": "Ich höre zu...",
-        "listeningHint": "Sprechen Sie. Die Aufnahme stoppt bei Stille.",
+        "listeningHint": "Sprechen Sie. Die Aufnahme stoppt bei Stille oder wenn Sie auf Senden drücken.",
         "processing": "Verarbeitung...",
         "speaking": "Antwort...",
         "transcriptionLabel": "Sie sagten",
@@ -7125,6 +7126,7 @@
     "voiceInput": {
       "startListening": "Nachricht diktieren",
       "stopListening": "Diktat beenden",
+      "cancelListening": "Diktat abbrechen",
       "error": "Das Diktat ist fehlgeschlagen. Prüfe, ob Gladys Plus verbunden ist, und versuche es erneut.",
       "errorNoSpeech": "Keine Stimme erkannt. Prüfe, ob dein Mikrofon aktiviert ist, und versuche es erneut.",
       "errorPermissionDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Einstellungen deines Browsers, um eine Nachricht zu diktieren.",
