@@ -4,8 +4,9 @@ import cx from 'classnames';
 
 import style from './MusicBox.css';
 
-// The thumb of the invisible native input: the drawn fill and thumb use the same geometry so
-// they sit exactly where the browser maps the pointer
+// The thumb of the invisible native input: the drawn thumb uses the same geometry so it sits
+// exactly where the browser maps the pointer. The fill spans the whole track (a full volume is a
+// full bar, not one stopping half a thumb short of the end): its end stays under the thumb anyway
 const THUMB_SIZE_PX = 12;
 
 // A thin player slider (progress and volume): the native range input stays on top, invisible, so
@@ -30,10 +31,7 @@ class MusicSlider extends Component {
         })}
       >
         <div class={style.sliderTrack}>
-          <div
-            class={style.sliderFill}
-            style={{ width: ratio > 0 ? `calc(${THUMB_SIZE_PX / 2}px + ${offset})` : '0px' }}
-          />
+          <div class={style.sliderFill} style={{ width: `${ratio * 100}%` }} />
         </div>
         {!disabled && <div class={style.sliderThumb} style={{ left: offset }} />}
         <Localizer>
