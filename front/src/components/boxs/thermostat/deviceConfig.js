@@ -27,6 +27,11 @@ const PARAM_FIELDS = [
   ['window_features', 'THERMOSTAT_WINDOW_FEATURE', parseSelectorList],
   // Seconds an opening has to last before the heating is suspended.
   ['window_delay', 'THERMOSTAT_WINDOW_DELAY', parseFloat],
+  // Presence sensors (spec A.4): the room is taken as empty once every one has
+  // seen nobody for the delay, in minutes, and regulated on the absence preset.
+  ['presence_features', 'THERMOSTAT_PRESENCE_FEATURE', parseSelectorList],
+  ['presence_delay', 'THERMOSTAT_PRESENCE_DELAY', parseFloat],
+  ['presence_preset', 'THERMOSTAT_PRESENCE_PRESET'],
   // The manual hold: the setpoint held by hand, and when it gives the thermostat
   // back to its programme. Empty expiry means a permanent hold, which is what a
   // thermostat that follows no schedule gets.
