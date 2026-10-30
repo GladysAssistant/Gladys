@@ -22,17 +22,17 @@ const EditActions = props => (
           </div>
         </div>
       ) : (
-        <div class="row align-items-center">
+        <div class={cx('row align-items-center', style.editFooterRow)}>
           <div class="col-auto">
             <Localizer>
               <button
                 onClick={props.duplicateScene}
                 aria-label={<Text id="editScene.duplicateButton" />}
-                className="btn btn-outline-primary"
+                className={cx('btn btn-outline-primary', style.editFooterIconButton)}
               >
                 <span class="d-none d-lg-inline-block" aria-hidden="true">
-                  <Text id="editScene.duplicateButton" />
-                </span>{' '}
+                  <Text id="editScene.duplicateButton" />{' '}
+                </span>
                 <i class="fe fe-copy" />
               </button>
             </Localizer>
@@ -40,11 +40,11 @@ const EditActions = props => (
               <button
                 onClick={props.askDeleteCurrentScene}
                 aria-label={<Text id="editScene.deleteButton" />}
-                className="btn btn-outline-danger ml-2"
+                className={cx('btn btn-outline-danger ml-2', style.editFooterIconButton)}
               >
                 <span class="d-none d-lg-inline-block" aria-hidden="true">
-                  <Text id="editScene.deleteButton" />
-                </span>{' '}
+                  <Text id="editScene.deleteButton" />{' '}
+                </span>
                 <i class="fe fe-trash" />
               </button>
             </Localizer>
@@ -67,9 +67,18 @@ const EditActions = props => (
             {props.runningInfo ? (
               <RunningStopButton runningInfo={props.runningInfo} onStop={props.stopScene} />
             ) : (
-              <button onClick={props.startScene} className="btn btn-primary">
-                <Text id="editScene.startButton" /> <i class="fe fe-play" />
-              </button>
+              <Localizer>
+                <button
+                  onClick={props.startScene}
+                  aria-label={<Text id="editScene.startButton" />}
+                  className="btn btn-primary"
+                >
+                  <span class={style.editFooterStartLabel} aria-hidden="true">
+                    <Text id="editScene.startButton" />{' '}
+                  </span>
+                  <i class="fe fe-play" />
+                </button>
+              </Localizer>
             )}
             <button onClick={props.saveScene} disabled={props.saving} className="btn btn-success ml-2">
               <Text id="editScene.saveButton" /> <i class="fe fe-save" />
