@@ -16,7 +16,12 @@ const {
   SUB_CONTAINER_CPU_MAX,
   SUB_CONTAINER_SHM_MIN_MB,
   SUB_CONTAINER_SHM_MAX_MB,
+  SUB_CONTAINER_PIDS_MIN,
+  SUB_CONTAINER_PIDS_MAX,
+  SUB_CONTAINER_TMP_MIN_MB,
+  SUB_CONTAINER_TMP_MAX_MB,
   SUB_CONTAINER_START_MODES,
+  SUB_CONTAINER_CAPABILITIES,
   HARDWARE_CLASSES,
   NETWORK_DISCOVERY_TYPES,
   MAX_NETWORK_DISCOVERY_ENTRIES,
@@ -115,10 +120,13 @@ const SUB_CONTAINER_FIELDS = [
   'volumes',
   'ports',
   'devices',
+  'capabilities',
   'read_only',
   'memory_mb',
   'cpu',
   'shm_mb',
+  'pids_limit',
+  'tmp_mb',
   'command',
 ];
 const PORT_FIELDS = ['container_port', 'protocol', 'label', 'name', 'browsable'];
@@ -1043,6 +1051,28 @@ function validateSubContainer(entry, index, seenNames, errors, seenPortNames) {
       });
     }
   }
+  if (entry.capabilities !== undefined) {
+    if (!Array.isArray(entry.capabilities) || entry.capabilities.length > SUB_CONTAINER_CAPABILITIES.length) {
+      errors.push(
+        `${path}.capabilities: must be an array of at most ${SUB_CONTAINER_CAPABILITIES.length} Linux capabilities`,
+      );
+    } else {
+      const seenCapabilities = new Set();
+      entry.capabilities.forEach((capability, capabilityIndex) => {
+        if (!SUB_CONTAINER_CAPABILITIES.includes(capability)) {
+          // closed need-based allowlist, strictly inside Docker's default
+          // set: SYS_ADMIN, NET_RAW & co. never
+          errors.push(
+            `${path}.capabilities[${capabilityIndex}]: must be one of ${SUB_CONTAINER_CAPABILITIES.join(', ')}`,
+          );
+        } else if (seenCapabilities.has(capability)) {
+          errors.push(`${path}.capabilities[${capabilityIndex}]: duplicate capability "${capability}"`);
+        } else {
+          seenCapabilities.add(capability);
+        }
+      });
+    }
+  }
   if (entry.read_only !== undefined && typeof entry.read_only !== 'boolean') {
     errors.push(`${path}.read_only: must be a boolean`);
   }
@@ -1070,6 +1100,26 @@ function validateSubContainer(entry, index, seenNames, errors, seenPortNames) {
   ) {
     errors.push(
       `${path}.shm_mb: must be an integer between ${SUB_CONTAINER_SHM_MIN_MB} and ${SUB_CONTAINER_SHM_MAX_MB}`,
+    );
+  }
+  if (
+    entry.pids_limit !== undefined &&
+    (!Number.isInteger(entry.pids_limit) ||
+      entry.pids_limit < SUB_CONTAINER_PIDS_MIN ||
+      entry.pids_limit > SUB_CONTAINER_PIDS_MAX)
+  ) {
+    errors.push(
+      `${path}.pids_limit: must be an integer between ${SUB_CONTAINER_PIDS_MIN} and ${SUB_CONTAINER_PIDS_MAX}`,
+    );
+  }
+  if (
+    entry.tmp_mb !== undefined &&
+    (!Number.isInteger(entry.tmp_mb) ||
+      entry.tmp_mb < SUB_CONTAINER_TMP_MIN_MB ||
+      entry.tmp_mb > SUB_CONTAINER_TMP_MAX_MB)
+  ) {
+    errors.push(
+      `${path}.tmp_mb: must be an integer between ${SUB_CONTAINER_TMP_MIN_MB} and ${SUB_CONTAINER_TMP_MAX_MB}`,
     );
   }
   if (entry.command !== undefined) {

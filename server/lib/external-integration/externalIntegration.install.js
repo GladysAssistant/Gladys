@@ -20,11 +20,14 @@ const { MANIFEST_IMAGE_LABEL } = require('./constants');
  * @param {Array} [options.grantedDevices] - Hardware classes granted by the
  * user on the install screen (subset of the classes requested by the
  * manifest sub-containers).
+ * @param {Array} [options.grantedCapabilities] - Linux capabilities granted
+ * by the user on the install screen (subset of the capabilities requested by
+ * the manifest sub-containers).
  * @returns {Promise<object>} Resolve with the installed integration.
  * @example
  * await gladys.externalIntegration.install({ dockerImage: 'my-image:1.0.0', manifest });
  */
-async function install({ dockerImage, manifest, storeSlug = null, grantedDevices } = {}) {
+async function install({ dockerImage, manifest, storeSlug = null, grantedDevices, grantedCapabilities } = {}) {
   if (!this.available) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
@@ -59,19 +62,8 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
     }
   }
   this.validateManifest(finalManifest);
-  if (grantedDevices !== undefined) {
-    if (!Array.isArray(grantedDevices) || grantedDevices.some((hardwareClass) => typeof hardwareClass !== 'string')) {
-      throw new Error422('granted_devices: must be an array of hardware classes');
-    }
-    const requestedClasses = new Set();
-    (finalManifest.containers || []).forEach((entry) => {
-      (entry.devices || []).forEach((hardwareClass) => requestedClasses.add(hardwareClass));
-    });
-    const unknownClasses = grantedDevices.filter((hardwareClass) => !requestedClasses.has(hardwareClass));
-    if (unknownClasses.length > 0) {
-      throw new Error422(`granted_devices: ${unknownClasses.join(', ')} not requested by the manifest`);
-    }
-  }
+  // a grant never names what the manifest does not request (422)
+  this.validateHardwareGrants(finalManifest.containers || [], { grantedDevices, grantedCapabilities });
   // install = every image (main + sub-containers) made available now, so a
   // start never depends on the network
   await Promise.each(finalManifest.containers || [], async (entry) => {
@@ -95,6 +87,7 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
       manifest: finalManifest,
       store_slug: storeSlug,
       granted_devices: grantedDevices === undefined ? null : grantedDevices,
+      granted_capabilities: grantedCapabilities === undefined ? null : grantedCapabilities,
     });
   } catch (e) {
     // two concurrent installs can race between the findOne pre-check and
