@@ -4477,8 +4477,9 @@ describe('build schemas', () => {
         },
         event: { emit: fake() },
       },
-      // Only "no-room" is close to a name of the home: "no room".
-      levenshtein: { distance: stub().callsFake((a, b) => (a === 'no room' && b === 'no-room' ? 1 : 10)) },
+      // "my room" is within the similarity distance of "no room" (2), like the real
+      // Levenshtein distance; nothing else is close to a name of the home.
+      levenshtein: { distance: stub().callsFake((a, b) => (a === 'no room' && b === 'my room' ? 2 : 10)) },
       toon: stub().callsFake((data) => JSON.stringify(data)),
     };
 
@@ -4510,8 +4511,8 @@ describe('build schemas', () => {
       { room: 'Chambre', device: 'Capteur chambre', value: 48 },
     ]);
 
-    // A name close to it reads the whole home too, and the device of no room is still
-    // part of it, labelled "No room".
+    // Its selector reads the whole home too, and the device of no room is still part
+    // of it, labelled "No room".
     const everything = await getStateTool.cb({ room: 'no-room' });
     expect(JSON.parse(everything.content[0].text).map(({ room, device }) => ({ room, device }))).to.deep.equal([
       { room: 'Salon', device: 'Capteur salon' },
@@ -4526,6 +4527,15 @@ describe('build schemas', () => {
         'No measurement exists for this query, do not report any value.',
     );
 
+    // A name only close to "No room" names a room: it is neither widened to the whole
+    // home nor narrowed to the devices of no room, the model is asked to retry.
+    const myRoom = await getStateTool.cb({ device_type: 'humidity-sensor', room: 'my room' });
+    expect(myRoom.content[0].text).to.eq(
+      'device.get-state: "my room" is not a room of this home, no state was read. ' +
+        'Available rooms: Salon, Chambre. ' +
+        'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+    );
+
     // The history of the humidity of the home: the first humidity sensor of the home,
     // instead of "no device or feature found" among the devices of no room.
     const history = await getHistoryTool.cb({ room: 'No room', feature: 'humidity-sensor:decimal' });
@@ -4533,6 +4543,21 @@ describe('build schemas', () => {
       'capteur-salon-humidity-sensor',
     );
     expect(JSON.parse(history.content[0].text)).to.include({ room: 'Salon', device: 'Capteur salon' });
+
+    mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
+
+    // A device asked for by name and absent from the selection does not fall back to the
+    // history of another device: the garage sensor has no humidity, and the bedroom sensor
+    // is not in the living room.
+    const garageHumidity = await getHistoryTool.cb({
+      room: 'No room',
+      device: 'Capteur garage',
+      feature: 'humidity-sensor:decimal',
+    });
+    expect(garageHumidity.content[0].text).to.eq('device.get-history, no device or feature found');
+    const bedroomInLivingRoom = await getHistoryTool.cb({ room: 'Salon', device: 'Capteur chambre' });
+    expect(bedroomInLivingRoom.content[0].text).to.eq('device.get-history, no device or feature found');
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.callCount).to.eq(0);
   });
 
   describe('weather.get tool', () => {

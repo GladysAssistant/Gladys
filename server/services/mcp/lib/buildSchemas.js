@@ -344,11 +344,14 @@ async function getAllTools(userId) {
   // room: a command or a camera image must not widen to the whole home on a guess, so
   // their description says what it targets instead. A home without any room gets a
   // string instead of an empty enum, which would match nothing.
-  const realRoomNames = rooms.filter(({ selector }) => selector !== noRoom.selector).map(({ name }) => name);
+  const realRooms = rooms.filter(({ selector }) => selector !== noRoom.selector);
+  const realRoomNames = realRooms.map(({ name }) => name);
   const realRoomSchema = realRoomNames.length > 0 ? z.enum(realRoomNames) : z.string();
   const noRoomDescription = `"${noRoom.name}" only targets the devices that are not assigned to a room, never the whole home.`;
-  // "No room", or anything close to it (see the room of device.get-state).
-  const isNoRoom = (room) => this.findBySimilarity(rooms, room).selector === noRoom.selector;
+  // The sentinel itself, as its name or its selector, and nothing merely close to it:
+  // "my room" or "bedroom" are within the similarity distance of "No room", but they
+  // name a room, which the read-only tools look up among the real rooms only.
+  const isNoRoom = (room) => [noRoom.name.toLowerCase(), noRoom.selector].includes(room.toLowerCase());
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const allHouses = await this.gladys.house.get();
@@ -663,13 +666,14 @@ async function getAllTools(userId) {
         // makes it pass the house as a room: that used to resolve to no selector at
         // all, filter every device out, and the empty result then reads as "no
         // temperature sensor is configured at home".
-        // "No room", or anything close to it, is read as the whole home too: it is what
-        // a model taking it for "no room filter" means, and narrowing to the devices of
-        // no room answered "there is no humidity sensor in the house". Reading more than
-        // asked is harmless, and every state keeps the room of its device, "No room"
-        // included, for a model that did mean the devices of no room.
+        // "No room" is read as the whole home too: it is what a model taking it for "no
+        // room filter" means, and narrowing to the devices of no room answered "there is
+        // no humidity sensor in the house". Reading more than asked is harmless, and every
+        // state keeps the room of its device, "No room" included, for a model that did
+        // mean the devices of no room. Any other name is looked up among the real rooms,
+        // so that a name close to "No room" is not resolved to the sentinel either.
         if (room && room !== '' && !isNoRoom(room)) {
-          const selectedRoom = this.findBySimilarity(rooms, room);
+          const selectedRoom = this.findBySimilarity(realRooms, room);
 
           if (selectedRoom?.selector) {
             selectedDevices = selectedDevices.filter(
@@ -905,7 +909,7 @@ async function getAllTools(userId) {
 
         // Same reasoning as device.get-state: "No room" is read as the whole home.
         if (room && room !== '' && !isNoRoom(room)) {
-          const { selector } = this.findBySimilarity(rooms, room);
+          const { selector } = this.findBySimilarity(realRooms, room);
           selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
         }
 
@@ -920,9 +924,10 @@ async function getAllTools(userId) {
 
         if (device && device !== '') {
           const deviceFound = this.findBySimilarity(selectedDevices, device);
-          if (deviceFound?.name) {
-            selectedDevices = [deviceFound];
-          }
+          // A device asked for by name and not found in the room, or without the feature,
+          // must not fall back to the first device of the list: the model would then answer
+          // with the history of another device.
+          selectedDevices = deviceFound?.name ? [deviceFound] : [];
         }
 
         if (selectedDevices.length > 0) {
@@ -1462,7 +1467,7 @@ async function getAllTools(userId) {
         // question is precisely the primary one for this tool, so "No room" is read as
         // the whole home too.
         if (room && room !== '' && !isNoRoom(room)) {
-          const selectedRoom = this.findBySimilarity(rooms, room);
+          const selectedRoom = this.findBySimilarity(realRooms, room);
 
           if (selectedRoom?.selector) {
             selectedDevices = selectedDevices.filter(
