@@ -10,6 +10,7 @@ const {
   onDeviceNewState,
   onExternalSetpointChanged,
   onExternalPowerChanged,
+  onExternalModeChanged,
   primeObservedSetpoints,
   getTargetSelectors,
   getWindowSelectors,
@@ -43,6 +44,7 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   this.windowSelectorsCache = null;
   this.targetSelectorsCache = null;
   this.powerSelectorsCache = null;
+  this.modeSelectorsCache = null;
   // The last setpoint this service wrote on each real thermostat, by selector.
   // The write is reported back as a NEW_STATE, and without this mark that report
   // would be taken for a change made on the device and arm a manual hold — so a
@@ -62,6 +64,9 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // reports of the powers this service wrote are its own.
   this.selfWrittenPowers = new Map();
   this.observedPowers = new Map();
+  // The last mode observed on the unit of each reversible heat pump, by selector:
+  // heating or cooling picked on its remote switches the thermostat's use (A.4).
+  this.observedModes = new Map();
   // The programme preset last announced to the dashboards, by thermostat
   // selector: the minute loop pushes one only when the point in force changes.
   this.announcedPresets = new Map();
@@ -98,6 +103,7 @@ ThermostatHandler.prototype.applySchedules = applySchedules;
 ThermostatHandler.prototype.onDeviceNewState = onDeviceNewState;
 ThermostatHandler.prototype.onExternalSetpointChanged = onExternalSetpointChanged;
 ThermostatHandler.prototype.onExternalPowerChanged = onExternalPowerChanged;
+ThermostatHandler.prototype.onExternalModeChanged = onExternalModeChanged;
 ThermostatHandler.prototype.primeObservedSetpoints = primeObservedSetpoints;
 ThermostatHandler.prototype.getTargetSelectors = getTargetSelectors;
 ThermostatHandler.prototype.getWindowSelectors = getWindowSelectors;

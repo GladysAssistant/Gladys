@@ -42,6 +42,14 @@ const PARAM_FIELDS = [
   ['preset_eco', 'THERMOSTAT_PRESET_ECO', parseFloat],
   ['preset_night', 'THERMOSTAT_PRESET_NIGHT', parseFloat],
   ['preset_comfort', 'THERMOSTAT_PRESET_COMFORT', parseFloat],
+  // A reversible heat pump (spec A.4) and the setpoints of its cooling presets,
+  // read in place of the ones above while it cools.
+  ['reversible', 'THERMOSTAT_REVERSIBLE', v => v === 'true'],
+  ['preset_cooling_frost', 'THERMOSTAT_PRESET_COOLING_FROST', parseFloat],
+  ['preset_cooling_away', 'THERMOSTAT_PRESET_COOLING_AWAY', parseFloat],
+  ['preset_cooling_eco', 'THERMOSTAT_PRESET_COOLING_ECO', parseFloat],
+  ['preset_cooling_night', 'THERMOSTAT_PRESET_COOLING_NIGHT', parseFloat],
+  ['preset_cooling_comfort', 'THERMOSTAT_PRESET_COOLING_COMFORT', parseFloat],
   ['hysteresis_start', 'THERMOSTAT_HYSTERESIS_START', parseFloat],
   ['hysteresis_stop', 'THERMOSTAT_HYSTERESIS_STOP', parseFloat],
   ['tpi_cycle_time', 'THERMOSTAT_TPI_CYCLE_TIME', v => parseInt(v, 10)],
@@ -75,6 +83,16 @@ export const buildConfigFromParams = device => {
     const parsed = parse ? parse(raw) : raw;
     config[field] = typeof parsed === 'number' && !Number.isFinite(parsed) ? null : parsed;
   });
+  // As the server reads it: never on a pilot-wire heater, which only heats. A
+  // reversible one shows the presets of the use in force, which is the
+  // THERMOSTAT_MODE param — switched from the widget, a scene or the remote.
+  config.reversible =
+    Boolean(config.reversible) && config.thermostat_type !== 'pilot-wire' && !config.pilot_wire_feature;
+  if (config.reversible && config.default_mode === 'cooling') {
+    ['frost', 'away', 'eco', 'night', 'comfort'].forEach(preset => {
+      config[`preset_${preset}`] = config[`preset_cooling_${preset}`];
+    });
+  }
   return config;
 };
 
