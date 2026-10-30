@@ -121,4 +121,35 @@ describe('zigbee2mqtt action enumType', () => {
       assert.equal(result, BUTTON_STATUS[`SINGLE_BUTTON_${n}`]);
     });
   });
+
+  describe('Hue Tap Dial (RDM002)', () => {
+    const tapDialExpose = {
+      name: 'action',
+      values: [1, 2, 3, 4]
+        .flatMap((n) => ['press', 'press_release', 'hold', 'hold_release'].map((a) => `button_${n}_${a}`))
+        .concat(['dial_rotate_left_step', 'dial_rotate_right_step', 'brightness_step_up', 'brightness_step_down']),
+    };
+
+    it('should have no indexes for Hue Tap Dial action values', () => {
+      const result = enumType.getFeatureIndexes(tapDialExpose.values);
+      assert.deepEqual(result, []);
+    });
+
+    [1, 2, 3, 4].forEach((n) => {
+      it(`should read "button_${n}_press_release" as BUTTON_STATUS.SINGLE_BUTTON_${n}`, () => {
+        const result = enumType.readValue(tapDialExpose, `button_${n}_press_release`);
+        assert.equal(result, BUTTON_STATUS[`SINGLE_BUTTON_${n}`]);
+      });
+
+      it(`should read "button_${n}_hold_release" as BUTTON_STATUS.LONG_BUTTON_${n}`, () => {
+        const result = enumType.readValue(tapDialExpose, `button_${n}_hold_release`);
+        assert.equal(result, BUTTON_STATUS[`LONG_BUTTON_${n}`]);
+      });
+
+      it(`should ignore "button_${n}_press" and "button_${n}_hold"`, () => {
+        assert.equal(enumType.readValue(tapDialExpose, `button_${n}_press`), undefined);
+        assert.equal(enumType.readValue(tapDialExpose, `button_${n}_hold`), undefined);
+      });
+    });
+  });
 });
