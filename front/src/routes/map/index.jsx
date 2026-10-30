@@ -68,14 +68,18 @@ class MapPage extends Component {
     this.state = {
       usersWithLocation: [],
       housesWithLocation: [],
-      areas: []
+      areas: [],
+      loaded: false
     };
   }
 
+  loadMapData = async () => {
+    await Promise.all([this.getUsersWithLocation(), this.getHousesWithLocation(), this.getAreas()]);
+    this.setState({ loaded: true });
+  };
+
   componentDidMount() {
-    this.getUsersWithLocation();
-    this.getHousesWithLocation();
-    this.getAreas();
+    this.loadMapData();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.LOCATION.NEW, this.updateUserLocationWebsocket);
   }
 
@@ -86,7 +90,7 @@ class MapPage extends Component {
     );
   }
 
-  render(props, { housesWithLocation, usersWithLocation, areas }) {
+  render(props, { housesWithLocation, usersWithLocation, areas, loaded }) {
     // No wrapper margins (the tabler .map-header helper carries a negative
     // top margin meant for banner maps): the map fills everything below the
     // chrome, sizing itself to the viewport minus that chrome.
@@ -95,7 +99,7 @@ class MapPage extends Component {
     return (
       <div class="page">
         <div class={cx('page-main', 'glass-theme', style.mapPage)}>
-          <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} />
+          <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} loaded={loaded} />
         </div>
       </div>
     );
