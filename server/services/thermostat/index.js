@@ -40,6 +40,8 @@ module.exports = function ThermostatService(gladys, serviceId) {
     // kept from before would cut the heating early on the first pass after a start.
     // Forgotten, it is read again from the sensor's own `last_value_changed`.
     thermostatHandler.windowOpenedAt.clear();
+    // The same for the presence sensors: someone may come and go while it is stopped.
+    thermostatHandler.presenceVacatedAt.clear();
   }
 
   /**
