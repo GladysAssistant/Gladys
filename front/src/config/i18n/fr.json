@@ -6973,7 +6973,7 @@
       "wind-setting": "Mode vent"
     },
     "flow-sensor": {
-      "shortCategoryName": "Débit",
+      "shortCategoryName": "Capteur de débit",
       "decimal": "Débit"
     },
     "hepa-filter-monitoring": {

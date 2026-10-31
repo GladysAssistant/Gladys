@@ -113,4 +113,8 @@ describe('constants DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR units', () => {
       DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
     ]);
   });
+
+  it('should expose the decimal feature type', () => {
+    expect(DEVICE_FEATURE_TYPES.FLOW_SENSOR.DECIMAL).to.equal('decimal');
+  });
 });
