@@ -3890,6 +3890,7 @@
         "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
         "reversibleNoModeError": "A reversible heat pump needs the unit's mode, so that switching between heating and cooling reaches the unit.",
+        "reversibleModeCannotCoolError": "This unit's mode only heats: a reversible heat pump needs a mode that can also cool.",
         "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
         "pilotWireUnreadError": "The pilot wire picked could not be read, so the order it rests on cannot be checked: reload the page and pick it again.",
         "activeScheduleLabel": "Active schedule",

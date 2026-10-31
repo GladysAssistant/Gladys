@@ -3890,6 +3890,7 @@
         "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Aktor (Schalter oder Steuerleitung): Er regelt, indem er den einen liest und den anderen schaltet.",
         "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
         "reversibleNoModeError": "Eine reversible Wärmepumpe braucht den Modus des Geräts, damit der Wechsel zwischen Heizen und Kühlen das Gerät erreicht.",
+        "reversibleModeCannotCoolError": "Der Modus dieses Geräts kann nur heizen: Eine reversible Wärmepumpe braucht einen Modus, der auch kühlen kann.",
         "incompletePilotWireError": "Ein Heizkörper mit Steuerleitung braucht die zu steuernde Steuerleitung.",
         "pilotWireUnreadError": "Die gewählte Steuerleitung konnte nicht gelesen werden, daher kann der Ruhebefehl nicht geprüft werden: Seite neu laden und sie erneut auswählen.",
         "activeScheduleLabel": "Aktiver Zeitplan",

@@ -483,6 +483,44 @@ describe('thermostat: reversible heat pump', () => {
       expect(reversibleParam(created)).to.equal('true');
     });
 
+    // The write is clamped to the mode's maximum: a heating-only mode would keep
+    // the unit heating under the cooling presets.
+    const saveWithMode = (unitMode) => {
+      const handler = buildCreateHandler();
+      handler.gladys.device.get = fake.resolves(
+        unitMode === null ? [] : [{ selector: 'unit', features: [{ selector: 'ac-mode', ...unitMode }] }],
+      );
+      return createDevice.call(handler, {
+        name: 'Heat pump',
+        external_id: 'thermostat:heat-pump',
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'ac-mode' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+        ],
+      });
+    };
+
+    it('should clear the reversible param of a unit whose mode only heats', async () => {
+      const created = await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT, max: 1 });
+
+      expect(reversibleParam(created)).to.equal('');
+    });
+
+    it('should keep the reversible param of a unit whose mode can cool', async () => {
+      expect(reversibleParam(await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT, max: 3 }))).to.equal(
+        'true',
+      );
+      // An air conditioner speaks AC_MODE, which always cools, whatever its max.
+      expect(
+        reversibleParam(await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING, max: 1 })),
+      ).to.equal('true');
+      // No declared maximum, or a mode not found: taken at its word.
+      expect(reversibleParam(await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT }))).to.equal('true');
+      expect(reversibleParam(await saveWithMode(null))).to.equal('true');
+    });
+
     // With no mode to write, the unit would keep its use while the cooling presets applied.
     it('should clear the reversible param of a real thermostat with no mode', async () => {
       const created = await createDevice.call(buildCreateHandler(), {
