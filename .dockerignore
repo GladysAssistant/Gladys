@@ -22,3 +22,4 @@ node.d.ts
 docker
 front/build
 .github
+.oss-scanner
