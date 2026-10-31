@@ -17,6 +17,11 @@ class MapComponent extends Component {
       this.leafletMap.remove();
     }
     this.leafletMap = leaflet.map(this.map).setView(view.center, view.zoom);
+    // Once the user pans or zooms, the view is theirs: a first marker
+    // arriving later must not reset it
+    this.leafletMap.on('dragstart zoomstart', () => {
+      this.boundsFitted = true;
+    });
 
     // Use the global dark mode state from props
     addMapTileLayer(this.leafletMap, this.props.darkMode);
