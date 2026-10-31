@@ -1,6 +1,6 @@
-// A virtual thermostat heating: the room below its setpoint and its relay on.
-// Its device is served by intercepts, so the widget is drawn without the
-// thermostat service having to regulate anything.
+// A virtual thermostat running, in either use: the room on the wrong side of
+// its setpoint and its relay on. Its device is served by intercepts, so the
+// widget is drawn without the thermostat service having to regulate anything.
 const SETPOINT = 'cypress-thermostat-setpoint';
 const ROOM_TEMPERATURE = 'cypress-thermostat-temperature';
 const RELAY = 'cypress-thermostat-relay';
@@ -20,7 +20,12 @@ const feature = (selector, category, type, lastValue, extra = {}) => ({
   ...extra
 });
 
-const thermostat = {
+const USES = {
+  heating: { mode: 1, setpoint: 21, room: 18 },
+  cooling: { mode: 2, setpoint: 24, room: 27 }
+};
+
+const thermostat = use => ({
   name: 'Cypress thermostat',
   selector: 'cypress-thermostat',
   external_id: 'thermostat:cypress',
@@ -28,23 +33,51 @@ const thermostat = {
     { name: 'THERMOSTAT_TYPE', value: 'virtual' },
     { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: ROOM_TEMPERATURE },
     { name: 'THERMOSTAT_SWITCH_FEATURE', value: RELAY },
-    { name: 'THERMOSTAT_MODE', value: 'heating' }
+    { name: 'THERMOSTAT_MODE', value: use }
   ],
   features: [
-    feature(SETPOINT, 'thermostat', 'target-temperature', 21, { unit: 'celsius', min: 5, max: 35 }),
-    // Heating (1), on the comfort preset (5).
-    feature('cypress-thermostat-mode', 'thermostat', 'mode', 1, { max: 2 }),
+    feature(SETPOINT, 'thermostat', 'target-temperature', USES[use].setpoint, { unit: 'celsius', min: 5, max: 35 }),
+    feature('cypress-thermostat-mode', 'thermostat', 'mode', USES[use].mode, { max: 2 }),
+    // On the comfort preset (5).
     feature('cypress-thermostat-preset', 'thermostat', 'preset', 5, { max: 5 })
   ]
-};
+});
 
-const sensors = {
+const sensors = use => ({
   name: 'Cypress sensors',
   selector: 'cypress-sensors',
   features: [
-    feature(ROOM_TEMPERATURE, 'temperature-sensor', 'decimal', 18, { unit: 'celsius', read_only: true, max: 50 }),
+    feature(ROOM_TEMPERATURE, 'temperature-sensor', 'decimal', USES[use].room, {
+      unit: 'celsius',
+      read_only: true,
+      max: 50
+    }),
     feature(RELAY, 'switch', 'binary', 1)
   ]
+});
+
+const serveThermostat = use => {
+  cy.intercept('GET', '**/api/v1/service/thermostat/device*', [thermostat(use)]);
+  cy.intercept('GET', '**/api/v1/service/thermostat/schedule*', []);
+  cy.intercept({ method: 'GET', pathname: '/api/v1/device', query: { device_feature_selectors: /.+/ } }, [
+    thermostat(use),
+    sensors(use)
+  ]);
+};
+
+// Safari resolves `transform-box: fill-box` on SVG text against the SVG's
+// origin: animated on its own position, the flame drifted to the bottom right
+// on every pulse. The icon is placed by a group on the gauge's centre line,
+// 54 below its centre (110, 110), and drawn on that group's origin, which its
+// animation scales and turns about in every browser.
+const shouldBeDrawnOnItsGroupOrigin = iconClass => {
+  cy.get(`[class*="${iconClass}"]`, { timeout: 10000 })
+    .should('have.attr', 'x', '0')
+    .and('have.attr', 'y', '0')
+    .and('have.css', 'transform-box', 'view-box')
+    .and('have.css', 'transform-origin', '0px 0px')
+    .parent('g')
+    .should('have.attr', 'transform', 'translate(110 164)');
 };
 
 describe('Dashboard Thermostat Box', () => {
@@ -62,12 +95,6 @@ describe('Dashboard Thermostat Box', () => {
         boxes: [[{ type: 'thermostat', thermostat_feature: SETPOINT }], [], []]
       }
     });
-    cy.intercept('GET', '**/api/v1/service/thermostat/device*', [thermostat]);
-    cy.intercept('GET', '**/api/v1/service/thermostat/schedule*', []);
-    cy.intercept({ method: 'GET', pathname: '/api/v1/device', query: { device_feature_selectors: /.+/ } }, [
-      thermostat,
-      sensors
-    ]);
   });
 
   afterEach(() => {
@@ -78,17 +105,15 @@ describe('Dashboard Thermostat Box', () => {
     });
   });
 
-  // Safari resolves `transform-box: fill-box` on SVG text against the SVG's
-  // origin: animated on its own position, the flame drifted to the bottom right
-  // on every pulse. It is placed by a group and drawn on that group's origin,
-  // which the pulse scales about in every browser.
   it('Should draw the heating flame on the origin of a placed group', () => {
+    serveThermostat('heating');
     cy.visit('/dashboard/test');
-    cy.get('[class*="activeIconHeating"]', { timeout: 10000 })
-      .should('have.attr', 'x', '0')
-      .and('have.attr', 'y', '0')
-      .parent('g')
-      .should('have.attr', 'transform')
-      .and('match', /^translate\(/);
+    shouldBeDrawnOnItsGroupOrigin('activeIconHeating');
+  });
+
+  it('Should draw the cooling snowflake on the origin of a placed group', () => {
+    serveThermostat('cooling');
+    cy.visit('/dashboard/test');
+    shouldBeDrawnOnItsGroupOrigin('activeIconCooling');
   });
 });
