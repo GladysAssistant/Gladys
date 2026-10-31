@@ -6972,6 +6972,10 @@
       "rock-setting": "Oscilación",
       "wind-setting": "Modo de viento"
     },
+    "flow-sensor": {
+      "shortCategoryName": "Sensor de caudal",
+      "decimal": "Caudal"
+    },
     "hepa-filter-monitoring": {
       "shortCategoryName": "Supervisión del filtro HEPA",
       "filter-life-remaining": "Vida útil restante del filtro"

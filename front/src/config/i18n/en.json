@@ -6972,6 +6972,10 @@
       "rock-setting": "Rocking",
       "wind-setting": "Wind mode"
     },
+    "flow-sensor": {
+      "shortCategoryName": "Flow sensor",
+      "decimal": "Flow"
+    },
     "hepa-filter-monitoring": {
       "shortCategoryName": "HEPA filter monitoring",
       "filter-life-remaining": "Filter life remaining"

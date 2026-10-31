@@ -6972,6 +6972,10 @@
       "rock-setting": "Oscillation",
       "wind-setting": "Mode vent"
     },
+    "flow-sensor": {
+      "shortCategoryName": "Débit",
+      "decimal": "Débit"
+    },
     "hepa-filter-monitoring": {
       "shortCategoryName": "Surveillance filtre HEPA",
       "filter-life-remaining": "Durée de vie restante du filtre"
