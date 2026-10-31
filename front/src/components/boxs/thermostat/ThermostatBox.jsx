@@ -627,13 +627,14 @@ class ThermostatBox extends Component {
     return numOr(cfg[`preset_${presetKey}`], defaults[presetKey]);
   };
 
-  // The order a preset sends a heater that regulates itself.
+  // The order a preset sends a heater that regulates itself: one of the six, as
+  // the server reads it, or the preset's default.
   getPresetOrder = presetKey => {
     if (presetKey === 'off') {
       return PILOT_WIRE_MODE.OFF;
     }
     const configured = this.getConfig()[`pilot_wire_order_${presetKey}`];
-    return Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[presetKey];
+    return PILOT_WIRE_ORDER_RANK[configured] !== undefined ? configured : DEFAULT_PILOT_WIRE_ORDERS[presetKey];
   };
 
   // The preset an empty room is regulated on, when it saves energy over the one
