@@ -819,6 +819,7 @@
         "editDescription": "Una barra compacta de chips de estado. Agregue chips y elija qué muestra cada uno.",
         "editChipLabel": "Chip {{index}}",
         "removeChipButton": "Quitar chip {{index}}",
+        "moveChipButton": "Mover chip {{index}}: arrastre o use las teclas de flecha arriba/abajo",
         "editChipTypeLabel": "¿Qué muestra este chip?",
         "chipTypes": {
           "device-feature": "Un estado de dispositivo",
