@@ -6857,6 +6857,11 @@
       "input-index": "Grid import index",
       "output-index": "Grid export index"
     },
+    "thermal-energy-sensor": {
+      "shortCategoryName": "Thermal energy sensor",
+      "power": "Thermal power",
+      "index": "Heat delivered index"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Home output sensor",
       "power": "Home output power",

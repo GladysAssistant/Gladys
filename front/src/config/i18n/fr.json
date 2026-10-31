@@ -6857,6 +6857,11 @@
       "input-index": "Index import réseau électrique",
       "output-index": "Index export réseau électrique"
     },
+    "thermal-energy-sensor": {
+      "shortCategoryName": "Capteur d'énergie thermique",
+      "power": "Puissance thermique",
+      "index": "Index de chaleur fournie"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Capteur de sortie maison",
       "power": "Puissance vers la maison",
