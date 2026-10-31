@@ -47,7 +47,13 @@ const buildGladys = (features = {}, failing = []) => ({
   event: { emit: fake.returns(null) },
 });
 
-const sensor = (selector, value, extra = {}) => ({ selector, last_value: value, ...extra });
+const sensor = (selector, value, extra = {}) => ({
+  selector,
+  category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+  type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+  last_value: value,
+  ...extra,
+});
 
 describe('thermostat presence: readsZeroSince', () => {
   it('should forget the time of a sensor that reads anything but 0', () => {
@@ -128,6 +134,40 @@ describe('thermostat presence: findAbsence', () => {
     );
   });
 
+  // Only what the form offers says anything about the room.
+  it('should leave out a feature that is not a presence sensor', async () => {
+    const gladys = buildGladys({
+      'salon-motion': sensor('salon-motion', 1),
+      'salon-presence': sensor('salon-presence', 0, { category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR }),
+      'salon-pushed': sensor('salon-pushed', 0, { type: DEVICE_FEATURE_TYPES.SENSOR.PUSH }),
+      'salon-temperature': sensor('salon-temperature', 0, {
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      }),
+    });
+    const vacatedAt = new Map([['salon-presence', NOW - 60 * MINUTE]]);
+
+    expect(
+      await findAbsence(gladys, ['salon-presence', 'salon-pushed', 'salon-temperature'], 30, vacatedAt, NOW),
+    ).to.equal(NOW - 60 * MINUTE);
+    // A motion sensor seeing someone still counts.
+    expect(await findAbsence(gladys, ['salon-presence', 'salon-motion'], 30, vacatedAt, NOW)).to.equal(null);
+  });
+
+  it('should forget the time of a sensor that lost its value, and keep that of one unread', async () => {
+    const gladys = buildGladys({ 'salon-motion': sensor('salon-motion', null) }, ['offline-motion']);
+    const vacatedAt = new Map([
+      ['salon-motion', NOW - 60 * MINUTE],
+      ['offline-motion', NOW - 60 * MINUTE],
+    ]);
+
+    expect(await findAbsence(gladys, ['salon-motion', 'offline-motion'], 30, vacatedAt, NOW)).to.equal(null);
+    expect(vacatedAt.has('salon-motion')).to.equal(false);
+    expect(vacatedAt.get('offline-motion')).to.equal(NOW - 60 * MINUTE);
+    // Its next 0 starts a new count.
+    expect(await findAbsence(gladys, ['salon-motion'], 30, null, NOW)).to.equal(null);
+  });
+
   it('should default to the present time and no record', async () => {
     const gladys = buildGladys({
       'salon-motion': sensor('salon-motion', 0, { last_value_changed: new Date(Date.now() - 60 * MINUTE) }),
@@ -175,6 +215,34 @@ describe('thermostat presence: presetForEmptyRoom', () => {
     expect(
       presetForEmptyRoom('comfort', config({ default_mode: 'cooling', pilot_wire_feature: 'heater-wire' })),
     ).to.equal('eco');
+  });
+
+  // A heater regulating itself is sent the presets' orders, not their setpoints.
+  it('should weigh the orders of a heater that regulates itself', () => {
+    const heater = (orders) =>
+      config({
+        pilot_wire_feature: 'heater-wire',
+        pilot_wire_regulation: 'heater',
+        // Setpoints that would say the opposite, to show they are not read.
+        preset_comfort: 15,
+        preset_eco: 20,
+        pilot_wire_orders: {
+          frost: PILOT_WIRE_MODE.FROST_PROTECTION,
+          away: PILOT_WIRE_MODE.FROST_PROTECTION,
+          eco: PILOT_WIRE_MODE.ECO,
+          night: PILOT_WIRE_MODE.ECO,
+          comfort: PILOT_WIRE_MODE.COMFORT,
+          ...orders,
+        },
+      });
+
+    expect(presetForEmptyRoom('comfort', heater())).to.equal('eco');
+    expect(presetForEmptyRoom('frost', heater())).to.equal('frost');
+    // Comfort -2 °C sends less heat than comfort -1 °C, whatever their values.
+    const derived = heater({ comfort: PILOT_WIRE_MODE.COMFORT_1, eco: PILOT_WIRE_MODE.COMFORT_2 });
+    expect(presetForEmptyRoom('comfort', derived)).to.equal('eco');
+    const reversed = heater({ comfort: PILOT_WIRE_MODE.COMFORT_2, eco: PILOT_WIRE_MODE.COMFORT_1 });
+    expect(presetForEmptyRoom('comfort', reversed)).to.equal('comfort');
   });
 
   it('should leave off and schedule alone', () => {
