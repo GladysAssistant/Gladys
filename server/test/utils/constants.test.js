@@ -105,3 +105,13 @@ describe('constants DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR / DEVICE_FEATUR
     ]);
   });
 });
+
+describe('constants DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW units', () => {
+  it('should allow the m³/h and m³/s units for the flow type', () => {
+    const unitsByType = DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE[DEVICE_FEATURE_CATEGORIES.WATER_VALVE];
+    expect(unitsByType[DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]).to.deep.equal([
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
+    ]);
+  });
+});

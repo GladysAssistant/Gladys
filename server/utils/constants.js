@@ -2109,7 +2109,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: [],
-    // m³/s is the unit of river flows (hydrometry stations)
+    // m³/s is the SI unit of volumetric flow (1 m³/s = 3600 m³/h), used e.g. by hydrometry stations
     [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [
       DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
       DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
