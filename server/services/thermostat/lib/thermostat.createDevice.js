@@ -21,6 +21,15 @@ const EXTERNAL_SETPOINT_PARAMS = [
   'THERMOSTAT_POWER_FEATURE',
 ];
 
+// The mode of a unit, as the edit form offers it: a thermostat's or an air
+// conditioner's, and one that can be written.
+const isWritableMode = (feature) =>
+  !feature.read_only &&
+  ((feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) ||
+    (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+      feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE));
+
 // Runtime state kept as params rather than features: a hold, a stop the
 // programme or a pilot-wire module made, and the end of one made on the unit
 // are bookkeeping of the regulation loop, not properties of the equipment. No
@@ -278,13 +287,15 @@ async function createDevice(device) {
   if (reversibleParam && (!external || !(modeParam && modeParam.value))) {
     reversibleParam.value = '';
   }
-  // Nor is one whose mode cannot cool: the write is clamped to the feature's
-  // maximum, and the unit would keep heating under the cooling presets. A mode
-  // that cannot be read is left to the form, which checked it.
+  // Nor is one whose mode cannot be switched to cooling: a selector that is
+  // no writable mode — what the form offers — takes no mode write, and a mode
+  // whose maximum is below cooling is clamped to it. Either way the unit would
+  // keep heating under the cooling presets. A mode that cannot be read is left
+  // to the form, which checked it.
   if (reversibleParam && reversibleParam.value === 'true') {
     try {
       const mode = await getFeatureBySelector(this.gladys, modeParam.value);
-      if (mode && !modeFeatureCanCool(mode.feature)) {
+      if (mode && (!isWritableMode(mode.feature) || !modeFeatureCanCool(mode.feature))) {
         logger.warn(`Thermostat: ${modeParam.value} cannot cool, ${device.name} saved as not reversible`);
         reversibleParam.value = '';
       }
