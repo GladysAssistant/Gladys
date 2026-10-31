@@ -3,7 +3,7 @@
 // them here avoids the drift where the form offered one default and the
 // regulation applied another.
 
-const { PILOT_WIRE_MODE } = require('./constants');
+const { DEVICE_FEATURE_CATEGORIES, PILOT_WIRE_MODE, THERMOSTAT_MODE } = require('./constants');
 
 const DEFAULT_PRESET_TEMPS = {
   frost: 7,
@@ -33,6 +33,27 @@ const DEFAULT_COOLING_PRESET_TEMPS = {
  */
 function defaultPresetTemps(mode) {
   return mode === 'cooling' ? DEFAULT_COOLING_PRESET_TEMPS : DEFAULT_PRESET_TEMPS;
+}
+
+/**
+ * @description The param that holds a preset's setpoint for the thermostat's
+ * current use.
+ *
+ * A thermostat has one set of preset setpoints, `THERMOSTAT_PRESET_<PRESET>`, in
+ * the use it was configured for. A reversible heat pump (`THERMOSTAT_REVERSIBLE`)
+ * needs two — Comfort is 21 °C in winter and 24 °C in summer — and keeps its
+ * cooling ones in `THERMOSTAT_PRESET_COOLING_<PRESET>`, so the heating ones stay
+ * where every thermostat saved so far has them and no migration is needed.
+ * @param {string} preset - A preset name (`frost` … `comfort`).
+ * @param {string} mode - The use, `heating` or `cooling`.
+ * @param {boolean} reversible - Whether the thermostat heats and cools.
+ * @returns {string} The param name.
+ * @example
+ * presetParamName('comfort', 'cooling', true); // 'THERMOSTAT_PRESET_COOLING_COMFORT'
+ */
+function presetParamName(preset, mode, reversible) {
+  const use = reversible && mode === 'cooling' ? 'COOLING_' : '';
+  return `THERMOSTAT_PRESET_${use}${preset.toUpperCase()}`;
 }
 
 // Fallback setpoint for a preset that is neither known nor configured.
@@ -142,6 +163,25 @@ const DEFAULT_PILOT_WIRE_ORDERS = {
 const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
 
 /**
+ * @description Whether a unit's mode feature can be told to cool, which a
+ * reversible heat pump needs (spec A.4). An air conditioner speaks AC_MODE,
+ * which always has cooling. A thermostat mode is clamped to its `max` when
+ * written, so a heating-only one (`max` 1) would keep heating while the cooling
+ * presets applied. A feature that declares no maximum is taken at its word.
+ * @param {object} feature - The mode feature, or the form's entry for it.
+ * @returns {boolean} True when cooling can be written.
+ * @example
+ * modeFeatureCanCool({ category: 'thermostat', max: 1 }); // false
+ */
+function modeFeatureCanCool(feature) {
+  if (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING) {
+    return true;
+  }
+  const max = feature.max === null || feature.max === undefined || feature.max === '' ? NaN : Number(feature.max);
+  return !Number.isFinite(max) || max >= THERMOSTAT_MODE.COOLING;
+}
+
+/**
  * @description The order a module can actually be sent, from the options its
  * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
  * the order was refused, written again on every pass, and the widget said it was
@@ -175,6 +215,7 @@ module.exports = {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_COOLING_PRESET_TEMPS,
   defaultPresetTemps,
+  presetParamName,
   FALLBACK_SETPOINT,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_HYSTERESIS_STOP,
@@ -200,4 +241,5 @@ module.exports = {
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder,
+  modeFeatureCanCool,
 };

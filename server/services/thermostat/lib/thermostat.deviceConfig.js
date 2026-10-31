@@ -1,5 +1,6 @@
 const {
   defaultPresetTemps,
+  presetParamName,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_HYSTERESIS_STOP,
   DEFAULT_TPI_CYCLE_TIME,
@@ -63,8 +64,24 @@ function buildParamsConfig(device) {
     const value = toNumber(getParam(`THERMOSTAT_PILOT_WIRE_ORDER_${preset.toUpperCase()}`), null);
     return PILOT_WIRE_ORDERS.includes(value) ? value : DEFAULT_PILOT_WIRE_ORDERS[preset];
   };
-  // A thermostat that cools aims higher: its presets default accordingly.
-  const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE') || DEFAULT_MODE);
+  // A heat pump that heats and cools (spec A.4): only a real thermostat with a
+  // mode to write, which is what switching its use reaches. A virtual one drives
+  // a single heater relay, which cooling would turn on in a room too warm, and a
+  // pilot wire only heats.
+  const reversible =
+    getParam('THERMOSTAT_REVERSIBLE') === 'true' &&
+    thermostatType === THERMOSTAT_TYPES.EXTERNAL &&
+    !!getParam('THERMOSTAT_MODE_FEATURE') &&
+    !getParam('THERMOSTAT_PILOT_WIRE_FEATURE');
+  // The use in force. On a reversible heat pump it is switched from the widget,
+  // a scene or the unit's remote, and saved on this same param, so everything
+  // reading the use follows it — and a stopped thermostat starts again in it.
+  const mode = getParam('THERMOSTAT_MODE') || DEFAULT_MODE;
+  // A thermostat that cools aims higher: its presets default accordingly. A
+  // reversible one reads the set of the use in force.
+  const presetDefaults = defaultPresetTemps(mode);
+  const presetSetpoint = (preset) =>
+    toNumber(getParam(presetParamName(preset, mode, reversible)), presetDefaults[preset]);
   // One sensor or several (A.1.1): the loop regulates on their average.
   const temperatureFeatures = parseSelectorList(getParam('THERMOSTAT_TEMPERATURE_FEATURE'));
   return {
@@ -103,7 +120,8 @@ function buildParamsConfig(device) {
       MAX_WINDOW_DELAY_SECONDS,
       Math.max(0, toNumber(getParam('THERMOSTAT_WINDOW_DELAY'), DEFAULT_WINDOW_DELAY_SECONDS)),
     ),
-    default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
+    default_mode: mode,
+    reversible,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
     temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),
     temp_max: toNumber(getParam('THERMOSTAT_MAX_TEMP'), DEFAULT_MAX_TEMP),
@@ -114,11 +132,11 @@ function buildParamsConfig(device) {
     // that unreachable, since `holdExpiry` can then never see the absence. The
     // callers that need a number apply the default themselves.
     manual_duration: toNumber(getParam('THERMOSTAT_MANUAL_DURATION'), null),
-    preset_frost: toNumber(getParam('THERMOSTAT_PRESET_FROST'), presetDefaults.frost),
-    preset_away: toNumber(getParam('THERMOSTAT_PRESET_AWAY'), presetDefaults.away),
-    preset_eco: toNumber(getParam('THERMOSTAT_PRESET_ECO'), presetDefaults.eco),
-    preset_night: toNumber(getParam('THERMOSTAT_PRESET_NIGHT'), presetDefaults.night),
-    preset_comfort: toNumber(getParam('THERMOSTAT_PRESET_COMFORT'), presetDefaults.comfort),
+    preset_frost: presetSetpoint('frost'),
+    preset_away: presetSetpoint('away'),
+    preset_eco: presetSetpoint('eco'),
+    preset_night: presetSetpoint('night'),
+    preset_comfort: presetSetpoint('comfort'),
     hysteresis_start: toNumber(getParam('THERMOSTAT_HYSTERESIS_START'), DEFAULT_HYSTERESIS_START),
     hysteresis_stop: toNumber(getParam('THERMOSTAT_HYSTERESIS_STOP'), DEFAULT_HYSTERESIS_STOP),
     tpi_cycle_time: toNumber(getParam('THERMOSTAT_TPI_CYCLE_TIME'), DEFAULT_TPI_CYCLE_TIME),

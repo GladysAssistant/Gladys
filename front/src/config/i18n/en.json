@@ -980,7 +980,11 @@
         },
         "backToSchedule": "Back to the schedule",
         "resumeFromStopped": "Start the thermostat",
-        "presetPending": "{{preset}} (applied when it starts again)"
+        "presetPending": "{{preset}} (applied when it starts again)",
+        "use": {
+          "heating": "Heating",
+          "cooling": "Cooling"
+        }
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -3763,6 +3767,8 @@
         "saveError": "Error while saving.",
         "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
+        "reversibleNoModeError": "A reversible heat pump needs the unit's mode, so that switching between heating and cooling reaches the unit.",
+        "reversibleModeCannotCoolError": "This unit's mode only heats: a reversible heat pump needs a mode that can also cool.",
         "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
@@ -3775,6 +3781,8 @@
         "manualDurationUnit": "min",
         "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action.",
         "modeHelp": "What this thermostat drives: heating or cooling.",
+        "reversibleLabel": "Reversible heat pump (heating and cooling)",
+        "reversibleHelp": "The use above is the one in force: switch it from the dashboard widget, a scene or the unit's remote. Each preset has a heating and a cooling setpoint, and the same schedule runs in both.",
         "sectionDevice": "Device",
         "section": {
           "heating": "Heating",

@@ -832,7 +832,11 @@
         },
         "backToSchedule": "Zurück zum Zeitplan",
         "resumeFromStopped": "Thermostat starten",
-        "presetPending": "{{preset}} (wird beim Neustart angewendet)"
+        "presetPending": "{{preset}} (wird beim Neustart angewendet)",
+        "use": {
+          "heating": "Heizen",
+          "cooling": "Kühlen"
+        }
       },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
@@ -3763,6 +3767,8 @@
         "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
         "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Aktor (Schalter oder Steuerleitung): Er regelt, indem er den einen liest und den anderen schaltet.",
         "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
+        "reversibleNoModeError": "Eine reversible Wärmepumpe braucht den Modus des Geräts, damit der Wechsel zwischen Heizen und Kühlen das Gerät erreicht.",
+        "reversibleModeCannotCoolError": "Der Modus dieses Geräts kann nur heizen: Eine reversible Wärmepumpe braucht einen Modus, der auch kühlen kann.",
         "incompletePilotWireError": "Ein Heizkörper mit Steuerleitung braucht die zu steuernde Steuerleitung.",
         "activeScheduleLabel": "Aktiver Zeitplan",
         "activeScheduleHelp": "Wähle den Zeitplan, der automatisch auf dieses Thermostat angewendet wird.",
@@ -3775,6 +3781,8 @@
         "manualDurationUnit": "Min.",
         "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird.",
         "modeHelp": "Was dieses Thermostat steuert: Heizung oder Kühlung.",
+        "reversibleLabel": "Reversible Wärmepumpe (Heizen und Kühlen)",
+        "reversibleHelp": "Die obige Nutzung ist die aktuelle: Sie wird im Dashboard-Widget, in einer Szene oder mit der Fernbedienung des Geräts umgeschaltet. Jedes Preset hat einen Heiz- und einen Kühlsollwert, und derselbe Zeitplan gilt in beiden Fällen.",
         "sectionDevice": "Gerät",
         "section": {
           "heating": "Heizung",

@@ -7,7 +7,8 @@ const {
   THERMOSTAT_PRESET,
   THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
-const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
+const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE, modeFeatureCanCool } = require('../../../utils/thermostatConstants');
+const { getFeatureBySelector } = require('./thermostat.deviceConfig');
 
 // The params that make an external thermostat drive a real device: its
 // setpoint, its running state, its mode and its power. A pilot-wire heater has
@@ -19,6 +20,15 @@ const EXTERNAL_SETPOINT_PARAMS = [
   'THERMOSTAT_MODE_FEATURE',
   'THERMOSTAT_POWER_FEATURE',
 ];
+
+// The mode of a unit, as the edit form offers it: a thermostat's or an air
+// conditioner's, and one that can be written.
+const isWritableMode = (feature) =>
+  !feature.read_only &&
+  ((feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) ||
+    (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+      feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE));
 
 // Runtime state kept as params rather than features: a hold, a stop the
 // programme or a pilot-wire module made, and the end of one made on the unit
@@ -55,6 +65,14 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_WINDOW_DELAY',
   'THERMOSTAT_MODE',
+  // A heat pump that heats and cools, and the setpoints of its cooling presets
+  // (spec A.4): the heating ones are THERMOSTAT_PRESET_* below.
+  'THERMOSTAT_REVERSIBLE',
+  'THERMOSTAT_PRESET_COOLING_FROST',
+  'THERMOSTAT_PRESET_COOLING_AWAY',
+  'THERMOSTAT_PRESET_COOLING_ECO',
+  'THERMOSTAT_PRESET_COOLING_NIGHT',
+  'THERMOSTAT_PRESET_COOLING_COMFORT',
   'THERMOSTAT_CONTROL_TYPE',
   'THERMOSTAT_MIN_TEMP',
   'THERMOSTAT_MAX_TEMP',
@@ -131,7 +149,11 @@ function buildStateFeatures(device, external) {
     external_id: `${base}:mode`,
     selector: `${base}:mode`,
     read_only: false,
-    has_feedback: false,
+    // The service saves the mode itself, and only when it is in force: a
+    // stopped reversible heat pump told to cool only switches its use (A.4).
+    // Without feedback, the core would save the value written after the
+    // service returned, and the next pass would start the unit.
+    has_feedback: true,
     min: THERMOSTAT_MODE.OFF,
     max: THERMOSTAT_MODE.COOLING,
     category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -254,6 +276,32 @@ async function createDevice(device) {
         param.value = 'hysteresis';
       }
     });
+  }
+
+  // Only a real thermostat with a mode is reversible (spec A.4): a virtual
+  // one's single relay would heat a room too warm, a pilot-wire heater only
+  // heats, and a unit with no mode to write would keep its use while the
+  // cooling presets applied.
+  const modeParam = params.find((param) => param.name === 'THERMOSTAT_MODE_FEATURE');
+  const reversibleParam = params.find((param) => param.name === 'THERMOSTAT_REVERSIBLE');
+  if (reversibleParam && (!external || !(modeParam && modeParam.value))) {
+    reversibleParam.value = '';
+  }
+  // Nor is one whose mode cannot be switched to cooling: a selector that is
+  // no writable mode — what the form offers — takes no mode write, and a mode
+  // whose maximum is below cooling is clamped to it. Either way the unit would
+  // keep heating under the cooling presets. A mode that cannot be read is left
+  // to the form, which checked it.
+  if (reversibleParam && reversibleParam.value === 'true') {
+    try {
+      const mode = await getFeatureBySelector(this.gladys, modeParam.value);
+      if (mode && (!isWritableMode(mode.feature) || !modeFeatureCanCool(mode.feature))) {
+        logger.warn(`Thermostat: ${modeParam.value} cannot cool, ${device.name} saved as not reversible`);
+        reversibleParam.value = '';
+      }
+    } catch (e) {
+      logger.warn(`Thermostat: could not read the mode ${modeParam.value}: ${e.message}`);
+    }
   }
 
   const features = (device.features || []).filter(
