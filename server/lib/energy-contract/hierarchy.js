@@ -23,13 +23,18 @@ const {
   CONSUMPTION_COST_TYPES,
   DERIVED_CONSUMPTION_SUFFIX,
   DERIVED_COST_SUFFIX,
+  DERIVED_PRODUCTION_SUFFIX,
 } = require('../../services/energy-monitoring/utils/addEnergyFeatures');
+const { PRODUCTION_INDEX_FEATURE_TYPES } = require('../../services/energy-monitoring/utils/constants');
+const { attachBreakdownIndexes } = require('../../services/energy-monitoring/utils/energyBreakdown');
 
-// the categories the integrations and the former "My devices" page ever linked
+// the categories the integrations and the former "My devices" page ever linked, and the production
+// category (a production index and the 30-minute production derived from it)
 const ENERGY_CATEGORIES = [
   DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   DEVICE_FEATURE_CATEGORIES.SWITCH,
   DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+  DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
 ];
 // the consumption type a cost type is derived from (the inverse of the derivation's own map)
 const CONSUMPTION_TYPE_OF_COST = Object.fromEntries(
@@ -170,9 +175,10 @@ async function setDeviceElectricMeter(deviceSelector, meterDeviceId) {
 }
 
 /**
- * @description The consumption a parentless derived feature belongs to, on its own device
- * (section C.3, step 3): the index of `<index>_consumption`, the consumption of `<x>_cost`
- * (`<x>_consumption`, else `<x>`), failing that the only consumption of the same duration.
+ * @description The source a parentless derived feature belongs to, on its own device (section
+ * C.3, step 3): the index of `<index>_consumption`, the production index of `<index>_production`,
+ * the consumption of `<x>_cost` (`<x>_consumption`, else `<x>`), failing that the only
+ * consumption of the same duration.
  * @param {object} feature - A parentless feature.
  * @param {Array} deviceFeatures - The features of its device.
  * @returns {object|null} The parent to restore, if any.
@@ -188,6 +194,18 @@ function findLostDerivedParent(feature, deviceFeatures) {
   ) {
     const indexExternalId = externalId.slice(0, -DERIVED_CONSUMPTION_SUFFIX.length);
     return deviceFeatures.find((f) => isEnergyIndexFeature(f) && f.external_id === indexExternalId) || null;
+  }
+  if (
+    feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR &&
+    feature.type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION &&
+    externalId.endsWith(DERIVED_PRODUCTION_SUFFIX)
+  ) {
+    const indexExternalId = externalId.slice(0, -DERIVED_PRODUCTION_SUFFIX.length);
+    return (
+      deviceFeatures.find(
+        (f) => f.external_id === indexExternalId && (PRODUCTION_INDEX_FEATURE_TYPES[f.category] || []).includes(f.type),
+      ) || null
+    );
   }
   if (!isEnergyCostFeature(feature)) {
     return null;
@@ -288,6 +306,29 @@ async function repairHierarchy() {
       } else {
         feature.energy_parent_id = null;
       }
+    }
+  }
+
+  // 4. a breakdown index hangs under the total of its device (a phase under the total of a
+  // three-phase meter, whatever parent it was left with); a device whose breakdown would close a
+  // cycle through another device is left as it is
+  // eslint-disable-next-line no-restricted-syntax
+  for (const deviceFeatures of featuresByDevice.values()) {
+    const breakdownChanges = attachBreakdownIndexes({ features: deviceFeatures });
+    // eslint-disable-next-line no-await-in-loop
+    const cycles = await Promise.all(breakdownChanges.map(({ feature }) => findCycle(feature, getFeature)));
+    if (cycles.some((cycle) => cycle !== null)) {
+      breakdownChanges.forEach(({ feature, previousParentId }) => {
+        feature.energy_parent_id = previousParentId;
+      });
+    } else {
+      breakdownChanges.forEach(({ feature }) => {
+        const reason =
+          feature.energy_parent_id === null
+            ? 'detached (a total index never hangs under its own breakdown)'
+            : `linked to "${byId.get(feature.energy_parent_id)?.selector}" (breakdown index)`;
+        setParent(feature, feature.energy_parent_id, reason);
+      });
     }
   }
 

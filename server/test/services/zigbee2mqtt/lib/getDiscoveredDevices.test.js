@@ -407,7 +407,9 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     },
   };
   const featureByProperty = (device, category, type, property) =>
-    device.features.find((f) => f.category === category && f.type === type && f.external_id.split(':')[4] === property);
+    device.features.find(
+      (f) => f.category === category && f.type === type && f.external_id.split(':').pop() === property,
+    );
 
   it('should map the Tuya SPM02V3 phases under its totals and derive its consumption and production', async () => {
     // PREPARE
@@ -568,5 +570,85 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     expect(productions).to.have.lengthOf(1);
     expect(productions[0].id).to.equal('production-id');
     expect(productions[0].energy_parent_id).to.equal('produced-energy-id');
+  });
+  it('should hang the phases under their total when the friendly name has a colon', async () => {
+    // PREPARE
+    gladys.stateManager.get.returns(null);
+    zigbee2MqttService.device.discoveredDevices = {
+      'panel:garage': { ...spm02v3, friendly_name: 'panel:garage' },
+    };
+
+    // EXECUTE
+    const [device] = zigbee2MqttService.device.getDiscoveredDevices({}, 'main-meter-feature-id');
+
+    // ASSERT
+    const energyType = DEVICE_FEATURE_TYPES.SWITCH.ENERGY;
+    const total = featureByProperty(device, DEVICE_FEATURE_CATEGORIES.SWITCH, energyType, 'energy');
+    expect(total.external_id).to.equal('zigbee2mqtt:panel:garage:switch:energy:energy');
+    expect(total.energy_parent_id).to.equal('main-meter-feature-id');
+    ['energy_a', 'energy_b', 'energy_c'].forEach((property) =>
+      expect(
+        featureByProperty(device, DEVICE_FEATURE_CATEGORIES.SWITCH, energyType, property).energy_parent_id,
+      ).to.equal(total.id),
+    );
+  });
+
+  it('should not close a cycle when the SPM02V3 is the main meter and a phase was its root', async () => {
+    // PREPARE: saved before the phases hung under the total, the main meter root feature is phase A
+    const energyExternalId = (property) => `zigbee2mqtt:three_phase_meter:switch:energy:${property}`;
+    const savedIndex = (id, property) => ({
+      id,
+      external_id: energyExternalId(property),
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+      energy_parent_id: null,
+    });
+    gladys.stateManager.get.returns({
+      id: 'existing-device-id',
+      external_id: 'zigbee2mqtt:three_phase_meter',
+      features: [savedIndex('energy-a-id', 'energy_a'), savedIndex('energy-id', 'energy')],
+    });
+    zigbee2MqttService.device.discoveredDevices = { three_phase_meter: spm02v3 };
+
+    // EXECUTE
+    const [device] = zigbee2MqttService.device.getDiscoveredDevices({}, 'energy-a-id');
+
+    // ASSERT: the total becomes the root, every phase hangs under it
+    const byExternalId = (property) => device.features.find((f) => f.external_id === energyExternalId(property));
+    expect(byExternalId('energy').energy_parent_id).to.equal(null);
+    ['energy_a', 'energy_b', 'energy_c'].forEach((property) =>
+      expect(byExternalId(property).energy_parent_id).to.equal('energy-id'),
+    );
+  });
+
+  it('should offer the update of a saved SPM02V3 whose phases are not under their total yet', async () => {
+    // PREPARE: the device as Gladys would save it today
+    gladys.stateManager.get.returns(null);
+    zigbee2MqttService.device.discoveredDevices = { three_phase_meter: spm02v3 };
+    const [discovered] = zigbee2MqttService.device.getDiscoveredDevices({}, 'main-meter-feature-id');
+    const saved = { ...discovered, id: 'existing-device-id', features: discovered.features.map((f) => ({ ...f })) };
+    const savedPhasesOnMainMeter = {
+      ...saved,
+      features: saved.features.map((f) =>
+        /:energy_[abc]$/.test(f.external_id) ? { ...f, energy_parent_id: 'main-meter-feature-id' } : { ...f },
+      ),
+    };
+
+    // EXECUTE
+    gladys.stateManager.get.returns(saved);
+    const upToDate = zigbee2MqttService.device.getDiscoveredDevices({ filter_existing: true }, 'main-meter-feature-id');
+    gladys.stateManager.get.returns(savedPhasesOnMainMeter);
+    const [toUpdate] = zigbee2MqttService.device.getDiscoveredDevices(
+      { filter_existing: true },
+      'main-meter-feature-id',
+    );
+
+    // ASSERT
+    expect(upToDate).to.deep.equal([]);
+    expect(toUpdate.updatable).to.equal(true);
+    const total = toUpdate.features.find((f) => f.external_id.endsWith(':switch:energy:energy'));
+    toUpdate.features
+      .filter((f) => /:energy_[abc]$/.test(f.external_id))
+      .forEach((phase) => expect(phase.energy_parent_id).to.equal(total.id));
   });
 });

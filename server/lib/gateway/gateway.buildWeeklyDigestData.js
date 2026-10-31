@@ -3,6 +3,7 @@ const dayjs = require('dayjs');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { isSensorFeature } = require('../../services/mcp/lib/selectFeature');
 const { isEnergyIndexFeature } = require('../../utils/energyHierarchy');
+const { findBreakdownTotal } = require('../../services/energy-monitoring/utils/energyBreakdown');
 
 const DEFAULT_DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED = 48;
 
@@ -187,8 +188,10 @@ function findCostFeatureForConsumption(device, consumptionFeature) {
 }
 
 /**
- * @description Tell whether a consumption is derived from an index that breaks down another index
- * of the same device (a phase of a three-phase meter under its total): the total already counts it.
+ * @description Tell whether a consumption is derived from a breakdown index the core knows (a phase
+ * of a three-phase meter, docs/specs/energy-hierarchy.md section B) whose device exposes the total:
+ * the total already counts it. Any other link between two indexes of a device (two independent
+ * channels, a link left by the former free parent editor) is not a breakdown: both are counted.
  * @param {object} device - Device with features.
  * @param {object} feature - Consumption feature of the device.
  * @returns {boolean} True for the consumption of a breakdown index.
@@ -197,10 +200,7 @@ function findCostFeatureForConsumption(device, consumptionFeature) {
  */
 function isBreakdownIndexConsumption(device, feature) {
   const index = device.features.find((f) => f.id === feature.energy_parent_id);
-  if (!index || !isEnergyIndexFeature(index)) {
-    return false;
-  }
-  return device.features.some((f) => f.id === index.energy_parent_id && isEnergyIndexFeature(f));
+  return Boolean(index) && isEnergyIndexFeature(index) && findBreakdownTotal(device, index) !== null;
 }
 
 /**

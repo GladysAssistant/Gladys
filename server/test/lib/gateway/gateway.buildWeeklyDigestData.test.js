@@ -753,26 +753,28 @@ describe('energy digest helpers', () => {
 });
 
 describe('getConsumptionFeaturesForDigest with a three-phase meter', () => {
+  const index = (id, property, energyParentId, deviceName = 'meter') => ({
+    id,
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+    external_id: `zigbee2mqtt:${deviceName}:switch:energy:${property}`,
+    energy_parent_id: energyParentId,
+  });
+  const consumption = (id, energyParentId) => ({
+    id,
+    category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+    type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    energy_parent_id: energyParentId,
+  });
+
   it('should keep the consumption of the total index, not the one of its phases', () => {
-    const index = (id, energyParentId) => ({
-      id,
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
-      energy_parent_id: energyParentId,
-    });
-    const consumption = (id, energyParentId) => ({
-      id,
-      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-      energy_parent_id: energyParentId,
-    });
     const candidates = getConsumptionFeaturesForDigest([
       {
         id: 'three-phase-meter',
         name: 'SPM02V3',
         features: [
-          index('energy', 'main-meter-feature'),
-          index('energy-a', 'energy'),
+          index('energy', 'energy', 'main-meter-feature', 'panel:garage'),
+          index('energy-a', 'energy_a', 'energy', 'panel:garage'),
           consumption('energy-consumption', 'energy'),
           consumption('energy-a-consumption', 'energy-a'),
         ],
@@ -780,6 +782,44 @@ describe('getConsumptionFeaturesForDigest with a three-phase meter', () => {
     ]);
 
     expect(candidates.map((candidate) => candidate.feature.id)).to.deep.equal(['energy-consumption']);
+  });
+
+  it('should leave out the consumption of a phase even when the link to its total was lost', () => {
+    const candidates = getConsumptionFeaturesForDigest([
+      {
+        id: 'three-phase-meter',
+        name: 'SPM02V3',
+        features: [
+          index('energy', 'energy', 'main-meter-feature'),
+          index('energy-a', 'energy_a', 'main-meter-feature'),
+          consumption('energy-consumption', 'energy'),
+          consumption('energy-a-consumption', 'energy-a'),
+        ],
+      },
+    ]);
+
+    expect(candidates.map((candidate) => candidate.feature.id)).to.deep.equal(['energy-consumption']);
+  });
+
+  it('should count both channels of a device without a total, even linked to one another', () => {
+    // a link left by the former free parent editor: channel B under channel A is not a breakdown
+    const candidates = getConsumptionFeaturesForDigest([
+      {
+        id: 'two-clamps-meter',
+        name: 'PJ-1203A',
+        features: [
+          index('energy-a', 'energy_a', 'main-meter-feature'),
+          index('energy-b', 'energy_b', 'energy-a'),
+          consumption('energy-a-consumption', 'energy-a'),
+          consumption('energy-b-consumption', 'energy-b'),
+        ],
+      },
+    ]);
+
+    expect(candidates.map((candidate) => candidate.feature.id)).to.deep.equal([
+      'energy-a-consumption',
+      'energy-b-consumption',
+    ]);
   });
 });
 

@@ -477,6 +477,82 @@ describe('EnergyContract energy hierarchy (docs/specs/energy-hierarchy.md)', () 
       expect(await parentOf(PLUG_COST_ID)).to.equal(null);
     });
 
+    describe('three-phase meter (section B)', () => {
+      const SPM_TOTAL_ID = '2f0c6a1e-9b7d-4c3e-8a51-6d2e4f7a9b01';
+      const SPM_PHASE_A_ID = '2f0c6a1e-9b7d-4c3e-8a51-6d2e4f7a9b02';
+      const SPM_PRODUCED_ID = '2f0c6a1e-9b7d-4c3e-8a51-6d2e4f7a9b03';
+      const SPM_PRODUCTION_ID = '2f0c6a1e-9b7d-4c3e-8a51-6d2e4f7a9b04';
+      const SPM_PRODUCTION_UNKNOWN_ID = '2f0c6a1e-9b7d-4c3e-8a51-6d2e4f7a9b05';
+      const { SWITCH, ENERGY_PRODUCTION_SENSOR } = DEVICE_FEATURE_CATEGORIES;
+      const producedExternalId = 'zigbee2mqtt:spm:energy-production-sensor:index:produced_energy';
+      const saveThreePhaseMeter = (totalParentId, phaseAParentId) =>
+        device.create({
+          service_id: TEST_SERVICE_ID,
+          name: 'SPM02V3',
+          external_id: 'zigbee2mqtt:spm',
+          selector: 'spm',
+          features: [
+            energyFeature(SPM_TOTAL_ID, 'zigbee2mqtt:spm:switch:energy:energy', DEVICE_FEATURE_TYPES.SWITCH.ENERGY, {
+              category: SWITCH,
+              energy_parent_id: totalParentId,
+            }),
+            energyFeature(
+              SPM_PHASE_A_ID,
+              'zigbee2mqtt:spm:switch:energy:energy_a',
+              DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+              {
+                category: SWITCH,
+                energy_parent_id: phaseAParentId,
+              },
+            ),
+            energyFeature(SPM_PRODUCED_ID, producedExternalId, DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX, {
+              category: ENERGY_PRODUCTION_SENSOR,
+            }),
+            energyFeature(
+              SPM_PRODUCTION_ID,
+              `${producedExternalId}_production`,
+              DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+              { category: ENERGY_PRODUCTION_SENSOR },
+            ),
+            energyFeature(
+              SPM_PRODUCTION_UNKNOWN_ID,
+              'zigbee2mqtt:spm:unknown_production',
+              DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+              { category: ENERGY_PRODUCTION_SENSOR },
+            ),
+          ],
+        });
+
+      it('should hang a phase under its total and link back the production of an index', async () => {
+        await saveThreePhaseMeter(METER_FEATURE_ID, METER_FEATURE_ID);
+        expect(await energyContract.repairHierarchy()).to.equal(2);
+        expect(await parentOf(SPM_PHASE_A_ID)).to.equal(SPM_TOTAL_ID);
+        expect(await parentOf(SPM_TOTAL_ID)).to.equal(METER_FEATURE_ID);
+        expect(await parentOf(SPM_PRODUCTION_ID)).to.equal(SPM_PRODUCED_ID);
+        // no production index of that name: left as is
+        expect(await parentOf(SPM_PRODUCTION_UNKNOWN_ID)).to.equal(null);
+        expect(await energyContract.repairHierarchy()).to.equal(0);
+      });
+
+      it('should make the total a root when it hangs under its phase', async () => {
+        await saveThreePhaseMeter(SPM_PHASE_A_ID, null);
+        await db.DeviceFeature.update({ energy_parent_id: SPM_PRODUCED_ID }, { where: { id: SPM_PRODUCTION_ID } });
+        expect(await energyContract.repairHierarchy()).to.equal(2);
+        expect(await parentOf(SPM_TOTAL_ID)).to.equal(null);
+        expect(await parentOf(SPM_PHASE_A_ID)).to.equal(SPM_TOTAL_ID);
+      });
+
+      it('should not hang a phase under its total through a cycle across devices', async () => {
+        await savePlug(device);
+        await saveThreePhaseMeter(PLUG_INDEX_ID, null);
+        await db.DeviceFeature.update({ energy_parent_id: SPM_PRODUCED_ID }, { where: { id: SPM_PRODUCTION_ID } });
+        await db.DeviceFeature.update({ energy_parent_id: SPM_PHASE_A_ID }, { where: { id: PLUG_INDEX_ID } });
+        expect(await energyContract.repairHierarchy()).to.equal(0);
+        expect(await parentOf(SPM_PHASE_A_ID)).to.equal(null);
+        expect(await parentOf(SPM_TOTAL_ID)).to.equal(PLUG_INDEX_ID);
+      });
+    });
+
     it('should never block the start-up', async () => {
       sinon.stub(energyContract, 'migrateFromEnergyPrice').resolves();
       sinon.stub(energyContract, 'repairHierarchy').rejects(new Error('database locked'));

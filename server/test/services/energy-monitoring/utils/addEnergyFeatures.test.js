@@ -1,5 +1,8 @@
 const { expect } = require('chai');
-const { addEnergyFeatures } = require('../../../../services/energy-monitoring/utils/addEnergyFeatures');
+const {
+  addEnergyFeatures,
+  isDerivedEnergyFeature,
+} = require('../../../../services/energy-monitoring/utils/addEnergyFeatures');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -434,5 +437,52 @@ describe('addEnergyFeatures', () => {
     // New features should be at the end
     expect(result.features[3].type).to.equal(DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION);
     expect(result.features[4].type).to.equal(DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST);
+  });
+});
+
+describe('addEnergyFeatures without selector', () => {
+  it('should not give a selector to the derived features of an index without one', () => {
+    const device = {
+      features: [
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+          external_id: 'matter:1:index',
+          name: 'Index',
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+      ],
+    };
+    const result = addEnergyFeatures(device, 'default-meter-feature-id');
+    expect(result.features).to.have.lengthOf(3);
+    result.features.slice(1).forEach((feature) => expect(feature).to.not.have.property('selector'));
+  });
+});
+
+describe('isDerivedEnergyFeature', () => {
+  it('should tell the features the core derives from an index', () => {
+    const { ENERGY_SENSOR, ENERGY_PRODUCTION_SENSOR, SWITCH } = DEVICE_FEATURE_CATEGORIES;
+    expect(
+      isDerivedEnergyFeature({
+        category: ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      }),
+    ).to.equal(true);
+    expect(
+      isDerivedEnergyFeature({
+        category: ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+      }),
+    ).to.equal(true);
+    expect(
+      isDerivedEnergyFeature({
+        category: ENERGY_PRODUCTION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+      }),
+    ).to.equal(true);
+    expect(isDerivedEnergyFeature({ category: SWITCH, type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY })).to.equal(false);
+    expect(
+      isDerivedEnergyFeature({ category: ENERGY_SENSOR, type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION }),
+    ).to.equal(false);
   });
 });

@@ -45,14 +45,32 @@ the installation has several meters.
   (`ENERGY_INDEX_FEATURE_TYPES`: `energy-sensor`/`index`, `energy-sensor`/`energy`,
   `switch`/`energy`, `teleinformation`/`east`, `easf01`…`easf10`) or a consumption
   (`energy-sensor`/`thirty-minutes-consumption`, `energy-sensor`/`daily-consumption`).
-  Production features (`energy-production-sensor`) are out of this specification.
+  Production features (`energy-production-sensor`) are not energy source features: they are never
+  attached to a meter, and only their derived links (a production index → its 30-minute
+  production, a production phase → its total) are covered here (C.3, F).
 - **Rank**: index 3, consumption 2, cost (`thirty-minutes-consumption-cost`,
   `daily-consumption-cost`) 1, anything else 0. A derived link always goes from a lower rank to a
   higher or equal one (cost → consumption → index; Enedis: 30-minute load curve → daily
   consumption).
 - **Derived link**: a link whose child and parent are on the **same device**. Besides index →
-  consumption → cost, a breakdown index hangs under the total index of its device (the phases of
-  a three-phase meter, section F): a link of equal rank, so a phase is not an attachment feature.
+  consumption → cost, a breakdown index hangs under the total index of its device: a link of equal
+  rank, so a phase is not an attachment feature.
+- **Breakdown index**: an index that is a part of another index of the same device, its **total**
+  (the phases of a three-phase meter). The relation is owned by the core, in a single table
+  (`ENERGY_INDEX_BREAKDOWNS`, `server/services/energy-monitoring/utils/energyBreakdown.js`): by
+  integration (the first segment of the `external_id`), the property of a breakdown index → the
+  property of its total, the property being read from the end of the `external_id` (the last
+  segment, or the last but one when the last is a numeric suffix), so a colon in a device name
+  does not shift it. The total is the feature of the same device, category and type whose
+  `external_id` only differs by that property; a device that does not expose it (the two clamps
+  of a Tuya PJ-1203A) has no breakdown. A link between two indexes of a device that is not in
+  this table (two independent channels, a link left by the former free parent editor) is **not**
+  a breakdown. `attachBreakdownIndexes(device)` hangs every breakdown index of a device under its
+  total; a total never hangs on its own device: one left under one of its features (a phase was
+  the root feature of the main meter, so the derivation attached the total to it) takes the
+  parent that feature had when it is on another device, else becomes a root. The discoveries and
+  the start-up repair (C.3, step 4) call it; an integration exposing breakdown indexes adds its
+  properties to the table.
 - **Attachment link**: a link whose child and parent are on **different devices**.
 - **Attachment features of a device**: its energy source features that are not the child of a
   derived link (parent `null` or on another device). They are what attaches the device to a
@@ -123,7 +141,12 @@ is written when the hierarchy is sound), each change logged:
      index back as parent;
    - a cost feature whose `external_id` is `<x>_cost` gets back the consumption of the same
      duration whose `external_id` is `<x>_consumption`, else `<x>`; failing that, the only
-     consumption of the same duration on the device.
+     consumption of the same duration on the device;
+   - a 30-minute production whose `external_id` is `<index>_production` gets that production
+     index back as parent;
+4. every breakdown index (section B) hangs under its total, whatever parent it was left with,
+   through `attachBreakdownIndexes`; the changes of a device are dropped when one of them would
+   close a cycle through another device.
 
 The repair requests no cost recalculation (the energy-monitoring service is not started yet at
 that point): the costs of the repaired period can be recomputed from the energy monitoring
@@ -179,12 +202,20 @@ the new parent would close a cycle (as before).
 
 - Zigbee2mqtt, Tasmota, MQTT, Enedis and the external integrations keep their derivation.
 - **Zigbee2mqtt** hangs the per-phase indexes of a meter exposing a total under that total
-  (`energy_a/b/c` under `energy`, `energy_produced_a/b/c` under `produced_energy`, e.g. Tuya
-  SPM02V3), a phase saved under the main meter included; without a total (the two clamps of a Tuya
-  PJ-1203A), each index is attached like any other. The weekly digest leaves out the consumption of
-  a phase: its total already counts it. Zigbee2mqtt also derives the 30-minute production of every
+  (`attachBreakdownIndexes`, section B: `energy_a/b/c` under `energy`, `energy_produced_a/b/c`
+  under `produced_energy`, e.g. Tuya SPM02V3), a phase saved under the main meter included; without
+  a total (the two clamps of a Tuya PJ-1203A), each index is attached like any other. A saved
+  device whose links change this way is offered for "Update" (`updatable`), like one missing a
+  derived feature. The weekly digest leaves out the consumption of a breakdown index whose device
+  exposes its total (read from the table, not from the link, so a lost link does not double
+  count): its total already counts it. Zigbee2mqtt also derives the 30-minute production of every
   production index (`addProductionFeatures`, `<index>_production`, filled by the production job),
-  never attached to a meter.
+  never attached to a meter, and keeps it on rediscovery (`isDerivedEnergyFeature`). The other
+  discoveries (Matter, Tasmota, external integrations) do not derive production yet: a follow-up.
+- The derived features are built by one helper (`buildDerivedFeature` in `addEnergyFeatures.js`):
+  read-only, historized, named after their source (`<source external_id><suffix>`,
+  `<source name> (<label>)`), with a `<source selector><suffix>` selector only when the source has
+  a selector.
 - **Matter** derives the energy features of a published cumulative index at discovery (the
   paired devices of `GET /api/v1/service/matter/paired-device`), like Zigbee2mqtt: the features
   already in Gladys keep their id and their parent — **a root included**: `addEnergyFeatures`
@@ -195,9 +226,9 @@ the new parent would close a cycle (as before).
   the server cannot see the existing device: the front gives every matched feature the id and the
   parent of the existing one (the meter the user chose, or a root), and remaps the parents of the
   newly derived features onto those ids.
-- The `<index>_consumption` / `<index>_cost` naming is owned by `addEnergyFeatures.js`
-  (`DERIVED_CONSUMPTION_SUFFIX`, `DERIVED_COST_SUFFIX`, with `CONSUMPTION_COST_TYPES`): the repair
-  and Matter import it.
+- The `<index>_consumption` / `<index>_cost` / `<index>_production` naming is owned by
+  `addEnergyFeatures.js` (`DERIVED_CONSUMPTION_SUFFIX`, `DERIVED_COST_SUFFIX`,
+  `DERIVED_PRODUCTION_SUFFIX`, with `CONSUMPTION_COST_TYPES`): the repair and Matter import it.
 - The other internal integrations publishing an index without derivation (Tuya, Xiaomi, Z-Wave JS
   UI, Broadlink) are deprecated in favour of external integrations and are not changed.
 
@@ -214,10 +245,16 @@ the new parent would close a cycle (as before).
   consumption, `east` preferred to `easf01`, a consumption fed by an integration accepted.
 - Contracts: creation and meter change detach the meter.
 - `repairHierarchy`: cycle cut, meter made root, derived links restored by name and by
-  uniqueness, nothing written on a sound hierarchy.
+  uniqueness, the production of an index linked back, a phase hung under its total (a total left
+  under its phase made a root, nothing changed when it would close a cycle), nothing written on a
+  sound hierarchy.
+- Breakdown table: the property read from the end of the `external_id` (a colon in the device
+  name, a numeric suffix), an unknown integration or property, a device without a total.
 - Matter: derived features added, ids and parents of existing features kept, derived features
   re-injected, no bogus selector.
 - Zigbee2mqtt: the phases of a three-phase meter under its totals (a phase saved under the main
-  meter moved), the per-channel indexes of a device without a total on the main meter, the
-  production features derived and kept on rediscovery; the digest leaving out the phases.
+  meter moved and the device offered for update, a friendly name with a colon, no cycle when a
+  phase was the root of the main meter), the per-channel indexes of a device without a total on
+  the main meter, the production features derived and kept on rediscovery; the digest leaving
+  out the phases (even with a lost link) and counting two linked independent channels.
 - Front: Cypress spec of the page (meters, unattached devices, meter select).
