@@ -2304,6 +2304,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
     CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
+    // state of one sub-container while its image downloads (start of a
+    // `manual` entry whose image is absent): started, progress, end
+    CONTAINER_UPDATED: 'external-integration.container-updated',
     DEVICE_SET_VALUE: 'external-integration.device.set-value',
     DEVICE_POLL: 'external-integration.device.poll',
     COMMAND_RESULT: 'external-integration.command-result',

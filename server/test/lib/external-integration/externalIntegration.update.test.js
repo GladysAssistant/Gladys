@@ -461,10 +461,63 @@ describe('externalIntegration.update', () => {
       system: { getContainers: fake.resolves([{ id: 'sub-1' }]) },
     });
     await externalIntegration.update(service.selector);
-    sinonAssert.calledWith(system.pull, 'eclipse-mosquitto:2.0.18');
+    // mqtt is manual and was never pulled: an update does not download it
+    sinonAssert.neverCalledWith(system.pull, 'eclipse-mosquitto:2.0.18');
     sinonAssert.calledWith(system.pull, 'ghcr.io/blakeblackshear/frigate:0.14.1');
     sinonAssert.calledWith(system.removeContainer, 'sub-1', { force: true });
     sinonAssert.notCalled(system.removeNetwork);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should re-pull a manual sub-container image already on the disk', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const imageExists = sinon.stub();
+    imageExists.withArgs('eclipse-mosquitto:2.0.18').resolves(true);
+    imageExists.resolves(false);
+    const { externalIntegration, system } = buildSupervisor({ system: { imageExists } });
+    await externalIntegration.update(service.selector);
+    sinonAssert.calledWith(system.pull, 'eclipse-mosquitto:2.0.18');
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should pull the new tag of a manual sub-container whose previous tag is on the disk', async () => {
+    const service = await seedExternalService({
+      store_slug: 'john/gladys-frigate',
+      manifest: TEST_CONTAINERS_MANIFEST,
+    });
+    const imageExists = sinon.stub();
+    // the version being replaced ran mosquitto 2.0.18; the new one declares 2.0.20
+    imageExists.withArgs('eclipse-mosquitto:2.0.18').resolves(true);
+    imageExists.resolves(false);
+    const { externalIntegration, system } = buildSupervisor({ system: { imageExists } });
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-frigate',
+      manifest: {
+        ...TEST_CONTAINERS_MANIFEST,
+        version: '2.0.0',
+        docker_image: 'ghcr.io/john/demo:2.0.0',
+        containers: [
+          { ...TEST_CONTAINERS_MANIFEST.containers[0], docker_image: 'eclipse-mosquitto:2.0.20' },
+          // a manual entry the previous version did not declare, never pulled
+          { name: 'go2rtc', docker_image: 'alexxit/go2rtc:1.9.4', start: 'manual' },
+        ],
+      },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    await externalIntegration.update(service.selector);
+    sinonAssert.calledWith(system.pull, 'eclipse-mosquitto:2.0.20');
+    sinonAssert.neverCalledWith(system.pull, 'alexxit/go2rtc:1.9.4');
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should pull a manual sub-container image when its local presence cannot be checked', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration, system } = buildSupervisor({
+      system: { imageExists: fake.rejects(new Error('DOCKER_DOWN')) },
+    });
+    await externalIntegration.update(service.selector);
+    sinonAssert.calledWith(system.pull, 'eclipse-mosquitto:2.0.18');
+    externalIntegration.clearTimers(service.id);
   });
 
   it('should remove the images of the replaced version once the new one runs', async () => {
@@ -525,7 +578,7 @@ describe('externalIntegration.update', () => {
   it('should translate a failing sub-container image pull on update', async () => {
     const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
     const pullStub = sinon.stub();
-    pullStub.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('NO_MATCHING_MANIFEST'));
+    pullStub.withArgs('ghcr.io/blakeblackshear/frigate:0.14.1').rejects(new Error('NO_MATCHING_MANIFEST'));
     pullStub.resolves(true);
     const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
     try {

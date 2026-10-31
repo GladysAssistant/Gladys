@@ -72,11 +72,16 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
       throw new Error422(`granted_devices: ${unknownClasses.join(', ')} not requested by the manifest`);
     }
   }
-  // install = every image (main + sub-containers) made available now, so a
-  // start never depends on the network
-  await Promise.each(finalManifest.containers || [], async (entry) => {
-    await this.ensureImage(entry.docker_image, { allowLocal });
-  });
+  // install = the images that start without being asked for (main + `auto`
+  // sub-containers) made available now, so their start never depends on the
+  // network. A `manual` entry is pulled at its first POST /container/:name/start
+  // (B.2): the Frigate image weighs gigabytes that a remote-mode user never runs
+  await Promise.each(
+    (finalManifest.containers || []).filter((entry) => entry.start !== 'manual'),
+    async (entry) => {
+      await this.ensureImage(entry.docker_image, { allowLocal });
+    },
+  );
   const selector = await this.buildSelector({ storeSlug, manifestName: finalManifest.name });
   const existingSelector = await db.Service.findOne({ where: { selector } });
   if (existingSelector !== null) {

@@ -27,6 +27,11 @@ async function checkSubContainersHealth(service) {
         // a restart is already scheduled with backoff
         return;
       }
+      if (this.subContainerPulls.has(`${service.id}:${entry.name}`)) {
+        // its image is downloading: the container does not exist yet, and a
+        // deliberate start is not a crash to count
+        return;
+      }
       const container = await this.findSubContainer(service, entry.name);
       let running = false;
       if (container) {
