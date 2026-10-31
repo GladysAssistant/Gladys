@@ -533,6 +533,12 @@ function createActions(store) {
           });
           return;
         }
+        // A reversible heat pump is switched through the unit's mode (spec A.4):
+        // without it, its cooling presets would apply to a unit still heating.
+        if (reversible && !state.thermostatEditModeFeature) {
+          store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'reversibleNoMode' });
+          return;
+        }
 
         // The standby order is saved as the form shows it: the one this module
         // is actually sent (spec C.1.1). An eco stored on a module that refuses
