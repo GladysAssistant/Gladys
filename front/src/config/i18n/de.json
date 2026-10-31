@@ -534,12 +534,16 @@
         "thresholdsLabel": "Eigene Schwellenwerte konfigurieren"
       },
       "userPresence": {
-        "description": "Zeige an, wer zuhause ist und wer nicht. Du kannst die Anwesenheit von Benutzern in Szenen ändern und hier die anzuzeigenden Benutzer auswählen.",
-        "left": "nicht zuhause (seit {{since}})",
+        "description": "Zeige an, wer zuhause ist und wer nicht. Du kannst die Anwesenheit von Benutzern in Szenen ändern und hier die anzuzeigenden Benutzer auswählen. Ohne Auswahl werden alle Benutzer angezeigt.",
+        "away": "nicht zuhause",
+        "since": "seit {{duration}}",
+        "showLastname": "Nachnamen anzeigen",
+        "showAwaySince": "Abwesenheitsdauer anzeigen",
+        "showHomeSince": "Anwesenheitsdauer anzeigen",
         "atHome": "zuhause",
         "neverSeenAtHome": "nie zuhause gesehen",
         "error": "Es gab einen Netzwerkfehler beim Abrufen der Benutzerliste. Bitte aktualisiere die Seite.",
-        "emptyText": "Es sind keine Benutzer ausgewählt. Du kannst diese Box bearbeiten, um die anzuzeigenden Benutzer auszuwählen."
+        "emptyText": "Keine Benutzer entsprechen der Auswahl. Bearbeite diese Box, um Benutzer auszuwählen, oder lasse die Auswahl leer, um alle anzuzeigen."
       },
       "camera": {
         "editCameraLabel": "Wähle die Kamera aus, die du hier anzeigen möchtest.",
@@ -4079,6 +4083,14 @@
         "userSeenDescription": "Diese Aktion markiert den Benutzer als \"zu Hause\".",
         "userLeftHomeDescription": "Diese Aktion mariert den Benutzer als \"hat das Zuhause verlassen\"."
       },
+      "setUserLocation": {
+        "description": "Speichert die GPS-Koordinaten eines Benutzers und prüft das Betreten und Verlassen von Gebieten. Zuhause/abwesend wird weiterhin über Szenen gesteuert.",
+        "latitude": "Breitengrad (−90 bis 90)",
+        "longitude": "Längengrad (−180 bis 180)",
+        "latitudePlaceholder": "z. B. 48.137154",
+        "longitudePlaceholder": "z. B. 11.576124",
+        "variablesHint": "Koordinate eingeben oder mit {{ eine Variable aus einem Trigger oder einer vorherigen Aktion auswählen. Dezimalpunkt verwenden."
+      },
       "checkUserPresence": {
         "description": "Wenn diese Aktion ausgeführt wird, überprüft Gladys, ob eines der ausgewählten Geräte in den letzten x Minuten zu Hause gesehen wurde. Wenn dies der Fall ist, tut die Aktion nichts weiter. Wenn kein Gerät gesehen wurde, wird der Benutzer als \"hat das Zuhause verlassen\" markiert.",
         "userLabel": "Benutzer",
@@ -4287,6 +4299,7 @@
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",
         "set-out-of-home": "Benutzer hat das Zuhause verlassen",
+        "set-location": "Standort eines Benutzers setzen",
         "check-presence": "Anwesenheit von Benutzern überprüfen"
       },
       "http": {
@@ -4372,7 +4385,8 @@
       "user": {
         "check-presence": "Einen Benutzer als abwesend markieren, wenn er länger nicht gesehen wurde",
         "set-seen-at-home": "Gladys mitteilen, dass ein Benutzer zu Hause ist",
-        "set-out-of-home": "Gladys mitteilen, dass ein Benutzer das Haus verlassen hat"
+        "set-out-of-home": "Gladys mitteilen, dass ein Benutzer das Haus verlassen hat",
+        "set-location": "GPS-Koordinaten aus festen Werten oder Szenenvariablen speichern"
       },
       "house": {
         "is-empty": "Nur fortfahren, wenn niemand zu Hause ist",

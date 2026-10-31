@@ -26,6 +26,27 @@ const UserPresenceBox = ({ children, ...props }) => (
             classNamePrefix="react-select"
           />
         </div>
+        {[
+          ['presence_show_lastname', 'showLastname', false],
+          ['presence_show_away_since', 'showAwaySince', true],
+          ['presence_show_home_since', 'showHomeSince', false]
+        ].map(([field, label, defaultValue]) => (
+          <div class="form-group" key={field}>
+            <label class="custom-switch">
+              <input
+                type="checkbox"
+                name={field}
+                class="custom-switch-input"
+                checked={props.box[field] === undefined ? defaultValue : props.box[field]}
+                onChange={e => props.updateBoxConfig(props.x, props.y, { [field]: e.target.checked })}
+              />
+              <span class="custom-switch-indicator" />
+              <span class="custom-switch-description">
+                <Text id={`dashboard.boxes.userPresence.${label}`} />
+              </span>
+            </label>
+          </div>
+        ))}
       </div>
     </div>
   </BaseEditBox>
@@ -37,7 +58,9 @@ class EditUserPresence extends Component {
       await this.setState({ loading: true });
       const users = await this.props.httpClient.get('/api/v1/user');
       const usersSelect = users.map(u => ({
-        label: u.firstname,
+        label: users.some(other => other.selector !== u.selector && other.firstname === u.firstname)
+          ? `${u.firstname} (${u.selector})`
+          : u.firstname,
         value: u.selector
       }));
       await this.setState({ users: usersSelect, loading: false });

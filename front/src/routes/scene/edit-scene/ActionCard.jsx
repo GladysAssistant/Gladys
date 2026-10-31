@@ -32,6 +32,7 @@ import BlinkLightParams from './actions/BlinkLightParams';
 import TurnOnOffSwitchParams from './actions/TurnOnOffSwitchParams';
 import StartSceneParams from './actions/StartSceneParams';
 import UserPresence from './actions/UserPresence';
+import SetUserLocation from './actions/SetUserLocation';
 import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
@@ -76,6 +77,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.USER.SET_SEEN_AT_HOME]: UserPresence,
   [ACTIONS.USER.CHECK_PRESENCE]: CheckUserPresence,
   [ACTIONS.USER.SET_OUT_OF_HOME]: UserPresence,
+  [ACTIONS.USER.SET_LOCATION]: SetUserLocation,
   [ACTIONS.HTTP.REQUEST]: HttpRequest,
   [ACTIONS.CONDITION.CHECK_TIME]: CheckTime,
   [ACTIONS.CONDITION.IN_TIME_RANGE]: InTimeRange,

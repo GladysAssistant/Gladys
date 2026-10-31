@@ -38,6 +38,7 @@ const SceneManager = function SceneManager(
   _brain,
   service,
   tts,
+  location,
 ) {
   this.stateManager = stateManager;
   this.event = event;
@@ -50,6 +51,7 @@ const SceneManager = function SceneManager(
   this.gateway = gateway;
   this.service = service;
   this.tts = tts;
+  this.location = location;
   // attached after construction by lib/index.js (energy-contract.current-price condition)
   this.energyContract = null;
   this.scenes = {};

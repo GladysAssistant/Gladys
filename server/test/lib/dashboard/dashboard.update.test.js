@@ -59,6 +59,48 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[1][0]).to.have.property('provider', '');
   });
 
+  it('should persist optional presence settings without changing legacy boxes', async () => {
+    const boxes = [
+      {
+        columns: [
+          [
+            { type: DASHBOARD_BOX_TYPE.USER_PRESENCE },
+            {
+              type: DASHBOARD_BOX_TYPE.USER_PRESENCE,
+              users: ['tony'],
+              presence_show_lastname: true,
+              presence_show_home_since: true,
+              presence_show_away_since: false,
+            },
+            {
+              type: DASHBOARD_BOX_TYPE.USER_PRESENCE,
+              presence_show_lastname: false,
+              presence_show_home_since: false,
+              presence_show_away_since: true,
+            },
+          ],
+        ],
+      },
+    ];
+    await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', { boxes });
+    const saved = await dashboard.getBySelector('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard');
+    expect(saved.boxes).to.deep.equal(boxes);
+  });
+
+  [
+    { presence_show_lastname: 'invalid' },
+    { presence_show_home_since: 'invalid' },
+    { presence_show_away_since: 'invalid' },
+  ].forEach((settings) => {
+    it(`should reject invalid presence settings: ${Object.keys(settings)[0]}`, async () => {
+      await assert.isRejected(
+        dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+          boxes: [{ columns: [[{ type: DASHBOARD_BOX_TYPE.USER_PRESENCE, ...settings }]] }],
+        }),
+      );
+    });
+  });
+
   it('should save a camera box with its PTZ controls toggle', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [

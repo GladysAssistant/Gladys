@@ -125,6 +125,7 @@ function Gladys(params = {}) {
     brain,
     service,
     tts,
+    location,
   );
   gateway.scene = scene;
   gateway.energyPrice = energyContract;

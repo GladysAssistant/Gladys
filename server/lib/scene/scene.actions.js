@@ -624,6 +624,33 @@ const actionsFunc = {
   [ACTIONS.USER.SET_OUT_OF_HOME]: async (self, action) => {
     await self.house.userLeft(action.house, action.user);
   },
+  [ACTIONS.USER.SET_LOCATION]: async (self, action, scope) => {
+    if (!action.user) {
+      throw new AbortScene('USER_LOCATION_USER_REQUIRED');
+    }
+    const coordinates = {};
+    [
+      ['latitude', 90],
+      ['longitude', 180],
+    ].forEach(([field, limit]) => {
+      const value = action[field];
+      if (typeof value !== 'number' && typeof value !== 'string') {
+        throw new AbortScene('USER_LOCATION_INVALID_COORDINATES');
+      }
+      let rendered;
+      try {
+        rendered = Handlebars.compile(String(value), { noEscape: true, strict: true })(scope).trim();
+      } catch (e) {
+        throw new AbortScene('USER_LOCATION_INVALID_COORDINATES');
+      }
+      const coordinate = Number(rendered);
+      if (rendered === '' || !Number.isFinite(coordinate) || Math.abs(coordinate) > limit) {
+        throw new AbortScene('USER_LOCATION_INVALID_COORDINATES');
+      }
+      coordinates[field] = coordinate;
+    });
+    await self.location.create(action.user, coordinates);
+  },
   [ACTIONS.HTTP.REQUEST]: async (self, action, scope, path) => {
     const headersObject = {};
     action.headers.forEach((header) => {
