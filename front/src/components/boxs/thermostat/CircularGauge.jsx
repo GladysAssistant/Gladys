@@ -399,32 +399,39 @@ const CircularGauge = ({
         </g>
       )}
 
-      {/* Active icon: at bottom of gauge */}
+      {/* Active icon: at bottom of gauge. Placed by a group, and drawn on the
+          group's origin, so that its pulse scales about its own centre: Safari
+          resolves `transform-box: fill-box` on SVG text against the SVG's origin
+          instead, and the flame drifted towards the bottom right on every pulse. */}
       {/* No icon for an open window: the icon font has no window glyph, and the
           state is already named by the banner under the gauge. */}
       {!isWindowOpen && isActive && mode === 'heating' && (
-        <text
-          aria-hidden="true"
-          x={cx}
-          y={cy + 54}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          class={`${style.activeIconHeating} ${style.gaugeIconGlyph}`}
-        >
-          {ICONS.flame}
-        </text>
+        <g transform={`translate(${cx} ${cy + 54})`}>
+          <text
+            aria-hidden="true"
+            x={0}
+            y={0}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            class={`${style.activeIconHeating} ${style.gaugeIconGlyph}`}
+          >
+            {ICONS.flame}
+          </text>
+        </g>
       )}
       {!isWindowOpen && isActive && mode === 'cooling' && (
-        <text
-          aria-hidden="true"
-          x={cx}
-          y={cy + 54}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          class={`${style.activeIconCooling} ${style.gaugeIconGlyph}`}
-        >
-          {ICONS.snowflake}
-        </text>
+        <g transform={`translate(${cx} ${cy + 54})`}>
+          <text
+            aria-hidden="true"
+            x={0}
+            y={0}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            class={`${style.activeIconCooling} ${style.gaugeIconGlyph}`}
+          >
+            {ICONS.snowflake}
+          </text>
+        </g>
       )}
 
       {/* The arrow keys on the slider cover the keyboard case, so these stay
