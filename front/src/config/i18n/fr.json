@@ -814,7 +814,7 @@
         "cancelManual": "Annuler le mode manuel",
         "windowOpen": "Fenêtre ouverte — chauffage suspendu",
         "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",
-        "presenceAbsent": "Personne vu depuis {{time}} — {{preset}}",
+        "presenceAbsent": "Aucune présence depuis {{time}} — {{preset}}",
         "pilotWireHeating": "Chauffe en cours",
         "pilotWireStandby": "En veille : consigne atteinte",
         "pilotWireOrderCurrent": "Ordre : {{order}}",

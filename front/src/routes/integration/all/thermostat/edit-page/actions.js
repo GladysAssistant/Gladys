@@ -246,6 +246,7 @@ function createActions(store) {
           activeSchedule = '';
         }
         const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE'));
+        const storedPresenceDelay = parseFloat(getParam('THERMOSTAT_PRESENCE_DELAY'));
         store.setState({
           thermostatEditActiveSchedule: activeSchedule,
           thermostatEditDeviceSchedule: activeSchedule,
@@ -277,7 +278,17 @@ function createActions(store) {
           // waits its default minute, which is what the field shows.
           thermostatEditWindowDelay: getParam('THERMOSTAT_WINDOW_DELAY') || '60',
           thermostatEditPresenceFeatures: parseSelectorList(getParam('THERMOSTAT_PRESENCE_FEATURE')),
-          thermostatEditPresenceDelay: getParam('THERMOSTAT_PRESENCE_DELAY') || String(DEFAULT_PRESENCE_DELAY_MINUTES),
+          // The delay the server regulates on: a stored value out of bounds is
+          // shown clamped, and one that is no number as the default.
+          thermostatEditPresenceDelay: String(
+            Math.min(
+              MAX_PRESENCE_DELAY_MINUTES,
+              Math.max(
+                MIN_PRESENCE_DELAY_MINUTES,
+                Number.isFinite(storedPresenceDelay) ? storedPresenceDelay : DEFAULT_PRESENCE_DELAY_MINUTES
+              )
+            )
+          ),
           // A preset the server would not take is shown as the one it uses instead.
           thermostatEditPresencePreset: PRESENCE_PRESETS.includes(getParam('THERMOSTAT_PRESENCE_PRESET'))
             ? getParam('THERMOSTAT_PRESENCE_PRESET')

@@ -156,6 +156,18 @@ const DEFAULT_PILOT_WIRE_ORDERS = {
 
 const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
 
+// The orders from the least heat to the most, which their values do not say:
+// comfort -2 °C sits below comfort -1 °C. What an empty room's preset is
+// weighed on when the heater regulates itself (A.4).
+const PILOT_WIRE_ORDER_RANK = {
+  [PILOT_WIRE_MODE.OFF]: 0,
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 1,
+  [PILOT_WIRE_MODE.ECO]: 2,
+  [PILOT_WIRE_MODE.COMFORT_2]: 3,
+  [PILOT_WIRE_MODE.COMFORT_1]: 4,
+  [PILOT_WIRE_MODE.COMFORT]: 5,
+};
+
 /**
  * @description The order a module can actually be sent, from the options its
  * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
@@ -219,5 +231,6 @@ module.exports = {
   DEFAULT_THERMOSTAT_TYPE,
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
+  PILOT_WIRE_ORDER_RANK,
   supportedPilotWireOrder,
 };

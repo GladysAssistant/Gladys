@@ -53,6 +53,7 @@ const {
   MAX_TPI_PROPORTIONAL_BAND,
   DEFAULT_MANUAL_DURATION_MINUTES,
   PILOT_WIRE_REGULATIONS,
+  PILOT_WIRE_ORDER_RANK,
   PRESETS: TEMPERATURE_PRESETS,
   supportedPilotWireOrder,
 } = require('../../../utils/thermostatConstants');
@@ -458,6 +459,14 @@ async function findOpenWindow(gladys, selectors, delaySeconds = 0, openedAt = nu
   return open.length > 0 ? open[0].feature.selector : null;
 }
 
+// A motion or presence sensor reporting a state, 1 for someone and 0 for nobody:
+// what the edit form offers. Anything else named in the param — by a client
+// writing it directly, or a sensor re-typed since — says nothing about the room.
+const isPresenceSensor = (feature) =>
+  (feature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR ||
+    feature.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR) &&
+  feature.type === DEVICE_FEATURE_TYPES.SENSOR.BINARY;
+
 /**
  * @description Whether the room is empty: every presence sensor of the thermostat
  * that can be read has seen nobody for THERMOSTAT_PRESENCE_DELAY minutes (A.4).
@@ -490,11 +499,22 @@ async function findAbsence(gladys, selectors, delayMinutes, vacatedAt = null, no
   // Every sensor is weighed, as for the windows: each keeps its own time, which
   // one seeing someone forgets (readsZeroSince).
   const readings = found
-    .map((sensor, index) =>
-      sensor && sensor.feature.last_value !== null && sensor.feature.last_value !== undefined
-        ? readsZeroSince(sensor.feature, selectors[index], vacatedAt, now)
-        : undefined,
-    )
+    .map((sensor, index) => {
+      // A failed lookup keeps the time recorded: the sensor may well still be
+      // quiet, and it is weighed again on the next pass.
+      if (!sensor || !isPresenceSensor(sensor.feature)) {
+        return undefined;
+      }
+      if (sensor.feature.last_value === null || sensor.feature.last_value === undefined) {
+        // A sensor that lost its value knows nothing of the room any more: its
+        // next `0` starts a new count rather than resume an old one.
+        if (vacatedAt) {
+          vacatedAt.delete(selectors[index]);
+        }
+        return undefined;
+      }
+      return readsZeroSince(sensor.feature, selectors[index], vacatedAt, now);
+    })
     .filter((since) => since !== undefined);
   if (readings.length === 0 || readings.includes(null)) {
     return null;
@@ -521,33 +541,6 @@ function getSetpointForPreset(preset, config) {
   }
   const defaults = defaultPresetTemps(config && config.default_mode);
   return defaults[preset] !== undefined ? defaults[preset] : FALLBACK_SETPOINT;
-}
-
-/**
- * @description The preset an empty room is regulated on: the absence preset
- * (THERMOSTAT_PRESENCE_PRESET) when it saves energy over the one in force, the
- * one in force otherwise (A.4).
- *
- * Only ever a saving: with eco at 18 °C as the absence preset, a programme
- * already on frost protection at night must stay there, not be raised to 18 °C
- * because the bedroom is empty. Lower is a saving when heating, higher when
- * cooling; a pilot-wire heater only heats. `off` and `schedule` name no
- * temperature, and are left alone.
- * @param {string} preset - The preset in force.
- * @param {object} config - Thermostat config object.
- * @returns {string} The preset to regulate on.
- * @example
- * presetForEmptyRoom('comfort', config); // 'eco'
- */
-function presetForEmptyRoom(preset, config) {
-  if (!TEMPERATURE_PRESETS.includes(preset) || preset === config.presence_preset) {
-    return preset;
-  }
-  const cooling = config.default_mode === 'cooling' && !config.pilot_wire_feature;
-  const inForce = getSetpointForPreset(preset, config);
-  const empty = getSetpointForPreset(config.presence_preset, config);
-  const saves = cooling ? empty > inForce : empty < inForce;
-  return saves ? config.presence_preset : preset;
 }
 
 /**
@@ -916,6 +909,41 @@ function pilotWireOrderForPreset(preset, config) {
   }
   // buildParamsConfig always fills the table in, defaults included.
   return config.pilot_wire_orders[preset];
+}
+
+/**
+ * @description The preset an empty room is regulated on: the absence preset
+ * (THERMOSTAT_PRESENCE_PRESET) when it saves energy over the one in force, the
+ * one in force otherwise (A.4).
+ *
+ * Only ever a saving: with eco at 18 °C as the absence preset, a programme
+ * already on frost protection at night must stay there, not be raised to 18 °C
+ * because the bedroom is empty. Lower is a saving when heating, higher when
+ * cooling; a pilot-wire heater only heats, and one regulating itself is
+ * weighed on the orders its presets send rather than on setpoints it never
+ * gets. `off` and `schedule` name no temperature, and are left alone.
+ * @param {string} preset - The preset in force.
+ * @param {object} config - Thermostat config object.
+ * @returns {string} The preset to regulate on.
+ * @example
+ * presetForEmptyRoom('comfort', config); // 'eco'
+ */
+function presetForEmptyRoom(preset, config) {
+  if (!TEMPERATURE_PRESETS.includes(preset) || preset === config.presence_preset) {
+    return preset;
+  }
+  if (config.pilot_wire_feature && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.HEATER) {
+    // A heater regulating itself is sent an order, not a setpoint (C.1.1): the
+    // saving is in the orders the two presets are set to.
+    const inForceOrder = PILOT_WIRE_ORDER_RANK[pilotWireOrderForPreset(preset, config)];
+    const emptyOrder = PILOT_WIRE_ORDER_RANK[pilotWireOrderForPreset(config.presence_preset, config)];
+    return emptyOrder < inForceOrder ? config.presence_preset : preset;
+  }
+  const cooling = config.default_mode === 'cooling' && !config.pilot_wire_feature;
+  const inForce = getSetpointForPreset(preset, config);
+  const empty = getSetpointForPreset(config.presence_preset, config);
+  const saves = cooling ? empty > inForce : empty < inForce;
+  return saves ? config.presence_preset : preset;
 }
 
 // When Gladys regulates, the module only ever carries comfort or frost from it:
@@ -1410,11 +1438,14 @@ async function regulateDevice(
     // is empty: Comfort picked for the evening keeps nobody warm once everybody
     // has gone to bed. A setpoint set on the dial is never touched — someone just
     // asked for that temperature, in the room — and it lapses on its own.
+    // An expired hold goes whatever it held, so it needs no lookup.
+    const expired = Boolean(manualUntil) && Date.now() > manualUntil;
     const pickedPresetLowered =
+      !expired &&
       emptySince !== null &&
       presetForEmptyRoom(currentPreset, config) !== currentPreset &&
       (await holdsPickedPreset(gladys, config, hold, currentPreset));
-    if (manualUntil && Date.now() > manualUntil) {
+    if (expired) {
       logger.info(`Thermostat schedule: manual hold expired for ${selector}, reverting to schedule`);
       await clearManualHold.call({ gladys }, device);
       // Hand the thermostat back to its programme rather than to the preset the
