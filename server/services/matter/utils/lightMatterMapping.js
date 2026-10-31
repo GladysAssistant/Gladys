@@ -15,11 +15,24 @@ const MATTER_LIGHT_DEVICE_TYPE = {
 
 const MATTER_LIGHT_DEVICE_TYPE_CODES = Object.values(MATTER_LIGHT_DEVICE_TYPE);
 
+// Matter device type IDs of the plugs and load controls. A dimmable one must expose LevelControl
+// with the lighting feature, which becomes a light brightness: its OnOff must stay a switch anyway,
+// or wall outlets and in-wall dimmers would join the light scenes.
+const MATTER_PLUG_DEVICE_TYPE = {
+  ON_OFF_PLUG_IN_UNIT: 0x010a,
+  DIMMABLE_PLUG_IN_UNIT: 0x010b,
+  MOUNTED_ON_OFF_CONTROL: 0x010f,
+  MOUNTED_DIMMABLE_LOAD_CONTROL: 0x0110,
+};
+
+const MATTER_PLUG_DEVICE_TYPE_CODES = Object.values(MATTER_PLUG_DEVICE_TYPE);
+
 /**
- * @description Tells if a Matter endpoint is a light: either it declares a lighting device type,
- * or it already got a light feature (brightness from LevelControl with the lighting feature, color
- * from ColorControl). The second rule covers the endpoints declaring no usable device type, and is
- * the one the migration of already paired devices relies on.
+ * @description Tells if a Matter endpoint is a light. The declared device type wins: a lighting
+ * device type is a light, a plug or load control device type is not. Otherwise the endpoint is a
+ * light when it already got a light feature (brightness from LevelControl with the lighting
+ * feature, color from ColorControl): this covers the endpoints declaring no usable device type,
+ * and is the rule the migration of already paired devices relies on.
  * @param {object} device - The Matter endpoint.
  * @param {Array} features - The Gladys features built for this endpoint.
  * @returns {boolean} True when the endpoint is a light.
@@ -33,6 +46,12 @@ function isLightEndpoint(device, features) {
     deviceTypes.some((deviceType) => deviceType && MATTER_LIGHT_DEVICE_TYPE_CODES.includes(deviceType.code))
   ) {
     return true;
+  }
+  if (
+    Array.isArray(deviceTypes) &&
+    deviceTypes.some((deviceType) => deviceType && MATTER_PLUG_DEVICE_TYPE_CODES.includes(deviceType.code))
+  ) {
+    return false;
   }
   return features.some((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT);
 }
@@ -64,6 +83,7 @@ function applyLightCategoryToOnOff(device, features) {
 
 module.exports = {
   MATTER_LIGHT_DEVICE_TYPE,
+  MATTER_PLUG_DEVICE_TYPE,
   isLightEndpoint,
   applyLightCategoryToOnOff,
 };

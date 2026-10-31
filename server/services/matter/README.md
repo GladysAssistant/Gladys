@@ -90,7 +90,7 @@ The **Gladys feature** column lists matching `category/type` pairs from `server/
 | `NetworkCommissioning` | Network commissioning is part of the overall Node commissioning. | No | — | Not explicitly handled in `server/services/matter`. |
 | `NitrogenDioxideConcentrationMeasurement` | Measures nitrogen dioxide concentration values reported by a sensor. | Yes | no2-matter-index-sensor/integer | NO2 index. |
 | `OccupancySensing` | The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. | Yes | motion-sensor/binary | Presence/motion sensing. |
-| `OnOff` | Provides attributes and commands for turning a device on and off. | Yes | switch/binary | Binary switch, read/write. |
+| `OnOff` | Provides attributes and commands for turning a device on and off. | Yes | switch/binary, light/binary | Binary switch, read/write. A light/binary on a light endpoint (lighting device type, or a light feature when no lighting nor plug device type is declared). |
 | `OperationalCredentials` | This cluster is used to add or remove Node Operational credentials on a Commissionee or already-configured Node, as well as manage the associated Fabrics. | No | — | Not explicitly handled in `server/services/matter`. |
 | `OperationalState` | This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. | No | — | Not explicitly handled in `server/services/matter`. |
 | `OtaSoftwareUpdateProvider` | This cluster implements the Provider role in the OTA process. | No | — | Not explicitly handled in `server/services/matter`. |

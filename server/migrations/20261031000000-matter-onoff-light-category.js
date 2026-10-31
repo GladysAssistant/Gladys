@@ -11,6 +11,10 @@ const MATTER_ON_OFF_EXTERNAL_ID_SUFFIX = ':6';
 // reach it (forum 11462). New pairings now create it as a light on/off; this moves the already
 // paired lights, the Matter devices which also carry a light feature (brightness or color).
 // An on/off-only Matter light has no such feature and keeps its switch until it is paired again.
+// The database does not keep the Matter device types, so a dimmable plug already paired (its
+// LevelControl with the lighting feature gave it a light brightness) looks like a light here and
+// is moved too. Deleting it in Gladys and adding it again from the Matter page gives it back its
+// switch, since a new device is built from its device types.
 module.exports = {
   up: async () => {
     const service = await db.Service.findOne({
