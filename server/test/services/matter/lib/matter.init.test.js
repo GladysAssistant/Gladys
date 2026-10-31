@@ -391,7 +391,7 @@ describe('Matter.init', () => {
         features: [
           {
             name: 'OnOff - 1',
-            category: 'switch',
+            category: 'light',
             type: 'binary',
             read_only: false,
             has_feedback: true,
@@ -676,7 +676,7 @@ describe('Matter.init', () => {
         features: [
           {
             name: 'OnOff - 1',
-            category: 'switch',
+            category: 'light',
             type: 'binary',
             read_only: false,
             has_feedback: true,

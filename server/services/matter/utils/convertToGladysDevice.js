@@ -43,6 +43,7 @@ const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
 const { getBooleanStateFeatureCategoryAndType } = require('./booleanStateMatterMapping');
+const { applyLightCategoryToOnOff } = require('./lightMatterMapping');
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -687,6 +688,8 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       }
     });
   }
+  // The OnOff cluster is built as a generic switch: on a light, it becomes the light on/off.
+  applyLightCategoryToOnOff(device, gladysDevice.features);
   gladysDevice.selector = matterExternalIdToSelector(gladysDevice.external_id);
   gladysDevice.features = gladysDevice.features.map((feature) => ({
     ...feature,
