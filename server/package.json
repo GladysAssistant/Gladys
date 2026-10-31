@@ -96,7 +96,7 @@
     "fs-extra": "^11.1.0",
     "get-value": "^3.0.1",
     "handlebars": "^4.7.10",
-    "joi": "^17.7.0",
+    "joi": "^17.13.9",
     "jsonwebtoken": "^8.5.1",
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
