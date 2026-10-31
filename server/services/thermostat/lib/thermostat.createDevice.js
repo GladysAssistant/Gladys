@@ -268,9 +268,12 @@ async function createDevice(device) {
     });
   }
 
-  // Only a real thermostat is reversible (spec A.4): a virtual one's single
-  // relay would heat a room too warm, and a pilot-wire heater only heats.
-  if (!external) {
+  // Only a real thermostat with a mode is reversible (spec A.4): a virtual
+  // one's single relay would heat a room too warm, a pilot-wire heater only
+  // heats, and a unit with no mode to write would keep its use while the
+  // cooling presets applied.
+  const modeParam = params.find((param) => param.name === 'THERMOSTAT_MODE_FEATURE');
+  if (!external || !(modeParam && modeParam.value)) {
     params.forEach((param) => {
       if (param.name === 'THERMOSTAT_REVERSIBLE') {
         param.value = '';

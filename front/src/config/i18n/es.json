@@ -3767,6 +3767,7 @@
         "saveError": "Error al guardar.",
         "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un actuador (conmutador o hilo piloto): regula leyendo uno y accionando el otro.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
+        "reversibleNoModeError": "Una bomba de calor reversible necesita el modo del aparato, para que el cambio entre calefacción y refrigeración le llegue.",
         "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",

@@ -526,6 +526,12 @@ function createActions(store) {
           });
           return;
         }
+        // A reversible heat pump is switched through the unit's mode (spec A.4):
+        // without it, its cooling presets would apply to a unit still heating.
+        if (reversible && !state.thermostatEditModeFeature) {
+          store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'reversibleNoMode' });
+          return;
+        }
 
         const device = {
           name,

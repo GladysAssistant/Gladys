@@ -3767,6 +3767,7 @@
         "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
         "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Aktor (Schalter oder Steuerleitung): Er regelt, indem er den einen liest und den anderen schaltet.",
         "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
+        "reversibleNoModeError": "Eine reversible Wärmepumpe braucht den Modus des Geräts, damit der Wechsel zwischen Heizen und Kühlen das Gerät erreicht.",
         "incompletePilotWireError": "Ein Heizkörper mit Steuerleitung braucht die zu steuernde Steuerleitung.",
         "activeScheduleLabel": "Aktiver Zeitplan",
         "activeScheduleHelp": "Wähle den Zeitplan, der automatisch auf dieses Thermostat angewendet wird.",

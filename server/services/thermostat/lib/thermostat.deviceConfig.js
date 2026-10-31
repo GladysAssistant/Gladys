@@ -64,12 +64,14 @@ function buildParamsConfig(device) {
     const value = toNumber(getParam(`THERMOSTAT_PILOT_WIRE_ORDER_${preset.toUpperCase()}`), null);
     return PILOT_WIRE_ORDERS.includes(value) ? value : DEFAULT_PILOT_WIRE_ORDERS[preset];
   };
-  // A heat pump that heats and cools (spec A.4): only a real thermostat, which
-  // has a mode to write. A virtual one drives a single heater relay, which
-  // cooling would turn on in a room too warm, and a pilot wire only heats.
+  // A heat pump that heats and cools (spec A.4): only a real thermostat with a
+  // mode to write, which is what switching its use reaches. A virtual one drives
+  // a single heater relay, which cooling would turn on in a room too warm, and a
+  // pilot wire only heats.
   const reversible =
     getParam('THERMOSTAT_REVERSIBLE') === 'true' &&
     thermostatType === THERMOSTAT_TYPES.EXTERNAL &&
+    !!getParam('THERMOSTAT_MODE_FEATURE') &&
     !getParam('THERMOSTAT_PILOT_WIRE_FEATURE');
   // The use in force. On a reversible heat pump it is switched from the widget,
   // a scene or the unit's remote, and saved on this same param, so everything

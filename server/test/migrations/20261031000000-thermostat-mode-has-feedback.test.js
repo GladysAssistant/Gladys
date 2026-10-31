@@ -58,6 +58,20 @@ describe('migration 20261031000000-thermostat-mode-has-feedback', () => {
       service_id: OTHER_SERVICE_ID,
     });
     await createModeFeature(THERMOSTAT_DEVICE_ID, 'thermostat-living-room-mode');
+    // The preset is the service's own state as well, but it is not the mode.
+    await db.DeviceFeature.create({
+      device_id: THERMOSTAT_DEVICE_ID,
+      name: 'Preset',
+      selector: 'thermostat-living-room-preset',
+      external_id: 'thermostat-living-room-preset',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+      read_only: false,
+      keep_history: true,
+      has_feedback: false,
+      min: 0,
+      max: 5,
+    });
     // Another integration's thermostat mode is its own business.
     await createModeFeature(OTHER_DEVICE_ID, 'zigbee2mqtt-radiator-valve-mode');
 
@@ -67,6 +81,7 @@ describe('migration 20261031000000-thermostat-mode-has-feedback', () => {
 
     expect(await hasFeedback('thermostat-living-room-mode')).to.equal(true);
     expect(await hasFeedback('zigbee2mqtt-radiator-valve-mode')).to.equal(false);
+    expect(await hasFeedback('thermostat-living-room-preset')).to.equal(false);
   });
 
   it('should have an empty down migration', async () => {

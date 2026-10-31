@@ -83,11 +83,15 @@ export const buildConfigFromParams = device => {
     const parsed = parse ? parse(raw) : raw;
     config[field] = typeof parsed === 'number' && !Number.isFinite(parsed) ? null : parsed;
   });
-  // As the server reads it: never on a pilot-wire heater, which only heats. A
+  // As the server reads it: only a real thermostat with a mode to write, never
+  // a virtual one's relay nor a pilot-wire heater, which only heats. A
   // reversible one shows the presets of the use in force, which is the
   // THERMOSTAT_MODE param — switched from the widget, a scene or the remote.
   config.reversible =
-    Boolean(config.reversible) && config.thermostat_type !== 'pilot-wire' && !config.pilot_wire_feature;
+    Boolean(config.reversible) &&
+    config.thermostat_type === 'external' &&
+    Boolean(config.mode_feature) &&
+    !config.pilot_wire_feature;
   if (config.reversible && config.default_mode === 'cooling') {
     ['frost', 'away', 'eco', 'night', 'comfort'].forEach(preset => {
       config[`preset_${preset}`] = config[`preset_cooling_${preset}`];

@@ -133,6 +133,18 @@ describe('thermostat: reversible heat pump', () => {
 
       expect(virtual.reversible).to.equal(false);
     });
+
+    it('should never read a real thermostat with no mode as reversible', () => {
+      const noMode = buildParamsConfig({
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+        ],
+      });
+
+      expect(noMode.reversible).to.equal(false);
+    });
   });
 
   describe('setValue on the mode feature', () => {
@@ -463,11 +475,28 @@ describe('thermostat: reversible heat pump', () => {
         params: [
           { name: 'THERMOSTAT_TYPE', value: 'external' },
           { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'ac-mode' },
           { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
         ],
       });
 
       expect(reversibleParam(created)).to.equal('true');
+    });
+
+    // With no mode to write, the unit would keep its use while the cooling presets applied.
+    it('should clear the reversible param of a real thermostat with no mode', async () => {
+      const created = await createDevice.call(buildCreateHandler(), {
+        name: 'Heat pump',
+        external_id: 'thermostat:heat-pump',
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: '' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+        ],
+      });
+
+      expect(reversibleParam(created)).to.equal('');
     });
 
     it('should clear the reversible param of a virtual thermostat', async () => {
