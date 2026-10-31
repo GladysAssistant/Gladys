@@ -904,6 +904,12 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.getEnergyContracts,
     },
+    // energy prices read (capabilities/energy-prices.md), gated by `energy_prices: true`
+    'get /api/integration/v1/energy/price': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getEnergyPrices,
+    },
     'get /api/integration/v1/config': {
       authenticated: false,
       externalIntegrationAuth: true,
