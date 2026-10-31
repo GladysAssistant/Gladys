@@ -5609,6 +5609,7 @@
     "milliliter": "Mililitro (ml)",
     "cubicmeter": "Metro cúbico (m³)",
     "cubic-meter-per-hour": "Metro cúbico por hora (m³/h)",
+    "cubic-meter-per-second": "Metro cúbico por segundo (m³/s)",
     "euro": "Euro (€)",
     "dollar": "Dólar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -5707,6 +5708,7 @@
     "milliliter": "ml",
     "cubicmeter": "m³",
     "cubic-meter-per-hour": "m³/h",
+    "cubic-meter-per-second": "m³/s",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -6969,6 +6971,10 @@
       "airflow-direction": "Dirección del flujo de aire",
       "rock-setting": "Oscilación",
       "wind-setting": "Modo de viento"
+    },
+    "flow-sensor": {
+      "shortCategoryName": "Sensor de caudal",
+      "decimal": "Caudal"
     },
     "hepa-filter-monitoring": {
       "shortCategoryName": "Supervisión del filtro HEPA",
