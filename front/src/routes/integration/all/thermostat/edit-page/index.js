@@ -5,7 +5,9 @@ import ThermostatPage from '../ThermostatPage';
 import EditForm from './EditForm';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
-  DEFAULT_PILOT_WIRE_STANDBY_ORDER
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  DEFAULT_PRESENCE_DELAY_MINUTES,
+  DEFAULT_PRESENCE_PRESET
 } from '../../../../../../../server/utils/thermostatConstants';
 
 class ThermostatEditPage extends Component {
@@ -38,6 +40,9 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditPowerFeature', '');
     this.props.updateThermostatField('thermostatEditWindowFeatures', []);
     this.props.updateThermostatField('thermostatEditWindowDelay', '60');
+    this.props.updateThermostatField('thermostatEditPresenceFeatures', []);
+    this.props.updateThermostatField('thermostatEditPresenceDelay', String(DEFAULT_PRESENCE_DELAY_MINUTES));
+    this.props.updateThermostatField('thermostatEditPresencePreset', DEFAULT_PRESENCE_PRESET);
     this.props.updateThermostatField('thermostatEditShowAllRooms', false);
     this.props.updateThermostatField('thermostatEditPresetFrost', '7');
     this.props.updateThermostatField('thermostatEditPresetAway', '16');

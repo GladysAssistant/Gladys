@@ -25,7 +25,8 @@ import {
   PRESENCE_PRESETS,
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder,
-  supportedStandbyOrder
+  supportedStandbyOrder,
+  PILOT_WIRE_ORDER_RANK
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -623,6 +624,26 @@ class ThermostatBox extends Component {
     }
   };
 
+  // A preset's setpoint, whether or not the bar shows it: a cooling bar only has
+  // Off and Comfort, while an empty room may be regulated on Eco (spec A.4).
+  getPresetTemp = presetKey => {
+    if (presetKey === 'off') {
+      return null;
+    }
+    const cfg = this.getConfig();
+    const defaults = defaultPresetTemps(cfg.default_mode || 'heating');
+    return numOr(cfg[`preset_${presetKey}`], defaults[presetKey]);
+  };
+
+  // The order a preset sends a heater that regulates itself.
+  getPresetOrder = presetKey => {
+    if (presetKey === 'off') {
+      return PILOT_WIRE_MODE.OFF;
+    }
+    const configured = this.getConfig()[`pilot_wire_order_${presetKey}`];
+    return Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[presetKey];
+  };
+
   // The preset an empty room is regulated on, when it saves energy over the one
   // in force, or null: the server's rule (presetForEmptyRoom), and only over the
   // programme or a preset picked — a setpoint set on the dial is kept.
@@ -632,18 +653,23 @@ class ThermostatBox extends Component {
       return null;
     }
     const absence = PRESENCE_PRESETS.includes(cfg.presence_preset) ? cfg.presence_preset : DEFAULT_PRESENCE_PRESET;
-    const presets = this.getPresets();
-    const inForce = presets.find(preset => preset.key === activePreset);
-    const empty = presets.find(preset => preset.key === absence);
-    if (!inForce || inForce.temp === null || !empty || inForce.key === absence) {
+    if (!isStartPreset(activePreset) || activePreset === absence) {
       return null;
     }
     const hold = this.getHold();
     if (hold && !this.holdMatchesPreset(hold.setpoint, activePreset)) {
       return null;
     }
+    if (this.isHeaterRegulated()) {
+      // A heater regulating itself is weighed on the orders the presets send.
+      const saves =
+        PILOT_WIRE_ORDER_RANK[this.getPresetOrder(absence)] < PILOT_WIRE_ORDER_RANK[this.getPresetOrder(activePreset)];
+      return saves ? absence : null;
+    }
+    const inForce = this.getPresetTemp(activePreset);
+    const empty = this.getPresetTemp(absence);
     const cooling = cfg.default_mode === 'cooling' && !cfg.pilot_wire_feature;
-    return (cooling ? empty.temp > inForce.temp : empty.temp < inForce.temp) ? absence : null;
+    return (cooling ? empty > inForce : empty < inForce) ? absence : null;
   };
 
   getDeviceData = async () => {
@@ -1784,6 +1810,13 @@ class ThermostatBox extends Component {
     const mode = activePreset === 'off' && !heldOverOff ? 'off' : configMode;
     const presets = this.getPresets();
     const emptyPreset = this.emptyRoomPreset(activePreset, isWindowOpen);
+    // The gauge shows the setpoint an empty room is regulated on (spec A.4), and
+    // the bar keeps the preset picked or followed. Not while the dial is turned,
+    // which takes a hold of its own.
+    const shownSetpoint =
+      emptyPreset && !this.state.isDragging && !manualSetpointOverride
+        ? this.toSetpointFeatureUnit(this.getPresetTemp(emptyPreset))
+        : setpoint;
     const hystStart = numOr(cfg.hysteresis_start, DEFAULT_HYSTERESIS_START);
     const hasCurrent = currentTemp !== null && currentTemp !== undefined;
     // TPI modulates the on-time over a cycle instead of switching on a band, so
@@ -1810,13 +1843,13 @@ class ThermostatBox extends Component {
         return false;
       }
       if (isTpi) {
-        return currentTemp < setpoint;
+        return currentTemp < shownSetpoint;
       }
       if (mode === 'heating') {
-        return currentTemp < setpoint - hystStart;
+        return currentTemp < shownSetpoint - hystStart;
       }
       if (mode === 'cooling') {
-        return currentTemp > setpoint + hystStart;
+        return currentTemp > shownSetpoint + hystStart;
       }
       return false;
     })();
@@ -1853,8 +1886,8 @@ class ThermostatBox extends Component {
       wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
       wantedRest = true;
     } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
-      const configured = cfg[`pilot_wire_order_${activePreset}`];
-      wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
+      // An empty room is sent the absence preset's order (spec A.4).
+      wantedOrder = this.getPresetOrder(emptyPreset || activePreset);
     }
     // The order actually sent, as the server picks it: one the module does not
     // take is sent as comfort, or not at all — and is then on its way for ever.
@@ -1901,7 +1934,7 @@ class ThermostatBox extends Component {
       pilotWireStatus === 'pilotWireHeating' ? 'comfort' : STANDBY_PRESET_BY_ORDER[pilotWireOrder] || 'frost';
 
     // Convert temperatures for display
-    const displaySetpoint = this.toDisplayTemp(setpoint);
+    const displaySetpoint = this.toDisplayTemp(shownSetpoint);
     const displayCurrentTemp = this.toDisplayTemp(currentTemp);
     const displayMinTemp = this.toDisplayTemp(minTemp);
     const displayMaxTemp = this.toDisplayTemp(maxTemp);
