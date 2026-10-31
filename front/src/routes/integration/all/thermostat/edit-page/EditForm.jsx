@@ -112,6 +112,7 @@ const SaveError = ({ status, reason }) =>
       {reason === 'pilotWireUnread' && <Text id="integration.thermostat.edit.pilotWireUnreadError" />}
       {reason === 'invertedRange' && <Text id="integration.thermostat.edit.invertedRangeError" />}
       {reason === 'reversibleNoMode' && <Text id="integration.thermostat.edit.reversibleNoModeError" />}
+      {reason === 'reversibleModeCannotCool' && <Text id="integration.thermostat.edit.reversibleModeCannotCoolError" />}
       {!reason && <Text id="integration.thermostat.edit.saveError" />}
     </div>
   );
