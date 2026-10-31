@@ -873,6 +873,17 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.getHouses,
     },
+    // designated device features of other integrations (capabilities/device-feature-read.md)
+    'get /api/integration/v1/device_feature/state': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getDeviceFeatureStates,
+    },
+    'get /api/integration/v1/device_feature/aggregate': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getDeviceFeatureAggregates,
+    },
     'post /api/integration/v1/state': {
       authenticated: false,
       externalIntegrationAuth: true,

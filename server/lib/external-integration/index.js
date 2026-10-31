@@ -35,6 +35,13 @@ const { getDiscoveredDevices } = require('./externalIntegration.getDiscoveredDev
 const { saveStates } = require('./externalIntegration.saveStates');
 const { getDevices } = require('./externalIntegration.getDevices');
 const { getHouses } = require('./externalIntegration.getHouses');
+const {
+  getDeviceFeatureGrant,
+  refreshDeviceFeatureGrant,
+  getDesignatedDeviceFeatureStates,
+  getDesignatedDeviceFeatureAggregates,
+  forwardDeviceFeatureState,
+} = require('./externalIntegration.deviceFeatureRead');
 const { getIntegrationConfig } = require('./externalIntegration.getIntegrationConfig');
 const { setIntegrationConfig } = require('./externalIntegration.setIntegrationConfig');
 const { getConfigForFront } = require('./externalIntegration.getConfigForFront');
@@ -224,6 +231,12 @@ const ExternalIntegration = function ExternalIntegration(
   this.calendarWriteRateLimits = new Map();
   // serviceId -> timestamp of the last Wake-on-LAN emission (1/2s)
   this.networkWakeTimes = new Map();
+  // designated device features of other integrations (capabilities/device-
+  // feature-read.md): serviceId -> { service, selectors } of the connected
+  // integrations the new states are pushed to, and the read rate limits
+  this.deviceFeatureReadGrants = new Map();
+  this.deviceFeatureStateRateLimits = new Map();
+  this.deviceFeatureAggregateRateLimits = new Map();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -291,6 +304,8 @@ const ExternalIntegration = function ExternalIntegration(
     eventFunctionWrapper(this.handleGatewayWebhook.bind(this)),
   );
   this.event.on(EVENTS.GATEWAY.LINK_STATUS_CHANGED, eventFunctionWrapper(this.notifyWebhookAvailability.bind(this)));
+  // new states of the device features a user designated for an integration
+  this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceFeatureState.bind(this)));
   // nightly sweep of the integration images no installed integration needs
   // anymore (config/scheduler-jobs.js)
   this.event.on(EVENTS.EXTERNAL_INTEGRATION.CLEAN_IMAGES, eventFunctionWrapper(this.cleanImages.bind(this)));
@@ -333,6 +348,11 @@ ExternalIntegration.prototype.getDiscoveredDevices = getDiscoveredDevices;
 ExternalIntegration.prototype.saveStates = saveStates;
 ExternalIntegration.prototype.getDevices = getDevices;
 ExternalIntegration.prototype.getHouses = getHouses;
+ExternalIntegration.prototype.getDeviceFeatureGrant = getDeviceFeatureGrant;
+ExternalIntegration.prototype.refreshDeviceFeatureGrant = refreshDeviceFeatureGrant;
+ExternalIntegration.prototype.getDesignatedDeviceFeatureStates = getDesignatedDeviceFeatureStates;
+ExternalIntegration.prototype.getDesignatedDeviceFeatureAggregates = getDesignatedDeviceFeatureAggregates;
+ExternalIntegration.prototype.forwardDeviceFeatureState = forwardDeviceFeatureState;
 ExternalIntegration.prototype.getIntegrationConfig = getIntegrationConfig;
 ExternalIntegration.prototype.setIntegrationConfig = setIntegrationConfig;
 ExternalIntegration.prototype.getConfigForFront = getConfigForFront;

@@ -5,6 +5,7 @@ const { validateConfigValue } = require('./externalIntegration.validateConfigVal
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
 const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
 const { hasWebhooks } = require('./externalIntegration.getWebhooks');
+const { saveDeviceFeatureGrant } = require('./externalIntegration.deviceFeatureRead');
 const { PREFER_LOCAL_CONFIG_KEY, OPEN_API_KEY_CONFIG_KEY } = require('./constants');
 
 /**
@@ -70,6 +71,9 @@ async function saveConfigFromFront(selector, config) {
       this.variable.setValue(key.toUpperCase(), JSON.stringify(valuesToSave[key]), service.id),
     ),
   );
+  // the device features designated here, by the user, are the only ones
+  // the integration may read (capabilities/device-feature-read.md)
+  await saveDeviceFeatureGrant.call(this, service, valuesToSave);
   // push the complete new values to the integration, so it reloads its
   // config without a restart (only for changes coming from the frontend,
   // never echoed for a POST /config of the integration itself)

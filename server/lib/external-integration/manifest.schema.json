@@ -80,6 +80,10 @@
       "type": "boolean",
       "description": "Declare true to request permission to send Wake-on-LAN magic packets through the Gladys core Host API. The request is shown on the install screen and is enforced server-side; an integration that does not declare it gets a 403."
     },
+    "device_features_read": {
+      "type": "boolean",
+      "description": "Declare true to request read access to device features of other integrations that the user designates in a `source: \"device_features\"` config field (GET /device_feature/state and /device_feature/aggregate host API, device-feature.new-state WebSocket event). Required to declare such a field. Shown on the install screen as an authorization contract; only the features the user designated are readable, any other gets a 403 (enforced server-side)."
+    },
     "network_discovery": {
       "type": "array",
       "minItems": 1,
@@ -172,6 +176,9 @@
             "$ref": "#/definitions/configField"
           },
           {
+            "$ref": "#/definitions/notConfigSchemaSource"
+          },
+          {
             "properties": {
               "type": {
                 "not": {
@@ -190,6 +197,9 @@
         "allOf": [
           {
             "$ref": "#/definitions/configField"
+          },
+          {
+            "$ref": "#/definitions/notConfigSchemaSource"
           },
           {
             "properties": {
@@ -263,6 +273,32 @@
     }
   },
   "allOf": [
+    {
+      "$comment": "a source: device_features config field requires the device_features_read authorization contract",
+      "if": {
+        "required": ["config_schema"],
+        "properties": {
+          "config_schema": {
+            "contains": {
+              "required": ["source"],
+              "properties": {
+                "source": {
+                  "const": "device_features"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": ["device_features_read"],
+        "properties": {
+          "device_features_read": {
+            "const": true
+          }
+        }
+      }
+    },
     {
       "$comment": "messaging only makes sense on communication integrations",
       "if": {
@@ -431,6 +467,16 @@
         "minLength": 1
       }
     },
+    "notConfigSchemaSource": {
+      "$comment": "source device_features is only allowed in the config_schema (capabilities/device-feature-read.md): the read scope is what the user saved in the integration config, a designation made in an action, a per-user form, a widget or a scene would reach the integration without granting anything",
+      "properties": {
+        "source": {
+          "not": {
+            "const": "device_features"
+          }
+        }
+      }
+    },
     "configField": {
       "type": "object",
       "additionalProperties": false,
@@ -502,8 +548,35 @@
         },
         "source": {
           "type": "string",
-          "enum": ["devices", "houses"],
-          "description": "Dynamic options of a `select` or `multi_select` field, provided by the core — a reserved enum, never a URL nor an expression. Mutually exclusive with `options`; `default` is not allowed with a source (code-enforced). \"devices\": the Gladys UI populates the options with the already-created devices of the integration (label = device name, value = external_id). \"houses\": the options are the houses of Gladys (label = house name, value = selector, the identifier GET /house returns)."
+          "enum": ["devices", "houses", "device_features"],
+          "description": "Dynamic options of a `select` or `multi_select` field, provided by the core — a reserved enum, never a URL nor an expression. Mutually exclusive with `options`; `default` is not allowed with a source (code-enforced). \"devices\": the Gladys UI populates the options with the already-created devices of the integration (label = device name, value = external_id). \"houses\": the options are the houses of Gladys (label = house name, value = selector, the identifier GET /house returns). \"device_features\": a picker of the device features of every integration, narrowed by the required `feature_filters`, camera images excluded (value = feature selector, a multi_select designates at most 20); only allowed in the `config_schema` (code-enforced) and only with `device_features_read: true`."
+        },
+        "feature_filters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "description": "Required with `source: \"device_features\"`, refused otherwise: the categories (and optionally types) of device features the picker offers, e.g. [{ \"category\": \"energy-sensor\", \"type\": \"power\" }, { \"category\": \"teleinformation\" }]. A feature matching one entry can be designated, no other. The `camera` category and the `image` type are refused: a camera image can never be designated. A category or type unknown to a Gladys instance matches nothing there (logged, never rejected).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["category"],
+            "properties": {
+              "category": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$",
+                "not": {
+                  "enum": ["camera"]
+                }
+              },
+              "type": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$",
+                "not": {
+                  "enum": ["image"]
+                }
+              }
+            }
+          }
         },
         "display": {
           "type": "string",
@@ -597,6 +670,26 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "required": ["source"],
+              "properties": {
+                "source": {
+                  "const": "device_features"
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": ["feature_filters"]
+            }
+          },
+          "else": {
+            "required": ["feature_filters"]
           }
         },
         {
@@ -902,9 +995,16 @@
         },
         "fields": {
           "type": "array",
-          "description": "Optional flat form shown before running the action, same format as config_schema entries.",
+          "description": "Optional flat form shown before running the action, same format as config_schema entries (source device_features excepted).",
           "items": {
-            "$ref": "#/definitions/configField"
+            "allOf": [
+              {
+                "$ref": "#/definitions/configField"
+              },
+              {
+                "$ref": "#/definitions/notConfigSchemaSource"
+              }
+            ]
           }
         }
       }
@@ -934,6 +1034,9 @@
       "allOf": [
         {
           "$ref": "#/definitions/configField"
+        },
+        {
+          "$ref": "#/definitions/notConfigSchemaSource"
         },
         {
           "properties": {
@@ -1037,6 +1140,9 @@
           "$ref": "#/definitions/configField"
         },
         {
+          "$ref": "#/definitions/notConfigSchemaSource"
+        },
+        {
           "properties": {
             "type": {
               "enum": ["string", "number", "select", "multi_select", "section"]
@@ -1069,6 +1175,9 @@
       "allOf": [
         {
           "$ref": "#/definitions/configField"
+        },
+        {
+          "$ref": "#/definitions/notConfigSchemaSource"
         },
         {
           "properties": {
