@@ -10,34 +10,28 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 class MapPage extends Component {
   getUsersWithLocation = async () => {
     try {
-      const usersWithLocation = await this.props.httpClient.get(
+      return await this.props.httpClient.get(
         '/api/v1/user?fields=id,firstname,selector,picture,last_latitude,last_longitude,last_altitude,last_accuracy,last_location_changed'
       );
-      this.setState({
-        usersWithLocation
-      });
     } catch (e) {
       console.error(e);
+      return [];
     }
   };
   getHousesWithLocation = async () => {
     try {
-      const housesWithLocation = await this.props.httpClient.get('/api/v1/house');
-      this.setState({
-        housesWithLocation
-      });
+      return await this.props.httpClient.get('/api/v1/house');
     } catch (e) {
       console.error(e);
+      return [];
     }
   };
   getAreas = async () => {
     try {
-      const areas = await this.props.httpClient.get('/api/v1/area');
-      this.setState({
-        areas
-      });
+      return await this.props.httpClient.get('/api/v1/area');
     } catch (e) {
       console.error(e);
+      return [];
     }
   };
   updateUserLocationWebsocket = event => {
@@ -68,14 +62,24 @@ class MapPage extends Component {
     this.state = {
       usersWithLocation: [],
       housesWithLocation: [],
-      areas: []
+      areas: [],
+      loaded: false
     };
   }
 
+  loadMapData = async () => {
+    // A single setState, so the markers and the first fit land together
+    // instead of flashing on the world view while the requests complete
+    const [usersWithLocation, housesWithLocation, areas] = await Promise.all([
+      this.getUsersWithLocation(),
+      this.getHousesWithLocation(),
+      this.getAreas()
+    ]);
+    this.setState({ usersWithLocation, housesWithLocation, areas, loaded: true });
+  };
+
   componentDidMount() {
-    this.getUsersWithLocation();
-    this.getHousesWithLocation();
-    this.getAreas();
+    this.loadMapData();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.LOCATION.NEW, this.updateUserLocationWebsocket);
   }
 
@@ -86,7 +90,7 @@ class MapPage extends Component {
     );
   }
 
-  render(props, { housesWithLocation, usersWithLocation, areas }) {
+  render(props, { housesWithLocation, usersWithLocation, areas, loaded }) {
     // No wrapper margins (the tabler .map-header helper carries a negative
     // top margin meant for banner maps): the map fills everything below the
     // chrome, sizing itself to the viewport minus that chrome.
@@ -95,7 +99,7 @@ class MapPage extends Component {
     return (
       <div class="page">
         <div class={cx('page-main', 'glass-theme', style.mapPage)}>
-          <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} />
+          <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} loaded={loaded} />
         </div>
       </div>
     );
