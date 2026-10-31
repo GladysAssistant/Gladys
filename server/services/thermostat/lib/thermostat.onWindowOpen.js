@@ -45,6 +45,7 @@ function invalidateDeviceCaches() {
   this.windowSelectorsCache = null;
   this.targetSelectorsCache = null;
   this.powerSelectorsCache = null;
+  this.presenceSelectorsCache = null;
 }
 
 /**
@@ -77,7 +78,12 @@ async function postUpdate() {
  * const selectors = await thermostatHandler.getWindowSelectors();
  */
 async function getWindowSelectors() {
-  if (this.windowSelectorsCache && this.targetSelectorsCache && this.powerSelectorsCache) {
+  if (
+    this.windowSelectorsCache &&
+    this.targetSelectorsCache &&
+    this.powerSelectorsCache &&
+    this.presenceSelectorsCache
+  ) {
     return this.windowSelectorsCache;
   }
   const devices = await this.gladys.device.get({ service: 'thermostat' });
@@ -90,6 +96,9 @@ async function getWindowSelectors() {
   // thermostat's dial.
   const targets = new Set();
   const powers = new Set();
+  // The presence sensors, with the shortest delay of the thermostats watching
+  // each: someone seen again only needs a pass once some room was taken as empty.
+  const presences = new Map();
   (devices || []).forEach((device) => {
     const config = buildParamsConfig(device);
     if (config) {
@@ -104,11 +113,80 @@ async function getWindowSelectors() {
     if (config && config.power_feature) {
       powers.add(config.power_feature);
     }
+    if (config) {
+      config.presence_features.forEach((selector) => {
+        const delay = presences.has(selector) ? presences.get(selector) : Infinity;
+        presences.set(selector, Math.min(delay, config.presence_delay));
+      });
+    }
   });
   this.windowSelectorsCache = selectors;
   this.targetSelectorsCache = targets;
   this.powerSelectorsCache = powers;
+  this.presenceSelectorsCache = presences;
   return selectors;
+}
+
+/**
+ * @description The presence sensors of the thermostats, each with the shortest
+ * delay of the thermostats it is configured on, for the same reason as
+ * `getTargetSelectors`.
+ * @returns {Promise<Map<string, number>>} Delay in minutes, by presence sensor selector.
+ * @example
+ * const sensors = await thermostatHandler.getPresenceSelectors();
+ */
+async function getPresenceSelectors() {
+  if (!this.presenceSelectorsCache) {
+    // Every cache is filled by the same pass over the devices.
+    await getWindowSelectors.call(this);
+  }
+  return this.presenceSelectorsCache;
+}
+
+/**
+ * @description Follow a presence sensor (A.4).
+ *
+ * Nobody seen: the time is recorded, so that a sensor re-reporting "nobody" does
+ * not restart the count — its `last_value_changed` moves on every report, as a
+ * window's does. The room is only taken as empty by the regulation pass, once
+ * the delay has run out: it is counted in minutes, and the minute tick is soon
+ * enough for that.
+ *
+ * Someone seen: the count is dropped, and a pass runs straight away when the
+ * sensor had been quiet for a delay — a room lowered to eco has to warm up for
+ * whoever just came in, not a minute later. A motion sensor goes back to
+ * "nobody" a minute or two after each movement, so a pass on every return would
+ * run all day for a room nobody left.
+ * @param {string} changedSelector - Selector of the feature that changed.
+ * @param {number} newValue - The value it changed to.
+ * @param {number} lifecycle - The run of the service the change arrived in (`lifecycle`).
+ * @returns {Promise<void>}
+ * @example
+ * await onPresenceChanged.call(handler, 'salon-motion', 1, handler.lifecycle);
+ */
+async function onPresenceChanged(changedSelector, newValue, lifecycle) {
+  try {
+    const presenceSelectors = await getPresenceSelectors.call(this);
+    // The service may have stopped during the lookup: its records are cleared,
+    // and one made now would never be.
+    if (this.lifecycle !== lifecycle || !presenceSelectors.has(changedSelector)) {
+      return;
+    }
+    if (newValue === 0) {
+      if (!this.presenceVacatedAt.has(changedSelector)) {
+        this.presenceVacatedAt.set(changedSelector, Date.now());
+      }
+      return;
+    }
+    const vacatedAt = this.presenceVacatedAt.get(changedSelector);
+    this.presenceVacatedAt.delete(changedSelector);
+    if (vacatedAt !== undefined && Date.now() - vacatedAt >= presenceSelectors.get(changedSelector) * 60 * 1000) {
+      logger.info(`Thermostat: someone seen again (${changedSelector}), regulating again`);
+      this.triggerApplySchedules();
+    }
+  } catch (e) {
+    logger.warn(`Thermostat: could not follow a presence sensor: ${e.message}`);
+  }
 }
 
 /**
@@ -784,6 +862,7 @@ async function onDeviceNewState(event) {
   if (newValue === null || newValue === undefined) {
     return;
   }
+  await onPresenceChanged.call(this, changedSelector, newValue, lifecycle);
   try {
     // Cheap rejection first: most events in a house are not a configured window.
     const windowSelectors = await getWindowSelectors.call(this);
@@ -930,6 +1009,7 @@ module.exports = {
   primeObservedSetpoints,
   getTargetSelectors,
   getPowerSelectors,
+  getPresenceSelectors,
   getWindowSelectors,
   invalidateDeviceCaches,
   postUpdate,

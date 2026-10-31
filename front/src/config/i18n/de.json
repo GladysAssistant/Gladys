@@ -814,6 +814,7 @@
         "cancelManual": "Manuellen Modus beenden",
         "windowOpen": "Fenster offen — Heizung ausgesetzt",
         "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
+        "presenceAbsent": "Niemand erkannt seit {{time}} — {{preset}}",
         "pilotWireHeating": "Heizt",
         "pilotWireStandby": "Bereitschaft: Sollwert erreicht",
         "pilotWireOrderCurrent": "Befehl: {{order}}",
@@ -3729,6 +3730,26 @@
         "windowDelayHelp": {
           "heating": "Wie lange das Fenster geöffnet bleiben muss, bevor die Heizung abgeschaltet wird. Eine Tür, die zum Hereinkommen geöffnet und gleich wieder geschlossen wird, schaltet sie nicht ab. 0 schaltet sofort ab; höchstens 3600 s (eine Stunde).",
           "cooling": "Wie lange das Fenster geöffnet bleiben muss, bevor die Kühlung abgeschaltet wird. Eine Tür, die zum Hereinkommen geöffnet und gleich wieder geschlossen wird, schaltet sie nicht ab. 0 schaltet sofort ab; höchstens 3600 s (eine Stunde)."
+        },
+        "presenceFeatureLabel": "Anwesenheitssensoren",
+        "addPresenceFeature": "Anwesenheitssensor hinzufügen",
+        "presenceFeatureHelp": {
+          "heating": "Optional. Bewegungs- oder Anwesenheitssensoren des Raums. Sobald keiner von ihnen während der unten angegebenen Verzögerung jemanden erkannt hat, wird die Heizung auf das Abwesenheits-Preset abgesenkt und kehrt zurück, sobald jemand erkannt wird.",
+          "cooling": "Optional. Bewegungs- oder Anwesenheitssensoren des Raums. Sobald keiner von ihnen während der unten angegebenen Verzögerung jemanden erkannt hat, wird die Kühlung auf das Abwesenheits-Preset reduziert und kehrt zurück, sobald jemand erkannt wird."
+        },
+        "presenceDelayLabel": "Raum leer nach",
+        "presenceDelayUnit": "Min.",
+        "presenceDelayHelp": "Wie lange alle Sensoren niemanden erkennen müssen, bevor der Raum als leer gilt. Ein Bewegungsmelder erkennt keine still sitzende Person: mindestens eine Viertelstunde einstellen. Von 1 bis 1440 Minuten.",
+        "presencePresetLabel": "Preset bei leerem Raum",
+        "presencePreset": {
+          "eco": "Eco",
+          "night": "Nacht",
+          "away": "Abwesend",
+          "frost": "Frostschutz"
+        },
+        "presencePresetHelp": {
+          "heating": "Nur angewendet, wenn es kühler ist als das aktuelle Preset: eine Nacht im Frostschutz bleibt dabei. Ein von Hand eingestellter Sollwert bleibt bis zu seinem Ende erhalten.",
+          "cooling": "Nur angewendet, wenn es wärmer ist als das aktuelle Preset. Ein von Hand eingestellter Sollwert bleibt bis zu seinem Ende erhalten."
         },
         "addWindowFeature": "Öffnungssensor hinzufügen",
         "removeFeature": "Entfernen",

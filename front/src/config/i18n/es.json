@@ -962,6 +962,7 @@
         "cancelManual": "Cancelar el modo manual",
         "windowOpen": "Ventana abierta — calefacción suspendida",
         "windowOpenCooling": "Ventana abierta — refrigeración suspendida",
+        "presenceAbsent": "Nadie detectado desde las {{time}} — {{preset}}",
         "pilotWireHeating": "Calentando",
         "pilotWireStandby": "En espera: consigna alcanzada",
         "pilotWireOrderCurrent": "Orden: {{order}}",
@@ -3729,6 +3730,26 @@
         "windowDelayHelp": {
           "heating": "Tiempo que la ventana debe permanecer abierta antes de cortar la calefacción. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo.",
           "cooling": "Tiempo que la ventana debe permanecer abierta antes de cortar la refrigeración. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo."
+        },
+        "presenceFeatureLabel": "Sensores de presencia",
+        "addPresenceFeature": "Añadir un sensor de presencia",
+        "presenceFeatureHelp": {
+          "heating": "Opcional. Sensores de movimiento o de presencia de la habitación. Cuando ninguno ha detectado a nadie durante el retardo de abajo, la calefacción baja al preset de ausencia, y vuelve en cuanto se detecta a alguien.",
+          "cooling": "Opcional. Sensores de movimiento o de presencia de la habitación. Cuando ninguno ha detectado a nadie durante el retardo de abajo, la climatización pasa al preset de ausencia, y vuelve en cuanto se detecta a alguien."
+        },
+        "presenceDelayLabel": "Habitación vacía tras",
+        "presenceDelayUnit": "min",
+        "presenceDelayHelp": "Cuánto tiempo deben todos los sensores no detectar a nadie antes de considerar la habitación vacía. Un sensor de movimiento no ve a alguien inmóvil: deje al menos un cuarto de hora. De 1 a 1440 minutos.",
+        "presencePresetLabel": "Preset con la habitación vacía",
+        "presencePreset": {
+          "eco": "Eco",
+          "night": "Noche",
+          "away": "Ausente",
+          "frost": "Antiheladas"
+        },
+        "presencePresetHelp": {
+          "heating": "Solo se aplica si es más fresco que el preset en curso: una noche ya en antiheladas se queda así. Una consigna ajustada a mano se mantiene hasta su fin.",
+          "cooling": "Solo se aplica si es más cálido que el preset en curso. Una consigna ajustada a mano se mantiene hasta su fin."
         },
         "addWindowFeature": "Añadir un sensor de apertura",
         "removeFeature": "Quitar",

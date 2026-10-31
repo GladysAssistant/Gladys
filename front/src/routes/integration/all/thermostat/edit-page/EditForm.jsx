@@ -11,7 +11,10 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
-  MAX_WINDOW_DELAY_SECONDS
+  MAX_WINDOW_DELAY_SECONDS,
+  MIN_PRESENCE_DELAY_MINUTES,
+  MAX_PRESENCE_DELAY_MINUTES,
+  PRESENCE_PRESETS
 } from '../../../../../../../server/utils/thermostatConstants';
 
 // The help text of each thermostat type, keyed by its value.
@@ -719,6 +722,76 @@ const EditForm = ({ ...props }) => {
                 </div>
                 <small class="form-text text-muted">
                   <Text id={`integration.thermostat.edit.windowDelayHelp.${modeSuffix}`} />
+                </small>
+              </div>
+            )}
+
+            {/* Capteurs de présence (spec A.4) : la pièce vide depuis le délai
+                passe sur le preset d'absence, quand il économise. */}
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.thermostat.edit.presenceFeatureLabel" />
+              </label>
+              <Localizer>
+                <FeatureListSelect
+                  values={props.thermostatEditPresenceFeatures}
+                  features={pickable(props.presenceFeatures, props.thermostatEditPresenceFeatures || [])}
+                  onChange={values => props.updateThermostatField('thermostatEditPresenceFeatures', values)}
+                  emptyLabel={<Text id="global.emptySelectOption" />}
+                  addLabel={<Text id="integration.thermostat.edit.addPresenceFeature" />}
+                  removeLabel={<Text id="integration.thermostat.edit.removeFeature" />}
+                />
+              </Localizer>
+              <small class="form-text text-muted">
+                <Text id={`integration.thermostat.edit.presenceFeatureHelp.${modeSuffix}`} />
+              </small>
+            </div>
+
+            {/* The delay and the preset are pointless without a sensor. */}
+            {(props.thermostatEditPresenceFeatures || []).length > 0 && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.presenceDelayLabel" />
+                </label>
+                <div class={cx('input-group', style.shortNumberField)}>
+                  <input
+                    type="number"
+                    class="form-control"
+                    min={MIN_PRESENCE_DELAY_MINUTES}
+                    max={MAX_PRESENCE_DELAY_MINUTES}
+                    step="1"
+                    value={props.thermostatEditPresenceDelay}
+                    onInput={e => props.updateThermostatField('thermostatEditPresenceDelay', e.target.value)}
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <Text id="integration.thermostat.edit.presenceDelayUnit" />
+                    </span>
+                  </div>
+                </div>
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.edit.presenceDelayHelp" />
+                </small>
+              </div>
+            )}
+            {(props.thermostatEditPresenceFeatures || []).length > 0 && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.presencePresetLabel" />
+                </label>
+                <select
+                  class="form-control"
+                  value={props.thermostatEditPresencePreset}
+                  onChange={e => props.updateThermostatField('thermostatEditPresencePreset', e.target.value)}
+                >
+                  {PRESENCE_PRESETS.map(preset => (
+                    <option key={preset} value={preset} selected={preset === props.thermostatEditPresencePreset}>
+                      <Text id={`integration.thermostat.edit.presencePreset.${preset}`} />
+                    </option>
+                  ))}
+                </select>
+                <small class="form-text text-muted">
+                  <Text id={`integration.thermostat.edit.presencePresetHelp.${modeSuffix}`} />
                 </small>
               </div>
             )}
