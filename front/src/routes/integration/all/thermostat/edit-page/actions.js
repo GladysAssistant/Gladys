@@ -63,6 +63,30 @@ const defaultInUnit = (state, mode, preset) => {
   const celsius = defaultPresetTemps(mode)[preset];
   return state.thermostatEditTempUnit === 'F' ? Math.round(((celsius * 9) / 5 + 32) * 2) / 2 : celsius;
 };
+// What ticking or unticking a reversible heat pump changes in the form (see
+// updateThermostatReversible).
+const reversibleFields = (state, reversible) => {
+  const next = { thermostatEditReversible: reversible };
+  if (state.thermostatEditMode === 'cooling') {
+    PRESET_FIELDS.forEach(([field, preset], index) => {
+      const [coolingField] = COOLING_PRESET_FIELDS[index];
+      if (reversible) {
+        next[coolingField] = state[field];
+        next[field] = String(defaultInUnit(state, 'heating', preset));
+      } else {
+        next[field] = state[coolingField];
+      }
+    });
+  } else if (reversible) {
+    // A new thermostat has no cooling presets yet: they start from their defaults.
+    COOLING_PRESET_FIELDS.forEach(([coolingField, preset]) => {
+      if (!state[coolingField]) {
+        next[coolingField] = String(defaultInUnit(state, 'cooling', preset));
+      }
+    });
+  }
+  return next;
+};
 // Switching the use carries the presets along while they still hold the
 // previous use's defaults: an air conditioner set up from a blank form kept
 // Comfort at 21 °C. A temperature someone typed is theirs, and stays.
@@ -345,26 +369,17 @@ function createActions(store) {
     // the heating ones start from their defaults; unticked while it cools, the
     // cooling ones become the only set again.
     updateThermostatReversible(state, reversible) {
-      const next = { thermostatEditReversible: reversible };
-      if (state.thermostatEditMode === 'cooling') {
-        PRESET_FIELDS.forEach(([field, preset], index) => {
-          const [coolingField] = COOLING_PRESET_FIELDS[index];
-          if (reversible) {
-            next[coolingField] = state[field];
-            next[field] = String(defaultInUnit(state, 'heating', preset));
-          } else {
-            next[field] = state[coolingField];
-          }
-        });
-      } else if (reversible) {
-        // A new thermostat has no cooling presets yet: they start from their defaults.
-        COOLING_PRESET_FIELDS.forEach(([coolingField, preset]) => {
-          if (!state[coolingField]) {
-            next[coolingField] = String(defaultInUnit(state, 'cooling', preset));
-          }
-        });
-      }
-      store.setState(next);
+      store.setState(reversibleFields(state, reversible));
+    },
+
+    // Only a real thermostat can be reversible: it has a mode to write, while a
+    // virtual one drives a single heater relay, which cooling would turn on in a
+    // room too warm (spec A.4). Leaving that type unticks it, presets and all.
+    updateThermostatType(state, type) {
+      store.setState({
+        thermostatEditType: type,
+        ...(type !== 'external' && state.thermostatEditReversible ? reversibleFields(state, false) : {})
+      });
     },
 
     // The order a preset sends a pilot-wire heater that regulates itself.
@@ -482,8 +497,9 @@ function createActions(store) {
         // A pilot-wire heater only heats: a cooling mode picked before it would
         // show cooling while the loop heats (spec C.1.1).
         const savedMode = pilotWireFeature || isPilotWireThermostat ? 'heating' : mode;
-        // Nor is a pilot-wire heater ever reversible (spec A.4).
-        const reversible = Boolean(state.thermostatEditReversible) && !pilotWireFeature && !isPilotWireThermostat;
+        // Only a real thermostat is reversible (spec A.4): never a pilot-wire
+        // heater, which only heats, nor a virtual one's single relay.
+        const reversible = Boolean(state.thermostatEditReversible) && isExternalThermostat;
 
         // Saving an empty form used to create a thermostat with no room, no
         // sensor and no actuator: it appeared in the list, regulated nothing, and

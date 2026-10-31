@@ -410,11 +410,12 @@ class ThermostatBox extends Component {
   // made elsewhere (a scene, the API, a second dashboard), which has to reload
   // the whole card.
   //
-  // It comes back twice: the thermostat service saves the state, and so does the
-  // core, which saves it itself for a feature without feedback. The value is
-  // therefore remembered for a few seconds rather than for one event: the second
-  // echo rebuilt the card from a device read taken before the preset and the
-  // setpoint written next had landed, and the card ended on neither. Every value
+  // It used to come back twice: the thermostat service saves the state, and so
+  // did the core, before the mode feature had feedback — a thermostat not saved
+  // since may still send both. The value is therefore remembered for a few
+  // seconds rather than for one event: the second echo rebuilt the card from a
+  // device read taken before the preset and the setpoint written next had
+  // landed, and the card ended on neither. Every value
   // written is remembered on its own: tapping Off then Comfort before the Off
   // echoes arrived took them for a stop made elsewhere, and the reload they
   // started left the card on Off while the thermostat heated.

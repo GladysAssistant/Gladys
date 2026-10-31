@@ -12,7 +12,8 @@ const {
 } = require('../../../../utils/constants');
 const { presetParamName } = require('../../../../utils/thermostatConstants');
 const { buildParamsConfig } = require('../../../../services/thermostat/lib/thermostat.deviceConfig');
-const { createDevice } = require('../../../../services/thermostat/lib/thermostat.createDevice');
+const { createDevice, buildStateFeatures } = require('../../../../services/thermostat/lib/thermostat.createDevice');
+const { setValue: coreSetValue } = require('../../../../lib/device/device.setValue');
 
 const silentLogger = { debug: fake.returns(null), info: fake.returns(null), warn: fake.returns(null) };
 
@@ -120,6 +121,18 @@ describe('thermostat: reversible heat pump', () => {
       expect(pilotWire.reversible).to.equal(false);
       expect(regulatedWire.reversible).to.equal(false);
     });
+
+    it('should never read a virtual thermostat as reversible', () => {
+      // Its single heater relay would turn on in a room too warm.
+      const virtual = buildParamsConfig({
+        params: [
+          { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'heater-relay' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+        ],
+      });
+
+      expect(virtual.reversible).to.equal(false);
+    });
   });
 
   describe('setValue on the mode feature', () => {
@@ -179,6 +192,33 @@ describe('thermostat: reversible heat pump', () => {
       assert.calledOnce(handler.broadcastConfigUpdated);
       assert.notCalled(handler.gladys.device.saveState);
       assert.notCalled(handler.triggerApplySchedules);
+    });
+
+    it('should keep a stopped heat pump stopped when the switch goes through the core', async () => {
+      // A scene, the widget and the API all write through the core, which saves
+      // the written value itself on a feature without feedback: the mode feature
+      // is built with feedback, so the stop stays (A.4).
+      const handler = buildHandler();
+      const device = {
+        ...heatPump({ mode: THERMOSTAT_MODE.OFF }),
+        service: { name: 'thermostat' },
+      };
+      const builtMode = buildStateFeatures({ external_id: 'thermostat:heat-pump' }, true).find(
+        (feature) => feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+      );
+      const feature = { ...builtMode, last_value: THERMOSTAT_MODE.OFF };
+      device.features = [feature];
+      const core = {
+        serviceManager: { getService: () => ({ device: { setValue: (...args) => handler.setValue(...args) } }) },
+        saveState: handler.gladys.device.saveState,
+        saveStringState: fake.resolves(null),
+      };
+
+      await coreSetValue.call(core, device, feature, THERMOSTAT_MODE.COOLING);
+
+      assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MODE', 'cooling');
+      assert.notCalled(handler.gladys.device.saveState);
+      expect(feature.last_value).to.equal(THERMOSTAT_MODE.OFF);
     });
 
     it('should start a stopped heat pump when its own use is written', async () => {
@@ -405,12 +445,47 @@ describe('thermostat: reversible heat pump', () => {
   });
 
   describe('createDevice', () => {
+    const buildCreateHandler = () => ({
+      serviceId: 'service-id',
+      gladys: { device: { create: fake((device) => Promise.resolve(device)) } },
+      invalidateDeviceCaches: fake.returns(null),
+    });
+    const setpoint = {
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+    };
+    const reversibleParam = (created) => created.params.find((param) => param.name === 'THERMOSTAT_REVERSIBLE').value;
+
+    it('should keep the reversible param of a real thermostat', async () => {
+      const created = await createDevice.call(buildCreateHandler(), {
+        name: 'Heat pump',
+        external_id: 'thermostat:heat-pump',
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+        ],
+      });
+
+      expect(reversibleParam(created)).to.equal('true');
+    });
+
+    it('should clear the reversible param of a virtual thermostat', async () => {
+      const created = await createDevice.call(buildCreateHandler(), {
+        name: 'Heater',
+        external_id: 'thermostat:heater',
+        features: [setpoint],
+        params: [
+          { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'heater-relay' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+        ],
+      });
+
+      expect(reversibleParam(created)).to.equal('');
+    });
+
     it('should clear the reversible param of a pilot-wire heater', async () => {
-      const handler = {
-        serviceId: 'service-id',
-        gladys: { device: { create: fake((device) => Promise.resolve(device)) } },
-        invalidateDeviceCaches: fake.returns(null),
-      };
+      const handler = buildCreateHandler();
 
       const created = await createDevice.call(handler, {
         name: 'Heater',

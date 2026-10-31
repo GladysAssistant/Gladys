@@ -179,8 +179,9 @@ const EditForm = ({ ...props }) => {
       );
   const keep = value => (value ? [value] : []);
 
-  // A reversible heat pump (spec A.4): never a pilot-wire heater, which only heats.
-  const reversible = Boolean(props.thermostatEditReversible) && !hasPilotWire;
+  // A reversible heat pump (spec A.4): only a real thermostat, which has a mode
+  // to write. A virtual one drives a single relay, and a pilot wire only heats.
+  const reversible = Boolean(props.thermostatEditReversible) && isExternalThermostat;
   const heatingPresets = ['frost', 'away', 'eco', 'night', 'comfort'];
   const coolingPresets = ['comfort'];
   // One programme in both uses: every preset it names needs a cooling setpoint.
@@ -481,7 +482,7 @@ const EditForm = ({ ...props }) => {
               <select
                 class="form-control"
                 value={thermostatType}
-                onChange={e => props.updateThermostatField('thermostatEditType', e.target.value)}
+                onChange={e => props.updateThermostatType(e.target.value)}
               >
                 <option value="virtual">
                   <Text id="integration.thermostat.edit.typeVirtual" />
@@ -535,7 +536,7 @@ const EditForm = ({ ...props }) => {
                 {/* One thermostat for both seasons (spec A.4): the use above is
                     then the one in force, switched from the widget, a scene or
                     the unit's remote. */}
-                {!hasPilotWire && (
+                {isExternalThermostat && (
                   <label class="custom-switch mt-2">
                     <input
                       type="checkbox"

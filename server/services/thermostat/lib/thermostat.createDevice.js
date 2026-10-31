@@ -139,7 +139,11 @@ function buildStateFeatures(device, external) {
     external_id: `${base}:mode`,
     selector: `${base}:mode`,
     read_only: false,
-    has_feedback: false,
+    // The service saves the mode itself, and only when it is in force: a
+    // stopped reversible heat pump told to cool only switches its use (A.4).
+    // Without feedback, the core would save the value written after the
+    // service returned, and the next pass would start the unit.
+    has_feedback: true,
     min: THERMOSTAT_MODE.OFF,
     max: THERMOSTAT_MODE.COOLING,
     category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -258,11 +262,18 @@ async function createDevice(device) {
       if (param.name === 'THERMOSTAT_MODE' && param.value === 'cooling') {
         param.value = 'heating';
       }
-      if (param.name === 'THERMOSTAT_REVERSIBLE') {
-        param.value = '';
-      }
       if (param.name === 'THERMOSTAT_CONTROL_TYPE' && param.value === 'tpi') {
         param.value = 'hysteresis';
+      }
+    });
+  }
+
+  // Only a real thermostat is reversible (spec A.4): a virtual one's single
+  // relay would heat a room too warm, and a pilot-wire heater only heats.
+  if (!external) {
+    params.forEach((param) => {
+      if (param.name === 'THERMOSTAT_REVERSIBLE') {
+        param.value = '';
       }
     });
   }
