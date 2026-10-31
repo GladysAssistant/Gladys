@@ -102,7 +102,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     logger.info(`Matter: Node ${nodeId} connected.`);
   }
 
-  // Handle binary device
+  // Handle binary device (a switch, or the on/off of a light: both are the "binary" type)
   // Locks share the same "binary" type, but they are controlled through the DoorLock cluster below
   if (
     gladysFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
