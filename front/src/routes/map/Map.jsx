@@ -61,8 +61,10 @@ class MapComponent extends Component {
     if (this.boundsFitted || !props.loaded) {
       return;
     }
-    this.boundsFitted = true;
+    // Only latch once something was fitted: an instance with no house
+    // location, zone or user position yet must still fit its first marker.
     if (this.markerArray.length >= 1) {
+      this.boundsFitted = true;
       const group = leaflet.featureGroup(this.markerArray);
       this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
     }

@@ -10,34 +10,28 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 class MapPage extends Component {
   getUsersWithLocation = async () => {
     try {
-      const usersWithLocation = await this.props.httpClient.get(
+      return await this.props.httpClient.get(
         '/api/v1/user?fields=id,firstname,selector,picture,last_latitude,last_longitude,last_altitude,last_accuracy,last_location_changed'
       );
-      this.setState({
-        usersWithLocation
-      });
     } catch (e) {
       console.error(e);
+      return [];
     }
   };
   getHousesWithLocation = async () => {
     try {
-      const housesWithLocation = await this.props.httpClient.get('/api/v1/house');
-      this.setState({
-        housesWithLocation
-      });
+      return await this.props.httpClient.get('/api/v1/house');
     } catch (e) {
       console.error(e);
+      return [];
     }
   };
   getAreas = async () => {
     try {
-      const areas = await this.props.httpClient.get('/api/v1/area');
-      this.setState({
-        areas
-      });
+      return await this.props.httpClient.get('/api/v1/area');
     } catch (e) {
       console.error(e);
+      return [];
     }
   };
   updateUserLocationWebsocket = event => {
@@ -74,8 +68,14 @@ class MapPage extends Component {
   }
 
   loadMapData = async () => {
-    await Promise.all([this.getUsersWithLocation(), this.getHousesWithLocation(), this.getAreas()]);
-    this.setState({ loaded: true });
+    // A single setState, so the markers and the first fit land together
+    // instead of flashing on the world view while the requests complete
+    const [usersWithLocation, housesWithLocation, areas] = await Promise.all([
+      this.getUsersWithLocation(),
+      this.getHousesWithLocation(),
+      this.getAreas()
+    ]);
+    this.setState({ usersWithLocation, housesWithLocation, areas, loaded: true });
   };
 
   componentDidMount() {
