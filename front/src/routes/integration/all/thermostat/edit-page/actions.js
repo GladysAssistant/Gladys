@@ -7,7 +7,8 @@ import {
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
   MAX_WINDOW_DELAY_SECONDS,
-  defaultPresetTemps
+  defaultPresetTemps,
+  modeFeatureCanCool
 } from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
@@ -530,6 +531,17 @@ function createActions(store) {
         // without it, its cooling presets would apply to a unit still heating.
         if (reversible && !state.thermostatEditModeFeature) {
           store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'reversibleNoMode' });
+          return;
+        }
+        // Nor one whose mode only heats: cooling would be clamped to heating.
+        const pickedMode = (state.modeFeatures || []).find(
+          feature => feature.selector === state.thermostatEditModeFeature
+        );
+        if (reversible && pickedMode && !modeFeatureCanCool(pickedMode)) {
+          store.setState({
+            thermostatCreateStatus: RequestStatus.Error,
+            thermostatEditError: 'reversibleModeCannotCool'
+          });
           return;
         }
 

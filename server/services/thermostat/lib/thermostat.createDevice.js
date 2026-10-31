@@ -7,7 +7,8 @@ const {
   THERMOSTAT_PRESET,
   THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
-const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
+const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE, modeFeatureCanCool } = require('../../../utils/thermostatConstants');
+const { getFeatureBySelector } = require('./thermostat.deviceConfig');
 
 // The params that make an external thermostat drive a real device: its
 // setpoint, its running state, its mode and its power. A pilot-wire heater has
@@ -273,12 +274,23 @@ async function createDevice(device) {
   // heats, and a unit with no mode to write would keep its use while the
   // cooling presets applied.
   const modeParam = params.find((param) => param.name === 'THERMOSTAT_MODE_FEATURE');
-  if (!external || !(modeParam && modeParam.value)) {
-    params.forEach((param) => {
-      if (param.name === 'THERMOSTAT_REVERSIBLE') {
-        param.value = '';
+  const reversibleParam = params.find((param) => param.name === 'THERMOSTAT_REVERSIBLE');
+  if (reversibleParam && (!external || !(modeParam && modeParam.value))) {
+    reversibleParam.value = '';
+  }
+  // Nor is one whose mode cannot cool: the write is clamped to the feature's
+  // maximum, and the unit would keep heating under the cooling presets. A mode
+  // that cannot be read is left to the form, which checked it.
+  if (reversibleParam && reversibleParam.value === 'true') {
+    try {
+      const mode = await getFeatureBySelector(this.gladys, modeParam.value);
+      if (mode && !modeFeatureCanCool(mode.feature)) {
+        logger.warn(`Thermostat: ${modeParam.value} cannot cool, ${device.name} saved as not reversible`);
+        reversibleParam.value = '';
       }
-    });
+    } catch (e) {
+      logger.warn(`Thermostat: could not read the mode ${modeParam.value}: ${e.message}`);
+    }
   }
 
   const features = (device.features || []).filter(
