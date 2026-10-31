@@ -502,22 +502,37 @@ describe('thermostat: reversible heat pump', () => {
       });
     };
 
+    const thermostatMode = {
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+    };
+    const airConditionerMode = {
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+    };
+
     it('should clear the reversible param of a unit whose mode only heats', async () => {
-      const created = await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT, max: 1 });
+      const created = await saveWithMode({ ...thermostatMode, max: 1 });
 
       expect(reversibleParam(created)).to.equal('');
     });
 
-    it('should keep the reversible param of a unit whose mode can cool', async () => {
-      expect(reversibleParam(await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT, max: 3 }))).to.equal(
-        'true',
-      );
-      // An air conditioner speaks AC_MODE, which always cools, whatever its max.
+    // What the form offers: a writable mode. Anything else takes no mode write.
+    it('should clear the reversible param of a read-only mode or a feature that is no mode', async () => {
+      expect(reversibleParam(await saveWithMode({ ...airConditionerMode, read_only: true }))).to.equal('');
       expect(
-        reversibleParam(await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING, max: 1 })),
-      ).to.equal('true');
+        reversibleParam(
+          await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING, type: 'fan-speed', max: 5 }),
+        ),
+      ).to.equal('');
+    });
+
+    it('should keep the reversible param of a unit whose mode can cool', async () => {
+      expect(reversibleParam(await saveWithMode({ ...thermostatMode, max: 3 }))).to.equal('true');
+      // An air conditioner speaks AC_MODE, which always cools, whatever its max.
+      expect(reversibleParam(await saveWithMode({ ...airConditionerMode, max: 1 }))).to.equal('true');
       // No declared maximum, or a mode not found: taken at its word.
-      expect(reversibleParam(await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT }))).to.equal('true');
+      expect(reversibleParam(await saveWithMode(thermostatMode))).to.equal('true');
       expect(reversibleParam(await saveWithMode(null))).to.equal('true');
     });
 
