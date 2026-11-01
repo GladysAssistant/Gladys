@@ -380,21 +380,18 @@ const EditForm = ({ ...props }) => {
     if (picked.unit && featureUnit !== (props.thermostatEditTempUnit || 'C')) {
       return;
     }
-    const defaults = { thermostatEditMinTemp: '5', thermostatEditMaxTemp: '35' };
-    if (
-      picked.min !== null &&
-      picked.min !== undefined &&
-      props.thermostatEditMinTemp === defaults.thermostatEditMinTemp
-    ) {
-      props.updateThermostatField('thermostatEditMinTemp', String(picked.min));
-    }
-    if (
-      picked.max !== null &&
-      picked.max !== undefined &&
-      props.thermostatEditMaxTemp === defaults.thermostatEditMaxTemp
-    ) {
-      props.updateThermostatField('thermostatEditMaxTemp', String(picked.max));
-    }
+    // Both ranges of a reversible heat pump (spec A.4): the cooling one is only
+    // saved once reversible is ticked, but filled now it is ready when it is.
+    [
+      ['thermostatEditMinTemp', picked.min, '5'],
+      ['thermostatEditMaxTemp', picked.max, '35'],
+      ['thermostatEditCoolingMinTemp', picked.min, '5'],
+      ['thermostatEditCoolingMaxTemp', picked.max, '35']
+    ].forEach(([field, value, defaultValue]) => {
+      if (value !== null && value !== undefined && String(props[field] || defaultValue) === defaultValue) {
+        props.updateThermostatField(field, String(value));
+      }
+    });
   };
 
   return (

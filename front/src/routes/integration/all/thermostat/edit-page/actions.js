@@ -88,6 +88,15 @@ const reversibleFields = (state, reversible) => {
       }
     });
   } else if (reversible) {
+    // A cooling range still on the form's defaults starts from the range in
+    // force, which the appliance's own may have filled.
+    if (
+      String(state.thermostatEditCoolingMinTemp || '5') === '5' &&
+      String(state.thermostatEditCoolingMaxTemp || '35') === '35'
+    ) {
+      next.thermostatEditCoolingMinTemp = state.thermostatEditMinTemp;
+      next.thermostatEditCoolingMaxTemp = state.thermostatEditMaxTemp;
+    }
     // A new thermostat has no cooling presets yet: they start from their defaults.
     COOLING_PRESET_FIELDS.forEach(([coolingField, preset]) => {
       if (!state[coolingField]) {
@@ -433,6 +442,8 @@ function createActions(store) {
         thermostatEditTempUnit: newUnit,
         thermostatEditMinTemp: conv(state.thermostatEditMinTemp),
         thermostatEditMaxTemp: conv(state.thermostatEditMaxTemp),
+        thermostatEditCoolingMinTemp: conv(state.thermostatEditCoolingMinTemp),
+        thermostatEditCoolingMaxTemp: conv(state.thermostatEditCoolingMaxTemp),
         thermostatEditPresetFrost: conv(state.thermostatEditPresetFrost),
         thermostatEditPresetAway: conv(state.thermostatEditPresetAway),
         thermostatEditPresetEco: conv(state.thermostatEditPresetEco),
