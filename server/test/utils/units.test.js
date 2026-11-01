@@ -32,6 +32,12 @@ describe('hslToRgb', () => {
     const rgb = hslToRgb(214, 1, 0.5);
     expect(rgb).to.deep.equal([0, 110, 255]);
   });
+
+  it('should return rgb scaled to 0-255 for achromatic colors', () => {
+    expect(hslToRgb(0, 0, 1)).to.deep.equal([255, 255, 255]);
+    expect(hslToRgb(120, 0, 0.5)).to.deep.equal([128, 128, 128]);
+    expect(hslToRgb(0, 0, 0)).to.deep.equal([0, 0, 0]);
+  });
 });
 
 describe('checkAndConvertUnit distances', () => {
