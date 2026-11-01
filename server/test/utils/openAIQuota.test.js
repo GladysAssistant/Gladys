@@ -32,6 +32,12 @@ describe('openAIQuota utils', () => {
       expect(formatResetDuration(90061, 'de')).to.equal('1T 1Std 1Min 1Sek');
     });
 
+    it('should format durations longer than 30 days without losing months', () => {
+      expect(formatResetDuration(45 * 86400, 'en')).to.equal('45d');
+      expect(formatResetDuration(31 * 86400, 'en')).to.equal('31d');
+      expect(formatResetDuration(45 * 86400 + 3600, 'en')).to.equal('45d 1h');
+    });
+
     it('should fallback to english labels for unknown language', () => {
       expect(formatResetDuration(30, 'es')).to.equal('30s');
     });
