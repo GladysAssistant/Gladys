@@ -69,6 +69,15 @@ const defaultInUnit = (state, mode, preset) => {
 const reversibleFields = (state, reversible) => {
   const next = { thermostatEditReversible: reversible };
   if (state.thermostatEditMode === 'cooling') {
+    // The range moves with the presets: the one a cooling thermostat had is
+    // its cooling range, and the cooling range is the only one again.
+    if (reversible) {
+      next.thermostatEditCoolingMinTemp = state.thermostatEditMinTemp;
+      next.thermostatEditCoolingMaxTemp = state.thermostatEditMaxTemp;
+    } else {
+      next.thermostatEditMinTemp = state.thermostatEditCoolingMinTemp;
+      next.thermostatEditMaxTemp = state.thermostatEditCoolingMaxTemp;
+    }
     PRESET_FIELDS.forEach(([field, preset], index) => {
       const [coolingField] = COOLING_PRESET_FIELDS[index];
       if (reversible) {
@@ -288,6 +297,11 @@ function createActions(store) {
           thermostatEditMode: getParam('THERMOSTAT_MODE') || 'heating',
           thermostatEditMinTemp: getParam('THERMOSTAT_MIN_TEMP') || '5',
           thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || '35',
+          // A reversible heat pump's cooling range, the single one until set.
+          thermostatEditCoolingMinTemp:
+            getParam('THERMOSTAT_COOLING_MIN_TEMP') || getParam('THERMOSTAT_MIN_TEMP') || '5',
+          thermostatEditCoolingMaxTemp:
+            getParam('THERMOSTAT_COOLING_MAX_TEMP') || getParam('THERMOSTAT_MAX_TEMP') || '35',
           thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C',
           thermostatEditControlType: getParam('THERMOSTAT_CONTROL_TYPE') || 'hysteresis',
           // One sensor or several (spec A.1.1).
@@ -582,6 +596,15 @@ function createActions(store) {
             { name: 'THERMOSTAT_MODE', value: savedMode },
             { name: 'THERMOSTAT_MIN_TEMP', value: String(minTemp) },
             { name: 'THERMOSTAT_MAX_TEMP', value: String(maxTemp) },
+            // The cooling range of a reversible heat pump, cleared otherwise.
+            {
+              name: 'THERMOSTAT_COOLING_MIN_TEMP',
+              value: reversible ? String(toNumber(state.thermostatEditCoolingMinTemp, minTemp)) : ''
+            },
+            {
+              name: 'THERMOSTAT_COOLING_MAX_TEMP',
+              value: reversible ? String(toNumber(state.thermostatEditCoolingMaxTemp, maxTemp)) : ''
+            },
             { name: 'THERMOSTAT_TEMP_UNIT', value: tempUnit },
             { name: 'THERMOSTAT_CONTROL_TYPE', value: controlType },
             { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
@@ -702,6 +725,8 @@ function createActions(store) {
           thermostatEditPresetNight: '17',
           thermostatEditPresetComfort: '21',
           thermostatEditReversible: false,
+          thermostatEditCoolingMinTemp: '5',
+          thermostatEditCoolingMaxTemp: '35',
           ...COOLING_PRESET_FIELDS.reduce((fields, [field]) => ({ ...fields, [field]: undefined }), {}),
           thermostatEditHysteresisStart: '0.5',
           thermostatEditHysteresisStop: '0.5',

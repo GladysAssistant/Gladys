@@ -825,6 +825,7 @@
         "preset": {
           "off": "Arrêt",
           "frost": "Hors-gel",
+          "frostCooling": "Protection",
           "away": "Absence",
           "comfort": "Confort",
           "eco": "Éco",
@@ -3791,6 +3792,10 @@
         "sectionProgramming": "Programmation",
         "deviceRangeHint": "L’appareil annonce {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Utiliser ces valeurs",
+        "rangeUse": {
+          "heating": "Chauffage",
+          "cooling": "Climatisation"
+        },
         "rangeSection": "Plage de températures"
       },
       "schedule": {
@@ -5894,7 +5899,7 @@
         "mode": {
           "off": "Arrêt",
           "heating": "Chauffage",
-          "cooling": "Refroidissement",
+          "cooling": "Climatisation",
           "auto": "Auto"
         },
         "preset": {
@@ -6208,7 +6213,7 @@
         "mode": {
           "0": "Arrêt",
           "1": "Chauffage",
-          "2": "Refroidissement",
+          "2": "Climatisation",
           "3": "Auto"
         },
         "preset": {

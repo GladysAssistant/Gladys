@@ -973,6 +973,7 @@
         "preset": {
           "off": "Apagado",
           "frost": "Antihielo",
+          "frostCooling": "Protección",
           "away": "Ausencia",
           "comfort": "Confort",
           "eco": "Eco",
@@ -3791,6 +3792,10 @@
         "sectionProgramming": "Programación",
         "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Usar estos valores",
+        "rangeUse": {
+          "heating": "Calefacción",
+          "cooling": "Refrigeración"
+        },
         "rangeSection": "Rango de temperaturas"
       },
       "schedule": {

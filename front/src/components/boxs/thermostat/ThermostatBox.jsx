@@ -44,6 +44,8 @@ const PRESET_ICONS = {
 // temperature you want when you are here", which is a flame when heating and a
 // snowflake when cooling. A sun for both read as "warm" even in cooling.
 const COMFORT_ICON = { heating: 'fe-flame', cooling: 'fe-snowflake' };
+// Frost protection, when cooling: the highest setpoint, kept while nobody is in.
+const PROTECTION_ICON = 'fe-shield';
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
@@ -525,6 +527,24 @@ class ThermostatBox extends Component {
     return presetColorForMode(presetKey, cfg.default_mode);
   };
 
+  // A preset's name on the card. Frost protection is named for what it does in
+  // the use in force: "Protection" when cooling.
+  getPresetName = presetKey => {
+    const { intl } = this.props;
+    const names =
+      intl &&
+      intl.dictionary &&
+      intl.dictionary.dashboard &&
+      intl.dictionary.dashboard.boxes &&
+      intl.dictionary.dashboard.boxes.thermostat &&
+      intl.dictionary.dashboard.boxes.thermostat.preset;
+    if (!names) {
+      return presetKey;
+    }
+    const cooling = this.getConfig().default_mode === 'cooling';
+    return (presetKey === 'frost' && cooling && names.frostCooling) || names[presetKey] || presetKey;
+  };
+
   getPresets = () => {
     const cfg = this.getConfig();
     const mode = cfg.default_mode || 'heating';
@@ -534,7 +554,14 @@ class ThermostatBox extends Component {
     const defaults = defaultPresetTemps(mode);
     const allPresets = {
       off: { key: 'off', icon: PRESET_ICONS.off, temp: null },
-      frost: { key: 'frost', icon: PRESET_ICONS.frost, temp: numOr(cfg.preset_frost, defaults.frost) },
+      // Frost protection means nothing to a unit cooling: there it keeps the
+      // house from overheating while nobody is in, under a name and an icon of
+      // its own (see getPresetName).
+      frost: {
+        key: 'frost',
+        icon: mode === 'cooling' ? PROTECTION_ICON : PRESET_ICONS.frost,
+        temp: numOr(cfg.preset_frost, defaults.frost)
+      },
       away: { key: 'away', icon: PRESET_ICONS.away, temp: numOr(cfg.preset_away, defaults.away) },
       comfort: {
         key: 'comfort',
@@ -1859,11 +1886,7 @@ class ThermostatBox extends Component {
                     if (matchedPreset) {
                       heldPreset = presets.find(candidate => candidate.key === matchedPreset);
                     }
-                    const i18nHeldPresets =
-                      props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
-                    const label = heldPreset
-                      ? (i18nHeldPresets && i18nHeldPresets[heldPreset.key]) || heldPreset.key
-                      : (t && t.manualMode) || '';
+                    const label = heldPreset ? this.getPresetName(heldPreset.key) : (t && t.manualMode) || '';
                     return (
                       <div
                         class={cx(style.manualBanner, { [style.manualBannerPreset]: !!heldPreset })}
@@ -1892,10 +1915,7 @@ class ThermostatBox extends Component {
                     presets.find(p => p.key === 'comfort') ||
                     presets[0];
                   const presetIcon = activePresetObj ? activePresetObj.icon : 'fe-power';
-                  const i18nPresets =
-                    props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
-                  const presetName =
-                    i18nPresets && i18nPresets[resolvedPresetKey] ? i18nPresets[resolvedPresetKey] : resolvedPresetKey;
+                  const presetName = this.getPresetName(resolvedPresetKey);
                   const bannerColor = this.getPresetColor(resolvedPresetKey);
                   const t2 = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
                   const untilLabel = (t2 && t2.scheduleUntil) || '';
@@ -2015,16 +2035,7 @@ class ThermostatBox extends Component {
                       aria-disabled={isWindowOpen ? 'true' : undefined}
                     >
                       {presets.map(preset => {
-                        const presetTitle =
-                          props.intl &&
-                          props.intl.dictionary &&
-                          props.intl.dictionary.dashboard &&
-                          props.intl.dictionary.dashboard.boxes &&
-                          props.intl.dictionary.dashboard.boxes.thermostat &&
-                          props.intl.dictionary.dashboard.boxes.thermostat.preset &&
-                          props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                            ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                            : preset.key;
+                        const presetTitle = this.getPresetName(preset.key);
                         const isActive =
                           (resolvedActivePreset === preset.key && !manualSetpointOverride) ||
                           matchedPreset === preset.key;
