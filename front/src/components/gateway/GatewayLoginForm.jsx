@@ -141,6 +141,8 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 </a>
                 <br />
                 <MarkupText id="gatewayLogin.noRecoveryCode" />
+                <br />
+                <MarkupText id="gatewayLogin.twoFactorHelp" />
               </p>
             </div>
           )}
@@ -167,6 +169,8 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 </a>
                 <br />
                 <MarkupText id="gatewayLogin.noRecoveryCode" />
+                <br />
+                <MarkupText id="gatewayLogin.twoFactorHelp" />
               </p>
             </div>
           )}
