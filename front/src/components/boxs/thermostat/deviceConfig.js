@@ -36,6 +36,8 @@ const PARAM_FIELDS = [
   ['control_type', 'THERMOSTAT_CONTROL_TYPE'],
   ['temp_min', 'THERMOSTAT_MIN_TEMP', parseFloat],
   ['temp_max', 'THERMOSTAT_MAX_TEMP', parseFloat],
+  ['cooling_temp_min', 'THERMOSTAT_COOLING_MIN_TEMP', parseFloat],
+  ['cooling_temp_max', 'THERMOSTAT_COOLING_MAX_TEMP', parseFloat],
   ['temp_unit', 'THERMOSTAT_TEMP_UNIT'],
   ['preset_frost', 'THERMOSTAT_PRESET_FROST', parseFloat],
   ['preset_away', 'THERMOSTAT_PRESET_AWAY', parseFloat],
@@ -95,6 +97,12 @@ export const buildConfigFromParams = device => {
   if (config.reversible && config.default_mode === 'cooling') {
     ['frost', 'away', 'eco', 'night', 'comfort'].forEach(preset => {
       config[`preset_${preset}`] = config[`preset_cooling_${preset}`];
+    });
+    // And the range of the cooling use, when it has one of its own.
+    ['temp_min', 'temp_max'].forEach(bound => {
+      if (config[`cooling_${bound}`] !== null && config[`cooling_${bound}`] !== undefined) {
+        config[bound] = config[`cooling_${bound}`];
+      }
     });
   }
   return config;

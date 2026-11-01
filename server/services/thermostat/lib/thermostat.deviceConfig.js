@@ -80,6 +80,7 @@ function buildParamsConfig(device) {
   // A thermostat that cools aims higher: its presets default accordingly. A
   // reversible one reads the set of the use in force.
   const presetDefaults = defaultPresetTemps(mode);
+  const coolingRange = reversible && mode === 'cooling';
   const presetSetpoint = (preset) =>
     toNumber(getParam(presetParamName(preset, mode, reversible)), presetDefaults[preset]);
   // One sensor or several (A.1.1): the loop regulates on their average.
@@ -96,6 +97,11 @@ function buildParamsConfig(device) {
   const savedMin = toNumber(getParam('THERMOSTAT_MIN_TEMP'), defaultRange.min);
   const savedMax = toNumber(getParam('THERMOSTAT_MAX_TEMP'), defaultRange.max);
   const tempRange = savedMin < savedMax ? { min: savedMin, max: savedMax } : defaultRange;
+  // The cooling range of a reversible heat pump, bound by bound over the
+  // heating one, and held to the same rule: one with no width stands for it.
+  const coolingMin = toNumber(getParam('THERMOSTAT_COOLING_MIN_TEMP'), tempRange.min);
+  const coolingMax = toNumber(getParam('THERMOSTAT_COOLING_MAX_TEMP'), tempRange.max);
+  const coolingTempRange = coolingMin < coolingMax ? { min: coolingMin, max: coolingMax } : tempRange;
   return {
     temperature_features: temperatureFeatures,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
@@ -137,8 +143,11 @@ function buildParamsConfig(device) {
     default_mode: mode,
     reversible,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
-    temp_min: tempRange.min,
-    temp_max: tempRange.max,
+    // A reversible heat pump has a range per use, like its presets (A.4): the
+    // cooling one when it cools, the heating one — the single range when the
+    // cooling one is not set — otherwise.
+    temp_min: (coolingRange ? coolingTempRange : tempRange).min,
+    temp_max: (coolingRange ? coolingTempRange : tempRange).max,
     temp_unit: tempUnit,
     // Null rather than the default when the param is absent: an absent duration
     // is a setting of its own — "hand the thermostat back at the next schedule
