@@ -42,7 +42,8 @@ function formatResetDuration(seconds, language = 'en') {
   const parts = [];
 
   if (duration.days() > 0) {
-    parts.push(`${duration.days()}${labels.day}`);
+    // asDays() is the total; dayjs .days() is the component left after whole months are extracted
+    parts.push(`${Math.floor(duration.asDays())}${labels.day}`);
   }
   if (duration.hours() > 0) {
     parts.push(`${duration.hours()}${labels.hour}`);
