@@ -11,6 +11,7 @@ const {
   isCameraEnabled,
   isStringStateFeature,
   normalizeStringState,
+  isNumeric,
 } = require('../../utils/device');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 
@@ -445,5 +446,28 @@ describe('isStringStateFeature / normalizeStringState', () => {
     expect(normalizeStringState({ category: 'music', type: 'artwork' }, '')).to.equal('');
     expect(normalizeStringState({ category: 'music', type: 'artwork' }, 'https://x/y.jpg')).to.equal(null);
     expect(normalizeStringState({ category: 'music', type: 'artwork' }, '-bad')).to.equal(null);
+  });
+});
+
+describe('isNumeric', () => {
+  it('should accept numbers', () => {
+    expect(isNumeric(12)).to.equal(true);
+    expect(isNumeric(12.5)).to.equal(true);
+    expect(isNumeric(-3)).to.equal(true);
+  });
+
+  it('should accept numeric strings', () => {
+    expect(isNumeric('12')).to.equal(true);
+    expect(isNumeric('12.5')).to.equal(true);
+    expect(isNumeric('  7 ')).to.equal(true);
+  });
+
+  it('should reject non-numeric values', () => {
+    expect(isNumeric('abc')).to.equal(false);
+    expect(isNumeric('')).to.equal(false);
+    expect(isNumeric(null)).to.equal(false);
+    expect(isNumeric(undefined)).to.equal(false);
+    expect(isNumeric(NaN)).to.equal(false);
+    expect(isNumeric(Infinity)).to.equal(false);
   });
 });
