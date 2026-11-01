@@ -81,6 +81,7 @@ function buildParamsConfig(device) {
   // A thermostat that cools aims higher: its presets default accordingly. A
   // reversible one reads the set of the use in force.
   const presetDefaults = defaultPresetTemps(mode);
+  const coolingRange = reversible && mode === 'cooling';
   const presetSetpoint = (preset) =>
     toNumber(getParam(presetParamName(preset, mode, reversible)), presetDefaults[preset]);
   // One sensor or several (A.1.1): the loop regulates on their average.
@@ -126,8 +127,17 @@ function buildParamsConfig(device) {
     default_mode: mode,
     reversible,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
-    temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),
-    temp_max: toNumber(getParam('THERMOSTAT_MAX_TEMP'), DEFAULT_MAX_TEMP),
+    // A reversible heat pump has a range per use, like its presets (A.4): the
+    // cooling one when it cools, and the heating one — or a single range when
+    // the cooling one is not set — otherwise.
+    temp_min: toNumber(
+      coolingRange ? getParam('THERMOSTAT_COOLING_MIN_TEMP') : null,
+      toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),
+    ),
+    temp_max: toNumber(
+      coolingRange ? getParam('THERMOSTAT_COOLING_MAX_TEMP') : null,
+      toNumber(getParam('THERMOSTAT_MAX_TEMP'), DEFAULT_MAX_TEMP),
+    ),
     temp_unit: getParam('THERMOSTAT_TEMP_UNIT') || DEFAULT_TEMP_UNIT,
     // Null rather than the default when the param is absent: an absent duration
     // is a setting of its own — "hand the thermostat back at the next schedule

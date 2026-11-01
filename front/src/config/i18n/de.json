@@ -852,6 +852,7 @@
         "preset": {
           "off": "Aus",
           "frost": "Frostschutz",
+          "frostCooling": "Schutz",
           "away": "Abwesend",
           "comfort": "Komfort",
           "eco": "Eco",
@@ -3914,6 +3915,10 @@
         "sectionProgramming": "Programmierung",
         "deviceRangeHint": "Das Gerät meldet {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Diese Werte übernehmen",
+        "rangeUse": {
+          "heating": "Heizen",
+          "cooling": "Kühlen"
+        },
         "rangeSection": "Temperaturbereich"
       },
       "schedule": {

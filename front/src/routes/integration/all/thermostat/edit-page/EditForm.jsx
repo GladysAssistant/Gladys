@@ -400,9 +400,14 @@ const EditForm = ({ ...props }) => {
     targetRange &&
     (targetRange.min !== String(props.thermostatEditMinTemp) ||
       targetRange.max !== String(props.thermostatEditMaxTemp));
+  // The appliance's range bounds both uses of a reversible heat pump.
   const applyDeviceRange = () => {
     props.updateThermostatField('thermostatEditMinTemp', targetRange.min);
     props.updateThermostatField('thermostatEditMaxTemp', targetRange.max);
+    if (reversible) {
+      props.updateThermostatField('thermostatEditCoolingMinTemp', targetRange.min);
+      props.updateThermostatField('thermostatEditCoolingMaxTemp', targetRange.max);
+    }
   };
 
   const chooseTargetFeature = event => {
@@ -1077,54 +1082,52 @@ const EditForm = ({ ...props }) => {
                   <i class={`fe fe-chevron-right ${style.tuningChevron}`} aria-hidden="true" />
                   <Text id="integration.thermostat.edit.rangeSection" />
                 </summary>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="form-label">
-                        <Text id="integration.thermostat.edit.minTempLabel" />
-                      </label>
-                      <div class="input-group">
-                        <Localizer>
-                          <input
-                            type="number"
-                            class="form-control"
-                            placeholder={<Text id="integration.thermostat.edit.minTempPlaceholder" />}
-                            value={props.thermostatEditMinTemp}
-                            onInput={e => props.updateThermostatField('thermostatEditMinTemp', e.target.value)}
-                          />
-                        </Localizer>
-                        <div class="input-group-append">
-                          <span class="input-group-text">
-                            {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                          </span>
+                {/* A reversible heat pump has a range per use, like its presets
+                    (spec A.4): the fields above the cooling ones are then the
+                    heating range. */}
+                {(reversible ? ['heating', 'cooling'] : [null]).map(use => {
+                  const cooling = use === 'cooling';
+                  const minField = cooling ? 'thermostatEditCoolingMinTemp' : 'thermostatEditMinTemp';
+                  const maxField = cooling ? 'thermostatEditCoolingMaxTemp' : 'thermostatEditMaxTemp';
+                  const unitLabel = (props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C';
+                  return (
+                    <div key={use || 'single'}>
+                      {use && (
+                        <div class="form-label text-muted">
+                          <Text id={`integration.thermostat.edit.rangeUse.${use}`} />
                         </div>
+                      )}
+                      <div class="row">
+                        {[
+                          [minField, 'minTemp'],
+                          [maxField, 'maxTemp']
+                        ].map(([field, key]) => (
+                          <div class="col-md-6" key={field}>
+                            <div class="form-group">
+                              <label class="form-label">
+                                <Text id={`integration.thermostat.edit.${key}Label`} />
+                              </label>
+                              <div class="input-group">
+                                <Localizer>
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    placeholder={<Text id={`integration.thermostat.edit.${key}Placeholder`} />}
+                                    value={props[field]}
+                                    onInput={e => props.updateThermostatField(field, e.target.value)}
+                                  />
+                                </Localizer>
+                                <div class="input-group-append">
+                                  <span class="input-group-text">{unitLabel}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="form-label">
-                        <Text id="integration.thermostat.edit.maxTempLabel" />
-                      </label>
-                      <div class="input-group">
-                        <Localizer>
-                          <input
-                            type="number"
-                            class="form-control"
-                            placeholder={<Text id="integration.thermostat.edit.maxTempPlaceholder" />}
-                            value={props.thermostatEditMaxTemp}
-                            onInput={e => props.updateThermostatField('thermostatEditMaxTemp', e.target.value)}
-                          />
-                        </Localizer>
-                        <div class="input-group-append">
-                          <span class="input-group-text">
-                            {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
                 {/* What the appliance says it accepts, inside the fold with the two
                   fields it is about. Adopting it on picking the setpoint feature
                   covers the usual path, but not a thermostat edited later or a

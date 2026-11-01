@@ -50,11 +50,19 @@ async function switchUse(device, use) {
     return false;
   }
   await this.gladys.device.setParam(device, 'THERMOSTAT_MODE', use);
-  // The caller builds its config from this same object right after.
-  device.params = [
-    ...device.params.filter((param) => param.name !== 'THERMOSTAT_MODE'),
-    { name: 'THERMOSTAT_MODE', value: use },
-  ];
+  // The caller builds its config from this same object right after. The core's
+  // copy is updated too: `setParam` only writes the database, while a scene, the
+  // widget and the API hand the service that copy. Followed from the unit's
+  // remote, the switch runs on a device read from the database, and the next
+  // preset picked was then held on the old use's setpoint — Comfort at 25 °C in
+  // heating.
+  const cached = this.gladys.stateManager && this.gladys.stateManager.get('deviceById', device.id);
+  [device, cached].filter(Boolean).forEach((copy) => {
+    copy.params = [
+      ...copy.params.filter((param) => param.name !== 'THERMOSTAT_MODE'),
+      { name: 'THERMOSTAT_MODE', value: use },
+    ];
+  });
   await clearManualHold.call(this, device);
   // The widgets read the presets of the use from the params: they reload them.
   this.broadcastConfigUpdated();

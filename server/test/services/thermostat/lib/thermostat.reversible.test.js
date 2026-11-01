@@ -103,6 +103,38 @@ describe('thermostat: reversible heat pump', () => {
       expect(config.preset_comfort).to.equal(23);
     });
 
+    it('should read the range of the use in force', () => {
+      const range = [
+        { name: 'THERMOSTAT_MIN_TEMP', value: '7' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '22' },
+        { name: 'THERMOSTAT_COOLING_MIN_TEMP', value: '24' },
+        { name: 'THERMOSTAT_COOLING_MAX_TEMP', value: '30' },
+      ];
+      const heating = buildParamsConfig(heatPump({ extra: range }));
+      const cooling = buildParamsConfig(heatPump({ use: 'cooling', extra: range }));
+
+      expect([heating.temp_min, heating.temp_max]).to.deep.equal([7, 22]);
+      expect([cooling.temp_min, cooling.temp_max]).to.deep.equal([24, 30]);
+    });
+
+    it('should keep a single range when the cooling one is not set, or the thermostat is not reversible', () => {
+      const range = [
+        { name: 'THERMOSTAT_MIN_TEMP', value: '10' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '31' },
+      ];
+      const cooling = buildParamsConfig(heatPump({ use: 'cooling', extra: range }));
+      const notReversible = buildParamsConfig(
+        heatPump({
+          use: 'cooling',
+          reversible: false,
+          extra: [...range, { name: 'THERMOSTAT_COOLING_MIN_TEMP', value: '24' }],
+        }),
+      );
+
+      expect([cooling.temp_min, cooling.temp_max]).to.deep.equal([10, 31]);
+      expect(notReversible.temp_min).to.equal(10);
+    });
+
     it('should never read a pilot-wire heater as reversible', () => {
       const pilotWire = buildParamsConfig({
         params: [
@@ -231,6 +263,22 @@ describe('thermostat: reversible heat pump', () => {
       assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MODE', 'cooling');
       assert.notCalled(handler.gladys.device.saveState);
       expect(feature.last_value).to.equal(THERMOSTAT_MODE.OFF);
+    });
+
+    // Followed from the unit's remote, the switch runs on a device read from the
+    // database: the core's copy, which the next widget or scene write hands over,
+    // must take the new use too.
+    it("should switch the use on the core's copy of the device as well", async () => {
+      const handler = buildHandler();
+      const cached = heatPump({ use: 'cooling' });
+      handler.gladys.stateManager = { get: fake.returns(cached) };
+      const fromDatabase = heatPump({ use: 'cooling' });
+
+      await handler.setValue(fromDatabase, fromDatabase.features[0], THERMOSTAT_MODE.HEATING);
+
+      assert.calledWith(handler.gladys.stateManager.get, 'deviceById', 'heat-pump-id');
+      expect(buildParamsConfig(cached).default_mode).to.equal('heating');
+      expect(buildParamsConfig(fromDatabase).default_mode).to.equal('heating');
     });
 
     it('should start a stopped heat pump when its own use is written', async () => {
