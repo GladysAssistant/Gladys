@@ -5495,6 +5495,7 @@
     "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
     "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
     "noRecoveryCode": "Keinen Wiederherstellungscode? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
+    "twoFactorHelp": "Code abgelehnt, neues Handy? <a href=\"https://gladysassistant.com/de/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Lies unsere 2FA-Hilfe zur Fehlerbehebung</a>.",
     "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
     "recoveryCodeLabel": "Wiederherstellungscode",
     "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",

@@ -5495,6 +5495,7 @@
     "lostTwoFactor": "Lost access to your two-factor app?",
     "useRecoveryCodeLink": "Use a recovery code",
     "noRecoveryCode": "No recovery code? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> and we will reset it.",
+    "twoFactorHelp": "Code refused, new phone? <a href=\"https://gladysassistant.com/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Read our 2FA troubleshooting guide</a>.",
     "useTwoFactorCodeLink": "Use a code from your two-factor app instead",
     "recoveryCodeLabel": "Recovery code",
     "recoveryCodePlaceholder": "Enter one of your recovery codes",
