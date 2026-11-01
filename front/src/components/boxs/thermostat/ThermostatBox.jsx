@@ -52,7 +52,9 @@ const STANDBY_PRESET_BY_ORDER = {
   [PILOT_WIRE_MODE.ECO]: 'eco'
 };
 // Frost protection, when cooling: the highest setpoint, kept while nobody is in.
-const PROTECTION_ICON = 'fe-shield';
+// A sun, the counterpart of comfort's snowflake, as frost's snowflake is of
+// comfort's flame when heating.
+const PROTECTION_ICON = 'fe-sun';
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
@@ -215,19 +217,29 @@ class ThermostatBox extends Component {
     const cfg = this.state.remoteConfig;
     return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
   };
-  getMinTemp = () => {
-    // Device feature native min has top priority
-    if (this.state.featureMin !== null) return this.state.featureMin;
+  getMinTemp = () => this.getDialRange().min;
+  getMaxTemp = () => this.getDialRange().max;
+
+  // The dial's bounds. The device feature's native range has top priority: it is
+  // what the appliance accepts. A reversible heat pump narrows it to the range of
+  // the use in force (spec A.4) — heating capped at 22 °C, cooling never below
+  // 24 °C — converted to the feature's unit, and never offers a setpoint the
+  // appliance would refuse. A range that would leave nothing keeps the device's.
+  getDialRange = () => {
     const cfg = this.getConfig();
-    if (cfg.temp_min !== undefined && cfg.temp_min !== null) return Number(cfg.temp_min);
-    return DEFAULT_MIN_TEMP;
-  };
-  getMaxTemp = () => {
-    // Device feature native max has top priority
-    if (this.state.featureMax !== null) return this.state.featureMax;
-    const cfg = this.getConfig();
-    if (cfg.temp_max !== undefined && cfg.temp_max !== null) return Number(cfg.temp_max);
-    return DEFAULT_MAX_TEMP;
+    const configured = bound => (cfg[bound] !== undefined && cfg[bound] !== null ? Number(cfg[bound]) : null);
+    const { featureMin, featureMax } = this.state;
+    if (featureMin === null || featureMax === null) {
+      const min = featureMin !== null ? featureMin : configured('temp_min');
+      const max = featureMax !== null ? featureMax : configured('temp_max');
+      return { min: min !== null ? min : DEFAULT_MIN_TEMP, max: max !== null ? max : DEFAULT_MAX_TEMP };
+    }
+    if (!cfg.reversible || configured('temp_min') === null || configured('temp_max') === null) {
+      return { min: featureMin, max: featureMax };
+    }
+    const min = Math.max(featureMin, this.toSetpointFeatureUnit(configured('temp_min')));
+    const max = Math.min(featureMax, this.toSetpointFeatureUnit(configured('temp_max')));
+    return min < max ? { min, max } : { min: featureMin, max: featureMax };
   };
 
   // Effective temperature unit: device feature unit takes priority over user preference
