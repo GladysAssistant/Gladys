@@ -487,16 +487,22 @@ const EditForm = ({ ...props }) => {
     }
     // Still at the defaults the form pre-fills, in its own unit (41-95 in °F),
     // and only a bound that narrows them, the rule the dial follows (spec F):
-    // Matter's -100-200 would otherwise be saved from a fold nobody opened.
+    // Matter's -100-200 would otherwise be saved from a fold nobody opened. Both
+    // ranges of a reversible heat pump (spec A.4): the cooling one is only saved
+    // once reversible is ticked, but filled now it is ready when it is.
     const defaults = defaultTempRange(props.thermostatEditTempUnit || 'C');
     const narrowsMin = picked.min !== null && picked.min !== undefined && Number(picked.min) > defaults.min;
     const narrowsMax = picked.max !== null && picked.max !== undefined && Number(picked.max) < defaults.max;
-    if (narrowsMin && props.thermostatEditMinTemp === String(defaults.min)) {
-      props.updateThermostatField('thermostatEditMinTemp', String(picked.min));
-    }
-    if (narrowsMax && props.thermostatEditMaxTemp === String(defaults.max)) {
-      props.updateThermostatField('thermostatEditMaxTemp', String(picked.max));
-    }
+    ['thermostatEditMinTemp', 'thermostatEditCoolingMinTemp'].forEach(field => {
+      if (narrowsMin && props[field] === String(defaults.min)) {
+        props.updateThermostatField(field, String(picked.min));
+      }
+    });
+    ['thermostatEditMaxTemp', 'thermostatEditCoolingMaxTemp'].forEach(field => {
+      if (narrowsMax && props[field] === String(defaults.max)) {
+        props.updateThermostatField(field, String(picked.max));
+      }
+    });
   };
 
   return (

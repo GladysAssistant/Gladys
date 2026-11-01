@@ -52,7 +52,9 @@ const STANDBY_PRESET_BY_ORDER = {
   [PILOT_WIRE_MODE.ECO]: 'eco'
 };
 // Frost protection, when cooling: the highest setpoint, kept while nobody is in.
-const PROTECTION_ICON = 'fe-shield';
+// A sun, the counterpart of comfort's snowflake, as frost's snowflake is of
+// comfort's flame when heating.
+const PROTECTION_ICON = 'fe-sun';
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
