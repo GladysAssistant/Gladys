@@ -5600,10 +5600,10 @@
     "invalidRecoveryCode": "Este código de recuperación no es válido o ya se ha utilizado.",
     "lostTwoFactor": "¿Ha perdido el acceso a su aplicación de doble factor?",
     "useRecoveryCodeLink": "Utilizar un código de recuperación",
-    "noRecoveryCode": "¿No le quedan códigos de recuperación? Un administrador de su Gladys puede generar nuevos desde Ajustes › Gladys Plus.",
+    "noRecoveryCode": "¿No le quedan códigos de recuperación? Un administrador de su Gladys puede generar nuevos desde Ajustes › Usuarios.",
     "resetTwoFactorLink": "¿Ninguna Gladys conectada? Restablezca su doble autenticación por correo electrónico.",
     "resetTwoFactorEmailSent": "Le hemos enviado un correo electrónico con un enlace para restablecer su doble autenticación. Solo funciona una vez y caduca en una hora.",
-    "resetTwoFactorInstanceConnected": "Su Gladys está conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Gladys Plus. El restablecimiento por correo electrónico solo está disponible cuando ninguna Gladys está conectada.",
+    "resetTwoFactorInstanceConnected": "Su Gladys está conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Usuarios. El restablecimiento por correo electrónico solo está disponible cuando ninguna Gladys está conectada.",
     "resetTwoFactorExpired": "Su sesión de inicio ha caducado: vuelva a iniciar sesión con su contraseña y solicite el restablecimiento.",
     "resetTwoFactorTooMany": "Se envió un correo hace menos de un minuto: revise su bandeja de entrada (y el spam) antes de volver a solicitarlo.",
     "resetTwoFactorError": "No se ha podido enviar el correo de restablecimiento. Inténtelo de nuevo más tarde.",
@@ -7476,7 +7476,7 @@
     "success": "Su doble autenticación ha sido restablecida. Inicie sesión con su contraseña: Gladys Plus le pedirá configurar una nueva aplicación de autenticación.",
     "loginLink": "Iniciar sesión",
     "errorLink": "Este enlace no es válido, ya se ha utilizado o ha caducado. Solicite uno nuevo desde la página de inicio de sesión.",
-    "instanceConnected": "Su Gladys vuelve a estar conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Gladys Plus. Este enlace sigue siendo válido mientras ninguna Gladys esté conectada.",
+    "instanceConnected": "Su Gladys vuelve a estar conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Usuarios. Este enlace sigue siendo válido mientras ninguna Gladys esté conectada.",
     "error": "No se ha podido restablecer su doble autenticación. Inténtelo de nuevo más tarde."
   },
   "gatewayResetPassword": {

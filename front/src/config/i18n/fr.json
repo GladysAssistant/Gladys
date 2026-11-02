@@ -5600,10 +5600,10 @@
     "invalidRecoveryCode": "Ce code de récupération est invalide ou a déjà été utilisé.",
     "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
     "useRecoveryCodeLink": "Utiliser un code de récupération",
-    "noRecoveryCode": "Plus de code de récupération ? Un administrateur de votre Gladys peut en générer de nouveaux depuis Paramètres › Gladys Plus.",
+    "noRecoveryCode": "Plus de code de récupération ? Un administrateur de votre Gladys peut en générer de nouveaux depuis Paramètres › Utilisateurs.",
     "resetTwoFactorLink": "Pas de Gladys connectée ? Réinitialisez votre double authentification par email.",
     "resetTwoFactorEmailSent": "Nous vous avons envoyé un email avec un lien pour réinitialiser votre double authentification. Il ne fonctionne qu'une fois et expire dans une heure.",
-    "resetTwoFactorInstanceConnected": "Votre Gladys est connectée à Gladys Plus : un administrateur de votre Gladys peut générer de nouveaux codes de récupération depuis Paramètres › Gladys Plus. La réinitialisation par email n'est possible que lorsqu'aucune Gladys n'est connectée.",
+    "resetTwoFactorInstanceConnected": "Votre Gladys est connectée à Gladys Plus : un administrateur de votre Gladys peut générer de nouveaux codes de récupération depuis Paramètres › Utilisateurs. La réinitialisation par email n'est possible que lorsqu'aucune Gladys n'est connectée.",
     "resetTwoFactorExpired": "Votre session de connexion a expiré : reconnectez-vous avec votre mot de passe, puis demandez la réinitialisation.",
     "resetTwoFactorTooMany": "Un email a été envoyé il y a moins d'une minute : vérifiez votre boîte mail (et vos spams) avant de redemander.",
     "resetTwoFactorError": "Impossible d'envoyer l'email de réinitialisation. Réessayez plus tard.",
@@ -7476,7 +7476,7 @@
     "success": "Votre double authentification a été réinitialisée. Connectez-vous avec votre mot de passe : Gladys Plus vous demandera de configurer une nouvelle application d'authentification.",
     "loginLink": "Se connecter",
     "errorLink": "Ce lien est invalide, déjà utilisé ou expiré. Demandez-en un nouveau depuis la page de connexion.",
-    "instanceConnected": "Votre Gladys est de nouveau connectée à Gladys Plus : un administrateur de votre Gladys peut plutôt générer de nouveaux codes de récupération depuis Paramètres › Gladys Plus. Ce lien reste valable tant qu'aucune Gladys n'est connectée.",
+    "instanceConnected": "Votre Gladys est de nouveau connectée à Gladys Plus : un administrateur de votre Gladys peut plutôt générer de nouveaux codes de récupération depuis Paramètres › Utilisateurs. Ce lien reste valable tant qu'aucune Gladys n'est connectée.",
     "error": "Impossible de réinitialiser votre double authentification. Réessayez plus tard."
   },
   "gatewayResetPassword": {

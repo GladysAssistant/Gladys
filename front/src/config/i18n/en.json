@@ -5600,10 +5600,10 @@
     "invalidRecoveryCode": "This recovery code is invalid or has already been used.",
     "lostTwoFactor": "Lost access to your two-factor app?",
     "useRecoveryCodeLink": "Use a recovery code",
-    "noRecoveryCode": "No recovery code left? An admin of your Gladys can generate new ones from Settings › Gladys Plus.",
+    "noRecoveryCode": "No recovery code left? An admin of your Gladys can generate new ones from Settings › Users.",
     "resetTwoFactorLink": "No Gladys connected? Reset your two-factor authentication by email.",
     "resetTwoFactorEmailSent": "We sent you an email with a link to reset your two-factor authentication. It works once and expires in one hour.",
-    "resetTwoFactorInstanceConnected": "Your Gladys is connected to Gladys Plus: an admin of your Gladys can generate new recovery codes from Settings › Gladys Plus. The reset by email is only available when no Gladys is connected.",
+    "resetTwoFactorInstanceConnected": "Your Gladys is connected to Gladys Plus: an admin of your Gladys can generate new recovery codes from Settings › Users. The reset by email is only available when no Gladys is connected.",
     "resetTwoFactorExpired": "Your login session has expired: log in again with your password, then ask for the reset.",
     "resetTwoFactorTooMany": "An email was sent less than a minute ago: check your mailbox (and your spam folder) before asking again.",
     "resetTwoFactorError": "Unable to send the reset email. Please try again later.",
@@ -7476,7 +7476,7 @@
     "success": "Your two-factor authentication was reset. Log in with your password: Gladys Plus will ask you to set up a new authenticator app.",
     "loginLink": "Log in",
     "errorLink": "This link is invalid, already used or expired. Request a new one from the login page.",
-    "instanceConnected": "Your Gladys is connected to Gladys Plus again: an admin of your Gladys can generate new recovery codes from Settings › Gladys Plus instead. This link stays valid while no Gladys is connected.",
+    "instanceConnected": "Your Gladys is connected to Gladys Plus again: an admin of your Gladys can generate new recovery codes from Settings › Users instead. This link stays valid while no Gladys is connected.",
     "error": "Unable to reset your two-factor authentication. Please try again later."
   },
   "gatewayResetPassword": {
