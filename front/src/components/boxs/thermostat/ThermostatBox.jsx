@@ -946,8 +946,9 @@ class ThermostatBox extends Component {
     } catch (e) {
       // A failed request says nothing about the schedule: the last one loaded
       // stays, and with it its `next.refresh_at`, so the minute tick tries again
-      // instead of dropping the banner for good.
-      return this.state.activeSchedule;
+      // instead of dropping the banner for good. Nothing is returned, so a
+      // caller deciding on the point does not take that stale one for a read.
+      return undefined;
     }
   };
 
@@ -1489,13 +1490,21 @@ class ThermostatBox extends Component {
     // would then hand back to Comfort. A second tap while the first is handing
     // back is dropped: taken once the first had left manual mode, it stopped a
     // thermostat for the season nobody asked to stop.
+    // The tap is dropped before the manual-mode check: the hand-back leaves
+    // manual mode before it is done, and a tap past that check stopped it.
+    if (preset.key === 'off' && this.handingBack) {
+      return;
+    }
     if (preset.key === 'off' && this.state.isManualMode && !this.isStopped()) {
-      if (this.handingBack) {
-        return;
-      }
       this.handingBack = true;
       try {
         const schedule = await this.loadSchedule();
+        // A programme that cannot be read is no answer: the tap does nothing,
+        // and the next one tries again. The card's own point may be the one the
+        // programme has just left, and Off would then hand back to Comfort.
+        if (schedule === undefined) {
+          return;
+        }
         if (schedule && schedule.current && schedule.current.preset === 'off') {
           await this.cancelManualMode();
           return;
