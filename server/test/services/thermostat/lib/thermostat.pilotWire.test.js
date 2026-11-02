@@ -525,6 +525,76 @@ describe('thermostat pilot wire: regulated by Gladys on a room sensor', () => {
     expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
 
+  // A towel rail locks its boost out under frost protection: the standby order
+  // is the user's to choose (C.1.1).
+  it('should rest on the standby order chosen while the room is above the setpoint', async () => {
+    const cases = [
+      [PILOT_WIRE_MODE.ECO, PILOT_WIRE_MODE.ECO],
+      [PILOT_WIRE_MODE.OFF, PILOT_WIRE_MODE.OFF],
+      // Not a standby order: frost protection, the default.
+      [PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.FROST_PROTECTION],
+    ];
+    await Promise.all(
+      cases.map(async ([chosen, sent]) => {
+        const mod = load(null);
+        const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 19.4 });
+
+        await regulate(
+          mod,
+          gladys,
+          pilotWireDevice('eco', { ...gladysRegulates, THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: String(chosen) }),
+        );
+
+        expect(gladys.device.setValue.firstCall.args[2], String(chosen)).to.equal(sent);
+        expect(savedOperatingStates(gladys), String(chosen)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+      }),
+    );
+  });
+
+  // Left unsent, the heater would keep the comfort it carries above the setpoint.
+  it('should fall back on frost protection, then off, when the module does not take the standby order', async () => {
+    const cases = [
+      [[{ value: 0 }, { value: 1 }, { value: 5 }], PILOT_WIRE_MODE.FROST_PROTECTION],
+      [[{ value: 0 }, { value: 5 }], PILOT_WIRE_MODE.OFF],
+    ];
+    await Promise.all(
+      cases.map(async ([supported, sent]) => {
+        const mod = load(null);
+        const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, temp: 19.4, supported });
+
+        await regulate(
+          mod,
+          gladys,
+          pilotWireDevice('eco', {
+            ...gladysRegulates,
+            THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: String(PILOT_WIRE_MODE.ECO),
+          }),
+        );
+
+        expect(gladys.device.setValue.firstCall.args[2]).to.equal(sent);
+      }),
+    );
+  });
+
+  // Eco carried as the standby order is Gladys's rest, not heating: inside the
+  // neutral zone the heater stays on it, and the thermostat reads idle.
+  it('should take the standby order carried as resting inside the neutral zone', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.ECO, temp: 21.2 });
+
+    await regulate(
+      mod,
+      gladys,
+      pilotWireDevice('comfort', {
+        ...gladysRegulates,
+        THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: String(PILOT_WIRE_MODE.ECO),
+      }),
+    );
+
+    assert.notCalled(gladys.device.setValue);
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+  });
+
   it('should send comfort while the room is below the setpoint, whatever the preset', async () => {
     // The wire is a switch here: eco would hand the decision back to the
     // heater's own thermometer, three and a half degrees below its comfort.

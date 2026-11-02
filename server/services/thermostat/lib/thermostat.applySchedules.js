@@ -54,6 +54,7 @@ const {
   DEFAULT_MANUAL_DURATION_MINUTES,
   PILOT_WIRE_REGULATIONS,
   supportedPilotWireOrder,
+  supportedStandbyOrder,
 } = require('../../../utils/thermostatConstants');
 
 // An air conditioner's mode is an AC_MODE, whose values differ from
@@ -996,9 +997,11 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
   const stop = preset === 'off';
   const regulated = !stop && setpoint !== null && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.GLADYS;
   let carriedBefore = null;
+  let supportedOptions = null;
   try {
     const found = await getFeatureBySelector(gladys, config.pilot_wire_feature);
     carriedBefore = found ? found.feature.last_value : null;
+    supportedOptions = found ? found.feature.supported_options : null;
   } catch (e) {
     // writePilotWireOrder looks it up again, and says why it cannot.
     logger.debug(`Thermostat schedule: pilot-wire order unreadable: ${e.message}`);
@@ -1011,6 +1014,10 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
     ? await readAverageTemperature(gladys, config.temperature_features, config.temp_unit)
     : null;
 
+  // The order this heater rests on while the room is warm enough (C.1.1):
+  // frost protection by default, eco or off when chosen — one the module takes.
+  const standby = supportedStandbyOrder(config.pilot_wire_standby_order, supportedOptions);
+  const resting = (carried) => isStandbyOrder(carried) || carried === standby;
   let order;
   let heating = false;
   let context = logContext;
@@ -1021,9 +1028,9 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
       setpoint,
       'heating',
       { ...config, control_type: 'hysteresis' },
-      carriedBefore !== null && carriedBefore !== undefined && !isStandbyOrder(carriedBefore),
+      carriedBefore !== null && carriedBefore !== undefined && !resting(carriedBefore),
     );
-    order = heating ? PILOT_WIRE_MODE.COMFORT : PILOT_WIRE_MODE.FROST_PROTECTION;
+    order = heating ? PILOT_WIRE_MODE.COMFORT : standby;
     context = `${logContext}, temp=${currentTemp}, setpoint=${setpoint}`;
   } else {
     order = forcedOrder !== null ? forcedOrder : pilotWireOrderForPreset(preset, config);
@@ -1069,8 +1076,7 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
   }
   // A write that failed leaves the previous order in force: the heater heats
   // only if the loop asks for it and that order lets it.
-  const state =
-    heating && !isStandbyOrder(carried) ? THERMOSTAT_OPERATING_STATE.HEATING : THERMOSTAT_OPERATING_STATE.IDLE;
+  const state = heating && !resting(carried) ? THERMOSTAT_OPERATING_STATE.HEATING : THERMOSTAT_OPERATING_STATE.IDLE;
   await saveOperatingState.call({ gladys }, device, state);
 }
 

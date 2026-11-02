@@ -11,6 +11,8 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
+  PILOT_WIRE_STANDBY_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   MAX_WINDOW_DELAY_SECONDS
 } from '../../../../../../../server/utils/thermostatConstants';
 
@@ -215,6 +217,9 @@ const EditForm = ({ ...props }) => {
     pickedPilotWire && pickedPilotWire.supportedOrders && pickedPilotWire.supportedOrders.length > 0
       ? pickedPilotWire.supportedOrders
       : null;
+  const standbyOrder = PILOT_WIRE_STANDBY_ORDERS.includes(props.thermostatEditPilotWireStandbyOrder)
+    ? props.thermostatEditPilotWireStandbyOrder
+    : DEFAULT_PILOT_WIRE_STANDBY_ORDER;
   const orderOptionsFor = key =>
     PILOT_WIRE_ORDER_OPTIONS.filter(
       ([value]) => !supportedOrders || supportedOrders.includes(value) || value === pilotWireOrders[key]
@@ -241,6 +246,33 @@ const EditForm = ({ ...props }) => {
           id={`integration.thermostat.edit.pilotWireRegulationHelp.${isPilotWireThermostat ? 'heater' : 'gladys'}`}
         />
       </small>
+      {/* The order a heater Gladys regulates rests on once the room is warm
+          enough (spec C.1.1): frost protection locks a towel rail's boost out. */}
+      {isVirtualThermostat && props.thermostatEditPilotWireFeature && (
+        <div class="mt-2">
+          <label class="form-label">
+            <Text id="integration.thermostat.edit.pilotWireStandbyOrderLabel" />
+          </label>
+          <select
+            class="form-control"
+            value={standbyOrder}
+            onChange={e => props.updateThermostatField('thermostatEditPilotWireStandbyOrder', Number(e.target.value))}
+          >
+            {PILOT_WIRE_ORDER_OPTIONS.filter(
+              ([value]) =>
+                PILOT_WIRE_STANDBY_ORDERS.includes(value) &&
+                (!supportedOrders || supportedOrders.includes(value) || value === standbyOrder)
+            ).map(([value, orderKey]) => (
+              <option value={value} selected={value === standbyOrder}>
+                <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+              </option>
+            ))}
+          </select>
+          <small class="form-text text-muted">
+            <Text id="integration.thermostat.edit.pilotWireStandbyOrderHelp" />
+          </small>
+        </div>
+      )}
       {/* Promised by the spec (G): a module that keeps its own programme
           writes orders that are taken as presses of its button, and Gladys
           and the programme take turns. */}

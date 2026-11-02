@@ -15,6 +15,8 @@ const {
   THERMOSTAT_TYPES,
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
+  PILOT_WIRE_STANDBY_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
 } = require('../../../utils/thermostatConstants');
 const { THERMOSTAT_MODE, PILOT_WIRE_MODE } = require('../../../utils/constants');
 const { parseSelectorList } = require('../../../utils/thermostatSelectorList');
@@ -67,6 +69,7 @@ function buildParamsConfig(device) {
   const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE') || DEFAULT_MODE);
   // One sensor or several (A.1.1): the loop regulates on their average.
   const temperatureFeatures = parseSelectorList(getParam('THERMOSTAT_TEMPERATURE_FEATURE'));
+  const standbyOrder = toNumber(getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER'), null);
   return {
     temperature_features: temperatureFeatures,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
@@ -79,6 +82,10 @@ function buildParamsConfig(device) {
       thermostatType === THERMOSTAT_TYPES.VIRTUAL && temperatureFeatures.length > 0
         ? PILOT_WIRE_REGULATIONS.GLADYS
         : PILOT_WIRE_REGULATIONS.HEATER,
+    // The order sent while the room is warm enough, when Gladys regulates.
+    pilot_wire_standby_order: PILOT_WIRE_STANDBY_ORDERS.includes(standbyOrder)
+      ? standbyOrder
+      : DEFAULT_PILOT_WIRE_STANDBY_ORDER,
     pilot_wire_orders: Object.keys(DEFAULT_PILOT_WIRE_ORDERS).reduce(
       (orders, preset) => ({ ...orders, [preset]: pilotWireOrder(preset) }),
       {},

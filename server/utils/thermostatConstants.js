@@ -141,6 +141,13 @@ const DEFAULT_PILOT_WIRE_ORDERS = {
 
 const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
 
+// The order a heater Gladys regulates is sent when the room is warm enough
+// (C.1.1), set per thermostat by THERMOSTAT_PILOT_WIRE_STANDBY_ORDER. Frost
+// protection by default; eco or off on a heater whose own functions — the boost
+// of a towel rail — frost protection locks out.
+const PILOT_WIRE_STANDBY_ORDERS = [PILOT_WIRE_MODE.FROST_PROTECTION, PILOT_WIRE_MODE.ECO, PILOT_WIRE_MODE.OFF];
+const DEFAULT_PILOT_WIRE_STANDBY_ORDER = PILOT_WIRE_MODE.FROST_PROTECTION;
+
 /**
  * @description The order a module can actually be sent, from the options its
  * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
@@ -169,6 +176,24 @@ function supportedPilotWireOrder(order, supportedOptions) {
     return PILOT_WIRE_MODE.OFF;
   }
   return null;
+}
+
+/**
+ * @description The standby order a module can be sent: the one chosen when it
+ * takes it, frost protection — or off — otherwise. Never nothing: an order left
+ * unsent keeps the heater on the comfort it carries, heating above the setpoint.
+ * @param {number} order - The chosen standby order.
+ * @param {Array} [supportedOptions] - The feature's `supported_options`.
+ * @returns {number|null} The order to send, or null when the module takes none.
+ * @example
+ * supportedStandbyOrder(PILOT_WIRE_MODE.ECO, [{ value: 0 }, { value: 5 }]); // 0
+ */
+function supportedStandbyOrder(order, supportedOptions) {
+  const supported = (supportedOptions || []).map((option) => option.value);
+  if (supported.length === 0 || supported.includes(order)) {
+    return order;
+  }
+  return supportedPilotWireOrder(PILOT_WIRE_MODE.FROST_PROTECTION, supportedOptions);
 }
 
 module.exports = {
@@ -200,4 +225,7 @@ module.exports = {
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder,
+  PILOT_WIRE_STANDBY_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  supportedStandbyOrder,
 };

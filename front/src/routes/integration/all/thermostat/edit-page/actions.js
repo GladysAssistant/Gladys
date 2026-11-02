@@ -6,6 +6,8 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
+  PILOT_WIRE_STANDBY_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   MAX_WINDOW_DELAY_SECONDS,
   defaultPresetTemps
 } from '../../../../../../../server/utils/thermostatConstants';
@@ -244,6 +246,12 @@ function createActions(store) {
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
           thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
           thermostatEditPilotWireOrders: readPilotWireOrders(getParam),
+          // The order a heater Gladys regulates rests on (spec C.1.1).
+          thermostatEditPilotWireStandbyOrder: PILOT_WIRE_STANDBY_ORDERS.includes(
+            parseInt(getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER'), 10)
+          )
+            ? parseInt(getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER'), 10)
+            : DEFAULT_PILOT_WIRE_STANDBY_ORDER,
           // A real thermostat given a pilot wire was how a heater regulating
           // itself was saved before it had a type of its own: it is shown as one.
           thermostatEditType:
@@ -493,6 +501,19 @@ function createActions(store) {
               name: PILOT_WIRE_ORDER_PARAM(preset),
               value: isPilotWireThermostat ? String(pilotWireOrders[preset]) : ''
             })),
+            // The order a heater Gladys regulates rests on: a virtual
+            // thermostat with a pilot wire only, cleared otherwise.
+            {
+              name: 'THERMOSTAT_PILOT_WIRE_STANDBY_ORDER',
+              value:
+                thermostatType === 'virtual' && pilotWireFeature
+                  ? String(
+                      PILOT_WIRE_STANDBY_ORDERS.includes(state.thermostatEditPilotWireStandbyOrder)
+                        ? state.thermostatEditPilotWireStandbyOrder
+                        : DEFAULT_PILOT_WIRE_STANDBY_ORDER
+                    )
+                  : ''
+            },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on a real thermostat, and cleared otherwise so
             // switching a device to another type cannot leave it driving a real
@@ -578,6 +599,7 @@ function createActions(store) {
           thermostatEditSwitchFeature: '',
           thermostatEditPilotWireFeature: '',
           thermostatEditPilotWireOrders: DEFAULT_PILOT_WIRE_ORDERS,
+          thermostatEditPilotWireStandbyOrder: DEFAULT_PILOT_WIRE_STANDBY_ORDER,
           thermostatEditType: 'virtual',
           thermostatEditTargetFeature: '',
           thermostatEditStateFeature: '',

@@ -44,6 +44,12 @@ const PRESET_ICONS = {
 // temperature you want when you are here", which is a flame when heating and a
 // snowflake when cooling. A sun for both read as "warm" even in cooling.
 const COMFORT_ICON = { heating: 'fe-flame', cooling: 'fe-snowflake' };
+// The preset whose colour and icon a standby order takes in the status banner.
+const STANDBY_PRESET_BY_ORDER = {
+  [PILOT_WIRE_MODE.OFF]: 'off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost',
+  [PILOT_WIRE_MODE.ECO]: 'eco'
+};
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
@@ -1638,8 +1644,8 @@ class ThermostatBox extends Component {
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
     // When Gladys regulates a pilot-wire heater, the module only ever carries
-    // comfort or frost protection, whatever the preset: eco at 18 °C in a room at
-    // 20 °C shows frost protection on the heater. Saying why, under the gauge,
+    // comfort or its standby order, whatever the preset: eco at 18 °C in a room
+    // at 20 °C shows frost protection on the heater, by default. Saying why, under the gauge,
     // is what keeps that from looking like a wrong order.
     const pilotWireStatus =
       this.isGladysRegulatedPilotWire() && !isWindowOpen && mode !== 'off' && isSwitchOn !== null
@@ -1647,6 +1653,8 @@ class ThermostatBox extends Component {
           ? 'pilotWireHeating'
           : 'pilotWireStandby'
         : null;
+    const statusPreset =
+      pilotWireStatus === 'pilotWireHeating' ? 'comfort' : STANDBY_PRESET_BY_ORDER[pilotWireOrder] || 'frost';
 
     // Convert temperatures for display
     const displaySetpoint = this.toDisplayTemp(setpoint);
@@ -1740,16 +1748,12 @@ class ThermostatBox extends Component {
 
               {/* Drawn like the card's other banners. Heating carries comfort's
                   flame and colour, the order the module then carries; standby
-                  carries frost's snowflake and colour, for the same reason. */}
+                  carries those of the order the module rests on — frost
+                  protection by default, eco or off when chosen (C.1.1). */}
               {pilotWireStatus && (
-                <div
-                  class={style.scheduleBanner}
-                  style={`--banner-color:${this.getPresetColor(
-                    pilotWireStatus === 'pilotWireHeating' ? 'comfort' : 'frost'
-                  )}`}
-                >
+                <div class={style.scheduleBanner} style={`--banner-color:${this.getPresetColor(statusPreset)}`}>
                   <i
-                    class={`fe ${pilotWireStatus === 'pilotWireHeating' ? COMFORT_ICON.heating : PRESET_ICONS.frost} ${
+                    class={`fe ${statusPreset === 'comfort' ? COMFORT_ICON.heating : PRESET_ICONS[statusPreset]} ${
                       style.scheduleBannerIcon
                     }`}
                   />
