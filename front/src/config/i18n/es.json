@@ -4919,6 +4919,7 @@
         "authorized": "Autorizado",
         "pending": "Esperando su autorización",
         "keys_changed": "Claves modificadas",
+        "linked": "Vinculado",
         "not_linked": "Aún no vinculado",
         "invited": "Invitación enviada",
         "none": "Sin acceso remoto"
@@ -4927,6 +4928,7 @@
         "authorized": "Puede controlar esta instancia de Gladys desde cualquier lugar, a través de Gladys Plus.",
         "pending": "Su cuenta de Gladys Plus está lista. Compruebe que las huellas de claves de abajo coinciden con las mostradas en su página de Gladys Plus y active el interruptor para autorizarlo.",
         "keys_changed": "Sus claves de cifrado cambiaron desde que lo autorizó: su acceso fue revocado por seguridad. Compruebe las nuevas huellas de abajo y vuelva a autorizarlo.",
+        "linked": "Vinculado a este usuario de Gladys. Sus claves de cifrado aparecerán aquí cuando su cuenta de Gladys Plus se haya conectado a esta instancia; un administrador de esta instancia las autorizará entonces.",
         "not_linked": "Tiene una cuenta de Gladys Plus que aún no está asociada a un usuario de Gladys: vincúlela aquí, o deje que elija su usuario en su próximo inicio de sesión en Gladys Plus.",
         "invited": "Invitación enviada el {{date}}. Cuando haya creado su cuenta de Gladys Plus, quedará vinculada a este usuario y usted autorizará sus claves aquí.",
         "none": "Sin cuenta de Gladys Plus: este usuario solo puede usar Gladys desde casa."

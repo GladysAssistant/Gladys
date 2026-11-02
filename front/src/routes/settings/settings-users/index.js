@@ -64,8 +64,9 @@ class SettingsUsers extends Component {
       return;
     }
     this.gatewayRequested = true;
+    let gatewayStatus;
     try {
-      const gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
+      gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
       this.setState({ gatewayStatus });
     } catch (e) {
       console.error(e);
@@ -73,13 +74,14 @@ class SettingsUsers extends Component {
       this.gatewayRequested = false;
       return;
     }
-    await this.getKeysIfAdmin();
+    // the status just received, not the state (not committed yet)
+    await this.getKeysIfAdmin(gatewayStatus);
   };
 
   // the logged user can still be loading when the page mounts: this runs
   // again when they arrive (componentDidUpdate)
-  getKeysIfAdmin = async () => {
-    const configured = get(this.state, 'gatewayStatus.configured') === true;
+  getKeysIfAdmin = async (gatewayStatus = this.state.gatewayStatus) => {
+    const configured = get(gatewayStatus, 'configured') === true;
     if (!configured || !this.isAdmin() || this.keysRequested) {
       return;
     }
@@ -94,6 +96,8 @@ class SettingsUsers extends Component {
       this.setState({ gatewayKeys, gatewayKeysStatus: RequestStatus.Success });
     } catch (e) {
       const error = get(e, 'response.data.error');
+      // the next logged-user change asks for the keys again
+      this.keysRequested = false;
       this.setState({
         gatewayKeysStatus:
           error === ERROR_MESSAGES.NO_CONNECTED_TO_THE_INTERNET ? RequestStatus.NetworkError : RequestStatus.Error
@@ -263,7 +267,10 @@ class SettingsUsers extends Component {
     });
     // the remote access of every row waits for the keys: one loader, no
     // "no remote access" flashing before "authorized"
-    const loading = state.loading || state.gatewayKeysStatus === RequestStatus.Getting;
+    const loading =
+      state.loading ||
+      state.gatewayKeysStatus === RequestStatus.Getting ||
+      (config.gatewayMode && state.plusUsersStatus === RequestStatus.Getting);
     return (
       <SettingsLayout>
         <UserPage

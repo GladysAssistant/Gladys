@@ -4919,6 +4919,7 @@
         "authorized": "Autorisé",
         "pending": "En attente de votre autorisation",
         "keys_changed": "Clés modifiées",
+        "linked": "Lié",
         "not_linked": "Pas encore lié",
         "invited": "Invitation envoyée",
         "none": "Pas d'accès à distance"
@@ -4927,6 +4928,7 @@
         "authorized": "Peut contrôler cette instance Gladys depuis n'importe où, via Gladys Plus.",
         "pending": "Son compte Gladys Plus est prêt. Vérifiez que les empreintes de clés ci-dessous correspondent à celles affichées sur sa page Gladys Plus, puis activez l'interrupteur pour l'autoriser.",
         "keys_changed": "Ses clés de chiffrement ont changé depuis que vous l'avez autorisé : son accès a été révoqué par sécurité. Vérifiez les nouvelles empreintes ci-dessous, puis autorisez-le à nouveau.",
+        "linked": "Lié à cet utilisateur Gladys. Ses clés de chiffrement apparaîtront ici dès que son compte Gladys Plus se sera connecté à cette instance ; un administrateur de cette instance les autorisera alors.",
         "not_linked": "Cette personne a un compte Gladys Plus qui n'est pas encore rattaché à un utilisateur Gladys : rattachez-le ici, ou laissez-la choisir son utilisateur à sa prochaine connexion sur Gladys Plus.",
         "invited": "Invitation envoyée le {{date}}. Dès que cette personne aura créé son compte Gladys Plus, il sera lié à cet utilisateur et vous autoriserez ses clés ici.",
         "none": "Pas de compte Gladys Plus : cet utilisateur ne peut utiliser Gladys que depuis la maison."

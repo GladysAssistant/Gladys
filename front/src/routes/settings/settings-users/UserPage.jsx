@@ -53,7 +53,10 @@ const UserPage = ({ children, ...props }) => {
     // the "link to a Gladys user" select: every user of the instance, the ones already
     // holding a Gladys Plus account or invitation left out
     users: props.users || [],
-    takenUserIds: members.filter(member => member.remote).map(member => member.user.id),
+    takenUserIds: view.takenUserIds,
+    // the Plus account actions wait for the account list: without it, every
+    // card would offer an invitation, a second one for people already in
+    plusReady: !gatewayMode || props.plusUsersStatus === RequestStatus.Success,
     language: props.user && props.user.language
   };
 

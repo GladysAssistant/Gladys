@@ -4919,6 +4919,7 @@
         "authorized": "Authorized",
         "pending": "Waiting for your authorization",
         "keys_changed": "Keys changed",
+        "linked": "Linked",
         "not_linked": "Not linked yet",
         "invited": "Invitation sent",
         "none": "No remote access"
@@ -4927,6 +4928,7 @@
         "authorized": "Can control this Gladys from anywhere, through Gladys Plus.",
         "pending": "Their Gladys Plus account is ready. Check that the key fingerprints below match the ones displayed on their Gladys Plus page, then turn on the switch to authorize them.",
         "keys_changed": "Their encryption keys changed since you authorized them, so their access was revoked for security. Check the new fingerprints below, then authorize them again.",
+        "linked": "Linked to this Gladys user. Their encryption keys will show up here once their Gladys Plus account has connected to this Gladys; an administrator of this Gladys then authorizes them.",
         "not_linked": "They have a Gladys Plus account that is not attached to a Gladys user yet: link it here, or let them pick their user on their next Gladys Plus login.",
         "invited": "Invitation sent on {{date}}. Once they have created their Gladys Plus account, it is linked to this user and you will authorize their keys here.",
         "none": "No Gladys Plus account: this user can only use Gladys from home."

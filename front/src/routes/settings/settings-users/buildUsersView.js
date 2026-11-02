@@ -21,6 +21,9 @@ export const REMOTE_STATUS = {
   KEYS_CHANGED: 'keys_changed',
   // keys known by the instance, never accepted (or revoked)
   PENDING: 'pending',
+  // Plus account linked to this Gladys user, no keys known by the instance (the
+  // account never connected to it, or the keys were not loaded: not a local admin)
+  LINKED: 'linked',
   // Plus account exists but the user has not picked their Gladys user yet
   NOT_LINKED: 'not_linked',
   // invitation sent, the Plus account does not exist yet
@@ -44,7 +47,7 @@ const getStatus = remote => {
     }
     return remote.linked ? REMOTE_STATUS.AUTHORIZED : REMOTE_STATUS.NOT_LINKED;
   }
-  return REMOTE_STATUS.NOT_LINKED;
+  return remote.linked ? REMOTE_STATUS.LINKED : REMOTE_STATUS.NOT_LINKED;
 };
 
 const finalize = (remote, linked) => {
@@ -186,5 +189,9 @@ export function buildUsersView({ users = [], gatewayKeys, plusUsers, search = ''
     .sort((a, b) => direction * fullName(a.user).localeCompare(fullName(b.user), undefined, { sensitivity: 'base' }));
   const filteredUnlinked = unlinked.filter(remote => matchesSearch(search, remote.name, remote.email));
 
-  return { members: sortedMembers, unlinked: filteredUnlinked, stats };
+  // the users already holding a Plus account or invitation, whatever the search
+  // shows: the "link to a Gladys user" select must never offer them
+  const takenUserIds = members.filter(member => member.remote).map(member => member.user.id);
+
+  return { members: sortedMembers, unlinked: filteredUnlinked, stats, takenUserIds };
 }

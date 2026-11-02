@@ -17,6 +17,7 @@ const STATUS_UI = {
   [REMOTE_STATUS.AUTHORIZED]: { badge: 'badge-success', icon: 'check-circle', tone: style.toneSuccess },
   [REMOTE_STATUS.PENDING]: { badge: 'badge-warning', icon: 'clock', tone: style.toneWarning },
   [REMOTE_STATUS.KEYS_CHANGED]: { badge: 'badge-danger', icon: 'alert-triangle', tone: style.toneDanger },
+  [REMOTE_STATUS.LINKED]: { badge: 'badge-info', icon: 'link', tone: style.toneInfo },
   [REMOTE_STATUS.NOT_LINKED]: { badge: 'badge-info', icon: 'link', tone: style.toneInfo },
   [REMOTE_STATUS.INVITED]: { badge: 'badge-info', icon: 'mail', tone: style.toneInfo },
   [REMOTE_STATUS.NONE]: { badge: 'badge-secondary', icon: 'globe', tone: style.toneMuted }
@@ -224,28 +225,23 @@ class RemoteAccess extends Component {
     const ui = STATUS_UI[status];
     const actionNeeded = ACTION_NEEDED_STATUSES.includes(status);
     const canSwitch = Boolean(remote && remote.keys && isAdmin);
-    const canInvite = status === REMOTE_STATUS.NONE && gatewayMode && isPlusAdmin && user;
+    // the Plus account actions need the account list (plusReady) and, for the
+    // ones never allowed on oneself, the admin's own Plus profile (plusMe)
+    const plusActions = Boolean(gatewayMode && isPlusAdmin && props.plusReady);
+    const canInvite = Boolean(status === REMOTE_STATUS.NONE && plusActions && user);
     const isMe = Boolean(remote && plusMe && remote.id === plusMe.id);
-    const canRevoke = Boolean(remote && remote.account && gatewayMode && isPlusAdmin && !isMe);
+    const canRevoke = Boolean(remote && remote.account && plusActions && plusMe && !isMe);
     // a Plus admin can reset the second factor of another user of the account who
     // lost their authenticator (confirming with their own code); never their own
     const canResetTwoFactor = Boolean(
-      remote &&
-        remote.account &&
-        !remote.isInvitation &&
-        gatewayMode &&
-        isPlusAdmin &&
-        !isMe &&
-        props.resetRemoteTwoFactor
+      remote && remote.account && !remote.isInvitation && plusActions && plusMe && !isMe && props.resetRemoteTwoFactor
     );
     const resettingTwoFactor = resetTwoFactorStatus === RequestStatus.Getting;
     const account = remote && remote.account;
     // a Plus admin can attach a Plus account or a pending invitation to a Gladys user:
     // in one click on the card it was recognized on (by email), or through a select
     // when it hangs under "not linked"
-    const canLink = Boolean(
-      remote && remote.account && !remote.linked && gatewayMode && isPlusAdmin && props.linkRemote
-    );
+    const canLink = Boolean(remote && remote.account && !remote.linked && plusActions && props.linkRemote);
     const linking = linkStatus === RequestStatus.Getting;
     const linkableUsers =
       canLink && !user ? props.users.filter(candidate => !props.takenUserIds.includes(candidate.id)) : [];
@@ -454,7 +450,12 @@ class RemoteAccess extends Component {
                 >
                   <i class="fe fe-send" /> <Text id="usersSettings.plus.invite.button" />
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm" onClick={this.closeInvite}>
+                <button
+                  type="button"
+                  class="btn btn-secondary btn-sm"
+                  onClick={this.closeInvite}
+                  disabled={inviteStatus === RequestStatus.Getting}
+                >
                   <Text id="usersSettings.plus.cancel" />
                 </button>
               </div>

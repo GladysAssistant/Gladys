@@ -4919,6 +4919,7 @@
         "authorized": "Autorisiert",
         "pending": "Wartet auf deine Autorisierung",
         "keys_changed": "Schlüssel geändert",
+        "linked": "Verknüpft",
         "not_linked": "Noch nicht verknüpft",
         "invited": "Einladung gesendet",
         "none": "Kein Fernzugriff"
@@ -4927,6 +4928,7 @@
         "authorized": "Kann diese Gladys-Instanz von überall über Gladys Plus steuern.",
         "pending": "Das Gladys-Plus-Konto ist bereit. Prüfe, dass die Schlüssel-Fingerabdrücke unten mit denen auf der Gladys-Plus-Seite dieser Person übereinstimmen, und aktiviere dann den Schalter, um sie zu autorisieren.",
         "keys_changed": "Die Verschlüsselungsschlüssel haben sich geändert, seit du sie autorisiert hast: Der Zugriff wurde aus Sicherheitsgründen widerrufen. Prüfe die neuen Fingerabdrücke unten und autorisiere die Person dann erneut.",
+        "linked": "Mit diesem Gladys-Benutzer verknüpft. Die Verschlüsselungsschlüssel erscheinen hier, sobald sich das Gladys-Plus-Konto mit dieser Gladys-Instanz verbunden hat; ein Administrator dieser Instanz autorisiert sie dann.",
         "not_linked": "Diese Person hat ein Gladys-Plus-Konto, das noch keinem Gladys-Benutzer zugeordnet ist: Verknüpfe es hier, oder lass sie ihren Benutzer bei ihrer nächsten Anmeldung bei Gladys Plus wählen.",
         "invited": "Einladung gesendet am {{date}}. Sobald die Person ihr Gladys-Plus-Konto erstellt hat, wird es mit diesem Benutzer verknüpft und du autorisierst hier ihre Schlüssel.",
         "none": "Kein Gladys-Plus-Konto: Dieser Benutzer kann Gladys nur von zu Hause aus nutzen."
