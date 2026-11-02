@@ -33,14 +33,14 @@ const GatewayRemoteUsersCard = ({ gatewayUsersKeys, gatewayGetKeysStatus }) => {
           <div class={style.remoteUsersSummary}>
             <span class="badge badge-success">
               <Text
-                id={authorized > 1 ? 'gateway.remoteUsersAuthorized' : 'gateway.remoteUsersAuthorizedOne'}
+                id={authorized === 1 ? 'gateway.remoteUsersAuthorizedOne' : 'gateway.remoteUsersAuthorized'}
                 fields={{ count: authorized }}
               />
             </span>
             {pending > 0 && (
               <span class="badge badge-warning">
                 <Text
-                  id={pending > 1 ? 'gateway.remoteUsersPending' : 'gateway.remoteUsersPendingOne'}
+                  id={pending === 1 ? 'gateway.remoteUsersPendingOne' : 'gateway.remoteUsersPending'}
                   fields={{ count: pending }}
                 />
               </span>

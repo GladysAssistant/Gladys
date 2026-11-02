@@ -26,7 +26,7 @@ class SettingsUsers extends Component {
     users: null,
     loading: true,
     orderDir: 'asc',
-    search: '',
+    searchTerms: '',
     gatewayStatus: null,
     gatewayKeys: null,
     gatewayKeysStatus: null,
@@ -58,22 +58,33 @@ class SettingsUsers extends Component {
     }
   };
 
+  // The Gladys Plus status is readable by anyone; the keys are an admin route
   getGateway = async () => {
-    // the Gladys Plus status and the keys are admin routes; the logged user
-    // can still be loading when the page mounts (componentDidUpdate retries)
-    if (!this.isAdmin() || this.gatewayRequested) {
+    if (this.gatewayRequested) {
       return;
     }
     this.gatewayRequested = true;
     try {
       const gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
       this.setState({ gatewayStatus });
-      if (gatewayStatus.configured === true) {
-        await this.getKeys();
-      }
     } catch (e) {
       console.error(e);
+      // a later call (the logged user arriving, for instance) retries
+      this.gatewayRequested = false;
+      return;
     }
+    await this.getKeysIfAdmin();
+  };
+
+  // the logged user can still be loading when the page mounts: this runs
+  // again when they arrive (componentDidUpdate)
+  getKeysIfAdmin = async () => {
+    const configured = get(this.state, 'gatewayStatus.configured') === true;
+    if (!configured || !this.isAdmin() || this.keysRequested) {
+      return;
+    }
+    this.keysRequested = true;
+    await this.getKeys();
   };
 
   getKeys = async () => {
@@ -95,20 +106,27 @@ class SettingsUsers extends Component {
       return;
     }
     this.setState({ plusUsersStatus: RequestStatus.Getting });
-    try {
-      const [plusUsers, plusMe] = await Promise.all([
-        this.props.session.gatewayClient.getUsersInAccount(),
-        this.props.session.gatewayClient.getMyself()
-      ]);
-      this.setState({ plusUsers, plusMe, plusUsersStatus: RequestStatus.Success });
-    } catch (e) {
-      console.error(e);
+    // independent: the list is worth showing even when the profile fails
+    // (isPlusAdmin falls back on the role read at login)
+    const [plusUsersResult, plusMeResult] = await Promise.allSettled([
+      this.props.session.gatewayClient.getUsersInAccount(),
+      this.props.session.gatewayClient.getMyself()
+    ]);
+    if (plusMeResult.status === 'fulfilled') {
+      this.setState({ plusMe: plusMeResult.value });
+    } else {
+      console.error(plusMeResult.reason);
+    }
+    if (plusUsersResult.status === 'fulfilled') {
+      this.setState({ plusUsers: plusUsersResult.value, plusUsersStatus: RequestStatus.Success });
+    } else {
+      console.error(plusUsersResult.reason);
       this.setState({ plusUsersStatus: RequestStatus.Error });
     }
   };
 
   search = e => {
-    this.setState({ search: e.target.value });
+    this.setState({ searchTerms: e.target.value });
   };
 
   changeOrderDir = e => {
@@ -221,23 +239,30 @@ class SettingsUsers extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.user !== this.props.user) {
       this.getGateway();
+      this.getKeysIfAdmin();
     }
   }
 
   render(props, state) {
-    const plusConfigured = get(state, 'gatewayStatus.configured') === true;
+    // in gateway mode the page is reached through Gladys Plus: the instance is
+    // configured whatever the status request says (or before it answers)
+    const plusConfigured = config.gatewayMode || get(state, 'gatewayStatus.configured') === true;
     const view = buildUsersView({
       users: state.users || [],
       gatewayKeys: plusConfigured ? state.gatewayKeys : null,
-      plusUsers: plusConfigured || config.gatewayMode ? state.plusUsers : null,
-      search: state.search,
+      plusUsers: plusConfigured ? state.plusUsers : null,
+      search: state.searchTerms,
       orderDir: state.orderDir
     });
+    // the remote access of every row waits for the keys: one loader, no
+    // "no remote access" flashing before "authorized"
+    const loading = state.loading || state.gatewayKeysStatus === RequestStatus.Getting;
     return (
       <SettingsLayout>
         <UserPage
           {...props}
           {...state}
+          loading={loading}
           view={view}
           isAdmin={this.isAdmin()}
           isPlusAdmin={this.isPlusAdmin()}

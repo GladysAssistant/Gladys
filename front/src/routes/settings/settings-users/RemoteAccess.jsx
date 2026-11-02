@@ -6,9 +6,11 @@ import { RequestStatus } from '../../../utils/consts';
 import { REMOTE_STATUS, ACTION_NEEDED_STATUSES } from './buildUsersView';
 import style from './style.css';
 
-// the Users page of the Gladys Plus app: where invitations are sent when this
-// page is opened locally (the browser has no Plus token there)
-export const GLADYS_PLUS_USERS_URL = 'https://plus.gladysassistant.com/dashboard/settings/user';
+// Where invitations are sent when this page is opened locally (the browser has
+// no Plus token there): the Plus users page of the Gladys Plus app. Its old
+// route, which redirects to the Users page once this version is deployed
+// there, and still serves the invite form until then.
+export const GLADYS_PLUS_USERS_URL = 'https://plus.gladysassistant.com/dashboard/settings/gateway-users';
 
 const STATUS_UI = {
   [REMOTE_STATUS.AUTHORIZED]: { badge: 'badge-success', icon: 'check-circle', tone: style.toneSuccess },
@@ -166,9 +168,13 @@ class RemoteAccess extends Component {
   ) {
     const { remote, user, gatewayMode, isAdmin, isPlusAdmin, plusMe, language } = props;
     const status = remote ? remote.status : REMOTE_STATUS.NONE;
-    const keysLoaded = props.gatewayKeysStatus === RequestStatus.Success;
-    // without the keys of the instance, "no remote access" would be a guess
-    const unknown = !remote && !keysLoaded;
+    // Without the keys of the instance, "no remote access" or "not linked" would
+    // be a guess: only when they could not be loaded (the page waits for them
+    // while they load; a Plus admin who is not a local admin never loads them
+    // and reads the Plus account instead)
+    const keysFailed =
+      props.gatewayKeysStatus === RequestStatus.Error || props.gatewayKeysStatus === RequestStatus.NetworkError;
+    const unknown = keysFailed && (!remote || (!remote.keys && !remote.isInvitation));
     const ui = STATUS_UI[status];
     const actionNeeded = ACTION_NEEDED_STATUSES.includes(status);
     const canSwitch = Boolean(remote && remote.keys && isAdmin);
@@ -215,7 +221,7 @@ class RemoteAccess extends Component {
                 <Text id={`usersSettings.plus.statusText.${status}`} fields={{ date: invitedOn }} />
               )}
             </p>
-            {(plusEmail || account) && !unknown && (
+            {(plusEmail || account || (remote && remote.keys && remote.keys.connected)) && !unknown && (
               <div class={style.remoteMeta}>
                 {plusEmail && <span>{remote.email}</span>}
                 {account && account.role && (
@@ -268,7 +274,7 @@ class RemoteAccess extends Component {
                 <i class="fe fe-send" /> <Text id="usersSettings.plus.inviteThisUser" />
               </button>
             )}
-            {status === REMOTE_STATUS.NONE && !gatewayMode && keysLoaded && (
+            {status === REMOTE_STATUS.NONE && !gatewayMode && !unknown && (
               <a
                 href={GLADYS_PLUS_USERS_URL}
                 target="_blank"

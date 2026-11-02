@@ -122,19 +122,31 @@ export function buildUsersView({ users = [], gatewayKeys, plusUsers, search = ''
   });
   const remoteList = Array.from(remotes.values());
 
-  const members = users.map(user => {
-    const email = normalizeEmail(user.email);
-    const linked = candidate => !candidate.attached && candidate.gladysUserId === user.id;
-    const sameEmail = candidate => !candidate.attached && email !== null && candidate.email === email;
-    // the link wins over the email, an account over an invitation
-    const match =
-      remoteList.find(linked) || invitations.find(linked) || remoteList.find(sameEmail) || invitations.find(sameEmail);
-    let remote = null;
-    if (match) {
-      match.attached = true;
-      remote = finalize(match, match.gladysUserId === user.id);
+  const candidates = remoteList.concat(invitations);
+  const attach = (member, match) => {
+    match.attached = true;
+    return { user: member.user, remote: finalize(match, match.gladysUserId === member.user.id) };
+  };
+  // Two passes, so a link always wins over an email whatever the order of the
+  // users: first every remote linked to a user (an account before an
+  // invitation), then, for the users still without one, a remote recognized
+  // by its email among those linked to nobody. A remote linked to a Gladys
+  // user who no longer exists stays unattached rather than going to someone
+  // else by email.
+  let members = users.map(user => ({ user, remote: null }));
+  members = members.map(member => {
+    const linked = candidates.find(candidate => !candidate.attached && candidate.gladysUserId === member.user.id);
+    return linked ? attach(member, linked) : member;
+  });
+  members = members.map(member => {
+    if (member.remote) {
+      return member;
     }
-    return { user, remote };
+    const email = normalizeEmail(member.user.email);
+    const sameEmail = candidates.find(
+      candidate => !candidate.attached && !candidate.gladysUserId && email !== null && candidate.email === email
+    );
+    return sameEmail ? attach(member, sameEmail) : member;
   });
 
   const unlinked = remoteList

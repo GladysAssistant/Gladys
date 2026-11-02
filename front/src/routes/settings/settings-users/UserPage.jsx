@@ -74,7 +74,7 @@ const UserPage = ({ children, ...props }) => {
                 changeOrderDir={props.changeOrderDir}
                 orderValue={props.orderDir}
                 search={props.search}
-                searchValue={props.searchValue}
+                searchValue={props.searchTerms}
                 searchPlaceHolder={<Text id="usersSettings.searchPlaceholder" />}
               />
             </Localizer>
@@ -121,7 +121,7 @@ const UserPage = ({ children, ...props }) => {
           {members.length > 0 && (
             <div class={style.listSummary}>
               <Text
-                id={stats.users > 1 ? 'usersSettings.userCount' : 'usersSettings.oneUserCount'}
+                id={stats.users === 1 ? 'usersSettings.oneUserCount' : 'usersSettings.userCount'}
                 fields={{ count: stats.users }}
               />
             </div>

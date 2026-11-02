@@ -73,7 +73,7 @@ const PlusOverview = ({ stats, gatewayMode, gatewayKeysStatus, plusUsersStatus }
       <div class={cx('alert alert-warning mb-0 mt-3', style.attentionAlert)} role="status">
         <i class="fe fe-alert-circle" />
         <Text
-          id={stats.actionNeeded > 1 ? 'usersSettings.plus.actionNeededMany' : 'usersSettings.plus.actionNeededOne'}
+          id={stats.actionNeeded === 1 ? 'usersSettings.plus.actionNeededOne' : 'usersSettings.plus.actionNeededMany'}
           fields={{ count: stats.actionNeeded }}
         />
       </div>
