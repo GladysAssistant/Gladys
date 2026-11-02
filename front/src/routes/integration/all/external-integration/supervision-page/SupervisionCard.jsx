@@ -8,21 +8,56 @@ import { getGithubRepoUrl, getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import integrationText from '../integrationText.css';
 
+// last_error codes of an asynchronous sub-container start (GET /container)
+const SUB_CONTAINER_ERROR_KEYS = {
+  UNABLE_TO_PULL_IMAGE: 'containerPullFailed',
+  UNABLE_TO_START_CONTAINER: 'containerStartFailed'
+};
+
+const SubContainerStatus = ({ container }) => {
+  if (container.status === 'running') {
+    return (
+      <span class="badge badge-success">
+        <Text id="integration.externalIntegration.supervision.containerRunning" />
+      </span>
+    );
+  }
+  if (container.status === 'pulling') {
+    // first start of a `manual` entry: its image is downloaded first (gigabytes for Frigate)
+    const progress = container.pull && container.pull.progress;
+    return (
+      <span class="badge badge-info">
+        <i class="fe fe-download mr-1" />
+        {typeof progress === 'number' ? (
+          <Text id="integration.externalIntegration.supervision.containerPulling" fields={{ progress }} />
+        ) : (
+          <Text id="integration.externalIntegration.supervision.containerPullingStarting" />
+        )}
+      </span>
+    );
+  }
+  const errorKey = SUB_CONTAINER_ERROR_KEYS[container.last_error];
+  return (
+    <span>
+      <span class="badge badge-secondary">
+        <Text id="integration.externalIntegration.supervision.containerStopped" />
+      </span>
+      {errorKey && (
+        <span class="badge badge-danger ml-1">
+          <Text id={`integration.externalIntegration.supervision.${errorKey}`} />
+        </span>
+      )}
+    </span>
+  );
+};
+
 const SubContainerRow = ({ container, language }) => {
   const running = container.status === 'running';
   return (
     <tr>
       <td>{container.name}</td>
       <td>
-        {running ? (
-          <span class="badge badge-success">
-            <Text id="integration.externalIntegration.supervision.containerRunning" />
-          </span>
-        ) : (
-          <span class="badge badge-secondary">
-            <Text id="integration.externalIntegration.supervision.containerStopped" />
-          </span>
-        )}
+        <SubContainerStatus container={container} />
       </td>
       <td>
         {(container.ports || [])

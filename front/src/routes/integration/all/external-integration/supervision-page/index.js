@@ -142,10 +142,51 @@ class ExternalIntegrationSupervisionPage extends Component {
     }
   };
 
+  // the state of one sub-container while its image downloads (first start
+  // of a `manual` entry): merged live, then the detail is read again once
+  // the download is over (the start assigned the host ports, started_at)
+  onContainerUpdated = payload => {
+    if (!payload || !this.state.integration || payload.selector !== this.props.selector) {
+      return;
+    }
+    const containers = (this.state.integration.containers || []).map(container =>
+      container.name === payload.name
+        ? Object.assign({}, container, {
+            status: payload.status,
+            pull: payload.pull,
+            last_error: payload.last_error
+          })
+        : container
+    );
+    this.setState({ integration: Object.assign({}, this.state.integration, { containers }) });
+    if (payload.status !== 'pulling') {
+      this.refreshContainers();
+    }
+  };
+
+  refreshContainers = async () => {
+    const { selector } = this.props;
+    try {
+      const integration = await this.props.httpClient.get(`/api/v1/external_integration/${selector}`);
+      if (selector !== this.props.selector || !this.state.integration) {
+        return;
+      }
+      this.setState({
+        integration: Object.assign({}, this.state.integration, { containers: integration.containers })
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
+    );
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONTAINER_UPDATED,
+      this.onContainerUpdated
     );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
@@ -164,6 +205,10 @@ class ExternalIntegrationSupervisionPage extends Component {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONTAINER_UPDATED,
+      this.onContainerUpdated
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,

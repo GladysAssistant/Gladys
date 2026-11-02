@@ -6,7 +6,8 @@ const logger = require('../../utils/logger');
  * @description Stop every existing sub-container of an integration (stop of
  * the whole integration: the main container stops first, then everything
  * else). The desired state is not touched: the next start resumes the same
- * containers.
+ * containers. An image download in progress is aborted (and awaited, so a
+ * container it was starting is gone too): everything stops.
  * @param {object} service - The external integration service (plain object).
  * @returns {Promise} Resolve when the sub-containers are stopped.
  * @example
@@ -14,6 +15,7 @@ const logger = require('../../utils/logger');
  */
 async function stopSubContainers(service) {
   await Promise.each(this.getManifestContainers(service), async (entry) => {
+    await this.cancelSubContainerPull(service, entry.name);
     const container = await this.findSubContainer(service, entry.name);
     if (container) {
       try {

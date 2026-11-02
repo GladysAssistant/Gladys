@@ -403,10 +403,15 @@ describe('externalIntegration.controlSubContainer', () => {
 
   it('should start the container with the provided env and persist the desired state', async () => {
     const { externalIntegration, system, variable } = buildSupervisor({
-      system: { createContainer: fake.resolves({ id: 'mqtt-1' }) },
+      system: { createContainer: fake.resolves({ id: 'mqtt-1' }), imageExists: fake.resolves(true) },
     });
     const service = await seedMultiContainerService();
-    await externalIntegration.controlSubContainer(service, 'mqtt', 'start', { env: { MQTT_PASSWORD: 's3cr3t' } });
+    const result = await externalIntegration.controlSubContainer(service, 'mqtt', 'start', {
+      env: { MQTT_PASSWORD: 's3cr3t' },
+    });
+    expect(result).to.deep.equal({ status: 'running' });
+    // the image is on the disk: started synchronously, nothing downloaded
+    assert.notCalled(system.pull);
     assert.calledOnce(system.createContainer);
     const descriptor = system.createContainer.firstCall.args[0];
     expect(descriptor.Env).to.include('MQTT_PASSWORD=s3cr3t');
@@ -437,7 +442,7 @@ describe('externalIntegration.controlSubContainer', () => {
 
   it('should restart an existing container', async () => {
     const { externalIntegration, system } = buildSupervisor({
-      system: { getContainers: fake.resolves([{ id: 'frigate-1' }]) },
+      system: { getContainers: fake.resolves([{ id: 'frigate-1' }]), imageExists: fake.resolves(true) },
     });
     const service = await seedMultiContainerService();
     await externalIntegration.controlSubContainer(service, 'frigate', 'restart');
@@ -468,7 +473,16 @@ describe('externalIntegration.getSubContainersState', () => {
     await variable.setValue(SUB_CONTAINER_PORTS_VARIABLE, JSON.stringify({ 'frigate/5000/tcp': 42115 }), service.id);
     const state = await externalIntegration.getSubContainersState(service);
     expect(state).to.deep.equal([
-      { name: 'mqtt', status: 'stopped', desired: 'stopped', started_at: null, ports: [], devices: [] },
+      {
+        name: 'mqtt',
+        status: 'stopped',
+        desired: 'stopped',
+        started_at: null,
+        ports: [],
+        devices: [],
+        pull: null,
+        last_error: null,
+      },
       {
         name: 'frigate',
         status: 'running',
@@ -488,6 +502,8 @@ describe('externalIntegration.getSubContainersState', () => {
           { class: 'coral-usb', granted: true, available: true },
           { class: 'gpu', granted: false, available: true },
         ],
+        pull: null,
+        last_error: null,
       },
     ]);
   });

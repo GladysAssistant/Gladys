@@ -9,7 +9,10 @@ const { SUB_CONTAINER_PORTS_VARIABLE } = require('./constants');
  * status, desired state, start date, assigned host ports and, per requested
  * hardware class, the granted/available flags — this is how the integration
  * knows what to put in its own config (e.g. `edgetpu` vs `cpu` detector for
- * Frigate). Also feeds the supervision block of the frontend.
+ * Frigate). Also feeds the supervision block of the frontend. An entry whose
+ * image is being downloaded by its first start reads `pulling`, with the
+ * `pull` progress; `last_error` is the code of its last failed asynchronous
+ * start (both in memory, see pullAndStartSubContainer).
  * @param {object} service - The external integration service (plain object).
  * @returns {Promise<Array>} Resolve with the list of sub-container states.
  * @example
@@ -68,6 +71,11 @@ async function getSubContainersState(service) {
         browsable: port.browsable !== false,
       };
     });
+    const key = `${service.id}:${entry.name}`;
+    const pull = this.subContainerPulls.get(key);
+    if (pull) {
+      status = 'pulling';
+    }
     const devices = (entry.devices || []).map((hardwareClass) => {
       const detected = detectedClasses.find((detectedClass) => detectedClass.class === hardwareClass);
       return {
@@ -83,6 +91,8 @@ async function getSubContainersState(service) {
       started_at: startedAt,
       ports,
       devices,
+      pull: pull ? { progress: pull.progress, detail: pull.detail } : null,
+      last_error: this.subContainerErrors.get(key) || null,
     };
   });
 }

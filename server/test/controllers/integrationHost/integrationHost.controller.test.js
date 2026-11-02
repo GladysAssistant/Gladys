@@ -773,6 +773,9 @@ describe('Integration host API', () => {
       stubSystem('stopContainer', () => Promise.resolve(true));
       stubSystem('createNetwork', () => Promise.resolve(true));
       stubSystem('getGladysBasePath', () => Promise.resolve({ basePathOnHost: '/var/lib/gladysassistant' }));
+      stubSystem('hasCpuCfsSupport', () => Promise.resolve(true));
+      // images on the disk: the starts below are synchronous (200)
+      stubSystem('imageExists', () => Promise.resolve(true));
     });
 
     afterEach(() => {
@@ -807,6 +810,27 @@ describe('Integration host API', () => {
         .post('/api/integration/v1/container/mqtt/restart')
         .send({})
         .expect(200);
+    });
+
+    it('should answer 202 when the image of the sub-container has to be downloaded first', async () => {
+      stubSystem('imageExists', () => Promise.resolve(false));
+      stubSystem('pull', () => Promise.resolve(true));
+      const res = await integrationRequest(token)
+        .post('/api/integration/v1/container/mqtt/start')
+        .send({})
+        .expect(202);
+      expect(res.body).to.deep.equal({ success: true, status: 'pulling' });
+      const list = await integrationRequest(token)
+        .get('/api/integration/v1/container')
+        .expect(200);
+      expect(list.body.containers[0]).to.include({ name: 'mqtt', status: 'pulling' });
+      expect(list.body.containers[0].pull).to.deep.equal({ progress: null, detail: null });
+      await gladys.externalIntegration.subContainerPulls.get(`${service.id}:mqtt`).promise;
+      await integrationRequest(token)
+        .post('/api/integration/v1/container/mqtt/restart')
+        .send({})
+        .expect(202);
+      await gladys.externalIntegration.subContainerPulls.get(`${service.id}:mqtt`).promise;
     });
 
     it('should return 400 on a reserved env key', async () => {

@@ -1019,6 +1019,8 @@ describe('External integration admin API', () => {
             },
           ],
           devices: [],
+          pull: null,
+          last_error: null,
         },
       ]);
     });

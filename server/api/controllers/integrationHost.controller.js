@@ -1,5 +1,22 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 
+/**
+ * @description Answer a sub-container start/restart: 202 when the image
+ * download runs in the background (the container is not running yet), 200
+ * otherwise.
+ * @param {object} res - Express response.
+ * @param {object} [result] - Result of controlSubContainer.
+ * @example
+ * sendControlResult(res, { status: 'pulling' });
+ */
+function sendControlResult(res, result) {
+  if (result && result.status === 'pulling') {
+    res.status(202).json({ success: true, status: 'pulling' });
+    return;
+  }
+  res.json({ success: true });
+}
+
 module.exports = function IntegrationHostController(gladys) {
   /**
    * @api {get} /api/integration/v1/status getStatus
@@ -382,13 +399,19 @@ module.exports = function IntegrationHostController(gladys) {
    * @apiDescription Creates the container if needed then starts it (desired
    * state "running"). The optional env is merged over the manifest env;
    * when it differs from the existing container, the container is recreated
-   * first (the /data volumes persist).
+   * first (the /data volumes persist). When the image is not on the disk yet
+   * (first start of a `manual` entry), answers 202 { success, status:
+   * "pulling" } at once: the download runs in the background, followed
+   * through GET /container.
    */
   async function startContainer(req, res) {
-    await gladys.externalIntegration.controlSubContainer(req.externalIntegrationService, req.params.name, 'start', {
-      env: req.body.env,
-    });
-    res.json({ success: true });
+    const result = await gladys.externalIntegration.controlSubContainer(
+      req.externalIntegrationService,
+      req.params.name,
+      'start',
+      { env: req.body.env },
+    );
+    sendControlResult(res, result);
   }
 
   /**
@@ -408,11 +431,16 @@ module.exports = function IntegrationHostController(gladys) {
    * @apiName restartContainer
    * @apiGroup IntegrationHostApi
    * @apiDescription Typical use: the integration rewrote a config file of
-   * the sub-container through /data and restarts it to apply.
+   * the sub-container through /data and restarts it to apply. Same 202
+   * answer as start when the image has to be downloaded first.
    */
   async function restartContainer(req, res) {
-    await gladys.externalIntegration.controlSubContainer(req.externalIntegrationService, req.params.name, 'restart');
-    res.json({ success: true });
+    const result = await gladys.externalIntegration.controlSubContainer(
+      req.externalIntegrationService,
+      req.params.name,
+      'restart',
+    );
+    sendControlResult(res, result);
   }
 
   /**

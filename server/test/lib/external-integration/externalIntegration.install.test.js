@@ -227,15 +227,15 @@ describe('externalIntegration.install', () => {
 
   it('should install a local sub-container image when its pull fails', async () => {
     const pull = sinon.stub();
-    pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('pull access denied'));
+    pull.withArgs('ghcr.io/blakeblackshear/frigate:0.14.1').rejects(new Error('pull access denied'));
     pull.resolves(true);
     const imageExists = sinon.stub();
-    imageExists.withArgs('eclipse-mosquitto:2.0.18').resolves(true);
+    imageExists.withArgs('ghcr.io/blakeblackshear/frigate:0.14.1').resolves(true);
     imageExists.resolves(false);
     const { externalIntegration } = buildSupervisor({ system: { pull, imageExists } });
     const integration = await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST });
     expect(integration.status).to.not.equal('ERROR');
-    sinonAssert.calledWith(imageExists, 'eclipse-mosquitto:2.0.18');
+    sinonAssert.calledWith(imageExists, 'ghcr.io/blakeblackshear/frigate:0.14.1');
   });
 
   it('should reject an image without manifest label in dev mode', async () => {
@@ -297,14 +297,15 @@ describe('externalIntegration.install', () => {
     expect(serviceInDb.status).to.equal('ERROR');
   });
 
-  it('should pull every sub-container image and persist the granted classes', async () => {
+  it('should pull the auto sub-container images only and persist the granted classes', async () => {
     const { externalIntegration, system } = buildSupervisor();
     const integration = await externalIntegration.install({
       manifest: TEST_CONTAINERS_MANIFEST,
       grantedDevices: ['coral-usb'],
     });
-    sinonAssert.calledWith(system.pull, 'eclipse-mosquitto:2.0.18');
+    // frigate is auto: pulled now; mqtt is manual: pulled at its first start
     sinonAssert.calledWith(system.pull, 'ghcr.io/blakeblackshear/frigate:0.14.1');
+    sinonAssert.neverCalledWith(system.pull, 'eclipse-mosquitto:2.0.18');
     const serviceInDb = await db.Service.findOne({ where: { selector: integration.selector } });
     expect(serviceInDb.granted_devices).to.deep.equal(['coral-usb']);
   });
@@ -328,7 +329,7 @@ describe('externalIntegration.install', () => {
 
   it('should translate a failing sub-container image pull', async () => {
     const pull = sinon.stub();
-    pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('NO_MATCHING_MANIFEST'));
+    pull.withArgs('ghcr.io/blakeblackshear/frigate:0.14.1').rejects(new Error('NO_MATCHING_MANIFEST'));
     pull.resolves(true);
     const { externalIntegration } = buildSupervisor({ system: { pull } });
     try {

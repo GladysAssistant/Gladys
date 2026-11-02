@@ -94,6 +94,15 @@ const MAX_FAILURE_COUNT = 5;
 // Restart backoff: min(10s * 2^n, 15min).
 const RESTART_BACKOFF_BASE_MS = 10 * 1000;
 const RESTART_BACKOFF_MAX_MS = 15 * 60 * 1000;
+// The download of a sub-container image started by POST /container/:name/start
+// pushes its progress to the frontend at most this often: Docker emits several
+// progress events per layer and per second, a multi-GB image would flood the WS.
+const SUB_CONTAINER_PULL_PROGRESS_INTERVAL_MS = 1000;
+// last_error codes of an asynchronous sub-container start (GET /container).
+const SUB_CONTAINER_ERRORS = {
+  PULL_FAILED: 'UNABLE_TO_PULL_IMAGE',
+  START_FAILED: 'UNABLE_TO_START_CONTAINER',
+};
 // WebSocket protocol ping interval; 2 missed pongs -> DEGRADED.
 const WEBSOCKET_PING_INTERVAL_MS = 20 * 1000;
 const MAX_MISSED_PINGS = 2;
@@ -648,6 +657,8 @@ module.exports = {
   SUPPORTED_MANIFEST_VERSION,
   STARTUP_TIMEOUT_MS,
   CHECK_HEALTH_INTERVAL_MS,
+  SUB_CONTAINER_PULL_PROGRESS_INTERVAL_MS,
+  SUB_CONTAINER_ERRORS,
   HEARTBEAT_TIMEOUT_MS,
   STABLE_RUNNING_RESET_MS,
   MAX_FAILURE_COUNT,
