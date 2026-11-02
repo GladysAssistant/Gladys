@@ -487,6 +487,45 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
   }
 }
 
+// The use each heating or cooling value of a unit's mode switches a reversible
+// heat pump to, by the category of the mode feature (A.0.3, A.4).
+const USE_OF_UNIT_MODE = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: { [AC_MODE.HEATING]: 'heating', [AC_MODE.COOLING]: 'cooling' },
+  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
+    [THERMOSTAT_MODE.HEATING]: 'heating',
+    [THERMOSTAT_MODE.COOLING]: 'cooling',
+  },
+};
+
+/**
+ * @description Take the use a reversible heat pump's unit reports, when it was
+ * switched on from the unit.
+ *
+ * A remote sends its whole state with each press, mode included: a unit switched
+ * on in heating while the thermostat was set to cool is to heat. Started on its
+ * own use, the thermostat wrote cooling back to the unit, and the heating report
+ * that followed then switched the use and dropped the hold the same press had
+ * armed — the next pass cut the unit on its programme's Off point. The hold is
+ * kept here for that reason: it is the unit's own setpoint, in the use it runs.
+ * @param {object} device - The thermostat device switched on from its unit.
+ * @returns {Promise<void>}
+ * @example
+ * await adoptUnitUse.call(handler, device);
+ */
+async function adoptUnitUse(device) {
+  // Found by its params, which always build a config.
+  const config = buildParamsConfig(device);
+  if (!config.reversible) {
+    return;
+  }
+  const found = await getFeatureBySelector(this.gladys, config.mode_feature);
+  const value = found ? found.feature.last_value : null;
+  const use = value === null ? undefined : (USE_OF_UNIT_MODE[found.feature.category] || {})[Number(value)];
+  if (use) {
+    await switchUse.call(this, device, use, { keepHold: true });
+  }
+}
+
 /**
  * @description Start a thermostat switched on from the unit on the setpoint the
  * unit carries, when it is not the one this service last wrote.
@@ -712,12 +751,14 @@ async function onExternalPowerChanged(changedSelector, newValue) {
           // that fails must not cost the start, or the next pass would find the
           // thermostat still stopped and cut the power the user just turned on.
           try {
+            await adoptUnitUse.call(this, device);
             await holdUnitSetpoint.call(this, device);
           } catch (e) {
             logger.warn(`Thermostat: could not hold the setpoint ${device.selector} carries: ${e.message}`);
           }
           await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
         } else if (value !== 0) {
+          await adoptUnitUse.call(this, device);
           await holdRemoteStartOnOffPoint.call(this, device);
         }
       }),
@@ -726,16 +767,6 @@ async function onExternalPowerChanged(changedSelector, newValue) {
     logger.warn(`Thermostat: could not follow a power change made on the device: ${e.message}`);
   }
 }
-
-// The use each heating or cooling value of a unit's mode switches a reversible
-// heat pump to, by the category of the mode feature (A.0.3, A.4).
-const USE_OF_UNIT_MODE = {
-  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: { [AC_MODE.HEATING]: 'heating', [AC_MODE.COOLING]: 'cooling' },
-  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
-    [THERMOSTAT_MODE.HEATING]: 'heating',
-    [THERMOSTAT_MODE.COOLING]: 'cooling',
-  },
-};
 
 /**
  * @description Follow heating or cooling picked on a reversible heat pump itself
@@ -792,7 +823,16 @@ async function onExternalModeChanged(changedSelector, newValue) {
           await switchUse.call(this, device, use);
           return;
         }
-        await this.setValue(device, modeFeature, use === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING);
+        // A running one keeps its hold: a remote sends its whole state with each
+        // press, and the setpoint held from that same press is the unit's own, in
+        // the use it now runs. Dropped, the next pass put the unit back on the
+        // programme — off, on an Off point.
+        await switchUse.call(this, device, use, { keepHold: true });
+        await this.gladys.device.saveState(
+          modeFeature,
+          use === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING,
+        );
+        this.triggerApplySchedules();
       }),
     );
   } catch (e) {

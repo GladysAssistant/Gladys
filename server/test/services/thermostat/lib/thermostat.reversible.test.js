@@ -337,9 +337,11 @@ describe('thermostat: reversible heat pump', () => {
               ),
             ),
             setParam: fake.resolves(null),
+            saveState: fake.resolves(null),
           },
           event: { emit: fake.returns(null) },
         },
+        triggerApplySchedules: fake.returns(null),
         windowSelectorsCache: null,
         targetSelectorsCache: null,
         powerSelectorsCache: null,
@@ -360,9 +362,26 @@ describe('thermostat: reversible heat pump', () => {
 
       await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
 
-      assert.calledOnce(handler.setValue);
-      expect(handler.setValue.firstCall.args[1].selector).to.equal('heat-pump:mode');
-      expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE', 'cooling');
+      assert.calledOnce(handler.gladys.device.saveState);
+      expect(handler.gladys.device.saveState.firstCall.args[0].selector).to.equal('heat-pump:mode');
+      expect(handler.gladys.device.saveState.firstCall.args[1]).to.equal(THERMOSTAT_MODE.COOLING);
+      assert.calledOnce(handler.triggerApplySchedules);
+    });
+
+    // The remote sends its whole state with each press: the setpoint held from
+    // that press is the unit's own, in the use it now runs. Dropped, the next
+    // pass put the unit back on the programme — off, on an Off point.
+    it('should keep the hold of a running heat pump whose use is switched on its remote', async () => {
+      const mod = loadListener();
+      const handler = buildHandler({
+        devices: [heatPump({ extra: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' }] })],
+      });
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+
+      assert.neverCalledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '');
+      assert.notCalled(handler.setValue);
     });
 
     it('should only take the use on a stopped heat pump, without starting it', async () => {
@@ -385,7 +404,7 @@ describe('thermostat: reversible heat pump', () => {
 
       await mod.onExternalModeChanged.call(handler, 'ac-mode', THERMOSTAT_MODE.HEATING);
 
-      expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.HEATING);
+      expect(handler.gladys.device.saveState.firstCall.args[1]).to.equal(THERMOSTAT_MODE.HEATING);
     });
 
     it('should leave auto, drying and fan to the regulation pass', async () => {
@@ -500,7 +519,85 @@ describe('thermostat: reversible heat pump', () => {
 
       await mod.onDeviceNewState.call(handler, { device_feature: 'ac-mode', state: AC_MODE.COOLING });
 
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE', 'cooling');
+    });
+  });
+
+  // A remote sends its whole state with each press, mode included: a unit
+  // switched on in heating while the thermostat was set to cool is to heat.
+  describe('onExternalPowerChanged', () => {
+    const loadListener = () =>
+      proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+        '../../../utils/logger': silentLogger,
+      });
+
+    const poweredPump = (mode) =>
+      heatPump({ use: 'cooling', mode, extra: [{ name: 'THERMOSTAT_POWER_FEATURE', value: 'ac-power' }] });
+
+    // `unitModeValue` undefined: the unit's mode is not found.
+    const buildHandler = (device, unitModeValue, category = DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING) => {
+      const features = {
+        'ac-mode': unitModeValue !== undefined && {
+          selector: 'ac-mode',
+          category,
+          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+          last_value: unitModeValue,
+        },
+        'ac-setpoint': { selector: 'ac-setpoint', last_value: 21 },
+      };
+      return {
+        gladys: {
+          device: {
+            get: fake((query) => {
+              const selector = query && query.device_feature_selectors;
+              if (selector) {
+                return Promise.resolve(features[selector] ? [{ selector: 'ac', features: [features[selector]] }] : []);
+              }
+              return Promise.resolve([device]);
+            }),
+            setParam: fake.resolves(null),
+          },
+          event: { emit: fake.returns(null) },
+        },
+        powerSelectorsCache: null,
+        observedPowers: new Map([['ac-power', 0]]),
+        selfWrittenPowers: new Map(),
+        selfWrittenSetpoints: new Map(),
+        setValue: fake.resolves(null),
+        broadcastConfigUpdated: fake.returns(null),
+        triggerApplySchedules: fake.returns(null),
+      };
+    };
+
+    it('should start a stopped heat pump in the use its unit was switched on in', async () => {
+      const mod = loadListener();
+      const device = poweredPump(THERMOSTAT_MODE.OFF);
+      const handler = buildHandler(device, AC_MODE.HEATING);
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE', 'heating');
       assert.calledOnce(handler.setValue);
+      expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.HEATING);
+    });
+
+    it('should leave the use of a unit switched on in a mode that names none', async () => {
+      const mod = loadListener();
+      const handler = buildHandler(poweredPump(THERMOSTAT_MODE.OFF), AC_MODE.DRYING);
+      const others = [
+        buildHandler(poweredPump(THERMOSTAT_MODE.OFF), null),
+        buildHandler(poweredPump(THERMOSTAT_MODE.OFF), undefined),
+        buildHandler(poweredPump(THERMOSTAT_MODE.OFF), AC_MODE.HEATING, DEVICE_FEATURE_CATEGORIES.SWITCH),
+      ];
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+      await Promise.all(others.map((other) => mod.onExternalPowerChanged.call(other, 'ac-power', 1)));
+
+      assert.neverCalledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE');
+      expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
+      others.forEach((other) =>
+        assert.neverCalledWith(other.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE'),
+      );
     });
   });
 
