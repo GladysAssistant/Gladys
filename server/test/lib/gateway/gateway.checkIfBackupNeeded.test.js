@@ -174,6 +174,19 @@ describe('gateway.checkIfBackupNeeded', () => {
     assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
   });
 
+  it('should not start the scheduled backup when one is in progress by then', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([]);
+
+    await gateway.checkIfBackupNeeded();
+    // "Backup now" clicked during the random delay, still running when it fires
+    gateway.backupInProgress = true;
+    clock.tick(gateway.backupRandomInterval * 10);
+
+    assert.notCalled(event.emit);
+    expect(gateway.pendingBackupTimer).to.equal(null);
+  });
+
   it('should not schedule a backup while one is in progress', async () => {
     gateway.connected = true;
     gateway.backupInProgress = true;

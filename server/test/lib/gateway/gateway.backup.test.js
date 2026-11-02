@@ -7,7 +7,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const db = require('../../../models');
 const getConfig = require('../../../utils/getConfig');
-const { NotFoundError } = require('../../../utils/coreErrors');
+const { NotFoundError, ConflictError } = require('../../../utils/coreErrors');
 const { Error402 } = require('../../../utils/httpErrors');
 
 const { fake, assert } = sinon;
@@ -100,6 +100,37 @@ describe('gateway.backup', async function describe() {
     assert.notCalled(gateway.gladysGatewayClient.abortMultiPartBackup);
     assert.notCalled(gateway.recordBackupFailure);
     expect(gateway.backupInProgress).to.equal(false);
+  });
+
+  it('should cancel the scheduled backup: this one covers the day', async () => {
+    const scheduled = fake.returns(null);
+    gateway.pendingBackupTimer = setTimeout(scheduled, 50);
+
+    await gateway.backup();
+
+    expect(gateway.pendingBackupTimer).to.equal(null);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100);
+    });
+    assert.notCalled(scheduled);
+  });
+
+  it('should refuse to start while another backup is in progress, without touching it', async () => {
+    gateway.backupInProgress = true;
+
+    try {
+      await gateway.backup();
+      assert.fail();
+    } catch (e) {
+      expect(e)
+        .instanceOf(ConflictError)
+        .haveOwnProperty('message', 'BACKUP_ALREADY_IN_PROGRESS');
+    }
+
+    // the running backup is not the one that failed here
+    expect(gateway.backupInProgress).to.equal(true);
+    assert.notCalled(gateway.gladysGatewayClient.initializeMultiPartBackup);
+    assert.notCalled(gateway.recordBackupFailure);
   });
 
   it('should be marked in progress while it runs, and not anymore once it failed', async () => {

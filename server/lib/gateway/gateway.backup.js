@@ -9,7 +9,7 @@ const logger = require('../../utils/logger');
 const { execFile } = require('../../utils/childProcess');
 const { escapeSqlStringLiteral } = require('../../utils/backupSafety');
 const { readChunk } = require('../../utils/readChunk');
-const { NotFoundError } = require('../../utils/coreErrors');
+const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const { Error402 } = require('../../utils/httpErrors');
 
@@ -58,9 +58,19 @@ const logMemoryUsage = async (label) => {
  * backup();
  */
 async function backup(jobId) {
-  const linkGeneration = this.subscriptionLinkGeneration;
+  // Before any await, so that two backups asked at the same moment (the
+  // scheduled one and "Backup now", or two clicks) cannot both get past:
+  // this backup covers the day, a scheduled one is no longer needed, and a
+  // second one at the same time would empty the folder of the first
+  clearTimeout(this.pendingBackupTimer);
+  this.pendingBackupTimer = null;
+  if (this.backupInProgress) {
+    logger.info('Gateway backup: a backup is already in progress, not starting another one.');
+    throw new ConflictError(ERROR_MESSAGES.BACKUP_ALREADY_IN_PROGRESS);
+  }
   // checkIfBackupNeeded does not schedule another backup while this one runs
   this.backupInProgress = true;
+  const linkGeneration = this.subscriptionLinkGeneration;
   try {
     // no point in dumping and encrypting the database when Gladys Plus will
     // refuse the upload anyway

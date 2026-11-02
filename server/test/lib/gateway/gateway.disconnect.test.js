@@ -55,6 +55,10 @@ describe('gateway.disconnect', () => {
 
     assert.calledOnceWithExactly(gateway.gladysGatewayClient.disconnect);
     assert.callCount(variable.destroy, 12);
+    assert.calledWith(variable.destroy, SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT);
+    assert.calledWith(variable.destroy, SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE);
+    assert.calledWith(variable.destroy, SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR);
+    assert.calledWith(variable.destroy, SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT);
     expect(gateway.pendingBackupTimer).to.equal(null);
     expect(gateway.subscriptionActive).to.equal(true);
     // Plus is now unlinked: external integration webhooks recompute

@@ -112,6 +112,12 @@ async function checkIfBackupNeeded() {
     logger.info(`Backup will be started in ${Math.round(randomMoment / 1000)} seconds`);
     this.pendingBackupTimer = setTimeout(() => {
       this.pendingBackupTimer = null;
+      // a manual backup started during the delay cancels this timer; one
+      // still running when it fires has the day covered as well
+      if (this.backupInProgress) {
+        logger.info(`A backup is in progress, not starting the scheduled one.`);
+        return;
+      }
       logger.info(`Starting backup!`);
       this.event.emit(EVENTS.GATEWAY.CREATE_BACKUP);
     }, randomMoment);
