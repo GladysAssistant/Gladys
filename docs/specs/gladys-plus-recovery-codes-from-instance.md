@@ -1,8 +1,10 @@
-# Gladys Plus two-factor recovery codes generated from the instance
+# Gladys Plus two-factor recovery: codes from the instance, reset by email
 
-> **Living specification — source of truth.** This document specifies how a Gladys instance
-> generates a new set of two-factor recovery codes for a user of its Gladys Plus account, and the
-> contract between Gladys, the Gladys Plus Gateway and its JS client. **Rule: any PR that changes
+> **Living specification — source of truth.** This document specifies how a Gladys Plus user who
+> lost their second factor gets back into their account without any human intervention: a new set of
+> recovery codes generated from their Gladys instance (sections B, C), or, when no instance is
+> connected, a reset of the two-factor authentication by email (section E). It owns the contract
+> between Gladys, the Gladys Plus Gateway and its JS client. **Rule: any PR that changes
 > one of these behaviors or contracts modifies this file in the same diff.**
 >
 > Status: **implemented** (Gladys, Gateway and `@gladysassistant/gladys-gateway-js` ≥ 4.23.0).
@@ -85,7 +87,84 @@ names, `gladys_4_user_id`). Strings under `gateway.recoveryCodes*` in every lang
 
 ## D. Out of scope
 
-- Resetting the two-factor **secret** itself: the user re-enrolls their app from Gladys Plus
-  after logging in with a recovery code, as today.
-- Accounts with **no linked instance** (fresh reinstall, lost hardware): still a manual reset.
-- Letting a non-admin local user, or a remote (Gladys Plus tunnel) session, trigger the flow.
+- Resetting the two-factor **secret** from the instance: the user re-enrolls their app from Gladys
+  Plus after logging in with a recovery code, as today. (The reset by email of section E does
+  remove the secret, by design: it is the path of last resort.)
+- Letting a non-admin local user, or a remote (Gladys Plus tunnel) session, trigger the flow of
+  section B.
+- Offering the reset by email from the Gladys Plus login form **of the instance** (Settings ›
+  Gladys Plus, linking flow): the user does it from the Gladys Plus web app.
+
+## E. Reset by email when no instance is connected
+
+### E.1 Rule
+
+The instance is the second factor of last resort. **While an instance of the account is connected
+to the Gateway** (socket authenticated, any node of the cluster), the reset by email is refused
+(`403 INSTANCE_CONNECTED`) and the user is sent to section B. When **no instance is connected**
+(never linked, dead or lost hardware, long power cut), the user can reset their two-factor
+authentication by email, **immediately**: there is no waiting period.
+
+What the reset gives an attacker holding the password and the mailbox is the account itself
+(billing, users, the possibility to link a new instance) — not the home: the backups stay
+encrypted with the backup key, which only the instance knows and which a password reset
+discards, and a new browser still needs its keys accepted locally on an instance. That is why an
+immediate reset is acceptable here while it would not be with an instance at home.
+
+The check is done twice: when the link is requested, and when it is used. A link requested while
+the instance was offline is refused, and kept, if the instance came back online meanwhile.
+
+### E.2 Flow
+
+1. Login step 2 of the Gladys Plus web app (password accepted, two-factor code asked): "No Gladys
+   connected? Reset your two-factor authentication by email." Or, for a user who **forgot their
+   password too**, the same link on the reset password page (the reset password token stands for
+   the password step).
+2. The Gateway emails the user a single-use link, valid **one hour**, at most **one request per
+   minute per user** (`two_factor_reset`, EN / FR, with a "if you did not ask for this, change
+   your password" danger tile).
+3. The link opens `GLADYS_PLUS_FRONTEND_URL/reset-two-factor?token=…`: the reset happens **on
+   click** of a button, never on page load (email clients prefetch links).
+4. The Gateway disables two-factor on the account: `two_factor_enabled = false`, secret and
+   recovery codes removed, failed attempts counter cleared, token deleted. The user is emailed
+   (`two_factor_reset_done`). At the next login the Gateway returns an access token with the
+   `two-factor-configure` scope, and the web app sends the user to set up a new app, then to
+   save new recovery codes, like after a signup.
+
+### E.3 Contracts (Gateway)
+
+- `POST /users/two-factor/reset-request` — auth: **two factor token** (`twoFactorTokenAuth`, the
+  2-minute token of the password step); rate limited per IP. `200 { success: true }`. `403
+  TWO_FACTOR_NOT_ENABLED`, `403 INSTANCE_CONNECTED`, `429 TWO_FACTOR_RESET_ALREADY_REQUESTED`
+  (cooldown), `401` without a two factor token. Email `two_factor_reset` with
+  `{ firstname, twoFactorResetUrlGladys4 }`.
+- `POST /users/reset-password/:token/two-factor/reset-request` — no auth, rate limited; `:token`
+  is an unused, unexpired reset password token (`404` otherwise). Same behaviour and errors.
+  The reset password link stays usable afterwards.
+- `POST /users/two-factor/reset` — no auth, rate limited; body `{ token }`. `200
+  { two_factor_enabled: false }`. `404 TOKEN_NOT_FOUND` (unknown, used, expired or malformed),
+  `403 INSTANCE_CONNECTED` (link kept). Email `two_factor_reset_done` with `{ firstname }`; a
+  mail failure is logged and does not fail the call.
+- Storage: Redis, `two_factor_reset:token:<sha256(token)>` → user id (TTL 1 h) and
+  `two_factor_reset:cooldown:<user id>` (TTL 60 s). Only the hash of the token is stored.
+- Implementation: `userModel.requestTwoFactorReset`, `requestTwoFactorResetFromPasswordReset`,
+  `resetTwoFactor`; the controller provides `isInstanceOfUserConnected` (instance ids of the
+  account ∩ `socketModel.getConnectedInstanceIds()`).
+
+### E.4 Contracts (JS client, ≥ 4.23.0)
+
+`requestTwoFactorReset(twoFactorToken)`, `requestTwoFactorResetFromPasswordReset(resetToken)`,
+`resetTwoFactor(token)`.
+
+### E.5 Front (Gladys Plus web app, `config.gatewayMode`)
+
+- `GatewayLoginForm`: the link is rendered only when the page provides `requestTwoFactorReset`
+  (the login-gateway route does, the Settings › Gladys Plus linking form does not); the
+  `gatewayLogin.resetTwoFactor*` strings cover the sent / instance connected / expired session /
+  cooldown / error states.
+- `routes/gateway-reset-password`: same link under the two-factor fields, through the reset
+  password token.
+- `routes/gateway-reset-two-factor` (`/reset-two-factor?token=`): one button, states under
+  `gatewayResetTwoFactor.*`.
+- `gatewayLogin.noRecoveryCode` and the `password_reset` email no longer ask the user to write
+  to support: they point to the instance (section B) and to the reset by email.

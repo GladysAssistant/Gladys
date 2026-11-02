@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import linkState from 'linkstate';
 import get from 'get-value';
 import ResetPassword from './ResetPassword';
+import { RequestStatus } from '../../utils/consts';
 
 class ResetPasswordPage extends Component {
   state = {
@@ -11,7 +12,34 @@ class ResetPasswordPage extends Component {
     twoFactorEnabled: null,
     useRecoveryCode: false,
     success: false,
-    resetInProgress: false
+    resetInProgress: false,
+    twoFactorResetStatus: null,
+    twoFactorResetError: null
+  };
+
+  // The user forgot their password AND lost their two-factor app and recovery codes,
+  // with no Gladys connected to Gladys Plus: the reset password link proves the mailbox,
+  // Gladys Plus emails a link that resets their two-factor authentication.
+  requestTwoFactorReset = async e => {
+    e.preventDefault();
+    this.setState({ twoFactorResetStatus: RequestStatus.Getting, twoFactorResetError: null });
+    try {
+      await this.props.session.gatewayClient.requestTwoFactorResetFromPasswordReset(this.props.token);
+      this.setState({ twoFactorResetStatus: RequestStatus.Success });
+    } catch (e) {
+      console.error(e);
+      const status = get(e, 'response.status');
+      const errorMessage = get(e, 'response.data.error_message');
+      let error = 'UNKNOWN';
+      if (errorMessage === 'INSTANCE_CONNECTED') {
+        error = 'INSTANCE_CONNECTED';
+      } else if (status === 429) {
+        error = 'TOO_MANY';
+      } else if (status === 404) {
+        error = 'LINK';
+      }
+      this.setState({ twoFactorResetStatus: RequestStatus.Error, twoFactorResetError: error });
+    }
   };
 
   showRecoveryCode = e => {
@@ -83,7 +111,9 @@ class ResetPasswordPage extends Component {
       twoFactorRecoveryCode,
       passwordError,
       passwordNotMatching,
-      resetInProgress
+      resetInProgress,
+      twoFactorResetStatus,
+      twoFactorResetError
     }
   ) {
     return (
@@ -107,6 +137,9 @@ class ResetPasswordPage extends Component {
         passwordRepeat={passwordRepeat}
         updatePasswordRepeat={linkState(this, 'passwordRepeat')}
         resetInProgress={resetInProgress}
+        requestTwoFactorReset={this.requestTwoFactorReset}
+        twoFactorResetStatus={twoFactorResetStatus}
+        twoFactorResetError={twoFactorResetError}
       />
     );
   }

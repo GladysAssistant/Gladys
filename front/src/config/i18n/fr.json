@@ -5509,7 +5509,13 @@
     "invalidRecoveryCode": "Ce code de récupération est invalide ou a déjà été utilisé.",
     "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
     "useRecoveryCodeLink": "Utiliser un code de récupération",
-    "noRecoveryCode": "Pas de code de récupération ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> et nous la réinitialiserons.",
+    "noRecoveryCode": "Plus de code de récupération ? Un administrateur de votre Gladys peut en générer de nouveaux depuis Paramètres › Gladys Plus.",
+    "resetTwoFactorLink": "Pas de Gladys connectée ? Réinitialisez votre double authentification par email.",
+    "resetTwoFactorEmailSent": "Nous vous avons envoyé un email avec un lien pour réinitialiser votre double authentification. Il ne fonctionne qu'une fois et expire dans une heure.",
+    "resetTwoFactorInstanceConnected": "Votre Gladys est connectée à Gladys Plus : un administrateur de votre Gladys peut générer de nouveaux codes de récupération depuis Paramètres › Gladys Plus. La réinitialisation par email n'est possible que lorsqu'aucune Gladys n'est connectée.",
+    "resetTwoFactorExpired": "Votre session de connexion a expiré : reconnectez-vous avec votre mot de passe, puis demandez la réinitialisation.",
+    "resetTwoFactorTooMany": "Un email a été envoyé il y a moins d'une minute : vérifiez votre boîte mail (et vos spams) avant de redemander.",
+    "resetTwoFactorError": "Impossible d'envoyer l'email de réinitialisation. Réessayez plus tard.",
     "twoFactorHelp": "Code refusé, nouveau téléphone ? <a href=\"https://gladysassistant.com/fr/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Consultez notre guide de dépannage 2FA</a>.",
     "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
     "recoveryCodeLabel": "Code de récupération",
@@ -7365,6 +7371,17 @@
     "dontHaveAccount": "Vous n'avez pas encore de compte ?",
     "signupLink": "S'inscrire"
   },
+  "gatewayResetTwoFactor": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Réinitialiser la double authentification",
+    "description": "Vous avez demandé à réinitialiser la double authentification de votre compte Gladys Plus. Une fois réinitialisée, votre application d'authentification et vos codes de récupération ne fonctionnent plus : à votre prochaine connexion, Gladys Plus vous demandera de configurer une nouvelle application, puis d'enregistrer de nouveaux codes de récupération.",
+    "button": "Réinitialiser ma double authentification",
+    "success": "Votre double authentification a été réinitialisée. Connectez-vous avec votre mot de passe : Gladys Plus vous demandera de configurer une nouvelle application d'authentification.",
+    "loginLink": "Se connecter",
+    "errorLink": "Ce lien est invalide, déjà utilisé ou expiré. Demandez-en un nouveau depuis la page de connexion.",
+    "instanceConnected": "Votre Gladys est de nouveau connectée à Gladys Plus : un administrateur de votre Gladys peut plutôt générer de nouveaux codes de récupération depuis Paramètres › Gladys Plus. Ce lien reste valable tant qu'aucune Gladys n'est connectée.",
+    "error": "Impossible de réinitialiser votre double authentification. Réessayez plus tard."
+  },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Réinitialiser le mot de passe",
@@ -7383,7 +7400,8 @@
     "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
     "recoveryCodeLabel": "Code de récupération",
     "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
-    "resetPasswordButton": "Réinitialiser le mot de passe"
+    "resetPasswordButton": "Réinitialiser le mot de passe",
+    "resetTwoFactorThenComeBack": "Une fois votre double authentification réinitialisée, revenez sur cette page : votre lien de réinitialisation de mot de passe reste valable deux heures."
   },
   "gatewayOpenApi": {
     "title": "Open API",

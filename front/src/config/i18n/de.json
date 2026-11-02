@@ -5509,7 +5509,13 @@
     "invalidRecoveryCode": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet.",
     "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
     "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
-    "noRecoveryCode": "Keinen Wiederherstellungscode? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
+    "noRecoveryCode": "Keinen Wiederherstellungscode mehr? Ein Administrator deiner Gladys kann unter Einstellungen › Gladys Plus neue erzeugen.",
+    "resetTwoFactorLink": "Keine Gladys verbunden? Setze deine Zwei-Faktor-Authentifizierung per E-Mail zurück.",
+    "resetTwoFactorEmailSent": "Wir haben dir eine E-Mail mit einem Link zum Zurücksetzen deiner Zwei-Faktor-Authentifizierung geschickt. Er funktioniert einmal und läuft in einer Stunde ab.",
+    "resetTwoFactorInstanceConnected": "Deine Gladys ist mit Gladys Plus verbunden: Ein Administrator deiner Gladys kann unter Einstellungen › Gladys Plus neue Wiederherstellungscodes erzeugen. Das Zurücksetzen per E-Mail ist nur möglich, wenn keine Gladys verbunden ist.",
+    "resetTwoFactorExpired": "Deine Anmeldesitzung ist abgelaufen: Melde dich erneut mit deinem Passwort an und fordere dann das Zurücksetzen an.",
+    "resetTwoFactorTooMany": "Vor weniger als einer Minute wurde eine E-Mail gesendet: Prüfe dein Postfach (und den Spam-Ordner), bevor du es erneut anforderst.",
+    "resetTwoFactorError": "Die E-Mail zum Zurücksetzen konnte nicht gesendet werden. Bitte versuche es später erneut.",
     "twoFactorHelp": "Code abgelehnt, neues Handy? <a href=\"https://gladysassistant.com/de/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Lies unsere 2FA-Hilfe zur Fehlerbehebung</a>.",
     "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
     "recoveryCodeLabel": "Wiederherstellungscode",
@@ -7365,6 +7371,17 @@
     "dontHaveAccount": "Du hast noch keinen Account?",
     "signupLink": "Registrieren"
   },
+  "gatewayResetTwoFactor": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Zwei-Faktor-Authentifizierung zurücksetzen",
+    "description": "Du hast das Zurücksetzen der Zwei-Faktor-Authentifizierung deines Gladys-Plus-Kontos angefordert. Danach funktionieren deine Authentifizierungs-App und deine Wiederherstellungscodes nicht mehr: Bei deiner nächsten Anmeldung bittet dich Gladys Plus, eine neue App einzurichten und neue Wiederherstellungscodes zu speichern.",
+    "button": "Meine Zwei-Faktor-Authentifizierung zurücksetzen",
+    "success": "Deine Zwei-Faktor-Authentifizierung wurde zurückgesetzt. Melde dich mit deinem Passwort an: Gladys Plus bittet dich, eine neue Authentifizierungs-App einzurichten.",
+    "loginLink": "Anmelden",
+    "errorLink": "Dieser Link ist ungültig, bereits verwendet oder abgelaufen. Fordere auf der Anmeldeseite einen neuen an.",
+    "instanceConnected": "Deine Gladys ist wieder mit Gladys Plus verbunden: Ein Administrator deiner Gladys kann stattdessen unter Einstellungen › Gladys Plus neue Wiederherstellungscodes erzeugen. Dieser Link bleibt gültig, solange keine Gladys verbunden ist.",
+    "error": "Deine Zwei-Faktor-Authentifizierung konnte nicht zurückgesetzt werden. Bitte versuche es später erneut."
+  },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Passwort zurücksetzen",
@@ -7383,7 +7400,8 @@
     "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
     "recoveryCodeLabel": "Wiederherstellungscode",
     "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
-    "resetPasswordButton": "Passwort zurücksetzen"
+    "resetPasswordButton": "Passwort zurücksetzen",
+    "resetTwoFactorThenComeBack": "Sobald deine Zwei-Faktor-Authentifizierung zurückgesetzt ist, komm auf diese Seite zurück: Dein Link zum Zurücksetzen des Passworts bleibt zwei Stunden gültig."
   },
   "gatewayOpenApi": {
     "title": "Offene API",

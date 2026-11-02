@@ -5509,7 +5509,13 @@
     "invalidRecoveryCode": "Este código de recuperación no es válido o ya se ha utilizado.",
     "lostTwoFactor": "¿Ha perdido el acceso a su aplicación de doble factor?",
     "useRecoveryCodeLink": "Utilizar un código de recuperación",
-    "noRecoveryCode": "¿No tiene un código de recuperación? Contáctenos en <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> y lo restableceremos.",
+    "noRecoveryCode": "¿No le quedan códigos de recuperación? Un administrador de su Gladys puede generar nuevos desde Ajustes › Gladys Plus.",
+    "resetTwoFactorLink": "¿Ninguna Gladys conectada? Restablezca su doble autenticación por correo electrónico.",
+    "resetTwoFactorEmailSent": "Le hemos enviado un correo electrónico con un enlace para restablecer su doble autenticación. Solo funciona una vez y caduca en una hora.",
+    "resetTwoFactorInstanceConnected": "Su Gladys está conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Gladys Plus. El restablecimiento por correo electrónico solo está disponible cuando ninguna Gladys está conectada.",
+    "resetTwoFactorExpired": "Su sesión de inicio ha caducado: vuelva a iniciar sesión con su contraseña y solicite el restablecimiento.",
+    "resetTwoFactorTooMany": "Se envió un correo hace menos de un minuto: revise su bandeja de entrada (y el spam) antes de volver a solicitarlo.",
+    "resetTwoFactorError": "No se ha podido enviar el correo de restablecimiento. Inténtelo de nuevo más tarde.",
     "twoFactorHelp": "¿Código rechazado, teléfono nuevo? <a href=\"https://gladysassistant.com/es/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Consulte nuestra guía de solución de problemas de 2FA</a>.",
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
@@ -7365,6 +7371,17 @@
     "dontHaveAccount": "¿Todavía no tiene una cuenta?",
     "signupLink": "Registrarse"
   },
+  "gatewayResetTwoFactor": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Restablecer la doble autenticación",
+    "description": "Ha solicitado restablecer la doble autenticación de su cuenta Gladys Plus. Una vez restablecida, su aplicación de autenticación y sus códigos de recuperación dejan de funcionar: en su próximo inicio de sesión, Gladys Plus le pedirá configurar una nueva aplicación y guardar nuevos códigos de recuperación.",
+    "button": "Restablecer mi doble autenticación",
+    "success": "Su doble autenticación ha sido restablecida. Inicie sesión con su contraseña: Gladys Plus le pedirá configurar una nueva aplicación de autenticación.",
+    "loginLink": "Iniciar sesión",
+    "errorLink": "Este enlace no es válido, ya se ha utilizado o ha caducado. Solicite uno nuevo desde la página de inicio de sesión.",
+    "instanceConnected": "Su Gladys vuelve a estar conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Gladys Plus. Este enlace sigue siendo válido mientras ninguna Gladys esté conectada.",
+    "error": "No se ha podido restablecer su doble autenticación. Inténtelo de nuevo más tarde."
+  },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Restablecer contraseña",
@@ -7383,7 +7400,8 @@
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
     "recoveryCodePlaceholder": "Introduzca uno de sus códigos de recuperación",
-    "resetPasswordButton": "Restablecer contraseña"
+    "resetPasswordButton": "Restablecer contraseña",
+    "resetTwoFactorThenComeBack": "Una vez restablecida su doble autenticación, vuelva a esta página: su enlace de restablecimiento de contraseña sigue siendo válido durante dos horas."
   },
   "gatewayOpenApi": {
     "title": "Open API",

@@ -47,7 +47,9 @@ function createActions(store) {
         gatewayLoginRecoveryCodes: null,
         gatewayLoginRecoveryCodesStatus: null,
         gatewayLoginRecoveryCodesTwoFactorCode: null,
-        gatewayLoginRecoveryCodesWrongTwoFactorCode: false
+        gatewayLoginRecoveryCodesWrongTwoFactorCode: false,
+        gatewayLoginTwoFactorResetStatus: null,
+        gatewayLoginTwoFactorResetError: null
       };
       // If there is a return URL and the URL is relative to this domain
       // (we want to avoid redirecting to another domain for security issues)
@@ -274,6 +276,42 @@ function createActions(store) {
         gatewayLoginRecoveryCodesWrongTwoFactorCode: false
       });
       route(nextUrl);
+    },
+    // The user lost both their two-factor app and their recovery codes, and has no
+    // Gladys connected to Gladys Plus (otherwise the codes are generated from it):
+    // Gladys Plus emails them a link that resets their two-factor authentication.
+    async requestTwoFactorReset(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
+      store.setState({
+        gatewayLoginTwoFactorResetStatus: RequestStatus.Getting,
+        gatewayLoginTwoFactorResetError: null,
+        gatewayLoginStatus: null
+      });
+      try {
+        await state.session.gatewayClient.requestTwoFactorReset(state.gatewayLoginResults.two_factor_token);
+        store.setState({
+          gatewayLoginTwoFactorResetStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        console.error(e);
+        const status = get(e, 'response.status');
+        const errorMessage = get(e, 'response.data.error_message');
+        let error = 'UNKNOWN';
+        if (errorMessage === 'INSTANCE_CONNECTED') {
+          error = 'INSTANCE_CONNECTED';
+        } else if (status === 401) {
+          // the two factor token lives 2 minutes: the password step must be done again
+          error = 'EXPIRED';
+        } else if (status === 429) {
+          error = 'TOO_MANY';
+        }
+        store.setState({
+          gatewayLoginTwoFactorResetStatus: RequestStatus.Error,
+          gatewayLoginTwoFactorResetError: error
+        });
+      }
     },
     showRecoveryCodeLogin(state, e) {
       if (e) {

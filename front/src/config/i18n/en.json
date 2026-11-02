@@ -5509,7 +5509,13 @@
     "invalidRecoveryCode": "This recovery code is invalid or has already been used.",
     "lostTwoFactor": "Lost access to your two-factor app?",
     "useRecoveryCodeLink": "Use a recovery code",
-    "noRecoveryCode": "No recovery code? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> and we will reset it.",
+    "noRecoveryCode": "No recovery code left? An admin of your Gladys can generate new ones from Settings › Gladys Plus.",
+    "resetTwoFactorLink": "No Gladys connected? Reset your two-factor authentication by email.",
+    "resetTwoFactorEmailSent": "We sent you an email with a link to reset your two-factor authentication. It works once and expires in one hour.",
+    "resetTwoFactorInstanceConnected": "Your Gladys is connected to Gladys Plus: an admin of your Gladys can generate new recovery codes from Settings › Gladys Plus. The reset by email is only available when no Gladys is connected.",
+    "resetTwoFactorExpired": "Your login session has expired: log in again with your password, then ask for the reset.",
+    "resetTwoFactorTooMany": "An email was sent less than a minute ago: check your mailbox (and your spam folder) before asking again.",
+    "resetTwoFactorError": "Unable to send the reset email. Please try again later.",
     "twoFactorHelp": "Code refused, new phone? <a href=\"https://gladysassistant.com/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Read our 2FA troubleshooting guide</a>.",
     "useTwoFactorCodeLink": "Use a code from your two-factor app instead",
     "recoveryCodeLabel": "Recovery code",
@@ -7365,6 +7371,17 @@
     "dontHaveAccount": "Don't have an account yet?",
     "signupLink": "Signup"
   },
+  "gatewayResetTwoFactor": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Reset two-factor authentication",
+    "description": "You asked to reset the two-factor authentication of your Gladys Plus account. Once reset, your authenticator app and your recovery codes stop working: at your next login, Gladys Plus asks you to set up a new app, then to save new recovery codes.",
+    "button": "Reset my two-factor authentication",
+    "success": "Your two-factor authentication was reset. Log in with your password: Gladys Plus will ask you to set up a new authenticator app.",
+    "loginLink": "Log in",
+    "errorLink": "This link is invalid, already used or expired. Request a new one from the login page.",
+    "instanceConnected": "Your Gladys is connected to Gladys Plus again: an admin of your Gladys can generate new recovery codes from Settings › Gladys Plus instead. This link stays valid while no Gladys is connected.",
+    "error": "Unable to reset your two-factor authentication. Please try again later."
+  },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Reset Password",
@@ -7383,7 +7400,8 @@
     "useTwoFactorCodeLink": "Use a code from your two-factor app instead",
     "recoveryCodeLabel": "Recovery code",
     "recoveryCodePlaceholder": "Enter one of your recovery codes",
-    "resetPasswordButton": "Reset Password"
+    "resetPasswordButton": "Reset Password",
+    "resetTwoFactorThenComeBack": "Once your two-factor authentication is reset, come back to this page: your reset password link stays valid for two hours."
   },
   "gatewayOpenApi": {
     "title": "Open API",
