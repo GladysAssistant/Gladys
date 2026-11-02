@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text, MarkupText } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../utils/consts';
@@ -85,11 +85,51 @@ class RemoteAccess extends Component {
     this.props.switchUserKey(remote.keysIndex, !remote.keys.accepted);
   };
 
-  invite = () => {
-    this.props.prefillInvite(this.props.user ? this.props.user.email : '');
+  // the invite form opens in the strip with the user's own email prefilled
+  openInvite = () => {
+    this.setState({
+      inviteOpen: true,
+      inviteEmail: this.props.user.email || '',
+      inviteRole: 'user',
+      inviteStatus: null
+    });
   };
 
-  render(props, { confirmRevoke, revoking }) {
+  closeInvite = () => {
+    this.setState({ inviteOpen: false, inviteStatus: null });
+  };
+
+  updateInviteEmail = e => {
+    this.setState({ inviteEmail: e.target.value, inviteStatus: null });
+  };
+
+  updateInviteRole = e => {
+    this.setState({ inviteRole: e.target.value });
+  };
+
+  invite = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ inviteStatus: RequestStatus.Getting });
+    try {
+      await this.props.inviteUser({
+        user: this.props.user,
+        email: this.state.inviteEmail,
+        role: this.state.inviteRole
+      });
+      // the card now shows the invitation: the form has done its job
+      this.setState({ inviteOpen: false, inviteStatus: null });
+    } catch (err) {
+      const status = err && err.message === RequestStatus.ValidationError ? err.message : RequestStatus.Error;
+      if (status === RequestStatus.Error) {
+        console.error(err);
+      }
+      this.setState({ inviteStatus: status });
+    }
+  };
+
+  render(props, { confirmRevoke, revoking, inviteOpen, inviteEmail, inviteRole, inviteStatus }) {
     const { remote, user, gatewayMode, isAdmin, isPlusAdmin, plusMe, language } = props;
     const status = remote ? remote.status : REMOTE_STATUS.NONE;
     const keysLoaded = props.gatewayKeysStatus === RequestStatus.Success;
@@ -169,8 +209,8 @@ class RemoteAccess extends Component {
                 </span>
               </label>
             )}
-            {canInvite && (
-              <button type="button" class="btn btn-primary btn-sm" onClick={this.invite}>
+            {canInvite && !inviteOpen && (
+              <button type="button" class="btn btn-primary btn-sm" onClick={this.openInvite}>
                 <i class="fe fe-send" /> <Text id="usersSettings.plus.inviteThisUser" />
               </button>
             )}
@@ -198,6 +238,74 @@ class RemoteAccess extends Component {
             )}
           </div>
         </div>
+        {canInvite && inviteOpen && (
+          <form class={style.inviteForm} onSubmit={this.invite}>
+            <p class={style.inviteDescription}>
+              <Text id="usersSettings.plus.invite.description" fields={{ name: user.firstname }} />
+            </p>
+            <div class={style.inviteFields}>
+              <div class={style.inviteEmail}>
+                <label class="form-label" for={`invite-email-${user.id}`}>
+                  <Text id="usersSettings.plus.invite.emailLabel" />
+                </label>
+                <Localizer>
+                  <input
+                    id={`invite-email-${user.id}`}
+                    type="email"
+                    class={cx('form-control', { 'is-invalid': inviteStatus === RequestStatus.ValidationError })}
+                    placeholder={<Text id="usersSettings.plus.invite.emailPlaceholder" />}
+                    value={inviteEmail}
+                    onInput={this.updateInviteEmail}
+                    required
+                  />
+                </Localizer>
+                {inviteStatus === RequestStatus.ValidationError && (
+                  <div class="invalid-feedback d-block">
+                    <Text id="usersSettings.plus.invite.invalidEmail" />
+                  </div>
+                )}
+              </div>
+              <div class={style.inviteRole}>
+                <label class="form-label" for={`invite-role-${user.id}`}>
+                  <Text id="usersSettings.plus.invite.roleLabel" />
+                </label>
+                <select
+                  id={`invite-role-${user.id}`}
+                  class="form-control custom-select"
+                  value={inviteRole}
+                  onChange={this.updateInviteRole}
+                >
+                  <option value="user">
+                    <Text id="usersSettings.plus.plusRole.user" />
+                  </option>
+                  <option value="admin">
+                    <Text id="usersSettings.plus.plusRole.admin" />
+                  </option>
+                </select>
+              </div>
+              <div class={style.inviteActions}>
+                <button
+                  type="submit"
+                  class={cx('btn btn-primary btn-sm', { 'btn-loading': inviteStatus === RequestStatus.Getting })}
+                  disabled={inviteStatus === RequestStatus.Getting}
+                >
+                  <i class="fe fe-send" /> <Text id="usersSettings.plus.invite.button" />
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onClick={this.closeInvite}>
+                  <Text id="usersSettings.plus.cancel" />
+                </button>
+              </div>
+            </div>
+            <p class={style.inviteHelp}>
+              <Text id="usersSettings.plus.invite.roleHelp" />
+            </p>
+            {inviteStatus === RequestStatus.Error && (
+              <div class="alert alert-danger mb-0" role="alert">
+                <Text id="usersSettings.plus.invite.error" />
+              </div>
+            )}
+          </form>
+        )}
         {confirmRevoke && (
           <div class={style.confirmBox}>
             <div class="alert alert-warning mb-2" role="alert">

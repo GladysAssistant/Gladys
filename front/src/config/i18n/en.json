@@ -4914,7 +4914,6 @@
       "actionNeededMany": "{{count}} people are waiting for your authorization: check their key fingerprints below, then turn on their switches.",
       "notConnected": "Your Gladys instance is not connected to Gladys Plus right now: remote access cannot be displayed. Check your internet connection and reload this page.",
       "loadError": "Unable to load the users of your Gladys Plus account. Check your internet connection and reload this page.",
-      "inviteButton": "Invite someone",
       "sectionLabel": "Remote access · Gladys Plus",
       "status": {
         "authorized": "Authorized",
@@ -4929,7 +4928,7 @@
         "pending": "Their Gladys Plus account is ready. Check that the key fingerprints below match the ones displayed on their Gladys Plus page, then turn on the switch to authorize them.",
         "keys_changed": "Their encryption keys changed since you authorized them, so their access was revoked for security. Check the new fingerprints below, then authorize them again.",
         "not_linked": "They have a Gladys Plus account but have not chosen their Gladys user yet: they need to sign in on Gladys Plus and pick it.",
-        "invited": "Invitation sent on {{date}}. They will appear here once they have created their Gladys Plus account.",
+        "invited": "Invitation sent on {{date}}. Once they have created their Gladys Plus account, it is linked to this user and you will authorize their keys here.",
         "none": "No Gladys Plus account: this user can only use Gladys from home."
       },
       "statusUnavailable": "Remote access cannot be checked while your instance is not connected to Gladys Plus.",
@@ -4959,15 +4958,13 @@
       "unlinkedTitle": "Gladys Plus accounts not linked to a user",
       "unlinkedHint": "These people are in your Gladys Plus account but are not attached to a Gladys user yet: their invitation is pending, or they have not chosen their Gladys user on Gladys Plus.",
       "invite": {
-        "title": "Invite someone to Gladys Plus",
-        "description": "They will receive an email to create their Gladys Plus account. Once signed up, they choose their Gladys user, and you authorize their keys here.",
+        "description": "{{name}} will receive an email to create their Gladys Plus account. That account will be linked to this Gladys user automatically: they will not have to pick one, and nobody can pick someone else's.",
         "emailLabel": "Email",
         "emailPlaceholder": "name@example.com",
         "invalidEmail": "This email address is not valid.",
         "roleLabel": "Role on Gladys Plus",
         "roleHelp": "A Gladys Plus administrator can invite and remove people and manage the subscription. The role on Gladys Plus is independent from the role on this Gladys.",
         "button": "Send invitation",
-        "success": "Invitation sent!",
         "error": "Unable to send the invitation. Check the email address and try again."
       }
     },

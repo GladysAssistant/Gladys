@@ -19,7 +19,7 @@ const Stat = ({ value, labelId, tone, icon }) => (
 // The strip at the top of the Users page when Gladys Plus is configured: what
 // remote access is, where everyone stands (authorized / waiting for the admin
 // / invited), and the one explanation worth reading before flipping a switch.
-const PlusOverview = ({ stats, gatewayMode, gatewayKeysStatus, plusUsersStatus, canInvite, prefillInvite }) => (
+const PlusOverview = ({ stats, gatewayMode, gatewayKeysStatus, plusUsersStatus }) => (
   <div class={cx('card', style.overview)}>
     <div class={style.overviewMain}>
       <span class={style.overviewIcon}>
@@ -76,13 +76,6 @@ const PlusOverview = ({ stats, gatewayMode, gatewayKeysStatus, plusUsersStatus, 
           id={stats.actionNeeded > 1 ? 'usersSettings.plus.actionNeededMany' : 'usersSettings.plus.actionNeededOne'}
           fields={{ count: stats.actionNeeded }}
         />
-      </div>
-    )}
-    {canInvite && (
-      <div class={style.overviewFooter}>
-        <button type="button" class="btn btn-primary btn-sm" onClick={() => prefillInvite('')}>
-          <i class="fe fe-send" /> <Text id="usersSettings.plus.inviteButton" />
-        </button>
       </div>
     )}
   </div>

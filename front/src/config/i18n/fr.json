@@ -4914,7 +4914,6 @@
       "actionNeededMany": "{{count}} personnes attendent votre autorisation : vérifiez les empreintes de leurs clés ci-dessous, puis activez leurs interrupteurs.",
       "notConnected": "Votre instance Gladys n'est pas connectée à Gladys Plus en ce moment : l'accès à distance ne peut pas être affiché. Vérifiez votre connexion internet puis rechargez cette page.",
       "loadError": "Impossible de charger les utilisateurs de votre compte Gladys Plus. Vérifiez votre connexion internet puis rechargez cette page.",
-      "inviteButton": "Inviter quelqu'un",
       "sectionLabel": "Accès à distance · Gladys Plus",
       "status": {
         "authorized": "Autorisé",
@@ -4929,7 +4928,7 @@
         "pending": "Son compte Gladys Plus est prêt. Vérifiez que les empreintes de clés ci-dessous correspondent à celles affichées sur sa page Gladys Plus, puis activez l'interrupteur pour l'autoriser.",
         "keys_changed": "Ses clés de chiffrement ont changé depuis que vous l'avez autorisé : son accès a été révoqué par sécurité. Vérifiez les nouvelles empreintes ci-dessous, puis autorisez-le à nouveau.",
         "not_linked": "Cette personne a un compte Gladys Plus mais n'a pas encore choisi son utilisateur Gladys : elle doit se connecter sur Gladys Plus et le sélectionner.",
-        "invited": "Invitation envoyée le {{date}}. Cette personne apparaîtra ici dès qu'elle aura créé son compte Gladys Plus.",
+        "invited": "Invitation envoyée le {{date}}. Dès que cette personne aura créé son compte Gladys Plus, il sera lié à cet utilisateur et vous autoriserez ses clés ici.",
         "none": "Pas de compte Gladys Plus : cet utilisateur ne peut utiliser Gladys que depuis la maison."
       },
       "statusUnavailable": "L'accès à distance ne peut pas être vérifié tant que votre instance n'est pas connectée à Gladys Plus.",
@@ -4959,15 +4958,13 @@
       "unlinkedTitle": "Comptes Gladys Plus non liés à un utilisateur",
       "unlinkedHint": "Ces personnes font partie de votre compte Gladys Plus mais ne sont pas encore rattachées à un utilisateur Gladys : leur invitation est en attente, ou elles n'ont pas encore choisi leur utilisateur Gladys sur Gladys Plus.",
       "invite": {
-        "title": "Inviter quelqu'un sur Gladys Plus",
-        "description": "La personne recevra un e-mail pour créer son compte Gladys Plus. Une fois inscrite, elle choisit son utilisateur Gladys, et vous autorisez ses clés ici.",
+        "description": "{{name}} recevra un e-mail pour créer son compte Gladys Plus. Ce compte sera automatiquement lié à cet utilisateur Gladys : pas d'utilisateur à choisir, et personne ne peut choisir celui d'un autre.",
         "emailLabel": "E-mail",
         "emailPlaceholder": "prenom@exemple.fr",
         "invalidEmail": "Cette adresse e-mail n'est pas valide.",
         "roleLabel": "Rôle sur Gladys Plus",
         "roleHelp": "Un administrateur Gladys Plus peut inviter et retirer des personnes et gérer l'abonnement. Le rôle sur Gladys Plus est indépendant du rôle sur cette instance Gladys.",
         "button": "Envoyer l'invitation",
-        "success": "Invitation envoyée !",
         "error": "Impossible d'envoyer l'invitation. Vérifiez l'adresse e-mail puis réessayez."
       }
     },

@@ -5,12 +5,14 @@
 // renders: every Gladys user with their remote access state, plus the Gladys
 // Plus accounts that are not attached to any Gladys user yet.
 //
-// A Gladys Plus user is attached to a Gladys user by the `gladys_4_user_id` the
-// user picks on their first Gladys Plus login (authoritative). Before that
-// link exists, the email is the only clue: an invitation or a Plus account
-// with the same email as a Gladys user is shown on that user's card, so the
-// admin sees the whole journey (invited → account created → linked →
-// authorized) in one place.
+// A Gladys Plus user is attached to a Gladys user by `gladys_4_user_id`
+// (authoritative): set by the admin when they invite someone from a user's
+// card (the invitation carries it, the account created from it inherits it),
+// or picked by the user on their first Gladys Plus login for accounts created
+// before that. Without a link, the email is the only clue: an invitation or a
+// Plus account with the same email as a Gladys user is shown on that user's
+// card, so the admin sees the whole journey (invited → account created →
+// linked → authorized) in one place.
 
 export const REMOTE_STATUS = {
   // keys accepted on the instance, Plus account linked to this Gladys user
@@ -82,6 +84,7 @@ export function buildUsersView({ users = [], gatewayKeys, plusUsers, search = ''
       email: null,
       keys,
       keysIndex,
+      gladysUserId: keys.gladys_4_user_id || null,
       account: null,
       isInvitation: false,
       attached: false
@@ -94,6 +97,7 @@ export function buildUsersView({ users = [], gatewayKeys, plusUsers, search = ''
         id: plusUser.id,
         name: plusUser.name || null,
         email: normalizeEmail(plusUser.email),
+        gladysUserId: plusUser.gladys_4_user_id || null,
         keys: null,
         keysIndex: -1,
         account: plusUser,
@@ -113,23 +117,22 @@ export function buildUsersView({ users = [], gatewayKeys, plusUsers, search = ''
     remote.account = plusUser;
     remote.name = plusUser.name || remote.name;
     remote.email = normalizeEmail(plusUser.email);
+    remote.gladysUserId = plusUser.gladys_4_user_id || remote.gladysUserId || null;
     remotes.set(plusUser.id, remote);
   });
   const remoteList = Array.from(remotes.values());
 
   const members = users.map(user => {
     const email = normalizeEmail(user.email);
-    const byLink = remoteList.find(
-      remote => !remote.attached && remote.keys && remote.keys.gladys_4_user_id === user.id
-    );
-    const byEmail = byLink || (email && remoteList.find(remote => !remote.attached && remote.email === email));
-    const invitation =
-      byEmail || (email && invitations.find(candidate => !candidate.attached && candidate.email === email));
-    const match = byLink || byEmail || invitation;
+    const linked = candidate => !candidate.attached && candidate.gladysUserId === user.id;
+    const sameEmail = candidate => !candidate.attached && email !== null && candidate.email === email;
+    // the link wins over the email, an account over an invitation
+    const match =
+      remoteList.find(linked) || invitations.find(linked) || remoteList.find(sameEmail) || invitations.find(sameEmail);
     let remote = null;
     if (match) {
       match.attached = true;
-      remote = finalize(match, Boolean(byLink));
+      remote = finalize(match, match.gladysUserId === user.id);
     }
     return { user, remote };
   });

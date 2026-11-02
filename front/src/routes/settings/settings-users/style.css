@@ -550,12 +550,6 @@
   gap: 0.5rem;
 }
 
-.overviewFooter {
-  margin-top: 0.9rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
-}
-
 @media (max-width: 767.98px) {
   .overviewMain {
     flex-wrap: wrap;
@@ -571,49 +565,29 @@
   }
 }
 
-/* ---------- invite card ---------- */
+/* ---------- inline invite form (in a user's strip) ---------- */
 
-.inviteCard {
-  margin-top: 1.75rem;
-  margin-bottom: 0;
-  padding: 1.1rem 1.25rem;
-}
-
-.inviteHeader {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.inviteIcon {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+.inviteForm {
+  margin: 0.85rem 0 0 2.95rem;
+  padding: 0.9rem 1rem;
   border-radius: 14px;
-  background: var(--gl-icon-tint-bg, #e3ebfb);
-  color: var(--gl-accent, #3d6df0);
-  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.6);
 }
 
-.inviteTitle {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--gl-ink, #1c2334);
-  margin: 0 0 0.25rem;
+@media (max-width: 767.98px) {
+  .inviteForm {
+    margin-left: 0;
+  }
 }
 
 .inviteDescription {
-  margin: 0;
+  margin: 0 0 0.75rem;
   font-size: 0.875rem;
-  color: var(--gl-muted, #7c8396);
+  color: var(--gl-ink, #1c2334);
   max-width: 44rem;
 }
 
-.inviteForm {
+.inviteFields {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -621,17 +595,21 @@
 }
 
 .inviteEmail {
-  flex: 1 1 16rem;
+  flex: 1 1 14rem;
   min-width: 0;
 }
 
 .inviteRole {
-  flex: 0 1 14rem;
+  flex: 0 1 13rem;
   min-width: 10rem;
 }
 
-.inviteSubmit {
+.inviteActions {
   flex: 0 0 auto;
+  display: flex;
+  gap: 0.4rem;
+  /* sits on the inputs' baseline, which carry a label above */
+  padding-bottom: 0.1rem;
 }
 
 .inviteHelp {
@@ -640,6 +618,6 @@
   color: var(--gl-muted, #7c8396);
 }
 
-.inviteCard :global(.alert) {
+.inviteForm :global(.alert) {
   margin-top: 0.75rem;
 }

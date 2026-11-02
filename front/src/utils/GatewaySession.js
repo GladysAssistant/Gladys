@@ -111,6 +111,20 @@ class GatewaySession {
     );
   }
 
+  // Invite someone to the Gladys Plus account, for a given Gladys user of the
+  // instance: the Gateway copies `gladys_4_user_id` onto the user created from
+  // the invitation, so they land on the right Gladys user without picking one
+  // (nobody can pick someone else's). The client library's inviteUser only
+  // takes the email and the role, so the request goes through its request
+  // helper (access token of the session, refreshed on 401).
+  async inviteUserForGladysUser({ email, role, gladysUserId }) {
+    return gatewayRequest.post(
+      `${this.gladysGatewayApiUrl}/invitations`,
+      { email, role, gladys_4_user_id: gladysUserId },
+      this.gatewayClient
+    );
+  }
+
   // Replacing the two-factor app of the Gladys Plus account is a user operation
   // (user-scoped routes): it is only possible from the Gladys Plus interface, where
   // the Gladys Plus user is the one logged in. The client library has no method for

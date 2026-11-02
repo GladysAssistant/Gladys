@@ -7,7 +7,6 @@ import { RequestStatus } from '../../../utils/consts';
 import UserCard from './UserCard';
 import PlusOverview from './PlusOverview';
 import RemoteAccess from './RemoteAccess';
-import InvitePlusUser from './InvitePlusUser';
 import style from './style.css';
 
 // Gladys Plus accounts that are not attached to any Gladys user: invitations
@@ -38,7 +37,6 @@ const UserPage = ({ children, ...props }) => {
   // nothing to show yet: the list is loading, not empty
   const loaded = props.users !== null;
   const noResult = loaded && members.length === 0 && unlinked.length === 0;
-  const canInvite = plusConfigured && gatewayMode && isPlusAdmin;
   const remoteProps = {
     plusConfigured,
     gatewayMode,
@@ -49,7 +47,7 @@ const UserPage = ({ children, ...props }) => {
     switchStatus: props.switchStatus,
     switchUserKey: props.switchUserKey,
     revokeRemote: props.revokeRemote,
-    prefillInvite: props.prefillInvite,
+    inviteUser: props.inviteUser,
     language: props.user && props.user.language
   };
 
@@ -93,8 +91,6 @@ const UserPage = ({ children, ...props }) => {
           gatewayMode={gatewayMode}
           gatewayKeysStatus={props.gatewayKeysStatus}
           plusUsersStatus={props.plusUsersStatus}
-          canInvite={canInvite}
-          prefillInvite={props.prefillInvite}
         />
       )}
 
@@ -152,17 +148,6 @@ const UserPage = ({ children, ...props }) => {
                 ))}
               </div>
             </section>
-          )}
-
-          {canInvite && (
-            <InvitePlusUser
-              email={props.inviteEmail}
-              role={props.inviteRole}
-              status={props.inviteStatus}
-              updateEmail={props.updateInviteEmail}
-              updateRole={props.updateInviteRole}
-              invite={props.inviteUser}
-            />
           )}
         </div>
       </div>

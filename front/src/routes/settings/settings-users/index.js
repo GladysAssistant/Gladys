@@ -33,9 +33,6 @@ class SettingsUsers extends Component {
     plusUsers: null,
     plusUsersStatus: null,
     plusMe: null,
-    inviteEmail: '',
-    inviteRole: 'user',
-    inviteStatus: null,
     revokeError: false,
     switchStatus: null
   };
@@ -150,49 +147,26 @@ class SettingsUsers extends Component {
     }
   };
 
-  updateInviteEmail = e => {
-    this.setState({ inviteEmail: e.target.value, inviteStatus: null });
-  };
-
-  updateInviteRole = e => {
-    this.setState({ inviteRole: e.target.value });
-  };
-
-  // "Invite to Gladys Plus" on a user's card: the invite form takes their email
-  prefillInvite = email => {
-    this.setState({ inviteEmail: email || '', inviteStatus: null });
-    const form = document.getElementById('invite-plus-user');
-    if (form) {
-      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const input = form.querySelector('input[type="email"]');
-      if (input) {
-        input.focus();
-      }
+  // Invite someone to Gladys Plus for a Gladys user of the instance, from
+  // that user's card: the invitation carries the Gladys user, so the account
+  // created from it is linked to it without the invitee picking one.
+  inviteUser = async ({ user, email, role }) => {
+    const cleanedEmail = cleanEmail(email);
+    if (!validateEmail(cleanedEmail)) {
+      throw new Error(RequestStatus.ValidationError);
     }
-  };
-
-  inviteUser = async e => {
-    if (e) {
-      e.preventDefault();
-    }
-    const email = cleanEmail(this.state.inviteEmail);
-    if (!validateEmail(email)) {
-      this.setState({ inviteStatus: RequestStatus.ValidationError });
-      return;
-    }
-    this.setState({ inviteStatus: RequestStatus.Getting });
-    try {
-      const invitation = await this.props.session.gatewayClient.inviteUser(email, this.state.inviteRole);
-      this.setState({
-        plusUsers: [...(this.state.plusUsers || []), { ...invitation, is_invitation: true }],
-        inviteEmail: '',
-        inviteRole: 'user',
-        inviteStatus: RequestStatus.Success
-      });
-    } catch (err) {
-      console.error(err);
-      this.setState({ inviteStatus: RequestStatus.Error });
-    }
+    const invitation = await this.props.session.inviteUserForGladysUser({
+      email: cleanedEmail,
+      role,
+      gladysUserId: user.id
+    });
+    this.setState({
+      plusUsers: [
+        ...(this.state.plusUsers || []),
+        // the link is kept on screen whatever the Gateway echoes back
+        { ...invitation, email: invitation.email || cleanedEmail, gladys_4_user_id: user.id, is_invitation: true }
+      ]
+    });
   };
 
   // remove a user (or cancel an invitation) from the Gladys Plus account
@@ -252,9 +226,6 @@ class SettingsUsers extends Component {
           changeOrderDir={this.changeOrderDir}
           switchUserKey={this.switchUserKey}
           deleteUser={this.deleteUser}
-          updateInviteEmail={this.updateInviteEmail}
-          updateInviteRole={this.updateInviteRole}
-          prefillInvite={this.prefillInvite}
           inviteUser={this.inviteUser}
           revokeRemote={this.revokeRemote}
         />

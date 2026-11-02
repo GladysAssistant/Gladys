@@ -4914,7 +4914,6 @@
       "actionNeededMany": "{{count}} Personen warten auf deine Autorisierung: Prüfe unten die Fingerabdrücke ihrer Schlüssel und aktiviere dann ihre Schalter.",
       "notConnected": "Deine Gladys-Instanz ist gerade nicht mit Gladys Plus verbunden: Der Fernzugriff kann nicht angezeigt werden. Prüfe deine Internetverbindung und lade diese Seite neu.",
       "loadError": "Die Benutzer deines Gladys-Plus-Kontos konnten nicht geladen werden. Prüfe deine Internetverbindung und lade diese Seite neu.",
-      "inviteButton": "Jemanden einladen",
       "sectionLabel": "Fernzugriff · Gladys Plus",
       "status": {
         "authorized": "Autorisiert",
@@ -4929,7 +4928,7 @@
         "pending": "Das Gladys-Plus-Konto ist bereit. Prüfe, dass die Schlüssel-Fingerabdrücke unten mit denen auf der Gladys-Plus-Seite dieser Person übereinstimmen, und aktiviere dann den Schalter, um sie zu autorisieren.",
         "keys_changed": "Die Verschlüsselungsschlüssel haben sich geändert, seit du sie autorisiert hast: Der Zugriff wurde aus Sicherheitsgründen widerrufen. Prüfe die neuen Fingerabdrücke unten und autorisiere die Person dann erneut.",
         "not_linked": "Diese Person hat ein Gladys-Plus-Konto, aber noch keinen Gladys-Benutzer gewählt: Sie muss sich bei Gladys Plus anmelden und ihn auswählen.",
-        "invited": "Einladung gesendet am {{date}}. Die Person erscheint hier, sobald sie ihr Gladys-Plus-Konto erstellt hat.",
+        "invited": "Einladung gesendet am {{date}}. Sobald die Person ihr Gladys-Plus-Konto erstellt hat, wird es mit diesem Benutzer verknüpft und du autorisierst hier ihre Schlüssel.",
         "none": "Kein Gladys-Plus-Konto: Dieser Benutzer kann Gladys nur von zu Hause aus nutzen."
       },
       "statusUnavailable": "Der Fernzugriff kann nicht geprüft werden, solange deine Instanz nicht mit Gladys Plus verbunden ist.",
@@ -4959,15 +4958,13 @@
       "unlinkedTitle": "Gladys-Plus-Konten ohne verknüpften Benutzer",
       "unlinkedHint": "Diese Personen gehören zu deinem Gladys-Plus-Konto, sind aber noch keinem Gladys-Benutzer zugeordnet: Ihre Einladung ist ausstehend, oder sie haben ihren Gladys-Benutzer bei Gladys Plus noch nicht gewählt.",
       "invite": {
-        "title": "Jemanden zu Gladys Plus einladen",
-        "description": "Die Person erhält eine E-Mail, um ihr Gladys-Plus-Konto zu erstellen. Nach der Registrierung wählt sie ihren Gladys-Benutzer, und du autorisierst ihre Schlüssel hier.",
+        "description": "{{name}} erhält eine E-Mail, um ein Gladys-Plus-Konto zu erstellen. Dieses Konto wird automatisch mit diesem Gladys-Benutzer verknüpft: Es muss kein Benutzer gewählt werden, und niemand kann den eines anderen wählen.",
         "emailLabel": "E-Mail",
         "emailPlaceholder": "name@beispiel.de",
         "invalidEmail": "Diese E-Mail-Adresse ist ungültig.",
         "roleLabel": "Rolle bei Gladys Plus",
         "roleHelp": "Ein Gladys-Plus-Administrator kann Personen einladen und entfernen sowie das Abonnement verwalten. Die Rolle bei Gladys Plus ist unabhängig von der Rolle auf dieser Gladys-Instanz.",
         "button": "Einladung senden",
-        "success": "Einladung gesendet!",
         "error": "Die Einladung konnte nicht gesendet werden. Prüfe die E-Mail-Adresse und versuche es erneut."
       }
     },

@@ -4914,7 +4914,6 @@
       "actionNeededMany": "{{count}} personas están esperando su autorización: compruebe las huellas de sus claves abajo y active sus interruptores.",
       "notConnected": "Su instancia de Gladys no está conectada a Gladys Plus en este momento: no se puede mostrar el acceso remoto. Compruebe su conexión a internet y recargue esta página.",
       "loadError": "No se pudieron cargar los usuarios de su cuenta de Gladys Plus. Compruebe su conexión a internet y recargue esta página.",
-      "inviteButton": "Invitar a alguien",
       "sectionLabel": "Acceso remoto · Gladys Plus",
       "status": {
         "authorized": "Autorizado",
@@ -4929,7 +4928,7 @@
         "pending": "Su cuenta de Gladys Plus está lista. Compruebe que las huellas de claves de abajo coinciden con las mostradas en su página de Gladys Plus y active el interruptor para autorizarlo.",
         "keys_changed": "Sus claves de cifrado cambiaron desde que lo autorizó: su acceso fue revocado por seguridad. Compruebe las nuevas huellas de abajo y vuelva a autorizarlo.",
         "not_linked": "Tiene una cuenta de Gladys Plus pero aún no ha elegido su usuario de Gladys: debe iniciar sesión en Gladys Plus y seleccionarlo.",
-        "invited": "Invitación enviada el {{date}}. Aparecerá aquí cuando haya creado su cuenta de Gladys Plus.",
+        "invited": "Invitación enviada el {{date}}. Cuando haya creado su cuenta de Gladys Plus, quedará vinculada a este usuario y usted autorizará sus claves aquí.",
         "none": "Sin cuenta de Gladys Plus: este usuario solo puede usar Gladys desde casa."
       },
       "statusUnavailable": "El acceso remoto no se puede comprobar mientras su instancia no esté conectada a Gladys Plus.",
@@ -4959,15 +4958,13 @@
       "unlinkedTitle": "Cuentas de Gladys Plus no vinculadas a un usuario",
       "unlinkedHint": "Estas personas forman parte de su cuenta de Gladys Plus pero aún no están asociadas a un usuario de Gladys: su invitación está pendiente, o no han elegido su usuario de Gladys en Gladys Plus.",
       "invite": {
-        "title": "Invitar a alguien a Gladys Plus",
-        "description": "Recibirá un correo para crear su cuenta de Gladys Plus. Una vez registrado, elegirá su usuario de Gladys y usted autorizará sus claves aquí.",
+        "description": "{{name}} recibirá un correo para crear su cuenta de Gladys Plus. Esa cuenta se vinculará automáticamente a este usuario de Gladys: no tendrá que elegir uno, y nadie puede elegir el de otra persona.",
         "emailLabel": "Correo electrónico",
         "emailPlaceholder": "nombre@ejemplo.es",
         "invalidEmail": "Esta dirección de correo no es válida.",
         "roleLabel": "Rol en Gladys Plus",
         "roleHelp": "Un administrador de Gladys Plus puede invitar y quitar personas y gestionar la suscripción. El rol en Gladys Plus es independiente del rol en esta instancia de Gladys.",
         "button": "Enviar invitación",
-        "success": "¡Invitación enviada!",
         "error": "No se pudo enviar la invitación. Compruebe la dirección de correo e inténtelo de nuevo."
       }
     },
