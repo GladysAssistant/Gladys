@@ -307,6 +307,13 @@ describe('GET /api/v1/gateway/status', () => {
       .then((res) => {
         expect(res.body).to.have.property('connected');
         expect(res.body).to.have.property('configured');
+        expect(res.body).to.have.property('backup_health');
+        expect(res.body.backup_health).to.have.all.keys(
+          'last_success_at',
+          'failing_since',
+          'last_error',
+          'alert_sent_at',
+        );
       });
   });
   it('should get gateway status as a non-admin user', async () => {
@@ -333,6 +340,8 @@ describe('GET /api/v1/gateway/status', () => {
         .then((res) => {
           expect(res.body).to.have.property('connected');
           expect(res.body).to.have.property('configured');
+          // the health of the backups (server paths in its last error) is for the admins
+          expect(res.body).to.not.have.property('backup_health');
         });
     } finally {
       await db.User.destroy({ where: { id: NON_ADMIN_USER_ID } });

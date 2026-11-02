@@ -297,6 +297,12 @@ describe('gateway subscription lock', () => {
         connected: true,
         subscription_active: false,
         payment_required_since: gateway.subscriptionPaymentRequiredSince,
+        backup_health: {
+          last_success_at: null,
+          failing_since: null,
+          last_error: null,
+          alert_sent_at: null,
+        },
       });
     });
   });

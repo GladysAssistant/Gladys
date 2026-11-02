@@ -1,8 +1,20 @@
 [
   {
-    "label": "backup.fail",
+    "label": "backup.failing",
     "answers": [
-      "La sauvegarde Gladys Plus a échoué. Pour en savoir plus, rendez-vous sur l'onglet \"Paramètres\" => \"Tâches\". Le message d'erreur est {{ errorMessage }}"
+      "⚠️ Vos sauvegardes Gladys Plus échouent depuis le {{ failingSinceDate }}{{#if lastSuccessDate}} (dernière sauvegarde réussie : {{ lastSuccessDate }}){{else}} (aucune sauvegarde n'a encore réussi){{/if}}. Dernière erreur : {{ errorMessage }}. Gladys réessaie chaque nuit : je vous préviens dès qu'une sauvegarde réussit à nouveau, ou dans une semaine si ça échoue toujours. Détails dans \"Paramètres\" => \"Tâches\"."
+    ]
+  },
+  {
+    "label": "backup.still-failing",
+    "answers": [
+      "⚠️ Rappel : vos sauvegardes Gladys Plus échouent depuis le {{ failingSinceDate }}{{#if lastSuccessDate}} (dernière sauvegarde réussie : {{ lastSuccessDate }}){{else}} (aucune sauvegarde n'a encore réussi){{/if}}. Dernière erreur : {{ errorMessage }}. Gladys continue de réessayer chaque nuit ; prochain rappel dans une semaine si ça échoue toujours. Détails dans \"Paramètres\" => \"Tâches\"."
+    ]
+  },
+  {
+    "label": "backup.recovered",
+    "answers": [
+      "✅ Vos sauvegardes Gladys Plus fonctionnent à nouveau : une sauvegarde a été envoyée avec succès le {{ lastSuccessDate }}."
     ]
   }
 ]

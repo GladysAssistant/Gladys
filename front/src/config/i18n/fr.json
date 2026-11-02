@@ -5674,7 +5674,15 @@
     "backupNowButton": "Sauvegarder maintenant",
     "backupStarted": "Début de la sauvegarde...",
     "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer.",
-    "restoreFailed": "La restauration de votre backup a échoué. Êtes-vous sûr que votre clé de sauvegarde est la même que celle utilisée par Gladys lorsque le backup a été créé ? Vous pouvez modifier la clé de sauvegarde dans l'onglet Gladys Plus des paramètres."
+    "restoreFailed": "La restauration de votre backup a échoué. Êtes-vous sûr que votre clé de sauvegarde est la même que celle utilisée par Gladys lorsque le backup a été créé ? Vous pouvez modifier la clé de sauvegarde dans l'onglet Gladys Plus des paramètres.",
+    "health": {
+      "failingTitle": "Vos sauvegardes échouent",
+      "failingSince": "Aucune sauvegarde Gladys Plus n'a réussi depuis le {{date}}.",
+      "lastSuccess": "Dernière sauvegarde réussie : {{date}}.",
+      "noSuccessYet": "Aucune sauvegarde n'a encore réussi sur cette instance.",
+      "lastError": "Dernière erreur : {{error}}",
+      "retry": "Gladys réessaie chaque nuit et quelques minutes après chaque démarrage. Les administrateurs sont prévenus dans la conversation à partir de la deuxième nuit d'échec, puis une fois par semaine tant que ça échoue ; une fois prévenus, ils sont informés dès qu'une sauvegarde réussit à nouveau. Détails dans l'onglet \"Tâches\"."
+    }
   },
   "alarmModes": {
     "armed": "armée",

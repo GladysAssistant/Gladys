@@ -1,8 +1,20 @@
 [
   {
-    "label": "backup.fail",
+    "label": "backup.failing",
     "answers": [
-      "La copia de seguridad de Gladys Plus ha fallado. Para más información, vaya a la pestaña \"Configuración\" => \"Tareas\". El mensaje de error es {{ errorMessage }}"
+      "⚠️ Sus copias de seguridad de Gladys Plus fallan desde el {{ failingSinceDate }}{{#if lastSuccessDate}} (última copia correcta: {{ lastSuccessDate }}){{else}} (ninguna copia ha tenido éxito todavía){{/if}}. Último error: {{ errorMessage }}. Gladys lo reintenta cada noche: le avisaré en cuanto una copia vuelva a funcionar, o dentro de una semana si sigue fallando. Detalles en \"Configuración\" => \"Tareas\"."
+    ]
+  },
+  {
+    "label": "backup.still-failing",
+    "answers": [
+      "⚠️ Recordatorio: sus copias de seguridad de Gladys Plus fallan desde el {{ failingSinceDate }}{{#if lastSuccessDate}} (última copia correcta: {{ lastSuccessDate }}){{else}} (ninguna copia ha tenido éxito todavía){{/if}}. Último error: {{ errorMessage }}. Gladys sigue reintentando cada noche; próximo recordatorio dentro de una semana si sigue fallando. Detalles en \"Configuración\" => \"Tareas\"."
+    ]
+  },
+  {
+    "label": "backup.recovered",
+    "answers": [
+      "✅ Sus copias de seguridad de Gladys Plus vuelven a funcionar: una copia se ha subido correctamente el {{ lastSuccessDate }}."
     ]
   }
 ]
