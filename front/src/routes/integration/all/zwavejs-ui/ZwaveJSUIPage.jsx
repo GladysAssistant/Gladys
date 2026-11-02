@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 
 const ZwaveJSUIPage = ({ children, user }) => (
   <IntegrationSubPageLayout
@@ -44,6 +45,7 @@ const ZwaveJSUIPage = ({ children, user }) => (
       </Fragment>
     }
   >
+    <DeprecationWarning />
     {children}
   </IntegrationSubPageLayout>
 );

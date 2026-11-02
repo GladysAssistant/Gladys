@@ -10,6 +10,7 @@
     "key": "xiaomi",
     "img": "/assets/integrations/cover/xiaomi.jpg",
     "local": true,
+    "deprecated": true,
     "categories": ["protocols"]
   },
   {
@@ -62,6 +63,7 @@
     "img": "/assets/integrations/cover/ewelink.jpg",
     "whiteBackground": true,
     "cloud": true,
+    "deprecated": true,
     "categories": ["lighting"]
   },
   {
@@ -76,6 +78,7 @@
     "img": "/assets/integrations/cover/broadlink.jpg",
     "whiteBackground": true,
     "local": true,
+    "deprecated": true,
     "categories": ["protocols", "multimedia"]
   },
   {
@@ -127,6 +130,7 @@
     "img": "/assets/integrations/cover/node-red.jpg",
     "whiteBackground": true,
     "local": true,
+    "deprecated": true,
     "categories": ["protocols"]
   },
   {
@@ -168,6 +172,7 @@
     "link": "google-cast",
     "img": "/assets/integrations/cover/google-cast.jpg",
     "local": true,
+    "deprecated": true,
     "categories": ["multimedia"]
   },
   {
