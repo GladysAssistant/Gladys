@@ -41,9 +41,12 @@ function formatResetDuration(seconds, language = 'en') {
   const duration = dayjs.duration(seconds, 'seconds');
   const parts = [];
 
-  if (duration.days() > 0) {
-    // asDays() is the total; dayjs .days() is the component left after whole months are extracted
-    parts.push(`${Math.floor(duration.asDays())}${labels.day}`);
+  // asDays() is the total number of days; dayjs .days() is only the component left
+  // after whole months (30 days) and years are extracted, so it must not be used
+  // for the value nor for the guard (30 days would give days() === 0).
+  const totalDays = Math.floor(duration.asDays());
+  if (totalDays > 0) {
+    parts.push(`${totalDays}${labels.day}`);
   }
   if (duration.hours() > 0) {
     parts.push(`${duration.hours()}${labels.hour}`);

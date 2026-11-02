@@ -38,6 +38,14 @@ describe('openAIQuota utils', () => {
       expect(formatResetDuration(45 * 86400 + 3600, 'en')).to.equal('45d 1h');
     });
 
+    it('should format exact multiples of 30 days without dropping the days', () => {
+      expect(formatResetDuration(30 * 86400, 'en')).to.equal('30d');
+      expect(formatResetDuration(60 * 86400, 'en')).to.equal('60d');
+      expect(formatResetDuration(30 * 86400 + 1, 'en')).to.equal('30d 1s');
+      expect(formatResetDuration(30 * 86400 + 3600, 'fr')).to.equal('30j 1h');
+      expect(formatResetDuration(365 * 86400, 'de')).to.equal('365T');
+    });
+
     it('should fallback to english labels for unknown language', () => {
       expect(formatResetDuration(30, 'es')).to.equal('30s');
     });
