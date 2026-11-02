@@ -11,6 +11,8 @@ const {
   Thermostat,
   CarbonDioxideConcentrationMeasurement,
   DoorLock,
+  OnOff,
+  LevelControl,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -18,6 +20,7 @@ const {
   convertToGladysDevice,
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
+const { MATTER_LIGHT_DEVICE_TYPE } = require('../../../../services/matter/utils/lightMatterMapping');
 const { AC_MODE, LOCK } = require('../../../../utils/constants');
 
 describe('Matter.convertToGladysDevice', () => {
@@ -639,6 +642,86 @@ describe('Matter.convertToGladysDevice', () => {
       external_id: 'matter:12345:1:257:state',
       min: LOCK.STATE.UNLOCKED,
       max: LOCK.STATE.ERROR,
+    });
+  });
+
+  const onOffClusterClient = {
+    id: OnOff.Complete.id,
+    name: 'OnOff',
+    endpointId: 1,
+  };
+
+  const buildOnOffDevice = ({ deviceTypes, clusterClients = [] } = {}) => ({
+    name: 'Test Device',
+    number: 1,
+    getAllClusterClients: () => [onOffClusterClient, ...clusterClients],
+    getChildEndpoints: () => [],
+    ...(deviceTypes ? { getDeviceTypes: () => deviceTypes } : {}),
+  });
+
+  it('should create a switch binary feature for the OnOff cluster of a plug', async () => {
+    const device = buildOnOffDevice({ deviceTypes: [{ name: 'MA-onoffpluginunit', code: 0x010a }] });
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'OnOff - 1',
+      selector: matterExternalIdToSelector('matter:12345:1:6'),
+      category: 'switch',
+      type: 'binary',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:6',
+      min: 0,
+      max: 1,
+    });
+  });
+
+  it('should create a light binary feature for the OnOff cluster of an on/off light', async () => {
+    const device = buildOnOffDevice({
+      deviceTypes: [{ name: 'MA-onofflight', code: MATTER_LIGHT_DEVICE_TYPE.ON_OFF_LIGHT }],
+    });
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'OnOff - 1',
+      selector: matterExternalIdToSelector('matter:12345:1:6'),
+      category: 'light',
+      type: 'binary',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:6',
+      min: 0,
+      max: 1,
+    });
+  });
+
+  it('should create a light binary feature for the OnOff cluster of a dimmable endpoint without device type', async () => {
+    // IKEA Kajplats over Thread (forum 11462): the OnOff cluster sits next to a lighting LevelControl.
+    const device = buildOnOffDevice({
+      clusterClients: [
+        {
+          id: LevelControl.Complete.id,
+          name: 'LevelControl',
+          endpointId: 1,
+          supportedFeatures: { lighting: true },
+          getMinLevelAttribute: async () => 1,
+          getMaxLevelAttribute: async () => 254,
+        },
+      ],
+    });
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(2);
+    expect(gladysDevice.features[0]).to.include({ external_id: 'matter:12345:1:6', category: 'light', type: 'binary' });
+    expect(gladysDevice.features[1]).to.include({
+      external_id: 'matter:12345:1:8',
+      category: 'light',
+      type: 'brightness',
     });
   });
 });
