@@ -284,6 +284,14 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
+      // one email is enough: a second request would hit the Gateway cooldown and
+      // replace the success notice with "wait a minute"
+      if (
+        state.gatewayLoginTwoFactorResetStatus === RequestStatus.Getting ||
+        state.gatewayLoginTwoFactorResetStatus === RequestStatus.Success
+      ) {
+        return;
+      }
       store.setState({
         gatewayLoginTwoFactorResetStatus: RequestStatus.Getting,
         gatewayLoginTwoFactorResetError: null,

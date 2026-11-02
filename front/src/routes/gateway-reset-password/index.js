@@ -22,7 +22,10 @@ class ResetPasswordPage extends Component {
   // Gladys Plus emails a link that resets their two-factor authentication.
   requestTwoFactorReset = async e => {
     e.preventDefault();
-    if (this.state.twoFactorResetStatus === RequestStatus.Getting) {
+    if (
+      this.state.twoFactorResetStatus === RequestStatus.Getting ||
+      this.state.twoFactorResetStatus === RequestStatus.Success
+    ) {
       return;
     }
     this.setState({ twoFactorResetStatus: RequestStatus.Getting, twoFactorResetError: null });

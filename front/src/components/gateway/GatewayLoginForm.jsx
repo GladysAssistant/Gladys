@@ -158,7 +158,7 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 </a>
                 <br />
                 <MarkupText id="gatewayLogin.noRecoveryCode" />
-                {props.requestTwoFactorReset && (
+                {props.requestTwoFactorReset && props.gatewayLoginTwoFactorResetStatus !== RequestStatus.Success && (
                   <span>
                     {' '}
                     <a href="#" onClick={props.requestTwoFactorReset}>
@@ -194,7 +194,7 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 </a>
                 <br />
                 <MarkupText id="gatewayLogin.noRecoveryCode" />
-                {props.requestTwoFactorReset && (
+                {props.requestTwoFactorReset && props.gatewayLoginTwoFactorResetStatus !== RequestStatus.Success && (
                   <span>
                     {' '}
                     <a href="#" onClick={props.requestTwoFactorReset}>

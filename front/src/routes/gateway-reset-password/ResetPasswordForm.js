@@ -98,10 +98,15 @@ const ResetPassworFrom = ({ children, ...props }) => (
               <Text id="gatewayResetPassword.useRecoveryCodeLink" />
             </a>
             <br />
-            <MarkupText id="gatewayLogin.noRecoveryCode" />{' '}
-            <a href="#" onClick={props.requestTwoFactorReset}>
-              <Text id="gatewayLogin.resetTwoFactorLink" />
-            </a>
+            <MarkupText id="gatewayLogin.noRecoveryCode" />
+            {props.twoFactorResetStatus !== RequestStatus.Success && (
+              <span>
+                {' '}
+                <a href="#" onClick={props.requestTwoFactorReset}>
+                  <Text id="gatewayLogin.resetTwoFactorLink" />
+                </a>
+              </span>
+            )}
           </p>
         </div>
       )}
@@ -126,10 +131,15 @@ const ResetPassworFrom = ({ children, ...props }) => (
               <Text id="gatewayResetPassword.useTwoFactorCodeLink" />
             </a>
             <br />
-            <MarkupText id="gatewayLogin.noRecoveryCode" />{' '}
-            <a href="#" onClick={props.requestTwoFactorReset}>
-              <Text id="gatewayLogin.resetTwoFactorLink" />
-            </a>
+            <MarkupText id="gatewayLogin.noRecoveryCode" />
+            {props.twoFactorResetStatus !== RequestStatus.Success && (
+              <span>
+                {' '}
+                <a href="#" onClick={props.requestTwoFactorReset}>
+                  <Text id="gatewayLogin.resetTwoFactorLink" />
+                </a>
+              </span>
+            )}
           </p>
         </div>
       )}

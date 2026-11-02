@@ -1,6 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ERROR_MESSAGES } = require('../../utils/constants');
 const { Error403 } = require('../../utils/httpErrors');
+const { PasswordNotMatchingError, NotFoundError } = require('../../utils/coreErrors');
 const { getAudioBufferFromRequest, getAudioContentTypeFromRequest } = require('../utils/getAudioBufferFromRequest');
 
 module.exports = function GatewayController(gladys) {
@@ -98,10 +99,17 @@ module.exports = function GatewayController(gladys) {
   async function generateUserRecoveryCodes(req, res) {
     // A session left open on a wall tablet must not be enough to get codes that
     // replace the second factor of a Gladys Plus account: the admin proves it is them.
+    if (typeof req.body.password !== 'string' || req.body.password.length === 0) {
+      throw new Error403(ERROR_MESSAGES.WRONG_PASSWORD);
+    }
     try {
       await gladys.user.login(req.user.email, req.body.password);
     } catch (e) {
-      throw new Error403(ERROR_MESSAGES.WRONG_PASSWORD);
+      // only a wrong password is the admin's fault: a database or hashing failure stays a 500
+      if (e instanceof PasswordNotMatchingError || e instanceof NotFoundError) {
+        throw new Error403(ERROR_MESSAGES.WRONG_PASSWORD);
+      }
+      throw e;
     }
     const result = await gladys.gateway.generateUserRecoveryCodes(req.params.gateway_user_id);
     res.json(result);

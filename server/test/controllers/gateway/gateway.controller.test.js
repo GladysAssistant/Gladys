@@ -84,6 +84,33 @@ describe('POST /api/v1/gateway/user/:gateway_user_id/recovery-codes', () => {
     nock.cleanAll();
   });
 
+  it('should return 500, not WRONG_PASSWORD, when checking the password itself fails', async () => {
+    const scope = nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(200, { recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+    // @ts-ignore
+    const originalLogin = global.TEST_GLADYS_INSTANCE.user.login;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.user.login = async () => {
+      throw new Error('database is down');
+    };
+    try {
+      await authenticatedRequest
+        .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+        .send({ password: 'mysuperpassword' })
+        .expect('Content-Type', /json/)
+        .expect(500)
+        .then((res) => {
+          expect(res.body.message).to.not.equal('WRONG_PASSWORD');
+        });
+    } finally {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.user.login = originalLogin;
+    }
+    expect(scope.isDone()).to.equal(false);
+    nock.cleanAll();
+  });
+
   it('should return 404 when the user is not in the account of this instance', async () => {
     nock(config.gladysGatewayServerUrl)
       .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)

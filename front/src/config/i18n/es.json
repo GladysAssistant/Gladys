@@ -4979,7 +4979,7 @@
       },
       "recoveryCodes": {
         "button": "Códigos de recuperación",
-        "confirmText": "¿{{name}} ha perdido su aplicación de doble autenticación y sus códigos de recuperación? Su Gladys, físicamente en su casa, sustituye a la aplicación: se generará un nuevo juego de códigos de recuperación de un solo uso para su cuenta Gladys Plus y se mostrará una sola vez, aquí. Sus códigos anteriores dejan de funcionar de inmediato y Gladys Plus le avisa por correo electrónico. Su contraseña sigue siendo necesaria para iniciar sesión. Para confirmar, introduzca su propia contraseña de Gladys.",
+        "confirmText": "¿{{name}} ha perdido su aplicación de doble autenticación y sus códigos de recuperación? Su Gladys, físicamente en su casa, sustituye a la aplicación: se generará un nuevo juego de códigos de recuperación de un solo uso para su cuenta Gladys Plus y se mostrará una sola vez, aquí. Sus códigos anteriores dejan de funcionar de inmediato, y Gladys Plus intentará avisarle por correo electrónico: avísele usted también. Su contraseña sigue siendo necesaria para iniciar sesión. Para confirmar, introduzca su propia contraseña de Gladys.",
         "passwordLabel": "Su contraseña de Gladys",
         "passwordPlaceholder": "Introduzca su contraseña de Gladys",
         "confirmButton": "Generar",
@@ -5632,7 +5632,7 @@
     "cardTitle": "Su aplicación de doble factor",
     "description": "¿Nuevo teléfono o nueva aplicación de doble factor? Registre en ella un nuevo secreto: su cuenta de Gladys Plus solo aceptará a partir de entonces los códigos de esta nueva aplicación.",
     "changeButton": "Cambiar mi aplicación de doble factor",
-    "replaceWarning": "Una vez confirmado, los códigos de su aplicación actual dejarán de aceptarse. Sus códigos de recuperación siguen siendo válidos.",
+    "replaceWarning": "Una vez confirmado, los códigos de su aplicación actual dejarán de aceptarse. Sus demás códigos de recuperación siguen siendo válidos.",
     "newCodeLabel": "Código mostrado por su nueva aplicación",
     "currentCodeLabel": "Código mostrado por su aplicación actual",
     "currentCodeHelp": "La pasarela requiere un código de la aplicación registrada actualmente para reemplazarla.",

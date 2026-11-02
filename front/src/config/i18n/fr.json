@@ -4979,7 +4979,7 @@
       },
       "recoveryCodes": {
         "button": "Codes de récupération",
-        "confirmText": "{{name}} a perdu son application de double authentification et ses codes de récupération ? Votre Gladys, physiquement chez vous, remplace son application : un nouveau jeu de codes de récupération à usage unique sera généré pour son compte Gladys Plus et affiché une seule fois, ici. Ses anciens codes cessent aussitôt de fonctionner et Gladys Plus le prévient par e-mail. Son mot de passe reste nécessaire pour se connecter. Pour confirmer, saisissez votre propre mot de passe Gladys.",
+        "confirmText": "{{name}} a perdu son application de double authentification et ses codes de récupération ? Votre Gladys, physiquement chez vous, remplace son application : un nouveau jeu de codes de récupération à usage unique sera généré pour son compte Gladys Plus et affiché une seule fois, ici. Ses anciens codes cessent aussitôt de fonctionner, et Gladys Plus essaiera de le prévenir par e-mail : prévenez-le aussi vous-même. Son mot de passe reste nécessaire pour se connecter. Pour confirmer, saisissez votre propre mot de passe Gladys.",
         "passwordLabel": "Votre mot de passe Gladys",
         "passwordPlaceholder": "Entrez votre mot de passe Gladys",
         "confirmButton": "Générer",
@@ -5632,7 +5632,7 @@
     "cardTitle": "Votre application 2FA",
     "description": "Nouveau téléphone ou nouvelle application 2FA ? Enregistrez-y un nouveau secret : votre compte Gladys Plus n'acceptera ensuite plus que les codes de cette nouvelle application.",
     "changeButton": "Changer mon application 2FA",
-    "replaceWarning": "Une fois confirmé, les codes de votre application actuelle ne seront plus acceptés. Vos codes de récupération restent valables.",
+    "replaceWarning": "Une fois confirmé, les codes de votre application actuelle ne seront plus acceptés. Vos autres codes de récupération restent valables.",
     "newCodeLabel": "Code affiché par votre nouvelle application",
     "currentCodeLabel": "Code affiché par votre application actuelle",
     "currentCodeHelp": "La Gateway exige un code de l'application actuellement enregistrée pour la remplacer.",

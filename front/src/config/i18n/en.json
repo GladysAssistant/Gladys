@@ -4979,7 +4979,7 @@
       },
       "recoveryCodes": {
         "button": "Recovery codes",
-        "confirmText": "{{name}} lost their two-factor app and their recovery codes? Your Gladys, physically at home, stands in for their app: a new set of single-use recovery codes will be generated for their Gladys Plus account and displayed once, here. Their previous codes stop working at once and Gladys Plus tells them by email. Their password is still required to sign in. To confirm, enter your own Gladys password.",
+        "confirmText": "{{name}} lost their two-factor app and their recovery codes? Your Gladys, physically at home, stands in for their app: a new set of single-use recovery codes will be generated for their Gladys Plus account and displayed once, here. Their previous codes stop working at once, and Gladys Plus will try to let them know by email: tell them yourself too. Their password is still required to sign in. To confirm, enter your own Gladys password.",
         "passwordLabel": "Your Gladys password",
         "passwordPlaceholder": "Enter your Gladys password",
         "confirmButton": "Generate",
@@ -5632,7 +5632,7 @@
     "cardTitle": "Your two-factor app",
     "description": "New phone or new two-factor app? Register a new secret in it: your Gladys Plus account will then only accept the codes of this new app.",
     "changeButton": "Change my two-factor app",
-    "replaceWarning": "Once confirmed, the codes of your current app will no longer be accepted. Your recovery codes stay valid.",
+    "replaceWarning": "Once confirmed, the codes of your current app will no longer be accepted. Your other recovery codes stay valid.",
     "newCodeLabel": "Code displayed by your new app",
     "currentCodeLabel": "Code displayed by your current app",
     "currentCodeHelp": "The Gateway requires a code from the app currently registered to replace it.",

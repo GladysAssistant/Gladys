@@ -124,16 +124,16 @@ class GatewayTwoFactorApp extends Component {
     if (this.state.status === RequestStatus.Getting) {
       return;
     }
+    // the mode can be switched while the request is pending: the error names the factor submitted
+    const { useRecoveryCode } = this.state;
     this.setState({ status: RequestStatus.Getting, error: null });
     try {
       await this.props.session.updateTwoFactor({
         twoFactorSecret: this.state.secret,
         twoFactorCode: this.state.twoFactorCode,
-        currentTwoFactorCode: this.state.useRecoveryCode ? undefined : this.state.currentTwoFactorCode,
+        currentTwoFactorCode: useRecoveryCode ? undefined : this.state.currentTwoFactorCode,
         // the copy / download of the codes joins them with line breaks: a paste may carry one
-        currentTwoFactorRecoveryCode: this.state.useRecoveryCode
-          ? this.state.currentTwoFactorRecoveryCode.trim()
-          : undefined
+        currentTwoFactorRecoveryCode: useRecoveryCode ? this.state.currentTwoFactorRecoveryCode.trim() : undefined
       });
       this.setState({
         configuring: false,
@@ -156,7 +156,7 @@ class GatewayTwoFactorApp extends Component {
         // one of the codes is wrong or expired: the new secret is still valid, the
         // user stays on the form to enter fresh codes (a wrong recovery code is not
         // consumed, nor is a valid one sent with a wrong code of the new app)
-        error = this.state.useRecoveryCode ? 'invalidRecoveryCode' : 'invalidCode';
+        error = useRecoveryCode ? 'invalidRecoveryCode' : 'invalidCode';
       } else if (status === 429) {
         error = 'tooManyAttempts';
       }

@@ -4979,7 +4979,7 @@
       },
       "recoveryCodes": {
         "button": "Wiederherstellungscodes",
-        "confirmText": "{{name}} hat die Zwei-Faktor-App und die Wiederherstellungscodes verloren? Deine Gladys, physisch bei dir zu Hause, ersetzt die App: Ein neuer Satz einmalig verwendbarer Wiederherstellungscodes wird für das Gladys-Plus-Konto erzeugt und hier einmal angezeigt. Die bisherigen Codes funktionieren sofort nicht mehr, und Gladys Plus informiert die Person per E-Mail. Das Passwort bleibt für die Anmeldung erforderlich. Gib zur Bestätigung dein eigenes Gladys-Passwort ein.",
+        "confirmText": "{{name}} hat die Zwei-Faktor-App und die Wiederherstellungscodes verloren? Deine Gladys, physisch bei dir zu Hause, ersetzt die App: Ein neuer Satz einmalig verwendbarer Wiederherstellungscodes wird für das Gladys-Plus-Konto erzeugt und hier einmal angezeigt. Die bisherigen Codes funktionieren sofort nicht mehr, und Gladys Plus versucht, die Person per E-Mail zu informieren: Sag es ihr auch selbst. Das Passwort bleibt für die Anmeldung erforderlich. Gib zur Bestätigung dein eigenes Gladys-Passwort ein.",
         "passwordLabel": "Dein Gladys-Passwort",
         "passwordPlaceholder": "Gib dein Gladys-Passwort ein",
         "confirmButton": "Erzeugen",
@@ -5632,7 +5632,7 @@
     "cardTitle": "Deine Zwei-Faktor-App",
     "description": "Neues Handy oder neue Zwei-Faktor-App? Registriere darin ein neues Geheimnis: Dein Gladys Plus Konto akzeptiert danach nur noch die Codes dieser neuen App.",
     "changeButton": "Meine Zwei-Faktor-App wechseln",
-    "replaceWarning": "Nach der Bestätigung werden die Codes deiner aktuellen App nicht mehr akzeptiert. Deine Wiederherstellungscodes bleiben gültig.",
+    "replaceWarning": "Nach der Bestätigung werden die Codes deiner aktuellen App nicht mehr akzeptiert. Deine übrigen Wiederherstellungscodes bleiben gültig.",
     "newCodeLabel": "Von deiner neuen App angezeigter Code",
     "currentCodeLabel": "Von deiner aktuellen App angezeigter Code",
     "currentCodeHelp": "Das Gateway verlangt einen Code der aktuell registrierten App, um sie zu ersetzen.",
