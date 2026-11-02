@@ -22,6 +22,7 @@ const PAGES_WITHOUT_HEADER = [
   '/signup/success',
   '/forgot-password',
   '/reset-password',
+  '/reset-two-factor',
   '/link-gateway-user',
   '/signup-gateway',
   '/subscribe-gateway',

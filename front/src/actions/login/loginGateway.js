@@ -295,8 +295,9 @@ function createActions(store) {
           gatewayLoginTwoFactorResetStatus: RequestStatus.Success
         });
       } catch (e) {
-        console.error(e);
         const status = get(e, 'response.status');
+        // the request carries the two factor token: never the whole error in the console
+        console.error('Could not request the two factor reset', status || e.message);
         const errorMessage = get(e, 'response.data.error_message');
         let error = 'UNKNOWN';
         if (errorMessage === 'INSTANCE_CONNECTED') {

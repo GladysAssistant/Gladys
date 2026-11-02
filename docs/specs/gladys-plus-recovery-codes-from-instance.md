@@ -40,16 +40,18 @@ for accounts without an instance (not covered here; still a manual reset).
 
 ## B. Flow
 
-1. On the instance, in **Settings › Gladys Plus**, an **admin** opens the "Gladys Plus recovery
-   codes" card, picks a Gladys Plus user of the account (the one linked to their local user is
-   preselected via `gladys_4_user_id`) and **re-enters their local Gladys password**. A session
-   left open on a wall tablet is not enough.
+1. On the instance, on the **Users page** (Settings › Users), an **admin** opens the "Recovery
+   codes" action of a user the instance knows (their keys are listed) and **re-enters their local
+   Gladys password**. A session left open on a wall tablet is not enough. The action exists in
+   **local mode only**: the Gladys Plus web app does not show it, and the Gladys Plus tunnel is
+   refused by the server (no rate limit runs there, and the point is to be at home).
 2. Gladys verifies the password (`gladys.user.login` on the requesting admin) and calls the
    Gateway, authenticated **as the instance** (`generateTwoFactorRecoveryCodesInstance`).
 3. The Gateway checks that the user belongs to the account of that instance, is active and has
    two-factor enabled, then generates a new set of 10 codes: only their hashes are stored, the
    previous codes are invalidated, the "generate your recovery codes" reminder is reset, and the
-   user is emailed (`recovery_codes_generated_from_instance`, EN / FR).
+   user is emailed (`recovery_codes_generated_from_instance`, EN / FR). The email is the only
+   notice and it is best-effort: a failed send is logged, not retried nor shown to the admin.
 4. Gladys displays the codes **once**, with the usual copy / download actions
    (`GatewayRecoveryCodes` component). Nothing is stored on the instance.
 
@@ -66,7 +68,7 @@ user of another account is not found (404), whatever the caller guessed.
 - `200 { "recovery_codes": ["1a2b-3c4d-…"] }` — 10 codes, same format and storage as
   `POST /users/two-factor/recovery-codes` (hashed, previous set invalidated, reminder reset).
 - `403` two-factor not enabled on that user. `404` user unknown, revoked, email not confirmed, not in
-  the account of the instance, or malformed id.
+  the account of the instance, deleted instance, or malformed id.
 - Side effects: `logger.warn` audit line; email `recovery_codes_generated_from_instance` to the
   user with `{ firstname, instanceName }`. A mail failure is logged and does **not** fail the call.
 - Implementation: `userModel.generateTwoFactorRecoveryCodesFromInstance(instance, userId)`, which
@@ -79,7 +81,9 @@ user of another account is not found (404), whatever the caller guessed.
 
 ### C.3 Gladys — `POST /api/v1/gateway/user/:gateway_user_id/recovery-codes`
 
-- `authenticated`, `admin`, `rateLimit`. Body `{ "password": "<local password of the admin>" }`.
+- `authenticated`, `admin`, `rateLimit`, `localOnly` (a new route flag: `setupGateway` answers
+  `403` to a call made through the Gladys Plus tunnel). Body
+  `{ "password": "<local password of the admin>" }`.
 - `403 { message: "WRONG_PASSWORD" }` when the password is missing or wrong — the Gateway is
   **not** called. `403 { message: "GATEWAY_TWO_FACTOR_NOT_ENABLED" }`, `404 { message:
   "GATEWAY_USER_NOT_FOUND" }`, `500 { error: "NO_CONNECTED_TO_THE_INTERNET" }` map the Gateway
@@ -88,9 +92,10 @@ user of another account is not found (404), whatever the caller guessed.
 
 ### C.4 Front
 
-`front/src/routes/settings/settings-gateway/GatewayUserRecoveryCodes.jsx`, rendered on the Gladys
-Plus settings page below the remote users list, fed by the same `gatewayUsersKeys` list (ids,
-names, `gladys_4_user_id`). Strings under `gateway.recoveryCodes*` in every language file.
+`front/src/routes/settings/settings-users/RemoteAccess.jsx`: the "Recovery codes" action of the
+Gladys Plus strip of a user, next to the admin reset of #3307, shown when the instance knows the
+user's keys, in local mode, to a local admin. Strings under `usersSettings.plus.recoveryCodes.*` in
+every language file.
 
 ## D. Out of scope
 
@@ -152,8 +157,13 @@ the instance was offline is refused, and kept, if the instance came back online 
   { two_factor_enabled: false }`. `404 TOKEN_NOT_FOUND` (unknown, used, expired or malformed),
   `403 INSTANCE_CONNECTED` (link kept). Email `two_factor_reset_done` with `{ firstname }`; a
   mail failure is logged and does not fail the call.
-- Storage: Redis, `two_factor_reset:token:<sha256(token)>` → user id (TTL 1 h) and
-  `two_factor_reset:cooldown:<user id>` (TTL 60 s). Only the hash of the token is stored.
+- Storage: Redis, one pending link per user: `two_factor_reset:user:<user id>` → hash of the
+  current link and `two_factor_reset:token:<sha256(token)>` → user id (TTL 1 h), plus
+  `two_factor_reset:cooldown:<user id>` (TTL 60 s, taken atomically). Only the hash of the token
+  is stored. A new request replaces the link; the link is consumed before the reset; and every
+  path that gives the user a second factor back drops it (new recovery codes, new app, enabling
+  two-factor, the admin reset of #272), so a leftover email never wipes a two-factor the user
+  just set up. A request whose email could not be sent leaves nothing behind.
 - Implementation: `userModel.requestTwoFactorReset`, `requestTwoFactorResetFromPasswordReset`,
   `resetTwoFactor`; the controller provides `isInstanceOfUserConnected` (instance ids of the
   account ∩ `socketModel.getConnectedInstanceIds()`).

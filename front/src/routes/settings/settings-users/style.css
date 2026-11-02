@@ -295,6 +295,12 @@
   color: var(--gl-ink, #1c2334);
 }
 
+/* the admin's local password, asked before generating the recovery codes of a user */
+.passwordInput {
+  flex: 1 1 14rem;
+  min-width: 12rem;
+}
+
 /* the admin's own code, asked before resetting another user's two factor */
 .twoFactorFields {
   max-width: 36rem;

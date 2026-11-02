@@ -112,6 +112,37 @@ describe('POST /api/v1/gateway/user/:gateway_user_id/recovery-codes', () => {
       });
   });
 
+  it('should return 403 and not call Gladys Plus through the Gladys Plus tunnel, even as admin', async () => {
+    const scope = nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(200, { recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+    const adminUser = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+      role: USER_ROLE.ADMIN,
+    };
+    const response = await new Promise((resolve) => {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.event.emit(
+        EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+        adminUser,
+        'POST',
+        `/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`,
+        {},
+        { password: 'mysuperpassword' },
+        resolve,
+      );
+    });
+    expect(response).to.have.property('status', 403);
+    expect(response).to.have.property('code', 'FORBIDDEN');
+    expect(scope.isDone()).to.equal(false);
+    nock.cleanAll();
+  });
+
   it('should return 403 for a non-admin user', async () => {
     await db.User.create({
       id: NON_ADMIN_USER_ID,

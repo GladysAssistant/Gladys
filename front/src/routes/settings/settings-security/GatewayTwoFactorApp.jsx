@@ -130,7 +130,10 @@ class GatewayTwoFactorApp extends Component {
         twoFactorSecret: this.state.secret,
         twoFactorCode: this.state.twoFactorCode,
         currentTwoFactorCode: this.state.useRecoveryCode ? undefined : this.state.currentTwoFactorCode,
-        currentTwoFactorRecoveryCode: this.state.useRecoveryCode ? this.state.currentTwoFactorRecoveryCode : undefined
+        // the copy / download of the codes joins them with line breaks: a paste may carry one
+        currentTwoFactorRecoveryCode: this.state.useRecoveryCode
+          ? this.state.currentTwoFactorRecoveryCode.trim()
+          : undefined
       });
       this.setState({
         configuring: false,

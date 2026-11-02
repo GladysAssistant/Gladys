@@ -4,6 +4,7 @@ import get from 'get-value';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../utils/consts';
+import GatewayRecoveryCodes from '../../../components/gateway/GatewayRecoveryCodes';
 import { REMOTE_STATUS, ACTION_NEEDED_STATUSES } from './buildUsersView';
 import style from './style.css';
 
@@ -133,6 +134,68 @@ class RemoteAccess extends Component {
     }
   };
 
+  // Gladys Plus recovery codes of a user who lost their two-factor app and their
+  // codes, generated from this instance: the local admin proves it is them with their
+  // local password (a session left open on a wall tablet is not enough), the codes are
+  // displayed once, the user is told by email. Local mode only: the server refuses the
+  // Gladys Plus tunnel.
+  askRecoveryCodes = () => {
+    this.setState({
+      recoveryCodesOpen: true,
+      recoveryCodesPassword: '',
+      recoveryCodesStatus: null,
+      recoveryCodesError: null,
+      recoveryCodes: null
+    });
+  };
+
+  cancelRecoveryCodes = () => {
+    this.setState({ recoveryCodesOpen: false, recoveryCodesPassword: '', recoveryCodesStatus: null });
+  };
+
+  updateRecoveryCodesPassword = e => {
+    this.setState({ recoveryCodesPassword: e.target.value, recoveryCodesError: null });
+  };
+
+  generateRecoveryCodes = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    // a second submit would rotate the codes about to be displayed
+    if (this.state.recoveryCodesStatus === RequestStatus.Getting) {
+      return;
+    }
+    this.setState({ recoveryCodesStatus: RequestStatus.Getting, recoveryCodesError: null });
+    try {
+      const { recovery_codes: recoveryCodes } = await this.props.generateRemoteRecoveryCodes(
+        this.props.remote,
+        this.state.recoveryCodesPassword
+      );
+      this.setState({ recoveryCodes, recoveryCodesPassword: '', recoveryCodesStatus: RequestStatus.Success });
+    } catch (err) {
+      // the request carries the admin's local password: never the whole error in the console
+      const httpStatus = get(err, 'response.status');
+      console.error('Could not generate the recovery codes of the user', httpStatus || err.message);
+      const message = get(err, 'response.data.message');
+      let error = 'unknown';
+      if (message === 'WRONG_PASSWORD') {
+        error = 'wrongPassword';
+      } else if (message === 'GATEWAY_TWO_FACTOR_NOT_ENABLED') {
+        error = 'twoFactorNotEnabled';
+      } else if (httpStatus === 404) {
+        error = 'userNotFound';
+      } else if (get(err, 'response.data.error') === 'NO_CONNECTED_TO_THE_INTERNET') {
+        error = 'network';
+      }
+      this.setState({ recoveryCodesStatus: RequestStatus.Error, recoveryCodesError: error, recoveryCodesPassword: '' });
+    }
+  };
+
+  // the codes were displayed once: nothing is kept
+  closeRecoveryCodes = () => {
+    this.setState({ recoveryCodesOpen: false, recoveryCodes: null, recoveryCodesStatus: null });
+  };
+
   askResetTwoFactor = () => {
     this.setState({ resetTwoFactorOpen: true, resetTwoFactorCode: '', resetTwoFactorStatus: null });
   };
@@ -213,7 +276,12 @@ class RemoteAccess extends Component {
       linkStatus,
       resetTwoFactorOpen,
       resetTwoFactorCode,
-      resetTwoFactorStatus
+      resetTwoFactorStatus,
+      recoveryCodesOpen,
+      recoveryCodesPassword,
+      recoveryCodesStatus,
+      recoveryCodesError,
+      recoveryCodes
     }
   ) {
     const { remote, user, gatewayMode, isAdmin, isPlusAdmin, plusMe, language } = props;
@@ -240,6 +308,13 @@ class RemoteAccess extends Component {
       remote && remote.account && !remote.isInvitation && plusActions && plusMe && !isMe && props.resetRemoteTwoFactor
     );
     const resettingTwoFactor = resetTwoFactorStatus === RequestStatus.Getting;
+    // a local admin, at home, can give new Gladys Plus recovery codes to a user the
+    // instance knows (their keys are here): the instance stands in for their second factor
+    const canGenerateRecoveryCodes = Boolean(
+      remote && remote.keys && !remote.isInvitation && !gatewayMode && isAdmin && props.generateRemoteRecoveryCodes
+    );
+    const generatingRecoveryCodes = recoveryCodesStatus === RequestStatus.Getting;
+    const otherActionOpen = Boolean(confirmRevoke || resetTwoFactorOpen || recoveryCodesOpen);
     const account = remote && remote.account;
     // a Plus admin can attach a Plus account or a pending invitation to a Gladys user:
     // in one click on the card it was recognized on (by email), or through a select
@@ -341,12 +416,17 @@ class RemoteAccess extends Component {
                 <i class="fe fe-external-link" /> <Text id="usersSettings.plus.inviteFromPlus" />
               </a>
             )}
-            {canResetTwoFactor && !resetTwoFactorOpen && !confirmRevoke && (
+            {canGenerateRecoveryCodes && !otherActionOpen && (
+              <button type="button" class={cx('btn btn-sm', style.quietAction)} onClick={this.askRecoveryCodes}>
+                <i class="fe fe-key" /> <Text id="usersSettings.plus.recoveryCodes.button" />
+              </button>
+            )}
+            {canResetTwoFactor && !otherActionOpen && (
               <button type="button" class={cx('btn btn-sm', style.quietAction)} onClick={this.askResetTwoFactor}>
                 <i class="fe fe-shield-off" /> <Text id="usersSettings.plus.twoFactor.button" />
               </button>
             )}
-            {canRevoke && !confirmRevoke && !resetTwoFactorOpen && (
+            {canRevoke && !otherActionOpen && (
               <button type="button" class={cx('btn btn-sm', style.quietDanger)} onClick={this.askRevoke}>
                 <i class="fe fe-user-x" />{' '}
                 <Text
@@ -527,6 +607,74 @@ class RemoteAccess extends Component {
               </div>
             )}
           </form>
+        )}
+        {canGenerateRecoveryCodes && recoveryCodesOpen && !recoveryCodes && (
+          <form class={style.confirmBox} onSubmit={this.generateRecoveryCodes}>
+            <div class="alert alert-warning mb-2" role="alert">
+              <Text id="usersSettings.plus.recoveryCodes.confirmText" fields={{ name: remote.name || remote.email }} />
+            </div>
+            <div class={style.twoFactorFields}>
+              <label class="form-label" for={`recovery-codes-password-${remote.id}`}>
+                <Text id="usersSettings.plus.recoveryCodes.passwordLabel" />
+              </label>
+              <div class={style.twoFactorRow}>
+                <Localizer>
+                  <input
+                    id={`recovery-codes-password-${remote.id}`}
+                    type="password"
+                    autoComplete="current-password"
+                    class={cx('form-control', style.passwordInput, {
+                      'is-invalid': recoveryCodesError === 'wrongPassword'
+                    })}
+                    placeholder={<Text id="usersSettings.plus.recoveryCodes.passwordPlaceholder" />}
+                    value={recoveryCodesPassword}
+                    onInput={this.updateRecoveryCodesPassword}
+                    required
+                  />
+                </Localizer>
+                <button
+                  type="submit"
+                  class={cx('btn btn-primary btn-sm', { 'btn-loading': generatingRecoveryCodes })}
+                  disabled={generatingRecoveryCodes || !recoveryCodesPassword}
+                >
+                  <i class="fe fe-key" /> <Text id="usersSettings.plus.recoveryCodes.confirmButton" />
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary btn-sm"
+                  onClick={this.cancelRecoveryCodes}
+                  disabled={generatingRecoveryCodes}
+                >
+                  <Text id="usersSettings.plus.cancel" />
+                </button>
+              </div>
+            </div>
+            {recoveryCodesStatus === RequestStatus.Error && (
+              <div class="alert alert-danger mt-2 mb-0" role="alert">
+                {recoveryCodesError === 'wrongPassword' && (
+                  <Text id="usersSettings.plus.recoveryCodes.errorWrongPassword" />
+                )}
+                {recoveryCodesError === 'twoFactorNotEnabled' && (
+                  <Text id="usersSettings.plus.recoveryCodes.errorTwoFactorNotEnabled" />
+                )}
+                {recoveryCodesError === 'userNotFound' && (
+                  <Text id="usersSettings.plus.recoveryCodes.errorUserNotFound" />
+                )}
+                {recoveryCodesError === 'network' && <Text id="usersSettings.plus.recoveryCodes.errorNetwork" />}
+                {recoveryCodesError === 'unknown' && <Text id="usersSettings.plus.recoveryCodes.error" />}
+              </div>
+            )}
+          </form>
+        )}
+        {recoveryCodes && (
+          <div class={style.confirmBox}>
+            <GatewayRecoveryCodes
+              recoveryCodes={recoveryCodes}
+              status={recoveryCodesStatus}
+              onContinue={this.closeRecoveryCodes}
+              continueLabelId="usersSettings.plus.recoveryCodes.doneButton"
+            />
+          </div>
         )}
         {resetTwoFactorStatus === RequestStatus.Success && !resetTwoFactorOpen && (
           <div class={cx('alert alert-success mb-0', style.remoteAlert)} role="status">

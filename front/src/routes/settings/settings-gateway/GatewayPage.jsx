@@ -10,7 +10,6 @@ import GatewayConfigured from './GatewayConfigured';
 import GatewayInstanceOfflineAlert from './GatewayInstanceOfflineAlert';
 import GatewayBackupKey from './GatewayBackupKey';
 import GatewayRemoteUsersCard from './GatewayRemoteUsersCard';
-import GatewayUserRecoveryCodes from './GatewayUserRecoveryCodes';
 import GatewayDisconnect from './GatewayDisconnect';
 import GatewayConnectedSuccess from './GatewayConnectedSuccess';
 
@@ -62,13 +61,6 @@ const GatewayPage = ({ children, ...props }) => (
           <GatewayRemoteUsersCard
             gatewayUsersKeys={props.gatewayUsersKeys}
             gatewayGetKeysStatus={props.gatewayGetKeysStatus}
-          />
-        </div>
-        <div class="col-md-12">
-          <GatewayUserRecoveryCodes
-            user={props.user}
-            httpClient={props.httpClient}
-            gatewayUsersKeys={props.gatewayUsersKeys}
           />
         </div>
         <div class="col-md-12">

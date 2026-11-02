@@ -214,6 +214,13 @@ class SettingsUsers extends Component {
     }
   };
 
+  // Gladys Plus recovery codes of a user who lost both their two-factor app and their
+  // recovery codes, generated from this instance (which stands in for their second
+  // factor): local admin, local mode only (the server refuses the Gladys Plus tunnel),
+  // and the admin proves it is them with their local password
+  generateRemoteRecoveryCodes = async (remote, password) =>
+    this.props.httpClient.post(`/api/v1/gateway/user/${encodeURIComponent(remote.id)}/recovery-codes`, { password });
+
   // Reset the two factor of a Plus user who lost their authenticator (Plus admin,
   // confirming with their own code): the user signs in with their password and sets
   // up a new authenticator; their keys and local authorization do not change
@@ -291,6 +298,7 @@ class SettingsUsers extends Component {
           inviteUser={this.inviteUser}
           linkRemote={this.linkRemote}
           resetRemoteTwoFactor={this.resetRemoteTwoFactor}
+          generateRemoteRecoveryCodes={this.generateRemoteRecoveryCodes}
           revokeRemote={this.revokeRemote}
         />
       </SettingsLayout>

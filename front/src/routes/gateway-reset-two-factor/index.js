@@ -15,13 +15,19 @@ class ResetTwoFactorPage extends Component {
 
   resetTwoFactor = async e => {
     e.preventDefault();
+    // a second click while the first one is pending would be refused (the token is
+    // single-use) and shown as a dead link over the success
+    if (this.state.status === RequestStatus.Getting || this.state.status === RequestStatus.Success) {
+      return;
+    }
     this.setState({ status: RequestStatus.Getting, error: null });
     try {
       await this.props.session.gatewayClient.resetTwoFactor(this.props.token);
       this.setState({ status: RequestStatus.Success });
     } catch (e) {
-      console.error(e);
       const status = get(e, 'response.status');
+      // the request carries the reset token: never the whole error in the console
+      console.error('Could not reset the two factor authentication', status || e.message);
       const errorMessage = get(e, 'response.data.error_message');
       let error = 'UNKNOWN';
       if (errorMessage === 'INSTANCE_CONNECTED') {

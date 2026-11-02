@@ -22,13 +22,17 @@ class ResetPasswordPage extends Component {
   // Gladys Plus emails a link that resets their two-factor authentication.
   requestTwoFactorReset = async e => {
     e.preventDefault();
+    if (this.state.twoFactorResetStatus === RequestStatus.Getting) {
+      return;
+    }
     this.setState({ twoFactorResetStatus: RequestStatus.Getting, twoFactorResetError: null });
     try {
       await this.props.session.gatewayClient.requestTwoFactorResetFromPasswordReset(this.props.token);
       this.setState({ twoFactorResetStatus: RequestStatus.Success });
     } catch (e) {
-      console.error(e);
       const status = get(e, 'response.status');
+      // the request carries the reset password token: never the whole error in the console
+      console.error('Could not request the two factor reset', status || e.message);
       const errorMessage = get(e, 'response.data.error_message');
       let error = 'UNKNOWN';
       if (errorMessage === 'INSTANCE_CONNECTED') {

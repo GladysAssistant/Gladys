@@ -50,6 +50,7 @@ const UserPage = ({ children, ...props }) => {
     inviteUser: props.inviteUser,
     linkRemote: props.linkRemote,
     resetRemoteTwoFactor: props.resetRemoteTwoFactor,
+    generateRemoteRecoveryCodes: props.generateRemoteRecoveryCodes,
     // the "link to a Gladys user" select: every user of the instance, the ones already
     // holding a Gladys Plus account or invitation left out
     users: props.users || [],
