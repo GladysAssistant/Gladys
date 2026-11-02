@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, ERROR_MESSAGES } = require('../../utils/constants');
+const { Error403 } = require('../../utils/httpErrors');
 const { getAudioBufferFromRequest, getAudioContentTypeFromRequest } = require('../utils/getAudioBufferFromRequest');
 
 module.exports = function GatewayController(gladys) {
@@ -80,6 +81,29 @@ module.exports = function GatewayController(gladys) {
    */
   async function enableTwoFactor(req, res) {
     const result = await gladys.gateway.enableTwoFactor(req.body.access_token, req.body.two_factor_code);
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/user/:gateway_user_id/recovery-codes Generate Gladys Plus recovery codes
+   * @apiName generateUserRecoveryCodes
+   * @apiGroup Gateway
+   * @apiDescription For a Gladys Plus user of the account who lost their two-factor
+   * app and their recovery codes: the instance stands in for the second factor and
+   * asks Gladys Plus for a new set of single-use recovery codes. Admin only, and the
+   * admin re-enters their local password. The previous codes are invalidated and
+   * Gladys Plus notifies the user by email.
+   * @apiParam {String} password The local password of the admin making the request.
+   */
+  async function generateUserRecoveryCodes(req, res) {
+    // A session left open on a wall tablet must not be enough to get codes that
+    // replace the second factor of a Gladys Plus account: the admin proves it is them.
+    try {
+      await gladys.user.login(req.user.email, req.body.password);
+    } catch (e) {
+      throw new Error403(ERROR_MESSAGES.WRONG_PASSWORD);
+    }
+    const result = await gladys.gateway.generateUserRecoveryCodes(req.params.gateway_user_id);
     res.json(result);
   }
 
@@ -360,6 +384,7 @@ module.exports = function GatewayController(gladys) {
     loginTwoFactor: asyncMiddleware(loginTwoFactor),
     configureTwoFactor: asyncMiddleware(configureTwoFactor),
     enableTwoFactor: asyncMiddleware(enableTwoFactor),
+    generateUserRecoveryCodes: asyncMiddleware(generateUserRecoveryCodes),
     getUsersKeys: asyncMiddleware(getUsersKeys),
     saveUsersKeys: asyncMiddleware(saveUsersKeys),
     saveBackupKey: asyncMiddleware(saveBackupKey),
