@@ -42,12 +42,24 @@ const { getCurrentPoint } = require('./thermostat.getSchedules');
  */
 async function startsOnOffPoint(device) {
   const preset = getPreset(device);
-  if (getManualHold(device) || (preset !== null && preset !== 'schedule')) {
+  // A hold already past its end is the programme's again: the next pass drops
+  // it, and the Off point applies.
+  const hold = getManualHold(device);
+  const holding = hold !== null && (hold.until === null || hold.until > Date.now());
+  if (holding || (preset !== null && preset !== 'schedule')) {
     return false;
   }
-  const schedule = await getScheduleOfDevice(device.id);
-  const point = schedule ? await getCurrentPoint(schedule.id) : null;
-  return Boolean(point && point.preset === 'off');
+  // A programme that cannot be read is no Off point: the start powers the unit
+  // on at once, as any start did, rather than leave it off with nothing to say
+  // so until the next pass.
+  try {
+    const schedule = await getScheduleOfDevice(device.id);
+    const point = schedule ? await getCurrentPoint(schedule.id) : null;
+    return Boolean(point && point.preset === 'off');
+  } catch (e) {
+    logger.warn(`Thermostat: could not read the programme of ${device.selector}: ${e.message}`);
+    return false;
+  }
 }
 
 /**

@@ -602,6 +602,65 @@ describe('thermostat.setValue', () => {
       );
     });
 
+    // A hold past its end is the programme's again: the Off point applies.
+    it('should leave a real thermostat started onto an Off point over an expired hold off', async () => {
+      const { setValue } = load(true, { day_of_week: 0, time: '18:00', preset: 'off' });
+      const handler = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue };
+      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+            { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+            { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' },
+            { name: 'THERMOSTAT_MANUAL_UNTIL', value: String(Date.now() - 60 * 1000) },
+          ],
+          [presetFeature, stoppedMode],
+        ),
+        stoppedMode,
+        THERMOSTAT_MODE.HEATING,
+      );
+
+      assert.notCalled(handler.gladys.device.setValue);
+    });
+
+    // A programme that cannot be read is no Off point: the unit is powered on
+    // at once, as any start did.
+    it('should power on a real thermostat whose programme cannot be read', async () => {
+      const { setValue } = proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
+        './thermostat.getSchedules': { getCurrentPoint: fake.rejects(new Error('database locked')) },
+        './thermostat.scheduleDevice': {
+          clearScheduleStop,
+          clearRemoteStop,
+          clearModuleStop,
+          followsSchedule: fake.resolves(true),
+          getScheduleOfDevice: fake.resolves({ id: 'programme-id', transitions: [] }),
+        },
+        '../../../utils/logger': { debug: fake.returns(null), info: fake.returns(null), warn: fake.returns(null) },
+      });
+      const handler = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue };
+      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+            { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+          ],
+          [presetFeature, stoppedMode],
+        ),
+        stoppedMode,
+        THERMOSTAT_MODE.HEATING,
+      );
+
+      expect(handler.gladys.device.setValue.firstCall.args[1].selector).to.equal('netatmo-power');
+    });
+
     // A unit powered off ignores its mode as surely as a setpoint: an air
     // conditioner is started by its power first (A.0.3).
     it('should power a real thermostat on before its mode when it is started', async () => {

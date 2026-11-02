@@ -931,7 +931,7 @@ class ThermostatBox extends Component {
     const deviceSelector = cfg && cfg.device_selector;
     if (!deviceSelector) {
       this.setState({ activeSchedule: null });
-      return;
+      return null;
     }
     try {
       const schedules = await this.props.httpClient.get('/api/v1/service/thermostat/schedule');
@@ -941,10 +941,13 @@ class ThermostatBox extends Component {
       // A schedule deleted behind the widget's back is missing from the list,
       // and degrades to "no schedule" rather than leaving a stale banner.
       this.setState({ activeSchedule: schedule || null });
+      // Returned as well: a caller deciding on it cannot wait for the render.
+      return schedule || null;
     } catch (e) {
       // A failed request says nothing about the schedule: the last one loaded
       // stays, and with it its `next.refresh_at`, so the minute tick tries again
       // instead of dropping the banner for good.
+      return this.state.activeSchedule;
     }
   };
 
@@ -1480,10 +1483,26 @@ class ThermostatBox extends Component {
     // it. Stopped, it sat in manual mode asking to resume a programme that said
     // the very same thing. With no hold, Off still stops it: a stop for the
     // season must be possible on an Off point too.
-    const current = this.state.activeSchedule && this.state.activeSchedule.current;
-    if (preset.key === 'off' && current && current.preset === 'off' && this.state.isManualMode && !this.isStopped()) {
-      await this.cancelManualMode();
-      return;
+    //
+    // The point is read again rather than taken from the card: the one it shows
+    // can still say Off for up to a minute after the programme moved on, and Off
+    // would then hand back to Comfort. A second tap while the first is handing
+    // back is dropped: taken once the first had left manual mode, it stopped a
+    // thermostat for the season nobody asked to stop.
+    if (preset.key === 'off' && this.state.isManualMode && !this.isStopped()) {
+      if (this.handingBack) {
+        return;
+      }
+      this.handingBack = true;
+      try {
+        const schedule = await this.loadSchedule();
+        if (schedule && schedule.current && schedule.current.preset === 'off') {
+          await this.cancelManualMode();
+          return;
+        }
+      } finally {
+        this.handingBack = false;
+      }
     }
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
