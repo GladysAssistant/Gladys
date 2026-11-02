@@ -52,9 +52,9 @@ const hueToRgb = (p, q, t2) => {
  * const rgb = hslToRgb(260, 50, 50);
  */
 function hslToRgb(h, s, l) {
-  // Achromatic
+  // Achromatic (same 0-255 scale as the chromatic path below)
   if (s === 0) {
-    return [l, l, l];
+    return [Math.round(l * 255), Math.round(l * 255), Math.round(l * 255)];
   }
   const h2 = h / 360;
 
