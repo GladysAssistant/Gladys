@@ -1,0 +1,645 @@
+/* Users settings: one list for the Gladys users AND their Gladys Plus remote
+   access (invitation → account → link → authorized keys), which used to be
+   spread over three pages. Same Horizon glass grammar as the houses page:
+   full-width rows, uppercase micro-labels, soft tinted stamps. Colors are
+   light only: the app darkens through the global inversion filter
+   (style/dark-mode.css). */
+
+.pageSubtitle {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.875rem;
+  margin: 0.15rem 0 0;
+  /* keeps the filters on the title's row at desktop widths */
+  max-width: 28rem;
+}
+
+.listSummary {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 0.75rem;
+}
+
+.sectionHint {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.875rem;
+  margin: -0.35rem 0 0.75rem;
+  max-width: 44rem;
+}
+
+.userList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.unlinkedSection {
+  margin-top: 1.75rem;
+}
+
+/* ---------- the user row ---------- */
+
+.userCard {
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.userHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1.25rem;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 14px;
+  background-color: var(--gl-icon-tint-bg, #e3ebfb);
+  background-size: cover;
+  background-position: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarInitials {
+  color: var(--gl-accent, #3d6df0);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.avatarPlaceholder {
+  color: var(--gl-muted, #7c8396);
+  font-size: 1.2rem;
+}
+
+.userHeading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.userName {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gl-ink, #1c2334);
+  overflow-wrap: anywhere;
+}
+
+.youTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gl-accent, #3d6df0);
+  background: var(--gl-icon-tint-bg, #e3ebfb);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  overflow-wrap: anywhere;
+}
+
+.roleTag {
+  font-size: 0.72rem;
+  height: 1.4rem;
+  line-height: 1.4rem;
+}
+
+.userActions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.userActions :global(.fe) + .actionLabel {
+  margin-left: 0.35rem;
+}
+
+@media (max-width: 575.98px) {
+  .actionLabel {
+    display: none;
+  }
+}
+
+.confirmBox {
+  padding: 0 1.25rem 1rem;
+}
+
+/* ---------- the Gladys Plus strip of a row ---------- */
+
+.remote {
+  --ra-tint: rgba(28, 35, 52, 0.04);
+  --ra-ink: var(--gl-muted, #7c8396);
+
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+  background: var(--ra-tint);
+  padding: 0.85rem 1.25rem;
+}
+
+/* the unattached Plus accounts are one strip each: no row above it */
+.unlinkedCard .remote {
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+.toneSuccess {
+  --ra-tint: rgba(56, 158, 90, 0.07);
+  --ra-ink: #2e8f5b;
+}
+
+.toneWarning {
+  --ra-tint: rgba(217, 160, 50, 0.1);
+  --ra-ink: #a5701e;
+}
+
+.toneDanger {
+  --ra-tint: rgba(194, 74, 51, 0.08);
+  --ra-ink: #c24a33;
+}
+
+.toneInfo {
+  --ra-tint: rgba(61, 109, 240, 0.07);
+  --ra-ink: #2f5bd7;
+}
+
+.toneMuted {
+  --ra-tint: rgba(28, 35, 52, 0.035);
+  --ra-ink: var(--gl-muted, #7c8396);
+}
+
+/* an authorization is expected from the admin: the strip gets the warm
+   left rule the dashboard uses for "needs you" notices */
+.remoteActionNeeded {
+  box-shadow: inset 4px 0 0 var(--ra-ink);
+}
+
+.remoteRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.remoteIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ra-ink);
+  font-size: 1rem;
+}
+
+.remoteBody {
+  /* basis 0: on phones the row wraps and the text must still share the
+     first line with the icon (an auto basis would push it under) */
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.remoteTitleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.remoteLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+}
+
+.remoteText {
+  margin: 0.3rem 0 0;
+  font-size: 0.875rem;
+  color: var(--gl-ink, #1c2334);
+  max-width: 44rem;
+}
+
+.remoteMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+  margin-top: 0.3rem;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  overflow-wrap: anywhere;
+}
+
+.online {
+  color: #2e8f5b;
+  font-weight: 600;
+}
+
+.remoteNote {
+  margin: 0.6rem 0 0 2.95rem;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  max-width: 44rem;
+}
+
+.remoteControls {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.switch {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.switchLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gl-ink, #1c2334);
+  margin: 0;
+}
+
+.quietDanger {
+  background: transparent;
+  border: none;
+  color: #c24a33;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.quietDanger:hover {
+  background: #fbe3de;
+  color: #a83e2a;
+}
+
+.inviteFromPlus {
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .remoteRow {
+    flex-wrap: wrap;
+  }
+
+  .remoteControls {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 2.95rem;
+  }
+
+  .remoteNote {
+    margin-left: 0;
+  }
+}
+
+/* ---------- fingerprints ---------- */
+
+.fingerprints {
+  margin: 0.6rem 0 0 2.95rem;
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 767.98px) {
+  .fingerprints {
+    margin-left: 0;
+  }
+}
+
+.fingerprintsSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--gl-muted, #7c8396);
+  list-style: none;
+}
+
+.fingerprintsSummary::-webkit-details-marker {
+  display: none;
+}
+
+.fingerprintsSummary::after {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  margin-left: 0.1rem;
+}
+
+.fingerprints[open] .fingerprintsSummary::after {
+  transform: rotate(45deg);
+}
+
+.fingerprintsSummary:hover {
+  color: var(--gl-ink, #1c2334);
+}
+
+.fingerprintsHint {
+  margin: 0.5rem 0 0.4rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+.fingerprintList {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+}
+
+.fingerprintList dt {
+  font-weight: 700;
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding-top: 0.2rem;
+}
+
+.fingerprintList dd {
+  margin: 0;
+  min-width: 0;
+}
+
+/* fingerprints are compared with the ones the user sees on Gladys Plus: they
+   must be fully visible, never truncated */
+.fingerprintList code {
+  display: block;
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--gl-ink, #1c2334);
+  font-size: 0.75rem;
+  white-space: normal;
+  word-break: break-all;
+}
+
+/* ---------- the Gladys Plus overview strip ---------- */
+
+.overview {
+  padding: 1.1rem 1.25rem;
+}
+
+.overviewMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.overviewIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 14px;
+  background: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1.2rem;
+}
+
+.overviewText {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.overviewTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gl-ink, #1c2334);
+  margin: 0 0 0.25rem;
+}
+
+.overviewDescription {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--gl-muted, #7c8396);
+  max-width: 44rem;
+}
+
+.why {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  max-width: 44rem;
+}
+
+.why summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--gl-accent, #3d6df0);
+  list-style: none;
+}
+
+.why summary::-webkit-details-marker {
+  display: none;
+}
+
+.why[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+.whyParagraph {
+  margin-bottom: 0.5rem;
+}
+
+.stats {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .stats {
+    margin-top: 0.75rem;
+  }
+}
+
+.stat {
+  --stat-bg: rgba(255, 255, 255, 0.6);
+  --stat-ink: var(--gl-ink, #1c2334);
+  --stat-icon: var(--gl-muted, #7c8396);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 16px;
+  background: var(--stat-bg);
+  text-align: center;
+}
+
+.statOk {
+  --stat-bg: #def0e2;
+  --stat-ink: #2e8f5b;
+  --stat-icon: #2e8f5b;
+}
+
+.statAttention {
+  --stat-bg: #f9eeda;
+  --stat-ink: #a5701e;
+  --stat-icon: #a5701e;
+}
+
+.statNeutral {
+  --stat-bg: #dde9fb;
+  --stat-ink: #2f5bd7;
+  --stat-icon: #2f5bd7;
+}
+
+.statIcon {
+  color: var(--stat-icon);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.statValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--stat-ink);
+}
+
+.statLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--stat-ink);
+  opacity: 0.85;
+}
+
+.attentionAlert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.overviewFooter {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+@media (max-width: 767.98px) {
+  .overviewMain {
+    flex-wrap: wrap;
+  }
+
+  .stats {
+    width: 100%;
+  }
+
+  .stat {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+/* ---------- invite card ---------- */
+
+.inviteCard {
+  margin-top: 1.75rem;
+  margin-bottom: 0;
+  padding: 1.1rem 1.25rem;
+}
+
+.inviteHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.inviteIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 14px;
+  background: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1.1rem;
+}
+
+.inviteTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gl-ink, #1c2334);
+  margin: 0 0 0.25rem;
+}
+
+.inviteDescription {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--gl-muted, #7c8396);
+  max-width: 44rem;
+}
+
+.inviteForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.inviteEmail {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.inviteRole {
+  flex: 0 1 14rem;
+  min-width: 10rem;
+}
+
+.inviteSubmit {
+  flex: 0 0 auto;
+}
+
+.inviteHelp {
+  margin: 0.6rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+.inviteCard :global(.alert) {
+  margin-top: 0.75rem;
+}
