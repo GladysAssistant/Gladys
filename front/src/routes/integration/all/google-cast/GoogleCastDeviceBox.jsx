@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import { connect } from 'unistore/preact';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 
 class GoogleCastDeviceBox extends Component {
   componentWillMount() {
@@ -181,6 +182,10 @@ class GoogleCastDeviceBox extends Component {
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.google-cast.saveButton" />
                     </button>
+                  )}
+
+                  {validModel && deleteButton && (
+                    <MigrateDeviceButton device={device} onMigrated={this.props.getGoogleCastDevices} />
                   )}
 
                   {deleteButton && (

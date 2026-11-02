@@ -2,6 +2,7 @@ import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 
 const OpenWeatherPage = ({ children, ...props }) => (
   <IntegrationSubPageLayout
@@ -20,6 +21,7 @@ const OpenWeatherPage = ({ children, ...props }) => (
       </DeviceConfigurationLink>
     }
   >
+    <DeprecationWarning />
     <div class="card">
       <div class="card-body">
         <div

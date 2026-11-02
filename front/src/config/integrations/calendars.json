@@ -5,6 +5,7 @@
     "whiteBackground": true,
     "local": true,
     "cloud": true,
+    "deprecated": true,
     "categories": ["services"]
   }
 ]

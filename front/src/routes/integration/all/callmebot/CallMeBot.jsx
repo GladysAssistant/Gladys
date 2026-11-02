@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 
 const CallMeBotPage = ({ children, user }) => (
   <IntegrationSubPageLayout
@@ -30,6 +31,7 @@ const CallMeBotPage = ({ children, user }) => (
       </Fragment>
     }
   >
+    <DeprecationWarning />
     {children}
   </IntegrationSubPageLayout>
 );
