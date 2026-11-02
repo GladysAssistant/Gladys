@@ -39,11 +39,14 @@ const USE_OF_MODE = {
  * in summer is Comfort's cooling setpoint.
  * @param {object} device - The thermostat device; its params are updated in place.
  * @param {string} use - `heating` or `cooling`.
+ * @param {object} [options] - Switch options.
+ * @param {boolean} [options.keepHold] - Keep the manual hold: one the unit's own
+ * remote armed in the same press, which is a setpoint of the new use.
  * @returns {Promise<boolean>} True when the use changed.
  * @example
  * await switchUse.call(handler, device, 'cooling');
  */
-async function switchUse(device, use) {
+async function switchUse(device, use, { keepHold = false } = {}) {
   const config = buildParamsConfig(device) || {};
   if (!config.reversible || config.default_mode === use) {
     return false;
@@ -62,7 +65,9 @@ async function switchUse(device, use) {
       { name: 'THERMOSTAT_MODE', value: use },
     ];
   });
-  await clearManualHold.call(this, device);
+  if (!keepHold) {
+    await clearManualHold.call(this, device);
+  }
   // The widgets read the presets of the use from the params: they reload them.
   this.broadcastConfigUpdated();
   logger.info(`Thermostat: ${device.selector} switched to ${use}`);
