@@ -9,7 +9,7 @@ import GatewayPricing from './GatewayPricing';
 import GatewayConfigured from './GatewayConfigured';
 import GatewayInstanceOfflineAlert from './GatewayInstanceOfflineAlert';
 import GatewayBackupKey from './GatewayBackupKey';
-import GatewayUsersList from './GatewayUsersList';
+import GatewayRemoteUsersCard from './GatewayRemoteUsersCard';
 import GatewayUserRecoveryCodes from './GatewayUserRecoveryCodes';
 import GatewayDisconnect from './GatewayDisconnect';
 import GatewayConnectedSuccess from './GatewayConnectedSuccess';
@@ -59,7 +59,10 @@ const GatewayPage = ({ children, ...props }) => (
           <GatewayInstanceOfflineAlert session={props.session} />
         </div>
         <div class="col-md-12">
-          <GatewayUsersList {...props} />
+          <GatewayRemoteUsersCard
+            gatewayUsersKeys={props.gatewayUsersKeys}
+            gatewayGetKeysStatus={props.gatewayGetKeysStatus}
+          />
         </div>
         <div class="col-md-12">
           <GatewayUserRecoveryCodes

@@ -33,7 +33,7 @@ const UserNotAcceptedLocally = props => {
           <MarkupText id="gatewayLinkUser.noInstanceFoundStepOpenLocalInstance" />
         </li>
         <li class="mb-2">
-          <MarkupText id="gatewayLinkUser.noInstanceFoundStepGoToSettings" />
+          <MarkupText id="gatewayLinkUser.notAcceptedStepGoToUsers" />
         </li>
         <li class="mb-2">
           <MarkupText id="gatewayLinkUser.notAcceptedStepAcceptUser" />

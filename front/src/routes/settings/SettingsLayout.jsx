@@ -11,11 +11,19 @@ import dashboardStyle from '../dashboard/style.css';
 
 const MENU_ITEMS = [
   { href: '/dashboard/settings/house', icon: 'home', textId: 'settings.housesTab', adminOnly: true },
-  { href: '/dashboard/settings/user', icon: 'user', textId: 'settings.usersTab', matchPrefix: true, adminOnly: true },
+  {
+    href: '/dashboard/settings/user',
+    icon: 'user',
+    textId: 'settings.usersTab',
+    matchPrefix: true,
+    adminOnly: true,
+    // the Users page is also where the Gladys Plus account users are invited
+    // and removed, which is a Plus admin operation whatever the local role
+    orGatewayAdmin: true
+  },
   { href: '/dashboard/settings/session', icon: 'smartphone', textId: 'settings.sessionsTab' },
   { href: '/dashboard/settings/security', icon: 'shield', textId: 'settings.securityTab', gatewayOnly: true },
   { href: '/dashboard/settings/gateway', icon: 'globe', textId: 'settings.gatewayTab', adminOnly: true },
-  { href: '/dashboard/settings/gateway-users', icon: 'user', textId: 'settings.gatewayUsersTab', gatewayOnly: true },
   {
     href: '/dashboard/settings/gateway-open-api',
     icon: 'globe',
@@ -44,7 +52,9 @@ const MENU_ITEMS = [
 // stays the authority on a deep link.
 // `gatewayAdminOnly` goes by the role in the Gladys Plus account, not on the
 // instance: billing belongs to the admin of the Plus account (same rule as the
-// trial card in the header, see refreshGatewayTrialState).
+// trial card in the header, see refreshGatewayTrialState). `orGatewayAdmin`
+// opens an admin-only tab to a Plus admin too (the Users page carries the Plus
+// account users since the "Plus users" tab was folded into it).
 // The settings live on the same Horizon glass scene as the dashboard: the
 // global .glass-theme class gates the shared theme layer (cards, alerts,
 // badges, buttons), .settings-page scopes the settings-only pass (style.css
@@ -89,7 +99,9 @@ const DashboardSettings = ({ children, ...props }) => (
             {MENU_ITEMS.filter(
               item =>
                 (!item.gatewayOnly || config.gatewayMode) &&
-                (!item.adminOnly || (props.user && props.user.role === USER_ROLE.ADMIN)) &&
+                (!item.adminOnly ||
+                  (props.user && props.user.role === USER_ROLE.ADMIN) ||
+                  (item.orGatewayAdmin && props.gatewayUserRole === 'admin')) &&
                 (!item.gatewayAdminOnly || props.gatewayUserRole === 'admin')
             ).map(item => (
               <Link

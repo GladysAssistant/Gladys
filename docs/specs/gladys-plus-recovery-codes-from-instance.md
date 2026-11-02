@@ -28,6 +28,12 @@ The design relies on what a Gladys Plus user always has: their Gladys instance, 
   accepted locally on the instance.
 - Any rotation is **notified by email** to the user, so one they did not ask for cannot go unnoticed.
 
+A third, complementary path exists on the Gladys Plus side and on the Users page of Gladys: an
+**admin of the account** resets the two-factor authentication of **another** user of the account
+with their own two-factor code (`POST /accounts/users/:id/reset-two-factor`, email
+`two_factor_reset`). It needs a second admin with a working app, so it does not cover a lone user
+or an account whose admins all lost their app; this document covers those.
+
 Alternatives considered: keeping a local copy of the codes on the instance (stale as soon as the
 user rotates them elsewhere, and a secret at rest for nothing), and a time-delayed reset by email
 for accounts without an instance (not covered here; still a manual reset).
@@ -122,7 +128,7 @@ the instance was offline is refused, and kept, if the instance came back online 
    password too**, the same link on the reset password page (the reset password token stands for
    the password step).
 2. The Gateway emails the user a single-use link, valid **one hour**, at most **one request per
-   minute per user** (`two_factor_reset`, EN / FR, with a "if you did not ask for this, change
+   minute per user** (`two_factor_reset_link`, EN / FR, with a "if you did not ask for this, change
    your password" danger tile).
 3. The link opens `GLADYS_PLUS_FRONTEND_URL/reset-two-factor?token=…`: the reset happens **on
    click** of a button, never on page load (email clients prefetch links).
@@ -137,7 +143,7 @@ the instance was offline is refused, and kept, if the instance came back online 
 - `POST /users/two-factor/reset-request` — auth: **two factor token** (`twoFactorTokenAuth`, the
   2-minute token of the password step); rate limited per IP. `200 { success: true }`. `403
   TWO_FACTOR_NOT_ENABLED`, `403 INSTANCE_CONNECTED`, `429 TWO_FACTOR_RESET_ALREADY_REQUESTED`
-  (cooldown), `401` without a two factor token. Email `two_factor_reset` with
+  (cooldown), `401` without a two factor token. Email `two_factor_reset_link` with
   `{ firstname, twoFactorResetUrlGladys4 }`.
 - `POST /users/reset-password/:token/two-factor/reset-request` — no auth, rate limited; `:token`
   is an unused, unexpired reset password token (`404` otherwise). Same behaviour and errors.

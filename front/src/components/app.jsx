@@ -71,7 +71,6 @@ import SettingsServicePage from '../routes/settings/settings-service';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
-import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
 import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api';
 import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs';
 
@@ -275,7 +274,8 @@ const AppRouter = connect(
         {config.gatewayMode && <GatewayConfirmEmail path="/confirm-email" />}
         {config.gatewayMode && <SettingsBilling path="/dashboard/settings/billing" />}
         {config.gatewayMode && <SettingsSecurityPage path="/dashboard/settings/security" />}
-        {config.gatewayMode && <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />}
+        {/* the Gladys Plus users are managed with the Gladys users since 5.x: old links land there */}
+        {config.gatewayMode && <Redirect path="/dashboard/settings/gateway-users" to="/dashboard/settings/user" />}
         {config.gatewayMode && <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />}
 
         {!config.gatewayMode && <SignupWelcomePage path="/signup" />}
