@@ -4978,6 +4978,19 @@
         "help": "La cuenta de Gladys Plus se asocia a ese usuario: su acceso remoto aparece entonces en la tarjeta del usuario, y controla Gladys como ese usuario.",
         "error": "No se pudo vincular esta cuenta de Gladys Plus. Compruebe que el usuario de Gladys no esté ya vinculado a otra cuenta."
       },
+      "recoveryCodes": {
+        "button": "Códigos de recuperación",
+        "confirmText": "¿{{name}} ha perdido su aplicación de doble autenticación y sus códigos de recuperación? Su Gladys, físicamente en su casa, sustituye a la aplicación: se generará un nuevo juego de códigos de recuperación de un solo uso para su cuenta Gladys Plus y se mostrará una sola vez, aquí. Sus códigos anteriores dejan de funcionar de inmediato, y Gladys Plus intentará avisarle por correo electrónico: avísele usted también. Su contraseña sigue siendo necesaria para iniciar sesión. Para confirmar, introduzca su propia contraseña de Gladys.",
+        "passwordLabel": "Su contraseña de Gladys",
+        "passwordPlaceholder": "Introduzca su contraseña de Gladys",
+        "confirmButton": "Generar",
+        "doneButton": "He guardado los códigos de recuperación",
+        "errorWrongPassword": "Contraseña incorrecta.",
+        "errorTwoFactorNotEnabled": "Esta persona no ha activado la doble autenticación en Gladys Plus: no necesita códigos de recuperación.",
+        "errorUserNotFound": "Esta persona ya no forma parte de su cuenta Gladys Plus. Recargue la página e inténtelo de nuevo.",
+        "errorNetwork": "Su Gladys no está conectada a Gladys Plus: compruebe su conexión a internet e inténtelo de nuevo.",
+        "error": "No se han podido generar los códigos de recuperación. Inténtelo de nuevo."
+      },
       "twoFactor": {
         "button": "Restablecer la autenticación de dos factores",
         "confirmText": "{{name}} ya no necesitará su aplicación de autenticación ni sus códigos de recuperación: iniciará sesión con su contraseña y configurará de inmediato una nueva aplicación. Sus claves de cifrado y su acceso a esta instancia de Gladys no cambian. Se le avisará por correo. Para confirmar, introduzca el código de su propia aplicación de autenticación.",
@@ -5588,7 +5601,13 @@
     "invalidRecoveryCode": "Este código de recuperación no es válido o ya se ha utilizado.",
     "lostTwoFactor": "¿Ha perdido el acceso a su aplicación de doble factor?",
     "useRecoveryCodeLink": "Utilizar un código de recuperación",
-    "noRecoveryCode": "¿No tiene un código de recuperación? Contáctenos en <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> y lo restableceremos.",
+    "noRecoveryCode": "¿No le quedan códigos de recuperación? Un administrador de su Gladys puede generar nuevos desde Ajustes › Usuarios.",
+    "resetTwoFactorLink": "¿Ninguna Gladys conectada? Restablezca su doble autenticación por correo electrónico.",
+    "resetTwoFactorEmailSent": "Le hemos enviado un correo electrónico con un enlace para restablecer su doble autenticación. Solo funciona una vez y caduca en una hora.",
+    "resetTwoFactorInstanceConnected": "Su Gladys está conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Usuarios. El restablecimiento por correo electrónico solo está disponible cuando ninguna Gladys está conectada.",
+    "resetTwoFactorExpired": "Su sesión de inicio ha caducado: vuelva a iniciar sesión con su contraseña y solicite el restablecimiento.",
+    "resetTwoFactorTooMany": "Se envió un correo hace menos de un minuto: revise su bandeja de entrada (y el spam) antes de volver a solicitarlo.",
+    "resetTwoFactorError": "No se ha podido enviar el correo de restablecimiento. Inténtelo de nuevo más tarde.",
     "twoFactorHelp": "¿Código rechazado, teléfono nuevo? <a href=\"https://gladysassistant.com/es/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Consulte nuestra guía de solución de problemas de 2FA</a>.",
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
@@ -5614,10 +5633,15 @@
     "cardTitle": "Su aplicación de doble factor",
     "description": "¿Nuevo teléfono o nueva aplicación de doble factor? Registre en ella un nuevo secreto: su cuenta de Gladys Plus solo aceptará a partir de entonces los códigos de esta nueva aplicación.",
     "changeButton": "Cambiar mi aplicación de doble factor",
-    "replaceWarning": "Una vez confirmado, los códigos de su aplicación actual dejarán de aceptarse. Sus códigos de recuperación siguen siendo válidos.",
+    "replaceWarning": "Una vez confirmado, los códigos de su aplicación actual dejarán de aceptarse. Sus demás códigos de recuperación siguen siendo válidos.",
     "newCodeLabel": "Código mostrado por su nueva aplicación",
     "currentCodeLabel": "Código mostrado por su aplicación actual",
     "currentCodeHelp": "La pasarela requiere un código de la aplicación registrada actualmente para reemplazarla.",
+    "useRecoveryCodeLink": "¿Ha perdido su aplicación actual? Utilice un código de recuperación en su lugar.",
+    "useCurrentCodeLink": "Utilizar en su lugar un código de su aplicación actual.",
+    "currentRecoveryCodeLabel": "Uno de sus códigos de recuperación",
+    "currentRecoveryCodeHelp": "Este código de recuperación se consume con el reemplazo. Una vez configurada su nueva aplicación, genere un nuevo juego de códigos de recuperación más arriba.",
+    "invalidRecoveryCode": "El código de recuperación no es válido o ya se ha utilizado, o el código de su nueva aplicación es incorrecto o ha caducado. Inténtelo de nuevo con un nuevo código de su nueva aplicación.",
     "confirmButton": "Reemplazar mi aplicación de doble factor",
     "replacedSuccess": "Su aplicación de doble factor ha sido reemplazada. A partir de ahora, use su nueva aplicación para iniciar sesión en Gladys Plus.",
     "invalidCode": "Uno de los códigos no es válido o ha caducado. Vuelva a intentarlo con nuevos códigos generados por sus aplicaciones.",
@@ -7446,6 +7470,17 @@
     "dontHaveAccount": "¿Todavía no tiene una cuenta?",
     "signupLink": "Registrarse"
   },
+  "gatewayResetTwoFactor": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Restablecer la doble autenticación",
+    "description": "Ha solicitado restablecer la doble autenticación de su cuenta Gladys Plus. Una vez restablecida, su aplicación de autenticación y sus códigos de recuperación dejan de funcionar: en su próximo inicio de sesión, Gladys Plus le pedirá configurar una nueva aplicación y guardar nuevos códigos de recuperación.",
+    "button": "Restablecer mi doble autenticación",
+    "success": "Su doble autenticación ha sido restablecida. Inicie sesión con su contraseña: Gladys Plus le pedirá configurar una nueva aplicación de autenticación.",
+    "loginLink": "Iniciar sesión",
+    "errorLink": "Este enlace no es válido, ya se ha utilizado o ha caducado. Solicite uno nuevo desde la página de inicio de sesión.",
+    "instanceConnected": "Su Gladys vuelve a estar conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Usuarios. Este enlace sigue siendo válido mientras ninguna Gladys esté conectada.",
+    "error": "No se ha podido restablecer su doble autenticación. Inténtelo de nuevo más tarde."
+  },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Restablecer contraseña",
@@ -7464,7 +7499,8 @@
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
     "recoveryCodePlaceholder": "Introduzca uno de sus códigos de recuperación",
-    "resetPasswordButton": "Restablecer contraseña"
+    "resetPasswordButton": "Restablecer contraseña",
+    "resetTwoFactorThenComeBack": "Una vez restablecida su doble autenticación, vuelva a esta página: su enlace de restablecimiento de contraseña sigue siendo válido durante dos horas."
   },
   "gatewayOpenApi": {
     "title": "Open API",

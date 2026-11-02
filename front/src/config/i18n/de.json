@@ -4978,6 +4978,19 @@
         "help": "Das Gladys-Plus-Konto wird diesem Benutzer zugeordnet: Sein Fernzugriff erscheint dann auf der Karte des Benutzers, und er steuert Gladys als dieser Benutzer.",
         "error": "Dieses Gladys-Plus-Konto konnte nicht verknüpft werden. Prüfe, dass der Gladys-Benutzer nicht bereits mit einem anderen Konto verknüpft ist."
       },
+      "recoveryCodes": {
+        "button": "Wiederherstellungscodes",
+        "confirmText": "{{name}} hat die Zwei-Faktor-App und die Wiederherstellungscodes verloren? Deine Gladys, physisch bei dir zu Hause, ersetzt die App: Ein neuer Satz einmalig verwendbarer Wiederherstellungscodes wird für das Gladys-Plus-Konto erzeugt und hier einmal angezeigt. Die bisherigen Codes funktionieren sofort nicht mehr, und Gladys Plus versucht, die Person per E-Mail zu informieren: Sag es ihr auch selbst. Das Passwort bleibt für die Anmeldung erforderlich. Gib zur Bestätigung dein eigenes Gladys-Passwort ein.",
+        "passwordLabel": "Dein Gladys-Passwort",
+        "passwordPlaceholder": "Gib dein Gladys-Passwort ein",
+        "confirmButton": "Erzeugen",
+        "doneButton": "Ich habe die Wiederherstellungscodes gespeichert",
+        "errorWrongPassword": "Falsches Passwort.",
+        "errorTwoFactorNotEnabled": "Diese Person hat die Zwei-Faktor-Authentifizierung bei Gladys Plus nicht aktiviert: Sie braucht keine Wiederherstellungscodes.",
+        "errorUserNotFound": "Diese Person gehört nicht mehr zu deinem Gladys-Plus-Konto. Lade die Seite neu und versuche es erneut.",
+        "errorNetwork": "Deine Gladys ist nicht mit Gladys Plus verbunden: Prüfe ihre Internetverbindung und versuche es erneut.",
+        "error": "Die Wiederherstellungscodes konnten nicht erzeugt werden. Bitte versuche es erneut."
+      },
       "twoFactor": {
         "button": "Zwei-Faktor-Authentifizierung zurücksetzen",
         "confirmText": "{{name}} braucht weder die Authentifizierungs-App noch die Wiederherstellungscodes mehr: Die Anmeldung erfolgt mit dem Passwort, danach wird sofort eine neue App eingerichtet. Die Verschlüsselungsschlüssel und der Zugriff auf diese Gladys-Instanz ändern sich nicht. Die Person wird per E-Mail informiert. Gib zur Bestätigung den Code deiner eigenen Authentifizierungs-App ein.",
@@ -5588,7 +5601,13 @@
     "invalidRecoveryCode": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet.",
     "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
     "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
-    "noRecoveryCode": "Keinen Wiederherstellungscode? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
+    "noRecoveryCode": "Keinen Wiederherstellungscode mehr? Ein Administrator deiner Gladys kann unter Einstellungen › Benutzer neue erzeugen.",
+    "resetTwoFactorLink": "Keine Gladys verbunden? Setze deine Zwei-Faktor-Authentifizierung per E-Mail zurück.",
+    "resetTwoFactorEmailSent": "Wir haben dir eine E-Mail mit einem Link zum Zurücksetzen deiner Zwei-Faktor-Authentifizierung geschickt. Er funktioniert einmal und läuft in einer Stunde ab.",
+    "resetTwoFactorInstanceConnected": "Deine Gladys ist mit Gladys Plus verbunden: Ein Administrator deiner Gladys kann unter Einstellungen › Benutzer neue Wiederherstellungscodes erzeugen. Das Zurücksetzen per E-Mail ist nur möglich, wenn keine Gladys verbunden ist.",
+    "resetTwoFactorExpired": "Deine Anmeldesitzung ist abgelaufen: Melde dich erneut mit deinem Passwort an und fordere dann das Zurücksetzen an.",
+    "resetTwoFactorTooMany": "Vor weniger als einer Minute wurde eine E-Mail gesendet: Prüfe dein Postfach (und den Spam-Ordner), bevor du es erneut anforderst.",
+    "resetTwoFactorError": "Die E-Mail zum Zurücksetzen konnte nicht gesendet werden. Bitte versuche es später erneut.",
     "twoFactorHelp": "Code abgelehnt, neues Handy? <a href=\"https://gladysassistant.com/de/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Lies unsere 2FA-Hilfe zur Fehlerbehebung</a>.",
     "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
     "recoveryCodeLabel": "Wiederherstellungscode",
@@ -5614,10 +5633,15 @@
     "cardTitle": "Deine Zwei-Faktor-App",
     "description": "Neues Handy oder neue Zwei-Faktor-App? Registriere darin ein neues Geheimnis: Dein Gladys Plus Konto akzeptiert danach nur noch die Codes dieser neuen App.",
     "changeButton": "Meine Zwei-Faktor-App wechseln",
-    "replaceWarning": "Nach der Bestätigung werden die Codes deiner aktuellen App nicht mehr akzeptiert. Deine Wiederherstellungscodes bleiben gültig.",
+    "replaceWarning": "Nach der Bestätigung werden die Codes deiner aktuellen App nicht mehr akzeptiert. Deine übrigen Wiederherstellungscodes bleiben gültig.",
     "newCodeLabel": "Von deiner neuen App angezeigter Code",
     "currentCodeLabel": "Von deiner aktuellen App angezeigter Code",
     "currentCodeHelp": "Das Gateway verlangt einen Code der aktuell registrierten App, um sie zu ersetzen.",
+    "useRecoveryCodeLink": "Deine aktuelle App verloren? Verwende stattdessen einen Wiederherstellungscode.",
+    "useCurrentCodeLink": "Stattdessen einen Code deiner aktuellen App verwenden.",
+    "currentRecoveryCodeLabel": "Einer deiner Wiederherstellungscodes",
+    "currentRecoveryCodeHelp": "Dieser Wiederherstellungscode wird durch den Austausch verbraucht. Sobald deine neue App eingerichtet ist, erzeuge oben einen neuen Satz Wiederherstellungscodes.",
+    "invalidRecoveryCode": "Der Wiederherstellungscode ist ungültig oder bereits verwendet, oder der Code deiner neuen App ist falsch oder abgelaufen. Versuche es erneut mit einem neuen Code deiner neuen App.",
     "confirmButton": "Meine Zwei-Faktor-App ersetzen",
     "replacedSuccess": "Deine Zwei-Faktor-App wurde ersetzt. Melde dich ab jetzt mit deiner neuen App bei Gladys Plus an.",
     "invalidCode": "Einer der Codes ist ungültig oder abgelaufen. Versuche es erneut mit neuen Codes aus deinen Apps.",
@@ -7446,6 +7470,17 @@
     "dontHaveAccount": "Du hast noch keinen Account?",
     "signupLink": "Registrieren"
   },
+  "gatewayResetTwoFactor": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Zwei-Faktor-Authentifizierung zurücksetzen",
+    "description": "Du hast das Zurücksetzen der Zwei-Faktor-Authentifizierung deines Gladys-Plus-Kontos angefordert. Danach funktionieren deine Authentifizierungs-App und deine Wiederherstellungscodes nicht mehr: Bei deiner nächsten Anmeldung bittet dich Gladys Plus, eine neue App einzurichten und neue Wiederherstellungscodes zu speichern.",
+    "button": "Meine Zwei-Faktor-Authentifizierung zurücksetzen",
+    "success": "Deine Zwei-Faktor-Authentifizierung wurde zurückgesetzt. Melde dich mit deinem Passwort an: Gladys Plus bittet dich, eine neue Authentifizierungs-App einzurichten.",
+    "loginLink": "Anmelden",
+    "errorLink": "Dieser Link ist ungültig, bereits verwendet oder abgelaufen. Fordere auf der Anmeldeseite einen neuen an.",
+    "instanceConnected": "Deine Gladys ist wieder mit Gladys Plus verbunden: Ein Administrator deiner Gladys kann stattdessen unter Einstellungen › Benutzer neue Wiederherstellungscodes erzeugen. Dieser Link bleibt gültig, solange keine Gladys verbunden ist.",
+    "error": "Deine Zwei-Faktor-Authentifizierung konnte nicht zurückgesetzt werden. Bitte versuche es später erneut."
+  },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Passwort zurücksetzen",
@@ -7464,7 +7499,8 @@
     "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
     "recoveryCodeLabel": "Wiederherstellungscode",
     "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
-    "resetPasswordButton": "Passwort zurücksetzen"
+    "resetPasswordButton": "Passwort zurücksetzen",
+    "resetTwoFactorThenComeBack": "Sobald deine Zwei-Faktor-Authentifizierung zurückgesetzt ist, komm auf diese Seite zurück: Dein Link zum Zurücksetzen des Passworts bleibt zwei Stunden gültig."
   },
   "gatewayOpenApi": {
     "title": "Offene API",

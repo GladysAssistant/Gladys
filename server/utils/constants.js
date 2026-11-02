@@ -2415,6 +2415,10 @@ const ERROR_MESSAGES = {
   INVALID_ACCESS_TOKEN: 'INVALID_ACCESS_TOKEN',
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
   GLADYS_PLUS_PAYMENT_REQUIRED: 'GLADYS_PLUS_PAYMENT_REQUIRED',
+  // Gladys Plus recovery codes generated from this instance (settings > Gladys Plus)
+  GATEWAY_USER_NOT_FOUND: 'GATEWAY_USER_NOT_FOUND',
+  GATEWAY_TWO_FACTOR_NOT_ENABLED: 'GATEWAY_TWO_FACTOR_NOT_ENABLED',
+  WRONG_PASSWORD: 'WRONG_PASSWORD',
   // an integration widget answered with a content version this Gladys does
   // not render: the remedy is on the user's side (upgrade), not the integration's
   WIDGET_CONTENT_VERSION_UNSUPPORTED: 'WIDGET_CONTENT_VERSION_UNSUPPORTED',

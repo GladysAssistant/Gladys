@@ -1,5 +1,6 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import { RequestStatus } from '../../utils/consts';
 
 const ResetPassworFrom = ({ children, ...props }) => (
   <form onSubmit={props.resetPassword} className="card">
@@ -25,6 +26,22 @@ const ResetPassworFrom = ({ children, ...props }) => (
       {props.passwordNotMatching && (
         <div class="alert alert-warning" role="alert">
           <Text id="gatewayResetPassword.passwordNotMatchingLabel" />
+        </div>
+      )}
+      {props.twoFactorResetStatus === RequestStatus.Success && (
+        <div class="alert alert-success" role="alert">
+          <Text id="gatewayLogin.resetTwoFactorEmailSent" />{' '}
+          <Text id="gatewayResetPassword.resetTwoFactorThenComeBack" />
+        </div>
+      )}
+      {props.twoFactorResetStatus === RequestStatus.Error && (
+        <div class="alert alert-danger" role="alert">
+          {props.twoFactorResetError === 'INSTANCE_CONNECTED' && (
+            <Text id="gatewayLogin.resetTwoFactorInstanceConnected" />
+          )}
+          {props.twoFactorResetError === 'TOO_MANY' && <Text id="gatewayLogin.resetTwoFactorTooMany" />}
+          {props.twoFactorResetError === 'LINK' && <Text id="gatewayResetPassword.errorLinkLabel" />}
+          {props.twoFactorResetError === 'UNKNOWN' && <Text id="gatewayLogin.resetTwoFactorError" />}
         </div>
       )}
       <div className="form-group">
@@ -82,6 +99,14 @@ const ResetPassworFrom = ({ children, ...props }) => (
             </a>
             <br />
             <MarkupText id="gatewayLogin.noRecoveryCode" />
+            {props.twoFactorResetStatus !== RequestStatus.Success && (
+              <span>
+                {' '}
+                <a href="#" onClick={props.requestTwoFactorReset}>
+                  <Text id="gatewayLogin.resetTwoFactorLink" />
+                </a>
+              </span>
+            )}
           </p>
         </div>
       )}
@@ -107,6 +132,14 @@ const ResetPassworFrom = ({ children, ...props }) => (
             </a>
             <br />
             <MarkupText id="gatewayLogin.noRecoveryCode" />
+            {props.twoFactorResetStatus !== RequestStatus.Success && (
+              <span>
+                {' '}
+                <a href="#" onClick={props.requestTwoFactorReset}>
+                  <Text id="gatewayLogin.resetTwoFactorLink" />
+                </a>
+              </span>
+            )}
           </p>
         </div>
       )}

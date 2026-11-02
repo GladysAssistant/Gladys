@@ -29,6 +29,7 @@ import SignupGateway from '../routes/signup-gateway';
 import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
+import GatewayResetTwoFactor from '../routes/gateway-reset-two-factor';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
 import AlexaGateway from '../routes/integration/all/alexa-gateway';
@@ -269,6 +270,7 @@ const AppRouter = connect(
         {config.gatewayMode && <LinkGatewayUser path="/link-gateway-user" />}
         {config.gatewayMode && <SignupGateway path="/signup-gateway" />}
         {config.gatewayMode && <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />}
+        {config.gatewayMode && <GatewayResetTwoFactor path="/reset-two-factor" />}
         {config.gatewayMode && <GatewayConfirmEmail path="/confirm-email" />}
         {config.gatewayMode && <SettingsBilling path="/dashboard/settings/billing" />}
         {config.gatewayMode && <SettingsSecurityPage path="/dashboard/settings/security" />}

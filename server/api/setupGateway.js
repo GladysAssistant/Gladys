@@ -25,6 +25,7 @@ function setupGateway(gladys, routes) {
       keys,
       regex: pathToRegexp(path, keys),
       admin: routes[routeKey].admin,
+      localOnly: routes[routeKey].localOnly,
       controller: routes[routeKey].controller,
     };
   });
@@ -65,6 +66,12 @@ function setupGateway(gladys, routes) {
           errorMiddleware(new ForbiddenError('This route is only accessible to admin user.'), req, res);
           return null;
         }
+      }
+      // a route reserved to the local network (no rate limit runs on the tunnel, and
+      // the action is only meant for someone physically at home)
+      if (regexes[i - 1].localOnly) {
+        errorMiddleware(new ForbiddenError('This route is not accessible through Gladys Plus.'), req, res);
+        return null;
       }
       // and we call the controller
       regexes[i - 1].controller(req, res, (e) => {

@@ -37,6 +37,7 @@ const OPEN_PAGES = [
   '/login',
   '/forgot-password',
   '/reset-password',
+  '/reset-two-factor',
   '/gateway-configure-two-factor',
   '/signup-gateway',
   '/subscribe-gateway',
