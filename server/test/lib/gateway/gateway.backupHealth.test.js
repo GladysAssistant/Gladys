@@ -139,6 +139,42 @@ describe('gateway.backupHealth', () => {
       });
     });
 
+    it('should never throw, the backup is already on Gladys Plus', async () => {
+      variable.getValue = fake.rejects(new Error('db locked'));
+
+      await gateway.recordBackupSuccess();
+
+      assert.notCalled(message.sendSystemMessage);
+    });
+
+    it('should write in English to an admin whose language has no brain answers', async () => {
+      variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT, '2024-01-03T02:00:00.000Z');
+      user.getByRole = fake.resolves([{ language: 'de', selector: 'toto-de' }]);
+      brain.getReply = sinon.stub().callsFake((language, intent) => {
+        if (language === 'de') {
+          throw new Error(`Answer with intent ${intent} and language ${language} not found`);
+        }
+        return `${language}:${intent}`;
+      });
+
+      await gateway.recordBackupSuccess();
+
+      assert.calledWithExactly(message.sendSystemMessage, 'toto-de', 'en:backup.recovered', null, {
+        messageType: 'notification',
+      });
+    });
+
+    it('should not throw when no message can be built at all', async () => {
+      variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT, '2024-01-03T02:00:00.000Z');
+      brain.getReply = sinon.stub().throws(new Error('no answer at all'));
+
+      await gateway.recordBackupSuccess();
+
+      // the fallback to English was tried for each admin
+      assert.callCount(brain.getReply, 4);
+      assert.notCalled(message.sendSystemMessage);
+    });
+
     it('should tell the other admins when one cannot be reached', async () => {
       variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT, '2024-01-03T02:00:00.000Z');
       message.sendSystemMessage = sinon.stub().callsFake(async (selector) => {

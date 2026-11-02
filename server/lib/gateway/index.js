@@ -113,6 +113,11 @@ const Gateway = function Gateway(
   this.backupCatchUpHour = 10;
   this.backupCatchUpInitTimer = null;
   this.backupCatchUpSchedule = null;
+  // one backup at a time: the random delay before a backup, and the backup
+  // itself, keep the other checks (night, daytime, start-up, unlock) from
+  // scheduling a second one
+  this.pendingBackupTimer = null;
+  this.backupInProgress = false;
   this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({

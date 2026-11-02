@@ -59,6 +59,8 @@ const logMemoryUsage = async (label) => {
  */
 async function backup(jobId) {
   const linkGeneration = this.subscriptionLinkGeneration;
+  // checkIfBackupNeeded does not schedule another backup while this one runs
+  this.backupInProgress = true;
   try {
     // no point in dumping and encrypting the database when Gladys Plus will
     // refuse the upload anyway
@@ -192,7 +194,6 @@ async function backup(jobId) {
       await this.job.updateProgress(jobId, 100);
       // done!
       logger.info(`Gladys backup uploaded with success to Gladys Gateway.`);
-      await this.recordBackupSuccess();
       await logMemoryUsage('after upload');
     } catch (e) {
       await this.gladysGatewayClient.abortMultiPartBackup({
@@ -202,6 +203,9 @@ async function backup(jobId) {
       });
       throw e;
     }
+    // outside the multipart try: the upload is finalized, nothing here may
+    // abort it (recordBackupSuccess never throws anyway)
+    await this.recordBackupSuccess();
     return {
       encryptedBackupFilePath,
     };
@@ -217,6 +221,8 @@ async function backup(jobId) {
     // the one rethrown below
     await this.recordBackupFailure(e.toString());
     throw e;
+  } finally {
+    this.backupInProgress = false;
   }
 }
 

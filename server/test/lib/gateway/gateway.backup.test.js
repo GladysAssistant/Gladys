@@ -93,8 +93,30 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
     assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
+    // recorded once the upload is finalized, where nothing can abort it anymore
     assert.calledOnce(gateway.recordBackupSuccess);
+    assert.callOrder(gateway.gladysGatewayClient.finalizeMultiPartBackup, gateway.recordBackupSuccess);
+    assert.notCalled(gateway.gladysGatewayClient.abortMultiPartBackup);
     assert.notCalled(gateway.recordBackupFailure);
+    expect(gateway.backupInProgress).to.equal(false);
+  });
+
+  it('should be marked in progress while it runs, and not anymore once it failed', async () => {
+    let inProgressDuringUpload;
+    gateway.gladysGatewayClient.uploadOneBackupChunk = sinon.stub().callsFake(async () => {
+      inProgressDuringUpload = gateway.backupInProgress;
+      throw new Error('error');
+    });
+
+    try {
+      await gateway.backup();
+      assert.fail();
+    } catch (e) {
+      expect(e).haveOwnProperty('message', 'error');
+    }
+
+    expect(inProgressDuringUpload).to.equal(true);
+    expect(gateway.backupInProgress).to.equal(false);
   });
 
   it('should export the DuckDB backup as Parquet compressed with ZSTD', async () => {

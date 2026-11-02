@@ -11,6 +11,9 @@ async function disconnect() {
     // Disconnect from Gladys Gateway
     this.gladysGatewayClient.disconnect();
     this.connected = false;
+    // a backup scheduled for the account being unlinked must not start
+    clearTimeout(this.pendingBackupTimer);
+    this.pendingBackupTimer = null;
     // The payment lock goes with the account. From now on, a transition asked
     // by a call made for this account (a 402 still in flight) is dropped, and
     // the one in progress is left to finish before the state is reset, so that

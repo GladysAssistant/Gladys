@@ -77,6 +77,21 @@ describe('gateway.getBackups', () => {
     }
   });
 
+  it('should throw 500 error, not 403, when Gladys Plus answers another HTTP error', async () => {
+    // a 502 / 503 / 429 is Gladys Plus not answering, not a plan without backups
+    const error = new Error();
+    error.response = { status: 502 };
+    gateway.gladysGatewayClient.getBackups = fake.rejects(error);
+
+    try {
+      await gateway.getBackups();
+      expect.fail();
+    } catch (e) {
+      expect(e).instanceOf(Error500);
+      expect(e.error).to.equal('REQUEST_TO_THIRD_PARTY_FAILED');
+    }
+  });
+
   it('should lock Gladys Plus features and throw 402 when payment is required', async () => {
     const error = new Error();
     error.response = { status: 402, data: { error_code: 'PAYMENT_REQUIRED' } };

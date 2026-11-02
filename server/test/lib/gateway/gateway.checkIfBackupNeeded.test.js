@@ -153,10 +153,37 @@ describe('gateway.checkIfBackupNeeded', () => {
     assert.calledOnce(gateway.gladysGatewayClient.getBackups);
     // nothing to sync: no backup yet
     assert.notCalled(gateway.recordBackupSuccess);
+    expect(gateway.pendingBackupTimer).to.not.equal(null);
 
     // wait Xms and see if backup was called
     clock.tick(gateway.backupRandomInterval * 10);
     assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+    expect(gateway.pendingBackupTimer).to.equal(null);
+  });
+
+  it('should not schedule a second backup while one is pending', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([]);
+
+    // the night check, then the start-up catch-up during the random delay
+    await gateway.checkIfBackupNeeded();
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+  });
+
+  it('should not schedule a backup while one is in progress', async () => {
+    gateway.connected = true;
+    gateway.backupInProgress = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([]);
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.gladysGatewayClient.getBackups);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.notCalled(event.emit);
   });
 
   it('should check if backup is needed and execute backup as last is old', async () => {

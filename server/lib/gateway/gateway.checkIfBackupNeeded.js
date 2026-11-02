@@ -40,6 +40,18 @@ function getLocalDay(date, timezone) {
  * checkIfBackupNeeded();
  */
 async function checkIfBackupNeeded() {
+  // The checks overlap by design (night, daytime, start-up, subscription
+  // unlock): the Gateway list only shows a backup once it is uploaded, so
+  // a check running while one is pending or in progress would schedule a
+  // second one, and two backups at once empty the same folder
+  if (this.pendingBackupTimer !== null) {
+    logger.info(`A backup is already scheduled, not checking again.`);
+    return;
+  }
+  if (this.backupInProgress) {
+    logger.info(`A backup is in progress, not checking again.`);
+    return;
+  }
   if (!this.connected) {
     const refreshToken = await this.variable.getValue('GLADYS_GATEWAY_REFRESH_TOKEN');
     if (refreshToken === null) {
@@ -98,7 +110,8 @@ async function checkIfBackupNeeded() {
     // between now (0ms wait) and RAND_INTERVAL_IN_MS wait
     const randomMoment = generateRandomInteger(this.backupRandomInterval);
     logger.info(`Backup will be started in ${Math.round(randomMoment / 1000)} seconds`);
-    setTimeout(() => {
+    this.pendingBackupTimer = setTimeout(() => {
+      this.pendingBackupTimer = null;
       logger.info(`Starting backup!`);
       this.event.emit(EVENTS.GATEWAY.CREATE_BACKUP);
     }, randomMoment);

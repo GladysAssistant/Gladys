@@ -13,6 +13,9 @@ const FIRST_ALERT_DELAY_IN_MS = 36 * 60 * 60 * 1000;
 // then one reminder a week while it keeps failing, never more
 const REMINDER_INTERVAL_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
+// the brain answers exist in these languages only, see config/brain/index.js
+const FALLBACK_LANGUAGE = 'en';
+
 // error texts of the nights where no backup could even be attempted
 const BACKUP_ERRORS = {
   NOT_CONNECTED: 'Gladys is not connected to Gladys Plus',
@@ -33,6 +36,27 @@ function formatDate(isoDate, language, timezone) {
 }
 
 /**
+ * @description Get the message of an intent in the language of a user, in
+ * English when the brain has no answers in that language (the brain answers
+ * exist in en / fr / es, the interface has more languages).
+ * @param {object} gateway - The gateway instance.
+ * @param {string} language - The language of the user.
+ * @param {string} intent - The brain intent.
+ * @param {object} context - The context of the message.
+ * @returns {string} The message.
+ * @example
+ * getReply(this, 'de', 'backup.recovered', context);
+ */
+function getReply(gateway, language, intent, context) {
+  try {
+    return gateway.brain.getReply(language, intent, context);
+  } catch (e) {
+    logger.debug(`No "${intent}" answer in language ${language}, falling back to English`);
+    return gateway.brain.getReply(FALLBACK_LANGUAGE, intent, context);
+  }
+}
+
+/**
  * @description Tell the admins of this instance about the health of the
  * backups, in their language, through the channel of the system messages.
  * Best effort: one failing admin must not prevent the others from being told.
@@ -50,12 +74,12 @@ async function notifyAdmins(gateway, intent, { failingSince = null, lastSuccessA
   const timezone = await gateway.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   const admins = await gateway.user.getByRole(USER_ROLE.ADMIN);
   await Promise.each(admins, async (admin) => {
-    const text = gateway.brain.getReply(admin.language, intent, {
-      failingSinceDate: failingSince ? formatDate(failingSince, admin.language, timezone) : null,
-      lastSuccessDate: lastSuccessAt ? formatDate(lastSuccessAt, admin.language, timezone) : null,
-      errorMessage,
-    });
     try {
+      const text = getReply(gateway, admin.language, intent, {
+        failingSinceDate: failingSince ? formatDate(failingSince, admin.language, timezone) : null,
+        lastSuccessDate: lastSuccessAt ? formatDate(lastSuccessAt, admin.language, timezone) : null,
+        errorMessage,
+      });
       await gateway.message.sendSystemMessage(admin.selector, text, null, { messageType: 'notification' });
     } catch (e) {
       logger.error(`Unable to send the backup health message (${intent}) to ${admin.selector}`, e);
@@ -87,22 +111,29 @@ async function getBackupHealth() {
 /**
  * @description A backup was uploaded: close the failure streak, and tell the
  * admins that backups work again when they had been warned of a problem.
+ * Never throws: the backup is on Gladys Plus, a bookkeeping error must not
+ * turn it into a failure.
  * @param {Date} [date] - When the backup was uploaded, now by default.
  * @returns {Promise} Resolve when the state is saved.
  * @example
  * await gateway.recordBackupSuccess();
  */
 async function recordBackupSuccess(date = new Date()) {
-  const health = await this.getBackupHealth();
-  await this.variable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT, date.toISOString());
-  await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE);
-  await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR);
-  if (health.alert_sent_at === null) {
-    return;
+  try {
+    const health = await this.getBackupHealth();
+    await this.variable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT, date.toISOString());
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE);
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR);
+    if (health.alert_sent_at === null) {
+      return;
+    }
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT);
+    logger.info('Gateway backup: backups are working again, telling the admins.');
+    await notifyAdmins(this, 'backup.recovered', { lastSuccessAt: date.toISOString() });
+  } catch (e) {
+    logger.warn('Gateway backup: unable to record the backup success');
+    logger.warn(e);
   }
-  await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT);
-  logger.info('Gateway backup: backups are working again, telling the admins.');
-  await notifyAdmins(this, 'backup.recovered', { lastSuccessAt: date.toISOString() });
 }
 
 /**
