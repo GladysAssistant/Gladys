@@ -14,7 +14,7 @@ function getBatteryPercent(voltage, minVolt, maxVolt) {
   if (voltage >= maxVolt) {
     return 100;
   }
-  return Math.round(((maxVolt - voltage) / (maxVolt - minVolt)) * 100);
+  return Math.round(((voltage - minVolt) / (maxVolt - minVolt)) * 100);
 }
 
 module.exports = {
