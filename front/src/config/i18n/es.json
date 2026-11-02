@@ -4974,6 +4974,17 @@
         "toThisUser": "Vincular a {{name}}",
         "help": "La cuenta de Gladys Plus se asocia a ese usuario: su acceso remoto aparece entonces en la tarjeta del usuario, y controla Gladys como ese usuario.",
         "error": "No se pudo vincular esta cuenta de Gladys Plus. Compruebe que el usuario de Gladys no esté ya vinculado a otra cuenta."
+      },
+      "twoFactor": {
+        "button": "Restablecer la autenticación de dos factores",
+        "confirmText": "{{name}} ya no necesitará su aplicación de autenticación ni sus códigos de recuperación: iniciará sesión con su contraseña y configurará de inmediato una nueva aplicación. Sus claves de cifrado y su acceso a esta instancia de Gladys no cambian. Se le avisará por correo. Para confirmar, introduzca el código de su propia aplicación de autenticación.",
+        "codeLabel": "Su código de dos factores",
+        "codePlaceholder": "123456",
+        "confirmButton": "Restablecer",
+        "success": "Autenticación de dos factores restablecida. Esta persona puede iniciar sesión con su contraseña y configurar una nueva aplicación de autenticación.",
+        "errorWrongCode": "Código incorrecto. Introduzca el código actual de su propia aplicación de autenticación.",
+        "errorTooManyAttempts": "Demasiados códigos incorrectos: espere unos minutos antes de volver a intentarlo.",
+        "error": "No se pudo restablecer la autenticación de dos factores de este usuario."
       }
     },
     "searchPlaceholder": "Buscar usuarios",

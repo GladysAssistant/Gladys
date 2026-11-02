@@ -282,6 +282,38 @@
   margin: 0;
 }
 
+.quietAction {
+  background: transparent;
+  border: none;
+  color: var(--gl-muted, #7c8396);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.quietAction:hover {
+  background: rgba(28, 35, 52, 0.07);
+  color: var(--gl-ink, #1c2334);
+}
+
+/* the admin's own code, asked before resetting another user's two factor */
+.twoFactorFields {
+  max-width: 36rem;
+}
+
+.twoFactorRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.twoFactorInput {
+  flex: 0 1 9rem;
+  min-width: 7rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.15em;
+}
+
 .quietDanger {
   background: transparent;
   border: none;

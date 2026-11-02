@@ -210,6 +210,13 @@ class SettingsUsers extends Component {
     }
   };
 
+  // Reset the two factor of a Plus user who lost their authenticator (Plus admin,
+  // confirming with their own code): the user signs in with their password and sets
+  // up a new authenticator; their keys and local authorization do not change
+  resetRemoteTwoFactor = async (remote, twoFactorCode) => {
+    await this.props.session.resetAccountUserTwoFactor(remote.id, twoFactorCode);
+  };
+
   // remove a user (or cancel an invitation) from the Gladys Plus account
   revokeRemote = async remote => {
     this.setState({ revokeError: false });
@@ -276,6 +283,7 @@ class SettingsUsers extends Component {
           deleteUser={this.deleteUser}
           inviteUser={this.inviteUser}
           linkRemote={this.linkRemote}
+          resetRemoteTwoFactor={this.resetRemoteTwoFactor}
           revokeRemote={this.revokeRemote}
         />
       </SettingsLayout>

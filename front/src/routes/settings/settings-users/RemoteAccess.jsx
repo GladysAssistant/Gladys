@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { Text, MarkupText, Localizer } from 'preact-i18n';
+import get from 'get-value';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../utils/consts';
@@ -131,6 +132,39 @@ class RemoteAccess extends Component {
     }
   };
 
+  askResetTwoFactor = () => {
+    this.setState({ resetTwoFactorOpen: true, resetTwoFactorCode: '', resetTwoFactorStatus: null });
+  };
+
+  cancelResetTwoFactor = () => {
+    this.setState({ resetTwoFactorOpen: false, resetTwoFactorStatus: null });
+  };
+
+  updateResetTwoFactorCode = e => {
+    this.setState({ resetTwoFactorCode: e.target.value, resetTwoFactorStatus: null });
+  };
+
+  resetTwoFactor = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ resetTwoFactorStatus: RequestStatus.Getting });
+    try {
+      await this.props.resetRemoteTwoFactor(this.props.remote, this.state.resetTwoFactorCode);
+      this.setState({ resetTwoFactorOpen: false, resetTwoFactorStatus: RequestStatus.Success });
+    } catch (err) {
+      console.error(err);
+      const httpStatus = get(err, 'response.status');
+      let status = RequestStatus.Error;
+      if (httpStatus === 403) {
+        status = RequestStatus.ValidationError;
+      } else if (httpStatus === 429) {
+        status = RequestStatus.RateLimitError;
+      }
+      this.setState({ resetTwoFactorStatus: status });
+    }
+  };
+
   selectLinkUser = e => {
     this.setState({ linkUserId: e.target.value, linkStatus: null });
   };
@@ -164,7 +198,19 @@ class RemoteAccess extends Component {
 
   render(
     props,
-    { confirmRevoke, revoking, inviteOpen, inviteEmail, inviteRole, inviteStatus, linkUserId, linkStatus }
+    {
+      confirmRevoke,
+      revoking,
+      inviteOpen,
+      inviteEmail,
+      inviteRole,
+      inviteStatus,
+      linkUserId,
+      linkStatus,
+      resetTwoFactorOpen,
+      resetTwoFactorCode,
+      resetTwoFactorStatus
+    }
   ) {
     const { remote, user, gatewayMode, isAdmin, isPlusAdmin, plusMe, language } = props;
     const status = remote ? remote.status : REMOTE_STATUS.NONE;
@@ -181,6 +227,18 @@ class RemoteAccess extends Component {
     const canInvite = status === REMOTE_STATUS.NONE && gatewayMode && isPlusAdmin && user;
     const isMe = Boolean(remote && plusMe && remote.id === plusMe.id);
     const canRevoke = Boolean(remote && remote.account && gatewayMode && isPlusAdmin && !isMe);
+    // a Plus admin can reset the second factor of another user of the account who
+    // lost their authenticator (confirming with their own code); never their own
+    const canResetTwoFactor = Boolean(
+      remote &&
+        remote.account &&
+        !remote.isInvitation &&
+        gatewayMode &&
+        isPlusAdmin &&
+        !isMe &&
+        props.resetRemoteTwoFactor
+    );
+    const resettingTwoFactor = resetTwoFactorStatus === RequestStatus.Getting;
     const account = remote && remote.account;
     // a Plus admin can attach a Plus account or a pending invitation to a Gladys user:
     // in one click on the card it was recognized on (by email), or through a select
@@ -284,7 +342,12 @@ class RemoteAccess extends Component {
                 <i class="fe fe-external-link" /> <Text id="usersSettings.plus.inviteFromPlus" />
               </a>
             )}
-            {canRevoke && !confirmRevoke && (
+            {canResetTwoFactor && !resetTwoFactorOpen && !confirmRevoke && (
+              <button type="button" class={cx('btn btn-sm', style.quietAction)} onClick={this.askResetTwoFactor}>
+                <i class="fe fe-shield-off" /> <Text id="usersSettings.plus.twoFactor.button" />
+              </button>
+            )}
+            {canRevoke && !confirmRevoke && !resetTwoFactorOpen && (
               <button type="button" class={cx('btn btn-sm', style.quietDanger)} onClick={this.askRevoke}>
                 <i class="fe fe-user-x" />{' '}
                 <Text
@@ -405,6 +468,66 @@ class RemoteAccess extends Component {
               </div>
             )}
           </form>
+        )}
+        {canResetTwoFactor && resetTwoFactorOpen && (
+          <form class={style.confirmBox} onSubmit={this.resetTwoFactor}>
+            <div class="alert alert-warning mb-2" role="alert">
+              <Text id="usersSettings.plus.twoFactor.confirmText" fields={{ name: remote.name || remote.email }} />
+            </div>
+            <div class={style.twoFactorFields}>
+              <label class="form-label" for={`reset-two-factor-${remote.id}`}>
+                <Text id="usersSettings.plus.twoFactor.codeLabel" />
+              </label>
+              <div class={style.twoFactorRow}>
+                <Localizer>
+                  <input
+                    id={`reset-two-factor-${remote.id}`}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    class={cx('form-control', style.twoFactorInput, {
+                      'is-invalid': resetTwoFactorStatus === RequestStatus.ValidationError
+                    })}
+                    placeholder={<Text id="usersSettings.plus.twoFactor.codePlaceholder" />}
+                    value={resetTwoFactorCode}
+                    onInput={this.updateResetTwoFactorCode}
+                    maxLength={6}
+                    required
+                  />
+                </Localizer>
+                <button
+                  type="submit"
+                  class={cx('btn btn-danger btn-sm', { 'btn-loading': resettingTwoFactor })}
+                  disabled={resettingTwoFactor || !resetTwoFactorCode}
+                >
+                  <i class="fe fe-shield-off" /> <Text id="usersSettings.plus.twoFactor.confirmButton" />
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onClick={this.cancelResetTwoFactor}>
+                  <Text id="usersSettings.plus.cancel" />
+                </button>
+              </div>
+            </div>
+            {resetTwoFactorStatus === RequestStatus.ValidationError && (
+              <div class="alert alert-danger mt-2 mb-0" role="alert">
+                <Text id="usersSettings.plus.twoFactor.errorWrongCode" />
+              </div>
+            )}
+            {resetTwoFactorStatus === RequestStatus.RateLimitError && (
+              <div class="alert alert-danger mt-2 mb-0" role="alert">
+                <Text id="usersSettings.plus.twoFactor.errorTooManyAttempts" />
+              </div>
+            )}
+            {resetTwoFactorStatus === RequestStatus.Error && (
+              <div class="alert alert-danger mt-2 mb-0" role="alert">
+                <Text id="usersSettings.plus.twoFactor.error" />
+              </div>
+            )}
+          </form>
+        )}
+        {resetTwoFactorStatus === RequestStatus.Success && !resetTwoFactorOpen && (
+          <div class={cx('alert alert-success mb-0', style.remoteAlert)} role="status">
+            <Text id="usersSettings.plus.twoFactor.success" />
+          </div>
         )}
         {confirmRevoke && (
           <div class={style.confirmBox}>

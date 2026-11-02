@@ -4974,6 +4974,17 @@
         "toThisUser": "Mit {{name}} verknüpfen",
         "help": "Das Gladys-Plus-Konto wird diesem Benutzer zugeordnet: Sein Fernzugriff erscheint dann auf der Karte des Benutzers, und er steuert Gladys als dieser Benutzer.",
         "error": "Dieses Gladys-Plus-Konto konnte nicht verknüpft werden. Prüfe, dass der Gladys-Benutzer nicht bereits mit einem anderen Konto verknüpft ist."
+      },
+      "twoFactor": {
+        "button": "Zwei-Faktor-Authentifizierung zurücksetzen",
+        "confirmText": "{{name}} braucht weder die Authentifizierungs-App noch die Wiederherstellungscodes mehr: Die Anmeldung erfolgt mit dem Passwort, danach wird sofort eine neue App eingerichtet. Die Verschlüsselungsschlüssel und der Zugriff auf diese Gladys-Instanz ändern sich nicht. Die Person wird per E-Mail informiert. Gib zur Bestätigung den Code deiner eigenen Authentifizierungs-App ein.",
+        "codeLabel": "Dein Zwei-Faktor-Code",
+        "codePlaceholder": "123456",
+        "confirmButton": "Zurücksetzen",
+        "success": "Zwei-Faktor-Authentifizierung zurückgesetzt. Die Person kann sich mit ihrem Passwort anmelden und eine neue Authentifizierungs-App einrichten.",
+        "errorWrongCode": "Falscher Code. Gib den aktuellen Code deiner eigenen Authentifizierungs-App ein.",
+        "errorTooManyAttempts": "Zu viele falsche Codes: Warte einige Minuten, bevor du es erneut versuchst.",
+        "error": "Die Zwei-Faktor-Authentifizierung dieses Benutzers konnte nicht zurückgesetzt werden."
       }
     },
     "searchPlaceholder": "Benutzer suchen",

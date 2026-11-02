@@ -146,6 +146,17 @@ class GatewaySession {
     );
   }
 
+  // Reset the two factor of a user of the Gladys Plus account who lost their
+  // authenticator, as an admin of the account confirming with their OWN current code
+  // (POST /accounts/users/:id/reset-two-factor)
+  async resetAccountUserTwoFactor(plusUserId, twoFactorCode) {
+    return gatewayRequest.post(
+      `${this.gladysGatewayApiUrl}/accounts/users/${plusUserId}/reset-two-factor`,
+      { two_factor_code: twoFactorCode },
+      this.gatewayClient
+    );
+  }
+
   // Replacing the two-factor app of the Gladys Plus account is a user operation
   // (user-scoped routes): it is only possible from the Gladys Plus interface, where
   // the Gladys Plus user is the one logged in. The client library has no method for

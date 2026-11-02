@@ -4974,6 +4974,17 @@
         "toThisUser": "Rattacher à {{name}}",
         "help": "Le compte Gladys Plus est rattaché à cet utilisateur : son accès à distance s'affiche alors sur la carte de l'utilisateur, et il contrôle Gladys en tant que cet utilisateur.",
         "error": "Impossible de rattacher ce compte Gladys Plus. Vérifiez que l'utilisateur Gladys n'est pas déjà rattaché à un autre compte."
+      },
+      "twoFactor": {
+        "button": "Réinitialiser la double authentification",
+        "confirmText": "{{name}} n'aura plus besoin de son application d'authentification ni de ses codes de récupération : il se connectera avec son mot de passe et configurera aussitôt une nouvelle application. Ses clés de chiffrement et son accès à cette instance Gladys ne changent pas. Il sera prévenu par e-mail. Pour confirmer, saisissez le code de votre propre application d'authentification.",
+        "codeLabel": "Votre code de double authentification",
+        "codePlaceholder": "123456",
+        "confirmButton": "Réinitialiser",
+        "success": "Double authentification réinitialisée. Cette personne peut se connecter avec son mot de passe et configurer une nouvelle application d'authentification.",
+        "errorWrongCode": "Code incorrect. Saisissez le code actuel de votre propre application d'authentification.",
+        "errorTooManyAttempts": "Trop de codes incorrects : attendez quelques minutes avant de réessayer.",
+        "error": "Impossible de réinitialiser la double authentification de cet utilisateur."
       }
     },
     "searchPlaceholder": "Chercher un utilisateur",
