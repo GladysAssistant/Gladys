@@ -18,7 +18,37 @@ const {
   clearModuleStop,
 } = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
-const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
+const {
+  presetName,
+  savePreset,
+  setManualHold,
+  clearManualHold,
+  isStopped,
+  getPreset,
+  getManualHold,
+} = require('./thermostat.state');
+const { getCurrentPoint } = require('./thermostat.getSchedules');
+
+/**
+ * @description Whether a thermostat started now goes straight back to an Off
+ * point of its programme: it follows the programme — no hold, no preset picked —
+ * and the point in force is Off. Such a start hands the thermostat back to the
+ * programme, which keeps the unit off: powering it on first, as any other start
+ * does, switched the unit on and the pass that followed switched it off again.
+ * @param {object} device - The thermostat being started.
+ * @returns {Promise<boolean>} True when the programme keeps it off.
+ * @example
+ * await startsOnOffPoint(device);
+ */
+async function startsOnOffPoint(device) {
+  const preset = getPreset(device);
+  if (getManualHold(device) || (preset !== null && preset !== 'schedule')) {
+    return false;
+  }
+  const schedule = await getScheduleOfDevice(device.id);
+  const point = schedule ? await getCurrentPoint(schedule.id) : null;
+  return Boolean(point && point.preset === 'off');
+}
 
 /**
  * @description The setpoint a preset arms its hold on, in the unit the hold is
@@ -236,7 +266,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
         );
       }
       await clearManualHold.call(this, device);
-    } else if (starting && isExternal(config)) {
+    } else if (starting && isExternal(config) && !(await startsOnOffPoint(device))) {
       // The power and the mode go first in this direction too. Left to the next
       // pass, they reached the appliance two seconds after the setpoint the widget
       // sends right behind a start: a thermostat still off was handed a target to ignore.

@@ -885,7 +885,13 @@ class ThermostatBox extends Component {
       this.setState({ isManualMode: false, manualUntil: null, manualSetpointOverride: false });
       this.refreshFromDevice();
     } else if (isManual !== this.state.isManualMode && !this.savingPreset) {
-      this.setState({ isManualMode: isManual });
+      // The expiry comes with it: without one the banner falls back to the
+      // schedule's, and a hold armed from the unit's remote on an Off point read
+      // "Off until 20:00" while the unit ran on the remote's setpoint.
+      this.setState({
+        isManualMode: isManual,
+        ...(isManual && payload.until && payload.until > Date.now() ? { manualUntil: payload.until } : {})
+      });
     } else if (isManual && payload.until) {
       // The server's expiry always wins over the one shown meanwhile: it is the
       // moment the loop will actually hand the thermostat back. The widget can
@@ -1468,6 +1474,17 @@ class ThermostatBox extends Component {
   // `off` is the exception, because stopping is a mode rather than a preset: it
   // goes to the mode feature instead.
   selectPreset = async preset => {
+    // Off over a hold taken on an Off point of the programme — the unit switched
+    // on from its remote, a preset picked: the programme already says off, so
+    // Off ends the hold and hands the thermostat back to it rather than stopping
+    // it. Stopped, it sat in manual mode asking to resume a programme that said
+    // the very same thing. With no hold, Off still stops it: a stop for the
+    // season must be possible on an Off point too.
+    const current = this.state.activeSchedule && this.state.activeSchedule.current;
+    if (preset.key === 'off' && current && current.preset === 'off' && this.state.isManualMode && !this.isStopped()) {
+      await this.cancelManualMode();
+      return;
+    }
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
     const newSetpoint =
