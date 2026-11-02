@@ -18,6 +18,12 @@ const SOURCE_RESOLVERS = {
     const houses = await db.House.findAll({ attributes: ['selector'] });
     return houses.map((house) => house.selector);
   },
+  // the device features of every integration, with what the per-field
+  // `feature_filters` match on (see validateConfigValue.getValidValues)
+  device_features: async () => {
+    const features = await db.DeviceFeature.findAll({ attributes: ['selector', 'category', 'type'] });
+    return features.map(({ selector, category, type }) => ({ selector, category, type }));
+  },
 };
 
 /**

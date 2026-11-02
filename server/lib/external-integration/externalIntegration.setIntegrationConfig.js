@@ -1,5 +1,5 @@
 const { BadParameters, ForbiddenError } = require('../../utils/coreErrors');
-const { RESERVED_PARAM_PREFIX } = require('./constants');
+const { RESERVED_PARAM_PREFIX, DEVICE_FEATURES_SOURCE } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
 
@@ -52,7 +52,13 @@ async function setIntegrationConfig(service, config) {
     configSchema.some((field) => field.key === key && field.source === 'houses'),
   );
   const checkChosenHouses = writesHouseField && service.manifest.location !== true;
-  const storedConfig = checkChosenHouses ? await this.getIntegrationConfig(service) : {};
+  // a `device_features` field is the user's designation of what the
+  // integration may read, whatever its manifest declares: the integration
+  // may only write it back unchanged (a no-op, same rules as a house)
+  const writesDeviceFeatureField = keys.some((key) =>
+    configSchema.some((field) => field.key === key && field.source === DEVICE_FEATURES_SOURCE),
+  );
+  const storedConfig = checkChosenHouses || writesDeviceFeatureField ? await this.getIntegrationConfig(service) : {};
   // the unchanged write-backs of a `houses` field are never persisted: a
   // real no-op, which cannot restore a stale value over a choice the user
   // saved in between
@@ -68,6 +74,12 @@ async function setIntegrationConfig(service, config) {
       throw new BadParameters(`config.${key}: ${RESERVED_PARAM_PREFIX}* keys are reserved`);
     }
     const field = configSchema.find((schemaField) => schemaField.key === key);
+    if (field && field.source === DEVICE_FEATURES_SOURCE) {
+      if (!isUnchangedValue(config[key], storedConfig[key])) {
+        throw new ForbiddenError(`config.${key}: only the user designates the device features of this field`);
+      }
+      return;
+    }
     if (checkChosenHouses && field && field.source === 'houses') {
       if (!isUnchangedValue(config[key], storedConfig[key])) {
         throw new ForbiddenError(

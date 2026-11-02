@@ -1,6 +1,12 @@
-const { ACCOUNT_FIELD_TYPES, PREFER_LOCAL_CONFIG_KEY, OPEN_API_KEY_CONFIG_KEY } = require('./constants');
+const {
+  ACCOUNT_FIELD_TYPES,
+  PREFER_LOCAL_CONFIG_KEY,
+  OPEN_API_KEY_CONFIG_KEY,
+  DEVICE_FEATURES_SOURCE,
+} = require('./constants');
 const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
 const { hasWebhooks } = require('./externalIntegration.getWebhooks');
+const { getDeviceFeatureDesignations } = require('./externalIntegration.deviceFeatureRead');
 
 /**
  * @description Get the config of an integration for the frontend
@@ -10,6 +16,10 @@ const { hasWebhooks } = require('./externalIntegration.getWebhooks');
  * always null, with a `configured_secrets` flag saying if they are set.
  * When the manifest declares both transports, the reserved
  * GLADYS_PREFER_LOCAL preference is included too (the standard toggle).
+ * A `source: "device_features"` field shows the user's recorded grant
+ * (null / [] without one), never the config variable: a leftover value of
+ * the key, stored by the integration before the field existed, must not be
+ * shown as picked and turned into a grant by the next Save.
  * @param {string} selector - The selector of the external integration.
  * @returns {Promise<object>} Resolve with { config, configured_secrets }.
  * @example
@@ -19,6 +29,7 @@ async function getConfigForFront(selector) {
   const service = await this.getBySelector(selector);
   const configSchema = (service.manifest && service.manifest.config_schema) || [];
   const fullConfig = await this.getIntegrationConfig(service);
+  const designations = await getDeviceFeatureDesignations.call(this, service);
   const preferLocal = hasDualTransports(service.manifest) ? fullConfig[PREFER_LOCAL_CONFIG_KEY] : undefined;
   const config = {};
   const configuredSecrets = [];
@@ -32,6 +43,13 @@ async function getConfigForFront(selector) {
       config[field.key] = null;
       if (hasValue) {
         configuredSecrets.push(field.key);
+      }
+    } else if (field.source === DEVICE_FEATURES_SOURCE) {
+      const designated = designations[field.key] || [];
+      if (field.type === 'multi_select') {
+        config[field.key] = designated;
+      } else {
+        config[field.key] = designated.length > 0 ? designated[0] : null;
       }
     } else if (ACCOUNT_FIELD_TYPES.includes(field.type)) {
       // nothing is ever stored under those keys (the credentials live

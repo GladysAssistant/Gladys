@@ -82,11 +82,15 @@ class SelectDeviceFeature extends Component {
       });
 
       let devicesWithoutRoom = [];
+      // a failed secondary fetch leaves the list incomplete: callers must not
+      // mistake the missing no-room features for withdrawn ones
+      let loadedAllDevices = true;
       try {
         const allDevices = await this.props.httpClient.get('/api/v1/device');
         devicesWithoutRoom = allDevices.filter(device => !device.room_id);
       } catch (e) {
         console.error('Could not load devices without room', e);
+        loadedAllDevices = false;
       }
 
       const noRoomDeviceFeatures = [];
@@ -101,6 +105,12 @@ class SelectDeviceFeature extends Component {
 
       await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
       await this.refreshSelectedOptions(this.props);
+      // optional: tell the caller every feature is known, so it can tell a
+      // stored selector that no longer resolves from a list still loading (or
+      // one whose devices without room could not be loaded)
+      if (loadedAllDevices && typeof this.props.onOptionsLoaded === 'function') {
+        this.props.onOptionsLoaded(deviceFeaturesDictionnary);
+      }
       return deviceOptions;
     } catch (e) {
       console.error(e);
@@ -206,7 +216,9 @@ class SelectDeviceFeature extends Component {
         option => excludedDeviceFeatures.indexOf(option.value) === -1
       );
     }
-    if (!this.props.isMulti || selectedOptions.length === 0) {
+    // a designation list (the device_features config fields of external
+    // integrations) mixes kinds on purpose: import and export power, indexes...
+    if (!this.props.isMulti || this.props.allowMixedFeatures || selectedOptions.length === 0) {
       return displayedOptions;
     }
     const firstFeature = deviceFeaturesDictionnary[selectedOptions[0].value];
@@ -256,6 +268,7 @@ class SelectDeviceFeature extends Component {
         class="select-device-feature"
         defaultValue={props.isMulti ? [] : ''}
         isMulti={props.isMulti}
+        isClearable={props.isClearable}
         value={props.isMulti ? selectedOptions : selectedOption}
         onChange={this.handleChange}
         options={this.getDisplayedOptions()}

@@ -1,5 +1,10 @@
 const db = require('../../models');
-const { RESERVED_PARAM_PREFIX, PREFER_LOCAL_CONFIG_KEY, MANIFEST_TRANSPORTS } = require('./constants');
+const {
+  RESERVED_PARAM_PREFIX,
+  PREFER_LOCAL_CONFIG_KEY,
+  MANIFEST_TRANSPORTS,
+  DEVICE_FEATURES_GRANT_KEY,
+} = require('./constants');
 
 /**
  * @description True when the manifest declares both the local and cloud
@@ -37,6 +42,10 @@ async function getIntegrationConfig(service) {
   });
   const config = {};
   variables.forEach((variable) => {
+    if (variable.name === DEVICE_FEATURES_GRANT_KEY) {
+      // core-owned record of the user's designations, not a config value
+      return;
+    }
     const key = variable.name.startsWith(RESERVED_PARAM_PREFIX) ? variable.name : variable.name.toLowerCase();
     try {
       config[key] = JSON.parse(variable.value);

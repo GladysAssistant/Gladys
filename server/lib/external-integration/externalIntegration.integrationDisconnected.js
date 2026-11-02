@@ -22,6 +22,7 @@ async function integrationDisconnected(service, ws) {
     return;
   }
   this.connections.delete(service.id);
+  this.deviceFeatureReadGrants.delete(service.id);
   const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
   if (serviceInDb !== null && serviceInDb.status === SERVICE_STATUS.RUNNING) {
     await this.saveStatus(service, SERVICE_STATUS.DEGRADED);

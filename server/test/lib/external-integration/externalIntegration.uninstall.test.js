@@ -139,6 +139,22 @@ describe('externalIntegration.uninstall', () => {
     expect(externalIntegration.cameraImageRateLimits.has('ext:ext-dev-other-integration:camera-1')).to.equal(true);
   });
 
+  it('should drop the designated features and their read rate limits of the integration only', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration } = buildSupervisor();
+    const rateLimit = () => ({ count: 1, resetAt: Date.now() + 60 * 1000 });
+    externalIntegration.connections.set(service.id, { terminate: fake.returns(null) });
+    externalIntegration.deviceFeatureReadGrants.set(service.id, { service, selectors: new Set(['a']) });
+    externalIntegration.deviceFeatureReadGrants.set('other-service-id', { service: {}, selectors: new Set(['a']) });
+    externalIntegration.deviceFeatureStateRateLimits.set(service.id, rateLimit());
+    externalIntegration.deviceFeatureAggregateRateLimits.set(service.id, rateLimit());
+    await externalIntegration.uninstall(service.selector);
+    expect(externalIntegration.deviceFeatureReadGrants.has(service.id)).to.equal(false);
+    expect(externalIntegration.deviceFeatureReadGrants.has('other-service-id')).to.equal(true);
+    expect(externalIntegration.deviceFeatureStateRateLimits.has(service.id)).to.equal(false);
+    expect(externalIntegration.deviceFeatureAggregateRateLimits.has(service.id)).to.equal(false);
+  });
+
   it('should throw on unknown integration', async () => {
     const { externalIntegration } = buildSupervisor();
     try {

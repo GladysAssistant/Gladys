@@ -1,4 +1,8 @@
-import { DYNAMIC_SOURCES } from '../../../../server/lib/external-integration/constants';
+import {
+  DYNAMIC_SOURCES,
+  DEVICE_FEATURES_EXCLUDED_CATEGORIES,
+  DEVICE_FEATURES_EXCLUDED_TYPES
+} from '../../../../server/lib/external-integration/constants';
 
 // The options of the select/multi_select fields whose `source` is a
 // core-defined dynamic source, shared by every screen rendering the manifest
@@ -20,9 +24,27 @@ const SOURCE_LOADERS = {
   }
 };
 
+// "device_features" is a source too, but its picker (SelectDeviceFeature)
+// loads the features itself: only the list sources are fetched here
 const getDynamicSources = fields => [
-  ...new Set((fields || []).map(field => field.source).filter(source => DYNAMIC_SOURCES.includes(source)))
+  ...new Set(
+    (fields || [])
+      .map(field => field.source)
+      .filter(source => DYNAMIC_SOURCES.includes(source) && SOURCE_LOADERS[source])
+  )
 ];
+
+// A `source: "device_features"` field narrows its picker with its required
+// `feature_filters` ([{ category, type? }]): same rule as the server
+// (validateConfigValue.matchesFeatureFilters), fails closed without filters,
+// and a camera image is never offered
+const matchesFeatureFilters = (field, feature) =>
+  Array.isArray(field.feature_filters) &&
+  !DEVICE_FEATURES_EXCLUDED_CATEGORIES.includes(feature.category) &&
+  !DEVICE_FEATURES_EXCLUDED_TYPES.includes(feature.type) &&
+  field.feature_filters.some(
+    filter => filter.category === feature.category && (filter.type === undefined || filter.type === feature.type)
+  );
 
 // true when at least one field takes its options from a dynamic source
 const hasDynamicSource = fields => getDynamicSources(fields).length > 0;
@@ -52,4 +74,4 @@ const fetchDynamicOptions = async (httpClient, integrationSelector, fields) => {
   return dynamicOptions;
 };
 
-export { hasDynamicSource, fetchDynamicOptions };
+export { hasDynamicSource, fetchDynamicOptions, matchesFeatureFilters };

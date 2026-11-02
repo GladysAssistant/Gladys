@@ -23,6 +23,12 @@ async function stop(selector) {
     }
     this.connections.delete(service.id);
   }
+  // the close handler early-returns once the connection is deleted above:
+  // the designated features (capabilities/device-feature-read.md) are
+  // dropped here, before the awaits, so no new state is pushed meanwhile
+  this.deviceFeatureReadGrants.delete(service.id);
+  this.deviceFeatureStateRateLimits.delete(service.id);
+  this.deviceFeatureAggregateRateLimits.delete(service.id);
   if (service.container_id) {
     try {
       await this.system.stopContainer(service.container_id);

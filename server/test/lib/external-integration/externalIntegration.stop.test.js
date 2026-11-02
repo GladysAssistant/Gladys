@@ -20,6 +20,22 @@ describe('externalIntegration.stop', () => {
     expect(externalIntegration.connections.has(service.id)).to.equal(false);
   });
 
+  it('should drop the designated features and their read rate limits, the close handler being skipped', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration } = buildSupervisor();
+    const rateLimit = () => ({ count: 1, resetAt: Date.now() + 60 * 1000 });
+    externalIntegration.connections.set(service.id, { terminate: fake.returns(null) });
+    externalIntegration.deviceFeatureReadGrants.set(service.id, { service, selectors: new Set(['a']) });
+    externalIntegration.deviceFeatureReadGrants.set('other-service-id', { service: {}, selectors: new Set(['a']) });
+    externalIntegration.deviceFeatureStateRateLimits.set(service.id, rateLimit());
+    externalIntegration.deviceFeatureAggregateRateLimits.set(service.id, rateLimit());
+    await externalIntegration.stop(service.selector);
+    expect(externalIntegration.deviceFeatureReadGrants.has(service.id)).to.equal(false);
+    expect(externalIntegration.deviceFeatureReadGrants.has('other-service-id')).to.equal(true);
+    expect(externalIntegration.deviceFeatureStateRateLimits.has(service.id)).to.equal(false);
+    expect(externalIntegration.deviceFeatureAggregateRateLimits.has(service.id)).to.equal(false);
+  });
+
   it('should still set STOPPED when the websocket cannot be terminated', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor();

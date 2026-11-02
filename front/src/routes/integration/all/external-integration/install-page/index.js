@@ -315,6 +315,12 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
+                            {manifest.device_features_read === true && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-activity mr-1" />
+                                <Text id="integration.externalIntegration.install.deviceFeaturesReadText" />
+                              </div>
+                            )}
                             <NetworkWakeSummary networkWake={manifest.network_wake} />
 
                             {manifest.location === true && (
