@@ -78,6 +78,9 @@ describe('gateway.backup', async function describe() {
     brain.getReply = fake.returns('Backup failed!');
 
     gateway = new Gateway(variable, event, system, sequelize, config, user, {}, {}, job, scheduler, message, brain);
+    // the health of the backups has its own tests, see gateway.backupHealth.test.js
+    gateway.recordBackupSuccess = fake.resolves(null);
+    gateway.recordBackupFailure = fake.resolves(null);
   });
 
   afterEach(() => {
@@ -90,6 +93,8 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
     assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
+    assert.calledOnce(gateway.recordBackupSuccess);
+    assert.notCalled(gateway.recordBackupFailure);
   });
 
   it('should export the DuckDB backup as Parquet compressed with ZSTD', async () => {
@@ -165,34 +170,21 @@ describe('gateway.backup', async function describe() {
 
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
-    assert.calledOnce(user.getByRole);
-    assert.calledWith(brain.getReply, 'fr', 'backup.fail', {
-      errorMessage: 'Error: error',
-    });
-    assert.calledWith(brain.getReply, 'en', 'backup.fail', {
-      errorMessage: 'Error: error',
-    });
-    assert.calledWithExactly(message.sendSystemMessage, 'toto-fr', 'Backup failed!', null, {
-      messageType: 'notification',
-    });
-    assert.calledWithExactly(message.sendSystemMessage, 'toto-en', 'Backup failed!', null, {
-      messageType: 'notification',
-    });
+    // the failure is recorded, the admins are warned on the state of the
+    // backups (not on each attempt), and the backup error is the one rethrown
+    assert.calledOnceWithExactly(gateway.recordBackupFailure, 'Error: error');
+    assert.notCalled(gateway.recordBackupSuccess);
   });
 
-  it('should rethrow the backup error when warning one admin fails', async () => {
+  it('should wait for the failure to be recorded before rethrowing the backup error', async () => {
     const backupError = new Error('upload failed');
     gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects(backupError);
-    const sentTo = [];
-    // resolves later: sentTo is only filled when backup waits for the sends
-    message.sendSystemMessage = sinon.stub().callsFake(async (selector) => {
+    let recorded = false;
+    gateway.recordBackupFailure = sinon.stub().callsFake(async () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 10);
       });
-      if (selector === 'toto-fr') {
-        throw new NotFoundError(`User ${selector} not found`);
-      }
-      sentTo.push(selector);
+      recorded = true;
     });
 
     let thrownError;
@@ -203,8 +195,7 @@ describe('gateway.backup', async function describe() {
     }
 
     expect(thrownError).to.equal(backupError);
-    assert.calledTwice(message.sendSystemMessage);
-    expect(sentTo).to.deep.equal(['toto-en']);
+    expect(recorded).to.equal(true);
   });
 
   it('should backup gladys with lots of insert at the same time', async () => {
@@ -249,7 +240,8 @@ describe('gateway.backup', async function describe() {
       expect(e).instanceOf(Error402);
     }
     assert.notCalled(gateway.gladysGatewayClient.initializeMultiPartBackup);
-    assert.notCalled(message.sendSystemMessage);
+    // the admins are already told by the lock itself
+    assert.notCalled(gateway.recordBackupFailure);
   });
 
   it('should not backup, no backup key found', async () => {
@@ -263,5 +255,6 @@ describe('gateway.backup', async function describe() {
         .instanceOf(NotFoundError)
         .haveOwnProperty('message', 'GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
     }
+    assert.calledOnceWithExactly(gateway.recordBackupFailure, 'Error: GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   });
 });

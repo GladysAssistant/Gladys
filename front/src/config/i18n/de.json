@@ -5674,7 +5674,15 @@
     "backupNowButton": "Jetzt sichern",
     "backupStarted": "Sicherung gestartet …",
     "notConfigured": "Um Backups zu aktivieren, muss Gladys Plus konfiguriert werden. Gehe dazu zum Tab \"Gladys Plus.\"",
-    "restoreFailed": "Die Wiederherstellung des Backups ist fehlgeschlagen. Bist du sicher, dass du denselben Schlüssel wie während des Backups verwendest? Du kannst zum Tab \"Gladys Plus\" in den Einstellungen gehen, um einen anderen Backup-Schlüssel festzulegen."
+    "restoreFailed": "Die Wiederherstellung des Backups ist fehlgeschlagen. Bist du sicher, dass du denselben Schlüssel wie während des Backups verwendest? Du kannst zum Tab \"Gladys Plus\" in den Einstellungen gehen, um einen anderen Backup-Schlüssel festzulegen.",
+    "health": {
+      "failingTitle": "Deine Backups schlagen fehl",
+      "failingSince": "Seit dem {{date}} ist kein Gladys Plus Backup mehr gelungen.",
+      "lastSuccess": "Letztes erfolgreiches Backup: {{date}}.",
+      "noSuccessYet": "Auf dieser Instanz ist noch kein Backup gelungen.",
+      "lastError": "Letzter Fehler: {{error}}",
+      "retry": "Gladys versucht es jede Nacht und einige Minuten nach jedem Start erneut. Die Administratoren werden ab der zweiten fehlgeschlagenen Nacht im Chat gewarnt, danach einmal pro Woche, solange es fehlschlägt, und sobald ein Backup wieder gelingt. Details im Tab \"Aufgaben\"."
+    }
   },
   "alarmModes": {
     "armed": "eingeschaltet",

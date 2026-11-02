@@ -38,6 +38,11 @@ async function disconnect() {
     // the payment lock belongs to the account being unlinked: the next
     // account linked to this instance starts unlocked
     await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE);
+    // so does the health of the backups: the next account starts from scratch
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT);
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE);
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR);
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT);
   } catch (e) {
     logger.debug(e);
     this.connected = false;

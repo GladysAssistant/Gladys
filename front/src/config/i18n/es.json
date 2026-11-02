@@ -5674,7 +5674,15 @@
     "backupNowButton": "Copia de seguridad ahora",
     "backupStarted": "Copia de seguridad iniciada...",
     "notConfigured": "Gladys Plus debe estar configurado para activar las copias de seguridad. Vaya a la pestaña de Gladys Plus para configurarlo.",
-    "restoreFailed": "No se pudo restaurar la copia de seguridad. ¿Está seguro de que tiene la misma clave de copia de seguridad utilizada durante la copia de seguridad? Puede ir a la pestaña de Gladys Plus en la configuración para establecer otra clave de copia de seguridad."
+    "restoreFailed": "No se pudo restaurar la copia de seguridad. ¿Está seguro de que tiene la misma clave de copia de seguridad utilizada durante la copia de seguridad? Puede ir a la pestaña de Gladys Plus en la configuración para establecer otra clave de copia de seguridad.",
+    "health": {
+      "failingTitle": "Sus copias de seguridad fallan",
+      "failingSince": "Ninguna copia de seguridad de Gladys Plus ha tenido éxito desde el {{date}}.",
+      "lastSuccess": "Última copia de seguridad correcta: {{date}}.",
+      "noSuccessYet": "Ninguna copia de seguridad ha tenido éxito todavía en esta instancia.",
+      "lastError": "Último error: {{error}}",
+      "retry": "Gladys lo reintenta cada noche y unos minutos después de cada inicio. Los administradores reciben un aviso en la conversación a partir de la segunda noche fallida, luego una vez por semana mientras siga fallando, y en cuanto una copia vuelve a funcionar. Detalles en la pestaña \"Tareas\"."
+    }
   },
   "alarmModes": {
     "armed": "armada",

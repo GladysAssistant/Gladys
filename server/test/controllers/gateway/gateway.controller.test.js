@@ -307,6 +307,13 @@ describe('GET /api/v1/gateway/status', () => {
       .then((res) => {
         expect(res.body).to.have.property('connected');
         expect(res.body).to.have.property('configured');
+        expect(res.body).to.have.property('backup_health');
+        expect(res.body.backup_health).to.have.all.keys(
+          'last_success_at',
+          'failing_since',
+          'last_error',
+          'alert_sent_at',
+        );
       });
   });
   it('should get gateway status as a non-admin user', async () => {

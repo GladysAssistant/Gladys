@@ -42,6 +42,12 @@ describe('POST /api/v1/gateway/subscription/refresh', () => {
           connected: false,
           subscription_active: false,
           payment_required_since: '2026-09-01T00:00:00.000Z',
+          backup_health: {
+            last_success_at: null,
+            failing_since: null,
+            last_error: null,
+            alert_sent_at: null,
+          },
         });
       });
   });
@@ -55,12 +61,20 @@ describe('POST /api/v1/gateway/subscription/refresh', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.deep.equal({
+        expect(res.body).to.include({
           configured: true,
           connected: false,
           subscription_active: true,
           payment_required_since: null,
         });
+        // the unlock runs the backup check in the background, which may or may
+        // not have recorded this unconnected instance by now
+        expect(res.body.backup_health).to.have.all.keys(
+          'last_success_at',
+          'failing_since',
+          'last_error',
+          'alert_sent_at',
+        );
       });
   });
 });

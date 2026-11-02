@@ -10,7 +10,7 @@ const { execFile } = require('../../utils/childProcess');
 const { escapeSqlStringLiteral } = require('../../utils/backupSafety');
 const { readChunk } = require('../../utils/readChunk');
 const { NotFoundError } = require('../../utils/coreErrors');
-const { USER_ROLE, ERROR_MESSAGES } = require('../../utils/constants');
+const { ERROR_MESSAGES } = require('../../utils/constants');
 const { Error402 } = require('../../utils/httpErrors');
 
 const BACKUP_NAME_BASE = 'gladys-db-backup';
@@ -192,6 +192,7 @@ async function backup(jobId) {
       await this.job.updateProgress(jobId, 100);
       // done!
       logger.info(`Gladys backup uploaded with success to Gladys Gateway.`);
+      await this.recordBackupSuccess();
       await logMemoryUsage('after upload');
     } catch (e) {
       await this.gladysGatewayClient.abortMultiPartBackup({
@@ -211,19 +212,10 @@ async function backup(jobId) {
     if (e instanceof Error402) {
       throw e;
     }
-    // If the backup fails, we need to warn the admins of this installation
-    const admins = await this.user.getByRole(USER_ROLE.ADMIN);
-    await Promise.each(admins, async (admin) => {
-      const message = this.brain.getReply(admin.language, 'backup.fail', {
-        errorMessage: e.toString(),
-      });
-      // a failing notification must not replace the backup error rethrown below
-      try {
-        await this.message.sendSystemMessage(admin.selector, message, null, { messageType: 'notification' });
-      } catch (sendError) {
-        logger.error(`Unable to send the backup failure message to ${admin.selector}`, sendError);
-      }
-    });
+    // The admins are warned on the state of the backups, not on each failed
+    // attempt (see gateway.backupHealth); never throws, the backup error is
+    // the one rethrown below
+    await this.recordBackupFailure(e.toString());
     throw e;
   }
 }

@@ -51,6 +51,7 @@ const { setSubscriptionActive } = require('./gateway.setSubscriptionActive');
 const { callPlanGatedApi } = require('./gateway.callPlanGatedApi');
 const { throwIfPaymentRequired } = require('./gateway.throwIfPaymentRequired');
 const { refreshSubscriptionStatus } = require('./gateway.refreshSubscriptionStatus');
+const { getBackupHealth, recordBackupSuccess, recordBackupFailure } = require('./gateway.backupHealth');
 
 // Enedis API
 const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
@@ -106,6 +107,12 @@ const Gateway = function Gateway(
   this.googleHomeForwardStateTimeout = 5 * 1000;
   this.alexaForwardStateTimeout = 5 * 1000;
   this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
+  // catch-up of a missed nightly backup (Gladys was off or offline at 2 AM):
+  // one check a few minutes after start-up, and one daytime check
+  this.backupCatchUpInitTimeout = 5 * 60 * 1000; // 5 minutes
+  this.backupCatchUpHour = 10;
+  this.backupCatchUpInitTimer = null;
+  this.backupCatchUpSchedule = null;
   this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({
@@ -172,6 +179,9 @@ Gateway.prototype.setSubscriptionActive = setSubscriptionActive;
 Gateway.prototype.callPlanGatedApi = callPlanGatedApi;
 Gateway.prototype.throwIfPaymentRequired = throwIfPaymentRequired;
 Gateway.prototype.refreshSubscriptionStatus = refreshSubscriptionStatus;
+Gateway.prototype.getBackupHealth = getBackupHealth;
+Gateway.prototype.recordBackupSuccess = recordBackupSuccess;
+Gateway.prototype.recordBackupFailure = recordBackupFailure;
 
 // Enedis API
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;

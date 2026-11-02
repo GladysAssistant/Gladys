@@ -563,6 +563,13 @@ const SYSTEM_VARIABLE_NAMES = {
   // ISO date of the moment Gladys Plus answered "payment required": while it is
   // set, the plan-gated features (backups, Enedis, AI) stay off locally
   GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE: 'GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE',
+  // health of the Gladys Plus backups, see lib/gateway/gateway.backupHealth.js:
+  // ISO date of the last backup uploaded, ISO date of the first failure of the
+  // current streak, text of its last error, ISO date of the last alert sent
+  GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT: 'GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT',
+  GLADYS_GATEWAY_BACKUP_FAILING_SINCE: 'GLADYS_GATEWAY_BACKUP_FAILING_SINCE',
+  GLADYS_GATEWAY_BACKUP_LAST_ERROR: 'GLADYS_GATEWAY_BACKUP_LAST_ERROR',
+  GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT: 'GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT',
   TIMEZONE: 'TIMEZONE',
   TTS_ACTIVE_PROVIDER: 'TTS_ACTIVE_PROVIDER',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',

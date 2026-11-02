@@ -17,6 +17,7 @@ async function getStatus() {
     connected: this.connected,
     subscription_active: this.subscriptionActive,
     payment_required_since: this.subscriptionPaymentRequiredSince,
+    backup_health: await this.getBackupHealth(),
   };
 }
 
