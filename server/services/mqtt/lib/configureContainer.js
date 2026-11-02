@@ -19,10 +19,11 @@ const MOSQUITTO_CONFIG_CONTENT = [
 
 /**
  * @description Configure MQTT container.
+ * @param {boolean} [resetPasswordFile] - Empty the password file (fresh install: its user is written right after).
  * @example
  * mqtt.configureContainer();
  */
-async function configureContainer() {
+async function configureContainer(resetPasswordFile = false) {
   logger.info('MQTT broker Docker container is being configured...');
 
   // Create configuration path (if not exists)
@@ -44,10 +45,10 @@ async function configureContainer() {
     await fs.writeFile(MOSQUITTO_CONFIG_FILE_PATH, MOSQUITTO_CONFIG_CONTENT.join(os.EOL));
   }
 
-  // Create empty password file if not already exists.
-  // 'a' never truncates: an existing file keeps its users, so the stored credentials
-  // still work after the broker container is reinstalled (e.g. on a mosquitto upgrade).
-  const pwdFile = await fs.open(MOSQUITTO_PASSWORD_FILE_PATH, 'a');
+  // A fresh install starts from an empty password file ('w' truncates): no retired user survives,
+  // and the Gladys user is written right after. Otherwise (mosquitto upgrade) the file is only
+  // created if missing ('a' never truncates), so the stored credentials keep working.
+  const pwdFile = await fs.open(MOSQUITTO_PASSWORD_FILE_PATH, resetPasswordFile ? 'w' : 'a');
   await pwdFile.close();
 }
 

@@ -136,6 +136,16 @@ describe('mqttHandler.configureContainer on a real file system', () => {
     expect(passwordFile).to.equal(passwordFileContent);
   });
 
+  it('should empty the password file on a fresh install', async () => {
+    // A fresh install writes the Gladys user right after: a retired user must not survive it
+    await realFs.writeFile(path.join(tmpDirectory, 'mosquitto.passwd'), `retired:$7$101$c2FsdA==$aGFzaA==${os.EOL}`);
+
+    await configureContainer(true);
+
+    const passwordFile = await realFs.readFile(path.join(tmpDirectory, 'mosquitto.passwd'), 'utf8');
+    expect(passwordFile).to.equal('');
+  });
+
   it('should create an empty password file when missing', async () => {
     await configureContainer();
 

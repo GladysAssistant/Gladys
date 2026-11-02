@@ -47,7 +47,9 @@ async function installContainer(saveConfiguration = true) {
 
     // Prepare broker env
     logger.info(`Preparing broker environment...`);
-    await this.configureContainer();
+    // A fresh install resets the broker users (saveConfiguration writes the Gladys one below),
+    // an upgrade (no save) keeps them
+    await this.configureContainer(saveConfiguration);
 
     logger.info(`Creating container...`);
     const containerDescriptorToMutate = cloneDeep(containerDescriptor);
