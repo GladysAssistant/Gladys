@@ -129,7 +129,41 @@ class RemoteAccess extends Component {
     }
   };
 
-  render(props, { confirmRevoke, revoking, inviteOpen, inviteEmail, inviteRole, inviteStatus }) {
+  selectLinkUser = e => {
+    this.setState({ linkUserId: e.target.value, linkStatus: null });
+  };
+
+  // link the Plus account (or invitation) to the Gladys user picked in the select,
+  // or, on a user's card where it was recognized by its email, to that user
+  link = async gladysUserId => {
+    if (!gladysUserId) {
+      return;
+    }
+    this.setState({ linkStatus: RequestStatus.Getting });
+    try {
+      await this.props.linkRemote(this.props.remote, gladysUserId);
+      this.setState({ linkStatus: RequestStatus.Success, linkUserId: '' });
+    } catch (err) {
+      console.error(err);
+      this.setState({ linkStatus: RequestStatus.Error });
+    }
+  };
+
+  linkToSelectedUser = e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.link(this.state.linkUserId);
+  };
+
+  linkToThisUser = () => {
+    this.link(this.props.user.id);
+  };
+
+  render(
+    props,
+    { confirmRevoke, revoking, inviteOpen, inviteEmail, inviteRole, inviteStatus, linkUserId, linkStatus }
+  ) {
     const { remote, user, gatewayMode, isAdmin, isPlusAdmin, plusMe, language } = props;
     const status = remote ? remote.status : REMOTE_STATUS.NONE;
     const keysLoaded = props.gatewayKeysStatus === RequestStatus.Success;
@@ -142,6 +176,15 @@ class RemoteAccess extends Component {
     const isMe = Boolean(remote && plusMe && remote.id === plusMe.id);
     const canRevoke = Boolean(remote && remote.account && gatewayMode && isPlusAdmin && !isMe);
     const account = remote && remote.account;
+    // a Plus admin can attach a Plus account or a pending invitation to a Gladys user:
+    // in one click on the card it was recognized on (by email), or through a select
+    // when it hangs under "not linked"
+    const canLink = Boolean(
+      remote && remote.account && !remote.linked && gatewayMode && isPlusAdmin && props.linkRemote
+    );
+    const linking = linkStatus === RequestStatus.Getting;
+    const linkableUsers =
+      canLink && !user ? props.users.filter(candidate => !props.takenUserIds.includes(candidate.id)) : [];
     const invitedOn = status === REMOTE_STATUS.INVITED && account ? formatDate(account.created_at, language) : null;
     const memberSince = status !== REMOTE_STATUS.INVITED && account ? formatDate(account.created_at, language) : null;
     // the Plus email is worth a line when it is not simply the user's own (an
@@ -209,6 +252,17 @@ class RemoteAccess extends Component {
                 </span>
               </label>
             )}
+            {canLink && user && (
+              <button
+                type="button"
+                class={cx('btn btn-primary btn-sm', { 'btn-loading': linking })}
+                disabled={linking}
+                onClick={this.linkToThisUser}
+              >
+                <i class="fe fe-link" />{' '}
+                <Text id="usersSettings.plus.link.toThisUser" fields={{ name: user.firstname }} />
+              </button>
+            )}
             {canInvite && !inviteOpen && (
               <button type="button" class="btn btn-primary btn-sm" onClick={this.openInvite}>
                 <i class="fe fe-send" /> <Text id="usersSettings.plus.inviteThisUser" />
@@ -238,6 +292,46 @@ class RemoteAccess extends Component {
             )}
           </div>
         </div>
+        {canLink && !user && (
+          <form class={style.linkForm} onSubmit={this.linkToSelectedUser}>
+            <label class="form-label" for={`link-user-${remote.id}`}>
+              <Text id="usersSettings.plus.link.selectLabel" />
+            </label>
+            <div class={style.linkFields}>
+              <select
+                id={`link-user-${remote.id}`}
+                class="form-control custom-select"
+                value={linkUserId || ''}
+                onChange={this.selectLinkUser}
+                disabled={linking}
+              >
+                <option value="">
+                  <Text id="usersSettings.plus.link.selectPlaceholder" />
+                </option>
+                {linkableUsers.map(candidate => (
+                  <option key={candidate.id} value={candidate.id}>
+                    {candidate.firstname} {candidate.lastname}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                class={cx('btn btn-primary btn-sm', { 'btn-loading': linking })}
+                disabled={linking || !linkUserId}
+              >
+                <i class="fe fe-link" /> <Text id="usersSettings.plus.link.button" />
+              </button>
+            </div>
+            <p class={style.inviteHelp}>
+              <Text id="usersSettings.plus.link.help" />
+            </p>
+          </form>
+        )}
+        {linkStatus === RequestStatus.Error && (
+          <div class={cx('alert alert-danger mb-0', style.remoteAlert)} role="alert">
+            <Text id="usersSettings.plus.link.error" />
+          </div>
+        )}
         {canInvite && inviteOpen && (
           <form class={style.inviteForm} onSubmit={this.invite}>
             <p class={style.inviteDescription}>

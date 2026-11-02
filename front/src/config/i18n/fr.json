@@ -4927,7 +4927,7 @@
         "authorized": "Peut contrôler cette instance Gladys depuis n'importe où, via Gladys Plus.",
         "pending": "Son compte Gladys Plus est prêt. Vérifiez que les empreintes de clés ci-dessous correspondent à celles affichées sur sa page Gladys Plus, puis activez l'interrupteur pour l'autoriser.",
         "keys_changed": "Ses clés de chiffrement ont changé depuis que vous l'avez autorisé : son accès a été révoqué par sécurité. Vérifiez les nouvelles empreintes ci-dessous, puis autorisez-le à nouveau.",
-        "not_linked": "Cette personne a un compte Gladys Plus mais n'a pas encore choisi son utilisateur Gladys : elle doit se connecter sur Gladys Plus et le sélectionner.",
+        "not_linked": "Cette personne a un compte Gladys Plus qui n'est pas encore rattaché à un utilisateur Gladys : rattachez-le ici, ou laissez-la choisir son utilisateur à sa prochaine connexion sur Gladys Plus.",
         "invited": "Invitation envoyée le {{date}}. Dès que cette personne aura créé son compte Gladys Plus, il sera lié à cet utilisateur et vous autoriserez ses clés ici.",
         "none": "Pas de compte Gladys Plus : cet utilisateur ne peut utiliser Gladys que depuis la maison."
       },
@@ -4966,6 +4966,14 @@
         "roleHelp": "Un administrateur Gladys Plus peut inviter et retirer des personnes et gérer l'abonnement. Le rôle sur Gladys Plus est indépendant du rôle sur cette instance Gladys.",
         "button": "Envoyer l'invitation",
         "error": "Impossible d'envoyer l'invitation. Vérifiez l'adresse e-mail puis réessayez."
+      },
+      "link": {
+        "selectLabel": "Rattacher à un utilisateur Gladys",
+        "selectPlaceholder": "Choisir un utilisateur Gladys…",
+        "button": "Rattacher",
+        "toThisUser": "Rattacher à {{name}}",
+        "help": "Le compte Gladys Plus est rattaché à cet utilisateur : son accès à distance s'affiche alors sur la carte de l'utilisateur, et il contrôle Gladys en tant que cet utilisateur.",
+        "error": "Impossible de rattacher ce compte Gladys Plus. Vérifiez que l'utilisateur Gladys n'est pas déjà rattaché à un autre compte."
       }
     },
     "searchPlaceholder": "Chercher un utilisateur",

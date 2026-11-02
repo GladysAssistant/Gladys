@@ -4927,7 +4927,7 @@
         "authorized": "Can control this Gladys from anywhere, through Gladys Plus.",
         "pending": "Their Gladys Plus account is ready. Check that the key fingerprints below match the ones displayed on their Gladys Plus page, then turn on the switch to authorize them.",
         "keys_changed": "Their encryption keys changed since you authorized them, so their access was revoked for security. Check the new fingerprints below, then authorize them again.",
-        "not_linked": "They have a Gladys Plus account but have not chosen their Gladys user yet: they need to sign in on Gladys Plus and pick it.",
+        "not_linked": "They have a Gladys Plus account that is not attached to a Gladys user yet: link it here, or let them pick their user on their next Gladys Plus login.",
         "invited": "Invitation sent on {{date}}. Once they have created their Gladys Plus account, it is linked to this user and you will authorize their keys here.",
         "none": "No Gladys Plus account: this user can only use Gladys from home."
       },
@@ -4966,6 +4966,14 @@
         "roleHelp": "A Gladys Plus administrator can invite and remove people and manage the subscription. The role on Gladys Plus is independent from the role on this Gladys.",
         "button": "Send invitation",
         "error": "Unable to send the invitation. Check the email address and try again."
+      },
+      "link": {
+        "selectLabel": "Link to a Gladys user",
+        "selectPlaceholder": "Choose a Gladys user…",
+        "button": "Link",
+        "toThisUser": "Link to {{name}}",
+        "help": "The Gladys Plus account is attached to that user: their remote access then shows on the user's card, and they control Gladys as that user.",
+        "error": "Unable to link this Gladys Plus account. Check that the Gladys user is not already linked to another account."
       }
     },
     "searchPlaceholder": "Search users",

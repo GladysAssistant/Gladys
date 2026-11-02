@@ -621,3 +621,36 @@
 .inviteForm :global(.alert) {
   margin-top: 0.75rem;
 }
+
+/* ---------- "link to a Gladys user" (unattached Plus accounts) ---------- */
+
+.linkForm {
+  margin: 0.85rem 0 0 2.95rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  max-width: 36rem;
+}
+
+.linkFields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.linkFields select {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.remoteAlert {
+  margin: 0.75rem 0 0 2.95rem;
+}
+
+@media (max-width: 767.98px) {
+  .linkForm,
+  .remoteAlert {
+    margin-left: 0;
+  }
+}

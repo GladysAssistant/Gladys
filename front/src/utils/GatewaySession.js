@@ -125,6 +125,27 @@ class GatewaySession {
     );
   }
 
+  // Link a user of the Gladys Plus account to a Gladys user of the instance, as an
+  // admin of the account (PATCH /accounts/users/:id), for accounts created before the
+  // linked invitations; null unlinks
+  async linkAccountUserToGladysUser(plusUserId, gladysUserId) {
+    return gatewayRequest.patch(
+      `${this.gladysGatewayApiUrl}/accounts/users/${plusUserId}`,
+      { gladys_4_user_id: gladysUserId },
+      this.gatewayClient
+    );
+  }
+
+  // Same for a pending invitation (PATCH /invitations/:id): the user created from it
+  // is then linked to that Gladys user
+  async linkInvitationToGladysUser(invitationId, gladysUserId) {
+    return gatewayRequest.patch(
+      `${this.gladysGatewayApiUrl}/invitations/${invitationId}`,
+      { gladys_4_user_id: gladysUserId },
+      this.gatewayClient
+    );
+  }
+
   // Replacing the two-factor app of the Gladys Plus account is a user operation
   // (user-scoped routes): it is only possible from the Gladys Plus interface, where
   // the Gladys Plus user is the one logged in. The client library has no method for

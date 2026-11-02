@@ -48,6 +48,11 @@ const UserPage = ({ children, ...props }) => {
     switchUserKey: props.switchUserKey,
     revokeRemote: props.revokeRemote,
     inviteUser: props.inviteUser,
+    linkRemote: props.linkRemote,
+    // the "link to a Gladys user" select: every user of the instance, the ones already
+    // holding a Gladys Plus account or invitation left out
+    users: props.users || [],
+    takenUserIds: members.filter(member => member.remote).map(member => member.user.id),
     language: props.user && props.user.language
   };
 

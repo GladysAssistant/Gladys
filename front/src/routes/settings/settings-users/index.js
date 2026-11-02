@@ -169,6 +169,29 @@ class SettingsUsers extends Component {
     });
   };
 
+  // Attach a Gladys Plus account (or a pending invitation) to a Gladys user of the
+  // instance, as a Plus admin: for accounts created before the linked invitations,
+  // or recognized by their email on a user's card. The instance learns the link on
+  // its next sync of the keys, asked right away.
+  linkRemote = async (remote, gladysUserId) => {
+    if (remote.isInvitation) {
+      await this.props.session.linkInvitationToGladysUser(remote.id, gladysUserId);
+    } else {
+      await this.props.session.linkAccountUserToGladysUser(remote.id, gladysUserId);
+    }
+    this.setState({
+      plusUsers: (this.state.plusUsers || []).map(plusUser =>
+        plusUser.id === remote.id ? { ...plusUser, gladys_4_user_id: gladysUserId } : plusUser
+      ),
+      gatewayKeys: (this.state.gatewayKeys || []).map(keys =>
+        keys.id === remote.id ? { ...keys, gladys_4_user_id: gladysUserId } : keys
+      )
+    });
+    if (remote.keys) {
+      await this.getKeys();
+    }
+  };
+
   // remove a user (or cancel an invitation) from the Gladys Plus account
   revokeRemote = async remote => {
     this.setState({ revokeError: false });
@@ -227,6 +250,7 @@ class SettingsUsers extends Component {
           switchUserKey={this.switchUserKey}
           deleteUser={this.deleteUser}
           inviteUser={this.inviteUser}
+          linkRemote={this.linkRemote}
           revokeRemote={this.revokeRemote}
         />
       </SettingsLayout>

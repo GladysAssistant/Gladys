@@ -4927,7 +4927,7 @@
         "authorized": "Kann diese Gladys-Instanz von überall über Gladys Plus steuern.",
         "pending": "Das Gladys-Plus-Konto ist bereit. Prüfe, dass die Schlüssel-Fingerabdrücke unten mit denen auf der Gladys-Plus-Seite dieser Person übereinstimmen, und aktiviere dann den Schalter, um sie zu autorisieren.",
         "keys_changed": "Die Verschlüsselungsschlüssel haben sich geändert, seit du sie autorisiert hast: Der Zugriff wurde aus Sicherheitsgründen widerrufen. Prüfe die neuen Fingerabdrücke unten und autorisiere die Person dann erneut.",
-        "not_linked": "Diese Person hat ein Gladys-Plus-Konto, aber noch keinen Gladys-Benutzer gewählt: Sie muss sich bei Gladys Plus anmelden und ihn auswählen.",
+        "not_linked": "Diese Person hat ein Gladys-Plus-Konto, das noch keinem Gladys-Benutzer zugeordnet ist: Verknüpfe es hier, oder lass sie ihren Benutzer bei ihrer nächsten Anmeldung bei Gladys Plus wählen.",
         "invited": "Einladung gesendet am {{date}}. Sobald die Person ihr Gladys-Plus-Konto erstellt hat, wird es mit diesem Benutzer verknüpft und du autorisierst hier ihre Schlüssel.",
         "none": "Kein Gladys-Plus-Konto: Dieser Benutzer kann Gladys nur von zu Hause aus nutzen."
       },
@@ -4966,6 +4966,14 @@
         "roleHelp": "Ein Gladys-Plus-Administrator kann Personen einladen und entfernen sowie das Abonnement verwalten. Die Rolle bei Gladys Plus ist unabhängig von der Rolle auf dieser Gladys-Instanz.",
         "button": "Einladung senden",
         "error": "Die Einladung konnte nicht gesendet werden. Prüfe die E-Mail-Adresse und versuche es erneut."
+      },
+      "link": {
+        "selectLabel": "Mit einem Gladys-Benutzer verknüpfen",
+        "selectPlaceholder": "Gladys-Benutzer wählen…",
+        "button": "Verknüpfen",
+        "toThisUser": "Mit {{name}} verknüpfen",
+        "help": "Das Gladys-Plus-Konto wird diesem Benutzer zugeordnet: Sein Fernzugriff erscheint dann auf der Karte des Benutzers, und er steuert Gladys als dieser Benutzer.",
+        "error": "Dieses Gladys-Plus-Konto konnte nicht verknüpft werden. Prüfe, dass der Gladys-Benutzer nicht bereits mit einem anderen Konto verknüpft ist."
       }
     },
     "searchPlaceholder": "Benutzer suchen",
