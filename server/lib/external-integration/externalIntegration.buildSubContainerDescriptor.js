@@ -2,24 +2,31 @@ const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const {
   EXTERNAL_INTEGRATION_LABEL,
   SUB_CONTAINER_LABEL,
+  SUB_CONTAINER_GRANTS_LABEL,
   PRIVATE_NETWORK_PREFIX,
   SUB_CONTAINER_MEMORY_DEFAULT_MB,
   SUB_CONTAINER_CPU_DEFAULT,
   SUB_CONTAINER_SHM_DEFAULT_MB,
+  SUB_CONTAINER_PIDS_DEFAULT,
+  SUB_CONTAINER_TMP_DEFAULT_MB,
 } = require('./constants');
 
 const BYTES_PER_MB = 1024 * 1024;
-// anti fork-bomb, same value as the main container
-const PIDS_LIMIT = 100;
 
 /**
  * @description Build the Docker descriptor of a declared sub-container, with
  * the same lockdown as the main container (CapDrop ALL, no-new-privileges,
- * supervisor-driven restart, bounded logs, tmpfs /tmp) except: only the
- * private network of the integration (never `gladys-integrations`: no token,
- * no host API access), volumes derived from the integration data folder
- * (the manifest never chooses a host path), host ports chosen by Gladys,
- * devices = requested (manifest) ∩ granted (user) ∩ present (detection).
+ * supervisor-driven restart, bounded logs, PidsLimit, noexec tmpfs /tmp)
+ * except: only the private network of the integration (never
+ * `gladys-integrations`: no token, no host API access), volumes derived from
+ * the integration data folder (the manifest never chooses a host path), host
+ * ports chosen by Gladys,
+ * devices = requested (manifest) ∩ granted (user) ∩ present (detection),
+ * CapAdd = requested ∩ granted ∩ allowlisted Linux capabilities (on top of
+ * CapDrop ALL, fail-closed: a name outside the allowlist produces nothing),
+ * a label fingerprinting these effective grants,
+ * and limits sized by the manifest within the validated bounds (memory, CPU,
+ * /dev/shm, tasks, /tmp size — never the flags).
  * @param {object} service - The external integration service (plain object).
  * @param {object} entry - The sub-container declaration from the manifest.
  * @param {object} [options] - Options.
@@ -34,19 +41,9 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
   const cpuCfsSupported = await this.system.hasCpuCfsSupport();
   const networkName = `${PRIVATE_NETWORK_PREFIX}${service.selector}`;
   const finalEnv = { ...(entry.env || {}), ...env, TZ: timezone };
-  // devices: requested ∩ granted ∩ present, resolved at every creation —
-  // plugging a Coral then recreating the container is enough
-  const grantedClasses = Array.isArray(service.granted_devices) ? service.granted_devices : [];
-  const detectedClasses = await this.system.detectHardwareClasses();
-  const devices = [];
-  (entry.devices || [])
-    .filter((hardwareClass) => grantedClasses.includes(hardwareClass))
-    .forEach((hardwareClass) => {
-      const detected = detectedClasses.find((detectedClass) => detectedClass.class === hardwareClass);
-      ((detected && detected.paths) || []).forEach((path) => {
-        devices.push({ PathOnHost: path, PathInContainer: path, CgroupPermissions: 'rwm' });
-      });
-    });
+  // devices = requested ∩ granted ∩ present, CapAdd = requested ∩ granted ∩
+  // allowlist (fail-closed), fingerprinted for the start-time reconciliation
+  const { capAdd, devices, fingerprint } = await this.getEffectiveSubContainerGrants(service, entry);
   // each volume is mounted from a host path DERIVED by the supervisor: a
   // sub-container cannot write outside the folder of its integration; the
   // main container sees these volumes under /data/containers/<name>/...
@@ -75,6 +72,9 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
       // the whole group, even orphans after a crash mid-operation
       [EXTERNAL_INTEGRATION_LABEL]: service.selector,
       [SUB_CONTAINER_LABEL]: entry.name,
+      // effective grants it was created with: a start recreates the
+      // container when they no longer match (revocation, allowlist change)
+      [SUB_CONTAINER_GRANTS_LABEL]: fingerprint,
       // updates are driven by the supervisor: Watchtower must never
       // recreate this container behind Gladys' back
       'com.centurylinklabs.watchtower.enable': 'false',
@@ -87,6 +87,7 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
       RestartPolicy: { Name: 'no' },
       ReadonlyRootfs: entry.read_only !== false,
       CapDrop: ['ALL'],
+      ...(capAdd.length > 0 ? { CapAdd: capAdd } : {}),
       SecurityOpt: ['no-new-privileges'],
       Memory: memoryInBytes,
       MemorySwap: memoryInBytes,
@@ -94,9 +95,11 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
       // the daemon would reject the creation with an HTTP 400
       ...(cpuCfsSupported ? { NanoCpus: Math.round((entry.cpu || SUB_CONTAINER_CPU_DEFAULT) * 1e9) } : {}),
       ShmSize: (entry.shm_mb || SUB_CONTAINER_SHM_DEFAULT_MB) * BYTES_PER_MB,
-      PidsLimit: PIDS_LIMIT,
+      // anti fork-bomb, threads included: the ceiling is validated (C.1)
+      PidsLimit: entry.pids_limit || SUB_CONTAINER_PIDS_DEFAULT,
       ...(binds.length > 0 ? { Binds: binds } : {}),
-      Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=64m' },
+      // only the size is declarable: /tmp is never an execution path
+      Tmpfs: { '/tmp': `rw,noexec,nosuid,size=${entry.tmp_mb || SUB_CONTAINER_TMP_DEFAULT_MB}m` },
       LogConfig: { Type: 'json-file', Config: { 'max-size': '10m', 'max-file': '2' } },
       ...(devices.length > 0 ? { Devices: devices } : {}),
       ...(Object.keys(portBindings).length > 0 ? { PortBindings: portBindings } : {}),

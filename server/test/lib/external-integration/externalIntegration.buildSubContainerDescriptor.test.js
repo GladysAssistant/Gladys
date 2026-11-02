@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
@@ -25,6 +26,11 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
       Labels: {
         'io.gladysassistant.external-integration': 'ext-dev-open-meteo-demo',
         'io.gladysassistant.container': 'frigate',
+        // fingerprint of the effective grants: no CapAdd, the two devices
+        'io.gladysassistant.grants': crypto
+          .createHash('sha256')
+          .update(JSON.stringify({ capAdd: [], devices: ['/dev/bus/usb', '/dev/dri'] }))
+          .digest('hex'),
         'com.centurylinklabs.watchtower.enable': 'false',
       },
       Env: ['LIBVA_DRIVER_NAME=i965', 'FRIGATE_MQTT_PASSWORD=s3cr3t', 'TZ=Europe/Paris'],
@@ -74,6 +80,8 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
     expect(descriptor.HostConfig.Memory).to.equal(128 * 1024 * 1024);
     expect(descriptor.HostConfig.NanoCpus).to.equal(500000000);
     expect(descriptor.HostConfig.ShmSize).to.equal(64 * 1024 * 1024);
+    expect(descriptor.HostConfig.PidsLimit).to.equal(100);
+    expect(descriptor.HostConfig.Tmpfs).to.deep.equal({ '/tmp': 'rw,noexec,nosuid,size=64m' });
     expect(descriptor.HostConfig).to.not.have.property('Devices');
     expect(descriptor.HostConfig).to.not.have.property('PortBindings');
     expect(descriptor).to.not.have.property('ExposedPorts');
@@ -82,6 +90,107 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
       '/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo/containers/mqtt/mosquitto/config:/mosquitto/config',
       '/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo/containers/mqtt/mosquitto/data:/mosquitto/data',
     ]);
+  });
+
+  it('should apply the declared task and /tmp limits, the tmpfs flags staying fixed', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], pids_limit: 512, tmp_mb: 1024 };
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.PidsLimit).to.equal(512);
+    expect(descriptor.HostConfig.Tmpfs).to.deep.equal({ '/tmp': 'rw,noexec,nosuid,size=1024m' });
+  });
+
+  it('should add back the requested and granted capabilities only, on top of CapDrop ALL', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // the user granted CHOWN and SETUID, plus KILL which this entry does
+    // not request (another sub-container may)
+    const service = await seedExternalService({
+      manifest: TEST_CONTAINERS_MANIFEST,
+      granted_capabilities: ['CHOWN', 'SETUID', 'KILL'],
+    });
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN', 'SETGID', 'SETUID'] };
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.CapDrop).to.deep.equal(['ALL']);
+    expect(descriptor.HostConfig.CapAdd).to.deep.equal(['CHOWN', 'SETUID']);
+    expect(descriptor.HostConfig.SecurityOpt).to.deep.equal(['no-new-privileges']);
+  });
+
+  it('should fail closed: a requested and granted capability outside the allowlist is never added', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // stale or tampered stored manifest (or an allowlist narrowed by a
+    // later Gladys): only the allowlisted names reach CapAdd
+    const service = await seedExternalService({
+      manifest: TEST_CONTAINERS_MANIFEST,
+      granted_capabilities: ['CHOWN', 'NET_RAW', 'SYS_ADMIN'],
+    });
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['NET_RAW', 'CHOWN', 'SYS_ADMIN'] };
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.CapAdd).to.deep.equal(['CHOWN']);
+  });
+
+  it('should fingerprint the effective grants, independently of their order', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['SETUID', 'CHOWN'] };
+    const service = await seedExternalService({
+      manifest: TEST_CONTAINERS_MANIFEST,
+      granted_capabilities: ['CHOWN', 'SETUID'],
+    });
+    const reordered = await externalIntegration.getEffectiveSubContainerGrants(
+      { ...service, granted_capabilities: ['SETUID', 'CHOWN'] },
+      { ...entry, capabilities: ['CHOWN', 'SETUID'] },
+    );
+    const revoked = await externalIntegration.getEffectiveSubContainerGrants(
+      { ...service, granted_capabilities: ['CHOWN'] },
+      entry,
+    );
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.Labels['io.gladysassistant.grants']).to.equal(reordered.fingerprint);
+    expect(revoked.fingerprint).to.not.equal(reordered.fingerprint);
+    expect(revoked.capAdd).to.deep.equal(['CHOWN']);
+  });
+
+  it('should omit CapAdd when nothing requested is granted', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const entry = { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN'] };
+    // requested but never granted (null column: install without grant)
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig.CapDrop).to.deep.equal(['ALL']);
+    expect(descriptor.HostConfig).to.not.have.property('CapAdd');
+  });
+
+  it('should publish the 4 declared ports of a sub-container', async () => {
+    const { externalIntegration, variable } = buildSupervisor();
+    const ports = [
+      { container_port: 8971, label: { en: 'Frigate UI' } },
+      { container_port: 8554, label: { en: 'RTSP' }, browsable: false },
+      { container_port: 8555, protocol: 'tcp', label: { en: 'WebRTC (TCP)' }, browsable: false },
+      { container_port: 8555, protocol: 'udp', label: { en: 'WebRTC (UDP)' }, browsable: false },
+    ];
+    const manifest = {
+      ...TEST_CONTAINERS_MANIFEST,
+      containers: [{ ...TEST_CONTAINERS_MANIFEST.containers[1], ports }],
+    };
+    const service = await seedExternalService({ manifest });
+    await variable.setValue(
+      SUB_CONTAINER_PORTS_VARIABLE,
+      JSON.stringify({
+        'frigate/8971/tcp': 42001,
+        'frigate/8554/tcp': 42002,
+        'frigate/8555/tcp': 42003,
+        'frigate/8555/udp': 42004,
+      }),
+      service.id,
+    );
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, manifest.containers[0]);
+    expect(descriptor.ExposedPorts).to.deep.equal({ '8971/tcp': {}, '8554/tcp': {}, '8555/tcp': {}, '8555/udp': {} });
+    expect(descriptor.HostConfig.PortBindings).to.deep.equal({
+      '8971/tcp': [{ HostIp: '0.0.0.0', HostPort: '42001' }],
+      '8554/tcp': [{ HostIp: '0.0.0.0', HostPort: '42002' }],
+      '8555/tcp': [{ HostIp: '0.0.0.0', HostPort: '42003' }],
+      '8555/udp': [{ HostIp: '0.0.0.0', HostPort: '42004' }],
+    });
   });
 
   it('should omit NanoCpus when the kernel has no CPU CFS support', async () => {

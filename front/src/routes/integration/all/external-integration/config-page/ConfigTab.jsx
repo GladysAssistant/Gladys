@@ -12,7 +12,12 @@ import WebhooksCard from './WebhooksCard';
 import TtsVoiceCard from './TtsVoiceCard';
 import HardwareCard from './HardwareCard';
 import AiProviderCard from './AiProviderCard';
-import { getAssignedPortsByName, getLocalizedText, getRequestedHardwareClasses } from '../utils';
+import {
+  getAssignedPortsByName,
+  getLocalizedText,
+  getRequestedHardwareClasses,
+  getRequestedCapabilities
+} from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../../server/utils/constants';
 
@@ -45,6 +50,7 @@ const ConfigTab = props => {
   const isTts = get(integration, 'manifest.type') === 'tts';
   const accountSchema = get(integration, 'manifest.account_schema') || [];
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
+  const requestedCapabilities = getRequestedCapabilities(get(integration, 'manifest.containers') || []);
   // host ports assigned to the manifest-named declared ports, for the
   // {{port:<name>}} placeholders of the section texts
   const placeholderPorts = getAssignedPortsByName(integration);
@@ -263,13 +269,18 @@ const ConfigTab = props => {
         />
       )}
 
-      {isAdmin && integration && requestedClasses.length > 0 && (
+      {isAdmin && integration && (requestedClasses.length > 0 || requestedCapabilities.length > 0) && (
         <HardwareCard
+          containers={get(integration, 'manifest.containers') || []}
           requestedClasses={requestedClasses}
           detectedClasses={props.detectedClasses || {}}
           grantedDevices={props.grantedDevices || []}
+          requestedCapabilities={requestedCapabilities}
+          grantedCapabilities={props.grantedCapabilities || []}
           hardwareStatus={props.hardwareStatus}
           onToggle={props.toggleHardwareClass}
+          onToggleCapability={props.toggleCapability}
+          onToggleAllCapabilities={props.toggleAllCapabilities}
           onSave={props.saveHardware}
         />
       )}

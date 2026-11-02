@@ -79,7 +79,7 @@ await gladys.connect(); // resolves once authenticated
 | `onScanRequest(cb)` | `() => Promise` (respond via `publishDiscoveredDevices`) |
 | `onDeviceCreated(cb)` / `onDeviceUpdated(cb)` / `onDeviceDeleted(cb)` | `(device) => Promise` |
 | `onConfigUpdated(cb)` | `(config) => Promise` (complete values, see C.4) |
-| `onHardwareUpdated(cb)` | `(containers) => Promise` — the hardware grants changed (C.4): regenerate the affected configs then `startContainer`/`restartContainer` |
+| `onHardwareUpdated(cb)` | `(containers) => Promise` — the hardware or Linux capability grants changed (C.4; each container carries `devices` and, from cores that know the field, `capabilities: [{ name, granted }]`): regenerate the affected configs then `startContainer`/`restartContainer` |
 | `onOAuthAuthorizeUrl(cb)` | `(key, redirectUri) => Promise<string>` — build the authorization URL (client_id from the config, scopes, `state` generated and retained); the resolved string goes into `data.authorize_url` |
 | `onOAuthCallback(cb)` | `(key, { code, state, redirectUri }) => Promise` — verify `state`, exchange the tokens, store them via `setConfig` (keys outside the schema), then `setConnectionStatus(true)` |
 | `onAction(key, cb)` | `(fields) => Promise<string \| object>` — handler of a declared action (C.1), registered by `key`; the resolved value goes into `data.message` (the ack delay is the action's `timeout_seconds`) |

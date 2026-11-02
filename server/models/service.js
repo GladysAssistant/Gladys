@@ -79,6 +79,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.JSON,
       },
+      granted_capabilities: {
+        allowNull: true,
+        type: DataTypes.JSON,
+      },
     },
     {},
   );

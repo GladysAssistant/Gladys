@@ -104,11 +104,12 @@ Consequences of this derivation:
     { "name": "mqtt", "status": "running", "desired": "running", "started_at": "2026-07-13T08:00:00.000Z", "ports": [] },
     { "name": "frigate", "status": "stopped", "desired": "stopped", "started_at": null,
       "ports": [{ "container_port": 5000, "protocol": "tcp", "host_port": 42115, "label": { "en": "Frigate UI" }, "name": "frigate_ui", "browsable": true }],
-      "devices": [{ "class": "coral-usb", "granted": true, "available": true }] }
+      "devices": [{ "class": "coral-usb", "granted": true, "available": true }],
+      "capabilities": [{ "name": "CHOWN", "granted": true }, { "name": "SETUID", "granted": false }] }
   ]
 }
 ```
-— the declared sub-containers, their Docker state, the desired state (B.2), the assigned host ports and, per requested hardware class, the granted/available state (this is how the integration knows what to put in its config — e.g. `edgetpu` vs `cpu` detector for Frigate); empty list if the integration declares none.
+— the declared sub-containers, their Docker state, the desired state (B.2), the assigned host ports and, per requested hardware class, the granted/available state (this is how the integration knows what to put in its config — e.g. `edgetpu` vs `cpu` detector for Frigate) and, per requested Linux capability (`capabilities`, C.1), whether the user granted it (`capabilities: [{ name, granted }]`, empty array when the entry requests none; absent on cores older than this field) — so the integration can tell the user what is missing when its sub-container cannot start (the effective `CapAdd` is requested ∩ granted ∩ allowlist, C.7; `granted` is the effective flag: a name outside the allowlist reads `false` even if stored as granted); empty list if the integration declares none.
 
 **`POST /api/integration/v1/container/:name/start`** — body `{}` or `{ "env": { "MQTT_PASSWORD": "..." } }` → `200 { "success": true }`. Creates the container if it does not exist yet, then starts it; it enters the "running" desired state (restarted by the supervisor if it crashes). The provided `env` is merged **on top of** the manifest's `env` (`GLADYS_*` keys forbidden → `400`) — it is the channel for values computed at runtime; if the `env` differs from the existing container's, the supervisor **recreates** it (destroy + create, the `/data` volumes persist) before starting it.
 

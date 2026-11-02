@@ -6,6 +6,7 @@
 // singleton's collection).
 // eslint-disable-next-line no-restricted-syntax
 const { fake } = require('sinon');
+const crypto = require('crypto');
 
 const ExternalIntegration = require('../../../lib/external-integration');
 const Calendar = require('../../../lib/calendar');
@@ -347,6 +348,25 @@ const TEST_DETECTED_CLASSES = [
 ];
 
 /**
+ * @description Labels of an existing sub-container created with the given
+ * effective grants (the fingerprint the supervisor stores, start-time
+ * reconciliation): a container listed with them is not recreated at start.
+ * @param {object} [grants] - The effective grants.
+ * @param {Array} [grants.capAdd] - The added capabilities.
+ * @param {Array} [grants.devices] - The mounted device paths.
+ * @returns {object} The labels.
+ * @example
+ * getContainers: fake.resolves([{ id: 'sub-1', labels: grantsLabels() }]);
+ */
+function grantsLabels({ capAdd = [], devices = [] } = {}) {
+  const fingerprint = crypto
+    .createHash('sha256')
+    .update(JSON.stringify({ capAdd: [...capAdd].sort(), devices: [...devices].sort() }))
+    .digest('hex');
+  return { 'io.gladysassistant.grants': fingerprint };
+}
+
+/**
  * @description Build a fake system manager for supervisor tests.
  * @param {object} [overrides] - Fakes to override.
  * @returns {object} The fake system.
@@ -540,6 +560,7 @@ async function seedExternalService(overrides = {}) {
 }
 
 module.exports = {
+  grantsLabels,
   TEST_JWT_SECRET,
   TEST_MANIFEST,
   TEST_COMMUNICATION_MANIFEST,

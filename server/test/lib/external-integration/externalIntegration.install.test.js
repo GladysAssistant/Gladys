@@ -326,6 +326,43 @@ describe('externalIntegration.install', () => {
     }
   });
 
+  it('should persist the granted capabilities, and none when the install screen sent nothing', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const manifest = {
+      ...TEST_CONTAINERS_MANIFEST,
+      containers: [
+        TEST_CONTAINERS_MANIFEST.containers[0],
+        { ...TEST_CONTAINERS_MANIFEST.containers[1], capabilities: ['CHOWN', 'SETUID'] },
+      ],
+    };
+    const integration = await externalIntegration.install({ manifest, grantedCapabilities: ['CHOWN', 'SETUID'] });
+    const serviceInDb = await db.Service.findOne({ where: { selector: integration.selector } });
+    expect(serviceInDb.granted_capabilities).to.deep.equal(['CHOWN', 'SETUID']);
+    externalIntegration.clearTimers(integration.id);
+    await db.Service.destroy({ where: { selector: integration.selector } });
+    const withoutGrant = await externalIntegration.install({ manifest });
+    const withoutGrantInDb = await db.Service.findOne({ where: { selector: withoutGrant.selector } });
+    expect(withoutGrantInDb.granted_capabilities).to.equal(null);
+  });
+
+  it('should reject granted capabilities that are invalid or not requested by the manifest', async () => {
+    const { externalIntegration } = buildSupervisor();
+    try {
+      await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST, grantedCapabilities: 'CHOWN' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.equal('granted_capabilities: must be an array of Linux capabilities');
+    }
+    try {
+      await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST, grantedCapabilities: ['CHOWN'] });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.equal('granted_capabilities: CHOWN not requested by the manifest');
+    }
+  });
+
   it('should translate a failing sub-container image pull', async () => {
     const pull = sinon.stub();
     pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('NO_MATCHING_MANIFEST'));
