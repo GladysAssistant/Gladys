@@ -3,7 +3,8 @@
 > **Living specification — source of truth.** This document specifies how a Gladys Plus user who
 > lost their second factor gets back into their account without any human intervention: a new set of
 > recovery codes generated from their Gladys instance (sections B, C), or, when no instance is
-> connected, a reset of the two-factor authentication by email (section E). It owns the contract
+> connected, a reset of the two-factor authentication by email (section E), then replaces their lost
+> app with a recovery code (section F). It owns the contract
 > between Gladys, the Gladys Plus Gateway and its JS client. **Rule: any PR that changes
 > one of these behaviors or contracts modifies this file in the same diff.**
 >
@@ -168,3 +169,20 @@ the instance was offline is refused, and kept, if the instance came back online 
   `gatewayResetTwoFactor.*`.
 - `gatewayLogin.noRecoveryCode` and the `password_reset` email no longer ask the user to write
   to support: they point to the instance (section B) and to the reset by email.
+
+## F. Replacing the two-factor app with a recovery code
+
+After a login with a recovery code (sections B or E give new ones), the user still has a lost
+app registered on the account: every login would burn another code. Settings › Security already
+lets the user replace their app, against a code of the **current** app; it now also accepts
+**one of their recovery codes** as the current second factor.
+
+- `PATCH /users/two-factor` takes `current_two_factor_recovery_code` as an alternative to
+  `current_two_factor_code`. The new secret is still proven by a code of the new app first; the
+  recovery code is then **consumed in the same transaction** as the replacement, so a wrong code
+  of the new app, or a failed replacement, never costs a recovery code. A wrong or used recovery
+  code is `403` and changes nothing.
+- Front: `GatewayTwoFactorApp` offers "Lost your current app? Use a recovery code instead" under
+  the current code field; `GatewaySession.updateTwoFactor` sends one of the two fields.
+- The other recovery codes stay valid; the user is told to generate a new set once the new app
+  is set up (that generation still requires a code of the app, which they now have).

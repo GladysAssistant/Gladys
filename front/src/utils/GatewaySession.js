@@ -122,14 +122,16 @@ class GatewaySession {
 
   // The Gateway only replaces the secret with a valid code from the NEW app (the
   // secret was registered correctly) and a valid code from the CURRENT app (the
-  // request comes from someone who holds the current second factor).
-  async updateTwoFactor({ twoFactorSecret, twoFactorCode, currentTwoFactorCode }) {
+  // request comes from someone who holds the current second factor), or one of the
+  // single-use recovery codes for a user who lost their current app.
+  async updateTwoFactor({ twoFactorSecret, twoFactorCode, currentTwoFactorCode, currentTwoFactorRecoveryCode }) {
     return gatewayRequest.patch(
       `${this.gladysGatewayApiUrl}/users/two-factor`,
       {
         two_factor_secret: twoFactorSecret,
         two_factor_code: twoFactorCode,
-        current_two_factor_code: currentTwoFactorCode
+        current_two_factor_code: currentTwoFactorRecoveryCode ? undefined : currentTwoFactorCode,
+        current_two_factor_recovery_code: currentTwoFactorRecoveryCode || undefined
       },
       this.gatewayClient
     );

@@ -27,6 +27,10 @@ class GatewayTwoFactorApp extends Component {
     secret: null,
     twoFactorCode: '',
     currentTwoFactorCode: '',
+    // the user lost their current app (they logged in with a recovery code): one of
+    // their recovery codes stands for the current code, and is consumed
+    useRecoveryCode: false,
+    currentTwoFactorRecoveryCode: '',
     error: null
   };
 
@@ -43,7 +47,9 @@ class GatewayTwoFactorApp extends Component {
       status: RequestStatus.Getting,
       error: null,
       twoFactorCode: '',
-      currentTwoFactorCode: ''
+      currentTwoFactorCode: '',
+      useRecoveryCode: false,
+      currentTwoFactorRecoveryCode: ''
     });
     try {
       const { otpauth_url: otpauthUrl, secret } = await this.props.session.getNewTwoFactorSecret();
@@ -97,6 +103,20 @@ class GatewayTwoFactorApp extends Component {
     this.setState({ currentTwoFactorCode: e.target.value });
   };
 
+  updateCurrentTwoFactorRecoveryCode = e => {
+    this.setState({ currentTwoFactorRecoveryCode: e.target.value });
+  };
+
+  useRecoveryCode = e => {
+    e.preventDefault();
+    this.setState({ useRecoveryCode: true, currentTwoFactorCode: '', error: null });
+  };
+
+  useCurrentCode = e => {
+    e.preventDefault();
+    this.setState({ useRecoveryCode: false, currentTwoFactorRecoveryCode: '', error: null });
+  };
+
   replaceTwoFactorApp = async e => {
     e.preventDefault();
     // a second submit (Enter key) while the first one is pending would be refused by
@@ -109,7 +129,8 @@ class GatewayTwoFactorApp extends Component {
       await this.props.session.updateTwoFactor({
         twoFactorSecret: this.state.secret,
         twoFactorCode: this.state.twoFactorCode,
-        currentTwoFactorCode: this.state.currentTwoFactorCode
+        currentTwoFactorCode: this.state.useRecoveryCode ? undefined : this.state.currentTwoFactorCode,
+        currentTwoFactorRecoveryCode: this.state.useRecoveryCode ? this.state.currentTwoFactorRecoveryCode : undefined
       });
       this.setState({
         configuring: false,
@@ -119,7 +140,9 @@ class GatewayTwoFactorApp extends Component {
         manualEntryKey: null,
         secret: null,
         twoFactorCode: '',
-        currentTwoFactorCode: ''
+        currentTwoFactorCode: '',
+        useRecoveryCode: false,
+        currentTwoFactorRecoveryCode: ''
       });
     } catch (err) {
       const status = get(err, 'response.status');
@@ -128,8 +151,9 @@ class GatewayTwoFactorApp extends Component {
       let error = 'update';
       if (status === 403) {
         // one of the codes is wrong or expired: the new secret is still valid, the
-        // user stays on the form to enter fresh codes
-        error = 'invalidCode';
+        // user stays on the form to enter fresh codes (a wrong recovery code is not
+        // consumed, nor is a valid one sent with a wrong code of the new app)
+        error = this.state.useRecoveryCode ? 'invalidRecoveryCode' : 'invalidCode';
       } else if (status === 429) {
         error = 'tooManyAttempts';
       }
@@ -137,15 +161,32 @@ class GatewayTwoFactorApp extends Component {
         status: RequestStatus.Error,
         error,
         twoFactorCode: '',
-        currentTwoFactorCode: ''
+        currentTwoFactorCode: '',
+        currentTwoFactorRecoveryCode: ''
       });
     }
   };
 
-  render({}, { status, configuring, replaced, dataUrl, manualEntryKey, twoFactorCode, currentTwoFactorCode, error }) {
+  render(
+    {},
+    {
+      status,
+      configuring,
+      replaced,
+      dataUrl,
+      manualEntryKey,
+      twoFactorCode,
+      currentTwoFactorCode,
+      useRecoveryCode,
+      currentTwoFactorRecoveryCode,
+      error
+    }
+  ) {
     const pending = status === RequestStatus.Getting;
-    const codesFilled =
-      twoFactorCode.length === TWO_FACTOR_CODE_LENGTH && currentTwoFactorCode.length === TWO_FACTOR_CODE_LENGTH;
+    const currentFactorFilled = useRecoveryCode
+      ? currentTwoFactorRecoveryCode.trim().length > 0
+      : currentTwoFactorCode.length === TWO_FACTOR_CODE_LENGTH;
+    const codesFilled = twoFactorCode.length === TWO_FACTOR_CODE_LENGTH && currentFactorFilled;
     return (
       <div class="card">
         <div class="card-body p-6">
@@ -166,6 +207,7 @@ class GatewayTwoFactorApp extends Component {
               {status === RequestStatus.Error && error && (
                 <div class="alert alert-danger" role="alert">
                   {error === 'invalidCode' && <Text id="gatewayTwoFactorApp.invalidCode" />}
+                  {error === 'invalidRecoveryCode' && <Text id="gatewayTwoFactorApp.invalidRecoveryCode" />}
                   {error === 'tooManyAttempts' && <Text id="gatewayTwoFactorApp.tooManyAttempts" />}
                   {error === 'load' && <Text id="gatewayTwoFactorApp.loadError" />}
                   {error === 'update' && <Text id="gatewayTwoFactorApp.updateError" />}
@@ -218,27 +260,56 @@ class GatewayTwoFactorApp extends Component {
                       />
                     </Localizer>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label" htmlFor="gateway-two-factor-current-code">
-                      <Text id="gatewayTwoFactorApp.currentCodeLabel" />
-                    </label>
-                    <Localizer>
-                      <input
-                        id="gateway-two-factor-current-code"
-                        type="text"
-                        class="form-control"
-                        placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
-                        value={currentTwoFactorCode}
-                        onInput={this.updateCurrentTwoFactorCode}
-                        inputmode="numeric"
-                        autocomplete="off"
-                        maxlength={TWO_FACTOR_CODE_LENGTH}
-                      />
-                    </Localizer>
-                    <small class="form-text text-muted">
-                      <Text id="gatewayTwoFactorApp.currentCodeHelp" />
-                    </small>
-                  </div>
+                  {!useRecoveryCode && (
+                    <div class="form-group">
+                      <label class="form-label" htmlFor="gateway-two-factor-current-code">
+                        <Text id="gatewayTwoFactorApp.currentCodeLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id="gateway-two-factor-current-code"
+                          type="text"
+                          class="form-control"
+                          placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
+                          value={currentTwoFactorCode}
+                          onInput={this.updateCurrentTwoFactorCode}
+                          inputmode="numeric"
+                          autocomplete="off"
+                          maxlength={TWO_FACTOR_CODE_LENGTH}
+                        />
+                      </Localizer>
+                      <small class="form-text text-muted">
+                        <Text id="gatewayTwoFactorApp.currentCodeHelp" />{' '}
+                        <a href="#" onClick={this.useRecoveryCode}>
+                          <Text id="gatewayTwoFactorApp.useRecoveryCodeLink" />
+                        </a>
+                      </small>
+                    </div>
+                  )}
+                  {useRecoveryCode && (
+                    <div class="form-group">
+                      <label class="form-label" htmlFor="gateway-two-factor-current-recovery-code">
+                        <Text id="gatewayTwoFactorApp.currentRecoveryCodeLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id="gateway-two-factor-current-recovery-code"
+                          type="text"
+                          class="form-control"
+                          placeholder={<Text id="gatewayLogin.recoveryCodePlaceholder" />}
+                          value={currentTwoFactorRecoveryCode}
+                          onInput={this.updateCurrentTwoFactorRecoveryCode}
+                          autocomplete="off"
+                        />
+                      </Localizer>
+                      <small class="form-text text-muted">
+                        <Text id="gatewayTwoFactorApp.currentRecoveryCodeHelp" />{' '}
+                        <a href="#" onClick={this.useCurrentCode}>
+                          <Text id="gatewayTwoFactorApp.useCurrentCodeLink" />
+                        </a>
+                      </small>
+                    </div>
+                  )}
                   <div class="btn-list">
                     <button type="submit" class="btn btn-primary" disabled={!codesFilled || pending}>
                       <Text id="gatewayTwoFactorApp.confirmButton" />
