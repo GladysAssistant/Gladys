@@ -110,7 +110,8 @@ function newValueTemperatureSensor(message, data) {
   if (data.humidity) {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `xiaomi:${sid}:humidity`,
-      state: Math.round(data.humidity / 100),
+      // the gateway reports humidity scaled by 100; keep one decimal like temperature above
+      state: Math.round(data.humidity / 10) / 10,
     });
   }
 
