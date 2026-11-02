@@ -152,17 +152,20 @@ class RemoteAccess extends Component {
     this.setState({ resetTwoFactorStatus: RequestStatus.Getting });
     try {
       await this.props.resetRemoteTwoFactor(this.props.remote, this.state.resetTwoFactorCode);
-      this.setState({ resetTwoFactorOpen: false, resetTwoFactorStatus: RequestStatus.Success });
+      this.setState({ resetTwoFactorOpen: false, resetTwoFactorCode: '', resetTwoFactorStatus: RequestStatus.Success });
     } catch (err) {
-      console.error(err);
+      // the request carries the admin's current authenticator code: never the
+      // whole error (Axios keeps the request body in it) in the console
       const httpStatus = get(err, 'response.status');
+      console.error('Could not reset the two factor of the user', httpStatus || err.message);
       let status = RequestStatus.Error;
       if (httpStatus === 403) {
         status = RequestStatus.ValidationError;
       } else if (httpStatus === 429) {
         status = RequestStatus.RateLimitError;
       }
-      this.setState({ resetTwoFactorStatus: status });
+      // a used code is not worth keeping, right or wrong
+      this.setState({ resetTwoFactorCode: '', resetTwoFactorStatus: status });
     }
   };
 
