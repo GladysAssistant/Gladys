@@ -177,6 +177,59 @@ describe('Mqtt handle message', () => {
       state: 'hello-world',
     });
   });
+  it('handle device with custom topic and empty payload', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: null,
+      },
+    ];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', '');
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with custom topic and null JSON value', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: null,
+        },
+      }),
+    );
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with custom topic and JSON value missing the object path', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          humidity: 50,
+        },
+      }),
+    );
+
+    assert.notCalled(gladys.event.emit);
+  });
   it('handle device with custom topic and custom object path', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {

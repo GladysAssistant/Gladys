@@ -33,11 +33,20 @@ function handleDeviceCustomTopicMessage(topic, message, deviceFeatureId, objectP
     // If objectPath is not null, it's supposed to be a JSON
     if (objectPath) {
       const state = get(JSON.parse(message), objectPath);
+      if (state === undefined || state === null || state === '') {
+        // Number() would turn an empty, null or missing value into 0; an empty
+        // payload carries no state, so ignore it instead
+        return;
+      }
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: deviceFeature.external_id,
         state: parseNumber(state),
       });
     } else {
+      if (message === '') {
+        // Number('') is 0: an empty payload carries no state, so ignore it instead
+        return;
+      }
       // else, it's supposed to be a normal string, send it raw
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: deviceFeature.external_id,
