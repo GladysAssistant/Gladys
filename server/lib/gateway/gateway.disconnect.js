@@ -20,6 +20,9 @@ async function disconnect() {
     // it cannot re-lock the instance for the next account.
     this.subscriptionLinkGeneration += 1;
     await (this.subscriptionTransition || Promise.resolve()).catch(() => null);
+    // same for the health of the backups: a change in progress finishes
+    // before the keys are deleted below, the queued ones are dropped
+    await (this.backupHealthTransition || Promise.resolve()).catch(() => null);
     if (!this.subscriptionActive) {
       // the lock goes with the account: the front drops its notice right away
       // (no "active again" chat message: nothing was paid, the link is gone)

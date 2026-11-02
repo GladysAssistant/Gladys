@@ -102,17 +102,38 @@ describe('gateway.backup', async function describe() {
     expect(gateway.backupInProgress).to.equal(false);
   });
 
-  it('should cancel the scheduled backup: this one covers the day', async () => {
+  it('should cancel the scheduled backup once it succeeded: this one covers the day', async () => {
     const scheduled = fake.returns(null);
-    gateway.pendingBackupTimer = setTimeout(scheduled, 50);
+    const timer = setTimeout(scheduled, 100000);
+    gateway.pendingBackupTimer = timer;
+    const clearTimeoutSpy = sinon.spy(global, 'clearTimeout');
 
-    await gateway.backup();
+    try {
+      await gateway.backup();
+    } finally {
+      clearTimeoutSpy.restore();
+      clearTimeout(timer);
+    }
 
     expect(gateway.pendingBackupTimer).to.equal(null);
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100);
-    });
+    assert.calledWith(clearTimeoutSpy, timer);
     assert.notCalled(scheduled);
+  });
+
+  it('should leave the scheduled backup armed when it fails: the day still needs one', async () => {
+    gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects(new Error('error'));
+    const timer = setTimeout(() => {}, 100000);
+    gateway.pendingBackupTimer = timer;
+
+    try {
+      await gateway.backup();
+      assert.fail();
+    } catch (e) {
+      expect(e).haveOwnProperty('message', 'error');
+    }
+
+    expect(gateway.pendingBackupTimer).to.equal(timer);
+    clearTimeout(timer);
   });
 
   it('should refuse to start while another backup is in progress, without touching it', async () => {

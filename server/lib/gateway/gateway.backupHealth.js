@@ -221,6 +221,12 @@ async function recordBackupFailure(errorMessage, generation = this.subscriptionL
       const failingSince = health.failing_since || now.toISOString();
       if (health.failing_since === null) {
         await this.variable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE, failingSince);
+        // a new streak starts from a clean slate: an alert left open by a
+        // recovery message that reached nobody belongs to the previous one
+        if (health.alert_sent_at !== null) {
+          await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT);
+          health.alert_sent_at = null;
+        }
       }
       await this.variable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR, safeError);
       // "two consecutive failed nights": measured from the last success when

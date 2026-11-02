@@ -33,42 +33,45 @@ function getLocalDay(date, timezone) {
 }
 
 /**
- * @description Check if a backup is needed: one backup a day, on the calendar
- * day of the instance. Runs every night, once in the daytime and after
- * start-up (see gateway.init), so a day missed for any reason is caught up.
+ * @description The check itself, see checkIfBackupNeeded.
+ * @param {object} gateway - The gateway instance.
+ * @returns {Promise} Resolve when the check is done.
  * @example
- * checkIfBackupNeeded();
+ * await runCheck(this);
  */
-async function checkIfBackupNeeded() {
-  // The checks overlap by design (night, daytime, start-up, subscription
-  // unlock): the Gateway list only shows a backup once it is uploaded, so
-  // a check running while one is pending or in progress would schedule a
-  // second one, and two backups at once empty the same folder
-  if (this.pendingBackupTimer !== null) {
-    logger.info(`A backup is already scheduled, not checking again.`);
-    return;
-  }
-  if (this.backupInProgress) {
-    logger.info(`A backup is in progress, not checking again.`);
-    return;
-  }
-  if (!this.connected) {
-    const refreshToken = await this.variable.getValue('GLADYS_GATEWAY_REFRESH_TOKEN');
-    if (refreshToken === null) {
+async function runCheck(gateway) {
+  // whatever is learnt here belongs to the account linked now: nothing is
+  // written nor scheduled for it once it was unlinked
+  const generation = gateway.subscriptionLinkGeneration;
+  const unlinkedMeanwhile = () => {
+    if (generation !== gateway.subscriptionLinkGeneration) {
+      logger.info(`The Gladys Plus account was unlinked during the backup check, not backing up.`);
+      return true;
+    }
+    return false;
+  };
+  if (!gateway.connected) {
+    const refreshToken = await gateway.variable.getValue('GLADYS_GATEWAY_REFRESH_TOKEN');
+    if (refreshToken === null || unlinkedMeanwhile()) {
       logger.debug(`Gladys Plus is not configured, not backing up.`);
+      return;
+    }
+    // the admins of a locked instance are already told by the lock itself
+    if (!gateway.subscriptionActive) {
+      logger.info(`Gladys Plus subscription is not paid and the instance is not connected, not backing up.`);
       return;
     }
     logger.info(`Instance not connected to Gladys Gateway, not backing up.`);
     // the instance is linked but cannot reach Gladys Plus: a night without
     // backup the admins must hear about if it lasts
-    await this.recordBackupFailure(BACKUP_ERRORS.NOT_CONNECTED);
+    await gateway.recordBackupFailure(BACKUP_ERRORS.NOT_CONNECTED, generation);
     return;
   }
   // Also the daily probe of a locked instance: one cheap call a day, and the
   // first success after the payment unlocks the features (see getBackups)
   let backups;
   try {
-    backups = await this.getBackups();
+    backups = await gateway.getBackups();
   } catch (e) {
     if (e instanceof Error402) {
       logger.info(`Gladys Plus subscription is not paid, not backing up.`);
@@ -80,13 +83,19 @@ async function checkIfBackupNeeded() {
       logger.info(`Backups are not included in the Gladys Plus plan of this instance, not backing up.`);
       return;
     }
+    if (unlinkedMeanwhile()) {
+      return;
+    }
     // no internet tonight: no backup, recorded as such
     logger.warn(`Unable to list the Gladys Plus backups, not backing up.`);
     logger.warn(e);
-    await this.recordBackupFailure(BACKUP_ERRORS.UNREACHABLE);
+    await gateway.recordBackupFailure(BACKUP_ERRORS.UNREACHABLE, generation);
     return;
   }
-  const timezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+  if (unlinkedMeanwhile()) {
+    return;
+  }
+  const timezone = await gateway.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   let shouldBackup = false;
   if (backups.length === 0) {
     shouldBackup = true;
@@ -95,34 +104,71 @@ async function checkIfBackupNeeded() {
     // Gladys Plus is the source of truth for the last backup: it fills the
     // local health at the first run after an upgrade, and fixes it after the
     // restore of an old backup (whose health is the one of the day it was made)
-    const health = await this.getBackupHealth();
+    const health = await gateway.getBackupHealth();
     if (health.last_success_at === null || new Date(health.last_success_at) < lastBackupDate) {
-      await this.recordBackupSuccess(lastBackupDate);
+      await gateway.recordBackupSuccess(lastBackupDate, generation);
     }
     // One backup a day, by calendar day: the night check starts between 2 and
     // 4 AM, so "the last backup is more than 24 hours old" was false one night
     // out of two, and most instances were backed up every other day
     shouldBackup = getLocalDay(lastBackupDate, timezone) !== getLocalDay(new Date(), timezone);
   }
+  if (unlinkedMeanwhile()) {
+    return;
+  }
   if (shouldBackup) {
     // To avoid being too brutal with the Gladys Gateway server
     // we start backups at a random moment
     // between now (0ms wait) and RAND_INTERVAL_IN_MS wait
-    const randomMoment = generateRandomInteger(this.backupRandomInterval);
+    const randomMoment = generateRandomInteger(gateway.backupRandomInterval);
     logger.info(`Backup will be started in ${Math.round(randomMoment / 1000)} seconds`);
-    this.pendingBackupTimer = setTimeout(() => {
-      this.pendingBackupTimer = null;
-      // a manual backup started during the delay cancels this timer; one
-      // still running when it fires has the day covered as well
-      if (this.backupInProgress) {
+    gateway.pendingBackupTimer = setTimeout(() => {
+      gateway.pendingBackupTimer = null;
+      // a manual backup that succeeded during the delay cancels this timer;
+      // one still running when it fires has the day covered as well
+      if (gateway.backupInProgress) {
         logger.info(`A backup is in progress, not starting the scheduled one.`);
         return;
       }
       logger.info(`Starting backup!`);
-      this.event.emit(EVENTS.GATEWAY.CREATE_BACKUP);
+      gateway.event.emit(EVENTS.GATEWAY.CREATE_BACKUP);
     }, randomMoment);
   } else {
     logger.info(`Not backing up instance to Gladys Gateway, a backup was already made today.`);
+  }
+}
+
+/**
+ * @description Check if a backup is needed: one backup a day, on the calendar
+ * day of the instance. Runs every night, once in the daytime and after
+ * start-up (see gateway.init), so a day missed for any reason is caught up.
+ * @example
+ * checkIfBackupNeeded();
+ */
+async function checkIfBackupNeeded() {
+  // The checks overlap by design (night, daytime, start-up, subscription
+  // unlock): the Gateway list only shows a backup once it is uploaded, so
+  // a check running while one is pending or in progress would schedule a
+  // second one, and two backups at once empty the same folder. The check
+  // itself is reserved before its first await: two checks started in the
+  // same second (a restart around 2 AM) must not both schedule a backup.
+  if (this.backupCheckInProgress) {
+    logger.info(`A backup check is already running, not checking again.`);
+    return;
+  }
+  if (this.pendingBackupTimer !== null) {
+    logger.info(`A backup is already scheduled, not checking again.`);
+    return;
+  }
+  if (this.backupInProgress) {
+    logger.info(`A backup is in progress, not checking again.`);
+    return;
+  }
+  this.backupCheckInProgress = true;
+  try {
+    await runCheck(this);
+  } finally {
+    this.backupCheckInProgress = false;
   }
 }
 

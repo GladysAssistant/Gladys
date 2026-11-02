@@ -381,6 +381,25 @@ describe('gateway.backupHealth', () => {
       );
     });
 
+    it('should warn of a new streak even when the recovery of the previous one reached nobody', async () => {
+      // the previous streak ended, its recovery message was never delivered
+      variables.set(
+        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT,
+        new Date(Date.now() - 2 * DAY).toISOString(),
+      );
+      variables.set(
+        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT,
+        new Date(Date.now() - 5 * DAY).toISOString(),
+      );
+
+      await gateway.recordBackupFailure('Error: boom');
+
+      assert.calledWith(brain.getReply, 'en', 'backup.failing', sinon.match.object);
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT)).to.equal(
+        '2024-01-05T02:30:00.000Z',
+      );
+    });
+
     it('should not alert again within a week of the last alert', async () => {
       variables.set(
         SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT,

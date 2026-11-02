@@ -50,6 +50,40 @@ describe('gateway.disconnect', () => {
     sinon.reset();
   });
 
+  it('should cancel the scheduled backup of the unlinked account', async () => {
+    const clock = sinon.useFakeTimers();
+    try {
+      const scheduled = fake.returns(null);
+      gateway.pendingBackupTimer = setTimeout(scheduled, 1000);
+
+      await gateway.disconnect();
+
+      clock.tick(10000);
+      assert.notCalled(scheduled);
+      expect(gateway.pendingBackupTimer).to.equal(null);
+    } finally {
+      clock.restore();
+    }
+  });
+
+  it('should wait for a change of the backup health in progress before deleting its keys', async () => {
+    const steps = [];
+    gateway.backupHealthTransition = new Promise((resolve) => {
+      setTimeout(() => {
+        steps.push('health change done');
+        resolve();
+      }, 10);
+    });
+    variable.destroy = sinon.stub().callsFake(async () => {
+      steps.push('destroy');
+    });
+
+    await gateway.disconnect();
+
+    expect(steps[0]).to.equal('health change done');
+    expect(steps.filter((step) => step === 'destroy').length).to.equal(12);
+  });
+
   it('should disconnect Gateway', async () => {
     await gateway.disconnect();
 

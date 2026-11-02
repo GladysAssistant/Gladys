@@ -340,6 +340,8 @@ describe('GET /api/v1/gateway/status', () => {
         .then((res) => {
           expect(res.body).to.have.property('connected');
           expect(res.body).to.have.property('configured');
+          // the health of the backups (server paths in its last error) is for the admins
+          expect(res.body).to.not.have.property('backup_health');
         });
     } finally {
       await db.User.destroy({ where: { id: NON_ADMIN_USER_ID } });

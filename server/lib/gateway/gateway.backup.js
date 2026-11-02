@@ -59,11 +59,8 @@ const logMemoryUsage = async (label) => {
  */
 async function backup(jobId) {
   // Before any await, so that two backups asked at the same moment (the
-  // scheduled one and "Backup now", or two clicks) cannot both get past:
-  // this backup covers the day, a scheduled one is no longer needed, and a
+  // scheduled one and "Backup now", or two clicks) cannot both get past: a
   // second one at the same time would empty the folder of the first
-  clearTimeout(this.pendingBackupTimer);
-  this.pendingBackupTimer = null;
   if (this.backupInProgress) {
     logger.info('Gateway backup: a backup is already in progress, not starting another one.');
     throw new ConflictError(ERROR_MESSAGES.BACKUP_ALREADY_IN_PROGRESS);
@@ -213,6 +210,10 @@ async function backup(jobId) {
       });
       throw e;
     }
+    // this backup covers the day: a scheduled one is no longer needed (a
+    // failed manual backup leaves it armed, the day still needs a backup)
+    clearTimeout(this.pendingBackupTimer);
+    this.pendingBackupTimer = null;
     // outside the multipart try: the upload is finalized, nothing here may
     // abort it (recordBackupSuccess never throws anyway)
     await this.recordBackupSuccess(new Date(), linkGeneration);

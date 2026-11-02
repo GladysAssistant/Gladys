@@ -1,5 +1,5 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { EVENTS, ERROR_MESSAGES } = require('../../utils/constants');
+const { EVENTS, ERROR_MESSAGES, USER_ROLE } = require('../../utils/constants');
 const { Error403 } = require('../../utils/httpErrors');
 const { PasswordNotMatchingError, NotFoundError } = require('../../utils/coreErrors');
 const { getAudioBufferFromRequest, getAudioContentTypeFromRequest } = require('../utils/getAudioBufferFromRequest');
@@ -12,6 +12,12 @@ module.exports = function GatewayController(gladys) {
    */
   async function getStatus(req, res) {
     const status = await gladys.gateway.getStatus();
+    // every user, and the signup restore flow without a session, needs the
+    // link and subscription state; the health of the backups (its last error
+    // names server paths) is for the admins
+    if (!req.user || req.user.role !== USER_ROLE.ADMIN) {
+      delete status.backup_health;
+    }
     res.json(status);
   }
   /**

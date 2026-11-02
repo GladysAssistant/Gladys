@@ -118,6 +118,7 @@ const Gateway = function Gateway(
   // scheduling a second one
   this.pendingBackupTimer = null;
   this.backupInProgress = false;
+  this.backupCheckInProgress = false;
   // pending change of the backup health, see gateway.backupHealth
   this.backupHealthTransition = null;
   this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
