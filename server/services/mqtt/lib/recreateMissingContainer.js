@@ -31,6 +31,7 @@ async function recreateMissingContainer(configuration) {
     return configuration;
   }
 
+  let container = null;
   try {
     // Whatever container carries our name (a user one, a broker Gladys never configured), it is left untouched
     const existingContainer = await findContainerByName(this.gladys.system, containerDescriptor.name);
@@ -40,7 +41,7 @@ async function recreateMissingContainer(configuration) {
     }
 
     logger.info('MQTT: the embedded broker container is missing, recreating it with the stored credentials...');
-    const container = await this.installContainer(false);
+    container = await this.installContainer(false);
     await this.gladys.system.restartContainer(container.id);
     // wait 5 seconds for the container to start
     await sleep(5 * 1000);
@@ -64,8 +65,17 @@ async function recreateMissingContainer(configuration) {
 
     return { ...configuration, brokerContainerAvailable: true, mosquittoVersion: DEFAULT.MOSQUITTO_VERSION };
   } catch (e) {
-    // Not worse than a missing broker: the service still starts, the broker can be installed from the setup page
     logger.error('MQTT: failed to recreate the embedded broker container:', e);
+    // A created container with an empty password file would be reported as available at the next start, and
+    // never recreated: remove it, so that the next start retries and the setup page can still install the broker
+    if (container) {
+      try {
+        await this.gladys.system.removeContainer(container.id, { force: true });
+      } catch (removeError) {
+        logger.error('MQTT: failed to remove the embedded broker container left half-configured:', removeError);
+      }
+    }
+    // The service still starts, as with a missing broker
     return configuration;
   }
 }

@@ -180,14 +180,45 @@ describe('mqttHandler.recreateMissingContainer', () => {
 
   it('should not crash when the broker cannot be recreated', async () => {
     gladys.system.pull = fake.rejects(new Error('network unreachable'));
+    gladys.system.removeContainer = fake.resolves(null);
     const configuration = { ...restoredConfiguration };
 
     const result = await mqttHandler.recreateMissingContainer(configuration);
 
     expect(result).to.equal(configuration);
     assert.notCalled(gladys.system.createContainer);
+    // Nothing was created, nothing to remove
+    assert.notCalled(gladys.system.removeContainer);
     assert.notCalled(gladys.system.exec);
     assert.notCalled(mqttHandler.saveConfiguration);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
+  it('should remove the created broker when its credentials cannot be written', async () => {
+    gladys.system.exec = fake.rejects(new Error('container is not running'));
+    gladys.system.removeContainer = fake.resolves(null);
+    const configuration = { ...restoredConfiguration };
+
+    const result = await mqttHandler.recreateMissingContainer(configuration);
+
+    expect(result).to.equal(configuration);
+    assert.calledOnce(gladys.system.createContainer);
+    // Left in place with an empty password file, it would be seen as available and never recreated
+    assert.calledOnceWithExactly(gladys.system.removeContainer, 'new-broker', { force: true });
+    assert.notCalled(mqttHandler.saveConfiguration);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
+  it('should not crash when the created broker cannot be removed either', async () => {
+    gladys.system.restartContainer = fake.rejects(new Error('cannot start container'));
+    gladys.system.removeContainer = fake.rejects(new Error('Docker daemon unavailable'));
+    const configuration = { ...restoredConfiguration };
+
+    const result = await mqttHandler.recreateMissingContainer(configuration);
+
+    expect(result).to.equal(configuration);
+    assert.calledOnceWithExactly(gladys.system.removeContainer, 'new-broker', { force: true });
+    assert.notCalled(gladys.system.exec);
     assert.notCalled(gladys.variable.setValue);
   });
 });
