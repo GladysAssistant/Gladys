@@ -3,6 +3,10 @@ import config from '../config';
 import { Dispatcher } from './Dispatcher';
 import { hasPasswordFields, omitPasswordFields } from './omitPasswordFields';
 
+// Gladys restarting (an update takes tens of seconds) refuses the websocket
+// until it listens again: the connection is attempted again at this pace
+const WEBSOCKET_RETRY_DELAY_MS = 2000;
+
 class Session {
   constructor() {
     this.user = null;
@@ -44,7 +48,8 @@ class Session {
     if (this.ws && this.ws.close) {
       this.ws.close();
     }
-    this.ws = new WebSocket(websocketUrl);
+    const ws = new WebSocket(websocketUrl);
+    this.ws = ws;
     this.ws.onopen = () => {
       this.websocketOpened = true;
       this.ws.send(
@@ -84,6 +89,17 @@ class Session {
             this.connect();
           }, 1000);
         }
+      } else if (this.ws === ws && this.user && e.code !== 1005 && e.code !== 1000) {
+        // The connection could not even be opened: Gladys is still restarting.
+        // Without trying again, a tab left open during an update would never
+        // get its live updates back until reloaded. Only the current socket of
+        // a session still logged in retries, and only if no newer connection
+        // was started in the meantime.
+        setTimeout(() => {
+          if (this.ws === ws && this.user) {
+            this.connect();
+          }
+        }, WEBSOCKET_RETRY_DELAY_MS);
       }
     };
   }

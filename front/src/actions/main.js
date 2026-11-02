@@ -30,6 +30,13 @@ let lastInstanceVersionRefresh = 0;
 // changes to the store: the listener is registered once per session
 let gatewaySubscriptionListenerSession = null;
 let gatewaySubscriptionListener = null;
+// the session whose websocket already forwards the startup progress of the
+// integrations to the store: the listeners are registered once per session
+let servicesStartupListenerSession = null;
+let servicesStartupListeners = null;
+// bumped by every progress received through the websocket: a state loaded over
+// HTTP meanwhile is older than it, and must not replace it
+let servicesStartupEventCount = 0;
 
 const OPEN_PAGES = [
   '/signup',
@@ -113,6 +120,8 @@ function createActions(store) {
         actions.refreshInstanceVersionState(state);
         // and for the Gladys Plus subscription lock, announced in the header
         actions.refreshGatewaySubscriptionState(state);
+        // and for the integrations still starting, announced in the header too
+        actions.refreshServicesStartupState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
           // logout swaps the session object out of the store: the role of the
@@ -256,6 +265,66 @@ function createActions(store) {
         });
       } catch (e) {
         // status unknown: better no notice than a wrong one
+        console.error(e);
+      }
+    },
+    // At boot, Gladys starts its integrations one after the other, and one that
+    // is not started yet cannot control its devices: the header announces it on
+    // every page (ServicesStartupNotice). Loaded at session check and each time
+    // the websocket connects again — Gladys just restarted, typically for an
+    // update — then kept up to date by the instance through the websocket.
+    async refreshServicesStartupState(state) {
+      // the demo has no real instance to start
+      if (config.demoMode) {
+        return;
+      }
+      // logout swaps the session object out of the store: a listener or a
+      // response belonging to a previous session must not write into the next one
+      const requestSession = state.session;
+      if (store.getState().session !== requestSession) {
+        return;
+      }
+      if (requestSession && requestSession.dispatcher && servicesStartupListenerSession !== requestSession) {
+        if (servicesStartupListenerSession && servicesStartupListenerSession.dispatcher) {
+          servicesStartupListenerSession.dispatcher.removeListener(
+            WEBSOCKET_MESSAGE_TYPES.SYSTEM.SERVICES_STARTUP,
+            servicesStartupListeners.onProgress
+          );
+          servicesStartupListenerSession.dispatcher.removeListener(
+            'websocket.connected',
+            servicesStartupListeners.onConnected
+          );
+        }
+        servicesStartupListenerSession = requestSession;
+        servicesStartupListeners = {
+          onProgress: payload => {
+            if (store.getState().session !== requestSession) {
+              return;
+            }
+            servicesStartupEventCount += 1;
+            store.setState({ servicesStartup: payload || null });
+          },
+          onConnected: payload => {
+            if (get(payload, 'connected') === true && store.getState().session === requestSession) {
+              actions.refreshServicesStartupState(store.getState());
+            }
+          }
+        };
+        requestSession.dispatcher.addListener(
+          WEBSOCKET_MESSAGE_TYPES.SYSTEM.SERVICES_STARTUP,
+          servicesStartupListeners.onProgress
+        );
+        requestSession.dispatcher.addListener('websocket.connected', servicesStartupListeners.onConnected);
+      }
+      const eventCountBeforeRequest = servicesStartupEventCount;
+      try {
+        const servicesStartup = await state.httpClient.get('/api/v1/service/startup');
+        if (store.getState().session !== requestSession || servicesStartupEventCount !== eventCountBeforeRequest) {
+          return;
+        }
+        store.setState({ servicesStartup });
+      } catch (e) {
+        // state unknown: better no notice than a wrong one
         console.error(e);
       }
     },
