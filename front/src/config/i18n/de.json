@@ -5681,7 +5681,7 @@
       "lastSuccess": "Letztes erfolgreiches Backup: {{date}}.",
       "noSuccessYet": "Auf dieser Instanz ist noch kein Backup gelungen.",
       "lastError": "Letzter Fehler: {{error}}",
-      "retry": "Gladys versucht es jede Nacht und einige Minuten nach jedem Start erneut. Die Administratoren werden ab der zweiten fehlgeschlagenen Nacht im Chat gewarnt, danach einmal pro Woche, solange es fehlschlägt, und sobald ein Backup wieder gelingt. Details im Tab \"Aufgaben\"."
+      "retry": "Gladys versucht es jede Nacht und einige Minuten nach jedem Start erneut. Die Administratoren werden ab der zweiten fehlgeschlagenen Nacht im Chat gewarnt, danach einmal pro Woche, solange es fehlschlägt; einmal gewarnt, erfahren sie es, sobald ein Backup wieder gelingt. Details im Tab \"Aufgaben\"."
     }
   },
   "alarmModes": {

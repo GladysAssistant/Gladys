@@ -5681,7 +5681,7 @@
       "lastSuccess": "Última copia de seguridad correcta: {{date}}.",
       "noSuccessYet": "Ninguna copia de seguridad ha tenido éxito todavía en esta instancia.",
       "lastError": "Último error: {{error}}",
-      "retry": "Gladys lo reintenta cada noche y unos minutos después de cada inicio. Los administradores reciben un aviso en la conversación a partir de la segunda noche fallida, luego una vez por semana mientras siga fallando, y en cuanto una copia vuelve a funcionar. Detalles en la pestaña \"Tareas\"."
+      "retry": "Gladys lo reintenta cada noche y unos minutos después de cada inicio. Los administradores reciben un aviso en la conversación a partir de la segunda noche fallida, luego una vez por semana mientras siga fallando; una vez avisados, se les informa en cuanto una copia vuelve a funcionar. Detalles en la pestaña \"Tareas\"."
     }
   },
   "alarmModes": {

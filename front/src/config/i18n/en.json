@@ -5681,7 +5681,7 @@
       "lastSuccess": "Last successful backup: {{date}}.",
       "noSuccessYet": "No backup has succeeded yet on this instance.",
       "lastError": "Last error: {{error}}",
-      "retry": "Gladys retries every night and a few minutes after each start-up. The administrators are warned in the chat from the second failed night on, then once a week while it keeps failing, and as soon as a backup succeeds again. Details in the \"Tasks\" tab."
+      "retry": "Gladys retries every night and a few minutes after each start-up. The administrators are warned in the chat from the second failed night on, then once a week while it keeps failing; once warned, they are told as soon as a backup succeeds again. Details in the \"Tasks\" tab."
     }
   },
   "alarmModes": {

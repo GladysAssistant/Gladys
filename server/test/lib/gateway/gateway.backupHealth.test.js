@@ -164,7 +164,7 @@ describe('gateway.backupHealth', () => {
       });
     });
 
-    it('should not throw when no message can be built at all', async () => {
+    it('should not throw when no message can be built at all, and keep the alert open', async () => {
       variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT, '2024-01-03T02:00:00.000Z');
       brain.getReply = sinon.stub().throws(new Error('no answer at all'));
 
@@ -173,6 +173,36 @@ describe('gateway.backupHealth', () => {
       // the fallback to English was tried for each admin
       assert.callCount(brain.getReply, 4);
       assert.notCalled(message.sendSystemMessage);
+      // nobody heard the end of the alert: the next success tells them
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT)).to.equal(
+        '2024-01-03T02:00:00.000Z',
+      );
+    });
+
+    it('should keep the failure streak when the backup predates it (list of Gladys Plus after a restore)', async () => {
+      variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE, '2024-01-03T02:00:00.000Z');
+      variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR, 'Error: boom');
+      variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT, '2024-01-04T02:00:00.000Z');
+
+      await gateway.recordBackupSuccess(new Date('2024-01-02T02:00:00.000Z'));
+
+      expect(await gateway.getBackupHealth()).to.deep.equal({
+        last_success_at: '2024-01-02T02:00:00.000Z',
+        failing_since: '2024-01-03T02:00:00.000Z',
+        last_error: 'Error: boom',
+        alert_sent_at: '2024-01-04T02:00:00.000Z',
+      });
+      assert.notCalled(message.sendSystemMessage);
+    });
+
+    it('should not move the last success back in time', async () => {
+      variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT, '2024-01-04T02:00:00.000Z');
+
+      await gateway.recordBackupSuccess(new Date('2024-01-03T02:00:00.000Z'));
+
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT)).to.equal(
+        '2024-01-04T02:00:00.000Z',
+      );
     });
 
     it('should tell the other admins when one cannot be reached', async () => {
@@ -270,13 +300,85 @@ describe('gateway.backupHealth', () => {
       assert.calledTwice(message.sendSystemMessage);
     });
 
-    it('should not alert an instance that never backed up before its second failed night', async () => {
+    it('should alert an instance that never backed up on its second failed night, not at the daytime catch-up', async () => {
       await gateway.recordBackupFailure('Error: boom');
-      clock.tick(DAY);
+      // the daytime catch-up of the same day
+      clock.tick(8 * HOUR);
       await gateway.recordBackupFailure('Error: boom');
-
       assert.notCalled(message.sendSystemMessage);
       expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT)).to.equal(undefined);
+
+      // the second night
+      clock.tick(16 * HOUR);
+      await gateway.recordBackupFailure('Error: boom');
+
+      assert.calledTwice(message.sendSystemMessage);
+      assert.calledWith(brain.getReply, 'en', 'backup.failing', {
+        failingSinceDate: new Date('2024-01-05T02:30:00.000Z').toLocaleString('en', { timeZone: 'Europe/Paris' }),
+        lastSuccessDate: null,
+        errorMessage: 'Error: boom',
+      });
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT)).to.equal(
+        '2024-01-06T02:30:00.000Z',
+      );
+    });
+
+    it('should redact the backup passphrase from the error before saving and sending it', async () => {
+      variables.set(
+        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT,
+        new Date(Date.now() - 2 * DAY).toISOString(),
+      );
+      const error = "Error: Command failed: openssl enc -aes-256-cbc -pass pass:my-secret-key -in 'a.tar.gz'";
+
+      await gateway.recordBackupFailure(error);
+
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR)).to.equal(
+        "Error: Command failed: openssl enc -aes-256-cbc -pass pass:*** -in 'a.tar.gz'",
+      );
+      expect(brain.getReply.firstCall.args[2].errorMessage).to.not.include('my-secret-key');
+      expect(brain.getReply.firstCall.args[2].errorMessage).to.include('pass:***');
+    });
+
+    it('should not mark the alert as sent when no admin received it', async () => {
+      variables.set(
+        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT,
+        new Date(Date.now() - 2 * DAY).toISOString(),
+      );
+      message.sendSystemMessage = fake.rejects(new Error('channel down'));
+
+      await gateway.recordBackupFailure('Error: boom');
+
+      assert.calledTwice(message.sendSystemMessage);
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT)).to.equal(undefined);
+
+      // the next check tries again
+      message.sendSystemMessage = fake.resolves(null);
+      clock.tick(DAY);
+      await gateway.recordBackupFailure('Error: boom');
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT)).to.equal(
+        '2024-01-06T02:30:00.000Z',
+      );
+      expect(brain.getReply.lastCall.args[1]).to.equal('backup.failing');
+    });
+
+    it('should drop a failure recorded for a previous Gladys Plus link', async () => {
+      const generation = gateway.subscriptionLinkGeneration;
+      gateway.subscriptionLinkGeneration += 1;
+
+      await gateway.recordBackupFailure('Error: boom', generation);
+
+      assert.notCalled(variable.setValue);
+      expect(variables.has(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE)).to.equal(false);
+    });
+
+    it('should run a success and a failure one after the other, in the order they came', async () => {
+      await Promise.all([gateway.recordBackupFailure('Error: boom'), gateway.recordBackupSuccess()]);
+      expect(variables.has(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE)).to.equal(false);
+
+      await Promise.all([gateway.recordBackupSuccess(), gateway.recordBackupFailure('Error: boom')]);
+      expect(variables.get(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE)).to.equal(
+        '2024-01-05T02:30:00.000Z',
+      );
     });
 
     it('should not alert again within a week of the last alert', async () => {
@@ -348,6 +450,23 @@ describe('gateway.backupHealth', () => {
   });
 
   describe('getStatus', () => {
+    it('should answer without the health of the backups when it cannot be read', async () => {
+      variable.getValue = sinon.stub().callsFake(async (name) => {
+        if (name.startsWith('GLADYS_GATEWAY_BACKUP_')) {
+          throw new Error('db locked');
+        }
+        return null;
+      });
+      const status = await gateway.getStatus();
+      expect(status).to.deep.equal({
+        configured: false,
+        connected: false,
+        subscription_active: true,
+        payment_required_since: null,
+        backup_health: null,
+      });
+    });
+
     it('should expose the health of the backups', async () => {
       variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_FAILING_SINCE, '2024-01-04T02:00:00.000Z');
       variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_ERROR, 'Error: boom');

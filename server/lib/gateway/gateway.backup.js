@@ -205,7 +205,7 @@ async function backup(jobId) {
     }
     // outside the multipart try: the upload is finalized, nothing here may
     // abort it (recordBackupSuccess never throws anyway)
-    await this.recordBackupSuccess();
+    await this.recordBackupSuccess(new Date(), linkGeneration);
     return {
       encryptedBackupFilePath,
     };
@@ -219,7 +219,7 @@ async function backup(jobId) {
     // The admins are warned on the state of the backups, not on each failed
     // attempt (see gateway.backupHealth); never throws, the backup error is
     // the one rethrown below
-    await this.recordBackupFailure(e.toString());
+    await this.recordBackupFailure(e.toString(), linkGeneration);
     throw e;
   } finally {
     this.backupInProgress = false;

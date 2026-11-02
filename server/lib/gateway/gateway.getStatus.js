@@ -1,3 +1,5 @@
+const logger = require('../../utils/logger');
+
 /**
  * @description Return if gateway is connected.
  * @returns {Promise} Return status.
@@ -12,12 +14,20 @@ async function getStatus() {
   const configured =
     gladysGatewayRefreshToken !== null && gladysGatewayRsaPrivateKey !== null && gladysGatewayEcdsaPrivateKey !== null;
 
+  // the connection and subscription state must not depend on the health read
+  let backupHealth = null;
+  try {
+    backupHealth = await this.getBackupHealth();
+  } catch (e) {
+    logger.warn('Gateway: unable to read the health of the backups');
+    logger.warn(e);
+  }
   return {
     configured,
     connected: this.connected,
     subscription_active: this.subscriptionActive,
     payment_required_since: this.subscriptionPaymentRequiredSince,
-    backup_health: await this.getBackupHealth(),
+    backup_health: backupHealth,
   };
 }
 

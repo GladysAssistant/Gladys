@@ -95,6 +95,7 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
     // recorded once the upload is finalized, where nothing can abort it anymore
     assert.calledOnce(gateway.recordBackupSuccess);
+    assert.calledWith(gateway.recordBackupSuccess, sinon.match.date, gateway.subscriptionLinkGeneration);
     assert.callOrder(gateway.gladysGatewayClient.finalizeMultiPartBackup, gateway.recordBackupSuccess);
     assert.notCalled(gateway.gladysGatewayClient.abortMultiPartBackup);
     assert.notCalled(gateway.recordBackupFailure);
@@ -194,7 +195,7 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
     // the failure is recorded, the admins are warned on the state of the
     // backups (not on each attempt), and the backup error is the one rethrown
-    assert.calledOnceWithExactly(gateway.recordBackupFailure, 'Error: error');
+    assert.calledOnceWithExactly(gateway.recordBackupFailure, 'Error: error', gateway.subscriptionLinkGeneration);
     assert.notCalled(gateway.recordBackupSuccess);
   });
 
@@ -277,6 +278,10 @@ describe('gateway.backup', async function describe() {
         .instanceOf(NotFoundError)
         .haveOwnProperty('message', 'GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
     }
-    assert.calledOnceWithExactly(gateway.recordBackupFailure, 'Error: GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
+    assert.calledOnceWithExactly(
+      gateway.recordBackupFailure,
+      'Error: GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND',
+      gateway.subscriptionLinkGeneration,
+    );
   });
 });

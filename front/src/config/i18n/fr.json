@@ -5681,7 +5681,7 @@
       "lastSuccess": "Dernière sauvegarde réussie : {{date}}.",
       "noSuccessYet": "Aucune sauvegarde n'a encore réussi sur cette instance.",
       "lastError": "Dernière erreur : {{error}}",
-      "retry": "Gladys réessaie chaque nuit et quelques minutes après chaque démarrage. Les administrateurs sont prévenus dans la conversation à partir de la deuxième nuit d'échec, puis une fois par semaine tant que ça échoue, et dès qu'une sauvegarde réussit à nouveau. Détails dans l'onglet \"Tâches\"."
+      "retry": "Gladys réessaie chaque nuit et quelques minutes après chaque démarrage. Les administrateurs sont prévenus dans la conversation à partir de la deuxième nuit d'échec, puis une fois par semaine tant que ça échoue ; une fois prévenus, ils sont informés dès qu'une sauvegarde réussit à nouveau. Détails dans l'onglet \"Tâches\"."
     }
   },
   "alarmModes": {
