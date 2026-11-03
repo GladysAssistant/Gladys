@@ -220,6 +220,14 @@ const EditForm = ({ ...props }) => {
   const standbyOrder = PILOT_WIRE_STANDBY_ORDERS.includes(props.thermostatEditPilotWireStandbyOrder)
     ? props.thermostatEditPilotWireStandbyOrder
     : DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+  // Forced, the standby order is eco or off, among the orders the module takes.
+  const standbyForced = standbyOrder !== DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+  const forcedStandbyOptions = PILOT_WIRE_ORDER_OPTIONS.filter(
+    ([value]) =>
+      PILOT_WIRE_STANDBY_ORDERS.includes(value) &&
+      value !== DEFAULT_PILOT_WIRE_STANDBY_ORDER &&
+      (!supportedOrders || supportedOrders.includes(value) || value === standbyOrder)
+  ).sort(([a], [b]) => b - a);
   const orderOptionsFor = key =>
     PILOT_WIRE_ORDER_OPTIONS.filter(
       ([value]) => !supportedOrders || supportedOrders.includes(value) || value === pilotWireOrders[key]
@@ -247,30 +255,55 @@ const EditForm = ({ ...props }) => {
         />
       </small>
       {/* The order a heater Gladys regulates rests on once the room is warm
-          enough (spec C.1.1): frost protection locks a towel rail's boost out. */}
-      {isVirtualThermostat && props.thermostatEditPilotWireFeature && (
+          enough (spec C.1.1). Frost protection unless forced: some heaters lock
+          their own functions out under it, a towel rail's boost among them. */}
+      {/* Not offered on a module that takes neither eco nor off. */}
+      {isVirtualThermostat && props.thermostatEditPilotWireFeature && forcedStandbyOptions.length > 0 && (
         <div class="mt-2">
-          <label class="form-label">
-            <Text id="integration.thermostat.edit.pilotWireStandbyOrderLabel" />
+          <label class="custom-switch">
+            <input
+              type="checkbox"
+              class="custom-switch-input"
+              checked={standbyForced}
+              onChange={e =>
+                props.updateThermostatField(
+                  'thermostatEditPilotWireStandbyOrder',
+                  e.target.checked ? forcedStandbyOptions[0][0] : DEFAULT_PILOT_WIRE_STANDBY_ORDER
+                )
+              }
+            />
+            <span class="custom-switch-indicator" />
+            <span class="custom-switch-description">
+              <Text id="integration.thermostat.edit.pilotWireStandbyForceLabel" />
+            </span>
           </label>
-          <select
-            class="form-control"
-            value={standbyOrder}
-            onChange={e => props.updateThermostatField('thermostatEditPilotWireStandbyOrder', Number(e.target.value))}
-          >
-            {PILOT_WIRE_ORDER_OPTIONS.filter(
-              ([value]) =>
-                PILOT_WIRE_STANDBY_ORDERS.includes(value) &&
-                (!supportedOrders || supportedOrders.includes(value) || value === standbyOrder)
-            ).map(([value, orderKey]) => (
-              <option value={value} selected={value === standbyOrder}>
-                <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
-              </option>
-            ))}
-          </select>
           <small class="form-text text-muted">
-            <Text id="integration.thermostat.edit.pilotWireStandbyOrderHelp" />
+            <Text id="integration.thermostat.edit.pilotWireStandbyForceHelp" />
           </small>
+          {standbyForced && (
+            <div class="mt-2">
+              <label class="form-label" htmlFor="thermostat-pilot-wire-standby-order">
+                <Text id="integration.thermostat.edit.pilotWireStandbyOrderLabel" />
+              </label>
+              <select
+                id="thermostat-pilot-wire-standby-order"
+                class="form-control"
+                value={standbyOrder}
+                onChange={e =>
+                  props.updateThermostatField('thermostatEditPilotWireStandbyOrder', Number(e.target.value))
+                }
+              >
+                {forcedStandbyOptions.map(([value, orderKey]) => (
+                  <option value={value} selected={value === standbyOrder}>
+                    <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+                  </option>
+                ))}
+              </select>
+              <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
+                <Text id="integration.thermostat.edit.pilotWireStandbyOrderWarning" />
+              </div>
+            </div>
+          )}
         </div>
       )}
       {/* Promised by the spec (G): a module that keeps its own programme

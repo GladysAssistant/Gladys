@@ -962,8 +962,10 @@ async function retractStaleRunningState(gladys, device) {
  *   its body. Whether it then draws current is unknown, so the state is left
  *   alone.
  * - Gladys (a virtual one with a room sensor, `gladys`). The wire is used as a switch,
- *   with the same hysteresis as one: below the setpoint comfort, above it frost
- *   protection — the standby that still guards the room against frost. Comfort
+ *   with the same hysteresis as one: below the setpoint comfort, above it the
+ *   standby order — frost protection by default, which still guards the room
+ *   against frost, or the eco or off forced on a heater that locks its own
+ *   functions out under frost protection (THERMOSTAT_PILOT_WIRE_STANDBY_ORDER). Comfort
  *   whatever the preset: the heater's own setpoint is set high, and eco would
  *   hand the decision back to its thermometer, three and a half degrees lower.
  *   TPI is not used: switching orders within a cycle is traffic for a heater

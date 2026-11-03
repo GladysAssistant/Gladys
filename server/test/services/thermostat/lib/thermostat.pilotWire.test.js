@@ -210,6 +210,25 @@ describe('thermostat pilot wire', () => {
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
   });
 
+  // An open window suspends the heating, which eco forced as the standby order
+  // would not: it still sends frost protection.
+  it('should put the heater on frost protection when a window opens, whatever its standby order', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT, windowOpen: true, temp: 19.4 });
+
+    await regulate(
+      mod,
+      gladys,
+      pilotWireDevice('comfort', {
+        THERMOSTAT_WINDOW_FEATURE: 'window-sensor',
+        THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
+        THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: String(PILOT_WIRE_MODE.ECO),
+      }),
+    );
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
+  });
+
   // Stopped, the heater carries off: frost protection would only raise it,
   // then the closing drop it back to off.
   it('should keep a stopped heater on off when a window opens', async () => {

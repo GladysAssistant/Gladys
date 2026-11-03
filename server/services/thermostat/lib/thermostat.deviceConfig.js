@@ -69,7 +69,10 @@ function buildParamsConfig(device) {
   const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE') || DEFAULT_MODE);
   // One sensor or several (A.1.1): the loop regulates on their average.
   const temperatureFeatures = parseSelectorList(getParam('THERMOSTAT_TEMPERATURE_FEATURE'));
-  const standbyOrder = toNumber(getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER'), null);
+  // An order is a whole number: `2garbage` read as 2 would send eco in place of
+  // the default.
+  const standbyParam = getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER');
+  const standbyOrder = /^\d+$/.test(String(standbyParam)) ? Number(standbyParam) : null;
   return {
     temperature_features: temperatureFeatures,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
