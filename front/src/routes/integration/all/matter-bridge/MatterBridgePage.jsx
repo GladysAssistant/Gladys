@@ -58,158 +58,194 @@ const ExposedDevicesSelect = ({ matterBridgeDevices, matterBridgeForm, updateMat
 
 const ExposedDevicesSelectWithIntl = withIntlAsProp(ExposedDevicesSelect);
 
-const PairingCard = ({ status, qrCode }) => (
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">
-        <Text id="integration.matter-bridge.pairingTitle" />
-      </h3>
+const PairingSection = ({ status, qrCode }) => (
+  <div class="mt-5">
+    <h4>
+      <Text id="integration.matter-bridge.pairingTitle" />
+    </h4>
+    {status.fabrics.length > 0 && (
+      <div>
+        <p>
+          <Text id="integration.matter-bridge.pairedWith" />
+        </p>
+        <ul>
+          {status.fabrics.map(fabric => (
+            <li key={fabric.fabricIndex}>{ecosystemName(fabric)}</li>
+          ))}
+        </ul>
+        <p class="text-muted">
+          <Text id="integration.matter-bridge.multiAdmin" />
+        </p>
+      </div>
+    )}
+    {!status.commissioned && (
+      <div class="text-center">
+        <p>
+          <Text id="integration.matter-bridge.scanQrCode" />
+        </p>
+        {qrCode && <img class={cx('mx-auto d-block mb-3', style.qrCode)} src={qrCode} />}
+        <p>
+          <Text id="integration.matter-bridge.manualCode" />
+        </p>
+        <p class={style.pairingCode}>{formatManualCode(status.manualPairingCode)}</p>
+      </div>
+    )}
+  </div>
+);
+
+const ExposureSection = props => (
+  <form class="mt-5" onSubmit={props.saveMatterBridge}>
+    <h4>
+      <Text id="integration.matter-bridge.exposureTitle" />
+    </h4>
+    <div class="form-group">
+      <select
+        class="form-control mb-2"
+        onChange={props.updateMatterBridgeExposureMode}
+        value={props.matterBridgeForm.exposureMode}
+      >
+        <option value={EXPOSURE_MODES.ALL}>
+          <Text id="integration.matter-bridge.exposureModeAll" />
+        </option>
+        <option value={EXPOSURE_MODES.SELECTION}>
+          <Text id="integration.matter-bridge.exposureModeSelection" />
+        </option>
+      </select>
+      {props.matterBridgeForm.exposureMode === EXPOSURE_MODES.SELECTION && <ExposedDevicesSelectWithIntl {...props} />}
     </div>
-    <div class="card-body">
-      {status.fabrics.length > 0 && (
+    {props.matterBridgeStatus.running && (
+      <p class="text-muted">
+        <Text id="integration.matter-bridge.exposedCount" fields={{ count: props.matterBridgeStatus.exposedCount }} />
+      </p>
+    )}
+    <button type="submit" class="btn btn-success">
+      <Text id="integration.matter-bridge.saveButton" />
+    </button>
+    {props.matterBridgeSaveStatus === RequestStatus.Success && (
+      <div class="alert alert-success mt-2">
+        <Text id="integration.matter-bridge.saveSuccess" />
+      </div>
+    )}
+    {props.matterBridgeSaveStatus === RequestStatus.Error && (
+      <div class="alert alert-danger mt-2">
+        <Text id="integration.matter-bridge.saveError" />
+      </div>
+    )}
+  </form>
+);
+
+const ResetSection = props => (
+  <div class="mt-5">
+    <h4>
+      <Text id="integration.matter-bridge.resetTitle" />
+    </h4>
+    <p class="text-muted">
+      <Text id="integration.matter-bridge.reset" />
+    </p>
+    {props.matterBridgeResetStatus === RequestStatus.Error && (
+      <div class="alert alert-danger">
+        <Text id="integration.matter-bridge.resetError" />
+      </div>
+    )}
+    {!props.matterBridgeConfirmReset && (
+      <button class="btn btn-outline-danger" onClick={props.askMatterBridgeReset}>
+        <Text id="integration.matter-bridge.resetButton" />
+      </button>
+    )}
+    {props.matterBridgeConfirmReset && (
+      <div class={cx('d-flex flex-column align-items-start', style.resetConfirm)}>
+        <div class="alert alert-danger mb-0">
+          <Text id="integration.matter-bridge.resetConfirmMessage" />
+        </div>
         <div>
-          <p>
-            <Text id="integration.matter-bridge.pairedWith" />
-          </p>
-          <ul>
-            {status.fabrics.map(fabric => (
-              <li key={fabric.fabricIndex}>{ecosystemName(fabric)}</li>
-            ))}
-          </ul>
-          <p class="text-muted">
-            <Text id="integration.matter-bridge.multiAdmin" />
-          </p>
+          <button class="btn btn-danger" onClick={props.resetMatterBridge}>
+            <Text id="integration.matter-bridge.resetConfirmButton" />
+          </button>
+          <button class="btn ml-2" onClick={props.cancelMatterBridgeReset}>
+            <Text id="integration.matter-bridge.resetCancelButton" />
+          </button>
         </div>
-      )}
-      {!status.commissioned && (
-        <div class="text-center">
-          <p>
-            <Text id="integration.matter-bridge.scanQrCode" />
-          </p>
-          {qrCode && <img class={cx('mx-auto d-block mb-3', style.qrCode)} src={qrCode} />}
-          <p>
-            <Text id="integration.matter-bridge.manualCode" />
-          </p>
-          <p class={style.pairingCode}>{formatManualCode(status.manualPairingCode)}</p>
-        </div>
-      )}
-    </div>
+      </div>
+    )}
   </div>
 );
 
 const MatterBridgePage = props => {
   const status = props.matterBridgeStatus;
-  const form = props.matterBridgeForm;
 
   return (
     <IntegrationSubPageLayout title={<Text id="integration.matter-bridge.title" />}>
       <div class="card">
-        <div class="card-body">
-          <div class={cx('dimmer', { active: props.loading })}>
-            <div class="loader" />
-            <div class="dimmer-content">
-              <p>
-                <MarkupText id="integration.matter-bridge.introduction" />
-              </p>
-              {props.matterBridgeGetStatus === RequestStatus.Error && (
-                <div class="alert alert-danger">
-                  <Text id="integration.matter-bridge.getError" />
-                </div>
-              )}
-              {status && status.error && (
-                <div class="alert alert-danger">
-                  <Text id="integration.matter-bridge.startError" />
-                  <pre class="mb-0 mt-2">{status.error}</pre>
-                </div>
-              )}
-              {form && (
-                <form onSubmit={props.saveMatterBridge}>
-                  <div class="form-group">
-                    <label class="custom-switch">
-                      <input
-                        type="checkbox"
-                        class="custom-switch-input"
-                        checked={form.enabled}
-                        onChange={props.updateMatterBridgeEnabled}
-                      />
-                      <span class="custom-switch-indicator flex-shrink-0" />
-                      <span class="custom-switch-description ml-2">
-                        <Text id="integration.matter-bridge.enable" />
-                      </span>
-                    </label>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.matter-bridge.exposure" />
-                    </label>
-                    <select
-                      class="form-control mb-2"
-                      onChange={props.updateMatterBridgeExposureMode}
-                      value={form.exposureMode}
-                    >
-                      <option value={EXPOSURE_MODES.ALL}>
-                        <Text id="integration.matter-bridge.exposureModeAll" />
-                      </option>
-                      <option value={EXPOSURE_MODES.SELECTION}>
-                        <Text id="integration.matter-bridge.exposureModeSelection" />
-                      </option>
-                    </select>
-                    {form.exposureMode === EXPOSURE_MODES.SELECTION && <ExposedDevicesSelectWithIntl {...props} />}
-                  </div>
-                  <button type="submit" class="btn btn-success">
-                    <Text id="integration.matter-bridge.saveButton" />
-                  </button>
-                  {props.matterBridgeSaveStatus === RequestStatus.Success && (
-                    <div class="alert alert-success mt-2">
-                      <Text id="integration.matter-bridge.saveSuccess" />
-                    </div>
-                  )}
-                  {props.matterBridgeSaveStatus === RequestStatus.Error && (
-                    <div class="alert alert-danger mt-2">
-                      <Text id="integration.matter-bridge.saveError" />
-                    </div>
-                  )}
-                </form>
-              )}
-              {status && status.running && (
-                <p class="mt-4 text-muted">
-                  <Text id="integration.matter-bridge.exposedCount" fields={{ count: status.exposedCount }} />
+        <div class="card-header">
+          <h3 class="card-title">
+            <Text id="integration.matter-bridge.settingsTitle" />
+          </h3>
+        </div>
+        <div class={cx('card-body dimmer', { active: props.loading })}>
+          <div class="loader" />
+          <div class="dimmer-content">
+            {props.matterBridgeGetStatus === RequestStatus.Error && (
+              <div class="alert alert-danger">
+                <Text id="integration.matter-bridge.getError" />
+              </div>
+            )}
+            {props.matterBridgeToggleStatus === RequestStatus.Error && (
+              <div class="alert alert-danger">
+                <Text id="integration.matter-bridge.toggleError" />
+              </div>
+            )}
+
+            {status && status.hasIpv6 === false && (
+              <div class="alert alert-danger">
+                <Text id="integration.matter-bridge.ipv6NotEnabled" />
+              </div>
+            )}
+            {status && status.hasIpv6 === true && (
+              <div class="alert alert-success">
+                <Text id="integration.matter-bridge.ipv6Enabled" />
+              </div>
+            )}
+
+            {status && !status.enabled && (
+              <>
+                <p>
+                  <MarkupText id="integration.matter-bridge.introduction" />
                 </p>
-              )}
-            </div>
+                <div class="alert alert-warning">
+                  <Text id="integration.matter-bridge.disabledWarning" />
+                </div>
+                <div class="form-group">
+                  <button class="btn btn-success" onClick={props.enableMatterBridge}>
+                    <Text id="integration.matter-bridge.enableButton" />
+                  </button>
+                </div>
+              </>
+            )}
+
+            {status && status.enabled && (
+              <>
+                <div class="alert alert-info">
+                  <Text id="integration.matter-bridge.enabledDescription" />
+                </div>
+                {status.error && (
+                  <div class="alert alert-danger">
+                    <Text id="integration.matter-bridge.startError" />
+                    <pre class="mb-0 mt-2">{status.error}</pre>
+                  </div>
+                )}
+                {status.running && <PairingSection status={status} qrCode={props.matterBridgeQrCode} />}
+                {props.matterBridgeForm && <ExposureSection {...props} />}
+                <div class="form-group mt-5">
+                  <button class="btn btn-danger" onClick={props.disableMatterBridge}>
+                    <Text id="integration.matter-bridge.disableButton" />
+                  </button>
+                </div>
+                {status.running && <ResetSection {...props} />}
+              </>
+            )}
           </div>
         </div>
       </div>
-      {status && status.running && <PairingCard status={status} qrCode={props.matterBridgeQrCode} />}
-      {status && status.running && (
-        <div class="card">
-          <div class="card-body">
-            <p>
-              <MarkupText id="integration.matter-bridge.reset" />
-            </p>
-            {!props.matterBridgeConfirmReset && (
-              <button class="btn btn-danger" onClick={props.askMatterBridgeReset}>
-                <Text id="integration.matter-bridge.resetButton" />
-              </button>
-            )}
-            {props.matterBridgeConfirmReset && (
-              <div>
-                <button class="btn btn-danger mr-2" onClick={props.resetMatterBridge}>
-                  <Text id="integration.matter-bridge.resetConfirmButton" />
-                </button>
-                <button class="btn btn-secondary" onClick={props.cancelMatterBridgeReset}>
-                  <Text id="integration.matter-bridge.resetCancelButton" />
-                </button>
-              </div>
-            )}
-            {props.matterBridgeResetStatus === RequestStatus.Error && (
-              <div class="alert alert-danger mt-2">
-                <Text id="integration.matter-bridge.resetError" />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </IntegrationSubPageLayout>
   );
 };
