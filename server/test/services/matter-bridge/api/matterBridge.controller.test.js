@@ -8,6 +8,7 @@ describe('MatterBridgeController', () => {
     getStatus: sinon.stub().resolves(status),
     getCompatibleDevices: sinon.stub().resolves([{ name: 'Light', selector: 'light', functions: ['light'] }]),
     saveConfig: sinon.stub().resolves(status),
+    setEnabled: sinon.stub().resolves(status),
     reset: sinon.stub().resolves(),
   };
   const controller = MatterBridgeController(bridge);
@@ -29,9 +30,21 @@ describe('MatterBridgeController', () => {
   });
 
   it('should save the settings', async () => {
-    const body = { enabled: true, exposureMode: 'all', exposedDevices: [] };
+    const body = { exposureMode: 'all', exposedDevices: [] };
     await controller['post /api/v1/service/matter-bridge/config'].controller({ body }, res);
     sinon.assert.calledOnceWithExactly(bridge.saveConfig, body);
+    sinon.assert.calledOnceWithExactly(res.json, status);
+  });
+
+  it('should turn the bridge on', async () => {
+    await controller['post /api/v1/service/matter-bridge/enable'].controller({}, res);
+    sinon.assert.calledOnceWithExactly(bridge.setEnabled, true);
+    sinon.assert.calledOnceWithExactly(res.json, status);
+  });
+
+  it('should turn the bridge off', async () => {
+    await controller['post /api/v1/service/matter-bridge/disable'].controller({}, res);
+    sinon.assert.calledOnceWithExactly(bridge.setEnabled, false);
     sinon.assert.calledOnceWithExactly(res.json, status);
   });
 

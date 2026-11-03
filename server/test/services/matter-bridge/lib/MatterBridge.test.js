@@ -8,7 +8,11 @@ const { VARIABLES } = require('../../../../services/matter-bridge/lib/constants'
 const { createMatter, feature } = require('../fakes');
 
 const fse = { ensureDir: sinon.stub().resolves(), remove: sinon.stub().resolves() };
-const MatterBridge = proxyquire('../../../../services/matter-bridge/lib/MatterBridge', { 'fs-extra': fse });
+const checkIpv6 = sinon.stub().returns({ hasIpv6: true, ipv6Interfaces: [] });
+const MatterBridge = proxyquire('../../../../services/matter-bridge/lib/MatterBridge', {
+  'fs-extra': fse,
+  './checkIpv6': { checkIpv6 },
+});
 
 const SERVICE_ID = 'a810b8db-6d04-4697-bed3-c4b72c996279';
 
@@ -316,8 +320,10 @@ describe('MatterBridge', () => {
   describe('getStatus', () => {
     it('should describe a stopped bridge', async () => {
       variables[VARIABLES.ENABLED] = 'false';
+      checkIpv6.returns({ hasIpv6: false, ipv6Interfaces: [] });
       expect(await bridge.getStatus()).to.deep.equal({
         enabled: false,
+        hasIpv6: false,
         running: false,
         error: null,
         exposureMode: 'all',
@@ -328,6 +334,7 @@ describe('MatterBridge', () => {
         manualPairingCode: null,
         fabrics: [],
       });
+      checkIpv6.returns({ hasIpv6: true, ipv6Interfaces: [] });
     });
 
     it('should describe a running bridge without leaking fabric keys', async () => {
@@ -335,6 +342,7 @@ describe('MatterBridge', () => {
       const status = await bridge.getStatus();
       expect(status).to.include({
         enabled: true,
+        hasIpv6: true,
         running: true,
         exposedCount: 2,
         commissioned: true,
@@ -345,38 +353,47 @@ describe('MatterBridge', () => {
     });
   });
 
+  describe('setEnabled', () => {
+    it('should turn the bridge on', async () => {
+      variables[VARIABLES.ENABLED] = 'false';
+      const status = await bridge.setEnabled(true);
+      expect(variables[VARIABLES.ENABLED]).to.equal('true');
+      expect(status.enabled).to.equal(true);
+      expect(status.running).to.equal(true);
+    });
+
+    it('should turn the bridge off', async () => {
+      await bridge.start();
+      const status = await bridge.setEnabled(false);
+      expect(variables[VARIABLES.ENABLED]).to.equal('false');
+      expect(status.running).to.equal(false);
+      expect(matter.server.closed).to.equal(true);
+    });
+  });
+
   describe('saveConfig', () => {
     it('should reject invalid settings', async () => {
-      const valid = { enabled: true, exposureMode: 'all', exposedDevices: [] };
-      await expect(bridge.saveConfig({ ...valid, enabled: 'yes' })).to.be.rejectedWith(BadParameters);
+      const valid = { exposureMode: 'all', exposedDevices: [] };
       await expect(bridge.saveConfig({ ...valid, exposureMode: 'some' })).to.be.rejectedWith(BadParameters);
       await expect(bridge.saveConfig({ ...valid, exposedDevices: 'light' })).to.be.rejectedWith(BadParameters);
       await expect(bridge.saveConfig({ ...valid, exposedDevices: [1] })).to.be.rejectedWith(BadParameters);
       sinon.assert.notCalled(gladys.variable.setValue);
     });
 
-    it('should start the bridge when it is enabled', async () => {
+    it('should save the selection of a stopped bridge without starting it', async () => {
       variables[VARIABLES.ENABLED] = 'false';
-      const status = await bridge.saveConfig({ enabled: true, exposureMode: 'selection', exposedDevices: ['light'] });
+      const status = await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['light'] });
       expect(variables[VARIABLES.EXPOSED_DEVICES]).to.equal('["light"]');
       expect(variables[VARIABLES.EXPOSURE_MODE]).to.equal('selection');
-      expect(variables[VARIABLES.ENABLED]).to.equal('true');
-      expect(status.running).to.equal(true);
-      expect(status.exposedCount).to.equal(1);
+      expect(variables[VARIABLES.ENABLED]).to.equal('false');
+      expect(status.running).to.equal(false);
     });
 
     it('should apply a new selection to a running bridge', async () => {
       await bridge.start();
-      const status = await bridge.saveConfig({ enabled: true, exposureMode: 'selection', exposedDevices: ['sensor'] });
+      const status = await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['sensor'] });
       expect(Array.from(bridge.devices.keys())).to.deep.equal(['sensor-id']);
       expect(status.exposedCount).to.equal(1);
-    });
-
-    it('should stop the bridge when it is disabled', async () => {
-      await bridge.start();
-      const status = await bridge.saveConfig({ enabled: false, exposureMode: 'all', exposedDevices: [] });
-      expect(status.running).to.equal(false);
-      expect(matter.server.closed).to.equal(true);
     });
   });
 });

@@ -1771,6 +1771,7 @@ const integrations = {
   // The Matter bridge, paired with Apple Home and exposing every compatible device
   'get /api/v1/service/matter-bridge/status': {
     enabled: true,
+    hasIpv6: true,
     running: true,
     error: null,
     exposureMode: 'all',

@@ -27,12 +27,13 @@ class MatterBridgeIntegration extends Component {
     const loading =
       props.matterBridgeGetStatus === RequestStatus.Getting ||
       props.matterBridgeSaveStatus === RequestStatus.Getting ||
+      props.matterBridgeToggleStatus === RequestStatus.Getting ||
       props.matterBridgeResetStatus === RequestStatus.Getting;
     return <MatterBridgePage {...props} loading={loading} />;
   }
 }
 
 export default connect(
-  'user,matterBridgeStatus,matterBridgeForm,matterBridgeDevices,matterBridgeQrCode,matterBridgeGetStatus,matterBridgeSaveStatus,matterBridgeResetStatus,matterBridgeConfirmReset',
+  'user,matterBridgeStatus,matterBridgeForm,matterBridgeDevices,matterBridgeQrCode,matterBridgeGetStatus,matterBridgeSaveStatus,matterBridgeResetStatus,matterBridgeToggleStatus,matterBridgeConfirmReset',
   actions
 )(MatterBridgeIntegration);

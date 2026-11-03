@@ -18,6 +18,7 @@ const { readExposure, isExposed } = require('./exposure');
 const { planDevice, planSignature } = require('./planDevice');
 const { buildEndpoints, truncate } = require('./buildEndpoints');
 const { Bindings } = require('./Bindings');
+const { checkIpv6 } = require('./checkIpv6');
 
 /**
  * @description Matter bridge exposing Gladys devices to Matter ecosystems (Apple Home, Google Home,
@@ -382,6 +383,7 @@ MatterBridge.prototype.getStatus = async function getStatus() {
   const { exposureMode, exposedDevices } = await readExposure(this.gladys, this.serviceId);
   const status = {
     enabled: await this.isEnabled(),
+    hasIpv6: checkIpv6().hasIpv6,
     running: this.server !== null,
     error: this.lastError,
     exposureMode,
@@ -407,19 +409,33 @@ MatterBridge.prototype.getStatus = async function getStatus() {
 };
 
 /**
- * @description Save the settings of the bridge and apply them at once.
- * @param {object} config - New settings.
- * @param {boolean} config.enabled - Bridge turned on.
+ * @description Turn the bridge on or off. Turning it on is not refused without IPv6, as for the
+ * Matter controller: the page warns about it, and a bridge that cannot start reports why.
+ * @param {boolean} enabled - True to turn the bridge on.
+ * @returns {Promise<object>} The new status.
+ * @example
+ * await bridge.setEnabled(true);
+ */
+MatterBridge.prototype.setEnabled = async function setEnabled(enabled) {
+  await this.gladys.variable.setValue(VARIABLES.ENABLED, String(enabled), this.serviceId);
+  if (enabled) {
+    await this.start();
+  } else {
+    await this.stop();
+  }
+  return this.getStatus();
+};
+
+/**
+ * @description Save which devices the bridge exposes and apply it at once.
+ * @param {object} config - New exposure settings.
  * @param {string} config.exposureMode - 'all' or 'selection'.
  * @param {Array<string>} config.exposedDevices - Selectors of the selected devices.
  * @returns {Promise<object>} The new status.
  * @example
- * await bridge.saveConfig({ enabled: true, exposureMode: 'all', exposedDevices: [] });
+ * await bridge.saveConfig({ exposureMode: 'all', exposedDevices: [] });
  */
-MatterBridge.prototype.saveConfig = async function saveConfig({ enabled, exposureMode, exposedDevices }) {
-  if (typeof enabled !== 'boolean') {
-    throw new BadParameters('enabled must be a boolean');
-  }
+MatterBridge.prototype.saveConfig = async function saveConfig({ exposureMode, exposedDevices }) {
   if (!Object.values(EXPOSURE_MODES).includes(exposureMode)) {
     throw new BadParameters('exposureMode must be "all" or "selection"');
   }
@@ -431,14 +447,9 @@ MatterBridge.prototype.saveConfig = async function saveConfig({ enabled, exposur
   // previous mode with an up to date list, instead of a selection mode with a stale list.
   await this.gladys.variable.setValue(VARIABLES.EXPOSED_DEVICES, JSON.stringify(exposedDevices), this.serviceId);
   await this.gladys.variable.setValue(VARIABLES.EXPOSURE_MODE, exposureMode, this.serviceId);
-  await this.gladys.variable.setValue(VARIABLES.ENABLED, String(enabled), this.serviceId);
 
-  if (!enabled) {
-    await this.stop();
-  } else if (this.server) {
+  if (this.server) {
     await this.enqueue(() => this.syncAll());
-  } else {
-    await this.start();
   }
   return this.getStatus();
 };
