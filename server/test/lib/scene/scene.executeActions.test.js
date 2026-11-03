@@ -174,11 +174,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -203,11 +199,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -233,11 +225,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -263,11 +251,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -288,11 +272,7 @@ describe('scene.executeActions', () => {
   it('should execute switch toggle error', async () => {
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.throws('An error occurred'),
-      },
+      features: [],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -314,6 +294,9 @@ describe('scene.executeActions', () => {
     const device = {
       setValue: fake.resolves(null),
     };
+    stateManager.setState('device', 'switch-1', {
+      features: [{ category: DEVICE_FEATURE_CATEGORIES.SWITCH, type: DEVICE_FEATURE_TYPES.SWITCH.BINARY }],
+    });
 
     await executeActions(
       { stateManager, event, device },

@@ -141,7 +141,12 @@ const getActionSummary = (action, dictionary, deviceFeatures, thermostatSchedule
     case ACTIONS.SWITCH.TURN_ON:
     case ACTIONS.SWITCH.TURN_OFF:
     case ACTIONS.SWITCH.TOGGLE:
-      return listSelectors(action.devices || action.device_features);
+      if (Array.isArray(action.device_features) && action.device_features.length > 0) {
+        return truncate(
+          action.device_features.map(selector => getFeatureLabel(selector, dictionary, deviceFeatures)).join(', ')
+        );
+      }
+      return listDeviceNames(action.devices, deviceFeatures);
     case ACTIONS.THERMOSTAT.SET_SCHEDULE:
       // A schedule selector is a slug plus a timestamp plus a random suffix
       // (school-holidays-1792941482500-tk5w): its name reads.

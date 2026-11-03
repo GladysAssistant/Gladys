@@ -65,6 +65,49 @@ function warnIfInvalidJsonMessage(actionName, topic, message) {
   }
 }
 
+/**
+ * @description Set the value of the switches of a switch action: each selected switch
+ * (device_features), and every writable switch of the selected devices (devices, the format
+ * of the scenes saved before the switches of a multi-switch device could be picked one by one).
+ * @param {object} self - Reference to the SceneManager.
+ * @param {object} action - The switch action.
+ * @param {Function} getValue - Returns the value to set, given the switch feature.
+ * @returns {Promise} Resolves when every switch was handled.
+ * @example
+ * await setSwitchesValue(self, { device_features: ['plug-socket-1'] }, () => 1);
+ */
+async function setSwitchesValue(self, action, getValue) {
+  const switches = [];
+  (action.device_features || []).forEach((deviceFeatureSelector) => {
+    const deviceFeature = self.stateManager.get('deviceFeature', deviceFeatureSelector);
+    if (!deviceFeature) {
+      logger.warn(`Switch action: device feature "${deviceFeatureSelector}" not found`);
+      return;
+    }
+    switches.push({ device: self.stateManager.get('deviceById', deviceFeature.device_id), deviceFeature });
+  });
+  (action.devices || []).forEach((deviceSelector) => {
+    const device = self.stateManager.get('device', deviceSelector);
+    const deviceFeatures = get(device, 'features', { default: [] }).filter(
+      (feature) =>
+        feature.category === DEVICE_FEATURE_CATEGORIES.SWITCH &&
+        feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
+        !feature.read_only,
+    );
+    if (deviceFeatures.length === 0) {
+      logger.warn(`Switch action: no writable switch found on device "${deviceSelector}"`);
+    }
+    deviceFeatures.forEach((deviceFeature) => switches.push({ device, deviceFeature }));
+  });
+  await Promise.map(switches, async ({ device, deviceFeature }) => {
+    try {
+      await self.device.setValue(device, deviceFeature, getValue(deviceFeature));
+    } catch (e) {
+      logger.warn(e);
+    }
+  });
+}
+
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
     let device;
@@ -219,50 +262,14 @@ const actionsFunc = {
       }
     });
   },
-  [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
-      try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
-        await self.device.setValue(device, deviceFeature, 1);
-      } catch (e) {
-        logger.warn(e);
-      }
-    });
+  [ACTIONS.SWITCH.TURN_ON]: async (self, action) => {
+    await setSwitchesValue(self, action, () => 1);
   },
-  [ACTIONS.SWITCH.TURN_OFF]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
-      try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
-        await self.device.setValue(device, deviceFeature, 0);
-      } catch (e) {
-        logger.warn(e);
-      }
-    });
+  [ACTIONS.SWITCH.TURN_OFF]: async (self, action) => {
+    await setSwitchesValue(self, action, () => 0);
   },
-  [ACTIONS.SWITCH.TOGGLE]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
-      try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
-        await self.device.setValue(device, deviceFeature, deviceFeature.last_value === 0 ? 1 : 0);
-      } catch (e) {
-        logger.warn(e);
-      }
-    });
+  [ACTIONS.SWITCH.TOGGLE]: async (self, action) => {
+    await setSwitchesValue(self, action, (deviceFeature) => (deviceFeature.last_value === 0 ? 1 : 0));
   },
   [ACTIONS.TIME.DELAY]: async (self, action, scope) => {
     let { value } = action;
