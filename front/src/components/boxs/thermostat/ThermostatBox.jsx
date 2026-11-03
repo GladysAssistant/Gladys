@@ -482,14 +482,15 @@ class ThermostatBox extends Component {
     const cfg = this.state.remoteConfig;
     const value = PRESET_VALUES[preset];
     if (!cfg || !cfg.presetFeature || value === undefined) {
-      return;
+      return false;
     }
     this.savingPreset = true;
     // Remembered past the write: its echo can land after the response, and in
     // manual mode it must not be taken for a preset picked elsewhere.
     this.lastPresetWrite = { preset, at: Date.now() };
     try {
-      await this.writeFeature(cfg.presetFeature, value);
+      // Whether the write went through, for a caller that showed it already.
+      return await this.writeFeature(cfg.presetFeature, value);
     } finally {
       this.savingPreset = false;
     }
@@ -993,7 +994,13 @@ class ThermostatBox extends Component {
       ...(current ? { activePreset: current.preset } : {})
     });
     await this.resumeIfStopped();
-    await this.savePreset('schedule');
+    if (!(await this.savePreset('schedule'))) {
+      // The hold is still on the device: the card shows it again rather than a
+      // programme the thermostat is not back on.
+      this.releaseSetpointHold();
+      await this.refreshFromDevice();
+      return;
+    }
     // The schedule first: its `current` point is what the thermostat follows
     // from now on, and loadMode reads it.
     await this.loadSchedule();
