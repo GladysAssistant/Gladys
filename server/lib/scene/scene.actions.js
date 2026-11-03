@@ -67,8 +67,9 @@ function warnIfInvalidJsonMessage(actionName, topic, message) {
 
 /**
  * @description Set the value of the switches of a switch action: each selected switch
- * (device_features), and every writable switch of the selected devices (devices, the format
- * of the scenes saved before the switches of a multi-switch device could be picked one by one).
+ * (device_features), or, when none is selected, every writable switch of the selected devices
+ * (devices, the format of the scenes saved before the switches of a multi-switch device could
+ * be picked one by one, and of the scenes created through MCP).
  * @param {object} self - Reference to the SceneManager.
  * @param {object} action - The switch action.
  * @param {Function} getValue - Returns the value to set, given the switch feature.
@@ -78,7 +79,8 @@ function warnIfInvalidJsonMessage(actionName, topic, message) {
  */
 async function setSwitchesValue(self, action, getValue) {
   const switches = [];
-  (action.device_features || []).forEach((deviceFeatureSelector) => {
+  const deviceFeatureSelectors = action.device_features || [];
+  deviceFeatureSelectors.forEach((deviceFeatureSelector) => {
     const deviceFeature = self.stateManager.get('deviceFeature', deviceFeatureSelector);
     if (!deviceFeature) {
       logger.warn(`Switch action: device feature "${deviceFeatureSelector}" not found`);
@@ -86,7 +88,9 @@ async function setSwitchesValue(self, action, getValue) {
     }
     switches.push({ device: self.stateManager.get('deviceById', deviceFeature.device_id), deviceFeature });
   });
-  (action.devices || []).forEach((deviceSelector) => {
+  // The devices are only a fallback: when switches are selected, the selection lives in device_features
+  const deviceSelectors = deviceFeatureSelectors.length > 0 ? [] : action.devices || [];
+  deviceSelectors.forEach((deviceSelector) => {
     const device = self.stateManager.get('device', deviceSelector);
     const deviceFeatures = get(device, 'features', { default: [] }).filter(
       (feature) =>

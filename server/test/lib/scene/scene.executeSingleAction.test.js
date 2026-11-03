@@ -159,12 +159,28 @@ describe('scene.executeSingleAction multi-switch device', () => {
     assert.calledWith(device.setValue, powerStrip, socket1, 0);
     assert.calledWith(device.setValue, powerStrip, socket2, 0);
   });
+  it('should only drive the selected switches when the legacy devices are also stored', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_ON,
+      device_features: ['power-strip-socket-1'],
+      devices: ['power-strip'],
+    });
+    assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 1);
+  });
   it('should skip a switch that no longer exists', async () => {
     await sceneManager.executeSingleAction({
       type: ACTIONS.SWITCH.TURN_ON,
       device_features: ['deleted-switch', 'power-strip-socket-1'],
-      devices: ['deleted-device'],
     });
     assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 1);
+  });
+  it('should skip a device that no longer exists', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_ON,
+      devices: ['deleted-device', 'power-strip'],
+    });
+    assert.calledTwice(device.setValue);
+    assert.calledWith(device.setValue, powerStrip, socket1, 1);
+    assert.calledWith(device.setValue, powerStrip, socket2, 1);
   });
 });

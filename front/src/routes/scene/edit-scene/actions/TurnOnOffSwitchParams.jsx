@@ -2,6 +2,8 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Select from '../../../../components/form/Select';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { getDeviceFeatureName } from '../../../../utils/device';
 
 import { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
@@ -24,7 +26,7 @@ class TurnOnOffSwitch extends Component {
         switches.forEach(feature => {
           deviceOptions.push({
             value: feature.selector,
-            label: switches.length > 1 ? `${device.name} (${feature.name})` : device.name,
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
             deviceSelector: device.selector
           });
         });
@@ -47,8 +49,11 @@ class TurnOnOffSwitch extends Component {
   };
   refreshSelectedOptions = nextProps => {
     const { device_features: deviceFeatures = [], devices = [] } = nextProps.action;
-    const selectedOptions = (this.state.deviceOptions || []).filter(
-      deviceOption => deviceFeatures.includes(deviceOption.value) || devices.includes(deviceOption.deviceSelector)
+    // Same rule as the execution: the devices are only a fallback when no switch is selected
+    const selectedOptions = (this.state.deviceOptions || []).filter(deviceOption =>
+      deviceFeatures.length > 0
+        ? deviceFeatures.includes(deviceOption.value)
+        : devices.includes(deviceOption.deviceSelector)
     );
     this.setState({ selectedOptions });
   };
@@ -94,4 +99,4 @@ class TurnOnOffSwitch extends Component {
   }
 }
 
-export default connect('httpClient', {})(TurnOnOffSwitch);
+export default connect('httpClient', {})(withIntlAsProp(TurnOnOffSwitch));
