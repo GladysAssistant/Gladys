@@ -37,6 +37,13 @@
     "categories": ["assistants"]
   },
   {
+    "key": "matter-bridge",
+    "img": "/assets/integrations/cover/matter.jpg",
+    "whiteBackground": true,
+    "local": true,
+    "categories": ["assistants"]
+  },
+  {
     "key": "openai",
     "img": "/assets/integrations/cover/openai.jpg",
     "gladysPlus": true,

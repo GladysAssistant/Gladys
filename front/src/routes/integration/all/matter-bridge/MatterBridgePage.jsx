@@ -1,0 +1,217 @@
+import { Text, MarkupText } from 'preact-i18n';
+import get from 'get-value';
+import Select from 'react-select';
+import cx from 'classnames';
+import { RequestStatus } from '../../../../utils/consts';
+import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { EXPOSURE_MODES } from './actions';
+import style from './style.css';
+
+// Vendor ids of the main Matter ecosystems, from the CSA vendor list: a paired ecosystem is shown
+// by name rather than by number.
+const ECOSYSTEMS = {
+  4937: 'Apple Home',
+  24582: 'Google Home',
+  4631: 'Amazon Alexa',
+  4362: 'SmartThings',
+  4939: 'Home Assistant'
+};
+
+const ecosystemName = fabric =>
+  ECOSYSTEMS[fabric.vendorId] ||
+  fabric.label ||
+  `0x${Number(fabric.vendorId)
+    .toString(16)
+    .toUpperCase()}`;
+
+// The manual pairing code is easier to type in groups, the way ecosystems print it: 1234-567-8901.
+const formatManualCode = code => (code ? code.replace(/^(\d{4})(\d{3})(\d+)$/, '$1-$2-$3') : '');
+
+const ExposedDevicesSelect = ({ matterBridgeDevices, matterBridgeForm, updateMatterBridgeExposedDevices, intl }) => {
+  const functionName = key => get(intl.dictionary, `integration.matter-bridge.functions.${key}`, { default: key });
+  const options = (matterBridgeDevices || []).map(device => ({
+    value: device.selector,
+    label: `${device.name} (${device.functions.map(functionName).join(', ')})`
+  }));
+
+  if (options.length === 0) {
+    return (
+      <div class="alert alert-info">
+        <Text id="integration.matter-bridge.noCompatibleDevice" />
+      </div>
+    );
+  }
+
+  return (
+    <Select
+      isMulti
+      options={options}
+      value={options.filter(option => matterBridgeForm.exposedDevices.includes(option.value))}
+      onChange={updateMatterBridgeExposedDevices}
+      maxMenuHeight={220}
+      className="react-select-container"
+      classNamePrefix="react-select"
+    />
+  );
+};
+
+const ExposedDevicesSelectWithIntl = withIntlAsProp(ExposedDevicesSelect);
+
+const PairingCard = ({ status, qrCode }) => (
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <Text id="integration.matter-bridge.pairingTitle" />
+      </h3>
+    </div>
+    <div class="card-body">
+      {status.fabrics.length > 0 && (
+        <div>
+          <p>
+            <Text id="integration.matter-bridge.pairedWith" />
+          </p>
+          <ul>
+            {status.fabrics.map(fabric => (
+              <li key={fabric.fabricIndex}>{ecosystemName(fabric)}</li>
+            ))}
+          </ul>
+          <p class="text-muted">
+            <Text id="integration.matter-bridge.multiAdmin" />
+          </p>
+        </div>
+      )}
+      {!status.commissioned && (
+        <div class="text-center">
+          <p>
+            <Text id="integration.matter-bridge.scanQrCode" />
+          </p>
+          {qrCode && <img class={cx('mx-auto d-block mb-3', style.qrCode)} src={qrCode} />}
+          <p>
+            <Text id="integration.matter-bridge.manualCode" />
+          </p>
+          <p class={style.pairingCode}>{formatManualCode(status.manualPairingCode)}</p>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+const MatterBridgePage = props => {
+  const status = props.matterBridgeStatus;
+  const form = props.matterBridgeForm;
+
+  return (
+    <IntegrationSubPageLayout title={<Text id="integration.matter-bridge.title" />}>
+      <div class="card">
+        <div class="card-body">
+          <div class={cx('dimmer', { active: props.loading })}>
+            <div class="loader" />
+            <div class="dimmer-content">
+              <p>
+                <MarkupText id="integration.matter-bridge.introduction" />
+              </p>
+              {props.matterBridgeGetStatus === RequestStatus.Error && (
+                <div class="alert alert-danger">
+                  <Text id="integration.matter-bridge.getError" />
+                </div>
+              )}
+              {status && status.error && (
+                <div class="alert alert-danger">
+                  <Text id="integration.matter-bridge.startError" />
+                  <pre class="mb-0 mt-2">{status.error}</pre>
+                </div>
+              )}
+              {form && (
+                <form onSubmit={props.saveMatterBridge}>
+                  <div class="form-group">
+                    <label class="custom-switch">
+                      <input
+                        type="checkbox"
+                        class="custom-switch-input"
+                        checked={form.enabled}
+                        onChange={props.updateMatterBridgeEnabled}
+                      />
+                      <span class="custom-switch-indicator flex-shrink-0" />
+                      <span class="custom-switch-description ml-2">
+                        <Text id="integration.matter-bridge.enable" />
+                      </span>
+                    </label>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.matter-bridge.exposure" />
+                    </label>
+                    <select
+                      class="form-control mb-2"
+                      onChange={props.updateMatterBridgeExposureMode}
+                      value={form.exposureMode}
+                    >
+                      <option value={EXPOSURE_MODES.ALL}>
+                        <Text id="integration.matter-bridge.exposureModeAll" />
+                      </option>
+                      <option value={EXPOSURE_MODES.SELECTION}>
+                        <Text id="integration.matter-bridge.exposureModeSelection" />
+                      </option>
+                    </select>
+                    {form.exposureMode === EXPOSURE_MODES.SELECTION && <ExposedDevicesSelectWithIntl {...props} />}
+                  </div>
+                  <button type="submit" class="btn btn-success">
+                    <Text id="integration.matter-bridge.saveButton" />
+                  </button>
+                  {props.matterBridgeSaveStatus === RequestStatus.Success && (
+                    <div class="alert alert-success mt-2">
+                      <Text id="integration.matter-bridge.saveSuccess" />
+                    </div>
+                  )}
+                  {props.matterBridgeSaveStatus === RequestStatus.Error && (
+                    <div class="alert alert-danger mt-2">
+                      <Text id="integration.matter-bridge.saveError" />
+                    </div>
+                  )}
+                </form>
+              )}
+              {status && status.running && (
+                <p class="mt-4 text-muted">
+                  <Text id="integration.matter-bridge.exposedCount" fields={{ count: status.exposedCount }} />
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      {status && status.running && <PairingCard status={status} qrCode={props.matterBridgeQrCode} />}
+      {status && status.running && (
+        <div class="card">
+          <div class="card-body">
+            <p>
+              <MarkupText id="integration.matter-bridge.reset" />
+            </p>
+            {!props.matterBridgeConfirmReset && (
+              <button class="btn btn-danger" onClick={props.askMatterBridgeReset}>
+                <Text id="integration.matter-bridge.resetButton" />
+              </button>
+            )}
+            {props.matterBridgeConfirmReset && (
+              <div>
+                <button class="btn btn-danger mr-2" onClick={props.resetMatterBridge}>
+                  <Text id="integration.matter-bridge.resetConfirmButton" />
+                </button>
+                <button class="btn btn-secondary" onClick={props.cancelMatterBridgeReset}>
+                  <Text id="integration.matter-bridge.resetCancelButton" />
+                </button>
+              </div>
+            )}
+            {props.matterBridgeResetStatus === RequestStatus.Error && (
+              <div class="alert alert-danger mt-2">
+                <Text id="integration.matter-bridge.resetError" />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </IntegrationSubPageLayout>
+  );
+};
+
+export default MatterBridgePage;

@@ -1768,6 +1768,25 @@ const integrations = {
   'get /api/v1/service/matter/node': [],
   'get /api/v1/service/matter/paired-device': [],
   'get /api/v1/service/homekit/device': [],
+  // The Matter bridge, paired with Apple Home and exposing every compatible device
+  'get /api/v1/service/matter-bridge/status': {
+    enabled: true,
+    running: true,
+    error: null,
+    exposureMode: 'all',
+    exposedDevices: [],
+    exposedCount: 4,
+    commissioned: true,
+    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
+    manualPairingCode: '34970112332',
+    fabrics: [{ fabricIndex: 1, label: '', vendorId: 4937 }]
+  },
+  'get /api/v1/service/matter-bridge/device': [
+    { name: 'Living room lamp', selector: 'living-room-lamp', functions: ['light'] },
+    { name: 'Kitchen sensor', selector: 'kitchen-sensor', functions: ['temperature', 'humidity', 'battery'] },
+    { name: 'Bedroom shutter', selector: 'bedroom-shutter', functions: ['cover'] },
+    { name: 'Front door', selector: 'front-door', functions: ['contact', 'battery'] }
+  ],
   'get /api/v1/service/matterbridge/status': {
     matterbridgeExist: false,
     matterbridgeRunning: false,
