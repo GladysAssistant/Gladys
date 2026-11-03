@@ -167,10 +167,16 @@ describe('scene.executeSingleAction multi-switch device', () => {
     });
     assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 1);
   });
-  it('should skip a switch that no longer exists', async () => {
+  it('should skip a switch that no longer exists, is read only or is not a switch', async () => {
+    stateManager.setState('deviceFeature', 'power-strip-power', {
+      ...socket1,
+      selector: 'power-strip-power',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+    });
     await sceneManager.executeSingleAction({
       type: ACTIONS.SWITCH.TURN_ON,
-      device_features: ['deleted-switch', 'power-strip-socket-1'],
+      device_features: ['deleted-switch', 'power-strip-read-only', 'power-strip-power', 'power-strip-socket-1'],
     });
     assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 1);
   });
