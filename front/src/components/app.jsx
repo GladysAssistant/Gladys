@@ -79,6 +79,7 @@ import TelegramPage from '../routes/integration/all/telegram';
 import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
 import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
 import HomeKitPage from '../routes/integration/all/homekit';
+import MatterBridgeIntegrationPage from '../routes/integration/all/matter-bridge';
 import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
@@ -370,6 +371,7 @@ const AppRouter = connect(
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
+        <MatterBridgeIntegrationPage path="/dashboard/integration/communication/matter-bridge" />
         <OpenAIPage path="/dashboard/integration/communication/openai" />
         <MCPPage path="/dashboard/integration/communication/mcp" />
 
