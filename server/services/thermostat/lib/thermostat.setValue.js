@@ -1,6 +1,10 @@
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES, THERMOSTAT_MODE } = require('../../../utils/constants');
-const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
+const {
+  DEFAULT_MANUAL_DURATION_MINUTES,
+  DEFAULT_MIN_TEMP,
+  DEFAULT_MAX_TEMP,
+} = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const {
   startExternalThermostat,
@@ -159,44 +163,33 @@ async function holdExpiry(device) {
 }
 
 /**
- * @description Bound a setpoint set by hand to the thermostat's own range.
+ * @description Bound a setpoint set by hand on a virtual thermostat to its range.
  *
- * `THERMOSTAT_MIN_TEMP` / `_MAX_TEMP` bound the dial, but a scene, the generic
- * device API or HomeKit write through here without it. The clamp the
- * regulation loop applies is the device's advertised range, and Matter
- * advertises -100-200 °C whatever the appliance: a scene asking a Tado X for
- * 166 °C went through. The range is configured in `THERMOSTAT_TEMP_UNIT`, so on
- * an external thermostat it is converted into the target feature's unit — the
- * unit the setpoint arrives in — as a preset's setpoint is.
+ * Only a virtual thermostat's own `target-temperature` comes through here: the
+ * core routes a write on the service owning the feature, so on an external
+ * thermostat a scene, the API, HomeKit and the widget's dial all write the real
+ * device's feature (Matter, Netatmo...) and never reach this service. There the
+ * dial is bounded by the widget (F). On a virtual thermostat nothing else
+ * bounds a scene or the API: `saveState` stores whatever it is handed.
+ * A thermostat with no params gets the shared default range, as the widget does.
  * @param {object} config - The thermostat's params config.
- * @param {object} deviceFeature - The setpoint feature being written.
  * @param {number} value - The setpoint asked for.
  * @returns {number} The setpoint within the range.
  * @example
- * clampToRange(config, feature, 166); // 25 on a thermostat set to 8-25
+ * clampToRange(config, 166); // 25 on a thermostat set to 8-25
  */
-function clampToRange(config, deviceFeature, value) {
-  const toFeatureUnit = (bound) => {
-    const number = toNumber(bound, null);
-    if (number === null || !isExternal(config)) {
-      return number;
-    }
-    return convertSetpointToFeatureUnit(number, config.temp_unit, deviceFeature.unit);
-  };
-  const min = toFeatureUnit(config.temp_min);
-  const max = toFeatureUnit(config.temp_max);
-  // An inverted range is a form mistake, not a bound: honouring it would pin
-  // every setpoint to one end.
-  if (min !== null && max !== null && min > max) {
+function clampToRange(config, value) {
+  if (isExternal(config)) {
     return value;
   }
-  if (min !== null && value < min) {
-    return min;
+  const min = toNumber(config.temp_min, DEFAULT_MIN_TEMP);
+  const max = toNumber(config.temp_max, DEFAULT_MAX_TEMP);
+  // An inverted range is a form mistake, not a bound: honouring it would pin
+  // every setpoint to one end.
+  if (min > max) {
+    return value;
   }
-  if (max !== null && value > max) {
-    return max;
-  }
-  return value;
+  return Math.min(max, Math.max(min, value));
 }
 
 /**
@@ -288,9 +281,9 @@ async function setValue(device, deviceFeature, value, manual = true) {
     return;
   }
 
-  // A setpoint set by hand stays within the thermostat's range; a scheduled one
-  // is written as the programme says (E.3).
-  const setpoint = manual ? clampToRange(buildParamsConfig(device) || {}, deviceFeature, Number(value)) : value;
+  // A setpoint set by hand on a virtual thermostat stays within its range; a
+  // scheduled one is written as the programme says (E.3).
+  const setpoint = manual ? clampToRange(buildParamsConfig(device) || {}, Number(value)) : value;
   if (manual && setpoint !== Number(value)) {
     logger.info(`Thermostat: setpoint ${value} outside the range of ${device.selector}, clamped to ${setpoint}`);
   }

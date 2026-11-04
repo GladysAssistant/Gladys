@@ -634,9 +634,9 @@ describe('thermostat.setValue', () => {
     });
   });
 
-  describe('on a setpoint outside the range of the thermostat', () => {
-    // A Tado X through Matter advertises -100-200 °C: the device's own range
-    // lets 166 °C through, so the thermostat's range has to bound it.
+  describe('on a setpoint outside the range of a virtual thermostat', () => {
+    // A scene or the API writes a virtual thermostat's own feature, and
+    // saveState stores whatever it is handed: the range has to bound it here.
     const range = [
       { name: 'THERMOSTAT_MIN_TEMP', value: '8' },
       { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
@@ -696,27 +696,27 @@ describe('thermostat.setValue', () => {
       assert.calledWith(handler.gladys.device.saveState, setpointFeature, 21);
     });
 
-    it('should bound an external setpoint in the unit of the real device', async () => {
+    it('should bound to the default range a thermostat with no params', async () => {
       const handler = buildHandler();
-      const fahrenheitFeature = { selector: 'netatmo-setpoint', unit: DEVICE_FEATURE_UNITS.FAHRENHEIT };
 
-      // 8-25 °C is 46-77 °F: 100 °F is above it.
-      await handler.setValue(
-        externalDevice([{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }, ...range]),
-        fahrenheitFeature,
-        100,
-      );
+      await handler.setValue(device(), setpointFeature, 166);
 
-      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(77);
-      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('77');
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 35);
     });
 
-    it('should bound an external setpoint to the default range when none is set', async () => {
+    it('should leave an external setpoint to the widget, which bounds the dial', async () => {
+      // The core routes a scene, the API or the dial to the real device's
+      // service: this branch is only reached by a direct call, and bounding it
+      // here would promise a protection external thermostats do not get.
       const handler = buildHandler();
 
-      await handler.setValue(externalDevice(), { selector: 'netatmo-setpoint' }, 166);
+      await handler.setValue(
+        externalDevice([{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }, ...range]),
+        { selector: 'netatmo-setpoint' },
+        30,
+      );
 
-      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(35);
+      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(30);
     });
   });
 
