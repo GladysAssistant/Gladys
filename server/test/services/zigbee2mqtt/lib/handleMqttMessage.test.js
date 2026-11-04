@@ -43,6 +43,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   });
 
   afterEach(() => {
+    // A health check retry left pending must not fire during another test
+    clearTimeout(zigbee2mqttManager.healthCheckTimer);
     sinon.restore();
   });
 
@@ -79,6 +81,57 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     // bridge/state is never mistaken for the state of a device
     assert.notCalled(gladys.stateManager.get);
+  });
+
+  describe('health check retries', () => {
+    const online = JSON.stringify({ state: 'online' });
+    const healthy = JSON.stringify({ data: { healthy: true }, status: 'ok' });
+    let clock;
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+      zigbee2mqttManager.zigbee2mqttConnected = false;
+      zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
+    });
+
+    it('should ask again until Zigbee2mqtt answers, as it announces itself online before listening', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      clock.tick(3000);
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', healthy);
+      clock.tick(60000);
+      // ASSERT
+      assert.calledTwice(zigbee2mqttManager.mqttClient.publish);
+      expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(true);
+    });
+
+    it('should stop asking after 10 attempts', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      clock.tick(60000);
+      // ASSERT
+      assert.callCount(zigbee2mqttManager.mqttClient.publish, 10);
+      expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    });
+
+    it('should stop asking when Zigbee2mqtt goes offline', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', JSON.stringify({ state: 'offline' }));
+      clock.tick(60000);
+      // ASSERT
+      assert.calledOnce(zigbee2mqttManager.mqttClient.publish);
+    });
+
+    it('should stop asking once Gladys is disconnected from the broker', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      const { publish } = zigbee2mqttManager.mqttClient;
+      zigbee2mqttManager.mqttClient = null;
+      clock.tick(60000);
+      // ASSERT
+      assert.calledOnce(publish);
+    });
   });
 
   it('should set Zigbee2mqtt online when it answers the health check', async () => {

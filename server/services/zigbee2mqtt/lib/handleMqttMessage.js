@@ -2,6 +2,31 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertFeature } = require('../utils/convertFeature');
 
+// Zigbee2mqtt announces itself online before it listens to its requests: a health check sent right away
+// is lost, so it is sent again until Zigbee2mqtt answers
+const HEALTH_CHECK_INTERVAL_IN_MS = 3000;
+const HEALTH_CHECK_MAX_ATTEMPTS = 10;
+
+/**
+ * @description Ask Zigbee2mqtt to prove that it runs, again and again until it answers.
+ * @param {object} manager - The Zigbee2mqtt manager.
+ * @param {number} attempt - Number of this attempt, starting at 1.
+ * @example
+ * requestHealthCheck(this);
+ */
+function requestHealthCheck(manager, attempt = 1) {
+  clearTimeout(manager.healthCheckTimer);
+  manager.healthCheckTimer = null;
+  // Gladys may have been disconnected from the broker in the meantime
+  if (!manager.mqttClient) {
+    return;
+  }
+  manager.mqttClient.publish('zigbee2mqtt/bridge/request/health_check', '{}');
+  if (attempt < HEALTH_CHECK_MAX_ATTEMPTS) {
+    manager.healthCheckTimer = setTimeout(() => requestHealthCheck(manager, attempt + 1), HEALTH_CHECK_INTERVAL_IN_MS);
+  }
+}
+
 /**
  * @description Read the state published by Zigbee2mqtt on its bridge/state topic.
  * @param {string} message - The bridge/state message: {"state":"online"}, or "online" as plain text
@@ -27,6 +52,9 @@ function getBridgeState(message) {
  * updateBridgeState(this, true);
  */
 function updateBridgeState(manager, online) {
+  // The state is known: no need to ask Zigbee2mqtt again
+  clearTimeout(manager.healthCheckTimer);
+  manager.healthCheckTimer = null;
   manager.zigbee2mqttConnected = online;
   manager.zigbee2mqttRunning = online;
   if (online) {
@@ -55,7 +83,7 @@ async function handleMqttMessage(topic, message) {
         // stopped first (host reboot). A Zigbee2mqtt whose adapter fails to start exits before
         // connecting to the broker, so it never replaces it. Only an answer from Zigbee2mqtt proves it runs.
         logger.debug('Zigbee2mqtt bridge announced online, checking its health...');
-        this.mqttClient.publish('zigbee2mqtt/bridge/request/health_check', '{}');
+        requestHealthCheck(this);
       } else {
         logger.debug('Zigbee2mqtt bridge is offline');
         updateBridgeState(this, false);

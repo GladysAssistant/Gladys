@@ -63,6 +63,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
   this.z2mPermitJoin = false;
+  this.healthCheckTimer = null;
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
