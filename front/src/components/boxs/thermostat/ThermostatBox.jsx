@@ -214,19 +214,36 @@ class ThermostatBox extends Component {
     return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
   };
   // The dial spans the range set on the thermostat (THERMOSTAT_MIN_TEMP /
-  // _MAX_TEMP), in the setpoint feature's unit. The range the device advertises
-  // only narrows it, never widens it: Matter advertises -100-200 °C, and taking
-  // it first let the dial reach 166 °C on a thermostat set to 8-25.
-  getDialBound = (configured, fallback) => {
-    const parsed = configured === undefined || configured === null ? NaN : Number(configured);
-    const value = Number.isFinite(parsed) ? this.toSetpointFeatureUnit(parsed) : fallback;
+  // _MAX_TEMP, or the shared default), in the setpoint feature's unit. The range
+  // the device advertises only narrows it, never widens it: Matter advertises
+  // -100-200 °C, and taking it first let the dial reach 166 °C on a thermostat
+  // set to 8-25 (spec F).
+  getDialRange = () => {
+    const cfg = this.getConfig();
     const { featureMin, featureMax } = this.state;
-    if (featureMin !== null && value < featureMin) return featureMin;
-    if (featureMax !== null && value > featureMax) return featureMax;
-    return value;
+    const configured = (value, fallback) => {
+      const parsed = value === undefined || value === null ? NaN : Number(value);
+      return this.toSetpointFeatureUnit(Number.isFinite(parsed) ? parsed : fallback);
+    };
+    let min = configured(cfg.temp_min, DEFAULT_MIN_TEMP);
+    let max = configured(cfg.temp_max, DEFAULT_MAX_TEMP);
+    // An inverted range bounds nothing, as on the server (D.0): it would turn +
+    // and − round. The default range stands in for it.
+    if (min > max) {
+      min = this.toSetpointFeatureUnit(DEFAULT_MIN_TEMP);
+      max = this.toSetpointFeatureUnit(DEFAULT_MAX_TEMP);
+    }
+    const low = featureMin !== null ? Math.max(min, featureMin) : min;
+    const high = featureMax !== null ? Math.min(max, featureMax) : max;
+    // A range the device cannot reach at all would pin the dial to one value:
+    // the device's own range is the only one it can follow.
+    if (low > high) {
+      return { min: featureMin !== null ? featureMin : high, max: featureMax !== null ? featureMax : low };
+    }
+    return { min: low, max: high };
   };
-  getMinTemp = () => this.getDialBound(this.getConfig().temp_min, DEFAULT_MIN_TEMP);
-  getMaxTemp = () => this.getDialBound(this.getConfig().temp_max, DEFAULT_MAX_TEMP);
+  getMinTemp = () => this.getDialRange().min;
+  getMaxTemp = () => this.getDialRange().max;
 
   // Effective temperature unit: device feature unit takes priority over user preference
   getEffectiveUnit = () => {
