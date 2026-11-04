@@ -159,6 +159,47 @@ async function holdExpiry(device) {
 }
 
 /**
+ * @description Bound a setpoint set by hand to the thermostat's own range.
+ *
+ * `THERMOSTAT_MIN_TEMP` / `_MAX_TEMP` bound the dial, but a scene, the generic
+ * device API or HomeKit write through here without it. The clamp the
+ * regulation loop applies is the device's advertised range, and Matter
+ * advertises -100-200 °C whatever the appliance: a scene asking a Tado X for
+ * 166 °C went through. The range is configured in `THERMOSTAT_TEMP_UNIT`, so on
+ * an external thermostat it is converted into the target feature's unit — the
+ * unit the setpoint arrives in — as a preset's setpoint is.
+ * @param {object} config - The thermostat's params config.
+ * @param {object} deviceFeature - The setpoint feature being written.
+ * @param {number} value - The setpoint asked for.
+ * @returns {number} The setpoint within the range.
+ * @example
+ * clampToRange(config, feature, 166); // 25 on a thermostat set to 8-25
+ */
+function clampToRange(config, deviceFeature, value) {
+  const toFeatureUnit = (bound) => {
+    const number = toNumber(bound, null);
+    if (number === null || !isExternal(config)) {
+      return number;
+    }
+    return convertSetpointToFeatureUnit(number, config.temp_unit, deviceFeature.unit);
+  };
+  const min = toFeatureUnit(config.temp_min);
+  const max = toFeatureUnit(config.temp_max);
+  // An inverted range is a form mistake, not a bound: honouring it would pin
+  // every setpoint to one end.
+  if (min !== null && max !== null && min > max) {
+    return value;
+  }
+  if (min !== null && value < min) {
+    return min;
+  }
+  if (max !== null && value > max) {
+    return max;
+  }
+  return value;
+}
+
+/**
  * @description Set a value on one of a thermostat's features. This is the
  * single write path: `device.set-value` in a scene, the generic device API and
  * the widget all land here, and each intent is a value on its own feature.
@@ -247,7 +288,14 @@ async function setValue(device, deviceFeature, value, manual = true) {
     return;
   }
 
-  await writeSetpoint.call(this, device, deviceFeature, value);
+  // A setpoint set by hand stays within the thermostat's range; a scheduled one
+  // is written as the programme says (E.3).
+  const setpoint = manual ? clampToRange(buildParamsConfig(device) || {}, deviceFeature, Number(value)) : value;
+  if (manual && setpoint !== Number(value)) {
+    logger.info(`Thermostat: setpoint ${value} outside the range of ${device.selector}, clamped to ${setpoint}`);
+  }
+
+  await writeSetpoint.call(this, device, deviceFeature, setpoint);
 
   if (!manual) {
     // Returning to the schedule: the caller has already cleared the hold, and
@@ -259,13 +307,13 @@ async function setValue(device, deviceFeature, value, manual = true) {
   }
 
   const until = await holdExpiry.call(this, device);
-  await setManualHold.call(this, device, value, until);
+  await setManualHold.call(this, device, setpoint, until);
 
   logger.info(
-    `Thermostat: setValue on ${deviceFeature.selector} held as manual setpoint ${value}` +
+    `Thermostat: setValue on ${deviceFeature.selector} held as manual setpoint ${setpoint}` +
       `${until ? ` until ${new Date(until).toISOString()}` : ' (no schedule, no expiry)'}`,
   );
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint };
+module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint, clampToRange };
