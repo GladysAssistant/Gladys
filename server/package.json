@@ -37,7 +37,8 @@
   "nodemonConfig": {
     "ignore": [
       "test/*",
-      "persist/*"
+      "persist/*",
+      "matter-bridge/*"
     ]
   },
   "c8": {
