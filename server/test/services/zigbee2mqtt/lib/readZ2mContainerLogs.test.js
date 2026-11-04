@@ -168,6 +168,28 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     });
   });
 
+  it('should ignore a known error found at the end of the logs when Zigbee2mqtt is online', async () => {
+    // The logs of the container are read from its creation: the error can come from an older start
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    const ezspLog = 'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
+  it('should ignore a known error found while reading when Zigbee2mqtt is online', async () => {
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    const ezspLog =
+      'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12\nmore logs\n';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
   it('should ignore an error: line when Zigbee2mqtt is online', async () => {
     // A device failing to answer during the startup is logged as an error, without stopping Zigbee2mqtt
     zigbee2mqttManager.zigbee2mqttConnected = true;

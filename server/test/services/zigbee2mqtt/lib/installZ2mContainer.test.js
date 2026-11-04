@@ -121,6 +121,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -130,6 +131,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+    // Gladys restarted the container: Zigbee2mqtt is shown as starting until it answers
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(true);
   });
 
   it('should restart z2m container (container running but config changed)', async () => {
@@ -154,6 +157,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -330,6 +334,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -339,6 +344,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+    // The container was already running: Gladys did not start it
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
   });
 
   it('should update restart policy of an existing z2m container missing it (#2734)', async () => {
@@ -441,6 +448,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -450,6 +458,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
   });
 
   it('it should fail to install z2m container', async () => {
@@ -478,6 +487,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -517,6 +527,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -536,6 +547,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,

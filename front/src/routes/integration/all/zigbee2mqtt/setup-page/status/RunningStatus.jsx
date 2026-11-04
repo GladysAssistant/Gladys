@@ -8,11 +8,18 @@ import ContainerLinkStatus from '../components/ContainerLinkStatus';
 
 const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
   const loading = setupZigee2mqttStatus === RequestStatus.Getting;
-  const { gladysConnected, zigbee2mqttConnected, z2mContainerError } = zigbee2mqttStatus;
+  const { gladysConnected, zigbee2mqttConnected, zigbee2mqttStarting, z2mContainerError } = zigbee2mqttStatus;
   // Gladys hears the broker, but Zigbee2mqtt has not answered yet (in external mode too, without container)
   const zigbee2mqttWaiting = !loading && gladysConnected && !zigbee2mqttConnected;
-  // Without a startup error, it is still starting
-  const zigbee2mqttStarting = zigbee2mqttWaiting && !z2mContainerError;
+  // Starting only when Gladys has just (re)started its container and no startup error was read: a stopped
+  // Zigbee2mqtt must not be shown as starting
+  const starting = zigbee2mqttWaiting && zigbee2mqttStarting && !z2mContainerError;
+  let explanationKey = 'integration.zigbee2mqtt.setup.zigbee2mqttNotResponding';
+  if (starting) {
+    explanationKey = 'integration.zigbee2mqtt.setup.zigbee2mqttStarting';
+  } else if (z2mContainerError) {
+    explanationKey = 'integration.zigbee2mqtt.setup.zigbee2mqttNotStarting';
+  }
 
   return (
     <Fragment>
@@ -35,9 +42,9 @@ const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
             imageSrc="/assets/integrations/logos/logo_mqtt.png"
             title={<Text id="integration.zigbee2mqtt.setup.mqtt" />}
           />
-          <ContainerLinkStatus loading={loading || zigbee2mqttStarting} linked={zigbee2mqttConnected} />
+          <ContainerLinkStatus loading={loading || starting} linked={zigbee2mqttConnected} />
           <ContainerStatus
-            loading={loading || zigbee2mqttStarting}
+            loading={loading || starting}
             exists={zigbee2mqttStatus.zigbee2mqttExist}
             running={zigbee2mqttStatus.zigbee2mqttRunning}
             imageSrc="/assets/integrations/logos/logo_zigbee2mqtt.png"
@@ -46,13 +53,7 @@ const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
         </div>
         {zigbee2mqttWaiting && (
           <p class="text-center text-muted mt-3 mb-0" data-cy="z2m-running-status-explanation">
-            <Text
-              id={
-                zigbee2mqttStarting
-                  ? 'integration.zigbee2mqtt.setup.zigbee2mqttStarting'
-                  : 'integration.zigbee2mqtt.setup.zigbee2mqttNotStarting'
-              }
-            />
+            <Text id={explanationKey} />
           </p>
         )}
       </div>

@@ -163,6 +163,8 @@ async function installZ2mContainer(config, setupMode = false) {
     // Check if we need to restart the container (container is not running / config changed)
     if (container.state !== 'running' || configChanged) {
       logger.info('Zigbee2mqtt container is (re)starting...');
+      // Until Zigbee2mqtt answers or reports itself offline, the UI tells that it is starting
+      this.zigbee2mqttStarting = true;
       await this.gladys.system.restartContainer(container.id);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
@@ -177,6 +179,7 @@ async function installZ2mContainer(config, setupMode = false) {
   } catch (e) {
     logger.error('Zigbee2mqtt container failed to start:', e);
     this.zigbee2mqttRunning = false;
+    this.zigbee2mqttStarting = false;
     throw e;
   } finally {
     this.emitStatusEvent();

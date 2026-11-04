@@ -21,6 +21,7 @@ async function init(setupMode = false) {
   this.zigbee2mqttRunning = false;
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.networkModeValid = false;
   this.z2mContainerError = null;

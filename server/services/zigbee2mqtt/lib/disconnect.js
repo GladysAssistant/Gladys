@@ -53,6 +53,7 @@ async function disconnect() {
   await removeOwnContainer(this.gladys.system, zigbee2mqttContainerDescriptor);
   this.zigbee2mqttRunning = false;
   this.zigbee2mqttConnected = false;
+  this.zigbee2mqttStarting = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
   this.emitStatusEvent();

@@ -28,6 +28,7 @@ describe('zigbee2mqtt status', () => {
     zigbee2MqttManager.zigbee2mqttRunning = true;
     zigbee2MqttManager.gladysConnected = false;
     zigbee2MqttManager.zigbee2mqttConnected = false;
+    zigbee2MqttManager.zigbee2mqttStarting = true;
     zigbee2MqttManager.dockerBased = false;
     zigbee2MqttManager.networkModeValid = false;
   });
@@ -44,6 +45,7 @@ describe('zigbee2mqtt status', () => {
     expect(result.zigbee2mqttRunning).that.equal(true);
     expect(result.gladysConnected).that.equal(false);
     expect(result.zigbee2mqttConnected).that.equal(false);
+    expect(result.zigbee2mqttStarting).that.equal(true);
     expect(result.dockerBased).that.equal(false);
     expect(result.networkModeValid).that.equal(false);
 

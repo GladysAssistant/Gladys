@@ -55,6 +55,7 @@ async function reset() {
   this.zigbee2mqttRunning = false;
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;

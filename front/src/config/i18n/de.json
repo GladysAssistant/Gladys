@@ -2049,6 +2049,7 @@
         "serviceStatus": "Dienststatus",
         "zigbee2mqttStarting": "Zigbee2MQTT startet: Es wird grün, sobald es Gladys antwortet.",
         "zigbee2mqttNotStarting": "Zigbee2MQTT kann nicht starten: siehe Fehler oben.",
+        "zigbee2mqttNotResponding": "Zigbee2MQTT antwortet nicht: Es ist gestoppt oder abgestürzt, ohne bekannten Fehler in seinen Logs.",
         "description": "Dieser Dienst verwendet zwei Docker-Container (MQTT-Broker und Zigbee2mqtt). Aktivieren Sie Zigbee2mqtt, um diese Container bereitzustellen. Weitere Informationen finden Sie auf der Zigbee2mqtt-Dokumentationsseite.",
         "nonDockerEnv": "Gladys wird derzeit nicht in Docker ausgeführt. Es ist unmöglich, Zigbee2mqtt von Gladys aus zu aktivieren.",
         "invalidDockerNetwork": "Gladys basiert auf einer benutzerdefinierten Installation. Um Zigbee2mqtt von dieser Seite aus zu installieren, muss der Docker-Container von Gladys mit der Option \"network=host\" gestartet werden.",

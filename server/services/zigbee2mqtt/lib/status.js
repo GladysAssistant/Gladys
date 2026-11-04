@@ -15,6 +15,7 @@ function status() {
     zigbee2mqttRunning: this.zigbee2mqttRunning,
     gladysConnected: this.gladysConnected,
     zigbee2mqttConnected: this.zigbee2mqttConnected,
+    zigbee2mqttStarting: this.zigbee2mqttStarting,
     z2mEnabled,
     dockerBased: this.dockerBased,
     networkModeValid: this.networkModeValid,

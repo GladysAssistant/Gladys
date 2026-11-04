@@ -45,7 +45,7 @@ class CheckStatus extends Component {
         <Link href="/dashboard/integration/device/zigbee2mqtt/setup">
           <Text id="integration.zigbee2mqtt.status.setupPageLink" />
         </Link>
-        {installed && z2mContainerError && (
+        {z2mContainerError && (
           <div class="mt-2" data-cy="z2m-status-alert-error">
             <ContainerError error={z2mContainerError} />
           </div>

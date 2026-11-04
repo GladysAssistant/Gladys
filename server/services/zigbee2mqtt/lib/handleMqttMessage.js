@@ -55,6 +55,8 @@ function updateBridgeState(manager, online) {
   manager.healthCheckTimer = null;
   manager.zigbee2mqttConnected = online;
   manager.zigbee2mqttRunning = online;
+  // Online, or offline: either way Zigbee2mqtt is not starting anymore
+  manager.zigbee2mqttStarting = false;
   if (online) {
     manager.zigbee2mqttExist = true;
     // Zigbee2mqtt started: an error read in its startup logs did not prevent it from running

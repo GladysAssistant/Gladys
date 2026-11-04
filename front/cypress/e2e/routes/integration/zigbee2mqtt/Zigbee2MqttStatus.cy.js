@@ -1,6 +1,6 @@
 describe('Zigbee2mqtt status', () => {
   // Gladys is connected to the broker, the Zigbee2mqtt container is installed, but Zigbee2mqtt has not
-  // reported itself online (bridge/state): it is starting, or crashing in a loop
+  // answered: it is stopped, or crashing in a loop
   const notOnlineStatus = {
     usbConfigured: true,
     networkAdapterConfigured: false,
@@ -10,6 +10,7 @@ describe('Zigbee2mqtt status', () => {
     zigbee2mqttRunning: false,
     gladysConnected: true,
     zigbee2mqttConnected: false,
+    zigbee2mqttStarting: false,
     z2mEnabled: false,
     dockerBased: true,
     networkModeValid: true,
@@ -66,14 +67,29 @@ describe('Zigbee2mqtt status', () => {
 
   it('should show Zigbee2mqtt as starting on the setup page, until it is online', () => {
     const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: notOnlineStatus });
+    // Gladys has just (re)started the Zigbee2mqtt container
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      { body: { ...notOnlineStatus, zigbee2mqttStarting: true } }
+    );
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
 
     cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttStarting');
+    // The enable switch follows Zigbee2mqtt being online
+    cy.get('#enableZigbee2mqtt').should('not.be.checked');
 
     cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: onlineStatus });
 
     cy.get('[data-cy=z2m-running-status-explanation]').should('not.exist');
+    cy.get('#enableZigbee2mqtt').should('be.checked');
+  });
+
+  it('should not show a stopped Zigbee2mqtt as starting on the setup page', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: notOnlineStatus });
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
+
+    cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttNotResponding');
   });
 
   it('should tell that Zigbee2mqtt fails to start on the setup page', () => {

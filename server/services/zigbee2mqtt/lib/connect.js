@@ -50,6 +50,8 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       logger.warn(`Error while connecting to MQTT - ${err}`);
       this.gladysConnected = false;
       this.zigbee2mqttConnected = false;
+      // Without the broker, nothing proves that Zigbee2mqtt still runs: it has to answer again
+      this.zigbee2mqttRunning = false;
       const connectionError = getMqttConnectionError(err);
       const authenticationFailed =
         connectionError.code === MQTT_CONNECTION_ERROR.BAD_CREDENTIALS ||
@@ -66,6 +68,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       logger.warn(`Disconnected from MQTT server`);
       this.gladysConnected = false;
       this.zigbee2mqttConnected = false;
+      this.zigbee2mqttRunning = false;
       this.emitStatusEvent();
     });
 
