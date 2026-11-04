@@ -16,6 +16,7 @@ const gladys = {
 const zigbee2mqttManager = {
   getDiscoveredDevices: fake.returns(['device']),
   getManagedAdapters: fake.returns(['adapter']),
+  getUsbPorts: fake.resolves(['port']),
   status: fake.returns(true),
   getSetup: fake.resolves({ config: 'values' }),
   setup: fake.resolves(true),
@@ -59,6 +60,18 @@ describe('zigbee2mqtt API', () => {
 
     assert.calledOnce(zigbee2mqttManager.getManagedAdapters);
     assert.calledWith(res.json, ['adapter']);
+  });
+
+  it('get /api/v1/service/zigbee2mqtt/usb/port', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/zigbee2mqtt/usb/port'].controller(req, res);
+
+    assert.calledOnce(zigbee2mqttManager.getUsbPorts);
+    assert.calledWith(res.json, ['port']);
   });
 
   it('get /api/v1/service/zigbee2mqtt/status', async () => {

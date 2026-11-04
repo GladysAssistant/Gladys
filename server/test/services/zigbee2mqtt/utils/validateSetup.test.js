@@ -23,11 +23,33 @@ describe('zigbee2mqtt validateSetup', () => {
 
   it('should return the configuration in USB mode', () => {
     // PREPARE
-    const config = { Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0' };
+    const config = {
+      Z2M_ADAPTER_MODE: 'usb',
+      ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+      ZIGBEE_DONGLE_NAME: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
+    };
     // EXECUTE
     const result = validateSetup(config);
     // ASSERT
     expect(result).to.deep.equal(config);
+  });
+
+  it('should fail in USB mode without dongle model', () => {
+    // PREPARE
+    const config = { Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0', ZIGBEE_DONGLE_NAME: null };
+    // EXECUTE
+    expect(() => validateSetup(config)).to.throw('Zigbee2mqtt: USB dongle model "null" is unknown');
+  });
+
+  it('should fail in USB mode with an unknown dongle model', () => {
+    // PREPARE
+    const config = {
+      Z2M_ADAPTER_MODE: 'usb',
+      ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+      ZIGBEE_DONGLE_NAME: 'my dongle',
+    };
+    // EXECUTE
+    expect(() => validateSetup(config)).to.throw('Zigbee2mqtt: USB dongle model "my dongle" is unknown');
   });
 
   it('should fail with an unknown adapter mode', () => {

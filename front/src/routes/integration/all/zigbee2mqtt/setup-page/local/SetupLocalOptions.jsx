@@ -13,15 +13,50 @@ class SetupLocalOptions extends Component {
     this.setState({ z2mAdapterMode });
   };
 
+  getDongleState = z2mDongleName => {
+    const adapter = this.state.zigbeeAdapters.find(zigbeeAdapter => zigbeeAdapter.value === z2mDongleName);
+    const z2mDongleConfigKey = get(adapter, 'configKey') || null;
+    return { z2mDongleName, z2mDongleConfigKey };
+  };
+
   updateZigbeeDriverPath = option => {
     const z2mDriverPath = get(option, 'value');
-    this.setState({ z2mDriverPath });
+    const adapter = get(option, 'adapter');
+    // The model of the dongle recognized on this port is selected with it
+    this.setState({ z2mDriverPath, ...(adapter ? this.getDongleState(adapter) : {}) });
   };
 
   updateZigbeeDongleName = option => {
     const z2mDongleName = get(option, 'value');
     const z2mDongleConfigKey = get(option, 'configKey') || null;
     this.setState({ z2mDongleName, z2mDongleConfigKey });
+  };
+
+  showAllUsbPorts = () => {
+    this.setState({ showAllUsbPorts: true });
+  };
+
+  preselectDetectedDongle = () => {
+    const { usbPorts, z2mDriverPath, z2mDongleName } = this.state;
+
+    if (!z2mDriverPath) {
+      // The only recognized dongle plugged in is the one to use
+      const detectedPorts = usbPorts.filter(usbPort => usbPort.adapter);
+      if (detectedPorts.length === 1) {
+        this.setState({ z2mDriverPath: detectedPorts[0].path, ...this.getDongleState(detectedPorts[0].adapter) });
+      }
+    } else if (!z2mDongleName) {
+      // A port configured without model: suggest the model recognized on it
+      const usbPort = usbPorts.find(port => port.path === z2mDriverPath);
+      if (usbPort && usbPort.adapter) {
+        this.setState(this.getDongleState(usbPort.adapter));
+      }
+    }
+  };
+
+  refreshUsbPorts = async () => {
+    await this.loadUsbPorts();
+    this.preselectDetectedDongle();
   };
 
   updateNetworkAdapterUrl = e => {
@@ -94,12 +129,11 @@ class SetupLocalOptions extends Component {
     });
 
     try {
-      const rawUsbPorts = await this.props.httpClient.get('/api/v1/service/usb/port');
+      const rawUsbPorts = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/usb/port');
       // Remove duplicated (dupe /dev/ttyUSB0 seen with Synology systems)
       const usbPortsMap = {};
       rawUsbPorts.forEach(usbPort => {
-        const label = [usbPort.comPath, usbPort.comName, usbPort.comVID].filter(Boolean).join(' - ');
-        usbPortsMap[usbPort.comPath] = { label, value: usbPort.comPath };
+        usbPortsMap[usbPort.path] = usbPort;
       });
       const usbPorts = Object.values(usbPortsMap);
       this.setState({
@@ -172,6 +206,12 @@ class SetupLocalOptions extends Component {
     return null;
   };
 
+  buildUsbPortOption = usbPort => ({
+    label: usbPort.name ? `${usbPort.name} (${usbPort.path})` : usbPort.path,
+    value: usbPort.path,
+    adapter: usbPort.adapter
+  });
+
   constructor(props) {
     super(props);
 
@@ -188,6 +228,7 @@ class SetupLocalOptions extends Component {
     this.state = {
       z2mDriverPath,
       usbPorts: [],
+      showAllUsbPorts: false,
       loadUsbPortsStatus: RequestStatus.Getting,
       z2mDongleName,
       z2mDongleConfigKey: null,
@@ -202,9 +243,9 @@ class SetupLocalOptions extends Component {
     };
   }
 
-  componentDidMount() {
-    this.loadUsbPorts();
-    this.loadZigbeeAdapters();
+  async componentDidMount() {
+    await Promise.all([this.loadUsbPorts(), this.loadZigbeeAdapters()]);
+    this.preselectDetectedDongle();
   }
 
   render(
@@ -212,6 +253,7 @@ class SetupLocalOptions extends Component {
     {
       z2mDriverPath,
       usbPorts,
+      showAllUsbPorts,
       loadUsbPortsStatus,
       z2mDongleName,
       zigbeeAdapters,
@@ -225,7 +267,20 @@ class SetupLocalOptions extends Component {
   ) {
     const emberFirmwareTooOld = this.isEmberFirmwareTooOld();
     const networkMode = z2mAdapterMode === ADAPTER_MODE.NETWORK;
-    const saveDisabled = networkMode ? !z2mNetworkAdapterUrl || !z2mNetworkAdapterType : !z2mDriverPath;
+    const saveDisabled = networkMode
+      ? !z2mNetworkAdapterUrl || !z2mNetworkAdapterType
+      : !z2mDriverPath || !z2mDongleName;
+
+    // The serial ports of the machine itself have no USB device name: hidden, unless no port has one
+    // (machine without udev, such as some NAS)
+    const hideMachinePorts = !showAllUsbPorts && usbPorts.some(usbPort => usbPort.pnpId);
+    const visibleUsbPorts = hideMachinePorts ? usbPorts.filter(usbPort => usbPort.pnpId) : usbPorts;
+    const selectedUsbPort = usbPorts.find(usbPort => usbPort.path === z2mDriverPath);
+    const selectedUsbPortOption = selectedUsbPort
+      ? this.buildUsbPortOption(selectedUsbPort)
+      : this.buildSelectOption(z2mDriverPath);
+    // The "legacy ezsp" models are kept only to display an existing configuration
+    const zigbeeAdapterOptions = zigbeeAdapters.filter(zigbeeAdapter => zigbeeAdapter.configKey !== 'ezsp');
 
     return (
       <div>
@@ -279,9 +334,9 @@ class SetupLocalOptions extends Component {
             <div class="row">
               <div class="col" data-cy="z2m-setup-local-usb-field">
                 <Select
-                  value={this.buildSelectOption(z2mDriverPath)}
+                  value={selectedUsbPortOption}
                   onChange={this.updateZigbeeDriverPath}
-                  options={usbPorts}
+                  options={visibleUsbPorts.map(this.buildUsbPortOption)}
                   isLoading={loadUsbPortsStatus === RequestStatus.Getting}
                   placeholder={<Text id="integration.zigbee2mqtt.setup.modes.local.usbDriverPathPlaceholder" />}
                   className="react-select-container"
@@ -291,13 +346,23 @@ class SetupLocalOptions extends Component {
               <div class="col-1 d-none d-sm-block">
                 <button
                   class="btn btn-outline-success ml-auto"
-                  onClick={this.loadUsbPorts}
+                  onClick={this.refreshUsbPorts}
                   disabled={loadUsbPortsStatus === RequestStatus.Getting}
                 >
                   <i class="fe fe-refresh-cw" />
                 </button>
               </div>
             </div>
+            {visibleUsbPorts.length < usbPorts.length && (
+              <button
+                type="button"
+                class="btn btn-link btn-sm px-0"
+                onClick={this.showAllUsbPorts}
+                data-cy="z2m-setup-local-usb-show-all"
+              >
+                <Text id="integration.zigbee2mqtt.setup.modes.local.usbDriverPathShowAll" />
+              </button>
+            )}
           </div>
         )}
         {!networkMode && (
@@ -310,10 +375,9 @@ class SetupLocalOptions extends Component {
                 <Select
                   value={this.buildSelectOption(z2mDongleName)}
                   onChange={this.updateZigbeeDongleName}
-                  options={zigbeeAdapters}
+                  options={zigbeeAdapterOptions}
                   isLoading={loadZigbeeAdaptersStatus === RequestStatus.Getting}
                   placeholder={<Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleNamePlaceholder" />}
-                  isClearable
                   className="react-select-container"
                   classNamePrefix="react-select"
                 />
@@ -328,6 +392,16 @@ class SetupLocalOptions extends Component {
                 </button>
               </div>
             </div>
+            {selectedUsbPort && selectedUsbPort.adapter && selectedUsbPort.adapter === z2mDongleName && (
+              <small class="form-text text-muted" data-cy="z2m-setup-local-dongle-detected">
+                <Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleNameDetected" />
+              </small>
+            )}
+            {selectedUsbPort && !selectedUsbPort.adapter && !z2mDongleName && (
+              <small class="form-text text-muted" data-cy="z2m-setup-local-dongle-not-detected">
+                <Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleNameNotDetected" />
+              </small>
+            )}
           </div>
         )}
         {networkMode && (

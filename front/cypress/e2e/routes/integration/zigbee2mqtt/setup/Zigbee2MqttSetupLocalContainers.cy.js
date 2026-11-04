@@ -57,10 +57,10 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: `${serverUrl}/api/v1/service/usb/port`
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port`
       },
       {
-        fixture: 'integration/routes/integration/usb/get_available_usb_ports.json'
+        fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports.json'
       }
     ).as('usbPorts');
 
@@ -77,6 +77,42 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
 
     // Save button is disabled
     cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
+
+    // No dongle recognized: nothing is selected
+    cy.get('[data-cy=z2m-setup-local-usb-field]').should('not.contain', '/dev/');
+
+    // The USB devices are listed by name, the serial ports of the machine are hidden
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .click();
+    cy.get('.react-select__option').should('have.length', 2);
+    cy.get('.react-select__option')
+      .first()
+      .should('have.text', 'Silicon Labs CP2102 USB to UART Bridge Controller (/dev/ttyUSB0)');
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .type('{esc}');
+    cy.get('[data-cy=z2m-setup-local-usb-show-all]').click();
+    cy.get('[data-cy=z2m-setup-local-usb-show-all]').should('not.exist');
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .click();
+    cy.get('.react-select__option').should('have.length', 3);
+    cy.get('.react-select__option')
+      .last()
+      .should('have.text', '/dev/ttyS0');
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .type('{esc}');
+
+    // The "legacy ezsp" models are not proposed anymore
+    cy.get('[data-cy=z2m-setup-local-dongle-field]')
+      .children()
+      .type('legacy ezsp');
+    cy.get('.react-select__menu-notice--no-options').should('exist');
+    cy.get('[data-cy=z2m-setup-local-dongle-field]')
+      .children()
+      .type('{esc}');
 
     // Start typing on USB port and abort
     cy.get('[data-cy=z2m-setup-local-usb-field]')
@@ -95,11 +131,16 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('@usbField').click();
     cy.get('@usbField').type('{downArrow}{enter}');
 
-    // Save button is still enabled
-    cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
+    // The dongle is not recognized: its model is required
+    cy.get('[data-cy=z2m-setup-local-dongle-not-detected]').should('exist');
+    cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
 
     // Select a dongle name
     selectDongle();
+
+    cy.get('[data-cy=z2m-setup-local-dongle-not-detected]').should('not.exist');
+    cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('not.exist');
+    cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
   });
 
   it('Check confirm configuration', () => {
@@ -231,5 +272,83 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
           .click();
       });
     cy.get('[data-cy=z2m-setup-reset]').click();
+  });
+});
+
+describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
+  const DETECTED_DONGLE_NAME = 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"';
+
+  beforeEach(() => {
+    cy.login();
+
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/status`
+      },
+      {
+        fixture: 'integration/routes/integration/zigbee2mqtt/status_ready_to_setup.json'
+      }
+    );
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
+      },
+      {
+        body: {}
+      }
+    );
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port`
+      },
+      {
+        fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports_detected.json'
+      }
+    ).as('usbPorts');
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
+  });
+
+  it('Preselect the recognized dongle and its model', () => {
+    cy.get('[data-cy=z2m-setup-local-panel]').within(() => {
+      cy.get('button').click();
+    });
+    cy.wait('@usbPorts');
+
+    cy.get('[data-cy=z2m-setup-local-usb-field]').should(
+      'contain',
+      'Itead Sonoff Zigbee 3.0 USB Dongle Plus V2 (/dev/ttyUSB0)'
+    );
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
+    cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('exist');
+
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
+      },
+      {
+        statusCode: 400
+      }
+    ).as('setup');
+
+    cy.get('[data-cy=z2m-setup-save]')
+      .should('not.be.disabled')
+      .click();
+
+    cy.wait('@setup')
+      .its('request.body')
+      .should('deep.eq', {
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: DETECTED_DONGLE_NAME,
+        Z2M_ADAPTER_MODE: 'usb',
+        Z2M_NETWORK_ADAPTER_URL: null,
+        Z2M_NETWORK_ADAPTER_TYPE: null,
+        Z2M_MQTT_MODE: 'local'
+      });
   });
 });

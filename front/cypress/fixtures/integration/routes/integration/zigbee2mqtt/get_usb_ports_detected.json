@@ -1,0 +1,13 @@
+[
+  {
+    "path": "/dev/ttyUSB0",
+    "name": "Itead Sonoff Zigbee 3.0 USB Dongle Plus V2",
+    "pnpId": "usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_8e73883472d9ee11bb48b74c37b89984-if00-port0",
+    "adapter": "ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model \"ZBDongle-E\""
+  },
+  {
+    "path": "/dev/ttyS0",
+    "name": null,
+    "adapter": null
+  }
+]

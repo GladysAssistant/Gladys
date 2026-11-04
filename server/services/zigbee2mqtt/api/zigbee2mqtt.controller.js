@@ -27,6 +27,17 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
+   * @api {get} /api/v1/service/zigbee2mqtt/usb/port List serial ports, with the recognized coordinator model
+   * @apiName getUsbPorts
+   * @apiGroup Zigbee2mqtt
+   */
+  async function getUsbPorts(req, res) {
+    logger.debug('Get USB ports');
+    const response = await zigbee2mqttManager.getUsbPorts();
+    res.json(response);
+  }
+
+  /**
    * @api {get} /api/v1/service/zigbee2mqtt/status Get Zigbee2mqtt connection status
    * @apiName status
    * @apiGroup Zigbee2mqtt
@@ -157,6 +168,10 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
     'get /api/v1/service/zigbee2mqtt/adapter': {
       authenticated: true,
       controller: asyncMiddleware(getManagedAdapters),
+    },
+    'get /api/v1/service/zigbee2mqtt/usb/port': {
+      authenticated: true,
+      controller: asyncMiddleware(getUsbPorts),
     },
     'get /api/v1/service/zigbee2mqtt/status': {
       authenticated: true,
