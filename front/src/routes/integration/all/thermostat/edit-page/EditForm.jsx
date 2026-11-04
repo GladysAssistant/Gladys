@@ -237,6 +237,15 @@ const EditForm = ({ ...props }) => {
       value !== DEFAULT_PILOT_WIRE_STANDBY_ORDER &&
       (!supportedOrders || supportedOrders.includes(value))
   ).sort(([a], [b]) => b - a);
+  // The switch forces "another order than frost protection": it only means
+  // something on a module that takes frost protection. On one that does not,
+  // unchecking it stored frost protection, which resolves back to off or eco,
+  // and the switch checked itself again. Such a module is offered the choice
+  // between eco and off directly when it takes both, and nothing to pick when
+  // its standby order can only be one.
+  const frostProtectionTaken = !supportedOrders || supportedOrders.includes(DEFAULT_PILOT_WIRE_STANDBY_ORDER);
+  const showStandbySwitch = frostProtectionTaken && forcedStandbyOptions.length > 0;
+  const showStandbySelect = showStandbySwitch ? standbyForced : forcedStandbyOptions.length > 1;
   const orderOptionsFor = key =>
     PILOT_WIRE_ORDER_OPTIONS.filter(
       ([value]) => !supportedOrders || supportedOrders.includes(value) || value === pilotWireOrders[key]
@@ -266,30 +275,34 @@ const EditForm = ({ ...props }) => {
       {/* The order a heater Gladys regulates rests on once the room is warm
           enough (spec C.1.1). Frost protection unless forced: some heaters lock
           their own functions out under it, a towel rail's boost among them. */}
-      {/* Not offered on a module that takes neither eco nor off. */}
-      {isVirtualThermostat && props.thermostatEditPilotWireFeature && forcedStandbyOptions.length > 0 && (
+      {/* Not offered when the module leaves no choice of standby order. */}
+      {isVirtualThermostat && props.thermostatEditPilotWireFeature && (showStandbySwitch || showStandbySelect) && (
         <div class="mt-2">
-          <label class="custom-switch">
-            <input
-              type="checkbox"
-              class="custom-switch-input"
-              checked={standbyForced}
-              onChange={e =>
-                props.updateThermostatField(
-                  'thermostatEditPilotWireStandbyOrder',
-                  e.target.checked ? forcedStandbyOptions[0][0] : DEFAULT_PILOT_WIRE_STANDBY_ORDER
-                )
-              }
-            />
-            <span class="custom-switch-indicator" />
-            <span class="custom-switch-description">
-              <Text id="integration.thermostat.edit.pilotWireStandbyForceLabel" />
-            </span>
-          </label>
-          <small class="form-text text-muted">
-            <Text id="integration.thermostat.edit.pilotWireStandbyForceHelp" />
-          </small>
-          {standbyForced && (
+          {showStandbySwitch && (
+            <label class="custom-switch">
+              <input
+                type="checkbox"
+                class="custom-switch-input"
+                checked={standbyForced}
+                onChange={e =>
+                  props.updateThermostatField(
+                    'thermostatEditPilotWireStandbyOrder',
+                    e.target.checked ? forcedStandbyOptions[0][0] : DEFAULT_PILOT_WIRE_STANDBY_ORDER
+                  )
+                }
+              />
+              <span class="custom-switch-indicator" />
+              <span class="custom-switch-description">
+                <Text id="integration.thermostat.edit.pilotWireStandbyForceLabel" />
+              </span>
+            </label>
+          )}
+          {showStandbySwitch && (
+            <small class="form-text text-muted">
+              <Text id="integration.thermostat.edit.pilotWireStandbyForceHelp" />
+            </small>
+          )}
+          {showStandbySelect && (
             <div class="mt-2">
               <label class="form-label" htmlFor="thermostat-pilot-wire-standby-order">
                 <Text id="integration.thermostat.edit.pilotWireStandbyOrderLabel" />

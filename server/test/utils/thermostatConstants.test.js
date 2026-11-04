@@ -57,4 +57,10 @@ describe('thermostatConstants.supportedStandbyOrder', () => {
     );
     expect(supportedStandbyOrder(PILOT_WIRE_MODE.ECO, options(PILOT_WIRE_MODE.COMFORT))).to.equal(null);
   });
+
+  it('should fall back on eco on a module that takes neither frost protection nor off', () => {
+    const ecoAndComfort = options(PILOT_WIRE_MODE.ECO, PILOT_WIRE_MODE.COMFORT);
+    expect(supportedStandbyOrder(PILOT_WIRE_MODE.FROST_PROTECTION, ecoAndComfort)).to.equal(PILOT_WIRE_MODE.ECO);
+    expect(supportedStandbyOrder(PILOT_WIRE_MODE.OFF, ecoAndComfort)).to.equal(PILOT_WIRE_MODE.ECO);
+  });
 });

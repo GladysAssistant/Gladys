@@ -180,11 +180,14 @@ function supportedPilotWireOrder(order, supportedOptions) {
 
 /**
  * @description The standby order a module can be sent: the one chosen when it
- * takes it, frost protection — or off — otherwise. Never nothing: an order left
- * unsent keeps the heater on the comfort it carries, heating above the setpoint.
+ * takes it, frost protection — or off — otherwise, and eco on a module that
+ * takes neither. Never nothing: an order left unsent keeps the heater on the
+ * comfort it carries, heating above the setpoint. Eco is the lowest order such
+ * a module takes, and already one of the standby orders.
  * @param {number} order - The chosen standby order.
  * @param {Array} [supportedOptions] - The feature's `supported_options`.
- * @returns {number|null} The order to send, or null when the module takes none.
+ * @returns {number|null} The order to send, or null when the module takes no
+ * standby order at all (none of frost protection, off or eco).
  * @example
  * supportedStandbyOrder(PILOT_WIRE_MODE.ECO, [{ value: 0 }, { value: 5 }]); // 0
  */
@@ -193,7 +196,11 @@ function supportedStandbyOrder(order, supportedOptions) {
   if (supported.length === 0 || supported.includes(order)) {
     return order;
   }
-  return supportedPilotWireOrder(PILOT_WIRE_MODE.FROST_PROTECTION, supportedOptions);
+  const fallback = supportedPilotWireOrder(PILOT_WIRE_MODE.FROST_PROTECTION, supportedOptions);
+  if (fallback !== null) {
+    return fallback;
+  }
+  return supported.includes(PILOT_WIRE_MODE.ECO) ? PILOT_WIRE_MODE.ECO : null;
 }
 
 module.exports = {
