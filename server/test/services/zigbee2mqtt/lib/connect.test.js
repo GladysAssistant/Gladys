@@ -118,6 +118,7 @@ describe('zigbee2mqtt connect', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -131,6 +132,8 @@ describe('zigbee2mqtt connect', () => {
   it('it should receive mqtt error message', async () => {
     // PREPARE
     zigbee2mqttManager.mqttRunning = true;
+    // Without the broker, Zigbee2mqtt has to answer again to be considered running
+    zigbee2mqttManager.zigbee2mqttRunning = true;
     const error = new Error('mqtt_error');
     // EXECUTE
     await zigbee2mqttManager.connect(externalConfiguration);
@@ -148,6 +151,7 @@ describe('zigbee2mqtt connect', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -230,6 +234,7 @@ describe('zigbee2mqtt connect', () => {
   it('it should receive mqtt offline message', async () => {
     // PREPARE
     zigbee2mqttManager.mqttRunning = true;
+    zigbee2mqttManager.zigbee2mqttRunning = true;
     // EXECUTE
     await zigbee2mqttManager.connect(configuration);
     zigbee2mqttManager.mqttClient.emit('offline');
@@ -246,6 +251,7 @@ describe('zigbee2mqtt connect', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,

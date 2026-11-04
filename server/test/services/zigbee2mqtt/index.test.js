@@ -52,8 +52,11 @@ describe('zigbee2mqtt service', () => {
   });
   it('isUsed: should return true, service is used', async () => {
     zigbee2MqttService.device.gladysConnected = true;
-    // handle one message so that zigbee2mqtt connected is true
-    await zigbee2MqttService.device.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify([]));
+    // Zigbee2mqtt answers the health check, so that zigbee2mqtt connected is true
+    await zigbee2MqttService.device.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/health_check',
+      JSON.stringify({ data: { healthy: true }, status: 'ok' }),
+    );
     const used = await zigbee2MqttService.isUsed();
     expect(used).to.equal(true);
   });

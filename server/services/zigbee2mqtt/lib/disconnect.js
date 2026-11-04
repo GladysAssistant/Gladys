@@ -47,12 +47,17 @@ async function disconnect() {
   // Stop & remove MQTT container
   await removeOwnContainer(this.gladys.system, mqttContainerDescriptor);
   this.mqttRunning = false;
+  this.mqttExist = false;
   this.emitStatusEvent();
 
   // Stop & remove zigbee2mqtt container
   await removeOwnContainer(this.gladys.system, zigbee2mqttContainerDescriptor);
+  // Without its container, Zigbee2mqtt is disabled, not "not responding"
+  this.zigbee2mqttExist = false;
   this.zigbee2mqttRunning = false;
   this.zigbee2mqttConnected = false;
+  clearTimeout(this.startingTimer);
+  this.zigbee2mqttStarting = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
   this.emitStatusEvent();

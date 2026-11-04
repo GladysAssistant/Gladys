@@ -54,7 +54,11 @@ async function readZ2mContainerLogs(containerId) {
         if (typeof stream.destroy === 'function') {
           stream.destroy();
         }
-        if (knownError !== null) {
+        if (this.zigbee2mqttConnected) {
+          // Ignored once Zigbee2mqtt is online: the error did not prevent it from starting, or comes from an
+          // older start, as the logs of the container are read from its creation
+          this.z2mContainerError = null;
+        } else if (knownError !== null) {
           this.z2mContainerError = knownError;
         } else if (lastRawError !== null) {
           this.z2mContainerError = { code: null, message: lastRawError };
@@ -78,7 +82,7 @@ async function readZ2mContainerLogs(containerId) {
               if (typeof stream.destroy === 'function') {
                 stream.destroy();
               }
-              this.z2mContainerError = knownError;
+              this.z2mContainerError = this.zigbee2mqttConnected ? null : knownError;
               resolve();
             }
             return;

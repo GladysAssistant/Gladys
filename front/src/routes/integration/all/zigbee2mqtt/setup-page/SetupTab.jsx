@@ -9,6 +9,7 @@ import SetupPanel from './SetupPanel';
 import EnableStatus from './status/EnableStatus';
 import RunningStatus from './status/RunningStatus';
 import MqttExternalCredentials from './local/MqttExternalCredentials';
+import ContainerError from '../commons/ContainerError';
 
 class SetupTab extends Component {
   showConfirmReset = () => {
@@ -100,16 +101,7 @@ class SetupTab extends Component {
                 {z2mContainerError && (
                   <li class="list-group-item">
                     <div class="alert alert-warning my-3">
-                      {z2mContainerError.code ? (
-                        <MarkupText
-                          id={`integration.zigbee2mqtt.setup.modes.local.containerErrors.${z2mContainerError.code}`}
-                        />
-                      ) : (
-                        <span>
-                          <Text id="integration.zigbee2mqtt.setup.modes.local.containerErrors.unknownErrorPrefix" />
-                          <code>{z2mContainerError.message}</code>
-                        </span>
-                      )}
+                      <ContainerError error={z2mContainerError} />
                     </div>
                   </li>
                 )}

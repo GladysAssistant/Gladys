@@ -2,6 +2,29 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertFeature } = require('../utils/convertFeature');
 
+// Zigbee2mqtt announces itself online before it listens to its requests: a health check sent right away
+// can be lost, so it is sent again until Zigbee2mqtt answers
+const HEALTH_CHECK_INTERVAL_IN_MS = 3000;
+
+/**
+ * @description Ask Zigbee2mqtt to prove that it runs, every 3 seconds until it answers, as long as Gladys is
+ * connected to the broker.
+ * @param {object} manager - The Zigbee2mqtt manager.
+ * @example
+ * requestHealthCheck(this);
+ */
+function requestHealthCheck(manager) {
+  clearTimeout(manager.healthCheckTimer);
+  manager.healthCheckTimer = null;
+  // Without the broker, the MQTT client would queue the requests and send them all at once on reconnection.
+  // On reconnection, the retained bridge/state starts asking again.
+  if (!manager.mqttClient || !manager.gladysConnected) {
+    return;
+  }
+  manager.mqttClient.publish('zigbee2mqtt/bridge/request/health_check', '{}');
+  manager.healthCheckTimer = setTimeout(() => requestHealthCheck(manager), HEALTH_CHECK_INTERVAL_IN_MS);
+}
+
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
@@ -11,15 +34,37 @@ const { convertFeature } = require('../utils/convertFeature');
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
 async function handleMqttMessage(topic, message) {
-  // Limit events only on status changes
-  if (!this.zigbee2mqttConnected) {
-    this.zigbee2mqttConnected = true;
-    this.zigbee2mqttRunning = true;
-    this.zigbee2mqttExist = true;
-    this.emitStatusEvent();
-  }
-
   switch (topic) {
+    case 'zigbee2mqtt/bridge/state': {
+      // Zigbee2mqtt publishes "online" (retained) once connected to the broker, and "offline" when it stops; the
+      // broker publishes "offline" in its place (last will) when it crashes. Neither proves the current state: a
+      // retained "online" can be left by a Zigbee2mqtt that no longer runs (it exits before connecting to the
+      // broker when its adapter fails), and the "offline" of a previous run can come after the "online" of the
+      // new one. Any announcement only means that the run changed: Gladys asks again until Zigbee2mqtt answers.
+      logger.debug(`Zigbee2mqtt bridge state is ${message}, checking its health...`);
+      this.zigbee2mqttConnected = false;
+      this.zigbee2mqttRunning = false;
+      this.emitStatusEvent();
+      requestHealthCheck(this);
+      break;
+    }
+    case 'zigbee2mqtt/bridge/response/health_check': {
+      // Only Zigbee2mqtt answers on this topic: any answer, even an error, proves that it runs and listens
+      logger.debug('Zigbee2mqtt answered the health check');
+      clearTimeout(this.healthCheckTimer);
+      this.healthCheckTimer = null;
+      this.zigbee2mqttConnected = true;
+      this.zigbee2mqttRunning = true;
+      this.zigbee2mqttExist = true;
+      // The startup ends only on an answer, or after its timeout (see installZ2mContainer)
+      clearTimeout(this.startingTimer);
+      this.startingTimer = null;
+      this.zigbee2mqttStarting = false;
+      // An error read in the logs of the container did not prevent Zigbee2mqtt from running
+      this.z2mContainerError = null;
+      this.emitStatusEvent();
+      break;
+    }
     case 'zigbee2mqtt/bridge/devices': {
       logger.debug('Getting config devices from Zigbee2mqtt');
       const devices = JSON.parse(message);
