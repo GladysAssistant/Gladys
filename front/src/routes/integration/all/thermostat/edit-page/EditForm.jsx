@@ -13,7 +13,8 @@ import {
   DEFAULT_PILOT_WIRE_ORDERS,
   PILOT_WIRE_STANDBY_ORDERS,
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
-  MAX_WINDOW_DELAY_SECONDS
+  MAX_WINDOW_DELAY_SECONDS,
+  supportedStandbyOrder
 } from '../../../../../../../server/utils/thermostatConstants';
 
 // The help text of each thermostat type, keyed by its value.
@@ -217,16 +218,24 @@ const EditForm = ({ ...props }) => {
     pickedPilotWire && pickedPilotWire.supportedOrders && pickedPilotWire.supportedOrders.length > 0
       ? pickedPilotWire.supportedOrders
       : null;
-  const standbyOrder = PILOT_WIRE_STANDBY_ORDERS.includes(props.thermostatEditPilotWireStandbyOrder)
+  const storedStandbyOrder = PILOT_WIRE_STANDBY_ORDERS.includes(props.thermostatEditPilotWireStandbyOrder)
     ? props.thermostatEditPilotWireStandbyOrder
     : DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+  // The order the server actually sends, with the server's own fallback: a
+  // stored eco on a module that refuses it rests on frost protection, or on off
+  // when the module takes only off. The form shows that one, not the stored one,
+  // which saving leaves untouched. Null when the module takes none.
+  const standbyOrder = supportedStandbyOrder(
+    storedStandbyOrder,
+    supportedOrders && supportedOrders.map(value => ({ value }))
+  );
   // Forced, the standby order is eco or off, among the orders the module takes.
-  const standbyForced = standbyOrder !== DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+  const standbyForced = standbyOrder !== null && standbyOrder !== DEFAULT_PILOT_WIRE_STANDBY_ORDER;
   const forcedStandbyOptions = PILOT_WIRE_ORDER_OPTIONS.filter(
     ([value]) =>
       PILOT_WIRE_STANDBY_ORDERS.includes(value) &&
       value !== DEFAULT_PILOT_WIRE_STANDBY_ORDER &&
-      (!supportedOrders || supportedOrders.includes(value) || value === standbyOrder)
+      (!supportedOrders || supportedOrders.includes(value))
   ).sort(([a], [b]) => b - a);
   const orderOptionsFor = key =>
     PILOT_WIRE_ORDER_OPTIONS.filter(
