@@ -781,6 +781,33 @@ describe('CalDAV sync of a calendar with recurring events', () => {
     expect(sync.gladys.calendar.destroyEvent.args).to.eql([['deleted-event']]);
   });
 
+  it('should not delete an event saved by another synchronization during a full synchronization', async () => {
+    sync.gladys.calendar.get.resolves([
+      {
+        id: calendarId,
+        selector: 'chauffage',
+        name: 'Chauffage',
+        sync: '1',
+        ctag: 'old-ctag',
+        sync_token: null,
+        external_id: 'https://caldav.host.com/home/heating',
+        type: 'CALDAV',
+      },
+    ]);
+    sync.gladys.calendar.getEvents.withArgs(userId, { calendarId }).resolves([]);
+    sync.requestChanges.callsFake(async () => {
+      // Another synchronization saves an event created on the CalDAV server after this listing
+      sync.gladys.calendar.getEvents
+        .withArgs(userId, { calendarId })
+        .resolves([{ selector: 'new-event', external_id: 'new-event', url: '/home/heating/new-event.ics' }]);
+      return [];
+    });
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(0);
+  });
+
   it('should only update a subscribed calendar whose ctag changed', async () => {
     sync.requestCalendars.resolves([
       {

@@ -143,6 +143,12 @@ async function saveEvents(userId, calendar, jsonEvents, savedEvents) {
  * syncEvents.call(caldavHandler, userId, xhr, CALDAV_HOST, calendar, calendar.sync_token)
  */
 async function syncEvents(userId, xhr, calDavHost, calendar, syncToken) {
+  // Without sync token, the events saved in Gladys are read before the server lists its events: an event
+  // saved by another synchronization running at the same time from a newer listing is then never deleted.
+  const savedEventsBeforeListing = syncToken
+    ? null
+    : await this.gladys.calendar.getEvents(userId, { calendarId: calendar.id });
+
   // Get events that have changed
   let eventsToUpdate;
   try {
@@ -166,10 +172,10 @@ async function syncEvents(userId, xhr, calDavHost, calendar, syncToken) {
 
   // Events already saved in Gladys for this calendar, so they can be compared
   // with what the CalDAV server returns without querying the database for each of them.
-  const savedEvents =
-    eventsToUpdate.length > 0 || !syncToken
-      ? await this.gladys.calendar.getEvents(userId, { calendarId: calendar.id })
-      : [];
+  let savedEvents = savedEventsBeforeListing || [];
+  if (!savedEventsBeforeListing && eventsToUpdate.length > 0) {
+    savedEvents = await this.gladys.calendar.getEvents(userId, { calendarId: calendar.id });
+  }
 
   // Delete events removed on the CalDAV server.
   // A recurring event is saved as one Gladys event per occurrence, all sharing the same
