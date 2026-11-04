@@ -8,9 +8,9 @@ import ContainerLinkStatus from '../components/ContainerLinkStatus';
 
 const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
   const loading = setupZigee2mqttStatus === RequestStatus.Getting;
-  const { gladysConnected, zigbee2mqttExist, zigbee2mqttConnected, z2mContainerError } = zigbee2mqttStatus;
-  // Gladys hears the broker and Zigbee2mqtt is installed, but it has not reported itself online yet
-  const zigbee2mqttWaiting = !loading && gladysConnected && zigbee2mqttExist && !zigbee2mqttConnected;
+  const { gladysConnected, zigbee2mqttConnected, z2mContainerError } = zigbee2mqttStatus;
+  // Gladys hears the broker, but Zigbee2mqtt has not answered yet (in external mode too, without container)
+  const zigbee2mqttWaiting = !loading && gladysConnected && !zigbee2mqttConnected;
   // Without a startup error, it is still starting
   const zigbee2mqttStarting = zigbee2mqttWaiting && !z2mContainerError;
 

@@ -1856,8 +1856,8 @@
           "unknownErrorPrefix": "Error de conexión MQTT: "
         },
         "serviceStatus": "Estado del servicio",
-        "zigbee2mqttStarting": "Zigbee2mqtt se está iniciando: se pondrá en verde en cuanto se conecte al broker MQTT.",
-        "zigbee2mqttNotStarting": "Zigbee2mqtt no consigue iniciarse y no se ha conectado al broker MQTT: vea el error de arriba.",
+        "zigbee2mqttStarting": "Zigbee2mqtt se está iniciando: se pondrá en verde en cuanto responda a Gladys.",
+        "zigbee2mqttNotStarting": "Zigbee2mqtt no consigue iniciarse: vea el error de arriba.",
         "description": "Este servicio utiliza dos contenedores Docker (broker MQTT y Zigbee2mqtt). Active Zigbee2mqtt para desplegar estos contenedores. Para más información, visite la página de documentación de Zigbee2mqtt.",
         "nonDockerEnv": "Gladys no se está ejecutando actualmente en Docker; es imposible activar Zigbee2mqtt desde Gladys.",
         "invalidDockerNetwork": "Gladys se basa en una instalación personalizada; para instalar Zigbee2mqtt desde esta página, el contenedor Docker de Gladys debe iniciarse con la opción \"network=host\".",

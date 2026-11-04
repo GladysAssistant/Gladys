@@ -53,6 +53,17 @@ describe('Zigbee2mqtt status', () => {
     cy.get('[data-cy=z2m-status-alert-error]').should('contain', 'error: Error: Resource busy');
   });
 
+  it('should tell that Zigbee2mqtt does not answer with an external broker, without container', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      { body: { ...notOnlineStatus, mqttExist: false, zigbee2mqttExist: false } }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.notRunning');
+  });
+
   it('should show Zigbee2mqtt as starting on the setup page, until it is online', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: notOnlineStatus });

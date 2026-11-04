@@ -32,8 +32,10 @@ class CheckStatus extends Component {
       return null;
     }
 
-    // An installed Zigbee2mqtt that does not answer is not a disabled one: say so, and why when known
-    const messageKey = zigbee2mqttExist
+    // An installed Zigbee2mqtt (its container, or a broker Gladys is connected to in external mode) that does
+    // not answer is not a disabled one: say so, and why when known
+    const installed = zigbee2mqttExist || gladysConnected;
+    const messageKey = installed
       ? 'integration.zigbee2mqtt.status.notRunning'
       : 'integration.zigbee2mqtt.status.notEnabled';
 
@@ -43,7 +45,7 @@ class CheckStatus extends Component {
         <Link href="/dashboard/integration/device/zigbee2mqtt/setup">
           <Text id="integration.zigbee2mqtt.status.setupPageLink" />
         </Link>
-        {zigbee2mqttExist && z2mContainerError && (
+        {installed && z2mContainerError && (
           <div class="mt-2" data-cy="z2m-status-alert-error">
             <ContainerError error={z2mContainerError} />
           </div>

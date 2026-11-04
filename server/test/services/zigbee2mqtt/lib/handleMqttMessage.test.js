@@ -67,6 +67,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   it('should check the health of Zigbee2mqtt when it announces itself online on bridge/state', async () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.gladysConnected = true;
     zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', JSON.stringify({ state: 'online' }));
@@ -91,6 +92,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     beforeEach(() => {
       clock = sinon.useFakeTimers();
       zigbee2mqttManager.zigbee2mqttConnected = false;
+      zigbee2mqttManager.gladysConnected = true;
       zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
     });
 
@@ -105,12 +107,13 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(true);
     });
 
-    it('should stop asking after 10 attempts', async () => {
+    it('should keep asking while Zigbee2mqtt does not answer', async () => {
       // EXECUTE
       await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
       clock.tick(60000);
       // ASSERT
-      assert.callCount(zigbee2mqttManager.mqttClient.publish, 10);
+      // One request right away, then one every 3 seconds
+      assert.callCount(zigbee2mqttManager.mqttClient.publish, 21);
       expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
     });
 
@@ -131,6 +134,24 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       clock.tick(60000);
       // ASSERT
       assert.calledOnce(publish);
+    });
+
+    it('should stop asking while Gladys has lost the broker, not to queue requests', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      zigbee2mqttManager.gladysConnected = false;
+      clock.tick(60000);
+      // ASSERT
+      assert.calledOnce(zigbee2mqttManager.mqttClient.publish);
+    });
+
+    it('should not ask when Gladys is not connected to the broker', async () => {
+      // PREPARE
+      zigbee2mqttManager.gladysConnected = false;
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      // ASSERT
+      assert.notCalled(zigbee2mqttManager.mqttClient.publish);
     });
   });
 
@@ -184,23 +205,25 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     );
   });
 
-  it('should keep Zigbee2mqtt offline when the health check fails', async () => {
-    // PREPARE
-    zigbee2mqttManager.zigbee2mqttConnected = true;
-    zigbee2mqttManager.zigbee2mqttRunning = true;
-    // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage(
-      'zigbee2mqtt/bridge/response/health_check',
-      JSON.stringify({ data: {}, status: 'error', error: 'Health check failed' }),
-    );
-    // ASSERT
-    expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
+  [
+    ['an error answer', JSON.stringify({ data: {}, status: 'error', error: 'Health check failed' })],
+    ['an unreadable answer', 'not json'],
+  ].forEach(([label, message]) => {
+    it(`should set Zigbee2mqtt online on ${label} to the health check, as it proves that it listens`, async () => {
+      // PREPARE
+      zigbee2mqttManager.zigbee2mqttConnected = false;
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', message);
+      // ASSERT
+      expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(true);
+      expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    });
   });
 
   it('should read a bridge/state published as plain text', async () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.gladysConnected = true;
     zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', 'online');

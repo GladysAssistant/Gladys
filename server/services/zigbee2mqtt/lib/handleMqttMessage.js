@@ -5,26 +5,24 @@ const { convertFeature } = require('../utils/convertFeature');
 // Zigbee2mqtt announces itself online before it listens to its requests: a health check sent right away
 // is lost, so it is sent again until Zigbee2mqtt answers
 const HEALTH_CHECK_INTERVAL_IN_MS = 3000;
-const HEALTH_CHECK_MAX_ATTEMPTS = 10;
 
 /**
- * @description Ask Zigbee2mqtt to prove that it runs, again and again until it answers.
+ * @description Ask Zigbee2mqtt to prove that it runs, again and again until it answers, reports itself
+ * offline, or Gladys loses the broker.
  * @param {object} manager - The Zigbee2mqtt manager.
- * @param {number} attempt - Number of this attempt, starting at 1.
  * @example
  * requestHealthCheck(this);
  */
-function requestHealthCheck(manager, attempt = 1) {
+function requestHealthCheck(manager) {
   clearTimeout(manager.healthCheckTimer);
   manager.healthCheckTimer = null;
-  // Gladys may have been disconnected from the broker in the meantime
-  if (!manager.mqttClient) {
+  // Without the broker, the MQTT client would queue the requests and send them all at once on reconnection.
+  // On reconnection, the retained "online" starts asking again.
+  if (!manager.mqttClient || !manager.gladysConnected) {
     return;
   }
   manager.mqttClient.publish('zigbee2mqtt/bridge/request/health_check', '{}');
-  if (attempt < HEALTH_CHECK_MAX_ATTEMPTS) {
-    manager.healthCheckTimer = setTimeout(() => requestHealthCheck(manager, attempt + 1), HEALTH_CHECK_INTERVAL_IN_MS);
-  }
+  manager.healthCheckTimer = setTimeout(() => requestHealthCheck(manager), HEALTH_CHECK_INTERVAL_IN_MS);
 }
 
 /**
@@ -91,10 +89,9 @@ async function handleMqttMessage(topic, message) {
       break;
     }
     case 'zigbee2mqtt/bridge/response/health_check': {
-      const { data } = JSON.parse(message);
-      const healthy = Boolean(data && data.healthy);
-      logger.debug(`Zigbee2mqtt health check: ${healthy ? 'healthy' : 'unhealthy'}`);
-      updateBridgeState(this, healthy);
+      // Only Zigbee2mqtt answers on this topic: any answer, even an error, proves that it runs and listens
+      logger.debug('Zigbee2mqtt answered the health check');
+      updateBridgeState(this, true);
       break;
     }
     case 'zigbee2mqtt/bridge/devices': {
