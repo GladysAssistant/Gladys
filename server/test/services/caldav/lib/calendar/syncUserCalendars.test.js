@@ -707,6 +707,80 @@ describe('CalDAV sync of a calendar with recurring events', () => {
     expect(sync.gladys.calendar.update.callCount).to.equal(0);
   });
 
+  it('should synchronize all the events if the sync token is rejected', async () => {
+    sync.requestChanges
+      .withArgs(sinon.match.any, sinon.match({ sync_token: 'old-sync-token' }))
+      .rejects(new Error('Bad status: 403'));
+    sync.requestChanges
+      .withArgs(sinon.match.any, sinon.match({ sync_token: null }))
+      .resolves([{ href: '/home/heating/recurring-event.ics', props: { etag: '91ca3c10' } }]);
+
+    sync.requestEventsData.resolves([
+      {
+        type: 'VEVENT',
+        uid: 'heating',
+        summary: 'Chauffage',
+        start: new Date('2026-01-01 08:00:00.000 +00:00'),
+        end: new Date('2026-01-01 09:00:00.000 +00:00'),
+        href: '/home/heating/recurring-event.ics',
+      },
+    ]);
+
+    sync.gladys.calendar.getEvents.withArgs(userId, { calendarId }).resolves([
+      { selector: 'heating', external_id: 'heating', url: '/home/heating/recurring-event.ics' },
+      // Occurrence deleted on the CalDAV server while the sync token was rejected
+      {
+        selector: 'heating-2026-01-02-08-00',
+        external_id: 'heating2026-01-02-08-00',
+        url: '/home/heating/recurring-event.ics',
+      },
+      // Event deleted on the CalDAV server while the sync token was rejected
+      { selector: 'deleted-event', external_id: 'deleted-event', url: '/home/heating/deleted-event.ics' },
+    ]);
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.requestChanges.callCount).to.equal(2);
+    expect(sync.requestEventsData.callCount).to.equal(1);
+    expect(sync.gladys.calendar.destroyEvent.args).to.eql([['deleted-event'], ['heating-2026-01-02-08-00']]);
+    // The calendar is up to date, the new ctag & sync token are saved
+    expect(sync.gladys.calendar.update.args[0][1]).to.include({ ctag: 'new-ctag', sync_token: 'new-sync-token' });
+  });
+
+  it('should not synchronize all the events if the changes request failed for another reason', async () => {
+    sync.requestChanges.rejects(new Error('Bad status: 500'));
+
+    await expect(sync.syncUserCalendars(userId))
+      .to.be.rejectedWith(Error)
+      .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_CHANGES');
+
+    expect(sync.requestChanges.callCount).to.equal(1);
+    expect(sync.gladys.calendar.update.callCount).to.equal(0);
+  });
+
+  it('should delete the events which do not exist anymore during a full synchronization', async () => {
+    sync.gladys.calendar.get.resolves([
+      {
+        id: calendarId,
+        selector: 'chauffage',
+        name: 'Chauffage',
+        sync: '1',
+        ctag: 'old-ctag',
+        sync_token: null,
+        external_id: 'https://caldav.host.com/home/heating',
+        type: 'CALDAV',
+      },
+    ]);
+    sync.requestChanges.resolves([]);
+    sync.gladys.calendar.getEvents
+      .withArgs(userId, { calendarId })
+      .resolves([{ selector: 'deleted-event', external_id: 'deleted-event', url: '/home/heating/deleted-event.ics' }]);
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.gladys.calendar.destroyEvent.args).to.eql([['deleted-event']]);
+  });
+
   it('should only update a subscribed calendar whose ctag changed', async () => {
     sync.requestCalendars.resolves([
       {

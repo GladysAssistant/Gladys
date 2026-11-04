@@ -11,6 +11,10 @@ const RECURRING_EVENTS_REFRESH_INTERVAL_DAYS = 30;
 // A server which does not support a filter must answer 403 (RFC 4791, section 7.7).
 const UNSUPPORTED_REQUEST_ERROR_REGEX = /^Bad status: (400|403|415|501)$/;
 
+// HTTP status returned by a CalDAV server which rejects the sync token of a sync-collection report
+// (RFC 6578, section 3.2).
+const INVALID_SYNC_TOKEN_ERROR_REGEX = /^Bad status: 403$/;
+
 /**
  * @description Return the different URLs an event can be saved with in Gladys.
  * Depending on the CalDAV server, the href returned by the sync-collection report
@@ -144,6 +148,15 @@ async function syncEvents(userId, xhr, calDavHost, calendar, syncToken) {
   try {
     eventsToUpdate = await this.requestChanges(xhr, { ...calendar, sync_token: syncToken });
   } catch (e) {
+    // A server rejects an expired or invalidated sync token with a 403 (RFC 6578, section 3.2):
+    // the client must then synchronize the whole calendar again, otherwise every synchronization fails.
+    if (syncToken && INVALID_SYNC_TOKEN_ERROR_REGEX.test(e.message)) {
+      logger.warn(
+        `CalDAV : the sync token of calendar ${calendar.name} was rejected, synchronizing all its events instead. ${e.message}`,
+      );
+      await syncEvents.call(this, userId, xhr, calDavHost, calendar, null);
+      return;
+    }
     logger.error(e);
     throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_CHANGES', log: e.stack });
   }
@@ -154,13 +167,22 @@ async function syncEvents(userId, xhr, calDavHost, calendar, syncToken) {
   // Events already saved in Gladys for this calendar, so they can be compared
   // with what the CalDAV server returns without querying the database for each of them.
   const savedEvents =
-    eventsToUpdate.length > 0 ? await this.gladys.calendar.getEvents(userId, { calendarId: calendar.id }) : [];
+    eventsToUpdate.length > 0 || !syncToken
+      ? await this.gladys.calendar.getEvents(userId, { calendarId: calendar.id })
+      : [];
 
   // Delete events removed on the CalDAV server.
   // A recurring event is saved as one Gladys event per occurrence, all sharing the same
   // URL, so every event matching this URL must be deleted, not only one.
   const deletedUrls = new Set(deletedEvents.reduce((urls, event) => urls.concat(getEventUrls(event.href)), []));
-  const eventsToDelete = savedEvents.filter((savedEvent) => deletedUrls.has(savedEvent.url));
+  let eventsToDelete = savedEvents.filter((savedEvent) => deletedUrls.has(savedEvent.url));
+
+  // Without sync token, the server only returns the events that still exist: the events already saved
+  // in Gladys that it does not return anymore were deleted on the CalDAV server.
+  if (!syncToken) {
+    const existingUrls = new Set(updatedEvents.reduce((urls, event) => urls.concat(getEventUrls(event.href)), []));
+    eventsToDelete = savedEvents.filter((savedEvent) => !existingUrls.has(savedEvent.url));
+  }
 
   let deletedEventCount = 0;
 
@@ -185,7 +207,8 @@ async function syncEvents(userId, xhr, calDavHost, calendar, syncToken) {
       throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_EVENTS', log: e.stack });
     }
 
-    const savedCount = await saveEvents.call(this, userId, calendar, jsonEvents, savedEvents);
+    const remainingEvents = savedEvents.filter((savedEvent) => !eventsToDelete.includes(savedEvent));
+    const savedCount = await saveEvents.call(this, userId, calendar, jsonEvents, remainingEvents);
     insertedOrUpdatedEvent += savedCount.insertedOrUpdatedEvent;
     deletedEventCount += savedCount.deletedEventCount;
   }
