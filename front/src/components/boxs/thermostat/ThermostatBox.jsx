@@ -996,9 +996,12 @@ class ThermostatBox extends Component {
     await this.resumeIfStopped();
     if (!(await this.savePreset('schedule'))) {
       // The hold is still on the device: the card shows it again rather than a
-      // programme the thermostat is not back on.
+      // programme the thermostat is not back on. initData, not refreshFromDevice:
+      // the tap cleared the hold's expiry and its own-setpoint flag, and only
+      // initData reads them back from the hold — without them the banner fell
+      // back to the programme's "Off until …" and the gauge painted Off.
       this.releaseSetpointHold();
-      await this.refreshFromDevice();
+      await this.initData();
       return;
     }
     // The schedule first: its `current` point is what the thermostat follows
