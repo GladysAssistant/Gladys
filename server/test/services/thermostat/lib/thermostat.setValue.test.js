@@ -688,6 +688,92 @@ describe('thermostat.setValue', () => {
     });
   });
 
+  describe('on a setpoint outside the range of the thermostat', () => {
+    // A Tado X through Matter advertises -100-200 °C: the device's own range
+    // lets 166 °C through, so the thermostat's range has to bound it.
+    const range = [
+      { name: 'THERMOSTAT_MIN_TEMP', value: '8' },
+      { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+    ];
+
+    it('should bring a setpoint above the range down to its top', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, 166);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 25);
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('25');
+    });
+
+    it('should bring a setpoint below the range up to its bottom', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, -50);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 8);
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('8');
+    });
+
+    it('should leave a setpoint within the range alone', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, 21.5);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 21.5);
+    });
+
+    it('should bound a setpoint sent as text, as a scene may', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, '30');
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 25);
+    });
+
+    it('should write a scheduled setpoint as the programme says', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, 30, false);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 30);
+    });
+
+    it('should not bound anything on an inverted range', async () => {
+      const handler = buildHandler();
+      const inverted = [
+        { name: 'THERMOSTAT_MIN_TEMP', value: '25' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '8' },
+      ];
+
+      await handler.setValue(device(inverted), setpointFeature, 21);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 21);
+    });
+
+    it('should bound an external setpoint in the unit of the real device', async () => {
+      const handler = buildHandler();
+      const fahrenheitFeature = { selector: 'netatmo-setpoint', unit: DEVICE_FEATURE_UNITS.FAHRENHEIT };
+
+      // 8-25 °C is 46-77 °F: 100 °F is above it.
+      await handler.setValue(
+        externalDevice([{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }, ...range]),
+        fahrenheitFeature,
+        100,
+      );
+
+      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(77);
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('77');
+    });
+
+    it('should bound an external setpoint to the default range when none is set', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(externalDevice(), { selector: 'netatmo-setpoint' }, 166);
+
+      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(35);
+    });
+  });
+
   describe('on an external thermostat', () => {
     const external = () => externalDevice();
     const externalFeature = { selector: 'netatmo-setpoint' };

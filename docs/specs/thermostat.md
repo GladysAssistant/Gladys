@@ -454,6 +454,8 @@ Only the schedule CRUD stays a service API (E). A weekly programme is not the va
 
 **On `target-temperature`** — persisting the value alone would not survive: the next regulation pass re-applies the scheduled preset and overwrites it within the minute. A write from outside the loop is therefore a **manual hold**: the setpoint is saved, the hold is armed, and a regulation pass is triggered.
 
+**The held setpoint is first brought within `THERMOSTAT_MIN_TEMP` / `_MAX_TEMP`** — converted into the target feature's unit on an external thermostat, as a preset's setpoint is (C.3) — and the clamp is logged. The widget's dial already stops there (F), but a scene, the generic device API or HomeKit do not go through the dial, and the clamp the loop applies (C.0) is the device's advertised range: Matter's -100-200 °C let a scene send 166 °C to a Tado X set to 8-25. An inverted range (min above max) is a form mistake and bounds nothing. A scheduled write (`manual = false`) is not clamped: the programme is written as the user entered it (E.3), and a setpoint changed on the real device (C.0.1) is held as the device reports it, since that write did not come through here.
+
 The **expiry is armed only when the device follows a schedule** — that is the only case where something would otherwise take the setpoint back. With a schedule, the hold lasts `THERMOSTAT_MANUAL_DURATION` (30 min by default) or until the next transition (E.3), and the programme then resumes. Without a schedule the hold is **permanent**, like on a physical thermostat: arming a timer there would silently revert to the stored preset minutes later, with nothing on screen to announce it.
 
 **On `preset`** — the value becomes the feature's state. `schedule` clears the hold and hands the thermostat back to its programme; any other preset arms a hold on that preset's setpoint, with the same expiry rule as above.
@@ -695,7 +697,7 @@ The same rule applies to external thermostats. An earlier revision exempted them
 
 **And a hold armed by a preset is named as that preset, not as "Manual mode".** The banner says what the thermostat is doing: "Night until 11:30", with the preset's icon and colour. "Manual mode" is for a setpoint that no preset carries — a hand-set temperature, or one set on the device. Saying "Manual mode" while the Night button was lit told the user their choice had been replaced by something else.
 
-The dial bounds come from the target feature's own `min`/`max` when it declares them, and fall back to `THERMOSTAT_MIN_TEMP` / `_MAX_TEMP` otherwise — the device knows its range better than the form does.
+**The dial spans `THERMOSTAT_MIN_TEMP` / `_MAX_TEMP`**, converted into the target feature's unit as the presets are (C.3), and the target feature's own `min`/`max` only narrow it — they never widen it. Taking the device's range first, as an earlier revision did, assumed the device advertised the range it really accepts: Netatmo's 5-30 does, but Matter advertises the cluster's -100-200 °C whatever the appliance, and a Tado X set to 8-25 got a dial reaching 166 °C — which the regulation loop's clamp (C.0) lets through, since it is within -100-200. Narrowing still matters the other way: a range of 5-35 typed for a Netatmo stops the dial at 30, a setpoint it would refuse or silently clamp. The edit form offers the device's range when it differs (_"Use these values"_); the user's range stays the one the dial follows.
 
 ## G. Out of scope
 

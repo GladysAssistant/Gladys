@@ -213,20 +213,20 @@ class ThermostatBox extends Component {
     const cfg = this.state.remoteConfig;
     return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
   };
-  getMinTemp = () => {
-    // Device feature native min has top priority
-    if (this.state.featureMin !== null) return this.state.featureMin;
-    const cfg = this.getConfig();
-    if (cfg.temp_min !== undefined && cfg.temp_min !== null) return Number(cfg.temp_min);
-    return DEFAULT_MIN_TEMP;
+  // The dial spans the range set on the thermostat (THERMOSTAT_MIN_TEMP /
+  // _MAX_TEMP), in the setpoint feature's unit. The range the device advertises
+  // only narrows it, never widens it: Matter advertises -100-200 °C, and taking
+  // it first let the dial reach 166 °C on a thermostat set to 8-25.
+  getDialBound = (configured, fallback) => {
+    const parsed = configured === undefined || configured === null ? NaN : Number(configured);
+    const value = Number.isFinite(parsed) ? this.toSetpointFeatureUnit(parsed) : fallback;
+    const { featureMin, featureMax } = this.state;
+    if (featureMin !== null && value < featureMin) return featureMin;
+    if (featureMax !== null && value > featureMax) return featureMax;
+    return value;
   };
-  getMaxTemp = () => {
-    // Device feature native max has top priority
-    if (this.state.featureMax !== null) return this.state.featureMax;
-    const cfg = this.getConfig();
-    if (cfg.temp_max !== undefined && cfg.temp_max !== null) return Number(cfg.temp_max);
-    return DEFAULT_MAX_TEMP;
-  };
+  getMinTemp = () => this.getDialBound(this.getConfig().temp_min, DEFAULT_MIN_TEMP);
+  getMaxTemp = () => this.getDialBound(this.getConfig().temp_max, DEFAULT_MAX_TEMP);
 
   // Effective temperature unit: device feature unit takes priority over user preference
   getEffectiveUnit = () => {
