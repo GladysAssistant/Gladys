@@ -84,6 +84,17 @@ describe('Zigbee2mqtt status', () => {
     cy.get('#enableZigbee2mqtt').should('be.checked');
   });
 
+  it('should show Zigbee2mqtt as starting before Gladys is connected to the broker again', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      { body: { ...notOnlineStatus, gladysConnected: false, zigbee2mqttStarting: true } }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
+
+    cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttStarting');
+  });
+
   it('should not show a stopped Zigbee2mqtt as starting on the setup page', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: notOnlineStatus });

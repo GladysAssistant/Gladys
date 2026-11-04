@@ -12,11 +12,16 @@ const toStoreState = zigbee2mqttStatus => ({
 // Number of live statuses received by websocket: a status received while the HTTP request below is pending is
 // newer than its answer, which must not overwrite it
 let liveStatusCount = 0;
+// Number of status requests sent: only the answer of the last one is kept, as two can overlap when the page is
+// left and opened again
+let statusRequestCount = 0;
 
 const createActions = store => {
   const actions = {
     async checkStatus(state) {
       const liveStatusCountAtRequest = liveStatusCount;
+      statusRequestCount += 1;
+      const statusRequest = statusRequestCount;
       let zigbee2mqttStatus = {
         usbConfigured: false,
         mqttExist: false,
@@ -30,7 +35,7 @@ const createActions = store => {
       try {
         zigbee2mqttStatus = await state.httpClient.get('/api/v1/service/zigbee2mqtt/status');
       } finally {
-        if (liveStatusCount === liveStatusCountAtRequest) {
+        if (liveStatusCount === liveStatusCountAtRequest && statusRequest === statusRequestCount) {
           store.setState(toStoreState(zigbee2mqttStatus));
         }
       }

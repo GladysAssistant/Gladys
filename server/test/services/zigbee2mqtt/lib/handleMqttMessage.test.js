@@ -66,13 +66,20 @@ describe('zigbee2mqtt handleMqttMessage', () => {
 
   it('should check the health of Zigbee2mqtt when it announces itself online on bridge/state', async () => {
     // PREPARE
-    zigbee2mqttManager.zigbee2mqttConnected = false;
+    // The previous run had answered: its answer no longer proves anything for the new one
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    zigbee2mqttManager.zigbee2mqttRunning = true;
     zigbee2mqttManager.gladysConnected = true;
     zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', JSON.stringify({ state: 'online' }));
     // ASSERT
     // A retained "online" can be outdated: Zigbee2mqtt is online only once it answers the health check
+    assert.calledWith(
+      gladys.event.emit,
+      EVENTS.WEBSOCKET.SEND_ALL,
+      sinon.match.has('type', 'zigbee2mqtt.status-change'),
+    );
     assert.calledOnceWithExactly(
       zigbee2mqttManager.mqttClient.publish,
       'zigbee2mqtt/bridge/request/health_check',
@@ -159,6 +166,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = false;
     zigbee2mqttManager.zigbee2mqttStarting = true;
+    zigbee2mqttManager.startingTimer = setTimeout(() => {}, 60000);
     zigbee2mqttManager.z2mContainerError = { code: null, message: 'error: a startup error' };
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage(
@@ -186,6 +194,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         mqttConnectionError: null,
       },
     });
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
+    expect(zigbee2mqttManager.startingTimer).to.equal(null);
   });
 
   it('should set Zigbee2mqtt offline from bridge/state', async () => {
@@ -201,8 +211,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     // The container still exists, only Zigbee2mqtt is not running
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
-    // Offline: Zigbee2mqtt is not starting anymore
-    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
+    // An "offline" can come from the previous run of a container Gladys has just restarted: still starting
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(true);
     assert.calledWith(
       gladys.event.emit,
       EVENTS.WEBSOCKET.SEND_ALL,

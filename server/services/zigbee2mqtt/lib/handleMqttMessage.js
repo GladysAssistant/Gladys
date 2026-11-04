@@ -55,9 +55,12 @@ function updateBridgeState(manager, online) {
   manager.healthCheckTimer = null;
   manager.zigbee2mqttConnected = online;
   manager.zigbee2mqttRunning = online;
-  // Online, or offline: either way Zigbee2mqtt is not starting anymore
-  manager.zigbee2mqttStarting = false;
   if (online) {
+    // Only an answer ends the startup: an "offline" can come from the previous run of the container, sent
+    // live when Gladys restarts it, or retained by the broker
+    clearTimeout(manager.startingTimer);
+    manager.startingTimer = null;
+    manager.zigbee2mqttStarting = false;
     manager.zigbee2mqttExist = true;
     // Zigbee2mqtt started: an error read in its startup logs did not prevent it from running
     manager.z2mContainerError = null;
@@ -83,6 +86,11 @@ async function handleMqttMessage(topic, message) {
         // stopped first (host reboot). A Zigbee2mqtt whose adapter fails to start exits before
         // connecting to the broker, so it never replaces it. Only an answer from Zigbee2mqtt proves it runs.
         logger.debug('Zigbee2mqtt bridge announced online, checking its health...');
+        // A new run announces itself: the answer of the previous one no longer proves anything, and the
+        // "offline" of a crashed run may only come after this "online"
+        this.zigbee2mqttConnected = false;
+        this.zigbee2mqttRunning = false;
+        this.emitStatusEvent();
         requestHealthCheck(this);
       } else {
         logger.debug('Zigbee2mqtt bridge is offline');

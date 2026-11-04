@@ -12,8 +12,8 @@ const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
   // Gladys hears the broker, but Zigbee2mqtt has not answered yet (in external mode too, without container)
   const zigbee2mqttWaiting = !loading && gladysConnected && !zigbee2mqttConnected;
   // Starting only when Gladys has just (re)started its container and no startup error was read: a stopped
-  // Zigbee2mqtt must not be shown as starting
-  const starting = zigbee2mqttWaiting && zigbee2mqttStarting && !z2mContainerError;
+  // Zigbee2mqtt must not be shown as starting. Even before Gladys is connected to the broker again.
+  const starting = !loading && zigbee2mqttStarting && !zigbee2mqttConnected && !z2mContainerError;
   let explanationKey = 'integration.zigbee2mqtt.setup.zigbee2mqttNotResponding';
   if (starting) {
     explanationKey = 'integration.zigbee2mqtt.setup.zigbee2mqttStarting';
@@ -51,7 +51,7 @@ const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
             title={<Text id="integration.zigbee2mqtt.setup.zigbee2Mqtt" />}
           />
         </div>
-        {zigbee2mqttWaiting && (
+        {(zigbee2mqttWaiting || starting) && (
           <p class="text-center text-muted mt-3 mb-0" data-cy="z2m-running-status-explanation">
             <Text id={explanationKey} />
           </p>

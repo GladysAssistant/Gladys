@@ -98,7 +98,28 @@ describe('zigbee2mqtt installz2mContainer', () => {
   });
 
   afterEach(() => {
+    // A startup window left open must not end during another test
+    clearTimeout(zigbee2mqttManager.startingTimer);
     sinon.reset();
+  });
+
+  it('should end the startup window when Zigbee2mqtt does not answer in time', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttStartingTimeoutInMs = 5;
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer({});
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(true);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 20);
+    });
+    // ASSERT
+    // Zigbee2mqtt crashed before connecting to the broker: it is shown as not answering, not as starting
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
+    expect(zigbee2mqttManager.startingTimer).to.equal(null);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: sinon.match.has('zigbee2mqttStarting', false),
+    });
   });
 
   it('should restart z2m container (container stopped)', async () => {
