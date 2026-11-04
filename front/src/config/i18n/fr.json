@@ -2098,6 +2098,7 @@
       "status": {
         "notConfigured": "Aucun dongle USB Zigbee2mqtt configuré, veuillez vous rendre sur ",
         "notEnabled": "Le service Zigbee2mqtt n'est pas activé, veuillez vous rendre sur ",
+        "notRunning": "Zigbee2mqtt ne répond pas : impossible d'associer ou de piloter des appareils Zigbee. Pour en savoir plus, rendez-vous sur ",
         "settingsPageLink": "la page de paramétrage du dongle USB",
         "setupPageLink": "la page de configuration de Zigbee2mqtt"
       },
@@ -2179,6 +2180,8 @@
           "unknownErrorPrefix": "Erreur de connexion MQTT : "
         },
         "serviceStatus": "Etat du service",
+        "zigbee2mqttStarting": "Zigbee2mqtt démarre : il passera au vert dès qu'il sera connecté au broker MQTT.",
+        "zigbee2mqttNotStarting": "Zigbee2mqtt n'arrive pas à démarrer et ne s'est pas connecté au broker MQTT : voir l'erreur ci-dessus.",
         "description": "Ce service utilise deux containers Docker (MQTT broker et Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",

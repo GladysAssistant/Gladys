@@ -171,7 +171,8 @@ async function installZ2mContainer(config, setupMode = false) {
     }
 
     logger.info('Zigbee2mqtt container successfully started');
-    this.zigbee2mqttRunning = true;
+    // Running is reported by Zigbee2mqtt itself, on bridge/state: a started container can still
+    // crash in a loop, for example when the adapter driver refuses the firmware of the dongle.
     this.zigbee2mqttExist = true;
   } catch (e) {
     logger.error('Zigbee2mqtt container failed to start:', e);

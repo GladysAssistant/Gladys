@@ -119,7 +119,9 @@ async function init(setupMode = false) {
     await this.installMqttContainer(configuration);
     await this.installZ2mContainer(configuration, setupMode);
 
-    if (this.isEnabled()) {
+    // Connect as soon as the broker runs, without waiting for Zigbee2mqtt: it reports that it is
+    // online through the broker itself (bridge/state).
+    if (this.mqttRunning) {
       await this.connect(configuration);
 
       // Schedule reccurent job if not already scheduled

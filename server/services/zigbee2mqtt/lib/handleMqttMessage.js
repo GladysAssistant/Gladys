@@ -3,6 +3,41 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertFeature } = require('../utils/convertFeature');
 
 /**
+ * @description Read the state published by Zigbee2mqtt on its bridge/state topic.
+ * @param {string} message - The bridge/state message: {"state":"online"}, or "online" as plain text
+ * for older Zigbee2mqtt versions.
+ * @returns {string} The state, "online" or "offline".
+ * @example
+ * getBridgeState('{"state":"online"}');
+ */
+function getBridgeState(message) {
+  try {
+    const payload = JSON.parse(message);
+    return payload && payload.state;
+  } catch (e) {
+    return message;
+  }
+}
+
+/**
+ * @description Store whether Zigbee2mqtt runs, and tell the UI.
+ * @param {object} manager - The Zigbee2mqtt manager.
+ * @param {boolean} online - Is Zigbee2mqtt online?
+ * @example
+ * updateBridgeState(this, true);
+ */
+function updateBridgeState(manager, online) {
+  manager.zigbee2mqttConnected = online;
+  manager.zigbee2mqttRunning = online;
+  if (online) {
+    manager.zigbee2mqttExist = true;
+    // Zigbee2mqtt started: an error read in its startup logs did not prevent it from running
+    manager.z2mContainerError = null;
+  }
+  manager.emitStatusEvent();
+}
+
+/**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
  * @param {object} message - The message sent.
@@ -11,15 +46,29 @@ const { convertFeature } = require('../utils/convertFeature');
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
 async function handleMqttMessage(topic, message) {
-  // Limit events only on status changes
-  if (!this.zigbee2mqttConnected) {
-    this.zigbee2mqttConnected = true;
-    this.zigbee2mqttRunning = true;
-    this.zigbee2mqttExist = true;
-    this.emitStatusEvent();
-  }
-
   switch (topic) {
+    case 'zigbee2mqtt/bridge/state': {
+      // Zigbee2mqtt publishes "online" (retained) once connected to the broker, and "offline" when it
+      // stops; the broker publishes "offline" in its place (last will) when it crashes.
+      if (getBridgeState(message) === 'online') {
+        // A retained "online" can be outdated: left by a Zigbee2mqtt that was running when the broker
+        // stopped first (host reboot). A Zigbee2mqtt whose adapter fails to start exits before
+        // connecting to the broker, so it never replaces it. Only an answer from Zigbee2mqtt proves it runs.
+        logger.debug('Zigbee2mqtt bridge announced online, checking its health...');
+        this.mqttClient.publish('zigbee2mqtt/bridge/request/health_check', '{}');
+      } else {
+        logger.debug('Zigbee2mqtt bridge is offline');
+        updateBridgeState(this, false);
+      }
+      break;
+    }
+    case 'zigbee2mqtt/bridge/response/health_check': {
+      const { data } = JSON.parse(message);
+      const healthy = Boolean(data && data.healthy);
+      logger.debug(`Zigbee2mqtt health check: ${healthy ? 'healthy' : 'unhealthy'}`);
+      updateBridgeState(this, healthy);
+      break;
+    }
     case 'zigbee2mqtt/bridge/devices': {
       logger.debug('Getting config devices from Zigbee2mqtt');
       const devices = JSON.parse(message);

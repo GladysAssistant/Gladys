@@ -128,7 +128,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttConnectionError: null,
       },
     });
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
@@ -155,13 +155,13 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
-        zigbee2mqttRunning: true,
+        zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
         mqttConnectionError: null,
       },
     });
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
@@ -186,7 +186,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.calledOnce(gladys.system.removeContainer);
     assert.calledOnce(gladys.system.createContainer);
     assert.calledOnceWithExactly(gladys.system.restartContainer, newContainer.id);
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
@@ -210,7 +210,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(createdDescriptor.HostConfig.Binds).to.deep.equal([
       `${path.join(__dirname, 'host')}/zigbee2mqtt/z2m:/app/data`,
     ]);
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
   });
 
   it('should create the z2m container with the timezone of the user', async () => {
@@ -331,13 +331,13 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
-        zigbee2mqttRunning: true,
+        zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
         mqttConnectionError: null,
       },
     });
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
@@ -400,7 +400,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.calledOnce(gladys.system.updateContainer);
     // The container must still be (re)started despite the failed policy update
     assert.calledOnce(gladys.system.restartContainer);
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
   });
 
   it('should not update restart policy when it already matches the expected one', async () => {
@@ -518,7 +518,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
-        zigbee2mqttRunning: true,
+        zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
         mqttConnectionError: null,
@@ -545,7 +545,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     });
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
     assert.calledOnce(gladys.system.createContainer);
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
     expect(config).to.deep.equal({});
   });
@@ -570,7 +570,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
     });
     // ASSERT
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    // The container started, but Zigbee2mqtt does not run: it never reported itself online
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
   });
 
   it('should not set error when container logs are clean', async () => {
@@ -589,7 +590,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
   });
 
   it('should not fail startup when getContainerLogs throws', async () => {
@@ -601,7 +602,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
-    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
   });
 
   it('should not adopt nor remove a user container carrying our name', async () => {

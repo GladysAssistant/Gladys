@@ -8,6 +8,11 @@ import ContainerLinkStatus from '../components/ContainerLinkStatus';
 
 const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
   const loading = setupZigee2mqttStatus === RequestStatus.Getting;
+  const { gladysConnected, zigbee2mqttExist, zigbee2mqttConnected, z2mContainerError } = zigbee2mqttStatus;
+  // Gladys hears the broker and Zigbee2mqtt is installed, but it has not reported itself online yet
+  const zigbee2mqttWaiting = !loading && gladysConnected && zigbee2mqttExist && !zigbee2mqttConnected;
+  // Without a startup error, it is still starting
+  const zigbee2mqttStarting = zigbee2mqttWaiting && !z2mContainerError;
 
   return (
     <Fragment>
@@ -30,15 +35,26 @@ const RunningStatus = ({ zigbee2mqttStatus = {}, setupZigee2mqttStatus }) => {
             imageSrc="/assets/integrations/logos/logo_mqtt.png"
             title={<Text id="integration.zigbee2mqtt.setup.mqtt" />}
           />
-          <ContainerLinkStatus loading={loading} linked={zigbee2mqttStatus.zigbee2mqttConnected} />
+          <ContainerLinkStatus loading={loading || zigbee2mqttStarting} linked={zigbee2mqttConnected} />
           <ContainerStatus
-            loading={loading}
+            loading={loading || zigbee2mqttStarting}
             exists={zigbee2mqttStatus.zigbee2mqttExist}
             running={zigbee2mqttStatus.zigbee2mqttRunning}
             imageSrc="/assets/integrations/logos/logo_zigbee2mqtt.png"
             title={<Text id="integration.zigbee2mqtt.setup.zigbee2Mqtt" />}
           />
         </div>
+        {zigbee2mqttWaiting && (
+          <p class="text-center text-muted mt-3 mb-0" data-cy="z2m-running-status-explanation">
+            <Text
+              id={
+                zigbee2mqttStarting
+                  ? 'integration.zigbee2mqtt.setup.zigbee2mqttStarting'
+                  : 'integration.zigbee2mqtt.setup.zigbee2mqttNotStarting'
+              }
+            />
+          </p>
+        )}
       </div>
     </Fragment>
   );

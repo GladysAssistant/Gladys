@@ -177,7 +177,6 @@ describe('zigbee2mqtt init', () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
-    zigbee2mqttManager.isEnabled.returns(false);
 
     // EXECUTE
     await zigbee2mqttManager.init();
@@ -187,7 +186,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
-    assert.calledOnce(zigbee2mqttManager.isEnabled);
+    assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
@@ -215,7 +214,6 @@ describe('zigbee2mqtt init', () => {
       mqttPassword: 'mqttPassword',
     };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
-    zigbee2mqttManager.isEnabled.returns(false);
 
     // EXECUTE
     await zigbee2mqttManager.init();
@@ -227,14 +225,13 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
-    assert.calledOnce(zigbee2mqttManager.isEnabled);
+    assert.notCalled(zigbee2mqttManager.isEnabled);
   });
 
   it('should save default mqtt params', async () => {
     // PREPARE
     const config = { mqttMode: 'local', z2mDriverPath: '/dev/ttyUSB0' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
-    zigbee2mqttManager.isEnabled.returns(false);
 
     // EXECUTE
     await zigbee2mqttManager.init();
@@ -255,7 +252,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledWithMatch(zigbee2mqttManager.installMqttContainer, sinon.match(expectedNewConfig));
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
     assert.calledWithMatch(zigbee2mqttManager.installZ2mContainer, sinon.match(expectedNewConfig));
-    assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
+    assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
@@ -264,7 +261,11 @@ describe('zigbee2mqtt init', () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
-    zigbee2mqttManager.isEnabled.returns(true);
+    // The broker runs, Zigbee2mqtt is not online yet: Gladys must connect to the broker to hear it
+    zigbee2mqttManager.installMqttContainer.callsFake(() => {
+      zigbee2mqttManager.mqttRunning = true;
+    });
+    zigbee2mqttManager.isEnabled.returns(false);
 
     gladys.scheduler = {
       scheduleJob: fake.returns(true),
@@ -277,7 +278,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnce(zigbee2mqttManager.saveConfiguration);
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
-    assert.calledOnce(zigbee2mqttManager.isEnabled);
+    assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.calledOnce(zigbee2mqttManager.connect);
     assert.calledOnce(gladys.scheduler.scheduleJob);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
@@ -287,7 +288,11 @@ describe('zigbee2mqtt init', () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
-    zigbee2mqttManager.isEnabled.returns(true);
+    // The broker runs, Zigbee2mqtt is not online yet: Gladys must connect to the broker to hear it
+    zigbee2mqttManager.installMqttContainer.callsFake(() => {
+      zigbee2mqttManager.mqttRunning = true;
+    });
+    zigbee2mqttManager.isEnabled.returns(false);
     zigbee2mqttManager.backupScheduledJob = 'this is not null';
 
     // EXECUTE
@@ -298,7 +303,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
-    assert.calledOnce(zigbee2mqttManager.isEnabled);
+    assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.calledOnce(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });

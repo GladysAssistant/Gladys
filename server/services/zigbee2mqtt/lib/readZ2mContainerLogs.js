@@ -56,7 +56,8 @@ async function readZ2mContainerLogs(containerId) {
         }
         if (knownError !== null) {
           this.z2mContainerError = knownError;
-        } else if (lastRawError !== null) {
+        } else if (lastRawError !== null && !this.zigbee2mqttConnected) {
+          // Ignored once Zigbee2mqtt is online: the error did not prevent it from starting
           this.z2mContainerError = { code: null, message: lastRawError };
         } else {
           this.z2mContainerError = null;

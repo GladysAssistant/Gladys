@@ -168,6 +168,17 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     });
   });
 
+  it('should ignore an error: line when Zigbee2mqtt is online', async () => {
+    // A device failing to answer during the startup is logged as an error, without stopping Zigbee2mqtt
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    const log = 'Zigbee2MQTT started!\nerror: Failed to configure device 0x00158d0001';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
   it('should remove the first character of each line (Docker stream prefix byte)', async () => {
     // buildLogStream prepends \x01 per line; without removal the match would fail
     const log = 'error: Docker prefix byte must be stripped';

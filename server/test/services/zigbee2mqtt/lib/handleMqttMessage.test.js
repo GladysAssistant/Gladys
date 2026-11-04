@@ -46,11 +46,50 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     sinon.restore();
   });
 
-  it('should set at connected / exist / running', async () => {
+  it('should not consider Zigbee2mqtt online because a message is received', async () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = false;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/unknown', JSON.stringify({}));
+    // ASSERT
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(false);
+    assert.neverCalledWith(
+      gladys.event.emit,
+      EVENTS.WEBSOCKET.SEND_ALL,
+      sinon.match.has('type', 'zigbee2mqtt.status-change'),
+    );
+  });
+
+  it('should check the health of Zigbee2mqtt when it announces itself online on bridge/state', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', JSON.stringify({ state: 'online' }));
+    // ASSERT
+    // A retained "online" can be outdated: Zigbee2mqtt is online only once it answers the health check
+    assert.calledOnceWithExactly(
+      zigbee2mqttManager.mqttClient.publish,
+      'zigbee2mqtt/bridge/request/health_check',
+      '{}',
+    );
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
+    // bridge/state is never mistaken for the state of a device
+    assert.notCalled(gladys.stateManager.get);
+  });
+
+  it('should set Zigbee2mqtt online when it answers the health check', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.z2mContainerError = { code: null, message: 'error: a startup error' };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/health_check',
+      JSON.stringify({ data: { healthy: true }, status: 'ok' }),
+    );
     // ASSERT
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -71,6 +110,64 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         mqttConnectionError: null,
       },
     });
+  });
+
+  it('should set Zigbee2mqtt offline from bridge/state', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    zigbee2mqttManager.zigbee2mqttRunning = true;
+    zigbee2mqttManager.zigbee2mqttExist = true;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', JSON.stringify({ state: 'offline' }));
+    // ASSERT
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
+    // The container still exists, only Zigbee2mqtt is not running
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+    assert.calledWith(
+      gladys.event.emit,
+      EVENTS.WEBSOCKET.SEND_ALL,
+      sinon.match.has('type', 'zigbee2mqtt.status-change'),
+    );
+  });
+
+  it('should keep Zigbee2mqtt offline when the health check fails', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    zigbee2mqttManager.zigbee2mqttRunning = true;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/health_check',
+      JSON.stringify({ data: {}, status: 'error', error: 'Health check failed' }),
+    );
+    // ASSERT
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
+  });
+
+  it('should read a bridge/state published as plain text', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', 'online');
+    // ASSERT
+    assert.calledOnceWithExactly(
+      zigbee2mqttManager.mqttClient.publish,
+      'zigbee2mqtt/bridge/request/health_check',
+      '{}',
+    );
+  });
+
+  it('should consider an unreadable bridge/state as offline', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    zigbee2mqttManager.zigbee2mqttRunning = true;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', JSON.stringify({}));
+    // ASSERT
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
   });
 
   it('should receive devices, exclude unsupported and coordinator', async () => {
@@ -243,7 +340,6 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       ['zigbee2mqtt/salon/lampe/set', `{"state":"ON"}`],
       ['zigbee2mqtt/salon/lampe/get', `{"state":""}`],
       ['zigbee2mqtt/salon/lampe/availability', `{"state":"online"}`],
-      ['zigbee2mqtt/bridge/state', `{"state":"online"}`],
     ].forEach(([topic, message]) => {
       it(`should not mistake ${topic} for a device state`, async () => {
         // PREPARE
