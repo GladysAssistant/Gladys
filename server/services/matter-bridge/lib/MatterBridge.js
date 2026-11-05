@@ -81,13 +81,26 @@ MatterBridge.prototype.isEnabled = async function isEnabled() {
 };
 
 /**
- * @description Start the bridge when it is enabled. A bridge that cannot start (no IPv6, port in
- * use) leaves Gladys running and reports the error in its status.
+ * @description Start the bridge when it is enabled. Starts, stops and resets go through the queue of
+ * device changes: two enables in a row cannot create two Matter nodes, and a change queued before
+ * a stop never runs against a closed node or the one of a reset.
  * @returns {Promise} Resolves once the bridge is online, or not started.
  * @example
  * await bridge.start();
  */
-MatterBridge.prototype.start = async function start() {
+MatterBridge.prototype.start = function start() {
+  return this.enqueue(() => this.startNow());
+};
+
+/**
+ * @description Start the bridge when it is enabled, at once: only to be called from a queued
+ * change. A bridge that cannot start (no IPv6, port in use) leaves Gladys running and reports the
+ * error in its status.
+ * @returns {Promise} Resolves once the bridge is online, or not started.
+ * @example
+ * await bridge.enqueue(() => bridge.startNow());
+ */
+MatterBridge.prototype.startNow = async function startNow() {
   if (!(await this.isEnabled())) {
     logger.info('Matter bridge: not enabled');
     return;
@@ -102,7 +115,7 @@ MatterBridge.prototype.start = async function start() {
   } catch (e) {
     this.lastError = e.message;
     logger.error(`Matter bridge: unable to start: ${e.message}`);
-    await this.stop();
+    await this.stopNow();
   }
 };
 
@@ -158,12 +171,23 @@ MatterBridge.prototype.startNode = async function startNode() {
 };
 
 /**
- * @description Take the bridge offline. Pairings are kept: the next start exposes the same bridge.
+ * @description Take the bridge offline, once the changes already queued are done. Pairings are
+ * kept: the next start exposes the same bridge.
  * @returns {Promise} Resolves once the node is closed.
  * @example
  * await bridge.stop();
  */
-MatterBridge.prototype.stop = async function stop() {
+MatterBridge.prototype.stop = function stop() {
+  return this.enqueue(() => this.stopNow());
+};
+
+/**
+ * @description Take the bridge offline at once: only to be called from a queued change.
+ * @returns {Promise} Resolves once the node is closed.
+ * @example
+ * await bridge.enqueue(() => bridge.stopNow());
+ */
+MatterBridge.prototype.stopNow = async function stopNow() {
   this.gladys.event.removeListener(EVENTS.TRIGGERS.CHECK, this.onTriggerCheck);
   this.gladys.event.removeListener(EVENTS.DEVICE.CREATE, this.onDeviceChange);
   this.gladys.event.removeListener(EVENTS.DEVICE.UPDATE, this.onDeviceChange);
@@ -184,17 +208,25 @@ MatterBridge.prototype.stop = async function stop() {
 
 /**
  * @description Forget every pairing: the bridge comes back with a new pairing code, and every
- * ecosystem has to add it again.
+ * ecosystem has to add it again. A reset that fails is reported in the status of the bridge.
  * @returns {Promise} Resolves once the bridge is restarted.
  * @example
  * await bridge.reset();
  */
-MatterBridge.prototype.reset = async function reset() {
-  await this.stop();
-  await fse.remove(getStoragePath(this.gladys));
-  await this.gladys.variable.destroy(VARIABLES.PASSCODE, this.serviceId);
-  await this.gladys.variable.destroy(VARIABLES.DISCRIMINATOR, this.serviceId);
-  await this.start();
+MatterBridge.prototype.reset = function reset() {
+  return this.enqueue(async () => {
+    await this.stopNow();
+    try {
+      await fse.remove(getStoragePath(this.gladys));
+      await this.gladys.variable.destroy(VARIABLES.PASSCODE, this.serviceId);
+      await this.gladys.variable.destroy(VARIABLES.DISCRIMINATOR, this.serviceId);
+    } catch (e) {
+      this.lastError = e.message;
+      logger.error(`Matter bridge: unable to reset: ${e.message}`);
+      return;
+    }
+    await this.startNow();
+  });
 };
 
 /**
@@ -224,9 +256,17 @@ MatterBridge.prototype.syncAll = async function syncAll() {
   // eslint-disable-next-line no-restricted-syntax
   for (const device of devices) {
     if (isExposed(device, exposure)) {
-      // eslint-disable-next-line no-await-in-loop
-      if (await this.upsertDevice(device)) {
-        kept.add(device.id);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        if (await this.upsertDevice(device)) {
+          kept.add(device.id);
+        }
+      } catch (e) {
+        // One device failing must not stop the others, nor the removal of the excluded ones.
+        logger.error(`Matter bridge: device ${device.selector} could not be synchronized: ${e.message}`);
+        if (this.devices.has(device.id)) {
+          kept.add(device.id);
+        }
       }
     }
   }
@@ -443,15 +483,37 @@ MatterBridge.prototype.saveConfig = async function saveConfig({ exposureMode, ex
     throw new BadParameters('exposedDevices must be an array of selectors');
   }
 
-  // The list is written before the mode: should the second write fail, the bridge keeps its
-  // previous mode with an up to date list, instead of a selection mode with a stale list.
+  // Both settings are saved, or none: should the mode fail to be written, the list goes back to
+  // what it was, so the bridge keeps exposing what it exposed before.
+  const previousDevices = await this.gladys.variable.getValue(VARIABLES.EXPOSED_DEVICES, this.serviceId);
   await this.gladys.variable.setValue(VARIABLES.EXPOSED_DEVICES, JSON.stringify(exposedDevices), this.serviceId);
-  await this.gladys.variable.setValue(VARIABLES.EXPOSURE_MODE, exposureMode, this.serviceId);
+  try {
+    await this.gladys.variable.setValue(VARIABLES.EXPOSURE_MODE, exposureMode, this.serviceId);
+  } catch (e) {
+    await this.restoreExposedDevices(previousDevices);
+    throw e;
+  }
 
   if (this.server) {
     await this.enqueue(() => this.syncAll());
   }
   return this.getStatus();
+};
+
+/**
+ * @description Put back the list of exposed devices saved before a failed change.
+ * @param {string|null} previousDevices - Raw value of the list before the change, null when there
+ * was none.
+ * @returns {Promise} Resolves once the list is restored.
+ * @example
+ * await bridge.restoreExposedDevices('["kitchen-light"]');
+ */
+MatterBridge.prototype.restoreExposedDevices = async function restoreExposedDevices(previousDevices) {
+  if (previousDevices === null || previousDevices === undefined) {
+    await this.gladys.variable.destroy(VARIABLES.EXPOSED_DEVICES, this.serviceId);
+  } else {
+    await this.gladys.variable.setValue(VARIABLES.EXPOSED_DEVICES, previousDevices, this.serviceId);
+  }
 };
 
 module.exports = MatterBridge;

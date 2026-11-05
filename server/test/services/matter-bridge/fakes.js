@@ -87,9 +87,20 @@ function FakeEndpoint(type, options) {
   });
 }
 
+// Like matter.js, a change the bridge makes itself is notified with a local context, which has no
+// fabric.
+const LOCAL_CONTEXT = {};
+
 FakeEndpoint.prototype.set = async function set(patch) {
   Object.entries(patch).forEach(([cluster, attributes]) => {
-    this.state[cluster] = { ...this.state[cluster], ...attributes };
+    const before = this.state[cluster] || {};
+    this.state[cluster] = { ...before, ...attributes };
+    Object.entries(attributes).forEach(([attribute, value]) => {
+      const observable = this.events[cluster] && this.events[cluster][`${attribute}$Changed`];
+      if (observable) {
+        observable.emit(value, before[attribute], LOCAL_CONTEXT);
+      }
+    });
   });
 };
 

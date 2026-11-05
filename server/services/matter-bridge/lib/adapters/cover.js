@@ -1,6 +1,12 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../../utils/constants');
 const { isNumber, toLiftPercent100ths, fromLiftPercent100ths } = require('../converters');
-const { MOVEMENT_TYPE, MOVEMENT_DIRECTION, WINDOW_COVERING_TYPE, END_PRODUCT_TYPE } = require('../constants');
+const {
+  MOVEMENT_TYPE,
+  MOVEMENT_STATUS,
+  MOVEMENT_DIRECTION,
+  WINDOW_COVERING_TYPE,
+  END_PRODUCT_TYPE,
+} = require('../constants');
 const { isFeature, isWritable, zipRoles } = require('./helpers');
 
 const COVER_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN];
@@ -103,18 +109,27 @@ const cover = {
       state: { windowCovering },
     };
   },
-  toMatter(role, value, roles) {
+  toMatter(role, value, roles, state) {
     // A cover without a position cannot report one: Matter only knows its position attributes.
     if (role !== 'position') {
       return null;
     }
     const percent100ths = toLiftPercent100ths(value, roles.position);
-    return {
-      windowCovering: {
-        currentPositionLiftPercent100ths: percent100ths,
-        targetPositionLiftPercent100ths: percent100ths,
-      },
-    };
+    const windowCovering = { currentPositionLiftPercent100ths: percent100ths };
+    // While a movement a Matter app asked for is under way, the positions Gladys reports on the
+    // way only move the current position: the target stays the one asked for, and matter.js
+    // reports the cover as opening or closing. The target follows the position once the cover is
+    // still, or once it reached the target, Gladys positions being coarser than Matter ones.
+    const current = (state && state.windowCovering) || {};
+    const moving = Boolean(current.operationalStatus) && current.operationalStatus.lift !== MOVEMENT_STATUS.STOPPED;
+    const reached =
+      moving &&
+      isNumber(current.targetPositionLiftPercent100ths) &&
+      fromLiftPercent100ths(current.targetPositionLiftPercent100ths, roles.position) === value;
+    if (!moving || reached) {
+      windowCovering.targetPositionLiftPercent100ths = percent100ths;
+    }
+    return { windowCovering };
   },
   listeners: [],
 };

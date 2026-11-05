@@ -11,7 +11,9 @@ const { VARIABLES, EXPOSURE_MODES } = require('./constants');
  */
 async function readExposure(gladys, serviceId) {
   const mode = await gladys.variable.getValue(VARIABLES.EXPOSURE_MODE, serviceId);
-  const exposureMode = mode === EXPOSURE_MODES.SELECTION ? EXPOSURE_MODES.SELECTION : EXPOSURE_MODES.ALL;
+  // Only a missing mode, or an explicit 'all', exposes every device: a value Gladys does not know
+  // falls back to the selection, so it can never expose devices the user did not pick.
+  const exposureMode = !mode || mode === EXPOSURE_MODES.ALL ? EXPOSURE_MODES.ALL : EXPOSURE_MODES.SELECTION;
   const raw = await gladys.variable.getValue(VARIABLES.EXPOSED_DEVICES, serviceId);
   let exposedDevices = [];
   try {

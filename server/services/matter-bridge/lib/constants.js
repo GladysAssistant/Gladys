@@ -63,6 +63,13 @@ const MOVEMENT_TYPE = {
   TILT: 1,
 };
 
+// WindowCovering operational status of a movement.
+const MOVEMENT_STATUS = {
+  STOPPED: 0,
+  OPENING: 1,
+  CLOSING: 2,
+};
+
 const MOVEMENT_DIRECTION = {
   OPEN: 0,
   CLOSE: 1,
@@ -134,6 +141,7 @@ module.exports = {
   COMMAND_DEBOUNCE_MS,
   COLOR_MODE,
   MOVEMENT_TYPE,
+  MOVEMENT_STATUS,
   MOVEMENT_DIRECTION,
   WINDOW_COVERING_TYPE,
   END_PRODUCT_TYPE,

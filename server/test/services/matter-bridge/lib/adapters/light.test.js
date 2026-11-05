@@ -125,6 +125,18 @@ describe('Matter bridge light adapter', () => {
     expect(hue.toGladys({ colorControl: { colorMode: COLOR_MODE.XY, currentX: 45940, currentY: 19595 } })).to.equal(
       0xff0000,
     );
-    expect(hue.toGladys({ colorControl: { colorMode: COLOR_MODE.COLOR_TEMPERATURE } })).to.equal(null);
+    const roles = { binary, color, temperature };
+    expect(hue.toGladys({ colorControl: { colorMode: COLOR_MODE.COLOR_TEMPERATURE } }, color, roles)).to.equal(null);
+  });
+
+  it('should send the white picked on a colour light without temperature as its colour', () => {
+    const white = listener('color', 'colorTemperatureMireds');
+    expect(white.debounce).to.equal(true);
+    const warm = { colorControl: { colorMode: COLOR_MODE.COLOR_TEMPERATURE, colorTemperatureMireds: 370 } };
+    expect(white.toGladys(warm, color, { binary, color })).to.equal(0xffa758);
+    // A light with a temperature feature of its own receives the white there instead.
+    expect(white.toGladys(warm, color, { binary, color, temperature })).to.equal(null);
+    const unknown = { colorControl: { colorMode: COLOR_MODE.COLOR_TEMPERATURE, colorTemperatureMireds: null } };
+    expect(white.toGladys(unknown, color, { binary, color })).to.equal(null);
   });
 });

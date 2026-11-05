@@ -28,8 +28,27 @@ const ecosystemName = fabric =>
 // The manual pairing code is easier to type in groups, the way ecosystems print it: 1234-567-8901.
 const formatManualCode = code => (code ? code.replace(/^(\d{4})(\d{3})(\d+)$/, '$1-$2-$3') : '');
 
-const ExposedDevicesSelect = ({ matterBridgeDevices, matterBridgeForm, updateMatterBridgeExposedDevices, intl }) => {
+const ExposedDevicesSelect = ({
+  matterBridgeDevices,
+  matterBridgeDevicesStatus,
+  matterBridgeForm,
+  updateMatterBridgeExposedDevices,
+  getMatterBridgeDevices,
+  intl
+}) => {
   const functionName = key => get(intl.dictionary, `integration.matter-bridge.functions.${key}`, { default: key });
+
+  if (matterBridgeDevicesStatus === RequestStatus.Error) {
+    return (
+      <div class="alert alert-danger">
+        <Text id="integration.matter-bridge.devicesError" />
+        <button type="button" class="btn btn-sm btn-secondary ml-2" onClick={getMatterBridgeDevices}>
+          <Text id="integration.matter-bridge.retryButton" />
+        </button>
+      </div>
+    );
+  }
+
   const options = (matterBridgeDevices || []).map(device => ({
     value: device.selector,
     label: `${device.name} (${device.functions.map(functionName).join(', ')})`
@@ -46,6 +65,7 @@ const ExposedDevicesSelect = ({ matterBridgeDevices, matterBridgeForm, updateMat
   return (
     <Select
       isMulti
+      aria-label={get(intl.dictionary, 'integration.matter-bridge.exposedDevicesLabel')}
       options={options}
       value={options.filter(option => matterBridgeForm.exposedDevices.includes(option.value))}
       onChange={updateMatterBridgeExposedDevices}
@@ -95,11 +115,12 @@ const PairingSection = ({ status, qrCode }) => (
 
 const ExposureSection = props => (
   <form class="mt-5" onSubmit={props.saveMatterBridge}>
-    <h4>
+    <h4 id="matter-bridge-exposure-title">
       <Text id="integration.matter-bridge.exposureTitle" />
     </h4>
     <div class="form-group">
       <select
+        aria-labelledby="matter-bridge-exposure-title"
         class="form-control mb-2"
         onChange={props.updateMatterBridgeExposureMode}
         value={props.matterBridgeForm.exposureMode}

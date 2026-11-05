@@ -29,6 +29,18 @@ describe('Matter bridge exposure', () => {
     expect(isExposed({ selector: 'other' }, exposure)).to.equal(false);
   });
 
+  it('should read an unknown mode as a selection, never as every device', async () => {
+    const exposure = await readExposure(
+      gladysWith({ [VARIABLES.EXPOSURE_MODE]: 'everything', [VARIABLES.EXPOSED_DEVICES]: '["lamp"]' }),
+      'service',
+    );
+    expect(exposure.exposureMode).to.equal('selection');
+    expect(isExposed({ selector: 'lamp' }, exposure)).to.equal(true);
+    expect(isExposed({ selector: 'other' }, exposure)).to.equal(false);
+    const all = await readExposure(gladysWith({ [VARIABLES.EXPOSURE_MODE]: 'all' }), 'service');
+    expect(all.exposureMode).to.equal('all');
+  });
+
   it('should expose nothing when the selection is broken', async () => {
     const broken = await readExposure(
       gladysWith({ [VARIABLES.EXPOSURE_MODE]: 'selection', [VARIABLES.EXPOSED_DEVICES]: '{not json' }),

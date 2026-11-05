@@ -27,7 +27,8 @@ function isRemoteChange(context) {
 function Bindings(gladys, debounceMs = COMMAND_DEBOUNCE_MS) {
   this.gladys = gladys;
   this.debounceMs = debounceMs;
-  // Feature selector -> { device, adapter, roles, role, endpoint }
+  // Feature selector -> [{ device, adapter, roles, role, endpoint }]: a battery is on every
+  // endpoint of the device that needs a power source.
   this.byFeature = new Map();
   // Device id -> functions to detach its listeners and timers
   this.cleanups = new Map();
@@ -66,12 +67,19 @@ Bindings.prototype.command = function command(device, feature, value) {
  */
 Bindings.prototype.add = function add(device, built) {
   const cleanups = [];
-  const functions = built.battery ? [...built.functions, built.battery] : built.functions;
+  const { battery } = built;
+  const batteries = battery
+    ? battery.endpoints.map((endpoint) => ({ adapter: battery.adapter, roles: battery.roles, endpoint }))
+    : [];
+  const functions = [...built.functions, ...batteries];
 
   functions.forEach(({ adapter, roles, endpoint }) => {
     Object.entries(roles).forEach(([role, feature]) => {
-      this.byFeature.set(feature.selector, { device, adapter, roles, role, endpoint });
-      cleanups.push(() => this.byFeature.delete(feature.selector));
+      if (!this.byFeature.has(feature.selector)) {
+        this.byFeature.set(feature.selector, []);
+        cleanups.push(() => this.byFeature.delete(feature.selector));
+      }
+      this.byFeature.get(feature.selector).push({ device, adapter, roles, role, endpoint });
     });
 
     adapter.listeners
@@ -155,27 +163,29 @@ Bindings.prototype.clear = function clear() {
 };
 
 /**
- * @description Push a new Gladys state to the Matter endpoint exposing the feature.
+ * @description Push a new Gladys state to the Matter endpoints exposing the feature.
  * @param {object} event - Gladys NEW_STATE event.
- * @returns {Promise} Resolves once the endpoint is updated, or at once when the feature is not
+ * @returns {Promise} Resolves once the endpoints are updated, or at once when the feature is not
  * exposed.
  * @example
  * await bindings.push({ device_feature: 'light-binary', last_value: 1 });
  */
 Bindings.prototype.push = async function push(event) {
-  const binding = this.byFeature.get(event.device_feature);
-  if (!binding || !isNumber(event.last_value)) {
+  const bindings = this.byFeature.get(event.device_feature);
+  if (!bindings || !isNumber(event.last_value)) {
     return;
   }
-  const { adapter, roles, role, endpoint } = binding;
-  const patch = adapter.toMatter(role, event.last_value, roles, endpoint.state);
-  if (!patch) {
-    return;
-  }
-  try {
-    await endpoint.set(patch);
-  } catch (e) {
-    logger.warn(`Matter bridge: unable to forward the state of ${event.device_feature}: ${e.message}`);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const { adapter, roles, role, endpoint } of bindings) {
+    const patch = adapter.toMatter(role, event.last_value, roles, endpoint.state);
+    if (patch) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await endpoint.set(patch);
+      } catch (e) {
+        logger.warn(`Matter bridge: unable to forward the state of ${event.device_feature}: ${e.message}`);
+      }
+    }
   }
 };
 

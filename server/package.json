@@ -38,7 +38,7 @@
     "ignore": [
       "test/*",
       "persist/*",
-      "matter-bridge/*"
+      "./matter-bridge/**"
     ]
   },
   "c8": {

@@ -4,6 +4,7 @@ const cover = require('../../../../../services/matter-bridge/lib/adapters/cover'
 const { COVER_STATE } = require('../../../../../utils/constants');
 const {
   MOVEMENT_TYPE,
+  MOVEMENT_STATUS,
   MOVEMENT_DIRECTION,
   WINDOW_COVERING_TYPE,
   END_PRODUCT_TYPE,
@@ -90,5 +91,36 @@ describe('Matter bridge cover adapter', () => {
       windowCovering: { currentPositionLiftPercent100ths: 10000, targetPositionLiftPercent100ths: 10000 },
     });
     expect(cover.toMatter('state', COVER_STATE.OPEN, { position, state })).to.equal(null);
+  });
+
+  it('should move the target along with the position of a still cover', () => {
+    const still = {
+      windowCovering: { operationalStatus: { lift: MOVEMENT_STATUS.STOPPED }, targetPositionLiftPercent100ths: 0 },
+    };
+    expect(cover.toMatter('position', 40, { position }, still)).to.deep.equal({
+      windowCovering: { currentPositionLiftPercent100ths: 6000, targetPositionLiftPercent100ths: 6000 },
+    });
+  });
+
+  it('should keep the target a Matter app asked for while the cover travels to it', () => {
+    const travelling = {
+      windowCovering: { operationalStatus: { lift: MOVEMENT_STATUS.CLOSING }, targetPositionLiftPercent100ths: 7500 },
+    };
+    expect(cover.toMatter('position', 60, { position }, travelling)).to.deep.equal({
+      windowCovering: { currentPositionLiftPercent100ths: 4000 },
+    });
+    // Once the cover reports the position it was sent to, the movement is over.
+    expect(cover.toMatter('position', 25, { position }, travelling)).to.deep.equal({
+      windowCovering: { currentPositionLiftPercent100ths: 7500, targetPositionLiftPercent100ths: 7500 },
+    });
+  });
+
+  it('should only move the current position of a travelling cover whose target is unknown', () => {
+    const travelling = {
+      windowCovering: { operationalStatus: { lift: MOVEMENT_STATUS.OPENING }, targetPositionLiftPercent100ths: null },
+    };
+    expect(cover.toMatter('position', 60, { position }, travelling)).to.deep.equal({
+      windowCovering: { currentPositionLiftPercent100ths: 4000 },
+    });
   });
 });
