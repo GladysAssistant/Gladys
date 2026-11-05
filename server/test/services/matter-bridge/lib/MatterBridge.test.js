@@ -88,7 +88,7 @@ describe('MatterBridge', () => {
       expect(aggregator.children.map((c) => c.id)).to.deep.equal(['light', 'sensor']);
       expect(aggregator.children[1].children.map((c) => c.id)).to.deep.equal([
         'sensor-temperature-1',
-        'sensor-humidity-2',
+        'sensor-humidity-1',
       ]);
       expect(bridge.devices.size).to.equal(2);
       sinon.assert.calledWith(gladys.event.on, EVENTS.TRIGGERS.CHECK, bridge.onTriggerCheck);
@@ -134,7 +134,7 @@ describe('MatterBridge', () => {
       const deleteSpy = sinon.spy(matter.main.Endpoint.prototype, 'delete');
       const realAdd = matter.main.Endpoint.prototype.add;
       sinon.stub(matter.main.Endpoint.prototype, 'add').callsFake(async function add(child) {
-        if (child.id === 'sensor-humidity-2') {
+        if (child.id === 'sensor-humidity-1') {
           throw new Error('conformance');
         }
         return realAdd.call(this, child);
@@ -190,6 +190,32 @@ describe('MatterBridge', () => {
       expect(bridge.server).to.not.equal(null);
       expect(variables[VARIABLES.PASSCODE]).to.not.equal(undefined);
       expect(typeof passcode).to.equal('number');
+      expect(matter.server.options.commissioning.passcode).to.not.equal(passcode);
+    });
+
+    it('should report a reset that fails, without restarting the bridge', async () => {
+      await bridge.start();
+      fse.remove.rejects(new Error('read-only'));
+      await bridge.reset();
+      expect(bridge.server).to.equal(null);
+      expect(bridge.lastError).to.equal('read-only');
+      sinon.assert.notCalled(gladys.variable.destroy);
+    });
+  });
+
+  describe('serialization', () => {
+    it('should create a single node when the bridge is started twice at once', async () => {
+      const create = sinon.spy(matter.main.ServerNode, 'create');
+      await Promise.all([bridge.start(), bridge.start()]);
+      sinon.assert.calledOnce(create);
+      create.restore();
+    });
+
+    it('should not apply a change queued before a stop to the closed bridge', async () => {
+      await bridge.start();
+      const created = { ...light, id: 'new-id', selector: 'new' };
+      await Promise.all([bridge.stop(), bridge.onDeviceChange(created)]);
+      expect(bridge.devices.size).to.equal(0);
     });
   });
 
@@ -295,6 +321,22 @@ describe('MatterBridge', () => {
       expect(bridge.devices.size).to.equal(0);
     });
 
+    it('should keep synchronizing the other devices when one fails', async () => {
+      const other = { ...light, id: 'other-id', selector: 'other' };
+      devices = [light, other, sensor];
+      const upsertDevice = bridge.upsertDevice.bind(bridge);
+      sinon.stub(bridge, 'upsertDevice').callsFake(async (device) => {
+        if (device.id !== 'sensor-id') {
+          throw new Error('broken');
+        }
+        return upsertDevice(device);
+      });
+      await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['light', 'other'] });
+      // The light keeps the endpoints it had, the other one was never on the bridge, and the sensor
+      // taken out of the selection is removed all the same.
+      expect(Array.from(bridge.devices.keys())).to.deep.equal(['light-id']);
+    });
+
     it('should keep going after a failing change', async () => {
       await bridge.enqueue(async () => {
         throw new Error('boom');
@@ -387,6 +429,36 @@ describe('MatterBridge', () => {
       expect(variables[VARIABLES.EXPOSURE_MODE]).to.equal('selection');
       expect(variables[VARIABLES.ENABLED]).to.equal('false');
       expect(status.running).to.equal(false);
+    });
+
+    it('should put the previous selection back when the mode cannot be saved', async () => {
+      variables[VARIABLES.EXPOSED_DEVICES] = '["sensor"]';
+      const { setValue } = gladys.variable;
+      gladys.variable.setValue = sinon.stub().callsFake(async (name, value) => {
+        if (name === VARIABLES.EXPOSURE_MODE) {
+          throw new Error('database locked');
+        }
+        return setValue(name, value);
+      });
+      await expect(bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['light'] })).to.be.rejectedWith(
+        'database locked',
+      );
+      expect(variables[VARIABLES.EXPOSED_DEVICES]).to.equal('["sensor"]');
+      expect(variables).to.not.have.property(VARIABLES.EXPOSURE_MODE);
+    });
+
+    it('should remove a selection that did not exist when the mode cannot be saved', async () => {
+      gladys.variable.setValue = sinon.stub().callsFake(async (name, value) => {
+        if (name === VARIABLES.EXPOSURE_MODE) {
+          throw new Error('database locked');
+        }
+        variables[name] = value;
+      });
+      await expect(bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['light'] })).to.be.rejectedWith(
+        'database locked',
+      );
+      expect(variables).to.not.have.property(VARIABLES.EXPOSED_DEVICES);
+      sinon.assert.calledWith(gladys.variable.destroy, VARIABLES.EXPOSED_DEVICES, SERVICE_ID);
     });
 
     it('should apply a new selection to a running bridge', async () => {

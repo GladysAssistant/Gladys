@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const MatterBridgeController = require('../../../../services/matter-bridge/api/matterBridge.controller');
@@ -17,6 +18,14 @@ describe('MatterBridgeController', () => {
   beforeEach(() => {
     sinon.resetHistory();
     res = { json: sinon.stub() };
+  });
+
+  it('should only let authenticated admins use the bridge', () => {
+    expect(Object.keys(controller)).to.have.lengthOf(6);
+    Object.values(controller).forEach((route) => {
+      expect(route.authenticated).to.equal(true);
+      expect(route.admin).to.equal(true);
+    });
   });
 
   it('should get the status', async () => {

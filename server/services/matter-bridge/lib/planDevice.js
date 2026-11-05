@@ -51,6 +51,8 @@ function planSignature(device, plan) {
   });
   return JSON.stringify({
     selector: device.selector,
+    // The model is the product name of the bridged device, set when its endpoints are built.
+    model: device.model,
     functions: plan.functions.map(describe),
     battery: plan.battery ? describe(plan.battery) : null,
   });

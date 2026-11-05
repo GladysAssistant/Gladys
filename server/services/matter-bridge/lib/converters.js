@@ -1,6 +1,14 @@
 const { DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
-const { intToRgb, rgbToHsb, hsbToRgb, rgbToInt, xyToInt } = require('../../../utils/colors');
+const {
+  intToRgb,
+  rgbToHsb,
+  hsbToRgb,
+  rgbToInt,
+  xyToInt,
+  kelvinToRGB,
+  miredToKelvin,
+} = require('../../../utils/colors');
 const { fahrenheitToCelsius } = require('../../../utils/units');
 const { AIR_QUALITY, BAT_CHARGE_LEVEL } = require('./constants');
 
@@ -14,6 +22,7 @@ const PERCENT_100THS_MAX = 10000;
 const XY_MAX = 65536;
 const ILLUMINANCE_MAX = 65534;
 const INT16_MAX = 32767;
+const KELVIN_OFFSET = 273.15;
 
 // Factors to hectopascals, which is the unit of the Matter pressure attribute (0.1 kPa).
 const TO_HECTOPASCAL = {
@@ -147,6 +156,22 @@ function hueSaturationToColor(hue, saturation) {
 }
 
 /**
+ * @description Convert a Matter colour temperature to the Gladys colour of a white of that
+ * temperature, for a colour light that has no colour temperature feature of its own.
+ * @param {number} mireds - Matter colour temperature, in mireds.
+ * @returns {number|null} RGB integer, or null when the temperature is unknown.
+ * @example
+ * miredsToColor(370); // a warm white
+ */
+function miredsToColor(mireds) {
+  if (!isNumber(mireds) || mireds <= 0) {
+    return null;
+  }
+  const kelvin = miredToKelvin(clamp(mireds, MIREDS_MIN, MIREDS_MAX));
+  return rgbToInt(kelvinToRGB(kelvin).map((channel) => clamp(channel, 0, 255)));
+}
+
+/**
  * @description Convert Matter CIE xy coordinates to a Gladys colour.
  * @param {number} x - Matter currentX, 0 to 65536.
  * @param {number} y - Matter currentY, 0 to 65536.
@@ -197,7 +222,12 @@ function fromLiftPercent100ths(percent100ths, feature) {
  * toCelsius100ths(21.5, 'celsius'); // 2150
  */
 function toCelsius100ths(value, unit) {
-  const celsius = unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? fahrenheitToCelsius(value) : value;
+  let celsius = value;
+  if (unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+    celsius = fahrenheitToCelsius(value);
+  } else if (unit === DEVICE_FEATURE_UNITS.KELVIN) {
+    celsius = value - KELVIN_OFFSET;
+  }
   return clamp(Math.round(celsius * 100), -27315, INT16_MAX);
 }
 
@@ -317,6 +347,7 @@ module.exports = {
   colorToHueSaturation,
   hueSaturationToColor,
   xyToColor,
+  miredsToColor,
   toLiftPercent100ths,
   fromLiftPercent100ths,
   toCelsius100ths,

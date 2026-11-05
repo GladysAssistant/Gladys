@@ -37,7 +37,8 @@ function truncate(value) {
  * @param {object} ctx - Build context: read(feature) and command(feature, value).
  * @param {number} [number] - Endpoint number to reuse, when the device is rebuilt: ecosystems know
  * a device by its endpoint number, so keeping it keeps the room and the name it was given there.
- * @returns {object} { root, children, functions: [{ adapter, roles, endpoint }], battery }.
+ * @returns {object} { root, children, functions: [{ adapter, roles, endpoint }], battery }, the
+ * battery listing the endpoints that carry it: { adapter, roles, endpoints }.
  * @example
  * const built = buildEndpoints(matter, device, plan, ctx);
  */
@@ -56,23 +57,23 @@ function buildEndpoints(matter, device, plan, ctx, number) {
     ...adapter.build(matter, roles, ctx),
   }));
 
-  // The battery goes on the root of the device, unless a function must carry a power source of
-  // its own: it then goes there, so that function does not have to pretend to be mains powered.
-  // A single function shares its endpoint with the root, so there both are the same.
+  // The battery goes on the root of the device, unless some functions must carry a power source
+  // of their own: it then goes on each of them, so none has to pretend to be mains powered. A
+  // single function shares its endpoint with the root, so there both are the same.
   const powered = parts.filter(({ adapter }) => adapter.requiresPowerSource);
   const root = { behaviors: [BridgedDeviceBasicInformationServer], states: [] };
-  const batteryHost = composed && powered.length > 0 ? powered[0] : root;
+  const batteryHosts = composed && powered.length > 0 ? powered : [root];
   if (plan.battery) {
-    batteryHost.behaviors.push(plan.battery.adapter.behavior(matter));
-    batteryHost.states.push(plan.battery.adapter.state(plan.battery.roles, ctx));
-  }
-  powered.forEach((part) => {
-    const hasBattery = Boolean(plan.battery) && (part === batteryHost || !composed);
-    if (!hasBattery) {
+    batteryHosts.forEach((host) => {
+      host.behaviors.push(plan.battery.adapter.behavior(matter));
+      host.states.push(plan.battery.adapter.state(plan.battery.roles, ctx));
+    });
+  } else {
+    powered.forEach((part) => {
       part.behaviors.push(BATTERY_ADAPTER.wiredBehavior(matter));
       part.states.push(BATTERY_ADAPTER.wiredState());
-    }
-  });
+    });
+  }
 
   root.states.push({
     bridgedDeviceBasicInformation: {
@@ -89,7 +90,7 @@ function buildEndpoints(matter, device, plan, ctx, number) {
   let rootEndpoint;
   let functions;
   let children = [];
-  let batteryEndpoint;
+  let batteryEndpoints = [];
 
   if (!composed) {
     const [part] = parts;
@@ -98,32 +99,39 @@ function buildEndpoints(matter, device, plan, ctx, number) {
       ...mergeState(part.state, ...part.states, ...root.states),
     });
     functions = [{ adapter: part.adapter, roles: part.roles, endpoint: rootEndpoint }];
-    batteryEndpoint = rootEndpoint;
+    batteryEndpoints = [rootEndpoint];
   } else {
     rootEndpoint = new Endpoint(matter.endpoints.BridgedNodeEndpoint.with(...root.behaviors), {
       ...rootOptions,
       ...mergeState(...root.states),
     });
-    functions = parts.map((part, index) => {
+    // A child is numbered among the functions of its own kind only: matter.js keeps the endpoint
+    // number of an id, so a new kind of function, or a change in the order adapters are tried,
+    // must not rename the children already paired in the ecosystems.
+    const counts = {};
+    functions = parts.map((part) => {
+      counts[part.adapter.key] = (counts[part.adapter.key] || 0) + 1;
       const type = part.behaviors.length > 0 ? part.type.with(...part.behaviors) : part.type;
       const endpoint = new Endpoint(type, {
-        id: `${rootId}-${part.adapter.key}-${index + 1}`,
+        id: `${rootId}-${part.adapter.key}-${counts[part.adapter.key]}`,
         ...mergeState(part.state, ...part.states),
       });
-      if (part === batteryHost) {
-        batteryEndpoint = endpoint;
+      if (batteryHosts.includes(part)) {
+        batteryEndpoints.push(endpoint);
       }
       return { adapter: part.adapter, roles: part.roles, endpoint };
     });
     children = functions.map(({ endpoint }) => endpoint);
-    batteryEndpoint = batteryEndpoint || rootEndpoint;
+    if (batteryEndpoints.length === 0) {
+      batteryEndpoints = [rootEndpoint];
+    }
   }
 
   return {
     root: rootEndpoint,
     children,
     functions,
-    battery: plan.battery ? { ...plan.battery, endpoint: batteryEndpoint } : null,
+    battery: plan.battery ? { ...plan.battery, endpoints: batteryEndpoints } : null,
   };
 }
 

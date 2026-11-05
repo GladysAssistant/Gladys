@@ -8,6 +8,7 @@ const {
   colorToHueSaturation,
   hueSaturationToColor,
   xyToColor,
+  miredsToColor,
   MIREDS_MIN,
   MIREDS_MAX,
 } = require('../converters');
@@ -164,18 +165,25 @@ const light = {
           ? fromMireds(state.colorControl.colorTemperatureMireds, feature)
           : null,
     },
-    ...['currentHue', 'currentSaturation', 'currentX', 'currentY'].map((attribute) => ({
+    // A colour light always offers a colour temperature in Matter (the extended colour light
+    // requires it). When the Gladys light has no temperature feature, a white picked that way is
+    // sent as the colour of that white, so the light does follow it.
+    ...['currentHue', 'currentSaturation', 'currentX', 'currentY', 'colorTemperatureMireds'].map((attribute) => ({
       cluster: 'colorControl',
       attribute,
       role: 'color',
       debounce: true,
-      toGladys: (state) => {
-        const { colorMode, currentHue, currentSaturation, currentX, currentY } = state.colorControl;
+      toGladys: (state, feature, roles) => {
+        const { colorMode, currentHue, currentSaturation, currentX, currentY, colorTemperatureMireds } =
+          state.colorControl;
         if (colorMode === COLOR_MODE.HUE_SATURATION) {
           return hueSaturationToColor(currentHue, currentSaturation);
         }
         if (colorMode === COLOR_MODE.XY) {
           return xyToColor(currentX, currentY);
+        }
+        if (colorMode === COLOR_MODE.COLOR_TEMPERATURE && !roles.temperature) {
+          return miredsToColor(colorTemperatureMireds);
         }
         return null;
       },

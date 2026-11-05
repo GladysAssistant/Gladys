@@ -39,7 +39,7 @@ describe('Matter bridge buildEndpoints', () => {
       reachable: true,
     });
     expect(built.functions[0].endpoint).to.equal(built.root);
-    expect(built.battery.endpoint).to.equal(built.root);
+    expect(built.battery.endpoints).to.deep.equal([built.root]);
   });
 
   it('should give two devices whose ids only differ at the end different unique ids', () => {
@@ -77,9 +77,28 @@ describe('Matter bridge buildEndpoints', () => {
     const built = buildEndpoints(matter, device, planDevice(device), createContext({}));
     expect(built.root.type.name).to.equal('BridgedNodeEndpoint');
     expect(behaviorNames(built.root.type)).to.deep.equal(['BridgedDeviceBasicInformationServer', 'PowerSourceServer']);
-    expect(built.children.map((c) => c.id)).to.deep.equal(['multi-temperature-1', 'multi-humidity-2']);
+    expect(built.children.map((c) => c.id)).to.deep.equal(['multi-temperature-1', 'multi-humidity-1']);
     expect(built.children[0].type.behaviors).to.deep.equal([]);
-    expect(built.battery.endpoint).to.equal(built.root);
+    expect(built.battery.endpoints).to.deep.equal([built.root]);
+  });
+
+  it('should number children among the functions of their own kind only', () => {
+    const device = {
+      id: 'id-3',
+      name: 'Multi',
+      selector: 'multi',
+      features: [
+        feature('t1', 'temperature-sensor', 'decimal'),
+        feature('h', 'humidity-sensor', 'decimal'),
+        feature('t2', 'temperature-sensor', 'decimal'),
+      ],
+    };
+    const built = buildEndpoints(matter, device, planDevice(device), createContext({}));
+    expect(built.children.map((c) => c.id)).to.deep.equal([
+      'multi-temperature-1',
+      'multi-temperature-2',
+      'multi-humidity-1',
+    ]);
   });
 
   it('should give a mains power source to a smoke alarm without battery', () => {
@@ -120,7 +139,25 @@ describe('Matter bridge buildEndpoints', () => {
     const [alarm, thermometer] = built.children;
     expect(alarm.state.powerSource.description).to.equal('Battery');
     expect(thermometer.state).to.not.have.property('powerSource');
-    expect(built.battery.endpoint).to.equal(alarm);
+    expect(built.battery.endpoints).to.deep.equal([alarm]);
+  });
+
+  it('should put the battery on every smoke alarm of a battery powered device', () => {
+    const device = {
+      id: 'id',
+      name: 'Smoke',
+      selector: 'smoke',
+      features: [
+        feature('s1', 'smoke-sensor', 'binary'),
+        feature('s2', 'smoke-sensor', 'binary'),
+        feature('b', 'battery', 'integer'),
+      ],
+    };
+    const built = buildEndpoints(matter, device, planDevice(device), createContext({ b: 80 }));
+    const [first, second] = built.children;
+    expect(first.state.powerSource.description).to.equal('Battery');
+    expect(second.state.powerSource.description).to.equal('Battery');
+    expect(built.battery.endpoints).to.deep.equal([first, second]);
   });
 
   it('should give mains power to the smoke alarms of a multi function device without battery', () => {

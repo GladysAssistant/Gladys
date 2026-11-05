@@ -1782,6 +1782,59 @@ const integrations = {
     manualPairingCode: '34970112332',
     fabrics: [{ fabricIndex: 1, label: '', vendorId: 4937 }]
   },
+  'post /api/v1/service/matter-bridge/enable': {
+    enabled: true,
+    hasIpv6: true,
+    running: true,
+    error: null,
+    exposureMode: 'all',
+    exposedDevices: [],
+    exposedCount: 4,
+    commissioned: true,
+    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
+    manualPairingCode: '34970112332',
+    fabrics: [{ fabricIndex: 1, label: '', vendorId: 4937 }]
+  },
+  'post /api/v1/service/matter-bridge/disable': {
+    enabled: false,
+    hasIpv6: true,
+    running: false,
+    error: null,
+    exposureMode: 'all',
+    exposedDevices: [],
+    exposedCount: 0,
+    commissioned: false,
+    qrPairingCode: null,
+    manualPairingCode: null,
+    fabrics: []
+  },
+  'post /api/v1/service/matter-bridge/config': {
+    enabled: true,
+    hasIpv6: true,
+    running: true,
+    error: null,
+    exposureMode: 'all',
+    exposedDevices: [],
+    exposedCount: 4,
+    commissioned: true,
+    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
+    manualPairingCode: '34970112332',
+    fabrics: [{ fabricIndex: 1, label: '', vendorId: 4937 }]
+  },
+  // A reset forgets every pairing: the bridge comes back waiting for one, with a new code.
+  'post /api/v1/service/matter-bridge/reset': {
+    enabled: true,
+    hasIpv6: true,
+    running: true,
+    error: null,
+    exposureMode: 'all',
+    exposedDevices: [],
+    exposedCount: 4,
+    commissioned: false,
+    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
+    manualPairingCode: '34970112332',
+    fabrics: []
+  },
   'get /api/v1/service/matter-bridge/device': [
     { name: 'Living room lamp', selector: 'living-room-lamp', functions: ['light'] },
     { name: 'Kitchen sensor', selector: 'kitchen-sensor', functions: ['temperature', 'humidity', 'battery'] },

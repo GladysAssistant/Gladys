@@ -30,7 +30,7 @@ describe('Matter bridge planDevice', () => {
   it('should never give a feature to two adapters', () => {
     const greedy = { key: 'greedy', claim: (features) => features.map((f) => ({ value: f })) };
     const plan = planDevice({ features: [binary, temperature] }, [greedy, greedy]);
-    expect(plan.functions).to.have.lengthOf(2);
+    expect(plan.functions.map(({ roles }) => roles)).to.deep.equal([{ value: binary }, { value: temperature }]);
   });
 
   it('should sign what requires the endpoints to be rebuilt', () => {
@@ -40,6 +40,8 @@ describe('Matter bridge planDevice', () => {
     expect(planSignature(renamed, planDevice(renamed))).to.equal(signature);
     const changed = { ...device, features: [{ ...binary, max: 255 }, level] };
     expect(planSignature(changed, planDevice(changed))).to.not.equal(signature);
+    const otherModel = { ...device, model: 'Other model' };
+    expect(planSignature(otherModel, planDevice(otherModel))).to.not.equal(signature);
     const withoutBattery = { ...device, features: [binary] };
     expect(planSignature(withoutBattery, planDevice(withoutBattery))).to.not.equal(signature);
   });

@@ -85,6 +85,35 @@ describe('Matter bridge Bindings', () => {
     expect(built.root.state.powerSource.batPercentRemaining).to.equal(30);
   });
 
+  it('should not send a state pushed to Matter back to Gladys', async () => {
+    await bindings.push({ device_feature: 'light-binary', last_value: 0 });
+    await bindings.push({ device_feature: 'light-brightness', last_value: 10 });
+    clock.tick(100);
+    expect(built.root.state.onOff.onOff).to.equal(false);
+    sinon.assert.notCalled(gladys.event.emit);
+  });
+
+  it('should push the battery to every endpoint carrying it', async () => {
+    const alarms = {
+      id: 'alarms-id',
+      name: 'Alarms',
+      selector: 'alarms',
+      features: [
+        feature('alarms-s1', 'smoke-sensor', 'binary'),
+        feature('alarms-s2', 'smoke-sensor', 'binary'),
+        feature('alarms-battery', 'battery', 'integer'),
+      ],
+    };
+    const alarmsBuilt = buildEndpoints(matter, alarms, planDevice(alarms), createContext({}));
+    bindings.add(alarms, alarmsBuilt);
+    await bindings.push({ device_feature: 'alarms-battery', last_value: 15 });
+    const [first, second] = alarmsBuilt.children;
+    expect(first.state.powerSource.batPercentRemaining).to.equal(30);
+    expect(second.state.powerSource.batPercentRemaining).to.equal(30);
+    bindings.remove('alarms-id');
+    expect(bindings.byFeature.has('alarms-battery')).to.equal(false);
+  });
+
   it('should ignore states of unknown features or without value', async () => {
     const set = sinon.spy(built.root, 'set');
     await bindings.push({ device_feature: 'unknown', last_value: 1 });

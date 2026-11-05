@@ -58,6 +58,15 @@ describe('Matter bridge converters', () => {
     expect(converters.toCelsius100ths(21.5, 'celsius')).to.equal(2150);
     expect(converters.toCelsius100ths(212, 'fahrenheit')).to.equal(10000);
     expect(converters.toCelsius100ths(-400, 'celsius')).to.equal(-27315);
+    expect(converters.toCelsius100ths(300, 'kelvin')).to.equal(2685);
+  });
+
+  it('should convert a colour temperature to the colour of that white', () => {
+    expect(converters.miredsToColor(370)).to.equal(0xffa758);
+    // Temperatures out of the range of the light are brought back into it.
+    expect(converters.miredsToColor(1000)).to.equal(converters.miredsToColor(500));
+    expect(converters.miredsToColor(null)).to.equal(null);
+    expect(converters.miredsToColor(0)).to.equal(null);
   });
 
   it('should convert humidity to hundredths of a percent', () => {
