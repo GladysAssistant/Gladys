@@ -172,11 +172,14 @@ async function installZ2mContainer(config, setupMode = false) {
         this.zigbee2mqttStarting = false;
         this.emitStatusEvent();
       }, this.zigbee2mqttStartingTimeoutInMs);
+      // Only the logs of the new run explain why it fails. Docker counts in seconds: taken before the restart, not
+      // to miss the first lines of the new run
+      const restartedAt = Math.floor(Date.now() / 1000);
       await this.gladys.system.restartContainer(container.id);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
       // We read the logs in non blocking mode
-      this.readZ2mContainerLogs(container.id);
+      this.readZ2mContainerLogs(container.id, restartedAt);
     }
 
     logger.info('Zigbee2mqtt container successfully started');

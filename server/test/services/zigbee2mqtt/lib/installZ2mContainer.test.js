@@ -161,6 +161,20 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(true);
   });
 
+  it('should read the logs of the container from its restart only', async () => {
+    // PREPARE
+    const clock = sinon.useFakeTimers({ now: 1700000000500, toFake: ['Date'] });
+    try {
+      // EXECUTE
+      await zigbee2mqttManager.installZ2mContainer({});
+    } finally {
+      clock.restore();
+    }
+    // ASSERT
+    // The error of a previous run must not be shown while the new one starts
+    assert.calledOnceWithExactly(gladys.system.getContainerLogs, container.id, { follow: true, since: 1700000000 });
+  });
+
   it('should restart z2m container (container running but config changed)', async () => {
     // PREPARE
     const config = {};

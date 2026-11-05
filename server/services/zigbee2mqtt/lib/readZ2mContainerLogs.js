@@ -10,13 +10,15 @@ const KNOWN_ERROR_PATTERNS = [
 /**
  * @description Read Zigbee2mqtt container logs and detect fatal errors.
  * @param {string} containerId - Docker container id.
+ * @param {number} since - When the container was restarted, as a UNIX timestamp in seconds: Docker keeps the logs
+ * of every run of a container, the older ones come from a previous run.
  * @returns {Promise} Resolve when logs have been read.
  * @example
- * await z2m.readZ2mContainerLogs('abc123');
+ * await z2m.readZ2mContainerLogs('abc123', 1700000000);
  */
-async function readZ2mContainerLogs(containerId) {
+async function readZ2mContainerLogs(containerId, since) {
   try {
-    const stream = await this.gladys.system.getContainerLogs(containerId, { follow: true });
+    const stream = await this.gladys.system.getContainerLogs(containerId, { follow: true, since });
     await new Promise((resolve) => {
       let leftover = '';
       let knownError = null;
@@ -55,8 +57,8 @@ async function readZ2mContainerLogs(containerId) {
           stream.destroy();
         }
         if (this.zigbee2mqttConnected) {
-          // Ignored once Zigbee2mqtt is online: the error did not prevent it from starting, or comes from an
-          // older start, as the logs of the container are read from its creation
+          // Ignored once Zigbee2mqtt is online: the error did not prevent it from starting, like a device failing
+          // to answer during the startup
           this.z2mContainerError = null;
         } else if (knownError !== null) {
           this.z2mContainerError = knownError;

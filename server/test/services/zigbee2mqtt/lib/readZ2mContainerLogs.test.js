@@ -85,10 +85,11 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     const stream = buildLogStream(ezspLog);
     gladys.system.getContainerLogs = fake.resolves(stream);
 
-    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc', 1700000000);
 
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
-    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', { follow: true });
+    // Only the logs of the current run: those of a previous run would explain a failure that no longer happens
+    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', { follow: true, since: 1700000000 });
     assert.calledOnce(stream.destroy);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -169,7 +170,7 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
   });
 
   it('should ignore a known error found at the end of the logs when Zigbee2mqtt is online', async () => {
-    // The logs of the container are read from its creation: the error can come from an older start
+    // Zigbee2mqtt answers: whatever was logged did not prevent it from running
     zigbee2mqttManager.zigbee2mqttConnected = true;
     const ezspLog = 'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12';
     gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
