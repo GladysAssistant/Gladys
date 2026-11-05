@@ -55,6 +55,8 @@ describe('Matter bridge cover adapter', () => {
       ['shutter-position', 100],
       ['shutter-state', COVER_STATE.STOP],
     ]);
+    // A cover with a position is reported still by matter.js once it reaches its target.
+    expect(behavior.state.operationalStatus.lift).to.equal(MOVEMENT_STATUS.OPENING);
   });
 
   it('should build a curtain without a position', () => {
@@ -73,6 +75,18 @@ describe('Matter bridge cover adapter', () => {
       ['curtain-state', COVER_STATE.CLOSE],
       ['curtain-state', COVER_STATE.OPEN],
     ]);
+  });
+
+  it('should report a cover without a position still once the order is sent', () => {
+    const curtain = feature('curtain-state', 'curtain', 'state');
+    const built = cover.build(matter, { state: curtain }, createContext({}));
+    const behavior = new built.type.behaviors[0]();
+    behavior.handleMovement(MOVEMENT_TYPE.LIFT, false, MOVEMENT_DIRECTION.CLOSE);
+    expect(behavior.state.operationalStatus).to.deep.equal({
+      global: MOVEMENT_STATUS.STOPPED,
+      lift: MOVEMENT_STATUS.STOPPED,
+      tilt: MOVEMENT_STATUS.STOPPED,
+    });
   });
 
   it('should not send a stop to a cover without a state, nor read an unknown position', () => {

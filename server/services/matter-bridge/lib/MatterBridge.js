@@ -16,23 +16,25 @@ const {
 const { getStoragePath, getPairingConfig, softwareVersionOf, uniqueIdOf } = require('./config');
 const { readExposure, isExposed } = require('./exposure');
 const { planDevice, planSignature } = require('./planDevice');
-const { buildEndpoints, truncate } = require('./buildEndpoints');
+const { buildEndpoints, endpointNumbers, truncate } = require('./buildEndpoints');
 const { Bindings } = require('./Bindings');
-const { checkIpv6 } = require('./checkIpv6');
+const { checkIpv6 } = require('../../../utils/checkIpv6');
 
 /**
  * @description Matter bridge exposing Gladys devices to Matter ecosystems (Apple Home, Google Home,
  * Alexa, SmartThings, Home Assistant...).
  * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - Service id.
- * @param {object} matter - The matter.js modules: { main, devices, endpoints, behaviors }.
+ * @param {Function} loadMatter - Loads the matter.js modules: { main, devices, endpoints, behaviors }.
+ * They are only loaded when the bridge starts, so a Gladys whose bridge is off never loads them.
  * @example
- * const bridge = new MatterBridge(gladys, serviceId, matter);
+ * const bridge = new MatterBridge(gladys, serviceId, loadMatter);
  */
-function MatterBridge(gladys, serviceId, matter) {
+function MatterBridge(gladys, serviceId, loadMatter) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.matter = matter;
+  this.loadMatter = loadMatter;
+  this.matter = null;
   this.server = null;
   this.aggregator = null;
   this.lastError = null;
@@ -109,6 +111,7 @@ MatterBridge.prototype.startNow = async function startNow() {
     return;
   }
   try {
+    this.matter = this.matter || this.loadMatter();
     await this.startNode();
     this.lastError = null;
     logger.info(`Matter bridge: online on port ${MATTER_BRIDGE_PORT}, ${this.devices.size} device(s) exposed`);
@@ -323,12 +326,12 @@ MatterBridge.prototype.upsertDevice = async function upsertDevice(device) {
     }
     return true;
   }
-  let number;
+  let numbers;
   if (existing) {
-    number = existing.built.root.number;
+    numbers = endpointNumbers(existing.built);
     await this.removeDevice(device.id);
   }
-  return this.addDevice(device, plan, signature, number);
+  return this.addDevice(device, plan, signature, numbers);
 };
 
 /**
@@ -337,12 +340,12 @@ MatterBridge.prototype.upsertDevice = async function upsertDevice(device) {
  * @param {object} device - Gladys device.
  * @param {object} plan - Plan of the device.
  * @param {string} signature - Signature of the plan.
- * @param {number} [number] - Endpoint number the device had before being rebuilt.
+ * @param {object} [numbers] - Endpoint numbers the device had before being rebuilt, by endpoint id.
  * @returns {Promise<boolean>} True when the device was added.
  * @example
  * await bridge.addDevice(device, plan, signature);
  */
-MatterBridge.prototype.addDevice = async function addDevice(device, plan, signature, number) {
+MatterBridge.prototype.addDevice = async function addDevice(device, plan, signature, numbers) {
   let built;
   try {
     built = buildEndpoints(
@@ -353,7 +356,7 @@ MatterBridge.prototype.addDevice = async function addDevice(device, plan, signat
         read: (feature) => this.readValue(feature),
         command: (feature, value) => this.bindings.command(device, feature, value),
       },
-      number,
+      numbers,
     );
     await this.aggregator.add(built.root);
     // eslint-disable-next-line no-restricted-syntax

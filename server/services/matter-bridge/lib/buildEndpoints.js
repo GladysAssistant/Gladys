@@ -28,26 +28,28 @@ function truncate(value) {
 }
 
 /**
- * @description Build the matter.js endpoints of a planned device. A device with one function is
- * one bridged endpoint; a device with several (a temperature and humidity sensor) is a bridged node
- * carrying one child endpoint per function, which every ecosystem shows as a single accessory.
+ * @description Build the matter.js endpoints of a planned device: a bridged node carrying one
+ * child endpoint per function (a light, a temperature sensor...), which every ecosystem shows as
+ * a single accessory. A device with one function is built the same way, so the endpoint of that
+ * function keeps its id and number when the device gains a second one: the ecosystems keep the
+ * room, the name and the automations given to it.
  * @param {object} matter - The matter.js modules.
  * @param {object} device - Gladys device.
  * @param {object} plan - Plan of the device, from planDevice.
  * @param {object} ctx - Build context: read(feature) and command(feature, value).
- * @param {number} [number] - Endpoint number to reuse, when the device is rebuilt: ecosystems know
- * a device by its endpoint number, so keeping it keeps the room and the name it was given there.
+ * @param {object} [numbers] - Endpoint numbers to reuse by endpoint id, when the device is rebuilt
+ * (see endpointNumbers): ecosystems know an endpoint by its number, and matter.js forgets the
+ * number of a deleted endpoint.
  * @returns {object} { root, children, functions: [{ adapter, roles, endpoint }], battery }, the
  * battery listing the endpoints that carry it: { adapter, roles, endpoints }.
  * @example
  * const built = buildEndpoints(matter, device, plan, ctx);
  */
-function buildEndpoints(matter, device, plan, ctx, number) {
+function buildEndpoints(matter, device, plan, ctx, numbers = {}) {
   const { Endpoint } = matter.main;
   const { BridgedDeviceBasicInformationServer } = matter.behaviors;
+  const withNumber = (id) => (numbers[id] === undefined ? { id } : { id, number: numbers[id] });
   const rootId = endpointId(device.selector);
-  const rootOptions = number === undefined ? { id: rootId } : { id: rootId, number };
-  const composed = plan.functions.length > 1;
 
   const parts = plan.functions.map(({ adapter, roles }) => ({
     adapter,
@@ -58,11 +60,10 @@ function buildEndpoints(matter, device, plan, ctx, number) {
   }));
 
   // The battery goes on the root of the device, unless some functions must carry a power source
-  // of their own: it then goes on each of them, so none has to pretend to be mains powered. A
-  // single function shares its endpoint with the root, so there both are the same.
+  // of their own: it then goes on each of them, so none has to pretend to be mains powered.
   const powered = parts.filter(({ adapter }) => adapter.requiresPowerSource);
   const root = { behaviors: [BridgedDeviceBasicInformationServer], states: [] };
-  const batteryHosts = composed && powered.length > 0 ? powered : [root];
+  const batteryHosts = powered.length > 0 ? powered : [root];
   if (plan.battery) {
     batteryHosts.forEach((host) => {
       host.behaviors.push(plan.battery.adapter.behavior(matter));
@@ -87,56 +88,57 @@ function buildEndpoints(matter, device, plan, ctx, number) {
     },
   });
 
-  let rootEndpoint;
-  let functions;
-  let children = [];
-  let batteryEndpoints = [];
+  const rootEndpoint = new Endpoint(matter.endpoints.BridgedNodeEndpoint.with(...root.behaviors), {
+    ...withNumber(rootId),
+    ...mergeState(...root.states),
+  });
 
-  if (!composed) {
-    const [part] = parts;
-    rootEndpoint = new Endpoint(part.type.with(...root.behaviors, ...part.behaviors), {
-      ...rootOptions,
-      ...mergeState(part.state, ...part.states, ...root.states),
+  // A child is numbered among the functions of its own kind only: matter.js keeps the endpoint
+  // number of an id, so a new kind of function, or a change in the order adapters are tried,
+  // must not rename the children already paired in the ecosystems.
+  const counts = {};
+  const functions = parts.map((part) => {
+    counts[part.adapter.key] = (counts[part.adapter.key] || 0) + 1;
+    const type = part.behaviors.length > 0 ? part.type.with(...part.behaviors) : part.type;
+    const endpoint = new Endpoint(type, {
+      ...withNumber(`${rootId}-${part.adapter.key}-${counts[part.adapter.key]}`),
+      ...mergeState(part.state, ...part.states),
     });
-    functions = [{ adapter: part.adapter, roles: part.roles, endpoint: rootEndpoint }];
-    batteryEndpoints = [rootEndpoint];
-  } else {
-    rootEndpoint = new Endpoint(matter.endpoints.BridgedNodeEndpoint.with(...root.behaviors), {
-      ...rootOptions,
-      ...mergeState(...root.states),
-    });
-    // A child is numbered among the functions of its own kind only: matter.js keeps the endpoint
-    // number of an id, so a new kind of function, or a change in the order adapters are tried,
-    // must not rename the children already paired in the ecosystems.
-    const counts = {};
-    functions = parts.map((part) => {
-      counts[part.adapter.key] = (counts[part.adapter.key] || 0) + 1;
-      const type = part.behaviors.length > 0 ? part.type.with(...part.behaviors) : part.type;
-      const endpoint = new Endpoint(type, {
-        id: `${rootId}-${part.adapter.key}-${counts[part.adapter.key]}`,
-        ...mergeState(part.state, ...part.states),
-      });
-      if (batteryHosts.includes(part)) {
-        batteryEndpoints.push(endpoint);
-      }
-      return { adapter: part.adapter, roles: part.roles, endpoint };
-    });
-    children = functions.map(({ endpoint }) => endpoint);
-    if (batteryEndpoints.length === 0) {
-      batteryEndpoints = [rootEndpoint];
-    }
-  }
+    return { adapter: part.adapter, roles: part.roles, endpoint };
+  });
+
+  const batteryEndpoints =
+    powered.length > 0
+      ? functions.filter(({ adapter }) => adapter.requiresPowerSource).map(({ endpoint }) => endpoint)
+      : [rootEndpoint];
 
   return {
     root: rootEndpoint,
-    children,
+    children: functions.map(({ endpoint }) => endpoint),
     functions,
     battery: plan.battery ? { ...plan.battery, endpoints: batteryEndpoints } : null,
   };
+}
+
+/**
+ * @description List the endpoint numbers of a built device by endpoint id, to give them back to
+ * the endpoints of the same ids when the device is rebuilt.
+ * @param {object} built - Endpoints of the device, from buildEndpoints.
+ * @returns {object} Endpoint numbers by endpoint id.
+ * @example
+ * endpointNumbers(built); // { plug: 12, 'plug-plug-1': 13 }
+ */
+function endpointNumbers(built) {
+  const numbers = {};
+  [built.root, ...built.children].forEach((endpoint) => {
+    numbers[endpoint.id] = endpoint.number;
+  });
+  return numbers;
 }
 
 module.exports = {
   endpointId,
   truncate,
   buildEndpoints,
+  endpointNumbers,
 };

@@ -2,10 +2,16 @@ const logger = require('../../utils/logger');
 const MatterBridge = require('./lib/MatterBridge');
 const MatterBridgeController = require('./api/matterBridge.controller');
 
-module.exports = function MatterBridgeService(gladys, serviceId) {
-  // Required here rather than at the top of the file: matter.js sets up its Node.js platform when
-  // it is loaded, which only an enabled service needs.
-  const matter = {
+/**
+ * @description Load the matter.js modules. Gladys builds every service at start-up, so they are
+ * not required here but when the bridge starts: matter.js sets up its Node.js platform when it is
+ * loaded, which only an enabled bridge needs.
+ * @returns {object} The matter.js modules: { main, devices, endpoints, behaviors }.
+ * @example
+ * const matter = loadMatter();
+ */
+function loadMatter() {
+  return {
     main: require('@matter/main'),
     // eslint-plugin-import does not read the "exports" map these sub-paths are declared in.
     // eslint-disable-next-line import/no-unresolved
@@ -15,7 +21,10 @@ module.exports = function MatterBridgeService(gladys, serviceId) {
     // eslint-disable-next-line import/no-unresolved
     behaviors: require('@matter/main/behaviors'),
   };
-  const bridge = new MatterBridge(gladys, serviceId, matter);
+}
+
+module.exports = function MatterBridgeService(gladys, serviceId) {
+  const bridge = new MatterBridge(gladys, serviceId, loadMatter);
 
   /**
    * @public

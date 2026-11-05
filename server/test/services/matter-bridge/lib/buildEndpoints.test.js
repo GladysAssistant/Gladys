@@ -1,6 +1,11 @@
 const { expect } = require('chai');
 
-const { buildEndpoints, endpointId, truncate } = require('../../../../services/matter-bridge/lib/buildEndpoints');
+const {
+  buildEndpoints,
+  endpointId,
+  endpointNumbers,
+  truncate,
+} = require('../../../../services/matter-bridge/lib/buildEndpoints');
 const { uniqueIdOf } = require('../../../../services/matter-bridge/lib/config');
 const { planDevice } = require('../../../../services/matter-bridge/lib/planDevice');
 const { createMatter, feature, createContext } = require('../fakes');
@@ -16,7 +21,7 @@ describe('Matter bridge buildEndpoints', () => {
     expect(truncate(undefined)).to.equal('');
   });
 
-  it('should build a single function device as one endpoint carrying its battery', () => {
+  it('should build a single function device as a bridged node with one child', () => {
     const device = {
       id: 'id-1',
       name: 'Thermometer',
@@ -25,12 +30,14 @@ describe('Matter bridge buildEndpoints', () => {
       features: [feature('t', 'temperature-sensor', 'decimal'), feature('b', 'battery', 'integer')],
     };
     const built = buildEndpoints(matter, device, planDevice(device), createContext({ t: 20, b: 50 }));
-    expect(built.children).to.deep.equal([]);
     expect(built.root.id).to.equal('thermometer');
-    expect(built.root.type.name).to.equal('TemperatureSensorDevice');
+    expect(built.root.type.name).to.equal('BridgedNodeEndpoint');
     expect(behaviorNames(built.root.type)).to.deep.equal(['BridgedDeviceBasicInformationServer', 'PowerSourceServer']);
-    expect(built.root.state.temperatureMeasurement.measuredValue).to.equal(2000);
     expect(built.root.state.powerSource.batPercentRemaining).to.equal(100);
+    const [thermometer] = built.children;
+    expect(thermometer.id).to.equal('thermometer-temperature-1');
+    expect(thermometer.type.name).to.equal('TemperatureSensorDevice');
+    expect(thermometer.state.temperatureMeasurement.measuredValue).to.equal(2000);
     expect(built.root.state.bridgedDeviceBasicInformation).to.deep.equal({
       nodeLabel: 'Thermometer',
       productName: 'TH01',
@@ -38,7 +45,7 @@ describe('Matter bridge buildEndpoints', () => {
       uniqueId: uniqueIdOf('id-1'),
       reachable: true,
     });
-    expect(built.functions[0].endpoint).to.equal(built.root);
+    expect(built.functions[0].endpoint).to.equal(thermometer);
     expect(built.battery.endpoints).to.deep.equal([built.root]);
   });
 
@@ -55,12 +62,32 @@ describe('Matter bridge buildEndpoints', () => {
     expect(first).to.not.equal(second);
   });
 
-  it('should reuse the endpoint number of a rebuilt device', () => {
+  it('should reuse the endpoint numbers of a rebuilt device', () => {
     const device = { id: 'id', name: 'Plug', selector: 'plug', features: [feature('p', 'switch', 'binary')] };
-    const built = buildEndpoints(matter, device, planDevice(device), createContext({}), 42);
+    const first = buildEndpoints(matter, device, planDevice(device), createContext({}));
+    expect(endpointNumbers(first)).to.deep.equal({
+      plug: first.root.number,
+      'plug-plug-1': first.children[0].number,
+    });
+    const built = buildEndpoints(matter, device, planDevice(device), createContext({}), {
+      plug: 42,
+      'plug-plug-1': 43,
+    });
     expect(built.root.number).to.equal(42);
+    expect(built.children[0].number).to.equal(43);
     expect(built.root.state.bridgedDeviceBasicInformation.productName).to.equal('Gladys');
     expect(built.battery).to.equal(null);
+  });
+
+  it('should keep the endpoint of a function when the device gains another one', () => {
+    const plug = feature('p', 'switch', 'binary');
+    const device = { id: 'id', name: 'Plug', selector: 'plug', features: [plug] };
+    const before = buildEndpoints(matter, device, planDevice(device), createContext({}));
+    const grown = { ...device, features: [plug, feature('t', 'temperature-sensor', 'decimal')] };
+    const after = buildEndpoints(matter, grown, planDevice(grown), createContext({}), endpointNumbers(before));
+    expect(after.root.number).to.equal(before.root.number);
+    expect(after.children.map((c) => c.id)).to.deep.equal(['plug-plug-1', 'plug-temperature-1']);
+    expect(after.children[0].number).to.equal(before.children[0].number);
   });
 
   it('should build a multi function device as a bridged node with children', () => {
@@ -104,15 +131,12 @@ describe('Matter bridge buildEndpoints', () => {
   it('should give a mains power source to a smoke alarm without battery', () => {
     const device = { id: 'id', name: 'Smoke', selector: 'smoke', features: [feature('s', 'smoke-sensor', 'binary')] };
     const built = buildEndpoints(matter, device, planDevice(device), createContext({}));
-    expect(behaviorNames(built.root.type)).to.deep.equal([
-      'SmokeCoAlarmServer',
-      'BridgedDeviceBasicInformationServer',
-      'PowerSourceServer',
-    ]);
-    expect(built.root.state.powerSource.description).to.equal('Mains');
+    expect(behaviorNames(built.root.type)).to.deep.equal(['BridgedDeviceBasicInformationServer']);
+    expect(behaviorNames(built.children[0].type)).to.deep.equal(['SmokeCoAlarmServer', 'PowerSourceServer']);
+    expect(built.children[0].state.powerSource.description).to.equal('Mains');
   });
 
-  it('should keep the battery of a single smoke alarm on its endpoint', () => {
+  it('should put the battery of a single smoke alarm on its endpoint', () => {
     const device = {
       id: 'id',
       name: 'Smoke',
@@ -120,7 +144,9 @@ describe('Matter bridge buildEndpoints', () => {
       features: [feature('s', 'smoke-sensor', 'binary'), feature('b', 'battery', 'integer')],
     };
     const built = buildEndpoints(matter, device, planDevice(device), createContext({ b: 80 }));
-    expect(built.root.state.powerSource.description).to.equal('Battery');
+    expect(built.root.state).to.not.have.property('powerSource');
+    expect(built.children[0].state.powerSource.description).to.equal('Battery');
+    expect(built.battery.endpoints).to.deep.equal([built.children[0]]);
   });
 
   it('should move the battery of a multi function device onto its smoke alarm', () => {
