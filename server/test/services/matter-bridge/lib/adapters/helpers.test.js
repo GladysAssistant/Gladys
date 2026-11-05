@@ -1,12 +1,23 @@
 const { expect } = require('chai');
 
-const { isFeature, zipRoles, mergeState } = require('../../../../../services/matter-bridge/lib/adapters/helpers');
+const {
+  isFeature,
+  isWritable,
+  zipRoles,
+  mergeState,
+} = require('../../../../../services/matter-bridge/lib/adapters/helpers');
 
 describe('Matter bridge adapter helpers', () => {
   it('should match a feature by category and types', () => {
     expect(isFeature({ category: 'light', type: 'binary' }, 'light', ['binary'])).to.equal(true);
     expect(isFeature({ category: 'light', type: 'color' }, 'light', ['binary'])).to.equal(false);
     expect(isFeature({ category: 'switch', type: 'binary' }, 'light', ['binary'])).to.equal(false);
+  });
+
+  it('should tell a writable feature from a read-only one', () => {
+    expect(isWritable({ read_only: false })).to.equal(true);
+    expect(isWritable({})).to.equal(true);
+    expect(isWritable({ read_only: true })).to.equal(false);
   });
 
   it('should pair features of each role in order', () => {

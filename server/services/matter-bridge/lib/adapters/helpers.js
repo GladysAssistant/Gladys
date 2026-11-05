@@ -14,6 +14,19 @@ function isFeature(feature, category, types) {
 }
 
 /**
+ * @description Tell if Gladys can set a feature. Matter apps may write any feature a device type
+ * controls, so a read-only feature, which only reports its value, must not be one of them: the
+ * device would show a control that fails.
+ * @param {object} feature - Gladys feature.
+ * @returns {boolean} True when the feature is not read-only.
+ * @example
+ * isWritable({ read_only: false }); // true
+ */
+function isWritable(feature) {
+  return !feature.read_only;
+}
+
+/**
  * @description Pair the features of each role into groups, one Matter function per group: the
  * first light switch goes with the first brightness, the second with the second, and so on.
  * @param {object} featuresByRole - Features of the device, grouped by the role they play.
@@ -92,6 +105,7 @@ function sensorAdapter({ key, matches, deviceType, initialState, toState }) {
 
 module.exports = {
   isFeature,
+  isWritable,
   zipRoles,
   sensorAdapter,
   mergeState,

@@ -29,4 +29,4 @@ size-plugin.json
 .tmp
 .DS_Store
 matter-controller-data
-matter-bridge
+/server/matter-bridge/

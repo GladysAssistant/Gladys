@@ -1,7 +1,7 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../../utils/constants');
 const { isNumber, toLiftPercent100ths, fromLiftPercent100ths } = require('../converters');
 const { MOVEMENT_TYPE, MOVEMENT_DIRECTION, WINDOW_COVERING_TYPE, END_PRODUCT_TYPE } = require('../constants');
-const { isFeature, zipRoles } = require('./helpers');
+const { isFeature, isWritable, zipRoles } = require('./helpers');
 
 const COVER_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN];
 
@@ -60,13 +60,28 @@ function coverBehavior(matter, roles, ctx) {
   };
 }
 
+/**
+ * @description Pick the writable features of a cover role.
+ * @param {Array} features - Unclaimed features of the device.
+ * @param {string} category - Gladys cover category.
+ * @param {string} type - Gladys cover feature type.
+ * @returns {Array} The matching features.
+ * @example
+ * coverFeatures(features, 'shutter', 'position');
+ */
+function coverFeatures(features, category, type) {
+  return features.filter((feature) => isFeature(feature, category, [type]) && isWritable(feature));
+}
+
+// Matter apps move a window covering, so only the features Gladys can set are claimed: a cover
+// that only reports its position or its state is not offered as one Matter could open.
 const cover = {
   key: 'cover',
   claim(features) {
     return COVER_CATEGORIES.flatMap((category) =>
       zipRoles({
-        position: features.filter((f) => isFeature(f, category, [DEVICE_FEATURE_TYPES.SHUTTER.POSITION])),
-        state: features.filter((f) => isFeature(f, category, [DEVICE_FEATURE_TYPES.SHUTTER.STATE])),
+        position: coverFeatures(features, category, DEVICE_FEATURE_TYPES.SHUTTER.POSITION),
+        state: coverFeatures(features, category, DEVICE_FEATURE_TYPES.SHUTTER.STATE),
       }),
     );
   },

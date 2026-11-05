@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 
 const { buildEndpoints, endpointId, truncate } = require('../../../../services/matter-bridge/lib/buildEndpoints');
+const { uniqueIdOf } = require('../../../../services/matter-bridge/lib/config');
 const { planDevice } = require('../../../../services/matter-bridge/lib/planDevice');
 const { createMatter, feature, createContext } = require('../fakes');
 
@@ -34,11 +35,24 @@ describe('Matter bridge buildEndpoints', () => {
       nodeLabel: 'Thermometer',
       productName: 'TH01',
       vendorName: 'Gladys',
-      uniqueId: 'id-1',
+      uniqueId: uniqueIdOf('id-1'),
       reachable: true,
     });
     expect(built.functions[0].endpoint).to.equal(built.root);
     expect(built.battery.endpoint).to.equal(built.root);
+  });
+
+  it('should give two devices whose ids only differ at the end different unique ids', () => {
+    const uniqueIdOfDevice = (id) => {
+      const device = { id, name: 'Plug', selector: `plug-${id}`, features: [feature(id, 'switch', 'binary')] };
+      return buildEndpoints(matter, device, planDevice(device), createContext({})).root.state
+        .bridgedDeviceBasicInformation.uniqueId;
+    };
+    const first = uniqueIdOfDevice('0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b0001');
+    const second = uniqueIdOfDevice('0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b0002');
+    expect(first).to.have.lengthOf(32);
+    expect(second).to.have.lengthOf(32);
+    expect(first).to.not.equal(second);
   });
 
   it('should reuse the endpoint number of a rebuilt device', () => {

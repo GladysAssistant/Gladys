@@ -243,6 +243,7 @@ This is not a formality: six display names appear twice in the catalog, once nat
 | IPP Printers | community | `device` | `network` |
 | LAN Manager | native | `device` | `network` |
 | Matter | native | `device` | `protocols` |
+| Matter Bridge | native | `communication` | `assistants` |
 | Matterbridge | native | `device` | `protocols` |
 | MCP | native | `communication` | `assistants` |
 | MELCloud | community | `device` | `climate` |
@@ -292,6 +293,8 @@ This is not a formality: six display names appear twice in the catalog, once nat
 | Zendure | community | `device` | `energy` |
 | Zigbee2mqtt | native | `device` | `protocols` |
 | ZWave JS UI | native | `device` | `protocols` |
+
+*Matter Bridge* (key `matter-bridge`) is a native entry added after the 2026-08-14 snapshot, so it is not counted in the distribution above. It goes the opposite way from its near namesakes: *Matter* and *Matterbridge* bring third-party devices **into** Gladys (a Matter controller, and the Docker wrapper of a Matterbridge server, both `protocols`), whereas *Matter Bridge* exposes the Gladys devices **to** the Matter ecosystems (Apple Home, Google Home, Alexa…), which is the job of the voice-assistant bridges, hence `assistants` next to HomeKit and Google Home and a `communication` type like theirs. The names stay as they are: the two cards sit on different shelves, and their descriptions say which way the devices go ("Control your Matterbridge devices in Gladys" against "Expose your Gladys devices over Matter to…").
 
 Notes on debatable rows: the native *Xiaomi Home* integration is the Xiaomi gateway (a hub → `protocols`) while the community one is Roborock-style vacuums (→ `appliances`) — same name, different products; *Prix carburants* is tagged both `energy` (fuel cost) and `environment` (open-data daily-life feed), a good example of a row where the assignment, not the vocabulary, is up for discussion. *Bluetooth Presence* is `network` first, not `protocols`: it is presence detection (i18n: "Presence detection via Bluetooth") that happens to use a radio, and filing it by its transport is exactly the mechanism-as-category mistake the governance rules reject — `protocols` stays as a secondary membership for users who do look for "Bluetooth". *Overkiz* (TaHoma) is primarily a covers hub — shutters, awnings, garage doors — before being an HVAC one, hence `lighting` (which now explicitly carries covers, §3) alongside `climate`; it is the row that exposed the missing covers shelf, see §9.6.
 

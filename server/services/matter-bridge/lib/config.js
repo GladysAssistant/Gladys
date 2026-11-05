@@ -112,17 +112,19 @@ function softwareVersionOf(gladysVersion) {
 }
 
 /**
- * @description Derive the unique id of the bridge from its serial number. Matter requires both,
- * and requires them to differ.
- * @param {string} serialNumber - Serial number of the bridge.
- * @returns {string} Unique id.
+ * @description Derive a Matter unique id, at most 32 characters long, by hashing an identifier:
+ * the serial number of the bridge (Matter requires both, and requires them to differ) or the id of
+ * a bridged Gladys device (a UUID, too long to be kept as is, and cutting it would make collisions
+ * likely).
+ * @param {string} identifier - Serial number of the bridge or id of a Gladys device.
+ * @returns {string} Unique id, 32 hexadecimal characters.
  * @example
  * uniqueIdOf('a1b2c3');
  */
-function uniqueIdOf(serialNumber) {
+function uniqueIdOf(identifier) {
   return crypto
     .createHash('sha256')
-    .update(`gladys-matter-bridge:${serialNumber}`)
+    .update(`gladys-matter-bridge:${identifier}`)
     .digest('hex')
     .slice(0, 32);
 }
