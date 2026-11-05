@@ -1029,9 +1029,10 @@ const DEVICE_FEATURE_CATEGORIES = {
   FAN: 'fan',
   // Volumetric flow rate of a fluid measured by a standalone sensor: a pipe flow meter, a pump, or
   // a river hydrometry station (Hub'Eau, Vigicrues...). Mirrors the Matter Flow Sensor device type
-  // (Flow Measurement cluster 0x0404) and the Zigbee Flow Measurement cluster. The flow reported by
-  // an irrigation valve about itself stays in `water-valve` / `flow`. The volume that went through
-  // (an index) is not a flow: it goes to `volume-sensor`.
+  // (Flow Measurement cluster 0x0404) and the Zigbee Flow Measurement cluster. `water-valve` / `flow`
+  // pre-dates it and holds the same quantity: a known legacy exception
+  // (docs/specs/device-feature-categories.md), kept for existing devices, never a precedent for a new
+  // mapping. The volume that went through (an index) is not a flow: it goes to `volume-sensor`.
   FLOW_SENSOR: 'flow-sensor',
   // Carbon content of the electricity DELIVERED BY THE GRID of a zone, as published by a grid data
   // provider (national TSO, Electricity Maps, WattTime...) or broadcast in the premises by a device
@@ -2124,7 +2125,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: [],
-    [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
+    ],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_DURATION]: [DEVICE_FEATURE_UNITS.SECONDS],

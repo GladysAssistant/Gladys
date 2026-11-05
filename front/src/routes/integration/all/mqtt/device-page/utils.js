@@ -706,6 +706,16 @@ export const getFeatureDefaultValues = (category, type) => {
     return { ...defaults, min: 0, max: 0, read_only: false, keep_history: false };
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR) {
+    // A pipe flow meter reports a few m³/h, a large river several thousand m³/s
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR) {
+    // Water meter indexes in liters grow for years: 10 000 m³ is 10 000 000 L
+    return applyDefaultUnit({ ...defaults, min: 0, max: 10000000 }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
   }
