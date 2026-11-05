@@ -23,6 +23,14 @@ describe('Matter bridge light adapter', () => {
     expect(light.claim([binary, brightness, other])).to.deep.equal([{ binary, brightness }]);
   });
 
+  it('should not claim the read-only features of a light', () => {
+    const readOnlyBinary = feature('ro-binary', 'light', 'binary', { max: 1, read_only: true });
+    const readOnlyBrightness = feature('ro-brightness', 'light', 'brightness', { read_only: true });
+    expect(light.claim([readOnlyBinary, readOnlyBrightness])).to.deep.equal([]);
+    expect(light.claim([readOnlyBinary, binary, brightness])).to.deep.equal([{ binary, brightness }]);
+    expect(light.claim([binary, readOnlyBrightness])).to.deep.equal([{ binary }]);
+  });
+
   it('should build an on/off light', () => {
     const { type, state } = light.build(matter, { binary }, createContext({ 'light-binary': 1 }));
     expect(type.name).to.equal('OnOffLightDevice');

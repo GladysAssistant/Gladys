@@ -1,5 +1,5 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
-const { isFeature } = require('./helpers');
+const { isFeature, isWritable } = require('./helpers');
 
 // A plug, a relay or one gang of a wall switch: each Gladys switch is its own Matter plug-in unit.
 // Read-only switches report a state they cannot be told to change, so they are not offered as
@@ -11,7 +11,7 @@ const plug = {
       .filter(
         (feature) =>
           isFeature(feature, DEVICE_FEATURE_CATEGORIES.SWITCH, [DEVICE_FEATURE_TYPES.SWITCH.BINARY]) &&
-          !feature.read_only,
+          isWritable(feature),
       )
       .map((feature) => ({ binary: feature }));
   },

@@ -12,7 +12,7 @@ const {
   MIREDS_MAX,
 } = require('../converters');
 const { COLOR_MODE } = require('../constants');
-const { isFeature, zipRoles } = require('./helpers');
+const { isFeature, isWritable, zipRoles } = require('./helpers');
 
 const { LIGHT } = DEVICE_FEATURE_TYPES;
 
@@ -20,7 +20,9 @@ const { LIGHT } = DEVICE_FEATURE_TYPES;
 const REMAINING_TIME = { attributes: { remainingTime: true } };
 
 /**
- * @description Pick the Gladys light features of a role.
+ * @description Pick the writable Gladys light features of a role. Matter apps set every attribute
+ * of a light, so a read-only feature (a light reporting its state apart from the one it is told
+ * to switch) is left out, and the writable one of the pair is used.
  * @param {Array} features - Unclaimed features of the device.
  * @param {string} type - Gladys light feature type.
  * @returns {Array} The matching features.
@@ -28,7 +30,9 @@ const REMAINING_TIME = { attributes: { remainingTime: true } };
  * lightFeatures(features, 'brightness');
  */
 function lightFeatures(features, type) {
-  return features.filter((feature) => isFeature(feature, DEVICE_FEATURE_CATEGORIES.LIGHT, [type]));
+  return features.filter(
+    (feature) => isFeature(feature, DEVICE_FEATURE_CATEGORIES.LIGHT, [type]) && isWritable(feature),
+  );
 }
 
 /**

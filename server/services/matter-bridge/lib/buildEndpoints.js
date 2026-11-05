@@ -1,4 +1,5 @@
 const { MAX_LABEL_LENGTH } = require('./constants');
+const { uniqueIdOf } = require('./config');
 const { mergeState } = require('./adapters/helpers');
 const { BATTERY_ADAPTER } = require('./adapters');
 
@@ -78,7 +79,9 @@ function buildEndpoints(matter, device, plan, ctx, number) {
       nodeLabel: truncate(device.name),
       productName: truncate(device.model || 'Gladys'),
       vendorName: 'Gladys',
-      uniqueId: truncate(device.id),
+      // Ecosystems know a bridged device by this id: it must stay unique, and a Gladys device id
+      // (a 36 characters UUID) does not fit the 32 characters Matter allows, so it is hashed.
+      uniqueId: uniqueIdOf(device.id),
       reachable: true,
     },
   });

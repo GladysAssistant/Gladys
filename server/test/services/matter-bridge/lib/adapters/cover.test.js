@@ -24,6 +24,13 @@ describe('Matter bridge cover adapter', () => {
     ]);
   });
 
+  it('should not claim the read-only features of a cover', () => {
+    const readOnlyPosition = feature('ro-position', 'shutter', 'position', { read_only: true });
+    const readOnlyState = feature('ro-state', 'shutter', 'state', { read_only: true });
+    expect(cover.claim([readOnlyPosition, readOnlyState])).to.deep.equal([]);
+    expect(cover.claim([readOnlyPosition, state])).to.deep.equal([{ state }]);
+  });
+
   it('should build a shutter with a position', () => {
     const ctx = createContext({ 'shutter-position': 75 });
     const built = cover.build(matter, { position, state }, ctx);
