@@ -87,6 +87,9 @@ function validateSetup(config) {
   if (adapterMode === ADAPTER_MODE.USB) {
     // Without a model, Zigbee2mqtt would be configured with the zstack adapter, whatever the dongle is
     const dongleName = config[CONFIGURATION.ZIGBEE_DONGLE_NAME];
+    if (dongleName === undefined || dongleName === null) {
+      throw new BadParameters('Zigbee2mqtt: USB dongle model is required');
+    }
     if (!ADAPTERS.some((adapter) => adapter.label === dongleName)) {
       throw new BadParameters(`Zigbee2mqtt: USB dongle model "${dongleName}" is unknown`);
     }
