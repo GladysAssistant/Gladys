@@ -213,7 +213,15 @@ class ThermostatBox extends Component {
   // set to 8-25 (spec F).
   getDialRange = () => {
     const cfg = this.getConfig();
-    const { featureMin, featureMax } = this.state;
+    // An inverted advertised range is no range either. On a virtual thermostat
+    // the form copies its bounds onto the feature's own min/max, so a 25-8 typed
+    // there comes back here as well and would undo the guard below.
+    const advertisedOrdered =
+      this.state.featureMin === null ||
+      this.state.featureMax === null ||
+      this.state.featureMin <= this.state.featureMax;
+    const featureMin = advertisedOrdered ? this.state.featureMin : null;
+    const featureMax = advertisedOrdered ? this.state.featureMax : null;
     const configured = (value, fallback) => {
       const parsed = value === undefined || value === null ? NaN : Number(value);
       return this.toSetpointFeatureUnit(Number.isFinite(parsed) ? parsed : fallback);
@@ -1418,12 +1426,14 @@ class ThermostatBox extends Component {
 
   increment = () => {
     const step = 0.5;
-    this.stepSetpoint(Math.min(this.getMaxTemp(), this.state.setpoint + step));
+    // Bounded both ways: a setpoint the programme left outside the range
+    // (5 °C under 10-25) would otherwise step to 5.5 rather than into the range.
+    this.stepSetpoint(Math.min(this.getMaxTemp(), Math.max(this.getMinTemp(), this.state.setpoint + step)));
   };
 
   decrement = () => {
     const step = 0.5;
-    this.stepSetpoint(Math.max(this.getMinTemp(), this.state.setpoint - step));
+    this.stepSetpoint(Math.max(this.getMinTemp(), Math.min(this.getMaxTemp(), this.state.setpoint - step)));
   };
 
   // A tap on + or −. On a stopped thermostat it also starts it again, on the
