@@ -10,8 +10,10 @@ const { STARTUP_TIMEOUT_MS } = require('./constants');
  * container exist, start the container (status LOADING) and arm the startup
  * timeout — a started container is not a working integration, RUNNING only
  * comes with the first successful WS auth or HTTP heartbeat; neither within
- * 60s means DEGRADED. Also called through the proxy service by the standard
- * service lifecycle (service.startAll at boot).
+ * 60s means DEGRADED. A container (re)created here gets its image pulled
+ * first when it is missing on the machine (backup restored on a new
+ * machine). Also called through the proxy service by the standard service
+ * lifecycle (service.startAll at boot).
  * @param {string} selector - The selector of the external integration.
  * @param {object} [options] - Options.
  * @param {boolean} [options.resetFailureCount] - False for supervised
@@ -66,6 +68,10 @@ async function start(selector, { resetFailureCount = true } = {}) {
   }
   if (!started) {
     try {
+      // the row can outlive the image: a backup restored on another machine
+      // (migration to a new mini-PC) brings the integration back without its
+      // container nor its image — pull what is missing before the creation
+      await this.ensureImagePresent(service.docker_image);
       try {
         const container = await this.createIntegrationContainer(service);
         await this.system.restartContainer(container.id);
