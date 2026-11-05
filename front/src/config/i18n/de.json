@@ -1987,7 +1987,7 @@
             "usbDongleNameLabel": "Wählen Sie das Modell des verwendeten Zigbee-Dongles",
             "usbDongleNamePlaceholder": "Modell des Zigbee-Dongles",
             "usbDongleNameDetected": "Modell anhand des an diesem Port eingesteckten Dongles erkannt.",
-            "usbDongleNameNotDetected": "Gladys hat den an diesem Port eingesteckten Dongle nicht erkannt: Wählen Sie sein Modell aus der Liste.",
+            "usbDongleNameNotDetected": "Kein Dongle an diesem Port erkannt: Wählen Sie sein Modell aus der Liste.",
             "usbDongleNameMismatch": "Der an diesem Port eingesteckte Dongle wurde als {{model}} erkannt: Überprüfen Sie das ausgewählte Modell.",
             "networkAdapterUrlLabel": "Geben Sie die Adresse des Netzwerk-Koordinators ein",
             "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",

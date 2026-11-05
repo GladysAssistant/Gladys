@@ -1796,7 +1796,7 @@
             "usbDongleNameLabel": "Seleccione el modelo del adaptador Zigbee utilizado",
             "usbDongleNamePlaceholder": "Modelo del adaptador Zigbee",
             "usbDongleNameDetected": "Modelo reconocido a partir del adaptador conectado a este puerto.",
-            "usbDongleNameNotDetected": "Gladys no ha reconocido el adaptador conectado a este puerto: seleccione su modelo en la lista.",
+            "usbDongleNameNotDetected": "No se ha reconocido ningún adaptador en este puerto: seleccione su modelo en la lista.",
             "usbDongleNameMismatch": "El adaptador conectado a este puerto se ha reconocido como {{model}}: compruebe el modelo seleccionado.",
             "networkAdapterUrlLabel": "Introduzca la dirección del coordinador de red",
             "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
