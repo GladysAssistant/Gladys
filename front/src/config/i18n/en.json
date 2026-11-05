@@ -2093,8 +2093,8 @@
       "saveMDNSError": "An error occurred while saving the mDNS advertiser."
     },
     "matter-bridge": {
-      "title": "Gladys → Matter",
-      "description": "Expose your Gladys devices over Matter to Apple Home, Google Home, Alexa, SmartThings or Home Assistant. Not to be confused with Matterbridge, which brings the devices of a Matterbridge server into Gladys.",
+      "title": "Matter Bridge",
+      "description": "Expose your Gladys devices over Matter to Apple Home, Google Home, Alexa, SmartThings or Home Assistant.",
       "introduction": "Gladys acts as a <b>Matter bridge</b>: once paired, your Gladys devices appear in the Matter app of your choice (Apple Home, Google Home, Amazon Alexa, SmartThings, Home Assistant...), whatever protocol they use. Matter needs IPv6 on your local network.",
       "getError": "An error occurred while getting the Matter bridge settings.",
       "settingsTitle": "Matter bridge",

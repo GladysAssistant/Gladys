@@ -2417,8 +2417,8 @@
       "saveMDNSError": "Une erreur est survenue lors de l'enregistrement de l'annonceur mDNS."
     },
     "matter-bridge": {
-      "title": "Gladys → Matter",
-      "description": "Exposez vos appareils Gladys en Matter à Apple Maison, Google Home, Alexa, SmartThings ou Home Assistant. À ne pas confondre avec Matterbridge, qui intègre dans Gladys les appareils d'un serveur Matterbridge.",
+      "title": "Bridge Matter",
+      "description": "Exposez vos appareils Gladys en Matter à Apple Maison, Google Home, Alexa, SmartThings ou Home Assistant.",
       "introduction": "Gladys agit comme un <b>bridge Matter</b> : une fois appairé, vos appareils Gladys apparaissent dans l'application Matter de votre choix (Apple Maison, Google Home, Amazon Alexa, SmartThings, Home Assistant...), quel que soit leur protocole. Matter a besoin de l'IPv6 sur votre réseau local.",
       "getError": "Une erreur est survenue lors de la récupération des paramètres du bridge Matter.",
       "settingsTitle": "Bridge Matter",
