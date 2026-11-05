@@ -430,6 +430,8 @@ describe('externalIntegration.update', () => {
     const { externalIntegration } = buildSupervisor({
       system: {
         pull: fake.rejects(new Error('no matching manifest')),
+        // nothing local to fall back on
+        imageExists: fake.resolves(false),
       },
     });
     try {
@@ -527,7 +529,9 @@ describe('externalIntegration.update', () => {
     const pullStub = sinon.stub();
     pullStub.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('NO_MATCHING_MANIFEST'));
     pullStub.resolves(true);
-    const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
+    const { externalIntegration } = buildSupervisor({
+      system: { pull: pullStub, imageExists: fake.resolves(false) },
+    });
     try {
       await externalIntegration.update(service.selector);
       throw new Error('should have thrown');

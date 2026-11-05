@@ -265,49 +265,57 @@ describe('externalIntegration.start', () => {
   });
 
   // migration to a new machine through a Gladys Plus backup: the t_service
-  // row is back, neither the container nor the image are on the new machine
-  it('should pull the missing image before recreating the container (backup restored on a new machine)', async () => {
-    const service = await seedExternalService({ container_id: null });
+  // row is back, neither the containers nor the images are on the new machine
+  it('should pull the missing images in the background and stay LOADING (backup restored on a new machine)', async () => {
+    const service = await seedExternalService({ container_id: null, manifest: TEST_CONTAINERS_MANIFEST });
     const { externalIntegration, system } = buildSupervisor({
       system: { imageExists: fake.resolves(false) },
     });
+    externalIntegration.pullMissingImages = fake.resolves(null);
     const integration = await externalIntegration.start(service.selector);
     expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
-    sinonAssert.calledWith(system.imageExists, 'ghcr.io/john/gladys-open-meteo-demo:1.2.0');
-    sinonAssert.calledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:1.2.0');
-    sinonAssert.callOrder(system.pull, system.createContainer);
-    expect(integration.container_id).to.equal('container-1');
-    externalIntegration.clearTimers(service.id);
+    // every image of the integration, the manual sub-container included
+    sinonAssert.calledOnce(externalIntegration.pullMissingImages);
+    expect(externalIntegration.pullMissingImages.firstCall.args[1]).to.deep.equal([
+      'ghcr.io/john/gladys-open-meteo-demo:1.2.0',
+      'eclipse-mosquitto:2.0.18',
+      'ghcr.io/blakeblackshear/frigate:0.14.1',
+    ]);
+    // nothing is created before the pull ends, and no startup timeout runs
+    // meanwhile: the start that follows the pull arms it
+    sinonAssert.notCalled(system.pull);
+    sinonAssert.notCalled(system.createContainer);
+    expect(externalIntegration.startupTimers.has(service.id)).to.equal(false);
   });
 
-  it('should not pull an image already present when recreating the container', async () => {
+  it('should not pull anything when the images are present', async () => {
     const service = await seedExternalService({ container_id: null });
-    const { externalIntegration, system } = buildSupervisor({
-      system: { imageExists: fake.resolves(true) },
-    });
+    const { externalIntegration, system } = buildSupervisor();
+    externalIntegration.pullMissingImages = fake.resolves(null);
     await externalIntegration.start(service.selector);
-    sinonAssert.notCalled(system.pull);
+    sinonAssert.notCalled(externalIntegration.pullMissingImages);
     sinonAssert.calledOnce(system.createContainer);
     externalIntegration.clearTimers(service.id);
   });
 
-  it('should set ERROR with an explicit message when the missing image cannot be pulled', async () => {
-    const service = await seedExternalService({ container_id: null });
-    const { externalIntegration, system } = buildSupervisor({
-      system: {
-        imageExists: fake.resolves(false),
-        pull: fake.rejects(new Error('no matching manifest for linux/arm64')),
-      },
-    });
-    try {
-      await externalIntegration.start(service.selector);
-      throw new Error('should have thrown');
-    } catch (e) {
-      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
-    }
+  it('should do nothing while the images are being pulled', async () => {
+    const service = await seedExternalService({ container_id: null, status: SERVICE_STATUS.LOADING });
+    const { externalIntegration, system } = buildSupervisor();
+    externalIntegration.imagePulls.set(service.id, new AbortController());
+    const integration = await externalIntegration.start(service.selector);
+    expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
     sinonAssert.notCalled(system.createContainer);
-    const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
-    expect(serviceInDb.status).to.equal(SERVICE_STATUS.ERROR);
+    sinonAssert.notCalled(system.restartContainer);
+  });
+
+  it('should survive a failing background pull job', async () => {
+    const service = await seedExternalService({ container_id: null });
+    const { externalIntegration } = buildSupervisor({
+      system: { imageExists: fake.resolves(false) },
+    });
+    externalIntegration.pullMissingImages = fake.rejects(new Error('CANNOT_SAVE'));
+    const integration = await externalIntegration.start(service.selector);
+    expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
   });
 
   it('should set ERROR when the container cannot be started at all', async () => {

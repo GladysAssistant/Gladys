@@ -21,8 +21,10 @@ async function startSubContainer(service, entry, { env } = {}) {
   const envChanged = env !== undefined && JSON.stringify(storedEnv) !== JSON.stringify(env);
   let container = await this.findSubContainer(service, entry.name);
   if (!container || envChanged) {
-    // the image can be missing on this machine (backup restored on a new
-    // one): pull it before the creation, like the main container
+    // safety net: every image is pulled at install, update and (restore
+    // case) by the boot start — an image still missing here (deleted by
+    // hand, failed boot pull) is pulled before the creation, synchronously:
+    // the caller (API start, supervised restart) waits for it
     await this.ensureImagePresent(entry.docker_image);
     container = await this.createSubContainer(service, entry, { env: effectiveEnv });
   }
