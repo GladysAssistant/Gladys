@@ -10,6 +10,7 @@ import EnableStatus from './status/EnableStatus';
 import RunningStatus from './status/RunningStatus';
 import MqttExternalCredentials from './local/MqttExternalCredentials';
 import ContainerError from '../commons/ContainerError';
+import MqttConnectionError from '../commons/MqttConnectionError';
 
 class SetupTab extends Component {
   showConfirmReset = () => {
@@ -108,14 +109,7 @@ class SetupTab extends Component {
                 {mqttConnectionError && (mqttConnectionError.code || mqttConnectionError.message) && (
                   <li class="list-group-item">
                     <div class="alert alert-danger my-3" data-cy="z2m-mqtt-connection-error">
-                      {mqttConnectionError.code ? (
-                        <Text id={`integration.zigbee2mqtt.setup.mqttConnectionErrors.${mqttConnectionError.code}`} />
-                      ) : (
-                        <span>
-                          <Text id="integration.zigbee2mqtt.setup.mqttConnectionErrors.unknownErrorPrefix" />
-                          <code>{mqttConnectionError.message}</code>
-                        </span>
-                      )}
+                      <MqttConnectionError error={mqttConnectionError} />
                     </div>
                   </li>
                 )}

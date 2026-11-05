@@ -5,6 +5,7 @@ import actions from './actions';
 import { Text } from 'preact-i18n';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import ContainerError from './ContainerError';
+import MqttConnectionError from './MqttConnectionError';
 
 class CheckStatus extends Component {
   componentWillMount() {
@@ -26,18 +27,23 @@ class CheckStatus extends Component {
     );
   }
 
-  render({ gladysConnected, zigbee2mqttConnected, zigbee2mqttExist, z2mContainerError }) {
+  render({ gladysConnected, zigbee2mqttConnected, zigbee2mqttExist, z2mContainerError, mqttConnectionError }) {
     // Same condition as the permit join switch: Zigbee2mqtt is usable only once it reported itself online
     if (gladysConnected && zigbee2mqttConnected) {
       return null;
     }
 
-    // An installed Zigbee2mqtt (its container, or a broker Gladys is connected to in external mode) that does
-    // not answer is not a disabled one: say so, and why when known
-    const installed = zigbee2mqttExist || gladysConnected;
-    const messageKey = installed
-      ? 'integration.zigbee2mqtt.status.notRunning'
-      : 'integration.zigbee2mqtt.status.notEnabled';
+    const mqttError =
+      mqttConnectionError && (mqttConnectionError.code || mqttConnectionError.message) ? mqttConnectionError : null;
+    // An installed Zigbee2mqtt that does not answer is not a disabled one: say so, and why when known
+    let messageKey = 'integration.zigbee2mqtt.status.notEnabled';
+    if (gladysConnected) {
+      // Gladys hears the broker (with or without container, in external mode), but Zigbee2mqtt does not answer
+      messageKey = 'integration.zigbee2mqtt.status.notRunning';
+    } else if (zigbee2mqttExist || mqttError) {
+      // Gladys does not reach the broker: Zigbee2mqtt may run fine, the broker is the one to look at
+      messageKey = 'integration.zigbee2mqtt.status.mqttNotConnected';
+    }
 
     return (
       <div class="alert alert-warning" data-cy="z2m-status-alert">
@@ -45,6 +51,11 @@ class CheckStatus extends Component {
         <Link href="/dashboard/integration/device/zigbee2mqtt/setup">
           <Text id="integration.zigbee2mqtt.status.setupPageLink" />
         </Link>
+        {mqttError && (
+          <div class="mt-2" data-cy="z2m-status-alert-mqtt-error">
+            <MqttConnectionError error={mqttError} />
+          </div>
+        )}
         {z2mContainerError && (
           <div class="mt-2" data-cy="z2m-status-alert-error">
             <ContainerError error={z2mContainerError} />
@@ -56,6 +67,6 @@ class CheckStatus extends Component {
 }
 
 export default connect(
-  'session,gladysConnected,zigbee2mqttConnected,zigbee2mqttExist,z2mContainerError',
+  'session,gladysConnected,zigbee2mqttConnected,zigbee2mqttExist,z2mContainerError,mqttConnectionError',
   actions
 )(CheckStatus);

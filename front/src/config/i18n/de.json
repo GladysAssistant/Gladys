@@ -1966,6 +1966,7 @@
         "notConfigured": "Es ist kein Zigbee2MQTT-USB-Dongle konfiguriert. Bitte gehe zu den ",
         "notEnabled": "Zigbee2MQTT ist nicht aktiviert. Bitte gehe zur ",
         "notRunning": "Zigbee2MQTT antwortet nicht: Zigbee-Geräte können weder gekoppelt noch gesteuert werden. Mehr dazu auf der ",
+        "mqttNotConnected": "Gladys ist nicht mit dem MQTT-Broker verbunden: Zigbee-Geräte können weder gekoppelt noch gesteuert werden. Mehr dazu auf der ",
         "settingsPageLink": "USB-Dongle-Einstellungen.",
         "setupPageLink": "Einrichtungseite."
       },

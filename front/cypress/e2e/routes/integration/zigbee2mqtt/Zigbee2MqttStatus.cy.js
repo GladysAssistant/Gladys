@@ -66,6 +66,42 @@ describe('Zigbee2mqtt status', () => {
     cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.notRunning');
   });
 
+  it('should blame the broker, not Zigbee2mqtt, when Gladys is not connected to it', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    // The Gladys-managed broker is stopped or restarting: a network error is not reported as an MQTT error
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      { body: { ...notOnlineStatus, gladysConnected: false } }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.mqttNotConnected');
+    cy.get('[data-cy=z2m-status-alert-mqtt-error]').should('not.exist');
+  });
+
+  it('should show why Gladys cannot connect to an external broker', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      {
+        body: {
+          ...notOnlineStatus,
+          gladysConnected: false,
+          mqttExist: false,
+          zigbee2mqttExist: false,
+          mqttConnectionError: { code: 'BAD_CREDENTIALS', message: null }
+        }
+      }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    // Not "Zigbee2mqtt is not activated": the user configured an external broker that refuses Gladys
+    cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.mqttNotConnected');
+    cy.get('[data-cy=z2m-status-alert-mqtt-error]').i18n(
+      'integration.zigbee2mqtt.setup.mqttConnectionErrors.BAD_CREDENTIALS'
+    );
+  });
+
   it('should show Zigbee2mqtt as starting on the setup page, until it is online', () => {
     const serverUrl = Cypress.env('serverUrl');
     // Gladys has just (re)started the Zigbee2mqtt container

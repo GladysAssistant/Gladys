@@ -1775,6 +1775,7 @@
         "notConfigured": "El adaptador USB de Zigbee2mqtt no está configurado; vaya a ",
         "notEnabled": "Zigbee2mqtt no está activado; vaya a ",
         "notRunning": "Zigbee2mqtt no responde: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
+        "mqttNotConnected": "Gladys no está conectada al broker MQTT: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "settingsPageLink": "la página de configuración del adaptador USB",
         "setupPageLink": "la página de configuración de Zigbee2mqtt"
       },

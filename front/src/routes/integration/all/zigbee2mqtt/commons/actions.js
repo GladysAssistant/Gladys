@@ -6,7 +6,8 @@ const toStoreState = zigbee2mqttStatus => ({
   gladysConnected: zigbee2mqttStatus.gladysConnected,
   zigbee2mqttConnected: zigbee2mqttStatus.zigbee2mqttConnected,
   zigbee2mqttExist: zigbee2mqttStatus.zigbee2mqttExist,
-  z2mContainerError: zigbee2mqttStatus.z2mContainerError
+  z2mContainerError: zigbee2mqttStatus.z2mContainerError,
+  mqttConnectionError: zigbee2mqttStatus.mqttConnectionError
 });
 
 // Incremented by each status request and each live status: an HTTP answer is kept only if nothing newer happened
