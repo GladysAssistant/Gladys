@@ -4,6 +4,7 @@ const {
   DEFAULT_MANUAL_DURATION_MINUTES,
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
+  THERMOSTAT_TYPES,
 } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const {
@@ -13,6 +14,7 @@ const {
   unitFeature,
   getSetpointForPreset,
   convertSetpointToFeatureUnit,
+  clamp,
   DEFAULT_TIMEZONE,
 } = require('./thermostat.applySchedules');
 const {
@@ -164,33 +166,36 @@ async function holdExpiry(device) {
 }
 
 /**
- * @description Bound a setpoint set by hand on a virtual thermostat to its range.
+ * @description The range a setpoint set by hand on a virtual thermostat is
+ * bounded to, or null when this service does not bound it.
  *
  * Only a virtual thermostat's own `target-temperature` comes through here: the
  * core routes a write on the service owning the feature, so on an external
  * thermostat a scene, the API, HomeKit and the widget's dial all write the real
  * device's feature (Matter, Netatmo...) and never reach this service. There the
- * dial is bounded by the widget (F). On a virtual thermostat nothing else
- * bounds a scene or the API: `saveState` stores whatever it is handed.
- * A thermostat with no params gets the shared default range, as the widget does.
+ * dial is bounded by the widget (F). A `pilot-wire` thermostat is left alone
+ * too: it takes no range, and a setpoint from a scene picks the nearest preset
+ * (C.1.1) — bounded, 7 °C would become Comfort rather than Frost.
+ *
+ * Missing params get the shared default range, as in the widget. So does an
+ * inverted range, which the edit form and createDevice refuse but an older
+ * device may still carry: the widget does the same, so the dial and a scene
+ * agree.
  * @param {object} config - The thermostat's params config.
- * @param {number} value - The setpoint asked for.
- * @returns {number} The setpoint within the range.
+ * @returns {{min: number, max: number}|null} The range, or null.
  * @example
- * clampToRange(config, 166); // 25 on a thermostat set to 8-25
+ * manualRange(config); // { min: 8, max: 25 }
  */
-function clampToRange(config, value) {
-  if (isExternal(config)) {
-    return value;
+function manualRange(config) {
+  if (isExternal(config) || config.thermostat_type === THERMOSTAT_TYPES.PILOT_WIRE) {
+    return null;
   }
   const min = toNumber(config.temp_min, DEFAULT_MIN_TEMP);
   const max = toNumber(config.temp_max, DEFAULT_MAX_TEMP);
-  // An inverted range is a form mistake, not a bound: honouring it would pin
-  // every setpoint to one end.
   if (min > max) {
-    return value;
+    return { min: DEFAULT_MIN_TEMP, max: DEFAULT_MAX_TEMP };
   }
-  return Math.min(max, Math.max(min, value));
+  return { min, max };
 }
 
 /**
@@ -283,9 +288,12 @@ async function setValue(device, deviceFeature, value, manual = true) {
   }
 
   // A setpoint set by hand on a virtual thermostat stays within its range; a
-  // scheduled one is written as the programme says (E.3).
-  const setpoint = manual ? clampToRange(buildParamsConfig(device) || {}, Number(value)) : value;
-  if (manual && setpoint !== Number(value)) {
+  // scheduled one is written as the programme says (E.3). A value that is no
+  // number is passed through untouched: saveState refuses it, as it always did.
+  const asked = Number(value);
+  const range = manual && Number.isFinite(asked) ? manualRange(buildParamsConfig(device) || {}) : null;
+  const setpoint = range ? clamp(asked, range.min, range.max) : value;
+  if (range && setpoint !== asked) {
     logger.info(`Thermostat: setpoint ${value} outside the range of ${device.selector}, clamped to ${setpoint}`);
   }
 
@@ -310,4 +318,4 @@ async function setValue(device, deviceFeature, value, manual = true) {
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint, clampToRange };
+module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint, manualRange };

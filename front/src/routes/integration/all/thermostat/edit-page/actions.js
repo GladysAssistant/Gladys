@@ -470,6 +470,13 @@ function createActions(store) {
           storedStandbyOrder,
           pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
         );
+        // An inverted range bounds nothing anyone could mean: refused here, and
+        // by the server for a client writing the params directly (spec D.0). A
+        // heater regulating itself takes no range, and its fields are hidden.
+        if (!isPilotWireThermostat && minTemp > maxTemp) {
+          store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'invertedRange' });
+          return;
+        }
 
         const device = {
           name,
@@ -495,7 +502,9 @@ function createActions(store) {
                   type: 'target-temperature',
                   read_only: false,
                   keep_history: true,
-                  has_feedback: false,
+                  // Saved by the thermostat service itself, clamped to the range:
+                  // without feedback the core saved the requested value after it.
+                  has_feedback: true,
                   min: minTemp,
                   max: maxTemp,
                   unit: tempUnit === 'F' ? 'fahrenheit' : 'celsius'
