@@ -38,7 +38,7 @@
   },
   {
     "key": "matter-bridge",
-    "img": "/assets/integrations/cover/matter.jpg",
+    "img": "/assets/integrations/cover/matter-bridge.jpg",
     "whiteBackground": true,
     "local": true,
     "categories": ["assistants"]
