@@ -44,6 +44,9 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       this.mqttExist = true;
       this.mqttConnectionError = null;
       this.emitStatusEvent();
+      // A Zigbee2mqtt already running does not always announce itself on subscription (retain disabled, or a
+      // broker restarted without persistence): ask it right away instead of waiting for a bridge/state
+      this.requestHealthCheck();
     });
 
     this.mqttClient.on('error', (err) => {

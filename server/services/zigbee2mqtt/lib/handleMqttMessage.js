@@ -2,29 +2,6 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertFeature } = require('../utils/convertFeature');
 
-// Zigbee2mqtt announces itself online before it listens to its requests: a health check sent right away
-// can be lost, so it is sent again until Zigbee2mqtt answers
-const HEALTH_CHECK_INTERVAL_IN_MS = 3000;
-
-/**
- * @description Ask Zigbee2mqtt to prove that it runs, every 3 seconds until it answers, as long as Gladys is
- * connected to the broker.
- * @param {object} manager - The Zigbee2mqtt manager.
- * @example
- * requestHealthCheck(this);
- */
-function requestHealthCheck(manager) {
-  clearTimeout(manager.healthCheckTimer);
-  manager.healthCheckTimer = null;
-  // Without the broker, the MQTT client would queue the requests and send them all at once on reconnection.
-  // On reconnection, the retained bridge/state starts asking again.
-  if (!manager.mqttClient || !manager.gladysConnected) {
-    return;
-  }
-  manager.mqttClient.publish('zigbee2mqtt/bridge/request/health_check', '{}');
-  manager.healthCheckTimer = setTimeout(() => requestHealthCheck(manager), HEALTH_CHECK_INTERVAL_IN_MS);
-}
-
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
@@ -45,7 +22,7 @@ async function handleMqttMessage(topic, message) {
       this.zigbee2mqttConnected = false;
       this.zigbee2mqttRunning = false;
       this.emitStatusEvent();
-      requestHealthCheck(this);
+      this.requestHealthCheck();
       break;
     }
     case 'zigbee2mqtt/bridge/response/health_check': {
