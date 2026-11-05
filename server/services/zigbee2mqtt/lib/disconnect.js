@@ -42,6 +42,8 @@ async function disconnect() {
   }
   this.gladysConnected = false;
   this.mqttConnectionError = null;
+  clearTimeout(this.healthCheckTimer);
+  this.healthCheckTimer = null;
   this.emitStatusEvent();
 
   // Stop & remove MQTT container
@@ -57,6 +59,7 @@ async function disconnect() {
   this.zigbee2mqttRunning = false;
   this.zigbee2mqttConnected = false;
   clearTimeout(this.startingTimer);
+  this.startingTimer = null;
   this.zigbee2mqttStarting = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;

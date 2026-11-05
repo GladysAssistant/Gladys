@@ -485,6 +485,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
+    expect(zigbee2mqttManager.startingTimer).to.equal(null);
   });
 
   it('it should fail to install z2m container', async () => {

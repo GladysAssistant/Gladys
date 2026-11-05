@@ -133,6 +133,8 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.coordinatorFirmware).to.equal(null);
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
     expect(zigbee2MqttManager.mqttConnectionError).to.equal(null);
+    expect(zigbee2MqttManager.startingTimer).to.equal(null);
+    expect(zigbee2MqttManager.healthCheckTimer).to.equal(null);
 
     // Host environment properties should be preserved
     expect(zigbee2MqttManager.dockerBased).to.equal(true);

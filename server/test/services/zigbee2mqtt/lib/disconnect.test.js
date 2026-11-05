@@ -157,8 +157,10 @@ describe('zigbee2mqtt disconnect', () => {
     // PREPARE
     const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const startingTimeout = fake();
+    const healthCheckRetry = fake();
     zigbee2MqttManager.zigbee2mqttStarting = true;
     zigbee2MqttManager.startingTimer = setTimeout(startingTimeout, 1000);
+    zigbee2MqttManager.healthCheckTimer = setTimeout(healthCheckRetry, 1000);
     zigbee2MqttManager.mqttExist = true;
     zigbee2MqttManager.zigbee2mqttExist = true;
     try {
@@ -170,6 +172,9 @@ describe('zigbee2mqtt disconnect', () => {
     }
     // ASSERT
     assert.notCalled(startingTimeout);
+    assert.notCalled(healthCheckRetry);
+    expect(zigbee2MqttManager.startingTimer).to.equal(null);
+    expect(zigbee2MqttManager.healthCheckTimer).to.equal(null);
     expect(zigbee2MqttManager.zigbee2mqttStarting).to.equal(false);
     // Disabled, not "not responding": the banner of the discover page says that Zigbee2mqtt is not activated
     expect(zigbee2MqttManager.mqttExist).to.equal(false);

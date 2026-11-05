@@ -92,11 +92,13 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('should end a pending startup', async () => {
+  it('should end a pending startup and stop asking Zigbee2mqtt whether it runs', async () => {
     // PREPARE
     const startingTimeout = fake();
+    const healthCheckRetry = fake();
     zigbee2mqttManager.zigbee2mqttStarting = true;
     zigbee2mqttManager.startingTimer = setTimeout(startingTimeout, 1000);
+    zigbee2mqttManager.healthCheckTimer = setTimeout(healthCheckRetry, 1000);
     gladys.system.isDocker = fake.resolves(false);
     zigbee2mqttManager.getConfiguration = fake.resolves({ mqttMode: 'local' });
     // EXECUTE
@@ -104,6 +106,9 @@ describe('zigbee2mqtt init', () => {
     clock.tick(1000);
     // ASSERT
     assert.notCalled(startingTimeout);
+    assert.notCalled(healthCheckRetry);
+    expect(zigbee2mqttManager.startingTimer).to.equal(null);
+    expect(zigbee2mqttManager.healthCheckTimer).to.equal(null);
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
   });
 

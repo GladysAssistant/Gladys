@@ -187,6 +187,7 @@ async function installZ2mContainer(config, setupMode = false) {
     logger.error('Zigbee2mqtt container failed to start:', e);
     this.zigbee2mqttRunning = false;
     clearTimeout(this.startingTimer);
+    this.startingTimer = null;
     this.zigbee2mqttStarting = false;
     throw e;
   } finally {
