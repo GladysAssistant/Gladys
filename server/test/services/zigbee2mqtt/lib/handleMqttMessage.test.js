@@ -647,4 +647,27 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       }),
     });
   });
+
+  it('should warn that a Zigbee2mqtt older than 1.21 does not answer the health check', async () => {
+    // PREPARE
+    const warnStub = sinon.stub(logger, 'warn');
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify({ version: '1.20.0' }));
+    // ASSERT
+    assert.calledOnceWithExactly(
+      warnStub,
+      'Zigbee2mqtt 1.20.0 does not answer the health check, Gladys needs Zigbee2mqtt 1.21 or later',
+    );
+  });
+
+  ['1.21.0', '2.14.2', '2.1.0-dev', undefined].forEach((version) => {
+    it(`should not warn about the version of Zigbee2mqtt ${version}`, async () => {
+      // PREPARE
+      const warnStub = sinon.stub(logger, 'warn');
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify({ version }));
+      // ASSERT
+      assert.notCalled(warnStub);
+    });
+  });
 });

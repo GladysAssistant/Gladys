@@ -2,6 +2,10 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertFeature } = require('../utils/convertFeature');
 
+// Zigbee2mqtt answers bridge/request/health_check since 1.21
+const HEALTH_CHECK_MIN_MAJOR = 1;
+const HEALTH_CHECK_MIN_MINOR = 21;
+
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
@@ -110,7 +114,14 @@ async function handleMqttMessage(topic, message) {
     }
     case 'zigbee2mqtt/bridge/info': {
       const info = JSON.parse(message);
-      const { coordinator } = info;
+      const { coordinator, version } = info;
+      const [major, minor] = `${version}`.split('.').map((part) => parseInt(part, 10));
+      if (major < HEALTH_CHECK_MIN_MAJOR || (major === HEALTH_CHECK_MIN_MAJOR && minor < HEALTH_CHECK_MIN_MINOR)) {
+        // Gladys shows Zigbee2mqtt running only once it answers the health check: say why it never will
+        logger.warn(
+          `Zigbee2mqtt ${version} does not answer the health check, Gladys needs Zigbee2mqtt ${HEALTH_CHECK_MIN_MAJOR}.${HEALTH_CHECK_MIN_MINOR} or later`,
+        );
+      }
       if (coordinator && coordinator.meta) {
         this.coordinatorFirmware = {
           ...coordinator.meta,
