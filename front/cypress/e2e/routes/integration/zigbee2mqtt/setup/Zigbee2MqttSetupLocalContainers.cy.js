@@ -316,6 +316,24 @@ describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
     cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
     cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('exist');
 
+    // An unrecognized port does not keep the model of the recognized dongle
+    cy.get('[data-cy=z2m-setup-local-usb-show-all]').click();
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .click();
+    cy.contains('.react-select__option', '/dev/ttyS0').click();
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('not.contain', DETECTED_DONGLE_NAME);
+    cy.get('[data-cy=z2m-setup-local-dongle-not-detected]').should('exist');
+    cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
+
+    // Back to the recognized dongle, its model is selected again
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .click();
+    cy.contains('.react-select__option', '/dev/ttyUSB0').click();
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
+    cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('exist');
+
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {

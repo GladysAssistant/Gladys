@@ -21,9 +21,12 @@ class SetupLocalOptions extends Component {
 
   updateZigbeeDriverPath = option => {
     const z2mDriverPath = get(option, 'value');
-    const adapter = get(option, 'adapter');
-    // The model of the dongle recognized on this port is selected with it
-    this.setState({ z2mDriverPath, ...(adapter ? this.getDongleState(adapter) : {}) });
+    if (z2mDriverPath === this.state.z2mDriverPath) {
+      return;
+    }
+    // The model follows the dongle of the new port: the recognized one, or none to choose, so that the model
+    // of another dongle never stays selected for an unrecognized one
+    this.setState({ z2mDriverPath, ...this.getDongleState(get(option, 'adapter') || null) });
   };
 
   updateZigbeeDongleName = option => {
