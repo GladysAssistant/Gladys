@@ -30,6 +30,7 @@ const {
   MODULE_STOP_PARAM,
 } = require('./thermostat.state');
 const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
+const { programmeKeepsOff } = require('./thermostat.offPoint');
 const { getCurrentPoint } = require('./thermostat.getSchedules');
 
 /**
@@ -506,21 +507,16 @@ async function holdUnitSetpoint(device) {
  * powered the unit off again within the minute (forum 11074). Switching it on by
  * hand is a decision, like turning its dial: it is held, on the setpoint the
  * unit carries, until the programme's next point, exactly as a setpoint changed
- * on the device is. An open window still wins, a hold already armed is left as
- * it is, and so is a preset picked by hand, which the programme does not drive.
+ * on the device is. An open window still wins, and a hold still in force or a
+ * preset picked by hand is left as it is, which the programme does not drive
+ * (programmeKeepsOff: a hold past its end no longer counts).
  * @param {object} device - The thermostat the unit belongs to.
  * @returns {Promise<void>}
  * @example
  * await holdRemoteStartOnOffPoint.call(handler, device);
  */
 async function holdRemoteStartOnOffPoint(device) {
-  const preset = getPreset(device);
-  if (getManualHold(device) || (preset !== null && preset !== 'schedule')) {
-    return;
-  }
-  const schedule = await getScheduleOfDevice(device.id);
-  const point = schedule ? await getCurrentPoint(schedule.id) : null;
-  if (!point || point.preset !== 'off') {
+  if (!(await programmeKeepsOff(device))) {
     return;
   }
   // Found by its params, which always build a config.

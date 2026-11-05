@@ -26,10 +26,12 @@ const clearScheduleStop = fake.resolves(null);
 const clearRemoteStop = fake.resolves(null);
 const clearModuleStop = fake.resolves(null);
 
-// `point`: the point in force on the programme it follows, null for none known.
-const load = (follows = true, point = null) =>
+// `keepsOff`: whether the programme keeps the thermostat off right now, an Off
+// point with nothing taking it off the programme (thermostat.offPoint, tested on
+// its own).
+const load = (follows = true, keepsOff = false) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
-    './thermostat.getSchedules': { getCurrentPoint: fake.resolves(point) },
+    './thermostat.offPoint': { programmeKeepsOff: fake.resolves(keepsOff) },
     './thermostat.scheduleDevice': {
       clearScheduleStop,
       clearRemoteStop,
@@ -547,7 +549,7 @@ describe('thermostat.setValue', () => {
     // Back to the programme on an Off point: the programme keeps the unit off,
     // and powering it on first switched it on, then the pass off again.
     it('should leave a real thermostat started onto an Off point of its programme off', async () => {
-      const { setValue } = load(true, { day_of_week: 0, time: '18:00', preset: 'off' });
+      const { setValue } = load(true, true);
       const handler = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue };
       const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
 
@@ -570,77 +572,10 @@ describe('thermostat.setValue', () => {
       assert.calledOnce(handler.triggerApplySchedules);
     });
 
-    // A hold, or a preset picked, is what the start runs on: the Off point no
-    // longer applies, and the unit is powered on at once as before.
-    it('should power on a real thermostat started onto an Off point with a hold or a picked preset', async () => {
-      const offPoint = { day_of_week: 0, time: '18:00', preset: 'off' };
-      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
-      const params = [
-        { name: 'THERMOSTAT_TYPE', value: 'external' },
-        { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
-        { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
-        { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
-      ];
-      const held = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue: load(true, offPoint).setValue };
-      const picked = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue: load(true, offPoint).setValue };
-      const noProgramme = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue: load(false, offPoint).setValue };
-
-      await held.setValue(
-        device([...params, { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' }], [presetFeature, stoppedMode]),
-        stoppedMode,
-        THERMOSTAT_MODE.HEATING,
-      );
-      await picked.setValue(
-        device(params, [{ ...presetFeature, last_value: THERMOSTAT_PRESET.COMFORT }, stoppedMode]),
-        stoppedMode,
-        THERMOSTAT_MODE.HEATING,
-      );
-      await noProgramme.setValue(device(params, [presetFeature, stoppedMode]), stoppedMode, THERMOSTAT_MODE.HEATING);
-
-      [held, picked, noProgramme].forEach((handler) =>
-        expect(handler.gladys.device.setValue.firstCall.args[1].selector).to.equal('netatmo-power'),
-      );
-    });
-
-    // A hold past its end is the programme's again: the Off point applies.
-    it('should leave a real thermostat started onto an Off point over an expired hold off', async () => {
-      const { setValue } = load(true, { day_of_week: 0, time: '18:00', preset: 'off' });
-      const handler = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue };
-      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
-
-      await handler.setValue(
-        device(
-          [
-            { name: 'THERMOSTAT_TYPE', value: 'external' },
-            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
-            { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
-            { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
-            { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' },
-            { name: 'THERMOSTAT_MANUAL_UNTIL', value: String(Date.now() - 60 * 1000) },
-          ],
-          [presetFeature, stoppedMode],
-        ),
-        stoppedMode,
-        THERMOSTAT_MODE.HEATING,
-      );
-
-      assert.notCalled(handler.gladys.device.setValue);
-    });
-
-    // A programme that cannot be read is no Off point: the unit is powered on
-    // at once, as any start did.
-    it('should power on a real thermostat whose programme cannot be read', async () => {
-      const { setValue } = proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
-        './thermostat.getSchedules': { getCurrentPoint: fake.rejects(new Error('database locked')) },
-        './thermostat.scheduleDevice': {
-          clearScheduleStop,
-          clearRemoteStop,
-          clearModuleStop,
-          followsSchedule: fake.resolves(true),
-          getScheduleOfDevice: fake.resolves({ id: 'programme-id', transitions: [] }),
-        },
-        '../../../utils/logger': { debug: fake.returns(null), info: fake.returns(null), warn: fake.returns(null) },
-      });
+    // A hold in force, a preset picked, no programme, or one that cannot be
+    // read: the unit is powered on at once, as any start did.
+    it('should power on a real thermostat its programme does not keep off', async () => {
+      const { setValue } = load(true, false);
       const handler = { ...buildHandler(true, THERMOSTAT_MODE.OFF), setValue };
       const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
 

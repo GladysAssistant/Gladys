@@ -932,7 +932,7 @@ class ThermostatBox extends Component {
     const deviceSelector = cfg && cfg.device_selector;
     if (!deviceSelector) {
       this.setState({ activeSchedule: null });
-      return null;
+      return { ok: true, schedule: null };
     }
     try {
       const schedules = await this.props.httpClient.get('/api/v1/service/thermostat/schedule');
@@ -943,13 +943,15 @@ class ThermostatBox extends Component {
       // and degrades to "no schedule" rather than leaving a stale banner.
       this.setState({ activeSchedule: schedule || null });
       // Returned as well: a caller deciding on it cannot wait for the render.
-      return schedule || null;
+      // An explicit shape rather than null / undefined: a failed read taken for
+      // "no schedule" would turn into a stop for the season (selectPreset).
+      return { ok: true, schedule: schedule || null };
     } catch (e) {
       // A failed request says nothing about the schedule: the last one loaded
       // stays, and with it its `next.refresh_at`, so the minute tick tries again
-      // instead of dropping the banner for good. Nothing is returned, so a
-      // caller deciding on the point does not take that stale one for a read.
-      return undefined;
+      // instead of dropping the banner for good. `ok: false`, so a caller
+      // deciding on the point does not take that stale one for a read.
+      return { ok: false, schedule: null };
     }
   };
 
@@ -980,20 +982,32 @@ class ThermostatBox extends Component {
     await this.initData();
   };
 
-  cancelManualMode = async () => {
+  // The banner's buttons hand back with the programme the card shows; the event
+  // they pass is not a schedule.
+  cancelManualMode = () => this.handBackToProgramme();
+
+  // `schedule`: the programme just read by the caller, which is fresher than the
+  // card's — a batched setState may not have committed it yet — and saves a
+  // second read of every schedule. Left out, the card's own is used and read
+  // again once the thermostat is back on it.
+  handBackToProgramme = async schedule => {
     this.holdSetpointUntilApplied();
     // The point in force is what the thermostat follows from the tap on, and the
     // server resolved it already: lit now, with the mode a stop hands back, not
     // once the reload below has landed — until then the card read as a running
     // thermostat still on Off.
-    const current = this.state.activeSchedule && this.state.activeSchedule.current;
+    const programme = schedule === undefined ? this.state.activeSchedule : schedule;
+    const current = programme && programme.current;
     this.setState({
       isManualMode: false,
       manualUntil: null,
       manualSetpointOverride: false,
       ...(current ? { activePreset: current.preset } : {})
     });
-    await this.resumeIfStopped();
+    // `schedule` before the mode: a stopped thermostat started while its hold is
+    // still in force powers the unit on at once (D.0), and the pass that the
+    // `schedule` write triggers then switched it off again on an Off point. With
+    // the hold gone first, the start onto an Off point is left to the pass.
     if (!(await this.savePreset('schedule'))) {
       // The hold is still on the device: the card shows it again rather than a
       // programme the thermostat is not back on. initData, not refreshFromDevice:
@@ -1004,9 +1018,13 @@ class ThermostatBox extends Component {
       await this.initData();
       return;
     }
+    await this.resumeIfStopped();
     // The schedule first: its `current` point is what the thermostat follows
-    // from now on, and loadMode reads it.
-    await this.loadSchedule();
+    // from now on, and loadMode reads it. A caller that just read it already set
+    // it on the card.
+    if (schedule === undefined) {
+      await this.loadSchedule();
+    }
     await this.loadConfig();
     const { activePreset } = this.loadMode();
     // Every setpoint was dropped since the tap, the server's own included: it
@@ -1497,32 +1515,55 @@ class ThermostatBox extends Component {
     //
     // The point is read again rather than taken from the card: the one it shows
     // can still say Off for up to a minute after the programme moved on, and Off
-    // would then hand back to Comfort. A second tap while the first is handing
-    // back is dropped: taken once the first had left manual mode, it stopped a
-    // thermostat for the season nobody asked to stop.
-    // The tap is dropped before the manual-mode check: the hand-back leaves
-    // manual mode before it is done, and a tap past that check stopped it.
-    if (preset.key === 'off' && this.handingBack) {
+    // would then hand back to Comfort.
+    //
+    // Taps while the hand-back runs are held, before the manual-mode check: the
+    // hand-back leaves manual mode before it is done. A second Off is dropped —
+    // taken once the first had left manual mode, it stopped a thermostat for the
+    // season nobody asked to stop. Any other preset is applied once the hand-back
+    // is done, the last one tapped winning: sent at once, it was overwritten by
+    // the `schedule` the hand-back writes last, and Comfort was silently lost.
+    if (this.handingBack) {
+      if (preset.key !== 'off') {
+        this.queuedPreset = preset;
+      }
       return;
     }
     if (preset.key === 'off' && this.state.isManualMode && !this.isStopped()) {
       this.handingBack = true;
+      let handled = true;
       try {
-        const schedule = await this.loadSchedule();
+        const read = await this.loadSchedule();
         // A programme that cannot be read is no answer: the tap does nothing,
         // and the next one tries again. The card's own point may be the one the
         // programme has just left, and Off would then hand back to Comfort.
-        if (schedule === undefined) {
-          return;
-        }
-        if (schedule && schedule.current && schedule.current.preset === 'off') {
-          await this.cancelManualMode();
-          return;
+        if (read.ok && read.schedule && read.schedule.current && read.schedule.current.preset === 'off') {
+          await this.handBackToProgramme(read.schedule);
+        } else if (read.ok) {
+          handled = false;
         }
       } finally {
         this.handingBack = false;
       }
+      if (handled) {
+        await this.applyQueuedPreset();
+        return;
+      }
     }
+    await this.applyPreset(preset);
+    await this.applyQueuedPreset();
+  };
+
+  // The preset tapped while Off was handing the thermostat back, if any.
+  applyQueuedPreset = async () => {
+    const queued = this.queuedPreset;
+    this.queuedPreset = null;
+    if (queued) {
+      await this.selectPreset(queued);
+    }
+  };
+
+  applyPreset = async preset => {
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
     const newSetpoint =
