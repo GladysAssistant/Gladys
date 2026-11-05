@@ -174,8 +174,14 @@ const light = {
       role: 'color',
       debounce: true,
       toGladys: (state, feature, roles) => {
-        const { colorMode, currentHue, currentSaturation, currentX, currentY, colorTemperatureMireds } =
-          state.colorControl;
+        const {
+          colorMode,
+          currentHue,
+          currentSaturation,
+          currentX,
+          currentY,
+          colorTemperatureMireds,
+        } = state.colorControl;
         if (colorMode === COLOR_MODE.HUE_SATURATION) {
           return hueSaturationToColor(currentHue, currentSaturation);
         }
