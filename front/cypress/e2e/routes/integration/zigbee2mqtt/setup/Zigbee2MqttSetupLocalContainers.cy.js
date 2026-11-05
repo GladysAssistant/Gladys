@@ -105,15 +105,6 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
       .children()
       .type('{esc}');
 
-    // The "legacy ezsp" models are not proposed anymore
-    cy.get('[data-cy=z2m-setup-local-dongle-field]')
-      .children()
-      .type('legacy ezsp');
-    cy.get('.react-select__menu-notice--no-options').should('exist');
-    cy.get('[data-cy=z2m-setup-local-dongle-field]')
-      .children()
-      .type('{esc}');
-
     // Start typing on USB port and abort
     cy.get('[data-cy=z2m-setup-local-usb-field]')
       .children()

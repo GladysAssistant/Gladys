@@ -279,8 +279,6 @@ class SetupLocalOptions extends Component {
     const selectedUsbPortOption = selectedUsbPort
       ? this.buildUsbPortOption(selectedUsbPort)
       : this.buildSelectOption(z2mDriverPath);
-    // The "legacy ezsp" models are kept only to display an existing configuration
-    const zigbeeAdapterOptions = zigbeeAdapters.filter(zigbeeAdapter => zigbeeAdapter.configKey !== 'ezsp');
 
     return (
       <div>
@@ -375,7 +373,7 @@ class SetupLocalOptions extends Component {
                 <Select
                   value={this.buildSelectOption(z2mDongleName)}
                   onChange={this.updateZigbeeDongleName}
-                  options={zigbeeAdapterOptions}
+                  options={zigbeeAdapters}
                   isLoading={loadZigbeeAdaptersStatus === RequestStatus.Getting}
                   placeholder={<Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleNamePlaceholder" />}
                   className="react-select-container"
