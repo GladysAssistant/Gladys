@@ -11,7 +11,7 @@ const fse = { ensureDir: sinon.stub().resolves(), remove: sinon.stub().resolves(
 const checkIpv6 = sinon.stub().returns({ hasIpv6: true, ipv6Interfaces: [] });
 const MatterBridge = proxyquire('../../../../services/matter-bridge/lib/MatterBridge', {
   'fs-extra': fse,
-  './checkIpv6': { checkIpv6 },
+  '../../../utils/checkIpv6': { checkIpv6 },
 });
 
 const SERVICE_ID = 'a810b8db-6d04-4697-bed3-c4b72c996279';
@@ -57,7 +57,7 @@ describe('MatterBridge', () => {
       event: { on: sinon.stub(), removeListener: sinon.stub(), emit: sinon.stub() },
     };
     matter = createMatter();
-    bridge = new MatterBridge(gladys, SERVICE_ID, matter);
+    bridge = new MatterBridge(gladys, SERVICE_ID, () => matter);
   });
 
   afterEach(() => {
@@ -67,11 +67,24 @@ describe('MatterBridge', () => {
   });
 
   describe('start', () => {
-    it('should not start when disabled', async () => {
+    it('should not start when disabled, nor load matter.js', async () => {
+      const loadMatter = sinon.stub().returns(matter);
+      bridge = new MatterBridge(gladys, SERVICE_ID, loadMatter);
       variables[VARIABLES.ENABLED] = 'false';
       await bridge.start();
       expect(bridge.server).to.equal(null);
       sinon.assert.notCalled(fse.ensureDir);
+      sinon.assert.notCalled(loadMatter);
+    });
+
+    it('should load matter.js once, at the first start', async () => {
+      const loadMatter = sinon.stub().returns(matter);
+      bridge = new MatterBridge(gladys, SERVICE_ID, loadMatter);
+      await bridge.start();
+      await bridge.stop();
+      await bridge.start();
+      sinon.assert.calledOnce(loadMatter);
+      expect(bridge.matter).to.equal(matter);
     });
 
     it('should start the node with the exposed devices', async () => {
@@ -86,6 +99,7 @@ describe('MatterBridge', () => {
       const [aggregator] = matter.server.added;
       expect(aggregator.id).to.equal('aggregator');
       expect(aggregator.children.map((c) => c.id)).to.deep.equal(['light', 'sensor']);
+      expect(aggregator.children[0].children.map((c) => c.id)).to.deep.equal(['light-light-1']);
       expect(aggregator.children[1].children.map((c) => c.id)).to.deep.equal([
         'sensor-temperature-1',
         'sensor-humidity-1',
@@ -226,7 +240,7 @@ describe('MatterBridge', () => {
 
     it('should forward Gladys states', async () => {
       await bridge.onTriggerCheck({ type: EVENTS.DEVICE.NEW_STATE, device_feature: 'light-binary', last_value: 0 });
-      const lightEndpoint = bridge.devices.get('light-id').built.root;
+      const [lightEndpoint] = bridge.devices.get('light-id').built.children;
       expect(lightEndpoint.state.onOff.onOff).to.equal(false);
       await bridge.onTriggerCheck({ type: EVENTS.ALARM.ARM, house: 'house' });
     });
@@ -244,7 +258,7 @@ describe('MatterBridge', () => {
         features: [feature('cover-state', 'shutter', 'state')],
       };
       await bridge.onDeviceChange(coverDevice);
-      const Behavior = bridge.devices.get('cover-id').built.root.type.behaviors[0];
+      const Behavior = bridge.devices.get('cover-id').built.children[0].type.behaviors[0];
       new Behavior().handleStopMovement();
       sinon.assert.calledWith(
         gladys.event.emit,
@@ -278,17 +292,31 @@ describe('MatterBridge', () => {
       sinon.assert.notCalled(set);
     });
 
-    it('should rebuild a changed device under the same endpoint number', async () => {
-      const endpoint = bridge.devices.get('light-id').built.root;
+    it('should rebuild a changed device under the same endpoint numbers', async () => {
+      const { root: endpoint, children } = bridge.devices.get('light-id').built;
       await bridge.onDeviceChange({
         ...light,
         features: [...light.features, feature('light-b', 'battery', 'integer')],
       });
-      const rebuilt = bridge.devices.get('light-id').built.root;
-      expect(rebuilt).to.not.equal(endpoint);
+      const rebuilt = bridge.devices.get('light-id').built;
+      expect(rebuilt.root).to.not.equal(endpoint);
       expect(endpoint.deleted).to.equal(true);
-      expect(rebuilt.number).to.equal(endpoint.number);
-      expect(rebuilt.state).to.have.property('powerSource');
+      expect(rebuilt.root.number).to.equal(endpoint.number);
+      expect(rebuilt.children[0].id).to.equal(children[0].id);
+      expect(rebuilt.children[0].number).to.equal(children[0].number);
+      expect(rebuilt.root.state).to.have.property('powerSource');
+    });
+
+    it('should keep the endpoint of a function when the device gains another one', async () => {
+      const [lightEndpoint] = bridge.devices.get('light-id').built.children;
+      await bridge.onDeviceChange({
+        ...light,
+        features: [...light.features, feature('light-t', 'temperature-sensor', 'decimal')],
+      });
+      const rebuilt = bridge.devices.get('light-id').built.children;
+      expect(rebuilt.map((c) => c.id)).to.deep.equal(['light-light-1', 'light-temperature-1']);
+      expect(rebuilt[0].number).to.equal(lightEndpoint.number);
+      expect(rebuilt[1].number).to.not.equal(lightEndpoint.number);
     });
 
     it('should remove a device that has nothing to expose anymore', async () => {

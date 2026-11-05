@@ -22,8 +22,10 @@ describe('MatterBridgeService', () => {
     sinon.resetHistory();
   });
 
-  it('should hand the matter.js modules to the bridge', () => {
-    sinon.assert.calledOnceWithExactly(MatterBridgeMock, gladys, 'service-id', {
+  it('should hand the bridge a loader of the matter.js modules, not the modules', () => {
+    sinon.assert.calledOnceWithExactly(MatterBridgeMock, gladys, 'service-id', sinon.match.func);
+    const loadMatter = MatterBridgeMock.firstCall.args[2];
+    expect(loadMatter()).to.deep.equal({
       main: { name: 'main' },
       devices: { name: 'devices' },
       endpoints: { name: 'endpoints' },

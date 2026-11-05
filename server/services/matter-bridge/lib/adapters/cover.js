@@ -50,10 +50,20 @@ function coverBehavior(matter, roles, ctx) {
 
   return class GladysWindowCoveringServer extends Base {
     // An override of a matter.js method, which matter.js calls on the behavior instance.
-    // eslint-disable-next-line class-methods-use-this
     handleMovement(type, reversed, direction, targetPercent100ths) {
-      if (type === MOVEMENT_TYPE.LIFT) {
-        moveCover(roles, ctx, direction, targetPercent100ths);
+      if (type !== MOVEMENT_TYPE.LIFT) {
+        return;
+      }
+      moveCover(roles, ctx, direction, targetPercent100ths);
+      // matter.js reports the cover as opening or closing before this call. A cover with a
+      // position stops once it reaches its target; one without can never tell when it does, so
+      // it is reported still at once rather than moving forever.
+      if (!roles.position) {
+        this.state.operationalStatus = {
+          global: MOVEMENT_STATUS.STOPPED,
+          lift: MOVEMENT_STATUS.STOPPED,
+          tilt: MOVEMENT_STATUS.STOPPED,
+        };
       }
     }
 

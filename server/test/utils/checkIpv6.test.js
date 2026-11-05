@@ -1,10 +1,10 @@
 const { expect } = require('chai');
 
-const { checkIpv6 } = require('../../../../services/matter-bridge/lib/checkIpv6');
+const { checkIpv6 } = require('../../utils/checkIpv6');
 
 const iface = (family, address, internal = false) => ({ family, address, internal });
 
-describe('Matter bridge checkIpv6', () => {
+describe('checkIpv6', () => {
   it('should find a routable IPv6 interface', () => {
     const global = iface('IPv6', '2a01:e0a:1:2::10');
     const result = checkIpv6(() => ({ eth0: [iface('IPv4', '192.168.1.10'), global] }));

@@ -2,8 +2,8 @@ const os = require('os');
 
 /**
  * @description Tell if the machine has an IPv6 address Matter can use. Matter only works over
- * IPv6: without a routable interface, ecosystems cannot reach the bridge. Same rule as the
- * Matter controller of the `matter` service: an IPv6 interface, neither internal nor link-local.
+ * IPv6: an interface that is IPv6, neither internal nor link-local, is needed. Shared by the
+ * Matter controller (`matter` service) and the Matter bridge (`matter-bridge` service).
  * @param {Function} [networkInterfaces] - Lists the network interfaces, os.networkInterfaces by default.
  * @returns {object} Whether IPv6 is available, and the IPv6 interfaces found.
  * @example

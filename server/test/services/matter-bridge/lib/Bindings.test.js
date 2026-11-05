@@ -39,8 +39,8 @@ describe('Matter bridge Bindings', () => {
   });
 
   it('should forward a Matter command to Gladys at once', () => {
-    built.root.state.onOff.onOff = false;
-    built.root.events.onOff.onOff$Changed.emit(false, true, REMOTE);
+    built.children[0].state.onOff.onOff = false;
+    built.children[0].events.onOff.onOff$Changed.emit(false, true, REMOTE);
     sinon.assert.calledOnceWithExactly(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
       type: ACTIONS.DEVICE.SET_VALUE,
       status: ACTIONS_STATUS.PENDING,
@@ -51,15 +51,15 @@ describe('Matter bridge Bindings', () => {
   });
 
   it('should ignore the changes the bridge makes itself', () => {
-    built.root.events.onOff.onOff$Changed.emit(true, false, {});
+    built.children[0].events.onOff.onOff$Changed.emit(true, false, {});
     sinon.assert.notCalled(gladys.event.emit);
   });
 
   it('should only forward the last of a series of level changes', () => {
-    built.root.state.levelControl.currentLevel = 100;
-    built.root.events.levelControl.currentLevel$Changed.emit(100, 50, REMOTE);
-    built.root.state.levelControl.currentLevel = 254;
-    built.root.events.levelControl.currentLevel$Changed.emit(254, 100, REMOTE);
+    built.children[0].state.levelControl.currentLevel = 100;
+    built.children[0].events.levelControl.currentLevel$Changed.emit(100, 50, REMOTE);
+    built.children[0].state.levelControl.currentLevel = 254;
+    built.children[0].events.levelControl.currentLevel$Changed.emit(254, 100, REMOTE);
     clock.tick(100);
     sinon.assert.calledOnce(gladys.event.emit);
     expect(gladys.event.emit.firstCall.args[1].value).to.equal(100);
@@ -73,14 +73,14 @@ describe('Matter bridge Bindings', () => {
   it('should skip listeners whose cluster the endpoint does not have', () => {
     const lightOnly = { id: 'x', name: 'X', selector: 'x', features: [feature('x-binary', 'light', 'binary')] };
     const other = buildEndpoints(matter, lightOnly, planDevice(lightOnly), createContext({}));
-    delete other.root.events.onOff;
+    delete other.children[0].events.onOff;
     bindings.add(lightOnly, other);
     expect(bindings.cleanups.get('x')).to.have.lengthOf(1);
   });
 
   it('should push Gladys states to Matter', async () => {
     await bindings.push({ device_feature: 'light-brightness', last_value: 100 });
-    expect(built.root.state.levelControl.currentLevel).to.equal(254);
+    expect(built.children[0].state.levelControl.currentLevel).to.equal(254);
     await bindings.push({ device_feature: 'light-battery', last_value: 15 });
     expect(built.root.state.powerSource.batPercentRemaining).to.equal(30);
   });
@@ -89,7 +89,7 @@ describe('Matter bridge Bindings', () => {
     await bindings.push({ device_feature: 'light-binary', last_value: 0 });
     await bindings.push({ device_feature: 'light-brightness', last_value: 10 });
     clock.tick(100);
-    expect(built.root.state.onOff.onOff).to.equal(false);
+    expect(built.children[0].state.onOff.onOff).to.equal(false);
     sinon.assert.notCalled(gladys.event.emit);
   });
 
@@ -115,7 +115,7 @@ describe('Matter bridge Bindings', () => {
   });
 
   it('should ignore states of unknown features or without value', async () => {
-    const set = sinon.spy(built.root, 'set');
+    const set = sinon.spy(built.children[0], 'set');
     await bindings.push({ device_feature: 'unknown', last_value: 1 });
     await bindings.push({ device_feature: 'light-binary', last_value: null });
     sinon.assert.notCalled(set);
@@ -125,23 +125,23 @@ describe('Matter bridge Bindings', () => {
     const coverDevice = { id: 'c', name: 'C', selector: 'c', features: [feature('c-state', 'shutter', 'state')] };
     const cover = buildEndpoints(matter, coverDevice, planDevice(coverDevice), createContext({}));
     bindings.add(coverDevice, cover);
-    const set = sinon.spy(cover.root, 'set');
+    const set = sinon.spy(cover.children[0], 'set');
     await bindings.push({ device_feature: 'c-state', last_value: 1 });
     sinon.assert.notCalled(set);
   });
 
   it('should survive an endpoint refusing a state', async () => {
-    sinon.stub(built.root, 'set').rejects(new Error('constraint'));
+    sinon.stub(built.children[0], 'set').rejects(new Error('constraint'));
     await bindings.push({ device_feature: 'light-binary', last_value: 1 });
   });
 
   it('should forget a device, its listeners and pending commands', () => {
-    built.root.events.levelControl.currentLevel$Changed.emit(1, 50, REMOTE);
+    built.children[0].events.levelControl.currentLevel$Changed.emit(1, 50, REMOTE);
     bindings.remove('light-id');
     clock.tick(100);
     sinon.assert.notCalled(gladys.event.emit);
     expect(bindings.byFeature.size).to.equal(0);
-    expect(built.root.events.onOff.onOff$Changed.handlers.size).to.equal(0);
+    expect(built.children[0].events.onOff.onOff$Changed.handlers.size).to.equal(0);
     bindings.remove('unknown');
   });
 

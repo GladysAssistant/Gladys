@@ -43,6 +43,11 @@ function createType(name, behaviors = []) {
 function createBehavior(name) {
   const make = (features, enabled) => {
     class FakeBehavior {
+      constructor() {
+        // Like matter.js, a movement is reported before handleMovement is called.
+        this.state = { operationalStatus: { global: 1, lift: 1, tilt: 0 } };
+      }
+
       handleStopMovement() {
         this.stopped = true;
         return 'super-stop';
