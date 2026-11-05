@@ -402,7 +402,7 @@ describe('Matter.vacuumCleanerStateMapping', () => {
         ],
       };
 
-      describe('Matter Bridge (setValue)', () => {
+      describe('Gladys → Matter (setValue)', () => {
         it('should map Gladys VACUUM to mode 66 (Vacuum: Default)', () => {
           expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.VACUUM, roborockRealSupportedModes)).to.equal(
             66,
@@ -496,7 +496,7 @@ describe('Matter.vacuumCleanerStateMapping', () => {
         });
       });
 
-      describe('roundtrip Matter Bridge → Gladys', () => {
+      describe('roundtrip Gladys → Matter → Gladys', () => {
         it('should preserve VACUUM through roundtrip', () => {
           const matter = convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.VACUUM, roborockRealSupportedModes);
           expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
