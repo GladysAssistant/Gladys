@@ -183,7 +183,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
-        zigbee2mqttStarting: false,
+        zigbee2mqttStarting: true,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
