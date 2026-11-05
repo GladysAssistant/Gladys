@@ -6,6 +6,7 @@ const { fake } = sinon;
 const { ADAPTERS } = require('../../../../services/zigbee2mqtt/adapters');
 const { USB_FINGERPRINTS } = require('../../../../services/zigbee2mqtt/adapters/usbFingerprints');
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -120,6 +121,19 @@ describe('zigbee2mqtt getUsbPorts', () => {
 
     // Without USB device name, the ZBDongle-E and ZBDongle-P can't be told apart: no model
     expect(ports).to.deep.equal([{ path: '/dev/ttyUSB0', name: 'ITEAD', pnpId: undefined, adapter: null }]);
+  });
+
+  it('should fail when the usb service is not available', async () => {
+    manager.gladys.service.getService = fake.returns(undefined);
+
+    try {
+      await manager.getUsbPorts();
+      expect.fail();
+    } catch (e) {
+      expect(e)
+        .instanceOf(ServiceNotConfiguredError)
+        .property('message', 'USB service is not available');
+    }
   });
 
   it('should keep the USB device name when its serial number is not at its end', async () => {
