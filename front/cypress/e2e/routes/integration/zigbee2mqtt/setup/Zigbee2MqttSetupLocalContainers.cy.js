@@ -380,7 +380,7 @@ describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
 describe('Zigbee2Mqtt setup wizard local mode with an existing configuration', () => {
   const DETECTED_DONGLE_NAME = 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"';
 
-  const visitSetup = ({ setup, status = {} }) => {
+  const visitSetup = ({ setup, status = {}, usbPortsFixture = 'get_usb_ports_detected.json' }) => {
     const serverUrl = Cypress.env('serverUrl');
     cy.fixture('integration/routes/integration/zigbee2mqtt/status_ready_to_setup.json').then(readyToSetup => {
       cy.intercept(
@@ -408,7 +408,7 @@ describe('Zigbee2Mqtt setup wizard local mode with an existing configuration', (
         url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port`
       },
       {
-        fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports_detected.json'
+        fixture: `integration/routes/integration/zigbee2mqtt/${usbPortsFixture}`
       }
     ).as('usbPorts');
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
@@ -433,5 +433,68 @@ describe('Zigbee2Mqtt setup wizard local mode with an existing configuration', (
 
     cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
     cy.get('[data-cy=z2m-setup-local-ember-firmware-warning]').should('exist');
+  });
+
+  it('Suggest the model recognized on a port configured without model, written on save', () => {
+    visitSetup({ setup: { ZIGBEE_DONGLE_NAME: null } });
+
+    cy.get('[data-cy=z2m-setup-local-usb-field]').should(
+      'contain',
+      'Itead Sonoff Zigbee 3.0 USB Dongle Plus V2 (/dev/ttyUSB0)'
+    );
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
+    cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('exist');
+
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
+      },
+      {
+        statusCode: 400
+      }
+    ).as('setup');
+
+    cy.get('[data-cy=z2m-setup-save]')
+      .should('not.be.disabled')
+      .click();
+
+    cy.wait('@setup')
+      .its('request.body')
+      .should('deep.eq', {
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: DETECTED_DONGLE_NAME,
+        Z2M_ADAPTER_MODE: 'usb',
+        Z2M_NETWORK_ADAPTER_URL: null,
+        Z2M_NETWORK_ADAPTER_TYPE: null,
+        Z2M_MQTT_MODE: 'local'
+      });
+  });
+
+  it('Suggest the model recognized on a port configured without model, once the ports are refreshed', () => {
+    visitSetup({ setup: { ZIGBEE_DONGLE_NAME: null }, usbPortsFixture: 'get_usb_ports.json' });
+
+    // The device on the configured port is not recognized
+    cy.get('[data-cy=z2m-setup-local-dongle-not-detected]').should('exist');
+    cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
+
+    // The dongle is plugged on this port, then the ports are refreshed
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port`
+      },
+      {
+        fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports_detected.json'
+      }
+    ).as('usbPortsRefreshed');
+    cy.get('[data-cy=z2m-setup-local-usb-refresh]').click();
+    cy.wait('@usbPortsRefreshed');
+
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
+    cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('exist');
+    cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
   });
 });

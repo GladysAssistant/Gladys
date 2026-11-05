@@ -359,6 +359,7 @@ class SetupLocalOptions extends Component {
                   class="btn btn-outline-success ml-auto"
                   onClick={this.refreshUsbPorts}
                   disabled={loadUsbPortsStatus === RequestStatus.Getting}
+                  data-cy="z2m-setup-local-usb-refresh"
                 >
                   <i class="fe fe-refresh-cw" />
                 </button>
