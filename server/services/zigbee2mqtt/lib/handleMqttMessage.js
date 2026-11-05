@@ -19,9 +19,12 @@ async function handleMqttMessage(topic, message) {
       // broker when its adapter fails), and the "offline" of a previous run can come after the "online" of the
       // new one. Any announcement only means that the run changed: Gladys asks again until Zigbee2mqtt answers.
       logger.debug(`Zigbee2mqtt bridge state is ${message}, checking its health...`);
-      this.zigbee2mqttConnected = false;
-      this.zigbee2mqttRunning = false;
-      this.emitStatusEvent();
+      // Broadcast only a change: an announcement often follows another one (the last will of the previous run)
+      if (this.zigbee2mqttConnected || this.zigbee2mqttRunning) {
+        this.zigbee2mqttConnected = false;
+        this.zigbee2mqttRunning = false;
+        this.emitStatusEvent();
+      }
       this.requestHealthCheck();
       break;
     }

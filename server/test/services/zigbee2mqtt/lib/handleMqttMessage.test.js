@@ -94,6 +94,24 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
   });
 
+  it('should not broadcast the status again when bridge/state finds Zigbee2mqtt already not answering', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.zigbee2mqttRunning = false;
+    zigbee2mqttManager.gladysConnected = true;
+    zigbee2mqttManager.mqttClient = { publish: fake.returns(null) };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', JSON.stringify({ state: 'offline' }));
+    // ASSERT
+    assert.neverCalledWith(
+      gladys.event.emit,
+      EVENTS.WEBSOCKET.SEND_ALL,
+      sinon.match.has('type', 'zigbee2mqtt.status-change'),
+    );
+    // Gladys still asks: the announcement means that the run changed
+    assert.calledOnce(zigbee2mqttManager.mqttClient.publish);
+  });
+
   describe('health check retries', () => {
     const online = JSON.stringify({ state: 'online' });
     const healthy = JSON.stringify({ data: { healthy: true }, status: 'ok' });
