@@ -16,7 +16,8 @@ function requestHealthCheck() {
   if (!this.mqttClient || !this.gladysConnected) {
     return;
   }
-  this.mqttClient.publish('zigbee2mqtt/bridge/request/health_check', '{}');
+  // Logged, and a failed publication reported, like any other request
+  this.publish('zigbee2mqtt/bridge/request/health_check', '{}');
   this.healthCheckTimer = setTimeout(() => this.requestHealthCheck(), HEALTH_CHECK_INTERVAL_IN_MS);
 }
 

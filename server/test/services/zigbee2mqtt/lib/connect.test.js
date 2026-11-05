@@ -140,7 +140,8 @@ describe('zigbee2mqtt connect', () => {
     zigbee2mqttManager.mqttClient.emit('connect');
     // ASSERT
     // A broker without retained bridge/state (retain disabled in Zigbee2mqtt) would never announce it
-    assert.calledOnceWithExactly(mqttClient.publish, 'zigbee2mqtt/bridge/request/health_check', '{}');
+    assert.calledOnce(mqttClient.publish);
+    assert.calledWith(mqttClient.publish, 'zigbee2mqtt/bridge/request/health_check', '{}');
   });
 
   it('it should receive mqtt error message', async () => {

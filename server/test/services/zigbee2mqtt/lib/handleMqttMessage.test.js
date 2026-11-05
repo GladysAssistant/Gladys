@@ -85,11 +85,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         EVENTS.WEBSOCKET.SEND_ALL,
         sinon.match.has('type', 'zigbee2mqtt.status-change'),
       );
-      assert.calledOnceWithExactly(
-        zigbee2mqttManager.mqttClient.publish,
-        'zigbee2mqtt/bridge/request/health_check',
-        '{}',
-      );
+      assert.calledOnce(zigbee2mqttManager.mqttClient.publish);
+      assert.calledWith(zigbee2mqttManager.mqttClient.publish, 'zigbee2mqtt/bridge/request/health_check', '{}');
       expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
       expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
       // bridge/state is never mistaken for the state of a device
