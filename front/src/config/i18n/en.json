@@ -1792,7 +1792,7 @@
             "adapterModeNetworkLabel": "Network coordinator (Ethernet/Wi-Fi)",
             "usbDriverPathLabel": "Select the USB port where the Zigbee dongle is inserted",
             "usbDriverPathPlaceholder": "USB Port",
-            "usbDriverPathShowAll": "Also show the serial ports of the machine",
+            "usbDriverPathShowAll": "Show the other serial ports (GPIO HAT, ports of the machine)",
             "usbDongleNameLabel": "Select the model of the Zigbee dongle used",
             "usbDongleNamePlaceholder": "Zigbee Dongle Model",
             "usbDongleNameDetected": "Model recognized from the dongle inserted in this port.",

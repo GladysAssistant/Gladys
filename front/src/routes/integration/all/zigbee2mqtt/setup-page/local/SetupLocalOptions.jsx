@@ -274,7 +274,7 @@ class SetupLocalOptions extends Component {
       ? !z2mNetworkAdapterUrl || !z2mNetworkAdapterType
       : !z2mDriverPath || !z2mDongleName;
 
-    // The serial ports of the machine itself have no USB device name: hidden, unless no port has one
+    // The serial ports of the machine itself, GPIO HATs included, have no USB device name: hidden, unless no port has one
     // (machine without udev, such as some NAS)
     const hideMachinePorts = !showAllUsbPorts && usbPorts.some(usbPort => usbPort.pnpId);
     const visibleUsbPorts = hideMachinePorts ? usbPorts.filter(usbPort => usbPort.pnpId) : usbPorts;

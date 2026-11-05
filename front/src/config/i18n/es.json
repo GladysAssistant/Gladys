@@ -1792,7 +1792,7 @@
             "adapterModeNetworkLabel": "Coordinador de red (Ethernet/Wi-Fi)",
             "usbDriverPathLabel": "Seleccione el puerto USB en el que está conectado el adaptador Zigbee",
             "usbDriverPathPlaceholder": "Puerto USB",
-            "usbDriverPathShowAll": "Mostrar también los puertos serie de la máquina",
+            "usbDriverPathShowAll": "Mostrar los demás puertos serie (HAT GPIO, puertos de la máquina)",
             "usbDongleNameLabel": "Seleccione el modelo del adaptador Zigbee utilizado",
             "usbDongleNamePlaceholder": "Modelo del adaptador Zigbee",
             "usbDongleNameDetected": "Modelo reconocido a partir del adaptador conectado a este puerto.",
