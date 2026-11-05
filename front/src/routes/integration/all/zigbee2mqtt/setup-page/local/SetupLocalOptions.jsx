@@ -282,6 +282,13 @@ class SetupLocalOptions extends Component {
     const selectedUsbPortOption = selectedUsbPort
       ? this.buildUsbPortOption(selectedUsbPort)
       : this.buildSelectOption(z2mDriverPath);
+    // The model chosen contradicts the recognized dongle, except its "(legacy ezsp)" variant, a deliberate choice
+    const recognizedAdapter = get(selectedUsbPort, 'adapter');
+    const dongleNameMismatch =
+      recognizedAdapter &&
+      z2mDongleName &&
+      z2mDongleName !== recognizedAdapter &&
+      z2mDongleName !== `${recognizedAdapter} (legacy ezsp)`;
 
     return (
       <div>
@@ -401,6 +408,14 @@ class SetupLocalOptions extends Component {
             {selectedUsbPort && !selectedUsbPort.adapter && !z2mDongleName && (
               <small class="form-text text-muted" data-cy="z2m-setup-local-dongle-not-detected">
                 <Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleNameNotDetected" />
+              </small>
+            )}
+            {dongleNameMismatch && (
+              <small class="form-text text-warning" data-cy="z2m-setup-local-dongle-mismatch">
+                <Text
+                  id="integration.zigbee2mqtt.setup.modes.local.usbDongleNameMismatch"
+                  fields={{ model: recognizedAdapter }}
+                />
               </small>
             )}
           </div>

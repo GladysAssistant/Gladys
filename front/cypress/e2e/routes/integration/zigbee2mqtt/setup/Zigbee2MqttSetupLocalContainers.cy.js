@@ -315,6 +315,21 @@ describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
     );
     cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
     cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('exist');
+    cy.get('[data-cy=z2m-setup-local-dongle-mismatch]').should('not.exist');
+
+    // Another model can be chosen, with a warning, except the "(legacy ezsp)" variant of the recognized one
+    cy.get('[data-cy=z2m-setup-local-dongle-field]')
+      .children()
+      .as('dongleField');
+    cy.get('@dongleField').click();
+    cy.get('@dongleField').type('ZBDongle-P{enter}');
+    cy.get('[data-cy=z2m-setup-local-dongle-mismatch]').should('exist');
+    cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('not.exist');
+    cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
+    cy.get('@dongleField').click();
+    cy.get('@dongleField').type('"ZBDongle-E" (legacy{enter}');
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', `${DETECTED_DONGLE_NAME} (legacy ezsp)`);
+    cy.get('[data-cy=z2m-setup-local-dongle-mismatch]').should('not.exist');
 
     // An unrecognized port does not keep the model of the recognized dongle
     cy.get('[data-cy=z2m-setup-local-usb-show-all]').click();

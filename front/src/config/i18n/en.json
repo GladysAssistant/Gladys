@@ -1797,6 +1797,7 @@
             "usbDongleNamePlaceholder": "Zigbee Dongle Model",
             "usbDongleNameDetected": "Model recognized from the dongle inserted in this port.",
             "usbDongleNameNotDetected": "Gladys did not recognize the dongle inserted in this port: select its model in the list.",
+            "usbDongleNameMismatch": "The dongle inserted in this port was recognized as {{model}}: check the selected model.",
             "networkAdapterUrlLabel": "Enter the address of the network coordinator",
             "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
             "networkAdapterUrlDescription": "IP address (or hostname) and TCP port of the coordinator, for example tcp://192.168.1.20:6638. The \"tcp://\" prefix is optional.",
