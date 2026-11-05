@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { BadParameters } = require('../../../utils/coreErrors');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -256,6 +257,22 @@ async function createDevice(device) {
     });
   }
 
+  // An inverted range bounds nothing anyone could mean: refused here as in the
+  // form, so a client writing the params directly cannot save one either. A
+  // heater regulating itself takes no range, and the form hides the fields.
+  if (!heaterRegulates) {
+    const bound = (name) => {
+      const param = params.find((candidate) => candidate.name === name);
+      const value = param ? parseFloat(param.value) : NaN;
+      return Number.isFinite(value) ? value : null;
+    };
+    const min = bound('THERMOSTAT_MIN_TEMP');
+    const max = bound('THERMOSTAT_MAX_TEMP');
+    if (min !== null && max !== null && min > max) {
+      throw new BadParameters(`Thermostat: the minimum temperature ${min} is above the maximum ${max}`);
+    }
+  }
+
   const features = (device.features || []).filter(
     (feature) =>
       feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
@@ -282,7 +299,13 @@ async function createDevice(device) {
     // The state features are built here rather than taken from the payload: they
     // are not the client's to shape, and a device saved before they existed gets
     // them on its next save.
-    features: [...(external ? [] : features.slice(0, 1)), ...buildStateFeatures(device, external)],
+    // The setpoint is saved by this service itself, clamped (D.0): with
+    // `has_feedback: false` the core saved the value as requested right after,
+    // undoing the clamp and writing a second history row.
+    features: [
+      ...(external ? [] : features.slice(0, 1).map((feature) => ({ ...feature, has_feedback: true }))),
+      ...buildStateFeatures(device, external),
+    ],
     params,
     service_id: this.serviceId,
   });

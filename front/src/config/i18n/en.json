@@ -3765,6 +3765,7 @@
         "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
         "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
+        "invertedRangeError": "The minimum temperature must not be above the maximum.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",

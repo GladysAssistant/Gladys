@@ -5,6 +5,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const { fake, assert } = sinon;
 
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { BadParameters } = require('../../../../utils/coreErrors');
 
 const stubLogger = {
   '../../../utils/logger': {
@@ -150,6 +151,50 @@ describe('thermostat.createDevice', () => {
     expect(error).to.not.equal(null);
     expect(error.message).to.contain('target-temperature');
     assert.notCalled(handler.gladys.device.create);
+  });
+
+  it('should save the setpoint with feedback, so the core keeps the clamped value', async () => {
+    const created = await buildHandler().createDevice({
+      name: 'Salon',
+      features: [{ ...setpointFeature, has_feedback: false }],
+    });
+
+    const setpoint = created.features.find((feature) => feature.type === 'target-temperature');
+    expect(setpoint.has_feedback).to.equal(true);
+  });
+
+  it('should refuse an inverted temperature range', async () => {
+    const handler = buildHandler();
+
+    let error = null;
+    try {
+      await handler.createDevice({
+        name: 'Salon',
+        features: [setpointFeature],
+        params: [
+          { name: 'THERMOSTAT_MIN_TEMP', value: '25' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '8' },
+        ],
+      });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(BadParameters);
+    assert.notCalled(handler.gladys.device.create);
+  });
+
+  it('should accept a range with a single bound, or a bound that is no number', async () => {
+    const created = await buildHandler().createDevice({
+      name: 'Salon',
+      features: [setpointFeature],
+      params: [
+        { name: 'THERMOSTAT_MIN_TEMP', value: '25' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '' },
+      ],
+    });
+
+    expect(created.name).to.equal('Salon');
   });
 
   it('should drop features that are not a thermostat setpoint', async () => {
@@ -516,6 +561,19 @@ describe('thermostat.createDevice - external', () => {
     const created = await buildHandler().createDevice(pilotWireHeater([], 'external'));
 
     expect(created.params.find((param) => param.name === 'THERMOSTAT_TYPE').value).to.equal('pilot-wire');
+    expect(featureTypes(created)).to.include('target-temperature');
+  });
+
+  it('should not check the range of a heater regulating itself, which takes none', async () => {
+    // The form hides the range on such a heater: a stale inverted one must not
+    // make it impossible to save.
+    const created = await buildHandler().createDevice(
+      pilotWireHeater([
+        { name: 'THERMOSTAT_MIN_TEMP', value: '25' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '8' },
+      ]),
+    );
+
     expect(featureTypes(created)).to.include('target-temperature');
   });
 
