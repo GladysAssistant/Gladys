@@ -117,14 +117,31 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(true);
     });
 
-    it('should keep asking while Zigbee2mqtt does not answer', async () => {
+    it('should keep asking while Zigbee2mqtt does not answer, less and less often, up to once a minute', async () => {
       // EXECUTE
       await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
-      clock.tick(60000);
       // ASSERT
-      // One request right away, then one every 3 seconds
-      assert.callCount(zigbee2mqttManager.mqttClient.publish, 21);
+      // One request right away, then after a delay doubled each time
+      assert.calledOnce(zigbee2mqttManager.mqttClient.publish);
+      [3000, 6000, 12000, 24000, 48000, 60000, 60000].forEach((delay, index) => {
+        clock.tick(delay - 1);
+        assert.callCount(zigbee2mqttManager.mqttClient.publish, index + 1);
+        clock.tick(1);
+        assert.callCount(zigbee2mqttManager.mqttClient.publish, index + 2);
+      });
       expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    });
+
+    it('should ask quickly again when Zigbee2mqtt announces a new run', async () => {
+      // PREPARE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      clock.tick(45000);
+      assert.callCount(zigbee2mqttManager.mqttClient.publish, 5);
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', online);
+      clock.tick(3000);
+      // ASSERT
+      assert.callCount(zigbee2mqttManager.mqttClient.publish, 7);
     });
 
     it('should keep asking after an offline, which can come from the previous run after the new one started', async () => {
