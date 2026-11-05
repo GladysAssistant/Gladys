@@ -167,10 +167,13 @@ class SetupLocalOptions extends Component {
       const networkAdapterTypes = [...new Set(adapters.map(adapter => adapter.configKey))]
         .sort()
         .map(configKey => ({ label: configKey, value: configKey }));
+      // The adapter of the model already selected (configured, or preselected before the list arrived)
+      const selectedAdapter = zigbeeAdapters.find(adapter => adapter.value === this.state.z2mDongleName);
 
       this.setState({
         zigbeeAdapters,
         networkAdapterTypes,
+        z2mDongleConfigKey: get(selectedAdapter, 'configKey') || null,
         loadZigbeeAdaptersStatus: RequestStatus.Success
       });
     } catch (e) {
@@ -469,7 +472,7 @@ class SetupLocalOptions extends Component {
           </div>
         )}
         {emberFirmwareTooOld && (
-          <div class="alert alert-warning">
+          <div class="alert alert-warning" data-cy="z2m-setup-local-ember-firmware-warning">
             <MarkupText id="integration.zigbee2mqtt.setup.modes.local.containerErrors.EZSP_PROTOCOL_VERSION" />
           </div>
         )}

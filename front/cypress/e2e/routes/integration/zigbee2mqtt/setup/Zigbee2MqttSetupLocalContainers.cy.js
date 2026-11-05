@@ -376,3 +376,62 @@ describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
       });
   });
 });
+
+describe('Zigbee2Mqtt setup wizard local mode with an existing configuration', () => {
+  const DETECTED_DONGLE_NAME = 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"';
+
+  const visitSetup = ({ setup, status = {} }) => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.fixture('integration/routes/integration/zigbee2mqtt/status_ready_to_setup.json').then(readyToSetup => {
+      cy.intercept(
+        {
+          method: 'GET',
+          url: `${serverUrl}/api/v1/service/zigbee2mqtt/status`
+        },
+        {
+          body: { ...readyToSetup, ...status }
+        }
+      );
+    });
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
+      },
+      {
+        body: { Z2M_MQTT_MODE: 'local', Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0', ...setup }
+      }
+    );
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port`
+      },
+      {
+        fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports_detected.json'
+      }
+    ).as('usbPorts');
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
+
+    cy.get('[data-cy=z2m-setup-local-summary]').within(() => {
+      cy.get('button')
+        .contains('integration.zigbee2mqtt.setup.changeButtonLabel')
+        .click();
+    });
+    cy.wait('@usbPorts');
+  };
+
+  beforeEach(() => {
+    cy.login();
+  });
+
+  it('Warn about an old ember firmware on the configured model', () => {
+    visitSetup({
+      setup: { ZIGBEE_DONGLE_NAME: DETECTED_DONGLE_NAME },
+      status: { coordinatorFirmware: { majorrel: 7, minorrel: 3 } }
+    });
+
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
+    cy.get('[data-cy=z2m-setup-local-ember-firmware-warning]').should('exist');
+  });
+});
