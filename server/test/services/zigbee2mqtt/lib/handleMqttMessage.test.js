@@ -228,7 +228,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         networkModeValid: true,
         usbConfigured: false,
         networkAdapterConfigured: false,
-        z2mEnabled: false,
+        z2mEnabled: true,
         zigbee2mqttConnected: true,
         zigbee2mqttStarting: false,
         zigbee2mqttExist: true,

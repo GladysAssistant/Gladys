@@ -54,4 +54,36 @@ describe('zigbee2mqtt status', () => {
     expect(result.z2mContainerError).that.equal(null);
     expect(result.mqttConnectionError).that.equal(null);
   });
+
+  it('should show Zigbee2mqtt enabled while its container exists, even when it does not answer', async () => {
+    // PREPARE
+    // Crashing in a loop: the user must still be able to turn it off
+    zigbee2MqttManager.zigbee2mqttRunning = false;
+    // EXECUTE
+    const result = await zigbee2MqttManager.status();
+    // ASSERT
+    expect(result.z2mEnabled).that.equal(true);
+  });
+
+  it('should show Zigbee2mqtt enabled while Gladys uses an external broker, even when it does not answer', async () => {
+    // PREPARE
+    zigbee2MqttManager.mqttExist = false;
+    zigbee2MqttManager.mqttRunning = false;
+    zigbee2MqttManager.zigbee2mqttExist = false;
+    zigbee2MqttManager.zigbee2mqttRunning = false;
+    zigbee2MqttManager.mqttClient = {};
+    // EXECUTE
+    const result = await zigbee2MqttManager.status();
+    // ASSERT
+    expect(result.z2mEnabled).that.equal(true);
+  });
+
+  it('should show Zigbee2mqtt disabled without container nor MQTT client', async () => {
+    // PREPARE
+    zigbee2MqttManager.zigbee2mqttExist = false;
+    // EXECUTE
+    const result = await zigbee2MqttManager.status();
+    // ASSERT
+    expect(result.z2mEnabled).that.equal(false);
+  });
 });

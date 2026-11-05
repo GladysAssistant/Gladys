@@ -11,14 +11,15 @@ describe('Zigbee2mqtt status', () => {
     gladysConnected: true,
     zigbee2mqttConnected: false,
     zigbee2mqttStarting: false,
-    z2mEnabled: false,
+    // The containers are deployed
+    z2mEnabled: true,
     dockerBased: true,
     networkModeValid: true,
     coordinatorFirmware: null,
     z2mContainerError: null,
     mqttConnectionError: null
   };
-  const onlineStatus = { ...notOnlineStatus, zigbee2mqttRunning: true, zigbee2mqttConnected: true, z2mEnabled: true };
+  const onlineStatus = { ...notOnlineStatus, zigbee2mqttRunning: true, zigbee2mqttConnected: true };
 
   beforeEach(() => {
     // Each test visits its own page: the session stored in localStorage is cleared between tests
@@ -75,13 +76,28 @@ describe('Zigbee2mqtt status', () => {
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
 
     cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttStarting');
-    // The enable switch follows Zigbee2mqtt being online
-    cy.get('#enableZigbee2mqtt').should('not.be.checked');
+    // The enable switch follows the deployment, not Zigbee2mqtt answering
+    cy.get('#enableZigbee2mqtt').should('be.checked');
 
     cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: onlineStatus });
 
     cy.get('[data-cy=z2m-running-status-explanation]').should('not.exist');
     cy.get('#enableZigbee2mqtt').should('be.checked');
+  });
+
+  it('should turn off a Zigbee2mqtt that does not answer', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: notOnlineStatus });
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/disconnect` }, { body: {} }).as(
+      'disconnect'
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
+
+    // Crashing in a loop: the user can still stop and remove its containers
+    cy.get('#enableZigbee2mqtt').should('be.checked');
+    cy.get('[data-cy=z2m-toggle-status] .custom-switch-indicator').click();
+
+    cy.wait('@disconnect');
   });
 
   it('should show Zigbee2mqtt as starting before Gladys is connected to the broker again', () => {

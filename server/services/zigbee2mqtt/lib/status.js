@@ -5,7 +5,9 @@
  * status();
  */
 function status() {
-  const z2mEnabled = this.isEnabled();
+  // The enable switch of the setup page: Gladys runs the Zigbee2mqtt container, or uses an external broker. Not
+  // whether Zigbee2mqtt answers (see isEnabled), so that a failing Zigbee2mqtt can still be turned off.
+  const z2mEnabled = this.zigbee2mqttExist || this.mqttClient !== null;
   const zigbee2mqttStatus = {
     usbConfigured: this.usbConfigured,
     networkAdapterConfigured: this.networkAdapterConfigured,
