@@ -1971,9 +1971,12 @@ class ThermostatBox extends Component {
                             bar used to disappear, and the card lost 56px of height
                             — every widget beside it on the dashboard shifted, and
                             came back when the window was shut. */}
+                    {/* `lang` picks the dictionary a name too long for its
+                            column is hyphenated with (see style.css). */}
                     <div
                       class={cx(style.segmentedControl, { [style.segmentedControlDisabled]: isWindowOpen })}
                       aria-disabled={isWindowOpen ? 'true' : undefined}
+                      lang={props.user && props.user.language ? props.user.language : undefined}
                     >
                       {presets.map(preset => {
                         const presetTitle =
@@ -2013,7 +2016,16 @@ class ThermostatBox extends Component {
                             {/* The name under the icon: `title` only shows on
                                     hover, so on a wall tablet the bar was six
                                     unlabelled pictograms. */}
-                            <span class={style.segmentBtnLabel}>{presetTitle}</span>
+                            <span class={style.segmentBtnLabel}>
+                              <span class={style.segmentBtnLabelText}>{presetTitle}</span>
+                              {/* The name in bold, invisible: it holds the label
+                                      at the height the active weight needs, so
+                                      picking a preset does not make the row
+                                      taller (see style.css). */}
+                              <span class={style.segmentBtnLabelReserve} aria-hidden="true">
+                                {presetTitle}
+                              </span>
+                            </span>
                           </button>
                         );
                       })}

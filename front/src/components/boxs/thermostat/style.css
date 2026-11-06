@@ -318,6 +318,9 @@
   max-width: 22rem;
   margin: 0 auto;
   padding: 0 4px;
+  /* The labels size themselves on the row, not on the screen: a narrow
+     dashboard column on a desktop squeezes them as much as a phone does. */
+  container-type: inline-size;
 }
 
 /* The preset a stopped thermostat carries: it is what it will run on when it
@@ -334,9 +337,6 @@
   color: #495057;
   font-weight: 600;
   letter-spacing: -0.2px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 1px 2px;
 }
 
 .segmentBtnPending .segmentBtnLabel::before {
@@ -735,62 +735,106 @@
   }
 }
 
-/* The preset name under its icon. Small and clipped rather than wrapped: the bar
-   holds six of these across a card that is narrow on a phone, and a name that
-   wrapped would push the icons out of line. */
-/* 9px read as decoration rather than as a label, and the icon's own grey left
-   it barely visible on the widget's background. Bigger and darker: it is the
-   only thing naming these six pictograms on a touch screen, where the tooltip
-   never opens. The active one inherits its preset colour from the button. */
-/* The active label is bold, so it is the widest the row ever gets: a hair of
-   letter-spacing back keeps "Hors-gel" on one line in its 57px column, where the
-   plain weight already fits. */
-/* 12px and a darker grey: at 11px in #6c757d these were the smallest, palest
-   text on the card, and they name the six buttons a thermostat is driven by.
-   #495057 on the card's white is about 7.5:1, against 4.7:1 before. A label too
-   long for its column wraps between words rather than being cut. */
+/* The preset name under its icon. It is the only thing naming these six
+   pictograms on a touch screen, where the tooltip never opens: 12px in #495057,
+   about 7.5:1 on the card's white.
+
+   A label has to stay inside its column whatever the language: each column is
+   only about 57px wide in a two-column dashboard, and a single long word went
+   straight through its neighbours — "Frostschutz" ran into "Abwesend". A name
+   too long for its column wraps between words first, then is hyphenated at a
+   syllable in the user's language (the bar carries the `lang` attribute, which
+   the dictionary is picked from: "Frost-schutz"), and only as a last resort —
+   a browser with no dictionary for that language — cut with an ellipsis. A
+   label that fits, the usual case in French, English and Spanish, is untouched.
+
+   The label has the same box in every state, the one the active pill and the
+   pending outline are drawn on: the whole column, the button's 1px of padding
+   on each side given back by the negative margins, so that neither the row nor
+   the text moves when a preset is picked. Its own 1px of padding leaves the
+   name exactly the width it always had: a name that fitted still fits. */
 .segmentBtnLabel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: calc(100% + 2px);
+  max-width: calc(100% + 2px);
+  margin: -1px;
+  padding: 1px;
+  box-sizing: border-box;
+  border-radius: 8px;
   font-size: 12px;
   line-height: 1.15;
   color: #495057;
-  max-width: 100%;
   text-align: center;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  /* The card sets `word-wrap: break-word`, which would cut a word anywhere
+     before the ellipsis below gets a chance. */
   overflow-wrap: normal;
 }
 
-/* Under 380px the row has six columns of about 55px: a notch smaller keeps
-   "Hors-gel" and "Absence" on one line each. */
+/* The bold weight of the active and pending labels is the widest the row ever
+   gets, and a name that fits on one line in the regular weight can need two in
+   bold: picking that preset made the whole row taller, and every widget beside
+   the card moved. An invisible bold copy of the name is laid out in the same
+   cell as the visible one, so the label is always as tall as its bold version,
+   whichever state it is in. */
+.segmentBtnLabelText,
+.segmentBtnLabelReserve {
+  grid-area: 1 / 1;
+}
+
+/* The last resort, for a browser that has no hyphenation dictionary for the
+   language: a word still too long for its column is cut with an ellipsis
+   ("Abwese…") rather than running into its neighbour, or than leaving its last
+   letter alone on a line. The button's `title` still carries the whole name. */
+.segmentBtnLabelText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.segmentBtnLabelReserve {
+  visibility: hidden;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* On a phone, or in a narrow dashboard column, the six columns are under 57px:
+   a notch smaller keeps more names on one line. The media query stays for the
+   browsers that do not know container queries. */
 @media (max-width: 379px) {
   .segmentBtnLabel {
     font-size: 11px;
   }
 }
 
-/* The pill carries the preset's colour behind the label. An earlier attempt
-   sized it around the word, so its padding was added to the label's width: that
-   pushed "Hors-gel" onto a second line, and only on the active button, so the row
-   jumped as presets were picked. It also clipped the background short of the ends
-   of "Absence", and at 18% opacity the night (#0d3b8e) came out a flat grey on a
-   dark card. The pill now fills the column, padding included, and carries the
-   colour at full strength.
+@container (max-width: 340px) {
+  .segmentBtnLabel {
+    font-size: 11px;
+  }
+}
 
-   The label itself is bold and takes whichever of black or white reads on that
-   colour — at least 4.5:1 on every preset, where the preset's own colour as text
-   sat between 1.8 and 2.4:1. */
+/* Under 260px — a 320px phone, a narrow column of a three-column dashboard —
+   a column is barely 40px: one more notch, or "Comfort" no longer fits on a
+   line and is cut in the middle rather than hyphenated (Chrome does not
+   hyphenate an English word that starts with a capital). */
+@container (max-width: 260px) {
+  .segmentBtnLabel {
+    font-size: 10px;
+  }
+}
+
+/* The pill carries the preset's colour behind the label, across the whole
+   column, at full strength. It never goes further: it used to be as wide as the
+   word, which in German laid it over the labels on either side. A word too long
+   for it wraps inside the pill like any other label.
+
+   The label itself is bold, with a hair of letter-spacing back, and takes
+   whichever of black or white reads on that colour — at least 4.5:1 on every
+   preset, where the preset's own colour as text sat between 1.8 and 2.4:1. */
 .segmentBtnActive .segmentBtnLabel {
   color: var(--preset-text, #212529);
   font-weight: 600;
-  /* The bold weight is the widest the row ever gets: a hair back keeps "Hors-gel"
-     on one line in its 57px column, where the plain weight already fits. */
   letter-spacing: -0.2px;
   background: var(--preset-color, #f59f00);
-  border-radius: 8px;
-  /* At least the column, and as wide as the word when the word is wider: in a
-     55px column the bold "Absence" ran past the pill, or was cut short of its
-     last letter. The gap between columns takes the few pixels it needs. */
-  min-width: 100%;
-  max-width: none;
-  white-space: nowrap;
-  box-sizing: border-box;
-  padding: 1px 3px;
 }
