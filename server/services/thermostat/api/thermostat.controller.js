@@ -15,18 +15,30 @@ const SCHEDULE_ERRORS = [
   { match: /^Invalid thermostat schedule/, status: 400, error: 'INVALID_SCHEDULE' },
 ];
 
+// The same for a thermostat the device route refuses to save: the form names
+// what is missing rather than reporting a generic failure.
+const DEVICE_ERRORS = [
+  { match: /^Thermostat: a reversible thermostat needs a mode feature/, status: 400, error: 'REVERSIBLE_NO_MODE' },
+  {
+    match: /^Thermostat: a reversible thermostat needs a mode that can cool/,
+    status: 400,
+    error: 'REVERSIBLE_MODE_CANNOT_COOL',
+  },
+];
+
 /**
  * @description Turn a schedule error into its HTTP status and code, so a bad
  * name or an unknown house reads as a 4xx the front can translate instead of a
  * 500 that looks like a crash.
  * @param {Error} e - The error thrown by the handler.
  * @param {object} res - The Express response.
+ * @param {Array<object>} [errors] - The known errors of the route.
  * @returns {boolean} True when the error was handled, false to rethrow it.
  * @example
  * try { await handler.createSchedule(...); } catch (e) { if (!sendScheduleError(e, res)) throw e; }
  */
-function sendScheduleError(e, res) {
-  const known = SCHEDULE_ERRORS.find((candidate) => candidate.match.test(e.message));
+function sendScheduleError(e, res, errors = SCHEDULE_ERRORS) {
+  const known = errors.find((candidate) => candidate.match.test(e.message));
   if (!known) {
     return false;
   }
@@ -54,8 +66,14 @@ module.exports = function ThermostatController(thermostatHandler) {
    * @apiGroup Thermostat
    */
   async function createDevice(req, res) {
-    const device = await thermostatHandler.createDevice(req.body);
-    res.json(device);
+    try {
+      const device = await thermostatHandler.createDevice(req.body);
+      res.json(device);
+    } catch (e) {
+      if (!sendScheduleError(e, res, DEVICE_ERRORS)) {
+        throw e;
+      }
+    }
   }
 
   /**

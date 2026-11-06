@@ -388,7 +388,10 @@ const EditForm = ({ ...props }) => {
       ['thermostatEditCoolingMinTemp', picked.min, '5'],
       ['thermostatEditCoolingMaxTemp', picked.max, '35']
     ].forEach(([field, value, defaultValue]) => {
-      if (value !== null && value !== undefined && String(props[field] || defaultValue) === defaultValue) {
+      // A field still on the form's default, or never filled: one the user
+      // emptied is theirs, as is one they typed.
+      const current = props[field] === undefined || props[field] === null ? defaultValue : String(props[field]);
+      if (value !== null && value !== undefined && current === defaultValue) {
         props.updateThermostatField(field, String(value));
       }
     });

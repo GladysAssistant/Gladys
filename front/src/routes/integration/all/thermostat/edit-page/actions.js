@@ -13,6 +13,7 @@ import {
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 import { parseSelectorList, serializeSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
+import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../../../server/utils/units';
 
 const PILOT_WIRE_ORDERS = Object.values(PILOT_WIRE_MODE);
 const PILOT_WIRE_ORDER_PARAM = preset => `THERMOSTAT_PILOT_WIRE_ORDER_${preset.toUpperCase()}`;
@@ -59,10 +60,19 @@ const COOLING_PRESET_FIELDS = [
   ['thermostatEditPresetCoolingComfort', 'comfort']
 ];
 const COOLING_PRESET_PARAM = preset => `THERMOSTAT_PRESET_COOLING_${preset.toUpperCase()}`;
-// A default preset temperature in the unit the form is in.
+// The form keeps temperatures to the half degree, in either unit.
+const roundToHalf = value => Math.round(value * 2) / 2;
+// A default preset temperature in the unit the form is in, converted and
+// rounded as switching the form between °C and °F does (updateThermostatUnit).
 const defaultInUnit = (state, mode, preset) => {
   const celsius = defaultPresetTemps(mode)[preset];
-  return state.thermostatEditTempUnit === 'F' ? Math.round(((celsius * 9) / 5 + 32) * 2) / 2 : celsius;
+  return state.thermostatEditTempUnit === 'F' ? roundToHalf(celsiusToFahrenheit(celsius)) : celsius;
+};
+// The refusals of the device route the form can name (spec A.4), by the code the
+// server answers with.
+const SAVE_ERRORS = {
+  REVERSIBLE_NO_MODE: 'reversibleNoMode',
+  REVERSIBLE_MODE_CANNOT_COOL: 'reversibleModeCannotCool'
 };
 // What ticking or unticking a reversible heat pump changes in the form (see
 // updateThermostatReversible).
@@ -112,13 +122,9 @@ const reversibleFields = (state, reversible) => {
 const carriedPresets = (state, previous, mode) => {
   const update = {};
   if (previous !== mode) {
-    const fahrenheit = state.thermostatEditTempUnit === 'F';
-    const inUnit = celsius => (fahrenheit ? Math.round(((celsius * 9) / 5 + 32) * 2) / 2 : celsius);
-    const from = defaultPresetTemps(previous);
-    const to = defaultPresetTemps(mode);
     PRESET_FIELDS.forEach(([field, preset]) => {
-      if (parseFloat(state[field]) === inUnit(from[preset])) {
-        update[field] = String(inUnit(to[preset]));
+      if (parseFloat(state[field]) === defaultInUnit(state, previous, preset)) {
+        update[field] = String(defaultInUnit(state, mode, preset));
       }
     });
   }
@@ -432,10 +438,10 @@ function createActions(store) {
       const oldUnit = state.thermostatEditTempUnit || 'C';
       if (oldUnit === newUnit) return;
       const isSet = v => v !== '' && v !== null && v !== undefined;
-      const round = v => String(Math.round(v * 2) / 2);
+      const round = v => String(roundToHalf(v));
       // Absolute temperatures (setpoints, min/max) carry the 32° offset...
-      const toF = v => (isSet(v) ? round((parseFloat(v) * 9) / 5 + 32) : v);
-      const toC = v => (isSet(v) ? round(((parseFloat(v) - 32) * 5) / 9) : v);
+      const toF = v => (isSet(v) ? round(celsiusToFahrenheit(parseFloat(v))) : v);
+      const toC = v => (isSet(v) ? round(fahrenheitToCelsius(parseFloat(v))) : v);
       // ...but hysteresis and the TPI band are temperature *differences*: adding
       // the offset would turn a 0.5 °C hysteresis into 32.9 °F.
       const deltaToF = v => (isSet(v) ? round((parseFloat(v) * 9) / 5) : v);
@@ -608,11 +614,13 @@ function createActions(store) {
           params: [
             // The active schedule is device-owned: the dashboard widget only
             // chooses which thermostat to display, it never drives regulation.
-            // The use, only when it is new or the form changed it: the widget
-            // and the unit's remote switch it too (spec A.4), and sent on every
-            // save, the use loaded with the form came back over theirs. Left
-            // out, the server keeps the one in force.
-            ...(!isEdit || state.thermostatEditModeChanged || savedMode !== mode
+            // The use of a reversible heat pump, only when it is new or the form
+            // changed it: the widget and the unit's remote switch it too (spec
+            // A.4), and the form's copy may predate their switch. Left out, the
+            // server keeps the one in force. Any other thermostat sends it, since
+            // its single set of presets was built for the use the form shows —
+            // one unticked here included.
+            ...(!isEdit || !reversible || state.thermostatEditModeChanged || savedMode !== mode
               ? [{ name: 'THERMOSTAT_MODE', value: savedMode }]
               : []),
             { name: 'THERMOSTAT_MIN_TEMP', value: String(minTemp) },
@@ -764,7 +772,9 @@ function createActions(store) {
         });
         route('/dashboard/integration/device/thermostat');
       } catch (e) {
-        store.setState({ thermostatCreateStatus: RequestStatus.Error });
+        // A thermostat the server refuses is named like one the form refuses.
+        const code = e && e.response && e.response.data && e.response.data.error;
+        store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: SAVE_ERRORS[code] || null });
       }
     }
   };

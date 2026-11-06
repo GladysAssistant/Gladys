@@ -3,7 +3,7 @@
 // them here avoids the drift where the form offered one default and the
 // regulation applied another.
 
-const { DEVICE_FEATURE_CATEGORIES, PILOT_WIRE_MODE, THERMOSTAT_MODE } = require('./constants');
+const { AC_MODE, DEVICE_FEATURE_CATEGORIES, PILOT_WIRE_MODE, THERMOSTAT_MODE } = require('./constants');
 
 const DEFAULT_PRESET_TEMPS = {
   frost: 7,
@@ -162,6 +162,46 @@ const DEFAULT_PILOT_WIRE_ORDERS = {
 
 const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
 
+// An air conditioner's mode is an AC_MODE, whose values differ from
+// THERMOSTAT_MODE (heating is 2 there, 1 here) and which has no off at all: the
+// unit is stopped by its power instead (A.0.3).
+const AC_MODE_BY_THERMOSTAT_MODE = {
+  [THERMOSTAT_MODE.HEATING]: AC_MODE.HEATING,
+  [THERMOSTAT_MODE.COOLING]: AC_MODE.COOLING,
+  [THERMOSTAT_MODE.AUTO]: AC_MODE.AUTO,
+};
+
+// The use each THERMOSTAT_MODE value picks on a reversible heat pump (spec A.4):
+// `off` and `auto` pick none.
+const USE_OF_MODE = {
+  [THERMOSTAT_MODE.HEATING]: 'heating',
+  [THERMOSTAT_MODE.COOLING]: 'cooling',
+};
+
+/**
+ * @description The use a mode value picks on a reversible heat pump (spec A.4),
+ * read in the encoding of the feature's category: THERMOSTAT_MODE on a
+ * thermostat mode, AC_MODE on an air conditioner's.
+ * @param {string} category - The category of the mode feature.
+ * @param {number} value - The mode value.
+ * @returns {string|undefined} `heating`, `cooling`, or undefined when the value
+ * picks no use (off, auto, drying, fan) or the category has no mode.
+ * @example
+ * useOfMode('air-conditioning', AC_MODE.COOLING); // 'cooling'
+ */
+function useOfMode(category, value) {
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT) {
+    return USE_OF_MODE[Number(value)];
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING) {
+    const mode = Object.keys(AC_MODE_BY_THERMOSTAT_MODE).find(
+      (key) => AC_MODE_BY_THERMOSTAT_MODE[key] === Number(value),
+    );
+    return mode === undefined ? undefined : USE_OF_MODE[Number(mode)];
+  }
+  return undefined;
+}
+
 /**
  * @description Whether a unit's mode feature can be told to cool, which a
  * reversible heat pump needs (spec A.4). An air conditioner speaks AC_MODE,
@@ -242,4 +282,7 @@ module.exports = {
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder,
   modeFeatureCanCool,
+  AC_MODE_BY_THERMOSTAT_MODE,
+  USE_OF_MODE,
+  useOfMode,
 };

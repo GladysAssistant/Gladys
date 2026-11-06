@@ -14,6 +14,8 @@ const { presetParamName } = require('../../../../utils/thermostatConstants');
 const { buildParamsConfig } = require('../../../../services/thermostat/lib/thermostat.deviceConfig');
 const { createDevice, buildStateFeatures } = require('../../../../services/thermostat/lib/thermostat.createDevice');
 const { setValue: coreSetValue } = require('../../../../lib/device/device.setValue');
+const { nextModeSequence } = require('../../../../services/thermostat/lib/thermostat.state');
+const { startExternalThermostat } = require('../../../../services/thermostat/lib/thermostat.applySchedules');
 
 const silentLogger = { debug: fake.returns(null), info: fake.returns(null), warn: fake.returns(null) };
 
@@ -315,6 +317,47 @@ describe('thermostat: reversible heat pump', () => {
       assert.notCalled(handler.broadcastConfigUpdated);
     });
 
+    // Every switch wrote two params and told the dashboards of a cleared hold.
+    it('should switch without clearing a hold there is not', async () => {
+      const handler = buildHandler();
+      const device = heatPump();
+      handler.gladys.device.get = fake.resolves([heatPump()]);
+
+      await handler.setValue(device, device.features[0], THERMOSTAT_MODE.COOLING);
+
+      assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MODE', 'cooling');
+      assert.neverCalledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT');
+      assert.notCalled(handler.gladys.event.emit);
+    });
+
+    // The copy the widget or a scene hands over predates a hold armed since:
+    // `setParam` writes the database alone.
+    it('should clear a hold only the database knows of, or one it cannot check', async () => {
+      const stale = buildHandler();
+      const device = heatPump();
+      stale.gladys.device.get = fake.resolves([
+        heatPump({ extra: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' }] }),
+      ]);
+      const unreadable = buildHandler();
+      unreadable.gladys.device.get = fake.rejects(new Error('db down'));
+      const empty = buildHandler();
+      empty.gladys.device.get = fake.resolves(null);
+      const held = buildHandler();
+      const heldDevice = heatPump({ extra: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' }] });
+
+      await stale.setValue(device, device.features[0], THERMOSTAT_MODE.COOLING);
+      const other = heatPump();
+      await unreadable.setValue(other, other.features[0], THERMOSTAT_MODE.COOLING);
+      await held.setValue(heldDevice, heldDevice.features[0], THERMOSTAT_MODE.COOLING);
+      const third = heatPump();
+      await empty.setValue(third, third.features[0], THERMOSTAT_MODE.COOLING);
+
+      [stale, unreadable, held, empty].forEach((handler) =>
+        assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', ''),
+      );
+      assert.notCalled(held.gladys.device.get);
+    });
+
     it('should keep the use of a thermostat that is not reversible', async () => {
       const handler = buildHandler();
       const device = heatPump({ reversible: false });
@@ -362,6 +405,7 @@ describe('thermostat: reversible heat pump', () => {
         modeSelectorsCache: null,
         observedModes: new Map(),
         modeReports: new Map(),
+        selfWrittenModes: new Map(),
         setValue: fake.resolves(null),
         broadcastConfigUpdated: fake.returns(null),
       };
@@ -838,6 +882,7 @@ describe('thermostat: reversible heat pump', () => {
         observedPowers: new Map([['ac-power', 0]]),
         selfWrittenPowers: new Map(),
         selfWrittenSetpoints: new Map(),
+        selfWrittenModes: new Map(),
         setValue: fake.resolves(null),
         broadcastConfigUpdated: fake.returns(null),
         triggerApplySchedules: fake.returns(null),
@@ -931,20 +976,53 @@ describe('thermostat: reversible heat pump', () => {
       type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
     };
 
-    it('should clear the reversible param of a unit whose mode only heats', async () => {
-      const created = await saveWithMode({ ...thermostatMode, max: 1 });
+    // Saved as not reversible, after the form split its presets, a thermostat
+    // set to cool read the heating ones and cooled to 21 °C.
+    const refusal = async (promise) => {
+      try {
+        await promise;
+      } catch (e) {
+        return e.message;
+      }
+      return null;
+    };
 
-      expect(reversibleParam(created)).to.equal('');
+    it('should refuse a unit whose mode only heats', async () => {
+      const message = await refusal(saveWithMode({ ...thermostatMode, max: 1 }));
+
+      expect(message).to.match(/^Thermostat: a reversible thermostat needs a mode that can cool/);
     });
 
     // What the form offers: a writable mode. Anything else takes no mode write.
-    it('should clear the reversible param of a read-only mode or a feature that is no mode', async () => {
-      expect(reversibleParam(await saveWithMode({ ...airConditionerMode, read_only: true }))).to.equal('');
-      expect(
-        reversibleParam(
-          await saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING, type: 'fan-speed', max: 5 }),
-        ),
-      ).to.equal('');
+    it('should refuse a read-only mode or a feature that is no mode', async () => {
+      const readOnly = await refusal(saveWithMode({ ...airConditionerMode, read_only: true }));
+      const noMode = await refusal(
+        saveWithMode({ category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING, type: 'fan-speed', max: 5 }),
+      );
+
+      expect(readOnly).to.match(/needs a mode that can cool/);
+      expect(noMode).to.match(/needs a mode that can cool/);
+    });
+
+    it('should save nothing when it refuses a thermostat', async () => {
+      const handler = buildCreateHandler();
+      handler.gladys.device.get = fake.resolves([
+        { selector: 'unit', features: [{ selector: 'ac-mode', ...thermostatMode, max: 1 }] },
+      ]);
+
+      await refusal(
+        createDevice.call(handler, {
+          name: 'Heat pump',
+          params: [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+            { name: 'THERMOSTAT_MODE_FEATURE', value: 'ac-mode' },
+            { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+          ],
+        }),
+      );
+
+      assert.notCalled(handler.gladys.device.create);
     });
 
     it('should keep the reversible param of a unit whose mode can cool', async () => {
@@ -957,15 +1035,33 @@ describe('thermostat: reversible heat pump', () => {
     });
 
     // With no mode to write, the unit would keep its use while the cooling presets applied.
-    it('should clear the reversible param of a real thermostat with no mode', async () => {
+    it('should refuse a real thermostat with no mode', async () => {
+      const save = (modeParams) =>
+        refusal(
+          createDevice.call(buildCreateHandler(), {
+            name: 'Heat pump',
+            external_id: 'thermostat:heat-pump',
+            params: [
+              { name: 'THERMOSTAT_TYPE', value: 'external' },
+              { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+              ...modeParams,
+              { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+            ],
+          }),
+        );
+
+      expect(await save([{ name: 'THERMOSTAT_MODE_FEATURE', value: '' }])).to.match(/needs a mode feature/);
+      expect(await save([])).to.match(/needs a mode feature/);
+    });
+
+    it('should save a real thermostat that is not reversible without a mode', async () => {
       const created = await createDevice.call(buildCreateHandler(), {
         name: 'Heat pump',
         external_id: 'thermostat:heat-pump',
         params: [
           { name: 'THERMOSTAT_TYPE', value: 'external' },
           { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
-          { name: 'THERMOSTAT_MODE_FEATURE', value: '' },
-          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: '' },
         ],
       });
 
@@ -1010,6 +1106,444 @@ describe('thermostat: reversible heat pump', () => {
       expect(reversible.value).to.equal('');
       // Allowed through, so a reversible heat pump keeps its cooling presets.
       expect(created.params.some((param) => param.name === 'THERMOSTAT_PRESET_COOLING_COMFORT')).to.equal(true);
+    });
+  });
+
+  // A use switched from the edit form is a switch like any other (A.4).
+  describe('createDevice switching the use', () => {
+    const stored = (use, extra = []) => ({
+      selector: 'heat-pump',
+      params: [
+        { name: 'THERMOSTAT_MODE', value: use },
+        { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+        { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' },
+        { name: 'THERMOSTAT_MANUAL_UNTIL', value: '1700000000000' },
+        ...extra,
+      ],
+    });
+    const buildHandler = (existing) => ({
+      serviceId: 'service-id',
+      gladys: {
+        device: {
+          create: fake((device) => Promise.resolve(device)),
+          get: fake((query) =>
+            Promise.resolve(
+              query && query.device_feature_selectors
+                ? [
+                    {
+                      selector: 'unit',
+                      features: [
+                        {
+                          selector: 'ac-mode',
+                          category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+                          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+                        },
+                      ],
+                    },
+                  ]
+                : [existing],
+            ),
+          ),
+        },
+      },
+      event: { emit: fake.returns(null) },
+      invalidateDeviceCaches: fake.returns(null),
+    });
+    const save = (handler, { use, reversible = 'true', hold = [] } = {}) =>
+      createDevice.call(Object.assign(handler, { gladys: { ...handler.gladys, event: handler.event } }), {
+        name: 'Heat pump',
+        selector: 'heat-pump',
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'ac-mode' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: reversible },
+          ...(use ? [{ name: 'THERMOSTAT_MODE', value: use }] : []),
+          ...hold,
+        ],
+      });
+    const param = (created, name) => {
+      const found = created.params.find((candidate) => candidate.name === name);
+      return found ? found.value : undefined;
+    };
+
+    it('should drop the hold of a reversible heat pump whose use the form switched', async () => {
+      const handler = buildHandler(stored('heating'));
+
+      const created = await save(handler, { use: 'cooling' });
+
+      expect(param(created, 'THERMOSTAT_MODE')).to.equal('cooling');
+      expect(param(created, 'THERMOSTAT_MANUAL_SETPOINT')).to.equal(undefined);
+      expect(param(created, 'THERMOSTAT_MANUAL_UNTIL')).to.equal(undefined);
+      assert.calledOnce(handler.event.emit);
+      expect(handler.event.emit.firstCall.args[1].payload).to.deep.equal({
+        device: 'heat-pump',
+        setpoint: null,
+        until: null,
+      });
+      // No marker of where a param came from reaches the database.
+      created.params.forEach((saved) => expect(saved).to.not.have.property('carried'));
+    });
+
+    // Unticked in the same save: the hold still belonged to the other use.
+    it('should drop the hold of a heat pump unticked reversible in the same save', async () => {
+      const created = await save(buildHandler(stored('heating')), { use: 'cooling', reversible: '' });
+
+      expect(param(created, 'THERMOSTAT_MANUAL_SETPOINT')).to.equal(undefined);
+    });
+
+    it('should keep the hold when the use is carried over, unchanged, or the thermostat never was reversible', async () => {
+      const carried = await save(buildHandler(stored('heating')));
+      const unchanged = await save(buildHandler(stored('heating')), { use: 'heating' });
+      const neverReversible = buildHandler({
+        selector: 'heat-pump',
+        params: [
+          { name: 'THERMOSTAT_MODE', value: 'heating' },
+          { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' },
+        ],
+      });
+      const notReversible = await save(neverReversible, { use: 'cooling', reversible: '' });
+
+      expect(param(carried, 'THERMOSTAT_MANUAL_SETPOINT')).to.equal('21');
+      expect(param(unchanged, 'THERMOSTAT_MANUAL_SETPOINT')).to.equal('21');
+      expect(param(notReversible, 'THERMOSTAT_MANUAL_SETPOINT')).to.equal('21');
+      assert.notCalled(neverReversible.event.emit);
+    });
+
+    it('should switch without telling the dashboards of a hold there was not', async () => {
+      const noHold = buildHandler({
+        selector: 'heat-pump',
+        params: [
+          { name: 'THERMOSTAT_MODE', value: 'heating' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+          { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '' },
+        ],
+      });
+      const noStoredUse = buildHandler({
+        selector: 'heat-pump',
+        params: [{ name: 'THERMOSTAT_REVERSIBLE', value: 'true' }],
+      });
+
+      const created = await save(noHold, { use: 'cooling' });
+      await save(noStoredUse, { use: 'cooling' });
+
+      expect(param(created, 'THERMOSTAT_MANUAL_SETPOINT')).to.equal('');
+      assert.notCalled(noHold.event.emit);
+      assert.notCalled(noStoredUse.event.emit);
+    });
+
+    // A hold the payload sends is its own, and a client cannot pass a param off
+    // as one carried from the device.
+    it('should keep a hold the payload sends', async () => {
+      const created = await save(buildHandler(stored('heating')), {
+        use: 'cooling',
+        hold: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '25', carried: true }],
+      });
+
+      expect(param(created, 'THERMOSTAT_MANUAL_SETPOINT')).to.equal('25');
+      expect(param(created, 'THERMOSTAT_MANUAL_UNTIL')).to.equal(undefined);
+    });
+  });
+
+  // A pass that wrote the old use while a remote press was being followed: its
+  // echo arrived after the press, and switched the heat pump back (A.4).
+  describe('the marks of the modes this service writes', () => {
+    const loadListener = () =>
+      proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+        '../../../utils/logger': silentLogger,
+      });
+
+    const acMode = (value) => ({
+      selector: 'ac-mode',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+      last_value: value,
+    });
+
+    const buildHandler = (device, lookup) => ({
+      gladys: {
+        device: {
+          get: fake((query) => (query && query.device_feature_selectors ? lookup() : Promise.resolve([device]))),
+          setParam: sinon.stub().callsFake((target, name, value) => {
+            target.params = [...target.params.filter((p) => p.name !== name), { name, value }];
+            return Promise.resolve(null);
+          }),
+          saveState: fake.resolves(null),
+        },
+        event: { emit: fake.returns(null) },
+      },
+      triggerApplySchedules: fake.returns(null),
+      broadcastConfigUpdated: fake.returns(null),
+      modeSelectorsCache: new Set(['ac-mode']),
+      windowSelectorsCache: new Set(),
+      targetSelectorsCache: new Set(),
+      powerSelectorsCache: new Set(),
+      observedModes: new Map([['ac-mode', AC_MODE.HEATING]]),
+      modeReports: new Map(),
+      selfWrittenModes: new Map(),
+    });
+
+    it('should mark a mode it writes on the unit, and only when it writes one', async () => {
+      const marks = new Map();
+      const setValue = fake.resolves(null);
+      const gladys = {
+        device: {
+          get: fake.resolves([{ selector: 'ac', features: [acMode(AC_MODE.HEATING)] }]),
+          setValue,
+        },
+      };
+      const config = { mode_feature: 'ac-mode', default_mode: 'cooling' };
+
+      await startExternalThermostat(gladys, config, 'test', null, marks);
+      expect(marks.get('ac-mode').value).to.equal(AC_MODE.COOLING);
+
+      const held = new Map();
+      await startExternalThermostat(gladys, { ...config, default_mode: 'heating' }, 'test', null, held);
+      expect(held.size).to.equal(0);
+      // Without marks to keep, the write goes out all the same.
+      await startExternalThermostat(gladys, config, 'test');
+      assert.calledTwice(setValue);
+    });
+
+    it("should not follow the echo of a pass's write that arrives after a remote press", async () => {
+      const mod = loadListener();
+      const device = heatPump();
+      let release;
+      const handler = buildHandler(
+        device,
+        () =>
+          new Promise((resolve) => {
+            release = () => resolve([{ selector: 'ac', features: [acMode(AC_MODE.COOLING)] }]);
+          }),
+      );
+
+      // The press: cooling picked on the remote, still being followed…
+      const press = mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      // …when a pass, which still read heating, writes it back to the unit…
+      handler.selfWrittenModes.set('ac-mode', { value: AC_MODE.HEATING, sequence: nextModeSequence() });
+      // …and its echo arrives behind the press.
+      const echo = mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.HEATING);
+      release();
+      await Promise.all([press, echo]);
+
+      expect(buildParamsConfig(device).default_mode).to.equal('cooling');
+      const uses = handler.gladys.device.setParam
+        .getCalls()
+        .filter((call) => call.args[1] === 'THERMOSTAT_MODE')
+        .map((call) => call.args[2]);
+      expect(uses).to.deep.equal(['cooling']);
+      expect(handler.observedModes.get('ac-mode')).to.equal(AC_MODE.HEATING);
+    });
+
+    // Kept after the unit moved away from it, the mark would swallow a press
+    // back to the mode last written.
+    it('should drop a mark once the unit reports another mode after it', async () => {
+      const mod = loadListener();
+      const device = heatPump();
+      const handler = buildHandler(device, () =>
+        Promise.resolve([{ selector: 'ac', features: [acMode(AC_MODE.COOLING)] }]),
+      );
+      handler.selfWrittenModes.set('ac-mode', { value: AC_MODE.HEATING, sequence: nextModeSequence() });
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+      expect(handler.selfWrittenModes.has('ac-mode')).to.equal(false);
+      expect(buildParamsConfig(device).default_mode).to.equal('cooling');
+
+      handler.gladys.device.get = fake((query) =>
+        Promise.resolve(
+          query && query.device_feature_selectors
+            ? [{ selector: 'ac', features: [acMode(AC_MODE.HEATING)] }]
+            : [device],
+        ),
+      );
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.HEATING);
+
+      expect(buildParamsConfig(device).default_mode).to.equal('heating');
+    });
+  });
+
+  describe('the observed mode at start-up', () => {
+    const loadListener = () =>
+      proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+        '../../../utils/logger': silentLogger,
+      });
+
+    const buildHandler = (device, unitValue) => ({
+      gladys: {
+        device: {
+          get: fake((query) =>
+            Promise.resolve(
+              query && query.device_feature_selectors
+                ? [
+                    {
+                      selector: 'ac',
+                      features: [
+                        {
+                          selector: query.device_feature_selectors,
+                          category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+                          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+                          last_value: unitValue,
+                        },
+                      ],
+                    },
+                  ]
+                : [device],
+            ),
+          ),
+          setParam: fake.resolves(null),
+          saveState: fake.resolves(null),
+        },
+        event: { emit: fake.returns(null) },
+      },
+      triggerApplySchedules: fake.returns(null),
+      broadcastConfigUpdated: fake.returns(null),
+      observedSetpoints: new Map(),
+      selfWrittenSetpoints: new Map(),
+      observedPowers: new Map(),
+      selfWrittenPowers: new Map(),
+      observedModes: new Map(),
+      selfWrittenModes: new Map(),
+      modeReports: new Map(),
+    });
+
+    it('should seed the mode of each unit from the database', async () => {
+      const mod = loadListener();
+      const handler = buildHandler(heatPump(), AC_MODE.HEATING);
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedModes.get('ac-mode')).to.equal(AC_MODE.HEATING);
+    });
+
+    // On an integration that only reports changes, the first report after a
+    // restart is the press itself: taken as the reference, the pass wrote the
+    // old use back.
+    it('should follow a first report that differs from the stored mode, and ignore an equal one', async () => {
+      const mod = loadListener();
+      const pressed = buildHandler(heatPump(), AC_MODE.HEATING);
+      const same = buildHandler(heatPump(), AC_MODE.HEATING);
+      await mod.primeObservedSetpoints.call(pressed);
+      await mod.primeObservedSetpoints.call(same);
+
+      await mod.onExternalModeChanged.call(pressed, 'ac-mode', AC_MODE.COOLING);
+      await mod.onExternalModeChanged.call(same, 'ac-mode', AC_MODE.HEATING);
+
+      assert.calledWith(pressed.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE', 'cooling');
+      assert.notCalled(same.gladys.device.setParam);
+    });
+
+    // A null read made `observedModes` NaN, and the next identical report was
+    // then followed as a change.
+    it('should take a list of devices that comes back empty as no heat pump to switch', async () => {
+      const mod = loadListener();
+      const handler = buildHandler(heatPump(), AC_MODE.COOLING);
+      handler.modeSelectorsCache = new Set(['ac-mode']);
+      handler.windowSelectorsCache = new Set();
+      handler.targetSelectorsCache = new Set();
+      handler.powerSelectorsCache = new Set();
+      handler.observedModes.set('ac-mode', AC_MODE.HEATING);
+      const { get } = handler.gladys.device;
+      handler.gladys.device.get = fake((query) =>
+        query && query.device_feature_selectors ? get(query) : Promise.resolve(null),
+      );
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+
+      expect(handler.observedModes.get('ac-mode')).to.equal(AC_MODE.COOLING);
+      assert.notCalled(handler.gladys.device.setParam);
+    });
+  });
+
+  // The use a unit switched on from its remote reports is best effort: the hold
+  // and the start behind it must not depend on it (A.4).
+  describe('a remote start whose use cannot be taken', () => {
+    const getScheduleOfDevice = fake.resolves(null);
+    const loadListener = () =>
+      proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+        '../../../utils/logger': silentLogger,
+        './thermostat.scheduleDevice': { getScheduleOfDevice },
+      });
+
+    const poweredPump = (mode) =>
+      heatPump({ use: 'cooling', mode, extra: [{ name: 'THERMOSTAT_POWER_FEATURE', value: 'ac-power' }] });
+
+    const buildHandler = (device, { modeLookupFails = false, useSaveFails = false } = {}) => ({
+      gladys: {
+        device: {
+          get: fake((query) => {
+            const selector = query && query.device_feature_selectors;
+            if (selector === 'ac-mode') {
+              return modeLookupFails
+                ? Promise.reject(new Error('cloud down'))
+                : Promise.resolve([
+                    {
+                      selector: 'ac',
+                      features: [
+                        {
+                          selector: 'ac-mode',
+                          category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+                          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+                          last_value: AC_MODE.HEATING,
+                        },
+                      ],
+                    },
+                  ]);
+            }
+            if (selector === 'ac-setpoint') {
+              return Promise.resolve([{ selector: 'ac', features: [{ selector: 'ac-setpoint', last_value: 22 }] }]);
+            }
+            return Promise.resolve([device]);
+          }),
+          setParam: sinon
+            .stub()
+            .callsFake((target, name) =>
+              useSaveFails && name === 'THERMOSTAT_MODE' ? Promise.reject(new Error('db busy')) : Promise.resolve(null),
+            ),
+        },
+        event: { emit: fake.returns(null) },
+      },
+      powerSelectorsCache: new Set(['ac-power']),
+      observedPowers: new Map([['ac-power', 0]]),
+      selfWrittenPowers: new Map(),
+      selfWrittenSetpoints: new Map([['ac-setpoint', 19]]),
+      selfWrittenModes: new Map(),
+      setValue: fake.resolves(null),
+      broadcastConfigUpdated: fake.returns(null),
+      triggerApplySchedules: fake.returns(null),
+    });
+
+    it('should still hold the setpoint and start a stopped heat pump when the lookup fails', async () => {
+      const mod = loadListener();
+      const handler = buildHandler(poweredPump(THERMOSTAT_MODE.OFF), { modeLookupFails: true });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '22');
+      assert.calledOnce(handler.setValue);
+    });
+
+    it('should still hold the setpoint and start a stopped heat pump when the use cannot be saved', async () => {
+      const mod = loadListener();
+      const handler = buildHandler(poweredPump(THERMOSTAT_MODE.OFF), { useSaveFails: true });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '22');
+      assert.calledOnce(handler.setValue);
+    });
+
+    it('should still look for an Off point on a running heat pump when the lookup fails', async () => {
+      const mod = loadListener();
+      const device = poweredPump(THERMOSTAT_MODE.COOLING);
+      const handler = buildHandler(device, { modeLookupFails: true });
+      getScheduleOfDevice.resetHistory();
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledOnceWithExactly(getScheduleOfDevice, device.id);
     });
   });
 });

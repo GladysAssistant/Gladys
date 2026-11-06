@@ -1,6 +1,6 @@
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES, THERMOSTAT_MODE } = require('../../../utils/constants');
-const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
+const { DEFAULT_MANUAL_DURATION_MINUTES, USE_OF_MODE } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const {
   startExternalThermostat,
@@ -18,14 +18,38 @@ const {
   clearModuleStop,
 } = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
-const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
+const {
+  presetName,
+  savePreset,
+  setManualHold,
+  clearManualHold,
+  getManualHold,
+  isStopped,
+} = require('./thermostat.state');
 
-// The use each value of the thermostat's own `mode` feature switches a
-// reversible heat pump to (spec A.4). `off` and `auto` switch nothing.
-const USE_OF_MODE = {
-  [THERMOSTAT_MODE.HEATING]: 'heating',
-  [THERMOSTAT_MODE.COOLING]: 'cooling',
-};
+/**
+ * @description Whether a thermostat holds a manual setpoint, read from the
+ * database: the copy of the device a scene, the widget or the API hands over
+ * may predate the hold, since `setParam` writes the database alone.
+ * @param {object} device - The thermostat device.
+ * @returns {Promise<boolean>} True when a hold is armed, or when it cannot be told.
+ * @example
+ * await holdIsArmed.call(handler, device);
+ */
+async function holdIsArmed(device) {
+  if (getManualHold(device)) {
+    return true;
+  }
+  try {
+    const devices = await this.gladys.device.get({ service: 'thermostat' });
+    const stored = (devices || []).find((candidate) => candidate.id === device.id);
+    // A device that cannot be found is cleared anyway: a clear too many costs a
+    // message, a hold left behind regulates the new use on the old setpoint.
+    return !stored || Boolean(getManualHold(stored));
+  } catch (e) {
+    return true;
+  }
+}
 
 /**
  * @description Switch a reversible heat pump between heating and cooling.
@@ -51,9 +75,10 @@ async function switchUse(device, use, { keepHold = false } = {}) {
   if (!config.reversible || config.default_mode === use) {
     return false;
   }
-  // The hold goes first: saved after the use, a failed clear left the old use's
-  // hold to be regulated under the new one, and a retry returned above.
-  if (!keepHold) {
+  // The hold goes first: saved after the use, a failed clear would leave the
+  // old use's hold regulated under the new one, and a retry would return above.
+  // With no hold, nothing is written and no dashboard is told of a cleared one.
+  if (!keepHold && (await holdIsArmed.call(this, device))) {
     await clearManualHold.call(this, device);
   }
   await this.gladys.device.setParam(device, 'THERMOSTAT_MODE', use);
@@ -143,6 +168,7 @@ async function writeSetpoint(device, deviceFeature, value) {
     config,
     `setValue ${value}, ${deviceFeature.selector}`,
     this.selfWrittenPowers,
+    this.selfWrittenModes,
   );
   // Mark it before writing: the device echoes the new value back as a NEW_STATE,
   // and the listener must not mistake our own write for a change made on the
@@ -296,6 +322,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
           `mode=off, ${device.selector}`,
           this.selfWrittenSetpoints,
           this.selfWrittenPowers,
+          this.selfWrittenModes,
         );
       }
       await clearManualHold.call(this, device);
@@ -303,7 +330,13 @@ async function setValue(device, deviceFeature, value, manual = true) {
       // The power and the mode go first in this direction too. Left to the next
       // pass, they reached the appliance two seconds after the setpoint the widget
       // sends right behind a start: a thermostat still off was handed a target to ignore.
-      await startExternalThermostat(this.gladys, config, `mode=${value}, ${device.selector}`, this.selfWrittenPowers);
+      await startExternalThermostat(
+        this.gladys,
+        config,
+        `mode=${value}, ${device.selector}`,
+        this.selfWrittenPowers,
+        this.selfWrittenModes,
+      );
     }
     logger.info(`Thermostat: mode ${value} set on ${device.selector}`);
     this.triggerApplySchedules();
@@ -338,5 +371,4 @@ module.exports = {
   holdExpiry,
   nextPointTimestamp,
   presetHoldSetpoint,
-  USE_OF_MODE,
 };
