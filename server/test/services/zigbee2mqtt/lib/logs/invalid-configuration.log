@@ -1,0 +1,15 @@
+Starting Zigbee2MQTT without watchdog.
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            READ THIS CAREFULLY
+
+Refusing to start because configuration is not valid, found the following errors:
+- serial/adapter must be equal to one of the allowed values
+
+If you don't know how to solve this, read https://www.zigbee2mqtt.io/guide/configuration
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Failure page is available at http://0.0.0.0:8080/

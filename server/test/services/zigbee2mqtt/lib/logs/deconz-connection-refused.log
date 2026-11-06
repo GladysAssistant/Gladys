@@ -1,0 +1,18 @@
+Starting Zigbee2MQTT without watchdog.
+[2026-11-06 18:56:55] [32minfo[39m: 	z2m: Logging to console, file (filename: log.log)
+[2026-11-06 18:56:55] [32minfo[39m: 	z2m: Starting Zigbee2MQTT version 2.14.2 (commit #5c0c1c60078e1737c5dee5f8217583bca7610e66
+)
+[2026-11-06 18:56:55] [32minfo[39m: 	z2m: Starting zigbee-herdsman (10.10.0)
+[2026-11-06 18:56:55] [31merror[39m: 	zh:deconz:driver: Socket error Error: connect ECONNREFUSED 127.0.0.1:6639
+[2026-11-06 18:56:55] [32minfo[39m: 	zh:deconz:driver: Port close: state: undefined, reason: true
+/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/dist/adapter/deconz/driver/driver.js:746
+        this.emitStateEvent(DriverEvent.Disconnected);
+             ^
+
+TypeError: this.emitStateEvent is not a function
+    at Socket.onPortClose (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/deconz/driver/driver.ts:828:14)
+    at Object.onceWrapper (node:events:631:26)
+    at Socket.emit (node:events:509:28)
+    at TCP.<anonymous> (node:net:351:12)
+
+Node.js v24.18.1

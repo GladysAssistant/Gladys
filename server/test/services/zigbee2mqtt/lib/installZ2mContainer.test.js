@@ -172,7 +172,11 @@ describe('zigbee2mqtt installz2mContainer', () => {
     }
     // ASSERT
     // The error of a previous run must not be shown while the new one starts
-    assert.calledOnceWithExactly(gladys.system.getContainerLogs, container.id, { follow: true, since: 1700000000 });
+    assert.calledOnceWithExactly(gladys.system.getContainerLogs, container.id, {
+      follow: true,
+      since: 1700000000,
+      tail: 'all',
+    });
   });
 
   it('should restart z2m container (container running but config changed)', async () => {

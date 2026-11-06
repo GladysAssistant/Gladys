@@ -1,0 +1,20 @@
+Starting Zigbee2MQTT without watchdog.
+[2026-11-06 18:53:23] [32minfo[39m: 	z2m: Logging to console, file (filename: log.log)
+[2026-11-06 18:53:23] [32minfo[39m: 	z2m: Starting Zigbee2MQTT version 2.14.2 (commit #5c0c1c60078e1737c5dee5f8217583bca7610e66
+)
+[2026-11-06 18:53:23] [32minfo[39m: 	z2m: Starting zigbee-herdsman (10.10.0)
+[2026-11-06 18:53:23] [33mwarning[39m: 	zh:ezsp: 'ezsp' driver is deprecated and will only remain to provide support for older firmware (pre 7.4.x). Migration to 'ember' is recommended. If using Zigbee2MQTT see https://github.com/Koenkk/zigbee2mqtt/discussions/21462
+[2026-11-06 18:53:33] [31merror[39m: 	zh:ezsp:uart: --> Error: Error: {"sequence":-1} after 10000ms
+/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/dist/adapter/ezsp/driver/ezsp.js:318
+            throw new Error("Failure to connect");
+                  ^
+
+Error: Failure to connect
+    at SerialDriver.resetForReconnect (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ezsp/driver/ezsp.ts:343:19)
+    at SerialDriver.emit (node:events:509:28)
+    at <anonymous> (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ezsp/driver/uart.ts:350:22)
+    at async AsyncMutex.run (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/utils/async-mutex.ts:17:20)
+    at async SerialDriver.reset (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ezsp/driver/uart.ts:335:16)
+    at async Socket.<anonymous> (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ezsp/driver/uart.ts:155:17)
+
+Node.js v24.18.1
