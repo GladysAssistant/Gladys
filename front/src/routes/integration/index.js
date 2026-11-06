@@ -40,10 +40,10 @@ import { RequestStatus } from '../../utils/consts';
 // of the instance are admin choices, and such a provider has no per-user
 // surface.
 const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'provider', 'ai', 'tts'];
-// homekit exposes the whole house to a hub; free-mobile is a single global SMS
-// account whose page reads service-wide credentials. Neither has anything
-// per-user, so a non-admin has no business on those pages.
-const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit', 'free-mobile'];
+// homekit and matter-bridge expose the whole house to a hub; free-mobile is a
+// single global SMS account whose page reads service-wide credentials. None has
+// anything per-user, so a non-admin has no business on those pages.
+const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit', 'matter-bridge', 'free-mobile'];
 // cross-cutting views: they are not browse categories, they filter the whole
 // catalog (a favorite, or an integration with a pending update, can be of any
 // category) — so no category filter must be applied to them
