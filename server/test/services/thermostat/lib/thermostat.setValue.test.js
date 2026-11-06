@@ -774,12 +774,23 @@ describe('thermostat.setValue', () => {
       assert.calledWith(handler.gladys.device.saveState, setpointFeature, 7);
     });
 
-    it('should pass a value that is no number through, for saveState to refuse', async () => {
+    it('should pass a value that is no number through untouched', async () => {
       const handler = buildHandler();
 
       await handler.setValue(device(range), setpointFeature, 'abc');
 
       assert.calledWith(handler.gladys.device.saveState, setpointFeature, 'abc');
+    });
+
+    // Number() reads each of these as 0, which was bounded and held as 8.
+    ['', '  ', null, false].forEach((empty) => {
+      it(`should pass ${JSON.stringify(empty)} through rather than hold the bottom of the range`, async () => {
+        const handler = buildHandler();
+
+        await handler.setValue(device(range), setpointFeature, empty);
+
+        assert.calledWith(handler.gladys.device.saveState, setpointFeature, empty);
+      });
     });
 
     it('should bound to the default range a thermostat with no params', async () => {
