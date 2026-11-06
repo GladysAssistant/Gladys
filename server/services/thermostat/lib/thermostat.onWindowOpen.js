@@ -46,8 +46,8 @@ const { pointInForce } = require('./thermostat.getSchedules');
  */
 function invalidateDeviceCaches() {
   // A pass already under way read the devices before the change: the next read
-  // starts a pass of its own.
-  this.deviceCachesFill = null;
+  // starts a pass of its own, and the old one publishes nothing.
+  this.deviceCachesGeneration = (this.deviceCachesGeneration || 0) + 1;
   this.windowSelectorsCache = null;
   this.targetSelectorsCache = null;
   this.powerSelectorsCache = null;
@@ -77,12 +77,13 @@ async function postUpdate() {
 
 /**
  * @description Fill every cache derived from this service's devices in one pass
- * (getWindowSelectors).
- * @returns {Promise<Set<string>>} Configured window selectors.
+ * (getWindowSelectors). A pass started before the devices changed publishes nothing.
+ * @param {number} generation - The `deviceCachesGeneration` the pass started in.
+ * @returns {Promise<object>} The `window`, `target`, `power` and `mode` selector sets.
  * @example
- * const selectors = await fillDeviceCaches.call(thermostatHandler);
+ * const { mode } = await fillDeviceCaches.call(thermostatHandler, 0);
  */
-async function fillDeviceCaches() {
+async function fillDeviceCaches(generation) {
   const devices = await this.gladys.device.get({ service: 'thermostat' });
   const selectors = new Set();
   // The setpoints and the powers of the external thermostats are collected in
@@ -114,11 +115,52 @@ async function fillDeviceCaches() {
       modes.add(config.mode_feature);
     }
   });
-  this.windowSelectorsCache = selectors;
-  this.targetSelectorsCache = targets;
-  this.powerSelectorsCache = powers;
-  this.modeSelectorsCache = modes;
-  return selectors;
+  // Read before the devices changed, they would hide the change until the next one.
+  if (generation === (this.deviceCachesGeneration || 0)) {
+    this.windowSelectorsCache = selectors;
+    this.targetSelectorsCache = targets;
+    this.powerSelectorsCache = powers;
+    this.modeSelectorsCache = modes;
+  }
+  return { window: selectors, target: targets, power: powers, mode: modes };
+}
+
+/**
+ * @description Fill the caches derived from this service's devices, or wait for
+ * the pass already filling them (getWindowSelectors).
+ * @returns {Promise<object>} The `window`, `target`, `power` and `mode` selector sets.
+ * @example
+ * const { mode } = await readDeviceCaches.call(thermostatHandler);
+ */
+async function readDeviceCaches() {
+  // Callers that find the caches empty together wait on the same pass, and so
+  // resume in the order they called: two mode reports of a unit, each on a pass
+  // of its own, could resume in either order and be followed in it (A.4). A pass
+  // started before the devices changed is stale: the next one waits for it to
+  // end first, so its callers still resume first.
+  const generation = this.deviceCachesGeneration || 0;
+  const pending = this.deviceCachesFill;
+  if (!pending || pending.generation !== generation) {
+    const fill = (async () => {
+      if (pending) {
+        try {
+          await pending.promise;
+        } catch (e) {
+          // Its own callers are told of its failure.
+        }
+      }
+      return fillDeviceCaches.call(this, generation);
+    })();
+    this.deviceCachesFill = { promise: fill, generation };
+  }
+  const current = this.deviceCachesFill;
+  try {
+    return await current.promise;
+  } finally {
+    if (this.deviceCachesFill === current) {
+      this.deviceCachesFill = null;
+    }
+  }
 }
 
 /**
@@ -133,20 +175,7 @@ async function getWindowSelectors() {
   if (this.windowSelectorsCache && this.targetSelectorsCache && this.powerSelectorsCache && this.modeSelectorsCache) {
     return this.windowSelectorsCache;
   }
-  // Callers that find the caches empty together wait on the same pass, and so
-  // resume in the order they called: two mode reports of a unit, each on a pass
-  // of its own, could resume in either order and be followed in it (A.4).
-  if (!this.deviceCachesFill) {
-    this.deviceCachesFill = fillDeviceCaches.call(this);
-  }
-  const fill = this.deviceCachesFill;
-  try {
-    return await fill;
-  } finally {
-    if (this.deviceCachesFill === fill) {
-      this.deviceCachesFill = null;
-    }
-  }
+  return (await readDeviceCaches.call(this)).window;
 }
 
 /**
@@ -159,11 +188,11 @@ async function getWindowSelectors() {
  * const selectors = await thermostatHandler.getTargetSelectors();
  */
 async function getTargetSelectors() {
-  if (!this.targetSelectorsCache) {
-    // Both caches are filled by the same pass over the devices.
-    await getWindowSelectors.call(this);
+  if (this.targetSelectorsCache) {
+    return this.targetSelectorsCache;
   }
-  return this.targetSelectorsCache;
+  // Every cache is filled by the same pass over the devices.
+  return (await readDeviceCaches.call(this)).target;
 }
 
 /**
@@ -174,11 +203,11 @@ async function getTargetSelectors() {
  * const selectors = await thermostatHandler.getPowerSelectors();
  */
 async function getPowerSelectors() {
-  if (!this.powerSelectorsCache) {
-    // Every cache is filled by the same pass over the devices.
-    await getWindowSelectors.call(this);
+  if (this.powerSelectorsCache) {
+    return this.powerSelectorsCache;
   }
-  return this.powerSelectorsCache;
+  // Every cache is filled by the same pass over the devices.
+  return (await readDeviceCaches.call(this)).power;
 }
 
 /**
@@ -189,11 +218,11 @@ async function getPowerSelectors() {
  * const selectors = await thermostatHandler.getModeSelectors();
  */
 async function getModeSelectors() {
-  if (!this.modeSelectorsCache) {
-    // Every cache is filled by the same pass over the devices.
-    await getWindowSelectors.call(this);
+  if (this.modeSelectorsCache) {
+    return this.modeSelectorsCache;
   }
-  return this.modeSelectorsCache;
+  // Every cache is filled by the same pass over the devices.
+  return (await readDeviceCaches.call(this)).mode;
 }
 
 /**
@@ -827,26 +856,37 @@ async function followModeReport(changedSelector, value, lifecycle) {
     const switches = await Promise.allSettled(
       devices.map(async (device) => {
         const config = buildParamsConfig(device);
-        if (!config || !config.reversible || config.mode_feature !== changedSelector || config.default_mode === use) {
+        if (!config || !config.reversible || config.mode_feature !== changedSelector) {
           return;
         }
-        logger.info(
-          `Thermostat: ${changedSelector} switched to ${use} on the device itself, following on ${device.selector}`,
-        );
         const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
-        if (!modeFeature || isStopped(device)) {
-          await switchUse.call(this, device, use);
-          return;
+        const running = Boolean(modeFeature) && !isStopped(device);
+        const [shown, other] =
+          use === 'cooling'
+            ? [THERMOSTAT_MODE.COOLING, THERMOSTAT_MODE.HEATING]
+            : [THERMOSTAT_MODE.HEATING, THERMOSTAT_MODE.COOLING];
+        if (config.default_mode === use) {
+          // Already in that use, unless its mode feature still shows the other
+          // one: the use was switched and the save of the feature failed. Left
+          // there, the next report skipped it, and the dashboards kept the old use.
+          if (!running || Number(modeFeature.last_value) !== other) {
+            return;
+          }
+        } else {
+          logger.info(
+            `Thermostat: ${changedSelector} switched to ${use} on the device itself, following on ${device.selector}`,
+          );
+          if (!running) {
+            await switchUse.call(this, device, use);
+            return;
+          }
+          // A running one keeps its hold: a remote sends its whole state with each
+          // press, and the setpoint held from that same press is the unit's own, in
+          // the use it now runs. Dropped, the next pass put the unit back on the
+          // programme — off, on an Off point.
+          await switchUse.call(this, device, use, { keepHold: true });
         }
-        // A running one keeps its hold: a remote sends its whole state with each
-        // press, and the setpoint held from that same press is the unit's own, in
-        // the use it now runs. Dropped, the next pass put the unit back on the
-        // programme — off, on an Off point.
-        await switchUse.call(this, device, use, { keepHold: true });
-        await this.gladys.device.saveState(
-          modeFeature,
-          use === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING,
-        );
+        await this.gladys.device.saveState(modeFeature, shown);
         this.triggerApplySchedules();
       }),
     );
