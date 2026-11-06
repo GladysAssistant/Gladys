@@ -1566,6 +1566,7 @@ class ThermostatBox extends Component {
   applyPreset = async preset => {
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
+    const wasManual = this.state.isManualMode;
     const newSetpoint =
       preset.temp !== null && preset.temp !== undefined ? this.toSetpointFeatureUnit(preset.temp) : this.state.setpoint;
     this.setState({
@@ -1577,6 +1578,7 @@ class ThermostatBox extends Component {
     // The hold the server arms is the widget's own, so the event it echoes back
     // must not un-highlight the preset that was just picked.
     this.pickingPreset = true;
+    let written;
     try {
       if (preset.key === 'off') {
         // Stopping is a mode, not a preset: it switches the machine off, and the
@@ -1584,16 +1586,24 @@ class ThermostatBox extends Component {
         // External thermostats carry this mode feature too — it is Gladys's own
         // stop, and the server turns it into the real device's stop (its mode
         // when it has one, plus the frost setpoint).
-        await this.writeMode(THERMOSTAT_MODE.OFF);
+        written = await this.writeMode(THERMOSTAT_MODE.OFF);
       } else {
         await this.resumeIfStopped();
-        await this.savePreset(preset.key);
+        written = await this.savePreset(preset.key);
       }
     } finally {
       this.pickingPreset = false;
     }
+    // A write that failed armed no hold: the card goes back to the manual mode
+    // it was in — not to `false`, since an earlier hold may still stand — until
+    // the refresh reads the device. Left set, an Off tapped before the refresh
+    // handed a thermostat on an Off point back to its programme instead of
+    // stopping it.
+    if (!written) {
+      this.setState({ isManualMode: wasManual });
+    }
     await this.refreshFromDevice();
-    if (hasSchedule && preset.key !== 'off') this.showManualCountdown();
+    if (written && hasSchedule && preset.key !== 'off') this.showManualCountdown();
   };
 
   render(

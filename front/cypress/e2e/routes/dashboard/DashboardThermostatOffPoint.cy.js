@@ -27,21 +27,26 @@ const feature = (selector, type, lastValue, extra = {}) => ({
   ...extra
 });
 
-// A virtual thermostat on `mode`, carrying a hold on Comfort until in an hour.
-const thermostat = mode => ({
+// A virtual thermostat on `mode`, carrying a hold on Comfort until in an hour,
+// or on the programme's point with no hold.
+const thermostat = (mode, hold = true) => ({
   name: 'Cypress Off point',
   selector: 'cypress-offpoint',
   external_id: 'thermostat:cypress-offpoint',
   params: [
     { name: 'THERMOSTAT_TYPE', value: 'virtual' },
     { name: 'THERMOSTAT_MODE', value: 'heating' },
-    { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' },
-    { name: 'THERMOSTAT_MANUAL_UNTIL', value: String(Date.now() + 60 * 60 * 1000) }
+    ...(hold
+      ? [
+          { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' },
+          { name: 'THERMOSTAT_MANUAL_UNTIL', value: String(Date.now() + 60 * 60 * 1000) }
+        ]
+      : [])
   ],
   features: [
     feature(SETPOINT, 'target-temperature', 21, { unit: 'celsius', min: 5, max: 35 }),
     feature(MODE, 'mode', mode, { max: 2 }),
-    feature(PRESET, 'preset', PRESET_COMFORT)
+    feature(PRESET, 'preset', hold ? PRESET_COMFORT : PRESET_SCHEDULE)
   ]
 });
 
@@ -58,17 +63,22 @@ const programme = {
 };
 
 // `scheduleDelay`: how long every read of the programme after the first takes.
-const serve = (mode, scheduleDelay = 0) => {
+// `hold`: whether the thermostat carries a hold. `failing`: a selector whose
+// writes fail.
+const serve = (mode, scheduleDelay = 0, { hold = true, failing = null } = {}) => {
   let scheduleReads = 0;
-  cy.intercept('GET', '**/api/v1/service/thermostat/device*', [thermostat(mode)]);
+  cy.intercept('GET', '**/api/v1/service/thermostat/device*', [thermostat(mode, hold)]);
   cy.intercept('GET', '**/api/v1/service/thermostat/schedule*', req => {
     scheduleReads += 1;
     req.reply({ body: [programme], delay: scheduleReads > 1 ? scheduleDelay : 0 });
   });
   cy.intercept({ method: 'GET', pathname: '/api/v1/device', query: { device_feature_selectors: /.+/ } }, [
-    thermostat(mode)
+    thermostat(mode, hold)
   ]);
-  cy.intercept('POST', '**/api/v1/device_feature/*/value', { statusCode: 200, body: {} }).as('write');
+  cy.intercept('POST', '**/api/v1/device_feature/*/value', req => {
+    const failed = failing && req.url.includes(`/device_feature/${failing}/`);
+    req.reply({ statusCode: failed ? 500 : 200, body: {} });
+  }).as('write');
 };
 
 // Every write the widget made so far, as `selector=value`.
@@ -135,5 +145,18 @@ describe('Dashboard Thermostat Box on an Off point', () => {
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(2000);
     writes().should('deep.equal', [`${PRESET}=${PRESET_SCHEDULE}`]);
+  });
+
+  // A preset whose write failed armed no hold, but left the card in manual mode
+  // until the device was read again: an Off tapped meanwhile handed the
+  // thermostat back to the programme instead of stopping it.
+  it('Should stop the thermostat on an Off tapped after a preset write failed', () => {
+    serve(MODE_HEATING, 1500, { hold: false, failing: PRESET });
+    cy.visit('/dashboard/test');
+    presetButton('fe-flame').click();
+    cy.wait('@write');
+    presetButton('fe-power').click();
+    cy.wait('@write');
+    writes().should('deep.equal', [`${PRESET}=${PRESET_COMFORT}`, `${MODE}=${MODE_OFF}`]);
   });
 });
