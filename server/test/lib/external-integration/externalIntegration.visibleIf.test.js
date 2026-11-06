@@ -425,8 +425,15 @@ describe('externalIntegration visible_if', () => {
       expect(match(null, 'scene', event, { ...trigger, fields: { source: 'rf', protocol: 'SONY' } })).not.to.equal(
         false,
       );
-      // visible, it filters as usual
-      expect(match(null, 'scene', event, { ...trigger, fields: { source: 'ir', protocol: 'SONY' } })).to.equal(false);
+      // visible, it filters as usual: the source matches, only the protocol rejects
+      const irEvent = externalIntegration.publishSceneEvent(service, {
+        key: 'code_received',
+        data: { source: 'ir', protocol: 'NEC' },
+      });
+      expect(match(null, 'scene', irEvent, { ...trigger, fields: { source: 'ir', protocol: 'SONY' } })).to.equal(false);
+      expect(match(null, 'scene', irEvent, { ...trigger, fields: { source: 'ir', protocol: 'NEC' } })).not.to.equal(
+        false,
+      );
       // an event without conditions keeps the plain matching
       const { filter_fields: ignored, ...plainEvent } = event;
       expect(match(null, 'scene', plainEvent, { ...trigger, fields: { source: 'rf', protocol: 'SONY' } })).to.equal(
