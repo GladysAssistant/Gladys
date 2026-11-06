@@ -287,10 +287,13 @@ async function setValue(device, deviceFeature, value, manual = true) {
   }
 
   // A setpoint set by hand on a virtual thermostat stays within its range; a
-  // scheduled one is written as the programme says (E.3). A value that is no
-  // number is passed through untouched: saveState refuses it, as it always did.
+  // scheduled one is written as the programme says (E.3). Only a number, or a
+  // text holding one as a scene sends it, is bounded: Number() turns '', a blank,
+  // null or false into 0, which would be held as the bottom of the range. Any
+  // other value goes through untouched, as before the range was enforced.
+  const numeric = typeof value === 'number' || (typeof value === 'string' && value.trim() !== '');
   const asked = Number(value);
-  const range = manual && Number.isFinite(asked) ? manualRange(buildParamsConfig(device) || {}) : null;
+  const range = manual && numeric && Number.isFinite(asked) ? manualRange(buildParamsConfig(device) || {}) : null;
   const setpoint = range ? clamp(asked, range.min, range.max) : value;
   if (range && setpoint !== asked) {
     logger.info(`Thermostat: setpoint ${value} outside the range of ${device.selector}, clamped to ${setpoint}`);
