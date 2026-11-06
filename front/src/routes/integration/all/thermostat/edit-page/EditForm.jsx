@@ -15,7 +15,8 @@ import {
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   MAX_WINDOW_DELAY_SECONDS,
   parsePilotWireStandbyOrder,
-  supportedStandbyOrder
+  supportedStandbyOrder,
+  defaultTempRange
 } from '../../../../../../../server/utils/thermostatConstants';
 
 // The help text of each thermostat type, keyed by its value.
@@ -433,19 +434,12 @@ const EditForm = ({ ...props }) => {
     if (picked.unit && featureUnit !== (props.thermostatEditTempUnit || 'C')) {
       return;
     }
-    const defaults = { thermostatEditMinTemp: '5', thermostatEditMaxTemp: '35' };
-    if (
-      picked.min !== null &&
-      picked.min !== undefined &&
-      props.thermostatEditMinTemp === defaults.thermostatEditMinTemp
-    ) {
+    // Still at the defaults the form pre-fills, in its own unit (41-95 in °F).
+    const defaults = defaultTempRange(props.thermostatEditTempUnit || 'C');
+    if (picked.min !== null && picked.min !== undefined && props.thermostatEditMinTemp === String(defaults.min)) {
       props.updateThermostatField('thermostatEditMinTemp', String(picked.min));
     }
-    if (
-      picked.max !== null &&
-      picked.max !== undefined &&
-      props.thermostatEditMaxTemp === defaults.thermostatEditMaxTemp
-    ) {
+    if (picked.max !== null && picked.max !== undefined && props.thermostatEditMaxTemp === String(defaults.max)) {
       props.updateThermostatField('thermostatEditMaxTemp', String(picked.max));
     }
   };
