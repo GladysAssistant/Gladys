@@ -19,7 +19,8 @@ import {
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
   DEFAULT_PILOT_WIRE_ORDERS,
-  supportedPilotWireOrder
+  supportedPilotWireOrder,
+  supportedStandbyOrder
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -1611,17 +1612,26 @@ class ThermostatBox extends Component {
     // otherwise the order the lit preset is set to. A setpoint turned by a scene
     // names no preset, and is not second-guessed.
     let wantedOrder = null;
+    let wantedRest = false;
     if (heaterRegulated && mode === 'off') {
       wantedOrder = PILOT_WIRE_MODE.OFF;
     } else if (heaterRegulated && isWindowOpen) {
       wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
+      wantedRest = true;
     } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
       const configured = cfg[`pilot_wire_order_${activePreset}`];
       wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
     }
     // The order actually sent, as the server picks it: one the module does not
     // take is sent as comfort, or not at all — and is then on its way for ever.
-    const expectedOrder = wantedOrder === null ? null : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
+    // The window's frost protection is a rest, sent as off, then eco, to a
+    // module without it.
+    let expectedOrder = null;
+    if (wantedOrder !== null) {
+      expectedOrder = wantedRest
+        ? supportedStandbyOrder(wantedOrder, pilotWireSupportedOptions)
+        : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
+    }
     // Until the module confirms it — a few seconds on Z-Wave — the banner says
     // the order is on its way rather than showing a ring and a preset that
     // disagree. Any comfort the heater keeps is comfort, as the server holds it.

@@ -14,6 +14,7 @@ import {
   PILOT_WIRE_STANDBY_ORDERS,
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   MAX_WINDOW_DELAY_SECONDS,
+  parsePilotWireStandbyOrder,
   supportedStandbyOrder
 } from '../../../../../../../server/utils/thermostatConstants';
 
@@ -218,15 +219,12 @@ const EditForm = ({ ...props }) => {
     pickedPilotWire && pickedPilotWire.supportedOrders && pickedPilotWire.supportedOrders.length > 0
       ? pickedPilotWire.supportedOrders
       : null;
-  const storedStandbyOrder = PILOT_WIRE_STANDBY_ORDERS.includes(props.thermostatEditPilotWireStandbyOrder)
-    ? props.thermostatEditPilotWireStandbyOrder
-    : DEFAULT_PILOT_WIRE_STANDBY_ORDER;
   // The order the server actually sends, with the server's own fallback: a
   // stored eco on a module that refuses it rests on frost protection, or on off
-  // when the module takes only off. The form shows that one, not the stored one,
-  // which saving leaves untouched. Null when the module takes none.
+  // when the module takes only off. The form shows that one, and saving stores
+  // that same one (actions.js). Null when the module takes none.
   const standbyOrder = supportedStandbyOrder(
-    storedStandbyOrder,
+    parsePilotWireStandbyOrder(props.thermostatEditPilotWireStandbyOrder),
     supportedOrders && supportedOrders.map(value => ({ value }))
   );
   // Forced, the standby order is eco or off, among the orders the module takes.

@@ -1,6 +1,10 @@
 const { expect } = require('chai');
 const { PILOT_WIRE_MODE } = require('../../utils/constants');
-const { supportedPilotWireOrder, supportedStandbyOrder } = require('../../utils/thermostatConstants');
+const {
+  supportedPilotWireOrder,
+  supportedStandbyOrder,
+  parsePilotWireStandbyOrder,
+} = require('../../utils/thermostatConstants');
 
 const options = (...values) => values.map((value) => ({ value }));
 
@@ -62,5 +66,19 @@ describe('thermostatConstants.supportedStandbyOrder', () => {
     const ecoAndComfort = options(PILOT_WIRE_MODE.ECO, PILOT_WIRE_MODE.COMFORT);
     expect(supportedStandbyOrder(PILOT_WIRE_MODE.FROST_PROTECTION, ecoAndComfort)).to.equal(PILOT_WIRE_MODE.ECO);
     expect(supportedStandbyOrder(PILOT_WIRE_MODE.OFF, ecoAndComfort)).to.equal(PILOT_WIRE_MODE.ECO);
+  });
+});
+
+describe('thermostatConstants.parsePilotWireStandbyOrder', () => {
+  it('should read a stored standby order, as text or as a number', () => {
+    expect(parsePilotWireStandbyOrder('2')).to.equal(PILOT_WIRE_MODE.ECO);
+    expect(parsePilotWireStandbyOrder('0')).to.equal(PILOT_WIRE_MODE.OFF);
+    expect(parsePilotWireStandbyOrder(PILOT_WIRE_MODE.ECO)).to.equal(PILOT_WIRE_MODE.ECO);
+  });
+
+  it('should read anything else as frost protection', () => {
+    ['5', '2garbage', '2.5', '-1', '', null, undefined].forEach((value) =>
+      expect(parsePilotWireStandbyOrder(value), String(value)).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION),
+    );
   });
 });

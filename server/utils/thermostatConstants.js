@@ -179,6 +179,21 @@ function supportedPilotWireOrder(order, supportedOptions) {
 }
 
 /**
+ * @description Read a stored THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: a whole
+ * number among the standby orders, frost protection otherwise. `2garbage` read
+ * as 2 would send eco in place of the default, and a comfort is no rest. Shared
+ * by the server and the edit form, so both read the same value.
+ * @param {string|number|null|undefined} value - The stored param, or the form's value.
+ * @returns {number} A PILOT_WIRE_STANDBY_ORDERS value.
+ * @example
+ * parsePilotWireStandbyOrder('2'); // 2
+ */
+function parsePilotWireStandbyOrder(value) {
+  const order = /^\d+$/.test(String(value)) ? Number(value) : null;
+  return PILOT_WIRE_STANDBY_ORDERS.includes(order) ? order : DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+}
+
+/**
  * @description The standby order a module can be sent: the one chosen when it
  * takes it, frost protection — or off — otherwise, and eco on a module that
  * takes neither. Never nothing: an order left unsent keeps the heater on the
@@ -234,5 +249,6 @@ module.exports = {
   supportedPilotWireOrder,
   PILOT_WIRE_STANDBY_ORDERS,
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  parsePilotWireStandbyOrder,
   supportedStandbyOrder,
 };

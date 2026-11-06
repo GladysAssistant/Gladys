@@ -6,10 +6,11 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
-  PILOT_WIRE_STANDBY_ORDERS,
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   MAX_WINDOW_DELAY_SECONDS,
-  defaultPresetTemps
+  defaultPresetTemps,
+  parsePilotWireStandbyOrder,
+  supportedStandbyOrder
 } from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
@@ -247,11 +248,9 @@ function createActions(store) {
           thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
           thermostatEditPilotWireOrders: readPilotWireOrders(getParam),
           // The order a heater Gladys regulates rests on (spec C.1.1).
-          thermostatEditPilotWireStandbyOrder: PILOT_WIRE_STANDBY_ORDERS.includes(
-            parseInt(getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER'), 10)
-          )
-            ? parseInt(getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER'), 10)
-            : DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+          thermostatEditPilotWireStandbyOrder: parsePilotWireStandbyOrder(
+            getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER')
+          ),
           // A real thermostat given a pilot wire was how a heater regulating
           // itself was saved before it had a type of its own: it is shown as one.
           thermostatEditType:
@@ -451,6 +450,16 @@ function createActions(store) {
           return;
         }
 
+        // The standby order is saved as the form shows it: the one this module
+        // is actually sent (spec C.1.1). An eco stored on a module that refuses
+        // it would otherwise wake up as eco on the next module, unasked.
+        const storedStandbyOrder = parsePilotWireStandbyOrder(state.thermostatEditPilotWireStandbyOrder);
+        const pickedPilotWire = (state.pilotWireFeatures || []).find(feature => feature.selector === pilotWireFeature);
+        const sentStandbyOrder = supportedStandbyOrder(
+          storedStandbyOrder,
+          pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
+        );
+
         const device = {
           name,
           external_id: isEdit ? state.thermostatEditDevice.external_id : newExternalId,
@@ -507,11 +516,7 @@ function createActions(store) {
               name: 'THERMOSTAT_PILOT_WIRE_STANDBY_ORDER',
               value:
                 thermostatType === 'virtual' && pilotWireFeature
-                  ? String(
-                      PILOT_WIRE_STANDBY_ORDERS.includes(state.thermostatEditPilotWireStandbyOrder)
-                        ? state.thermostatEditPilotWireStandbyOrder
-                        : DEFAULT_PILOT_WIRE_STANDBY_ORDER
-                    )
+                  ? String(sentStandbyOrder !== null ? sentStandbyOrder : storedStandbyOrder)
                   : ''
             },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
