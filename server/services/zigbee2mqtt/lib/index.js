@@ -31,6 +31,7 @@ const { getUsbPorts } = require('./getUsbPorts');
 const { readZ2mContainerLogs } = require('./readZ2mContainerLogs');
 const { reset } = require('./reset');
 const { requestHealthCheck } = require('./requestHealthCheck');
+const { fallbackToEzsp } = require('./fallbackToEzsp');
 const { JOB_TYPES } = require('../../../utils/constants');
 
 // EVENTS
@@ -71,6 +72,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
+  // Gladys switched Zigbee2mqtt to the ezsp driver since the last init: the setup page loads the new model
+  this.ezspFallback = false;
+  this.installedConfig = null;
   this.mqttConnectionError = null;
   this.dockerBased = false;
 
@@ -117,6 +121,7 @@ Zigbee2mqttManager.prototype.getUsbPorts = getUsbPorts;
 Zigbee2mqttManager.prototype.readZ2mContainerLogs = readZ2mContainerLogs;
 Zigbee2mqttManager.prototype.reset = reset;
 Zigbee2mqttManager.prototype.requestHealthCheck = requestHealthCheck;
+Zigbee2mqttManager.prototype.fallbackToEzsp = fallbackToEzsp;
 
 // EVENTS
 Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;

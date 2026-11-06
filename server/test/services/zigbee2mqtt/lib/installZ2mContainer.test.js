@@ -137,6 +137,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // ASSERT
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
     assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    // The very object of init, which the ezsp fallback changes before installing Zigbee2mqtt again
+    expect(zigbee2mqttManager.installedConfig).to.equal(config);
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: {
@@ -154,6 +156,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -208,6 +211,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -385,6 +389,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -528,6 +533,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -568,6 +574,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -608,6 +615,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -628,6 +636,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
