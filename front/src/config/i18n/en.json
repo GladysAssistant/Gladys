@@ -3725,9 +3725,13 @@
         "pilotWireFeatureLabel": "Pilot wire (actuator)",
         "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off…) instead of cutting its supply. Turn the module’s own programme off first.",
         "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
+        "pilotWireStandbyOrderLabel": "Order once the setpoint is reached",
+        "pilotWireStandbyForceLabel": "Force another order than frost protection at rest",
+        "pilotWireStandbyForceHelp": "By default, Gladys sends frost protection once the setpoint is reached. Some heaters then lock their own functions out, like a towel rail’s boost, because frost protection and off are priority orders: force eco to keep them.",
+        "pilotWireStandbyOrderWarning": "Eco: the heater then regulates on its own eco setpoint, about 3.5 °C below its comfort; a lower Gladys setpoint (night) is not reached while eco is sent. Off: the heater is cut, with no frost protection should Gladys stop. The frost and away presets, like an open window, still rest on frost protection; a module that does not take the order chosen gets the lowest it takes: frost protection, off, then eco.",
         "pilotWireRegulationHelp": {
           "heater": "Each preset sends the order picked in the presets table (eco → eco, away → frost protection…). The room sensor, if any, is only displayed.",
-          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
+          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat and, once the preset’s setpoint is reached, a rest order: frost protection, or on a module that does not take it off, then eco, unless another is forced. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
         },
         "windowFeatureLabel": "Window opening sensors",
         "windowFeatureHelp": {
@@ -3774,6 +3778,7 @@
         "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
         "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
+        "pilotWireUnreadError": "The pilot wire picked could not be read, so the order it rests on cannot be checked: reload the page and pick it again.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",

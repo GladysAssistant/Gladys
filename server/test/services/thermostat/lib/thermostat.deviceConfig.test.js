@@ -139,6 +139,20 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
     expect(config.pilot_wire_regulation).to.equal('gladys');
   });
 
+  // Frost protection by default; eco or off when forced (C.1.1). Anything else —
+  // a comfort, a malformed value — is the default.
+  it('should read the standby order of a heater Gladys regulates', () => {
+    const read = (value) =>
+      buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: value })).pilot_wire_standby_order;
+
+    expect(read('2')).to.equal(2);
+    expect(read('0')).to.equal(0);
+    ['5', '2garbage', '2.5', '-1', ''].forEach((value) => expect(read(value), value).to.equal(1));
+    expect(
+      buildParamsConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' })).pilot_wire_standby_order,
+    ).to.equal(1);
+  });
+
   it('should let the heater regulate a pilot wire on a pilot-wire thermostat, sensor or not', () => {
     const config = buildParamsConfig(
       deviceWithParams({ THERMOSTAT_TYPE: 'pilot-wire', THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }),
