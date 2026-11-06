@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import BaseEditBox from '../baseEditBox';
 import { ConfigField } from '../../integration/ConfigSchemaForm';
+import { getVisibleFields } from '../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import { hasDynamicSource, fetchDynamicOptions } from '../../integration/dynamicOptions';
 import StatusBadge from '../../../routes/integration/all/external-integration/components/StatusBadge';
 import { getLocalizedText } from '../../../routes/integration/all/external-integration/utils';
@@ -146,7 +147,7 @@ class EditExternalWidgetBox extends Component {
             <label>
               <Text id="dashboard.boxes.external-widget.editSettingsLabel" />
             </label>
-            {settings.map(field => (
+            {getVisibleFields(settings, displayedValues).map(field => (
               <ConfigField
                 key={field.key}
                 field={field}

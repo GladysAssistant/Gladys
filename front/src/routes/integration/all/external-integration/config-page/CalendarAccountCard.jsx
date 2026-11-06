@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { ConfigField } from '../../../../../components/integration/ConfigSchemaForm';
+import { getVisibleFields } from '../../../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import { RequestStatus } from '../../../../../utils/consts';
 
 // The per-user block of a calendar integration (spec: external-integrations/capabilities/calendar-type.md): every user — not
@@ -55,7 +56,7 @@ const CalendarAccountCard = ({
           </div>
         )}
         <form onSubmit={onSave}>
-          {accountSchema.map(field => (
+          {getVisibleFields(accountSchema, values || {}).map(field => (
             <ConfigField
               key={field.key}
               field={field}

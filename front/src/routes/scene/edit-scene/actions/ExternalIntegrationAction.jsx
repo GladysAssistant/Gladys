@@ -4,6 +4,7 @@ import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
 import { ConfigField } from '../../../../components/integration/ConfigSchemaForm';
+import { getVisibleFields } from '../../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import { hasDynamicSource, fetchDynamicOptions } from '../../../../components/integration/dynamicOptions';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 import ExternalIntegrationDeclarationState from '../ExternalIntegrationDeclarationState';
@@ -164,7 +165,9 @@ class ExternalIntegrationAction extends Component {
           </div>
         )}
         {description && <p>{description}</p>}
-        {fields.map(field => this.renderField(field, language, dynamicOptions))}
+        {getVisibleFields(fields, props.action.fields || {}).map(field =>
+          this.renderField(field, language, dynamicOptions)
+        )}
         {outputs.length > 0 && (
           <p class="text-muted small mb-0 mt-3">
             <Text id="editScene.externalIntegration.outputsAvailable" />{' '}

@@ -110,6 +110,16 @@ function publishSceneEvent(service, body) {
     filters,
     data: eventData,
   };
+  // the matcher needs the display conditions of the filters: a filter hidden
+  // by its visible_if (for the values the scene stored) is a wildcard
+  const conditionalFields = (declaration.fields || []).filter((field) => field.type !== 'section');
+  if (conditionalFields.some((field) => field.visible_if)) {
+    event.filter_fields = conditionalFields.map(({ key: fieldKey, default: defaultValue, visible_if: visibleIf }) => ({
+      key: fieldKey,
+      default: defaultValue,
+      visible_if: visibleIf,
+    }));
+  }
   logger.debug(`External integration ${service.selector}: scene event ${key} accepted`);
   this.event.emit(EVENTS.TRIGGERS.CHECK, event);
   return event;
