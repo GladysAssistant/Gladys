@@ -652,11 +652,9 @@ class ThermostatBox extends Component {
     }
     const hold = this.getHold();
     if (hold) {
-      // A preset picked by hand holds that preset's own setpoint — any of the
-      // five, whether or not the bar shows it: a scene may write Night on a
-      // thermostat that cools. Compared in the hold's unit, as the server does.
-      const presetTemp = isStartPreset(activePreset) ? this.getPresetTemp(activePreset) : null;
-      if (presetTemp === null || this.toSetpointFeatureUnit(presetTemp) !== hold.setpoint) {
+      // A preset picked by hand holds that preset's own setpoint
+      // (holdMatchesPreset); a setpoint set on the dial is kept.
+      if (!this.holdMatchesPreset(hold.setpoint, activePreset)) {
         return null;
       }
       if (!absenceLowersHold(hold.since, emptySince)) {
@@ -1210,16 +1208,17 @@ class ThermostatBox extends Component {
   // the thermostat's: Comfort at 21 °C is held as 70 on a Fahrenheit appliance.
   // The preset's temperature is converted the way the server converts it before
   // the two are compared, or a preset picked on such a device never lit.
+  //
+  // Any of the five presets, whether or not the bar shows it, as the server's
+  // holdsPickedPreset: a scene may write Night on a thermostat that cools, whose
+  // bar only has Off and Comfort. Matched against the bar only, Night's hold was
+  // taken for a dial setpoint, and the gauge kept it while the room was empty.
   holdMatchesPreset = (setpoint, presetKey) => {
-    if (setpoint === null || setpoint === undefined || !presetKey) {
+    if (setpoint === null || setpoint === undefined || !isStartPreset(presetKey)) {
       return false;
     }
-    return this.getPresets().some(
-      candidate =>
-        candidate.key === presetKey &&
-        candidate.temp !== null &&
-        this.toSetpointFeatureUnit(candidate.temp) === setpoint
-    );
+    const presetTemp = this.getPresetTemp(presetKey);
+    return presetTemp !== null && this.toSetpointFeatureUnit(presetTemp) === setpoint;
   };
 
   // The preset whose temperature a setpoint lands on, or null. Asked on the forum:
