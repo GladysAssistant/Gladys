@@ -11,6 +11,10 @@ const { isFeature, isWritable, zipRoles } = require('./helpers');
 
 const COVER_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN];
 
+// How far, in Gladys position steps, a cover may stop from the target a Matter app sent it to and
+// still count as having reached it.
+const REACHED_TOLERANCE = 1;
+
 /**
  * @description Forward a movement asked by a Matter app to the Gladys cover. A position is sent
  * when the cover has one and Matter gave a target, otherwise an open or close order.
@@ -129,13 +133,17 @@ const cover = {
     // While a movement a Matter app asked for is under way, the positions Gladys reports on the
     // way only move the current position: the target stays the one asked for, and matter.js
     // reports the cover as opening or closing. The target follows the position once the cover is
-    // still, or once it reached the target, Gladys positions being coarser than Matter ones.
+    // still, or once it reached the target, Gladys positions being coarser than Matter ones. Many
+    // covers stop one step short of (or past) the position they were sent to, so a position within
+    // REACHED_TOLERANCE of the target counts as reached: otherwise the cover would stay opening or
+    // closing until the next Matter command.
     const current = (state && state.windowCovering) || {};
     const moving = Boolean(current.operationalStatus) && current.operationalStatus.lift !== MOVEMENT_STATUS.STOPPED;
     const reached =
       moving &&
       isNumber(current.targetPositionLiftPercent100ths) &&
-      fromLiftPercent100ths(current.targetPositionLiftPercent100ths, roles.position) === value;
+      Math.abs(fromLiftPercent100ths(current.targetPositionLiftPercent100ths, roles.position) - value) <=
+        REACHED_TOLERANCE;
     if (!moving || reached) {
       windowCovering.targetPositionLiftPercent100ths = percent100ths;
     }
