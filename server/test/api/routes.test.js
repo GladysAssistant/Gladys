@@ -23,4 +23,12 @@ describe('API routes', () => {
     expect(route.externalIntegrationAuth).to.equal(true);
     expect(route.controller).to.be.a('function');
   });
+
+  it('should register the energy price read on the host API only', () => {
+    const { externalIntegration } = buildSupervisor();
+    const routes = getRoutes({ externalIntegration, service: { getServices: () => [] } });
+    const route = routes['get /api/integration/v1/energy/price'];
+    expect(route).to.include({ authenticated: false, externalIntegrationAuth: true });
+    expect(route.controller).to.be.a('function');
+  });
 });
