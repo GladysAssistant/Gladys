@@ -137,6 +137,9 @@ const { stopSubContainers } = require('./externalIntegration.stopSubContainers')
 const { removeSubContainers } = require('./externalIntegration.removeSubContainers');
 const { getImagesInUse } = require('./externalIntegration.getImagesInUse');
 const { ensureImage } = require('./externalIntegration.ensureImage');
+const { ensureImagePresent } = require('./externalIntegration.ensureImagePresent');
+const { getMissingImages } = require('./externalIntegration.getMissingImages');
+const { pullMissingImages, abortImagePull } = require('./externalIntegration.pullMissingImages');
 const { removeImages } = require('./externalIntegration.removeImages');
 const { cleanImages } = require('./externalIntegration.cleanImages');
 const { controlSubContainer } = require('./externalIntegration.controlSubContainer');
@@ -229,6 +232,9 @@ const ExternalIntegration = function ExternalIntegration(
   this.restartTimers = new Map();
   this.stableRunningTimers = new Map();
   this.startedAt = new Map();
+  // in-flight background pulls of missing images (restore case), by
+  // service id: the AbortController that stop/uninstall abort
+  this.imagePulls = new Map();
   // serviceId -> missed WS pings count
   this.missedPings = new Map();
   // serviceId -> { count, resetAt } sliding rate limit on POST /state
@@ -427,6 +433,10 @@ ExternalIntegration.prototype.stopSubContainers = stopSubContainers;
 ExternalIntegration.prototype.removeSubContainers = removeSubContainers;
 ExternalIntegration.prototype.getImagesInUse = getImagesInUse;
 ExternalIntegration.prototype.ensureImage = ensureImage;
+ExternalIntegration.prototype.ensureImagePresent = ensureImagePresent;
+ExternalIntegration.prototype.getMissingImages = getMissingImages;
+ExternalIntegration.prototype.pullMissingImages = pullMissingImages;
+ExternalIntegration.prototype.abortImagePull = abortImagePull;
 ExternalIntegration.prototype.removeImages = removeImages;
 ExternalIntegration.prototype.cleanImages = cleanImages;
 ExternalIntegration.prototype.controlSubContainer = controlSubContainer;

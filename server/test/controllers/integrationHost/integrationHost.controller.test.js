@@ -771,6 +771,13 @@ describe('Integration host API', () => {
       stubSystem('removeContainer', () => Promise.resolve(true));
       stubSystem('restartContainer', () => Promise.resolve(true));
       stubSystem('stopContainer', () => Promise.resolve(true));
+      // the sub-container images are on the machine (the state after an
+      // install): no pull must ever reach a Docker daemon from here
+      stubSystem('imageExists', () => Promise.resolve(true));
+      stubSystem('pull', () => Promise.reject(new Error('NO_PULL_EXPECTED_IN_TESTS')));
+      // without a Docker daemon, hasCpuCfsSupport throws: the descriptor
+      // must build the same way on a developer machine and on CI
+      stubSystem('hasCpuCfsSupport', () => Promise.resolve(true));
       stubSystem('createNetwork', () => Promise.resolve(true));
       stubSystem('getGladysBasePath', () => Promise.resolve({ basePathOnHost: '/var/lib/gladysassistant' }));
     });

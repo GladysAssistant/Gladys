@@ -21,6 +21,7 @@ const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 async function uninstall(selector) {
   const service = await this.getBySelector(selector);
   this.clearTimers(service.id);
+  this.abortImagePull(service.id);
   const connection = this.connections.get(service.id);
   if (connection) {
     try {
