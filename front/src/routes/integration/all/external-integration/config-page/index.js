@@ -224,7 +224,9 @@ class ExternalIntegrationConfigPage extends Component {
     const { integration, contactProfileValues = {}, contactProfileTouchedSecrets = {} } = this.state;
     const contactSchema = get(integration, 'manifest.contact_schema') || [];
     const values = {};
-    contactSchema.forEach(field => {
+    // a field hidden by its visible_if condition is not sent: its stored
+    // value is kept (the save is a partial merge), never overwritten
+    getVisibleFields(contactSchema, contactProfileValues).forEach(field => {
       const value = contactProfileValues[field.key];
       if (field.type === 'secret') {
         // a secret set to null means "unchanged" on the server side
@@ -341,7 +343,9 @@ class ExternalIntegrationConfigPage extends Component {
     const { integration, calendarAccountValues = {}, calendarAccountTouchedSecrets = {} } = this.state;
     const accountSchema = get(integration, 'manifest.account_schema') || [];
     const config = {};
-    accountSchema.forEach(field => {
+    // a field hidden by its visible_if condition is not sent: its stored
+    // value is kept (the save is a partial merge), never overwritten
+    getVisibleFields(accountSchema, calendarAccountValues).forEach(field => {
       const value = calendarAccountValues[field.key];
       if (field.type === 'secret') {
         // a secret set to null means "unchanged" on the server side

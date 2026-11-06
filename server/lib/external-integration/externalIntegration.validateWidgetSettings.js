@@ -1,7 +1,7 @@
 const { Error422 } = require('../../utils/httpErrors');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
-const { getVisibleFields } = require('./externalIntegration.fieldVisibility');
+const { resolveVisibleValues } = require('./externalIntegration.fieldVisibility');
 const { MAX_WIDGET_SETTINGS, MAX_WIDGET_SETTING_STRING_LENGTH, MAX_WIDGET_SETTINGS_BYTES } = require('./constants');
 
 /**
@@ -88,11 +88,18 @@ async function validateWidgetSettings(service, widget, rawSettings = {}) {
   // sections are presentational: no value, their key is never a setting
   const declaredFields = (widget.settings || []).filter((field) => field.type !== 'section');
   const dynamicOptions = await getDynamicOptions(service, declaredFields);
-  const settings = {};
   Object.keys(rawSettings).forEach((key) => {
-    const field = declaredFields.find((declaredField) => declaredField.key === key);
-    if (!field) {
+    if (!declaredFields.some((declaredField) => declaredField.key === key)) {
       throw new Error422(`settings.${key}: unknown setting`);
+    }
+  });
+  // a setting hidden by its visible_if condition is neither validated, nor
+  // required, nor relayed: a stale value of an earlier choice never blocks
+  const { values: settings, missingRequired } = resolveVisibleValues(declaredFields, rawSettings);
+  declaredFields.forEach((field) => {
+    const { key } = field;
+    if (rawSettings[key] === undefined || settings[key] === undefined) {
+      return;
     }
     try {
       validateConfigValue(field, rawSettings[key], dynamicOptions);
@@ -101,20 +108,10 @@ async function validateWidgetSettings(service, widget, rawSettings = {}) {
       // is a setting — validateConfigValue only ever throws an Error422
       throw new Error422(`${e.properties}`.replace(/^config\./, 'settings.'));
     }
-    settings[key] = rawSettings[key];
   });
-  declaredFields.forEach((field) => {
-    if (settings[field.key] === undefined && field.default !== undefined) {
-      settings[field.key] = field.default;
-    }
-  });
-  // a setting hidden by its visible_if condition is never required
-  const visibleKeys = new Set(getVisibleFields(declaredFields, settings).map((field) => field.key));
-  declaredFields.forEach((field) => {
-    if (field.required && visibleKeys.has(field.key) && settings[field.key] === undefined) {
-      throw new Error422(`settings.${field.key}: required`);
-    }
-  });
+  if (missingRequired.length > 0) {
+    throw new Error422(`settings.${missingRequired[0].key}: required`);
+  }
   return settings;
 }
 

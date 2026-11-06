@@ -24,7 +24,7 @@ const {
   MAX_WIDGET_URL_LENGTH,
   WIDGET_CONTENT_BUDGET,
 } = require('./constants');
-const { validateConfigField } = require('./externalIntegration.validateManifest');
+const { validateConfigField, validateVisibleIf } = require('./externalIntegration.validateManifest');
 
 // The content vocabulary of the integration dashboard widgets
 // (capabilities/dashboard-widgets.md, sections 4 and 5). The payload comes
@@ -681,6 +681,9 @@ function normalizeActionFields(rawFields, actionKey) {
         }
       }
     });
+    // the same visible_if grammar as a manifest form: a malformed condition
+    // drops the button, it never reaches the form or the value validation
+    validateVisibleIf(rawFields, 'fields', errors);
   }
   if (errors.length > 0) {
     logger.warn(`Widget content: invalid fields on action "${actionKey}": ${errors.join('; ')}`);

@@ -8,8 +8,9 @@ const { Error422 } = require('../../../utils/httpErrors');
 const { EVENTS } = require('../../../utils/constants');
 const {
   getVisibleFields,
-  isFieldVisible,
+  isUnsetValue,
   matchesVisibleIf,
+  resolveVisibleValues,
 } = require('../../../lib/external-integration/externalIntegration.fieldVisibility');
 const { validateActionValues } = require('../../../lib/external-integration/externalIntegration.runWidgetAction');
 const {
@@ -104,8 +105,54 @@ describe('externalIntegration visible_if', () => {
     it('should accept missing arguments', () => {
       expect(getVisibleFields()).to.deep.equal([]);
       expect(keysOf(getVisibleFields(FORM, null))).to.deep.equal(['mqtt_mode', 'mqtt_url', 'use_tls']);
-      expect(isFieldVisible(FORM, 'mqtt_url', { mqtt_mode: 'disabled' })).to.equal(false);
-      expect(matchesVisibleIf({ field: 'mqtt_mode', in: ['external'] }, MODE, {})).to.equal(true);
+      expect(matchesVisibleIf({ field: 'mqtt_mode', in: ['external'] }, MODE, null)).to.equal(true);
+    });
+
+    it('should treat null and an empty string as not set: the default applies', () => {
+      expect(keysOf(getVisibleFields(FORM, { mqtt_mode: null }))).to.deep.equal(['mqtt_mode', 'mqtt_url', 'use_tls']);
+      expect(keysOf(getVisibleFields(FORM, { mqtt_mode: '' }))).to.deep.equal(['mqtt_mode', 'mqtt_url', 'use_tls']);
+      expect([undefined, null, ''].every(isUnsetValue)).to.equal(true);
+      expect([0, false, [], 'x'].some(isUnsetValue)).to.equal(false);
+    });
+
+    it('should hide a field with a malformed condition, never throw', () => {
+      const malformed = [
+        MODE,
+        { key: 'a', type: 'string', visible_if: { field: 'mqtt_mode', in: 'external' } },
+        { key: 'b', type: 'string', visible_if: 'mqtt_mode' },
+        { key: 'c', type: 'string', visible_if: null },
+        { key: 'd', type: 'string', visible_if: { field: 1, in: ['external'] } },
+        null,
+      ];
+      expect(keysOf(getVisibleFields(malformed, {}))).to.deep.equal(['mqtt_mode']);
+      expect(getVisibleFields('not a list', {})).to.deep.equal([]);
+      expect(matchesVisibleIf({ field: 'mqtt_mode' }, MODE, {})).to.equal(false);
+    });
+  });
+
+  describe('resolveVisibleValues', () => {
+    it('should apply the defaults, keep the visible values and list the missing required fields', () => {
+      const { values, missingRequired } = resolveVisibleValues(FORM, { use_tls: true });
+      expect(values).to.deep.equal({ mqtt_mode: 'external', use_tls: true });
+      expect(keysOf(missingRequired)).to.deep.equal(['mqtt_url', 'ca_certificate']);
+    });
+
+    it('should drop the values of hidden fields', () => {
+      const { values, missingRequired } = resolveVisibleValues(FORM, {
+        mqtt_mode: 'embedded',
+        mqtt_url: 'stale',
+        use_tls: true,
+      });
+      expect(values).to.deep.equal({ mqtt_mode: 'embedded' });
+      expect(missingRequired).to.deep.equal([]);
+    });
+
+    it('should let the caller decide what a value not set is', () => {
+      expect(resolveVisibleValues(FORM, { mqtt_mode: '' }).values).to.deep.equal({ mqtt_mode: '' });
+      expect(resolveVisibleValues(FORM, { mqtt_mode: '' }, { isUnset: isUnsetValue }).values).to.deep.equal({
+        mqtt_mode: 'external',
+      });
+      expect(resolveVisibleValues(FORM, null).values).to.deep.equal({ mqtt_mode: 'external' });
     });
   });
 
@@ -250,6 +297,41 @@ describe('externalIntegration visible_if', () => {
         () => externalIntegration.runAction(service.selector, 'connect', { mqtt_url: 'mqtt://h', use_tls: true }),
         'fields.ca_certificate: required',
       );
+      // a visible value is still validated
+      await expect422(
+        () => externalIntegration.runAction(service.selector, 'connect', { mqtt_url: 12 }),
+        'mqtt_url: must be a string',
+      );
+    });
+
+    it('should neither validate nor relay a stale value of a hidden field', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedExternalService({
+        manifest: { ...TEST_MANIFEST, actions: [{ key: 'connect', label: { en: 'Connect' }, fields: FORM }] },
+      });
+      externalIntegration.sendCommand = fake.resolves({ success: true, data: {} });
+      // the URL left by the "external" choice is invalid and hidden now
+      await externalIntegration.runAction(service.selector, 'connect', { mqtt_mode: 'embedded', mqtt_url: 12 });
+      expect(externalIntegration.sendCommand.firstCall.args[2].fields).to.deep.equal({ mqtt_mode: 'embedded' });
+      const render = (text) => text;
+      expect(
+        await resolveSceneActionFields(service, { fields: FORM }, { mqtt_mode: 'embedded', mqtt_url: 12 }, render),
+      ).to.deep.equal({ mqtt_mode: 'embedded' });
+      expect(validateActionValues({ fields: FORM }, { mqtt_mode: 'disabled', mqtt_url: 12 })).to.deep.equal({
+        mqtt_mode: 'disabled',
+      });
+      expect(
+        await validateWidgetSettings(service, { settings: FORM }, { mqtt_mode: 'embedded', mqtt_url: 12 }),
+      ).to.deep.equal({ mqtt_mode: 'embedded' });
+    });
+
+    it('should refuse an unknown key before resolving the visibility', async () => {
+      await expect422(() => validateActionValues({ fields: FORM }, { nope: 1 }), 'values.nope: unknown field');
+      const service = { id: 'service-id', selector: 'ext-dev-demo', manifest: TEST_MANIFEST };
+      await expect422(
+        () => validateWidgetSettings(service, { settings: FORM }, { nope: 1 }),
+        'settings.nope: unknown setting',
+      );
     });
 
     it('should apply the same rule to the values of a widget button form', async () => {
@@ -274,6 +356,11 @@ describe('externalIntegration visible_if', () => {
         await resolveSceneActionFields(service, { fields: FORM }, { mqtt_mode: 'disabled' }, render),
       ).to.deep.equal({ mqtt_mode: 'disabled' });
       await expect(resolveSceneActionFields(service, { fields: FORM }, {}, render)).to.be.rejectedWith(
+        BadParameters,
+        'fields.mqtt_url: required',
+      );
+      // a mode left empty in the scene takes its default: the URL shows, required
+      await expect(resolveSceneActionFields(service, { fields: FORM }, { mqtt_mode: null }, render)).to.be.rejectedWith(
         BadParameters,
         'fields.mqtt_url: required',
       );

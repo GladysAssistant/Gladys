@@ -8,7 +8,7 @@ const {
 } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
-const { getVisibleFields } = require('./externalIntegration.fieldVisibility');
+const { isUnsetValue, resolveVisibleValues } = require('./externalIntegration.fieldVisibility');
 const { getDeclaredSceneActions, coerceSceneValue } = require('./externalIntegration.sceneDeclarations');
 
 /**
@@ -56,33 +56,27 @@ function normalizeSceneActionOutputs(outputs, declaredOutputs) {
  */
 async function resolveSceneActionFields(service, declaration, storedFields, render) {
   const declaredFields = (declaration.fields || []).filter((field) => field.type !== 'section');
-  const fields = {};
-  declaredFields.forEach((field) => {
-    const stored = storedFields[field.key];
-    if (stored !== undefined && stored !== null && stored !== '') {
-      fields[field.key] = stored;
-    } else if (field.default !== undefined) {
-      fields[field.key] = field.default;
-    }
+  // an empty stored value takes the declared default; a field hidden by its
+  // visible_if condition (for the stored values) is neither validated, nor
+  // required, nor relayed: a stale value of an earlier choice never blocks
+  const { values: fields, missingRequired } = resolveVisibleValues(declaredFields, storedFields, {
+    isUnset: isUnsetValue,
   });
+  if (missingRequired.length > 0) {
+    // a required field added by an update without a default: the scene
+    // fails loudly until the user edits it, never sends garbage
+    throw new BadParameters(`fields.${missingRequired[0].key}: required`);
+  }
   declaredFields.forEach((field) => {
     if (field.type === 'string' && typeof fields[field.key] === 'string') {
       fields[field.key] = render(fields[field.key]);
     }
   });
   const dynamicOptions = await getDynamicOptions(service, declaredFields);
-  // a field hidden by its visible_if condition is never required
-  const visibleKeys = new Set(getVisibleFields(declaredFields, fields).map((field) => field.key));
   declaredFields.forEach((field) => {
-    if (fields[field.key] === undefined) {
-      if (field.required && visibleKeys.has(field.key)) {
-        // a required field added by an update without a default: the scene
-        // fails loudly until the user edits it, never sends garbage
-        throw new BadParameters(`fields.${field.key}: required`);
-      }
-      return;
+    if (fields[field.key] !== undefined) {
+      validateConfigValue(field, fields[field.key], dynamicOptions);
     }
-    validateConfigValue(field, fields[field.key], dynamicOptions);
   });
   return fields;
 }
