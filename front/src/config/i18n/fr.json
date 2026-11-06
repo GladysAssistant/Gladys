@@ -7369,6 +7369,15 @@
     "subscriptionNoticeButton": "Mettre à jour mon moyen de paiement",
     "subscriptionNoticeCheck": "Vérifier l'abonnement",
     "subscriptionNoticeContactAdmin": "Merci de contacter l'administrateur de votre compte Gladys Plus.",
+    "servicesStartupNoticeTitle": "Gladys démarre",
+    "servicesStartupNoticeText": "{{done}}/{{total}} intégrations démarrées. Les appareils des intégrations pas encore démarrées ne peuvent pas être contrôlés pour l'instant.",
+    "servicesStartupNoticeProgress": "{{done}}/{{total}} intégrations",
+    "servicesStartupNoticeCurrent": "En cours :",
+    "servicesStartupNoticeWaiting": "En attente :",
+    "servicesStartupNoticeWaitingMore": {
+      "one": "et 1 autre",
+      "other": "et {{count}} autres"
+    },
     "instanceUpdateNoticeTitle": "Mise à jour disponible",
     "instanceUpdateNoticeText": "Gladys Plus a été mis à jour en {{latestVersion}}, mais votre instance est encore en {{instanceVersion}}. Certaines fonctionnalités peuvent mal fonctionner tant que votre instance n'est pas à jour.",
     "instanceUpdateNoticeButton": "Mettre à jour mon instance",

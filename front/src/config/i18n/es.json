@@ -7369,6 +7369,15 @@
     "subscriptionNoticeButton": "Actualizar mi método de pago",
     "subscriptionNoticeCheck": "Comprobar la suscripción",
     "subscriptionNoticeContactAdmin": "Póngase en contacto con el administrador de su cuenta de Gladys Plus.",
+    "servicesStartupNoticeTitle": "Gladys se está iniciando",
+    "servicesStartupNoticeText": "{{done}}/{{total}} integraciones iniciadas. Los dispositivos de las integraciones que aún no se han iniciado no se pueden controlar por ahora.",
+    "servicesStartupNoticeProgress": "{{done}}/{{total}} integraciones",
+    "servicesStartupNoticeCurrent": "Iniciando:",
+    "servicesStartupNoticeWaiting": "En espera:",
+    "servicesStartupNoticeWaitingMore": {
+      "one": "y 1 más",
+      "other": "y {{count}} más"
+    },
     "instanceUpdateNoticeTitle": "Actualización disponible",
     "instanceUpdateNoticeText": "Gladys Plus se ha actualizado a la versión {{latestVersion}}, pero su instancia sigue en la {{instanceVersion}}. Algunas funciones pueden no funcionar correctamente hasta que actualice su instancia.",
     "instanceUpdateNoticeButton": "Actualizar mi instancia",

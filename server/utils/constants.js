@@ -2247,6 +2247,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
+    SERVICES_STARTUP: 'system.services-startup',
     WATCHTOWER_LOG: 'system.watchtower-log',
     UPGRADE_ERROR: 'system.upgrade-error',
   },

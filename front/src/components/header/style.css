@@ -190,6 +190,44 @@
   color: #3d6df0;
 }
 
+/* Gladys is starting its integrations (see ServicesStartupNotice): same shape
+   as the notices around it, in blue — it is informational and goes away on its
+   own once every integration is started */
+.startupNoticeCard {
+  background-color: rgba(61, 109, 240, 0.12);
+}
+
+.startupNoticeIcon {
+  color: #3d6df0;
+  margin-top: 1px;
+}
+
+/* Mobile echo of the startup notice: a one-line strip right below the fixed
+   top bar, which the page makes room for (body.gladys-services-starting) */
+.startupMobileStrip {
+  position: fixed;
+  top: 3.25rem;
+  left: 0;
+  right: 0;
+  height: 2rem;
+  z-index: 1029;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.85rem;
+  border: 0;
+  border-bottom: 1px solid rgba(28, 35, 52, 0.08);
+  background-color: #e6ecfd;
+  font-size: 0.78rem;
+  color: #1c2334;
+  text-align: left;
+  cursor: pointer;
+}
+
+.startupMobileStripTitle {
+  font-weight: 600;
+}
+
 /* Unpaid Gladys Plus subscription (see GatewaySubscriptionNotice): same shape
    as the notices above, in red — this one is not informational, the Gladys
    Plus features of the instance are paused until it is dealt with */

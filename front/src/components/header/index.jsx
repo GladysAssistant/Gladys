@@ -9,6 +9,7 @@ import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
 import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
+import ServicesStartupNotice, { ServicesStartupMobileStrip } from './ServicesStartupNotice';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import style from './style.css';
 
@@ -184,6 +185,7 @@ class Header extends Component {
       userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://community.gladysassistant.com/';
     const showInstanceUpdateNotice =
       isInstanceBehindFront(props.instanceGladysVersion) && !isUpdateNoticeDismissed(props.instanceGladysVersion);
+    const showServicesStartupNotice = get(props, 'servicesStartup.in_progress') === true;
 
     return (
       <div>
@@ -200,7 +202,7 @@ class Header extends Component {
             {/* on mobile the notice lives in the closed menu: this dot is
                 what tells the user there is something to open it for. Screen
                 readers get the notice content itself, in the menu. */}
-            {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
+            {(showInstanceUpdateNotice || props.gatewayPaymentRequired || showServicesStartupNotice) && (
               <span class={style.mobileTogglerDot} aria-hidden="true" />
             )}
           </button>
@@ -214,6 +216,9 @@ class Header extends Component {
           </a>
           <DarkModeToggle />
         </div>
+        {showServicesStartupNotice && (
+          <ServicesStartupMobileStrip servicesStartup={props.servicesStartup} onClick={props.toggleCollapsedMenu} />
+        )}
         {props.showCollapsedMenu && (
           <div class={cx(style.sidebarBackdrop, 'd-lg-none')} onClick={props.toggleCollapsedMenu} />
         )}
@@ -268,6 +273,7 @@ class Header extends Component {
               </li>
             ))}
           </ul>
+          {showServicesStartupNotice && <ServicesStartupNotice servicesStartup={props.servicesStartup} />}
           {showInstanceUpdateNotice && (
             <InstanceUpdateNotice
               instanceVersion={props.instanceGladysVersion}
