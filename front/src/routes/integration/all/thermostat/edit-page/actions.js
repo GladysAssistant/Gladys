@@ -14,6 +14,7 @@ import {
   PRESENCE_PRESETS,
   defaultPresetTemps
 } from '../../../../../../../server/utils/thermostatConstants';
+import { isPresenceSensor } from '../../../../../../../server/utils/thermostatPresence';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 import { parseSelectorList, serializeSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
@@ -33,13 +34,6 @@ const TEMPERATURE_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR];
 const HUMIDITY_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR];
 const SWITCH_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.SWITCH];
 const OPENING_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR];
-// Someone in the room (spec A.4): a motion or a presence sensor reporting a
-// state, 1 for someone and 0 for nobody. The `push` variants only say that
-// something happened, never that it stopped, so they could not tell an empty room.
-const isPresenceFeature = feature =>
-  (feature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR ||
-    feature.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR) &&
-  feature.type === DEVICE_FEATURE_TYPES.SENSOR.BINARY;
 // The setpoint, mode and power an external thermostat is driven through. A heat
 // pump or an air conditioner publishes them in the air-conditioning category,
 // not in the thermostat one (spec A.0.3).
@@ -170,7 +164,8 @@ function createActions(store) {
             if (OPENING_CATEGORIES.includes(feature.category)) {
               openingFeatures.push(entry);
             }
-            if (isPresenceFeature(feature)) {
+            // Someone in the room (spec A.4): the sensors the regulation loop reads.
+            if (isPresenceSensor(feature)) {
               presenceFeatures.push(entry);
             }
             if (!isOwnThermostat) {

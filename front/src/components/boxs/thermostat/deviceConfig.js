@@ -37,6 +37,9 @@ const PARAM_FIELDS = [
   // thermostat that follows no schedule gets.
   ['manual_setpoint', 'THERMOSTAT_MANUAL_SETPOINT', parseFloat],
   ['manual_until', 'THERMOSTAT_MANUAL_UNTIL', v => parseInt(v, 10)],
+  // When the hold was armed: an empty room only lowers a preset picked before
+  // it emptied (spec A.4).
+  ['manual_since', 'THERMOSTAT_MANUAL_SINCE', v => parseInt(v, 10)],
   ['default_mode', 'THERMOSTAT_MODE'],
   ['control_type', 'THERMOSTAT_CONTROL_TYPE'],
   ['temp_min', 'THERMOSTAT_MIN_TEMP', parseFloat],
