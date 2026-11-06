@@ -455,6 +455,17 @@ function createActions(store) {
         // it would otherwise wake up as eco on the next module, unasked.
         const storedStandbyOrder = parsePilotWireStandbyOrder(state.thermostatEditPilotWireStandbyOrder);
         const pickedPilotWire = (state.pilotWireFeatures || []).find(feature => feature.selector === pilotWireFeature);
+        // Only a module that was read can say which order it takes: with the
+        // list not loaded, or the module gone from it, the order would be saved
+        // unchecked, and an eco or an off the module refuses would wake up on
+        // the next module, unasked. A module that declares no orders takes any.
+        if (thermostatType === 'virtual' && pilotWireFeature && !pickedPilotWire) {
+          store.setState({
+            thermostatCreateStatus: RequestStatus.Error,
+            thermostatEditError: 'pilotWireUnread'
+          });
+          return;
+        }
         const sentStandbyOrder = supportedStandbyOrder(
           storedStandbyOrder,
           pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
