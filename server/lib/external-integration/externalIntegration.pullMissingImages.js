@@ -1,7 +1,8 @@
 const Promise = require('bluebird');
 
+const db = require('../../models');
 const logger = require('../../utils/logger');
-const { SERVICE_STATUS } = require('../../utils/constants');
+const { SERVICE_STATUS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Pull the missing images of an integration in the background,
@@ -39,7 +40,19 @@ async function pullMissingImages(service, images) {
       return;
     }
     logger.warn(`Unable to pull the images of integration ${service.selector}`, e);
-    await this.saveStatus(service, SERVICE_STATUS.ERROR);
+    // ERROR only over LOADING, in one conditional write: a stop that landed
+    // before the pull was registered (so had nothing to abort) wrote
+    // STOPPED, and that must stay the status the user sees
+    const [updatedCount] = await db.Service.update(
+      { status: SERVICE_STATUS.ERROR },
+      { where: { id: service.id, status: SERVICE_STATUS.LOADING } },
+    );
+    if (updatedCount > 0) {
+      this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
+        payload: { selector: service.selector, status: SERVICE_STATUS.ERROR },
+      });
+    }
     return;
   }
   this.imagePulls.delete(service.id);

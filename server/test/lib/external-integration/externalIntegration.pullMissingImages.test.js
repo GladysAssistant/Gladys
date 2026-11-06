@@ -39,7 +39,7 @@ describe('externalIntegration.pullMissingImages', () => {
     const service = await seedExternalService({ container_id: null, status: SERVICE_STATUS.LOADING });
     const pull = sinon.stub().resolves(true);
     pull.withArgs(IMAGES[1]).rejects(new Error('no matching manifest for linux/arm64'));
-    const { externalIntegration, system } = buildSupervisor({
+    const { externalIntegration, system, event } = buildSupervisor({
       // nothing local to fall back on
       system: { pull, imageExists: fake.resolves(false) },
     });
@@ -49,7 +49,34 @@ describe('externalIntegration.pullMissingImages', () => {
     sinonAssert.notCalled(externalIntegration.start);
     const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     expect(serviceInDb.status).to.equal(SERVICE_STATUS.ERROR);
+    // the frontend is told, like every status change
+    sinonAssert.calledOnce(event.emit);
+    expect(event.emit.firstCall.args[1].payload).to.deep.equal({
+      selector: service.selector,
+      status: SERVICE_STATUS.ERROR,
+    });
     expect(externalIntegration.imagePulls.has(service.id)).to.equal(false);
+  });
+
+  it('should not write ERROR over a STOPPED integration when the pull fails', async () => {
+    // stop() landed between the LOADING write and the registration of the
+    // pull: nothing to abort, the pull goes on and fails later
+    const service = await seedExternalService({ container_id: null, status: SERVICE_STATUS.LOADING });
+    const { externalIntegration, event } = buildSupervisor({
+      system: {
+        pull: fake(async () => {
+          await db.Service.update({ status: SERVICE_STATUS.STOPPED }, { where: { id: service.id } });
+          throw new Error('registry unreachable');
+        }),
+        imageExists: fake.resolves(false),
+      },
+    });
+    externalIntegration.start = fake.resolves(null);
+    await externalIntegration.pullMissingImages(service, IMAGES);
+    sinonAssert.notCalled(externalIntegration.start);
+    const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
+    expect(serviceInDb.status).to.equal(SERVICE_STATUS.STOPPED);
+    sinonAssert.notCalled(event.emit);
   });
 
   it('should leave the status alone and not start when the pull was aborted', async () => {
@@ -121,19 +148,19 @@ describe('externalIntegration.pullMissingImages', () => {
     const integration = await externalIntegration.start(service.selector);
     expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
     sinonAssert.notCalled(system.createContainer);
-    // wait for the background job
-    while (externalIntegration.imagePulls.has(service.id)) {
+    // wait for the background job: the persisted container_id is the last
+    // write of the start that follows the pull
+    let serviceInDb = await db.Service.findOne({ where: { id: service.id } });
+    for (let attempt = 0; attempt < 200 && !serviceInDb.container_id; attempt += 1) {
       // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => {
         setTimeout(resolve, 5);
       });
+      // eslint-disable-next-line no-await-in-loop
+      serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     }
-    await new Promise((resolve) => {
-      setTimeout(resolve, 20);
-    });
     sinonAssert.calledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:1.2.0');
     sinonAssert.calledOnce(system.createContainer);
-    const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     expect(serviceInDb.container_id).to.equal('container-1');
     externalIntegration.clearTimers(service.id);
   });
