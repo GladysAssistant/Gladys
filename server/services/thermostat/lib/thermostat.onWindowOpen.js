@@ -45,6 +45,9 @@ const { pointInForce } = require('./thermostat.getSchedules');
  * thermostatHandler.invalidateDeviceCaches();
  */
 function invalidateDeviceCaches() {
+  // A pass already under way read the devices before the change: the next read
+  // starts a pass of its own.
+  this.deviceCachesFill = null;
   this.windowSelectorsCache = null;
   this.targetSelectorsCache = null;
   this.powerSelectorsCache = null;
@@ -73,17 +76,13 @@ async function postUpdate() {
 }
 
 /**
- * @description The set of window-sensor selectors configured on the thermostats.
- * EVENTS.DEVICE.NEW_STATE fires for every feature in the house, so without this
- * cache every binary sensor reaching 0 would trigger a device query.
+ * @description Fill every cache derived from this service's devices in one pass
+ * (getWindowSelectors).
  * @returns {Promise<Set<string>>} Configured window selectors.
  * @example
- * const selectors = await thermostatHandler.getWindowSelectors();
+ * const selectors = await fillDeviceCaches.call(thermostatHandler);
  */
-async function getWindowSelectors() {
-  if (this.windowSelectorsCache && this.targetSelectorsCache && this.powerSelectorsCache && this.modeSelectorsCache) {
-    return this.windowSelectorsCache;
-  }
+async function fillDeviceCaches() {
   const devices = await this.gladys.device.get({ service: 'thermostat' });
   const selectors = new Set();
   // The setpoints and the powers of the external thermostats are collected in
@@ -120,6 +119,34 @@ async function getWindowSelectors() {
   this.powerSelectorsCache = powers;
   this.modeSelectorsCache = modes;
   return selectors;
+}
+
+/**
+ * @description The set of window-sensor selectors configured on the thermostats.
+ * EVENTS.DEVICE.NEW_STATE fires for every feature in the house, so without this
+ * cache every binary sensor reaching 0 would trigger a device query.
+ * @returns {Promise<Set<string>>} Configured window selectors.
+ * @example
+ * const selectors = await thermostatHandler.getWindowSelectors();
+ */
+async function getWindowSelectors() {
+  if (this.windowSelectorsCache && this.targetSelectorsCache && this.powerSelectorsCache && this.modeSelectorsCache) {
+    return this.windowSelectorsCache;
+  }
+  // Callers that find the caches empty together wait on the same pass, and so
+  // resume in the order they called: two mode reports of a unit, each on a pass
+  // of its own, could resume in either order and be followed in it (A.4).
+  if (!this.deviceCachesFill) {
+    this.deviceCachesFill = fillDeviceCaches.call(this);
+  }
+  const fill = this.deviceCachesFill;
+  try {
+    return await fill;
+  } finally {
+    if (this.deviceCachesFill === fill) {
+      this.deviceCachesFill = null;
+    }
+  }
 }
 
 /**
@@ -791,11 +818,13 @@ async function followModeReport(changedSelector, value, lifecycle) {
       return;
     }
     const devices = await this.gladys.device.get({ service: 'thermostat' });
-    // The service may have stopped during the lookups: nothing is written then.
+    // The service may have stopped during the lookups: nothing is written then,
+    // and the report is not taken as followed.
     if (this.lifecycle !== lifecycle) {
+      this.observedModes.set(changedSelector, NaN);
       return;
     }
-    await Promise.all(
+    const switches = await Promise.allSettled(
       devices.map(async (device) => {
         const config = buildParamsConfig(device);
         if (!config || !config.reversible || config.mode_feature !== changedSelector || config.default_mode === use) {
@@ -821,10 +850,17 @@ async function followModeReport(changedSelector, value, lifecycle) {
         this.triggerApplySchedules();
       }),
     );
+    const failed = switches.find((outcome) => outcome.status === 'rejected');
+    if (failed) {
+      throw failed.reason;
+    }
   } catch (e) {
-    // The reports of this unit are followed one at a time: the previous one is
-    // still the last report before this one, and nothing newer is overwritten.
-    this.observedModes.set(changedSelector, previouslyObserved);
+    // Not followed, or only by some of the heat pumps on this unit: the mode
+    // observed is unknown, so the next report is followed whatever it says. Each
+    // heat pump already in the use it reports is left as it is. Put back to the
+    // previous report, a report of that previous mode was ignored, and left the
+    // heat pumps that had switched in the other use.
+    this.observedModes.set(changedSelector, NaN);
     logger.warn(`Thermostat: could not follow a mode change made on the device: ${e.message}`);
   }
 }
@@ -846,10 +882,11 @@ async function followModeReport(changedSelector, value, lifecycle) {
  *
  * The reports of one unit are followed one at a time, in the order they arrived:
  * run side by side, a heating report that arrived before a cooling one could be
- * recorded after it and switch the heat pump back. A switch that fails puts the
- * previous report back, so the same report arriving again retries it — recorded
- * as seen, it was ignored until the unit reported another mode, while every pass
- * wrote the old use to it.
+ * recorded after it and switch the heat pump back. A switch that fails leaves the
+ * mode observed as unknown, so the next report is followed whatever it says —
+ * recorded as seen, the same report was ignored until the unit reported another
+ * mode, while every pass wrote the old use to it. A service stopped during the
+ * lookups leaves it unknown as well.
  * @param {string} changedSelector - Selector of the feature that changed.
  * @param {number} newValue - The value it changed to.
  * @param {number} [lifecycle] - The run of the service the report arrived in.
@@ -862,8 +899,9 @@ async function onExternalModeChanged(changedSelector, newValue, lifecycle = this
     return;
   }
   const value = Number(newValue);
-  // Most events in a house are no unit's mode: they queue behind nothing. The
-  // lookups of two reports resolve in the order they were made.
+  // Most events in a house are no unit's mode: they queue behind nothing. Two
+  // reports resume from this lookup in the order they arrived, even when it has
+  // to read the devices (getWindowSelectors).
   try {
     if (!(await getModeSelectors.call(this)).has(changedSelector)) {
       return;
