@@ -1,6 +1,11 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
+const EventEmitter = require('events');
+
+const Device = require('../../../../lib/device');
+const StateManager = require('../../../../lib/state');
+const Job = require('../../../../lib/job');
 
 const { fake, assert } = sinon;
 
@@ -631,6 +636,196 @@ describe('thermostat.setValue', () => {
       await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
 
       assert.calledOnceWithExactly(clearModuleStop, 'device-id');
+    });
+  });
+
+  describe('on a setpoint outside the range of a virtual thermostat', () => {
+    // A scene or the API writes a virtual thermostat's own feature, and
+    // saveState stores whatever it is handed: the range has to bound it here.
+    const range = [
+      { name: 'THERMOSTAT_MIN_TEMP', value: '8' },
+      { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+    ];
+
+    it('should bring a setpoint above the range down to its top', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, 166);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 25);
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('25');
+    });
+
+    it('should bring a setpoint below the range up to its bottom', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, -50);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 8);
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('8');
+    });
+
+    it('should leave a setpoint within the range alone', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, 21.5);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 21.5);
+    });
+
+    it('should bound a setpoint sent as text, as a scene may', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, '30');
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 25);
+    });
+
+    it('should write a scheduled setpoint as the programme says', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, 30, false);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 30);
+    });
+
+    it('should bound an inverted range to the default one, as the widget does', async () => {
+      // Refused at save time now, but an older device may still carry one.
+      const handler = buildHandler();
+      const inverted = [
+        { name: 'THERMOSTAT_MIN_TEMP', value: '25' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '8' },
+      ];
+
+      await handler.setValue(device(inverted), setpointFeature, 166);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 35);
+    });
+
+    it('should leave a pilot-wire thermostat alone, whose setpoint picks a preset', async () => {
+      // 7 °C from a scene means frost (C.1.1): bounded to 20, it read as comfort.
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'pilot-wire' },
+          { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+          { name: 'THERMOSTAT_MIN_TEMP', value: '20' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+        ]),
+        setpointFeature,
+        7,
+      );
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 7);
+    });
+
+    it('should pass a value that is no number through untouched', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(range), setpointFeature, 'abc');
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 'abc');
+    });
+
+    // Number() reads each of these as 0, which was bounded and held as 8.
+    ['', '  ', null, false].forEach((empty) => {
+      it(`should pass ${JSON.stringify(empty)} through rather than hold the bottom of the range`, async () => {
+        const handler = buildHandler();
+
+        await handler.setValue(device(range), setpointFeature, empty);
+
+        assert.calledWith(handler.gladys.device.saveState, setpointFeature, empty);
+      });
+    });
+
+    it('should bound to the default range a thermostat with no params', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 166);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 35);
+    });
+
+    // Taken in Celsius, the default range clamped a 70 °F setpoint to 35 °F.
+    it('should bound a Fahrenheit thermostat with no bounds to the default range in Fahrenheit', async () => {
+      const handler = buildHandler();
+      const fahrenheit = [{ name: 'THERMOSTAT_TEMP_UNIT', value: 'F' }];
+
+      await handler.setValue(device(fahrenheit), setpointFeature, 70);
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 70);
+
+      await handler.setValue(device(fahrenheit), setpointFeature, 120);
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 95);
+    });
+
+    it('should bound an inverted range of a Fahrenheit thermostat to the default range in Fahrenheit', async () => {
+      const handler = buildHandler();
+      const inverted = [
+        { name: 'THERMOSTAT_TEMP_UNIT', value: 'F' },
+        { name: 'THERMOSTAT_MIN_TEMP', value: '77' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '46' },
+      ];
+
+      await handler.setValue(device(inverted), setpointFeature, 20);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 41);
+    });
+
+    it('should leave an external setpoint to the widget, which bounds the dial', async () => {
+      // The core routes a scene, the API or the dial to the real device's
+      // service: this branch is only reached by a direct call, and bounding it
+      // here would promise a protection external thermostats do not get.
+      const handler = buildHandler();
+
+      await handler.setValue(
+        externalDevice([{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }, ...range]),
+        { selector: 'netatmo-setpoint' },
+        30,
+      );
+
+      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(30);
+    });
+  });
+
+  describe('through the core device.setValue', () => {
+    // The real path of a scene or the API: the core calls this service, then
+    // saves the requested value itself unless the feature has feedback. The
+    // tests above call the service directly and could not see that save.
+    const buildCore = (handler) => {
+      const event = new EventEmitter();
+      const core = new Device(
+        event,
+        {},
+        new StateManager(event),
+        { getService: () => ({ device: { setValue: (...args) => handler.setValue(...args) } }) },
+        {},
+        {},
+        new Job(event),
+      );
+      core.saveState = handler.gladys.device.saveState;
+      return core;
+    };
+
+    it('should keep the clamped setpoint, not the value requested', async () => {
+      const handler = buildHandler();
+      const core = buildCore(handler);
+      // As createDevice and the migration now save it.
+      const feature = { ...setpointFeature, has_feedback: true };
+
+      await core.setValue(
+        {
+          ...device([
+            { name: 'THERMOSTAT_MIN_TEMP', value: '8' },
+            { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+          ]),
+          service: { name: 'thermostat' },
+        },
+        feature,
+        166,
+      );
+
+      assert.calledOnceWithExactly(handler.gladys.device.saveState, feature, 25);
     });
   });
 

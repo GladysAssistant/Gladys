@@ -251,6 +251,14 @@ describe('thermostat.deviceConfig - getDeviceConfig', () => {
     expect(config.temp_unit).to.equal('C');
   });
 
+  // In Celsius, 35 °F was also its cooling stop setpoint (C.0).
+  it('should default the min/max in Fahrenheit on a Fahrenheit thermostat', () => {
+    const config = getDeviceConfig(deviceWithParams({ THERMOSTAT_TEMP_UNIT: 'F' }));
+
+    expect(config.temp_min).to.equal(41);
+    expect(config.temp_max).to.equal(95);
+  });
+
   it('should leave the manual duration null when unset', () => {
     // An absent duration is the setting "hand the thermostat back at the next
     // schedule point": filling in the default here made that unreachable, since

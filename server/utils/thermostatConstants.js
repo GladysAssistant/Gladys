@@ -4,6 +4,7 @@
 // regulation applied another.
 
 const { PILOT_WIRE_MODE } = require('./constants');
+const { celsiusToFahrenheit } = require('./units');
 
 const DEFAULT_PRESET_TEMPS = {
   frost: 7,
@@ -59,6 +60,21 @@ const DEFAULT_CONTROL_TYPE = 'hysteresis';
 const DEFAULT_MIN_TEMP = 5;
 const DEFAULT_MAX_TEMP = 35;
 const DEFAULT_TEMP_UNIT = 'C';
+
+/**
+ * @description The range a thermostat gets when its bounds are missing or
+ * inverted, in its own unit: the defaults are in Celsius, and taken as they are
+ * on a Fahrenheit thermostat they clamped a 70 °F setpoint to 35 °F — and made
+ * 35 °F its cooling stop setpoint. Rounded to whole degrees, 41-95 °F.
+ * @param {string} [unit] - The thermostat's unit, 'C' or 'F'.
+ * @returns {{min: number, max: number}} The default range.
+ * @example
+ * defaultTempRange('F'); // { min: 41, max: 95 }
+ */
+const defaultTempRange = (unit) =>
+  unit === 'F'
+    ? { min: Math.round(celsiusToFahrenheit(DEFAULT_MIN_TEMP)), max: Math.round(celsiusToFahrenheit(DEFAULT_MAX_TEMP)) }
+    : { min: DEFAULT_MIN_TEMP, max: DEFAULT_MAX_TEMP };
 
 // How long a manual setpoint (widget dial or scene) holds before the schedule
 // takes over again. Configurable per device through THERMOSTAT_MANUAL_DURATION,
@@ -189,6 +205,7 @@ module.exports = {
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
   DEFAULT_TEMP_UNIT,
+  defaultTempRange,
   DEFAULT_MANUAL_DURATION_MINUTES,
   MANUAL_DURATION_MS,
   DEFAULT_WINDOW_DELAY_SECONDS,

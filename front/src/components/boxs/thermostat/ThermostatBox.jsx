@@ -13,8 +13,7 @@ import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/
 import { calendarDaysAhead } from '../../../../../server/utils/thermostatSchedule';
 import {
   defaultPresetTemps,
-  DEFAULT_MIN_TEMP,
-  DEFAULT_MAX_TEMP,
+  defaultTempRange,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
@@ -206,19 +205,76 @@ class ThermostatBox extends Component {
     const cfg = this.state.remoteConfig;
     return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
   };
-  getMinTemp = () => {
-    // Device feature native min has top priority
-    if (this.state.featureMin !== null) return this.state.featureMin;
+  // The dial spans the range set on the thermostat (THERMOSTAT_MIN_TEMP /
+  // _MAX_TEMP, or the shared default), in the setpoint feature's unit. The range
+  // the device advertises only narrows it, never widens it: Matter advertises
+  // -100-200 °C, and taking it first let the dial reach 166 °C on a thermostat
+  // set to 8-25 (spec F). Kept until one of its inputs changes: a drag of the
+  // dial reads it on every pointer move.
+  getDialRange = () => {
     const cfg = this.getConfig();
-    if (cfg.temp_min !== undefined && cfg.temp_min !== null) return Number(cfg.temp_min);
-    return DEFAULT_MIN_TEMP;
+    const { featureUnit, featureMin, featureMax } = this.state;
+    const key = [
+      cfg.temp_min,
+      cfg.temp_max,
+      cfg.temp_unit,
+      this.isExternal(),
+      featureUnit,
+      featureMin,
+      featureMax
+    ].join('|');
+    if (!this.dialRange || this.dialRange.key !== key) {
+      this.dialRange = { key, range: this.computeDialRange(cfg) };
+    }
+    return this.dialRange.range;
   };
-  getMaxTemp = () => {
-    // Device feature native max has top priority
-    if (this.state.featureMax !== null) return this.state.featureMax;
-    const cfg = this.getConfig();
-    if (cfg.temp_max !== undefined && cfg.temp_max !== null) return Number(cfg.temp_max);
-    return DEFAULT_MAX_TEMP;
+
+  computeDialRange = cfg => {
+    // In the thermostat's unit, like its bounds: 5-35 read as Fahrenheit.
+    const defaults = defaultTempRange(cfg.temp_unit);
+    let min = numOr(cfg.temp_min, defaults.min);
+    let max = numOr(cfg.temp_max, defaults.max);
+    // An inverted range is refused at save time; one an older device still
+    // carries stands for the default range, as on the server (D.0) — honoured,
+    // it turned + and − round. Compared before the unit conversion, whose
+    // rounding can make two distinct bounds equal (13 and 12.5 °C are both 55 °F).
+    if (min > max) {
+      ({ min, max } = defaults);
+    }
+    const distinct = min < max;
+    min = this.toSetpointFeatureUnit(min);
+    max = this.toSetpointFeatureUnit(max);
+    // Two distinct bounds the conversion rounded together leave a dial with no
+    // width: it takes the default range instead.
+    if (distinct && min >= max) {
+      min = this.toSetpointFeatureUnit(defaults.min);
+      max = this.toSetpointFeatureUnit(defaults.max);
+    }
+    // An inverted advertised range is no range either. On a virtual thermostat
+    // the form copies its bounds onto the feature's own min/max.
+    const advertisedOrdered =
+      this.state.featureMin === null ||
+      this.state.featureMax === null ||
+      this.state.featureMin <= this.state.featureMax;
+    const featureMin = advertisedOrdered ? this.state.featureMin : null;
+    const featureMax = advertisedOrdered ? this.state.featureMax : null;
+    const low = featureMin !== null ? Math.max(min, featureMin) : min;
+    const high = featureMax !== null ? Math.min(max, featureMax) : max;
+    if (low <= high) {
+      return { min: low, max: high };
+    }
+    // A range the device cannot reach would pin the dial to a single value: it
+    // follows the device instead. With only one bound advertised, the open side
+    // keeps the width of the configured range (a device topping out at 4 under
+    // a 5-35 range gets -26-4, not 4-4).
+    const span = max - min;
+    if (featureMin !== null && featureMax !== null) {
+      return { min: featureMin, max: featureMax };
+    }
+    if (featureMin !== null) {
+      return { min: featureMin, max: featureMin + span };
+    }
+    return { min: featureMax - span, max: featureMax };
   };
 
   // Effective temperature unit: device feature unit takes priority over user preference
@@ -1201,7 +1257,9 @@ class ThermostatBox extends Component {
     const comfort = numOr(cfg.preset_comfort, defaultPresetTemps(cfg.default_mode).comfort);
     // The comfort preset can sit outside the device's own range, which would
     // put the needle off the arc.
-    const fallback = Math.min(this.getMaxTemp(), Math.max(this.getMinTemp(), comfort));
+    // The preset is in the thermostat's unit, the range in the feature's.
+    const range = this.getDialRange();
+    const fallback = Math.min(range.max, Math.max(range.min, this.toSetpointFeatureUnit(comfort)));
     this.setState({ setpoint: fallback });
   };
 
@@ -1309,7 +1367,10 @@ class ThermostatBox extends Component {
     }
   };
 
-  angleToTemp = angleDeg => angleToSetpoint(angleDeg, this.getMinTemp(), this.getMaxTemp());
+  angleToTemp = angleDeg => {
+    const { min, max } = this.getDialRange();
+    return angleToSetpoint(angleDeg, min, max);
+  };
 
   onPointerDown = e => {
     if (!this.svgRef) return;
@@ -1401,12 +1462,16 @@ class ThermostatBox extends Component {
 
   increment = () => {
     const step = 0.5;
-    this.stepSetpoint(Math.min(this.getMaxTemp(), this.state.setpoint + step));
+    // Bounded both ways: a setpoint the programme left outside the range
+    // (5 °C under 10-25) would otherwise step to 5.5 rather than into the range.
+    const { min, max } = this.getDialRange();
+    this.stepSetpoint(Math.min(max, Math.max(min, this.state.setpoint + step)));
   };
 
   decrement = () => {
     const step = 0.5;
-    this.stepSetpoint(Math.max(this.getMinTemp(), this.state.setpoint - step));
+    const { min, max } = this.getDialRange();
+    this.stepSetpoint(Math.max(min, Math.min(max, this.state.setpoint - step)));
   };
 
   // A tap on + or −. On a stopped thermostat it also starts it again, on the
@@ -1520,8 +1585,7 @@ class ThermostatBox extends Component {
     }
   ) {
     const cfg = this.getConfig();
-    const minTemp = this.getMinTemp();
-    const maxTemp = this.getMaxTemp();
+    const { min: minTemp, max: maxTemp } = this.getDialRange();
     const configMode = cfg.default_mode || 'heating';
     // The gauge builds one sentence out of these for screen readers; taken from
     // the dictionary directly because it composes them with live values rather

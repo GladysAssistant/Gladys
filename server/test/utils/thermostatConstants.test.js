@@ -1,6 +1,17 @@
 const { expect } = require('chai');
 const { PILOT_WIRE_MODE } = require('../../utils/constants');
-const { supportedPilotWireOrder } = require('../../utils/thermostatConstants');
+const { supportedPilotWireOrder, defaultTempRange } = require('../../utils/thermostatConstants');
+
+describe('thermostatConstants.defaultTempRange', () => {
+  it('should give the default range in Celsius', () => {
+    expect(defaultTempRange('C')).to.deep.equal({ min: 5, max: 35 });
+    expect(defaultTempRange(undefined)).to.deep.equal({ min: 5, max: 35 });
+  });
+
+  it('should give the default range in whole Fahrenheit degrees', () => {
+    expect(defaultTempRange('F')).to.deep.equal({ min: 41, max: 95 });
+  });
+});
 
 const options = (...values) => values.map((value) => ({ value }));
 
