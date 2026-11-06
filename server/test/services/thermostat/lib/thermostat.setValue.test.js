@@ -170,7 +170,7 @@ describe('thermostat.setValue', () => {
 
       assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-        payload: { device: 'living-room', setpoint: 21.5, until: sinon.match.number },
+        payload: { device: 'living-room', setpoint: 21.5, until: sinon.match.number, since: sinon.match.number },
       });
     });
 

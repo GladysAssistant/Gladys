@@ -701,6 +701,30 @@ describe('Device.migrate', function Describe() {
     expect(valueOf('THERMOSTAT_WINDOW_FEATURE')).to.equal('["salon-window","kitchen-door"]');
   });
 
+  // The presence sensors of a thermostat are a list too (thermostat.md A.4).
+  it('should re-point the migrated entry of a thermostat presence sensor list', async () => {
+    const thermostat = await db.Device.create(
+      {
+        name: 'Migration thermostat',
+        selector: 'migration-thermostat',
+        external_id: 'thermostat:migration',
+        service_id: SEEDED_SERVICE_ID,
+        params: [{ name: 'THERMOSTAT_PRESENCE_FEATURE', value: '["salon-motion","migration-source-temp"]' }],
+      },
+      { include: [{ model: db.DeviceParam, as: 'params' }] },
+    );
+
+    await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+    });
+
+    const param = await db.DeviceParam.findOne({
+      where: { device_id: thermostat.id, name: 'THERMOSTAT_PRESENCE_FEATURE' },
+    });
+    expect(param.value).to.equal('["salon-motion","migration-destination-temp"]');
+  });
+
   it('should re-point a sensor list padded with whitespace', async () => {
     // Written through the API, the array may not start the value: it is still a
     // list the thermostat reads, and the migrated entry must not be lost.

@@ -78,6 +78,21 @@ const DEFAULT_WINDOW_DELAY_SECONDS = 60;
 // come in.
 const MAX_WINDOW_DELAY_SECONDS = 3600;
 
+// How long every presence sensor has to read "nobody" before the room is taken
+// as empty, in minutes. A motion sensor only sees someone who moves: someone
+// reading on the sofa goes unseen for a quarter of an hour, so the default
+// leaves room for that. Configurable per device through THERMOSTAT_PRESENCE_DELAY.
+const DEFAULT_PRESENCE_DELAY_MINUTES = 30;
+// Bounded both ways: under a minute every still moment is an absence, and a day
+// is already what a house-wide presence or a scene says better. A day also keeps
+// the pending check within what `setTimeout` takes (see MAX_WINDOW_DELAY_SECONDS).
+const MIN_PRESENCE_DELAY_MINUTES = 1;
+const MAX_PRESENCE_DELAY_MINUTES = 1440;
+// The preset an empty room is lowered to, through THERMOSTAT_PRESENCE_PRESET, and
+// the ones it may name. Comfort is no saving, and off is a stop, not a preset.
+const DEFAULT_PRESENCE_PRESET = 'eco';
+const PRESENCE_PRESETS = ['eco', 'night', 'away', 'frost'];
+
 // The preset names, as they are stored in a schedule transition and used to key
 // DEFAULT_PRESET_TEMPS. `schedule` is not one of them: it is a state of the
 // thermostat ("follow the programme"), carried by the preset feature, and a
@@ -141,6 +156,18 @@ const DEFAULT_PILOT_WIRE_ORDERS = {
 
 const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
 
+// The orders from the least heat to the most, which their values do not say:
+// comfort -2 °C sits below comfort -1 °C. What an empty room's preset is
+// weighed on when the heater regulates itself (A.4).
+const PILOT_WIRE_ORDER_RANK = {
+  [PILOT_WIRE_MODE.OFF]: 0,
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 1,
+  [PILOT_WIRE_MODE.ECO]: 2,
+  [PILOT_WIRE_MODE.COMFORT_2]: 3,
+  [PILOT_WIRE_MODE.COMFORT_1]: 4,
+  [PILOT_WIRE_MODE.COMFORT]: 5,
+};
+
 /**
  * @description The order a module can actually be sent, from the options its
  * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
@@ -193,11 +220,17 @@ module.exports = {
   MANUAL_DURATION_MS,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
+  DEFAULT_PRESENCE_DELAY_MINUTES,
+  MIN_PRESENCE_DELAY_MINUTES,
+  MAX_PRESENCE_DELAY_MINUTES,
+  DEFAULT_PRESENCE_PRESET,
+  PRESENCE_PRESETS,
   PRESETS,
   TRANSITION_PRESETS,
   THERMOSTAT_TYPES,
   DEFAULT_THERMOSTAT_TYPE,
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
+  PILOT_WIRE_ORDER_RANK,
   supportedPilotWireOrder,
 };

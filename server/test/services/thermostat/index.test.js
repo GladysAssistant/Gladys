@@ -20,6 +20,7 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     lifecycle: 0,
     windowTimers: new Map(),
     windowOpenedAt: new Map(),
+    presenceVacatedAt: new Map(),
     // As the real handler is built: not running until start().
     running: false,
   };
@@ -162,6 +163,17 @@ describe('ThermostatService', () => {
     await service.stop();
 
     expect(handler.windowOpenedAt.size).to.equal(0);
+  });
+
+  // Someone may come and go while the service is stopped: a room counts as empty
+  // from what its sensors say after the start, not from a time kept before the stop.
+  it('should forget when the presence sensors went quiet on stop', async () => {
+    const { service, handler } = buildService();
+    handler.presenceVacatedAt.set('salon-motion', 1000);
+
+    await service.stop();
+
+    expect(handler.presenceVacatedAt.size).to.equal(0);
   });
 
   // A state change still in flight compares this to the run it arrived in: a
