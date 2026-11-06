@@ -136,6 +136,10 @@ class ThermostatBox extends Component {
     // a way out of it shows at once, and a reload already in flight when the
     // user tapped cannot bring the old mode back.
     pendingMode: null,
+    // The use this card switched a stopped heat pump to, until a reload of the
+    // device carries it (see switchUse). Kept apart from pendingMode, which
+    // would read the thermostat as running.
+    pendingUse: null,
     // Whether the first load has settled the setpoint. Until then the gauge
     // jumps rather than glides: on a °F feature under a °C thermostat it is
     // first drawn on the unconverted value, then corrected once the feature's
@@ -324,7 +328,13 @@ class ThermostatBox extends Component {
           remoteConfig.mode !== null &&
           remoteConfig.mode !== undefined &&
           Number(remoteConfig.mode) === prev.pendingMode;
-        return confirmed ? { remoteConfig, pendingMode: null } : { remoteConfig };
+        // The same for the use of a stopped heat pump.
+        const useConfirmed = prev.pendingUse !== null && remoteConfig.default_mode === prev.pendingUse;
+        return {
+          remoteConfig,
+          ...(confirmed ? { pendingMode: null } : {}),
+          ...(useConfirmed ? { pendingUse: null } : {})
+        };
       }, resolve)
     );
     return remoteConfig;
@@ -387,23 +397,33 @@ class ThermostatBox extends Component {
     return Number(mode) === THERMOSTAT_MODE.OFF;
   };
 
+  // The use in force: the one this card just switched a stopped heat pump to,
+  // until the device carries it, or the one the device is configured with.
+  getUse = () => this.state.pendingUse || this.getConfig().default_mode;
+
   // The mode a running thermostat carries, from what it is configured to do.
-  getRunningMode = () =>
-    this.getConfig().default_mode === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
+  getRunningMode = () => (this.getUse() === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING);
 
   // Heating or cooling on a reversible heat pump (spec A.4) is a mode write, like
   // a start: the server saves the use and the presets of that use, drops a hold
   // taken in the other one, and the card reloads them on CONFIG_UPDATED. On a
   // stopped thermostat it only switches the use and leaves it stopped: the start
-  // stays the power button's, so nothing is held as a pending start here.
+  // stays the power button's, so nothing is held as a pending start here. The
+  // use is held as pending instead, until a reload carries it: a power press
+  // before then wrote the previous use, which the server switched back to.
   switchUse = async use => {
-    if (this.getConfig().default_mode === use) {
+    if (this.getUse() === use) {
       return;
     }
     const value = use === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
     if (this.isStopped()) {
       const cfg = this.state.remoteConfig;
-      await this.writeFeature(cfg && cfg.modeFeature, value);
+      const previousUse = this.state.pendingUse;
+      this.setState({ pendingUse: use });
+      const written = await this.writeFeature(cfg && cfg.modeFeature, value);
+      if (!written) {
+        this.setState({ pendingUse: previousUse });
+      }
       return;
     }
     await this.writeMode(value);

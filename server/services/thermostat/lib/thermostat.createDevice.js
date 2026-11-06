@@ -42,6 +42,12 @@ const RUNTIME_PARAMS = [
   'THERMOSTAT_MODULE_STOP',
 ];
 
+// Carried over the same way when the payload leaves it out: the use of a
+// reversible heat pump, which the widget and the unit's remote switch (A.4). The
+// edit form sends it only when the user changed it there, so a form left open
+// while the use changed elsewhere no longer puts the old use back on save.
+const CARRIED_PARAMS = [...RUNTIME_PARAMS, 'THERMOSTAT_MODE'];
+
 // Params the integration owns. Anything else sent by a client is dropped rather
 // than persisted, so the device never carries unknown regulation settings.
 const ALLOWED_PARAMS = [
@@ -227,12 +233,13 @@ async function createDevice(device) {
   // runtime state the edit form knows nothing about, so saving the form would
   // silently drop it — and the next regulation pass would overwrite the setpoint
   // the user, a scene or the physical dial had just chosen. Carry it over from
-  // the device as it stands, unless the caller sent it explicitly.
+  // the device as it stands, unless the caller sent it explicitly — and the use
+  // with it (CARRIED_PARAMS).
   if (device.selector) {
     const devices = await this.gladys.device.get({ service: 'thermostat' });
     const existing = (devices || []).find((candidate) => candidate.selector === device.selector);
     const existingParams = (existing && existing.params) || [];
-    RUNTIME_PARAMS.forEach((name) => {
+    CARRIED_PARAMS.forEach((name) => {
       if (params.some((param) => param.name === name)) {
         return;
       }

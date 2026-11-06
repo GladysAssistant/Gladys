@@ -289,13 +289,15 @@ function createActions(store) {
         // has them, and its cooling ones apart, whichever use is in force.
         const reversible = getParam('THERMOSTAT_REVERSIBLE') === 'true';
         const presetDefaults = defaultPresetTemps(reversible ? 'heating' : getParam('THERMOSTAT_MODE'));
-        const coolingDefaults = defaultPresetTemps('cooling');
+        // In the thermostat's own unit, like the save-time defaults: 24 °C left
+        // as 24 on a Fahrenheit thermostat was saved as 24 °F.
+        const unitState = { thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C' };
         store.setState({
           thermostatEditReversible: reversible,
           ...COOLING_PRESET_FIELDS.reduce(
             (fields, [field, preset]) => ({
               ...fields,
-              [field]: getParam(COOLING_PRESET_PARAM(preset)) || String(coolingDefaults[preset])
+              [field]: getParam(COOLING_PRESET_PARAM(preset)) || String(defaultInUnit(unitState, 'cooling', preset))
             }),
             {}
           ),
@@ -304,6 +306,8 @@ function createActions(store) {
           thermostatEditDevice: device,
           thermostatEditName: device.name,
           thermostatEditMode: getParam('THERMOSTAT_MODE') || 'heating',
+          // Set once the use is changed in the form: only then is it saved.
+          thermostatEditModeChanged: false,
           thermostatEditMinTemp: getParam('THERMOSTAT_MIN_TEMP') || '5',
           thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || '35',
           // A reversible heat pump's cooling range, the single one until set.
@@ -378,7 +382,7 @@ function createActions(store) {
         // A reversible one already holds its heating presets: nothing to carry.
         Object.assign(
           next,
-          { thermostatEditMode: 'heating' },
+          { thermostatEditMode: 'heating', thermostatEditModeChanged: true },
           state.thermostatEditReversible ? {} : carriedPresets(state, 'cooling', 'heating')
         );
       }
@@ -421,7 +425,7 @@ function createActions(store) {
       // A reversible heat pump has a set of presets for each use: the use in
       // force changes, neither set does.
       const carried = state.thermostatEditReversible ? {} : carriedPresets(state, previous, mode);
-      store.setState({ thermostatEditMode: mode, ...carried });
+      store.setState({ thermostatEditMode: mode, thermostatEditModeChanged: true, ...carried });
     },
 
     updateThermostatUnit(state, newUnit) {
@@ -604,7 +608,13 @@ function createActions(store) {
           params: [
             // The active schedule is device-owned: the dashboard widget only
             // chooses which thermostat to display, it never drives regulation.
-            { name: 'THERMOSTAT_MODE', value: savedMode },
+            // The use, only when it is new or the form changed it: the widget
+            // and the unit's remote switch it too (spec A.4), and sent on every
+            // save, the use loaded with the form came back over theirs. Left
+            // out, the server keeps the one in force.
+            ...(!isEdit || state.thermostatEditModeChanged || savedMode !== mode
+              ? [{ name: 'THERMOSTAT_MODE', value: savedMode }]
+              : []),
             { name: 'THERMOSTAT_MIN_TEMP', value: String(minTemp) },
             { name: 'THERMOSTAT_MAX_TEMP', value: String(maxTemp) },
             // The cooling range of a reversible heat pump, cleared otherwise.
@@ -661,7 +671,7 @@ function createActions(store) {
             { name: 'THERMOSTAT_REVERSIBLE', value: reversible ? 'true' : '' },
             ...COOLING_PRESET_FIELDS.map(([field, preset]) => ({
               name: COOLING_PRESET_PARAM(preset),
-              value: reversible ? String(toNumber(state[field], defaultPresetTemps('cooling')[preset])) : ''
+              value: reversible ? String(toNumber(state[field], defaultInUnit(state, 'cooling', preset))) : ''
             })),
             { name: 'THERMOSTAT_HYSTERESIS_START', value: String(hysteresisStart) },
             { name: 'THERMOSTAT_HYSTERESIS_STOP', value: String(hysteresisStop) },
@@ -712,6 +722,7 @@ function createActions(store) {
           thermostatEditDevice: null,
           thermostatEditName: '',
           thermostatEditMode: 'heating',
+          thermostatEditModeChanged: false,
           thermostatEditMinTemp: '5',
           thermostatEditMaxTemp: '35',
           thermostatEditTempUnit: 'C',
