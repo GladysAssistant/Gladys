@@ -98,6 +98,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -130,6 +131,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -168,6 +170,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -205,6 +208,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -247,6 +251,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -268,6 +273,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -325,6 +331,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });

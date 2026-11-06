@@ -2006,7 +2006,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Adaptertyp",
               "unknownDongle": "Nicht definiert",
-              "tcpPort": "TCP-Port"
+              "tcpPort": "TCP-Port",
+              "ezspDriver": "Alte Firmware: Gladys verwendet den Kompatibilitätstreiber <code>ezsp</code>, da der Treiber <code>ember</code> Firmware 7.4 oder höher erfordert. Zigbee2mqtt funktioniert so, aber dieser Treiber ist veraltet. Um zu <code>ember</code> zurückzukehren, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">aktualisieren Sie die Firmware</a> und wählen Sie dann das Modell ohne „(legacy ezsp)“ (oder den Typ <code>ember</code> für einen Netzwerk-Koordinator)."
             },
             "externalMqtt": {
               "title": "Verbindung für externe Tools",
@@ -2016,7 +2017,7 @@
               "copied": "Kopiert"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Warnung: Die Firmware Ihres Ember-Koordinators ist veraltet. Version 7.4.x oder höher ist erforderlich. Bitte folgen Sie der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>, um sie zu aktualisieren. Wählen Sie andernfalls den Dongle (legacy ezsp) in der Konfiguration aus.",
+              "EZSP_PROTOCOL_VERSION": "Die Firmware Ihres Koordinators ist zu alt für den Treiber <code>ember</code>, der Version 7.4 oder höher erfordert, und für dieses Modell gibt es keinen Kompatibilitätstreiber. Aktualisieren Sie sie mit der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>.",
               "unknownErrorPrefix": "Zigbee2MQTT-Containerfehler: "
             }
           },

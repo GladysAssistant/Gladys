@@ -235,6 +235,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -624,6 +625,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
           type: 'EmberZNet',
         },
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
