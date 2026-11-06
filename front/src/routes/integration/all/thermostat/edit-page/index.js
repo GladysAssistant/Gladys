@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import ThermostatPage from '../ThermostatPage';
 import EditForm from './EditForm';
-import { DEFAULT_PILOT_WIRE_ORDERS } from '../../../../../../../server/utils/thermostatConstants';
+import { DEFAULT_PILOT_WIRE_ORDERS, defaultTempRange } from '../../../../../../../server/utils/thermostatConstants';
 
 class ThermostatEditPage extends Component {
   // Extracted so a selector change on a reused route reloads the form. Doing this
@@ -17,8 +17,8 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditDevice', null);
     this.props.updateThermostatField('thermostatEditName', '');
     this.props.updateThermostatField('thermostatEditMode', 'heating');
-    this.props.updateThermostatField('thermostatEditMinTemp', '5');
-    this.props.updateThermostatField('thermostatEditMaxTemp', '35');
+    this.props.updateThermostatField('thermostatEditMinTemp', String(defaultTempRange('C').min));
+    this.props.updateThermostatField('thermostatEditMaxTemp', String(defaultTempRange('C').max));
     this.props.updateThermostatField('thermostatEditTempUnit', 'C');
     this.props.updateThermostatField('thermostatEditControlType', 'hysteresis');
     this.props.updateThermostatField('thermostatEditActiveSchedule', '');

@@ -184,13 +184,47 @@ describe('thermostat.createDevice', () => {
     assert.notCalled(handler.gladys.device.create);
   });
 
-  it('should accept a range with a single bound, or a bound that is no number', async () => {
+  it('should accept a single bound within the default range, or a bound that is no number', async () => {
     const created = await buildHandler().createDevice({
       name: 'Salon',
       features: [setpointFeature],
       params: [
         { name: 'THERMOSTAT_MIN_TEMP', value: '25' },
         { name: 'THERMOSTAT_MAX_TEMP', value: '' },
+      ],
+    });
+
+    expect(created.name).to.equal('Salon');
+  });
+
+  // Saved, the minimum was compared with the default maximum and dropped for
+  // the default range everywhere, without a word.
+  it('should refuse a single bound beyond the default other bound', async () => {
+    const handler = buildHandler();
+
+    let error = null;
+    try {
+      await handler.createDevice({
+        name: 'Salon',
+        features: [setpointFeature],
+        params: [{ name: 'THERMOSTAT_MIN_TEMP', value: '40' }],
+      });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(BadParameters);
+    expect(error.message).to.contain('40');
+    assert.notCalled(handler.gladys.device.create);
+  });
+
+  it('should compare a single bound with the default in the thermostat unit', async () => {
+    const created = await buildHandler().createDevice({
+      name: 'Salon',
+      features: [setpointFeature],
+      params: [
+        { name: 'THERMOSTAT_TEMP_UNIT', value: 'F' },
+        { name: 'THERMOSTAT_MIN_TEMP', value: '50' },
       ],
     });
 

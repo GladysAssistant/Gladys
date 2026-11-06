@@ -209,9 +209,27 @@ class ThermostatBox extends Component {
   // _MAX_TEMP, or the shared default), in the setpoint feature's unit. The range
   // the device advertises only narrows it, never widens it: Matter advertises
   // -100-200 °C, and taking it first let the dial reach 166 °C on a thermostat
-  // set to 8-25 (spec F). Computed once per use: callers take both bounds.
+  // set to 8-25 (spec F). Kept until one of its inputs changes: a drag of the
+  // dial reads it on every pointer move.
   getDialRange = () => {
     const cfg = this.getConfig();
+    const { featureUnit, featureMin, featureMax } = this.state;
+    const key = [
+      cfg.temp_min,
+      cfg.temp_max,
+      cfg.temp_unit,
+      this.isExternal(),
+      featureUnit,
+      featureMin,
+      featureMax
+    ].join('|');
+    if (!this.dialRange || this.dialRange.key !== key) {
+      this.dialRange = { key, range: this.computeDialRange(cfg) };
+    }
+    return this.dialRange.range;
+  };
+
+  computeDialRange = cfg => {
     // In the thermostat's unit, like its bounds: 5-35 read as Fahrenheit.
     const defaults = defaultTempRange(cfg.temp_unit);
     let min = numOr(cfg.temp_min, defaults.min);
@@ -223,8 +241,15 @@ class ThermostatBox extends Component {
     if (min > max) {
       ({ min, max } = defaults);
     }
+    const distinct = min < max;
     min = this.toSetpointFeatureUnit(min);
     max = this.toSetpointFeatureUnit(max);
+    // Two distinct bounds the conversion rounded together leave a dial with no
+    // width: it takes the default range instead.
+    if (distinct && min >= max) {
+      min = this.toSetpointFeatureUnit(defaults.min);
+      max = this.toSetpointFeatureUnit(defaults.max);
+    }
     // An inverted advertised range is no range either. On a virtual thermostat
     // the form copies its bounds onto the feature's own min/max.
     const advertisedOrdered =
@@ -1232,8 +1257,9 @@ class ThermostatBox extends Component {
     const comfort = numOr(cfg.preset_comfort, defaultPresetTemps(cfg.default_mode).comfort);
     // The comfort preset can sit outside the device's own range, which would
     // put the needle off the arc.
+    // The preset is in the thermostat's unit, the range in the feature's.
     const range = this.getDialRange();
-    const fallback = Math.min(range.max, Math.max(range.min, comfort));
+    const fallback = Math.min(range.max, Math.max(range.min, this.toSetpointFeatureUnit(comfort)));
     this.setState({ setpoint: fallback });
   };
 
