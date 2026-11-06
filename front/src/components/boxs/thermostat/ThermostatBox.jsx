@@ -13,8 +13,7 @@ import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/
 import { calendarDaysAhead } from '../../../../../server/utils/thermostatSchedule';
 import {
   defaultPresetTemps,
-  DEFAULT_MIN_TEMP,
-  DEFAULT_MAX_TEMP,
+  defaultTempRange,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
@@ -220,15 +219,16 @@ class ThermostatBox extends Component {
   // set to 8-25 (spec F). Computed once per use: callers take both bounds.
   getDialRange = () => {
     const cfg = this.getConfig();
-    let min = numOr(cfg.temp_min, DEFAULT_MIN_TEMP);
-    let max = numOr(cfg.temp_max, DEFAULT_MAX_TEMP);
+    // In the thermostat's unit, like its bounds: 5-35 read as Fahrenheit.
+    const defaults = defaultTempRange(cfg.temp_unit);
+    let min = numOr(cfg.temp_min, defaults.min);
+    let max = numOr(cfg.temp_max, defaults.max);
     // An inverted range is refused at save time; one an older device still
     // carries stands for the default range, as on the server (D.0) — honoured,
     // it turned + and − round. Compared before the unit conversion, whose
     // rounding can make two distinct bounds equal (13 and 12.5 °C are both 55 °F).
     if (min > max) {
-      min = DEFAULT_MIN_TEMP;
-      max = DEFAULT_MAX_TEMP;
+      ({ min, max } = defaults);
     }
     min = this.toSetpointFeatureUnit(min);
     max = this.toSetpointFeatureUnit(max);

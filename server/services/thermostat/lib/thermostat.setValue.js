@@ -2,9 +2,8 @@ const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES, THERMOSTAT_MODE } = require('../../../utils/constants');
 const {
   DEFAULT_MANUAL_DURATION_MINUTES,
-  DEFAULT_MIN_TEMP,
-  DEFAULT_MAX_TEMP,
   THERMOSTAT_TYPES,
+  defaultTempRange,
 } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const {
@@ -177,7 +176,8 @@ async function holdExpiry(device) {
  * too: it takes no range, and a setpoint from a scene picks the nearest preset
  * (C.1.1) — bounded, 7 °C would become Comfort rather than Frost.
  *
- * Missing params get the shared default range, as in the widget. So does an
+ * Missing params get the shared default range in the thermostat's unit, as in
+ * the widget. So does an
  * inverted range, which the edit form and createDevice refuse but an older
  * device may still carry: the widget does the same, so the dial and a scene
  * agree.
@@ -190,10 +190,11 @@ function manualRange(config) {
   if (isExternal(config) || config.thermostat_type === THERMOSTAT_TYPES.PILOT_WIRE) {
     return null;
   }
-  const min = toNumber(config.temp_min, DEFAULT_MIN_TEMP);
-  const max = toNumber(config.temp_max, DEFAULT_MAX_TEMP);
+  const defaults = defaultTempRange(config.temp_unit);
+  const min = toNumber(config.temp_min, defaults.min);
+  const max = toNumber(config.temp_max, defaults.max);
   if (min > max) {
-    return { min: DEFAULT_MIN_TEMP, max: DEFAULT_MAX_TEMP };
+    return defaults;
   }
   return { min, max };
 }
