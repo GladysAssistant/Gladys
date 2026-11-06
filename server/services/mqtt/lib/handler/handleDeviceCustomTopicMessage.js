@@ -30,29 +30,22 @@ function handleDeviceCustomTopicMessage(topic, message, deviceFeatureId, objectP
       logger.warn(`handleDeviceCustomTopicMessage: Device feature ${deviceFeatureId} not found`);
       return;
     }
-    // If objectPath is not null, it's supposed to be a JSON
-    if (objectPath) {
-      const state = get(JSON.parse(message), objectPath);
-      if (state === undefined || state === null || state === '') {
-        // Number() would turn an empty, null or missing value into 0; an empty
-        // payload carries no state, so ignore it instead
-        return;
-      }
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: deviceFeature.external_id,
-        state: parseNumber(state),
-      });
-    } else {
-      if (message === '') {
-        // Number('') is 0: an empty payload carries no state, so ignore it instead
-        return;
-      }
-      // else, it's supposed to be a normal string, send it raw
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: deviceFeature.external_id,
-        state: parseNumber(message),
-      });
+    // An empty or whitespace-only payload carries no state (a retained-clear publication),
+    // and JSON.parse would only throw on it - ignore it before parsing
+    if (message === undefined || message === null || String(message).trim() === '') {
+      return;
     }
+    // If objectPath is set the payload is JSON, otherwise it's a plain string
+    const state = objectPath ? get(JSON.parse(message), objectPath) : message;
+    // Number() turns '', ' ' and null into 0, and a missing path gives undefined:
+    // none of those is a state, so ignore them instead
+    if (state === undefined || state === null || String(state).trim() === '') {
+      return;
+    }
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: deviceFeature.external_id,
+      state: parseNumber(state),
+    });
   } catch (e) {
     logger.warn(
       `handleDeviceCustomTopicMessage: Fail to handle message from custom MQTT topic ${topic}, ${deviceFeatureId}, ${objectPath}`,
