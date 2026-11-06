@@ -218,6 +218,26 @@ describe('thermostat.createDevice', () => {
     );
   });
 
+  // The edit form sends the use only when the user changed it there: a form left
+  // open while the widget or the unit's remote switched it put the old use back.
+  it('should keep the use in force when the payload leaves it out, and take the one it sends', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([
+      { selector: 'living-room', params: [{ name: 'THERMOSTAT_MODE', value: 'cooling' }] },
+    ]);
+
+    const kept = await handler.createDevice({ name: 'Salon', selector: 'living-room', features: [setpointFeature] });
+    const changed = await handler.createDevice({
+      name: 'Salon',
+      selector: 'living-room',
+      features: [setpointFeature],
+      params: [{ name: 'THERMOSTAT_MODE', value: 'heating' }],
+    });
+
+    expect(kept.params.find((param) => param.name === 'THERMOSTAT_MODE').value).to.equal('cooling');
+    expect(changed.params.find((param) => param.name === 'THERMOSTAT_MODE').value).to.equal('heating');
+  });
+
   it('should let the caller clear a hold explicitly', async () => {
     const handler = buildHandler();
     handler.gladys.device.get = fake.resolves([

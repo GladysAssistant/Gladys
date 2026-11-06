@@ -52,6 +52,11 @@ async function switchUse(device, use, { keepHold = false } = {}) {
   if (!config.reversible || config.default_mode === use) {
     return false;
   }
+  // The hold goes first: saved after the use, a failed clear left the old use's
+  // hold to be regulated under the new one, and a retry returned above.
+  if (!keepHold) {
+    await clearManualHold.call(this, device);
+  }
   await this.gladys.device.setParam(device, 'THERMOSTAT_MODE', use);
   // The caller builds its config from this same object right after. The core's
   // copy is updated too: `setParam` only writes the database, while a scene, the
@@ -66,9 +71,6 @@ async function switchUse(device, use, { keepHold = false } = {}) {
       { name: 'THERMOSTAT_MODE', value: use },
     ];
   });
-  if (!keepHold) {
-    await clearManualHold.call(this, device);
-  }
   // The widgets read the presets of the use from the params: they reload them.
   this.broadcastConfigUpdated();
   logger.info(`Thermostat: ${device.selector} switched to ${use}`);

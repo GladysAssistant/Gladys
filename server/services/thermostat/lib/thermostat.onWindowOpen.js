@@ -769,46 +769,32 @@ async function onExternalPowerChanged(changedSelector, newValue) {
 }
 
 /**
- * @description Follow heating or cooling picked on a reversible heat pump itself
- * — its remote, its vendor app (A.4).
- *
- * The unit is a second writer and wins (C.0.1): without this, the next pass
- * writes the thermostat's use back over the remote's, and a house that switched
- * its heat pump to cooling for the first hot day finds it heating again a minute
- * later. The thermostat switches its use instead, exactly as from the widget. A
- * stopped one only takes the use, so it starts again in it: the remote's mode is
- * no reason to start a thermostat someone stopped. Auto, drying and fan pick no
- * use, and are left to the pass as before.
- *
- * A change is a difference from the previous report, as for the power: the
- * service only ever writes the use in force, so its own writes switch nothing.
+ * @description Follow one mode report of a unit (onExternalModeChanged), once
+ * the reports before it have been followed. It never throws.
  * @param {string} changedSelector - Selector of the feature that changed.
- * @param {number} newValue - The value it changed to.
+ * @param {number} value - The mode it reports.
+ * @param {number} lifecycle - The run of the service the report arrived in.
  * @returns {Promise<void>}
  * @example
- * await onExternalModeChanged.call(handler, 'melcloud-mode', AC_MODE.COOLING);
+ * await followModeReport.call(handler, 'melcloud-mode', AC_MODE.COOLING, handler.lifecycle);
  */
-async function onExternalModeChanged(changedSelector, newValue) {
-  if (newValue === null || newValue === undefined) {
+async function followModeReport(changedSelector, value, lifecycle) {
+  const previouslyObserved = this.observedModes.get(changedSelector);
+  this.observedModes.set(changedSelector, value);
+  if (previouslyObserved === undefined || Number(previouslyObserved) === value) {
     return;
   }
-  const value = Number(newValue);
   try {
-    const modeSelectors = await getModeSelectors.call(this);
-    if (!modeSelectors.has(changedSelector)) {
-      return;
-    }
-    const previouslyObserved = this.observedModes.get(changedSelector);
-    this.observedModes.set(changedSelector, value);
-    if (previouslyObserved === undefined || Number(previouslyObserved) === value) {
-      return;
-    }
     const found = await getFeatureBySelector(this.gladys, changedSelector);
     const use = found && (USE_OF_UNIT_MODE[found.feature.category] || {})[value];
     if (!use) {
       return;
     }
     const devices = await this.gladys.device.get({ service: 'thermostat' });
+    // The service may have stopped during the lookups: nothing is written then.
+    if (this.lifecycle !== lifecycle) {
+      return;
+    }
     await Promise.all(
       devices.map(async (device) => {
         const config = buildParamsConfig(device);
@@ -836,7 +822,65 @@ async function onExternalModeChanged(changedSelector, newValue) {
       }),
     );
   } catch (e) {
+    // The reports of this unit are followed one at a time: the previous one is
+    // still the last report before this one, and nothing newer is overwritten.
+    this.observedModes.set(changedSelector, previouslyObserved);
     logger.warn(`Thermostat: could not follow a mode change made on the device: ${e.message}`);
+  }
+}
+
+/**
+ * @description Follow heating or cooling picked on a reversible heat pump itself
+ * — its remote, its vendor app (A.4).
+ *
+ * The unit is a second writer and wins (C.0.1): without this, the next pass
+ * writes the thermostat's use back over the remote's, and a house that switched
+ * its heat pump to cooling for the first hot day finds it heating again a minute
+ * later. The thermostat switches its use instead, exactly as from the widget. A
+ * stopped one only takes the use, so it starts again in it: the remote's mode is
+ * no reason to start a thermostat someone stopped. Auto, drying and fan pick no
+ * use, and are left to the pass as before.
+ *
+ * A change is a difference from the previous report, as for the power: the
+ * service only ever writes the use in force, so its own writes switch nothing.
+ *
+ * The reports of one unit are followed one at a time, in the order they arrived:
+ * run side by side, a heating report that arrived before a cooling one could be
+ * recorded after it and switch the heat pump back. A switch that fails puts the
+ * previous report back, so the same report arriving again retries it — recorded
+ * as seen, it was ignored until the unit reported another mode, while every pass
+ * wrote the old use to it.
+ * @param {string} changedSelector - Selector of the feature that changed.
+ * @param {number} newValue - The value it changed to.
+ * @param {number} [lifecycle] - The run of the service the report arrived in.
+ * @returns {Promise<void>}
+ * @example
+ * await onExternalModeChanged.call(handler, 'melcloud-mode', AC_MODE.COOLING);
+ */
+async function onExternalModeChanged(changedSelector, newValue, lifecycle = this.lifecycle) {
+  if (newValue === null || newValue === undefined) {
+    return;
+  }
+  const value = Number(newValue);
+  // Most events in a house are no unit's mode: they queue behind nothing. The
+  // lookups of two reports resolve in the order they were made.
+  try {
+    if (!(await getModeSelectors.call(this)).has(changedSelector)) {
+      return;
+    }
+  } catch (e) {
+    logger.warn(`Thermostat: could not follow a mode change made on the device: ${e.message}`);
+    return;
+  }
+  const previous = this.modeReports.get(changedSelector) || Promise.resolve();
+  const run = (async () => {
+    await previous;
+    await followModeReport.call(this, changedSelector, value, lifecycle);
+  })();
+  this.modeReports.set(changedSelector, run);
+  await run;
+  if (this.modeReports.get(changedSelector) === run) {
+    this.modeReports.delete(changedSelector);
   }
 }
 
@@ -920,7 +964,7 @@ async function onDeviceNewState(event) {
   // The same goes for the power of an air conditioner switched from its remote.
   await onExternalPowerChanged.call(this, changedSelector, newValue);
   // And heating or cooling picked on a reversible heat pump's remote (A.4).
-  await onExternalModeChanged.call(this, changedSelector, newValue);
+  await onExternalModeChanged.call(this, changedSelector, newValue, lifecycle);
 
   if (newValue === null || newValue === undefined) {
     return;
