@@ -747,6 +747,31 @@ describe('thermostat.setValue', () => {
       assert.calledWith(handler.gladys.device.saveState, setpointFeature, 35);
     });
 
+    // Taken in Celsius, the default range clamped a 70 °F setpoint to 35 °F.
+    it('should bound a Fahrenheit thermostat with no bounds to the default range in Fahrenheit', async () => {
+      const handler = buildHandler();
+      const fahrenheit = [{ name: 'THERMOSTAT_TEMP_UNIT', value: 'F' }];
+
+      await handler.setValue(device(fahrenheit), setpointFeature, 70);
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 70);
+
+      await handler.setValue(device(fahrenheit), setpointFeature, 120);
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 95);
+    });
+
+    it('should bound an inverted range of a Fahrenheit thermostat to the default range in Fahrenheit', async () => {
+      const handler = buildHandler();
+      const inverted = [
+        { name: 'THERMOSTAT_TEMP_UNIT', value: 'F' },
+        { name: 'THERMOSTAT_MIN_TEMP', value: '77' },
+        { name: 'THERMOSTAT_MAX_TEMP', value: '46' },
+      ];
+
+      await handler.setValue(device(inverted), setpointFeature, 20);
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 41);
+    });
+
     it('should leave an external setpoint to the widget, which bounds the dial', async () => {
       // The core routes a scene, the API or the dial to the real device's
       // service: this branch is only reached by a direct call, and bounding it
