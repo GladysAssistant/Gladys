@@ -4,18 +4,21 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const getConfig = require('../../../utils/getConfig');
-const { EVENTS } = require('../../../utils/constants');
-const { Error500 } = require('../../../utils/httpErrors');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { BACKUP_ERRORS } = require('../../../lib/gateway/gateway.backupHealth');
 
 const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
+const HOUR = 60 * 60 * 1000;
+
 describe('gateway.checkIfBackupNeeded', () => {
   const event = {};
 
   let gateway;
+  let variables;
   let clock;
 
   beforeEach(async () => {
@@ -43,10 +46,28 @@ describe('gateway.checkIfBackupNeeded', () => {
       },
     };
 
-    gateway = new Gateway({}, event, {}, {}, config, {}, {}, {}, job, scheduler);
-    gateway.backupRandomInterval = 50;
+    // an in-memory store of the system variables: a linked instance, in Paris
+    variables = new Map([
+      ['GLADYS_GATEWAY_REFRESH_TOKEN', 'refresh-token'],
+      [SYSTEM_VARIABLE_NAMES.TIMEZONE, 'Europe/Paris'],
+    ]);
+    const variable = {
+      getValue: sinon.stub().callsFake(async (name) => (variables.has(name) ? variables.get(name) : null)),
+      setValue: sinon.stub().callsFake(async (name, value) => {
+        variables.set(name, value);
+      }),
+      destroy: sinon.stub().callsFake(async (name) => {
+        variables.delete(name);
+      }),
+    };
 
-    clock = sinon.useFakeTimers();
+    gateway = new Gateway(variable, event, {}, {}, config, {}, {}, {}, job, scheduler);
+    gateway.backupRandomInterval = 50;
+    gateway.recordBackupFailure = fake.resolves(null);
+    gateway.recordBackupSuccess = fake.resolves(null);
+
+    // the nightly check: 03:30 in Paris, the 5th of January
+    clock = sinon.useFakeTimers(new Date('2024-01-05T02:30:00.000Z'));
   });
 
   afterEach(() => {
@@ -54,15 +75,29 @@ describe('gateway.checkIfBackupNeeded', () => {
     sinon.reset();
   });
 
-  it('should check if backup is needed and not connected', async () => {
-    // Force connected mode
+  it('should do nothing when Gladys Plus is not configured', async () => {
+    gateway.connected = false;
+    variables.delete('GLADYS_GATEWAY_REFRESH_TOKEN');
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.gladysGatewayClient.getBackups);
+    assert.notCalled(gateway.recordBackupFailure);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.notCalled(event.emit);
+  });
+
+  it('should record a failed night when the instance is linked but not connected', async () => {
     gateway.connected = false;
 
     await gateway.checkIfBackupNeeded();
 
     assert.notCalled(gateway.gladysGatewayClient.getBackups);
-
-    // wait Xms and see if backup was called
+    assert.calledOnceWithExactly(
+      gateway.recordBackupFailure,
+      BACKUP_ERRORS.NOT_CONNECTED,
+      gateway.subscriptionLinkGeneration,
+    );
     clock.tick(gateway.backupRandomInterval * 10);
     assert.notCalled(event.emit);
   });
@@ -72,12 +107,13 @@ describe('gateway.checkIfBackupNeeded', () => {
     const error = new Error();
     error.response = { status: 402 };
     gateway.gladysGatewayClient.getBackups = fake.rejects(error);
-    gateway.variable = { setValue: fake.resolves(null), destroy: fake.resolves(null) };
 
     await gateway.checkIfBackupNeeded();
 
     assert.calledOnce(gateway.gladysGatewayClient.getBackups);
     expect(gateway.subscriptionActive).to.equal(false);
+    // the admins are already told by the lock itself
+    assert.notCalled(gateway.recordBackupFailure);
     clock.tick(gateway.backupRandomInterval * 10);
     assert.neverCalledWith(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
   });
@@ -93,20 +129,23 @@ describe('gateway.checkIfBackupNeeded', () => {
     assert.calledOnce(gateway.gladysGatewayClient.getBackups);
     // a plan without backups is not an unpaid subscription: no lock
     expect(gateway.subscriptionActive).to.equal(true);
+    // nothing to back up, nothing to report
+    assert.notCalled(gateway.recordBackupFailure);
     clock.tick(gateway.backupRandomInterval * 10);
     assert.neverCalledWith(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
   });
 
-  it('should forward errors other than payment required', async () => {
+  it('should record a failed night, without throwing, when Gladys Plus cannot be reached', async () => {
     gateway.connected = true;
     gateway.gladysGatewayClient.getBackups = fake.rejects(new Error('network'));
 
-    try {
-      await gateway.checkIfBackupNeeded();
-      expect.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error500);
-    }
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnceWithExactly(
+      gateway.recordBackupFailure,
+      BACKUP_ERRORS.UNREACHABLE,
+      gateway.subscriptionLinkGeneration,
+    );
     clock.tick(gateway.backupRandomInterval * 10);
     assert.neverCalledWith(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
   });
@@ -120,10 +159,151 @@ describe('gateway.checkIfBackupNeeded', () => {
     await gateway.checkIfBackupNeeded();
 
     assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+    // nothing to sync: no backup yet
+    assert.notCalled(gateway.recordBackupSuccess);
+    expect(gateway.pendingBackupTimer).to.not.equal(null);
 
     // wait Xms and see if backup was called
     clock.tick(gateway.backupRandomInterval * 10);
     assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+    expect(gateway.pendingBackupTimer).to.equal(null);
+  });
+
+  it('should not schedule a second backup while one is pending', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([]);
+
+    // the night check, then the start-up catch-up during the random delay
+    await gateway.checkIfBackupNeeded();
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+  });
+
+  it('should not start the scheduled backup when one is in progress by then', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([]);
+
+    await gateway.checkIfBackupNeeded();
+    // "Backup now" clicked during the random delay, still running when it fires
+    gateway.backupInProgress = true;
+    clock.tick(gateway.backupRandomInterval * 10);
+
+    assert.notCalled(event.emit);
+    expect(gateway.pendingBackupTimer).to.equal(null);
+  });
+
+  it('should not schedule a second backup when two checks overlap', async () => {
+    gateway.connected = true;
+    let releaseBackups;
+    const backupsReleased = new Promise((resolve) => {
+      releaseBackups = resolve;
+    });
+    gateway.gladysGatewayClient.getBackups = fake(() => backupsReleased);
+
+    // a restart around 2 AM: the night check and the start-up catch-up start
+    // before either has its answer from Gladys Plus
+    const firstCheck = gateway.checkIfBackupNeeded();
+    const secondCheck = gateway.checkIfBackupNeeded();
+    releaseBackups([]);
+    await Promise.all([firstCheck, secondCheck]);
+
+    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+    expect(gateway.backupCheckInProgress).to.equal(false);
+  });
+
+  it('should release the check when it fails', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([]);
+    gateway.variable.getValue = fake.rejects(new Error('unexpected'));
+
+    try {
+      await gateway.checkIfBackupNeeded();
+      expect.fail();
+    } catch (e) {
+      expect(e.message).to.equal('unexpected');
+    }
+    expect(gateway.backupCheckInProgress).to.equal(false);
+  });
+
+  it('should neither record nor schedule anything when the account was unlinked during the check', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = sinon.stub().callsFake(async () => {
+      // disconnect() during the request
+      gateway.subscriptionLinkGeneration += 1;
+      return [];
+    });
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.recordBackupSuccess);
+    assert.notCalled(gateway.recordBackupFailure);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.notCalled(event.emit);
+  });
+
+  it('should not record the night when the account was unlinked while Gladys Plus was unreachable', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = sinon.stub().callsFake(async () => {
+      gateway.subscriptionLinkGeneration += 1;
+      throw new Error('network');
+    });
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.recordBackupFailure);
+  });
+
+  it('should not sync nor schedule when the account was unlinked while the health was read', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([{ created_at: '2024-01-03T02:45:00.000Z' }]);
+    gateway.getBackupHealth = sinon.stub().callsFake(async () => {
+      gateway.subscriptionLinkGeneration += 1;
+      return { last_success_at: null, failing_since: null, last_error: null, alert_sent_at: null };
+    });
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnce(gateway.recordBackupSuccess);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.notCalled(event.emit);
+  });
+
+  it('should stay silent when the instance is not connected and the subscription is locked', async () => {
+    gateway.connected = false;
+    gateway.subscriptionActive = false;
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.recordBackupFailure);
+  });
+
+  it('should not record the night when the account was unlinked while reading the configuration', async () => {
+    gateway.connected = false;
+    gateway.variable.getValue = sinon.stub().callsFake(async (name) => {
+      gateway.subscriptionLinkGeneration += 1;
+      return name === 'GLADYS_GATEWAY_REFRESH_TOKEN' ? 'refresh-token' : null;
+    });
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.recordBackupFailure);
+  });
+
+  it('should not schedule a backup while one is in progress', async () => {
+    gateway.connected = true;
+    gateway.backupInProgress = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([]);
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.gladysGatewayClient.getBackups);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.notCalled(event.emit);
   });
 
   it('should check if backup is needed and execute backup as last is old', async () => {
@@ -145,22 +325,114 @@ describe('gateway.checkIfBackupNeeded', () => {
     assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
   });
 
-  it('should check if backup is needed and avoid backup as last to young', async () => {
-    // Force connected mode
+  it('should backup every day: the last backup was made yesterday, less than 24 hours ago', async () => {
     gateway.connected = true;
-    // Force last backup date
+    // yesterday at 03:45 in Paris, 22h45 before this check: the former
+    // "more than 24 hours old" rule skipped this night, one night out of two
     gateway.gladysGatewayClient.getBackups = fake.resolves([
       {
-        created_at: Date.now(), // now
+        created_at: new Date('2024-01-04T02:45:00.000Z').toISOString(),
       },
     ]);
 
     await gateway.checkIfBackupNeeded();
 
-    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+  });
 
-    // wait Xms and see if backup was called
+  it('should backup when the last backup is from yesterday in the timezone of the instance, today in UTC', async () => {
+    gateway.connected = true;
+    // the 4th at 23:30 in Paris is the 4th at 22:30 UTC: yesterday in both,
+    // but the 4th at 23:30 UTC is already the 5th in Paris
+    gateway.gladysGatewayClient.getBackups = fake.resolves([
+      {
+        created_at: new Date('2024-01-04T22:30:00.000Z').toISOString(),
+      },
+    ]);
+
+    await gateway.checkIfBackupNeeded();
+
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+  });
+
+  it('should not backup when a backup was already made today in the timezone of the instance', async () => {
+    gateway.connected = true;
+    // the 4th at 23:30 UTC is the 5th at 00:30 in Paris: today
+    gateway.gladysGatewayClient.getBackups = fake.resolves([
+      {
+        created_at: new Date('2024-01-04T23:30:00.000Z').toISOString(),
+      },
+    ]);
+
+    await gateway.checkIfBackupNeeded();
+
     clock.tick(gateway.backupRandomInterval * 10);
     assert.notCalled(event.emit);
+  });
+
+  it('should not backup twice a day: the daytime catch-up after a successful night', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.resolves([
+      {
+        created_at: new Date(Date.now() - HOUR).toISOString(),
+      },
+    ]);
+    // the catch-up, 10:00 in Paris
+    clock.tick(6.5 * HOUR);
+
+    await gateway.checkIfBackupNeeded();
+
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.notCalled(event.emit);
+  });
+
+  it('should use the system timezone when the instance has none', async () => {
+    gateway.connected = true;
+    variables.delete(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+    gateway.gladysGatewayClient.getBackups = fake.resolves([
+      {
+        created_at: new Date(Date.now() - 10 * 24 * HOUR).toISOString(),
+      },
+    ]);
+
+    await gateway.checkIfBackupNeeded();
+
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+  });
+
+  it('should fill the local health with the last backup of Gladys Plus when it has none', async () => {
+    gateway.connected = true;
+    const lastBackup = new Date('2024-01-04T02:45:00.000Z');
+    gateway.gladysGatewayClient.getBackups = fake.resolves([{ created_at: lastBackup.toISOString() }]);
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnce(gateway.recordBackupSuccess);
+    expect(gateway.recordBackupSuccess.firstCall.args[0].getTime()).to.equal(lastBackup.getTime());
+  });
+
+  it('should fix the local health when Gladys Plus has a more recent backup (restore of an old backup)', async () => {
+    gateway.connected = true;
+    variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT, '2023-12-20T02:45:00.000Z');
+    const lastBackup = new Date('2024-01-04T02:45:00.000Z');
+    gateway.gladysGatewayClient.getBackups = fake.resolves([{ created_at: lastBackup.toISOString() }]);
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnce(gateway.recordBackupSuccess);
+    expect(gateway.recordBackupSuccess.firstCall.args[0].getTime()).to.equal(lastBackup.getTime());
+  });
+
+  it('should keep the local health when it is at least as recent as Gladys Plus', async () => {
+    gateway.connected = true;
+    variables.set(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT, '2024-01-04T02:50:00.000Z');
+    gateway.gladysGatewayClient.getBackups = fake.resolves([{ created_at: '2024-01-04T02:45:00.000Z' }]);
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.notCalled(gateway.recordBackupSuccess);
   });
 });

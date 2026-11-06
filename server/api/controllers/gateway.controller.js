@@ -1,5 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, ERROR_MESSAGES, USER_ROLE } = require('../../utils/constants');
+const { Error403 } = require('../../utils/httpErrors');
+const { PasswordNotMatchingError, NotFoundError } = require('../../utils/coreErrors');
 const { getAudioBufferFromRequest, getAudioContentTypeFromRequest } = require('../utils/getAudioBufferFromRequest');
 
 module.exports = function GatewayController(gladys) {
@@ -10,6 +12,12 @@ module.exports = function GatewayController(gladys) {
    */
   async function getStatus(req, res) {
     const status = await gladys.gateway.getStatus();
+    // every user, and the signup restore flow without a session, needs the
+    // link and subscription state; the health of the backups (its last error
+    // names server paths) is for the admins
+    if (!req.user || req.user.role !== USER_ROLE.ADMIN) {
+      delete status.backup_health;
+    }
     res.json(status);
   }
   /**
@@ -80,6 +88,36 @@ module.exports = function GatewayController(gladys) {
    */
   async function enableTwoFactor(req, res) {
     const result = await gladys.gateway.enableTwoFactor(req.body.access_token, req.body.two_factor_code);
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/user/:gateway_user_id/recovery-codes Generate Gladys Plus recovery codes
+   * @apiName generateUserRecoveryCodes
+   * @apiGroup Gateway
+   * @apiDescription For a Gladys Plus user of the account who lost their two-factor
+   * app and their recovery codes: the instance stands in for the second factor and
+   * asks Gladys Plus for a new set of single-use recovery codes. Admin only, and the
+   * admin re-enters their local password. The previous codes are invalidated and
+   * Gladys Plus notifies the user by email.
+   * @apiParam {String} password The local password of the admin making the request.
+   */
+  async function generateUserRecoveryCodes(req, res) {
+    // A session left open on a wall tablet must not be enough to get codes that
+    // replace the second factor of a Gladys Plus account: the admin proves it is them.
+    if (typeof req.body.password !== 'string' || req.body.password.length === 0) {
+      throw new Error403(ERROR_MESSAGES.WRONG_PASSWORD);
+    }
+    try {
+      await gladys.user.login(req.user.email, req.body.password);
+    } catch (e) {
+      // only a wrong password is the admin's fault: a database or hashing failure stays a 500
+      if (e instanceof PasswordNotMatchingError || e instanceof NotFoundError) {
+        throw new Error403(ERROR_MESSAGES.WRONG_PASSWORD);
+      }
+      throw e;
+    }
+    const result = await gladys.gateway.generateUserRecoveryCodes(req.params.gateway_user_id);
     res.json(result);
   }
 
@@ -360,6 +398,7 @@ module.exports = function GatewayController(gladys) {
     loginTwoFactor: asyncMiddleware(loginTwoFactor),
     configureTwoFactor: asyncMiddleware(configureTwoFactor),
     enableTwoFactor: asyncMiddleware(enableTwoFactor),
+    generateUserRecoveryCodes: asyncMiddleware(generateUserRecoveryCodes),
     getUsersKeys: asyncMiddleware(getUsersKeys),
     saveUsersKeys: asyncMiddleware(saveUsersKeys),
     saveBackupKey: asyncMiddleware(saveBackupKey),

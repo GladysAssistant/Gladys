@@ -35,6 +35,8 @@ function mapUnit(deviceUnit, featureUnit) {
       return DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE;
     case 'm³/h':
       return DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR;
+    case 'm³/s':
+      return DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND;
     case 'L':
       return DEVICE_FEATURE_UNITS.LITER;
     case 's':

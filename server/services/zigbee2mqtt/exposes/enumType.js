@@ -169,6 +169,16 @@ addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_2, 'press_2');
 addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_3, 'press_3');
 addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_4, 'press_4');
 
+// Philips Hue Tap Dial switch (RDM002)
+// https://www.zigbee2mqtt.io/devices/8719514440937_8719514440999.html
+// A short press publishes "press" then "press_release", a long press "press", "hold" (repeated
+// while held) then "hold_release": only the releases are mapped, so each press fires once and a
+// long press does not also fire a single press.
+[1, 2, 3, 4].forEach((n) => {
+  addMapping('action', BUTTON_STATUS[`SINGLE_BUTTON_${n}`], `button_${n}_press_release`);
+  addMapping('action', BUTTON_STATUS[`LONG_BUTTON_${n}`], `button_${n}_hold_release`);
+});
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');

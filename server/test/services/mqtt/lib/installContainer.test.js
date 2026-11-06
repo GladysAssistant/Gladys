@@ -106,7 +106,8 @@ describe('mqttHandler.installContainer', () => {
     await mqttHandler.installContainer();
 
     assert.callCount(gladys.variable.setValue, 5);
-    assert.calledOnce(mqttHandler.configureContainer);
+    // fresh install: the broker users are reset before the Gladys one is written
+    assert.calledOnceWithExactly(mqttHandler.configureContainer, true);
     assert.calledOnce(gladys.system.pull);
     assert.calledOnce(gladys.system.createContainer);
     assert.calledOnce(gladys.system.getNetworkMode);
@@ -155,7 +156,8 @@ describe('mqttHandler.installContainer', () => {
     await mqttHandler.installContainer(false);
 
     assert.notCalled(gladys.variable.setValue);
-    assert.calledOnce(mqttHandler.configureContainer);
+    // upgrade: the broker users are kept
+    assert.calledOnceWithExactly(mqttHandler.configureContainer, false);
     assert.calledOnce(gladys.system.pull);
     assert.calledOnce(gladys.system.createContainer);
     assert.calledOnce(gladys.system.getNetworkMode);

@@ -21,7 +21,10 @@ async function init() {
     this.listenToHomeAssistantDeviceStateIfNeeded(device);
   });
 
-  const configuration = await this.getConfiguration();
+  let configuration = await this.getConfiguration();
+
+  // Recreate the embedded broker if its container is missing (e.g. backup restored on a new machine)
+  configuration = await this.recreateMissingContainer(configuration);
 
   // Check for container configuration
   await this.updateContainer(configuration);

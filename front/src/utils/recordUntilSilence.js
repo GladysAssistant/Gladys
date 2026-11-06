@@ -15,6 +15,7 @@ export function isRecordUntilSilenceAbortError(error) {
  * @description Record audio from the microphone until the user stops speaking.
  * @param {object} options - Recording options.
  * @param {AbortSignal} [options.signal] - Abort signal to cancel recording.
+ * @param {AbortSignal} [options.stopSignal] - Stop signal to end recording now and keep the audio.
  * @param {() => void} [options.onReady] - Called once microphone capture is active.
  * @returns {Promise<Blob>} 16 kHz mono WAV blob.
  * @example

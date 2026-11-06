@@ -393,9 +393,10 @@ function buildFakeSystem(overrides = {}) {
     }),
     getGladysContainerId: fake.resolves('gladys-container-id'),
     getImageLabels: fake.resolves({}),
-    // no image is present locally by default: the local fallback of
-    // ensureImage stays out of the way unless a test opts in
-    imageExists: fake.resolves(false),
+    // every image is present on the machine by default (the state after an
+    // install): a test of the missing-image paths (restore case, local
+    // fallback of ensureImage) opts out explicitly
+    imageExists: fake.resolves(true),
     listImages: fake.resolves([]),
     getImagePullTime: fake.returns(undefined),
     removeImage: fake.resolves(true),

@@ -442,6 +442,17 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.enableTwoFactor,
     },
+    // the instance stands in for the second factor of a Gladys Plus user who lost
+    // it: admin only, local password required again, rate limited like a login,
+    // and never through the Gladys Plus tunnel (no rate limit there, and the point
+    // is to be at home)
+    'post /api/v1/gateway/user/:gateway_user_id/recovery-codes': {
+      authenticated: true,
+      admin: true,
+      rateLimit: true,
+      localOnly: true,
+      controller: gatewayController.generateUserRecoveryCodes,
+    },
     'get /api/v1/gateway/key': {
       authenticated: true,
       admin: true,

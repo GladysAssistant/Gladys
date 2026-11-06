@@ -106,6 +106,17 @@ describe('externalIntegration.uninstall', () => {
     expect(sendCalls[0].args[1].userId).to.equal(userId);
   });
 
+  it('should abort an in-flight pull of the images (restore case)', async () => {
+    const service = await seedExternalService({ container_id: null });
+    const { externalIntegration } = buildSupervisor();
+    const controller = new AbortController();
+    externalIntegration.imagePulls.set(service.id, controller);
+    await externalIntegration.uninstall(service.selector);
+    expect(controller.signal.aborted).to.equal(true);
+    const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
+    expect(serviceInDb).to.equal(null);
+  });
+
   it('should uninstall even when the container cannot be removed', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor({

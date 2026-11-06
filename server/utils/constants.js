@@ -563,6 +563,13 @@ const SYSTEM_VARIABLE_NAMES = {
   // ISO date of the moment Gladys Plus answered "payment required": while it is
   // set, the plan-gated features (backups, Enedis, AI) stay off locally
   GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE: 'GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE',
+  // health of the Gladys Plus backups, see lib/gateway/gateway.backupHealth.js:
+  // ISO date of the last backup uploaded, ISO date of the first failure of the
+  // current streak, text of its last error, ISO date of the last alert sent
+  GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT: 'GLADYS_GATEWAY_BACKUP_LAST_SUCCESS_AT',
+  GLADYS_GATEWAY_BACKUP_FAILING_SINCE: 'GLADYS_GATEWAY_BACKUP_FAILING_SINCE',
+  GLADYS_GATEWAY_BACKUP_LAST_ERROR: 'GLADYS_GATEWAY_BACKUP_LAST_ERROR',
+  GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT: 'GLADYS_GATEWAY_BACKUP_ALERT_SENT_AT',
   TIMEZONE: 'TIMEZONE',
   TTS_ACTIVE_PROVIDER: 'TTS_ACTIVE_PROVIDER',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
@@ -1027,6 +1034,13 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   FAN: 'fan',
+  // Volumetric flow rate of a fluid measured by a standalone sensor: a pipe flow meter, a pump, or
+  // a river hydrometry station (Hub'Eau, Vigicrues...). Mirrors the Matter Flow Sensor device type
+  // (Flow Measurement cluster 0x0404) and the Zigbee Flow Measurement cluster. `water-valve` / `flow`
+  // pre-dates it and holds the same quantity: a known legacy exception
+  // (docs/specs/device-feature-categories.md), kept for existing devices, never a precedent for a new
+  // mapping. The volume that went through (an index) is not a flow: it goes to `volume-sensor`.
+  FLOW_SENSOR: 'flow-sensor',
   // Carbon content of the electricity DELIVERED BY THE GRID of a zone, as published by a grid data
   // provider (national TSO, Electricity Maps, WattTime...) or broadcast in the premises by a device
   // implementing the Matter Electrical Grid Conditions cluster. It describes the electricity, not
@@ -1241,6 +1255,11 @@ const DEVICE_FEATURE_TYPES = {
     AIRFLOW_DIRECTION: 'airflow-direction',
     ROCK_SETTING: 'rock-setting',
     WIND_SETTING: 'wind-setting',
+  },
+  // Value convention: a flow is >= 0, like the Matter MeasuredValue (unsigned). Matter and Zigbee
+  // report it in m³/h; river flows are published in m³/s.
+  FLOW_SENSOR: {
+    DECIMAL: 'decimal',
   },
   HEATER: {
     PILOT_WIRE_MODE: 'pilot-wire-mode',
@@ -1746,6 +1765,8 @@ const DEVICE_FEATURE_UNITS = {
   CUBIC_METER: 'cubicmeter',
   // Flow units
   CUBIC_METER_PER_HOUR: 'cubic-meter-per-hour',
+  // SI unit of volumetric flow (1 m³/s = 3600 m³/h), the unit of river flows
+  CUBIC_METER_PER_SECOND: 'cubic-meter-per-second',
   // Currency units
   EURO: 'euro',
   DOLLAR: 'dollar',
@@ -1887,6 +1908,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR]: [
+    DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+    DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
   ],
   [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: [
     DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
@@ -2107,7 +2132,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: [],
-    [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
+    ],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_DURATION]: [DEVICE_FEATURE_UNITS.SECONDS],
@@ -2415,6 +2443,11 @@ const ERROR_MESSAGES = {
   INVALID_ACCESS_TOKEN: 'INVALID_ACCESS_TOKEN',
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
   GLADYS_PLUS_PAYMENT_REQUIRED: 'GLADYS_PLUS_PAYMENT_REQUIRED',
+  BACKUP_ALREADY_IN_PROGRESS: 'BACKUP_ALREADY_IN_PROGRESS',
+  // Gladys Plus recovery codes generated from this instance (settings > Gladys Plus)
+  GATEWAY_USER_NOT_FOUND: 'GATEWAY_USER_NOT_FOUND',
+  GATEWAY_TWO_FACTOR_NOT_ENABLED: 'GATEWAY_TWO_FACTOR_NOT_ENABLED',
+  WRONG_PASSWORD: 'WRONG_PASSWORD',
   // an integration widget answered with a content version this Gladys does
   // not render: the remedy is on the user's side (upgrade), not the integration's
   WIDGET_CONTENT_VERSION_UNSUPPORTED: 'WIDGET_CONTENT_VERSION_UNSUPPORTED',

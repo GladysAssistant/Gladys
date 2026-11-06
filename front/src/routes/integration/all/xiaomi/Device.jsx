@@ -8,6 +8,7 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/consta
 import { RequestStatus } from '../../../../utils/consts';
 import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 
 class XiaomiDeviceBox extends Component {
   refreshDeviceProperty = () => {
@@ -140,6 +141,7 @@ class XiaomiDeviceBox extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.xiaomi.device.saveButton" />
                   </button>
+                  <MigrateDeviceButton device={props.device} onMigrated={props.getXiaomiDevices} />
                   <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.xiaomi.device.deleteButton" />
                   </button>

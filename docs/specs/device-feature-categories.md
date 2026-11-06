@@ -173,3 +173,5 @@ For any PR touching `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`:
 ## Known legacy exceptions
 
 A few existing entries pre-date these rules and would not be accepted today, e.g. `teleinformation` (specific to French electricity meters) or `voc-matter-index-sensor` / `no2-matter-index-sensor` (protocol name embedded in the category). They are kept for backward compatibility but **must not be used as precedents** to justify new brand- or protocol-specific categories.
+
+`water-valve` / `flow` is the same kind of exception, to the rule that one physical quantity is not split across categories. It was added for the flow an irrigation valve reports about itself (SONOFF SWV), before `flow-sensor` existed, and Zigbee2mqtt still maps every `flow` expose to it. Moving it to `flow-sensor` / `decimal` would change the category, type, external id and selector of the features already stored, so it stays as it is. A new integration maps a volumetric flow rate to `flow-sensor` / `decimal`, whatever device measures it, including a valve; `water-valve` / `flow` is never cited as a precedent. Both accept the m³/h and m³/s units.

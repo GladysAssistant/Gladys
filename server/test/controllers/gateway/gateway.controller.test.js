@@ -34,6 +34,166 @@ describe('GET /api/v1/gateway/backup', () => {
   });
 });
 
+describe('POST /api/v1/gateway/user/:gateway_user_id/recovery-codes', () => {
+  const GATEWAY_USER_ID = 'a139e4a6-ec6c-442d-9730-0499155d38d4';
+
+  it('should generate the recovery codes of the user from the instance, with the admin password', async () => {
+    const scope = nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(200, { recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+    await authenticatedRequest
+      .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+      .send({ password: 'mysuperpassword' })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({ recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+      });
+    expect(scope.isDone()).to.equal(true);
+  });
+
+  it('should return 403 and not call Gladys Plus with a wrong password', async () => {
+    const scope = nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(200, { recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+    await authenticatedRequest
+      .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+      .send({ password: 'wrong-password' })
+      .expect('Content-Type', /json/)
+      .expect(403)
+      .then((res) => {
+        expect(res.body.message).to.equal('WRONG_PASSWORD');
+      });
+    expect(scope.isDone()).to.equal(false);
+    nock.cleanAll();
+  });
+
+  it('should return 403 and not call Gladys Plus without a password', async () => {
+    const scope = nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(200, { recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+    await authenticatedRequest
+      .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+      .send({})
+      .expect('Content-Type', /json/)
+      .expect(403)
+      .then((res) => {
+        expect(res.body.message).to.equal('WRONG_PASSWORD');
+      });
+    expect(scope.isDone()).to.equal(false);
+    nock.cleanAll();
+  });
+
+  it('should return 500, not WRONG_PASSWORD, when checking the password itself fails', async () => {
+    const scope = nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(200, { recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+    // @ts-ignore
+    const originalLogin = global.TEST_GLADYS_INSTANCE.user.login;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.user.login = async () => {
+      throw new Error('database is down');
+    };
+    try {
+      await authenticatedRequest
+        .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+        .send({ password: 'mysuperpassword' })
+        .expect('Content-Type', /json/)
+        .expect(500)
+        .then((res) => {
+          expect(res.body.message).to.not.equal('WRONG_PASSWORD');
+        });
+    } finally {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.user.login = originalLogin;
+    }
+    expect(scope.isDone()).to.equal(false);
+    nock.cleanAll();
+  });
+
+  it('should return 404 when the user is not in the account of this instance', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(404, {});
+    await authenticatedRequest
+      .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+      .send({ password: 'mysuperpassword' })
+      .expect('Content-Type', /json/)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).to.equal('GATEWAY_USER_NOT_FOUND');
+      });
+  });
+
+  it('should return 403 when two factor is not enabled on the Gladys Plus user', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(403, {});
+    await authenticatedRequest
+      .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+      .send({ password: 'mysuperpassword' })
+      .expect('Content-Type', /json/)
+      .expect(403)
+      .then((res) => {
+        expect(res.body.message).to.equal('GATEWAY_TWO_FACTOR_NOT_ENABLED');
+      });
+  });
+
+  it('should return 403 and not call Gladys Plus through the Gladys Plus tunnel, even as admin', async () => {
+    const scope = nock(config.gladysGatewayServerUrl)
+      .post(`/instances/users/${GATEWAY_USER_ID}/two-factor/recovery-codes`)
+      .reply(200, { recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'] });
+    const adminUser = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+      role: USER_ROLE.ADMIN,
+    };
+    const response = await new Promise((resolve) => {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.event.emit(
+        EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+        adminUser,
+        'POST',
+        `/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`,
+        {},
+        { password: 'mysuperpassword' },
+        resolve,
+      );
+    });
+    expect(response).to.have.property('status', 403);
+    expect(response).to.have.property('code', 'FORBIDDEN');
+    expect(scope.isDone()).to.equal(false);
+    nock.cleanAll();
+  });
+
+  it('should return 403 for a non-admin user', async () => {
+    await db.User.create({
+      id: NON_ADMIN_USER_ID,
+      firstname: 'Non',
+      lastname: 'Admin',
+      selector: 'non-admin-recovery-codes',
+      email: 'non-admin-recovery-codes@test.com',
+      password: 'mysuperpassword',
+      role: USER_ROLE.HABITANT,
+      birthdate: '1990-01-01',
+      language: 'en',
+    });
+    try {
+      await nonAdminRequest
+        .post(`/api/v1/gateway/user/${GATEWAY_USER_ID}/recovery-codes`)
+        .send({ password: 'mysuperpassword' })
+        .expect('Content-Type', /json/)
+        .expect(403);
+    } finally {
+      await db.User.destroy({ where: { id: NON_ADMIN_USER_ID } });
+    }
+  });
+});
+
 describe('GET /api/v1/gateway/key', () => {
   it('should get users keys', async () => {
     const users = [
@@ -147,6 +307,13 @@ describe('GET /api/v1/gateway/status', () => {
       .then((res) => {
         expect(res.body).to.have.property('connected');
         expect(res.body).to.have.property('configured');
+        expect(res.body).to.have.property('backup_health');
+        expect(res.body.backup_health).to.have.all.keys(
+          'last_success_at',
+          'failing_since',
+          'last_error',
+          'alert_sent_at',
+        );
       });
   });
   it('should get gateway status as a non-admin user', async () => {
@@ -173,6 +340,8 @@ describe('GET /api/v1/gateway/status', () => {
         .then((res) => {
           expect(res.body).to.have.property('connected');
           expect(res.body).to.have.property('configured');
+          // the health of the backups (server paths in its last error) is for the admins
+          expect(res.body).to.not.have.property('backup_health');
         });
     } finally {
       await db.User.destroy({ where: { id: NON_ADMIN_USER_ID } });

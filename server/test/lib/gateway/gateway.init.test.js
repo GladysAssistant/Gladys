@@ -247,4 +247,46 @@ describe('gateway.init', () => {
 
     assert.calledOnceWithExactly(cancel);
   });
+
+  it('should schedule a daytime catch-up of the backup check', async () => {
+    await gateway.init();
+
+    expect(gateway.backupCatchUpSchedule).to.deep.contains({
+      rule: { tz: 'Europe/Paris', hour: 10, minute: 0, second: 0 },
+    });
+    expect(gateway.backupCatchUpSchedule.callback).to.be.a('function');
+  });
+
+  it('should cancel the pending catch-up schedule and timer when init runs again', async () => {
+    const cancel = fake.returns(null);
+    gateway.backupCatchUpSchedule = { cancel };
+    gateway.checkIfBackupNeeded = fake.resolves(null);
+
+    await gateway.init();
+    await gateway.init();
+
+    assert.calledOnceWithExactly(cancel);
+    // the timer of the first init was cleared: one catch-up check, not two
+    await clock.tickAsync(gateway.backupCatchUpInitTimeout);
+    assert.calledOnce(gateway.checkIfBackupNeeded);
+  });
+
+  it('should check if a backup is needed 5 minutes after init', async () => {
+    gateway.checkIfBackupNeeded = fake.resolves(null);
+
+    await gateway.init();
+
+    assert.notCalled(gateway.checkIfBackupNeeded);
+    await clock.tickAsync(5 * 60 * 1000);
+    assert.calledOnceWithExactly(gateway.checkIfBackupNeeded);
+  });
+
+  it('should not crash when the backup catch-up check fails after init', async () => {
+    gateway.checkIfBackupNeeded = fake.rejects(new Error('db locked'));
+
+    await gateway.init();
+
+    await clock.tickAsync(5 * 60 * 1000);
+    assert.calledOnceWithExactly(gateway.checkIfBackupNeeded);
+  });
 });

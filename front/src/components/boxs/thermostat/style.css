@@ -201,16 +201,20 @@
   font-size: 22px;
   fill: #f97316;
   animation: flamePulse 1.4s ease-in-out infinite;
-  transform-origin: center;
-  transform-box: fill-box;
+  /* The gauge draws it on its group's origin (see CircularGauge): scaling and
+     turning about that point keeps it in place, in every browser. */
+  transform-origin: 0 0;
+  transform-box: view-box;
 }
 
 .activeIconCooling {
   font-size: 22px;
   fill: #3b82f6;
   animation: frostSpin 2s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
+  /* The gauge draws it on its group's origin (see CircularGauge): scaling and
+     turning about that point keeps it in place, in every browser. */
+  transform-origin: 0 0;
+  transform-box: view-box;
 }
 
 .tempMain {

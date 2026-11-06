@@ -50,7 +50,7 @@
     "vite-plugin-static-copy": "^4.1.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.22.1",
+    "@gladysassistant/gladys-gateway-js": "^4.23.0",
     "@gladysassistant/theme-optimized": "^2.1.0",
     "@jaames/iro": "^5.5.2",
     "@maplibre/maplibre-gl-leaflet": "^0.1.4",

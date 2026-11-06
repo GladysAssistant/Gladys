@@ -25,6 +25,9 @@ const ResetPassword = ({ children, ...props }) => (
         errorLink={props.errorLink}
         invalidRecoveryCode={props.invalidRecoveryCode}
         resetInProgress={props.resetInProgress}
+        requestTwoFactorReset={props.requestTwoFactorReset}
+        twoFactorResetStatus={props.twoFactorResetStatus}
+        twoFactorResetError={props.twoFactorResetError}
       />
     )}
 

@@ -111,6 +111,52 @@ class GatewaySession {
     );
   }
 
+  // Invite someone to the Gladys Plus account, for a given Gladys user of the
+  // instance: the Gateway copies `gladys_4_user_id` onto the user created from
+  // the invitation, so they land on the right Gladys user without picking one
+  // (nobody can pick someone else's). The client library's inviteUser only
+  // takes the email and the role, so the request goes through its request
+  // helper (access token of the session, refreshed on 401).
+  async inviteUserForGladysUser({ email, role, gladysUserId }) {
+    return gatewayRequest.post(
+      `${this.gladysGatewayApiUrl}/invitations`,
+      { email, role, gladys_4_user_id: gladysUserId },
+      this.gatewayClient
+    );
+  }
+
+  // Link a user of the Gladys Plus account to a Gladys user of the instance, as an
+  // admin of the account (PATCH /accounts/users/:id), for accounts created before the
+  // linked invitations; null unlinks
+  async linkAccountUserToGladysUser(plusUserId, gladysUserId) {
+    return gatewayRequest.patch(
+      `${this.gladysGatewayApiUrl}/accounts/users/${plusUserId}`,
+      { gladys_4_user_id: gladysUserId },
+      this.gatewayClient
+    );
+  }
+
+  // Same for a pending invitation (PATCH /invitations/:id): the user created from it
+  // is then linked to that Gladys user
+  async linkInvitationToGladysUser(invitationId, gladysUserId) {
+    return gatewayRequest.patch(
+      `${this.gladysGatewayApiUrl}/invitations/${invitationId}`,
+      { gladys_4_user_id: gladysUserId },
+      this.gatewayClient
+    );
+  }
+
+  // Reset the two factor of a user of the Gladys Plus account who lost their
+  // authenticator, as an admin of the account confirming with their OWN current code
+  // (POST /accounts/users/:id/reset-two-factor)
+  async resetAccountUserTwoFactor(plusUserId, twoFactorCode) {
+    return gatewayRequest.post(
+      `${this.gladysGatewayApiUrl}/accounts/users/${plusUserId}/reset-two-factor`,
+      { two_factor_code: twoFactorCode },
+      this.gatewayClient
+    );
+  }
+
   // Replacing the two-factor app of the Gladys Plus account is a user operation
   // (user-scoped routes): it is only possible from the Gladys Plus interface, where
   // the Gladys Plus user is the one logged in. The client library has no method for
@@ -122,14 +168,16 @@ class GatewaySession {
 
   // The Gateway only replaces the secret with a valid code from the NEW app (the
   // secret was registered correctly) and a valid code from the CURRENT app (the
-  // request comes from someone who holds the current second factor).
-  async updateTwoFactor({ twoFactorSecret, twoFactorCode, currentTwoFactorCode }) {
+  // request comes from someone who holds the current second factor), or one of the
+  // single-use recovery codes for a user who lost their current app.
+  async updateTwoFactor({ twoFactorSecret, twoFactorCode, currentTwoFactorCode, currentTwoFactorRecoveryCode }) {
     return gatewayRequest.patch(
       `${this.gladysGatewayApiUrl}/users/two-factor`,
       {
         two_factor_secret: twoFactorSecret,
         two_factor_code: twoFactorCode,
-        current_two_factor_code: currentTwoFactorCode
+        current_two_factor_code: currentTwoFactorRecoveryCode ? undefined : currentTwoFactorCode,
+        current_two_factor_recovery_code: currentTwoFactorRecoveryCode || undefined
       },
       this.gatewayClient
     );

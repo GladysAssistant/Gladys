@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import MigrateDeviceButton from '../../../../../components/device/migrate/MigrateDeviceButton';
 import { RequestStatus } from '../../../../../utils/consts';
 
 class DeviceBox extends Component {
@@ -145,6 +146,7 @@ class DeviceBox extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.broadlink.device.saveButton" />
                   </button>
+                  <MigrateDeviceButton device={device} onMigrated={this.props.getBroadlinkRemotes} />
                   <button onClick={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.broadlink.device.deleteButton" />
                   </button>
