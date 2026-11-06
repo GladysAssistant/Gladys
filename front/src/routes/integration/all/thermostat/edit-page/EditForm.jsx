@@ -104,6 +104,8 @@ const SaveError = ({ status, reason }) =>
       {reason === 'incompleteVirtual' && <Text id="integration.thermostat.edit.incompleteVirtualError" />}
       {reason === 'incompleteExternal' && <Text id="integration.thermostat.edit.incompleteExternalError" />}
       {reason === 'incompletePilotWire' && <Text id="integration.thermostat.edit.incompletePilotWireError" />}
+      {reason === 'reversibleNoMode' && <Text id="integration.thermostat.edit.reversibleNoModeError" />}
+      {reason === 'reversibleModeCannotCool' && <Text id="integration.thermostat.edit.reversibleModeCannotCoolError" />}
       {!reason && <Text id="integration.thermostat.edit.saveError" />}
     </div>
   );
@@ -179,9 +181,13 @@ const EditForm = ({ ...props }) => {
       );
   const keep = value => (value ? [value] : []);
 
+  // A reversible heat pump (spec A.4): only a real thermostat, which has a mode
+  // to write. A virtual one drives a single relay, and a pilot wire only heats.
+  const reversible = Boolean(props.thermostatEditReversible) && isExternalThermostat;
   const heatingPresets = ['frost', 'away', 'eco', 'night', 'comfort'];
   const coolingPresets = ['comfort'];
-  const activePresets = mode === 'cooling' ? coolingPresets : heatingPresets;
+  // One programme in both uses: every preset it names needs a cooling setpoint.
+  const activePresets = mode === 'cooling' && !reversible ? coolingPresets : heatingPresets;
 
   const presetFields = {
     frost: 'thermostatEditPresetFrost',
@@ -190,6 +196,29 @@ const EditForm = ({ ...props }) => {
     night: 'thermostatEditPresetNight',
     comfort: 'thermostatEditPresetComfort'
   };
+  const coolingPresetFields = {
+    frost: 'thermostatEditPresetCoolingFrost',
+    away: 'thermostatEditPresetCoolingAway',
+    eco: 'thermostatEditPresetCoolingEco',
+    night: 'thermostatEditPresetCoolingNight',
+    comfort: 'thermostatEditPresetCoolingComfort'
+  };
+
+  // The setpoint of one preset, in the form's unit.
+  const presetTempInput = field => (
+    <div class={cx('input-group', 'input-group-sm', style.presetTempGroup)}>
+      <input
+        type="number"
+        class={`form-control ${style.presetTempInput}`}
+        value={props[field]}
+        onInput={e => props.updateThermostatField(field, e.target.value)}
+        step="0.5"
+      />
+      <div class="input-group-append">
+        <span class="input-group-text">{(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}</span>
+      </div>
+    </div>
+  );
 
   // A pilot wire is regulated on hysteresis only (spec C.1.1): TPI is neither
   // offered nor shown while one is picked.
@@ -285,9 +314,14 @@ const EditForm = ({ ...props }) => {
     targetRange &&
     (targetRange.min !== String(props.thermostatEditMinTemp) ||
       targetRange.max !== String(props.thermostatEditMaxTemp));
+  // The appliance's range bounds both uses of a reversible heat pump.
   const applyDeviceRange = () => {
     props.updateThermostatField('thermostatEditMinTemp', targetRange.min);
     props.updateThermostatField('thermostatEditMaxTemp', targetRange.max);
+    if (reversible) {
+      props.updateThermostatField('thermostatEditCoolingMinTemp', targetRange.min);
+      props.updateThermostatField('thermostatEditCoolingMaxTemp', targetRange.max);
+    }
   };
 
   const chooseTargetFeature = event => {
@@ -346,21 +380,21 @@ const EditForm = ({ ...props }) => {
     if (picked.unit && featureUnit !== (props.thermostatEditTempUnit || 'C')) {
       return;
     }
-    const defaults = { thermostatEditMinTemp: '5', thermostatEditMaxTemp: '35' };
-    if (
-      picked.min !== null &&
-      picked.min !== undefined &&
-      props.thermostatEditMinTemp === defaults.thermostatEditMinTemp
-    ) {
-      props.updateThermostatField('thermostatEditMinTemp', String(picked.min));
-    }
-    if (
-      picked.max !== null &&
-      picked.max !== undefined &&
-      props.thermostatEditMaxTemp === defaults.thermostatEditMaxTemp
-    ) {
-      props.updateThermostatField('thermostatEditMaxTemp', String(picked.max));
-    }
+    // Both ranges of a reversible heat pump (spec A.4): the cooling one is only
+    // saved once reversible is ticked, but filled now it is ready when it is.
+    [
+      ['thermostatEditMinTemp', picked.min, '5'],
+      ['thermostatEditMaxTemp', picked.max, '35'],
+      ['thermostatEditCoolingMinTemp', picked.min, '5'],
+      ['thermostatEditCoolingMaxTemp', picked.max, '35']
+    ].forEach(([field, value, defaultValue]) => {
+      // A field still on the form's default, or never filled: one the user
+      // emptied is theirs, as is one they typed.
+      const current = props[field] === undefined || props[field] === null ? defaultValue : String(props[field]);
+      if (value !== null && value !== undefined && current === defaultValue) {
+        props.updateThermostatField(field, String(value));
+      }
+    });
   };
 
   return (
@@ -455,7 +489,7 @@ const EditForm = ({ ...props }) => {
               <select
                 class="form-control"
                 value={thermostatType}
-                onChange={e => props.updateThermostatField('thermostatEditType', e.target.value)}
+                onChange={e => props.updateThermostatType(e.target.value)}
               >
                 <option value="virtual">
                   <Text id="integration.thermostat.edit.typeVirtual" />
@@ -506,6 +540,28 @@ const EditForm = ({ ...props }) => {
                 <small class="form-text text-muted">
                   <Text id="integration.thermostat.edit.modeHelp" />
                 </small>
+                {/* One thermostat for both seasons (spec A.4): the use above is
+                    then the one in force, switched from the widget, a scene or
+                    the unit's remote. */}
+                {isExternalThermostat && (
+                  <label class="custom-switch mt-2">
+                    <input
+                      type="checkbox"
+                      class="custom-switch-input"
+                      checked={reversible}
+                      onChange={e => props.updateThermostatReversible(e.target.checked)}
+                    />
+                    <span class="custom-switch-indicator" />
+                    <span class="custom-switch-description">
+                      <Text id="integration.thermostat.edit.reversibleLabel" />
+                    </span>
+                  </label>
+                )}
+                {reversible && (
+                  <small class="form-text text-muted">
+                    <Text id="integration.thermostat.edit.reversibleHelp" />
+                  </small>
+                )}
               </div>
             )}
 
@@ -940,54 +996,52 @@ const EditForm = ({ ...props }) => {
                   <i class={`fe fe-chevron-right ${style.tuningChevron}`} aria-hidden="true" />
                   <Text id="integration.thermostat.edit.rangeSection" />
                 </summary>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="form-label">
-                        <Text id="integration.thermostat.edit.minTempLabel" />
-                      </label>
-                      <div class="input-group">
-                        <Localizer>
-                          <input
-                            type="number"
-                            class="form-control"
-                            placeholder={<Text id="integration.thermostat.edit.minTempPlaceholder" />}
-                            value={props.thermostatEditMinTemp}
-                            onInput={e => props.updateThermostatField('thermostatEditMinTemp', e.target.value)}
-                          />
-                        </Localizer>
-                        <div class="input-group-append">
-                          <span class="input-group-text">
-                            {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                          </span>
+                {/* A reversible heat pump has a range per use, like its presets
+                    (spec A.4): the fields above the cooling ones are then the
+                    heating range. */}
+                {(reversible ? ['heating', 'cooling'] : [null]).map(use => {
+                  const cooling = use === 'cooling';
+                  const minField = cooling ? 'thermostatEditCoolingMinTemp' : 'thermostatEditMinTemp';
+                  const maxField = cooling ? 'thermostatEditCoolingMaxTemp' : 'thermostatEditMaxTemp';
+                  const unitLabel = (props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C';
+                  return (
+                    <div key={use || 'single'}>
+                      {use && (
+                        <div class="form-label text-muted">
+                          <Text id={`integration.thermostat.edit.rangeUse.${use}`} />
                         </div>
+                      )}
+                      <div class="row">
+                        {[
+                          [minField, 'minTemp'],
+                          [maxField, 'maxTemp']
+                        ].map(([field, key]) => (
+                          <div class="col-md-6" key={field}>
+                            <div class="form-group">
+                              <label class="form-label">
+                                <Text id={`integration.thermostat.edit.${key}Label`} />
+                              </label>
+                              <div class="input-group">
+                                <Localizer>
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    placeholder={<Text id={`integration.thermostat.edit.${key}Placeholder`} />}
+                                    value={props[field]}
+                                    onInput={e => props.updateThermostatField(field, e.target.value)}
+                                  />
+                                </Localizer>
+                                <div class="input-group-append">
+                                  <span class="input-group-text">{unitLabel}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="form-label">
-                        <Text id="integration.thermostat.edit.maxTempLabel" />
-                      </label>
-                      <div class="input-group">
-                        <Localizer>
-                          <input
-                            type="number"
-                            class="form-control"
-                            placeholder={<Text id="integration.thermostat.edit.maxTempPlaceholder" />}
-                            value={props.thermostatEditMaxTemp}
-                            onInput={e => props.updateThermostatField('thermostatEditMaxTemp', e.target.value)}
-                          />
-                        </Localizer>
-                        <div class="input-group-append">
-                          <span class="input-group-text">
-                            {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
                 {/* What the appliance says it accepts, inside the fold with the two
                   fields it is about. Adopting it on picking the setpoint feature
                   covers the usual path, but not a thermostat edited later or a
@@ -1025,15 +1079,23 @@ const EditForm = ({ ...props }) => {
                     </th>
                     <th>
                       {/* A heater regulating itself takes no temperature: each
-                          preset sends an order instead (spec C.1.1). */}
+                          preset sends an order instead (spec C.1.1). A
+                          reversible heat pump has a setpoint for each use. */}
                       <Text
                         id={
                           presetsAreOrders
                             ? 'integration.thermostat.edit.presetColOrderLabel'
+                            : reversible
+                            ? 'integration.thermostat.edit.mode.heating'
                             : 'integration.thermostat.edit.presetColTempLabel'
                         }
                       />
                     </th>
+                    {reversible && (
+                      <th>
+                        <Text id="integration.thermostat.edit.mode.cooling" />
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -1061,24 +1123,20 @@ const EditForm = ({ ...props }) => {
                           </select>
                         )}
                         {presetsAreOrders ? null : presetFields[key] ? (
-                          <div class={cx('input-group', 'input-group-sm', style.presetTempGroup)}>
-                            <input
-                              type="number"
-                              class={`form-control ${style.presetTempInput}`}
-                              value={props[presetFields[key]]}
-                              onInput={e => props.updateThermostatField(presetFields[key], e.target.value)}
-                              step="0.5"
-                            />
-                            <div class="input-group-append">
-                              <span class="input-group-text">
-                                {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                              </span>
-                            </div>
-                          </div>
+                          presetTempInput(presetFields[key])
                         ) : (
                           <span class="text-muted">—</span>
                         )}
                       </td>
+                      {reversible && (
+                        <td class="align-middle">
+                          {coolingPresetFields[key] ? (
+                            presetTempInput(coolingPresetFields[key])
+                          ) : (
+                            <span class="text-muted">—</span>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

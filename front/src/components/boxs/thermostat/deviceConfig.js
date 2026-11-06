@@ -36,12 +36,22 @@ const PARAM_FIELDS = [
   ['control_type', 'THERMOSTAT_CONTROL_TYPE'],
   ['temp_min', 'THERMOSTAT_MIN_TEMP', parseFloat],
   ['temp_max', 'THERMOSTAT_MAX_TEMP', parseFloat],
+  ['cooling_temp_min', 'THERMOSTAT_COOLING_MIN_TEMP', parseFloat],
+  ['cooling_temp_max', 'THERMOSTAT_COOLING_MAX_TEMP', parseFloat],
   ['temp_unit', 'THERMOSTAT_TEMP_UNIT'],
   ['preset_frost', 'THERMOSTAT_PRESET_FROST', parseFloat],
   ['preset_away', 'THERMOSTAT_PRESET_AWAY', parseFloat],
   ['preset_eco', 'THERMOSTAT_PRESET_ECO', parseFloat],
   ['preset_night', 'THERMOSTAT_PRESET_NIGHT', parseFloat],
   ['preset_comfort', 'THERMOSTAT_PRESET_COMFORT', parseFloat],
+  // A reversible heat pump (spec A.4) and the setpoints of its cooling presets,
+  // read in place of the ones above while it cools.
+  ['reversible', 'THERMOSTAT_REVERSIBLE', v => v === 'true'],
+  ['preset_cooling_frost', 'THERMOSTAT_PRESET_COOLING_FROST', parseFloat],
+  ['preset_cooling_away', 'THERMOSTAT_PRESET_COOLING_AWAY', parseFloat],
+  ['preset_cooling_eco', 'THERMOSTAT_PRESET_COOLING_ECO', parseFloat],
+  ['preset_cooling_night', 'THERMOSTAT_PRESET_COOLING_NIGHT', parseFloat],
+  ['preset_cooling_comfort', 'THERMOSTAT_PRESET_COOLING_COMFORT', parseFloat],
   ['hysteresis_start', 'THERMOSTAT_HYSTERESIS_START', parseFloat],
   ['hysteresis_stop', 'THERMOSTAT_HYSTERESIS_STOP', parseFloat],
   ['tpi_cycle_time', 'THERMOSTAT_TPI_CYCLE_TIME', v => parseInt(v, 10)],
@@ -50,6 +60,24 @@ const PARAM_FIELDS = [
 ];
 
 const DEFAULTS = { default_mode: 'heating', control_type: 'hysteresis', thermostat_type: 'virtual' };
+
+const USE_PRESETS = ['frost', 'away', 'eco', 'night', 'comfort'];
+const USE_BOUNDS = ['temp_min', 'temp_max'];
+
+// The presets and the range of one use of a reversible heat pump: the cooling
+// range when it has one of its own, the heating one otherwise.
+const applyUse = (config, use) => {
+  const cooling = use === 'cooling';
+  const next = { ...config, default_mode: use };
+  USE_PRESETS.forEach(preset => {
+    next[`preset_${preset}`] = config[cooling ? `preset_cooling_${preset}` : `preset_heating_${preset}`];
+  });
+  USE_BOUNDS.forEach(bound => {
+    const own = cooling ? config[`cooling_${bound}`] : null;
+    next[bound] = own !== null && own !== undefined ? own : config[`heating_${bound}`];
+  });
+  return next;
+};
 
 /**
  * Build the widget config from a device's params. Returns null when the device
@@ -75,8 +103,35 @@ export const buildConfigFromParams = device => {
     const parsed = parse ? parse(raw) : raw;
     config[field] = typeof parsed === 'number' && !Number.isFinite(parsed) ? null : parsed;
   });
-  return config;
+  // As the server reads it: only a real thermostat with a mode to write, never
+  // a virtual one's relay nor a pilot-wire heater, which only heats. A
+  // reversible one shows the presets of the use in force, which is the
+  // THERMOSTAT_MODE param — switched from the widget, a scene or the remote.
+  config.reversible =
+    Boolean(config.reversible) &&
+    config.thermostat_type === 'external' &&
+    Boolean(config.mode_feature) &&
+    !config.pilot_wire_feature;
+  if (!config.reversible) {
+    return config;
+  }
+  // The heating set, kept apart so that either use can be read from the config.
+  USE_PRESETS.forEach(preset => {
+    config[`preset_heating_${preset}`] = config[`preset_${preset}`];
+  });
+  USE_BOUNDS.forEach(bound => {
+    config[`heating_${bound}`] = config[bound];
+  });
+  return applyUse(config, config.default_mode);
 };
+
+/**
+ * The config of a reversible heat pump read in another use than the one it is
+ * saved in: the use the widget has just switched to, until the device carries
+ * it. Any other config, or no use, is returned as it is.
+ */
+export const configForUse = (config, use) =>
+  config && config.reversible && use && use !== config.default_mode ? applyUse(config, use) : config;
 
 /**
  * Read the state a thermostat carries on its own features: the preset it

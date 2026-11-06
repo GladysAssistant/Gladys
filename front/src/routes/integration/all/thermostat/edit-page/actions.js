@@ -7,11 +7,13 @@ import {
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
   MAX_WINDOW_DELAY_SECONDS,
-  defaultPresetTemps
+  defaultPresetTemps,
+  modeFeatureCanCool
 } from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 import { parseSelectorList, serializeSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
+import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../../../server/utils/units';
 
 const PILOT_WIRE_ORDERS = Object.values(PILOT_WIRE_MODE);
 const PILOT_WIRE_ORDER_PARAM = preset => `THERMOSTAT_PILOT_WIRE_ORDER_${preset.toUpperCase()}`;
@@ -48,19 +50,81 @@ const PRESET_FIELDS = [
   ['thermostatEditPresetNight', 'night'],
   ['thermostatEditPresetComfort', 'comfort']
 ];
+// The setpoints of a reversible heat pump's cooling presets (spec A.4): the
+// fields above then hold its heating ones.
+const COOLING_PRESET_FIELDS = [
+  ['thermostatEditPresetCoolingFrost', 'frost'],
+  ['thermostatEditPresetCoolingAway', 'away'],
+  ['thermostatEditPresetCoolingEco', 'eco'],
+  ['thermostatEditPresetCoolingNight', 'night'],
+  ['thermostatEditPresetCoolingComfort', 'comfort']
+];
+const COOLING_PRESET_PARAM = preset => `THERMOSTAT_PRESET_COOLING_${preset.toUpperCase()}`;
+// The form keeps temperatures to the half degree, in either unit.
+const roundToHalf = value => Math.round(value * 2) / 2;
+// A default preset temperature in the unit the form is in, converted and
+// rounded as switching the form between °C and °F does (updateThermostatUnit).
+const defaultInUnit = (state, mode, preset) => {
+  const celsius = defaultPresetTemps(mode)[preset];
+  return state.thermostatEditTempUnit === 'F' ? roundToHalf(celsiusToFahrenheit(celsius)) : celsius;
+};
+// The refusals of the device route the form can name (spec A.4), by the code the
+// server answers with.
+const SAVE_ERRORS = {
+  REVERSIBLE_NO_MODE: 'reversibleNoMode',
+  REVERSIBLE_MODE_CANNOT_COOL: 'reversibleModeCannotCool'
+};
+// What ticking or unticking a reversible heat pump changes in the form (see
+// updateThermostatReversible).
+const reversibleFields = (state, reversible) => {
+  const next = { thermostatEditReversible: reversible };
+  if (state.thermostatEditMode === 'cooling') {
+    // The range moves with the presets: the one a cooling thermostat had is
+    // its cooling range, and the cooling range is the only one again.
+    if (reversible) {
+      next.thermostatEditCoolingMinTemp = state.thermostatEditMinTemp;
+      next.thermostatEditCoolingMaxTemp = state.thermostatEditMaxTemp;
+    } else {
+      next.thermostatEditMinTemp = state.thermostatEditCoolingMinTemp;
+      next.thermostatEditMaxTemp = state.thermostatEditCoolingMaxTemp;
+    }
+    PRESET_FIELDS.forEach(([field, preset], index) => {
+      const [coolingField] = COOLING_PRESET_FIELDS[index];
+      if (reversible) {
+        next[coolingField] = state[field];
+        next[field] = String(defaultInUnit(state, 'heating', preset));
+      } else {
+        next[field] = state[coolingField];
+      }
+    });
+  } else if (reversible) {
+    // A cooling range still on the form's defaults starts from the range in
+    // force, which the appliance's own may have filled.
+    if (
+      String(state.thermostatEditCoolingMinTemp || '5') === '5' &&
+      String(state.thermostatEditCoolingMaxTemp || '35') === '35'
+    ) {
+      next.thermostatEditCoolingMinTemp = state.thermostatEditMinTemp;
+      next.thermostatEditCoolingMaxTemp = state.thermostatEditMaxTemp;
+    }
+    // A new thermostat has no cooling presets yet: they start from their defaults.
+    COOLING_PRESET_FIELDS.forEach(([coolingField, preset]) => {
+      if (!state[coolingField]) {
+        next[coolingField] = String(defaultInUnit(state, 'cooling', preset));
+      }
+    });
+  }
+  return next;
+};
 // Switching the use carries the presets along while they still hold the
 // previous use's defaults: an air conditioner set up from a blank form kept
 // Comfort at 21 °C. A temperature someone typed is theirs, and stays.
 const carriedPresets = (state, previous, mode) => {
   const update = {};
   if (previous !== mode) {
-    const fahrenheit = state.thermostatEditTempUnit === 'F';
-    const inUnit = celsius => (fahrenheit ? Math.round(((celsius * 9) / 5 + 32) * 2) / 2 : celsius);
-    const from = defaultPresetTemps(previous);
-    const to = defaultPresetTemps(mode);
     PRESET_FIELDS.forEach(([field, preset]) => {
-      if (parseFloat(state[field]) === inUnit(from[preset])) {
-        update[field] = String(inUnit(to[preset]));
+      if (parseFloat(state[field]) === defaultInUnit(state, previous, preset)) {
+        update[field] = String(defaultInUnit(state, mode, preset));
       }
     });
   }
@@ -227,15 +291,36 @@ function createActions(store) {
         } catch (e) {
           activeSchedule = '';
         }
-        const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE'));
+        // A reversible heat pump keeps its heating presets where every thermostat
+        // has them, and its cooling ones apart, whichever use is in force.
+        const reversible = getParam('THERMOSTAT_REVERSIBLE') === 'true';
+        const presetDefaults = defaultPresetTemps(reversible ? 'heating' : getParam('THERMOSTAT_MODE'));
+        // In the thermostat's own unit, like the save-time defaults: 24 °C left
+        // as 24 on a Fahrenheit thermostat was saved as 24 °F.
+        const unitState = { thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C' };
         store.setState({
+          thermostatEditReversible: reversible,
+          ...COOLING_PRESET_FIELDS.reduce(
+            (fields, [field, preset]) => ({
+              ...fields,
+              [field]: getParam(COOLING_PRESET_PARAM(preset)) || String(defaultInUnit(unitState, 'cooling', preset))
+            }),
+            {}
+          ),
           thermostatEditActiveSchedule: activeSchedule,
           thermostatEditDeviceSchedule: activeSchedule,
           thermostatEditDevice: device,
           thermostatEditName: device.name,
           thermostatEditMode: getParam('THERMOSTAT_MODE') || 'heating',
+          // Set once the use is changed in the form: only then is it saved.
+          thermostatEditModeChanged: false,
           thermostatEditMinTemp: getParam('THERMOSTAT_MIN_TEMP') || '5',
           thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || '35',
+          // A reversible heat pump's cooling range, the single one until set.
+          thermostatEditCoolingMinTemp:
+            getParam('THERMOSTAT_COOLING_MIN_TEMP') || getParam('THERMOSTAT_MIN_TEMP') || '5',
+          thermostatEditCoolingMaxTemp:
+            getParam('THERMOSTAT_COOLING_MAX_TEMP') || getParam('THERMOSTAT_MAX_TEMP') || '35',
           thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C',
           thermostatEditControlType: getParam('THERMOSTAT_CONTROL_TYPE') || 'hysteresis',
           // One sensor or several (spec A.1.1).
@@ -300,9 +385,35 @@ function createActions(store) {
       // A pilot-wire heater only heats, and the presets come along as on any
       // change of use.
       if (pilotWire && value && state.thermostatEditMode === 'cooling') {
-        Object.assign(next, { thermostatEditMode: 'heating' }, carriedPresets(state, 'cooling', 'heating'));
+        // A reversible one already holds its heating presets: nothing to carry.
+        Object.assign(
+          next,
+          { thermostatEditMode: 'heating', thermostatEditModeChanged: true },
+          state.thermostatEditReversible ? {} : carriedPresets(state, 'cooling', 'heating')
+        );
+      }
+      if (pilotWire && value) {
+        next.thermostatEditReversible = false;
       }
       store.setState(next);
+    },
+
+    // A reversible heat pump keeps two sets of presets (spec A.4). Ticked on a
+    // thermostat set up to cool, the presets it had are its cooling ones, and
+    // the heating ones start from their defaults; unticked while it cools, the
+    // cooling ones become the only set again.
+    updateThermostatReversible(state, reversible) {
+      store.setState(reversibleFields(state, reversible));
+    },
+
+    // Only a real thermostat can be reversible: it has a mode to write, while a
+    // virtual one drives a single heater relay, which cooling would turn on in a
+    // room too warm (spec A.4). Leaving that type unticks it, presets and all.
+    updateThermostatType(state, type) {
+      store.setState({
+        thermostatEditType: type,
+        ...(type !== 'external' && state.thermostatEditReversible ? reversibleFields(state, false) : {})
+      });
     },
 
     // The order a preset sends a pilot-wire heater that regulates itself.
@@ -317,17 +428,20 @@ function createActions(store) {
 
     updateThermostatMode(state, mode) {
       const previous = state.thermostatEditMode || 'heating';
-      store.setState({ thermostatEditMode: mode, ...carriedPresets(state, previous, mode) });
+      // A reversible heat pump has a set of presets for each use: the use in
+      // force changes, neither set does.
+      const carried = state.thermostatEditReversible ? {} : carriedPresets(state, previous, mode);
+      store.setState({ thermostatEditMode: mode, thermostatEditModeChanged: true, ...carried });
     },
 
     updateThermostatUnit(state, newUnit) {
       const oldUnit = state.thermostatEditTempUnit || 'C';
       if (oldUnit === newUnit) return;
       const isSet = v => v !== '' && v !== null && v !== undefined;
-      const round = v => String(Math.round(v * 2) / 2);
+      const round = v => String(roundToHalf(v));
       // Absolute temperatures (setpoints, min/max) carry the 32° offset...
-      const toF = v => (isSet(v) ? round((parseFloat(v) * 9) / 5 + 32) : v);
-      const toC = v => (isSet(v) ? round(((parseFloat(v) - 32) * 5) / 9) : v);
+      const toF = v => (isSet(v) ? round(celsiusToFahrenheit(parseFloat(v))) : v);
+      const toC = v => (isSet(v) ? round(fahrenheitToCelsius(parseFloat(v))) : v);
       // ...but hysteresis and the TPI band are temperature *differences*: adding
       // the offset would turn a 0.5 °C hysteresis into 32.9 °F.
       const deltaToF = v => (isSet(v) ? round((parseFloat(v) * 9) / 5) : v);
@@ -338,11 +452,14 @@ function createActions(store) {
         thermostatEditTempUnit: newUnit,
         thermostatEditMinTemp: conv(state.thermostatEditMinTemp),
         thermostatEditMaxTemp: conv(state.thermostatEditMaxTemp),
+        thermostatEditCoolingMinTemp: conv(state.thermostatEditCoolingMinTemp),
+        thermostatEditCoolingMaxTemp: conv(state.thermostatEditCoolingMaxTemp),
         thermostatEditPresetFrost: conv(state.thermostatEditPresetFrost),
         thermostatEditPresetAway: conv(state.thermostatEditPresetAway),
         thermostatEditPresetEco: conv(state.thermostatEditPresetEco),
         thermostatEditPresetNight: conv(state.thermostatEditPresetNight),
         thermostatEditPresetComfort: conv(state.thermostatEditPresetComfort),
+        ...COOLING_PRESET_FIELDS.reduce((fields, [field]) => ({ ...fields, [field]: conv(state[field]) }), {}),
         thermostatEditHysteresisStart: convDelta(state.thermostatEditHysteresisStart),
         thermostatEditHysteresisStop: convDelta(state.thermostatEditHysteresisStop),
         thermostatEditTpiProportionalBand: convDelta(state.thermostatEditTpiProportionalBand)
@@ -416,6 +533,9 @@ function createActions(store) {
         // A pilot-wire heater only heats: a cooling mode picked before it would
         // show cooling while the loop heats (spec C.1.1).
         const savedMode = pilotWireFeature || isPilotWireThermostat ? 'heating' : mode;
+        // Only a real thermostat is reversible (spec A.4): never a pilot-wire
+        // heater, which only heats, nor a virtual one's single relay.
+        const reversible = Boolean(state.thermostatEditReversible) && isExternalThermostat;
 
         // Saving an empty form used to create a thermostat with no room, no
         // sensor and no actuator: it appeared in the list, regulated nothing, and
@@ -439,6 +559,23 @@ function createActions(store) {
               'pilot-wire': 'incompletePilotWire',
               virtual: 'incompleteVirtual'
             }[thermostatType]
+          });
+          return;
+        }
+        // A reversible heat pump is switched through the unit's mode (spec A.4):
+        // without it, its cooling presets would apply to a unit still heating.
+        if (reversible && !state.thermostatEditModeFeature) {
+          store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'reversibleNoMode' });
+          return;
+        }
+        // Nor one whose mode only heats: cooling would be clamped to heating.
+        const pickedMode = (state.modeFeatures || []).find(
+          feature => feature.selector === state.thermostatEditModeFeature
+        );
+        if (reversible && pickedMode && !modeFeatureCanCool(pickedMode)) {
+          store.setState({
+            thermostatCreateStatus: RequestStatus.Error,
+            thermostatEditError: 'reversibleModeCannotCool'
           });
           return;
         }
@@ -477,9 +614,26 @@ function createActions(store) {
           params: [
             // The active schedule is device-owned: the dashboard widget only
             // chooses which thermostat to display, it never drives regulation.
-            { name: 'THERMOSTAT_MODE', value: savedMode },
+            // The use of a reversible heat pump, only when it is new or the form
+            // changed it: the widget and the unit's remote switch it too (spec
+            // A.4), and the form's copy may predate their switch. Left out, the
+            // server keeps the one in force. Any other thermostat sends it, since
+            // its single set of presets was built for the use the form shows —
+            // one unticked here included.
+            ...(!isEdit || !reversible || state.thermostatEditModeChanged || savedMode !== mode
+              ? [{ name: 'THERMOSTAT_MODE', value: savedMode }]
+              : []),
             { name: 'THERMOSTAT_MIN_TEMP', value: String(minTemp) },
             { name: 'THERMOSTAT_MAX_TEMP', value: String(maxTemp) },
+            // The cooling range of a reversible heat pump, cleared otherwise.
+            {
+              name: 'THERMOSTAT_COOLING_MIN_TEMP',
+              value: reversible ? String(toNumber(state.thermostatEditCoolingMinTemp, minTemp)) : ''
+            },
+            {
+              name: 'THERMOSTAT_COOLING_MAX_TEMP',
+              value: reversible ? String(toNumber(state.thermostatEditCoolingMaxTemp, maxTemp)) : ''
+            },
             { name: 'THERMOSTAT_TEMP_UNIT', value: tempUnit },
             { name: 'THERMOSTAT_CONTROL_TYPE', value: controlType },
             { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
@@ -520,6 +674,13 @@ function createActions(store) {
             { name: 'THERMOSTAT_PRESET_ECO', value: presetEco },
             { name: 'THERMOSTAT_PRESET_NIGHT', value: presetNight },
             { name: 'THERMOSTAT_PRESET_COMFORT', value: presetComfort },
+            // Cleared on a thermostat that is not reversible, like the real
+            // thermostat's params above.
+            { name: 'THERMOSTAT_REVERSIBLE', value: reversible ? 'true' : '' },
+            ...COOLING_PRESET_FIELDS.map(([field, preset]) => ({
+              name: COOLING_PRESET_PARAM(preset),
+              value: reversible ? String(toNumber(state[field], defaultInUnit(state, 'cooling', preset))) : ''
+            })),
             { name: 'THERMOSTAT_HYSTERESIS_START', value: String(hysteresisStart) },
             { name: 'THERMOSTAT_HYSTERESIS_STOP', value: String(hysteresisStop) },
             { name: 'THERMOSTAT_TPI_CYCLE_TIME', value: String(tpiCycleTime) },
@@ -569,6 +730,7 @@ function createActions(store) {
           thermostatEditDevice: null,
           thermostatEditName: '',
           thermostatEditMode: 'heating',
+          thermostatEditModeChanged: false,
           thermostatEditMinTemp: '5',
           thermostatEditMaxTemp: '35',
           thermostatEditTempUnit: 'C',
@@ -592,6 +754,10 @@ function createActions(store) {
           thermostatEditPresetEco: '18',
           thermostatEditPresetNight: '17',
           thermostatEditPresetComfort: '21',
+          thermostatEditReversible: false,
+          thermostatEditCoolingMinTemp: '5',
+          thermostatEditCoolingMaxTemp: '35',
+          ...COOLING_PRESET_FIELDS.reduce((fields, [field]) => ({ ...fields, [field]: undefined }), {}),
           thermostatEditHysteresisStart: '0.5',
           thermostatEditHysteresisStop: '0.5',
           thermostatEditTpiCycleTime: '30',
@@ -606,7 +772,9 @@ function createActions(store) {
         });
         route('/dashboard/integration/device/thermostat');
       } catch (e) {
-        store.setState({ thermostatCreateStatus: RequestStatus.Error });
+        // A thermostat the server refuses is named like one the form refuses.
+        const code = e && e.response && e.response.data && e.response.data.error;
+        store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: SAVE_ERRORS[code] || null });
       }
     }
   };

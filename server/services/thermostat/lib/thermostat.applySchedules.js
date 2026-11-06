@@ -8,7 +8,6 @@ const {
   DEVICE_FEATURE_UNITS,
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
-  AC_MODE,
   PILOT_WIRE_MODE,
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
@@ -32,6 +31,7 @@ const {
   getManualHold,
   setManualHold,
   clearManualHold,
+  nextModeSequence,
   REMOTE_STOP_UNTIL_PARAM,
 } = require('./thermostat.state');
 const {
@@ -54,16 +54,8 @@ const {
   DEFAULT_MANUAL_DURATION_MINUTES,
   PILOT_WIRE_REGULATIONS,
   supportedPilotWireOrder,
+  AC_MODE_BY_THERMOSTAT_MODE,
 } = require('../../../utils/thermostatConstants');
-
-// An air conditioner's mode is an AC_MODE, whose values differ from
-// THERMOSTAT_MODE (heating is 2 there, 1 here) and which has no off at all: the
-// unit is stopped by its power instead (A.0.3).
-const AC_MODE_BY_THERMOSTAT_MODE = {
-  [THERMOSTAT_MODE.HEATING]: AC_MODE.HEATING,
-  [THERMOSTAT_MODE.COOLING]: AC_MODE.COOLING,
-  [THERMOSTAT_MODE.AUTO]: AC_MODE.AUTO,
-};
 
 /**
  * @description Convert a setpoint written in the thermostat's own unit into the
@@ -209,11 +201,12 @@ async function writeExternalSetpoint(gladys, targetSelector, setpoint, thermosta
  * @param {string} modeSelector - Selector of the external mode feature.
  * @param {number} mode - Value from the THERMOSTAT_MODE enum.
  * @param {string} logContext - Context for the log line.
+ * @param {Map<string, object>} [selfWrittenModes] - Marks of the modes this service wrote.
  * @returns {Promise<void>}
  * @example
  * await writeExternalMode(gladys, 'netatmo:x:mode', THERMOSTAT_MODE.OFF, 'salon');
  */
-async function writeExternalMode(gladys, modeSelector, mode, logContext) {
+async function writeExternalMode(gladys, modeSelector, mode, logContext, selfWrittenModes = null) {
   try {
     const found = await getFeatureBySelector(gladys, modeSelector);
     if (!found) {
@@ -243,6 +236,13 @@ async function writeExternalMode(gladys, modeSelector, mode, logContext) {
     if (found.feature.last_value === value) {
       logger.debug(`Thermostat schedule: external mode already ${value} (${logContext})`);
       return;
+    }
+    // Marked before the write, and only when a write goes out: its echo is the
+    // service's own, and must not be followed as heating or cooling picked on
+    // the unit's remote (A.4). The mark is dated, so that a report received
+    // before the write can tell it is older than the mark (followModeReport).
+    if (selfWrittenModes) {
+      selfWrittenModes.set(modeSelector, { value, sequence: nextModeSequence() });
     }
     await gladys.device.setValue(found.device, found.feature, value);
     logger.info(`Thermostat schedule: external mode ${value} written (${logContext})`);
@@ -521,18 +521,26 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext,
  * @param {string} logContext - Context for the log lines.
  * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
  * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
+ * @param {Map<string, object>} [selfWrittenModes] - Marks of the modes this service wrote.
  * @returns {Promise<void>}
  * @example
  * await stopExternalThermostat(gladys, config, 'preset=off, salon');
  */
-async function stopExternalThermostat(gladys, config, logContext, selfWritten, selfWrittenPowers = null) {
+async function stopExternalThermostat(
+  gladys,
+  config,
+  logContext,
+  selfWritten,
+  selfWrittenPowers = null,
+  selfWrittenModes = null,
+) {
   // The mode goes first, in both directions: it is what the machine obeys.
   // Writing the frost setpoint to a thermostat still in COOLING asks it to cool
   // the room to 7 °C until the mode write lands — and to keep doing so if that
   // write fails on an expired token or the core's 5 s budget, which is the
   // opposite of suspending it.
   if (config.mode_feature) {
-    await writeExternalMode(gladys, config.mode_feature, THERMOSTAT_MODE.OFF, logContext);
+    await writeExternalMode(gladys, config.mode_feature, THERMOSTAT_MODE.OFF, logContext, selfWrittenModes);
   }
   // Then the power: the stop of a device whose mode cannot say off — an air
   // conditioner, whose AC_MODE has no such value (A.0.3). Once it is cut, no
@@ -576,16 +584,17 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten, s
  * @param {object} config - Thermostat config object.
  * @param {string} logContext - Context for the log lines.
  * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
+ * @param {Map<string, object>} [selfWrittenModes] - Marks of the modes this service wrote.
  * @returns {Promise<void>}
  * @example
  * await startExternalThermostat(gladys, config, 'preset=comfort, salon');
  */
-async function startExternalThermostat(gladys, config, logContext, selfWrittenPowers = null) {
+async function startExternalThermostat(gladys, config, logContext, selfWrittenPowers = null, selfWrittenModes = null) {
   if (config.power_feature) {
     await actuateSwitch(gladys, config.power_feature, true, logContext, selfWrittenPowers);
   }
   if (config.mode_feature) {
-    await writeExternalMode(gladys, config.mode_feature, getRunningMode(config), logContext);
+    await writeExternalMode(gladys, config.mode_feature, getRunningMode(config), logContext, selfWrittenModes);
   }
 }
 
@@ -1147,6 +1156,7 @@ async function driveHeldPilotWire(gladys, device, config, hold, currentPreset, l
  * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
  * @param {Set<string>} [runningUnits] - The units a running thermostat switches (runningUnitFeatures).
  * @param {Map<string, number>} [windowOpenedAt] - When each window sensor was seen opening.
+ * @param {Map<string, object>} [selfWrittenModes] - Marks of the modes this service wrote.
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
@@ -1162,6 +1172,7 @@ async function regulateDevice(
   selfWrittenPowers = null,
   runningUnits = null,
   windowOpenedAt = null,
+  selfWrittenModes = null,
 ) {
   const config = getDeviceConfig(device);
   if (!config) {
@@ -1197,7 +1208,14 @@ async function regulateDevice(
         // fires again as soon as the room drops below the frost setpoint,
         // window open or not. The schedule restores both on the next pass
         // once the window closes.
-        await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten, selfWrittenPowers);
+        await stopExternalThermostat(
+          gladys,
+          config,
+          `window open, ${selector}`,
+          selfWritten,
+          selfWrittenPowers,
+          selfWrittenModes,
+        );
       } else if (config.pilot_wire_feature) {
         // A pilot-wire heater is stopped by the order, not by cutting its
         // supply: the wire is a command line, not the power feed. Frost
@@ -1236,7 +1254,14 @@ async function regulateDevice(
       // Another thermostat runs this unit: it is the one to switch it.
       logger.debug(`Thermostat schedule: ${selector} is stopped, its unit is another thermostat's to run`);
     } else if (external) {
-      await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten, selfWrittenPowers);
+      await stopExternalThermostat(
+        gladys,
+        config,
+        `mode=off, ${selector}`,
+        selfWritten,
+        selfWrittenPowers,
+        selfWrittenModes,
+      );
     } else if (config.pilot_wire_feature) {
       await drivePilotWire(gladys, device, config, 'off', `mode=off, ${selector}`, selfWritten);
     } else if (config.switch_feature) {
@@ -1299,7 +1324,7 @@ async function regulateDevice(
         // hysteresis to run — running one here would fight the device's own.
         // The power and the mode are handed back first: a setpoint written to a
         // thermostat still switched off by a previous `off` preset would change nothing.
-        await startExternalThermostat(gladys, config, `manual, ${selector}`, selfWrittenPowers);
+        await startExternalThermostat(gladys, config, `manual, ${selector}`, selfWrittenPowers, selfWrittenModes);
         // The hold is stored in the unit it was set in, which on an external
         // thermostat is the real feature's own: the widget dial reads that
         // feature's unit, and a change made on the device arrives in it too.
@@ -1493,12 +1518,25 @@ async function regulateDevice(
     // frost-protection setpoint — the only way to say "stop" that every
     // thermostat understands, mode feature or not.
     if (targetPreset === 'off') {
-      await stopExternalThermostat(gladys, config, `preset="off", ${selector}`, selfWritten, selfWrittenPowers);
+      await stopExternalThermostat(
+        gladys,
+        config,
+        `preset="off", ${selector}`,
+        selfWritten,
+        selfWrittenPowers,
+        selfWrittenModes,
+      );
       return;
     }
     // Coming back from an `off` slot, the device is still switched off: the
     // power and the mode have to be handed back before the setpoint means anything.
-    await startExternalThermostat(gladys, config, `preset="${targetPreset}", ${selector}`, selfWrittenPowers);
+    await startExternalThermostat(
+      gladys,
+      config,
+      `preset="${targetPreset}", ${selector}`,
+      selfWrittenPowers,
+      selfWrittenModes,
+    );
     if (newSetpoint !== null) {
       await writeExternalSetpoint(
         gladys,
@@ -1608,7 +1646,14 @@ async function applySchedules() {
     await Promise.all(
       thermostatDevices.map(async (device) => {
         try {
-          const { serviceId, selfWrittenSetpoints, announcedPresets, selfWrittenPowers, windowOpenedAt } = this;
+          const {
+            serviceId,
+            selfWrittenSetpoints,
+            announcedPresets,
+            selfWrittenPowers,
+            windowOpenedAt,
+            selfWrittenModes,
+          } = this;
           await regulateDevice(
             this.gladys,
             device,
@@ -1620,6 +1665,7 @@ async function applySchedules() {
             selfWrittenPowers,
             runningUnits,
             windowOpenedAt,
+            selfWrittenModes,
           );
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);
