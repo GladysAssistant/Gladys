@@ -983,8 +983,20 @@ class ThermostatBox extends Component {
   };
 
   // The banner's buttons hand back with the programme the card shows; the event
-  // they pass is not a schedule.
-  cancelManualMode = () => this.handBackToProgramme();
+  // they pass is not a schedule. Taps while it runs are held as during an Off
+  // hand-back (selectPreset) — Off included, since this hand-back is no stop:
+  // sent at once, an Off landed before the `schedule` write and the start that
+  // follows it, which then started the thermostat it had just stopped.
+  cancelManualMode = async () => {
+    if (this.handingBack) return;
+    this.handingBack = 'banner';
+    try {
+      await this.handBackToProgramme();
+    } finally {
+      this.handingBack = false;
+    }
+    await this.applyQueuedPreset();
+  };
 
   // `schedule`: the programme just read by the caller, which is fresher than the
   // card's — a batched setState may not have committed it yet — and saves a
@@ -1518,34 +1530,37 @@ class ThermostatBox extends Component {
     // would then hand back to Comfort.
     //
     // Taps while the hand-back runs are held, before the manual-mode check: the
-    // hand-back leaves manual mode before it is done. A second Off is dropped —
-    // taken once the first had left manual mode, it stopped a thermostat for the
-    // season nobody asked to stop. Any other preset is applied once the hand-back
+    // hand-back leaves manual mode before it is done. A second Off during an Off
+    // hand-back is dropped — taken once the first had left manual mode, it
+    // stopped a thermostat for the season nobody asked to stop; during the
+    // banner's, it is held like any preset (cancelManualMode). Any other preset is applied once the hand-back
     // is done, the last one tapped winning: sent at once, it was overwritten by
     // the `schedule` the hand-back writes last, and Comfort was silently lost.
     if (this.handingBack) {
-      if (preset.key !== 'off') {
+      if (preset.key !== 'off' || this.handingBack === 'banner') {
         this.queuedPreset = preset;
       }
       return;
     }
     if (preset.key === 'off' && this.state.isManualMode && !this.isStopped()) {
       this.handingBack = true;
-      let handled = true;
+      // Whether the tap stops the thermostat: only once the programme was read,
+      // and found on another point. Any other outcome stops nothing.
+      let stops = false;
       try {
         const read = await this.loadSchedule();
         // A programme that cannot be read is no answer: the tap does nothing,
         // and the next one tries again. The card's own point may be the one the
         // programme has just left, and Off would then hand back to Comfort.
-        if (read.ok && read.schedule && read.schedule.current && read.schedule.current.preset === 'off') {
+        const offPoint = read.ok && read.schedule && read.schedule.current && read.schedule.current.preset === 'off';
+        if (offPoint) {
           await this.handBackToProgramme(read.schedule);
-        } else if (read.ok) {
-          handled = false;
         }
+        stops = read.ok && !offPoint;
       } finally {
         this.handingBack = false;
       }
-      if (handled) {
+      if (!stops) {
         await this.applyQueuedPreset();
         return;
       }
@@ -1566,7 +1581,13 @@ class ThermostatBox extends Component {
   applyPreset = async preset => {
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
-    const wasManual = this.state.isManualMode;
+    // What the card showed before the tap, put back if the write fails.
+    const before = {
+      activePreset: this.state.activePreset,
+      setpoint: this.state.setpoint,
+      isManualMode: this.state.isManualMode,
+      manualSetpointOverride: this.state.manualSetpointOverride
+    };
     const newSetpoint =
       preset.temp !== null && preset.temp !== undefined ? this.toSetpointFeatureUnit(preset.temp) : this.state.setpoint;
     this.setState({
@@ -1594,13 +1615,14 @@ class ThermostatBox extends Component {
     } finally {
       this.pickingPreset = false;
     }
-    // A write that failed armed no hold: the card goes back to the manual mode
-    // it was in — not to `false`, since an earlier hold may still stand — until
-    // the refresh reads the device. Left set, an Off tapped before the refresh
-    // handed a thermostat on an Off point back to its programme instead of
-    // stopping it.
+    // A write that failed changed nothing: the card goes back to what it showed
+    // before the tap — the manual mode it was in, not `false`, since an earlier
+    // hold may still stand — until the refresh reads the device. Left in manual
+    // mode, an Off tapped before the refresh handed a thermostat on an Off point
+    // back to its programme instead of stopping it; left on the new setpoint,
+    // the dial showed it until the device next reported.
     if (!written) {
-      this.setState({ isManualMode: wasManual });
+      this.setState(before);
     }
     await this.refreshFromDevice();
     if (written && hasSchedule && preset.key !== 'off') this.showManualCountdown();

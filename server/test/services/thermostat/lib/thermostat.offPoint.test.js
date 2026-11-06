@@ -12,15 +12,28 @@ const COMFORT_POINT = { day_of_week: 0, time: '06:30', preset: 'comfort' };
 const logger = { debug: fake.returns(null), info: fake.returns(null), warn: fake.returns(null) };
 
 // `schedule`: what getScheduleOfDevice returns, or an Error it rejects with.
-const load = ({ schedule = { id: 'programme', transitions: [OFF_POINT] }, point = OFF_POINT } = {}) => {
+// `stored`: the thermostat as the database holds it, or an Error its read
+// rejects with — by default the device handed to programmeKeepsOff.
+const load = ({ schedule = { id: 'programme', transitions: [OFF_POINT] }, point = OFF_POINT, stored = null } = {}) => {
   const getScheduleOfDevice = schedule instanceof Error ? fake.rejects(schedule) : fake.resolves(schedule);
   const pointInForce = fake.resolves(point);
+  let handed = null;
+  const loadThermostat = fake(async () => {
+    if (stored instanceof Error) {
+      throw stored;
+    }
+    return stored || handed;
+  });
   const module = proxyquire('../../../../services/thermostat/lib/thermostat.offPoint', {
-    './thermostat.scheduleDevice': { getScheduleOfDevice },
+    './thermostat.scheduleDevice': { getScheduleOfDevice, loadThermostat },
     './thermostat.getSchedules': { pointInForce },
     '../../../utils/logger': logger,
   });
-  return { ...module, getScheduleOfDevice, pointInForce };
+  const programmeKeepsOff = (device) => {
+    handed = device;
+    return module.programmeKeepsOff(device);
+  };
+  return { ...module, programmeKeepsOff, getScheduleOfDevice, pointInForce, loadThermostat };
 };
 
 // A thermostat on `preset`, carrying the hold params given.
@@ -121,6 +134,31 @@ describe('thermostat.offPoint', () => {
       const expired = thermostat({ preset: THERMOSTAT_PRESET.COMFORT, params: hold(Date.now() - 10 * 1000) });
 
       expect(await programmeKeepsOff(expired)).to.equal(true);
+    });
+
+    // The device a write hands the service is the in-memory one, whose params
+    // setParam never refreshes: a hold loaded at start-up and cleared since
+    // still read as in force there.
+    it('should read the hold from the database, not from the device it is handed', async () => {
+      const { programmeKeepsOff, loadThermostat } = load({ stored: thermostat() });
+      const inMemory = thermostat({ params: hold(Date.now() + 60 * 60 * 1000) });
+
+      expect(await programmeKeepsOff(inMemory)).to.equal(true);
+      assert.calledOnceWithExactly(loadThermostat, 'device-id');
+    });
+
+    it('should see a hold armed after the device in memory was loaded', async () => {
+      const { programmeKeepsOff } = load({ stored: thermostat({ params: hold(Date.now() + 60 * 60 * 1000) }) });
+
+      expect(await programmeKeepsOff(thermostat())).to.equal(false);
+    });
+
+    it('should be false, and say so, when the thermostat cannot be read', async () => {
+      const { programmeKeepsOff, getScheduleOfDevice } = load({ stored: new Error('database locked') });
+
+      expect(await programmeKeepsOff(thermostat())).to.equal(false);
+      assert.calledOnce(logger.warn);
+      assert.notCalled(getScheduleOfDevice);
     });
 
     it('should be false, and say so, when the programme cannot be read', async () => {

@@ -173,12 +173,7 @@ async function pointInForce(transitions) {
  * await getCurrentPoint(schedule.id); // { day_of_week: 1, time: '06:30', preset: 'comfort' }
  */
 async function getCurrentPoint(scheduleId) {
-  const [transitions, timezone] = await Promise.all([
-    db.ThermostatScheduleTransition.findAll({ where: { schedule_id: scheduleId }, raw: true }),
-    getTimezone(),
-  ]);
-  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
-  return findCurrentTransition(transitions, dayOfWeek, currentMinutes);
+  return pointInForce(await db.ThermostatScheduleTransition.findAll({ where: { schedule_id: scheduleId }, raw: true }));
 }
 
 module.exports = {

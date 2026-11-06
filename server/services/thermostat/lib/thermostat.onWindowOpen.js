@@ -31,7 +31,7 @@ const {
 } = require('./thermostat.state');
 const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
 const { programmeKeepsOff } = require('./thermostat.offPoint');
-const { getCurrentPoint } = require('./thermostat.getSchedules');
+const { pointInForce } = require('./thermostat.getSchedules');
 
 /**
  * @description Invalidate the caches derived from this service's devices: the
@@ -567,7 +567,8 @@ async function holdRemoteStartOnOffPoint(device) {
  */
 async function stopFromUnit(device, modeFeature) {
   const schedule = await getScheduleOfDevice(device.id);
-  const point = schedule ? await getCurrentPoint(schedule.id) : null;
+  // Resolved from the transitions read with the schedule, as programmeKeepsOff does.
+  const point = schedule ? await pointInForce(schedule.transitions) : null;
   if (point && point.preset === 'off') {
     const presetFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
     const preset = getPreset(device);

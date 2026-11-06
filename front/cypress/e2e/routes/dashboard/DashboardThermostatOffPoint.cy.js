@@ -64,8 +64,8 @@ const programme = {
 
 // `scheduleDelay`: how long every read of the programme after the first takes.
 // `hold`: whether the thermostat carries a hold. `failing`: a selector whose
-// writes fail.
-const serve = (mode, scheduleDelay = 0, { hold = true, failing = null } = {}) => {
+// writes fail. `slow`: a selector whose writes take 1.5 s.
+const serve = (mode, scheduleDelay = 0, { hold = true, failing = null, slow = null } = {}) => {
   let scheduleReads = 0;
   cy.intercept('GET', '**/api/v1/service/thermostat/device*', [thermostat(mode, hold)]);
   cy.intercept('GET', '**/api/v1/service/thermostat/schedule*', req => {
@@ -77,7 +77,8 @@ const serve = (mode, scheduleDelay = 0, { hold = true, failing = null } = {}) =>
   ]);
   cy.intercept('POST', '**/api/v1/device_feature/*/value', req => {
     const failed = failing && req.url.includes(`/device_feature/${failing}/`);
-    req.reply({ statusCode: failed ? 500 : 200, body: {} });
+    const delay = slow && req.url.includes(`/device_feature/${slow}/`) ? 1500 : 0;
+    req.reply({ statusCode: failed ? 500 : 200, body: {}, delay });
   }).as('write');
 };
 
@@ -158,5 +159,20 @@ describe('Dashboard Thermostat Box on an Off point', () => {
     presetButton('fe-power').click();
     cy.wait('@write');
     writes().should('deep.equal', [`${PRESET}=${PRESET_COMFORT}`, `${MODE}=${MODE_OFF}`]);
+  });
+
+  // Sent at once while the banner handed back, Off landed before the
+  // `schedule` write, and the start that follows it started the thermostat
+  // again: it waits for the hand-back instead.
+  it('Should stop the thermostat on an Off tapped while the banner hands back', () => {
+    serve(MODE_HEATING, 0, { slow: PRESET });
+    cy.visit('/dashboard/test');
+    cy.get('button:has(i.fe-x)', { timeout: 10000 }).click();
+    presetButton('fe-power').click();
+    cy.wait(['@write', '@write']);
+    // A write that must not happen has no request to wait for.
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+    writes().should('deep.equal', [`${PRESET}=${PRESET_SCHEDULE}`, `${MODE}=${MODE_OFF}`]);
   });
 });

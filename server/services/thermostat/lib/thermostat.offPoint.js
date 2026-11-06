@@ -1,6 +1,6 @@
 const logger = require('../../../utils/logger');
 const { getPreset, getManualHold } = require('./thermostat.state');
-const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
+const { getScheduleOfDevice, loadThermostat } = require('./thermostat.scheduleDevice');
 const { pointInForce } = require('./thermostat.getSchedules');
 
 /**
@@ -30,19 +30,23 @@ function offProgramme(device) {
  * force is Off. The single reading of an Off point for the start of a stopped
  * thermostat (setValue) and for a unit switched on from its remote
  * (onWindowOpen), so the two cannot disagree. The point is resolved from the
- * transitions the schedule is read with, in one query. A programme that cannot
- * be read is no Off point: the start powers the unit on, as any start did, and
- * a remote start is left to the pass.
+ * transitions the schedule is read with, in one query. The hold and the preset
+ * are read from the database: the device a write hands the service is the
+ * in-memory one, whose params the core's `setParam` never refreshes — a hold
+ * loaded at start-up and cleared since still read as in force there, and the
+ * start powered on a unit the pass then switched off. A programme or a
+ * thermostat that cannot be read is no Off point: the start powers the unit on,
+ * as any start did, and a remote start is left to the pass.
  * @param {object} device - The thermostat.
  * @returns {Promise<boolean>} True on an Off point the thermostat follows.
  * @example
  * await programmeKeepsOff(device);
  */
 async function programmeKeepsOff(device) {
-  if (offProgramme(device)) {
-    return false;
-  }
   try {
+    if (offProgramme(await loadThermostat(device.id))) {
+      return false;
+    }
     const schedule = await getScheduleOfDevice(device.id);
     const point = schedule ? await pointInForce(schedule.transitions || []) : null;
     return Boolean(point && point.preset === 'off');
