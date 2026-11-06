@@ -1,6 +1,6 @@
 const { BadParameters } = require('../../../utils/coreErrors');
 const { CONFIGURATION, ADAPTER_MODE } = require('../lib/constants');
-const { CONFIG_KEYS } = require('../adapters');
+const { ADAPTERS, CONFIG_KEYS } = require('../adapters');
 
 // tcp://<host>:<port>, the serial port format Zigbee2mqtt expects for a network coordinator
 const NETWORK_ADAPTER_URL_REGEX = /^tcp:\/\/([a-zA-Z0-9][a-zA-Z0-9._-]*):(\d{1,5})$/;
@@ -84,7 +84,16 @@ function validateSetup(config) {
     );
   }
 
-  if (adapterMode !== ADAPTER_MODE.NETWORK) {
+  if (adapterMode === ADAPTER_MODE.USB) {
+    // Without a model, Zigbee2mqtt would be configured with the zstack adapter, whatever the dongle is
+    const dongleName = config[CONFIGURATION.ZIGBEE_DONGLE_NAME];
+    if (dongleName === undefined || dongleName === null) {
+      throw new BadParameters('Zigbee2mqtt: USB dongle model is required');
+    }
+    if (!ADAPTERS.some((adapter) => adapter.label === dongleName)) {
+      throw new BadParameters(`Zigbee2mqtt: USB dongle model "${dongleName}" is unknown`);
+    }
+
     return config;
   }
 
