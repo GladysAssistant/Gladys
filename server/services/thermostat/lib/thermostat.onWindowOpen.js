@@ -1,7 +1,5 @@
 const logger = require('../../../utils/logger');
 const {
-  AC_MODE,
-  DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   PILOT_WIRE_MODE,
   THERMOSTAT_MODE,
@@ -15,6 +13,7 @@ const {
   getSetpointForPreset,
   presetForPilotWireOrder,
 } = require('./thermostat.applySchedules');
+const { useOfMode } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, getFeatureBySelector, getRunningMode, isExternal } = require('./thermostat.deviceConfig');
 const { holdExpiry, nextPointTimestamp, switchUse } = require('./thermostat.setValue');
 const {
@@ -30,6 +29,7 @@ const {
   REMOTE_STOP_UNTIL_PARAM,
   REMOTE_STOP_NO_END,
   MODULE_STOP_PARAM,
+  nextModeSequence,
 } = require('./thermostat.state');
 const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
 const { programmeKeepsOff } = require('./thermostat.offPoint');
@@ -298,6 +298,10 @@ async function seedObservedValues(gladys, selectors, observed, selfWritten, seed
  * stored `1`, that report read as the unit switched off from its remote, and
  * stopped the heating. Missing a remote press made while Gladys was down costs
  * one pass powering the unit on again; that stop cost the heating.
+ *
+ * The mode of a reversible heat pump's unit is seeded like the setpoint: a mode
+ * report only ever switches the use to the mode reported, so one equal to the
+ * stored mode does nothing.
  * @returns {Promise<void>}
  * @example
  * await thermostatHandler.primeObservedSetpoints();
@@ -308,10 +312,11 @@ async function primeObservedSetpoints() {
     const powerSelectors = await getPowerSelectors.call(this);
     await seedObservedValues(this.gladys, targetSelectors, this.observedSetpoints, this.selfWrittenSetpoints);
     await seedObservedValues(this.gladys, powerSelectors, this.observedPowers, this.selfWrittenPowers, false);
-    // Nor is the mode of a reversible unit, for the same reason: its first report
-    // after a start establishes the reference. No mark of our own writes is kept:
-    // the service only ever writes the use in force, which switches nothing.
-    await seedObservedValues(this.gladys, await getModeSelectors.call(this), this.observedModes, new Map(), false);
+    // The mode of a reversible unit is seeded, unlike the power: a report equal
+    // to the stored mode switches nothing, so a unit coming back from a power
+    // cut in the mode it had is not taken for a remote press, while the press
+    // that is the first report after a restart is followed (A.4).
+    await seedObservedValues(this.gladys, await getModeSelectors.call(this), this.observedModes, this.selfWrittenModes);
   } catch (e) {
     // Never block the service from starting: without a reference the listener
     // simply establishes one on the first report, which is the previous
@@ -543,26 +548,14 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
   }
 }
 
-// The use each heating or cooling value of a unit's mode switches a reversible
-// heat pump to, by the category of the mode feature (A.0.3, A.4).
-const USE_OF_UNIT_MODE = {
-  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: { [AC_MODE.HEATING]: 'heating', [AC_MODE.COOLING]: 'cooling' },
-  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
-    [THERMOSTAT_MODE.HEATING]: 'heating',
-    [THERMOSTAT_MODE.COOLING]: 'cooling',
-  },
-};
-
 /**
  * @description Take the use a reversible heat pump's unit reports, when it was
  * switched on from the unit.
  *
  * A remote sends its whole state with each press, mode included: a unit switched
- * on in heating while the thermostat was set to cool is to heat. Started on its
- * own use, the thermostat wrote cooling back to the unit, and the heating report
- * that followed then switched the use and dropped the hold the same press had
- * armed — the next pass cut the unit on its programme's Off point. The hold is
- * kept here for that reason: it is the unit's own setpoint, in the use it runs.
+ * on in heating while the thermostat was set to cool is to heat, and is started
+ * in that use rather than written back to cooling. The hold the same press arms
+ * is kept: it is the unit's own setpoint, in the use it runs.
  * @param {object} device - The thermostat device switched on from its unit.
  * @returns {Promise<void>}
  * @example
@@ -576,9 +569,27 @@ async function adoptUnitUse(device) {
   }
   const found = await getFeatureBySelector(this.gladys, config.mode_feature);
   const value = found ? found.feature.last_value : null;
-  const use = value === null ? undefined : (USE_OF_UNIT_MODE[found.feature.category] || {})[Number(value)];
+  const use = value === null ? undefined : useOfMode(found.feature.category, value);
   if (use) {
     await switchUse.call(this, device, use, { keepHold: true });
+  }
+}
+
+/**
+ * @description Take the use a unit switched on from its remote reports, as
+ * best effort (adoptUnitUse): a lookup or a save that fails must cost neither
+ * the hold nor the start that follow, or the next pass would switch off, on an
+ * Off point, the unit the user just switched on.
+ * @param {object} device - The thermostat device switched on from its unit.
+ * @returns {Promise<void>}
+ * @example
+ * await adoptUnitUseSafely.call(handler, device);
+ */
+async function adoptUnitUseSafely(device) {
+  try {
+    await adoptUnitUse.call(this, device);
+  } catch (e) {
+    logger.warn(`Thermostat: could not take the use the unit of ${device.selector} reports: ${e.message}`);
   }
 }
 
@@ -806,15 +817,15 @@ async function onExternalPowerChanged(changedSelector, newValue) {
           // The hold is best effort, like the missing-mark cases above: a lookup
           // that fails must not cost the start, or the next pass would find the
           // thermostat still stopped and cut the power the user just turned on.
+          await adoptUnitUseSafely.call(this, device);
           try {
-            await adoptUnitUse.call(this, device);
             await holdUnitSetpoint.call(this, device);
           } catch (e) {
             logger.warn(`Thermostat: could not hold the setpoint ${device.selector} carries: ${e.message}`);
           }
           await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
         } else if (value !== 0) {
-          await adoptUnitUse.call(this, device);
+          await adoptUnitUseSafely.call(this, device);
           await holdRemoteStartOnOffPoint.call(this, device);
         }
       }),
@@ -830,19 +841,33 @@ async function onExternalPowerChanged(changedSelector, newValue) {
  * @param {string} changedSelector - Selector of the feature that changed.
  * @param {number} value - The mode it reports.
  * @param {number} lifecycle - The run of the service the report arrived in.
+ * @param {number} sequence - When the report arrived (nextModeSequence).
  * @returns {Promise<void>}
  * @example
- * await followModeReport.call(handler, 'melcloud-mode', AC_MODE.COOLING, handler.lifecycle);
+ * await followModeReport.call(handler, 'melcloud-mode', AC_MODE.COOLING, handler.lifecycle, 12);
  */
-async function followModeReport(changedSelector, value, lifecycle) {
+async function followModeReport(changedSelector, value, lifecycle, sequence) {
   const previouslyObserved = this.observedModes.get(changedSelector);
   this.observedModes.set(changedSelector, value);
+  const written = this.selfWrittenModes.get(changedSelector);
+  if (written) {
+    // The echo of a mode this service wrote is its own, even when a report
+    // received before the write is followed in between.
+    if (written.value === value) {
+      return;
+    }
+    // Another mode, received after the write: the unit has moved away from it,
+    // and the mark no longer stands for anything it will report.
+    if (written.sequence < sequence) {
+      this.selfWrittenModes.delete(changedSelector);
+    }
+  }
   if (previouslyObserved === undefined || Number(previouslyObserved) === value) {
     return;
   }
   try {
     const found = await getFeatureBySelector(this.gladys, changedSelector);
-    const use = found && (USE_OF_UNIT_MODE[found.feature.category] || {})[value];
+    const use = found && useOfMode(found.feature.category, value);
     if (!use) {
       return;
     }
@@ -854,7 +879,7 @@ async function followModeReport(changedSelector, value, lifecycle) {
       return;
     }
     const switches = await Promise.allSettled(
-      devices.map(async (device) => {
+      (devices || []).map(async (device) => {
         const config = buildParamsConfig(device);
         if (!config || !config.reversible || config.mode_feature !== changedSelector) {
           return;
@@ -917,8 +942,11 @@ async function followModeReport(changedSelector, value, lifecycle) {
  * no reason to start a thermostat someone stopped. Auto, drying and fan pick no
  * use, and are left to the pass as before.
  *
- * A change is a difference from the previous report, as for the power: the
- * service only ever writes the use in force, so its own writes switch nothing.
+ * A change is a difference from the previous report, seeded from the database
+ * at start-up (primeObservedSetpoints). The echo of a mode this service wrote is
+ * marked as its own (selfWrittenModes): a regulation pass that wrote the old use
+ * while a remote press was still being followed must not have its echo followed
+ * after it, switching the heat pump back.
  *
  * The reports of one unit are followed one at a time, in the order they arrived:
  * run side by side, a heating report that arrived before a cooling one could be
@@ -939,6 +967,9 @@ async function onExternalModeChanged(changedSelector, newValue, lifecycle = this
     return;
   }
   const value = Number(newValue);
+  // Dated on arrival, before any lookup: a mode written while this report waits
+  // is newer than it (followModeReport).
+  const sequence = nextModeSequence();
   // Most events in a house are no unit's mode: they queue behind nothing. Two
   // reports resume from this lookup in the order they arrived, even when it has
   // to read the devices (getWindowSelectors).
@@ -953,7 +984,7 @@ async function onExternalModeChanged(changedSelector, newValue, lifecycle = this
   const previous = this.modeReports.get(changedSelector) || Promise.resolve();
   const run = (async () => {
     await previous;
-    await followModeReport.call(this, changedSelector, value, lifecycle);
+    await followModeReport.call(this, changedSelector, value, lifecycle, sequence);
   })();
   this.modeReports.set(changedSelector, run);
   await run;
@@ -1135,6 +1166,7 @@ async function onDeviceNewState(event) {
               `window open, ${device.selector}`,
               this.selfWrittenSetpoints,
               this.selfWrittenPowers,
+              this.selfWrittenModes,
             );
           } catch (e) {
             logger.warn(`Thermostat: Failed to stop an external thermostat on window open: ${e.message}`);

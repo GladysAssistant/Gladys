@@ -493,13 +493,18 @@ const EditForm = ({ ...props }) => {
     const defaults = defaultTempRange(props.thermostatEditTempUnit || 'C');
     const narrowsMin = picked.min !== null && picked.min !== undefined && Number(picked.min) > defaults.min;
     const narrowsMax = picked.max !== null && picked.max !== undefined && Number(picked.max) < defaults.max;
+    // A field still on the form's default, or never filled: one the user
+    // emptied is theirs, as is one they typed.
+    const onDefault = (field, defaultValue) =>
+      (props[field] === undefined || props[field] === null ? String(defaultValue) : String(props[field])) ===
+      String(defaultValue);
     ['thermostatEditMinTemp', 'thermostatEditCoolingMinTemp'].forEach(field => {
-      if (narrowsMin && props[field] === String(defaults.min)) {
+      if (narrowsMin && onDefault(field, defaults.min)) {
         props.updateThermostatField(field, String(picked.min));
       }
     });
     ['thermostatEditMaxTemp', 'thermostatEditCoolingMaxTemp'].forEach(field => {
-      if (narrowsMax && props[field] === String(defaults.max)) {
+      if (narrowsMax && onDefault(field, defaults.max)) {
         props.updateThermostatField(field, String(picked.max));
       }
     });
