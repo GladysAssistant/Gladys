@@ -226,6 +226,20 @@ describe('thermostat: reversible heat pump', () => {
       expect(buildParamsConfig(device).default_mode).to.equal('cooling');
     });
 
+    // Saved after the use, a hold that failed to clear stayed to be regulated
+    // under the new use, and a retry found the use already switched.
+    it('should clear the hold before it saves the new use', async () => {
+      const handler = buildHandler();
+      const device = heatPump();
+      handler.gladys.device.setParam = sinon.stub().rejects(new Error('db busy'));
+
+      await handler.setValue(device, device.features[0], THERMOSTAT_MODE.COOLING).catch(() => null);
+
+      assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_SETPOINT', '');
+      assert.neverCalledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE');
+      expect(buildParamsConfig(device).default_mode).to.equal('heating');
+    });
+
     it('should only switch the use of a stopped heat pump, without starting it', async () => {
       const handler = buildHandler();
       const device = heatPump({ mode: THERMOSTAT_MODE.OFF });
@@ -347,6 +361,7 @@ describe('thermostat: reversible heat pump', () => {
         powerSelectorsCache: null,
         modeSelectorsCache: null,
         observedModes: new Map(),
+        modeReports: new Map(),
         setValue: fake.resolves(null),
         broadcastConfigUpdated: fake.returns(null),
       };
@@ -492,6 +507,77 @@ describe('thermostat: reversible heat pump', () => {
       await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
 
       assert.notCalled(handler.setValue);
+    });
+
+    it('should log and swallow a failure to list the units', async () => {
+      const mod = loadListener();
+      const handler = buildHandler();
+      handler.gladys.device.get = fake.rejects(new Error('db down'));
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+
+      assert.notCalled(handler.gladys.device.setParam);
+    });
+
+    // Recorded as seen, a report whose switch failed was ignored until the unit
+    // reported another mode, while every pass wrote the old use to it.
+    it('should retry a failed switch when the same report arrives again', async () => {
+      const mod = loadListener();
+      const handler = buildHandler();
+      const setParam = sinon.stub().resolves(null);
+      setParam.onFirstCall().rejects(new Error('db busy'));
+      handler.gladys.device.setParam = setParam;
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+      expect(handler.observedModes.get('ac-mode')).to.equal(AC_MODE.HEATING);
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+
+      expect(setParam.secondCall.args.slice(1)).to.deep.equal(['THERMOSTAT_MODE', 'cooling']);
+      expect(handler.observedModes.get('ac-mode')).to.equal(AC_MODE.COOLING);
+    });
+
+    // Run side by side, a heating report that arrived before a cooling one
+    // finished after it, and switched the heat pump back to heating.
+    it('should follow the reports of a unit in the order they arrived', async () => {
+      const mod = loadListener();
+      const device = heatPump();
+      const handler = buildHandler({ devices: [device] });
+      let lookups = 0;
+      handler.gladys.device.get = fake((query) => {
+        if (!query || !query.device_feature_selectors) {
+          return Promise.resolve([device]);
+        }
+        lookups += 1;
+        const feature = unitMode(DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING, AC_MODE.COOLING);
+        const delay = lookups === 1 ? 30 : 0;
+        return new Promise((resolve) => {
+          setTimeout(() => resolve([{ selector: 'ac', features: [feature] }]), delay);
+        });
+      });
+
+      await Promise.all([
+        mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING),
+        mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.HEATING),
+      ]);
+
+      const uses = handler.gladys.device.setParam
+        .getCalls()
+        .filter((call) => call.args[1] === 'THERMOSTAT_MODE')
+        .map((call) => call.args[2]);
+      expect(uses).to.deep.equal(['cooling', 'heating']);
+      expect(buildParamsConfig(device).default_mode).to.equal('heating');
+      expect(handler.modeReports.size).to.equal(0);
+    });
+
+    it('should write nothing once the service stopped during the lookups', async () => {
+      const mod = loadListener();
+      const handler = buildHandler();
+      handler.lifecycle = 1;
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING, 0);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.notCalled(handler.gladys.device.saveState);
     });
 
     it('should forget the mode of a unit no heat pump drives any more', async () => {

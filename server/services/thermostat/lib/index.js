@@ -67,6 +67,9 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // The last mode observed on the unit of each reversible heat pump, by selector:
   // heating or cooling picked on its remote switches the thermostat's use (A.4).
   this.observedModes = new Map();
+  // The report of each unit's mode being followed, by selector: they are followed
+  // one at a time, in the order they arrived.
+  this.modeReports = new Map();
   // The programme preset last announced to the dashboards, by thermostat
   // selector: the minute loop pushes one only when the point in force changes.
   this.announcedPresets = new Map();
