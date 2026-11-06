@@ -16,6 +16,7 @@ const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedul
 const {
   readsZeroSince,
   findAbsence,
+  readRoom,
   presetForEmptyRoom,
   holdsPickedPreset,
 } = require('../../../../services/thermostat/lib/thermostat.applySchedules');
@@ -26,18 +27,20 @@ const MINUTE = 60 * 1000;
 
 const params = (map) => Object.keys(map).map((name) => ({ name, value: map[name] }));
 
-// Feature lookups go through gladys.device.get({ device_feature_selectors }).
+// Feature lookups go through gladys.device.get({ device_feature_selectors }),
+// several selectors joined by commas; each feature found is on a device of its own.
 const buildGladys = (features = {}, failing = []) => ({
   device: {
     get: fake((query) => {
-      const selector = query && query.device_feature_selectors;
-      if (failing.includes(selector)) {
+      const selectors = ((query && query.device_feature_selectors) || '').split(',').filter(Boolean);
+      if (selectors.some((selector) => failing.includes(selector))) {
         return Promise.reject(new Error('sensor offline'));
       }
-      if (selector && features[selector] !== undefined) {
-        return Promise.resolve([{ selector: `${selector}-device`, features: [features[selector]] }]);
-      }
-      return Promise.resolve([]);
+      return Promise.resolve(
+        selectors
+          .filter((selector) => features[selector] !== undefined)
+          .map((selector) => ({ selector: `${selector}-device`, features: [features[selector]] })),
+      );
     }),
     setValue: fake.resolves(null),
     saveState: fake.resolves(null),
@@ -79,101 +82,198 @@ describe('thermostat presence: readsZeroSince', () => {
 });
 
 describe('thermostat presence: findAbsence', () => {
-  afterEach(() => {
-    sinon.restore();
-  });
+  const read = (sensors) => new Map(sensors.map((feature) => [feature.selector, feature]));
 
-  it('should take the room as empty once every sensor has seen nobody for the delay', async () => {
-    const gladys = buildGladys({
-      'salon-motion': sensor('salon-motion', 0),
-      'kitchen-motion': sensor('kitchen-motion', 0),
-    });
+  it('should take the room as empty once every sensor has seen nobody for the delay', () => {
+    const features = read([sensor('salon-motion', 0), sensor('kitchen-motion', 0)]);
     const vacatedAt = new Map([
       ['salon-motion', NOW - 45 * MINUTE],
       ['kitchen-motion', NOW - 31 * MINUTE],
     ]);
 
     // From the last sensor to go quiet.
-    expect(await findAbsence(gladys, ['salon-motion', 'kitchen-motion'], 30, vacatedAt, NOW)).to.equal(
-      NOW - 31 * MINUTE,
-    );
+    expect(findAbsence(features, ['salon-motion', 'kitchen-motion'], 30, vacatedAt, NOW)).to.equal(NOW - 31 * MINUTE);
   });
 
-  it('should not take the room as empty before the delay has run out', async () => {
-    const gladys = buildGladys({ 'salon-motion': sensor('salon-motion', 0) });
+  it('should not take the room as empty before the delay has run out', () => {
     const vacatedAt = new Map([['salon-motion', NOW - 29 * MINUTE]]);
 
-    expect(await findAbsence(gladys, ['salon-motion'], 30, vacatedAt, NOW)).to.equal(null);
+    expect(findAbsence(read([sensor('salon-motion', 0)]), ['salon-motion'], 30, vacatedAt, NOW)).to.equal(null);
   });
 
-  it('should take one sensor seeing someone as an occupied room', async () => {
-    const gladys = buildGladys({
-      'salon-motion': sensor('salon-motion', 0),
-      'kitchen-motion': sensor('kitchen-motion', 1),
-    });
+  it('should take one sensor seeing someone as an occupied room', () => {
+    const features = read([sensor('salon-motion', 0), sensor('kitchen-motion', 1)]);
     const vacatedAt = new Map([['salon-motion', NOW - 60 * MINUTE]]);
 
-    expect(await findAbsence(gladys, ['salon-motion', 'kitchen-motion'], 30, vacatedAt, NOW)).to.equal(null);
+    expect(findAbsence(features, ['salon-motion', 'kitchen-motion'], 30, vacatedAt, NOW)).to.equal(null);
   });
 
   // A sensor on a flat battery must not leave the house on eco for good.
-  it('should never take the room as empty with no sensor that can be read', async () => {
-    const gladys = buildGladys({ 'never-reported': sensor('never-reported', null) }, ['offline-motion']);
+  it('should never take the room as empty with no sensor that can be read', () => {
+    const features = read([sensor('never-reported', null)]);
 
-    expect(
-      await findAbsence(gladys, ['offline-motion', 'never-reported', 'unknown-motion'], 30, new Map(), NOW),
-    ).to.equal(null);
+    expect(findAbsence(features, ['offline-motion', 'never-reported'], 30, new Map(), NOW)).to.equal(null);
   });
 
-  it('should leave out a sensor that cannot be read', async () => {
-    const gladys = buildGladys({ 'salon-motion': sensor('salon-motion', 0) }, ['offline-motion']);
+  it('should leave out a sensor that was not read', () => {
     const vacatedAt = new Map([['salon-motion', NOW - 60 * MINUTE]]);
 
-    expect(await findAbsence(gladys, ['salon-motion', 'offline-motion'], 30, vacatedAt, NOW)).to.equal(
-      NOW - 60 * MINUTE,
-    );
+    expect(
+      findAbsence(read([sensor('salon-motion', 0)]), ['salon-motion', 'offline-motion'], 30, vacatedAt, NOW),
+    ).to.equal(NOW - 60 * MINUTE);
   });
 
   // Only what the form offers says anything about the room.
-  it('should leave out a feature that is not a presence sensor', async () => {
-    const gladys = buildGladys({
-      'salon-motion': sensor('salon-motion', 1),
-      'salon-presence': sensor('salon-presence', 0, { category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR }),
-      'salon-pushed': sensor('salon-pushed', 0, { type: DEVICE_FEATURE_TYPES.SENSOR.PUSH }),
-      'salon-temperature': sensor('salon-temperature', 0, {
+  it('should leave out a feature that is not a presence sensor', () => {
+    const features = read([
+      sensor('salon-motion', 1),
+      sensor('salon-presence', 0, { category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR }),
+      sensor('salon-pushed', 0, { type: DEVICE_FEATURE_TYPES.SENSOR.PUSH }),
+      sensor('salon-temperature', 0, {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
       }),
-    });
+    ]);
     const vacatedAt = new Map([['salon-presence', NOW - 60 * MINUTE]]);
 
-    expect(
-      await findAbsence(gladys, ['salon-presence', 'salon-pushed', 'salon-temperature'], 30, vacatedAt, NOW),
-    ).to.equal(NOW - 60 * MINUTE);
+    expect(findAbsence(features, ['salon-presence', 'salon-pushed', 'salon-temperature'], 30, vacatedAt, NOW)).to.equal(
+      NOW - 60 * MINUTE,
+    );
     // A motion sensor seeing someone still counts.
-    expect(await findAbsence(gladys, ['salon-presence', 'salon-motion'], 30, vacatedAt, NOW)).to.equal(null);
+    expect(findAbsence(features, ['salon-presence', 'salon-motion'], 30, vacatedAt, NOW)).to.equal(null);
   });
 
-  it('should forget the time of a sensor that lost its value, and keep that of one unread', async () => {
-    const gladys = buildGladys({ 'salon-motion': sensor('salon-motion', null) }, ['offline-motion']);
+  it('should forget the time of a sensor that lost its value, and keep that of one unread', () => {
+    const features = read([sensor('salon-motion', null)]);
     const vacatedAt = new Map([
       ['salon-motion', NOW - 60 * MINUTE],
       ['offline-motion', NOW - 60 * MINUTE],
     ]);
 
-    expect(await findAbsence(gladys, ['salon-motion', 'offline-motion'], 30, vacatedAt, NOW)).to.equal(null);
+    expect(findAbsence(features, ['salon-motion', 'offline-motion'], 30, vacatedAt, NOW)).to.equal(null);
     expect(vacatedAt.has('salon-motion')).to.equal(false);
     expect(vacatedAt.get('offline-motion')).to.equal(NOW - 60 * MINUTE);
     // Its next 0 starts a new count.
-    expect(await findAbsence(gladys, ['salon-motion'], 30, null, NOW)).to.equal(null);
+    expect(findAbsence(features, ['salon-motion'], 30, null, NOW)).to.equal(null);
   });
 
-  it('should default to the present time and no record', async () => {
+  it('should default to the present time and no record', () => {
+    const features = read([sensor('salon-motion', 0, { last_value_changed: new Date(Date.now() - 60 * MINUTE) })]);
+
+    expect(findAbsence(features, ['salon-motion'])).to.equal(null);
+    expect(findAbsence(features, ['salon-motion'], 30)).to.not.equal(null);
+  });
+});
+
+describe('thermostat presence: readRoom', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const config = (overrides = {}) => ({
+    thermostat_type: 'virtual',
+    presence_features: ['salon-motion', 'kitchen-motion'],
+    presence_delay: 30,
+    ...overrides,
+  });
+
+  // One query per thermostat, whatever the number of sensors.
+  it('should read every sensor in one query', async () => {
     const gladys = buildGladys({
-      'salon-motion': sensor('salon-motion', 0, { last_value_changed: new Date(Date.now() - 60 * MINUTE) }),
+      'salon-motion': sensor('salon-motion', 0),
+      'kitchen-motion': sensor('kitchen-motion', 0),
+    });
+    const vacatedAt = new Map([
+      ['salon-motion', NOW - 45 * MINUTE],
+      ['kitchen-motion', NOW - 40 * MINUTE],
+    ]);
+    sinon.useFakeTimers(NOW);
+
+    const room = await readRoom(gladys, config(), vacatedAt);
+
+    assert.calledOnceWithExactly(gladys.device.get, { device_feature_selectors: 'salon-motion,kitchen-motion' });
+    expect(room).to.deep.equal({ emptySince: NOW - 40 * MINUTE, pilotWireOptions: null, target: null });
+  });
+
+  it('should read the pilot wire of a heater regulating itself, and the target of an external thermostat', async () => {
+    const options = [{ value: PILOT_WIRE_MODE.OFF }, { value: PILOT_WIRE_MODE.COMFORT }];
+    const target = { selector: 'netatmo-setpoint', unit: DEVICE_FEATURE_UNITS.FAHRENHEIT };
+    const gladys = buildGladys({
+      'salon-motion': sensor('salon-motion', 1),
+      'heater-wire': { selector: 'heater-wire', supported_options: options },
+      'netatmo-setpoint': target,
     });
 
-    expect(await findAbsence(gladys, ['salon-motion'], 30)).to.not.equal(null);
+    const heater = await readRoom(
+      gladys,
+      config({
+        presence_features: ['salon-motion'],
+        pilot_wire_feature: 'heater-wire',
+        pilot_wire_regulation: 'heater',
+      }),
+    );
+    const external = await readRoom(
+      gladys,
+      config({ presence_features: ['salon-motion'], thermostat_type: 'external', target_feature: 'netatmo-setpoint' }),
+    );
+
+    expect(heater.pilotWireOptions).to.equal(options);
+    expect(external.target).to.equal(target);
+    expect(external.emptySince).to.equal(null);
+  });
+
+  // Gladys regulating the heater sends comfort or frost: the orders of the presets do not matter.
+  it('should not read the pilot wire of a heater Gladys regulates, nor one that declares no option', async () => {
+    const gladys = buildGladys({ 'heater-wire': { selector: 'heater-wire' } });
+
+    const regulated = await readRoom(
+      gladys,
+      config({
+        presence_features: ['salon-motion'],
+        pilot_wire_feature: 'heater-wire',
+        pilot_wire_regulation: 'gladys',
+      }),
+    );
+    const heater = await readRoom(
+      gladys,
+      config({
+        presence_features: ['salon-motion'],
+        pilot_wire_feature: 'heater-wire',
+        pilot_wire_regulation: 'heater',
+      }),
+    );
+    const gone = await readRoom(
+      buildGladys(),
+      config({
+        presence_features: ['salon-motion'],
+        pilot_wire_feature: 'heater-wire',
+        pilot_wire_regulation: 'heater',
+      }),
+    );
+
+    expect(gladys.device.get.firstCall.args[0]).to.deep.equal({ device_feature_selectors: 'salon-motion' });
+    expect(regulated.pilotWireOptions).to.equal(null);
+    expect(heater.pilotWireOptions).to.equal(null);
+    expect(gone.pilotWireOptions).to.equal(null);
+  });
+
+  it('should read nothing, and keep the times recorded, when the query fails', async () => {
+    const gladys = buildGladys({}, ['salon-motion']);
+    const vacatedAt = new Map([['salon-motion', NOW - 60 * MINUTE]]);
+
+    const room = await readRoom(gladys, config({ thermostat_type: 'external', target_feature: 'netatmo' }), vacatedAt);
+
+    expect(room).to.deep.equal({ emptySince: null, pilotWireOptions: null, target: null });
+    expect(vacatedAt.get('salon-motion')).to.equal(NOW - 60 * MINUTE);
+  });
+
+  it('should take no device found as nothing read', async () => {
+    const gladys = buildGladys();
+    gladys.device.get = fake.resolves(null);
+
+    expect((await readRoom(gladys, config())).emptySince).to.equal(null);
+    gladys.device.get = fake.resolves([{ selector: 'odd-device' }]);
+    expect((await readRoom(gladys, config())).emptySince).to.equal(null);
   });
 });
 
@@ -249,6 +349,35 @@ describe('thermostat presence: presetForEmptyRoom', () => {
     expect(presetForEmptyRoom('off', config())).to.equal('off');
     expect(presetForEmptyRoom('schedule', config())).to.equal('schedule');
   });
+
+  // A 4-order module takes no comfort -1: COMFORT_1 is sent as comfort, so an
+  // absence preset set to COMFORT_1 changes nothing over comfort, and is no saving.
+  it('should weigh the orders a 4-order module takes, as they are sent', () => {
+    const fourOrders = [
+      { value: PILOT_WIRE_MODE.OFF },
+      { value: PILOT_WIRE_MODE.FROST_PROTECTION },
+      { value: PILOT_WIRE_MODE.ECO },
+      { value: PILOT_WIRE_MODE.COMFORT },
+    ];
+    const heater = config({
+      pilot_wire_feature: 'heater-wire',
+      pilot_wire_regulation: 'heater',
+      pilot_wire_orders: {
+        frost: PILOT_WIRE_MODE.FROST_PROTECTION,
+        away: PILOT_WIRE_MODE.FROST_PROTECTION,
+        eco: PILOT_WIRE_MODE.COMFORT_1,
+        night: PILOT_WIRE_MODE.ECO,
+        comfort: PILOT_WIRE_MODE.COMFORT,
+      },
+    });
+
+    // Configured orders alone would say comfort -1 saves over comfort.
+    expect(presetForEmptyRoom('comfort', heater)).to.equal('eco');
+    expect(presetForEmptyRoom('comfort', heater, fourOrders)).to.equal('comfort');
+    // An order the module takes none of changes nothing either.
+    expect(presetForEmptyRoom('comfort', { ...heater, presence_preset: 'night' }, [{ value: 5 }])).to.equal('comfort');
+    expect(presetForEmptyRoom('comfort', { ...heater, presence_preset: 'night' }, fourOrders)).to.equal('night');
+  });
 });
 
 describe('thermostat presence: holdsPickedPreset', () => {
@@ -258,31 +387,27 @@ describe('thermostat presence: holdsPickedPreset', () => {
 
   const virtualConfig = { thermostat_type: 'virtual', default_mode: 'heating', preset_comfort: 21, temp_unit: 'C' };
 
-  it('should tell a picked preset from a turn of the dial', async () => {
-    const gladys = buildGladys();
-
-    expect(await holdsPickedPreset(gladys, virtualConfig, { setpoint: 21 }, 'comfort')).to.equal(true);
-    expect(await holdsPickedPreset(gladys, virtualConfig, { setpoint: 22 }, 'comfort')).to.equal(false);
+  it('should tell a picked preset from a turn of the dial', () => {
+    expect(holdsPickedPreset(virtualConfig, { setpoint: 21 }, 'comfort')).to.equal(true);
+    expect(holdsPickedPreset(virtualConfig, { setpoint: 22 }, 'comfort')).to.equal(false);
   });
 
-  it('should not take a hold on the programme for a picked preset', async () => {
-    expect(await holdsPickedPreset(buildGladys(), virtualConfig, { setpoint: 21 }, 'schedule')).to.equal(false);
+  it('should not take a hold on the programme for a picked preset', () => {
+    expect(holdsPickedPreset(virtualConfig, { setpoint: 21 }, 'schedule')).to.equal(false);
   });
 
   // On an external thermostat the hold is in the real feature's unit (C.3).
-  it('should compare in the unit of an external target', async () => {
+  it('should compare in the unit of an external target', () => {
     const config = { ...virtualConfig, thermostat_type: 'external', target_feature: 'netatmo-setpoint' };
-    const gladys = buildGladys({
-      'netatmo-setpoint': { selector: 'netatmo-setpoint', unit: DEVICE_FEATURE_UNITS.FAHRENHEIT, last_value: 70 },
-    });
+    const target = { selector: 'netatmo-setpoint', unit: DEVICE_FEATURE_UNITS.FAHRENHEIT, last_value: 70 };
 
-    expect(await holdsPickedPreset(gladys, config, { setpoint: 70 }, 'comfort')).to.equal(true);
+    expect(holdsPickedPreset(config, { setpoint: 70 }, 'comfort', target)).to.equal(true);
   });
 
-  it('should compare in the thermostat unit when the external target is gone', async () => {
+  it('should compare in the thermostat unit when the external target is gone', () => {
     const config = { ...virtualConfig, thermostat_type: 'external', target_feature: 'netatmo-setpoint' };
 
-    expect(await holdsPickedPreset(buildGladys(), config, { setpoint: 21 }, 'comfort')).to.equal(true);
+    expect(holdsPickedPreset(config, { setpoint: 21 }, 'comfort')).to.equal(true);
   });
 });
 
@@ -357,7 +482,7 @@ describe('thermostat presence: regulateDevice', () => {
     last_value: null,
   });
 
-  const virtualDevice = ({ preset = 'schedule', hold = null, extra = {} } = {}) => {
+  const virtualDevice = ({ preset = 'schedule', hold = null, since = null, extra = {} } = {}) => {
     const setpoint = setpointFeature();
     const active = activePresetFeature();
     return {
@@ -378,6 +503,7 @@ describe('thermostat presence: regulateDevice', () => {
           ...(hold === null
             ? {}
             : { THERMOSTAT_MANUAL_SETPOINT: String(hold), THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60 * MINUTE) }),
+          ...(since === null ? {} : { THERMOSTAT_MANUAL_SINCE: String(since) }),
           ...extra,
         }),
       },
@@ -445,10 +571,10 @@ describe('thermostat presence: regulateDevice', () => {
   });
 
   // Comfort picked for the evening keeps nobody warm once everybody is in bed.
-  it('should lower a preset picked by hand', async () => {
+  it('should lower a preset picked by hand before the room emptied', async () => {
     const mod = load('eco');
     const gladys = buildGladys(roomFeatures(0));
-    const { device, setpoint } = virtualDevice({ preset: 'comfort', hold: 21 });
+    const { device, setpoint } = virtualDevice({ preset: 'comfort', hold: 21, since: Date.now() - 45 * MINUTE });
 
     await regulate(mod, gladys, device, emptyFor(31));
 
@@ -458,6 +584,95 @@ describe('thermostat presence: regulateDevice', () => {
       .getCalls()
       .filter((call) => call.args[0].type === DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
     expect(presetWrites).to.have.length(0);
+  });
+
+  // Armed before this rule existed, or written by another client: nothing says
+  // it was a pre-heating.
+  it('should lower a preset picked by hand at a time unknown', async () => {
+    const mod = load('eco');
+    const gladys = buildGladys(roomFeatures(0));
+    const { device, setpoint } = virtualDevice({ preset: 'comfort', hold: 21 });
+
+    await regulate(mod, gladys, device, emptyFor(31));
+
+    assert.calledWith(gladys.device.saveState, setpoint, 18);
+  });
+
+  // Comfort picked from the phone on the way home: the room was already empty.
+  it('should keep a preset picked in a room already empty, until it empties again', async () => {
+    const mod = load('eco');
+    const pickedAt = Date.now() - 60 * MINUTE;
+    const { device, setpoint, active } = virtualDevice({ preset: 'comfort', hold: 21, since: pickedAt });
+    const vacatedAt = emptyFor(120);
+
+    const preheating = buildGladys(roomFeatures(0));
+    await regulate(mod, preheating, device, vacatedAt);
+
+    assert.calledWith(preheating.device.saveState, setpoint, 21);
+    assert.calledWith(preheating.device.saveState, active, THERMOSTAT_ACTIVE_PRESET.COMFORT);
+    // The heating runs on comfort: 17 °C is under 21 °C.
+    expect(preheating.device.setValue.firstCall.args[2]).to.equal(1);
+
+    // Someone comes in: the record of the quiet room is gone.
+    const occupied = buildGladys(roomFeatures(1));
+    await regulate(mod, occupied, device, vacatedAt);
+    expect(vacatedAt.has('salon-motion')).to.equal(false);
+    assert.calledWith(occupied.device.saveState, setpoint, 21);
+
+    // And leaves, after the hold: the room empties again, and comfort is lowered.
+    vacatedAt.set('salon-motion', Date.now() - 31 * MINUTE);
+    const leftAgain = buildGladys(roomFeatures(0));
+    await regulate(mod, leftAgain, device, vacatedAt);
+    assert.calledWith(leftAgain.device.saveState, setpoint, 18);
+    assert.calledWith(leftAgain.device.saveState, active, THERMOSTAT_ACTIVE_PRESET.ECO);
+  });
+
+  // Nothing to weigh: the hold is a dial setpoint, so the sensors are not read.
+  it('should not read the room over a setpoint set on the dial', async () => {
+    const mod = load('comfort');
+    const gladys = buildGladys(roomFeatures(0));
+    const { device } = virtualDevice({ preset: 'comfort', hold: 22.5 });
+
+    await regulate(mod, gladys, device, emptyFor(31));
+
+    const presenceQueries = gladys.device.get
+      .getCalls()
+      .filter((call) => String(call.args[0].device_feature_selectors).includes('salon-motion'));
+    expect(presenceQueries).to.have.length(0);
+  });
+
+  it('should regulate an empty room in cooling on the warmer absence preset', async () => {
+    const mod = load('comfort');
+    const gladys = buildGladys({ ...roomFeatures(0), 'temp-sensor': { selector: 'temp-sensor', last_value: 27 } });
+    const { device, setpoint, active } = virtualDevice({
+      extra: { THERMOSTAT_MODE: 'cooling', THERMOSTAT_PRESET_COMFORT: '24', THERMOSTAT_PRESET_ECO: '26' },
+    });
+
+    await regulate(mod, gladys, device, emptyFor(31));
+
+    assert.calledWith(gladys.device.saveState, setpoint, 26);
+    assert.calledWith(gladys.device.saveState, active, THERMOSTAT_ACTIVE_PRESET.ECO);
+  });
+
+  // A scene writes Night on a thermostat that cools: a preset the bar does not show.
+  it('should lower a preset picked by hand in cooling', async () => {
+    const mod = load('comfort');
+    const gladys = buildGladys({ ...roomFeatures(0), 'temp-sensor': { selector: 'temp-sensor', last_value: 27 } });
+    const { device, setpoint } = virtualDevice({
+      preset: 'night',
+      hold: 25,
+      since: Date.now() - 45 * MINUTE,
+      extra: {
+        THERMOSTAT_MODE: 'cooling',
+        THERMOSTAT_PRESET_COMFORT: '24',
+        THERMOSTAT_PRESET_NIGHT: '25',
+        THERMOSTAT_PRESET_ECO: '26',
+      },
+    });
+
+    await regulate(mod, gladys, device, emptyFor(31));
+
+    assert.calledWith(gladys.device.saveState, setpoint, 26);
   });
 
   it('should keep a setpoint set on the dial', async () => {
@@ -518,6 +733,78 @@ describe('thermostat presence: regulateDevice', () => {
     await regulate(mod, gladys, device, emptyFor(31));
 
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(18);
+  });
+
+  // The hold on an external thermostat is in the real feature's unit (C.3).
+  it('should lower a preset picked by hand on an external thermostat, in the unit of its feature', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({
+      'salon-motion': sensor('salon-motion', 0),
+      'netatmo-setpoint': {
+        selector: 'netatmo-setpoint',
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+        last_value: 70,
+      },
+    });
+    const preset = presetFeature('comfort');
+    const device = {
+      id: 'device-id',
+      selector: 'netatmo-thermostat',
+      features: [preset],
+      params: params({
+        THERMOSTAT_TYPE: 'external',
+        THERMOSTAT_TARGET_FEATURE: 'netatmo-setpoint',
+        THERMOSTAT_MODE: 'heating',
+        THERMOSTAT_PRESET_COMFORT: '21',
+        THERMOSTAT_PRESET_ECO: '18',
+        THERMOSTAT_PRESENCE_FEATURE: 'salon-motion',
+        THERMOSTAT_MANUAL_SETPOINT: '70',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60 * MINUTE),
+        THERMOSTAT_MANUAL_SINCE: String(Date.now() - 45 * MINUTE),
+      }),
+    };
+
+    await regulate(mod, gladys, device, emptyFor(31));
+
+    // Eco's 18 °C, in the feature's Fahrenheit.
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(64);
+  });
+
+  // A 4-order module sends COMFORT_1 as comfort: the absence preset set to it
+  // changes nothing, so nothing says eco.
+  it('should not report the absence preset when the module sends the same order', async () => {
+    const mod = load('comfort');
+    const gladys = buildGladys({
+      'salon-motion': sensor('salon-motion', 0),
+      'heater-wire': {
+        selector: 'heater-wire',
+        category: DEVICE_FEATURE_CATEGORIES.HEATER,
+        type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+        last_value: PILOT_WIRE_MODE.ECO,
+        supported_options: [
+          { value: PILOT_WIRE_MODE.OFF },
+          { value: PILOT_WIRE_MODE.FROST_PROTECTION },
+          { value: PILOT_WIRE_MODE.ECO },
+          { value: PILOT_WIRE_MODE.COMFORT },
+        ],
+      },
+    });
+    const { device, active } = virtualDevice({
+      extra: {
+        THERMOSTAT_TYPE: 'pilot-wire',
+        THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-wire',
+        THERMOSTAT_PILOT_WIRE_ORDER_ECO: String(PILOT_WIRE_MODE.COMFORT_1),
+        THERMOSTAT_SWITCH_FEATURE: '',
+      },
+    });
+
+    await regulate(mod, gladys, device, emptyFor(31));
+
+    assert.calledWith(gladys.device.saveState, active, THERMOSTAT_ACTIVE_PRESET.COMFORT);
+    assert.neverCalledWith(gladys.device.saveState, active, THERMOSTAT_ACTIVE_PRESET.ECO);
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.COMFORT);
   });
 
   it('should send the absence order to a pilot-wire heater', async () => {

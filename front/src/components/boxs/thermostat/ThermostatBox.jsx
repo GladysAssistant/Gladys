@@ -28,6 +28,7 @@ import {
   supportedStandbyOrder,
   PILOT_WIRE_ORDER_RANK
 } from '../../../../../server/utils/thermostatConstants';
+import { presetSavingForEmptyRoom, absenceLowersHold } from '../../../../../server/utils/thermostatPresence';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
 import {
@@ -466,14 +467,16 @@ class ThermostatBox extends Component {
   };
 
   // The manual hold, as the device carries it. `until` is null on a permanent
-  // hold, which is what a thermostat following no schedule gets.
+  // hold, which is what a thermostat following no schedule gets; `since` is when
+  // it was armed, null when the hold does not say.
   getHold = () => {
     const cfg = this.state.remoteConfig;
     if (!cfg || cfg.manual_setpoint === null || cfg.manual_setpoint === undefined) {
       return null;
     }
     const until = cfg.manual_until && cfg.manual_until > Date.now() ? cfg.manual_until : null;
-    return { setpoint: cfg.manual_setpoint, until };
+    const since = Number.isFinite(cfg.manual_since) ? cfg.manual_since : null;
+    return { setpoint: cfg.manual_setpoint, until, since };
   };
 
   // Last preset that was not a stop, so turning the thermostat back on restores
@@ -646,31 +649,37 @@ class ThermostatBox extends Component {
   };
 
   // The preset an empty room is regulated on, when it saves energy over the one
-  // in force, or null: the server's rule (presetForEmptyRoom), and only over the
-  // programme or a preset picked — a setpoint set on the dial is kept.
+  // in force, or null: the server's rule (presetSavingForEmptyRoom, shared), and
+  // only over the programme or a preset picked — a setpoint set on the dial is
+  // kept, and so is a preset picked while the room was already empty (spec A.4).
   emptyRoomPreset = (activePreset, isWindowOpen) => {
     const cfg = this.getConfig();
-    if (this.state.emptySince === null || isWindowOpen || this.isStopped()) {
-      return null;
-    }
-    const absence = PRESENCE_PRESETS.includes(cfg.presence_preset) ? cfg.presence_preset : DEFAULT_PRESENCE_PRESET;
-    if (!isStartPreset(activePreset) || activePreset === absence) {
+    const { emptySince } = this.state;
+    if (emptySince === null || isWindowOpen || this.isStopped()) {
       return null;
     }
     const hold = this.getHold();
-    if (hold && !this.holdMatchesPreset(hold.setpoint, activePreset)) {
-      return null;
+    if (hold) {
+      // A preset picked by hand holds that preset's own setpoint — any of the
+      // five, whether or not the bar shows it: a scene may write Night on a
+      // thermostat that cools. Compared in the hold's unit, as the server does.
+      const presetTemp = isStartPreset(activePreset) ? this.getPresetTemp(activePreset) : null;
+      if (presetTemp === null || this.toSetpointFeatureUnit(presetTemp) !== hold.setpoint) {
+        return null;
+      }
+      if (!absenceLowersHold(hold.since, emptySince)) {
+        return null;
+      }
     }
-    if (this.isHeaterRegulated()) {
-      // A heater regulating itself is weighed on the orders the presets send.
-      const saves =
-        PILOT_WIRE_ORDER_RANK[this.getPresetOrder(absence)] < PILOT_WIRE_ORDER_RANK[this.getPresetOrder(activePreset)];
-      return saves ? absence : null;
-    }
-    const inForce = this.getPresetTemp(activePreset);
-    const empty = this.getPresetTemp(absence);
-    const cooling = cfg.default_mode === 'cooling' && !cfg.pilot_wire_feature;
-    return (cooling ? empty > inForce : empty < inForce) ? absence : null;
+    const absence = PRESENCE_PRESETS.includes(cfg.presence_preset) ? cfg.presence_preset : DEFAULT_PRESENCE_PRESET;
+    const lowered = presetSavingForEmptyRoom(activePreset, absence, {
+      cooling: cfg.default_mode === 'cooling' && !cfg.pilot_wire_feature,
+      setpointOf: this.getPresetTemp,
+      // A heater regulating itself is weighed on the orders its module takes.
+      orderOf: this.isHeaterRegulated() ? this.getPresetOrder : null,
+      supportedOptions: this.state.pilotWireSupportedOptions
+    });
+    return lowered === activePreset ? null : lowered;
   };
 
   getDeviceData = async () => {
@@ -971,6 +980,20 @@ class ThermostatBox extends Component {
 
   handleThermostatManualModeUpdated = payload => {
     if (!this.isOurDevice(payload)) return;
+    // The hold the device now carries, for what reads it from the config: the
+    // absence banner weighs when it was armed (spec A.4).
+    this.setState(prevState =>
+      prevState.remoteConfig
+        ? {
+            remoteConfig: {
+              ...prevState.remoteConfig,
+              manual_setpoint: payload.setpoint === undefined ? null : payload.setpoint,
+              manual_until: payload.until || null,
+              manual_since: payload.since || null
+            }
+          }
+        : null
+    );
     // The same preset write also arms a hold, which only takes effect once the
     // thermostat starts again: a stopped one is in no manual mode.
     if (this.isStopped()) return;

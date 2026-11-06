@@ -17,6 +17,9 @@ const APPLY_DEBOUNCE_MS = 2000;
 // is per-device configuration-shaped state, which is what params are for.
 const MANUAL_SETPOINT_PARAM = 'THERMOSTAT_MANUAL_SETPOINT';
 const MANUAL_UNTIL_PARAM = 'THERMOSTAT_MANUAL_UNTIL';
+// When the hold was armed: an empty room only lowers a preset picked by hand
+// when it went empty afterwards (A.4).
+const MANUAL_SINCE_PARAM = 'THERMOSTAT_MANUAL_SINCE';
 
 // A stop this service made itself: a thermostat left on the Off point of a
 // programme it no longer follows, or of one emptied of its points (E.6). It is
@@ -338,11 +341,12 @@ async function saveOperatingState(device, state) {
 /**
  * @description The manual hold armed on a thermostat, read from its params.
  * `until` is null on a permanent hold — the case of a thermostat that follows
- * no schedule, where nothing would otherwise take the setpoint back.
+ * no schedule, where nothing would otherwise take the setpoint back. `since` is
+ * when it was armed, null when the hold does not say.
  * @param {object} device - The thermostat device.
- * @returns {{ setpoint: number, until: number|null }|null} The hold, or null when none is armed.
+ * @returns {{ setpoint: number, until: number|null, since: number|null }|null} The hold, or null when none is armed.
  * @example
- * getManualHold(device); // { setpoint: 21.5, until: 1700000000000 }
+ * getManualHold(device); // { setpoint: 21.5, until: 1700000000000, since: 1699998200000 }
  */
 function getManualHold(device) {
   const params = (device && device.params) || [];
@@ -357,24 +361,36 @@ function getManualHold(device) {
   }
   const untilParam = params.find((param) => param.name === MANUAL_UNTIL_PARAM);
   const until = untilParam && untilParam.value ? Number(untilParam.value) : null;
-  return { setpoint, until: Number.isFinite(until) ? until : null };
+  const sinceParam = params.find((param) => param.name === MANUAL_SINCE_PARAM);
+  const since = sinceParam && sinceParam.value ? Number(sinceParam.value) : null;
+  return {
+    setpoint,
+    until: Number.isFinite(until) ? until : null,
+    since: Number.isFinite(since) ? since : null,
+  };
 }
 
 /**
  * @description Arm a manual hold on a thermostat.
+ *
+ * `since` is when the hold was armed: now for a new one, and the time the hold
+ * already carries when only its expiry moves — a hold moved onto the next point
+ * is still the one armed then.
  * @param {object} device - The thermostat device.
  * @param {number} setpoint - The setpoint to hold.
  * @param {number|null} until - When the hold expires, or null to hold for ever.
+ * @param {number|null} [since] - When it was armed, in ms; now by default, null when unknown.
  * @returns {Promise<void>}
  * @example
  * await setManualHold.call(this, device, 21.5, Date.now() + 1800000);
  */
-async function setManualHold(device, setpoint, until) {
+async function setManualHold(device, setpoint, until, since = Date.now()) {
   await this.gladys.device.setParam(device, MANUAL_SETPOINT_PARAM, String(setpoint));
   await this.gladys.device.setParam(device, MANUAL_UNTIL_PARAM, until === null ? '' : String(until));
+  await this.gladys.device.setParam(device, MANUAL_SINCE_PARAM, since === null ? '' : String(since));
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-    payload: { device: device.selector, setpoint, until },
+    payload: { device: device.selector, setpoint, until, since },
   });
 }
 
@@ -389,9 +405,10 @@ async function setManualHold(device, setpoint, until) {
 async function clearManualHold(device) {
   await this.gladys.device.setParam(device, MANUAL_SETPOINT_PARAM, '');
   await this.gladys.device.setParam(device, MANUAL_UNTIL_PARAM, '');
+  await this.gladys.device.setParam(device, MANUAL_SINCE_PARAM, '');
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-    payload: { device: device.selector, setpoint: null, until: null },
+    payload: { device: device.selector, setpoint: null, until: null, since: null },
   });
 }
 
@@ -463,6 +480,7 @@ module.exports = {
   PRESETS,
   MANUAL_SETPOINT_PARAM,
   MANUAL_UNTIL_PARAM,
+  MANUAL_SINCE_PARAM,
   SCHEDULE_STOP_PARAM,
   REMOTE_STOP_UNTIL_PARAM,
   REMOTE_STOP_NO_END,

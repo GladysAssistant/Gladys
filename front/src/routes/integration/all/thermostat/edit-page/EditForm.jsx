@@ -812,8 +812,8 @@ const EditForm = ({ ...props }) => {
               </div>
             )}
 
-            {/* Capteurs de présence (spec A.4) : la pièce vide depuis le délai
-                passe sur le preset d'absence, quand il économise. */}
+            {/* Presence sensors (spec A.4): a room empty for the delay is
+                regulated on the absence preset, when that saves energy. */}
             <div class="form-group">
               <label class="form-label">
                 <Text id="integration.thermostat.edit.presenceFeatureLabel" />
