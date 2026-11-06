@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 
 const NextcloudTalkPage = ({ children, ...props }) => (
   <IntegrationSubPageLayout
@@ -21,6 +22,7 @@ const NextcloudTalkPage = ({ children, ...props }) => (
       </DeviceConfigurationLink>
     }
   >
+    <DeprecationWarning />
     <div class="card">
       <div class="card-body">
         <div

@@ -3,6 +3,7 @@ const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 // Categories of DeviceFeatures
 const CameraManager = require('./camera');
+const MusicManager = require('./music');
 const LightManager = require('./light');
 const TemperatureSensorManager = require('./temperature-sensor');
 const HumiditySensorManager = require('./humidity-sensor');
@@ -129,6 +130,7 @@ const DeviceManager = function DeviceManager(
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
+  this.music = new MusicManager(this.stateManager, serviceManager);
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);

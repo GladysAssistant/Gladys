@@ -14,6 +14,7 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS
 } from '../../../../../../server/utils/constants';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class EnergyMonitoringPage extends Component {
   state = {
@@ -142,7 +143,7 @@ class EnergyMonitoringPage extends Component {
         params: []
       };
 
-      const createdDevice = await this.props.httpClient.post('/api/v1/device', newDevice);
+      const createdDevice = await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(newDevice));
 
       // Reload devices to include the new one
       await this.loadDevices();

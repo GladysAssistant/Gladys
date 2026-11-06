@@ -1,0 +1,19 @@
+[
+  {
+    "path": "/dev/ttyUSB0",
+    "name": "Silicon Labs CP2102 USB to UART Bridge Controller",
+    "pnpId": "usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
+    "adapter": null
+  },
+  {
+    "path": "/dev/ttyACM0",
+    "name": "Arduino www.arduino.cc 0043",
+    "pnpId": "usb-Arduino__www.arduino.cc__0043_85735313932351F0E1C1-if00",
+    "adapter": null
+  },
+  {
+    "path": "/dev/ttyS0",
+    "name": null,
+    "adapter": null
+  }
+]

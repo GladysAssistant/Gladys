@@ -9,6 +9,7 @@ import get from 'get-value';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import normalizeSearchText from '../../../utils/normalizeSearchText';
+import createBackdropDismiss from '../../../utils/backdropDismiss';
 import { getDeviceIntegration, disambiguateIntegrationNames } from '../../../routes/devices/integrationLinks';
 import style from './style.css';
 
@@ -40,11 +41,7 @@ class MigrateDeviceModal extends Component {
     }
   };
 
-  handleOverlayClick = e => {
-    if (e.target === e.currentTarget) {
-      this.close();
-    }
-  };
+  backdropDismiss = createBackdropDismiss(() => this.close());
 
   close = () => {
     // Covers all close paths (X, Escape, overlay, Cancel): while a migration
@@ -291,6 +288,13 @@ class MigrateDeviceModal extends Component {
       );
     const playNotificationLost =
       destinationDevice && hasPlayNotification(sourceFeatures) && !hasPlayNotification(destinationDevice.features);
+    // A `music.play-media` scene action stores the device selector and a media id owned by the
+    // source player's provider (capabilities/music.md, section 7). The destination always
+    // belongs to another integration (the modal filters the source's service out), so the
+    // re-pointed action can only work when both players share the same provider: a player
+    // being migrated gets a dedicated note.
+    const isMusicPlayer = sourceFeatures.some(feature => feature.category === DEVICE_FEATURE_CATEGORIES.MUSIC);
+    const playMediaAtRisk = Boolean(destinationDevice) && isMusicPlayer;
     const deviceGroups = this.getDeviceOptions();
     const hasDeviceOptions = devices.length > 0;
     // The modal is rendered on <body>: it opens from inside a glass card, whose
@@ -298,7 +302,7 @@ class MigrateDeviceModal extends Component {
     // stacking context (same reason the light control panel is portaled).
     // glass-theme keeps the dialog on the theme's glass surface out there.
     return createPortal(
-      <div class={cx('glass-theme', style.modalOverlay)} onClick={this.handleOverlayClick}>
+      <div class={cx('glass-theme', style.modalOverlay)} {...this.backdropDismiss}>
         <div class={style.modalDialog}>
           <div class="card mb-0">
             <div class="card-header">
@@ -384,6 +388,11 @@ class MigrateDeviceModal extends Component {
                           {playNotificationLost && (
                             <div class="alert alert-warning">
                               <Text id="device.migrate.playNotificationWarning" />
+                            </div>
+                          )}
+                          {playMediaAtRisk && (
+                            <div class="alert alert-warning">
+                              <Text id="device.migrate.playMediaWarning" />
                             </div>
                           )}
                         </div>

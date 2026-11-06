@@ -1,8 +1,15 @@
 const cloneDeep = require('lodash.clonedeep');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezonePlugin = require('dayjs/plugin/timezone');
 
 const logger = require('../../utils/logger');
-const { EVENTS, ANY_CHANGE_OPERATOR } = require('../../utils/constants');
+const { EVENTS, ANY_CHANGE_OPERATOR, TIME_RANGE_EVENTS } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
+const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
+
+dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
 
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
@@ -165,7 +172,62 @@ const triggersFunc = {
 
     return false;
   },
-  [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
+  [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => {
+    if (event.key !== trigger.key) {
+      return false;
+    }
+    // A time-range trigger carries which side of the range fired, so the scene can react
+    // differently to a start and to an end. It is exposed to the actions through the scope
+    // (`scope.triggerEvent`, written by scene.checkTrigger).
+    // `event` is the single object checkTrigger walks every scene with, so writing on it
+    // is only safe because the key guard above lets at most one trigger through: keys are
+    // uuid v4, assigned per trigger in addScene. Keep that guard before this branch.
+    if (trigger.scheduler_type === 'time-range') {
+      const instant = dayjs();
+      const now = dayjs.tz(instant, self.timezone);
+      // A start is computed on the current minute too, not taken as "inside": on the
+      // spring-forward night, cron moves a 02:30 edge to 03:30 but leaves a 03:15 one where
+      // it is, so a 02:30 -> 03:15 range starts after its own end. Taken as inside, that
+      // start switched the device on until the next day's end, about 24 h later. On any
+      // other night the start minute is inside the range (its start is included). A job a
+      // few milliseconds early lands in the minute before its start, so a start also tries
+      // the next minute: 11:59 still answers for a 12:00 start, while 03:31 stays outside
+      // both spring-forward cases. The next minute is taken from the instant, not with
+      // now.add(): across a DST change, add() keeps the old offset when the system runs in
+      // UTC, and 01:59 + 1 minute became 02:00, a minute that does not exist that night.
+      //
+      // The whole planning of the scene answers, not just the ranges of the trigger which
+      // fired: the days are configured per trigger, so a "weekdays + weekend" planning is
+      // necessarily two triggers, and the end of one of them must not report the scene as
+      // outside while the other one still covers this minute. `condition.in-time-range` trusts
+      // this flag as soon as the key belongs to the scene, so the union has to be computed
+      // here rather than left to the condition.
+      const scene = self.scenes && self.scenes[sceneSelector];
+      // The scene is always in the store when a job of its own fires; falling back on the
+      // trigger which fired keeps the answer sane if it somehow is not.
+      const sceneTriggers = (scene && scene.triggers) || [trigger];
+      const timeRanges = sceneTriggers
+        .filter((sceneTrigger) => sceneTrigger.scheduler_type === 'time-range')
+        .flatMap((sceneTrigger) =>
+          resolveTriggerTimeRanges(sceneTrigger).filter(
+            // The range which just ended no longer counts — its end is excluded — but every
+            // other one still does: two consecutive ranges ("10:00 -> 12:00" then
+            // "12:00 -> 14:00"), or two overlapping ones, keep the scene inside.
+            // A resume replays nothing, so it keeps them all.
+            (range, index) =>
+              event.range_event !== TIME_RANGE_EVENTS.END ||
+              sceneTrigger.key !== trigger.key ||
+              index !== event.range_index,
+          ),
+        );
+      event.in_range =
+        isInTimeRanges(timeRanges, now) ||
+        (event.range_event === TIME_RANGE_EVENTS.START &&
+          isInTimeRanges(timeRanges, dayjs.tz(instant.add(1, 'minute'), self.timezone)));
+      logger.debug(`Scene trigger time-range: ${event.range_event} event, in_range = ${event.in_range}.`);
+    }
+    return true;
+  },
   [EVENTS.TIME.SUNRISE]: matchSunEvent,
   [EVENTS.TIME.SUNSET]: matchSunEvent,
   [EVENTS.USER_PRESENCE.BACK_HOME]: (self, sceneSelector, event, trigger) =>

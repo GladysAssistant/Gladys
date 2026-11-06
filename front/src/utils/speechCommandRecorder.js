@@ -1,5 +1,5 @@
 import { float32SamplesToSttWav } from './speechAudioForStt';
-import { getSpeechUserMedia, SpeechRecordingError } from './speechMicrophoneAccess';
+import { getSpeechUserMedia, isSpeechRecordingError, SpeechRecordingError } from './speechMicrophoneAccess';
 
 const DEFAULT_OPTIONS = {
   silenceThreshold: 0.01,
@@ -73,7 +73,7 @@ class GladysSpeechCommandRecorder extends AudioWorkletProcessor {
         type: 'recording',
         samples,
         sampleRate,
-        reason: this.stopReason || 'manual'
+        reason: this.stopReason || (this.speechDetected ? 'manual' : 'no_speech')
       },
       [samples.buffer]
     );
@@ -174,6 +174,26 @@ function createAudioContext() {
  */
 function isAbortError(error) {
   return Boolean(error && (error.name === 'AbortError' || error.message === 'Aborted'));
+}
+
+/**
+ * @description Call a handler once a signal is aborted, right away when it already is.
+ * @param {AbortSignal} [signal] - Signal to watch.
+ * @param {() => void} handler - Handler to call.
+ * @returns {() => void} Removes the listener.
+ * @example
+ * const removeListener = onSignalAborted(signal, () => {});
+ */
+function onSignalAborted(signal, handler) {
+  if (!signal) {
+    return () => {};
+  }
+  if (signal.aborted) {
+    handler();
+    return () => {};
+  }
+  signal.addEventListener('abort', handler, { once: true });
+  return () => signal.removeEventListener('abort', handler);
 }
 
 /**
@@ -437,6 +457,7 @@ function buildWorkletOptions(options) {
  * @param {MediaStream} stream - Microphone stream.
  * @param {object} options - Recording options.
  * @param {AbortSignal} [options.signal] - Abort signal.
+ * @param {AbortSignal} [options.stopSignal] - Stop signal, ends the recording and keeps the audio.
  * @param {() => void} [options.onReady] - Called once the audio graph receives the first microphone frame.
  * @returns {Promise<Blob>} WAV blob.
  * @example
@@ -494,6 +515,9 @@ async function recordWithAudioWorklet(stream, options) {
   };
 
   return new Promise((resolve, reject) => {
+    let removeAbortListener = () => {};
+    let removeStopListener = () => {};
+
     const finish = () => {
       if (finished) {
         return;
@@ -502,10 +526,10 @@ async function recordWithAudioWorklet(stream, options) {
       recorderNode.port.postMessage({ type: 'flush' });
     };
 
+    // Also runs after a stop, while waiting for the flushed samples: a cancel
+    // must release the microphone without depending on the worklet reply. The
+    // listener is removed once the recording arrives, so it runs at most once.
     const abort = () => {
-      if (finished) {
-        return;
-      }
       finished = true;
       const rejectAbort = async () => {
         await cleanup();
@@ -513,10 +537,6 @@ async function recordWithAudioWorklet(stream, options) {
       };
       settleAsync(rejectAbort, reject);
     };
-
-    if (options.signal) {
-      options.signal.addEventListener('abort', abort, { once: true });
-    }
 
     recorderNode.port.onmessage = event => {
       const { data } = event;
@@ -530,9 +550,8 @@ async function recordWithAudioWorklet(stream, options) {
         options.onReady();
       }
       if (data.type === 'recording') {
-        if (options.signal) {
-          options.signal.removeEventListener('abort', abort);
-        }
+        removeAbortListener();
+        removeStopListener();
         const resolveRecording = async () => {
           await cleanup();
           if (data.reason === 'no_speech') {
@@ -545,6 +564,9 @@ async function recordWithAudioWorklet(stream, options) {
         settleAsync(resolveRecording, reject);
       }
     };
+
+    removeAbortListener = onSignalAborted(options.signal, abort);
+    removeStopListener = onSignalAborted(options.stopSignal, finish);
   });
 }
 
@@ -552,6 +574,8 @@ async function recordWithAudioWorklet(stream, options) {
  * @description Record speech using ScriptProcessor fallback.
  * @param {MediaStream} stream - Microphone stream.
  * @param {object} options - Recording options.
+ * @param {AbortSignal} [options.signal] - Abort signal.
+ * @param {AbortSignal} [options.stopSignal] - Stop signal, ends the recording and keeps the audio.
  * @param {() => void} [options.onReady] - Called once the audio graph receives the first microphone frame.
  * @returns {Promise<Blob>} WAV blob.
  * @example
@@ -633,9 +657,11 @@ async function recordWithScriptProcessor(stream, options) {
       settleAsync(rejectAbort, reject);
     };
 
-    if (options.signal) {
-      options.signal.addEventListener('abort', abort, { once: true });
-    }
+    // Stopped by the user: keep the audio, unless no speech was heard yet.
+    const stop = () => finish(speechDetected ? 'manual' : 'no_speech');
+
+    onSignalAborted(options.signal, abort);
+    onSignalAborted(options.stopSignal, stop);
 
     processor.onaudioprocess = event => {
       if (finished) {
@@ -677,7 +703,9 @@ async function recordWithScriptProcessor(stream, options) {
 /**
  * @description Record a voice command until the user stops speaking.
  * @param {object} [options={}] - Recording options.
- * @param {AbortSignal} [options.signal] - Abort signal.
+ * @param {AbortSignal} [options.signal] - Abort signal, drops the recording.
+ * @param {AbortSignal} [options.stopSignal] - Stop signal, ends the recording now and keeps the audio,
+ * as if the user had stopped speaking. Rejects with NO_SPEECH when no speech was detected yet.
  * @param {number} [options.silenceThreshold=0.01] - RMS below this value is silence.
  * @param {number} [options.speechThreshold=0.015] - RMS above this value starts speech.
  * @param {number} [options.silenceDurationMs=1200] - Silence duration before stop.
@@ -698,7 +726,8 @@ export async function recordSpeechCommandUntilSilence(options = {}) {
     try {
       return await recordWithAudioWorklet(stream, mergedOptions);
     } catch (e) {
-      if (isAbortError(e)) {
+      // NO_SPEECH ends the recording: only a failing AudioWorklet falls back.
+      if (isAbortError(e) || isSpeechRecordingError(e)) {
         throw e;
       }
       return await recordWithScriptProcessor(stream, mergedOptions);

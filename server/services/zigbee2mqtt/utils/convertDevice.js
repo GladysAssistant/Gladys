@@ -1,4 +1,5 @@
 const { mapDefinition } = require('./features/mapDefinition');
+const { DEVICE_PARAMS } = require('../lib/constants');
 
 /**
  * @description Converts an MQTT device to a Gladys device.
@@ -24,6 +25,9 @@ function convertDevice(device, serviceId) {
 
   if (ieeeAddress) {
     gladysDevice.ieee_address = ieeeAddress;
+    // Persist the IEEE address so the device can be matched again
+    // after a rename in Zigbee2mqtt (the external_id is name-based).
+    gladysDevice.params = [{ name: DEVICE_PARAMS.IEEE_ADDRESS, value: ieeeAddress }];
   }
 
   return gladysDevice;

@@ -35,7 +35,7 @@ async function update(selector, data) {
   if (next.valid_to !== null && next.valid_to < next.valid_from) {
     throw new BadParameters('valid_to: must be on or after valid_from');
   }
-  next.tariff = validateContractTariff(next.tariff, next.inputs, next.pricing_mode);
+  next.tariff = validateContractTariff(next.tariff, next.inputs, next.pricing_mode, next);
   await assertNoOverlap(next, before.id);
   // the meter of a consumption contract is a root, priced by it (energy-hierarchy.md, section C.2)
   await this.detachElectricMeter(next);

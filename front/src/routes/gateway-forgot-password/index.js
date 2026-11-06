@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import linkState from 'linkstate';
 import ForgotPassword from './ForgotPassword';
+import { cleanEmail } from '../../utils/validator';
 
 class ForgotPasswordPage extends Component {
   state = {
@@ -13,7 +14,7 @@ class ForgotPasswordPage extends Component {
     e.preventDefault();
     this.setState({ forgotInProgress: true });
     this.props.session.gatewayClient
-      .forgotPassword(this.state.email)
+      .forgotPassword(cleanEmail(this.state.email).toLowerCase())
       .then(() => this.setState({ success: true, forgotInProgress: false }))
       .catch(e => {
         console.error(e);

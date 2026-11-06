@@ -76,6 +76,15 @@ const { getConnectionStatus } = require('./externalIntegration.getConnectionStat
 const { getOAuthAuthorizeUrl } = require('./externalIntegration.getOAuthAuthorizeUrl');
 const { relayOAuthCallback } = require('./externalIntegration.relayOAuthCallback');
 const { runAction } = require('./externalIntegration.runAction');
+const { aiChat } = require('./externalIntegration.aiChat');
+const {
+  relayMusicCommand,
+  rememberMusicArtworkKeys,
+  isMusicArtworkKeyAllowed,
+  getMusicArtwork,
+} = require('./externalIntegration.music');
+const { getAiProviders } = require('./externalIntegration.getAiProviders');
+const { setAiProvider } = require('./externalIntegration.setAiProvider');
 const { getContainerStartedAt } = require('./externalIntegration.getContainerStartedAt');
 const { runNetworkDiscoveryScan } = require('./networkDiscovery/networkDiscovery.runScan');
 const { scanUdpBroadcast } = require('./networkDiscovery/networkDiscovery.scanUdpBroadcast');
@@ -128,6 +137,9 @@ const { stopSubContainers } = require('./externalIntegration.stopSubContainers')
 const { removeSubContainers } = require('./externalIntegration.removeSubContainers');
 const { getImagesInUse } = require('./externalIntegration.getImagesInUse');
 const { ensureImage } = require('./externalIntegration.ensureImage');
+const { ensureImagePresent } = require('./externalIntegration.ensureImagePresent');
+const { getMissingImages } = require('./externalIntegration.getMissingImages');
+const { pullMissingImages, abortImagePull } = require('./externalIntegration.pullMissingImages');
 const { removeImages } = require('./externalIntegration.removeImages');
 const { cleanImages } = require('./externalIntegration.cleanImages');
 const { controlSubContainer } = require('./externalIntegration.controlSubContainer');
@@ -138,6 +150,8 @@ const { setGrantedDevices } = require('./externalIntegration.setGrantedDevices')
 const { refreshIndex } = require('./store/store.refreshIndex');
 const { getIndex } = require('./store/store.getIndex');
 const { getCatalog } = require('./store/store.getCatalog');
+const { getStoreEntry } = require('./store/store.getStoreEntry');
+const { getStoreIntegration } = require('./store/store.getStoreIntegration');
 const { refreshCatalog } = require('./store/store.refreshCatalog');
 const { getDocsMarkdown } = require('./store/store.getDocsMarkdown');
 const { fetchManifestFromRepo } = require('./store/store.fetchManifestFromRepo');
@@ -218,12 +232,21 @@ const ExternalIntegration = function ExternalIntegration(
   this.restartTimers = new Map();
   this.stableRunningTimers = new Map();
   this.startedAt = new Map();
+  // in-flight background pulls of missing images (restore case), by
+  // service id: the AbortController that stop/uninstall abort
+  this.imagePulls = new Map();
   // serviceId -> missed WS pings count
   this.missedPings = new Map();
   // serviceId -> { count, resetAt } sliding rate limit on POST /state
   this.stateRateLimits = new Map();
   // deviceExternalId -> { count, resetAt } rate limit on POST /camera/image
   this.cameraImageRateLimits = new Map();
+  // requests in flight per AI provider integration (service id -> count), see aiChat
+  this.aiChatInFlight = new Map();
+  // music commands in flight per integration (service id -> count), see relayMusicCommand
+  this.musicCommandsInFlight = new Map();
+  // serviceId -> LRU Map of artwork key -> expiry of its allowlisting (capabilities/music.md, section 3)
+  this.musicArtworkKeys = new Map();
   // serviceId -> timestamp of the last accepted weather freshness nudge
   this.weatherRefreshTimes = new Map();
   // serviceId -> last energy-calendar.refresh nudge (capabilities/energy-contracts.md)
@@ -261,6 +284,8 @@ const ExternalIntegration = function ExternalIntegration(
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
   this.storeIndexFetchedAt = 0;
+  // last complete store entry fetched (per-integration file), see getStoreEntry
+  this.storeEntryCache = null;
   this.storeRefreshInterval = null;
   // storeSlug -> manifest fetched directly from the repo (repo_url installs absent from the index)
   this.repoManifests = new Map();
@@ -350,6 +375,13 @@ ExternalIntegration.prototype.getConnectionStatus = getConnectionStatus;
 ExternalIntegration.prototype.getOAuthAuthorizeUrl = getOAuthAuthorizeUrl;
 ExternalIntegration.prototype.relayOAuthCallback = relayOAuthCallback;
 ExternalIntegration.prototype.runAction = runAction;
+ExternalIntegration.prototype.aiChat = aiChat;
+ExternalIntegration.prototype.relayMusicCommand = relayMusicCommand;
+ExternalIntegration.prototype.rememberMusicArtworkKeys = rememberMusicArtworkKeys;
+ExternalIntegration.prototype.isMusicArtworkKeyAllowed = isMusicArtworkKeyAllowed;
+ExternalIntegration.prototype.getMusicArtwork = getMusicArtwork;
+ExternalIntegration.prototype.getAiProviders = getAiProviders;
+ExternalIntegration.prototype.setAiProvider = setAiProvider;
 ExternalIntegration.prototype.getContainerStartedAt = getContainerStartedAt;
 ExternalIntegration.prototype.runNetworkDiscoveryScan = runNetworkDiscoveryScan;
 ExternalIntegration.prototype.scanUdpBroadcast = scanUdpBroadcast;
@@ -401,6 +433,10 @@ ExternalIntegration.prototype.stopSubContainers = stopSubContainers;
 ExternalIntegration.prototype.removeSubContainers = removeSubContainers;
 ExternalIntegration.prototype.getImagesInUse = getImagesInUse;
 ExternalIntegration.prototype.ensureImage = ensureImage;
+ExternalIntegration.prototype.ensureImagePresent = ensureImagePresent;
+ExternalIntegration.prototype.getMissingImages = getMissingImages;
+ExternalIntegration.prototype.pullMissingImages = pullMissingImages;
+ExternalIntegration.prototype.abortImagePull = abortImagePull;
 ExternalIntegration.prototype.removeImages = removeImages;
 ExternalIntegration.prototype.cleanImages = cleanImages;
 ExternalIntegration.prototype.controlSubContainer = controlSubContainer;
@@ -411,6 +447,8 @@ ExternalIntegration.prototype.setGrantedDevices = setGrantedDevices;
 ExternalIntegration.prototype.refreshIndex = refreshIndex;
 ExternalIntegration.prototype.getIndex = getIndex;
 ExternalIntegration.prototype.getCatalog = getCatalog;
+ExternalIntegration.prototype.getStoreEntry = getStoreEntry;
+ExternalIntegration.prototype.getStoreIntegration = getStoreIntegration;
 ExternalIntegration.prototype.refreshCatalog = refreshCatalog;
 ExternalIntegration.prototype.getDocsMarkdown = getDocsMarkdown;
 ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;

@@ -177,6 +177,129 @@ describe('Mqtt handle message', () => {
       state: 'hello-world',
     });
   });
+  it('handle device with custom topic and empty payload', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: null,
+      },
+    ];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', '');
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with custom topic and whitespace-only payload', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: null,
+      },
+    ];
+    // what `echo "" | mosquitto_pub -s` publishes
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', '\n');
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with custom topic and empty JSON payload', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', '');
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with custom topic and whitespace JSON value', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: ' ',
+        },
+      }),
+    );
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with custom topic and a legitimate zero JSON value', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: 0,
+        },
+      }),
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 0,
+    });
+  });
+  it('handle device with custom topic and null JSON value', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: null,
+        },
+      }),
+    );
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with custom topic and JSON value missing the object path', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          humidity: 50,
+        },
+      }),
+    );
+
+    assert.notCalled(gladys.event.emit);
+  });
   it('handle device with custom topic and custom object path', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {

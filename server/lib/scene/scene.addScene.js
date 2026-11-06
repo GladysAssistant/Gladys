@@ -2,7 +2,14 @@ const cloneDeep = require('lodash.clonedeep');
 const uuid = require('uuid');
 
 const { BadParameters } = require('../../utils/coreErrors');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, TIME_RANGE_EVENTS } = require('../../utils/constants');
+const logger = require('../../utils/logger');
+const {
+  daysOfTheWeekToNumbers,
+  isOvernightRange,
+  resolveTriggerTimeRanges,
+  timeToMinutes,
+} = require('../../utils/timeRanges');
 
 const MAX_VALUE_SET_INTERVAL = 2 ** 31 - 1;
 
@@ -33,6 +40,102 @@ const nodeScheduleDaysOfWeek = {
 };
 
 /**
+ * @description Schedule the jobs of a "time-range" trigger: one job at the start and one at
+ * the end of each configured range.
+ *
+ * The days of the week are attached to the START of the range. For a range crossing midnight
+ * ("22:00 -> 06:00"), the end job is therefore scheduled on the day AFTER each selected day,
+ * so a range configured on monday ends on tuesday morning — which is what `isInTimeRanges`
+ * computes as well.
+ * @param {object} self - The scene manager.
+ * @param {object} trigger - The time-range trigger.
+ * @returns {object[]} The scheduled jobs, so they can be cancelled later.
+ * @example
+ * scheduleTimeRangeJobs(this, trigger);
+ */
+function scheduleTimeRangeJobs(self, trigger) {
+  const jobs = [];
+  const timeRanges = resolveTriggerTimeRanges(trigger);
+
+  // Every range is checked before any job is scheduled: a throw half-way left the jobs of
+  // the ranges before it running, with no trigger left in the store to cancel them.
+  timeRanges.forEach((range, rangeIndex) => {
+    // A range covering nothing would fire its start and its end at the same second,
+    // leaving the scene with two contradictory executions.
+    if (timeToMinutes(range.start) === timeToMinutes(range.end)) {
+      throw new BadParameters(`Time range ${rangeIndex}: start and end cannot be equal`);
+    }
+    if (daysOfTheWeekToNumbers(range.days_of_the_week).length === 0) {
+      throw new BadParameters(`Time range ${rangeIndex}: no valid day of the week`);
+    }
+  });
+
+  timeRanges.forEach((range, rangeIndex) => {
+    const startDays = daysOfTheWeekToNumbers(range.days_of_the_week);
+    // For an overnight range, the end happens on the next day.
+    const endDays = isOvernightRange(range) ? startDays.map((day) => (day + 1) % 7) : startDays;
+
+    const scheduleOne = (time, days, rangeEvent) => {
+      // A cron rule rather than a RecurrenceRule: on the night the clocks go forward, a
+      // RecurrenceRule at 02:30 skips the day — the end of a 22:00 -> 02:30 range never
+      // came, and the device it drives ran on for a day — and on the night they go back it
+      // fires twice. The cron rule fires once, at 03:30 in March.
+      const rule = {
+        tz: self.timezone,
+        rule: `0 ${parseInt(time.substr(3, 2), 10)} ${parseInt(time.substr(0, 2), 10)} * * ${[...days]
+          .sort()
+          .join(',')}`,
+      };
+      // Only the identity of the trigger is emitted, never the trigger object itself: it
+      // holds the scheduled jobs, which would then travel through the event bus and end up
+      // in the scope of the scene, readable from any action template. `range_index` tells
+      // which range of the planning fired, so a scene can tell them apart from a template
+      // ({{triggerEvent.range_index}}).
+      return self.scheduler.scheduleJob(rule, () =>
+        self.event.emit(EVENTS.TRIGGERS.CHECK, {
+          type: trigger.type,
+          key: trigger.key,
+          scheduler_type: trigger.scheduler_type,
+          range_event: rangeEvent,
+          range_index: rangeIndex,
+          // When the boundary fired: `condition.in-time-range` only trusts the side it carries
+          // for a moment, not for a whole run that waits or loops past the boundary.
+          fired_at: Date.now(),
+        }),
+      );
+    };
+
+    // Both sides of the range always fire: a scene reacting to only one of them simply
+    // leaves the other branch of its "if/else" empty.
+    jobs.push(scheduleOne(range.start, startDays, TIME_RANGE_EVENTS.START));
+
+    // Two consecutive ranges ("10:00 -> 12:00" then "12:00 -> 14:00") share a boundary: the
+    // end of the first and the start of the second would fire at the very same second, running
+    // the scene twice — sending its notifications twice, and racing the two branches of its
+    // "if/else" as the scene queue is not serialized. The start wins: it carries the state the
+    // planning continues with, so the redundant end is not scheduled.
+    //
+    // The days are the trigger's, but the end of an overnight range falls on the next day,
+    // so the redundant days are removed one by one: a 22:00 -> 06:00 range on monday ends on
+    // tuesday, and a 06:00 -> 08:00 range on monday only does not start then, so that end
+    // job is still needed on tuesday.
+    const daysStartedByAnotherRange = new Set();
+    timeRanges.forEach((other, otherIndex) => {
+      if (otherIndex === rangeIndex || timeToMinutes(other.start) !== timeToMinutes(range.end)) {
+        return;
+      }
+      daysOfTheWeekToNumbers(other.days_of_the_week).forEach((day) => daysStartedByAnotherRange.add(day));
+    });
+    const endDaysToSchedule = endDays.filter((day) => !daysStartedByAnotherRange.has(day));
+    if (endDaysToSchedule.length > 0) {
+      jobs.push(scheduleOne(range.end, endDaysToSchedule, TIME_RANGE_EVENTS.END));
+    }
+  });
+
+  return jobs;
+}
+
+/**
  * @description Add a scene to the scene manager.
  * @param {object} sceneRaw - Scene object from DB.
  * @param {object} [options] - Options.
@@ -56,7 +159,18 @@ async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
     scene.triggers.forEach((trigger) => {
       // First, we had a trigger key, import to uniquely identify this trigger
       trigger.key = uuid.v4();
-      if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
+      if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'time-range') {
+        // A time-range trigger schedules several jobs (2 per range), unlike the other
+        // scheduler types which only need one.
+        trigger.nodeScheduleJobs = scheduleTimeRangeJobs(this, trigger);
+        // A trigger without any range schedules nothing and can never fire. The scene was
+        // refused before reaching the database, so this only shows up for a scene already
+        // stored in an inconsistent state, loaded by init(): warn rather than throw, so the
+        // rest of the scene keeps working.
+        if (trigger.nodeScheduleJobs.length === 0) {
+          logger.warn(`Scene ${scene.name}: a "time range" trigger has no range, it will never fire.`);
+        }
+      } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
         const rule = {};
         rule.tz = this.timezone;
         switch (trigger.scheduler_type) {
@@ -151,4 +265,5 @@ async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
 module.exports = {
   addScene,
   hasSunriseSunsetTrigger,
+  scheduleTimeRangeJobs,
 };

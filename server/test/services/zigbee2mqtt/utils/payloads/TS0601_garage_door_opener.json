@@ -119,7 +119,13 @@
     ],
     "name": "Garage door",
     "model": "TS0601_garage_door_opener",
-    "should_poll": false
+    "should_poll": false,
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0xa4c1382720b9e514"
+      }
+    ]
   },
   "values": [
     {

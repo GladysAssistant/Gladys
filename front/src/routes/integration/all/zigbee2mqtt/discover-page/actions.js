@@ -2,6 +2,7 @@ import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
 import getZ2mUrl, { shouldShowZ2mUrlWarning } from '../utils/getZ2mUrl';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -77,26 +78,6 @@ function createActions(store) {
         permitJoin: value
       });
     },
-    async checkStatus(state) {
-      let zigbee2mqttStatus = {
-        usbConfigured: false,
-        mqttExist: false,
-        mqttRunning: false,
-        zigbee2mqttExist: false,
-        zigbee2mqttRunning: false,
-        gladysConnected: false,
-        zigbee2mqttConnected: false,
-        z2mEnabled: false
-      };
-      try {
-        zigbee2mqttStatus = await state.httpClient.get('/api/v1/service/zigbee2mqtt/status');
-      } finally {
-        store.setState({
-          gladysConnected: zigbee2mqttStatus.gladysConnected,
-          zigbee2mqttConnected: zigbee2mqttStatus.zigbee2mqttConnected
-        });
-      }
-    },
     updateDeviceField(state, index, field, value) {
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
         [index]: {
@@ -117,7 +98,7 @@ function createActions(store) {
           feature.name = featureName;
         }
       });
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
       const zigbee2mqttDevices = state.zigbee2mqttDevices.filter(d => d.external_id !== savedDevice.external_id);
       store.setState({
         zigbee2mqttDevices

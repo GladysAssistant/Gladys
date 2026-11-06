@@ -1,6 +1,12 @@
 const get = require('get-value');
 
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('./constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  MUSIC_STRING_FEATURE_TYPES,
+  MAX_MUSIC_TEXT_LENGTH,
+  MUSIC_ARTWORK_KEY_REGEX,
+} = require('./constants');
 
 /**
  * @description Get Device param by name.
@@ -92,6 +98,49 @@ function isCameraEnabled(device) {
     return true;
   }
   return enabledFeature.last_value !== 0;
+}
+
+/**
+ * @description Tell if a feature holds a string state because of its category and type: a
+ * `text` feature, or one of the string types of the `music` category (title, artist, album,
+ * artwork — capabilities/music.md, section 1). The core routes these to saveStringState
+ * whatever the shape of the event, so an empty string is a valid "nothing loaded" state.
+ * @param {object} deviceFeature - The device feature.
+ * @returns {boolean} True when the feature's state is a string.
+ * @example
+ * isStringStateFeature({ category: 'music', type: 'title' });
+ */
+function isStringStateFeature(deviceFeature) {
+  if (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT) {
+    return (
+      deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT || deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT
+    );
+  }
+  return (
+    deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MUSIC &&
+    MUSIC_STRING_FEATURE_TYPES.includes(deviceFeature.type)
+  );
+}
+
+/**
+ * @description Bound a string state before it is saved: a music text is truncated at
+ * MAX_MUSIC_TEXT_LENGTH, a music artwork must be an image key (or empty) — null when refused.
+ * Other string features are returned as they are.
+ * @param {object} deviceFeature - The device feature.
+ * @param {string} value - The string state.
+ * @returns {string|null} The bounded state, or null when it must not be saved.
+ * @example
+ * normalizeStringState({ category: 'music', type: 'artwork' }, 'art-3f9a2c');
+ */
+function normalizeStringState(deviceFeature, value) {
+  const stringValue = String(value);
+  if (deviceFeature.category !== DEVICE_FEATURE_CATEGORIES.MUSIC) {
+    return stringValue;
+  }
+  if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.ARTWORK) {
+    return stringValue === '' || MUSIC_ARTWORK_KEY_REGEX.test(stringValue) ? stringValue : null;
+  }
+  return stringValue.substring(0, MAX_MUSIC_TEXT_LENGTH);
 }
 
 /**
@@ -285,6 +334,8 @@ module.exports = {
   setDeviceParam,
   getDeviceFeature,
   isCameraEnabled,
+  isStringStateFeature,
+  normalizeStringState,
   setDeviceFeature,
   hasDeviceChanged,
   mergeFeatures,

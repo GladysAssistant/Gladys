@@ -44,6 +44,7 @@ async function reset() {
 
   // 4. Reset in-memory state
   this.discoveredDevices = {};
+  this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
   this.networkAdapterConfigured = false;
@@ -54,6 +55,11 @@ async function reset() {
   this.zigbee2mqttRunning = false;
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  clearTimeout(this.healthCheckTimer);
+  this.healthCheckTimer = null;
+  clearTimeout(this.startingTimer);
+  this.startingTimer = null;
+  this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;

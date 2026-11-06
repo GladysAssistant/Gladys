@@ -1,4 +1,12 @@
 {
+  "musicMediaTypes": {
+    "track": "Pista",
+    "album": "Álbum",
+    "artist": "Artista",
+    "playlist": "Lista de reproducción",
+    "radio": "Radio",
+    "folder": "Carpeta"
+  },
   "global": {
     "logoAlt": "Logo de Gladys",
     "needHelpText": "¿Necesita ayuda? Únase a nosotros en <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
@@ -83,6 +91,7 @@
       "unitMismatchWarning": "Esta función tiene una unidad diferente a la de la función de origen: los valores se trasladan sin conversión, por lo que los gráficos pueden volverse incoherentes.",
       "unmappedWarning": "Algunas funciones no tienen coincidencia: su historial se eliminará y las escenas y paneles que las utilicen no se actualizarán.",
       "playNotificationWarning": "El dispositivo de destino no puede reproducir notificaciones: las escenas que \"hablan en\" este altavoz se redirigirán al destino y fallarán al ejecutarse. Elija un destino compatible con las notificaciones o modifique esas escenas después de la migración.",
+      "playMediaWarning": "Las escenas que reproducen música (una lista, un álbum, una pista) en este reproductor conservan referencias de medios que pertenecen a su integración: se redirigirán al destino y solo funcionarán si el destino usa el mismo proveedor de música. Revise esas escenas después de la migración.",
       "noDestinationAvailable": "No se encontró ningún dispositivo de otra integración. Cree primero el dispositivo de destino en su nueva integración y luego vuelva aquí para migrar.",
       "loadError": "No se pudo cargar la lista de dispositivos. Inténtelo de nuevo.",
       "migrateError": "La migración falló. El dispositivo antiguo no se eliminó, pero es posible que parte del historial ya se haya trasladado al destino. Revise la página de tareas y su lista de dispositivos, y luego vuelva a intentarlo: al repetir la operación solo se traslada lo que falta por migrar.",
@@ -757,13 +766,45 @@
         "cancelAlarmArming": "Cancelar"
       },
       "music": {
-        "selectDeviceLabel": "Seleccionar dispositivo a controlar"
+        "selectDeviceLabel": "Seleccionar dispositivo a controlar",
+        "nothingPlaying": "Nada en reproducción",
+        "unknownTrack": "Pista desconocida",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "play": "Reproducir",
+        "pause": "Pausa",
+        "shuffle": "Aleatorio",
+        "repeat": "Repetir",
+        "mute": "Silencio",
+        "volume": "Volumen",
+        "queue": "Cola",
+        "browse": "Explorar",
+        "search": "Buscar",
+        "searchPlaceholder": "Canciones, artistas, listas…",
+        "back": "Atrás",
+        "close": "Cerrar",
+        "playItem": "Reproducir",
+        "playNext": "Reproducir a continuación",
+        "addToQueue": "Añadir a la cola",
+        "added": "Añadido a la cola",
+        "playAll": "Reproducir",
+        "pickThis": "Elegir",
+        "live": "En directo",
+        "commandFailed": "El reproductor no pudo ejecutar la orden.",
+        "noResponse": "El reproductor no respondió.",
+        "emptyQueue": "La cola está vacía",
+        "noResults": "Sin resultados",
+        "loading": "Cargando…",
+        "loadMore": "Cargar más",
+        "unavailable": "La integración no está disponible. Se muestra el último estado conocido.",
+        "error": "Algo salió mal."
       },
       "voice-assistant": {
         "speak": "Hablar",
         "stop": "Detener",
+        "send": "Enviar",
         "listening": "Escuchando...",
-        "listeningHint": "Hable ahora. La grabación se detiene cuando guarda silencio.",
+        "listeningHint": "Hable ahora. La grabación se detiene cuando guarda silencio o al pulsar Enviar.",
         "processing": "Procesando...",
         "speaking": "Hablando...",
         "transcriptionLabel": "Usted dijo",
@@ -905,9 +946,32 @@
         "scheduleLabel": "Programación:",
         "scheduleUntil": "hasta",
         "manualUntil": "hasta",
+        "untilTomorrow": "mañana",
+        "untilDays": {
+          "0": "el lunes",
+          "1": "el martes",
+          "2": "el miércoles",
+          "3": "el jueves",
+          "4": "el viernes",
+          "5": "el sábado",
+          "6": "el domingo"
+        },
+        "untilNextDays": {
+          "0": "el próximo lunes",
+          "1": "el próximo martes",
+          "2": "el próximo miércoles",
+          "3": "el próximo jueves",
+          "4": "el próximo viernes",
+          "5": "el próximo sábado",
+          "6": "el próximo domingo"
+        },
         "cancelManual": "Cancelar el modo manual",
         "windowOpen": "Ventana abierta — calefacción suspendida",
         "windowOpenCooling": "Ventana abierta — refrigeración suspendida",
+        "pilotWireHeating": "Calentando",
+        "pilotWireStandby": "En espera: consigna alcanzada",
+        "pilotWireOrderCurrent": "Orden: {{order}}",
+        "pilotWireOrderPending": "Enviando la orden {{order}}…",
         "a11ySetpoint": "Consigna",
         "a11yCurrentTemp": "Temperatura actual",
         "a11yHumidity": "Humedad",
@@ -979,20 +1043,51 @@
       "external": "Comunidad",
       "native": "Nativa",
       "deprecated": "Próximamente obsoleta",
-      "new": "Nueva"
+      "new": "Nueva",
+      "installed": "Instalada"
     },
     "root": {
       "title": "Integraciones",
       "subtitle": "{{length}} de {{total}} integraciones",
       "subtitleTotal": "{{total}} integraciones",
+      "loadingCatalog": "Cargando el catálogo…",
       "searchPlaceholder": "Buscar una integración",
       "noIntegrations": "No se encontró ninguna integración",
+      "showMore": {
+        "one": "Mostrar 1 integración más",
+        "other": "Mostrar más integraciones ({{count}} restantes)"
+      },
+      "storeUnavailable": "No se pudo acceder a la tienda de integraciones de la comunidad: solo se muestran las integraciones nativas y las ya instaladas.",
+      "storeUnavailableRetry": "Reintentar",
       "allIntegrationsUpToDate": "Todas sus integraciones están actualizadas.",
+      "updateButton": "Actualizar",
+      "updateRetryButton": "Reintentar",
+      "updateError": "La actualización ha fallado. Revise los registros de la integración y vuelva a intentarlo.",
+      "updatedTo": "Actualizado a v{{version}}",
       "noInstalledIntegrations": "Aún no hay ninguna integración de la comunidad instalada en esta instancia.",
       "installedSummary": {
         "title": {
           "one": "1 integración de la comunidad instalada en esta instancia.",
           "other": "{{count}} integraciones de la comunidad instaladas en esta instancia."
+        }
+      },
+      "updateAll": {
+        "title": {
+          "one": "1 actualización disponible",
+          "other": "{{count}} actualizaciones disponibles"
+        },
+        "description": "Las integraciones se actualizan una tras otra: cada contenedor se reinicia con su nueva versión.",
+        "button": "Actualizar todo",
+        "progress": "Actualizando {{name}} ({{current}} de {{total}})…",
+        "keepPageOpen": "Mantenga abierto el catálogo de integraciones hasta el final: puede cambiar de vista, pero salir del catálogo detiene las actualizaciones restantes.",
+        "waitCardUpdate": "Se está actualizando una integración desde su tarjeta: «Actualizar todo» estará disponible cuando termine.",
+        "success": {
+          "one": "La integración se ha actualizado.",
+          "other": "Las {{total}} integraciones se han actualizado."
+        },
+        "failed": {
+          "one": "1 de {{total}} actualizaciones ha fallado. Abra la integración para consultar sus registros y volver a intentarlo:",
+          "other": "{{failed}} de {{total}} actualizaciones han fallado. Abra cada integración para consultar sus registros y volver a intentarlo:"
         }
       },
       "noSearchResults": "No se encontró ninguna integración que coincida con \"{{searchKeyword}}\".",
@@ -1011,6 +1106,17 @@
         "description": "Muchos dispositivos pueden conectarse mediante <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocolo universal). Su dispositivo también puede ser compatible con una <b>integración externa</b> de la comunidad: cualquiera puede crear una y publicarla en la tienda, y luego aparecerá en esta lista. Consulte la <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">documentación de integraciones externas</a>."
       },
       "orderDirNewest": "Más recientes primero",
+      "orderDirUpdated": "Última actualización",
+      "clearFilters": "Borrar filtros",
+      "countryFilter": {
+        "scoped": {
+          "one": "País: {{country}}. 1 integración de otro país está oculta.",
+          "other": "País: {{country}}. {{count}} integraciones de otros países están ocultas."
+        },
+        "showAll": "Ver todos los países",
+        "all": "Se muestran todos los países.",
+        "showOnly": "Limitar a {{country}}"
+      },
       "menu": {
         "all": "Todas las integraciones",
         "favorites": "Favoritas",
@@ -1027,11 +1133,14 @@
         "network": "Red y presencia",
         "notifications": "Mensajería y notificaciones",
         "assistants": "Asistentes de voz e IA",
-        "services": "Servicios"
+        "services": "Servicios",
+        "transport": "Transporte y movilidad",
+        "vehicles": "Vehículos y recarga",
+        "servers": "Servidores y autoalojamiento",
+        "leisure": "Ocio, deporte y juegos"
       }
     },
     "externalIntegration": {
-      "updateAvailable": "Actualización disponible",
       "deviceTab": "Dispositivos",
       "discoverTab": "Descubrir",
       "configTab": "Configuración",
@@ -1053,7 +1162,18 @@
         "openRawLink": "Abrir en una pestaña nueva"
       },
       "config": {
+        "aiProviderActive": "Esta integración es el proveedor de IA del asistente: las conversaciones con el asistente se le envían.",
+        "aiProviderInactive": "Esta integración está instalada pero el asistente aún no la utiliza: selecciónela como proveedor de IA de la instancia para que el chat, las acciones «Preguntar a la IA» de las escenas y el resumen semanal pasen por ella en lugar de Gladys Plus.",
+        "aiProviderUseButton": "Usar como proveedor de IA",
+        "aiProviderSettingsLink": "Abrir los ajustes de la IA",
+        "aiProviderError": "No se pudo cambiar el proveedor de IA de la instancia. Inténtelo de nuevo.",
+        "aiProviderLoadError": "No se pudo leer el proveedor de IA de la instancia.",
+        "aiProviderChecking": "Comprobando si esta integración es el proveedor de IA del asistente…",
         "title": "Configuración",
+        "ttsVoiceActive": "Esta integración es la voz de su instancia: los anuncios de las escenas y las respuestas del asistente de voz pasan por ella.",
+        "ttsVoiceActiveNotRunning": "Esta integración es la voz de su instancia, pero no está en ejecución: los anuncios de las escenas y las respuestas del asistente de voz fallarán hasta que se reinicie.",
+        "ttsVoiceInactive": "Esta integración no es la voz de su instancia (la voz activa es \"{{name}}\"). Instalarla no basta: selecciónela como voz para usarla.",
+        "ttsVoiceChangeLink": "Cambiar la voz de la instancia",
         "docsLink": "Documentación",
         "loadError": "Ocurrió un error al cargar la configuración.",
         "noConfig": "Esta integración no tiene opciones de configuración.",
@@ -1132,6 +1252,9 @@
         "uninstallWarning": "¿Está seguro de que desea desinstalar esta integración? Se eliminarán su contenedor y su configuración. Los dispositivos creados por esta integración permanecerán en Gladys hasta que usted los elimine.",
         "uninstallCalendarWarning": "¿Está seguro de que desea desinstalar esta integración? Se eliminarán su contenedor y su configuración, y los calendarios que creó se eliminarán con sus eventos para todos los usuarios del hogar, no solo los suyos.",
         "uninstallEnergyWarning": "Esta integración calcula por sí misma el coste de contratos de energía: los contratos que tarifica dejarán de calcularse una vez desinstalada (sus costes existentes se conservan).",
+        "uninstallAiProviderWarning": "Esta integración es el proveedor de IA del asistente: una vez desinstalada, el asistente vuelve a Gladys Plus (o deja de responder hasta que haya un proveedor disponible, sin Gladys Plus).",
+        "uninstallAiProviderUnknownWarning": "Gladys no pudo comprobar si esta integración es el proveedor de IA del asistente: si lo es, el asistente vuelve a Gladys Plus una vez desinstalada (o deja de responder hasta que haya un proveedor disponible, sin Gladys Plus).",
+        "uninstallAiProviderCheckingWarning": "Comprobando si esta integración es el proveedor de IA del asistente…",
         "confirmUninstallButton": "Sí, desinstalar",
         "cancelUninstallButton": "Cancelar",
         "startedAtLabel": "En ejecución desde"
@@ -1217,6 +1340,7 @@
       },
       "install": {
         "notFound": "Esta integración no se encontró en la tienda.",
+        "loadError": "No se pudo cargar esta integración desde la tienda. Compruebe la conexión a internet de su Gladys e inténtelo de nuevo.",
         "starsLabel": "estrellas",
         "lastPushLabel": "Última actualización:",
         "warningTitle": "Integración de la comunidad",
@@ -1241,6 +1365,8 @@
         "notificationWarningText": "Esta integración es un canal de notificación: podrá enviarle mensajes, pero nunca podrá recibir mensajes ni actuar en su nombre (garantía del lado del servidor).",
         "weatherInfoText": "Esta integración es un proveedor meteorológico: una vez instalada, proporcionará el clima que se muestra en Gladys (widget del panel y asistente).",
         "calendarInfoText": "Esta integración es un proveedor de calendarios: una vez instalada, creará calendarios y eventos en Gladys para los usuarios que la activen con su propia cuenta.",
+        "ttsInfoText": "Esta integración es un proveedor de síntesis de voz: una vez instalada, selecciónela como la voz de su instancia en la integración Inteligencia Artificial. Los anuncios se sirven en su red local: los altavoces y navegadores de la misma red pueden reproducirlos.",
+        "ttsInfoLink": "Abrir la integración Inteligencia Artificial",
         "widgetsTitle": "Widgets del panel",
         "widgetsText": "Esta integración proporciona los siguientes widgets, disponibles para todos los usuarios en el editor del panel:",
         "energyContractsTitle": "Contratos de energía",
@@ -1250,6 +1376,7 @@
         "energyContractsDelegatedText": "Una plantilla calculada por la integración calcula por sí misma sus costes de energía: los costes de estos contratos solo se calculan mientras la integración está en funcionamiento, y dejan de calcularse si se desinstala.",
         "providerInfoText": "Esta integración no gestiona ningún dispositivo: proporciona widgets para el panel. Configúrela aquí y luego añada sus widgets desde el editor del panel.",
         "providerEnergyInfoText": "Esta integración no gestiona ningún dispositivo: proporciona plantillas de contratos de energía y calendarios tarifarios. Configúrela aquí y luego elija sus contratos desde la página de seguimiento energético.",
+        "aiWarningText": "Esta integración es un proveedor de IA: si un administrador la selecciona como proveedor de IA de la instancia (Integraciones → Inteligencia artificial → Proveedor de IA, o el botón de la pantalla de configuración de esta integración), recibirá todas las conversaciones con el asistente (mensajes, historial, estados de los dispositivos devueltos por las herramientas, imágenes del chat), y sus respuestas dirigirán las acciones del asistente en su hogar.",
         "sceneDeclarationsTitle": "Activadores y acciones de escenas",
         "sceneDeclarationsText": "Esta integración añade {{triggers}} activador(es) y {{actions}} acción(es) al editor de escenas.",
         "sceneTriggerPrefix": "Activador:",
@@ -1652,6 +1779,8 @@
       "status": {
         "notConfigured": "El adaptador USB de Zigbee2mqtt no está configurado; vaya a ",
         "notEnabled": "Zigbee2mqtt no está activado; vaya a ",
+        "notRunning": "Zigbee2mqtt no responde: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
+        "mqttNotConnected": "Gladys no está conectada al broker MQTT: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "settingsPageLink": "la página de configuración del adaptador USB",
         "setupPageLink": "la página de configuración de Zigbee2mqtt"
       },
@@ -1670,8 +1799,12 @@
             "adapterModeNetworkLabel": "Coordinador de red (Ethernet/Wi-Fi)",
             "usbDriverPathLabel": "Seleccione el puerto USB en el que está conectado el adaptador Zigbee",
             "usbDriverPathPlaceholder": "Puerto USB",
+            "usbDriverPathShowAll": "Mostrar los demás puertos serie (HAT GPIO, puertos de la máquina)",
             "usbDongleNameLabel": "Seleccione el modelo del adaptador Zigbee utilizado",
             "usbDongleNamePlaceholder": "Modelo del adaptador Zigbee",
+            "usbDongleNameDetected": "Modelo reconocido a partir del adaptador conectado a este puerto.",
+            "usbDongleNameNotDetected": "No se ha reconocido ningún adaptador en este puerto: seleccione su modelo en la lista.",
+            "usbDongleNameMismatch": "El adaptador conectado a este puerto se ha reconocido como {{model}}: compruebe el modelo seleccionado.",
             "networkAdapterUrlLabel": "Introduzca la dirección del coordinador de red",
             "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
             "networkAdapterUrlDescription": "Dirección IP (o nombre de host) y puerto TCP del coordinador, por ejemplo tcp://192.168.1.20:6638. El prefijo \"tcp://\" es opcional.",
@@ -1733,6 +1866,9 @@
           "unknownErrorPrefix": "Error de conexión MQTT: "
         },
         "serviceStatus": "Estado del servicio",
+        "zigbee2mqttStarting": "Zigbee2mqtt se está iniciando: se pondrá en verde en cuanto responda a Gladys.",
+        "zigbee2mqttNotStarting": "Zigbee2mqtt no consigue iniciarse: vea el error de arriba.",
+        "zigbee2mqttNotResponding": "Zigbee2mqtt no responde a Gladys.",
         "description": "Este servicio utiliza dos contenedores Docker (broker MQTT y Zigbee2mqtt). Active Zigbee2mqtt para desplegar estos contenedores. Para más información, visite la página de documentación de Zigbee2mqtt.",
         "nonDockerEnv": "Gladys no se está ejecutando actualmente en Docker; es imposible activar Zigbee2mqtt desde Gladys.",
         "invalidDockerNetwork": "Gladys se basa en una instalación personalizada; para instalar Zigbee2mqtt desde esta página, el contenedor Docker de Gladys debe iniciarse con la opción \"network=host\".",
@@ -1924,6 +2060,7 @@
         "usagePointName": "Contador",
         "lastRefresh": "Últimos datos:",
         "usagePointId": "ID del contador",
+        "usagePointDeviceName": "Nombre",
         "contractType": "Tipo de contrato",
         "contracts": {
           "hc-hp": "Horas valle/horas punta",
@@ -3283,6 +3420,7 @@
       "documentation": "Documentación de IA",
       "description": "Otorgue a Gladys el poder de la inteligencia artificial.",
       "firstExplanation": "Gladys puede utilizar la inteligencia artificial (modelos de IA de pesos abiertos a través de Gladys Plus) para ayudarle a comunicarse con su hogar conectado.",
+      "firstExplanationExternalProvider": "Gladys utiliza la inteligencia artificial para ayudarle a comunicarse con su hogar conectado. En esta instancia, el asistente pasa por la integración de proveedor de IA «{{name}}» seleccionada por un administrador, en lugar de Gladys Plus: las conversaciones con el asistente se le envían.",
       "examplesIntro": "Esto es lo que puede hacer con la IA:",
       "examplesChatTitle": "En el chat de Gladys",
       "examplesChatHint": "Acciones disponibles: luces e interruptores por habitación, cámaras, escenas, temperatura, humedad y el clima.",
@@ -3314,6 +3452,20 @@
         "downloadButton": "Descargar contexto JSON para depuración",
         "error": "No se pudo generar el contexto de depuración. Asegúrese de que el servicio MCP esté en ejecución."
       },
+      "aiProvider": {
+        "activeNotice": "El asistente utiliza actualmente el proveedor de IA «{{name}}»: las conversaciones con el asistente se le envían.",
+        "title": "Proveedor de IA",
+        "description": "Gladys utiliza Gladys Plus como proveedor de IA por defecto. Puede hacer pasar el asistente (chat, enrutamiento de intenciones, acciones «Preguntar a la IA» de las escenas, resumen semanal) por una integración de proveedor de IA instalada: Claude, DeepSeek, OpenAI, un modelo local... Los ajustes propios del proveedor (clave de API, modelo) están en la página de su integración.",
+        "selectLabel": "Proveedor utilizado para las solicitudes de IA",
+        "gladysPlusOption": "Gladys Plus (por defecto)",
+        "trustWarning": "Todas las conversaciones con el asistente (mensajes, historial, estados de los dispositivos devueltos por las herramientas, imágenes del chat) se envían a este proveedor, y sus respuestas dirigen las acciones del asistente en su hogar. Si el proveedor no está disponible, las solicitudes de IA fallan: nunca se redirigen a Gladys Plus.",
+        "noProvider": "No hay ninguna integración de proveedor de IA instalada. Instale una desde el catálogo de integraciones para usar otro proveedor distinto de Gladys Plus.",
+        "loadError": "No se pudieron cargar los ajustes del proveedor de IA.",
+        "retry": "Reintentar",
+        "saveError": "No se pudo guardar el proveedor de IA. Inténtelo de nuevo.",
+        "providerNotRunning": "Esta integración de proveedor de IA no está en ejecución: las solicitudes de IA fallarán hasta que se inicie.",
+        "providerNotRunningLink": "Abrir la página de la integración"
+      },
       "weeklyDigest": {
         "title": "Resumen semanal del hogar",
         "description": "Gladys le envía un resumen semanal de su hogar conectado: confort, energía, mantenimiento y consejos útiles.",
@@ -3333,7 +3485,19 @@
       },
       "rateLimit": "Dado que la API de IA no es gratuita, esta integración está limitada a 3000 solicitudes de texto y 500 solicitudes de imagen al mes por cuenta.",
       "notOnGladysPlus": "Dado que la API de IA no es gratuita, esta integración solo está disponible para los usuarios de Gladys Plus.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus.",
+      "ttsProvider": "Voz (proveedor de síntesis de voz)",
+      "ttsProviderText": "El proveedor utilizado para hablar: los anuncios de las escenas en sus altavoces y las respuestas del asistente de voz. Gladys Plus funciona en todas partes (incluido el acceso remoto); una integración de proveedor TTS genera la voz localmente y la sirve en su red local.",
+      "ttsProviderSelectLabel": "Proveedor utilizado para hablar",
+      "ttsProviderPlusNotConnected": "Gladys Plus no está conectado: los anuncios y las respuestas de voz no se reproducirán.",
+      "ttsProviderPlusSettingsLink": "Conectar Gladys Plus",
+      "ttsProviderPlusNotConnectedOr": "o instale una integración de síntesis de voz y selecciónela aquí:",
+      "ttsProviderNotRunning": "\"{{name}}\" no está en ejecución: los anuncios y las respuestas de voz fallarán hasta que se reinicie.",
+      "ttsProviderUnavailable": "El proveedor seleccionado \"{{provider}}\" ya no está disponible: seleccione otra voz.",
+      "ttsProviderUnavailableOption": "{{provider}} (ya no disponible)",
+      "ttsProviderInstallHint": "Solo Gladys Plus está disponible. Una integración de síntesis de voz del catálogo puede generar la voz localmente, sin suscripción.",
+      "ttsProviderOpenIntegration": "Abrir la integración",
+      "ttsProviderBrowseCatalog": "Explorar las integraciones de asistentes de voz"
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -3486,6 +3650,8 @@
         "activeScheduleLabel": "Programación activa",
         "noSchedule": "Sin programación",
         "setpointLabel": "Consigna",
+        "regulationLabel": "Regulación",
+        "heaterRegulates": "Por el radiador",
         "noSetpoint": "—",
         "saveButton": "Guardar",
         "editButton": "Editar",
@@ -3503,22 +3669,29 @@
         "nameLabel": "Nombre",
         "namePlaceholder": "ej. Termostato del salón",
         "roomLabel": "Habitación",
+        "showAllRoomsLabel": "Mostrar los dispositivos de todas las habitaciones",
+        "showAllRoomsHelp": "Las listas de abajo solo ofrecen los dispositivos de esta habitación. Amplíalas cuando la zona calefactada abarca varias habitaciones, como un salón y una cocina abiertos.",
         "modeLabel": "Uso",
         "typeLabel": "Tipo de termostato",
         "tuningSection": "Ajuste fino",
         "typeVirtual": "Termostato virtual (Gladys regula)",
         "typeExternal": "Termostato real (el aparato regula por sí mismo)",
+        "typePilotWire": "Radiador con hilo piloto (el radiador regula por sí mismo)",
         "vendorProgrammeWarning": "Desactiva el programa del fabricante en este aparato (aplicación Netatmo, Tado…) antes de controlarlo desde Gladys. Si no, el programa del aparato y el de Gladys escriben la consigna por turnos, y el termostato sigue al que haya escrito el último.",
         "typeHelp": {
-          "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) para alcanzar la consigna.",
-          "external": "El termostato gestiona su propia regulación y su propio calefactor. Gladys solo escribe la consigna que resuelve su programación y muestra el estado del dispositivo."
+          "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) o un radiador con hilo piloto para alcanzar la consigna.",
+          "external": "El termostato gestiona su propia regulación y su propio calefactor. Gladys solo escribe la consigna que resuelve su programación y muestra el estado del dispositivo.",
+          "pilotWire": "El radiador regula con su propio termostato. Gladys solo le envía la orden de cada preajuste (eco, confort, antihielo…) por el hilo piloto."
         },
         "targetFeatureLabel": "Consigna del termostato real",
         "targetFeatureHelp": "La función en la que Gladys escribe la temperatura de consigna. Algunos dispositivos exponen varias (calefacción/refrigeración, ocupado/desocupado): elige la que realmente controla tu calefacción.",
-        "stateFeatureLabel": "Estado de calefacción (opcional)",
+        "stateFeatureLabel": "Estado de funcionamiento (opcional)",
         "stateFeatureHelp": "Se usa para mostrar si el dispositivo está funcionando. Se acepta como estado de funcionamiento o como contacto de caldera. Déjalo vacío si tu termostato no lo informa.",
         "modeFeatureLabel": "Modo de funcionamiento (opcional)",
-        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno. Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
+        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno — el modo de un aire acondicionado también sirve. En un termostato, Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo. El modo de un aire acondicionado no tiene Apagado: se detiene mediante su Alimentación, que entonces hay que indicar.",
+        "powerFeatureLabel": "Alimentación (opcional)",
+        "powerFeatureHelp": "El interruptor que enciende y apaga el dispositivo real, como la alimentación de un aire acondicionado o de una bomba de calor. Gladys lo apaga cuando el termostato se detiene, se abre una ventana o se aplica un tramo Apagado, y lo vuelve a encender en cuanto una consigna toma el relevo. Necesario para un aire acondicionado, cuyo modo no tiene apagado.",
+        "powerFeatureNeeded": "El modo de un aire acondicionado no tiene apagado: elige aquí su alimentación, o Gladys no podrá apagarlo cuando se abra una ventana, se aplique una franja Apagado o se detenga el termostato.",
         "mode": {
           "heating": "Calefacción",
           "cooling": "Refrigeración"
@@ -3540,8 +3713,9 @@
         "minTempPlaceholder": "ej. 5",
         "maxTempLabel": "Temp. máx.",
         "maxTempPlaceholder": "ej. 35",
-        "temperatureFeatureLabel": "Sensor de temperatura",
-        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "temperatureFeatureLabel": "Sensores de temperatura",
+        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente, o varios: el termostato usa entonces su media. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
+        "addTemperatureFeature": "Añadir un sensor de temperatura",
         "humidityFeatureLabel": "Sensor de humedad",
         "humidityFeatureHelp": "Opcional. Se muestra en el widget del termostato.",
         "switchFeatureLabel": "Interruptor (actuador)",
@@ -3549,11 +3723,30 @@
           "heating": "El interruptor que se encenderá y apagará para calentar la habitación.",
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
         },
-        "windowFeatureLabel": "Sensor de apertura de ventana",
-        "windowFeatureHelp": {
-          "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",
-          "cooling": "Opcional. Si una ventana está abierta, la refrigeración se corta automáticamente."
+        "noSwitchHint": {
+          "heating": "No hay ningún interruptor para elegir. Muestra arriba los dispositivos de todas las habitaciones o, para un termostato o una bomba de calor que se regula sola, elige el tipo «Termostato real».",
+          "cooling": "No hay ningún interruptor para elegir. Un aire acondicionado se regula solo: elige el tipo «Termostato real» y luego su consigna. Un ventilador o un climatizador en un enchufe puede seguir siendo un termostato virtual."
         },
+        "pilotWireFeatureLabel": "Hilo piloto (actuador)",
+        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado…) en lugar de cortar su alimentación. Desactive primero el programa propio del módulo.",
+        "pilotWireProgrammeWarning": "Desactive el programa o el modo termostato propio del módulo (programación de Heatzy, programa de Tuya…) antes de controlarlo desde Gladys. Si no, cada orden que escribe ese programa se toma por un cambio hecho en el módulo, y el módulo y Gladys escriben la orden por turnos.",
+        "pilotWireRegulationHelp": {
+          "heater": "Cada preajuste envía la orden elegida en la tabla de preajustes (eco → eco, ausencia → antihielo…). El sensor de ambiente, si lo hay, solo sirve para mostrar la temperatura.",
+          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar, antihielo una vez alcanzada la consigna del preajuste. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
+        },
+        "windowFeatureLabel": "Sensores de apertura de ventana",
+        "windowFeatureHelp": {
+          "heating": "Opcional. En cuanto una de las ventanas seleccionadas permanece abierta más tiempo que el retardo de abajo, la calefacción se corta automáticamente.",
+          "cooling": "Opcional. En cuanto una de las ventanas seleccionadas permanece abierta más tiempo que el retardo de abajo, la refrigeración se corta automáticamente."
+        },
+        "windowDelayLabel": "Retardo antes del corte",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "Tiempo que la ventana debe permanecer abierta antes de cortar la calefacción. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo.",
+          "cooling": "Tiempo que la ventana debe permanecer abierta antes de cortar la refrigeración. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato; 3600 s (una hora) como máximo."
+        },
+        "addWindowFeature": "Añadir un sensor de apertura",
+        "removeFeature": "Quitar",
         "hysteresisStartLabel": "Umbral de arranque",
         "hysteresisStartHelp": {
           "heating": "La calefacción se enciende cuando la temperatura está por debajo de (consigna − umbral de arranque). Ej. consigna 21 °C, umbral 0,5 °C → se enciende por debajo de 20,5 °C.",
@@ -3571,6 +3764,7 @@
         "presetsLabel": "Preajustes de temperatura",
         "presetColNameLabel": "Preajuste",
         "presetColTempLabel": "Consigna",
+        "presetColOrderLabel": "Orden enviada",
         "preset": {
           "off": "Apagado",
           "frost": "Antihielo",
@@ -3582,8 +3776,9 @@
         "saveButton": "Guardar",
         "cancelButton": "Cancelar",
         "saveError": "Error al guardar.",
-        "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un conmutador: regula leyendo uno y accionando el otro.",
+        "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un actuador (conmutador o hilo piloto): regula leyendo uno y accionando el otro.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
+        "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",
         "noActiveSchedule": "Sin programación (control manual)",
@@ -3596,7 +3791,10 @@
         "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual.",
         "modeHelp": "Lo que controla este termostato: calefacción o climatización.",
         "sectionDevice": "Dispositivo",
-        "sectionHeating": "Calefacción",
+        "section": {
+          "heating": "Calefacción",
+          "cooling": "Refrigeración"
+        },
         "sectionProgramming": "Programación",
         "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Usar estos valores",
@@ -3678,7 +3876,8 @@
         "noSearchResult": "Ninguna programación coincide con esta búsqueda.",
         "editorTitleEdit": "Modificar la programación",
         "editorTitleNew": "Nueva programación",
-        "sameTimeError": "La hora de fin debe ser distinta de la de inicio: un intervalo que termina a su hora de inicio cubriría 24 h.",
+        "sameTimeError": "La hora de fin debe ser distinta de la de inicio: un intervalo que termina a su hora de inicio cubriría 24 h. Para el día completo, marque «Todo el día».",
+        "allDay": "Todo el día",
         "startLabel": "Inicio",
         "endLabel": "Fin",
         "confirmSlotButton": "Añadir",
@@ -3756,6 +3955,7 @@
       },
       "askAi": {
         "description": "Esta acción enviará un mensaje a la IA a través de Gladys Plus y le responderá con un mensaje. Si adjunta una imagen de cámara, la IA podrá ver lo que aparece en la imagen e incluso actuar en consecuencia.",
+        "descriptionExternalProvider": "Esta acción enviará un mensaje al proveedor de IA «{{name}}» seleccionado en los ajustes de la IA y le responderá con un mensaje. Si adjunta una imagen de cámara, la IA podrá ver lo que aparece en la imagen e incluso actuar en consecuencia.",
         "userLabel": "Gladys responderá a",
         "cameraLabel": "Adjuntar una imagen de cámara (opcional)",
         "textLabel": "Mi pregunta para la IA",
@@ -3983,6 +4183,11 @@
         "houseLabel": "Vivienda",
         "alarmModeLabel": "Modo de alarma"
       },
+      "thermostatSetSchedule": {
+        "description": "Esta acción hace que los termostatos seleccionados sigan otro horario, por ejemplo para pasar del horario habitual al de las vacaciones escolares. El termostato sigue el horario de inmediato: se cancela una consigna manual en curso, pero un termostato apagado a mano sigue apagado.",
+        "scheduleLabel": "Horario",
+        "thermostatsLabel": "Termostatos"
+      },
       "alarmSetMode": {
         "description": "Esta acción establecerá la vivienda seleccionada en el modo de alarma seleccionado.",
         "houseLabel": "Vivienda",
@@ -4003,8 +4208,22 @@
         "variablesExplanation": "Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta.",
         "messagePlaceholder": "Mi mensaje"
       },
+      "playMedia": {
+        "description": "Esta acción iniciará el contenido seleccionado en el reproductor elegido.",
+        "deviceLabel": "Reproductor",
+        "mediaLabel": "Contenido a reproducir",
+        "selectedMedia": "Selección",
+        "changeMedia": "Cambiar",
+        "noMedia": "Aún no hay contenido seleccionado: explore o busque en el catálogo del reproductor.",
+        "unsupported": "Este reproductor no ofrece catálogo: elija otro reproductor.",
+        "modeLabel": "Modo",
+        "modeReplace": "Reproducir ahora (sustituye la reproducción actual)",
+        "modeNext": "Reproducir a continuación",
+        "modeAppend": "Añadir al final de la cola"
+      },
       "playNotification": {
         "description": "Esta acción hará que Gladys hable en el altavoz seleccionado.",
+        "voiceSettingLink": "Elegir la voz de su instancia (integración Inteligencia Artificial)",
         "deviceLabel": "Altavoz",
         "volumeLabel": "Volumen",
         "valueTypeSimple": "Simple",
@@ -4029,6 +4248,13 @@
           "inferior": "menor que",
           "inferiorOrEqual": "menor o igual que"
         }
+      },
+      "inTimeRange": {
+        "label": "Continuar solo si",
+        "inRange": "Estamos dentro de una franja horaria",
+        "outOfRange": "Estamos fuera de las franjas horarias",
+        "description": "Esta condición usa las franjas horarias del disparador «Franjas horarias» de la escena. Colócala en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final, con una sola escena.",
+        "noTrigger": "Esta escena no tiene un disparador programado «franjas horarias»: esta condición la detendrá cada vez."
       }
     },
     "actions": {
@@ -4070,7 +4296,8 @@
         "only-continue-if": "Condición sobre variables",
         "check-time": "Condición de hora",
         "if-then-else": "Condición: Si...entonces...si no...",
-        "while": "Bucle: Mientras... repetir..."
+        "while": "Bucle: Mientras... repetir...",
+        "in-time-range": "Planificación horaria"
       },
       "user": {
         "set-seen-at-home": "Usuario visto en casa",
@@ -4094,6 +4321,9 @@
         "check-alarm-mode": "Si la alarma está en el modo",
         "set-alarm-mode": "Establecer el modo de alarma a"
       },
+      "thermostat": {
+        "set-schedule": "Cambiar el horario de los termostatos"
+      },
       "mqtt": {
         "send": "Enviar mensaje MQTT"
       },
@@ -4101,7 +4331,8 @@
         "send": "Enviar mensaje Zigbee2mqtt"
       },
       "music": {
-        "play-notification": "Hablar en un altavoz"
+        "play-notification": "Hablar en un altavoz",
+        "play-media": "Reproducir música en un altavoz"
       },
       "ai": {
         "ask": "Preguntar a la IA"
@@ -4143,13 +4374,15 @@
         "send": "Enviar un mensaje de texto a un teléfono"
       },
       "music": {
-        "play-notification": "Leer un texto en voz alta en un altavoz"
+        "play-notification": "Leer un texto en voz alta en un altavoz",
+        "play-media": "Iniciar una pista, un álbum, una lista o una radio en un altavoz"
       },
       "condition": {
         "if-then-else": "Seguir una ruta diferente según una condición",
         "only-continue-if": "Detener la escena aquí si no se cumple la condición",
         "while": "Repetir acciones mientras una condición sea verdadera",
-        "check-time": "Continuar solo en determinados horarios o días"
+        "check-time": "Continuar solo en determinados horarios o días",
+        "in-time-range": "Continuar solo si estamos dentro de una de las franjas horarias del disparador"
       },
       "user": {
         "check-presence": "Marcar a un usuario como ausente si no se le ha visto recientemente",
@@ -4180,6 +4413,9 @@
       },
       "http": {
         "request": "Llamar a una API o servicio externo"
+      },
+      "thermostat": {
+        "set-schedule": "Hacer que los termostatos sigan otro horario semanal"
       },
       "mqtt": {
         "send": "Publicar un mensaje en el broker MQTT"
@@ -4404,7 +4640,32 @@
           "saturday": "Sábado",
           "sunday": "Domingo"
         },
-        "house": "Vivienda"
+        "house": "Vivienda",
+        "timeRange": "Franjas horarias",
+        "timeRangesLabel": "Franjas horarias",
+        "noTimeRange": "Todavía no hay ninguna franja horaria. Añade una para definir la planificación.",
+        "addRange": "Añadir una franja",
+        "deleteRange": "Eliminar la franja",
+        "rangeStart": "Inicio",
+        "rangeEnd": "Fin",
+        "rangeDuration": "Duración",
+        "rangeDays": "Días",
+        "overnight": "+1d",
+        "emptyRange": "Franja no válida",
+        "resumeOnStartup": "Reevaluar al iniciar Gladys",
+        "timeRangesHelp": "La escena se ejecuta al inicio y al final de cada franja. Usa la acción «Planificación horaria» en un bloque «Si… Entonces… Si no» para encender un dispositivo al inicio de una franja y apagarlo al final. Si «Reevaluar al iniciar Gladys» está marcado, la escena también se ejecuta al arrancar con el estado real de la planificación, para que tus dispositivos vuelvan al estado correcto tras un corte.",
+        "daysOfTheWeekShort": {
+          "monday": "LU",
+          "tuesday": "MA",
+          "wednesday": "MI",
+          "thursday": "JU",
+          "friday": "VI",
+          "saturday": "SÁ",
+          "sunday": "DO"
+        },
+        "lastDayLocked": "Debe quedar al menos un día seleccionado.",
+        "invalidRangesError": "Complete o elimine las franjas horarias de la escena: cada una necesita un inicio y un fin, que no pueden ser a la misma hora.",
+        "noRangeError": "Añada al menos una franja horaria al disparador «Franjas horarias», o elimine el disparador."
       },
       "warning": {
         "houseWithoutCoordinate": "Su vivienda no tiene coordenadas. Este activador no puede funcionar sin estos datos. Vaya a Configuración / Viviendas y haga clic en el mapa para establecer las coordenadas de la vivienda."
@@ -4541,6 +4802,7 @@
     "userRole": "Usuario",
     "adminRole": "Administrador",
     "roleDescription": "Un administrador tiene todos los derechos en la instancia de Gladys. Un usuario solo puede editar su panel, hablar con Gladys, ver sus calendarios y el mapa. No puede crear escenas, editar preferencias ni modificar la configuración de una integración.",
+    "ownRoleLocked": "No puede cambiar su propio rol. Otro administrador puede hacerlo por usted.",
     "invitationPending": "Pendiente",
     "invitationSuccess": "Aceptada",
     "firstnameLabel": "Nombre",
@@ -4599,7 +4861,6 @@
     "backupTab": "Copias de seguridad",
     "serviceTab": "Servicios",
     "billingTab": "Facturación",
-    "gatewayUsersTab": "Usuarios Plus",
     "gatewayOpenApiTab": "Open API",
     "jobsTab": "Tareas",
     "scrollLeft": "Desplazar el menú a la izquierda",
@@ -4645,6 +4906,117 @@
   },
   "usersSettings": {
     "title": "Usuarios",
+    "subtitle": "Las personas que pueden iniciar sesión en esta instancia de Gladys.",
+    "subtitlePlus": "Las personas que pueden iniciar sesión en esta instancia de Gladys, y su acceso remoto a través de Gladys Plus.",
+    "userCount": "{{count}} usuarios",
+    "oneUserCount": "1 usuario",
+    "you": "usted",
+    "roles": {
+      "admin": "Administrador",
+      "user": "Usuario"
+    },
+    "deleteUserError": "No se pudo eliminar este usuario.",
+    "plus": {
+      "title": "Acceso remoto con Gladys Plus",
+      "description": "Para controlar Gladys desde fuera de casa, una persona necesita una cuenta de Gladys Plus vinculada a su usuario de Gladys, y usted debe autorizar sus claves de cifrado aquí, en su hogar. Todo ocurre en esta página: invitar, seguir, autorizar.",
+      "whyTitle": "¿Por qué tengo que autorizar claves?",
+      "whyText": "Cada usuario de Gladys Plus tiene sus propias claves de cifrado. Al autorizar a un usuario, usted valida localmente, en su instancia, que sus claves son aceptadas: esta validación local es lo que protege su hogar contra ataques de intermediario (man-in-the-middle). <b>Nadie, ni siquiera los servidores de Gladys Plus, puede conceder acceso a su instancia sin esta validación realizada en su hogar.</b>",
+      "whyKeysChangedText": "Las claves de un usuario cambian cuando restablece su contraseña de Gladys Plus: su acceso se revoca entonces automáticamente por seguridad y aparece como \"Claves modificadas\". Compruebe con él que las nuevas huellas coinciden con las mostradas en su página de Gladys Plus y vuelva a autorizarlo.",
+      "statAuthorized": "Autorizados",
+      "statActionNeeded": "Por autorizar",
+      "statInvited": "Invitados",
+      "actionNeededOne": "1 persona está esperando su autorización: compruebe las huellas de sus claves abajo y active su interruptor.",
+      "actionNeededMany": "{{count}} personas están esperando su autorización: compruebe las huellas de sus claves abajo y active sus interruptores.",
+      "notConnected": "Su instancia de Gladys no está conectada a Gladys Plus en este momento: no se puede mostrar el acceso remoto. Compruebe su conexión a internet y recargue esta página.",
+      "loadError": "No se pudieron cargar los usuarios de su cuenta de Gladys Plus. Compruebe su conexión a internet y recargue esta página.",
+      "sectionLabel": "Acceso remoto · Gladys Plus",
+      "status": {
+        "authorized": "Autorizado",
+        "pending": "Esperando su autorización",
+        "keys_changed": "Claves modificadas",
+        "linked": "Vinculado",
+        "not_linked": "Aún no vinculado",
+        "invited": "Invitación enviada",
+        "none": "Sin acceso remoto"
+      },
+      "statusText": {
+        "authorized": "Puede controlar esta instancia de Gladys desde cualquier lugar, a través de Gladys Plus.",
+        "pending": "Su cuenta de Gladys Plus está lista. Compruebe que las huellas de claves de abajo coinciden con las mostradas en su página de Gladys Plus y active el interruptor para autorizarlo.",
+        "keys_changed": "Sus claves de cifrado cambiaron desde que lo autorizó: su acceso fue revocado por seguridad. Compruebe las nuevas huellas de abajo y vuelva a autorizarlo.",
+        "linked": "Vinculado a este usuario de Gladys. Sus claves de cifrado aparecerán aquí cuando su cuenta de Gladys Plus se haya conectado a esta instancia; un administrador de esta instancia las autorizará entonces.",
+        "not_linked": "Tiene una cuenta de Gladys Plus que aún no está asociada a un usuario de Gladys: vincúlela aquí, o deje que elija su usuario en su próximo inicio de sesión en Gladys Plus.",
+        "invited": "Invitación enviada el {{date}}. Cuando haya creado su cuenta de Gladys Plus, quedará vinculada a este usuario y usted autorizará sus claves aquí.",
+        "none": "Sin cuenta de Gladys Plus: este usuario solo puede usar Gladys desde casa."
+      },
+      "statusUnavailable": "El acceso remoto no se puede comprobar mientras su instancia no esté conectada a Gladys Plus.",
+      "memberSince": "En Gladys Plus desde el {{date}}",
+      "online": "Conectado ahora mismo",
+      "plusRole": {
+        "admin": "Administrador de Gladys Plus",
+        "user": "Usuario de Gladys Plus"
+      },
+      "unknownName": "Usuario de Gladys Plus",
+      "authorizeSwitchLabel": "Autorizado",
+      "fingerprintsSummary": "Huellas de las claves de cifrado",
+      "fingerprintsHint": "Compárelas con las mostradas en la página de Gladys Plus del usuario (Ajustes → Gladys Plus) antes de autorizar.",
+      "rsaKey": "RSA",
+      "ecdsaKey": "ECDSA",
+      "keysChangedNote": "Esto ocurre tras un <b>restablecimiento de la contraseña de Gladys Plus</b>: se generan nuevas claves y su instancia las rechaza hasta que usted mismo las valide.",
+      "inviteThisUser": "Invitar a Gladys Plus",
+      "inviteFromPlus": "Invitar desde Gladys Plus",
+      "revokeButton": "Quitar de Gladys Plus",
+      "cancelInvitationButton": "Cancelar invitación",
+      "confirmRevokeText": "Perderá su acceso remoto y será eliminado de su cuenta de Gladys Plus. Su usuario de Gladys y sus datos se conservan.",
+      "confirmCancelInvitationText": "El enlace de invitación que recibió dejará de funcionar.",
+      "confirmRevokeButton": "Confirmar",
+      "cancel": "Cancelar",
+      "revokeError": "No se pudo quitar a esta persona de Gladys Plus.",
+      "switchError": "No se pudo guardar la autorización: ha vuelto a su estado anterior.",
+      "unlinkedTitle": "Cuentas de Gladys Plus no vinculadas a un usuario",
+      "unlinkedHint": "Estas personas forman parte de su cuenta de Gladys Plus pero aún no están asociadas a un usuario de Gladys: su invitación está pendiente, o no han elegido su usuario de Gladys en Gladys Plus.",
+      "invite": {
+        "description": "{{name}} recibirá un correo para crear su cuenta de Gladys Plus. Esa cuenta se vinculará automáticamente a este usuario de Gladys: no tendrá que elegir uno, y nadie puede elegir el de otra persona.",
+        "emailLabel": "Correo electrónico",
+        "emailPlaceholder": "nombre@ejemplo.es",
+        "invalidEmail": "Esta dirección de correo no es válida.",
+        "roleLabel": "Rol en Gladys Plus",
+        "roleHelp": "Un administrador de Gladys Plus puede invitar y quitar personas y gestionar la suscripción. El rol en Gladys Plus es independiente del rol en esta instancia de Gladys.",
+        "button": "Enviar invitación",
+        "error": "No se pudo enviar la invitación. Compruebe la dirección de correo e inténtelo de nuevo."
+      },
+      "link": {
+        "selectLabel": "Vincular a un usuario de Gladys",
+        "selectPlaceholder": "Elegir un usuario de Gladys…",
+        "button": "Vincular",
+        "toThisUser": "Vincular a {{name}}",
+        "help": "La cuenta de Gladys Plus se asocia a ese usuario: su acceso remoto aparece entonces en la tarjeta del usuario, y controla Gladys como ese usuario.",
+        "error": "No se pudo vincular esta cuenta de Gladys Plus. Compruebe que el usuario de Gladys no esté ya vinculado a otra cuenta."
+      },
+      "recoveryCodes": {
+        "button": "Códigos de recuperación",
+        "confirmText": "¿{{name}} ha perdido su aplicación de doble autenticación y sus códigos de recuperación? Su Gladys, físicamente en su casa, sustituye a la aplicación: se generará un nuevo juego de códigos de recuperación de un solo uso para su cuenta Gladys Plus y se mostrará una sola vez, aquí. Sus códigos anteriores dejan de funcionar de inmediato, y Gladys Plus intentará avisarle por correo electrónico: avísele usted también. Su contraseña sigue siendo necesaria para iniciar sesión. Para confirmar, introduzca su propia contraseña de Gladys.",
+        "passwordLabel": "Su contraseña de Gladys",
+        "passwordPlaceholder": "Introduzca su contraseña de Gladys",
+        "confirmButton": "Generar",
+        "doneButton": "He guardado los códigos de recuperación",
+        "errorWrongPassword": "Contraseña incorrecta.",
+        "errorTwoFactorNotEnabled": "Esta persona no ha activado la doble autenticación en Gladys Plus: no necesita códigos de recuperación.",
+        "errorUserNotFound": "Esta persona ya no forma parte de su cuenta Gladys Plus. Recargue la página e inténtelo de nuevo.",
+        "errorNetwork": "Su Gladys no está conectada a Gladys Plus: compruebe su conexión a internet e inténtelo de nuevo.",
+        "error": "No se han podido generar los códigos de recuperación. Inténtelo de nuevo."
+      },
+      "twoFactor": {
+        "button": "Restablecer la autenticación de dos factores",
+        "confirmText": "{{name}} ya no necesitará su aplicación de autenticación ni sus códigos de recuperación: iniciará sesión con su contraseña y configurará de inmediato una nueva aplicación. Sus claves de cifrado y su acceso a esta instancia de Gladys no cambian. Se le avisará por correo. Para confirmar, introduzca el código de su propia aplicación de autenticación.",
+        "codeLabel": "Su código de dos factores",
+        "codePlaceholder": "123456",
+        "confirmButton": "Restablecer",
+        "success": "Autenticación de dos factores restablecida. Esta persona puede iniciar sesión con su contraseña y configurar una nueva aplicación de autenticación.",
+        "errorWrongCode": "Código incorrecto. Introduzca el código actual de su propia aplicación de autenticación.",
+        "errorTooManyAttempts": "Demasiados códigos incorrectos: espere unos minutos antes de volver a intentarlo.",
+        "error": "No se pudo restablecer la autenticación de dos factores de este usuario."
+      }
+    },
     "searchPlaceholder": "Buscar usuarios",
     "noUsersFound": "No se encontró ningún usuario con esta búsqueda.",
     "newUserButton": "Nuevo",
@@ -5009,14 +5381,13 @@
     "backupKeyPlaceholder": "Introducir/Restaurar una clave de copia de seguridad",
     "toggleBackupKeyVisibility": "Mostrar u ocultar la clave de copia de seguridad",
     "saveBackupKeyButton": "Guardar",
-    "usersListTitle": "Usuarios remotos",
-    "userColumn": "Usuario",
-    "statusColumn": "Estado",
-    "userRsaKey": "Clave RSA:",
-    "userEcdsaKey": "Clave ECDSA:",
-    "usersListDescription": "Esta lista está sincronizada con sus usuarios de Gladys Plus. Para que un usuario (incluido usted mismo) pueda acceder a su instancia de forma remota, debe autorizarlo aquí activando el interruptor junto a su nombre.",
-    "usersListWhyAcceptDescription": "<b>¿Por qué este paso?</b> Cada usuario de Gladys Plus tiene sus propias claves de cifrado, cuyas huellas se muestran a continuación. Al autorizar a un usuario, usted valida localmente, en su instancia, que sus claves son aceptadas: esta validación local es lo que protege su hogar contra ataques de intermediario (man-in-the-middle). Nadie, ni siquiera los servidores de Gladys Plus, puede conceder acceso a su instancia sin esta validación realizada en su hogar.",
-    "usersListRevokedDescription": "Si las claves de un usuario cambian (por ejemplo, cuando se restablece su autenticación de dos factores), su acceso se revoca automáticamente por seguridad: deberá volver a autorizarlo aquí. Para eliminar a un usuario, vaya a la página de gestión de usuarios de Gladys Plus.",
+    "remoteUsersTitle": "Usuarios remotos",
+    "remoteUsersDescription": "Las personas que pueden controlar esta instancia de Gladys a través de Gladys Plus se gestionan junto con sus usuarios de Gladys: invitaciones, cuentas de Gladys Plus y autorización de sus claves de cifrado, todo en la página Usuarios.",
+    "remoteUsersAuthorizedOne": "1 usuario autorizado",
+    "remoteUsersAuthorized": "{{count}} usuarios autorizados",
+    "remoteUsersPendingOne": "1 pendiente de autorización",
+    "remoteUsersPending": "{{count}} pendientes de autorización",
+    "remoteUsersManageButton": "Gestionar usuarios",
     "disconnectTitle": "Desconectar su cuenta Plus",
     "disconnectButton": "Desconectar",
     "gatewayConnectedSuccessTitle": "¡Gladys Plus conectado correctamente!",
@@ -5214,6 +5585,8 @@
     },
     "tts": {
       "title": "Esta acción requiere Gladys Plus",
+      "providerTitle": "Esta acción necesita una voz",
+      "providerCompactDescription": "Gladys Plus da a Gladys una voz natural que funciona en todas partes, incluido el acceso remoto. Sin suscripción, también puede instalar una integración de síntesis de voz y seleccionarla como la voz de su instancia.",
       "description": "La acción \"Reproducir en un altavoz\" utiliza las API de conversión de texto a voz a través de Gladys Plus para que Gladys hable en sus altavoces (Sonos, Google Cast, etc.) con una voz natural.",
       "compactDescription": "Esta acción utiliza las API de conversión de texto a voz a través de Gladys Plus.",
       "feature1": "Voces naturales y multilingües",
@@ -5232,7 +5605,6 @@
     "wrongCredentials": "Correo electrónico o contraseña incorrectos.",
     "invalidEmail": "Correo electrónico no válido",
     "networkError": "Error de red: ¿está seguro de que su instancia de Gladys está conectada a Internet?",
-    "userNotAcceptedLocally": "Su usuario no está aceptado localmente; vuelva a su instancia de Gladys y permita el acceso a este usuario en la configuración.",
     "gatewayNoInstanceFound": "No se encontró ninguna instancia. Primero debe conectar su instancia a Gladys.",
     "gatewayAccessBilling": "Para acceder a la facturación, haga clic aquí.",
     "unknownError": "Se produjo un error desconocido. Póngase en contacto con nosotros para obtener más información.",
@@ -5243,7 +5615,14 @@
     "invalidRecoveryCode": "Este código de recuperación no es válido o ya se ha utilizado.",
     "lostTwoFactor": "¿Ha perdido el acceso a su aplicación de doble factor?",
     "useRecoveryCodeLink": "Utilizar un código de recuperación",
-    "noRecoveryCode": "¿No tiene un código de recuperación? Contáctenos en <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> y lo restableceremos.",
+    "noRecoveryCode": "¿No le quedan códigos de recuperación? Un administrador de su Gladys puede generar nuevos desde Ajustes › Usuarios.",
+    "resetTwoFactorLink": "¿Ninguna Gladys conectada? Restablezca su doble autenticación por correo electrónico.",
+    "resetTwoFactorEmailSent": "Le hemos enviado un correo electrónico con un enlace para restablecer su doble autenticación. Solo funciona una vez y caduca en una hora.",
+    "resetTwoFactorInstanceConnected": "Su Gladys está conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Usuarios. El restablecimiento por correo electrónico solo está disponible cuando ninguna Gladys está conectada.",
+    "resetTwoFactorExpired": "Su sesión de inicio ha caducado: vuelva a iniciar sesión con su contraseña y solicite el restablecimiento.",
+    "resetTwoFactorTooMany": "Se envió un correo hace menos de un minuto: revise su bandeja de entrada (y el spam) antes de volver a solicitarlo.",
+    "resetTwoFactorError": "No se ha podido enviar el correo de restablecimiento. Inténtelo de nuevo más tarde.",
+    "twoFactorHelp": "¿Código rechazado, teléfono nuevo? <a href=\"https://gladysassistant.com/es/docs/plus/two-factor-authentication/\" target=\"_blank\" rel=\"noopener noreferrer\">Consulte nuestra guía de solución de problemas de 2FA</a>.",
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
     "recoveryCodePlaceholder": "Introduzca uno de sus códigos de recuperación",
@@ -5263,6 +5642,26 @@
     "rotationWarning": "Generar un nuevo conjunto invalida inmediatamente los códigos de recuperación que ya pueda tener. Solo funcionarán los nuevos.",
     "continueButton": "Continuar",
     "twoFactorCodeRequired": "Introduzca un código de su aplicación de doble factor: la pasarela lo requiere para generar códigos de recuperación."
+  },
+  "gatewayTwoFactorApp": {
+    "cardTitle": "Su aplicación de doble factor",
+    "description": "¿Nuevo teléfono o nueva aplicación de doble factor? Registre en ella un nuevo secreto: su cuenta de Gladys Plus solo aceptará a partir de entonces los códigos de esta nueva aplicación.",
+    "changeButton": "Cambiar mi aplicación de doble factor",
+    "replaceWarning": "Una vez confirmado, los códigos de su aplicación actual dejarán de aceptarse. Sus demás códigos de recuperación siguen siendo válidos.",
+    "newCodeLabel": "Código mostrado por su nueva aplicación",
+    "currentCodeLabel": "Código mostrado por su aplicación actual",
+    "currentCodeHelp": "La pasarela requiere un código de la aplicación registrada actualmente para reemplazarla.",
+    "useRecoveryCodeLink": "¿Ha perdido su aplicación actual? Utilice un código de recuperación en su lugar.",
+    "useCurrentCodeLink": "Utilizar en su lugar un código de su aplicación actual.",
+    "currentRecoveryCodeLabel": "Uno de sus códigos de recuperación",
+    "currentRecoveryCodeHelp": "Este código de recuperación se consume con el reemplazo. Una vez configurada su nueva aplicación, genere un nuevo juego de códigos de recuperación más arriba.",
+    "invalidRecoveryCode": "El código de recuperación no es válido o ya se ha utilizado, o el código de su nueva aplicación es incorrecto o ha caducado. Inténtelo de nuevo con un nuevo código de su nueva aplicación.",
+    "confirmButton": "Reemplazar mi aplicación de doble factor",
+    "replacedSuccess": "Su aplicación de doble factor ha sido reemplazada. A partir de ahora, use su nueva aplicación para iniciar sesión en Gladys Plus.",
+    "invalidCode": "Uno de los códigos no es válido o ha caducado. Vuelva a intentarlo con nuevos códigos generados por sus aplicaciones.",
+    "tooManyAttempts": "Demasiados intentos fallidos. Espere unos minutos antes de volver a intentarlo.",
+    "loadError": "No pudimos generar un nuevo secreto. Compruebe su conexión y vuelva a intentarlo.",
+    "updateError": "No pudimos reemplazar su aplicación de doble factor. Vuelva a intentarlo."
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configurar la autenticación de doble factor (2FA)",
@@ -5289,7 +5688,15 @@
     "backupNowButton": "Copia de seguridad ahora",
     "backupStarted": "Copia de seguridad iniciada...",
     "notConfigured": "Gladys Plus debe estar configurado para activar las copias de seguridad. Vaya a la pestaña de Gladys Plus para configurarlo.",
-    "restoreFailed": "No se pudo restaurar la copia de seguridad. ¿Está seguro de que tiene la misma clave de copia de seguridad utilizada durante la copia de seguridad? Puede ir a la pestaña de Gladys Plus en la configuración para establecer otra clave de copia de seguridad."
+    "restoreFailed": "No se pudo restaurar la copia de seguridad. ¿Está seguro de que tiene la misma clave de copia de seguridad utilizada durante la copia de seguridad? Puede ir a la pestaña de Gladys Plus en la configuración para establecer otra clave de copia de seguridad.",
+    "health": {
+      "failingTitle": "Sus copias de seguridad fallan",
+      "failingSince": "Ninguna copia de seguridad de Gladys Plus ha tenido éxito desde el {{date}}.",
+      "lastSuccess": "Última copia de seguridad correcta: {{date}}.",
+      "noSuccessYet": "Ninguna copia de seguridad ha tenido éxito todavía en esta instancia.",
+      "lastError": "Último error: {{error}}",
+      "retry": "Gladys lo reintenta cada noche y unos minutos después de cada inicio. Los administradores reciben un aviso en la conversación a partir de la segunda noche fallida, luego una vez por semana mientras siga fallando; una vez avisados, se les informa en cuanto una copia vuelve a funcionar. Detalles en la pestaña \"Tareas\"."
+    }
   },
   "alarmModes": {
     "armed": "armada",
@@ -5343,6 +5750,7 @@
     "milliliter": "Mililitro (ml)",
     "cubicmeter": "Metro cúbico (m³)",
     "cubic-meter-per-hour": "Metro cúbico por hora (m³/h)",
+    "cubic-meter-per-second": "Metro cúbico por segundo (m³/s)",
     "euro": "Euro (€)",
     "dollar": "Dólar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -5441,6 +5849,7 @@
     "milliliter": "ml",
     "cubicmeter": "m³",
     "cubic-meter-per-hour": "m³/h",
+    "cubic-meter-per-second": "m³/s",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -5670,6 +6079,13 @@
           "deep-clean": "Limpieza profunda",
           "vacuum": "Aspirar",
           "mop": "Fregar"
+        }
+      },
+      "music": {
+        "repeat": {
+          "off": "Desactivado",
+          "all": "Todo",
+          "one": "Una pista"
         }
       },
       "water-heater": {
@@ -5939,6 +6355,15 @@
           "4": "Noche",
           "5": "Confort"
         },
+        "active-preset": {
+          "unknown": "{{value}} (desconocido)",
+          "0": "Apagado",
+          "1": "Antihielo",
+          "2": "Ausencia",
+          "3": "Eco",
+          "4": "Noche",
+          "5": "Confort"
+        },
         "operating-state": {
           "unknown": "{{value}} (desconocido)",
           "0": "Inactivo",
@@ -5979,7 +6404,14 @@
       "music": {
         "playback_state": {
           "0": "En pausa",
-          "1": "Reproduciendo"
+          "1": "Reproduciendo",
+          "2": "Detenido",
+          "3": "Cargando"
+        },
+        "repeat": {
+          "0": "Desactivado",
+          "1": "Todo",
+          "2": "Una pista"
         }
       },
       "opening-sensor": {
@@ -6681,6 +7113,10 @@
       "rock-setting": "Oscilación",
       "wind-setting": "Modo de viento"
     },
+    "flow-sensor": {
+      "shortCategoryName": "Sensor de caudal",
+      "decimal": "Caudal"
+    },
     "hepa-filter-monitoring": {
       "shortCategoryName": "Supervisión del filtro HEPA",
       "filter-life-remaining": "Vida útil restante del filtro"
@@ -6733,6 +7169,7 @@
       "target-temperature": "Temperatura del termostato",
       "mode": "Modo del termostato",
       "preset": "Preajuste del termostato",
+      "active-preset": "Preajuste activo del termostato",
       "operating-state": "Estado de funcionamiento del termostato"
     },
     "airquality-sensor": {
@@ -6764,7 +7201,16 @@
       "previous": "Botón anterior",
       "next": "Botón siguiente",
       "playback_state": "Estado de reproducción",
-      "play_notification": "Difundir una notificación"
+      "play_notification": "Difundir una notificación",
+      "title": "Título de la pista",
+      "artist": "Artista",
+      "album": "Álbum",
+      "artwork": "Carátula",
+      "duration": "Duración de la pista",
+      "position": "Posición de reproducción",
+      "shuffle": "Reproducción aleatoria",
+      "repeat": "Modo de repetición",
+      "mute": "Silencio"
     },
     "lock": {
       "shortCategoryName": "Cerradura",
@@ -6826,6 +7272,7 @@
     "voiceInput": {
       "startListening": "Dictar un mensaje",
       "stopListening": "Detener el dictado",
+      "cancelListening": "Cancelar el dictado",
       "error": "El dictado falló. Compruebe que Gladys Plus esté conectado y vuelva a intentarlo.",
       "errorNoSpeech": "No se detectó voz. Compruebe que su micrófono esté activado y vuelva a intentarlo.",
       "errorPermissionDenied": "Se denegó el acceso al micrófono. Permítalo en la configuración de su navegador para dictar un mensaje.",
@@ -6946,19 +7393,31 @@
   "gatewayLinkUser": {
     "title": "Configurar Gladys Plus",
     "label": "Seleccione su usuario de Gladys",
-    "description": "Seleccione el usuario de Gladys al que desea vincular su cuenta de Gladys Plus. Este usuario debe estar autorizado localmente en su instancia: en la configuración de su instancia, pestaña \"Gladys Plus\", sección \"Usuarios remotos\".",
+    "description": "Seleccione el usuario de Gladys al que desea vincular su cuenta de Gladys Plus. Este usuario debe estar autorizado localmente en su instancia: en los ajustes de su instancia, pestaña \"Usuarios\", sección \"Acceso remoto\" de su usuario.",
     "noInstanceFoundTitle": "¡Un último paso!",
     "noInstanceFoundIntro": "Su cuenta de Gladys Plus está activa 🙂. Lo único que falta es conectar su instancia de Gladys (la instalada en su domicilio) a su cuenta de Gladys Plus. Este es un paso normal la primera vez que utiliza Gladys Plus; ¡no hay nada roto! Siga estos pasos:",
     "noInstanceFoundStepOpenLocalInstance": "Abra su instancia de Gladys <b>localmente</b>, desde su red doméstica, utilizando su dirección local habitual (por ejemplo, <code>http://direccion-ip-de-su-dispositivo</code>).",
     "noInstanceFoundStepGoToSettings": "Inicie sesión y luego vaya a <b>Configuración</b>, pestaña \"<b>Gladys Plus</b>\".",
     "noInstanceFoundStepLogin": "Haga clic en \"<b>Ya tengo una cuenta</b>\" y luego inicie sesión con su cuenta de Gladys Plus (el mismo correo electrónico y contraseña que aquí).",
-    "noInstanceFoundStepAcceptUser": "Todavía en la pestaña \"Gladys Plus\", sección \"<b>Usuarios remotos</b>\", <b>autorice a su usuario</b> activando el interruptor junto a su nombre. Esta validación local garantiza que solo las claves de cifrado que usted aprobó en su domicilio puedan acceder a su instancia (protección contra ataques de intermediario).",
+    "noInstanceFoundStepAcceptUser": "Vaya a la pestaña \"<b>Usuarios</b>\": bajo su usuario, <b>autorice su acceso remoto</b> activando el interruptor. Esta validación local garantiza que solo las claves de cifrado que usted aprobó en su hogar pueden acceder a su instancia (protección contra ataques de intermediario).",
     "noInstanceFoundStepComeBack": "Vuelva a esta página y haga clic en el botón de abajo.",
     "noInstanceFoundRetryButton": "He conectado mi instancia, volver a intentarlo",
     "noInstanceFoundTutorialLink": "¿Necesita una guía paso a paso con capturas de pantalla? <a href=\"https://gladysassistant.com/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Consulte el tutorial en nuestra documentación</a>.",
     "noInstanceFoundNote": "¿Ya completó este paso anteriormente? A veces es necesario repetirlo, por ejemplo cuando se restableció su autenticación de doble factor (2FA): simplemente vuelva a iniciar sesión en la pestaña \"Gladys Plus\" de su instancia. ¿Necesita ayuda? Contáctenos en <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Se produjo un error. ¿Está seguro de que su usuario está aceptado localmente en su instancia de Gladys?",
-    "errorNotAcceptedLocally": "El usuario todavía no ha sido autorizado localmente en la instancia de Gladys. En su instancia local, vaya a la configuración, pestaña \"Gladys Plus\", sección \"Usuarios remotos\", y active el interruptor junto a su nombre.",
+    "keysChangedTitle": "Su acceso debe autorizarse de nuevo",
+    "keysChangedIntro": "Sus claves de cifrado de Gladys Plus han cambiado desde que su instancia de Gladys las autorizó. Es normal después de restablecer su contraseña de Gladys Plus (\"Olvidé mi contraseña\"): se generan nuevas claves. Por seguridad, su instancia rechaza cualquier clave que no haya validado ella misma. No hay nada roto: solo tiene que volver a autorizar a su usuario, desde su domicilio.",
+    "notAcceptedTitle": "Su acceso debe ser autorizado",
+    "notAcceptedIntro": "Su cuenta de Gladys Plus está vinculada a su instancia de Gladys, pero su usuario no está (o ya no está) autorizado para acceder a ella a distancia. Por seguridad, cada usuario de Gladys Plus debe ser autorizado desde la propia instancia, en su domicilio: nadie, ni siquiera los servidores de Gladys Plus, puede acceder a su hogar sin esta validación.",
+    "notAcceptedUnknownReasonIntro": "Su instancia de Gladys no ha autorizado (o ya no autoriza) a su usuario a acceder a ella a distancia. Es normal la primera vez, pero también después de restablecer su contraseña de Gladys Plus: se generan nuevas claves de cifrado y su instancia debe validarlas de nuevo. Por seguridad, esta autorización solo puede hacerse desde la propia instancia, en su domicilio.",
+    "notAcceptedAskAdmin": "Solo un administrador de su instancia de Gladys puede autorizar su acceso. Si usted no lo es, pida a la persona que gestiona Gladys en su domicilio que siga estos pasos.",
+    "notAcceptedStepGoToUsers": "Inicie sesión y vaya a <b>Ajustes</b>, pestaña \"<b>Usuarios</b>\".",
+    "notAcceptedStepAcceptUser": "Bajo su usuario, sección \"<b>Acceso remoto</b>\", compruebe que las huellas de claves mostradas coinciden con las de abajo y <b>active el interruptor</b>.",
+    "notAcceptedFingerprintsLabel": "Huellas de sus claves de cifrado:",
+    "rsaKeyFingerprint": "Clave RSA:",
+    "ecdsaKeyFingerprint": "Clave ECDSA:",
+    "stillNotAccepted": "Su usuario todavía no está autorizado. Compruebe que el interruptor junto a su nombre está activado en su instancia y vuelva a intentarlo.",
+    "notAcceptedRetryButton": "Mi usuario está autorizado, volver a intentarlo",
     "saveButton": "Guardar",
     "manageBillingLink": "Gestionar mi suscripción y facturas",
     "logoutButton": "Cerrar sesión"
@@ -7039,6 +7498,17 @@
     "dontHaveAccount": "¿Todavía no tiene una cuenta?",
     "signupLink": "Registrarse"
   },
+  "gatewayResetTwoFactor": {
+    "pageTitle": "Gladys Assistant",
+    "formTitle": "Gladys Plus - Restablecer la doble autenticación",
+    "description": "Ha solicitado restablecer la doble autenticación de su cuenta Gladys Plus. Una vez restablecida, su aplicación de autenticación y sus códigos de recuperación dejan de funcionar: en su próximo inicio de sesión, Gladys Plus le pedirá configurar una nueva aplicación y guardar nuevos códigos de recuperación.",
+    "button": "Restablecer mi doble autenticación",
+    "success": "Su doble autenticación ha sido restablecida. Inicie sesión con su contraseña: Gladys Plus le pedirá configurar una nueva aplicación de autenticación.",
+    "loginLink": "Iniciar sesión",
+    "errorLink": "Este enlace no es válido, ya se ha utilizado o ha caducado. Solicite uno nuevo desde la página de inicio de sesión.",
+    "instanceConnected": "Su Gladys vuelve a estar conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Usuarios. Este enlace sigue siendo válido mientras ninguna Gladys esté conectada.",
+    "error": "No se ha podido restablecer su doble autenticación. Inténtelo de nuevo más tarde."
+  },
   "gatewayResetPassword": {
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Restablecer contraseña",
@@ -7057,7 +7527,8 @@
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
     "recoveryCodePlaceholder": "Introduzca uno de sus códigos de recuperación",
-    "resetPasswordButton": "Restablecer contraseña"
+    "resetPasswordButton": "Restablecer contraseña",
+    "resetTwoFactorThenComeBack": "Una vez restablecida su doble autenticación, vuelva a esta página: su enlace de restablecimiento de contraseña sigue siendo válido durante dos horas."
   },
   "gatewayOpenApi": {
     "title": "Open API",
@@ -7108,19 +7579,6 @@
     "passwordPlaceholder": "Contraseña",
     "passwordInvalid": "La contraseña debe tener 8 caracteres",
     "createAccountButton": "Crear nueva cuenta"
-  },
-  "gatewayUsers": {
-    "managerUsersLabel": "Gestionar sus usuarios",
-    "revokeError": "No puede revocar a este usuario.",
-    "columnName": "Nombre",
-    "columnRole": "Rol",
-    "columnStatus": "Estado",
-    "columnAddDate": "Añadido el",
-    "columnRevoke": "Revocar",
-    "emailPlaceholder": "Correo electrónico",
-    "roleAdmin": "Administrador",
-    "roleUser": "Usuario",
-    "inviteUserButton": "Invitar usuario"
   },
   "gatewayBilling": {
     "title": "Facturación",

@@ -89,18 +89,6 @@ const integrations = {
       neighbors: [1]
     }
   ],
-  'get /api/v1/service/usb/port': [
-    {
-      comPath: '/dev/ttyUSB0',
-      comVID: '0658',
-      comName: '0200'
-    },
-    {
-      comPath: '/dev/ttyUSB1',
-      comVID: '0478',
-      comName: '0910'
-    }
-  ],
   'get /api/v1/service/zwave/device': [
     {
       id: 'fbedb47f-4d25-4381-8923-2633b23192a0',
@@ -574,6 +562,25 @@ const integrations = {
     Z2M_TCP_PORT: '12000',
     Z2M_ADAPTER_MODE: 'usb'
   },
+  'get /api/v1/service/zigbee2mqtt/usb/port': [
+    {
+      path: '/dev/ttyUSB0',
+      name: 'Electrolama zig-a-zig-ah zzh',
+      pnpId: 'usb-Electrolama_zig-a-zig-ah__zzh__4C0E1AB2-if00-port0',
+      adapter: 'Electrolama zig-a-zig-ah! (zzh!)'
+    },
+    {
+      path: '/dev/ttyUSB1',
+      name: 'Itead Sonoff Zigbee 3.0 USB Dongle Plus V2',
+      pnpId: 'usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_8e73883472d9ee11-if00-port0',
+      adapter: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"'
+    },
+    {
+      path: '/dev/ttyS0',
+      name: null,
+      adapter: null
+    }
+  ],
   'get /api/v1/service/zigbee2mqtt/adapter': [
     { label: 'ConBee', configKey: 'deconz' },
     { label: 'ConBee II', configKey: 'deconz' },

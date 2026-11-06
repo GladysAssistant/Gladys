@@ -6,6 +6,7 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { connect } from 'unistore/preact';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class MELCloudDeviceBox extends Component {
   componentWillMount() {
@@ -44,7 +45,10 @@ class MELCloudDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(this.state.device)
+      );
       this.setState({
         device: savedDevice
       });

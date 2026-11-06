@@ -4,6 +4,18 @@
     "answers": ["La solicitud a la API de Inteligencia Artificial ha fallado, ¡por favor, inténtelo de nuevo!"]
   },
   {
+    "label": "openai.provider-unavailable",
+    "answers": [
+      "El proveedor de IA seleccionado en esta instancia no ha respondido (está detenido, desconectado, es demasiado lento o ha devuelto una respuesta no válida). Compruébelo en la página de su integración, o vuelva a Gladys Plus en los ajustes de la IA."
+    ]
+  },
+  {
+    "label": "openai.provider-busy",
+    "answers": [
+      "El proveedor de IA seleccionado en esta instancia está saturado por demasiadas solicitudes simultáneas: inténtelo de nuevo en un momento."
+    ]
+  },
+  {
     "label": "openai.request.tooManyRequests",
     "answers": ["¡Usted ha realizado demasiadas solicitudes este mes a la API de Inteligencia Artificial!"]
   },

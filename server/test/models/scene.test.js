@@ -156,4 +156,114 @@ describe('models/scene', () => {
       await assert.isRejected(promise, `"[0].${key}" is not allowed`);
     });
   });
+
+  describe('time-range trigger', () => {
+    it('should validate a time-range trigger', async () => {
+      await buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        days_of_the_week: ['monday', 'tuesday'],
+        time_ranges: [
+          { start: '12:00', end: '14:30' },
+          { start: '16:00', end: '17:30' },
+        ],
+        resume_on_startup: true,
+      }).validate();
+    });
+
+    // Shapes of earlier iterations of this feature, never released: a range carrying its
+    // own days could be saved with none, then refused by addScene after the save.
+    [
+      { key: 'trigger_start', value: true },
+      { key: 'trigger_end', value: false },
+    ].forEach(({ key, value }) => {
+      it(`should reject a time-range trigger holding "${key}"`, async () => {
+        const promise = buildScene({
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          days_of_the_week: ['monday'],
+          time_ranges: [{ start: '12:00', end: '14:30' }],
+          [key]: value,
+        }).validate();
+        await assert.isRejected(promise, `"[0].${key}" is not allowed`);
+      });
+    });
+
+    it('should reject days of the week carried by a range', async () => {
+      const promise = buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        time_ranges: [{ start: '12:00', end: '14:30', days_of_the_week: [] }],
+      }).validate();
+      await assert.isRejected(promise, '"[0].time_ranges[0].days_of_the_week" is not allowed');
+    });
+
+    it('should reject a range without an end', async () => {
+      const promise = buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        time_ranges: [{ start: '12:00' }],
+      }).validate();
+      await assert.isRejected(promise, '"[0].time_ranges[0].end" is required');
+    });
+
+    it('should reject a trigger without any range', async () => {
+      const promise = buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        time_ranges: [],
+      }).validate();
+      await assert.isRejected(promise, 'at least one time range');
+    });
+
+    it('should reject a trigger where every day was unselected', async () => {
+      const promise = buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        days_of_the_week: [],
+        time_ranges: [{ start: '12:00', end: '14:30' }],
+      }).validate();
+      await assert.isRejected(promise, 'at least one day of the week');
+    });
+
+    it('should reject a range starting and ending at the same time', async () => {
+      const promise = buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        time_ranges: [{ start: '12:00', end: '12:00' }],
+      }).validate();
+      await assert.isRejected(promise, 'cannot start and end at the same time');
+    });
+
+    // A loose HH:mm regex accepts these, and node-schedule then builds a rule which never
+    // fires: the trigger would be silently dead.
+    ['99:99', '12:75', '24:00'].forEach((time) => {
+      it(`should reject the impossible time "${time}"`, async () => {
+        const promise = buildScene({
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [{ start: time, end: '20:00' }],
+        }).validate();
+        await assert.isRejected(promise, '"[0].time_ranges[0].start"');
+      });
+    });
+
+    // The other trigger types must not be affected by the time-range rules.
+    it('should still validate a classic every-day trigger', async () => {
+      await buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'every-day',
+        time: '09:00',
+      }).validate();
+    });
+
+    it('should reject a badly formatted time', async () => {
+      const promise = buildScene({
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        time_ranges: [{ start: '12h00', end: '14:30' }],
+      }).validate();
+      await assert.isRejected(promise, '"[0].time_ranges[0].start"');
+    });
+  });
 });

@@ -1,11 +1,50 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
 const Gladys = require('../../lib');
-const { EVENTS } = require('../../utils/constants');
+const db = require('../../models');
+const { generateAccessToken } = require('../../utils/accessToken');
+const { Error401 } = require('../../utils/httpErrors');
+const { EVENTS, SESSION_TOKEN_TYPES } = require('../../utils/constants');
 
 describe('gladys.start', () => {
+  it('should refuse the access tokens of the recently revoked sessions once the boot sequence resolves', async function test() {
+    this.timeout(15000);
+    const userId = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
+    const revokedSession = await db.Session.create({
+      user_id: userId,
+      token_type: SESSION_TOKEN_TYPES.REFRESH_TOKEN,
+      token_hash: 'token-hash',
+      scope: 'dashboard:read',
+      revoked: true,
+    });
+    const gladys = Gladys({
+      jwtSecret: 'secret',
+      disableBrainLoading: true,
+      disableSceneLoading: true,
+      disableDeviceLoading: true,
+      disableUserLoading: true,
+      disableRoomLoading: true,
+      disableAreaLoading: true,
+      disableSchedulerLoading: true,
+      disableJobInit: true,
+      disableExternalIntegration: true,
+      disableDuckDbMigration: true,
+      disableGladysUpgradedCheck: true,
+    });
+    gladys.service.load = fake.resolves(null);
+    gladys.service.startAll = fake.resolves(null);
+    // the server only listens once start resolves: the revoked sessions
+    // must already be in the RAM cache of this fresh instance by then
+    await gladys.start();
+    const accessToken = generateAccessToken(userId, ['dashboard:read'], revokedSession.id, 'secret');
+    expect(() => gladys.session.validateAccessToken(accessToken, 'dashboard:read')).to.throw(
+      Error401,
+      'AuthMiddleware: Session was revoked',
+    );
+  });
   it('should fire the upgrade check without blocking the boot sequence, once the services are started', async function test() {
     this.timeout(15000);
     const gladys = Gladys({

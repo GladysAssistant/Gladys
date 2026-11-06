@@ -18,6 +18,7 @@ import {
 } from './commons/deviceHelpers';
 import TuyaLocalPollSection from './TuyaLocalPollSection';
 import TuyaGithubIssueSection from './discover-page/TuyaGithubIssueSection';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 const LOCAL_POLL_FREQUENCY = 10 * 1000;
 const CLOUD_POLL_FREQUENCY = 30 * 1000;
@@ -198,7 +199,7 @@ class TuyaDeviceBox extends Component {
       if (shouldFallbackToBaselineFeatures) {
         payload.features = baselineFeatures;
       }
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
+      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(payload));
       this.setState({
         device: savedDevice,
         baselineDevice: savedDevice

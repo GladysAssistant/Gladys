@@ -23,6 +23,7 @@ import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDevic
 import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 import WaterHeaterModeDeviceState from './device-states/WaterHeaterModeDeviceState';
 import SmokeSensorContaminationDeviceState from './device-states/SmokeSensorContaminationDeviceState';
+import ThermostatActivePresetDeviceState from './device-states/ThermostatActivePresetDeviceState';
 
 // Operator the condition widgets settle on by default, and the one to go back to when the
 // "any state change" mode is turned off
@@ -184,6 +185,7 @@ class TurnOnLight extends Component {
     let waterValveStatusDevice = false;
     let waterHeaterModeDevice = false;
     let smokeContaminationDevice = false;
+    let thermostatActivePresetDevice = false;
 
     if (selectedDeviceFeature && !anyStateChange) {
       const { category, type } = selectedDeviceFeature;
@@ -228,6 +230,8 @@ class TurnOnLight extends Component {
       smokeContaminationDevice =
         category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
         type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CONTAMINATION_STATE;
+      thermostatActivePresetDevice =
+        category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET;
     }
 
     const defaultDevice =
@@ -244,7 +248,8 @@ class TurnOnLight extends Component {
       !levelMatterSensorDevice &&
       !waterValveStatusDevice &&
       !waterHeaterModeDevice &&
-      !smokeContaminationDevice;
+      !smokeContaminationDevice &&
+      !thermostatActivePresetDevice;
 
     // the mode is hidden for event-like features, but a trigger already saved with it (written
     // by hand or by the MCP tools) still shows the switch, so that it can be turned off
@@ -263,7 +268,8 @@ class TurnOnLight extends Component {
       !levelMatterSensorDevice &&
       !waterValveStatusDevice &&
       !waterHeaterModeDevice &&
-      !smokeContaminationDevice;
+      !smokeContaminationDevice &&
+      !thermostatActivePresetDevice;
 
     return (
       <div>
@@ -296,6 +302,7 @@ class TurnOnLight extends Component {
             <WaterHeaterModeDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />
           )}
           {smokeContaminationDevice && <SmokeSensorContaminationDeviceState {...props} />}
+          {thermostatActivePresetDevice && <ThermostatActivePresetDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {displayAnyStateChangeSwitch && (

@@ -100,3 +100,14 @@
 :global(.glass-theme .page .alert).vendorWarning {
   color: #8a5c17;
 }
+
+/* One row per sensor chosen (spec A.1.1), stacked above the select that adds
+   another. */
+.featureListRow {
+  margin-bottom: 0.5rem;
+}
+
+/* Under the room it widens the pickers from (spec A.3). */
+.showAllRooms {
+  margin-top: 0.75rem;
+}

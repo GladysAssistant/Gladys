@@ -55,12 +55,11 @@ describe('user.controller forgotPassword', () => {
       'http://localhost:1444',
     );
     sinonAssert.calledOnceWithExactly(gladys.brain.getReply, 'en', 'user.forgot-password.success', {});
-    sinonAssert.calledTwice(gladys.message.sendToUser);
-    sinonAssert.calledWith(gladys.message.sendToUser.firstCall, 'tony', 'Password reset instructions');
-    sinonAssert.calledWith(
-      gladys.message.sendToUser.secondCall,
+    // the text and the link in one message: a channel like email would send them in two mails
+    sinonAssert.calledOnceWithExactly(
+      gladys.message.sendToUser,
       'tony',
-      'http://localhost:1444/reset-password?token=reset-token',
+      'Password reset instructions\nhttp://localhost:1444/reset-password?token=reset-token',
     );
     sinonAssert.calledOnce(res.json);
     expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
@@ -80,9 +79,7 @@ describe('user.controller forgotPassword', () => {
     await controller.forgotPassword(req, res);
 
     sinonAssert.calledOnceWithExactly(gladys.brain.getReply, 'fr', 'user.forgot-password.code', {});
-    sinonAssert.calledTwice(gladys.message.sendToUser);
-    sinonAssert.calledWith(gladys.message.sendToUser.firstCall, 'tony', 'Password reset instructions');
-    sinonAssert.calledWith(gladys.message.sendToUser.secondCall, 'tony', 'ABCD-EFGH');
+    sinonAssert.calledOnceWithExactly(gladys.message.sendToUser, 'tony', 'Password reset instructions\nABCD-EFGH');
     expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });
 
@@ -105,7 +102,11 @@ describe('user.controller forgotPassword', () => {
     sinonAssert.calledTwice(gladys.brain.getReply);
     sinonAssert.calledWith(gladys.brain.getReply.firstCall, 'de', 'user.forgot-password.success', {});
     sinonAssert.calledWith(gladys.brain.getReply.secondCall, 'en', 'user.forgot-password.success', {});
-    sinonAssert.calledWith(gladys.message.sendToUser.firstCall, 'tony', 'English instructions');
+    sinonAssert.calledOnceWithExactly(
+      gladys.message.sendToUser,
+      'tony',
+      'English instructions\nhttp://localhost:1444/reset-password?token=reset-token',
+    );
     expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });
 

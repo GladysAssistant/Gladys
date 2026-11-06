@@ -1,5 +1,5 @@
 import { LoginStatus, RequestStatus } from '../../utils/consts';
-import { validateEmail } from '../../utils/validator';
+import { validateEmail, cleanEmail } from '../../utils/validator';
 import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
 import { isSafeReturnUrl } from '../../utils/url';
@@ -19,7 +19,8 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
-      if (!validateEmail(state.loginFormEmailValue)) {
+      const email = cleanEmail(state.loginFormEmailValue);
+      if (!validateEmail(email)) {
         return store.setState({
           loginStatus: LoginStatus.WrongEmailError
         });
@@ -30,7 +31,7 @@ function createActions(store) {
       try {
         // Login
         const userFromLogin = await state.httpClient.post('/api/v1/login', {
-          email: state.loginFormEmailValue,
+          email,
           password: state.loginFormPasswordValue
         });
         state.session.saveUser(userFromLogin);

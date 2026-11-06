@@ -12,6 +12,7 @@ const {
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
+  THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../../utils/constants');
 
 const state = proxyquire('../../../../services/thermostat/lib/thermostat.state', {
@@ -38,6 +39,13 @@ const operatingStateFeature = (lastValue) => ({
   selector: 'living-room:operating-state',
   category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
   type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+  last_value: lastValue,
+});
+
+const activePresetFeature = (lastValue) => ({
+  selector: 'living-room:active-preset',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET,
   last_value: lastValue,
 });
 
@@ -108,6 +116,18 @@ describe('thermostat.state isStopped', () => {
   });
 });
 
+describe('thermostat.state isModuleStop', () => {
+  it('should read a stop pressed on the module', () => {
+    expect(state.isModuleStop({ params: [{ name: state.MODULE_STOP_PARAM, value: 'true' }] })).to.equal(true);
+  });
+
+  it('should read a stop made from Gladys, or a mark cleared since, as no module stop', () => {
+    expect(state.isModuleStop({ params: [{ name: state.MODULE_STOP_PARAM, value: '' }] })).to.equal(false);
+    expect(state.isModuleStop({ params: [] })).to.equal(false);
+    expect(state.isModuleStop({})).to.equal(false);
+  });
+});
+
 describe('thermostat.state isScheduleStop', () => {
   it('should read a stop the programme made', () => {
     expect(state.isScheduleStop({ params: [{ name: state.SCHEDULE_STOP_PARAM, value: 'true' }] })).to.equal(true);
@@ -117,6 +137,33 @@ describe('thermostat.state isScheduleStop', () => {
     expect(state.isScheduleStop({ params: [{ name: state.SCHEDULE_STOP_PARAM, value: '' }] })).to.equal(false);
     expect(state.isScheduleStop({ params: [] })).to.equal(false);
     expect(state.isScheduleStop({})).to.equal(false);
+  });
+});
+
+describe('thermostat.state getRemoteStopUntil', () => {
+  it('should read when a stop made on the unit ends', () => {
+    expect(
+      state.getRemoteStopUntil({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value: '1792000000000' }] }),
+    ).to.equal(1792000000000);
+  });
+
+  it('should be null when there is no such stop, or no readable end', () => {
+    expect(state.getRemoteStopUntil({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value: '' }] })).to.equal(null);
+    expect(state.getRemoteStopUntil({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value: 'soon' }] })).to.equal(
+      null,
+    );
+    expect(state.getRemoteStopUntil({})).to.equal(null);
+  });
+});
+
+describe('thermostat.state isRemoteStop', () => {
+  // Only a stop the unit made is the remote's to lift, with or without an end.
+  it('should tell a stop made on the unit from one made from Gladys', () => {
+    const marked = (value) => ({ params: [{ name: state.REMOTE_STOP_UNTIL_PARAM, value }] });
+    expect(state.isRemoteStop(marked('1792000000000'))).to.equal(true);
+    expect(state.isRemoteStop(marked(state.REMOTE_STOP_NO_END))).to.equal(true);
+    expect(state.isRemoteStop(marked(''))).to.equal(false);
+    expect(state.isRemoteStop(null)).to.equal(false);
   });
 });
 
@@ -216,6 +263,80 @@ describe('thermostat.state operating state', () => {
   });
 });
 
+describe('thermostat.state active preset', () => {
+  afterEach(() => sinon.restore());
+
+  it('should map what is in force to its value', () => {
+    expect(state.activePresetValue('comfort')).to.equal(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+    expect(state.activePresetValue('frost')).to.equal(THERMOSTAT_ACTIVE_PRESET.FROST);
+    expect(state.activePresetValue('off')).to.equal(THERMOSTAT_ACTIVE_PRESET.OFF);
+  });
+
+  it('should have no value for the programme itself, nor for an unknown name', () => {
+    // `schedule` is never in force: one of its points is.
+    expect(state.activePresetValue('schedule')).to.equal(null);
+    expect(state.activePresetValue('boost')).to.equal(null);
+    expect(state.activePresetValue(null)).to.equal(null);
+  });
+
+  it('should write the preset in force through saveState, so scenes see it change', async () => {
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT)] };
+
+    await state.saveActivePreset.call(handler, device, 'frost');
+
+    assert.calledOnceWithExactly(handler.gladys.device.saveState, device.features[0], THERMOSTAT_ACTIVE_PRESET.FROST);
+  });
+
+  it('should write off on a feature never written', async () => {
+    // `Number(null)` is off: the first stop was taken for the stored value.
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(null)] };
+
+    await state.saveActivePreset.call(handler, device, 'off');
+
+    assert.calledWith(handler.gladys.device.saveState, device.features[0], THERMOSTAT_ACTIVE_PRESET.OFF);
+  });
+
+  it('should skip the preset already in force, so the minute loop starts no scene', async () => {
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO)] };
+
+    await state.saveActivePreset.call(handler, device, 'eco');
+
+    assert.notCalled(handler.gladys.device.saveState);
+  });
+
+  it('should write nothing for the programme with no point in force', async () => {
+    const handler = buildHandler();
+    const device = { features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO)] };
+
+    await state.saveActivePreset.call(handler, device, 'schedule');
+
+    assert.notCalled(handler.gladys.device.saveState);
+  });
+
+  // Only a report, written before the actuation: a failure must not stop the pass.
+  it('should survive a failing write', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.saveState = fake.rejects(new Error('database locked'));
+    const device = { selector: 'salon', features: [activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO)] };
+
+    await state.saveActivePreset.call(handler, device, 'comfort');
+
+    assert.calledOnce(handler.gladys.device.saveState);
+  });
+
+  it('should do nothing on a device with no active-preset feature', async () => {
+    // A thermostat saved before the feature existed, until the migration runs.
+    const handler = buildHandler();
+
+    await state.saveActivePreset.call(handler, { features: [] }, 'comfort');
+
+    assert.notCalled(handler.gladys.device.saveState);
+  });
+});
+
 describe('thermostat.state manual hold', () => {
   afterEach(() => sinon.restore());
 
@@ -308,7 +429,7 @@ describe('thermostat.state broadcasts', () => {
 
   it('should run a debounced regulation pass', async () => {
     const clock = sinon.useFakeTimers();
-    const handler = { applyTimer: null, applySchedules: fake.resolves(null) };
+    const handler = { running: true, applyTimer: null, applySchedules: fake.resolves(null) };
 
     state.triggerApplySchedules.call(handler);
     await clock.tickAsync(2000);
@@ -319,7 +440,7 @@ describe('thermostat.state broadcasts', () => {
 
   it('should collapse a burst of calls into a single run', async () => {
     const clock = sinon.useFakeTimers();
-    const handler = { applyTimer: null, applySchedules: fake.resolves(null) };
+    const handler = { running: true, applyTimer: null, applySchedules: fake.resolves(null) };
 
     state.triggerApplySchedules.call(handler);
     state.triggerApplySchedules.call(handler);
@@ -329,9 +450,21 @@ describe('thermostat.state broadcasts', () => {
     assert.calledOnce(handler.applySchedules);
   });
 
+  // A stopped service regulates nothing, whatever its API is asked to write.
+  it('should run no pass while the service is stopped', async () => {
+    const clock = sinon.useFakeTimers();
+    const handler = { running: false, applyTimer: null, applySchedules: fake.resolves(null) };
+
+    state.triggerApplySchedules.call(handler);
+    await clock.tickAsync(2000);
+
+    assert.notCalled(handler.applySchedules);
+    expect(handler.applyTimer).to.equal(null);
+  });
+
   it('should swallow a failing regulation pass', async () => {
     const clock = sinon.useFakeTimers();
-    const handler = { applyTimer: null, applySchedules: fake.rejects(new Error('boom')) };
+    const handler = { running: true, applyTimer: null, applySchedules: fake.rejects(new Error('boom')) };
 
     state.triggerApplySchedules.call(handler);
 

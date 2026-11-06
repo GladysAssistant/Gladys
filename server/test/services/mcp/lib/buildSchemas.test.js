@@ -1971,6 +1971,51 @@ describe('build schemas', () => {
     ]);
   });
 
+  it('should read device.get-battery-levels of the whole home when the model passes "No room"', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const batteryApiTool = mcpToolsToChatApiFormat(tools).find(
+      (tool) => tool.function.name === 'device_get_battery_levels',
+    );
+    expect(batteryApiTool.function.parameters.properties.room.enum).to.deep.equal(['Salon', 'Chambre', 'Cuisine']);
+
+    // "État des piles de la maison" with "No room" taken for "no room filter": every
+    // battery of the home, and the device of no room still labelled "No room".
+    const result = await batteryTool.cb({ room: 'No room' });
+    expect(result.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].batteries.map(({ room, device }) => ({ room, device }))).to.deep.equal([
+      { room: 'Chambre', device: 'Capteur porte chambre' },
+      { room: 'Salon', device: 'Capteur humidité salon' },
+      { room: 'Salon', device: 'Capteur température salon' },
+      { room: 'No room', device: 'Détecteur de fumée' },
+      { room: 'Chambre', device: 'Télécommande chambre' },
+    ]);
+  });
+
+  it('should offer any room name to device.get-battery-levels of a home without rooms', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    mcpHandler.gladys.room.getAll = stub().resolves([]);
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    // An enum without "No room" would be empty, and match nothing.
+    const batteryApiTool = mcpToolsToChatApiFormat(tools).find(
+      (tool) => tool.function.name === 'device_get_battery_levels',
+    );
+    expect(batteryApiTool.function.parameters.properties.room).to.deep.equal({
+      type: 'string',
+      description: 'Room name, to get the battery levels of this room only. Leave empty to cover the whole home.',
+    });
+
+    const result = await batteryTool.cb({ room: 'No room' });
+    expect(result.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].batteries.length).to.eq(5);
+  });
+
   it('should flag device.get-battery-levels levels below the battery warning threshold', async () => {
     const mcpHandler = buildBatteryMcpHandler();
     mcpHandler.gladys.variable.getValue = stub().resolves('20');
@@ -2302,6 +2347,133 @@ describe('build schemas', () => {
     // list filters on an exact tag name, so a scene tagged "ai" would be missed.
     await sceneCreateTool.cb({ ...baseScene, name: 'Scene tagged in lowercase', tags: [{ name: 'ai' }] });
     expect(mcpHandler.gladys.scene.create.getCall(3).args[0].tags).to.deep.equal([{ name: AI_GENERATED_SCENE_TAG }]);
+  });
+
+  describe('thermostat.set-schedule in scene.create', () => {
+    const thermostat = {
+      selector: 'living-room-thermostat',
+      name: 'Living room',
+      room: { name: 'Salon', selector: 'salon' },
+      service: { name: 'thermostat' },
+      features: [],
+    };
+    const climateDevice = {
+      selector: 'netatmo-living-room',
+      name: 'Netatmo',
+      room: { name: 'Salon', selector: 'salon' },
+      service: { name: 'netatmo' },
+      features: [],
+    };
+    const buildHandler = (devices, thermostatService) => ({
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isBatteryFeature,
+      isWritableSensorFeature,
+      formatValue: stub(),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: {
+          get: stub().resolves([]),
+          create: stub().resolves({ id: 'scene-id', name: 'Scene', selector: 'scene' }),
+        },
+        device: {
+          get: stub().resolves(devices),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        service: { getService: stub().returns(thermostatService) },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('toonmockdata'),
+    });
+    const createScene = (sceneCreateTool, action) =>
+      sceneCreateTool.cb({
+        name: 'Holidays',
+        icon: 'bell',
+        triggers: [{ type: 'system.start' }],
+        actions: [[{ type: 'thermostat.set-schedule', ...action }]],
+      });
+
+    it('should only accept the Gladys thermostats and the existing schedules', async () => {
+      const thermostatService = {
+        device: {
+          running: true,
+          getSchedules: stub().resolves([{ selector: 'school-term' }, { selector: 'school-holidays' }]),
+        },
+      };
+      const mcpHandler = buildHandler([thermostat, climateDevice], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'school-holidays' });
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+
+      const rejected = [
+        { devices: ['netatmo-living-room'], schedule: 'school-holidays' },
+        { devices: ['living-room-thermostat'], schedule: 'invented-schedule' },
+      ];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const action of rejected) {
+        let thrown = null;
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          await createScene(sceneCreateTool, action);
+        } catch (e) {
+          thrown = e;
+        }
+        expect(thrown).to.be.an('error');
+        expect(thrown.message).to.contain('scene.create validation failed (422)');
+      }
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
+    it('should not ask for schedules when there is no thermostat', async () => {
+      const mcpHandler = buildHandler([climateDevice], null);
+      await mcpHandler.getAllTools();
+      expect(mcpHandler.gladys.service.getService.called).to.equal(false);
+    });
+
+    it('should accept any schedule when the thermostat service is not running', async () => {
+      const mcpHandler = buildHandler([thermostat], null);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(mcpHandler.gladys.service.getService.calledWith('thermostat')).to.equal(true);
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
+    // Rejected, the lookup took every MCP tool down with it.
+    it('should accept any schedule when the schedules cannot be read', async () => {
+      const thermostatService = {
+        device: { running: true, getSchedules: stub().rejects(new Error('database locked')) },
+      };
+      const mcpHandler = buildHandler([thermostat], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
+
+    // A stopped service is still in the stateManager: only `running` says it runs.
+    it('should not read the schedules of a thermostat service that is stopped', async () => {
+      const thermostatService = { device: { running: false, getSchedules: stub().resolves([]) } };
+      const mcpHandler = buildHandler([thermostat], thermostatService);
+      const tools = await mcpHandler.getAllTools();
+      const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+      await createScene(sceneCreateTool, { devices: ['living-room-thermostat'], schedule: 'any-schedule' });
+      expect(thermostatService.device.getSchedules.called).to.equal(false);
+      expect(mcpHandler.gladys.scene.create.callCount).to.equal(1);
+    });
   });
 
   it('should reject scene.create when http.request action misses headers', async () => {
@@ -4244,6 +4416,150 @@ describe('build schemas', () => {
         'No measurement exists for this query, do not report any value.',
     );
   });
+
+  it('should read the whole home when the model passes "No room" to device.get-state or device.get-history', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon', house_id: 'house-1' },
+      { id: 'room-2', name: 'Chambre', selector: 'chambre', house_id: 'house-1' },
+    ];
+
+    const buildSensor = (suffix, roomSelector, roomName, category, value) => ({
+      selector: `capteur-${suffix}`,
+      name: `Capteur ${suffix}`,
+      room: roomSelector ? { selector: roomSelector, name: roomName } : null,
+      features: [
+        {
+          id: `feature-${suffix}`,
+          selector: `capteur-${suffix}-${category}`,
+          name: category,
+          category,
+          type: 'decimal',
+          unit: category === 'humidity-sensor' ? 'percent' : 'celsius',
+          last_value: value,
+          keep_history: true,
+        },
+      ],
+    });
+
+    // Every humidity sensor is in a room: the only device that was never assigned to
+    // a room is a temperature sensor.
+    const sensors = [
+      buildSensor('salon', 'salon', 'Salon', 'humidity-sensor', 52),
+      buildSensor('chambre', 'chambre', 'Chambre', 'humidity-sensor', 48),
+      buildSensor('garage', null, null, 'temperature-sensor', 17),
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isBatteryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({ value: feature.last_value, unit: feature.unit, age: '2min' })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Maison', selector: 'maison' }]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(sensors),
+          getBySelector: stub().callsFake(async (selector) => sensors.find((s) => s.selector === selector)),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      // "my room" is within the similarity distance of "no room" (2), like the real
+      // Levenshtein distance; nothing else is close to a name of the home.
+      levenshtein: { distance: stub().callsFake((a, b) => (a === 'no room' && b === 'my room' ? 2 : 10)) },
+      toon: stub().callsFake((data) => JSON.stringify(data)),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+    const getHistoryTool = tools.find((tool) => tool.intent === 'device.get-history');
+
+    // The read-only tools do not offer "No room" as a room any more.
+    const apiTools = mcpToolsToChatApiFormat(tools);
+    const roomParameterOf = (name) =>
+      apiTools.find((tool) => tool.function.name === name).function.parameters.properties.room;
+    expect(roomParameterOf('device_get_state').enum).to.deep.equal(['Salon', 'Chambre']);
+    expect(roomParameterOf('device_get_history').enum).to.deep.equal(['Salon', 'Chambre']);
+    // The camera and the control tools keep it, and say what it targets.
+    expect(roomParameterOf('camera_get_image').enum).to.deep.equal(['Salon', 'Chambre', 'No room']);
+    expect(roomParameterOf('camera_get_image').description).to.eq(
+      'Room to get image from. "No room" only targets the devices that are not assigned to a room, never the whole home.',
+    );
+    expect(roomParameterOf('device_turn_on_off').enum).to.deep.equal(['Salon', 'Chambre', 'No room']);
+    expect(roomParameterOf('device_turn_on_off').description).to.contain('"No room" only targets the devices');
+
+    // "Quels taux d'humidité dans la maison ?": the call of the forum report, which used
+    // to answer that no humidity sensor is configured in room "No room".
+    const humidity = await getStateTool.cb({ device_type: 'humidity-sensor', room: 'No room' });
+    expect(
+      JSON.parse(humidity.content[0].text).map(({ room, device, value }) => ({ room, device, value })),
+    ).to.deep.equal([
+      { room: 'Salon', device: 'Capteur salon', value: 52 },
+      { room: 'Chambre', device: 'Capteur chambre', value: 48 },
+    ]);
+
+    // Its selector reads the whole home too, and the device of no room is still part
+    // of it, labelled "No room".
+    const everything = await getStateTool.cb({ room: 'no-room' });
+    expect(JSON.parse(everything.content[0].text).map(({ room, device }) => ({ room, device }))).to.deep.equal([
+      { room: 'Salon', device: 'Capteur salon' },
+      { room: 'Chambre', device: 'Capteur chambre' },
+      { room: 'No room', device: 'Capteur garage' },
+    ]);
+
+    // Nothing of that type at home: the answer is about the whole home, not "No room".
+    const noCo2 = await getStateTool.cb({ device_type: 'co2-sensor', room: 'No room' });
+    expect(noCo2.content[0].text).to.eq(
+      'device.get-state: no device of type "co2-sensor" is configured. ' +
+        'No measurement exists for this query, do not report any value.',
+    );
+
+    // A name only close to "No room" names a room: it is neither widened to the whole
+    // home nor narrowed to the devices of no room, the model is asked to retry.
+    const myRoom = await getStateTool.cb({ device_type: 'humidity-sensor', room: 'my room' });
+    expect(myRoom.content[0].text).to.eq(
+      'device.get-state: "my room" is not a room of this home, no state was read. ' +
+        'Available rooms: Salon, Chambre. ' +
+        'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+    );
+
+    // The history of the humidity of the home: the first humidity sensor of the home,
+    // instead of "no device or feature found" among the devices of no room.
+    const history = await getHistoryTool.cb({ room: 'No room', feature: 'humidity-sensor:decimal' });
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[0]).to.eq(
+      'capteur-salon-humidity-sensor',
+    );
+    expect(JSON.parse(history.content[0].text)).to.include({ room: 'Salon', device: 'Capteur salon' });
+
+    mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
+
+    // A device asked for by name and absent from the selection does not fall back to the
+    // history of another device: the garage sensor has no humidity, and the bedroom sensor
+    // is not in the living room.
+    const garageHumidity = await getHistoryTool.cb({
+      room: 'No room',
+      device: 'Capteur garage',
+      feature: 'humidity-sensor:decimal',
+    });
+    expect(garageHumidity.content[0].text).to.eq('device.get-history, no device or feature found');
+    const bedroomInLivingRoom = await getHistoryTool.cb({ room: 'Salon', device: 'Capteur chambre' });
+    expect(bedroomInLivingRoom.content[0].text).to.eq('device.get-history, no device or feature found');
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.callCount).to.eq(0);
+  });
+
   describe('weather.get tool', () => {
     const houses = [
       { id: 'house-1', name: 'Maison', selector: 'maison', latitude: 48.8566, longitude: 2.3522 },

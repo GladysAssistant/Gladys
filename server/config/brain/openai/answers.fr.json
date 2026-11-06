@@ -4,6 +4,18 @@
     "answers": ["La requête vers l'API d'Intelligence Artificielle a échoué, merci de réessayer !"]
   },
   {
+    "label": "openai.provider-unavailable",
+    "answers": [
+      "Le fournisseur d'IA sélectionné sur cette instance n'a pas répondu (il est arrêté, déconnecté, trop lent, ou a renvoyé une réponse invalide). Vérifiez-le sur la page de son intégration, ou revenez à Gladys Plus dans les réglages de l'IA."
+    ]
+  },
+  {
+    "label": "openai.provider-busy",
+    "answers": [
+      "Le fournisseur d'IA sélectionné sur cette instance est saturé par trop de requêtes simultanées : merci de réessayer dans un instant."
+    ]
+  },
+  {
     "label": "openai.request.tooManyRequests",
     "answers": ["Vous avez fait trop de requêtes ce mois-ci vers l'API d'Intelligence Artificielle !"]
   },

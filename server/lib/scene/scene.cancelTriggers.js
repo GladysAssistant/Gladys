@@ -21,6 +21,12 @@ function cancelTriggers(sceneSelector) {
         trigger.nodeScheduleJob.cancel();
         delete trigger.nodeScheduleJob;
       }
+      // A "time-range" trigger schedules two jobs per range: all of them must be
+      // cancelled, otherwise an updated scene keeps firing on its former ranges.
+      if (trigger.nodeScheduleJobs) {
+        trigger.nodeScheduleJobs.forEach((job) => job.cancel());
+        delete trigger.nodeScheduleJobs;
+      }
       if (trigger.jsInterval) {
         clearInterval(trigger.jsInterval);
         delete trigger.jsInterval;

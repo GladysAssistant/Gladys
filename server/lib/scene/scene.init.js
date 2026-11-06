@@ -17,19 +17,23 @@ async function init() {
   }
   // get all scenes
   const scenes = await db.Scene.findAll();
-  const plainScenes = scenes.map((scene) => {
-    const plainScene = scene.get({ plain: true });
-    logger.debug(`Loading scene ${plainScene.name}`);
-    try {
-      this.addScene(plainScene, { skipDailyUpdate: true });
-      logger.debug(`Scene loaded with success`);
-    } catch (e) {
-      logger.warn(`Unable to load scene ${plainScene.name}`);
-      logger.warn(e);
-    }
+  // addScene is async: not awaited, a scene it refused became an unhandled rejection
+  // instead of the "Unable to load scene" below.
+  const plainScenes = await Promise.all(
+    scenes.map(async (scene) => {
+      const plainScene = scene.get({ plain: true });
+      logger.debug(`Loading scene ${plainScene.name}`);
+      try {
+        await this.addScene(plainScene, { skipDailyUpdate: true });
+        logger.debug(`Scene loaded with success`);
+      } catch (e) {
+        logger.warn(`Unable to load scene ${plainScene.name}`);
+        logger.warn(e);
+      }
 
-    return plainScene;
-  });
+      return plainScene;
+    }),
+  );
 
   // Recurrence rule (00:00 every day) to update sunrise/sunset time.
   const rule = { tz: this.timezone, hour: 0, minute: 0, second: 0 };
@@ -38,6 +42,9 @@ async function init() {
 
   //  At every minute, check if calendar event is coming
   this.scheduler.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
+
+  // Only re-applies the plannings on the first init: init() also runs on a timezone change.
+  this.resumeTimeRangeTriggers();
 
   return plainScenes;
 }

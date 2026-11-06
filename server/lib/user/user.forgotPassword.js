@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { Op } = require('sequelize');
 const db = require('../../models');
+const { normalizeEmail } = require('../../utils/email');
 const logger = require('../../utils/logger');
 const { NotFoundError } = require('../../utils/coreErrors');
 const { parseOrigin } = require('../../utils/origin');
@@ -90,7 +91,7 @@ async function forgotPassword(email, useragent, origin = null) {
   // look  if the user exist
   const user = await db.User.findOne({
     where: {
-      email,
+      email: normalizeEmail(email),
     },
   });
 

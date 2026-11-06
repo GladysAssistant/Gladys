@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 
 import { formatHttpError } from '../../utils/formatErrors';
 import downloadDeviceFeaturesCsv from '../../utils/downloadDeviceFeaturesCsv';
+import createBackdropDismiss from '../../utils/backdropDismiss';
 import { getExportableFeatures } from './helpers';
 import style from './style.css';
 
@@ -62,11 +63,7 @@ class DeviceExportCsvModal extends Component {
     }
   };
 
-  handleOverlayClick = e => {
-    if (e.target === e.currentTarget) {
-      this.close();
-    }
-  };
+  backdropDismiss = createBackdropDismiss(() => this.close());
 
   close = () => {
     // Covers all close paths (X, Escape, overlay, Cancel). While an export is
@@ -150,7 +147,7 @@ class DeviceExportCsvModal extends Component {
     // The dialog is rendered on <body>: the page and its cards carry backdrop filters, which
     // would turn a fixed overlay nested inside them into a box clipped to the card.
     return createPortal(
-      <div class={cx('glass-theme', style.exportOverlay)} onClick={this.handleOverlayClick}>
+      <div class={cx('glass-theme', style.exportOverlay)} {...this.backdropDismiss}>
         <Localizer>
           <div
             class={style.exportSheet}

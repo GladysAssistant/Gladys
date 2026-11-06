@@ -5,7 +5,7 @@ const sinon = require('sinon').createSandbox();
 
 const { assert, fake, stub } = sinon;
 const WebsocketManager = require('../../api/websockets');
-const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { WEBSOCKET_MESSAGE_TYPES, ERROR_MESSAGES } = require('../../utils/constants');
 
 describe('Websockets', () => {
   it('should test connection with normal token', async () => {
@@ -43,6 +43,46 @@ describe('Websockets', () => {
     ws.emit('message', JSON.stringify(connectionFirstMessage));
     await promise;
     assert.calledWith(gladys.session.validateAccessToken, 'token');
+  });
+  it('should keep the session the connection authenticated with', async () => {
+    const wss = new EventEmitter();
+    const gladys = {
+      event: new EventEmitter(),
+      user: {
+        getById: fake.resolves({ firstname: 'toto' }),
+      },
+      session: {
+        validateAccessToken: fake.returns({
+          user_id: '2efc9037-ff72-436b-9925-45782dfd305c',
+          session_id: 'a0bd2a19-60e1-4d4c-9a37-39c4b8a2dbd8',
+        }),
+      },
+    };
+    const websocketManager = new WebsocketManager(wss, gladys);
+    const promise = new Promise((resolve, reject) => {
+      // @ts-ignore
+      websocketManager.userConnected = (user, ws, sessionId) => {
+        try {
+          expect(sessionId).to.equal('a0bd2a19-60e1-4d4c-9a37-39c4b8a2dbd8');
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      };
+    });
+    websocketManager.init();
+    const ws = new EventEmitter();
+    wss.emit('connection', ws);
+    ws.emit(
+      'message',
+      JSON.stringify({
+        type: WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.REQUEST,
+        payload: {
+          accessToken: 'token',
+        },
+      }),
+    );
+    await promise;
   });
   it('should test connection with alarm token', async () => {
     const wss = new EventEmitter();
@@ -136,5 +176,60 @@ describe('Websockets', () => {
     websocketManager.userConnected({ id: 'aa0eaee9-5b90-4287-841a-0237f9d75832' }, client);
     websocketManager.sendMessageUser({ ...message, userId: 'aa0eaee9-5b90-4287-841a-0237f9d75832' });
     assert.calledWith(client.send, JSON.stringify(message));
+  });
+  it('should keep the last session a connection authenticated with', () => {
+    const wss = new EventEmitter();
+    const gladys = {
+      event: new EventEmitter(),
+      session: {
+        isRevoked: (sessionId) => sessionId === 'b7f1c1e2-3d4a-4f5b-8c6d-7e8f9a0b1c2d',
+      },
+    };
+    const websocketManager = new WebsocketManager(wss, gladys);
+    const client = {
+      readyState: WebSocket.OPEN,
+      send: fake.returns(0),
+      close: fake.returns(0),
+    };
+    const user = { id: 'aa0eaee9-5b90-4287-841a-0237f9d75832' };
+    websocketManager.userConnected(user, client, 'a0bd2a19-60e1-4d4c-9a37-39c4b8a2dbd8');
+    // authenticated again on the same socket, with a session that is revoked since
+    websocketManager.userConnected(user, client, 'b7f1c1e2-3d4a-4f5b-8c6d-7e8f9a0b1c2d');
+    expect(websocketManager.connections[user.id]).to.have.lengthOf(1);
+    expect(websocketManager.connections[user.id][0].sessionId).to.equal('b7f1c1e2-3d4a-4f5b-8c6d-7e8f9a0b1c2d');
+    assert.calledWith(client.close, 4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
+  });
+  it('should close the connection of a revoked session instead of sending it a message', () => {
+    const wss = new EventEmitter();
+    const gladys = {
+      event: new EventEmitter(),
+      session: {
+        isRevoked: stub().returns(false),
+      },
+    };
+    const websocketManager = new WebsocketManager(wss, gladys);
+    const client = {
+      readyState: WebSocket.OPEN,
+      send: fake.returns(0),
+      close: fake.returns(0),
+    };
+    const message = {
+      type: 'test',
+      payload: 'test',
+    };
+    websocketManager.userConnected(
+      { id: 'aa0eaee9-5b90-4287-841a-0237f9d75832' },
+      client,
+      'a0bd2a19-60e1-4d4c-9a37-39c4b8a2dbd8',
+    );
+    // the "connected" message is sent while the session is valid
+    assert.calledOnce(client.send);
+    gladys.session.isRevoked.returns(true);
+    websocketManager.sendMessageUser({ ...message, userId: 'aa0eaee9-5b90-4287-841a-0237f9d75832' });
+    websocketManager.sendMessageAllUsers(message);
+    assert.calledOnce(client.send);
+    assert.calledTwice(client.close);
+    assert.calledWith(client.close, 4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
+    assert.calledWith(gladys.session.isRevoked, 'a0bd2a19-60e1-4d4c-9a37-39c4b8a2dbd8');
   });
 });

@@ -29,6 +29,7 @@ import SignupGateway from '../routes/signup-gateway';
 import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
+import GatewayResetTwoFactor from '../routes/gateway-reset-two-factor';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
 import AlexaGateway from '../routes/integration/all/alexa-gateway';
@@ -70,7 +71,6 @@ import SettingsServicePage from '../routes/settings/settings-service';
 import SettingsGateway from '../routes/settings/settings-gateway';
 import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
-import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
 import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api';
 import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs';
 
@@ -270,10 +270,12 @@ const AppRouter = connect(
         {config.gatewayMode && <LinkGatewayUser path="/link-gateway-user" />}
         {config.gatewayMode && <SignupGateway path="/signup-gateway" />}
         {config.gatewayMode && <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />}
+        {config.gatewayMode && <GatewayResetTwoFactor path="/reset-two-factor" />}
         {config.gatewayMode && <GatewayConfirmEmail path="/confirm-email" />}
         {config.gatewayMode && <SettingsBilling path="/dashboard/settings/billing" />}
         {config.gatewayMode && <SettingsSecurityPage path="/dashboard/settings/security" />}
-        {config.gatewayMode && <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />}
+        {/* the Gladys Plus users are managed with the Gladys users since 5.x: old links land there */}
+        {config.gatewayMode && <Redirect path="/dashboard/settings/gateway-users" to="/dashboard/settings/user" />}
         {config.gatewayMode && <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />}
 
         {!config.gatewayMode && <SignupWelcomePage path="/signup" />}
@@ -287,7 +289,10 @@ const AppRouter = connect(
         <SafeAsyncRoute path="/dashboard/:dashboardSelector" component={Dashboard} />
         <EditDashboard path="/dashboard/:dashboardSelector/edit" />
         <NewDashboard path="/dashboard/create/new" />
-        <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
+        {/* a plain element like the other catalog views, not an AsyncRoute:
+            preact-router then reuses the same page from one view to the next,
+            so a running "Update all" survives a visit to "All integrations" */}
+        <IntegrationPage path="/dashboard/integration" />
 
         <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
         <IntegrationPage path="/dashboard/integration/updates" category="updates" />
@@ -305,6 +310,7 @@ const AppRouter = connect(
         <Redirect path="/dashboard/integration/communication" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/calendar" to="/dashboard/integration/services" />
         <Redirect path="/dashboard/integration/weather" to="/dashboard/integration/environment" />
+        <Redirect path="/dashboard/integration/tts" to="/dashboard/integration/assistants" />
         <Redirect path="/dashboard/integration/music" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/health" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/navigation" to="/dashboard/integration" />

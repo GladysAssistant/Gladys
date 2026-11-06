@@ -1,7 +1,9 @@
 import { Text } from 'preact-i18n';
+import get from 'get-value';
 import { RequestStatus } from '../../../utils/consts';
 
 import GatewayBackupRow from './GatewayBackupRow';
+import GatewayBackupHealth from './GatewayBackupHealth';
 
 const GatewayPage = ({ children, ...props }) => (
   <div class="card">
@@ -28,6 +30,7 @@ const GatewayPage = ({ children, ...props }) => (
           <Text id="gatewayBackup.restoreFailed" />
         </div>
       )}
+      <GatewayBackupHealth backupHealth={get(props, 'gatewayStatus.backup_health')} user={props.user} />
       <p>
         <Text id="gatewayBackup.description" />
       </p>

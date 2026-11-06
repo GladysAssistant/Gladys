@@ -20,7 +20,11 @@ const CATEGORY_ICONS = {
   network: 'wifi',
   notifications: 'message-square',
   assistants: 'mic',
-  services: 'calendar'
+  services: 'calendar',
+  transport: 'bus',
+  vehicles: 'car',
+  servers: 'server',
+  leisure: 'gamepad-2'
 };
 
 const catalogCategories = INTEGRATION_CATALOG_CATEGORIES.map(key => ({

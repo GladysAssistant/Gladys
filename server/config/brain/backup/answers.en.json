@@ -1,8 +1,20 @@
 [
   {
-    "label": "backup.fail",
+    "label": "backup.failing",
     "answers": [
-      "The Gladys Plus backup failed. For more information, go to the \"Settings\" => \"Tasks\" tab. The error message is {{ errorMessage }}"
+      "⚠️ Your Gladys Plus backups have been failing since {{ failingSinceDate }}{{#if lastSuccessDate}} (last successful backup: {{ lastSuccessDate }}){{else}} (no backup has succeeded yet){{/if}}. Last error: {{ errorMessage }}. Gladys retries every night: I will tell you as soon as a backup succeeds again, or remind you in a week if it still fails. Details in \"Settings\" => \"Tasks\"."
+    ]
+  },
+  {
+    "label": "backup.still-failing",
+    "answers": [
+      "⚠️ Reminder: your Gladys Plus backups have been failing since {{ failingSinceDate }}{{#if lastSuccessDate}} (last successful backup: {{ lastSuccessDate }}){{else}} (no backup has succeeded yet){{/if}}. Last error: {{ errorMessage }}. Gladys keeps retrying every night; next reminder in a week if it still fails. Details in \"Settings\" => \"Tasks\"."
+    ]
+  },
+  {
+    "label": "backup.recovered",
+    "answers": [
+      "✅ Your Gladys Plus backups are working again: a backup was uploaded successfully on {{ lastSuccessDate }}."
     ]
   }
 ]

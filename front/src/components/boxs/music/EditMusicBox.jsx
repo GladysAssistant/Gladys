@@ -21,9 +21,16 @@ class EditMusicBoxComponent extends Component {
       let musicDevices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: DEVICE_FEATURE_CATEGORIES.MUSIC
       });
-      // We only keep music player with at least the "play" capability
-      // Some music devices like the Nest Mini only exposes the "notification" for now
-      musicDevices = musicDevices.filter(d => d.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY));
+      // We only keep music players that can be told to play: a "play" command, or a writable
+      // playback_state (capabilities/music.md). Some music devices like the Nest Mini only
+      // expose the "notification" for now
+      musicDevices = musicDevices.filter(d =>
+        d.features.find(
+          f =>
+            f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY ||
+            (f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE && f.read_only === false)
+        )
+      );
       const musicDevicesOptions = musicDevices.map(d => ({
         label: d.name,
         value: d.selector

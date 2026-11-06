@@ -4,6 +4,7 @@ import uuid from 'uuid';
 import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
@@ -33,7 +34,7 @@ function createActions(store) {
       }
     },
     async saveDevice(state, device, index) {
-      const savedDevice = await state.httpClient.post('/api/v1/device', device);
+      const savedDevice = await state.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       const newState = update(state, {
         mqttDevices: {
           $splice: [[index, 1, savedDevice]]

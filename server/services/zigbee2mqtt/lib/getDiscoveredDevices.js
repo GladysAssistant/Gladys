@@ -80,7 +80,12 @@ function getDiscoveredDevices(filters = {}, defaultElectricMeterDeviceFeatureId)
     })
     .map((d) => {
       // Add energy features after merge so we can find existing consumption/cost features
+      const nbFeaturesBefore = d.features.length;
       addEnergyFeatures(d, defaultElectricMeterDeviceFeatureId);
+      // An existing device missing its consumption/cost features must be updatable to get them
+      if (d.id && d.features.length !== nbFeaturesBefore) {
+        d.updatable = true;
+      }
       return d;
     });
 

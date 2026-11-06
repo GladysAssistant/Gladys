@@ -21,6 +21,8 @@ describe('zigbee2mqtt mapUnit', () => {
     { input: 'VA', expected: DEVICE_FEATURE_UNITS.VOLT_AMPERE },
     { input: 'VArh', expected: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE },
     { input: 'min', expected: DEVICE_FEATURE_UNITS.MINUTES },
+    { input: 'm³/h', expected: DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR },
+    { input: 'm³/s', expected: DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND },
   ];
 
   values.forEach((value) => {

@@ -1,6 +1,7 @@
 import { ERROR_MESSAGES, WEBSOCKET_MESSAGE_TYPES } from '../../../server/utils/constants';
 import config from '../config';
 import { Dispatcher } from './Dispatcher';
+import { hasPasswordFields, omitPasswordFields } from './omitPasswordFields';
 
 class Session {
   constructor() {
@@ -93,7 +94,13 @@ class Session {
     }
     const data = localStorage.getItem('user');
     if (data) {
-      this.user = JSON.parse(data);
+      const user = JSON.parse(data);
+      if (hasPasswordFields(user)) {
+        // older versions of the profile page stored the new password here
+        this.saveUser(user);
+      } else {
+        this.user = user;
+      }
     }
     return this.user;
   }
@@ -146,7 +153,7 @@ class Session {
   }
 
   saveUser(user) {
-    const mergedUser = Object.assign({}, this.user, user);
+    const mergedUser = omitPasswordFields(Object.assign({}, this.user, user));
     this.user = mergedUser;
     localStorage.setItem('user', JSON.stringify(mergedUser));
   }

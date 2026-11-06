@@ -11,7 +11,7 @@ const logger = require('../../../utils/logger');
  */
 async function proxy(req, res, handler) {
   const mcpHandler = handler || this;
-  if (mcpHandler.server === null) {
+  if (mcpHandler.schemas === null) {
     res.json({
       success: false,
       error: 'MCP server is not running',
@@ -20,6 +20,7 @@ async function proxy(req, res, handler) {
   }
 
   try {
+    const server = mcpHandler.createServer();
     const transport = new mcpHandler.mcp.StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       ...(!handler && { enableJsonResponse: true }),
@@ -27,9 +28,10 @@ async function proxy(req, res, handler) {
 
     res.on('close', () => {
       transport.close();
+      server.close();
     });
 
-    await mcpHandler.server.connect(transport);
+    await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
   } catch (e) {
     logger.error('Error handling MCP request:', e);

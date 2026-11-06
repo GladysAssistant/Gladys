@@ -11,6 +11,7 @@ import config from '../../../../config';
 import EnedisPage from './EnedisPage';
 import { buildUsagePointDevicePayload } from './usagePointDeviceBuilder';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway }) => (
   <div class="card">
@@ -123,7 +124,7 @@ class EnedisWelcomePageComponent extends Component {
       intlDictionary: this.props.intl.dictionary,
       existingDevice
     });
-    await this.props.httpClient.post('/api/v1/device', device);
+    await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
   };
   sync = async () => {
     await this.props.httpClient.post('/api/v1/service/enedis/sync');

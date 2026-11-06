@@ -8,6 +8,7 @@ import { PARAMS } from '../../../../../../server/services/zwavejs-ui/lib/constan
 
 import { connect } from 'unistore/preact';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class ZwaveJSUIDeviceBox extends Component {
   componentWillMount() {
@@ -47,7 +48,10 @@ class ZwaveJSUIDeviceBox extends Component {
     });
     try {
       let deviceDidNotExist = this.state.device.id === undefined;
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(this.state.device)
+      );
       if (deviceDidNotExist) {
         savedDevice.alreadyExist = true;
       }

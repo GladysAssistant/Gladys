@@ -5,8 +5,8 @@ import SecurityPage from './SecurityPage';
 import { RequestStatus } from '../../../utils/consts';
 
 // Gladys Plus account security. Only reachable in gateway mode, where the
-// Gladys Plus user is the one logged in: the recovery codes route is
-// user-scoped, a Gladys instance cannot generate codes for its account.
+// Gladys Plus user is the one logged in: the recovery codes and two-factor
+// routes are user-scoped, a Gladys instance cannot act on its account.
 class SettingsSecurity extends Component {
   state = {
     status: null,
@@ -54,6 +54,7 @@ class SettingsSecurity extends Component {
   render(props, { status, confirming, recoveryCodes, twoFactorCode, wrongTwoFactorCode }) {
     return (
       <SecurityPage
+        session={props.session}
         status={status}
         confirming={confirming}
         recoveryCodes={recoveryCodes}

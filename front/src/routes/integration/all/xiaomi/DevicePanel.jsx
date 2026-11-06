@@ -43,6 +43,7 @@ const DevicePanel = ({ children, ...props }) => (
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  getXiaomiDevices={props.getXiaomiDevices}
                 />
               ))}
             {props.xiaomiDevices && props.xiaomiDevices.length === 0 && (

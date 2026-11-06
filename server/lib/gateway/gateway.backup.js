@@ -9,8 +9,8 @@ const logger = require('../../utils/logger');
 const { execFile } = require('../../utils/childProcess');
 const { escapeSqlStringLiteral } = require('../../utils/backupSafety');
 const { readChunk } = require('../../utils/readChunk');
-const { NotFoundError } = require('../../utils/coreErrors');
-const { USER_ROLE, ERROR_MESSAGES } = require('../../utils/constants');
+const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
+const { ERROR_MESSAGES } = require('../../utils/constants');
 const { Error402 } = require('../../utils/httpErrors');
 
 const BACKUP_NAME_BASE = 'gladys-db-backup';
@@ -58,6 +58,15 @@ const logMemoryUsage = async (label) => {
  * backup();
  */
 async function backup(jobId) {
+  // Before any await, so that two backups asked at the same moment (the
+  // scheduled one and "Backup now", or two clicks) cannot both get past: a
+  // second one at the same time would empty the folder of the first
+  if (this.backupInProgress) {
+    logger.info('Gateway backup: a backup is already in progress, not starting another one.');
+    throw new ConflictError(ERROR_MESSAGES.BACKUP_ALREADY_IN_PROGRESS);
+  }
+  // checkIfBackupNeeded does not schedule another backup while this one runs
+  this.backupInProgress = true;
   const linkGeneration = this.subscriptionLinkGeneration;
   try {
     // no point in dumping and encrypting the database when Gladys Plus will
@@ -201,6 +210,13 @@ async function backup(jobId) {
       });
       throw e;
     }
+    // this backup covers the day: a scheduled one is no longer needed (a
+    // failed manual backup leaves it armed, the day still needs a backup)
+    clearTimeout(this.pendingBackupTimer);
+    this.pendingBackupTimer = null;
+    // outside the multipart try: the upload is finalized, nothing here may
+    // abort it (recordBackupSuccess never throws anyway)
+    await this.recordBackupSuccess(new Date(), linkGeneration);
     return {
       encryptedBackupFilePath,
     };
@@ -211,15 +227,13 @@ async function backup(jobId) {
     if (e instanceof Error402) {
       throw e;
     }
-    // If the backup fails, we need to warn the admins of this installation
-    const admins = await this.user.getByRole(USER_ROLE.ADMIN);
-    admins.forEach((admin) => {
-      const message = this.brain.getReply(admin.language, 'backup.fail', {
-        errorMessage: e.toString(),
-      });
-      this.message.sendSystemMessage(admin.selector, message);
-    });
+    // The admins are warned on the state of the backups, not on each failed
+    // attempt (see gateway.backupHealth); never throws, the backup error is
+    // the one rethrown below
+    await this.recordBackupFailure(e.toString(), linkGeneration);
     throw e;
+  } finally {
+    this.backupInProgress = false;
   }
 }
 

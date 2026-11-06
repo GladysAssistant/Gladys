@@ -28,11 +28,20 @@ async function getUsersKeys() {
 
       // if the user already exist
       if (found) {
+        // the link to the local Gladys user, the name and the connection state
+        // live on Gladys Plus: they change after the list was saved (the user
+        // picks their Gladys user on their first Gladys Plus login, for instance)
+        found.name = onlineUser.name;
+        found.gladys_4_user_id = onlineUser.gladys_4_user_id;
+        found.connected = onlineUser.connected;
         // if the keys are different, we revoke the authorization
         if (
           found.rsa_public_key !== onlineUser.rsa_public_key ||
           found.ecdsa_public_key !== onlineUser.ecdsa_public_key
         ) {
+          // remember that this user was authorized with other keys, so the UI
+          // can explain why they need to be authorized again
+          found.keys_changed = found.accepted === true || found.keys_changed === true;
           found.accepted = false;
           found.rsa_public_key = onlineUser.rsa_public_key;
           found.ecdsa_public_key = onlineUser.ecdsa_public_key;

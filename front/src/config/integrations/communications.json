@@ -10,6 +10,7 @@
     "key": "nextcloudTalk",
     "img": "/assets/integrations/cover/nextcloud-talk.jpg",
     "local": true,
+    "deprecated": true,
     "categories": ["notifications"]
   },
   {
@@ -55,6 +56,7 @@
     "key": "callmebot",
     "img": "/assets/integrations/cover/callmebot.jpg",
     "cloud": true,
+    "deprecated": true,
     "categories": ["notifications"]
   },
   {

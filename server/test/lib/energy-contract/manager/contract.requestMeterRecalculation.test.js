@@ -3,6 +3,7 @@ const sinon = require('sinon').createSandbox();
 const { EVENTS } = require('../../../../utils/constants');
 const { buildManager, contractPayload, METER_DEVICE_ID } = require('./helpers');
 const { RECALCULATION_MIN_INTERVAL_MS } = require('../../../../lib/energy-contract/recalculation.schedule');
+const { waitUntil } = require('../../../helpers/waitUntil');
 
 describe('energyContract.requestMeterRecalculation', () => {
   let energyContract;
@@ -29,7 +30,8 @@ describe('energyContract.requestMeterRecalculation', () => {
     expect(clearCache.callCount).to.equal(1);
     // within the window: merged into one deferred run, keeping the earliest instant
     const state = energyContract.meterRecalculations.get(METER_DEVICE_ID);
-    state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 50;
+    // the window ends in 500 ms: room for the three requests below on a loaded CI runner
+    state.last_at = Date.now() - RECALCULATION_MIN_INTERVAL_MS + 500;
     await energyContract.requestMeterRecalculation(METER_DEVICE_ID, new Date('2026-01-13T05:30:00Z'));
     // a later instant never pushes the pending one forward
     await energyContract.requestMeterRecalculation(METER_DEVICE_ID, new Date('2026-01-14T05:30:00Z'));
@@ -39,10 +41,7 @@ describe('energyContract.requestMeterRecalculation', () => {
     expect(state.timer).to.not.equal(null);
     // the current price cache is cleared on every request, not when the deferred run starts
     expect(clearCache.callCount).to.equal(4);
-    await new Promise((resolve) => {
-      setTimeout(resolve, 150);
-    });
-    expect(emitted.callCount).to.equal(2);
+    await waitUntil(() => emitted.callCount === 2, { timeout: 3000, message: 'the deferred recalculation' });
     expect(emitted.secondCall.args[0].from.toISOString()).to.equal('2026-01-10T05:30:00.000Z');
     // a backfill before the first contract of the meter: recalculated from the contract start only
     state.last_at = 0;

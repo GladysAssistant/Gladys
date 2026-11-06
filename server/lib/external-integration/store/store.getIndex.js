@@ -1,8 +1,9 @@
 const logger = require('../../../utils/logger');
 const { STORE_INDEX_CACHE_VARIABLE, STORE_INDEX_TTL_MS } = require('./store.constants');
+const { toLiteIndex } = require('./store.downloadIndex');
 
 /**
- * @description Get the store index: in-memory copy if fresh (< 30 min),
+ * @description Get the lite store index: in-memory copy if fresh (< 30 min),
  * otherwise refreshed from the network, with fallback on the local
  * persistent cache when the network or the store storage is unavailable. Can
  * return null when no index was ever fetched: the worst case (store fully
@@ -30,7 +31,8 @@ async function getIndex({ refresh = false } = {}) {
     if (cached !== null) {
       try {
         const parsed = JSON.parse(cached);
-        this.storeIndex = parsed.index;
+        // a cache written before the lite index existed holds the full one
+        this.storeIndex = toLiteIndex(parsed.index);
         this.storeIndexFetchedAt = parsed.fetched_at || 0;
       } catch (e) {
         logger.warn('Invalid store index local cache', e);

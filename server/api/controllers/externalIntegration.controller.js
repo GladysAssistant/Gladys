@@ -1,7 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { BadParameters, NotFoundError } = require('../../utils/coreErrors');
 const { Error422 } = require('../../utils/httpErrors');
-const { USER_ROLE } = require('../../utils/constants');
+const { USER_ROLE, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { MAX_WIDGET_SETTINGS_BYTES } = require('../../lib/external-integration/constants');
 
 // Manifest types of the integrations a non-admin user can act on: they link
@@ -258,12 +258,29 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @api {get} /api/v1/external_integration/store getStore
    * @apiName getStore
    * @apiGroup ExternalIntegration
-   * @apiDescription The store catalog from the server index cache, with
-   * search and the installed / update available / compatible flags.
+   * @apiDescription The store catalog from the server lite index cache
+   * (manifest reduced to what the list needs), with search and the
+   * installed / update available / compatible flags.
    */
   async function getStore(req, res) {
     const catalog = await gladys.externalIntegration.getCatalog({ search: req.query.search });
     res.json(catalog);
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/store/integration getStoreIntegration
+   * @apiName getStoreIntegration
+   * @apiGroup ExternalIntegration
+   * @apiDescription One store integration with its complete manifest, for
+   * its install page (the catalog only carries the lite manifest). 404 when
+   * the integration is not in the store index.
+   */
+  async function getStoreIntegration(req, res) {
+    if (!req.query.store_slug) {
+      throw new BadParameters('store_slug is required');
+    }
+    const integration = await gladys.externalIntegration.getStoreIntegration(req.query.store_slug);
+    res.json(integration);
   }
 
   /**
@@ -681,6 +698,40 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/ai_provider getAiProvider
+   * @apiName getAiProvider
+   * @apiGroup ExternalIntegration
+   * @apiDescription Current AI provider selection (null selector = the
+   * Gladys Plus default) and the installed AI provider integrations
+   * (manifest type "ai"). Authenticated but not admin-only: the chat needs
+   * to know an external provider is active to hide its model selector.
+   */
+  async function getAiProvider(req, res) {
+    const [selector, providers] = await Promise.all([
+      gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER),
+      gladys.externalIntegration.getAiProviders(),
+    ]);
+    res.json({ selector, providers });
+  }
+
+  /**
+   * @api {post} /api/v1/ai_provider setAiProvider
+   * @apiName setAiProvider
+   * @apiGroup ExternalIntegration
+   * @apiParam {string} [selector] Selector of an installed AI provider
+   * integration, or null to reset to Gladys Plus.
+   * @apiDescription Select the AI provider of the instance. All the AI
+   * traffic (chat, intent router, scene ai.ask, weekly digest) then goes
+   * through it instead of Gladys Plus.
+   */
+  async function setAiProvider(req, res) {
+    const requestedSelector = req.body.selector === undefined ? null : req.body.selector;
+    const selector = await gladys.externalIntegration.setAiProvider(requestedSelector);
+    const providers = await gladys.externalIntegration.getAiProviders();
+    res.json({ selector, providers });
+  }
+
+  /**
    * @api {delete} /api/v1/external_integration/:selector destroy
    * @apiName destroy
    * @apiGroup ExternalIntegration
@@ -699,6 +750,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     getHardware: asyncMiddleware(getHardware),
     setHardware: asyncMiddleware(setHardware),
     getStore: asyncMiddleware(getStore),
+    getStoreIntegration: asyncMiddleware(getStoreIntegration),
     refreshStore: asyncMiddleware(refreshStore),
     getStoreDocs: asyncMiddleware(getStoreDocs),
     install: asyncMiddleware(install),
@@ -728,6 +780,8 @@ module.exports = function ExternalIntegrationController(gladys) {
     saveOwnCalendarAccount: asyncMiddleware(saveOwnCalendarAccount),
     disableOwnCalendarAccount: asyncMiddleware(disableOwnCalendarAccount),
     updateOwnCalendar: asyncMiddleware(updateOwnCalendar),
+    getAiProvider: asyncMiddleware(getAiProvider),
+    setAiProvider: asyncMiddleware(setAiProvider),
     destroy: asyncMiddleware(destroy),
   });
 };

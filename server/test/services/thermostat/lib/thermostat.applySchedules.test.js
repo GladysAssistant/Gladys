@@ -263,7 +263,9 @@ describe('thermostat.applySchedules (integration)', () => {
   });
 
   it('should cut heating when the window is open', async () => {
-    const device = buildThermostatDevice(baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+    const device = buildThermostatDevice(
+      baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
+    );
     const mod = loadModule(buildSchedule('comfort'));
     const gladys = makeGladys({
       devices: [device],

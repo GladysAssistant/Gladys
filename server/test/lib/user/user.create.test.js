@@ -38,6 +38,18 @@ describe('user.create', () => {
     });
     await user.login('tony.stark@gladysassistant.com', 'testststs');
   });
+  it('should store the email trimmed and in lower case', async () => {
+    const createdUser = await user.create({
+      firstname: 'Tony',
+      lastname: 'Stark',
+      email: ' Tony.Stark@gladysassistant.com ',
+      password: 'testststs',
+      birthdate: '01/01/2019',
+      language: 'en',
+      role: 'admin',
+    });
+    expect(createdUser).to.have.property('email', 'tony.stark@gladysassistant.com');
+  });
   it('should not create user, wrong email', async () => {
     const promise = user.create({
       firstname: 'Tony',

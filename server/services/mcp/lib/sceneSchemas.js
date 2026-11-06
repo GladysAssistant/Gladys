@@ -15,6 +15,18 @@ const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'fr
 const comparisonOperatorSchema = z.enum(COMPARISON_OPERATORS);
 const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
 const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
+// The days of the week are shared by every range, and live on the trigger itself.
+// A range starting and ending at the same time covers nothing, and is rejected by the scene
+// model: refusing it here too makes the tool fail with a message instead of failing later,
+// deeper in the create.
+const timeRangeSchema = z
+  .object({
+    start: z.string().regex(hhmmPattern),
+    end: z.string().regex(hhmmPattern),
+  })
+  .refine((range) => range.start !== range.end, {
+    message: 'A time range cannot start and end at the same time',
+  });
 
 const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.DEVICE.NEW_STATE,
@@ -159,6 +171,8 @@ function selectorSchema(selectors) {
  * @param {Array<string>} [deviceFeatureSelectors] - Allowed device feature selectors.
  * @param {Array<string>} [calendarSelectors] - Allowed calendar selectors.
  * @param {Array<string>} [areaSelectors] - Allowed area selectors.
+ * @param {Array<string>} [thermostatDeviceSelectors] - Allowed thermostat device selectors.
+ * @param {Array<string>} [thermostatScheduleSelectors] - Allowed thermostat schedule selectors.
  * @returns {object} Scene creation Zod schema.
  * @example
  * createSceneCreateInputSchema(['scene-a'], ['john'], ['main-house']);
@@ -173,6 +187,8 @@ function createSceneCreateInputSchema(
   deviceFeatureSelectors = [],
   calendarSelectors = [],
   areaSelectors = [],
+  thermostatDeviceSelectors = [],
+  thermostatScheduleSelectors = [],
 ) {
   const sceneSelectorSchema = selectorSchema(sceneSelectors);
   const userSelectorSchema = selectorSchema(userSelectors);
@@ -183,6 +199,8 @@ function createSceneCreateInputSchema(
   const deviceFeatureSelectorSchema = selectorSchema(deviceFeatureSelectors);
   const calendarSelectorSchema = selectorSchema(calendarSelectors);
   const areaSelectorSchema = selectorSchema(areaSelectors);
+  const thermostatDevicesSchema = z.array(selectorSchema(thermostatDeviceSelectors));
+  const thermostatScheduleSelectorSchema = selectorSchema(thermostatScheduleSelectors);
   const messageServiceSchema = z
     .string()
     .nullish()
@@ -304,6 +322,14 @@ function createSceneCreateInputSchema(
           .optional(),
         days_of_the_week: z.array(weekDaysSchema).optional(),
       }),
+      actionSchemaByType(ACTIONS.CONDITION.IN_TIME_RANGE, {
+        in_range: z
+          .boolean()
+          .optional()
+          .describe(
+            'True (default) continues when the current time is inside one of the time ranges of the scene, false when it is outside.',
+          ),
+      }),
       actionSchemaByType(ACTIONS.HOUSE.IS_EMPTY, {
         house: houseSelectorSchema,
       }),
@@ -374,6 +400,10 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.ZIGBEE2MQTT.SEND, {
         topic: z.string(),
         message: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.THERMOSTAT.SET_SCHEDULE, {
+        devices: thermostatDevicesSchema.describe('Thermostats created by the Thermostat integration.'),
+        schedule: thermostatScheduleSelectorSchema.describe('Weekly schedule the thermostats follow from now on.'),
       }),
       actionSchemaByType(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, {
         integration: z.string(),
@@ -532,6 +562,25 @@ function createSceneCreateInputSchema(
         .min(1)
         .max(31)
         .optional(),
+      key: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.CHANGED, {
+      scheduler_type: z.literal('time-range'),
+      time_ranges: z
+        .array(timeRangeSchema)
+        .min(1)
+        .describe('Time ranges: the scene runs at the start and at the end of each one.'),
+      resume_on_startup: z
+        .boolean()
+        .optional()
+        .describe('Also run the scene when Gladys starts, to re-apply the state of the planning.'),
+      // Only what a planning means: the date, time, interval, unit and day of the month of
+      // the other scheduler types do nothing here.
+      days_of_the_week: z
+        .array(weekDaysSchema)
+        .min(1)
+        .optional()
+        .describe('Days the ranges start on. Absent means every day; an empty list is refused.'),
       key: z.string().optional(),
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {

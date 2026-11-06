@@ -46,6 +46,38 @@ describe('IncomingMessageMock', () => {
     expect(request.listeners.end).to.eq(endListener);
   });
 
+  it('should remove event listener with off() method', () => {
+    const request = new IncomingMessageMock('GET', {}, '');
+
+    const dataListener = fake();
+    const endListener = fake();
+
+    request.on('data', dataListener);
+    request.on('end', endListener);
+    request.off('data', dataListener);
+
+    expect(request.listeners.data).to.eq(undefined);
+    expect(request.listeners.end).to.eq(endListener);
+  });
+
+  it('should end the stream at once with resume() method', () => {
+    const request = new IncomingMessageMock('POST', {}, '{}');
+
+    const endListener = fake();
+    request.on('end', endListener);
+
+    const result = request.resume();
+
+    expect(endListener.callCount).to.eq(1);
+    expect(result).to.eq(request);
+  });
+
+  it('should not throw when resume() is called without end listener', () => {
+    const request = new IncomingMessageMock('POST', {}, '{}');
+
+    expect(() => request.resume()).to.not.throw();
+  });
+
   it('should parse JSON body with json() method', () => {
     const bodyObject = {
       message: 'Hello',

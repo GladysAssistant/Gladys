@@ -10,7 +10,10 @@ const { STARTUP_TIMEOUT_MS } = require('./constants');
  * container exist, start the container (status LOADING) and arm the startup
  * timeout — a started container is not a working integration, RUNNING only
  * comes with the first successful WS auth or HTTP heartbeat; neither within
- * 60s means DEGRADED. Also called through the proxy service by the standard
+ * 60s means DEGRADED. An image missing on the machine (backup restored on
+ * a new machine) is pulled first, in the background: the start returns the
+ * LOADING integration and pullMissingImages starts it again once every
+ * image is there. Also called through the proxy service by the standard
  * service lifecycle (service.startAll at boot).
  * @param {string} selector - The selector of the external integration.
  * @param {object} [options] - Options.
@@ -25,6 +28,11 @@ async function start(selector, { resetFailureCount = true } = {}) {
   if (!this.available) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
+  if (this.imagePulls.has(service.id)) {
+    // the images of a previous start are still being pulled: that pull
+    // ends with a start, nothing to do until then
+    return service;
+  }
   this.clearTimers(service.id);
   // a manual start is the admin action required to leave the ERROR state
   if (resetFailureCount && service.failure_count > 0) {
@@ -32,6 +40,18 @@ async function start(selector, { resetFailureCount = true } = {}) {
   }
   await this.saveStatus(service, SERVICE_STATUS.LOADING);
   await this.ensureNetwork();
+  // the row can outlive the images: a backup restored on another machine
+  // (migration to a new mini-PC) brings the integration back without its
+  // containers nor its images — pull what is missing in the background
+  // (service.startAll is sequential: an awaited pull would hold every
+  // later service back) and come back here once done
+  const missingImages = await this.getMissingImages(service);
+  if (missingImages.length > 0) {
+    this.pullMissingImages(service, missingImages).catch((e) => {
+      logger.warn(`Unable to pull the images of integration ${selector}`, e);
+    });
+    return this.getBySelector(selector);
+  }
   // the desired sub-containers start before the main container (zero code
   // for the `start: "auto"` case; `"manual"` entries wait for the API)
   try {

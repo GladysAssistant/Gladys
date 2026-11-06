@@ -163,19 +163,35 @@ async function installZ2mContainer(config, setupMode = false) {
     // Check if we need to restart the container (container is not running / config changed)
     if (container.state !== 'running' || configChanged) {
       logger.info('Zigbee2mqtt container is (re)starting...');
+      // Until Zigbee2mqtt answers, the UI tells that it is starting, for a bounded time: a Zigbee2mqtt that
+      // crashes before connecting to the broker never says anything
+      this.zigbee2mqttStarting = true;
+      clearTimeout(this.startingTimer);
+      this.startingTimer = setTimeout(() => {
+        this.startingTimer = null;
+        this.zigbee2mqttStarting = false;
+        this.emitStatusEvent();
+      }, this.zigbee2mqttStartingTimeoutInMs);
+      // Only the logs of the new run explain why it fails. Docker counts in seconds: taken before the restart, not
+      // to miss the first lines of the new run
+      const restartedAt = Math.floor(Date.now() / 1000);
       await this.gladys.system.restartContainer(container.id);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
       // We read the logs in non blocking mode
-      this.readZ2mContainerLogs(container.id);
+      this.readZ2mContainerLogs(container.id, restartedAt);
     }
 
     logger.info('Zigbee2mqtt container successfully started');
-    this.zigbee2mqttRunning = true;
+    // Running is proven by Zigbee2mqtt itself, when it answers the health check: a started container can
+    // still crash in a loop, for example when the adapter driver refuses the firmware of the dongle.
     this.zigbee2mqttExist = true;
   } catch (e) {
     logger.error('Zigbee2mqtt container failed to start:', e);
     this.zigbee2mqttRunning = false;
+    clearTimeout(this.startingTimer);
+    this.startingTimer = null;
+    this.zigbee2mqttStarting = false;
     throw e;
   } finally {
     this.emitStatusEvent();

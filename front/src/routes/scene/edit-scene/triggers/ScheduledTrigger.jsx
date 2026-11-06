@@ -10,6 +10,7 @@ import { fr, de, es } from 'date-fns/locale';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import datePickerStyle from '../../../../components/datePicker.css';
+import TimeRangesTrigger from './TimeRangesTrigger';
 
 const DAYS_OF_THE_MONTH = new Array(31).fill(0, 0, 31).map((val, index) => index + 1);
 
@@ -23,6 +24,8 @@ class TurnOnLight extends Component {
     this.props.updateTriggerProperty(this.props.index, 'unit', undefined);
     this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', undefined);
     this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', undefined);
+    this.props.updateTriggerProperty(this.props.index, 'time_ranges', undefined);
+    this.props.updateTriggerProperty(this.props.index, 'resume_on_startup', undefined);
   };
   handleTypeChange = e => {
     const schedulerType = e.target.value;
@@ -52,6 +55,18 @@ class TurnOnLight extends Component {
     } else if (schedulerType === 'interval') {
       this.props.updateTriggerProperty(this.props.index, 'unit', 'second');
       this.props.updateTriggerProperty(this.props.index, 'interval', 30);
+    } else if (schedulerType === 'time-range') {
+      this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday'
+      ]);
+      this.props.updateTriggerProperty(this.props.index, 'time_ranges', [{ start: '', end: '' }]);
+      this.props.updateTriggerProperty(this.props.index, 'resume_on_startup', false);
     }
   };
   handleDateChange = date => {
@@ -117,6 +132,9 @@ class TurnOnLight extends Component {
                 </option>
                 <option value="custom-time">
                   <Text id="editScene.triggersCard.scheduledTrigger.customTime" />
+                </option>
+                <option value="time-range">
+                  <Text id="editScene.triggersCard.scheduledTrigger.timeRange" />
                 </option>
               </select>
             </div>
@@ -346,6 +364,13 @@ class TurnOnLight extends Component {
             </div>
           )}
         </div>
+        {this.props.trigger.scheduler_type === 'time-range' && (
+          <TimeRangesTrigger
+            trigger={this.props.trigger}
+            index={this.props.index}
+            updateTriggerProperty={this.props.updateTriggerProperty}
+          />
+        )}
       </div>
     );
   }

@@ -6,6 +6,8 @@ const { disconnect } = require('./disconnect');
 const { handleMqttMessage } = require('./handleMqttMessage');
 const { publish } = require('./publish');
 const { getDiscoveredDevices } = require('./getDiscoveredDevices');
+const { syncRenamedDevices } = require('./syncRenamedDevices');
+const { postDelete } = require('./postDelete');
 const { findMatchingExpose } = require('./findMatchingExpose');
 const { readValue } = require('./readValue');
 const { setValue } = require('./setValue');
@@ -25,8 +27,10 @@ const { saveZ2mBackup } = require('./saveZ2mBackup');
 const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
 const { getManagedAdapters } = require('./getManagedAdapters');
+const { getUsbPorts } = require('./getUsbPorts');
 const { readZ2mContainerLogs } = require('./readZ2mContainerLogs');
 const { reset } = require('./reset');
+const { requestHealthCheck } = require('./requestHealthCheck');
 const { JOB_TYPES } = require('../../../utils/constants');
 
 // EVENTS
@@ -47,6 +51,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.mqttClient = null;
 
   this.discoveredDevices = {};
+  this.syncRenamedDevicesRunning = false;
+  this.pendingSyncRenamedDevices = null;
+  this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
   this.networkAdapterConfigured = false;
@@ -57,7 +64,10 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.zigbee2mqttRunning = false;
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  // Gladys (re)started the Zigbee2mqtt container and waits for it to answer
+  this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
+  this.healthCheckTimer = null;
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
@@ -65,6 +75,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.dockerBased = false;
 
   this.containerRestartWaitTimeInMs = 5 * 1000;
+  // Without an answer by then, Zigbee2mqtt is shown as not answering instead of starting
+  this.zigbee2mqttStartingTimeoutInMs = 2 * 60 * 1000;
+  this.startingTimer = null;
 
   this.backup = gladys.job.wrapper(JOB_TYPES.SERVICE_ZIGBEE2MQTT_BACKUP, this.backup.bind(this));
   this.backupJob = {};
@@ -79,6 +92,8 @@ Zigbee2mqttManager.prototype.disconnect = disconnect;
 Zigbee2mqttManager.prototype.handleMqttMessage = handleMqttMessage;
 Zigbee2mqttManager.prototype.publish = publish;
 Zigbee2mqttManager.prototype.getDiscoveredDevices = getDiscoveredDevices;
+Zigbee2mqttManager.prototype.syncRenamedDevices = syncRenamedDevices;
+Zigbee2mqttManager.prototype.postDelete = postDelete;
 Zigbee2mqttManager.prototype.findMatchingExpose = findMatchingExpose;
 Zigbee2mqttManager.prototype.readValue = readValue;
 Zigbee2mqttManager.prototype.setValue = setValue;
@@ -98,8 +113,10 @@ Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
 Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
+Zigbee2mqttManager.prototype.getUsbPorts = getUsbPorts;
 Zigbee2mqttManager.prototype.readZ2mContainerLogs = readZ2mContainerLogs;
 Zigbee2mqttManager.prototype.reset = reset;
+Zigbee2mqttManager.prototype.requestHealthCheck = requestHealthCheck;
 
 // EVENTS
 Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;

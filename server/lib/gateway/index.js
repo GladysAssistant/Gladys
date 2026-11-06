@@ -17,6 +17,7 @@ const { login } = require('./gateway.login');
 const { loginTwoFactor } = require('./gateway.loginTwoFactor');
 const { configureTwoFactor } = require('./gateway.configureTwoFactor');
 const { enableTwoFactor } = require('./gateway.enableTwoFactor');
+const { generateUserRecoveryCodes } = require('./gateway.generateUserRecoveryCodes');
 const { init } = require('./gateway.init');
 const { getStatus } = require('./gateway.getStatus');
 const { getBackups } = require('./gateway.getBackups');
@@ -50,6 +51,7 @@ const { setSubscriptionActive } = require('./gateway.setSubscriptionActive');
 const { callPlanGatedApi } = require('./gateway.callPlanGatedApi');
 const { throwIfPaymentRequired } = require('./gateway.throwIfPaymentRequired');
 const { refreshSubscriptionStatus } = require('./gateway.refreshSubscriptionStatus');
+const { getBackupHealth, recordBackupSuccess, recordBackupFailure } = require('./gateway.backupHealth');
 
 // Enedis API
 const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
@@ -105,6 +107,20 @@ const Gateway = function Gateway(
   this.googleHomeForwardStateTimeout = 5 * 1000;
   this.alexaForwardStateTimeout = 5 * 1000;
   this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
+  // catch-up of a missed nightly backup (Gladys was off or offline at 2 AM):
+  // one check a few minutes after start-up, and one daytime check
+  this.backupCatchUpInitTimeout = 5 * 60 * 1000; // 5 minutes
+  this.backupCatchUpHour = 10;
+  this.backupCatchUpInitTimer = null;
+  this.backupCatchUpSchedule = null;
+  // one backup at a time: the random delay before a backup, and the backup
+  // itself, keep the other checks (night, daytime, start-up, unlock) from
+  // scheduling a second one
+  this.pendingBackupTimer = null;
+  this.backupInProgress = false;
+  this.backupCheckInProgress = false;
+  // pending change of the backup health, see gateway.backupHealth
+  this.backupHealthTransition = null;
   this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({
@@ -140,6 +156,7 @@ Gateway.prototype.login = login;
 Gateway.prototype.loginTwoFactor = loginTwoFactor;
 Gateway.prototype.configureTwoFactor = configureTwoFactor;
 Gateway.prototype.enableTwoFactor = enableTwoFactor;
+Gateway.prototype.generateUserRecoveryCodes = generateUserRecoveryCodes;
 Gateway.prototype.init = init;
 Gateway.prototype.getStatus = getStatus;
 Gateway.prototype.getBackups = getBackups;
@@ -170,6 +187,9 @@ Gateway.prototype.setSubscriptionActive = setSubscriptionActive;
 Gateway.prototype.callPlanGatedApi = callPlanGatedApi;
 Gateway.prototype.throwIfPaymentRequired = throwIfPaymentRequired;
 Gateway.prototype.refreshSubscriptionStatus = refreshSubscriptionStatus;
+Gateway.prototype.getBackupHealth = getBackupHealth;
+Gateway.prototype.recordBackupSuccess = recordBackupSuccess;
+Gateway.prototype.recordBackupFailure = recordBackupFailure;
 
 // Enedis API
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;

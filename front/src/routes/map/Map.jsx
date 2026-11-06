@@ -12,11 +12,16 @@ import { route } from 'preact-router';
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
 class MapComponent extends Component {
-  initMap = () => {
+  initMap = (view = { center: DEFAULT_COORDS, zoom: 2 }) => {
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
-    this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
+    this.leafletMap = leaflet.map(this.map).setView(view.center, view.zoom);
+    // Once the user pans or zooms, the view is theirs: a first marker
+    // arriving later must not reset it
+    this.leafletMap.on('dragstart zoomstart', () => {
+      this.boundsFitted = true;
+    });
 
     // Use the global dark mode state from props
     addMapTileLayer(this.leafletMap, this.props.darkMode);
@@ -51,7 +56,20 @@ class MapComponent extends Component {
     this.displayHouses(props);
     this.displayUsers(props);
     this.displayAreas(props);
+    this.fitBoundsOnceLoaded(props);
+  };
+
+  // The view is fitted on the markers only once, when the page has loaded
+  // its data: afterwards it belongs to the user, and a live location update,
+  // a window resize or a dark mode switch must not reset their zoom and pan.
+  fitBoundsOnceLoaded = props => {
+    if (this.boundsFitted || !props.loaded) {
+      return;
+    }
+    // Only latch once something was fitted: an instance with no house
+    // location, zone or user position yet must still fit its first marker.
     if (this.markerArray.length >= 1) {
+      this.boundsFitted = true;
       const group = leaflet.featureGroup(this.markerArray);
       this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
     }
@@ -145,6 +163,7 @@ class MapComponent extends Component {
     this.houseMarkers = {};
     this.areaMarkers = {};
     this.markerArray = [];
+    this.boundsFitted = false;
   }
 
   componentWillMount() {
@@ -153,16 +172,24 @@ class MapComponent extends Component {
 
   componentDidMount() {
     this.initMap();
-    window.addEventListener('resize', this.updateDimensions.bind(this));
+    window.addEventListener('resize', this.updateDimensions);
   }
 
-  componentDidUpdate(prevProps) {
-    // If dark mode state has changed, reinitialize the map
+  componentDidUpdate(prevProps, prevState) {
     if (prevProps.darkMode !== this.props.darkMode) {
-      this.initMap();
-    } else {
-      // If other props changed, update markers
+      // Reinitialize the map with the new tiles, keeping the current view
+      const center = this.leafletMap.getCenter();
+      this.initMap({ center: [center.lat, center.lng], zoom: this.leafletMap.getZoom() });
+    } else if (
+      prevProps.users !== this.props.users ||
+      prevProps.houses !== this.props.houses ||
+      prevProps.areas !== this.props.areas ||
+      prevProps.loaded !== this.props.loaded
+    ) {
       this.displayAll(this.props);
+    }
+    if (prevState.height !== this.state.height) {
+      this.leafletMap.invalidateSize();
     }
   }
 
@@ -170,7 +197,7 @@ class MapComponent extends Component {
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
-    window.removeEventListener('resize', this.updateDimensions.bind(this));
+    window.removeEventListener('resize', this.updateDimensions);
   }
 
   render(props, { height }) {

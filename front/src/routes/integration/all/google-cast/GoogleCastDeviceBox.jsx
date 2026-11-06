@@ -4,6 +4,8 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { connect } from 'unistore/preact';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 
 class GoogleCastDeviceBox extends Component {
   componentWillMount() {
@@ -43,7 +45,10 @@ class GoogleCastDeviceBox extends Component {
     });
     try {
       let deviceDidNotExist = this.state.device.id === undefined;
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(this.state.device)
+      );
       if (deviceDidNotExist) {
         savedDevice.alreadyExist = true;
       }
@@ -177,6 +182,10 @@ class GoogleCastDeviceBox extends Component {
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.google-cast.saveButton" />
                     </button>
+                  )}
+
+                  {validModel && deleteButton && (
+                    <MigrateDeviceButton device={device} onMigrated={this.props.getGoogleCastDevices} />
                   )}
 
                   {deleteButton && (

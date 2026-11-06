@@ -5,7 +5,10 @@ import FeatureHistorySize from '../../../../../components/device/FeatureHistoryS
 // only keeps its last value): offering the toggle there would promise a
 // history that will never exist. The MQTT device screen hides it for the
 // same reason.
-export const isHistorizableFeature = feature => feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT;
+// The music category is live too: the core forces keep_history off on every
+// music feature (capabilities/music.md, section 2), so the switch would lie.
+export const isHistorizableFeature = feature =>
+  feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT && feature.category !== DEVICE_FEATURE_CATEGORIES.MUSIC;
 
 // The definition of a feature belongs to the integration (name, category,
 // unit, bounds...): only the "keep history" choice is the user's, so it is

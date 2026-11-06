@@ -1,34 +1,26 @@
-const axios = require('axios');
 const Promise = require('bluebird');
 
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { SERVICE_TYPES } = require('../../../utils/constants');
-const {
-  DEFAULT_STORE_INDEX_URL,
-  STORE_INDEX_CACHE_VARIABLE,
-  SUPPORTED_INDEX_FORMAT,
-  STORE_HTTP_TIMEOUT_MS,
-} = require('./store.constants');
+const { STORE_INDEX_CACHE_VARIABLE } = require('./store.constants');
+const { getStoreIndexUrls, downloadIndex, toLiteIndex } = require('./store.downloadIndex');
 
 /**
- * @description Download the store index (a static index.json rebuilt by a
- * fully automatic indexer crawling the `gladys-assistant-integration` GitHub
- * topic) and persist it in the local cache: the catalog stays available
- * offline or if the store storage is down, and installed integrations never
- * depend on the index to work. Also refreshes the manifests of integrations
- * installed by repo_url that are absent from the index (not crawled yet),
- * for update detection.
- * @returns {Promise<object>} Resolve with the index.
+ * @description Download the lite store index (a static index-lite.json
+ * rebuilt by a fully automatic indexer crawling the
+ * `gladys-assistant-integration` GitHub topic: every entry, with the manifest
+ * reduced to what the catalog needs) and persist it in the local cache: the
+ * catalog stays available offline or if the store storage is down, and
+ * installed integrations never depend on the index to work. Also refreshes
+ * the manifests of integrations installed by repo_url that are absent from
+ * the index (not crawled yet), for update detection.
+ * @returns {Promise<object>} Resolve with the lite index.
  * @example
  * await gladys.externalIntegration.refreshIndex();
  */
 async function refreshIndex() {
-  const indexUrl = process.env.EXTERNAL_INTEGRATION_STORE_INDEX_URL || DEFAULT_STORE_INDEX_URL;
-  const { data } = await axios.get(indexUrl, { timeout: STORE_HTTP_TIMEOUT_MS });
-  if (!data || data.index_format !== SUPPORTED_INDEX_FORMAT || !Array.isArray(data.integrations)) {
-    throw new Error('INVALID_STORE_INDEX');
-  }
+  const data = toLiteIndex(await downloadIndex(getStoreIndexUrls().liteIndexUrl));
   this.storeIndex = data;
   this.storeIndexFetchedAt = Date.now();
   await this.variable.setValue(

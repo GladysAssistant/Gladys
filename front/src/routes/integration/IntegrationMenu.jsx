@@ -1,6 +1,37 @@
+import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import { getCatalogPath } from './catalog-url';
 import style from './style.css';
+
+// the chip row scrolls horizontally and holds every shelf: with sixteen of
+// them, the active one is often off-screen and nothing on screen says which
+// view is open. It is scrolled into view when needed — only when it is not
+// fully visible, so a row the user scrolled by hand is left alone. The chip
+// is found by the `data-active-chip` mark set from the displayed view, not
+// by the router's active class, which is applied a render later; measured
+// on the next frame, once the row is laid out
+const scrollActiveChipIntoView = scroller => {
+  if (!scroller || typeof requestAnimationFrame !== 'function') {
+    return;
+  }
+  requestAnimationFrame(() => {
+    const chip = scroller.isConnected && scroller.querySelector('[data-active-chip]');
+    if (!chip || typeof chip.scrollIntoView !== 'function') {
+      return;
+    }
+    const chipRect = chip.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    if (chipRect.left < scrollerRect.left || chipRect.right > scrollerRect.right) {
+      chip.scrollIntoView({ inline: 'center', block: 'nearest' });
+    }
+  });
+};
+
+// the shelves of the row depend on the catalog (a shelf needs enough visible
+// integrations to earn its chip): compared by key, since the list is rebuilt
+// on every render of the page
+const getShelvesKey = integrationCategories => integrationCategories.map(({ key }) => key).join(',');
 
 const getMenuItems = (
   integrationCategories,
@@ -49,31 +80,52 @@ const getMenuItems = (
 const MenuItemCount = ({ count, color = 'danger', className = '' }) =>
   count > 0 ? <span class={`badge badge-${color} ${className}`.trim()}>{count}</span> : null;
 
-export const IntegrationMenuMobile = ({
-  integrationCategories,
-  integrationsToUpdate,
-  installedIntegrationsCount,
-  category
-}) => (
-  <nav class={style.mobileCategoryNav} aria-label="Integration categories">
-    {/* hz-chips-scroll: the Layout watches this scroller and shows the
-        "more to the right" arrow while chips overflow (horizonIntegrations.css) */}
-    <div class={`${style.mobileCategoryScroll} hz-chips-scroll`}>
-      {getMenuItems(integrationCategories, { integrationsToUpdate, installedIntegrationsCount, category }).map(item => (
-        <Link
-          key={item.href}
-          href={item.href}
-          class={style.mobileCategoryChip}
-          activeClassName={style.mobileCategoryChipActive}
-        >
-          <i class={`fe fe-${item.icon}`} />
-          <Text id={item.labelKey} />
-          <MenuItemCount count={item.count} color={item.countColor} />
-        </Link>
-      ))}
-    </div>
-  </nav>
-);
+export class IntegrationMenuMobile extends Component {
+  setScroller = scroller => {
+    this.scroller = scroller;
+  };
+
+  componentDidMount() {
+    scrollActiveChipIntoView(this.scroller);
+  }
+
+  // the shelf chips only appear once the catalog is loaded: the active one
+  // may not exist yet when the row mounts
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.category !== this.props.category ||
+      getShelvesKey(prevProps.integrationCategories) !== getShelvesKey(this.props.integrationCategories)
+    ) {
+      scrollActiveChipIntoView(this.scroller);
+    }
+  }
+
+  render({ integrationCategories, integrationsToUpdate, installedIntegrationsCount, category }) {
+    return (
+      <nav class={style.mobileCategoryNav} aria-label="Integration categories">
+        {/* hz-chips-scroll: the Layout watches this scroller and shows the
+            "more to the right" arrow while chips overflow (horizonIntegrations.css) */}
+        <div class={`${style.mobileCategoryScroll} hz-chips-scroll`} ref={this.setScroller}>
+          {getMenuItems(integrationCategories, { integrationsToUpdate, installedIntegrationsCount, category }).map(
+            item => (
+              <Link
+                key={item.href}
+                href={item.href}
+                class={style.mobileCategoryChip}
+                activeClassName={style.mobileCategoryChipActive}
+                data-active-chip={item.href === getCatalogPath(category) || undefined}
+              >
+                <i class={`fe fe-${item.icon}`} />
+                <Text id={item.labelKey} />
+                <MenuItemCount count={item.count} color={item.countColor} />
+              </Link>
+            )
+          )}
+        </div>
+      </nav>
+    );
+  }
+}
 
 const IntegrationMenu = ({ integrationCategories, integrationsToUpdate, installedIntegrationsCount, category }) => (
   <div class="list-group list-group-transparent mb-0">

@@ -1,4 +1,5 @@
 const { promisify } = require('util');
+const { handleRequest, readFeatureValue } = require('./characteristicHandlers');
 const { intToRgb, rgbToHsb, hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -74,23 +75,29 @@ function buildService(device, features, categoryMapping, subtype) {
         );
 
         if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
-          characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-            callback(undefined, this.gladys.stateManager.get('deviceFeature', feature.selector).last_value);
-          });
+          characteristic.on(
+            CharacteristicEventTypes.GET,
+            handleRequest(async (callback) => {
+              callback(undefined, readFeatureValue(this.gladys.stateManager, feature));
+            }),
+          );
         }
 
         if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
-          characteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-            const action = {
-              type: ACTIONS.DEVICE.SET_VALUE,
-              status: ACTIONS_STATUS.PENDING,
-              value: value ? 1 : 0,
-              device: device.selector,
-              device_feature: feature.selector,
-            };
-            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-            callback();
-          });
+          characteristic.on(
+            CharacteristicEventTypes.SET,
+            handleRequest(async (value, callback) => {
+              const action = {
+                type: ACTIONS.DEVICE.SET_VALUE,
+                status: ACTIONS_STATUS.PENDING,
+                value: value ? 1 : 0,
+                device: device.selector,
+                device_feature: feature.selector,
+              };
+              this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+              callback();
+            }, 1),
+          );
         }
         break;
       }
@@ -98,19 +105,23 @@ function buildService(device, features, categoryMapping, subtype) {
       case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.PUSH}`: {
         // A stateless switch has no state to read: HomeKit expects null and only listens to the
         // events pushed when the button is actually pressed.
-        service
-          .getCharacteristic(Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]])
-          .on(CharacteristicEventTypes.GET, async (callback) => {
+        service.getCharacteristic(Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]]).on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
             callback(undefined, null);
-          });
+          }),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
         const contactCharacteristic = service.getCharacteristic(Characteristic.ContactSensorState);
 
-        contactCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(undefined, +!this.gladys.stateManager.get('deviceFeature', feature.selector).last_value);
-        });
+        contactCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(undefined, +!readFeatureValue(this.gladys.stateManager, feature));
+          }),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`:
@@ -122,40 +133,46 @@ function buildService(device, features, categoryMapping, subtype) {
         characteristics.forEach((c) => {
           const characteristic = service.getCharacteristic(Characteristic[c]);
           if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
-            characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-              callback(
-                undefined,
-                normalize(
-                  this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
-                  feature.min,
-                  feature.max,
-                  characteristic.props.minValue,
-                  characteristic.props.maxValue,
-                ),
-              );
-            });
+            characteristic.on(
+              CharacteristicEventTypes.GET,
+              handleRequest(async (callback) => {
+                callback(
+                  undefined,
+                  normalize(
+                    readFeatureValue(this.gladys.stateManager, feature),
+                    feature.min,
+                    feature.max,
+                    characteristic.props.minValue,
+                    characteristic.props.maxValue,
+                  ),
+                );
+              }),
+            );
           }
 
           if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
-            characteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
-              const action = {
-                type: ACTIONS.DEVICE.SET_VALUE,
-                status: ACTIONS_STATUS.PENDING,
-                value: Math.round(
-                  normalize(
-                    value,
-                    characteristic.props.minValue,
-                    characteristic.props.maxValue,
-                    feature.min,
-                    feature.max,
+            characteristic.on(
+              CharacteristicEventTypes.SET,
+              handleRequest((value, callback) => {
+                const action = {
+                  type: ACTIONS.DEVICE.SET_VALUE,
+                  status: ACTIONS_STATUS.PENDING,
+                  value: Math.round(
+                    normalize(
+                      value,
+                      characteristic.props.minValue,
+                      characteristic.props.maxValue,
+                      feature.min,
+                      feature.max,
+                    ),
                   ),
-                ),
-                device: device.selector,
-                device_feature: feature.selector,
-              };
-              this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-              callback();
-            });
+                  device: device.selector,
+                  device_feature: feature.selector,
+                };
+                this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+                callback();
+              }, 1),
+            );
           }
         });
         break;
@@ -163,64 +180,79 @@ function buildService(device, features, categoryMapping, subtype) {
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`: {
         const hueCharacteristic = service.getCharacteristic(Characteristic.Hue);
 
-        hueCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const rgb = intToRgb(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value);
-          const [h] = rgbToHsb(rgb);
-          callback(undefined, h);
-        });
-        hueCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          await sleep(50);
-          let rgb = intToRgb(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value);
-          const [, s, b] = rgbToHsb(rgb);
-          rgb = hsbToRgb([value, s, b]);
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: rgbToInt(rgb),
-            device: device.selector,
-            device_feature: feature.selector,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
+        hueCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            const rgb = intToRgb(readFeatureValue(this.gladys.stateManager, feature));
+            const [h] = rgbToHsb(rgb);
+            callback(undefined, h);
+          }),
+        );
+        hueCharacteristic.on(
+          CharacteristicEventTypes.SET,
+          handleRequest(async (value, callback) => {
+            await sleep(50);
+            let rgb = intToRgb(readFeatureValue(this.gladys.stateManager, feature));
+            const [, s, b] = rgbToHsb(rgb);
+            rgb = hsbToRgb([value, s, b]);
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: rgbToInt(rgb),
+              device: device.selector,
+              device_feature: feature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          }, 1),
+        );
 
         const saturationCharacteristic = service.getCharacteristic(Characteristic.Saturation);
 
-        saturationCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const rgb = intToRgb(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value);
-          const [, s] = rgbToHsb(rgb);
-          callback(undefined, s);
-        });
-        saturationCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          let rgb = intToRgb(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value);
-          const [h, , b] = rgbToHsb(rgb);
-          rgb = hsbToRgb([h, value, b]);
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: rgbToInt(rgb),
-            device: device.selector,
-            device_feature: feature.selector,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
+        saturationCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            const rgb = intToRgb(readFeatureValue(this.gladys.stateManager, feature));
+            const [, s] = rgbToHsb(rgb);
+            callback(undefined, s);
+          }),
+        );
+        saturationCharacteristic.on(
+          CharacteristicEventTypes.SET,
+          handleRequest(async (value, callback) => {
+            let rgb = intToRgb(readFeatureValue(this.gladys.stateManager, feature));
+            const [h, , b] = rgbToHsb(rgb);
+            rgb = hsbToRgb([h, value, b]);
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: rgbToInt(rgb),
+              device: device.selector,
+              device_feature: feature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          }, 1),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
         const currentTemperatureCharacteristic = service.getCharacteristic(Characteristic.CurrentTemperature);
 
-        currentTemperatureCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          let currentTemp = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+        currentTemperatureCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            let currentTemp = readFeatureValue(this.gladys.stateManager, feature);
 
-          if (feature.unit === DEVICE_FEATURE_UNITS.KELVIN) {
-            currentTemp -= 273.15;
-          } else if (feature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
-            currentTemp = fahrenheitToCelsius(currentTemp);
-          }
+            if (feature.unit === DEVICE_FEATURE_UNITS.KELVIN) {
+              currentTemp -= 273.15;
+            } else if (feature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+              currentTemp = fahrenheitToCelsius(currentTemp);
+            }
 
-          callback(undefined, currentTemp);
-        });
+            callback(undefined, currentTemp);
+          }),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
@@ -229,15 +261,18 @@ function buildService(device, features, categoryMapping, subtype) {
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
         );
 
-        lightLevelCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            clampToCharacteristic(
-              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
-              lightLevelCharacteristic.props,
-            ),
-          );
-        });
+        lightLevelCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(
+              undefined,
+              clampToCharacteristic(
+                readFeatureValue(this.gladys.stateManager, feature),
+                lightLevelCharacteristic.props,
+              ),
+            );
+          }),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
@@ -256,18 +291,18 @@ function buildService(device, features, categoryMapping, subtype) {
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
         );
 
-        densityCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            clampToCharacteristic(
-              toMicrogramPerCubicMeter(
-                this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
-                feature.unit,
+        densityCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(
+              undefined,
+              clampToCharacteristic(
+                toMicrogramPerCubicMeter(readFeatureValue(this.gladys.stateManager, feature), feature.unit),
+                densityCharacteristic.props,
               ),
-              densityCharacteristic.props,
-            ),
-          );
-        });
+            );
+          }),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.BATTERY.INTEGER}`:
@@ -276,25 +311,28 @@ function buildService(device, features, categoryMapping, subtype) {
         const [levelName, lowName] = mappings[feature.category].capabilities[feature.type].characteristics;
 
         const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
-        levelCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            clampToCharacteristic(
-              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
-              levelCharacteristic.props,
-            ),
-          );
-        });
+        levelCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(
+              undefined,
+              clampToCharacteristic(readFeatureValue(this.gladys.stateManager, feature), levelCharacteristic.props),
+            );
+          }),
+        );
 
         // StatusLowBattery is required by HomeKit, so it is derived from the level — but only when
         // the device has no dedicated low-battery feature, which is authoritative when present.
         if (!features.some((f) => f.category === DEVICE_FEATURE_CATEGORIES.BATTERY_LOW)) {
-          service.getCharacteristic(Characteristic[lowName]).on(CharacteristicEventTypes.GET, async (callback) => {
-            const level = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-            // Number.isFinite and not a bare comparison: `null <= 20` is true in JavaScript, so a
-            // device that has not reported yet would be announced as low on battery.
-            callback(undefined, Number.isFinite(level) && level <= LOW_BATTERY_THRESHOLD ? 1 : 0);
-          });
+          service.getCharacteristic(Characteristic[lowName]).on(
+            CharacteristicEventTypes.GET,
+            handleRequest(async (callback) => {
+              const level = readFeatureValue(this.gladys.stateManager, feature);
+              // Number.isFinite and not a bare comparison: `null <= 20` is true in JavaScript, so a
+              // device that has not reported yet would be announced as low on battery.
+              callback(undefined, Number.isFinite(level) && level <= LOW_BATTERY_THRESHOLD ? 1 : 0);
+            }),
+          );
         }
         break;
       }
@@ -303,9 +341,12 @@ function buildService(device, features, categoryMapping, subtype) {
         // Gladys and HomeKit agree on the direction: 1 means the battery is low.
         service
           .getCharacteristic(Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]])
-          .on(CharacteristicEventTypes.GET, async (callback) => {
-            callback(undefined, this.gladys.stateManager.get('deviceFeature', feature.selector).last_value ? 1 : 0);
-          });
+          .on(
+            CharacteristicEventTypes.GET,
+            handleRequest(async (callback) => {
+              callback(undefined, readFeatureValue(this.gladys.stateManager, feature) ? 1 : 0);
+            }),
+          );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
@@ -316,23 +357,26 @@ function buildService(device, features, categoryMapping, subtype) {
         const threshold = gasDetectedThresholds[feature.category];
 
         const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
-        levelCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            clampToCharacteristic(
-              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
-              levelCharacteristic.props,
-            ),
-          );
-        });
+        levelCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(
+              undefined,
+              clampToCharacteristic(readFeatureValue(this.gladys.stateManager, feature), levelCharacteristic.props),
+            );
+          }),
+        );
 
         // HomeKit requires the "detected" characteristic, Gladys only exposes a concentration,
         // so the alarm is derived from a fixed threshold.
         const detectedCharacteristic = service.getCharacteristic(Characteristic[detectedName]);
-        detectedCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const concentration = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-          callback(undefined, concentration >= threshold ? 1 : 0);
-        });
+        detectedCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            const concentration = readFeatureValue(this.gladys.stateManager, feature);
+            callback(undefined, concentration >= threshold ? 1 : 0);
+          }),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`: {
@@ -340,12 +384,12 @@ function buildService(device, features, categoryMapping, subtype) {
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
         );
 
-        airQualityCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            aqiToAirQuality(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value),
-          );
-        });
+        airQualityCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(undefined, aqiToAirQuality(readFeatureValue(this.gladys.stateManager, feature)));
+          }),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.LOCK}:${DEVICE_FEATURE_TYPES.LOCK.BINARY}`: {
@@ -360,7 +404,7 @@ function buildService(device, features, categoryMapping, subtype) {
         let commanded;
         let valueAtCommand;
         const readLockState = () => {
-          const { last_value: lastValue } = this.gladys.stateManager.get('deviceFeature', feature.selector);
+          const lastValue = readFeatureValue(this.gladys.stateManager, feature);
           if (commanded !== undefined && lastValue === valueAtCommand) {
             return commanded;
           }
@@ -369,32 +413,41 @@ function buildService(device, features, categoryMapping, subtype) {
         };
 
         const targetStateCharacteristic = service.getCharacteristic(Characteristic[targetStateName]);
-        targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(undefined, readLockState());
-        });
-        targetStateCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: value ? LOCK.ACTION.LOCK : LOCK.ACTION.UNLOCK,
-            device: device.selector,
-            device_feature: feature.selector,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+        targetStateCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(undefined, readLockState());
+          }),
+        );
+        targetStateCharacteristic.on(
+          CharacteristicEventTypes.SET,
+          handleRequest(async (value, callback) => {
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: value ? LOCK.ACTION.LOCK : LOCK.ACTION.UNLOCK,
+              device: device.selector,
+              device_feature: feature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
 
-          if (!hasStateFeature) {
-            commanded = value ? 1 : 0;
-            valueAtCommand = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-            service.updateCharacteristic(Characteristic[currentStateName], commanded);
-          }
-          callback();
-        });
+            if (!hasStateFeature) {
+              commanded = value ? 1 : 0;
+              valueAtCommand = readFeatureValue(this.gladys.stateManager, feature);
+              service.updateCharacteristic(Characteristic[currentStateName], commanded);
+            }
+            callback();
+          }, 1),
+        );
 
         if (!hasStateFeature) {
           const currentStateCharacteristic = service.getCharacteristic(Characteristic[currentStateName]);
-          currentStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-            callback(undefined, readLockState());
-          });
+          currentStateCharacteristic.on(
+            CharacteristicEventTypes.GET,
+            handleRequest(async (callback) => {
+              callback(undefined, readLockState());
+            }),
+          );
         }
         break;
       }
@@ -402,12 +455,12 @@ function buildService(device, features, categoryMapping, subtype) {
         const [currentStateName, targetStateName] = categoryMapping.capabilities[feature.type].characteristics;
 
         const currentStateCharacteristic = service.getCharacteristic(Characteristic[currentStateName]);
-        currentStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            lockStateMapping[this.gladys.stateManager.get('deviceFeature', feature.selector).last_value],
-          );
-        });
+        currentStateCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(undefined, lockStateMapping[readFeatureValue(this.gladys.stateManager, feature)]);
+          }),
+        );
 
         // HomeKit always requires a target state, even on a lock Gladys can only read.
         if (!features.some((f) => f.type === DEVICE_FEATURE_TYPES.LOCK.BINARY)) {
@@ -418,10 +471,13 @@ function buildService(device, features, categoryMapping, subtype) {
           targetStateCharacteristic.setProps({
             perms: targetStateCharacteristic.props.perms.filter((perm) => perm !== Perms.PAIRED_WRITE),
           });
-          targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-            const state = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-            callback(undefined, state === LOCK.STATE.LOCKED ? 1 : 0);
-          });
+          targetStateCharacteristic.on(
+            CharacteristicEventTypes.GET,
+            handleRequest(async (callback) => {
+              const state = readFeatureValue(this.gladys.stateManager, feature);
+              callback(undefined, state === LOCK.STATE.LOCKED ? 1 : 0);
+            }),
+          );
         }
         break;
       }
@@ -433,28 +489,34 @@ function buildService(device, features, categoryMapping, subtype) {
         // HomeKit only knows on/off, so turning the fan back on restores the last mode it ran at.
         let lastActiveMode = Math.min(FAN_MODE.HIGH, feature.max === undefined ? FAN_MODE.HIGH : feature.max);
 
-        activeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const mode = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-          if (mode !== FAN_MODE.OFF) {
-            lastActiveMode = mode;
-          }
-          callback(undefined, mode === FAN_MODE.OFF ? 0 : 1);
-        });
-        activeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          const mode = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-          if (mode !== FAN_MODE.OFF) {
-            lastActiveMode = mode;
-          }
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: value ? lastActiveMode : FAN_MODE.OFF,
-            device: device.selector,
-            device_feature: feature.selector,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
+        activeCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            const mode = readFeatureValue(this.gladys.stateManager, feature);
+            if (mode !== FAN_MODE.OFF) {
+              lastActiveMode = mode;
+            }
+            callback(undefined, mode === FAN_MODE.OFF ? 0 : 1);
+          }),
+        );
+        activeCharacteristic.on(
+          CharacteristicEventTypes.SET,
+          handleRequest(async (value, callback) => {
+            const mode = readFeatureValue(this.gladys.stateManager, feature);
+            if (mode !== FAN_MODE.OFF) {
+              lastActiveMode = mode;
+            }
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: value ? lastActiveMode : FAN_MODE.OFF,
+              device: device.selector,
+              device_feature: feature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          }, 1),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.PERCENT}`:
@@ -477,73 +539,85 @@ function buildService(device, features, categoryMapping, subtype) {
         const [rotationSpeedName, activeName] = categoryMapping.capabilities[feature.type].characteristics;
         const rotationSpeedCharacteristic = service.getCharacteristic(Characteristic[rotationSpeedName]);
 
-        rotationSpeedCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            normalize(
-              this.gladys.stateManager.get('deviceFeature', readFeature.selector).last_value,
-              readFeature.min,
-              readFeature.max,
-              rotationSpeedCharacteristic.props.minValue,
-              rotationSpeedCharacteristic.props.maxValue,
-            ),
-          );
-        });
-        rotationSpeedCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: Math.round(
+        rotationSpeedCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(
+              undefined,
               normalize(
-                value,
+                readFeatureValue(this.gladys.stateManager, readFeature),
+                readFeature.min,
+                readFeature.max,
                 rotationSpeedCharacteristic.props.minValue,
                 rotationSpeedCharacteristic.props.maxValue,
-                writeFeature.min,
-                writeFeature.max,
               ),
-            ),
-            device: device.selector,
-            device_feature: writeFeature.selector,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
+            );
+          }),
+        );
+        rotationSpeedCharacteristic.on(
+          CharacteristicEventTypes.SET,
+          handleRequest(async (value, callback) => {
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: Math.round(
+                normalize(
+                  value,
+                  rotationSpeedCharacteristic.props.minValue,
+                  rotationSpeedCharacteristic.props.maxValue,
+                  writeFeature.min,
+                  writeFeature.max,
+                ),
+              ),
+              device: device.selector,
+              device_feature: writeFeature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          }, 1),
+        );
 
         // Fanv2 always requires Active. Without a mode feature, the speed is the only on/off signal.
         if (!features.some((f) => f.type === DEVICE_FEATURE_TYPES.FAN.MODE)) {
           let lastActiveSpeed = writeFeature.max;
           const activeCharacteristic = service.getCharacteristic(Characteristic[activeName]);
 
-          activeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-            const speed = this.gladys.stateManager.get('deviceFeature', readFeature.selector).last_value;
-            if (speed > readFeature.min) {
-              // The speed to restore is remembered on the feature it will be written back to, since
-              // the read and write features can use different scales.
-              lastActiveSpeed = this.gladys.stateManager.get('deviceFeature', writeFeature.selector).last_value;
-            }
-            callback(undefined, speed > readFeature.min ? 1 : 0);
-          });
-          activeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-            // Snapshot the speed on the way down rather than relying on a GET having happened
-            // first: switching the fan off from the Home app without reading it beforehand would
-            // otherwise restore it at full speed instead of where the user had left it.
-            if (!value) {
-              const currentSpeed = this.gladys.stateManager.get('deviceFeature', writeFeature.selector).last_value;
-              if (currentSpeed > writeFeature.min) {
-                lastActiveSpeed = currentSpeed;
+          activeCharacteristic.on(
+            CharacteristicEventTypes.GET,
+            handleRequest(async (callback) => {
+              const speed = readFeatureValue(this.gladys.stateManager, readFeature);
+              if (speed > readFeature.min) {
+                // The speed to restore is remembered on the feature it will be written back to, since
+                // the read and write features can use different scales.
+                lastActiveSpeed = readFeatureValue(this.gladys.stateManager, writeFeature);
               }
-            }
+              callback(undefined, speed > readFeature.min ? 1 : 0);
+            }),
+          );
+          activeCharacteristic.on(
+            CharacteristicEventTypes.SET,
+            handleRequest(async (value, callback) => {
+              // Snapshot the speed on the way down rather than relying on a GET having happened
+              // first: switching the fan off from the Home app without reading it beforehand would
+              // otherwise restore it at full speed instead of where the user had left it.
+              if (!value) {
+                const currentSpeed = readFeatureValue(this.gladys.stateManager, writeFeature);
+                if (currentSpeed > writeFeature.min) {
+                  lastActiveSpeed = currentSpeed;
+                }
+              }
 
-            const action = {
-              type: ACTIONS.DEVICE.SET_VALUE,
-              status: ACTIONS_STATUS.PENDING,
-              value: value ? lastActiveSpeed : writeFeature.min,
-              device: device.selector,
-              device_feature: writeFeature.selector,
-            };
-            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-            callback();
-          });
+              const action = {
+                type: ACTIONS.DEVICE.SET_VALUE,
+                status: ACTIONS_STATUS.PENDING,
+                value: value ? lastActiveSpeed : writeFeature.min,
+                device: device.selector,
+                device_feature: writeFeature.selector,
+              };
+              this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+              callback();
+            }, 1),
+          );
         }
         break;
       }
@@ -556,21 +630,27 @@ function buildService(device, features, categoryMapping, subtype) {
         // is the set of axes the device supports, so it is the value used to enable oscillation.
         const enabledRockSetting = feature.max || FAN_ROCK_SETTING.LEFT_RIGHT;
 
-        swingModeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const rockSetting = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-          callback(undefined, rockSetting === FAN_ROCK_SETTING.OFF ? 0 : 1);
-        });
-        swingModeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: value ? enabledRockSetting : FAN_ROCK_SETTING.OFF,
-            device: device.selector,
-            device_feature: feature.selector,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
+        swingModeCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            const rockSetting = readFeatureValue(this.gladys.stateManager, feature);
+            callback(undefined, rockSetting === FAN_ROCK_SETTING.OFF ? 0 : 1);
+          }),
+        );
+        swingModeCharacteristic.on(
+          CharacteristicEventTypes.SET,
+          handleRequest(async (value, callback) => {
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: value ? enabledRockSetting : FAN_ROCK_SETTING.OFF,
+              device: device.selector,
+              device_feature: feature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          }, 1),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION}`: {
@@ -578,22 +658,28 @@ function buildService(device, features, categoryMapping, subtype) {
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
         );
 
-        rotationDirectionCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const direction = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-          // HomeKit RotationDirection: 0 clockwise, 1 counter clockwise.
-          callback(undefined, direction === FAN_AIRFLOW_DIRECTION.REVERSE ? 1 : 0);
-        });
-        rotationDirectionCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: value ? FAN_AIRFLOW_DIRECTION.REVERSE : FAN_AIRFLOW_DIRECTION.FORWARD,
-            device: device.selector,
-            device_feature: feature.selector,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
+        rotationDirectionCharacteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            const direction = readFeatureValue(this.gladys.stateManager, feature);
+            // HomeKit RotationDirection: 0 clockwise, 1 counter clockwise.
+            callback(undefined, direction === FAN_AIRFLOW_DIRECTION.REVERSE ? 1 : 0);
+          }),
+        );
+        rotationDirectionCharacteristic.on(
+          CharacteristicEventTypes.SET,
+          handleRequest(async (value, callback) => {
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: value ? FAN_AIRFLOW_DIRECTION.REVERSE : FAN_AIRFLOW_DIRECTION.FORWARD,
+              device: device.selector,
+              device_feature: feature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          }, 1),
+        );
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`:
@@ -602,12 +688,12 @@ function buildService(device, features, categoryMapping, subtype) {
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
         );
 
-        characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(
-            undefined,
-            coverStateMapping[this.gladys.stateManager.get('deviceFeature', feature.selector).last_value],
-          );
-        });
+        characteristic.on(
+          CharacteristicEventTypes.GET,
+          handleRequest(async (callback) => {
+            callback(undefined, coverStateMapping[readFeatureValue(this.gladys.stateManager, feature)]);
+          }),
+        );
 
         if (
           !features.find((f) =>
@@ -620,25 +706,28 @@ function buildService(device, features, categoryMapping, subtype) {
           const targetPosCharacteristic = service.getCharacteristic(
             Characteristic[categoryMapping.capabilities[DEVICE_FEATURE_TYPES.CURTAIN.POSITION].characteristics[1]],
           );
-          targetPosCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-            const action = {
-              type: ACTIONS.DEVICE.SET_VALUE,
-              status: ACTIONS_STATUS.PENDING,
-              value: Math.round(
-                normalize(
-                  value,
-                  targetPosCharacteristic.props.minValue,
-                  targetPosCharacteristic.props.maxValue,
-                  feature.min,
-                  feature.max,
+          targetPosCharacteristic.on(
+            CharacteristicEventTypes.SET,
+            handleRequest(async (value, callback) => {
+              const action = {
+                type: ACTIONS.DEVICE.SET_VALUE,
+                status: ACTIONS_STATUS.PENDING,
+                value: Math.round(
+                  normalize(
+                    value,
+                    targetPosCharacteristic.props.minValue,
+                    targetPosCharacteristic.props.maxValue,
+                    feature.min,
+                    feature.max,
+                  ),
                 ),
-              ),
-              device: device.selector,
-              device_feature: feature.selector,
-            };
-            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-            callback();
-          });
+                device: device.selector,
+                device_feature: feature.selector,
+              };
+              this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+              callback();
+            }, 1),
+          );
         }
         break;
       }

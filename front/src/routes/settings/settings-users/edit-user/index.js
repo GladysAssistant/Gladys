@@ -118,6 +118,6 @@ class SettingsUsers extends Component {
 }
 
 export default connect(
-  'currentUrl,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue,ProfilePatchStatus,ProfileGetStatus',
+  'currentUrl,user,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue,ProfilePatchStatus,ProfileGetStatus',
   actions
 )(SettingsUsers);

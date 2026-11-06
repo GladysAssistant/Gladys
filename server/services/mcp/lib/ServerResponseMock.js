@@ -36,7 +36,7 @@ class ServerResponseMock {
   }
 
   sendResponse() {
-    this.listeners.close?.();
+    (this.listeners.close || []).forEach((listener) => listener());
 
     return this.cb({
       status: this.statusCode,
@@ -46,11 +46,11 @@ class ServerResponseMock {
   }
 
   on(event, cb) {
-    this.listeners[event] = cb;
+    this.listeners[event] = [...(this.listeners[event] || []), cb];
   }
 
   off(event, cb) {
-    delete this.listeners[event];
+    this.listeners[event] = (this.listeners[event] || []).filter((listener) => listener !== cb);
   }
 
   flushHeaders() {

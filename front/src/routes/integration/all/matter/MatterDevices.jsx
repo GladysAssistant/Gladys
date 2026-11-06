@@ -12,7 +12,7 @@ import MatterDeviceBox from './MatterDeviceBox';
 import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
-import { getDeviceParam } from '../../../../utils/device';
+import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/device';
 import style from './style.css';
 
 const compareDevices = (deviceA, deviceB) => {
@@ -243,7 +243,7 @@ class MatterDevices extends Component {
     this.setPairedDeviceLoading(externalId, true);
     this.setPairedDeviceError(externalId, null);
     try {
-      await this.props.httpClient.post('/api/v1/device', device);
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {
@@ -310,7 +310,7 @@ class MatterDevices extends Component {
           f.energy_parent_id = replacedFeatureIds.get(f.energy_parent_id);
         }
       });
-      await this.props.httpClient.post('/api/v1/device', device);
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {

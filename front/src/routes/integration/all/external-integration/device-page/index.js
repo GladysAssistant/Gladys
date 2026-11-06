@@ -9,6 +9,7 @@ import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DeviceTab from './DeviceTab';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 class ExternalIntegrationDevicePage extends Component {
   getIntegration = async () => {
@@ -77,7 +78,7 @@ class ExternalIntegrationDevicePage extends Component {
 
   saveDevice = async index => {
     const device = this.state.devices[index];
-    const savedDevice = await this.props.httpClient.post('/api/v1/device', device);
+    const savedDevice = await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     const devices = update(this.state.devices, {
       $splice: [[index, 1, savedDevice]]
     });

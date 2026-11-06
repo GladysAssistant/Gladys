@@ -21,6 +21,11 @@ async function init(setupMode = false) {
   this.zigbee2mqttRunning = false;
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  clearTimeout(this.healthCheckTimer);
+  this.healthCheckTimer = null;
+  clearTimeout(this.startingTimer);
+  this.startingTimer = null;
+  this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.networkModeValid = false;
   this.z2mContainerError = null;
@@ -119,7 +124,9 @@ async function init(setupMode = false) {
     await this.installMqttContainer(configuration);
     await this.installZ2mContainer(configuration, setupMode);
 
-    if (this.isEnabled()) {
+    // Connect as soon as the broker runs, without waiting for Zigbee2mqtt to be online: Gladys asks it
+    // through the broker whether it runs (health check).
+    if (this.mqttRunning) {
       await this.connect(configuration);
 
       // Schedule reccurent job if not already scheduled

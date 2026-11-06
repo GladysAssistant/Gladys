@@ -9,6 +9,8 @@ const {
   mergeDevices,
   normalize,
   isCameraEnabled,
+  isStringStateFeature,
+  normalizeStringState,
 } = require('../../utils/device');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 
@@ -422,5 +424,26 @@ describe('isCameraEnabled', () => {
   });
   it('should return false when the enabled feature is 0', () => {
     expect(isCameraEnabled(buildCamera(0))).to.equal(false);
+  });
+});
+
+describe('isStringStateFeature / normalizeStringState', () => {
+  it('should tell string state features apart by category and type', () => {
+    expect(isStringStateFeature({ category: 'text', type: 'text' })).to.equal(true);
+    expect(isStringStateFeature({ category: 'text', type: 'select' })).to.equal(true);
+    expect(isStringStateFeature({ category: 'text', type: 'other' })).to.equal(false);
+    expect(isStringStateFeature({ category: 'music', type: 'title' })).to.equal(true);
+    expect(isStringStateFeature({ category: 'music', type: 'artwork' })).to.equal(true);
+    expect(isStringStateFeature({ category: 'music', type: 'volume' })).to.equal(false);
+    expect(isStringStateFeature({ category: 'light', type: 'binary' })).to.equal(false);
+  });
+  it('should bound music string states and leave the others untouched', () => {
+    expect(normalizeStringState({ category: 'text', type: 'text' }, 'x'.repeat(300))).to.equal('x'.repeat(300));
+    expect(normalizeStringState({ category: 'text', type: 'select' }, 5)).to.equal('5');
+    expect(normalizeStringState({ category: 'music', type: 'album' }, 'x'.repeat(300))).to.equal('x'.repeat(200));
+    expect(normalizeStringState({ category: 'music', type: 'artwork' }, 'art-3f9a2c')).to.equal('art-3f9a2c');
+    expect(normalizeStringState({ category: 'music', type: 'artwork' }, '')).to.equal('');
+    expect(normalizeStringState({ category: 'music', type: 'artwork' }, 'https://x/y.jpg')).to.equal(null);
+    expect(normalizeStringState({ category: 'music', type: 'artwork' }, '-bad')).to.equal(null);
   });
 });

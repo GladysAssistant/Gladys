@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const db = require('../../models');
+const { normalizeEmail } = require('../../utils/email');
 const logger = require('../../utils/logger');
 const { Error401 } = require('../../utils/httpErrors');
 const { hashRefreshToken } = require('../../utils/refreshToken');
@@ -24,7 +25,7 @@ async function verifyForgotPasswordCode(email, code, useragent) {
   const user = await db.User.findOne({
     attributes: ['id'],
     where: {
-      email,
+      email: normalizeEmail(email),
     },
   });
   if (user === null) {

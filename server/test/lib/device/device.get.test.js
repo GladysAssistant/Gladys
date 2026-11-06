@@ -6,6 +6,7 @@ const { fake } = sinon;
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
+const db = require('../../../models');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -113,6 +114,20 @@ describe('Device.get', () => {
     expect(devices)
       .to.be.instanceOf(Array)
       .and.have.lengthOf(0);
+  });
+  it('should not return the camera image in last_value_string', async () => {
+    const cameraFeature = await db.DeviceFeature.findOne({ where: { category: 'camera', type: 'image' } });
+    await cameraFeature.update({ last_value_string: 'data:image/png;base64,AAAA' });
+    const devices = await device.get();
+    const features = devices.reduce((acc, oneDevice) => acc.concat(oneDevice.features), []);
+    const cameraFeatures = features.filter((f) => f.category === 'camera' && f.type === 'image');
+    expect(cameraFeatures).to.have.length.greaterThan(0);
+    cameraFeatures.forEach((f) => {
+      expect(f.last_value_string).to.equal(null);
+      expect(f).to.have.property('last_value_changed');
+    });
+    const stored = await db.DeviceFeature.findOne({ where: { id: cameraFeature.id } });
+    expect(stored.last_value_string).to.equal('data:image/png;base64,AAAA');
   });
   it('should throw not found error', async () => {
     const stateManager = new StateManager(event);

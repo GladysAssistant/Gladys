@@ -8,6 +8,7 @@ import { connect } from 'unistore/preact';
 import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
 import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import style from './style.css';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class MatterDeviceBox extends Component {
   constructor(props) {
@@ -51,7 +52,10 @@ class MatterDeviceBox extends Component {
     });
     try {
       const deviceDidNotExist = this.state.device.id === undefined;
-      const savedDevice = await this.props.httpClient.post('/api/v1/device', this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        '/api/v1/device',
+        stripDeviceStatesForSave(this.state.device)
+      );
       if (deviceDidNotExist) {
         savedDevice.alreadyExist = true;
       }

@@ -170,6 +170,26 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000 };
     const count = await externalIntegration.setDiscoveredDevices(service, [device]);
     expect(count).to.equal(1);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0]).to.have.property('should_poll', true);
+  });
+
+  it('should keep should_poll: false published with a poll_frequency', async () => {
+    const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000, should_poll: false };
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0]).to.have.property('should_poll', false);
+  });
+
+  it('should not set should_poll without poll_frequency', async () => {
+    await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector)]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0]).to.not.have.property('should_poll');
+  });
+
+  it('should reject a non-boolean should_poll', async () => {
+    const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000, should_poll: 'false' };
+    await expectBadParameters([device], 'devices[0].should_poll: must be a boolean');
   });
 
   it('should normalize the supported_options of a feature', async () => {

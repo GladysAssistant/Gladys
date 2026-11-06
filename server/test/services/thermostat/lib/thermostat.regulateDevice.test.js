@@ -12,6 +12,7 @@ const {
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
+  THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
 
@@ -177,7 +178,7 @@ describe('thermostat.regulateDevice', () => {
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
     });
 
     // Regulation continued despite the sensor error
@@ -190,11 +191,58 @@ describe('thermostat.regulateDevice', () => {
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
     });
 
     const [, , value] = gladys.device.setValue.firstCall.args;
     expect(value).to.equal(0);
+  });
+
+  // A door opened to come in and closed right behind must not cut the heating.
+  it('should keep regulating while the window has not been open for the delay', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const features = standardFeatures({ temp: 18, switchOn: false, windowOpen: true });
+    features['window-sensor'].last_value_changed = new Date();
+    const gladys = buildGladys({ features });
+    const openedAt = new Map();
+
+    await mod.regulateDevice(
+      gladys,
+      { features: [setpointFeature()], params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }) },
+      todayDow,
+      12 * 60,
+      null,
+      null,
+      null,
+      null,
+      null,
+      openedAt,
+    );
+
+    // 18 °C under a 21 °C comfort: the heating starts, the window notwithstanding.
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+    expect(openedAt.has('window-sensor')).to.equal(true);
+  });
+
+  it('should cut the switch once the window has been open for the delay', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 18, switchOn: true, windowOpen: true }) });
+    const openedAt = new Map([['window-sensor', Date.now() - 61 * 1000]]);
+
+    await mod.regulateDevice(
+      gladys,
+      { features: [setpointFeature()], params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }) },
+      todayDow,
+      12 * 60,
+      null,
+      null,
+      null,
+      null,
+      null,
+      openedAt,
+    );
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
   });
 
   it('should not try to actuate on an open window without a switch', async () => {
@@ -206,6 +254,7 @@ describe('thermostat.regulateDevice', () => {
       params: params({
         THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
         THERMOSTAT_WINDOW_FEATURE: 'window-sensor',
+        THERMOSTAT_WINDOW_DELAY: '0',
       }),
     });
 
@@ -713,7 +762,7 @@ describe('thermostat.regulateDevice - resilience', () => {
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }),
+      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
     });
 
     assert.notCalled(gladys.device.setValue);
@@ -1191,5 +1240,308 @@ describe('thermostat.regulateDevice - config defaults', () => {
 
     const [, , value] = gladys.device.setValue.firstCall.args;
     expect(value).to.equal(0);
+  });
+});
+
+// A large room, or an open-plan floor heated as one, has several probes and
+// several openings (A.1.1): the loop regulates on the average temperature, and
+// any opening stops it.
+describe('thermostat.regulateDevice - several sensors', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const twoProbes = (salon, kitchen, extra = {}) => ({
+    'salon-temp': { selector: 'salon-temp', last_value: salon },
+    'kitchen-temp': { selector: 'kitchen-temp', last_value: kitchen },
+    'heater-switch': { selector: 'heater-switch', last_value: 0 },
+    ...extra,
+  });
+  const twoProbeParams = (overrides = {}) =>
+    baseParams({ THERMOSTAT_TEMPERATURE_FEATURE: '["salon-temp","kitchen-temp"]', ...overrides });
+
+  it('should heat on the average of the probes', async () => {
+    // 22 and 18 average to 20, below 21 minus the band: heat, although the salon
+    // probe alone reads warm enough.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(22, 18) });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+  });
+
+  it('should leave a probe with no value out of the average', async () => {
+    // Counted as 0, the silent probe would drag the average to 11 and heat.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: twoProbes(22, null, { 'heater-switch': { selector: 'heater-switch', last_value: 1 } }),
+    });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
+  });
+
+  it('should convert each probe into the thermostat unit before averaging', async () => {
+    // 68 °F is 20 °C: with a 22 °C probe the average is 21, inside the band, so
+    // the heater keeps running. Averaged raw, 45 would turn it off.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        'salon-temp': { selector: 'salon-temp', last_value: 22, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+        'kitchen-temp': { selector: 'kitchen-temp', last_value: 68, unit: DEVICE_FEATURE_UNITS.FAHRENHEIT },
+        'heater-switch': { selector: 'heater-switch', last_value: 1 },
+      },
+    });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    assert.notCalled(gladys.device.setValue);
+  });
+
+  it('should make no switch decision when no probe has a value', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(null, null) });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    assert.notCalled(gladys.device.setValue);
+  });
+
+  it('should leave a probe that cannot be read out of the average', async () => {
+    // The salon probe cannot be looked up: the kitchen alone still regulates.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: twoProbes(22, 18),
+      getOverride: (query) =>
+        query && query.device_feature_selectors === 'salon-temp' ? Promise.reject(new Error('locked')) : undefined,
+    });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+  });
+
+  // A probe that stopped reporting keeps its last value for ever.
+  describe('a probe that stopped reporting', () => {
+    const ago = (minutes) => new Date(Date.now() - minutes * 60 * 1000).toISOString();
+    const probes = (salonAge, kitchenAge) => ({
+      'salon-temp': { selector: 'salon-temp', last_value: 22, last_value_changed: ago(salonAge) },
+      'kitchen-temp': { selector: 'kitchen-temp', last_value: 10, last_value_changed: ago(kitchenAge) },
+      'heater-switch': { selector: 'heater-switch', last_value: 1 },
+    });
+
+    it('should be left out while a fresher probe reports', async () => {
+      // The kitchen probe died at 10 °C two days ago: averaged, 16 would heat.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: probes(5, 48 * 60) });
+
+      await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+      expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
+    });
+
+    it('should still be counted when every probe is as old', async () => {
+      // 22 and 10 average to 16: heat, rather than regulate on nothing.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: { ...probes(3 * 60, 48 * 60), 'heater-switch': { selector: 'heater-switch', last_value: 0 } },
+      });
+
+      await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+      expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+    });
+  });
+
+  it('should regulate a manual hold on the average too', async () => {
+    // 24 and 18 average to 21, below 23 minus the band: heat, although the
+    // first probe alone reads warm enough.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(24, 18) });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature({ last_value: 23 })],
+      params: twoProbeParams({
+        THERMOSTAT_MANUAL_SETPOINT: '23',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
+      }),
+    });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+  });
+
+  it('should leave the switch alone on a manual hold when no probe has a value', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(null, null) });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature({ last_value: 23 })],
+      params: twoProbeParams({
+        THERMOSTAT_MANUAL_SETPOINT: '23',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
+      }),
+    });
+
+    assert.notCalled(gladys.device.setValue);
+  });
+
+  it('should cut the switch when any of several windows is open', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        ...standardFeatures({ temp: 18, switchOn: true }),
+        'salon-window': { selector: 'salon-window', last_value: 1 },
+        'kitchen-door': { selector: 'kitchen-door', last_value: 0 },
+      },
+    });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature()],
+      params: baseParams({
+        THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]',
+        THERMOSTAT_WINDOW_DELAY: '0',
+      }),
+    });
+
+    expect(gladys.device.setValue.firstCall.args[1].selector).to.equal('heater-switch');
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
+  });
+});
+
+describe('thermostat.regulateDevice - active preset', () => {
+  // The preset feature keeps reading `schedule` while the programme runs, so a
+  // scene listening to it never started when the programme moved on. The preset
+  // in force goes on its own feature, written through saveState, which is what
+  // a scene trigger sees.
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const activePresetFeature = (value = null) => ({
+    selector: 'thermostat-living-room:active-preset',
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.THERMOSTAT.ACTIVE_PRESET,
+    last_value: value,
+  });
+
+  const activeWrites = (gladys, feature) =>
+    gladys.device.saveState
+      .getCalls()
+      .filter((call) => call.args[0] === feature)
+      .map((call) => call.args[1]);
+
+  const thermostat = (features, extraParams = {}) => ({
+    id: 'device-id',
+    selector: 'living-room',
+    features: [setpointFeature(), ...features],
+    params: baseParams({ THERMOSTAT_PRESET_ECO: '18', ...extraParams }),
+  });
+
+  it('should write the point of the programme in force', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const preset = presetFeature('schedule');
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+
+    await regulate(mod, gladys, thermostat([preset, active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.ECO]);
+    // The standing choice is untouched: the thermostat keeps following its programme.
+    expect(activeWrites(gladys, preset)).to.deep.equal([]);
+  });
+
+  it('should write nothing while the same point stays in force', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(mod, gladys, thermostat([presetFeature('schedule'), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([]);
+  });
+
+  it('should write off on an Off point of the programme', async () => {
+    const mod = load(fullDaySchedule('off'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(mod, gladys, thermostat([presetFeature('schedule'), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.OFF]);
+  });
+
+  it('should write the preset a user picked', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(null);
+
+    await regulate(mod, gladys, thermostat([presetFeature('comfort'), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.COMFORT]);
+  });
+
+  it('should write the preset a hold was armed on', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(
+      mod,
+      gladys,
+      thermostat([presetFeature('comfort'), active], {
+        THERMOSTAT_MANUAL_SETPOINT: '21',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 3600 * 1000),
+      }),
+    );
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.COMFORT]);
+  });
+
+  it('should keep the last preset on a hold taken on the dial', async () => {
+    // The dial names no preset: the thermostat still reads `schedule`.
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.ECO);
+
+    await regulate(
+      mod,
+      gladys,
+      thermostat([presetFeature('schedule'), active], {
+        THERMOSTAT_MANUAL_SETPOINT: '22.5',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 3600 * 1000),
+      }),
+    );
+
+    expect(activeWrites(gladys, active)).to.deep.equal([]);
+  });
+
+  it('should write off on a thermostat stopped by hand', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+
+    await regulate(mod, gladys, thermostat([presetFeature('schedule'), modeFeature(THERMOSTAT_MODE.OFF), active]));
+
+    expect(activeWrites(gladys, active)).to.deep.equal([THERMOSTAT_ACTIVE_PRESET.OFF]);
+  });
+
+  it('should keep the preset in force while a window is open', async () => {
+    // The window only interrupts the heating: the preset comes back with it.
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15, windowOpen: true }) });
+    const active = activePresetFeature(THERMOSTAT_ACTIVE_PRESET.COMFORT);
+
+    await regulate(
+      mod,
+      gladys,
+      thermostat([presetFeature('schedule'), active], {
+        THERMOSTAT_WINDOW_FEATURE: 'window-sensor',
+        THERMOSTAT_WINDOW_DELAY: '0',
+      }),
+    );
+
+    expect(activeWrites(gladys, active)).to.deep.equal([]);
   });
 });

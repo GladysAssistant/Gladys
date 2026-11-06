@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { PasswordNotMatchingError, NotFoundError } = require('../../utils/coreErrors');
+const { normalizeEmail } = require('../../utils/email');
 
 /**
  * @private
@@ -13,7 +14,7 @@ const { PasswordNotMatchingError, NotFoundError } = require('../../utils/coreErr
  */
 async function login(email, password) {
   const user = await db.User.findOne({
-    where: { email },
+    where: { email: normalizeEmail(email) },
     attributes: [
       'id',
       'firstname',

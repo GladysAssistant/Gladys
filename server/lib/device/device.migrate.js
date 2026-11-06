@@ -5,6 +5,7 @@ const logger = require('../../utils/logger');
 const { NotFoundError, BadParameters, ConflictError } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
+const { parseSelectorList, serializeSelectorList } = require('../../utils/thermostatSelectorList');
 
 // Fields carrying selectors in scene actions/triggers and dashboard boxes.
 // This list is a contract with the Joi schemas of models/scene.js and
@@ -12,7 +13,7 @@ const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes')
 const FEATURE_STRING_FIELDS = ['device_feature', 'thermostat_feature'];
 // Device params that name a feature of another device by its selector. The
 // thermostat integration keeps its configuration on its own device
-// (docs/specs/thermostat.md A.1): the sensors it reads, the switch it drives and,
+// (docs/specs/thermostat.md A.1): the sensors it reads, the switch or pilot wire it drives and,
 // on an external thermostat, the real device's features. Left on a migrated
 // selector, the regulation loop finds none of them, and the dashboard widget no
 // longer finds its thermostat.
@@ -20,11 +21,16 @@ const FEATURE_PARAM_NAMES = [
   'THERMOSTAT_TEMPERATURE_FEATURE',
   'THERMOSTAT_HUMIDITY_FEATURE',
   'THERMOSTAT_SWITCH_FEATURE',
+  'THERMOSTAT_PILOT_WIRE_FEATURE',
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
   'THERMOSTAT_MODE_FEATURE',
+  'THERMOSTAT_POWER_FEATURE',
 ];
+// Of those, the params that may name several features as a JSON array
+// (docs/specs/thermostat.md A.1.1): several windows, several temperature probes.
+const FEATURE_LIST_PARAM_NAMES = ['THERMOSTAT_TEMPERATURE_FEATURE', 'THERMOSTAT_WINDOW_FEATURE'];
 const FEATURE_ARRAY_FIELDS = ['device_features'];
 const DEVICE_STRING_FIELDS = ['device', 'camera'];
 const DEVICE_ARRAY_FIELDS = ['devices'];
@@ -522,9 +528,31 @@ async function executeMigration(selector, options, jobId) {
   const paramsToRewrite = await db.DeviceParam.findAll({
     where: { name: FEATURE_PARAM_NAMES, value: Object.keys(featureReplacements) },
   });
+  // A list param can hold a JSON array, which never equals a single selector:
+  // those are read by name and parsed — not filtered on their text, which an
+  // API write may have padded — then rewritten entry by entry, in place. One
+  // holding a single selector is already in the batch above.
+  const listParams = await db.DeviceParam.findAll({
+    where: { name: FEATURE_LIST_PARAM_NAMES },
+  });
   const devicesWithParamsUpdated = new Set();
   await Promise.each(paramsToRewrite, async (param) => {
     await param.update({ value: featureReplacements[param.value] });
+    devicesWithParamsUpdated.add(param.device_id);
+    deviceIdsToRefresh.add(param.device_id);
+  });
+  await Promise.each(listParams, async (param) => {
+    if (featureReplacements[param.value] !== undefined) {
+      return;
+    }
+    const selectors = parseSelectorList(param.value);
+    if (!selectors.some((entry) => featureReplacements[entry] !== undefined)) {
+      return;
+    }
+    const rewritten = selectors.map((entry) =>
+      featureReplacements[entry] !== undefined ? featureReplacements[entry] : entry,
+    );
+    await param.update({ value: serializeSelectorList(rewritten) });
     devicesWithParamsUpdated.add(param.device_id);
     deviceIdsToRefresh.add(param.device_id);
   });

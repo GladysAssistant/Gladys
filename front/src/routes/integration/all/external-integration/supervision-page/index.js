@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import SupervisionCard from './SupervisionCard';
@@ -18,7 +19,11 @@ class ExternalIntegrationSupervisionPage extends Component {
       loadStatus: RequestStatus.Getting,
       actionStatus: null,
       actionError: null,
-      updateResult: null
+      updateResult: null,
+      // unknown until the AI provider selection is read: the status of the
+      // previous integration must not leak onto this one
+      isActiveAiProvider: null,
+      aiProviderReadFailed: false
     });
     const { selector } = this.props;
     try {
@@ -28,6 +33,9 @@ class ExternalIntegrationSupervisionPage extends Component {
         return;
       }
       this.setState({ integration, loadStatus: RequestStatus.Success });
+      if (get(integration, 'manifest.type') === 'ai') {
+        await this.loadAiProvider(selector);
+      }
     } catch (e) {
       console.error(e);
       if (selector !== this.props.selector) {
@@ -36,6 +44,33 @@ class ExternalIntegrationSupervisionPage extends Component {
       this.setState({ integration: null, loadStatus: RequestStatus.Error });
     }
   };
+
+  // whether this AI provider integration is the one the assistant uses:
+  // uninstalling it switches the assistant back to Gladys Plus, the
+  // confirmation must say so (capabilities/ai-type.md). true / false once
+  // read, null while unknown — pending, or failed (aiProviderReadFailed): a
+  // failed read is not a "not the provider" answer, the confirmation says
+  // it is checking, then that it could not check
+  loadAiProvider = async selector => {
+    this.aiProviderRequest = (this.aiProviderRequest || 0) + 1;
+    const request = this.aiProviderRequest;
+    const isStale = () => selector !== this.props.selector || request !== this.aiProviderRequest;
+    try {
+      const aiProvider = await this.props.httpClient.get('/api/v1/ai_provider');
+      if (isStale()) {
+        // a newer read has started since, discard this stale answer
+        return;
+      }
+      this.setState({ isActiveAiProvider: aiProvider.selector === selector, aiProviderReadFailed: false });
+    } catch (e) {
+      console.error(e);
+      if (!isStale()) {
+        this.setState({ aiProviderReadFailed: true });
+      }
+    }
+  };
+
+  isAiProvider = () => get(this.state, 'integration.manifest.type') === 'ai';
 
   executeAction = async action => {
     const previousVersion = this.state.integration && this.state.integration.version;
@@ -65,6 +100,13 @@ class ExternalIntegrationSupervisionPage extends Component {
 
   askUninstall = () => {
     this.setState({ askingUninstall: true });
+    if (this.isAiProvider()) {
+      // the selection can change while this page is open (another tab, the
+      // configuration screen): read it again now, the confirmation is where
+      // the answer matters, and say "unknown" until it comes back
+      this.setState({ isActiveAiProvider: null, aiProviderReadFailed: false });
+      this.loadAiProvider(this.props.selector);
+    }
   };
 
   cancelUninstall = () => {
@@ -147,6 +189,9 @@ class ExternalIntegrationSupervisionPage extends Component {
             updateResult={state.updateResult}
             uninstallStatus={state.uninstallStatus}
             askingUninstall={state.askingUninstall}
+            isAiProvider={this.isAiProvider()}
+            isActiveAiProvider={state.isActiveAiProvider}
+            aiProviderReadFailed={state.aiProviderReadFailed}
             executeAction={this.executeAction}
             onAskUninstall={this.askUninstall}
             onCancelUninstall={this.cancelUninstall}

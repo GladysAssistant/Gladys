@@ -55,6 +55,15 @@ describe('POST /api/v1/login', () => {
       .expect('Content-Type', /json/)
       .expect(404);
   });
+  it('should not login user (missing email)', async () => {
+    await request
+      .post('/api/v1/login')
+      .send({
+        password: 'mysuperpassword',
+      })
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
   it('should not login user (wrong password)', async () => {
     await request
       .post('/api/v1/login')

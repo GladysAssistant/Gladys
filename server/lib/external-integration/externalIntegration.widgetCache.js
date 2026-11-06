@@ -181,8 +181,9 @@ function invalidateWidgetContent(service, widgetKey, { broadcast = false } = {})
  * @description Drop every widget cache and counter of an integration: the
  * contents, the images, the generations (an in-flight command stamped with
  * a generation that no longer exists never writes to the cache), the pull
- * and action counters and the nudge timestamps. Called when the integration
- * stops, updates or is uninstalled.
+ * and action counters, the nudge timestamps, and the music artwork allowlist and
+ * command counters (capabilities/music.md). Called when the integration stops,
+ * updates or is uninstalled.
  * @param {object} service - The external integration service.
  * @example
  * gladys.externalIntegration.clearWidgetCaches(service);
@@ -210,6 +211,8 @@ function clearWidgetCaches(service) {
     this.widgetImageInFlight,
     this.widgetImageSlots,
     this.widgetActionRates,
+    this.musicArtworkKeys,
+    this.musicCommandsInFlight,
   ].forEach((state) => state.delete(service.id));
   [...this.widgetRefreshTimes.keys()]
     .filter((key) => key.startsWith(prefix))

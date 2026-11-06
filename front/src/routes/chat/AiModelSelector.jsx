@@ -8,11 +8,13 @@ class AiModelSelector extends Component {
   state = {
     models: [],
     loading: true,
-    loadError: false
+    loadError: false,
+    externalProviderActive: null
   };
 
   componentDidMount() {
     this.fetchModels();
+    this.fetchAiProvider();
   }
 
   fetchModels = async () => {
@@ -32,6 +34,19 @@ class AiModelSelector extends Component {
     }
   };
 
+  // the model list is Gladys Plus vocabulary: when an external AI provider
+  // integration is selected, the provider picks its own model and the
+  // selector disappears. null = unknown (request pending or failed): the
+  // selector only renders once the absence of a provider is confirmed
+  fetchAiProvider = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      this.setState({ externalProviderActive: Boolean(response.selector) });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   handleChange = e => {
     if (this.props.onChange) {
       this.props.onChange(e.target.value);
@@ -40,7 +55,10 @@ class AiModelSelector extends Component {
 
   formatModelLabel = model => `${model.id} · ${model.priceLabel}`;
 
-  render({ value }, { models, loading, loadError }) {
+  render({ value }, { models, loading, loadError, externalProviderActive }) {
+    if (externalProviderActive !== false) {
+      return null;
+    }
     return (
       <div class={style.modelSelectorWrap}>
         <label class={style.modelSelectorLabel} for="ai-chat-model">

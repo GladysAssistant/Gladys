@@ -30,7 +30,7 @@ describe('POST /api/v1/service/mcp/proxy', () => {
 
   it('should return error when MCP server is not running', async () => {
     mcpHandler = {
-      server: null,
+      schemas: null,
       mcp: {
         StreamableHTTPServerTransport: fake(),
       },
@@ -49,10 +49,12 @@ describe('POST /api/v1/service/mcp/proxy', () => {
   it('should successfully handle MCP request', async () => {
     const server = {
       connect: fake.resolves(undefined),
+      close: fake(),
     };
 
     mcpHandler = {
-      server,
+      schemas: { resources: [], tools: [] },
+      createServer: stub().returns(server),
       mcp: {
         StreamableHTTPServerTransport: stub().returns(transport),
       },
@@ -61,6 +63,7 @@ describe('POST /api/v1/service/mcp/proxy', () => {
     const mcpController = MCPController(mcpHandler);
     await mcpController['post /api/v1/service/mcp/proxy'].controller(req, res);
 
+    expect(mcpHandler.createServer.callCount).to.eq(1);
     expect(mcpHandler.mcp.StreamableHTTPServerTransport.callCount).to.eq(1);
     expect(mcpHandler.mcp.StreamableHTTPServerTransport.firstCall.args[0]).to.deep.equal({
       sessionIdGenerator: undefined,
@@ -78,10 +81,12 @@ describe('POST /api/v1/service/mcp/proxy', () => {
   it('should close transport when response closes', async () => {
     const server = {
       connect: fake.resolves(undefined),
+      close: fake(),
     };
 
     mcpHandler = {
-      server,
+      schemas: { resources: [], tools: [] },
+      createServer: stub().returns(server),
       mcp: {
         StreamableHTTPServerTransport: stub().returns(transport),
       },
@@ -94,16 +99,19 @@ describe('POST /api/v1/service/mcp/proxy', () => {
     closeCallback();
 
     expect(transport.close.callCount).to.eq(1);
+    expect(server.close.callCount).to.eq(1);
   });
 
   it('should handle error and return 500 when headers not sent', async () => {
     const error = new Error('Test error');
     const server = {
       connect: fake.rejects(error),
+      close: fake(),
     };
 
     mcpHandler = {
-      server,
+      schemas: { resources: [], tools: [] },
+      createServer: stub().returns(server),
       mcp: {
         StreamableHTTPServerTransport: stub().returns(transport),
       },

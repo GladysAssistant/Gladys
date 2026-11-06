@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class NukiDeviceBox extends Component {
   componentWillMount() {
@@ -38,7 +39,10 @@ class NukiDeviceBox extends Component {
     });
     try {
       const deviceDidNotExist = this.state.device.id === undefined;
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(this.state.device)
+      );
       if (deviceDidNotExist) {
         savedDevice.alreadyExist = true;
       }

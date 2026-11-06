@@ -1,6 +1,7 @@
 import update from 'immutability-helper';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 function createActions(store) {
   const actions = {
@@ -56,7 +57,7 @@ function createActions(store) {
     },
     async saveDevice(state, index) {
       const { device } = state.broadlinkPeripherals[index];
-      const savedDevice = await state.httpClient.post('/api/v1/device', device);
+      const savedDevice = await state.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
 
       const newState = update(state, {
         broadlinkPeripherals: {

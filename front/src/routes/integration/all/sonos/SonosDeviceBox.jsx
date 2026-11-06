@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import { connect } from 'unistore/preact';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class SonosDeviceBox extends Component {
   componentWillMount() {
@@ -44,7 +45,10 @@ class SonosDeviceBox extends Component {
     });
     try {
       let deviceDidNotExist = this.state.device.id === undefined;
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const savedDevice = await this.props.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(this.state.device)
+      );
       if (deviceDidNotExist) {
         savedDevice.alreadyExist = true;
       }

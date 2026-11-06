@@ -20,7 +20,9 @@ class ShutterButtons extends Component {
 
   render({ value, category, type, isLive = false }, {}) {
     return (
-      <div class="btn-group" role="group">
+      // hz-segmented: under the glass theme, the card button rule paints every
+      // btn-secondary alike, the segmented control keeps the active one visible
+      <div class="btn-group hz-segmented" role="group">
         <button
           class={cx('btn btn-sm btn-secondary', {
             active: value === COVER_STATE.OPEN

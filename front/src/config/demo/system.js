@@ -50,7 +50,7 @@ const system = {
       rsa_public_key: 'fa:f9:5b:80:69:8d:c3:d7:4b:cc:33:7b:5d:ba:98:9b:17:22:76:f8:f3:79:db:6b:b8:53:37:ec:2a:cf:18:fd',
       ecdsa_public_key:
         'cf:df:75:79:a0:93:74:f4:e2:d7:b8:74:ab:67:7b:80:6e:57:1d:ef:bc:38:5d:70:8b:cf:dd:ba:88:c8:d6:f4',
-      gladys_4_user_id: null,
+      gladys_4_user_id: uuid('user-pepper'),
       connected: true,
       accepted: true
     },
@@ -60,11 +60,12 @@ const system = {
       rsa_public_key: '51:89:e6:91:4f:da:f8:d6:b6:f6:1e:15:54:c4:c0:fd:cc:69:70:81:d4:a8:ea:26:8b:02:4b:b9:ff:97:64:1a',
       ecdsa_public_key:
         '2e:e9:ee:a0:b3:22:46:62:f8:22:9b:52:9d:f4:3f:65:70:62:59:76:d1:85:ad:3b:9f:65:4e:61:4c:26:89:7e',
-      gladys_4_user_id: null,
+      gladys_4_user_id: uuid('user-tony'),
       connected: true,
       accepted: true
     }
   ],
+  'patch /api/v1/gateway/key': { success: true },
   'get /api/v1/ping': {},
   'get /api/v1/system/info': {
     hostname: 'Raspberry Pi 4',

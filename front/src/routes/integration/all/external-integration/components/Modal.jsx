@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { createPortal } from 'preact/compat';
 import cx from 'classnames';
+import createBackdropDismiss from '../../../../../utils/backdropDismiss';
 import style from './modal.css';
 
 class Modal extends Component {
@@ -18,13 +19,13 @@ class Modal extends Component {
     }
   };
 
-  handleOverlayClick = e => {
-    // Close only when the backdrop itself is clicked, not a click bubbling up
-    // from inside the dialog.
-    if (e.target === e.currentTarget && this.props.onClose) {
+  // Close only when the backdrop itself is pressed, not on a click bubbling up
+  // from inside the dialog, nor on the release of a drag that started in it.
+  backdropDismiss = createBackdropDismiss(() => {
+    if (this.props.onClose) {
       this.props.onClose();
     }
-  };
+  });
 
   render({ children, title, onClose, large }) {
     // The modal is rendered on <body>: it opens from inside a glass card, whose
@@ -32,7 +33,7 @@ class Modal extends Component {
     // stacking context (same reason the light control panel is portaled).
     // glass-theme keeps the dialog on the theme's glass surface out there.
     return createPortal(
-      <div class={cx('glass-theme', style.modalOverlay)} onClick={this.handleOverlayClick}>
+      <div class={cx('glass-theme', style.modalOverlay)} {...this.backdropDismiss}>
         <div class={cx(style.modalDialog, { [style.modalDialogLarge]: large })}>
           <div class="card mb-0">
             <div class="card-header">

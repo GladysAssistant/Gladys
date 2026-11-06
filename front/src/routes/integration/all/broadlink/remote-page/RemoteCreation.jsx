@@ -12,6 +12,7 @@ import { PARAMS } from '../../../../../../../server/services/broadlink/lib/utils
 import RemoteFeatureEditionPanel from './RemoteFeatureEditionPanel';
 import { MANAGED_CATEGORIES, MANAGED_FEATURES } from './features';
 import RemoteFeatureTag from './edition/RemoteFeatureTag';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 class RemoteCreation extends Component {
   updateDeviceName = e => {
@@ -123,7 +124,7 @@ class RemoteCreation extends Component {
     };
 
     try {
-      await this.props.httpClient.post('/api/v1/device', deviceToCreate);
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToCreate));
       this.setState({
         saveStatus: RequestStatus.Success
       });

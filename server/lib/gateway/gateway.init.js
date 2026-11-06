@@ -68,11 +68,30 @@ async function init() {
   if (this.backupSchedule && this.backupSchedule.cancel) {
     this.backupSchedule.cancel();
   }
-  // schedule backup at midnight
+  if (this.backupCatchUpSchedule && this.backupCatchUpSchedule.cancel) {
+    this.backupCatchUpSchedule.cancel();
+  }
+  clearTimeout(this.backupCatchUpInitTimer);
+  // schedule the nightly backup check
   const timezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
   const rule = { tz: timezone, hour: 2, minute: 0, second: 0 };
   this.backupSchedule = this.scheduler.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
+  // The check only backs up when no backup was made today, so it can run
+  // again without harm: once in the daytime, for the instances that were off
+  // or offline at night (an internet box switched off at night, say), and a
+  // few minutes after start-up, for the instances that are off every night or
+  // restarted during the backup window
+  const catchUpRule = { tz: timezone, hour: this.backupCatchUpHour, minute: 0, second: 0 };
+  this.backupCatchUpSchedule = this.scheduler.scheduleJob(catchUpRule, this.checkIfBackupNeeded.bind(this));
+  this.backupCatchUpInitTimer = setTimeout(async () => {
+    try {
+      await this.checkIfBackupNeeded();
+    } catch (e) {
+      logger.warn('Gateway: backup catch-up check failed after start-up');
+      logger.warn(e);
+    }
+  }, this.backupCatchUpInitTimeout);
 
   try {
     await this.scheduleWeeklyDigest();

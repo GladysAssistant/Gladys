@@ -18,7 +18,9 @@ const GatewayLoginForm = ({ children, ...props }) => (
     <div class="card-body p-6">
       <div
         class={cx('dimmer', {
-          active: props.gatewayLoginStatus === RequestStatus.Getting
+          active:
+            props.gatewayLoginStatus === RequestStatus.Getting ||
+            props.gatewayLoginTwoFactorResetStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
@@ -56,11 +58,6 @@ const GatewayLoginForm = ({ children, ...props }) => (
               <Text id="gatewayLogin.twoFactorEnabledSuccess" />
             </div>
           )}
-          {props.gatewayLoginStatus === RequestStatus.UserNotAcceptedLocally && (
-            <div class="alert alert-danger" role="alert">
-              <Text id="gatewayLogin.userNotAcceptedLocally" />
-            </div>
-          )}
           {props.gatewayLoginStatus === RequestStatus.GatewayNoInstanceFound && (
             <div class="alert alert-danger" role="alert">
               <Text id="gatewayLogin.gatewayNoInstanceFound" />{' '}
@@ -77,6 +74,21 @@ const GatewayLoginForm = ({ children, ...props }) => (
           {props.gatewayLoginStatus === RequestStatus.Error && (
             <div class="alert alert-danger" role="alert">
               <Text id="gatewayLogin.unknownError" />
+            </div>
+          )}
+          {props.gatewayLoginTwoFactorResetStatus === RequestStatus.Success && (
+            <div class="alert alert-success" role="alert">
+              <Text id="gatewayLogin.resetTwoFactorEmailSent" />
+            </div>
+          )}
+          {props.gatewayLoginTwoFactorResetStatus === RequestStatus.Error && (
+            <div class="alert alert-danger" role="alert">
+              {props.gatewayLoginTwoFactorResetError === 'INSTANCE_CONNECTED' && (
+                <Text id="gatewayLogin.resetTwoFactorInstanceConnected" />
+              )}
+              {props.gatewayLoginTwoFactorResetError === 'EXPIRED' && <Text id="gatewayLogin.resetTwoFactorExpired" />}
+              {props.gatewayLoginTwoFactorResetError === 'TOO_MANY' && <Text id="gatewayLogin.resetTwoFactorTooMany" />}
+              {props.gatewayLoginTwoFactorResetError === 'UNKNOWN' && <Text id="gatewayLogin.resetTwoFactorError" />}
             </div>
           )}
           {!props.gatewayLoginStep2 && (
@@ -146,6 +158,16 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 </a>
                 <br />
                 <MarkupText id="gatewayLogin.noRecoveryCode" />
+                {props.requestTwoFactorReset && props.gatewayLoginTwoFactorResetStatus !== RequestStatus.Success && (
+                  <span>
+                    {' '}
+                    <a href="#" onClick={props.requestTwoFactorReset}>
+                      <Text id="gatewayLogin.resetTwoFactorLink" />
+                    </a>
+                  </span>
+                )}
+                <br />
+                <MarkupText id="gatewayLogin.twoFactorHelp" />
               </p>
             </div>
           )}
@@ -172,6 +194,16 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 </a>
                 <br />
                 <MarkupText id="gatewayLogin.noRecoveryCode" />
+                {props.requestTwoFactorReset && props.gatewayLoginTwoFactorResetStatus !== RequestStatus.Success && (
+                  <span>
+                    {' '}
+                    <a href="#" onClick={props.requestTwoFactorReset}>
+                      <Text id="gatewayLogin.resetTwoFactorLink" />
+                    </a>
+                  </span>
+                )}
+                <br />
+                <MarkupText id="gatewayLogin.twoFactorHelp" />
               </p>
             </div>
           )}

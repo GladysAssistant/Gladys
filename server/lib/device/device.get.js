@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 const db = require('../../models');
 const { isNumeric } = require('../../utils/device');
 const { NotFoundError } = require('../../utils/coreErrors');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 
 const DEFAULT_OPTIONS = {
@@ -128,6 +128,11 @@ async function get(options) {
       const tooOldTimestamp = Date.now() - numberOfHoursBeforeStateIsOutdated * 60 * 60 * 1000;
       const lastValueIsToOld = lastValueInTimestamp < tooOldTimestamp;
       feature.last_value_is_too_old = lastValueIsToOld;
+      // The camera image (up to 150 kB of base64) is served by /api/v1/camera/:selector/image:
+      // returning it in the device lists would bloat them and break device saves (413).
+      if (feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.IMAGE) {
+        feature.last_value_string = null;
+      }
     });
     return rawDevice;
   });

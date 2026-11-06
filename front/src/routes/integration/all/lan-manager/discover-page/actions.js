@@ -2,6 +2,7 @@ import update from 'immutability-helper';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import createActionsHouse from '../../../../../actions/house';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 const createActions = store => {
   const houseActions = createActionsHouse(store);
@@ -98,7 +99,7 @@ const createActions = store => {
       const device = state.lanManagerDiscoveredDevices[deviceIndex];
 
       try {
-        const savedDevice = await state.httpClient.post('/api/v1/device', device);
+        const savedDevice = await state.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
         const newState = update(state, {
           lanManagerDiscoveredDevices: {
             [deviceIndex]: {

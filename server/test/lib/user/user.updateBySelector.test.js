@@ -1,6 +1,8 @@
 const { assert, expect } = require('chai');
 
 const EventEmitter = require('events');
+const db = require('../../../models');
+const { Cache } = require('../../../utils/cache');
 const User = require('../../../lib/user');
 const StateManager = require('../../../lib/state');
 
@@ -12,7 +14,7 @@ const Session = require('../../../lib/session');
 const tooLongImage = require('./tooLongImage.json');
 
 describe('user.updateBySelector', () => {
-  const session = new Session('secret');
+  const session = new Session('secret', new Cache());
   const user = new User(session, stateManager);
   it('should update user', async () => {
     const updatedUser = await user.updateBySelector('pepper', {
@@ -42,10 +44,20 @@ describe('user.updateBySelector', () => {
     });
   });
   it('should update user password', async () => {
-    const updatedUser = await user.updateBySelector('pepper', {
-      password: 'mybigpassword',
-    });
+    const pepperSession = await session.create('7a137a56-069e-4996-8816-36558174b727', ['dashboard:write'], 60);
+    const updatedUser = await user.updateBySelector(
+      'pepper',
+      {
+        password: 'mybigpassword',
+      },
+      'baf1fa89-153b-4f2e-adf3-787e410ec291',
+    );
     await user.login(updatedUser.email, 'mybigpassword');
+    // the sessions of pepper are logged out, the admin's session is not touched
+    const pepperSessionInDb = await db.Session.findByPk(pepperSession.session_id);
+    expect(pepperSessionInDb.revoked).to.equal(true);
+    const adminSession = await db.Session.findByPk('baf1fa89-153b-4f2e-adf3-787e410ec291');
+    expect(adminSession.revoked).to.equal(false);
   });
   it('should return error, password too short', async () => {
     const promise = user.updateBySelector('pepper', {
@@ -58,6 +70,39 @@ describe('user.updateBySelector', () => {
       picture: tooLongImage.picture,
     });
     return assert.isRejected(promise, 'Validation error: Profile picture too big');
+  });
+  it('should remove the admin role when another administrator remains', async () => {
+    const updatedUser = await user.updateBySelector('pepper', {
+      role: 'habitant',
+    });
+    expect(updatedUser).to.have.property('role', 'habitant');
+    const john = await db.User.findOne({ where: { selector: 'john' } });
+    expect(john).to.have.property('role', 'admin');
+  });
+  it('should return error, the last administrator cannot lose the admin role', async () => {
+    await db.User.update({ role: 'habitant' }, { where: { selector: 'john' } });
+    const promise = user.updateBySelector('pepper', {
+      role: 'user',
+    });
+    await assert.isRejected(promise, 'The last administrator of the instance cannot lose the admin role');
+    const pepper = await db.User.findOne({ where: { selector: 'pepper' } });
+    expect(pepper).to.have.property('role', 'admin');
+  });
+  it('should update the last administrator when the admin role is kept', async () => {
+    await db.User.update({ role: 'habitant' }, { where: { selector: 'john' } });
+    const updatedUser = await user.updateBySelector('pepper', {
+      firstname: 'Virginia',
+      role: 'admin',
+    });
+    expect(updatedUser).to.have.property('firstname', 'Virginia');
+    expect(updatedUser).to.have.property('role', 'admin');
+  });
+  it('should give the admin role back to a user when there is no administrator', async () => {
+    await db.User.update({ role: 'habitant' }, { where: {} });
+    const updatedUser = await user.updateBySelector('pepper', {
+      role: 'admin',
+    });
+    expect(updatedUser).to.have.property('role', 'admin');
   });
   it('should return error, user not found', async () => {
     const promise = user.updateBySelector('USER_NOT_FOUND', {

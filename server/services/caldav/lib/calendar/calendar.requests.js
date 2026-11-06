@@ -15,6 +15,36 @@ function getElementsByTagRegex(container, regex) {
 }
 
 /**
+ * @description Extract the events from the multistatus XML response of a CalDAV REPORT.
+ * @param {object} xmlDom - XML DOM library.
+ * @param {object} ical - ICal library.
+ * @param {string} responseText - XML response of the CalDAV server.
+ * @returns {Array} Events found in the response, with their href.
+ * @example
+ * parseEventsResponse(xmlDom, ical, '<d:multistatus>...</d:multistatus>')
+ */
+function parseEventsResponse(xmlDom, ical, responseText) {
+  const xmlEvents = new xmlDom.DOMParser().parseFromString(responseText);
+  const jsonEvents = getElementsByTagRegex(xmlEvents, /^[a-zA-Z]*:?response$/).map((xmlEvent) => {
+    const event = ical.parseICS(getElementsByTagRegex(xmlEvent, /^[a-zA-Z]*:?calendar-data$/)[0].childNodes[0].data);
+    for (let j = 0; j < Object.keys(event).length; j += 1) {
+      if (event[Object.keys(event)[j]].type === 'VEVENT') {
+        return {
+          href: getElementsByTagRegex(xmlEvent, /^[a-zA-Z]*:?href$/)[0].childNodes[0].data,
+          ...event[Object.keys(event)[j]],
+        };
+      }
+    }
+    return null;
+  });
+
+  // Filter only event objects
+  return jsonEvents.filter((jsonEvent) => {
+    return jsonEvent !== null;
+  });
+}
+
+/**
  * @description Get calendars from caldav server.
  * @param {object} xhr - Request with dav credentials.
  * @param {string} homeUrl - Request url.
@@ -132,31 +162,50 @@ async function requestEventsData(xhr, calendarUrl, eventsToUpdate, calDavHost) {
 
   const eventsData = await xhr.send(req, calendarUrl);
 
-  // Extract data from XML response
-  const xmlEvents = new this.xmlDom.DOMParser().parseFromString(eventsData.request.responseText);
-  const jsonEvents = getElementsByTagRegex(xmlEvents, /^[a-zA-Z]*:?response$/).map((xmlEvent) => {
-    const event = this.ical.parseICS(
-      getElementsByTagRegex(xmlEvent, /^[a-zA-Z]*:?calendar-data$/)[0].childNodes[0].data,
-    );
-    for (let j = 0; j < Object.keys(event).length; j += 1) {
-      if (event[Object.keys(event)[j]].type === 'VEVENT') {
-        return {
-          href: getElementsByTagRegex(xmlEvent, /^[a-zA-Z]*:?href$/)[0].childNodes[0].data,
-          ...event[Object.keys(event)[j]],
-        };
-      }
-    }
-    return null;
+  return parseEventsResponse(this.xmlDom, this.ical, eventsData.request.responseText);
+}
+
+/**
+ * @description Get the recurring events of a calendar from caldav server.
+ * Only the calendar objects with a recurrence rule are requested, with a calendar-query
+ * REPORT filtering on the RRULE property (RFC 4791, section 9.7.2).
+ * @param {object} xhr - Request with dav credentials.
+ * @param {string} calendarUrl - Request url.
+ * @returns {Promise} Resolving with all detailed recurring events.
+ * @example
+ * requestRecurringEvents(xhr, calendarUrl)
+ */
+async function requestRecurringEvents(xhr, calendarUrl) {
+  const req = new this.dav.Request({
+    method: 'REPORT',
+    requestData: `
+          <c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
+              <d:prop>
+                  <d:getetag />
+                  <c:calendar-data />
+              </d:prop>
+              <c:filter>
+                  <c:comp-filter name="VCALENDAR">
+                      <c:comp-filter name="VEVENT">
+                          <c:prop-filter name="RRULE" />
+                      </c:comp-filter>
+                  </c:comp-filter>
+              </c:filter>
+          </c:calendar-query>`,
+    transformRequest: (request) => {
+      request.setRequestHeader('Content-Type', 'application/xml;charset=utf-8');
+      request.setRequestHeader('Depth', '1');
+    },
   });
 
-  // Filter only event objects
-  return jsonEvents.filter((jsonEvent) => {
-    return jsonEvent !== null;
-  });
+  const eventsData = await xhr.send(req, calendarUrl);
+
+  return parseEventsResponse(this.xmlDom, this.ical, eventsData.request.responseText);
 }
 
 module.exports = {
   requestCalendars,
   requestChanges,
   requestEventsData,
+  requestRecurringEvents,
 };

@@ -1,0 +1,4 @@
+/* key fingerprints are long strings without spaces */
+.fingerprint {
+  word-break: break-all;
+}
