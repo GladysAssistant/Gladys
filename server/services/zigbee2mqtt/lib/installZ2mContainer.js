@@ -13,6 +13,10 @@ const sleep = promisify(setTimeout);
 // have used anyway, so it never makes the clock of a device worse than it already is.
 const DEFAULT_TIMEZONE = 'UTC';
 
+// Zigbee2mqtt fails to start within a couple of minutes: an older run is a running Zigbee2mqtt, whose logs do not
+// explain a startup failure
+const RECENT_RUN_IN_SECONDS = 5 * 60;
+
 /**
  * @description Build the Zigbee2mqtt container descriptor to create.
  * @param {string} containerPath - Path of the Z2M data folder on the host.
@@ -180,6 +184,14 @@ async function installZ2mContainer(config, setupMode = false) {
       await sleep(this.containerRestartWaitTimeInMs);
       // We read the logs in non blocking mode
       this.readZ2mContainerLogs(container.id, restartedAt);
+    } else {
+      // Left running: it may still crash in a loop, seen between two restarts (Docker restarts it at once when it
+      // ran for 10 s or more). Its current run tells why, when it is recent.
+      const { State } = await this.gladys.system.inspectContainer(container.id);
+      const startedAt = Math.floor(new Date(State.StartedAt).getTime() / 1000);
+      if (Date.now() / 1000 - startedAt < RECENT_RUN_IN_SECONDS) {
+        this.readZ2mContainerLogs(container.id, startedAt);
+      }
     }
 
     logger.info('Zigbee2mqtt container successfully started');

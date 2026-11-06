@@ -30,6 +30,8 @@ const containerStopped = {
 
 const containerDescription = {
   Id: 'a8293feec54547a797aa2e52cc14b93f89a007d6c5608c587e30491feec8ee61',
+  // Started long ago: a running Zigbee2mqtt
+  State: { StartedAt: '2026-01-01T08:00:00.123456789Z' },
   HostConfig: {
     NetworkMode: 'host',
     RestartPolicy: {
@@ -389,6 +391,35 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
     // The container was already running: Gladys did not start it
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
+    // Running for long: its logs do not explain a startup failure
+    assert.notCalled(gladys.system.getContainerLogs);
+  });
+
+  it('should read the logs of a container left running that started recently', async () => {
+    // PREPARE
+    // Crashing in a loop, seen between two restarts
+    const clock = sinon.useFakeTimers({ now: Date.parse('2026-11-06T18:30:00Z'), toFake: ['Date'] });
+    try {
+      gladys.system.getContainers = fake.resolves([container]);
+      gladys.system.inspectContainer = fake.resolves({
+        ...containerDescription,
+        State: { StartedAt: '2026-11-06T18:29:40.123456789Z' },
+      });
+      // EXECUTE
+      await zigbee2mqttManager.installZ2mContainer({});
+    } finally {
+      clock.restore();
+    }
+    // ASSERT
+    assert.notCalled(gladys.system.restartContainer);
+    // Its current run only
+    assert.calledOnceWithExactly(gladys.system.getContainerLogs, container.id, {
+      follow: true,
+      since: Date.parse('2026-11-06T18:29:40Z') / 1000,
+      tail: 'all',
+    });
+    // Gladys did not start it: not shown as starting
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
   });
 
