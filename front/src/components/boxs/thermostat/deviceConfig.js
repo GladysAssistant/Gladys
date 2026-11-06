@@ -61,6 +61,24 @@ const PARAM_FIELDS = [
 
 const DEFAULTS = { default_mode: 'heating', control_type: 'hysteresis', thermostat_type: 'virtual' };
 
+const USE_PRESETS = ['frost', 'away', 'eco', 'night', 'comfort'];
+const USE_BOUNDS = ['temp_min', 'temp_max'];
+
+// The presets and the range of one use of a reversible heat pump: the cooling
+// range when it has one of its own, the heating one otherwise.
+const applyUse = (config, use) => {
+  const cooling = use === 'cooling';
+  const next = { ...config, default_mode: use };
+  USE_PRESETS.forEach(preset => {
+    next[`preset_${preset}`] = config[cooling ? `preset_cooling_${preset}` : `preset_heating_${preset}`];
+  });
+  USE_BOUNDS.forEach(bound => {
+    const own = cooling ? config[`cooling_${bound}`] : null;
+    next[bound] = own !== null && own !== undefined ? own : config[`heating_${bound}`];
+  });
+  return next;
+};
+
 /**
  * Build the widget config from a device's params. Returns null when the device
  * carries none, so the caller can fall back to the shared defaults.
@@ -94,19 +112,26 @@ export const buildConfigFromParams = device => {
     config.thermostat_type === 'external' &&
     Boolean(config.mode_feature) &&
     !config.pilot_wire_feature;
-  if (config.reversible && config.default_mode === 'cooling') {
-    ['frost', 'away', 'eco', 'night', 'comfort'].forEach(preset => {
-      config[`preset_${preset}`] = config[`preset_cooling_${preset}`];
-    });
-    // And the range of the cooling use, when it has one of its own.
-    ['temp_min', 'temp_max'].forEach(bound => {
-      if (config[`cooling_${bound}`] !== null && config[`cooling_${bound}`] !== undefined) {
-        config[bound] = config[`cooling_${bound}`];
-      }
-    });
+  if (!config.reversible) {
+    return config;
   }
-  return config;
+  // The heating set, kept apart so that either use can be read from the config.
+  USE_PRESETS.forEach(preset => {
+    config[`preset_heating_${preset}`] = config[`preset_${preset}`];
+  });
+  USE_BOUNDS.forEach(bound => {
+    config[`heating_${bound}`] = config[bound];
+  });
+  return applyUse(config, config.default_mode);
 };
+
+/**
+ * The config of a reversible heat pump read in another use than the one it is
+ * saved in: the use the widget has just switched to, until the device carries
+ * it. Any other config, or no use, is returned as it is.
+ */
+export const configForUse = (config, use) =>
+  config && config.reversible && use && use !== config.default_mode ? applyUse(config, use) : config;
 
 /**
  * Read the state a thermostat carries on its own features: the preset it

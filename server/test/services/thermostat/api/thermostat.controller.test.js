@@ -94,6 +94,41 @@ describe('thermostat.controller', () => {
     expect(res.body).to.deep.equal({ selector: 'created' });
   });
 
+  // The form names what is missing rather than reporting a generic failure.
+  it('should report a refused thermostat as its own status and code', async () => {
+    const cases = [
+      ['Thermostat: a reversible thermostat needs a mode feature (THERMOSTAT_MODE_FEATURE)', 'REVERSIBLE_NO_MODE'],
+      ['Thermostat: a reversible thermostat needs a mode that can cool, x cannot', 'REVERSIBLE_MODE_CANNOT_COOL'],
+    ];
+
+    await Promise.all(
+      cases.map(async ([message, error]) => {
+        const handler = buildHandler({ createDevice: fake.rejects(new Error(message)) });
+        const routes = ThermostatController(handler);
+        const res = buildRes();
+
+        await callRoute(routes, 'post /api/v1/service/thermostat/device', { body: {} }, res);
+
+        expect(res.statusCode, message).to.equal(400);
+        expect(res.body.error, message).to.equal(error);
+      }),
+    );
+  });
+
+  it('should let an unexpected error through on the device route', async () => {
+    const handler = buildHandler({ createDevice: fake.rejects(new Error('db down')) });
+    const routes = ThermostatController(handler);
+
+    let failed = null;
+    try {
+      await callRoute(routes, 'post /api/v1/service/thermostat/device', { body: {} }, buildRes());
+    } catch (e) {
+      failed = e;
+    }
+
+    expect(failed.message).to.equal('db down');
+  });
+
   it('should return the schedules', async () => {
     const handler = buildHandler();
     const routes = ThermostatController(handler);

@@ -31,7 +31,7 @@ import {
 } from '../../../utils/thermostatPresetColors';
 import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
-import { loadDeviceConfig } from './deviceConfig';
+import { configForUse, loadDeviceConfig } from './deviceConfig';
 import { isRunningFromStateFeature } from './operatingState';
 
 const PRESET_ICONS = {
@@ -174,7 +174,10 @@ class ThermostatBox extends Component {
   // The mode values this card has just written, each with the timer that forgets it.
   expectedModes = new Map();
 
-  getConfig = () => ({ ...this.props.box, ...(this.state.remoteConfig || {}) });
+  // The config in force: the device's, read in the use this card has just
+  // switched to until a reload of the device carries it (getPendingUse), so the
+  // switch, the presets, their names and icons and the dial all show that use.
+  getConfig = () => configForUse({ ...this.props.box, ...(this.state.remoteConfig || {}) }, this.getPendingUse());
 
   // A real thermostat driven by its setpoint. A pilot-wire heater never is (spec
   // C.1.1): it owns its setpoint feature like a virtual thermostat. `external`
@@ -404,9 +407,22 @@ class ThermostatBox extends Component {
     return Number(mode) === THERMOSTAT_MODE.OFF;
   };
 
-  // The use in force: the one this card just switched a stopped heat pump to,
-  // until the device carries it, or the one the device is configured with.
-  getUse = () => this.state.pendingUse || this.getConfig().default_mode;
+  // The use this card has just switched to and the device does not carry yet: on
+  // a stopped heat pump the pending use, on a running one the heating or cooling
+  // mode it wrote. Null otherwise.
+  getPendingUse = () => {
+    const { pendingUse, pendingMode } = this.state;
+    if (pendingUse) {
+      return pendingUse;
+    }
+    if (pendingMode === THERMOSTAT_MODE.HEATING) {
+      return 'heating';
+    }
+    return pendingMode === THERMOSTAT_MODE.COOLING ? 'cooling' : null;
+  };
+
+  // The use in force, as shown.
+  getUse = () => this.getConfig().default_mode;
 
   // The mode a running thermostat carries, from what it is configured to do.
   getRunningMode = () => (this.getUse() === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING);
