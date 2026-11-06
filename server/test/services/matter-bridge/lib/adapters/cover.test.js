@@ -129,6 +129,25 @@ describe('Matter bridge cover adapter', () => {
     });
   });
 
+  it('should end the movement of a cover that stops one step away from its target', () => {
+    // Apple Home asks for 25 %, sent to Gladys as 75.
+    const travelling = {
+      windowCovering: { operationalStatus: { lift: MOVEMENT_STATUS.CLOSING }, targetPositionLiftPercent100ths: 2500 },
+    };
+    // Two steps away, the cover is still travelling.
+    expect(cover.toMatter('position', 73, { position }, travelling)).to.deep.equal({
+      windowCovering: { currentPositionLiftPercent100ths: 2700 },
+    });
+    // One step short of the target, the cover is done.
+    expect(cover.toMatter('position', 74, { position }, travelling)).to.deep.equal({
+      windowCovering: { currentPositionLiftPercent100ths: 2600, targetPositionLiftPercent100ths: 2600 },
+    });
+    // One step past the target, too.
+    expect(cover.toMatter('position', 76, { position }, travelling)).to.deep.equal({
+      windowCovering: { currentPositionLiftPercent100ths: 2400, targetPositionLiftPercent100ths: 2400 },
+    });
+  });
+
   it('should only move the current position of a travelling cover whose target is unknown', () => {
     const travelling = {
       windowCovering: { operationalStatus: { lift: MOVEMENT_STATUS.OPENING }, targetPositionLiftPercent100ths: null },
