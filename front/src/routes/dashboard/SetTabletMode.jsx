@@ -66,11 +66,13 @@ class SetTabletMode extends Component {
   };
 
   // The ready-to-use URL for a wall tablet: opens this dashboard already in
-  // tablet mode for the selected house, and forced full-screen. The value is
-  // the house selector (a URL-safe slug), so no encoding or name typing is
-  // needed - this is what frees the user from ever knowing what a selector is.
+  // tablet mode for the selected house, and forced full-screen. It keeps the
+  // current dashboard (window.location.pathname), so a tablet pinned to a
+  // specific dashboard stays on it. The value is the house selector (a URL-safe
+  // slug), so no encoding or name typing is needed - this is what frees the
+  // user from ever knowing what a selector is.
   tabletModeUrl = () =>
-    `${window.location.origin}/dashboard?tablet_mode_house=${this.state.selectedHouse}&fullscreen=force`;
+    `${window.location.origin}${window.location.pathname}?tablet_mode_house=${this.state.selectedHouse}&fullscreen=force`;
 
   copyTabletModeUrl = async () => {
     try {

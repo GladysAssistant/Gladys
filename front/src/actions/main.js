@@ -93,7 +93,9 @@ function createActions(store) {
     // caller (both call sites already wrap this in their own try/catch).
     async setTabletMode(state, houseSelector) {
       await state.httpClient.post('/api/v1/session/tablet_mode', {
-        tablet_mode: houseSelector !== null,
+        // != null, not !== null: a Save from the menu before getTabletMode has
+        // resolved must not post tablet_mode: true with an undefined house
+        tablet_mode: houseSelector != null,
         house: houseSelector
       });
       await actions.refreshTabletMode(state);
