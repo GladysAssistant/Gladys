@@ -651,9 +651,9 @@ describe('thermostat: reversible heat pump', () => {
       expect(handler.deviceCachesFill).to.equal(null);
     });
 
-    // The pass under way read the devices before they changed: a read after
-    // the change starts its own, and the old one leaves it in place.
-    it('should start a new read of the devices once they changed during one', async () => {
+    // The pass under way read the devices before they changed: published, its
+    // caches hid the change until the next one.
+    it('should start a new read of the devices once they changed during one, and drop the old one', async () => {
       const mod = loadListener();
       const handler = buildHandler();
       const releases = [];
@@ -667,16 +667,106 @@ describe('thermostat: reversible heat pump', () => {
       const before = mod.getWindowSelectors.call(handler);
       mod.invalidateDeviceCaches.call(handler);
       const after = mod.getWindowSelectors.call(handler);
-      const pending = handler.deviceCachesFill;
-      expect(handler.gladys.device.get.callCount).to.equal(2);
-      releases[0]([]);
+      // The new pass waits for the old one to end before reading.
+      expect(handler.gladys.device.get.callCount).to.equal(1);
+      releases[0]([heatPump()]);
       await before;
 
-      expect(handler.deviceCachesFill).to.equal(pending);
-      releases[1]([heatPump()]);
+      expect(handler.modeSelectorsCache).to.equal(null);
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      expect(handler.gladys.device.get.callCount).to.equal(2);
+      releases[1]([]);
       await after;
+      expect([...handler.modeSelectorsCache]).to.deep.equal([]);
       expect(handler.deviceCachesFill).to.equal(null);
+    });
+
+    it('should read the devices again after a stale pass that failed', async () => {
+      const mod = loadListener();
+      const handler = buildHandler();
+      let rejectFirst;
+      handler.gladys.device.get = sinon.stub();
+      handler.gladys.device.get.onFirstCall().returns(
+        new Promise((resolve, reject) => {
+          rejectFirst = reject;
+        }),
+      );
+      handler.gladys.device.get.onSecondCall().resolves([heatPump()]);
+
+      const before = mod.getWindowSelectors.call(handler);
+      mod.invalidateDeviceCaches.call(handler);
+      const after = mod.getWindowSelectors.call(handler);
+      rejectFirst(new Error('db down'));
+
+      let failed = null;
+      try {
+        await before;
+      } catch (e) {
+        failed = e;
+      }
+      expect(failed.message).to.equal('db down');
+      await after;
       expect([...handler.modeSelectorsCache]).to.deep.equal(['ac-mode']);
+    });
+
+    // A report arriving after a device change starts a read of its own: it
+    // still waits for the reports that arrived before the change.
+    it('should keep the arrival order of the reports across a device change', async () => {
+      const mod = loadListener();
+      const device = heatPump();
+      const handler = buildHandler({ devices: [device] });
+      const releases = [];
+      handler.gladys.device.get = fake((query) => {
+        if (query && query.device_feature_selectors) {
+          const feature = unitMode(DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING, AC_MODE.COOLING);
+          return Promise.resolve([{ selector: 'ac', features: [feature] }]);
+        }
+        if (releases.length === 0) {
+          return new Promise((resolve) => {
+            releases.push(resolve);
+          });
+        }
+        return Promise.resolve([device]);
+      });
+
+      const cooling = mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+      mod.invalidateDeviceCaches.call(handler);
+      const heating = mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.HEATING);
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      releases[0]([device]);
+      await Promise.all([cooling, heating]);
+
+      const uses = handler.gladys.device.setParam
+        .getCalls()
+        .filter((call) => call.args[1] === 'THERMOSTAT_MODE')
+        .map((call) => call.args[2]);
+      expect(uses).to.deep.equal(['cooling', 'heating']);
+    });
+
+    // Switched, but its mode feature still showed the old use: the next report
+    // skipped it, since it was already in the use reported.
+    it('should save the mode feature again when its save failed after the switch', async () => {
+      const mod = loadListener();
+      const device = heatPump();
+      const handler = buildHandler({ devices: [device] });
+      const saveState = sinon.stub().resolves(null);
+      saveState.onFirstCall().rejects(new Error('db busy'));
+      handler.gladys.device.saveState = saveState;
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+      expect(buildParamsConfig(device).default_mode).to.equal('cooling');
+      assert.notCalled(handler.triggerApplySchedules);
+
+      await mod.onExternalModeChanged.call(handler, 'ac-mode', AC_MODE.COOLING);
+
+      assert.calledOnceWithExactly(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MODE', 'cooling');
+      expect(saveState.secondCall.args[1]).to.equal(THERMOSTAT_MODE.COOLING);
+      assert.calledOnce(handler.triggerApplySchedules);
+      expect(handler.observedModes.get('ac-mode')).to.equal(AC_MODE.COOLING);
     });
 
     it('should forget the mode of a unit no heat pump drives any more', async () => {

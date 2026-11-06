@@ -45,8 +45,10 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   this.targetSelectorsCache = null;
   this.powerSelectorsCache = null;
   this.modeSelectorsCache = null;
-  // The pass filling them, while one is under way (getWindowSelectors).
+  // The pass filling them, while one is under way, and the count of device
+  // changes that tells a pass started before the latest one (getWindowSelectors).
   this.deviceCachesFill = null;
+  this.deviceCachesGeneration = 0;
   // The last setpoint this service wrote on each real thermostat, by selector.
   // The write is reported back as a NEW_STATE, and without this mark that report
   // would be taken for a change made on the device and arm a manual hold — so a
