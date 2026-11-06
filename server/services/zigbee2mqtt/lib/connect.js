@@ -44,12 +44,17 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       this.mqttExist = true;
       this.mqttConnectionError = null;
       this.emitStatusEvent();
+      // A Zigbee2mqtt already running does not always announce itself on subscription (retain disabled, or a
+      // broker restarted without persistence): ask it right away instead of waiting for a bridge/state
+      this.requestHealthCheck();
     });
 
     this.mqttClient.on('error', (err) => {
       logger.warn(`Error while connecting to MQTT - ${err}`);
       this.gladysConnected = false;
       this.zigbee2mqttConnected = false;
+      // Without the broker, nothing proves that Zigbee2mqtt still runs: it has to answer again
+      this.zigbee2mqttRunning = false;
       const connectionError = getMqttConnectionError(err);
       const authenticationFailed =
         connectionError.code === MQTT_CONNECTION_ERROR.BAD_CREDENTIALS ||
@@ -66,6 +71,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       logger.warn(`Disconnected from MQTT server`);
       this.gladysConnected = false;
       this.zigbee2mqttConnected = false;
+      this.zigbee2mqttRunning = false;
       this.emitStatusEvent();
     });
 

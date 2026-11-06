@@ -37,6 +37,7 @@ describe('zigbee2mqtt connect', () => {
     const eventMqtt = new EventEmitter();
     mqttClient = Object.assign(eventMqtt, {
       subscribe: fake.resolves(null),
+      publish: fake.returns(null),
       end: fake.resolves(null),
       removeAllListeners: fake.resolves(null),
     });
@@ -50,6 +51,8 @@ describe('zigbee2mqtt connect', () => {
   });
 
   afterEach(() => {
+    // A health check retry left pending must not fire during another test
+    clearTimeout(zigbee2mqttManager.healthCheckTimer);
     sinon.reset();
   });
 
@@ -116,8 +119,9 @@ describe('zigbee2mqtt connect', () => {
         networkModeValid: true,
         usbConfigured: false,
         networkAdapterConfigured: false,
-        z2mEnabled: false,
+        z2mEnabled: true,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -128,9 +132,23 @@ describe('zigbee2mqtt connect', () => {
     assert.calledOnceWithExactly(mqttClient.subscribe, 'zigbee2mqtt/#');
   });
 
+  it('it should ask Zigbee2mqtt whether it runs once connected, without waiting for a bridge/state', async () => {
+    // PREPARE
+    zigbee2mqttManager.mqttRunning = true;
+    // EXECUTE
+    await zigbee2mqttManager.connect(externalConfiguration);
+    zigbee2mqttManager.mqttClient.emit('connect');
+    // ASSERT
+    // A broker without retained bridge/state (retain disabled in Zigbee2mqtt) would never announce it
+    assert.calledOnce(mqttClient.publish);
+    assert.calledWith(mqttClient.publish, 'zigbee2mqtt/bridge/request/health_check', '{}');
+  });
+
   it('it should receive mqtt error message', async () => {
     // PREPARE
     zigbee2mqttManager.mqttRunning = true;
+    // Without the broker, Zigbee2mqtt has to answer again to be considered running
+    zigbee2mqttManager.zigbee2mqttRunning = true;
     const error = new Error('mqtt_error');
     // EXECUTE
     await zigbee2mqttManager.connect(externalConfiguration);
@@ -146,8 +164,9 @@ describe('zigbee2mqtt connect', () => {
         networkModeValid: true,
         usbConfigured: false,
         networkAdapterConfigured: false,
-        z2mEnabled: false,
+        z2mEnabled: true,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -230,6 +249,7 @@ describe('zigbee2mqtt connect', () => {
   it('it should receive mqtt offline message', async () => {
     // PREPARE
     zigbee2mqttManager.mqttRunning = true;
+    zigbee2mqttManager.zigbee2mqttRunning = true;
     // EXECUTE
     await zigbee2mqttManager.connect(configuration);
     zigbee2mqttManager.mqttClient.emit('offline');
@@ -244,8 +264,9 @@ describe('zigbee2mqtt connect', () => {
         networkModeValid: true,
         usbConfigured: false,
         networkAdapterConfigured: false,
-        z2mEnabled: false,
+        z2mEnabled: true,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,

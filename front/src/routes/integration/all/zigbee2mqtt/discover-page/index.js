@@ -17,7 +17,7 @@ class Zigbee2mqttIntegration extends Component {
       this.props.updatePermitJoin
     );
 
-    this.props.checkStatus();
+    // The Zigbee2mqtt status (permit join switch, banner) is loaded and followed by CheckStatus
     this.props.getPermitJoin();
     this.props.setDiscoveredDevices(undefined);
     this.props.getHouses();

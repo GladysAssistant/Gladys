@@ -85,10 +85,11 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     const stream = buildLogStream(ezspLog);
     gladys.system.getContainerLogs = fake.resolves(stream);
 
-    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc', 1700000000);
 
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
-    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', { follow: true });
+    // Only the logs of the current run: those of a previous run would explain a failure that no longer happens
+    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', { follow: true, since: 1700000000 });
     assert.calledOnce(stream.destroy);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -166,6 +167,39 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
       code: null,
       message: 'error: Failed to connect to serial port /dev/ttyUSB0',
     });
+  });
+
+  it('should ignore a known error found at the end of the logs when Zigbee2mqtt is online', async () => {
+    // Zigbee2mqtt answers: whatever was logged did not prevent it from running
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    const ezspLog = 'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
+  it('should ignore a known error found while reading when Zigbee2mqtt is online', async () => {
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    const ezspLog =
+      'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12\nmore logs\n';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
+  it('should ignore an error: line when Zigbee2mqtt is online', async () => {
+    // A device failing to answer during the startup is logged as an error, without stopping Zigbee2mqtt
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    const log = 'Zigbee2MQTT started!\nerror: Failed to configure device 0x00158d0001';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
   });
 
   it('should remove the first character of each line (Docker stream prefix byte)', async () => {

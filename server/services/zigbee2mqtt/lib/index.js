@@ -29,6 +29,7 @@ const { backup } = require('./backup');
 const { getManagedAdapters } = require('./getManagedAdapters');
 const { readZ2mContainerLogs } = require('./readZ2mContainerLogs');
 const { reset } = require('./reset');
+const { requestHealthCheck } = require('./requestHealthCheck');
 const { JOB_TYPES } = require('../../../utils/constants');
 
 // EVENTS
@@ -62,7 +63,10 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.zigbee2mqttRunning = false;
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  // Gladys (re)started the Zigbee2mqtt container and waits for it to answer
+  this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
+  this.healthCheckTimer = null;
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
@@ -70,6 +74,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.dockerBased = false;
 
   this.containerRestartWaitTimeInMs = 5 * 1000;
+  // Without an answer by then, Zigbee2mqtt is shown as not answering instead of starting
+  this.zigbee2mqttStartingTimeoutInMs = 2 * 60 * 1000;
+  this.startingTimer = null;
 
   this.backup = gladys.job.wrapper(JOB_TYPES.SERVICE_ZIGBEE2MQTT_BACKUP, this.backup.bind(this));
   this.backupJob = {};
@@ -107,6 +114,7 @@ Zigbee2mqttManager.prototype.backup = backup;
 Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
 Zigbee2mqttManager.prototype.readZ2mContainerLogs = readZ2mContainerLogs;
 Zigbee2mqttManager.prototype.reset = reset;
+Zigbee2mqttManager.prototype.requestHealthCheck = requestHealthCheck;
 
 // EVENTS
 Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;

@@ -75,6 +75,7 @@ describe('zigbee2mqtt disconnect', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -105,6 +106,7 @@ describe('zigbee2mqtt disconnect', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -141,6 +143,7 @@ describe('zigbee2mqtt disconnect', () => {
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
+        zigbee2mqttStarting: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
@@ -148,6 +151,34 @@ describe('zigbee2mqtt disconnect', () => {
         mqttConnectionError: null,
       },
     });
+  });
+
+  it('should end a pending startup and forget the removed containers', async () => {
+    // PREPARE
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const startingTimeout = fake();
+    const healthCheckRetry = fake();
+    zigbee2MqttManager.zigbee2mqttStarting = true;
+    zigbee2MqttManager.startingTimer = setTimeout(startingTimeout, 1000);
+    zigbee2MqttManager.healthCheckTimer = setTimeout(healthCheckRetry, 1000);
+    zigbee2MqttManager.mqttExist = true;
+    zigbee2MqttManager.zigbee2mqttExist = true;
+    try {
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      clock.tick(1000);
+    } finally {
+      clock.restore();
+    }
+    // ASSERT
+    assert.notCalled(startingTimeout);
+    assert.notCalled(healthCheckRetry);
+    expect(zigbee2MqttManager.startingTimer).to.equal(null);
+    expect(zigbee2MqttManager.healthCheckTimer).to.equal(null);
+    expect(zigbee2MqttManager.zigbee2mqttStarting).to.equal(false);
+    // Disabled, not "not responding": the banner of the discover page says that Zigbee2mqtt is not activated
+    expect(zigbee2MqttManager.mqttExist).to.equal(false);
+    expect(zigbee2MqttManager.zigbee2mqttExist).to.equal(false);
   });
 
   it('no container -> nothing to stop', async () => {

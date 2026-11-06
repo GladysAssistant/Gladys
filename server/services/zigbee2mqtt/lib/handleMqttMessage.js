@@ -2,6 +2,10 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertFeature } = require('../utils/convertFeature');
 
+// Zigbee2mqtt answers bridge/request/health_check since 1.21
+const HEALTH_CHECK_MIN_MAJOR = 1;
+const HEALTH_CHECK_MIN_MINOR = 21;
+
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
@@ -11,15 +15,40 @@ const { convertFeature } = require('../utils/convertFeature');
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
 async function handleMqttMessage(topic, message) {
-  // Limit events only on status changes
-  if (!this.zigbee2mqttConnected) {
-    this.zigbee2mqttConnected = true;
-    this.zigbee2mqttRunning = true;
-    this.zigbee2mqttExist = true;
-    this.emitStatusEvent();
-  }
-
   switch (topic) {
+    case 'zigbee2mqtt/bridge/state': {
+      // Zigbee2mqtt publishes "online" (retained) once connected to the broker, and "offline" when it stops; the
+      // broker publishes "offline" in its place (last will) when it crashes. Neither proves the current state: a
+      // retained "online" can be left by a Zigbee2mqtt that no longer runs (it exits before connecting to the
+      // broker when its adapter fails), and the "offline" of a previous run can come after the "online" of the
+      // new one. Any announcement only means that the run changed: Gladys asks again until Zigbee2mqtt answers.
+      logger.debug(`Zigbee2mqtt bridge state is ${message}, checking its health...`);
+      // Broadcast only a change: an announcement often follows another one (the last will of the previous run)
+      if (this.zigbee2mqttConnected || this.zigbee2mqttRunning) {
+        this.zigbee2mqttConnected = false;
+        this.zigbee2mqttRunning = false;
+        this.emitStatusEvent();
+      }
+      this.requestHealthCheck();
+      break;
+    }
+    case 'zigbee2mqtt/bridge/response/health_check': {
+      // Only Zigbee2mqtt answers on this topic: any answer, even an error, proves that it runs and listens
+      logger.debug('Zigbee2mqtt answered the health check');
+      clearTimeout(this.healthCheckTimer);
+      this.healthCheckTimer = null;
+      this.zigbee2mqttConnected = true;
+      this.zigbee2mqttRunning = true;
+      this.zigbee2mqttExist = true;
+      // The startup ends only on an answer, or after its timeout (see installZ2mContainer)
+      clearTimeout(this.startingTimer);
+      this.startingTimer = null;
+      this.zigbee2mqttStarting = false;
+      // An error read in the logs of the container did not prevent Zigbee2mqtt from running
+      this.z2mContainerError = null;
+      this.emitStatusEvent();
+      break;
+    }
     case 'zigbee2mqtt/bridge/devices': {
       logger.debug('Getting config devices from Zigbee2mqtt');
       const devices = JSON.parse(message);
@@ -85,7 +114,14 @@ async function handleMqttMessage(topic, message) {
     }
     case 'zigbee2mqtt/bridge/info': {
       const info = JSON.parse(message);
-      const { coordinator } = info;
+      const { coordinator, version } = info;
+      const [major, minor] = `${version}`.split('.').map((part) => parseInt(part, 10));
+      if (major < HEALTH_CHECK_MIN_MAJOR || (major === HEALTH_CHECK_MIN_MAJOR && minor < HEALTH_CHECK_MIN_MINOR)) {
+        // Gladys shows Zigbee2mqtt running only once it answers the health check: say why it never will
+        logger.warn(
+          `Zigbee2mqtt ${version} does not answer the health check, Gladys needs Zigbee2mqtt ${HEALTH_CHECK_MIN_MAJOR}.${HEALTH_CHECK_MIN_MINOR} or later`,
+        );
+      }
       if (coordinator && coordinator.meta) {
         this.coordinatorFirmware = {
           ...coordinator.meta,
