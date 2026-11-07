@@ -40,6 +40,7 @@ describe('zigbee2mqtt waitForZigbee2mqtt', () => {
     };
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
     zigbee2mqttManager.emitInstallProgress = fake();
+    zigbee2mqttManager.getConfiguration = fake.resolves({ mqttMode: 'local' });
     zigbee2mqttManager.startInstallation('install');
     // A plugged dongle, Zigbee2mqtt started
     zigbee2mqttManager.usbConfigured = true;
@@ -111,6 +112,18 @@ describe('zigbee2mqtt waitForZigbee2mqtt', () => {
     expect(connectAdapterPhase().state).to.equal('running');
   });
 
+  it('should fail at once when the dongle is not plugged in, even with the MQTT client of a previous run', async () => {
+    // PREPARE
+    zigbee2mqttManager.usbConfigured = false;
+    // Still connected to the Zigbee2mqtt of the dongle configured before, which answers
+    zigbee2mqttManager.mqttClient = {};
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    // EXECUTE
+    const error = await zigbee2mqttManager.waitForZigbee2mqtt().catch((e) => e);
+    // ASSERT
+    expect(error.installationError).to.deep.equal({ code: 'DONGLE_NOT_FOUND', message: null });
+  });
+
   it('should wait for Zigbee2mqtt behind a network coordinator', async () => {
     // PREPARE
     zigbee2mqttManager.usbConfigured = false;
@@ -125,7 +138,7 @@ describe('zigbee2mqtt waitForZigbee2mqtt', () => {
   it('should wait for the Zigbee2mqtt behind an external broker', async () => {
     // PREPARE
     zigbee2mqttManager.usbConfigured = false;
-    zigbee2mqttManager.mqttClient = {};
+    zigbee2mqttManager.getConfiguration = fake.resolves({ mqttMode: 'external' });
     zigbee2mqttManager.zigbee2mqttConnected = true;
     // EXECUTE
     await zigbee2mqttManager.waitForZigbee2mqtt();

@@ -12,11 +12,15 @@ const PULL_PHASE_BY_IMAGE = {
   [mqttContainerDescriptor.Image]: INSTALLATION_PHASE.PULL_MQTT,
 };
 
+// Docker reports a download every few seconds while it goes on: without any report for that long, the download is
+// stuck (registry or connection that stopped answering) and would hold the installation forever
+const PULL_STALL_TIMEOUT_IN_MS = 5 * 60 * 1000;
+
 /**
  * @description Download an image missing from the machine, its progress followed by the installation and the prefetch.
  * @param {object} manager - Zigbee2mqtt manager.
  * @param {string} image - Image of a container descriptor.
- * @returns {Promise} Resolve once the image is on the machine.
+ * @returns {Promise} Resolve once the image is on the machine, reject when the download fails or stalls.
  * @example
  * await downloadImage(this, 'eclipse-mosquitto:2.0.15');
  */
@@ -30,15 +34,43 @@ async function downloadImage(manager, image) {
   const phase = PULL_PHASE_BY_IMAGE[image];
   manager.updateInstallationPhase(phase, { state: INSTALLATION_PHASE_STATE.RUNNING });
   const startedAt = Date.now();
-  let layers = {};
-  await manager.gladys.system.pull(image, (event) => {
-    layers = addPullEvent(layers, event);
-    const progress = getPullProgress(layers);
-    // Both are read at each event: an installation or a prefetch started meanwhile follows the download from then on
-    manager.updateInstallationPhase(phase, { state: INSTALLATION_PHASE_STATE.RUNNING, progress });
-    manager.updatePrefetchProgress(image, progress);
-    manager.emitInstallProgress();
+  const abortController = new AbortController();
+  // Rejects as soon as the download is given up, as the pull is not sure to settle once aborted: a stream closed
+  // without an error would even resolve it, with an image half downloaded
+  const stalled = new Promise((resolve, reject) => {
+    abortController.signal.addEventListener('abort', () => {
+      reject(new Error(`Download of ${image} stalled: no progress for ${PULL_STALL_TIMEOUT_IN_MS / 60000} min`));
+    });
   });
+  let stallTimer = null;
+  // Armed when the download starts, then again at each of its progress events
+  const watchForStall = () => {
+    clearTimeout(stallTimer);
+    stallTimer = setTimeout(() => abortController.abort(), PULL_STALL_TIMEOUT_IN_MS);
+  };
+  let layers = {};
+  watchForStall();
+  try {
+    await Promise.race([
+      manager.gladys.system.pull(
+        image,
+        (event) => {
+          watchForStall();
+          layers = addPullEvent(layers, event);
+          const progress = getPullProgress(layers);
+          // Both are read at each event: an installation or a prefetch started meanwhile follows the download from
+          // then on
+          manager.updateInstallationPhase(phase, { state: INSTALLATION_PHASE_STATE.RUNNING, progress });
+          manager.updatePrefetchProgress(image, progress);
+          manager.emitInstallProgress();
+        },
+        { abortSignal: abortController.signal },
+      ),
+      stalled,
+    ]);
+  } finally {
+    clearTimeout(stallTimer);
+  }
   logger.info(`${image} image pulled in ${formatDuration(Date.now() - startedAt)}`);
   // Here rather than by the caller: init downloads the images before installing the containers, which then find them
   manager.updateInstallationPhase(phase, { state: INSTALLATION_PHASE_STATE.DONE });

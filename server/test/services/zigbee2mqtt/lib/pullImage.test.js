@@ -33,9 +33,9 @@ describe('zigbee2mqtt pullImage', () => {
       system: {
         imageExists: fake.resolves(false),
         pull: fake(
-          (image, onProgress) =>
+          (image, onProgress, { abortSignal }) =>
             new Promise((resolve, reject) => {
-              pulls.push({ image, onProgress, resolve, reject });
+              pulls.push({ image, onProgress, abortSignal, resolve, reject });
             }),
         ),
       },
@@ -172,5 +172,88 @@ describe('zigbee2mqtt pullImage', () => {
     await Promise.all([installationPromise, promise]);
     expect(phase('pull_z2m')).to.deep.equal({ key: 'pull_z2m', state: 'done', progress: 100 });
     assert.calledOnce(gladys.system.pull);
+  });
+
+  describe('when the download makes no progress', () => {
+    let clock;
+    const progressEvent = { status: 'Downloading', progressDetail: { current: 50, total: 100 }, id: 'aaa' };
+
+    beforeEach(() => {
+      // Not setImmediate, which waitForPull uses. Restored by sinon.restore
+      clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    });
+
+    it('should give up a download without any progress for 5 minutes, and release the image', async () => {
+      // PREPARE
+      zigbee2mqttManager.startInstallation('install');
+      const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+      // Followed from now on, as it rejects while the clock ticks
+      const rejection = expect(promise).to.be.rejectedWith(
+        'Download of eclipse-mosquitto:2.0.15 stalled: no progress for 5 min',
+      );
+      await waitForPull();
+      // EXECUTE
+      await clock.tickAsync(2 * 60 * 1000);
+      pulls[0].onProgress(progressEvent);
+      // Counted from the last progress
+      await clock.tickAsync(5 * 60 * 1000 - 1);
+      expect(pulls[0].abortSignal.aborted).to.equal(false);
+      await clock.tickAsync(1);
+      // ASSERT
+      // Even though the aborted pull never settles
+      const error = await rejection;
+      // Docker stops the download
+      expect(pulls[0].abortSignal.aborted).to.equal(true);
+      // Shown as the failure of the installation
+      zigbee2mqttManager.finishInstallation(error);
+      expect(zigbee2mqttManager.installation.error).to.deep.equal({
+        code: null,
+        message: 'Download of eclipse-mosquitto:2.0.15 stalled: no progress for 5 min',
+      });
+      // The next call downloads it again
+      expect(zigbee2mqttManager.imagePulls).to.deep.equal({});
+    });
+
+    it('should give up a download that never starts', async () => {
+      // PREPARE
+      const promise = zigbee2mqttManager.pullImage(Z2M_IMAGE);
+      const rejection = expect(promise).to.be.rejectedWith(
+        'Download of koenkk/zigbee2mqtt:2.14.2 stalled: no progress for 5 min',
+      );
+      await waitForPull();
+      // EXECUTE
+      await clock.tickAsync(5 * 60 * 1000);
+      // ASSERT
+      await rejection;
+    });
+
+    it('should keep waiting for a slow download that progresses, and stop watching it once over', async () => {
+      // PREPARE
+      const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+      await waitForPull();
+      // EXECUTE
+      for (let minutes = 0; minutes < 12; minutes += 4) {
+        // eslint-disable-next-line no-await-in-loop
+        await clock.tickAsync(4 * 60 * 1000);
+        pulls[0].onProgress(progressEvent);
+      }
+      pulls[0].resolve([]);
+      await promise;
+      // ASSERT
+      expect(pulls[0].abortSignal.aborted).to.equal(false);
+      expect(clock.countTimers()).to.equal(0);
+    });
+
+    it('should stop watching a download that fails', async () => {
+      // PREPARE
+      const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+      await waitForPull();
+      // EXECUTE
+      pulls[0].reject(new Error('docker fail pull'));
+      // ASSERT
+      await expect(promise).to.be.rejectedWith('docker fail pull');
+      expect(pulls[0].abortSignal.aborted).to.equal(false);
+      expect(clock.countTimers()).to.equal(0);
+    });
   });
 });

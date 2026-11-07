@@ -178,10 +178,12 @@ async function init(setupMode = false) {
 
       // The replacement of the containers by a new version is followed by the setup page like an installation, from
       // the download of the new images. Unless an installation runs: it follows this init already.
-      if (
+      const updateRequired =
         this.installation.state !== INSTALLATION_STATE.RUNNING &&
-        (await isUpdateRequired(this.gladys.system, configuration))
-      ) {
+        (await isUpdateRequired(this.gladys.system, configuration));
+      // Checked again once the containers are found: a setup sent meanwhile started an installation, which would
+      // refuse this one and fail the start of the service
+      if (updateRequired && this.installation.state !== INSTALLATION_STATE.RUNNING) {
         this.startInstallation(INSTALLATION_KIND.UPDATE);
         updating = true;
       }
