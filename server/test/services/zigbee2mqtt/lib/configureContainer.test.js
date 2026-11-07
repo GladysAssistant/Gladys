@@ -33,6 +33,7 @@ const ezspConfigFilePath = path.join(configBasePath, 'z2m_adapter-ezsp_config.ya
 const portConfigFilePath = path.join(configBasePath, 'z2m_port_config.yaml');
 const networkAdapterConfigFilePath = path.join(configBasePath, 'z2m_network-adapter_config.yaml');
 const onboardingConfigFilePath = path.join(configBasePath, 'z2m_onboarding_config.yaml');
+const usedOnboardingConfigFilePath = path.join(configBasePath, 'z2m_onboarding-used_config.yaml');
 
 describe('zigbee2mqtt configureContainer', () => {
   // PREPARE
@@ -135,6 +136,23 @@ describe('zigbee2mqtt configureContainer', () => {
     const expectedContent = fs.readFileSync(mqttConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should keep a used file flagged for the onboarding of Zigbee2mqtt', async () => {
+    // PREPARE
+    // Flag set by hand on a file of Gladys, whose network uses the default keys of Zigbee2mqtt: it must be kept
+    fs.copyFileSync(usedOnboardingConfigFilePath, configFilePath);
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(usedOnboardingConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
   });
 
   it('it should override mqtt credentials', async () => {
