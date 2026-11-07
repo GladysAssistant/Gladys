@@ -49,6 +49,7 @@ describe('zigbee2mqtt init', () => {
 
     zigbee2mqttManager.getConfiguration = sinon.stub();
     zigbee2mqttManager.saveConfiguration = sinon.stub();
+    zigbee2mqttManager.pullMissingImages = sinon.stub();
     zigbee2mqttManager.checkForContainerUpdates = sinon.stub();
     zigbee2mqttManager.installMqttContainer = sinon.stub();
     zigbee2mqttManager.installZ2mContainer = sinon.stub();
@@ -168,6 +169,7 @@ describe('zigbee2mqtt init', () => {
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnce(zigbee2mqttManager.saveConfiguration);
+    assert.notCalled(zigbee2mqttManager.pullMissingImages);
     assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
@@ -204,9 +206,17 @@ describe('zigbee2mqtt init', () => {
     // ASSERT
     assert.calledOnce(zigbee2mqttManager.getConfiguration);
     assert.calledOnce(zigbee2mqttManager.saveConfiguration);
+    assert.calledOnceWithExactly(zigbee2mqttManager.pullMissingImages);
     assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+    // The images are there before a container is replaced by a new version
+    assert.callOrder(
+      zigbee2mqttManager.pullMissingImages,
+      zigbee2mqttManager.checkForContainerUpdates,
+      zigbee2mqttManager.installMqttContainer,
+      zigbee2mqttManager.installZ2mContainer,
+    );
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);

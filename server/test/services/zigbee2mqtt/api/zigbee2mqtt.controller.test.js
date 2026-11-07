@@ -21,6 +21,7 @@ const zigbee2mqttManager = {
   getSetup: fake.resolves({ config: 'values' }),
   getConfiguration: fake.resolves({ mqttUrl: 'mqtt://localhost:1884' }),
   setup: fake.resolves(true),
+  startPrefetch: fake.resolves({ state: 'running', progress: 0, freeBytes: null, neededBytes: 214000000, error: null }),
   init: fake.resolves(true),
   installMqttContainer: fake.resolves(true),
   installZ2mContainer: fake.resolves(true),
@@ -108,6 +109,23 @@ describe('zigbee2mqtt API', () => {
     await controller['post /api/v1/service/zigbee2mqtt/setup'].controller(req, res);
     assert.calledOnceWithExactly(zigbee2mqttManager.setup, req.body);
     assert.calledOnceWithExactly(res.json, { config: 'values' });
+  });
+
+  it('post /api/v1/service/zigbee2mqtt/prefetch', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/zigbee2mqtt/prefetch'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.startPrefetch);
+    assert.calledOnceWithExactly(res.json, {
+      state: 'running',
+      progress: 0,
+      freeBytes: null,
+      neededBytes: 214000000,
+      error: null,
+    });
   });
 
   it('post /api/v1/service/zigbee2mqtt/connect', async () => {

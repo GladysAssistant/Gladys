@@ -72,6 +72,18 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
+   * @api {post} /api/v1/service/zigbee2mqtt/prefetch Download the missing images ahead of the installation
+   * @apiName prefetch
+   * @apiGroup Zigbee2mqtt
+   */
+  async function prefetch(req, res) {
+    logger.debug('Prefetch the images');
+    // Answers once the disk space is checked: the downloads go on in the background
+    const response = await zigbee2mqttManager.startPrefetch();
+    res.json(response);
+  }
+
+  /**
    * @api {post} /api/v1/service/zigbee2mqtt/connect Connect
    * @apiName connect
    * @apiGroup Zigbee2mqtt
@@ -190,6 +202,12 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(setup),
+    },
+    // downloads the images of the installation, more than 200 MB on the disk of Gladys
+    'post /api/v1/service/zigbee2mqtt/prefetch': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(prefetch),
     },
     'post /api/v1/service/zigbee2mqtt/connect': {
       authenticated: true,

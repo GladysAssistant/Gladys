@@ -38,6 +38,10 @@ const { updateInstallationPhase } = require('./updateInstallationPhase');
 const { waitForZigbee2mqtt } = require('./waitForZigbee2mqtt');
 const { finishInstallation } = require('./finishInstallation');
 const { runInstallation } = require('./runInstallation');
+const { pullImage } = require('./pullImage');
+const { pullMissingImages } = require('./pullMissingImages');
+const { startPrefetch } = require('./startPrefetch');
+const { updatePrefetchProgress } = require('./updatePrefetchProgress');
 const { JOB_TYPES } = require('../../../utils/constants');
 const { INSTALLATION_STATE } = require('./constants');
 
@@ -106,6 +110,10 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.installationJobProgress = 0;
   // Download of the images before the setup, followed by the setup page too
   this.prefetch = { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null };
+  // Progress of the download of each image of the running prefetch (see updatePrefetchProgress)
+  this.prefetchProgressByImage = {};
+  // Download of each image being pulled, shared by the installation and the prefetch (see pullImage)
+  this.imagePulls = {};
   // See emitInstallProgress
   this.installProgressSentAt = null;
   this.installProgressTimer = null;
@@ -156,6 +164,10 @@ Zigbee2mqttManager.prototype.updateInstallationPhase = updateInstallationPhase;
 Zigbee2mqttManager.prototype.waitForZigbee2mqtt = waitForZigbee2mqtt;
 Zigbee2mqttManager.prototype.finishInstallation = finishInstallation;
 Zigbee2mqttManager.prototype.runInstallation = runInstallation;
+Zigbee2mqttManager.prototype.pullImage = pullImage;
+Zigbee2mqttManager.prototype.pullMissingImages = pullMissingImages;
+Zigbee2mqttManager.prototype.startPrefetch = startPrefetch;
+Zigbee2mqttManager.prototype.updatePrefetchProgress = updatePrefetchProgress;
 
 // EVENTS
 Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;

@@ -95,6 +95,17 @@ const INSTALLATION_ERROR = {
   NO_ANSWER: 'NO_ANSWER',
   // The configured USB dongle is not plugged in, so Zigbee2mqtt was not started
   DONGLE_NOT_FOUND: 'DONGLE_NOT_FOUND',
+  // The images to download ahead of the installation do not fit on the disk (see startPrefetch)
+  NOT_ENOUGH_DISK_SPACE: 'NOT_ENOUGH_DISK_SPACE',
+};
+
+// Size on disk of the image of each container descriptor, which must fit in the free disk space before it is
+// downloaded ahead of the installation (see startPrefetch). Measured with `docker image ls` on arm64 (Colima,
+// containerd image store), in November 2026: the download itself is smaller (47.7 MB and 6.2 MB compressed), but its
+// layers are extracted. To measure again when a descriptor changes its image.
+const IMAGE_SIZE_IN_BYTES = {
+  'koenkk/zigbee2mqtt:2.14.2': 214000000,
+  'eclipse-mosquitto:2.0.15': 22400000,
 };
 
 const SETUP_VARIABLES = [
@@ -168,6 +179,7 @@ module.exports = {
   INSTALLATION_PHASE_STATE,
   INSTALLATION_PHASE_WEIGHTS,
   INSTALLATION_ERROR,
+  IMAGE_SIZE_IN_BYTES,
   SETUP_VARIABLES,
   DEFAULT,
 };

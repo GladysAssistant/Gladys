@@ -59,4 +59,6 @@ function finishInstallation(error) {
 
 module.exports = {
   finishInstallation,
+  // The failure of the prefetch is shown the same way (see startPrefetch)
+  getInstallationError,
 };

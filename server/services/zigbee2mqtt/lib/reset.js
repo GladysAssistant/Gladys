@@ -75,6 +75,10 @@ async function reset() {
       durationMs: null,
     };
   }
+  // A running prefetch goes on too, and tells its own outcome
+  if (this.prefetch.state !== INSTALLATION_STATE.RUNNING) {
+    this.prefetch = { state: INSTALLATION_STATE.IDLE, progress: 0, freeBytes: null, neededBytes: null, error: null };
+  }
 
   // 5. Emit status event
   this.emitStatusEvent();

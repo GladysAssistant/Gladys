@@ -75,6 +75,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         getContainers: fake.resolves([containerStopped]),
         inspectContainer: fake.resolves(containerDescription),
         stopContainer: fake.resolves(true),
+        imageExists: fake.resolves(false),
         pull: fake.resolves(true),
         restartContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
@@ -679,7 +680,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
       .resolves([])
       .onSecondCall()
       .resolves([containerStopped]);
-    gladys.system.pull = fake.resolves([{ status: 'Status: Downloaded newer image for koenkk/zigbee2mqtt:2.14.2' }]);
     // EXECUTE
     try {
       await zigbee2mqttManager.installZ2mContainer({});
@@ -726,6 +726,42 @@ describe('zigbee2mqtt installz2mContainer', () => {
       expect(startPhaseDuringPull.state).to.equal('pending');
       expect(phase('pull_z2m')).to.deep.equal({ key: 'pull_z2m', state: 'done', progress: 100 });
       expect(phase('start_z2m')).to.deep.equal({ key: 'start_z2m', state: 'done', progress: 100 });
+    });
+
+    it('should not download an image already present, and create Zigbee2mqtt', async () => {
+      // PREPARE
+      gladys.system.getContainers = stub()
+        .onFirstCall()
+        .resolves([])
+        .onSecondCall()
+        .resolves([containerStopped]);
+      gladys.system.imageExists = fake.resolves(true);
+      zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+      // EXECUTE
+      await zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: '/dev/ttyUSB0' });
+      // ASSERT
+      // Faster, and works offline: Docker would ask the registry
+      assert.calledOnceWithExactly(gladys.system.imageExists, 'koenkk/zigbee2mqtt:2.14.2');
+      assert.notCalled(gladys.system.pull);
+      assert.calledOnce(gladys.system.createContainer);
+      expect(phase('pull_z2m')).to.deep.equal({ key: 'pull_z2m', state: 'skipped', progress: 100 });
+      expect(phase('start_z2m')).to.deep.equal({ key: 'start_z2m', state: 'done', progress: 100 });
+    });
+
+    it('should keep the download done by init before', async () => {
+      // PREPARE
+      gladys.system.getContainers = stub()
+        .onFirstCall()
+        .resolves([])
+        .onSecondCall()
+        .resolves([containerStopped]);
+      zigbee2mqttManager.updateInstallationPhase('pull_z2m', { state: 'done' });
+      gladys.system.imageExists = fake.resolves(true);
+      zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+      // EXECUTE
+      await zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: '/dev/ttyUSB0' });
+      // ASSERT
+      expect(phase('pull_z2m')).to.deep.equal({ key: 'pull_z2m', state: 'done', progress: 100 });
     });
 
     it('should skip the download, and restart a stopped Zigbee2mqtt', async () => {

@@ -4,8 +4,6 @@ const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { ADAPTER_MODE, INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
 const { formatDuration } = require('../utils/formatDuration');
-const { isImageUpToDate } = require('../utils/isImageUpToDate');
-const { addPullEvent, getPullProgress } = require('../utils/getPullProgress');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
@@ -124,17 +122,9 @@ async function installZ2mContainer(config, setupMode = false) {
 
     try {
       logger.info('Zigbee2mqtt is being installed as Docker container...');
-      logger.info(`Pulling ${containerDescriptor.Image} image...`);
-      this.updateInstallationPhase(PULL_Z2M, { state: RUNNING });
-      const pullStartedAt = Date.now();
-      let pullLayers = {};
-      const pullOutput = await this.gladys.system.pull(containerDescriptor.Image, (event) => {
-        pullLayers = addPullEvent(pullLayers, event);
-        this.updateInstallationPhase(PULL_Z2M, { state: RUNNING, progress: getPullProgress(pullLayers) });
-      });
-      const pullOutcome = isImageUpToDate(pullOutput) ? 'already present' : 'pulled';
-      logger.info(`${containerDescriptor.Image} image ${pullOutcome} in ${formatDuration(Date.now() - pullStartedAt)}`);
-      this.updateInstallationPhase(PULL_Z2M, { state: DONE });
+      await this.pullImage(containerDescriptor.Image);
+      // Done once downloaded, maybe before by init (see pullImage): skipped when the image was there already
+      this.updateInstallationPhase(PULL_Z2M, { state: SKIPPED });
       this.updateInstallationPhase(START_Z2M, { state: RUNNING });
 
       logger.info(`Configuration of Device ${networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath}`);

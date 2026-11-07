@@ -175,6 +175,35 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.installation).to.equal(installation);
   });
 
+  it('should forget the outcome of the last prefetch', async () => {
+    zigbee2MqttManager.prefetch = {
+      state: 'failed',
+      progress: 0,
+      freeBytes: 100000000,
+      neededBytes: 236400000,
+      error: { code: 'NOT_ENOUGH_DISK_SPACE', message: null },
+    };
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.prefetch).to.deep.equal({
+      state: 'idle',
+      progress: 0,
+      freeBytes: null,
+      neededBytes: null,
+      error: null,
+    });
+  });
+
+  it('should keep a running prefetch, which tells its own outcome', async () => {
+    const prefetch = { state: 'running', progress: 42, freeBytes: null, neededBytes: 214000000, error: null };
+    zigbee2MqttManager.prefetch = prefetch;
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.prefetch).to.equal(prefetch);
+  });
+
   it('should throw when folder deletion fails', async () => {
     fsRmStub = fake.rejects(new Error('Permission denied'));
 

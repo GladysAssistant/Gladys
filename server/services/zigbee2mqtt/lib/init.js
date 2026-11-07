@@ -123,6 +123,8 @@ async function init(setupMode = false) {
     // We force set the mqttMode to local for existing instances
     configuration.mqttMode = MQTT_MODE.LOCAL;
 
+    // Before any container is replaced: a container replaced by a new version keeps running during the download
+    await this.pullMissingImages();
     await this.checkForContainerUpdates(configuration);
     await this.installMqttContainer(configuration);
     await this.installZ2mContainer(configuration, setupMode);
