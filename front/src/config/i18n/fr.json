@@ -2217,6 +2217,28 @@
           "confirmButton": "Oui, tout réinitialiser",
           "cancelButton": "Annuler",
           "error": "Une erreur est survenue lors de la réinitialisation de l'intégration."
+        },
+        "installation": {
+          "titles": {
+            "install": "Installation de Zigbee2MQTT",
+            "update": "Mise à jour de Zigbee2MQTT",
+            "switch": "Changement de coordinateur Zigbee"
+          },
+          "phases": {
+            "pull_z2m": "Téléchargement de Zigbee2MQTT",
+            "pull_mqtt": "Téléchargement du broker MQTT",
+            "start_mqtt": "Démarrage du broker MQTT",
+            "start_z2m": "Démarrage de Zigbee2MQTT",
+            "connect_adapter": "Connexion à la clé Zigbee"
+          },
+          "leavePage": "Vous pouvez quitter cette page : l'installation continue.",
+          "failedPhase": "Échec de l'étape :",
+          "alreadyRunning": "Une installation est déjà en cours : attendez qu'elle se termine avant d'enregistrer à nouveau la configuration.",
+          "errors": {
+            "NO_ANSWER": "Zigbee2MQTT n'a pas répondu à Gladys dans les 2 minutes qui ont suivi son démarrage, sans indiquer pourquoi. Vérifiez que le modèle choisi est bien celui de votre clé, débranchez-la et rebranchez-la, puis enregistrez à nouveau la configuration.",
+            "DONGLE_NOT_FOUND": "Votre clé Zigbee n'est pas branchée (ou pas sur le port choisi) : Zigbee2MQTT n'a pas pu démarrer. Branchez-la, vérifiez le port choisi, puis enregistrez à nouveau la configuration.",
+            "unknownErrorPrefix": "Erreur pendant l'installation : "
+          }
         }
       },
       "device": {

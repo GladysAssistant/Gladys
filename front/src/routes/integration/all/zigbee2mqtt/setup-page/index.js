@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -30,6 +31,11 @@ class Zigbee2mqttSetupPage extends Component {
       this.loadZ2MConfig();
     }
     this.setState({ zigbee2mqttStatus });
+  };
+
+  // Sent apart from the status, which carries them too, to follow an installation without flooding the status
+  handleInstallProgress = ({ installation, prefetch }) => {
+    this.setState({ zigbee2mqttStatus: { ...this.state.zigbee2mqttStatus, installation, prefetch } });
   };
 
   loadZ2MStatus = async () => {
@@ -79,7 +85,8 @@ class Zigbee2mqttSetupPage extends Component {
     } catch (e) {
       console.error(e);
       this.setState({
-        setupZigee2mqttStatus: RequestStatus.Error
+        // An installation is already running
+        setupZigee2mqttStatus: get(e, 'response.status') === 409 ? RequestStatus.ConflictError : RequestStatus.Error
       });
     }
   };
@@ -144,12 +151,20 @@ class Zigbee2mqttSetupPage extends Component {
     this.loadZ2MStatus();
     this.loadZ2MConfig();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE, this.handleZ2MStatus);
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS,
+      this.handleInstallProgress
+    );
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       this.handleZ2MStatus
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS,
+      this.handleInstallProgress
     );
   }
 

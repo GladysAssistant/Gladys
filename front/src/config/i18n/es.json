@@ -1893,6 +1893,28 @@
           "confirmButton": "Sí, restablecer todo",
           "cancelButton": "Cancelar",
           "error": "Se produjo un error al restablecer la integración."
+        },
+        "installation": {
+          "titles": {
+            "install": "Instalación de Zigbee2MQTT",
+            "update": "Actualización de Zigbee2MQTT",
+            "switch": "Cambio de coordinador Zigbee"
+          },
+          "phases": {
+            "pull_z2m": "Descarga de Zigbee2MQTT",
+            "pull_mqtt": "Descarga del broker MQTT",
+            "start_mqtt": "Inicio del broker MQTT",
+            "start_z2m": "Inicio de Zigbee2MQTT",
+            "connect_adapter": "Conexión con el adaptador Zigbee"
+          },
+          "leavePage": "Puede salir de esta página: la instalación continúa.",
+          "failedPhase": "Paso fallido:",
+          "alreadyRunning": "Ya hay una instalación en curso: espere a que termine antes de guardar de nuevo la configuración.",
+          "errors": {
+            "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos posteriores a su inicio, sin indicar por qué. Compruebe que el modelo elegido es el de su adaptador, desconéctelo y vuelva a conectarlo, y después guarde de nuevo la configuración.",
+            "DONGLE_NOT_FOUND": "Su adaptador Zigbee no está conectado (o no en el puerto elegido): Zigbee2MQTT no ha podido iniciarse. Conéctelo, compruebe el puerto elegido y después guarde de nuevo la configuración.",
+            "unknownErrorPrefix": "Error durante la instalación: "
+          }
         }
       },
       "device": {
