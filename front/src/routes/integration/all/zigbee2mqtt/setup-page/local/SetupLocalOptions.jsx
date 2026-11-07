@@ -260,9 +260,13 @@ class SetupLocalOptions extends Component {
       z2mDongleName !== recognizedAdapter &&
       z2mDongleName !== `${recognizedAdapter} (legacy ezsp)`;
     // The ezsp driver only runs a firmware older than 7.4, and Gladys switches to it by itself when the ember driver
-    // refuses one: hidden, unless already configured
+    // refuses one: hidden, unless already configured, or the variant of the recognized dongle, kept by hand in case
+    // the fallback does not happen
     const dongleOptions = zigbeeAdapters.filter(
-      adapter => adapter.configKey !== 'ezsp' || adapter.value === configuration.z2mDongleName
+      adapter =>
+        adapter.configKey !== 'ezsp' ||
+        adapter.value === configuration.z2mDongleName ||
+        adapter.value === `${recognizedAdapter} (legacy ezsp)`
     );
     const networkAdapterTypeOptions = networkAdapterTypes.filter(
       adapterType => adapterType.value !== 'ezsp' || adapterType.value === configuration.z2mNetworkAdapterType

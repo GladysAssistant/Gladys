@@ -129,6 +129,16 @@ describe('zigbee2mqtt installz2mContainer', () => {
     }
   });
 
+  it('should keep the configuration of the ezsp fallback when called without configuration', async () => {
+    // POST /z2m/start calls it without configuration: it fails, and must not leave a pending log reader without one
+    const config = { z2mDongleName: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P' };
+    zigbee2mqttManager.installedConfig = config;
+
+    await expect(zigbee2mqttManager.installZ2mContainer()).to.be.rejectedWith(TypeError);
+
+    expect(zigbee2mqttManager.installedConfig).to.equal(config);
+  });
+
   it('should restart z2m container (container stopped)', async () => {
     // PREPARE
     const config = {};

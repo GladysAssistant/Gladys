@@ -126,6 +126,15 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-local-dongle-not-detected]').should('exist');
     cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
 
+    // No "(legacy ezsp)" model for a dongle that is not recognized: Gladys switches to it by itself
+    cy.get('[data-cy=z2m-setup-local-dongle-field]')
+      .children()
+      .as('dongleField');
+    cy.get('@dongleField').click();
+    cy.get('@dongleField').type('(legacy ezsp)');
+    cy.get('.react-select__menu-notice--no-options').should('exist');
+    cy.get('@dongleField').type('{esc}');
+
     // Select a dongle name
     selectDongle();
 
@@ -326,11 +335,16 @@ describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
     cy.get('[data-cy=z2m-setup-local-dongle-mismatch]').should('exist');
     cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('not.exist');
     cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
-    // The "(legacy ezsp)" models are not proposed: Gladys switches to them by itself when the firmware is too old
+    // Of the "(legacy ezsp)" models, only the variant of the recognized dongle is proposed, in case the automatic
+    // fallback does not happen, without the mismatch warning
     cy.get('@dongleField').click();
     cy.get('@dongleField').type('(legacy ezsp)');
-    cy.get('.react-select__menu-notice--no-options').should('exist');
-    cy.get('@dongleField').type('{esc}');
+    cy.get('.react-select__option')
+      .should('have.length', 1)
+      .and('have.text', `${DETECTED_DONGLE_NAME} (legacy ezsp)`)
+      .click();
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', `${DETECTED_DONGLE_NAME} (legacy ezsp)`);
+    cy.get('[data-cy=z2m-setup-local-dongle-mismatch]').should('not.exist');
 
     // An unrecognized port does not keep the model of the recognized dongle
     cy.get('[data-cy=z2m-setup-local-usb-show-all]').click();
@@ -461,6 +475,36 @@ describe('Zigbee2Mqtt setup wizard local mode with an existing configuration', (
         expect($alert[0].getBoundingClientRect().right).to.be.at.most(summaryRight);
       });
     });
+  });
+
+  it('Close the form when Gladys falls back on the ezsp driver', () => {
+    // The form holds the ember model: saving it would undo the fallback
+    visitSetup({ setup: { ZIGBEE_DONGLE_NAME: DETECTED_DONGLE_NAME } });
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', DETECTED_DONGLE_NAME);
+
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
+      },
+      {
+        body: {
+          Z2M_MQTT_MODE: 'local',
+          Z2M_ADAPTER_MODE: 'usb',
+          ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+          ZIGBEE_DONGLE_NAME: `${DETECTED_DONGLE_NAME} (legacy ezsp)`
+        }
+      }
+    ).as('setupAfterFallback');
+    cy.fixture('integration/routes/integration/zigbee2mqtt/status_ready_to_setup.json').then(status => {
+      cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: { ...status, ezspFallback: true } });
+    });
+    cy.wait('@setupAfterFallback');
+
+    cy.get('[data-cy=z2m-setup-save]').should('not.exist');
+    cy.get('[data-cy=z2m-setup-local-dongle-summary]').should('have.text', `${DETECTED_DONGLE_NAME} (legacy ezsp)`);
+    cy.get('[data-cy=z2m-setup-local-ezsp-driver]').should('exist');
   });
 
   it('Explain the ezsp adapter type of a network coordinator', () => {
