@@ -88,6 +88,8 @@ describe('zigbee2mqtt disconnect', () => {
     });
     assert.calledTwice(gladys.system.stopContainer);
     assert.calledTwice(gladys.system.removeContainer);
+    // With their anonymous volumes, left behind otherwise
+    assert.alwaysCalledWithMatch(gladys.system.removeContainer, sinon.match.string, { v: true });
   });
 
   it('mqtt connected', async () => {

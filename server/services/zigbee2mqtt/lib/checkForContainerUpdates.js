@@ -39,7 +39,8 @@ async function checkForContainerUpdates(config) {
       logger.debug('Removing current installed MQTT container...');
       // If container is present, we remove it
       // The init process will create it again
-      await this.gladys.system.removeContainer(mqttContainer.id, { force: true });
+      // With its anonymous volumes (/mosquitto/data and /mosquitto/log of the image, unused), left behind otherwise
+      await this.gladys.system.removeContainer(mqttContainer.id, { force: true, v: true });
     }
 
     // Update to last version
