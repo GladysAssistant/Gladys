@@ -39,6 +39,15 @@ class Zigbee2mqttSetupPage extends Component {
     this.setState({ zigbee2mqttStatus: { ...this.state.zigbee2mqttStatus, installation, prefetch } });
   };
 
+  // The setup answered before the server saved the port of the interface and the generated MQTT credentials, and
+  // the configuration can be saved again
+  handleInstallationEnd = () => {
+    this.loadZ2MConfig();
+    if (this.state.setupZigee2mqttStatus === RequestStatus.ConflictError) {
+      this.setState({ setupZigee2mqttStatus: null });
+    }
+  };
+
   loadZ2MStatus = async () => {
     try {
       const zigbee2mqttStatus = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/status');
@@ -181,6 +190,14 @@ class Zigbee2mqttSetupPage extends Component {
     );
     await Promise.all([this.loadZ2MStatus(), this.loadZ2MConfig()]);
     this.prefetchImages();
+  }
+
+  componentDidUpdate(previousProps, previousState) {
+    const previousInstallationState = get(previousState, 'zigbee2mqttStatus.installation.state');
+    const installationState = get(this.state, 'zigbee2mqttStatus.installation.state');
+    if (previousInstallationState === 'running' && (installationState === 'done' || installationState === 'failed')) {
+      this.handleInstallationEnd();
+    }
   }
 
   componentWillUnmount() {

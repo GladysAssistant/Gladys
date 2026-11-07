@@ -35,15 +35,19 @@ const isShownBelow = (error, statusErrors) =>
   );
 
 // Progress of the installation launched by saving the configuration, or of its failure
-const InstallationProgress = ({ installation, statusErrors = [] }) => {
+const InstallationProgress = ({ installation, zigbee2mqttConnected, statusErrors = [] }) => {
   if (!installation || (installation.state !== 'running' && installation.state !== 'failed')) {
     return null;
   }
   const failed = installation.state === 'failed';
+  // Zigbee2mqtt answered after the failure (restarted by Docker, slow machine, update postponed with the old
+  // containers still running): the failure no longer matters
+  if (failed && zigbee2mqttConnected) {
+    return null;
+  }
+  const findPhase = phaseState => installation.phases.find(({ state }) => state === phaseState);
   // Between two phases, none runs: the next one is named
-  const phase = installation.phases.find(({ state }) =>
-    failed ? state === 'failed' : state === 'running' || state === 'pending'
-  );
+  const phase = failed ? findPhase('failed') : findPhase('running') || findPhase('pending');
 
   return (
     <li class="list-group-item" data-cy="z2m-installation-progress">

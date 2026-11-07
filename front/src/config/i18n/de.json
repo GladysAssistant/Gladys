@@ -2096,13 +2096,13 @@
             "pull_mqtt": "Herunterladen des MQTT-Brokers",
             "start_mqtt": "Starten des MQTT-Brokers",
             "start_z2m": "Starten von Zigbee2MQTT",
-            "connect_adapter": "Verbindung mit dem Zigbee-Stick"
+            "connect_adapter": "Verbindung mit dem Zigbee-Koordinator"
           },
           "leavePage": "Sie können diese Seite verlassen: Die Installation läuft weiter.",
           "failedPhase": "Fehlgeschlagener Schritt:",
           "alreadyRunning": "Es läuft bereits eine Installation: Warten Sie, bis sie abgeschlossen ist, bevor Sie die Konfiguration erneut speichern.",
           "errors": {
-            "NO_ANSWER": "Zigbee2MQTT hat Gladys innerhalb von 2 Minuten nach dem Start nicht geantwortet, ohne einen Grund anzugeben. Überprüfen Sie, ob das gewählte Modell Ihrem Stick entspricht, ziehen Sie ihn ab und stecken Sie ihn wieder ein, und speichern Sie dann die Konfiguration erneut.",
+            "NO_ANSWER": "Zigbee2MQTT hat Gladys innerhalb von 2 Minuten nach dem Start nicht geantwortet, ohne einen Grund anzugeben. Überprüfen Sie, ob das gewählte Modell Ihrem Koordinator entspricht, ziehen Sie Ihren Stick ab und stecken Sie ihn wieder ein oder starten Sie Ihren Netzwerk-Koordinator neu, und speichern Sie dann die Konfiguration erneut.",
             "DONGLE_NOT_FOUND": "Ihr Zigbee-Stick ist nicht eingesteckt (oder nicht am gewählten Port): Zigbee2MQTT konnte nicht starten. Stecken Sie ihn ein, überprüfen Sie den gewählten Port und speichern Sie dann die Konfiguration erneut.",
             "unknownErrorPrefix": "Fehler bei der Installation: "
           }
