@@ -454,7 +454,13 @@ describe('Zigbee2Mqtt setup wizard local mode with an existing configuration', (
     cy.wait('@setupAfterFallback');
 
     cy.get('[data-cy=z2m-setup-local-dongle-summary]').should('have.text', `${DETECTED_DONGLE_NAME} (legacy ezsp)`);
-    cy.get('[data-cy=z2m-setup-local-ezsp-driver]').should('exist');
+    // Its text wraps inside the summary instead of overflowing it
+    cy.get('[data-cy=z2m-setup-local-summary]').then($summary => {
+      const summaryRight = $summary[0].getBoundingClientRect().right;
+      cy.get('[data-cy=z2m-setup-local-ezsp-driver]').should($alert => {
+        expect($alert[0].getBoundingClientRect().right).to.be.at.most(summaryRight);
+      });
+    });
   });
 
   it('Explain the ezsp adapter type of a network coordinator', () => {

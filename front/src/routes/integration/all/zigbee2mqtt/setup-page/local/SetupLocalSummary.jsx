@@ -75,16 +75,17 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
               </table>
             </small>
           </div>
-          {ezspDriver && (
-            <div class="alert alert-info mt-3 mb-0" data-cy="z2m-setup-local-ezsp-driver">
-              <MarkupText id="integration.zigbee2mqtt.setup.modes.local.summary.ezspDriver" />
-            </div>
-          )}
         </div>
       </div>
       <button class="btn btn-primary btn-sm ml-auto" onClick={enableEditionMode} disabled={disabled}>
         <Text id="integration.zigbee2mqtt.setup.changeButtonLabel" />
       </button>
+      {ezspDriver && (
+        // Full width, on its own line below the summary: the inline form does not wrap the text of its items
+        <div class="alert alert-info w-100 mt-3 mb-0" data-cy="z2m-setup-local-ezsp-driver">
+          <MarkupText id="integration.zigbee2mqtt.setup.modes.local.summary.ezspDriver" />
+        </div>
+      )}
     </div>
   );
 };
