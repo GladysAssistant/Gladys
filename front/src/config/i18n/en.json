@@ -1826,6 +1826,9 @@
             },
             "containerErrors": {
               "EZSP_PROTOCOL_VERSION": "Warning: Your Ember coordinator firmware is outdated. Firmware version 7.4.x or higher is required. Please follow the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a> to update it. Otherwise, select the dongle (legacy ezsp) in the configuration.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT gets no answer from your Zigbee coordinator. Check that the model selected in the configuration is yours (it sets the driver used) and that no other software (Home Assistant, another Zigbee2MQTT…) uses the coordinator, then unplug and plug your dongle back in, or restart your network coordinator.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT cannot reach your network coordinator. Check that it is powered on and connected to the network, and that its address in the configuration (tcp://address:port) is the right one.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT refuses to start because its configuration (configuration.yaml file) is not valid. If you edited it by hand, fix it; otherwise, report it on the <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys forum</a>. Refused settings:",
               "unknownErrorPrefix": "Zigbee2MQTT container error: "
             }
           },
