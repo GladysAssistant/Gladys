@@ -30,9 +30,18 @@ describe('zigbee2mqtt fallbackToEzsp', () => {
   it('should switch a USB dongle to its legacy ezsp model and install Zigbee2mqtt again', async () => {
     const config = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E, mqttPassword: 'generated-by-init' };
     zigbee2mqttManager.installedConfig = config;
+    let stateDuringInstall;
+    zigbee2mqttManager.installZ2mContainer = fake(async () => {
+      stateDuringInstall = {
+        ezspFallback: zigbee2mqttManager.ezspFallback,
+        z2mContainerError: zigbee2mqttManager.z2mContainerError,
+      };
+    });
 
     await zigbee2mqttManager.fallbackToEzsp();
 
+    // Shown as starting while it installs, announced to the setup page only once installed
+    expect(stateDuringInstall).to.deep.equal({ ezspFallback: false, z2mContainerError: null });
     expect(config.z2mDongleName).to.equal(`${DONGLE_E} (legacy ezsp)`);
     assert.calledOnceWithExactly(
       zigbee2mqttManager.saveOrDestroyVariable,
@@ -86,7 +95,30 @@ describe('zigbee2mqtt fallbackToEzsp', () => {
     expect(zigbee2mqttManager.ezspFallback).to.equal(true);
   });
 
-  it('should not reject when Zigbee2mqtt fails to install again', async () => {
+  it('should not switch again a network coordinator already on the ezsp adapter type', async () => {
+    // Another reader of the same logs, while the first fallback runs: the shared configuration is already switched
+    const config = { z2mAdapterMode: 'network', z2mNetworkAdapterType: 'ezsp' };
+    zigbee2mqttManager.installedConfig = config;
+
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    assert.notCalled(zigbee2mqttManager.saveOrDestroyVariable);
+    assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+    // The error of the ember run is not shown as "no compatibility driver"
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
+  it('should not switch again a USB dongle already on its legacy ezsp model', async () => {
+    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDongleName: `${DONGLE_E} (legacy ezsp)` };
+
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    assert.notCalled(zigbee2mqttManager.saveOrDestroyVariable);
+    assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
+  it('should show the failure when Zigbee2mqtt fails to install again, without rejecting', async () => {
     // Called while the logs are read in the background: a rejection would be unhandled
     zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
     zigbee2mqttManager.installZ2mContainer = fake.rejects(new Error('Docker error'));
@@ -94,6 +126,31 @@ describe('zigbee2mqtt fallbackToEzsp', () => {
     await zigbee2mqttManager.fallbackToEzsp();
 
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
-    expect(zigbee2mqttManager.ezspFallback).to.equal(true);
+    expect(zigbee2mqttManager.ezspFallback).to.equal(false);
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: 'Docker error' });
+  });
+
+  it('should keep the error set by the installation when it fails', async () => {
+    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    const installError = { code: null, message: 'Container name taken by another container' };
+    zigbee2mqttManager.installZ2mContainer = fake(async () => {
+      zigbee2mqttManager.z2mContainerError = installError;
+      throw new Error('Name taken');
+    });
+
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(installError);
+  });
+
+  it('should show the failure when the model cannot be saved', async () => {
+    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    zigbee2mqttManager.saveOrDestroyVariable = fake.rejects(new Error('Database locked'));
+
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+    expect(zigbee2mqttManager.ezspFallback).to.equal(false);
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: 'Database locked' });
   });
 });
