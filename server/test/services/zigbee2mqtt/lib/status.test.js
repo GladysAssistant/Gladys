@@ -54,6 +54,31 @@ describe('zigbee2mqtt status', () => {
     expect(result.z2mContainerError).that.equal(null);
     expect(result.ezspFallback).that.equal(false);
     expect(result.mqttConnectionError).that.equal(null);
+    expect(result.installation).to.deep.equal({
+      state: 'idle',
+      kind: null,
+      phases: [],
+      progress: 0,
+      error: null,
+      durationMs: null,
+    });
+    expect(result.prefetch).to.deep.equal({
+      state: 'idle',
+      progress: 0,
+      freeBytes: null,
+      neededBytes: null,
+      error: null,
+    });
+  });
+
+  it('should give the installation being followed', async () => {
+    // PREPARE
+    const installation = { state: 'running', kind: 'switch', phases: [], progress: 42, error: null, durationMs: null };
+    zigbee2MqttManager.installation = installation;
+    // EXECUTE
+    const result = await zigbee2MqttManager.status();
+    // ASSERT
+    expect(result.installation).to.equal(installation);
   });
 
   it('should show Zigbee2mqtt enabled while its container exists, even when it does not answer', async () => {

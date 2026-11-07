@@ -45,6 +45,58 @@ const ADAPTER_MODE = {
   NETWORK: 'network',
 };
 
+// Installation of Zigbee2mqtt launched by the setup, followed by the setup page (see startInstallation)
+const INSTALLATION_STATE = {
+  IDLE: 'idle',
+  RUNNING: 'running',
+  DONE: 'done',
+  FAILED: 'failed',
+};
+
+const INSTALLATION_KIND = {
+  INSTALL: 'install',
+  UPDATE: 'update',
+  // Another coordinator replaces the configured one
+  SWITCH: 'switch',
+};
+
+// Phases of an installation, in the order they are shown
+const INSTALLATION_PHASE = {
+  PULL_Z2M: 'pull_z2m',
+  PULL_MQTT: 'pull_mqtt',
+  START_MQTT: 'start_mqtt',
+  START_Z2M: 'start_z2m',
+  // Until Zigbee2mqtt answers, which it does once connected to the coordinator
+  CONNECT_ADAPTER: 'connect_adapter',
+};
+
+const INSTALLATION_PHASE_STATE = {
+  PENDING: 'pending',
+  RUNNING: 'running',
+  DONE: 'done',
+  // Nothing to do: the image is there, the container already runs
+  SKIPPED: 'skipped',
+  FAILED: 'failed',
+};
+
+// Share of each phase in the progress of an installation. Downloading the Zigbee2mqtt image (48 MB compressed, 214 MB
+// on disk) takes most of the time, the broker image is 8 times smaller; Zigbee2mqtt then takes a while to answer.
+const INSTALLATION_PHASE_WEIGHTS = {
+  [INSTALLATION_PHASE.PULL_Z2M]: 50,
+  [INSTALLATION_PHASE.PULL_MQTT]: 10,
+  [INSTALLATION_PHASE.START_MQTT]: 10,
+  [INSTALLATION_PHASE.START_Z2M]: 10,
+  [INSTALLATION_PHASE.CONNECT_ADAPTER]: 20,
+};
+
+// Failures of an installation without a code of their own (see readZ2mContainerLogs for the others)
+const INSTALLATION_ERROR = {
+  // Zigbee2mqtt neither answered nor told why
+  NO_ANSWER: 'NO_ANSWER',
+  // The configured USB dongle is not plugged in, so Zigbee2mqtt was not started
+  DONGLE_NOT_FOUND: 'DONGLE_NOT_FOUND',
+};
+
 const SETUP_VARIABLES = [
   CONFIGURATION.Z2M_DRIVER_PATH,
   CONFIGURATION.ZIGBEE_DONGLE_NAME,
@@ -110,6 +162,12 @@ module.exports = {
   DEVICE_PARAMS,
   MQTT_CONNECTION_ERROR,
   ADAPTER_MODE,
+  INSTALLATION_STATE,
+  INSTALLATION_KIND,
+  INSTALLATION_PHASE,
+  INSTALLATION_PHASE_STATE,
+  INSTALLATION_PHASE_WEIGHTS,
+  INSTALLATION_ERROR,
   SETUP_VARIABLES,
   DEFAULT,
 };

@@ -101,6 +101,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(true);
@@ -134,6 +136,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(true);
@@ -173,6 +177,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(false);
@@ -211,6 +217,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(false);
@@ -254,6 +262,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     // 2nd call - mqtt is ready
@@ -276,6 +286,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledOnce(gladys.system.createContainer);
@@ -331,6 +343,69 @@ describe('zigbee2mqtt installMqttContainer', () => {
     assert.calledWith(infoStub, sinon.match(/^MQTT broker ready in \d+\.\d s$/));
   });
 
+  describe('during an installation', () => {
+    const phase = (key) =>
+      zigbee2mqttManager.installation.phases.find((installationPhase) => installationPhase.key === key);
+
+    beforeEach(() => {
+      zigbee2mqttManager.emitInstallProgress = fake();
+      zigbee2mqttManager.startInstallation('install');
+    });
+
+    it('should report the progress of the download, then start the broker', async () => {
+      // PREPARE
+      gladys.system.getContainers = sinon
+        .stub()
+        .onFirstCall()
+        .resolves([])
+        .onSecondCall()
+        .resolves([container]);
+      let pullPhaseDuringPull;
+      gladys.system.pull = fake(async (image, onProgress) => {
+        onProgress({ status: 'Pulling from library/eclipse-mosquitto', id: '2.0.15' });
+        onProgress({ status: 'Downloading', progressDetail: { current: 50, total: 100 }, id: 'aaa' });
+        pullPhaseDuringPull = { ...phase('pull_mqtt') };
+        return [];
+      });
+      // EXECUTE
+      await zigbee2mqttManager.installMqttContainer({});
+      // ASSERT
+      expect(pullPhaseDuringPull).to.deep.equal({ key: 'pull_mqtt', state: 'running', progress: 25 });
+      expect(phase('pull_mqtt')).to.deep.equal({ key: 'pull_mqtt', state: 'done', progress: 100 });
+      expect(phase('start_mqtt')).to.deep.equal({ key: 'start_mqtt', state: 'done', progress: 100 });
+    });
+
+    it('should leave the broker starting when its configuration fails', async () => {
+      // PREPARE
+      gladys.system.getContainers = fake.resolves([]);
+      gladys.system.createContainer = fake.rejects(new Error('docker fail create'));
+      // EXECUTE
+      await expect(zigbee2mqttManager.installMqttContainer({})).to.be.rejectedWith('docker fail create');
+      // ASSERT
+      // Marked as failed by finishInstallation
+      expect(phase('pull_mqtt').state).to.equal('done');
+      expect(phase('start_mqtt').state).to.equal('running');
+    });
+
+    it('should skip the download, and start a stopped broker', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.installMqttContainer({});
+      // ASSERT
+      expect(phase('pull_mqtt')).to.deep.equal({ key: 'pull_mqtt', state: 'skipped', progress: 100 });
+      expect(phase('start_mqtt')).to.deep.equal({ key: 'start_mqtt', state: 'done', progress: 100 });
+    });
+
+    it('should skip both phases when the broker runs', async () => {
+      // PREPARE
+      gladys.system.getContainers = fake.resolves([container]);
+      // EXECUTE
+      await zigbee2mqttManager.installMqttContainer({});
+      // ASSERT
+      expect(phase('pull_mqtt').state).to.equal('skipped');
+      expect(phase('start_mqtt').state).to.equal('skipped');
+    });
+  });
+
   it('should fail to configure MQTT container', async function Test() {
     // PREPARE
     this.timeout(11000);
@@ -372,6 +447,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledOnce(gladys.system.createContainer);

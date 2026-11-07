@@ -144,6 +144,37 @@ describe('zigbee2mqtt reset', () => {
     assert.called(gladys.event.emit);
   });
 
+  it('should forget the outcome of the last installation', async () => {
+    zigbee2MqttManager.installation = {
+      state: 'failed',
+      kind: 'install',
+      phases: [{ key: 'pull_z2m', state: 'failed', progress: 10 }],
+      progress: 5,
+      error: { code: 'NO_ANSWER', message: null },
+      durationMs: 1000,
+    };
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.installation).to.deep.equal({
+      state: 'idle',
+      kind: null,
+      phases: [],
+      progress: 0,
+      error: null,
+      durationMs: null,
+    });
+  });
+
+  it('should keep a running installation, which tells its own outcome', async () => {
+    const installation = { state: 'running', kind: 'install', phases: [], progress: 5, error: null, durationMs: null };
+    zigbee2MqttManager.installation = installation;
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.installation).to.equal(installation);
+  });
+
   it('should throw when folder deletion fails', async () => {
     fsRmStub = fake.rejects(new Error('Permission denied'));
 

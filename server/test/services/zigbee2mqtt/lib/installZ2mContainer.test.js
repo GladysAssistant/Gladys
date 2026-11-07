@@ -169,6 +169,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -224,6 +226,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -402,6 +406,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -546,6 +552,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -587,6 +595,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -628,6 +638,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -649,6 +661,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
@@ -679,6 +693,59 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.calledWith(infoStub, sinon.match(/^Zigbee2mqtt container started in \d+\.\d s$/));
     // To log how long Zigbee2mqtt takes to answer
     expect(zigbee2mqttManager.zigbee2mqttStartingSince).to.be.a('number');
+  });
+
+  describe('during an installation', () => {
+    const phase = (key) =>
+      zigbee2mqttManager.installation.phases.find((installationPhase) => installationPhase.key === key);
+
+    beforeEach(() => {
+      zigbee2mqttManager.emitInstallProgress = fake();
+      zigbee2mqttManager.startInstallation('install');
+    });
+
+    it('should report the progress of the download, then start Zigbee2mqtt', async () => {
+      // PREPARE
+      gladys.system.getContainers = stub()
+        .onFirstCall()
+        .resolves([])
+        .onSecondCall()
+        .resolves([containerStopped]);
+      let pullPhaseDuringPull;
+      let startPhaseDuringPull;
+      gladys.system.pull = fake(async (image, onProgress) => {
+        onProgress({ status: 'Pulling fs layer', progressDetail: {}, id: 'aaa' });
+        onProgress({ status: 'Extracting', progressDetail: { current: 50, total: 100 }, id: 'aaa' });
+        pullPhaseDuringPull = { ...phase('pull_z2m') };
+        startPhaseDuringPull = { ...phase('start_z2m') };
+        return [];
+      });
+      // EXECUTE
+      await zigbee2mqttManager.installZ2mContainer({});
+      // ASSERT
+      expect(pullPhaseDuringPull).to.deep.equal({ key: 'pull_z2m', state: 'running', progress: 75 });
+      expect(startPhaseDuringPull.state).to.equal('pending');
+      expect(phase('pull_z2m')).to.deep.equal({ key: 'pull_z2m', state: 'done', progress: 100 });
+      expect(phase('start_z2m')).to.deep.equal({ key: 'start_z2m', state: 'done', progress: 100 });
+    });
+
+    it('should skip the download, and restart a stopped Zigbee2mqtt', async () => {
+      // EXECUTE
+      await zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: '/dev/ttyUSB0' });
+      // ASSERT
+      expect(phase('pull_z2m')).to.deep.equal({ key: 'pull_z2m', state: 'skipped', progress: 100 });
+      expect(phase('start_z2m')).to.deep.equal({ key: 'start_z2m', state: 'done', progress: 100 });
+    });
+
+    it('should skip both phases when Zigbee2mqtt runs with the same configuration', async () => {
+      // PREPARE
+      gladys.system.getContainers = fake.resolves([container]);
+      // EXECUTE
+      await zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: '/dev/ttyUSB0' });
+      // ASSERT
+      expect(phase('pull_z2m').state).to.equal('skipped');
+      expect(phase('start_z2m').state).to.equal('skipped');
+    });
   });
 
   it('should detect EZSP protocol version error in container logs', async () => {

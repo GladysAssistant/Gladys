@@ -2277,6 +2277,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
+    // the progress of an installation, sent at most twice a second
+    INSTALL_PROGRESS: 'zigbee2mqtt.install-progress',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
@@ -2514,6 +2516,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES: 'device-state-purge-orphaned-duckdb-states',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
+  SERVICE_ZIGBEE2MQTT_INSTALL: 'service-zigbee2mqtt-install',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',

@@ -5168,6 +5168,7 @@
       "device-state-purge-single-feature": "Single device feature states clean",
       "vacuum": "Database cleaning",
       "service-zigbee2mqtt-backup": "Zigbee2MQTT backup",
+      "service-zigbee2mqtt-install": "Zigbee2MQTT installation",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
       "device-state-purge-all-sqlite-states": "Purge all SQLite states",
       "device-state-purge-orphaned-duckdb-states": "Purge orphaned DuckDB states",

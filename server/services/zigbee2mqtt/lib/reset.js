@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 
 const logger = require('../../../utils/logger');
-const { CONFIGURATION } = require('./constants');
+const { CONFIGURATION, INSTALLATION_STATE } = require('./constants');
 
 const ALL_CONFIGURATION_KEYS = [
   CONFIGURATION.Z2M_DRIVER_PATH,
@@ -64,6 +64,17 @@ async function reset() {
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
   this.mqttConnectionError = null;
+  // A running installation goes on, and tells its own outcome
+  if (this.installation.state !== INSTALLATION_STATE.RUNNING) {
+    this.installation = {
+      state: INSTALLATION_STATE.IDLE,
+      kind: null,
+      phases: [],
+      progress: 0,
+      error: null,
+      durationMs: null,
+    };
+  }
 
   // 5. Emit status event
   this.emitStatusEvent();
