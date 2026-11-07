@@ -1,7 +1,9 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const Zigbee2MqttController = require('../../../../services/zigbee2mqtt/api/zigbee2mqtt.controller');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const event = {
   emit: fake.resolves(null),
@@ -36,6 +38,7 @@ describe('zigbee2mqtt API', () => {
 
   beforeEach(() => {
     controller = Zigbee2MqttController(gladys, zigbee2mqttManager, 'de1dd005-092d-456d-93d1-817c9ace4c67');
+    zigbee2mqttManager.installation = { state: 'idle' };
     sinon.reset();
   });
 
@@ -203,5 +206,32 @@ describe('zigbee2mqtt API', () => {
     await controller['post /api/v1/service/zigbee2mqtt/reset'].controller(req, res);
     assert.calledOnce(zigbee2mqttManager.reset);
     assert.calledWith(res.json, { success: true });
+  });
+
+  // The end of the installation would undo them (containers recreated, configuration saved), or run alongside them
+  [
+    ['connect', 'init'],
+    ['disconnect', 'disconnect'],
+    ['reset', 'reset'],
+  ].forEach(([action, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${action} should be refused while an installation runs`, async () => {
+      // PREPARE
+      zigbee2mqttManager.installation = { state: 'running' };
+      const req = {};
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller[`post /api/v1/service/zigbee2mqtt/${action}`].controller(req, res, next);
+      // ASSERT
+      assert.calledOnce(next);
+      const [error] = next.firstCall.args;
+      // Answered with a 409 by the error middleware
+      expect(error).to.be.instanceOf(ConflictError);
+      expect(error.message).to.equal(`Zigbee2mqtt: cannot ${action} while an installation is running`);
+      assert.notCalled(zigbee2mqttManager[method]);
+      assert.notCalled(res.json);
+    });
   });
 });

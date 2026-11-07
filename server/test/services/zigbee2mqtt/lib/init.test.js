@@ -497,6 +497,22 @@ describe('zigbee2mqtt init', () => {
       assert.notCalled(zigbee2mqttManager.waitForZigbee2mqtt);
     });
 
+    it('should not open an update when a setup started an installation while the containers were looked for', async () => {
+      // PREPARE
+      gladys.system.getContainers = fake(async ({ filters }) => {
+        zigbee2mqttManager.startInstallation('switch');
+        return filters.name[0] === 'gladys-z2m-zigbee2mqtt' ? [z2mContainer] : [];
+      });
+      // EXECUTE
+      await zigbee2mqttManager.init();
+      // ASSERT
+      // Not refused by the installation of the setup, which goes on
+      expect(zigbee2mqttManager.installation).to.include({ state: 'running', kind: 'switch' });
+      assert.calledOnce(gladys.system.getContainers);
+      assert.notCalled(zigbee2mqttManager.finishInstallation);
+      assert.notCalled(zigbee2mqttManager.waitForZigbee2mqtt);
+    });
+
     it('should not follow a first installation as an update', async () => {
       // PREPARE
       gladys.system.getContainers = fake.resolves([]);

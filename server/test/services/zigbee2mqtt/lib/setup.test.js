@@ -145,18 +145,74 @@ describe('zigbee2mqtt setup', () => {
     expect(zigbee2MqttManager.installation).to.include({ state: 'running', kind: 'install' });
   });
 
+  const usbDongle = { ZIGBEE_DONGLE_NAME: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P' };
+  const networkCoordinator = { Z2M_ADAPTER_MODE: 'network', Z2M_NETWORK_ADAPTER_TYPE: 'ember' };
   [
-    ['a USB dongle', { z2mDriverPath: 'usb0' }, 'switch'],
-    ['an old installation without adapter mode', { z2mAdapterMode: null, z2mDriverPath: 'usb0' }, 'switch'],
-    ['a network coordinator', { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' }, 'switch'],
-    ['a network mode without coordinator', { z2mAdapterMode: 'network', z2mDriverPath: 'usb0' }, 'install'],
-    ['no coordinator', { z2mAdapterMode: 'usb' }, 'install'],
-  ].forEach(([label, configuration, kind]) => {
-    it(`should ${kind} Zigbee2mqtt when ${label} was configured`, async () => {
+    ['a USB dongle moved to another port', { z2mDriverPath: 'usb0' }, { ZIGBEE2MQTT_DRIVER_PATH: 'usb1' }, 'switch'],
+    [
+      'a USB dongle of an old installation without adapter mode, moved to another port',
+      { z2mAdapterMode: null, z2mDriverPath: 'usb0' },
+      { ZIGBEE2MQTT_DRIVER_PATH: 'usb1' },
+      'switch',
+    ],
+    [
+      'a network coordinator replaced by a USB dongle',
+      { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' },
+      { ...usbDongle, Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: 'usb1' },
+      'switch',
+    ],
+    [
+      'a USB dongle replaced by a network coordinator',
+      { z2mAdapterMode: 'usb', z2mDriverPath: 'usb0' },
+      { ...networkCoordinator, Z2M_NETWORK_ADAPTER_URL: '192.168.1.20:6638', ZIGBEE2MQTT_DRIVER_PATH: null },
+      'switch',
+    ],
+    [
+      'a network coordinator at another URL',
+      { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' },
+      { ...networkCoordinator, Z2M_NETWORK_ADAPTER_URL: '192.168.1.21:6638' },
+      'switch',
+    ],
+    // Saved again after a failed installation
+    [
+      'the same USB dongle saved again',
+      { z2mAdapterMode: 'usb', z2mDriverPath: 'usb0' },
+      { ...usbDongle, Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: 'usb0' },
+      'install',
+    ],
+    [
+      'the same USB dongle of an old installation without adapter mode',
+      { z2mAdapterMode: null, z2mDriverPath: 'usb0' },
+      { ...usbDongle, Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: 'usb0' },
+      'install',
+    ],
+    [
+      // Compared once normalized
+      'the same network coordinator saved again',
+      { z2mAdapterMode: 'network', z2mDriverPath: 'usb0', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' },
+      { ...networkCoordinator, Z2M_NETWORK_ADAPTER_URL: '192.168.1.20:6638', ZIGBEE2MQTT_DRIVER_PATH: null },
+      'install',
+    ],
+    // The coordinator missing from the setup stays the stored one
+    [
+      'a change of the port of the interface only',
+      { z2mAdapterMode: 'usb', z2mDriverPath: 'usb0' },
+      { Z2M_TCP_PORT: '8081' },
+      'install',
+    ],
+    [
+      'a first coordinator, after a network mode without one',
+      { z2mAdapterMode: 'network', z2mDriverPath: 'usb0' },
+      { ZIGBEE2MQTT_DRIVER_PATH: 'usb1' },
+      'install',
+    ],
+    ['a first coordinator', { z2mAdapterMode: 'usb' }, { ZIGBEE2MQTT_DRIVER_PATH: 'usb1' }, 'install'],
+  ].forEach(([label, configuration, config, kind]) => {
+    it(`should ${kind} Zigbee2mqtt for ${label}`, async () => {
       // PREPARE
       zigbee2MqttManager.getConfiguration = fake.resolves(configuration);
       // EXECUTE
-      await zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb1', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+      await zigbee2MqttManager.setup(config);
       // ASSERT
       expect(zigbee2MqttManager.installation.kind).to.equal(kind);
     });
@@ -199,6 +255,29 @@ describe('zigbee2mqtt setup', () => {
     // ASSERT
     expect(zigbee2MqttManager.installation.state).to.equal('failed');
     expect(zigbee2MqttManager.installation.error).to.deep.equal({ code: null, message: 'SQLITE_FULL' });
+  });
+
+  it('should not end the installation of a setup sent while the job of the previous one saved its failure', async () => {
+    // PREPARE
+    let failJob;
+    zigbee2MqttManager.runInstallation = fake.returns(
+      new Promise((resolve, reject) => {
+        failJob = reject;
+      }),
+    );
+    await zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    // The installation tells its failure, then its job saves it before rejecting
+    const error = new Error('Zigbee2mqtt failed to start: NO_ANSWER');
+    zigbee2MqttManager.finishInstallation(error);
+    // EXECUTE
+    zigbee2MqttManager.runInstallation = fake.returns(new Promise(() => {}));
+    await zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb1', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    failJob(error);
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    // ASSERT
+    expect(zigbee2MqttManager.installation).to.include({ state: 'running', error: null });
   });
 
   it('should keep the outcome told by a failed installation', async () => {

@@ -1,7 +1,23 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
+const { ConflictError } = require('../../../utils/coreErrors');
+const { INSTALLATION_STATE } = require('../lib/constants');
 
 module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
+  /**
+   * @description Refuse a request that the running installation would undo or run into: once its downloads are over,
+   * the installation recreates the containers and saves its configuration, and a second init would run alongside it.
+   * Checked here rather than in disconnect, which stop and reset call too.
+   * @param {string} action - What the request does, told in the error.
+   * @example
+   * refuseWhileInstalling('reset');
+   */
+  function refuseWhileInstalling(action) {
+    if (zigbee2mqttManager.installation.state === INSTALLATION_STATE.RUNNING) {
+      throw new ConflictError(`Zigbee2mqtt: cannot ${action} while an installation is running`);
+    }
+  }
+
   /**
    * @api {get} /api/v1/service/zigbee2mqtt/discovered Get discovered Zigbee2mqtt devices
    * @apiName getDiscoveredDevices
@@ -90,6 +106,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function connect(req, res) {
     logger.debug('Entering connect step');
+    refuseWhileInstalling('connect');
     await zigbee2mqttManager.init();
     res.json({
       success: true,
@@ -131,6 +148,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function disconnect(req, res) {
     logger.debug('Entering disconnect step');
+    refuseWhileInstalling('disconnect');
     await zigbee2mqttManager.disconnect();
     res.json({
       success: true,
@@ -157,6 +175,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function reset(req, res) {
     logger.debug('Entering reset step');
+    refuseWhileInstalling('reset');
     await zigbee2mqttManager.reset();
     res.json({
       success: true,

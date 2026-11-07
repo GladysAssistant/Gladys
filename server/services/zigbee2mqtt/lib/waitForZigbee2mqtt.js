@@ -1,4 +1,4 @@
-const { INSTALLATION_PHASE, INSTALLATION_PHASE_STATE, INSTALLATION_ERROR } = require('./constants');
+const { INSTALLATION_PHASE, INSTALLATION_PHASE_STATE, INSTALLATION_ERROR, MQTT_MODE } = require('./constants');
 
 // Often enough for the setup page to tell at once that Zigbee2mqtt answers
 const CHECK_INTERVAL_IN_MS = 500;
@@ -28,9 +28,14 @@ function buildStartupError(installationError) {
  */
 async function waitForZigbee2mqtt() {
   this.updateInstallationPhase(INSTALLATION_PHASE.CONNECT_ADAPTER, { state: INSTALLATION_PHASE_STATE.RUNNING });
-  // Neither a coordinator found nor an external broker: init started nothing, nothing would ever answer
-  if (!this.usbConfigured && !this.networkAdapterConfigured && !this.mqttClient) {
-    throw buildStartupError({ code: INSTALLATION_ERROR.DONGLE_NOT_FOUND, message: null });
+  // Neither a coordinator found nor an external broker: init started nothing, nothing would ever answer. The stored
+  // mode tells the external broker, not the MQTT client: the one of a previous run stays connected, to a Zigbee2mqtt
+  // that may even answer
+  if (!this.usbConfigured && !this.networkAdapterConfigured) {
+    const { mqttMode } = await this.getConfiguration();
+    if (mqttMode !== MQTT_MODE.EXTERNAL) {
+      throw buildStartupError({ code: INSTALLATION_ERROR.DONGLE_NOT_FOUND, message: null });
+    }
   }
   const startedAt = Date.now();
   await new Promise((resolve, reject) => {
