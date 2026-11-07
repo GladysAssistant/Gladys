@@ -91,7 +91,9 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function installMqttContainer(req, res) {
     logger.debug('Install MQTT container');
-    await zigbee2mqttManager.installMqttContainer();
+    // The broker accounts, also used to wait for the broker to answer
+    const configuration = await zigbee2mqttManager.getConfiguration();
+    await zigbee2mqttManager.installMqttContainer(configuration);
     res.json({
       success: true,
     });

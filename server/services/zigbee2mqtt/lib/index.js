@@ -18,6 +18,7 @@ const { isEnabled } = require('./isEnabled');
 const { subscribe } = require('./subscribe');
 const { checkForContainerUpdates } = require('./checkForContainerUpdates');
 const { installMqttContainer } = require('./installMqttContainer');
+const { waitForBroker } = require('./waitForBroker');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { configureContainer } = require('./configureContainer');
 const { setup } = require('./setup');
@@ -92,7 +93,6 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.mqttConnectionError = null;
   this.dockerBased = false;
 
-  this.containerRestartWaitTimeInMs = 5 * 1000;
   // Without an answer by then, Zigbee2mqtt is shown as not answering instead of starting
   this.zigbee2mqttStartingTimeoutInMs = 2 * 60 * 1000;
   this.startingTimer = null;
@@ -141,6 +141,7 @@ Zigbee2mqttManager.prototype.isEnabled = isEnabled;
 Zigbee2mqttManager.prototype.subscribe = subscribe;
 Zigbee2mqttManager.prototype.checkForContainerUpdates = checkForContainerUpdates;
 Zigbee2mqttManager.prototype.installMqttContainer = installMqttContainer;
+Zigbee2mqttManager.prototype.waitForBroker = waitForBroker;
 Zigbee2mqttManager.prototype.installZ2mContainer = installZ2mContainer;
 Zigbee2mqttManager.prototype.configureContainer = configureContainer;
 Zigbee2mqttManager.prototype.setup = setup;
