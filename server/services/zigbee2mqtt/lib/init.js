@@ -193,15 +193,18 @@ async function init(setupMode = false) {
       try {
         await this.pullMissingImages();
       } catch (e) {
-        // Without the new images (no Internet, registry down), the running containers are kept and Gladys connects
-        // to them: the update is tried again on the next start, instead of leaving Gladys without Zigbee until then
-        if (!updating) {
-          throw e;
+        if (updating) {
+          // Without the new images (no Internet, registry down), the running containers are kept and Gladys connects
+          // to them: the update is tried again on the next start, instead of leaving Gladys without Zigbee until then
+          logger.warn('Zigbee2mqtt: new images not downloaded, the update is postponed to the next start:', e);
+          this.finishInstallation(e);
+          updating = false;
+          newImagesPulled = false;
+        } else {
+          // Only a container to create needs its image, and downloads it again then: running containers whose image
+          // tag left the machine (removed by hand) keep running, Gladys connects to them
+          logger.warn('Zigbee2mqtt: images not downloaded ahead, going on with the containers in place:', e);
         }
-        logger.warn('Zigbee2mqtt: new images not downloaded, the update is postponed to the next start:', e);
-        this.finishInstallation(e);
-        updating = false;
-        newImagesPulled = false;
       }
       // Skipped, the stored versions stay the old ones
       if (newImagesPulled) {

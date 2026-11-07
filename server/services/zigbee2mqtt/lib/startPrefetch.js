@@ -1,5 +1,10 @@
 const logger = require('../../../utils/logger');
-const { INSTALLATION_STATE, INSTALLATION_ERROR, IMAGE_SIZE_IN_BYTES } = require('./constants');
+const {
+  INSTALLATION_STATE,
+  INSTALLATION_ERROR,
+  IMAGE_SIZE_IN_BYTES,
+  DISK_SPACE_MARGIN_IN_BYTES,
+} = require('./constants');
 const { getInstallationError } = require('./finishInstallation');
 
 const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -66,7 +71,11 @@ async function startPrefetch() {
       this.gladys.system.getDiskSpace(),
     ]);
     const missingImages = IMAGES.filter((image, index) => !imagesPresent[index]);
-    prefetch.neededBytes = missingImages.reduce((sum, image) => sum + IMAGE_SIZE_IN_BYTES[image], 0);
+    // The missing images, and a margin left free for the rest of Gladys
+    prefetch.neededBytes =
+      missingImages.length === 0
+        ? 0
+        : missingImages.reduce((sum, image) => sum + IMAGE_SIZE_IN_BYTES[image], DISK_SPACE_MARGIN_IN_BYTES);
     // Unknown without df: the images are downloaded anyway
     prefetch.freeBytes = diskSpace ? diskSpace.available : null;
     if (missingImages.length === 0) {

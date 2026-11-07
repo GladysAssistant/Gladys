@@ -13,12 +13,15 @@ function updatePrefetchProgress(image, progress) {
     return;
   }
   this.prefetchProgressByImage[image] = progress;
-  const weightedProgress = Object.entries(this.prefetchProgressByImage).reduce(
+  const prefetchedImages = Object.entries(this.prefetchProgressByImage);
+  const weightedProgress = prefetchedImages.reduce(
     (sum, [prefetchedImage, imageProgress]) => sum + IMAGE_SIZE_IN_BYTES[prefetchedImage] * imageProgress,
     0,
   );
+  // Not neededBytes, which adds the margin kept free on the disk
+  const totalSize = prefetchedImages.reduce((sum, [prefetchedImage]) => sum + IMAGE_SIZE_IN_BYTES[prefetchedImage], 0);
   // Never backwards: a pull discovers the size of the layers as it goes
-  this.prefetch.progress = Math.max(this.prefetch.progress, Math.floor(weightedProgress / this.prefetch.neededBytes));
+  this.prefetch.progress = Math.max(this.prefetch.progress, Math.floor(weightedProgress / totalSize));
 }
 
 module.exports = {

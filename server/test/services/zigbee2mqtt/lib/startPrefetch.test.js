@@ -79,7 +79,7 @@ describe('zigbee2mqtt startPrefetch', () => {
       state: 'running',
       progress: 0,
       freeBytes: 1000000000,
-      neededBytes: 236400000,
+      neededBytes: 736400000,
       error: null,
     });
     expect(zigbee2mqttManager.status().prefetch).to.equal(prefetch);
@@ -103,7 +103,7 @@ describe('zigbee2mqtt startPrefetch', () => {
       state: 'done',
       progress: 100,
       freeBytes: 1000000000,
-      neededBytes: 236400000,
+      neededBytes: 736400000,
       error: null,
     });
     // The setup page reads the outcome
@@ -117,7 +117,7 @@ describe('zigbee2mqtt startPrefetch', () => {
     const prefetch = await zigbee2mqttManager.startPrefetch();
     await flush();
     // ASSERT
-    expect(prefetch.neededBytes).to.equal(214000000);
+    expect(prefetch.neededBytes).to.equal(714000000);
     expect(pulls.map(({ image }) => image)).to.deep.equal([Z2M_IMAGE]);
     // The progress is the one of this image only
     pulls[0].onProgress({ status: 'Downloading', progressDetail: { current: 100, total: 100 }, id: 'aaa' });
@@ -161,11 +161,30 @@ describe('zigbee2mqtt startPrefetch', () => {
       state: 'failed',
       progress: 0,
       freeBytes: 200000000,
-      neededBytes: 236400000,
+      neededBytes: 736400000,
       error: { code: 'NOT_ENOUGH_DISK_SPACE', message: null },
     });
     assert.notCalled(gladys.system.pull);
     assert.calledOnce(zigbee2mqttManager.emitInstallProgress);
+  });
+
+  it('should keep a margin free on the disk on top of the images', async () => {
+    // PREPARE
+    // Enough for the images alone (236.4 MB), not with the margin left for the databases of Gladys
+    gladys.system.getDiskSpace = fake.resolves({
+      available: 400000000,
+      size: 0,
+      used: 0,
+      capacity: 0,
+      mountpoint: '/',
+    });
+    // EXECUTE
+    const prefetch = await zigbee2mqttManager.startPrefetch();
+    await flush();
+    // ASSERT
+    expect(prefetch.state).to.equal('failed');
+    expect(prefetch.error).to.deep.equal({ code: 'NOT_ENOUGH_DISK_SPACE', message: null });
+    assert.notCalled(gladys.system.pull);
   });
 
   it('should download the images when the free disk space is unknown', async () => {
