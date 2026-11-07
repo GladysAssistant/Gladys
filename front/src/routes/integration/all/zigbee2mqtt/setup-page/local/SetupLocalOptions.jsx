@@ -6,6 +6,7 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import { MQTT_MODE, ADAPTER_MODE } from '../constants';
 import Select from 'react-select';
 import SubmitConfiguration from '../components/SubmitConfiguration';
+import PrefetchStatus from '../components/PrefetchStatus';
 
 class SetupLocalOptions extends Component {
   updateAdapterMode = e => {
@@ -223,7 +224,7 @@ class SetupLocalOptions extends Component {
   }
 
   render(
-    { disabled, configuration },
+    { disabled, configuration, zigbee2mqttStatus },
     {
       z2mDriverPath,
       usbPorts,
@@ -472,6 +473,7 @@ class SetupLocalOptions extends Component {
             <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortDescription" />
           </small>
         </div>
+        <PrefetchStatus configuration={configuration} zigbee2mqttStatus={zigbee2mqttStatus} />
         <SubmitConfiguration
           saveDisabled={saveDisabled}
           disabled={disabled}

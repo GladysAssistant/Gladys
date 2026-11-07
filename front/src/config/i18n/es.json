@@ -1915,6 +1915,12 @@
             "DONGLE_NOT_FOUND": "Su adaptador Zigbee no está conectado (o no en el puerto elegido): Zigbee2MQTT no ha podido iniciarse. Conéctelo, compruebe el puerto elegido y después guarde de nuevo la configuración.",
             "unknownErrorPrefix": "Error durante la instalación: "
           }
+        },
+        "prefetch": {
+          "running": "Preparando la instalación en segundo plano · {{progress}} %",
+          "done": "Descarga completada: la instalación será rápida.",
+          "notEnoughDiskSpace": "Espacio en disco insuficiente: {{free}} MB libres, {{needed}} MB necesarios para instalar Zigbee2MQTT. Libere espacio antes de instalar.",
+          "notEnoughDiskSpaceNoFigures": "Espacio en disco insuficiente para instalar Zigbee2MQTT. Libere espacio antes de instalar."
         }
       },
       "device": {

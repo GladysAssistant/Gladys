@@ -2239,6 +2239,12 @@
             "DONGLE_NOT_FOUND": "Votre clé Zigbee n'est pas branchée (ou pas sur le port choisi) : Zigbee2MQTT n'a pas pu démarrer. Branchez-la, vérifiez le port choisi, puis enregistrez à nouveau la configuration.",
             "unknownErrorPrefix": "Erreur pendant l'installation : "
           }
+        },
+        "prefetch": {
+          "running": "Préparation de l'installation en arrière-plan · {{progress}} %",
+          "done": "Téléchargement terminé : l'installation sera rapide.",
+          "notEnoughDiskSpace": "Espace disque insuffisant : {{free}} Mo libres, {{needed}} Mo nécessaires pour installer Zigbee2MQTT. Libérez de la place avant d'installer.",
+          "notEnoughDiskSpaceNoFigures": "Espace disque insuffisant pour installer Zigbee2MQTT. Libérez de la place avant d'installer."
         }
       },
       "device": {

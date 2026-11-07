@@ -1915,6 +1915,12 @@
             "DONGLE_NOT_FOUND": "Your Zigbee dongle is not plugged in (or not on the selected port): Zigbee2MQTT could not start. Plug it in, check the selected port, then save the configuration again.",
             "unknownErrorPrefix": "Installation error: "
           }
+        },
+        "prefetch": {
+          "running": "Preparing the installation in the background · {{progress}}%",
+          "done": "Download complete: the installation will be quick.",
+          "notEnoughDiskSpace": "Not enough disk space: {{free}} MB free, {{needed}} MB needed to install Zigbee2MQTT. Free up some space before installing.",
+          "notEnoughDiskSpaceNoFigures": "Not enough disk space to install Zigbee2MQTT. Free up some space before installing."
         }
       },
       "device": {

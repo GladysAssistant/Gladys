@@ -6,6 +6,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 import { RequestStatus } from '../../../../../utils/consts';
 import getZ2mUrl from '../utils/getZ2mUrl';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
+import { MQTT_MODE } from './constants';
 import SetupTab from './SetupTab';
 
 const VARIABLE_MAP = {
@@ -64,6 +65,31 @@ class Zigbee2mqttSetupPage extends Component {
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service config', e);
       this.setState({ loadZigbee2mqttConfig: RequestStatus.Error });
+    }
+  };
+
+  // Nothing configured yet: the images are downloaded in the background, so that the installation does not wait for them
+  prefetchImages = async () => {
+    const { loadZigbee2mqttStatus, loadZigbee2mqttConfig, configuration, zigbee2mqttStatus } = this.state;
+    const { dockerBased, networkModeValid, installation } = zigbee2mqttStatus;
+    if (
+      loadZigbee2mqttStatus !== RequestStatus.Success ||
+      loadZigbee2mqttConfig !== RequestStatus.Success ||
+      configuration.z2mDriverPath ||
+      configuration.z2mNetworkAdapterUrl ||
+      configuration.mqttMode === MQTT_MODE.EXTERNAL ||
+      !dockerBased ||
+      !networkModeValid ||
+      get(installation, 'state') === 'running'
+    ) {
+      return;
+    }
+    try {
+      const prefetch = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/prefetch');
+      this.setState({ zigbee2mqttStatus: { ...this.state.zigbee2mqttStatus, prefetch } });
+    } catch (e) {
+      // The installation downloads what is missing anyway
+      console.error('Failed to prefetch the Zigbee2mqtt images', e);
     }
   };
 
@@ -147,14 +173,14 @@ class Zigbee2mqttSetupPage extends Component {
     };
   }
 
-  componentDidMount() {
-    this.loadZ2MStatus();
-    this.loadZ2MConfig();
+  async componentDidMount() {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE, this.handleZ2MStatus);
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS,
       this.handleInstallProgress
     );
+    await Promise.all([this.loadZ2MStatus(), this.loadZ2MConfig()]);
+    this.prefetchImages();
   }
 
   componentWillUnmount() {

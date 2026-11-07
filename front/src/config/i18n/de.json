@@ -2106,6 +2106,12 @@
             "DONGLE_NOT_FOUND": "Ihr Zigbee-Stick ist nicht eingesteckt (oder nicht am gewählten Port): Zigbee2MQTT konnte nicht starten. Stecken Sie ihn ein, überprüfen Sie den gewählten Port und speichern Sie dann die Konfiguration erneut.",
             "unknownErrorPrefix": "Fehler bei der Installation: "
           }
+        },
+        "prefetch": {
+          "running": "Die Installation wird im Hintergrund vorbereitet · {{progress}} %",
+          "done": "Download abgeschlossen: Die Installation geht schnell.",
+          "notEnoughDiskSpace": "Nicht genügend Speicherplatz: {{free}} MB frei, {{needed}} MB für die Installation von Zigbee2MQTT benötigt. Geben Sie vor der Installation Speicherplatz frei.",
+          "notEnoughDiskSpaceNoFigures": "Nicht genügend Speicherplatz für die Installation von Zigbee2MQTT. Geben Sie vor der Installation Speicherplatz frei."
         }
       },
       "device": {
