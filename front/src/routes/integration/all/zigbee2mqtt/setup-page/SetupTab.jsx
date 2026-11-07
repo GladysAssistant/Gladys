@@ -43,7 +43,8 @@ class SetupTab extends Component {
       resetZigbee2mqttStatus,
       configuration = {}
     } = props;
-    const { z2mContainerError, mqttConnectionError, installation } = props.zigbee2mqttStatus || {};
+    const { z2mContainerError, mqttConnectionError, installation, zigbee2mqttConnected } =
+      props.zigbee2mqttStatus || {};
     const loading = loadZigbee2mqttStatus === RequestStatus.Getting || loadZigbee2mqttConfig === RequestStatus.Getting;
     const error = loadZigbee2mqttStatus === RequestStatus.Error || loadZigbee2mqttConfig === RequestStatus.Error;
     const success = loadZigbee2mqttStatus === RequestStatus.Success && loadZigbee2mqttConfig === RequestStatus.Success;
@@ -51,7 +52,9 @@ class SetupTab extends Component {
       setupZigee2mqttStatus === RequestStatus.Getting ||
       toggleZigee2mqttStatus === RequestStatus.Getting ||
       resetZigbee2mqttStatus === RequestStatus.Getting;
-    const disabled = loading || saving;
+    // The setup answers at once and the installation goes on in the background: the server refuses the other actions
+    const installing = installation && installation.state === 'running';
+    const disabled = loading || saving || installing;
     const isLocalMode = configuration.mqttMode === MQTT_MODE.LOCAL;
     const { mqttRunning = false } = props.zigbee2mqttStatus || {};
 
@@ -79,6 +82,7 @@ class SetupTab extends Component {
               <ul class="list-group list-group-flush list-unstyled">
                 <InstallationProgress
                   installation={installation}
+                  zigbee2mqttConnected={zigbee2mqttConnected}
                   statusErrors={[z2mContainerError, mqttConnectionError]}
                 />
                 {success && <SetupPanel {...props} disabled={disabled} />}

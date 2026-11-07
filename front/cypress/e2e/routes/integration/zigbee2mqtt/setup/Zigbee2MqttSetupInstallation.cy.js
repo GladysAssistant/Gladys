@@ -46,6 +46,15 @@ describe('Zigbee2mqtt installation progress', () => {
     durationMs: 154000
   };
 
+  const doneInstallation = { ...runningInstallation, state: 'done', progress: 100 };
+  // The dongle is saved, but not yet the port of the interface nor the MQTT credentials, saved at the end
+  const localSetup = {
+    Z2M_MQTT_MODE: 'local',
+    Z2M_ADAPTER_MODE: 'usb',
+    ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+    ZIGBEE_DONGLE_NAME: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P'
+  };
+
   const idleInstallation = { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null };
   const notEnoughDiskSpace = {
     state: 'failed',
@@ -130,6 +139,88 @@ describe('Zigbee2mqtt installation progress', () => {
     cy.get('[data-cy=z2m-installation-phase]').i18n('integration.zigbee2mqtt.setup.installation.phases.start_z2m');
   });
 
+  it('should name the running phase rather than a pending one above it', () => {
+    // Zigbee2mqtt is downloaded after the broker is started
+    const startingBroker = {
+      ...runningInstallation,
+      phases: phases({
+        pull_z2m: 'pending',
+        pull_mqtt: 'done',
+        start_mqtt: 'running',
+        start_z2m: 'pending',
+        connect_adapter: 'pending'
+      })
+    };
+    visitSetup({ ...readyToSetupStatus, installation: startingBroker, prefetch });
+
+    cy.get('[data-cy=z2m-installation-phase]').i18n('integration.zigbee2mqtt.setup.installation.phases.start_mqtt');
+  });
+
+  it('should not show the failure once Zigbee2mqtt answers', () => {
+    // Restarted by Docker after the failure
+    visitSetup({
+      ...readyToSetupStatus,
+      gladysConnected: true,
+      zigbee2mqttConnected: true,
+      installation: failedInstallation,
+      prefetch
+    });
+
+    // Shown once the status is loaded, like the progress of the installation
+    cy.get('[data-cy=z2m-setup-local-panel]').should('exist');
+    cy.get('[data-cy=z2m-installation-progress]').should('not.exist');
+  });
+
+  it('should disable the controls while an installation is running', () => {
+    visitSetup(
+      { ...readyToSetupStatus, usbConfigured: true, installation: runningInstallation, prefetch },
+      { setup: localSetup }
+    );
+
+    cy.get('[data-cy=z2m-installation-progress]').should('exist');
+    cy.get('#enableZigbee2mqtt').should('be.disabled');
+    cy.get('[data-cy=z2m-reset-button]').should('be.disabled');
+    cy.get('[data-cy=z2m-setup-local-summary] button').should('be.disabled');
+
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.install-progress',
+      payload: { installation: doneInstallation, prefetch }
+    });
+    cy.get('#enableZigbee2mqtt').should('not.be.disabled');
+    cy.get('[data-cy=z2m-reset-button]').should('not.be.disabled');
+    cy.get('[data-cy=z2m-setup-local-summary] button').should('not.be.disabled');
+  });
+
+  it('should reload the configuration once the installation is over', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    visitSetup(
+      { ...readyToSetupStatus, usbConfigured: true, installation: runningInstallation, prefetch },
+      { setup: localSetup }
+    );
+    cy.wait('@config');
+    cy.get('[data-cy=z2m-mqtt-external-credentials-pending]').should('exist');
+
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` },
+      {
+        body: {
+          ...localSetup,
+          Z2M_TCP_PORT: '12000',
+          GLADYS_MQTT_USERNAME: 'gladys',
+          GLADYS_MQTT_PASSWORD: 'generated-password'
+        }
+      }
+    ).as('configAfterInstallation');
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.install-progress',
+      payload: { installation: doneInstallation, prefetch }
+    });
+    cy.wait('@configAfterInstallation');
+
+    cy.get('[data-cy=z2m-mqtt-external-credentials]').should('exist');
+    cy.get('a[href$=":12000"]').should('exist');
+  });
+
   it('should not repeat an error already shown by the status', () => {
     visitSetup({
       ...readyToSetupStatus,
@@ -186,6 +277,20 @@ describe('Zigbee2mqtt installation progress', () => {
 
     cy.get('[data-cy=z2m-setup-save-conflict]').i18n('integration.zigbee2mqtt.setup.installation.alreadyRunning');
     cy.get('[data-cy=z2m-setup-save-error]').should('not.exist');
+
+    // The warning lasts as long as the installation
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.install-progress',
+      payload: { installation: runningInstallation, prefetch }
+    });
+    cy.get('[data-cy=z2m-installation-progress]').should('exist');
+    cy.get('[data-cy=z2m-setup-save-conflict]').should('exist');
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.install-progress',
+      payload: { installation: doneInstallation, prefetch }
+    });
+    cy.get('[data-cy=z2m-installation-progress]').should('not.exist');
+    cy.get('[data-cy=z2m-setup-save-conflict]').should('not.exist');
   });
 
   it('should download the images in the background when nothing is configured', () => {
