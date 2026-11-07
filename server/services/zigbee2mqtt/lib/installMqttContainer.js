@@ -5,6 +5,8 @@ const fse = require('fs-extra');
 
 const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
+const { formatDuration } = require('../utils/formatDuration');
+const { isImageUpToDate } = require('../utils/isImageUpToDate');
 
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 
@@ -35,7 +37,10 @@ async function installMqttContainer(config) {
     try {
       logger.info('MQTT broker is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
-      await this.gladys.system.pull(containerDescriptor.Image);
+      const pullStartedAt = Date.now();
+      const pullOutput = await this.gladys.system.pull(containerDescriptor.Image);
+      const pullOutcome = isImageUpToDate(pullOutput) ? 'already present' : 'pulled';
+      logger.info(`${containerDescriptor.Image} image ${pullOutcome} in ${formatDuration(Date.now() - pullStartedAt)}`);
 
       // Prepare broker env
       logger.info(`Preparing broker environment...`);
@@ -59,7 +64,9 @@ async function installMqttContainer(config) {
       await containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
 
       logger.info(`Creating container with data in "${basePathOnHost}" on host...`);
+      const creationStartedAt = Date.now();
       containerMqtt = await this.gladys.system.createContainer(containerDescriptorToMutate);
+      logger.info(`MQTT broker container created in ${formatDuration(Date.now() - creationStartedAt)}`);
       logger.trace(containerMqtt);
       this.mqttExist = true;
     } catch (e) {
@@ -72,7 +79,9 @@ async function installMqttContainer(config) {
 
     try {
       logger.info('MQTT broker is restarting...');
+      const restartStartedAt = Date.now();
       await this.gladys.system.restartContainer(containerMqtt.id);
+      logger.info(`MQTT broker container started in ${formatDuration(Date.now() - restartStartedAt)}`);
 
       // Wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
@@ -93,6 +102,7 @@ async function installMqttContainer(config) {
       // wait 5 seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
 
+      logger.info(`MQTT broker ready in ${formatDuration(Date.now() - restartStartedAt)}`);
       logger.info('MQTT broker container successfully started and configured');
 
       this.mqttRunning = true;
@@ -109,9 +119,12 @@ async function installMqttContainer(config) {
     try {
       if (container.state !== 'running') {
         logger.info('MQTT broker is starting...');
+        const restartStartedAt = Date.now();
         await this.gladys.system.restartContainer(container.id);
+        logger.info(`MQTT broker container started in ${formatDuration(Date.now() - restartStartedAt)}`);
         // wait a few seconds for the container to restart
         await sleep(this.containerRestartWaitTimeInMs);
+        logger.info(`MQTT broker ready in ${formatDuration(Date.now() - restartStartedAt)}`);
       }
 
       logger.info('MQTT broker container successfully started');
