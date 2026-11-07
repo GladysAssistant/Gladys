@@ -108,6 +108,11 @@ const IMAGE_SIZE_IN_BYTES = {
   'eclipse-mosquitto:2.0.15': 22400000,
 };
 
+// Left free on top of the images downloaded ahead of the installation: the databases of Gladys keep writing on the
+// same disk, a download that fills it would break them. The free space is also measured on the disk of the Gladys
+// container, not always the one where Docker stores its images.
+const DISK_SPACE_MARGIN_IN_BYTES = 500000000;
+
 const SETUP_VARIABLES = [
   CONFIGURATION.Z2M_DRIVER_PATH,
   CONFIGURATION.ZIGBEE_DONGLE_NAME,
@@ -180,6 +185,7 @@ module.exports = {
   INSTALLATION_PHASE_WEIGHTS,
   INSTALLATION_ERROR,
   IMAGE_SIZE_IN_BYTES,
+  DISK_SPACE_MARGIN_IN_BYTES,
   SETUP_VARIABLES,
   DEFAULT,
 };

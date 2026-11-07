@@ -463,15 +463,23 @@ describe('zigbee2mqtt init', () => {
       );
     });
 
-    it('should fail a first installation when the images are not downloaded', async () => {
+    it('should go on with the containers in place when the images are not downloaded ahead, without an update', async () => {
       // PREPARE
       gladys.system.getContainers = fake.resolves([]);
       const error = new Error('docker fail pull');
       zigbee2mqttManager.pullMissingImages = sinon.stub().rejects(error);
       // EXECUTE
-      await expect(zigbee2mqttManager.init()).to.be.rejectedWith(error);
+      await zigbee2mqttManager.init();
       // ASSERT
-      assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
+      // A container to create downloads its image again, and fails there if it still cannot
+      assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
+      assert.calledOnce(zigbee2mqttManager.installMqttContainer);
+      assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+      assert.calledOnceWithExactly(
+        logger.warn,
+        'Zigbee2mqtt: images not downloaded ahead, going on with the containers in place:',
+        error,
+      );
       assert.notCalled(zigbee2mqttManager.finishInstallation);
     });
 
