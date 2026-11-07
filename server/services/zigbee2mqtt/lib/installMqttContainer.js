@@ -1,5 +1,4 @@
 const cloneDeep = require('lodash.clonedeep');
-const { promisify } = require('util');
 const path = require('path');
 const fse = require('fs-extra');
 
@@ -7,12 +6,11 @@ const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
 const { formatDuration } = require('../utils/formatDuration');
+const { hashMosquittoPassword } = require('../utils/hashMosquittoPassword');
 const { isImageUpToDate } = require('../utils/isImageUpToDate');
 const { addPullEvent, getPullProgress } = require('../utils/getPullProgress');
 
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
-
-const sleep = promisify(setTimeout);
 
 const { PULL_MQTT, START_MQTT } = INSTALLATION_PHASE;
 const { RUNNING, DONE, SKIPPED } = INSTALLATION_PHASE_STATE;
@@ -69,9 +67,14 @@ async function installMqttContainer(config) {
       await fse.ensureDir(mosquittoFolderPath);
       const mosquittoConfContent = await fse.readFile(path.join(__dirname, '../docker/mosquitto.conf'));
       await fse.writeFile(mosquittoConfigFilePath, mosquittoConfContent, 'utf-8');
-      // create an empty password file so that the container can start
-      // it'll be filled later
-      await fse.writeFile(mosquittoPasswordFilePath, '', 'utf-8');
+      // Both accounts are written before the container is created, hashed like mosquitto_passwd does: the broker
+      // starts once, already configured, instead of being restarted once the accounts are added inside it
+      const { z2mMqttUsername, z2mMqttPassword, mqttUsername, mqttPassword } = config;
+      const mosquittoPasswordContent = [
+        `${z2mMqttUsername}:${hashMosquittoPassword(z2mMqttPassword)}`,
+        `${mqttUsername}:${hashMosquittoPassword(mqttPassword)}`,
+      ].join('\n');
+      await fse.writeFile(mosquittoPasswordFilePath, `${mosquittoPasswordContent}\n`, 'utf-8');
 
       await containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
 
@@ -90,31 +93,12 @@ async function installMqttContainer(config) {
     }
 
     try {
-      logger.info('MQTT broker is restarting...');
+      // Created stopped: this is its only start, its configuration and accounts are already written
+      logger.info('MQTT broker is starting...');
       const restartStartedAt = Date.now();
       await this.gladys.system.restartContainer(containerMqtt.id);
       logger.info(`MQTT broker container started in ${formatDuration(Date.now() - restartStartedAt)}`);
-
-      // Wait a few seconds for the container to restart
-      await sleep(this.containerRestartWaitTimeInMs);
-
-      // Copy password in broker container
-      const { z2mMqttUsername, z2mMqttPassword, mqttUsername, mqttPassword } = config;
-      logger.info(`Creating user/pass...`);
-      await this.gladys.system.exec(containerMqtt.id, {
-        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', z2mMqttUsername, z2mMqttPassword],
-      });
-      await this.gladys.system.exec(containerMqtt.id, {
-        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUsername, mqttPassword],
-      });
-
-      // Container restart to initialize users configuration
-      logger.info('MQTT broker is restarting...');
-      await this.gladys.system.restartContainer(containerMqtt.id);
-      // wait 5 seconds for the container to restart
-      await sleep(this.containerRestartWaitTimeInMs);
-
-      logger.info(`MQTT broker ready in ${formatDuration(Date.now() - restartStartedAt)}`);
+      await this.waitForBroker(config);
       logger.info('MQTT broker container successfully started and configured');
 
       this.mqttRunning = true;
@@ -137,9 +121,7 @@ async function installMqttContainer(config) {
         const restartStartedAt = Date.now();
         await this.gladys.system.restartContainer(container.id);
         logger.info(`MQTT broker container started in ${formatDuration(Date.now() - restartStartedAt)}`);
-        // wait a few seconds for the container to restart
-        await sleep(this.containerRestartWaitTimeInMs);
-        logger.info(`MQTT broker ready in ${formatDuration(Date.now() - restartStartedAt)}`);
+        await this.waitForBroker(config);
         this.updateInstallationPhase(START_MQTT, { state: DONE });
       } else {
         this.updateInstallationPhase(START_MQTT, { state: SKIPPED });

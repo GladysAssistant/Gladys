@@ -1,5 +1,4 @@
 const cloneDeep = require('lodash.clonedeep');
-const { promisify } = require('util');
 
 const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
@@ -9,8 +8,6 @@ const { isImageUpToDate } = require('../utils/isImageUpToDate');
 const { addPullEvent, getPullProgress } = require('../utils/getPullProgress');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
-
-const sleep = promisify(setTimeout);
 
 const { PULL_Z2M, START_Z2M } = INSTALLATION_PHASE;
 const { RUNNING, DONE, SKIPPED } = INSTALLATION_PHASE_STATE;
@@ -211,8 +208,6 @@ async function installZ2mContainer(config, setupMode = false) {
       const restartStartedAt = Date.now();
       await this.gladys.system.restartContainer(container.id);
       logger.info(`Zigbee2mqtt container started in ${formatDuration(Date.now() - restartStartedAt)}`);
-      // wait a few seconds for the container to restart
-      await sleep(this.containerRestartWaitTimeInMs);
       // We read the logs in non blocking mode
       this.readZ2mContainerLogs(container.id, restartedAt);
       this.updateInstallationPhase(START_Z2M, { state: DONE });

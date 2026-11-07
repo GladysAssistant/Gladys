@@ -97,7 +97,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
     zigbee2mqttManager.networkModeValid = true;
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
-    zigbee2mqttManager.containerRestartWaitTimeInMs = 0;
   });
 
   afterEach(() => {
@@ -108,7 +107,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('should end the startup window when Zigbee2mqtt does not answer in time', async () => {
     // PREPARE
-    // Only the startup timer is faked: the wait after the restart and the log stream keep real timers
+    // Only the startup timer is faked: the log stream keeps real timers
     const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     try {
       // EXECUTE

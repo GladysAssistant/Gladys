@@ -19,6 +19,7 @@ const zigbee2mqttManager = {
   getUsbPorts: fake.resolves(['port']),
   status: fake.returns(true),
   getSetup: fake.resolves({ config: 'values' }),
+  getConfiguration: fake.resolves({ mqttUrl: 'mqtt://localhost:1884' }),
   setup: fake.resolves(true),
   init: fake.resolves(true),
   installMqttContainer: fake.resolves(true),
@@ -127,7 +128,7 @@ describe('zigbee2mqtt API', () => {
     };
 
     await controller['post /api/v1/service/zigbee2mqtt/mqtt/start'].controller(req, res);
-    assert.calledOnce(zigbee2mqttManager.installMqttContainer);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, { mqttUrl: 'mqtt://localhost:1884' });
     assert.calledWith(res.json, { success: true });
   });
 
