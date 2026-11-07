@@ -10,6 +10,10 @@ const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
+// Logged by Zigbee2mqtt 2.14.2 when the ember driver refuses a firmware older than EmberZNet 7.4
+const OLD_FIRMWARE_LOG =
+  '[2026-11-06 10:00:00] error: z2m: Adapter EZSP protocol version (12) is not supported by Host [13-19].';
+
 /**
  * Build a fake log stream that emits the given log text via 'data' then 'end'.
  * @description Creates an EventEmitter that asynchronously emits a 'data' event with the
@@ -74,15 +78,15 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     };
 
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, {}, serviceId);
+    zigbee2mqttManager.fallbackToEzsp = fake.resolves(null);
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('should detect EZSP protocol version error and set z2mContainerError', async () => {
-    const ezspLog = 'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12';
-    const stream = buildLogStream(ezspLog);
+  it('should detect EZSP protocol version error, set z2mContainerError and fall back on ezsp', async () => {
+    const stream = buildLogStream(OLD_FIRMWARE_LOG);
     gladys.system.getContainerLogs = fake.resolves(stream);
 
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc', 1700000000);
@@ -91,6 +95,7 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     // Only the logs of the current run: those of a previous run would explain a failure that no longer happens
     assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', { follow: true, since: 1700000000 });
     assert.calledOnce(stream.destroy);
+    assert.calledOnceWithExactly(zigbee2mqttManager.fallbackToEzsp);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -105,7 +110,20 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    assert.notCalled(zigbee2mqttManager.fallbackToEzsp);
     assert.calledOnce(gladys.event.emit);
+  });
+
+  it('should show a firmware too recent for the ember driver as a raw error, without falling back on ezsp', async () => {
+    // The ezsp driver refuses it too
+    const log =
+      '[2026-11-06 10:00:00] error: z2m: Adapter EZSP protocol version (20) is not supported by Host [13-19].';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: log });
+    assert.notCalled(zigbee2mqttManager.fallbackToEzsp);
   });
 
   it('should set z2mContainerError to null on stream error and still emit status', async () => {
@@ -126,8 +144,7 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     assert.calledOnce(gladys.event.emit);
   });
 
-  it('should require both EZSP substrings to trigger the error', async () => {
-    // Only the first part of the EZSP error message, not the second
+  it('should not detect the EZSP error without the protocol versions', async () => {
     const partialLog = 'Adapter EZSP protocol version 13 detected';
     gladys.system.getContainerLogs = fake.resolves(buildLogStream(partialLog));
 
@@ -172,19 +189,17 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
   it('should ignore a known error found at the end of the logs when Zigbee2mqtt is online', async () => {
     // Zigbee2mqtt answers: whatever was logged did not prevent it from running
     zigbee2mqttManager.zigbee2mqttConnected = true;
-    const ezspLog = 'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(OLD_FIRMWARE_LOG));
 
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    assert.notCalled(zigbee2mqttManager.fallbackToEzsp);
   });
 
   it('should ignore a known error found while reading when Zigbee2mqtt is online', async () => {
     zigbee2mqttManager.zigbee2mqttConnected = true;
-    const ezspLog =
-      'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12\nmore logs\n';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(`${OLD_FIRMWARE_LOG}\nmore logs\n`));
 
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
@@ -252,8 +267,7 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
   });
 
   it('should prefer known error code over raw error lines', async () => {
-    const log =
-      'error: some random error\nAdapter EZSP protocol version 13 is not supported by Host\nerror: another error';
+    const log = `error: some random error\n${OLD_FIRMWARE_LOG}\nerror: another error`;
     const stream = buildLogStream(log);
     gladys.system.getContainerLogs = fake.resolves(stream);
 

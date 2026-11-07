@@ -127,6 +127,16 @@ describe('zigbee2mqtt installz2mContainer', () => {
     }
   });
 
+  it('should keep the configuration of the ezsp fallback when called without configuration', async () => {
+    // POST /z2m/start calls it without configuration: it fails, and must not leave a pending log reader without one
+    const config = { z2mDongleName: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P' };
+    zigbee2mqttManager.installedConfig = config;
+
+    await expect(zigbee2mqttManager.installZ2mContainer()).to.be.rejectedWith(TypeError);
+
+    expect(zigbee2mqttManager.installedConfig).to.equal(config);
+  });
+
   it('should restart z2m container (container stopped)', async () => {
     // PREPARE
     const config = {};
@@ -135,6 +145,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // ASSERT
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
     assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    // The very object of init, which the ezsp fallback changes before installing Zigbee2mqtt again
+    expect(zigbee2mqttManager.installedConfig).to.equal(config);
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: {
@@ -152,6 +164,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -202,6 +215,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -379,6 +393,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -493,6 +508,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -533,6 +549,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -573,6 +590,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -593,6 +611,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
