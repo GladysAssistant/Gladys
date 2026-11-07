@@ -8,6 +8,7 @@ const { assert, fake, stub } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ConflictError } = require('../../../../utils/coreErrors');
+const logger = require('../../../../utils/logger');
 
 const configureContainer = fake.resolves({ configChanged: false, adapterChanged: false });
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
@@ -655,6 +656,29 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
     expect(config).to.deep.equal({});
+  });
+
+  it('should log how long each step of the installation takes', async () => {
+    // PREPARE
+    const infoStub = sinon.stub(logger, 'info');
+    gladys.system.getContainers = stub()
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([containerStopped]);
+    gladys.system.pull = fake.resolves([{ status: 'Status: Downloaded newer image for koenkk/zigbee2mqtt:2.14.2' }]);
+    // EXECUTE
+    try {
+      await zigbee2mqttManager.installZ2mContainer({});
+    } finally {
+      infoStub.restore();
+    }
+    // ASSERT
+    assert.calledWith(infoStub, sinon.match(/^koenkk\/zigbee2mqtt:.+ image pulled in \d+\.\d s$/));
+    assert.calledWith(infoStub, sinon.match(/^Zigbee2mqtt container created in \d+\.\d s$/));
+    assert.calledWith(infoStub, sinon.match(/^Zigbee2mqtt container started in \d+\.\d s$/));
+    // To log how long Zigbee2mqtt takes to answer
+    expect(zigbee2mqttManager.zigbee2mqttStartingSince).to.be.a('number');
   });
 
   it('should detect EZSP protocol version error in container logs', async () => {

@@ -4,6 +4,8 @@ const { promisify } = require('util');
 const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { ADAPTER_MODE } = require('./constants');
+const { formatDuration } = require('../utils/formatDuration');
+const { isImageUpToDate } = require('../utils/isImageUpToDate');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
@@ -122,7 +124,10 @@ async function installZ2mContainer(config, setupMode = false) {
     try {
       logger.info('Zigbee2mqtt is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
-      await this.gladys.system.pull(containerDescriptor.Image);
+      const pullStartedAt = Date.now();
+      const pullOutput = await this.gladys.system.pull(containerDescriptor.Image);
+      const pullOutcome = isImageUpToDate(pullOutput) ? 'already present' : 'pulled';
+      logger.info(`${containerDescriptor.Image} image ${pullOutcome} in ${formatDuration(Date.now() - pullStartedAt)}`);
 
       logger.info(`Configuration of Device ${networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath}`);
       const containerDescriptorToMutate = buildContainerDescriptor(
@@ -133,7 +138,9 @@ async function installZ2mContainer(config, setupMode = false) {
       );
 
       logger.info(`Creation of container...`);
+      const creationStartedAt = Date.now();
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
+      logger.info(`Zigbee2mqtt container created in ${formatDuration(Date.now() - creationStartedAt)}`);
       logger.trace(containerLog);
       logger.info('Zigbee2mqtt successfully installed and configured as Docker container');
       this.zigbee2mqttExist = true;
@@ -163,7 +170,9 @@ async function installZ2mContainer(config, setupMode = false) {
         networkAdapter,
         timezone,
       );
+      const creationStartedAt = Date.now();
       await this.gladys.system.createContainer(containerDescriptorToMutate);
+      logger.info(`Zigbee2mqtt container created in ${formatDuration(Date.now() - creationStartedAt)}`);
 
       container = await findManagedContainer(this.gladys.system, containerDescriptor);
     }
@@ -174,6 +183,8 @@ async function installZ2mContainer(config, setupMode = false) {
       // Until Zigbee2mqtt answers, the UI tells that it is starting, for a bounded time: a Zigbee2mqtt that
       // crashes before connecting to the broker never says anything
       this.zigbee2mqttStarting = true;
+      // To log how long Zigbee2mqtt takes to answer once restarted
+      this.zigbee2mqttStartingSince = Date.now();
       clearTimeout(this.startingTimer);
       this.startingTimer = setTimeout(() => {
         this.startingTimer = null;
@@ -183,7 +194,9 @@ async function installZ2mContainer(config, setupMode = false) {
       // Only the logs of the new run explain why it fails. Docker counts in seconds: taken before the restart, not
       // to miss the first lines of the new run
       const restartedAt = Math.floor(Date.now() / 1000);
+      const restartStartedAt = Date.now();
       await this.gladys.system.restartContainer(container.id);
+      logger.info(`Zigbee2mqtt container started in ${formatDuration(Date.now() - restartStartedAt)}`);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
       // We read the logs in non blocking mode

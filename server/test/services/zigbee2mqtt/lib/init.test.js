@@ -3,6 +3,7 @@ const { expect } = require('chai');
 
 const { assert, fake } = sinon;
 
+const logger = require('../../../../utils/logger');
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const container = {
@@ -209,6 +210,21 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
+  });
+
+  it('should log how long the installation of the containers takes', async () => {
+    // PREPARE
+    const infoStub = sinon.stub(logger, 'info');
+    zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' });
+    zigbee2mqttManager.installZ2mContainer.callsFake(() => clock.tick(102400));
+    // EXECUTE
+    try {
+      await zigbee2mqttManager.init();
+    } finally {
+      infoStub.restore();
+    }
+    // ASSERT
+    assert.calledWithExactly(infoStub, 'Zigbee2mqtt: containers installed and started in 1 min 42 s');
   });
 
   it('should not install containers, network coordinator not configured', async () => {

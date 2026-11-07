@@ -67,6 +67,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.zigbee2mqttConnected = false;
   // Gladys (re)started the Zigbee2mqtt container and waits for it to answer
   this.zigbee2mqttStarting = false;
+  // When Gladys (re)started it, to log how long Zigbee2mqtt took to answer
+  this.zigbee2mqttStartingSince = null;
   this.z2mPermitJoin = false;
   this.healthCheckTimer = null;
   this.networkModeValid = false;

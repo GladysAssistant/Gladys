@@ -243,6 +243,22 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.startingTimer).to.equal(null);
   });
 
+  it('should log how long Zigbee2mqtt took to answer after the restart of its container', async () => {
+    // PREPARE
+    const infoStub = sinon.stub(logger, 'info');
+    zigbee2mqttManager.zigbee2mqttStarting = true;
+    zigbee2mqttManager.zigbee2mqttStartingSince = Date.now() - 42000;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    // A later answer does not end a startup
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    // ASSERT
+    assert.calledOnceWithExactly(
+      infoStub,
+      sinon.match(/^Zigbee2mqtt answered 42\.\d s after the restart of its container$/),
+    );
+  });
+
   it('should set Zigbee2mqtt offline from bridge/state', async () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = true;

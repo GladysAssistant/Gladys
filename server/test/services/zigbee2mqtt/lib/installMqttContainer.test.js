@@ -7,6 +7,7 @@ const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ConflictError } = require('../../../../utils/coreErrors');
+const logger = require('../../../../utils/logger');
 
 const { installMqttContainer } = proxyquire('../../../../services/zigbee2mqtt/lib/installMqttContainer', {});
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
@@ -292,6 +293,44 @@ describe('zigbee2mqtt installMqttContainer', () => {
     const mosquittoPwdContent = await fs.readFile(mosquittoPwdPath, 'utf-8');
     expect(mosquittoPwdContent).to.equal('');
   });
+
+  it('should log how long each step of the installation takes', async () => {
+    // PREPARE
+    const infoStub = sinon.stub(logger, 'info');
+    gladys.system.getContainers = sinon
+      .stub()
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([container]);
+    gladys.system.pull = fake.resolves([{ status: 'Status: Image is up to date for eclipse-mosquitto:2.0.15' }]);
+    // EXECUTE
+    try {
+      await zigbee2mqttManager.installMqttContainer({});
+    } finally {
+      infoStub.restore();
+    }
+    // ASSERT
+    assert.calledWith(infoStub, sinon.match(/^eclipse-mosquitto:.+ image already present in \d+\.\d s$/));
+    assert.calledWith(infoStub, sinon.match(/^MQTT broker container created in \d+\.\d s$/));
+    assert.calledWith(infoStub, sinon.match(/^MQTT broker container started in \d+\.\d s$/));
+    assert.calledWith(infoStub, sinon.match(/^MQTT broker ready in \d+\.\d s$/));
+  });
+
+  it('should log how long a stopped broker takes to start', async () => {
+    // PREPARE
+    const infoStub = sinon.stub(logger, 'info');
+    // EXECUTE
+    try {
+      await zigbee2mqttManager.installMqttContainer({});
+    } finally {
+      infoStub.restore();
+    }
+    // ASSERT
+    assert.calledWith(infoStub, sinon.match(/^MQTT broker container started in \d+\.\d s$/));
+    assert.calledWith(infoStub, sinon.match(/^MQTT broker ready in \d+\.\d s$/));
+  });
+
   it('should fail to configure MQTT container', async function Test() {
     // PREPARE
     this.timeout(11000);

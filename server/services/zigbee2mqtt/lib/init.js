@@ -2,6 +2,7 @@ const logger = require('../../../utils/logger');
 const { CONFIGURATION, MQTT_MODE, ADAPTER_MODE } = require('./constants');
 const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { formatDuration } = require('../utils/formatDuration');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
@@ -11,6 +12,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
  * await z2m.init();
  */
 async function init(setupMode = false) {
+  const startedAt = Date.now();
   // Reset status
   this.usbConfigured = false;
   this.networkAdapterConfigured = false;
@@ -135,6 +137,7 @@ async function init(setupMode = false) {
         this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
       }
     }
+    logger.info(`Zigbee2mqtt: containers installed and started in ${formatDuration(Date.now() - startedAt)}`);
   } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
     await this.connect(configuration);
   }
