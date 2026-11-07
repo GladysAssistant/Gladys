@@ -68,6 +68,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
       system: {
         getContainers: fake.resolves([containerStopped]),
         stopContainer: fake.resolves(true),
+        imageExists: fake.resolves(false),
         pull: fake.resolves(true),
         restartContainer: fake.resolves(true),
         createContainer: fake.resolves(true),
@@ -365,7 +366,6 @@ describe('zigbee2mqtt installMqttContainer', () => {
       .resolves([])
       .onSecondCall()
       .resolves([container]);
-    gladys.system.pull = fake.resolves([{ status: 'Status: Image is up to date for eclipse-mosquitto:2.0.15' }]);
     // EXECUTE
     try {
       await zigbee2mqttManager.installMqttContainer({ ...credentials });
@@ -373,7 +373,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
       infoStub.restore();
     }
     // ASSERT
-    assert.calledWith(infoStub, sinon.match(/^eclipse-mosquitto:.+ image already present in \d+\.\d s$/));
+    assert.calledWith(infoStub, sinon.match(/^eclipse-mosquitto:.+ image pulled in \d+\.\d s$/));
     assert.calledWith(infoStub, sinon.match(/^MQTT broker container created in \d+\.\d s$/));
     assert.calledWith(infoStub, sinon.match(/^MQTT broker container started in \d+\.\d s$/));
   });
@@ -435,6 +435,42 @@ describe('zigbee2mqtt installMqttContainer', () => {
       // Marked as failed by finishInstallation
       expect(phase('pull_mqtt').state).to.equal('done');
       expect(phase('start_mqtt').state).to.equal('running');
+    });
+
+    it('should not download an image already present, and create the broker', async () => {
+      // PREPARE
+      gladys.system.getContainers = sinon
+        .stub()
+        .onFirstCall()
+        .resolves([])
+        .onSecondCall()
+        .resolves([container]);
+      gladys.system.imageExists = fake.resolves(true);
+      // EXECUTE
+      await zigbee2mqttManager.installMqttContainer({ ...credentials });
+      // ASSERT
+      // Faster, and works offline: Docker would ask the registry
+      assert.calledOnceWithExactly(gladys.system.imageExists, 'eclipse-mosquitto:2.0.15');
+      assert.notCalled(gladys.system.pull);
+      assert.calledOnce(gladys.system.createContainer);
+      expect(phase('pull_mqtt')).to.deep.equal({ key: 'pull_mqtt', state: 'skipped', progress: 100 });
+      expect(phase('start_mqtt')).to.deep.equal({ key: 'start_mqtt', state: 'done', progress: 100 });
+    });
+
+    it('should keep the download done by init before', async () => {
+      // PREPARE
+      gladys.system.getContainers = sinon
+        .stub()
+        .onFirstCall()
+        .resolves([])
+        .onSecondCall()
+        .resolves([container]);
+      zigbee2mqttManager.updateInstallationPhase('pull_mqtt', { state: 'done' });
+      gladys.system.imageExists = fake.resolves(true);
+      // EXECUTE
+      await zigbee2mqttManager.installMqttContainer({ ...credentials });
+      // ASSERT
+      expect(phase('pull_mqtt')).to.deep.equal({ key: 'pull_mqtt', state: 'done', progress: 100 });
     });
 
     it('should skip the download, and start a stopped broker', async () => {

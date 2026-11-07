@@ -7,8 +7,6 @@ const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
 const { formatDuration } = require('../utils/formatDuration');
 const { hashMosquittoPassword } = require('../utils/hashMosquittoPassword');
-const { isImageUpToDate } = require('../utils/isImageUpToDate');
-const { addPullEvent, getPullProgress } = require('../utils/getPullProgress');
 
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 
@@ -39,17 +37,9 @@ async function installMqttContainer(config) {
     let containerMqtt;
     try {
       logger.info('MQTT broker is being installed as Docker container...');
-      logger.info(`Pulling ${containerDescriptor.Image} image...`);
-      this.updateInstallationPhase(PULL_MQTT, { state: RUNNING });
-      const pullStartedAt = Date.now();
-      let pullLayers = {};
-      const pullOutput = await this.gladys.system.pull(containerDescriptor.Image, (event) => {
-        pullLayers = addPullEvent(pullLayers, event);
-        this.updateInstallationPhase(PULL_MQTT, { state: RUNNING, progress: getPullProgress(pullLayers) });
-      });
-      const pullOutcome = isImageUpToDate(pullOutput) ? 'already present' : 'pulled';
-      logger.info(`${containerDescriptor.Image} image ${pullOutcome} in ${formatDuration(Date.now() - pullStartedAt)}`);
-      this.updateInstallationPhase(PULL_MQTT, { state: DONE });
+      await this.pullImage(containerDescriptor.Image);
+      // Done once downloaded, maybe before by init (see pullImage): skipped when the image was there already
+      this.updateInstallationPhase(PULL_MQTT, { state: SKIPPED });
       this.updateInstallationPhase(START_MQTT, { state: RUNNING });
 
       // Prepare broker env
