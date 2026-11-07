@@ -16,7 +16,9 @@ async function removeOwnContainer(system, descriptor) {
   const container = await findOwnContainer(system, descriptor);
   if (container) {
     await system.stopContainer(container.id);
-    await system.removeContainer(container.id);
+    // With its anonymous volumes (/mosquitto/data and /mosquitto/log of the broker image, unused: the broker persists
+    // in its configuration folder, mounted from the disk of Gladys), left behind at each removal otherwise
+    await system.removeContainer(container.id, { v: true });
   }
 }
 

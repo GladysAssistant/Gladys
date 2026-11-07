@@ -96,6 +96,8 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
     });
 
     assert.calledTwice(gladys.system.removeContainer);
+    // The broker with its anonymous volumes
+    assert.calledWithExactly(gladys.system.removeContainer, 'container-id', { force: true, v: true });
     assert.calledWithExactly(gladys.system.removeContainer, 'container-id', { force: true });
 
     expect(config).deep.equal({
