@@ -3,7 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
-const { MockedPhilipsHueClient, hueApiHsColorMode, hueApiCtColorMode } = require('../mocks.test');
+const { MockedPhilipsHueClient, hueApiHsColorMode, hueApiNoColorMode, hueApiCtColorMode } = require('../mocks.test');
 const { EVENTS } = require('../../../../utils/constants');
 
 const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
@@ -216,6 +216,34 @@ describe('PhilipsHueService Poll', () => {
       device_feature_external_id: 'philips-hue-light:1234:1:temperature',
       state: 305,
     });
+  });
+  it('should not emit a color state when the light reports no colormode', async () => {
+    // PREPARE
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    philipsHueService.device.hueClient.api = {
+      createLocal: () => ({
+        connect: () => hueApiNoColorMode,
+      }),
+    };
+    await philipsHueService.device.init();
+    // EXECUTE
+    await philipsHueService.device.poll({
+      external_id: 'light:1234:1',
+      features: [
+        {
+          category: 'light',
+          type: 'color',
+          last_value: 16759424,
+        },
+      ],
+    });
+    // ASSERT
+    // an undefined state can never be saved, so emitting it every 15s just
+    // spams the logs and the database with failing writes
+    const colorEmits = gladys.event.emit
+      .getCalls()
+      .filter((call) => call.args[1] && call.args[1].device_feature_external_id === 'philips-hue-light:1234:1:color');
+    expect(colorEmits).to.have.lengthOf(0);
   });
   it('should poll light and update bri', async () => {
     // PREPARE

@@ -87,6 +87,20 @@ const hueApiHsColorMode = {
   },
 };
 
+const hueApiNoColorMode = {
+  lights: {
+    // some third-party Zigbee bulbs omit colormode (notably while off)
+    getLightState: fake.resolves({
+      on: false,
+      bri: 100,
+      effect: 'none',
+      alert: 'select',
+      mode: 'homeautomation',
+      reachable: true,
+    }),
+  },
+};
+
 const hueApiCtColorMode = {
   lights: {
     getLightState: fake.resolves({
@@ -161,6 +175,7 @@ module.exports = {
   fakes,
   hueApi,
   hueApiHsColorMode,
+  hueApiNoColorMode,
   hueApiCtColorMode,
 };
 

@@ -49,7 +49,9 @@ async function poll(device) {
   }
   const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
 
-  if (colorFeature && colorFeature.last_value !== currentColorState) {
+  // an unknown colormode leaves currentColorState undefined, and an undefined
+  // state can never be saved - skip instead of failing the write every poll
+  if (colorFeature && currentColorState !== undefined && colorFeature.last_value !== currentColorState) {
     logger.debug(
       `Polling Philips Hue ${lightId}, new color value = ${currentColorState} from color mode ${state.colormode}`,
     );
