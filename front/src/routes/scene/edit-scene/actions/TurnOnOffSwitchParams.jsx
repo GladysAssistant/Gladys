@@ -15,19 +15,16 @@ class TurnOnOffSwitch extends Component {
         device_feature_type: DEVICE_FEATURE_TYPES.SWITCH.BINARY
       });
       // One option per writable switch, so each switch of a multi-switch device can be picked
+      // (the features are already filtered on the switch category and type by the API)
       const deviceOptions = [];
       devices.forEach(device => {
-        const switches = device.features.filter(
-          f =>
-            f.category === DEVICE_FEATURE_CATEGORIES.SWITCH &&
-            f.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
-            f.read_only === false
-        );
-        switches.forEach(feature => {
+        const switches = device.features.filter(f => f.read_only === false);
+        switches.forEach((feature, index) => {
           deviceOptions.push({
             value: feature.selector,
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
-            deviceSelector: device.selector
+            deviceSelector: device.selector,
+            isFirstSwitchOfDevice: index === 0
           });
         });
       });
@@ -42,19 +39,25 @@ class TurnOnOffSwitch extends Component {
     const deviceFeatures = selectedOptions ? selectedOptions.map(selectedOption => selectedOption.value) : [];
     this.props.updateActionProperty(this.props.path, 'device_features', deviceFeatures);
     // Scenes saved before the switches could be picked one by one store devices, shown
-    // as all their switches selected: the selection now lives in device_features only
+    // as their first switch selected: the selection now lives in device_features only
     if (this.props.action.devices) {
       this.props.updateActionProperty(this.props.path, 'devices', undefined);
     }
   };
   refreshSelectedOptions = nextProps => {
     const { device_features: deviceFeatures = [], devices = [] } = nextProps.action;
-    // Same rule as the execution: the devices are only a fallback when no switch is selected
-    const selectedOptions = (this.state.deviceOptions || []).filter(deviceOption =>
+    const deviceOptions = this.state.deviceOptions || [];
+    // Same rule as the execution: the devices are only a fallback when no switch is selected,
+    // and drive their first writable switch. The selection keeps the stored order, which
+    // react-select emits back on the next change.
+    const selectedOptions =
       deviceFeatures.length > 0
-        ? deviceFeatures.includes(deviceOption.value)
-        : devices.includes(deviceOption.deviceSelector)
-    );
+        ? deviceOptions
+            .filter(deviceOption => deviceFeatures.includes(deviceOption.value))
+            .sort((a, b) => deviceFeatures.indexOf(a.value) - deviceFeatures.indexOf(b.value))
+        : deviceOptions
+            .filter(deviceOption => deviceOption.isFirstSwitchOfDevice && devices.includes(deviceOption.deviceSelector))
+            .sort((a, b) => devices.indexOf(a.deviceSelector) - devices.indexOf(b.deviceSelector));
     this.setState({ selectedOptions });
   };
   constructor(props) {

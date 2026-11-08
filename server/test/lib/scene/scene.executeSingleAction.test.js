@@ -150,14 +150,21 @@ describe('scene.executeSingleAction multi-switch device', () => {
     assert.calledWith(device.setValue, powerStrip, socket1, 1);
     assert.calledWith(device.setValue, powerStrip, socket2, 0);
   });
-  it('should turn off every writable switch of a device selected the legacy way', async () => {
+  it('should turn off only the first writable switch of a device selected the legacy way', async () => {
     await sceneManager.executeSingleAction({
       type: ACTIONS.SWITCH.TURN_OFF,
       devices: ['power-strip'],
     });
-    assert.calledTwice(device.setValue);
-    assert.calledWith(device.setValue, powerStrip, socket1, 0);
-    assert.calledWith(device.setValue, powerStrip, socket2, 0);
+    assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 0);
+  });
+  it('should skip the read only switches of a device selected the legacy way', async () => {
+    const wallSwitch = { id: 'wall-switch-id', features: [readOnlySwitch, socket2] };
+    stateManager.setState('device', 'wall-switch', wallSwitch);
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_ON,
+      devices: ['wall-switch'],
+    });
+    assert.calledOnceWithExactly(device.setValue, wallSwitch, socket2, 1);
   });
   it('should only drive the selected switches when the legacy devices are also stored', async () => {
     await sceneManager.executeSingleAction({
@@ -185,8 +192,22 @@ describe('scene.executeSingleAction multi-switch device', () => {
       type: ACTIONS.SWITCH.TURN_ON,
       devices: ['deleted-device', 'power-strip'],
     });
-    assert.calledTwice(device.setValue);
-    assert.calledWith(device.setValue, powerStrip, socket1, 1);
-    assert.calledWith(device.setValue, powerStrip, socket2, 1);
+    assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 1);
+  });
+  it('should drive nothing when the action has neither switches nor devices', async () => {
+    await sceneManager.executeSingleAction({ type: ACTIONS.SWITCH.TURN_ON });
+    assert.notCalled(device.setValue);
+  });
+  it('should skip a selected switch whose device is not loaded', async () => {
+    stateManager.setState('deviceFeature', 'orphan-switch', {
+      ...socket1,
+      selector: 'orphan-switch',
+      device_id: 'unknown-device-id',
+    });
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.SWITCH.TURN_ON,
+      device_features: ['orphan-switch', 'power-strip-socket-1'],
+    });
+    assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 1);
   });
 });

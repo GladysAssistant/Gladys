@@ -379,6 +379,40 @@ describe('createSceneCreateInputSchema selectors', () => {
     ).to.equal(false);
   });
 
+  it('should accept the switch features picked one by one in a switch action', () => {
+    const schema = createSceneCreateInputSchema(
+      [],
+      [],
+      [],
+      [],
+      ['power-strip'],
+      [],
+      ['socket-1', 'socket-2', 'power-strip-sensor'],
+      [],
+      [],
+      [],
+      [],
+      ['socket-1', 'socket-2'],
+    );
+    const sceneWithSwitchFeatures = (deviceFeatures) => ({
+      name: 'My scene',
+      icon: 'lightbulb',
+      triggers: [{ type: 'system.start' }],
+      actions: [
+        [
+          { type: 'switch.turn-on', devices: [], device_features: deviceFeatures },
+          { type: 'switch.turn-off', devices: [], device_features: deviceFeatures },
+          { type: 'switch.toggle', devices: [], device_features: deviceFeatures },
+        ],
+      ],
+    });
+
+    const result = schema.safeParse(sceneWithSwitchFeatures(['socket-2']));
+    expect(result.success).to.equal(true);
+    expect(result.data.actions[0][0].device_features).to.deep.equal(['socket-2']);
+    expect(schema.safeParse(sceneWithSwitchFeatures(['power-strip-sensor'])).success).to.equal(false);
+  });
+
   it('should accept any selector when all the known selectors are empty', () => {
     const schema = createSceneCreateInputSchema([''], [], [], [], ['']);
     const result = schema.safeParse({

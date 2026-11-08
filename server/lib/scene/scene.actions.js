@@ -67,9 +67,9 @@ function warnIfInvalidJsonMessage(actionName, topic, message) {
 
 /**
  * @description Set the value of the switches of a switch action: each selected switch
- * (device_features), or, when none is selected, every writable switch of the selected devices
- * (devices, the format of the scenes saved before the switches of a multi-switch device could
- * be picked one by one, and of the scenes created through MCP).
+ * (device_features), or, when none is selected, the first writable switch of each selected
+ * device (devices, the format of the scenes saved before the switches of a multi-switch device
+ * could be picked one by one, and of the scenes created through MCP without device_features).
  * @param {object} self - Reference to the SceneManager.
  * @param {object} action - The switch action.
  * @param {Function} getValue - Returns the value to set, given the switch feature.
@@ -90,17 +90,23 @@ async function setSwitchesValue(self, action, getValue) {
       logger.warn(`Switch action: "${deviceFeatureSelector}" is not a writable switch`);
       return;
     }
-    switches.push({ device: self.stateManager.get('deviceById', deviceFeature.device_id), deviceFeature });
+    const device = self.stateManager.get('deviceById', deviceFeature.device_id);
+    if (!device) {
+      logger.warn(`Switch action: device of "${deviceFeatureSelector}" not found`);
+      return;
+    }
+    switches.push({ device, deviceFeature });
   });
   // The devices are only a fallback: when switches are selected, the selection lives in device_features
   const deviceSelectors = deviceFeatureSelectors.length > 0 ? [] : action.devices || [];
   deviceSelectors.forEach((deviceSelector) => {
     const device = self.stateManager.get('device', deviceSelector);
-    const deviceFeatures = get(device, 'features', { default: [] }).filter(isWritableSwitch);
-    if (deviceFeatures.length === 0) {
+    const deviceFeature = get(device, 'features', { default: [] }).find(isWritableSwitch);
+    if (!deviceFeature) {
       logger.warn(`Switch action: no writable switch found on device "${deviceSelector}"`);
+      return;
     }
-    deviceFeatures.forEach((deviceFeature) => switches.push({ device, deviceFeature }));
+    switches.push({ device, deviceFeature });
   });
   await Promise.map(switches, async ({ device, deviceFeature }) => {
     try {
@@ -272,7 +278,8 @@ const actionsFunc = {
     await setSwitchesValue(self, action, () => 0);
   },
   [ACTIONS.SWITCH.TOGGLE]: async (self, action) => {
-    await setSwitchesValue(self, action, (deviceFeature) => (deviceFeature.last_value === 0 ? 1 : 0));
+    // A switch which never reported its state (last_value null) is turned on
+    await setSwitchesValue(self, action, (deviceFeature) => (deviceFeature.last_value ? 0 : 1));
   },
   [ACTIONS.TIME.DELAY]: async (self, action, scope) => {
     let { value } = action;
