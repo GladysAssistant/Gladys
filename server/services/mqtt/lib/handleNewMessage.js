@@ -34,8 +34,11 @@ function handleNewMessage(topic, message) {
       }
     }, this);
 
-    // Handle custom device listener
-    const customListenersFound = this.deviceFeatureCustomMqttTopics.filter((t) => topic.match(t.regex_key));
+    // Handle custom device listener. Match with mqttTopicMatches like the core
+    // bindings above: the old regex was only built from the first "+" of the
+    // filter and was not anchored, so later wildcards stayed literal and any
+    // topic with the filter as prefix matched.
+    const customListenersFound = this.deviceFeatureCustomMqttTopics.filter((t) => mqttTopicMatches(t.topic, topic));
     customListenersFound.forEach((foundCustomListener) => {
       forwardedMessage = true;
       this.handleDeviceCustomTopicMessage(

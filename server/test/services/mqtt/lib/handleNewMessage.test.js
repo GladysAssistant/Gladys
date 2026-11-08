@@ -133,7 +133,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: null,
       },
@@ -149,7 +148,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: null,
       },
@@ -165,7 +163,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: null,
       },
@@ -181,7 +178,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: null,
       },
@@ -194,7 +190,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: null,
       },
@@ -208,7 +203,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -221,7 +215,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -241,7 +234,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -264,7 +256,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -284,7 +275,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -304,7 +294,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -327,7 +316,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -350,7 +338,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.status',
       },
@@ -374,13 +361,11 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
       {
         device_feature_id: '309c9ec6-193b-4fb5-a4db-29874984e834',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.co2',
       },
@@ -408,7 +393,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -421,7 +405,6 @@ describe('Mqtt handle message', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'test.temperature',
       },
@@ -435,6 +418,72 @@ describe('Mqtt handle message', () => {
         },
       }),
     );
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('matches custom topics with multiple + wildcards', async () => {
+    // build the listener through the production path so the same matching the
+    // service actually performs is under test
+    const device = {
+      selector: 'my-device',
+      features: [
+        {
+          id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        },
+      ],
+      params: [
+        {
+          name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
+          value: 'zigbee2mqtt/+/action/+/power',
+        },
+      ],
+    };
+    await mqttHandler.listenToCustomMqttTopicIfNeeded(device);
+    mqttHandler.handleNewMessage('zigbee2mqtt/kitchen/action/office/power', '12');
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 12,
+    });
+  });
+  it('matches a custom topic exactly, not as a prefix', async () => {
+    const device = {
+      selector: 'my-device',
+      features: [
+        {
+          id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        },
+      ],
+      params: [
+        {
+          name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
+          value: 'zigbee2mqtt/salon',
+        },
+      ],
+    };
+    await mqttHandler.listenToCustomMqttTopicIfNeeded(device);
+    mqttHandler.handleNewMessage('zigbee2mqtt/salon2', '12');
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('matches a custom topic wildcard over exactly one level', async () => {
+    const device = {
+      selector: 'my-device',
+      features: [
+        {
+          id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        },
+      ],
+      params: [
+        {
+          name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
+          value: 'zigbee2mqtt/+/action',
+        },
+      ],
+    };
+    await mqttHandler.listenToCustomMqttTopicIfNeeded(device);
+    // a "+" must not match two levels joined together
+    mqttHandler.handleNewMessage('zigbee2mqtt/kitchen/office/action', '12');
 
     assert.notCalled(gladys.event.emit);
   });
