@@ -178,10 +178,11 @@ describe('PhilipsHueService Poll', () => {
       ],
     });
     // ASSERT
-    // Color is hsb: 67, so 16187362 in Int
+    // The bridge reports hue 0-65535 and sat/bri 0-254: hue 35000 = 192°,
+    // sat 94 = 37%, bri 100 = 39% -> rgb 63,93,100 = 4152676 in Int
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'philips-hue-light:1234:1:color',
-      state: 11534095,
+      state: 4152676,
     });
   });
   it('should poll light with mode ct and update color temperature', async () => {

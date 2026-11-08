@@ -43,7 +43,11 @@ async function poll(device) {
       currentColorState = xyToInt(state.xy[0], state.xy[1]);
       break;
     case 'hs':
-      currentColorState = rgbToInt(hsbToRgb([state.hue, state.sat, state.bri]));
+      // The bridge reports hue in 0-65535 and sat/bri in 0-254, while hsbToRgb
+      // expects degrees and percentages - convert before computing the rgb
+      currentColorState = rgbToInt(
+        hsbToRgb([(state.hue / 65535) * 360, (state.sat / 254) * 100, (state.bri / 254) * 100]),
+      );
       break;
     default:
   }
