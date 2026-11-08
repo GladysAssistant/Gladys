@@ -1,5 +1,7 @@
 const { expect } = require('chai');
 const features = require('../../../../../services/ewelink/lib/features');
+const temperatureFeature = require('../../../../../services/ewelink/lib/features/temperature');
+const humidityFeature = require('../../../../../services/ewelink/lib/features/humidity');
 const { parseExternalId } = require('../../../../../services/ewelink/lib/utils/externalId');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
@@ -53,5 +55,35 @@ describe('eWeLink features getDevice', () => {
   it('should return device without features for an unhandled model', () => {
     const device = features.getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkUnhandledDevice, 0);
     expect(device).to.deep.equal(GladysUnhandledDevice);
+  });
+});
+
+describe('eWeLink features pollTemperature', () => {
+  const feature = { external_id: 'ewelink:10004531ae:temperature:1', last_value: 25 };
+
+  it('should return an exactly-zero temperature instead of dropping it', () => {
+    // 0°C is a normal reading for an outdoor sensor in winter, and the feature
+    // declares min: -100 - the value must reach Gladys like any other.
+    const value = temperatureFeature.pollTemperature({ params: { currentTemperature: 0 } }, feature);
+    expect(value).to.equal(0);
+  });
+
+  it('should return null when the device reports no temperature param', () => {
+    const value = temperatureFeature.pollTemperature({ params: {} }, feature);
+    expect(value).to.equal(null);
+  });
+});
+
+describe('eWeLink features pollHumidity', () => {
+  const feature = { external_id: 'ewelink:10004531ae:humidity:1', last_value: 55 };
+
+  it('should return an exactly-zero humidity instead of dropping it', () => {
+    const value = humidityFeature.pollHumidity({ params: { currentHumidity: 0 } }, feature);
+    expect(value).to.equal(0);
+  });
+
+  it('should return null when the device reports no humidity param', () => {
+    const value = humidityFeature.pollHumidity({ params: {} }, feature);
+    expect(value).to.equal(null);
   });
 });

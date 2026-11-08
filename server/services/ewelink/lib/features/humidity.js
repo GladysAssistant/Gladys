@@ -22,9 +22,9 @@ module.exports = {
   },
   pollHumidity: (eWeLinkDevice, feature) => {
     const { deviceId } = parseExternalId(feature.external_id);
-    const currentHumidity = (eWeLinkDevice.params && eWeLinkDevice.params.currentHumidity) || false;
-    // if the value is different from the value we have, save new state
-    if (currentHumidity && feature.last_value !== currentHumidity) {
+    const currentHumidity = eWeLinkDevice.params && eWeLinkDevice.params.currentHumidity;
+    // 0% is a valid reading, so only a missing value is skipped here
+    if (currentHumidity !== undefined && currentHumidity !== null && feature.last_value !== currentHumidity) {
       logger.debug(`eWeLink: Polling device "${deviceId}", humidity new value = ${currentHumidity}`);
       return currentHumidity;
     }
