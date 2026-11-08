@@ -209,4 +209,20 @@ describe('zigbee2mqtt numericType', () => {
       });
     });
   });
+
+  describe('ZLinky TIC phase voltage features', () => {
+    // each phase must carry its own type: anything resolving a feature by
+    // category+type would read phase 2 for the phase-3 feature otherwise
+    it('should configure UMOY1 feature with the UMOY1 type', () => {
+      assert.equal(numericType.names.UMOY1.feature.type, DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY1);
+    });
+
+    it('should configure UMOY2 feature with the UMOY2 type', () => {
+      assert.equal(numericType.names.UMOY2.feature.type, DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY2);
+    });
+
+    it('should configure UMOY3 feature with the UMOY3 type', () => {
+      assert.equal(numericType.names.UMOY3.feature.type, DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY3);
+    });
+  });
 });
