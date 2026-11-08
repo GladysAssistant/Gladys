@@ -21,7 +21,12 @@ module.exports = {
     const switches = (eWeLinkDevice.params && eWeLinkDevice.params.switches) || false;
     if (state || switches) {
       if (switches) {
-        state = switches[channel - 1].switch;
+        // a device can report fewer gangs than were recorded at discovery time;
+        // a missing channel entry must not crash the whole polling round
+        const channelSwitch = switches[channel - 1];
+        if (channelSwitch) {
+          state = channelSwitch.switch;
+        }
       }
     }
     const currentBinaryState = state === 'on' ? STATE.ON : STATE.OFF;

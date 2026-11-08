@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const features = require('../../../../../services/ewelink/lib/features');
+const binaryFeature = require('../../../../../services/ewelink/lib/features/binary');
 const { parseExternalId } = require('../../../../../services/ewelink/lib/utils/externalId');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
 const GladysPowDevice = require('../../mocks/Gladys-pow.json');
@@ -53,5 +54,24 @@ describe('eWeLink features getDevice', () => {
   it('should return device without features for an unhandled model', () => {
     const device = features.getDevice('a810b8db-6d04-4697-bed3-c4b72c996279', eweLinkUnhandledDevice, 0);
     expect(device).to.deep.equal(GladysUnhandledDevice);
+  });
+});
+
+describe('eWeLink features pollBinary', () => {
+  it('should not crash when the switches array is shorter than the channel', () => {
+    // a device reporting fewer gangs than recorded at discovery time must not
+    // abort the whole polling round with a TypeError
+    const feature = { external_id: 'ewelink:10004531ae:binary:2', last_value: 1 };
+    const value = binaryFeature.pollBinary({ params: { switches: [{ switch: 'on' }] } }, feature);
+    expect(value).to.equal(null);
+  });
+
+  it('should read the channel switch from the switches array', () => {
+    const feature = { external_id: 'ewelink:10004531ae:binary:2', last_value: 0 };
+    const value = binaryFeature.pollBinary(
+      { params: { switches: [{ switch: 'off' }, { switch: 'on' }] } },
+      feature,
+    );
+    expect(value).to.equal(1);
   });
 });
