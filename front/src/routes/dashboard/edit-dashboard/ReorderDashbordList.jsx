@@ -66,8 +66,17 @@ const DashboardListItem = ({ children, ...props }) => {
   };
 
   const openEditPage = () => {
-    route(`/dashboard/${props.selector}/edit`);
+    const url = `/dashboard/${props.selector}/edit`;
+    // through the editor's guard: switching dashboards with pending changes asks first
+    if (props.requestNavigation) {
+      props.requestNavigation(url);
+    } else {
+      route(url);
+    }
   };
+
+  // the grab handle drags; a tap on it must not also open the dashboard
+  const stopClick = event => event.stopPropagation();
 
   return (
     <li
@@ -79,7 +88,13 @@ const DashboardListItem = ({ children, ...props }) => {
         [style.dashboardListItemActive]: props.isSelected
       })}
     >
-      <span class={style.listDragHandle} data-cy={`reorder-dashboard-${index}`} onPointerDown={onHandlePointerDown}>
+      <span
+        class={style.listDragHandle}
+        data-cy={`reorder-dashboard-${index}`}
+        onPointerDown={onHandlePointerDown}
+        onClick={stopClick}
+        aria-hidden="true"
+      >
         <i class="fe fe-menu" />
       </span>
       <span class={style.dashboardListItemName}>{wrapEmojisJSX(props.name)}</span>
@@ -112,6 +127,7 @@ class RedorderDashboardList extends Component {
               selector={dashboard.selector}
               isSelected={dashboard.id === currentDashboard.id}
               insertAtPosition={this.insertAtPosition}
+              requestNavigation={this.props.requestNavigation}
             />
           ))}
         <li class={style.newDashboardItem}>

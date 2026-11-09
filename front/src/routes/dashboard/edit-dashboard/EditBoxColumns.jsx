@@ -4,6 +4,7 @@ import cx from 'classnames';
 import EditableBoxPreview from './EditableBoxPreview';
 import EditPanel from './EditPanel';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
+import EditorExplanation from './EditorExplanation';
 import {
   DEFAULT_COLUMN_WIDTH,
   WIDE_COLUMN_WIDTH,
@@ -13,6 +14,7 @@ import {
   isValueTileBox,
   MAX_COLUMNS_PER_SECTION
 } from '../../../utils/dashboardSections';
+import { DASHBOARD_SECTION_MOBILE_ORDER } from '../../../../../server/utils/constants';
 import style from './style.css';
 import stylePrimary from '../style.css';
 
@@ -23,19 +25,40 @@ const getTotalColumns = props => {
 // Editor v2: the canvas IS the dashboard — real widgets with edit
 // affordances, settings in a side panel / bottom sheet (EditPanel).
 // Widget reordering runs on the pointer-events engine (utils/pointerDrag.js).
+// Reorganize mode (props.reorganizing) collapses every widget to its toolbar
+// row — the canvas becomes a short list to reorder and move widgets on a
+// phone, instead of the full-size dashboard (CSS: .compactCanvas).
 const EditBoxColumns = ({ children, ...props }) => (
-  <div class="pb-6">
+  <div class={cx('pb-6', { [style.compactCanvas]: props.reorganizing })} data-cy="editor-canvas">
     <div class={style.editorTopBar}>
       <h3 class="mb-0">{props.homeDashboard.name}</h3>
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary"
-        data-cy="dashboard-settings-button"
-        onClick={props.openDashboardSettings}
-      >
-        <i class="fe fe-sliders mr-1" />
-        <Text id="dashboard.editorDashboardSettingsButton" />
-      </button>
+      <div class={style.editorTopBarActions}>
+        <button
+          type="button"
+          class={cx('btn btn-sm btn-outline-primary', { [style.topBarButtonActive]: props.reorganizing })}
+          data-cy="reorganize-button"
+          aria-pressed={props.reorganizing ? 'true' : 'false'}
+          onClick={props.toggleReorganize}
+        >
+          <i class={cx('fe mr-1', props.reorganizing ? 'fe-maximize-2' : 'fe-list')} />
+          {props.reorganizing ? <Text id="dashboard.editorReorganizeDone" /> : <Text id="dashboard.editorReorganize" />}
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          data-cy="dashboard-settings-button"
+          onClick={props.openDashboardSettings}
+        >
+          <i class="fe fe-sliders mr-1" />
+          {/* the full label next to "Reorganize" wraps the bar on a phone */}
+          <span class="d-none d-sm-inline">
+            <Text id="dashboard.editorDashboardSettingsButton" />
+          </span>
+          <span class="d-sm-none">
+            <Text id="dashboard.editorDashboardSettingsShort" />
+          </span>
+        </button>
+      </div>
     </div>
     {props.dashboardAlreadyExistError && (
       <div class="alert alert-danger">
@@ -52,9 +75,7 @@ const EditBoxColumns = ({ children, ...props }) => (
         <Text id="newDashboard.unknownError" />
       </div>
     )}
-    <p class={style.editorExplanation}>
-      <Text id="dashboard.editDashboardExplanation" />
-    </p>
+    <EditorExplanation />
     <>
       {props.homeDashboard &&
         props.homeDashboard.boxes &&
@@ -73,25 +94,51 @@ const EditBoxColumns = ({ children, ...props }) => (
           return (
             <div class={style.section} data-widget-drop-section>
               <div class={style.sectionHeader}>
-                <Text id="dashboard.boxes.section" fields={{ index: sectionIndex + 1 }} />
+                <span>
+                  <Text id="dashboard.boxes.section" fields={{ index: sectionIndex + 1 }} />
+                </span>
                 <span class={style.sectionActions}>
                   {/* the add-column control lives in the section header, NOT
                       as a flex sibling of the columns: a slot in the wrapping
                       row would make the canvas wrap a few pixels before the
                       viewer does */}
-                  {sectionSize < MAX_COLUMNS_PER_SECTION && (
+                  {/* on a phone the columns of a section stack: column by
+                      column, or row by row (first widget of every column,
+                      then the second…) — meaningless with a single column */}
+                  {sectionSize > 1 && (
                     <Localizer>
                       <button
                         type="button"
-                        class={style.previewButton}
-                        onClick={() => props.addColumn(sectionIndex)}
-                        data-cy={`add-column-${sectionIndex}`}
-                        aria-label={<Text id="dashboard.editDashboardAddColumnButton" />}
-                        title={<Text id="dashboard.editDashboardAddColumnButton" />}
+                        class={style.sectionTextButton}
+                        onClick={() => props.toggleSectionMobileOrder(sectionIndex)}
+                        data-cy={`section-mobile-order-${sectionIndex}`}
+                        title={<Text id="dashboard.editorMobileOrderHelp" />}
                       >
-                        <i class="fe fe-plus" />
+                        <i class="fe fe-smartphone" aria-hidden="true" />
+                        {props.sectionMobileOrders &&
+                        props.sectionMobileOrders[sectionIndex] === DASHBOARD_SECTION_MOBILE_ORDER.ROWS ? (
+                          <Text id="dashboard.editorMobileOrderRows" />
+                        ) : (
+                          <Text id="dashboard.editorMobileOrderColumns" />
+                        )}
                       </button>
                     </Localizer>
+                  )}
+                  {/* the add-column control lives in the section header, NOT
+                      as a flex sibling of the columns: a slot in the wrapping
+                      row would make the canvas wrap a few pixels before the
+                      viewer does. It carries a text label: the canvas has
+                      several "+" (widget, column, dashboard) */}
+                  {sectionSize < MAX_COLUMNS_PER_SECTION && (
+                    <button
+                      type="button"
+                      class={style.sectionTextButton}
+                      onClick={() => props.addColumn(sectionIndex)}
+                      data-cy={`add-column-${sectionIndex}`}
+                    >
+                      <i class="fe fe-plus" aria-hidden="true" />
+                      <Text id="dashboard.editorAddColumnShort" />
+                    </button>
                   )}
                   {/* one-step reorder arrows: dragging a whole section would be hell */}
                   {props.sectionSizes.length > 1 && (
@@ -103,6 +150,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                         onClick={() => props.moveSection(sectionIndex, -1)}
                         data-cy={`move-section-up-${sectionIndex}`}
                         title={<Text id="dashboard.editorMoveSectionUp" />}
+                        aria-label={<Text id="dashboard.editorMoveSectionUp" />}
                       >
                         <i class="fe fe-arrow-up" />
                       </button>
@@ -117,6 +165,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                         onClick={() => props.moveSection(sectionIndex, 1)}
                         data-cy={`move-section-down-${sectionIndex}`}
                         title={<Text id="dashboard.editorMoveSectionDown" />}
+                        aria-label={<Text id="dashboard.editorMoveSectionDown" />}
                       >
                         <i class="fe fe-arrow-down" />
                       </button>
@@ -150,7 +199,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                             <Localizer>
                               <button
                                 type="button"
-                                class={cx('btn p-0 ml-2', style.btnLinkDelete, {
+                                class={cx('btn p-0 ml-2', style.btnLinkDelete, style.columnWidthToggle, {
                                   [style.btnColumnWidthActive]: isWide
                                 })}
                                 onClick={() => props.toggleColumnWidth(x)}
@@ -176,12 +225,19 @@ const EditBoxColumns = ({ children, ...props }) => (
                             </Localizer>
                           )}
                           {getTotalColumns(props) > 1 && (
-                            <button
-                              class={cx('btn p-0 ml-2', style.btnLinkDelete)}
-                              onClick={() => props.deleteCurrentColumn(x)}
-                            >
-                              <i class="fe fe-trash" />
-                            </button>
+                            <Localizer>
+                              <button
+                                type="button"
+                                class={cx('btn p-0 ml-2', style.btnLinkDelete)}
+                                onClick={() => props.deleteCurrentColumn(x)}
+                                aria-label={
+                                  <Text id="dashboard.editorDeleteColumn" fields={{ index: columnIndex + 1 }} />
+                                }
+                                title={<Text id="dashboard.editorDeleteColumn" fields={{ index: columnIndex + 1 }} />}
+                              >
+                                <i class="fe fe-trash" aria-hidden="true" />
+                              </button>
+                            </Localizer>
                           )}
                         </span>
                       </div>
@@ -217,13 +273,18 @@ const EditBoxColumns = ({ children, ...props }) => (
                                 })}
                               >
                                 <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />
-                                <div class="d-flex justify-content-center mb-2">
-                                  <button
-                                    class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
-                                    onClick={() => props.addBoxAtPositionAndEdit(x, y)}
-                                  >
-                                    <i class="fe fe-plus" />
-                                  </button>
+                                <div class={cx('d-flex justify-content-center mb-2', style.addBetweenSlot)}>
+                                  <Localizer>
+                                    <button
+                                      type="button"
+                                      class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
+                                      onClick={() => props.addBoxAtPositionAndEdit(x, y)}
+                                      aria-label={<Text id="dashboard.editorAddWidgetHere" />}
+                                      title={<Text id="dashboard.editorAddWidgetHere" />}
+                                    >
+                                      <i class="fe fe-plus" aria-hidden="true" />
+                                    </button>
+                                  </Localizer>
                                 </div>
                               </div>
                             );

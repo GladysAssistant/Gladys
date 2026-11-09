@@ -5,6 +5,7 @@ import cx from 'classnames';
 import EditBox from './EditBox';
 import DashboardSettingsForm from './DashboardSettingsForm';
 import NewDashboardForm from './NewDashboardForm';
+import MoveBoxForm from './MoveBoxForm';
 import { revealAbovePanel } from '../../../utils/revealAbovePanel';
 import style from './style.css';
 
@@ -37,11 +38,18 @@ const suppressNextClick = () => {
 // longer points at a box (a column inserted before it…) is no target. The
 // action bar and the canvas spacing read the same resolution, so they never
 // stay in "panel open" mode while no panel is shown.
+const getBoxAt = (props, position) =>
+  position && props.homeDashboard.boxes[position.x] && props.homeDashboard.boxes[position.x][position.y];
+
 const getPanelTarget = props => {
+  const moving = props.movingBoxPosition;
+  if (getBoxAt(props, moving)) {
+    return { move: true, position: moving, key: `move-${moving.x}-${moving.y}` };
+  }
   const position = props.editingBoxPosition;
-  const box = position && props.homeDashboard.boxes[position.x] && props.homeDashboard.boxes[position.x][position.y];
+  const box = getBoxAt(props, position);
   if (box) {
-    return { box, key: `box-${position.x}-${position.y}` };
+    return { box, position, key: `box-${position.x}-${position.y}` };
   }
   if (props.newDashboardOpen) {
     return { key: 'new-dashboard' };
@@ -193,10 +201,31 @@ class EditPanel extends Component {
     });
   };
 
+  // The iOS keyboard shrinks the VISUAL viewport only: a position: fixed
+  // sheet stays anchored to the layout viewport, under the keyboard. Lift it
+  // by the overlaid height and cap it to what is visible, like the
+  // dashboard's mobile dock does (DashboardPage).
+  updateViewportLift = () => {
+    const viewport = window.visualViewport; // eslint-disable-line compat/compat
+    if (!viewport || !this.panelElement) {
+      return;
+    }
+    const overlaid = window.innerHeight - viewport.height - viewport.offsetTop;
+    // a pinch-zoom also shrinks the visual viewport, but overlays nothing
+    const lift = viewport.scale > 1.01 ? 0 : Math.max(0, Math.round(overlaid));
+    this.panelElement.style.setProperty('--panel-lift', `${lift}px`);
+    this.panelElement.style.setProperty('--panel-visible-height', `${Math.round(viewport.height)}px`);
+  };
+
   componentDidMount() {
     document.addEventListener('pointerdown', this.handleOutsidePointerDown);
     document.addEventListener('pointerup', this.handleOutsidePointerUp);
     document.addEventListener('pointercancel', this.handleOutsidePointerCancel);
+    const viewport = window.visualViewport; // eslint-disable-line compat/compat
+    if (viewport) {
+      viewport.addEventListener('resize', this.updateViewportLift);
+      viewport.addEventListener('scroll', this.updateViewportLift);
+    }
   }
 
   // a new target (another widget, the settings…) starts compact, with the
@@ -212,8 +241,26 @@ class EditPanel extends Component {
 
   componentDidUpdate(previousProps, previousState) {
     const target = getPanelTarget(this.props);
-    if (target && target.box && previousState.targetKey !== this.state.targetKey) {
+    if (previousState.targetKey === this.state.targetKey) {
+      return;
+    }
+    if (target && target.box) {
       this.revealEditedWidget();
+    }
+    // a dialog moves the focus into itself when it opens and gives it back
+    // to what opened it when it closes (keyboard and screen reader users)
+    if (!previousState.targetKey && this.state.targetKey) {
+      this.returnFocusTo = document.activeElement;
+      this.updateViewportLift();
+      if (this.titleElement) {
+        this.titleElement.focus({ preventScroll: true });
+      }
+    } else if (previousState.targetKey && !this.state.targetKey) {
+      const returnFocusTo = this.returnFocusTo;
+      this.returnFocusTo = null;
+      if (returnFocusTo && document.body.contains(returnFocusTo)) {
+        returnFocusTo.focus({ preventScroll: true });
+      }
     }
   }
 
@@ -221,16 +268,26 @@ class EditPanel extends Component {
     document.removeEventListener('pointerdown', this.handleOutsidePointerDown);
     document.removeEventListener('pointerup', this.handleOutsidePointerUp);
     document.removeEventListener('pointercancel', this.handleOutsidePointerCancel);
+    const viewport = window.visualViewport; // eslint-disable-line compat/compat
+    if (viewport) {
+      viewport.removeEventListener('resize', this.updateViewportLift);
+      viewport.removeEventListener('scroll', this.updateViewportLift);
+    }
   }
+
+  setTitleRef = element => {
+    this.titleElement = element;
+  };
 
   render(props, { expanded, header }) {
     const target = getPanelTarget(props);
     if (!target) {
       return null;
     }
-    const { box } = target;
-    const position = props.editingBoxPosition;
-    const defaultTitle = box ? (
+    const { box, position } = target;
+    const defaultTitle = target.move ? (
+      <Text id="dashboard.editorMoveWidgetTitle" />
+    ) : box ? (
       box.type ? (
         <Text id={`dashboard.boxTitle.${box.type}`} />
       ) : (
@@ -247,6 +304,9 @@ class EditPanel extends Component {
         class={cx(style.editPanel, 'settings-page', { [style.editPanelExpanded]: expanded })}
         data-cy="edit-panel"
         ref={this.setPanelRef}
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="edit-panel-title"
       >
         <Localizer>
           <button
@@ -266,7 +326,9 @@ class EditPanel extends Component {
               <span>{header.backLabel}</span>
             </button>
           )}
-          <strong class={style.editPanelTitle}>{(header && header.title) || defaultTitle}</strong>
+          <strong class={style.editPanelTitle} id="edit-panel-title" tabIndex="-1" ref={this.setTitleRef}>
+            {(header && header.title) || defaultTitle}
+          </strong>
           <Localizer>
             <button
               type="button"
@@ -280,6 +342,14 @@ class EditPanel extends Component {
           </Localizer>
         </div>
         <div class={style.editPanelBody}>
+          {target.move && (
+            <MoveBoxForm
+              homeDashboard={props.homeDashboard}
+              sectionSizes={props.sectionSizes}
+              position={position}
+              moveBoxTo={props.moveBoxTo}
+            />
+          )}
           {box && (
             <EditBox
               {...props}
@@ -287,13 +357,14 @@ class EditPanel extends Component {
               box={box}
               x={position.x}
               y={position.y}
-              isMobileReordering={false}
               setPanelHeader={this.setPanelHeader}
               setPanelExpanded={this.setPanelExpanded}
             />
           )}
-          {!box && props.newDashboardOpen && <NewDashboardForm closeEditPanel={props.closeEditPanel} />}
-          {!box && !props.newDashboardOpen && <DashboardSettingsForm {...props} />}
+          {!box && !target.move && props.newDashboardOpen && (
+            <NewDashboardForm closeEditPanel={props.closeEditPanel} navigate={props.requestNavigation} />
+          )}
+          {!box && !target.move && !props.newDashboardOpen && <DashboardSettingsForm {...props} />}
         </div>
       </div>
     );

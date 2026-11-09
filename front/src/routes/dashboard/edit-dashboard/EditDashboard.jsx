@@ -4,6 +4,7 @@ import cx from 'classnames';
 import EditActions from './EditActions';
 import ReorderDashbordList from './ReorderDashbordList';
 import EditBoxColumns from './EditBoxColumns';
+import LeaveConfirmDialog from './LeaveConfirmDialog';
 import { isEditPanelOpen } from './EditPanel';
 import style from '../style.css';
 import editStyle from './style.css';
@@ -52,6 +53,7 @@ const EditDashboard = ({ children, ...props }) => (
                     currentDashboard={props.currentDashboard}
                     updateDashboardList={props.updateDashboardList}
                     openNewDashboard={props.openNewDashboard}
+                    requestNavigation={props.requestNavigation}
                   />
                 </div>
               )}
@@ -59,6 +61,24 @@ const EditDashboard = ({ children, ...props }) => (
               {props.currentDashboard && <EditBoxColumns {...props} homeDashboard={props.currentDashboard} />}
 
               <EditActions {...props} />
+
+              {/* Removing a widget asks nothing: this toast brings it back */}
+              {props.undoRemoval && (
+                <div class={editStyle.undoToast} role="status" data-cy="widget-undo">
+                  <span class={editStyle.undoToastMessage}>
+                    <strong>
+                      <Text id={`dashboard.boxTitle.${props.undoRemoval.type}`} />
+                    </strong>
+                    {' · '}
+                    <Text id="dashboard.widgetRemoved" />
+                  </span>
+                  <button type="button" class={editStyle.undoToastButton} onClick={props.undoRemoveBox}>
+                    <Text id="dashboard.boxes.devices.undo" />
+                  </button>
+                </div>
+              )}
+
+              {props.leaveConfirm && <LeaveConfirmDialog onConfirm={props.confirmLeave} onCancel={props.cancelLeave} />}
             </div>
           </div>
         </div>

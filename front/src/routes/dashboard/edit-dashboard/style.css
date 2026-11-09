@@ -49,12 +49,34 @@
 }
 
 .editorExplanation {
-  font-size: 0.8125rem;
-  color: #9aa0ac;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-:global(.glass-theme) .editorExplanation {
-  color: var(--gl-muted);
+/* ink, not muted: this text carries information (audit: the muted gray on a
+   translucent glass scene fell under a readable contrast) */
+.editorExplanationText {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--gl-ink, #1c2334);
+}
+
+.editorExplanationClose {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: -0.375rem -0.375rem 0 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gl-muted, #7c8396);
+  cursor: pointer;
 }
 
 .columnLabel {
@@ -519,6 +541,9 @@
 }
 
 .editPanelBody {
+  /* a scroll that reaches the end of the form must not carry on into the
+     page behind the sheet */
+  overscroll-behavior: contain;
   /* Fill the height the panel leaves below its header: without flex the body
      is only as tall as its content, so a short form sits squeezed at the top
      with its own scrollbar instead of using the panel. min-height: 0 lets it
@@ -731,6 +756,10 @@
    ("Annuler", "Supprimer", "Sauvegarder") made it 452px wide. Right-aligned,
    the extra 62px went off the LEFT of the screen and cut the cancel button in
    half — an action the user could see but not fully reach. */
+.editActionsCancel {
+  margin-right: auto;
+}
+
 .editActionsRow {
   display: flex;
   flex-wrap: wrap;
@@ -974,4 +1003,381 @@
     padding: 0.5rem 1rem;
     font-size: 0.9375rem;
   }
+}
+
+/* ============================================================
+   Editor toolbar additions (mobile UX audit, November 2026)
+   ============================================================ */
+
+.editorTopBarActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary).topBarButtonActive {
+  background-color: var(--gl-ink);
+  border-color: var(--gl-ink);
+  color: #fff;
+}
+
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary).topBarButtonActive :global(.fe) {
+  color: #fff;
+}
+
+/* text buttons of the section header (phone order, add a column): the
+   canvas has several "+", a bare one did not say what it adds */
+.sectionTextButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--gl-border, rgba(0, 40, 100, 0.12));
+  background-color: var(--gl-surface-strong, #fff);
+  color: var(--gl-ink, #1c2334);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sectionTextButton :global(.fe) {
+  color: var(--gl-accent, #3d6df0);
+}
+
+@media (pointer: coarse) {
+  .sectionTextButton {
+    min-height: 2.5rem;
+    font-size: 0.8125rem;
+  }
+}
+
+.sectionActions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* the width of a column only exists next to other columns: below the 700px
+   columns breakpoint they stack and the toggle changed nothing on screen */
+@media (max-width: 699.98px) {
+  .columnWidthToggle {
+    display: none !important;
+  }
+}
+
+.previewSubtitle {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+/* Reorganize mode: every widget collapses to its toolbar row, the canvas
+   becomes a short list (one screen instead of a dozen on a phone) */
+.compactCanvas .previewContent,
+.compactCanvas .addBetweenSlot,
+.compactCanvas .addWidgetButton,
+.compactCanvas .dropZone {
+  display: none !important;
+}
+
+.compactCanvas .previewWrapper {
+  margin-bottom: 0.5rem;
+  padding: 0.375rem 0.375rem 0.375rem 0.875rem;
+  border: 1px solid var(--gl-border, rgba(0, 40, 100, 0.12));
+  background: var(--gl-surface-strong, #fff);
+}
+
+.compactCanvas .previewToolbar {
+  padding: 0;
+}
+
+.compactCanvas .previewTitle {
+  font-size: 0.875rem;
+  color: var(--gl-ink, #1c2334);
+}
+
+.compactCanvas .columnBoxHeader {
+  min-height: 0;
+}
+
+/* a widget that just moved: a short accent ring tells where it went */
+:global(.gladys-widget-flash) {
+  animation: gladysWidgetFlash 1.2s ease-out;
+}
+
+@keyframes gladysWidgetFlash {
+  0% {
+    box-shadow: 0 0 0 3px var(--gl-accent, #3d6df0);
+  }
+  100% {
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.gladys-widget-flash) {
+    animation: none;
+    outline: 2px solid var(--gl-accent, #3d6df0);
+  }
+}
+
+/* On a phone: in reorganize mode the section header stays visible while its
+   widgets scroll by (where am I in the list?) — only there: over full-size
+   widgets it would cover the one revealed above the sheet — and the section
+   frame loses its side
+   padding so a widget gets the width it has on the dashboard (340 → 366px
+   on an iPhone) */
+@media (max-width: 699.98px) {
+  .compactCanvas .sectionHeader {
+    position: sticky;
+    top: 3.25rem;
+    z-index: 4;
+    margin: 0 -0.25rem 0.5rem;
+    padding: 0.5rem 0.25rem 0.5rem 0.5rem;
+    border-radius: 12px;
+    background: var(--gl-surface-strong, rgba(255, 255, 255, 0.92));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  :global(.glass-theme) .section {
+    padding: 0.5rem 0 0.75rem;
+    border-width: 1px 0;
+    border-radius: 0;
+    background: transparent;
+  }
+}
+
+/* Editor dashboard pills: one sideways-scrolling row on mobile, like the
+   viewer's dock, instead of wrapping the "+" alone onto a second line */
+@media (max-width: 991px) {
+  .dashboardList {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 -0.75rem;
+    padding: 2px 0.75rem 6px;
+  }
+
+  .dashboardList::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dashboardListItem,
+  .newDashboardItem {
+    flex: 0 0 auto;
+  }
+}
+
+/* 16px in every field of the panel on touch screens: below that, iOS
+   Safari zooms the page on focus and the fixed sheet ends up off screen */
+@media (pointer: coarse), (max-width: 991px) {
+  .editPanel :global(input:not([type='checkbox']):not([type='radio'])),
+  .editPanel :global(select),
+  .editPanel :global(textarea),
+  .editPanel :global(.react-select__control),
+  .editPanel :global(.react-select__input input) {
+    font-size: 16px !important;
+  }
+}
+
+/* the iOS keyboard: lifted by the overlaid height, capped to what is
+   visible (EditPanel.updateViewportLift) */
+@media (max-width: 991px) {
+  .editPanel {
+    transform: translateY(calc(-1 * var(--panel-lift, 0px)));
+    max-height: min(65dvh, calc(var(--panel-visible-height, 100dvh) - 1rem));
+  }
+
+  .editPanelExpanded {
+    height: min(calc(100dvh - 4rem), calc(var(--panel-visible-height, 100dvh) - 1rem));
+    max-height: none;
+  }
+}
+
+/* "Removed · Undo" toast of the canvas */
+.undoToast {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left, 0px));
+  right: max(12px, env(safe-area-inset-right, 0px));
+  bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  z-index: 41;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 32rem;
+  margin: 0 auto;
+  min-height: 52px;
+  padding: 0.375rem 0.375rem 0.375rem 1rem;
+  border-radius: 16px;
+  background: #1c2334;
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(28, 35, 52, 0.35);
+}
+
+.undoToastMessage {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.undoToastButton {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 0.875rem;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* "Leave without saving?" dialog */
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1070;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px))
+    max(12px, env(safe-area-inset-left, 0px));
+  background: rgba(28, 35, 52, 0.4);
+}
+
+@media (min-width: 576px) {
+  .dialogBackdrop {
+    align-items: center;
+  }
+}
+
+.dialog {
+  width: 100%;
+  max-width: 26rem;
+  padding: 1.25rem 1.125rem 1rem;
+  border-radius: 22px;
+  background: #fff;
+  color: #1c2334;
+  box-shadow: 0 18px 50px rgba(28, 35, 52, 0.3);
+}
+
+.dialogTitle {
+  margin: 0 0 0.375rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.dialogText {
+  margin: 0 0 1rem;
+  color: #4b5366;
+}
+
+.dialogDanger,
+.dialogSecondary,
+.dangerButton,
+.dangerCancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 46px;
+  margin-top: 0.5rem;
+  border: 0;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dialogDanger,
+.dangerButton {
+  background: #fbe3de;
+  color: #c4472f;
+}
+
+.dialogSecondary,
+.dangerCancel {
+  background: rgba(28, 35, 52, 0.07);
+  color: #1c2334;
+}
+
+/* dashboard settings: deleting lives at the end, apart */
+.dangerZone {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.1));
+}
+
+.dangerText {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+  color: var(--gl-ink, #1c2334);
+}
+
+/* "Move to…" form */
+.moveHint {
+  margin: 0 0 1rem;
+  color: var(--gl-ink, #1c2334);
+}
+
+.moveSection {
+  margin-bottom: 1rem;
+}
+
+.moveSectionTitle {
+  margin: 0 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gl-muted, #7c8396);
+}
+
+.moveTarget {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 0.375rem;
+  padding: 0 0.875rem;
+  border: 1px solid rgba(44, 62, 118, 0.08);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--gl-ink, #1c2334);
+  text-align: left;
+  cursor: pointer;
+}
+
+.moveTarget :global(.fe) {
+  color: var(--gl-accent, #3d6df0);
+}
+
+.moveTargetCurrent {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.moveTargetName {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+
+.moveTargetMeta {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.875rem;
+}
+
+.sectionHeader > :first-child {
+  white-space: nowrap;
+}
+
+.dialogDanger:focus:not(:focus-visible),
+.dialogSecondary:focus:not(:focus-visible) {
+  outline: none;
 }

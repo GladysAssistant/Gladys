@@ -41,7 +41,14 @@ class NewDashboardForm extends Component {
       });
       this.setState({ loading: false });
       this.props.closeEditPanel();
-      route(`/dashboard/${createdDashboard.selector}/edit`);
+      // through the editor's guard: pending changes on the current dashboard
+      // are not lost silently by jumping to the new one
+      const url = `/dashboard/${createdDashboard.selector}/edit`;
+      if (this.props.navigate) {
+        this.props.navigate(url);
+      } else {
+        route(url);
+      }
     } catch (error) {
       if (error.response && error.response.status === 409) {
         this.setState({ loading: false, dashboardAlreadyExistError: true });

@@ -16,56 +16,37 @@ const EditActions = props => {
       data-cy="edit-actions"
     >
       <div class="container">
-        {/* the actions are one wrapping, right-aligned row: on a narrow phone
-            the three labels of a verbose language (fr: Annuler / Supprimer /
-            Sauvegarder) are wider than the screen, and a single non-wrapping
-            row overflowed off the LEFT edge — "Annuler" ended up half out of
-            the viewport, out of reach */}
+        {/* One row whatever the language: Cancel on the left (only while
+            there is something to discard), the primary action on the right.
+            Deleting the dashboard — rare and irreversible — moved to the
+            dashboard settings, out of the way of Save. */}
         <div class={style.editActionsRow}>
-          {!props.askDeleteDashboard && (
-            <>
-              {/* cancel only makes sense while there is something to discard */}
-              {props.hasUnsavedChanges && (
-                <button onClick={props.cancelDashboardEdit} className="btn btn-outline-secondary btn-sm">
-                  <Text id="dashboard.editDashboardCancelButton" /> <i class="fe fe-slash" />
-                </button>
-              )}
-              <button onClick={props.askDeleteCurrentDashboard} className="btn btn-outline-danger btn-sm">
-                <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
-              </button>
-              {/* saving keeps the user in the editor (chain editing): the
-                  confirmation is a transient label that never blocks anything —
-                  the moment everything is saved, leaving is available */}
-              {props.justSaved && (
-                <span className="text-success" data-cy="dashboard-saved-label">
-                  <Text id="dashboard.editDashboardSavedButton" /> <i class="fe fe-check" />
-                </span>
-              )}
-              {props.hasUnsavedChanges && (
-                <button onClick={props.saveDashboard} className="btn btn-outline-primary btn-sm">
-                  <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
-                </button>
-              )}
-              {!props.hasUnsavedChanges && (
-                <button onClick={props.cancelDashboardEdit} className="btn btn-outline-primary btn-sm">
-                  <Text id="dashboard.editDashboardDoneButton" /> <i class="fe fe-check" />
-                </button>
-              )}
-            </>
+          {props.hasUnsavedChanges && (
+            <button
+              onClick={props.cancelDashboardEdit}
+              className={cx('btn btn-outline-secondary btn-sm', style.editActionsCancel)}
+              data-cy="edit-cancel-button"
+            >
+              <Text id="dashboard.editDashboardCancelButton" />
+            </button>
           )}
-
-          {props.askDeleteDashboard && (
-            <>
-              <span class={style.editActionsQuestion}>
-                <Text id="dashboard.editDashboardDeleteText" />
-              </span>
-              <button onClick={props.deleteCurrentDashboard} className="btn btn-outline-danger btn-sm">
-                <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
-              </button>
-              <button onClick={props.cancelDeleteCurrentDashboard} className="btn btn-outline-secondary btn-sm">
-                <Text id="dashboard.editDashboardCancelButton" /> <i class="fe fe-slash" />
-              </button>
-            </>
+          {/* saving keeps the user in the editor (chain editing): the
+              confirmation is a transient label that never blocks anything —
+              the moment everything is saved, leaving is available */}
+          {props.justSaved && (
+            <span className="text-success" data-cy="dashboard-saved-label">
+              <Text id="dashboard.editDashboardSavedButton" /> <i class="fe fe-check" />
+            </span>
+          )}
+          {props.hasUnsavedChanges && (
+            <button onClick={props.saveDashboard} className="btn btn-outline-primary btn-sm">
+              <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
+            </button>
+          )}
+          {!props.hasUnsavedChanges && (
+            <button onClick={props.cancelDashboardEdit} className="btn btn-outline-primary btn-sm">
+              <Text id="dashboard.editDashboardDoneButton" /> <i class="fe fe-check" />
+            </button>
           )}
         </div>
       </div>
