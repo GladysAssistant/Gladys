@@ -164,4 +164,20 @@ describe('Dashboard Devices Box editor', () => {
       expect(box.device_feature_names).to.deep.equal(['Outside', 'Living']);
     });
   });
+
+  it('Should keep the preview empty once the last device is removed', () => {
+    cy.viewport(390, 664);
+    cy.visit('/dashboard/test/edit');
+    cy.get('[data-cy="edit-box-0-0"]').click();
+    cy.get('[data-widget-wrapper][data-editing] tbody tr').should('have.length', 1);
+
+    cy.get('[data-cy="devices-add-button"]').click();
+    cy.get(`[data-cy="picker-feature-${probe(1)}"]`).click();
+    cy.get('[data-cy="picker-validate"]').click();
+    cy.get('[data-device-row]').should('have.length', 0);
+
+    // an empty device_feature_selectors filter is no filter: the preview
+    // must not fall back to every device of the house
+    cy.get('[data-widget-wrapper][data-editing] tbody tr').should('have.length', 0);
+  });
 });

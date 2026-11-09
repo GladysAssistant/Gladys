@@ -157,14 +157,17 @@ class EditPanel extends Component {
       panel.classList.remove(style.editPanelDragging);
       panel.style.height = '';
       panel.style.maxHeight = '';
+      // a gesture the browser cancelled (palm rejection, a system gesture)
+      // was not the user's decision: the sheet keeps its height
+      if (endEvent.type !== 'pointerup') {
+        return;
+      }
       // a tap is handled by the click (onGrabClick): toggling here, on
       // pointerup, resized the sheet BEFORE the browser dispatched the tap's
       // click — which then landed on whatever had just moved under the
-      // finger (a row of the form, opening it)
-      // only a drag that ends with a release can be followed by its click: a
-      // cancelled gesture has none, and arming the guard then would swallow
-      // the user's next real tap (the close button…)
-      if (endEvent.type === 'pointerup' && Math.abs(travel) > TAP_MAX_TRAVEL_PX) {
+      // finger (a row of the form, opening it). A real drag swallows the
+      // click its release may produce.
+      if (Math.abs(travel) > TAP_MAX_TRAVEL_PX) {
         suppressNextClick();
       }
       if (travel < -GRAB_SWITCH_PX) {
