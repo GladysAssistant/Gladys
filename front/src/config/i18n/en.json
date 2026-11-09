@@ -4789,6 +4789,103 @@
       "outputsAvailable": "Results available to the following steps:",
       "variablesHint": "Type '{{' to insert scene information, such as the details passed on by the trigger.",
       "requiredFieldError": "The field \"{{field}}\" of \"{{title}}\" is required: it cannot be left empty."
+    },
+    "searchConditionsPlaceholder": "Search for a condition…",
+    "conditionsDescriptions": {
+      "condition": {
+        "check-time": "The time or the day matches",
+        "only-continue-if": "Compare variables or device values",
+        "in-time-range": "We are inside one of the trigger's time ranges"
+      },
+      "edf-tempo": {
+        "condition": "The EDF Tempo day color matches (France)"
+      },
+      "alarm": {
+        "check-alarm-mode": "The alarm is in a given mode"
+      },
+      "calendar": {
+        "is-event-running": "A calendar event is running",
+        "get-events": "Fetch calendar events to compare them"
+      },
+      "ecowatt": {
+        "condition": "The Ecowatt signal of the French power grid matches"
+      },
+      "energy-contract": {
+        "current-price": "The current price of an energy contract meets a threshold"
+      },
+      "house": {
+        "is-empty": "Nobody is home",
+        "is-not-empty": "Someone is home"
+      },
+      "device": {
+        "get-value": "Refresh the value of a sensor before comparing it"
+      }
+    },
+    "mobile": {
+      "ok": "OK",
+      "close": "Close",
+      "savedToast": "Scene saved",
+      "stepDeleted": "Step deleted",
+      "conditionDeleted": "Condition deleted",
+      "triggerDeleted": "Trigger deleted",
+      "undo": "Undo",
+      "leaveTitle": "Unsaved changes",
+      "leaveText": "You have unsaved changes on “{{name}}”.",
+      "saveAndLeave": "Save and leave",
+      "leaveWithoutSaving": "Leave without saving",
+      "keepEditing": "Keep editing",
+      "draftFound": "Unsaved changes found ·",
+      "restoreDraft": "Restore",
+      "discardDraft": "Discard",
+      "noCondition": "No condition",
+      "delete": "Delete",
+      "addSimultaneousAction": "Add a simultaneous action",
+      "insertStepAfter": "Insert a step after",
+      "deleteStep": "Delete the step",
+      "deleteCondition": "Delete the condition",
+      "deleteTrigger": "Delete the trigger",
+      "noActionInBranch": "No action",
+      "addTo": {
+        "then": "Add to “Then”",
+        "else": "Add to “Else”"
+      },
+      "then": "Then",
+      "else": "Else",
+      "repeat": "Repeat",
+      "conditionsTitle": "Conditions",
+      "addCondition": "Add a condition",
+      "conditionsAllRequired": "All the conditions must be met. Tap a condition to change it.",
+      "atTheSameTime": "At the same time",
+      "simultaneousAction": "Simultaneous action",
+      "reorderTitle": "Reorder",
+      "reorderHint": "Move the steps with the arrows. What each step does does not change.",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "done": "Done",
+      "changes": {
+        "zero": "No change",
+        "one": "1 change",
+        "other": "{{count}} changes"
+      },
+      "test": "Test",
+      "runScene": "Run the scene",
+      "moreActions": "More actions",
+      "sceneActive": "Scene active",
+      "sceneDisabled": "Scene disabled",
+      "lastRun": "Last run",
+      "neverRun": "Never run",
+      "whenSubtitle": "any one of these events is enough",
+      "chooseTrigger": "Choose a trigger",
+      "orWhen": "Or when…",
+      "thenSubtitle": "in order, from top to bottom",
+      "addFirstStep": "Add a first step",
+      "swipeHint": "Tap a row to change it. Swipe it to the left to delete it.",
+      "settingsMenu": "Name, icon and tags",
+      "reorderMenu": "Reorder the steps",
+      "deleteScene": "Delete the scene",
+      "deleteSceneTitle": "Delete the scene?",
+      "deleteSceneText": "“{{name}}” and its triggers will be deleted. This cannot be undone.",
+      "deleteForever": "Delete for good"
     }
   },
   "profile": {
@@ -5361,7 +5458,20 @@
     "filterTagsName": "Filter by tags",
     "unselectTags": "Unselect all tags",
     "running": "Running",
-    "stopButton": "Stop"
+    "stopButton": "Stop",
+    "mobile": {
+      "newSceneTitle": "New scene",
+      "newScenePlaceholder": "e.g. Good night",
+      "createError": "The scene could not be created. Try again.",
+      "iconGuessed": "Icon chosen from the name, you can change it later.",
+      "createAndChooseTrigger": "Create and choose a trigger",
+      "disable": "Disable",
+      "enable": "Enable",
+      "disabled": "Disabled",
+      "runScene": "Run “{{name}}”",
+      "allTags": "All",
+      "swipeHint": "Tip: swipe a scene to the left to disable or duplicate it."
+    }
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",

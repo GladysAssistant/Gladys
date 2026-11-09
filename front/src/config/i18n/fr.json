@@ -4789,6 +4789,103 @@
       "outputsAvailable": "Résultats utilisables dans les étapes suivantes :",
       "variablesHint": "Tapez « {{ » pour insérer une information de la scène, par exemple celles transmises par le déclencheur.",
       "requiredFieldError": "Le champ « {{field}} » de « {{title}} » est obligatoire : il ne peut pas rester vide."
+    },
+    "searchConditionsPlaceholder": "Rechercher une condition…",
+    "conditionsDescriptions": {
+      "condition": {
+        "check-time": "L'heure ou le jour correspond",
+        "only-continue-if": "Comparer des variables ou des valeurs d'appareils",
+        "in-time-range": "On est dans une plage horaire du déclencheur"
+      },
+      "edf-tempo": {
+        "condition": "La couleur du jour EDF Tempo correspond (France)"
+      },
+      "alarm": {
+        "check-alarm-mode": "L'alarme est dans un mode donné"
+      },
+      "calendar": {
+        "is-event-running": "Un évènement de calendrier est en cours",
+        "get-events": "Récupérer des évènements de calendrier pour les comparer"
+      },
+      "ecowatt": {
+        "condition": "Le signal Ecowatt du réseau électrique correspond (France)"
+      },
+      "energy-contract": {
+        "current-price": "Le prix actuel d'un contrat d'énergie respecte un seuil"
+      },
+      "house": {
+        "is-empty": "Personne n'est à la maison",
+        "is-not-empty": "Quelqu'un est à la maison"
+      },
+      "device": {
+        "get-value": "Relever la valeur d'un capteur avant de la comparer"
+      }
+    },
+    "mobile": {
+      "ok": "OK",
+      "close": "Fermer",
+      "savedToast": "Scène enregistrée",
+      "stepDeleted": "Étape supprimée",
+      "conditionDeleted": "Condition supprimée",
+      "triggerDeleted": "Déclencheur supprimé",
+      "undo": "Annuler",
+      "leaveTitle": "Modifications non enregistrées",
+      "leaveText": "Vous avez des modifications non enregistrées sur « {{name}} ».",
+      "saveAndLeave": "Enregistrer et quitter",
+      "leaveWithoutSaving": "Quitter sans enregistrer",
+      "keepEditing": "Continuer la modification",
+      "draftFound": "Modifications non enregistrées retrouvées ·",
+      "restoreDraft": "Restaurer",
+      "discardDraft": "Ignorer",
+      "noCondition": "Aucune condition",
+      "delete": "Supprimer",
+      "addSimultaneousAction": "Ajouter une action simultanée",
+      "insertStepAfter": "Insérer une étape après",
+      "deleteStep": "Supprimer l'étape",
+      "deleteCondition": "Supprimer la condition",
+      "deleteTrigger": "Supprimer le déclencheur",
+      "noActionInBranch": "Aucune action",
+      "addTo": {
+        "then": "Ajouter dans « Alors »",
+        "else": "Ajouter dans « Sinon »"
+      },
+      "then": "Alors",
+      "else": "Sinon",
+      "repeat": "Répéter",
+      "conditionsTitle": "Conditions",
+      "addCondition": "Ajouter une condition",
+      "conditionsAllRequired": "Toutes les conditions doivent être remplies. Touchez une condition pour la modifier.",
+      "atTheSameTime": "En même temps",
+      "simultaneousAction": "Action simultanée",
+      "reorderTitle": "Réorganiser",
+      "reorderHint": "Déplacez les étapes avec les flèches. Ce que fait chaque étape ne change pas.",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "done": "Terminé",
+      "changes": {
+        "zero": "Aucune modification",
+        "one": "1 modification",
+        "other": "{{count}} modifications"
+      },
+      "test": "Tester",
+      "runScene": "Lancer la scène",
+      "moreActions": "Plus d'actions",
+      "sceneActive": "Scène active",
+      "sceneDisabled": "Scène désactivée",
+      "lastRun": "Dernière exécution",
+      "neverRun": "Jamais lancée",
+      "whenSubtitle": "un seul de ces événements suffit",
+      "chooseTrigger": "Choisir un déclencheur",
+      "orWhen": "Ou quand…",
+      "thenSubtitle": "dans l'ordre, de haut en bas",
+      "addFirstStep": "Ajouter une première étape",
+      "swipeHint": "Touchez une ligne pour la modifier. Glissez-la vers la gauche pour la supprimer.",
+      "settingsMenu": "Nom, icône et tags",
+      "reorderMenu": "Réorganiser les étapes",
+      "deleteScene": "Supprimer la scène",
+      "deleteSceneTitle": "Supprimer la scène ?",
+      "deleteSceneText": "« {{name}} » et ses déclencheurs seront supprimés. Cette action est définitive.",
+      "deleteForever": "Supprimer définitivement"
     }
   },
   "profile": {
@@ -5361,7 +5458,20 @@
     "filterTagsName": "Filtrer par tags",
     "unselectTags": "Désélectionner tous les tags",
     "running": "En cours",
-    "stopButton": "Arrêter"
+    "stopButton": "Arrêter",
+    "mobile": {
+      "newSceneTitle": "Nouvelle scène",
+      "newScenePlaceholder": "ex. Bonne nuit",
+      "createError": "La scène n'a pas pu être créée. Réessayez.",
+      "iconGuessed": "Icône choisie d'après le nom, modifiable ensuite.",
+      "createAndChooseTrigger": "Créer et choisir un déclencheur",
+      "disable": "Désactiver",
+      "enable": "Activer",
+      "disabled": "Désactivée",
+      "runScene": "Lancer « {{name}} »",
+      "allTags": "Toutes",
+      "swipeHint": "Astuce : glissez une scène vers la gauche pour la désactiver ou la dupliquer."
+    }
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",

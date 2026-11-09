@@ -4789,6 +4789,103 @@
       "outputsAvailable": "Resultados disponibles para los pasos siguientes:",
       "variablesHint": "Escriba '{{' para insertar información de la escena, como los datos transmitidos por el activador.",
       "requiredFieldError": "El campo \"{{field}}\" de \"{{title}}\" es obligatorio: no puede dejarse vacío."
+    },
+    "searchConditionsPlaceholder": "Buscar una condición…",
+    "conditionsDescriptions": {
+      "condition": {
+        "check-time": "La hora o el día coinciden",
+        "only-continue-if": "Comparar variables o valores de dispositivos",
+        "in-time-range": "Estamos dentro de una de las franjas horarias del disparador"
+      },
+      "edf-tempo": {
+        "condition": "El color del día de EDF Tempo coincide (Francia)"
+      },
+      "alarm": {
+        "check-alarm-mode": "La alarma está en un modo determinado"
+      },
+      "calendar": {
+        "is-event-running": "Un evento del calendario está en curso",
+        "get-events": "Obtener eventos del calendario para compararlos"
+      },
+      "ecowatt": {
+        "condition": "La señal Ecowatt de la red eléctrica francesa coincide"
+      },
+      "energy-contract": {
+        "current-price": "El precio actual de un contrato de energía cumple un umbral"
+      },
+      "house": {
+        "is-empty": "No hay nadie en casa",
+        "is-not-empty": "Hay alguien en casa"
+      },
+      "device": {
+        "get-value": "Obtener el valor de un sensor antes de compararlo"
+      }
+    },
+    "mobile": {
+      "ok": "OK",
+      "close": "Cerrar",
+      "savedToast": "Escena guardada",
+      "stepDeleted": "Paso eliminado",
+      "conditionDeleted": "Condición eliminada",
+      "triggerDeleted": "Disparador eliminado",
+      "undo": "Deshacer",
+      "leaveTitle": "Cambios sin guardar",
+      "leaveText": "Tienes cambios sin guardar en «{{name}}».",
+      "saveAndLeave": "Guardar y salir",
+      "leaveWithoutSaving": "Salir sin guardar",
+      "keepEditing": "Seguir editando",
+      "draftFound": "Cambios sin guardar encontrados ·",
+      "restoreDraft": "Restaurar",
+      "discardDraft": "Descartar",
+      "noCondition": "Ninguna condición",
+      "delete": "Eliminar",
+      "addSimultaneousAction": "Añadir una acción simultánea",
+      "insertStepAfter": "Insertar un paso después",
+      "deleteStep": "Eliminar el paso",
+      "deleteCondition": "Eliminar la condición",
+      "deleteTrigger": "Eliminar el disparador",
+      "noActionInBranch": "Ninguna acción",
+      "addTo": {
+        "then": "Añadir en «Entonces»",
+        "else": "Añadir en «Si no»"
+      },
+      "then": "Entonces",
+      "else": "Si no",
+      "repeat": "Repetir",
+      "conditionsTitle": "Condiciones",
+      "addCondition": "Añadir una condición",
+      "conditionsAllRequired": "Se deben cumplir todas las condiciones. Toca una condición para cambiarla.",
+      "atTheSameTime": "Al mismo tiempo",
+      "simultaneousAction": "Acción simultánea",
+      "reorderTitle": "Reordenar",
+      "reorderHint": "Mueve los pasos con las flechas. Lo que hace cada paso no cambia.",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "done": "Listo",
+      "changes": {
+        "zero": "Ningún cambio",
+        "one": "1 cambio",
+        "other": "{{count}} cambios"
+      },
+      "test": "Probar",
+      "runScene": "Ejecutar la escena",
+      "moreActions": "Más acciones",
+      "sceneActive": "Escena activa",
+      "sceneDisabled": "Escena desactivada",
+      "lastRun": "Última ejecución",
+      "neverRun": "Nunca ejecutada",
+      "whenSubtitle": "basta con uno de estos eventos",
+      "chooseTrigger": "Elegir un disparador",
+      "orWhen": "O cuando…",
+      "thenSubtitle": "en orden, de arriba abajo",
+      "addFirstStep": "Añadir un primer paso",
+      "swipeHint": "Toca una fila para cambiarla. Deslízala a la izquierda para eliminarla.",
+      "settingsMenu": "Nombre, icono y etiquetas",
+      "reorderMenu": "Reordenar los pasos",
+      "deleteScene": "Eliminar la escena",
+      "deleteSceneTitle": "¿Eliminar la escena?",
+      "deleteSceneText": "«{{name}}» y sus disparadores se eliminarán. Esta acción es definitiva.",
+      "deleteForever": "Eliminar definitivamente"
     }
   },
   "profile": {
@@ -5361,7 +5458,20 @@
     "filterTagsName": "Filtrar por etiquetas",
     "unselectTags": "Deseleccionar todas las etiquetas",
     "running": "En ejecución",
-    "stopButton": "Detener"
+    "stopButton": "Detener",
+    "mobile": {
+      "newSceneTitle": "Nueva escena",
+      "newScenePlaceholder": "p. ej. Buenas noches",
+      "createError": "No se pudo crear la escena. Inténtalo de nuevo.",
+      "iconGuessed": "Icono elegido a partir del nombre, se puede cambiar después.",
+      "createAndChooseTrigger": "Crear y elegir un disparador",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "disabled": "Desactivada",
+      "runScene": "Ejecutar «{{name}}»",
+      "allTags": "Todas",
+      "swipeHint": "Consejo: desliza una escena a la izquierda para desactivarla o duplicarla."
+    }
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",

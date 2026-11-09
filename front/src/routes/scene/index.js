@@ -6,6 +6,8 @@ import update from 'immutability-helper';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import { mergeRunningScenes } from './runningInfo';
 import ScenePage from './ScenePage';
+import MobileScenePage from './MobileScenePage';
+import { isMobileViewport, watchMobileViewport } from '../../utils/mobileViewport';
 
 class Scene extends Component {
   getUrlParams = () => {
@@ -195,10 +197,19 @@ class Scene extends Component {
       scenes: [],
       runningScenes: [],
       now: Date.now(),
-      loading: true
+      loading: true,
+      isMobile: isMobileViewport()
     };
     this.ticker = null;
     this.debouncedGetScenes = debounce(this.getScenes.bind(this), 200);
+  }
+
+  onViewportChange = isMobile => {
+    this.setState({ isMobile });
+  };
+
+  componentDidMount() {
+    this.unwatchViewport = watchMobileViewport(this.onViewportChange);
   }
 
   componentWillMount() {
@@ -215,6 +226,9 @@ class Scene extends Component {
   }
 
   componentWillUnmount() {
+    if (this.unwatchViewport) {
+      this.unwatchViewport();
+    }
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
     if (this.ticker) {
@@ -223,10 +237,13 @@ class Scene extends Component {
     }
   }
 
-  render(props, { scenes, runningScenes, now, loading, getError, tags }) {
+  render(props, { scenes, runningScenes, now, loading, getError, tags, isMobile }) {
     const { sceneSearch, sceneTagSearch, orderDir } = this.getUrlParams();
+    // the phone layout (docs/specs/scene-editor-mobile.md, D)
+    const Page = isMobile ? MobileScenePage : ScenePage;
     return (
-      <ScenePage
+      <Page
+        user={props.user}
         httpClient={props.httpClient}
         currentUrl={props.currentUrl}
         scenes={scenes}
@@ -247,4 +264,4 @@ class Scene extends Component {
   }
 }
 
-export default connect('httpClient,currentUrl,session', {})(Scene);
+export default connect('httpClient,currentUrl,session,user', {})(Scene);

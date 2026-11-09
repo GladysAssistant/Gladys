@@ -1,0 +1,1175 @@
+/* ==================================================================
+   Scenes on a phone (docs/specs/scene-editor-mobile.md): the list and
+   the editor share these surfaces. Every touch target is >= 44px and
+   every field >= 16px. Light colors only: dark mode is the app-wide
+   inversion filter.
+   ================================================================== */
+
+/* ---------- swipe rows ---------- */
+
+.swipeRow {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.swipeRowFlush {
+  border-radius: 0;
+}
+
+.swipeRowNested {
+  border-radius: 12px;
+}
+
+.swipeActions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+}
+
+.swipeAction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.swipeAction :global(.fe) {
+  font-size: 1.125rem;
+}
+
+.swipeAction-danger {
+  background-color: #c23434;
+}
+
+.swipeAction-neutral {
+  background-color: #4f5866;
+}
+
+.swipeAction-accent {
+  background-color: #2f5bd8;
+}
+
+.swipeForeground {
+  position: relative;
+  background-color: #fff;
+  transition: transform 0.22s ease;
+  touch-action: pan-y;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipeForeground {
+    transition: none;
+  }
+}
+
+/* ---------- step / trigger / scene rows ---------- */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* a row of a card (an "at the same time" block, an if/while block): no border of its own */
+.rowFlush {
+  border: 0;
+  border-radius: 0;
+  min-height: 60px;
+}
+
+/* a row of a branch: lighter, slightly smaller */
+.rowNested {
+  min-height: 52px;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.rowRunning {
+  box-shadow: inset 0 0 0 2px #2f5bd8;
+}
+
+.rowTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 1.125rem;
+}
+
+.rowNested .rowTile {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rowTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowNested .rowTitle {
+  font-size: 0.9375rem;
+}
+
+.rowSub,
+.rowMeta {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: #4f5866;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowMeta {
+  font-size: 0.75rem;
+}
+
+.rowChevron {
+  flex-shrink: 0;
+  color: #8b93a1;
+  font-size: 1.125rem;
+}
+
+.runningDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  vertical-align: middle;
+}
+
+/* ---------- section titles ---------- */
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 24px 4px 10px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sectionTitleWhen {
+  color: #9a4f16;
+}
+
+.sectionTitleThen {
+  color: #2f5bd8;
+}
+
+.sectionSubtitle {
+  font-size: 0.8125rem;
+  color: #4f5866;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orSeparator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.orSeparator::before,
+.orSeparator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #d9dee7;
+}
+
+.orPill {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a4f16;
+  background-color: #fdecdc;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* ---------- link buttons, dashed add buttons ---------- */
+
+.linkButton {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.linkButtonWhen {
+  color: #9a4f16;
+}
+
+.dashedButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  border: 1.5px dashed #9fb4ea;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dashedButtonWhen {
+  min-height: 64px;
+  border-color: #e0a56d;
+  background-color: #fffaf5;
+  color: #9a4f16;
+}
+
+.hint {
+  margin: 14px 4px 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+/* ---------- timeline ---------- */
+
+.timelineItem {
+  display: flex;
+  gap: 10px;
+}
+
+.timelineRail {
+  width: 28px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timelineNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  margin-top: 19px;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.timelineLine {
+  flex: 1;
+  width: 2px;
+  margin: 4px 0 -4px;
+  border-radius: 2px;
+  background-color: #d5dbe6;
+}
+
+.timelineLineLast {
+  background-color: transparent;
+}
+
+.timelineContent {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 12px;
+}
+
+.timelineEnd {
+  display: flex;
+  gap: 10px;
+}
+
+.timelineEnd::before {
+  content: '';
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.card {
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.cardLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f5866;
+}
+
+.cardDivider {
+  border-top: 1px solid #edf0f4;
+}
+
+.cardFooterButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-top: 1px solid #edf0f4;
+  background-color: #fff;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.branch {
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.branchLabel {
+  padding: 6px 2px 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2f5bd8;
+}
+
+.branchLabelElse {
+  color: #4f5866;
+}
+
+.branchBody {
+  display: flex;
+  gap: 10px;
+}
+
+/* the rail of a branch: 12px of indentation per level */
+.branchRail {
+  width: 2px;
+  flex-shrink: 0;
+  margin-left: 6px;
+  border-radius: 2px;
+  background-color: #b9c9f2;
+}
+
+.branchRailElse {
+  background-color: #d5dae3;
+}
+
+.branchRows {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.branchEmpty {
+  padding: 2px 4px;
+  font-size: 0.8125rem;
+  color: #4f5866;
+}
+
+/* ---------- sheet content ---------- */
+
+/* the shared parameter form of a step / trigger, on a white card of the sheet */
+.sheetForm {
+  padding: 14px 14px 2px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.sheetForm :global(.form-group) {
+  margin-bottom: 1rem;
+}
+
+.sheetSection {
+  margin-top: 18px;
+}
+
+.sheetLabel {
+  display: block;
+  margin: 0 4px 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #4f5866;
+}
+
+.sheetActions {
+  margin-top: 18px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.sheetActionsFirst {
+  margin-top: 0;
+}
+
+.sheetAction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 0;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sheetAction + .sheetAction {
+  border-top: 1px solid #edf0f4;
+}
+
+.sheetAction :global(.fe) {
+  color: #2f5bd8;
+  font-size: 1.125rem;
+}
+
+.sheetActionDanger,
+.sheetActionDanger :global(.fe) {
+  color: #b42d2d;
+}
+
+.sheetText {
+  margin: 0 4px 16px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f5866;
+  text-align: center;
+}
+
+.sheetButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bigButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bigButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.bigButtonPrimary {
+  background-color: #1c2334;
+  color: #fff;
+}
+
+.bigButtonSoft {
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+}
+
+.bigButtonDanger {
+  background-color: #b42d2d;
+  color: #fff;
+}
+
+.bigButtonDangerSoft {
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  color: #b42d2d;
+}
+
+.bigButtonGhost {
+  background-color: transparent;
+  color: #2f5bd8;
+}
+
+.bigButtonNeutral {
+  background-color: #e6e9f0;
+  color: #1c2334;
+}
+
+/* ---------- editor chrome ---------- */
+
+.editorPage {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.navBar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 6px;
+  background-color: rgba(242, 244, 248, 0.92);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+.navSide {
+  flex: 0 0 104px;
+  display: flex;
+  align-items: center;
+}
+
+.navSideEnd {
+  justify-content: flex-end;
+}
+
+.navBack {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 0 8px 0 2px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.navBack :global(.fe) {
+  font-size: 1.5rem;
+}
+
+.navTitle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #1c2334;
+  font: inherit;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navTitleText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navTitleTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 0.9375rem;
+}
+
+.navIconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1.375rem;
+  cursor: pointer;
+}
+
+.navTextButton {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editorContent {
+  padding: 14px 16px calc(150px + env(safe-area-inset-bottom, 0px));
+}
+
+.statusLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 6px 8px 14px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.statusText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statusTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.statusSub {
+  font-size: 0.8125rem;
+  color: #4f5866;
+}
+
+.switchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.switchButton:disabled {
+  opacity: 0.6;
+}
+
+.switchTrack {
+  position: relative;
+  width: 52px;
+  height: 32px;
+  border-radius: 999px;
+  background-color: #c9ced8;
+  transition: background-color 0.2s;
+}
+
+.switchTrackOn {
+  background-color: #2f5bd8;
+}
+
+.switchKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s;
+}
+
+.switchTrackOn .switchKnob {
+  transform: translateX(20px);
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background-color: #fff4e5;
+  border: 1px solid #f3d3a8;
+  color: #6b3a07;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.bannerButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.bannerButtons .bigButton {
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background-color: rgba(247, 248, 251, 0.94);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+.bottomBarRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bottomBarRow .bigButton {
+  width: auto;
+  min-height: 48px;
+}
+
+.dirtyLabel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #8a4a0f;
+}
+
+.dirtyDot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background-color: #e8892b;
+}
+
+.errorBanner {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background-color: #fdeaea;
+  color: #8c1f1f;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* the running/stop control fills the bottom bar */
+.bottomBar :global(.btn) {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+.toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  z-index: 1070;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 6px 4px 16px;
+  border-radius: 14px;
+  background-color: #1c2334;
+  color: #fff;
+  font-size: 0.9375rem;
+  box-shadow: 0 10px 30px rgba(16, 22, 38, 0.3);
+  animation: toastIn 0.22s ease-out;
+}
+
+.toastText {
+  flex: 1;
+}
+
+.toastButton {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #a9c0ff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@keyframes toastIn {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* ---------- reorder mode ---------- */
+
+.reorderList {
+  margin-top: 12px;
+}
+
+.reorderRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 60px;
+  padding: 0 4px;
+}
+
+.reorderRow + .reorderRow {
+  border-top: 1px solid #edf0f4;
+}
+
+.reorderNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background-color: #e6e9f0;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.reorderText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-left: 6px;
+}
+
+.reorderButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.reorderButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.reorderButtonDanger {
+  color: #c23434;
+}
+
+/* ---------- scene list ---------- */
+
+.listHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+.listTitle {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background-color: rgba(28, 35, 52, 0.07);
+  color: #4f5866;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #1c2334;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  margin: 0 -16px;
+  padding: 0 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #d7dce5;
+  border-radius: 999px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chipSelected {
+  border-color: #1c2334;
+  background-color: #1c2334;
+  color: #fff;
+}
+
+.sceneList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+}
+
+.sceneRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px 8px 0;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.sceneRowOpen {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding-left: 12px;
+  color: #1c2334;
+}
+
+.sceneRowOpen:hover,
+.sceneRowOpen:focus {
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.sceneTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 1.125rem;
+}
+
+.sceneTileDisabled {
+  background-color: #eceef1;
+  color: #5f6878;
+}
+
+.playButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.playButton:disabled {
+  opacity: 0.6;
+}
+
+.sceneRow :global(.btn) {
+  min-height: 44px;
+  border-radius: 999px;
+}
+
+.fab {
+  position: fixed;
+  right: 20px;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  color: #fff;
+  font-size: 1.625rem;
+  box-shadow: 0 10px 24px rgba(47, 91, 216, 0.4);
+  cursor: pointer;
+}
+
+.newSceneIcon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 4px 16px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+.textField {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid #d7dce5;
+  border-radius: 14px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 17px;
+}
+
+.textField:focus {
+  border-color: #2f5bd8;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.18);
+}
+
+.fieldError {
+  margin: 8px 4px 0;
+  font-size: 0.875rem;
+  color: #b42d2d;
+}
+
+/* below 768px no field of the scene pages triggers the iOS zoom on focus */
+@media (max-width: 767.98px) {
+  .editorPage :global(.form-control),
+  .editorPage :global(.custom-select),
+  .editorPage input,
+  .editorPage select,
+  .editorPage textarea {
+    font-size: 16px;
+  }
+}

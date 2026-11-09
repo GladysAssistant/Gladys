@@ -6,11 +6,24 @@ import get from 'get-value'; // Import get-value package
 
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
+import MobileEditScenePage from './mobile/MobileEditScenePage';
+import LeaveConfirmSheet from './LeaveConfirmSheet';
 import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
 import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { findMissingRequiredField, hasIntegrationSteps } from './sceneIntegrations';
 import { sortRanges } from './triggers/TimeRangesTrigger';
+import { readSceneDraft, writeSceneDraft, removeSceneDraft } from './sceneDraft';
+import { isMobileViewport, watchMobileViewport } from '../../../utils/mobileViewport';
+
+// The normalizations the step forms apply when they mount (default values, if/then/else arrays)
+// are done well within this delay: only then is a stored draft compared with the scene on screen
+const DRAFT_CHECK_DELAY_MS = 1500;
+const DRAFT_WRITE_DEBOUNCE_MS = 500;
+const TOAST_DURATION_MS = 2600;
+const UNDO_TOAST_DURATION_MS = 5000;
+
+const cloneDeep = value => JSON.parse(JSON.stringify(value));
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -348,6 +361,7 @@ class EditScene extends Component {
         triggersVariables,
         SceneGetStatus: RequestStatus.Success
       });
+      this.scheduleDraftCheck();
     } catch (e) {
       this.setState({
         SceneGetStatus: RequestStatus.Error
@@ -471,8 +485,21 @@ class EditScene extends Component {
       });
     }
   };
+  // Saves the scene; resolves to true when the server acknowledged it. A failure leaves the
+  // error alert in the state, and bumps errorNonce so the pages bring it into view (spec C.3)
   saveScene = async e => {
-    if (e) {
+    const saved = await this.saveSceneInternal(e);
+    if (saved) {
+      removeSceneDraft(this.props.scene_selector);
+      this.showToast('editScene.mobile.savedToast');
+    } else {
+      this.setState(prevState => ({ errorNonce: (prevState.errorNonce || 0) + 1 }));
+    }
+    return saved;
+  };
+
+  saveSceneInternal = async e => {
+    if (e && e.preventDefault) {
       e.preventDefault();
     }
     // Serialize the scene before the request: the local state can change while it is in
@@ -494,7 +521,7 @@ class EditScene extends Component {
         errorMessageId: 'editScene.triggersCard.scheduledTrigger.noRangeError',
         errorMessageFields: {}
       });
-      return;
+      return false;
     }
     if (
       timeRangeTriggers.some(trigger =>
@@ -507,7 +534,7 @@ class EditScene extends Component {
         errorMessageId: 'editScene.triggersCard.scheduledTrigger.invalidRangesError',
         errorMessageFields: {}
       });
-      return;
+      return false;
     }
     timeRangeTriggers.forEach(trigger => {
       trigger.time_ranges = sortRanges(trigger.time_ranges);
@@ -529,7 +556,7 @@ class EditScene extends Component {
           errorMessageId: 'editScene.externalIntegration.catalogUnavailableError',
           errorMessageFields: {}
         });
-        return;
+        return false;
       }
     }
     // a required filter of an integration trigger left empty would match any
@@ -547,7 +574,7 @@ class EditScene extends Component {
         errorMessageId: 'editScene.externalIntegration.requiredFieldError',
         errorMessageFields: missingRequiredField
       });
-      return;
+      return false;
     }
     this.setState({ saving: true, error: false, errorMessage: null, errorMessageId: null });
     try {
@@ -584,9 +611,11 @@ class EditScene extends Component {
           errorMessage = e.response.data.message;
         }
       }
-      this.setState({ error: true, errorMessage });
+      this.setState({ error: true, errorMessage, saving: false });
+      return false;
     }
     this.setState({ saving: false });
+    return true;
   };
 
   // This function is used to check and add empty groups to the actions and variables arrays
@@ -1081,8 +1110,47 @@ class EditScene extends Component {
     });
   };
 
+  // The list keeps its search and tags through the URL; the "new" flag of a just-created
+  // scene only concerns the editor
+  getListUrl = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.delete('new');
+    const search = urlParams.toString();
+    return search ? `/dashboard/scene?${search}` : '/dashboard/scene';
+  };
+
+  leave = () => {
+    clearTimeout(this.draftWriteTimer);
+    this.draftWritesEnabled = false;
+    removeSceneDraft(this.props.scene_selector);
+    route(this.getListUrl());
+  };
+
+  // The back control of the editor: with unsaved changes, ask first (spec C.2)
   goBack = () => {
-    route(`/dashboard/scene${window.location.search}`);
+    if (this.hasUnsavedChanges()) {
+      this.setState({ leaveConfirmOpen: true });
+      return;
+    }
+    this.leave();
+  };
+
+  cancelLeave = () => {
+    this.setState({ leaveConfirmOpen: false });
+  };
+
+  leaveWithoutSaving = () => {
+    this.setState({ leaveConfirmOpen: false });
+    this.leave();
+  };
+
+  saveAndLeave = async () => {
+    const saved = await this.saveScene();
+    if (saved) {
+      this.leave();
+    } else {
+      this.setState({ leaveConfirmOpen: false });
+    }
   };
 
   deleteScene = async () => {
@@ -1090,7 +1158,7 @@ class EditScene extends Component {
     try {
       await this.props.httpClient.delete(`/api/v1/scene/${this.props.scene_selector}`);
       this.setState({ saving: false });
-      this.goBack();
+      this.leave();
     } catch (e) {
       this.setState({ saving: false });
     }
@@ -1555,6 +1623,242 @@ class EditScene extends Component {
     }
   };
 
+  // ---------------------------------------------------------------------------------------------
+  // Unsaved changes, local draft, toasts and undo (docs/specs/scene-editor-mobile.md, C.2 / E.6)
+  // ---------------------------------------------------------------------------------------------
+
+  hasUnsavedChanges = () => {
+    const { scene, savedSceneSnapshot } = this.state;
+    return Boolean(scene && savedSceneSnapshot && JSON.stringify(scene) !== savedSceneSnapshot);
+  };
+
+  // A draft is only offered once the forms are mounted and normalized: comparing it with the
+  // scene earlier would offer the normalizations as "unsaved changes"
+  scheduleDraftCheck = () => {
+    clearTimeout(this.draftCheckTimer);
+    this.draftCheckTimer = setTimeout(this.checkDraft, DRAFT_CHECK_DELAY_MS);
+  };
+
+  checkDraft = () => {
+    const { scene, savedSceneSnapshot } = this.state;
+    const draft = readSceneDraft(this.props.scene_selector);
+    this.draftWritesEnabled = true;
+    if (!draft || !scene) {
+      return;
+    }
+    // a draft written on top of another version of the scene would overwrite newer work
+    if (draft.base !== savedSceneSnapshot || JSON.stringify(draft.scene) === JSON.stringify(scene)) {
+      removeSceneDraft(this.props.scene_selector);
+      return;
+    }
+    this.setState({ draftToRestore: draft });
+  };
+
+  persistDraft = () => {
+    if (!this.draftWritesEnabled || !this.state.scene || !this.state.savedSceneSnapshot) {
+      return;
+    }
+    if (this.hasUnsavedChanges()) {
+      writeSceneDraft(this.props.scene_selector, this.state.savedSceneSnapshot, this.state.scene);
+    } else if (!this.state.draftToRestore) {
+      removeSceneDraft(this.props.scene_selector);
+    }
+  };
+
+  scheduleDraftWrite = () => {
+    if (!this.draftWritesEnabled) {
+      return;
+    }
+    clearTimeout(this.draftWriteTimer);
+    this.draftWriteTimer = setTimeout(this.persistDraft, DRAFT_WRITE_DEBOUNCE_MS);
+  };
+
+  restoreDraft = () => {
+    const { draftToRestore } = this.state;
+    if (!draftToRestore) {
+      return;
+    }
+    const scene = draftToRestore.scene;
+    if (!scene.triggers) {
+      scene.triggers = [];
+    }
+    // the forms register their variables when they mount: they are remounted (editorKey) on
+    // the restored scene, as on a load
+    this.setState(prevState => ({
+      scene,
+      variables: initializeSceneVariables(scene.actions),
+      triggersVariables: scene.triggers.map(() => []),
+      draftToRestore: null,
+      editorKey: (prevState.editorKey || 0) + 1
+    }));
+  };
+
+  discardDraft = () => {
+    removeSceneDraft(this.props.scene_selector);
+    this.setState({ draftToRestore: null });
+  };
+
+  onBeforeUnload = e => {
+    if (this.hasUnsavedChanges()) {
+      e.preventDefault();
+      // eslint-disable-next-line no-param-reassign
+      e.returnValue = '';
+    }
+  };
+
+  showToast = (textId, withUndo = false) => {
+    clearTimeout(this.toastTimer);
+    this.setState(prevState => ({
+      toast: { id: (prevState.toast ? prevState.toast.id : 0) + 1, textId, withUndo }
+    }));
+    this.toastTimer = setTimeout(
+      () => this.setState({ toast: null }),
+      withUndo ? UNDO_TOAST_DURATION_MS : TOAST_DURATION_MS
+    );
+  };
+
+  hideToast = () => {
+    clearTimeout(this.toastTimer);
+    this.setState({ toast: null });
+  };
+
+  // Snapshot of what a deletion changes, taken before it (some mutations rewrite the variable
+  // references of the actions in place: the snapshot must be a deep copy)
+  takeUndoSnapshot = () => {
+    const { scene, variables, triggersVariables } = this.state;
+    this.undoSnapshot = cloneDeep({ scene, variables, triggersVariables });
+  };
+
+  undo = () => {
+    if (!this.undoSnapshot) {
+      return;
+    }
+    const snapshot = this.undoSnapshot;
+    this.undoSnapshot = null;
+    this.hideToast();
+    this.setState({
+      scene: snapshot.scene,
+      variables: snapshot.variables,
+      triggersVariables: snapshot.triggersVariables
+    });
+  };
+
+  // ---------------------------------------------------------------------------------------------
+  // Mutations of the mobile editor: thin wrappers around the shared ones, resolving to the path of
+  // what they created so the editor can open its sheet (docs/specs/scene-editor-mobile.md, E.4)
+  // ---------------------------------------------------------------------------------------------
+
+  getActionByPath = path => {
+    let current = this.state.scene.actions;
+    for (const segment of path.split('.')) {
+      if (current === undefined || current === null) {
+        return null;
+      }
+      current = /^\d+$/.test(segment) ? current[parseInt(segment, 10)] : current[segment];
+    }
+    return current || null;
+  };
+
+  // Adds an empty step at the end of a level (the root, or a then/else branch): the step goes in
+  // the trailing empty group the data model keeps at the end of every level
+  appendStep = async (containerPath = '') => {
+    await this.addEmptyActionGroupIfNeeded();
+    const container = this.getActionContainer(containerPath ? containerPath.split('.') : []);
+    if (!container) {
+      return null;
+    }
+    const groupIndex = container.length - 1;
+    const groupPath = containerPath ? `${containerPath}.${groupIndex}` : `${groupIndex}`;
+    await this.addAction(groupPath);
+    return `${groupPath}.0`;
+  };
+
+  // Root level only: the shared mutation shifts the variables of the following groups
+  insertStepAfter = async index => {
+    await this.addActionGroupAfter(index);
+    await this.addAction(`${index + 1}`);
+    return `${index + 1}.0`;
+  };
+
+  addParallelAction = async groupPath => {
+    const group = this.getActionByPath(groupPath);
+    const index = Array.isArray(group) ? group.length : 0;
+    await this.addAction(groupPath);
+    return `${groupPath}.${index}`;
+  };
+
+  addConditionToBlock = async (blockPath, filter) => {
+    const block = this.getActionByPath(blockPath);
+    if (!block) {
+      return null;
+    }
+    if (!Array.isArray(block.if)) {
+      this.updateActionProperty(blockPath, 'if', []);
+    }
+    const index = Array.isArray(block.if) ? block.if.length : 0;
+    await this.addAction(`${blockPath}.if`, { filter });
+    return `${blockPath}.if.${index}`;
+  };
+
+  addTriggerAndGetIndex = () => {
+    const index = this.state.scene.triggers.length;
+    this.addTrigger();
+    return index;
+  };
+
+  deleteActionWithUndo = path => {
+    this.takeUndoSnapshot();
+    this.deleteAction(path);
+    this.showToast(path.includes('.if.') ? 'editScene.mobile.conditionDeleted' : 'editScene.mobile.stepDeleted', true);
+  };
+
+  deleteActionGroupWithUndo = groupPath => {
+    this.takeUndoSnapshot();
+    this.deleteActionGroup(groupPath);
+    this.showToast('editScene.mobile.stepDeleted', true);
+  };
+
+  deleteTriggerWithUndo = index => {
+    this.takeUndoSnapshot();
+    this.deleteTrigger(index);
+    this.showToast('editScene.mobile.triggerDeleted', true);
+  };
+
+  // A sheet closed while its step still has no type: nothing half-created stays in the scene
+  cancelEmptyAction = path => {
+    const action = this.getActionByPath(path);
+    if (action && action.type === null) {
+      this.deleteAction(path);
+    }
+  };
+
+  cancelEmptyTrigger = index => {
+    const trigger = this.state.scene.triggers[index];
+    if (trigger && trigger.type === null) {
+      this.deleteTrigger(index);
+    }
+  };
+
+  moveRootStep = async (index, direction) => {
+    const destination = index + direction;
+    // the trailing empty group is not a step: nothing moves past it
+    if (destination < 0 || destination >= this.state.scene.actions.length - 1) {
+      return;
+    }
+    await this.moveCardGroup(`${index}`, `${destination}`);
+  };
+
+  saveAndStartScene = async () => {
+    const saved = await this.saveScene();
+    if (saved) {
+      await this.startScene();
+    }
+  };
+
+  onViewportChange = isMobile => {
+    this.setState({ isMobile });
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -1565,12 +1869,20 @@ class EditScene extends Component {
       deviceFeatures: null,
       thermostatSchedules: null,
       runningScenes: [],
-      now: Date.now()
+      now: Date.now(),
+      isMobile: isMobileViewport(),
+      editorKey: 0,
+      toast: null,
+      leaveConfirmOpen: false,
+      draftToRestore: null
     };
     this.ticker = null;
+    this.draftWritesEnabled = false;
   }
 
   componentDidMount() {
+    this.unwatchViewport = watchMobileViewport(this.onViewportChange);
+    window.addEventListener('beforeunload', this.onBeforeUnload);
     this.getSceneBySelector();
     this.getSceneIntegrations();
     this.getDeviceFeatures();
@@ -1587,12 +1899,22 @@ class EditScene extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     // Start/stop the ticker based on the applied state.
     this.refreshTicker();
+    if (prevState.scene !== this.state.scene || prevState.savedSceneSnapshot !== this.state.savedSceneSnapshot) {
+      this.scheduleDraftWrite();
+    }
   }
 
   componentWillUnmount() {
+    if (this.unwatchViewport) {
+      this.unwatchViewport();
+    }
+    window.removeEventListener('beforeunload', this.onBeforeUnload);
+    clearTimeout(this.draftCheckTimer);
+    clearTimeout(this.draftWriteTimer);
+    clearTimeout(this.toastTimer);
     document.removeEventListener('click', this.closeEdition, true);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
@@ -1610,6 +1932,7 @@ class EditScene extends Component {
       errorMessage,
       errorMessageId,
       errorMessageFields,
+      errorNonce,
       variables,
       scene,
       triggersVariables,
@@ -1620,59 +1943,104 @@ class EditScene extends Component {
       askDeleteScene,
       runningScenes,
       now,
-      savedSceneSnapshot
+      savedSceneSnapshot,
+      highLightedActions,
+      isMobile,
+      editorKey,
+      toast,
+      leaveConfirmOpen,
+      draftToRestore
     }
   ) {
+    if (!scene) {
+      return null;
+    }
     const runningInfo = computeRunningInfo(runningScenes, props.scene_selector, now);
-    const hasUnsavedChanges = Boolean(scene && savedSceneSnapshot && JSON.stringify(scene) !== savedSceneSnapshot);
+    const hasUnsavedChanges = Boolean(savedSceneSnapshot && JSON.stringify(scene) !== savedSceneSnapshot);
+    const savedScene = hasUnsavedChanges ? JSON.parse(savedSceneSnapshot) : scene;
+    const pageProps = {
+      ...props,
+      scene,
+      savedScene,
+      hasUnsavedChanges,
+      runningInfo,
+      stopScene: this.stopScene,
+      tags,
+      updateActionProperty: this.updateActionProperty,
+      updateTriggerProperty: this.updateTriggerProperty,
+      addAction: this.addAction,
+      deleteActionGroup: this.deleteActionGroup,
+      deleteAction: this.deleteAction,
+      addTrigger: this.addTrigger,
+      deleteTrigger: this.deleteTrigger,
+      saving,
+      error,
+      errorMessage,
+      errorMessageId,
+      errorMessageFields,
+      errorNonce,
+      variables,
+      triggersVariables,
+      sceneIntegrations,
+      deviceFeatures,
+      thermostatSchedules,
+      highLightedActions,
+      setVariables: this.setVariables,
+      setVariablesTrigger: this.setVariablesTrigger,
+      switchActiveScene: this.switchActiveScene,
+      updateSceneName: this.updateSceneName,
+      moveCard: this.moveCard,
+      moveCardGroup: this.moveCardGroup,
+      updateSceneDescription: this.updateSceneDescription,
+      startScene: this.startScene,
+      deleteScene: this.deleteScene,
+      saveScene: this.saveScene,
+      duplicateScene: this.duplicateScene,
+      setTags: this.setTags,
+      updateSceneIcon: this.updateSceneIcon,
+      addActionGroupAfter: this.addActionGroupAfter,
+      askDeleteScene,
+      askDeleteCurrentScene: this.askDeleteCurrentScene,
+      cancelDeleteCurrentScene: this.cancelDeleteCurrentScene,
+      goBack: this.goBack,
+      draftToRestore,
+      restoreDraft: this.restoreDraft,
+      discardDraft: this.discardDraft
+    };
     return (
-      scene && (
-        <div>
-          <EditScenePage
-            {...props}
-            scene={scene}
-            hasUnsavedChanges={hasUnsavedChanges}
-            runningInfo={runningInfo}
-            stopScene={this.stopScene}
-            tags={tags}
-            updateActionProperty={this.updateActionProperty}
-            updateTriggerProperty={this.updateTriggerProperty}
-            addAction={this.addAction}
-            deleteActionGroup={this.deleteActionGroup}
-            deleteAction={this.deleteAction}
-            addTrigger={this.addTrigger}
-            deleteTrigger={this.deleteTrigger}
-            saving={saving}
-            error={error}
-            errorMessage={errorMessage}
-            errorMessageId={errorMessageId}
-            errorMessageFields={errorMessageFields}
-            variables={variables}
-            triggersVariables={triggersVariables}
-            sceneIntegrations={sceneIntegrations}
-            deviceFeatures={deviceFeatures}
-            thermostatSchedules={thermostatSchedules}
-            setVariables={this.setVariables}
-            setVariablesTrigger={this.setVariablesTrigger}
-            switchActiveScene={this.switchActiveScene}
-            updateSceneName={this.updateSceneName}
-            moveCard={this.moveCard}
-            moveCardGroup={this.moveCardGroup}
-            updateSceneDescription={this.updateSceneDescription}
-            startScene={this.startScene}
-            deleteScene={this.deleteScene}
-            saveScene={this.saveScene}
-            duplicateScene={this.duplicateScene}
-            setTags={this.setTags}
-            updateSceneIcon={this.updateSceneIcon}
-            addActionGroupAfter={this.addActionGroupAfter}
-            askDeleteScene={askDeleteScene}
-            askDeleteCurrentScene={this.askDeleteCurrentScene}
-            cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
-            goBack={this.goBack}
+      <div key={editorKey}>
+        {isMobile ? (
+          <MobileEditScenePage
+            {...pageProps}
+            isNewScene={new URLSearchParams(window.location.search).get('new') === '1'}
+            toast={toast}
+            hideToast={this.hideToast}
+            undo={this.undo}
+            appendStep={this.appendStep}
+            insertStepAfter={this.insertStepAfter}
+            addParallelAction={this.addParallelAction}
+            addConditionToBlock={this.addConditionToBlock}
+            addTriggerAndGetIndex={this.addTriggerAndGetIndex}
+            deleteActionWithUndo={this.deleteActionWithUndo}
+            deleteActionGroupWithUndo={this.deleteActionGroupWithUndo}
+            deleteTriggerWithUndo={this.deleteTriggerWithUndo}
+            cancelEmptyAction={this.cancelEmptyAction}
+            cancelEmptyTrigger={this.cancelEmptyTrigger}
+            moveRootStep={this.moveRootStep}
+            saveAndStartScene={this.saveAndStartScene}
           />
-        </div>
-      )
+        ) : (
+          <EditScenePage {...pageProps} />
+        )}
+        <LeaveConfirmSheet
+          open={leaveConfirmOpen}
+          sceneName={scene.name}
+          saving={saving}
+          onSaveAndLeave={this.saveAndLeave}
+          onLeaveWithoutSaving={this.leaveWithoutSaving}
+          onCancel={this.cancelLeave}
+        />
+      </div>
     );
   }
 }
