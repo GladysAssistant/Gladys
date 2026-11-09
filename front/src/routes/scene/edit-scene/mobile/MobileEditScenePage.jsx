@@ -501,12 +501,18 @@ class MobileEditScenePage extends Component {
             ) : (
               <>
                 <div class={style.navSide}>
-                  <button type="button" class={style.navBack} onClick={props.goBack} data-cy="scene-back-button">
+                  <button
+                    type="button"
+                    class={style.navBack}
+                    onClick={props.goBack}
+                    data-cy="scene-back-button"
+                    data-not-an-edit
+                  >
                     <i class="fe fe-chevron-left" aria-hidden="true" />
                     <Text id="scene.title" />
                   </button>
                 </div>
-                <button type="button" class={style.navTitle} onClick={this.openSettings}>
+                <button type="button" class={style.navTitle} onClick={this.openSettings} data-not-an-edit>
                   {scene.icon && (
                     <span class={style.navTitleTile} aria-hidden="true">
                       <i class={`fe fe-${scene.icon}`} />
@@ -520,6 +526,7 @@ class MobileEditScenePage extends Component {
                       type="button"
                       class={style.navIconButton}
                       onClick={this.openMenu}
+                      data-not-an-edit
                       aria-label={<Text id="editScene.mobile.moreActions" />}
                       data-cy="scene-more-button"
                     >

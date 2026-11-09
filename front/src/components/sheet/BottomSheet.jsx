@@ -155,6 +155,7 @@ class BottomSheet extends Component {
     return createPortal(
       <div
         class={cx('glass-theme', style.overlay, { [style.overlayHidden]: !open })}
+        data-sheet-backdrop
         aria-hidden={open ? undefined : 'true'}
         style={depth ? { zIndex: 1060 + depth * 2 } : undefined}
         {...this.backdropDismiss}
@@ -169,7 +170,7 @@ class BottomSheet extends Component {
           ref={this.setSheetRef}
         >
           <div class={style.handle} />
-          <div class={style.header}>
+          <div class={style.header} data-not-an-edit>
             <div class={style.headerSide}>
               {onBack && (
                 <button type="button" class={style.headerLink} onClick={onBack}>

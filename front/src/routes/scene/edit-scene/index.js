@@ -33,8 +33,18 @@ const withoutActive = snapshot => {
   return JSON.stringify(parsed);
 };
 
-// Events that mean the user acts on the editor (a scroll gesture is none of them)
-const EDIT_EVENTS = ['click', 'input', 'change', 'keydown'];
+// Events that mean the user may be editing the scene (a scroll gesture is none of them). A
+// click inside [data-not-an-edit] (back, opening a row or a sheet, closing it) or on a sheet's
+// backdrop only moves around the editor
+const EDIT_EVENTS = ['click', 'input', 'change'];
+
+const isNavigationClick = event => {
+  const target = event.target;
+  if (event.type !== 'click' || !target || typeof target.closest !== 'function') {
+    return false;
+  }
+  return Boolean(target.closest('[data-not-an-edit]') || target.hasAttribute('data-sheet-backdrop'));
+};
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -1133,12 +1143,24 @@ class EditScene extends Component {
   leave = () => {
     clearTimeout(this.draftWriteTimer);
     this.draftWritesEnabled = false;
+    this.leftOnPurpose = true;
     removeSceneDraft(this.props.scene_selector);
     route(this.getListUrl());
   };
 
   // The back control of the editor: with unsaved changes, ask first (spec C.2)
   goBack = () => {
+    // Back before the forms have settled, without any edit: whatever differs from the saved
+    // version is their mount normalization, nothing to ask about nor to save. A draft left by an
+    // earlier session stays in storage, to be offered next time.
+    if (!this.draftCheckDone && !this.userActed) {
+      clearTimeout(this.draftCheckTimer);
+      this.stopWatchingUserActions();
+      this.draftWritesEnabled = false;
+      this.leftOnPurpose = true;
+      route(this.getListUrl());
+      return;
+    }
     if (this.hasUnsavedChanges()) {
       this.setState({ leaveConfirmOpen: true });
       return;
@@ -1648,12 +1670,15 @@ class EditScene extends Component {
   scheduleDraftCheck = () => {
     clearTimeout(this.draftCheckTimer);
     this.userActed = false;
+    this.draftCheckDone = false;
     EDIT_EVENTS.forEach(type => document.addEventListener(type, this.onUserAction, true));
     this.draftCheckTimer = setTimeout(this.checkDraft, DRAFT_CHECK_DELAY_MS);
   };
 
-  onUserAction = () => {
-    this.userActed = true;
+  onUserAction = event => {
+    if (!isNavigationClick(event)) {
+      this.userActed = true;
+    }
   };
 
   stopWatchingUserActions = () => {
@@ -1662,6 +1687,7 @@ class EditScene extends Component {
 
   checkDraft = () => {
     this.stopWatchingUserActions();
+    this.draftCheckDone = true;
     const { scene, savedSceneSnapshot } = this.state;
     if (!scene || !savedSceneSnapshot) {
       return;
@@ -1672,13 +1698,19 @@ class EditScene extends Component {
     // the user has not acted yet, those writes are part of the saved version, not changes the
     // leave guard should ask about
     const normalizedScene = JSON.stringify(scene);
-    if (!this.userActed && normalizedScene !== savedSceneSnapshot) {
+    const rebased = !this.userActed && normalizedScene !== savedSceneSnapshot;
+    if (rebased) {
       currentBase = withoutActive(normalizedScene);
       this.setState({ savedSceneSnapshot: normalizedScene });
     }
     this.draftWritesEnabled = true;
     const draft = readSceneDraft(this.props.scene_selector);
     if (!draft) {
+      // edits made while the forms settled are written now: an app killed in the background
+      // runs no unmount
+      if (!rebased) {
+        this.persistDraft();
+      }
       return;
     }
     // a draft written on top of another version of the scene would overwrite newer work
@@ -1981,6 +2013,10 @@ class EditScene extends Component {
     // when the user chose to discard)
     clearTimeout(this.draftWriteTimer);
     if (this.draftWritesEnabled) {
+      this.persistDraft();
+    } else if (this.userActed && !this.leftOnPurpose) {
+      // left while the forms were still settling, after an edit
+      this.draftWritesEnabled = true;
       this.persistDraft();
     }
     clearTimeout(this.toastTimer);

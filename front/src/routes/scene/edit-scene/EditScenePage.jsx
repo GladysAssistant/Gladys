@@ -50,6 +50,7 @@ const EditScenePage = ({ children, ...props }) => {
                     <Localizer>
                       <button
                         onClick={props.goBack}
+                        data-not-an-edit
                         class={cx('btn btn-secondary btn-sm', style.backButton)}
                         aria-label={<Text id="editScene.backButton" />}
                       >
@@ -85,6 +86,7 @@ const EditScenePage = ({ children, ...props }) => {
                       <button
                         onClick={settingsOpen ? closeSettings : openSettings}
                         data-cy="edit-scene-settings-button"
+                        data-not-an-edit
                         aria-label={<Text id="editScene.settings" />}
                         className={cx('btn mb-0', style.headerActionBtn, {
                           'btn-secondary': settingsOpen,

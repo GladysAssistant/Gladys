@@ -129,7 +129,7 @@ const ActionCard = ({ children, ...props }) => {
             {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
             {props.action.type === null && <i class="fe fe-plus-circle" />}
           </span>
-          <div class={style.stepText} onClick={toggleExpanded}>
+          <div class={style.stepText} onClick={toggleExpanded} data-not-an-edit>
             <span class={style.stepLabel} data-step-label>
               {declarationTitle || <Text id={`editScene.actions.${props.action.type}`} />}
               {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
@@ -170,6 +170,7 @@ const ActionCard = ({ children, ...props }) => {
                 <button
                   type="button"
                   onClick={toggleExpanded}
+                  data-not-an-edit
                   class={style.cardOptionButton}
                   aria-expanded={isExpanded}
                   aria-label={<Text id={isExpanded ? 'editScene.collapseStepButton' : 'editScene.expandStepButton'} />}

@@ -71,6 +71,67 @@ describe('Scene on a phone', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
   });
 
+  it('Should leave a scene opened by mistake without asking', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    // a scene the forms normalize when they mount: a delay without unit, an if block without
+    // then / else
+    cy.window().then(win => {
+      const { access_token: accessToken } = JSON.parse(win.localStorage.getItem('user'));
+      cy.request({
+        method: 'POST',
+        url: `${serverUrl}/api/v1/scene`,
+        headers: { authorization: `Bearer ${accessToken}` },
+        body: {
+          name: 'My normalized scene',
+          icon: 'zap',
+          actions: [[{ type: 'delay', value: 3 }], [{ type: 'condition.if-then-else', if: [] }]],
+          tags: []
+        }
+      }).then(resp => {
+        Cypress.env('normalizedSceneSelector', resp.body.selector);
+        cy.visit(`/dashboard/scene/${resp.body.selector}`);
+      });
+    });
+
+    cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+    cy.get('[data-cy=scene-leave-confirm]').should('not.exist');
+
+    cy.window().then(win => {
+      const { access_token: accessToken } = JSON.parse(win.localStorage.getItem('user'));
+      cy.request({
+        method: 'DELETE',
+        url: `${serverUrl}/api/v1/scene/${Cypress.env('normalizedSceneSelector')}`,
+        headers: { authorization: `Bearer ${accessToken}` }
+      });
+    });
+  });
+
+  it('Should offer back the unsaved changes after a reload', () => {
+    const sceneUrl = Cypress.env('mobileSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.visit(sceneUrl);
+
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
+    // the draft is written once the forms have settled, then debounced
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2500);
+
+    cy.reload();
+    cy.get('[data-cy=scene-draft-banner]').should('be.visible');
+    cy.get('[data-cy=scene-draft-restore]').click();
+    cy.get('[data-cy="scene-step-row-1.0"]').should('be.visible');
+    cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
+
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.get('[data-cy=scene-leave-discard]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+  });
+
   it('Should disable the scene from its status line', () => {
     const sceneUrl = Cypress.env('mobileSceneUrl');
     expect(sceneUrl).to.exist;

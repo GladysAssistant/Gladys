@@ -46,7 +46,7 @@ const TriggerCard = ({ children, ...props }) => {
           {TRIGGER_ICON[props.trigger.type] && <i class={TRIGGER_ICON[props.trigger.type]} />}
           {props.trigger.type === null && <i class="fe fe-plus-circle" />}
         </span>
-        <div class={style.stepText} onClick={toggleExpanded}>
+        <div class={style.stepText} onClick={toggleExpanded} data-not-an-edit>
           <span class={style.stepLabel}>
             {declarationTitle || <Text id={`editScene.triggers.${props.trigger.type}`} />}
             {props.trigger.type === null && <Text id="editScene.newTrigger" />}
@@ -68,6 +68,7 @@ const TriggerCard = ({ children, ...props }) => {
             <button
               type="button"
               onClick={toggleExpanded}
+              data-not-an-edit
               class={style.cardOptionButton}
               aria-expanded={expanded}
               aria-label={<Text id={expanded ? 'editScene.collapseStepButton' : 'editScene.expandStepButton'} />}

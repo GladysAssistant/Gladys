@@ -64,9 +64,12 @@ devices not loaded yet) is shown as is.
 
 The step forms normalize their step when they mount (a default unit, the `if` / `then` / `else`
 arrays of a block…). Those writes are not changes: about 1.5 s after the load, once every form is
-mounted, if the user has not acted on the editor yet (no click, input, change nor key press), the
-saved version is re-based on the normalized scene. Without this, the leave guard would ask about
-a scene nobody edited.
+mounted, if the user has not acted on the editor yet (no input, no change, no click other than a
+navigation one — back, opening a row or a sheet, closing it: the elements marked
+`data-not-an-edit` and the sheet backdrops), the saved version is re-based on the normalized
+scene. Before that moment, the back control leaves without asking when the user has not acted
+(whatever differs is normalization; a draft from an earlier session stays stored). Without this,
+the leave guard would ask about a scene nobody edited.
 
 1. **Leave guard.** Leaving the editor through its back control with unsaved changes opens a
    confirmation: **Save and leave** / **Leave without saving** (destructive) / **Keep editing**. It
@@ -76,7 +79,9 @@ a scene nobody edited.
 3. **Local draft.** While there are unsaved changes, the editor writes a draft to `localStorage`
    (key `gladys-scene-draft:<scene selector>`, debounced ~500 ms):
    `{ version: 1, base: <saved version without "active">, scene: <scene>, saved_at: <ISO date> }`.
-   A write still pending when the editor unmounts (swipe-back, global navigation) is flushed then.
+   Edits made while the forms settle are written as soon as the drafts are enabled (the end of
+   that window), and a write still pending when the editor unmounts (swipe-back, global
+   navigation) is flushed then — including an edit made before the window ended.
    - The draft is removed when the scene is saved, when the user leaves without saving, when the
      scene is deleted, and when the edits are undone back to the saved version.
    - When the editor opens a scene and finds a draft **whose `base` equals the scene just loaded
@@ -288,7 +293,8 @@ bar) leaves the mode. Steps inside branches keep their order in this phase (G).
 - Cypress, phone viewport (`cy.viewport('iphone-x')`), `front/cypress/e2e/routes/scene/SceneMobile.cy.js`:
   create a scene from the "+" sheet (name only), add a trigger and a step through the type picker
   sheets, see the bottom bar switch to "unsaved", save, delete a step from its sheet and undo, get
-  the leave guard on "‹ Scenes", disable the scene from its status line, delete it from the menu.
+  the leave guard on "‹ Scenes", leave a scene the forms normalize without being asked, get a
+  draft back after a reload, disable the scene from its status line, delete it from the menu.
 - The swipe gesture itself (`SwipeRow`) is not driven by Cypress: the pointer events Cypress
   synthesizes do not reach the row's handlers in its browser. It is checked in a phone emulation
   with a real pointer (Playwright); every swipe action has a non-gesture equivalent that the specs
