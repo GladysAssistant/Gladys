@@ -37,42 +37,51 @@ const ExposedDevicesSelect = ({
   intl
 }) => {
   const functionName = key => get(intl.dictionary, `integration.matter-bridge.functions.${key}`, { default: key });
-
-  if (matterBridgeDevicesStatus === RequestStatus.Error) {
-    return (
-      <div class="alert alert-danger">
-        <Text id="integration.matter-bridge.devicesError" />
-        <button type="button" class="btn btn-sm btn-secondary ml-2" onClick={getMatterBridgeDevices}>
-          <Text id="integration.matter-bridge.retryButton" />
-        </button>
-      </div>
-    );
-  }
+  const devicesError = matterBridgeDevicesStatus === RequestStatus.Error;
 
   const options = (matterBridgeDevices || []).map(device => ({
     value: device.selector,
     label: `${device.name} (${device.functions.map(functionName).join(', ')})`
   }));
 
-  if (options.length === 0) {
-    return (
+  let content = null;
+  if (!devicesError && options.length === 0) {
+    content = (
       <div class="alert alert-info">
         <Text id="integration.matter-bridge.noCompatibleDevice" />
       </div>
     );
+  } else if (!devicesError) {
+    content = (
+      <Select
+        isMulti
+        aria-label={get(intl.dictionary, 'integration.matter-bridge.exposedDevicesLabel')}
+        options={options}
+        value={options.filter(option => matterBridgeForm.exposedDevices.includes(option.value))}
+        onChange={updateMatterBridgeExposedDevices}
+        maxMenuHeight={220}
+        className="react-select-container"
+        classNamePrefix="react-select"
+      />
+    );
   }
 
+  // A failed refresh replaces the selector: the live region stays mounted so that a screen reader
+  // announces the error when it appears, and the retry button sits right after it.
   return (
-    <Select
-      isMulti
-      aria-label={get(intl.dictionary, 'integration.matter-bridge.exposedDevicesLabel')}
-      options={options}
-      value={options.filter(option => matterBridgeForm.exposedDevices.includes(option.value))}
-      onChange={updateMatterBridgeExposedDevices}
-      maxMenuHeight={220}
-      className="react-select-container"
-      classNamePrefix="react-select"
-    />
+    <div>
+      <div role="status" aria-live="polite">
+        {devicesError && (
+          <div class="alert alert-danger">
+            <Text id="integration.matter-bridge.devicesError" />
+            <button type="button" class="btn btn-sm btn-secondary ml-2" onClick={getMatterBridgeDevices}>
+              <Text id="integration.matter-bridge.retryButton" />
+            </button>
+          </div>
+        )}
+      </div>
+      {content}
+    </div>
   );
 };
 
