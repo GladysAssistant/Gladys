@@ -5193,6 +5193,22 @@
     }
   },
   "systemSettings": {
+    "clockTitle": "Horloge",
+    "clockDescription": "Gladys s'appuie sur l'horloge de la machine qui l'héberge pour les scènes planifiées, l'historique et l'énergie. Elle est comparée ici à l'horloge de l'appareil que vous utilisez.",
+    "clockOnTime": "L'horloge de Gladys est à l'heure.",
+    "clockOffsetConsequences": "Les scènes planifiées se déclenchent au mauvais moment et les états sont enregistrés avec une mauvaise date.",
+    "clockMeasureError": "Impossible de lire l'horloge de Gladys.",
+    "clockSyncUnavailable": "Gladys ne peut pas lire les réglages de synchronisation de l'heure de la machine (systemd-timedated n'est pas joignable). Vérifiez-les directement sur la machine, par exemple avec la commande \"timedatectl\".",
+    "clockSyncOk": "La machine garde son horloge à l'heure automatiquement (synchronisation de l'heure par le réseau).",
+    "clockSyncOkDeviceOff": "Comme la machine est synchronisée, c'est probablement l'horloge de l'appareil que vous utilisez qui est fausse.",
+    "clockSyncNotSynchronized": "La synchronisation automatique de l'heure est activée, mais la machine n'est pas encore synchronisée. Si cela dure, vérifiez qu'elle a accès à Internet (NTP, port UDP 123).",
+    "clockSyncEnabled": "La synchronisation automatique de l'heure a été activée : l'horloge devrait être corrigée d'ici quelques minutes.",
+    "clockSyncDisabled": "La synchronisation automatique de l'heure de la machine est désactivée : son horloge dérive et n'est jamais corrigée.",
+    "clockSyncEnableButton": "Activer la synchronisation automatique de l'heure",
+    "clockSyncEnableError": "Impossible d'activer la synchronisation automatique de l'heure.",
+    "clockSyncNoService": "Aucun service de synchronisation de l'heure n'est installé sur la machine : son horloge dérive et n'est jamais corrigée. Installez-en un (par exemple systemd-timesyncd).",
+    "clockRestartHint": "Une fois l'horloge corrigée, redémarrez Gladys pour que les scènes planifiées soient recalculées avec la bonne heure.",
+    "clockCheckAgain": "Vérifier à nouveau",
     "connected": "Connecté",
     "ping": "{{time}} ms ping",
     "disk": "Disque",
@@ -7357,7 +7373,41 @@
       }
     }
   },
+  "clock": {
+    "ahead": {
+      "minutes": {
+        "one": "L'horloge de Gladys a 1 minute d'avance sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} minutes d'avance sur cet appareil."
+      },
+      "hours": {
+        "one": "L'horloge de Gladys a 1 heure d'avance sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} heures d'avance sur cet appareil."
+      },
+      "days": {
+        "one": "L'horloge de Gladys a 1 jour d'avance sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} jours d'avance sur cet appareil."
+      }
+    },
+    "behind": {
+      "minutes": {
+        "one": "L'horloge de Gladys a 1 minute de retard sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} minutes de retard sur cet appareil."
+      },
+      "hours": {
+        "one": "L'horloge de Gladys a 1 heure de retard sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} heures de retard sur cet appareil."
+      },
+      "days": {
+        "one": "L'horloge de Gladys a 1 jour de retard sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} jours de retard sur cet appareil."
+      }
+    }
+  },
   "header": {
+    "clockNoticeTitle": "L'heure de Gladys est fausse",
+    "clockNoticeText": "Les scènes planifiées, l'historique et l'énergie peuvent être faux.",
+    "clockNoticeButton": "Vérifier l'horloge",
+    "clockNoticeContactAdmin": "Prévenez l'administrateur de votre maison.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Accueil",
     "chat": "Discussion",

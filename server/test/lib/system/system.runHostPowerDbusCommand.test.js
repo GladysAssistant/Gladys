@@ -3,7 +3,11 @@ const sinon = require('sinon').createSandbox();
 
 const proxyquire = require('proxyquire').noCallThru();
 
-const { buildDbusArgv, runHostPowerDbusCommand } = require('../../../lib/system/system.runHostPowerDbusCommand');
+const {
+  buildDbusArgv,
+  runHostDbusCommand,
+  runHostPowerDbusCommand,
+} = require('../../../lib/system/system.runHostPowerDbusCommand');
 
 describe('system.buildDbusArgv', () => {
   it('should append boolean:false for action methods', () => {
@@ -184,5 +188,37 @@ describe('system.runHostPowerDbusCommand (unknown mechanism)', () => {
       caught = e;
     }
     expect(caught).to.be.an('error');
+  });
+});
+
+describe('system.runHostDbusCommand', () => {
+  it('should run any dbus-send argv on the host bus', async () => {
+    const container = {
+      start: sinon.stub().resolves(),
+      wait: sinon.stub().resolves({ StatusCode: 0 }),
+      logs: sinon.stub().resolves(Buffer.from('variant boolean true')),
+      kill: sinon.stub().resolves(),
+      remove: sinon.stub().resolves(),
+    };
+    const self = {
+      dockerode: { createContainer: sinon.stub().resolves(container) },
+      getGladysImage: sinon.stub().resolves({ image: 'gladysassistant/gladys:v4' }),
+    };
+    const argv = ['dbus-send', '--system', '--print-reply', '--dest=org.freedesktop.timedate1'];
+    const output = await runHostDbusCommand.call(self, argv, 'docker-helper', 'time-sync-status');
+    expect(output).to.contain('true');
+    const options = self.dockerode.createContainer.firstCall.args[0];
+    expect(options.Cmd).to.deep.equal(argv);
+    expect(options.name).to.match(/^gladys-time-sync-status-\d+$/);
+  });
+
+  it('should throw when the mechanism is not supported', async () => {
+    let caught;
+    try {
+      await runHostDbusCommand.call({}, ['dbus-send'], 'nope', 'test');
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught.message).to.equal('HOST_DBUS_NOT_AVAILABLE');
   });
 });

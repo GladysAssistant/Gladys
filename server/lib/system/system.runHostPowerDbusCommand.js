@@ -53,28 +53,29 @@ function buildDbusArgv(method) {
 
 /**
  * @description Run the command directly (Gladys runs on the host, not in Docker).
- * @param {string} method - Method name on the logind Manager interface.
+ * @param {Array<string>} argv - The dbus-send argv.
  * @returns {Promise<string>} Resolve with the command stdout.
  * @example
- * await runLocal('CanReboot');
+ * await runLocal(buildDbusArgv('CanReboot'));
  */
-async function runLocal(method) {
-  const { stdout } = await execAsync(buildDbusArgv(method).join(' '), { timeout: COMMAND_TIMEOUT_MS });
+async function runLocal(argv) {
+  const { stdout } = await execAsync(argv.join(' '), { timeout: COMMAND_TIMEOUT_MS });
   return stdout;
 }
 
 /**
  * @description Run the command in a short-lived helper container launched
  * through the Docker socket. The daemon bind-mounts the HOST system DBus socket
- * into the helper, so we can reach systemd-logind even though the Gladys
- * container itself has no /run/dbus mount. Uses the Gladys image (ships
- * dbus-send) so nothing needs to be pulled.
- * @param {string} method - Method name on the logind Manager interface.
+ * into the helper, so we can reach the host systemd services (logind,
+ * timedated) even though the Gladys container itself has no /run/dbus mount.
+ * Uses the Gladys image (ships dbus-send) so nothing needs to be pulled.
+ * @param {Array<string>} argv - The dbus-send argv.
+ * @param {string} label - Short name of the command, used in the container name.
  * @returns {Promise<string>} Resolve with the container output (dbus-send reply).
  * @example
- * await runViaHelperContainer('Reboot');
+ * await runViaHelperContainer(buildDbusArgv('Reboot'), 'host-power-reboot');
  */
-async function runViaHelperContainer(method) {
+async function runViaHelperContainer(argv, label) {
   if (!this.dockerode) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
@@ -89,8 +90,8 @@ async function runViaHelperContainer(method) {
   const createHelperContainer = async (securityOpt) =>
     this.dockerode.createContainer({
       Image: image,
-      name: `gladys-host-power-${method.toLowerCase()}-${Date.now()}`,
-      Cmd: buildDbusArgv(method),
+      name: `gladys-${label}-${Date.now()}`,
+      Cmd: argv,
       HostConfig: {
         Binds: [HOST_DBUS_SOCKET_BIND],
         ...(securityOpt ? { SecurityOpt: securityOpt } : {}),
@@ -107,7 +108,7 @@ async function runViaHelperContainer(method) {
       throw e;
     }
     logger.warn(
-      `System: Docker rejected the AppArmor security option for the host power helper container, retrying without it: ${e.message}`,
+      `System: Docker rejected the AppArmor security option for the host DBus helper container, retrying without it: ${e.message}`,
     );
     container = await createHelperContainer(null);
   }
@@ -123,7 +124,7 @@ async function runViaHelperContainer(method) {
       waitPromise,
       new Promise((resolve, reject) => {
         timeout = setTimeout(
-          () => reject(new Error(`Host power helper container timed out after ${HELPER_TIMEOUT_MS}ms`)),
+          () => reject(new Error(`Host DBus helper container timed out after ${HELPER_TIMEOUT_MS}ms`)),
           HELPER_TIMEOUT_MS,
         );
       }),
@@ -131,7 +132,7 @@ async function runViaHelperContainer(method) {
     const logBuffer = await container.logs({ follow: false, stdout: true, stderr: true });
     output = logBuffer.toString('utf8');
     if (StatusCode !== 0) {
-      throw new Error(`Host power helper container exited with status ${StatusCode}: ${output}`);
+      throw new Error(`Host DBus helper container exited with status ${StatusCode}: ${output}`);
     }
     return output;
   } finally {
@@ -141,6 +142,26 @@ async function runViaHelperContainer(method) {
     await container.kill().catch(() => {});
     await container.remove({ force: true }).catch(() => {});
   }
+}
+
+/**
+ * @description Run a dbus-send command against the HOST system bus, using the
+ * given mechanism (direct on the host, or via a helper container).
+ * @param {Array<string>} argv - The dbus-send argv.
+ * @param {string} mechanism - 'local' | 'docker-helper'.
+ * @param {string} label - Short name of the command, used in the helper container name.
+ * @returns {Promise<string>} Resolve with the raw dbus-send output.
+ * @example
+ * await system.runHostDbusCommand(argv, 'docker-helper', 'time-sync-status');
+ */
+async function runHostDbusCommand(argv, mechanism, label) {
+  if (mechanism === 'local') {
+    return runLocal(argv);
+  }
+  if (mechanism === 'docker-helper') {
+    return runViaHelperContainer.call(this, argv, label);
+  }
+  throw new PlatformNotCompatible('HOST_DBUS_NOT_AVAILABLE');
 }
 
 /**
@@ -154,16 +175,14 @@ async function runViaHelperContainer(method) {
  */
 async function runHostPowerDbusCommand(method, mechanism) {
   logger.info(`System: running host power command ${method} via ${mechanism}`);
-  if (mechanism === 'local') {
-    return runLocal(method);
+  if (mechanism !== 'local' && mechanism !== 'docker-helper') {
+    throw new PlatformNotCompatible('HOST_POWER_MANAGEMENT_NOT_AVAILABLE');
   }
-  if (mechanism === 'docker-helper') {
-    return runViaHelperContainer.call(this, method);
-  }
-  throw new PlatformNotCompatible('HOST_POWER_MANAGEMENT_NOT_AVAILABLE');
+  return runHostDbusCommand.call(this, buildDbusArgv(method), mechanism, `host-power-${method.toLowerCase()}`);
 }
 
 module.exports = {
+  runHostDbusCommand,
   runHostPowerDbusCommand,
   buildDbusArgv,
 };

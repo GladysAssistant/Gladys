@@ -1142,6 +1142,20 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: systemController.getSystemInfos,
     },
+    'get /api/v1/system/clock': {
+      authenticated: true,
+      controller: systemController.getClock,
+    },
+    'get /api/v1/system/clock/sync': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.getTimeSyncStatus,
+    },
+    'post /api/v1/system/clock/sync': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.enableTimeSync,
+    },
     'get /api/v1/system/disk': {
       authenticated: true,
       controller: systemController.getDiskSpace,

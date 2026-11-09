@@ -131,6 +131,14 @@ const system = {
     is_docker: true,
     new_release_available: false
   },
+  // the demo runs in the browser: its "server" clock is the clock of this device
+  'get /api/v1/system/clock': () => ({ server_time: new Date().toISOString() }),
+  'get /api/v1/system/clock/sync': {
+    available: true,
+    can_ntp: true,
+    ntp_enabled: true,
+    ntp_synchronized: true
+  },
   'get /api/v1/system/disk': {
     filesystem: '/dev/disk1s1',
     size: 499313172480,

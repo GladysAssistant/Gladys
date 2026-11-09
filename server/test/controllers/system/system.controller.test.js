@@ -16,6 +16,58 @@ describe('GET /api/v1/system/info', () => {
   });
 });
 
+describe('GET /api/v1/system/clock', () => {
+  it('should return the current time of the server', async () => {
+    const before = Date.now();
+    await authenticatedRequest
+      .get('/api/v1/system/clock')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        const serverTime = Date.parse(res.body.server_time);
+        expect(serverTime).to.be.at.least(before);
+        expect(serverTime).to.be.at.most(Date.now());
+      });
+  });
+});
+
+describe('GET /api/v1/system/clock/sync', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should return the network time synchronization status of the host', async () => {
+    const status = { available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false };
+    sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'getTimeSyncStatus').resolves(status);
+    await authenticatedRequest
+      .get('/api/v1/system/clock/sync')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal(status);
+      });
+  });
+});
+
+describe('POST /api/v1/system/clock/sync', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should turn on the network time synchronization of the host', async () => {
+    const status = { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: false };
+    const enableTimeSync = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'enableTimeSync').resolves(status);
+    await authenticatedRequest
+      .post('/api/v1/system/clock/sync')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal(status);
+      });
+    sinon.assert.calledOnce(enableTimeSync);
+  });
+});
+
 describe('GET /api/v1/system/disk', () => {
   it('should return disk usage', async () => {
     await authenticatedRequest
