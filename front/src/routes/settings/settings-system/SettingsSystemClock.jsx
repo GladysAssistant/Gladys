@@ -7,6 +7,14 @@ import actions from '../../../actions/main';
 import ClockOffsetText from '../../../components/clock/ClockOffsetText';
 import { measureClockOffset, isClockOffsetSignificant } from '../../../utils/clock';
 
+// NTPSynchronized is the kernel "clock synchronized" bit: it stays set for
+// hours after the time synchronization is turned off (timedatectl set-ntp
+// false), while the clock already drifts. It only means the host keeps its
+// clock on time when a time service is on — the one timedated manages, or,
+// when timedated knows of none (CanNTP false), one it does not manage.
+const hostKeepsTime = timeSync =>
+  !!timeSync && timeSync.available && timeSync.ntp_synchronized && (timeSync.ntp_enabled || !timeSync.can_ntp);
+
 // Compares the clock of the server with the clock of this device, and tells
 // whether the machine running Gladys keeps its clock on time on its own
 // (network time synchronization, read from systemd-timedated on the host) —
@@ -22,14 +30,16 @@ class SettingsSystemClock extends Component {
     enabled: false
   };
 
-  check = async () => {
+  // refresh: "Check again" asks the server for a fresh read of the host
+  // status, instead of the one it keeps for a minute
+  check = async ({ refresh = false } = {}) => {
     this.setState({ loading: true, measureError: false });
     const [measure, timeSync] = await Promise.all([
       measureClockOffset(this.props.httpClient).catch(e => {
         console.error(e);
         return null;
       }),
-      this.props.httpClient.get('/api/v1/system/clock/sync').catch(e => {
+      this.props.httpClient.get('/api/v1/system/clock/sync', refresh ? { refresh: true } : undefined).catch(e => {
         console.error(e);
         return null;
       })
@@ -54,6 +64,8 @@ class SettingsSystemClock extends Component {
     }
   };
 
+  checkAgain = () => this.check({ refresh: true });
+
   componentDidMount() {
     this.check();
   }
@@ -66,7 +78,7 @@ class SettingsSystemClock extends Component {
         </div>
       );
     }
-    if (timeSync.ntp_synchronized) {
+    if (hostKeepsTime(timeSync)) {
       return (
         <div class="alert alert-success">
           <Text id="systemSettings.clockSyncOk" />
@@ -151,13 +163,15 @@ class SettingsSystemClock extends Component {
               </div>
             )}
             {!loading && this.renderTimeSync(timeSync, offsetSignificant, state)}
-            {/* a synchronized machine means the device is the one off: nothing to restart */}
-            {offsetSignificant && !(timeSync && timeSync.ntp_synchronized) && (
+            {/* a machine keeping its time means the device is the one off:
+                nothing to restart. Right after turning the synchronization
+                on, the clock is about to jump: the advice stays visible. */}
+            {((offsetSignificant && !hostKeepsTime(timeSync)) || state.enabled) && (
               <p class="text-muted small">
                 <Text id="systemSettings.clockRestartHint" />
               </p>
             )}
-            <button type="button" class="btn btn-secondary btn-sm" onClick={this.check} disabled={loading}>
+            <button type="button" class="btn btn-secondary btn-sm" onClick={this.checkAgain} disabled={loading}>
               <Text id="systemSettings.clockCheckAgain" />
             </button>
           </div>

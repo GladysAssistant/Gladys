@@ -19,18 +19,20 @@ const DAY_MS = 24 * HOUR_MS;
 
 // The server time is read during the request: its exact moment is unknown,
 // somewhere between the request and the response. Assuming the middle of the
-// round trip, the error is at most half of it.
+// round trip, the error is at most half of it. The round trip is measured on
+// the monotonic clock: the device clock itself may be adjusted meanwhile.
 const measureClockOffset = async httpClient => {
   const requestedAt = Date.now();
+  const startedAt = performance.now();
   const { server_time: serverTime } = await httpClient.get('/api/v1/system/clock');
-  const receivedAt = Date.now();
+  const roundTrip = performance.now() - startedAt;
   const serverTimestamp = Date.parse(serverTime);
   if (Number.isNaN(serverTimestamp)) {
     return null;
   }
   return {
-    offset: serverTimestamp - (requestedAt + receivedAt) / 2,
-    uncertainty: (receivedAt - requestedAt) / 2
+    offset: serverTimestamp - (requestedAt + roundTrip / 2),
+    uncertainty: roundTrip / 2
   };
 };
 

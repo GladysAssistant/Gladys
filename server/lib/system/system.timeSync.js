@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { performance } = require('perf_hooks');
 
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
@@ -8,7 +9,8 @@ const TIMEDATE_DESTINATION = 'org.freedesktop.timedate1';
 const TIMEDATE_PATH = '/org/freedesktop/timedate1';
 // Every read through the Docker helper spins up a short-lived container: the
 // answer is kept this long, so the System settings page (and its reloads)
-// never turns into a helper-container factory.
+// never turns into a helper-container factory. Its age is measured on the
+// monotonic clock: this feature exists because the wall clock can jump.
 const TIME_SYNC_STATUS_CACHE_MS = 60 * 1000;
 
 const UNAVAILABLE_STATUS = Object.freeze({
@@ -161,15 +163,21 @@ async function readTimeSyncStatus() {
  * time by a network time service (NTP), as reported by systemd-timedated on
  * the host. A wrong clock breaks scheduled scenes, history and energy
  * computations: the System settings page uses this to explain why the clock
- * is off and how to fix it. The answer is cached for a minute and concurrent
- * callers share one read.
+ * is off and how to fix it. The answer is cached for a minute, unless a
+ * refresh is asked (the "Check again" button), and concurrent callers share
+ * one read.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.refresh] - Read the status again, even when cached.
  * @returns {Promise<object>} `{ available, can_ntp, ntp_enabled, ntp_synchronized }`.
  * @example
- * await system.getTimeSyncStatus();
+ * await system.getTimeSyncStatus({ refresh: true });
  */
-async function getTimeSyncStatus() {
-  const fresh = this.timeSyncStatusReadAt && Date.now() - this.timeSyncStatusReadAt < TIME_SYNC_STATUS_CACHE_MS;
-  if (this.timeSyncStatus && fresh) {
+async function getTimeSyncStatus({ refresh = false } = {}) {
+  const fresh =
+    this.timeSyncStatusReadAt !== null &&
+    this.timeSyncStatusReadAt !== undefined &&
+    performance.now() - this.timeSyncStatusReadAt < TIME_SYNC_STATUS_CACHE_MS;
+  if (this.timeSyncStatus && fresh && !refresh) {
     return this.timeSyncStatus;
   }
   if (this.timeSyncStatusInFlight) {
@@ -179,7 +187,7 @@ async function getTimeSyncStatus() {
     try {
       const status = await readTimeSyncStatus.call(this);
       this.timeSyncStatus = status;
-      this.timeSyncStatusReadAt = Date.now();
+      this.timeSyncStatusReadAt = performance.now();
       return status;
     } finally {
       this.timeSyncStatusInFlight = null;

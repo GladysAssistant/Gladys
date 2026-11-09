@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
+const { performance } = require('perf_hooks');
 
 const {
   getTimeSyncStatus,
@@ -183,24 +184,33 @@ describe('system.getTimeSyncStatus', () => {
     sinon.assert.notCalled(runHostDbusCommand);
   });
 
-  it('should cache the status, and share a read in flight', async () => {
-    const clock = sinon.useFakeTimers({ now: 1700000000000, toFake: ['Date'] });
-    try {
-      const runHostDbusCommand = sinon.stub().resolves(buildGetAllOutput());
-      const system = buildSystem(runHostDbusCommand);
-      const [first, second] = await Promise.all([
-        getTimeSyncStatusWithFs.call(system),
-        getTimeSyncStatusWithFs.call(system),
-      ]);
-      expect(first).to.equal(second);
-      await getTimeSyncStatusWithFs.call(system);
-      sinon.assert.calledOnce(runHostDbusCommand);
-      clock.tick(TIME_SYNC_STATUS_CACHE_MS + 1);
-      await getTimeSyncStatusWithFs.call(system);
-      sinon.assert.calledTwice(runHostDbusCommand);
-    } finally {
-      clock.restore();
-    }
+  it('should cache the status on the monotonic clock, and share a read in flight', async () => {
+    let monotonicNow = 1000;
+    sinon.stub(performance, 'now').callsFake(() => monotonicNow);
+    const runHostDbusCommand = sinon.stub().resolves(buildGetAllOutput());
+    const system = buildSystem(runHostDbusCommand);
+    const [first, second] = await Promise.all([
+      getTimeSyncStatusWithFs.call(system),
+      getTimeSyncStatusWithFs.call(system),
+    ]);
+    expect(first).to.equal(second);
+    await getTimeSyncStatusWithFs.call(system);
+    sinon.assert.calledOnce(runHostDbusCommand);
+    monotonicNow += TIME_SYNC_STATUS_CACHE_MS + 1;
+    await getTimeSyncStatusWithFs.call(system);
+    sinon.assert.calledTwice(runHostDbusCommand);
+  });
+
+  it('should read the status again when a refresh is asked, even when cached', async () => {
+    const runHostDbusCommand = sinon.stub();
+    runHostDbusCommand.onFirstCall().resolves('Error org.freedesktop.DBus.Error.ServiceUnknown');
+    runHostDbusCommand.onSecondCall().resolves(buildGetAllOutput());
+    const system = buildSystem(runHostDbusCommand);
+    expect((await getTimeSyncStatusWithFs.call(system)).available).to.equal(false);
+    expect((await getTimeSyncStatusWithFs.call(system)).available).to.equal(false);
+    sinon.assert.calledOnce(runHostDbusCommand);
+    expect((await getTimeSyncStatusWithFs.call(system, { refresh: true })).available).to.equal(true);
+    sinon.assert.calledTwice(runHostDbusCommand);
   });
 });
 

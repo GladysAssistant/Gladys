@@ -21,6 +21,8 @@ module.exports = function SystemController(gladys) {
    * clock of the device it runs on to detect a server clock that is off.
    */
   async function getClock(req, res) {
+    // a cached answer would read as a server falling further and further behind
+    res.set('Cache-Control', 'no-store');
     res.json({
       server_time: new Date().toISOString(),
     });
@@ -30,9 +32,11 @@ module.exports = function SystemController(gladys) {
    * @api {get} /api/v1/system/clock/sync Get the network time synchronization status of the host
    * @apiName getTimeSyncStatus
    * @apiGroup System
+   * @apiQuery {Boolean} [refresh=false] Read the status again instead of the one cached for a minute.
    */
   async function getTimeSyncStatus(req, res) {
-    const status = await gladys.system.getTimeSyncStatus();
+    const refresh = req.query.refresh === 'true' || req.query.refresh === true;
+    const status = await gladys.system.getTimeSyncStatus({ refresh });
     res.json(status);
   }
 

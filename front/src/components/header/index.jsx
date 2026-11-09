@@ -142,6 +142,9 @@ class Header extends Component {
   maybeRefreshInstanceVersion = () => {
     if (!this.isHidden() && this.props.user && this.props.user.id) {
       this.props.refreshInstanceVersionState();
+      // same for the server clock: a client-side login never runs the
+      // session check that measures it (throttled, so almost always a no-op)
+      this.props.refreshClockOffsetState();
     }
   };
 
