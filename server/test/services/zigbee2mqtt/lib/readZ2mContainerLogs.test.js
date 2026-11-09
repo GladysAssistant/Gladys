@@ -141,6 +141,37 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     });
   });
 
+  it('should fall back on ezsp when the installation that started the reading is still the current one', async () => {
+    const installedConfig = { z2mAdapterMode: 'usb' };
+    zigbee2mqttManager.installedConfig = installedConfig;
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(OLD_FIRMWARE_LOG));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc', 1700000000);
+
+    assert.calledOnceWithExactly(zigbee2mqttManager.fallbackToEzsp);
+  });
+
+  it('should not fall back on ezsp for the logs of a replaced installation', async () => {
+    // Another coordinator saved while the logs of the ember run were read: switching to ezsp would change it
+    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'network', z2mNetworkAdapterType: 'ember' };
+    const newConfig = { z2mAdapterMode: 'network', z2mNetworkAdapterType: 'zstack' };
+    const stream = new EventEmitter();
+    stream.destroy = sinon.fake();
+    gladys.system.getContainerLogs = fake.resolves(stream);
+    setImmediate(() => {
+      zigbee2mqttManager.installedConfig = newConfig;
+      stream.emit('data', `\x01${OLD_FIRMWARE_LOG}\n`);
+    });
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc', 1700000000);
+
+    assert.notCalled(zigbee2mqttManager.fallbackToEzsp);
+    expect(newConfig.z2mNetworkAdapterType).to.equal('zstack');
+    // The replaced installation does not explain the state of the new one
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    assert.calledOnce(gladys.event.emit);
+  });
+
   it('should set z2mContainerError to null when no error is found in logs', async () => {
     const normalLog = 'Zigbee2mqtt started successfully';
     gladys.system.getContainerLogs = fake.resolves(buildLogStream(normalLog));

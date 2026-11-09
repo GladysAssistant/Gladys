@@ -120,7 +120,8 @@ describe('zigbee2mqtt fallbackToEzsp', () => {
 
   it('should show the failure when Zigbee2mqtt fails to install again, without rejecting', async () => {
     // Called while the logs are read in the background: a rejection would be unhandled
-    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    const config = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    zigbee2mqttManager.installedConfig = config;
     zigbee2mqttManager.installZ2mContainer = fake.rejects(new Error('Docker error'));
 
     await zigbee2mqttManager.fallbackToEzsp();
@@ -128,6 +129,52 @@ describe('zigbee2mqtt fallbackToEzsp', () => {
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
     expect(zigbee2mqttManager.ezspFallback).to.equal(false);
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: 'Docker error' });
+    // Restored: a later ember error tries the fallback again
+    expect(config.z2mDongleName).to.equal(DONGLE_E);
+  });
+
+  it('should try again a failed fallback on the next ember error', async () => {
+    const config = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    zigbee2mqttManager.installedConfig = config;
+    zigbee2mqttManager.installZ2mContainer = fake.rejects(new Error('Docker error'));
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    zigbee2mqttManager.installZ2mContainer = fake.resolves(null);
+    zigbee2mqttManager.z2mContainerError = { code: 'EZSP_PROTOCOL_VERSION', message: null };
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    expect(config.z2mDongleName).to.equal(`${DONGLE_E} (legacy ezsp)`);
+    expect(zigbee2mqttManager.ezspFallback).to.equal(true);
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+  });
+
+  it('should restore the network adapter type when the fallback fails', async () => {
+    const config = { z2mAdapterMode: 'network', z2mNetworkAdapterType: 'ember' };
+    zigbee2mqttManager.installedConfig = config;
+    zigbee2mqttManager.installZ2mContainer = fake.rejects(new Error('Docker error'));
+
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    assert.calledOnceWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_NETWORK_ADAPTER_TYPE', 'ezsp');
+    expect(config.z2mNetworkAdapterType).to.equal('ember');
+    expect(zigbee2mqttManager.ezspFallback).to.equal(false);
+  });
+
+  it('should not switch again while a fallback is in progress', async () => {
+    // Another reader of the same logs during the installation: the configuration is switched until it fails
+    const config = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    zigbee2mqttManager.installedConfig = config;
+    let secondFallback;
+    zigbee2mqttManager.installZ2mContainer = fake(async () => {
+      secondFallback = zigbee2mqttManager.fallbackToEzsp();
+      await secondFallback;
+    });
+
+    await zigbee2mqttManager.fallbackToEzsp();
+
+    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+    assert.calledOnce(zigbee2mqttManager.saveOrDestroyVariable);
   });
 
   it('should keep the error set by the installation when it fails', async () => {

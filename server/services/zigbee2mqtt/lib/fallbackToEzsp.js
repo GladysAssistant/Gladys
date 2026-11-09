@@ -25,31 +25,34 @@ async function fallbackToEzsp() {
     return;
   }
 
-  let variable;
+  // The setting switched: restored when the fallback fails, so that a later ember error tries it again instead of
+  // finding it already switched
+  let setting;
   if (networkAdapter) {
-    config.z2mNetworkAdapterType = CONFIG_KEYS.EZSP;
-    variable = { key: CONFIGURATION.Z2M_NETWORK_ADAPTER_TYPE, value: config.z2mNetworkAdapterType };
+    setting = { field: 'z2mNetworkAdapterType', key: CONFIGURATION.Z2M_NETWORK_ADAPTER_TYPE, value: CONFIG_KEYS.EZSP };
   } else {
     // The models sold with such a firmware have a "(legacy ezsp)" variant. For the others, a firmware update is needed.
     const legacyDongleName = `${config.z2mDongleName} (legacy ezsp)`;
     if (!legacyModels.includes(legacyDongleName)) {
       return;
     }
-    config.z2mDongleName = legacyDongleName;
-    variable = { key: CONFIGURATION.ZIGBEE_DONGLE_NAME, value: config.z2mDongleName };
+    setting = { field: 'z2mDongleName', key: CONFIGURATION.ZIGBEE_DONGLE_NAME, value: legacyDongleName };
   }
+  const previousValue = config[setting.field];
+  config[setting.field] = setting.value;
 
   logger.warn('Zigbee2mqtt: coordinator firmware too old for the ember driver, falling back on the ezsp driver...');
   // Zigbee2mqtt is shown as starting again, not as refusing the firmware
   this.z2mContainerError = null;
   try {
-    await this.saveOrDestroyVariable(variable.key, variable.value);
+    await this.saveOrDestroyVariable(setting.key, setting.value);
     await this.installZ2mContainer(config);
     // Only now: the setup page loads the new model
     this.ezspFallback = true;
   } catch (e) {
     // The logs are read in the background, nobody else would catch it
     logger.error('Zigbee2mqtt: failed to fall back on the ezsp driver:', e);
+    config[setting.field] = previousValue;
     // Shown on the setup page, unless the installation already explained the failure
     this.z2mContainerError = this.z2mContainerError || { code: null, message: e.message };
   }
