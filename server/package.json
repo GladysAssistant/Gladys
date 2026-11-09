@@ -38,6 +38,7 @@
     "ignore": [
       "test/*",
       "persist/*",
+      "matter-controller-data/*",
       "./matter-bridge/**"
     ]
   },
