@@ -522,9 +522,10 @@ class EditScene extends Component {
     const saved = await this.saveSceneInternal(e);
     if (saved) {
       removeSceneDraft(this.getDraftId());
-      // edits made while the request was in flight are written against the version just saved,
-      // without waiting for the debounce
-      this.setState({}, this.persistDraft);
+      // a draft still offered is superseded by the version just saved (restoring it would put an
+      // older scene over it); edits made while the request was in flight are written against that
+      // version, without waiting for the debounce
+      this.setState({ draftToRestore: null }, this.persistDraft);
       this.showToast('editScene.mobile.savedToast');
     } else {
       this.setState(prevState => ({ errorNonce: (prevState.errorNonce || 0) + 1 }));

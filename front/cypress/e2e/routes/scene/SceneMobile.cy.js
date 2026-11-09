@@ -189,6 +189,8 @@ describe('Scene on a phone', () => {
     cy.get('[data-cy="scene-step-sheet-2.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
     cy.get('body').type('{esc}');
     cy.wait('@saveScene');
+    // the response reaching the browser is not the editor having applied it: the "saved" toast is
+    cy.get('[data-cy=scene-toast]').should('be.visible');
     cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
 
     // the second edit is still recoverable once the save has landed

@@ -97,8 +97,8 @@ the leave guard would ask about a scene nobody edited.
    - The draft is removed when the scene is saved (edits made while the save was in flight are
      written again at once, against the version just saved), when the user leaves without saving,
      when the scene is deleted, and when the edits are undone back to the saved version. A draft
-     offered back (banner below) and neither restored nor discarded stays stored when the user
-     leaves.
+     offered back (banner below) and neither restored, discarded nor superseded by a save stays
+     stored when the user leaves; a save closes the banner.
    - When the editor opens a scene and finds a draft **whose `base` equals the scene just loaded
      from the server** (or its normalized version, server-managed fields left out of both), it shows a banner: "Unsaved changes from <relative date> were kept" with
      **Restore** / **Discard**. Restore loads the draft scene (variables are re-initialized from it,
