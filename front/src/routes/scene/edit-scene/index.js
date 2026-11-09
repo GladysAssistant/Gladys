@@ -557,7 +557,12 @@ class EditScene extends Component {
     let scene = this.state.scene;
     if (this.unmounted) {
       const draft = readSceneDraft(draftId);
-      scene = draft ? draft.scene : null;
+      // only the draft this editor flushed is its own: an offered draft written back by leave(),
+      // or a draft of a newer visit to the scene, is left as it is
+      if (!draft || JSON.stringify(draft.scene) !== this.lastDraftWritten) {
+        return;
+      }
+      scene = draft.scene;
     } else if (!this.draftWritesEnabled) {
       // before the draft check, edits are not drafts yet (the check would offer them back)
       scene = null;
@@ -1798,6 +1803,7 @@ class EditScene extends Component {
       return;
     }
     if (this.hasUnsavedChanges()) {
+      this.lastDraftWritten = JSON.stringify(this.state.scene);
       writeSceneDraft(this.getDraftId(), withoutServerFields(this.state.savedSceneSnapshot), this.state.scene);
     } else if (!this.state.draftToRestore) {
       removeSceneDraft(this.getDraftId());

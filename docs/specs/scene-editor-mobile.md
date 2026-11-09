@@ -97,7 +97,7 @@ the leave guard would ask about a scene nobody edited.
    navigation) is flushed then — including an edit made before the window ended.
    - The draft is removed when the scene is saved (edits made while the save was in flight are
      written again at once, against the version just saved — also when the save lands after the
-     editor is gone), when the user leaves without saving,
+     editor is gone, provided the stored draft is still the one that editor wrote), when the user leaves without saving,
      when the scene is deleted, and when the edits are undone back to the saved version. A draft
      offered back (banner below) and neither restored, discarded nor superseded by a save stays
      stored when the user leaves (not when the scene is deleted); a save closes the banner.
