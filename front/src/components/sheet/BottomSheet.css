@@ -170,9 +170,14 @@
 .sheet :global(.react-select__input-container),
 .sheet :global(.react-select__input),
 .sheet :global(.react-select__input input),
-.sheet :global(.react-select__single-value),
+.sheet :global(.react-select__single-value) {
+  font-size: 16px;
+}
+
+/* the raw fields too, whatever styles them: react-select puts an inline "font-size: inherit" on its
+   input, prefixed or not */
 .sheet input,
 .sheet select,
 .sheet textarea {
-  font-size: 16px;
+  font-size: 16px !important;
 }
