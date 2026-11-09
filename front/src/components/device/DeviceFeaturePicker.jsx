@@ -10,9 +10,12 @@ import normalizeSearchText from '../../utils/normalizeSearchText';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './deviceFeaturePicker.css';
 
-const ALL_ROOMS = 'all';
-const SELECTED_ONLY = 'selected';
-const NO_ROOM = '__no_room__';
+// The two special filters and the rooms share the chip row: room keys are
+// prefixed so a room whose selector is "all" or "selected" stays a room
+const ALL_ROOMS = 'filter:all';
+const SELECTED_ONLY = 'filter:selected';
+const NO_ROOM = 'no-room';
+const getRoomKey = device => (device.room ? `room:${device.room.selector || device.room.id}` : NO_ROOM);
 
 const getFeatureIcon = feature => get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`) || 'sliders';
 
@@ -20,7 +23,9 @@ const getFeatureIcon = feature => get(DeviceFeatureCategoriesIcon, `${feature.ca
 // features (in the device's own order), each feature carrying the text the
 // search matches against: room + device + feature description
 const buildGroups = (devices, dictionary, filterFeature) => {
-  const rooms = {};
+  // a Map, not an object: a room selector such as "constructor" must not
+  // hit an inherited property
+  const rooms = new Map();
   (devices || []).forEach(device => {
     const features = (device.features || [])
       .filter(feature => !filterFeature || filterFeature(feature, device))
@@ -31,21 +36,21 @@ const buildGroups = (devices, dictionary, filterFeature) => {
     if (features.length === 0) {
       return;
     }
-    const roomKey = device.room ? device.room.selector || device.room.id : NO_ROOM;
-    if (!rooms[roomKey]) {
-      rooms[roomKey] = {
+    const roomKey = getRoomKey(device);
+    if (!rooms.has(roomKey)) {
+      rooms.set(roomKey, {
         key: roomKey,
         name: device.room ? device.room.name : get(dictionary, 'device.noRoom'),
         devices: []
-      };
+      });
     }
-    const roomName = rooms[roomKey].name;
+    const room = rooms.get(roomKey);
     features.forEach(entry => {
-      entry.searchText = normalizeSearchText(`${roomName} ${device.name} ${entry.description}`);
+      entry.searchText = normalizeSearchText(`${room.name} ${device.name} ${entry.description}`);
     });
-    rooms[roomKey].devices.push({ device, features });
+    room.devices.push({ device, features });
   });
-  return Object.values(rooms)
+  return Array.from(rooms.values())
     .sort((a, b) => {
       if (a.key === NO_ROOM || b.key === NO_ROOM) {
         return a.key === NO_ROOM ? 1 : -1;
@@ -139,7 +144,7 @@ class DeviceFeaturePicker extends Component {
         class={style.roomChip}
         aria-pressed={this.state.room === key ? 'true' : 'false'}
         onClick={() => this.selectRoom(key)}
-        data-cy={`picker-room-${key}`}
+        data-cy={`picker-room-${key.replace(':', '-')}`}
       >
         {label}
         {count > 0 && <span class={style.roomChipCount}>{count}</span>}

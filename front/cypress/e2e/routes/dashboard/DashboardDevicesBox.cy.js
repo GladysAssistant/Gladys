@@ -117,7 +117,8 @@ describe('Dashboard Devices Box editor', () => {
     cy.get('[data-cy="devices-row-2"] button')
       .first()
       .click();
-    cy.get('[data-cy="devices-detail-name"]').type('Outside');
+    // a name is stored trimmed
+    cy.get('[data-cy="devices-detail-name"]').type('Outside ');
     // the row being edited is outlined in the widget's live preview
     cy.get('.gladys-editing-device-row').should('contain', 'Outside');
     cy.get('[data-cy="devices-detail-up"]').click();
@@ -135,14 +136,30 @@ describe('Dashboard Devices Box editor', () => {
     cy.get('[data-cy="devices-undo"] button').click();
     cy.get('[data-device-row]').should('have.length', 3);
 
+    // the picker also removes: unchecking a feature drops it
+    cy.get('[data-cy="devices-add-button"]').click();
+    cy.get(`[data-cy="picker-feature-${probe(3)}"]`).click();
+    cy.get('[data-cy="picker-diff"]').should('contain', '−1');
+    cy.get('[data-cy="picker-validate"]').click();
+    cy.get('[data-device-row]').should('have.length', 2);
+    cy.get('[data-cy="devices-undo"]').should('be.visible');
+
+    // any later edit dismisses the pending undo: it would revert that edit too
+    cy.get('[data-cy="devices-row-1"] button')
+      .first()
+      .click();
+    cy.get('[data-cy="devices-detail-name"]').type('Living');
+    cy.get('[data-cy="edit-panel-back"]').click();
+    cy.get('[data-cy="devices-undo"]').should('not.exist');
+
     // the action bar comes back with Save once the sheet is closed
     cy.get('[data-cy="edit-panel-close"]').click();
     cy.get('[data-cy="edit-panel"]').should('not.exist');
     cy.contains('button', Cypress.env('i18n').dashboard.editDashboardSaveButton).click();
     cy.wait('@saveDashboard').then(({ request }) => {
       const box = request.body.boxes[0].columns[0][0];
-      expect(box.device_features).to.deep.equal([probe(2), probe(1), probe(3)]);
-      expect(box.device_feature_names).to.deep.equal(['Outside', defaultName(1), defaultName(3)]);
+      expect(box.device_features).to.deep.equal([probe(2), probe(1)]);
+      expect(box.device_feature_names).to.deep.equal(['Outside', 'Living']);
     });
   });
 });

@@ -370,3 +370,8 @@ input.input {
   outline-offset: -1px;
   border-radius: 14px;
 }
+
+/* devices that could not be loaded: rows are shown, not editable */
+.rowMain:disabled {
+  cursor: default;
+}

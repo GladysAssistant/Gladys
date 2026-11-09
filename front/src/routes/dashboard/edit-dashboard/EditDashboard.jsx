@@ -4,6 +4,7 @@ import cx from 'classnames';
 import EditActions from './EditActions';
 import ReorderDashbordList from './ReorderDashbordList';
 import EditBoxColumns from './EditBoxColumns';
+import { isEditPanelOpen } from './EditPanel';
 import style from '../style.css';
 import editStyle from './style.css';
 import get from 'get-value';
@@ -30,8 +31,10 @@ const EditDashboard = ({ children, ...props }) => (
                 // live preview of the "full" width while editing
                 [style.fullWidthContainer]: get(props, 'currentDashboard.width') === 'full',
                 // room to scroll the last widgets up above the mobile sheet
-                [editStyle.editorContainerUnderPanel]:
-                  Boolean(props.editingBoxPosition) || props.dashboardSettingsOpen || props.newDashboardOpen
+                [editStyle.editorContainerUnderPanel]: isEditPanelOpen({
+                  ...props,
+                  homeDashboard: props.currentDashboard
+                })
               })}
             >
               {/* The dashboard list is a wrapping row of pills above the canvas

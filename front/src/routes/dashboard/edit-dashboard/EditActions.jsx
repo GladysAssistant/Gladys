@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
+import { isEditPanelOpen } from './EditPanel';
 import style from './style.css';
 
 // Fixed action bar of the editor. On mobile it slides away while the edit
@@ -8,7 +9,7 @@ import style from './style.css';
 // the screen and carries its own actions, and the bar comes back — with
 // Save — as soon as the sheet closes.
 const EditActions = props => {
-  const panelOpen = Boolean(props.editingBoxPosition) || props.dashboardSettingsOpen || props.newDashboardOpen;
+  const panelOpen = isEditPanelOpen({ ...props, homeDashboard: props.currentDashboard });
   return (
     <div
       class={cx('fixed-bottom footer', style.editActionsFooter, { [style.editActionsFooterUnderPanel]: panelOpen })}

@@ -13,7 +13,30 @@ import style from './style.css';
 const TAP_MAX_TRAVEL_PX = 10;
 // Grab-handle travel that switches the sheet height (or closes it)
 const GRAB_SWITCH_PX = 40;
+// How long the click that may follow a grab-handle drag is swallowed
+const CLICK_SUPPRESS_MS = 400;
 
+// A drag on the grab handle must not end with a click: with a mouse (or a
+// late synthetic click on iOS) the release's click would toggle the height
+// back, or — when the drag closed the sheet — land on the canvas under the
+// finger and reopen a widget. Same guard as the pointer-drag engine.
+const suppressNextClick = () => {
+  const suppress = clickEvent => {
+    clickEvent.preventDefault();
+    clickEvent.stopPropagation();
+    removeSuppress();
+  };
+  const removeSuppress = () => {
+    window.removeEventListener('click', suppress, true);
+  };
+  window.addEventListener('click', suppress, true);
+  window.setTimeout(removeSuppress, CLICK_SUPPRESS_MS);
+};
+
+// What the panel shows, resolved against the dashboard: a position that no
+// longer points at a box (a column inserted before it…) is no target. The
+// action bar and the canvas spacing read the same resolution, so they never
+// stay in "panel open" mode while no panel is shown.
 const getPanelTarget = props => {
   const position = props.editingBoxPosition;
   const box = position && props.homeDashboard.boxes[position.x] && props.homeDashboard.boxes[position.x][position.y];
@@ -138,6 +161,9 @@ class EditPanel extends Component {
       // pointerup, resized the sheet BEFORE the browser dispatched the tap's
       // click — which then landed on whatever had just moved under the
       // finger (a row of the form, opening it)
+      if (Math.abs(travel) > TAP_MAX_TRAVEL_PX) {
+        suppressNextClick();
+      }
       if (travel < -GRAB_SWITCH_PX) {
         this.setState({ expanded: true });
       } else if (travel > GRAB_SWITCH_PX) {
@@ -268,4 +294,7 @@ class EditPanel extends Component {
   }
 }
 
+const isEditPanelOpen = props => Boolean(props.homeDashboard && getPanelTarget(props));
+
+export { isEditPanelOpen };
 export default EditPanel;

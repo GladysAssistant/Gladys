@@ -405,7 +405,8 @@ class EditDashboard extends Component {
         $splice: [[insertAt, 0, DEFAULT_COLUMN_WIDTH]]
       }
     });
-    this.setState({ ...newState, boxNotEmptyError: false, hasUnsavedChanges: true });
+    // global column coordinates shifted: never point the panel at a stale box
+    this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
   };
 
   // A column is either normal (1) or wide (2): one toggle, no free resize

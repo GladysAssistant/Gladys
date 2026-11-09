@@ -55,12 +55,12 @@ const scrollPanelToTop = element => {
 // One row of the compact list: no text input (a stray tap must never open
 // the keyboard), a tap opens the detail, the handle drags on the editor's
 // pointer-events engine
-const DeviceListRow = ({ item, index, onOpen, onHandlePointerDown, displayName, moveLabel }) => (
+const DeviceListRow = ({ item, index, onOpen, onHandlePointerDown, displayName, moveLabel, readOnly }) => (
   <div class={style.row} data-device-row data-index={index} data-cy={`devices-row-${index}`}>
     <span class={style.badge} aria-hidden="true">
       <i class={`fe fe-${item.entry ? getFeatureIcon(item.entry.feature) : 'alert-circle'}`} />
     </span>
-    <button type="button" class={style.rowMain} onClick={() => onOpen(item.selector)}>
+    <button type="button" class={style.rowMain} onClick={() => onOpen(item.selector)} disabled={readOnly}>
       <span class={style.rowName}>{displayName}</span>
       <span class={style.rowSub}>
         {item.entry ? `${item.entry.device.name} · ${item.description}` : item.missingLabel}
@@ -71,15 +71,17 @@ const DeviceListRow = ({ item, index, onOpen, onHandlePointerDown, displayName, 
         <DeviceFeatureValueText feature={item.entry.feature} />
       </span>
     )}
-    <button
-      type="button"
-      class={style.handle}
-      onPointerDown={event => onHandlePointerDown(event, index, displayName)}
-      aria-label={moveLabel}
-      data-cy={`devices-row-handle-${index}`}
-    >
-      <GripIcon />
-    </button>
+    {!readOnly && (
+      <button
+        type="button"
+        class={style.handle}
+        onPointerDown={event => onHandlePointerDown(event, index, displayName)}
+        aria-label={moveLabel}
+        data-cy={`devices-row-handle-${index}`}
+      >
+        <GripIcon />
+      </button>
+    )}
   </div>
 );
 
@@ -153,7 +155,18 @@ class EditDevices extends Component {
 
   getDisplayName = item => item.name || item.defaultName;
 
+  // The undo bar restores a full snapshot: any later edit dismisses it, or
+  // Undo would also revert that edit. A removal or a picker validation
+  // writes, then shows its own bar (replacing the old one).
+  dismissUndo = () => {
+    if (this.state.undo) {
+      clearTimeout(this.undoTimeout);
+      this.setState({ undo: null });
+    }
+  };
+
   writeItems = items => {
+    this.dismissUndo();
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       device_features: items.map(item => item.selector),
       device_feature_names: items.map(item => item.name || item.defaultName)
@@ -182,6 +195,7 @@ class EditDevices extends Component {
   };
 
   updateWidgetName = e => {
+    this.dismissUndo();
     this.props.updateBoxConfig(this.props.x, this.props.y, { name: e.target.value });
   };
 
@@ -220,7 +234,7 @@ class EditDevices extends Component {
     }
     // an empty name means "the default name", written right away: the
     // widget must never keep showing the name that was just erased
-    item.name = draftName.trim() ? draftName : item.defaultName;
+    item.name = draftName.trim() || item.defaultName;
     this.writeItems(items);
   };
 
@@ -498,6 +512,7 @@ class EditDevices extends Component {
                   displayName={this.getDisplayName(item)}
                   onOpen={this.openDetail}
                   onHandlePointerDown={this.onHandlePointerDown}
+                  readOnly={this.state.loadError}
                   moveLabel={
                     <Text id="dashboard.boxes.devices.moveHandle" fields={{ name: this.getDisplayName(item) }} />
                   }

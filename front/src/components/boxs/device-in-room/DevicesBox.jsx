@@ -76,33 +76,47 @@ class DevicesComponent extends Component {
     this.getDeviceFeatures();
   };
 
+  // Order and names of loaded features, from the CURRENT box config. Names
+  // are aligned with device_features, so they are looked up by selector: a
+  // selector whose feature no longer exists must not shift the names of the
+  // features after it.
+  sortAndName = deviceFeatures => {
+    const selectors = this.props.box.device_features || [];
+    const names = this.props.box.device_feature_names || [];
+    return [...deviceFeatures]
+      .sort((a, b) => selectors.indexOf(a.selector) - selectors.indexOf(b.selector))
+      .map(deviceFeature => ({ ...deviceFeature, new_label: names[selectors.indexOf(deviceFeature.selector)] }));
+  };
+
   getDeviceFeatures = async () => {
+    // only the latest request commits: in the editor the config changes
+    // under a pending request, and an older response finishing last must
+    // not bring back an older order
+    this.requestId = (this.requestId || 0) + 1;
+    const requestId = this.requestId;
     this.setState({ status: RequestStatus.Getting });
     try {
       const deviceFeatureSelectors = this.props.box.device_features;
       const devices = await this.props.httpClient.get(`/api/v1/device`, {
         device_feature_selectors: deviceFeatureSelectors.join(',')
       });
+      if (requestId !== this.requestId) {
+        return;
+      }
       const deviceFeaturesFlat = [];
       devices.forEach(device => {
         device.features.forEach(feature => {
           deviceFeaturesFlat.push({ ...feature, device });
         });
       });
-      const deviceFeaturesSorted = deviceFeaturesFlat.sort(
-        (a, b) => deviceFeatureSelectors.indexOf(a.selector) - deviceFeatureSelectors.indexOf(b.selector)
-      );
-      const deviceFeaturesNewNames = this.props.box.device_feature_names;
-      if (deviceFeaturesNewNames) {
-        deviceFeaturesSorted.forEach((deviceFeature, index) => {
-          deviceFeature.new_label = deviceFeaturesNewNames[index];
-        });
-      }
       this.setState({
-        deviceFeatures: deviceFeaturesSorted,
+        deviceFeatures: this.sortAndName(deviceFeaturesFlat),
         status: RequestStatus.Success
       });
     } catch (e) {
+      if (requestId !== this.requestId) {
+        return;
+      }
       this.setState({
         status: RequestStatus.Error
       });
@@ -219,12 +233,7 @@ class DevicesComponent extends Component {
     if (!deviceFeatures) {
       return;
     }
-    const selectors = this.props.box.device_features || [];
-    const names = this.props.box.device_feature_names || [];
-    const reordered = [...deviceFeatures]
-      .sort((a, b) => selectors.indexOf(a.selector) - selectors.indexOf(b.selector))
-      .map(deviceFeature => ({ ...deviceFeature, new_label: names[selectors.indexOf(deviceFeature.selector)] }));
-    this.setState({ deviceFeatures: reordered });
+    this.setState({ deviceFeatures: this.sortAndName(deviceFeatures) });
   };
 
   componentDidUpdate(previousProps) {
