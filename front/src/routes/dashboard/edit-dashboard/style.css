@@ -135,6 +135,12 @@
   padding: 0;
 }
 
+/* a tap leaves the focus on the button: no ring for the pointer, the
+   keyboard keeps its :focus-visible one */
+.previewButton:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .previewButton:disabled {
   opacity: 0.35;
   cursor: default;
@@ -392,18 +398,57 @@
   }
 }
 
+/* Mobile bottom sheet. The editor's action bar slides away while it is open
+   (EditActions), so the sheet sits on the screen edge, clear of the home
+   indicator. Two heights: compact — capped so the edited widget stays
+   visible above it (revealAbovePanel scrolls it there) — and expanded
+   (grab handle, or a form asking for it through setPanelExpanded). dvh
+   where supported: on iOS vh is the height WITHOUT Safari's toolbars, so a
+   vh sheet could run under them. */
 @media (max-width: 991px) {
   .editPanel {
     left: 0;
     right: 0;
-    /* clear the fixed save/cancel footer, like the desktop panel does —
-       at bottom: 0 the footer bar hides the form's last field or button.
-       The bar measures itself (EditActions) because it wraps to two rows
-       when the labels don't fit; the fallback is its one-row height. */
-    bottom: var(--gl-editor-footer-height, 3.5rem);
-    max-height: 78vh;
-    border-radius: 16px 16px 0 0;
+    bottom: 0;
+    max-height: 65vh;
+    max-height: 65dvh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-radius: 20px 20px 0 0;
+    transition: max-height 0.25s ease, height 0.25s ease;
   }
+
+  .editPanelExpanded {
+    height: calc(100vh - 4rem);
+    height: calc(100dvh - 4rem);
+    max-height: none;
+  }
+
+  .editPanelDragging {
+    transition: none;
+  }
+}
+
+/* the grab handle: tap to switch height, drag to resize or close */
+.editPanelGrab {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.editPanelGrab::before {
+  content: '';
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(28, 35, 52, 0.22);
 }
 
 .editPanelHeader {
@@ -416,7 +461,55 @@
   flex: 0 0 auto;
 }
 
+@media (max-width: 991px) {
+  .editPanelHeader {
+    padding-top: 0;
+  }
+}
+
+.editPanelTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* a form view with a back button (setPanelHeader): back on the left, the
+   view's title centered, close on the right */
+.editPanelHeaderWithBack .editPanelTitle {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.editPanelHeaderWithBack .editPanelBack {
+  flex: 0 1 auto;
+  max-width: 40%;
+}
+
+.editPanelBack {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  margin-left: -0.5rem;
+  padding: 0 0.5rem 0 0.25rem;
+  border: 0;
+  background: transparent;
+  color: var(--gl-accent, #467fcf);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.editPanelBack span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .editPanelClose {
+  flex: 0 0 auto;
   border: none;
   background: transparent;
   color: #6e7687;
@@ -656,6 +749,18 @@
   .editActionsFooter {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+    transition: transform 0.25s ease, visibility 0.25s;
+  }
+
+  /* the bottom sheet replaces the bar while it is open */
+  .editActionsFooterUnderPanel {
+    transform: translateY(110%);
+    visibility: hidden;
+  }
+
+  /* room to scroll the last widgets of the canvas up above the sheet */
+  .editorContainerUnderPanel {
+    margin-bottom: 70vh;
   }
 }
 

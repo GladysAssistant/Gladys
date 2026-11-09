@@ -11,6 +11,7 @@ import { DeviceFeatureCategoriesIcon } from '../../../utils/consts';
 import { getDeviceFeatureName, getDeviceFeatureDescription } from '../../../utils/device';
 import { startPointerDrag } from '../../../utils/pointerDrag';
 import { computeInsertionIndex, insertionLineRect } from '../../../routes/dashboard/edit-dashboard/widgetDropPlacement';
+import { revealAbovePanel } from '../../../utils/revealAbovePanel';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './editDevices.css';
 
@@ -18,6 +19,22 @@ const VIEW_LIST = 'list';
 const VIEW_DETAIL = 'detail';
 const VIEW_PICKER = 'picker';
 const UNDO_DURATION_MS = 6000;
+// global class: the row lives in the canvas preview (DeviceCard), outside
+// this component's tree
+const PREVIEW_ROW_HIGHLIGHT_CLASS = 'gladys-editing-device-row';
+
+// Six-dot grip: the icon set has no grab glyph, and the ≡ "menu" icon reads
+// as a menu button, not as something to hold
+const GripIcon = () => (
+  <svg class={style.gripIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <circle cx="9" cy="6" r="1.6" />
+    <circle cx="15" cy="6" r="1.6" />
+    <circle cx="9" cy="12" r="1.6" />
+    <circle cx="15" cy="12" r="1.6" />
+    <circle cx="9" cy="18" r="1.6" />
+    <circle cx="15" cy="18" r="1.6" />
+  </svg>
+);
 
 const getFeatureIcon = feature => get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`) || 'sliders';
 
@@ -61,7 +78,7 @@ const DeviceListRow = ({ item, index, onOpen, onHandlePointerDown, displayName, 
       aria-label={moveLabel}
       data-cy={`devices-row-handle-${index}`}
     >
-      <i class="fe fe-menu" />
+      <GripIcon />
     </button>
   </div>
 );
@@ -313,23 +330,133 @@ class EditDevices extends Component {
     });
   };
 
+  // ------------------------------------------------------------ panel header & height
+  // The sub-views put their title and a back button in the panel header
+  // (EditPanel setPanelHeader) instead of a row of their own, and the picker
+  // asks for the expanded sheet
+  syncPanel = () => {
+    const { setPanelHeader, setPanelExpanded } = this.props;
+    const { view } = this.state;
+    if (setPanelHeader) {
+      if (view === VIEW_DETAIL) {
+        setPanelHeader({
+          title: <Text id="dashboard.boxes.devices.detailTitle" />,
+          backLabel: <Text id="dashboard.boxes.devices.backToList" />,
+          onBack: this.backToList
+        });
+      } else if (view === VIEW_PICKER) {
+        setPanelHeader({
+          title: <Text id="deviceFeaturePicker.title" />,
+          backLabel: <Text id="deviceFeaturePicker.cancel" />,
+          onBack: this.backToList
+        });
+      } else {
+        setPanelHeader(null);
+      }
+    }
+    if (setPanelExpanded) {
+      setPanelExpanded(view === VIEW_PICKER);
+    }
+  };
+
+  // ------------------------------------------------------------ live preview highlight
+  // In the detail view, the row being edited is outlined in the widget's
+  // live preview on the canvas, and scrolled above the mobile sheet
+  getPanelElement = () => (this.root && this.root.closest ? this.root.closest('[data-cy="edit-panel"]') : null);
+
+  findPreviewRow = selector => {
+    const widget = document.querySelector('[data-widget-wrapper][data-editing]');
+    if (!widget || !selector) {
+      return null;
+    }
+    return (
+      Array.from(widget.querySelectorAll('[data-feature-selectors]')).find(row =>
+        row
+          .getAttribute('data-feature-selectors')
+          .split(' ')
+          .includes(selector)
+      ) || null
+    );
+  };
+
+  clearPreviewHighlight = () => {
+    document.querySelectorAll(`.${PREVIEW_ROW_HIGHLIGHT_CLASS}`).forEach(row => {
+      row.classList.remove(PREVIEW_ROW_HIGHLIGHT_CLASS);
+    });
+  };
+
+  // the preview re-renders after the config changes (rename, move): applied
+  // a frame later, idempotent, and the reveal only when asked
+  schedulePreviewHighlight = reveal => {
+    // several updates can land in one frame (the header sync re-renders the
+    // panel right after a view change): a reveal asked by any of them stays
+    // asked, a later "no reveal" must not cancel it
+    this.pendingReveal = this.pendingReveal || reveal;
+    cancelAnimationFrame(this.highlightFrame);
+    this.highlightFrame = requestAnimationFrame(() => {
+      const shouldReveal = this.pendingReveal;
+      this.pendingReveal = false;
+      const selector = this.state.view === VIEW_DETAIL ? this.state.detailSelector : null;
+      const row = this.findPreviewRow(selector);
+      if (!row || !row.classList.contains(PREVIEW_ROW_HIGHLIGHT_CLASS)) {
+        this.clearPreviewHighlight();
+        if (row) {
+          row.classList.add(PREVIEW_ROW_HIGHLIGHT_CLASS);
+        }
+      }
+      if (row && shouldReveal) {
+        revealAbovePanel(row, this.getPanelElement(), 'center');
+      }
+    });
+  };
+
   // ------------------------------------------------------------ lifecycle
   setRootRef = element => {
     this.root = element;
   };
 
   componentDidMount() {
+    this.syncedView = this.state.view;
+    this.previousSyncedView = this.state.view;
+    this.syncedOrder = get(this.props, 'box.device_features');
     this.getDevices();
+    this.syncPanel();
   }
 
-  componentDidUpdate(previousProps, previousState) {
-    if (previousState.view !== this.state.view) {
+  // The view, detail and order last applied to the panel and the preview
+  // are tracked here, not read from previousState: a parent re-render
+  // triggered from this very hook (setPanelHeader / setPanelExpanded) can
+  // hand the next update a stale previousState, which re-synced the panel
+  // and undid the user's own height change on the grab handle.
+  componentDidUpdate() {
+    const { view, detailSelector } = this.state;
+    const order = get(this.props, 'box.device_features');
+    const viewChanged = view !== this.syncedView;
+    if (viewChanged) {
+      this.syncedView = view;
       scrollPanelToTop(this.root);
+      this.syncPanel();
     }
+    const detailChanged = viewChanged || detailSelector !== this.syncedDetailSelector;
+    const orderChanged = order !== this.syncedOrder;
+    this.syncedDetailSelector = detailSelector;
+    this.syncedOrder = order;
+    if (view === VIEW_DETAIL || (viewChanged && this.previousSyncedView === VIEW_DETAIL)) {
+      this.schedulePreviewHighlight(detailChanged || orderChanged);
+    }
+    this.previousSyncedView = view;
   }
 
   componentWillUnmount() {
     clearTimeout(this.undoTimeout);
+    cancelAnimationFrame(this.highlightFrame);
+    this.clearPreviewHighlight();
+    if (this.props.setPanelHeader) {
+      this.props.setPanelHeader(null);
+    }
+    if (this.props.setPanelExpanded) {
+      this.props.setPanelExpanded(false);
+    }
   }
 
   // ------------------------------------------------------------ render
@@ -388,16 +515,6 @@ class EditDevices extends Component {
             <Text id="dashboard.boxes.devices.dragHint" />
           </p>
         )}
-        <button
-          type="button"
-          class={style.addButton}
-          onClick={this.openPicker}
-          disabled={!this.state.devices}
-          data-cy="devices-add-button"
-        >
-          <i class="fe fe-plus" />
-          <Text id="dashboard.boxes.devices.addDevicesButton" />
-        </button>
         <div class={cx('form-group', style.titleField)}>
           <label class="form-label" for={`devices-widget-name-${props.x}-${props.y}`}>
             <Text id="dashboard.boxes.devices.editNameLabel" />
@@ -413,6 +530,19 @@ class EditDevices extends Component {
             />
           </Localizer>
         </div>
+        {/* pinned to the bottom of the panel: reachable whatever the length of the list */}
+        <div class={style.stickyFooter}>
+          <button
+            type="button"
+            class={style.primaryButton}
+            onClick={this.openPicker}
+            disabled={!this.state.devices}
+            data-cy="devices-add-button"
+          >
+            <i class="fe fe-plus" />
+            <Text id="dashboard.boxes.devices.addDevicesButton" />
+          </button>
+        </div>
       </div>
     );
   }
@@ -426,12 +556,15 @@ class EditDevices extends Component {
     const inputId = `devices-feature-name-${props.x}-${props.y}`;
     return (
       <div data-cy="devices-detail">
-        <div class={style.backRow}>
-          <button type="button" class={style.backButton} onClick={this.backToList} data-cy="devices-detail-back">
-            <i class="fe fe-chevron-left" />
-            <Text id="dashboard.boxes.devices.backToList" />
-          </button>
-        </div>
+        {/* inside the edit panel, the back button lives in its header (syncPanel) */}
+        {!props.setPanelHeader && (
+          <div class={style.backRow}>
+            <button type="button" class={style.backButton} onClick={this.backToList}>
+              <i class="fe fe-chevron-left" />
+              <Text id="dashboard.boxes.devices.backToList" />
+            </button>
+          </div>
+        )}
         <div class={style.deviceCard}>
           <span class={cx(style.badge, style.badgeLarge)} aria-hidden="true">
             <i class={`fe fe-${item.entry ? getFeatureIcon(item.entry.feature) : 'alert-circle'}`} />
@@ -503,9 +636,12 @@ class EditDevices extends Component {
           <i class="fe fe-trash-2" />
           <Text id="dashboard.boxes.devices.removeFromWidget" />
         </button>
-        <button type="button" class={style.doneButton} onClick={this.backToList}>
-          <Text id="dashboard.boxes.devices.done" />
-        </button>
+        <div class={style.stickyFooter}>
+          <button type="button" class={style.primaryButton} onClick={this.backToList} data-cy="devices-detail-done">
+            <i class="fe fe-check" />
+            <Text id="dashboard.boxes.devices.done" />
+          </button>
+        </div>
       </div>
     );
   }
@@ -520,6 +656,7 @@ class EditDevices extends Component {
           selected={items.map(item => item.selector)}
           onValidate={this.validatePicker}
           onCancel={this.backToList}
+          hideBackButton={Boolean(props.setPanelHeader)}
         />
       );
     } else if (view === VIEW_DETAIL) {

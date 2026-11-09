@@ -547,7 +547,8 @@
           "one": "1 quitado",
           "other": "{{count}} quitados"
         },
-        "undo": "Deshacer"
+        "undo": "Deshacer",
+        "detailTitle": "Renombrar"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Seleccione la habitación que desea mostrar aquí.",
@@ -1043,7 +1044,10 @@
       "scenesText": "Luces al atardecer, rutinas matutinas: su hogar actúa por usted.",
       "usersTitle": "Invite a su familia",
       "usersText": "Cree una cuenta para cada miembro de la familia."
-    }
+    },
+    "editPanelClose": "Cerrar",
+    "editPanelExpand": "Ampliar el panel",
+    "editPanelCollapse": "Reducir el panel"
   },
   "newDashboard": {
     "cardTitle": "Crear un nuevo panel",
@@ -7637,6 +7641,7 @@
       "one": "1 seleccionado",
       "other": "{{count}} seleccionados"
     },
-    "validate": "Listo"
+    "validate": "Listo",
+    "title": "Elegir"
   }
 }

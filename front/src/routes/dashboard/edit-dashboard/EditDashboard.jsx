@@ -28,7 +28,10 @@ const EditDashboard = ({ children, ...props }) => (
             <div
               class={cx('container', style.largeContainer, editStyle.editorContainer, {
                 // live preview of the "full" width while editing
-                [style.fullWidthContainer]: get(props, 'currentDashboard.width') === 'full'
+                [style.fullWidthContainer]: get(props, 'currentDashboard.width') === 'full',
+                // room to scroll the last widgets up above the mobile sheet
+                [editStyle.editorContainerUnderPanel]:
+                  Boolean(props.editingBoxPosition) || props.dashboardSettingsOpen || props.newDashboardOpen
               })}
             >
               {/* The dashboard list is a wrapping row of pills above the canvas

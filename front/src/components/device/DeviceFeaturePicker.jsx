@@ -166,12 +166,15 @@ class DeviceFeaturePicker extends Component {
 
     return (
       <div class={style.picker} data-cy="device-feature-picker">
-        <div class={style.backRow}>
-          <button type="button" class={style.backButton} onClick={props.onCancel} data-cy="picker-cancel">
-            <i class="fe fe-chevron-left" />
-            <Text id="deviceFeaturePicker.cancel" />
-          </button>
-        </div>
+        {/* a host with its own header (the dashboard edit panel) shows the back button there */}
+        {!props.hideBackButton && (
+          <div class={style.backRow}>
+            <button type="button" class={style.backButton} onClick={props.onCancel} data-cy="picker-cancel">
+              <i class="fe fe-chevron-left" />
+              <Text id="deviceFeaturePicker.cancel" />
+            </button>
+          </div>
+        )}
 
         <div class={style.search}>
           <i class={cx('fe fe-search', style.searchIcon)} aria-hidden="true" />

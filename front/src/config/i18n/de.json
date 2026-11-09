@@ -547,7 +547,8 @@
           "one": "1 entfernt",
           "other": "{{count}} entfernt"
         },
-        "undo": "Rückgängig"
+        "undo": "Rückgängig",
+        "detailTitle": "Umbenennen"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -1043,7 +1044,10 @@
       "scenesText": "Licht bei Sonnenuntergang, Morgenroutinen: Dein Zuhause handelt für dich.",
       "usersTitle": "Lade deinen Haushalt ein",
       "usersText": "Erstelle ein Konto für jedes Familienmitglied."
-    }
+    },
+    "editPanelClose": "Schließen",
+    "editPanelExpand": "Bereich vergrößern",
+    "editPanelCollapse": "Bereich verkleinern"
   },
   "newDashboard": {
     "cardTitle": "Ein neues Dashboard hinzufügen",
@@ -7637,6 +7641,7 @@
       "one": "1 ausgewählt",
       "other": "{{count}} ausgewählt"
     },
-    "validate": "Fertig"
+    "validate": "Fertig",
+    "title": "Geräte wählen"
   }
 }

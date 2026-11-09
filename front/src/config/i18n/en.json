@@ -547,7 +547,8 @@
           "one": "1 removed",
           "other": "{{count}} removed"
         },
-        "undo": "Undo"
+        "undo": "Undo",
+        "detailTitle": "Rename"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -1043,7 +1044,10 @@
       "scenesText": "Lights at sunset, morning routines: your home acts for you.",
       "usersTitle": "Invite your household",
       "usersText": "Create an account for everyone in the family."
-    }
+    },
+    "editPanelClose": "Close",
+    "editPanelExpand": "Expand the panel",
+    "editPanelCollapse": "Reduce the panel"
   },
   "newDashboard": {
     "cardTitle": "Create a new dashboard",
@@ -7637,6 +7641,7 @@
       "one": "1 selected",
       "other": "{{count}} selected"
     },
-    "validate": "Done"
+    "validate": "Done",
+    "title": "Choose devices"
   }
 }

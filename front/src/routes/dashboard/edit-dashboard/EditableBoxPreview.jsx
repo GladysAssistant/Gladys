@@ -43,11 +43,14 @@ const EditableBoxPreview = ({ children, ...props }) => {
     });
   };
 
+  // data-editing marks the edited widget for the panel and the forms
+  // (revealAbovePanel, the devices widget's row highlight)
   const isEditing = props.editingBoxPosition && props.editingBoxPosition.x === x && props.editingBoxPosition.y === y;
   return (
     <div
       ref={ref}
       data-widget-wrapper
+      data-editing={isEditing ? 'true' : undefined}
       class={cx(style.previewWrapper, {
         [style.previewWrapperEditing]: isEditing
       })}

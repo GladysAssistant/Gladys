@@ -547,7 +547,8 @@
           "one": "1 retiré",
           "other": "{{count}} retirés"
         },
-        "undo": "Annuler"
+        "undo": "Annuler",
+        "detailTitle": "Renommer"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -1043,7 +1044,10 @@
       "scenesText": "Lumières au coucher du soleil, routines du matin : votre maison agit pour vous.",
       "usersTitle": "Invitez votre foyer",
       "usersText": "Créez un compte pour chaque membre de la famille."
-    }
+    },
+    "editPanelClose": "Fermer",
+    "editPanelExpand": "Agrandir le panneau",
+    "editPanelCollapse": "Réduire le panneau"
   },
   "newDashboard": {
     "cardTitle": "Créer un tableau de bord",
@@ -7637,6 +7641,7 @@
       "one": "1 sélectionné",
       "other": "{{count}} sélectionnés"
     },
-    "validate": "Valider"
+    "validate": "Valider",
+    "title": "Choisir"
   }
 }

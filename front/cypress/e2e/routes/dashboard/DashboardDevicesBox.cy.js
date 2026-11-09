@@ -78,9 +78,11 @@ describe('Dashboard Devices Box editor', () => {
     cy.visit('/dashboard/test/edit');
     cy.get('[data-cy="edit-box-0-0"]').click();
 
-    // compact list: one row per feature, no text input in the list
+    // compact list: one row per feature, no text input in the list; the
+    // sheet replaces the editor's action bar while it is open
     cy.get('[data-cy="devices-row-0"]').should('contain', defaultName(1));
     cy.get('[data-device-row] input').should('not.exist');
+    cy.get('[data-cy="edit-actions"]').should('not.be.visible');
 
     // picker: the features already in the widget start checked
     cy.get('[data-cy="devices-add-button"]').click();
@@ -108,7 +110,7 @@ describe('Dashboard Devices Box editor', () => {
       .click();
     cy.get('[data-cy="devices-detail-name"]').type('Garden');
     cy.get('[data-cy="devices-detail-name"]').clear();
-    cy.get('[data-cy="devices-detail-back"]').click();
+    cy.get('[data-cy="edit-panel-back"]').click();
     cy.get('[data-cy="devices-row-2"]').should('contain', defaultName(2));
 
     // rename and move to the top with the buttons
@@ -116,10 +118,12 @@ describe('Dashboard Devices Box editor', () => {
       .first()
       .click();
     cy.get('[data-cy="devices-detail-name"]').type('Outside');
+    // the row being edited is outlined in the widget's live preview
+    cy.get('.gladys-editing-device-row').should('contain', 'Outside');
     cy.get('[data-cy="devices-detail-up"]').click();
     cy.get('[data-cy="devices-detail-up"]').click();
     cy.get('[data-cy="devices-detail-up"]').should('be.disabled');
-    cy.get('[data-cy="devices-detail-back"]').click();
+    cy.get('[data-cy="edit-panel-back"]').click();
     cy.get('[data-cy="devices-row-0"]').should('contain', 'Outside');
 
     // removing asks nothing, and can be undone
@@ -131,6 +135,9 @@ describe('Dashboard Devices Box editor', () => {
     cy.get('[data-cy="devices-undo"] button').click();
     cy.get('[data-device-row]').should('have.length', 3);
 
+    // the action bar comes back with Save once the sheet is closed
+    cy.get('[data-cy="edit-panel-close"]').click();
+    cy.get('[data-cy="edit-panel"]').should('not.exist');
     cy.contains('button', Cypress.env('i18n').dashboard.editDashboardSaveButton).click();
     cy.wait('@saveDashboard').then(({ request }) => {
       const box = request.body.boxes[0].columns[0][0];

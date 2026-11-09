@@ -1,48 +1,19 @@
-import { useLayoutEffect, useRef } from 'preact/hooks';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './style.css';
 
-// Fixed action bar of the editor. Its height is published as a CSS variable
-// because the edit panel (a bottom sheet on mobile) must sit exactly on top
-// of it: the bar grows to two rows when the labels don't fit on one line, and
-// a hardcoded offset would then leave the sheet hidden behind it.
-const useFooterHeight = () => {
-  const ref = useRef(null);
-  useLayoutEffect(() => {
-    const element = ref.current;
-    if (!element) {
-      return undefined;
-    }
-    const publish = () => {
-      document.documentElement.style.setProperty('--gl-editor-footer-height', `${element.offsetHeight}px`);
-    };
-    publish();
-    // ResizeObserver is not everywhere (old wall tablets): the initial
-    // measure above already covers the common case, the observer only keeps
-    // it honest across rotations and label changes
-    let observer;
-    if (typeof ResizeObserver === 'function') {
-      observer = new ResizeObserver(publish);
-      observer.observe(element);
-    }
-    window.addEventListener('resize', publish);
-    return () => {
-      if (observer) {
-        observer.disconnect();
-      }
-      window.removeEventListener('resize', publish);
-      document.documentElement.style.removeProperty('--gl-editor-footer-height');
-    };
-  }, []);
-  return ref;
-};
-
+// Fixed action bar of the editor. On mobile it slides away while the edit
+// panel (a bottom sheet there) is open: the sheet takes the whole bottom of
+// the screen and carries its own actions, and the bar comes back — with
+// Save — as soon as the sheet closes.
 const EditActions = props => {
-  const footerRef = useFooterHeight();
+  const panelOpen = Boolean(props.editingBoxPosition) || props.dashboardSettingsOpen || props.newDashboardOpen;
   return (
-    <div class={cx('fixed-bottom footer', style.editActionsFooter)} ref={footerRef}>
+    <div
+      class={cx('fixed-bottom footer', style.editActionsFooter, { [style.editActionsFooterUnderPanel]: panelOpen })}
+      data-cy="edit-actions"
+    >
       <div class="container">
         {/* the actions are one wrapping, right-aligned row: on a narrow phone
             the three labels of a verbose language (fr: Annuler / Supprimer /

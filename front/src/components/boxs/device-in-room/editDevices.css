@@ -133,6 +133,12 @@
   color: var(--gl-ink, #1c2334);
 }
 
+.gripIcon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
 /* pointer-drag engine ghost + insertion line (utils/pointerDrag.js) */
 .dragGhost {
   display: inline-flex;
@@ -173,15 +179,28 @@
   color: var(--gl-muted, #7c8396);
 }
 
-.addButton,
-.doneButton {
+/* Pinned to the bottom of the panel's scrolling body, like the picker's
+   footer. The body has padding (EditPanel .editPanelBody: 1.25rem 1.375rem
+   1.5rem): the negative margins stretch the bar over it */
+.stickyFooter {
+  position: sticky;
+  bottom: -1.5rem;
+  z-index: 2;
+  margin: 1rem -1.375rem -1.5rem;
+  padding: 0.75rem 1.375rem 1rem;
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+  background: var(--gl-surface-strong, rgba(255, 255, 255, 0.94));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.primaryButton {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
   min-height: 46px;
-  margin-top: 1rem;
   border: 0;
   border-radius: 999px;
   background: var(--gl-ink, #1c2334);
@@ -192,7 +211,7 @@
   cursor: pointer;
 }
 
-.addButton:disabled {
+.primaryButton:disabled {
   opacity: 0.45;
   box-shadow: none;
   cursor: default;
@@ -302,8 +321,7 @@ input.input {
 .handle:focus:not(:focus-visible),
 .softButton:focus:not(:focus-visible),
 .removeButton:focus:not(:focus-visible),
-.addButton:focus:not(:focus-visible),
-.doneButton:focus:not(:focus-visible),
+.primaryButton:focus:not(:focus-visible),
 .backButton:focus:not(:focus-visible),
 .linkButton:focus:not(:focus-visible),
 .undoButton:focus:not(:focus-visible) {
@@ -339,4 +357,16 @@ input.input {
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+}
+
+/* The row being edited in the detail view, outlined in the widget's live
+   preview on the canvas (a <tr> of DeviceCard, tagged by EditDevices) */
+:global(tr.gladys-editing-device-row) > :global(td) {
+  background-color: rgba(61, 109, 240, 0.12) !important;
+}
+
+:global(tr.gladys-editing-device-row) {
+  outline: 2px solid var(--gl-accent, #3d6df0);
+  outline-offset: -1px;
+  border-radius: 14px;
 }

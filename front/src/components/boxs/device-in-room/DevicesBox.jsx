@@ -209,9 +209,39 @@ class DevicesComponent extends Component {
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
+  // The editor writes the box config on every keystroke and every move, and
+  // the canvas previews it live: a rename or a reorder only re-labels or
+  // re-sorts the features already loaded — a refetch would flash the loading
+  // skeleton under the user's finger. Only a different SET of features
+  // needs the API.
+  applyNamesAndOrder = () => {
+    const { deviceFeatures } = this.state;
+    if (!deviceFeatures) {
+      return;
+    }
+    const selectors = this.props.box.device_features || [];
+    const names = this.props.box.device_feature_names || [];
+    const reordered = [...deviceFeatures]
+      .sort((a, b) => selectors.indexOf(a.selector) - selectors.indexOf(b.selector))
+      .map(deviceFeature => ({ ...deviceFeature, new_label: names[selectors.indexOf(deviceFeature.selector)] }));
+    this.setState({ deviceFeatures: reordered });
+  };
+
   componentDidUpdate(previousProps) {
-    const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
-    if (deviceFeaturesChanged) {
+    const previousSelectors = get(previousProps, 'box.device_features') || [];
+    const selectors = get(this.props, 'box.device_features') || [];
+    if (
+      previousSelectors === selectors &&
+      get(previousProps, 'box.device_feature_names') === get(this.props, 'box.device_feature_names')
+    ) {
+      return;
+    }
+    const sameSet =
+      previousSelectors.length === selectors.length &&
+      [...previousSelectors].sort().join(',') === [...selectors].sort().join(',');
+    if (sameSet && this.state.status === RequestStatus.Success) {
+      this.applyNamesAndOrder();
+    } else {
       this.refreshData();
     }
   }
