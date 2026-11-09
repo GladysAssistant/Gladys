@@ -25,11 +25,16 @@ const UNDO_TOAST_DURATION_MS = 5000;
 
 const cloneDeep = value => JSON.parse(JSON.stringify(value));
 
-// The "active" flag is patched on its own (spec C.2): a draft is tied to the saved version of
-// everything else, so toggling the switch never orphans it
-const withoutActive = snapshot => {
+// A draft is tied to the saved version of what the user edits (spec C.2). The "active" flag is
+// patched on its own, and the server moves updated_at / last_executed by itself (a toggle, a run):
+// none of them may orphan a draft
+const SERVER_MANAGED_FIELDS = ['active', 'updated_at', 'last_executed', 'created_at'];
+
+const withoutServerFields = snapshot => {
   const parsed = JSON.parse(snapshot);
-  delete parsed.active;
+  SERVER_MANAGED_FIELDS.forEach(field => {
+    delete parsed[field];
+  });
   return JSON.stringify(parsed);
 };
 
@@ -511,7 +516,7 @@ class EditScene extends Component {
   saveScene = async e => {
     const saved = await this.saveSceneInternal(e);
     if (saved) {
-      removeSceneDraft(this.props.scene_selector);
+      removeSceneDraft(this.getDraftId());
       this.showToast('editScene.mobile.savedToast');
     } else {
       this.setState(prevState => ({ errorNonce: (prevState.errorNonce || 0) + 1 }));
@@ -1144,7 +1149,7 @@ class EditScene extends Component {
     clearTimeout(this.draftWriteTimer);
     this.draftWritesEnabled = false;
     this.leftOnPurpose = true;
-    removeSceneDraft(this.props.scene_selector);
+    removeSceneDraft(this.getDraftId());
     route(this.getListUrl());
   };
 
@@ -1169,6 +1174,8 @@ class EditScene extends Component {
   };
 
   cancelLeave = () => {
+    // "Keep editing" while a "Save and leave" is in flight: the save may land, the leave must not
+    this.pendingLeave = null;
     this.setState({ leaveConfirmOpen: false });
   };
 
@@ -1178,7 +1185,13 @@ class EditScene extends Component {
   };
 
   saveAndLeave = async () => {
+    const request = {};
+    this.pendingLeave = request;
     const saved = await this.saveScene();
+    if (this.pendingLeave !== request) {
+      return;
+    }
+    this.pendingLeave = null;
     if (saved) {
       this.leave();
     } else {
@@ -1338,13 +1351,14 @@ class EditScene extends Component {
   // "else" branch of an if/while block), or null when the path does not designate one
   getActionContainer = containerSegments => {
     let container = this.state.scene.actions;
+    // a branch path goes through the block action itself ("3.0.then": group 3, action 0, then)
     for (const segment of containerSegments) {
-      container = segment === 'then' || segment === 'else' ? container[segment] : container[parseInt(segment, 10)];
-      if (!Array.isArray(container)) {
+      container = /^\d+$/.test(segment) ? container[parseInt(segment, 10)] : container[segment];
+      if (container === undefined || container === null) {
         return null;
       }
     }
-    return container;
+    return Array.isArray(container) ? container : null;
   };
 
   // A group holding a single action renders as a plain step, without any group chrome: dropping
@@ -1692,7 +1706,7 @@ class EditScene extends Component {
     if (!scene || !savedSceneSnapshot) {
       return;
     }
-    const loadedBase = withoutActive(savedSceneSnapshot);
+    const loadedBase = withoutServerFields(savedSceneSnapshot);
     let currentBase = loadedBase;
     // The forms normalize their step when they mount (default unit, if/then/else arrays…): when
     // the user has not acted yet, those writes are part of the saved version, not changes the
@@ -1700,11 +1714,11 @@ class EditScene extends Component {
     const normalizedScene = JSON.stringify(scene);
     const rebased = !this.userActed && normalizedScene !== savedSceneSnapshot;
     if (rebased) {
-      currentBase = withoutActive(normalizedScene);
+      currentBase = withoutServerFields(normalizedScene);
       this.setState({ savedSceneSnapshot: normalizedScene });
     }
     this.draftWritesEnabled = true;
-    const draft = readSceneDraft(this.props.scene_selector);
+    const draft = readSceneDraft(this.getDraftId());
     if (!draft) {
       // edits made while the forms settled are written now: an app killed in the background
       // runs no unmount
@@ -1716,20 +1730,20 @@ class EditScene extends Component {
     // a draft written on top of another version of the scene would overwrite newer work
     const sameBase = draft.base === loadedBase || draft.base === currentBase;
     if (!sameBase || JSON.stringify(draft.scene) === normalizedScene) {
-      removeSceneDraft(this.props.scene_selector);
+      removeSceneDraft(this.getDraftId());
       return;
     }
     this.setState({ draftToRestore: draft });
   };
 
   persistDraft = () => {
-    if (!this.draftWritesEnabled || !this.state.scene || !this.state.savedSceneSnapshot) {
+    if (!this.draftWritesEnabled || !this.isSessionOpen() || !this.state.scene || !this.state.savedSceneSnapshot) {
       return;
     }
     if (this.hasUnsavedChanges()) {
-      writeSceneDraft(this.props.scene_selector, withoutActive(this.state.savedSceneSnapshot), this.state.scene);
+      writeSceneDraft(this.getDraftId(), withoutServerFields(this.state.savedSceneSnapshot), this.state.scene);
     } else if (!this.state.draftToRestore) {
-      removeSceneDraft(this.props.scene_selector);
+      removeSceneDraft(this.getDraftId());
     }
   };
 
@@ -1746,7 +1760,11 @@ class EditScene extends Component {
     if (!draftToRestore) {
       return;
     }
-    const scene = draftToRestore.scene;
+    // the edits come from the draft, the fields the server manages from the version just loaded
+    const scene = { ...draftToRestore.scene };
+    SERVER_MANAGED_FIELDS.forEach(field => {
+      scene[field] = this.state.scene[field];
+    });
     if (!scene.triggers) {
       scene.triggers = [];
     }
@@ -1762,11 +1780,26 @@ class EditScene extends Component {
   };
 
   discardDraft = () => {
-    removeSceneDraft(this.props.scene_selector);
+    removeSceneDraft(this.getDraftId());
     this.setState({ draftToRestore: null });
   };
 
+  // A draft is per user and per scene: another account of this browser never sees it
+  getDraftId = () => `${get(this.props, 'user.id') || 'local'}:${this.props.scene_selector}`;
+
+  // After a logout (the session reset clears the storage before the editor unmounts), nothing of
+  // the previous user may be written back
+  isSessionOpen = () => {
+    const { session } = this.props;
+    return !session || typeof session.isConnected !== 'function' || session.isConnected();
+  };
+
   onBeforeUnload = e => {
+    // the debounced write may not run before the page goes: write the draft now
+    if (this.draftWritesEnabled) {
+      clearTimeout(this.draftWriteTimer);
+      this.persistDraft();
+    }
     if (this.hasUnsavedChanges()) {
       e.preventDefault();
       // eslint-disable-next-line no-param-reassign
@@ -1804,8 +1837,10 @@ class EditScene extends Component {
     const snapshot = this.undoSnapshot;
     this.undoSnapshot = null;
     this.hideToast();
+    // the active switch was patched on its own: undo never puts it back out of sync with the server
+    const scene = { ...snapshot.scene, active: this.state.scene.active };
     this.setState(prevState => ({
-      scene: snapshot.scene,
+      scene,
       variables: snapshot.variables,
       triggersVariables: snapshot.triggersVariables,
       structureVersion: prevState.structureVersion + 1
@@ -2012,7 +2047,9 @@ class EditScene extends Component {
     // pending draft write must not be lost with the component (leave() has disabled the writes
     // when the user chose to discard)
     clearTimeout(this.draftWriteTimer);
-    if (this.draftWritesEnabled) {
+    if (!this.isSessionOpen()) {
+      // logged out: no draft write
+    } else if (this.draftWritesEnabled) {
       this.persistDraft();
     } else if (this.userActed && !this.leftOnPurpose) {
       // left while the forms were still settling, after an edit

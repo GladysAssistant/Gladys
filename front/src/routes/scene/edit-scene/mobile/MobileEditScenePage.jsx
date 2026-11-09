@@ -195,7 +195,12 @@ class MobileEditScenePage extends Component {
                 <Text id="editScene.mobile.noActionInBranch" />
               </span>
             )}
-            <button type="button" class={style.linkButton} onClick={() => this.addStep(branchPath)}>
+            <button
+              type="button"
+              class={style.linkButton}
+              onClick={() => this.addStep(branchPath)}
+              data-cy={`scene-add-to-${branchPath}`}
+            >
               <i class="fe fe-plus" aria-hidden="true" />
               <Text id={`editScene.mobile.addTo.${branch}`} />
             </button>
@@ -264,13 +269,20 @@ class MobileEditScenePage extends Component {
               <i class="fe fe-layers" aria-hidden="true" />
               <Text id="editScene.mobile.atTheSameTime" />
             </div>
-            {group.map((action, actionIndex) => (
-              <div class={style.cardDivider} key={actionIndex}>
-                {this.renderRow(action, `${groupIndex}.${actionIndex}`, 'flush', {
-                  running: Boolean(highLightedActions && highLightedActions[`${groupIndex}:${actionIndex}`])
-                })}
-              </div>
-            ))}
+            {group.map((action, actionIndex) => {
+              const path = `${groupIndex}.${actionIndex}`;
+              const extra = {
+                running: Boolean(highLightedActions && highLightedActions[`${groupIndex}:${actionIndex}`])
+              };
+              // an if/while block running at the same time as other steps keeps its branches
+              return (
+                <div class={style.cardDivider} key={actionIndex}>
+                  {isBlockAction(action)
+                    ? this.renderBlock(action, path, 'flush', extra)
+                    : this.renderRow(action, path, 'flush', extra)}
+                </div>
+              );
+            })}
             <button
               type="button"
               class={style.cardFooterButton}
@@ -395,15 +407,20 @@ class MobileEditScenePage extends Component {
             <span class={style.dirtyDot} aria-hidden="true" />
             <Text id="editScene.mobile.changes" plural={changes} fields={{ count: changes }} />
           </span>
-          <button
-            type="button"
-            class={cx(style.bigButton, style.bigButtonSoft)}
-            onClick={props.saveAndStartScene}
-            disabled={props.saving}
-            data-cy="scene-test-button"
-          >
-            <Text id="editScene.mobile.test" />
-          </button>
+          {/* while the scene runs, Stop stays at hand: Test would not start a second run */}
+          {props.runningInfo ? (
+            <RunningStopButton runningInfo={props.runningInfo} onStop={props.stopScene} small />
+          ) : (
+            <button
+              type="button"
+              class={cx(style.bigButton, style.bigButtonSoft)}
+              onClick={props.saveAndStartScene}
+              disabled={props.saving}
+              data-cy="scene-test-button"
+            >
+              <Text id="editScene.mobile.test" />
+            </button>
+          )}
           <button
             type="button"
             class={cx(style.bigButton, style.bigButtonPrimary)}

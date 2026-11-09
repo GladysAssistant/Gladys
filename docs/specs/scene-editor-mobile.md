@@ -73,19 +73,26 @@ the leave guard would ask about a scene nobody edited.
 
 1. **Leave guard.** Leaving the editor through its back control with unsaved changes opens a
    confirmation: **Save and leave** / **Leave without saving** (destructive) / **Keep editing**. It
-   is a bottom sheet on a phone and a centered dialog from 576 px.
+   is a bottom sheet on a phone and a centered dialog from 576 px. **Keep editing** while a *Save
+   and leave* is in flight cancels the leave: the save may land, the editor stays.
 2. **Reload / tab close.** While there are unsaved changes, the page registers a `beforeunload`
    handler (the browser shows its own prompt).
 3. **Local draft.** While there are unsaved changes, the editor writes a draft to `localStorage`
-   (key `gladys-scene-draft:<scene selector>`, debounced ~500 ms):
-   `{ version: 1, base: <saved version without "active">, scene: <scene>, saved_at: <ISO date> }`.
+   (key `gladys-scene-draft:<user id>:<scene selector>`, debounced ~500 ms):
+   `{ version: 1, base: <saved version without its server-managed fields>, scene: <scene>, saved_at: <ISO date> }`.
+   The server-managed fields — `active` (patched on its own), `updated_at`, `last_executed`,
+   `created_at` — are left out of the base, so a toggle or a run never orphans a draft; a restored
+   draft takes them from the version just loaded.
+   The page's `beforeunload` writes the pending draft at once. After a logout (the session reset
+   clears the storage), the editor writes nothing back: a draft never outlives its session, and
+   the user id in the key keeps another account of the same browser from ever reading it.
    Edits made while the forms settle are written as soon as the drafts are enabled (the end of
    that window), and a write still pending when the editor unmounts (swipe-back, global
    navigation) is flushed then — including an edit made before the window ended.
    - The draft is removed when the scene is saved, when the user leaves without saving, when the
      scene is deleted, and when the edits are undone back to the saved version.
    - When the editor opens a scene and finds a draft **whose `base` equals the scene just loaded
-     from the server** (or its normalized version, `active` left out of both), it shows a banner: "Unsaved changes from <relative date> were kept" with
+     from the server** (or its normalized version, server-managed fields left out of both), it shows a banner: "Unsaved changes from <relative date> were kept" with
      **Restore** / **Discard**. Restore loads the draft scene (variables are re-initialized from it,
      as on load) and shows it as unsaved. A draft whose base differs (the scene was saved elsewhere
      since) is discarded silently: restoring it would overwrite newer work.
@@ -179,8 +186,8 @@ trigger type picker. A scene with no trigger shows a single dashed "Choose a tri
 The action groups of the root level render as a **numbered vertical timeline**:
 
 - a group with **one action** is one row (icon tile, type label, summary);
-- a group with **several actions** is one card "AT THE SAME TIME" holding one row per action and a
-  "+ Simultaneous action" button;
+- a group with **several actions** is one card "AT THE SAME TIME" holding one row per action (an
+  if/while block keeps its branches there too) and a "+ Simultaneous action" button;
 - an **if/then/else** or **while** action is one card: its header row ("If" / "While" + the
   conditions' summary, opening the block's sheet), then the **Then** branch (or **Repeat** for a
   while) and the **Else** branch (if/then/else only) as indented lists of rows, each with its
@@ -230,7 +237,8 @@ its own, and **focuses its search field** when it opens.
 - Swiping a step, condition or trigger row to the left reveals **Delete** (same gesture rules as
   D.3). The sheet's "Delete" button does the same.
 - A deletion shows a toast "Step deleted" / "Trigger deleted" / "Condition deleted" with **Undo**
-  for 5 seconds. Undo restores the scene (and its variables) as they were just before the deletion.
+  for 5 seconds. Undo restores the scene (and its variables) as they were just before the deletion,
+  except the active switch, which keeps its current (server) value.
 - Deleting the scene itself is confirmed in a sheet ("Delete “<name>”? This cannot be undone.").
 
 ### E.7 Bottom bar
@@ -242,6 +250,7 @@ A frosted bar fixed at the bottom (above the safe area) whose content follows th
 | Saved, not running | **Run the scene** (full width) |
 | Saved, running | the running/stop control, full width |
 | Unsaved changes | "● N changes" · **Test** · **Save** |
+| Unsaved changes, running | "● N changes" · the running/stop control · **Save** |
 | Saving | the buttons disabled, a spinner in **Save** |
 | Reorder mode | **Done** |
 
@@ -293,7 +302,8 @@ bar) leaves the mode. Steps inside branches keep their order in this phase (G).
 - Cypress, phone viewport (`cy.viewport('iphone-x')`), `front/cypress/e2e/routes/scene/SceneMobile.cy.js`:
   create a scene from the "+" sheet (name only), add a trigger and a step through the type picker
   sheets, see the bottom bar switch to "unsaved", save, delete a step from its sheet and undo, get
-  the leave guard on "‹ Scenes", leave a scene the forms normalize without being asked, get a
+  the leave guard on "‹ Scenes", add a step to the Then branch of an if block, leave a scene the
+  forms normalize without being asked, get a
   draft back after a reload, disable the scene from its status line, delete it from the menu.
 - The swipe gesture itself (`SwipeRow`) is not driven by Cypress: the pointer events Cypress
   synthesizes do not reach the row's handlers in its browser. It is checked in a phone emulation

@@ -168,6 +168,8 @@
 .sheet :global(.form-control),
 .sheet :global(.custom-select),
 .sheet :global(.react-select__input-container),
+.sheet :global(.react-select__input),
+.sheet :global(.react-select__input input),
 .sheet :global(.react-select__single-value),
 .sheet input,
 .sheet select,

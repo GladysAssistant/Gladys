@@ -71,6 +71,27 @@ describe('Scene on a phone', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
   });
 
+  it('Should add a step inside the Then branch of an if block', () => {
+    const sceneUrl = Cypress.env('mobileSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.visit(sceneUrl);
+
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get(
+      '[data-cy="scene-step-sheet-1.0"] [data-cy="type-picker-option"][data-value="condition.if-then-else"]'
+    ).click();
+    cy.get('body').type('{esc}');
+
+    cy.get('[data-cy="scene-add-to-1.0.then"]').click();
+    cy.get('[data-cy="scene-step-sheet-1.0.then.0.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy="scene-step-row-1.0.then.0.0"]').should('be.visible');
+
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.get('[data-cy=scene-leave-discard]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+  });
+
   it('Should leave a scene opened by mistake without asking', () => {
     const serverUrl = Cypress.env('serverUrl');
     // a scene the forms normalize when they mount: a delay without unit, an if block without

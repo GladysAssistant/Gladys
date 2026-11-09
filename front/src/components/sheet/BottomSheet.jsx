@@ -47,6 +47,14 @@ class BottomSheet extends Component {
     }
   }
 
+  // the element that opens the sheet is read before the sheet's content renders: a field of the
+  // content may take the focus as it updates (an autofocused search)
+  componentWillUpdate(nextProps) {
+    if (nextProps.open && !this.props.open) {
+      this.openerElement = document.activeElement;
+    }
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.open && !prevProps.open) {
       this.onOpen();
@@ -62,7 +70,8 @@ class BottomSheet extends Component {
   }
 
   onOpen = () => {
-    this.previousFocus = document.activeElement;
+    this.previousFocus = this.openerElement || document.activeElement;
+    this.openerElement = null;
     openSheets.push(this);
     lockPageScroll();
     document.addEventListener('keydown', this.handleKeyDown);

@@ -47,12 +47,17 @@ class NewSceneSheet extends Component {
   };
 
   updateName = e => {
-    this.setState({ name: e.target.value, status: null });
+    const name = e.target.value;
+    // a creation in flight stays pending: a second submission would create a second scene
+    this.setState(prevState => ({ name, status: prevState.status === 'creating' ? 'creating' : null }));
   };
 
   create = async e => {
     if (e) {
       e.preventDefault();
+    }
+    if (this.state.status === 'creating') {
+      return;
     }
     const name = this.state.name.trim();
     // "new" is the route of the creation page, not a valid scene selector

@@ -112,6 +112,21 @@ class SwipeRow extends Component {
     }
   };
 
+  // the browser took the gesture over (a scroll): the row goes back to where it was, and nothing
+  // counts as a completed swipe
+  onPointerCancel = event => {
+    const gesture = this.gesture;
+    this.gesture = null;
+    if (!gesture || gesture.pointerId !== event.pointerId || !gesture.engaged) {
+      return;
+    }
+    if (gesture.baseOffset < 0) {
+      this.open();
+    } else {
+      this.close();
+    }
+  };
+
   // the end of a swipe, or a tap on an open row, must not reach the row's own button
   onClickCapture = event => {
     const justSwiped = this.swipedAt && Date.now() - this.swipedAt < CLICK_AFTER_SWIPE_MS;
@@ -158,7 +173,7 @@ class SwipeRow extends Component {
           onPointerDown={this.onPointerDown}
           onPointerMove={this.onPointerMove}
           onPointerUp={this.onPointerUp}
-          onPointerCancel={this.onPointerUp}
+          onPointerCancel={this.onPointerCancel}
           onClickCapture={this.onClickCapture}
         >
           {children}

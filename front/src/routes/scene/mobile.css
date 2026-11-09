@@ -843,11 +843,16 @@
   line-height: 1.4;
 }
 
-/* the running/stop control fills the bottom bar */
+/* the running/stop control fills the bottom bar, or sits beside Save when there are changes */
 .bottomBar :global(.btn) {
   width: 100%;
   min-height: 52px;
   border-radius: 14px;
+}
+
+.bottomBarRow :global(.btn) {
+  width: auto;
+  min-height: 48px;
 }
 
 .toast {
