@@ -64,8 +64,9 @@ devices not loaded yet) is shown as is.
 
 The step forms normalize their step when they mount (a default unit, the `if` / `then` / `else`
 arrays of a block…). Those writes are not changes: about 1.5 s after the load, once every form is
-mounted, if the user has not acted on the editor yet (no input, no change, no key press other
-than Tab / Escape / modifiers — the steps also move with the arrow keys —, no click other than a
+mounted, if the user has not acted on the editor yet (no input, no change, no key press on a
+field or a focused step other than Tab / Escape / modifiers — the steps also move with the arrow
+keys; a key pressed on the page itself only scrolls it —, no click other than a
 navigation one — back, opening a row or a sheet, closing it, the active switch, save / test / run
 / stop: the elements marked `data-not-an-edit` and the sheet backdrops), the saved version is
 re-based on the normalized
@@ -95,10 +96,11 @@ the leave guard would ask about a scene nobody edited.
    that window), and a write still pending when the editor unmounts (swipe-back, global
    navigation) is flushed then — including an edit made before the window ended.
    - The draft is removed when the scene is saved (edits made while the save was in flight are
-     written again at once, against the version just saved), when the user leaves without saving,
+     written again at once, against the version just saved — also when the save lands after the
+     editor is gone), when the user leaves without saving,
      when the scene is deleted, and when the edits are undone back to the saved version. A draft
      offered back (banner below) and neither restored, discarded nor superseded by a save stays
-     stored when the user leaves; a save closes the banner.
+     stored when the user leaves (not when the scene is deleted); a save closes the banner.
    - When the editor opens a scene and finds a draft **whose `base` equals the scene just loaded
      from the server** (or its normalized version, server-managed fields left out of both), it shows a banner: "Unsaved changes from <relative date> were kept" with
      **Restore** / **Discard**. Restore loads the draft scene (variables are re-initialized from it,

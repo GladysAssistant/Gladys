@@ -47,7 +47,12 @@ const NON_EDITING_KEYS = ['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta'];
 
 const isNotAnEdit = event => {
   const target = event.target;
-  if (event.type === 'keydown' && NON_EDITING_KEYS.includes(event.key)) {
+  // a key pressed on the page itself (Space, Page Down, the arrows…) only scrolls it: keys edit
+  // the scene from a field or a focused step
+  if (
+    event.type === 'keydown' &&
+    (NON_EDITING_KEYS.includes(event.key) || target === document.body || target === document.documentElement)
+  ) {
     return true;
   }
   if (!target || typeof target.closest !== 'function') {
@@ -520,6 +525,10 @@ class EditScene extends Component {
   // error alert in the state, and bumps errorNonce so the pages bring it into view (spec C.3)
   saveScene = async e => {
     const saved = await this.saveSceneInternal(e);
+    if (saved && this.unmounted) {
+      this.rebaseDraftOnSave();
+      return saved;
+    }
     if (saved) {
       removeSceneDraft(this.getDraftId());
       // a draft still offered is superseded by the version just saved (restoring it would put an
@@ -531,6 +540,25 @@ class EditScene extends Component {
       this.setState(prevState => ({ errorNonce: (prevState.errorNonce || 0) + 1 }));
     }
     return saved;
+  };
+
+  // The save was acknowledged after the editor went away (edits during the save, then a way out):
+  // the draft its unmount flushed is now based on an older version, and would be dropped on the
+  // next open. It is rebased on the version just saved, or removed when it holds nothing more.
+  rebaseDraftOnSave = () => {
+    if (!this.isSessionOpen() || !this.acknowledgedScene) {
+      return;
+    }
+    const draft = readSceneDraft(this.getDraftId());
+    if (!draft) {
+      return;
+    }
+    const acknowledgedBase = withoutServerFields(JSON.stringify(this.acknowledgedScene));
+    if (withoutServerFields(JSON.stringify(draft.scene)) === acknowledgedBase) {
+      removeSceneDraft(this.getDraftId());
+    } else {
+      writeSceneDraft(this.getDraftId(), acknowledgedBase, draft.scene);
+    }
   };
 
   saveSceneInternal = async e => {
@@ -614,6 +642,7 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false, errorMessage: null, errorMessageId: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
+      this.acknowledgedScene = sceneToSave;
       // The snapshot is the payload actually sent, not the state it was built from: the
       // ranges were sorted on the way, and comparing against the unsorted state would leave
       // the editor thinking it has unsaved changes forever. The state itself is realigned on
@@ -1154,12 +1183,12 @@ class EditScene extends Component {
     return search ? `/dashboard/scene?${search}` : '/dashboard/scene';
   };
 
-  leave = () => {
+  leave = ({ sceneDeleted = false } = {}) => {
     clearTimeout(this.draftWriteTimer);
     this.draftWritesEnabled = false;
     this.leftOnPurpose = true;
     const { draftToRestore } = this.state;
-    if (draftToRestore) {
+    if (draftToRestore && !sceneDeleted) {
       // a draft offered back and neither restored nor discarded is still offered next time
       writeSceneDraft(this.getDraftId(), draftToRestore.base, draftToRestore.scene);
     } else {
@@ -1219,7 +1248,7 @@ class EditScene extends Component {
     try {
       await this.props.httpClient.delete(`/api/v1/scene/${this.props.scene_selector}`);
       this.setState({ saving: false });
-      this.leave();
+      this.leave({ sceneDeleted: true });
     } catch (e) {
       this.setState({ saving: false });
     }
@@ -2078,6 +2107,7 @@ class EditScene extends Component {
     // pending draft write must not be lost with the component (leave() has disabled the writes
     // when the user chose to discard)
     this.flushDraft();
+    this.unmounted = true;
     // a "Save and leave" still in flight must not navigate away from wherever the user went
     this.pendingLeave = null;
     clearTimeout(this.toastTimer);
