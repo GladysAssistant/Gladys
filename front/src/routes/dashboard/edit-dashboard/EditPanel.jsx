@@ -20,9 +20,14 @@ const CLICK_SUPPRESS_MS = 400;
 // A drag on the grab handle must not end with a click: with a mouse (or a
 // late synthetic click on iOS) the release's click would toggle the height
 // back, or — when the drag closed the sheet — land on the canvas under the
-// finger and reopen a widget. Same guard as the pointer-drag engine.
-const suppressNextClick = () => {
+// finger and reopen a widget. Same guard as the pointer-drag engine. A touch
+// drag often produces no click at all, so only a click at the release point
+// is that gesture's: an unrelated tap elsewhere within the delay goes through.
+const suppressNextClick = (releaseX, releaseY) => {
   const suppress = clickEvent => {
+    if (Math.hypot(clickEvent.clientX - releaseX, clickEvent.clientY - releaseY) > TAP_MAX_TRAVEL_PX) {
+      return;
+    }
     clickEvent.preventDefault();
     clickEvent.stopPropagation();
     removeSuppress();
@@ -182,7 +187,7 @@ class EditPanel extends Component {
       // finger (a row of the form, opening it). A real drag swallows the
       // click its release may produce.
       if (Math.abs(travel) > TAP_MAX_TRAVEL_PX) {
-        suppressNextClick();
+        suppressNextClick(endEvent.clientX, endEvent.clientY);
       }
       if (travel < -GRAB_SWITCH_PX) {
         this.setState({ expanded: true });
