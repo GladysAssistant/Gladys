@@ -13,6 +13,12 @@ describe('Matter.getNodes', () => {
       job: {
         wrapper: fake.returns(null),
       },
+      device: {
+        get: fake.resolves([
+          { name: 'Kitchen plug', selector: 'kitchen-plug', external_id: 'matter:1234:1' },
+          { name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
+        ]),
+      },
     };
     const MatterMain = {};
     const ProjectChipMatter = {};
@@ -73,6 +79,7 @@ describe('Matter.getNodes', () => {
       {
         node_id: '1234',
         is_connected: true,
+        gladys_devices: [{ name: 'Kitchen plug', selector: 'kitchen-plug' }],
         devices: [
           {
             name: 'Test Device',

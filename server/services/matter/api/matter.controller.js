@@ -56,8 +56,10 @@ module.exports = function MatterController(matterHandler) {
    * @apiGroup Matter
    */
   async function decommissionNode(req, res) {
-    await matterHandler.decommission(BigInt(req.params.node_id));
-    res.json({ success: true });
+    const result = await matterHandler.decommission(BigInt(req.params.node_id), {
+      deleteGladysDevices: Boolean(req.body && req.body.delete_gladys_devices === true),
+    });
+    res.json({ success: true, ...result });
   }
 
   /**
@@ -89,6 +91,7 @@ module.exports = function MatterController(matterHandler) {
     },
     'post /api/v1/service/matter/node/:node_id/decommission': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(decommissionNode),
     },
     'post /api/v1/service/matter/reset': {

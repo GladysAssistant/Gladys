@@ -1,21 +1,58 @@
+const Promise = require('bluebird');
 const logger = require('../../../utils/logger');
 
 /**
- * @description Decommission a node.
+ * @description Decommission a node: the node is asked to leave the fabric, and when it can not be
+ * reached it is removed from the controller only (the appliance then has to be factory reset).
+ * The Gladys devices created from this node can be deleted in the same gesture.
  * @param {bigint} nodeId - The node ID.
- * @example matter.decommission(nodeId);
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.deleteGladysDevices] - Also delete the Gladys devices of this node.
+ * @returns {Promise<object>} Whether the removal was forced, and the Gladys devices deleted / kept.
+ * @example await matter.decommission(nodeId, { deleteGladysDevices: true });
  */
-async function decommission(nodeId) {
+async function decommission(nodeId, { deleteGladysDevices = false } = {}) {
   const node = this.nodesMap.get(nodeId);
+  let forced = false;
   try {
+    if (!node) {
+      throw new Error('node is not loaded');
+    }
     await node.decommission();
   } catch (e) {
-    logger.warn(`Matter: Failed to decommission node ${nodeId}: ${e}`);
+    logger.warn(`Matter: Failed to decommission node ${nodeId}: ${e}, removing it from the controller`);
+    // if this fails too, the error goes up to the caller and nothing is cleaned
     await this.commissioningController.removeNode(BigInt(nodeId), false);
+    forced = true;
   }
 
+  const externalIdPrefix = `matter:${nodeId.toString()}:`;
   this.nodesMap.delete(nodeId);
-  this.devices = this.devices.filter((device) => !device.external_id.startsWith(`matter:${nodeId.toString()}:`));
+  this.devices = this.devices.filter((device) => !device.external_id.startsWith(externalIdPrefix));
+
+  const deletedDevices = [];
+  const failedDevices = [];
+  if (deleteGladysDevices) {
+    const matterDevices = await this.gladys.device.get({ service: 'matter' });
+    const nodeDevices = matterDevices.filter((device) => device.external_id.startsWith(externalIdPrefix));
+    await Promise.each(nodeDevices, async (device) => {
+      try {
+        await this.gladys.device.destroy(device.selector);
+        deletedDevices.push(device.name);
+      } catch (e) {
+        // the node is already gone: one device that can not be deleted (too many states,
+        // the purge is then running) must not hide the others
+        logger.warn(`Matter: Failed to delete device ${device.selector} of node ${nodeId}: ${e}`);
+        failedDevices.push(device.name);
+      }
+    });
+  }
+
+  return {
+    forced,
+    deleted_devices: deletedDevices,
+    failed_devices: failedDevices,
+  };
 }
 
 module.exports = { decommission };

@@ -45,12 +45,18 @@ async function getNodes() {
     }
     return true;
   });
+  // the Gladys devices created from each node, shown before a decommission
+  const gladysDevices = await this.gladys.device.get({ service: 'matter' });
   return Promise.mapSeries(filteredNodeDetails, async (nodeDetail) => {
     const node = await this.commissioningController.getNode(nodeDetail.nodeId);
     const devices = node.getDevices();
+    const externalIdPrefix = `matter:${nodeDetail.nodeId.toString()}:`;
     return {
       node_id: nodeDetail.nodeId.toString(),
       is_connected: node.isConnected,
+      gladys_devices: gladysDevices
+        .filter((gladysDevice) => gladysDevice.external_id.startsWith(externalIdPrefix))
+        .map((gladysDevice) => ({ name: gladysDevice.name, selector: gladysDevice.selector })),
       devices: devices.map((device) => {
         return convertDevice(device);
       }),

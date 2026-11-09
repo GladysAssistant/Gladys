@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import { RequestStatus } from '../../../../utils/consts';
 import { connect } from 'unistore/preact';
@@ -135,6 +135,10 @@ class MatterSettingsPage extends Component {
       nodes: [],
       loadingNodes: true,
       decommissioningNodes: {},
+      nodeToDecommission: null,
+      deleteGladysDevices: true,
+      decommissionError: null,
+      decommissionResult: null,
       collapsedDevices: {},
       visibleKeys: {},
       showConfirmReset: false,
@@ -229,18 +233,47 @@ class MatterSettingsPage extends Component {
     }
   };
 
-  decommissionNode = async nodeId => {
+  askDecommissionNode = nodeId => {
+    this.setState({ nodeToDecommission: nodeId, deleteGladysDevices: true });
+  };
+
+  cancelDecommissionNode = () => {
+    this.setState({ nodeToDecommission: null });
+  };
+
+  toggleDeleteGladysDevices = () => {
+    this.setState(prevState => ({ deleteGladysDevices: !prevState.deleteGladysDevices }));
+  };
+
+  decommissionNode = async node => {
+    const nodeId = node.node_id;
+    const deleteGladysDevices = this.state.deleteGladysDevices && node.gladys_devices.length > 0;
     this.setState({
+      nodeToDecommission: null,
+      decommissionError: null,
+      decommissionResult: null,
       decommissioningNodes: {
         ...this.state.decommissioningNodes,
         [nodeId]: true
       }
     });
     try {
-      await this.props.httpClient.post(`/api/v1/service/matter/node/${nodeId}/decommission`);
+      const result = await this.props.httpClient.post(`/api/v1/service/matter/node/${nodeId}/decommission`, {
+        delete_gladys_devices: deleteGladysDevices
+      });
+      this.setState({
+        decommissionResult: {
+          name: `${node.node_information.vendor_name} - ${node.node_information.product_name}`,
+          forced: result.forced,
+          deletedDevices: result.deleted_devices,
+          failedDevices: result.failed_devices
+        }
+      });
       await this.loadNodes();
     } catch (e) {
       console.error(e);
+      const message = (e.response && e.response.data && e.response.data.message) || e.message;
+      this.setState({ decommissionError: { nodeId, message } });
     }
     this.setState({
       decommissioningNodes: {
@@ -354,6 +387,10 @@ class MatterSettingsPage extends Component {
       loading,
       loadingNodes,
       decommissioningNodes,
+      nodeToDecommission,
+      deleteGladysDevices,
+      decommissionError,
+      decommissionResult,
       collapsedDevices,
       visibleKeys,
       hasIpv6,
@@ -361,6 +398,7 @@ class MatterSettingsPage extends Component {
       resetting,
       resetError
     } = this.state;
+    const isAdmin = this.props.user && this.props.user.role === 'admin';
 
     return (
       <MatterPage user={this.props.user}>
@@ -429,6 +467,53 @@ class MatterSettingsPage extends Component {
                       )}
                     </div>
 
+                    {decommissionError && (
+                      <div class="alert alert-danger">
+                        <Text id="integration.matter.settings.decommission.error" />
+                        {decommissionError.message && (
+                          <div>
+                            <small>{decommissionError.message}</small>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {decommissionResult && (
+                      <>
+                        <div class="alert alert-success">
+                          <Text
+                            id="integration.matter.settings.decommission.success"
+                            fields={{ name: decommissionResult.name }}
+                          />
+                          {decommissionResult.deletedDevices.length > 0 && (
+                            <span>
+                              {' '}
+                              <Text
+                                id="integration.matter.settings.decommission.devicesDeleted"
+                                plural={decommissionResult.deletedDevices.length}
+                                fields={{ count: decommissionResult.deletedDevices.length }}
+                              />
+                            </span>
+                          )}
+                        </div>
+                        {decommissionResult.forced && (
+                          <div class="alert alert-warning">
+                            <Text id="integration.matter.settings.decommission.forcedWarning" />
+                          </div>
+                        )}
+                        {decommissionResult.failedDevices.length > 0 && (
+                          <div class="alert alert-warning">
+                            <Text id="integration.matter.settings.decommission.devicesNotDeleted" />
+                            <ul class="mb-0">
+                              {decommissionResult.failedDevices.map(name => (
+                                <li>{name}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </>
+                    )}
+
                     <div
                       class={cx('dimmer', {
                         active: loadingNodes
@@ -453,17 +538,60 @@ class MatterSettingsPage extends Component {
                                           Product ID: {node.node_information.product_id}
                                         </small>
                                       </div>
-                                      <button
-                                        onClick={() => this.decommissionNode(node.node_id)}
-                                        class={cx('btn btn-danger btn-sm flex-shrink-0 ml-2', {
-                                          loading: decommissioningNodes[node.node_id]
-                                        })}
-                                        disabled={decommissioningNodes[node.node_id]}
-                                      >
-                                        <Text id="integration.matter.settings.decommissionButton" />
-                                      </button>
+                                      {isAdmin && (
+                                        <button
+                                          onClick={() => this.askDecommissionNode(node.node_id)}
+                                          class={cx('btn btn-danger btn-sm flex-shrink-0 ml-2', {
+                                            loading: decommissioningNodes[node.node_id]
+                                          })}
+                                          disabled={
+                                            decommissioningNodes[node.node_id] || nodeToDecommission === node.node_id
+                                          }
+                                        >
+                                          <Text id="integration.matter.settings.decommissionButton" />
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
+                                  {nodeToDecommission === node.node_id && (
+                                    <div class="card-body border-bottom">
+                                      <div class="alert alert-danger mb-3">
+                                        <MarkupText id="integration.matter.settings.decommission.confirmMessage" />
+                                      </div>
+                                      {node.gladys_devices.length > 0 && (
+                                        <div class="mb-3">
+                                          <Text id="integration.matter.settings.decommission.linkedDevices" />
+                                          <ul>
+                                            {node.gladys_devices.map(gladysDevice => (
+                                              <li>{gladysDevice.name}</li>
+                                            ))}
+                                          </ul>
+                                          <label class="custom-control custom-checkbox">
+                                            <input
+                                              type="checkbox"
+                                              class="custom-control-input"
+                                              checked={deleteGladysDevices}
+                                              onChange={this.toggleDeleteGladysDevices}
+                                            />
+                                            <span class="custom-control-label">
+                                              <Text id="integration.matter.settings.decommission.deleteDevicesLabel" />
+                                            </span>
+                                          </label>
+                                          <small class="form-text text-muted">
+                                            <Text id="integration.matter.settings.decommission.deleteDevicesHelp" />
+                                          </small>
+                                        </div>
+                                      )}
+                                      <div>
+                                        <button class="btn btn-danger" onClick={() => this.decommissionNode(node)}>
+                                          <Text id="integration.matter.settings.decommission.confirmButton" />
+                                        </button>
+                                        <button class="btn ml-2" onClick={this.cancelDecommissionNode}>
+                                          <Text id="integration.matter.settings.decommission.cancelButton" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
                                   <div class="card-body">
                                     {node.devices.map(device => (
                                       <DeviceDisplay

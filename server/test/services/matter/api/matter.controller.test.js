@@ -1,4 +1,5 @@
 const sinon = require('sinon').createSandbox();
+const { expect } = require('chai');
 const MatterController = require('../../../../services/matter/api/matter.controller');
 
 const { assert, fake } = sinon;
@@ -27,7 +28,7 @@ describe('MatterController', () => {
           },
         ],
       }),
-      decommission: fake.resolves(null),
+      decommission: fake.resolves({ forced: false, deleted_devices: ['Plug'], failed_devices: [] }),
       listenToStateChange: fake.resolves(null),
       reset: fake.resolves(null),
     };
@@ -121,8 +122,27 @@ describe('MatterController', () => {
     };
 
     await controller['post /api/v1/service/matter/node/:node_id/decommission'].controller(req, res);
-    assert.calledOnce(matterHandler.decommission);
-    assert.calledWith(res.json, { success: true });
+    assert.calledOnceWithExactly(matterHandler.decommission, 1234n, { deleteGladysDevices: false });
+    assert.calledWith(res.json, { success: true, forced: false, deleted_devices: ['Plug'], failed_devices: [] });
+  });
+  it('should decommission a node and delete its Gladys devices', async () => {
+    const req = {
+      params: {
+        node_id: '1234',
+      },
+      body: {
+        delete_gladys_devices: true,
+      },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/matter/node/:node_id/decommission'].controller(req, res);
+    assert.calledOnceWithExactly(matterHandler.decommission, 1234n, { deleteGladysDevices: true });
+  });
+  it('should only let an admin decommission a node', async () => {
+    expect(controller['post /api/v1/service/matter/node/:node_id/decommission'].admin).to.equal(true);
   });
   it('should reset matter integration', async () => {
     const req = {};
