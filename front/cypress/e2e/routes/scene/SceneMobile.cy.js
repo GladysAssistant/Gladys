@@ -165,6 +165,43 @@ describe('Scene on a phone', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
   });
 
+  it('Should keep an edit made while a save is in flight', () => {
+    const sceneUrl = Cypress.env('mobileSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.intercept('PATCH', '**/api/v1/scene/*', req => {
+      req.on('response', res => {
+        res.setDelay(1500);
+      });
+    }).as('saveScene');
+    cy.visit(sceneUrl);
+    cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+
+    // a first edit, saved slowly
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy=scene-save-button]').click();
+
+    // a second edit while the request is in flight
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-2.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+    cy.wait('@saveScene');
+    cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
+
+    // the second edit is still recoverable once the save has landed
+    cy.reload();
+    cy.get('[data-cy=scene-draft-banner]').should('be.visible');
+    cy.get('[data-cy=scene-draft-restore]').click();
+    cy.get('[data-cy="scene-step-row-2.0"]').should('be.visible');
+
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.get('[data-cy=scene-leave-discard]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+  });
+
   it('Should disable the scene from its status line', () => {
     const sceneUrl = Cypress.env('mobileSceneUrl');
     expect(sceneUrl).to.exist;
