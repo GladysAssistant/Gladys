@@ -7375,6 +7375,10 @@
   },
   "clock": {
     "ahead": {
+      "seconds": {
+        "one": "Gladys's clock is 1 second ahead of this device.",
+        "other": "Gladys's clock is {{count}} seconds ahead of this device."
+      },
       "minutes": {
         "one": "Gladys's clock is 1 minute ahead of this device.",
         "other": "Gladys's clock is {{count}} minutes ahead of this device."
@@ -7389,6 +7393,10 @@
       }
     },
     "behind": {
+      "seconds": {
+        "one": "Gladys's clock is 1 second behind this device.",
+        "other": "Gladys's clock is {{count}} seconds behind this device."
+      },
       "minutes": {
         "one": "Gladys's clock is 1 minute behind this device.",
         "other": "Gladys's clock is {{count}} minutes behind this device."

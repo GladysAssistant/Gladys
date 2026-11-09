@@ -5,11 +5,15 @@
 // network: comparing both clocks reveals a wrong server clock, without
 // asking anything to a third-party service.
 
-// Under this gap, nothing visible goes wrong, and a device whose own clock
-// is slightly off must not raise the alarm.
-const CLOCK_OFFSET_THRESHOLD_MS = 2 * 60 * 1000;
+// Some displays mix a timestamp of the server with the clock of the device
+// (the progress of the music widget, "x seconds ago"): a gap of a few tens of
+// seconds is already visible there. Under 10 seconds, nothing visible goes
+// wrong, and the clock of a device that has not synchronized for a few days
+// (Windows only does it once a week by default) must not raise the alarm.
+const CLOCK_OFFSET_THRESHOLD_MS = 10 * 1000;
 
-const MINUTE_MS = 60 * 1000;
+const SECOND_MS = 1000;
+const MINUTE_MS = 60 * SECOND_MS;
 const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
 
@@ -35,8 +39,9 @@ const measureClockOffset = async httpClient => {
 const isClockOffsetSignificant = measure =>
   !!measure && Math.abs(measure.offset) - measure.uncertainty > CLOCK_OFFSET_THRESHOLD_MS;
 
-// The gap, rounded to the unit a human would use: "3 minutes", "2 hours", "5 days".
-// direction: 'ahead' when the server is in the future of this device.
+// The gap, rounded to the unit a human would use: "40 seconds", "3 minutes",
+// "2 hours", "5 days". direction: 'ahead' when the server is in the future of
+// this device.
 const describeClockOffset = offset => {
   const absolute = Math.abs(offset);
   const direction = offset > 0 ? 'ahead' : 'behind';
@@ -46,7 +51,10 @@ const describeClockOffset = offset => {
   if (absolute >= HOUR_MS) {
     return { direction, unit: 'hours', count: Math.round(absolute / HOUR_MS) };
   }
-  return { direction, unit: 'minutes', count: Math.max(1, Math.round(absolute / MINUTE_MS)) };
+  if (absolute >= MINUTE_MS) {
+    return { direction, unit: 'minutes', count: Math.round(absolute / MINUTE_MS) };
+  }
+  return { direction, unit: 'seconds', count: Math.max(1, Math.round(absolute / SECOND_MS)) };
 };
 
 export { CLOCK_OFFSET_THRESHOLD_MS, measureClockOffset, isClockOffsetSignificant, describeClockOffset };

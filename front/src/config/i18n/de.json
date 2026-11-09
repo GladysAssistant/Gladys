@@ -7375,6 +7375,10 @@
   },
   "clock": {
     "ahead": {
+      "seconds": {
+        "one": "Die Uhr von Gladys geht 1 Sekunde vor gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Sekunden vor gegenüber diesem Gerät."
+      },
       "minutes": {
         "one": "Die Uhr von Gladys geht 1 Minute vor gegenüber diesem Gerät.",
         "other": "Die Uhr von Gladys geht {{count}} Minuten vor gegenüber diesem Gerät."
@@ -7389,6 +7393,10 @@
       }
     },
     "behind": {
+      "seconds": {
+        "one": "Die Uhr von Gladys geht 1 Sekunde nach gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Sekunden nach gegenüber diesem Gerät."
+      },
       "minutes": {
         "one": "Die Uhr von Gladys geht 1 Minute nach gegenüber diesem Gerät.",
         "other": "Die Uhr von Gladys geht {{count}} Minuten nach gegenüber diesem Gerät."

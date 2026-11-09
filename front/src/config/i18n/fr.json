@@ -7375,6 +7375,10 @@
   },
   "clock": {
     "ahead": {
+      "seconds": {
+        "one": "L'horloge de Gladys a 1 seconde d'avance sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} secondes d'avance sur cet appareil."
+      },
       "minutes": {
         "one": "L'horloge de Gladys a 1 minute d'avance sur cet appareil.",
         "other": "L'horloge de Gladys a {{count}} minutes d'avance sur cet appareil."
@@ -7389,6 +7393,10 @@
       }
     },
     "behind": {
+      "seconds": {
+        "one": "L'horloge de Gladys a 1 seconde de retard sur cet appareil.",
+        "other": "L'horloge de Gladys a {{count}} secondes de retard sur cet appareil."
+      },
       "minutes": {
         "one": "L'horloge de Gladys a 1 minute de retard sur cet appareil.",
         "other": "L'horloge de Gladys a {{count}} minutes de retard sur cet appareil."
