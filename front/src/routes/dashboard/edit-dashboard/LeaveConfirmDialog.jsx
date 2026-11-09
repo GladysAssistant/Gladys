@@ -25,7 +25,7 @@ const LeaveConfirmDialog = ({ onConfirm, onCancel }) => {
   }, [onCancel]);
 
   return (
-    <div class={style.dialogBackdrop} {...backdropDismiss.current} data-cy="leave-confirm">
+    <div class={style.dialogBackdrop} {...backdropDismiss.current} data-editor-dialog data-cy="leave-confirm">
       <div
         class={style.dialog}
         role="alertdialog"

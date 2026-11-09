@@ -104,6 +104,12 @@ class EditPanel extends Component {
     if (event.target.closest && event.target.closest('.react-select__menu-portal')) {
       return false;
     }
+    // the editor's own dialogs ("Leave without saving?") answer a gesture
+    // made in the panel: tapping them must not close it, or staying would
+    // lose the form being filled
+    if (event.target.closest && event.target.closest('[data-editor-dialog]')) {
+      return false;
+    }
     return true;
   };
 
@@ -362,7 +368,11 @@ class EditPanel extends Component {
             />
           )}
           {!box && !target.move && props.newDashboardOpen && (
-            <NewDashboardForm closeEditPanel={props.closeEditPanel} navigate={props.requestNavigation} />
+            <NewDashboardForm
+              closeEditPanel={props.closeEditPanel}
+              requestLeaveAction={props.requestLeaveAction}
+              leaveTo={props.leaveTo}
+            />
           )}
           {!box && !target.move && !props.newDashboardOpen && <DashboardSettingsForm {...props} />}
         </div>

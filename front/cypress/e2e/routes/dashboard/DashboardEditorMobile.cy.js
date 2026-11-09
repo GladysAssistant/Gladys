@@ -70,6 +70,42 @@ describe('Dashboard editor on a phone', () => {
     });
   });
 
+  it('Should withdraw the undo of a removal once the layout changes', () => {
+    cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="remove-box-1-0"]').click();
+    cy.get('[data-cy="widget-undo"]').should('be.visible');
+    // the phone order is restored by Undo too: changing it withdraws the
+    // offer, so Undo can never revert it along with the widget
+    cy.get('[data-cy="section-mobile-order-0"]').click();
+    cy.get('[data-cy="widget-undo"]').should('not.exist');
+  });
+
+  it('Should ask before creating a dashboard with unsaved changes', () => {
+    cy.intercept('POST', `${serverUrl}/api/v1/dashboard`).as('createDashboard');
+    cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="move-box-down-0-0"]').click();
+
+    cy.get('[data-cy="new-dashboard-button"]').click();
+    cy.get('[data-cy="edit-panel"] form input[type="text"]')
+      .first()
+      .type('Not created');
+    cy.get('input[name="icon"][value="home"]').check({ force: true });
+    cy.get('[data-cy="edit-panel"]')
+      .contains('button', Cypress.env('i18n').newDashboard.createDashboardButton)
+      .click();
+
+    // asked before the POST: staying creates nothing
+    cy.get('[data-cy="leave-confirm"]').should('be.visible');
+    cy.get('[data-cy="leave-confirm-stay"]').click();
+    cy.get('[data-cy="leave-confirm"]').should('not.exist');
+    cy.get('@createDashboard.all').should('have.length', 0);
+    // and the form being filled is still there
+    cy.get('[data-cy="edit-panel"] form input[type="text"]')
+      .first()
+      .should('have.value', 'Not created');
+    cy.url().should('match', /\/dashboard\/phone\/edit$/);
+  });
+
   it('Should collapse the widgets in reorganize mode', () => {
     cy.visit('/dashboard/phone/edit');
     cy.get('[data-cy="reorganize-button"]').click();

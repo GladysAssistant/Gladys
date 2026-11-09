@@ -1186,16 +1186,30 @@
 }
 
 /* the iOS keyboard: lifted by the overlaid height, capped to what is
-   visible (EditPanel.updateViewportLift) */
+   visible (EditPanel.updateViewportLift). A declaration holding var() is
+   only checked once computed: where dvh is unknown (iOS < 15.4, Chrome < 108)
+   a dvh one would compute to max-height: none — a sheet taller than the
+   screen — instead of falling back. Hence vh first, dvh behind @supports. */
 @media (max-width: 991px) {
   .editPanel {
     transform: translateY(calc(-1 * var(--panel-lift, 0px)));
-    max-height: min(65dvh, calc(var(--panel-visible-height, 100dvh) - 1rem));
+    max-height: min(65vh, calc(var(--panel-visible-height, 100vh) - 1rem));
   }
 
   .editPanelExpanded {
-    height: min(calc(100dvh - 4rem), calc(var(--panel-visible-height, 100dvh) - 1rem));
+    height: min(calc(100vh - 4rem), calc(var(--panel-visible-height, 100vh) - 1rem));
     max-height: none;
+  }
+
+  @supports (height: 1dvh) {
+    .editPanel {
+      max-height: min(65dvh, calc(var(--panel-visible-height, 100dvh) - 1rem));
+    }
+
+    .editPanelExpanded {
+      height: min(calc(100dvh - 4rem), calc(var(--panel-visible-height, 100dvh) - 1rem));
+      max-height: none;
+    }
   }
 }
 

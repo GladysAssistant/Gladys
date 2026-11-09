@@ -121,8 +121,31 @@ class EditDashboard extends Component {
     route(url);
   };
 
+  // An action that leaves the editor after a server write (creating a
+  // dashboard from the panel) asks before the write: staying must leave
+  // nothing behind on the server. The action ends with leaveTo.
+  requestLeaveAction = action => {
+    if (this.state.hasUnsavedChanges) {
+      this.setState({ leaveConfirm: action });
+      return;
+    }
+    action();
+  };
+
+  leaveTo = url => {
+    this.setState({ hasUnsavedChanges: false });
+    this.navigateAway(url);
+  };
+
   confirmLeave = () => {
     const url = this.state.leaveConfirm;
+    if (typeof url === 'function') {
+      // the action may still fail (a name already taken): the pending
+      // changes stay pending until it really leaves
+      this.setState({ leaveConfirm: null });
+      url();
+      return;
+    }
     this.setState({ leaveConfirm: null, hasUnsavedChanges: false });
     if (url === HISTORY_BACK) {
       window.history.back();
@@ -390,7 +413,7 @@ class EditDashboard extends Component {
       }
     });
     // removing asks nothing: an "Undo" toast restores the widget, as long as
-    // nothing else changed the canvas meanwhile (componentDidUpdate)
+    // nothing else changed the canvas meanwhile (getPendingUndoRemoval)
     clearTimeout(this.undoRemovalTimeout);
     await this.setState({
       ...newState,
@@ -400,18 +423,34 @@ class EditDashboard extends Component {
       hasUnsavedChanges: true,
       undoRemoval:
         removedBox && removedBox.type
-          ? { snapshot, type: removedBox.type, boxesRef: newState.currentDashboard.boxes }
+          ? {
+              snapshot,
+              type: removedBox.type,
+              // the canvas the removal left: every layout array Undo writes back
+              layoutRefs: [
+                newState.currentDashboard.boxes,
+                newState.sectionSizes,
+                newState.columnWidths,
+                newState.sectionMobileOrders
+              ]
+            }
           : null
     });
     this.undoRemovalTimeout = setTimeout(() => this.setState({ undoRemoval: null }), UNDO_REMOVAL_MS);
   };
 
   // The toast restores a snapshot of the canvas: it only stands while the
-  // canvas is still the one the removal left — any other change to it
-  // (move, add, column…) withdraws the offer, or Undo would revert that too
+  // canvas is still the one the removal left — any other change to it (move,
+  // add, column, column width, phone order…) withdraws the offer, or Undo
+  // would revert that too. Every edit replaces the array it touches, so
+  // comparing references is enough.
   getPendingUndoRemoval = () => {
-    const { undoRemoval, currentDashboard } = this.state;
-    return undoRemoval && currentDashboard && currentDashboard.boxes === undoRemoval.boxesRef ? undoRemoval : null;
+    const { undoRemoval, currentDashboard, sectionSizes, columnWidths, sectionMobileOrders } = this.state;
+    if (!undoRemoval || !currentDashboard) {
+      return null;
+    }
+    const current = [currentDashboard.boxes, sectionSizes, columnWidths, sectionMobileOrders];
+    return undoRemoval.layoutRefs.every((ref, i) => ref === current[i]) ? undoRemoval : null;
   };
 
   undoRemoveBox = () => {
@@ -948,6 +987,8 @@ class EditDashboard extends Component {
         confirmLeave={this.confirmLeave}
         cancelLeave={this.cancelLeave}
         requestNavigation={this.requestNavigation}
+        requestLeaveAction={this.requestLeaveAction}
+        leaveTo={this.leaveTo}
         addColumn={this.addColumn}
         addSection={this.addSection}
         moveSection={this.moveSection}

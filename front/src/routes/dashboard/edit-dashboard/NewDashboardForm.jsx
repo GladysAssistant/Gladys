@@ -23,13 +23,24 @@ class NewDashboardForm extends Component {
     this.setState({ icon: e.target.value });
   };
 
-  createDashboard = async e => {
+  createDashboard = e => {
     e.preventDefault();
     // The submit button is disabled without a name and an icon, but Enter in
     // the name input can still submit the form: same guard on the handler.
     if (!this.state.name || !this.state.icon) {
       return;
     }
+    // through the editor's guard, before anything is written: pending changes
+    // on the current dashboard are not lost silently by jumping to the new
+    // one, and staying does not leave a dashboard behind on the server
+    if (this.props.requestLeaveAction) {
+      this.props.requestLeaveAction(this.postDashboard);
+    } else {
+      this.postDashboard();
+    }
+  };
+
+  postDashboard = async () => {
     this.setState({ loading: true, dashboardAlreadyExistError: false, unknownError: false });
     try {
       const createdDashboard = await this.props.httpClient.post('/api/v1/dashboard', {
@@ -41,11 +52,9 @@ class NewDashboardForm extends Component {
       });
       this.setState({ loading: false });
       this.props.closeEditPanel();
-      // through the editor's guard: pending changes on the current dashboard
-      // are not lost silently by jumping to the new one
       const url = `/dashboard/${createdDashboard.selector}/edit`;
-      if (this.props.navigate) {
-        this.props.navigate(url);
+      if (this.props.leaveTo) {
+        this.props.leaveTo(url);
       } else {
         route(url);
       }
