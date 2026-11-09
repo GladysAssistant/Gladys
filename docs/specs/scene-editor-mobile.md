@@ -62,6 +62,12 @@ devices not loaded yet) is shown as is.
 "Unsaved" means the scene differs from the last version the server acknowledged
 (`savedSceneSnapshot`); the `active` switch is excluded (it is persisted on its own).
 
+The step forms normalize their step when they mount (a default unit, the `if` / `then` / `else`
+arrays of a block…). Those writes are not changes: about 1.5 s after the load, once every form is
+mounted, if the user has not acted on the editor yet (no click, input, change nor key press), the
+saved version is re-based on the normalized scene. Without this, the leave guard would ask about
+a scene nobody edited.
+
 1. **Leave guard.** Leaving the editor through its back control with unsaved changes opens a
    confirmation: **Save and leave** / **Leave without saving** (destructive) / **Keep editing**. It
    is a bottom sheet on a phone and a centered dialog from 576 px.
@@ -69,11 +75,12 @@ devices not loaded yet) is shown as is.
    handler (the browser shows its own prompt).
 3. **Local draft.** While there are unsaved changes, the editor writes a draft to `localStorage`
    (key `gladys-scene-draft:<scene selector>`, debounced ~500 ms):
-   `{ version: 1, base: <savedSceneSnapshot>, scene: <scene>, saved_at: <ISO date> }`.
+   `{ version: 1, base: <saved version without "active">, scene: <scene>, saved_at: <ISO date> }`.
+   A write still pending when the editor unmounts (swipe-back, global navigation) is flushed then.
    - The draft is removed when the scene is saved, when the user leaves without saving, when the
      scene is deleted, and when the edits are undone back to the saved version.
    - When the editor opens a scene and finds a draft **whose `base` equals the scene just loaded
-     from the server**, it shows a banner: "Unsaved changes from <relative date> were kept" with
+     from the server** (or its normalized version, `active` left out of both), it shows a banner: "Unsaved changes from <relative date> were kept" with
      **Restore** / **Discard**. Restore loads the draft scene (variables are re-initialized from it,
      as on load) and shows it as unsaved. A draft whose base differs (the scene was saved elsewhere
      since) is discarded silently: restoring it would overwrite newer work.
@@ -133,7 +140,9 @@ Tapping anywhere else closes an open row. A hint under the list says the gesture
 The "+" button opens a **New scene** bottom sheet asking for the **name only** (autofocused,
 `enterkeyhint="go"`). The icon is **guessed from the name**
 (`front/src/routes/scene/guessSceneIcon.js`: the first rule whose keyword appears in the name,
-compared without case nor accents, in the four languages of the interface — night → `moon`,
+compared without case nor accents with the **whole words** of the name — a keyword ending with
+`*` is a stem matching the words that start with it — in the four languages of the interface —
+night → `moon`,
 morning / wake → `sunrise`, leave → `log-out`, water / leak → `droplet`, solar → `sun`, movie /
 TV → `film`, alarm → `shield`, home / back → `home`, heating → `thermometer`, music → `music`,
 reminder → `bell`, light → `zap`; `zap` when nothing matches) and previewed in the sheet; it can be changed later in the scene settings. Creating posts
@@ -196,6 +205,10 @@ The action groups of the root level render as a **numbered vertical timeline**:
   arrays…) when they mount. So the mobile editor mounts **one sheet per action and per trigger, for
   the whole scene, all the time**, and only shows the open ones. A sheet never mounts its form on
   opening. (The desktop editor keeps the same invariant by hiding collapsed card bodies.)
+- Sheets are addressed by position (path, trigger index). After a change of structure — a step,
+  condition or trigger inserted, deleted, moved, or an undo — every sheet is remounted (keys carry a
+  structure version), so no form keeps the local state of the step that used to sit at its
+  position.
 - **Adding** a step, a condition or a trigger first adds an empty one (`type: null`) through the
   shared mutations, then opens its sheet on the **type picker** (E.5). Picking a type turns the
   same sheet into the parameter form: one transition. Closing the sheet while the type is still

@@ -121,8 +121,8 @@ class MobileEditScenePage extends Component {
 
   // ---------- triggers ----------
 
-  addTrigger = () => {
-    const index = this.props.addTriggerAndGetIndex();
+  addTrigger = async () => {
+    const index = await this.props.addTriggerAndGetIndex();
     this.openSheet(TRIGGER_SHEET, index);
   };
 
@@ -679,7 +679,7 @@ class MobileEditScenePage extends Component {
         {/* one sheet per trigger and per action, mounted for their whole life (E.4) */}
         {triggers.map((trigger, index) => (
           <TriggerSheet
-            key={`trigger-${index}`}
+            key={`trigger-${props.structureVersion}-${index}`}
             trigger={trigger}
             index={index}
             open={isOpen(TRIGGER_SHEET, index)}
@@ -700,7 +700,7 @@ class MobileEditScenePage extends Component {
           const groupPath = segments.slice(0, -1).join('.');
           return (
             <ActionSheet
-              key={`action-${path}`}
+              key={`action-${props.structureVersion}-${path}`}
               {...formProps}
               action={action}
               path={path}

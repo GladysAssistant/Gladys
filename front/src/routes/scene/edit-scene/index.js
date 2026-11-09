@@ -25,6 +25,17 @@ const UNDO_TOAST_DURATION_MS = 5000;
 
 const cloneDeep = value => JSON.parse(JSON.stringify(value));
 
+// The "active" flag is patched on its own (spec C.2): a draft is tied to the saved version of
+// everything else, so toggling the switch never orphans it
+const withoutActive = snapshot => {
+  const parsed = JSON.parse(snapshot);
+  delete parsed.active;
+  return JSON.stringify(parsed);
+};
+
+// Events that mean the user acts on the editor (a scroll gesture is none of them)
+const EDIT_EVENTS = ['click', 'input', 'change', 'keydown'];
+
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
   [ACTIONS.AI.ASK]: ['text'],
@@ -1636,18 +1647,43 @@ class EditScene extends Component {
   // scene earlier would offer the normalizations as "unsaved changes"
   scheduleDraftCheck = () => {
     clearTimeout(this.draftCheckTimer);
+    this.userActed = false;
+    EDIT_EVENTS.forEach(type => document.addEventListener(type, this.onUserAction, true));
     this.draftCheckTimer = setTimeout(this.checkDraft, DRAFT_CHECK_DELAY_MS);
   };
 
+  onUserAction = () => {
+    this.userActed = true;
+  };
+
+  stopWatchingUserActions = () => {
+    EDIT_EVENTS.forEach(type => document.removeEventListener(type, this.onUserAction, true));
+  };
+
   checkDraft = () => {
+    this.stopWatchingUserActions();
     const { scene, savedSceneSnapshot } = this.state;
-    const draft = readSceneDraft(this.props.scene_selector);
+    if (!scene || !savedSceneSnapshot) {
+      return;
+    }
+    const loadedBase = withoutActive(savedSceneSnapshot);
+    let currentBase = loadedBase;
+    // The forms normalize their step when they mount (default unit, if/then/else arrays…): when
+    // the user has not acted yet, those writes are part of the saved version, not changes the
+    // leave guard should ask about
+    const normalizedScene = JSON.stringify(scene);
+    if (!this.userActed && normalizedScene !== savedSceneSnapshot) {
+      currentBase = withoutActive(normalizedScene);
+      this.setState({ savedSceneSnapshot: normalizedScene });
+    }
     this.draftWritesEnabled = true;
-    if (!draft || !scene) {
+    const draft = readSceneDraft(this.props.scene_selector);
+    if (!draft) {
       return;
     }
     // a draft written on top of another version of the scene would overwrite newer work
-    if (draft.base !== savedSceneSnapshot || JSON.stringify(draft.scene) === JSON.stringify(scene)) {
+    const sameBase = draft.base === loadedBase || draft.base === currentBase;
+    if (!sameBase || JSON.stringify(draft.scene) === normalizedScene) {
       removeSceneDraft(this.props.scene_selector);
       return;
     }
@@ -1659,7 +1695,7 @@ class EditScene extends Component {
       return;
     }
     if (this.hasUnsavedChanges()) {
-      writeSceneDraft(this.props.scene_selector, this.state.savedSceneSnapshot, this.state.scene);
+      writeSceneDraft(this.props.scene_selector, withoutActive(this.state.savedSceneSnapshot), this.state.scene);
     } else if (!this.state.draftToRestore) {
       removeSceneDraft(this.props.scene_selector);
     }
@@ -1736,11 +1772,19 @@ class EditScene extends Component {
     const snapshot = this.undoSnapshot;
     this.undoSnapshot = null;
     this.hideToast();
-    this.setState({
+    this.setState(prevState => ({
       scene: snapshot.scene,
       variables: snapshot.variables,
-      triggersVariables: snapshot.triggersVariables
-    });
+      triggersVariables: snapshot.triggersVariables,
+      structureVersion: prevState.structureVersion + 1
+    }));
+  };
+
+  // Steps and triggers are addressed by their position: after an insertion, a deletion or a move,
+  // the mobile editor remounts its sheets (keyed by this version) so no form keeps the local
+  // state of the step that used to sit at its position
+  bumpStructureVersion = () => {
+    this.setState(prevState => ({ structureVersion: prevState.structureVersion + 1 }));
   };
 
   // ---------------------------------------------------------------------------------------------
@@ -1775,6 +1819,7 @@ class EditScene extends Component {
 
   // Root level only: the shared mutation shifts the variables of the following groups
   insertStepAfter = async index => {
+    this.bumpStructureVersion();
     await this.addActionGroupAfter(index);
     await this.addAction(`${index + 1}`);
     return `${index + 1}.0`;
@@ -1800,26 +1845,39 @@ class EditScene extends Component {
     return `${blockPath}.if.${index}`;
   };
 
-  addTriggerAndGetIndex = () => {
-    const index = this.state.scene.triggers.length;
-    this.addTrigger();
-    return index;
-  };
+  // The index is read inside the update: two quick taps add two triggers, each with its own sheet
+  addTriggerAndGetIndex = () =>
+    new Promise(resolve => {
+      let index;
+      this.setState(
+        prevState => {
+          index = prevState.scene.triggers.length;
+          return update(prevState, {
+            scene: { triggers: { $push: [{ type: null }] } },
+            triggersVariables: { $push: [[]] }
+          });
+        },
+        () => resolve(index)
+      );
+    });
 
   deleteActionWithUndo = path => {
     this.takeUndoSnapshot();
+    this.bumpStructureVersion();
     this.deleteAction(path);
     this.showToast(path.includes('.if.') ? 'editScene.mobile.conditionDeleted' : 'editScene.mobile.stepDeleted', true);
   };
 
   deleteActionGroupWithUndo = groupPath => {
     this.takeUndoSnapshot();
+    this.bumpStructureVersion();
     this.deleteActionGroup(groupPath);
     this.showToast('editScene.mobile.stepDeleted', true);
   };
 
   deleteTriggerWithUndo = index => {
     this.takeUndoSnapshot();
+    this.bumpStructureVersion();
     this.deleteTrigger(index);
     this.showToast('editScene.mobile.triggerDeleted', true);
   };
@@ -1828,6 +1886,7 @@ class EditScene extends Component {
   cancelEmptyAction = path => {
     const action = this.getActionByPath(path);
     if (action && action.type === null) {
+      this.bumpStructureVersion();
       this.deleteAction(path);
     }
   };
@@ -1835,6 +1894,7 @@ class EditScene extends Component {
   cancelEmptyTrigger = index => {
     const trigger = this.state.scene.triggers[index];
     if (trigger && trigger.type === null) {
+      this.bumpStructureVersion();
       this.deleteTrigger(index);
     }
   };
@@ -1845,6 +1905,7 @@ class EditScene extends Component {
     if (destination < 0 || destination >= this.state.scene.actions.length - 1) {
       return;
     }
+    this.bumpStructureVersion();
     await this.moveCardGroup(`${index}`, `${destination}`);
   };
 
@@ -1872,6 +1933,7 @@ class EditScene extends Component {
       now: Date.now(),
       isMobile: isMobileViewport(),
       editorKey: 0,
+      structureVersion: 0,
       toast: null,
       leaveConfirmOpen: false,
       draftToRestore: null
@@ -1912,8 +1974,15 @@ class EditScene extends Component {
       this.unwatchViewport();
     }
     window.removeEventListener('beforeunload', this.onBeforeUnload);
+    this.stopWatchingUserActions();
     clearTimeout(this.draftCheckTimer);
+    // leaving the editor in a way no guard catches (swipe-back, the global navigation…): the
+    // pending draft write must not be lost with the component (leave() has disabled the writes
+    // when the user chose to discard)
     clearTimeout(this.draftWriteTimer);
+    if (this.draftWritesEnabled) {
+      this.persistDraft();
+    }
     clearTimeout(this.toastTimer);
     document.removeEventListener('click', this.closeEdition, true);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
@@ -1947,6 +2016,7 @@ class EditScene extends Component {
       highLightedActions,
       isMobile,
       editorKey,
+      structureVersion,
       toast,
       leaveConfirmOpen,
       draftToRestore
@@ -2013,6 +2083,7 @@ class EditScene extends Component {
           <MobileEditScenePage
             {...pageProps}
             isNewScene={new URLSearchParams(window.location.search).get('new') === '1'}
+            structureVersion={structureVersion}
             toast={toast}
             hideToast={this.hideToast}
             undo={this.undo}
