@@ -36,7 +36,12 @@ const LeaveConfirmSheet = ({ open, sceneName, saving, onSaveAndLeave, onLeaveWit
       >
         <Text id="editScene.mobile.leaveWithoutSaving" />
       </button>
-      <button type="button" class={cx(style.bigButton, style.bigButtonGhost)} onClick={onCancel}>
+      <button
+        type="button"
+        class={cx(style.bigButton, style.bigButtonGhost)}
+        onClick={onCancel}
+        data-cy="scene-leave-keep-editing"
+      >
         <Text id="editScene.mobile.keepEditing" />
       </button>
     </div>

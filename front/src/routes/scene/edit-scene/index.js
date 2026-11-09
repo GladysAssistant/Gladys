@@ -525,16 +525,18 @@ class EditScene extends Component {
   // error alert in the state, and bumps errorNonce so the pages bring it into view (spec C.3)
   saveScene = async e => {
     const saved = await this.saveSceneInternal(e);
-    if (saved && this.unmounted) {
+    if (saved) {
+      // a draft still offered is superseded by the version just saved (restoring it would put an
+      // older scene over it): leave() must not write it back, even before the state below lands
+      this.offeredDraftSuperseded = true;
+      // edits made while the request was in flight are written against that version at once
       this.rebaseDraftOnSave();
+    }
+    if (saved && this.unmounted) {
       return saved;
     }
     if (saved) {
-      removeSceneDraft(this.getDraftId());
-      // a draft still offered is superseded by the version just saved (restoring it would put an
-      // older scene over it); edits made while the request was in flight are written against that
-      // version, without waiting for the debounce
-      this.setState({ draftToRestore: null }, this.persistDraft);
+      this.setState({ draftToRestore: null });
       this.showToast('editScene.mobile.savedToast');
     } else {
       this.setState(prevState => ({ errorNonce: (prevState.errorNonce || 0) + 1 }));
@@ -542,22 +544,29 @@ class EditScene extends Component {
     return saved;
   };
 
-  // The save was acknowledged after the editor went away (edits during the save, then a way out):
-  // the draft its unmount flushed is now based on an older version, and would be dropped on the
-  // next open. It is rebased on the version just saved, or removed when it holds nothing more.
+  // A save was acknowledged: the draft now has the version just saved as its base. It holds the
+  // edits made while the request was in flight (the current scene, or, when the editor went away
+  // meanwhile, the draft its unmount flushed), and is removed when there are none. Written right
+  // away: a pending state update would be lost if the app were killed first.
   rebaseDraftOnSave = () => {
+    const draftId = this.getDraftId();
     if (!this.isSessionOpen() || !this.acknowledgedScene) {
+      removeSceneDraft(draftId);
       return;
     }
-    const draft = readSceneDraft(this.getDraftId());
-    if (!draft) {
-      return;
+    let scene = this.state.scene;
+    if (this.unmounted) {
+      const draft = readSceneDraft(draftId);
+      scene = draft ? draft.scene : null;
+    } else if (!this.draftWritesEnabled) {
+      // before the draft check, edits are not drafts yet (the check would offer them back)
+      scene = null;
     }
     const acknowledgedBase = withoutServerFields(JSON.stringify(this.acknowledgedScene));
-    if (withoutServerFields(JSON.stringify(draft.scene)) === acknowledgedBase) {
-      removeSceneDraft(this.getDraftId());
+    if (!scene || withoutServerFields(JSON.stringify(scene)) === acknowledgedBase) {
+      removeSceneDraft(draftId);
     } else {
-      writeSceneDraft(this.getDraftId(), acknowledgedBase, draft.scene);
+      writeSceneDraft(draftId, acknowledgedBase, scene);
     }
   };
 
@@ -1188,7 +1197,7 @@ class EditScene extends Component {
     this.draftWritesEnabled = false;
     this.leftOnPurpose = true;
     const { draftToRestore } = this.state;
-    if (draftToRestore && !sceneDeleted) {
+    if (draftToRestore && !sceneDeleted && !this.offeredDraftSuperseded) {
       // a draft offered back and neither restored nor discarded is still offered next time
       writeSceneDraft(this.getDraftId(), draftToRestore.base, draftToRestore.scene);
     } else {
@@ -1727,6 +1736,7 @@ class EditScene extends Component {
   // scene earlier would offer the normalizations as "unsaved changes"
   scheduleDraftCheck = () => {
     clearTimeout(this.draftCheckTimer);
+    this.offeredDraftSuperseded = false;
     this.userActed = false;
     this.draftCheckDone = false;
     EDIT_EVENTS.forEach(type => document.addEventListener(type, this.onUserAction, true));
@@ -1851,7 +1861,9 @@ class EditScene extends Component {
     }
     if (this.draftWritesEnabled) {
       this.persistDraft();
-    } else if (this.userActed && !this.leftOnPurpose) {
+    } else if (this.userActed && !this.leftOnPurpose && !readSceneDraft(this.getDraftId())) {
+      // an edit made while the forms settle; a draft already stored has not been offered yet,
+      // and is kept rather than replaced by these few seconds of work
       this.draftWritesEnabled = true;
       this.persistDraft();
       this.draftWritesEnabled = false;

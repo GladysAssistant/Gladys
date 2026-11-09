@@ -204,6 +204,51 @@ describe('Scene on a phone', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
   });
 
+  it('Should stay in the editor when Keep editing is chosen during a Save and leave', () => {
+    const sceneUrl = Cypress.env('mobileSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.intercept('PATCH', '**/api/v1/scene/*', req => {
+      req.on('response', res => {
+        res.setDelay(1500);
+      });
+    }).as('saveScene');
+    cy.visit(sceneUrl);
+    cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+
+    // the previous test saved a second step: the new ones come third and fourth
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-2.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+
+    // Save and leave, then Keep editing while the request is in flight
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.get('[data-cy=scene-leave-save]').click();
+    cy.get('[data-cy=scene-leave-keep-editing]').click();
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-3.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+
+    cy.wait('@saveScene');
+    cy.get('[data-cy=scene-toast]').should('be.visible');
+    // the editor stayed, with the later edit unsaved and already in the draft
+    cy.url().should('include', sceneUrl);
+    cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
+    cy.window().then(win => {
+      const key = Object.keys(win.localStorage).find(
+        storageKey => storageKey.startsWith('gladys-scene-draft:') && storageKey.endsWith(sceneUrl.split('/').pop())
+      );
+      expect(key).to.exist;
+      const draft = JSON.parse(win.localStorage.getItem(key));
+      expect(draft.scene.actions[3][0].type).to.eq('delay');
+    });
+
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.get('[data-cy=scene-leave-discard]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+  });
+
   it('Should disable the scene from its status line', () => {
     const sceneUrl = Cypress.env('mobileSceneUrl');
     expect(sceneUrl).to.exist;

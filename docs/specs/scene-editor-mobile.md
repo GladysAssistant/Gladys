@@ -88,7 +88,7 @@ the leave guard would ask about a scene nobody edited.
    `created_at` — are left out of the base, so a toggle or a run never orphans a draft; a restored
    draft takes them from the version just loaded.
    The page's `beforeunload` writes the pending draft at once, an edit made while the forms
-   settle included. After a logout (the session reset
+   settle included — unless a draft not offered yet is stored: that one is kept. After a logout (the session reset
    clears the storage and marks the session disconnected, local and Gladys Plus sessions alike),
    the editor writes nothing back: a draft never outlives its session, and
    the user id in the key keeps another account of the same browser from ever reading it.
