@@ -1,6 +1,20 @@
 // The scene pages on a phone (docs/specs/scene-editor-mobile.md): the list, the creation sheet and
 // the mobile editor, against the real server. Every interaction goes through data-cy selectors:
 // the texts are the i18n keys in the Cypress build.
+// the local draft of a scene, whatever the user id in its key
+const findDraftKey = (win, sceneUrl) => {
+  const key = Object.keys(win.localStorage).find(
+    storageKey => storageKey.startsWith('gladys-scene-draft:') && storageKey.endsWith(`:${sceneUrl.split('/').pop()}`)
+  );
+  expect(key).to.exist;
+  return key;
+};
+
+const hasDraft = (win, sceneUrl) =>
+  Object.keys(win.localStorage).some(
+    storageKey => storageKey.startsWith('gladys-scene-draft:') && storageKey.endsWith(`:${sceneUrl.split('/').pop()}`)
+  );
+
 describe('Scene on a phone', () => {
   beforeEach(() => {
     cy.viewport('iphone-x');
@@ -192,6 +206,12 @@ describe('Scene on a phone', () => {
     // the response reaching the browser is not the editor having applied it: the "saved" toast is
     cy.get('[data-cy=scene-toast]').should('be.visible');
     cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
+    // written with the acknowledgement, before any reload: the second edit, against the saved base
+    cy.window().then(win => {
+      const draft = JSON.parse(win.localStorage.getItem(findDraftKey(win, sceneUrl)));
+      expect(draft.scene.actions[2][0].type).to.eq('delay');
+      expect(JSON.parse(draft.base).actions[1][0].type).to.eq('delay');
+    });
 
     // the second edit is still recoverable once the save has landed
     cy.reload();
@@ -236,17 +256,48 @@ describe('Scene on a phone', () => {
     cy.url().should('include', sceneUrl);
     cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
     cy.window().then(win => {
-      const key = Object.keys(win.localStorage).find(
-        storageKey => storageKey.startsWith('gladys-scene-draft:') && storageKey.endsWith(sceneUrl.split('/').pop())
-      );
-      expect(key).to.exist;
-      const draft = JSON.parse(win.localStorage.getItem(key));
+      const draft = JSON.parse(win.localStorage.getItem(findDraftKey(win, sceneUrl)));
       expect(draft.scene.actions[3][0].type).to.eq('delay');
     });
 
     cy.get('[data-cy=scene-back-button]').click();
     cy.get('[data-cy=scene-leave-discard]').click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+  });
+
+  it('Should not keep the offered draft after a Save and leave', () => {
+    const sceneUrl = Cypress.env('mobileSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.visit(sceneUrl);
+    cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+
+    // a draft, offered back after a reload (the previous tests saved three steps)
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-3.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
+    cy.reload();
+    cy.get('[data-cy=scene-draft-banner]').should('be.visible');
+
+    // ignored: another edit, then Save and leave
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-3.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.get('[data-cy=scene-leave-save]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+
+    // the save superseded the offered draft: nothing is offered on the next open
+    cy.window().then(win => {
+      expect(hasDraft(win, sceneUrl)).to.eq(false);
+    });
+    cy.visit(sceneUrl);
+    cy.get('[data-cy="scene-step-row-3.0"]').should('be.visible');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+    cy.get('[data-cy=scene-draft-banner]').should('not.exist');
   });
 
   it('Should disable the scene from its status line', () => {
