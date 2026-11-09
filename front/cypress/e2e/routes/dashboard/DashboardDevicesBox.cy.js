@@ -150,7 +150,9 @@ describe('Dashboard Devices Box editor', () => {
       .click();
     cy.get('[data-cy="devices-detail-name"]').type('Living');
     cy.get('[data-cy="edit-panel-back"]').click();
-    cy.get('[data-cy="devices-undo"]').should('not.exist');
+    // short timeout: the bar also expires on its own after 6s, which must
+    // not be what makes this assertion pass
+    cy.get('[data-cy="devices-undo"]', { timeout: 1000 }).should('not.exist');
 
     // the action bar comes back with Save once the sheet is closed
     cy.get('[data-cy="edit-panel-close"]').click();

@@ -94,6 +94,13 @@ class DevicesComponent extends Component {
     // not bring back an older order
     this.requestId = (this.requestId || 0) + 1;
     const requestId = this.requestId;
+    // nothing selected: nothing to fetch — an empty device_feature_selectors
+    // filter is no filter at all, and the API would return every device of
+    // the house (a widget emptied in the editor showed them all)
+    if ((this.props.box.device_features || []).length === 0) {
+      this.setState({ deviceFeatures: [], status: RequestStatus.Success });
+      return;
+    }
     this.setState({ status: RequestStatus.Getting });
     try {
       const deviceFeatureSelectors = this.props.box.device_features;

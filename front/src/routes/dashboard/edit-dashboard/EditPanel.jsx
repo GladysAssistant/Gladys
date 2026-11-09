@@ -150,7 +150,7 @@ class EditPanel extends Component {
       panel.style.maxHeight = 'none';
       panel.style.height = `${Math.max(120, Math.min(maxHeight, startHeight - travel))}px`;
     };
-    const onEnd = () => {
+    const onEnd = endEvent => {
       handle.removeEventListener('pointermove', onMove);
       handle.removeEventListener('pointerup', onEnd);
       handle.removeEventListener('pointercancel', onEnd);
@@ -161,7 +161,10 @@ class EditPanel extends Component {
       // pointerup, resized the sheet BEFORE the browser dispatched the tap's
       // click — which then landed on whatever had just moved under the
       // finger (a row of the form, opening it)
-      if (Math.abs(travel) > TAP_MAX_TRAVEL_PX) {
+      // only a drag that ends with a release can be followed by its click: a
+      // cancelled gesture has none, and arming the guard then would swallow
+      // the user's next real tap (the close button…)
+      if (endEvent.type === 'pointerup' && Math.abs(travel) > TAP_MAX_TRAVEL_PX) {
         suppressNextClick();
       }
       if (travel < -GRAB_SWITCH_PX) {
