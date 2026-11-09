@@ -521,7 +521,33 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Enter the name of the widget",
-        "addADeviceLabel": "Add a device:"
+        "addADeviceLabel": "Add a device:",
+        "listLabel": "Displayed devices",
+        "emptyList": "No device in this widget yet.",
+        "addDevicesButton": "Add devices",
+        "dragHint": "Drag the handle to reorder, tap a device to rename it.",
+        "backToList": "Devices",
+        "moveHandle": "Move {{name}}",
+        "displayNameLabel": "Name shown in the widget",
+        "defaultNameHint": "Empty: the widget shows “{{name}}”.",
+        "useDefaultName": "Use the default name",
+        "position": "Position {{index}} of {{total}}",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "removeFromWidget": "Remove from widget",
+        "done": "Done",
+        "deviceNotFound": "Device not found",
+        "loadError": "The devices could not be loaded. Check the connection to Gladys, then reopen the widget.",
+        "removedUndo": "“{{name}}” removed",
+        "addedCount": {
+          "one": "1 added",
+          "other": "{{count}} added"
+        },
+        "removedCount": {
+          "one": "1 removed",
+          "other": "{{count}} removed"
+        },
+        "undo": "Undo"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -7595,5 +7621,22 @@
     "closed": "Closed",
     "on": "On",
     "off": "Off"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Cancel",
+    "searchPlaceholder": "Room, device, measurement…",
+    "searchLabel": "Search a device",
+    "clearSearch": "Clear the search",
+    "allRooms": "All",
+    "selectedFilter": "Selected",
+    "roomsLabel": "Filter by room",
+    "noResult": "No device matches “{{search}}”.",
+    "noSelection": "No device selected yet.",
+    "noDevice": "No device yet: add your devices from an integration first.",
+    "selectedCount": {
+      "one": "1 selected",
+      "other": "{{count}} selected"
+    },
+    "validate": "Done"
   }
 }

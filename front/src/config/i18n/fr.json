@@ -521,7 +521,33 @@
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Entrez le nom du widget",
-        "addADeviceLabel": "Ajouter un appareil :"
+        "addADeviceLabel": "Ajouter un appareil :",
+        "listLabel": "Appareils affichés",
+        "emptyList": "Aucun appareil dans ce widget pour le moment.",
+        "addDevicesButton": "Ajouter des appareils",
+        "dragHint": "Glissez la poignée pour réordonner, touchez un appareil pour le renommer.",
+        "backToList": "Appareils",
+        "moveHandle": "Déplacer {{name}}",
+        "displayNameLabel": "Nom affiché dans le widget",
+        "defaultNameHint": "Vide : le widget affiche « {{name}} ».",
+        "useDefaultName": "Revenir au nom par défaut",
+        "position": "Position {{index}} sur {{total}}",
+        "moveUp": "Monter",
+        "moveDown": "Descendre",
+        "removeFromWidget": "Retirer du widget",
+        "done": "OK",
+        "deviceNotFound": "Appareil introuvable",
+        "loadError": "Impossible de charger les appareils. Vérifiez la connexion à Gladys, puis rouvrez le widget.",
+        "removedUndo": "« {{name}} » retiré",
+        "addedCount": {
+          "one": "1 ajouté",
+          "other": "{{count}} ajoutés"
+        },
+        "removedCount": {
+          "one": "1 retiré",
+          "other": "{{count}} retirés"
+        },
+        "undo": "Annuler"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -7595,5 +7621,22 @@
     "closed": "Fermé",
     "on": "Allumé",
     "off": "Éteint"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Annuler",
+    "searchPlaceholder": "Pièce, appareil, mesure…",
+    "searchLabel": "Rechercher un appareil",
+    "clearSearch": "Effacer la recherche",
+    "allRooms": "Toutes",
+    "selectedFilter": "Sélectionnés",
+    "roomsLabel": "Filtrer par pièce",
+    "noResult": "Aucun appareil ne correspond à « {{search}} ».",
+    "noSelection": "Aucun appareil sélectionné pour le moment.",
+    "noDevice": "Aucun appareil pour l'instant : ajoutez d'abord vos appareils depuis une intégration.",
+    "selectedCount": {
+      "one": "1 sélectionné",
+      "other": "{{count}} sélectionnés"
+    },
+    "validate": "Valider"
   }
 }

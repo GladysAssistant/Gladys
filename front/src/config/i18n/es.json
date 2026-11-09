@@ -521,7 +521,33 @@
         "editDeviceFeaturesLabel": "Seleccione los dispositivos que desea mostrar:",
         "editNameLabel": "Nombre del widget (opcional)",
         "editNamePlaceholder": "Ingrese el nombre del widget",
-        "addADeviceLabel": "Agregar un dispositivo:"
+        "addADeviceLabel": "Agregar un dispositivo:",
+        "listLabel": "Dispositivos mostrados",
+        "emptyList": "Todavía no hay ningún dispositivo en este widget.",
+        "addDevicesButton": "Agregar dispositivos",
+        "dragHint": "Arrastra el asa para reordenar, toca un dispositivo para renombrarlo.",
+        "backToList": "Dispositivos",
+        "moveHandle": "Mover {{name}}",
+        "displayNameLabel": "Nombre mostrado en el widget",
+        "defaultNameHint": "Vacío: el widget muestra «{{name}}».",
+        "useDefaultName": "Usar el nombre predeterminado",
+        "position": "Posición {{index}} de {{total}}",
+        "moveUp": "Subir",
+        "moveDown": "Bajar",
+        "removeFromWidget": "Quitar del widget",
+        "done": "Listo",
+        "deviceNotFound": "Dispositivo no encontrado",
+        "loadError": "No se pudieron cargar los dispositivos. Comprueba la conexión con Gladys y vuelve a abrir el widget.",
+        "removedUndo": "«{{name}}» quitado",
+        "addedCount": {
+          "one": "1 agregado",
+          "other": "{{count}} agregados"
+        },
+        "removedCount": {
+          "one": "1 quitado",
+          "other": "{{count}} quitados"
+        },
+        "undo": "Deshacer"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Seleccione la habitación que desea mostrar aquí.",
@@ -7595,5 +7621,22 @@
     "closed": "Cerrado",
     "on": "Encendido",
     "off": "Apagado"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Cancelar",
+    "searchPlaceholder": "Habitación, dispositivo, medida…",
+    "searchLabel": "Buscar un dispositivo",
+    "clearSearch": "Borrar la búsqueda",
+    "allRooms": "Todas",
+    "selectedFilter": "Seleccionados",
+    "roomsLabel": "Filtrar por habitación",
+    "noResult": "Ningún dispositivo coincide con «{{search}}».",
+    "noSelection": "Todavía no hay ningún dispositivo seleccionado.",
+    "noDevice": "Todavía no hay dispositivos: primero agrega tus dispositivos desde una integración.",
+    "selectedCount": {
+      "one": "1 seleccionado",
+      "other": "{{count}} seleccionados"
+    },
+    "validate": "Listo"
   }
 }

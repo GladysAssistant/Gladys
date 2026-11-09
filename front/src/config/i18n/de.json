@@ -521,7 +521,33 @@
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Gib den Namen des Widgets ein",
-        "addADeviceLabel": "Füge ein Gerät hinzu:"
+        "addADeviceLabel": "Füge ein Gerät hinzu:",
+        "listLabel": "Angezeigte Geräte",
+        "emptyList": "Noch kein Gerät in diesem Widget.",
+        "addDevicesButton": "Geräte hinzufügen",
+        "dragHint": "Ziehe den Griff zum Sortieren, tippe auf ein Gerät, um es umzubenennen.",
+        "backToList": "Geräte",
+        "moveHandle": "{{name}} verschieben",
+        "displayNameLabel": "Im Widget angezeigter Name",
+        "defaultNameHint": "Leer: Das Widget zeigt „{{name}}“.",
+        "useDefaultName": "Standardnamen verwenden",
+        "position": "Position {{index}} von {{total}}",
+        "moveUp": "Nach oben",
+        "moveDown": "Nach unten",
+        "removeFromWidget": "Aus dem Widget entfernen",
+        "done": "Fertig",
+        "deviceNotFound": "Gerät nicht gefunden",
+        "loadError": "Die Geräte konnten nicht geladen werden. Prüfe die Verbindung zu Gladys und öffne das Widget erneut.",
+        "removedUndo": "„{{name}}“ entfernt",
+        "addedCount": {
+          "one": "1 hinzugefügt",
+          "other": "{{count}} hinzugefügt"
+        },
+        "removedCount": {
+          "one": "1 entfernt",
+          "other": "{{count}} entfernt"
+        },
+        "undo": "Rückgängig"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -7595,5 +7621,22 @@
     "closed": "Geschlossen",
     "on": "An",
     "off": "Aus"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Abbrechen",
+    "searchPlaceholder": "Raum, Gerät, Messwert…",
+    "searchLabel": "Gerät suchen",
+    "clearSearch": "Suche löschen",
+    "allRooms": "Alle",
+    "selectedFilter": "Ausgewählt",
+    "roomsLabel": "Nach Raum filtern",
+    "noResult": "Kein Gerät entspricht „{{search}}“.",
+    "noSelection": "Noch kein Gerät ausgewählt.",
+    "noDevice": "Noch keine Geräte: Füge deine Geräte zuerst über eine Integration hinzu.",
+    "selectedCount": {
+      "one": "1 ausgewählt",
+      "other": "{{count}} ausgewählt"
+    },
+    "validate": "Fertig"
   }
 }
