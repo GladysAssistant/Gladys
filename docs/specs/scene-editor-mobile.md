@@ -64,9 +64,11 @@ devices not loaded yet) is shown as is.
 
 The step forms normalize their step when they mount (a default unit, the `if` / `then` / `else`
 arrays of a block…). Those writes are not changes: about 1.5 s after the load, once every form is
-mounted, if the user has not acted on the editor yet (no input, no change, no click other than a
-navigation one — back, opening a row or a sheet, closing it: the elements marked
-`data-not-an-edit` and the sheet backdrops), the saved version is re-based on the normalized
+mounted, if the user has not acted on the editor yet (no input, no change, no key press other
+than Tab / Escape / modifiers — the steps also move with the arrow keys —, no click other than a
+navigation one — back, opening a row or a sheet, closing it, the active switch, save / test / run
+/ stop: the elements marked `data-not-an-edit` and the sheet backdrops), the saved version is
+re-based on the normalized
 scene. Before that moment, the back control leaves without asking when the user has not acted
 (whatever differs is normalization; a draft from an earlier session stays stored). Without this,
 the leave guard would ask about a scene nobody edited.
@@ -74,7 +76,8 @@ the leave guard would ask about a scene nobody edited.
 1. **Leave guard.** Leaving the editor through its back control with unsaved changes opens a
    confirmation: **Save and leave** / **Leave without saving** (destructive) / **Keep editing**. It
    is a bottom sheet on a phone and a centered dialog from 576 px. **Keep editing** while a *Save
-   and leave* is in flight cancels the leave: the save may land, the editor stays.
+   and leave* is in flight cancels the leave: the save may land, the editor stays; so does leaving
+   the editor another way (browser history) before the save lands.
 2. **Reload / tab close.** While there are unsaved changes, the page registers a `beforeunload`
    handler (the browser shows its own prompt).
 3. **Local draft.** While there are unsaved changes, the editor writes a draft to `localStorage`
@@ -83,20 +86,25 @@ the leave guard would ask about a scene nobody edited.
    The server-managed fields — `active` (patched on its own), `updated_at`, `last_executed`,
    `created_at` — are left out of the base, so a toggle or a run never orphans a draft; a restored
    draft takes them from the version just loaded.
-   The page's `beforeunload` writes the pending draft at once. After a logout (the session reset
+   The page's `beforeunload` writes the pending draft at once, an edit made while the forms
+   settle included. After a logout (the session reset
    clears the storage and marks the session disconnected, local and Gladys Plus sessions alike),
    the editor writes nothing back: a draft never outlives its session, and
    the user id in the key keeps another account of the same browser from ever reading it.
    Edits made while the forms settle are written as soon as the drafts are enabled (the end of
    that window), and a write still pending when the editor unmounts (swipe-back, global
    navigation) is flushed then — including an edit made before the window ended.
-   - The draft is removed when the scene is saved, when the user leaves without saving, when the
-     scene is deleted, and when the edits are undone back to the saved version.
+   - The draft is removed when the scene is saved (edits made while the save was in flight are
+     written again at once, against the version just saved), when the user leaves without saving,
+     when the scene is deleted, and when the edits are undone back to the saved version. A draft
+     offered back (banner below) and neither restored nor discarded stays stored when the user
+     leaves.
    - When the editor opens a scene and finds a draft **whose `base` equals the scene just loaded
      from the server** (or its normalized version, server-managed fields left out of both), it shows a banner: "Unsaved changes from <relative date> were kept" with
      **Restore** / **Discard**. Restore loads the draft scene (variables are re-initialized from it,
      as on load) and shows it as unsaved. A draft whose base differs (the scene was saved elsewhere
-     since) is discarded silently: restoring it would overwrite newer work.
+     since) is discarded silently: restoring it would overwrite newer work; edits made meanwhile
+     are written in its place.
    - Every `localStorage` access is guarded: storage may be unavailable (private mode, quota); the
      editor then works without drafts.
    - This is what protects the cases no guard can catch: the iOS swipe-back gesture, the global
@@ -193,8 +201,9 @@ The action groups of the root level render as a **numbered vertical timeline**:
   conditions' summary, opening the block's sheet), then the **Then** branch (or **Repeat** for a
   while) and the **Else** branch (if/then/else only) as indented lists of rows, each with its
   "+ Add to Then / Else / Repeat" button. A branch with no action shows "No action".
-- Rows of a branch are rendered with the same rules, recursively, each level indented behind a
-  thin rail (blue for Then / Repeat, gray for Else).
+- The groups of a branch are rendered with the same rules, recursively (a group of several
+  actions is an "AT THE SAME TIME" card with its own "+ Simultaneous action" button), each level
+  indented behind a thin rail (blue for Then / Repeat, gray for Else).
 - The trailing empty groups the data model keeps at the end of every level are never rendered.
 - While the scene runs, the root row whose action is executing is marked (the existing
   `scene.executing-action` websocket events, already used by the desktop editor).

@@ -65,7 +65,7 @@ const EditScenePage = ({ children, ...props }) => {
                     <span class={style.sceneName}>{props.scene.name}</span>
 
                     {/* The active flag is patched on its own: keep it from racing a full save */}
-                    <label className="custom-switch m-0 ml-3 ml-md-4">
+                    <label className="custom-switch m-0 ml-3 ml-md-4" data-not-an-edit>
                       <input
                         type="checkbox"
                         name="active"

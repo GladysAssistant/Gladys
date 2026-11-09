@@ -38,14 +38,19 @@ const withoutServerFields = snapshot => {
   return JSON.stringify(parsed);
 };
 
-// Events that mean the user may be editing the scene (a scroll gesture is none of them). A
-// click inside [data-not-an-edit] (back, opening a row or a sheet, closing it) or on a sheet's
-// backdrop only moves around the editor
-const EDIT_EVENTS = ['click', 'input', 'change'];
+// Events that mean the user may be editing the scene (a scroll gesture is none of them; a key
+// press is, as the steps move with the arrow keys). Nothing inside [data-not-an-edit] (back,
+// opening a row or a sheet, closing it, the active switch, run / stop) nor on a sheet's backdrop
+// edits the scene, and neither do the keys that only move the focus or close a sheet
+const EDIT_EVENTS = ['click', 'input', 'change', 'keydown'];
+const NON_EDITING_KEYS = ['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta'];
 
-const isNavigationClick = event => {
+const isNotAnEdit = event => {
   const target = event.target;
-  if (event.type !== 'click' || !target || typeof target.closest !== 'function') {
+  if (event.type === 'keydown' && NON_EDITING_KEYS.includes(event.key)) {
+    return true;
+  }
+  if (!target || typeof target.closest !== 'function') {
     return false;
   }
   return Boolean(target.closest('[data-not-an-edit]') || target.hasAttribute('data-sheet-backdrop'));
@@ -517,6 +522,9 @@ class EditScene extends Component {
     const saved = await this.saveSceneInternal(e);
     if (saved) {
       removeSceneDraft(this.getDraftId());
+      // edits made while the request was in flight are written against the version just saved,
+      // without waiting for the debounce
+      this.setState({}, this.persistDraft);
       this.showToast('editScene.mobile.savedToast');
     } else {
       this.setState(prevState => ({ errorNonce: (prevState.errorNonce || 0) + 1 }));
@@ -1149,7 +1157,13 @@ class EditScene extends Component {
     clearTimeout(this.draftWriteTimer);
     this.draftWritesEnabled = false;
     this.leftOnPurpose = true;
-    removeSceneDraft(this.getDraftId());
+    const { draftToRestore } = this.state;
+    if (draftToRestore) {
+      // a draft offered back and neither restored nor discarded is still offered next time
+      writeSceneDraft(this.getDraftId(), draftToRestore.base, draftToRestore.scene);
+    } else {
+      removeSceneDraft(this.getDraftId());
+    }
     route(this.getListUrl());
   };
 
@@ -1690,7 +1704,7 @@ class EditScene extends Component {
   };
 
   onUserAction = event => {
-    if (!isNavigationClick(event)) {
+    if (!isNotAnEdit(event)) {
       this.userActed = true;
     }
   };
@@ -1731,6 +1745,9 @@ class EditScene extends Component {
     const sameBase = draft.base === loadedBase || draft.base === currentBase;
     if (!sameBase || JSON.stringify(draft.scene) === normalizedScene) {
       removeSceneDraft(this.getDraftId());
+      if (!rebased) {
+        this.persistDraft();
+      }
       return;
     }
     this.setState({ draftToRestore: draft });
@@ -1794,12 +1811,25 @@ class EditScene extends Component {
     return !session || typeof session.isConnected !== 'function' || session.isConnected();
   };
 
-  onBeforeUnload = e => {
-    // the debounced write may not run before the page goes: write the draft now
-    if (this.draftWritesEnabled) {
-      clearTimeout(this.draftWriteTimer);
-      this.persistDraft();
+  // Writes the pending draft now, when the page or the editor goes: the debounced write would
+  // never run. Edits made while the forms were settling are written too, unless the user chose
+  // to leave without them; nothing is written after a logout.
+  flushDraft = () => {
+    clearTimeout(this.draftWriteTimer);
+    if (!this.isSessionOpen()) {
+      return;
     }
+    if (this.draftWritesEnabled) {
+      this.persistDraft();
+    } else if (this.userActed && !this.leftOnPurpose) {
+      this.draftWritesEnabled = true;
+      this.persistDraft();
+      this.draftWritesEnabled = false;
+    }
+  };
+
+  onBeforeUnload = e => {
+    this.flushDraft();
     if (this.hasUnsavedChanges()) {
       e.preventDefault();
       // eslint-disable-next-line no-param-reassign
@@ -2046,16 +2076,9 @@ class EditScene extends Component {
     // leaving the editor in a way no guard catches (swipe-back, the global navigation…): the
     // pending draft write must not be lost with the component (leave() has disabled the writes
     // when the user chose to discard)
-    clearTimeout(this.draftWriteTimer);
-    if (!this.isSessionOpen()) {
-      // logged out: no draft write
-    } else if (this.draftWritesEnabled) {
-      this.persistDraft();
-    } else if (this.userActed && !this.leftOnPurpose) {
-      // left while the forms were still settling, after an edit
-      this.draftWritesEnabled = true;
-      this.persistDraft();
-    }
+    this.flushDraft();
+    // a "Save and leave" still in flight must not navigate away from wherever the user went
+    this.pendingLeave = null;
     clearTimeout(this.toastTimer);
     document.removeEventListener('click', this.closeEdition, true);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);

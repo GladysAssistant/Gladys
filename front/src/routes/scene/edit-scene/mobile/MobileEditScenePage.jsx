@@ -173,8 +173,14 @@ class MobileEditScenePage extends Component {
     const branchPath = `${blockPath}.${branch}`;
     const rows = [];
     (groups || []).forEach((group, groupIndex) => {
+      const groupPath = `${branchPath}.${groupIndex}`;
+      // actions running at the same time inside a branch keep their group, as at the top level
+      if (group.length > 1) {
+        rows.push(this.renderParallelGroup(group, groupPath));
+        return;
+      }
       group.forEach((action, actionIndex) => {
-        const path = `${branchPath}.${groupIndex}.${actionIndex}`;
+        const path = `${groupPath}.${actionIndex}`;
         rows.push(
           isBlockAction(action) ? this.renderBlock(action, path, 'nested') : this.renderRow(action, path, 'nested')
         );
@@ -253,6 +259,37 @@ class MobileEditScenePage extends Component {
     </div>
   );
 
+  // Actions running at the same time: one card, with its own "add a simultaneous action" control.
+  // An if/while block inside keeps its branches.
+  renderParallelGroup = (group, groupPath, isRunning = () => false) => (
+    <div class={style.card} key={groupPath}>
+      <div class={style.cardLabel}>
+        <i class="fe fe-layers" aria-hidden="true" />
+        <Text id="editScene.mobile.atTheSameTime" />
+      </div>
+      {group.map((action, actionIndex) => {
+        const path = `${groupPath}.${actionIndex}`;
+        const extra = { running: isRunning(actionIndex) };
+        return (
+          <div class={style.cardDivider} key={actionIndex}>
+            {isBlockAction(action)
+              ? this.renderBlock(action, path, 'flush', extra)
+              : this.renderRow(action, path, 'flush', extra)}
+          </div>
+        );
+      })}
+      <button
+        type="button"
+        class={style.cardFooterButton}
+        onClick={() => this.addParallelAction(groupPath)}
+        data-cy={`scene-add-parallel-${groupPath}`}
+      >
+        <i class="fe fe-plus" aria-hidden="true" />
+        <Text id="editScene.mobile.simultaneousAction" />
+      </button>
+    </div>
+  );
+
   renderTimeline = () => {
     const { scene, highLightedActions } = this.props;
     // the trailing empty groups the data model keeps are not steps
@@ -263,35 +300,8 @@ class MobileEditScenePage extends Component {
       const isLast = stepIndex === steps.length - 1;
       let content;
       if (group.length > 1) {
-        content = (
-          <div class={style.card}>
-            <div class={style.cardLabel}>
-              <i class="fe fe-layers" aria-hidden="true" />
-              <Text id="editScene.mobile.atTheSameTime" />
-            </div>
-            {group.map((action, actionIndex) => {
-              const path = `${groupIndex}.${actionIndex}`;
-              const extra = {
-                running: Boolean(highLightedActions && highLightedActions[`${groupIndex}:${actionIndex}`])
-              };
-              // an if/while block running at the same time as other steps keeps its branches
-              return (
-                <div class={style.cardDivider} key={actionIndex}>
-                  {isBlockAction(action)
-                    ? this.renderBlock(action, path, 'flush', extra)
-                    : this.renderRow(action, path, 'flush', extra)}
-                </div>
-              );
-            })}
-            <button
-              type="button"
-              class={style.cardFooterButton}
-              onClick={() => this.addParallelAction(`${groupIndex}`)}
-            >
-              <i class="fe fe-plus" aria-hidden="true" />
-              <Text id="editScene.mobile.simultaneousAction" />
-            </button>
-          </div>
+        content = this.renderParallelGroup(group, `${groupIndex}`, actionIndex =>
+          Boolean(highLightedActions && highLightedActions[`${groupIndex}:${actionIndex}`])
         );
       } else {
         const action = group[0];
@@ -587,6 +597,7 @@ class MobileEditScenePage extends Component {
                       onClick={props.switchActiveScene}
                       disabled={props.saving}
                       data-cy="scene-active-switch"
+                      data-not-an-edit
                     >
                       <span class={cx(style.switchTrack, { [style.switchTrackOn]: scene.active })}>
                         <span class={style.switchKnob} />
@@ -681,7 +692,8 @@ class MobileEditScenePage extends Component {
             )}
           </div>
 
-          <div class={style.bottomBar}>
+          {/* save, test, run, stop: none of them edits the scene (draft check, spec C.2) */}
+          <div class={style.bottomBar} data-not-an-edit>
             {this.renderError()}
             {this.renderBottomBar()}
           </div>

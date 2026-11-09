@@ -61,6 +61,8 @@ class SwipeRow extends Component {
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
+    // a new gesture: the click suppression of the previous swipe is over
+    this.swipedAt = null;
     this.gesture = {
       pointerId: event.pointerId,
       startX: event.clientX,

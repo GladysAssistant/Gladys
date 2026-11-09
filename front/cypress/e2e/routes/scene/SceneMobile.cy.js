@@ -119,6 +119,16 @@ describe('Scene on a phone', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
     cy.get('[data-cy=scene-leave-confirm]').should('not.exist');
 
+    // once the forms have settled, the normalizations are part of the saved version
+    cy.then(() => cy.visit(`/dashboard/scene/${Cypress.env('normalizedSceneSelector')}`));
+    cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2500);
+    cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+    cy.get('[data-cy=scene-leave-confirm]').should('not.exist');
+
     cy.window().then(win => {
       const { access_token: accessToken } = JSON.parse(win.localStorage.getItem('user'));
       cy.request({
@@ -133,14 +143,16 @@ describe('Scene on a phone', () => {
     const sceneUrl = Cypress.env('mobileSceneUrl');
     expect(sceneUrl).to.exist;
     cy.visit(sceneUrl);
+    // the forms settle first; the edit is then reloaded right away, before the debounced write:
+    // the draft comes from the beforeunload flush
+    cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
 
     cy.get('[data-cy=scene-add-step]').click();
     cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
     cy.get('body').type('{esc}');
     cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
-    // the draft is written once the forms have settled, then debounced
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(2500);
 
     cy.reload();
     cy.get('[data-cy=scene-draft-banner]').should('be.visible');
