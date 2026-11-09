@@ -23,6 +23,8 @@ const CLICK_SUPPRESS_MS = 400;
 // finger and reopen a widget. Same guard as the pointer-drag engine. A touch
 // drag often produces no click at all, so only a click at the release point
 // is that gesture's: an unrelated tap elsewhere within the delay goes through.
+// The gesture's own click comes before any new press, so the next pointerdown
+// (a new tap, even on the same spot) ends the guard.
 const suppressNextClick = (releaseX, releaseY) => {
   const suppress = clickEvent => {
     if (Math.hypot(clickEvent.clientX - releaseX, clickEvent.clientY - releaseY) > TAP_MAX_TRAVEL_PX) {
@@ -34,8 +36,10 @@ const suppressNextClick = (releaseX, releaseY) => {
   };
   const removeSuppress = () => {
     window.removeEventListener('click', suppress, true);
+    window.removeEventListener('pointerdown', removeSuppress, true);
   };
   window.addEventListener('click', suppress, true);
+  window.addEventListener('pointerdown', removeSuppress, true);
   window.setTimeout(removeSuppress, CLICK_SUPPRESS_MS);
 };
 
