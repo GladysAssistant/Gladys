@@ -3,6 +3,52 @@ import { minutesAgo, uuid } from './helpers';
 
 // Demo fixtures for the integration pages: every "/api/v1/service/*" route
 // and the devices those pages display.
+
+// The demo Matter bridge works like a real one for one page load: whatever the
+// page changes (turning it off or on, saving a selection, resetting the
+// pairing) is what the next status poll returns.
+const MATTER_BRIDGE_DEVICES = [
+  { name: 'Living room lamp', selector: 'living-room-lamp', functions: ['light'] },
+  { name: 'Kitchen sensor', selector: 'kitchen-sensor', functions: ['temperature', 'humidity', 'battery'] },
+  { name: 'Bedroom shutter', selector: 'bedroom-shutter', functions: ['cover'] },
+  { name: 'Front door', selector: 'front-door', functions: ['contact', 'battery'] }
+];
+const matterBridge = { enabled: true, commissioned: true, exposureMode: 'all', exposedDevices: [] };
+
+// Like the server, a stopped bridge exposes nothing
+const matterBridgeExposedCount = () => {
+  if (!matterBridge.enabled) {
+    return 0;
+  }
+  if (matterBridge.exposureMode === 'all') {
+    return MATTER_BRIDGE_DEVICES.length;
+  }
+  return MATTER_BRIDGE_DEVICES.filter(device => matterBridge.exposedDevices.includes(device.selector)).length;
+};
+
+// Copies are returned, so the form of the page never shares the demo state
+const matterBridgeStatus = () => {
+  const { enabled, commissioned, exposureMode, exposedDevices } = matterBridge;
+  const paired = enabled && commissioned;
+  return {
+    enabled,
+    hasIpv6: true,
+    running: enabled,
+    error: null,
+    exposureMode,
+    exposedDevices: [...exposedDevices],
+    exposedCount: matterBridgeExposedCount(),
+    commissioned: paired,
+    qrPairingCode: enabled ? 'MT:Y.K9042C00KA0648G00' : null,
+    manualPairingCode: enabled ? '34970112332' : null,
+    fabrics: paired ? [{ fabricIndex: 1, label: '', vendorId: 4937 }] : []
+  };
+};
+
+const updateMatterBridge = changes => {
+  Object.assign(matterBridge, changes);
+  return matterBridgeStatus();
+};
 const integrations = {
   'get /api/v1/service/philips-hue/bridge': [
     {
@@ -1769,78 +1815,14 @@ const integrations = {
   'get /api/v1/service/matter/paired-device': [],
   'get /api/v1/service/homekit/device': [],
   // The Matter bridge, paired with Apple Home and exposing every compatible device
-  'get /api/v1/service/matter-bridge/status': {
-    enabled: true,
-    hasIpv6: true,
-    running: true,
-    error: null,
-    exposureMode: 'all',
-    exposedDevices: [],
-    exposedCount: 4,
-    commissioned: true,
-    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
-    manualPairingCode: '34970112332',
-    fabrics: [{ fabricIndex: 1, label: '', vendorId: 4937 }]
-  },
-  'post /api/v1/service/matter-bridge/enable': {
-    enabled: true,
-    hasIpv6: true,
-    running: true,
-    error: null,
-    exposureMode: 'all',
-    exposedDevices: [],
-    exposedCount: 4,
-    commissioned: true,
-    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
-    manualPairingCode: '34970112332',
-    fabrics: [{ fabricIndex: 1, label: '', vendorId: 4937 }]
-  },
-  'post /api/v1/service/matter-bridge/disable': {
-    enabled: false,
-    hasIpv6: true,
-    running: false,
-    error: null,
-    exposureMode: 'all',
-    exposedDevices: [],
-    exposedCount: 0,
-    commissioned: false,
-    qrPairingCode: null,
-    manualPairingCode: null,
-    fabrics: []
-  },
-  'post /api/v1/service/matter-bridge/config': {
-    enabled: true,
-    hasIpv6: true,
-    running: true,
-    error: null,
-    exposureMode: 'all',
-    exposedDevices: [],
-    exposedCount: 4,
-    commissioned: true,
-    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
-    manualPairingCode: '34970112332',
-    fabrics: [{ fabricIndex: 1, label: '', vendorId: 4937 }]
-  },
+  'get /api/v1/service/matter-bridge/status': () => matterBridgeStatus(),
+  'post /api/v1/service/matter-bridge/enable': () => updateMatterBridge({ enabled: true }),
+  'post /api/v1/service/matter-bridge/disable': () => updateMatterBridge({ enabled: false }),
+  'post /api/v1/service/matter-bridge/config': ({ exposureMode, exposedDevices }) =>
+    updateMatterBridge({ exposureMode, exposedDevices: [...exposedDevices] }),
   // A reset forgets every pairing: the bridge comes back waiting for one, with a new code.
-  'post /api/v1/service/matter-bridge/reset': {
-    enabled: true,
-    hasIpv6: true,
-    running: true,
-    error: null,
-    exposureMode: 'all',
-    exposedDevices: [],
-    exposedCount: 4,
-    commissioned: false,
-    qrPairingCode: 'MT:Y.K9042C00KA0648G00',
-    manualPairingCode: '34970112332',
-    fabrics: []
-  },
-  'get /api/v1/service/matter-bridge/device': [
-    { name: 'Living room lamp', selector: 'living-room-lamp', functions: ['light'] },
-    { name: 'Kitchen sensor', selector: 'kitchen-sensor', functions: ['temperature', 'humidity', 'battery'] },
-    { name: 'Bedroom shutter', selector: 'bedroom-shutter', functions: ['cover'] },
-    { name: 'Front door', selector: 'front-door', functions: ['contact', 'battery'] }
-  ],
+  'post /api/v1/service/matter-bridge/reset': () => updateMatterBridge({ commissioned: false }),
+  'get /api/v1/service/matter-bridge/device': MATTER_BRIDGE_DEVICES,
   'get /api/v1/service/matterbridge/status': {
     matterbridgeExist: false,
     matterbridgeRunning: false,
