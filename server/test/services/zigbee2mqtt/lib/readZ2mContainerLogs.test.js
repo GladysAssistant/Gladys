@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const EventEmitter = require('events');
+const fs = require('fs');
+const path = require('path');
 
 const { fake, assert } = sinon;
 
@@ -11,31 +13,63 @@ const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 /**
- * Build a fake log stream that emits the given log text via 'data' then 'end'.
- * @description Creates an EventEmitter that asynchronously emits a 'data' event with the
- * provided text followed by an 'end' event, simulating a Docker container log stream.
- * The events are deferred with setImmediate so callers can attach listeners before they fire.
- * @param {string} text - Log content to emit.
- * @returns {EventEmitter} Fake stream.
+ * @description Read logs of Zigbee2mqtt 2.14.2 captured in a container, for a startup failure.
+ * @param {string} name - File name in the logs folder.
+ * @returns {string} Log content.
  * @example
- * const stream = buildLogStream('Zigbee2mqtt started');
- * stream.on('data', (chunk) => console.log(chunk)); // 'Zigbee2mqtt started'
- * stream.on('end', () => console.log('done'));
+ * const log = readLogFixture('zstack-no-response.log');
  */
-function buildLogStream(text) {
-  const stream = new EventEmitter();
-  stream.destroy = sinon.fake();
-  // Prepend Docker stream prefix byte (\x01 = stdout) to each line, matching real Docker output
-  const prefixed = text
+function readLogFixture(name) {
+  return fs.readFileSync(path.join(__dirname, 'logs', name), 'utf8');
+}
+
+/**
+ * @description Prepend the Docker stream prefix byte (\x01 = stdout) to each line, matching real Docker output.
+ * @param {string} text - Log content.
+ * @returns {string} Log content as sent by Docker.
+ * @example
+ * const chunk = withDockerPrefix('Zigbee2mqtt started');
+ */
+function withDockerPrefix(text) {
+  return text
     .split('\n')
     .map((line) => `\x01${line}`)
     .join('\n');
+}
+
+/**
+ * Build a fake log stream that emits the given chunks via 'data' then 'end'.
+ * @description Creates an EventEmitter that asynchronously emits a 'data' event per given chunk, as is,
+ * followed by an 'end' event, simulating a Docker container log stream.
+ * The events are deferred with setImmediate so callers can attach listeners before they fire.
+ * @param {...string} chunks - Data to emit, one 'data' event per chunk.
+ * @returns {EventEmitter} Fake stream.
+ * @example
+ * const stream = buildRawLogStream('\x01Zigbee2mqtt started');
+ * stream.on('data', (chunk) => console.log(chunk)); // '\x01Zigbee2mqtt started'
+ * stream.on('end', () => console.log('done'));
+ */
+function buildRawLogStream(...chunks) {
+  const stream = new EventEmitter();
+  stream.destroy = sinon.fake();
   // Emit data + end asynchronously so listeners are attached first
   setImmediate(() => {
-    stream.emit('data', prefixed);
+    chunks.forEach((chunk) => stream.emit('data', chunk));
     stream.emit('end');
   });
   return stream;
+}
+
+/**
+ * Build a fake log stream that emits the given log texts, each one starting a line.
+ * @description Same as buildRawLogStream, with the Docker stream prefix byte on each line.
+ * @param {...string} texts - Log content to emit, one 'data' event per text.
+ * @returns {EventEmitter} Fake stream.
+ * @example
+ * const stream = buildLogStream('Zigbee2mqtt started');
+ */
+function buildLogStream(...texts) {
+  return buildRawLogStream(...texts.map(withDockerPrefix));
 }
 
 /**
@@ -89,7 +123,11 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
 
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
     // Only the logs of the current run: those of a previous run would explain a failure that no longer happens
-    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', { follow: true, since: 1700000000 });
+    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', {
+      follow: true,
+      since: 1700000000,
+      tail: 'all',
+    });
     assert.calledOnce(stream.destroy);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -140,32 +178,179 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     const clock = sinon.useFakeTimers();
     try {
       const stream = new EventEmitter();
+      stream.destroy = sinon.fake();
       gladys.system.getContainerLogs = fake.resolves(stream);
 
       const promise = zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
-      // Let the awaited getContainerLogs promise settle and listeners attach,
-      // then fire the 30-second timeout by advancing the fake clock.
-      await clock.tickAsync(30001);
+      // Let the awaited getContainerLogs promise settle and listeners attach: still reading after 4 minutes, as
+      // Zigbee2mqtt can be slow to start on a modest machine
+      await clock.tickAsync(4 * 60 * 1000);
+      stream.emit('data', withDockerPrefix('[2026-11-06 18:53:24] info: \tz2m: Starting zigbee-herdsman (10.10.0)\n'));
+      assert.notCalled(stream.destroy);
+      assert.notCalled(gladys.event.emit);
 
+      // Then stops after 5 minutes
+      await clock.tickAsync(60 * 1000);
       await promise;
 
       expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+      assert.calledOnce(stream.destroy);
       assert.calledOnce(gladys.event.emit);
     } finally {
       clock.restore();
     }
   });
 
-  it('should set unknown error when log contains error: line but no known pattern', async () => {
-    const unknownLog = 'Something went wrong\nerror: Failed to connect to serial port /dev/ttyUSB0\nDone';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(unknownLog));
+  [
+    // A model other than the selected one: the driver gets no answer it understands
+    { fixture: 'zstack-no-response.log', code: 'ADAPTER_NO_RESPONSE' },
+    { fixture: 'ember-no-response.log', code: 'ADAPTER_NO_RESPONSE' },
+    { fixture: 'ezsp-no-response.log', code: 'ADAPTER_NO_RESPONSE' },
+    { fixture: 'deconz-no-response.log', code: 'ADAPTER_NO_RESPONSE' },
+    // A network coordinator out of reach: told before the driver gives up (HOST_FATAL_ERROR for ember...)
+    { fixture: 'zstack-connection-refused.log', code: 'ADAPTER_UNREACHABLE' },
+    { fixture: 'ember-unknown-host.log', code: 'ADAPTER_UNREACHABLE' },
+    { fixture: 'ezsp-connection-refused.log', code: 'ADAPTER_UNREACHABLE' },
+    { fixture: 'deconz-connection-refused.log', code: 'ADAPTER_UNREACHABLE' },
+  ].forEach(({ fixture, code }) => {
+    it(`should detect ${code} in real logs (${fixture})`, async () => {
+      const stream = buildLogStream(readLogFixture(fixture));
+      gladys.system.getContainerLogs = fake.resolves(stream);
+
+      await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+      expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code, message: null });
+      assert.calledOnce(stream.destroy);
+    });
+  });
+
+  it('should detect an invalid configuration with the settings refused by Zigbee2mqtt', async () => {
+    const stream = buildLogStream(readLogFixture('invalid-configuration.log'));
+    gladys.system.getContainerLogs = fake.resolves(stream);
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: 'INVALID_CONFIGURATION',
+      message: 'serial/adapter must be equal to one of the allowed values',
+    });
+    // Zigbee2mqtt waits on its failure page without exiting: the end of the list is enough
+    assert.calledOnce(stream.destroy);
+  });
+
+  it('should keep every setting refused by Zigbee2mqtt, even when the logs end before the end of the list', async () => {
+    const log = [
+      'Refusing to start because configuration is not valid, found the following errors:',
+      '- serial/adapter must be equal to one of the allowed values',
+      '- mqtt/server must be string',
+    ].join('\n');
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: 'INVALID_CONFIGURATION',
+      message: 'serial/adapter must be equal to one of the allowed values; mqtt/server must be string',
+    });
+  });
+
+  it('should stop reading once Zigbee2mqtt is started, ignoring the errors logged before', async () => {
+    const log = [
+      '[2026-11-06 18:53:24] info: \tz2m: Starting zigbee-herdsman (10.10.0)',
+      '[2026-11-06 18:53:30] error: \tz2m: Failed to configure device 0x00158d0001',
+      '[2026-11-06 18:53:31] info: \tz2m: Zigbee2MQTT started!',
+      '',
+    ].join('\n');
+    const stream = buildLogStream(log, 'Adapter EZSP protocol version 13 is not supported by Host\n');
+    gladys.system.getContainerLogs = fake.resolves(stream);
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    assert.calledOnce(stream.destroy);
+    assert.calledOnce(gladys.event.emit);
+  });
+
+  it('should ignore the logs sent once the cause is found', async () => {
+    const stream = buildLogStream(
+      readLogFixture('zstack-no-response.log'),
+      '[2026-11-06 18:53:42] error: \tz2m: Error: something else\n',
+    );
+    gladys.system.getContainerLogs = fake.resolves(stream);
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'ADAPTER_NO_RESPONSE', message: null });
+  });
+
+  it('should detect an error split across two chunks', async () => {
+    const stream = buildRawLogStream(
+      withDockerPrefix('[2026-11-06 18:53:42] error: \tz2m: Error: Failed to connect to the ad'),
+      // The second chunk continues the line, without Docker stream prefix byte
+      'apter (Error: SRSP - SYS - ping after 6000ms)\n',
+    );
+    gladys.system.getContainerLogs = fake.resolves(stream);
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'ADAPTER_NO_RESPONSE', message: null });
+  });
+
+  it('should detect an error on the last line of the logs, without line break', async () => {
+    const log = '[2026-11-06 18:53:42] error: \tz2m: Error: Failure to connect';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'ADAPTER_NO_RESPONSE', message: null });
+  });
+
+  it('should not blame the coordinator when Zigbee2mqtt cannot reach the broker', async () => {
+    const log = [
+      '[2026-11-06 18:53:42] info: \tz2m: Connecting to MQTT server at mqtt://localhost:1884',
+      '[2026-11-06 18:53:42] error: \tz2m: MQTT error: connect ECONNREFUSED 127.0.0.1:1884',
+      '[2026-11-06 18:53:42] error: \tz2m: MQTT failed to connect, exiting...',
+    ].join('\n');
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
 
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
       code: null,
-      message: 'error: Failed to connect to serial port /dev/ttyUSB0',
+      message: 'z2m: MQTT failed to connect, exiting...',
+    });
+  });
+
+  it('should keep the last error logged by Zigbee2mqtt when no known pattern matches', async () => {
+    // Zigbee2mqtt logs why it exits after "Exiting...", followed by a noisy dump that is not a logged error
+    const log = [
+      '[2026-11-06 18:53:40] error: \tz2m: Error while starting zigbee-herdsman',
+      '[2026-11-06 18:53:40] error: \tz2m: Exiting...',
+      '[2026-11-06 18:53:40] error: \tz2m: Error: Unexpected adapter answer',
+      '    at Znp.request (/app/node_modules/zigbee-herdsman/dist/adapter/z-stack/znp/znp.js:300:19)',
+      'NodeError: write after end',
+      'Some info',
+    ].join('\n');
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: null,
+      message: 'z2m: Error: Unexpected adapter answer',
+    });
+  });
+
+  it('should strip ANSI color codes and the Docker stream prefix byte from log lines', async () => {
+    const log = '[2026-11-06 18:53:40] \x1B[31merror\x1B[39m: \tz2m: Error: Unexpected adapter answer';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: null,
+      message: 'z2m: Error: Unexpected adapter answer',
     });
   });
 
@@ -191,10 +376,10 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
   });
 
-  it('should ignore an error: line when Zigbee2mqtt is online', async () => {
+  it('should ignore a logged error when Zigbee2mqtt is online', async () => {
     // A device failing to answer during the startup is logged as an error, without stopping Zigbee2mqtt
     zigbee2mqttManager.zigbee2mqttConnected = true;
-    const log = 'Zigbee2MQTT started!\nerror: Failed to configure device 0x00158d0001';
+    const log = '[2026-11-06 18:53:30] error: \tz2m: Failed to configure device 0x00158d0001';
     gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
 
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
@@ -202,58 +387,12 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
   });
 
-  it('should remove the first character of each line (Docker stream prefix byte)', async () => {
-    // buildLogStream prepends \x01 per line; without removal the match would fail
-    const log = 'error: Docker prefix byte must be stripped';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
-
-    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
-
-    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
-      code: null,
-      message: 'error: Docker prefix byte must be stripped',
-    });
-  });
-
-  it('should strip ANSI color codes from log lines', async () => {
-    const log = '\x1B[31merror\x1B[39m: Failed to open serial port';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
-
-    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
-
-    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
-      code: null,
-      message: 'error: Failed to open serial port',
-    });
-  });
-
-  it('should match error: case-insensitively', async () => {
-    const log = 'Error: Something bad happened';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
-
-    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
-
-    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
-      code: null,
-      message: 'Error: Something bad happened',
-    });
-  });
-
-  it('should keep the last raw error line when multiple error: lines are present', async () => {
-    const log = 'error: First error\nSome info\nERROR: Last error';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
-
-    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
-
-    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
-      code: null,
-      message: 'ERROR: Last error',
-    });
-  });
-
   it('should prefer known error code over raw error lines', async () => {
-    const log =
-      'error: some random error\nAdapter EZSP protocol version 13 is not supported by Host\nerror: another error';
+    const log = [
+      '[2026-11-06 18:53:40] error: \tz2m: some random error',
+      'Adapter EZSP protocol version 13 is not supported by Host',
+      '[2026-11-06 18:53:40] error: \tz2m: another error',
+    ].join('\n');
     const stream = buildLogStream(log);
     gladys.system.getContainerLogs = fake.resolves(stream);
 
