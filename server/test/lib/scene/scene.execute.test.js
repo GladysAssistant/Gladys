@@ -5,6 +5,7 @@ const { expect } = require('chai');
 const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
+const db = require('../../../models');
 
 describe('scene.execute', () => {
   let sandbox;
@@ -279,5 +280,46 @@ describe('scene.execute', () => {
         }
       });
     });
+  });
+  it('should save when the scene was last executed, without changing updated_at', async () => {
+    const sceneBefore = await db.Scene.findOne({ where: { selector: 'test-scene' } });
+    expect(sceneBefore.last_executed).to.equal(null);
+    const updateSpy = sandbox.spy(db.Scene, 'update');
+    const scene = {
+      selector: 'test-scene',
+      triggers: [],
+      actions: [[{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }]],
+    };
+    await sceneManager.addScene(scene);
+    const startedBefore = Date.now();
+    await sceneManager.execute('test-scene');
+    await new Promise((resolve) => {
+      sceneManager.queue.start(resolve);
+    });
+    // the write is not awaited by the execution
+    assert.calledOnce(updateSpy);
+    await updateSpy.firstCall.returnValue;
+    const sceneAfter = await db.Scene.findOne({ where: { selector: 'test-scene' } });
+    expect(new Date(sceneAfter.last_executed).getTime()).to.be.at.least(startedBefore);
+    expect(new Date(sceneAfter.updated_at).getTime()).to.equal(new Date(sceneBefore.updated_at).getTime());
+    assert.calledOnce(device.setValue);
+  });
+  it('should execute the scene even if its last execution cannot be saved', async () => {
+    const updateStub = sandbox.stub(db.Scene, 'update').rejects(new Error('database is locked'));
+    const scene = {
+      selector: 'my-scene',
+      triggers: [],
+      actions: [[{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }]],
+    };
+    await sceneManager.addScene(scene);
+    await sceneManager.execute('my-scene');
+    await new Promise((resolve) => {
+      sceneManager.queue.start(resolve);
+    });
+    assert.calledOnce(updateStub);
+    assert.calledWith(updateStub, match({ last_executed: match.date }), match({ where: { selector: 'my-scene' } }));
+    // the failure is logged, never thrown
+    await updateStub.firstCall.returnValue.catch(() => null);
+    assert.calledOnce(device.setValue);
   });
 });

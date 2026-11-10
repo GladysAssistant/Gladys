@@ -1,6 +1,7 @@
 const uuid = require('uuid');
 const executeActionsFactory = require('./scene.executeActions');
 const actionsFunc = require('./scene.actions');
+const db = require('../../models');
 const logger = require('../../utils/logger');
 const { AbortScene } = require('../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
@@ -51,6 +52,15 @@ function execute(sceneSelector, scope = {}) {
       this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED,
         payload: runningScene,
+      });
+      // Remember when the scene last ran (shown by the scene list and the editor, and read by
+      // the weekly digest). Not awaited: the run never waits for this write, nor fails with it.
+      // "silent" leaves updated_at alone: a run is not an edit of the scene.
+      db.Scene.update(
+        { last_executed: runningScene.startedAt },
+        { where: { selector: sceneSelector }, silent: true },
+      ).catch((e) => {
+        logger.warn(`Unable to save the last execution of scene ${sceneSelector}`, e);
       });
       try {
         await executeActions(this, scene.actions, scope);
