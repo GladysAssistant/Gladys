@@ -85,6 +85,22 @@ class EditDashboard extends Component {
     }
   };
 
+  // Room names, for the title of the widgets that are only told apart by
+  // their room ("Temperature in room"): a convenience, so a failure leaves
+  // the titles as they were
+  getRoomNames = async () => {
+    try {
+      const rooms = await this.props.httpClient.get('/api/v1/room');
+      const roomNames = {};
+      rooms.forEach(room => {
+        roomNames[room.selector] = room.name;
+      });
+      this.setState({ roomNames });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   init = async () => {
     await this.getDashboards();
     if (this.state.currentDashboardSelector) {
@@ -103,10 +119,18 @@ class EditDashboard extends Component {
   // a closed tab (beforeunload). With unsaved changes it asks first.
   requestNavigation = url => {
     if (this.state.hasUnsavedChanges) {
-      this.setState({ leaveConfirm: url });
+      this.askBeforeLeaving(url);
       return;
     }
     this.navigateAway(url);
+  };
+
+  // The question can come from the app's mobile menu (a link of its drawer)
+  // or while it is open (back gesture): the menu closes, so staying brings
+  // the user back to the editor, not to a menu left open over it
+  askBeforeLeaving = destination => {
+    this.props.closeMenus();
+    this.setState({ leaveConfirm: destination });
   };
 
   // While the history guard is armed, the current history entry is the
@@ -126,7 +150,7 @@ class EditDashboard extends Component {
   // nothing behind on the server. The action ends with leaveTo.
   requestLeaveAction = action => {
     if (this.state.hasUnsavedChanges) {
-      this.setState({ leaveConfirm: action });
+      this.askBeforeLeaving(action);
       return;
     }
     action();
@@ -180,7 +204,7 @@ class EditDashboard extends Component {
     }
     this.historyGuardArmed = false;
     if (this.state.hasUnsavedChanges) {
-      this.setState({ leaveConfirm: HISTORY_BACK });
+      this.askBeforeLeaving(HISTORY_BACK);
     } else {
       window.history.back();
     }
@@ -866,6 +890,7 @@ class EditDashboard extends Component {
       sectionSizes: [],
       columnWidths: [],
       sectionMobileOrders: [],
+      roomNames: {},
       undoRemoval: null,
       reorganizing: false,
       leaveConfirm: null,
@@ -884,6 +909,7 @@ class EditDashboard extends Component {
 
   componentDidMount() {
     this.init();
+    this.getRoomNames();
     window.addEventListener('beforeunload', this.handleBeforeUnload);
     window.addEventListener('popstate', this.handlePopState);
     document.addEventListener('click', this.handleDocumentClick, true);
@@ -928,6 +954,7 @@ class EditDashboard extends Component {
       justSaved,
       hasUnsavedChanges,
       sectionMobileOrders,
+      roomNames,
       reorganizing,
       leaveConfirm
     }
@@ -978,6 +1005,7 @@ class EditDashboard extends Component {
         openMoveBox={this.openMoveBox}
         moveBoxTo={this.moveBoxTo}
         sectionMobileOrders={sectionMobileOrders}
+        roomNames={roomNames}
         toggleSectionMobileOrder={this.toggleSectionMobileOrder}
         undoRemoval={this.getPendingUndoRemoval()}
         undoRemoveBox={this.undoRemoveBox}
@@ -1003,4 +1031,6 @@ class EditDashboard extends Component {
   }
 }
 
-export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {})(EditDashboard);
+export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {
+  closeMenus: () => ({ showCollapsedMenu: false, showDropDown: false })
+})(EditDashboard);

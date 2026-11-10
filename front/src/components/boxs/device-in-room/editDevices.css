@@ -73,7 +73,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0;
+  padding: 0.375rem 0;
   border: 0;
   background: transparent;
   color: inherit;
@@ -81,12 +81,18 @@
   cursor: pointer;
 }
 
+/* up to two lines: on a narrow phone the name shares its row with the
+   value and the handle, and one line cut "Multi sensor (Temperature)" to
+   "Multi sens…" */
 .rowName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-size: 1rem;
   font-weight: 600;
-  white-space: nowrap;
+  line-height: 1.25;
   overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
   max-width: 100%;
 }
 
@@ -99,17 +105,21 @@
   max-width: 100%;
 }
 
+/* a number and its unit fit on one line; a longer text ("No value") wraps
+   on two rather than being cut and taking the room of the name */
 .rowValue {
   flex: 0 0 auto;
   max-width: 30%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1.25;
   color: var(--gl-muted, #7c8396);
   font-variant-numeric: tabular-nums;
   text-align: right;
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* a touch on the handle must drag, never scroll the panel */
@@ -374,4 +384,13 @@ input.input {
 /* devices that could not be loaded: rows are shown, not editable */
 .rowMain:disabled {
   cursor: default;
+}
+
+/* A phone in landscape leaves the sheet about 250px: pinned, the footer
+   (plus the panel header) left less than one row of the list visible. It
+   goes back into the flow, at the end of the form. */
+@media (max-height: 480px) {
+  .stickyFooter {
+    position: static;
+  }
 }

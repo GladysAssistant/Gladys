@@ -71,6 +71,10 @@ const EditableBoxPreview = ({ children, ...props }) => {
   // (revealAbovePanel, the devices widget's row highlight); data-x / data-y
   // let the editor find a widget again after it moved
   const isEditing = props.editingBoxPosition && props.editingBoxPosition.x === x && props.editingBoxPosition.y === y;
+  // What tells this widget apart from another of the same type: its name,
+  // its title, or the room it shows. In reorganize mode the content is
+  // hidden and this is all that is left to recognise it.
+  const label = box.name || box.title || (box.room && props.roomNames && props.roomNames[box.room]);
   const titleId = `widget-title-${x}-${y}`;
   return (
     <div
@@ -87,8 +91,15 @@ const EditableBoxPreview = ({ children, ...props }) => {
           "Weather, group — Move up, button…" instead of four nameless buttons */}
       <div class={style.previewToolbar} role="group" aria-labelledby={titleId}>
         <span class={style.previewTitle} data-preview-title id={titleId}>
-          {box.type ? <Text id={`dashboard.boxTitle.${box.type}`} /> : <Text id="dashboard.editorNewWidget" />}
-          {box.name && <span class={style.previewSubtitle}> · {box.name}</span>}
+          <span class={style.previewType}>
+            {box.type ? <Text id={`dashboard.boxTitle.${box.type}`} /> : <Text id="dashboard.editorNewWidget" />}
+          </span>
+          {label && (
+            <span class={style.previewSubtitle} data-cy={`widget-label-${x}-${y}`}>
+              <span class={style.previewSeparator}> · </span>
+              {label}
+            </span>
+          )}
         </span>
         <div class={style.previewActions}>
           <Localizer>

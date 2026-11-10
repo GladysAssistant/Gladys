@@ -95,8 +95,17 @@ class EditPanel extends Component {
     this.panelElement = element;
   };
 
+  // A form changing its view (list → detail → picker) unmounts the button
+  // that was just activated: the focus falls back to <body>, and a keyboard
+  // or screen reader user is thrown out of the dialog. It goes to the
+  // title of the new view — only when it was lost, never taken from a field.
   setPanelHeader = header => {
-    this.setState({ header });
+    this.setState({ header }, () => {
+      const active = document.activeElement;
+      if (this.titleElement && (!active || active === document.body)) {
+        this.titleElement.focus({ preventScroll: true });
+      }
+    });
   };
 
   setPanelExpanded = expanded => {

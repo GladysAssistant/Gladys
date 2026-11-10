@@ -117,6 +117,8 @@ describe('Dashboard editor on a phone', () => {
       const top = $stay[0].ownerDocument.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
       expect($stay[0].contains(top)).to.equal(true);
     });
+    // asking closes the menu: staying comes back to the editor itself
+    cy.get('[data-cy="sidebar-nav"]').should('not.be.visible');
     cy.get('[data-cy="leave-confirm-stay"]').click();
     cy.url().should('match', /\/dashboard\/phone\/edit$/);
   });
@@ -132,6 +134,39 @@ describe('Dashboard editor on a phone', () => {
     cy.get('[data-widget-wrapper][data-x="0"][data-y="0"]').should('contain', 'Second of column 1');
     cy.get('[data-cy="reorganize-button"]').click();
     cy.get('[data-cy="reorganize-button"]').should('have.attr', 'aria-pressed', 'false');
+  });
+
+  // collapsed, a widget is only its toolbar row: what tells it apart from
+  // another of the same type (its name, its title or its room) must be there
+  it('Should tell widgets of the same type apart in reorganize mode', () => {
+    const room = Cypress.env('house').rooms[0];
+    cy.request({
+      method: 'PATCH',
+      url: `${serverUrl}/api/v1/dashboard/phone`,
+      body: {
+        boxes: [
+          {
+            columns: [
+              [
+                { type: 'temperature-in-room', room: room.selector },
+                { type: 'link', title: 'A titled link', url: 'https://gladysassistant.com' },
+                { type: 'clock', clock_type: 'digital' }
+              ]
+            ]
+          }
+        ]
+      }
+    });
+    cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="reorganize-button"]').click();
+    cy.get('[data-cy="widget-label-0-0"]')
+      .should('be.visible')
+      .and('contain', room.name);
+    cy.get('[data-cy="widget-label-0-1"]')
+      .should('be.visible')
+      .and('contain', 'A titled link');
+    // nothing to tell a clock apart: its type alone
+    cy.get('[data-cy="widget-label-0-2"]').should('not.exist');
   });
 
   it('Should ask before leaving with unsaved changes', () => {

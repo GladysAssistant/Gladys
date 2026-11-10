@@ -1102,9 +1102,48 @@
   padding: 0;
 }
 
+/* two lines instead of one truncated "TYPE · na…": what tells the widget
+   apart (its name, title or room) first, its type underneath. A widget
+   with neither shows its type alone, as the main line. */
 .compactCanvas .previewTitle {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column-reverse;
+  min-width: 0;
+  white-space: normal;
+}
+
+.compactCanvas .previewType {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the label itself may take two lines: it is what the user looks for */
+.compactCanvas .previewSubtitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.compactCanvas .previewSubtitle,
+.compactCanvas .previewType:last-child {
   font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--gl-ink, #1c2334);
+}
+
+.compactCanvas .previewType:not(:last-child) {
+  font-size: 0.625rem;
+}
+
+.compactCanvas .previewSeparator {
+  display: none;
 }
 
 .compactCanvas .columnBoxHeader {
