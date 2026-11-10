@@ -244,14 +244,18 @@ class DevicesComponent extends Component {
   };
 
   componentDidUpdate(previousProps) {
-    const previousSelectors = get(previousProps, 'box.device_features') || [];
-    const selectors = get(this.props, 'box.device_features') || [];
+    // compare the raw props: a box without device_features (a widget just
+    // created, or stored that way) would otherwise fall back to a fresh []
+    // on both sides, never equal — and applyNamesAndOrder's setState would
+    // re-render, and land here again, forever
     if (
-      previousSelectors === selectors &&
+      get(previousProps, 'box.device_features') === get(this.props, 'box.device_features') &&
       get(previousProps, 'box.device_feature_names') === get(this.props, 'box.device_feature_names')
     ) {
       return;
     }
+    const previousSelectors = get(previousProps, 'box.device_features') || [];
+    const selectors = get(this.props, 'box.device_features') || [];
     const sameSet =
       previousSelectors.length === selectors.length &&
       [...previousSelectors].sort().join(',') === [...selectors].sort().join(',');

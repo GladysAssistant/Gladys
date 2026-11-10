@@ -111,6 +111,12 @@ const EditBoxColumns = ({ children, ...props }) => (
                         type="button"
                         class={style.sectionTextButton}
                         onClick={() => props.toggleSectionMobileOrder(sectionIndex)}
+                        aria-pressed={
+                          props.sectionMobileOrders &&
+                          props.sectionMobileOrders[sectionIndex] === DASHBOARD_SECTION_MOBILE_ORDER.ROWS
+                            ? 'true'
+                            : 'false'
+                        }
                         data-cy={`section-mobile-order-${sectionIndex}`}
                         title={<Text id="dashboard.editorMobileOrderHelp" />}
                       >

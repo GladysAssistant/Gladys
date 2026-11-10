@@ -83,6 +83,7 @@ const DashboardListItem = ({ children, ...props }) => {
       ref={ref}
       onClick={openEditPage}
       data-dashboard-list-drop
+      data-active={props.isSelected ? 'true' : undefined}
       data-drop-index={index}
       class={cx(style.dashboardListItem, {
         [style.dashboardListItemActive]: props.isSelected
@@ -115,9 +116,37 @@ class RedorderDashboardList extends Component {
     this.props.updateDashboardList(newDashboards);
   };
 
+  // On a phone the pills scroll sideways: center the dashboard being edited,
+  // like the viewer's dock, or it may sit half off-screen
+  revealActive = () => {
+    const list = this.listElement;
+    const active = list && list.querySelector('[data-active]');
+    if (!active || list.scrollWidth <= list.clientWidth) {
+      return;
+    }
+    const maxScroll = list.scrollWidth - list.clientWidth;
+    list.scrollLeft = Math.max(0, Math.min(active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2, maxScroll));
+  };
+
+  setListElement = element => {
+    this.listElement = element;
+  };
+
+  componentDidMount() {
+    this.revealActive();
+  }
+
+  componentDidUpdate(previousProps) {
+    const previousId = previousProps.currentDashboard && previousProps.currentDashboard.id;
+    const currentId = this.props.currentDashboard && this.props.currentDashboard.id;
+    if (previousId !== currentId || previousProps.dashboards !== this.props.dashboards) {
+      this.revealActive();
+    }
+  }
+
   render({ dashboards, currentDashboard, openNewDashboard }, {}) {
     return (
-      <ul class={style.dashboardList} data-dashboard-list>
+      <ul class={style.dashboardList} data-dashboard-list ref={this.setListElement}>
         {dashboards &&
           dashboards.map((dashboard, index) => (
             <DashboardListItem

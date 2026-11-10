@@ -106,6 +106,21 @@ describe('Dashboard editor on a phone', () => {
     cy.url().should('match', /\/dashboard\/phone\/edit$/);
   });
 
+  it('Should ask above the mobile menu when one of its links is tapped', () => {
+    cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="move-box-down-0-0"]').click();
+    cy.get('[data-cy="sidebar-toggler"]').click();
+    cy.get('[data-cy="sidebar-nav"] a[href="/dashboard/scene"]').click();
+    // the dialog is the topmost element where it is drawn, not the drawer
+    cy.get('[data-cy="leave-confirm-stay"]').then($stay => {
+      const rect = $stay[0].getBoundingClientRect();
+      const top = $stay[0].ownerDocument.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      expect($stay[0].contains(top)).to.equal(true);
+    });
+    cy.get('[data-cy="leave-confirm-stay"]').click();
+    cy.url().should('match', /\/dashboard\/phone\/edit$/);
+  });
+
   it('Should collapse the widgets in reorganize mode', () => {
     cy.visit('/dashboard/phone/edit');
     cy.get('[data-cy="reorganize-button"]').click();

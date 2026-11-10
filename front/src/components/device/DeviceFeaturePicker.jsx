@@ -75,7 +75,8 @@ class DeviceFeaturePicker extends Component {
     this.state = {
       selected: [...(props.selected || [])],
       search: '',
-      room: ALL_ROOMS
+      room: ALL_ROOMS,
+      selectedSnapshot: null
     };
     this.groups = buildGroups(props.devices, get(props, 'intl.dictionary'), props.filterFeature);
   }
@@ -95,7 +96,10 @@ class DeviceFeaturePicker extends Component {
   };
 
   selectRoom = room => {
-    this.setState({ room });
+    // "Selected" lists the selection as it was when the chip was tapped: an
+    // unchecked row stays, unticked, so the list does not jump under the
+    // finger and a mis-tap can be taken back from this view
+    this.setState({ room, selectedSnapshot: room === SELECTED_ONLY ? this.state.selected : null });
   };
 
   toggleFeature = selector => {
@@ -115,7 +119,7 @@ class DeviceFeaturePicker extends Component {
   };
 
   getVisibleGroups() {
-    const { search, room, selected } = this.state;
+    const { search, room, selectedSnapshot } = this.state;
     const words = normalizeSearchText(search)
       .split(/\s+/)
       .filter(Boolean);
@@ -128,7 +132,7 @@ class DeviceFeaturePicker extends Component {
             ...entry,
             features: entry.features.filter(
               ({ feature, searchText }) =>
-                (room !== SELECTED_ONLY || selected.includes(feature.selector)) &&
+                (room !== SELECTED_ONLY || selectedSnapshot.includes(feature.selector)) &&
                 words.every(word => searchText.includes(word))
             )
           }))

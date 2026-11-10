@@ -180,4 +180,34 @@ describe('Dashboard Devices Box editor', () => {
     // must not fall back to every device of the house
     cy.get('[data-widget-wrapper][data-editing] tbody tr').should('have.length', 0);
   });
+
+  // a devices widget without device_features — just created from the widget
+  // picker, or stored that way — must not loop on re-renders (it froze the tab)
+  it('Should create a devices widget from the widget picker', () => {
+    cy.viewport(390, 664);
+    cy.visit('/dashboard/test/edit');
+    cy.contains('.btn-primary', 'dashboard.addBoxButton')
+      .first()
+      .click();
+    cy.get('[data-cy="box-type-popular-devices"]').click();
+    // the new widget opens straight on the picker, and the page still answers
+    cy.get(`[data-cy="picker-feature-${probe(2)}"]`).click();
+    cy.get('[data-cy="picker-validate"]').click();
+    cy.get('[data-device-row]').should('have.length', 1);
+    cy.get('[data-widget-wrapper][data-editing] tbody tr').should('have.length', 1);
+  });
+
+  it('Should show a stored devices widget that has no devices', () => {
+    cy.request({
+      method: 'PATCH',
+      url: `${serverUrl}/api/v1/dashboard/test`,
+      body: { boxes: [{ columns: [[{ type: 'devices', name: 'Empty' }], [{ type: 'clock', clock_type: 'digital' }]] }] }
+    });
+    cy.visit('/dashboard/test');
+    cy.contains('Empty');
+    // the page is responsive: the editor opens and the widget can be removed
+    cy.visit('/dashboard/test/edit');
+    cy.get('[data-cy="remove-box-0-0"]').click();
+    cy.get('[data-widget-wrapper][data-x="0"]').should('have.length', 0);
+  });
 });

@@ -1049,6 +1049,13 @@
   color: var(--gl-accent, #3d6df0);
 }
 
+/* a state toggle (phone order): row by row reads as "on" */
+.sectionTextButton[aria-pressed='true'] {
+  border-color: var(--gl-accent, #3d6df0);
+  background-color: var(--gl-accent-soft, rgba(61, 109, 240, 0.1));
+  color: var(--gl-accent, #3d6df0);
+}
+
 @media (pointer: coarse) {
   .sectionTextButton {
     min-height: 2.5rem;
@@ -1156,6 +1163,8 @@
    viewer's dock, instead of wrapping the "+" alone onto a second line */
 @media (max-width: 991px) {
   .dashboardList {
+    /* offsetParent of the pills, for centering the active one */
+    position: relative;
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
@@ -1379,7 +1388,21 @@
 
 .moveTargetName {
   flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.5rem 0;
   font-weight: 600;
+  text-align: left;
+}
+
+/* the column's first widgets, under its name */
+.moveTargetContent {
+  display: block;
+  overflow: hidden;
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .moveTargetMeta {
