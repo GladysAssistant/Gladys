@@ -127,6 +127,7 @@ const DeviceDisplay = ({
 class MatterSettingsPage extends Component {
   constructor(props) {
     super(props);
+    this.decommissionsInProgress = new Set();
     this.state = {
       matterEnabled: null,
       loading: true,
@@ -247,6 +248,11 @@ class MatterSettingsPage extends Component {
 
   decommissionNode = async node => {
     const nodeId = node.node_id;
+    // synchronous guard: setState is asynchronous, a double click would otherwise send two requests
+    if (this.decommissionsInProgress.has(nodeId)) {
+      return;
+    }
+    this.decommissionsInProgress.add(nodeId);
     const deleteGladysDevices = this.state.deleteGladysDevices && node.gladys_devices.length > 0;
     this.setState({
       nodeToDecommission: null,
@@ -272,9 +278,10 @@ class MatterSettingsPage extends Component {
       await this.loadNodes();
     } catch (e) {
       console.error(e);
-      const message = (e.response && e.response.data && e.response.data.message) || e.message;
+      const message = (e.response && e.response.data && e.response.data.error) || e.message;
       this.setState({ decommissionError: { nodeId, message } });
     }
+    this.decommissionsInProgress.delete(nodeId);
     this.setState({
       decommissioningNodes: {
         ...this.state.decommissioningNodes,
@@ -506,7 +513,7 @@ class MatterSettingsPage extends Component {
                             <Text id="integration.matter.settings.decommission.devicesNotDeleted" />
                             <ul class="mb-0">
                               {decommissionResult.failedDevices.map(name => (
-                                <li>{name}</li>
+                                <li key={name}>{name}</li>
                               ))}
                             </ul>
                           </div>
@@ -563,7 +570,7 @@ class MatterSettingsPage extends Component {
                                           <Text id="integration.matter.settings.decommission.linkedDevices" />
                                           <ul>
                                             {node.gladys_devices.map(gladysDevice => (
-                                              <li>{gladysDevice.name}</li>
+                                              <li key={gladysDevice.selector}>{gladysDevice.name}</li>
                                             ))}
                                           </ul>
                                           <label class="custom-control custom-checkbox">
@@ -583,10 +590,18 @@ class MatterSettingsPage extends Component {
                                         </div>
                                       )}
                                       <div>
-                                        <button class="btn btn-danger" onClick={() => this.decommissionNode(node)}>
+                                        <button
+                                          class="btn btn-danger"
+                                          onClick={() => this.decommissionNode(node)}
+                                          disabled={decommissioningNodes[node.node_id]}
+                                        >
                                           <Text id="integration.matter.settings.decommission.confirmButton" />
                                         </button>
-                                        <button class="btn ml-2" onClick={this.cancelDecommissionNode}>
+                                        <button
+                                          class="btn ml-2"
+                                          onClick={this.cancelDecommissionNode}
+                                          disabled={decommissioningNodes[node.node_id]}
+                                        >
                                           <Text id="integration.matter.settings.decommission.cancelButton" />
                                         </button>
                                       </div>

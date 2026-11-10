@@ -88,6 +88,31 @@ describe('Matter.decommission', () => {
     expect(matterHandler.nodesMap.size).to.equal(1);
     assert.notCalled(gladys.device.destroy);
   });
+  it('should fail and keep the node when its Gladys devices can not be listed', async () => {
+    const node = {
+      decommission: fake.resolves(null),
+    };
+    matterHandler.nodesMap.set(1234n, node);
+    matterHandler.devices.push({
+      external_id: 'matter:1234:1',
+    });
+    matterHandler.commissioningController = {
+      removeNode: fake.resolves(null),
+    };
+    gladys.device.get = fake.rejects(new Error('Database locked'));
+    let error;
+    try {
+      await matterHandler.decommission(1234n, { deleteGladysDevices: true });
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.have.property('message', 'Database locked');
+    assert.notCalled(node.decommission);
+    assert.notCalled(matterHandler.commissioningController.removeNode);
+    assert.notCalled(gladys.device.destroy);
+    expect(matterHandler.devices).to.have.lengthOf(1);
+    expect(matterHandler.nodesMap.size).to.equal(1);
+  });
   it('should delete the Gladys devices of the node only', async () => {
     matterHandler.nodesMap.set(1234n, {
       decommission: fake.resolves(null),

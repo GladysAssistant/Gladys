@@ -3554,7 +3554,7 @@
           "confirmMessage": "<b>Decommission this node?</b> The appliance will leave the Gladys Matter network and will have to be paired again to be used in Gladys.",
           "linkedDevices": "Gladys devices created from this node:",
           "deleteDevicesLabel": "Also delete these devices from Gladys",
-          "deleteDevicesHelp": "Their history is deleted, and the scenes and dashboards using them will have to be updated. Uncheck this box to keep them, for instance if you are about to pair the appliance again.",
+          "deleteDevicesHelp": "Their history is deleted, and the scenes and dashboards using them will have to be updated. Uncheck this box to keep them with their history: they will no longer be updated, and pairing the appliance again creates new devices.",
           "confirmButton": "Yes, decommission",
           "cancelButton": "Cancel",
           "error": "An error occurred while decommissioning the node, it has not been removed.",
@@ -3563,7 +3563,7 @@
             "singular": "{{count}} Gladys device has been deleted.",
             "plural": "{{count}} Gladys devices have been deleted."
           },
-          "forcedWarning": "The appliance could not be reached: it has been removed from Gladys, but it has not been told. Factory reset it before pairing it again.",
+          "forcedWarning": "The appliance could not be reached: it has been removed from the Gladys Matter network, but it has not been told. Factory reset it before pairing it again.",
           "devicesNotDeleted": "These Gladys devices could not be deleted, most likely because their history is too large. Gladys is cleaning it: try again later from the \"Devices\" tab."
         },
         "noNodesFound": "No Matter nodes found. You can add a Matter device by going to the \"Add Device\" tab.",

@@ -56,10 +56,15 @@ module.exports = function MatterController(matterHandler) {
    * @apiGroup Matter
    */
   async function decommissionNode(req, res) {
-    const result = await matterHandler.decommission(BigInt(req.params.node_id), {
-      deleteGladysDevices: Boolean(req.body && req.body.delete_gladys_devices === true),
-    });
-    res.json({ success: true, ...result });
+    try {
+      const result = await matterHandler.decommission(BigInt(req.params.node_id), {
+        deleteGladysDevices: Boolean(req.body && req.body.delete_gladys_devices === true),
+      });
+      res.json({ success: true, ...result });
+    } catch (e) {
+      // the cause is shown to the user (the generic error middleware would hide it)
+      res.status(500).json({ error: e.message });
+    }
   }
 
   /**

@@ -13,6 +13,13 @@ const logger = require('../../../utils/logger');
  */
 async function decommission(nodeId, { deleteGladysDevices = false } = {}) {
   const node = this.nodesMap.get(nodeId);
+  const externalIdPrefix = `matter:${nodeId.toString()}:`;
+  // resolved before the node leaves the fabric: a lookup failure must leave everything as it was
+  const nodeDevices = deleteGladysDevices
+    ? (await this.gladys.device.get({ service: 'matter' })).filter((device) =>
+        device.external_id.startsWith(externalIdPrefix),
+      )
+    : [];
   let forced = false;
   try {
     if (!node) {
@@ -26,27 +33,22 @@ async function decommission(nodeId, { deleteGladysDevices = false } = {}) {
     forced = true;
   }
 
-  const externalIdPrefix = `matter:${nodeId.toString()}:`;
   this.nodesMap.delete(nodeId);
   this.devices = this.devices.filter((device) => !device.external_id.startsWith(externalIdPrefix));
 
   const deletedDevices = [];
   const failedDevices = [];
-  if (deleteGladysDevices) {
-    const matterDevices = await this.gladys.device.get({ service: 'matter' });
-    const nodeDevices = matterDevices.filter((device) => device.external_id.startsWith(externalIdPrefix));
-    await Promise.each(nodeDevices, async (device) => {
-      try {
-        await this.gladys.device.destroy(device.selector);
-        deletedDevices.push(device.name);
-      } catch (e) {
-        // the node is already gone: one device that can not be deleted (too many states,
-        // the purge is then running) must not hide the others
-        logger.warn(`Matter: Failed to delete device ${device.selector} of node ${nodeId}: ${e}`);
-        failedDevices.push(device.name);
-      }
-    });
-  }
+  await Promise.each(nodeDevices, async (device) => {
+    try {
+      await this.gladys.device.destroy(device.selector);
+      deletedDevices.push(device.name);
+    } catch (e) {
+      // the node is already gone: one device that can not be deleted (too many states,
+      // the purge is then running) must not hide the others
+      logger.warn(`Matter: Failed to delete device ${device.selector} of node ${nodeId}: ${e}`);
+      failedDevices.push(device.name);
+    }
+  });
 
   return {
     forced,

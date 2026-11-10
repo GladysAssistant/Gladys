@@ -3554,7 +3554,7 @@
           "confirmMessage": "<b>¿Retirar este nodo?</b> El dispositivo saldrá de la red Matter de Gladys y tendrá que emparejarse de nuevo para usarse en Gladys.",
           "linkedDevices": "Dispositivos de Gladys creados a partir de este nodo:",
           "deleteDevicesLabel": "Eliminar también estos dispositivos de Gladys",
-          "deleteDevicesHelp": "Su historial se elimina, y las escenas y los paneles que los utilizan tendrán que actualizarse. Desmarque esta casilla para conservarlos, por ejemplo si va a emparejar de nuevo el dispositivo.",
+          "deleteDevicesHelp": "Su historial se elimina, y las escenas y los paneles que los utilizan tendrán que actualizarse. Desmarque esta casilla para conservarlos con su historial: ya no se actualizarán, y emparejar de nuevo el dispositivo crea nuevos dispositivos.",
           "confirmButton": "Sí, retirar",
           "cancelButton": "Cancelar",
           "error": "Se produjo un error al retirar el nodo, no se ha eliminado.",
@@ -3563,7 +3563,7 @@
             "singular": "Se ha eliminado {{count}} dispositivo de Gladys.",
             "plural": "Se han eliminado {{count}} dispositivos de Gladys."
           },
-          "forcedWarning": "No se pudo contactar con el dispositivo: se ha retirado de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
+          "forcedWarning": "No se pudo contactar con el dispositivo: se ha retirado de la red Matter de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
           "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar, probablemente porque su historial es demasiado grande. Gladys lo está limpiando: inténtelo más tarde desde la pestaña «Dispositivos»."
         },
         "noNodesFound": "No se encontró ningún nodo Matter. Puede añadir un dispositivo Matter yendo a la pestaña \"Añadir dispositivo\".",

@@ -3554,7 +3554,7 @@
           "confirmMessage": "<b>Diesen Knoten stilllegen?</b> Das Gerät verlässt das Matter-Netzwerk von Gladys und muss erneut gekoppelt werden, um in Gladys verwendet zu werden.",
           "linkedDevices": "Aus diesem Knoten erstellte Gladys-Geräte:",
           "deleteDevicesLabel": "Diese Geräte auch aus Gladys löschen",
-          "deleteDevicesHelp": "Ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, müssen angepasst werden. Deaktivieren Sie dieses Kästchen, um sie zu behalten, zum Beispiel wenn Sie das Gerät erneut koppeln möchten.",
+          "deleteDevicesHelp": "Ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, müssen angepasst werden. Deaktivieren Sie dieses Kästchen, um sie mit ihrem Verlauf zu behalten: Sie werden nicht mehr aktualisiert, und ein erneutes Koppeln des Geräts erstellt neue Geräte.",
           "confirmButton": "Ja, stilllegen",
           "cancelButton": "Abbrechen",
           "error": "Beim Stilllegen des Knotens ist ein Fehler aufgetreten, er wurde nicht entfernt.",
@@ -3563,7 +3563,7 @@
             "singular": "{{count}} Gladys-Gerät wurde gelöscht.",
             "plural": "{{count}} Gladys-Geräte wurden gelöscht."
           },
-          "forcedWarning": "Das Gerät war nicht erreichbar: Es wurde aus Gladys entfernt, aber nicht darüber informiert. Setzen Sie es auf die Werkseinstellungen zurück, bevor Sie es erneut koppeln.",
+          "forcedWarning": "Das Gerät war nicht erreichbar: Es wurde aus dem Matter-Netzwerk von Gladys entfernt, aber nicht darüber informiert. Setzen Sie es auf die Werkseinstellungen zurück, bevor Sie es erneut koppeln.",
           "devicesNotDeleted": "Diese Gladys-Geräte konnten nicht gelöscht werden, vermutlich weil ihr Verlauf zu groß ist. Gladys bereinigt ihn gerade: Versuchen Sie es später im Tab „Geräte“ erneut."
         },
         "noNodesFound": "Keine Matter-Knoten gefunden. Du kannst ein Matter-Gerät hinzufügen, indem du auf der Registerkarte \"Gerät hinzufügen\" gehst.",

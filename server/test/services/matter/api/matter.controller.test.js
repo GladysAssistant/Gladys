@@ -141,6 +141,24 @@ describe('MatterController', () => {
     await controller['post /api/v1/service/matter/node/:node_id/decommission'].controller(req, res);
     assert.calledOnceWithExactly(matterHandler.decommission, 1234n, { deleteGladysDevices: true });
   });
+  it('should return the cause when a node can not be decommissioned', async () => {
+    matterHandler.decommission = fake.rejects(new Error('Impossible to remove'));
+    const req = {
+      params: {
+        node_id: '1234',
+      },
+    };
+    const json = fake.returns(null);
+    const res = {
+      status: fake.returns({ json }),
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/matter/node/:node_id/decommission'].controller(req, res);
+    assert.calledOnceWithExactly(res.status, 500);
+    assert.calledOnceWithExactly(json, { error: 'Impossible to remove' });
+    assert.notCalled(res.json);
+  });
   it('should only let an admin decommission a node', async () => {
     expect(controller['post /api/v1/service/matter/node/:node_id/decommission'].admin).to.equal(true);
   });
