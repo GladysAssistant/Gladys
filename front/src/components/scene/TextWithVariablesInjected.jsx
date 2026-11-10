@@ -106,6 +106,11 @@ class TextWithVariablesInjected extends Component {
     });
     const previousVariablesKey = this.state.variablesKey;
     await this.setState({ variableWhileList, variableReady, variablesKey });
+    // the field may be gone by now (the mobile scene editor remounts its step forms when the
+    // structure of the scene changes): there is no input left to bind Tagify to
+    if (this.unmounted) {
+      return;
+    }
     // we compare here the previous variables key
     // and the new one, and we compare if they are the same
     if (variablesKey !== previousVariablesKey) {
@@ -165,8 +170,10 @@ class TextWithVariablesInjected extends Component {
     }
   }
   componentWillUnmount() {
+    this.unmounted = true;
     if (this.tagify) {
       this.tagify.destroy();
+      this.tagify = null;
     }
   }
 

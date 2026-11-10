@@ -137,9 +137,7 @@ const ActionCard = ({ children, ...props }) => {
             </span>
             {summary && <span class={style.stepSummary}>{summary}</span>}
           </div>
-          {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
-            <div class="card-status bg-blue" />
-          )}
+          {props.highLightedActions && props.highLightedActions[props.path] && <div class="card-status bg-blue" />}
           <div class="card-options">
             <Localizer>
               <button

@@ -76,7 +76,15 @@ class Scene extends Component {
       if (alreadyKnown) {
         return null;
       }
-      return { runningScenes: [...prevState.runningScenes, payload] };
+      return {
+        runningScenes: [...prevState.runningScenes, payload],
+        // the server stamps last_executed when a run starts: the "last run" of the row follows
+        scenes: prevState.scenes.map(scene =>
+          scene.selector === payload.sceneSelector && payload.startedAt
+            ? { ...scene, last_executed: payload.startedAt }
+            : scene
+        )
+      };
     });
   };
   onSceneStopped = payload => {
@@ -109,7 +117,10 @@ class Scene extends Component {
       console.error(e);
     }
   };
-  updateURL = ({ sceneSearch, sceneTagSearch, orderDir }) => {
+  // The search, the tags and the order live together in the URL: changing one keeps the others
+  // (a search typed while a tag is selected filters inside that tag)
+  updateURL = changes => {
+    const { sceneSearch, sceneTagSearch, orderDir } = { ...this.getUrlParams(), ...changes };
     const urlParams = new URLSearchParams();
 
     // If we are updating the search

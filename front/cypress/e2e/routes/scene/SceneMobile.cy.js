@@ -34,6 +34,23 @@ describe('Scene on a phone', () => {
 
     // a new scene opens on the trigger picker
     cy.get('[data-cy="scene-trigger-sheet-0"]').should('be.visible');
+
+    // closing the picker without choosing, once the draft check has run, leaves nothing behind:
+    // the empty trigger the editor added by itself is not an unsaved change
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy="scene-trigger-sheet-0"]').should('not.exist');
+    cy.get('[data-cy=scene-run-button]').should('be.visible');
+    cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
+    // (the draft written while the picker was open goes with the debounced write)
+    cy.url().then(url => {
+      cy.window().should(win => {
+        expect(hasDraft(win, url.split('?')[0])).to.equal(false);
+      });
+    });
+
+    cy.get('[data-cy=scene-add-trigger]').click();
     cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy="type-picker-option"][data-value="house.empty"]').click();
     cy.get('body').type('{esc}');
     cy.get('[data-cy="scene-trigger-row-0"]').should('be.visible');
@@ -96,10 +113,49 @@ describe('Scene on a phone', () => {
     ).click();
     cy.get('body').type('{esc}');
 
+    // a condition deleted from the block's sheet: the sheet stays open, Undo stays within reach
+    cy.get('[data-cy="scene-step-row-1.0"]').click();
+    cy.get('[data-cy="scene-add-condition-1.0"]').click();
+    cy.get('[data-cy="scene-step-sheet-1.0.if.0"] [data-cy="type-picker-option"][data-value="house.is-empty"]').click();
+    cy.get('[data-cy="scene-step-sheet-delete-1.0.if.0"]').click();
+    cy.get('[data-cy="scene-step-sheet-1.0"]').should('be.visible');
+    cy.get('[data-cy="scene-step-row-1.0.if.0"]').should('not.exist');
+    cy.get('[data-cy=scene-toast-undo]').click();
+    cy.get('[data-cy="scene-step-row-1.0.if.0"]').should('be.visible');
+    cy.get('[data-cy="scene-step-sheet-1.0"]').should('be.visible');
+    cy.get('body').type('{esc}');
+
     cy.get('[data-cy="scene-add-to-1.0.then"]').click();
     cy.get('[data-cy="scene-step-sheet-1.0.then.0.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
     cy.get('body').type('{esc}');
     cy.get('[data-cy="scene-step-row-1.0.then.0.0"]').should('be.visible');
+
+    cy.get('[data-cy=scene-back-button]').click();
+    cy.get('[data-cy=scene-leave-discard]').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+  });
+
+  it('Should show a save error that can be closed', () => {
+    const sceneUrl = Cypress.env('mobileSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.visit(sceneUrl);
+
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy="type-picker-option"][data-value="delay"]').click();
+    cy.get('body').type('{esc}');
+
+    cy.intercept('PATCH', `${Cypress.env('serverUrl')}/api/v1/scene/*`, {
+      statusCode: 422,
+      body: { status: 422, code: 'UNPROCESSABLE_ENTITY', message: 'Validation error' }
+    }).as('refusedSave');
+    cy.get('[data-cy=scene-save-button]').click();
+    cy.wait('@refusedSave');
+    cy.get('[data-cy=scene-save-error]').should('be.visible');
+
+    // closing the alert only hides it: the changes stay unsaved
+    cy.get('[data-cy=scene-save-error-close]').click();
+    cy.get('[data-cy=scene-save-error]').should('not.exist');
+    cy.get('[data-cy=scene-unsaved-label]').should('be.visible');
 
     cy.get('[data-cy=scene-back-button]').click();
     cy.get('[data-cy=scene-leave-discard]').click();
@@ -298,6 +354,34 @@ describe('Scene on a phone', () => {
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(2000);
     cy.get('[data-cy=scene-draft-banner]').should('not.exist');
+  });
+
+  it('Should follow a run: the last run of the status line and the executing step', () => {
+    const sceneUrl = Cypress.env('mobileSceneUrl');
+    expect(sceneUrl).to.exist;
+    const sceneSelector = sceneUrl.split('/').pop();
+    cy.visit(sceneUrl);
+    cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+    cy.get('[data-cy=scene-last-run]').should('not.exist');
+
+    // the messages the server sends over a run (Cypress delivers the websocket messages itself)
+    cy.sendWebSocket({
+      type: 'scene.started',
+      payload: { executionId: 'cypress-run', sceneSelector, startedAt: new Date().toISOString() }
+    });
+    cy.get('[data-cy=scene-last-run]').should('be.visible');
+    // a run is not an unsaved change
+    cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
+
+    // the executing action is named by its path
+    cy.sendWebSocket({ type: 'scene.executing-action', payload: { path: '0.0' } });
+    cy.get('[data-cy="scene-step-row-0.0"]').should('have.attr', 'aria-current', 'step');
+    cy.sendWebSocket({ type: 'scene.finished-executing-action', payload: { path: '0.0' } });
+    cy.get('[data-cy="scene-step-row-0.0"]').should('not.have.attr', 'aria-current');
+
+    cy.sendWebSocket({ type: 'scene.stopped', payload: { executionId: 'cypress-run', sceneSelector } });
+    cy.get('[data-cy=scene-run-button]').should('be.visible');
+    cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
   });
 
   it('Should disable the scene from its status line', () => {

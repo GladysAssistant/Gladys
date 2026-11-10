@@ -29,6 +29,7 @@ const TimelineRow = ({ info, variant, running, onOpen, onDelete, dataCy }) => (
       onClick={onOpen}
       data-cy={dataCy}
       data-not-an-edit
+      aria-current={running ? 'step' : undefined}
     >
       <span class={cx(style.rowTile, info.colorClass)} aria-hidden="true">
         <i class={cx(info.icon, 'dark-mode-fe-none-filter')} />

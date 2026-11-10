@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { createPortal } from 'preact/compat';
 import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
@@ -115,7 +116,14 @@ class MobileEditScenePage extends Component {
   };
 
   deleteAction = path => {
-    this.closeAllSheets();
+    // a condition is deleted from its block's sheet: that sheet stays open, the user is still
+    // working on the block's conditions. Any other deletion goes back to the timeline.
+    const conditionIndex = path.lastIndexOf('.if.');
+    if (conditionIndex >= 0) {
+      this.setState({ sheets: [{ kind: ACTION_SHEET, key: path.slice(0, conditionIndex) }] });
+    } else {
+      this.closeAllSheets();
+    }
     this.props.deleteActionWithUndo(path);
   };
 
@@ -157,12 +165,15 @@ class MobileEditScenePage extends Component {
     language: get(this.props, 'user.language') || 'en'
   });
 
-  renderRow = (action, path, variant, extra = {}) => (
+  // the server names the executing action by its path, at every level (root steps and branches)
+  isRunning = path => Boolean(this.props.highLightedActions && this.props.highLightedActions[path]);
+
+  renderRow = (action, path, variant) => (
     <TimelineRow
       key={path}
       info={getActionRowInfo(action, path, this.getContext())}
       variant={variant}
-      running={extra.running}
+      running={this.isRunning(path)}
       onOpen={() => this.openSheet(ACTION_SHEET, path)}
       onDelete={() => this.deleteAction(path)}
       dataCy={`scene-step-row-${path}`}
@@ -181,9 +192,7 @@ class MobileEditScenePage extends Component {
       }
       group.forEach((action, actionIndex) => {
         const path = `${groupPath}.${actionIndex}`;
-        rows.push(
-          isBlockAction(action) ? this.renderBlock(action, path, 'nested') : this.renderRow(action, path, 'nested')
-        );
+        rows.push(isBlockAction(action) ? this.renderBlock(action, path) : this.renderRow(action, path, 'nested'));
       });
     });
     const isElse = branch === 'else';
@@ -216,11 +225,11 @@ class MobileEditScenePage extends Component {
     );
   };
 
-  renderBlock = (action, path, variant, extra = {}) => {
+  renderBlock = (action, path) => {
     const isWhile = action.type === ACTIONS.CONDITION.WHILE;
     return (
       <div key={path} class={style.card}>
-        {this.renderRow(action, path, 'flush', extra)}
+        {this.renderRow(action, path, 'flush')}
         <div class={style.branch}>
           {this.renderBranch(path, 'then', action.then, isWhile ? 'editScene.mobile.repeat' : 'editScene.mobile.then')}
           {!isWhile && this.renderBranch(path, 'else', action.else, 'editScene.mobile.else')}
@@ -261,7 +270,7 @@ class MobileEditScenePage extends Component {
 
   // Actions running at the same time: one card, with its own "add a simultaneous action" control.
   // An if/while block inside keeps its branches.
-  renderParallelGroup = (group, groupPath, isRunning = () => false) => (
+  renderParallelGroup = (group, groupPath) => (
     <div class={style.card} key={groupPath}>
       <div class={style.cardLabel}>
         <i class="fe fe-layers" aria-hidden="true" />
@@ -269,12 +278,9 @@ class MobileEditScenePage extends Component {
       </div>
       {group.map((action, actionIndex) => {
         const path = `${groupPath}.${actionIndex}`;
-        const extra = { running: isRunning(actionIndex) };
         return (
           <div class={style.cardDivider} key={actionIndex}>
-            {isBlockAction(action)
-              ? this.renderBlock(action, path, 'flush', extra)
-              : this.renderRow(action, path, 'flush', extra)}
+            {isBlockAction(action) ? this.renderBlock(action, path) : this.renderRow(action, path, 'flush')}
           </div>
         );
       })}
@@ -291,7 +297,7 @@ class MobileEditScenePage extends Component {
   );
 
   renderTimeline = () => {
-    const { scene, highLightedActions } = this.props;
+    const { scene } = this.props;
     // the trailing empty groups the data model keeps are not steps
     const steps = scene.actions
       .map((group, groupIndex) => ({ group, groupIndex }))
@@ -300,15 +306,12 @@ class MobileEditScenePage extends Component {
       const isLast = stepIndex === steps.length - 1;
       let content;
       if (group.length > 1) {
-        content = this.renderParallelGroup(group, `${groupIndex}`, actionIndex =>
-          Boolean(highLightedActions && highLightedActions[`${groupIndex}:${actionIndex}`])
-        );
+        content = this.renderParallelGroup(group, `${groupIndex}`);
       } else {
         const action = group[0];
-        const extra = { running: Boolean(highLightedActions && highLightedActions[`${groupIndex}:0`]) };
         content = isBlockAction(action)
-          ? this.renderBlock(action, `${groupIndex}.0`, 'card', extra)
-          : this.renderRow(action, `${groupIndex}.0`, 'card', extra);
+          ? this.renderBlock(action, `${groupIndex}.0`)
+          : this.renderRow(action, `${groupIndex}.0`, 'card');
       }
       return (
         <div class={style.timelineItem} key={groupIndex}>
@@ -467,14 +470,27 @@ class MobileEditScenePage extends Component {
       return null;
     }
     return (
-      <div class={style.errorBanner} role="alert">
-        <Text id="editScene.saveSceneError" />
-        {props.errorMessage && <div>{props.errorMessage}</div>}
-        {props.errorMessageId && (
-          <div>
-            <Text id={props.errorMessageId} fields={props.errorMessageFields} />
-          </div>
-        )}
+      <div class={style.errorBanner} role="alert" data-cy="scene-save-error">
+        <div class={style.errorBannerText}>
+          <Text id="editScene.saveSceneError" />
+          {props.errorMessage && <div>{props.errorMessage}</div>}
+          {props.errorMessageId && (
+            <div>
+              <Text id={props.errorMessageId} fields={props.errorMessageFields} />
+            </div>
+          )}
+        </div>
+        <Localizer>
+          <button
+            type="button"
+            class={style.errorBannerClose}
+            onClick={props.dismissError}
+            aria-label={<Text id="editScene.mobile.close" />}
+            data-cy="scene-save-error-close"
+          >
+            <i class="fe fe-x" aria-hidden="true" />
+          </button>
+        </Localizer>
       </div>
     );
   };
@@ -578,10 +594,10 @@ class MobileEditScenePage extends Component {
                     </span>
                     <span class={style.statusSub}>
                       {scene.last_executed ? (
-                        <>
+                        <span data-cy="scene-last-run">
                           <Text id="editScene.mobile.lastRun" />{' '}
                           <RelativeTime datetime={scene.last_executed} language={context.language} futureDisabled />
-                        </>
+                        </span>
                       ) : (
                         <Text id="editScene.mobile.neverRun" />
                       )}
@@ -697,8 +713,12 @@ class MobileEditScenePage extends Component {
             {this.renderError()}
             {this.renderBottomBar()}
           </div>
+        </div>
 
-          {props.toast && (
+        {/* on <body>, above the sheets: a condition is deleted from its block's sheet, which stays
+            open, and "Undo" must remain within reach */}
+        {props.toast &&
+          createPortal(
             <div class={style.toast} role="status" key={props.toast.id} data-cy="scene-toast">
               <span class={style.toastText}>
                 <Text id={props.toast.textId} />
@@ -708,9 +728,9 @@ class MobileEditScenePage extends Component {
                   <Text id="editScene.mobile.undo" />
                 </button>
               )}
-            </div>
+            </div>,
+            document.body
           )}
-        </div>
 
         {/* one sheet per trigger and per action, mounted for their whole life (E.4) */}
         {triggers.map((trigger, index) => (

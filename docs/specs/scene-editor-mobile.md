@@ -116,7 +116,10 @@ the leave guard would ask about a scene nobody edited.
 
 A failed save (client-side validation or server refusal) shows the existing error alert **and
 brings it into view**: the page scrolls to the alert on desktop; on a phone the error is shown in
-a sticky banner above the bottom bar, so it is visible wherever the user is.
+a sticky banner above the bottom bar, so it is visible wherever the user is. That banner sits over
+the timeline the user has to reach to fix the step: it has a **close button** (44 px) and its text
+never grows past 30 % of the screen height (it scrolls inside). Closing it only hides the alert,
+the changes stay unsaved.
 
 ### C.4 Fields never trigger the iOS zoom
 
@@ -137,7 +140,9 @@ is wrong inside an if block.
 
 From top to bottom: the page title, a full-width search field (16 px), a horizontally scrolling row
 of **tag chips** ("All" + one chip per tag, multi-select, same URL parameters as today: `search`,
-`tags`), then the scene rows. The sort select is not shown on a phone (the order of the URL is
+`tags`), then the scene rows. The search, the tags and the order **combine**: changing one keeps the
+others in the URL (typing a search while a tag is selected filters inside that tag; this holds for
+the desktop list too). The sort select is not shown on a phone (the order of the URL is
 still applied). A **floating "+" button** (60 px, bottom right, above the safe area) creates a
 scene.
 
@@ -145,7 +150,11 @@ scene.
 
 A row is ≥ 64 px high and holds: the scene icon tile (44 px), the name (16 px, one line), the
 description (one line, ellipsis), and a third line with the last execution ("Last run 6 hours ago",
-from `last_executed`, relative and localized; "Never run" when null). A disabled scene shows a gray
+from `last_executed`, relative and localized; "Never run" when null). The scene manager stamps
+`last_executed` when a run starts (`scene.execute`: a write that is not awaited, never fails the
+run and leaves `updated_at` alone), and a scene update never overwrites it (`scene.update` drops
+the field: an editor saves the scene it loaded before the run). The row follows the
+`scene.started` websocket event, whose payload carries `startedAt`. A disabled scene shows a gray
 icon tile and a "Disabled ·" prefix on its second line. Tapping the row opens the editor (keeping
 the list's search and tags in the URL, as today). On the right, a **44 px round play button** starts
 the scene; while it runs, the button becomes the existing running/stop control (`RunningStopButton`).
@@ -207,8 +216,11 @@ The action groups of the root level render as a **numbered vertical timeline**:
   actions is an "AT THE SAME TIME" card with its own "+ Simultaneous action" button), each level
   indented behind a thin rail (blue for Then / Repeat, gray for Else).
 - The trailing empty groups the data model keeps at the end of every level are never rendered.
-- While the scene runs, the root row whose action is executing is marked (the existing
-  `scene.executing-action` websocket events, already used by the desktop editor).
+- While the scene runs, the row whose action is executing is marked, at every level (root steps
+  and branches). The `scene.executing-action` / `scene.finished-executing-action` websocket
+  events name the action by its **path** (`{ path: "2.0.then.0.0" }`), the same path the editor
+  gives each step: the desktop card and the mobile row are both matched on it. Actions of a group
+  run at the same time and are each marked on their own.
 - "+ Add a step" (dashed, full width) ends the timeline; a scene with no step shows "Add a first
   step" instead. A hint says rows can be swiped.
 
@@ -250,7 +262,10 @@ its own, and **focuses its search field** when it opens.
   D.3). The sheet's "Delete" button does the same.
 - A deletion shows a toast "Step deleted" / "Trigger deleted" / "Condition deleted" with **Undo**
   for 5 seconds. Undo restores the scene (and its variables) as they were just before the deletion,
-  except the active switch, which keeps its current (server) value.
+  except the active switch and the last run, which keep their current (server) values.
+- Deleting a **condition** leaves the sheet of its block open (the user is still working on the
+  block's conditions); any other deletion goes back to the timeline. The toast is rendered on
+  `<body>`, above the sheets, so Undo stays within reach.
 - Deleting the scene itself is confirmed in a sheet ("Delete “<name>”? This cannot be undone.").
 
 ### E.7 Bottom bar
@@ -312,9 +327,11 @@ bar) leaves the mode. Steps inside branches keep their order in this phase (G).
 
 - Cypress, desktop viewport (unchanged default): the existing scene specs keep passing.
 - Cypress, phone viewport (`cy.viewport('iphone-x')`), `front/cypress/e2e/routes/scene/SceneMobile.cy.js`:
-  create a scene from the "+" sheet (name only), add a trigger and a step through the type picker
+  create a scene from the "+" sheet (name only), cancel its trigger picker without being left with
+  an unsaved change, add a trigger and a step through the type picker
   sheets, see the bottom bar switch to "unsaved", save, delete a step from its sheet and undo, get
-  the leave guard on "‹ Scenes", add a step to the Then branch of an if block, leave a scene the
+  the leave guard on "‹ Scenes", add a step to the Then branch of an if block, delete a condition
+  from its block's sheet (the sheet stays, Undo is reachable), close a save error, leave a scene the
   forms normalize without being asked, get a
   draft back after a reload, disable the scene from its status line, delete it from the menu.
 - The swipe gesture itself (`SwipeRow`) is not driven by Cypress: the pointer events Cypress

@@ -455,7 +455,18 @@ class EditScene extends Component {
       if (alreadyKnown) {
         return null;
       }
-      return { runningScenes: [...prevState.runningScenes, payload] };
+      const newState = { runningScenes: [...prevState.runningScenes, payload] };
+      // the server stamps last_executed when a run starts: the status line follows, and the saved
+      // snapshot with it (a run is not an unsaved change)
+      if (prevState.scene && payload.startedAt) {
+        newState.scene = { ...prevState.scene, last_executed: payload.startedAt };
+        if (prevState.savedSceneSnapshot) {
+          const snapshot = JSON.parse(prevState.savedSceneSnapshot);
+          snapshot.last_executed = payload.startedAt;
+          newState.savedSceneSnapshot = JSON.stringify(snapshot);
+        }
+      }
+      return newState;
     });
   };
   onSceneStopped = payload => {
@@ -670,8 +681,11 @@ class EditScene extends Component {
         // flip, and writing it to the snapshot would show an unsaved change although both
         // requests succeeded. The snapshot always holds what the server last acknowledged,
         // so that value is the one kept.
+        // The same goes for "last_executed", which the server stamps when a run starts.
         if (prevState.savedSceneSnapshot) {
-          savedScene.active = JSON.parse(prevState.savedSceneSnapshot).active;
+          const acknowledged = JSON.parse(prevState.savedSceneSnapshot);
+          savedScene.active = acknowledged.active;
+          savedScene.last_executed = acknowledged.last_executed;
         }
         const savedSceneSnapshot = JSON.stringify(savedScene);
         return JSON.stringify(prevState.scene) === sceneSnapshotBeforeSave
@@ -1159,21 +1173,27 @@ class EditScene extends Component {
     });
   };
 
-  highlighCurrentlyExecutedAction = ({ columnIndex, rowIndex }) => {
-    this.setState({
-      highLightedActions: {
-        [`${columnIndex}:${rowIndex}`]: true
-      }
-    });
+  // The server names the executing action by its path ("1.0", "2.0.then.0.0"), the same path the
+  // editor gives each step. Actions of a group run at the same time: each one is marked on its own.
+  highlighCurrentlyExecutedAction = ({ path }) => {
+    this.setState(prevState => ({
+      highLightedActions: { ...prevState.highLightedActions, [path]: true }
+    }));
   };
-  removeHighlighAction = ({ columnIndex, rowIndex }) => {
+  removeHighlighAction = ({ path }) => {
     setTimeout(() => {
-      this.setState({
-        highLightedActions: {
-          [`${columnIndex}:${rowIndex}`]: false
-        }
-      });
+      if (this.unmounted) {
+        return;
+      }
+      this.setState(prevState => ({
+        highLightedActions: { ...prevState.highLightedActions, [path]: false }
+      }));
     }, 500);
+  };
+
+  // The save error alert can be closed: on a phone it sits in the bottom bar, over the timeline
+  dismissError = () => {
+    this.setState({ error: false, errorMessage: null, errorMessageId: null });
   };
 
   askDeleteCurrentScene = async () => {
@@ -1915,8 +1935,13 @@ class EditScene extends Component {
     const snapshot = this.undoSnapshot;
     this.undoSnapshot = null;
     this.hideToast();
-    // the active switch was patched on its own: undo never puts it back out of sync with the server
-    const scene = { ...snapshot.scene, active: this.state.scene.active };
+    // the active switch was patched on its own, and a run moved last_executed: undo never puts
+    // them back out of sync with the server
+    const scene = {
+      ...snapshot.scene,
+      active: this.state.scene.active,
+      last_executed: this.state.scene.last_executed
+    };
     this.setState(prevState => ({
       scene,
       variables: snapshot.variables,
@@ -1991,8 +2016,12 @@ class EditScene extends Component {
   };
 
   // The index is read inside the update: two quick taps add two triggers, each with its own sheet
-  addTriggerAndGetIndex = () =>
-    new Promise(resolve => {
+  addTriggerAndGetIndex = () => {
+    // Adding a trigger is an edit, also when the editor does it by itself (a scene just created
+    // opens on the trigger picker): the draft check must never fold that empty trigger into the
+    // saved version, or cancelling the picker would read as an unsaved change
+    this.userActed = true;
+    return new Promise(resolve => {
       let index;
       this.setState(
         prevState => {
@@ -2005,6 +2034,7 @@ class EditScene extends Component {
         () => resolve(index)
       );
     });
+  };
 
   deleteActionWithUndo = path => {
     this.takeUndoSnapshot();
@@ -2096,11 +2126,13 @@ class EditScene extends Component {
     this.getThermostatSchedules();
     this.getTags();
     this.getRunningScenes();
-    this.props.session.dispatcher.addListener('scene.executing-action', payload =>
-      this.highlighCurrentlyExecutedAction(payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
+      this.highlighCurrentlyExecutedAction
     );
-    this.props.session.dispatcher.addListener('scene.finished-executing-action', payload =>
-      this.removeHighlighAction(payload)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
+      this.removeHighlighAction
     );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
@@ -2130,6 +2162,14 @@ class EditScene extends Component {
     this.pendingLeave = null;
     clearTimeout(this.toastTimer);
     document.removeEventListener('click', this.closeEdition, true);
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
+      this.highlighCurrentlyExecutedAction
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
+      this.removeHighlighAction
+    );
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
     if (this.ticker) {
@@ -2218,6 +2258,7 @@ class EditScene extends Component {
       askDeleteCurrentScene: this.askDeleteCurrentScene,
       cancelDeleteCurrentScene: this.cancelDeleteCurrentScene,
       goBack: this.goBack,
+      dismissError: this.dismissError,
       draftToRestore,
       restoreDraft: this.restoreDraft,
       discardDraft: this.discardDraft

@@ -833,14 +833,45 @@
   background-color: #e8892b;
 }
 
+/* closable, and never taller than a third of the screen: it sits over the timeline the user has
+   to reach to fix the step */
 .errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
   margin-bottom: 10px;
-  padding: 10px 12px;
+  padding: 10px 4px 10px 12px;
   border-radius: 12px;
   background-color: #fdeaea;
   color: #8c1f1f;
   font-size: 0.875rem;
   line-height: 1.4;
+}
+
+.errorBannerText {
+  flex: 1;
+  min-width: 0;
+  max-height: 30vh;
+  max-height: 30dvh;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+
+.errorBannerClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 1.125rem;
+  cursor: pointer;
 }
 
 /* the running/stop control fills the bottom bar, or sits beside Save when there are changes */
@@ -860,7 +891,8 @@
   left: 16px;
   right: 16px;
   bottom: calc(96px + env(safe-area-inset-bottom, 0px));
-  z-index: 1070;
+  /* rendered on <body>, above any stack of sheets (1060 + 2 per level) */
+  z-index: 1200;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1007,11 +1039,13 @@
   outline: none;
 }
 
+/* edge to edge: the negative margin is the side padding of the page container (12px), no more,
+   or the page itself would scroll sideways */
 .chips {
   display: flex;
   gap: 8px;
-  margin: 0 -16px;
-  padding: 0 16px 4px;
+  margin: 0 -12px;
+  padding: 0 12px 4px;
   overflow-x: auto;
   scrollbar-width: none;
 }
