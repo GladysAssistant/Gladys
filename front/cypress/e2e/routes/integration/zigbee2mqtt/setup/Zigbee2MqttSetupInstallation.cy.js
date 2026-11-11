@@ -73,7 +73,8 @@ describe('Zigbee2mqtt installation progress', () => {
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: setup }).as('config');
     cy.intercept(
       { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch` },
-      { body: prefetchResponse }
+      // Or a handler of the request
+      typeof prefetchResponse === 'function' ? prefetchResponse : { body: prefetchResponse }
     ).as('prefetch');
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   };
@@ -229,6 +230,8 @@ describe('Zigbee2mqtt installation progress', () => {
     );
     visitSetup({ ...readyToSetupStatus, installation: runningInstallation, prefetch });
     cy.get('[data-cy=z2m-installation-progress]').should('exist');
+    // Loaded after the status
+    cy.wait('@config');
 
     // The load at the end of the installation, read before the save, answers after it
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { delay: 3000, body: {} }).as(
@@ -253,22 +256,58 @@ describe('Zigbee2mqtt installation progress', () => {
   it('should keep the end of an installation received before the status, read while it was running', () => {
     visitSetup(
       { ...readyToSetupStatus, usbConfigured: true, installation: runningInstallation, prefetch },
-      { setup: localSetup, statusDelay: 2000 }
+      // Long enough for the message and the check that the configuration is not read meanwhile
+      { setup: localSetup, statusDelay: 5000 }
     );
-    // The app opens its websocket as it starts: it is open once the configuration, not delayed, is loaded
-    cy.wait('@config');
+    cy.waitForWebSocket();
     cy.sendWebSocket({
       type: 'zigbee2mqtt.install-progress',
       payload: { installation: doneInstallation, prefetch }
     });
+    // Read after the status, the configuration is the one saved by the installation
+    cy.get('@config.all').should('have.length', 0);
     cy.wait('@status');
+    cy.wait('@config');
 
     cy.get('#enableZigbee2mqtt').should('not.be.disabled');
     cy.get('[data-cy=z2m-reset-button]').should('not.be.disabled');
     cy.get('[data-cy=z2m-setup-local-summary] button').should('not.be.disabled');
     cy.get('[data-cy=z2m-installation-progress]').should('not.exist');
-    // Loaded alongside the status, the configuration may predate the end of the installation: it is loaded again
-    cy.wait('@config');
+  });
+
+  it('should download the images in the background once the server tells it runs in Docker', () => {
+    // Whether the server told it runs in Docker when each download was asked
+    const toldDockerWhenAsked = [];
+    let toldDocker = false;
+    // Gladys just restarted: the integration has not started yet
+    visitSetup(
+      { ...readyToSetupStatus, dockerBased: false, networkModeValid: false },
+      {
+        prefetchResponse: req => {
+          toldDockerWhenAsked.push(toldDocker);
+          req.reply({ body: prefetch });
+        }
+      }
+    );
+    // Shown once the status and the configuration are loaded, when the page would have asked for the download
+    cy.get('[data-cy=z2m-setup-local-panel] button').should('be.disabled');
+
+    cy.then(() => {
+      toldDocker = true;
+    });
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.status-change',
+      payload: { ...readyToSetupStatus, installation: idleInstallation, prefetch }
+    });
+    cy.wait('@prefetch');
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.status-change',
+      payload: { ...readyToSetupStatus, installation: idleInstallation, prefetch }
+    });
+    // Asks for the USB ports, after the page would have asked for the download again
+    chooseLocalMode();
+
+    cy.wrap(toldDockerWhenAsked).should('deep.equal', [true]);
   });
 
   it('should tell that the disk space is missing to download Zigbee2mqtt', () => {

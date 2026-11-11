@@ -19,7 +19,8 @@ const LAYER_PROGRESS_BY_STATUS = {
  * @description Add a progress event of a pull to the layers of the image seen so far.
  * @param {object} layers - Layers seen so far, by id: what the previous call returned, or {} before the first event.
  * @param {object} event - Progress event sent by Docker, like { status: 'Downloading', id, progressDetail }.
- * @returns {object} The layers seen so far, with this event, without changing the layers given.
+ * @returns {object} The layers seen so far, with this event, without changing the layers given: the same object when
+ * the event tells nothing new, so that the caller knows whether the pull made progress.
  * @example
  * layers = addPullEvent(layers, { status: 'Downloading', id: '8a49fdb3b6a5', progressDetail: { current: 5 } });
  */
@@ -29,14 +30,24 @@ function addPullEvent(layers, event) {
     return layers;
   }
   const previousLayer = layers[id] || {};
+  const layer = {
+    status,
+    current: progressDetail.current || 0,
+    // Only the downloading and extracting events tell the size of the layer
+    total: progressDetail.total || previousLayer.total || null,
+  };
+  // Docker repeats the position of each layer at a fixed pace with its containerd image store, even when the download
+  // makes no progress
+  if (
+    layer.status === previousLayer.status &&
+    layer.current === previousLayer.current &&
+    layer.total === previousLayer.total
+  ) {
+    return layers;
+  }
   return {
     ...layers,
-    [id]: {
-      status,
-      current: progressDetail.current || 0,
-      // Only the downloading and extracting events tell the size of the layer
-      total: progressDetail.total || previousLayer.total || null,
-    },
+    [id]: layer,
   };
 }
 

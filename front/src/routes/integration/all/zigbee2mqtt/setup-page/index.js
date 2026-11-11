@@ -64,14 +64,6 @@ class Zigbee2mqttSetupPage extends Component {
         zigbee2mqttStatus: { ...zigbee2mqttStatus, installation, prefetch },
         loadZigbee2mqttStatus: RequestStatus.Success
       });
-      // The installation ended during the request: the configuration loaded alongside may predate its end
-      if (
-        outdated &&
-        get(zigbee2mqttStatus, 'installation.state') === 'running' &&
-        get(installation, 'state') !== 'running'
-      ) {
-        this.handleInstallationEnd();
-      }
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service status', e);
       if (!this.unmounted) {
@@ -104,11 +96,14 @@ class Zigbee2mqttSetupPage extends Component {
     }
   };
 
-  // Nothing configured yet: the images are downloaded in the background, so that the installation does not wait for them
+  // Nothing configured yet: the images are downloaded in the background, so that the installation does not wait for them.
+  // Asked once, as soon as the page knows it can: on a Gladys that just restarted, the server tells that it runs in
+  // Docker with the host network only once it started the integration, after the page opened.
   prefetchImages = async () => {
     const { loadZigbee2mqttStatus, loadZigbee2mqttConfig, configuration, zigbee2mqttStatus } = this.state;
     const { dockerBased, networkModeValid, installation } = zigbee2mqttStatus;
     if (
+      this.prefetchRequested ||
       loadZigbee2mqttStatus !== RequestStatus.Success ||
       loadZigbee2mqttConfig !== RequestStatus.Success ||
       configuration.z2mDriverPath ||
@@ -120,6 +115,7 @@ class Zigbee2mqttSetupPage extends Component {
     ) {
       return;
     }
+    this.prefetchRequested = true;
     const { progressMessages } = this;
     try {
       const prefetch = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/prefetch');
@@ -227,8 +223,10 @@ class Zigbee2mqttSetupPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS,
       this.handleInstallProgress
     );
-    await Promise.all([this.loadZ2MStatus(), this.loadZ2MConfig()]);
-    this.prefetchImages();
+    // The configuration is read after the status: a status that tells the end of an installation comes with the
+    // configuration saved by it, and a status that tells an installation running is followed by the message of its end
+    await this.loadZ2MStatus();
+    await this.loadZ2MConfig();
   }
 
   componentDidUpdate(previousProps, previousState) {
@@ -237,6 +235,7 @@ class Zigbee2mqttSetupPage extends Component {
     if (previousInstallationState === 'running' && (installationState === 'done' || installationState === 'failed')) {
       this.handleInstallationEnd();
     }
+    this.prefetchImages();
   }
 
   componentWillUnmount() {
