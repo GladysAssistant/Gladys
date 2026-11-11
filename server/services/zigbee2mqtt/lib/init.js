@@ -274,11 +274,11 @@ async function initialize(setupMode) {
  * await z2m.init();
  */
 async function init(setupMode = false) {
-  this.runningInits += 1;
+  this.runningOperations += 1;
   try {
     return await initialize.call(this, setupMode);
   } finally {
-    this.runningInits -= 1;
+    this.runningOperations -= 1;
     // Kept for the containers of this init only: a later call downloads again
     this.imagePullFailures = {};
   }

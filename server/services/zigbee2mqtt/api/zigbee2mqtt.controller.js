@@ -1,6 +1,7 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 const { BadParameters } = require('../../../utils/coreErrors');
+const { ADAPTER_MODE } = require('../lib/constants');
 
 module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   /**
@@ -126,8 +127,18 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function installZ2mContainer(req, res) {
     logger.debug('Install Z2M container');
+    // The coordinator passed to Zigbee2mqtt, and the broker account it connects with
+    const configuration = await zigbee2mqttManager.getConfiguration();
+    // Once the configuration is read, with no wait until Zigbee2mqtt is installed
     zigbee2mqttManager.refuseWhileInstalling('start Zigbee2mqtt');
-    await zigbee2mqttManager.installZ2mContainer();
+    // Saved by the setup: without it, the container would be created without a coordinator. The one of the adapter
+    // mode, as init reads it.
+    const { z2mAdapterMode, z2mDriverPath, z2mNetworkAdapterUrl } = configuration;
+    const coordinator = z2mAdapterMode === ADAPTER_MODE.NETWORK ? z2mNetworkAdapterUrl : z2mDriverPath;
+    if (!coordinator) {
+      throw new BadParameters('Zigbee2mqtt: no Zigbee coordinator is configured yet, save the setup first');
+    }
+    await zigbee2mqttManager.installZ2mContainer(configuration);
     res.json({
       success: true,
     });

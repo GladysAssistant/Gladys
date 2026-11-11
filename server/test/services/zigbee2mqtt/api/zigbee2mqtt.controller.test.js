@@ -188,16 +188,51 @@ describe('zigbee2mqtt API', () => {
     });
   });
 
-  it('post /api/v1/service/zigbee2mqtt/z2m/start', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
+  [
+    ['a USB dongle', { z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB0', z2mMqttPassword: 'z2m-password' }],
+    ['a USB dongle of an old installation without adapter mode', { z2mDriverPath: '/dev/ttyUSB0' }],
+    ['a network coordinator', { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' }],
+  ].forEach(([label, configuration]) => {
+    it(`post /api/v1/service/zigbee2mqtt/z2m/start with ${label}`, async () => {
+      // PREPARE
+      zigbee2mqttManager.getConfiguration = fake.resolves(configuration);
+      const req = {};
+      const res = {
+        json: fake.returns(null),
+      };
+      // EXECUTE
+      await controller['post /api/v1/service/zigbee2mqtt/z2m/start'].controller(req, res);
+      // ASSERT
+      assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'start Zigbee2mqtt');
+      // The stored configuration, which gives the coordinator and the broker account to the container
+      assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, configuration);
+      assert.calledWith(res.json, { success: true });
+    });
+  });
 
-    await controller['post /api/v1/service/zigbee2mqtt/z2m/start'].controller(req, res);
-    assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'start Zigbee2mqtt');
-    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
-    assert.calledWith(res.json, { success: true });
+  [
+    ['the integration was never set up', { z2mAdapterMode: null, z2mDriverPath: null, z2mNetworkAdapterUrl: null }],
+    // The port left by a USB dongle used before is not the coordinator of the network mode
+    ['the network mode has no URL', { z2mAdapterMode: 'network', z2mDriverPath: '/dev/ttyUSB0' }],
+    ['the USB mode has no port', { z2mAdapterMode: 'usb', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' }],
+  ].forEach(([label, configuration]) => {
+    it(`post /api/v1/service/zigbee2mqtt/z2m/start should be refused when ${label}`, async () => {
+      // PREPARE
+      zigbee2mqttManager.getConfiguration = fake.resolves(configuration);
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller['post /api/v1/service/zigbee2mqtt/z2m/start'].controller({}, res, next);
+      // ASSERT
+      // Answered with a 400 by the error middleware, instead of a container created without a coordinator
+      const [error] = next.firstCall.args;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Zigbee2mqtt: no Zigbee coordinator is configured yet, save the setup first');
+      assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+      assert.notCalled(res.json);
+    });
   });
 
   it('post /api/v1/service/zigbee2mqtt/disconnect', async () => {
@@ -246,8 +281,8 @@ describe('zigbee2mqtt API', () => {
     assert.calledWith(res.json, { success: true });
   });
 
-  // An installation or an init in progress would undo them (containers recreated, configuration saved), or run
-  // alongside them
+  // An installation or an operation in progress (init, disconnect, reset, ezsp fallback) would undo them (containers
+  // recreated or removed, configuration saved or destroyed), or run alongside them
   [
     ['connect', 'connect', 'init'],
     ['mqtt/start', 'start the MQTT broker', 'installMqttContainer'],
@@ -255,7 +290,7 @@ describe('zigbee2mqtt API', () => {
     ['disconnect', 'disconnect', 'disconnect'],
     ['reset', 'reset', 'reset'],
   ].forEach(([route, action, method]) => {
-    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused while an installation or an init runs`, async () => {
+    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused while an installation or an operation runs`, async () => {
       // PREPARE
       const conflict = new ConflictError(`Zigbee2mqtt: cannot ${action} while an installation is running`);
       zigbee2mqttManager.refuseWhileInstalling = fake.throws(conflict);

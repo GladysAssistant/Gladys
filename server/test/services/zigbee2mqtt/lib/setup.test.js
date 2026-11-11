@@ -233,14 +233,14 @@ describe('zigbee2mqtt setup', () => {
 
   it('should refuse a setup while an init runs, as at the start of Gladys', async () => {
     // PREPARE
-    zigbee2MqttManager.runningInits = 1;
+    zigbee2MqttManager.runningOperations = 1;
     // EXECUTE
     const promise = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
     // ASSERT
     // The init of the installation would run alongside it
     await expect(promise).to.be.rejectedWith(
       ConflictError,
-      'Zigbee2mqtt: cannot save the setup while the integration is starting',
+      'Zigbee2mqtt: cannot save the setup while the integration is busy',
     );
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(zigbee2MqttManager.runInstallation);

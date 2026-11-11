@@ -66,6 +66,21 @@ describe('zigbee2mqtt finishInstallation', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.emitInstallProgress);
   });
 
+  it('should tell done a phase left running once the installation succeeded', () => {
+    // PREPARE
+    sinon.stub(logger, 'info');
+    // A broker slow to answer during an update: its start is left running, the update goes on
+    zigbee2mqttManager.updateInstallationPhase('start_mqtt', { state: 'running' });
+    // EXECUTE
+    zigbee2mqttManager.finishInstallation(null);
+    // ASSERT
+    expect(zigbee2mqttManager.installation.phases.find((phase) => phase.key === 'start_mqtt')).to.deep.equal({
+      key: 'start_mqtt',
+      state: 'done',
+      progress: 100,
+    });
+  });
+
   it('should tell why Zigbee2mqtt failed to start, and the phase that failed', () => {
     // PREPARE
     const warnStub = sinon.stub(logger, 'warn');
