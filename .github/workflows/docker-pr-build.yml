@@ -30,7 +30,7 @@ jobs:
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -68,7 +68,7 @@ jobs:
           persist-credentials: false
       - name: 💽 Setup nodejs
         id: setup-node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'
@@ -119,7 +119,7 @@ jobs:
           fetch-depth: 2
       - name: 💽 Setup nodejs
         id: setup-node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'
@@ -183,7 +183,7 @@ jobs:
           persist-credentials: false
       - name: 💽 Setup nodejs
         id: setup-node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -242,7 +242,7 @@ jobs:
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
