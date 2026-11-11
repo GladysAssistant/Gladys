@@ -42,7 +42,7 @@ jobs:
               ;;
           esac
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v
+        uses: actions/checkout@v7
         with:
           # Always release from the current tip of master, not from the commit
           # master pointed at when the workflow was dispatched.
