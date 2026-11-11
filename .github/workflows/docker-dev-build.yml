@@ -75,6 +75,7 @@ jobs:
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
         with:
           version: latest
+          cache-binary: false
       - name: ↙️ Download build artifact
         uses: actions/download-artifact@v8
         with:
