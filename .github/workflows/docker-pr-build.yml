@@ -26,7 +26,7 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
@@ -63,7 +63,7 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
@@ -113,7 +113,7 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 2
@@ -178,7 +178,7 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
@@ -238,7 +238,7 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
@@ -278,7 +278,7 @@ jobs:
       pull-requests: write
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 🏷️ Compute image tag from branch name

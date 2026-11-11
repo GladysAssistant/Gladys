@@ -19,7 +19,7 @@ jobs:
     environment: production
     name: Build and publish demo website
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs

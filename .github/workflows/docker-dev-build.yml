@@ -20,7 +20,7 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
@@ -58,7 +58,7 @@ jobs:
       DOCKERHUB_REPO: ${{vars.DOCKERHUB_REPO}}
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 🐳 Docker meta
