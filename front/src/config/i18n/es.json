@@ -1909,7 +1909,7 @@
           },
           "leavePage": "Puede salir de esta página: la instalación continúa.",
           "failedPhase": "Paso fallido:",
-          "alreadyRunning": "Hay una instalación en curso o la integración se está iniciando: espere a que termine antes de guardar de nuevo la configuración.",
+          "alreadyRunning": "Hay una instalación en curso o la integración está ocupada (inicio, parada o restablecimiento): espere a que termine antes de guardar de nuevo la configuración.",
           "errors": {
             "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos posteriores a su inicio, sin indicar por qué. Compruebe que el modelo elegido es el de su coordinador, desconecte y vuelva a conectar su adaptador o reinicie su coordinador de red, y después guarde de nuevo la configuración.",
             "DONGLE_NOT_FOUND": "Su adaptador Zigbee no está conectado (o no en el puerto elegido): Zigbee2MQTT no ha podido iniciarse. Conéctelo, compruebe el puerto elegido y después guarde de nuevo la configuración.",
