@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
-import { EXPOSURE_MODES } from './actions';
+import { EXPOSURE_MODES, ERROR_CODES } from './actions';
 import style from './style.css';
 
 // Vendor ids of the main Matter ecosystems, from the CSA vendor list: a paired ecosystem is shown
@@ -200,6 +200,31 @@ const ResetSection = props => (
   </div>
 );
 
+// Why a bridge turned on is not running. The errors the page can explain get their own message;
+// any other one is shown as the server reported it.
+const StartError = ({ status }) => {
+  if (status.errorCode === ERROR_CODES.MATTERBRIDGE_ENABLED) {
+    return (
+      <div class="alert alert-danger">
+        <MarkupText id="integration.matter-bridge.matterbridgeEnabledStartError" fields={{ port: status.port }} />
+      </div>
+    );
+  }
+  if (status.errorCode === ERROR_CODES.PORT_IN_USE) {
+    return (
+      <div class="alert alert-danger">
+        <Text id="integration.matter-bridge.portInUse" fields={{ port: status.port }} />
+      </div>
+    );
+  }
+  return (
+    <div class="alert alert-danger">
+      <Text id="integration.matter-bridge.startError" />
+      <pre class="mb-0 mt-2">{status.error}</pre>
+    </div>
+  );
+};
+
 const MatterBridgePage = props => {
   const status = props.matterBridgeStatus;
 
@@ -241,11 +266,21 @@ const MatterBridgePage = props => {
                 <p>
                   <MarkupText id="integration.matter-bridge.introduction" />
                 </p>
-                <div class="alert alert-warning">
-                  <Text id="integration.matter-bridge.disabledWarning" />
-                </div>
+                {status.matterbridgeEnabled ? (
+                  <div class="alert alert-warning">
+                    <MarkupText id="integration.matter-bridge.matterbridgeEnabled" fields={{ port: status.port }} />
+                  </div>
+                ) : (
+                  <div class="alert alert-warning">
+                    <Text id="integration.matter-bridge.disabledWarning" />
+                  </div>
+                )}
                 <div class="form-group">
-                  <button class="btn btn-success" onClick={props.enableMatterBridge}>
+                  <button
+                    class="btn btn-success"
+                    onClick={props.enableMatterBridge}
+                    disabled={status.matterbridgeEnabled}
+                  >
                     <Text id="integration.matter-bridge.enableButton" />
                   </button>
                 </div>
@@ -257,12 +292,7 @@ const MatterBridgePage = props => {
                 <div class="alert alert-info">
                   <Text id="integration.matter-bridge.enabledDescription" />
                 </div>
-                {status.error && (
-                  <div class="alert alert-danger">
-                    <Text id="integration.matter-bridge.startError" />
-                    <pre class="mb-0 mt-2">{status.error}</pre>
-                  </div>
-                )}
+                {status.error && <StartError status={status} />}
                 {status.running && <PairingSection status={status} qrCode={props.matterBridgeQrCode} />}
                 {props.matterBridgeForm && <ExposureSection {...props} />}
                 <div class="form-group mt-5">

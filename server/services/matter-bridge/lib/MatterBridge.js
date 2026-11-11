@@ -2,12 +2,13 @@ const fse = require('fs-extra');
 
 const logger = require('../../../utils/logger');
 const { EVENTS } = require('../../../utils/constants');
-const { BadParameters } = require('../../../utils/coreErrors');
+const { BadParameters, ConflictError } = require('../../../utils/coreErrors');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 const {
   VARIABLES,
   EXPOSURE_MODES,
   MATTER_BRIDGE_PORT,
+  ERROR_CODES,
   NODE_ID,
   AGGREGATOR_ID,
   VENDOR_ID,
@@ -38,6 +39,7 @@ function MatterBridge(gladys, serviceId, loadMatter) {
   this.server = null;
   this.aggregator = null;
   this.lastError = null;
+  this.lastErrorCode = null;
   // Device id -> { selector, name, signature, built }
   this.devices = new Map();
   this.bindings = new Bindings(gladys);
@@ -83,6 +85,54 @@ MatterBridge.prototype.isEnabled = async function isEnabled() {
 };
 
 /**
+ * @description Tell if the Matterbridge integration is enabled. Its container runs on the host
+ * network and listens on the standard Matter port, the one the bridge needs: both cannot run.
+ * @returns {Promise<boolean>} True when the Matterbridge integration is enabled.
+ * @example
+ * await bridge.isMatterbridgeEnabled();
+ */
+MatterBridge.prototype.isMatterbridgeEnabled = async function isMatterbridgeEnabled() {
+  const matterbridge = this.gladys.service.getService('matterbridge');
+  if (!matterbridge || !matterbridge.device) {
+    return false;
+  }
+  return matterbridge.device.isEnabled();
+};
+
+/**
+ * @description Tell if an error comes from a port another program already listens on. The
+ * matter.js library throws an AddressInUseError, possibly as the cause of the error it reports.
+ * @param {Error} error - Error thrown while starting the node.
+ * @returns {boolean} True when the Matter port is already in use.
+ * @example
+ * bridge.isPortInUse(error);
+ */
+MatterBridge.prototype.isPortInUse = function isPortInUse(error) {
+  // matter.js may have failed to load: then it threw nothing of its own.
+  const AddressInUseError = this.matter && this.matter.main.AddressInUseError;
+  let current = error;
+  while (current) {
+    if ((AddressInUseError && current instanceof AddressInUseError) || current.code === 'EADDRINUSE') {
+      return true;
+    }
+    current = current.cause;
+  }
+  return false;
+};
+
+/**
+ * @description Remember why the bridge is not running, for its status.
+ * @param {string} message - Error message.
+ * @param {string} [code] - One of ERROR_CODES, when the settings page can explain the error.
+ * @example
+ * bridge.setError('port in use', ERROR_CODES.PORT_IN_USE);
+ */
+MatterBridge.prototype.setError = function setError(message, code = null) {
+  this.lastError = message;
+  this.lastErrorCode = code;
+};
+
+/**
  * @description Start the bridge when it is enabled. Starts, stops and resets go through the queue of
  * device changes: two enables in a row cannot create two Matter nodes, and a change queued before
  * a stop never runs against a closed node or the one of a reset.
@@ -96,8 +146,9 @@ MatterBridge.prototype.start = function start() {
 
 /**
  * @description Start the bridge when it is enabled, at once: only to be called from a queued
- * change. A bridge that cannot start (no IPv6, port in use) leaves Gladys running and reports the
- * error in its status.
+ * change. A bridge that cannot start (no IPv6, port in use, Matterbridge integration enabled)
+ * leaves Gladys running and reports the error in its status: it is not started, and is tried
+ * again on the next start.
  * @returns {Promise} Resolves once the bridge is online, or not started.
  * @example
  * await bridge.enqueue(() => bridge.startNow());
@@ -110,13 +161,25 @@ MatterBridge.prototype.startNow = async function startNow() {
   if (this.server) {
     return;
   }
+  if (await this.isMatterbridgeEnabled()) {
+    this.setError(
+      `The Matterbridge integration is enabled and uses port ${MATTER_BRIDGE_PORT}`,
+      ERROR_CODES.MATTERBRIDGE_ENABLED,
+    );
+    logger.warn(`Matter bridge: not started: ${this.lastError}`);
+    return;
+  }
   try {
     this.matter = this.matter || this.loadMatter();
     await this.startNode();
-    this.lastError = null;
+    this.setError(null);
     logger.info(`Matter bridge: online on port ${MATTER_BRIDGE_PORT}, ${this.devices.size} device(s) exposed`);
   } catch (e) {
-    this.lastError = e.message;
+    if (this.isPortInUse(e)) {
+      this.setError(`Port ${MATTER_BRIDGE_PORT} is already in use by another program`, ERROR_CODES.PORT_IN_USE);
+    } else {
+      this.setError(e.message);
+    }
     logger.error(`Matter bridge: unable to start: ${e.message}`);
     await this.stopNow();
   }
@@ -427,8 +490,11 @@ MatterBridge.prototype.getStatus = async function getStatus() {
   const status = {
     enabled: await this.isEnabled(),
     hasIpv6: checkIpv6().hasIpv6,
+    matterbridgeEnabled: await this.isMatterbridgeEnabled(),
+    port: MATTER_BRIDGE_PORT,
     running: this.server !== null,
     error: this.lastError,
+    errorCode: this.lastErrorCode,
     exposureMode,
     exposedDevices,
     exposedCount: this.devices.size,
@@ -453,13 +519,18 @@ MatterBridge.prototype.getStatus = async function getStatus() {
 
 /**
  * @description Turn the bridge on or off. Turning it on is not refused without IPv6, as for the
- * Matter controller: the page warns about it, and a bridge that cannot start reports why.
+ * Matter controller: the page warns about it, and a bridge that cannot start reports why. It is
+ * refused while the Matterbridge integration is enabled, as both need the same port.
  * @param {boolean} enabled - True to turn the bridge on.
  * @returns {Promise<object>} The new status.
+ * @throws {ConflictError} When turned on while the Matterbridge integration is enabled.
  * @example
  * await bridge.setEnabled(true);
  */
 MatterBridge.prototype.setEnabled = async function setEnabled(enabled) {
+  if (enabled && (await this.isMatterbridgeEnabled())) {
+    throw new ConflictError(`The Matterbridge integration is enabled and uses port ${MATTER_BRIDGE_PORT}`);
+  }
   await this.gladys.variable.setValue(VARIABLES.ENABLED, String(enabled), this.serviceId);
   if (enabled) {
     await this.start();

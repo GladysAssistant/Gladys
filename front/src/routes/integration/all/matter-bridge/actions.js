@@ -6,6 +6,13 @@ const EXPOSURE_MODES = {
   SELECTION: 'selection'
 };
 
+// Errors of the bridge the page explains with a message of its own: the `ERROR_CODES` of the
+// server (server/services/matter-bridge/lib/constants.js).
+const ERROR_CODES = {
+  PORT_IN_USE: 'port_in_use',
+  MATTERBRIDGE_ENABLED: 'matterbridge_enabled'
+};
+
 const formOf = status => ({
   exposureMode: status.exposureMode,
   exposedDevices: status.exposedDevices
@@ -134,5 +141,5 @@ const actions = store => ({
   }
 });
 
-export { EXPOSURE_MODES };
+export { EXPOSURE_MODES, ERROR_CODES };
 export default actions;

@@ -33,8 +33,11 @@ const matterBridgeStatus = () => {
   return {
     enabled,
     hasIpv6: true,
+    matterbridgeEnabled: false,
+    port: 5540,
     running: enabled,
     error: null,
+    errorCode: null,
     exposureMode,
     exposedDevices: [...exposedDevices],
     exposedCount: matterBridgeExposedCount(),

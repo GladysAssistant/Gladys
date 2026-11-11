@@ -13,9 +13,20 @@ const EXPOSURE_MODES = {
   SELECTION: 'selection',
 };
 
-// The Matter controller of the `matter` service listens on the default Matter port (5540): the
-// bridge is a second Matter node in the same process, so it needs a port of its own.
-const MATTER_BRIDGE_PORT = 5541;
+// The bridge listens on the standard Matter port: Amazon Alexa only discovers Matter devices on
+// 5540, whatever port their mDNS record announces, so any other port hides the bridge from Alexa.
+// The Matter controller of the `matter` service does not compete for it: it gives no port to
+// matter.js, which then picks a random one. The Matterbridge container of the `matterbridge`
+// service does, as it runs on the host network and listens on 5540 too: only one of them can run.
+const MATTER_BRIDGE_PORT = 5540;
+
+// Why the bridge is not running, for the settings page to explain it.
+const ERROR_CODES = {
+  // Another program already listens on MATTER_BRIDGE_PORT.
+  PORT_IN_USE: 'port_in_use',
+  // The `matterbridge` integration is enabled: its container needs MATTER_BRIDGE_PORT as well.
+  MATTERBRIDGE_ENABLED: 'matterbridge_enabled',
+};
 
 const NODE_ID = 'gladys-matter-bridge';
 const AGGREGATOR_ID = 'aggregator';
@@ -130,6 +141,7 @@ module.exports = {
   VARIABLES,
   EXPOSURE_MODES,
   MATTER_BRIDGE_PORT,
+  ERROR_CODES,
   NODE_ID,
   AGGREGATOR_ID,
   VENDOR_ID,

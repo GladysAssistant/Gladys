@@ -3,8 +3,8 @@ const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
 const { EVENTS } = require('../../../../utils/constants');
-const { BadParameters } = require('../../../../utils/coreErrors');
-const { VARIABLES } = require('../../../../services/matter-bridge/lib/constants');
+const { BadParameters, ConflictError } = require('../../../../utils/coreErrors');
+const { VARIABLES, ERROR_CODES } = require('../../../../services/matter-bridge/lib/constants');
 const { createMatter, feature } = require('../fakes');
 
 const fse = { ensureDir: sinon.stub().resolves(), remove: sinon.stub().resolves() };
@@ -22,6 +22,7 @@ describe('MatterBridge', () => {
   let devices;
   let matter;
   let bridge;
+  let matterbridgeEnabled;
 
   const light = {
     id: 'light-id',
@@ -40,6 +41,7 @@ describe('MatterBridge', () => {
   beforeEach(() => {
     variables = { [VARIABLES.ENABLED]: 'true' };
     devices = [light, sensor, unsupported];
+    matterbridgeEnabled = false;
     gladys = {
       config: { storage: '/var/lib/gladysassistant/gladys.db' },
       system: { gladysVersion: 'v4.70.1' },
@@ -55,6 +57,13 @@ describe('MatterBridge', () => {
       device: { get: sinon.stub().callsFake(async () => devices) },
       stateManager: { get: sinon.stub().returns({ last_value: 1 }) },
       event: { on: sinon.stub(), removeListener: sinon.stub(), emit: sinon.stub() },
+      service: {
+        getService: sinon
+          .stub()
+          .callsFake((name) =>
+            name === 'matterbridge' ? { device: { isEnabled: async () => matterbridgeEnabled } } : null,
+          ),
+      },
     };
     matter = createMatter();
     bridge = new MatterBridge(gladys, SERVICE_ID, () => matter);
@@ -92,7 +101,7 @@ describe('MatterBridge', () => {
       expect(matter.server.started).to.equal(true);
       expect(matter.vars.get('storage.path')).to.equal('/var/lib/gladysassistant/matter-bridge');
       const { options } = matter.server;
-      expect(options.network).to.deep.equal({ port: 5541 });
+      expect(options.network).to.deep.equal({ port: 5540 });
       expect(options.commissioning.passcode).to.be.a('number');
       expect(options.basicInformation).to.include({ softwareVersion: 47001, softwareVersionString: '4.70.1' });
       expect(options.basicInformation.uniqueId).to.not.equal(options.basicInformation.serialNumber);
@@ -120,12 +129,70 @@ describe('MatterBridge', () => {
 
     it('should report a node that cannot start', async () => {
       matter.server.start = async () => {
-        throw new Error('Cannot bind to {::}:5541');
+        throw new Error('Cannot bind to {::}:5540 (code EAFNOSUPPORT)');
       };
       await bridge.start();
       expect(bridge.server).to.equal(null);
       expect(matter.server.closed).to.equal(true);
-      expect((await bridge.getStatus()).error).to.equal('Cannot bind to {::}:5541');
+      const status = await bridge.getStatus();
+      expect(status.error).to.equal('Cannot bind to {::}:5540 (code EAFNOSUPPORT)');
+      expect(status.errorCode).to.equal(null);
+    });
+
+    it('should not start when the Matter port is already in use', async () => {
+      matter.server.start = async () => {
+        throw new matter.main.AddressInUseError('Cannot bind [::]:5540 because port is already in use');
+      };
+      await bridge.start();
+      expect(bridge.server).to.equal(null);
+      expect(matter.server.closed).to.equal(true);
+      sinon.assert.calledWith(gladys.event.removeListener, EVENTS.DEVICE.CREATE, bridge.onDeviceChange);
+      const status = await bridge.getStatus();
+      expect(status).to.include({
+        enabled: true,
+        running: false,
+        error: 'Port 5540 is already in use by another program',
+        errorCode: ERROR_CODES.PORT_IN_USE,
+      });
+    });
+
+    it('should find a port in use behind the error matter.js reports', async () => {
+      matter.server.start = async () => {
+        const error = new Error('Behaviors have errors');
+        error.cause = Object.assign(new Error('bind EADDRINUSE'), { code: 'EADDRINUSE' });
+        throw error;
+      };
+      await bridge.start();
+      expect((await bridge.getStatus()).errorCode).to.equal(ERROR_CODES.PORT_IN_USE);
+    });
+
+    it('should forget the error of a previous start once started', async () => {
+      const realStart = matter.server.start;
+      matter.server.start = async () => {
+        throw new matter.main.AddressInUseError('port is already in use');
+      };
+      await bridge.start();
+      matter.server.start = realStart;
+      await bridge.start();
+      const status = await bridge.getStatus();
+      expect(status.running).to.equal(true);
+      expect(status.error).to.equal(null);
+      expect(status.errorCode).to.equal(null);
+    });
+
+    it('should not start while the Matterbridge integration is enabled', async () => {
+      matterbridgeEnabled = true;
+      const create = sinon.spy(matter.main.ServerNode, 'create');
+      await bridge.start();
+      sinon.assert.notCalled(create);
+      expect(bridge.server).to.equal(null);
+      const status = await bridge.getStatus();
+      expect(status).to.include({
+        enabled: true,
+        running: false,
+        matterbridgeEnabled: true,
+        errorCode: ERROR_CODES.MATTERBRIDGE_ENABLED,
+      });
     });
 
     it('should leave out a device that cannot be built', async () => {
@@ -377,6 +444,22 @@ describe('MatterBridge', () => {
     });
   });
 
+  describe('isMatterbridgeEnabled', () => {
+    it('should read the state of the Matterbridge integration', async () => {
+      expect(await bridge.isMatterbridgeEnabled()).to.equal(false);
+      matterbridgeEnabled = true;
+      expect(await bridge.isMatterbridgeEnabled()).to.equal(true);
+      sinon.assert.calledWith(gladys.service.getService, 'matterbridge');
+    });
+
+    it('should tell the Matterbridge integration is not enabled when it is not loaded', async () => {
+      gladys.service.getService = sinon.stub().returns(null);
+      expect(await bridge.isMatterbridgeEnabled()).to.equal(false);
+      gladys.service.getService = sinon.stub().returns({});
+      expect(await bridge.isMatterbridgeEnabled()).to.equal(false);
+    });
+  });
+
   describe('getCompatibleDevices', () => {
     it('should list the devices the bridge can expose', async () => {
       devices = [light, { ...sensor, features: [...sensor.features, feature('b', 'battery', 'integer')] }, unsupported];
@@ -394,8 +477,11 @@ describe('MatterBridge', () => {
       expect(await bridge.getStatus()).to.deep.equal({
         enabled: false,
         hasIpv6: false,
+        matterbridgeEnabled: false,
+        port: 5540,
         running: false,
         error: null,
+        errorCode: null,
         exposureMode: 'all',
         exposedDevices: [],
         exposedCount: 0,
@@ -430,6 +516,21 @@ describe('MatterBridge', () => {
       expect(variables[VARIABLES.ENABLED]).to.equal('true');
       expect(status.enabled).to.equal(true);
       expect(status.running).to.equal(true);
+    });
+
+    it('should refuse to turn the bridge on while the Matterbridge integration is enabled', async () => {
+      variables[VARIABLES.ENABLED] = 'false';
+      matterbridgeEnabled = true;
+      await expect(bridge.setEnabled(true)).to.be.rejectedWith(ConflictError);
+      expect(variables[VARIABLES.ENABLED]).to.equal('false');
+      expect(bridge.server).to.equal(null);
+    });
+
+    it('should turn the bridge off while the Matterbridge integration is enabled', async () => {
+      matterbridgeEnabled = true;
+      const status = await bridge.setEnabled(false);
+      expect(variables[VARIABLES.ENABLED]).to.equal('false');
+      expect(status.enabled).to.equal(false);
     });
 
     it('should turn the bridge off', async () => {

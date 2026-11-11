@@ -185,10 +185,14 @@ function createMatter() {
     behaviors[name] = createBehavior(name);
   });
 
+  // Thrown by matter.js when the port of the node is already in use.
+  class AddressInUseError extends Error {}
+
   return {
     vars,
     server,
     main: {
+      AddressInUseError,
       Environment: { default: { vars: { set: (key, value) => vars.set(key, value) } } },
       ServerNode: { create: async (options) => Object.assign(server, { options }) },
       Endpoint: FakeEndpoint,
