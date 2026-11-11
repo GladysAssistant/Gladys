@@ -2006,7 +2006,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Adaptertyp",
               "unknownDongle": "Nicht definiert",
-              "tcpPort": "TCP-Port"
+              "tcpPort": "TCP-Port",
+              "ezspDriver": "Alte Firmware: Gladys verwendet den Kompatibilitätstreiber <code>ezsp</code>, da der Treiber <code>ember</code> Firmware 7.4 oder höher erfordert. Zigbee2mqtt funktioniert so, aber dieser Treiber ist veraltet. Um zu <code>ember</code> zurückzukehren, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">aktualisieren Sie die Firmware</a> und wählen Sie dann das Modell ohne „(legacy ezsp)“ (oder den Typ <code>ember</code> für einen Netzwerk-Koordinator)."
             },
             "externalMqtt": {
               "title": "Verbindung für externe Tools",
@@ -2016,7 +2017,7 @@
               "copied": "Kopiert"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Warnung: Die Firmware Ihres Ember-Koordinators ist veraltet. Version 7.4.x oder höher ist erforderlich. Bitte folgen Sie der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>, um sie zu aktualisieren. Wählen Sie andernfalls den Dongle (legacy ezsp) in der Konfiguration aus.",
+              "EZSP_PROTOCOL_VERSION": "Die Firmware Ihres Koordinators ist zu alt für den Treiber <code>ember</code>, der Version 7.4 oder höher erfordert, und für dieses Modell gibt es keinen Kompatibilitätstreiber. Aktualisieren Sie sie mit der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>.",
               "ADAPTER_NO_RESPONSE": "Zigbee2MQTT erhält keine Antwort von Ihrem Zigbee-Koordinator. Überprüfen Sie, ob das in der Konfiguration gewählte Modell Ihrem entspricht (es bestimmt den verwendeten Treiber) und ob keine andere Software (Home Assistant, ein anderes Zigbee2MQTT…) den Koordinator verwendet. Ziehen Sie dann Ihren Stick ab und stecken Sie ihn wieder ein, oder starten Sie Ihren Netzwerk-Koordinator neu.",
               "ADAPTER_UNREACHABLE": "Zigbee2MQTT kann Ihren Netzwerk-Koordinator nicht erreichen. Überprüfen Sie, ob er eingeschaltet und mit dem Netzwerk verbunden ist und ob seine Adresse in der Konfiguration (tcp://adresse:port) korrekt ist.",
               "INVALID_CONFIGURATION": "Zigbee2MQTT verweigert den Start, weil seine Konfiguration (Datei configuration.yaml) ungültig ist. Wenn Sie sie von Hand geändert haben, korrigieren Sie sie; andernfalls melden Sie es im <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys-Forum</a>. Abgelehnte Einstellungen:",

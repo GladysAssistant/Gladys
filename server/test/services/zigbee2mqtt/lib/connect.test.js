@@ -126,6 +126,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });
@@ -171,6 +172,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: { code: null, message: 'mqtt_error' },
       },
     });
@@ -271,6 +273,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        ezspFallback: false,
         mqttConnectionError: null,
       },
     });

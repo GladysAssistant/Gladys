@@ -25,6 +25,10 @@ class Zigbee2mqttSetupPage extends Component {
   resolveZ2mUrl = configuration => getZ2mUrl(configuration, this.props.session.gatewayClient !== undefined);
 
   handleZ2MStatus = zigbee2mqttStatus => {
+    // Gladys switched Zigbee2mqtt to the ezsp driver by itself: the saved model changed
+    if (zigbee2mqttStatus.ezspFallback && !this.state.zigbee2mqttStatus.ezspFallback) {
+      this.loadZ2MConfig();
+    }
     this.setState({ zigbee2mqttStatus });
   };
 

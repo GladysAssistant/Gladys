@@ -1815,7 +1815,8 @@
               "dongleName": "Adaptador",
               "networkAdapterType": "Tipo de adaptador",
               "unknownDongle": "No definido",
-              "tcpPort": "Puerto TCP"
+              "tcpPort": "Puerto TCP",
+              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2mqtt funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
             },
             "externalMqtt": {
               "title": "Conexión de herramientas externas",
@@ -1825,7 +1826,7 @@
               "copied": "Copiado"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Advertencia: el firmware de su coordinador Ember está desactualizado. Se requiere la versión de firmware 7.4.x o superior. Siga la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a> para actualizarlo. En caso contrario, seleccione el adaptador (ezsp heredado) en la configuración.",
+              "EZSP_PROTOCOL_VERSION": "El firmware de su coordinador es demasiado antiguo para el controlador <code>ember</code>, que requiere la versión 7.4 o superior, y este modelo no tiene controlador de compatibilidad. Actualícelo siguiendo la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a>.",
               "ADAPTER_NO_RESPONSE": "Zigbee2MQTT no recibe respuesta de su coordinador Zigbee. Compruebe que el modelo elegido en la configuración es el suyo (determina el controlador utilizado) y que ningún otro software (Home Assistant, otro Zigbee2MQTT…) usa el coordinador; después desconecte y vuelva a conectar su adaptador, o reinicie su coordinador de red.",
               "ADAPTER_UNREACHABLE": "Zigbee2MQTT no consigue conectar con su coordinador de red. Compruebe que está encendido y conectado a la red, y que su dirección en la configuración (tcp://dirección:puerto) es la correcta.",
               "INVALID_CONFIGURATION": "Zigbee2MQTT se niega a arrancar porque su configuración (archivo configuration.yaml) no es válida. Si la ha modificado a mano, corríjala; si no, avíselo en el <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">foro de Gladys</a>. Ajustes rechazados:",
