@@ -64,11 +64,12 @@ describe('Zigbee2mqtt installation progress', () => {
     error: { code: 'NOT_ENOUGH_DISK_SPACE', message: 'Not enough disk space' }
   };
 
-  const visitSetup = (status, { setup = {}, prefetchResponse = prefetch } = {}) => {
+  const visitSetup = (status, { setup = {}, prefetchResponse = prefetch, statusDelay = 0 } = {}) => {
     const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: status }).as(
-      'status'
-    );
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      { body: status, delay: statusDelay }
+    ).as('status');
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: setup }).as('config');
     cy.intercept(
       { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch` },
@@ -219,6 +220,78 @@ describe('Zigbee2mqtt installation progress', () => {
 
     cy.get('[data-cy=z2m-mqtt-external-credentials]').should('exist');
     cy.get('a[href$=":12000"]').should('exist');
+  });
+
+  it('should keep the saved configuration when a load sent before the save answers after it', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: localSetup }).as(
+      'setup'
+    );
+    visitSetup({ ...readyToSetupStatus, installation: runningInstallation, prefetch });
+    cy.get('[data-cy=z2m-installation-progress]').should('exist');
+
+    // The load at the end of the installation, read before the save, answers after it
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { delay: 3000, body: {} }).as(
+      'configReload'
+    );
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.install-progress',
+      payload: { installation: doneInstallation, prefetch }
+    });
+    chooseLocalMode();
+    cy.get('[data-cy=z2m-setup-save]')
+      .should('not.be.disabled')
+      .click();
+    cy.wait('@setup');
+    cy.get('[data-cy=z2m-setup-local-summary]').should('exist');
+    cy.wait('@configReload');
+
+    cy.get('[data-cy=z2m-setup-local-summary]').should('exist');
+    cy.get('[data-cy=z2m-setup-local-panel]').should('not.exist');
+  });
+
+  it('should keep the end of an installation received before the status, read while it was running', () => {
+    visitSetup(
+      { ...readyToSetupStatus, usbConfigured: true, installation: runningInstallation, prefetch },
+      { setup: localSetup, statusDelay: 2000 }
+    );
+    // The app opens its websocket as it starts: it is open once the configuration, not delayed, is loaded
+    cy.wait('@config');
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.install-progress',
+      payload: { installation: doneInstallation, prefetch }
+    });
+    cy.wait('@status');
+
+    cy.get('#enableZigbee2mqtt').should('not.be.disabled');
+    cy.get('[data-cy=z2m-reset-button]').should('not.be.disabled');
+    cy.get('[data-cy=z2m-setup-local-summary] button').should('not.be.disabled');
+    cy.get('[data-cy=z2m-installation-progress]').should('not.exist');
+    // Loaded alongside the status, the configuration may predate the end of the installation: it is loaded again
+    cy.wait('@config');
+  });
+
+  it('should tell that the disk space is missing to download Zigbee2mqtt', () => {
+    const notEnoughDiskSpaceInstallation = {
+      ...failedInstallation,
+      phases: phases({
+        pull_z2m: 'failed',
+        pull_mqtt: 'done',
+        start_mqtt: 'done',
+        start_z2m: 'pending',
+        connect_adapter: 'pending'
+      }),
+      progress: 20,
+      error: { code: 'NOT_ENOUGH_DISK_SPACE', message: 'Not enough disk space' }
+    };
+    visitSetup({ ...readyToSetupStatus, installation: notEnoughDiskSpaceInstallation, prefetch });
+
+    cy.get('[data-cy=z2m-installation-failed-phase]').i18n(
+      'integration.zigbee2mqtt.setup.installation.phases.pull_z2m'
+    );
+    cy.get('[data-cy=z2m-installation-error-message]').i18n(
+      'integration.zigbee2mqtt.setup.installation.errors.NOT_ENOUGH_DISK_SPACE'
+    );
   });
 
   it('should not repeat an error already shown by the status', () => {

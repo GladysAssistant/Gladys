@@ -6,6 +6,7 @@ import ContainerError from '../../commons/ContainerError';
 const ERROR_TEXTS = {
   NO_ANSWER: 'integration.zigbee2mqtt.setup.installation.errors.NO_ANSWER',
   DONGLE_NOT_FOUND: 'integration.zigbee2mqtt.setup.installation.errors.DONGLE_NOT_FOUND',
+  NOT_ENOUGH_DISK_SPACE: 'integration.zigbee2mqtt.setup.installation.errors.NOT_ENOUGH_DISK_SPACE',
   SYSTEM_NOT_RUNNING_DOCKER: 'integration.zigbee2mqtt.setup.nonDockerEnv',
   DOCKER_BAD_NETWORK: 'integration.zigbee2mqtt.setup.invalidDockerNetwork',
   BAD_CREDENTIALS: 'integration.zigbee2mqtt.setup.mqttConnectionErrors.BAD_CREDENTIALS',
