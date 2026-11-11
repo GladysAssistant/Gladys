@@ -1993,7 +1993,8 @@
         "status": "Status",
         "matterbridge": "Matterbridge",
         "gladys": "Gladys",
-        "urlLabel": "Matterbridge interface url: <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (Not accessible from Gladys Plus)"
+        "urlLabel": "Matterbridge interface url: <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (Not accessible from Gladys Plus)",
+        "matterBridgeEnabled": "The <a href=\"/dashboard/integration/communication/matter-bridge\">Gladys Matter bridge</a> is enabled. It uses port 5540, the standard Matter port, which Matterbridge needs too: both cannot run at the same time. Disable the Gladys Matter bridge to be able to enable Matterbridge."
       }
     },
     "googleHome": {

@@ -17,7 +17,8 @@ const EXPOSURE_MODES = {
 // 5540, whatever port their mDNS record announces, so any other port hides the bridge from Alexa.
 // The Matter controller of the `matter` service does not compete for it: it gives no port to
 // matter.js, which then picks a random one. The Matterbridge container of the `matterbridge`
-// service does, as it runs on the host network and listens on 5540 too: only one of them can run.
+// service does, as it runs on the host network and listens on 5540 too: only one of them can run,
+// and each one refuses to start while the other is turned on.
 const MATTER_BRIDGE_PORT = 5540;
 
 // Why the bridge is not running, for the settings page to explain it.

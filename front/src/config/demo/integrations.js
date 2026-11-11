@@ -1826,13 +1826,15 @@ const integrations = {
   // A reset forgets every pairing: the bridge comes back waiting for one, with a new code.
   'post /api/v1/service/matter-bridge/reset': () => updateMatterBridge({ commissioned: false }),
   'get /api/v1/service/matter-bridge/device': MATTER_BRIDGE_DEVICES,
-  'get /api/v1/service/matterbridge/status': {
+  // Matterbridge cannot be turned on while the Matter bridge of the demo is
+  'get /api/v1/service/matterbridge/status': () => ({
     matterbridgeExist: false,
     matterbridgeRunning: false,
     matterbridgeEnabled: false,
+    matterBridgeEnabled: matterBridge.enabled,
     dockerBased: true,
     networkModeValid: true
-  },
+  }),
   'get /api/v1/service/telegram/link': { link: 'https://t.me/GladysAssistantBot?start=demo' },
   // The community catalogue is downloaded from a GitHub release on a real instance:
   // the demo serves the merged template list of the contracts tab directly

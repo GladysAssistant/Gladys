@@ -2317,7 +2317,8 @@
         "status": "Statut",
         "matterbridge": "Matterbridge",
         "gladys": "Gladys",
-        "urlLabel": "Url de l'interface Matterbridge : <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (Pas accessible depuis Gladys Plus)"
+        "urlLabel": "Url de l'interface Matterbridge : <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (Pas accessible depuis Gladys Plus)",
+        "matterBridgeEnabled": "Le <a href=\"/dashboard/integration/communication/matter-bridge\">bridge Matter de Gladys</a> est activé. Il utilise le port 5540, le port Matter standard, dont Matterbridge a aussi besoin : les deux ne peuvent pas fonctionner en même temps. Désactivez le bridge Matter de Gladys pour pouvoir activer Matterbridge."
       }
     },
     "googleHome": {

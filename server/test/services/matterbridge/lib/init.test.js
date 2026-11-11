@@ -3,6 +3,7 @@ const { expect } = require('chai');
 
 const { assert, fake } = sinon;
 
+const { ConflictError } = require('../../../../utils/coreErrors');
 const MatterbridgeManager = require('../../../../services/matterbridge/lib');
 
 const container = {
@@ -26,6 +27,10 @@ describe('Matterbridge init', () => {
       },
       variable: {
         getValue: fake.resolves('1'),
+        setValue: fake.resolves(null),
+      },
+      service: {
+        getService: fake.returns(null),
       },
     };
 
@@ -42,6 +47,33 @@ describe('Matterbridge init', () => {
 
   afterEach(() => {
     sinon.reset();
+  });
+
+  it('should not start while the Matter bridge of Gladys is turned on', async () => {
+    gladys.service.getService = fake.returns({ bridge: { isEnabled: fake.resolves(true) } });
+
+    try {
+      await matterbridgeManager.init();
+      assert.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(ConflictError);
+      expect(e.message).to.equal('MATTER_BRIDGE_ENABLED');
+    }
+
+    assert.calledWith(gladys.service.getService, 'matter-bridge');
+    assert.calledOnceWithExactly(gladys.variable.setValue, 'MATTERBRIDGE_ENABLED', '0', serviceId);
+    assert.notCalled(gladys.system.isDocker);
+    assert.notCalled(matterbridgeManager.checkForContainerUpdates);
+    assert.notCalled(matterbridgeManager.installContainer);
+  });
+
+  it('should start while the Matter bridge of Gladys is turned off', async () => {
+    gladys.service.getService = fake.returns({ bridge: { isEnabled: fake.resolves(false) } });
+
+    await matterbridgeManager.init();
+
+    assert.notCalled(gladys.variable.setValue);
+    assert.calledOnce(matterbridgeManager.installContainer);
   });
 
   it('should fail because not a Docker System', async () => {

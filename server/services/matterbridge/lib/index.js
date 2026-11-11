@@ -5,6 +5,7 @@ const { installContainer } = require('./installContainer');
 const { checkForContainerUpdates } = require('./checkForContainerUpdates');
 const { disconnect } = require('./disconnect');
 const { isEnabled } = require('./isEnabled');
+const { isMatterBridgeEnabled, checkMatterBridgeConflict } = require('./checkMatterBridgeConflict');
 const { status } = require('./status');
 const { configureContainer } = require('./configureContainer');
 
@@ -35,6 +36,8 @@ MatterbridgeManager.prototype.installContainer = installContainer;
 MatterbridgeManager.prototype.checkForContainerUpdates = checkForContainerUpdates;
 MatterbridgeManager.prototype.disconnect = disconnect;
 MatterbridgeManager.prototype.isEnabled = isEnabled;
+MatterbridgeManager.prototype.isMatterBridgeEnabled = isMatterBridgeEnabled;
+MatterbridgeManager.prototype.checkMatterBridgeConflict = checkMatterBridgeConflict;
 MatterbridgeManager.prototype.status = status;
 MatterbridgeManager.prototype.configureContainer = configureContainer;
 
