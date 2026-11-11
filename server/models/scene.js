@@ -56,6 +56,24 @@ const actionSchema = Joi.object()
     device: Joi.string(),
     devices: Joi.array().items(Joi.string()),
     user: Joi.string(),
+    latitude: Joi.alternatives().try(
+      Joi.number()
+        .strict()
+        .min(-90)
+        .max(90),
+      Joi.string()
+        .max(1000)
+        .allow(''),
+    ),
+    longitude: Joi.alternatives().try(
+      Joi.number()
+        .strict()
+        .min(-180)
+        .max(180),
+      Joi.string()
+        .max(1000)
+        .allow(''),
+    ),
     house: Joi.string(),
     scene: Joi.string(),
     // selector of the thermostat schedule a "thermostat.set-schedule" action switches to

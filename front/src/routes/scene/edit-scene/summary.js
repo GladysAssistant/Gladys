@@ -111,6 +111,8 @@ const getActionSummary = (action, dictionary, deviceFeatures, thermostatSchedule
     case ACTIONS.USER.SET_OUT_OF_HOME:
     case ACTIONS.USER.CHECK_PRESENCE:
       return joinParts([action.user, action.house]);
+    case ACTIONS.USER.SET_LOCATION:
+      return joinParts([action.user, action.latitude, action.longitude]);
     case ACTIONS.DEVICE.GET_VALUE:
       return getFeatureLabel(action.device_feature, dictionary, deviceFeatures);
     case ACTIONS.DEVICE.SET_VALUE: {

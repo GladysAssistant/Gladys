@@ -30,6 +30,29 @@ const buildSceneWithActions = (actions) =>
   });
 
 describe('models/scene', () => {
+  it('should accept fixed, variable and incomplete user-location actions', async () => {
+    await buildSceneWithActions([
+      [
+        { type: ACTIONS.USER.SET_LOCATION, user: 'john', latitude: 0, longitude: -180 },
+        {
+          type: ACTIONS.USER.SET_LOCATION,
+          user: 'john',
+          latitude: '{{0.0.value}}',
+          longitude: '{{triggerEvent.data.longitude}}',
+        },
+        { type: ACTIONS.USER.SET_LOCATION, latitude: '', longitude: '' },
+      ],
+    ]).validate();
+  });
+
+  it('should reject malformed coordinate fields and out-of-range numeric coordinates', async () => {
+    await Promise.all(
+      [{ latitude: 91 }, { longitude: -181 }, { latitude: {} }, { longitude: true }].map((coordinates) =>
+        assert.isRejected(buildSceneWithActions([[{ type: ACTIONS.USER.SET_LOCATION, ...coordinates }]]).validate()),
+      ),
+    );
+  });
+
   it('should validate an external integration scene trigger and action', async () => {
     await buildScene({
       type: EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT,
