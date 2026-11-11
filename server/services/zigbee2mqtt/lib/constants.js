@@ -1,3 +1,6 @@
+const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
+const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
+
 const CONFIGURATION = {
   Z2M_DRIVER_PATH: 'ZIGBEE2MQTT_DRIVER_PATH',
   Z2M_BACKUP: 'Z2M_BACKUP',
@@ -79,6 +82,15 @@ const INSTALLATION_PHASE_STATE = {
   FAILED: 'failed',
 };
 
+// Phase of an installation that follows the download of the image of each container: the only list of the images, read
+// by the downloads and the prefetch. Zigbee2mqtt first, its download is the longest.
+const PULL_PHASE_BY_IMAGE = {
+  [z2mContainerDescriptor.Image]: INSTALLATION_PHASE.PULL_Z2M,
+  [mqttContainerDescriptor.Image]: INSTALLATION_PHASE.PULL_MQTT,
+};
+
+const IMAGES = Object.keys(PULL_PHASE_BY_IMAGE);
+
 // Share of each phase in the progress of an installation. Downloading the Zigbee2mqtt image (48 MB compressed, 214 MB
 // on disk) takes most of the time, the broker image is 8 times smaller; Zigbee2mqtt then takes a while to answer.
 const INSTALLATION_PHASE_WEIGHTS = {
@@ -112,6 +124,28 @@ const IMAGE_SIZE_IN_BYTES = {
 // same disk, a download that fills it would break them. The free space is also measured on the disk of the Gladys
 // container, not always the one where Docker stores its images.
 const DISK_SPACE_MARGIN_IN_BYTES = 500000000;
+
+/**
+ * @description The installation when none ran since Gladys started, or once its outcome is forgotten. A new object at
+ * each call, as an installation is changed in place while it runs.
+ * @returns {object} The idle installation.
+ * @example
+ * this.installation = getIdleInstallation();
+ */
+function getIdleInstallation() {
+  return { state: INSTALLATION_STATE.IDLE, kind: null, phases: [], progress: 0, error: null, durationMs: null };
+}
+
+/**
+ * @description The prefetch when none ran since Gladys started, or once its outcome is forgotten. A new object at each
+ * call, as a prefetch is changed in place while it runs.
+ * @returns {object} The idle prefetch.
+ * @example
+ * this.prefetch = getIdlePrefetch();
+ */
+function getIdlePrefetch() {
+  return { state: INSTALLATION_STATE.IDLE, progress: 0, freeBytes: null, neededBytes: null, error: null };
+}
 
 const SETUP_VARIABLES = [
   CONFIGURATION.Z2M_DRIVER_PATH,
@@ -182,10 +216,14 @@ module.exports = {
   INSTALLATION_KIND,
   INSTALLATION_PHASE,
   INSTALLATION_PHASE_STATE,
+  PULL_PHASE_BY_IMAGE,
+  IMAGES,
   INSTALLATION_PHASE_WEIGHTS,
   INSTALLATION_ERROR,
   IMAGE_SIZE_IN_BYTES,
   DISK_SPACE_MARGIN_IN_BYTES,
+  getIdleInstallation,
+  getIdlePrefetch,
   SETUP_VARIABLES,
   DEFAULT,
 };

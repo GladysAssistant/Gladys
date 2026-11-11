@@ -40,8 +40,10 @@ async function setup(config) {
   // A switch replaces the configured coordinator: not when the same one is saved again, after a failed installation,
   // or when only another setting changes, like the port of the interface
   const coordinatorSwitched = storedCoordinator !== null && savedCoordinator !== storedCoordinator;
-  // Refused while an installation runs, as it reads the stored setup. Started before saving it, with no wait since
-  // the check: another setup sent meanwhile is refused too, and the setup page reads the installation at once.
+  // Refused while an installation runs, as it reads the stored setup, or while an init runs, alongside which the init
+  // of the installation would run. Started before saving it, with no wait since the check: another setup sent meanwhile
+  // is refused too, and the setup page reads the installation at once.
+  this.refuseWhileInstalling('save the setup');
   this.startInstallation(coordinatorSwitched ? INSTALLATION_KIND.SWITCH : INSTALLATION_KIND.INSTALL);
   try {
     await Promise.all(

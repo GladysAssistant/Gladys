@@ -48,6 +48,13 @@ async function disconnect() {
   this.healthCheckTimer = null;
   this.emitStatusEvent();
 
+  // Disabled: the outcome of the last installation no longer describes Zigbee2mqtt
+  this.clearInstallation();
+  // A send left waiting goes at once, with the idle installation: its timer would outlive the integration
+  if (this.installProgressTimer !== null) {
+    this.emitInstallProgress(true);
+  }
+
   // Stop & remove MQTT container
   await removeOwnContainer(this.gladys.system, mqttContainerDescriptor);
   this.mqttRunning = false;

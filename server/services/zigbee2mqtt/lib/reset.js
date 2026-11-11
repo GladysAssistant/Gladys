@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 
 const logger = require('../../../utils/logger');
-const { CONFIGURATION, INSTALLATION_STATE } = require('./constants');
+const { CONFIGURATION, INSTALLATION_STATE, getIdlePrefetch } = require('./constants');
 
 const ALL_CONFIGURATION_KEYS = [
   CONFIGURATION.Z2M_DRIVER_PATH,
@@ -64,24 +64,21 @@ async function reset() {
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
   this.mqttConnectionError = null;
-  // A running installation goes on, and tells its own outcome
-  if (this.installation.state !== INSTALLATION_STATE.RUNNING) {
-    this.installation = {
-      state: INSTALLATION_STATE.IDLE,
-      kind: null,
-      phases: [],
-      progress: 0,
-      error: null,
-      durationMs: null,
-    };
-  }
-  // A running prefetch goes on too, and tells its own outcome
-  if (this.prefetch.state !== INSTALLATION_STATE.RUNNING) {
-    this.prefetch = { state: INSTALLATION_STATE.IDLE, progress: 0, freeBytes: null, neededBytes: null, error: null };
+  // Done by disconnect already, unless an installation finished since
+  this.clearInstallation();
+  // A running prefetch goes on, and tells its own outcome
+  const { state: prefetchState } = this.prefetch;
+  if (prefetchState === INSTALLATION_STATE.DONE || prefetchState === INSTALLATION_STATE.FAILED) {
+    this.prefetch = getIdlePrefetch();
+    this.emitInstallProgress();
   }
 
   // 5. Emit status event
   this.emitStatusEvent();
+  // A send left waiting goes at once: its timer would outlive the reset
+  if (this.installProgressTimer !== null) {
+    this.emitInstallProgress(true);
+  }
 
   logger.info('Zigbee2mqtt: integration reset complete');
 }

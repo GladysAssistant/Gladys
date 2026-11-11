@@ -50,6 +50,7 @@ describe('zigbee2mqtt init', () => {
 
     zigbee2mqttManager.getConfiguration = sinon.stub();
     zigbee2mqttManager.saveConfiguration = sinon.stub();
+    zigbee2mqttManager.saveOrDestroyVariable = sinon.stub().resolves();
     zigbee2mqttManager.pullMissingImages = sinon.stub();
     zigbee2mqttManager.checkForContainerUpdates = sinon.stub();
     zigbee2mqttManager.installMqttContainer = sinon.stub();
@@ -304,6 +305,131 @@ describe('zigbee2mqtt init', () => {
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
+  it('should save the generated MQTT accounts before the broker is created with them', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({ mqttMode: 'local', z2mDriverPath: '/dev/ttyUSB0' });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    const [config] = zigbee2mqttManager.installMqttContainer.firstCall.args;
+    assert.callCount(zigbee2mqttManager.saveOrDestroyVariable, 5);
+    assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'GLADYS_MQTT_USERNAME', 'gladys');
+    assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'GLADYS_MQTT_PASSWORD', config.mqttPassword);
+    assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_URL', 'mqtt://localhost:1884');
+    assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_USERNAME', 'z2m');
+    assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_PASSWORD', config.z2mMqttPassword);
+    expect(config.mqttPassword).to.have.lengthOf(20);
+    expect(config.z2mMqttPassword).to.have.lengthOf(20);
+    assert.callOrder(zigbee2mqttManager.saveOrDestroyVariable, zigbee2mqttManager.installMqttContainer);
+  });
+
+  it('should save only the MQTT settings it generates', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({
+      mqttMode: 'local',
+      z2mDriverPath: '/dev/ttyUSB0',
+      mqttUsername: 'gladys',
+      mqttPassword: 'gladys-password',
+      z2mMqttUsername: 'z2m',
+      z2mMqttPassword: 'z2m-password',
+    });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_URL', 'mqtt://localhost:1884');
+  });
+
+  it('should keep the MQTT accounts of a broker created by an installation that failed after', async () => {
+    // PREPARE
+    // Variables stored for real, with the setup of a dongle
+    const variables = { ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0', Z2M_MQTT_MODE: 'local' };
+    gladys.variable = {
+      getValue: fake(async (key) => (variables[key] === undefined ? null : variables[key])),
+      setValue: fake(async (key, value) => {
+        variables[key] = value;
+      }),
+      destroy: fake(async (key) => {
+        delete variables[key];
+      }),
+    };
+    delete zigbee2mqttManager.getConfiguration;
+    delete zigbee2mqttManager.saveConfiguration;
+    delete zigbee2mqttManager.saveOrDestroyVariable;
+    // The broker is created with the accounts, then the image of Zigbee2mqtt fails to download
+    const brokerAccounts = [];
+    zigbee2mqttManager.installMqttContainer.callsFake(async (config) => {
+      brokerAccounts.push([config.mqttUsername, config.mqttPassword, config.z2mMqttUsername, config.z2mMqttPassword]);
+    });
+    zigbee2mqttManager.installZ2mContainer.rejects(new Error('docker fail pull'));
+    await expect(zigbee2mqttManager.init()).to.be.rejectedWith('docker fail pull');
+    // EXECUTE
+    // Tried again
+    await expect(zigbee2mqttManager.init()).to.be.rejectedWith('docker fail pull');
+    // ASSERT
+    // The broker created by the first try still accepts them
+    expect(brokerAccounts).to.have.lengthOf(2);
+    expect(brokerAccounts[1]).to.deep.equal(brokerAccounts[0]);
+    expect(variables.GLADYS_MQTT_PASSWORD).to.equal(brokerAccounts[0][1]);
+    expect(variables.Z2M_MQTT_PASSWORD).to.equal(brokerAccounts[0][3]);
+  });
+
+  it('should count itself while it runs, and stop counting once it ends', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' });
+    let runningInitsDuringInit;
+    zigbee2mqttManager.installMqttContainer.callsFake(async () => {
+      runningInitsDuringInit = zigbee2mqttManager.runningInits;
+    });
+    // EXECUTE
+    const promise = zigbee2mqttManager.init();
+    // Counted from its first line: a route checked before calling it is refused at once
+    expect(zigbee2mqttManager.runningInits).to.equal(1);
+    await promise;
+    // ASSERT
+    expect(runningInitsDuringInit).to.equal(1);
+    expect(zigbee2mqttManager.runningInits).to.equal(0);
+  });
+
+  it('should stop counting itself when it fails', async () => {
+    // PREPARE
+    gladys.system.isDocker = fake.resolves(false);
+    zigbee2mqttManager.getConfiguration.resolves({ mqttMode: 'local' });
+    // EXECUTE
+    await expect(zigbee2mqttManager.init()).to.be.rejectedWith('SYSTEM_NOT_RUNNING_DOCKER');
+    // ASSERT
+    expect(zigbee2mqttManager.runningInits).to.equal(0);
+  });
+
+  it('should forget the failed downloads once it ends, for a later call to download again', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' });
+    zigbee2mqttManager.pullMissingImages.callsFake(async () => {
+      zigbee2mqttManager.imagePullFailures = { 'koenkk/zigbee2mqtt:2.14.2': new Error('docker fail pull') };
+      throw new Error('docker fail pull');
+    });
+    let failuresKnownByInstallers;
+    zigbee2mqttManager.installZ2mContainer.callsFake(async () => {
+      failuresKnownByInstallers = Object.keys(zigbee2mqttManager.imagePullFailures);
+    });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    expect(failuresKnownByInstallers).to.deep.equal(['koenkk/zigbee2mqtt:2.14.2']);
+    expect(zigbee2mqttManager.imagePullFailures).to.deep.equal({});
+  });
+
+  it('should leave the progress of the installation waiting to be sent, as an installation runs it', async () => {
+    // PREPARE
+    const sendLeftWaiting = fake();
+    zigbee2mqttManager.installProgressTimer = setTimeout(sendLeftWaiting, 500);
+    zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    clock.tick(500);
+    // ASSERT
+    assert.calledOnce(sendLeftWaiting);
+  });
+
   it('should connect', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
@@ -463,6 +589,33 @@ describe('zigbee2mqtt init', () => {
       );
     });
 
+    it('should show a failed download pending again during an installation, as it goes on without it', async () => {
+      // PREPARE
+      gladys.system.getContainers = fake.resolves([]);
+      zigbee2mqttManager.startInstallation('install');
+      zigbee2mqttManager.updateInstallationPhase('pull_z2m', { state: 'running', progress: 40 });
+      const error = new Error('docker fail pull');
+      zigbee2mqttManager.pullMissingImages = sinon.stub().callsFake(async () => {
+        zigbee2mqttManager.updateInstallationPhase('pull_mqtt', { state: 'running', progress: 30 });
+        zigbee2mqttManager.updateInstallationPhase('pull_mqtt', { state: 'failed' });
+        throw error;
+      });
+      let phasesDuringInstallation;
+      zigbee2mqttManager.installMqttContainer = sinon.stub().callsFake(async () => {
+        phasesDuringInstallation = zigbee2mqttManager.installation.phases.map(({ key, state }) => [key, state]);
+      });
+      // EXECUTE
+      await zigbee2mqttManager.init(true);
+      // ASSERT
+      expect(phasesDuringInstallation.slice(0, 2)).to.deep.equal([
+        // Still downloading
+        ['pull_z2m', 'running'],
+        // Failed once more when a container to create needs its image (see pullImage)
+        ['pull_mqtt', 'pending'],
+      ]);
+      assert.notCalled(zigbee2mqttManager.finishInstallation);
+    });
+
     it('should go on with the containers in place when the images are not downloaded ahead, without an update', async () => {
       // PREPARE
       gladys.system.getContainers = fake.resolves([]);
@@ -577,6 +730,8 @@ describe('zigbee2mqtt init', () => {
           currentZ2mContainer = { ...z2mContainer, id: 'new-z2m', state: 'created' };
         }),
         getGladysBasePath: fake.resolves({ basePathOnHost: '/var/lib/gladysassistant', basePathOnContainer: '/tmp' }),
+        // Unknown without df
+        getDiskSpace: fake.resolves(null),
       });
       // EXECUTE
       await zigbee2mqttManager.init();

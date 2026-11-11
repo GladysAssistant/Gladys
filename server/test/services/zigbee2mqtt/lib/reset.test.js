@@ -4,6 +4,8 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 
+const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 // Our own container, named after the requested filter
@@ -25,6 +27,13 @@ describe('zigbee2mqtt reset', () => {
   let zigbee2MqttManager;
   let gladys;
   let fsRmStub;
+
+  // What was sent to the setup page
+  const sentInstallProgresses = () =>
+    gladys.event.emit
+      .getCalls()
+      .filter(({ args }) => args[1].type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS)
+      .map(({ args }) => args[1].payload);
 
   beforeEach(() => {
     fsRmStub = fake.resolves(null);
@@ -164,6 +173,28 @@ describe('zigbee2mqtt reset', () => {
       error: null,
       durationMs: null,
     });
+    // The setup page stops showing its failure
+    const sentInstallations = sentInstallProgresses().map(({ installation }) => installation);
+    expect(sentInstallations[sentInstallations.length - 1]).to.equal(zigbee2MqttManager.installation);
+  });
+
+  it('should forget the outcome of an installation that finished while the integration was reset', async () => {
+    // Running when disconnect checked it
+    zigbee2MqttManager.installation = {
+      state: 'running',
+      kind: 'install',
+      phases: [],
+      progress: 5,
+      error: null,
+      durationMs: null,
+    };
+    gladys.variable.destroy = fake(async () => {
+      zigbee2MqttManager.installation.state = 'done';
+    });
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.installation.state).to.equal('idle');
   });
 
   it('should keep a running installation, which tells its own outcome', async () => {
@@ -183,6 +214,8 @@ describe('zigbee2mqtt reset', () => {
       neededBytes: 236400000,
       error: { code: 'NOT_ENOUGH_DISK_SPACE', message: null },
     };
+    // Its failure was just sent: the idle prefetch would be left waiting
+    zigbee2MqttManager.emitInstallProgress();
 
     await zigbee2MqttManager.reset();
 
@@ -193,6 +226,16 @@ describe('zigbee2mqtt reset', () => {
       neededBytes: null,
       error: null,
     });
+    // Sent at once, though within the interval since the last send
+    const sentPrefetches = sentInstallProgresses().map(({ prefetch }) => prefetch);
+    expect(sentPrefetches[sentPrefetches.length - 1]).to.equal(zigbee2MqttManager.prefetch);
+    expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
+  });
+
+  it('should send nothing to the setup page when there is nothing to forget', async () => {
+    await zigbee2MqttManager.reset();
+
+    expect(sentInstallProgresses()).to.deep.equal([]);
   });
 
   it('should keep a running prefetch, which tells its own outcome', async () => {

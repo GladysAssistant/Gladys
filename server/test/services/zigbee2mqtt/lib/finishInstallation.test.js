@@ -92,6 +92,29 @@ describe('zigbee2mqtt finishInstallation', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.emitInstallProgress);
   });
 
+  it('should not blame the download still running alongside the one that failed', () => {
+    // PREPARE
+    sinon.stub(logger, 'info');
+    // Not the one of beforeEach, whose downloads are skipped
+    zigbee2mqttManager.finishInstallation(null);
+    zigbee2mqttManager.startInstallation('install');
+    zigbee2mqttManager.updateInstallationPhase('pull_z2m', { state: 'running', progress: 30 });
+    zigbee2mqttManager.updateInstallationPhase('pull_mqtt', { state: 'running', progress: 60 });
+    // The download of the broker image fails, see pullImage
+    zigbee2mqttManager.updateInstallationPhase('pull_mqtt', { state: 'failed' });
+    // EXECUTE
+    zigbee2mqttManager.finishInstallation(new Error('docker fail pull'));
+    // ASSERT
+    expect(zigbee2mqttManager.installation.phases).to.deep.equal([
+      // Not followed any more: neither failed nor running
+      { key: 'pull_z2m', state: 'pending', progress: 30 },
+      { key: 'pull_mqtt', state: 'failed', progress: 60 },
+      { key: 'start_mqtt', state: 'pending', progress: 0 },
+      { key: 'start_z2m', state: 'pending', progress: 0 },
+      { key: 'connect_adapter', state: 'pending', progress: 0 },
+    ]);
+  });
+
   it('should give the code of a platform not compatible', () => {
     // EXECUTE
     zigbee2mqttManager.finishInstallation(new PlatformNotCompatible('DOCKER_BAD_NETWORK'));

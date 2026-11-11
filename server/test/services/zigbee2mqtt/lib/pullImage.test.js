@@ -32,6 +32,8 @@ describe('zigbee2mqtt pullImage', () => {
       },
       system: {
         imageExists: fake.resolves(false),
+        // Unknown without df
+        getDiskSpace: fake.resolves(null),
         pull: fake(
           (image, onProgress, { abortSignal }) =>
             new Promise((resolve, reject) => {
@@ -172,6 +174,103 @@ describe('zigbee2mqtt pullImage', () => {
     await Promise.all([installationPromise, promise]);
     expect(phase('pull_z2m')).to.deep.equal({ key: 'pull_z2m', state: 'done', progress: 100 });
     assert.calledOnce(gladys.system.pull);
+  });
+
+  it('should tell that the download failed, not the other one running alongside it', async () => {
+    // PREPARE
+    zigbee2mqttManager.startInstallation('install');
+    const promise = Promise.allSettled([
+      zigbee2mqttManager.pullImage(Z2M_IMAGE),
+      zigbee2mqttManager.pullImage(MQTT_IMAGE),
+    ]);
+    await waitForPull(2);
+    // EXECUTE
+    pulls[1].reject(new Error('docker fail pull'));
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    // ASSERT
+    expect(phase('pull_mqtt').state).to.equal('failed');
+    expect(phase('pull_z2m').state).to.equal('running');
+    pulls[0].resolve([]);
+    await promise;
+  });
+
+  describe('with the free disk space known', () => {
+    const diskSpace = (available) => ({ available, size: 32000000000, used: 0, capacity: 0, mountpoint: '/' });
+
+    it('should not download an image that does not fit with the margin left free', async () => {
+      // PREPARE
+      sinon.stub(logger, 'info');
+      // The Zigbee2mqtt image (214 MB) and the margin (500 MB), but one byte
+      gladys.system.getDiskSpace = fake.resolves(diskSpace(713999999));
+      zigbee2mqttManager.startInstallation('install');
+      // EXECUTE
+      const error = await zigbee2mqttManager.pullImage(Z2M_IMAGE).catch((e) => e);
+      // ASSERT
+      expect(error.message).to.equal(
+        'Not enough disk space to download koenkk/zigbee2mqtt:2.14.2: 714000000 bytes needed, 713999999 bytes free',
+      );
+      assert.notCalled(gladys.system.pull);
+      expect(phase('pull_z2m').state).to.equal('failed');
+      // Shown by the setup page like the failure of the prefetch
+      zigbee2mqttManager.finishInstallation(error);
+      expect(zigbee2mqttManager.installation.error).to.deep.equal({ code: 'NOT_ENOUGH_DISK_SPACE', message: null });
+    });
+
+    it('should download an image that fits with the margin left free', async () => {
+      // PREPARE
+      gladys.system.getDiskSpace = fake.resolves(diskSpace(522400000));
+      // EXECUTE
+      const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+      await waitForPull();
+      pulls[0].resolve([]);
+      await promise;
+      // ASSERT
+      assert.calledOnce(gladys.system.pull);
+    });
+
+    it('should not check the free disk space for an image already present', async () => {
+      // PREPARE
+      gladys.system.imageExists = fake.resolves(true);
+      gladys.system.getDiskSpace = fake.resolves(diskSpace(0));
+      // EXECUTE
+      await zigbee2mqttManager.pullImage(MQTT_IMAGE);
+      // ASSERT
+      assert.notCalled(gladys.system.getDiskSpace);
+    });
+  });
+
+  it('should download an image when the free disk space is unknown', async () => {
+    // EXECUTE
+    const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+    await waitForPull();
+    pulls[0].resolve([]);
+    await promise;
+    // ASSERT
+    assert.calledOnce(gladys.system.getDiskSpace);
+    assert.calledOnce(gladys.system.pull);
+  });
+
+  it('should fail at once, without downloading again, on a download failed in the last pullMissingImages', async () => {
+    // PREPARE
+    const error = new Error('Download of koenkk/zigbee2mqtt:2.14.2 stalled: no progress for 5 min');
+    zigbee2mqttManager.imagePullFailures = { [Z2M_IMAGE]: error };
+    zigbee2mqttManager.startInstallation('install');
+    // EXECUTE
+    const promise = zigbee2mqttManager.pullImage(Z2M_IMAGE);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith(error);
+    assert.notCalled(gladys.system.imageExists);
+    assert.notCalled(gladys.system.pull);
+    // The container to create fails on this download
+    expect(phase('pull_z2m').state).to.equal('failed');
+    // The other image is downloaded
+    const mqttPromise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+    await waitForPull();
+    pulls[0].resolve([]);
+    await mqttPromise;
+    expect(pulls.map(({ image }) => image)).to.deep.equal([MQTT_IMAGE]);
   });
 
   describe('when the download makes no progress', () => {

@@ -7,12 +7,18 @@ const MIN_INTERVAL_IN_MS = 500;
 /**
  * @description Send the progress of the installation and of the prefetch to the setup page, at most twice a second.
  * A call within the interval is sent once it is over, with the state of that time: the last state is always sent.
+ * @param {boolean} [immediate] - Send at once, in place of a send left waiting: when the integration is disabled or
+ * reset, no timer outlives it.
  * @example
  * this.emitInstallProgress();
  */
-function emitInstallProgress() {
+function emitInstallProgress(immediate = false) {
+  if (immediate) {
+    clearTimeout(this.installProgressTimer);
+    this.installProgressTimer = null;
+  }
   const waitInMs =
-    this.installProgressSentAt === null ? 0 : this.installProgressSentAt + MIN_INTERVAL_IN_MS - Date.now();
+    immediate || this.installProgressSentAt === null ? 0 : this.installProgressSentAt + MIN_INTERVAL_IN_MS - Date.now();
   if (waitInMs > 0) {
     if (this.installProgressTimer === null) {
       this.installProgressTimer = setTimeout(() => {

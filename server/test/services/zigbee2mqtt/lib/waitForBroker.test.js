@@ -71,7 +71,9 @@ describe('zigbee2mqtt waitForBroker', () => {
   const expectClientsClosed = () => {
     clients.forEach((client) => {
       assert.calledOnceWithExactly(client.end, true);
-      expect(client.eventNames()).to.deep.equal([]);
+      // Only the listener that swallows the errors emitted once settled
+      expect(client.eventNames()).to.deep.equal(['error']);
+      expect(client.listenerCount('error')).to.equal(1);
     });
   };
 
@@ -100,8 +102,9 @@ describe('zigbee2mqtt waitForBroker', () => {
 
   it('should end as soon as the broker accepts the connection of Gladys', async () => {
     // EXECUTE
-    await zigbee2mqttManager.waitForBroker(config);
+    const brokerAnswered = await zigbee2mqttManager.waitForBroker(config);
     // ASSERT
+    expect(brokerAnswered).to.equal(true);
     assert.calledOnceWithExactly(mqttLibrary.connect, 'mqtt://localhost:1884', {
       username: 'gladys',
       password: 'gladys-password',
@@ -158,42 +161,51 @@ describe('zigbee2mqtt waitForBroker', () => {
     });
   });
 
-  it('should warn and go on when the broker does not answer within 30 seconds', async () => {
+  it('should warn and resolve with false when the broker does not answer within 30 seconds', async () => {
     // PREPARE
     mqttLibrary.connect.callsFake(answerWith(refusedConnection));
     // EXECUTE
-    const wait = follow(zigbee2mqttManager.waitForBroker(config));
+    const promise = zigbee2mqttManager.waitForBroker(config);
+    const wait = follow(promise);
     await clock.tickAsync(29999);
     expect(wait.settled).to.equal(false);
     await clock.tickAsync(1);
     // ASSERT
-    // Not a failure: the client of Gladys reconnects until the broker answers
+    // Not a failure here: the caller decides (see installMqttContainer)
     expect(wait).to.deep.equal({ settled: true, error: null });
+    expect(await promise).to.equal(false);
     assert.callCount(mqttLibrary.connect, 121);
     expectClientsClosed();
-    assert.calledOnceWithExactly(
-      logger.warn,
-      'MQTT broker did not answer within 30.0 s, going on anyway: ECONNREFUSED',
-    );
+    assert.calledOnceWithExactly(logger.warn, 'MQTT broker did not answer within 30.0 s: ECONNREFUSED');
     assert.notCalled(logger.info);
   });
 
-  it('should warn and go on when the connections are never answered', async () => {
+  it('should warn and resolve with false when the connections are never answered', async () => {
     // PREPARE
     mqttLibrary.connect.callsFake(answerWith(closedWithoutAnswer, 2000));
     // EXECUTE
-    const wait = follow(zigbee2mqttManager.waitForBroker(config));
+    const promise = zigbee2mqttManager.waitForBroker(config);
+    const wait = follow(promise);
     // The last attempt starts before 30 s, and lasts its connect timeout
     await clock.tickAsync(31249);
     expect(wait.settled).to.equal(false);
     await clock.tickAsync(1);
     // ASSERT
     expect(wait).to.deep.equal({ settled: true, error: null });
+    expect(await promise).to.equal(false);
     assert.callCount(mqttLibrary.connect, 14);
     expectClientsClosed();
     assert.calledOnceWithExactly(
       logger.warn,
-      'MQTT broker did not answer within 30.0 s, going on anyway: Connection closed without an answer',
+      'MQTT broker did not answer within 30.0 s: Connection closed without an answer',
     );
+  });
+
+  it('should not throw on an error emitted by the client once the attempt is settled', async () => {
+    // EXECUTE
+    await zigbee2mqttManager.waitForBroker(config);
+    // ASSERT
+    // Without a listener, an EventEmitter throws the error it emits
+    expect(() => clients[0].emit('error', new Error('read ECONNRESET'))).not.to.throw();
   });
 });

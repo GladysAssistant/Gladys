@@ -42,8 +42,10 @@ const { pullImage } = require('./pullImage');
 const { pullMissingImages } = require('./pullMissingImages');
 const { startPrefetch } = require('./startPrefetch');
 const { updatePrefetchProgress } = require('./updatePrefetchProgress');
+const { refuseWhileInstalling } = require('./refuseWhileInstalling');
+const { clearInstallation } = require('./clearInstallation');
 const { JOB_TYPES } = require('../../../utils/constants');
-const { INSTALLATION_STATE } = require('./constants');
+const { getIdleInstallation, getIdlePrefetch } = require('./constants');
 
 // EVENTS
 const { emitStatusEvent } = require('./events/emitStatusEvent');
@@ -97,23 +99,21 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.startingTimer = null;
 
   // Installation launched by the setup, followed by the setup page (see startInstallation)
-  this.installation = {
-    state: INSTALLATION_STATE.IDLE,
-    kind: null,
-    phases: [],
-    progress: 0,
-    error: null,
-    durationMs: null,
-  };
+  this.installation = getIdleInstallation();
   this.installationStartedAt = null;
   this.installationJobId = null;
   this.installationJobProgress = 0;
   // Download of the images before the setup, followed by the setup page too
-  this.prefetch = { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null };
+  this.prefetch = getIdlePrefetch();
   // Progress of the download of each image of the running prefetch (see updatePrefetchProgress)
   this.prefetchProgressByImage = {};
   // Download of each image being pulled, shared by the installation and the prefetch (see pullImage)
   this.imagePulls = {};
+  // Error of each download that failed in the last pullMissingImages, given again without downloading (see pullImage)
+  this.imagePullFailures = {};
+  // Number of inits running (see refuseWhileInstalling). A count, not a flag: the start route shared by all services
+  // runs an init that the routes of this service cannot refuse, alongside another one
+  this.runningInits = 0;
   // See emitInstallProgress
   this.installProgressSentAt = null;
   this.installProgressTimer = null;
@@ -168,6 +168,8 @@ Zigbee2mqttManager.prototype.pullImage = pullImage;
 Zigbee2mqttManager.prototype.pullMissingImages = pullMissingImages;
 Zigbee2mqttManager.prototype.startPrefetch = startPrefetch;
 Zigbee2mqttManager.prototype.updatePrefetchProgress = updatePrefetchProgress;
+Zigbee2mqttManager.prototype.refuseWhileInstalling = refuseWhileInstalling;
+Zigbee2mqttManager.prototype.clearInstallation = clearInstallation;
 
 // EVENTS
 Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;

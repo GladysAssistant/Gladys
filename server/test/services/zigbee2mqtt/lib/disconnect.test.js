@@ -192,6 +192,69 @@ describe('zigbee2mqtt disconnect', () => {
     expect(zigbee2MqttManager.zigbee2mqttExist).to.equal(false);
   });
 
+  describe('with the installation followed by the setup page', () => {
+    let clock;
+    // The installations sent to the setup page
+    const sentInstallations = () =>
+      gladys.event.emit
+        .getCalls()
+        .filter(({ args }) => args[1].type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS)
+        .map(({ args }) => args[1].payload.installation);
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers({ now: 1700000000000, toFake: ['Date', 'setTimeout', 'clearTimeout'] });
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
+    it('should forget the failure of the last installation, and send it at once', async () => {
+      // PREPARE
+      zigbee2MqttManager.startInstallation('install');
+      zigbee2MqttManager.finishInstallation(new Error('docker fail pull'));
+      gladys.event.emit.resetHistory();
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      // ASSERT
+      expect(zigbee2MqttManager.installation.state).to.equal('idle');
+      expect(sentInstallations()).to.deep.equal([zigbee2MqttManager.installation]);
+      // Sent at once, even within the interval since the failure was sent
+      expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
+      expect(clock.countTimers()).to.equal(0);
+    });
+
+    it('should keep a running installation, which tells its own outcome', async () => {
+      // PREPARE
+      zigbee2MqttManager.startInstallation('install');
+      const { installation } = zigbee2MqttManager;
+      gladys.event.emit.resetHistory();
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      // ASSERT
+      expect(zigbee2MqttManager.installation).to.equal(installation);
+      expect(sentInstallations()).to.deep.equal([]);
+    });
+
+    it('should send at once the progress left waiting, not after the integration is disabled', async () => {
+      // PREPARE
+      zigbee2MqttManager.emitInstallProgress();
+      zigbee2MqttManager.prefetch.progress = 42;
+      // Within the interval: left waiting
+      zigbee2MqttManager.emitInstallProgress();
+      gladys.event.emit.resetHistory();
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      // ASSERT
+      const progressCalls = gladys.event.emit
+        .getCalls()
+        .filter(({ args }) => args[1].type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS);
+      expect(progressCalls.map(({ args }) => args[1].payload.prefetch.progress)).to.deep.equal([42]);
+      expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
+      expect(clock.countTimers()).to.equal(0);
+    });
+  });
+
   it('no container -> nothing to stop', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([]);
