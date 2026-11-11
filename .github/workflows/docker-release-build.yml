@@ -129,7 +129,7 @@ jobs:
         run: |
           npm run build
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: static
           path: front/build
@@ -188,7 +188,7 @@ jobs:
         with:
           version: v0.9.1
       - name: ↙️ Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: static
           path: static
