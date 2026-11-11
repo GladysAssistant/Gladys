@@ -80,7 +80,7 @@ jobs:
       # Same server node_modules cache as the "Server test" job (shared key).
       - name: 💾 Restore NPM dependencies cache
         id: deps-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             server/node_modules
@@ -136,7 +136,7 @@ jobs:
       # contain native addons built for the running node.
       - name: 💾 Restore NPM dependencies cache
         id: deps-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             server/node_modules
@@ -201,7 +201,7 @@ jobs:
       # native addons built for the running node.
       - name: 💾 Restore NPM dependencies cache
         id: deps-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
