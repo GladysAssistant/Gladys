@@ -1909,10 +1909,11 @@
           },
           "leavePage": "You can leave this page: the installation goes on.",
           "failedPhase": "Failed step:",
-          "alreadyRunning": "An installation is already running: wait for it to finish before saving the configuration again.",
+          "alreadyRunning": "An installation is running, or the integration is starting: wait for it to finish before saving the configuration again.",
           "errors": {
             "NO_ANSWER": "Zigbee2MQTT did not answer Gladys within 2 minutes of starting, without telling why. Check that the selected model is the one of your coordinator, unplug and plug your dongle back in or restart your network coordinator, then save the configuration again.",
             "DONGLE_NOT_FOUND": "Your Zigbee dongle is not plugged in (or not on the selected port): Zigbee2MQTT could not start. Plug it in, check the selected port, then save the configuration again.",
+            "NOT_ENOUGH_DISK_SPACE": "There is not enough disk space to download Zigbee2MQTT. Free up some space, then save the configuration again.",
             "unknownErrorPrefix": "Installation error: "
           }
         },

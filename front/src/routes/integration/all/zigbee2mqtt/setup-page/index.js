@@ -27,6 +27,7 @@ class Zigbee2mqttSetupPage extends Component {
   resolveZ2mUrl = configuration => getZ2mUrl(configuration, this.props.session.gatewayClient !== undefined);
 
   handleZ2MStatus = zigbee2mqttStatus => {
+    this.progressMessages += 1;
     // Gladys switched Zigbee2mqtt to the ezsp driver by itself: the saved model changed
     if (zigbee2mqttStatus.ezspFallback && !this.state.zigbee2mqttStatus.ezspFallback) {
       this.loadZ2MConfig();
@@ -36,6 +37,7 @@ class Zigbee2mqttSetupPage extends Component {
 
   // Sent apart from the status, which carries them too, to follow an installation without flooding the status
   handleInstallProgress = ({ installation, prefetch }) => {
+    this.progressMessages += 1;
     this.setState({ zigbee2mqttStatus: { ...this.state.zigbee2mqttStatus, installation, prefetch } });
   };
 
@@ -49,21 +51,44 @@ class Zigbee2mqttSetupPage extends Component {
   };
 
   loadZ2MStatus = async () => {
+    const { progressMessages } = this;
     try {
       const zigbee2mqttStatus = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/status');
+      if (this.unmounted) {
+        return;
+      }
+      // A message received during the request carried a more recent installation and prefetch
+      const outdated = progressMessages !== this.progressMessages;
+      const { installation, prefetch } = outdated ? this.state.zigbee2mqttStatus : zigbee2mqttStatus;
       this.setState({
-        zigbee2mqttStatus,
+        zigbee2mqttStatus: { ...zigbee2mqttStatus, installation, prefetch },
         loadZigbee2mqttStatus: RequestStatus.Success
       });
+      // The installation ended during the request: the configuration loaded alongside may predate its end
+      if (
+        outdated &&
+        get(zigbee2mqttStatus, 'installation.state') === 'running' &&
+        get(installation, 'state') !== 'running'
+      ) {
+        this.handleInstallationEnd();
+      }
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service status', e);
-      this.setState({ loadZigbee2mqttStatus: RequestStatus.Error });
+      if (!this.unmounted) {
+        this.setState({ loadZigbee2mqttStatus: RequestStatus.Error });
+      }
     }
   };
 
   loadZ2MConfig = async () => {
+    this.configRequests += 1;
+    const configRequest = this.configRequests;
     try {
       const savedConfig = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
+      // Loaded again or saved during the request: the configuration of the latest is kept
+      if (this.unmounted || configRequest !== this.configRequests) {
+        return;
+      }
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
@@ -73,7 +98,9 @@ class Zigbee2mqttSetupPage extends Component {
       });
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service config', e);
-      this.setState({ loadZigbee2mqttConfig: RequestStatus.Error });
+      if (!this.unmounted && configRequest === this.configRequests) {
+        this.setState({ loadZigbee2mqttConfig: RequestStatus.Error });
+      }
     }
   };
 
@@ -93,8 +120,13 @@ class Zigbee2mqttSetupPage extends Component {
     ) {
       return;
     }
+    const { progressMessages } = this;
     try {
       const prefetch = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/prefetch');
+      // A message received during the request carried a more recent prefetch
+      if (this.unmounted || progressMessages !== this.progressMessages) {
+        return;
+      }
       this.setState({ zigbee2mqttStatus: { ...this.state.zigbee2mqttStatus, prefetch } });
     } catch (e) {
       // The installation downloads what is missing anyway
@@ -110,6 +142,8 @@ class Zigbee2mqttSetupPage extends Component {
       const mapping = {};
       Object.keys(VARIABLE_MAP).forEach(key => (mapping[key] = nextConfiguration[VARIABLE_MAP[key]]));
       const savedConfig = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', mapping);
+      // A load still running read the configuration before the save
+      this.configRequests += 1;
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
@@ -180,6 +214,11 @@ class Zigbee2mqttSetupPage extends Component {
       loadZigbee2mqttStatus: RequestStatus.Getting,
       loadZigbee2mqttConfig: RequestStatus.Getting
     };
+    // Websocket messages received with the installation and the prefetch, more recent than an answer to a request
+    // sent before them
+    this.progressMessages = 0;
+    // Loads of the configuration sent, and saves answered: only the answer of the latest is applied
+    this.configRequests = 0;
   }
 
   async componentDidMount() {
@@ -201,6 +240,7 @@ class Zigbee2mqttSetupPage extends Component {
   }
 
   componentWillUnmount() {
+    this.unmounted = true;
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       this.handleZ2MStatus

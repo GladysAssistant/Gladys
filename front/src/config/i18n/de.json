@@ -2100,10 +2100,11 @@
           },
           "leavePage": "Sie können diese Seite verlassen: Die Installation läuft weiter.",
           "failedPhase": "Fehlgeschlagener Schritt:",
-          "alreadyRunning": "Es läuft bereits eine Installation: Warten Sie, bis sie abgeschlossen ist, bevor Sie die Konfiguration erneut speichern.",
+          "alreadyRunning": "Es läuft eine Installation oder die Integration startet gerade: Warten Sie, bis sie abgeschlossen ist, bevor Sie die Konfiguration erneut speichern.",
           "errors": {
             "NO_ANSWER": "Zigbee2MQTT hat Gladys innerhalb von 2 Minuten nach dem Start nicht geantwortet, ohne einen Grund anzugeben. Überprüfen Sie, ob das gewählte Modell Ihrem Koordinator entspricht, ziehen Sie Ihren Stick ab und stecken Sie ihn wieder ein oder starten Sie Ihren Netzwerk-Koordinator neu, und speichern Sie dann die Konfiguration erneut.",
             "DONGLE_NOT_FOUND": "Ihr Zigbee-Stick ist nicht eingesteckt (oder nicht am gewählten Port): Zigbee2MQTT konnte nicht starten. Stecken Sie ihn ein, überprüfen Sie den gewählten Port und speichern Sie dann die Konfiguration erneut.",
+            "NOT_ENOUGH_DISK_SPACE": "Es ist nicht genügend Speicherplatz vorhanden, um Zigbee2MQTT herunterzuladen. Geben Sie Speicherplatz frei und speichern Sie dann die Konfiguration erneut.",
             "unknownErrorPrefix": "Fehler bei der Installation: "
           }
         },
