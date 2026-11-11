@@ -23,11 +23,11 @@ const ALL_CONFIGURATION_KEYS = [
 ];
 
 /**
- * @description Reset Zigbee2mqtt integration to factory defaults.
+ * @description Reset Zigbee2mqtt integration to factory defaults, see reset.
  * @example
- * await this.reset();
+ * await resetIntegration.call(this);
  */
-async function reset() {
+async function resetIntegration() {
   logger.info('Zigbee2mqtt: resetting integration...');
 
   // 1. Disconnect (stop containers + disconnect MQTT)
@@ -81,6 +81,23 @@ async function reset() {
   }
 
   logger.info('Zigbee2mqtt: integration reset complete');
+}
+
+/**
+ * @description Reset Zigbee2mqtt integration to factory defaults. Counted while it runs, from its first line, the
+ * disconnect it runs being counted too: the routes and the setup checked before calling it are refused until it ends,
+ * as it would destroy the configuration and the folder that an installation started meanwhile writes (see
+ * refuseWhileInstalling).
+ * @example
+ * await this.reset();
+ */
+async function reset() {
+  this.runningOperations += 1;
+  try {
+    await resetIntegration.call(this);
+  } finally {
+    this.runningOperations -= 1;
+  }
 }
 
 module.exports = {

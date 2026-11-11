@@ -376,18 +376,18 @@ describe('zigbee2mqtt init', () => {
   it('should count itself while it runs, and stop counting once it ends', async () => {
     // PREPARE
     zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' });
-    let runningInitsDuringInit;
+    let runningOperationsDuringInit;
     zigbee2mqttManager.installMqttContainer.callsFake(async () => {
-      runningInitsDuringInit = zigbee2mqttManager.runningInits;
+      runningOperationsDuringInit = zigbee2mqttManager.runningOperations;
     });
     // EXECUTE
     const promise = zigbee2mqttManager.init();
     // Counted from its first line: a route checked before calling it is refused at once
-    expect(zigbee2mqttManager.runningInits).to.equal(1);
+    expect(zigbee2mqttManager.runningOperations).to.equal(1);
     await promise;
     // ASSERT
-    expect(runningInitsDuringInit).to.equal(1);
-    expect(zigbee2mqttManager.runningInits).to.equal(0);
+    expect(runningOperationsDuringInit).to.equal(1);
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
   });
 
   it('should stop counting itself when it fails', async () => {
@@ -397,7 +397,7 @@ describe('zigbee2mqtt init', () => {
     // EXECUTE
     await expect(zigbee2mqttManager.init()).to.be.rejectedWith('SYSTEM_NOT_RUNNING_DOCKER');
     // ASSERT
-    expect(zigbee2mqttManager.runningInits).to.equal(0);
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
   });
 
   it('should forget the failed downloads once it ends, for a later call to download again', async () => {

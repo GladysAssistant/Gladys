@@ -22,7 +22,7 @@ describe('zigbee2mqtt refuseWhileInstalling', () => {
   });
 
   ['idle', 'done', 'failed'].forEach((state) => {
-    it(`should accept a request when the installation is ${state} and no init runs`, () => {
+    it(`should accept a request when the installation is ${state} and no operation runs`, () => {
       // PREPARE
       zigbee2mqttManager.installation.state = state;
       // EXECUTE & ASSERT
@@ -34,7 +34,7 @@ describe('zigbee2mqtt refuseWhileInstalling', () => {
     // PREPARE
     zigbee2mqttManager.installation.state = 'running';
     // The init of the installation
-    zigbee2mqttManager.runningInits = 1;
+    zigbee2mqttManager.runningOperations = 1;
     // EXECUTE & ASSERT
     expect(() => zigbee2mqttManager.refuseWhileInstalling('reset')).to.throw(
       ConflictError,
@@ -42,13 +42,13 @@ describe('zigbee2mqtt refuseWhileInstalling', () => {
     );
   });
 
-  it('should refuse a request while an init runs outside an installation, as at the start of Gladys', () => {
+  it('should refuse a request while an operation runs outside an installation, as an init at the start of Gladys', () => {
     // PREPARE
-    zigbee2mqttManager.runningInits = 1;
+    zigbee2mqttManager.runningOperations = 1;
     // EXECUTE & ASSERT
     expect(() => zigbee2mqttManager.refuseWhileInstalling('save the setup')).to.throw(
       ConflictError,
-      'Zigbee2mqtt: cannot save the setup while the integration is starting',
+      'Zigbee2mqtt: cannot save the setup while the integration is busy',
     );
   });
 });

@@ -533,16 +533,36 @@ describe('zigbee2mqtt installMqttContainer', () => {
     expect(zigbee2mqttManager.installation.phases.find(({ key }) => key === 'start_mqtt').state).to.equal('running');
   });
 
-  it('should go on without the answer of the broker during an update, as Gladys connects once it answers', async () => {
+  it('should go on without the answer of the stopped broker it starts during an update, leaving its phase running', async () => {
     // PREPARE
+    zigbee2mqttManager.emitInstallProgress = fake();
+    zigbee2mqttManager.startInstallation('update');
+    zigbee2mqttManager.waitForBroker = fake.resolves(false);
+    const startMqttPhase = () => zigbee2mqttManager.installation.phases.find(({ key }) => key === 'start_mqtt');
+    // EXECUTE
+    await zigbee2mqttManager.installMqttContainer({ ...credentials });
+    // ASSERT
+    // Init goes on, as Gladys connects once the broker answers
+    expect(zigbee2mqttManager.mqttRunning).to.equal(true);
+    // Not shown started: the phase that failed if the update fails later
+    expect(startMqttPhase().state).to.equal('running');
+    zigbee2mqttManager.finishInstallation(new Error('Zigbee2mqtt did not answer'));
+    expect(startMqttPhase().state).to.equal('failed');
+  });
+
+  it('should go on without the answer of the broker it creates during an update, leaving its phase running', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.resolves([]);
+    gladys.system.createContainer = fake.resolves({ id: container.id });
     zigbee2mqttManager.emitInstallProgress = fake();
     zigbee2mqttManager.startInstallation('update');
     zigbee2mqttManager.waitForBroker = fake.resolves(false);
     // EXECUTE
     await zigbee2mqttManager.installMqttContainer({ ...credentials });
     // ASSERT
+    // Init goes on, as Gladys connects once the broker answers
     expect(zigbee2mqttManager.mqttRunning).to.equal(true);
-    expect(zigbee2mqttManager.installation.phases.find(({ key }) => key === 'start_mqtt').state).to.equal('done');
+    expect(zigbee2mqttManager.installation.phases.find(({ key }) => key === 'start_mqtt').state).to.equal('running');
   });
 
   it('should go on without the answer of the broker at the start of Gladys', async () => {

@@ -5,6 +5,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const { assert, fake } = sinon;
 
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -294,5 +295,59 @@ describe('zigbee2mqtt reset', () => {
     assert.calledOnce(cancelFake);
     assert.callCount(gladys.variable.destroy, 15);
     assert.calledOnce(fsRmStub);
+  });
+
+  it('should refuse a setup sent while it runs, whose configuration it would destroy once its disconnect ended', async () => {
+    // PREPARE
+    const runningOperationsDuringDisconnect = [];
+    gladys.system.stopContainer = fake(async () => {
+      runningOperationsDuringDisconnect.push(zigbee2MqttManager.runningOperations);
+      return true;
+    });
+    let destroyReached;
+    const destroyStarted = new Promise((resolve) => {
+      destroyReached = resolve;
+    });
+    let releaseDestroy;
+    const destroyReleased = new Promise((resolve) => {
+      releaseDestroy = resolve;
+    });
+    // The configuration is being destroyed, as when the reset route was sent from another tab
+    gladys.variable.destroy = fake(async () => {
+      destroyReached();
+      await destroyReleased;
+      return null;
+    });
+    zigbee2MqttManager.getConfiguration = fake.resolves({});
+    zigbee2MqttManager.runInstallation = fake.resolves(null);
+    const resetting = zigbee2MqttManager.reset();
+    await destroyStarted;
+    // EXECUTE
+    const setup = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    // ASSERT
+    // Answered with a 409 by the error middleware
+    await expect(setup).to.be.rejectedWith(
+      ConflictError,
+      'Zigbee2mqtt: cannot save the setup while the integration is busy',
+    );
+    expect(zigbee2MqttManager.installation.state).to.equal('idle');
+    assert.notCalled(zigbee2MqttManager.runInstallation);
+    // Its disconnect counted inside it, then ended: the reset alone is still counted
+    expect(runningOperationsDuringDisconnect).to.deep.equal([2, 2]);
+    expect(zigbee2MqttManager.runningOperations).to.equal(1);
+    releaseDestroy();
+    await resetting;
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
+  });
+
+  it('should stop counting itself when it fails', async () => {
+    // PREPARE
+    gladys.variable.destroy = fake.rejects(new Error('database is locked'));
+    // EXECUTE
+    await expect(zigbee2MqttManager.reset()).to.be.rejectedWith('database is locked');
+    // ASSERT
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
   });
 });

@@ -23,11 +23,11 @@ async function removeOwnContainer(system, descriptor) {
 }
 
 /**
- * @description Disconnect service from dependent containers.
+ * @description Disconnect service from dependent containers, see disconnect.
  * @example
- * disconnect();
+ * await disconnectContainers.call(this);
  */
-async function disconnect() {
+async function disconnectContainers() {
   // Stop backup reccurent job
   if (this.backupScheduledJob) {
     this.backupScheduledJob.cancel();
@@ -73,6 +73,22 @@ async function disconnect() {
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
   this.emitStatusEvent();
+}
+
+/**
+ * @description Disconnect service from dependent containers. Counted while it runs, from its first line: the routes
+ * and the setup checked before calling it are refused until it ends, as an installation started meanwhile would lose
+ * the containers it creates (see refuseWhileInstalling).
+ * @example
+ * disconnect();
+ */
+async function disconnect() {
+  this.runningOperations += 1;
+  try {
+    await disconnectContainers.call(this);
+  } finally {
+    this.runningOperations -= 1;
+  }
 }
 
 module.exports = {

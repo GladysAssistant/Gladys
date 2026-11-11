@@ -4,6 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -281,5 +282,47 @@ describe('zigbee2mqtt disconnect', () => {
     assert.notCalled(gladys.system.removeContainer);
     expect(zigbee2MqttManager.mqttRunning).to.equal(false);
     expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
+  });
+
+  it('should refuse a setup sent while it runs, whose installation would lose the containers removed meanwhile', async () => {
+    // PREPARE
+    let releaseDocker;
+    const dockerReleased = new Promise((resolve) => {
+      releaseDocker = resolve;
+    });
+    // The broker is being stopped, as when the disconnect route was sent from another tab
+    gladys.system.stopContainer = fake(async () => {
+      await dockerReleased;
+      return true;
+    });
+    zigbee2MqttManager.getConfiguration = fake.resolves({});
+    zigbee2MqttManager.runInstallation = fake.resolves(null);
+    const disconnecting = zigbee2MqttManager.disconnect();
+    // Counted from its first line: a route checked before calling it is refused at once
+    expect(zigbee2MqttManager.runningOperations).to.equal(1);
+    // EXECUTE
+    const setup = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    // ASSERT
+    // Answered with a 409 by the error middleware
+    await expect(setup).to.be.rejectedWith(
+      ConflictError,
+      'Zigbee2mqtt: cannot save the setup while the integration is busy',
+    );
+    expect(zigbee2MqttManager.installation.state).to.equal('idle');
+    assert.notCalled(zigbee2MqttManager.runInstallation);
+    releaseDocker();
+    await disconnecting;
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
+  });
+
+  it('should stop counting itself when it fails', async () => {
+    // PREPARE
+    gladys.system.stopContainer = fake.rejects(new Error('Docker is not answering'));
+    // EXECUTE
+    await expect(zigbee2MqttManager.disconnect()).to.be.rejectedWith('Docker is not answering');
+    // ASSERT
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
   });
 });

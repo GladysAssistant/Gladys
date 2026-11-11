@@ -53,6 +53,14 @@ function finishInstallation(error) {
         phase.state = INSTALLATION_PHASE_STATE.SKIPPED;
         phase.progress = 100;
       });
+    // Zigbee2mqtt answered through the broker: a phase left running, like the start of a broker slow to answer during
+    // an update, did succeed
+    installation.phases
+      .filter((phase) => phase.state === INSTALLATION_PHASE_STATE.RUNNING)
+      .forEach((phase) => {
+        phase.state = INSTALLATION_PHASE_STATE.DONE;
+        phase.progress = 100;
+      });
     installation.progress = 100;
     logger.info(`Zigbee2mqtt: ${installation.kind} done in ${duration}`);
   }
