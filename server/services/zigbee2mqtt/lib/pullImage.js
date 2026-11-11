@@ -9,7 +9,7 @@ const {
 const { formatDuration } = require('../utils/formatDuration');
 const { addPullEvent, getPullProgress } = require('../utils/getPullProgress');
 
-// Docker reports a download every few seconds while it goes on: without any report for that long, the download is
+// Docker reports a download every few seconds while it goes on: without any progress for that long, the download is
 // stuck (registry or connection that stopped answering) and would hold the installation forever
 const PULL_STALL_TIMEOUT_IN_MS = 5 * 60 * 1000;
 
@@ -58,7 +58,7 @@ async function pull(manager, image, phase) {
     });
   });
   let stallTimer = null;
-  // Armed when the download starts, then again at each of its progress events
+  // Armed when the download starts, then again each time it makes progress
   const watchForStall = () => {
     clearTimeout(stallTimer);
     stallTimer = setTimeout(() => abortController.abort(), PULL_STALL_TIMEOUT_IN_MS);
@@ -70,8 +70,12 @@ async function pull(manager, image, phase) {
       manager.gladys.system.pull(
         image,
         (event) => {
-          watchForStall();
-          layers = addPullEvent(layers, event);
+          const nextLayers = addPullEvent(layers, event);
+          // Not on an event that tells nothing new: Docker can repeat the position of a download that is stuck
+          if (nextLayers !== layers) {
+            watchForStall();
+          }
+          layers = nextLayers;
           const progress = getPullProgress(layers);
           // Both are read at each event: an installation or a prefetch started meanwhile follows the download from
           // then on

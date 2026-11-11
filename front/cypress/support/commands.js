@@ -30,6 +30,9 @@ Cypress.on('window:before:load', window => {
   const lang = Cypress.env('language');
   Object.defineProperty(window.navigator, 'language', { value: lang });
 
+  // The sockets of the page left, or of a previous test, are not the ones of the page loading
+  cypressWebSockets.length = 0;
+
   // Track every WebSocket the app opens so tests can push fake messages with cy.sendWebSocket.
   // The `onmessage` accessor stores the handler WITHOUT wiring it to native events:
   // tests must fully control message delivery, real server pushes would race with the
@@ -194,6 +197,18 @@ Cypress.Commands.add('sendWebSocket', payload => {
   cypressWebSockets
     .filter(ws => ws.url && ws.url.startsWith(websocketUrl) && typeof ws.onmessage === 'function')
     .forEach(ws => ws.onmessage({ data: JSON.stringify(payload) }));
+});
+
+// Until the app listens on the Gladys websocket: for a message pushed while the
+// requests of the page are still waiting for their answer.
+Cypress.Commands.add('waitForWebSocket', () => {
+  const websocketUrl = Cypress.env('websocketUrl');
+  cy.wrap(cypressWebSockets).should(websockets => {
+    const listening = websockets.some(
+      ws => ws.url && ws.url.startsWith(websocketUrl) && typeof ws.onmessage === 'function'
+    );
+    expect(listening).to.equal(true);
+  });
 });
 
 // Clean all devices according to a single service

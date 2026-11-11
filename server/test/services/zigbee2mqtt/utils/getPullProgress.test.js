@@ -68,6 +68,19 @@ describe('zigbee2mqtt getPullProgress', () => {
     expect(getPullProgress(layers)).to.equal(50);
   });
 
+  it('should give back the same layers for an event that tells nothing new', () => {
+    const layers = follow([{ status: 'Downloading', progressDetail: { current: 50, total: 100 }, id: 'aaa' }]);
+    // The position of a layer repeated, without its size, which is known already
+    expect(addPullEvent(layers, { status: 'Downloading', progressDetail: { current: 50 }, id: 'aaa' })).to.equal(
+      layers,
+    );
+    expect(addPullEvent(layers, { status: 'Downloading', progressDetail: { current: 51 }, id: 'aaa' })).not.to.equal(
+      layers,
+    );
+    expect(addPullEvent(layers, { status: 'Download complete', progressDetail: {}, id: 'aaa' })).not.to.equal(layers);
+    expect(addPullEvent(layers, { status: 'Waiting', progressDetail: {}, id: 'bbb' })).not.to.equal(layers);
+  });
+
   it('should not change the layers given', () => {
     const layers = follow([{ status: 'Pulling fs layer', progressDetail: {}, id: 'aaa' }]);
     const nextLayers = addPullEvent(layers, { status: 'Pull complete', id: 'aaa' });

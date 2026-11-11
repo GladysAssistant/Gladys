@@ -326,6 +326,27 @@ describe('zigbee2mqtt pullImage', () => {
       await rejection;
     });
 
+    it('should give up a download whose position Docker repeats without any progress', async () => {
+      // PREPARE
+      const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+      const rejection = expect(promise).to.be.rejectedWith(
+        'Download of eclipse-mosquitto:2.0.15 stalled: no progress for 5 min',
+      );
+      await waitForPull();
+      pulls[0].onProgress(progressEvent);
+      // EXECUTE
+      // Like the containerd image store of Docker, which repeats the position of each layer
+      for (let minutes = 0; minutes < 4; minutes += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await clock.tickAsync(60 * 1000);
+        pulls[0].onProgress(progressEvent);
+      }
+      await clock.tickAsync(60 * 1000);
+      // ASSERT
+      await rejection;
+      expect(pulls[0].abortSignal.aborted).to.equal(true);
+    });
+
     it('should keep waiting for a slow download that progresses, and stop watching it once over', async () => {
       // PREPARE
       const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
@@ -334,7 +355,7 @@ describe('zigbee2mqtt pullImage', () => {
       for (let minutes = 0; minutes < 12; minutes += 4) {
         // eslint-disable-next-line no-await-in-loop
         await clock.tickAsync(4 * 60 * 1000);
-        pulls[0].onProgress(progressEvent);
+        pulls[0].onProgress({ ...progressEvent, progressDetail: { current: minutes + 1, total: 100 } });
       }
       pulls[0].resolve([]);
       await promise;
