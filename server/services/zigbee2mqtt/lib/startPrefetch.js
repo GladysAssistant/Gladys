@@ -2,17 +2,14 @@ const logger = require('../../../utils/logger');
 const {
   INSTALLATION_STATE,
   INSTALLATION_ERROR,
+  IMAGES,
   IMAGE_SIZE_IN_BYTES,
   DISK_SPACE_MARGIN_IN_BYTES,
+  getIdlePrefetch,
 } = require('./constants');
 const { getInstallationError } = require('./finishInstallation');
 
-const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
-const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
-
 const { RUNNING, DONE, FAILED } = INSTALLATION_STATE;
-
-const IMAGES = [z2mContainerDescriptor.Image, mqttContainerDescriptor.Image];
 
 /**
  * @description Tell the failure of the prefetch, shown by the setup page like the failure of an installation.
@@ -62,7 +59,7 @@ async function startPrefetch() {
     return this.prefetch;
   }
   // Running from now on, with no wait since the check: a call meanwhile starts nothing
-  this.prefetch = { state: RUNNING, progress: 0, freeBytes: null, neededBytes: null, error: null };
+  this.prefetch = { ...getIdlePrefetch(), state: RUNNING };
   this.prefetchProgressByImage = {};
   const { prefetch } = this;
   try {

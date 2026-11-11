@@ -4,14 +4,35 @@ const fse = require('fs-extra');
 
 const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
-const { INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
+const { INSTALLATION_STATE, INSTALLATION_KIND, INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
 const { formatDuration } = require('../utils/formatDuration');
 const { hashMosquittoPassword } = require('../utils/hashMosquittoPassword');
+const { BROKER_MAX_WAIT_IN_MS } = require('./waitForBroker');
 
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 
 const { PULL_MQTT, START_MQTT } = INSTALLATION_PHASE;
 const { RUNNING, DONE, SKIPPED } = INSTALLATION_PHASE_STATE;
+
+/**
+ * @description Wait for the broker just started to answer. An installation launched from the setup page fails when it
+ * does not: its phase would show the broker started, and the installation would fail later on a less clear error. At
+ * the start of Gladys or during an update, Gladys goes on as before: its client connects once the broker answers.
+ * @param {object} manager - Zigbee2mqtt manager.
+ * @param {object} config - Service configuration properties.
+ * @returns {Promise} Resolve once the broker answers, or after the maximum wait outside such an installation.
+ * @example
+ * await waitForStartedBroker(this, config);
+ */
+async function waitForStartedBroker(manager, config) {
+  const brokerAnswered = await manager.waitForBroker(config);
+  const { state, kind } = manager.installation;
+  const launchedFromSetupPage =
+    state === INSTALLATION_STATE.RUNNING && (kind === INSTALLATION_KIND.INSTALL || kind === INSTALLATION_KIND.SWITCH);
+  if (!brokerAnswered && launchedFromSetupPage) {
+    throw new Error(`MQTT broker did not answer within ${formatDuration(BROKER_MAX_WAIT_IN_MS)}`);
+  }
+}
 
 /**
  * @description Install and starts MQTT container.
@@ -88,7 +109,7 @@ async function installMqttContainer(config) {
       const restartStartedAt = Date.now();
       await this.gladys.system.restartContainer(containerMqtt.id);
       logger.info(`MQTT broker container started in ${formatDuration(Date.now() - restartStartedAt)}`);
-      await this.waitForBroker(config);
+      await waitForStartedBroker(this, config);
       logger.info('MQTT broker container successfully started and configured');
 
       this.mqttRunning = true;
@@ -111,7 +132,7 @@ async function installMqttContainer(config) {
         const restartStartedAt = Date.now();
         await this.gladys.system.restartContainer(container.id);
         logger.info(`MQTT broker container started in ${formatDuration(Date.now() - restartStartedAt)}`);
-        await this.waitForBroker(config);
+        await waitForStartedBroker(this, config);
         this.updateInstallationPhase(START_MQTT, { state: DONE });
       } else {
         this.updateInstallationPhase(START_MQTT, { state: SKIPPED });

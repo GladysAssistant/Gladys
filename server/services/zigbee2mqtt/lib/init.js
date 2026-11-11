@@ -6,6 +6,8 @@ const {
   DEFAULT,
   INSTALLATION_STATE,
   INSTALLATION_KIND,
+  INSTALLATION_PHASE_STATE,
+  PULL_PHASE_BY_IMAGE,
 } = require('./constants');
 const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
@@ -56,13 +58,13 @@ async function finishUpdate(manager) {
 }
 
 /**
- * @description Prepares service and starts connection with broker if needed.
+ * @description Prepares service and starts connection with broker if needed, see init.
  * @param {boolean} setupMode - In setup mode.
  * @returns {Promise} Resolve when init finished.
  * @example
- * await z2m.init();
+ * await initialize.call(this, setupMode);
  */
-async function init(setupMode = false) {
+async function initialize(setupMode) {
   const startedAt = Date.now();
   // Reset status
   this.usbConfigured = false;
@@ -78,6 +80,7 @@ async function init(setupMode = false) {
   this.healthCheckTimer = null;
   clearTimeout(this.startingTimer);
   this.startingTimer = null;
+  // Not installProgressTimer: an installation runs this init, its last progress must still be sent
   this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.networkModeValid = false;
@@ -145,6 +148,8 @@ async function init(setupMode = false) {
   this.emitStatusEvent();
 
   if (mqttMode === MQTT_MODE.LOCAL) {
+    // Variables generated below, by key
+    const generatedVariables = {};
     // Check for existing credentials for Gladys
     if (!mqttPassword) {
       configuration.mqttUsername = CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE;
@@ -153,10 +158,13 @@ async function init(setupMode = false) {
         lowercase: true,
         uppercase: true,
       });
+      generatedVariables[CONFIGURATION.GLADYS_MQTT_USERNAME_KEY] = configuration.mqttUsername;
+      generatedVariables[CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY] = configuration.mqttPassword;
     }
     // Verify that mqttUrl is present
     if (!mqttUrl) {
       configuration.mqttUrl = CONFIGURATION.MQTT_URL_VALUE;
+      generatedVariables[CONFIGURATION.MQTT_URL_KEY] = configuration.mqttUrl;
     }
     // Check for existing credentials for Z2M
     if (!configuration.z2mMqttPassword) {
@@ -166,7 +174,13 @@ async function init(setupMode = false) {
         lowercase: true,
         uppercase: true,
       });
+      generatedVariables[CONFIGURATION.Z2M_MQTT_USERNAME_KEY] = configuration.z2mMqttUsername;
+      generatedVariables[CONFIGURATION.Z2M_MQTT_PASSWORD_KEY] = configuration.z2mMqttPassword;
     }
+    // Saved as soon as generated, before the broker is created with these accounts: saved only at the end of init,
+    // they would be lost when the installation fails after the creation of the broker, which would then refuse every
+    // later try (BAD_CREDENTIALS)
+    await Promise.all(Object.entries(generatedVariables).map(([key, value]) => this.saveOrDestroyVariable(key, value)));
   }
 
   let updating = false;
@@ -201,9 +215,15 @@ async function init(setupMode = false) {
           updating = false;
           newImagesPulled = false;
         } else {
-          // Only a container to create needs its image, and downloads it again then: running containers whose image
-          // tag left the machine (removed by hand) keep running, Gladys connects to them
+          // Only a container to create needs its image, and fails on the same error then (see pullImage): running
+          // containers whose image tag left the machine (removed by hand) keep running, Gladys connects to them
           logger.warn('Zigbee2mqtt: images not downloaded ahead, going on with the containers in place:', e);
+          // The installation goes on: a failed download is pending again, failed once more when a container to create
+          // needs its image, skipped when none is created
+          const pullPhases = Object.values(PULL_PHASE_BY_IMAGE);
+          this.installation.phases
+            .filter(({ key, state }) => pullPhases.includes(key) && state === INSTALLATION_PHASE_STATE.FAILED)
+            .forEach(({ key }) => this.updateInstallationPhase(key, { state: INSTALLATION_PHASE_STATE.PENDING }));
         }
       }
       // Skipped, the stored versions stay the old ones
@@ -243,6 +263,25 @@ async function init(setupMode = false) {
   }
 
   return null;
+}
+
+/**
+ * @description Prepares service and starts connection with broker if needed. Counted while it runs, from its first
+ * line: the routes and the setup checked before calling it are refused until it ends (see refuseWhileInstalling).
+ * @param {boolean} setupMode - In setup mode.
+ * @returns {Promise} Resolve when init finished.
+ * @example
+ * await z2m.init();
+ */
+async function init(setupMode = false) {
+  this.runningInits += 1;
+  try {
+    return await initialize.call(this, setupMode);
+  } finally {
+    this.runningInits -= 1;
+    // Kept for the containers of this init only: a later call downloads again
+    this.imagePullFailures = {};
+  }
 }
 
 module.exports = {

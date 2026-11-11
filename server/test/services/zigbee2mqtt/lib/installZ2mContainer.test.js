@@ -76,6 +76,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         inspectContainer: fake.resolves(containerDescription),
         stopContainer: fake.resolves(true),
         imageExists: fake.resolves(false),
+        // Unknown without df
+        getDiskSpace: fake.resolves(null),
         pull: fake.resolves(true),
         restartContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),

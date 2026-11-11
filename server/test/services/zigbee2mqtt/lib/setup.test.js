@@ -231,6 +231,22 @@ describe('zigbee2mqtt setup', () => {
     expect(zigbee2MqttManager.installation.state).to.equal('running');
   });
 
+  it('should refuse a setup while an init runs, as at the start of Gladys', async () => {
+    // PREPARE
+    zigbee2MqttManager.runningInits = 1;
+    // EXECUTE
+    const promise = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    // ASSERT
+    // The init of the installation would run alongside it
+    await expect(promise).to.be.rejectedWith(
+      ConflictError,
+      'Zigbee2mqtt: cannot save the setup while the integration is starting',
+    );
+    assert.notCalled(gladys.variable.setValue);
+    assert.notCalled(zigbee2MqttManager.runInstallation);
+    expect(zigbee2MqttManager.installation.state).to.equal('idle');
+  });
+
   it('should end the installation when the setup fails to be stored', async () => {
     // PREPARE
     gladys.variable.setValue = fake.rejects(new Error('database is locked'));

@@ -7,7 +7,7 @@ const { getMqttConnectionError } = require('../utils/getMqttConnectionError');
 const RETRY_INTERVAL_IN_MS = 250;
 // A listening broker answers at once: an attempt that lasts is a connection that will not be answered
 const ATTEMPT_TIMEOUT_IN_MS = 2000;
-// Beyond, Gladys goes on without the answer, as it did before: its client reconnects every 5 seconds (see connect)
+// Beyond, the caller decides whether Gladys goes on without the answer (see installMqttContainer)
 const MAX_WAIT_IN_MS = 30 * 1000;
 
 /**
@@ -36,6 +36,8 @@ function probeBroker(mqttLibrary, { mqttUrl, mqttUsername, mqttPassword }) {
     const listeners = {};
     const settle = (error) => {
       Object.entries(listeners).forEach(([event, listener]) => client.removeListener(event, listener));
+      // An error emitted once settled, like a socket error while the connection closes, would be thrown without one
+      client.on('error', () => {});
       client.end(true);
       resolve(error);
     };
@@ -57,9 +59,10 @@ function probeBroker(mqttLibrary, { mqttUrl, mqttUsername, mqttPassword }) {
 /**
  * @description Wait for the MQTT broker of Gladys to answer once its container is started.
  * @param {object} config - Service configuration properties.
- * @returns {Promise} Resolve once the broker answers, even to refuse the credentials, or after the maximum wait.
+ * @returns {Promise<boolean>} Resolve with true once the broker answers, even to refuse the credentials, or with false
+ * after the maximum wait.
  * @example
- * await this.waitForBroker(config);
+ * const brokerAnswered = await this.waitForBroker(config);
  */
 async function waitForBroker(config) {
   const startedAt = Date.now();
@@ -75,13 +78,15 @@ async function waitForBroker(config) {
   if (error) {
     // A refused connection to localhost has no message since Node 20, which tries both its IPv4 and IPv6 addresses
     const reason = error.message || error.code;
-    // Not a failure: a slow machine may need more time, and the client of Gladys connects once the broker answers
-    logger.warn(`MQTT broker did not answer within ${formatDuration(MAX_WAIT_IN_MS)}, going on anyway: ${reason}`);
-    return;
+    logger.warn(`MQTT broker did not answer within ${formatDuration(MAX_WAIT_IN_MS)}: ${reason}`);
+    return false;
   }
   logger.info(`MQTT broker ready in ${formatDuration(Date.now() - startedAt)}`);
+  return true;
 }
 
 module.exports = {
   waitForBroker,
+  // Told by the error of an installation whose broker does not answer (see installMqttContainer)
+  BROKER_MAX_WAIT_IN_MS: MAX_WAIT_IN_MS,
 };

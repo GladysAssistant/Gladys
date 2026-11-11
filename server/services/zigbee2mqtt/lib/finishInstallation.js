@@ -35,11 +35,13 @@ function finishInstallation(error) {
   if (error) {
     installation.state = INSTALLATION_STATE.FAILED;
     installation.error = getInstallationError(error);
-    // The phase that was running is the one that failed
+    // The phase that was running is the one that failed. Unless a phase already failed on its own, like a download
+    // (see pullImage): the other download, still running alongside it, did not fail, and ends unfollowed
+    const phaseFailed = installation.phases.some((phase) => phase.state === INSTALLATION_PHASE_STATE.FAILED);
     installation.phases
       .filter((phase) => phase.state === INSTALLATION_PHASE_STATE.RUNNING)
       .forEach((phase) => {
-        phase.state = INSTALLATION_PHASE_STATE.FAILED;
+        phase.state = phaseFailed ? INSTALLATION_PHASE_STATE.PENDING : INSTALLATION_PHASE_STATE.FAILED;
       });
     logger.warn(`Zigbee2mqtt: ${installation.kind} failed after ${duration}`);
   } else {

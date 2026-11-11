@@ -95,6 +95,23 @@ describe('zigbee2mqtt emitInstallProgress', () => {
     expect(sentProgresses).to.deep.equal([0, 10]);
   });
 
+  it('should send at once when asked, in place of the send left waiting', () => {
+    // PREPARE
+    zigbee2mqttManager.emitInstallProgress();
+    clock.tick(100);
+    zigbee2mqttManager.installation.progress = 10;
+    zigbee2mqttManager.emitInstallProgress();
+    expect(zigbee2mqttManager.installProgressTimer).to.not.equal(null);
+    zigbee2mqttManager.installation.progress = 20;
+    // EXECUTE
+    zigbee2mqttManager.emitInstallProgress(true);
+    // ASSERT
+    expect(sentProgresses).to.deep.equal([0, 20]);
+    expect(zigbee2mqttManager.installProgressTimer).to.equal(null);
+    clock.tick(5000);
+    expect(sentProgresses).to.deep.equal([0, 20]);
+  });
+
   it('should update the progress of the installation job when it changes', () => {
     // PREPARE
     zigbee2mqttManager.installationJobId = 'job-id';

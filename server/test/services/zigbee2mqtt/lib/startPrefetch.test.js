@@ -210,7 +210,8 @@ describe('zigbee2mqtt startPrefetch', () => {
     await flush();
     // ASSERT
     expect(secondPrefetch).to.equal(firstPrefetch);
-    assert.calledOnce(gladys.system.getDiskSpace);
+    // Once by the prefetch, then before each of its two downloads (see pullImage)
+    assert.calledThrice(gladys.system.getDiskSpace);
     expect(pulls).to.have.lengthOf(2);
   });
 

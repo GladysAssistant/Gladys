@@ -135,15 +135,50 @@ describe('zigbee2mqtt waitForZigbee2mqtt', () => {
     expect(connectAdapterPhase().state).to.equal('done');
   });
 
-  it('should wait for the Zigbee2mqtt behind an external broker', async () => {
-    // PREPARE
-    zigbee2mqttManager.usbConfigured = false;
-    zigbee2mqttManager.getConfiguration = fake.resolves({ mqttMode: 'external' });
-    zigbee2mqttManager.zigbee2mqttConnected = true;
-    // EXECUTE
-    await zigbee2mqttManager.waitForZigbee2mqtt();
-    // ASSERT
-    expect(connectAdapterPhase().state).to.equal('done');
+  describe('with an external broker', () => {
+    beforeEach(() => {
+      // Gladys installs nothing
+      zigbee2mqttManager.usbConfigured = false;
+      zigbee2mqttManager.getConfiguration = fake.resolves({ mqttMode: 'external' });
+    });
+
+    it('should end once Gladys is connected to the broker, without waiting for Zigbee2mqtt', async () => {
+      // EXECUTE
+      const wait = follow(zigbee2mqttManager.waitForZigbee2mqtt());
+      await clock.tickAsync(1000);
+      expect(wait.settled).to.equal(false);
+      zigbee2mqttManager.gladysConnected = true;
+      await clock.tickAsync(500);
+      // ASSERT
+      // The status tells whether Zigbee2mqtt answers
+      expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+      expect(wait).to.deep.equal({ settled: true, error: null });
+      expect(connectAdapterPhase().state).to.equal('done');
+    });
+
+    it('should fail as soon as Gladys fails to connect to the broker', async () => {
+      // EXECUTE
+      const wait = follow(zigbee2mqttManager.waitForZigbee2mqtt());
+      await clock.tickAsync(1000);
+      zigbee2mqttManager.mqttConnectionError = { code: 'BROKER_UNREACHABLE', message: null };
+      await clock.tickAsync(500);
+      // ASSERT
+      expect(wait.settled).to.equal(true);
+      expect(wait.error.installationError).to.deep.equal({ code: 'BROKER_UNREACHABLE', message: null });
+    });
+
+    it('should fail when Gladys is not connected to the broker in time, without telling why', async () => {
+      // PREPARE
+      zigbee2mqttManager.zigbee2mqttStartingTimeoutInMs = 60000;
+      // EXECUTE
+      const wait = follow(zigbee2mqttManager.waitForZigbee2mqtt());
+      await clock.tickAsync(59500);
+      expect(wait.settled).to.equal(false);
+      await clock.tickAsync(500);
+      // ASSERT
+      expect(wait.settled).to.equal(true);
+      expect(wait.error.installationError).to.deep.equal({ code: 'BROKER_UNREACHABLE', message: null });
+    });
   });
 
   it('should fail as soon as Gladys fails to connect to the broker', async () => {

@@ -69,6 +69,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
         getContainers: fake.resolves([containerStopped]),
         stopContainer: fake.resolves(true),
         imageExists: fake.resolves(false),
+        // Unknown without df
+        getDiskSpace: fake.resolves(null),
         pull: fake.resolves(true),
         restartContainer: fake.resolves(true),
         createContainer: fake.resolves(true),
@@ -85,7 +87,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
     zigbee2mqttManager.networkModeValid = true;
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
-    zigbee2mqttManager.waitForBroker = fake.resolves(undefined);
+    // The broker answers
+    zigbee2mqttManager.waitForBroker = fake.resolves(true);
   });
 
   afterEach(() => {
@@ -490,6 +493,77 @@ describe('zigbee2mqtt installMqttContainer', () => {
       expect(phase('pull_mqtt').state).to.equal('skipped');
       expect(phase('start_mqtt').state).to.equal('skipped');
     });
+
+    it('should fail when the broker it created does not answer, instead of showing it started', async () => {
+      // PREPARE
+      gladys.system.getContainers = sinon
+        .stub()
+        .onFirstCall()
+        .resolves([])
+        .onSecondCall()
+        .resolves([container]);
+      gladys.system.createContainer = fake.resolves({ id: container.id });
+      zigbee2mqttManager.waitForBroker = fake.resolves(false);
+      // EXECUTE
+      const promise = zigbee2mqttManager.installMqttContainer({ ...credentials });
+      // ASSERT
+      const error = await promise.catch((e) => e);
+      expect(error.message).to.equal('MQTT broker did not answer within 30.0 s');
+      expect(zigbee2mqttManager.mqttRunning).to.equal(false);
+      // The phase that fails, shown as such once the installation tells its failure
+      expect(phase('start_mqtt').state).to.equal('running');
+      zigbee2mqttManager.finishInstallation(error);
+      expect(phase('start_mqtt').state).to.equal('failed');
+      expect(zigbee2mqttManager.installation.error).to.deep.equal({
+        code: null,
+        message: 'MQTT broker did not answer within 30.0 s',
+      });
+    });
+  });
+
+  it('should fail when the stopped broker it starts for another coordinator does not answer', async () => {
+    // PREPARE
+    zigbee2mqttManager.emitInstallProgress = fake();
+    zigbee2mqttManager.startInstallation('switch');
+    zigbee2mqttManager.waitForBroker = fake.resolves(false);
+    // EXECUTE
+    const promise = zigbee2mqttManager.installMqttContainer({ ...credentials });
+    // ASSERT
+    await expect(promise).to.be.rejectedWith('MQTT broker did not answer within 30.0 s');
+    expect(zigbee2mqttManager.installation.phases.find(({ key }) => key === 'start_mqtt').state).to.equal('running');
+  });
+
+  it('should go on without the answer of the broker during an update, as Gladys connects once it answers', async () => {
+    // PREPARE
+    zigbee2mqttManager.emitInstallProgress = fake();
+    zigbee2mqttManager.startInstallation('update');
+    zigbee2mqttManager.waitForBroker = fake.resolves(false);
+    // EXECUTE
+    await zigbee2mqttManager.installMqttContainer({ ...credentials });
+    // ASSERT
+    expect(zigbee2mqttManager.mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.installation.phases.find(({ key }) => key === 'start_mqtt').state).to.equal('done');
+  });
+
+  it('should go on without the answer of the broker at the start of Gladys', async () => {
+    // PREPARE
+    zigbee2mqttManager.waitForBroker = fake.resolves(false);
+    // EXECUTE
+    await zigbee2mqttManager.installMqttContainer({ ...credentials });
+    // ASSERT
+    expect(zigbee2mqttManager.mqttRunning).to.equal(true);
+  });
+
+  it('should go on without the answer of the broker after a failed installation', async () => {
+    // PREPARE
+    zigbee2mqttManager.emitInstallProgress = fake();
+    zigbee2mqttManager.startInstallation('install');
+    zigbee2mqttManager.finishInstallation(new Error('docker fail pull'));
+    zigbee2mqttManager.waitForBroker = fake.resolves(false);
+    // EXECUTE
+    await zigbee2mqttManager.installMqttContainer({ ...credentials });
+    // ASSERT
+    expect(zigbee2mqttManager.mqttRunning).to.equal(true);
   });
 
   it('should fail to configure MQTT container', async function Test() {
