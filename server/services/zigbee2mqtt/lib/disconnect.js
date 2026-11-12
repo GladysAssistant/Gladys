@@ -31,6 +31,8 @@ async function disconnectContainers() {
   // Stop backup reccurent job
   if (this.backupScheduledJob) {
     this.backupScheduledJob.cancel();
+    // Scheduled again by the next init only when there is none
+    this.backupScheduledJob = null;
   }
 
   // Disconnect from MQTT broker
