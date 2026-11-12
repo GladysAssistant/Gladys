@@ -230,13 +230,20 @@ describe('Zigbee2mqtt installation progress', () => {
     );
     visitSetup({ ...readyToSetupStatus, installation: runningInstallation, prefetch });
     cy.get('[data-cy=z2m-installation-progress]').should('exist');
-    // Loaded after the status
+    // Loaded after the status, and shown: answered to the page too, not only to the proxy. The HTTP client gives the
+    // answer of a GET still running to the same GET asked meanwhile, instead of sending it.
     cy.wait('@config');
+    cy.get('[data-cy=z2m-setup-local-panel]').should('exist');
 
-    // The load at the end of the installation, read before the save, answers after it
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { delay: 3000, body: {} }).as(
-      'configReload'
-    );
+    // The load at the end of the installation, read before the save, answers once the save is shown
+    let answerReload;
+    const reloadAnswered = new Promise(resolve => {
+      answerReload = resolve;
+    });
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, async req => {
+      await reloadAnswered;
+      req.reply({ body: {} });
+    }).as('configReload');
     cy.sendWebSocket({
       type: 'zigbee2mqtt.install-progress',
       payload: { installation: doneInstallation, prefetch }
@@ -247,6 +254,7 @@ describe('Zigbee2mqtt installation progress', () => {
       .click();
     cy.wait('@setup');
     cy.get('[data-cy=z2m-setup-local-summary]').should('exist');
+    cy.then(() => answerReload());
     cy.wait('@configReload');
 
     cy.get('[data-cy=z2m-setup-local-summary]').should('exist');

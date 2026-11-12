@@ -29,6 +29,10 @@ function startInstallation(kind) {
     error: null,
     durationMs: null,
   };
+  // Resolved by finishInstallation: the service waits for it before it stops (see its stop)
+  this.installationEnd = new Promise((resolve) => {
+    this.resolveInstallationEnd = resolve;
+  });
   this.emitInstallProgress();
 }
 
