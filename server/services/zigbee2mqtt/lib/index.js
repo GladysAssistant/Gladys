@@ -114,7 +114,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.imagePulls = {};
   // Error of each download that failed in the last pullMissingImages, given again without downloading (see pullImage)
   this.imagePullFailures = {};
-  // Number of inits, disconnects, resets and ezsp fallbacks running (see refuseWhileInstalling). A count, not a flag:
+  // Number of inits, disconnects, resets and ezsp fallbacks running (see refuseWhileInstalling, and the stop of the
+  // service, which waits for them). A count, not a flag:
   // reset runs a disconnect, and the start route shared by all services runs an init that the routes of this service
   // cannot refuse, alongside another operation
   this.runningOperations = 0;
