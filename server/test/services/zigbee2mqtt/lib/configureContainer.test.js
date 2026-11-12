@@ -35,6 +35,7 @@ const networkAdapterConfigFilePath = path.join(configBasePath, 'z2m_network-adap
 const onboardingConfigFilePath = path.join(configBasePath, 'z2m_onboarding_config.yaml');
 const usedOnboardingConfigFilePath = path.join(configBasePath, 'z2m_onboarding-used_config.yaml');
 const restoredConfigFilePath = path.join(configBasePath, 'z2m_restored_config.yaml');
+const coordinatorBackupConfigFilePath = path.join(configBasePath, 'z2m_coordinator-backup_config.yaml');
 const configFolder = path.dirname(configFilePath);
 
 describe('zigbee2mqtt configureContainer', () => {
@@ -164,6 +165,47 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
     assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
+  });
+
+  it('it should keep the network settings of the coordinator backup left by Zigbee2mqtt, without Z2M backup', async () => {
+    // PREPARE
+    // Written by zigbee-herdsman 10.10 (open coordinator backup format)
+    fs.writeFileSync(
+      path.join(configFolder, 'coordinator_backup.json'),
+      JSON.stringify({
+        pan_id: 'cbac',
+        extended_pan_id: '79a72f8e5058b222',
+        channel: 15,
+        network_key: { key: '181b15952df956b87a22e8560fb15b98', sequence_number: 0, frame_counter: 1234 },
+      }),
+    );
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(coordinatorBackupConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should ask Zigbee2mqtt to draw the network settings when the coordinator backup is unreadable', async () => {
+    // PREPARE
+    fs.writeFileSync(path.join(configFolder, 'coordinator_backup.json'), '{');
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(mqttConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
   });
 
   it('it should restore the Z2M backup in place of an empty configuration file', async () => {

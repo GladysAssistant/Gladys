@@ -81,4 +81,17 @@ describe('zigbee2mqtt restoreZ2mBackup', () => {
     expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
     expect(fs.existsSync(path.join(outputPath, 'coordinator_backup.json'))).equals(true);
   });
+
+  it('should restore the folders of the backup', async () => {
+    // Holds external_converters/my-device.js
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-subfolder.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath);
+
+    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
+    expect(fs.readFileSync(path.join(outputPath, 'external_converters', 'my-device.js'), 'utf8')).equals(
+      'module.exports = [];\n',
+    );
+  });
 });

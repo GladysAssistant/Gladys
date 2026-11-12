@@ -36,6 +36,38 @@ async function readConfigFile(configFilepath) {
 }
 
 /**
+ * @description Read the settings of the network formed by Zigbee2mqtt from the coordinator backup it writes in its
+ * data folder (open coordinator backup format, read as zigbee-herdsman does).
+ * @param {string} backupFilepath - Path of coordinator_backup.json.
+ * @returns {Promise<object>} The network settings, as in the "advanced" section of the configuration, null without
+ * a readable backup.
+ * @example
+ * const networkSettings = await readCoordinatorBackup('/app/data/coordinator_backup.json');
+ * // { network_key: [24, 27, ...], pan_id: 52140, ext_pan_id: [121, 167, ...], channel: 11 }
+ */
+async function readCoordinatorBackup(backupFilepath) {
+  let fileContent;
+  try {
+    fileContent = await fs.readFile(backupFilepath);
+  } catch (e) {
+    return null;
+  }
+  try {
+    const backup = JSON.parse(fileContent.toString());
+    const toBytes = (hex) => [...Buffer.from(hex, 'hex')];
+    return {
+      network_key: toBytes(backup.network_key.key),
+      pan_id: Number.parseInt(backup.pan_id, 16),
+      ext_pan_id: toBytes(backup.extended_pan_id),
+      channel: backup.channel,
+    };
+  } catch (e) {
+    logger.warn('Zigbee2mqtt: unreadable coordinator backup, its network settings are not kept', e);
+    return null;
+  }
+}
+
+/**
  * @description Configure Z2M container.
  * @param {string} basePathOnContainer - Zigbee2mqtt base path.
  * @param {object} config - Gladys Z2M stored configuration.
@@ -68,16 +100,22 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
     logger.info('Z2M configuration file already exists.');
   } else {
     // A network already formed gets back its settings, and its devices, from the Z2M backup saved by Gladys, also
-    // when the container was not created again. Without backup, the default configuration lets Zigbee2mqtt form a new
-    // network. A file left in place would stop the restore.
+    // when the container was not created again. A file left in place would stop the restore.
     logger.info('No Z2M configuration file to keep, restoring its backup...');
     await fs.rm(configFilepath, { force: true });
     await this.restoreZ2mBackup(configFolder);
     loadedConfig = await readConfigFile(configFilepath);
     if (!loadedConfig) {
       logger.info('Writing default Z2M configuration...');
-      await fs.writeFile(configFilepath, yaml.stringify(DEFAULT.CONFIGURATION_CONTENT));
       loadedConfig = cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
+      // Without Z2M backup, the coordinator backup left by Zigbee2mqtt still holds the settings of its network: kept,
+      // as new ones would make Zigbee2mqtt leave this network (ember) or stop on "configuration-adapter mismatch"
+      // (z-stack). Without either, Zigbee2mqtt forms a new network.
+      const networkSettings = await readCoordinatorBackup(path.join(configFolder, 'coordinator_backup.json'));
+      if (networkSettings) {
+        loadedConfig.advanced = networkSettings;
+      }
+      await fs.writeFile(configFilepath, yaml.stringify(loadedConfig));
     }
     configCreated = true;
   }

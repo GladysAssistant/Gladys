@@ -32,15 +32,23 @@ async function restoreZ2mBackup(containerPath) {
     const zip = new JSZip();
     const { files } = await zip.loadAsync(z2mBackup, { base64: true });
 
-    // Without configuration file, the files left in the folder (such as a database written since the backup) are
-    // newer than those of the backup: they are kept
-    const existingFiles = await fsPromises.readdir(containerPath);
+    // The folders of the backup (such as external converters) are created with their files
     await Promise.all(
       Object.values(files)
-        .filter((file) => !existingFiles.includes(file.name))
+        .filter((file) => !file.dir)
         .map(async (file) => {
+          const filePath = path.join(containerPath, file.name);
+          // Without configuration file, the files left in the folder (such as a database written since the backup)
+          // are newer than those of the backup: they are kept
+          try {
+            await fsPromises.access(filePath);
+            return null;
+          } catch (e) {
+            // Not in the folder, restored
+          }
+          await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
           const content = await file.async('arraybuffer');
-          return fsPromises.writeFile(path.join(containerPath, file.name), Buffer.from(content));
+          return fsPromises.writeFile(filePath, Buffer.from(content));
         }),
     );
   } else {
