@@ -218,9 +218,12 @@ The action groups of the root level render as a **numbered vertical timeline**:
 - The trailing empty groups the data model keeps at the end of every level are never rendered.
 - While the scene runs, the row whose action is executing is marked, at every level (root steps
   and branches). The `scene.executing-action` / `scene.finished-executing-action` websocket
-  events name the action by its **path** (`{ path: "2.0.then.0.0" }`), the same path the editor
-  gives each step: the desktop card and the mobile row are both matched on it. Actions of a group
-  run at the same time and are each marked on their own.
+  events name the action by its **path** and its scene
+  (`{ path: "2.0.then.0.0", sceneSelector: "good-night" }`), the path being the one the editor
+  gives each step: the desktop card and the mobile row are both matched on it. These events are
+  sent to every client, whichever scene runs: an editor ignores those of another scene (and an
+  event without a path), or two scenes running at once would mark each other's steps. Actions of
+  a group run at the same time and are each marked on their own.
 - "+ Add a step" (dashed, full width) ends the timeline; a scene with no step shows "Add a first
   step" instead. A hint says rows can be swiped.
 

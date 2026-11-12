@@ -281,6 +281,34 @@ describe('scene.execute', () => {
       });
     });
   });
+  it('should name the scene in the messages sent while its actions execute', async () => {
+    const messages = [];
+    const listener = (message) => messages.push(message);
+    event.on(EVENTS.WEBSOCKET.SEND_ALL, listener);
+    const scene = {
+      selector: 'my-scene',
+      triggers: [],
+      actions: [[{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }]],
+    };
+    await sceneManager.addScene(scene);
+    await sceneManager.execute('my-scene');
+    await new Promise((resolve) => {
+      sceneManager.queue.start(resolve);
+    });
+    event.removeListener(EVENTS.WEBSOCKET.SEND_ALL, listener);
+    // every client receives these messages: an editor only marks the steps of its own scene
+    const executing = messages.filter(({ type }) => type === WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION);
+    const finished = messages.filter(({ type }) => type === WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION);
+    expect(executing).to.deep.equal([
+      { type: WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION, payload: { path: '0.0', sceneSelector: 'my-scene' } },
+    ]);
+    expect(finished).to.deep.equal([
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
+        payload: { path: '0.0', sceneSelector: 'my-scene' },
+      },
+    ]);
+  });
   it('should save when the scene was last executed, without changing updated_at', async () => {
     const sceneBefore = await db.Scene.findOne({ where: { selector: 'test-scene' } });
     expect(sceneBefore.last_executed).to.equal(null);

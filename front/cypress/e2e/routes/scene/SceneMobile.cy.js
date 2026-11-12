@@ -374,13 +374,21 @@ describe('Scene on a phone', () => {
     cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
 
     // the executing action is named by its path
-    cy.sendWebSocket({ type: 'scene.executing-action', payload: { path: '0.0' } });
+    cy.sendWebSocket({ type: 'scene.executing-action', payload: { path: '0.0', sceneSelector } });
     cy.get('[data-cy="scene-step-row-0.0"]').should('have.attr', 'aria-current', 'step');
-    cy.sendWebSocket({ type: 'scene.finished-executing-action', payload: { path: '0.0' } });
+    cy.sendWebSocket({ type: 'scene.finished-executing-action', payload: { path: '0.0', sceneSelector } });
     cy.get('[data-cy="scene-step-row-0.0"]').should('not.have.attr', 'aria-current');
+
+    // these messages reach every client: the step of another scene at the same path is not ours
+    // (checked once the stop below, sent after it, has been rendered)
+    cy.sendWebSocket({
+      type: 'scene.executing-action',
+      payload: { path: '0.0', sceneSelector: 'another-scene' }
+    });
 
     cy.sendWebSocket({ type: 'scene.stopped', payload: { executionId: 'cypress-run', sceneSelector } });
     cy.get('[data-cy=scene-run-button]').should('be.visible');
+    cy.get('[data-cy="scene-step-row-0.0"]').should('not.have.attr', 'aria-current');
     cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
   });
 

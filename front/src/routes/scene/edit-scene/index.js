@@ -1174,19 +1174,28 @@ class EditScene extends Component {
   };
 
   // The server names the executing action by its path ("1.0", "2.0.then.0.0"), the same path the
-  // editor gives each step. Actions of a group run at the same time: each one is marked on its own.
-  highlighCurrentlyExecutedAction = ({ path }) => {
+  // editor gives each step, and the scene it belongs to: these messages reach every client,
+  // whichever scene runs. Actions of a group run at the same time: each one is marked on its own.
+  isActionOfThisScene = ({ path, sceneSelector }) => Boolean(path) && sceneSelector === this.props.scene_selector;
+
+  highlighCurrentlyExecutedAction = payload => {
+    if (!this.isActionOfThisScene(payload)) {
+      return;
+    }
     this.setState(prevState => ({
-      highLightedActions: { ...prevState.highLightedActions, [path]: true }
+      highLightedActions: { ...prevState.highLightedActions, [payload.path]: true }
     }));
   };
-  removeHighlighAction = ({ path }) => {
+  removeHighlighAction = payload => {
+    if (!this.isActionOfThisScene(payload)) {
+      return;
+    }
     setTimeout(() => {
       if (this.unmounted) {
         return;
       }
       this.setState(prevState => ({
-        highLightedActions: { ...prevState.highLightedActions, [path]: false }
+        highLightedActions: { ...prevState.highLightedActions, [payload.path]: false }
       }));
     }, 500);
   };
