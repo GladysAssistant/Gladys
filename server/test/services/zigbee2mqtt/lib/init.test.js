@@ -457,6 +457,27 @@ describe('zigbee2mqtt init', () => {
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
+  it('should schedule the backup again after a disconnect', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
+    zigbee2mqttManager.getConfiguration.resolves({ ...config });
+    zigbee2mqttManager.installMqttContainer.callsFake(() => {
+      zigbee2mqttManager.mqttRunning = true;
+    });
+    gladys.event = { emit: fake() };
+    gladys.scheduler = { scheduleJob: fake.returns({ cancel: fake() }) };
+    // Scheduled by a first init
+    await zigbee2mqttManager.init();
+    // Disabled then enabled again from the setup page, or reset then set up again
+    gladys.system.getContainers = fake.resolves([]);
+    await zigbee2mqttManager.disconnect();
+    gladys.system.getContainers = fake.resolves([container]);
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    assert.calledTwice(gladys.scheduler.scheduleJob);
+  });
+
   it('should connect and scheduler already there', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };

@@ -133,12 +133,16 @@ describe('zigbee2mqtt disconnect', () => {
 
   it('clear backup interval', async () => {
     // PREPARE
-    zigbee2MqttManager.backupScheduledJob = {
+    const backupScheduledJob = {
       cancel: fake.returns(true),
     };
+    zigbee2MqttManager.backupScheduledJob = backupScheduledJob;
     // EXECUTE
     await zigbee2MqttManager.disconnect();
     // ASSERT
+    assert.calledOnce(backupScheduledJob.cancel);
+    // Forgotten, so that the next init schedules it again
+    expect(zigbee2MqttManager.backupScheduledJob).to.equal(null);
     assert.calledThrice(gladys.event.emit);
     assert.alwaysCalledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
