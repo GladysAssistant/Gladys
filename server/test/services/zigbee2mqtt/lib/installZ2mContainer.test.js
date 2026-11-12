@@ -264,7 +264,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
       .onSecondCall()
       .resolves([containerStopped]);
     gladys.system.getContainers = getContainersStub;
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -287,7 +286,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
       .onSecondCall()
       .resolves([containerStopped]);
     gladys.system.getContainers = getContainersStub;
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -308,7 +306,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
       .onSecondCall()
       .resolves([containerStopped]);
     gladys.system.getContainers = getContainersStub;
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -320,7 +317,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
   it('should recreate the z2m container when switching from USB to a network coordinator', async () => {
     // PREPARE
     const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -362,7 +358,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
         Devices: undefined,
       },
     });
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT

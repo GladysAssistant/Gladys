@@ -1,8 +1,10 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
+const proxyquire = require('proxyquire').noCallThru();
 
 const { assert } = sinon;
 const fs = require('fs');
+const fsPromises = require('fs/promises');
 const path = require('path');
 
 const { fake } = sinon;
@@ -93,5 +95,28 @@ describe('zigbee2mqtt restoreZ2mBackup', () => {
     expect(fs.readFileSync(path.join(outputPath, 'external_converters', 'my-device.js'), 'utf8')).equals(
       'module.exports = [];\n',
     );
+  });
+
+  it('should keep the entries of the backup in its folder', async () => {
+    // Holds an entry named ../escaped.txt
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-parent-path.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath);
+
+    expect(fs.existsSync(path.join(outputPath, 'escaped.txt'))).equals(true);
+    expect(fs.existsSync(path.join(backupPath, 'escaped.txt'))).equals(false);
+  });
+
+  it('should fail when a file of the backup cannot be written', async () => {
+    const writeError = new Error('EACCES: permission denied');
+    writeError.code = 'EACCES';
+    const { restoreZ2mBackup } = proxyquire('../../../../services/zigbee2mqtt/lib/restoreZ2mBackup', {
+      'fs/promises': { ...fsPromises, writeFile: fake.rejects(writeError) },
+    });
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64.backup'));
+    const manager = { gladys: { variable: { getValue: fake.resolves(base64Zip.toString()) } }, serviceId };
+
+    await expect(restoreZ2mBackup.call(manager, outputPath)).to.be.rejectedWith('EACCES');
   });
 });

@@ -103,6 +103,116 @@ describe('zigbee2mqtt configureContainer', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
   });
 
+  it('it should take the network settings of the coordinator backup over those of the restored Z2M backup', async () => {
+    // PREPARE
+    // The channel was changed after the Z2M backup: the coordinator backup holds the current network
+    fs.writeFileSync(
+      path.join(configFolder, 'coordinator_backup.json'),
+      JSON.stringify({
+        pan_id: 'cbac',
+        extended_pan_id: '79a72f8e5058b222',
+        channel: 15,
+        network_key: { key: '181b15952df956b87a22e8560fb15b98', sequence_number: 0, frame_counter: 1234 },
+      }),
+    );
+    // The Z2M backup was taken on channel 11
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      const restoredContent = fs
+        .readFileSync(restoredConfigFilePath, 'utf8')
+        .replace('frontend:', '  channel: 11\nfrontend:');
+      fs.writeFileSync(path.join(folder, 'configuration.yaml'), restoredContent);
+    });
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    // Channel 15, from the coordinator backup
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(coordinatorBackupConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
+  });
+
+  it('it should not replace a configuration file when the coordinator backup cannot be read', async () => {
+    // PREPARE
+    // Not a file: reading it fails, as for a file without read permission
+    fs.mkdirSync(path.join(configFolder, 'coordinator_backup.json'));
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith('EISDIR');
+    expect(fs.existsSync(configFilePath)).to.equal(false);
+  });
+
+  it('it should set aside a configuration file zeroed by a power cut, and restore the Z2M backup in its place', async () => {
+    // PREPARE
+    // Read by YAML as a string
+    fs.writeFileSync(configFilePath, Buffer.alloc(16));
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      if (!fs.existsSync(path.join(folder, 'configuration.yaml'))) {
+        fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+      }
+    });
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    expect(fs.readFileSync(`${configFilePath}.invalid`)).to.deep.equal(Buffer.alloc(16));
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
+  });
+
+  it('it should set aside a configuration file that is not YAML, and restore the Z2M backup in its place', async () => {
+    // PREPARE
+    // Left by a write cut short in a quoted value
+    const invalidContent =
+      "homeassistant: false\nmap_options:\n  graphviz:\n    colors:\n      fill:\n        enddevice: '#fff8";
+    fs.writeFileSync(configFilePath, invalidContent);
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+    });
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    expect(fs.readFileSync(`${configFilePath}.invalid`, 'utf8')).to.equal(invalidContent);
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
+  });
+
+  it('it should not replace a configuration file Gladys cannot read', async () => {
+    // PREPARE
+    // Not a file: reading it fails, as for a file without read permission
+    fs.mkdirSync(configFilePath);
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith('EISDIR');
+    expect(fs.statSync(configFilePath).isDirectory()).to.equal(true);
+    assert.notCalled(zigbee2mqttManager.restoreZ2mBackup);
+  });
+
   it('it should force override to random TCP port', async () => {
     // PREPARE
     const config = {

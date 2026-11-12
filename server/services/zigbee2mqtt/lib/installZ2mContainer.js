@@ -116,9 +116,7 @@ async function installZ2mContainer(config, setupMode = false) {
   const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
   const containerPath = `${basePathOnHost}/zigbee2mqtt/z2m`;
   if (!container || creationNeeded) {
-    // Restore backup only in case of new installation
-    await this.restoreZ2mBackup(containerPath);
-
+    // The Z2M backup is restored by configureContainer, when there is no configuration file to keep
     try {
       logger.info('Zigbee2mqtt is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
