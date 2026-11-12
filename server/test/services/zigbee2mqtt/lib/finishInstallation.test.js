@@ -66,6 +66,23 @@ describe('zigbee2mqtt finishInstallation', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.emitInstallProgress);
   });
 
+  it('should tell that the installation ended to whoever waits for it', async () => {
+    // PREPARE
+    sinon.stub(logger, 'info');
+    let ended = false;
+    // eslint-disable-next-line promise/prefer-await-to-then
+    zigbee2mqttManager.installationEnd.then(() => {
+      ended = true;
+    });
+    await Promise.resolve();
+    expect(ended).to.equal(false);
+    // EXECUTE
+    zigbee2mqttManager.finishInstallation(null);
+    // ASSERT
+    await zigbee2mqttManager.installationEnd;
+    expect(ended).to.equal(true);
+  });
+
   it('should tell done a phase left running once the installation succeeded', () => {
     // PREPARE
     sinon.stub(logger, 'info');

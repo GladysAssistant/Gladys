@@ -103,6 +103,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.installationStartedAt = null;
   this.installationJobId = null;
   this.installationJobProgress = 0;
+  // End of the running installation, waited for by the stop of the service (see startInstallation)
+  this.installationEnd = null;
+  this.resolveInstallationEnd = null;
   // Download of the images before the setup, followed by the setup page too
   this.prefetch = getIdlePrefetch();
   // Progress of the download of each image of the running prefetch (see updatePrefetchProgress)

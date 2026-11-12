@@ -65,6 +65,7 @@ function finishInstallation(error) {
     logger.info(`Zigbee2mqtt: ${installation.kind} done in ${duration}`);
   }
   this.emitInstallProgress();
+  this.resolveInstallationEnd();
 }
 
 module.exports = {
