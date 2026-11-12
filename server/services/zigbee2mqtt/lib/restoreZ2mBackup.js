@@ -32,11 +32,16 @@ async function restoreZ2mBackup(containerPath) {
     const zip = new JSZip();
     const { files } = await zip.loadAsync(z2mBackup, { base64: true });
 
+    // Without configuration file, the files left in the folder (such as a database written since the backup) are
+    // newer than those of the backup: they are kept
+    const existingFiles = await fsPromises.readdir(containerPath);
     await Promise.all(
-      Object.values(files).map(async (file) => {
-        const content = await file.async('arraybuffer');
-        return fsPromises.writeFile(path.join(containerPath, file.name), Buffer.from(content));
-      }),
+      Object.values(files)
+        .filter((file) => !existingFiles.includes(file.name))
+        .map(async (file) => {
+          const content = await file.async('arraybuffer');
+          return fsPromises.writeFile(path.join(containerPath, file.name), Buffer.from(content));
+        }),
     );
   } else {
     logger.info('No zigbee2mqtt backup avaiable');

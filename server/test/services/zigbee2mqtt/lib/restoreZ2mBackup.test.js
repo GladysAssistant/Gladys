@@ -67,4 +67,18 @@ describe('zigbee2mqtt restoreZ2mBackup', () => {
     expect(fs.existsSync(path.join(outputPath, 'database.db'))).equals(true);
     expect(fs.existsSync(path.join(outputPath, 'state.json'))).equals(true);
   });
+
+  it('should keep the files already in the folder', async () => {
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+    // Written since the backup
+    fs.mkdirSync(outputPath);
+    fs.writeFileSync(path.join(outputPath, 'database.db'), 'newer database');
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath);
+
+    expect(fs.readFileSync(path.join(outputPath, 'database.db'), 'utf8')).equals('newer database');
+    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
+    expect(fs.existsSync(path.join(outputPath, 'coordinator_backup.json'))).equals(true);
+  });
 });

@@ -166,6 +166,29 @@ describe('zigbee2mqtt configureContainer', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
   });
 
+  it('it should restore the Z2M backup in place of an empty configuration file', async () => {
+    // PREPARE
+    // Left by a write cut short
+    fs.writeFileSync(configFilePath, '');
+    // Skips the restore when a configuration file is there
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      if (!fs.existsSync(path.join(folder, 'configuration.yaml'))) {
+        fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+      }
+    });
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
+  });
+
   it('it should keep the network settings drawn by Zigbee2mqtt when it writes the file again', async () => {
     // PREPARE
     fs.copyFileSync(restoredConfigFilePath, configFilePath);
