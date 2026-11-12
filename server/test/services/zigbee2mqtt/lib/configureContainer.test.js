@@ -34,8 +34,8 @@ const portConfigFilePath = path.join(configBasePath, 'z2m_port_config.yaml');
 const networkAdapterConfigFilePath = path.join(configBasePath, 'z2m_network-adapter_config.yaml');
 const onboardingConfigFilePath = path.join(configBasePath, 'z2m_onboarding_config.yaml');
 const usedOnboardingConfigFilePath = path.join(configBasePath, 'z2m_onboarding-used_config.yaml');
-const newNetworkConfigFilePath = path.join(configBasePath, 'z2m_new-network_config.yaml');
-const mqttNewNetworkConfigFilePath = path.join(configBasePath, 'z2m_mqtt_new-network_config.yaml');
+const restoredConfigFilePath = path.join(configBasePath, 'z2m_restored_config.yaml');
+const configFolder = path.dirname(configFilePath);
 
 describe('zigbee2mqtt configureContainer', () => {
   // PREPARE
@@ -51,16 +51,11 @@ describe('zigbee2mqtt configureContainer', () => {
           };
         },
       },
-      // By default, a network already formed: its Z2M backup is saved by Gladys
-      variable: {
-        getValue: fake.resolves('z2m-backup'),
-      },
-      device: {
-        get: fake.resolves([]),
-      },
     };
 
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
+    // By default, no Z2M backup to restore
+    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(null);
 
     fs.mkdirSync(path.dirname(configFilePath), { recursive: true });
   });
@@ -82,36 +77,29 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
     assert.calledOnce(portfinderMock.getPortPromise);
-    assert.calledOnceWithExactly(gladys.variable.getValue, 'Z2M_BACKUP', serviceId);
-    assert.notCalled(gladys.device.get);
+    // Asking Zigbee2mqtt to draw the network settings, after looking for a backup
+    expect(resultContent).to.include('network_key: GENERATE');
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
   });
 
-  it('it should let Zigbee2mqtt draw the network settings of a new installation', async () => {
+  it('it should restore the Z2M backup when the configuration file is missing', async () => {
     // PREPARE
-    gladys.variable.getValue = fake.resolves(null);
-    const config = {};
+    // Holds the network settings drawn by Zigbee2mqtt when it formed its network
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+    });
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    const expectedContent = fs.readFileSync(newNetworkConfigFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
-    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
-    assert.calledOnceWithExactly(gladys.device.get, { service: 'zigbee2mqtt', take: 1 });
-  });
-
-  it('it should keep the network settings of Zigbee2mqtt devices known by Gladys, without backup', async () => {
-    // PREPARE
-    gladys.variable.getValue = fake.resolves(null);
-    gladys.device.get = fake.resolves([{ external_id: 'zigbee2mqtt:0x00158d0001a2b3c4' }]);
-    const config = {};
-    // EXECUTE
-    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
-    // ASSERT
-    const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    const expectedContent = fs.readFileSync(defaultConfigFilePath, 'utf8');
-    expect(resultContent).to.equal(expectedContent);
-    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
   });
 
   it('it should force override to random TCP port', async () => {
@@ -170,17 +158,42 @@ describe('zigbee2mqtt configureContainer', () => {
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
-    // Same file as if there was none: no onboarding, the broker of Gladys, the network settings already formed
+    // Same file as if there was none: no onboarding, the broker of Gladys
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
     const expectedContent = fs.readFileSync(mqttConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
   });
 
-  it('it should replace a file waiting for the onboarding of Zigbee2mqtt by the one of a new installation', async () => {
+  it('it should keep the network settings drawn by Zigbee2mqtt when it writes the file again', async () => {
     // PREPARE
-    gladys.variable.getValue = fake.resolves(null);
+    fs.copyFileSync(restoredConfigFilePath, configFilePath);
+    const config = {
+      mqttUsername: 'other-mqtt-username',
+      mqttPassword: 'other-mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs
+      .readFileSync(restoredConfigFilePath, 'utf8')
+      .replace('user: mqtt-username', 'user: other-mqtt-username')
+      .replace('password: mqtt-password', 'password: other-mqtt-password');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
+  });
+
+  it('it should restore the Z2M backup in place of a file waiting for the onboarding of Zigbee2mqtt', async () => {
+    // PREPARE
     fs.copyFileSync(onboardingConfigFilePath, configFilePath);
+    // Skips the restore when a configuration file is there
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      if (!fs.existsSync(path.join(folder, 'configuration.yaml'))) {
+        fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+      }
+    });
     const config = {
       mqttUsername: 'mqtt-username',
       mqttPassword: 'mqtt-password',
@@ -189,9 +202,9 @@ describe('zigbee2mqtt configureContainer', () => {
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    const expectedContent = fs.readFileSync(mqttNewNetworkConfigFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
-    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
   });
 
   it('it should keep a used file flagged for the onboarding of Zigbee2mqtt', async () => {
@@ -209,6 +222,7 @@ describe('zigbee2mqtt configureContainer', () => {
     const expectedContent = fs.readFileSync(usedOnboardingConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
+    assert.notCalled(zigbee2mqttManager.restoreZ2mBackup);
   });
 
   it('it should override mqtt credentials', async () => {

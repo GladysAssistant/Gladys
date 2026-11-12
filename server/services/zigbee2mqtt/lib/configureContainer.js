@@ -6,7 +6,7 @@ const portfinder = require('portfinder');
 const cloneDeep = require('lodash.clonedeep');
 
 const logger = require('../../../utils/logger');
-const { DEFAULT, ADAPTER_MODE, CONFIGURATION } = require('./constants');
+const { DEFAULT, ADAPTER_MODE } = require('./constants');
 const {
   DEFAULT_KEY,
   CONFIG_KEYS,
@@ -17,35 +17,22 @@ const {
 
 const YAML_CONFIG = { singleQuote: true };
 
-// Drawn by Zigbee2mqtt when it starts its network, and written in place of these values
-const NEW_NETWORK_SETTINGS = {
-  network_key: 'GENERATE',
-  pan_id: 'GENERATE',
-  ext_pan_id: 'GENERATE',
-};
-
 /**
- * @description Build the default Z2M configuration, written when there is no file to keep. For a network not formed
- * yet, Zigbee2mqtt draws its key and identifiers at its first start, as in the files it creates itself. A network
- * already formed (its data folder lost with no backup to restore) keeps the settings it was formed with: new ones
- * would form another network, and every device would have to be paired again. It is told by the Z2M backup saved
- * by Gladys, or by the Zigbee2mqtt devices of Gladys.
- * @param {object} gladys - Gladys instance.
- * @param {string} serviceId - Zigbee2mqtt service id.
- * @returns {Promise<object>} The default Z2M configuration.
+ * @description Read the Z2M configuration file.
+ * @param {string} configFilepath - Path of the configuration file.
+ * @returns {Promise<object>} The configuration, null when there is no file.
  * @example
- * const defaultConfig = await getDefaultConfiguration(gladys, serviceId);
+ * const loadedConfig = await readConfigFile('/var/lib/gladysassistant/zigbee2mqtt/z2m/configuration.yaml');
  */
-async function getDefaultConfiguration(gladys, serviceId) {
-  const defaultConfig = cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
-  const networkFormed =
-    (await gladys.variable.getValue(CONFIGURATION.Z2M_BACKUP, serviceId)) !== null ||
-    (await gladys.device.get({ service: 'zigbee2mqtt', take: 1 })).length > 0;
-  if (!networkFormed) {
-    logger.info('Zigbee2mqtt will draw the settings of its new network at its first start');
-    defaultConfig.advanced = { ...NEW_NETWORK_SETTINGS };
+async function readConfigFile(configFilepath) {
+  try {
+    // eslint-disable-next-line no-bitwise
+    await fs.access(configFilepath, constants.R_OK | constants.W_OK);
+  } catch (e) {
+    return null;
   }
-  return defaultConfig;
+  const fileContent = await fs.readFile(configFilepath);
+  return yaml.parse(fileContent.toString());
 }
 
 /**
@@ -62,34 +49,36 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
 
   // Create configuration path (if not exists)
   const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
-  await fs.mkdir(path.dirname(configFilepath), {
+  const configFolder = path.dirname(configFilepath);
+  await fs.mkdir(configFolder, {
     recursive: true,
   });
 
-  // Check if config file not already exists
-  let configCreated = false;
-  try {
-    // eslint-disable-next-line no-bitwise
-    await fs.access(configFilepath, constants.R_OK | constants.W_OK);
-    logger.info('Z2M configuration file already exists.');
-  } catch (e) {
-    logger.info('Writing default Z2M configuration...');
-    await fs.writeFile(configFilepath, yaml.stringify(await getDefaultConfiguration(this.gladys, this.serviceId)));
-    configCreated = true;
-  }
-
-  // Check for changes
-  const fileContent = await fs.readFile(configFilepath);
-  let loadedConfig = yaml.parse(fileContent.toString());
+  let loadedConfig = await readConfigFile(configFilepath);
   // Started without configuration file (its data folder removed while its container ran), Zigbee2mqtt writes its
   // own, flagged "onboarding", and waits at every start for the user to fill its onboarding page, never shown by
-  // Gladys. Never completed, this file holds nothing to keep: it is replaced as if there was none. Its network key
+  // Gladys. Never completed, this file holds nothing to keep: it is handled as if there was none. Its network key
   // still "GENERATE" (replaced by Zigbee2mqtt once its network started) tells it from a used file, left untouched.
-  // Its network settings are not kept either: like a missing file, it gets those of the default configuration.
-  if (loadedConfig.onboarding && (loadedConfig.advanced || {}).network_key === 'GENERATE') {
-    logger.info('Z2M configuration file waits for an onboarding, writing default Z2M configuration...');
-    loadedConfig = await getDefaultConfiguration(this.gladys, this.serviceId);
-    await fs.writeFile(configFilepath, yaml.stringify(loadedConfig));
+  if (loadedConfig && loadedConfig.onboarding && (loadedConfig.advanced || {}).network_key === 'GENERATE') {
+    logger.info('Z2M configuration file waits for an onboarding, replacing it...');
+    await fs.rm(configFilepath);
+    loadedConfig = null;
+  }
+
+  let configCreated = false;
+  if (loadedConfig) {
+    logger.info('Z2M configuration file already exists.');
+  } else {
+    // A network already formed gets back its settings, and its devices, from the Z2M backup saved by Gladys, also
+    // when the container was not created again. Without backup, the default configuration lets Zigbee2mqtt form a new
+    // network.
+    await this.restoreZ2mBackup(configFolder);
+    loadedConfig = await readConfigFile(configFilepath);
+    if (!loadedConfig) {
+      logger.info('Writing default Z2M configuration...');
+      await fs.writeFile(configFilepath, yaml.stringify(DEFAULT.CONFIGURATION_CONTENT));
+      loadedConfig = cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
+    }
     configCreated = true;
   }
   const { mqtt = {} } = loadedConfig;

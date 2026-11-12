@@ -23,8 +23,32 @@ map_options:
         active: '#009900'
         inactive: '#994444'
 advanced:
-  network_key: GENERATE
-  pan_id: GENERATE
-  ext_pan_id: GENERATE
+  network_key:
+    - 24
+    - 27
+    - 21
+    - 149
+    - 45
+    - 249
+    - 86
+    - 184
+    - 122
+    - 34
+    - 232
+    - 86
+    - 15
+    - 177
+    - 91
+    - 152
+  pan_id: 52140
+  ext_pan_id:
+    - 121
+    - 167
+    - 47
+    - 142
+    - 80
+    - 88
+    - 178
+    - 34
 frontend:
   port: 12000

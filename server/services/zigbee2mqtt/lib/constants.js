@@ -96,6 +96,13 @@ const DEFAULT = {
         },
       },
     },
+    // Drawn by Zigbee2mqtt when it forms its network, and written in place of these values, as in the files it
+    // creates itself
+    advanced: {
+      network_key: 'GENERATE',
+      pan_id: 'GENERATE',
+      ext_pan_id: 'GENERATE',
+    },
   },
   CONFIGURATION_PORTS: {
     min: 12000,
