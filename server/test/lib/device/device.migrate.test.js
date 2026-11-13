@@ -794,6 +794,32 @@ describe('Device.migrate', function Describe() {
     expect(param.value).to.equal('migration-destination-binary');
   });
 
+  // The two switches of a pilot wire (thermostat.md C.1.2) are a pair: the
+  // migrated one is replaced where it stands, since the states are written by
+  // position.
+  it('should re-point one of the two switches of a pilot wire in place', async () => {
+    const thermostat = await db.Device.create(
+      {
+        name: 'Migration two-switch thermostat',
+        selector: 'migration-two-switch-thermostat',
+        external_id: 'thermostat:migration-two-switch',
+        service_id: SEEDED_SERVICE_ID,
+        params: [{ name: 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE', value: '["migration-source-binary","other-relay"]' }],
+      },
+      { include: [{ model: db.DeviceParam, as: 'params' }] },
+    );
+
+    await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-binary': 'migration-destination-binary' },
+    });
+
+    const param = await db.DeviceParam.findOne({
+      where: { device_id: thermostat.id, name: 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE' },
+    });
+    expect(param.value).to.equal('["migration-destination-binary","other-relay"]');
+  });
+
   // A thermostat may watch several windows and average several probes, stored as
   // a JSON array (thermostat.md A.1.1): only the migrated entry is replaced.
   it('should re-point the migrated entry of a thermostat sensor list in place', async () => {

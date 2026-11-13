@@ -8,7 +8,15 @@ const {
   THERMOSTAT_PRESET,
   THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
-const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE, defaultTempRange } = require('../../../utils/thermostatConstants');
+const {
+  THERMOSTAT_TYPES,
+  DEFAULT_THERMOSTAT_TYPE,
+  PILOT_WIRE_SWITCH_ORDERS,
+  PILOT_WIRE_SWITCH_STATES_PARAMS,
+  isPilotWireSwitchStates,
+  defaultTempRange,
+} = require('../../../utils/thermostatConstants');
+const { parseSelectorList } = require('../../../utils/thermostatSelectorList');
 const { toNumber } = require('./thermostat.deviceConfig');
 
 // The params that make an external thermostat drive a real device: its
@@ -51,6 +59,10 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_PILOT_WIRE_ORDER_COMFORT',
   // And the order a heater Gladys regulates is sent while the room is warm enough.
   'THERMOSTAT_PILOT_WIRE_STANDBY_ORDER',
+  // A pilot wire driven by two switches rather than by a module (C.1.2): the
+  // pair, and the state of the two for each of the four orders.
+  'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE',
+  ...Object.values(PILOT_WIRE_SWITCH_STATES_PARAMS),
   'THERMOSTAT_TYPE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
@@ -223,13 +235,42 @@ async function createDevice(device) {
 
   const typeParam = params.find((param) => param.name === 'THERMOSTAT_TYPE');
   const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
-  const pilotWire = !!(pilotWireParam && pilotWireParam.value);
+  const pilotWireModule = !!(pilotWireParam && pilotWireParam.value);
   // A real thermostat given a pilot wire was how a heater regulating itself was
   // saved before it had a type of its own: it is saved as one now.
-  if (typeParam && typeParam.value === THERMOSTAT_TYPES.EXTERNAL && pilotWire) {
+  if (typeParam && typeParam.value === THERMOSTAT_TYPES.EXTERNAL && pilotWireModule) {
     typeParam.value = THERMOSTAT_TYPES.PILOT_WIRE;
   }
   const thermostatType = (typeParam && typeParam.value) || DEFAULT_THERMOSTAT_TYPE;
+  // A pilot wire driven by two switches (C.1.2). It is one wire, carried one
+  // way: a module's feature wins over the pair. Half a pair drives nothing, and
+  // a real thermostat has no wire. A pair left behind is cleared, with its
+  // states, so it can never come back to life on a later save.
+  const switchPairParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE');
+  const pilotWireSwitches =
+    !pilotWireModule &&
+    thermostatType !== THERMOSTAT_TYPES.EXTERNAL &&
+    parseSelectorList(switchPairParam && switchPairParam.value).length === 2;
+  const switchStatesParams = params.filter((param) =>
+    Object.values(PILOT_WIRE_SWITCH_STATES_PARAMS).includes(param.name),
+  );
+  if (!pilotWireSwitches) {
+    [switchPairParam, ...switchStatesParams].filter(Boolean).forEach((param) => {
+      param.value = '';
+    });
+  } else if (switchStatesParams.some((param) => param.value)) {
+    // Each order needs a state of its own: two orders on the same one could not
+    // be told apart, and the second would never be sent. No state at all is
+    // the default wiring.
+    const states = PILOT_WIRE_SWITCH_ORDERS.reduce((table, order) => {
+      const stored = switchStatesParams.find((param) => param.name === PILOT_WIRE_SWITCH_STATES_PARAMS[order]);
+      return { ...table, [order]: stored && stored.value };
+    }, {});
+    if (!isPilotWireSwitchStates(states)) {
+      throw new Error('Thermostat: the two switches of a pilot wire need a state of their own for each order');
+    }
+  }
+  const pilotWire = pilotWireModule || pilotWireSwitches;
   // A pilot-wire heater is driven by an order on either of its types (C.1.1):
   // the type only says who regulates it. It owns its setpoint feature and
   // carries the state features of a virtual thermostat, and none of a real
@@ -237,7 +278,9 @@ async function createDevice(device) {
   const external = thermostatType === THERMOSTAT_TYPES.EXTERNAL;
   const heaterRegulates = thermostatType === THERMOSTAT_TYPES.PILOT_WIRE;
   if (heaterRegulates && !pilotWire) {
-    throw new Error('Thermostat: a pilot-wire thermostat needs a THERMOSTAT_PILOT_WIRE_FEATURE param');
+    throw new Error(
+      'Thermostat: a pilot-wire thermostat needs a THERMOSTAT_PILOT_WIRE_FEATURE or THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE param',
+    );
   }
 
   // A pilot-wire heater only heats, and its orders are never pulsed within a

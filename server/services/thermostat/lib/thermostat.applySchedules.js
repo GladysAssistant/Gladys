@@ -16,6 +16,7 @@ const {
   toNumber,
   getDeviceConfig,
   getFeatureBySelector,
+  findPilotWire,
   isExternal,
   getRunningMode,
 } = require('./thermostat.deviceConfig');
@@ -879,9 +880,8 @@ function isComfortOrder(order) {
  * The order is marked as this service's own, written or already carried: the
  * module reports it back as a NEW_STATE, and without the mark that report would
  * be taken for an order changed on the module and arm a hold (C.1.1).
- * @param {object} gladys - Gladys instance.
- * @param {{ device: object, feature: object }} found - The heater and its pilot-wire-mode feature.
- * @param {string} pilotWireSelector - The heater's pilot-wire-mode feature selector.
+ * Two switches report nothing this service follows (C.1.2), and leave no mark.
+ * @param {{ key: string|null, carried: number|null, write: Function }} found - The pilot wire, from findPilotWire.
  * @param {number} order - The PILOT_WIRE_MODE value to write, one the module takes.
  * @param {string} logContext - What this write is for, for the log line.
  * @param {Map<string, number>} selfWritten - Marks of the values this service wrote.
@@ -889,32 +889,34 @@ function isComfortOrder(order) {
  * afterwards: the new one, the previous one when the write failed, or nothing
  * when it is unknown.
  * @example
- * await writePilotWireOrder(gladys, found, 'heater-pilot-wire', PILOT_WIRE_MODE.COMFORT, 'schedule', new Map());
+ * await writePilotWireOrder(found, PILOT_WIRE_MODE.COMFORT, 'schedule', new Map());
  */
-async function writePilotWireOrder(gladys, found, pilotWireSelector, order, logContext, selfWritten) {
+async function writePilotWireOrder(found, order, logContext, selfWritten) {
   let marked = false;
   try {
     // Marked in both branches: nothing goes on the wire when the order is
     // already carried, but it is still the order Gladys stands behind, and a
     // module re-reporting it must not look like a press of its button.
-    selfWritten.set(pilotWireSelector, order);
-    if (found.feature.last_value === order) {
+    if (found.key) {
+      selfWritten.set(found.key, order);
+    }
+    if (found.carried === order) {
       logger.debug(`Thermostat schedule: pilot-wire already on order ${order} (${logContext})`);
       return order;
     }
     marked = true;
-    await gladys.device.setValue(found.device, found.feature, order);
+    await found.write(order);
     logger.info(`Thermostat schedule: pilot-wire order ${order} written (${logContext})`);
     return order;
   } catch (e) {
     // The write never reached the module, so no report of it will come: a mark
     // left behind would swallow a real press of that same order later on.
-    if (marked) {
-      selfWritten.delete(pilotWireSelector);
+    if (marked && found.key) {
+      selfWritten.delete(found.key);
     }
     logger.warn(`Thermostat schedule: Failed to write the pilot-wire order: ${e.message}`);
     // The heater kept the order it had: that is what it is doing now.
-    return found.feature.last_value;
+    return found.carried;
   }
 }
 
@@ -1001,15 +1003,16 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
   const regulated = !stop && setpoint !== null && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.GLADYS;
   let found = null;
   try {
-    found = await getFeatureBySelector(gladys, config.pilot_wire_feature);
+    found = await findPilotWire(gladys, config);
     if (!found) {
-      logger.warn(`Thermostat schedule: pilot-wire feature not found for selector="${config.pilot_wire_feature}"`);
+      const selectors = config.pilot_wire_switches || [config.pilot_wire_feature];
+      logger.warn(`Thermostat schedule: pilot-wire feature not found for selector="${selectors.join('", "')}"`);
     }
   } catch (e) {
     logger.warn(`Thermostat schedule: pilot-wire feature unreadable: ${e.message}`);
   }
-  const carriedBefore = found ? found.feature.last_value : null;
-  const supportedOptions = found ? found.feature.supported_options : null;
+  const carriedBefore = found ? found.carried : null;
+  const supportedOptions = found ? found.supportedOptions : null;
 
   // Gladys only regulates a thermostat that has a room sensor (buildParamsConfig),
   // on the average of its probes (A.1.1). Each probe that cannot be read is left
@@ -1086,14 +1089,7 @@ async function drivePilotWire(gladys, device, config, preset, logContext, selfWr
     logger.warn(`Thermostat schedule: the module takes no order ${wanted}, nothing sent (${context})`);
     carried = carriedBefore;
   } else {
-    carried = await writePilotWireOrder(
-      gladys,
-      found,
-      config.pilot_wire_feature,
-      order,
-      context,
-      selfWritten || new Map(),
-    );
+    carried = await writePilotWireOrder(found, order, context, selfWritten || new Map());
   }
   if (carried === null || carried === undefined) {
     return;
@@ -1235,7 +1231,7 @@ async function regulateDevice(
         // window open or not. The schedule restores both on the next pass
         // once the window closes.
         await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten, selfWrittenPowers);
-      } else if (config.pilot_wire_feature) {
+      } else if (config.pilot_wire) {
         // A pilot-wire heater is stopped by the order, not by cutting its
         // supply: the wire is a command line, not the power feed. Frost
         // protection rather than off, as the external path writes the frost
@@ -1274,7 +1270,7 @@ async function regulateDevice(
       logger.debug(`Thermostat schedule: ${selector} is stopped, its unit is another thermostat's to run`);
     } else if (external) {
       await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten, selfWrittenPowers);
-    } else if (config.pilot_wire_feature) {
+    } else if (config.pilot_wire) {
       await drivePilotWire(gladys, device, config, 'off', `mode=off, ${selector}`, selfWritten);
     } else if (config.switch_feature) {
       await actuateSwitch(gladys, config.switch_feature, false, `mode=off, ${selector}`);
@@ -1366,7 +1362,7 @@ async function regulateDevice(
       // into the order it stands for. Picking a preset by hand arms a hold, so
       // without this branch no preset chosen in the widget ever reached the
       // heater — the switch below is the only actuator this path drove.
-      if (config.pilot_wire_feature) {
+      if (config.pilot_wire) {
         await driveHeldPilotWire(
           gladys,
           device,
@@ -1553,7 +1549,7 @@ async function regulateDevice(
   // the preset into one, or regulates on the room sensor when Gladys does.
   // `schedule` with no point in force names no order: the heater keeps the one
   // it carries, unless Gladys regulates on the setpoint it kept.
-  if (config.pilot_wire_feature) {
+  if (config.pilot_wire) {
     await drivePilotWire(gladys, device, config, targetPreset, `preset="${targetPreset}", ${selector}`, selfWritten, {
       setpoint: newSetpoint,
     });

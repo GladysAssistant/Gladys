@@ -19,7 +19,9 @@ import {
   MAX_WINDOW_DELAY_SECONDS,
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder,
-  supportedStandbyOrder
+  supportedStandbyOrder,
+  pilotWireOrderOfSwitches,
+  PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -158,6 +160,8 @@ class ThermostatBox extends Component {
   // thermostat's unit, and whether each opening sensor reads open.
   sensorUnits = {};
   temperatureReadings = {};
+  // The last state of each of the two switches of a pilot wire (spec C.1.2).
+  pilotWireSwitchReadings = {};
   openWindows = {};
   thermostatUnit = null;
   savingPreset = false;
@@ -179,7 +183,7 @@ class ThermostatBox extends Component {
   // `pilot-wire` type existed.
   isExternal = () => {
     const cfg = this.getConfig();
-    return cfg.thermostat_type === 'external' && !cfg.pilot_wire_feature;
+    return cfg.thermostat_type === 'external' && !cfg.pilot_wire;
   };
 
   // Which feature tells the widget the equipment is running: the switch Gladys
@@ -196,7 +200,7 @@ class ThermostatBox extends Component {
     const cfg = this.state.remoteConfig;
     if (!cfg) return null;
     if (this.isExternal()) return cfg.state_feature || null;
-    if (cfg.pilot_wire_feature) return this.isHeaterRegulated() ? null : cfg.operatingStateFeature || null;
+    if (cfg.pilot_wire) return this.isHeaterRegulated() ? null : cfg.operatingStateFeature || null;
     return cfg.switch_feature || null;
   };
 
@@ -205,7 +209,7 @@ class ThermostatBox extends Component {
   // hands it the order of the preset: there is no setpoint to turn.
   isHeaterRegulated = () => {
     const cfg = this.state.remoteConfig;
-    if (!cfg || !cfg.pilot_wire_feature) return false;
+    if (!cfg || !cfg.pilot_wire) return false;
     return (
       cfg.thermostat_type === 'pilot-wire' ||
       cfg.thermostat_type === 'external' ||
@@ -216,7 +220,26 @@ class ThermostatBox extends Component {
   // A pilot-wire heater Gladys regulates on the room sensor.
   isGladysRegulatedPilotWire = () => {
     const cfg = this.state.remoteConfig;
-    return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
+    return !!(cfg && cfg.pilot_wire) && !this.isHeaterRegulated();
+  };
+
+  // What carries the order of a heater regulating itself: the feature of its
+  // module, or two switches whose states together make the order (spec C.1.2).
+  getPilotWireSelectors = () => {
+    const cfg = this.state.remoteConfig;
+    if (!this.isHeaterRegulated()) return [];
+    return cfg.pilot_wire_switches || [cfg.pilot_wire_feature];
+  };
+
+  // The order two switches carry, once both have a state.
+  setPilotWireSwitchReading = (selector, value) => {
+    const cfg = this.state.remoteConfig;
+    this.pilotWireSwitchReadings = { ...this.pilotWireSwitchReadings, [selector]: value };
+    const [first, second] = cfg.pilot_wire_switches.map(feature => this.pilotWireSwitchReadings[feature]);
+    this.setState({
+      pilotWireOrder: pilotWireOrderOfSwitches(cfg.pilot_wire_switch_states, first, second),
+      pilotWireSupportedOptions: PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS
+    });
   };
   // The dial spans the range set on the thermostat (THERMOSTAT_MIN_TEMP /
   // _MAX_TEMP, or the shared default), in the setpoint feature's unit. The range
@@ -661,7 +684,9 @@ class ThermostatBox extends Component {
     // thermostat, and from the real device's state feature on an external one.
     // Both end up in `isSwitchOn`, which is what draws the heating halo.
     const switchFeature = this.getRunningStateFeature();
-    const pilotWireFeature = this.isHeaterRegulated() ? this.state.remoteConfig.pilot_wire_feature : null;
+    const pilotWireSelectors = this.getPilotWireSelectors();
+    const pilotWireSwitches = (this.state.remoteConfig && this.state.remoteConfig.pilot_wire_switches) || [];
+    this.pilotWireSwitchReadings = {};
     if (!thermostatFeature && temperatureFeatures.length === 0) {
       this.setState({ noConfig: true });
       return;
@@ -682,7 +707,7 @@ class ThermostatBox extends Component {
       this.showWindowBanner();
     }
     if (!switchFeature) stateUpdate.isSwitchOn = null;
-    if (!pilotWireFeature) stateUpdate.pilotWireOrder = null;
+    if (pilotWireSelectors.length === 0) stateUpdate.pilotWireOrder = null;
     this.setState(stateUpdate);
     const selectors = [
       thermostatFeature,
@@ -690,7 +715,7 @@ class ThermostatBox extends Component {
       humidityFeature,
       ...windowFeatures,
       switchFeature,
-      pilotWireFeature
+      ...pilotWireSelectors
     ]
       .filter(Boolean)
       .join(',');
@@ -761,11 +786,15 @@ class ThermostatBox extends Component {
               this.stateFeature = feat;
               this.setState({ isSwitchOn: isRunningFromStateFeature(feat, feat.last_value) });
             }
-            if (pilotWireFeature && feat.selector === pilotWireFeature) {
-              this.setState({
-                pilotWireOrder: feat.last_value,
-                pilotWireSupportedOptions: feat.supported_options || null
-              });
+            if (pilotWireSelectors.includes(feat.selector)) {
+              if (pilotWireSwitches.includes(feat.selector)) {
+                this.setPilotWireSwitchReading(feat.selector, feat.last_value);
+              } else {
+                this.setState({
+                  pilotWireOrder: feat.last_value,
+                  pilotWireSupportedOptions: feat.supported_options || null
+                });
+              }
             }
           });
         });
@@ -854,12 +883,12 @@ class ThermostatBox extends Component {
       this.setState({ isSwitchOn: isRunningFromStateFeature(this.stateFeature, payload.last_value) });
     }
     const remoteConfig = this.state.remoteConfig;
-    if (
-      this.isHeaterRegulated() &&
-      remoteConfig &&
-      payload.device_feature_selector === remoteConfig.pilot_wire_feature
-    ) {
-      this.setState({ pilotWireOrder: payload.last_value });
+    if (this.getPilotWireSelectors().includes(payload.device_feature_selector)) {
+      if (remoteConfig.pilot_wire_switches) {
+        this.setPilotWireSwitchReading(payload.device_feature_selector, payload.last_value);
+      } else {
+        this.setState({ pilotWireOrder: payload.last_value });
+      }
     }
   };
 

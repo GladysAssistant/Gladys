@@ -23,6 +23,7 @@ const FEATURE_PARAM_NAMES = [
   'THERMOSTAT_HUMIDITY_FEATURE',
   'THERMOSTAT_SWITCH_FEATURE',
   'THERMOSTAT_PILOT_WIRE_FEATURE',
+  'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE',
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',
@@ -30,8 +31,13 @@ const FEATURE_PARAM_NAMES = [
   'THERMOSTAT_POWER_FEATURE',
 ];
 // Of those, the params that may name several features as a JSON array
-// (docs/specs/thermostat.md A.1.1): several windows, several temperature probes.
-const FEATURE_LIST_PARAM_NAMES = ['THERMOSTAT_TEMPERATURE_FEATURE', 'THERMOSTAT_WINDOW_FEATURE'];
+// (docs/specs/thermostat.md A.1.1): several windows, several temperature
+// probes, and the two switches of a pilot wire (C.1.2).
+const FEATURE_LIST_PARAM_NAMES = [
+  'THERMOSTAT_TEMPERATURE_FEATURE',
+  'THERMOSTAT_WINDOW_FEATURE',
+  'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE',
+];
 const FEATURE_ARRAY_FIELDS = ['device_features'];
 // `electric_meter`: the meter of the energy-price box and of the energy price trigger / condition
 const DEVICE_STRING_FIELDS = ['device', 'camera', 'electric_meter'];

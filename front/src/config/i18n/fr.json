@@ -4386,6 +4386,19 @@
         },
         "pilotWireFeatureLabel": "Fil pilote (actionneur)",
         "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie un ordre (confort, éco, hors-gel, arrêt…) au lieu de couper son alimentation. Désactivez d’abord le programme propre au module.",
+        "pilotWireKind": {
+          "module": "Un module fil pilote",
+          "switches": "Deux interrupteurs (module à deux relais)"
+        },
+        "pilotWireSwitchLabel": "Interrupteur {{number}}",
+        "pilotWireSwitchOrderLabel": "Ordre",
+        "pilotWireSwitchesHelp": "Les deux sorties d’un module à deux relais câblé sur le fil pilote par deux diodes (FIBARO FGS-224, par exemple), que Gladys voit comme deux interrupteurs. Indiquez ci-dessous l’état des deux interrupteurs pour chaque ordre : il dépend du sens des diodes. Le réglage proposé est le câblage le plus courant.",
+        "pilotWireSwitchState": {
+          "on": "Allumé",
+          "off": "Éteint"
+        },
+        "pilotWireSwitchStatesError": "Chaque ordre doit avoir sa propre combinaison des deux interrupteurs : deux ordres sur la même combinaison ne peuvent pas être distingués.",
+        "pilotWireSwitchesWarning": "Ces deux interrupteurs sont réservés au thermostat : s’ils sont changés ailleurs (scène, tableau de bord, bouton du module), Gladys remet l’ordre attendu en moins d’une minute. Pensez à désactiver les scènes qui les pilotaient.",
         "pilotWireProgrammeWarning": "Désactivez le programme ou le mode thermostat propre au module (planning Heatzy, programme Tuya…) avant de le piloter depuis Gladys. Sinon, chaque ordre écrit par ce programme est pris pour un changement fait sur le module, et le module et Gladys écrivent l’ordre à tour de rôle.",
         "pilotWireStandbyOrderLabel": "Ordre une fois la consigne atteinte",
         "pilotWireStandbyForceLabel": "Forcer un autre ordre que hors-gel au repos",
@@ -4439,7 +4452,7 @@
         "saveError": "Erreur lors de la sauvegarde.",
         "incompleteVirtualError": "Un thermostat virtuel a besoin d’un capteur de température et d’un actionneur (commutateur ou fil pilote) : c’est en lisant l’un et en actionnant l’autre qu’il régule.",
         "incompleteExternalError": "Un thermostat existant a besoin de la consigne du thermostat à piloter.",
-        "incompletePilotWireError": "Un radiateur à fil pilote a besoin du fil pilote à commander.",
+        "incompletePilotWireError": "Un radiateur à fil pilote a besoin du fil pilote à commander : un module fil pilote, ou les deux interrupteurs qui le commandent.",
         "pilotWireUnreadError": "Le fil pilote choisi n'a pas pu être lu, l'ordre de repos ne peut donc pas être vérifié : rechargez la page et choisissez-le à nouveau.",
         "invertedRangeError": "La température minimale doit être inférieure à la température maximale.",
         "activeScheduleLabel": "Planning actif",
