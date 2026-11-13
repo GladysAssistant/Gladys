@@ -570,6 +570,87 @@ describe('scene.continue-only-if', () => {
         { triggerEvent: { last_value: 0 } },
       );
     });
+    it('should never verify a condition on a feature that never reported its state', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: null,
+      });
+      // null would compare as a zero, and as a value different from any other
+      const operators = [
+        { operator: '<', value: 20 },
+        { operator: '<=', value: 20 },
+        { operator: '>=', value: -5 },
+        { operator: '!=', value: 1 },
+        { operator: '=', value: 0 },
+      ];
+      await Promise.all(
+        operators.map((condition) =>
+          chaiAssert.isRejected(
+            runCondition({ device_feature: 'my-device-feature', ...condition }),
+            AbortScene,
+            'CONDITION_NOT_VERIFIED',
+          ),
+        ),
+      );
+      // a feature saved without the column at all is not known either
+      stateManager.setState('deviceFeature', 'my-device-feature', { category: 'temperature-sensor', type: 'decimal' });
+      await chaiAssert.isRejected(
+        runCondition({ device_feature: 'my-device-feature', operator: '!=', value: 1 }),
+        AbortScene,
+        'CONDITION_NOT_VERIFIED',
+      );
+    });
+    it('should never verify a condition on a string feature that never reported its state', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'text',
+        type: 'text',
+        // a number is not the state of a text feature
+        last_value: 1,
+        last_value_string: null,
+      });
+      await chaiAssert.isRejected(
+        runCondition({ device_feature: 'my-device-feature', operator: '!=', value: 'hello' }),
+        AbortScene,
+        'CONDITION_NOT_VERIFIED',
+      );
+      // an empty text is a state: nothing is written on the display
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'text',
+        type: 'text',
+        last_value_string: '',
+      });
+      await runCondition({ device_feature: 'my-device-feature', operator: '!=', value: 'hello' });
+      await runCondition({ device_feature: 'my-device-feature', operator: '=', value: '' });
+    });
+    it('should still continue when another condition is verified next to a feature without a state', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: null,
+      });
+      stateManager.setState('deviceFeature', 'my-other-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: 0,
+      });
+      await executeActions(
+        { stateManager, event },
+        [
+          [
+            {
+              type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+              conditions: [
+                { device_feature: 'my-device-feature', operator: '<', value: 20 },
+                // zero is a state like any other
+                { device_feature: 'my-other-feature', operator: '<', value: 20 },
+              ],
+            },
+          ],
+        ],
+        {},
+      );
+    });
     it('should abort scene, the feature of the condition does not exist anymore', async () => {
       const promise = runCondition({ device_feature: 'deleted-device-feature', operator: '=', value: 15 });
       return chaiAssert.isRejected(promise, AbortScene, 'DEVICE_FEATURE_NOT_FOUND');

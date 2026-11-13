@@ -543,6 +543,7 @@ const actionsFunc = {
       }
 
       let currentValue;
+      let currentValueKnown = true;
       // A condition compares either the current state of a device feature, read when the
       // condition runs, or a variable of the scene. The scene model accepts exactly one of the
       // two: "defined" is tested rather than "truthy", so that a selector resolving to nothing
@@ -556,12 +557,17 @@ const actionsFunc = {
         }
         // Same value as the variable the "get device value" action exposes for this feature
         currentValue = isStringStateFeature(deviceFeature) ? deviceFeature.last_value_string : deviceFeature.last_value;
+        // A feature that never reported its state holds null. JavaScript would compare it as
+        // a zero (`null < 20` is true) and as a value different from any other (`null !== 1`):
+        // a state that is not known verifies no condition, whatever the operator — like the
+        // price that is not known in the energy price condition.
+        currentValueKnown = currentValue !== null && currentValue !== undefined;
       } else {
         // removing brackets
         const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
         currentValue = get(scope, variableWithoutBrackets);
       }
-      const conditionVerified = compare(condition.operator, currentValue, value);
+      const conditionVerified = currentValueKnown && compare(condition.operator, currentValue, value);
       if (conditionVerified) {
         oneConditionVerified = true;
       } else {

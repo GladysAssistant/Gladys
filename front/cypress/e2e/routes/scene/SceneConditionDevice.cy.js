@@ -43,6 +43,9 @@ const SUFFIX = Date.now();
 const NEW_SCENE = `condition-device-new-${SUFFIX}`;
 const VARIABLE_SCENE = `condition-device-variable-${SUFFIX}`;
 const DELETED_SCENE = `condition-device-deleted-${SUFFIX}`;
+const IF_BLOCK_SCENE = `condition-device-if-block-${SUFFIX}`;
+const WHILE_BLOCK_SCENE = `condition-device-while-block-${SUFFIX}`;
+const TWO_CONDITIONS_SCENE = `condition-device-two-conditions-${SUFFIX}`;
 const PHONE_NEW_SCENE = `condition-device-phone-new-${SUFFIX}`;
 const PHONE_VARIABLE_SCENE = `condition-device-phone-variable-${SUFFIX}`;
 const VARIABLE_STEPS = [
@@ -113,7 +116,7 @@ const saveScene = () => {
 
 describe('Scene - condition on the current state of a device', () => {
   beforeEach(() => {
-    cy.viewport(1280, 1600);
+    cy.viewport(1280, 2400);
     cy.login();
   });
 
@@ -121,6 +124,46 @@ describe('Scene - condition on the current state of a device', () => {
     cy.visit('/dashboard/scene');
     createScene(NEW_SCENE, []);
     createScene(VARIABLE_SCENE, VARIABLE_STEPS);
+    createScene(IF_BLOCK_SCENE, [
+      [
+        {
+          type: 'condition.if-then-else',
+          if: [
+            {
+              type: 'condition.only-continue-if',
+              conditions: [{ device_feature: 'thermometer-temperature', operator: '<', value: 19 }]
+            }
+          ],
+          then: [],
+          else: []
+        }
+      ]
+    ]);
+    createScene(WHILE_BLOCK_SCENE, [
+      [
+        {
+          type: 'condition.while',
+          if: [
+            {
+              type: 'condition.only-continue-if',
+              conditions: [{ device_feature: 'front-door-opening', operator: '=', value: 0 }]
+            }
+          ],
+          then: [[{ type: 'delay', unit: 'seconds', value: 1 }]]
+        }
+      ]
+    ]);
+    createScene(TWO_CONDITIONS_SCENE, [
+      [
+        {
+          type: 'condition.only-continue-if',
+          conditions: [
+            { device_feature: 'front-door-opening', operator: '=', value: 1 },
+            { device_feature: 'front-door-opening', operator: '=', value: 0 }
+          ]
+        }
+      ]
+    ]);
     createScene(DELETED_SCENE, [
       [
         {
@@ -210,10 +253,76 @@ describe('Scene - condition on the current state of a device', () => {
     });
   });
 
+  it('Should offer the devices to a condition of an If / Then / Else block too', () => {
+    openScene(IF_BLOCK_SCENE);
+    // the condition of the block is a card of its own, named like any other
+    const celsius = Cypress.env('i18n').deviceFeatureUnitShort.celsius;
+    cy.get('[data-cy="drag-step-0.0.if.0"]')
+      .closest('.card-header')
+      .find('[class*="stepSummary"]')
+      .should('have.text', `Thermometer (Température) < 19 ${celsius}`);
+    // a block shows its conditions as soon as the scene opens: only the condition is collapsed
+    expandStep('0.0.if.0');
+    cy.get(`${SELECT} .react-select__single-value`).should('have.text', 'Thermometer (Température)');
+
+    // a second condition added to the block lists the devices as well
+    cy.contains('editScene.actionsCard.conditionIfThenElse.addCondition').click();
+    cy.get('[data-cy="type-picker-option"][data-value="condition.only-continue-if"]').click();
+    openMenu(`[data-card-index="1"] ${SELECT} .react-select__control`);
+    cy.get('.react-select__menu .react-select__group-heading').should('have.length', 2);
+    pickOption('Front door (Opening)');
+    cy.get('[data-card-index="1"] select.form-control').select('=');
+    cy.get(`[data-card-index="1"] .react-select__control`)
+      .eq(1)
+      .as('blockValueControl');
+    openMenu('@blockValueControl');
+    pickOption(openingLabel('one'));
+
+    saveScene();
+    apiRequest('GET', `/scene/${IF_BLOCK_SCENE}`).then(scene => {
+      expect(scene.actions[0][0].if.map(condition => condition.conditions)).to.deep.equal([
+        [{ device_feature: 'thermometer-temperature', operator: '<', value: 19 }],
+        [{ device_feature: 'front-door-opening', operator: '=', value: 1 }]
+      ]);
+    });
+  });
+
+  it('Should offer the devices to a condition of a While block too', () => {
+    openScene(WHILE_BLOCK_SCENE);
+    cy.get('[data-cy="drag-step-0.0.if.0"]')
+      .closest('.card-header')
+      .find('[class*="stepSummary"]')
+      .should('have.text', `Front door (Opening) = ${openingLabel('zero')}`);
+    expandStep('0.0.if.0');
+    cy.get(`${SELECT} .react-select__single-value`).should('have.text', 'Front door (Opening)');
+    openMenu(`${SELECT} .react-select__control`);
+    cy.get('.react-select__menu .react-select__group-heading').should('have.length', 2);
+  });
+
+  it('Should keep the state of a condition row with its condition when another one is deleted', () => {
+    openScene(TWO_CONDITIONS_SCENE);
+    expandStep('0.0');
+    // both conditions show the list of the states of a door
+    cy.contains('.card-body:visible a', 'editScene.actionsCard.onlyContinueIf.useValueList').should('not.exist');
+    // the first one switches to a typed value...
+    cy.contains('.card-body:visible a', 'editScene.actionsCard.onlyContinueIf.useCustomValue').click();
+    cy.contains('.card-body:visible a', 'editScene.actionsCard.onlyContinueIf.useValueList').should('exist');
+    // ... and is deleted: the one that remains still shows its list
+    cy.get('.card-body:visible .btn-danger')
+      .first()
+      .click();
+    cy.get(`${SELECT}`).should('have.length', 1);
+    cy.contains('.card-body:visible a', 'editScene.actionsCard.onlyContinueIf.useValueList').should('not.exist');
+    cy.contains('.card-body:visible a', 'editScene.actionsCard.onlyContinueIf.useCustomValue').should('exist');
+  });
+
   it('Should delete the scenes', () => {
     cy.visit('/dashboard/scene');
     apiRequest('DELETE', `/scene/${NEW_SCENE}`);
     apiRequest('DELETE', `/scene/${VARIABLE_SCENE}`);
+    apiRequest('DELETE', `/scene/${IF_BLOCK_SCENE}`);
+    apiRequest('DELETE', `/scene/${WHILE_BLOCK_SCENE}`);
+    apiRequest('DELETE', `/scene/${TWO_CONDITIONS_SCENE}`);
     apiRequest('DELETE', `/scene/${DELETED_SCENE}`);
   });
 });
@@ -223,6 +332,16 @@ describe('Scene - condition on the current state of a device', () => {
 // (docs/specs/scene-editor-mobile.md, C.6 and E.10)
 describe('Scene - condition on the current state of a device, on a phone', () => {
   const FIELD = `[data-cy="scene-condition-device-or-variable"]`;
+
+  // A save the server refused would send the same request: the answer is checked, and the
+  // tests then read the scene the server stored
+  const savePhoneScene = () => {
+    cy.intercept('PATCH', '**/api/v1/scene/*').as('saveScene');
+    cy.get('[data-cy=scene-save-button]').click();
+    cy.wait('@saveScene')
+      .its('response.statusCode')
+      .should('eq', 200);
+  };
 
   beforeEach(() => {
     cy.viewport('iphone-x');
@@ -258,12 +377,9 @@ describe('Scene - condition on the current state of a device, on a phone', () =>
     cy.get('body').type('{esc}');
     cy.get('[data-cy="scene-step-row-0.0"]').should('contain', 'Front door (Opening)');
 
-    cy.intercept('PATCH', '**/api/v1/scene/*').as('saveScene');
-    cy.get('[data-cy=scene-save-button]').click();
-    cy.wait('@saveScene').then(({ request }) => {
-      expect(request.body.actions[0][0].conditions).to.deep.equal([
-        { device_feature: 'front-door-opening', operator: '=' }
-      ]);
+    savePhoneScene();
+    apiRequest('GET', `/scene/${PHONE_NEW_SCENE}`).then(scene => {
+      expect(scene.actions[0][0].conditions).to.deep.equal([{ device_feature: 'front-door-opening', operator: '=' }]);
     });
   });
 
@@ -293,13 +409,10 @@ describe('Scene - condition on the current state of a device, on a phone', () =>
     cy.get(`${FIELD} [data-cy="device-picker-item-front-door-opening"]`).should('be.visible');
     cy.get('body').type('{esc}');
 
-    cy.intercept('PATCH', '**/api/v1/scene/*').as('saveScene');
-    cy.get('[data-cy=scene-save-button]').click();
-    cy.wait('@saveScene').then(({ request }) => {
+    savePhoneScene();
+    apiRequest('GET', `/scene/${PHONE_VARIABLE_SCENE}`).then(scene => {
       // one attribute, never both; the value typed for a temperature is not a state of a door
-      expect(request.body.actions[1][0].conditions).to.deep.equal([
-        { device_feature: 'front-door-opening', operator: '>' }
-      ]);
+      expect(scene.actions[1][0].conditions).to.deep.equal([{ device_feature: 'front-door-opening', operator: '>' }]);
     });
   });
 

@@ -176,8 +176,19 @@ The scene model accepts exactly one of the two per condition (`xor`), and so doe
 given to the assistant. A feature that no longer exists when the condition runs stops the scene
 (`DEVICE_FEATURE_NOT_FOUND`), like a value that cannot be computed
 (`CONDITION_VALUE_NOT_A_NUMBER`): a condition that cannot be evaluated is never read as true or
-false. `device_feature` is a device reference like any other: a device migration rewrites it
-(`device-migration.md`, B.3).
+false. **A feature that never reported its state** (`null`) **verifies no condition, whatever the
+operator**: JavaScript would compare it as a zero (`null < 20`) and as a value different from any
+other (`null != 1`), and the scene would run on a state nobody knows. Unlike a missing feature it
+does not stop the scene by itself — it is one condition that is not verified, so another condition
+of the box can still be (the rule of the energy price condition for a price that is not known).
+An empty string is a state. A condition on a *variable* keeps comparing what the scope holds, as
+it always did. `device_feature` is a device reference like any other: a device migration rewrites
+it (`device-migration.md`, B.3).
+
+The form of a condition is the same wherever the step sits: the cards of the "if" list of a
+block receive the devices of the editor like the steps of the scene do. The rows of a box are
+keyed, so the state of a row (a typed value instead of the list, what was put aside on a phone)
+stays with its condition when another one is deleted.
 
 In the form, the field "Device or variable" writes the attribute of what is picked and removes
 the other one. A feature holding constants offers their list as the value, exactly as for the
@@ -548,7 +559,9 @@ From 768 px the forms are untouched.
   ignores accents, the picked device and a value of its list are saved as `device_feature`, the
   collapsed step names the device and its value, a condition saved on a variable is shown and can
   be replaced by a device without keeping both attributes, a feature whose device is gone is
-  shown as stored and kept in the saved scene. In a phone viewport: a first condition is one
+  shown as stored and kept in the saved scene, a condition in the "if" list of an If / Then / Else
+  block and of a While block named and offered the devices, a row keeping its state when the
+  one before it is deleted. In a phone viewport: a first condition is one
   "Choose a device" button and no select, the device is picked in the picker sheet in one tap and
   saved, no "Device / Variable" switch without a variable to offer; with one, the switch shows the
   variable held, puts it aside for a device and brings it back.

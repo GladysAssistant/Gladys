@@ -220,7 +220,18 @@ describe('Device.migrate', function Describe() {
       name: 'Migration scene untouched',
       selector: 'migration-scene-untouched',
       icon: 'fe fe-bell',
-      actions: [[{ type: 'light.turn-on', devices: ['some-other-device'] }]],
+      actions: [
+        [{ type: 'light.turn-on', devices: ['some-other-device'] }],
+        // selectors named like members of Object are selectors like any other: not mapped,
+        // so left as they are
+        [
+          { type: 'light.turn-on', devices: ['toString'] },
+          {
+            type: 'condition.only-continue-if',
+            conditions: [{ device_feature: 'constructor', operator: '=', value: 1 }],
+          },
+        ],
+      ],
       triggers: null,
     });
     const dashboard = await db.Dashboard.create({

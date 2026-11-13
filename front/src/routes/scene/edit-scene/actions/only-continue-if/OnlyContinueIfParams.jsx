@@ -90,10 +90,32 @@ class OnlyContinueIf extends Component {
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
+  // A row keeps a state of its own (a value typed instead of picked in the list, what was put
+  // aside when switching between a device and a variable on a phone), and a condition has no
+  // identifier: each row gets a key, and the keys follow the conditions when one is added or
+  // deleted here. Without them the rows are matched by position, and deleting a condition hands
+  // its state to the next one. A list that changed from the outside (an undo, a restored draft)
+  // no longer matches the keys: every row then starts afresh.
+  conditionKeys = [];
+  lastConditionKey = 0;
+
+  newConditionKey = () => {
+    this.lastConditionKey += 1;
+    return this.lastConditionKey;
+  };
+
+  getConditionKeys = conditions => {
+    if (this.conditionKeys.length !== conditions.length) {
+      this.conditionKeys = conditions.map(this.newConditionKey);
+    }
+    return this.conditionKeys;
+  };
+
   addCondition = () => {
     const newConditions = update(this.props.action.conditions, {
       $push: [{}]
     });
+    this.conditionKeys = this.getConditionKeys(this.props.action.conditions).concat(this.newConditionKey());
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
@@ -101,6 +123,9 @@ class OnlyContinueIf extends Component {
     const newConditions = update(this.props.action.conditions, {
       $splice: [[conditionIndex, 1]]
     });
+    this.conditionKeys = this.getConditionKeys(this.props.action.conditions).filter(
+      (key, index) => index !== conditionIndex
+    );
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
@@ -157,6 +182,7 @@ class OnlyContinueIf extends Component {
         {props.action.conditions &&
           props.action.conditions.map((condition, index) => (
             <Condition
+              key={this.getConditionKeys(props.action.conditions)[index]}
               condition={condition}
               index={index}
               variableOptions={variableOptions}
