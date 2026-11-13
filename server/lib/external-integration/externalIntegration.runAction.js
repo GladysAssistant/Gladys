@@ -4,6 +4,7 @@ const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { ACTION_DEFAULT_TIMEOUT_SECONDS } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
+const { resolveVisibleValues } = require('./externalIntegration.fieldVisibility');
 
 // transport-level failures stay a 400 (integration unreachable), only an
 // explicit refusal of the integration (success: false) becomes a 422
@@ -40,24 +41,24 @@ async function runAction(selector, actionKey, fields = {}) {
   // core-defined source ("devices", "houses"), exactly like a config_schema field
   const dynamicOptions = await getDynamicOptions(service, declaredFields);
   Object.keys(fields).forEach((key) => {
-    const field = declaredFields.find((declaredField) => declaredField.key === key);
-    if (!field) {
+    if (!declaredFields.some((declaredField) => declaredField.key === key)) {
       throw new Error422(`fields.${key}: unknown action field`);
     }
-    validateConfigValue(field, fields[key], dynamicOptions);
   });
   // an absent field takes its declared default (validated with the
   // manifest), like a config_schema or scene action field, before the
-  // required check: the API behaves the same whatever the caller sends
-  const resolvedFields = { ...fields };
+  // required check: the API behaves the same whatever the caller sends. A
+  // field hidden by its visible_if condition is neither validated, nor
+  // required, nor relayed: a stale value of an earlier choice never blocks
+  const { values: resolvedFields, missingRequired } = resolveVisibleValues(declaredFields, fields);
   declaredFields.forEach((field) => {
-    if (resolvedFields[field.key] === undefined && field.default !== undefined) {
-      resolvedFields[field.key] = field.default;
-    }
-    if (field.required && resolvedFields[field.key] === undefined) {
-      throw new Error422(`fields.${field.key}: required`);
+    if (fields[field.key] !== undefined && resolvedFields[field.key] !== undefined) {
+      validateConfigValue(field, fields[field.key], dynamicOptions);
     }
   });
+  if (missingRequired.length > 0) {
+    throw new Error422(`fields.${missingRequired[0].key}: required`);
+  }
   const timeoutSeconds = action.timeout_seconds || ACTION_DEFAULT_TIMEOUT_SECONDS;
   let result;
   try {

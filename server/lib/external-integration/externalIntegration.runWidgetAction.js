@@ -11,6 +11,7 @@ const { findWidgetAction } = require('./externalIntegration.normalizeWidgetConte
 const { findDeclaredWidget, validateWidgetSettings } = require('./externalIntegration.validateWidgetSettings');
 const { countPerMinute } = require('./externalIntegration.widgetCache');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
+const { resolveVisibleValues } = require('./externalIntegration.fieldVisibility');
 const { toWidgetHttpError } = require('./externalIntegration.widgetErrors');
 
 const LANGUAGE_KEY_REGEX = /^[a-z]{2}(-[A-Z]{2})?$/;
@@ -58,11 +59,18 @@ function validateActionValues(action, rawValues = {}) {
     throw new Error422('values: must be an object');
   }
   const declaredFields = action.fields || [];
-  const values = {};
   Object.keys(rawValues).forEach((key) => {
-    const field = declaredFields.find((declaredField) => declaredField.key === key);
-    if (!field) {
+    if (!declaredFields.some((declaredField) => declaredField.key === key)) {
       throw new Error422(`values.${key}: unknown field`);
+    }
+  });
+  // a field hidden by its visible_if condition is neither validated, nor
+  // required, nor relayed: a stale value of an earlier choice never blocks
+  const { values, missingRequired } = resolveVisibleValues(declaredFields, rawValues);
+  declaredFields.forEach((field) => {
+    const { key } = field;
+    if (rawValues[key] === undefined || values[key] === undefined) {
+      return;
     }
     try {
       validateConfigValue(field, rawValues[key]);
@@ -74,16 +82,10 @@ function validateActionValues(action, rawValues = {}) {
     if (typeof rawValues[key] === 'string' && rawValues[key].length > MAX_WIDGET_ACTION_VALUE_LENGTH) {
       throw new Error422(`values.${key}: must be at most ${MAX_WIDGET_ACTION_VALUE_LENGTH} characters`);
     }
-    values[key] = rawValues[key];
   });
-  declaredFields.forEach((field) => {
-    if (values[field.key] === undefined && field.default !== undefined) {
-      values[field.key] = field.default;
-    }
-    if (field.required && values[field.key] === undefined) {
-      throw new Error422(`values.${field.key}: required`);
-    }
-  });
+  if (missingRequired.length > 0) {
+    throw new Error422(`values.${missingRequired[0].key}: required`);
+  }
   return values;
 }
 
@@ -157,4 +159,5 @@ async function runWidgetAction(selector, widgetKey, actionKey, rawSettings, { la
 
 module.exports = {
   runWidgetAction,
+  validateActionValues,
 };

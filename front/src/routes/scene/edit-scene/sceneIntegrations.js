@@ -1,4 +1,5 @@
 import { ACTIONS, EVENTS } from '../../../../../server/utils/constants';
+import { getVisibleFields } from '../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import { getLocalizedText } from '../../../utils/getLocalizedText';
 
 // Scene triggers and actions declared by the external integrations
@@ -148,7 +149,9 @@ export const getMissingRequiredFields = (sceneIntegrations, kind, step, language
     return [];
   }
   const values = step.fields || {};
-  return (declaration.fields || [])
+  // a field hidden by its visible_if condition is not shown, hence never
+  // required: the scene saves, the core skips it as well
+  return getVisibleFields(declaration.fields || [], values)
     .filter(field => field.type !== 'section' && field.required && isWildcardValue(values[field.key]))
     .map(field => getLocalizedText(field.label, language) || field.key);
 };
