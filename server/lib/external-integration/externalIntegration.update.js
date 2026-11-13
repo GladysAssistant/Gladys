@@ -24,7 +24,9 @@ const MANIFEST_SOURCE_INSTALLED = 'installed';
  * does not know, and the version requirement is the reason the admin must be
  * given. Manifests refused by validateManifest are dropped rather than
  * raised: the index is unmoderated external data, one bad entry must not
- * make the button fail. Every dropped manifest is recorded in `skipped`, so
+ * make the button fail. A version older than the installed one is dropped
+ * too: an update never downgrades. Every incompatible or invalid manifest is
+ * recorded in `skipped`, so
  * the update can say which version it did not apply, and why. Deduplicated
  * by image, so a source advertising the image already installed is not
  * pulled twice.
@@ -75,6 +77,12 @@ function buildUpdateCandidates(supervisor, service, indexManifest, repoManifest)
         return false;
       }
     })
+    // an update never downgrades: a source still advertising a version older
+    // than the installed one (an index lagging behind a release installed
+    // from the repo) must not win over the running image once the newer
+    // source is dropped. The installed version itself stays a candidate
+    // (force update re-pull)
+    .filter(({ manifest }) => semver.valid(service.version) === null || !semver.lt(manifest.version, service.version))
     // Array.prototype.sort is stable: equal versions keep the repo first
     .sort((first, second) => semver.compare(second.manifest.version, first.manifest.version))
     // validateManifest guarantees a usable docker_image reference

@@ -22,6 +22,14 @@ const INTEGRATION = {
   update_requires_gladys_version: '>=99.0.0'
 };
 
+// the translated sentence, interpolated: what the banner must read word for
+// word, so it cannot be confused with another banner carrying the same numbers
+const sentence = (key, fields) =>
+  Object.keys(fields).reduce(
+    (text, field) => text.replace(`{{${field}}}`, fields[field]),
+    key.split('.').reduce((node, part) => node[part], Cypress.env('i18n').integration.externalIntegration.supervision)
+  );
+
 describe('External integration - update requiring a newer Gladys', () => {
   beforeEach(() => {
     cy.login();
@@ -33,10 +41,14 @@ describe('External integration - update requiring a newer Gladys', () => {
     cy.visit(SUPERVISION_URL);
     cy.wait('@getIntegration');
 
-    cy.get('.alert-warning')
-      .should('contain', '3.6.0')
-      .and('contain', '>=99.0.0')
-      .and('contain', 'v3.5.0');
+    cy.get('.alert-warning').should(
+      'contain',
+      sentence('updateRequiresGladysText', {
+        latestVersion: '3.6.0',
+        gladysVersion: '>=99.0.0',
+        currentVersion: '3.5.0'
+      })
+    );
     // no "update available" banner, and the button stays the forced update
     cy.get('.alert-info').should('not.exist');
     cy.contains('button', 'integration.externalIntegration.supervision.forceUpdateButton').should('be.visible');
@@ -57,12 +69,21 @@ describe('External integration - update requiring a newer Gladys', () => {
     cy.contains('button', 'integration.externalIntegration.supervision.forceUpdateButton').click();
     cy.wait('@update');
 
-    // not "already up to date": the version that was not installed, why, and
-    // the version that stays installed
+    // not "already up to date": one banner, the update outcome — the version
+    // that was not installed, why, and the version that stays installed. The
+    // requirement banner of the page load is gone with the detail it came from
     cy.get('.alert-warning')
-      .should('contain', '3.6.0')
-      .and('contain', '>=99.0.0')
-      .and('contain', '3.5.0');
+      .should('have.length', 1)
+      .and('contain', sentence('updateSkipped.GLADYS_VERSION', { skippedVersion: '3.6.0', gladysVersion: '>=99.0.0' }))
+      .and('contain', sentence('updateKeptVersionText', { version: '3.5.0' }))
+      .and(
+        'not.contain',
+        sentence('updateRequiresGladysText', {
+          latestVersion: '3.6.0',
+          gladysVersion: '>=99.0.0',
+          currentVersion: '3.5.0'
+        })
+      );
     cy.get('.alert-info').should('not.exist');
     cy.get('.alert-success').should('not.exist');
   });

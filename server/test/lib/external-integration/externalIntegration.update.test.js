@@ -317,6 +317,59 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
+  it('should never downgrade to an older version still advertised by the index', async () => {
+    // a release installed from the repo before the indexer caught up: the
+    // repo now advertises a version requiring a newer Gladys, the index still
+    // the previous release. Dropping the repo version must not hand the
+    // update to the older index one — the running image is re-pulled
+    const installedManifest = {
+      ...TEST_MANIFEST,
+      version: '2.0.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:2.0.0',
+    };
+    const service = await seedExternalService({
+      store_slug: 'john/gladys-open-meteo-demo',
+      version: '2.0.0',
+      docker_image: installedManifest.docker_image,
+      manifest: installedManifest,
+    });
+    const { externalIntegration, system } = buildSupervisor();
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '1.9.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.9.0' },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '2.1.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:2.1.0',
+      gladys_version: '>=99.0.0',
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('2.0.0');
+    sinonAssert.neverCalledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:1.9.0');
+    sinonAssert.calledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:2.0.0');
+    expect(integration.skipped_update).to.deep.equal({
+      version: '2.1.0',
+      reason: 'GLADYS_VERSION',
+      gladys_version: '>=99.0.0',
+    });
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should keep the remote candidates when the installed version is not semver', async () => {
+    // nothing to compare against: the downgrade guard cannot apply
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: 'dev' });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '1.3.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0' },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.3.0');
+    externalIntegration.clearTimers(service.id);
+  });
+
   it('should report a newer version whose manifest this Gladys refuses', async () => {
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();
