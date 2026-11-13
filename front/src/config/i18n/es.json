@@ -7606,6 +7606,10 @@
     "instanceUpdateNoticeButton": "Actualizar mi instancia",
     "instanceUpdateNoticeDismiss": "Ocultar este mensaje",
     "needHelp": "¿Necesita ayuda?",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú",
+    "collapseMenu": "Ocultar el menú",
+    "expandMenu": "Mostrar el menú",
     "signOut": "Cerrar sesión"
   },
   "gatewayLinkUser": {

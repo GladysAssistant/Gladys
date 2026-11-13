@@ -72,6 +72,11 @@ function createActions(store) {
         showCollapsedMenu: !state.showCollapsedMenu
       });
     },
+    closeCollapsedMenu() {
+      store.setState({
+        showCollapsedMenu: false
+      });
+    },
     redirectToLogin() {
       const returnUrl = window.location.pathname + window.location.search;
       route(`/login?return_url=${encodeURIComponent(returnUrl)}`);

@@ -3,6 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 import { Link } from 'preact-router/match';
+import { connect } from 'unistore/preact';
 import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
@@ -10,6 +11,7 @@ import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
 import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
+import sidebarActions from '../../actions/sidebar';
 import style from './style.css';
 
 const PAGES_WITHOUT_HEADER = [
@@ -112,12 +114,49 @@ const NAV_ITEMS = [
   }
 ];
 
+// The rail and the content beside it only animate while the user is
+// collapsing or expanding the rail: this body class carries the transitions
+// (components/header/style.css, style/index.css) for the length of the slide.
+// Left on permanently, they would also fire every time the rail simply comes
+// and goes — signing in, entering or leaving the wall-panel fullscreen mode —
+// and the page would slide sideways on each of them.
+const SIDEBAR_ANIMATING_CLASS = 'gladys-sidebar-animating';
+// a little over the 0.22s of the CSS transitions
+const SIDEBAR_ANIMATION_DURATION_MS = 300;
+
+const prefersReducedMotion = () =>
+  typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 class Header extends Component {
   dropdownRef = createRef(null);
+
+  collapseButtonRef = createRef(null);
+
+  expandButtonRef = createRef(null);
 
   handleClickOutside = e => {
     if (this.dropdownRef.current && !this.dropdownRef.current.contains(e.target)) {
       this.props.closeDropDown();
+    }
+  };
+
+  // The open mobile drawer covers the page: Escape must give it back, as it
+  // does for any other overlay. Only relevant while that drawer is open — on
+  // desktop the rail (expanded or collapsed) is part of the layout, never an
+  // overlay, so Escape means nothing to it. Innermost overlay first (the
+  // profile dropup opens above the drawer), and a dedicated close and not a
+  // toggle: another document-level Escape handler closing the drawer in the
+  // same tick must not see it toggled back open here.
+  handleKeyDown = e => {
+    if (e.key !== 'Escape') {
+      return;
+    }
+    if (this.props.showDropDown) {
+      this.props.closeDropDown();
+      return;
+    }
+    if (this.props.showCollapsedMenu) {
+      this.props.closeCollapsedMenu();
     }
   };
 
@@ -144,10 +183,27 @@ class Header extends Component {
     }
   };
 
-  // Content offsets (style/index.css) key off this body class so they vanish
-  // together with the sidebar on auth pages and in fullscreen mode
+  // Content offsets (style/index.css) key off these body classes so they
+  // vanish together with the sidebar on auth pages and in fullscreen mode.
+  // The second one is the collapsed rail: the page then keeps only the slim
+  // gutter the expand button sits in, instead of a full rail-wide column.
   syncBodyClass = () => {
-    document.body.classList.toggle('gladys-sidebar-nav', !this.isHidden());
+    const visible = !this.isHidden();
+    document.body.classList.toggle('gladys-sidebar-nav', visible);
+    document.body.classList.toggle('gladys-sidebar-collapsed', visible && Boolean(this.props.sidebarCollapsed));
+  };
+
+  // Set in the same pass as the collapsed class, so the browser sees both in
+  // one style recalculation and animates from the previous layout
+  startSidebarAnimation = () => {
+    clearTimeout(this.sidebarAnimationTimeout);
+    if (prefersReducedMotion()) {
+      return;
+    }
+    document.body.classList.add(SIDEBAR_ANIMATING_CLASS);
+    this.sidebarAnimationTimeout = setTimeout(() => {
+      document.body.classList.remove(SIDEBAR_ANIMATING_CLASS);
+    }, SIDEBAR_ANIMATION_DURATION_MS);
   };
 
   constructor(props) {
@@ -160,18 +216,39 @@ class Header extends Component {
 
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
+    document.addEventListener('keydown', this.handleKeyDown);
     this.syncBodyClass();
     this.maybeRefreshInstanceVersion();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    const sidebarToggled = prevProps.sidebarCollapsed !== this.props.sidebarCollapsed && !this.isHidden();
+    if (sidebarToggled) {
+      this.startSidebarAnimation();
+    }
     this.syncBodyClass();
     this.maybeRefreshInstanceVersion();
+    // Toggling always takes away the control that was just pressed —
+    // collapsing rides the footer chevron off-canvas, expanding unmounts the
+    // floating button — so the keyboard would be dropped back to the top of
+    // the document mid-task. Hand it to the control that took over. Only on
+    // a real change: on mount the collapsed rail must not steal focus from
+    // the page the user just opened.
+    if (sidebarToggled) {
+      const takingOver = this.props.sidebarCollapsed ? this.expandButtonRef : this.collapseButtonRef;
+      if (takingOver.current) {
+        takingOver.current.focus();
+      }
+    }
   }
 
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside);
+    document.removeEventListener('keydown', this.handleKeyDown);
+    clearTimeout(this.sidebarAnimationTimeout);
     document.body.classList.remove('gladys-sidebar-nav');
+    document.body.classList.remove('gladys-sidebar-collapsed');
+    document.body.classList.remove(SIDEBAR_ANIMATING_CLASS);
   }
 
   render(props) {
@@ -188,22 +265,25 @@ class Header extends Component {
     return (
       <div>
         <div class={cx(style.mobileTopBar, 'd-lg-none', 'gladys-mobile-top-bar')}>
-          <button
-            type="button"
-            class={style.mobileToggler}
-            onClick={props.toggleCollapsedMenu}
-            data-cy="sidebar-toggler"
-            aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
-            aria-controls="sidebar-navigation"
-          >
-            <i class="fe fe-menu" />
-            {/* on mobile the notice lives in the closed menu: this dot is
-                what tells the user there is something to open it for. Screen
-                readers get the notice content itself, in the menu. */}
-            {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
-              <span class={style.mobileTogglerDot} aria-hidden="true" />
-            )}
-          </button>
+          <Localizer>
+            <button
+              type="button"
+              class={style.mobileToggler}
+              onClick={props.toggleCollapsedMenu}
+              data-cy="sidebar-toggler"
+              aria-label={<Text id={props.showCollapsedMenu ? 'header.closeMenu' : 'header.openMenu'} />}
+              aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
+              aria-controls="sidebar-navigation"
+            >
+              <i class="fe fe-menu" />
+              {/* on mobile the notice lives in the closed menu: this dot is
+                  what tells the user there is something to open it for. Screen
+                  readers get the notice content itself, in the menu. */}
+              {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
+                <span class={style.togglerDot} aria-hidden="true" />
+              )}
+            </button>
+          </Localizer>
           <a class={style.mobileBrand} href="/dashboard">
             <Localizer>
               <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
@@ -214,6 +294,31 @@ class Header extends Component {
           </a>
           <DarkModeToggle />
         </div>
+        {/* Collapsed rail on desktop: this floating button, alone in the slim
+            gutter the page keeps on the left, expands it back — into the
+            docked rail, never an overlay. No top bar up here: a full-width
+            one would cost every page a row, and width is exactly what
+            collapsing is for. */}
+        {props.sidebarCollapsed && (
+          <Localizer>
+            <button
+              type="button"
+              class={style.expandButton}
+              onClick={props.toggleSidebarCollapsed}
+              ref={this.expandButtonRef}
+              data-cy="sidebar-expand-button"
+              title={<Text id="header.expandMenu" />}
+              aria-label={<Text id="header.expandMenu" />}
+              aria-expanded="false"
+              aria-controls="sidebar-navigation"
+            >
+              <i class="fe fe-menu" />
+              {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
+                <span class={style.togglerDot} aria-hidden="true" />
+              )}
+            </button>
+          </Localizer>
+        )}
         {props.showCollapsedMenu && (
           <div class={cx(style.sidebarBackdrop, 'd-lg-none')} onClick={props.toggleCollapsedMenu} />
         )}
@@ -298,6 +403,27 @@ class Header extends Component {
               </span>
             </a>
             <DarkModeToggle />
+            {/* Collapse, desktop only (below the breakpoint the rail is an
+                on-demand drawer, where this button is hidden by CSS). It sits
+                here rather than in the brand row: at 15rem that row has no
+                width to spare beside the logo lockup — even less once the
+                ~44px coarse-pointer target applies — and the footer is
+                already where the view toggles live. */}
+            <Localizer>
+              <button
+                type="button"
+                class={style.collapseButton}
+                onClick={props.toggleSidebarCollapsed}
+                ref={this.collapseButtonRef}
+                data-cy="sidebar-collapse-button"
+                title={<Text id="header.collapseMenu" />}
+                aria-label={<Text id="header.collapseMenu" />}
+                aria-expanded="true"
+                aria-controls="sidebar-navigation"
+              >
+                <i class="fe fe-chevron-left" />
+              </button>
+            </Localizer>
             <div class={cx('dropdown-menu', style.profileMenu, { show: props.showDropDown })}>
               <a class="dropdown-item" href="/dashboard/profile">
                 <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
@@ -323,4 +449,8 @@ class Header extends Component {
   }
 }
 
-export default Header;
+// The collapsed preference is read from the store here, and not handed down
+// by the app router like the other props: a toggle then re-renders this
+// component alone instead of the whole routed page, so the rail starts moving
+// on the tap and not once a heavy dashboard has been diffed.
+export default connect('sidebarCollapsed', sidebarActions)(Header);
