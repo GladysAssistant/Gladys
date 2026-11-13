@@ -239,8 +239,13 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         clusterClient.supportedFeatures &&
         clusterClient.supportedFeatures.lighting
       ) {
-        const minLevel = await clusterClient.getMinLevelAttribute();
-        const maxLevel = await clusterClient.getMaxLevelAttribute();
+        // MinLevel and MaxLevel are optional attributes in the Matter specification: a light
+        // that does not implement them answers "UnsupportedAttribute", and matter.js returns
+        // undefined. Without a fallback, the brightness feature is rejected by the database
+        // ("t_device_feature.min cannot be null") and the whole device cannot be added.
+        // We fall back on the defaults of the specification for a lighting LevelControl.
+        const minLevel = (await clusterClient.getMinLevelAttribute()) ?? 1;
+        const maxLevel = (await clusterClient.getMaxLevelAttribute()) ?? 254;
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
