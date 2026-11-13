@@ -20,11 +20,12 @@ const DISTANCE_UNIT_CONVERSIONS = {
     },
     [DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM]: {
       unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE,
-      convert: (kwh) => kwh / 1.60934,
+      // consumption per fixed 100-distance grows with the larger mile unit
+      convert: (kwh) => kwh * 1.60934,
     },
     [DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM]: {
       unit: DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE,
-      convert: (wh) => wh / 1.60934,
+      convert: (wh) => wh * 1.60934,
     },
   },
   [MEASUREMENT_UNITS.METRIC]: {
@@ -51,11 +52,11 @@ const DISTANCE_UNIT_CONVERSIONS = {
     },
     [DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE]: {
       unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM,
-      convert: (kwh) => kwh * 1.60934,
+      convert: (kwh) => kwh / 1.60934,
     },
     [DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE]: {
       unit: DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM,
-      convert: (wh) => wh * 1.60934,
+      convert: (wh) => wh / 1.60934,
     },
   },
 };
