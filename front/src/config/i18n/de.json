@@ -7635,7 +7635,7 @@
     "link": "Feedback geben",
     "subjectTopicTitle": "Mein Feedback zur Integration {{subject}}",
     "generalTopicTitle": "Mein Feedback zu Gladys",
-    "topicBody": "<!-- Erzählen Sie uns: was gut funktioniert, was Sie blockiert, was Sie sich verbessert wünschen. Jedes Feedback ist willkommen! -->\n\n\n\n---\n_Gesendet von Gladys v{{version}}_"
+    "topicBody": "**Was gut funktioniert:**\n\n\n**Was verbessert werden könnte:**\n\n\n---\n_Gesendet von Gladys v{{version}}_"
   },
   "header": {
     "clockNoticeTitle": "Die Uhrzeit von Gladys ist falsch",

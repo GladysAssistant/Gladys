@@ -25,4 +25,9 @@ const buildForumFeedbackUrl = ({ title, body }) => {
   return `${FORUM_NEW_TOPIC_URL}?${params}`;
 };
 
-export { buildForumFeedbackUrl, FORUM_FEEDBACK_CATEGORY };
+// The instance gives its version as "v5.3.2", the front as "5.3.2": the
+// topic body adds the "v" itself.
+const getFeedbackVersion = (instanceVersion, frontVersion) =>
+  String(instanceVersion || frontVersion || '').replace(/^v/, '');
+
+export { buildForumFeedbackUrl, getFeedbackVersion, FORUM_FEEDBACK_CATEGORY };

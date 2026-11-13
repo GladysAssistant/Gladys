@@ -7635,7 +7635,7 @@
     "link": "Dar mi opinión",
     "subjectTopicTitle": "Mi opinión sobre la integración {{subject}}",
     "generalTopicTitle": "Mi opinión sobre Gladys",
-    "topicBody": "<!-- Cuéntenos: qué funciona bien, qué le bloquea, qué le gustaría mejorar. ¡Todas las opiniones son bienvenidas! -->\n\n\n\n---\n_Enviado desde Gladys v{{version}}_"
+    "topicBody": "**Lo que funciona bien:**\n\n\n**Lo que se podría mejorar:**\n\n\n---\n_Enviado desde Gladys v{{version}}_"
   },
   "header": {
     "clockNoticeTitle": "La hora de Gladys es incorrecta",
