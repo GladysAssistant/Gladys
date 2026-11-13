@@ -3909,6 +3909,7 @@
     "newCondition": "Nueva condición",
     "selectActionType": "Seleccione un tipo de acción",
     "selectConditionType": "Seleccione un tipo de condición",
+    "conditionAndText": "Y",
     "noTriggersYet": "Todavía no se ha añadido ningún activador. No es obligatorio tener un activador en una escena.",
     "addNewTriggerButton": "Añadir activador",
     "saveSceneError": "Se produjo un error al guardar su escena. Compruebe que todas las acciones/activadores estén completos y sean correctos.",
