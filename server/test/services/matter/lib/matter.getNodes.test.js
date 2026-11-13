@@ -14,12 +14,12 @@ describe('Matter.getNodes', () => {
         wrapper: fake.returns(null),
       },
       stateManager: {
-        getAllKeys: fake.returns(['matter:1234:1', 'matter:12345:1']),
-        get: (entity, externalId) =>
+        getAllKeys: fake.returns(['id-1', 'id-2']),
+        get: (entity, id) =>
           ({
-            'matter:1234:1': { name: 'Kitchen plug', selector: 'kitchen-plug', external_id: 'matter:1234:1' },
-            'matter:12345:1': { name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
-          }[externalId]),
+            'id-1': { name: 'Kitchen plug', selector: 'kitchen-plug', external_id: 'matter:1234:1' },
+            'id-2': { name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
+          }[id]),
       },
     };
     const MatterMain = {};

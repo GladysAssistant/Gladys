@@ -2,6 +2,7 @@ const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const MatterController = require('../../../../services/matter/api/matter.controller');
 const { BadParameters, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { Error500 } = require('../../../../utils/httpErrors');
 
 const { assert, fake } = sinon;
 
@@ -226,15 +227,21 @@ describe('MatterController', () => {
         node_id: '1234',
       },
     };
-    const json = fake.returns(null);
     const res = {
-      status: fake.returns({ json }),
       json: fake.returns(null),
     };
 
-    await controller['post /api/v1/service/matter/node/:node_id/decommission'].controller(req, res);
-    assert.calledOnceWithExactly(res.status, 500);
-    assert.calledOnceWithExactly(json, { error: 'Impossible to remove' });
+    const next = fake.returns(null);
+    await controller['post /api/v1/service/matter/node/:node_id/decommission'].controller(req, res, next);
+    assert.calledOnce(next);
+    const error = next.firstCall.args[0];
+    expect(error).to.be.instanceOf(Error500);
+    // the status is in the body: Gladys Plus ignores res.status()
+    expect(JSON.parse(JSON.stringify(error))).to.deep.equal({
+      status: 500,
+      code: 'SERVER_ERROR',
+      error: 'Impossible to remove',
+    });
     assert.notCalled(res.json);
   });
   it('should only let an admin decommission a node', async () => {

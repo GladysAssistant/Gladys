@@ -124,6 +124,14 @@ const DeviceDisplay = ({
   );
 };
 
+// Gladys errors are JSON objects carrying `error` or `code`. An HTML error page from a proxy (ex: 504),
+// or a Gladys Plus transport error (`error_code`: the instance did not answer) also come with a
+// `response`, but they do not mean that Gladys refused the request.
+const isAnswerFromGladys = e => {
+  const data = e.response && e.response.data;
+  return Boolean(data && typeof data === 'object' && !data.error_code && (data.error || data.code));
+};
+
 const DecommissionFeedback = ({ feedback, onDismiss }) => {
   const dismissButton = <button type="button" class="close" onClick={onDismiss} />;
   if (feedback.status === 'error') {
@@ -247,7 +255,28 @@ class MatterSettingsPage extends Component {
     }
   };
 
-  loadNodes = async () => {
+  // GET requests already in flight are shared by the HTTP clients: a reload asked while one runs
+  // could get an answer prepared before the change that asked for it (ex: a decommission which just
+  // ended). The reloads are therefore chained, and one more runs if one was asked in the meantime.
+  loadNodes = () => {
+    if (this.loadingNodesPromise) {
+      this.nodesReloadRequested = true;
+      return this.loadingNodesPromise;
+    }
+    this.loadingNodesPromise = (async () => {
+      try {
+        do {
+          this.nodesReloadRequested = false;
+          await this.fetchNodes();
+        } while (this.nodesReloadRequested);
+      } finally {
+        this.loadingNodesPromise = null;
+      }
+    })();
+    return this.loadingNodesPromise;
+  };
+
+  fetchNodes = async () => {
     this.setState({ loadingNodes: true });
     try {
       const nodes = await this.props.httpClient.get('/api/v1/service/matter/node', { with_gladys_devices: true });
@@ -349,12 +378,12 @@ class MatterSettingsPage extends Component {
       });
     } catch (e) {
       console.error(e);
-      if (e.response) {
-        // the server answered: the node has not been removed
-        const data = e.response.data || {};
+      if (isAnswerFromGladys(e)) {
+        // Gladys answered with an error: the node has not been removed
+        const { data } = e.response;
         this.setDecommissionFeedback(nodeId, { status: 'error', name, message: data.error || data.message });
       } else {
-        // timeout or connection lost: the server may still have removed the node
+        // timeout, connection lost, proxy or Gladys Plus error: Gladys may still have removed the node
         this.setDecommissionFeedback(nodeId, { status: 'noResponse', name });
       }
     }

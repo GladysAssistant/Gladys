@@ -6,25 +6,33 @@ const { fake, assert } = sinon;
 const MatterHandler = require('../../../../services/matter/lib');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
-const GLADYS_DEVICES = {
-  'matter:1234:1': { name: 'Plug', selector: 'plug', external_id: 'matter:1234:1' },
-  'matter:1234:2': { name: 'Sensor', selector: 'sensor', external_id: 'matter:1234:2' },
-  'matter:12345:1': { name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
-};
+const buildGladysDevices = () => [
+  { id: 'id-1', name: 'Plug', selector: 'plug', external_id: 'matter:1234:1' },
+  { id: 'id-2', name: 'Sensor', selector: 'sensor', external_id: 'matter:1234:2' },
+  { id: 'id-3', name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
+];
+
+// the in-memory device state, by id and by selector, as device.add fills it
+const buildStateManager = (devices) => ({
+  getAllKeys: fake(() => devices.map((device) => device.id)),
+  get: (entity, key) => {
+    const found = devices.find((device) => (entity === 'deviceById' ? device.id : device.selector) === key);
+    return found === undefined ? null : found;
+  },
+});
 
 describe('Matter.decommission', () => {
   let matterHandler;
   let gladys;
+  let gladysDevices;
 
   beforeEach(() => {
+    gladysDevices = buildGladysDevices();
     gladys = {
       job: {
         wrapper: fake.returns(null),
       },
-      stateManager: {
-        getAllKeys: fake.returns(Object.keys(GLADYS_DEVICES)),
-        get: (entity, externalId) => GLADYS_DEVICES[externalId],
-      },
+      stateManager: buildStateManager(gladysDevices),
       device: {
         destroy: fake.resolves(null),
       },
@@ -111,7 +119,7 @@ describe('Matter.decommission', () => {
       decommission: fake.resolves(null),
     });
     const result = await matterHandler.decommission(1234n, { gladysDeviceSelectors: ['plug', 'sensor', 'other-node'] });
-    assert.calledOnceWithExactly(gladys.stateManager.getAllKeys, 'deviceByExternalId');
+    assert.calledOnceWithExactly(gladys.stateManager.getAllKeys, 'deviceById');
     assert.calledTwice(gladys.device.destroy);
     assert.calledWith(gladys.device.destroy, 'plug');
     assert.calledWith(gladys.device.destroy, 'sensor');
@@ -146,5 +154,17 @@ describe('Matter.decommission', () => {
       deleted_devices: [{ name: 'Sensor', selector: 'sensor' }],
       failed_devices: [{ name: 'Plug', selector: 'plug' }],
     });
+  });
+  it('should keep a Gladys device which is no longer a device of the node when it is deleted', async () => {
+    matterHandler.nodesMap.set(1234n, {
+      // while the node leaves the fabric, "plug" is taken over by a re-paired node and "sensor" is deleted
+      decommission: fake(async () => {
+        gladysDevices[0].external_id = 'matter:9999:1';
+        gladysDevices.splice(1, 1);
+      }),
+    });
+    const result = await matterHandler.decommission(1234n, { gladysDeviceSelectors: ['plug', 'sensor'] });
+    assert.notCalled(gladys.device.destroy);
+    expect(result).to.deep.equal({ forced: false, deleted_devices: [], failed_devices: [] });
   });
 });

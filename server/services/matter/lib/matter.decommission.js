@@ -45,6 +45,13 @@ async function decommission(nodeId, { gladysDeviceSelectors = [] } = {}) {
   const deletedDevices = [];
   const failedDevices = [];
   await Promise.each(nodeDevices, async (device) => {
+    // node.decommission() can be long: in the meantime the device may have been deleted, or taken
+    // over by a re-paired node from the Devices tab. It is then not a device of this node anymore.
+    const currentDevice = this.gladys.stateManager.get('device', device.selector);
+    if (currentDevice === null || !currentDevice.external_id.startsWith(externalIdPrefix)) {
+      logger.info(`Matter: Device ${device.selector} is no longer a device of node ${nodeId}, it is kept`);
+      return;
+    }
     try {
       await this.gladys.device.destroy(device.selector);
       deletedDevices.push(device);

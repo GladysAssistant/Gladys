@@ -20,11 +20,13 @@ function getNodeExternalIdPrefix(nodeId) {
  */
 function getGladysDevicesOfNode(stateManager, nodeId) {
   const externalIdPrefix = getNodeExternalIdPrefix(nodeId);
+  // read by id, not by external_id: when a device is replaced by a re-paired one (same id, new
+  // external_id), device.add does not remove the former deviceByExternalId key, which keeps the
+  // device as it was, under its former node. The id never changes and always holds the current device.
   return stateManager
-    .getAllKeys('deviceByExternalId')
-    .filter((externalId) => externalId.startsWith(externalIdPrefix))
-    .map((externalId) => stateManager.get('deviceByExternalId', externalId))
-    .filter((device) => device !== null)
+    .getAllKeys('deviceById')
+    .map((id) => stateManager.get('deviceById', id))
+    .filter((device) => device !== null && device.external_id.startsWith(externalIdPrefix))
     .map((device) => ({ name: device.name, selector: device.selector }));
 }
 

@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { BadParameters, ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const { Error500 } = require('../../../utils/httpErrors');
 
 module.exports = function MatterController(matterHandler) {
   /**
@@ -79,8 +80,9 @@ module.exports = function MatterController(matterHandler) {
       if (e instanceof BadParameters || e instanceof ServiceNotConfiguredError) {
         throw e;
       }
-      // the cause is shown to the user (the generic error middleware would hide it)
-      res.status(500).json({ error: e.message });
+      // the cause is shown to the user: the error middleware would send an Error object, which
+      // serializes to {}. The status is in the body, Gladys Plus ignores res.status()
+      throw new Error500(e.message);
     }
   }
 
