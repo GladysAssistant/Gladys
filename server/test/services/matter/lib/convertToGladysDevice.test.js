@@ -724,4 +724,54 @@ describe('Matter.convertToGladysDevice', () => {
       type: 'brightness',
     });
   });
+
+  it('should keep the MinLevel and MaxLevel of a lighting LevelControl as brightness bounds', async () => {
+    const device = buildOnOffDevice({
+      clusterClients: [
+        {
+          id: LevelControl.Complete.id,
+          name: 'LevelControl',
+          endpointId: 1,
+          supportedFeatures: { lighting: true },
+          getMinLevelAttribute: async () => 2,
+          getMaxLevelAttribute: async () => 200,
+        },
+      ],
+    });
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features[1]).to.include({ external_id: 'matter:12345:1:8', min: 2, max: 200 });
+  });
+
+  it('should use the Matter default brightness bounds when the light does not implement MinLevel and MaxLevel', async () => {
+    // MinLevel / MaxLevel are optional: matter.js returns undefined when the light answers UnsupportedAttribute
+    const device = buildOnOffDevice({
+      clusterClients: [
+        {
+          id: LevelControl.Complete.id,
+          name: 'LevelControl',
+          endpointId: 1,
+          supportedFeatures: { lighting: true },
+          getMinLevelAttribute: async () => undefined,
+          getMaxLevelAttribute: async () => undefined,
+        },
+      ],
+    });
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(2);
+    expect(gladysDevice.features[1]).to.deep.equal({
+      name: 'LevelControl - 1',
+      selector: matterExternalIdToSelector('matter:12345:1:8'),
+      category: 'light',
+      type: 'brightness',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:8',
+      min: 1,
+      max: 254,
+    });
+  });
 });
