@@ -124,21 +124,28 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
     // the container was created again or not. A file left in place would stop the restore.
     logger.info('No Z2M configuration file to keep, restoring its backup...');
     await fs.rm(configFilepath, { force: true });
-    await this.restoreZ2mBackup(configFolder);
-    loadedConfig = await readConfigFile(configFilepath);
-    if (!loadedConfig) {
-      logger.info('Writing default Z2M configuration...');
-      loadedConfig = cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
+    try {
+      await this.restoreZ2mBackup(configFolder);
+      loadedConfig = await readConfigFile(configFilepath);
+      if (!loadedConfig) {
+        logger.info('Writing default Z2M configuration...');
+        loadedConfig = cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
+      }
+      // The coordinator backup left by Zigbee2mqtt in its folder holds the settings of the network the coordinator
+      // carries, newer than those of a restored file: they win, as other settings would make Zigbee2mqtt leave this
+      // network (ember) or stop on "configuration-adapter mismatch" (z-stack). Without it nor a Z2M backup, the
+      // default configuration lets Zigbee2mqtt form a new network.
+      const networkSettings = await readCoordinatorBackup(path.join(configFolder, 'coordinator_backup.json'));
+      if (networkSettings) {
+        loadedConfig.advanced = { ...loadedConfig.advanced, ...networkSettings };
+      }
+      await fs.writeFile(configFilepath, yaml.stringify(loadedConfig, YAML_CONFIG));
+    } catch (e) {
+      // A file restored but not given the coordinator settings, or written in part, would be kept as is by the next
+      // call: it is removed, for the next call to do it all again. It can only be the file written above.
+      await fs.rm(configFilepath, { force: true });
+      throw e;
     }
-    // The coordinator backup left by Zigbee2mqtt in its folder holds the settings of the network the coordinator
-    // carries, newer than those of a restored file: they win, as other settings would make Zigbee2mqtt leave this
-    // network (ember) or stop on "configuration-adapter mismatch" (z-stack). Without it nor a Z2M backup, the default
-    // configuration lets Zigbee2mqtt form a new network.
-    const networkSettings = await readCoordinatorBackup(path.join(configFolder, 'coordinator_backup.json'));
-    if (networkSettings) {
-      loadedConfig.advanced = { ...loadedConfig.advanced, ...networkSettings };
-    }
-    await fs.writeFile(configFilepath, yaml.stringify(loadedConfig, YAML_CONFIG));
     configCreated = true;
   }
   const { mqtt = {} } = loadedConfig;

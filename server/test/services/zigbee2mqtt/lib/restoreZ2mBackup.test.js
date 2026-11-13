@@ -108,15 +108,37 @@ describe('zigbee2mqtt restoreZ2mBackup', () => {
     expect(fs.existsSync(path.join(backupPath, 'escaped.txt'))).equals(false);
   });
 
-  it('should fail when a file of the backup cannot be written', async () => {
-    const writeError = new Error('EACCES: permission denied');
-    writeError.code = 'EACCES';
+  it('should fail, without the files cut short, when the files of the backup cannot be written', async () => {
+    const writeError = new Error('ENOSPC: no space left on device');
+    writeError.code = 'ENOSPC';
+    // The disk is full: each file is created, then cut short
+    const writeFile = fake(async (filePath) => {
+      await fsPromises.writeFile(filePath, 'cut');
+      throw writeError;
+    });
     const { restoreZ2mBackup } = proxyquire('../../../../services/zigbee2mqtt/lib/restoreZ2mBackup', {
-      'fs/promises': { ...fsPromises, writeFile: fake.rejects(writeError) },
+      'fs/promises': { ...fsPromises, writeFile },
     });
     const base64Zip = fs.readFileSync(path.join(backupPath, 'base64.backup'));
     const manager = { gladys: { variable: { getValue: fake.resolves(base64Zip.toString()) } }, serviceId };
 
-    await expect(restoreZ2mBackup.call(manager, outputPath)).to.be.rejectedWith('EACCES');
+    await expect(restoreZ2mBackup.call(manager, outputPath)).to.be.rejectedWith('ENOSPC');
+
+    // Not kept by the next restore as newer than the backup
+    expect(fs.readdirSync(outputPath)).deep.equals([]);
+  });
+
+  it('should end every write of the backup before failing', async () => {
+    // Holds configuration.yaml and external_converters/my-device.js
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-subfolder.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+    // A file in place of the folder of the external converters: creating it fails at once
+    fs.mkdirSync(outputPath);
+    fs.writeFileSync(path.join(outputPath, 'external_converters'), 'not a folder');
+
+    await expect(zigbee2MqttService.restoreZ2mBackup(outputPath)).to.be.rejected;
+
+    // Already written when the error is thrown: not created after its caller removed it
+    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
   });
 });
