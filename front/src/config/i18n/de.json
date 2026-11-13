@@ -928,6 +928,7 @@
         "editLabelLabel": "Beschriftung (optional)",
         "editLabelPlaceholder": "z. B. Garage",
         "addChipButton": "Chip hinzufügen",
+        "maxChipsReached": "Diese Leiste fasst höchstens {{max}} Chips: Entfernen Sie einen, um einen neuen Chip hinzuzufügen.",
         "openings": "{{count}} offen",
         "allClosed": "Alles geschlossen",
         "noEvent": "Kein anstehender Termin",
@@ -960,6 +961,7 @@
         "labelLabel": "Button-Beschriftung (optional)",
         "labelPlaceholder": "EG öffnen…",
         "addActionButton": "Aktion hinzufügen",
+        "maxActionsReached": "Dieses Widget fasst höchstens {{max}} Aktionen: Entfernen Sie eine, um eine neue Aktion hinzuzufügen.",
         "noActions": "Noch keine Aktion konfiguriert. Bearbeite das Dashboard, um welche hinzuzufügen."
       },
       "house-view": {
@@ -976,6 +978,7 @@
         "editPinFeatureLabel": "Gerätefunktion",
         "editPinLabelLabel": "Beschriftung (optional)",
         "editPinLabelPlaceholder": "z. B. Solar",
+        "maxPinsReached": "Dieses Widget fasst höchstens {{max}} Pins: Entfernen Sie einen, um einen neuen Pin zu setzen.",
         "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
         "error": "Das Bild konnte nicht geladen werden."
       },

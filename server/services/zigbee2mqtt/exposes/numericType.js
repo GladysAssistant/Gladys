@@ -70,6 +70,24 @@ const ZLINKY_APPARENT_POWER_FEATURES = {
   ),
 };
 
+const SWITCH_VOLTAGE_FEATURE = {
+  feature: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+    unit: DEVICE_FEATURE_UNITS.VOLT,
+  },
+};
+
+// Energy injected back to the grid: a production index, tracked apart from the consumption so it
+// is never counted as consumed.
+const PRODUCTION_INDEX_FEATURE = {
+  feature: {
+    category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+    unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  },
+};
+
 module.exports = {
   type: 'numeric',
   writeValue: (expose, value) => {
@@ -182,6 +200,15 @@ module.exports = {
         max: 1000,
       },
     },
+    current_c: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000,
+      },
+    },
     current_heating_setpoint: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -254,6 +281,16 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
+    energy_c: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    energy_produced_a: PRODUCTION_INDEX_FEATURE,
+    energy_produced_b: PRODUCTION_INDEX_FEATURE,
+    energy_produced_c: PRODUCTION_INDEX_FEATURE,
     gas: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
@@ -364,6 +401,13 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
+    power_c: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
     power_ab: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -378,6 +422,9 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
       },
     },
+    // Energy injected back to the grid, in total and per phase, e.g. Tuya SPM02V3
+    // https://www.zigbee2mqtt.io/devices/SPM02V3.html
+    produced_energy: PRODUCTION_INDEX_FEATURE,
     // External probe of a temperature/humidity sensor, e.g. Excellux ZG-105NTH
     // https://www.zigbee2mqtt.io/devices/ZG-105NTH.html
     // Tuya spells the same capability `temperature_probe`: both map to the same feature.
@@ -440,6 +487,9 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
+    voltage_a: SWITCH_VOLTAGE_FEATURE,
+    voltage_b: SWITCH_VOLTAGE_FEATURE,
+    voltage_c: SWITCH_VOLTAGE_FEATURE,
     voltage_phase_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,

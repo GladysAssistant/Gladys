@@ -16,8 +16,9 @@ function formatDateInUTC(date) {
   // Convert date to UTC
   const dateInUTC = dayjs(date).utc();
 
-  // Format the date
-  const formattedDate = dateInUTC.format('YYYY-MM-DD HH:mm:ss.SSSSSS');
+  // Format the date. dayjs has no microsecond token: 'SSSSSS' would just render
+  // the milliseconds twice, so take the 3-digit milliseconds and pad to microseconds.
+  const formattedDate = `${dateInUTC.format('YYYY-MM-DD HH:mm:ss.SSS')}000`;
 
   // Append the UTC offset
   return `${formattedDate}+00`;

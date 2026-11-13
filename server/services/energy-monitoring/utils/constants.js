@@ -52,8 +52,25 @@ const ENERGY_FROM_INDEX_KINDS = {
   },
 };
 
+/**
+ * @description Tell whether a feature is one Gladys derives from a cumulative index (the
+ * 30-minute consumption or production of ENERGY_FROM_INDEX_KINDS, the cost of a consumption):
+ * no integration publishes it, so a rediscovery must keep it.
+ * @param {object} feature - The feature to test.
+ * @returns {boolean} True for a derived energy feature.
+ * @example
+ * isDerivedEnergyFeature({ category: 'energy-sensor', type: 'thirty-minutes-consumption-cost' }); // true
+ */
+const isDerivedEnergyFeature = (feature) =>
+  (feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+    feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST) ||
+  Object.values(ENERGY_FROM_INDEX_KINDS).some(
+    (kind) => feature.category === kind.targetFeatureCategory && feature.type === kind.targetFeatureType,
+  );
+
 module.exports = {
   ENERGY_INDEX_FEATURE_TYPES,
   PRODUCTION_INDEX_FEATURE_TYPES,
   ENERGY_FROM_INDEX_KINDS,
+  isDerivedEnergyFeature,
 };
