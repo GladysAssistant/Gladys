@@ -6,6 +6,7 @@ const { fake } = sinon;
 const {
   buildWeeklyDigestData,
   sumConsumptionValues,
+  roundDigestValue,
   isConsumptionFeature,
   getConsumptionFeaturesForDigest,
   findCostFeatureForConsumption,
@@ -537,6 +538,100 @@ describe('energy digest helpers', () => {
     });
   });
 
+  it('should round weekly kWh and cost totals to two decimals', async () => {
+    const periodStart = new Date('2026-06-01');
+    // raw sums of daily buckets, as reported on the forum: 92.168 kWh and
+    // 28.7603 euros must never reach the AI with every decimal
+    const getConsumptionByDates = fake(async (selectors, options) => {
+      const isCurrentWeek = options.from === periodStart;
+      if (options.display_mode === 'currency') {
+        return [
+          {
+            values: isCurrentWeek ? [{ sum_value: 20.1 }, { sum_value: 13.834 }] : [{ sum_value: 28.7603 }],
+            deviceFeature: { currency_unit: 'euro' },
+          },
+        ];
+      }
+      return [{ values: isCurrentWeek ? [{ sum_value: 50.111 }, { sum_value: 61.229 }] : [{ sum_value: 92.168 }] }];
+    });
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates,
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForFeature(
+      context,
+      {
+        device: {
+          id: 'meter-1',
+          name: 'Main meter',
+          features: [
+            {
+              id: 'cost-feature-1',
+              selector: 'meter-consumption-cost',
+              type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+              energy_parent_id: 'consumption-feature-1',
+            },
+          ],
+        },
+        feature: {
+          id: 'consumption-feature-1',
+          name: 'Consumption',
+          selector: 'meter-consumption',
+          type: DAILY_CONSUMPTION,
+        },
+      },
+      periodStart,
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+      'meter-1',
+      [],
+    );
+
+    expect(result).to.deep.include({
+      current_week_kwh: 111.34,
+      previous_week_kwh: 92.17,
+      current_week_cost: 33.93,
+      previous_week_cost: 28.76,
+      cost_unit: 'euro',
+    });
+  });
+
+  it('should keep a missing weekly total as null', async () => {
+    const periodStart = new Date('2026-06-01');
+    const context = {
+      device: {
+        energySensorManager: {
+          // no data for the previous week
+          getConsumptionByDates: fake(async (selectors, options) =>
+            options.from === periodStart ? [{ values: [{ sum_value: 4.256 }] }] : [],
+          ),
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForFeature(
+      context,
+      {
+        device: { id: 'plug-1', name: 'Plug', features: [] },
+        feature: { id: 'feature-1', name: 'Consumption', selector: 'plug-consumption', type: DAILY_CONSUMPTION },
+      },
+      periodStart,
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+      null,
+      [],
+    );
+
+    expect(result).to.deep.include({
+      current_week_kwh: 4.26,
+      previous_week_kwh: null,
+    });
+  });
+
   it('should skip cost when no linked cost feature exists', async () => {
     const getConsumptionByDates = fake(async () => [{ values: [{ sum_value: 8 }] }]);
     const context = {
@@ -784,6 +879,19 @@ describe('sumConsumptionValues', () => {
         },
       ]),
     ).to.equal(10);
+  });
+});
+
+describe('roundDigestValue', () => {
+  it('should round to the requested number of decimals', () => {
+    expect(roundDigestValue(28.7603, 2)).to.equal(28.76);
+    expect(roundDigestValue(92.168, 2)).to.equal(92.17);
+    expect(roundDigestValue(0.1 + 0.2, 2)).to.equal(0.3);
+    expect(roundDigestValue(12, 2)).to.equal(12);
+  });
+
+  it('should keep null when there is no total', () => {
+    expect(roundDigestValue(null, 2)).to.equal(null);
   });
 });
 

@@ -5,6 +5,11 @@ const { isSensorFeature } = require('../../services/mcp/lib/selectFeature');
 
 const DEFAULT_DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED = 48;
 
+// the AI copies the payload numbers as they are: weekly totals are rounded
+// here so the digest never shows a raw sum like 28.7603 euros
+const KWH_DECIMALS = 2;
+const COST_DECIMALS = 2;
+
 const CONSUMPTION_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
@@ -232,6 +237,23 @@ function sumConsumptionValues(consumptionResults) {
 }
 
 /**
+ * @description Round a digest total to a fixed number of decimals.
+ * @param {number|null} value - Total to round.
+ * @param {number} decimals - Number of decimals to keep.
+ * @returns {number|null} Rounded total, or null when there is no total.
+ * @example
+ * roundDigestValue(28.7603, 2); // 28.76
+ */
+function roundDigestValue(value, decimals) {
+  if (value === null) {
+    return null;
+  }
+
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+}
+
+/**
  * @description Fetch consumption totals for a period comparison.
  * @param {object} context - Gateway context with device manager.
  * @param {string} selector - Device feature selector.
@@ -337,12 +359,12 @@ async function fetchEnergyConsumptionForFeature(
         mainMeterDeviceId !== null &&
         candidate.device.id !== mainMeterDeviceId &&
         belongsToMainMeterBranch(devices, candidate.feature, mainMeterDeviceId),
-      current_week_kwh: kwhTotals.current,
-      previous_week_kwh: kwhTotals.previous,
+      current_week_kwh: roundDigestValue(kwhTotals.current, KWH_DECIMALS),
+      previous_week_kwh: roundDigestValue(kwhTotals.previous, KWH_DECIMALS),
       ...(hasCostData
         ? {
-            current_week_cost: costTotals.current,
-            previous_week_cost: costTotals.previous,
+            current_week_cost: roundDigestValue(costTotals.current, COST_DECIMALS),
+            previous_week_cost: roundDigestValue(costTotals.previous, COST_DECIMALS),
             cost_unit: costTotals.currencyUnit ?? costFeature?.unit ?? null,
           }
         : {}),
@@ -502,6 +524,7 @@ async function buildWeeklyDigestData() {
 module.exports = {
   buildWeeklyDigestData,
   sumConsumptionValues,
+  roundDigestValue,
   isConsumptionFeature,
   shouldCheckFeatureForStale,
   formatSilentDuration,
