@@ -6,6 +6,15 @@ const EXTERNAL_INTEGRATION_LABEL = 'io.gladysassistant.external-integration';
 const MANIFEST_IMAGE_LABEL = 'io.gladysassistant.manifest';
 // Name of the manifest file at the root of the integration GitHub repo.
 const MANIFEST_FILE_NAME = 'gladys-assistant-integration.json';
+// Why an update did not apply a version newer than the one it installed
+// (`skipped_update.reason` of the update response, C.5): the version requires
+// another Gladys (`gladys_version` not satisfied), its manifest is refused by
+// validateManifest, or its image could not be pulled (not published yet).
+const UPDATE_SKIP_REASONS = {
+  GLADYS_VERSION: 'GLADYS_VERSION',
+  INVALID_MANIFEST: 'INVALID_MANIFEST',
+  IMAGE_UNAVAILABLE: 'IMAGE_UNAVAILABLE',
+};
 // Dedicated bridge network. icc is disabled so integrations are isolated
 // from each other; container -> gateway (Gladys) and container -> internet
 // still work.
@@ -612,6 +621,7 @@ const WIDGET_CONTENT_BUDGET = {
 };
 
 module.exports = {
+  UPDATE_SKIP_REASONS,
   EXTERNAL_INTEGRATION_LABEL,
   MANIFEST_IMAGE_LABEL,
   MANIFEST_FILE_NAME,

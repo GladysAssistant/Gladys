@@ -1121,6 +1121,12 @@
       "updateRetryButton": "Erneut versuchen",
       "updateError": "Die Aktualisierung ist fehlgeschlagen. Prüfen Sie die Logs der Integration und versuchen Sie es erneut.",
       "updatedTo": "Auf v{{version}} aktualisiert",
+      "updateRequiresGladys": "Diese Version erfordert Gladys {{gladysVersion}}: Aktualisieren Sie zuerst Gladys.",
+      "updateSkipped": {
+        "GLADYS_VERSION": "v{{skippedVersion}} erfordert Gladys {{gladysVersion}}: Aktualisieren Sie zuerst Gladys. v{{version}} ist installiert.",
+        "INVALID_MANIFEST": "v{{skippedVersion}} konnte nicht installiert werden: Diese Gladys-Version akzeptiert das Manifest nicht (siehe Gladys-Logs). v{{version}} ist installiert.",
+        "IMAGE_UNAVAILABLE": "Das Image von v{{skippedVersion}} kann noch nicht heruntergeladen werden: Versuchen Sie es später erneut. v{{version}} ist installiert."
+      },
       "noInstalledIntegrations": "Auf dieser Instanz ist noch keine Community-Integration installiert.",
       "installedSummary": {
         "title": {
@@ -1289,6 +1295,13 @@
         "updateAvailableVersionText": "Eine neue Version dieser Integration ist verfügbar: v{{latestVersion}} (installiert: v{{currentVersion}}).",
         "updateSuccessText": "Integration auf Version {{version}} aktualisiert.",
         "alreadyUpToDateText": "Die Integration ist bereits aktuell (Version {{version}}): Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
+        "updateRequiresGladysText": "Version {{latestVersion}} dieser Integration ist verfügbar, erfordert aber Gladys {{gladysVersion}} (installiert: v{{currentVersion}}). Aktualisieren Sie zuerst Gladys und danach diese Integration.",
+        "updateKeptVersionText": "Version {{version}} bleibt installiert: Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
+        "updateSkipped": {
+          "GLADYS_VERSION": "Version {{skippedVersion}} wurde nicht installiert, da sie Gladys {{gladysVersion}} erfordert. Aktualisieren Sie zuerst Gladys und aktualisieren Sie danach diese Integration erneut.",
+          "INVALID_MANIFEST": "Version {{skippedVersion}} wurde nicht installiert: Diese Gladys-Version akzeptiert das Manifest nicht (Details in den Gladys-Logs). Eine Aktualisierung von Gladys kann das Problem beheben.",
+          "IMAGE_UNAVAILABLE": "Version {{skippedVersion}} wurde nicht installiert: Das zugehörige Docker-Image kann noch nicht heruntergeladen werden (es wird möglicherweise noch veröffentlicht). Versuchen Sie es in einigen Minuten erneut."
+        },
         "statusLabel": "Status",
         "versionLabel": "Version",
         "changelogTitle": "Changelog dieser Version anzeigen",

@@ -115,7 +115,8 @@ module.exports = function ExternalIntegrationController(gladys) {
    *     "store_slug": null,
    *     "manifest": {},
    *     "update_available": false,
-   *     "latest_version": null
+   *     "latest_version": null,
+   *     "update_requires_gladys_version": null
    *   }
    * ]
    * @apiDescription A non-admin user only gets the installed communication
@@ -179,6 +180,7 @@ module.exports = function ExternalIntegrationController(gladys) {
       ...integration,
       update_available: gladys.externalIntegration.isUpdateAvailable(integration),
       latest_version: gladys.externalIntegration.getLatestVersion(integration),
+      update_requires_gladys_version: gladys.externalIntegration.getRequiredGladysVersion(integration),
       connection_status: gladys.externalIntegration.getConnectionStatus(integration.id),
       started_at: await gladys.externalIntegration.getContainerStartedAt(integration),
       docs: gladys.externalIntegration.getDocsUrls(integration),
@@ -319,7 +321,17 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @apiName update
    * @apiGroup ExternalIntegration
    * @apiDescription Pull the new image and recreate the container (the
-   * previous integration token is invalidated).
+   * previous integration token is invalidated). `skipped_update` names the
+   * most recent version newer than the one installed that could not be
+   * applied, and why (`GLADYS_VERSION`: it requires the Gladys version
+   * `gladys_version`; `INVALID_MANIFEST`; `IMAGE_UNAVAILABLE`), null when
+   * the latest known version was installed.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "selector": "ext-prohand-gladys-vigieau",
+   *   "version": "3.5.0",
+   *   "skipped_update": { "version": "3.6.0", "reason": "GLADYS_VERSION", "gladys_version": ">=5.3.0" }
+   * }
    */
   async function update(req, res) {
     const integration = await gladys.externalIntegration.update(req.params.selector);
