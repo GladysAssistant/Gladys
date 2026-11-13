@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef } from 'preact/hooks';
 import DeviceRow from './DeviceRow';
 import LightDeviceFeature from './device-features/light/LightDeviceFeature';
 import { buildDeviceRows } from './device-features/light/lightFeatures';
+import VacuumDeviceFeature from './device-features/vacuum/VacuumDeviceFeature';
+import { groupVacuumRows } from './device-features/vacuum/vacuumFeatures';
 import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
@@ -27,9 +29,10 @@ const DeviceCard = ({ children, ...props }) => {
   // Create placeholder rows based on the number of expected features
   const placeholderRows = Array(featureSelectors.length).fill(0);
 
-  // Every light feature of a same device is merged into one row opening the light panel; every
-  // other feature keeps the row it has always had.
-  const rows = buildDeviceRows(deviceFeatures);
+  // Every light feature of a same device is merged into one row opening the light panel, every
+  // feature of a same robot vacuum into one row opening the robot panel; every other feature keeps
+  // the row it has always had.
+  const rows = groupVacuumRows(buildDeviceRows(deviceFeatures), deviceFeatures);
 
   // Each rendered row is tagged with the selector(s) of the feature(s) it
   // shows, so the widget editor can point at one row of the live preview
@@ -93,7 +96,20 @@ const DeviceCard = ({ children, ...props }) => {
                     </tr>
                   ))
                 : rows.map(row =>
-                    row.features ? (
+                    row.vacuum ? (
+                      <VacuumDeviceFeature
+                        key={row.key}
+                        user={props.user}
+                        x={props.x}
+                        y={props.y}
+                        roomIndex={props.roomIndex}
+                        device={row.device}
+                        entries={row.entries}
+                        updateValue={props.updateValue}
+                        updateValueWithDebounce={props.updateValueWithDebounce}
+                        intl={props.intl}
+                      />
+                    ) : row.features ? (
                       <LightDeviceFeature
                         key={row.key}
                         x={props.x}
