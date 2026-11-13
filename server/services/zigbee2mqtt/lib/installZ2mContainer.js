@@ -144,7 +144,17 @@ async function installZ2mContainer(config, setupMode = false) {
     }
   }
 
-  const { configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode);
+  let configChanged;
+  let adapterChanged;
+  try {
+    ({ configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode));
+  } catch (e) {
+    // Zigbee2mqtt is not started without its configuration file: shown as is by the setup page
+    this.z2mContainerError = { code: null, message: e.message };
+    logger.error('Zigbee2mqtt: failed to write its configuration file:', e);
+    this.emitStatusEvent();
+    throw e;
+  }
 
   try {
     container = await findManagedContainer(this.gladys.system, containerDescriptor);

@@ -18,6 +18,8 @@ const CONFIGURATION = {
   DOCKER_MQTT_VERSION: 'DOCKER_MQTT_VERSION', // Variable to identify last version of MQTT docker file is installed
   DOCKER_Z2M_VERSION: 'DOCKER_Z2M_VERSION', // Variable to identify last version of Z2M docker file is installed
   Z2M_FRONTEND_URL: 'Z2M_FRONTEND_URL',
+  // Saved when Gladys asks Zigbee2mqtt to draw the settings of its network
+  Z2M_NETWORK_GENERATED: 'Z2M_NETWORK_GENERATED',
 };
 
 const MQTT_MODE = {
