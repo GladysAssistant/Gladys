@@ -1001,13 +1001,15 @@
       "energyPrice": {
         "editName": "Widget-Name (optional)",
         "editNamePlaceholder": "Auf dem Dashboard angezeigter Name",
-        "editContract": "Stromvertrag",
+        "editMeter": "Stromzähler",
+        "editMeterHelp": "Das Widget zeigt den Preis des auf diesem Zähler aktiven Vertrags: Legen Sie bei einer Tarifänderung den neuen Vertrag an, das Widget folgt ihm automatisch.",
         "noContract": "Noch kein Stromvertrag vorhanden.",
         "noContractLink": "Legen Sie einen in der Energieüberwachungs-Integration an.",
-        "notConfigured": "Wählen Sie in den Widget-Einstellungen einen Vertrag aus.",
+        "noActiveContract": "Derzeit kein aktiver Vertrag für {{meter}}.",
+        "manageContractsLink": "Verträge verwalten",
         "until": "Bis {{time}}",
         "unknownPrice": "Preis unbekannt",
-        "error": "Der Strompreis konnte nicht geladen werden. Prüfen Sie, ob der Vertrag noch existiert.",
+        "error": "Der Strompreis konnte nicht geladen werden. Prüfen Sie, ob der Zähler und seine Verträge noch existieren.",
         "cumulativeToday": "Heute: {{kwh}} kWh"
       }
     },
@@ -1662,6 +1664,13 @@
       "description": "Verfolgen Sie Ihren Stromverbrauch in Gladys",
       "myDevicesTab": "Meine Geräte",
       "energyPriceTab": "Energietarife",
+      "meterSelect": {
+        "mainMeter": "Hauptzähler",
+        "mainMeterNamed": "Hauptzähler ({{name}})",
+        "anyMeter": "Jeder Zähler",
+        "noActiveContract": "kein aktiver Vertrag",
+        "deletedContract": "Der Vertrag dieser Einstellung existiert nicht mehr: Wählen Sie einen Zähler aus."
+      },
       "documentation": "Dokumentation",
       "wizard": {
         "basics": "Informationen",
@@ -4317,8 +4326,8 @@
         "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
       },
       "energyCurrentPrice": {
-        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des ausgewählten Vertrags die folgende Bedingung erfüllt.",
-        "contractLabel": "Energievertrag",
+        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des auf dem ausgewählten Zähler aktiven Vertrags die folgende Bedingung erfüllt. Ohne aktiven Vertrag wird die Szene angehalten.",
+        "meterLabel": "Stromzähler",
         "operatorLabel": "Fortfahren, wenn der Preis",
         "valueLabel": "Schwellenwert (pro kWh)",
         "valuePlaceholder": "0.20",
@@ -4833,9 +4842,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "Dieser Auslöser wird aktiviert, wenn sich der aktuelle kWh-Preis (oder die Tarifstufe) des ausgewählten Vertrags ändert, zum Beispiel beim Wechsel von Niedertarif zu Hochtarif.",
-        "contractLabel": "Energievertrag",
-        "anyContract": "Jeder Vertrag",
+        "description": "Dieser Auslöser wird aktiviert, wenn sich der aktuelle kWh-Preis (oder die Tarifstufe) des ausgewählten Zählers ändert, zum Beispiel beim Wechsel von Niedertarif zu Hochtarif. Er folgt dem aktiven Vertrag des Zählers: Bei einer Tarifänderung funktioniert die Szene ohne Anpassung weiter.",
+        "meterLabel": "Stromzähler",
         "error": "Die Energieverträge konnten nicht geladen werden."
       }
     },

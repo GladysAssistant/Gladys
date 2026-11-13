@@ -1,8 +1,11 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
+
+export const CONTRACTS_PAGE = '/dashboard/integration/device/energy-monitoring/contracts';
 
 // The price of a tier changes a few times a day at most: 5 minutes is fast
 // enough to follow it, and the box also reschedules itself on the exact
@@ -55,7 +58,25 @@ const formatKwh = (value, language) => {
   }
 };
 
-const EnergyPriceBox = ({ title, loading, error, notConfigured, current, language }) => {
+// The box targets a meter, the main meter when it names none, and shows the
+// price of the contract active on it (docs/specs/energy-contracts.md 8.2). A box
+// saved before the meter targeting names a contract instead: the server reads it
+// as the meter of that contract.
+const getCurrentPrice = (httpClient, { electric_meter: electricMeter, energy_contract: energyContract }) => {
+  if (!electricMeter && energyContract) {
+    return httpClient.get(`/api/v1/energy_contract/${encodeURIComponent(energyContract)}/current`);
+  }
+  return httpClient.get(
+    '/api/v1/energy_contract/current',
+    electricMeter ? { electric_meter: electricMeter } : undefined
+  );
+};
+
+const EnergyPriceBox = ({ title, loading, error, current, language }) => {
+  // the meter has no contract covering "now" (or there is no meter at all):
+  // say so, never show the price of an expired contract
+  const noActiveContract = current && current.contract === null;
+  const meterName = current && current.electric_meter ? current.electric_meter.name : null;
   const hasPrice = current && current.price !== null && current.price !== undefined;
   const validUntil = current && current.valid_until ? formatTime(current.valid_until, language) : null;
   const hasNextPrice = current && current.next_price !== null && current.next_price !== undefined;
@@ -74,12 +95,7 @@ const EnergyPriceBox = ({ title, loading, error, notConfigured, current, languag
               </span>
               {current && current.label && <span class={style.tierBadge}>{current.label}</span>}
             </div>
-            {notConfigured && (
-              <div class={style.muted}>
-                <Text id="dashboard.boxes.energyPrice.notConfigured" />
-              </div>
-            )}
-            {!notConfigured && error && (
+            {error && (
               <div class={style.errorState}>
                 <i class="fe fe-bell" />
                 <span>
@@ -87,7 +103,23 @@ const EnergyPriceBox = ({ title, loading, error, notConfigured, current, languag
                 </span>
               </div>
             )}
-            {!notConfigured && !error && current && (
+            {!error && noActiveContract && (
+              <div>
+                <div class={style.unknownPrice}>
+                  {meterName ? (
+                    <Text id="dashboard.boxes.energyPrice.noActiveContract" fields={{ meter: meterName }} />
+                  ) : (
+                    <Text id="dashboard.boxes.energyPrice.noContract" />
+                  )}
+                </div>
+                <div class={style.muted}>
+                  <Link href={CONTRACTS_PAGE}>
+                    <Text id="dashboard.boxes.energyPrice.manageContractsLink" />
+                  </Link>
+                </div>
+              </div>
+            )}
+            {!error && current && !noActiveContract && (
               <div>
                 {hasPrice ? (
                   <div class={style.price}>{formatPrice(current.price, current.currency, current.unit, language)}</div>
@@ -137,17 +169,10 @@ class EnergyPrice extends Component {
   }
 
   refreshData = async () => {
-    const { energy_contract: energyContract } = this.props.box;
     clearTimeout(this.switchTimeout);
-    if (!energyContract) {
-      this.setState({ loading: false, error: false, current: null });
-      return;
-    }
     try {
       this.setState({ error: false, loading: true });
-      const current = await this.props.httpClient.get(
-        `/api/v1/energy_contract/${encodeURIComponent(energyContract)}/current`
-      );
+      const current = await getCurrentPrice(this.props.httpClient, this.props.box);
       this.setState({ error: false, loading: false, current });
       this.scheduleRefreshAtSwitch(current);
     } catch (e) {
@@ -174,7 +199,10 @@ class EnergyPrice extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.energy_contract !== this.props.box.energy_contract) {
+    if (
+      prevProps.box.electric_meter !== this.props.box.electric_meter ||
+      prevProps.box.energy_contract !== this.props.box.energy_contract
+    ) {
       this.refreshData();
     }
   }
@@ -186,17 +214,13 @@ class EnergyPrice extends Component {
 
   render({ box, user }, { loading, error, current }) {
     const language = user && user.language ? user.language : undefined;
-    const title = box.name || (current && current.contract && current.contract.name) || box.energy_contract || '';
-    return (
-      <EnergyPriceBox
-        title={title}
-        loading={loading}
-        error={error}
-        notConfigured={!box.energy_contract}
-        current={current}
-        language={language}
-      />
-    );
+    // the box name, else the contract that priced it, else its meter
+    const title = box.name ||
+      (current && current.contract && current.contract.name) ||
+      (current && current.electric_meter && current.electric_meter.name) || (
+        <Text id="dashboard.boxTitle.energy-price" />
+      );
+    return <EnergyPriceBox title={title} loading={loading} error={error} current={current} language={language} />;
   }
 }
 

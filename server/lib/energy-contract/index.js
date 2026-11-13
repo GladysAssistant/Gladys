@@ -2,16 +2,20 @@
 // tariff calendars, the templates and the pricing of a meter's intervals through the
 // rule engine of ./engine.js (or the integration in delegated mode). The engine stays
 // pure; everything touching the database, the meters or the integrations is here.
-const { get, getBySelector, getActive } = require('./contract.get');
+const { get, getBySelector, getActive, getActiveAt } = require('./contract.get');
 const { create, requestRecalculation } = require('./contract.create');
 const { update } = require('./contract.update');
 const { destroy } = require('./contract.destroy');
 const { getStatus } = require('./contract.getStatus');
 const { preview } = require('./contract.preview');
 const { getCurrent, clearCurrentPriceCache } = require('./contract.getCurrent');
+const { resolveElectricMeter, getMeterCurrent } = require('./contract.getMeterCurrent');
 const { checkPriceChanges } = require('./contract.checkPriceChanges');
 const { priceContractIntervals, getCompiledTariff } = require('./contract.price');
-const { getDefaultElectricMeterFeatureId } = require('./contract.getDefaultElectricMeterFeatureId');
+const {
+  getMainElectricMeterDeviceId,
+  getDefaultElectricMeterFeatureId,
+} = require('./contract.getDefaultElectricMeterFeatureId');
 const { getMeterRootFeatureId, detachElectricMeter, setDeviceElectricMeter, repairHierarchy } = require('./hierarchy');
 const {
   getMeterConsumptionFeature,
@@ -59,7 +63,7 @@ const EnergyContract = function EnergyContract(event, stateManager, serviceManag
   this.externalIntegration = null;
   this.compiledTariffs = new Map();
   this.currentPriceCache = new Map();
-  // last price / label observed per contract id, for the price-changed scene trigger (spec 8.2)
+  // last price / label observed per meter device id, for the price-changed scene trigger (spec 8.2)
   this.lastKnownPrices = new Map();
   this.calendarRecalculations = new Map();
   // meter device id -> bounded recalculation state (consumption published after the fact)
@@ -71,6 +75,7 @@ EnergyContract.prototype.init = init;
 EnergyContract.prototype.get = get;
 EnergyContract.prototype.getBySelector = getBySelector;
 EnergyContract.prototype.getActive = getActive;
+EnergyContract.prototype.getActiveAt = getActiveAt;
 EnergyContract.prototype.getStatus = getStatus;
 EnergyContract.prototype.clearCurrentPriceCache = clearCurrentPriceCache;
 EnergyContract.prototype.create = create;
@@ -81,9 +86,12 @@ EnergyContract.prototype.recalculate = recalculate;
 EnergyContract.prototype.requestMeterRecalculation = requestMeterRecalculation;
 EnergyContract.prototype.preview = preview;
 EnergyContract.prototype.getCurrent = getCurrent;
+EnergyContract.prototype.resolveElectricMeter = resolveElectricMeter;
+EnergyContract.prototype.getMeterCurrent = getMeterCurrent;
 EnergyContract.prototype.checkPriceChanges = checkPriceChanges;
 EnergyContract.prototype.priceContractIntervals = priceContractIntervals;
 EnergyContract.prototype.getCompiledTariff = getCompiledTariff;
+EnergyContract.prototype.getMainElectricMeterDeviceId = getMainElectricMeterDeviceId;
 EnergyContract.prototype.getDefaultElectricMeterFeatureId = getDefaultElectricMeterFeatureId;
 EnergyContract.prototype.getMeterRootFeatureId = getMeterRootFeatureId;
 EnergyContract.prototype.detachElectricMeter = detachElectricMeter;

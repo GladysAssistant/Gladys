@@ -942,13 +942,15 @@
       "energyPrice": {
         "editName": "Widget name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
-        "editContract": "Electricity contract",
+        "editMeter": "Electric meter",
+        "editMeterHelp": "The widget shows the price of the contract active on this meter: when your tariff changes, create the new contract and the widget follows it.",
         "noContract": "No electricity contract yet.",
         "noContractLink": "Create one in the energy monitoring integration.",
-        "notConfigured": "Select a contract in the widget settings.",
+        "noActiveContract": "No active contract on {{meter}} right now.",
+        "manageContractsLink": "Manage the contracts",
         "until": "Until {{time}}",
         "unknownPrice": "Price unknown",
-        "error": "Unable to load the electricity price. Check that the contract still exists.",
+        "error": "Unable to load the electricity price. Check that the meter and its contracts still exist.",
         "cumulativeToday": "Today: {{kwh}} kWh"
       },
       "thermostat": {
@@ -3027,6 +3029,13 @@
       "description": "Track your electricity consumption in Gladys",
       "myDevicesTab": "My Devices",
       "energyPriceTab": "Energy Rates",
+      "meterSelect": {
+        "mainMeter": "Main meter",
+        "mainMeterNamed": "Main meter ({{name}})",
+        "anyMeter": "Any meter",
+        "noActiveContract": "no active contract",
+        "deletedContract": "The contract this setting was bound to no longer exists: choose a meter."
+      },
       "documentation": "Documentation",
       "wizard": {
         "basics": "Information",
@@ -4317,8 +4326,8 @@
         "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
       },
       "energyCurrentPrice": {
-        "description": "The scene will continue only if the current price per kWh of the selected contract meets the condition below.",
-        "contractLabel": "Energy contract",
+        "description": "The scene will continue only if the current price per kWh of the contract active on the selected meter meets the condition below. Without an active contract, the scene stops.",
+        "meterLabel": "Electric meter",
         "operatorLabel": "Continue if the price is",
         "valueLabel": "Threshold (per kWh)",
         "valuePlaceholder": "0.20",
@@ -4833,9 +4842,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "This will trigger when the current price per kWh (or the tariff tier) of the selected contract changes, for example when switching from off-peak to peak hours.",
-        "contractLabel": "Energy contract",
-        "anyContract": "Any contract",
+        "description": "This will trigger when the current price per kWh (or the tariff tier) of the selected meter changes, for example when switching from off-peak to peak hours. It follows the meter's active contract: when your tariff changes, the scene keeps working without any change.",
+        "meterLabel": "Electric meter",
         "error": "Unable to load the energy contracts."
       }
     },
