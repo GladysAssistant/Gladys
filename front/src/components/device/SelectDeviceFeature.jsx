@@ -5,13 +5,7 @@ import DevicePickerField from './DevicePickerField';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
-
-// Search should not care about case or accents ("temperature" must match "Température")
-const normalizeSearchString = str =>
-  str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+import { normalizeSearchString, filterOptionByWords } from '../../utils/searchOptions';
 
 // Keeps the room grouping while filtering options, dropping rooms left empty
 const filterOptionGroups = (groups, predicate) =>
@@ -258,18 +252,6 @@ class SelectDeviceFeature extends Component {
       return feature && feature.category === firstFeature.category && feature.type === firstFeature.type;
     });
   };
-  // Every typed word must match (implicit AND) against room + device + feature,
-  // so "motion living" finds the motion sensor of the living room
-  filterOption = (option, rawInput) => {
-    if (!rawInput) {
-      return true;
-    }
-    const searchText = option.data.searchText || normalizeSearchString(option.label);
-    return normalizeSearchString(rawInput)
-      .split(/\s+/)
-      .filter(Boolean)
-      .every(word => searchText.includes(word));
-  };
   constructor(props) {
     super(props);
     this.state = {
@@ -329,7 +311,7 @@ class SelectDeviceFeature extends Component {
         value={props.isMulti ? selectedOptions : selectedOption}
         onChange={this.handleChange}
         options={this.getDisplayedOptions()}
-        filterOption={this.filterOption}
+        filterOption={filterOptionByWords}
         styles={{ menu: base => ({ ...base, zIndex: 2 }) }}
         className="react-select-container"
         classNamePrefix="react-select"

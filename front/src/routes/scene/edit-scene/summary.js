@@ -269,8 +269,21 @@ const getActionSummary = (action, dictionary, deviceFeatures, thermostatSchedule
       const [first] = action.conditions;
       const hasEvaluateValue =
         first.evaluate_value !== undefined && first.evaluate_value !== null && first.evaluate_value !== '';
-      const value = hasEvaluateValue ? nameVariablesInText(String(first.evaluate_value), names) : first.value;
-      const firstText = [getVariableLabel(first.variable, names), formatOperator(first.operator), value]
+      // A condition reads either the current state of a device or a variable of the scene.
+      // The device is named and its value read like in a device state trigger ("Open", "18 °C")
+      // once the devices are loaded; a variable shows the label its step declared.
+      const comparesDeviceFeature = first.device_feature !== undefined && first.device_feature !== null;
+      const { feature } = (comparesDeviceFeature && deviceFeatures && deviceFeatures[first.device_feature]) || {};
+      let value = first.value;
+      if (hasEvaluateValue) {
+        value = nameVariablesInText(String(first.evaluate_value), names);
+      } else if (comparesDeviceFeature) {
+        value = formatFeatureValue(first.value, feature, dictionary);
+      }
+      const subject = comparesDeviceFeature
+        ? getFeatureLabel(first.device_feature, dictionary, deviceFeatures)
+        : getVariableLabel(first.variable, names);
+      const firstText = [subject, formatOperator(first.operator), value]
         .filter(part => part !== null && part !== undefined && part !== '')
         .join(' ');
       return joinParts([truncate(firstText), action.conditions.length > 1 ? `+${action.conditions.length - 1}` : null]);

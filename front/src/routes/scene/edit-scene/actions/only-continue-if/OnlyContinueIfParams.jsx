@@ -6,12 +6,64 @@ import get from 'get-value';
 
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import FormulaFunctionsHelp from '../../../../../components/scene/FormulaFunctionsHelp';
+import { getDeviceFeatureName } from '../../../../../utils/device';
+import { normalizeSearchString } from '../../../../../utils/searchOptions';
 
 import { isVariableAvailableAtThisPath, convertPathToText } from '../../sceneUtils';
 
 import Condition from './Condition';
 
+const sortByLabel = (a, b) => a.label.localeCompare(b.label);
+
+// The features of the house as options of the condition select, grouped by room (the devices
+// without a room last). They come from the devices the editor loaded when it opened
+// (deviceFeatures: selector -> { device, feature }), so a condition box costs no request.
+const buildDeviceFeatureOptions = (deviceFeatures, dictionary) => {
+  const noRoomLabel = get(dictionary, 'device.noRoom');
+  const rooms = new Map();
+  const noRoomOptions = [];
+  Object.keys(deviceFeatures || {}).forEach(selector => {
+    const { device, feature } = deviceFeatures[selector];
+    const label = getDeviceFeatureName(dictionary, device, feature);
+    const roomName = device.room ? device.room.name : noRoomLabel;
+    const option = {
+      value: selector,
+      label,
+      // the room is only the header of the group: searchable through this field
+      searchText: normalizeSearchString(`${roomName} ${label}`),
+      isDeviceFeature: true,
+      // same shape as the variable of a "get device value" step: the condition offers the
+      // list of values of the feature when it has one
+      data: { device, deviceFeature: feature }
+    };
+    if (!device.room) {
+      noRoomOptions.push(option);
+      return;
+    }
+    if (!rooms.has(device.room.id)) {
+      rooms.set(device.room.id, { label: roomName, options: [] });
+    }
+    rooms.get(device.room.id).options.push(option);
+  });
+  const groups = Array.from(rooms.values()).sort(sortByLabel);
+  if (noRoomOptions.length > 0) {
+    groups.push({ label: noRoomLabel, options: noRoomOptions });
+  }
+  groups.forEach(group => group.options.sort(sortByLabel));
+  return groups;
+};
+
 class OnlyContinueIf extends Component {
+  // Rebuilt only when the devices of the editor change, not on every keystroke in the box
+  getDeviceFeatureOptions = () => {
+    const { deviceFeatures, intl } = this.props;
+    if (this.deviceFeatureOptionsSource !== deviceFeatures) {
+      this.deviceFeatureOptionsSource = deviceFeatures;
+      this.deviceFeatureOptions = buildDeviceFeatureOptions(deviceFeatures, intl.dictionary);
+    }
+    return this.deviceFeatureOptions;
+  };
+
   handleConditionChange = (conditionIndex, condition) => {
     const newConditions = update(this.props.action.conditions, {
       [conditionIndex]: {
@@ -66,6 +118,10 @@ class OnlyContinueIf extends Component {
       }
     });
 
+    // After the variables of the previous steps, every device of the house: its state is read
+    // when the condition runs, no "get device value" step needed before
+    const allOptions = variableOptions.concat(this.getDeviceFeatureOptions());
+
     return (
       <div>
         <div class="alert alert-secondary">
@@ -84,7 +140,7 @@ class OnlyContinueIf extends Component {
             <Condition
               condition={condition}
               index={index}
-              variableOptions={variableOptions}
+              variableOptions={allOptions}
               handleConditionChange={this.handleConditionChange}
               addCondition={this.addCondition}
               deleteCondition={this.deleteCondition}

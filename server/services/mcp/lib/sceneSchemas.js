@@ -111,24 +111,55 @@ function assertTriggerTypesNotInActions(scene) {
   );
 }
 
-const sceneConditionSchema = z
-  .object({
-    variable: z
-      .string()
+const sceneConditionValueShape = {
+  operator: comparisonOperatorSchema,
+  value: z
+    .union([z.number(), z.string()])
+    .optional()
+    .describe('Literal value to compare against.'),
+  evaluate_value: z
+    .string()
+    .optional()
+    .describe('Optional Handlebars expression evaluated to a value before comparison.'),
+};
+
+/**
+ * @description Build the schema of one condition of a condition.only-continue-if action: it
+ * compares either the current state of a device feature or a scene variable. The two forms
+ * are two strict objects, like the two forms of the device.new-state trigger, so that the
+ * exclusivity is part of the schema the model reads, not a rule checked afterwards.
+ * The selector schema is used as it is, without a description of its own: the enum of every
+ * device feature of the home is written once in the tool sent to the AI chat only if all its
+ * occurrences are identical (extractRepeatedSchemas), so the explanation is on the object.
+ * @param {object} deviceFeatureSelectorSchema - Zod schema of a device feature selector.
+ * @returns {object} Zod schema of a scene condition.
+ * @example
+ * createSceneConditionSchema(z.enum(['mqtt-temperature']));
+ */
+function createSceneConditionSchema(deviceFeatureSelectorSchema) {
+  return z.union([
+    z
+      .object({
+        device_feature: deviceFeatureSelectorSchema,
+        ...sceneConditionValueShape,
+      })
+      .strict()
       .describe(
-        'Scope path to compare, for example "0.0.last_value" after a device.get-value action in action group 0.',
+        'Compares the current state of the device feature "device_feature", read when the condition runs. Preferred way to test the state of a device: no "device.get-value" action is needed before.',
       ),
-    operator: comparisonOperatorSchema,
-    value: z
-      .union([z.number(), z.string()])
-      .optional()
-      .describe('Literal value to compare against.'),
-    evaluate_value: z
-      .string()
-      .optional()
-      .describe('Optional Handlebars expression evaluated to a value before comparison.'),
-  })
-  .strict();
+    z
+      .object({
+        variable: z
+          .string()
+          .describe(
+            'Scope path of a scene variable to compare, for example "0.0.last_value" after a device.get-value action in action group 0, or "0.0.value" after a variable.set action.',
+          ),
+        ...sceneConditionValueShape,
+      })
+      .strict()
+      .describe('Compares a scene variable, set by a previous action or by the trigger.'),
+  ]);
+}
 
 const actionSchemaByType = (type, specificShape) =>
   z
@@ -318,7 +349,7 @@ function createSceneCreateInputSchema(
       }),
       actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
         conditions: z
-          .array(sceneConditionSchema)
+          .array(createSceneConditionSchema(deviceFeatureSelectorSchema))
           .min(1)
           .describe(
             'Conditions combined with OR logic: the scene continues if at least one condition is true. Use separate only-continue-if action groups in sequence for AND logic.',
@@ -825,7 +856,7 @@ function formatSceneCreateZodIssue(issue, rawScene) {
 }
 
 const SCENE_CREATE_TOOL_DESCRIPTION =
-  'Create a new home automation scene. The payload MUST have two separate top-level arrays: triggers (when the scene starts) and actions (what the scene does). NEVER put device.new-state, time.changed, time.sunrise or any trigger type inside actions. device.new-state belongs in triggers with numeric value (1=ON, 0=OFF). actions is nested groups only: [[group1],[group2]]. Example: {"name":"Switchbeau de ville","icon":"droplet","triggers":[{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}],"actions":[[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}],[{"type":"condition.only-continue-if","conditions":[{"variable":"1.0.last_value","operator":">","value":2400}]}],[{"type":"light.turn-off","devices":["mqtt-lumiere"]}]]}';
+  'Create a new home automation scene. The payload MUST have two separate top-level arrays: triggers (when the scene starts) and actions (what the scene does). NEVER put device.new-state, time.changed, time.sunrise or any trigger type inside actions. device.new-state belongs in triggers with numeric value (1=ON, 0=OFF). actions is nested groups only: [[group1],[group2]]. Example: {"name":"Switchbeau de ville","icon":"droplet","triggers":[{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}],"actions":[[{"type":"delay","unit":"minutes","value":45}],[{"type":"condition.only-continue-if","conditions":[{"device_feature":"mqtt-co2","operator":">","value":2400}]}],[{"type":"light.turn-off","devices":["mqtt-lumiere"]}]]}';
 
 module.exports = {
   createSceneCreateInputSchema,

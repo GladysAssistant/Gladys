@@ -122,14 +122,23 @@ const actionSchema = Joi.object()
         .required(),
       otherwise: Joi.forbidden(),
     }),
-    conditions: Joi.array().items({
-      variable: Joi.string().required(),
-      operator: Joi.string()
-        .valid('=', '!=', '>', '>=', '<', '<=')
-        .required(),
-      value: Joi.alternatives().try(Joi.number(), Joi.string()),
-      evaluate_value: Joi.string(),
-    }),
+    // A condition compares either a variable of the scene or the current state of a device
+    // feature (no "get device value" action needed before it): exactly one of the two.
+    // `device_feature` is a device reference like any other: device.migrate rewrites it
+    // (docs/specs/device-migration.md, B.3).
+    conditions: Joi.array().items(
+      Joi.object()
+        .keys({
+          variable: Joi.string(),
+          device_feature: Joi.string(),
+          operator: Joi.string()
+            .valid('=', '!=', '>', '>=', '<', '<=')
+            .required(),
+          value: Joi.alternatives().try(Joi.number(), Joi.string()),
+          evaluate_value: Joi.string(),
+        })
+        .xor('variable', 'device_feature'),
+    ),
     alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
     // music.play-media: the media reference picked from the player's catalog (the id is
     // what plays, the title is display only) and the play mode

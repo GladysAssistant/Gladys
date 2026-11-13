@@ -7,6 +7,7 @@ import SelectDeviceFeatureValue from '../../../../../components/device/SelectDev
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
 import getDeviceFeatureValueOptions, { isValueInOptions } from '../../../../../utils/deviceFeatureValueOptions';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+import { filterOptionByWords } from '../../../../../utils/searchOptions';
 
 import style from './Condition.css';
 
@@ -24,8 +25,12 @@ class Condition extends Component {
     // If the new variable only accepts a list of values, we drop the previous value if it's not in that list
     const shouldResetValue = Boolean(valueOptions) && !this.isValueInValueOptions(valueOptions);
 
+    // A condition compares either the current state of a device (`device_feature`) or a variable
+    // of the scene (`variable`), never both: the attribute of the other kind is removed
+    const isDeviceFeature = Boolean(selectedOption && selectedOption.isDeviceFeature);
     const newCondition = update(this.props.condition, {
-      variable: {
+      $unset: [isDeviceFeature ? 'variable' : 'device_feature'],
+      [isDeviceFeature ? 'device_feature' : 'variable']: {
         $set: selectedOption && selectedOption.value ? selectedOption.value : null
       },
       ...(shouldResetValue
@@ -134,14 +139,27 @@ class Condition extends Component {
   };
 
   getSelectedOption = () => {
+    const { variable, device_feature: deviceFeature } = this.props.condition;
+    const isDeviceFeature = deviceFeature !== undefined && deviceFeature !== null;
     let selectedOption = null;
 
     this.props.variableOptions.forEach(variableOption => {
-      const foundOption = variableOption.options.find(option => this.props.condition.variable === option.value);
+      const foundOption = variableOption.options.find(option =>
+        isDeviceFeature
+          ? option.isDeviceFeature === true && option.value === deviceFeature
+          : option.isDeviceFeature !== true && option.value === variable
+      );
       if (foundOption) {
         selectedOption = foundOption;
       }
     });
+
+    // A feature that is not in the list (deleted device, or devices still loading) is shown
+    // as it is stored, like in the summary of the step: an empty field would hide a condition
+    // that is saved and that stops the scene when it runs
+    if (!selectedOption && isDeviceFeature && deviceFeature !== '') {
+      return { value: deviceFeature, label: deviceFeature, isDeviceFeature: true };
+    }
 
     return selectedOption;
   };
@@ -174,7 +192,7 @@ class Condition extends Component {
       <div>
         <div class="row">
           <div class="col-md-4">
-            <div class="form-group">
+            <div class="form-group" data-cy="scene-condition-device-or-variable">
               <label class="form-label">
                 <Text id="editScene.actionsCard.onlyContinueIf.variableLabel" />
                 <span class="form-required">
@@ -186,6 +204,7 @@ class Condition extends Component {
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={props.variableOptions}
+                filterOption={filterOptionByWords}
                 className="react-select-container"
                 classNamePrefix="react-select"
               />

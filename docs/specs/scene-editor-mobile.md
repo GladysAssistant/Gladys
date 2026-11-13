@@ -2,8 +2,8 @@
 
 > **Living specification — source of truth.** This document specifies how the scene list and the
 > scene editor behave on a phone, and the editor behaviors shared by every screen size (unsaved
-> changes, local draft, save errors, step summaries). **Rule: any PR that changes one of these
-> behaviors modifies this file in the same diff.**
+> changes, local draft, save errors, step summaries, what a condition compares). **Rule: any PR
+> that changes one of these behaviors modifies this file in the same diff.**
 >
 > Status: **phases 1 and 2 implemented** (sections C to F). Section G lists what is designed but
 > not built yet.
@@ -75,7 +75,10 @@ summary never shows an identifier whose name the editor knows:**
   those lists when it opens (`getNames`: one request per list, each failing on its own).
 - **Variables**: the label the step exposing it declared — a condition reads "Living room sensor
   (Temperature) < 19", not `0.0.last_value < 19`, and a text typed with variables shows them
-  between brackets ("It is [Living room sensor (Temperature)] °C").
+  between brackets ("It is [Living room sensor (Temperature)] °C"). A condition comparing the
+  current state of a device (`conditions[].device_feature`, C.6) reads like a device state
+  trigger: the feature named, the value with its unit or the label of its constant ("Front door
+  (Opening) = Open").
 
 Anything unknown (deleted, or not loaded yet) is shown as is. On a phone a summary takes up to
 **two lines** in the editor: its end is often what matters.
@@ -156,6 +159,34 @@ says "Search for a condition…", and the descriptions come from `editScene.cond
 (falling back to `editScene.actionsDescriptions` for a type with no condition-specific text). The
 "only continue if" type is described as "Compare variables", not "Stop the scene here if…", which
 is wrong inside an if block.
+
+### C.6 A condition compares a device or a variable
+
+Each condition of an "only continue if" step (at the root of the scene, or in the "if" list of an
+if/while block) compares **one** of two things with a value:
+
+- a **variable** of the scene (`variable`, a scope path such as `0.0.last_value`), exposed by a
+  previous step or by the trigger;
+- the **current state of a device** (`device_feature`, a feature selector), read from the state
+  of the house **when the condition runs** — no "get the last state" step is needed before it.
+  The value compared is the one that step would expose: `last_value_string` for a feature whose
+  state is a string (text, select, the string types of music), `last_value` otherwise.
+
+The scene model accepts exactly one of the two per condition (`xor`), and so does the scene schema
+given to the assistant. A feature that no longer exists when the condition runs stops the scene
+(`DEVICE_FEATURE_NOT_FOUND`), like a value that cannot be computed
+(`CONDITION_VALUE_NOT_A_NUMBER`): a condition that cannot be evaluated is never read as true or
+false. `device_feature` is a device reference like any other: a device migration rewrites it
+(`device-migration.md`, B.3).
+
+In the form, one select, "Device or variable", lists the variables available at this step first
+(one group per step exposing some), then **every feature of the house, grouped by room** (the
+devices without a room last). The features come from the devices the editor loads when it opens
+(C.1): a condition box sends no request. The search ignores case and accents and matches the room
+too ("motion living"). Picking an option writes its attribute and removes the other one. A feature
+holding constants offers their list as the value, exactly as for the variable of a "get the last
+state" step. A stored feature that is not in the list (deleted device, devices still loading) is
+shown as it is stored instead of leaving the field empty.
 
 ## D. Mobile scene list (`/dashboard/scene`, < 768 px)
 
@@ -404,8 +435,9 @@ The fields concerned, and what they select:
 
 `SelectDeviceFeature` opts in with `mobilePicker`, for a multi-selection (`sameKindOnly`) as for a
 single one (`single`): its other callers — the dashboard widgets — keep the select. The fields
-that select something else than a device (a user, a house, a calendar, a schedule, the variable
-of a condition) keep their select too. A selector whose device no longer
+that select something else than a device (a user, a house, a calendar, a schedule) keep their
+select too, and so does the "Device or variable" field of a condition (C.6): it mixes the
+variables of the scene with the devices, which the device picker cannot list. A selector whose device no longer
 exists keeps its row in the field ("Device not found", removable), and is never dropped by a
 validation of the picker: every field hands the picker the **stored** selectors, resolved or not,
 and writes back the whole selection (a device state trigger receives it next to the features
@@ -501,6 +533,12 @@ From 768 px the forms are untouched.
   a feature whose device is gone kept in the field and in the saved trigger, an untouched
   picker and a tap on the device already selected changing nothing;
   and the select kept on a wider screen.
+- Cypress, desktop viewport, `SceneConditionDevice.cy.js` (C.6): a condition added as the first
+  step lists the devices by room (the ones without a room last), the search matches the room and
+  ignores accents, the picked device and a value of its list are saved as `device_feature`, the
+  collapsed step names the device and its value, a condition saved on a variable is shown and can
+  be replaced by a device without keeping both attributes, a feature whose device is gone is
+  shown as stored and kept in the saved scene.
 - Cypress, phone viewport, `SceneMobileGestures.cy.js`: summaries naming the user and the house,
   the system "back" closing the sheet on top then leaving the editor in one press, a sheet
   dragged down by its header (kept when barely moved), a step moved by a long press (a quick move

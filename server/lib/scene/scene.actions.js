@@ -8,7 +8,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
-const { getDeviceFeature } = require('../../utils/device');
+const { getDeviceFeature, isStringStateFeature } = require('../../utils/device');
 const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
@@ -542,15 +542,30 @@ const actionsFunc = {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
 
-      // removing brackets
-      const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
-      const conditionVerified = compare(condition.operator, get(scope, variableWithoutBrackets), value);
+      let currentValue;
+      // A condition compares either the current state of a device feature, read when the
+      // condition runs, or a variable of the scene. The scene model accepts exactly one of the
+      // two: "defined" is tested rather than "truthy", so that a selector resolving to nothing
+      // aborts below instead of being read as a missing variable.
+      if (condition.device_feature !== undefined) {
+        const deviceFeature = self.stateManager.get('deviceFeature', condition.device_feature);
+        // The feature was deleted since the scene was saved: the condition cannot be
+        // evaluated, so the scene stops instead of comparing against nothing.
+        if (!deviceFeature) {
+          throw new AbortScene('DEVICE_FEATURE_NOT_FOUND');
+        }
+        // Same value as the variable the "get device value" action exposes for this feature
+        currentValue = isStringStateFeature(deviceFeature) ? deviceFeature.last_value_string : deviceFeature.last_value;
+      } else {
+        // removing brackets
+        const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
+        currentValue = get(scope, variableWithoutBrackets);
+      }
+      const conditionVerified = compare(condition.operator, currentValue, value);
       if (conditionVerified) {
         oneConditionVerified = true;
       } else {
-        logger.debug(
-          `Condition not verified. Condition: "${get(scope, variableWithoutBrackets)} ${condition.operator} ${value}"`,
-        );
+        logger.debug(`Condition not verified. Condition: "${currentValue} ${condition.operator} ${value}"`);
       }
     });
     if (oneConditionVerified === false) {

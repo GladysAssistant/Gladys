@@ -4148,7 +4148,7 @@
         "textExplanationText": "Introduzca aquí el texto que se enviará a su dispositivo. Para insertar una variable de la escena en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Dispositivo o variable",
         "operatorLabel": "Operador",
         "valueLabel": "Valor",
         "removeLabel": "Eliminar",
@@ -4157,7 +4157,7 @@
         "useCustomValue": "Introducir un valor personalizado",
         "useValueList": "Elegir de la lista de valores",
         "logicExplanationText": "Las condiciones de este bloque se combinan con un O: el bloque se cumple en cuanto se cumple una de ellas. Para hacer un Y, añada varios bloques \"Condición sobre variables\": entonces todos deberán cumplirse.",
-        "explanationText": "En lugar de un valor fijo, puede introducir aquí un cálculo basado en una variable de la escena. Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "explanationText": "Elija qué comparar: el estado actual de un dispositivo, leído cuando la escena llega a este bloque, o una variable establecida por una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" situada antes de esta. Como valor, introduzca un valor fijo o un cálculo basado en una variable de la escena: para insertar una variable, pulse \"{{\"."
       },
       "conditionIfThenElse": {
         "conditions": "Condiciones",
