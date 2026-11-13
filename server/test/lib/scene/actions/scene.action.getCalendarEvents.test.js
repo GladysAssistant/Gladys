@@ -146,9 +146,9 @@ describe('scene.action.getCalendarEvents', () => {
     expect(calendarEvents.events[0]).to.have.property('summary', 'Spring holidays');
   });
   it('should get the full-day events of the day in a timezone west of UTC', async () => {
-    // Full-day events are stored at midnight UTC. In New York, the local day starts at
-    // 04:00 UTC, so matching them on the local bounds of the range would miss the full-day
-    // event of the day and return the one of the next day instead.
+    // Full-day events stored at midnight UTC (CalDAV sync on a server running in UTC). In
+    // New York, the local day starts at 04:00 UTC, so matching them on the local bounds of
+    // the range would miss the full-day event of the day and return the one of the next day.
     const stateManager = new StateManager(event);
     const scope = {};
     await calendar.createEvent('test-calendar', {
@@ -179,6 +179,78 @@ describe('scene.action.getCalendarEvents', () => {
     const { calendarEvents } = scope['0'][0];
     expect(calendarEvents.count).to.equal(1);
     expect(calendarEvents.text).to.equal('Birthday');
+  });
+  it('should get the full-day events of the day when they are stored at the local midnight', async () => {
+    // CalDAV sync on a server running with TZ=Europe/Paris: the full-day events are stored
+    // at the midnight of Paris, so at 23:00 UTC the day before.
+    const stateManager = new StateManager(event);
+    const scope = {};
+    await calendar.createEvent('test-calendar', {
+      name: 'Birthday',
+      start: new Date('2025-03-09T23:00:00.000Z'),
+      end: new Date('2025-03-10T23:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Holidays tomorrow',
+      start: new Date('2025-03-10T23:00:00.000Z'),
+      end: new Date('2025-03-11T23:00:00.000Z'),
+      full_day: true,
+    });
+    await executeActions(
+      { stateManager, event, calendar, timezone: 'Europe/Paris' },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.GET_EVENTS,
+            calendars: ['test-calendar'],
+            time_range: 'today',
+          },
+        ],
+      ],
+      scope,
+    );
+    const { calendarEvents } = scope['0'][0];
+    expect(calendarEvents.count).to.equal(1);
+    expect(calendarEvents.text).to.equal('Birthday');
+  });
+  it('should get the full-day events of tomorrow when they are stored at the local midnight', async () => {
+    const stateManager = new StateManager(event);
+    const scope = {};
+    await calendar.createEvent('test-calendar', {
+      name: 'Birthday',
+      start: new Date('2025-03-09T23:00:00.000Z'),
+      end: new Date('2025-03-10T23:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Holidays tomorrow',
+      start: new Date('2025-03-10T23:00:00.000Z'),
+      end: new Date('2025-03-11T23:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Holidays the day after tomorrow',
+      start: new Date('2025-03-11T23:00:00.000Z'),
+      end: new Date('2025-03-12T23:00:00.000Z'),
+      full_day: true,
+    });
+    await executeActions(
+      { stateManager, event, calendar, timezone: 'Europe/Paris' },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.GET_EVENTS,
+            calendars: ['test-calendar'],
+            time_range: 'tomorrow',
+          },
+        ],
+      ],
+      scope,
+    );
+    const { calendarEvents } = scope['0'][0];
+    expect(calendarEvents.count).to.equal(1);
+    expect(calendarEvents.text).to.equal('Holidays tomorrow');
   });
   it('should only get events in the next x hours', async () => {
     const stateManager = new StateManager(event);

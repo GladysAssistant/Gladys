@@ -38,7 +38,13 @@ class CalendarPage extends Component {
         .toDate();
     } else {
       from = dayjs(range.start).toDate();
-      to = dayjs(range.end).toDate();
+      // `to` is exclusive: ask up to the midnight after the last visible day,
+      // which the month (end of the week) and agenda (end of the day) views
+      // still display
+      to = dayjs(range.end)
+        .add(1, 'day')
+        .startOf('day')
+        .toDate();
     }
     // remembered so a calendar.updated push can refetch the displayed range
     this.currentRange = { from, to };

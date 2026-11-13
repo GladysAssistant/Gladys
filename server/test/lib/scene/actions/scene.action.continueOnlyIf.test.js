@@ -435,6 +435,260 @@ describe('scene.continue-only-if', () => {
     );
     return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
   });
+  describe('condition on the current state of a device feature', () => {
+    const runCondition = (condition, scope = {}) =>
+      executeActions(
+        { stateManager, event },
+        [[{ type: ACTIONS.CONDITION.ONLY_CONTINUE_IF, conditions: [condition] }]],
+        scope,
+      );
+
+    it('should finish scene, the state of the feature verifies the condition', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: 15,
+      });
+      const scope = {};
+      await runCondition({ device_feature: 'my-device-feature', operator: '=', value: 15 }, scope);
+      // nothing is written in the scope: the state is read, not exposed as a variable
+      chaiAssert.deepEqual(scope, {});
+    });
+    it('should abort scene, the state of the feature does not verify the condition', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: 15,
+      });
+      const promise = runCondition({ device_feature: 'my-device-feature', operator: '>', value: 20 });
+      return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
+    });
+    it('should read the state of the feature when the condition runs, not when the scene starts', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'switch',
+        type: 'binary',
+        last_value: 0,
+      });
+      // the feature changes while the scene is already running
+      const promise = executeActions(
+        { stateManager, event },
+        [
+          [{ type: ACTIONS.TIME.DELAY, unit: 'milliseconds', value: 5 }],
+          [
+            {
+              type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+              conditions: [{ device_feature: 'my-device-feature', operator: '=', value: 1 }],
+            },
+          ],
+        ],
+        {},
+      );
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'switch',
+        type: 'binary',
+        last_value: 1,
+      });
+      await promise;
+    });
+    it('should compare the value of the feature with a computed value', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: 22,
+      });
+      stateManager.setState('deviceFeature', 'my-setpoint', {
+        category: 'thermostat',
+        type: 'target-temperature',
+        last_value: 19,
+      });
+      await executeActions(
+        { stateManager, event },
+        [
+          [{ type: ACTIONS.DEVICE.GET_VALUE, device_feature: 'my-setpoint' }],
+          [
+            {
+              type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+              conditions: [
+                { device_feature: 'my-device-feature', operator: '>', evaluate_value: '{{0.0.last_value}} + 2' },
+              ],
+            },
+          ],
+        ],
+        {},
+      );
+    });
+    it('should compare the string state of a text feature', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'text',
+        type: 'text',
+        last_value: null,
+        last_value_string: 'hello',
+      });
+      await runCondition({ device_feature: 'my-device-feature', operator: '=', value: 'hello' });
+      const promise = runCondition({ device_feature: 'my-device-feature', operator: '!=', value: 'hello' });
+      return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
+    });
+    it('should compare the string state of a select feature', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'text',
+        type: 'select',
+        last_value: null,
+        last_value_string: 'netflix',
+      });
+      await runCondition({ device_feature: 'my-device-feature', operator: '=', value: 'netflix' });
+      const promise = runCondition({ device_feature: 'my-device-feature', operator: '=', value: 'youtube' });
+      return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
+    });
+    it('should compare the string state of a music title feature', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'music',
+        type: 'title',
+        last_value: null,
+        last_value_string: 'Clair de lune',
+      });
+      await runCondition({ device_feature: 'my-device-feature', operator: '=', value: 'Clair de lune' });
+    });
+    it('should verify one condition on a feature or one condition on a variable', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: 15,
+      });
+      await executeActions(
+        { stateManager, event },
+        [
+          [
+            {
+              type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+              conditions: [
+                { variable: 'triggerEvent.last_value', operator: '=', value: 1 },
+                { device_feature: 'my-device-feature', operator: '<', value: 20 },
+              ],
+            },
+          ],
+        ],
+        { triggerEvent: { last_value: 0 } },
+      );
+    });
+    it('should never verify a condition on a feature that never reported its state', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: null,
+      });
+      // null would compare as a zero, and as a value different from any other
+      const operators = [
+        { operator: '<', value: 20 },
+        { operator: '<=', value: 20 },
+        { operator: '>=', value: -5 },
+        { operator: '!=', value: 1 },
+        { operator: '=', value: 0 },
+      ];
+      await Promise.all(
+        operators.map((condition) =>
+          chaiAssert.isRejected(
+            runCondition({ device_feature: 'my-device-feature', ...condition }),
+            AbortScene,
+            'CONDITION_NOT_VERIFIED',
+          ),
+        ),
+      );
+      // a feature saved without the column at all is not known either
+      stateManager.setState('deviceFeature', 'my-device-feature', { category: 'temperature-sensor', type: 'decimal' });
+      await chaiAssert.isRejected(
+        runCondition({ device_feature: 'my-device-feature', operator: '!=', value: 1 }),
+        AbortScene,
+        'CONDITION_NOT_VERIFIED',
+      );
+    });
+    it('should never verify a condition on a string feature that never reported its state', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'text',
+        type: 'text',
+        // a number is not the state of a text feature
+        last_value: 1,
+        last_value_string: null,
+      });
+      await chaiAssert.isRejected(
+        runCondition({ device_feature: 'my-device-feature', operator: '!=', value: 'hello' }),
+        AbortScene,
+        'CONDITION_NOT_VERIFIED',
+      );
+      // an empty text is a state: nothing is written on the display
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'text',
+        type: 'text',
+        last_value_string: '',
+      });
+      await runCondition({ device_feature: 'my-device-feature', operator: '!=', value: 'hello' });
+      await runCondition({ device_feature: 'my-device-feature', operator: '=', value: '' });
+    });
+    it('should still continue when another condition is verified next to a feature without a state', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: null,
+      });
+      stateManager.setState('deviceFeature', 'my-other-feature', {
+        category: 'temperature-sensor',
+        type: 'decimal',
+        last_value: 0,
+      });
+      await executeActions(
+        { stateManager, event },
+        [
+          [
+            {
+              type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+              conditions: [
+                { device_feature: 'my-device-feature', operator: '<', value: 20 },
+                // zero is a state like any other
+                { device_feature: 'my-other-feature', operator: '<', value: 20 },
+              ],
+            },
+          ],
+        ],
+        {},
+      );
+    });
+    it('should abort scene, the feature of the condition does not exist anymore', async () => {
+      const promise = runCondition({ device_feature: 'deleted-device-feature', operator: '=', value: 15 });
+      return chaiAssert.isRejected(promise, AbortScene, 'DEVICE_FEATURE_NOT_FOUND');
+    });
+    it('should abort scene, the feature of the condition is an empty selector', async () => {
+      const promise = runCondition({ device_feature: '', operator: '=', value: 15 });
+      return chaiAssert.isRejected(promise, AbortScene, 'DEVICE_FEATURE_NOT_FOUND');
+    });
+    it('should run the "then" branch of a block when the state of the feature verifies its condition', async () => {
+      stateManager.setState('deviceFeature', 'my-device-feature', {
+        category: 'opening-sensor',
+        type: 'binary',
+        last_value: 0,
+      });
+      const device = { setValue: fake.resolves(null) };
+      const ifThenElse = (value) => [
+        [
+          {
+            type: ACTIONS.CONDITION.IF_THEN_ELSE,
+            if: [
+              {
+                type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+                conditions: [{ device_feature: 'my-device-feature', operator: '=', value }],
+              },
+            ],
+            then: [[{ type: ACTIONS.DEVICE.SET_VALUE, device_feature: 'my-device-feature', value: 1 }]],
+            else: [[{ type: ACTIONS.DEVICE.SET_VALUE, device_feature: 'my-device-feature', value: 2 }]],
+          },
+        ],
+      ];
+      await executeActions({ stateManager, event, device }, ifThenElse(0), {});
+      assert.calledOnce(device.setValue);
+      chaiAssert.equal(device.setValue.firstCall.args[2], 1);
+      await executeActions({ stateManager, event, device }, ifThenElse(5), {});
+      assert.calledTwice(device.setValue);
+      chaiAssert.equal(device.setValue.secondCall.args[2], 2);
+    });
+  });
   it('should finish scene, condition is verified', async () => {
     const http = {
       request: fake.resolves({ result: [18], error: null }),

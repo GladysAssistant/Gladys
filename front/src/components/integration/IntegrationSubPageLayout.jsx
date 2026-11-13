@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 
 import ChipsScroll from '../chips-scroll';
 import BackToIntegrationsLink from './BackToIntegrationsLink';
+import FeedbackLink from '../feedback/FeedbackLink';
 
 // The Horizon shell every integration sub-page shares: the back-to-catalog
 // link, the page title, and the section menu as a horizontal row of frosted
@@ -25,12 +26,22 @@ import BackToIntegrationsLink from './BackToIntegrationsLink';
 // window.location idiom (and guard) that page already uses.
 const getActiveKey = () => (typeof window !== 'undefined' && window.location ? window.location.pathname : undefined);
 
+// The "give your feedback" link shares the back link's row, on the other
+// side: it is on every integration page — where feedback is the most
+// precise — without competing with the title or the tabs. Its topic is
+// about the integration of the page (the title).
 const IntegrationSubPageLayout = ({ title, tabs, children }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
         <div class="container">
-          <BackToIntegrationsLink />
+          <div class="d-flex flex-wrap align-items-start justify-content-between">
+            <BackToIntegrationsLink />
+            <FeedbackLink subject={title} className="hz-feedback-link mb-4" dataCy="integration-feedback-link">
+              <i class="fe fe-message-circle mr-1" />
+              <Text id="feedback.link" />
+            </FeedbackLink>
+          </div>
           <h3 class="page-title mb-3">{title}</h3>
           {tabs && (
             <ChipsScroll

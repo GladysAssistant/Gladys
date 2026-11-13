@@ -113,127 +113,141 @@ class ConditionWhile extends Component {
         </div>
 
         {/* Conditions Section */}
-        <div class="conditions-container mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4>
-              <Text id="editScene.actionsCard.conditionWhile.conditions">Conditions</Text>
-            </h4>
-          </div>
-          <div class="row">
-            <div class="col">
-              <div class="alert alert-secondary">
-                <Text id="editScene.actionsCard.conditionWhile.conditionDescription">
-                  As long as all conditions are met, the actions in the "Repeat" block will be executed in a loop. The
-                  conditions are re-evaluated before each iteration.
-                </Text>
-              </div>
+        {/* the mobile editor lists the conditions as rows, each in its own sheet */}
+        {props.renderConditions ? (
+          props.renderConditions(conditions, WHILE_CONDITION_ACTIONS)
+        ) : (
+          <div class="conditions-container mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h4>
+                <Text id="editScene.actionsCard.conditionWhile.conditions">Conditions</Text>
+              </h4>
             </div>
-          </div>
-          <div
-            class="row"
-            data-condition-flow
-            data-flow-path={`${props.path}.if`}
-            data-drop-active-class={style.nestedFlowDropActive}
-          >
-            {conditions.map((condition, index) => (
-              <>
-                {/* The boxes are combined with an AND: written between two boxes, not before the first one */}
-                {index > 0 && <ConditionAndSeparator />}
-                <ActionCard
-                  action={condition}
-                  index={index}
-                  allActions={props.allActions}
-                  path={`${props.path}.if.${index}`}
-                  updateActionProperty={props.updateActionProperty}
-                  deleteAction={props.deleteAction}
-                  actionsGroupsBefore={props.actionsGroupsBefore}
-                  variables={props.variables}
-                  triggersVariables={props.triggersVariables}
-                  setVariables={props.setVariables}
-                  moveCard={props.moveCard}
-                  moveCardGroup={props.moveCardGroup}
-                  scene={props.scene}
-                />
-              </>
-            ))}
-            {conditions.length === 0 && (
+            <div class="row">
               <div class="col">
                 <div class="alert alert-secondary">
-                  <Text id="editScene.actionsCard.conditionWhile.noCondition">
-                    No condition has been added yet. Click the '+' button to add a condition to this block. Without
-                    condition, the loop will not run.
+                  <Text id="editScene.actionsCard.conditionWhile.conditionDescription">
+                    As long as all conditions are met, the actions in the "Repeat" block will be executed in a loop. The
+                    conditions are re-evaluated before each iteration.
                   </Text>
                 </div>
               </div>
-            )}
-          </div>
-          <div class="text-center mt-4">
-            <button onClick={this.addCondition} class="btn btn-sm btn-outline-primary">
-              <i class="fe fe-plus" /> <Text id="editScene.actionsCard.conditionWhile.addCondition">Add condition</Text>
-            </button>
-          </div>
-        </div>
-
-        {/* Repeat Section */}
-        <div class="repeat-container mb-4">
-          <div
-            class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
-            onClick={this.toggleRepeatCollapse}
-            onKeyDown={this.handleRepeatKeyDown}
-            role="button"
-            tabIndex="0"
-            aria-expanded={!repeatCollapsed}
-          >
-            <h4>
-              <i class={`fe fe-chevron-${repeatCollapsed ? 'right' : 'down'} mr-2`} />
-              <Text id="editScene.actionsCard.conditionWhile.repeat">Repeat...</Text>
-              {repeatCollapsed && (
-                <span class="badge badge-pill badge-secondary ml-2">
-                  <Text
-                    id="editScene.actionsCard.conditionWhile.actionCount"
-                    plural={this.getNumberOfActionsInRepeat()}
-                    fields={{
-                      count: this.getNumberOfActionsInRepeat()
-                    }}
-                  />
-                </span>
-              )}
-            </h4>
-          </div>
-          {!repeatCollapsed && props.action.then && (
+            </div>
             <div
-              class="pl-4"
-              data-step-flow
-              data-flow-path={`${props.path}.then`}
-              data-flow-level={props.path.split('.').length + 2}
+              class="row"
+              data-condition-flow
+              data-flow-path={`${props.path}.if`}
               data-drop-active-class={style.nestedFlowDropActive}
             >
-              {props.action.then.map((actions, index) => (
-                <ActionGroup
-                  actions={actions}
-                  allActions={props.allActions}
-                  path={`${props.path}.then.${index}`}
-                  addAction={props.addAction}
-                  deleteAction={props.deleteAction}
-                  deleteActionGroup={props.deleteActionGroup}
-                  updateActionProperty={props.updateActionProperty}
-                  moveCard={props.moveCard}
-                  moveCardGroup={props.moveCardGroup}
-                  highLightedActions={props.highLightedActions}
-                  actionsGroupsBefore={props.actionsGroupsBefore}
-                  variables={props.variables}
-                  triggersVariables={props.triggersVariables}
-                  setVariables={props.setVariables}
-                  scene={props.scene}
-                  sceneIntegrations={props.sceneIntegrations}
-                  deviceFeatures={props.deviceFeatures}
-                  thermostatSchedules={props.thermostatSchedules}
-                  lastActionGroup={index === props.action.then.length - 1}
-                />
+              {conditions.map((condition, index) => (
+                <>
+                  {/* The boxes are combined with an AND: written between two boxes, not before the first one */}
+                  {index > 0 && <ConditionAndSeparator />}
+                  <ActionCard
+                    action={condition}
+                    index={index}
+                    allActions={props.allActions}
+                    path={`${props.path}.if.${index}`}
+                    updateActionProperty={props.updateActionProperty}
+                    deleteAction={props.deleteAction}
+                    actionsGroupsBefore={props.actionsGroupsBefore}
+                    variables={props.variables}
+                    triggersVariables={props.triggersVariables}
+                    setVariables={props.setVariables}
+                    moveCard={props.moveCard}
+                    moveCardGroup={props.moveCardGroup}
+                    scene={props.scene}
+                    deviceFeatures={props.deviceFeatures}
+                    names={props.names}
+                  />
+                </>
               ))}
+              {conditions.length === 0 && (
+                <div class="col">
+                  <div class="alert alert-secondary">
+                    <Text id="editScene.actionsCard.conditionWhile.noCondition">
+                      No condition has been added yet. Click the '+' button to add a condition to this block. Without
+                      condition, the loop will not run.
+                    </Text>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+            <div class="text-center mt-4">
+              <button onClick={this.addCondition} class="btn btn-sm btn-outline-primary">
+                <i class="fe fe-plus" />{' '}
+                <Text id="editScene.actionsCard.conditionWhile.addCondition">Add condition</Text>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* the mobile editor shows the branches in its timeline */}
+        {!props.hideBranches && (
+          <>
+            {/* Repeat Section */}
+            <div class="repeat-container mb-4">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
+                onClick={this.toggleRepeatCollapse}
+                onKeyDown={this.handleRepeatKeyDown}
+                role="button"
+                tabIndex="0"
+                aria-expanded={!repeatCollapsed}
+              >
+                <h4>
+                  <i class={`fe fe-chevron-${repeatCollapsed ? 'right' : 'down'} mr-2`} />
+                  <Text id="editScene.actionsCard.conditionWhile.repeat">Repeat...</Text>
+                  {repeatCollapsed && (
+                    <span class="badge badge-pill badge-secondary ml-2">
+                      <Text
+                        id="editScene.actionsCard.conditionWhile.actionCount"
+                        plural={this.getNumberOfActionsInRepeat()}
+                        fields={{
+                          count: this.getNumberOfActionsInRepeat()
+                        }}
+                      />
+                    </span>
+                  )}
+                </h4>
+              </div>
+              {!repeatCollapsed && props.action.then && (
+                <div
+                  class="pl-4"
+                  data-step-flow
+                  data-flow-path={`${props.path}.then`}
+                  data-flow-level={props.path.split('.').length + 2}
+                  data-drop-active-class={style.nestedFlowDropActive}
+                >
+                  {props.action.then.map((actions, index) => (
+                    <ActionGroup
+                      actions={actions}
+                      allActions={props.allActions}
+                      path={`${props.path}.then.${index}`}
+                      addAction={props.addAction}
+                      deleteAction={props.deleteAction}
+                      deleteActionGroup={props.deleteActionGroup}
+                      updateActionProperty={props.updateActionProperty}
+                      moveCard={props.moveCard}
+                      moveCardGroup={props.moveCardGroup}
+                      highLightedActions={props.highLightedActions}
+                      actionsGroupsBefore={props.actionsGroupsBefore}
+                      variables={props.variables}
+                      triggersVariables={props.triggersVariables}
+                      setVariables={props.setVariables}
+                      scene={props.scene}
+                      sceneIntegrations={props.sceneIntegrations}
+                      deviceFeatures={props.deviceFeatures}
+                      thermostatSchedules={props.thermostatSchedules}
+                      names={props.names}
+                      lastActionGroup={index === props.action.then.length - 1}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </>
     );
   }

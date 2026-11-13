@@ -170,9 +170,26 @@ describe('Device.migrate', function Describe() {
         [
           {
             type: 'condition.if-then-else',
-            if: [{ type: 'device.get-value', device_feature: 'migration-source-temp' }],
+            if: [
+              { type: 'device.get-value', device_feature: 'migration-source-temp' },
+              // a condition of the block comparing the current state of a feature
+              {
+                type: 'condition.only-continue-if',
+                conditions: [{ device_feature: 'migration-source-temp', operator: '<', value: 30 }],
+              },
+            ],
             then: [[{ type: 'light.turn-on', devices: ['migration-source'] }]],
             else: [[{ type: 'message.send-camera', camera: 'migration-source', user: 'john' }]],
+          },
+        ],
+        // a condition names a feature when it compares its current state, a variable otherwise
+        [
+          {
+            type: 'condition.only-continue-if',
+            conditions: [
+              { device_feature: 'migration-source-temp', operator: '>', value: 20 },
+              { variable: '0.0.last_value', operator: '<', value: 30 },
+            ],
           },
         ],
         // the energy price condition names its meter; a former save names a contract instead,
@@ -203,7 +220,18 @@ describe('Device.migrate', function Describe() {
       name: 'Migration scene untouched',
       selector: 'migration-scene-untouched',
       icon: 'fe fe-bell',
-      actions: [[{ type: 'light.turn-on', devices: ['some-other-device'] }]],
+      actions: [
+        [{ type: 'light.turn-on', devices: ['some-other-device'] }],
+        // selectors named like members of Object are selectors like any other: not mapped,
+        // so left as they are
+        [
+          { type: 'light.turn-on', devices: ['toString'] },
+          {
+            type: 'condition.only-continue-if',
+            conditions: [{ device_feature: 'constructor', operator: '=', value: 1 }],
+          },
+        ],
+      ],
       triggers: null,
     });
     const dashboard = await db.Dashboard.create({
@@ -295,9 +323,25 @@ describe('Device.migrate', function Describe() {
         [
           {
             type: 'condition.if-then-else',
-            if: [{ type: 'device.get-value', device_feature: 'migration-destination-temp' }],
+            if: [
+              { type: 'device.get-value', device_feature: 'migration-destination-temp' },
+              // a condition of the block comparing the current state of a feature
+              {
+                type: 'condition.only-continue-if',
+                conditions: [{ device_feature: 'migration-destination-temp', operator: '<', value: 30 }],
+              },
+            ],
             then: [[{ type: 'light.turn-on', devices: ['migration-destination'] }]],
             else: [[{ type: 'message.send-camera', camera: 'migration-destination', user: 'john' }]],
+          },
+        ],
+        [
+          {
+            type: 'condition.only-continue-if',
+            conditions: [
+              { device_feature: 'migration-destination-temp', operator: '>', value: 20 },
+              { variable: '0.0.last_value', operator: '<', value: 30 },
+            ],
           },
         ],
         [

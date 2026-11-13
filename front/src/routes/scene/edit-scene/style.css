@@ -270,6 +270,12 @@
   padding: 0 0.5rem;
 }
 
+/* In a mobile sheet the picker is the sheet's content: the sheet scrolls, never a box inside it */
+.typePickerListFill {
+  max-height: none;
+  overflow-y: visible;
+}
+
 .typePickerCategory {
   margin-bottom: 0.75rem;
 }

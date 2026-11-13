@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import { getDeviceFeatureName } from '../../../../utils/device';
 
@@ -28,7 +29,7 @@ class TurnOnOffSwitch extends Component {
           });
         });
       });
-      await this.setState({ deviceOptions });
+      await this.setState({ deviceOptions, devices });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
@@ -44,6 +45,12 @@ class TurnOnOffSwitch extends Component {
       this.props.updateActionProperty(this.props.path, 'devices', undefined);
     }
   };
+  // on a phone the switches are picked in the device picker sheet, by room: one row per writable
+  // switch, as the options of the select
+  handlePickerChange = deviceFeatures => {
+    this.handleChange(deviceFeatures.map(value => ({ value })));
+  };
+  isWritableSwitch = feature => feature.read_only === false;
   refreshSelectedOptions = nextProps => {
     const { device_features: deviceFeatures = [], devices = [] } = nextProps.action;
     const deviceOptions = this.state.deviceOptions || [];
@@ -64,6 +71,8 @@ class TurnOnOffSwitch extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
+      // null while loading: the picker field of a phone waits for the list
+      devices: null,
       selectedOptions: []
     };
   }
@@ -75,7 +84,7 @@ class TurnOnOffSwitch extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, { selectedOptions, deviceOptions, devices }) {
     return (
       <div class="form-group">
         <label class="form-label">
@@ -88,15 +97,28 @@ class TurnOnOffSwitch extends Component {
             <Text id="editScene.actionsCard.toggleSwitches.description" />
           </p>
         )}
-        <Select
-          defaultValue={[]}
-          isMulti
-          value={selectedOptions}
-          onChange={this.handleChange}
-          options={deviceOptions}
-          className="react-select-container"
-          classNamePrefix="react-select"
-        />
+        <DevicePickerField
+          devices={devices}
+          selected={
+            // the stored switches, one whose device is gone included ("Device not found"); a scene
+            // still storing devices shows the first switch of each
+            Array.isArray(props.action.device_features) && props.action.device_features.length > 0
+              ? props.action.device_features
+              : selectedOptions.map(option => option.value)
+          }
+          onChange={this.handlePickerChange}
+          filterFeature={this.isWritableSwitch}
+        >
+          <Select
+            defaultValue={[]}
+            isMulti
+            value={selectedOptions}
+            onChange={this.handleChange}
+            options={deviceOptions}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+        </DevicePickerField>
       </div>
     );
   }

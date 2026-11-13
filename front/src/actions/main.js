@@ -12,6 +12,7 @@ import {
   isInstanceVersionCheckSettled,
   markInstanceVersionCheckSettled
 } from '../utils/instanceVersion';
+import { measureClockOffset, isClockOffsetSignificant } from '../utils/clock';
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 // Self-hosted gateways without Stripe get a ~100-year "trial": past this
@@ -23,9 +24,13 @@ const GATEWAY_TRIAL_REFRESH_INTERVAL_MS = 30 * 1000;
 // The instance version changes at most a few times a day (Watchtower): one
 // call a minute on tab focus is enough to notice an update happened.
 const INSTANCE_VERSION_REFRESH_INTERVAL_MS = 60 * 1000;
+// A server clock does not drift in minutes: re-checking it at most every 5
+// minutes (on tab focus, while the notice is displayed) is plenty.
+const CLOCK_OFFSET_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 let lastGatewayTrialRefresh = 0;
 let lastInstanceVersionRefresh = 0;
+let lastClockOffsetRefresh = 0;
 // the session whose websocket already forwards the Gladys Plus subscription
 // changes to the store: the listener is registered once per session
 let gatewaySubscriptionListenerSession = null;
@@ -70,6 +75,11 @@ function createActions(store) {
     toggleCollapsedMenu(state) {
       store.setState({
         showCollapsedMenu: !state.showCollapsedMenu
+      });
+    },
+    closeCollapsedMenu() {
+      store.setState({
+        showCollapsedMenu: false
       });
     },
     redirectToLogin() {
@@ -129,6 +139,8 @@ function createActions(store) {
         actions.refreshInstanceVersionState(state);
         // and for the Gladys Plus subscription lock, announced in the header
         actions.refreshGatewaySubscriptionState(state);
+        // and for a server clock that is off, announced in the header too
+        actions.refreshClockOffsetState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
           // logout swaps the session object out of the store: the role of the
@@ -321,6 +333,30 @@ function createActions(store) {
         console.error(e);
       }
     },
+    // A server clock that is off breaks scheduled scenes, history and energy
+    // without any visible error: the header announces it (ClockOffsetNotice)
+    // as soon as the gap with the clock of this device is significant. Called
+    // at session check, when the tab regains focus while the notice is
+    // displayed, and by the clock card of the System settings (force: true).
+    async refreshClockOffsetState(state, { force = false } = {}) {
+      if (!force && Date.now() - lastClockOffsetRefresh < CLOCK_OFFSET_REFRESH_INTERVAL_MS) {
+        return;
+      }
+      lastClockOffsetRefresh = Date.now();
+      const requestSession = state.session;
+      try {
+        const measure = await measureClockOffset(state.httpClient);
+        if (store.getState().session !== requestSession) {
+          return;
+        }
+        store.setState({
+          clockOffset: isClockOffsetSignificant(measure) ? measure.offset : null
+        });
+      } catch (e) {
+        // server unreachable: better no notice than a wrong one
+        console.error(e);
+      }
+    },
     async logout(state, e) {
       e.preventDefault();
       const user = state.session.getUser();
@@ -334,6 +370,7 @@ function createActions(store) {
       // and the instance version throttle must not carry over: logging back
       // in right away gets a fresh check, not a 60s silence
       lastInstanceVersionRefresh = 0;
+      lastClockOffsetRefresh = 0;
       route('/login', true);
       const defaultState = getDefaultState();
       store.setState(defaultState, true);

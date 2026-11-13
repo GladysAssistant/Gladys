@@ -98,7 +98,7 @@ class MapPage extends Component {
     // (create-zone pill, Leaflet controls, tooltips) composes on.
     return (
       <div class="page">
-        <div class={cx('page-main', 'glass-theme', style.mapPage)}>
+        <div class={cx('page-main', 'glass-theme', style.mapPage, style.mapFullPage)}>
           <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} loaded={loaded} />
         </div>
       </div>

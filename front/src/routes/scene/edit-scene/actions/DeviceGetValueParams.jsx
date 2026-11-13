@@ -65,7 +65,11 @@ class DeviceGetValue extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <SelectDeviceFeature value={action.device_feature} onDeviceFeatureChange={this.onDeviceFeatureChange} />
+          <SelectDeviceFeature
+            value={action.device_feature}
+            onDeviceFeatureChange={this.onDeviceFeatureChange}
+            mobilePicker
+          />
         </div>
       </div>
     );

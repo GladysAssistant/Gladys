@@ -490,10 +490,19 @@
    paints its scene on a fixed ::before layer instead. The chat page keeps
    its fixed height: the padding gives the pulled-back space to the chrome. */
 @media (min-width: 992px) {
+  /* --gladys-sidebar-offset (style/index.css) is the page's left padding:
+     the full rail, or only the slim expand-button gutter while the rail is
+     collapsed — the scene then reaches under the floating button. */
   :global(body.gladys-sidebar-nav) .chatPage {
-    width: calc(100% + 15rem);
-    margin-left: -15rem;
-    padding-left: 15rem;
+    width: calc(100% + var(--gladys-sidebar-offset));
+    margin-left: calc(-1 * var(--gladys-sidebar-offset));
+    padding-left: var(--gladys-sidebar-offset);
+  }
+
+  /* Same pace as the page padding while the rail slides, or a strip of bare
+     page background would open between the rail and the scene. */
+  :global(body.gladys-sidebar-animating) .chatPage {
+    transition: width 0.22s ease, margin-left 0.22s ease, padding-left 0.22s ease;
   }
 }
 

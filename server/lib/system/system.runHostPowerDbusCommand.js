@@ -1,5 +1,6 @@
 const { promisify } = require('util');
 const childProcess = require('child_process');
+const crypto = require('crypto');
 
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
@@ -15,7 +16,8 @@ const HOST_DBUS_SOCKET_BIND = '/run/dbus:/run/dbus:ro';
 // hosts where dbus-daemon enforces AppArmor mediation (Debian 12+,
 // Ubuntu 23.10+...) that means default-deny: a confined helper is rejected by
 // the bus before it can even complete the DBus handshake. The helper only runs
-// a single dbus-send against logind, so it is started unconfined. Docker
+// a single dbus-send (against logind or timedated, see runHostDbusCommand), so
+// it is started unconfined. Docker
 // daemons on hosts without AppArmor ignore the option; a daemon that rejects
 // it outright is retried without it (see runViaHelperContainer).
 const HELPER_SECURITY_OPT = ['apparmor=unconfined'];
@@ -52,29 +54,62 @@ function buildDbusArgv(method) {
 }
 
 /**
+ * @description Read the logs of a helper container started without a TTY:
+ * Docker multiplexes them, each log message (one per output line with the
+ * default json-file driver) prefixed with an 8-byte header — stream type,
+ * three zero bytes, then the payload size, whose bytes can be printable and
+ * end up in the middle of the dbus-send reply. A buffer that does not start
+ * with such a header is returned as plain text.
+ * @param {Buffer} buffer - Raw logs of the helper container.
+ * @returns {string} The output of the helper container.
+ * @example
+ * demuxDockerLogs(await container.logs({ stdout: true, stderr: true }));
+ */
+function demuxDockerLogs(buffer) {
+  const chunks = [];
+  let offset = 0;
+  while (offset < buffer.length) {
+    const isFrameHeader =
+      offset + 8 <= buffer.length &&
+      buffer[offset] <= 2 &&
+      buffer[offset + 1] === 0 &&
+      buffer[offset + 2] === 0 &&
+      buffer[offset + 3] === 0;
+    if (!isFrameHeader) {
+      return buffer.toString('utf8');
+    }
+    const size = buffer.readUInt32BE(offset + 4);
+    chunks.push(buffer.subarray(offset + 8, offset + 8 + size));
+    offset += 8 + size;
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+/**
  * @description Run the command directly (Gladys runs on the host, not in Docker).
- * @param {string} method - Method name on the logind Manager interface.
+ * @param {Array<string>} argv - The dbus-send argv.
  * @returns {Promise<string>} Resolve with the command stdout.
  * @example
- * await runLocal('CanReboot');
+ * await runLocal(buildDbusArgv('CanReboot'));
  */
-async function runLocal(method) {
-  const { stdout } = await execAsync(buildDbusArgv(method).join(' '), { timeout: COMMAND_TIMEOUT_MS });
+async function runLocal(argv) {
+  const { stdout } = await execAsync(argv.join(' '), { timeout: COMMAND_TIMEOUT_MS });
   return stdout;
 }
 
 /**
  * @description Run the command in a short-lived helper container launched
  * through the Docker socket. The daemon bind-mounts the HOST system DBus socket
- * into the helper, so we can reach systemd-logind even though the Gladys
- * container itself has no /run/dbus mount. Uses the Gladys image (ships
- * dbus-send) so nothing needs to be pulled.
- * @param {string} method - Method name on the logind Manager interface.
+ * into the helper, so we can reach the host systemd services (logind,
+ * timedated) even though the Gladys container itself has no /run/dbus mount.
+ * Uses the Gladys image (ships dbus-send) so nothing needs to be pulled.
+ * @param {Array<string>} argv - The dbus-send argv.
+ * @param {string} label - Short name of the command, used in the container name.
  * @returns {Promise<string>} Resolve with the container output (dbus-send reply).
  * @example
- * await runViaHelperContainer('Reboot');
+ * await runViaHelperContainer(buildDbusArgv('Reboot'), 'host-power-reboot');
  */
-async function runViaHelperContainer(method) {
+async function runViaHelperContainer(argv, label) {
   if (!this.dockerode) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
@@ -89,8 +124,9 @@ async function runViaHelperContainer(method) {
   const createHelperContainer = async (securityOpt) =>
     this.dockerode.createContainer({
       Image: image,
-      name: `gladys-host-power-${method.toLowerCase()}-${Date.now()}`,
-      Cmd: buildDbusArgv(method),
+      // two calls in the same millisecond must not fight over a name
+      name: `gladys-${label}-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
+      Cmd: argv,
       HostConfig: {
         Binds: [HOST_DBUS_SOCKET_BIND],
         ...(securityOpt ? { SecurityOpt: securityOpt } : {}),
@@ -107,7 +143,7 @@ async function runViaHelperContainer(method) {
       throw e;
     }
     logger.warn(
-      `System: Docker rejected the AppArmor security option for the host power helper container, retrying without it: ${e.message}`,
+      `System: Docker rejected the AppArmor security option for the host DBus helper container, retrying without it: ${e.message}`,
     );
     container = await createHelperContainer(null);
   }
@@ -123,15 +159,15 @@ async function runViaHelperContainer(method) {
       waitPromise,
       new Promise((resolve, reject) => {
         timeout = setTimeout(
-          () => reject(new Error(`Host power helper container timed out after ${HELPER_TIMEOUT_MS}ms`)),
+          () => reject(new Error(`Host DBus helper container timed out after ${HELPER_TIMEOUT_MS}ms`)),
           HELPER_TIMEOUT_MS,
         );
       }),
     ]);
     const logBuffer = await container.logs({ follow: false, stdout: true, stderr: true });
-    output = logBuffer.toString('utf8');
+    output = demuxDockerLogs(logBuffer);
     if (StatusCode !== 0) {
-      throw new Error(`Host power helper container exited with status ${StatusCode}: ${output}`);
+      throw new Error(`Host DBus helper container exited with status ${StatusCode}: ${output}`);
     }
     return output;
   } finally {
@@ -141,6 +177,31 @@ async function runViaHelperContainer(method) {
     await container.kill().catch(() => {});
     await container.remove({ force: true }).catch(() => {});
   }
+}
+
+/**
+ * @description Run a dbus-send command against the HOST system bus, using the
+ * given mechanism (direct on the host, or via a helper container).
+ * @param {Array<string>} argv - The dbus-send argv.
+ * @param {string} mechanism - 'local' | 'docker-helper'.
+ * @param {string} label - Short name of the command, used in the helper container name.
+ * @returns {Promise<string>} Resolve with the raw dbus-send output.
+ * @example
+ * await system.runHostDbusCommand(argv, 'docker-helper', 'time-sync-status');
+ */
+async function runHostDbusCommand(argv, mechanism, label) {
+  // the helper runs unconfined with the host system bus mounted: it must
+  // never become a way to run anything else than dbus-send
+  if (!Array.isArray(argv) || argv[0] !== 'dbus-send') {
+    throw new PlatformNotCompatible('HOST_DBUS_COMMAND_NOT_ALLOWED');
+  }
+  if (mechanism === 'local') {
+    return runLocal(argv);
+  }
+  if (mechanism === 'docker-helper') {
+    return runViaHelperContainer.call(this, argv, label);
+  }
+  throw new PlatformNotCompatible('HOST_DBUS_NOT_AVAILABLE');
 }
 
 /**
@@ -154,16 +215,15 @@ async function runViaHelperContainer(method) {
  */
 async function runHostPowerDbusCommand(method, mechanism) {
   logger.info(`System: running host power command ${method} via ${mechanism}`);
-  if (mechanism === 'local') {
-    return runLocal(method);
+  if (mechanism !== 'local' && mechanism !== 'docker-helper') {
+    throw new PlatformNotCompatible('HOST_POWER_MANAGEMENT_NOT_AVAILABLE');
   }
-  if (mechanism === 'docker-helper') {
-    return runViaHelperContainer.call(this, method);
-  }
-  throw new PlatformNotCompatible('HOST_POWER_MANAGEMENT_NOT_AVAILABLE');
+  return runHostDbusCommand.call(this, buildDbusArgv(method), mechanism, `host-power-${method.toLowerCase()}`);
 }
 
 module.exports = {
+  runHostDbusCommand,
   runHostPowerDbusCommand,
   buildDbusArgv,
+  demuxDockerLogs,
 };

@@ -63,7 +63,7 @@ const EditActions = props => (
               )}
             </span>
           </div>
-          <div class="col-auto ml-auto">
+          <div class="col-auto ml-auto" data-not-an-edit>
             {props.runningInfo ? (
               <RunningStopButton runningInfo={props.runningInfo} onStop={props.stopScene} />
             ) : (

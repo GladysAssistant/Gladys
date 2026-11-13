@@ -65,6 +65,23 @@ describe('mcpToolsToChatApiFormat', () => {
     });
     expect(serialized.split('device-feature-299')).to.have.lengthOf(2);
     expect(serialized).to.include('"$ref":"#/$defs/device_feature"');
+    // the feature of a condition is one more reference to the same list, not a copy of it
+    const findActionSchema = (node, type) => {
+      if (!node || typeof node !== 'object') {
+        return undefined;
+      }
+      if (node.properties && node.properties.type && node.properties.type.const === type) {
+        return node;
+      }
+      return Object.values(node).reduce((found, child) => found || findActionSchema(child, type), undefined);
+    };
+    const onlyContinueIf = findActionSchema(tool.function.parameters, 'condition.only-continue-if');
+    const [deviceCondition, variableCondition] = onlyContinueIf.properties.conditions.items.anyOf;
+    expect(deviceCondition.properties.device_feature).to.deep.equal({ $ref: '#/$defs/device_feature' });
+    expect(deviceCondition.required).to.deep.equal(['device_feature', 'operator']);
+    expect(deviceCondition.additionalProperties).to.equal(false);
+    expect(variableCondition.required).to.deep.equal(['variable', 'operator']);
+    expect(variableCondition.properties).not.to.have.property('device_feature');
   });
 });
 

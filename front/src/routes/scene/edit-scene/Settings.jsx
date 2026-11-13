@@ -4,7 +4,77 @@ import { CreatableSelect } from '../../../components/form/Select';
 import IconSelector from '../../../components/scene/IconSelector';
 import style from './style.css';
 
+const SettingsFields = props => (
+  <>
+    <div class="col-sm-12 col-md-6">
+      <div class="form-group">
+        <div class="form-label">
+          <Text id="editScene.nameTitle" />
+        </div>
+        <Localizer>
+          <input
+            type="text"
+            className="form-control"
+            onChange={props.updateSceneName}
+            value={props.scene.name}
+            placeholder={<Text id="editScene.editNamePlaceholder" />}
+          />
+        </Localizer>
+      </div>
+      <div class="form-group">
+        <div class="form-label">
+          <Text id="editScene.descriptionTitle" />
+        </div>
+        <Localizer>
+          <input
+            type="text"
+            class="form-control"
+            maxlength="100"
+            onChange={props.updateSceneDescription}
+            value={props.scene.description}
+            placeholder={<Text id="editScene.editDescriptionPlaceholder" />}
+          />
+        </Localizer>
+      </div>
+      <div class="form-group">
+        <div class="form-label">
+          <Text id="editScene.tagsTitle" />
+        </div>
+        <Localizer>
+          <CreatableSelect
+            defaultValue={props.scene.tags.map(tag => ({ value: tag.name, label: tag.name }))}
+            closeMenuOnSelect={false}
+            isMulti
+            options={props.tags && props.tags.map(tag => ({ value: tag.name, label: tag.name }))}
+            onChange={tags => props.setTags(tags.map(tag => tag.value))}
+            placeholder={<Text id="editScene.editTagsPlaceholder" />}
+            formatCreateLabel={inputValue => <Text id="editScene.createTag" fields={{ tagName: inputValue }} />}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+        </Localizer>
+      </div>
+    </div>
+    <div class="col">
+      <div class="form-group">
+        <label className="form-label">
+          <Text id="editScene.iconLabel" />
+        </label>
+        <IconSelector value={props.scene.icon} onChange={props.updateSceneIcon} darkModeNoFilter />
+      </div>
+    </div>
+  </>
+);
+
 const Settings = ({ children, ...props }) => {
+  // the mobile editor shows the fields alone, in a sheet
+  if (props.bare) {
+    return (
+      <div class="row">
+        <SettingsFields {...props} />
+      </div>
+    );
+  }
   return (
     <div class="col">
       <div class="card">
@@ -34,65 +104,7 @@ const Settings = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content row">
-              <div class="col-sm-12 col-md-6">
-                <div class="form-group">
-                  <div class="form-label">
-                    <Text id="editScene.nameTitle" />
-                  </div>
-                  <Localizer>
-                    <input
-                      type="text"
-                      className="form-control"
-                      onChange={props.updateSceneName}
-                      value={props.scene.name}
-                      placeholder={<Text id="editScene.editNamePlaceholder" />}
-                    />
-                  </Localizer>
-                </div>
-                <div class="form-group">
-                  <div class="form-label">
-                    <Text id="editScene.descriptionTitle" />
-                  </div>
-                  <Localizer>
-                    <input
-                      type="text"
-                      class="form-control"
-                      maxlength="100"
-                      onChange={props.updateSceneDescription}
-                      value={props.scene.description}
-                      placeholder={<Text id="editScene.editDescriptionPlaceholder" />}
-                    />
-                  </Localizer>
-                </div>
-                <div class="form-group">
-                  <div class="form-label">
-                    <Text id="editScene.tagsTitle" />
-                  </div>
-                  <Localizer>
-                    <CreatableSelect
-                      defaultValue={props.scene.tags.map(tag => ({ value: tag.name, label: tag.name }))}
-                      closeMenuOnSelect={false}
-                      isMulti
-                      options={props.tags && props.tags.map(tag => ({ value: tag.name, label: tag.name }))}
-                      onChange={tags => props.setTags(tags.map(tag => tag.value))}
-                      placeholder={<Text id="editScene.editTagsPlaceholder" />}
-                      formatCreateLabel={inputValue => (
-                        <Text id="editScene.createTag" fields={{ tagName: inputValue }} />
-                      )}
-                      className="react-select-container"
-                      classNamePrefix="react-select"
-                    />
-                  </Localizer>
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label className="form-label">
-                    <Text id="editScene.iconLabel" />
-                  </label>
-                  <IconSelector value={props.scene.icon} onChange={props.updateSceneIcon} darkModeNoFilter />
-                </div>
-              </div>
+              <SettingsFields {...props} />
             </div>
           </div>
         </div>

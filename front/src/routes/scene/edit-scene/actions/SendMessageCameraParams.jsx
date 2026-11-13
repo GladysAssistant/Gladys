@@ -1,4 +1,5 @@
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
@@ -39,7 +40,7 @@ class SendMessageCameraParams extends Component {
       } else if (this.props.action.camera) {
         selectedCameraOption = cameraOptions.find(option => option.value === this.props.action.camera) || '';
       }
-      this.setState({ userOptions, cameraOptions, selectedUserOption, selectedCameraOption }, () => {
+      this.setState({ userOptions, cameraOptions, cameras, selectedUserOption, selectedCameraOption }, () => {
         actionUpdates.forEach(([key, value]) => this.props.updateActionProperty(this.props.path, key, value));
       });
       return userOptions;
@@ -64,6 +65,9 @@ class SendMessageCameraParams extends Component {
       this.props.updateActionProperty(this.props.path, 'camera', null);
     }
   };
+
+  // on a phone the camera is picked in the device picker sheet
+  handleCameraPickerChange = ([camera]) => this.handleCameraChange(camera ? { value: camera } : null);
 
   refreshSelectedOptions = nextProps => {
     let selectedUserOption = '';
@@ -97,7 +101,7 @@ class SendMessageCameraParams extends Component {
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
   }
-  render(props, { selectedUserOption, userOptions, selectedCameraOption, cameraOptions }) {
+  render(props, { selectedUserOption, userOptions, selectedCameraOption, cameraOptions, cameras }) {
     return (
       <div>
         <div class="form-group">
@@ -126,17 +130,26 @@ class SendMessageCameraParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select
-            styles={{
-              // Fixes the overlapping problem of the component
-              menu: provided => ({ ...provided, zIndex: 2 })
-            }}
-            options={cameraOptions}
-            value={selectedCameraOption}
-            onChange={this.handleCameraChange}
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+          <DevicePickerField
+            devices={cameras || null}
+            selected={props.action.camera ? [props.action.camera] : []}
+            onChange={this.handleCameraPickerChange}
+            pickDevices
+            single
+            defaultIcon="camera"
+          >
+            <Select
+              styles={{
+                // Fixes the overlapping problem of the component
+                menu: provided => ({ ...provided, zIndex: 2 })
+              }}
+              options={cameraOptions}
+              value={selectedCameraOption}
+              onChange={this.handleCameraChange}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </DevicePickerField>
         </div>
         <MessageServiceSelector
           value={props.action.service}

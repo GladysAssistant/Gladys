@@ -1,0 +1,128 @@
+/* A device selection as a form field on a phone (docs/specs/scene-editor-mobile.md, E.10): the
+   picked devices as rows, and the button opening the picker sheet. Light colors only: dark mode
+   is the app-wide inversion. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #e4e8ef;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 4px 4px 4px 12px;
+  background-color: #fff;
+}
+
+.item + .item {
+  border-top: 1px solid #edf0f5;
+}
+
+.itemIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  color: #1c2334;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.itemRoom {
+  color: #6b7385;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+}
+
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #6b7385;
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.empty {
+  margin: 0;
+  color: #6b7385;
+  font-size: 0.9375rem;
+}
+
+.openButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.openButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* The picker was laid out for the dashboard edit panel, whose body has its own padding: it
+   bleeds to the edges of that body. A sheet's body has none on its sides, and 0.5rem below. */
+.pickerHost {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  --picker-bleed-x: 0px;
+  --picker-bleed-bottom: 0.5rem;
+  /* the pinned footer is opaque, in the sheet's own color: no list showing through it */
+  --gl-surface-strong: #f7f8fb;
+}
+
+.pickerHost > * {
+  flex: 1 1 auto;
+}
+
+:global(.dark-mode) .pickerHost {
+  --gl-surface-strong: #ced8e6;
+}

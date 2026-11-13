@@ -81,10 +81,15 @@ class ExternalIntegrationSupervisionPage extends Component {
       );
       // an update that changes nothing is a legitimate outcome (already on
       // the latest version): without this the button looks like it did
-      // nothing at all
+      // nothing at all. `skipped`: the newer version it could not apply, and
+      // why — then it is not "up to date", and the banner says so
       const updateResult =
         action === 'update'
-          ? { version: integration.version, upToDate: integration.version === previousVersion }
+          ? {
+              version: integration.version,
+              upToDate: integration.version === previousVersion,
+              skipped: integration.skipped_update || null
+            }
           : null;
       this.setState({ integration, actionStatus: RequestStatus.Success, updateResult });
       if (action === 'update') {

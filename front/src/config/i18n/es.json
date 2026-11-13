@@ -1131,6 +1131,12 @@
       "updateRetryButton": "Reintentar",
       "updateError": "La actualización ha fallado. Revise los registros de la integración y vuelva a intentarlo.",
       "updatedTo": "Actualizado a v{{version}}",
+      "updateRequiresGladys": "Esta versión requiere Gladys {{gladysVersion}}: actualice Gladys primero.",
+      "updateSkipped": {
+        "GLADYS_VERSION": "La v{{skippedVersion}} requiere Gladys {{gladysVersion}}: actualice Gladys primero. La v{{version}} está instalada.",
+        "INVALID_MANIFEST": "No se pudo instalar la v{{skippedVersion}}: esta versión de Gladys no acepta su manifiesto (consulte los logs de Gladys). La v{{version}} está instalada.",
+        "IMAGE_UNAVAILABLE": "La imagen de la v{{skippedVersion}} aún no se puede descargar: inténtelo más tarde. La v{{version}} está instalada."
+      },
       "noInstalledIntegrations": "Aún no hay ninguna integración de la comunidad instalada en esta instancia.",
       "installedSummary": {
         "title": {
@@ -1299,6 +1305,13 @@
         "updateAvailableVersionText": "Hay una nueva versión de esta integración disponible: v{{latestVersion}} (instalada: v{{currentVersion}}).",
         "updateSuccessText": "Integración actualizada a la versión {{version}}.",
         "alreadyUpToDateText": "La integración ya está actualizada (versión {{version}}): se volvió a descargar la imagen Docker y se recreó el contenedor.",
+        "updateRequiresGladysText": "La versión {{latestVersion}} de esta integración está disponible, pero requiere Gladys {{gladysVersion}} (instalada: v{{currentVersion}}). Actualice Gladys primero y luego actualice esta integración.",
+        "updateKeptVersionText": "La versión {{version}} sigue instalada: se volvió a descargar su imagen Docker y se recreó el contenedor.",
+        "updateSkipped": {
+          "GLADYS_VERSION": "La versión {{skippedVersion}} no se instaló: requiere Gladys {{gladysVersion}}. Actualice Gladys primero y luego vuelva a actualizar esta integración.",
+          "INVALID_MANIFEST": "La versión {{skippedVersion}} no se instaló: esta versión de Gladys no acepta su manifiesto (detalles en los logs de Gladys). Actualizar Gladys puede solucionarlo.",
+          "IMAGE_UNAVAILABLE": "La versión {{skippedVersion}} no se instaló: su imagen Docker aún no se puede descargar (puede que todavía se esté publicando). Inténtelo de nuevo en unos minutos."
+        },
         "statusLabel": "Estado",
         "versionLabel": "Versión",
         "changelogTitle": "Consultar el registro de cambios de esta versión",
@@ -4140,7 +4153,9 @@
         "textExplanationText": "Introduzca aquí el texto que se enviará a su dispositivo. Para insertar una variable de la escena en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Dispositivo o variable",
+        "sourceDevice": "Dispositivo",
+        "sourceVariable": "Variable",
         "operatorLabel": "Operador",
         "valueLabel": "Valor",
         "removeLabel": "Eliminar",
@@ -4149,7 +4164,7 @@
         "useCustomValue": "Introducir un valor personalizado",
         "useValueList": "Elegir de la lista de valores",
         "logicExplanationText": "Las condiciones de este bloque se combinan con un O: el bloque se cumple en cuanto se cumple una de ellas. Para hacer un Y, añada varios bloques \"Condición sobre variables\": entonces todos deberán cumplirse.",
-        "explanationText": "En lugar de un valor fijo, puede introducir aquí un cálculo basado en una variable de la escena. Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "explanationText": "Elija qué comparar: el estado actual de un dispositivo, leído cuando la escena llega a este bloque, o una variable establecida por una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" situada antes de esta. Como valor, introduzca un valor fijo o un cálculo basado en una variable de la escena: para insertar una variable, pulse \"{{\"."
       },
       "conditionIfThenElse": {
         "conditions": "Condiciones",
@@ -4894,6 +4909,103 @@
       "outputsAvailable": "Resultados disponibles para los pasos siguientes:",
       "variablesHint": "Escriba '{{' para insertar información de la escena, como los datos transmitidos por el activador.",
       "requiredFieldError": "El campo \"{{field}}\" de \"{{title}}\" es obligatorio: no puede dejarse vacío."
+    },
+    "searchConditionsPlaceholder": "Buscar una condición…",
+    "conditionsDescriptions": {
+      "condition": {
+        "check-time": "La hora o el día coinciden",
+        "only-continue-if": "Comparar variables o valores de dispositivos",
+        "in-time-range": "Estamos dentro de una de las franjas horarias del disparador"
+      },
+      "edf-tempo": {
+        "condition": "El color del día de EDF Tempo coincide (Francia)"
+      },
+      "alarm": {
+        "check-alarm-mode": "La alarma está en un modo determinado"
+      },
+      "calendar": {
+        "is-event-running": "Un evento del calendario está en curso",
+        "get-events": "Obtener eventos del calendario para compararlos"
+      },
+      "ecowatt": {
+        "condition": "La señal Ecowatt de la red eléctrica francesa coincide"
+      },
+      "energy-contract": {
+        "current-price": "El precio actual de un contrato de energía cumple un umbral"
+      },
+      "house": {
+        "is-empty": "No hay nadie en casa",
+        "is-not-empty": "Hay alguien en casa"
+      },
+      "device": {
+        "get-value": "Obtener el valor de un sensor antes de compararlo"
+      }
+    },
+    "mobile": {
+      "ok": "OK",
+      "close": "Cerrar",
+      "savedToast": "Escena guardada",
+      "stepDeleted": "Paso eliminado",
+      "conditionDeleted": "Condición eliminada",
+      "triggerDeleted": "Disparador eliminado",
+      "undo": "Deshacer",
+      "leaveTitle": "Cambios sin guardar",
+      "leaveText": "Tienes cambios sin guardar en «{{name}}».",
+      "saveAndLeave": "Guardar y salir",
+      "leaveWithoutSaving": "Salir sin guardar",
+      "keepEditing": "Seguir editando",
+      "draftFound": "Cambios sin guardar encontrados ·",
+      "restoreDraft": "Restaurar",
+      "discardDraft": "Descartar",
+      "noCondition": "Ninguna condición",
+      "delete": "Eliminar",
+      "addSimultaneousAction": "Añadir una acción simultánea",
+      "insertStepAfter": "Insertar un paso después",
+      "deleteStep": "Eliminar el paso",
+      "deleteCondition": "Eliminar la condición",
+      "deleteTrigger": "Eliminar el disparador",
+      "noActionInBranch": "Ninguna acción",
+      "addTo": {
+        "then": "Añadir en «Entonces»",
+        "else": "Añadir en «Si no»"
+      },
+      "then": "Entonces",
+      "else": "Si no",
+      "repeat": "Repetir",
+      "conditionsTitle": "Condiciones",
+      "addCondition": "Añadir una condición",
+      "conditionsAllRequired": "Se deben cumplir todas las condiciones. Toca una condición para cambiarla.",
+      "atTheSameTime": "Al mismo tiempo",
+      "simultaneousAction": "Acción simultánea",
+      "reorderTitle": "Reordenar",
+      "reorderHint": "Mueve los pasos con las flechas. Lo que hace cada paso no cambia.",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "done": "Listo",
+      "changes": {
+        "zero": "Ningún cambio",
+        "one": "1 cambio",
+        "other": "{{count}} cambios"
+      },
+      "test": "Probar",
+      "runScene": "Ejecutar la escena",
+      "moreActions": "Más acciones",
+      "sceneActive": "Escena activa",
+      "sceneDisabled": "Escena desactivada",
+      "lastRun": "Última ejecución",
+      "neverRun": "Nunca ejecutada",
+      "whenSubtitle": "basta con uno de estos eventos",
+      "chooseTrigger": "Elegir un disparador",
+      "orWhen": "O cuando…",
+      "thenSubtitle": "en orden, de arriba abajo",
+      "addFirstStep": "Añadir un primer paso",
+      "swipeHint": "Toca una fila para cambiarla. Deslízala a la izquierda para eliminarla. Mantén pulsado un paso para moverlo.",
+      "settingsMenu": "Nombre, icono y etiquetas",
+      "reorderMenu": "Reordenar los pasos",
+      "deleteScene": "Eliminar la escena",
+      "deleteSceneTitle": "¿Eliminar la escena?",
+      "deleteSceneText": "«{{name}}» y sus disparadores se eliminarán. Esta acción es definitiva.",
+      "deleteForever": "Eliminar definitivamente"
     }
   },
   "profile": {
@@ -5295,6 +5407,22 @@
     }
   },
   "systemSettings": {
+    "clockTitle": "Reloj",
+    "clockDescription": "Gladys utiliza el reloj de la máquina en la que se ejecuta para las escenas programadas, el historial y la energía. Aquí se compara con el reloj del dispositivo que estás usando.",
+    "clockOnTime": "El reloj de Gladys está en hora.",
+    "clockOffsetConsequences": "Las escenas programadas se ejecutan a una hora incorrecta y los estados se guardan con una fecha incorrecta.",
+    "clockMeasureError": "No se puede leer el reloj de Gladys.",
+    "clockSyncUnavailable": "Gladys no puede leer la configuración de sincronización horaria de la máquina (systemd-timedated no es accesible). Compruébala directamente en la máquina, por ejemplo con el comando \"timedatectl\".",
+    "clockSyncOk": "La máquina mantiene su reloj en hora automáticamente (sincronización horaria por red).",
+    "clockSyncOkDeviceOff": "Como la máquina está sincronizada, probablemente es el reloj del dispositivo que estás usando el que es incorrecto.",
+    "clockSyncNotSynchronized": "La sincronización horaria automática está activada, pero la máquina aún no está sincronizada. Si esto continúa, comprueba que tiene acceso a Internet (NTP, puerto UDP 123).",
+    "clockSyncEnabled": "Se ha activado la sincronización horaria automática: el reloj debería corregirse en unos minutos.",
+    "clockSyncDisabled": "La sincronización horaria automática de la máquina está desactivada: su reloj se desvía y nunca se corrige.",
+    "clockSyncEnableButton": "Activar la sincronización horaria automática",
+    "clockSyncEnableError": "No se puede activar la sincronización horaria automática.",
+    "clockSyncNoService": "No hay ningún servicio de sincronización horaria instalado en la máquina: su reloj se desvía y nunca se corrige. Instala uno (por ejemplo systemd-timesyncd).",
+    "clockRestartHint": "Una vez corregido el reloj, reinicia Gladys para que las escenas programadas se vuelvan a calcular con la hora correcta.",
+    "clockCheckAgain": "Comprobar de nuevo",
     "connected": "Conectado",
     "ping": "{{time}} ms de ping",
     "disk": "Disco",
@@ -5466,7 +5594,20 @@
     "filterTagsName": "Filtrar por etiquetas",
     "unselectTags": "Deseleccionar todas las etiquetas",
     "running": "En ejecución",
-    "stopButton": "Detener"
+    "stopButton": "Detener",
+    "mobile": {
+      "newSceneTitle": "Nueva escena",
+      "newScenePlaceholder": "p. ej. Buenas noches",
+      "createError": "No se pudo crear la escena. Inténtalo de nuevo.",
+      "iconGuessed": "Icono elegido a partir del nombre, se puede cambiar después.",
+      "createAndChooseTrigger": "Crear y elegir un disparador",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "disabled": "Desactivada",
+      "runScene": "Ejecutar «{{name}}»",
+      "allTags": "Todas",
+      "swipeHint": "Consejo: desliza una escena a la izquierda para desactivarla o duplicarla."
+    }
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -7459,7 +7600,55 @@
       }
     }
   },
+  "clock": {
+    "ahead": {
+      "seconds": {
+        "one": "El reloj de Gladys va 1 segundo adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} segundos adelantado respecto a este dispositivo."
+      },
+      "minutes": {
+        "one": "El reloj de Gladys va 1 minuto adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} minutos adelantado respecto a este dispositivo."
+      },
+      "hours": {
+        "one": "El reloj de Gladys va 1 hora adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} horas adelantado respecto a este dispositivo."
+      },
+      "days": {
+        "one": "El reloj de Gladys va 1 día adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} días adelantado respecto a este dispositivo."
+      }
+    },
+    "behind": {
+      "seconds": {
+        "one": "El reloj de Gladys va 1 segundo atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} segundos atrasado respecto a este dispositivo."
+      },
+      "minutes": {
+        "one": "El reloj de Gladys va 1 minuto atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} minutos atrasado respecto a este dispositivo."
+      },
+      "hours": {
+        "one": "El reloj de Gladys va 1 hora atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} horas atrasado respecto a este dispositivo."
+      },
+      "days": {
+        "one": "El reloj de Gladys va 1 día atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} días atrasado respecto a este dispositivo."
+      }
+    }
+  },
+  "feedback": {
+    "link": "Dar mi opinión",
+    "subjectTopicTitle": "Mi opinión sobre la integración {{subject}}",
+    "generalTopicTitle": "Mi opinión sobre Gladys",
+    "topicBody": "**Lo que funciona bien:**\n\n\n**Lo que se podría mejorar:**\n\n\n---\n_Enviado desde Gladys v{{version}}_"
+  },
   "header": {
+    "clockNoticeTitle": "La hora de Gladys es incorrecta",
+    "clockNoticeText": "Las escenas programadas, el historial y la energía pueden ser incorrectos.",
+    "clockNoticeButton": "Comprobar el reloj",
+    "clockNoticeContactAdmin": "Avisa al administrador de tu casa.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Inicio",
     "chat": "Chat",
@@ -7488,6 +7677,10 @@
     "instanceUpdateNoticeButton": "Actualizar mi instancia",
     "instanceUpdateNoticeDismiss": "Ocultar este mensaje",
     "needHelp": "¿Necesita ayuda?",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú",
+    "collapseMenu": "Ocultar el menú",
+    "expandMenu": "Mostrar el menú",
     "signOut": "Cerrar sesión"
   },
   "gatewayLinkUser": {
@@ -7717,6 +7910,18 @@
       "other": "{{count}} seleccionados"
     },
     "validate": "Listo",
-    "title": "Elegir"
+    "title": "Elegir",
+    "sameKindHint": "Solo se muestran los dispositivos del mismo tipo: comparten una única condición."
+  },
+  "devicePickerField": {
+    "title": "Elegir dispositivos",
+    "choose": "Elegir dispositivos",
+    "edit": "Añadir o quitar dispositivos",
+    "titleOne": "Elegir un dispositivo",
+    "chooseOne": "Elegir un dispositivo",
+    "changeOne": "Cambiar de dispositivo",
+    "empty": "Ningún dispositivo seleccionado.",
+    "remove": "Quitar {{name}}",
+    "notFound": "Dispositivo no encontrado"
   }
 }
