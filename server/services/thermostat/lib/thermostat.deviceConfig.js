@@ -72,6 +72,13 @@ function buildParamsConfig(device) {
   // Fahrenheit thermostat, a 70 °F setpoint was clamped to 35 °F, and 35 °F was
   // its cooling stop setpoint (C.0).
   const defaultRange = defaultTempRange(tempUnit);
+  // A range with no width or an inverted one is refused at save time; one an
+  // older device still carries stands for the default range (D.0), for every
+  // reader at once: the clamp, the dial and the cooling stop setpoint, which
+  // read 8 °C off a 25 / 8 range and asked the unit to cool as hard as it can.
+  const savedMin = toNumber(getParam('THERMOSTAT_MIN_TEMP'), defaultRange.min);
+  const savedMax = toNumber(getParam('THERMOSTAT_MAX_TEMP'), defaultRange.max);
+  const tempRange = savedMin < savedMax ? { min: savedMin, max: savedMax } : defaultRange;
   return {
     temperature_features: temperatureFeatures,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
@@ -112,8 +119,8 @@ function buildParamsConfig(device) {
     ),
     default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
-    temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), defaultRange.min),
-    temp_max: toNumber(getParam('THERMOSTAT_MAX_TEMP'), defaultRange.max),
+    temp_min: tempRange.min,
+    temp_max: tempRange.max,
     temp_unit: tempUnit,
     // Null rather than the default when the param is absent: an absent duration
     // is a setting of its own — "hand the thermostat back at the next schedule

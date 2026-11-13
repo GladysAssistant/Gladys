@@ -475,10 +475,11 @@ function createActions(store) {
           storedStandbyOrder,
           pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
         );
-        // An inverted range bounds nothing anyone could mean: refused here, and
-        // by the server for a client writing the params directly (spec D.0). A
+        // An inverted range bounds nothing anyone could mean, and one with no
+        // width (20-20) pins the dial to a single value: refused here, and by
+        // the server for a client writing the params directly (spec D.0). A
         // heater regulating itself takes no range, and its fields are hidden.
-        if (!isPilotWireThermostat && minTemp > maxTemp) {
+        if (!isPilotWireThermostat && minTemp >= maxTemp) {
           store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'invertedRange' });
           return;
         }

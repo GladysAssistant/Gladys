@@ -3887,7 +3887,7 @@
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
         "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
         "pilotWireUnreadError": "The pilot wire picked could not be read, so the order it rests on cannot be checked: reload the page and pick it again.",
-        "invertedRangeError": "The minimum temperature must not be above the maximum.",
+        "invertedRangeError": "The minimum temperature must be below the maximum.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",
@@ -3906,7 +3906,7 @@
         },
         "sectionProgramming": "Programming",
         "deviceRangeHint": "The device advertises {{min}} – {{max}} °{{unit}}.",
-        "deviceRangeApply": "Use these values",
+        "deviceRangeApply": "Keep within this range",
         "rangeSection": "Temperature range"
       },
       "schedule": {

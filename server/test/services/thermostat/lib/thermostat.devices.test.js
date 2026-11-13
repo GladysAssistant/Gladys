@@ -184,6 +184,27 @@ describe('thermostat.createDevice', () => {
     assert.notCalled(handler.gladys.device.create);
   });
 
+  it('should refuse a temperature range with no width', async () => {
+    const handler = buildHandler();
+
+    let error = null;
+    try {
+      await handler.createDevice({
+        name: 'Salon',
+        features: [setpointFeature],
+        params: [
+          { name: 'THERMOSTAT_MIN_TEMP', value: '20' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '20' },
+        ],
+      });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(BadParameters);
+    assert.notCalled(handler.gladys.device.create);
+  });
+
   it('should accept a single bound within the default range, or a bound that is no number', async () => {
     const created = await buildHandler().createDevice({
       name: 'Salon',

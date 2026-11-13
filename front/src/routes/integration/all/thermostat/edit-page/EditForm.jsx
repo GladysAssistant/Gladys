@@ -340,10 +340,11 @@ const EditForm = ({ ...props }) => {
     </div>
   );
 
-  // Picking the real thermostat's setpoint feature adopts the range it
-  // advertises. A Netatmo says 5-30, and the 5-35 default then offered the user
-  // two degrees the device would refuse or silently clamp. Only the untouched
-  // defaults are replaced: a range the user has already narrowed is theirs.
+  // Picking the real thermostat's setpoint feature adopts the bounds it
+  // advertises that narrow the defaults. A Netatmo says 5-30, and the 5-35
+  // default then offered the user two degrees the device would refuse or
+  // silently clamp. Only the untouched defaults are replaced: a range the user
+  // has already narrowed is theirs.
   // The range the chosen real thermostat advertises, when it declares one in the
   // unit this form is in. Adopting it automatically covers the common path, but
   // only while the bounds are still untouched: this hint covers the rest — a
@@ -368,14 +369,26 @@ const EditForm = ({ ...props }) => {
     (!pickedTarget.unit || (pickedTarget.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? 'F' : 'C') === formUnit)
       ? { min: String(pickedTarget.min), max: String(pickedTarget.max) }
       : null;
-  // Shown only when the form does not already say the same thing.
+  // What the device's range would narrow the form's range to. A wider device
+  // range is never offered: Matter advertises the cluster's -100-200 °C whatever
+  // the appliance, and one click would hand the dial the range spec F keeps it
+  // out of. An emptied field stands for its default, as it does once saved.
+  const formDefaults = defaultTempRange(formUnit);
+  const formBound = (value, fallback) =>
+    value === '' || value === null || value === undefined || !Number.isFinite(Number(value)) ? fallback : Number(value);
+  const formMin = formBound(props.thermostatEditMinTemp, formDefaults.min);
+  const formMax = formBound(props.thermostatEditMaxTemp, formDefaults.max);
+  const narrowedRange = targetRange
+    ? { min: Math.max(formMin, Number(targetRange.min)), max: Math.min(formMax, Number(targetRange.max)) }
+    : null;
+  // Shown only when the device narrows the form's range, and leaves it a width.
   const rangeDiffers =
-    targetRange &&
-    (targetRange.min !== String(props.thermostatEditMinTemp) ||
-      targetRange.max !== String(props.thermostatEditMaxTemp));
+    !!narrowedRange &&
+    narrowedRange.min < narrowedRange.max &&
+    (narrowedRange.min !== formMin || narrowedRange.max !== formMax);
   const applyDeviceRange = () => {
-    props.updateThermostatField('thermostatEditMinTemp', targetRange.min);
-    props.updateThermostatField('thermostatEditMaxTemp', targetRange.max);
+    props.updateThermostatField('thermostatEditMinTemp', String(narrowedRange.min));
+    props.updateThermostatField('thermostatEditMaxTemp', String(narrowedRange.max));
   };
 
   const chooseTargetFeature = event => {
@@ -434,12 +447,16 @@ const EditForm = ({ ...props }) => {
     if (picked.unit && featureUnit !== (props.thermostatEditTempUnit || 'C')) {
       return;
     }
-    // Still at the defaults the form pre-fills, in its own unit (41-95 in °F).
+    // Still at the defaults the form pre-fills, in its own unit (41-95 in °F),
+    // and only a bound that narrows them, the rule the dial follows (spec F):
+    // Matter's -100-200 would otherwise be saved from a fold nobody opened.
     const defaults = defaultTempRange(props.thermostatEditTempUnit || 'C');
-    if (picked.min !== null && picked.min !== undefined && props.thermostatEditMinTemp === String(defaults.min)) {
+    const narrowsMin = picked.min !== null && picked.min !== undefined && Number(picked.min) > defaults.min;
+    const narrowsMax = picked.max !== null && picked.max !== undefined && Number(picked.max) < defaults.max;
+    if (narrowsMin && props.thermostatEditMinTemp === String(defaults.min)) {
       props.updateThermostatField('thermostatEditMinTemp', String(picked.min));
     }
-    if (picked.max !== null && picked.max !== undefined && props.thermostatEditMaxTemp === String(defaults.max)) {
+    if (narrowsMax && props.thermostatEditMaxTemp === String(defaults.max)) {
       props.updateThermostatField('thermostatEditMaxTemp', String(picked.max));
     }
   };

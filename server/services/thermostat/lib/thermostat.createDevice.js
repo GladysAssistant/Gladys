@@ -260,8 +260,9 @@ async function createDevice(device) {
     });
   }
 
-  // An inverted range bounds nothing anyone could mean: refused here as in the
-  // form, so a client writing the params directly cannot save one either. A
+  // An inverted range bounds nothing anyone could mean, and one with no width
+  // pins the dial to a single value: refused here as in the form, so a client
+  // writing the params directly cannot save one either. A
   // missing bound is the default its readers take, in the thermostat's unit:
   // a minimum of 40 saved alone was compared with the default maximum of 35 by
   // the clamp and the widget, and dropped for the default range without a word.
@@ -274,8 +275,8 @@ async function createDevice(device) {
     const defaults = defaultTempRange(paramValue('THERMOSTAT_TEMP_UNIT'));
     const min = toNumber(paramValue('THERMOSTAT_MIN_TEMP'), defaults.min);
     const max = toNumber(paramValue('THERMOSTAT_MAX_TEMP'), defaults.max);
-    if (min > max) {
-      throw new BadParameters(`Thermostat: the minimum temperature ${min} is above the maximum ${max}`);
+    if (min >= max) {
+      throw new BadParameters(`Thermostat: the minimum temperature ${min} is not below the maximum ${max}`);
     }
   }
 

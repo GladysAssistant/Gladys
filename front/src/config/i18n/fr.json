@@ -3887,7 +3887,7 @@
         "incompleteExternalError": "Un thermostat existant a besoin de la consigne du thermostat à piloter.",
         "incompletePilotWireError": "Un radiateur à fil pilote a besoin du fil pilote à commander.",
         "pilotWireUnreadError": "Le fil pilote choisi n'a pas pu être lu, l'ordre de repos ne peut donc pas être vérifié : rechargez la page et choisissez-le à nouveau.",
-        "invertedRangeError": "La température minimale ne doit pas être supérieure à la température maximale.",
+        "invertedRangeError": "La température minimale doit être inférieure à la température maximale.",
         "activeScheduleLabel": "Planning actif",
         "activeScheduleHelp": "Sélectionnez le planning à appliquer automatiquement à ce thermostat.",
         "noActiveSchedule": "Aucun planning (contrôle manuel)",
@@ -3906,7 +3906,7 @@
         },
         "sectionProgramming": "Programmation",
         "deviceRangeHint": "L’appareil annonce {{min}} – {{max}} °{{unit}}.",
-        "deviceRangeApply": "Utiliser ces valeurs",
+        "deviceRangeApply": "Rester dans cette plage",
         "rangeSection": "Plage de températures"
       },
       "schedule": {

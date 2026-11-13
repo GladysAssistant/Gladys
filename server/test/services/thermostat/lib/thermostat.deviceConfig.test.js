@@ -273,6 +273,24 @@ describe('thermostat.deviceConfig - getDeviceConfig', () => {
     expect(config.temp_max).to.equal(95);
   });
 
+  // Refused at save time, but an older device may still carry one: 8 was read
+  // as the cooling stop setpoint, and the unit asked to cool as hard as it can.
+  it('should read an inverted range as the default one', () => {
+    const config = getDeviceConfig(deviceWithParams({ THERMOSTAT_MIN_TEMP: '25', THERMOSTAT_MAX_TEMP: '8' }));
+
+    expect(config.temp_min).to.equal(5);
+    expect(config.temp_max).to.equal(35);
+  });
+
+  it('should read a range with no width as the default one, in the thermostat unit', () => {
+    const config = getDeviceConfig(
+      deviceWithParams({ THERMOSTAT_MIN_TEMP: '68', THERMOSTAT_MAX_TEMP: '68', THERMOSTAT_TEMP_UNIT: 'F' }),
+    );
+
+    expect(config.temp_min).to.equal(41);
+    expect(config.temp_max).to.equal(95);
+  });
+
   it('should leave the manual duration null when unset', () => {
     // An absent duration is the setting "hand the thermostat back at the next
     // schedule point": filling in the default here made that unreachable, since

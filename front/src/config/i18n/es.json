@@ -3887,7 +3887,7 @@
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
         "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
         "pilotWireUnreadError": "No se ha podido leer el hilo piloto elegido, así que no se puede comprobar la orden de reposo: recarga la página y vuelve a elegirlo.",
-        "invertedRangeError": "La temperatura mínima no debe ser superior a la temperatura máxima.",
+        "invertedRangeError": "La temperatura mínima debe ser inferior a la temperatura máxima.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",
         "noActiveSchedule": "Sin programación (control manual)",
@@ -3906,7 +3906,7 @@
         },
         "sectionProgramming": "Programación",
         "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
-        "deviceRangeApply": "Usar estos valores",
+        "deviceRangeApply": "Limitar a este rango",
         "rangeSection": "Rango de temperaturas"
       },
       "schedule": {

@@ -241,19 +241,19 @@ class ThermostatBox extends Component {
     const defaults = defaultTempRange(cfg.temp_unit);
     let min = numOr(cfg.temp_min, defaults.min);
     let max = numOr(cfg.temp_max, defaults.max);
-    // An inverted range is refused at save time; one an older device still
-    // carries stands for the default range, as on the server (D.0) — honoured,
-    // it turned + and − round. Compared before the unit conversion, whose
-    // rounding can make two distinct bounds equal (13 and 12.5 °C are both 55 °F).
-    if (min > max) {
+    // An inverted range, or one with no width, is refused at save time; one an
+    // older device still carries stands for the default range, as on the server
+    // (D.0) — honoured, it turned + and − round. Compared before the unit
+    // conversion, whose rounding can make two distinct bounds equal (13 and
+    // 12.5 °C are both 55 °F).
+    if (min >= max) {
       ({ min, max } = defaults);
     }
-    const distinct = min < max;
     min = this.toSetpointFeatureUnit(min);
     max = this.toSetpointFeatureUnit(max);
     // Two distinct bounds the conversion rounded together leave a dial with no
     // width: it takes the default range instead.
-    if (distinct && min >= max) {
+    if (min >= max) {
       min = this.toSetpointFeatureUnit(defaults.min);
       max = this.toSetpointFeatureUnit(defaults.max);
     }
@@ -267,7 +267,9 @@ class ThermostatBox extends Component {
     const featureMax = advertisedOrdered ? this.state.featureMax : null;
     const low = featureMin !== null ? Math.max(min, featureMin) : min;
     const high = featureMax !== null ? Math.min(max, featureMax) : max;
-    if (low <= high) {
+    // Two ranges that only touch (5-35 on a device advertising 35-60) leave a
+    // single value, a dial + and − do nothing on: no width is no range either.
+    if (low < high) {
       return { min: low, max: high };
     }
     // A range the device cannot reach would pin the dial to a single value: it

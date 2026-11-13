@@ -3,6 +3,7 @@ const { DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES, THERMOSTAT_MODE } = require
 const {
   DEFAULT_MANUAL_DURATION_MINUTES,
   THERMOSTAT_TYPES,
+  PILOT_WIRE_REGULATIONS,
   defaultTempRange,
 } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
@@ -172,31 +173,30 @@ async function holdExpiry(device) {
  * core routes a write on the service owning the feature, so on an external
  * thermostat a scene, the API, HomeKit and the widget's dial all write the real
  * device's feature (Matter, Netatmo...) and never reach this service. There the
- * dial is bounded by the widget (F). A `pilot-wire` thermostat is left alone
- * too: it takes no range, and a setpoint from a scene picks the nearest preset
- * (C.1.1) — bounded, 7 °C would become Comfort rather than Frost.
+ * dial is bounded by the widget (F). A heater that regulates itself is left
+ * alone too, whatever the thermostat's type — a `pilot-wire` one, or a virtual
+ * one driving a pilot wire with no room sensor: it takes no range, and a
+ * setpoint from a scene picks the nearest preset (C.1.1) — bounded, 7 °C would
+ * become Comfort rather than Frost.
  *
- * Missing params get the shared default range in the thermostat's unit, as in
- * the widget. So does an
- * inverted range, which the edit form and createDevice refuse but an older
- * device may still carry: the widget does the same, so the dial and a scene
- * agree.
+ * The config already carries the shared default range, in the thermostat's
+ * unit, for missing params and for an inverted range an older device may still
+ * carry: the widget reads the same, so the dial and a scene agree.
  * @param {object} config - The thermostat's params config.
  * @returns {{min: number, max: number}|null} The range, or null.
  * @example
  * manualRange(config); // { min: 8, max: 25 }
  */
 function manualRange(config) {
-  if (isExternal(config) || config.thermostat_type === THERMOSTAT_TYPES.PILOT_WIRE) {
+  const heaterRegulates =
+    config.thermostat_type === THERMOSTAT_TYPES.PILOT_WIRE ||
+    (!!config.pilot_wire_feature && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.HEATER);
+  if (isExternal(config) || heaterRegulates) {
     return null;
   }
+  // A thermostat with no params at all has no config: the default range.
   const defaults = defaultTempRange(config.temp_unit);
-  const min = toNumber(config.temp_min, defaults.min);
-  const max = toNumber(config.temp_max, defaults.max);
-  if (min > max) {
-    return defaults;
-  }
-  return { min, max };
+  return { min: toNumber(config.temp_min, defaults.min), max: toNumber(config.temp_max, defaults.max) };
 }
 
 /**

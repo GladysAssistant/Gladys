@@ -774,6 +774,43 @@ describe('thermostat.setValue', () => {
       assert.calledWith(handler.gladys.device.saveState, setpointFeature, 7);
     });
 
+    it('should leave a virtual thermostat alone when its heater regulates itself', async () => {
+      // A pilot wire and no room sensor: the heater regulates, and the setpoint
+      // picks the nearest preset as on a pilot-wire thermostat.
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'virtual' },
+          { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+          { name: 'THERMOSTAT_MIN_TEMP', value: '20' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+        ]),
+        setpointFeature,
+        7,
+      );
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 7);
+    });
+
+    it('should bound a virtual thermostat regulating a pilot wire on its room sensor', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'virtual' },
+          { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+          { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: 'room-temperature' },
+          { name: 'THERMOSTAT_MIN_TEMP', value: '20' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+        ]),
+        setpointFeature,
+        7,
+      );
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 20);
+    });
+
     it('should pass a value that is no number through untouched', async () => {
       const handler = buildHandler();
 
