@@ -38,9 +38,14 @@ const BOXES = [
 
 const message = (box, key, max) => Cypress.env('i18n').dashboard.boxes[box][key].replace('{{max}}', max);
 
-// The editors translate their aria-labels: select on the prefix of the active
-// locale ("Pin " in English, "Épingle " in French), not on English text.
-const labelPrefix = (box, key) => Cypress.env('i18n').dashboard.boxes[box][key].replace('{{index}}', '');
+// The editors translate their aria-labels, and the index is not always at the
+// end ("Pin 1", "Épingle 1", "Chip 1 entfernen"): match the text of the active
+// locale on both sides of it. An empty suffix is left out, since [attr$=""]
+// matches nothing.
+const labelSelector = (box, key) => {
+  const [before, after] = Cypress.env('i18n').dashboard.boxes[box][key].split('{{index}}');
+  return `[aria-label^="${before}"]${after ? `[aria-label$="${after}"]` : ''}`;
+};
 
 // The edit panel is a fixed, scrolling sheet: the message can sit below its
 // fold (the entry just added pushes it down), so scroll to it first.
@@ -82,10 +87,7 @@ describe('Dashboard editor list caps', () => {
   });
 
   it('stops placing house-view pins at the maximum and says why', () => {
-    const pinMarkers = `[data-cy="edit-panel"] span[role="button"][aria-label^="${labelPrefix(
-      'house-view',
-      'editPinLabel'
-    )}"]`;
+    const pinMarkers = `[data-cy="edit-panel"] span[role="button"]${labelSelector('house-view', 'editPinLabel')}`;
     const maxPinsMessage = message('house-view', 'maxPinsReached', MAX_PINS);
 
     cy.get('[data-cy="edit-box-0-0"]').click();
@@ -124,7 +126,7 @@ describe('Dashboard editor list caps', () => {
     cy.contains('[data-cy="edit-panel"] button', 'dashboard.boxes.chips.addChipButton')
       .should('not.be.disabled')
       .click();
-    cy.get(`[data-cy="edit-panel"] button[aria-label^="${labelPrefix('chips', 'removeChipButton')}"]`).should(
+    cy.get(`[data-cy="edit-panel"] button${labelSelector('chips', 'removeChipButton')}`).should(
       'have.length',
       MAX_CHIPS
     );
@@ -139,7 +141,7 @@ describe('Dashboard editor list caps', () => {
     cy.contains('[data-cy="edit-panel"] button', 'dashboard.boxes.actions.addActionButton')
       .should('not.be.disabled')
       .click();
-    cy.get(`[data-cy="edit-panel"] button[aria-label^="${labelPrefix('actions', 'removeActionButton')}"]`).should(
+    cy.get(`[data-cy="edit-panel"] button${labelSelector('actions', 'removeActionButton')}`).should(
       'have.length',
       MAX_ACTIONS
     );
