@@ -121,6 +121,40 @@ const DashboardSettingsForm = ({ children, ...props }) => (
         onChange={e => props.updateCurrentDashboardProperty('icon', e.target.value)}
       />
     </div>
+    {/* Deleting is rare and irreversible: it lives here, at the end of the
+        settings, behind an explicit confirmation — not next to Save */}
+    <div class={style.dangerZone}>
+      {!props.askDeleteDashboard && (
+        <button
+          type="button"
+          class={style.dangerButton}
+          onClick={props.askDeleteCurrentDashboard}
+          data-cy="delete-dashboard-button"
+        >
+          <i class="fe fe-trash-2" />
+          <Text id="dashboard.editDashboardDeleteThisDashboard" />
+        </button>
+      )}
+      {props.askDeleteDashboard && (
+        <div role="alert">
+          <p class={style.dangerText}>
+            <Text id="dashboard.editDashboardDeleteText" />
+          </p>
+          <button
+            type="button"
+            class={style.dangerButton}
+            onClick={props.deleteCurrentDashboard}
+            data-cy="delete-dashboard-confirm"
+          >
+            <i class="fe fe-trash-2" />
+            <Text id="dashboard.editDashboardDeleteForever" />
+          </button>
+          <button type="button" class={style.dangerCancel} onClick={props.cancelDeleteCurrentDashboard}>
+            <Text id="dashboard.editDashboardCancelButton" />
+          </button>
+        </div>
+      )}
+    </div>
   </div>
 );
 

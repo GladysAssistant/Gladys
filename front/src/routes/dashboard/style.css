@@ -981,6 +981,19 @@
   min-width: 13rem;
 }
 
+/* first letter of a dashboard without icon (DashboardTabs) — sized like
+   the icon glyph it replaces so the pills keep one rhythm */
+.dashboardTabLetter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15em;
+  height: 1.15em;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .dashboardTabsMenuIcon {
   margin-right: 0.5rem;
 }
@@ -1888,5 +1901,31 @@
     background-color: #fff !important;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+  }
+}
+
+/* ============================================================
+   Phone order of a section (section.mobile_order = rows): below the
+   700px columns breakpoint the columns stack; in "rows" order the
+   section reads row by row instead — the first widget of every column,
+   then the second… The columns dissolve (display: contents) and each
+   widget's wrapper takes its place in the section row through order.
+   Above the breakpoint the wrapper is display: contents itself, so the
+   columns, the stretch chain and every desktop rule are untouched.
+   ============================================================ */
+.mobileOrderItem {
+  display: contents;
+}
+
+@media (max-width: 699.98px) {
+  /* !important: the column carries Bootstrap's d-flex, whose
+     display: flex is itself !important */
+  .mobileRowsOrder > .dashboardColumn {
+    display: contents !important;
+  }
+
+  .mobileRowsOrder .mobileOrderItem {
+    display: block;
+    width: 100%;
   }
 }
