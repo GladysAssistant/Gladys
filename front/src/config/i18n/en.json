@@ -3613,6 +3613,23 @@
         "nodeDetailsLabel": "Node Details",
         "actionsLabel": "Actions",
         "decommissionButton": "Decommission",
+        "decommission": {
+          "confirmMessage": "<b>Decommission this node?</b> The appliance will leave the Gladys Matter network and will have to be paired again to be used in Gladys.",
+          "linkedDevices": "Gladys devices created from this node:",
+          "deleteDevicesLabel": "Also delete these devices from Gladys",
+          "deleteDevicesHelp": "Their history is deleted, and the scenes and dashboards using them will have to be updated. Leave this box unchecked to keep them: they are no longer updated until the appliance is paired again, and the \"Devices\" tab will then offer to update them, which keeps their history, scenes and dashboards.",
+          "confirmButton": "Yes, decommission",
+          "cancelButton": "Cancel",
+          "error": "An error occurred while decommissioning the node \"{{name}}\", it has not been removed.",
+          "noResponse": "No answer from Gladys while decommissioning the node \"{{name}}\" (connection lost or too slow). It may have been removed anyway: the list of nodes below has been reloaded.",
+          "success": "The node \"{{name}}\" has been decommissioned.",
+          "devicesDeleted": {
+            "singular": "{{count}} Gladys device has been deleted.",
+            "plural": "{{count}} Gladys devices have been deleted."
+          },
+          "forcedWarning": "The appliance \"{{name}}\" could not be reached: it has been removed from the Gladys Matter network, but it has not been told. Factory reset it before pairing it again.",
+          "devicesNotDeleted": "These Gladys devices could not be deleted, most likely because their history is too large. Gladys is cleaning it: try again later from the \"Devices\" tab."
+        },
         "noNodesFound": "No Matter nodes found. You can add a Matter device by going to the \"Add Device\" tab.",
         "disabledWarning": "Matter is not activated. Please activate it in <a href=\"/dashboard/integration/device/matter/settings\">Settings</a> before using the integration",
         "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",

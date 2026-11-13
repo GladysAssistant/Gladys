@@ -3613,6 +3613,23 @@
         "nodeDetailsLabel": "Detalles del nodo",
         "actionsLabel": "Acciones",
         "decommissionButton": "Retirar",
+        "decommission": {
+          "confirmMessage": "<b>¿Retirar este nodo?</b> El dispositivo saldrá de la red Matter de Gladys y tendrá que emparejarse de nuevo para usarse en Gladys.",
+          "linkedDevices": "Dispositivos de Gladys creados a partir de este nodo:",
+          "deleteDevicesLabel": "Eliminar también estos dispositivos de Gladys",
+          "deleteDevicesHelp": "Su historial se elimina, y las escenas y los paneles que los utilizan tendrán que actualizarse. Deje esta casilla sin marcar para conservarlos: ya no se actualizarán hasta que el dispositivo se empareje de nuevo, y la pestaña «Dispositivos» ofrecerá entonces actualizarlos, lo que conserva su historial, sus escenas y sus paneles.",
+          "confirmButton": "Sí, retirar",
+          "cancelButton": "Cancelar",
+          "error": "Se produjo un error al retirar el nodo «{{name}}», no se ha eliminado.",
+          "noResponse": "Gladys no respondió al retirar el nodo «{{name}}» (conexión perdida o demasiado lenta). Es posible que se haya eliminado de todos modos: la lista de nodos de abajo se ha recargado.",
+          "success": "El nodo «{{name}}» ha sido retirado.",
+          "devicesDeleted": {
+            "singular": "Se ha eliminado {{count}} dispositivo de Gladys.",
+            "plural": "Se han eliminado {{count}} dispositivos de Gladys."
+          },
+          "forcedWarning": "No se pudo contactar con el dispositivo «{{name}}»: se ha retirado de la red Matter de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
+          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar, probablemente porque su historial es demasiado grande. Gladys lo está limpiando: inténtelo más tarde desde la pestaña «Dispositivos»."
+        },
         "noNodesFound": "No se encontró ningún nodo Matter. Puede añadir un dispositivo Matter yendo a la pestaña \"Añadir dispositivo\".",
         "disabledWarning": "Matter no está activado. Actívelo en <a href=\"/dashboard/integration/device/matter/settings\">Configuración</a> antes de utilizar la integración",
         "disabledWarningSettings": "Matter no está activado; haga clic en el botón de abajo para activarlo.",

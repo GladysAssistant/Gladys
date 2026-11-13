@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const logger = require('../../../utils/logger');
+const { getGladysDevicesOfNode } = require('../utils/getGladysDevicesOfNode');
 
 const convertDevice = (device) => {
   const clusterClients = [];
@@ -32,11 +33,14 @@ const convertDevice = (device) => {
 
 /**
  * @description Get the nodes.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.withGladysDevices] - Also list the Gladys devices created from each node
+ * (shown before a decommission).
  * @returns {Promise<Array>} The nodes.
  * @example
- * const nodes = await matterHandler.getNodes();
+ * const nodes = await matterHandler.getNodes({ withGladysDevices: true });
  */
-async function getNodes() {
+async function getNodes({ withGladysDevices = false } = {}) {
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
   const filteredNodeDetails = nodeDetails.filter((nodeDetail) => {
     if (!nodeDetail.deviceData || !nodeDetail.deviceData.basicInformation) {
@@ -51,6 +55,9 @@ async function getNodes() {
     return {
       node_id: nodeDetail.nodeId.toString(),
       is_connected: node.isConnected,
+      ...(withGladysDevices && {
+        gladys_devices: getGladysDevicesOfNode(this.gladys.stateManager, nodeDetail.nodeId),
+      }),
       devices: devices.map((device) => {
         return convertDevice(device);
       }),
