@@ -1,7 +1,6 @@
 import { Component, createRef } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import get from 'get-value';
 import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
@@ -10,6 +9,7 @@ import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
 import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
 import ClockOffsetNotice from './ClockOffsetNotice';
+import FeedbackLink from '../feedback/FeedbackLink';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import style from './style.css';
 
@@ -182,10 +182,8 @@ class Header extends Component {
     if (this.isHidden()) {
       return null;
     }
-    // Adapt forum URL to user language
-    const userLanguage = get(props, 'user.language');
-    const forumUrl =
-      userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://community.gladysassistant.com/';
+    // The forum is bilingual: one URL whatever the user's language
+    const forumUrl = 'https://community.gladysassistant.com/';
     const showInstanceUpdateNotice =
       isInstanceBehindFront(props.instanceGladysVersion) && !isUpdateNoticeDismissed(props.instanceGladysVersion);
     const showClockOffsetNotice = Number.isFinite(props.clockOffset);
@@ -324,6 +322,9 @@ class Header extends Component {
               <a class="dropdown-item" href={forumUrl} target="_blank" rel="noopener noreferrer">
                 <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
               </a>
+              <FeedbackLink className="dropdown-item" dataCy="header-feedback-link">
+                <i class="dropdown-icon fe fe-message-circle" /> <Text id="feedback.link" />
+              </FeedbackLink>
               <a class="dropdown-item" href="" onClick={props.logout}>
                 <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />
               </a>

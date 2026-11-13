@@ -584,3 +584,21 @@
 .dark-mode .glass-theme .page .card .list-group-item {
   background-color: transparent !important;
 }
+
+/* The "give your feedback" link of the integration sub-pages, on the back
+   link's row: a quiet muted link, not a button — the page is there to
+   configure the integration, the link must not compete with it */
+.glass-theme .page .hz-feedback-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gl-muted);
+}
+
+.glass-theme .page .hz-feedback-link:hover,
+.glass-theme .page .hz-feedback-link:focus {
+  color: var(--gl-ink);
+  text-decoration: none;
+}

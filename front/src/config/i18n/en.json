@@ -7631,6 +7631,12 @@
       }
     }
   },
+  "feedback": {
+    "link": "Give feedback",
+    "subjectTopicTitle": "My feedback on the {{subject}} integration",
+    "generalTopicTitle": "My feedback on Gladys",
+    "topicBody": "**What works well:**\n\n\n**What could be improved:**\n\n\n---\n_Sent from Gladys v{{version}}_"
+  },
   "header": {
     "clockNoticeTitle": "Gladys's clock is wrong",
     "clockNoticeText": "Scheduled scenes, history and energy may be wrong.",
