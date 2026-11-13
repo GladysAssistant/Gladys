@@ -9,6 +9,7 @@ const {
   DASHBOARD_WIDTH_LIST,
   DASHBOARD_BACKGROUND_SCENE_LIST,
   DASHBOARD_SECTION_MOBILE_ORDER_LIST,
+  DASHBOARD_BOX_MAX_ITEMS,
 } = require('../utils/constants');
 const {
   WIDGET_KEY_REGEX,
@@ -107,7 +108,7 @@ const boxSchema = Joi.object().keys({
         icon: Joi.string(),
       }),
     )
-    .max(20),
+    .max(DASHBOARD_BOX_MAX_ITEMS.HOUSE_VIEW_PINS),
   // chips box: an ordered list of compact state pills
   chips: Joi.array()
     .items(
@@ -124,7 +125,7 @@ const boxSchema = Joi.object().keys({
         calendar_event_name_filter: Joi.string().allow(''),
       }),
     )
-    .max(20),
+    .max(DASHBOARD_BOX_MAX_ITEMS.CHIPS),
   // actions box: an ordered list of compact command buttons. A device-feature
   // action without a value toggles a binary feature; with a value it sends
   // that value (e.g. COVER_STATE open/stop/close for shutters).
@@ -141,7 +142,7 @@ const boxSchema = Joi.object().keys({
         value: Joi.number(),
       }),
     )
-    .max(20),
+    .max(DASHBOARD_BOX_MAX_ITEMS.ACTIONS),
   // external-widget box: a widget declared by an installed external
   // integration. `settings` is bounded in size but NOT validated against the
   // manifest here — the box schema is static and manifest-independent, the

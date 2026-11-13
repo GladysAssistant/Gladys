@@ -2444,6 +2444,18 @@ const DASHBOARD_BACKGROUND_SCENE = {
   MIST: 'mist',
 };
 
+// Maximum number of entries in the list fields of a dashboard box. Shared by
+// the box schema (server/models/dashboard.js) and the box editors, which stop
+// adding entries at the cap and say so, instead of letting the save fail
+// (docs/specs/dashboard-flexible-layout-and-widgets.md).
+const DASHBOARD_BOX_MAX_ITEMS = {
+  // house-view: a whole house is easily one temperature + one humidity + one
+  // opening per room, so the pins get more room than the compact bars
+  HOUSE_VIEW_PINS: 50,
+  CHIPS: 20,
+  ACTIONS: 20,
+};
+
 const ERROR_MESSAGES = {
   HOUSE_HAS_NO_COORDINATES: 'HOUSE_HAS_NO_COORDINATES',
   SERVICE_NOT_CONFIGURED: 'SERVICE_NOT_CONFIGURED',
@@ -2801,6 +2813,7 @@ module.exports.DASHBOARD_SECTION_MOBILE_ORDER = DASHBOARD_SECTION_MOBILE_ORDER;
 module.exports.DASHBOARD_SECTION_MOBILE_ORDER_LIST = DASHBOARD_SECTION_MOBILE_ORDER_LIST;
 module.exports.DASHBOARD_BACKGROUND_SCENE = DASHBOARD_BACKGROUND_SCENE;
 module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST;
+module.exports.DASHBOARD_BOX_MAX_ITEMS = DASHBOARD_BOX_MAX_ITEMS;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
 

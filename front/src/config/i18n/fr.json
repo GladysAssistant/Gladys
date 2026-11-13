@@ -923,6 +923,7 @@
         "editLabelLabel": "Libellé (optionnel)",
         "editLabelPlaceholder": "ex : Garage",
         "addChipButton": "Ajouter une pastille",
+        "maxChipsReached": "Cette barre accueille au maximum {{max}} pastilles : supprimez-en une pour en ajouter une nouvelle.",
         "openings": "{{count}} ouvert(s)",
         "allClosed": "Tout fermé",
         "noEvent": "Aucun événement à venir",
@@ -955,6 +956,7 @@
         "labelLabel": "Libellé du bouton (optionnel)",
         "labelPlaceholder": "Ouvrir RDC…",
         "addActionButton": "Ajouter une action",
+        "maxActionsReached": "Ce widget accueille au maximum {{max}} actions : supprimez-en une pour en ajouter une nouvelle.",
         "noActions": "Aucune action configurée pour l'instant. Éditez le tableau de bord pour en ajouter."
       },
       "house-view": {
@@ -971,6 +973,7 @@
         "editPinFeatureLabel": "Fonctionnalité de l'appareil",
         "editPinLabelLabel": "Libellé (optionnel)",
         "editPinLabelPlaceholder": "ex : Solaire",
+        "maxPinsReached": "Ce widget accueille au maximum {{max}} épingles : supprimez-en une pour en poser une nouvelle.",
         "noImage": "Choisissez une illustration dans les réglages du widget.",
         "error": "L'image n'a pas pu être chargée."
       },

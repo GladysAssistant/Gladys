@@ -103,6 +103,11 @@
   cursor: crosshair;
 }
 
+/* the pin cap is reached: a click on the image no longer places a pin */
+.editImageFull {
+  cursor: default;
+}
+
 .editPinNumber {
   position: absolute;
   transform: translate(-50%, -50%);

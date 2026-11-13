@@ -10,7 +10,12 @@ import { HOUSE_VIEW_GALLERY } from './gallery';
 import { resolveHouseViewImage } from './HouseViewBox';
 import { prepareImageUpload } from '../../../utils/downscaleImage';
 import { startPinDrag, percentFromPointer, clampPercent } from './pinDrag';
+import { DASHBOARD_BOX_MAX_ITEMS } from '../../../../../server/utils/constants';
 import style from './style.css';
+
+// The server refuses a box holding more pins than this: the editor stops
+// placing pins at the cap and says so, instead of failing on save.
+const MAX_PINS = DASHBOARD_BOX_MAX_ITEMS.HOUSE_VIEW_PINS;
 
 // Keyboard nudge on a focused pin: one percent per key press, a tenth with
 // shift for the last bit of precision.
@@ -62,8 +67,11 @@ class EditHouseViewBox extends Component {
   };
 
   addPinOnImage = e => {
-    const position = percentFromPointer(e.currentTarget.getBoundingClientRect(), e.clientX, e.clientY);
     const pins = this.props.box.pins || [];
+    if (pins.length >= MAX_PINS) {
+      return;
+    }
+    const position = percentFromPointer(e.currentTarget.getBoundingClientRect(), e.clientX, e.clientY);
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       pins: [...pins, { ...position, device_feature: undefined }]
     });
@@ -140,6 +148,7 @@ class EditHouseViewBox extends Component {
   render(props, { imageUrl, uploading, uploadError }) {
     const selectedImage = props.box.image || '';
     const pins = props.box.pins || [];
+    const maxPinsReached = pins.length >= MAX_PINS;
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.house-view">
         <div class="form-group">
@@ -204,7 +213,7 @@ class EditHouseViewBox extends Component {
             </small>
             <div class={style.imageWrapper} ref={this.attachImageWrapper}>
               <img
-                class={cx(style.image, style.editImage)}
+                class={cx(style.image, style.editImage, { [style.editImageFull]: maxPinsReached })}
                 src={imageUrl}
                 alt=""
                 ref={this.attachImage}
@@ -227,6 +236,11 @@ class EditHouseViewBox extends Component {
                 </Localizer>
               ))}
             </div>
+            {maxPinsReached && (
+              <div class="alert alert-info mt-2 mb-0">
+                <Text id="dashboard.boxes.house-view.maxPinsReached" fields={{ max: MAX_PINS }} />
+              </div>
+            )}
             {pins.map((pin, index) => (
               <div class="card p-3 mt-2 mb-0">
                 <div class="d-flex justify-content-between align-items-center mb-2">
