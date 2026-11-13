@@ -176,6 +176,9 @@ the new parent would close a cycle (as before).
 ## F. Integrations
 
 - Zigbee2mqtt, Tasmota, MQTT, Enedis and the external integrations keep their derivation.
+- **Zigbee2mqtt** also derives the 30-minute production of every production index
+  (`addProductionFeatures`, `<index>_production`, filled by the production job), never attached to
+  a meter, and keeps it on rediscovery.
 - **Matter** derives the energy features of a published cumulative index at discovery (the
   paired devices of `GET /api/v1/service/matter/paired-device`), like Zigbee2mqtt: the features
   already in Gladys keep their id and their parent — **a root included**: `addEnergyFeatures`
@@ -208,4 +211,5 @@ the new parent would close a cycle (as before).
   uniqueness, nothing written on a sound hierarchy.
 - Matter: derived features added, ids and parents of existing features kept, derived features
   re-injected, no bogus selector.
+- Zigbee2mqtt: the production features derived and kept on rediscovery.
 - Front: Cypress spec of the page (meters, unattached devices, meter select).
