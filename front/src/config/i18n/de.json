@@ -4946,7 +4946,7 @@
       "orWhen": "Oder wenn…",
       "thenSubtitle": "der Reihe nach, von oben nach unten",
       "addFirstStep": "Ersten Schritt hinzufügen",
-      "swipeHint": "Tippe auf eine Zeile, um sie zu ändern. Wische sie nach links, um sie zu löschen.",
+      "swipeHint": "Tippe auf eine Zeile, um sie zu ändern. Wische sie nach links, um sie zu löschen. Halte einen Schritt gedrückt, um ihn zu verschieben.",
       "settingsMenu": "Name, Symbol und Tags",
       "reorderMenu": "Schritte neu anordnen",
       "deleteScene": "Szene löschen",

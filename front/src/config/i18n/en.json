@@ -4946,7 +4946,7 @@
       "orWhen": "Or when…",
       "thenSubtitle": "in order, from top to bottom",
       "addFirstStep": "Add a first step",
-      "swipeHint": "Tap a row to change it. Swipe it to the left to delete it.",
+      "swipeHint": "Tap a row to change it. Swipe it to the left to delete it. Press and hold a step to move it.",
       "settingsMenu": "Name, icon and tags",
       "reorderMenu": "Reorder the steps",
       "deleteScene": "Delete the scene",

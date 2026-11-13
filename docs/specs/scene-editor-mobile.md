@@ -5,8 +5,8 @@
 > changes, local draft, save errors, step summaries). **Rule: any PR that changes one of these
 > behaviors modifies this file in the same diff.**
 >
-> Status: **phase 1 implemented** (sections C to F). Section G lists what is designed but not built
-> yet.
+> Status: **phases 1 and 2 implemented** (sections C to F). Section G lists what is designed but
+> not built yet.
 
 ## A. Context
 
@@ -33,29 +33,52 @@ model that never loses work.
 
 ## B. Scope and principles
 
-- **Breakpoint.** "Mobile" is a viewport narrower than **768 px** (`(max-width: 767.98px)`),
-  evaluated with `matchMedia` and re-evaluated when it changes (rotation, window resize). From
-  768 px up, the list and the editor keep their current layout.
+- **Breakpoint.** "Mobile" is a viewport narrower than **768 px**, or **a phone held in
+  landscape**: a touch screen at most 500 px high
+  (`(max-width: 767.98px), (max-height: 500px) and (pointer: coarse)`, `utils/mobileViewport.js`),
+  evaluated with `matchMedia` and re-evaluated when it changes (rotation, window resize). A phone
+  in landscape is wider than 768 px, but it is the same device: turning it must not swap the
+  mobile editor for the desktop one in the middle of an edit (open sheets and all). A tablet is
+  higher than 500 px and a low desktop window has a mouse: both keep the current layout, as does
+  every other screen from 768 px up.
+- **Landscape.** On a low screen the content keeps the width of a phone (40 rem, centered, clear
+  of the notch through the safe-area insets), a sheet is a dialog taking the height there is, and
+  the bottom bar is thinner.
 - **No data model or API change.** The mobile editor edits the same `scene` object with the same
   mutations as the desktop editor (`front/src/routes/scene/edit-scene/index.js`: `addAction`,
   `deleteAction`, `deleteActionGroup`, `moveCardGroup`, `updateActionProperty`, `addTrigger`…). The
   variable-path bookkeeping those mutations carry (renaming `{{1.0.…}}` references when steps move)
   is therefore shared, never re-implemented.
 - **The step and trigger parameter forms are shared.** A sheet renders the very component the
-  desktop card renders (`actionComponents.js`, `TriggerParams.jsx`). Phase 1 changes the shell
-  around the forms, not the forms themselves (except the shared fixes of section C).
+  desktop card renders (`actionComponents.js`, `TriggerParams.jsx`). The sheet dresses that form
+  for a phone (E.11) — its styles, plus a few fields that render another control below 768 px
+  (the device fields of E.10, the times, dates and days of E.11) — but there is one form per step
+  type, never a mobile copy of it.
 - **Mobile-native means:** one decision per screen or sheet, primary actions in the bottom third,
   rare actions behind "•••", every touch target ≥ 44 px, fields ≥ 16 px, no nested scroll areas,
   and nothing destructive without an undo or a confirmation.
 
 ## C. Behaviors shared by every screen size
 
-### C.1 Step summaries name things
+### C.1 Summaries name things
 
-A collapsed step (desktop card, mobile row) shows a one-line summary (`summary.js`). Light, switch
-and blink steps show **device names** (resolved through the devices the editor loads), not
-selectors: "Kitchen spots", not `kitchen-spots`. A selector whose device is unknown (deleted, or
-devices not loaded yet) is shown as is.
+A collapsed step or trigger (desktop card, mobile row) shows a short summary (`summary.js`). **A
+summary never shows an identifier whose name the editor knows:**
+
+- **Devices and features** (resolved through the devices the editor loads): "Kitchen spots", not
+  `kitchen-spots`. A device state trigger names its feature ("Living room sensor (Temperature)");
+  with several features of one kind, the device names alone ("Hall motion, Bedroom motion").
+- **Values**: the label of a constant ("Open", not `1`), a number with its unit ("< 18 °C"), and
+  the operators as signs (≠, ≥, ≤).
+- **Users, houses, scenes, calendars and areas**: the first name of the user, the name of the
+  others ("Tony · Home", not `tony · home`; "Good night", not `good-night-ob31`). The editor loads
+  those lists when it opens (`getNames`: one request per list, each failing on its own).
+- **Variables**: the label the step exposing it declared — a condition reads "Living room sensor
+  (Temperature) < 19", not `0.0.last_value < 19`, and a text typed with variables shows them
+  between brackets ("It is [Living room sensor (Temperature)] °C").
+
+Anything unknown (deleted, or not loaded yet) is shown as is. On a phone a summary takes up to
+**two lines** in the editor: its end is often what matters.
 
 ### C.2 Unsaved changes are never lost silently
 
@@ -148,7 +171,7 @@ scene.
 
 ### D.2 A scene row
 
-A row is ≥ 64 px high and holds: the scene icon tile (44 px), the name (16 px, one line), the
+A row is ≥ 64 px high and holds: the scene icon tile (44 px), the name (16 px, two lines at most), the
 description (one line, ellipsis), and a third line with the last execution ("Last run 6 hours ago",
 from `last_executed`, relative and localized; "Never run" when null). The scene manager stamps
 `last_executed` when a run starts (`scene.execute`: a write that is not awaited, never fails the
@@ -189,7 +212,9 @@ unchanged and stays reachable.
 
 - The app's mobile top bar is hidden while the editor is shown (`body.gladys-focus-page`); the
   editor brings its own **navigation bar** (56 px): "‹ Scenes" on the left (the leave guard of C.2
-  applies), the scene icon and name in the middle (tap = scene settings), "•••" on the right.
+  applies), the scene icon and name in the middle (tap = scene settings), "•••" on the right. The
+  two sides share the room the name leaves: a short name is centered, a long one is only cut
+  when it reaches the buttons.
 - Under it, a **status line**: "Scene active / disabled" with a labelled switch (patched on its own,
   as today) and the last execution.
 - The content scrolls between the navigation bar and the **bottom bar** (E.7); there is no other
@@ -229,14 +254,33 @@ The action groups of the root level render as a **numbered vertical timeline**:
 
 ### E.4 Sheets
 
-- Tapping a row opens **its sheet**: a bottom sheet (portaled on `<body>`, closing on the backdrop,
-  on "OK" and on Escape, page scroll locked while open, focus kept inside) titled with the type
-  label, holding **the parameter form of that step or trigger**, followed by a list of actions:
+- Tapping a row opens **its sheet**: a bottom sheet (portaled on `<body>`, page scroll locked
+  while open, focus kept inside) titled with the type label, holding **the parameter form of that
+  step or trigger**, followed by a list of actions:
   - for a step: **Add a simultaneous action** (not for if/while), **Insert a step after** (root
     steps only), **Delete the step**;
   - for a trigger: **Delete the trigger**;
   - for an if/while block: its own fields (the while's max iterations), its **conditions as rows**
-    (each opening its own sheet, stacked above) and "+ Add a condition".
+    (each opening its own sheet, stacked above) and "+ Add a condition". The conditions are
+    combined with an AND, **written between two rows** as between the boxes of the desktop block.
+- **Closing a sheet** (`components/sheet/BottomSheet.jsx`). A form sheet shows **OK** (a 44 px
+  pill), a sheet with nothing to validate (a picker, a menu) a **×** at the same place. Every
+  sheet also closes on its backdrop, on Escape, and:
+  - **dragged down**: the sheet follows a finger that takes it by its handle or its header, or by
+    its content once that content is scrolled back to its top (never from a field, a slider or a
+    row being swiped). Released past 30 % of its height (140 px at most) or flicked, it closes;
+    otherwise it goes back up. The centered dialog of wider screens does not move.
+  - with **the system "back"** (the Android button, the iOS edge swipe, the browser button): it
+    closes the sheet on top instead of leaving the editor, one sheet per press
+    (`sheetHistory.js`). While a sheet is open, one history entry of the same URL sits above the
+    page's one. That entry is never popped by the code when the sheet closes another way (a
+    `history.back()` is asynchronous: a navigation started right after would be undone): it stays
+    and is reused by the next sheet, a "back" leaving it with no sheet open is passed on at once
+    (the user leaves the page in one press), and a navigation started from a sheet (the leave
+    guard, the delete confirmation, "Duplicate", the creation of a scene) **replaces** it, so
+    "back" from the next page lands on the editor once.
+  - A closing sheet **slides out** while its backdrop fades (200 ms).
+- A sheet title takes one line whenever it fits between the buttons, two otherwise.
 - Sheets **stack**: a condition sheet opens above its block's sheet; closing it returns to the
   block.
 - **Invariant — every form stays mounted.** The step and trigger forms register the variables they
@@ -295,11 +339,19 @@ A frosted bar fixed at the bottom (above the safe area) whose content follows th
 A sheet with: **Name, icon and tags** (the settings form in a sheet), **Reorder steps**, **Duplicate
 the scene** (the existing duplicate page), and **Delete the scene** (destructive, confirmed — E.6).
 
-### E.9 Reorder mode
+### E.9 Reordering the steps
 
-Lists the root steps with a ⊖ delete button and ↑ / ↓ buttons (44 px each) per step; the moves go
-through `moveCardGroup`, so variable references follow the steps. "Done" (bottom bar or navigation
-bar) leaves the mode. Steps inside branches keep their order in this phase (G).
+- **A long press** (≈ 0.4 s without moving) on a root step of the timeline lifts it
+  (`mobile/timelineDrag.js`): it follows the finger, the other steps slide to make room, and
+  releasing drops it there. A press that moves before the delay stays what it was — a scroll, or
+  the swipe of the row — and a long press released without moving does nothing (it is not a tap
+  either: no sheet opens). The page scrolls by itself when the finger nears the top or the bottom
+  of the visible timeline, once it has gone that way. A hint under the timeline says so.
+- **Reorder mode** ("•••" menu) is the equivalent without a gesture: it lists the root steps with
+  a ⊖ delete button and ↑ / ↓ buttons (44 px each) per step. "Done" (bottom bar or navigation
+  bar) leaves the mode.
+- Both go through `moveCardGroup`, so variable references follow the steps. Steps inside branches
+  keep their order (G).
 
 ### E.10 Device fields: the picker sheet
 
@@ -358,6 +410,38 @@ exists keeps its row in the field ("Device not found", removable), and is never 
 validation of the picker. No data contract changes: the forms write the same `devices` /
 `device_features` arrays.
 
+### E.11 Forms dressed for a phone
+
+The forms of the desktop cards mix native selects, react-selects, text fields, checkboxes and
+tabs, each with the look of its library, under paragraphs of explanation. In a sheet they are
+dressed by the card that holds them (`mobile/SheetForm.jsx` and the "sheet forms" styles of
+`mobile.css`), without a second copy of any form:
+
+- **One look for every field**: text fields, native selects, react-selects and fields with
+  variables are 48 px high with the same border, radius and focus ring; every list shows the
+  same chevron; a field and its unit are one control.
+- **A checkbox is a row** — its label on the left, a switch (51 × 31 px) on the right, the whole
+  row being the target.
+- **"Simple / Computed"** is a segmented control; buttons inside a form are 44 px.
+- **Explanations are footnotes**: one size (13 px) and one gray. An explanation longer than 120
+  characters is **folded on two lines** with a chevron; a tap (or Enter / Space) opens it, another
+  folds it back. Colored alerts are warnings: never folded. Unfolding is not an edit (C.2). The
+  card marks the help texts of the forms as it finds them (`data-help-fold`) and watches for the
+  ones a form adds later, so every form — the ones declared by integrations included — gets it.
+- **Variables** inserted in a text are accent pills, with a 24 px remove button.
+- **Times and dates** use the native field of the system (`<input type="time">` /
+  `type="date"`: the wheels of iOS, the clock of Android) instead of the desktop picker — a list
+  of times opening over the sheet (`components/scene/PhoneNativeField.jsx`; scheduled trigger,
+  time condition). The stored formats do not change (`HH:mm`, `yyyy-MM-dd`).
+- **Days of the week** are seven toggles on one line (`components/scene/DayPills.jsx`: short
+  names in the user's language, 44 px, `aria-pressed`) instead of a multi-select of seven options
+  (scheduled trigger, time ranges, time condition). The selection is stored in the order of the
+  week, as before; the time ranges keep their rule (the last day cannot be unticked).
+- **The table of the time ranges** stacks: start, end and the delete button on one line, the
+  duration under them. Nothing scrolls sideways in a sheet.
+
+From 768 px the forms are untouched.
+
 ## F. Accessibility and motion
 
 - Every control is a real `<button>`/`<a>`/`<input>`, with an `aria-label` when it has no visible
@@ -365,8 +449,10 @@ validation of the picker. No data contract changes: the forms write the same `de
 - Sheets are `role="dialog"` with `aria-modal="true"`, named by their title, trap the focus and
   give it back to the element that opened them.
 - Toasts are `role="status"`.
-- Swipe actions always have a non-gesture equivalent (the sheet buttons, the menu, reorder mode).
-- Sheet and toast animations are skipped under `prefers-reduced-motion: reduce`.
+- Every gesture has an equivalent without it: the swipe actions (the sheet buttons, the menu), the
+  drag of a sheet (OK / ×, Escape, the backdrop), the long-press drag of a step (reorder mode).
+- Sheet and toast animations, and the slide of the steps during a drag, are skipped under
+  `prefers-reduced-motion: reduce`.
 - Dark mode: the new surfaces follow the app-wide inversion like the other Horizon sheets, with
   the exceptions an audit of every screen asked for (`mobile.css`, "Dark mode"). Colors that carry
   a meaning are **inverted back to themselves**: the swipe actions, the destructive button of the
@@ -376,15 +462,16 @@ validation of the picker. No data contract changes: the forms write the same `de
   transparent field in its pill (the rule for inputs painted a darker rectangle in it), and the
   running / stop button follows the page (the rule for outline buttons gave it back a dark green
   on the dark bottom bar). The search icon of the device picker sits above its field, which the
-  input rule turns into a stacking context.
+  input rule turns into a stacking context. The switches of the forms (E.11) get their track
+  back (the input rule painted it the color of the card), and the selected segment of a segmented
+  control stays lighter than its track.
 
 ## G. Designed, not built yet (phase 2)
 
-- **Day pills** (M T W T F S S + "Weekdays / Weekend / Every day") and the native
-  `<input type="time">` in the scheduled trigger.
+- "Weekdays / Weekend / Every day" shortcuts above the day toggles.
 - **"Insert a value" chip bar** above text fields accepting variables, replacing the typed `{{`.
-- Long-press drag & drop in the timeline (the shared pointer engine already supports touch), and
-  reordering inside branches.
+- Reordering inside branches (the long press moves root steps only).
+- A dark theme of its own for these pages (dark mode is the app-wide inversion, see F).
 - Opening a deeply nested branch (3+ levels) in its own sheet with a breadcrumb.
 - **Test a draft without saving** (needs a server endpoint running an unsaved scene).
 - Scene templates in the creation sheet.
@@ -406,6 +493,13 @@ validation of the picker. No data contract changes: the forms write the same `de
   the field, the lights of an action picked as devices, a closed picker keeping the selection,
   the saved payload, a single device replaced in one tap (no confirmation, no remove button);
   and the select kept on a wider screen.
+- Cypress, phone viewport, `SceneMobileGestures.cy.js`: summaries naming the user and the house,
+  the system "back" closing the sheet on top then leaving the editor in one press, a sheet
+  dragged down by its header (kept when barely moved), a step moved by a long press (a quick move
+  moves nothing), a long explanation folded and opened, the days picked with toggles and the time
+  with the native field (saved payload). The touch gestures are driven with synthetic touch
+  events; they are also checked with real ones in a phone emulation (Playwright), as is the
+  landscape rule — the Cypress browser has a mouse, not a touch screen.
 - The swipe gesture itself (`SwipeRow`) is not driven by Cypress: the pointer events Cypress
   synthesizes do not reach the row's handlers in its browser. It is checked in a phone emulation
   with a real pointer (Playwright); every swipe action has a non-gesture equivalent that the specs

@@ -87,7 +87,13 @@ const ActionCard = ({ children, ...props }) => {
   );
 
   const summary = !isExpanded
-    ? getActionSummary(props.action, props.intl.dictionary, props.deviceFeatures, props.thermostatSchedules)
+    ? getActionSummary(
+        props.action,
+        props.intl.dictionary,
+        props.deviceFeatures,
+        props.thermostatSchedules,
+        props.names
+      )
     : null;
   // an action declared by an external integration is titled by its manifest
   // label; an orphan one (uninstalled, key removed) keeps the generic label
@@ -201,7 +207,8 @@ const ActionCard = ({ children, ...props }) => {
               scene: props.scene,
               sceneIntegrations: props.sceneIntegrations,
               deviceFeatures: props.deviceFeatures,
-              thermostatSchedules: props.thermostatSchedules
+              thermostatSchedules: props.thermostatSchedules,
+              names: props.names
             };
 
             return <Component {...commonProps} />;

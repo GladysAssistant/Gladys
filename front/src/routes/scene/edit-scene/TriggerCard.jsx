@@ -24,7 +24,9 @@ const TriggerCard = ({ children, ...props }) => {
   const toggleExpanded = useCallback(() => {
     setExpanded(previousExpanded => !previousExpanded);
   }, []);
-  const summary = !expanded ? getTriggerSummary(props.trigger, props.intl.dictionary) : null;
+  const summary = !expanded
+    ? getTriggerSummary(props.trigger, props.intl.dictionary, props.deviceFeatures, props.names)
+    : null;
   // a trigger declared by an external integration is titled by its manifest
   // label; an orphan one (uninstalled, key removed) keeps the generic label
   const declarationTitle =

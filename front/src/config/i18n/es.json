@@ -4946,7 +4946,7 @@
       "orWhen": "O cuando…",
       "thenSubtitle": "en orden, de arriba abajo",
       "addFirstStep": "Añadir un primer paso",
-      "swipeHint": "Toca una fila para cambiarla. Deslízala a la izquierda para eliminarla.",
+      "swipeHint": "Toca una fila para cambiarla. Deslízala a la izquierda para eliminarla. Mantén pulsado un paso para moverlo.",
       "settingsMenu": "Nombre, icono y etiquetas",
       "reorderMenu": "Reordenar los pasos",
       "deleteScene": "Eliminar la escena",

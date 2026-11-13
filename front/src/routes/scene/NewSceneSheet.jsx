@@ -5,6 +5,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import BottomSheet from '../../components/sheet/BottomSheet';
+import { isSheetEntryOnTop } from '../../components/sheet/sheetHistory';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import guessSceneIcon from './guessSceneIcon';
 import style from './mobile.css';
@@ -74,7 +75,8 @@ class NewSceneSheet extends Component {
         tags: []
       });
       this.props.onClose();
-      route(`/dashboard/scene/${createdScene.selector}?new=1`);
+      // the editor takes the place of this sheet's history entry
+      route(`/dashboard/scene/${createdScene.selector}?new=1`, isSheetEntryOnTop());
     } catch (error) {
       this.setState({ status: get(error, 'response.status') === 409 ? 'conflict' : 'error' });
     }

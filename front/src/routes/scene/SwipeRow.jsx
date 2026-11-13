@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import { isStepDragging } from './edit-scene/mobile/timelineDrag';
 import style from './mobile.css';
 
 const ACTION_WIDTH_PX = 88;
@@ -75,6 +76,14 @@ class SwipeRow extends Component {
   onPointerMove = event => {
     const gesture = this.gesture;
     if (!gesture || gesture.pointerId !== event.pointerId) {
+      return;
+    }
+    // the step is being dragged to another place of the timeline: not a swipe
+    if (isStepDragging()) {
+      this.gesture = null;
+      if (this.state.dragging) {
+        this.close();
+      }
       return;
     }
     const deltaX = event.clientX - gesture.startX;

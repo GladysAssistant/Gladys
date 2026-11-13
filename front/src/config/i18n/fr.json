@@ -4946,7 +4946,7 @@
       "orWhen": "Ou quand…",
       "thenSubtitle": "dans l'ordre, de haut en bas",
       "addFirstStep": "Ajouter une première étape",
-      "swipeHint": "Touchez une ligne pour la modifier. Glissez-la vers la gauche pour la supprimer.",
+      "swipeHint": "Touchez une ligne pour la modifier. Glissez-la vers la gauche pour la supprimer. Maintenez le doigt sur une étape pour la déplacer.",
       "settingsMenu": "Nom, icône et tags",
       "reorderMenu": "Réorganiser les étapes",
       "deleteScene": "Supprimer la scène",

@@ -15,6 +15,7 @@ import TimelineRow from './TimelineRow';
 import ActionSheet from './ActionSheet';
 import TriggerSheet from './TriggerSheet';
 import { getActionRowInfo, getTriggerRowInfo, collectActions, countChanges, isBlockAction } from './rowInfo';
+import { createTimelineDrag } from './timelineDrag';
 import { ACTIONS } from '../../../../../../server/utils/constants';
 import style from '../../mobile.css';
 import dashboardStyle from '../../../dashboard/style.css';
@@ -56,7 +57,20 @@ class MobileEditScenePage extends Component {
 
   componentWillUnmount() {
     document.body.classList.remove(FOCUS_PAGE_BODY_CLASS);
+    this.timelineDrag.detach();
   }
+
+  // a long press on a step of the timeline drags it to another place (E.9)
+  timelineDrag = createTimelineDrag({
+    itemSelector: '[data-timeline-step]',
+    draggingClass: style.timelineItemDragging,
+    shiftingClass: style.timelineShifting,
+    onMove: (from, to) => this.props.moveRootStepTo(from, to)
+  });
+
+  setTimelineRef = element => {
+    this.timelineDrag.attach(element);
+  };
 
   // ---------- sheets ----------
 
@@ -161,6 +175,7 @@ class MobileEditScenePage extends Component {
     dictionary: this.props.intl.dictionary,
     deviceFeatures: this.props.deviceFeatures,
     thermostatSchedules: this.props.thermostatSchedules,
+    names: this.props.names,
     sceneIntegrations: this.props.sceneIntegrations,
     language: get(this.props, 'user.language') || 'en'
   });
@@ -246,7 +261,19 @@ class MobileEditScenePage extends Component {
         <Text id="editScene.mobile.conditionsTitle" />
       </span>
       <div class={style.stack}>
-        {conditions.map((condition, index) => this.renderRow(condition, `${blockPath}.if.${index}`, 'nested'))}
+        {conditions.map((condition, index) => (
+          <div class={style.stack} key={index}>
+            {/* the conditions are combined with an AND, written between two rows as on the desktop */}
+            {index > 0 && (
+              <div class={style.orSeparator} data-cy="scene-condition-and-separator">
+                <span class={cx(style.orPill, style.andPill)}>
+                  <Text id="editScene.conditionAndText" />
+                </span>
+              </div>
+            )}
+            {this.renderRow(condition, `${blockPath}.if.${index}`, 'nested')}
+          </div>
+        ))}
         {conditions.length === 0 && (
           <span class={style.branchEmpty}>
             <Text id="editScene.mobile.noCondition" />
@@ -314,7 +341,7 @@ class MobileEditScenePage extends Component {
           : this.renderRow(action, `${groupIndex}.0`, 'card');
       }
       return (
-        <div class={style.timelineItem} key={groupIndex}>
+        <div class={style.timelineItem} key={groupIndex} data-timeline-step>
           <div class={style.timelineRail} aria-hidden="true">
             <span class={style.timelineNumber}>{stepIndex + 1}</span>
             <span class={cx(style.timelineLine, { [style.timelineLineLast]: isLast })} />
@@ -514,7 +541,8 @@ class MobileEditScenePage extends Component {
       moveCardGroup: props.moveCardGroup,
       sceneIntegrations: props.sceneIntegrations,
       deviceFeatures: props.deviceFeatures,
-      thermostatSchedules: props.thermostatSchedules
+      thermostatSchedules: props.thermostatSchedules,
+      names: props.names
     };
 
     return (
@@ -680,7 +708,9 @@ class MobileEditScenePage extends Component {
                     <Text id="editScene.mobile.thenSubtitle" />
                   </span>
                 </div>
-                {this.renderTimeline()}
+                <div class={style.timeline} ref={this.setTimelineRef}>
+                  {this.renderTimeline()}
+                </div>
                 {hasSteps ? (
                   <div class={style.timelineEnd}>
                     <button

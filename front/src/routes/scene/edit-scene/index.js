@@ -15,6 +15,7 @@ import { findMissingRequiredField, hasIntegrationSteps } from './sceneIntegratio
 import { sortRanges } from './triggers/TimeRangesTrigger';
 import { readSceneDraft, writeSceneDraft, removeSceneDraft } from './sceneDraft';
 import { isMobileViewport, watchMobileViewport } from '../../../utils/mobileViewport';
+import { isSheetEntryOnTop } from '../../../components/sheet/sheetHistory';
 
 // The normalizations the step forms apply when they mount (default values, if/then/else arrays)
 // are done well within this delay: only then is a stored draft compared with the scene on screen
@@ -1219,6 +1220,8 @@ class EditScene extends Component {
 
   // The list keeps its search and tags through the URL; the "new" flag of a just-created
   // scene only concerns the editor
+  // Leaving from a sheet (the leave guard, the delete confirmation, the menu) replaces the history
+  // entry of that sheet: "back" from the next page then comes back here once, not twice.
   getListUrl = () => {
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.delete('new');
@@ -1237,7 +1240,7 @@ class EditScene extends Component {
     } else {
       removeSceneDraft(this.getDraftId());
     }
-    route(this.getListUrl());
+    route(this.getListUrl(), isSheetEntryOnTop());
   };
 
   // The back control of the editor: with unsaved changes, ask first (spec C.2)
@@ -1250,7 +1253,7 @@ class EditScene extends Component {
       this.stopWatchingUserActions();
       this.draftWritesEnabled = false;
       this.leftOnPurpose = true;
-      route(this.getListUrl());
+      route(this.getListUrl(), isSheetEntryOnTop());
       return;
     }
     if (this.hasUnsavedChanges()) {
@@ -1409,7 +1412,7 @@ class EditScene extends Component {
   };
 
   duplicateScene = () => {
-    route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
+    route(`/dashboard/scene/${this.props.scene_selector}/duplicate`, isSheetEntryOnTop());
   };
 
   // After a card moved out of its group, remove the group if it became empty,
@@ -1743,6 +1746,36 @@ class EditScene extends Component {
       this.setState({ thermostatSchedules });
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  getNames = async () => {
+    // selector -> name, for what a step names by a selector: a collapsed card (or a row of the
+    // mobile timeline) then reads "Tony · Home", not "tony · home". Each list is loaded on its
+    // own: one that fails (an integration not configured) leaves its selectors as they are.
+    const load = async (url, params, getName) => {
+      try {
+        const items = await this.props.httpClient.get(url, params);
+        const map = {};
+        (items || []).forEach(item => {
+          map[item.selector] = getName(item);
+        });
+        return map;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    };
+    const byName = item => item.name;
+    const [users, houses, scenes, calendars, areas] = await Promise.all([
+      load('/api/v1/user', undefined, user => user.firstname),
+      load('/api/v1/house', undefined, byName),
+      load('/api/v1/scene', undefined, byName),
+      load('/api/v1/calendar', { shared: true }, byName),
+      load('/api/v1/area', undefined, byName)
+    ]);
+    if (!this.unmounted) {
+      this.setState({ names: { users, houses, scenes, calendars, areas } });
     }
   };
 
@@ -2093,6 +2126,17 @@ class EditScene extends Component {
     await this.moveCardGroup(`${index}`, `${destination}`);
   };
 
+  // a step dragged to another place of the timeline (spec E.9)
+  moveRootStepTo = async (index, destination) => {
+    if (destination === index || destination < 0 || destination >= this.state.scene.actions.length - 1) {
+      return;
+    }
+    // a drag is an edit, though it ends with no click (spec C.2)
+    this.userActed = true;
+    this.bumpStructureVersion();
+    await this.moveCardGroup(`${index}`, `${destination}`);
+  };
+
   saveAndStartScene = async () => {
     const saved = await this.saveScene();
     if (saved) {
@@ -2113,6 +2157,7 @@ class EditScene extends Component {
       sceneIntegrations: null,
       deviceFeatures: null,
       thermostatSchedules: null,
+      names: null,
       runningScenes: [],
       now: Date.now(),
       isMobile: isMobileViewport(),
@@ -2133,6 +2178,7 @@ class EditScene extends Component {
     this.getSceneIntegrations();
     this.getDeviceFeatures();
     this.getThermostatSchedules();
+    this.getNames();
     this.getTags();
     this.getRunningScenes();
     this.props.session.dispatcher.addListener(
@@ -2202,6 +2248,7 @@ class EditScene extends Component {
       sceneIntegrations,
       deviceFeatures,
       thermostatSchedules,
+      names,
       tags,
       askDeleteScene,
       runningScenes,
@@ -2248,6 +2295,8 @@ class EditScene extends Component {
       sceneIntegrations,
       deviceFeatures,
       thermostatSchedules,
+      // what the summaries name: the loaded selectors, and the variables of the scene
+      names: { ...(names || {}), variables, triggersVariables },
       highLightedActions,
       setVariables: this.setVariables,
       setVariablesTrigger: this.setVariablesTrigger,
@@ -2293,6 +2342,7 @@ class EditScene extends Component {
             cancelEmptyAction={this.cancelEmptyAction}
             cancelEmptyTrigger={this.cancelEmptyTrigger}
             moveRootStep={this.moveRootStep}
+            moveRootStepTo={this.moveRootStepTo}
             saveAndStartScene={this.saveAndStartScene}
           />
         ) : (

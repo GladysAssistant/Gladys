@@ -43,7 +43,7 @@ class SendMqttMessage extends Component {
             <label class="form-label">
               <Text id="editScene.actionsCard.mqttMessage.messageLabel" />
             </label>
-            <div style={helpTextStyle}>
+            <div class="small" style={helpTextStyle}>
               <Text id="editScene.actionsCard.mqttMessage.variablesExplanation" />
             </div>
             <Localizer>

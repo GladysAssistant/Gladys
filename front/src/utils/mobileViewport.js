@@ -1,6 +1,10 @@
 // The phone layout of the scene pages (docs/specs/scene-editor-mobile.md, B): a viewport narrower
-// than 768px. Evaluated with matchMedia and re-evaluated when it changes (rotation, resize).
-const MOBILE_MEDIA_QUERY = '(max-width: 767.98px)';
+// than 768px, or a phone held in landscape — wider than that, but too low for the desktop layout,
+// and above all the same device: turning it must not swap one editor for the other in the middle
+// of an edit. A phone in landscape is a touch screen at most 500px high (a tablet is higher, a
+// low desktop window has a mouse). Evaluated with matchMedia and re-evaluated when it changes
+// (rotation, resize).
+const MOBILE_MEDIA_QUERY = '(max-width: 767.98px), (max-height: 500px) and (pointer: coarse)';
 
 const getMediaQueryList = () =>
   typeof window !== 'undefined' && typeof window.matchMedia === 'function'

@@ -127,7 +127,7 @@ class TypePicker extends Component {
         <div class={cx(style.typePickerList, { [style.typePickerListFill]: fill })}>
           {visibleCategories.map(category => (
             <div class={style.typePickerCategory} key={category.key}>
-              <div class={style.typePickerCategoryTitle}>
+              <div class={style.typePickerCategoryTitle} data-type-picker-category-title>
                 <Text id={`${categoryPrefix}.${category.key}`} />
               </div>
               <div class={style.typePickerOptions}>

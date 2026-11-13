@@ -3,6 +3,7 @@ import cx from 'classnames';
 
 import BottomSheet from '../../../../components/sheet/BottomSheet';
 import TriggerParams from '../TriggerParams';
+import SheetForm from './SheetForm';
 import style from '../../mobile.css';
 
 // The sheet of one trigger of the mobile editor (docs/specs/scene-editor-mobile.md, E.4): mounted
@@ -20,7 +21,7 @@ const TriggerSheet = props => {
       onOk={hasType ? props.onClose : undefined}
       dataCy={`scene-trigger-sheet-${index}`}
     >
-      <div class={style.sheetForm}>
+      <SheetForm>
         <TriggerParams
           trigger={trigger}
           index={index}
@@ -31,7 +32,7 @@ const TriggerSheet = props => {
           autoFocusSearch={open && !hasType}
           fill
         />
-      </div>
+      </SheetForm>
       {hasType && (
         <div class={style.sheetActions}>
           <button

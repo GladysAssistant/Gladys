@@ -5,6 +5,7 @@ import cx from 'classnames';
 import BottomSheet from '../../../../components/sheet/BottomSheet';
 import ACTION_COMPONENTS from '../actionComponents';
 import { isBlockAction } from './rowInfo';
+import SheetForm from './SheetForm';
 import style from '../../mobile.css';
 
 /**
@@ -32,7 +33,7 @@ class ActionSheet extends Component {
         dataCy={`scene-step-sheet-${path}`}
       >
         {FormComponent && (
-          <div class={style.sheetForm}>
+          <SheetForm>
             <FormComponent
               action={action}
               allActions={props.scene.actions}
@@ -51,12 +52,13 @@ class ActionSheet extends Component {
               sceneIntegrations={props.sceneIntegrations}
               deviceFeatures={props.deviceFeatures}
               thermostatSchedules={props.thermostatSchedules}
+              names={props.names}
               autoFocusSearch={open && !hasType}
               fill
               hideBranches
               renderConditions={isBlock ? props.renderConditions : undefined}
             />
-          </div>
+          </SheetForm>
         )}
         {hasType && (
           <div class={style.sheetActions}>

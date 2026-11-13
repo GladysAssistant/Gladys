@@ -13,7 +13,7 @@ const colorClassOf = color => editStyle[COLOR_CLASS[color] || 'typePickerIconGra
 
 // What a row of the mobile timeline shows for a step (docs/specs/scene-editor-mobile.md, E.3)
 export const getActionRowInfo = (action, path, context) => {
-  const { dictionary, deviceFeatures, thermostatSchedules, sceneIntegrations, language } = context;
+  const { dictionary, deviceFeatures, thermostatSchedules, names, sceneIntegrations, language } = context;
   if (!action || action.type === null) {
     return {
       title: get(dictionary, path.includes('.if.') ? 'editScene.newCondition' : 'editScene.newAction'),
@@ -27,7 +27,7 @@ export const getActionRowInfo = (action, path, context) => {
       ? getSceneDeclarationTitle(sceneIntegrations, SCENE_DECLARATION_KINDS.action, action, language)
       : null;
   const title = declarationTitle || get(dictionary, `editScene.actions.${action.type}`) || action.type;
-  let summary = getActionSummary(action, dictionary, deviceFeatures, thermostatSchedules);
+  let summary = getActionSummary(action, dictionary, deviceFeatures, thermostatSchedules, names);
   if (isBlockAction(action)) {
     // a block is read through its conditions
     const conditions = Array.isArray(action.if) ? action.if : [];
@@ -51,7 +51,7 @@ export const getActionRowInfo = (action, path, context) => {
 };
 
 export const getTriggerRowInfo = (trigger, context) => {
-  const { dictionary, sceneIntegrations, language } = context;
+  const { dictionary, deviceFeatures, names, sceneIntegrations, language } = context;
   if (!trigger || trigger.type === null) {
     return {
       title: get(dictionary, 'editScene.newTrigger'),
@@ -66,7 +66,7 @@ export const getTriggerRowInfo = (trigger, context) => {
       : null;
   return {
     title: declarationTitle || get(dictionary, `editScene.triggers.${trigger.type}`) || trigger.type,
-    summary: getTriggerSummary(trigger, dictionary),
+    summary: getTriggerSummary(trigger, dictionary, deviceFeatures, names),
     icon: TRIGGER_ICON[trigger.type] || 'fe fe-box',
     colorClass: colorClassOf(TRIGGER_COLOR[trigger.type])
   };
