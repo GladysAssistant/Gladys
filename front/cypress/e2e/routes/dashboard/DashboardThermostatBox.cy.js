@@ -116,4 +116,31 @@ describe('Dashboard Thermostat Box', () => {
     cy.visit('/dashboard/test');
     shouldBeDrawnOnItsGroupOrigin('activeIconCooling');
   });
+
+  // A preset name longer than its column ran through the names beside it — in
+  // German, "Frostschutz" into "Abwesend". On a phone the columns are at their
+  // narrowest, so each name has to be painted inside its own button whatever
+  // the language, the font and the hyphenation dictionaries the browser has.
+  // Measured on the text itself rather than on its box, and clipped to the box
+  // only where the box hides its overflow (the ellipsis of the last resort).
+  it('Should keep every preset name inside its own column on a phone', () => {
+    cy.viewport(360, 800);
+    serveThermostat('heating');
+    cy.visit('/dashboard/test');
+    cy.get('[class*="segmentBtnLabelText"]', { timeout: 10000 })
+      .should('have.length.at.least', 2)
+      .each($text => {
+        const element = $text[0];
+        const range = element.ownerDocument.createRange();
+        range.selectNodeContents(element);
+        const text = range.getBoundingClientRect();
+        const box = element.getBoundingClientRect();
+        const clipped = element.ownerDocument.defaultView.getComputedStyle(element).overflowX !== 'visible';
+        const left = clipped ? Math.max(text.left, box.left) : text.left;
+        const right = clipped ? Math.min(text.right, box.right) : text.right;
+        const column = element.closest('button').getBoundingClientRect();
+        expect(left, `left edge of "${$text.text()}"`).to.be.at.least(column.left - 0.5);
+        expect(right, `right edge of "${$text.text()}"`).to.be.at.most(column.right + 0.5);
+      });
+  });
 });
