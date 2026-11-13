@@ -104,8 +104,10 @@ const actionSchema = Joi.object()
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
-    // energy-contract.current-price condition: the contract selector, the comparison
-    // operator and the threshold (`value`, above)
+    // energy-contract.current-price condition: the meter's device selector (empty: the main
+    // meter), the comparison operator and the threshold (`value`, above); `energy_contract` is
+    // the contract selector of a condition saved before the meter targeting, read as its meter
+    electric_meter: Joi.string().allow(''),
     energy_contract: Joi.string(),
     operator: Joi.string().valid(...COMPARISON_OPERATORS),
     headers: Joi.alternatives().conditional('type', {
@@ -272,7 +274,10 @@ const triggerSchema = Joi.object()
     integration: Joi.string(),
     trigger_key: sceneDeclarationKeySchema,
     fields: sceneDeclarationFieldsSchema,
-    // energy-contract.price-changed trigger: the contract selector, empty for any contract
+    // energy-contract.price-changed trigger: the meter's device selector, empty for any meter;
+    // `energy_contract` is the contract selector of a trigger saved before the meter targeting,
+    // read as the meter of that contract
+    electric_meter: Joi.string().allow(''),
     energy_contract: Joi.string().allow(''),
   })
   // A "changed" trigger fires on `last_value !== previous_value`: it matches no value, and

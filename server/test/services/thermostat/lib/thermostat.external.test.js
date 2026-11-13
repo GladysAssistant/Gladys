@@ -1487,19 +1487,38 @@ describe('thermostat.onExternalPowerChanged', () => {
   // `point`: the point in force on the programme the thermostat follows, null
   // for a thermostat that follows none.
   // `nextPoint`: when the programme's next point falls, null when it has none.
-  const loadListener = ({ point = null, nextPoint = null } = {}) =>
-    proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
-      './thermostat.setValue': { holdExpiry: fake.resolves(null), nextPointTimestamp: fake.resolves(nextPoint) },
-      './thermostat.scheduleDevice': {
-        getScheduleOfDevice: fake.resolves(point ? { id: 'programme-id', transitions: [point] } : null),
-      },
-      './thermostat.getSchedules': { getCurrentPoint: fake.resolves(point) },
-      '../../../utils/logger': {
-        debug: fake.returns(null),
-        info: fake.returns(null),
-        warn: fake.returns(null),
-      },
+  // The Off-point reading is the real one (thermostat.offPoint), on the same
+  // programme: the hold and preset rules it applies are part of what is tested.
+  const loadListener = ({ point = null, nextPoint = null } = {}) => {
+    const logger = { debug: fake.returns(null), info: fake.returns(null), warn: fake.returns(null) };
+    // The thermostat this listener reads from the database is the one the
+    // database holds: the device it hands the Off-point reading.
+    let handed = null;
+    const scheduleDevice = {
+      getScheduleOfDevice: fake.resolves(point ? { id: 'programme-id', transitions: [point] } : null),
+      loadThermostat: fake(async () => handed),
+    };
+    const getSchedules = { getCurrentPoint: fake.resolves(point), pointInForce: fake.resolves(point) };
+    const realOffPoint = proxyquire('../../../../services/thermostat/lib/thermostat.offPoint', {
+      './thermostat.scheduleDevice': scheduleDevice,
+      './thermostat.getSchedules': getSchedules,
+      '../../../utils/logger': logger,
     });
+    const offPoint = {
+      ...realOffPoint,
+      programmeKeepsOff: (device) => {
+        handed = device;
+        return realOffPoint.programmeKeepsOff(device);
+      },
+    };
+    return proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+      './thermostat.setValue': { holdExpiry: fake.resolves(null), nextPointTimestamp: fake.resolves(nextPoint) },
+      './thermostat.scheduleDevice': scheduleDevice,
+      './thermostat.getSchedules': getSchedules,
+      './thermostat.offPoint': offPoint,
+      '../../../utils/logger': logger,
+    });
+  };
 
   const thermostatModeFeature = (mode) => ({
     selector: 'ac-thermostat-mode',

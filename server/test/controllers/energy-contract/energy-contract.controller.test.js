@@ -91,6 +91,54 @@ describe('energy_contract API', () => {
     await authenticatedRequest.get('/api/v1/energy_contract/api-contract').expect(404);
   });
 
+  it('should answer the current price of a meter, its main meter by default, and read a contract as its meter', async () => {
+    // no consumption contract at all: no meter, no contract, no price
+    await authenticatedRequest
+      .get('/api/v1/energy_contract/current')
+      .expect(200)
+      .then((res) => expect(res.body).to.deep.equal({ electric_meter: null, contract: null, price: null }));
+    // a tariff change: the old contract ended, its successor started the next day
+    await authenticatedRequest
+      .post('/api/v1/energy_contract')
+      .send(payload({ name: 'Old tariff', valid_to: '2025-12-31' }))
+      .expect(201);
+    await authenticatedRequest
+      .post('/api/v1/energy_contract')
+      .send(
+        payload({
+          name: 'New tariff',
+          valid_from: '2026-01-01',
+          tariff: { ...TARIFF, components: [{ ...TARIFF.components[0], fallback: { price: 0.3 } }] },
+        }),
+      )
+      .expect(201);
+    const meter = { id: meterId, selector: 'api-meter', name: 'API meter' };
+    const expectNewTariff = (res) => {
+      expect(res.body).to.include({ price: 0.3, currency: 'EUR', unit: 'kWh' });
+      expect(res.body.contract).to.include({ selector: 'new-tariff' });
+      expect(res.body.electric_meter).to.deep.equal(meter);
+    };
+    await authenticatedRequest
+      .get('/api/v1/energy_contract/current')
+      .expect(200)
+      .then(expectNewTariff);
+    await authenticatedRequest
+      .get('/api/v1/energy_contract/current')
+      .query({ electric_meter: 'api-meter' })
+      .expect(200)
+      .then(expectNewTariff);
+    // a widget saved with the expired contract follows its meter
+    await authenticatedRequest
+      .get('/api/v1/energy_contract/old-tariff/current')
+      .expect(200)
+      .then(expectNewTariff);
+    await authenticatedRequest
+      .get('/api/v1/energy_contract/current')
+      .query({ electric_meter: 'unknown-meter' })
+      .expect(404);
+    await authenticatedRequest.get('/api/v1/energy_contract/unknown-contract/current').expect(404);
+  });
+
   it('should answer 400 on an invalid tariff and 409 on an overlap', async () => {
     await authenticatedRequest
       .post('/api/v1/energy_contract')

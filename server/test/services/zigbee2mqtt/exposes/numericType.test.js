@@ -209,4 +209,28 @@ describe('zigbee2mqtt numericType', () => {
       });
     });
   });
+  describe('Tuya SPM02V3 three-phase energy meter features', () => {
+    it('should map the phase C measures like the phases A and B', () => {
+      ['current', 'energy', 'power'].forEach((measure) => {
+        assert.deepEqual(numericType.names[`${measure}_c`], numericType.names[`${measure}_a`]);
+        assert.deepEqual(numericType.names[`${measure}_c`], numericType.names[`${measure}_b`]);
+      });
+    });
+
+    it('should map the voltage of each phase like the voltage', () => {
+      ['voltage_a', 'voltage_b', 'voltage_c'].forEach((name) => {
+        assert.deepEqual(numericType.names[name], numericType.names.voltage);
+      });
+    });
+
+    it('should map the produced energy to a production index, never to a consumption index', () => {
+      ['produced_energy', 'energy_produced_a', 'energy_produced_b', 'energy_produced_c'].forEach((name) => {
+        assert.deepEqual(numericType.names[name].feature, {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        });
+      });
+    });
+  });
 });

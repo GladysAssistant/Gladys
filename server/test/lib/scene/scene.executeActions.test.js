@@ -174,11 +174,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -203,11 +199,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -233,11 +225,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -263,11 +251,7 @@ describe('scene.executeActions', () => {
     };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
-      },
+      features: [deviceFeature],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -276,7 +260,7 @@ describe('scene.executeActions', () => {
       [
         [
           {
-            type: ACTIONS.SWITCH.TURN_OFF,
+            type: ACTIONS.SWITCH.TOGGLE,
             devices: ['switch-1'],
           },
         ],
@@ -285,14 +269,70 @@ describe('scene.executeActions', () => {
     );
     assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
   });
-  it('should execute switch toggle error', async () => {
+  it('should turn on a switch which never reported its state when toggled', async () => {
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      last_value: null,
+    };
     const device = {
       setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.throws('An error occurred'),
-      },
+      features: [deviceFeature],
+    };
+
+    stateManager.setState('device', 'switch-1', device);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TOGGLE,
+            devices: ['switch-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
+  });
+  it('should still drive the other switches when one of them fails', async () => {
+    const socket1 = {
+      selector: 'socket-1',
+      device_id: 'power-strip-id',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      read_only: false,
+    };
+    const socket2 = { ...socket1, selector: 'socket-2' };
+    const powerStrip = { id: 'power-strip-id', features: [socket1, socket2] };
+    const device = {
+      setValue: fake((oneDevice, deviceFeature) =>
+        deviceFeature === socket1 ? Promise.reject(new Error('Device not responding')) : Promise.resolve(null),
+      ),
+    };
+
+    stateManager.setState('deviceById', 'power-strip-id', powerStrip);
+    stateManager.setState('deviceFeature', 'socket-1', socket1);
+    stateManager.setState('deviceFeature', 'socket-2', socket2);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_ON,
+            device_features: ['socket-1', 'socket-2'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledTwice(device.setValue);
+    assert.calledWith(device.setValue, powerStrip, socket2, 1);
+  });
+  it('should skip a device without writable switch', async () => {
+    const device = {
+      setValue: fake.resolves(null),
+      features: [],
     };
 
     stateManager.setState('device', 'switch-1', device);
@@ -314,6 +354,9 @@ describe('scene.executeActions', () => {
     const device = {
       setValue: fake.resolves(null),
     };
+    stateManager.setState('device', 'switch-1', {
+      features: [{ category: DEVICE_FEATURE_CATEGORIES.SWITCH, type: DEVICE_FEATURE_TYPES.SWITCH.BINARY }],
+    });
 
     await executeActions(
       { stateManager, event, device },

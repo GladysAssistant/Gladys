@@ -19,7 +19,8 @@ import {
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
   DEFAULT_PILOT_WIRE_ORDERS,
-  supportedPilotWireOrder
+  supportedPilotWireOrder,
+  supportedStandbyOrder
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -44,6 +45,12 @@ const PRESET_ICONS = {
 // temperature you want when you are here", which is a flame when heating and a
 // snowflake when cooling. A sun for both read as "warm" even in cooling.
 const COMFORT_ICON = { heating: 'fe-flame', cooling: 'fe-snowflake' };
+// The preset whose colour and icon a standby order takes in the status banner.
+const STANDBY_PRESET_BY_ORDER = {
+  [PILOT_WIRE_MODE.OFF]: 'off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost',
+  [PILOT_WIRE_MODE.ECO]: 'eco'
+};
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
@@ -482,14 +489,15 @@ class ThermostatBox extends Component {
     const cfg = this.state.remoteConfig;
     const value = PRESET_VALUES[preset];
     if (!cfg || !cfg.presetFeature || value === undefined) {
-      return;
+      return false;
     }
     this.savingPreset = true;
     // Remembered past the write: its echo can land after the response, and in
     // manual mode it must not be taken for a preset picked elsewhere.
     this.lastPresetWrite = { preset, at: Date.now() };
     try {
-      await this.writeFeature(cfg.presetFeature, value);
+      // Whether the write went through, for a caller that showed it already.
+      return await this.writeFeature(cfg.presetFeature, value);
     } finally {
       this.savingPreset = false;
     }
@@ -885,7 +893,13 @@ class ThermostatBox extends Component {
       this.setState({ isManualMode: false, manualUntil: null, manualSetpointOverride: false });
       this.refreshFromDevice();
     } else if (isManual !== this.state.isManualMode && !this.savingPreset) {
-      this.setState({ isManualMode: isManual });
+      // The expiry comes with it: without one the banner falls back to the
+      // schedule's, and a hold armed from the unit's remote on an Off point read
+      // "Off until 20:00" while the unit ran on the remote's setpoint.
+      this.setState({
+        isManualMode: isManual,
+        ...(isManual && payload.until && payload.until > Date.now() ? { manualUntil: payload.until } : {})
+      });
     } else if (isManual && payload.until) {
       // The server's expiry always wins over the one shown meanwhile: it is the
       // moment the loop will actually hand the thermostat back. The widget can
@@ -925,7 +939,7 @@ class ThermostatBox extends Component {
     const deviceSelector = cfg && cfg.device_selector;
     if (!deviceSelector) {
       this.setState({ activeSchedule: null });
-      return;
+      return { ok: true, schedule: null };
     }
     try {
       const schedules = await this.props.httpClient.get('/api/v1/service/thermostat/schedule');
@@ -935,10 +949,16 @@ class ThermostatBox extends Component {
       // A schedule deleted behind the widget's back is missing from the list,
       // and degrades to "no schedule" rather than leaving a stale banner.
       this.setState({ activeSchedule: schedule || null });
+      // Returned as well: a caller deciding on it cannot wait for the render.
+      // An explicit shape rather than null / undefined: a failed read taken for
+      // "no schedule" would turn into a stop for the season (selectPreset).
+      return { ok: true, schedule: schedule || null };
     } catch (e) {
       // A failed request says nothing about the schedule: the last one loaded
       // stays, and with it its `next.refresh_at`, so the minute tick tries again
-      // instead of dropping the banner for good.
+      // instead of dropping the banner for good. `ok: false`, so a caller
+      // deciding on the point does not take that stale one for a read.
+      return { ok: false, schedule: null };
     }
   };
 
@@ -969,24 +989,61 @@ class ThermostatBox extends Component {
     await this.initData();
   };
 
+  // The banner's buttons hand back with the programme the card shows; the event
+  // they pass is not a schedule. Taps while it runs are held as during an Off
+  // hand-back (selectPreset) — Off included, since this hand-back is no stop:
+  // sent at once, an Off landed before the `schedule` write and the start that
+  // follows it, which then started the thermostat it had just stopped.
   cancelManualMode = async () => {
+    if (this.handingBack) return;
+    this.handingBack = 'banner';
+    try {
+      await this.handBackToProgramme();
+    } finally {
+      this.handingBack = false;
+    }
+    await this.applyQueuedPreset();
+  };
+
+  // `schedule`: the programme just read by the caller, which is fresher than the
+  // card's — a batched setState may not have committed it yet — and saves a
+  // second read of every schedule. Left out, the card's own is used and read
+  // again once the thermostat is back on it.
+  handBackToProgramme = async schedule => {
     this.holdSetpointUntilApplied();
     // The point in force is what the thermostat follows from the tap on, and the
     // server resolved it already: lit now, with the mode a stop hands back, not
     // once the reload below has landed — until then the card read as a running
     // thermostat still on Off.
-    const current = this.state.activeSchedule && this.state.activeSchedule.current;
+    const programme = schedule === undefined ? this.state.activeSchedule : schedule;
+    const current = programme && programme.current;
     this.setState({
       isManualMode: false,
       manualUntil: null,
       manualSetpointOverride: false,
       ...(current ? { activePreset: current.preset } : {})
     });
+    // `schedule` before the mode: a stopped thermostat started while its hold is
+    // still in force powers the unit on at once (D.0), and the pass that the
+    // `schedule` write triggers then switched it off again on an Off point. With
+    // the hold gone first, the start onto an Off point is left to the pass.
+    if (!(await this.savePreset('schedule'))) {
+      // The hold is still on the device: the card shows it again rather than a
+      // programme the thermostat is not back on. initData, not refreshFromDevice:
+      // the tap cleared the hold's expiry and its own-setpoint flag, and only
+      // initData reads them back from the hold — without them the banner fell
+      // back to the programme's "Off until …" and the gauge painted Off.
+      this.releaseSetpointHold();
+      await this.initData();
+      return;
+    }
     await this.resumeIfStopped();
-    await this.savePreset('schedule');
     // The schedule first: its `current` point is what the thermostat follows
-    // from now on, and loadMode reads it.
-    await this.loadSchedule();
+    // from now on, and loadMode reads it. A caller that just read it already set
+    // it on the card.
+    if (schedule === undefined) {
+      await this.loadSchedule();
+    }
     await this.loadConfig();
     const { activePreset } = this.loadMode();
     // Every setpoint was dropped since the tap, the server's own included: it
@@ -1468,8 +1525,76 @@ class ThermostatBox extends Component {
   // `off` is the exception, because stopping is a mode rather than a preset: it
   // goes to the mode feature instead.
   selectPreset = async preset => {
+    // Off over a hold taken on an Off point of the programme — the unit switched
+    // on from its remote, a preset picked: the programme already says off, so
+    // Off ends the hold and hands the thermostat back to it rather than stopping
+    // it. Stopped, it sat in manual mode asking to resume a programme that said
+    // the very same thing. With no hold, Off still stops it: a stop for the
+    // season must be possible on an Off point too.
+    //
+    // The point is read again rather than taken from the card: the one it shows
+    // can still say Off for up to a minute after the programme moved on, and Off
+    // would then hand back to Comfort.
+    //
+    // Taps while the hand-back runs are held, before the manual-mode check: the
+    // hand-back leaves manual mode before it is done. A second Off during an Off
+    // hand-back is dropped — taken once the first had left manual mode, it
+    // stopped a thermostat for the season nobody asked to stop; during the
+    // banner's, it is held like any preset (cancelManualMode). Any other preset is applied once the hand-back
+    // is done, the last one tapped winning: sent at once, it was overwritten by
+    // the `schedule` the hand-back writes last, and Comfort was silently lost.
+    if (this.handingBack) {
+      if (preset.key !== 'off' || this.handingBack === 'banner') {
+        this.queuedPreset = preset;
+      }
+      return;
+    }
+    if (preset.key === 'off' && this.state.isManualMode && !this.isStopped()) {
+      this.handingBack = true;
+      // Whether the tap stops the thermostat: only once the programme was read,
+      // and found on another point. Any other outcome stops nothing.
+      let stops = false;
+      try {
+        const read = await this.loadSchedule();
+        // A programme that cannot be read is no answer: the tap does nothing,
+        // and the next one tries again. The card's own point may be the one the
+        // programme has just left, and Off would then hand back to Comfort.
+        const offPoint = read.ok && read.schedule && read.schedule.current && read.schedule.current.preset === 'off';
+        if (offPoint) {
+          await this.handBackToProgramme(read.schedule);
+        }
+        stops = read.ok && !offPoint;
+      } finally {
+        this.handingBack = false;
+      }
+      if (!stops) {
+        await this.applyQueuedPreset();
+        return;
+      }
+    }
+    await this.applyPreset(preset);
+    await this.applyQueuedPreset();
+  };
+
+  // The preset tapped while Off was handing the thermostat back, if any.
+  applyQueuedPreset = async () => {
+    const queued = this.queuedPreset;
+    this.queuedPreset = null;
+    if (queued) {
+      await this.selectPreset(queued);
+    }
+  };
+
+  applyPreset = async preset => {
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
+    // What the card showed before the tap, put back if the write fails.
+    const before = {
+      activePreset: this.state.activePreset,
+      setpoint: this.state.setpoint,
+      isManualMode: this.state.isManualMode,
+      manualSetpointOverride: this.state.manualSetpointOverride
+    };
     const newSetpoint =
       preset.temp !== null && preset.temp !== undefined ? this.toSetpointFeatureUnit(preset.temp) : this.state.setpoint;
     this.setState({
@@ -1481,6 +1606,7 @@ class ThermostatBox extends Component {
     // The hold the server arms is the widget's own, so the event it echoes back
     // must not un-highlight the preset that was just picked.
     this.pickingPreset = true;
+    let written;
     try {
       if (preset.key === 'off') {
         // Stopping is a mode, not a preset: it switches the machine off, and the
@@ -1488,16 +1614,25 @@ class ThermostatBox extends Component {
         // External thermostats carry this mode feature too — it is Gladys's own
         // stop, and the server turns it into the real device's stop (its mode
         // when it has one, plus the frost setpoint).
-        await this.writeMode(THERMOSTAT_MODE.OFF);
+        written = await this.writeMode(THERMOSTAT_MODE.OFF);
       } else {
         await this.resumeIfStopped();
-        await this.savePreset(preset.key);
+        written = await this.savePreset(preset.key);
       }
     } finally {
       this.pickingPreset = false;
     }
+    // A write that failed changed nothing: the card goes back to what it showed
+    // before the tap — the manual mode it was in, not `false`, since an earlier
+    // hold may still stand — until the refresh reads the device. Left in manual
+    // mode, an Off tapped before the refresh handed a thermostat on an Off point
+    // back to its programme instead of stopping it; left on the new setpoint,
+    // the dial showed it until the device next reported.
+    if (!written) {
+      this.setState(before);
+    }
     await this.refreshFromDevice();
-    if (hasSchedule && preset.key !== 'off') this.showManualCountdown();
+    if (written && hasSchedule && preset.key !== 'off') this.showManualCountdown();
   };
 
   render(
@@ -1605,17 +1740,26 @@ class ThermostatBox extends Component {
     // otherwise the order the lit preset is set to. A setpoint turned by a scene
     // names no preset, and is not second-guessed.
     let wantedOrder = null;
+    let wantedRest = false;
     if (heaterRegulated && mode === 'off') {
       wantedOrder = PILOT_WIRE_MODE.OFF;
     } else if (heaterRegulated && isWindowOpen) {
       wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
+      wantedRest = true;
     } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
       const configured = cfg[`pilot_wire_order_${activePreset}`];
       wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
     }
     // The order actually sent, as the server picks it: one the module does not
     // take is sent as comfort, or not at all — and is then on its way for ever.
-    const expectedOrder = wantedOrder === null ? null : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
+    // The window's frost protection is a rest, sent as off, then eco, to a
+    // module without it.
+    let expectedOrder = null;
+    if (wantedOrder !== null) {
+      expectedOrder = wantedRest
+        ? supportedStandbyOrder(wantedOrder, pilotWireSupportedOptions)
+        : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
+    }
     // Until the module confirms it — a few seconds on Z-Wave — the banner says
     // the order is on its way rather than showing a ring and a preset that
     // disagree. Any comfort the heater keeps is comfort, as the server holds it.
@@ -1638,8 +1782,8 @@ class ThermostatBox extends Component {
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
     // When Gladys regulates a pilot-wire heater, the module only ever carries
-    // comfort or frost protection, whatever the preset: eco at 18 °C in a room at
-    // 20 °C shows frost protection on the heater. Saying why, under the gauge,
+    // comfort or its standby order, whatever the preset: eco at 18 °C in a room
+    // at 20 °C shows frost protection on the heater, by default. Saying why, under the gauge,
     // is what keeps that from looking like a wrong order.
     const pilotWireStatus =
       this.isGladysRegulatedPilotWire() && !isWindowOpen && mode !== 'off' && isSwitchOn !== null
@@ -1647,6 +1791,8 @@ class ThermostatBox extends Component {
           ? 'pilotWireHeating'
           : 'pilotWireStandby'
         : null;
+    const statusPreset =
+      pilotWireStatus === 'pilotWireHeating' ? 'comfort' : STANDBY_PRESET_BY_ORDER[pilotWireOrder] || 'frost';
 
     // Convert temperatures for display
     const displaySetpoint = this.toDisplayTemp(setpoint);
@@ -1740,16 +1886,12 @@ class ThermostatBox extends Component {
 
               {/* Drawn like the card's other banners. Heating carries comfort's
                   flame and colour, the order the module then carries; standby
-                  carries frost's snowflake and colour, for the same reason. */}
+                  carries those of the order the module rests on — frost
+                  protection by default, eco or off when chosen (C.1.1). */}
               {pilotWireStatus && (
-                <div
-                  class={style.scheduleBanner}
-                  style={`--banner-color:${this.getPresetColor(
-                    pilotWireStatus === 'pilotWireHeating' ? 'comfort' : 'frost'
-                  )}`}
-                >
+                <div class={style.scheduleBanner} style={`--banner-color:${this.getPresetColor(statusPreset)}`}>
                   <i
-                    class={`fe ${pilotWireStatus === 'pilotWireHeating' ? COMFORT_ICON.heating : PRESET_ICONS.frost} ${
+                    class={`fe ${statusPreset === 'comfort' ? COMFORT_ICON.heating : PRESET_ICONS[statusPreset]} ${
                       style.scheduleBannerIcon
                     }`}
                   />

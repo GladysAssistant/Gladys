@@ -17,6 +17,7 @@ const {
   clearRemoteStop,
   clearModuleStop,
 } = require('./thermostat.scheduleDevice');
+const { programmeKeepsOff } = require('./thermostat.offPoint');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
 const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
 
@@ -236,7 +237,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
         );
       }
       await clearManualHold.call(this, device);
-    } else if (starting && isExternal(config)) {
+    } else if (starting && isExternal(config) && !(await programmeKeepsOff(device))) {
       // The power and the mode go first in this direction too. Left to the next
       // pass, they reached the appliance two seconds after the setpoint the widget
       // sends right behind a start: a thermostat still off was handed a target to ignore.

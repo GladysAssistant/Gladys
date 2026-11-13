@@ -102,14 +102,15 @@ describe('checkAndConvertUnit distances', () => {
   });
 
   it('converts kWh/100km to kWh/100mi (US preference)', () => {
+    // consumption per fixed 100-distance grows with the larger mile unit
     const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM, MEASUREMENT_UNITS.US);
-    expect(result.value).to.be.closeTo(6.21, 0.01);
+    expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE);
   });
 
   it('converts Wh/km to Wh/mi (US preference)', () => {
     const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM, MEASUREMENT_UNITS.US);
-    expect(result.value).to.be.closeTo(6.21, 0.01);
+    expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE);
   });
 
@@ -133,13 +134,13 @@ describe('checkAndConvertUnit distances', () => {
 
   it('converts kWh/100mi to kWh/100km (metric preference)', () => {
     const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE, MEASUREMENT_UNITS.METRIC);
-    expect(result.value).to.be.closeTo(16.1, 0.01);
+    expect(result.value).to.be.closeTo(6.21, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM);
   });
 
   it('converts Wh/mi to Wh/km (metric preference)', () => {
     const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE, MEASUREMENT_UNITS.METRIC);
-    expect(result.value).to.be.closeTo(16.1, 0.01);
+    expect(result.value).to.be.closeTo(6.21, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM);
   });
 

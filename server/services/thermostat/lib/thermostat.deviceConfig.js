@@ -15,6 +15,7 @@ const {
   THERMOSTAT_TYPES,
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
+  parsePilotWireStandbyOrder,
 } = require('../../../utils/thermostatConstants');
 const { THERMOSTAT_MODE, PILOT_WIRE_MODE } = require('../../../utils/constants');
 const { parseSelectorList } = require('../../../utils/thermostatSelectorList');
@@ -79,6 +80,8 @@ function buildParamsConfig(device) {
       thermostatType === THERMOSTAT_TYPES.VIRTUAL && temperatureFeatures.length > 0
         ? PILOT_WIRE_REGULATIONS.GLADYS
         : PILOT_WIRE_REGULATIONS.HEATER,
+    // The order sent while the room is warm enough, when Gladys regulates.
+    pilot_wire_standby_order: parsePilotWireStandbyOrder(getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER')),
     pilot_wire_orders: Object.keys(DEFAULT_PILOT_WIRE_ORDERS).reduce(
       (orders, preset) => ({ ...orders, [preset]: pilotWireOrder(preset) }),
       {},

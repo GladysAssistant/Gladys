@@ -381,7 +381,7 @@ The fields concerned, and what they select:
 | Form | Selection | Picker options |
 | --- | --- | --- |
 | Turn on / turn off / toggle the lights | device selectors (`devices`) | `pickDevices` |
-| Turn on / turn off / toggle the switches | device selectors (`devices`), writable switches only | `pickDevices` |
+| Turn on / turn off / toggle the switches | feature selectors (`device_features`): one row per writable switch, so each switch of a multi-switch device can be picked. A scene still storing `devices` shows the first switch of each, and stores features from its next change | — |
 | Blink the lights | device selectors (`devices`), lights and switches | `pickDevices` |
 | Change the thermostats' schedule | device selectors (`devices`), the thermostats of the schedule's house; disabled until a schedule is chosen | `pickDevices` |
 | "Device state change" trigger | feature selectors (`device_features`) | `sameKindOnly` |

@@ -1,5 +1,10 @@
 const { expect, assert } = require('chai');
-const { DASHBOARD_BOX_TYPE, DASHBOARD_TYPE, DASHBOARD_VISIBILITY } = require('../../../utils/constants');
+const {
+  DASHBOARD_BOX_TYPE,
+  DASHBOARD_BOX_MAX_ITEMS,
+  DASHBOARD_TYPE,
+  DASHBOARD_VISIBILITY,
+} = require('../../../utils/constants');
 
 const Dashboard = require('../../../lib/dashboard');
 
@@ -303,6 +308,117 @@ describe('dashboard.update', () => {
     return assert.isRejected(promise);
   });
 
+  const houseViewBoxWithPins = (count) => ({
+    boxes: [
+      {
+        columns: [
+          [
+            {
+              type: DASHBOARD_BOX_TYPE.HOUSE_VIEW,
+              image: 'gallery:house-solar',
+              pins: Array.from({ length: count }, (_, index) => ({
+                x_pct: index % 100,
+                y_pct: 50,
+                device_feature: `feature-${index}`,
+              })),
+            },
+          ],
+        ],
+      },
+    ],
+  });
+
+  it('should save a house-view box holding the maximum number of pins', async () => {
+    expect(DASHBOARD_BOX_MAX_ITEMS.HOUSE_VIEW_PINS).to.equal(50);
+    const updatedDashboard = await dashboard.update(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      'test-dashboard',
+      houseViewBoxWithPins(DASHBOARD_BOX_MAX_ITEMS.HOUSE_VIEW_PINS),
+    );
+    expect(updatedDashboard.boxes[0].columns[0][0].pins).to.have.lengthOf(DASHBOARD_BOX_MAX_ITEMS.HOUSE_VIEW_PINS);
+  });
+
+  it('should reject a house-view box holding more pins than the maximum', async () => {
+    const promise = dashboard.update(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      'test-dashboard',
+      houseViewBoxWithPins(DASHBOARD_BOX_MAX_ITEMS.HOUSE_VIEW_PINS + 1),
+    );
+    return assert.isRejected(promise, '.pins" must contain less than or equal to 50 items');
+  });
+
+  const chipsBoxWithChips = (count) => ({
+    boxes: [
+      {
+        columns: [
+          [
+            {
+              type: DASHBOARD_BOX_TYPE.CHIPS,
+              chips: Array.from({ length: count }, (_, index) => ({
+                chip_type: 'device-feature',
+                device_feature: `feature-${index}`,
+              })),
+            },
+          ],
+        ],
+      },
+    ],
+  });
+
+  it('should save a chips box holding the maximum number of chips', async () => {
+    const updatedDashboard = await dashboard.update(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      'test-dashboard',
+      chipsBoxWithChips(DASHBOARD_BOX_MAX_ITEMS.CHIPS),
+    );
+    expect(updatedDashboard.boxes[0].columns[0][0].chips).to.have.lengthOf(DASHBOARD_BOX_MAX_ITEMS.CHIPS);
+  });
+
+  it('should reject a chips box holding more chips than the maximum', async () => {
+    const promise = dashboard.update(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      'test-dashboard',
+      chipsBoxWithChips(DASHBOARD_BOX_MAX_ITEMS.CHIPS + 1),
+    );
+    return assert.isRejected(promise, '.chips" must contain less than or equal to 20 items');
+  });
+
+  const actionsBoxWithActions = (count) => ({
+    boxes: [
+      {
+        columns: [
+          [
+            {
+              type: DASHBOARD_BOX_TYPE.ACTIONS,
+              actions: Array.from({ length: count }, (_, index) => ({
+                action_type: 'scene',
+                scene: `scene-${index}`,
+              })),
+            },
+          ],
+        ],
+      },
+    ],
+  });
+
+  it('should save an actions box holding the maximum number of actions', async () => {
+    const updatedDashboard = await dashboard.update(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      'test-dashboard',
+      actionsBoxWithActions(DASHBOARD_BOX_MAX_ITEMS.ACTIONS),
+    );
+    expect(updatedDashboard.boxes[0].columns[0][0].actions).to.have.lengthOf(DASHBOARD_BOX_MAX_ITEMS.ACTIONS);
+  });
+
+  it('should reject an actions box holding more actions than the maximum', async () => {
+    const promise = dashboard.update(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      'test-dashboard',
+      actionsBoxWithActions(DASHBOARD_BOX_MAX_ITEMS.ACTIONS + 1),
+    );
+    return assert.isRejected(promise, '.actions" must contain less than or equal to 20 items');
+  });
+
   it('should save a scene box with status features', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [
@@ -369,6 +485,24 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('period_start_day', 5);
   });
 
+  it('should save an energy price box carrying a meter, or none for the main meter', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        [
+          { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: 'linky', name: 'Electricity price' },
+          { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: '' },
+          { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE },
+        ],
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0]).to.deep.equal([
+      { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: 'linky', name: 'Electricity price' },
+      { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: '' },
+      { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE },
+    ]);
+  });
+
+  // a box saved before the meter targeting
   it('should save an energy price box carrying a contract selector', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [

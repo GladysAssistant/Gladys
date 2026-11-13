@@ -267,7 +267,7 @@ const ENERGY_SECTIONS = [
       [
         {
           type: 'energy-price',
-          energy_contract: 'edf-tempo-9-kva',
+          electric_meter: 'electric-meter',
           name: 'Electricity price'
         },
         {

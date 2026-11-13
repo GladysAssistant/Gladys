@@ -1,6 +1,11 @@
 import get from 'get-value';
 
-import { ACTIONS, EVENTS } from '../../../../../server/utils/constants';
+import {
+  ACTIONS,
+  EVENTS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
+} from '../../../../../server/utils/constants';
 import { isWildcardValue } from './sceneIntegrations';
 import getDeviceFeatureValueOptions from '../../../utils/deviceFeatureValueOptions';
 import { getDeviceFeatureName } from '../../../utils/device';
@@ -31,13 +36,6 @@ const listDeclaredFields = fields => {
     .filter(key => !isWildcardValue(fields[key]))
     .map(key => `${key}: ${Array.isArray(fields[key]) ? fields[key].join(', ') : fields[key]}`);
   return parts.length > 0 ? truncate(parts.join(' · ')) : null;
-};
-
-const listSelectors = selectors => {
-  if (!Array.isArray(selectors) || selectors.length === 0) {
-    return null;
-  }
-  return truncate(selectors.join(', '));
 };
 
 // What a selector stands for — the first name of a user, the name of a house, a scene, a
@@ -142,6 +140,29 @@ const listDeviceNames = (selectors, deviceFeatures) => {
   return truncate(names.join(', '));
 };
 
+// A switch action saved with devices drives the first writable switch of each device:
+// the name of that switch once the devices are loaded, the raw selector until then
+const listLegacySwitchNames = (selectors, dictionary, deviceFeatures) => {
+  if (!Array.isArray(selectors) || selectors.length === 0) {
+    return null;
+  }
+  const entries = deviceFeatures ? Object.values(deviceFeatures) : [];
+  const names = selectors.map(selector => {
+    const entry = entries.find(({ device }) => device.selector === selector);
+    if (!entry) {
+      return selector;
+    }
+    const feature = entry.device.features.find(
+      f =>
+        f.category === DEVICE_FEATURE_CATEGORIES.SWITCH &&
+        f.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
+        f.read_only === false
+    );
+    return feature ? getDeviceFeatureName(dictionary, entry.device, feature) : entry.device.name;
+  });
+  return truncate(names.join(', '));
+};
+
 // Builds a short human-readable summary of a configured action, displayed when
 // its card is collapsed. Returns null when there is nothing meaningful to show:
 // the card then only displays the action type label. deviceFeatures maps a
@@ -228,7 +249,12 @@ const getActionSummary = (action, dictionary, deviceFeatures, thermostatSchedule
     case ACTIONS.SWITCH.TURN_ON:
     case ACTIONS.SWITCH.TURN_OFF:
     case ACTIONS.SWITCH.TOGGLE:
-      return action.devices ? listDeviceNames(action.devices, deviceFeatures) : listSelectors(action.device_features);
+      if (Array.isArray(action.device_features) && action.device_features.length > 0) {
+        return truncate(
+          action.device_features.map(selector => getFeatureLabel(selector, dictionary, deviceFeatures)).join(', ')
+        );
+      }
+      return listLegacySwitchNames(action.devices, dictionary, deviceFeatures);
     case ACTIONS.THERMOSTAT.SET_SCHEDULE:
       // A schedule selector is a slug plus a timestamp plus a random suffix
       // (school-holidays-1792941482500-tk5w): its name reads.
@@ -290,7 +316,7 @@ const getActionSummary = (action, dictionary, deviceFeatures, thermostatSchedule
     }
     case ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE:
       return joinParts([
-        truncate(action.energy_contract),
+        truncate(action.electric_meter || action.energy_contract),
         action.operator && action.value !== undefined && action.value !== null && action.value !== ''
           ? `${formatOperator(action.operator)} ${action.value}`
           : null
@@ -392,7 +418,7 @@ const getTriggerSummary = (trigger, dictionary, deviceFeatures, names) => {
     case EVENTS.WEATHER.ALERT_ENDED:
       return joinParts([nameOf(names, 'houses', trigger.house), trigger.weather_alert_type]);
     case EVENTS.ENERGY_CONTRACT.PRICE_CHANGED:
-      return truncate(trigger.energy_contract);
+      return truncate(trigger.electric_meter || trigger.energy_contract);
     case EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT:
       return listDeclaredFields(trigger.fields);
     default:

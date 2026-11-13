@@ -9,13 +9,19 @@ const { STORE_HTTP_TIMEOUT_MS } = require('./store.constants');
  * @description Fetch and validate the manifest of a GitHub repo (indexed or
  * not): resolve the default branch through the GitHub API, then download
  * `gladys-assistant-integration.json` from the raw endpoint and validate it
- * with the same rules as the indexer.
+ * with the same rules as the indexer. The update passes `validate: false`: it
+ * checks the `gladys_version` of the manifest *before* validating it (a
+ * manifest written for a newer Gladys usually declares fields this one does
+ * not know yet, and "requires Gladys >=x" is what the admin must be told,
+ * not "unknown field"), then validates it itself.
  * @param {string} storeSlug - The `owner/repo` slug.
- * @returns {Promise<object>} Resolve with the validated manifest.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.validate] - Validate the manifest (default true).
+ * @returns {Promise<object>} Resolve with the manifest (validated unless `validate` is false).
  * @example
  * const manifest = await gladys.externalIntegration.fetchManifestFromRepo('john/gladys-open-meteo-demo');
  */
-async function fetchManifestFromRepo(storeSlug) {
+async function fetchManifestFromRepo(storeSlug, { validate = true } = {}) {
   const [owner, repo] = storeSlug.split('/');
   let defaultBranch;
   try {
@@ -49,7 +55,7 @@ async function fetchManifestFromRepo(storeSlug) {
     }
     throw e;
   }
-  return this.validateManifest(manifest);
+  return validate ? this.validateManifest(manifest) : manifest;
 }
 
 module.exports = {
