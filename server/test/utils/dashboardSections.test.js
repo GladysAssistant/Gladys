@@ -53,4 +53,13 @@ describe('normalizeDashboardBoxes', () => {
     const sectionBoxes = [{ columns: 'invalid', widths: [2, 1] }];
     expect(normalizeDashboardBoxes(sectionBoxes)).to.equal(sectionBoxes);
   });
+  it('should drop the default phone order of a section', () => {
+    expect(
+      normalizeDashboardBoxes([{ columns: [[], []], widths: [1, 1], mobile_order: 'columns' }, { columns: [[]] }]),
+    ).to.deep.equal([{ columns: [[], []] }, { columns: [[]] }]);
+  });
+  it('should keep a section ordered row by row untouched', () => {
+    const sectionBoxes = [{ columns: [[], []], mobile_order: 'rows' }];
+    expect(normalizeDashboardBoxes(sectionBoxes)).to.equal(sectionBoxes);
+  });
 });

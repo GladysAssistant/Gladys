@@ -373,7 +373,7 @@
     "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
-    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, nutze die +-Buttons für Widgets, Spalten oder Abschnitte. Ziehe Widgets zum Verschieben — auf dem Handy nutze die Pfeile.",
+    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, und nutze die +-Schaltflächen, um Widgets, Spalten oder Abschnitte hinzuzufügen. Ziehe Widgets, um sie zu verschieben – auf dem Telefon nutze die Pfeile, „Verschieben nach…“ oder den Modus „Neu anordnen“.",
     "editorDashboardSettingsButton": "Dashboard-Einstellungen",
     "editorDashboardSettings": "Dashboard-Einstellungen",
     "editorMoveSectionUp": "Abschnitt nach oben verschieben",
@@ -521,7 +521,34 @@
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Gib den Namen des Widgets ein",
-        "addADeviceLabel": "Füge ein Gerät hinzu:"
+        "addADeviceLabel": "Füge ein Gerät hinzu:",
+        "listLabel": "Angezeigte Geräte",
+        "emptyList": "Noch kein Gerät in diesem Widget.",
+        "addDevicesButton": "Geräte hinzufügen",
+        "dragHint": "Ziehe den Griff zum Sortieren, tippe auf ein Gerät, um es umzubenennen.",
+        "backToList": "Geräte",
+        "moveHandle": "{{name}} verschieben",
+        "displayNameLabel": "Im Widget angezeigter Name",
+        "defaultNameHint": "Leer: Das Widget zeigt „{{name}}“.",
+        "useDefaultName": "Standardnamen verwenden",
+        "position": "Position {{index}} von {{total}}",
+        "moveUp": "Nach oben",
+        "moveDown": "Nach unten",
+        "removeFromWidget": "Aus dem Widget entfernen",
+        "done": "Fertig",
+        "deviceNotFound": "Gerät nicht gefunden",
+        "loadError": "Die Geräte konnten nicht geladen werden. Prüfe die Verbindung zu Gladys und öffne das Widget erneut.",
+        "removedUndo": "„{{name}}“ entfernt",
+        "addedCount": {
+          "one": "1 hinzugefügt",
+          "other": "{{count}} hinzugefügt"
+        },
+        "removedCount": {
+          "one": "1 entfernt",
+          "other": "{{count}} entfernt"
+        },
+        "undo": "Rückgängig",
+        "detailTitle": "Umbenennen"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -1017,7 +1044,42 @@
       "scenesText": "Licht bei Sonnenuntergang, Morgenroutinen: Dein Zuhause handelt für dich.",
       "usersTitle": "Lade deinen Haushalt ein",
       "usersText": "Erstelle ein Konto für jedes Familienmitglied."
-    }
+    },
+    "editPanelClose": "Schließen",
+    "editPanelExpand": "Bereich vergrößern",
+    "editPanelCollapse": "Bereich verkleinern",
+    "editDashboardDeleteThisDashboard": "Dieses Dashboard löschen",
+    "editDashboardDeleteForever": "Endgültig löschen",
+    "editorAddColumnShort": "Spalte",
+    "editorAddWidgetHere": "Hier ein Widget hinzufügen",
+    "editorDeleteColumn": "Spalte {{index}} löschen",
+    "editorExplanationDismiss": "Diese Hilfe ausblenden",
+    "editorMobileOrderColumns": "Nach Spalte",
+    "editorMobileOrderRows": "Nach Zeile",
+    "editorMobileOrderHelp": "Auf dem Telefon werden die Spalten gestapelt: Widgets Spalte für Spalte oder Zeile für Zeile anzeigen (das erste Widget jeder Spalte, dann das zweite…)",
+    "editorMoveCurrentColumn": "Aktuelle Spalte",
+    "editorMoveWidgetCount": {
+      "zero": "Leer",
+      "one": "1 Widget",
+      "other": "{{count}} Widgets"
+    },
+    "editorMoveWidgetUp": "Nach oben",
+    "editorMoveWidgetDown": "Nach unten",
+    "editorMoveWidgetTo": "Verschieben nach…",
+    "editorMoveWidgetTitle": "Widget verschieben",
+    "editorMoveWidgetHint": "Wähle die Spalte für das Widget: Es wird an ihrem Ende eingefügt.",
+    "editorRemoveWidget": "Widget entfernen",
+    "editorWidgetSettings": "Widget-Einstellungen",
+    "editorReorganize": "Neu anordnen",
+    "editorReorganizeDone": "Vollansicht",
+    "leaveConfirmTitle": "Ohne Speichern verlassen?",
+    "leaveConfirmText": "Die Änderungen an diesem Dashboard gehen verloren.",
+    "leaveConfirmLeave": "Ohne Speichern verlassen",
+    "leaveConfirmStay": "Weiter bearbeiten",
+    "selectBoxTypePopularSection": "Am häufigsten verwendet",
+    "selectBoxTypeAllSection": "Alle Widgets",
+    "widgetRemoved": "Widget entfernt",
+    "editorDashboardSettingsShort": "Einstellungen"
   },
   "newDashboard": {
     "cardTitle": "Ein neues Dashboard hinzufügen",
@@ -2006,7 +2068,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Adaptertyp",
               "unknownDongle": "Nicht definiert",
-              "tcpPort": "TCP-Port"
+              "tcpPort": "TCP-Port",
+              "ezspDriver": "Alte Firmware: Gladys verwendet den Kompatibilitätstreiber <code>ezsp</code>, da der Treiber <code>ember</code> Firmware 7.4 oder höher erfordert. Zigbee2mqtt funktioniert so, aber dieser Treiber ist veraltet. Um zu <code>ember</code> zurückzukehren, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">aktualisieren Sie die Firmware</a> und wählen Sie dann das Modell ohne „(legacy ezsp)“ (oder den Typ <code>ember</code> für einen Netzwerk-Koordinator)."
             },
             "externalMqtt": {
               "title": "Verbindung für externe Tools",
@@ -2016,7 +2079,10 @@
               "copied": "Kopiert"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Warnung: Die Firmware Ihres Ember-Koordinators ist veraltet. Version 7.4.x oder höher ist erforderlich. Bitte folgen Sie der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>, um sie zu aktualisieren. Wählen Sie andernfalls den Dongle (legacy ezsp) in der Konfiguration aus.",
+              "EZSP_PROTOCOL_VERSION": "Die Firmware Ihres Koordinators ist zu alt für den Treiber <code>ember</code>, der Version 7.4 oder höher erfordert, und für dieses Modell gibt es keinen Kompatibilitätstreiber. Aktualisieren Sie sie mit der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT erhält keine Antwort von Ihrem Zigbee-Koordinator. Überprüfen Sie, ob das in der Konfiguration gewählte Modell Ihrem entspricht (es bestimmt den verwendeten Treiber) und ob keine andere Software (Home Assistant, ein anderes Zigbee2MQTT…) den Koordinator verwendet. Ziehen Sie dann Ihren Stick ab und stecken Sie ihn wieder ein, oder starten Sie Ihren Netzwerk-Koordinator neu.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT kann Ihren Netzwerk-Koordinator nicht erreichen. Überprüfen Sie, ob er eingeschaltet und mit dem Netzwerk verbunden ist und ob seine Adresse in der Konfiguration (tcp://adresse:port) korrekt ist.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT verweigert den Start, weil seine Konfiguration (Datei configuration.yaml) ungültig ist. Wenn Sie sie von Hand geändert haben, korrigieren Sie sie; andernfalls melden Sie es im <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys-Forum</a>. Abgelehnte Einstellungen:",
               "unknownErrorPrefix": "Zigbee2MQTT-Containerfehler: "
             }
           },
@@ -7705,5 +7771,23 @@
     "closed": "Geschlossen",
     "on": "An",
     "off": "Aus"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Abbrechen",
+    "searchPlaceholder": "Raum, Gerät, Messwert…",
+    "searchLabel": "Gerät suchen",
+    "clearSearch": "Suche löschen",
+    "allRooms": "Alle",
+    "selectedFilter": "Ausgewählt",
+    "roomsLabel": "Nach Raum filtern",
+    "noResult": "Kein Gerät entspricht „{{search}}“.",
+    "noSelection": "Noch kein Gerät ausgewählt.",
+    "noDevice": "Noch keine Geräte: Füge deine Geräte zuerst über eine Integration hinzu.",
+    "selectedCount": {
+      "one": "1 ausgewählt",
+      "other": "{{count}} ausgewählt"
+    },
+    "validate": "Fertig",
+    "title": "Geräte wählen"
   }
 }

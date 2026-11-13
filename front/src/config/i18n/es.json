@@ -373,7 +373,7 @@
     "editDashboardAddSectionButton": "Agregar una sección",
     "editDashboardBoxNotEmpty": "No puede eliminar esta columna porque contiene widgets.",
     "editDashboardMyDashboards": "Mis paneles",
-    "editDashboardExplanation": "Este es su panel real: toque un widget para editarlo y use los botones + para agregar widgets, columnas o secciones. Arrastre los widgets para moverlos; en el móvil, use las flechas.",
+    "editDashboardExplanation": "Este es tu panel real: toca un widget para editarlo y usa los botones + para agregar widgets, columnas o secciones. Arrastra los widgets para moverlos; en el teléfono, usa las flechas, «Mover a…» o el modo Reorganizar.",
     "editorDashboardSettingsButton": "Configuración del panel",
     "editorDashboardSettings": "Configuración del panel",
     "editorMoveSectionUp": "Mover la sección hacia arriba",
@@ -521,7 +521,34 @@
         "editDeviceFeaturesLabel": "Seleccione los dispositivos que desea mostrar:",
         "editNameLabel": "Nombre del widget (opcional)",
         "editNamePlaceholder": "Ingrese el nombre del widget",
-        "addADeviceLabel": "Agregar un dispositivo:"
+        "addADeviceLabel": "Agregar un dispositivo:",
+        "listLabel": "Dispositivos mostrados",
+        "emptyList": "Todavía no hay ningún dispositivo en este widget.",
+        "addDevicesButton": "Agregar dispositivos",
+        "dragHint": "Arrastra el asa para reordenar, toca un dispositivo para renombrarlo.",
+        "backToList": "Dispositivos",
+        "moveHandle": "Mover {{name}}",
+        "displayNameLabel": "Nombre mostrado en el widget",
+        "defaultNameHint": "Vacío: el widget muestra «{{name}}».",
+        "useDefaultName": "Usar el nombre predeterminado",
+        "position": "Posición {{index}} de {{total}}",
+        "moveUp": "Subir",
+        "moveDown": "Bajar",
+        "removeFromWidget": "Quitar del widget",
+        "done": "Listo",
+        "deviceNotFound": "Dispositivo no encontrado",
+        "loadError": "No se pudieron cargar los dispositivos. Comprueba la conexión con Gladys y vuelve a abrir el widget.",
+        "removedUndo": "«{{name}}» quitado",
+        "addedCount": {
+          "one": "1 agregado",
+          "other": "{{count}} agregados"
+        },
+        "removedCount": {
+          "one": "1 quitado",
+          "other": "{{count}} quitados"
+        },
+        "undo": "Deshacer",
+        "detailTitle": "Renombrar"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Seleccione la habitación que desea mostrar aquí.",
@@ -1017,7 +1044,42 @@
       "scenesText": "Luces al atardecer, rutinas matutinas: su hogar actúa por usted.",
       "usersTitle": "Invite a su familia",
       "usersText": "Cree una cuenta para cada miembro de la familia."
-    }
+    },
+    "editPanelClose": "Cerrar",
+    "editPanelExpand": "Ampliar el panel",
+    "editPanelCollapse": "Reducir el panel",
+    "editDashboardDeleteThisDashboard": "Eliminar este panel",
+    "editDashboardDeleteForever": "Eliminar definitivamente",
+    "editorAddColumnShort": "Columna",
+    "editorAddWidgetHere": "Agregar un widget aquí",
+    "editorDeleteColumn": "Eliminar la columna {{index}}",
+    "editorExplanationDismiss": "Ocultar esta ayuda",
+    "editorMobileOrderColumns": "Por columna",
+    "editorMobileOrderRows": "Por fila",
+    "editorMobileOrderHelp": "En el teléfono las columnas se apilan: mostrar los widgets columna por columna, o fila por fila (el primer widget de cada columna, luego el segundo…)",
+    "editorMoveCurrentColumn": "Columna actual",
+    "editorMoveWidgetCount": {
+      "zero": "Vacía",
+      "one": "1 widget",
+      "other": "{{count}} widgets"
+    },
+    "editorMoveWidgetUp": "Subir",
+    "editorMoveWidgetDown": "Bajar",
+    "editorMoveWidgetTo": "Mover a…",
+    "editorMoveWidgetTitle": "Mover el widget",
+    "editorMoveWidgetHint": "Elige la columna para el widget: se coloca al final.",
+    "editorRemoveWidget": "Eliminar el widget",
+    "editorWidgetSettings": "Ajustes del widget",
+    "editorReorganize": "Reorganizar",
+    "editorReorganizeDone": "Vista completa",
+    "leaveConfirmTitle": "¿Salir sin guardar?",
+    "leaveConfirmText": "Se perderán los cambios de este panel.",
+    "leaveConfirmLeave": "Salir sin guardar",
+    "leaveConfirmStay": "Seguir editando",
+    "selectBoxTypePopularSection": "Los más usados",
+    "selectBoxTypeAllSection": "Todos los widgets",
+    "widgetRemoved": "widget eliminado",
+    "editorDashboardSettingsShort": "Ajustes"
   },
   "newDashboard": {
     "cardTitle": "Crear un nuevo panel",
@@ -1815,7 +1877,8 @@
               "dongleName": "Adaptador",
               "networkAdapterType": "Tipo de adaptador",
               "unknownDongle": "No definido",
-              "tcpPort": "Puerto TCP"
+              "tcpPort": "Puerto TCP",
+              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2mqtt funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
             },
             "externalMqtt": {
               "title": "Conexión de herramientas externas",
@@ -1825,7 +1888,10 @@
               "copied": "Copiado"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Advertencia: el firmware de su coordinador Ember está desactualizado. Se requiere la versión de firmware 7.4.x o superior. Siga la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a> para actualizarlo. En caso contrario, seleccione el adaptador (ezsp heredado) en la configuración.",
+              "EZSP_PROTOCOL_VERSION": "El firmware de su coordinador es demasiado antiguo para el controlador <code>ember</code>, que requiere la versión 7.4 o superior, y este modelo no tiene controlador de compatibilidad. Actualícelo siguiendo la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT no recibe respuesta de su coordinador Zigbee. Compruebe que el modelo elegido en la configuración es el suyo (determina el controlador utilizado) y que ningún otro software (Home Assistant, otro Zigbee2MQTT…) usa el coordinador; después desconecte y vuelva a conectar su adaptador, o reinicie su coordinador de red.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT no consigue conectar con su coordinador de red. Compruebe que está encendido y conectado a la red, y que su dirección en la configuración (tcp://dirección:puerto) es la correcta.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT se niega a arrancar porque su configuración (archivo configuration.yaml) no es válida. Si la ha modificado a mano, corríjala; si no, avíselo en el <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">foro de Gladys</a>. Ajustes rechazados:",
               "unknownErrorPrefix": "Error del contenedor de Zigbee2MQTT: "
             }
           },
@@ -7705,5 +7771,23 @@
     "closed": "Cerrado",
     "on": "Encendido",
     "off": "Apagado"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Cancelar",
+    "searchPlaceholder": "Habitación, dispositivo, medida…",
+    "searchLabel": "Buscar un dispositivo",
+    "clearSearch": "Borrar la búsqueda",
+    "allRooms": "Todas",
+    "selectedFilter": "Seleccionados",
+    "roomsLabel": "Filtrar por habitación",
+    "noResult": "Ningún dispositivo coincide con «{{search}}».",
+    "noSelection": "Todavía no hay ningún dispositivo seleccionado.",
+    "noDevice": "Todavía no hay dispositivos: primero agrega tus dispositivos desde una integración.",
+    "selectedCount": {
+      "one": "1 seleccionado",
+      "other": "{{count}} seleccionados"
+    },
+    "validate": "Listo",
+    "title": "Elegir"
   }
 }

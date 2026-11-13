@@ -373,7 +373,7 @@
     "editDashboardAddSectionButton": "Add a section",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
-    "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it, use the + buttons to add widgets, columns or sections. Drag widgets to move them — on mobile, use the arrows.",
+    "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it, use the + buttons to add widgets, columns or sections. Drag widgets to move them — on a phone, use the arrows, “Move to…” or the Reorganize mode.",
     "editorDashboardSettingsButton": "Dashboard settings",
     "editorDashboardSettings": "Dashboard settings",
     "editorMoveSectionUp": "Move the section up",
@@ -521,7 +521,34 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Enter the name of the widget",
-        "addADeviceLabel": "Add a device:"
+        "addADeviceLabel": "Add a device:",
+        "listLabel": "Displayed devices",
+        "emptyList": "No device in this widget yet.",
+        "addDevicesButton": "Add devices",
+        "dragHint": "Drag the handle to reorder, tap a device to rename it.",
+        "backToList": "Devices",
+        "moveHandle": "Move {{name}}",
+        "displayNameLabel": "Name shown in the widget",
+        "defaultNameHint": "Empty: the widget shows “{{name}}”.",
+        "useDefaultName": "Use the default name",
+        "position": "Position {{index}} of {{total}}",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "removeFromWidget": "Remove from widget",
+        "done": "Done",
+        "deviceNotFound": "Device not found",
+        "loadError": "The devices could not be loaded. Check the connection to Gladys, then reopen the widget.",
+        "removedUndo": "“{{name}}” removed",
+        "addedCount": {
+          "one": "1 added",
+          "other": "{{count}} added"
+        },
+        "removedCount": {
+          "one": "1 removed",
+          "other": "{{count}} removed"
+        },
+        "undo": "Undo",
+        "detailTitle": "Rename"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -1017,7 +1044,42 @@
       "scenesText": "Lights at sunset, morning routines: your home acts for you.",
       "usersTitle": "Invite your household",
       "usersText": "Create an account for everyone in the family."
-    }
+    },
+    "editPanelClose": "Close",
+    "editPanelExpand": "Expand the panel",
+    "editPanelCollapse": "Reduce the panel",
+    "editDashboardDeleteThisDashboard": "Delete this dashboard",
+    "editDashboardDeleteForever": "Delete permanently",
+    "editorAddColumnShort": "Column",
+    "editorAddWidgetHere": "Add a widget here",
+    "editorDeleteColumn": "Delete column {{index}}",
+    "editorExplanationDismiss": "Hide this help",
+    "editorMobileOrderColumns": "By column",
+    "editorMobileOrderRows": "By row",
+    "editorMobileOrderHelp": "On a phone the columns stack: show the widgets column by column, or row by row (the first widget of every column, then the second…)",
+    "editorMoveCurrentColumn": "Current column",
+    "editorMoveWidgetCount": {
+      "zero": "Empty",
+      "one": "1 widget",
+      "other": "{{count}} widgets"
+    },
+    "editorMoveWidgetUp": "Move up",
+    "editorMoveWidgetDown": "Move down",
+    "editorMoveWidgetTo": "Move to…",
+    "editorMoveWidgetTitle": "Move the widget",
+    "editorMoveWidgetHint": "Choose the column the widget goes to: it is placed at the end of it.",
+    "editorRemoveWidget": "Remove the widget",
+    "editorWidgetSettings": "Widget settings",
+    "editorReorganize": "Reorganize",
+    "editorReorganizeDone": "Full view",
+    "leaveConfirmTitle": "Leave without saving?",
+    "leaveConfirmText": "The changes made to this dashboard will be lost.",
+    "leaveConfirmLeave": "Leave without saving",
+    "leaveConfirmStay": "Keep editing",
+    "selectBoxTypePopularSection": "Most used",
+    "selectBoxTypeAllSection": "All widgets",
+    "widgetRemoved": "widget removed",
+    "editorDashboardSettingsShort": "Settings"
   },
   "newDashboard": {
     "cardTitle": "Create a new dashboard",
@@ -1815,7 +1877,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Adapter type",
               "unknownDongle": "Not defined",
-              "tcpPort": "TCP Port"
+              "tcpPort": "TCP Port",
+              "ezspDriver": "Old firmware: Gladys uses the <code>ezsp</code> compatibility driver, because the <code>ember</code> driver requires firmware 7.4 or later. Zigbee2mqtt works this way, but this driver is deprecated. To go back to <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">update the firmware</a>, then choose the model without \"(legacy ezsp)\" (or the <code>ember</code> type for a network coordinator)."
             },
             "externalMqtt": {
               "title": "External tools connection",
@@ -1825,7 +1888,10 @@
               "copied": "Copied"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Warning: Your Ember coordinator firmware is outdated. Firmware version 7.4.x or higher is required. Please follow the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a> to update it. Otherwise, select the dongle (legacy ezsp) in the configuration.",
+              "EZSP_PROTOCOL_VERSION": "Your coordinator firmware is too old for the <code>ember</code> driver, which requires version 7.4 or later, and this model has no compatibility driver. Update it by following the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT gets no answer from your Zigbee coordinator. Check that the model selected in the configuration is yours (it sets the driver used) and that no other software (Home Assistant, another Zigbee2MQTT…) uses the coordinator, then unplug and plug your dongle back in, or restart your network coordinator.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT cannot reach your network coordinator. Check that it is powered on and connected to the network, and that its address in the configuration (tcp://address:port) is the right one.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT refuses to start because its configuration (configuration.yaml file) is not valid. If you edited it by hand, fix it; otherwise, report it on the <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys forum</a>. Refused settings:",
               "unknownErrorPrefix": "Zigbee2MQTT container error: "
             }
           },
@@ -7705,5 +7771,23 @@
     "closed": "Closed",
     "on": "On",
     "off": "Off"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Cancel",
+    "searchPlaceholder": "Room, device, measurement…",
+    "searchLabel": "Search a device",
+    "clearSearch": "Clear the search",
+    "allRooms": "All",
+    "selectedFilter": "Selected",
+    "roomsLabel": "Filter by room",
+    "noResult": "No device matches “{{search}}”.",
+    "noSelection": "No device selected yet.",
+    "noDevice": "No device yet: add your devices from an integration first.",
+    "selectedCount": {
+      "one": "1 selected",
+      "other": "{{count}} selected"
+    },
+    "validate": "Done",
+    "title": "Choose devices"
   }
 }

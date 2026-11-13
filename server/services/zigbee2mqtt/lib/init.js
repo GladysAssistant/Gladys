@@ -29,6 +29,7 @@ async function init(setupMode = false) {
   this.z2mPermitJoin = false;
   this.networkModeValid = false;
   this.z2mContainerError = null;
+  this.ezspFallback = false;
   this.mqttConnectionError = null;
   this.dockerBased = false;
 

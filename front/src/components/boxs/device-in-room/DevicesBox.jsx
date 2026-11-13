@@ -76,33 +76,54 @@ class DevicesComponent extends Component {
     this.getDeviceFeatures();
   };
 
+  // Order and names of loaded features, from the CURRENT box config. Names
+  // are aligned with device_features, so they are looked up by selector: a
+  // selector whose feature no longer exists must not shift the names of the
+  // features after it.
+  sortAndName = deviceFeatures => {
+    const selectors = this.props.box.device_features || [];
+    const names = this.props.box.device_feature_names || [];
+    return [...deviceFeatures]
+      .sort((a, b) => selectors.indexOf(a.selector) - selectors.indexOf(b.selector))
+      .map(deviceFeature => ({ ...deviceFeature, new_label: names[selectors.indexOf(deviceFeature.selector)] }));
+  };
+
   getDeviceFeatures = async () => {
+    // only the latest request commits: in the editor the config changes
+    // under a pending request, and an older response finishing last must
+    // not bring back an older order
+    this.requestId = (this.requestId || 0) + 1;
+    const requestId = this.requestId;
+    // nothing selected: nothing to fetch — an empty device_feature_selectors
+    // filter is no filter at all, and the API would return every device of
+    // the house (a widget emptied in the editor showed them all)
+    if ((this.props.box.device_features || []).length === 0) {
+      this.setState({ deviceFeatures: [], status: RequestStatus.Success });
+      return;
+    }
     this.setState({ status: RequestStatus.Getting });
     try {
       const deviceFeatureSelectors = this.props.box.device_features;
       const devices = await this.props.httpClient.get(`/api/v1/device`, {
         device_feature_selectors: deviceFeatureSelectors.join(',')
       });
+      if (requestId !== this.requestId) {
+        return;
+      }
       const deviceFeaturesFlat = [];
       devices.forEach(device => {
         device.features.forEach(feature => {
           deviceFeaturesFlat.push({ ...feature, device });
         });
       });
-      const deviceFeaturesSorted = deviceFeaturesFlat.sort(
-        (a, b) => deviceFeatureSelectors.indexOf(a.selector) - deviceFeatureSelectors.indexOf(b.selector)
-      );
-      const deviceFeaturesNewNames = this.props.box.device_feature_names;
-      if (deviceFeaturesNewNames) {
-        deviceFeaturesSorted.forEach((deviceFeature, index) => {
-          deviceFeature.new_label = deviceFeaturesNewNames[index];
-        });
-      }
       this.setState({
-        deviceFeatures: deviceFeaturesSorted,
+        deviceFeatures: this.sortAndName(deviceFeaturesFlat),
         status: RequestStatus.Success
       });
     } catch (e) {
+      if (requestId !== this.requestId) {
+        return;
+      }
       this.setState({
         status: RequestStatus.Error
       });
@@ -209,9 +230,38 @@ class DevicesComponent extends Component {
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
+  // The editor writes the box config on every keystroke and every move, and
+  // the canvas previews it live: a rename or a reorder only re-labels or
+  // re-sorts the features already loaded — a refetch would flash the loading
+  // skeleton under the user's finger. Only a different SET of features
+  // needs the API.
+  applyNamesAndOrder = () => {
+    const { deviceFeatures } = this.state;
+    if (!deviceFeatures) {
+      return;
+    }
+    this.setState({ deviceFeatures: this.sortAndName(deviceFeatures) });
+  };
+
   componentDidUpdate(previousProps) {
-    const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
-    if (deviceFeaturesChanged) {
+    // compare the raw props: a box without device_features (a widget just
+    // created, or stored that way) would otherwise fall back to a fresh []
+    // on both sides, never equal — and applyNamesAndOrder's setState would
+    // re-render, and land here again, forever
+    if (
+      get(previousProps, 'box.device_features') === get(this.props, 'box.device_features') &&
+      get(previousProps, 'box.device_feature_names') === get(this.props, 'box.device_feature_names')
+    ) {
+      return;
+    }
+    const previousSelectors = get(previousProps, 'box.device_features') || [];
+    const selectors = get(this.props, 'box.device_features') || [];
+    const sameSet =
+      previousSelectors.length === selectors.length &&
+      [...previousSelectors].sort().join(',') === [...selectors].sort().join(',');
+    if (sameSet && this.state.status === RequestStatus.Success) {
+      this.applyNamesAndOrder();
+    } else {
       this.refreshData();
     }
   }

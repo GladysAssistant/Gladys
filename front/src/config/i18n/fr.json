@@ -373,7 +373,7 @@
     "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
-    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur mobile, utilisez les flèches.",
+    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur téléphone, utilisez les flèches, « Déplacer vers… » ou le mode Réorganiser.",
     "editorDashboardSettingsButton": "Réglages du tableau de bord",
     "editorDashboardSettings": "Réglages du tableau de bord",
     "editorMoveSectionUp": "Monter la section",
@@ -521,7 +521,34 @@
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Entrez le nom du widget",
-        "addADeviceLabel": "Ajouter un appareil :"
+        "addADeviceLabel": "Ajouter un appareil :",
+        "listLabel": "Appareils affichés",
+        "emptyList": "Aucun appareil dans ce widget pour le moment.",
+        "addDevicesButton": "Ajouter des appareils",
+        "dragHint": "Glissez la poignée pour réordonner, touchez un appareil pour le renommer.",
+        "backToList": "Appareils",
+        "moveHandle": "Déplacer {{name}}",
+        "displayNameLabel": "Nom affiché dans le widget",
+        "defaultNameHint": "Vide : le widget affiche « {{name}} ».",
+        "useDefaultName": "Revenir au nom par défaut",
+        "position": "Position {{index}} sur {{total}}",
+        "moveUp": "Monter",
+        "moveDown": "Descendre",
+        "removeFromWidget": "Retirer du widget",
+        "done": "OK",
+        "deviceNotFound": "Appareil introuvable",
+        "loadError": "Impossible de charger les appareils. Vérifiez la connexion à Gladys, puis rouvrez le widget.",
+        "removedUndo": "« {{name}} » retiré",
+        "addedCount": {
+          "one": "1 ajouté",
+          "other": "{{count}} ajoutés"
+        },
+        "removedCount": {
+          "one": "1 retiré",
+          "other": "{{count}} retirés"
+        },
+        "undo": "Annuler",
+        "detailTitle": "Renommer"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -1017,7 +1044,42 @@
       "scenesText": "Lumières au coucher du soleil, routines du matin : votre maison agit pour vous.",
       "usersTitle": "Invitez votre foyer",
       "usersText": "Créez un compte pour chaque membre de la famille."
-    }
+    },
+    "editPanelClose": "Fermer",
+    "editPanelExpand": "Agrandir le panneau",
+    "editPanelCollapse": "Réduire le panneau",
+    "editDashboardDeleteThisDashboard": "Supprimer ce tableau de bord",
+    "editDashboardDeleteForever": "Supprimer définitivement",
+    "editorAddColumnShort": "Colonne",
+    "editorAddWidgetHere": "Ajouter un widget ici",
+    "editorDeleteColumn": "Supprimer la colonne {{index}}",
+    "editorExplanationDismiss": "Masquer cette aide",
+    "editorMobileOrderColumns": "Par colonne",
+    "editorMobileOrderRows": "Par rangée",
+    "editorMobileOrderHelp": "Sur téléphone, les colonnes s’empilent : afficher les widgets colonne par colonne, ou rangée par rangée (le premier widget de chaque colonne, puis le deuxième…)",
+    "editorMoveCurrentColumn": "Colonne actuelle",
+    "editorMoveWidgetCount": {
+      "zero": "Vide",
+      "one": "1 widget",
+      "other": "{{count}} widgets"
+    },
+    "editorMoveWidgetUp": "Monter",
+    "editorMoveWidgetDown": "Descendre",
+    "editorMoveWidgetTo": "Déplacer vers…",
+    "editorMoveWidgetTitle": "Déplacer le widget",
+    "editorMoveWidgetHint": "Choisissez la colonne où placer le widget : il est ajouté à la fin.",
+    "editorRemoveWidget": "Supprimer le widget",
+    "editorWidgetSettings": "Réglages du widget",
+    "editorReorganize": "Réorganiser",
+    "editorReorganizeDone": "Vue complète",
+    "leaveConfirmTitle": "Quitter sans enregistrer ?",
+    "leaveConfirmText": "Les modifications de ce tableau de bord seront perdues.",
+    "leaveConfirmLeave": "Quitter sans enregistrer",
+    "leaveConfirmStay": "Continuer l’édition",
+    "selectBoxTypePopularSection": "Les plus utilisés",
+    "selectBoxTypeAllSection": "Tous les widgets",
+    "widgetRemoved": "widget supprimé",
+    "editorDashboardSettingsShort": "Réglages"
   },
   "newDashboard": {
     "cardTitle": "Créer un tableau de bord",
@@ -2139,7 +2201,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Type d'adaptateur",
               "unknownDongle": "Non défini",
-              "tcpPort": "Port TCP"
+              "tcpPort": "Port TCP",
+              "ezspDriver": "Firmware ancien : Gladys utilise le pilote de compatibilité <code>ezsp</code>, car le pilote <code>ember</code> exige un firmware 7.4 ou supérieur. Zigbee2mqtt fonctionne ainsi, mais ce pilote est en fin de vie. Pour revenir à <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">mettez à jour le firmware</a>, puis choisissez le modèle sans « (legacy ezsp) » (ou le type <code>ember</code> pour un coordinateur réseau)."
             },
             "externalMqtt": {
               "title": "Connexion pour outils externes",
@@ -2149,7 +2212,10 @@
               "copied": "Copié"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Attention : Le firmware de votre coordinateur Ember est obsolète. La version 7.4.x ou supérieure est requise. Vous pouvez suivre ce <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guide</a> pour le mettre à jour. Dans le cas contraire, sélectionner le dongle (legacy ezsp) dans la configuration.",
+              "EZSP_PROTOCOL_VERSION": "Le firmware de votre coordinateur est trop ancien pour le pilote <code>ember</code>, qui exige la version 7.4 ou supérieure, et ce modèle n'a pas de pilote de compatibilité. Mettez-le à jour en suivant ce <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guide</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT ne reçoit pas de réponse de votre coordinateur Zigbee. Vérifiez que le modèle choisi dans la configuration est bien le vôtre (il détermine le pilote utilisé) et qu'aucun autre logiciel (Home Assistant, un autre Zigbee2MQTT…) n'utilise le coordinateur, puis débranchez et rebranchez votre clé, ou redémarrez votre coordinateur réseau.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT n'arrive pas à joindre votre coordinateur réseau. Vérifiez qu'il est allumé et connecté au réseau, et que son adresse dans la configuration (tcp://adresse:port) est la bonne.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT refuse de démarrer, car sa configuration (fichier configuration.yaml) n'est pas valide. Si vous l'avez modifiée à la main, corrigez-la ; sinon, signalez-le sur le <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">forum de Gladys</a>. Réglages refusés :",
               "unknownErrorPrefix": "Erreur du conteneur Zigbee2MQTT : "
             }
           },
@@ -7705,5 +7771,23 @@
     "closed": "Fermé",
     "on": "Allumé",
     "off": "Éteint"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Annuler",
+    "searchPlaceholder": "Pièce, appareil, mesure…",
+    "searchLabel": "Rechercher un appareil",
+    "clearSearch": "Effacer la recherche",
+    "allRooms": "Toutes",
+    "selectedFilter": "Sélectionnés",
+    "roomsLabel": "Filtrer par pièce",
+    "noResult": "Aucun appareil ne correspond à « {{search}} ».",
+    "noSelection": "Aucun appareil sélectionné pour le moment.",
+    "noDevice": "Aucun appareil pour l'instant : ajoutez d'abord vos appareils depuis une intégration.",
+    "selectedCount": {
+      "one": "1 sélectionné",
+      "other": "{{count}} sélectionnés"
+    },
+    "validate": "Valider",
+    "title": "Choisir"
   }
 }
