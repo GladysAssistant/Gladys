@@ -7670,6 +7670,10 @@
     "instanceUpdateNoticeButton": "Update my instance",
     "instanceUpdateNoticeDismiss": "Hide this message",
     "needHelp": "Need help",
+    "openMenu": "Open the menu",
+    "closeMenu": "Close the menu",
+    "collapseMenu": "Hide the menu",
+    "expandMenu": "Show the menu",
     "signOut": "Sign Out"
   },
   "gatewayLinkUser": {
