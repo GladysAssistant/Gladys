@@ -1,5 +1,7 @@
 const Promise = require('bluebird');
 const logger = require('../../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const { getNodeExternalIdPrefix, getGladysDevicesOfNode } = require('../utils/getGladysDevicesOfNode');
 
 /**
  * @description Decommission a node: the node is asked to leave the fabric, and when it can not be
@@ -7,19 +9,22 @@ const logger = require('../../../utils/logger');
  * The Gladys devices created from this node can be deleted in the same gesture.
  * @param {bigint} nodeId - The node ID.
  * @param {object} [options] - Options.
- * @param {boolean} [options.deleteGladysDevices] - Also delete the Gladys devices of this node.
+ * @param {Array<string>} [options.gladysDeviceSelectors] - The Gladys devices of this node the user
+ * confirmed to delete. Only the ones which are really devices of this node are deleted.
  * @returns {Promise<object>} Whether the removal was forced, and the Gladys devices deleted / kept.
- * @example await matter.decommission(nodeId, { deleteGladysDevices: true });
+ * @example await matter.decommission(nodeId, { gladysDeviceSelectors: ['kitchen-plug'] });
  */
-async function decommission(nodeId, { deleteGladysDevices = false } = {}) {
+async function decommission(nodeId, { gladysDeviceSelectors = [] } = {}) {
+  if (!this.commissioningController) {
+    throw new ServiceNotConfiguredError('Matter is not started');
+  }
   const node = this.nodesMap.get(nodeId);
-  const externalIdPrefix = `matter:${nodeId.toString()}:`;
-  // resolved before the node leaves the fabric: a lookup failure must leave everything as it was
-  const nodeDevices = deleteGladysDevices
-    ? (await this.gladys.device.get({ service: 'matter' })).filter((device) =>
-        device.external_id.startsWith(externalIdPrefix),
-      )
-    : [];
+  // the devices shown to the user when they confirmed: a device of this node created since then
+  // (another tab, another admin) is not deleted without having been listed
+  const confirmedSelectors = new Set(gladysDeviceSelectors);
+  const nodeDevices = getGladysDevicesOfNode(this.gladys.stateManager, nodeId).filter((device) =>
+    confirmedSelectors.has(device.selector),
+  );
   let forced = false;
   try {
     if (!node) {
@@ -34,6 +39,7 @@ async function decommission(nodeId, { deleteGladysDevices = false } = {}) {
   }
 
   this.nodesMap.delete(nodeId);
+  const externalIdPrefix = getNodeExternalIdPrefix(nodeId);
   this.devices = this.devices.filter((device) => !device.external_id.startsWith(externalIdPrefix));
 
   const deletedDevices = [];
@@ -41,12 +47,12 @@ async function decommission(nodeId, { deleteGladysDevices = false } = {}) {
   await Promise.each(nodeDevices, async (device) => {
     try {
       await this.gladys.device.destroy(device.selector);
-      deletedDevices.push(device.name);
+      deletedDevices.push(device);
     } catch (e) {
       // the node is already gone: one device that can not be deleted (too many states,
       // the purge is then running) must not hide the others
       logger.warn(`Matter: Failed to delete device ${device.selector} of node ${nodeId}: ${e}`);
-      failedDevices.push(device.name);
+      failedDevices.push(device);
     }
   });
 

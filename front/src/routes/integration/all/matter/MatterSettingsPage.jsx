@@ -124,6 +124,64 @@ const DeviceDisplay = ({
   );
 };
 
+const DecommissionFeedback = ({ feedback, onDismiss }) => {
+  const dismissButton = <button type="button" class="close" onClick={onDismiss} />;
+  if (feedback.status === 'error') {
+    return (
+      <div class="alert alert-danger alert-dismissible">
+        {dismissButton}
+        <Text id="integration.matter.settings.decommission.error" fields={{ name: feedback.name }} />
+        {feedback.message && (
+          <div>
+            <small>{feedback.message}</small>
+          </div>
+        )}
+      </div>
+    );
+  }
+  if (feedback.status === 'noResponse') {
+    return (
+      <div class="alert alert-warning alert-dismissible">
+        {dismissButton}
+        <Text id="integration.matter.settings.decommission.noResponse" fields={{ name: feedback.name }} />
+      </div>
+    );
+  }
+  return (
+    <>
+      <div class="alert alert-success alert-dismissible">
+        {dismissButton}
+        <Text id="integration.matter.settings.decommission.success" fields={{ name: feedback.name }} />
+        {feedback.deletedDevices.length > 0 && (
+          <span>
+            {' '}
+            <Text
+              id="integration.matter.settings.decommission.devicesDeleted"
+              plural={feedback.deletedDevices.length}
+              fields={{ count: feedback.deletedDevices.length }}
+            />
+          </span>
+        )}
+      </div>
+      {feedback.forced && (
+        <div class="alert alert-warning">
+          <Text id="integration.matter.settings.decommission.forcedWarning" fields={{ name: feedback.name }} />
+        </div>
+      )}
+      {feedback.failedDevices.length > 0 && (
+        <div class="alert alert-warning">
+          <Text id="integration.matter.settings.decommission.devicesNotDeleted" fields={{ name: feedback.name }} />
+          <ul class="mb-0">
+            {feedback.failedDevices.map(device => (
+              <li key={device.selector}>{device.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  );
+};
+
 class MatterSettingsPage extends Component {
   constructor(props) {
     super(props);
@@ -137,9 +195,9 @@ class MatterSettingsPage extends Component {
       loadingNodes: true,
       decommissioningNodes: {},
       nodeToDecommission: null,
-      deleteGladysDevices: true,
-      decommissionError: null,
-      decommissionResult: null,
+      deleteGladysDevices: false,
+      // outcome of each decommission, by node id: several nodes can be decommissioned at the same time
+      decommissionFeedbacks: {},
       collapsedDevices: {},
       visibleKeys: {},
       showConfirmReset: false,
@@ -192,7 +250,7 @@ class MatterSettingsPage extends Component {
   loadNodes = async () => {
     this.setState({ loadingNodes: true });
     try {
-      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node');
+      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node', { with_gladys_devices: true });
 
       // Initialize all devices as collapsed
       const collapsedDevices = {};
@@ -235,7 +293,7 @@ class MatterSettingsPage extends Component {
   };
 
   askDecommissionNode = nodeId => {
-    this.setState({ nodeToDecommission: nodeId, deleteGladysDevices: true });
+    this.setState({ nodeToDecommission: nodeId, deleteGladysDevices: false });
   };
 
   cancelDecommissionNode = () => {
@@ -246,6 +304,18 @@ class MatterSettingsPage extends Component {
     this.setState(prevState => ({ deleteGladysDevices: !prevState.deleteGladysDevices }));
   };
 
+  setDecommissionFeedback = (nodeId, feedback) => {
+    this.setState(prevState => {
+      const decommissionFeedbacks = { ...prevState.decommissionFeedbacks };
+      if (feedback) {
+        decommissionFeedbacks[nodeId] = feedback;
+      } else {
+        delete decommissionFeedbacks[nodeId];
+      }
+      return { decommissionFeedbacks };
+    });
+  };
+
   decommissionNode = async node => {
     const nodeId = node.node_id;
     // synchronous guard: setState is asynchronous, a double click would otherwise send two requests
@@ -253,41 +323,50 @@ class MatterSettingsPage extends Component {
       return;
     }
     this.decommissionsInProgress.add(nodeId);
-    const deleteGladysDevices = this.state.deleteGladysDevices && node.gladys_devices.length > 0;
-    this.setState({
+    const name = `${node.node_information.vendor_name} - ${node.node_information.product_name}`;
+    // only the devices the user saw in the confirmation are sent: the server deletes nothing else
+    const gladysDeviceSelectors = this.state.deleteGladysDevices
+      ? node.gladys_devices.map(gladysDevice => gladysDevice.selector)
+      : [];
+    this.setDecommissionFeedback(nodeId, null);
+    this.setState(prevState => ({
       nodeToDecommission: null,
-      decommissionError: null,
-      decommissionResult: null,
       decommissioningNodes: {
-        ...this.state.decommissioningNodes,
+        ...prevState.decommissioningNodes,
         [nodeId]: true
       }
-    });
+    }));
     try {
       const result = await this.props.httpClient.post(`/api/v1/service/matter/node/${nodeId}/decommission`, {
-        delete_gladys_devices: deleteGladysDevices
+        gladys_device_selectors: gladysDeviceSelectors
       });
-      this.setState({
-        decommissionResult: {
-          name: `${node.node_information.vendor_name} - ${node.node_information.product_name}`,
-          forced: result.forced,
-          deletedDevices: result.deleted_devices,
-          failedDevices: result.failed_devices
-        }
+      this.setDecommissionFeedback(nodeId, {
+        status: 'success',
+        name,
+        forced: result.forced,
+        deletedDevices: result.deleted_devices,
+        failedDevices: result.failed_devices
       });
-      await this.loadNodes();
     } catch (e) {
       console.error(e);
-      const message = (e.response && e.response.data && e.response.data.error) || e.message;
-      this.setState({ decommissionError: { nodeId, message } });
+      if (e.response) {
+        // the server answered: the node has not been removed
+        const data = e.response.data || {};
+        this.setDecommissionFeedback(nodeId, { status: 'error', name, message: data.error || data.message });
+      } else {
+        // timeout or connection lost: the server may still have removed the node
+        this.setDecommissionFeedback(nodeId, { status: 'noResponse', name });
+      }
     }
     this.decommissionsInProgress.delete(nodeId);
-    this.setState({
+    this.setState(prevState => ({
       decommissioningNodes: {
-        ...this.state.decommissioningNodes,
+        ...prevState.decommissioningNodes,
         [nodeId]: false
       }
-    });
+    }));
+    // in every case, the list shows the actual state of the nodes
+    await this.loadNodes();
   };
 
   enableMatter = async () => {
@@ -396,8 +475,7 @@ class MatterSettingsPage extends Component {
       decommissioningNodes,
       nodeToDecommission,
       deleteGladysDevices,
-      decommissionError,
-      decommissionResult,
+      decommissionFeedbacks,
       collapsedDevices,
       visibleKeys,
       hasIpv6,
@@ -474,52 +552,13 @@ class MatterSettingsPage extends Component {
                       )}
                     </div>
 
-                    {decommissionError && (
-                      <div class="alert alert-danger">
-                        <Text id="integration.matter.settings.decommission.error" />
-                        {decommissionError.message && (
-                          <div>
-                            <small>{decommissionError.message}</small>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {decommissionResult && (
-                      <>
-                        <div class="alert alert-success">
-                          <Text
-                            id="integration.matter.settings.decommission.success"
-                            fields={{ name: decommissionResult.name }}
-                          />
-                          {decommissionResult.deletedDevices.length > 0 && (
-                            <span>
-                              {' '}
-                              <Text
-                                id="integration.matter.settings.decommission.devicesDeleted"
-                                plural={decommissionResult.deletedDevices.length}
-                                fields={{ count: decommissionResult.deletedDevices.length }}
-                              />
-                            </span>
-                          )}
-                        </div>
-                        {decommissionResult.forced && (
-                          <div class="alert alert-warning">
-                            <Text id="integration.matter.settings.decommission.forcedWarning" />
-                          </div>
-                        )}
-                        {decommissionResult.failedDevices.length > 0 && (
-                          <div class="alert alert-warning">
-                            <Text id="integration.matter.settings.decommission.devicesNotDeleted" />
-                            <ul class="mb-0">
-                              {decommissionResult.failedDevices.map(name => (
-                                <li key={name}>{name}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </>
-                    )}
+                    {Object.keys(decommissionFeedbacks).map(nodeId => (
+                      <DecommissionFeedback
+                        key={nodeId}
+                        feedback={decommissionFeedbacks[nodeId]}
+                        onDismiss={() => this.setDecommissionFeedback(nodeId, null)}
+                      />
+                    ))}
 
                     <div
                       class={cx('dimmer', {

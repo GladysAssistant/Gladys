@@ -13,11 +13,13 @@ describe('Matter.getNodes', () => {
       job: {
         wrapper: fake.returns(null),
       },
-      device: {
-        get: fake.resolves([
-          { name: 'Kitchen plug', selector: 'kitchen-plug', external_id: 'matter:1234:1' },
-          { name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
-        ]),
+      stateManager: {
+        getAllKeys: fake.returns(['matter:1234:1', 'matter:12345:1']),
+        get: (entity, externalId) =>
+          ({
+            'matter:1234:1': { name: 'Kitchen plug', selector: 'kitchen-plug', external_id: 'matter:1234:1' },
+            'matter:12345:1': { name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
+          }[externalId]),
       },
     };
     const MatterMain = {};
@@ -26,7 +28,7 @@ describe('Matter.getNodes', () => {
     matterHandler = new MatterHandler(gladys, MatterMain, ProjectChipMatter, 'service-1');
   });
 
-  it('should return all nodes', async () => {
+  const setupController = () => {
     const clusterClient = {
       id: 2,
       name: 'OnOff',
@@ -73,7 +75,11 @@ describe('Matter.getNodes', () => {
         },
       ]),
     };
-    const nodes = await matterHandler.getNodes();
+  };
+
+  it('should return all nodes', async () => {
+    setupController();
+    const nodes = await matterHandler.getNodes({ withGladysDevices: true });
     expect(nodes).to.have.lengthOf(1);
     expect(nodes).to.deep.equal([
       {
@@ -112,5 +118,12 @@ describe('Matter.getNodes', () => {
         },
       },
     ]);
+  });
+  it('should not list the Gladys devices unless asked', async () => {
+    setupController();
+    const nodes = await matterHandler.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0]).to.not.have.property('gladys_devices');
+    expect(nodes[0]).to.have.property('is_connected', true);
   });
 });

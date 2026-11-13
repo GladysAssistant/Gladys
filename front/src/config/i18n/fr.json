@@ -3597,16 +3597,17 @@
           "confirmMessage": "<b>Décommissionner ce nœud ?</b> L'appareil quittera le réseau Matter de Gladys et devra être appairé à nouveau pour être utilisé dans Gladys.",
           "linkedDevices": "Appareils Gladys créés à partir de ce nœud :",
           "deleteDevicesLabel": "Supprimer aussi ces appareils de Gladys",
-          "deleteDevicesHelp": "Leur historique est supprimé, et les scènes et tableaux de bord qui les utilisent devront être mis à jour. Décochez cette case pour les conserver avec leur historique : ils ne seront plus mis à jour, et ré-appairer l'appareil crée de nouveaux appareils.",
+          "deleteDevicesHelp": "Leur historique est supprimé, et les scènes et tableaux de bord qui les utilisent devront être mis à jour. Laissez cette case décochée pour les conserver : ils ne sont plus mis à jour jusqu'à ce que l'appareil soit appairé à nouveau, et l'onglet « Appareils » proposera alors de les mettre à jour, ce qui conserve leur historique, leurs scènes et leurs tableaux de bord.",
           "confirmButton": "Oui, décommissionner",
           "cancelButton": "Annuler",
-          "error": "Une erreur est survenue lors de la décommission du nœud, il n'a pas été retiré.",
+          "error": "Une erreur est survenue lors de la décommission du nœud « {{name}} », il n'a pas été retiré.",
+          "noResponse": "Pas de réponse de Gladys lors de la décommission du nœud « {{name}} » (connexion perdue ou trop lente). Il a peut-être quand même été retiré : la liste des nœuds ci-dessous a été rechargée.",
           "success": "Le nœud « {{name}} » a été décommissionné.",
           "devicesDeleted": {
             "singular": "{{count}} appareil Gladys a été supprimé.",
             "plural": "{{count}} appareils Gladys ont été supprimés."
           },
-          "forcedWarning": "L'appareil était injoignable : il a été retiré du réseau Matter de Gladys, mais il n'en a pas été informé. Réinitialisez-le aux paramètres d'usine avant de l'appairer à nouveau.",
+          "forcedWarning": "L'appareil « {{name}} » était injoignable : il a été retiré du réseau Matter de Gladys, mais il n'en a pas été informé. Réinitialisez-le aux paramètres d'usine avant de l'appairer à nouveau.",
           "devicesNotDeleted": "Ces appareils Gladys n'ont pas pu être supprimés, probablement parce que leur historique est trop volumineux. Gladys est en train de le nettoyer : réessayez plus tard depuis l'onglet « Appareils »."
         },
         "noNodesFound": "Aucun nœud Matter trouvé. Vous pouvez ajouter un appareil Matter en allant sur l'onglet \"Ajouter un appareil\".",
