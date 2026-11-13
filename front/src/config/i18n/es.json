@@ -3791,9 +3791,13 @@
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
         "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado…) en lugar de cortar su alimentación. Desactive primero el programa propio del módulo.",
         "pilotWireProgrammeWarning": "Desactive el programa o el modo termostato propio del módulo (programación de Heatzy, programa de Tuya…) antes de controlarlo desde Gladys. Si no, cada orden que escribe ese programa se toma por un cambio hecho en el módulo, y el módulo y Gladys escriben la orden por turnos.",
+        "pilotWireStandbyOrderLabel": "Orden una vez alcanzada la consigna",
+        "pilotWireStandbyForceLabel": "Forzar otra orden que antihielo en reposo",
+        "pilotWireStandbyForceHelp": "Por defecto, Gladys envía antihielo una vez alcanzada la consigna. Algunos radiadores bloquean entonces sus propias funciones, como el boost de un toallero, porque antihielo y apagado son órdenes prioritarias: fuerce eco para conservarlas.",
+        "pilotWireStandbyOrderWarning": "Eco: el radiador regula entonces él mismo sobre su consigna eco, unos 3,5 °C por debajo de su confort; una consigna de Gladys más baja (noche) no se alcanza mientras se envía eco. Apagado: el radiador se corta, sin protección antihielo si Gladys se detiene. Los preajustes antihielo y ausencia, como una ventana abierta, siguen en antihielo; un módulo que no acepta la orden elegida recibe la más baja que acepta: antihielo, apagado y luego eco.",
         "pilotWireRegulationHelp": {
           "heater": "Cada preajuste envía la orden elegida en la tabla de preajustes (eco → eco, ausencia → antihielo…). El sensor de ambiente, si lo hay, solo sirve para mostrar la temperatura.",
-          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar, antihielo una vez alcanzada la consigna del preajuste. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
+          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar y, una vez alcanzada la consigna del preajuste, una orden de reposo: antihielo o, en un módulo que no la acepta, apagado y luego eco, salvo que se fuerce otra. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
         },
         "windowFeatureLabel": "Sensores de apertura de ventana",
         "windowFeatureHelp": {
@@ -3840,6 +3844,7 @@
         "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un actuador (conmutador o hilo piloto): regula leyendo uno y accionando el otro.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
         "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
+        "pilotWireUnreadError": "No se ha podido leer el hilo piloto elegido, así que no se puede comprobar la orden de reposo: recarga la página y vuelve a elegirlo.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",
         "noActiveSchedule": "Sin programación (control manual)",

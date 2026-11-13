@@ -19,7 +19,8 @@ import {
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
   DEFAULT_PILOT_WIRE_ORDERS,
-  supportedPilotWireOrder
+  supportedPilotWireOrder,
+  supportedStandbyOrder
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -44,6 +45,12 @@ const PRESET_ICONS = {
 // temperature you want when you are here", which is a flame when heating and a
 // snowflake when cooling. A sun for both read as "warm" even in cooling.
 const COMFORT_ICON = { heating: 'fe-flame', cooling: 'fe-snowflake' };
+// The preset whose colour and icon a standby order takes in the status banner.
+const STANDBY_PRESET_BY_ORDER = {
+  [PILOT_WIRE_MODE.OFF]: 'off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost',
+  [PILOT_WIRE_MODE.ECO]: 'eco'
+};
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
@@ -1605,17 +1612,26 @@ class ThermostatBox extends Component {
     // otherwise the order the lit preset is set to. A setpoint turned by a scene
     // names no preset, and is not second-guessed.
     let wantedOrder = null;
+    let wantedRest = false;
     if (heaterRegulated && mode === 'off') {
       wantedOrder = PILOT_WIRE_MODE.OFF;
     } else if (heaterRegulated && isWindowOpen) {
       wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
+      wantedRest = true;
     } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
       const configured = cfg[`pilot_wire_order_${activePreset}`];
       wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
     }
     // The order actually sent, as the server picks it: one the module does not
     // take is sent as comfort, or not at all — and is then on its way for ever.
-    const expectedOrder = wantedOrder === null ? null : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
+    // The window's frost protection is a rest, sent as off, then eco, to a
+    // module without it.
+    let expectedOrder = null;
+    if (wantedOrder !== null) {
+      expectedOrder = wantedRest
+        ? supportedStandbyOrder(wantedOrder, pilotWireSupportedOptions)
+        : supportedPilotWireOrder(wantedOrder, pilotWireSupportedOptions);
+    }
     // Until the module confirms it — a few seconds on Z-Wave — the banner says
     // the order is on its way rather than showing a ring and a preset that
     // disagree. Any comfort the heater keeps is comfort, as the server holds it.
@@ -1638,8 +1654,8 @@ class ThermostatBox extends Component {
     const isRunning = isSwitchOn !== null ? isSwitchOn : estimatedActive;
     const showActive = !heaterRegulated && !isWindowOpen && mode !== 'off' && isRunning;
     // When Gladys regulates a pilot-wire heater, the module only ever carries
-    // comfort or frost protection, whatever the preset: eco at 18 °C in a room at
-    // 20 °C shows frost protection on the heater. Saying why, under the gauge,
+    // comfort or its standby order, whatever the preset: eco at 18 °C in a room
+    // at 20 °C shows frost protection on the heater, by default. Saying why, under the gauge,
     // is what keeps that from looking like a wrong order.
     const pilotWireStatus =
       this.isGladysRegulatedPilotWire() && !isWindowOpen && mode !== 'off' && isSwitchOn !== null
@@ -1647,6 +1663,8 @@ class ThermostatBox extends Component {
           ? 'pilotWireHeating'
           : 'pilotWireStandby'
         : null;
+    const statusPreset =
+      pilotWireStatus === 'pilotWireHeating' ? 'comfort' : STANDBY_PRESET_BY_ORDER[pilotWireOrder] || 'frost';
 
     // Convert temperatures for display
     const displaySetpoint = this.toDisplayTemp(setpoint);
@@ -1740,16 +1758,12 @@ class ThermostatBox extends Component {
 
               {/* Drawn like the card's other banners. Heating carries comfort's
                   flame and colour, the order the module then carries; standby
-                  carries frost's snowflake and colour, for the same reason. */}
+                  carries those of the order the module rests on — frost
+                  protection by default, eco or off when chosen (C.1.1). */}
               {pilotWireStatus && (
-                <div
-                  class={style.scheduleBanner}
-                  style={`--banner-color:${this.getPresetColor(
-                    pilotWireStatus === 'pilotWireHeating' ? 'comfort' : 'frost'
-                  )}`}
-                >
+                <div class={style.scheduleBanner} style={`--banner-color:${this.getPresetColor(statusPreset)}`}>
                   <i
-                    class={`fe ${pilotWireStatus === 'pilotWireHeating' ? COMFORT_ICON.heating : PRESET_ICONS.frost} ${
+                    class={`fe ${statusPreset === 'comfort' ? COMFORT_ICON.heating : PRESET_ICONS[statusPreset]} ${
                       style.scheduleBannerIcon
                     }`}
                   />

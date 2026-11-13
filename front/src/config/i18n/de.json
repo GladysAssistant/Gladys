@@ -3791,9 +3791,13 @@
         "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
         "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus…), statt die Stromzufuhr zu unterbrechen. Schalten Sie zuerst das eigene Programm des Moduls aus.",
         "pilotWireProgrammeWarning": "Schalten Sie das eigene Programm oder den Thermostatmodus des Moduls aus (Heatzy-Zeitplan, Tuya-Programm…), bevor Sie es mit Gladys steuern. Sonst wird jeder vom Programm geschriebene Befehl als Änderung am Modul gewertet, und Modul und Gladys schreiben den Befehl abwechselnd.",
+        "pilotWireStandbyOrderLabel": "Befehl nach Erreichen des Sollwerts",
+        "pilotWireStandbyForceLabel": "Einen anderen Ruhebefehl als Frostschutz erzwingen",
+        "pilotWireStandbyForceHelp": "Standardmäßig sendet Gladys Frostschutz, sobald der Sollwert erreicht ist. Manche Heizkörper sperren dann ihre eigenen Funktionen, etwa den Boost eines Handtuchheizkörpers, weil Frostschutz und Aus Vorrangbefehle sind: Erzwingen Sie Eco, um sie zu behalten.",
+        "pilotWireStandbyOrderWarning": "Eco: Der Heizkörper regelt dann selbst auf seinen Eco-Sollwert, etwa 3,5 °C unter seinem Komfort; ein niedrigerer Gladys-Sollwert (Nacht) wird nicht erreicht, solange Eco gesendet wird. Aus: Der Heizkörper ist abgeschaltet, ohne Frostschutz, falls Gladys ausfällt. Die Voreinstellungen Frostschutz und Abwesend bleiben, wie ein offenes Fenster, auf Frostschutz; ein Modul, das den gewählten Befehl nicht annimmt, erhält den niedrigsten, den es annimmt: Frostschutz, Aus, dann Eco.",
         "pilotWireRegulationHelp": {
           "heater": "Jede Voreinstellung sendet den in der Tabelle der Voreinstellungen gewählten Befehl (Eco → Eco, Abwesend → Frostschutz…). Der Raumsensor, falls vorhanden, dient nur der Anzeige.",
-          "gladys": "Gladys misst den Raum mit dem Raumsensor und nutzt die Steuerleitung als Schalter — Komfort zum Heizen, Frostschutz, sobald der Sollwert der Voreinstellung erreicht ist. Stellen Sie den Komfort-Sollwert am Heizkörper selbst hoch genug ein (zum Beispiel 24 °C): Er gehorcht dann Gladys statt seinem eigenen Thermometer, und dieser Wert bleibt eine Sicherheitsobergrenze, falls Gladys ausfällt. Damit der Heizkörper selbst regelt, wählen Sie den Typ „Heizkörper mit Steuerleitung“."
+          "gladys": "Gladys misst den Raum mit dem Raumsensor und nutzt die Steuerleitung als Schalter — Komfort zum Heizen und, sobald der Sollwert der Voreinstellung erreicht ist, ein Ruhebefehl: Frostschutz oder, bei einem Modul, das ihn nicht annimmt, Aus, dann Eco, sofern kein anderer erzwungen wird. Stellen Sie den Komfort-Sollwert am Heizkörper selbst hoch genug ein (zum Beispiel 24 °C): Er gehorcht dann Gladys statt seinem eigenen Thermometer, und dieser Wert bleibt eine Sicherheitsobergrenze, falls Gladys ausfällt. Damit der Heizkörper selbst regelt, wählen Sie den Typ „Heizkörper mit Steuerleitung“."
         },
         "windowFeatureLabel": "Fensterkontakte",
         "windowFeatureHelp": {
@@ -3840,6 +3844,7 @@
         "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Aktor (Schalter oder Steuerleitung): Er regelt, indem er den einen liest und den anderen schaltet.",
         "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
         "incompletePilotWireError": "Ein Heizkörper mit Steuerleitung braucht die zu steuernde Steuerleitung.",
+        "pilotWireUnreadError": "Die gewählte Steuerleitung konnte nicht gelesen werden, daher kann der Ruhebefehl nicht geprüft werden: Seite neu laden und sie erneut auswählen.",
         "activeScheduleLabel": "Aktiver Zeitplan",
         "activeScheduleHelp": "Wähle den Zeitplan, der automatisch auf dieses Thermostat angewendet wird.",
         "noActiveSchedule": "Kein Zeitplan (manuelle Steuerung)",
