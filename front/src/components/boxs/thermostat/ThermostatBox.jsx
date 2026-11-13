@@ -61,6 +61,16 @@ const STANDBY_PRESET_BY_ORDER = {
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
+// Since when the room has been empty, for its banner: the time alone today,
+// with the day in front otherwise — a room empty since yesterday read as today.
+const formatEmptySince = (since, now = new Date()) => {
+  const date = new Date(since);
+  const pad = value => String(value).padStart(2, '0');
+  const time = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return date.toDateString() === now.toDateString()
+    ? time
+    : `${pad(date.getDate())}/${pad(date.getMonth() + 1)} ${time}`;
+};
 const isStartPreset = preset => preset !== 'off' && [...HEATING_PRESETS, ...COOLING_PRESETS].includes(preset);
 // The preset feature carries an integer; the widget speaks in names. `off` is in
 // neither table: stopping is a mode, and it goes to the mode feature.
@@ -661,8 +671,14 @@ class ThermostatBox extends Component {
     const hold = this.getHold();
     if (hold) {
       // A preset picked by hand holds that preset's own setpoint
-      // (holdMatchesPreset); a setpoint set on the dial is kept.
-      if (!this.holdMatchesPreset(hold.setpoint, activePreset)) {
+      // (holdMatchesPreset); a setpoint set on the dial is kept. Compared with
+      // the preset the device carries, as the server's holdsPickedPreset, not
+      // with the one in force: on a thermostat following its programme that is
+      // `schedule`, so a hold is a dial setpoint even when it lands on the
+      // setpoint of the programme's point — 21 °C written by a scene over
+      // Comfort at 21 °C is kept by the server, and the card lowered it.
+      const remote = this.state.remoteConfig;
+      if (!this.holdMatchesPreset(hold.setpoint, remote ? PRESET_NAMES[remote.preset] : null)) {
         return null;
       }
       if (!absenceLowersHold(hold.since, emptySince)) {
@@ -798,7 +814,14 @@ class ThermostatBox extends Component {
                 feat.last_value_changed === null || feat.last_value_changed === undefined
                   ? NaN
                   : new Date(feat.last_value_changed).getTime();
-              this.setPresenceReading(feat.selector, feat.last_value, Number.isFinite(changed) ? changed : Date.now());
+              // A sensor silent for so long that its value is outdated says
+              // nothing of the room, as on the server: a motion sensor dies on
+              // `0`, and would read as a room empty for good (spec A.4).
+              this.setPresenceReading(
+                feat.selector,
+                feat.last_value_is_too_old ? null : feat.last_value,
+                Number.isFinite(changed) ? changed : Date.now()
+              );
             }
             if (
               switchFeature &&
@@ -2092,9 +2115,7 @@ class ThermostatBox extends Component {
                     <Text
                       id="dashboard.boxes.thermostat.presenceAbsent"
                       fields={{
-                        time: `${String(new Date(emptySince).getHours()).padStart(2, '0')}:${String(
-                          new Date(emptySince).getMinutes()
-                        ).padStart(2, '0')}`,
+                        time: formatEmptySince(emptySince),
                         preset: (a11yDict.preset && a11yDict.preset[emptyPreset]) || emptyPreset
                       }}
                     />

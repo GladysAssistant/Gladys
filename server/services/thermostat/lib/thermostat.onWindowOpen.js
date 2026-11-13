@@ -125,6 +125,13 @@ async function getWindowSelectors() {
   this.targetSelectorsCache = targets;
   this.powerSelectorsCache = powers;
   this.presenceSelectorsCache = presences;
+  // A sensor no thermostat watches any more is no longer followed: its record
+  // would never be cleared, and added back days later, the sensor found on `0`
+  // would resume that old time and empty the room at once.
+  const vacatedAt = this.presenceVacatedAt || new Map();
+  [...vacatedAt.keys()]
+    .filter((selector) => !presences.has(selector))
+    .forEach((selector) => vacatedAt.delete(selector));
   return selectors;
 }
 

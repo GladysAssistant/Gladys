@@ -466,9 +466,12 @@ async function findOpenWindow(gladys, selectors, delaySeconds = 0, openedAt = nu
  *
  * The reverse of the windows: one sensor seeing someone is enough for the room to
  * be occupied, and the delay runs from the *last* one to go quiet. A sensor that
- * cannot be read, or has never reported, is left out — and with none left the
- * room is never taken as empty: a motion sensor on a flat battery must not leave
- * the house on eco for good. Only what the edit form offers is weighed
+ * cannot be read, has never reported, or has reported nothing for so long that
+ * its value is outdated (`last_value_is_too_old`, 48 hours unless the instance
+ * says otherwise) is left out — and with none left the room is never taken as
+ * empty. A motion sensor goes back to `0` a minute or two after the last
+ * movement, so `0` is the value it dies on: weighed for ever, a flat battery
+ * left the room on the absence preset for good. Only what the edit form offers is weighed
  * (isPresenceSensor): a feature of another kind named in the param — by a client
  * writing it directly, or a sensor re-typed since — says nothing about the room.
  * @param {Map<string, object>} features - The features read, by selector.
@@ -491,9 +494,10 @@ function findAbsence(features, selectors, delayMinutes, vacatedAt = null, now = 
       if (!feature || !isPresenceSensor(feature)) {
         return undefined;
       }
-      if (feature.last_value === null || feature.last_value === undefined) {
-        // A sensor that lost its value knows nothing of the room any more: its
-        // next `0` starts a new count rather than resume an old one.
+      if (feature.last_value === null || feature.last_value === undefined || feature.last_value_is_too_old) {
+        // A sensor that lost its value, or went silent, knows nothing of the
+        // room any more: its next `0` starts a new count rather than resume an
+        // old one.
         if (vacatedAt) {
           vacatedAt.delete(selector);
         }
