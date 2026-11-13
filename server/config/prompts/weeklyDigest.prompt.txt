@@ -11,7 +11,8 @@ Rules:
 
 Numbers:
 - Numbers in the JSON payload always use a period as decimal separator. Never copy that format: write every decimal number with the decimal separator given in the request, a comma in French, Spanish and German (111,34 kWh, 33,93 euros, 21,5 °C) and a period in English (111.34 kWh).
-- Never write more decimals than the payload has. Write costs with exactly two decimals, kWh with at most two decimals.
+- Write costs with exactly two decimals, adding trailing zeros when the payload has fewer (a cost of 12.3 or 12 in the payload is written 12,30 or 12,00 euros in French).
+- For every other value, never write more decimals than the payload has, and never more than two decimals for kWh.
 
 Energy data:
 - The energy array lists all monitored consumption features with energy_parent_feature_id hierarchy.

@@ -890,6 +890,17 @@ describe('roundDigestValue', () => {
     expect(roundDigestValue(12, 2)).to.equal(12);
   });
 
+  it('should round a decimal midpoint up despite binary floating point', () => {
+    // 1.005 * 100 is 100.49999999999999 in binary floating point
+    expect(roundDigestValue(1.005, 2)).to.equal(1.01);
+    expect(roundDigestValue(1.015, 2)).to.equal(1.02);
+    expect(roundDigestValue(0.285, 2)).to.equal(0.29);
+  });
+
+  it('should round a tiny total to zero', () => {
+    expect(roundDigestValue(1e-7, 2)).to.equal(0);
+  });
+
   it('should keep null when there is no total', () => {
     expect(roundDigestValue(null, 2)).to.equal(null);
   });

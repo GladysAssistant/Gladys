@@ -249,8 +249,12 @@ function roundDigestValue(value, decimals) {
     return null;
   }
 
+  // 1.005 * 100 is 100.49999999999999 in binary floating point: keeping 15
+  // significant digits (what a double holds exactly) gives back 100.5, so the
+  // midpoint rounds up like on paper (1.005 -> 1.01)
   const factor = 10 ** decimals;
-  return Math.round(value * factor) / factor;
+  const shifted = Number((value * factor).toPrecision(15));
+  return Math.round(shifted) / factor;
 }
 
 /**
