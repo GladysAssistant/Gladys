@@ -27,7 +27,11 @@ class SettingsSystemClock extends Component {
     timeSync: null,
     enabling: false,
     enableError: null,
-    enabled: false
+    enabled: false,
+    // once a gap has been seen on a host that does not keep its time, the
+    // restart advice stays: fixing the clock (from here or on the host) does
+    // not recompute the scheduled jobs
+    restartAdvised: false
   };
 
   // refresh: "Check again" asks the server for a fresh read of the host
@@ -44,7 +48,13 @@ class SettingsSystemClock extends Component {
         return null;
       })
     ]);
-    this.setState({ loading: false, measure, measureError: measure === null, timeSync });
+    this.setState(prevState => ({
+      loading: false,
+      measure,
+      measureError: measure === null,
+      timeSync,
+      restartAdvised: prevState.restartAdvised || (isClockOffsetSignificant(measure) && !hostKeepsTime(timeSync))
+    }));
     // keep the notice of the sidebar in line with what this card displays
     this.props.refreshClockOffsetState({ force: true });
   };
@@ -53,7 +63,7 @@ class SettingsSystemClock extends Component {
     this.setState({ enabling: true, enableError: null });
     try {
       const timeSync = await this.props.httpClient.post('/api/v1/system/clock/sync');
-      this.setState({ timeSync, enabled: true });
+      this.setState({ timeSync, enabled: true, restartAdvised: true });
     } catch (e) {
       console.error(e);
       this.setState({
@@ -164,9 +174,10 @@ class SettingsSystemClock extends Component {
             )}
             {!loading && this.renderTimeSync(timeSync, offsetSignificant, state)}
             {/* a machine keeping its time means the device is the one off:
-                nothing to restart. Right after turning the synchronization
-                on, the clock is about to jump: the advice stays visible. */}
-            {((offsetSignificant && !hostKeepsTime(timeSync)) || state.enabled) && (
+                nothing to restart. Once a gap was seen on a machine that does
+                not, or the synchronization was turned on from here, the advice
+                stays visible even after the clock is fixed. */}
+            {state.restartAdvised && (
               <p class="text-muted small">
                 <Text id="systemSettings.clockRestartHint" />
               </p>

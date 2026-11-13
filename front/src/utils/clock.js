@@ -7,10 +7,14 @@
 
 // Some displays mix a timestamp of the server with the clock of the device
 // (the progress of the music widget, "x seconds ago"): a gap of a few tens of
-// seconds is already visible there. Under 10 seconds, nothing visible goes
-// wrong, and the clock of a device that has not synchronized for a few days
-// (Windows only does it once a week by default) must not raise the alarm.
-const CLOCK_OFFSET_THRESHOLD_MS = 10 * 1000;
+// seconds is already visible there. Under 20 seconds, nothing visible goes
+// wrong, and the clock of a device that has not synchronized for a week
+// (Windows only does it once a week by default, ~12 s of drift) must not
+// raise the alarm.
+const CLOCK_OFFSET_THRESHOLD_MS = 20 * 1000;
+// A sample whose wall-clock and monotonic elapsed times disagree by more than
+// this was taken while the device clock was being adjusted: it is dropped.
+const CLOCK_ADJUSTMENT_TOLERANCE_MS = 1000;
 
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;
@@ -20,12 +24,17 @@ const DAY_MS = 24 * HOUR_MS;
 // The server time is read during the request: its exact moment is unknown,
 // somewhere between the request and the response. Assuming the middle of the
 // round trip, the error is at most half of it. The round trip is measured on
-// the monotonic clock: the device clock itself may be adjusted meanwhile.
+// the monotonic clock, and a sample taken while the device clock was being
+// adjusted (wall-clock and monotonic elapsed times disagree) gives no measure.
 const measureClockOffset = async httpClient => {
   const requestedAt = Date.now();
   const startedAt = performance.now();
   const { server_time: serverTime } = await httpClient.get('/api/v1/system/clock');
   const roundTrip = performance.now() - startedAt;
+  const wallClockElapsed = Date.now() - requestedAt;
+  if (Math.abs(wallClockElapsed - roundTrip) > CLOCK_ADJUSTMENT_TOLERANCE_MS) {
+    return null;
+  }
   const serverTimestamp = Date.parse(serverTime);
   if (Number.isNaN(serverTimestamp)) {
     return null;
