@@ -173,6 +173,7 @@ function selectorSchema(selectors) {
  * @param {Array<string>} [areaSelectors] - Allowed area selectors.
  * @param {Array<string>} [thermostatDeviceSelectors] - Allowed thermostat device selectors.
  * @param {Array<string>} [thermostatScheduleSelectors] - Allowed thermostat schedule selectors.
+ * @param {Array<string>} [switchFeatureSelectors] - Allowed writable switch feature selectors.
  * @returns {object} Scene creation Zod schema.
  * @example
  * createSceneCreateInputSchema(['scene-a'], ['john'], ['main-house']);
@@ -189,6 +190,7 @@ function createSceneCreateInputSchema(
   areaSelectors = [],
   thermostatDeviceSelectors = [],
   thermostatScheduleSelectors = [],
+  switchFeatureSelectors = [],
 ) {
   const sceneSelectorSchema = selectorSchema(sceneSelectors);
   const userSelectorSchema = selectorSchema(userSelectors);
@@ -197,6 +199,14 @@ function createSceneCreateInputSchema(
   const switchDevicesSchema = z.array(selectorSchema(switchDeviceSelectors));
   const musicNotificationDevicesSchema = selectorSchema(musicNotificationDeviceSelectors);
   const deviceFeatureSelectorSchema = selectorSchema(deviceFeatureSelectors);
+  const switchFeaturesSchema = z
+    .array(selectorSchema(switchFeatureSelectors))
+    .optional()
+    .describe(
+      'Switch features to drive, to target one switch of a multi-switch device ' +
+        '(a socket of a power strip). When not empty, devices is ignored and can be []. ' +
+        'Without it, each device drives its first switch.',
+    );
   const calendarSelectorSchema = selectorSchema(calendarSelectors);
   const areaSelectorSchema = selectorSchema(areaSelectors);
   const thermostatDevicesSchema = z.array(selectorSchema(thermostatDeviceSelectors));
@@ -236,12 +246,15 @@ function createSceneCreateInputSchema(
       }),
       actionSchemaByType(ACTIONS.SWITCH.TURN_ON, {
         devices: switchDevicesSchema,
+        device_features: switchFeaturesSchema,
       }),
       actionSchemaByType(ACTIONS.SWITCH.TURN_OFF, {
         devices: switchDevicesSchema,
+        device_features: switchFeaturesSchema,
       }),
       actionSchemaByType(ACTIONS.SWITCH.TOGGLE, {
         devices: switchDevicesSchema,
+        device_features: switchFeaturesSchema,
       }),
       actionSchemaByType(ACTIONS.TIME.DELAY, {
         value: z.number().optional(),
