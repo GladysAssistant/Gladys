@@ -4148,7 +4148,9 @@
         "textExplanationText": "Entrez ici le texte à envoyer à votre appareil. Pour injecter une variable de scène dans le texte, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Appareil ou variable",
+        "sourceDevice": "Appareil",
+        "sourceVariable": "Variable",
         "operatorLabel": "Opérateur",
         "valueLabel": "Valeur",
         "removeLabel": "Effacer",
@@ -4157,7 +4159,7 @@
         "useCustomValue": "Saisir une valeur personnalisée",
         "useValueList": "Choisir dans la liste des valeurs",
         "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
-        "explanationText": "Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc condition."
+        "explanationText": "Choisissez ce que vous comparez : l'état actuel d'un appareil, lu au moment où la scène arrive sur ce bloc, ou une variable définie par une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc. Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène : pour injecter une variable, tapez '{{'."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",

@@ -4148,7 +4148,9 @@
         "textExplanationText": "Gib hier den Text ein, der an dein Gerät gesendet werden soll. Um eine Szenenvariable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Gerät oder Variable",
+        "sourceDevice": "Gerät",
+        "sourceVariable": "Variable",
         "operatorLabel": "Operator",
         "valueLabel": "Wert",
         "removeLabel": "Entfernen",
@@ -4157,7 +4159,7 @@
         "useCustomValue": "Eigenen Wert eingeben",
         "useValueList": "Aus der Werteliste auswählen",
         "logicExplanationText": "Die Bedingungen in diesem Block sind mit ODER verknüpft: Der Block ist erfüllt, sobald eine davon zutrifft. Für ein UND fügst du mehrere Blöcke \"Nur fortsetzen, wenn\" hinzu: Dann müssen alle erfüllt sein.",
-        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Wähle, was verglichen wird: den aktuellen Zustand eines Geräts, der gelesen wird, sobald die Szene diesen Block erreicht, oder eine Variable, die zuvor mit dem Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" festgelegt wurde. Als Wert gibst du einen festen Wert oder eine Berechnung auf Basis einer Szenenvariable ein: Um eine Variable einzufügen, gib \"{{\" ein."
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",

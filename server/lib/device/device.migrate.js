@@ -92,7 +92,9 @@ function rewriteReferences(item, featureReplacements, deviceReplacements) {
  * @description Replace selectors in scene actions/triggers or dashboard boxes. Handles both
  * flat arrays (triggers) and arrays of arrays (actions, boxes), and recurses into the nested
  * actions of condition.if-then-else (`if` is a flat list, `then`/`else` are arrays of arrays)
- * and of condition.while (`if` is a flat list, `then` is an array of arrays, no `else`).
+ * and of condition.while (`if` is a flat list, `then` is an array of arrays, no `else`), and
+ * into the `conditions` of condition.only-continue-if (a flat list of condition objects, each
+ * naming a feature in `device_feature` when it compares the current state of a device).
  * @param {Array} items - Array of items (or of arrays of items), mutated in place.
  * @param {object} featureReplacements - Map of source feature selector to destination feature selector.
  * @param {object} deviceReplacements - Map of source device selector to destination device selector.
@@ -110,6 +112,9 @@ function rewriteItems(items, featureReplacements, deviceReplacements) {
       return;
     }
     if (rewriteReferences(item, featureReplacements, deviceReplacements)) {
+      changed = true;
+    }
+    if (Array.isArray(item.conditions) && rewriteItems(item.conditions, featureReplacements, deviceReplacements)) {
       changed = true;
     }
     if (Array.isArray(item.if) && rewriteItems(item.if, featureReplacements, deviceReplacements)) {
@@ -522,7 +527,10 @@ async function executeMigration(selector, options, jobId) {
   // Device params naming a mapped feature (B.3) are re-pointed like the scenes
   // and the dashboards below; the devices carrying them are refreshed with the
   // others and notified, so their service drops what it cached from them.
-  const featureReplacements = {};
+  // The replacement maps are looked up with selectors read from scenes, dashboards and params,
+  // which are free text: without a prototype, a selector named like a member of Object
+  // ("constructor", "toString") finds nothing instead of finding that member.
+  const featureReplacements = Object.create(null);
   pairs.forEach(({ sourceFeature, destinationFeature }) => {
     featureReplacements[sourceFeature.selector] = destinationFeature.selector;
   });
@@ -591,7 +599,8 @@ async function executeMigration(selector, options, jobId) {
   await this.job.updateProgress(jobId, 70, { step: 'rewriting_scenes' });
 
   // Rewrite scenes then dashboards with the selector replacement maps.
-  const deviceReplacements = { [source.selector]: destination.selector };
+  const deviceReplacements = Object.create(null);
+  deviceReplacements[source.selector] = destination.selector;
 
   const scenesUpdated = [];
   const scenes = await db.Scene.findAll();

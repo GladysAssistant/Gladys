@@ -122,6 +122,8 @@ class ConditionIfElseThen extends Component {
                     moveCard={props.moveCard}
                     moveCardGroup={props.moveCardGroup}
                     scene={props.scene}
+                    deviceFeatures={props.deviceFeatures}
+                    names={props.names}
                   />
                 </>
               ))}
