@@ -1460,11 +1460,13 @@ describe('thermostat: reversible heat pump', () => {
   // The use a unit switched on from its remote reports is best effort: the hold
   // and the start behind it must not depend on it (A.4).
   describe('a remote start whose use cannot be taken', () => {
-    const getScheduleOfDevice = fake.resolves(null);
+    // Whether the programme keeps the unit off is read by `programmeKeepsOff`
+    // (thermostat.offPoint.js), the one reading of an Off point (C.0.1).
+    const programmeKeepsOff = fake.resolves(false);
     const loadListener = () =>
       proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
         '../../../utils/logger': silentLogger,
-        './thermostat.scheduleDevice': { getScheduleOfDevice },
+        './thermostat.offPoint': { programmeKeepsOff },
       });
 
     const poweredPump = (mode) =>
@@ -1539,11 +1541,11 @@ describe('thermostat: reversible heat pump', () => {
       const mod = loadListener();
       const device = poweredPump(THERMOSTAT_MODE.COOLING);
       const handler = buildHandler(device, { modeLookupFails: true });
-      getScheduleOfDevice.resetHistory();
+      programmeKeepsOff.resetHistory();
 
       await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
 
-      assert.calledOnceWithExactly(getScheduleOfDevice, device.id);
+      assert.calledOnceWithExactly(programmeKeepsOff, device);
     });
   });
 });
