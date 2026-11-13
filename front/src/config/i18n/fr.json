@@ -1126,6 +1126,12 @@
       "updateRetryButton": "Réessayer",
       "updateError": "La mise à jour a échoué. Consultez les logs de l'intégration, puis réessayez.",
       "updatedTo": "Mis à jour en v{{version}}",
+      "updateRequiresGladys": "Cette version nécessite Gladys {{gladysVersion}} : mettez d'abord Gladys à jour.",
+      "updateSkipped": {
+        "GLADYS_VERSION": "La v{{skippedVersion}} nécessite Gladys {{gladysVersion}} : mettez d'abord Gladys à jour. La v{{version}} est installée.",
+        "INVALID_MANIFEST": "La v{{skippedVersion}} n'a pas pu être installée : cette version de Gladys n'accepte pas son manifeste (voir les logs de Gladys). La v{{version}} est installée.",
+        "IMAGE_UNAVAILABLE": "L'image de la v{{skippedVersion}} ne peut pas encore être téléchargée : réessayez plus tard. La v{{version}} est installée."
+      },
       "noInstalledIntegrations": "Aucune intégration de la communauté n'est encore installée sur cette instance.",
       "installedSummary": {
         "title": {
@@ -1294,6 +1300,13 @@
         "updateAvailableVersionText": "Une nouvelle version de cette intégration est disponible : v{{latestVersion}} (installée : v{{currentVersion}}).",
         "updateSuccessText": "Intégration mise à jour en version {{version}}.",
         "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
+        "updateRequiresGladysText": "La version {{latestVersion}} de cette intégration est disponible, mais elle nécessite Gladys {{gladysVersion}} (installée : v{{currentVersion}}). Mettez d'abord Gladys à jour, puis mettez à jour cette intégration.",
+        "updateKeptVersionText": "La version {{version}} reste installée : son image Docker a été re-téléchargée et le conteneur recréé.",
+        "updateSkipped": {
+          "GLADYS_VERSION": "La version {{skippedVersion}} n'a pas été installée : elle nécessite Gladys {{gladysVersion}}. Mettez d'abord Gladys à jour, puis relancez la mise à jour de cette intégration.",
+          "INVALID_MANIFEST": "La version {{skippedVersion}} n'a pas été installée : cette version de Gladys n'accepte pas son manifeste (détails dans les logs de Gladys). Mettre Gladys à jour peut régler le problème.",
+          "IMAGE_UNAVAILABLE": "La version {{skippedVersion}} n'a pas été installée : son image Docker ne peut pas encore être téléchargée (elle est peut-être encore en cours de publication). Réessayez dans quelques minutes."
+        },
         "statusLabel": "Statut",
         "versionLabel": "Version",
         "changelogTitle": "Voir le changelog de cette version",

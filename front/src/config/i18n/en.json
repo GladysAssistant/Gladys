@@ -1126,6 +1126,12 @@
       "updateRetryButton": "Retry",
       "updateError": "The update failed. Check the integration logs, then retry.",
       "updatedTo": "Updated to v{{version}}",
+      "updateRequiresGladys": "This version requires Gladys {{gladysVersion}}: update Gladys first.",
+      "updateSkipped": {
+        "GLADYS_VERSION": "v{{skippedVersion}} requires Gladys {{gladysVersion}}: update Gladys first. v{{version}} is installed.",
+        "INVALID_MANIFEST": "v{{skippedVersion}} could not be installed: this version of Gladys does not accept its manifest (see the Gladys logs). v{{version}} is installed.",
+        "IMAGE_UNAVAILABLE": "The image of v{{skippedVersion}} cannot be pulled yet: try again later. v{{version}} is installed."
+      },
       "noInstalledIntegrations": "No community integration is installed on this instance yet.",
       "installedSummary": {
         "title": {
@@ -1294,6 +1300,13 @@
         "updateAvailableVersionText": "A new version of this integration is available: v{{latestVersion}} (installed: v{{currentVersion}}).",
         "updateSuccessText": "Integration updated to version {{version}}.",
         "alreadyUpToDateText": "The integration is already up to date (version {{version}}): the Docker image was re-pulled and the container recreated.",
+        "updateRequiresGladysText": "Version {{latestVersion}} of this integration is available, but it requires Gladys {{gladysVersion}} (installed: v{{currentVersion}}). Update Gladys first, then update this integration.",
+        "updateKeptVersionText": "Version {{version}} stays installed: its Docker image was re-pulled and the container recreated.",
+        "updateSkipped": {
+          "GLADYS_VERSION": "Version {{skippedVersion}} was not installed: it requires Gladys {{gladysVersion}}. Update Gladys first, then update this integration again.",
+          "INVALID_MANIFEST": "Version {{skippedVersion}} was not installed: this version of Gladys does not accept its manifest (details in the Gladys logs). Updating Gladys may solve it.",
+          "IMAGE_UNAVAILABLE": "Version {{skippedVersion}} was not installed: its Docker image cannot be pulled yet (it may still be being published). Try again in a few minutes."
+        },
         "statusLabel": "Status",
         "versionLabel": "Version",
         "changelogTitle": "See the changelog of this version",

@@ -1126,6 +1126,12 @@
       "updateRetryButton": "Reintentar",
       "updateError": "La actualización ha fallado. Revise los registros de la integración y vuelva a intentarlo.",
       "updatedTo": "Actualizado a v{{version}}",
+      "updateRequiresGladys": "Esta versión requiere Gladys {{gladysVersion}}: actualice Gladys primero.",
+      "updateSkipped": {
+        "GLADYS_VERSION": "La v{{skippedVersion}} requiere Gladys {{gladysVersion}}: actualice Gladys primero. La v{{version}} está instalada.",
+        "INVALID_MANIFEST": "No se pudo instalar la v{{skippedVersion}}: esta versión de Gladys no acepta su manifiesto (consulte los logs de Gladys). La v{{version}} está instalada.",
+        "IMAGE_UNAVAILABLE": "La imagen de la v{{skippedVersion}} aún no se puede descargar: inténtelo más tarde. La v{{version}} está instalada."
+      },
       "noInstalledIntegrations": "Aún no hay ninguna integración de la comunidad instalada en esta instancia.",
       "installedSummary": {
         "title": {
@@ -1294,6 +1300,13 @@
         "updateAvailableVersionText": "Hay una nueva versión de esta integración disponible: v{{latestVersion}} (instalada: v{{currentVersion}}).",
         "updateSuccessText": "Integración actualizada a la versión {{version}}.",
         "alreadyUpToDateText": "La integración ya está actualizada (versión {{version}}): se volvió a descargar la imagen Docker y se recreó el contenedor.",
+        "updateRequiresGladysText": "La versión {{latestVersion}} de esta integración está disponible, pero requiere Gladys {{gladysVersion}} (instalada: v{{currentVersion}}). Actualice Gladys primero y luego actualice esta integración.",
+        "updateKeptVersionText": "La versión {{version}} sigue instalada: se volvió a descargar su imagen Docker y se recreó el contenedor.",
+        "updateSkipped": {
+          "GLADYS_VERSION": "La versión {{skippedVersion}} no se instaló: requiere Gladys {{gladysVersion}}. Actualice Gladys primero y luego vuelva a actualizar esta integración.",
+          "INVALID_MANIFEST": "La versión {{skippedVersion}} no se instaló: esta versión de Gladys no acepta su manifiesto (detalles en los logs de Gladys). Actualizar Gladys puede solucionarlo.",
+          "IMAGE_UNAVAILABLE": "La versión {{skippedVersion}} no se instaló: su imagen Docker aún no se puede descargar (puede que todavía se esté publicando). Inténtelo de nuevo en unos minutos."
+        },
         "statusLabel": "Estado",
         "versionLabel": "Versión",
         "changelogTitle": "Consultar el registro de cambios de esta versión",

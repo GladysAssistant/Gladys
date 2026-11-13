@@ -18,6 +18,7 @@ const {
 const {
   buildCatalogEntry,
   coerceGladysVersion,
+  getUnsatisfiedGladysVersion,
 } = require('../../../../lib/external-integration/store/store.buildCatalogEntry');
 
 const INDEX_URL_ORIGIN = 'https://integration-store-storage.gladysassistant.com';
@@ -560,6 +561,26 @@ describe('externalIntegration store', () => {
       }
     });
 
+    it('should return the manifest as published when asked not to validate it', async () => {
+      // the update checks the gladys_version of a manifest written for a newer
+      // Gladys before validating it: its unknown fields must not hide it
+      const newerManifest = {
+        ...TEST_MANIFEST,
+        version: '2.0.0',
+        gladys_version: '>=99.0.0',
+        field_of_a_newer_gladys: true,
+      };
+      nock('https://api.github.com')
+        .get('/repos/john/newer-manifest')
+        .reply(200, { default_branch: 'main' });
+      nock('https://raw.githubusercontent.com')
+        .get('/john/newer-manifest/main/gladys-assistant-integration.json')
+        .reply(200, JSON.stringify(newerManifest));
+      const { externalIntegration } = buildSupervisor();
+      const manifest = await externalIntegration.fetchManifestFromRepo('john/newer-manifest', { validate: false });
+      expect(manifest).to.deep.equal(newerManifest);
+    });
+
     it('should throw a 422 when the manifest is invalid', async () => {
       nock('https://api.github.com')
         .get('/repos/john/invalid-manifest')
@@ -587,6 +608,25 @@ describe('externalIntegration store', () => {
       expect(coerceGladysVersion('v4.62.1')).to.equal('4.62.1');
       expect(coerceGladysVersion(undefined)).to.equal(null);
       expect(coerceGladysVersion('not-a-version')).to.equal(null);
+    });
+  });
+
+  describe('getUnsatisfiedGladysVersion', () => {
+    it('should give the range the running Gladys does not satisfy', () => {
+      expect(getUnsatisfiedGladysVersion({ gladys_version: '>=5.3.0' }, '5.2.1')).to.equal('>=5.3.0');
+    });
+
+    it('should give null when the running Gladys satisfies the range', () => {
+      expect(getUnsatisfiedGladysVersion({ gladys_version: '>=5.2.0' }, '5.2.1')).to.equal(null);
+    });
+
+    it('should give null when the running Gladys version is unknown', () => {
+      expect(getUnsatisfiedGladysVersion({ gladys_version: '>=5.3.0' }, null)).to.equal(null);
+    });
+
+    it('should leave a missing or malformed range to validateManifest', () => {
+      expect(getUnsatisfiedGladysVersion({}, '5.2.1')).to.equal(null);
+      expect(getUnsatisfiedGladysVersion({ gladys_version: 'not a range' }, '5.2.1')).to.equal(null);
     });
   });
 

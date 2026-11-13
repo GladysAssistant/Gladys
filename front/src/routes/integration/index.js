@@ -470,6 +470,9 @@ class Integration extends Component {
         version: integration.version,
         latestVersion: integration.latest_version,
         updateAvailable: integration.update_available,
+        // a newer version needing a Gladys this one is not: not an update to
+        // offer, the card tells the admin to update Gladys first
+        requiredGladysVersion: integration.update_requires_gladys_version || null,
         updateState: updateStates[integration.selector],
         updateLocked,
         categories: getCardCategories(manifest, storeIntegration),
@@ -803,7 +806,8 @@ class Integration extends Component {
   // a facet or the sort narrows or orders the run as it does the list. A card
   // whose update already went through is left out — a list that could not be
   // reloaded after it still carries the flag, and only a version newer than
-  // the one just installed is to update again (the rule of the card footer).
+  // the one just installed, and than the one that update could not apply, is
+  // to update again (the rule of the card footer).
   // Admin-only: the server does not send the update_available flag to the
   // other users
   getIntegrationsToUpdate() {
@@ -813,7 +817,11 @@ class Integration extends Component {
     const isStillToUpdate = card => {
       const updateState = card.updateState || {};
       if (updateState.status === RequestStatus.Success) {
-        return !!card.latestVersion && card.latestVersion !== updateState.version;
+        return (
+          !!card.latestVersion &&
+          card.latestVersion !== updateState.version &&
+          card.latestVersion !== (updateState.skipped || {}).version
+        );
       }
       return true;
     };
@@ -918,7 +926,13 @@ class Integration extends Component {
         this.props.refreshExternalIntegrationsToUpdate();
         return RequestStatus.Success;
       }
-      await this.setUpdateState(selector, { status: RequestStatus.Success, version: integration.version });
+      // skipped_update: the newer version this update could not apply, and
+      // why — the card says so instead of a plain "Updated"
+      await this.setUpdateState(selector, {
+        status: RequestStatus.Success,
+        version: integration.version,
+        skipped: integration.skipped_update || null
+      });
       return RequestStatus.Success;
     } catch (e) {
       console.error(e);
