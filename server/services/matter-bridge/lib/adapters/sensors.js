@@ -58,14 +58,15 @@ const leakSensor = sensorAdapter({
   toState: (value) => ({ booleanState: { stateValue: value === 1 } }),
 });
 
-// Motion and presence both end up as Matter occupancy. The push flavour lan-manager creates carries
-// a lasting state despite its name (1 while the device answers, 0 once it stops), so it is read the
-// same way as the binary one.
+// Motion and presence both end up as Matter occupancy, from real sensors only. The push flavour of
+// presence is the network presence of a phone or a computer, from the Bluetooth and LAN scanners:
+// it is not an occupancy sensor, and the Bluetooth scanner never reports a device gone, which would
+// leave the room occupied forever.
 const occupancySensor = sensorAdapter({
   key: 'occupancy',
   matches: [
     [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, [SENSOR.BINARY]],
-    [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR, [SENSOR.BINARY, SENSOR.PUSH]],
+    [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR, [SENSOR.BINARY]],
   ],
   deviceType: (matter) =>
     matter.devices.OccupancySensorDevice.with(matter.behaviors.OccupancySensingServer.with('PassiveInfrared')),

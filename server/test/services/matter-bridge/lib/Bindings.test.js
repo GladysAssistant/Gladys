@@ -5,6 +5,7 @@ const { Bindings, isRemoteChange } = require('../../../../services/matter-bridge
 const { buildEndpoints } = require('../../../../services/matter-bridge/lib/buildEndpoints');
 const { planDevice } = require('../../../../services/matter-bridge/lib/planDevice');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../../../utils/constants');
+const { EXPRESSED_STATE } = require('../../../../services/matter-bridge/lib/constants');
 const { createMatter, feature, createContext } = require('../fakes');
 
 const REMOTE = { fabric: 1 };
@@ -133,6 +134,40 @@ describe('Matter bridge Bindings', () => {
   it('should survive an endpoint refusing a state', async () => {
     sinon.stub(built.children[0], 'set').rejects(new Error('constraint'));
     await bindings.push({ device_feature: 'light-binary', last_value: 1 });
+  });
+
+  it('should push states one at a time, each one from the state the previous one left', async () => {
+    const smoke = feature('alarm-smoke', 'smoke-sensor', 'binary');
+    const co = feature('alarm-co', 'co-sensor', 'binary');
+    const alarmDevice = { id: 'alarm', name: 'Alarm', selector: 'alarm', features: [smoke, co] };
+    const alarm = buildEndpoints(matter, alarmDevice, planDevice(alarmDevice), createContext({}));
+    bindings.add(alarmDevice, alarm);
+    // Like matter.js, a state is applied some time after it is set.
+    const [endpoint] = alarm.children;
+    const { set } = endpoint;
+    endpoint.set = async (patch) => {
+      await Promise.resolve();
+      await Promise.resolve();
+      return set.call(endpoint, patch);
+    };
+    await Promise.all([
+      bindings.push({ device_feature: 'alarm-smoke', last_value: 1 }),
+      bindings.push({ device_feature: 'alarm-co', last_value: 1 }),
+    ]);
+    expect(endpoint.state.smokeCoAlarm.expressedState).to.equal(EXPRESSED_STATE.SMOKE_ALARM);
+  });
+
+  it('should keep pushing states after an endpoint refused one', async () => {
+    sinon
+      .stub(built.children[0], 'set')
+      .onFirstCall()
+      .rejects(new Error('constraint'))
+      .callThrough();
+    await Promise.all([
+      bindings.push({ device_feature: 'light-binary', last_value: 1 }),
+      bindings.push({ device_feature: 'light-binary', last_value: 0 }),
+    ]);
+    expect(built.children[0].state.onOff.onOff).to.equal(false);
   });
 
   it('should forget a device, its listeners and pending commands', () => {

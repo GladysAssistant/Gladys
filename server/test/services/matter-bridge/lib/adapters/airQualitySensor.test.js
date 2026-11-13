@@ -21,6 +21,7 @@ describe('Matter bridge air quality adapter', () => {
     const built = airQualitySensor.build(matter, { co2, pm25 }, createContext({ co2: 600 }));
     expect(built.type.name).to.equal('AirQualitySensorDevice');
     expect(built.type.behaviors.map((b) => [b.behaviorName, b.features])).to.deep.equal([
+      ['AirQualityServer', ['Fair', 'Moderate', 'VeryPoor', 'ExtremelyPoor']],
       ['CarbonDioxideConcentrationMeasurementServer', ['NumericMeasurement']],
       ['Pm25ConcentrationMeasurementServer', ['NumericMeasurement']],
     ]);

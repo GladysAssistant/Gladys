@@ -3,6 +3,9 @@ const { isNumber, airQualityOf } = require('../converters');
 const { MEASUREMENT_UNIT, MEASUREMENT_MEDIUM } = require('../constants');
 const { isFeature, zipRoles } = require('./helpers');
 
+// AirQuality cluster features enabling every level airQualityOf reports.
+const AIR_QUALITY_FEATURES = ['Fair', 'Moderate', 'VeryPoor', 'ExtremelyPoor'];
+
 const NUMERIC = [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, DEVICE_FEATURE_TYPES.SENSOR.INTEGER];
 
 // Each Gladys concentration and the Matter concentration measurement cluster it feeds.
@@ -73,7 +76,10 @@ const airQualitySensor = {
       };
     });
     state.airQuality = { airQuality: airQualityOf(values) };
-    return { type: matter.devices.AirQualitySensorDevice.with(...servers), state };
+    // Fair, Moderate, VeryPoor and ExtremelyPoor are only valid air quality values with the
+    // feature of the same name, and airQualityOf may report any of them.
+    const airQualityServer = matter.behaviors.AirQualityServer.with(...AIR_QUALITY_FEATURES);
+    return { type: matter.devices.AirQualitySensorDevice.with(airQualityServer, ...servers), state };
   },
   toMatter(role, value, roles, endpointState) {
     const { cluster } = CONCENTRATIONS[role];

@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 
 const battery = require('../../../../../services/matter-bridge/lib/adapters/battery');
-const { BAT_CHARGE_LEVEL } = require('../../../../../services/matter-bridge/lib/constants');
+const { BAT_CHARGE_LEVEL, WIRED_CURRENT_TYPE } = require('../../../../../services/matter-bridge/lib/constants');
 const { createMatter, feature, createContext } = require('../../fakes');
 
 const level = feature('battery', 'battery', 'integer');
@@ -20,6 +20,7 @@ describe('Matter bridge battery adapter', () => {
       description: 'Battery',
       batPercentRemaining: 100,
       batChargeLevel: BAT_CHARGE_LEVEL.OK,
+      batReplacementNeeded: false,
     });
     expect(battery.state({ level }, createContext({})).powerSource).to.include({ batPercentRemaining: null });
     expect(battery.toMatter('level', 5)).to.deep.equal({
@@ -29,6 +30,9 @@ describe('Matter bridge battery adapter', () => {
 
   it('should build a mains power source', () => {
     expect(battery.wiredBehavior(matter).features).to.deep.equal(['Wired']);
-    expect(battery.wiredState().powerSource).to.include({ description: 'Mains' });
+    expect(battery.wiredState().powerSource).to.include({
+      description: 'Mains',
+      wiredCurrentType: WIRED_CURRENT_TYPE.AC,
+    });
   });
 });

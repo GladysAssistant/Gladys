@@ -300,7 +300,7 @@ const MatterBridgePage = props => {
                     <Text id="integration.matter-bridge.disableButton" />
                   </button>
                 </div>
-                {status.running && <ResetSection {...props} />}
+                <ResetSection {...props} />
               </>
             )}
           </div>

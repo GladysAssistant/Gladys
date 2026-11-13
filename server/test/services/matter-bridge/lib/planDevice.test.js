@@ -27,6 +27,10 @@ describe('Matter bridge planDevice', () => {
     expect(planDevice({})).to.equal(null);
   });
 
+  it('should not plan the network presence of a phone, Bluetooth or LAN', () => {
+    expect(planDevice({ features: [feature('phone', 'presence-sensor', 'push')] })).to.equal(null);
+  });
+
   it('should never give a feature to two adapters', () => {
     const greedy = { key: 'greedy', claim: (features) => features.map((f) => ({ value: f })) };
     const plan = planDevice({ features: [binary, temperature] }, [greedy, greedy]);

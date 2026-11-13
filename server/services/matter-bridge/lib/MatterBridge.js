@@ -38,6 +38,8 @@ function MatterBridge(gladys, serviceId, loadMatter) {
   this.matter = null;
   this.server = null;
   this.aggregator = null;
+  // True once the node is online: the node exists before, while it is being built.
+  this.online = false;
   this.lastError = null;
   this.lastErrorCode = null;
   // Device id -> { selector, name, signature, built }
@@ -172,6 +174,7 @@ MatterBridge.prototype.startNow = async function startNow() {
   try {
     this.matter = this.matter || this.loadMatter();
     await this.startNode();
+    this.online = true;
     this.setError(null);
     logger.info(`Matter bridge: online on port ${MATTER_BRIDGE_PORT}, ${this.devices.size} device(s) exposed`);
   } catch (e) {
@@ -261,6 +264,7 @@ MatterBridge.prototype.stopNow = async function stopNow() {
   this.bindings.clear();
   this.devices.clear();
   const { server } = this;
+  this.online = false;
   this.server = null;
   this.aggregator = null;
   if (server) {
@@ -287,7 +291,8 @@ MatterBridge.prototype.reset = function reset() {
       await this.gladys.variable.destroy(VARIABLES.PASSCODE, this.serviceId);
       await this.gladys.variable.destroy(VARIABLES.DISCRIMINATOR, this.serviceId);
     } catch (e) {
-      this.lastError = e.message;
+      // The bridge is left stopped: the settings page keeps offering the reset, to try it again.
+      this.setError(`Unable to reset: ${e.message}`);
       logger.error(`Matter bridge: unable to reset: ${e.message}`);
       return;
     }
@@ -489,10 +494,10 @@ MatterBridge.prototype.getStatus = async function getStatus() {
   const { exposureMode, exposedDevices } = await readExposure(this.gladys, this.serviceId);
   const status = {
     enabled: await this.isEnabled(),
-    hasIpv6: checkIpv6().hasIpv6,
+    hasIpv6: checkIpv6(undefined, { allowLinkLocal: true }).hasIpv6,
     matterbridgeEnabled: await this.isMatterbridgeEnabled(),
     port: MATTER_BRIDGE_PORT,
-    running: this.server !== null,
+    running: this.online,
     error: this.lastError,
     errorCode: this.lastErrorCode,
     exposureMode,
@@ -503,11 +508,12 @@ MatterBridge.prototype.getStatus = async function getStatus() {
     manualPairingCode: null,
     fabrics: [],
   };
-  if (this.server) {
+  if (this.online) {
     const { commissioning, operationalCredentials } = this.server.state;
+    const pairingCodes = commissioning.pairingCodes || {};
     status.commissioned = commissioning.commissioned;
-    status.qrPairingCode = commissioning.pairingCodes.qrPairingCode;
-    status.manualPairingCode = commissioning.pairingCodes.manualPairingCode;
+    status.qrPairingCode = pairingCodes.qrPairingCode || null;
+    status.manualPairingCode = pairingCodes.manualPairingCode || null;
     status.fabrics = operationalCredentials.fabrics.map(({ fabricIndex, label, vendorId }) => ({
       fabricIndex,
       label,
@@ -568,9 +574,12 @@ MatterBridge.prototype.saveConfig = async function saveConfig({ exposureMode, ex
     throw e;
   }
 
-  if (this.server) {
-    await this.enqueue(() => this.syncAll());
-  }
+  // Checked once the changes queued before are done: a stop queued earlier leaves nothing to sync.
+  await this.enqueue(async () => {
+    if (this.server) {
+      await this.syncAll();
+    }
+  });
   return this.getStatus();
 };
 

@@ -19,6 +19,14 @@ describe('checkIpv6', () => {
     expect(result).to.deep.equal({ hasIpv6: false, ipv6Interfaces: [] });
   });
 
+  it('should accept a link-local interface when asked to', () => {
+    const linkLocal = iface('IPv6', 'fe80::1');
+    const result = checkIpv6(() => ({ lo: [iface('IPv6', '::1', true)], eth0: [linkLocal] }), {
+      allowLinkLocal: true,
+    });
+    expect(result).to.deep.equal({ hasIpv6: true, ipv6Interfaces: [linkLocal] });
+  });
+
   it('should read the interfaces of the machine by default', () => {
     expect(checkIpv6())
       .to.have.property('hasIpv6')

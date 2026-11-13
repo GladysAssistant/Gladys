@@ -2,16 +2,14 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
+const loadMatter = () => ({});
 const MatterBridgeMock = sinon.stub();
 MatterBridgeMock.prototype.start = sinon.stub().resolves();
 MatterBridgeMock.prototype.stop = sinon.stub().resolves();
 
 const MatterBridgeService = proxyquire('../../../services/matter-bridge/index', {
   './lib/MatterBridge': MatterBridgeMock,
-  '@matter/main': { name: 'main' },
-  '@matter/main/devices': { name: 'devices' },
-  '@matter/main/endpoints': { name: 'endpoints' },
-  '@matter/main/behaviors': { name: 'behaviors' },
+  './lib/loadMatter': { loadMatter },
 });
 
 describe('MatterBridgeService', () => {
@@ -23,14 +21,7 @@ describe('MatterBridgeService', () => {
   });
 
   it('should hand the bridge a loader of the matter.js modules, not the modules', () => {
-    sinon.assert.calledOnceWithExactly(MatterBridgeMock, gladys, 'service-id', sinon.match.func);
-    const loadMatter = MatterBridgeMock.firstCall.args[2];
-    expect(loadMatter()).to.deep.equal({
-      main: { name: 'main' },
-      devices: { name: 'devices' },
-      endpoints: { name: 'endpoints' },
-      behaviors: { name: 'behaviors' },
-    });
+    sinon.assert.calledOnceWithExactly(MatterBridgeMock, gladys, 'service-id', loadMatter);
     expect(service.controllers).to.have.property('get /api/v1/service/matter-bridge/status');
   });
 

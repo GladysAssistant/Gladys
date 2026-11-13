@@ -172,6 +172,7 @@ function createMatter() {
     'SmokeCoAlarmServer',
     'PowerSourceServer',
     'CarbonDioxideConcentrationMeasurementServer',
+    'AirQualityServer',
     'Pm25ConcentrationMeasurementServer',
     'Pm10ConcentrationMeasurementServer',
   ];

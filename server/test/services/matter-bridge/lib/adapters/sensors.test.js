@@ -85,10 +85,10 @@ describe('Matter bridge sensor adapters', () => {
     });
   });
 
-  it('should expose motion and presence as occupancy', () => {
+  it('should expose motion and presence sensors as occupancy', () => {
     const { occupancySensor } = sensors;
     const motion = feature('m', 'motion-sensor', 'binary');
-    const presence = feature('p', 'presence-sensor', 'push');
+    const presence = feature('p', 'presence-sensor', 'binary');
     expect(occupancySensor.claim([motion, presence])).to.deep.equal([{ value: motion }, { value: presence }]);
     const built = occupancySensor.build(matter, { value: motion }, createContext({ m: 1 }));
     expect(built.type.name).to.equal('OccupancySensorDevice');
@@ -101,5 +101,11 @@ describe('Matter bridge sensor adapters', () => {
     expect(occupancySensor.toMatter('value', 0, { value: motion })).to.deep.equal({
       occupancySensing: { occupancy: { occupied: false } },
     });
+  });
+
+  it('should not expose the network presence of the Bluetooth and LAN scanners', () => {
+    const { occupancySensor } = sensors;
+    const bluetooth = feature('bt', 'presence-sensor', 'push');
+    expect(occupancySensor.claim([bluetooth])).to.deep.equal([]);
   });
 });

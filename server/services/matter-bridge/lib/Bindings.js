@@ -34,6 +34,10 @@ function Bindings(gladys, debounceMs = COMMAND_DEBOUNCE_MS) {
   this.cleanups = new Map();
   // Feature selector -> pending debounced command
   this.timers = new Map();
+  // Gladys states are pushed one at a time: a state derived from several features (the expressed
+  // state of a smoke and CO alarm, the overall air quality) is computed from the endpoint state,
+  // which must hold the previous push.
+  this.pushes = Promise.resolve();
 }
 
 /**
@@ -163,14 +167,30 @@ Bindings.prototype.clear = function clear() {
 };
 
 /**
- * @description Push a new Gladys state to the Matter endpoints exposing the feature.
+ * @description Push a new Gladys state to the Matter endpoints exposing the feature, once the
+ * states pushed before are applied.
+ * @param {object} event - Gladys NEW_STATE event.
+ * @returns {Promise} Resolves once the endpoints are updated.
+ * @example
+ * await bindings.push({ device_feature: 'light-binary', last_value: 1 });
+ */
+Bindings.prototype.push = function push(event) {
+  // pushNow never rejects: a failing endpoint is logged and the next pushes still run.
+  // eslint-disable-next-line promise/prefer-await-to-then
+  this.pushes = this.pushes.then(() => this.pushNow(event));
+  return this.pushes;
+};
+
+/**
+ * @description Push a new Gladys state to the Matter endpoints exposing the feature, at once:
+ * only to be called through push.
  * @param {object} event - Gladys NEW_STATE event.
  * @returns {Promise} Resolves once the endpoints are updated, or at once when the feature is not
  * exposed.
  * @example
- * await bindings.push({ device_feature: 'light-binary', last_value: 1 });
+ * await bindings.pushNow({ device_feature: 'light-binary', last_value: 1 });
  */
-Bindings.prototype.push = async function push(event) {
+Bindings.prototype.pushNow = async function pushNow(event) {
   const bindings = this.byFeature.get(event.device_feature);
   if (!bindings || !isNumber(event.last_value)) {
     return;

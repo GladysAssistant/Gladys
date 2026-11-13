@@ -276,10 +276,13 @@ describe('MatterBridge', () => {
 
     it('should report a reset that fails, without restarting the bridge', async () => {
       await bridge.start();
+      bridge.setError('port in use', ERROR_CODES.PORT_IN_USE);
       fse.remove.rejects(new Error('read-only'));
       await bridge.reset();
       expect(bridge.server).to.equal(null);
-      expect(bridge.lastError).to.equal('read-only');
+      expect(bridge.online).to.equal(false);
+      expect(bridge.lastError).to.equal('Unable to reset: read-only');
+      expect(bridge.lastErrorCode).to.equal(null);
       sinon.assert.notCalled(gladys.variable.destroy);
     });
   });
@@ -471,6 +474,34 @@ describe('MatterBridge', () => {
   });
 
   describe('getStatus', () => {
+    it('should tell the bridge has IPv6 with a link-local address only', async () => {
+      await bridge.getStatus();
+      sinon.assert.calledWithExactly(checkIpv6, undefined, { allowLinkLocal: true });
+    });
+
+    it('should not describe a bridge still starting as running', async () => {
+      let statusWhileStarting;
+      const { start } = matter.server;
+      matter.server.start = async () => {
+        statusWhileStarting = await bridge.getStatus();
+        return start();
+      };
+      await bridge.start();
+      expect(statusWhileStarting).to.include({
+        running: false,
+        commissioned: false,
+        qrPairingCode: null,
+        manualPairingCode: null,
+      });
+      expect((await bridge.getStatus()).running).to.equal(true);
+    });
+
+    it('should describe a running bridge whose pairing codes are not ready', async () => {
+      await bridge.start();
+      delete matter.server.state.commissioning.pairingCodes;
+      expect(await bridge.getStatus()).to.include({ running: true, qrPairingCode: null, manualPairingCode: null });
+    });
+
     it('should describe a stopped bridge', async () => {
       variables[VARIABLES.ENABLED] = 'false';
       checkIpv6.returns({ hasIpv6: false, ipv6Interfaces: [] });
@@ -588,6 +619,26 @@ describe('MatterBridge', () => {
       );
       expect(variables).to.not.have.property(VARIABLES.EXPOSED_DEVICES);
       sinon.assert.calledWith(gladys.variable.destroy, VARIABLES.EXPOSED_DEVICES, SERVICE_ID);
+    });
+
+    it('should not sync a bridge stopped by a stop queued before the save', async () => {
+      await bridge.start();
+      const syncAll = sinon.spy(bridge, 'syncAll');
+      // A change still running holds the stop in the queue while the configuration is saved.
+      let release;
+      const gate = new Promise((resolve) => {
+        release = resolve;
+      });
+      const busy = bridge.enqueue(() => gate);
+      const stopped = bridge.stop();
+      const saved = bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['sensor'] });
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      release();
+      const [status] = await Promise.all([saved, busy, stopped]);
+      sinon.assert.notCalled(syncAll);
+      expect(status.running).to.equal(false);
     });
 
     it('should apply a new selection to a running bridge', async () => {
