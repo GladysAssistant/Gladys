@@ -634,7 +634,7 @@ module.exports = {
       feature: {
         name: 'Tension moyenne Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY2,
+        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY3,
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
