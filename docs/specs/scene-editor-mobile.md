@@ -301,6 +301,46 @@ Lists the root steps with a ⊖ delete button and ↑ / ↓ buttons (44 px each)
 through `moveCardGroup`, so variable references follow the steps. "Done" (bottom bar or navigation
 bar) leaves the mode. Steps inside branches keep their order in this phase (G).
 
+### E.10 Device fields: the picker sheet
+
+On a phone, a react-select with several devices is the wrong tool inside a sheet: a menu of every
+device of the house opening over the form, one pick per opening, chips that wrap, and the keyboard
+coming up on each tap. The **multi-device fields** of the scene forms therefore become, below
+768 px, a `DevicePickerField` (`components/device/DevicePickerField.jsx`):
+
+- the selection as **rows** (category icon, device name, and underneath what is measured and the
+  room), each with a 44 px **remove** button; "No device selected." when empty;
+- one button — "Choose devices", then "Add or remove devices" — opening the **device picker of
+  the dashboard** (`DeviceFeaturePicker`, `dashboard-flexible-layout-and-widgets.md` A.3.1:
+  search that does not open the keyboard by itself, room chips, checkbox rows with the current
+  value, a pinned "Done" with the pending `+2 · −1`) in a **full-height sheet above the step's
+  one** (`depth` 10). Devices are added and removed in **one validation**; closing the sheet
+  (×, Escape, outside) keeps the selection as it was.
+
+From 768 px the field renders its children: the select the form already had, unchanged.
+
+The fields concerned, and what they select:
+
+| Form | Selection | Picker option |
+| --- | --- | --- |
+| Turn on / turn off / toggle the lights | device selectors (`devices`) | `pickDevices` |
+| Turn on / turn off / toggle the switches | device selectors (`devices`), writable switches only | `pickDevices` |
+| Blink the lights | device selectors (`devices`), lights and switches | `pickDevices` |
+| "Device state change" trigger | feature selectors (`device_features`) | `sameKindOnly` |
+
+- `pickDevices`: a row is a **device**, selected as a whole (an action on lights takes lights, not
+  their features); its icon and value are those of its first accepted feature.
+- `sameKindOnly`: the features of a trigger share one condition, so they must be comparable. Once
+  a first feature is ticked, **only the features of its category and type are listed** (with a
+  line saying so), exactly as the select narrows its options; unticking everything lists every
+  kind again. The row under the finger stays in view when the list narrows.
+
+`SelectDeviceFeature` opts in with `mobilePicker` (multi-selection only): its other callers, and
+the single-device selects of the scene forms, keep the select. A selector whose device no longer
+exists keeps its row in the field ("Device not found", removable), and is never dropped by a
+validation of the picker. No data contract changes: the forms write the same `devices` /
+`device_features` arrays.
+
 ## F. Accessibility and motion
 
 - Every control is a real `<button>`/`<a>`/`<input>`, with an `aria-label` when it has no visible
@@ -310,12 +350,21 @@ bar) leaves the mode. Steps inside branches keep their order in this phase (G).
 - Toasts are `role="status"`.
 - Swipe actions always have a non-gesture equivalent (the sheet buttons, the menu, reorder mode).
 - Sheet and toast animations are skipped under `prefers-reduced-motion: reduce`.
-- Dark mode: the new surfaces follow the app-wide inversion like the other Horizon sheets.
+- Dark mode: the new surfaces follow the app-wide inversion like the other Horizon sheets, with
+  the exceptions an audit of every screen asked for (`mobile.css`, "Dark mode"). Colors that carry
+  a meaning are **inverted back to themselves**: the swipe actions, the destructive button of the
+  delete confirmation, the floating "+" (whose icon must not be inverted a third time), and the
+  switch (white knob on the accent when on, on a dark track when off). Two global rules of
+  `style/dark-mode.css` are undone where they do not fit: the search field of the list is a
+  transparent field in its pill (the rule for inputs painted a darker rectangle in it), and the
+  running / stop button follows the page (the rule for outline buttons gave it back a dark green
+  on the dark bottom bar). The search icon of the device picker sits above its field, which the
+  input rule turns into a stacking context.
 
 ## G. Designed, not built yet (phase 2)
 
-- **Device picker by room** (full-height sheet, search, rows with check marks) replacing the
-  react-select device fields on a phone.
+- The **single-device** selects (get the last state, control a device, the variable of a
+  condition) in the picker sheet: E.10 covers the fields selecting several devices.
 - **Day pills** (M T W T F S S + "Weekdays / Weekend / Every day") and the native
   `<input type="time">` in the scheduled trigger.
 - **"Insert a value" chip bar** above text fields accepting variables, replacing the typed `{{`.
@@ -337,6 +386,10 @@ bar) leaves the mode. Steps inside branches keep their order in this phase (G).
   from its block's sheet (the sheet stays, Undo is reachable), close a save error, leave a scene the
   forms normalize without being asked, get a
   draft back after a reload, disable the scene from its status line, delete it from the menu.
+- Cypress, phone viewport, `SceneMobileDevicePicker.cy.js`: the features of a device state
+  trigger picked in the sheet (only the features of the selected kind are listed), removed from
+  the field, the lights of an action picked as devices, a closed picker keeping the selection,
+  the saved payload; and the select kept on a wider screen.
 - The swipe gesture itself (`SwipeRow`) is not driven by Cypress: the pointer events Cypress
   synthesizes do not reach the row's handlers in its browser. It is checked in a phone emulation
   with a real pointer (Playwright); every swipe action has a non-gesture equivalent that the specs

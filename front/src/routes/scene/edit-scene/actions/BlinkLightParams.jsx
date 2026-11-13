@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 
 class BlinkLight extends Component {
   getOptions = async () => {
@@ -20,7 +21,14 @@ class BlinkLight extends Component {
           label: device.name
         }))
         .sort((d1, d2) => d1.label.localeCompare(d2.label));
-      await this.setState({ deviceOptions });
+      // a device with both a light and a switch feature is listed once in the picker
+      const devices = [];
+      [...lightDevices, ...switchDevices].forEach(device => {
+        if (!devices.some(known => known.selector === device.selector)) {
+          devices.push(device);
+        }
+      });
+      await this.setState({ deviceOptions, devices });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
@@ -34,6 +42,10 @@ class BlinkLight extends Component {
     } else {
       this.props.updateActionProperty(this.props.path, 'devices', []);
     }
+  };
+  // on a phone the devices are picked in the device picker sheet, by room
+  handlePickerChange = devices => {
+    this.props.updateActionProperty(this.props.path, 'devices', devices);
   };
   handleChangeBlinkingTime = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
@@ -59,6 +71,7 @@ class BlinkLight extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
+      devices: null,
       selectedOptions: []
     };
   }
@@ -73,7 +86,7 @@ class BlinkLight extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, { selectedOptions, deviceOptions, devices }) {
     return (
       <div>
         <div class="row">
@@ -82,15 +95,22 @@ class BlinkLight extends Component {
               <div class="form-label">
                 <Text id="editScene.actionsCard.blinkLigths.label" />
               </div>
-              <Select
-                defaultValue={[]}
-                isMulti
-                value={selectedOptions}
-                onChange={this.handleChange}
-                options={deviceOptions}
-                className="react-select-container"
-                classNamePrefix="react-select"
-              />
+              <DevicePickerField
+                devices={devices}
+                selected={props.action.devices}
+                onChange={this.handlePickerChange}
+                pickDevices
+              >
+                <Select
+                  defaultValue={[]}
+                  isMulti
+                  value={selectedOptions}
+                  onChange={this.handleChange}
+                  options={deviceOptions}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                />
+              </DevicePickerField>
             </div>
           </div>
         </div>

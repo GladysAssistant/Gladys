@@ -7788,6 +7788,15 @@
       "other": "{{count}} selected"
     },
     "validate": "Done",
-    "title": "Choose devices"
+    "title": "Choose devices",
+    "sameKindHint": "Only the devices of the same type are listed: they share one condition."
+  },
+  "devicePickerField": {
+    "title": "Choose devices",
+    "choose": "Choose devices",
+    "edit": "Add or remove devices",
+    "empty": "No device selected.",
+    "remove": "Remove {{name}}",
+    "notFound": "Device not found"
   }
 }

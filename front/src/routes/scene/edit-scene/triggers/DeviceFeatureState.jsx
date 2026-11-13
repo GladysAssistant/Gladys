@@ -283,6 +283,7 @@ class TurnOnLight extends Component {
             <div class="form-group">
               <SelectDeviceFeature
                 isMulti
+                mobilePicker
                 value={this.getSelectedSelectors()}
                 onDeviceFeaturesChange={this.onDeviceFeaturesChange}
               />

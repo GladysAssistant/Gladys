@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from '../form/Select';
+import DevicePickerField from './DevicePickerField';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
@@ -26,6 +27,8 @@ class SelectDeviceFeature extends Component {
     try {
       const rooms = await this.props.httpClient.get('/api/v1/room', { expand: 'devices' });
       const deviceOptions = [];
+      // the same devices for the picker sheet of a phone, each with its room
+      const pickerDevices = [];
 
       const deviceDictionnary = {};
       const deviceFeaturesDictionnary = {};
@@ -72,6 +75,9 @@ class SelectDeviceFeature extends Component {
       rooms.forEach(room => {
         const roomDeviceFeatures = [];
         pushDeviceFeatures(room.devices, roomDeviceFeatures, room.name);
+        room.devices.forEach(device => {
+          pickerDevices.push({ ...device, room: { id: room.id, name: room.name, selector: room.selector } });
+        });
         if (roomDeviceFeatures.length > 0) {
           roomDeviceFeatures.sort(sortByLabel);
           deviceOptions.push({
@@ -91,6 +97,9 @@ class SelectDeviceFeature extends Component {
 
       const noRoomDeviceFeatures = [];
       pushDeviceFeatures(devicesWithoutRoom, noRoomDeviceFeatures, this.props.intl.dictionary.device.noRoom);
+      devicesWithoutRoom.forEach(device => {
+        pickerDevices.push({ ...device, room: null });
+      });
       if (noRoomDeviceFeatures.length > 0) {
         noRoomDeviceFeatures.sort(sortByLabel);
         deviceOptions.push({
@@ -99,7 +108,7 @@ class SelectDeviceFeature extends Component {
         });
       }
 
-      await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
+      await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary, pickerDevices });
       await this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
@@ -125,6 +134,21 @@ class SelectDeviceFeature extends Component {
     } else {
       this.props.onDeviceFeatureChange(null);
     }
+  };
+  // The picker sheet of a phone hands back selectors: they go through the same path as the
+  // options of the select
+  handlePickerChange = selectors => {
+    const { deviceFeaturesDictionnary } = this.state;
+    this.handleChange(
+      selectors.filter(selector => deviceFeaturesDictionnary[selector]).map(selector => ({ value: selector }))
+    );
+  };
+  // the features the picker may list: the ones the select offers
+  isFeatureSelectable = feature => {
+    if (this.props.exclude_read_only_device_features === true && feature.read_only) {
+      return false;
+    }
+    return typeof this.props.filterFeature !== 'function' || this.props.filterFeature(feature);
   };
   findOption = value => {
     let deviceOption;
@@ -247,10 +271,30 @@ class SelectDeviceFeature extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOption, selectedOptions, deviceOptions }) {
+  render(props, { selectedOption, selectedOptions, deviceOptions, pickerDevices }) {
     if (!deviceOptions) {
       return null;
     }
+    const select = this.renderSelect(props, { selectedOption, selectedOptions });
+    // opt-in (mobilePicker), multi-selection only: on a phone the features are picked in the
+    // device picker sheet, by room; anywhere else the select below is rendered as before
+    if (props.isMulti && props.mobilePicker) {
+      return (
+        <DevicePickerField
+          devices={pickerDevices}
+          selected={selectedOptions.map(option => option.value)}
+          onChange={this.handlePickerChange}
+          filterFeature={this.isFeatureSelectable}
+          sameKindOnly
+        >
+          {select}
+        </DevicePickerField>
+      );
+    }
+    return select;
+  }
+
+  renderSelect(props, { selectedOption, selectedOptions }) {
     return (
       <Select
         class="select-device-feature"

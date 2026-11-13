@@ -7788,6 +7788,15 @@
       "other": "{{count}} ausgewählt"
     },
     "validate": "Fertig",
-    "title": "Geräte wählen"
+    "title": "Geräte wählen",
+    "sameKindHint": "Es werden nur Geräte desselben Typs angezeigt: Sie teilen sich eine Bedingung."
+  },
+  "devicePickerField": {
+    "title": "Geräte auswählen",
+    "choose": "Geräte auswählen",
+    "edit": "Geräte hinzufügen oder entfernen",
+    "empty": "Kein Gerät ausgewählt.",
+    "remove": "{{name}} entfernen",
+    "notFound": "Gerät nicht gefunden"
   }
 }

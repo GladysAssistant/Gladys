@@ -7788,6 +7788,15 @@
       "other": "{{count}} sélectionnés"
     },
     "validate": "Valider",
-    "title": "Choisir"
+    "title": "Choisir",
+    "sameKindHint": "Seuls les appareils du même type sont listés : ils partagent une seule condition."
+  },
+  "devicePickerField": {
+    "title": "Choisir des appareils",
+    "choose": "Choisir des appareils",
+    "edit": "Ajouter ou retirer des appareils",
+    "empty": "Aucun appareil sélectionné.",
+    "remove": "Retirer {{name}}",
+    "notFound": "Appareil introuvable"
   }
 }

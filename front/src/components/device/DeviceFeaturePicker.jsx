@@ -21,20 +21,26 @@ const getFeatureIcon = feature => get(DeviceFeatureCategoriesIcon, `${feature.ca
 
 // Rooms (by name, devices without a room last) > devices (by name) >
 // features (in the device's own order), each feature carrying the text the
-// search matches against: room + device + feature description
-const buildGroups = (devices, dictionary, filterFeature) => {
+// search matches against: room + device + feature description, and the
+// selector it stands for in the selection. With pickDevices a device is one
+// row, selected as a whole: its selector is the device's, its icon and value
+// those of its first accepted feature.
+const buildGroups = (devices, dictionary, filterFeature, pickDevices) => {
   // a Map, not an object: a room selector such as "constructor" must not
   // hit an inherited property
   const rooms = new Map();
   (devices || []).forEach(device => {
-    const features = (device.features || [])
+    let features = (device.features || [])
       .filter(feature => !filterFeature || filterFeature(feature, device))
       .map(feature => {
         const description = getDeviceFeatureDescription(dictionary, device, feature);
-        return { feature, description };
+        return { feature, description, selector: feature.selector };
       });
     if (features.length === 0) {
       return;
+    }
+    if (pickDevices) {
+      features = [{ feature: features[0].feature, description: device.name, selector: device.selector }];
     }
     const roomKey = getRoomKey(device);
     if (!rooms.has(roomKey)) {
@@ -46,7 +52,9 @@ const buildGroups = (devices, dictionary, filterFeature) => {
     }
     const room = rooms.get(roomKey);
     features.forEach(entry => {
-      entry.searchText = normalizeSearchText(`${room.name} ${device.name} ${entry.description}`);
+      entry.searchText = normalizeSearchText(
+        pickDevices ? `${room.name} ${device.name}` : `${room.name} ${device.name} ${entry.description}`
+      );
     });
     room.devices.push({ device, features });
   });
@@ -69,6 +77,12 @@ const buildGroups = (devices, dictionary, filterFeature) => {
 // included) and the currently selected selectors, and gets the new ordered
 // selection back — kept selectors keep their order, new ones are appended in
 // the order they were checked.
+// Two options for the other callers (the scene forms on a phone):
+// - pickDevices: the rows are devices, and the selection device selectors
+//   (an action on lights takes lights, not their features);
+// - sameKindOnly: every selected feature must share its category and type
+//   (the features of a scene trigger are compared with one condition), so
+//   once a first feature is ticked only the features of its kind are listed.
 class DeviceFeaturePicker extends Component {
   constructor(props) {
     super(props);
@@ -78,13 +92,41 @@ class DeviceFeaturePicker extends Component {
       room: ALL_ROOMS,
       selectedSnapshot: null
     };
-    this.groups = buildGroups(props.devices, get(props, 'intl.dictionary'), props.filterFeature);
+    this.groups = buildGroups(props.devices, get(props, 'intl.dictionary'), props.filterFeature, props.pickDevices);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.devices !== this.props.devices || nextProps.filterFeature !== this.props.filterFeature) {
-      this.groups = buildGroups(nextProps.devices, get(nextProps, 'intl.dictionary'), nextProps.filterFeature);
+    if (
+      nextProps.devices !== this.props.devices ||
+      nextProps.filterFeature !== this.props.filterFeature ||
+      nextProps.pickDevices !== this.props.pickDevices
+    ) {
+      this.groups = buildGroups(
+        nextProps.devices,
+        get(nextProps, 'intl.dictionary'),
+        nextProps.filterFeature,
+        nextProps.pickDevices
+      );
     }
+  }
+
+  // sameKindOnly: the feature every other one must be comparable with, the
+  // first of the selection that is still a known feature
+  getReferenceFeature(selected) {
+    if (!this.props.sameKindOnly) {
+      return null;
+    }
+    for (const selector of selected) {
+      for (const group of this.groups) {
+        for (const entry of group.devices) {
+          const match = entry.features.find(candidate => candidate.selector === selector);
+          if (match) {
+            return match.feature;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   updateSearch = e => {
@@ -102,12 +144,22 @@ class DeviceFeaturePicker extends Component {
     this.setState({ room, selectedSnapshot: room === SELECTED_ONLY ? this.state.selected : null });
   };
 
-  toggleFeature = selector => {
-    this.setState(prevState => ({
-      selected: prevState.selected.includes(selector)
-        ? prevState.selected.filter(s => s !== selector)
-        : [...prevState.selected, selector]
-    }));
+  toggleFeature = (selector, event) => {
+    const row = event && event.target && event.target.closest ? event.target.closest('label') : null;
+    this.setState(
+      prevState => ({
+        selected: prevState.selected.includes(selector)
+          ? prevState.selected.filter(s => s !== selector)
+          : [...prevState.selected, selector]
+      }),
+      () => {
+        // sameKindOnly: ticking the first feature (or unticking the last one)
+        // changes which rows are listed; the row under the finger stays in view
+        if (this.props.sameKindOnly && row && row.isConnected && typeof row.scrollIntoView === 'function') {
+          row.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    );
   };
 
   validate = () => {
@@ -119,7 +171,8 @@ class DeviceFeaturePicker extends Component {
   };
 
   getVisibleGroups() {
-    const { search, room, selectedSnapshot } = this.state;
+    const { search, room, selectedSnapshot, selected } = this.state;
+    const reference = this.getReferenceFeature(selected);
     const words = normalizeSearchText(search)
       .split(/\s+/)
       .filter(Boolean);
@@ -131,8 +184,11 @@ class DeviceFeaturePicker extends Component {
           .map(entry => ({
             ...entry,
             features: entry.features.filter(
-              ({ feature, searchText }) =>
-                (room !== SELECTED_ONLY || selectedSnapshot.includes(feature.selector)) &&
+              ({ feature, searchText, selector }) =>
+                (room !== SELECTED_ONLY || selectedSnapshot.includes(selector)) &&
+                (!reference ||
+                  selected.includes(selector) ||
+                  (feature.category === reference.category && feature.type === reference.type)) &&
                 words.every(word => searchText.includes(word))
             )
           }))
@@ -165,8 +221,8 @@ class DeviceFeaturePicker extends Component {
     this.groups.forEach(group => {
       selectedCountByRoom[group.key] = 0;
       group.devices.forEach(entry =>
-        entry.features.forEach(({ feature }) => {
-          if (selected.includes(feature.selector)) {
+        entry.features.forEach(({ selector }) => {
+          if (selected.includes(selector)) {
             selectedCountByRoom[group.key] += 1;
           }
         })
@@ -221,20 +277,30 @@ class DeviceFeaturePicker extends Component {
           </div>
         </Localizer>
 
+        {props.sameKindOnly && this.getReferenceFeature(selected) && (
+          <p class={style.hint} data-cy="picker-same-kind-hint">
+            <Text id="deviceFeaturePicker.sameKindHint" />
+          </p>
+        )}
+
         <div class={style.list}>
           {visibleGroups.map(group => (
             <div key={group.key}>
               <div class={style.roomHeading}>{group.name}</div>
               {group.devices.map(({ device, features }) => (
                 <div class={style.device} key={device.selector}>
-                  <div class={style.deviceName}>{device.name}</div>
-                  {features.map(({ feature, description }) => (
-                    <label class={style.feature} key={feature.selector} data-cy={`picker-feature-${feature.selector}`}>
+                  {!props.pickDevices && <div class={style.deviceName}>{device.name}</div>}
+                  {features.map(({ feature, description, selector }) => (
+                    <label
+                      class={cx(style.feature, { [style.featureAlone]: props.pickDevices })}
+                      key={selector}
+                      data-cy={`picker-feature-${selector}`}
+                    >
                       <input
                         type="checkbox"
                         class={style.checkbox}
-                        checked={selected.includes(feature.selector)}
-                        onChange={() => this.toggleFeature(feature.selector)}
+                        checked={selected.includes(selector)}
+                        onChange={event => this.toggleFeature(selector, event)}
                       />
                       <span class={style.tick} aria-hidden="true">
                         <i class="fe fe-check" />

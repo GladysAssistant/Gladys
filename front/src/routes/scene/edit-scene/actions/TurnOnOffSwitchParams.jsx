@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
@@ -21,7 +22,7 @@ class TurnOnOffSwitch extends Component {
         value: device.selector,
         label: device.name
       }));
-      await this.setState({ deviceOptions });
+      await this.setState({ deviceOptions, devices: devicesFiltered });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
@@ -35,6 +36,10 @@ class TurnOnOffSwitch extends Component {
     } else {
       this.props.updateActionProperty(this.props.path, 'devices', []);
     }
+  };
+  // on a phone the switches are picked in the device picker sheet, by room
+  handlePickerChange = switches => {
+    this.props.updateActionProperty(this.props.path, 'devices', switches);
   };
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
@@ -52,6 +57,7 @@ class TurnOnOffSwitch extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
+      devices: null,
       selectedOptions: []
     };
   }
@@ -63,7 +69,7 @@ class TurnOnOffSwitch extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, { selectedOptions, deviceOptions, devices }) {
     return (
       <div class="form-group">
         <label class="form-label">
@@ -76,15 +82,22 @@ class TurnOnOffSwitch extends Component {
             <Text id="editScene.actionsCard.toggleSwitches.description" />
           </p>
         )}
-        <Select
-          defaultValue={[]}
-          isMulti
-          value={selectedOptions}
-          onChange={this.handleChange}
-          options={deviceOptions}
-          className="react-select-container"
-          classNamePrefix="react-select"
-        />
+        <DevicePickerField
+          devices={devices}
+          selected={props.action.devices}
+          onChange={this.handlePickerChange}
+          pickDevices
+        >
+          <Select
+            defaultValue={[]}
+            isMulti
+            value={selectedOptions}
+            onChange={this.handleChange}
+            options={deviceOptions}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+        </DevicePickerField>
       </div>
     );
   }

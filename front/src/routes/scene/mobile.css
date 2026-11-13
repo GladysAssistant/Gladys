@@ -1212,3 +1212,52 @@
     font-size: 16px;
   }
 }
+
+/* ---------- Dark mode ----------
+   Dark mode is the app-wide inversion (style/dark-mode.css): the light colors above are inverted
+   with the page, which is right for surfaces and text. A few things must not follow blindly:
+   colors that carry a meaning are inverted back to themselves, and the global dark-mode rules
+   written for the classic form controls are undone where they do not fit. */
+
+/* the search of the list is a transparent field inside its pill: dark-mode.css paints every
+   input with its own solid background and inverts it back, which showed as a darker rectangle */
+:global(.dark-mode) .search input.searchInput {
+  background-color: transparent !important;
+  color: #1c2334 !important;
+  filter: none;
+}
+
+:global(.dark-mode) .search input.searchInput::placeholder {
+  color: #6b7385 !important;
+}
+
+/* danger, neutral and accent blocks keep their own color and their white label: inverted, the
+   red of a deletion turned pink, with a dark label */
+:global(.dark-mode) .swipeAction,
+:global(.dark-mode) .bigButtonDanger,
+:global(.dark-mode) .fab {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* the "+" sits outside the glass page, where dark-mode.css inverts the icons back: it must
+   follow its button, not be inverted a third time */
+:global(.dark-mode) .fab :global(.fe) {
+  filter: none;
+}
+
+/* a switch reads by its knob: white on the accent when on, on a dark track when off */
+:global(.dark-mode) .switchTrack {
+  background-color: #4a5263;
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+:global(.dark-mode) .switchTrackOn {
+  background-color: #2f5bd8;
+}
+
+/* the running / stop button: dark-mode.css gives outline buttons their light-mode colors back,
+   a dark green on the dark bottom bar. Inverted with the page, it is a light green */
+:global(.dark-mode) .bottomBar :global(.btn-outline-success),
+:global(.dark-mode) .sceneRow :global(.btn-outline-success) {
+  filter: none;
+}

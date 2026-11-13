@@ -7788,6 +7788,15 @@
       "other": "{{count}} seleccionados"
     },
     "validate": "Listo",
-    "title": "Elegir"
+    "title": "Elegir",
+    "sameKindHint": "Solo se muestran los dispositivos del mismo tipo: comparten una única condición."
+  },
+  "devicePickerField": {
+    "title": "Elegir dispositivos",
+    "choose": "Elegir dispositivos",
+    "edit": "Añadir o quitar dispositivos",
+    "empty": "Ningún dispositivo seleccionado.",
+    "remove": "Quitar {{name}}",
+    "notFound": "Dispositivo no encontrado"
   }
 }
