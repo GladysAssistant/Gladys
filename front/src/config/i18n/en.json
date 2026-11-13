@@ -5400,6 +5400,22 @@
     }
   },
   "systemSettings": {
+    "clockTitle": "Clock",
+    "clockDescription": "Gladys relies on the clock of the machine it runs on for scheduled scenes, history and energy. It is compared here with the clock of the device you are using.",
+    "clockOnTime": "Gladys's clock is on time.",
+    "clockOffsetConsequences": "Scheduled scenes run at the wrong time and states are saved with a wrong date.",
+    "clockMeasureError": "Unable to read Gladys's clock.",
+    "clockSyncUnavailable": "Gladys cannot read the time synchronization settings of the machine (systemd-timedated is not reachable). Check them directly on the machine, for example with the \"timedatectl\" command.",
+    "clockSyncOk": "The machine keeps its clock on time automatically (network time synchronization).",
+    "clockSyncOkDeviceOff": "As the machine is synchronized, the clock of the device you are using is probably the one that is wrong.",
+    "clockSyncNotSynchronized": "Automatic time synchronization is on, but the machine is not synchronized yet. If this lasts, check that it can reach the Internet (NTP, UDP port 123).",
+    "clockSyncEnabled": "Automatic time synchronization has been turned on: the clock should be corrected within a few minutes.",
+    "clockSyncDisabled": "The automatic time synchronization of the machine is turned off: its clock drifts and is never corrected.",
+    "clockSyncEnableButton": "Turn on automatic time synchronization",
+    "clockSyncEnableError": "Unable to turn on the automatic time synchronization.",
+    "clockSyncNoService": "No network time service is installed on the machine: its clock drifts and is never corrected. Install one (for example systemd-timesyncd).",
+    "clockRestartHint": "Once the clock is corrected, restart Gladys so that scheduled scenes are computed again with the right time.",
+    "clockCheckAgain": "Check again",
     "connected": "Connected",
     "ping": "{{time}} ms ping",
     "disk": "Disk",
@@ -7577,7 +7593,49 @@
       }
     }
   },
+  "clock": {
+    "ahead": {
+      "seconds": {
+        "one": "Gladys's clock is 1 second ahead of this device.",
+        "other": "Gladys's clock is {{count}} seconds ahead of this device."
+      },
+      "minutes": {
+        "one": "Gladys's clock is 1 minute ahead of this device.",
+        "other": "Gladys's clock is {{count}} minutes ahead of this device."
+      },
+      "hours": {
+        "one": "Gladys's clock is 1 hour ahead of this device.",
+        "other": "Gladys's clock is {{count}} hours ahead of this device."
+      },
+      "days": {
+        "one": "Gladys's clock is 1 day ahead of this device.",
+        "other": "Gladys's clock is {{count}} days ahead of this device."
+      }
+    },
+    "behind": {
+      "seconds": {
+        "one": "Gladys's clock is 1 second behind this device.",
+        "other": "Gladys's clock is {{count}} seconds behind this device."
+      },
+      "minutes": {
+        "one": "Gladys's clock is 1 minute behind this device.",
+        "other": "Gladys's clock is {{count}} minutes behind this device."
+      },
+      "hours": {
+        "one": "Gladys's clock is 1 hour behind this device.",
+        "other": "Gladys's clock is {{count}} hours behind this device."
+      },
+      "days": {
+        "one": "Gladys's clock is 1 day behind this device.",
+        "other": "Gladys's clock is {{count}} days behind this device."
+      }
+    }
+  },
   "header": {
+    "clockNoticeTitle": "Gladys's clock is wrong",
+    "clockNoticeText": "Scheduled scenes, history and energy may be wrong.",
+    "clockNoticeButton": "Check the clock",
+    "clockNoticeContactAdmin": "Please tell the administrator of your house.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Home",
     "chat": "Chat",

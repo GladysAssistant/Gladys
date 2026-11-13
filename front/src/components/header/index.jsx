@@ -10,6 +10,7 @@ import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
 import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
+import ClockOffsetNotice from './ClockOffsetNotice';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import sidebarActions from '../../actions/sidebar';
 import style from './style.css';
@@ -180,6 +181,9 @@ class Header extends Component {
   maybeRefreshInstanceVersion = () => {
     if (!this.isHidden() && this.props.user && this.props.user.id) {
       this.props.refreshInstanceVersionState();
+      // same for the server clock: a client-side login never runs the
+      // session check that measures it (throttled, so almost always a no-op)
+      this.props.refreshClockOffsetState();
     }
   };
 
@@ -261,6 +265,10 @@ class Header extends Component {
       userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://community.gladysassistant.com/';
     const showInstanceUpdateNotice =
       isInstanceBehindFront(props.instanceGladysVersion) && !isUpdateNoticeDismissed(props.instanceGladysVersion);
+    const showClockOffsetNotice = Number.isFinite(props.clockOffset);
+    // a notice waiting in a menu that is closed — the mobile drawer, or the
+    // rail collapsed on desktop — is echoed by a dot on the button opening it
+    const showTogglerDot = showInstanceUpdateNotice || props.gatewayPaymentRequired || showClockOffsetNotice;
 
     return (
       <div>
@@ -279,9 +287,7 @@ class Header extends Component {
               {/* on mobile the notice lives in the closed menu: this dot is
                   what tells the user there is something to open it for. Screen
                   readers get the notice content itself, in the menu. */}
-              {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
-                <span class={style.togglerDot} aria-hidden="true" />
-              )}
+              {showTogglerDot && <span class={style.togglerDot} aria-hidden="true" />}
             </button>
           </Localizer>
           <a class={style.mobileBrand} href="/dashboard">
@@ -313,9 +319,7 @@ class Header extends Component {
               aria-controls="sidebar-navigation"
             >
               <i class="fe fe-menu" />
-              {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
-                <span class={style.togglerDot} aria-hidden="true" />
-              )}
+              {showTogglerDot && <span class={style.togglerDot} aria-hidden="true" />}
             </button>
           </Localizer>
         )}
@@ -382,6 +386,13 @@ class Header extends Component {
             />
           )}
           {props.gatewayPaymentRequired && <GatewaySubscriptionNotice user={props.user} />}
+          {showClockOffsetNotice && (
+            <ClockOffsetNotice
+              clockOffset={props.clockOffset}
+              user={props.user}
+              refreshClockOffsetState={props.refreshClockOffsetState}
+            />
+          )}
           {Number.isInteger(props.gatewayTrialDaysLeft) && (
             <GatewayTrialIndicator
               daysLeft={props.gatewayTrialDaysLeft}

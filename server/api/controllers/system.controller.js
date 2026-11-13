@@ -14,6 +14,43 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/system/clock Get the current time of the server
+   * @apiName getClock
+   * @apiGroup System
+   * @apiDescription Kept as light as possible: the front compares it with the
+   * clock of the device it runs on to detect a server clock that is off.
+   */
+  async function getClock(req, res) {
+    // a cached answer would read as a server falling further and further behind
+    res.set('Cache-Control', 'no-store');
+    res.json({
+      server_time: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * @api {get} /api/v1/system/clock/sync Get the network time synchronization status of the host
+   * @apiName getTimeSyncStatus
+   * @apiGroup System
+   * @apiQuery {Boolean} [refresh=false] Read the status again instead of the one cached for a minute.
+   */
+  async function getTimeSyncStatus(req, res) {
+    const refresh = req.query.refresh === 'true' || req.query.refresh === true;
+    const status = await gladys.system.getTimeSyncStatus({ refresh });
+    res.json(status);
+  }
+
+  /**
+   * @api {post} /api/v1/system/clock/sync Turn on the network time synchronization of the host
+   * @apiName enableTimeSync
+   * @apiGroup System
+   */
+  async function enableTimeSync(req, res) {
+    const status = await gladys.system.enableTimeSync();
+    res.json(status);
+  }
+
+  /**
    * @api {get} /api/v1/system/disk Get the disk space used and available
    * @apiName getDiskUsage
    * @apiGroup System
@@ -120,6 +157,9 @@ module.exports = function SystemController(gladys) {
   return Object.freeze({
     installUpgrade: asyncMiddleware(installUpgrade),
     getSystemInfos: asyncMiddleware(getSystemInfos),
+    getClock: asyncMiddleware(getClock),
+    getTimeSyncStatus: asyncMiddleware(getTimeSyncStatus),
+    enableTimeSync: asyncMiddleware(enableTimeSync),
     getDiskSpace: asyncMiddleware(getDiskSpace),
     getContainers: asyncMiddleware(getContainers),
     shutdown: asyncMiddleware(shutdown),

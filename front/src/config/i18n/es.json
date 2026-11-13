@@ -5400,6 +5400,22 @@
     }
   },
   "systemSettings": {
+    "clockTitle": "Reloj",
+    "clockDescription": "Gladys utiliza el reloj de la máquina en la que se ejecuta para las escenas programadas, el historial y la energía. Aquí se compara con el reloj del dispositivo que estás usando.",
+    "clockOnTime": "El reloj de Gladys está en hora.",
+    "clockOffsetConsequences": "Las escenas programadas se ejecutan a una hora incorrecta y los estados se guardan con una fecha incorrecta.",
+    "clockMeasureError": "No se puede leer el reloj de Gladys.",
+    "clockSyncUnavailable": "Gladys no puede leer la configuración de sincronización horaria de la máquina (systemd-timedated no es accesible). Compruébala directamente en la máquina, por ejemplo con el comando \"timedatectl\".",
+    "clockSyncOk": "La máquina mantiene su reloj en hora automáticamente (sincronización horaria por red).",
+    "clockSyncOkDeviceOff": "Como la máquina está sincronizada, probablemente es el reloj del dispositivo que estás usando el que es incorrecto.",
+    "clockSyncNotSynchronized": "La sincronización horaria automática está activada, pero la máquina aún no está sincronizada. Si esto continúa, comprueba que tiene acceso a Internet (NTP, puerto UDP 123).",
+    "clockSyncEnabled": "Se ha activado la sincronización horaria automática: el reloj debería corregirse en unos minutos.",
+    "clockSyncDisabled": "La sincronización horaria automática de la máquina está desactivada: su reloj se desvía y nunca se corrige.",
+    "clockSyncEnableButton": "Activar la sincronización horaria automática",
+    "clockSyncEnableError": "No se puede activar la sincronización horaria automática.",
+    "clockSyncNoService": "No hay ningún servicio de sincronización horaria instalado en la máquina: su reloj se desvía y nunca se corrige. Instala uno (por ejemplo systemd-timesyncd).",
+    "clockRestartHint": "Una vez corregido el reloj, reinicia Gladys para que las escenas programadas se vuelvan a calcular con la hora correcta.",
+    "clockCheckAgain": "Comprobar de nuevo",
     "connected": "Conectado",
     "ping": "{{time}} ms de ping",
     "disk": "Disco",
@@ -7577,7 +7593,49 @@
       }
     }
   },
+  "clock": {
+    "ahead": {
+      "seconds": {
+        "one": "El reloj de Gladys va 1 segundo adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} segundos adelantado respecto a este dispositivo."
+      },
+      "minutes": {
+        "one": "El reloj de Gladys va 1 minuto adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} minutos adelantado respecto a este dispositivo."
+      },
+      "hours": {
+        "one": "El reloj de Gladys va 1 hora adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} horas adelantado respecto a este dispositivo."
+      },
+      "days": {
+        "one": "El reloj de Gladys va 1 día adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} días adelantado respecto a este dispositivo."
+      }
+    },
+    "behind": {
+      "seconds": {
+        "one": "El reloj de Gladys va 1 segundo atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} segundos atrasado respecto a este dispositivo."
+      },
+      "minutes": {
+        "one": "El reloj de Gladys va 1 minuto atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} minutos atrasado respecto a este dispositivo."
+      },
+      "hours": {
+        "one": "El reloj de Gladys va 1 hora atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} horas atrasado respecto a este dispositivo."
+      },
+      "days": {
+        "one": "El reloj de Gladys va 1 día atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} días atrasado respecto a este dispositivo."
+      }
+    }
+  },
   "header": {
+    "clockNoticeTitle": "La hora de Gladys es incorrecta",
+    "clockNoticeText": "Las escenas programadas, el historial y la energía pueden ser incorrectos.",
+    "clockNoticeButton": "Comprobar el reloj",
+    "clockNoticeContactAdmin": "Avisa al administrador de tu casa.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Inicio",
     "chat": "Chat",
