@@ -341,7 +341,12 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
   it('should not arm a check for an opening that ended during the device lookup', async () => {
     const mod = loadModule();
     const handler = buildHandler(60);
+    // Every cache is filled, so the lookup is the one following the opening: a
+    // report arriving during a fill of the caches waits on that same fill.
     handler.windowSelectorsCache = new Set(['window-sensor']);
+    handler.targetSelectorsCache = new Set();
+    handler.powerSelectorsCache = new Set();
+    handler.modeSelectorsCache = new Set();
     const { get } = handler.gladys.device;
     let reopened = false;
     handler.gladys.device.get = fake(async (query) => {
@@ -355,11 +360,15 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     });
 
     await opens(mod, handler);
+    // The closing seen during the lookup brought the heating back.
+    assert.calledOnce(handler.triggerApplySchedules);
+    // Armed on the first opening's time, the check would have run now.
     await clock.tickAsync(55 * 1000);
-    assert.notCalled(handler.triggerApplySchedules);
+    assert.calledOnce(handler.triggerApplySchedules);
+    // It runs a full delay after the window opened again.
     await clock.tickAsync(5 * 1000);
 
-    assert.calledOnce(handler.triggerApplySchedules);
+    assert.calledTwice(handler.triggerApplySchedules);
     assert.notCalled(handler.gladys.device.setValue);
   });
 

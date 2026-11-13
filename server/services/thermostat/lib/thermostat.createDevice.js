@@ -1,5 +1,7 @@
 const logger = require('../../../utils/logger');
 const {
+  EVENTS,
+  WEBSOCKET_MESSAGE_TYPES,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   THERMOSTAT_MODE,
@@ -7,7 +9,8 @@ const {
   THERMOSTAT_PRESET,
   THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
-const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
+const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE, modeFeatureCanCool } = require('../../../utils/thermostatConstants');
+const { getFeatureBySelector } = require('./thermostat.deviceConfig');
 
 // The params that make an external thermostat drive a real device: its
 // setpoint, its running state, its mode and its power. A pilot-wire heater has
@@ -20,6 +23,15 @@ const EXTERNAL_SETPOINT_PARAMS = [
   'THERMOSTAT_POWER_FEATURE',
 ];
 
+// The mode of a unit, as the edit form offers it: a thermostat's or an air
+// conditioner's, and one that can be written.
+const isWritableMode = (feature) =>
+  !feature.read_only &&
+  ((feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) ||
+    (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+      feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE));
+
 // Runtime state kept as params rather than features: a hold, a stop the
 // programme or a pilot-wire module made, and the end of one made on the unit
 // are bookkeeping of the regulation loop, not properties of the equipment. No
@@ -31,6 +43,16 @@ const RUNTIME_PARAMS = [
   'THERMOSTAT_REMOTE_STOP_UNTIL',
   'THERMOSTAT_MODULE_STOP',
 ];
+
+// Carried over the same way when the payload leaves it out: the use of a
+// reversible heat pump, which the widget and the unit's remote switch (A.4). The
+// edit form sends it only when the user changed it there, so a form left open
+// while the use changed elsewhere does not put the old use back on save.
+const CARRIED_PARAMS = [...RUNTIME_PARAMS, 'THERMOSTAT_MODE'];
+
+// The hold, dropped when the form switches the use of a reversible heat pump,
+// as a switch from the widget does (A.4).
+const HOLD_PARAMS = ['THERMOSTAT_MANUAL_SETPOINT', 'THERMOSTAT_MANUAL_UNTIL'];
 
 // Params the integration owns. Anything else sent by a client is dropped rather
 // than persisted, so the device never carries unknown regulation settings.
@@ -57,6 +79,18 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_WINDOW_DELAY',
   'THERMOSTAT_MODE',
+  // A heat pump that heats and cools, and the setpoints of its cooling presets
+  // (spec A.4): the heating ones are THERMOSTAT_PRESET_* below.
+  'THERMOSTAT_REVERSIBLE',
+  'THERMOSTAT_PRESET_COOLING_FROST',
+  'THERMOSTAT_PRESET_COOLING_AWAY',
+  'THERMOSTAT_PRESET_COOLING_ECO',
+  'THERMOSTAT_PRESET_COOLING_NIGHT',
+  'THERMOSTAT_PRESET_COOLING_COMFORT',
+  // And the range of its cooling use; THERMOSTAT_MIN_TEMP / MAX_TEMP are then
+  // the heating one.
+  'THERMOSTAT_COOLING_MIN_TEMP',
+  'THERMOSTAT_COOLING_MAX_TEMP',
   'THERMOSTAT_CONTROL_TYPE',
   'THERMOSTAT_MIN_TEMP',
   'THERMOSTAT_MAX_TEMP',
@@ -133,7 +167,11 @@ function buildStateFeatures(device, external) {
     external_id: `${base}:mode`,
     selector: `${base}:mode`,
     read_only: false,
-    has_feedback: false,
+    // The service saves the mode itself, and only when it is in force: a
+    // stopped reversible heat pump told to cool only switches its use (A.4).
+    // Without feedback, the core would save the value written after the
+    // service returned, and the next pass would start the unit.
+    has_feedback: true,
     min: THERMOSTAT_MODE.OFF,
     max: THERMOSTAT_MODE.COOLING,
     category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -197,27 +235,34 @@ async function createDevice(device) {
   // not theirs to change.
   const params = (device.params || [])
     .filter((param) => ALLOWED_PARAMS.includes(param.name))
-    .map((param) => ({ ...param }));
+    // `carried` marks the params taken from the stored device below.
+    .map(({ carried, ...param }) => ({ ...param }));
 
   // `device.create` deletes every param the payload leaves out. The hold is
   // runtime state the edit form knows nothing about, so saving the form would
   // silently drop it — and the next regulation pass would overwrite the setpoint
   // the user, a scene or the physical dial had just chosen. Carry it over from
-  // the device as it stands, unless the caller sent it explicitly.
+  // the device as it stands, unless the caller sent it explicitly — and the use
+  // with it (CARRIED_PARAMS).
+  let existingParams = [];
   if (device.selector) {
     const devices = await this.gladys.device.get({ service: 'thermostat' });
     const existing = (devices || []).find((candidate) => candidate.selector === device.selector);
-    const existingParams = (existing && existing.params) || [];
-    RUNTIME_PARAMS.forEach((name) => {
+    existingParams = (existing && existing.params) || [];
+    CARRIED_PARAMS.forEach((name) => {
       if (params.some((param) => param.name === name)) {
         return;
       }
       const carried = existingParams.find((param) => param.name === name);
       if (carried) {
-        params.push({ name, value: carried.value });
+        params.push({ name, value: carried.value, carried: true });
       }
     });
   }
+  const storedParam = (name) => {
+    const found = existingParams.find((param) => param.name === name);
+    return found ? found.value : null;
+  };
 
   const typeParam = params.find((param) => param.name === 'THERMOSTAT_TYPE');
   const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
@@ -258,6 +303,54 @@ async function createDevice(device) {
     });
   }
 
+  // Only a real thermostat is reversible (spec A.4): a virtual one's single
+  // relay would heat a room too warm, and a pilot-wire heater only heats. The
+  // param is cleared on those, as the other real-thermostat params are.
+  const modeParam = params.find((param) => param.name === 'THERMOSTAT_MODE_FEATURE');
+  const reversibleParam = params.find((param) => param.name === 'THERMOSTAT_REVERSIBLE');
+  if (reversibleParam && !external) {
+    reversibleParam.value = '';
+  }
+  const reversible = Boolean(reversibleParam && reversibleParam.value === 'true');
+  // A real one is refused rather than saved as not reversible: the form has
+  // already split its presets into a heating and a cooling set, and saved as
+  // not reversible, a thermostat set to cool would read the heating ones. It
+  // needs a mode to write, or its use would never reach the unit…
+  if (reversible && !(modeParam && modeParam.value)) {
+    throw new Error('Thermostat: a reversible thermostat needs a mode feature (THERMOSTAT_MODE_FEATURE)');
+  }
+  // …and one that can be switched to cooling: a selector that is no writable
+  // mode — what the form offers — takes no mode write, and a mode whose maximum
+  // is below cooling is clamped to it. Either way the unit would keep heating
+  // under the cooling presets. A mode that cannot be read is left to the form,
+  // which checked it.
+  if (reversible) {
+    let mode = null;
+    try {
+      mode = await getFeatureBySelector(this.gladys, modeParam.value);
+    } catch (e) {
+      logger.warn(`Thermostat: could not read the mode ${modeParam.value}: ${e.message}`);
+    }
+    if (mode && (!isWritableMode(mode.feature) || !modeFeatureCanCool(mode.feature))) {
+      throw new Error(`Thermostat: a reversible thermostat needs a mode that can cool, ${modeParam.value} cannot`);
+    }
+  }
+
+  // A use switched from the edit form is a switch like any other (A.4): a hold
+  // taken in the other use goes with it, rather than regulating the new use on
+  // the old setpoint — 21 °C held in winter, cooling to 21 °C. Only the hold
+  // carried from the stored device is dropped: one the payload sends is its own.
+  const useParam = params.find((param) => param.name === 'THERMOSTAT_MODE');
+  const storedUse = storedParam('THERMOSTAT_MODE');
+  const useSwitched =
+    (reversible || storedParam('THERMOSTAT_REVERSIBLE') === 'true') &&
+    Boolean(useParam && !useParam.carried && storedUse && useParam.value !== storedUse);
+  const holdDropped =
+    useSwitched && params.some((param) => param.carried && HOLD_PARAMS.includes(param.name) && param.value);
+  const savedParams = params
+    .filter((param) => !(holdDropped && param.carried && HOLD_PARAMS.includes(param.name)))
+    .map(({ carried, ...param }) => param);
+
   const features = (device.features || []).filter(
     (feature) =>
       feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
@@ -285,9 +378,16 @@ async function createDevice(device) {
     // are not the client's to shape, and a device saved before they existed gets
     // them on its next save.
     features: [...(external ? [] : features.slice(0, 1)), ...buildStateFeatures(device, external)],
-    params,
+    params: savedParams,
     service_id: this.serviceId,
   });
+  if (holdDropped) {
+    logger.info(`Thermostat: ${device.selector} switched to ${useParam.value} from the form, hold dropped`);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
+      payload: { device: device.selector, setpoint: null, until: null },
+    });
+  }
   // The window sensor and the feature set may have changed: drop the caches
   // derived from them so the next read rebuilds them.
   this.invalidateDeviceCaches();
