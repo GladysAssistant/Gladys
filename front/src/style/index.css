@@ -561,6 +561,11 @@ body .apexcharts-tooltip {
   body.gladys-sidebar-nav #app > .page {
     padding-top: 3.25rem;
   }
+  /* room for the "Gladys is starting" strip below the top bar (see
+     ServicesStartupMobileStrip), only while the integrations start */
+  body.gladys-sidebar-nav.gladys-services-starting #app > .page {
+    padding-top: 5.25rem;
+  }
 }
 
 /* Every <select class="custom-select"> of the app is missing its dropdown

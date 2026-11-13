@@ -3,6 +3,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 const { expect } = require('chai');
 const { BUTTON_PUSH } = require('../../../../utils/constants');
+const { BadParameters, ServiceNotReadyError } = require('../../../../utils/coreErrors');
 
 const Zigbee2MqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -154,6 +155,44 @@ describe('zigbee2mqtt setValue', () => {
         `Zigbee2mqtt expose not found: "zigbee2mqtt:0x00158d00045b2740:light:color:color" with property "color"`,
       );
     }
+  });
+
+  it('set value while the device list has not been received from Zigbee2mqtt', async () => {
+    // PREPARE
+    zigbee2MqttManager.discoveredDevices = {};
+    zigbee2MqttManager.lastBridgeDevices = null;
+    // EXECUTE
+    try {
+      await zigbee2MqttManager.setValue(null, featureBinary, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(ServiceNotReadyError);
+      expect(e.message).to.equal(
+        `Zigbee2mqtt is not ready yet, so "0x00158d00045b2740" cannot be controlled: Gladys has not received the list of devices from Zigbee2mqtt. ` +
+          `Gladys may still be starting its integrations, or it is not connected to Zigbee2mqtt (see the status in the Zigbee2mqtt integration).`,
+      );
+    }
+    assert.notCalled(mqttClient.publish);
+  });
+
+  it('set value on a device missing from the device list sent by Zigbee2mqtt', async () => {
+    // PREPARE
+    zigbee2MqttManager.lastBridgeDevices = discoveredDevices;
+    // EXECUTE
+    try {
+      await zigbee2MqttManager.setValue(
+        null,
+        { external_id: 'zigbee2mqtt:Lumière couloir:switch:binary:state', type: 'binary' },
+        1,
+      );
+      assert.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.equal(
+        `Zigbee2mqtt device "Lumière couloir" is not in the list of devices sent by Zigbee2mqtt: it may have been removed from Zigbee2mqtt, or renamed there.`,
+      );
+    }
+    assert.notCalled(mqttClient.publish);
   });
 
   it('set value good topic ON', async () => {

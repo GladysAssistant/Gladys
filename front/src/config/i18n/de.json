@@ -7444,6 +7444,15 @@
     "subscriptionNoticeButton": "Zahlungsmethode aktualisieren",
     "subscriptionNoticeCheck": "Abonnement prüfen",
     "subscriptionNoticeContactAdmin": "Bitte wende dich an den Administrator deines Gladys-Plus-Kontos.",
+    "servicesStartupNoticeTitle": "Gladys wird gestartet",
+    "servicesStartupNoticeText": "{{done}}/{{total}} Integrationen gestartet. Geräte von Integrationen, die noch nicht gestartet sind, können vorerst nicht gesteuert werden.",
+    "servicesStartupNoticeProgress": "{{done}}/{{total}} Integrationen",
+    "servicesStartupNoticeCurrent": "Wird gestartet:",
+    "servicesStartupNoticeWaiting": "Wartend:",
+    "servicesStartupNoticeWaitingMore": {
+      "one": "und 1 weitere",
+      "other": "und {{count}} weitere"
+    },
     "instanceUpdateNoticeTitle": "Update verfügbar",
     "instanceUpdateNoticeText": "Gladys Plus wurde auf {{latestVersion}} aktualisiert, deine Instanz ist aber noch auf {{instanceVersion}}. Einige Funktionen können fehlerhaft sein, bis deine Instanz aktualisiert ist.",
     "instanceUpdateNoticeButton": "Meine Instanz aktualisieren",

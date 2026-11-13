@@ -129,11 +129,29 @@ module.exports = function ServiceController(gladys) {
     res.json(messageServices);
   }
 
+  /**
+   * @api {get} /api/v1/service/startup getStartupState
+   * @apiName getStartupState
+   * @apiGroup Service
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "in_progress": true,
+   *   "total": 12,
+   *   "done": 7,
+   *   "current": { "name": "zigbee2mqtt", "label": null },
+   *   "waiting": [{ "name": "ext-my-integration", "label": "My integration" }]
+   * }
+   */
+  async function getStartupState(req, res) {
+    res.json(gladys.service.getStartupState());
+  }
+
   return Object.freeze({
     start: asyncMiddleware(start),
     stop: asyncMiddleware(stop),
     getByName: asyncMiddleware(getByName),
     getAll: asyncMiddleware(getAll),
     getMessageServices: asyncMiddleware(getMessageServices),
+    getStartupState: asyncMiddleware(getStartupState),
   });
 };
