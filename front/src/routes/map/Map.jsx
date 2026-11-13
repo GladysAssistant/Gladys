@@ -177,15 +177,15 @@ class MapComponent extends Component {
   // center of a box it no longer has. Observe the container itself, and
   // resize the way Leaflet does for the window: the center stays the center.
   observeMapSize = () => {
-    if (typeof ResizeObserver === 'undefined') {
-      return;
+    // feature-tested: without it (old wall tablets) the map behaves as before
+    if (typeof ResizeObserver === 'function') {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.leafletMap) {
+          this.leafletMap.invalidateSize({ debounceMoveend: true });
+        }
+      });
+      this.resizeObserver.observe(this.map);
     }
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.leafletMap) {
-        this.leafletMap.invalidateSize({ debounceMoveend: true });
-      }
-    });
-    this.resizeObserver.observe(this.map);
   };
 
   componentDidMount() {
