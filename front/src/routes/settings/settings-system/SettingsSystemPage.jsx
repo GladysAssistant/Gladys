@@ -12,6 +12,7 @@ import SettingsSystemDatabaseCleaning from './SettingsSystemDatabaseCleaning';
 import SettingsSystemDuckDbMigration from './SettingsSystemDuckDbMigration';
 import SettingsSystemDownloadLogs from './SettingsSystemDownloadLogs';
 import SettingsSystemHostPower from './SettingsSystemHostPower';
+import SettingsSystemClock from './SettingsSystemClock';
 
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
@@ -158,6 +159,7 @@ const SystemPage = ({ children, ...props }) => (
       </div>
       <div class="col-lg-6">
         <SettingsSystemTimezone />
+        <SettingsSystemClock />
         <SettingsSystemMdns systemInfos={props.systemInfos} />
         <SettingsSystemBatteryLevelWarning />
         <SettingsSystemMessageService />

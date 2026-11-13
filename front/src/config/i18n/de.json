@@ -5400,6 +5400,22 @@
     }
   },
   "systemSettings": {
+    "clockTitle": "Uhr",
+    "clockDescription": "Gladys verwendet die Uhr des Rechners, auf dem es läuft, für geplante Szenen, den Verlauf und die Energie. Sie wird hier mit der Uhr des Geräts verglichen, das du gerade verwendest.",
+    "clockOnTime": "Die Uhr von Gladys geht richtig.",
+    "clockOffsetConsequences": "Geplante Szenen werden zur falschen Zeit ausgeführt und Zustände mit einem falschen Datum gespeichert.",
+    "clockMeasureError": "Die Uhr von Gladys konnte nicht gelesen werden.",
+    "clockSyncUnavailable": "Gladys kann die Einstellungen der Zeitsynchronisation des Rechners nicht lesen (systemd-timedated ist nicht erreichbar). Prüfe sie direkt auf dem Rechner, zum Beispiel mit dem Befehl \"timedatectl\".",
+    "clockSyncOk": "Der Rechner hält seine Uhr automatisch richtig (Zeitsynchronisation über das Netzwerk).",
+    "clockSyncOkDeviceOff": "Da der Rechner synchronisiert ist, geht wahrscheinlich die Uhr des Geräts falsch, das du gerade verwendest.",
+    "clockSyncNotSynchronized": "Die automatische Zeitsynchronisation ist aktiviert, aber der Rechner ist noch nicht synchronisiert. Wenn das anhält, prüfe, ob er das Internet erreichen kann (NTP, UDP-Port 123).",
+    "clockSyncEnabled": "Die automatische Zeitsynchronisation wurde aktiviert: Die Uhr sollte innerhalb weniger Minuten korrigiert sein.",
+    "clockSyncDisabled": "Die automatische Zeitsynchronisation des Rechners ist deaktiviert: Seine Uhr driftet ab und wird nie korrigiert.",
+    "clockSyncEnableButton": "Automatische Zeitsynchronisation aktivieren",
+    "clockSyncEnableError": "Die automatische Zeitsynchronisation konnte nicht aktiviert werden.",
+    "clockSyncNoService": "Auf dem Rechner ist kein Zeitsynchronisationsdienst installiert: Seine Uhr driftet ab und wird nie korrigiert. Installiere einen (zum Beispiel systemd-timesyncd).",
+    "clockRestartHint": "Sobald die Uhr korrigiert ist, starte Gladys neu, damit geplante Szenen mit der richtigen Uhrzeit neu berechnet werden.",
+    "clockCheckAgain": "Erneut prüfen",
     "connected": "Verbunden",
     "ping": "{{time}} ms Ping",
     "disk": "Speicher",
@@ -7577,7 +7593,49 @@
       }
     }
   },
+  "clock": {
+    "ahead": {
+      "seconds": {
+        "one": "Die Uhr von Gladys geht 1 Sekunde vor gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Sekunden vor gegenüber diesem Gerät."
+      },
+      "minutes": {
+        "one": "Die Uhr von Gladys geht 1 Minute vor gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Minuten vor gegenüber diesem Gerät."
+      },
+      "hours": {
+        "one": "Die Uhr von Gladys geht 1 Stunde vor gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Stunden vor gegenüber diesem Gerät."
+      },
+      "days": {
+        "one": "Die Uhr von Gladys geht 1 Tag vor gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Tage vor gegenüber diesem Gerät."
+      }
+    },
+    "behind": {
+      "seconds": {
+        "one": "Die Uhr von Gladys geht 1 Sekunde nach gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Sekunden nach gegenüber diesem Gerät."
+      },
+      "minutes": {
+        "one": "Die Uhr von Gladys geht 1 Minute nach gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Minuten nach gegenüber diesem Gerät."
+      },
+      "hours": {
+        "one": "Die Uhr von Gladys geht 1 Stunde nach gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Stunden nach gegenüber diesem Gerät."
+      },
+      "days": {
+        "one": "Die Uhr von Gladys geht 1 Tag nach gegenüber diesem Gerät.",
+        "other": "Die Uhr von Gladys geht {{count}} Tage nach gegenüber diesem Gerät."
+      }
+    }
+  },
   "header": {
+    "clockNoticeTitle": "Die Uhrzeit von Gladys ist falsch",
+    "clockNoticeText": "Geplante Szenen, Verlauf und Energie können falsch sein.",
+    "clockNoticeButton": "Uhr prüfen",
+    "clockNoticeContactAdmin": "Bitte informiere den Administrator deines Hauses.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Startseite",
     "chat": "Chat",

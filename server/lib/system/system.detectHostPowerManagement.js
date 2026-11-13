@@ -207,6 +207,8 @@ module.exports = {
   probeHostPowerCapabilities,
   parseCanReply,
   replyMeansAvailable,
+  DBUS_SYSTEM_SOCKETS,
+  DBUS_SEND_BINARIES,
   HOST_POWER_REDETECTION_THROTTLE_MS,
   HOST_POWER_REDETECTION_MAX_ATTEMPTS,
 };
