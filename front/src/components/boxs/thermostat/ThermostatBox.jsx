@@ -18,10 +18,17 @@ import {
   DEFAULT_HYSTERESIS_START,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
+  DEFAULT_PRESENCE_DELAY_MINUTES,
+  MIN_PRESENCE_DELAY_MINUTES,
+  MAX_PRESENCE_DELAY_MINUTES,
+  DEFAULT_PRESENCE_PRESET,
+  PRESENCE_PRESETS,
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder,
-  supportedStandbyOrder
+  supportedStandbyOrder,
+  PILOT_WIRE_ORDER_RANK
 } from '../../../../../server/utils/thermostatConstants';
+import { presetSavingForEmptyRoom, absenceLowersHold } from '../../../../../server/utils/thermostatPresence';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
 import {
@@ -54,6 +61,16 @@ const STANDBY_PRESET_BY_ORDER = {
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
+// Since when the room has been empty, for its banner: the time alone today,
+// with the day in front otherwise — a room empty since yesterday read as today.
+const formatEmptySince = (since, now = new Date()) => {
+  const date = new Date(since);
+  const pad = value => String(value).padStart(2, '0');
+  const time = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return date.toDateString() === now.toDateString()
+    ? time
+    : `${pad(date.getDate())}/${pad(date.getMonth() + 1)} ${time}`;
+};
 const isStartPreset = preset => preset !== 'off' && [...HEATING_PRESETS, ...COOLING_PRESETS].includes(preset);
 // The preset feature carries an integer; the widget speaks in names. `off` is in
 // neither table: stopping is a mode, and it goes to the mode feature.
@@ -124,6 +141,9 @@ class ThermostatBox extends Component {
     // The phone's day the hold banner was last drawn on (see refreshClock)
     today: new Date().toDateString(),
     isWindowOpen: false,
+    // Since when the room has been empty, once every presence sensor has seen
+    // nobody for the delay (spec A.4), or null.
+    emptySince: null,
     // Real state of the actuator, as reported by the switch feature. The widget
     // reflects it rather than recomputing it: hysteresis has a neutral zone where
     // the server holds the current state, and that memory cannot be re-derived
@@ -154,6 +174,8 @@ class ThermostatBox extends Component {
   sensorUnits = {};
   temperatureReadings = {};
   openWindows = {};
+  // Since when each presence sensor has seen nobody, null while it sees someone.
+  quietSensors = {};
   thermostatUnit = null;
   savingPreset = false;
   // True while selectPreset writes: the hold it may arm is the widget's own, so
@@ -279,6 +301,8 @@ class ThermostatBox extends Component {
 
   getWindowFeatures = () => (this.state.remoteConfig && this.state.remoteConfig.window_features) || [];
 
+  getPresenceFeatures = () => (this.state.remoteConfig && this.state.remoteConfig.presence_features) || [];
+
   // The room temperature is the average of the probes that have a value, the same
   // figure the server regulates on (spec A.1.1); a silent probe is left out
   // rather than counted as 0.
@@ -302,6 +326,20 @@ class ThermostatBox extends Component {
       this.openWindows[selector] = Math.min(since, Date.now());
     }
     this.showWindowBanner();
+  };
+
+  // Since when each presence sensor has seen nobody, as for the windows: a sensor
+  // re-reporting "nobody" keeps the first time. One with no value is left out,
+  // as the server leaves it out (spec A.4).
+  setPresenceReading = (selector, value, since = Date.now()) => {
+    if (value === null || value === undefined) {
+      delete this.quietSensors[selector];
+    } else if (value !== 0) {
+      this.quietSensors[selector] = null;
+    } else if (this.quietSensors[selector] === null || this.quietSensors[selector] === undefined) {
+      this.quietSensors[selector] = Math.min(since, Date.now());
+    }
+    this.showPresenceBanner();
   };
 
   loadConfig = async () => {
@@ -439,14 +477,16 @@ class ThermostatBox extends Component {
   };
 
   // The manual hold, as the device carries it. `until` is null on a permanent
-  // hold, which is what a thermostat following no schedule gets.
+  // hold, which is what a thermostat following no schedule gets; `since` is when
+  // it was armed, null when the hold does not say.
   getHold = () => {
     const cfg = this.state.remoteConfig;
     if (!cfg || cfg.manual_setpoint === null || cfg.manual_setpoint === undefined) {
       return null;
     }
     const until = cfg.manual_until && cfg.manual_until > Date.now() ? cfg.manual_until : null;
-    return { setpoint: cfg.manual_setpoint, until };
+    const since = Number.isFinite(cfg.manual_since) ? cfg.manual_since : null;
+    return { setpoint: cfg.manual_setpoint, until, since };
   };
 
   // Last preset that was not a stop, so turning the thermostat back on restores
@@ -567,6 +607,95 @@ class ThermostatBox extends Component {
     }
   };
 
+  // The room is empty once every sensor that reports has seen nobody for the
+  // delay, counted from the last one to go quiet — what the server regulates on
+  // (spec A.4). The card checks again when the delay runs out.
+  showPresenceBanner = () => {
+    if (this.presenceTimer) {
+      clearTimeout(this.presenceTimer);
+      this.presenceTimer = null;
+    }
+    const delayMinutes = Math.min(
+      MAX_PRESENCE_DELAY_MINUTES,
+      Math.max(MIN_PRESENCE_DELAY_MINUTES, numOr(this.getConfig().presence_delay, DEFAULT_PRESENCE_DELAY_MINUTES))
+    );
+    const readings = this.getPresenceFeatures()
+      .map(feature => this.quietSensors[feature])
+      .filter(since => since !== undefined);
+    if (readings.length === 0 || readings.includes(null)) {
+      this.setState({ emptySince: null });
+      return;
+    }
+    const quietSince = Math.max(...readings);
+    const left = quietSince + delayMinutes * 60 * 1000 - Date.now();
+    this.setState({ emptySince: left <= 0 ? quietSince : null });
+    if (left > 0) {
+      this.presenceTimer = setTimeout(() => {
+        this.presenceTimer = null;
+        this.showPresenceBanner();
+      }, left);
+    }
+  };
+
+  // A preset's setpoint, whether or not the bar shows it: a cooling bar only has
+  // Off and Comfort, while an empty room may be regulated on Eco (spec A.4).
+  getPresetTemp = presetKey => {
+    if (presetKey === 'off') {
+      return null;
+    }
+    const cfg = this.getConfig();
+    const defaults = defaultPresetTemps(cfg.default_mode || 'heating');
+    return numOr(cfg[`preset_${presetKey}`], defaults[presetKey]);
+  };
+
+  // The order a preset sends a heater that regulates itself: one of the six, as
+  // the server reads it, or the preset's default.
+  getPresetOrder = presetKey => {
+    if (presetKey === 'off') {
+      return PILOT_WIRE_MODE.OFF;
+    }
+    const configured = this.getConfig()[`pilot_wire_order_${presetKey}`];
+    return PILOT_WIRE_ORDER_RANK[configured] !== undefined ? configured : DEFAULT_PILOT_WIRE_ORDERS[presetKey];
+  };
+
+  // The preset an empty room is regulated on, when it saves energy over the one
+  // in force, or null: the server's rule (presetSavingForEmptyRoom, shared), and
+  // only over the programme or a preset picked — a setpoint set on the dial is
+  // kept, and so is a preset picked while the room was already empty (spec A.4).
+  emptyRoomPreset = (activePreset, isWindowOpen) => {
+    const cfg = this.getConfig();
+    const { emptySince } = this.state;
+    if (emptySince === null || isWindowOpen || this.isStopped()) {
+      return null;
+    }
+    const hold = this.getHold();
+    if (hold) {
+      // A preset picked by hand holds that preset's own setpoint
+      // (holdMatchesPreset); a setpoint set on the dial is kept. Compared with
+      // the preset the device carries, as the server's holdsPickedPreset, not
+      // with the one in force: on a thermostat following its programme that is
+      // `schedule`, so a hold is a dial setpoint even when it lands on the
+      // setpoint of the programme's point — 21 °C written by a scene over
+      // Comfort at 21 °C is kept by the server, and the card lowered it.
+      const remote = this.state.remoteConfig;
+      if (!this.holdMatchesPreset(hold.setpoint, remote ? PRESET_NAMES[remote.preset] : null)) {
+        return null;
+      }
+      if (!absenceLowersHold(hold.since, emptySince)) {
+        return null;
+      }
+    }
+    const absence = PRESENCE_PRESETS.includes(cfg.presence_preset) ? cfg.presence_preset : DEFAULT_PRESENCE_PRESET;
+    const lowered = presetSavingForEmptyRoom(activePreset, absence, {
+      cooling: cfg.default_mode === 'cooling' && !cfg.pilot_wire_feature,
+      setpointOf: this.getPresetTemp,
+      // A heater regulating itself is weighed on the orders its module takes.
+      orderOf: this.isHeaterRegulated() ? this.getPresetOrder : null,
+      supportedOptions: this.state.pilotWireSupportedOptions
+    });
+    return lowered === activePreset ? null : lowered;
+  };
+
   getDeviceData = async () => {
     const { box } = this.props;
     const thermostatFeature = box.thermostat_feature;
@@ -574,6 +703,7 @@ class ThermostatBox extends Component {
     const temperatureFeatures = this.getTemperatureFeatures();
     const humidityFeature = (this.state.remoteConfig && this.state.remoteConfig.humidity_feature) || null;
     const windowFeatures = this.getWindowFeatures();
+    const presenceFeatures = this.getPresenceFeatures();
     // The running state comes from the switch Gladys drives on a virtual
     // thermostat, and from the real device's state feature on an external one.
     // Both end up in `isSwitchOn`, which is what draws the heating halo.
@@ -598,6 +728,15 @@ class ThermostatBox extends Component {
       // No sensor left: no banner, nor a check still waiting to show one.
       this.showWindowBanner();
     }
+    // The same for the presence sensors.
+    this.quietSensors = presenceFeatures.reduce(
+      (kept, feature) =>
+        this.quietSensors[feature] === undefined ? kept : { ...kept, [feature]: this.quietSensors[feature] },
+      {}
+    );
+    if (presenceFeatures.length === 0) {
+      this.showPresenceBanner();
+    }
     if (!switchFeature) stateUpdate.isSwitchOn = null;
     if (!pilotWireFeature) stateUpdate.pilotWireOrder = null;
     this.setState(stateUpdate);
@@ -606,6 +745,7 @@ class ThermostatBox extends Component {
       ...temperatureFeatures,
       humidityFeature,
       ...windowFeatures,
+      ...presenceFeatures,
       switchFeature,
       pilotWireFeature
     ]
@@ -668,6 +808,20 @@ class ThermostatBox extends Component {
                   ? NaN
                   : new Date(feat.last_value_changed).getTime();
               this.setWindowReading(feat.selector, feat.last_value, Number.isFinite(changed) ? changed : Date.now());
+            }
+            if (presenceFeatures.includes(feat.selector)) {
+              const changed =
+                feat.last_value_changed === null || feat.last_value_changed === undefined
+                  ? NaN
+                  : new Date(feat.last_value_changed).getTime();
+              // A sensor silent for so long that its value is outdated says
+              // nothing of the room, as on the server: a motion sensor dies on
+              // `0`, and would read as a room empty for good (spec A.4).
+              this.setPresenceReading(
+                feat.selector,
+                feat.last_value_is_too_old ? null : feat.last_value,
+                Number.isFinite(changed) ? changed : Date.now()
+              );
             }
             if (
               switchFeature &&
@@ -736,6 +890,9 @@ class ThermostatBox extends Component {
     if (this.getWindowFeatures().includes(payload.device_feature_selector)) {
       // The server (onDeviceNewState) cuts the switch; the widget only reflects the state
       this.setWindowReading(payload.device_feature_selector, payload.last_value);
+    }
+    if (this.getPresenceFeatures().includes(payload.device_feature_selector)) {
+      this.setPresenceReading(payload.device_feature_selector, payload.last_value);
     }
     const modeFeature = this.state.remoteConfig && this.state.remoteConfig.modeFeature;
     if (modeFeature && payload.device_feature_selector === modeFeature.selector) {
@@ -844,6 +1001,20 @@ class ThermostatBox extends Component {
 
   handleThermostatManualModeUpdated = payload => {
     if (!this.isOurDevice(payload)) return;
+    // The hold the device now carries, for what reads it from the config: the
+    // absence banner weighs when it was armed (spec A.4).
+    this.setState(prevState =>
+      prevState.remoteConfig
+        ? {
+            remoteConfig: {
+              ...prevState.remoteConfig,
+              manual_setpoint: payload.setpoint === undefined ? null : payload.setpoint,
+              manual_until: payload.until || null,
+              manual_since: payload.since || null
+            }
+          }
+        : null
+    );
     // The same preset write also arms a hold, which only takes effect once the
     // thermostat starts again: a stopped one is in no manual mode.
     if (this.isStopped()) return;
@@ -1117,16 +1288,17 @@ class ThermostatBox extends Component {
   // the thermostat's: Comfort at 21 °C is held as 70 on a Fahrenheit appliance.
   // The preset's temperature is converted the way the server converts it before
   // the two are compared, or a preset picked on such a device never lit.
+  //
+  // Any of the five presets, whether or not the bar shows it, as the server's
+  // holdsPickedPreset: a scene may write Night on a thermostat that cools, whose
+  // bar only has Off and Comfort. Matched against the bar only, Night's hold was
+  // taken for a dial setpoint, and the gauge kept it while the room was empty.
   holdMatchesPreset = (setpoint, presetKey) => {
-    if (setpoint === null || setpoint === undefined || !presetKey) {
+    if (setpoint === null || setpoint === undefined || !isStartPreset(presetKey)) {
       return false;
     }
-    return this.getPresets().some(
-      candidate =>
-        candidate.key === presetKey &&
-        candidate.temp !== null &&
-        this.toSetpointFeatureUnit(candidate.temp) === setpoint
-    );
+    const presetTemp = this.getPresetTemp(presetKey);
+    return presetTemp !== null && this.toSetpointFeatureUnit(presetTemp) === setpoint;
   };
 
   // The preset whose temperature a setpoint lands on, or null. Asked on the forum:
@@ -1316,6 +1488,10 @@ class ThermostatBox extends Component {
     if (this.windowTimer) {
       clearTimeout(this.windowTimer);
       this.windowTimer = null;
+    }
+    if (this.presenceTimer) {
+      clearTimeout(this.presenceTimer);
+      this.presenceTimer = null;
     }
     this.forgetExpectedMode();
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.handleWebsocketMessage);
@@ -1648,6 +1824,7 @@ class ThermostatBox extends Component {
       manualUntil,
       manualSetpointOverride,
       isWindowOpen,
+      emptySince,
       isSwitchOn,
       pilotWireOrder,
       pilotWireSupportedOptions,
@@ -1678,6 +1855,14 @@ class ThermostatBox extends Component {
     const heldOverOff = activePreset === 'off' && isManualMode && manualSetpointOverride;
     const mode = activePreset === 'off' && !heldOverOff ? 'off' : configMode;
     const presets = this.getPresets();
+    const emptyPreset = this.emptyRoomPreset(activePreset, isWindowOpen);
+    // The gauge shows the setpoint an empty room is regulated on (spec A.4), and
+    // the bar keeps the preset picked or followed. Not while the dial is turned,
+    // which takes a hold of its own.
+    const shownSetpoint =
+      emptyPreset && !this.state.isDragging && !manualSetpointOverride
+        ? this.toSetpointFeatureUnit(this.getPresetTemp(emptyPreset))
+        : setpoint;
     const hystStart = numOr(cfg.hysteresis_start, DEFAULT_HYSTERESIS_START);
     const hasCurrent = currentTemp !== null && currentTemp !== undefined;
     // TPI modulates the on-time over a cycle instead of switching on a band, so
@@ -1704,13 +1889,13 @@ class ThermostatBox extends Component {
         return false;
       }
       if (isTpi) {
-        return currentTemp < setpoint;
+        return currentTemp < shownSetpoint;
       }
       if (mode === 'heating') {
-        return currentTemp < setpoint - hystStart;
+        return currentTemp < shownSetpoint - hystStart;
       }
       if (mode === 'cooling') {
-        return currentTemp > setpoint + hystStart;
+        return currentTemp > shownSetpoint + hystStart;
       }
       return false;
     })();
@@ -1747,8 +1932,8 @@ class ThermostatBox extends Component {
       wantedOrder = PILOT_WIRE_MODE.FROST_PROTECTION;
       wantedRest = true;
     } else if (heaterRegulated && isStartPreset(activePreset) && !manualSetpointOverride) {
-      const configured = cfg[`pilot_wire_order_${activePreset}`];
-      wantedOrder = Number.isInteger(configured) ? configured : DEFAULT_PILOT_WIRE_ORDERS[activePreset];
+      // An empty room is sent the absence preset's order (spec A.4).
+      wantedOrder = this.getPresetOrder(emptyPreset || activePreset);
     }
     // The order actually sent, as the server picks it: one the module does not
     // take is sent as comfort, or not at all — and is then on its way for ever.
@@ -1795,7 +1980,7 @@ class ThermostatBox extends Component {
       pilotWireStatus === 'pilotWireHeating' ? 'comfort' : STANDBY_PRESET_BY_ORDER[pilotWireOrder] || 'frost';
 
     // Convert temperatures for display
-    const displaySetpoint = this.toDisplayTemp(setpoint);
+    const displaySetpoint = this.toDisplayTemp(shownSetpoint);
     const displayCurrentTemp = this.toDisplayTemp(currentTemp);
     const displayMinTemp = this.toDisplayTemp(minTemp);
     const displayMaxTemp = this.toDisplayTemp(maxTemp);
@@ -1916,6 +2101,23 @@ class ThermostatBox extends Component {
                           ? 'dashboard.boxes.thermostat.windowOpenCooling'
                           : 'dashboard.boxes.thermostat.windowOpen'
                       }
+                    />
+                  </span>
+                </div>
+              )}
+
+              {/* The room seen empty: the heating is lowered to the absence preset,
+                  and the banner says since when and to which (spec A.4). */}
+              {emptyPreset && (
+                <div class={style.scheduleBanner} style={`--banner-color:${this.getPresetColor(emptyPreset)}`}>
+                  <i class={`fe ${PRESET_ICONS[emptyPreset]} ${style.scheduleBannerIcon}`} />
+                  <span class={style.scheduleBannerText}>
+                    <Text
+                      id="dashboard.boxes.thermostat.presenceAbsent"
+                      fields={{
+                        time: formatEmptySince(emptySince),
+                        preset: (a11yDict.preset && a11yDict.preset[emptyPreset]) || emptyPreset
+                      }}
                     />
                   </span>
                 </div>

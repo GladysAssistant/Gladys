@@ -463,8 +463,14 @@ describe('thermostat.regulateDevice', () => {
       const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
       const before = Date.now();
 
-      await regulate(mod, gladys, heldDevice({ until: null }));
+      await regulate(
+        mod,
+        gladys,
+        heldDevice({ until: null, extraParams: { THERMOSTAT_MANUAL_SINCE: '1700000000000' } }),
+      );
 
+      // Still the hold armed then: only its expiry is new (A.4).
+      assert.calledWith(gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SINCE', '1700000000000');
       const call = gladys.device.setParam
         .getCalls()
         .find((c) => c.args[1] === 'THERMOSTAT_MANUAL_UNTIL' && c.args[2] !== '');

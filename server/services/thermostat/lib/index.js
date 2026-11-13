@@ -83,6 +83,12 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // once it resumes — nor when the service has started again meanwhile, which a
   // stopped flag alone, set back on the start, would let through.
   this.lifecycle = 0;
+  // When each presence sensor was seen going to "nobody", by selector (A.4): the
+  // room is taken as empty once every sensor has been quiet THERMOSTAT_PRESENCE_DELAY
+  // minutes, counted from there rather than from `last_value_changed`, which a
+  // sensor re-reporting "nobody" moves on every report.
+  this.presenceVacatedAt = new Map();
+  this.presenceSelectorsCache = null;
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;
