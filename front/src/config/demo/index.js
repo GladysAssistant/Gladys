@@ -390,6 +390,7 @@ const SERVICE_VARIABLES = {
   'node-red': ['NODE_RED_USERNAME', 'NODE_RED_PASSWORD', 'NODE_RED_PORT'],
   melcloud: ['MELCLOUD_USERNAME', 'MELCLOUD_PASSWORD'],
   matter: ['MATTER_ENABLED'],
+  'matter-bridge': ['MATTER_BRIDGE_ENABLED'],
   tuya: [
     'TUYA_ACCESS_KEY',
     'TUYA_SECRET_KEY',

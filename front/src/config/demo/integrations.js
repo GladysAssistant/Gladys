@@ -3,6 +3,55 @@ import { minutesAgo, uuid } from './helpers';
 
 // Demo fixtures for the integration pages: every "/api/v1/service/*" route
 // and the devices those pages display.
+
+// The demo Matter bridge works like a real one for one page load: whatever the
+// page changes (turning it off or on, saving a selection, resetting the
+// pairing) is what the next status poll returns.
+const MATTER_BRIDGE_DEVICES = [
+  { name: 'Living room lamp', selector: 'living-room-lamp', functions: ['light'] },
+  { name: 'Kitchen sensor', selector: 'kitchen-sensor', functions: ['temperature', 'humidity', 'battery'] },
+  { name: 'Bedroom shutter', selector: 'bedroom-shutter', functions: ['cover'] },
+  { name: 'Front door', selector: 'front-door', functions: ['contact', 'battery'] }
+];
+const matterBridge = { enabled: true, commissioned: true, exposureMode: 'all', exposedDevices: [] };
+
+// Like the server, a stopped bridge exposes nothing
+const matterBridgeExposedCount = () => {
+  if (!matterBridge.enabled) {
+    return 0;
+  }
+  if (matterBridge.exposureMode === 'all') {
+    return MATTER_BRIDGE_DEVICES.length;
+  }
+  return MATTER_BRIDGE_DEVICES.filter(device => matterBridge.exposedDevices.includes(device.selector)).length;
+};
+
+// Copies are returned, so the form of the page never shares the demo state
+const matterBridgeStatus = () => {
+  const { enabled, commissioned, exposureMode, exposedDevices } = matterBridge;
+  const paired = enabled && commissioned;
+  return {
+    enabled,
+    hasIpv6: true,
+    matterbridgeEnabled: false,
+    port: 5540,
+    running: enabled,
+    error: null,
+    errorCode: null,
+    exposureMode,
+    exposedDevices: [...exposedDevices],
+    exposedCount: matterBridgeExposedCount(),
+    commissioned: paired,
+    qrPairingCode: enabled ? 'MT:Y.K9042C00KA0648G00' : null,
+    manualPairingCode: enabled ? '34970112332' : null,
+    fabrics: paired ? [{ fabricIndex: 1, label: '', vendorId: 4937 }] : []
+  };
+};
+
+const updateMatterBridge = changes => {
+  Object.assign(matterBridge, changes);
+  return matterBridgeStatus();
+};
 const integrations = {
   'get /api/v1/service/philips-hue/bridge': [
     {
@@ -1768,13 +1817,24 @@ const integrations = {
   'get /api/v1/service/matter/node': [],
   'get /api/v1/service/matter/paired-device': [],
   'get /api/v1/service/homekit/device': [],
-  'get /api/v1/service/matterbridge/status': {
+  // The Matter bridge, paired with Apple Home and exposing every compatible device
+  'get /api/v1/service/matter-bridge/status': () => matterBridgeStatus(),
+  'post /api/v1/service/matter-bridge/enable': () => updateMatterBridge({ enabled: true }),
+  'post /api/v1/service/matter-bridge/disable': () => updateMatterBridge({ enabled: false }),
+  'post /api/v1/service/matter-bridge/config': ({ exposureMode, exposedDevices }) =>
+    updateMatterBridge({ exposureMode, exposedDevices: [...exposedDevices] }),
+  // A reset forgets every pairing: the bridge comes back waiting for one, with a new code.
+  'post /api/v1/service/matter-bridge/reset': () => updateMatterBridge({ commissioned: false }),
+  'get /api/v1/service/matter-bridge/device': MATTER_BRIDGE_DEVICES,
+  // Matterbridge cannot be turned on while the Matter bridge of the demo is
+  'get /api/v1/service/matterbridge/status': () => ({
     matterbridgeExist: false,
     matterbridgeRunning: false,
     matterbridgeEnabled: false,
+    matterBridgeEnabled: matterBridge.enabled,
     dockerBased: true,
     networkModeValid: true
-  },
+  }),
   'get /api/v1/service/telegram/link': { link: 'https://t.me/GladysAssistantBot?start=demo' },
   // The community catalogue is downloaded from a GitHub release on a real instance:
   // the demo serves the merged template list of the contracts tab directly
