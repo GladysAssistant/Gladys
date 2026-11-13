@@ -4149,6 +4149,8 @@
       },
       "onlyContinueIf": {
         "variableLabel": "Appareil ou variable",
+        "sourceDevice": "Appareil",
+        "sourceVariable": "Variable",
         "operatorLabel": "Opérateur",
         "valueLabel": "Valeur",
         "removeLabel": "Effacer",

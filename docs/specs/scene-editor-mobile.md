@@ -179,14 +179,24 @@ given to the assistant. A feature that no longer exists when the condition runs 
 false. `device_feature` is a device reference like any other: a device migration rewrites it
 (`device-migration.md`, B.3).
 
-In the form, one select, "Device or variable", lists the variables available at this step first
-(one group per step exposing some), then **every feature of the house, grouped by room** (the
-devices without a room last). The features come from the devices the editor loads when it opens
-(C.1): a condition box sends no request. The search ignores case and accents and matches the room
-too ("motion living"). Picking an option writes its attribute and removes the other one. A feature
-holding constants offers their list as the value, exactly as for the variable of a "get the last
-state" step. A stored feature that is not in the list (deleted device, devices still loading) is
-shown as it is stored instead of leaving the field empty.
+In the form, the field "Device or variable" writes the attribute of what is picked and removes
+the other one. A feature holding constants offers their list as the value, exactly as for the
+variable of a "get the last state" step. The features come from the devices the editor loads when
+it opens (C.1): a condition box sends no request.
+
+- **From 768 px, one select**: the variables available at this step first (one group per step
+  exposing some), then **every feature of the house, grouped by room** (the devices without a
+  room last). The search ignores case and accents and matches the room too ("motion living"). A
+  stored feature that is not in the list (deleted device, devices still loading) is shown as it
+  is stored instead of leaving the field empty.
+- **On a phone, two fields and never a menu of every device** (E.10): the device is a
+  `DevicePickerField` taking one feature (`single`) — its row, "Change the device", the device
+  picker sheet by room, "Device not found" for a feature whose device is gone — and the variable
+  is a select of the variables alone. A segmented control, "Device / Variable", shows one or the
+  other; it only exists when the step has variables to offer or already compares one, so a first
+  condition is one button: "Choose a device". The side shown is the one the condition holds, the
+  device when it holds nothing. Switching puts aside what was picked and brings back what had
+  been picked on the other side: a tap on the wrong side loses nothing.
 
 ## D. Mobile scene list (`/dashboard/scene`, < 768 px)
 
@@ -418,6 +428,7 @@ The fields concerned, and what they select:
 | "Device state change" trigger | feature selectors (`device_features`) | `sameKindOnly` |
 | Check the presence of a user | feature selectors (`device_features`), the first presence feature of each device | — |
 | Get the last state | one feature selector (`device_feature`) | `single` |
+| Condition ("only continue if"), device side (C.6) | one feature selector per condition (`conditions[].device_feature`) | `single` |
 | Control a device | one feature selector (`device_feature`), writable features only | `single` |
 | Speak on a speaker | one device selector (`device`) | `pickDevices`, `single` |
 | Play music | one device selector (`device`) | `pickDevices`, `single` |
@@ -435,9 +446,8 @@ The fields concerned, and what they select:
 
 `SelectDeviceFeature` opts in with `mobilePicker`, for a multi-selection (`sameKindOnly`) as for a
 single one (`single`): its other callers — the dashboard widgets — keep the select. The fields
-that select something else than a device (a user, a house, a calendar, a schedule) keep their
-select too, and so does the "Device or variable" field of a condition (C.6): it mixes the
-variables of the scene with the devices, which the device picker cannot list. A selector whose device no longer
+that select something else than a device (a user, a house, a calendar, a schedule, the variable
+of a condition) keep their select too. A selector whose device no longer
 exists keeps its row in the field ("Device not found", removable), and is never dropped by a
 validation of the picker: every field hands the picker the **stored** selectors, resolved or not,
 and writes back the whole selection (a device state trigger receives it next to the features
@@ -538,7 +548,10 @@ From 768 px the forms are untouched.
   ignores accents, the picked device and a value of its list are saved as `device_feature`, the
   collapsed step names the device and its value, a condition saved on a variable is shown and can
   be replaced by a device without keeping both attributes, a feature whose device is gone is
-  shown as stored and kept in the saved scene.
+  shown as stored and kept in the saved scene. In a phone viewport: a first condition is one
+  "Choose a device" button and no select, the device is picked in the picker sheet in one tap and
+  saved, no "Device / Variable" switch without a variable to offer; with one, the switch shows the
+  variable held, puts it aside for a device and brings it back.
 - Cypress, phone viewport, `SceneMobileGestures.cy.js`: summaries naming the user and the house,
   the system "back" closing the sheet on top then leaving the editor in one press, a sheet
   dragged down by its header (kept when barely moved), a step moved by a long press (a quick move

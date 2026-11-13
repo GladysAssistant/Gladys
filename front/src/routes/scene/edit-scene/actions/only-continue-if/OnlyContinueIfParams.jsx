@@ -53,15 +53,32 @@ const buildDeviceFeatureOptions = (deviceFeatures, dictionary) => {
   return groups;
 };
 
+// The same devices for the device picker of a phone: each one once, with its room and its
+// features. Null while the editor has not loaded them: the picker waits for its list.
+const buildPickerDevices = deviceFeatures => {
+  if (!deviceFeatures) {
+    return null;
+  }
+  const devices = new Map();
+  Object.keys(deviceFeatures).forEach(selector => {
+    const { device } = deviceFeatures[selector];
+    devices.set(device.selector, device);
+  });
+  return Array.from(devices.values());
+};
+
 class OnlyContinueIf extends Component {
   // Rebuilt only when the devices of the editor change, not on every keystroke in the box
-  getDeviceFeatureOptions = () => {
+  getDevices = () => {
     const { deviceFeatures, intl } = this.props;
-    if (this.deviceFeatureOptionsSource !== deviceFeatures) {
-      this.deviceFeatureOptionsSource = deviceFeatures;
-      this.deviceFeatureOptions = buildDeviceFeatureOptions(deviceFeatures, intl.dictionary);
+    if (this.devicesSource !== deviceFeatures || !this.devices) {
+      this.devicesSource = deviceFeatures;
+      this.devices = {
+        deviceFeatureOptions: buildDeviceFeatureOptions(deviceFeatures, intl.dictionary),
+        pickerDevices: buildPickerDevices(deviceFeatures)
+      };
     }
-    return this.deviceFeatureOptions;
+    return this.devices;
   };
 
   handleConditionChange = (conditionIndex, condition) => {
@@ -100,8 +117,10 @@ class OnlyContinueIf extends Component {
       // If the variable is defined before the current path, we can use it
       if (isVariableAvailableAtThisPath(variablePath, props.path)) {
         const action = get(props.allActions, variablePath);
-        // If we find an action at this path
-        if (action) {
+        // If we find an action at this path, and if it exposes variables: a step without any
+        // (a delay, another condition) is not a group of the list, and must not make a phone
+        // offer a "Variable" side with nothing in it
+        if (action && props.variables[variablePath].length > 0) {
           variableOptions.push({
             label: `${convertPathToText(variablePath, this.props.intl.dictionary)} ${get(
               this,
@@ -118,9 +137,9 @@ class OnlyContinueIf extends Component {
       }
     });
 
-    // After the variables of the previous steps, every device of the house: its state is read
+    // Next to the variables of the previous steps, every device of the house: its state is read
     // when the condition runs, no "get device value" step needed before
-    const allOptions = variableOptions.concat(this.getDeviceFeatureOptions());
+    const { deviceFeatureOptions, pickerDevices } = this.getDevices();
 
     return (
       <div>
@@ -140,7 +159,9 @@ class OnlyContinueIf extends Component {
             <Condition
               condition={condition}
               index={index}
-              variableOptions={allOptions}
+              variableOptions={variableOptions}
+              deviceFeatureOptions={deviceFeatureOptions}
+              pickerDevices={pickerDevices}
               handleConditionChange={this.handleConditionChange}
               addCondition={this.addCondition}
               deleteCondition={this.deleteCondition}

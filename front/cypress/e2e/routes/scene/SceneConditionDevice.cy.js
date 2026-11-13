@@ -43,6 +43,12 @@ const SUFFIX = Date.now();
 const NEW_SCENE = `condition-device-new-${SUFFIX}`;
 const VARIABLE_SCENE = `condition-device-variable-${SUFFIX}`;
 const DELETED_SCENE = `condition-device-deleted-${SUFFIX}`;
+const PHONE_NEW_SCENE = `condition-device-phone-new-${SUFFIX}`;
+const PHONE_VARIABLE_SCENE = `condition-device-phone-variable-${SUFFIX}`;
+const VARIABLE_STEPS = [
+  [{ type: 'device.get-value', device_feature: 'thermometer-temperature' }],
+  [{ type: 'condition.only-continue-if', conditions: [{ variable: '0.0.last_value', operator: '>', value: 20 }] }]
+];
 const SELECT = '[data-cy="scene-condition-device-or-variable"]';
 
 const apiRequest = (method, path, body) =>
@@ -114,10 +120,7 @@ describe('Scene - condition on the current state of a device', () => {
   it('Should create the scenes', () => {
     cy.visit('/dashboard/scene');
     createScene(NEW_SCENE, []);
-    createScene(VARIABLE_SCENE, [
-      [{ type: 'device.get-value', device_feature: 'thermometer-temperature' }],
-      [{ type: 'condition.only-continue-if', conditions: [{ variable: '0.0.last_value', operator: '>', value: 20 }] }]
-    ]);
+    createScene(VARIABLE_SCENE, VARIABLE_STEPS);
     createScene(DELETED_SCENE, [
       [
         {
@@ -212,5 +215,97 @@ describe('Scene - condition on the current state of a device', () => {
     apiRequest('DELETE', `/scene/${NEW_SCENE}`);
     apiRequest('DELETE', `/scene/${VARIABLE_SCENE}`);
     apiRequest('DELETE', `/scene/${DELETED_SCENE}`);
+  });
+});
+
+// On a phone the device is picked by room in the device picker sheet, like every device field
+// of the scene forms, and never in a menu of every device of the house
+// (docs/specs/scene-editor-mobile.md, C.6 and E.10)
+describe('Scene - condition on the current state of a device, on a phone', () => {
+  const FIELD = `[data-cy="scene-condition-device-or-variable"]`;
+
+  beforeEach(() => {
+    cy.viewport('iphone-x');
+    cy.login();
+  });
+
+  it('Should create the scenes', () => {
+    cy.visit('/dashboard/scene');
+    createScene(PHONE_NEW_SCENE, []);
+    createScene(PHONE_VARIABLE_SCENE, VARIABLE_STEPS);
+  });
+
+  it('Should offer one "choose a device" button for a first condition, and pick the device in the sheet', () => {
+    openScene(PHONE_NEW_SCENE);
+    cy.get('[data-cy=scene-add-step]').click();
+    cy.get(
+      '[data-cy="scene-step-sheet-0.0"] [data-cy="type-picker-option"][data-value="condition.only-continue-if"]'
+    ).click();
+
+    // no variable to offer at the first step: no switch, and no select listing every device
+    cy.get(`${FIELD} [data-cy="scene-condition-source"]`).should('not.exist');
+    cy.get(`${FIELD} .react-select__control`).should('not.exist');
+    cy.get(`${FIELD} [data-cy="device-picker-open"]`)
+      .should('be.visible')
+      .click();
+    cy.get('[data-cy="device-picker-sheet"]').should('be.visible');
+    // one tap picks the device and closes the picker
+    cy.get('[data-cy="picker-feature-front-door-opening"]').click();
+    cy.get('[data-cy="device-picker-sheet"]').should('not.exist');
+    cy.get(`${FIELD} [data-cy="device-picker-item-front-door-opening"]`).should('contain', 'Front door');
+
+    cy.get('[data-cy="scene-step-sheet-0.0"] select.form-control').select('=');
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy="scene-step-row-0.0"]').should('contain', 'Front door (Opening)');
+
+    cy.intercept('PATCH', '**/api/v1/scene/*').as('saveScene');
+    cy.get('[data-cy=scene-save-button]').click();
+    cy.wait('@saveScene').then(({ request }) => {
+      expect(request.body.actions[0][0].conditions).to.deep.equal([
+        { device_feature: 'front-door-opening', operator: '=' }
+      ]);
+    });
+  });
+
+  it('Should switch between the variable and a device without losing either', () => {
+    openScene(PHONE_VARIABLE_SCENE);
+    cy.get('[data-cy="scene-step-row-1.0"]').click();
+    // the condition holds a variable: its side is shown, in a select of the variables alone
+    cy.get(`${FIELD} [data-cy="scene-condition-source-variable"]`).should('have.attr', 'aria-pressed', 'true');
+    cy.get(`${FIELD} .react-select__single-value`).should('have.text', 'Thermometer (Température)');
+    cy.get(`${FIELD} [data-cy="device-picker-open"]`).should('not.exist');
+
+    // the device side starts empty, the variable is put aside
+    cy.get(`${FIELD} [data-cy="scene-condition-source-device"]`).click();
+    cy.get(`${FIELD} [data-cy^="device-picker-item-"]`).should('not.exist');
+    cy.get(`${FIELD} .react-select__control`).should('not.exist');
+    cy.get(`${FIELD} [data-cy="scene-condition-source-variable"]`).click();
+    cy.get(`${FIELD} .react-select__single-value`).should('have.text', 'Thermometer (Température)');
+
+    // a device is picked, then the same round trip brings each side back
+    cy.get(`${FIELD} [data-cy="scene-condition-source-device"]`).click();
+    cy.get(`${FIELD} [data-cy="device-picker-open"]`).click();
+    cy.get('[data-cy="picker-feature-front-door-opening"]').click();
+    cy.get(`${FIELD} [data-cy="device-picker-item-front-door-opening"]`).should('be.visible');
+    cy.get(`${FIELD} [data-cy="scene-condition-source-variable"]`).click();
+    cy.get(`${FIELD} .react-select__single-value`).should('have.text', 'Thermometer (Température)');
+    cy.get(`${FIELD} [data-cy="scene-condition-source-device"]`).click();
+    cy.get(`${FIELD} [data-cy="device-picker-item-front-door-opening"]`).should('be.visible');
+    cy.get('body').type('{esc}');
+
+    cy.intercept('PATCH', '**/api/v1/scene/*').as('saveScene');
+    cy.get('[data-cy=scene-save-button]').click();
+    cy.wait('@saveScene').then(({ request }) => {
+      // one attribute, never both; the value typed for a temperature is not a state of a door
+      expect(request.body.actions[1][0].conditions).to.deep.equal([
+        { device_feature: 'front-door-opening', operator: '>' }
+      ]);
+    });
+  });
+
+  it('Should delete the scenes', () => {
+    cy.visit('/dashboard/scene');
+    apiRequest('DELETE', `/scene/${PHONE_NEW_SCENE}`);
+    apiRequest('DELETE', `/scene/${PHONE_VARIABLE_SCENE}`);
   });
 });
