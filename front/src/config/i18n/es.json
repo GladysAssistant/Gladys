@@ -864,6 +864,7 @@
         "editLabelLabel": "Etiqueta (opcional)",
         "editLabelPlaceholder": "ej.: Garaje",
         "addChipButton": "Agregar un chip",
+        "maxChipsReached": "Esta barra admite como máximo {{max}} chips: quite uno para agregar un chip nuevo.",
         "openings": "{{count}} abierta(s)",
         "allClosed": "Todo cerrado",
         "noEvent": "Sin próximos eventos",
@@ -896,6 +897,7 @@
         "labelLabel": "Etiqueta del botón (opcional)",
         "labelPlaceholder": "Abrir planta baja…",
         "addActionButton": "Agregar una acción",
+        "maxActionsReached": "Este widget admite como máximo {{max}} acciones: quite una para agregar una acción nueva.",
         "noActions": "Aún no hay acciones configuradas. Edite el panel para agregar algunas."
       },
       "house-view": {
@@ -912,6 +914,7 @@
         "editPinFeatureLabel": "Función del dispositivo",
         "editPinLabelLabel": "Etiqueta (opcional)",
         "editPinLabelPlaceholder": "ej.: Solar",
+        "maxPinsReached": "Este widget admite como máximo {{max}} pines: quite uno para colocar un pin nuevo.",
         "noImage": "Elija una ilustración en la configuración del widget.",
         "error": "No se pudo cargar la imagen."
       },

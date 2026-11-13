@@ -864,6 +864,7 @@
         "editLabelLabel": "Label (optional)",
         "editLabelPlaceholder": "e.g. Garage",
         "addChipButton": "Add a chip",
+        "maxChipsReached": "This bar holds at most {{max}} chips: remove one to add a new chip.",
         "openings": "{{count}} open",
         "allClosed": "All closed",
         "noEvent": "No upcoming event",
@@ -896,6 +897,7 @@
         "labelLabel": "Button label (optional)",
         "labelPlaceholder": "Open ground floor…",
         "addActionButton": "Add an action",
+        "maxActionsReached": "This widget holds at most {{max}} actions: remove one to add a new action.",
         "noActions": "No action configured yet. Edit the dashboard to add some."
       },
       "house-view": {
@@ -912,6 +914,7 @@
         "editPinFeatureLabel": "Device feature",
         "editPinLabelLabel": "Label (optional)",
         "editPinLabelPlaceholder": "e.g. Solar",
+        "maxPinsReached": "This widget holds at most {{max}} pins: remove one to place a new pin.",
         "noImage": "Pick an illustration in the widget settings.",
         "error": "The image could not be loaded."
       },
