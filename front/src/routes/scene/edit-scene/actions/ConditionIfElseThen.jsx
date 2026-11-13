@@ -70,188 +70,200 @@ class ConditionIfElseThen extends Component {
     return (
       <>
         {/* Conditions Section */}
-        <div class="conditions-container mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4>
-              <Text id="editScene.actionsCard.conditionIfThenElse.conditions">Conditions</Text>
-            </h4>
-          </div>
-          {conditions.length > 0 && (
-            <div class="row">
-              <div class="col">
-                <div class="alert alert-secondary">
-                  <div>
-                    <Text id="editScene.actionsCard.conditionIfThenElse.conditionDescription">
-                      If all conditions are met, the actions in the "Then" block will be executed.
-                    </Text>
-                  </div>
-                  <div class="mt-2">
-                    <Text id="editScene.actionsCard.conditionIfThenElse.conditionLogicDescription">
-                      The conditions below are combined with an AND: they all need to be verified.
-                    </Text>
-                  </div>
-                </div>
-              </div>
+        {/* the mobile editor lists the conditions as rows, each in its own sheet */}
+        {props.renderConditions ? (
+          props.renderConditions(conditions, CONDITION_ACTIONS)
+        ) : (
+          <div class="conditions-container mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h4>
+                <Text id="editScene.actionsCard.conditionIfThenElse.conditions">Conditions</Text>
+              </h4>
             </div>
-          )}
-          <div
-            class="row"
-            data-condition-flow
-            data-flow-path={`${props.path}.if`}
-            data-drop-active-class={style.nestedFlowDropActive}
-          >
-            {conditions.map((condition, index) => (
-              <>
-                {/* The boxes are combined with an AND: written between two boxes, not before the first one */}
-                {index > 0 && <ConditionAndSeparator />}
-                <ActionCard
-                  action={condition}
-                  index={index}
-                  allActions={props.allActions}
-                  path={`${props.path}.if.${index}`}
-                  updateActionProperty={props.updateActionProperty}
-                  deleteAction={props.deleteAction}
-                  actionsGroupsBefore={props.actionsGroupsBefore}
-                  variables={props.variables}
-                  triggersVariables={props.triggersVariables}
-                  setVariables={props.setVariables}
-                  moveCard={props.moveCard}
-                  moveCardGroup={props.moveCardGroup}
-                  scene={props.scene}
-                />
-              </>
-            ))}
-            {conditions.length === 0 && (
-              <div class="col">
-                <div class="alert alert-secondary">
-                  <Text id="editScene.actionsCard.conditionIfThenElse.noCondition">
-                    No condition has been added yet. Click the '+' button to add a condition to this block
-                  </Text>
+            {conditions.length > 0 && (
+              <div class="row">
+                <div class="col">
+                  <div class="alert alert-secondary">
+                    <div>
+                      <Text id="editScene.actionsCard.conditionIfThenElse.conditionDescription">
+                        If all conditions are met, the actions in the "Then" block will be executed.
+                      </Text>
+                    </div>
+                    <div class="mt-2">
+                      <Text id="editScene.actionsCard.conditionIfThenElse.conditionLogicDescription">
+                        The conditions below are combined with an AND: they all need to be verified.
+                      </Text>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
-          </div>
-          <div class="text-center mt-4">
-            <button onClick={this.addCondition} class="btn btn-sm btn-outline-primary">
-              <i class="fe fe-plus" />{' '}
-              <Text id="editScene.actionsCard.conditionIfThenElse.addCondition">Add condition</Text>
-            </button>
-          </div>
-        </div>
-
-        {/* Then Section */}
-        <div class="then-container mb-4">
-          <div
-            class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
-            onClick={this.toggleThenCollapse}
-          >
-            <h4>
-              <i class={`fe fe-chevron-${thenCollapsed ? 'right' : 'down'} mr-2`} />
-              <Text id="editScene.actionsCard.conditionIfThenElse.then">Then...</Text>
-              {thenCollapsed && (
-                <span class="badge badge-pill badge-secondary ml-2">
-                  <Text
-                    id="editScene.actionsCard.conditionIfThenElse.actionCount"
-                    plural={this.getNumberOfActionsInThen()}
-                    fields={{
-                      count: this.getNumberOfActionsInThen()
-                    }}
-                  />
-                </span>
-              )}
-            </h4>
-          </div>
-          {!thenCollapsed && props.action.then && (
             <div
-              class="pl-4"
-              data-step-flow
-              data-flow-path={`${props.path}.then`}
-              data-flow-level={props.path.split('.').length + 2}
+              class="row"
+              data-condition-flow
+              data-flow-path={`${props.path}.if`}
               data-drop-active-class={style.nestedFlowDropActive}
             >
-              {props.action.then.map((actions, index) => (
-                <ActionGroup
-                  actions={actions}
-                  allActions={props.allActions}
-                  path={`${props.path}.then.${index}`}
-                  addAction={props.addAction}
-                  deleteAction={props.deleteAction}
-                  deleteActionGroup={props.deleteActionGroup}
-                  updateActionProperty={props.updateActionProperty}
-                  moveCard={props.moveCard}
-                  moveCardGroup={props.moveCardGroup}
-                  highLightedActions={props.highLightedActions}
-                  actionsGroupsBefore={props.actionsGroupsBefore}
-                  variables={props.variables}
-                  triggersVariables={props.triggersVariables}
-                  setVariables={props.setVariables}
-                  scene={props.scene}
-                  sceneIntegrations={props.sceneIntegrations}
-                  deviceFeatures={props.deviceFeatures}
-                  thermostatSchedules={props.thermostatSchedules}
-                  lastActionGroup={index === props.action.then.length - 1}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Else Section */}
-        <div class="else-container">
-          <div
-            class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
-            onClick={this.toggleElseCollapse}
-          >
-            <h4>
-              <i class={`fe fe-chevron-${elseCollapsed ? 'right' : 'down'} mr-2`} />
-              <Text id="editScene.actionsCard.conditionIfThenElse.else">Else...</Text>
-              {elseCollapsed && (
-                <span class="badge badge-pill badge-secondary ml-2">
-                  <Text
-                    id="editScene.actionsCard.conditionIfThenElse.actionCount"
-                    plural={this.getNumberOfActionsInElse()}
-                    fields={{
-                      count: this.getNumberOfActionsInElse()
-                    }}
+              {conditions.map((condition, index) => (
+                <>
+                  {/* The boxes are combined with an AND: written between two boxes, not before the first one */}
+                  {index > 0 && <ConditionAndSeparator />}
+                  <ActionCard
+                    action={condition}
+                    index={index}
+                    allActions={props.allActions}
+                    path={`${props.path}.if.${index}`}
+                    updateActionProperty={props.updateActionProperty}
+                    deleteAction={props.deleteAction}
+                    actionsGroupsBefore={props.actionsGroupsBefore}
+                    variables={props.variables}
+                    triggersVariables={props.triggersVariables}
+                    setVariables={props.setVariables}
+                    moveCard={props.moveCard}
+                    moveCardGroup={props.moveCardGroup}
+                    scene={props.scene}
                   />
-                </span>
-              )}
-            </h4>
-          </div>
-          {!elseCollapsed && props.action.else && (
-            <div
-              class="pl-4"
-              data-step-flow
-              data-flow-path={`${props.path}.else`}
-              data-flow-level={props.path.split('.').length + 2}
-              data-drop-active-class={style.nestedFlowDropActive}
-            >
-              {props.action.else.map((actions, index) => (
-                <ActionGroup
-                  actions={actions}
-                  allActions={props.allActions}
-                  path={`${props.path}.else.${index}`}
-                  addAction={props.addAction}
-                  deleteAction={props.deleteAction}
-                  deleteActionGroup={props.deleteActionGroup}
-                  updateActionProperty={props.updateActionProperty}
-                  moveCard={props.moveCard}
-                  moveCardGroup={props.moveCardGroup}
-                  highLightedActions={props.highLightedActions}
-                  actionsGroupsBefore={props.actionsGroupsBefore}
-                  variables={props.variables}
-                  triggersVariables={props.triggersVariables}
-                  setVariables={props.setVariables}
-                  scene={props.scene}
-                  sceneIntegrations={props.sceneIntegrations}
-                  deviceFeatures={props.deviceFeatures}
-                  thermostatSchedules={props.thermostatSchedules}
-                  lastActionGroup={index === props.action.else.length - 1}
-                />
+                </>
               ))}
+              {conditions.length === 0 && (
+                <div class="col">
+                  <div class="alert alert-secondary">
+                    <Text id="editScene.actionsCard.conditionIfThenElse.noCondition">
+                      No condition has been added yet. Click the '+' button to add a condition to this block
+                    </Text>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+            <div class="text-center mt-4">
+              <button onClick={this.addCondition} class="btn btn-sm btn-outline-primary">
+                <i class="fe fe-plus" />{' '}
+                <Text id="editScene.actionsCard.conditionIfThenElse.addCondition">Add condition</Text>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* the mobile editor shows the branches in its timeline */}
+        {!props.hideBranches && (
+          <>
+            {/* Then Section */}
+            <div class="then-container mb-4">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
+                onClick={this.toggleThenCollapse}
+              >
+                <h4>
+                  <i class={`fe fe-chevron-${thenCollapsed ? 'right' : 'down'} mr-2`} />
+                  <Text id="editScene.actionsCard.conditionIfThenElse.then">Then...</Text>
+                  {thenCollapsed && (
+                    <span class="badge badge-pill badge-secondary ml-2">
+                      <Text
+                        id="editScene.actionsCard.conditionIfThenElse.actionCount"
+                        plural={this.getNumberOfActionsInThen()}
+                        fields={{
+                          count: this.getNumberOfActionsInThen()
+                        }}
+                      />
+                    </span>
+                  )}
+                </h4>
+              </div>
+              {!thenCollapsed && props.action.then && (
+                <div
+                  class="pl-4"
+                  data-step-flow
+                  data-flow-path={`${props.path}.then`}
+                  data-flow-level={props.path.split('.').length + 2}
+                  data-drop-active-class={style.nestedFlowDropActive}
+                >
+                  {props.action.then.map((actions, index) => (
+                    <ActionGroup
+                      actions={actions}
+                      allActions={props.allActions}
+                      path={`${props.path}.then.${index}`}
+                      addAction={props.addAction}
+                      deleteAction={props.deleteAction}
+                      deleteActionGroup={props.deleteActionGroup}
+                      updateActionProperty={props.updateActionProperty}
+                      moveCard={props.moveCard}
+                      moveCardGroup={props.moveCardGroup}
+                      highLightedActions={props.highLightedActions}
+                      actionsGroupsBefore={props.actionsGroupsBefore}
+                      variables={props.variables}
+                      triggersVariables={props.triggersVariables}
+                      setVariables={props.setVariables}
+                      scene={props.scene}
+                      sceneIntegrations={props.sceneIntegrations}
+                      deviceFeatures={props.deviceFeatures}
+                      thermostatSchedules={props.thermostatSchedules}
+                      names={props.names}
+                      lastActionGroup={index === props.action.then.length - 1}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Else Section */}
+            <div class="else-container">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
+                onClick={this.toggleElseCollapse}
+              >
+                <h4>
+                  <i class={`fe fe-chevron-${elseCollapsed ? 'right' : 'down'} mr-2`} />
+                  <Text id="editScene.actionsCard.conditionIfThenElse.else">Else...</Text>
+                  {elseCollapsed && (
+                    <span class="badge badge-pill badge-secondary ml-2">
+                      <Text
+                        id="editScene.actionsCard.conditionIfThenElse.actionCount"
+                        plural={this.getNumberOfActionsInElse()}
+                        fields={{
+                          count: this.getNumberOfActionsInElse()
+                        }}
+                      />
+                    </span>
+                  )}
+                </h4>
+              </div>
+              {!elseCollapsed && props.action.else && (
+                <div
+                  class="pl-4"
+                  data-step-flow
+                  data-flow-path={`${props.path}.else`}
+                  data-flow-level={props.path.split('.').length + 2}
+                  data-drop-active-class={style.nestedFlowDropActive}
+                >
+                  {props.action.else.map((actions, index) => (
+                    <ActionGroup
+                      actions={actions}
+                      allActions={props.allActions}
+                      path={`${props.path}.else.${index}`}
+                      addAction={props.addAction}
+                      deleteAction={props.deleteAction}
+                      deleteActionGroup={props.deleteActionGroup}
+                      updateActionProperty={props.updateActionProperty}
+                      moveCard={props.moveCard}
+                      moveCardGroup={props.moveCardGroup}
+                      highLightedActions={props.highLightedActions}
+                      actionsGroupsBefore={props.actionsGroupsBefore}
+                      variables={props.variables}
+                      triggersVariables={props.triggersVariables}
+                      setVariables={props.setVariables}
+                      scene={props.scene}
+                      sceneIntegrations={props.sceneIntegrations}
+                      deviceFeatures={props.deviceFeatures}
+                      thermostatSchedules={props.thermostatSchedules}
+                      names={props.names}
+                      lastActionGroup={index === props.action.else.length - 1}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </>
     );
   }

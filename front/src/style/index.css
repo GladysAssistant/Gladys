@@ -563,6 +563,18 @@ body .apexcharts-tooltip {
   }
 }
 
+/* A focus page (the scene editor on a phone, docs/specs/scene-editor-mobile.md E.1) brings its
+   own navigation bar: the app's mobile top bar gives way */
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  body.gladys-focus-page .gladys-mobile-top-bar {
+    display: none !important;
+  }
+
+  body.gladys-focus-page.gladys-sidebar-nav #app > .page {
+    padding-top: 0;
+  }
+}
+
 /* Every <select class="custom-select"> of the app is missing its dropdown
    arrow: the one Tabler paints encodes the color as a raw `#999` inside a
    data: URL, where a `#` starts a fragment — the browser drops the rest of

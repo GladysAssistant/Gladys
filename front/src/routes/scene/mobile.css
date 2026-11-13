@@ -1,0 +1,1858 @@
+/* ==================================================================
+   Scenes on a phone (docs/specs/scene-editor-mobile.md): the list and
+   the editor share these surfaces. Every touch target is >= 44px and
+   every field >= 16px. Light colors only: dark mode is the app-wide
+   inversion filter.
+   ================================================================== */
+
+/* ---------- swipe rows ---------- */
+
+.swipeRow {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.swipeRowFlush {
+  border-radius: 0;
+}
+
+.swipeRowNested {
+  border-radius: 12px;
+}
+
+.swipeActions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+}
+
+.swipeAction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.swipeAction :global(.fe) {
+  font-size: 1.125rem;
+}
+
+.swipeAction-danger {
+  background-color: #c23434;
+}
+
+.swipeAction-neutral {
+  background-color: #4f5866;
+}
+
+.swipeAction-accent {
+  background-color: #2f5bd8;
+}
+
+.swipeForeground {
+  position: relative;
+  background-color: #fff;
+  transition: transform 0.22s ease;
+  touch-action: pan-y;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipeForeground {
+    transition: none;
+  }
+}
+
+/* ---------- step / trigger / scene rows ---------- */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* a row of a card (an "at the same time" block, an if/while block): no border of its own */
+.rowFlush {
+  border: 0;
+  border-radius: 0;
+  min-height: 60px;
+}
+
+/* a row of a branch: lighter, slightly smaller */
+.rowNested {
+  min-height: 52px;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.rowRunning {
+  box-shadow: inset 0 0 0 2px #2f5bd8;
+}
+
+.rowTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 1.125rem;
+}
+
+.rowNested .rowTile {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rowTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  /* a long name or type label takes a second line rather than losing its end */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.rowNested .rowTitle {
+  font-size: 0.9375rem;
+}
+
+.rowSub,
+.rowMeta {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: #4f5866;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowMeta {
+  font-size: 0.75rem;
+}
+
+/* in the editor a summary may take two lines: its end is often what matters ("… · < 18 °C") */
+.row .rowSub {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.rowChevron {
+  flex-shrink: 0;
+  color: #8b93a1;
+  font-size: 1.125rem;
+}
+
+.runningDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  vertical-align: middle;
+}
+
+/* ---------- section titles ---------- */
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 24px 4px 10px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sectionTitleWhen {
+  color: #9a4f16;
+}
+
+.sectionTitleThen {
+  color: #2f5bd8;
+}
+
+.sectionSubtitle {
+  font-size: 0.8125rem;
+  color: #4f5866;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orSeparator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.orSeparator::before,
+.orSeparator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #d9dee7;
+}
+
+.orPill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a4f16;
+  background-color: #fdecdc;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* the AND between the conditions of a block: neutral, the orange is the color of "When" */
+.andPill {
+  color: #3d4656;
+  background-color: #e9edf3;
+}
+
+/* ---------- link buttons, dashed add buttons ---------- */
+
+.linkButton {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.linkButtonWhen {
+  color: #9a4f16;
+}
+
+.dashedButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  border: 1.5px dashed #9fb4ea;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dashedButtonWhen {
+  min-height: 64px;
+  border-color: #e0a56d;
+  background-color: #fffaf5;
+  color: #9a4f16;
+}
+
+.hint {
+  margin: 14px 4px 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+/* ---------- timeline ---------- */
+
+/* a long press drags a step: no text selection nor callout while the finger holds */
+.timeline {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 10px;
+}
+
+/* while a step is dragged, the others slide to make room */
+.timelineShifting .timelineItem {
+  transition: transform 0.18s ease;
+}
+
+.timelineShifting .timelineLine {
+  opacity: 0;
+}
+
+.timelineShifting .timelineItemDragging {
+  position: relative;
+  z-index: 5;
+  transition: none;
+}
+
+.timelineItemDragging .timelineContent > * {
+  box-shadow: 0 14px 34px rgba(16, 22, 36, 0.24);
+  transform: scale(1.02);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timelineShifting .timelineItem,
+  .timelineItemDragging .timelineContent > * {
+    transition: none;
+  }
+}
+
+.timelineRail {
+  width: 28px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timelineNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  margin-top: 19px;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.timelineLine {
+  flex: 1;
+  width: 2px;
+  margin: 4px 0 -4px;
+  border-radius: 2px;
+  background-color: #d5dbe6;
+}
+
+.timelineLineLast {
+  background-color: transparent;
+}
+
+.timelineContent {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 12px;
+}
+
+.timelineEnd {
+  display: flex;
+  gap: 10px;
+}
+
+.timelineEnd::before {
+  content: '';
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.card {
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.cardLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f5866;
+}
+
+.cardDivider {
+  border-top: 1px solid #edf0f4;
+}
+
+.cardFooterButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-top: 1px solid #edf0f4;
+  background-color: #fff;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.branch {
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.branchLabel {
+  padding: 6px 2px 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2f5bd8;
+}
+
+.branchLabelElse {
+  color: #4f5866;
+}
+
+.branchBody {
+  display: flex;
+  gap: 10px;
+}
+
+/* the rail of a branch: 12px of indentation per level */
+.branchRail {
+  width: 2px;
+  flex-shrink: 0;
+  margin-left: 6px;
+  border-radius: 2px;
+  background-color: #b9c9f2;
+}
+
+.branchRailElse {
+  background-color: #d5dae3;
+}
+
+.branchRows {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.branchEmpty {
+  padding: 2px 4px;
+  font-size: 0.8125rem;
+  color: #4f5866;
+}
+
+/* ---------- sheet content ---------- */
+
+/* the shared parameter form of a step / trigger, on a white card of the sheet */
+.sheetForm {
+  padding: 14px 14px 2px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.sheetForm :global(.form-group) {
+  margin-bottom: 1rem;
+}
+
+/* ---------- sheet forms: the shared forms, dressed for a thumb (spec E.11) ----------
+   The forms of the desktop cards mix native selects, react-selects, text fields, checkboxes and
+   tabs, each with the look of its library. In a sheet they share one: 48px fields with the same
+   border and radius, switches, a segmented control, 44px buttons. */
+
+.sheetForm :global(.form-label) {
+  margin-bottom: 6px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1c2334;
+}
+
+.sheetForm :global(.form-control),
+.sheetForm :global(.custom-select) {
+  min-height: 48px;
+  padding: 10px 14px;
+  color: #1c2334;
+  line-height: 1.35;
+  background-color: #fff;
+  border: 1px solid #d5dbe5;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.sheetForm :global(.form-control):focus,
+.sheetForm :global(.custom-select):focus {
+  border-color: #2f5bd8;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.15);
+}
+
+.sheetForm textarea:global(.form-control) {
+  min-height: 96px;
+}
+
+/* one chevron for every list, native or not */
+.sheetForm select:global(.form-control),
+.sheetForm select:global(.custom-select) {
+  padding-right: 40px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7385' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px 14px;
+}
+
+.sheetForm :global(.react-select__control) {
+  min-height: 48px;
+  border-color: #d5dbe5;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.sheetForm :global(.react-select__control--is-focused) {
+  border-color: #2f5bd8;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.15);
+}
+
+.sheetForm :global(.react-select__value-container) {
+  padding: 4px 12px;
+}
+
+.sheetForm :global(.react-select__indicator-separator) {
+  display: none;
+}
+
+.sheetForm :global(.react-select__dropdown-indicator),
+.sheetForm :global(.react-select__clear-indicator) {
+  padding: 12px;
+}
+
+.sheetForm :global(.react-select__menu) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.sheetForm :global(.react-select__option) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 1rem;
+}
+
+.sheetForm :global(.react-select__multi-value) {
+  border-radius: 8px;
+}
+
+.sheetForm :global(.react-select__multi-value__remove) {
+  min-width: 28px;
+  justify-content: center;
+}
+
+/* the desktop pickers that remain take the width of the other fields */
+.sheetForm :global(.react-datepicker-wrapper),
+.sheetForm :global(.react-datepicker__input-container) {
+  display: block;
+  width: 100%;
+}
+
+/* a field and its unit */
+.sheetForm :global(.input-group) > :global(.form-control):not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.sheetForm :global(.input-group) > :global(.form-control):not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.sheetForm :global(.input-group-text) {
+  min-height: 48px;
+  padding: 0 14px;
+  font-size: 1rem;
+  color: #4f5866;
+  background-color: #f4f6fa;
+  border-color: #d5dbe5;
+}
+
+.sheetForm :global(.input-group-append) > :global(.input-group-text),
+.sheetForm :global(.input-group-append) > :global(.btn) {
+  border-radius: 0 12px 12px 0;
+}
+
+.sheetForm :global(.input-group-prepend) > :global(.input-group-text),
+.sheetForm :global(.input-group-prepend) > :global(.btn) {
+  border-radius: 12px 0 0 12px;
+}
+
+.sheetForm :global(.btn) {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  font-size: 0.9375rem;
+  border-radius: 12px;
+}
+
+.sheetForm input[type='range'] {
+  min-height: 44px;
+}
+
+/* a checkbox is a row with its label on the left and a switch on the right */
+.sheetForm :global(.form-check.form-switch) {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 52px;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid #edf0f4;
+  cursor: pointer;
+}
+
+.sheetForm :global(.form-check.form-switch) :global(.form-check-label) {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: #1c2334;
+}
+
+.sheetForm :global(.form-check.form-switch) :global(.form-check-input) {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  flex: 0 0 auto;
+  width: 51px;
+  height: 31px;
+  margin: 0;
+  background-color: #d5dbe5;
+  background-image: none;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sheetForm :global(.form-check.form-switch) :global(.form-check-input)::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(16, 22, 36, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.sheetForm :global(.form-check.form-switch) :global(.form-check-input):checked {
+  background-color: #2f5bd8;
+}
+
+.sheetForm :global(.form-check.form-switch) :global(.form-check-input):checked::before {
+  transform: translateX(20px);
+}
+
+.sheetForm :global(.form-check.form-switch) :global(.form-check-input):focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+/* the checkboxes of the older markup (custom-control): the same row, the switch drawn by the
+   label since their input is hidden */
+.sheetForm label:global(.custom-control.custom-checkbox) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  margin: 0;
+  padding: 8px 65px 8px 0;
+  cursor: pointer;
+}
+
+.sheetForm label:global(.custom-control.custom-checkbox) :global(.custom-control-label) {
+  position: static;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: #1c2334;
+}
+
+.sheetForm label:global(.custom-control.custom-checkbox) :global(.custom-control-label)::before {
+  top: 50%;
+  right: 0;
+  left: auto;
+  width: 51px;
+  height: 31px;
+  background-color: #d5dbe5;
+  border: 0;
+  border-radius: 999px;
+  box-shadow: none;
+  transform: translateY(-50%);
+  transition: background-color 0.2s ease;
+}
+
+.sheetForm label:global(.custom-control.custom-checkbox) :global(.custom-control-label)::after {
+  top: 50%;
+  right: 22px;
+  left: auto;
+  width: 27px;
+  height: 27px;
+  background: #fff none;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(16, 22, 36, 0.3);
+  transform: translateY(-50%);
+  transition: right 0.2s ease;
+}
+
+.sheetForm
+  label:global(.custom-control.custom-checkbox)
+  :global(.custom-control-input):checked
+  ~ :global(.custom-control-label)::before {
+  background-color: #2f5bd8;
+}
+
+.sheetForm
+  label:global(.custom-control.custom-checkbox)
+  :global(.custom-control-input):checked
+  ~ :global(.custom-control-label)::after {
+  right: 2px;
+  background: #fff none;
+}
+
+/* the table of the time ranges: four columns do not fit a phone. Start, end and the delete
+   button share a line, the duration goes under them: nothing scrolls sideways in a sheet. */
+.sheetForm :global(.table-responsive) {
+  overflow: visible;
+}
+
+.sheetForm :global(.table-responsive) table,
+.sheetForm :global(.table-responsive) thead,
+.sheetForm :global(.table-responsive) tbody {
+  display: block;
+  margin: 0;
+}
+
+.sheetForm :global(.table-responsive) tr {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+  gap: 4px 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sheetForm :global(.table-responsive) th,
+.sheetForm :global(.table-responsive) td {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sheetForm :global(.table-responsive) th {
+  font-size: 0.75rem;
+}
+
+.sheetForm :global(.table-responsive) th:nth-child(n + 3) {
+  display: none;
+}
+
+.sheetForm :global(.table-responsive) td:nth-child(3) {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  font-size: 0.8125rem;
+  color: #5b6474;
+}
+
+.sheetForm :global(.table-responsive) td:nth-child(3):empty {
+  display: none;
+}
+
+.sheetForm :global(.table-responsive) td:nth-child(4) {
+  grid-row: 1;
+  grid-column: 3;
+}
+
+.sheetForm :global(.table-responsive) :global(.btn) {
+  padding: 0;
+}
+
+.sheetForm :global(.table-responsive) :global(.form-control) {
+  padding-right: 8px;
+  padding-left: 10px;
+}
+
+/* "Simple / Computed": a segmented control */
+.sheetForm :global(.nav-tabs) {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
+  background-color: #eef1f6;
+  border: 0;
+  border-radius: 12px;
+}
+
+.sheetForm :global(.nav-tabs) :global(.nav-link) {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #4f5866;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.sheetForm :global(.nav-tabs) :global(.nav-link.active) {
+  color: #1c2334;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(16, 22, 36, 0.16);
+}
+
+.sheetForm :global(.alert) {
+  padding: 12px 14px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  border: 0;
+  border-radius: 12px;
+}
+
+/* the gray box of an explanation is an explanation, not a warning: no box in the card */
+.sheetForm :global(.alert-secondary) {
+  margin-bottom: 0.75rem;
+  padding: 0;
+  font-size: 0.8125rem;
+  color: #5b6474;
+  background-color: transparent;
+}
+
+/* the explanations of a form read as footnotes: one size, one gray */
+.sheetForm p:not([class]),
+.sheetForm small,
+.sheetForm :global(.small),
+.sheetForm :global(.form-text) {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #5b6474;
+}
+
+.sheetForm p:not([class]) small,
+.sheetForm :global(.alert) p:not([class]),
+.sheetForm :global(.alert) small,
+.sheetForm :global(.alert) :global(.small) {
+  font-size: inherit;
+  color: inherit;
+}
+
+.sheetForm details {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #5b6474;
+}
+
+.sheetForm details * {
+  font-size: inherit !important;
+}
+
+.sheetForm details > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: #2f5bd8;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* a long explanation is folded on two lines, a tap opens it (SheetForm.jsx) */
+.sheetForm [data-help-fold] {
+  position: relative;
+  /* two lines and their padding: a 44px target */
+  padding: 3px 28px 3px 0;
+  cursor: pointer;
+}
+
+.sheetForm [data-help-fold]:not([data-help-open]) {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sheetForm [data-help-fold]::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #2f5bd8;
+  border-bottom: 2px solid #2f5bd8;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.sheetForm [data-help-fold][data-help-open]::after {
+  top: 11px;
+  transform: rotate(225deg);
+}
+
+.sheetForm [data-help-fold]:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* a field with variables: the same field as the others, its variables as accent pills */
+.sheetForm :global(.tagify) {
+  --tag-bg: #e3ebfb;
+  --tag-hover: #d3e0fa;
+  --tag-text-color: #1d3a8f;
+  --tag-text-color--edit: #1d3a8f;
+  --tag-border-radius: 8px;
+  --tag-pad: 0.2em 0.5em;
+  --tag-remove-btn-color: #1d3a8f;
+  min-height: 48px;
+  padding: 6px 8px;
+  line-height: 1.5;
+  border-color: #d5dbe5;
+  border-radius: 12px;
+}
+
+.sheetForm :global(.tagify--focus) {
+  border-color: #2f5bd8;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.15);
+}
+
+.sheetForm :global(.tagify__tag) {
+  margin: 2px 3px;
+  font-size: 0.875rem;
+}
+
+.sheetForm :global(.tagify__tag__removeBtn) {
+  width: 24px;
+  height: 24px;
+  font-size: 1.125rem;
+}
+
+/* the categories of the type pickers: 12px at least on a phone */
+.sheetForm :global([data-type-picker-category-title]) {
+  font-size: 0.75rem;
+}
+
+.sheetSection {
+  margin-top: 18px;
+}
+
+.sheetLabel {
+  display: block;
+  margin: 0 4px 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #4f5866;
+}
+
+.sheetActions {
+  margin-top: 18px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.sheetActionsFirst {
+  margin-top: 0;
+}
+
+.sheetAction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 0;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sheetAction + .sheetAction {
+  border-top: 1px solid #edf0f4;
+}
+
+.sheetAction :global(.fe) {
+  color: #2f5bd8;
+  font-size: 1.125rem;
+}
+
+.sheetActionDanger,
+.sheetActionDanger :global(.fe) {
+  color: #b42d2d;
+}
+
+.sheetText {
+  margin: 0 4px 16px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f5866;
+  text-align: center;
+}
+
+.sheetButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bigButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bigButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.bigButtonPrimary {
+  background-color: #1c2334;
+  color: #fff;
+}
+
+.bigButtonSoft {
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+}
+
+.bigButtonDanger {
+  background-color: #b42d2d;
+  color: #fff;
+}
+
+.bigButtonDangerSoft {
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  color: #b42d2d;
+}
+
+.bigButtonGhost {
+  background-color: transparent;
+  color: #2f5bd8;
+}
+
+.bigButtonNeutral {
+  background-color: #e6e9f0;
+  color: #1c2334;
+}
+
+/* ---------- editor chrome ---------- */
+
+.editorPage {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.navBar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 max(6px, env(safe-area-inset-right, 0px)) 0 max(6px, env(safe-area-inset-left, 0px));
+  background-color: rgba(242, 244, 248, 0.92);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+/* the two sides share what the title leaves: a short name is centered, a long one takes the room
+   down to the width of the buttons before it is cut */
+.navSide {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+}
+
+.navSideEnd {
+  justify-content: flex-end;
+}
+
+.navBack {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 0 8px 0 2px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.navBack :global(.fe) {
+  font-size: 1.5rem;
+}
+
+.navTitle {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #1c2334;
+  font: inherit;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navTitleText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navTitleTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 0.9375rem;
+}
+
+.navIconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1.375rem;
+  cursor: pointer;
+}
+
+.navTextButton {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* on a phone in landscape the content keeps the width of a phone, centered and clear of the notch */
+.editorContent {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(150px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
+}
+
+.statusLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 6px 8px 14px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.statusText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statusTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.statusSub {
+  font-size: 0.8125rem;
+  color: #4f5866;
+}
+
+.switchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.switchButton:disabled {
+  opacity: 0.6;
+}
+
+.switchTrack {
+  position: relative;
+  width: 52px;
+  height: 32px;
+  border-radius: 999px;
+  background-color: #c9ced8;
+  transition: background-color 0.2s;
+}
+
+.switchTrackOn {
+  background-color: #2f5bd8;
+}
+
+.switchKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s;
+}
+
+.switchTrackOn .switchKnob {
+  transform: translateX(20px);
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background-color: #fff4e5;
+  border: 1px solid #f3d3a8;
+  color: #6b3a07;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.bannerButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.bannerButtons .bigButton {
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
+  background-color: rgba(247, 248, 251, 0.94);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+.bottomBar > * {
+  max-width: 38rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bottomBarRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bottomBarRow .bigButton {
+  width: auto;
+  min-height: 48px;
+}
+
+.dirtyLabel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #8a4a0f;
+}
+
+.dirtyDot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background-color: #e8892b;
+}
+
+/* closable, and never taller than a third of the screen: it sits over the timeline the user has
+   to reach to fix the step */
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 10px 4px 10px 12px;
+  border-radius: 12px;
+  background-color: #fdeaea;
+  color: #8c1f1f;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.errorBannerText {
+  flex: 1;
+  min-width: 0;
+  max-height: 30vh;
+  max-height: 30dvh;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+
+.errorBannerClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+/* the running/stop control fills the bottom bar, or sits beside Save when there are changes */
+.bottomBar :global(.btn) {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+.bottomBarRow :global(.btn) {
+  width: auto;
+  min-height: 48px;
+}
+
+.toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  max-width: 38rem;
+  margin: 0 auto;
+  /* rendered on <body>, above any stack of sheets (1060 + 2 per level) */
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 6px 4px 16px;
+  border-radius: 14px;
+  background-color: #1c2334;
+  color: #fff;
+  font-size: 0.9375rem;
+  box-shadow: 0 10px 30px rgba(16, 22, 38, 0.3);
+  animation: toastIn 0.22s ease-out;
+}
+
+.toastText {
+  flex: 1;
+}
+
+.toastButton {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #a9c0ff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@keyframes toastIn {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* ---------- reorder mode ---------- */
+
+.reorderList {
+  margin-top: 12px;
+}
+
+.reorderRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 60px;
+  padding: 0 4px;
+}
+
+.reorderRow + .reorderRow {
+  border-top: 1px solid #edf0f4;
+}
+
+.reorderNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background-color: #e6e9f0;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.reorderText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-left: 6px;
+}
+
+.reorderButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.reorderButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.reorderButtonDanger {
+  color: #c23434;
+}
+
+/* ---------- scene list ---------- */
+
+.listHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+.listTitle {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background-color: rgba(28, 35, 52, 0.07);
+  color: #4f5866;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #1c2334;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+/* edge to edge: the negative margin is the side padding of the page container (12px), no more,
+   or the page itself would scroll sideways */
+.chips {
+  display: flex;
+  gap: 8px;
+  margin: 0 -12px;
+  padding: 0 12px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #d7dce5;
+  border-radius: 999px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chipSelected {
+  border-color: #1c2334;
+  background-color: #1c2334;
+  color: #fff;
+}
+
+.sceneList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+}
+
+.sceneRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px 8px 0;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.sceneRowOpen {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding-left: 12px;
+  color: #1c2334;
+}
+
+.sceneRowOpen:hover,
+.sceneRowOpen:focus {
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.sceneTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 1.125rem;
+}
+
+.sceneTileDisabled {
+  background-color: #eceef1;
+  color: #5f6878;
+}
+
+.playButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.playButton:disabled {
+  opacity: 0.6;
+}
+
+.sceneRow :global(.btn) {
+  min-height: 44px;
+  border-radius: 999px;
+}
+
+.fab {
+  position: fixed;
+  right: 20px;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  color: #fff;
+  font-size: 1.625rem;
+  box-shadow: 0 10px 24px rgba(47, 91, 216, 0.4);
+  cursor: pointer;
+}
+
+.newSceneIcon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 4px 16px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+.textField {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid #d7dce5;
+  border-radius: 14px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 17px;
+}
+
+.textField:focus {
+  border-color: #2f5bd8;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.18);
+}
+
+.fieldError {
+  margin: 8px 4px 0;
+  font-size: 0.875rem;
+  color: #b42d2d;
+}
+
+/* no field of the phone editor triggers the iOS zoom on focus (the page is only rendered on a
+   phone, in portrait or in landscape) */
+.editorPage :global(.form-control),
+.editorPage :global(.custom-select),
+.editorPage input,
+.editorPage select,
+.editorPage textarea {
+  font-size: 16px;
+}
+
+/* a phone in landscape: the screen is low, the bottom bar takes less of it */
+@media (max-height: 500px) {
+  .bottomBar {
+    padding-top: 6px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bottomBar .bigButton,
+  .bottomBar :global(.btn) {
+    min-height: 44px;
+  }
+
+  .editorContent {
+    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ---------- Dark mode ----------
+   Dark mode is the app-wide inversion (style/dark-mode.css): the light colors above are inverted
+   with the page, which is right for surfaces and text. A few things must not follow blindly:
+   colors that carry a meaning are inverted back to themselves, and the global dark-mode rules
+   written for the classic form controls are undone where they do not fit. */
+
+/* the search of the list is a transparent field inside its pill: dark-mode.css paints every
+   input with its own solid background and inverts it back, which showed as a darker rectangle */
+:global(.dark-mode) .search input.searchInput {
+  background-color: transparent !important;
+  color: #1c2334 !important;
+  filter: none;
+}
+
+:global(.dark-mode) .search input.searchInput::placeholder {
+  color: #6b7385 !important;
+}
+
+/* danger, neutral and accent blocks keep their own color and their white label: inverted, the
+   red of a deletion turned pink, with a dark label */
+:global(.dark-mode) .swipeAction,
+:global(.dark-mode) .bigButtonDanger,
+:global(.dark-mode) .fab {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* the "+" sits outside the glass page, where dark-mode.css inverts the icons back: it must
+   follow its button, not be inverted a third time */
+:global(.dark-mode) .fab :global(.fe) {
+  filter: none;
+}
+
+/* a switch reads by its knob: white on the accent when on, on a dark track when off */
+:global(.dark-mode) .switchTrack {
+  background-color: #4a5263;
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+:global(.dark-mode) .switchTrackOn {
+  background-color: #2f5bd8;
+}
+
+/* the running / stop button: dark-mode.css gives outline buttons their light-mode colors back,
+   a dark green on the dark bottom bar. Inverted with the page, it is a light green */
+:global(.dark-mode) .bottomBar :global(.btn-outline-success),
+:global(.dark-mode) .sceneRow :global(.btn-outline-success) {
+  filter: none;
+}
+
+/* the switches of the forms: dark-mode.css paints every input with the background of a text field
+   (and inverts it back): the track would be the color of the card */
+:global(.dark-mode) .sheetForm :global(.form-check.form-switch) :global(.form-check-input) {
+  background-color: #4a5263 !important;
+  border: 0 !important;
+}
+
+:global(.dark-mode) .sheetForm :global(.form-check.form-switch) :global(.form-check-input):checked {
+  background-color: #2f5bd8 !important;
+}
+
+/* the selected segment stands out lighter than its track once inverted, as it does in light mode */
+:global(.dark-mode) .sheetForm :global(.nav-tabs) :global(.nav-link.active) {
+  background-color: #c9d1de;
+  box-shadow: none;
+}

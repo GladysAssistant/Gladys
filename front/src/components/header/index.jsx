@@ -187,7 +187,7 @@ class Header extends Component {
 
     return (
       <div>
-        <div class={cx(style.mobileTopBar, 'd-lg-none')}>
+        <div class={cx(style.mobileTopBar, 'd-lg-none', 'gladys-mobile-top-bar')}>
           <button
             type="button"
             class={style.mobileToggler}

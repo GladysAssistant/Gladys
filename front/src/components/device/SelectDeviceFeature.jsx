@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from '../form/Select';
+import DevicePickerField from './DevicePickerField';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
@@ -26,6 +27,8 @@ class SelectDeviceFeature extends Component {
     try {
       const rooms = await this.props.httpClient.get('/api/v1/room', { expand: 'devices' });
       const deviceOptions = [];
+      // the same devices for the picker sheet of a phone, each with its room
+      const pickerDevices = [];
 
       const deviceDictionnary = {};
       const deviceFeaturesDictionnary = {};
@@ -72,6 +75,9 @@ class SelectDeviceFeature extends Component {
       rooms.forEach(room => {
         const roomDeviceFeatures = [];
         pushDeviceFeatures(room.devices, roomDeviceFeatures, room.name);
+        room.devices.forEach(device => {
+          pickerDevices.push({ ...device, room: { id: room.id, name: room.name, selector: room.selector } });
+        });
         if (roomDeviceFeatures.length > 0) {
           roomDeviceFeatures.sort(sortByLabel);
           deviceOptions.push({
@@ -91,6 +97,9 @@ class SelectDeviceFeature extends Component {
 
       const noRoomDeviceFeatures = [];
       pushDeviceFeatures(devicesWithoutRoom, noRoomDeviceFeatures, this.props.intl.dictionary.device.noRoom);
+      devicesWithoutRoom.forEach(device => {
+        pickerDevices.push({ ...device, room: null });
+      });
       if (noRoomDeviceFeatures.length > 0) {
         noRoomDeviceFeatures.sort(sortByLabel);
         deviceOptions.push({
@@ -99,7 +108,7 @@ class SelectDeviceFeature extends Component {
         });
       }
 
-      await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
+      await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary, pickerDevices });
       await this.refreshSelectedOptions(this.props);
       return deviceOptions;
     } catch (e) {
@@ -125,6 +134,37 @@ class SelectDeviceFeature extends Component {
     } else {
       this.props.onDeviceFeatureChange(null);
     }
+  };
+  // The picker sheet of a phone hands back selectors: they go through the same path as the
+  // options of the select
+  handlePickerChange = selectors => {
+    const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;
+    const known = selectors.filter(selector => deviceFeaturesDictionnary[selector]);
+    if (this.props.isMulti) {
+      // A selector whose device no longer exists keeps its row in the field and is only dropped
+      // when the user removes that row: the whole selection is handed back, in its order, next
+      // to the features that could be resolved (docs/specs/scene-editor-mobile.md, E.10).
+      this.props.onDeviceFeaturesChange(
+        known.map(selector => deviceFeaturesDictionnary[selector]),
+        known.map(selector => deviceDictionnary[selector]),
+        true,
+        selectors
+      );
+      return;
+    }
+    if (known.length > 0) {
+      this.handleChange({ value: known[0] });
+    } else if (selectors.length === 0) {
+      this.handleChange(null);
+    }
+    // otherwise the only selector is the unknown one already stored: nothing to change
+  };
+  // the features the picker may list: the ones the select offers
+  isFeatureSelectable = feature => {
+    if (this.props.exclude_read_only_device_features === true && feature.read_only) {
+      return false;
+    }
+    return typeof this.props.filterFeature !== 'function' || this.props.filterFeature(feature);
   };
   findOption = value => {
     let deviceOption;
@@ -247,10 +287,40 @@ class SelectDeviceFeature extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOption, selectedOptions, deviceOptions }) {
+  render(props, { selectedOption, selectedOptions, deviceOptions, pickerDevices }) {
     if (!deviceOptions) {
       return null;
     }
+    const select = this.renderSelect(props, { selectedOption, selectedOptions });
+    // opt-in (mobilePicker): on a phone the features are picked in the device picker sheet, by
+    // room; anywhere else the select below is rendered as before. Several features share one
+    // condition, so they must be of the same kind; a single one is picked in one tap.
+    if (props.mobilePicker) {
+      // the stored selectors, resolved or not: one whose device is gone shows as "Device not
+      // found" instead of vanishing from the field
+      let selected = [];
+      if (props.isMulti) {
+        selected = Array.isArray(props.value) ? props.value : [];
+      } else if (props.value) {
+        selected = [props.value];
+      }
+      return (
+        <DevicePickerField
+          devices={pickerDevices}
+          selected={selected}
+          onChange={this.handlePickerChange}
+          filterFeature={this.isFeatureSelectable}
+          sameKindOnly={Boolean(props.isMulti)}
+          single={!props.isMulti}
+        >
+          {select}
+        </DevicePickerField>
+      );
+    }
+    return select;
+  }
+
+  renderSelect(props, { selectedOption, selectedOptions }) {
     return (
       <Select
         class="select-device-feature"

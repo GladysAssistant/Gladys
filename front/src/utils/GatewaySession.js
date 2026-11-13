@@ -41,6 +41,10 @@ class GatewaySession {
     this.user = null;
     this.profilePicture = null;
     this.initialized = false;
+    // a closed session is no longer connected: a component still holding it (the scene editor
+    // writing its local draft on unmount) must not see it as open
+    this.connected = false;
+    this.ready = false;
     keyValueStore.clear();
   }
 

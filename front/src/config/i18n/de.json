@@ -4902,6 +4902,103 @@
       "outputsAvailable": "Ergebnisse, die in den folgenden Schritten verwendbar sind:",
       "variablesHint": "Tippe '{{', um Informationen der Szene einzufügen, zum Beispiel die vom Auslöser übermittelten.",
       "requiredFieldError": "Das Feld „{{field}}“ von „{{title}}“ ist erforderlich: es darf nicht leer bleiben."
+    },
+    "searchConditionsPlaceholder": "Nach einer Bedingung suchen…",
+    "conditionsDescriptions": {
+      "condition": {
+        "check-time": "Die Uhrzeit oder der Tag passt",
+        "only-continue-if": "Variablen oder Gerätewerte vergleichen",
+        "in-time-range": "Wir befinden uns in einem Zeitfenster des Auslösers"
+      },
+      "edf-tempo": {
+        "condition": "Die EDF-Tempo-Tagesfarbe passt (Frankreich)"
+      },
+      "alarm": {
+        "check-alarm-mode": "Der Alarm befindet sich in einem bestimmten Modus"
+      },
+      "calendar": {
+        "is-event-running": "Ein Kalendertermin läuft gerade",
+        "get-events": "Kalendertermine abrufen, um sie zu vergleichen"
+      },
+      "ecowatt": {
+        "condition": "Das Ecowatt-Signal des französischen Stromnetzes passt"
+      },
+      "energy-contract": {
+        "current-price": "Der aktuelle Preis eines Energievertrags erfüllt einen Schwellenwert"
+      },
+      "house": {
+        "is-empty": "Niemand ist zu Hause",
+        "is-not-empty": "Jemand ist zu Hause"
+      },
+      "device": {
+        "get-value": "Den Wert eines Sensors abrufen, bevor er verglichen wird"
+      }
+    },
+    "mobile": {
+      "ok": "OK",
+      "close": "Schließen",
+      "savedToast": "Szene gespeichert",
+      "stepDeleted": "Schritt gelöscht",
+      "conditionDeleted": "Bedingung gelöscht",
+      "triggerDeleted": "Auslöser gelöscht",
+      "undo": "Rückgängig",
+      "leaveTitle": "Ungespeicherte Änderungen",
+      "leaveText": "Du hast ungespeicherte Änderungen an „{{name}}“.",
+      "saveAndLeave": "Speichern und verlassen",
+      "leaveWithoutSaving": "Ohne Speichern verlassen",
+      "keepEditing": "Weiter bearbeiten",
+      "draftFound": "Ungespeicherte Änderungen gefunden ·",
+      "restoreDraft": "Wiederherstellen",
+      "discardDraft": "Verwerfen",
+      "noCondition": "Keine Bedingung",
+      "delete": "Löschen",
+      "addSimultaneousAction": "Gleichzeitige Aktion hinzufügen",
+      "insertStepAfter": "Schritt danach einfügen",
+      "deleteStep": "Schritt löschen",
+      "deleteCondition": "Bedingung löschen",
+      "deleteTrigger": "Auslöser löschen",
+      "noActionInBranch": "Keine Aktion",
+      "addTo": {
+        "then": "Zu „Dann“ hinzufügen",
+        "else": "Zu „Sonst“ hinzufügen"
+      },
+      "then": "Dann",
+      "else": "Sonst",
+      "repeat": "Wiederholen",
+      "conditionsTitle": "Bedingungen",
+      "addCondition": "Bedingung hinzufügen",
+      "conditionsAllRequired": "Alle Bedingungen müssen erfüllt sein. Tippe auf eine Bedingung, um sie zu ändern.",
+      "atTheSameTime": "Gleichzeitig",
+      "simultaneousAction": "Gleichzeitige Aktion",
+      "reorderTitle": "Neu anordnen",
+      "reorderHint": "Verschiebe die Schritte mit den Pfeilen. Was jeder Schritt tut, ändert sich nicht.",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "done": "Fertig",
+      "changes": {
+        "zero": "Keine Änderung",
+        "one": "1 Änderung",
+        "other": "{{count}} Änderungen"
+      },
+      "test": "Testen",
+      "runScene": "Szene ausführen",
+      "moreActions": "Weitere Aktionen",
+      "sceneActive": "Szene aktiv",
+      "sceneDisabled": "Szene deaktiviert",
+      "lastRun": "Zuletzt ausgeführt",
+      "neverRun": "Noch nie ausgeführt",
+      "whenSubtitle": "eines dieser Ereignisse genügt",
+      "chooseTrigger": "Auslöser wählen",
+      "orWhen": "Oder wenn…",
+      "thenSubtitle": "der Reihe nach, von oben nach unten",
+      "addFirstStep": "Ersten Schritt hinzufügen",
+      "swipeHint": "Tippe auf eine Zeile, um sie zu ändern. Wische sie nach links, um sie zu löschen. Halte einen Schritt gedrückt, um ihn zu verschieben.",
+      "settingsMenu": "Name, Symbol und Tags",
+      "reorderMenu": "Schritte neu anordnen",
+      "deleteScene": "Szene löschen",
+      "deleteSceneTitle": "Szene löschen?",
+      "deleteSceneText": "„{{name}}“ und ihre Auslöser werden gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      "deleteForever": "Endgültig löschen"
     }
   },
   "profile": {
@@ -5474,7 +5571,20 @@
     "filterTagsName": "Nach Tags filtern",
     "unselectTags": "Alle Tags abwählen",
     "running": "Läuft",
-    "stopButton": "Stoppen"
+    "stopButton": "Stoppen",
+    "mobile": {
+      "newSceneTitle": "Neue Szene",
+      "newScenePlaceholder": "z. B. Gute Nacht",
+      "createError": "Die Szene konnte nicht erstellt werden. Versuche es erneut.",
+      "iconGuessed": "Symbol anhand des Namens gewählt, später änderbar.",
+      "createAndChooseTrigger": "Erstellen und Auslöser wählen",
+      "disable": "Deaktivieren",
+      "enable": "Aktivieren",
+      "disabled": "Deaktiviert",
+      "runScene": "„{{name}}“ ausführen",
+      "allTags": "Alle",
+      "swipeHint": "Tipp: Wische eine Szene nach links, um sie zu deaktivieren oder zu duplizieren."
+    }
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -7725,6 +7835,18 @@
       "other": "{{count}} ausgewählt"
     },
     "validate": "Fertig",
-    "title": "Geräte wählen"
+    "title": "Geräte wählen",
+    "sameKindHint": "Es werden nur Geräte desselben Typs angezeigt: Sie teilen sich eine Bedingung."
+  },
+  "devicePickerField": {
+    "title": "Geräte auswählen",
+    "choose": "Geräte auswählen",
+    "edit": "Geräte hinzufügen oder entfernen",
+    "titleOne": "Gerät auswählen",
+    "chooseOne": "Gerät auswählen",
+    "changeOne": "Gerät ändern",
+    "empty": "Kein Gerät ausgewählt.",
+    "remove": "{{name}} entfernen",
+    "notFound": "Gerät nicht gefunden"
   }
 }

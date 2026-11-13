@@ -1,4 +1,5 @@
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
@@ -33,7 +34,7 @@ class CheckUserPresence extends Component {
           });
         }
       });
-      await this.setState({ userOptions, houseOptions, deviceOptions });
+      await this.setState({ userOptions, houseOptions, deviceOptions, presenceDevices });
       this.refreshSelectedOptions(this.props);
     } catch (e) {
       console.error(e);
@@ -61,6 +62,13 @@ class CheckUserPresence extends Component {
       this.props.updateActionProperty(this.props.path, 'device_features', []);
     }
   };
+  // on a phone the presence sensors are picked in the device picker sheet
+  handleDevicePickerChange = deviceFeatures => {
+    this.props.updateActionProperty(this.props.path, 'device_features', deviceFeatures);
+  };
+  // the select offers one presence feature per device, its first: so does the picker
+  isPresenceFeature = (feature, device) =>
+    feature === device.features.find(f => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR);
   handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
     this.props.updateActionProperty(this.props.path, 'minutes', newValue);
@@ -120,7 +128,8 @@ class CheckUserPresence extends Component {
       houseOptions,
       selectedHouseOption,
       deviceOptions,
-      selectedDeviceOptions
+      selectedDeviceOptions,
+      presenceDevices
     } = state;
     return (
       <div>
@@ -166,14 +175,21 @@ class CheckUserPresence extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select
-            options={deviceOptions}
-            value={selectedDeviceOptions}
-            isMulti
-            onChange={this.handleDeviceChange}
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+          <DevicePickerField
+            devices={presenceDevices || null}
+            selected={props.action.device_features}
+            onChange={this.handleDevicePickerChange}
+            filterFeature={this.isPresenceFeature}
+          >
+            <Select
+              options={deviceOptions}
+              value={selectedDeviceOptions}
+              isMulti
+              onChange={this.handleDeviceChange}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </DevicePickerField>
         </div>
         <div class="form-group">
           <label class="form-label">

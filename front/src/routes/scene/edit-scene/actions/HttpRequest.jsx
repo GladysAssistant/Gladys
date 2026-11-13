@@ -275,7 +275,7 @@ class HttpRequestAction extends Component {
                   <label class="form-label">
                     <Text id="editScene.actionsCard.httpRequest.bodyLabel" />
                   </label>
-                  <div style={helpTextStyle}>
+                  <div class="small" style={helpTextStyle}>
                     <Text id="editScene.actionsCard.httpRequest.variablesExplanation" />
                   </div>
                   <Localizer>

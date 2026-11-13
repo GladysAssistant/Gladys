@@ -33,8 +33,11 @@
   margin-bottom: 0.625rem;
 }
 
+/* above the field: in dark mode the input is filtered (style/dark-mode.css), which makes it a
+   stacking context painted over a plain positioned icon */
 .searchIcon {
   position: absolute;
+  z-index: 1;
   left: 0.875rem;
   top: 50%;
   transform: translateY(-50%);
@@ -70,14 +73,16 @@ input.searchInput::-webkit-search-cancel-button {
   cursor: pointer;
 }
 
-/* one sideways-scrolling row, flush with the panel edges */
+/* one sideways-scrolling row, flush with the panel edges. The bleed is the padding of the
+   host's scrolling body (the dashboard edit panel by default); another host — a bottom sheet —
+   sets --picker-bleed-x / --picker-bleed-bottom to its own */
 .roomChips {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
   scrollbar-width: none;
-  margin: 0 -1.375rem 0.25rem;
-  padding: 0.125rem 1.375rem 0.5rem;
+  margin: 0 calc(-1 * var(--picker-bleed-x, 1.375rem)) 0.25rem;
+  padding: 0.125rem var(--picker-bleed-x, 1.375rem) 0.5rem;
 }
 
 .roomChips::-webkit-scrollbar {
@@ -159,6 +164,19 @@ input.searchInput::-webkit-search-cancel-button {
   border-top: 0;
 }
 
+/* pickDevices: the device is the row, there is no name above it */
+.featureAlone {
+  border-top: 0;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 0 0.125rem 0.25rem;
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
 /* the real checkbox stays in the accessibility tree and takes the keyboard
    focus; .tick is its visual */
 .checkbox {
@@ -180,6 +198,11 @@ input.searchInput::-webkit-search-cancel-button {
   color: transparent;
   font-size: 0.875rem;
   transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+/* single: the rows are radios */
+.tickRadio {
+  border-radius: 999px;
 }
 
 .checkbox:checked + .tick {
@@ -222,6 +245,15 @@ input.searchInput::-webkit-search-cancel-button {
   text-align: right;
 }
 
+/* on the narrowest phones (320px) a long value ("No value") took 40% of the row and broke the
+   name in the middle of a word: the value wraps instead */
+@media (max-width: 359.98px) {
+  .featureValue {
+    max-width: 28%;
+    font-size: 0.8125rem;
+  }
+}
+
 .empty {
   padding: 1.5rem 0.5rem;
   text-align: center;
@@ -233,13 +265,13 @@ input.searchInput::-webkit-search-cancel-button {
    stretch the bar over it so the list never shows around the bar */
 .footer {
   position: sticky;
-  bottom: -1.5rem;
+  bottom: calc(-1 * var(--picker-bleed-bottom, 1.5rem));
   z-index: 2;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin: 0.75rem -1.375rem -1.5rem;
-  padding: 0.75rem 1.375rem 1rem;
+  margin: 0.75rem calc(-1 * var(--picker-bleed-x, 1.375rem)) calc(-1 * var(--picker-bleed-bottom, 1.5rem));
+  padding: 0.75rem var(--picker-bleed-x, 1.375rem) 1rem;
   border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
   background: var(--gl-surface-strong, rgba(255, 255, 255, 0.94));
   backdrop-filter: blur(20px);

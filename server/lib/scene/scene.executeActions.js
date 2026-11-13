@@ -27,11 +27,13 @@ module.exports = (actionsFunc) => {
       throw new Error(`Action type "${action.type}" does not exist.`);
     }
 
-    // send message to tell UI the action is executed
+    // send message to tell UI the action is executed. The message goes to every client: it names
+    // the running scene (set on the scope by scene.execute), so an editor showing another scene
+    // does not mark its own step at the same path
     if (path !== undefined) {
       self.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
-        payload: { path },
+        payload: { path, sceneSelector: scope.sceneSelector },
       });
     }
     try {
@@ -52,7 +54,7 @@ module.exports = (actionsFunc) => {
     if (path !== undefined) {
       self.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
-        payload: { path },
+        payload: { path, sceneSelector: scope.sceneSelector },
       });
     }
 

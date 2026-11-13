@@ -56,9 +56,14 @@ class ChooseActionType extends Component {
             deprecated={DEPRECATED_ACTIONS}
             filter={props.action && props.action.filter}
             labelPrefix="editScene.actions"
-            descriptionPrefix="editScene.actionsDescriptions"
+            descriptionPrefix={isCondition ? 'editScene.conditionsDescriptions' : 'editScene.actionsDescriptions'}
+            fallbackDescriptionPrefix={isCondition ? 'editScene.actionsDescriptions' : null}
             categoryPrefix="editScene.actionCategories"
-            searchPlaceholderId="editScene.searchActionsPlaceholder"
+            searchPlaceholderId={
+              isCondition ? 'editScene.searchConditionsPlaceholder' : 'editScene.searchActionsPlaceholder'
+            }
+            autoFocusSearch={props.autoFocusSearch}
+            fill={props.fill}
             onSelect={this.selectActionType}
           />
         </div>
