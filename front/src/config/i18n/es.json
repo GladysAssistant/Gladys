@@ -7632,8 +7632,7 @@
     }
   },
   "feedback": {
-    "integrationLink": "Dar mi opinión",
-    "generalLink": "Dar mi opinión sobre Gladys",
+    "link": "Dar mi opinión",
     "subjectTopicTitle": "Mi opinión sobre la integración {{subject}}",
     "generalTopicTitle": "Mi opinión sobre Gladys",
     "topicBody": "<!-- Cuéntenos: qué funciona bien, qué le bloquea, qué le gustaría mejorar. ¡Todas las opiniones son bienvenidas! -->\n\n\n\n---\n_Enviado desde Gladys v{{version}}_"

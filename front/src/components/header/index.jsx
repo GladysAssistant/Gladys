@@ -323,7 +323,7 @@ class Header extends Component {
                 <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
               </a>
               <FeedbackLink className="dropdown-item" dataCy="header-feedback-link">
-                <i class="dropdown-icon fe fe-message-circle" /> <Text id="feedback.generalLink" />
+                <i class="dropdown-icon fe fe-message-circle" /> <Text id="feedback.link" />
               </FeedbackLink>
               <a class="dropdown-item" href="" onClick={props.logout}>
                 <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />

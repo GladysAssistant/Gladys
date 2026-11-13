@@ -7632,8 +7632,7 @@
     }
   },
   "feedback": {
-    "integrationLink": "Feedback geben",
-    "generalLink": "Feedback zu Gladys geben",
+    "link": "Feedback geben",
     "subjectTopicTitle": "Mein Feedback zur Integration {{subject}}",
     "generalTopicTitle": "Mein Feedback zu Gladys",
     "topicBody": "<!-- Erzählen Sie uns: was gut funktioniert, was Sie blockiert, was Sie sich verbessert wünschen. Jedes Feedback ist willkommen! -->\n\n\n\n---\n_Gesendet von Gladys v{{version}}_"

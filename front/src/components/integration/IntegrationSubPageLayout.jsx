@@ -39,7 +39,7 @@ const IntegrationSubPageLayout = ({ title, tabs, children }) => (
             <BackToIntegrationsLink />
             <FeedbackLink subject={title} className="hz-feedback-link mb-4" dataCy="integration-feedback-link">
               <i class="fe fe-message-circle mr-1" />
-              <Text id="feedback.integrationLink" />
+              <Text id="feedback.link" />
             </FeedbackLink>
           </div>
           <h3 class="page-title mb-3">{title}</h3>
