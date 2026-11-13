@@ -147,6 +147,130 @@ describe('Integration host API: energy contracts', () => {
     await gladys.device.destroy('host-meter');
   });
 
+  describe('GET /api/integration/v1/energy/price', () => {
+    const batteryExternalId = `ext:${TEST_ENERGY_MANIFEST_SELECTOR}:battery`;
+    const HOUR_MS = 60 * 60 * 1000;
+    const window = (fromMs, toMs) =>
+      `from=${encodeURIComponent(new Date(fromMs).toISOString())}&to=${encodeURIComponent(
+        new Date(toMs).toISOString(),
+      )}`;
+    let meter;
+    beforeEach(async () => {
+      await db.Service.update(
+        { manifest: { ...TEST_ENERGY_MANIFEST, energy_prices: true } },
+        { where: { id: service.id } },
+      );
+      meter = await gladys.device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Main meter',
+        external_id: 'main-meter',
+        selector: 'main-meter',
+        features: [],
+      });
+      // a home battery: no energy source feature, it is on the main meter
+      await gladys.device.create({
+        service_id: service.id,
+        name: 'Battery',
+        external_id: batteryExternalId,
+        selector: 'battery',
+        features: [],
+      });
+    });
+    afterEach(async () => {
+      gladys.externalIntegration.energyPriceRateLimits.clear();
+      await gladys.device.destroy('battery');
+      await gladys.device.destroy('main-meter');
+    });
+
+    it('should return the energy price of the main meter, never the contract nor the meter', async () => {
+      await gladys.energyContract.create({
+        name: 'Base',
+        electric_meter_device_id: meter.id,
+        valid_from: '2025-01-01',
+        currency: 'EUR',
+        timezone: 'UTC',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            { key: 'energy', kind: 'consumption', rules: [], fallback: { label: 'Base', price: 0.2 } },
+            { key: 'subscription', kind: 'fixed', amount: 12, per: 'month' },
+          ],
+        },
+      });
+      const slotStart = Math.floor(Date.now() / (30 * 60 * 1000)) * 30 * 60 * 1000;
+      const prices = await api()
+        .get(
+          `/api/integration/v1/energy/price?device_external_id=${batteryExternalId}&${window(
+            slotStart,
+            slotStart + HOUR_MS,
+          )}`,
+        )
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => res.body);
+      expect(prices).to.deep.equal({
+        currency: 'EUR',
+        slots: [
+          {
+            starts_at: new Date(slotStart).toISOString(),
+            ends_at: new Date(slotStart + HOUR_MS / 2).toISOString(),
+            price: 0.2,
+            label: 'Base',
+          },
+          {
+            starts_at: new Date(slotStart + HOUR_MS / 2).toISOString(),
+            ends_at: new Date(slotStart + HOUR_MS).toISOString(),
+            price: 0.2,
+            label: 'Base',
+          },
+        ],
+      });
+    });
+
+    it('should answer 403 without energy_prices: true in the manifest', async () => {
+      await db.Service.update({ manifest: TEST_ENERGY_MANIFEST }, { where: { id: service.id } });
+      await api()
+        .get(
+          `/api/integration/v1/energy/price?device_external_id=${batteryExternalId}&${window(
+            Date.now(),
+            Date.now() + HOUR_MS,
+          )}`,
+        )
+        .expect(403);
+    });
+
+    it('should answer 400 on an invalid window and 404 on a device not ours or not on a meter', async () => {
+      await api()
+        .get(`/api/integration/v1/energy/price?device_external_id=${batteryExternalId}&from=yesterday&to=now`)
+        .expect(400);
+      await api()
+        .get(
+          `/api/integration/v1/energy/price?device_external_id=${batteryExternalId}&${window(
+            Date.now(),
+            Date.now() + 8 * 24 * HOUR_MS,
+          )}`,
+        )
+        .expect(400);
+      // the meter belongs to another service: invisible, like an unknown device
+      await api()
+        .get(
+          `/api/integration/v1/energy/price?device_external_id=main-meter&${window(Date.now(), Date.now() + HOUR_MS)}`,
+        )
+        .expect(404)
+        .then((res) => expect(res.body.message).to.equal('DEVICE_NOT_FOUND'));
+      // no contract in the instance: no main meter
+      await api()
+        .get(
+          `/api/integration/v1/energy/price?device_external_id=${batteryExternalId}&${window(
+            Date.now(),
+            Date.now() + HOUR_MS,
+          )}`,
+        )
+        .expect(404)
+        .then((res) => expect(res.body.message).to.equal('DEVICE_NOT_ON_ELECTRIC_METER'));
+    });
+  });
+
   describe('POST /api/integration/v1/energy/consumption', () => {
     const consumptionExternalId = `ext:${TEST_ENERGY_MANIFEST_SELECTOR}:meter:consumption`;
     beforeEach(async () => {

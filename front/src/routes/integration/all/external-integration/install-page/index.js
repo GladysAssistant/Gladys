@@ -324,6 +324,13 @@ class ExternalIntegrationInstallPage extends Component {
                               </div>
                             )}
 
+                            {manifest.energy_prices === true && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-zap mr-1" />
+                                <Text id="integration.externalIntegration.install.energyPricesText" />
+                              </div>
+                            )}
+
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
 
                             <WidgetsSummary widgets={manifest.widgets} language={language} />

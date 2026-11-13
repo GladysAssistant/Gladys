@@ -188,6 +188,8 @@ The schema lives in `server/lib/energy-contract/tariff.schema.json` (the JSON Sc
 
 Owned by `docs/specs/external-integrations/capabilities/energy-contracts.md`: manifest field, host API endpoints, WebSocket messages, trust boundary of the delegated mode, provider discovery and lifecycle, SDK surface, and the two publishing paths (catalogue for code-free contracts, integration for everything else).
 
+The other direction, an integration **reading** the energy price per kWh that applies to one of its own devices (a home battery valuing the energy it shifts), is the `energy_prices` capability, owned by `docs/specs/external-integrations/capabilities/energy-prices.md`: `energyContract.getMeterPrices(meterDeviceId, { from, to })` prices the slots of a window with the unit price of 7.7 (`getUnitPriceAt`, energy only), each slot by the contract active at its start, tiers on the meter's real accumulations, and a `delegated` contract only at the current instant through `getCurrent`.
+
 ## 6. Use cases: what the engine must cover
 
 The rule engine is validated against the contract families below; each row becomes an engine test case (`server/test/lib/energy-contract/tariffs/<country>-<contract>.test.js`) with a real JSON definition and expected intervals. The amounts in the examples are illustrative, never official tariffs.

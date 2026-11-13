@@ -65,6 +65,13 @@ the installation has several meters.
 - **Main meter feature** (`getDefaultElectricMeterFeatureId`, unchanged signature): the root
   feature of the meter of the most recently created consumption contract (a production contract
   never makes a solar meter the main meter). It never returns a derived feature.
+- **Meter of a device** (`energyContract.getDeviceElectricMeterId(device)`, the price read of
+  `docs/specs/external-integrations/capabilities/energy-prices.md`): the device of the root reached
+  by walking up the parents (`getRootElectricMeterDevice`) of its first attachment feature that
+  resolves — the device itself for a meter or an unattached device, `null` on a missing parent or
+  a cycle. A device with no energy source feature at all (a home battery publishing only powers
+  and `battery-storage` indexes) can never be attached: it is on the meter of the most recently
+  created consumption contract, the main meter (`null` without any consumption contract).
 
 ## C. Invariants
 
