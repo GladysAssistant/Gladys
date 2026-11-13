@@ -52,7 +52,7 @@ describe('zigbee2mqtt init', () => {
     zigbee2mqttManager.saveConfiguration = sinon.stub();
     zigbee2mqttManager.saveOrDestroyVariable = sinon.stub().resolves();
     zigbee2mqttManager.pullMissingImages = sinon.stub();
-    zigbee2mqttManager.checkForContainerUpdates = sinon.stub();
+    zigbee2mqttManager.checkForContainerUpdates = sinon.stub().resolves([]);
     zigbee2mqttManager.installMqttContainer = sinon.stub();
     zigbee2mqttManager.installZ2mContainer = sinon.stub();
     zigbee2mqttManager.emitStatusEvent = sinon.stub();
@@ -208,7 +208,7 @@ describe('zigbee2mqtt init', () => {
     // ASSERT
     assert.calledOnce(zigbee2mqttManager.getConfiguration);
     assert.calledOnce(zigbee2mqttManager.saveConfiguration);
-    assert.calledOnceWithExactly(zigbee2mqttManager.pullMissingImages);
+    assert.calledOnceWithExactly(zigbee2mqttManager.pullMissingImages, {});
     assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
@@ -403,8 +403,8 @@ describe('zigbee2mqtt init', () => {
   it('should forget the failed downloads once it ends, for a later call to download again', async () => {
     // PREPARE
     zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' });
-    zigbee2mqttManager.pullMissingImages.callsFake(async () => {
-      zigbee2mqttManager.imagePullFailures = { 'koenkk/zigbee2mqtt:2.14.2': new Error('docker fail pull') };
+    zigbee2mqttManager.pullMissingImages.callsFake(async (failures) => {
+      failures['koenkk/zigbee2mqtt:2.14.2'] = new Error('docker fail pull');
       throw new Error('docker fail pull');
     });
     let failuresKnownByInstallers;
@@ -507,6 +507,7 @@ describe('zigbee2mqtt init', () => {
     const z2mContainer = {
       id: 'old-z2m',
       name: '/gladys-z2m-zigbee2mqtt',
+      image: 'koenkk/zigbee2mqtt:2.6.0',
       state: 'running',
       labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
     };
@@ -645,8 +646,9 @@ describe('zigbee2mqtt init', () => {
       // EXECUTE
       await zigbee2mqttManager.init();
       // ASSERT
-      // A container to create downloads its image again, and fails there if it still cannot
-      assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
+      // Nothing replaced without the images. A container to create downloads its image again, and fails there if it
+      // still cannot.
+      assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
       assert.calledOnce(zigbee2mqttManager.installMqttContainer);
       assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
       assert.calledOnceWithExactly(
@@ -655,6 +657,87 @@ describe('zigbee2mqtt init', () => {
         error,
       );
       assert.notCalled(zigbee2mqttManager.finishInstallation);
+    });
+
+    it('should keep the outdated containers running when a setup runs this init and the new images are not downloaded', async () => {
+      // PREPARE
+      // The update, the download and the installation of Zigbee2mqtt are done for real
+      delete zigbee2mqttManager.pullMissingImages;
+      delete zigbee2mqttManager.checkForContainerUpdates;
+      delete zigbee2mqttManager.installZ2mContainer;
+      zigbee2mqttManager.configureContainer = fake.resolves({ configChanged: false, adapterChanged: false });
+      Object.assign(gladys.system, {
+        // Only the new Zigbee2mqtt image is missing, and cannot be downloaded (no Internet, disk full)
+        imageExists: fake((image) => Promise.resolve(image !== 'koenkk/zigbee2mqtt:2.14.2')),
+        pull: fake.rejects(new Error('docker fail pull')),
+        removeContainer: fake.resolves(null),
+        inspectContainer: fake.resolves({
+          State: { StartedAt: '2026-01-01T08:00:00.123456789Z' },
+          HostConfig: { RestartPolicy: { Name: 'always' }, Devices: [{ PathOnHost: '/dev/ttyUSB0' }] },
+        }),
+        getGladysBasePath: fake.resolves({ basePathOnHost: '/var/lib/gladysassistant', basePathOnContainer: '/tmp' }),
+        // Unknown without df
+        getDiskSpace: fake.resolves(null),
+      });
+      // The setup page saved (a new port of the interface) while an update is pending
+      zigbee2mqttManager.startInstallation('install');
+      // EXECUTE
+      await zigbee2mqttManager.init(true);
+      // ASSERT
+      assert.calledOnce(gladys.system.pull);
+      assert.notCalled(gladys.system.removeContainer);
+      // Tried again on the next start, with the old version still stored
+      assert.calledWithMatch(zigbee2mqttManager.saveConfiguration, { dockerZ2mVersion: '12' });
+      expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+    });
+
+    it('should follow the update of the broker alone like an installation', async () => {
+      // PREPARE
+      zigbee2mqttManager.getConfiguration.resolves({
+        z2mDriverPath: '/dev/ttyUSB0',
+        mqttPassword: 'mqttPassword',
+        dockerMqttVersion: '1',
+        dockerZ2mVersion: DEFAULT.DOCKER_Z2M_VERSION,
+      });
+      gladys.system.getContainers = fake.resolves([{ ...z2mContainer, id: 'mqtt', name: '/gladys-z2m-mqtt' }]);
+      // EXECUTE
+      await zigbee2mqttManager.init();
+      // ASSERT
+      expect(zigbee2mqttManager.installation.kind).to.equal('update');
+      assert.calledOnce(gladys.system.getContainers);
+      assert.calledWithMatch(gladys.system.getContainers, { filters: { name: ['gladys-z2m-mqtt'] } });
+      expect(await finished).to.equal(null);
+    });
+
+    it('should go on when the image of a replaced container fails to be removed', async () => {
+      // PREPARE
+      zigbee2mqttManager.checkForContainerUpdates.resolves(['koenkk/zigbee2mqtt:2.6.0']);
+      const error = new Error('docker fail');
+      gladys.system.removeImage = fake.rejects(error);
+      // EXECUTE
+      await zigbee2mqttManager.init();
+      // ASSERT
+      assert.calledOnceWithExactly(
+        logger.warn,
+        'Zigbee2mqtt: image koenkk/zigbee2mqtt:2.6.0 of the replaced container not removed:',
+        error,
+      );
+      assert.calledOnce(zigbee2mqttManager.saveConfiguration);
+      expect(await finished).to.equal(null);
+    });
+
+    it('should not follow as an update a broker left by a first installation that failed', async () => {
+      // PREPARE
+      // No version stored: they are stored once init ends
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' });
+      gladys.system.getContainers = fake.resolves([{ ...z2mContainer, id: 'mqtt', name: '/gladys-z2m-mqtt' }]);
+      // EXECUTE
+      await zigbee2mqttManager.init();
+      // ASSERT
+      expect(zigbee2mqttManager.installation.state).to.equal('idle');
+      // Still recreated with the accounts saved
+      assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
+      assert.notCalled(gladys.system.getContainers);
     });
 
     it('should not tell an update failed when init fails without one', async () => {
@@ -750,6 +833,7 @@ describe('zigbee2mqtt init', () => {
         createContainer: fake(async () => {
           currentZ2mContainer = { ...z2mContainer, id: 'new-z2m', state: 'created' };
         }),
+        removeImage: fake.resolves(true),
         getGladysBasePath: fake.resolves({ basePathOnHost: '/var/lib/gladysassistant', basePathOnContainer: '/tmp' }),
         // Unknown without df
         getDiskSpace: fake.resolves(null),
@@ -762,6 +846,9 @@ describe('zigbee2mqtt init', () => {
       assert.calledOnceWithExactly(gladys.system.removeContainer, 'old-z2m', { force: true });
       assert.calledOnce(gladys.system.createContainer);
       assert.callOrder(gladys.system.pull, gladys.system.removeContainer, gladys.system.createContainer);
+      // Its old image once the new container exists, which Docker keeps if the new one uses it
+      assert.calledOnceWithExactly(gladys.system.removeImage, 'koenkk/zigbee2mqtt:2.6.0');
+      assert.callOrder(gladys.system.createContainer, gladys.system.removeImage);
       assert.calledOnceWithExactly(gladys.system.restartContainer, 'new-z2m');
       const pullPhase = zigbee2mqttManager.installation.phases.find(({ key }) => key === 'pull_z2m');
       expect(pullPhase).to.deep.equal({ key: 'pull_z2m', state: 'done', progress: 100 });

@@ -52,7 +52,7 @@ class SetupLocalMode extends Component {
     }
   }
 
-  render({ configuration, httpClient, disabled, zigbee2mqttStatus }, { editionMode }) {
+  render({ configuration, httpClient, disabled, zigbee2mqttStatus, prefetchImages }, { editionMode }) {
     if (editionMode) {
       return (
         <SetupLocalOptions
@@ -62,6 +62,7 @@ class SetupLocalMode extends Component {
           saveConfiguration={this.saveConfiguration}
           resetConfiguration={this.resetConfiguration}
           zigbee2mqttStatus={zigbee2mqttStatus}
+          prefetchImages={prefetchImages}
         />
       );
     }

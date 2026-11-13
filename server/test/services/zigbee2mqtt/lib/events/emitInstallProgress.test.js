@@ -85,6 +85,25 @@ describe('zigbee2mqtt emitInstallProgress', () => {
     expect(sentProgresses).to.deep.equal([0, 20]);
   });
 
+  it('should not send again what did not change, to every user and through Gladys Plus', () => {
+    // EXECUTE
+    zigbee2mqttManager.emitInstallProgress();
+    clock.tick(500);
+    zigbee2mqttManager.emitInstallProgress();
+    clock.tick(500);
+    zigbee2mqttManager.emitInstallProgress(true);
+    expect(sentProgresses).to.deep.equal([0]);
+    // ASSERT
+    // Sent at once on a change: the interval counts from the last send
+    zigbee2mqttManager.prefetch.progress = 5;
+    zigbee2mqttManager.emitInstallProgress();
+    expect(sentProgresses).to.deep.equal([0, 0]);
+    clock.tick(500);
+    zigbee2mqttManager.installation.progress = 10;
+    zigbee2mqttManager.emitInstallProgress();
+    expect(sentProgresses).to.deep.equal([0, 0, 10]);
+  });
+
   it('should send at once after the interval', () => {
     // EXECUTE
     zigbee2mqttManager.emitInstallProgress();

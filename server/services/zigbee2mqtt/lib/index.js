@@ -112,7 +112,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.prefetchProgressByImage = {};
   // Download of each image being pulled, shared by the installation and the prefetch (see pullImage)
   this.imagePulls = {};
-  // Error of each download that failed in the last pullMissingImages, given again without downloading (see pullImage)
+  // Error of each download that failed in the running init, given again without downloading (see pullImage)
   this.imagePullFailures = {};
   // Number of inits, disconnects, resets and ezsp fallbacks running (see refuseWhileInstalling, and the stop of the
   // service, which waits for them). A count, not a flag:
@@ -121,6 +121,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.runningOperations = 0;
   // See emitInstallProgress
   this.installProgressSentAt = null;
+  this.installProgressSentPayload = null;
   this.installProgressTimer = null;
 
   this.backup = gladys.job.wrapper(JOB_TYPES.SERVICE_ZIGBEE2MQTT_BACKUP, this.backup.bind(this));

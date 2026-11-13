@@ -10,6 +10,8 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 const { ConflictError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
+const z2mContainerDescriptor = require('../../../../services/zigbee2mqtt/docker/gladys-z2m-zigbee2mqtt-container.json');
+
 const configureContainer = fake.resolves({ configChanged: false, adapterChanged: false });
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
   './configureContainer': { configureContainer },
@@ -261,6 +263,25 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
+  it('should keep the z2m container in place when the adapter type changes and its image cannot be downloaded', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([container]);
+    gladys.system.pull = fake.rejects(new Error('docker fail pull'));
+    zigbee2mqttManager.configureContainer = fake.resolves({ configChanged: true, adapterChanged: true });
+    sinon.stub(logger, 'error');
+    // EXECUTE
+    const promise = zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith('docker fail pull');
+    logger.error.restore();
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(gladys.system.createContainer);
+    // Restarted on the configuration written with the new adapter: a later setup finds nothing to change
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+  });
+
   it('should create the z2m container without USB device in network mode', async () => {
     // PREPARE
     const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
@@ -337,6 +358,22 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.calledOnce(gladys.system.createContainer);
     const [createdDescriptor] = gladys.system.createContainer.firstCall.args;
     expect(createdDescriptor.HostConfig.Devices).to.deep.equal([]);
+  });
+
+  it('should keep the z2m container in place when the image of a new coordinator failed to download', async () => {
+    // PREPARE
+    const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
+    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+    // An update postponed for want of Internet or disk space, the new image is missing (see init)
+    const error = new Error('docker fail pull');
+    zigbee2mqttManager.imagePullFailures = { [z2mContainerDescriptor.Image]: error };
+    // EXECUTE
+    const promise = zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith(error);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(zigbee2mqttManager.restoreZ2mBackup);
   });
 
   it('should keep the z2m container of an already configured network coordinator', async () => {

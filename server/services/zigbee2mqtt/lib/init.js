@@ -28,15 +28,40 @@ const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-contain
  */
 async function isUpdateRequired(system, config) {
   const outdatedDescriptors = [];
-  if (config.dockerMqttVersion !== DEFAULT.DOCKER_MQTT_VERSION) {
+  // Without a stored version, a container was left by a first installation that failed (the versions are stored once
+  // init ends): recreated by checkForContainerUpdates, but not shown as an update
+  if (config.dockerMqttVersion && config.dockerMqttVersion !== DEFAULT.DOCKER_MQTT_VERSION) {
     outdatedDescriptors.push(mqttContainerDescriptor);
   }
-  if (config.dockerZ2mVersion !== DEFAULT.DOCKER_Z2M_VERSION) {
+  if (config.dockerZ2mVersion && config.dockerZ2mVersion !== DEFAULT.DOCKER_Z2M_VERSION) {
     outdatedDescriptors.push(z2mContainerDescriptor);
   }
   // Not ours, a container is not replaced: checkForContainerUpdates fails, and tells why
   const containers = await Promise.all(outdatedDescriptors.map((descriptor) => findOwnContainer(system, descriptor)));
   return containers.some((container) => container !== null);
+}
+
+/**
+ * @description Remove the images of the containers replaced by a new version: each version left behind takes the disk
+ * space that the download of the next one needs (see pullImage). Called once the new containers exist: Docker then
+ * declines to remove an image that one of them still uses (a new version that keeps the same image), or a container
+ * of the user. Never forced, best effort: the update goes on without it.
+ * @param {object} system - Gladys system module.
+ * @param {Array<string>} images - Images of the replaced containers.
+ * @returns {Promise} Resolve once each image is removed, or left.
+ * @example
+ * await removeReplacedImages(this.gladys.system, ['koenkk/zigbee2mqtt:2.6.0']);
+ */
+async function removeReplacedImages(system, images) {
+  await Promise.all(
+    images.map(async (image) => {
+      try {
+        await system.removeImage(image);
+      } catch (e) {
+        logger.warn(`Zigbee2mqtt: image ${image} of the replaced container not removed:`, e);
+      }
+    }),
+  );
 }
 
 /**
@@ -204,16 +229,19 @@ async function initialize(setupMode) {
 
       // Before any container is replaced: a container replaced by a new version keeps running during the download
       let newImagesPulled = true;
+      // Kept for the containers of this init only (see pullImage): a later call downloads again
+      this.imagePullFailures = {};
       try {
-        await this.pullMissingImages();
+        await this.pullMissingImages(this.imagePullFailures);
       } catch (e) {
+        // Without the new images (no Internet, registry down, disk full), the running containers are kept, whoever runs
+        // this init (a setup too): the update is tried again on the next start, instead of leaving Gladys without
+        // Zigbee until then
+        newImagesPulled = false;
         if (updating) {
-          // Without the new images (no Internet, registry down), the running containers are kept and Gladys connects
-          // to them: the update is tried again on the next start, instead of leaving Gladys without Zigbee until then
           logger.warn('Zigbee2mqtt: new images not downloaded, the update is postponed to the next start:', e);
           this.finishInstallation(e);
           updating = false;
-          newImagesPulled = false;
         } else {
           // Only a container to create needs its image, and fails on the same error then (see pullImage): running
           // containers whose image tag left the machine (removed by hand) keep running, Gladys connects to them
@@ -227,9 +255,7 @@ async function initialize(setupMode) {
         }
       }
       // Skipped, the stored versions stay the old ones
-      if (newImagesPulled) {
-        await this.checkForContainerUpdates(configuration);
-      }
+      const replacedImages = newImagesPulled ? await this.checkForContainerUpdates(configuration) : [];
       await this.installMqttContainer(configuration);
       await this.installZ2mContainer(configuration, setupMode);
 
@@ -243,6 +269,8 @@ async function initialize(setupMode) {
           this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
         }
       }
+      // Once Gladys is connected: removing an image takes a few seconds on an SD card
+      await removeReplacedImages(this.gladys.system, replacedImages);
       logger.info(`Zigbee2mqtt: containers installed and started in ${formatDuration(Date.now() - startedAt)}`);
     } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
       await this.connect(configuration);
@@ -279,7 +307,8 @@ async function init(setupMode = false) {
     return await initialize.call(this, setupMode);
   } finally {
     this.runningOperations -= 1;
-    // Kept for the containers of this init only: a later call downloads again
+    // Kept for the containers of this init only: a later call downloads again. A download that fails once init ended
+    // writes in the table of this init, no longer read.
     this.imagePullFailures = {};
   }
 }

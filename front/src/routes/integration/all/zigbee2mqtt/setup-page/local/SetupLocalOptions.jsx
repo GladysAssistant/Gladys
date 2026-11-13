@@ -223,6 +223,16 @@ class SetupLocalOptions extends Component {
     this.preselectDetectedDongle();
   }
 
+  componentDidUpdate() {
+    // A coordinator chosen, or the dongle preselected: Zigbee2mqtt is set up on this Gladys, its images can be downloaded
+    // ahead. Asked again on each update, as the page waits for the server to tell it runs in Docker (see prefetchImages).
+    const { z2mAdapterMode, z2mDriverPath, z2mNetworkAdapterUrl } = this.state;
+    const coordinator = z2mAdapterMode === ADAPTER_MODE.NETWORK ? z2mNetworkAdapterUrl : z2mDriverPath;
+    if (coordinator) {
+      this.props.prefetchImages();
+    }
+  }
+
   render(
     { disabled, configuration, zigbee2mqttStatus },
     {

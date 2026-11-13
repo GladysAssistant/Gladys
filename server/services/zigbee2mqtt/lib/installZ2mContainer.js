@@ -87,6 +87,9 @@ async function installZ2mContainer(config, setupMode = false) {
       logger.info(
         `Zigbee2mqtt container with USB dongle path ${currentDevicePath} should be removed (new Zigbee coordinator ${newCoordinator} configured)...`,
       );
+      // Before it is removed: without its image (an update postponed for want of Internet or disk space), the
+      // container in place keeps running instead of leaving Gladys without Zigbee
+      await this.pullImage(containerDescriptor.Image);
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
       creationNeeded = true;
@@ -161,6 +164,15 @@ async function installZ2mContainer(config, setupMode = false) {
     // If adapter type changed, remove and recreate container for clean state and fresh logs
     if (adapterChanged && !creationNeeded && container) {
       logger.info('Zigbee2mqtt adapter type changed, recreating container...');
+      // Before it is removed, like on a change of coordinator above
+      try {
+        await this.pullImage(containerDescriptor.Image);
+      } catch (e) {
+        // Its configuration already names the new adapter: restarted, the container in place runs it on its image,
+        // instead of the old adapter until Docker restarts it, which a later setup would not notice
+        await this.gladys.system.restartContainer(container.id);
+        throw e;
+      }
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
 

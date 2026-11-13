@@ -131,9 +131,9 @@ async function downloadImage(manager, image) {
  * await this.pullImage('eclipse-mosquitto:2.0.15');
  */
 async function pullImage(image) {
-  // Failed in the last pullMissingImages, after which init goes on with the containers in place: a container to create
-  // fails at once on the same error, instead of waiting for a stalled registry once more. Downloaded again by the next
-  // pullMissingImages.
+  // Failed in the pullMissingImages of the running init, which goes on with the containers in place: a container to
+  // create fails at once on the same error, instead of waiting for a stalled registry once more. Downloaded again by
+  // the next init.
   if (this.imagePullFailures[image]) {
     this.updateInstallationPhase(PULL_PHASE_BY_IMAGE[image], { state: INSTALLATION_PHASE_STATE.FAILED });
     throw this.imagePullFailures[image];
