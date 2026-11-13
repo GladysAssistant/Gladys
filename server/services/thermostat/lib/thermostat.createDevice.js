@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { BadParameters } = require('../../../utils/coreErrors');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -7,7 +8,8 @@ const {
   THERMOSTAT_PRESET,
   THERMOSTAT_ACTIVE_PRESET,
 } = require('../../../utils/constants');
-const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
+const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE, defaultTempRange } = require('../../../utils/thermostatConstants');
+const { toNumber } = require('./thermostat.deviceConfig');
 
 // The params that make an external thermostat drive a real device: its
 // setpoint, its running state, its mode and its power. A pilot-wire heater has
@@ -258,6 +260,26 @@ async function createDevice(device) {
     });
   }
 
+  // An inverted range bounds nothing anyone could mean, and one with no width
+  // pins the dial to a single value: refused here as in the form, so a client
+  // writing the params directly cannot save one either. A
+  // missing bound is the default its readers take, in the thermostat's unit:
+  // a minimum of 40 saved alone was compared with the default maximum of 35 by
+  // the clamp and the widget, and dropped for the default range without a word.
+  // A heater regulating itself takes no range, and the form hides the fields.
+  if (!heaterRegulates) {
+    const paramValue = (name) => {
+      const param = params.find((candidate) => candidate.name === name);
+      return param ? param.value : undefined;
+    };
+    const defaults = defaultTempRange(paramValue('THERMOSTAT_TEMP_UNIT'));
+    const min = toNumber(paramValue('THERMOSTAT_MIN_TEMP'), defaults.min);
+    const max = toNumber(paramValue('THERMOSTAT_MAX_TEMP'), defaults.max);
+    if (min >= max) {
+      throw new BadParameters(`Thermostat: the minimum temperature ${min} is not below the maximum ${max}`);
+    }
+  }
+
   const features = (device.features || []).filter(
     (feature) =>
       feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
@@ -284,7 +306,13 @@ async function createDevice(device) {
     // The state features are built here rather than taken from the payload: they
     // are not the client's to shape, and a device saved before they existed gets
     // them on its next save.
-    features: [...(external ? [] : features.slice(0, 1)), ...buildStateFeatures(device, external)],
+    // The setpoint is saved by this service itself, clamped (D.0): with
+    // `has_feedback: false` the core saved the value as requested right after,
+    // undoing the clamp and writing a second history row.
+    features: [
+      ...(external ? [] : features.slice(0, 1).map((feature) => ({ ...feature, has_feedback: true }))),
+      ...buildStateFeatures(device, external),
+    ],
     params,
     service_id: this.serviceId,
   });

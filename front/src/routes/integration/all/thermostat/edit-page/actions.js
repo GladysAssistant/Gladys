@@ -10,7 +10,8 @@ import {
   MAX_WINDOW_DELAY_SECONDS,
   defaultPresetTemps,
   parsePilotWireStandbyOrder,
-  supportedStandbyOrder
+  supportedStandbyOrder,
+  defaultTempRange
 } from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
@@ -231,14 +232,17 @@ function createActions(store) {
           activeSchedule = '';
         }
         const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE'));
+        // Bounds never saved default in the thermostat's unit: 5-35 shown on a
+        // Fahrenheit one was saved as 5-35 °F.
+        const rangeDefaults = defaultTempRange(getParam('THERMOSTAT_TEMP_UNIT'));
         store.setState({
           thermostatEditActiveSchedule: activeSchedule,
           thermostatEditDeviceSchedule: activeSchedule,
           thermostatEditDevice: device,
           thermostatEditName: device.name,
           thermostatEditMode: getParam('THERMOSTAT_MODE') || 'heating',
-          thermostatEditMinTemp: getParam('THERMOSTAT_MIN_TEMP') || '5',
-          thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || '35',
+          thermostatEditMinTemp: getParam('THERMOSTAT_MIN_TEMP') || String(rangeDefaults.min),
+          thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || String(rangeDefaults.max),
           thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C',
           thermostatEditControlType: getParam('THERMOSTAT_CONTROL_TYPE') || 'hysteresis',
           // One sensor or several (spec A.1.1).
@@ -373,9 +377,10 @@ function createActions(store) {
 
         const name = state.thermostatEditName || 'Thermostat';
         const mode = state.thermostatEditMode || 'heating';
-        const minTemp = toNumber(state.thermostatEditMinTemp, 5);
-        const maxTemp = toNumber(state.thermostatEditMaxTemp, 35);
         const tempUnit = state.thermostatEditTempUnit || 'C';
+        const rangeDefaults = defaultTempRange(tempUnit);
+        const minTemp = toNumber(state.thermostatEditMinTemp, rangeDefaults.min);
+        const maxTemp = toNumber(state.thermostatEditMaxTemp, rangeDefaults.max);
         const temperatureFeature = serializeSelectorList(state.thermostatEditTemperatureFeatures);
         const humidityFeature = state.thermostatEditHumidityFeature || '';
         // Three types (spec A.1, C.1.1): `virtual`, regulated by Gladys through a
@@ -470,6 +475,14 @@ function createActions(store) {
           storedStandbyOrder,
           pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
         );
+        // An inverted range bounds nothing anyone could mean, and one with no
+        // width (20-20) pins the dial to a single value: refused here, and by
+        // the server for a client writing the params directly (spec D.0). A
+        // heater regulating itself takes no range, and its fields are hidden.
+        if (!isPilotWireThermostat && minTemp >= maxTemp) {
+          store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'invertedRange' });
+          return;
+        }
 
         const device = {
           name,
@@ -495,7 +508,9 @@ function createActions(store) {
                   type: 'target-temperature',
                   read_only: false,
                   keep_history: true,
-                  has_feedback: false,
+                  // Saved by the thermostat service itself, clamped to the range:
+                  // without feedback the core saved the requested value after it.
+                  has_feedback: true,
                   min: minTemp,
                   max: maxTemp,
                   unit: tempUnit === 'F' ? 'fahrenheit' : 'celsius'
@@ -606,8 +621,8 @@ function createActions(store) {
           thermostatEditDevice: null,
           thermostatEditName: '',
           thermostatEditMode: 'heating',
-          thermostatEditMinTemp: '5',
-          thermostatEditMaxTemp: '35',
+          thermostatEditMinTemp: String(defaultTempRange('C').min),
+          thermostatEditMaxTemp: String(defaultTempRange('C').max),
           thermostatEditTempUnit: 'C',
           thermostatEditControlType: 'hysteresis',
           thermostatEditTemperatureFeatures: [],
