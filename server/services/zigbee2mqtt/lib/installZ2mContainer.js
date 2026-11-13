@@ -1,13 +1,14 @@
 const cloneDeep = require('lodash.clonedeep');
-const { promisify } = require('util');
 
 const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
-const { ADAPTER_MODE } = require('./constants');
+const { ADAPTER_MODE, INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
+const { formatDuration } = require('../utils/formatDuration');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
-const sleep = promisify(setTimeout);
+const { PULL_Z2M, START_Z2M } = INSTALLATION_PHASE;
+const { RUNNING, DONE, SKIPPED } = INSTALLATION_PHASE_STATE;
 
 // Fallback when the user has not set a timezone yet: this is the timezone the container would
 // have used anyway, so it never makes the clock of a device worse than it already is.
@@ -86,6 +87,9 @@ async function installZ2mContainer(config, setupMode = false) {
       logger.info(
         `Zigbee2mqtt container with USB dongle path ${currentDevicePath} should be removed (new Zigbee coordinator ${newCoordinator} configured)...`,
       );
+      // Before it is removed: without its image (an update postponed for want of Internet or disk space), the
+      // container in place keeps running instead of leaving Gladys without Zigbee
+      await this.pullImage(containerDescriptor.Image);
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
       creationNeeded = true;
@@ -121,8 +125,10 @@ async function installZ2mContainer(config, setupMode = false) {
 
     try {
       logger.info('Zigbee2mqtt is being installed as Docker container...');
-      logger.info(`Pulling ${containerDescriptor.Image} image...`);
-      await this.gladys.system.pull(containerDescriptor.Image);
+      await this.pullImage(containerDescriptor.Image);
+      // Done once downloaded, maybe before by init (see pullImage): skipped when the image was there already
+      this.updateInstallationPhase(PULL_Z2M, { state: SKIPPED });
+      this.updateInstallationPhase(START_Z2M, { state: RUNNING });
 
       logger.info(`Configuration of Device ${networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath}`);
       const containerDescriptorToMutate = buildContainerDescriptor(
@@ -133,7 +139,9 @@ async function installZ2mContainer(config, setupMode = false) {
       );
 
       logger.info(`Creation of container...`);
+      const creationStartedAt = Date.now();
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
+      logger.info(`Zigbee2mqtt container created in ${formatDuration(Date.now() - creationStartedAt)}`);
       logger.trace(containerLog);
       logger.info('Zigbee2mqtt successfully installed and configured as Docker container');
       this.zigbee2mqttExist = true;
@@ -144,6 +152,8 @@ async function installZ2mContainer(config, setupMode = false) {
     } finally {
       this.emitStatusEvent();
     }
+  } else {
+    this.updateInstallationPhase(PULL_Z2M, { state: SKIPPED });
   }
 
   const { configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode);
@@ -154,6 +164,15 @@ async function installZ2mContainer(config, setupMode = false) {
     // If adapter type changed, remove and recreate container for clean state and fresh logs
     if (adapterChanged && !creationNeeded && container) {
       logger.info('Zigbee2mqtt adapter type changed, recreating container...');
+      // Before it is removed, like on a change of coordinator above
+      try {
+        await this.pullImage(containerDescriptor.Image);
+      } catch (e) {
+        // Its configuration already names the new adapter: restarted, the container in place runs it on its image,
+        // instead of the old adapter until Docker restarts it, which a later setup would not notice
+        await this.gladys.system.restartContainer(container.id);
+        throw e;
+      }
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
 
@@ -163,7 +182,9 @@ async function installZ2mContainer(config, setupMode = false) {
         networkAdapter,
         timezone,
       );
+      const creationStartedAt = Date.now();
       await this.gladys.system.createContainer(containerDescriptorToMutate);
+      logger.info(`Zigbee2mqtt container created in ${formatDuration(Date.now() - creationStartedAt)}`);
 
       container = await findManagedContainer(this.gladys.system, containerDescriptor);
     }
@@ -171,9 +192,12 @@ async function installZ2mContainer(config, setupMode = false) {
     // Check if we need to restart the container (container is not running / config changed)
     if (container.state !== 'running' || configChanged) {
       logger.info('Zigbee2mqtt container is (re)starting...');
+      this.updateInstallationPhase(START_Z2M, { state: RUNNING });
       // Until Zigbee2mqtt answers, the UI tells that it is starting, for a bounded time: a Zigbee2mqtt that
       // crashes before connecting to the broker never says anything
       this.zigbee2mqttStarting = true;
+      // To log how long Zigbee2mqtt takes to answer once restarted
+      this.zigbee2mqttStartingSince = Date.now();
       clearTimeout(this.startingTimer);
       this.startingTimer = setTimeout(() => {
         this.startingTimer = null;
@@ -183,12 +207,14 @@ async function installZ2mContainer(config, setupMode = false) {
       // Only the logs of the new run explain why it fails. Docker counts in seconds: taken before the restart, not
       // to miss the first lines of the new run
       const restartedAt = Math.floor(Date.now() / 1000);
+      const restartStartedAt = Date.now();
       await this.gladys.system.restartContainer(container.id);
-      // wait a few seconds for the container to restart
-      await sleep(this.containerRestartWaitTimeInMs);
+      logger.info(`Zigbee2mqtt container started in ${formatDuration(Date.now() - restartStartedAt)}`);
       // We read the logs in non blocking mode
       this.readZ2mContainerLogs(container.id, restartedAt);
+      this.updateInstallationPhase(START_Z2M, { state: DONE });
     } else {
+      this.updateInstallationPhase(START_Z2M, { state: SKIPPED });
       // Left running: it may still crash in a loop, seen between two restarts (Docker restarts it at once when it
       // ran for 10 s or more). Its current run tells why, when it is recent.
       const { State } = await this.gladys.system.inspectContainer(container.id);

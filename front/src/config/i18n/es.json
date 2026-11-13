@@ -1973,6 +1973,35 @@
           "confirmButton": "Sí, restablecer todo",
           "cancelButton": "Cancelar",
           "error": "Se produjo un error al restablecer la integración."
+        },
+        "installation": {
+          "titles": {
+            "install": "Instalación de Zigbee2MQTT",
+            "update": "Actualización de Zigbee2MQTT",
+            "switch": "Cambio de coordinador Zigbee"
+          },
+          "phases": {
+            "pull_z2m": "Descarga de Zigbee2MQTT",
+            "pull_mqtt": "Descarga del broker MQTT",
+            "start_mqtt": "Inicio del broker MQTT",
+            "start_z2m": "Inicio de Zigbee2MQTT",
+            "connect_adapter": "Conexión con el coordinador Zigbee"
+          },
+          "leavePage": "Puede salir de esta página: la instalación continúa.",
+          "failedPhase": "Paso fallido:",
+          "alreadyRunning": "Hay una instalación en curso o la integración está ocupada (inicio, parada o restablecimiento): espere a que termine antes de guardar de nuevo la configuración.",
+          "errors": {
+            "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos posteriores a su inicio, sin indicar por qué. Compruebe que el modelo elegido es el de su coordinador, desconecte y vuelva a conectar su adaptador o reinicie su coordinador de red, y después guarde de nuevo la configuración.",
+            "DONGLE_NOT_FOUND": "Su adaptador Zigbee no está conectado (o no en el puerto elegido): Zigbee2MQTT no ha podido iniciarse. Conéctelo, compruebe el puerto elegido y después guarde de nuevo la configuración.",
+            "NOT_ENOUGH_DISK_SPACE": "No hay suficiente espacio en disco para descargar Zigbee2MQTT. Libere espacio y después guarde de nuevo la configuración.",
+            "unknownErrorPrefix": "Error durante la instalación: "
+          }
+        },
+        "prefetch": {
+          "running": "Preparando la instalación en segundo plano · {{progress}} %",
+          "done": "Descarga completada: la instalación será rápida.",
+          "notEnoughDiskSpace": "Espacio en disco insuficiente: {{free}} MB libres, {{needed}} MB necesarios para instalar Zigbee2MQTT. Libere espacio antes de instalar.",
+          "notEnoughDiskSpaceNoFigures": "Espacio en disco insuficiente para instalar Zigbee2MQTT. Libere espacio antes de instalar."
         }
       },
       "device": {
@@ -5376,6 +5405,7 @@
       "device-state-purge-single-feature": "Limpieza de estados de una sola función",
       "vacuum": "Limpieza de la base de datos",
       "service-zigbee2mqtt-backup": "Copia de seguridad de Zigbee2MQTT",
+      "service-zigbee2mqtt-install": "Instalación de Zigbee2MQTT",
       "migrate-sqlite-to-duckdb": "Migración a DuckDB",
       "device-state-purge-all-sqlite-states": "Purgar todos los estados de SQLite",
       "device-state-purge-orphaned-duckdb-states": "Purgar estados huérfanos de DuckDB",

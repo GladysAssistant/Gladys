@@ -16,6 +16,7 @@ const { isEnabled } = require('./isEnabled');
 const { subscribe } = require('./subscribe');
 const { checkForContainerUpdates } = require('./checkForContainerUpdates');
 const { installMqttContainer } = require('./installMqttContainer');
+const { waitForBroker } = require('./waitForBroker');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { configureContainer } = require('./configureContainer');
 const { setup } = require('./setup');
@@ -32,10 +33,23 @@ const { readZ2mContainerLogs } = require('./readZ2mContainerLogs');
 const { reset } = require('./reset');
 const { requestHealthCheck } = require('./requestHealthCheck');
 const { fallbackToEzsp } = require('./fallbackToEzsp');
+const { startInstallation } = require('./startInstallation');
+const { updateInstallationPhase } = require('./updateInstallationPhase');
+const { waitForZigbee2mqtt } = require('./waitForZigbee2mqtt');
+const { finishInstallation } = require('./finishInstallation');
+const { runInstallation } = require('./runInstallation');
+const { pullImage } = require('./pullImage');
+const { pullMissingImages } = require('./pullMissingImages');
+const { startPrefetch } = require('./startPrefetch');
+const { updatePrefetchProgress } = require('./updatePrefetchProgress');
+const { refuseWhileInstalling } = require('./refuseWhileInstalling');
+const { clearInstallation } = require('./clearInstallation');
 const { JOB_TYPES } = require('../../../utils/constants');
+const { getIdleInstallation, getIdlePrefetch } = require('./constants');
 
 // EVENTS
 const { emitStatusEvent } = require('./events/emitStatusEvent');
+const { emitInstallProgress } = require('./events/emitInstallProgress');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -67,6 +81,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.zigbee2mqttConnected = false;
   // Gladys (re)started the Zigbee2mqtt container and waits for it to answer
   this.zigbee2mqttStarting = false;
+  // When Gladys (re)started it, to log how long Zigbee2mqtt took to answer
+  this.zigbee2mqttStartingSince = null;
   this.z2mPermitJoin = false;
   this.healthCheckTimer = null;
   this.networkModeValid = false;
@@ -78,12 +94,38 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.mqttConnectionError = null;
   this.dockerBased = false;
 
-  this.containerRestartWaitTimeInMs = 5 * 1000;
   // Without an answer by then, Zigbee2mqtt is shown as not answering instead of starting
   this.zigbee2mqttStartingTimeoutInMs = 2 * 60 * 1000;
   this.startingTimer = null;
 
+  // Installation launched by the setup, followed by the setup page (see startInstallation)
+  this.installation = getIdleInstallation();
+  this.installationStartedAt = null;
+  this.installationJobId = null;
+  this.installationJobProgress = 0;
+  // End of the running installation, waited for by the stop of the service (see startInstallation)
+  this.installationEnd = null;
+  this.resolveInstallationEnd = null;
+  // Download of the images before the setup, followed by the setup page too
+  this.prefetch = getIdlePrefetch();
+  // Progress of the download of each image of the running prefetch (see updatePrefetchProgress)
+  this.prefetchProgressByImage = {};
+  // Download of each image being pulled, shared by the installation and the prefetch (see pullImage)
+  this.imagePulls = {};
+  // Error of each download that failed in the running init, given again without downloading (see pullImage)
+  this.imagePullFailures = {};
+  // Number of inits, disconnects, resets and ezsp fallbacks running (see refuseWhileInstalling, and the stop of the
+  // service, which waits for them). A count, not a flag:
+  // reset runs a disconnect, and the start route shared by all services runs an init that the routes of this service
+  // cannot refuse, alongside another operation
+  this.runningOperations = 0;
+  // See emitInstallProgress
+  this.installProgressSentAt = null;
+  this.installProgressSentPayload = null;
+  this.installProgressTimer = null;
+
   this.backup = gladys.job.wrapper(JOB_TYPES.SERVICE_ZIGBEE2MQTT_BACKUP, this.backup.bind(this));
+  this.runInstallation = gladys.job.wrapper(JOB_TYPES.SERVICE_ZIGBEE2MQTT_INSTALL, this.runInstallation.bind(this));
   this.backupJob = {};
   this.backupScheduledJob = null;
 };
@@ -106,6 +148,7 @@ Zigbee2mqttManager.prototype.isEnabled = isEnabled;
 Zigbee2mqttManager.prototype.subscribe = subscribe;
 Zigbee2mqttManager.prototype.checkForContainerUpdates = checkForContainerUpdates;
 Zigbee2mqttManager.prototype.installMqttContainer = installMqttContainer;
+Zigbee2mqttManager.prototype.waitForBroker = waitForBroker;
 Zigbee2mqttManager.prototype.installZ2mContainer = installZ2mContainer;
 Zigbee2mqttManager.prototype.configureContainer = configureContainer;
 Zigbee2mqttManager.prototype.setup = setup;
@@ -122,8 +165,20 @@ Zigbee2mqttManager.prototype.readZ2mContainerLogs = readZ2mContainerLogs;
 Zigbee2mqttManager.prototype.reset = reset;
 Zigbee2mqttManager.prototype.requestHealthCheck = requestHealthCheck;
 Zigbee2mqttManager.prototype.fallbackToEzsp = fallbackToEzsp;
+Zigbee2mqttManager.prototype.startInstallation = startInstallation;
+Zigbee2mqttManager.prototype.updateInstallationPhase = updateInstallationPhase;
+Zigbee2mqttManager.prototype.waitForZigbee2mqtt = waitForZigbee2mqtt;
+Zigbee2mqttManager.prototype.finishInstallation = finishInstallation;
+Zigbee2mqttManager.prototype.runInstallation = runInstallation;
+Zigbee2mqttManager.prototype.pullImage = pullImage;
+Zigbee2mqttManager.prototype.pullMissingImages = pullMissingImages;
+Zigbee2mqttManager.prototype.startPrefetch = startPrefetch;
+Zigbee2mqttManager.prototype.updatePrefetchProgress = updatePrefetchProgress;
+Zigbee2mqttManager.prototype.refuseWhileInstalling = refuseWhileInstalling;
+Zigbee2mqttManager.prototype.clearInstallation = clearInstallation;
 
 // EVENTS
 Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;
+Zigbee2mqttManager.prototype.emitInstallProgress = emitInstallProgress;
 
 module.exports = Zigbee2mqttManager;

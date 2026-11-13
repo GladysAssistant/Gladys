@@ -4,6 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 const DONGLE_E = 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"';
@@ -199,5 +200,54 @@ describe('zigbee2mqtt fallbackToEzsp', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     expect(zigbee2mqttManager.ezspFallback).to.equal(false);
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: 'Database locked' });
+  });
+
+  it('should refuse a setup sent while it installs Zigbee2mqtt again, which would create the same container', async () => {
+    // PREPARE
+    // Outside an installation: started in the background once the logs of Zigbee2mqtt are read
+    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    let installReached;
+    const installStarted = new Promise((resolve) => {
+      installReached = resolve;
+    });
+    let releaseInstall;
+    const installReleased = new Promise((resolve) => {
+      releaseInstall = resolve;
+    });
+    zigbee2mqttManager.installZ2mContainer = fake(async () => {
+      installReached();
+      await installReleased;
+    });
+    zigbee2mqttManager.getConfiguration = fake.resolves({});
+    zigbee2mqttManager.runInstallation = fake.resolves(null);
+    const fallingBack = zigbee2mqttManager.fallbackToEzsp();
+    await installStarted;
+    // EXECUTE
+    const setup = zigbee2mqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    // ASSERT
+    // Answered with a 409 by the error middleware
+    await expect(setup).to.be.rejectedWith(
+      ConflictError,
+      'Zigbee2mqtt: cannot save the setup while the integration is busy',
+    );
+    expect(zigbee2mqttManager.installation.state).to.equal('idle');
+    assert.notCalled(zigbee2mqttManager.runInstallation);
+    releaseInstall();
+    await fallingBack;
+    expect(zigbee2mqttManager.ezspFallback).to.equal(true);
+    // A setup is accepted again
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
+  });
+
+  it('should stop counting itself when Zigbee2mqtt fails to install again', async () => {
+    // PREPARE
+    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDongleName: DONGLE_E };
+    zigbee2mqttManager.installZ2mContainer = fake.rejects(new Error('Docker error'));
+    // EXECUTE
+    await zigbee2mqttManager.fallbackToEzsp();
+    // ASSERT
+    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+    // A setup is accepted again
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
   });
 });

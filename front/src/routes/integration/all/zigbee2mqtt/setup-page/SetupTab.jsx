@@ -9,6 +9,7 @@ import SetupPanel from './SetupPanel';
 import EnableStatus from './status/EnableStatus';
 import RunningStatus from './status/RunningStatus';
 import MqttExternalCredentials from './local/MqttExternalCredentials';
+import InstallationProgress from './components/InstallationProgress';
 import ContainerError from '../commons/ContainerError';
 import MqttConnectionError from '../commons/MqttConnectionError';
 
@@ -42,7 +43,8 @@ class SetupTab extends Component {
       resetZigbee2mqttStatus,
       configuration = {}
     } = props;
-    const { z2mContainerError, mqttConnectionError } = props.zigbee2mqttStatus || {};
+    const { z2mContainerError, mqttConnectionError, installation, zigbee2mqttConnected } =
+      props.zigbee2mqttStatus || {};
     const loading = loadZigbee2mqttStatus === RequestStatus.Getting || loadZigbee2mqttConfig === RequestStatus.Getting;
     const error = loadZigbee2mqttStatus === RequestStatus.Error || loadZigbee2mqttConfig === RequestStatus.Error;
     const success = loadZigbee2mqttStatus === RequestStatus.Success && loadZigbee2mqttConfig === RequestStatus.Success;
@@ -50,7 +52,9 @@ class SetupTab extends Component {
       setupZigee2mqttStatus === RequestStatus.Getting ||
       toggleZigee2mqttStatus === RequestStatus.Getting ||
       resetZigbee2mqttStatus === RequestStatus.Getting;
-    const disabled = loading || saving;
+    // The setup answers at once and the installation goes on in the background: the server refuses the other actions
+    const installing = installation && installation.state === 'running';
+    const disabled = loading || saving || installing;
     const isLocalMode = configuration.mqttMode === MQTT_MODE.LOCAL;
     const { mqttRunning = false } = props.zigbee2mqttStatus || {};
 
@@ -76,11 +80,23 @@ class SetupTab extends Component {
                 </div>
               )}
               <ul class="list-group list-group-flush list-unstyled">
+                <InstallationProgress
+                  installation={installation}
+                  zigbee2mqttConnected={zigbee2mqttConnected}
+                  statusErrors={[z2mContainerError, mqttConnectionError]}
+                />
                 {success && <SetupPanel {...props} disabled={disabled} />}
                 {setupZigee2mqttStatus === RequestStatus.Error && (
                   <li class="list-group-item">
                     <div class="alert alert-danger my-3" data-cy="z2m-setup-save-error">
                       <Text id="integration.zigbee2mqtt.setup.saveError" />
+                    </div>
+                  </li>
+                )}
+                {setupZigee2mqttStatus === RequestStatus.ConflictError && (
+                  <li class="list-group-item">
+                    <div class="alert alert-warning my-3" data-cy="z2m-setup-save-conflict">
+                      <Text id="integration.zigbee2mqtt.setup.installation.alreadyRunning" />
                     </div>
                   </li>
                 )}

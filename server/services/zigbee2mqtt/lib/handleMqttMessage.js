@@ -1,6 +1,8 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertFeature } = require('../utils/convertFeature');
+const { formatDuration } = require('../utils/formatDuration');
+const { INSTALLATION_STATE } = require('./constants');
 
 // Zigbee2mqtt answers bridge/request/health_check since 1.21
 const HEALTH_CHECK_MIN_MAJOR = 1;
@@ -35,6 +37,10 @@ async function handleMqttMessage(topic, message) {
     case 'zigbee2mqtt/bridge/response/health_check': {
       // Only Zigbee2mqtt answers on this topic: any answer, even an error, proves that it runs and listens
       logger.debug('Zigbee2mqtt answered the health check');
+      if (this.zigbee2mqttStarting) {
+        const answeredIn = formatDuration(Date.now() - this.zigbee2mqttStartingSince);
+        logger.info(`Zigbee2mqtt answered ${answeredIn} after the restart of its container`);
+      }
       clearTimeout(this.healthCheckTimer);
       this.healthCheckTimer = null;
       this.zigbee2mqttConnected = true;
@@ -47,6 +53,11 @@ async function handleMqttMessage(topic, message) {
       // An error read in the logs of the container did not prevent Zigbee2mqtt from running
       this.z2mContainerError = null;
       this.emitStatusEvent();
+      // Nor did the failure of the last installation, which no longer describes Zigbee2mqtt: the setup page stops
+      // showing it. A running installation ends on this answer (see waitForZigbee2mqtt).
+      if (this.installation.state === INSTALLATION_STATE.FAILED) {
+        this.clearInstallation();
+      }
       break;
     }
     case 'zigbee2mqtt/bridge/devices': {

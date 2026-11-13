@@ -6,6 +6,7 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import { MQTT_MODE, ADAPTER_MODE } from '../constants';
 import Select from 'react-select';
 import SubmitConfiguration from '../components/SubmitConfiguration';
+import PrefetchStatus from '../components/PrefetchStatus';
 
 class SetupLocalOptions extends Component {
   updateAdapterMode = e => {
@@ -222,8 +223,18 @@ class SetupLocalOptions extends Component {
     this.preselectDetectedDongle();
   }
 
+  componentDidUpdate() {
+    // A coordinator chosen, or the dongle preselected: Zigbee2mqtt is set up on this Gladys, its images can be downloaded
+    // ahead. Asked again on each update, as the page waits for the server to tell it runs in Docker (see prefetchImages).
+    const { z2mAdapterMode, z2mDriverPath, z2mNetworkAdapterUrl } = this.state;
+    const coordinator = z2mAdapterMode === ADAPTER_MODE.NETWORK ? z2mNetworkAdapterUrl : z2mDriverPath;
+    if (coordinator) {
+      this.props.prefetchImages();
+    }
+  }
+
   render(
-    { disabled, configuration },
+    { disabled, configuration, zigbee2mqttStatus },
     {
       z2mDriverPath,
       usbPorts,
@@ -472,6 +483,7 @@ class SetupLocalOptions extends Component {
             <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortDescription" />
           </small>
         </div>
+        <PrefetchStatus configuration={configuration} zigbee2mqttStatus={zigbee2mqttStatus} />
         <SubmitConfiguration
           saveDisabled={saveDisabled}
           disabled={disabled}

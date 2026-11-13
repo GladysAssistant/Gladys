@@ -1,7 +1,9 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const Zigbee2MqttController = require('../../../../services/zigbee2mqtt/api/zigbee2mqtt.controller');
+const { BadParameters, ConflictError } = require('../../../../utils/coreErrors');
 
 const event = {
   emit: fake.resolves(null),
@@ -20,6 +22,7 @@ const zigbee2mqttManager = {
   status: fake.returns(true),
   getSetup: fake.resolves({ config: 'values' }),
   setup: fake.resolves(true),
+  startPrefetch: fake.resolves({ state: 'running', progress: 0, freeBytes: null, neededBytes: 214000000, error: null }),
   init: fake.resolves(true),
   installMqttContainer: fake.resolves(true),
   installZ2mContainer: fake.resolves(true),
@@ -27,6 +30,7 @@ const zigbee2mqttManager = {
   setPermitJoin: fake.returns(true),
   getPermitJoin: fake.returns(true),
   reset: fake.resolves(true),
+  refuseWhileInstalling: fake(),
 };
 
 describe('zigbee2mqtt API', () => {
@@ -34,6 +38,12 @@ describe('zigbee2mqtt API', () => {
 
   beforeEach(() => {
     controller = Zigbee2MqttController(gladys, zigbee2mqttManager, 'de1dd005-092d-456d-93d1-817c9ace4c67');
+    zigbee2mqttManager.refuseWhileInstalling = fake();
+    zigbee2mqttManager.getConfiguration = fake.resolves({
+      mqttUrl: 'mqtt://localhost:1884',
+      mqttPassword: 'gladys-password',
+      z2mMqttPassword: 'z2m-password',
+    });
     sinon.reset();
   });
 
@@ -109,6 +119,23 @@ describe('zigbee2mqtt API', () => {
     assert.calledOnceWithExactly(res.json, { config: 'values' });
   });
 
+  it('post /api/v1/service/zigbee2mqtt/prefetch', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/zigbee2mqtt/prefetch'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.startPrefetch);
+    assert.calledOnceWithExactly(res.json, {
+      state: 'running',
+      progress: 0,
+      freeBytes: null,
+      neededBytes: 214000000,
+      error: null,
+    });
+  });
+
   it('post /api/v1/service/zigbee2mqtt/connect', async () => {
     const req = {};
     const res = {
@@ -116,6 +143,7 @@ describe('zigbee2mqtt API', () => {
     };
 
     await controller['post /api/v1/service/zigbee2mqtt/connect'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'connect');
     assert.calledOnce(zigbee2mqttManager.init);
     assert.calledWith(res.json, { success: true });
   });
@@ -127,19 +155,84 @@ describe('zigbee2mqtt API', () => {
     };
 
     await controller['post /api/v1/service/zigbee2mqtt/mqtt/start'].controller(req, res);
-    assert.calledOnce(zigbee2mqttManager.installMqttContainer);
+    assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'start the MQTT broker');
+    assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, {
+      mqttUrl: 'mqtt://localhost:1884',
+      mqttPassword: 'gladys-password',
+      z2mMqttPassword: 'z2m-password',
+    });
     assert.calledWith(res.json, { success: true });
   });
 
-  it('post /api/v1/service/zigbee2mqtt/z2m/start', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
+  [
+    ['the integration was never set up', { mqttPassword: null, z2mMqttPassword: null }],
+    ['the account of Zigbee2mqtt is missing', { mqttPassword: 'gladys-password', z2mMqttPassword: null }],
+    ['the account of Gladys is missing', { mqttPassword: null, z2mMqttPassword: 'z2m-password' }],
+  ].forEach(([label, configuration]) => {
+    it(`post /api/v1/service/zigbee2mqtt/mqtt/start should be refused when ${label}`, async () => {
+      // PREPARE
+      zigbee2mqttManager.getConfiguration = fake.resolves(configuration);
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller['post /api/v1/service/zigbee2mqtt/mqtt/start'].controller({}, res, next);
+      // ASSERT
+      // Answered with a 400 by the error middleware, not a 500 on the hash of a missing password
+      const [error] = next.firstCall.args;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Zigbee2mqtt: the MQTT accounts do not exist yet, save the setup first');
+      assert.notCalled(zigbee2mqttManager.installMqttContainer);
+      assert.notCalled(res.json);
+    });
+  });
 
-    await controller['post /api/v1/service/zigbee2mqtt/z2m/start'].controller(req, res);
-    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
-    assert.calledWith(res.json, { success: true });
+  [
+    ['a USB dongle', { z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB0', z2mMqttPassword: 'z2m-password' }],
+    ['a USB dongle of an old installation without adapter mode', { z2mDriverPath: '/dev/ttyUSB0' }],
+    ['a network coordinator', { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' }],
+  ].forEach(([label, configuration]) => {
+    it(`post /api/v1/service/zigbee2mqtt/z2m/start with ${label}`, async () => {
+      // PREPARE
+      zigbee2mqttManager.getConfiguration = fake.resolves(configuration);
+      const req = {};
+      const res = {
+        json: fake.returns(null),
+      };
+      // EXECUTE
+      await controller['post /api/v1/service/zigbee2mqtt/z2m/start'].controller(req, res);
+      // ASSERT
+      assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'start Zigbee2mqtt');
+      // The stored configuration, which gives the coordinator and the broker account to the container
+      assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, configuration);
+      assert.calledWith(res.json, { success: true });
+    });
+  });
+
+  [
+    ['the integration was never set up', { z2mAdapterMode: null, z2mDriverPath: null, z2mNetworkAdapterUrl: null }],
+    // The port left by a USB dongle used before is not the coordinator of the network mode
+    ['the network mode has no URL', { z2mAdapterMode: 'network', z2mDriverPath: '/dev/ttyUSB0' }],
+    ['the USB mode has no port', { z2mAdapterMode: 'usb', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' }],
+  ].forEach(([label, configuration]) => {
+    it(`post /api/v1/service/zigbee2mqtt/z2m/start should be refused when ${label}`, async () => {
+      // PREPARE
+      zigbee2mqttManager.getConfiguration = fake.resolves(configuration);
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller['post /api/v1/service/zigbee2mqtt/z2m/start'].controller({}, res, next);
+      // ASSERT
+      // Answered with a 400 by the error middleware, instead of a container created without a coordinator
+      const [error] = next.firstCall.args;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Zigbee2mqtt: no Zigbee coordinator is configured yet, save the setup first');
+      assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+      assert.notCalled(res.json);
+    });
   });
 
   it('post /api/v1/service/zigbee2mqtt/disconnect', async () => {
@@ -149,6 +242,7 @@ describe('zigbee2mqtt API', () => {
     };
 
     await controller['post /api/v1/service/zigbee2mqtt/disconnect'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'disconnect');
     assert.calledOnce(zigbee2mqttManager.disconnect);
     assert.calledWith(res.json, { success: true });
   });
@@ -182,7 +276,37 @@ describe('zigbee2mqtt API', () => {
     };
 
     await controller['post /api/v1/service/zigbee2mqtt/reset'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'reset');
     assert.calledOnce(zigbee2mqttManager.reset);
     assert.calledWith(res.json, { success: true });
+  });
+
+  // An installation or an operation in progress (init, disconnect, reset, ezsp fallback) would undo them (containers
+  // recreated or removed, configuration saved or destroyed), or run alongside them
+  [
+    ['connect', 'connect', 'init'],
+    ['mqtt/start', 'start the MQTT broker', 'installMqttContainer'],
+    ['z2m/start', 'start Zigbee2mqtt', 'installZ2mContainer'],
+    ['disconnect', 'disconnect', 'disconnect'],
+    ['reset', 'reset', 'reset'],
+  ].forEach(([route, action, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused while an installation or an operation runs`, async () => {
+      // PREPARE
+      const conflict = new ConflictError(`Zigbee2mqtt: cannot ${action} while an installation is running`);
+      zigbee2mqttManager.refuseWhileInstalling = fake.throws(conflict);
+      const req = {};
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller[`post /api/v1/service/zigbee2mqtt/${route}`].controller(req, res, next);
+      // ASSERT
+      assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, action);
+      // Answered with a 409 by the error middleware
+      assert.calledOnceWithExactly(next, conflict);
+      assert.notCalled(zigbee2mqttManager[method]);
+      assert.notCalled(res.json);
+    });
   });
 });

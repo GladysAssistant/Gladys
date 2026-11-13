@@ -4,6 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -82,10 +83,14 @@ describe('zigbee2mqtt disconnect', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
     assert.calledTwice(gladys.system.removeContainer);
+    // With their anonymous volumes, left behind otherwise
+    assert.alwaysCalledWithMatch(gladys.system.removeContainer, sinon.match.string, { v: true });
   });
 
   it('mqtt connected', async () => {
@@ -114,6 +119,8 @@ describe('zigbee2mqtt disconnect', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
@@ -126,12 +133,16 @@ describe('zigbee2mqtt disconnect', () => {
 
   it('clear backup interval', async () => {
     // PREPARE
-    zigbee2MqttManager.backupScheduledJob = {
+    const backupScheduledJob = {
       cancel: fake.returns(true),
     };
+    zigbee2MqttManager.backupScheduledJob = backupScheduledJob;
     // EXECUTE
     await zigbee2MqttManager.disconnect();
     // ASSERT
+    assert.calledOnce(backupScheduledJob.cancel);
+    // Forgotten, so that the next init schedules it again
+    expect(zigbee2MqttManager.backupScheduledJob).to.equal(null);
     assert.calledThrice(gladys.event.emit);
     assert.alwaysCalledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -152,6 +163,8 @@ describe('zigbee2mqtt disconnect', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
   });
@@ -184,6 +197,69 @@ describe('zigbee2mqtt disconnect', () => {
     expect(zigbee2MqttManager.zigbee2mqttExist).to.equal(false);
   });
 
+  describe('with the installation followed by the setup page', () => {
+    let clock;
+    // The installations sent to the setup page
+    const sentInstallations = () =>
+      gladys.event.emit
+        .getCalls()
+        .filter(({ args }) => args[1].type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS)
+        .map(({ args }) => args[1].payload.installation);
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers({ now: 1700000000000, toFake: ['Date', 'setTimeout', 'clearTimeout'] });
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
+    it('should forget the failure of the last installation, and send it at once', async () => {
+      // PREPARE
+      zigbee2MqttManager.startInstallation('install');
+      zigbee2MqttManager.finishInstallation(new Error('docker fail pull'));
+      gladys.event.emit.resetHistory();
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      // ASSERT
+      expect(zigbee2MqttManager.installation.state).to.equal('idle');
+      expect(sentInstallations()).to.deep.equal([zigbee2MqttManager.installation]);
+      // Sent at once, even within the interval since the failure was sent
+      expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
+      expect(clock.countTimers()).to.equal(0);
+    });
+
+    it('should keep a running installation, which tells its own outcome', async () => {
+      // PREPARE
+      zigbee2MqttManager.startInstallation('install');
+      const { installation } = zigbee2MqttManager;
+      gladys.event.emit.resetHistory();
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      // ASSERT
+      expect(zigbee2MqttManager.installation).to.equal(installation);
+      expect(sentInstallations()).to.deep.equal([]);
+    });
+
+    it('should send at once the progress left waiting, not after the integration is disabled', async () => {
+      // PREPARE
+      zigbee2MqttManager.emitInstallProgress();
+      zigbee2MqttManager.prefetch.progress = 42;
+      // Within the interval: left waiting
+      zigbee2MqttManager.emitInstallProgress();
+      gladys.event.emit.resetHistory();
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      // ASSERT
+      const progressCalls = gladys.event.emit
+        .getCalls()
+        .filter(({ args }) => args[1].type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS);
+      expect(progressCalls.map(({ args }) => args[1].payload.prefetch.progress)).to.deep.equal([42]);
+      expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
+      expect(clock.countTimers()).to.equal(0);
+    });
+  });
+
   it('no container -> nothing to stop', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([]);
@@ -210,5 +286,47 @@ describe('zigbee2mqtt disconnect', () => {
     assert.notCalled(gladys.system.removeContainer);
     expect(zigbee2MqttManager.mqttRunning).to.equal(false);
     expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
+  });
+
+  it('should refuse a setup sent while it runs, whose installation would lose the containers removed meanwhile', async () => {
+    // PREPARE
+    let releaseDocker;
+    const dockerReleased = new Promise((resolve) => {
+      releaseDocker = resolve;
+    });
+    // The broker is being stopped, as when the disconnect route was sent from another tab
+    gladys.system.stopContainer = fake(async () => {
+      await dockerReleased;
+      return true;
+    });
+    zigbee2MqttManager.getConfiguration = fake.resolves({});
+    zigbee2MqttManager.runInstallation = fake.resolves(null);
+    const disconnecting = zigbee2MqttManager.disconnect();
+    // Counted from its first line: a route checked before calling it is refused at once
+    expect(zigbee2MqttManager.runningOperations).to.equal(1);
+    // EXECUTE
+    const setup = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    // ASSERT
+    // Answered with a 409 by the error middleware
+    await expect(setup).to.be.rejectedWith(
+      ConflictError,
+      'Zigbee2mqtt: cannot save the setup while the integration is busy',
+    );
+    expect(zigbee2MqttManager.installation.state).to.equal('idle');
+    assert.notCalled(zigbee2MqttManager.runInstallation);
+    releaseDocker();
+    await disconnecting;
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
+  });
+
+  it('should stop counting itself when it fails', async () => {
+    // PREPARE
+    gladys.system.stopContainer = fake.rejects(new Error('Docker is not answering'));
+    // EXECUTE
+    await expect(zigbee2MqttManager.disconnect()).to.be.rejectedWith('Docker is not answering');
+    // ASSERT
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
   });
 });

@@ -169,7 +169,26 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     expect(newConfig.z2mNetworkAdapterType).to.equal('zstack');
     // The replaced installation does not explain the state of the new one
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
-    assert.calledOnce(gladys.event.emit);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should not tell the error of a replaced installation, which would fail the new one', async () => {
+    // A reader of the previous run, which ends once the new installation started
+    zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB0' };
+    const stream = new EventEmitter();
+    stream.destroy = sinon.fake();
+    gladys.system.getContainerLogs = fake.resolves(stream);
+    setImmediate(() => {
+      // The new installation clears the error of the previous one as it starts (see init)
+      zigbee2mqttManager.installedConfig = { z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB1' };
+      stream.emit('data', withDockerPrefix('[2026-11-06 10:00:00] error: z2m: Failed to connect to the adapter\n'));
+    });
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc', 1700000000);
+
+    // waitForZigbee2mqtt would fail the new installation on it
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    assert.notCalled(gladys.event.emit);
   });
 
   it('should set z2mContainerError to null when no error is found in logs', async () => {

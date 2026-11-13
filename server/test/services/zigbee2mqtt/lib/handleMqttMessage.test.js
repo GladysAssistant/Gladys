@@ -237,10 +237,60 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
     expect(zigbee2mqttManager.startingTimer).to.equal(null);
+  });
+
+  it('should forget the failure of the last installation once Zigbee2mqtt answers, and tell the setup page', async () => {
+    // PREPARE
+    zigbee2mqttManager.emitInstallProgress = fake();
+    zigbee2mqttManager.startInstallation('install');
+    zigbee2mqttManager.finishInstallation(new Error('Zigbee2mqtt failed to start: NO_ANSWER'));
+    zigbee2mqttManager.emitInstallProgress.resetHistory();
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    // ASSERT
+    expect(zigbee2mqttManager.installation.state).to.equal('idle');
+    assert.calledOnceWithExactly(zigbee2mqttManager.emitInstallProgress);
+  });
+
+  ['done', 'running'].forEach((state) => {
+    it(`should keep an installation ${state} when Zigbee2mqtt answers`, async () => {
+      // PREPARE
+      zigbee2mqttManager.emitInstallProgress = fake();
+      zigbee2mqttManager.startInstallation('install');
+      if (state === 'done') {
+        zigbee2mqttManager.finishInstallation(null);
+      }
+      const { installation } = zigbee2mqttManager;
+      zigbee2mqttManager.emitInstallProgress.resetHistory();
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+      // ASSERT
+      expect(zigbee2mqttManager.installation).to.equal(installation);
+      expect(installation.state).to.equal(state);
+      assert.notCalled(zigbee2mqttManager.emitInstallProgress);
+    });
+  });
+
+  it('should log how long Zigbee2mqtt took to answer after the restart of its container', async () => {
+    // PREPARE
+    const infoStub = sinon.stub(logger, 'info');
+    zigbee2mqttManager.zigbee2mqttStarting = true;
+    zigbee2mqttManager.zigbee2mqttStartingSince = Date.now() - 42000;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    // A later answer does not end a startup
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    // ASSERT
+    assert.calledOnceWithExactly(
+      infoStub,
+      sinon.match(/^Zigbee2mqtt answered 42\.\d s after the restart of its container$/),
+    );
   });
 
   it('should set Zigbee2mqtt offline from bridge/state', async () => {
@@ -627,6 +677,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
   });

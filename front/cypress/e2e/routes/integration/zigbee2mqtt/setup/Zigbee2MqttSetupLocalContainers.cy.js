@@ -31,6 +31,16 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         body: {}
       }
     );
+    // Nothing configured: the page asks the server to download the images once a dongle is chosen
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch`
+      },
+      {
+        body: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null }
+      }
+    );
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   });
 
@@ -298,6 +308,16 @@ describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
       },
       {
         body: {}
+      }
+    );
+    // Nothing configured: the page asks the server to download the images once a dongle is chosen
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch`
+      },
+      {
+        body: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null }
       }
     );
     cy.intercept(

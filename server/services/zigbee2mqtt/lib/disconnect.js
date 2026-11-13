@@ -16,19 +16,23 @@ async function removeOwnContainer(system, descriptor) {
   const container = await findOwnContainer(system, descriptor);
   if (container) {
     await system.stopContainer(container.id);
-    await system.removeContainer(container.id);
+    // With its anonymous volumes (/mosquitto/data and /mosquitto/log of the broker image, unused: the broker persists
+    // in its configuration folder, mounted from the disk of Gladys), left behind at each removal otherwise
+    await system.removeContainer(container.id, { v: true });
   }
 }
 
 /**
- * @description Disconnect service from dependent containers.
+ * @description Disconnect service from dependent containers, see disconnect.
  * @example
- * disconnect();
+ * await disconnectContainers.call(this);
  */
-async function disconnect() {
+async function disconnectContainers() {
   // Stop backup reccurent job
   if (this.backupScheduledJob) {
     this.backupScheduledJob.cancel();
+    // Scheduled again by the next init only when there is none
+    this.backupScheduledJob = null;
   }
 
   // Disconnect from MQTT broker
@@ -45,6 +49,13 @@ async function disconnect() {
   clearTimeout(this.healthCheckTimer);
   this.healthCheckTimer = null;
   this.emitStatusEvent();
+
+  // Disabled: the outcome of the last installation no longer describes Zigbee2mqtt
+  this.clearInstallation();
+  // A send left waiting goes at once, with the idle installation: its timer would outlive the integration
+  if (this.installProgressTimer !== null) {
+    this.emitInstallProgress(true);
+  }
 
   // Stop & remove MQTT container
   await removeOwnContainer(this.gladys.system, mqttContainerDescriptor);
@@ -64,6 +75,22 @@ async function disconnect() {
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
   this.emitStatusEvent();
+}
+
+/**
+ * @description Disconnect service from dependent containers. Counted while it runs, from its first line: the routes
+ * and the setup checked before calling it are refused until it ends, as an installation started meanwhile would lose
+ * the containers it creates (see refuseWhileInstalling).
+ * @example
+ * disconnect();
+ */
+async function disconnect() {
+  this.runningOperations += 1;
+  try {
+    await disconnectContainers.call(this);
+  } finally {
+    this.runningOperations -= 1;
+  }
 }
 
 module.exports = {
