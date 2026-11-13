@@ -3971,6 +3971,7 @@
     "newCondition": "New condition",
     "selectActionType": "Select an action type",
     "selectConditionType": "Select a condition type",
+    "conditionAndText": "AND",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",

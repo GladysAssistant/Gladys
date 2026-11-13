@@ -159,6 +159,39 @@ describe('Scene view', () => {
     });
   });
 
+  it('Should show an AND between the condition boxes of an If / Then / Else block', () => {
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
+    cy.contains('editScene.addStepButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
+
+    cy.get('[data-cy="type-picker-option"][data-value="condition.if-then-else"]').click();
+
+    // One condition box: there is no operator to show
+    cy.contains('editScene.actionsCard.conditionIfThenElse.addCondition').click();
+    cy.get('[data-cy="type-picker-option"][data-value="house.is-empty"]').click();
+    cy.get('[data-condition-slot]').should('have.length', 1);
+    cy.get('[data-cy="scene-condition-and-separator"]').should('not.exist');
+
+    // Two condition boxes: exactly one AND, written between them
+    cy.contains('editScene.actionsCard.conditionIfThenElse.addCondition').click();
+    cy.get('[data-cy="type-picker-option"][data-value="house.is-not-empty"]').click();
+    cy.get('[data-condition-slot]').should('have.length', 2);
+    cy.get('[data-cy="scene-condition-and-separator"]')
+      .should('have.length', 1)
+      .i18n('editScene.conditionAndText');
+    // The separator is not a drop slot of the condition list, it sits between the two cards
+    cy.get('[data-cy="scene-condition-and-separator"]').should('not.have.attr', 'data-condition-slot');
+    cy.get('[data-cy="scene-condition-and-separator"]')
+      .prev()
+      .should('have.attr', 'data-card-index', '0');
+    cy.get('[data-cy="scene-condition-and-separator"]')
+      .next()
+      .should('have.attr', 'data-card-index', '1');
+  });
+
   it('Should add new calendar event trigger', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available

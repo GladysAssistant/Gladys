@@ -4,6 +4,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 import ActionGroup from '../ActionGroup';
 import ActionCard from '../ActionCard';
+import ConditionAndSeparator from './ConditionAndSeparator';
 import style from '../style.css';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
@@ -104,21 +105,25 @@ class ConditionIfElseThen extends Component {
               data-drop-active-class={style.nestedFlowDropActive}
             >
               {conditions.map((condition, index) => (
-                <ActionCard
-                  action={condition}
-                  index={index}
-                  allActions={props.allActions}
-                  path={`${props.path}.if.${index}`}
-                  updateActionProperty={props.updateActionProperty}
-                  deleteAction={props.deleteAction}
-                  actionsGroupsBefore={props.actionsGroupsBefore}
-                  variables={props.variables}
-                  triggersVariables={props.triggersVariables}
-                  setVariables={props.setVariables}
-                  moveCard={props.moveCard}
-                  moveCardGroup={props.moveCardGroup}
-                  scene={props.scene}
-                />
+                <>
+                  {/* The boxes are combined with an AND: written between two boxes, not before the first one */}
+                  {index > 0 && <ConditionAndSeparator />}
+                  <ActionCard
+                    action={condition}
+                    index={index}
+                    allActions={props.allActions}
+                    path={`${props.path}.if.${index}`}
+                    updateActionProperty={props.updateActionProperty}
+                    deleteAction={props.deleteAction}
+                    actionsGroupsBefore={props.actionsGroupsBefore}
+                    variables={props.variables}
+                    triggersVariables={props.triggersVariables}
+                    setVariables={props.setVariables}
+                    moveCard={props.moveCard}
+                    moveCardGroup={props.moveCardGroup}
+                    scene={props.scene}
+                  />
+                </>
               ))}
               {conditions.length === 0 && (
                 <div class="col">

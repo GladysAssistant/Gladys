@@ -795,3 +795,9 @@
 :global(body.gladys-scene-step-dragging) .stepInsertButton {
   opacity: 0.15;
 }
+
+/* likewise, while a condition drag is live, the "AND" written between two
+   condition boxes fades out: the indicator line is drawn in the gap it sits in */
+:global(body.gladys-scene-condition-dragging) .conditionAndSeparator {
+  opacity: 0.15;
+}
