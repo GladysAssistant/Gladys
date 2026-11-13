@@ -200,6 +200,11 @@ input.searchInput::-webkit-search-cancel-button {
   transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
+/* single: the rows are radios */
+.tickRadio {
+  border-radius: 999px;
+}
+
 .checkbox:checked + .tick {
   background: var(--gl-accent, #3d6df0);
   border-color: var(--gl-accent, #3d6df0);

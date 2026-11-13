@@ -61,7 +61,10 @@ describe('Scene device picker on a phone', () => {
             value: 1
           }
         ],
-        actions: [[{ type: 'light.turn-on', devices: ['picker-light-1'] }]]
+        actions: [
+          [{ type: 'light.turn-on', devices: ['picker-light-1'] }],
+          [{ type: 'device.get-value', device_feature: 'picker-motion-1-motion' }]
+        ]
       }
     }).then(res => {
       sceneSelector = res.body.selector;
@@ -123,6 +126,36 @@ describe('Scene device picker on a phone', () => {
       expect(request.body.actions[0][0].devices).to.deep.equal(['picker-light-1', 'picker-light-2']);
     });
     cy.get('[data-cy=scene-run-button]').should('be.visible');
+  });
+
+  it('Should replace a single device in one tap', () => {
+    cy.intercept('PATCH', `${serverUrl}/api/v1/scene/*`).as('saveScene');
+    cy.then(() => cy.visit(`/dashboard/scene/${sceneSelector}`));
+
+    cy.get('[data-cy="scene-step-row-1.0"]').click();
+    // one device: its row has no remove button
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy="device-picker-item-picker-motion-1-motion"]').should(
+      'be.visible'
+    );
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy^="device-picker-remove-"]').should('not.exist');
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy="device-picker-open"]').click();
+    // radios: nothing to confirm, every kind of feature is listed
+    cy.get('[data-cy="device-picker-sheet"]').should('be.visible');
+    cy.get('[data-cy="picker-validate"]').should('not.exist');
+    cy.get('[data-cy="picker-feature-picker-light-1-binary"]').should('be.visible');
+    cy.get('[data-cy="picker-feature-picker-motion-2-temperature"]').click();
+    // the tap selected the feature and closed the picker
+    cy.get('[data-cy="device-picker-sheet"]').should('not.exist');
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy^="device-picker-item-"]').should('have.length', 1);
+    cy.get('[data-cy="scene-step-sheet-1.0"] [data-cy="device-picker-item-picker-motion-2-temperature"]').should(
+      'be.visible'
+    );
+    cy.get('body').type('{esc}');
+
+    cy.get('[data-cy=scene-save-button]').click();
+    cy.wait('@saveScene').then(({ request }) => {
+      expect(request.body.actions[1][0].device_feature).to.equal('picker-motion-2-temperature');
+    });
   });
 
   it('Should keep the select on a wider screen', () => {

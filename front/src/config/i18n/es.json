@@ -7795,6 +7795,9 @@
     "title": "Elegir dispositivos",
     "choose": "Elegir dispositivos",
     "edit": "Añadir o quitar dispositivos",
+    "titleOne": "Elegir un dispositivo",
+    "chooseOne": "Elegir un dispositivo",
+    "changeOne": "Cambiar de dispositivo",
     "empty": "Ningún dispositivo seleccionado.",
     "remove": "Quitar {{name}}",
     "notFound": "Dispositivo no encontrado"

@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 
 class ThermostatSetSchedule extends Component {
   getOptions = async () => {
@@ -32,7 +33,7 @@ class ThermostatSetSchedule extends Component {
         label: thermostat.name,
         house: houseByRoomId[thermostat.room_id] || null
       }));
-      await this.setState({ scheduleOptions, thermostatOptions });
+      await this.setState({ scheduleOptions, thermostatOptions, thermostats });
       this.refreshSelectedOptions(this.props);
     } catch (e) {
       console.error(e);
@@ -56,6 +57,11 @@ class ThermostatSetSchedule extends Component {
 
   handleThermostatsChange = selectedOptions => {
     const devices = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    this.props.updateActionProperty(this.props.path, 'devices', devices);
+  };
+
+  // on a phone the thermostats are picked in the device picker sheet
+  handleThermostatsPickerChange = devices => {
     this.props.updateActionProperty(this.props.path, 'devices', devices);
   };
 
@@ -95,12 +101,19 @@ class ThermostatSetSchedule extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { scheduleOptions, thermostatOptions, selectedScheduleOption, selectedThermostatOptions }) {
+  render(
+    props,
+    { scheduleOptions, thermostatOptions, thermostats, selectedScheduleOption, selectedThermostatOptions }
+  ) {
     // Thermostats are offered once a schedule is picked, and only those of its house.
     const availableThermostats =
       selectedScheduleOption && thermostatOptions
         ? thermostatOptions.filter(option => option.house === selectedScheduleOption.house)
         : [];
+    // the same thermostats for the picker sheet of a phone
+    const availableThermostatDevices = thermostats
+      ? thermostats.filter(thermostat => availableThermostats.some(option => option.value === thermostat.selector))
+      : null;
     const scheduleInputId = `thermostat-set-schedule-${props.path}-schedule`;
     const thermostatsInputId = `thermostat-set-schedule-${props.path}-thermostats`;
     return (
@@ -131,17 +144,26 @@ class ThermostatSetSchedule extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select
-            inputId={thermostatsInputId}
-            defaultValue={[]}
-            isMulti
-            isDisabled={!selectedScheduleOption}
-            options={availableThermostats}
-            value={selectedThermostatOptions}
-            onChange={this.handleThermostatsChange}
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+          <DevicePickerField
+            devices={availableThermostatDevices}
+            selected={props.action.devices}
+            onChange={this.handleThermostatsPickerChange}
+            pickDevices
+            disabled={!selectedScheduleOption}
+            defaultIcon="thermometer"
+          >
+            <Select
+              inputId={thermostatsInputId}
+              defaultValue={[]}
+              isMulti
+              isDisabled={!selectedScheduleOption}
+              options={availableThermostats}
+              value={selectedThermostatOptions}
+              onChange={this.handleThermostatsChange}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </DevicePickerField>
         </div>
       </div>
     );

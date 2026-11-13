@@ -139,9 +139,10 @@ class SelectDeviceFeature extends Component {
   // options of the select
   handlePickerChange = selectors => {
     const { deviceFeaturesDictionnary } = this.state;
-    this.handleChange(
-      selectors.filter(selector => deviceFeaturesDictionnary[selector]).map(selector => ({ value: selector }))
-    );
+    const options = selectors
+      .filter(selector => deviceFeaturesDictionnary[selector])
+      .map(selector => ({ value: selector }));
+    this.handleChange(this.props.isMulti ? options : options[0] || null);
   };
   // the features the picker may list: the ones the select offers
   isFeatureSelectable = feature => {
@@ -276,16 +277,24 @@ class SelectDeviceFeature extends Component {
       return null;
     }
     const select = this.renderSelect(props, { selectedOption, selectedOptions });
-    // opt-in (mobilePicker), multi-selection only: on a phone the features are picked in the
-    // device picker sheet, by room; anywhere else the select below is rendered as before
-    if (props.isMulti && props.mobilePicker) {
+    // opt-in (mobilePicker): on a phone the features are picked in the device picker sheet, by
+    // room; anywhere else the select below is rendered as before. Several features share one
+    // condition, so they must be of the same kind; a single one is picked in one tap.
+    if (props.mobilePicker) {
+      let selected = [];
+      if (props.isMulti) {
+        selected = selectedOptions.map(option => option.value);
+      } else if (selectedOption) {
+        selected = [selectedOption.value];
+      }
       return (
         <DevicePickerField
           devices={pickerDevices}
-          selected={selectedOptions.map(option => option.value)}
+          selected={selected}
           onChange={this.handlePickerChange}
           filterFeature={this.isFeatureSelectable}
-          sameKindOnly
+          sameKindOnly={Boolean(props.isMulti)}
+          single={!props.isMulti}
         >
           {select}
         </DevicePickerField>

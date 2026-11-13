@@ -7795,6 +7795,9 @@
     "title": "Choose devices",
     "choose": "Choose devices",
     "edit": "Add or remove devices",
+    "titleOne": "Choose a device",
+    "chooseOne": "Choose a device",
+    "changeOne": "Change the device",
     "empty": "No device selected.",
     "remove": "Remove {{name}}",
     "notFound": "Device not found"

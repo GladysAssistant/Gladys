@@ -305,8 +305,9 @@ bar) leaves the mode. Steps inside branches keep their order in this phase (G).
 
 On a phone, a react-select with several devices is the wrong tool inside a sheet: a menu of every
 device of the house opening over the form, one pick per opening, chips that wrap, and the keyboard
-coming up on each tap. The **multi-device fields** of the scene forms therefore become, below
-768 px, a `DevicePickerField` (`components/device/DevicePickerField.jsx`):
+coming up on each tap. The **device fields** of the scene forms — the ones selecting several
+devices and the ones selecting a single one — therefore become, below 768 px, a
+`DevicePickerField` (`components/device/DevicePickerField.jsx`):
 
 - the selection as **rows** (category icon, device name, and underneath what is measured and the
   room), each with a 44 px **remove** button; "No device selected." when empty;
@@ -315,28 +316,44 @@ coming up on each tap. The **multi-device fields** of the scene forms therefore 
   search that does not open the keyboard by itself, room chips, checkbox rows with the current
   value, a pinned "Done" with the pending `+2 · −1`) in a **full-height sheet above the step's
   one** (`depth` 10). Devices are added and removed in **one validation**; closing the sheet
-  (×, Escape, outside) keeps the selection as it was.
+  (×, Escape, outside) keeps the selection as it was;
+- a field taking **one device** (`single`) shows it without a remove button, under a "Change the
+  device" button ("Choose a device" while empty). In the picker its rows are **radios** and there
+  is nothing to confirm: **tapping a row selects it and closes the sheet**. Only an optional field
+  (`clearable`: the camera of a question to the AI) keeps the remove button.
 
 From 768 px the field renders its children: the select the form already had, unchanged.
 
 The fields concerned, and what they select:
 
-| Form | Selection | Picker option |
+| Form | Selection | Picker options |
 | --- | --- | --- |
 | Turn on / turn off / toggle the lights | device selectors (`devices`) | `pickDevices` |
 | Turn on / turn off / toggle the switches | device selectors (`devices`), writable switches only | `pickDevices` |
 | Blink the lights | device selectors (`devices`), lights and switches | `pickDevices` |
+| Change the thermostats' schedule | device selectors (`devices`), the thermostats of the schedule's house; disabled until a schedule is chosen | `pickDevices` |
 | "Device state change" trigger | feature selectors (`device_features`) | `sameKindOnly` |
+| Check the presence of a user | feature selectors (`device_features`), the first presence feature of each device | — |
+| Get the last state | one feature selector (`device_feature`) | `single` |
+| Control a device | one feature selector (`device_feature`), writable features only | `single` |
+| Speak on a speaker | one device selector (`device`) | `pickDevices`, `single` |
+| Play music | one device selector (`device`) | `pickDevices`, `single` |
+| Send a camera image | one device selector (`camera`) | `pickDevices`, `single` |
+| Ask the AI | one device selector (`camera`), optional | `pickDevices`, `single`, `clearable` |
 
 - `pickDevices`: a row is a **device**, selected as a whole (an action on lights takes lights, not
-  their features); its icon and value are those of its first accepted feature.
+  their features); its icon and value are those of its first accepted feature. A device row only
+  shows a value it has ("No value" on every camera or speaker is noise), and a device whose
+  features tell no icon takes the field's `defaultIcon` (a camera).
 - `sameKindOnly`: the features of a trigger share one condition, so they must be comparable. Once
   a first feature is ticked, **only the features of its category and type are listed** (with a
   line saying so), exactly as the select narrows its options; unticking everything lists every
   kind again. The row under the finger stays in view when the list narrows.
 
-`SelectDeviceFeature` opts in with `mobilePicker` (multi-selection only): its other callers, and
-the single-device selects of the scene forms, keep the select. A selector whose device no longer
+`SelectDeviceFeature` opts in with `mobilePicker`, for a multi-selection (`sameKindOnly`) as for a
+single one (`single`): its other callers — the dashboard widgets — keep the select. The fields
+that select something else than a device (a user, a house, a calendar, a schedule, the variable
+of a condition) keep their select too. A selector whose device no longer
 exists keeps its row in the field ("Device not found", removable), and is never dropped by a
 validation of the picker. No data contract changes: the forms write the same `devices` /
 `device_features` arrays.
@@ -363,8 +380,6 @@ validation of the picker. No data contract changes: the forms write the same `de
 
 ## G. Designed, not built yet (phase 2)
 
-- The **single-device** selects (get the last state, control a device, the variable of a
-  condition) in the picker sheet: E.10 covers the fields selecting several devices.
 - **Day pills** (M T W T F S S + "Weekdays / Weekend / Every day") and the native
   `<input type="time">` in the scheduled trigger.
 - **"Insert a value" chip bar** above text fields accepting variables, replacing the typed `{{`.
@@ -389,7 +404,8 @@ validation of the picker. No data contract changes: the forms write the same `de
 - Cypress, phone viewport, `SceneMobileDevicePicker.cy.js`: the features of a device state
   trigger picked in the sheet (only the features of the selected kind are listed), removed from
   the field, the lights of an action picked as devices, a closed picker keeping the selection,
-  the saved payload; and the select kept on a wider screen.
+  the saved payload, a single device replaced in one tap (no confirmation, no remove button);
+  and the select kept on a wider screen.
 - The swipe gesture itself (`SwipeRow`) is not driven by Cypress: the pointer events Cypress
   synthesizes do not reach the row's handlers in its browser. It is checked in a phone emulation
   with a real pointer (Playwright); every swipe action has a non-gesture equivalent that the specs

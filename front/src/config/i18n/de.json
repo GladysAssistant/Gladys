@@ -7795,6 +7795,9 @@
     "title": "Geräte auswählen",
     "choose": "Geräte auswählen",
     "edit": "Geräte hinzufügen oder entfernen",
+    "titleOne": "Gerät auswählen",
+    "chooseOne": "Gerät auswählen",
+    "changeOne": "Gerät ändern",
     "empty": "Kein Gerät ausgewählt.",
     "remove": "{{name}} entfernen",
     "notFound": "Gerät nicht gefunden"

@@ -17,7 +17,10 @@ const SELECTED_ONLY = 'filter:selected';
 const NO_ROOM = 'no-room';
 const getRoomKey = device => (device.room ? `room:${device.room.selector || device.room.id}` : NO_ROOM);
 
-const getFeatureIcon = feature => get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`) || 'sliders';
+const getFeatureIcon = (feature, defaultIcon) =>
+  (feature && get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)) || defaultIcon || 'sliders';
+
+const hasValue = feature => Boolean(feature) && feature.last_value !== null && feature.last_value !== undefined;
 
 // Rooms (by name, devices without a room last) > devices (by name) >
 // features (in the device's own order), each feature carrying the text the
@@ -36,11 +39,14 @@ const buildGroups = (devices, dictionary, filterFeature, pickDevices) => {
         const description = getDeviceFeatureDescription(dictionary, device, feature);
         return { feature, description, selector: feature.selector };
       });
-    if (features.length === 0) {
+    // pickDevices: the caller lists the devices it wants, with or without a feature to show
+    if (features.length === 0 && !pickDevices) {
       return;
     }
     if (pickDevices) {
-      features = [{ feature: features[0].feature, description: device.name, selector: device.selector }];
+      features = [
+        { feature: features[0] ? features[0].feature : null, description: device.name, selector: device.selector }
+      ];
     }
     const roomKey = getRoomKey(device);
     if (!rooms.has(roomKey)) {
@@ -82,7 +88,9 @@ const buildGroups = (devices, dictionary, filterFeature, pickDevices) => {
 //   (an action on lights takes lights, not their features);
 // - sameKindOnly: every selected feature must share its category and type
 //   (the features of a scene trigger are compared with one condition), so
-//   once a first feature is ticked only the features of its kind are listed.
+//   once a first feature is ticked only the features of its kind are listed;
+// - single: one device at most. A row is a radio: tapping it validates the
+//   picker at once with that selection, there is nothing to confirm.
 class DeviceFeaturePicker extends Component {
   constructor(props) {
     super(props);
@@ -145,6 +153,10 @@ class DeviceFeaturePicker extends Component {
   };
 
   toggleFeature = (selector, event) => {
+    if (this.props.single) {
+      this.props.onValidate([selector]);
+      return;
+    }
     const row = event && event.target && event.target.closest ? event.target.closest('label') : null;
     this.setState(
       prevState => ({
@@ -272,7 +284,8 @@ class DeviceFeaturePicker extends Component {
         <Localizer>
           <div class={style.roomChips} role="group" aria-label={<Text id="deviceFeaturePicker.roomsLabel" />}>
             {this.renderRoomChip(ALL_ROOMS, <Text id="deviceFeaturePicker.allRooms" />, 0)}
-            {this.renderRoomChip(SELECTED_ONLY, <Text id="deviceFeaturePicker.selectedFilter" />, selected.length)}
+            {!props.single &&
+              this.renderRoomChip(SELECTED_ONLY, <Text id="deviceFeaturePicker.selectedFilter" />, selected.length)}
             {this.groups.map(group => this.renderRoomChip(group.key, group.name, selectedCountByRoom[group.key]))}
           </div>
         </Localizer>
@@ -297,21 +310,26 @@ class DeviceFeaturePicker extends Component {
                       data-cy={`picker-feature-${selector}`}
                     >
                       <input
-                        type="checkbox"
+                        type={props.single ? 'radio' : 'checkbox'}
                         class={style.checkbox}
                         checked={selected.includes(selector)}
-                        onChange={event => this.toggleFeature(selector, event)}
+                        onClick={props.single ? event => this.toggleFeature(selector, event) : undefined}
+                        onChange={props.single ? undefined : event => this.toggleFeature(selector, event)}
                       />
-                      <span class={style.tick} aria-hidden="true">
+                      <span class={cx(style.tick, { [style.tickRadio]: props.single })} aria-hidden="true">
                         <i class="fe fe-check" />
                       </span>
                       <span class={style.featureIcon} aria-hidden="true">
-                        <i class={`fe fe-${getFeatureIcon(feature)}`} />
+                        <i class={`fe fe-${getFeatureIcon(feature, props.defaultIcon)}`} />
                       </span>
                       <span class={style.featureName}>{description}</span>
-                      <span class={style.featureValue}>
-                        <DeviceFeatureValueText feature={feature} />
-                      </span>
+                      {/* a device row only shows a value it has: "No value" on every camera or
+                          speaker is noise */}
+                      {(!props.pickDevices || hasValue(feature)) && (
+                        <span class={style.featureValue}>
+                          <DeviceFeatureValueText feature={feature} />
+                        </span>
+                      )}
                     </label>
                   ))}
                 </div>
@@ -329,23 +347,25 @@ class DeviceFeaturePicker extends Component {
           )}
         </div>
 
-        <div class={style.footer}>
-          <span class={style.diff} data-cy="picker-diff">
-            {addedCount > 0 && <span class={style.diffAdded}>+{addedCount}</span>}
-            {addedCount > 0 && removedCount > 0 && ' · '}
-            {removedCount > 0 && <span class={style.diffRemoved}>−{removedCount}</span>}
-            {addedCount === 0 && removedCount === 0 && (
-              <Text
-                id="deviceFeaturePicker.selectedCount"
-                plural={selected.length}
-                fields={{ count: selected.length }}
-              />
-            )}
-          </span>
-          <button type="button" class={style.validateButton} onClick={this.validate} data-cy="picker-validate">
-            <Text id="deviceFeaturePicker.validate" />
-          </button>
-        </div>
+        {!props.single && this.renderFooter(props, selected, addedCount, removedCount)}
+      </div>
+    );
+  }
+
+  renderFooter(props, selected, addedCount, removedCount) {
+    return (
+      <div class={style.footer}>
+        <span class={style.diff} data-cy="picker-diff">
+          {addedCount > 0 && <span class={style.diffAdded}>+{addedCount}</span>}
+          {addedCount > 0 && removedCount > 0 && ' · '}
+          {removedCount > 0 && <span class={style.diffRemoved}>−{removedCount}</span>}
+          {addedCount === 0 && removedCount === 0 && (
+            <Text id="deviceFeaturePicker.selectedCount" plural={selected.length} fields={{ count: selected.length }} />
+          )}
+        </span>
+        <button type="button" class={style.validateButton} onClick={this.validate} data-cy="picker-validate">
+          <Text id="deviceFeaturePicker.validate" />
+        </button>
       </div>
     );
   }

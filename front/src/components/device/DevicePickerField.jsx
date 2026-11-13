@@ -14,8 +14,8 @@ import style from './devicePickerField.css';
 // mobile scene editor, themselves stacked by depth): it goes above any of them
 const PICKER_SHEET_DEPTH = 10;
 
-const getFeatureIcon = feature =>
-  (feature && get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)) || 'sliders';
+const getFeatureIcon = (feature, defaultIcon) =>
+  (feature && get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)) || defaultIcon || 'sliders';
 
 /**
  * @description A multi-selection of devices (or device features) as a form field, for a phone
@@ -28,6 +28,9 @@ const getFeatureIcon = feature =>
  * devices: the devices to pick from, each with its room and its features (null while loading).
  * selected: the selectors of the selection (device selectors with pickDevices, feature selectors
  * otherwise). onChange receives the new ordered selection.
+ * single: one device at most. The field shows it with a "Change" button, tapping a row of the
+ * picker replaces it and closes the sheet; the selection can only be emptied with clearable.
+ * defaultIcon: the icon of a device whose features do not tell one (a camera).
  */
 class DevicePickerField extends Component {
   state = {
@@ -67,7 +70,7 @@ class DevicePickerField extends Component {
         const features = (device.features || []).filter(feature => !filterFeature || filterFeature(feature, device));
         if (pickDevices) {
           if (device.selector === selector) {
-            match = { name: device.name, room: get(device, 'room.name'), feature: features[0] };
+            match = { name: device.name, room: get(device, 'room.name'), feature: features[0] || null };
           }
         } else {
           const feature = features.find(candidate => candidate.selector === selector);
@@ -94,6 +97,16 @@ class DevicePickerField extends Component {
     }
     const items = this.getItems();
     const loading = !props.devices;
+    const removable = !props.single || props.clearable;
+    let openLabelId = 'devicePickerField.choose';
+    let openIcon = 'plus';
+    if (props.single) {
+      openLabelId = items.length > 0 ? 'devicePickerField.changeOne' : 'devicePickerField.chooseOne';
+      openIcon = items.length > 0 ? 'repeat' : 'plus';
+    } else if (items.length > 0) {
+      openLabelId = 'devicePickerField.edit';
+      openIcon = 'edit-2';
+    }
     return (
       <div class={style.field} data-cy={props.dataCy || 'device-picker-field'}>
         {items.length > 0 && (
@@ -101,7 +114,7 @@ class DevicePickerField extends Component {
             {items.map(item => (
               <li class={style.item} key={item.selector} data-cy={`device-picker-item-${item.selector}`}>
                 <span class={style.itemIcon} aria-hidden="true">
-                  <i class={`fe fe-${getFeatureIcon(item.feature)}`} />
+                  <i class={`fe fe-${getFeatureIcon(item.feature, props.defaultIcon)}`} />
                 </span>
                 <span class={style.itemText}>
                   <span class={style.itemName}>{item.name}</span>
@@ -111,17 +124,19 @@ class DevicePickerField extends Component {
                     </span>
                   )}
                 </span>
-                <Localizer>
-                  <button
-                    type="button"
-                    class={style.removeButton}
-                    onClick={this.remove(item.selector)}
-                    aria-label={<Text id="devicePickerField.remove" fields={{ name: item.name }} />}
-                    data-cy={`device-picker-remove-${item.selector}`}
-                  >
-                    <i class="fe fe-x" aria-hidden="true" />
-                  </button>
-                </Localizer>
+                {removable && (
+                  <Localizer>
+                    <button
+                      type="button"
+                      class={style.removeButton}
+                      onClick={this.remove(item.selector)}
+                      aria-label={<Text id="devicePickerField.remove" fields={{ name: item.name }} />}
+                      data-cy={`device-picker-remove-${item.selector}`}
+                    >
+                      <i class="fe fe-x" aria-hidden="true" />
+                    </button>
+                  </Localizer>
+                )}
               </li>
             ))}
           </ul>
@@ -135,18 +150,21 @@ class DevicePickerField extends Component {
           type="button"
           class={style.openButton}
           onClick={this.openPicker}
-          disabled={loading}
+          disabled={loading || props.disabled}
           data-cy="device-picker-open"
         >
-          <i class={`fe fe-${items.length > 0 ? 'edit-2' : 'plus'}`} aria-hidden="true" />
-          <Text id={items.length > 0 ? 'devicePickerField.edit' : 'devicePickerField.choose'} />
+          <i class={`fe fe-${openIcon}`} aria-hidden="true" />
+          <Text id={openLabelId} />
         </button>
 
         <BottomSheet
           open={pickerOpen}
           size="full"
           depth={PICKER_SHEET_DEPTH}
-          title={props.sheetTitle || get(props.intl.dictionary, 'devicePickerField.title')}
+          title={
+            props.sheetTitle ||
+            get(props.intl.dictionary, props.single ? 'devicePickerField.titleOne' : 'devicePickerField.title')
+          }
           onClose={this.closePicker}
           dataCy="device-picker-sheet"
         >
@@ -158,6 +176,8 @@ class DevicePickerField extends Component {
                 filterFeature={props.filterFeature}
                 pickDevices={props.pickDevices}
                 sameKindOnly={props.sameKindOnly}
+                single={props.single}
+                defaultIcon={props.defaultIcon}
                 onValidate={this.validatePicker}
                 onCancel={this.closePicker}
                 hideBackButton

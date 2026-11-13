@@ -7795,6 +7795,9 @@
     "title": "Choisir des appareils",
     "choose": "Choisir des appareils",
     "edit": "Ajouter ou retirer des appareils",
+    "titleOne": "Choisir un appareil",
+    "chooseOne": "Choisir un appareil",
+    "changeOne": "Changer d'appareil",
     "empty": "Aucun appareil sélectionné.",
     "remove": "Retirer {{name}}",
     "notFound": "Appareil introuvable"
