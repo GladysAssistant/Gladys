@@ -37,7 +37,10 @@ module.exports = function MatterController(matterHandler) {
    */
   async function getNodes(req, res) {
     const nodes = await matterHandler.getNodes({
-      withGladysDevices: Boolean(req.query && req.query.with_gladys_devices === 'true'),
+      // a string through the local API, a boolean through Gladys Plus (the query object is forwarded as is)
+      withGladysDevices: Boolean(
+        req.query && (req.query.with_gladys_devices === 'true' || req.query.with_gladys_devices === true),
+      ),
     });
     res.json(nodes);
   }

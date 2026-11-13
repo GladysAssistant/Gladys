@@ -108,6 +108,20 @@ describe('MatterController', () => {
     await controller['get /api/v1/service/matter/node'].controller(req, res);
     assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: true });
   });
+  it('should get nodes with their Gladys devices through Gladys Plus', async () => {
+    // Gladys Plus forwards the query object as is: the boolean is not turned into a string
+    const req = {
+      query: {
+        with_gladys_devices: true,
+      },
+    };
+    const res = {
+      json: fake.returns([]),
+    };
+
+    await controller['get /api/v1/service/matter/node'].controller(req, res);
+    assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: true });
+  });
   it('should get ipv6 status', async () => {
     const req = {};
     const res = {

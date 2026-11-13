@@ -132,6 +132,9 @@ const isAnswerFromGladys = e => {
   return Boolean(data && typeof data === 'object' && !data.error_code && (data.error || data.code));
 };
 
+// a node list loaded without its Gladys devices (or by an older server) shows "no linked devices"
+const getLinkedGladysDevices = node => node.gladys_devices || [];
+
 const DecommissionFeedback = ({ feedback, onDismiss }) => {
   const dismissButton = <button type="button" class="close" onClick={onDismiss} />;
   if (feedback.status === 'error') {
@@ -355,7 +358,7 @@ class MatterSettingsPage extends Component {
     const name = `${node.node_information.vendor_name} - ${node.node_information.product_name}`;
     // only the devices the user saw in the confirmation are sent: the server deletes nothing else
     const gladysDeviceSelectors = this.state.deleteGladysDevices
-      ? node.gladys_devices.map(gladysDevice => gladysDevice.selector)
+      ? getLinkedGladysDevices(node).map(gladysDevice => gladysDevice.selector)
       : [];
     this.setDecommissionFeedback(nodeId, null);
     this.setState(prevState => ({
@@ -633,11 +636,11 @@ class MatterSettingsPage extends Component {
                                       <div class="alert alert-danger mb-3">
                                         <MarkupText id="integration.matter.settings.decommission.confirmMessage" />
                                       </div>
-                                      {node.gladys_devices.length > 0 && (
+                                      {getLinkedGladysDevices(node).length > 0 && (
                                         <div class="mb-3">
                                           <Text id="integration.matter.settings.decommission.linkedDevices" />
                                           <ul>
-                                            {node.gladys_devices.map(gladysDevice => (
+                                            {getLinkedGladysDevices(node).map(gladysDevice => (
                                               <li key={gladysDevice.selector}>{gladysDevice.name}</li>
                                             ))}
                                           </ul>
