@@ -1,6 +1,8 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { ENERGY_CONTRACT_DIRECTIONS } = require('../../utils/constants');
 const { getStatus } = require('./contract.getStatus');
+const { getLocalContext } = require('./tariff.time');
 
 /**
  * @description Turn a contract row into its API shape: plain object with its status.
@@ -29,6 +31,13 @@ const providerInclude = {
   attributes: ['id', 'name', 'selector', 'status'],
 };
 
+// the meter of the contract, which the price widget and the price scene editors list (spec 8.2)
+const meterInclude = {
+  model: db.Device,
+  as: 'electric_meter_device',
+  attributes: ['id', 'selector', 'name'],
+};
+
 /**
  * @description List the contracts, most recent first.
  * @param {object} [options] - Filters: `electric_meter_device_id`, `provider_service_id`, `template_key`.
@@ -45,7 +54,7 @@ async function get(options = {}) {
   });
   const rows = await db.EnergyContract.findAll({
     where,
-    include: [providerInclude],
+    include: [providerInclude, meterInclude],
     order: [
       ['valid_from', 'DESC'],
       ['created_at', 'DESC'],
@@ -62,7 +71,7 @@ async function get(options = {}) {
  * await getBySelector('edf-tempo-9-kva');
  */
 async function getBySelector(selector) {
-  const row = await db.EnergyContract.findOne({ where: { selector }, include: [providerInclude] });
+  const row = await db.EnergyContract.findOne({ where: { selector }, include: [providerInclude, meterInclude] });
   if (row === null) {
     throw new NotFoundError('ENERGY_CONTRACT_NOT_FOUND');
   }
@@ -88,4 +97,27 @@ async function getActive(electricMeterDeviceId, date, direction = 'consumption')
   return row ? row.get({ plain: true }) : null;
 }
 
-module.exports = { get, getBySelector, getActive, toPlain };
+/**
+ * @description Find the consumption contract of a meter active at an instant, the validity of each contract
+ * being judged on the local date of its own timezone (spec 8.1 and 8.2: the price widget and the
+ * price scenes follow the meter's active contract, so a tariff change, a new successive contract,
+ * needs no reconfiguration, and an expired contract never prices "now").
+ * @param {string} electricMeterDeviceId - Meter device id.
+ * @param {number} at - Instant (ms).
+ * @returns {Promise<object|null>} The contract or null when none covers the instant.
+ * @example
+ * await getActiveAt('…', Date.now());
+ */
+async function getActiveAt(electricMeterDeviceId, at) {
+  const rows = await db.EnergyContract.findAll({
+    where: { electric_meter_device_id: electricMeterDeviceId, direction: ENERGY_CONTRACT_DIRECTIONS.CONSUMPTION },
+    order: [['valid_from', 'DESC']],
+  });
+  const row = rows.find((r) => {
+    const { date } = getLocalContext(at, r.timezone);
+    return r.valid_from <= date && (r.valid_to === null || r.valid_to >= date);
+  });
+  return row ? row.get({ plain: true }) : null;
+}
+
+module.exports = { get, getBySelector, getActive, getActiveAt, toPlain };

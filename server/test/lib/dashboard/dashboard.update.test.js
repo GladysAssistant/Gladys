@@ -341,6 +341,24 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('period_start_day', 5);
   });
 
+  it('should save an energy price box carrying a meter, or none for the main meter', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        [
+          { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: 'linky', name: 'Electricity price' },
+          { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: '' },
+          { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE },
+        ],
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0]).to.deep.equal([
+      { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: 'linky', name: 'Electricity price' },
+      { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE, electric_meter: '' },
+      { type: DASHBOARD_BOX_TYPE.ENERGY_PRICE },
+    ]);
+  });
+
+  // a box saved before the meter targeting
   it('should save an energy price box carrying a contract selector', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [

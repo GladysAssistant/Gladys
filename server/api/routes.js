@@ -1231,6 +1231,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: energyContractController.getTemplate,
     },
+    // current price of a meter (section 8.1): declared before `:selector`, like `template`
+    'get /api/v1/energy_contract/current': {
+      authenticated: true,
+      controller: energyContractController.getMeterCurrent,
+    },
     'get /api/v1/energy_contract/:selector': {
       authenticated: true,
       controller: energyContractController.getBySelector,

@@ -915,13 +915,15 @@
       "energyPrice": {
         "editName": "Nombre del widget (opcional)",
         "editNamePlaceholder": "Nombre mostrado en el panel",
-        "editContract": "Contrato de electricidad",
+        "editMeter": "Contador eléctrico",
+        "editMeterHelp": "El widget muestra el precio del contrato activo en este contador: cuando cambie su tarifa, cree el nuevo contrato y el widget lo seguirá automáticamente.",
         "noContract": "Todavía no hay ningún contrato de electricidad.",
         "noContractLink": "Cree uno en la integración de seguimiento energético.",
-        "notConfigured": "Seleccione un contrato en los ajustes del widget.",
+        "noActiveContract": "Ningún contrato activo en {{meter}} en este momento.",
+        "manageContractsLink": "Gestionar los contratos",
         "until": "Hasta las {{time}}",
         "unknownPrice": "Precio desconocido",
-        "error": "No se pudo cargar el precio de la electricidad. Compruebe que el contrato sigue existiendo.",
+        "error": "No se pudo cargar el precio de la electricidad. Compruebe que el contador y sus contratos siguen existiendo.",
         "cumulativeToday": "Hoy: {{kwh}} kWh"
       },
       "thermostat": {
@@ -2965,6 +2967,13 @@
       "description": "Realice un seguimiento de su consumo eléctrico en Gladys",
       "myDevicesTab": "Mis dispositivos",
       "energyPriceTab": "Tarifas de energía",
+      "meterSelect": {
+        "mainMeter": "Contador principal",
+        "mainMeterNamed": "Contador principal ({{name}})",
+        "anyMeter": "Cualquier contador",
+        "noActiveContract": "sin contrato activo",
+        "deletedContract": "El contrato de este ajuste ya no existe: elija un contador."
+      },
       "documentation": "Documentación",
       "wizard": {
         "basics": "Información",
@@ -4232,8 +4241,8 @@
         "variablesExplanation": "Para insertar una variable, escriba \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
       },
       "energyCurrentPrice": {
-        "description": "La escena solo continuará si el precio actual del kWh del contrato seleccionado cumple la condición siguiente.",
-        "contractLabel": "Contrato de energía",
+        "description": "La escena solo continuará si el precio actual del kWh del contrato activo en el contador seleccionado cumple la condición siguiente. Sin contrato activo, la escena se detiene.",
+        "meterLabel": "Contador eléctrico",
         "operatorLabel": "Continuar si el precio es",
         "valueLabel": "Umbral (por kWh)",
         "valuePlaceholder": "0.20",
@@ -4748,9 +4757,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "Se activa cuando cambia el precio actual del kWh (o el tramo tarifario) del contrato seleccionado, por ejemplo al pasar de horas valle a horas punta.",
-        "contractLabel": "Contrato de energía",
-        "anyContract": "Cualquier contrato",
+        "description": "Se activa cuando cambia el precio actual del kWh (o el tramo tarifario) del contador seleccionado, por ejemplo al pasar de horas valle a horas punta. Sigue el contrato activo del contador: cuando cambia la tarifa, la escena sigue funcionando sin modificaciones.",
+        "meterLabel": "Contador eléctrico",
         "error": "No se pudieron cargar los contratos de energía."
       }
     },

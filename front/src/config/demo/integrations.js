@@ -1908,6 +1908,7 @@ const integrations = {
       selector: 'edf-tempo-9-kva',
       name: 'EDF Tempo 9 kVA',
       electric_meter_device_id: uuid('electric-meter'),
+      electric_meter_device: { id: uuid('electric-meter'), selector: 'electric-meter', name: 'Electric meter' },
       valid_from: '2025-02-01',
       valid_to: null,
       currency: 'EUR',
@@ -1946,7 +1947,8 @@ const integrations = {
         ]
       },
       inputs: null,
-      migration_warning: null
+      migration_warning: null,
+      created_at: '2025-01-20T10:00:00.000Z'
     }
   ],
   'post /api/v1/energy_contract': { success: true },
@@ -1983,9 +1985,10 @@ const integrations = {
     { starts_at: '2026-09-21T04:00:00.000Z', value: 'blue' },
     { starts_at: '2026-09-22T04:00:00.000Z', value: 'blue' }
   ],
-  // Current price of the demo contract, as the electricity price widget asks
-  // for it: a Tempo blue day, peak hours until 22:00 UTC
-  'get /api/v1/energy_contract/edf-tempo-9-kva/current': {
+  // Current price of the demo meter, as the electricity price widget asks for it
+  // (the price of the contract active on the meter): a Tempo blue day, peak
+  // hours until 22:00 UTC
+  'get /api/v1/energy_contract/current': {
     price: 0.1609,
     currency: 'EUR',
     unit: 'kWh',
@@ -1994,7 +1997,8 @@ const integrations = {
     next_price: 0.1296,
     next_label: 'Blue off-peak',
     cumulative: { day: 6.2, month: 154, billing_period: 154 },
-    contract: { id: 'contract-1', selector: 'edf-tempo-9-kva', name: 'EDF Tempo 9 kVA' }
+    contract: { id: 'contract-1', selector: 'edf-tempo-9-kva', name: 'EDF Tempo 9 kVA' },
+    electric_meter: { id: uuid('electric-meter'), selector: 'electric-meter', name: 'Electric meter' }
   },
   // Gladys Plus AI quota, one bucket for text and one for images
   'get /api/v1/gateway/aichat/quota': {

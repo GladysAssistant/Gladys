@@ -886,18 +886,26 @@ const actionsFunc = {
     }
   },
   [ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE]: async (self, action) => {
-    // current unit price of the contract (spec 8.2) compared with the threshold; an
-    // unknown price (null, spec 7.7) never validates the condition
+    // current unit price of the meter's active contract (spec 8.2) compared with the threshold:
+    // the meter of the condition, else the meter of the contract a condition saved before the
+    // meter targeting names, else the main meter; no active contract or an unknown price
+    // (null, spec 7.7) never validates the condition
     const threshold = parseFloat(action.value);
     if (Number.isNaN(threshold)) {
       throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
     }
     let current;
     try {
-      current = await self.energyContract.getCurrent(action.energy_contract);
+      current = await self.energyContract.getMeterCurrent({
+        electric_meter: action.electric_meter,
+        energy_contract: action.energy_contract,
+      });
     } catch (e) {
-      // a contract that cannot be read (deleted, integration down) never validates
+      // a meter or a contract that cannot be read (deleted, integration down) never validates
       throw new AbortScene(e.message);
+    }
+    if (current.contract === null) {
+      throw new AbortScene('NO_ACTIVE_ENERGY_CONTRACT');
     }
     if (current.price === null || !compare(action.operator, current.price, threshold)) {
       throw new AbortScene('ENERGY_PRICE_CONDITION_NOT_MET');

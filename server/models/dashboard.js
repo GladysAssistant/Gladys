@@ -65,7 +65,10 @@ const boxSchema = Joi.object().keys({
   gauge_color_high: Joi.string(),
   colors: Joi.array().items(Joi.string()),
   show_subscription_prices: Joi.boolean(),
-  // energy-price box: the selector of the contract whose current price is shown
+  // energy-price box: the device selector of the meter whose active contract's price is shown
+  // (empty: the main meter); `energy_contract` is the contract selector of a box saved before
+  // the meter targeting, read as the meter of that contract
+  electric_meter: Joi.string().allow(''),
   energy_contract: Joi.string(),
   period_start_day: Joi.number()
     .integer()

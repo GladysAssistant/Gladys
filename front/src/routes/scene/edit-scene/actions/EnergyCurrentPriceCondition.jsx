@@ -4,6 +4,12 @@ import { Localizer, Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../utils/consts';
+import ElectricMeterSelect from '../../../../components/energy-contract/ElectricMeterSelect';
+import {
+  getElectricMeters,
+  getMeterSelectorOfContract,
+  getTargetedMeter
+} from '../../../../components/energy-contract/electricMeters';
 
 const OPERATORS = ['=', '!=', '>', '>=', '<', '<='];
 
@@ -18,8 +24,10 @@ const OPERATOR_LABEL_KEYS = {
 
 const isNullOrUndefined = variable => variable === null || variable === undefined;
 
-// Scene condition: the current unit price of an energy contract (spec 8.2)
-// compared with a threshold in the currency of the contract, per kWh
+// Scene condition: the current unit price of a meter (spec 8.2), the price of
+// the contract active on it, compared with a threshold in the currency of the
+// contract, per kWh. The meter is stored in `electric_meter`, empty for the main
+// meter, so a tariff change (a new contract on the meter) needs no reconfiguration.
 class EnergyCurrentPriceCondition extends Component {
   getContracts = async () => {
     this.setState({
@@ -31,10 +39,7 @@ class EnergyCurrentPriceCondition extends Component {
         contracts,
         SceneGetContracts: RequestStatus.Success
       });
-      // default to the first contract, so a freshly added condition is valid
-      if (isNullOrUndefined(get(this.props, 'action.energy_contract')) && contracts.length > 0) {
-        this.props.updateActionProperty(this.props.path, 'energy_contract', contracts[0].selector);
-      }
+      this.normalizeLegacyContract(contracts);
     } catch (e) {
       this.setState({
         SceneGetContracts: RequestStatus.Error
@@ -42,8 +47,24 @@ class EnergyCurrentPriceCondition extends Component {
     }
   };
 
-  handleContractChange = e => {
-    this.props.updateActionProperty(this.props.path, 'energy_contract', e.target.value);
+  // A condition saved before the meter targeting names a contract: it is read as
+  // the meter of that contract, and saved as that meter from now on
+  normalizeLegacyContract = contracts => {
+    const { action, path } = this.props;
+    if (action.electric_meter || !action.energy_contract) {
+      return;
+    }
+    const meterSelector = getMeterSelectorOfContract(contracts, action.energy_contract);
+    if (meterSelector) {
+      this.props.updateActionProperty(path, 'electric_meter', meterSelector);
+      this.props.updateActionProperty(path, 'energy_contract', undefined);
+    }
+  };
+
+  // an empty value is the main meter
+  handleMeterChange = e => {
+    this.props.updateActionProperty(this.props.path, 'electric_meter', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'energy_contract', undefined);
   };
 
   handleOperatorChange = e => {
@@ -74,8 +95,11 @@ class EnergyCurrentPriceCondition extends Component {
   }
 
   render({ action, path }, { contracts, SceneGetContracts }) {
-    const selectedContract = contracts.find(contract => contract.selector === action.energy_contract);
-    const currency = selectedContract ? selectedContract.currency : null;
+    const electricMeters = getElectricMeters(contracts);
+    // the currency of the meter's active contract, else of its latest one
+    const meter = getTargetedMeter(electricMeters, action.electric_meter);
+    const contract = meter ? meter.activeContract || meter.contracts[0] : null;
+    const currency = contract ? contract.currency : null;
     return (
       <div>
         {path && !path.includes('.if') && (
@@ -91,24 +115,22 @@ class EnergyCurrentPriceCondition extends Component {
           <div class="col-md-12">
             <div class="form-group">
               <div class="form-label">
-                <Text id="editScene.actionsCard.energyCurrentPrice.contractLabel" />
+                <Text id="editScene.actionsCard.energyCurrentPrice.meterLabel" />
               </div>
-              <select class="form-control" onChange={this.handleContractChange} value={action.energy_contract || ''}>
-                <option value="" disabled>
-                  <Text id="global.emptySelectOption" />
-                </option>
-                {contracts.map(contract => (
-                  <option key={contract.selector} value={contract.selector}>
-                    {contract.name} ({contract.status})
-                  </option>
-                ))}
-              </select>
+              <ElectricMeterSelect
+                meters={electricMeters.meters}
+                mainMeter={electricMeters.mainMeter}
+                value={action.electric_meter}
+                onChange={this.handleMeterChange}
+                emptyOption="main"
+                legacyContract={action.energy_contract}
+              />
               {SceneGetContracts === RequestStatus.Error && (
                 <small class="text-danger">
                   <Text id="editScene.actionsCard.energyCurrentPrice.error" />
                 </small>
               )}
-              {SceneGetContracts === RequestStatus.Success && contracts.length === 0 && (
+              {SceneGetContracts === RequestStatus.Success && electricMeters.meters.length === 0 && (
                 <small class="text-muted">
                   <Text id="editScene.actionsCard.energyCurrentPrice.noContract" />
                 </small>

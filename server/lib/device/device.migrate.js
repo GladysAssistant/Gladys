@@ -32,7 +32,8 @@ const FEATURE_PARAM_NAMES = [
 // (docs/specs/thermostat.md A.1.1): several windows, several temperature probes.
 const FEATURE_LIST_PARAM_NAMES = ['THERMOSTAT_TEMPERATURE_FEATURE', 'THERMOSTAT_WINDOW_FEATURE'];
 const FEATURE_ARRAY_FIELDS = ['device_features'];
-const DEVICE_STRING_FIELDS = ['device', 'camera'];
+// `electric_meter`: the meter of the energy-price box and of the energy price trigger / condition
+const DEVICE_STRING_FIELDS = ['device', 'camera', 'electric_meter'];
 const DEVICE_ARRAY_FIELDS = ['devices'];
 
 // Progress range of the DuckDB history move, spread over the slices below so a

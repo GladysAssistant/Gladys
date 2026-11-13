@@ -974,13 +974,15 @@
       "energyPrice": {
         "editName": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le dashboard",
-        "editContract": "Contrat d'électricité",
+        "editMeter": "Compteur électrique",
+        "editMeterHelp": "Le widget affiche le prix du contrat actif sur ce compteur : lors d'un changement de tarif, créez le nouveau contrat et le widget le suivra automatiquement.",
         "noContract": "Aucun contrat d'électricité pour le moment.",
         "noContractLink": "Créez-en un dans l'intégration de suivi énergétique.",
-        "notConfigured": "Sélectionnez un contrat dans les réglages du widget.",
+        "noActiveContract": "Aucun contrat actif sur {{meter}} en ce moment.",
+        "manageContractsLink": "Gérer les contrats",
         "until": "Jusqu'à {{time}}",
         "unknownPrice": "Prix inconnu",
-        "error": "Impossible de charger le prix de l'électricité. Vérifiez que le contrat existe toujours.",
+        "error": "Impossible de charger le prix de l'électricité. Vérifiez que le compteur et ses contrats existent toujours.",
         "cumulativeToday": "Aujourd'hui : {{kwh}} kWh"
       }
     },
@@ -1484,6 +1486,13 @@
       "description": "Suivez votre consommation d'électricité dans Gladys",
       "myDevicesTab": "Mes appareils",
       "energyPriceTab": "Tarifs d'énergie",
+      "meterSelect": {
+        "mainMeter": "Compteur principal",
+        "mainMeterNamed": "Compteur principal ({{name}})",
+        "anyMeter": "Tous les compteurs",
+        "noActiveContract": "aucun contrat actif",
+        "deletedContract": "Le contrat utilisé par ce réglage n'existe plus : choisissez un compteur."
+      },
       "documentation": "Documentation",
       "wizard": {
         "basics": "Informations",
@@ -4232,8 +4241,8 @@
         "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       },
       "energyCurrentPrice": {
-        "description": "La scène ne continuera que si le prix actuel du kWh du contrat sélectionné respecte la condition ci-dessous.",
-        "contractLabel": "Contrat d'énergie",
+        "description": "La scène ne continuera que si le prix actuel du kWh du contrat actif sur le compteur sélectionné respecte la condition ci-dessous. Sans contrat actif, la scène s'arrête.",
+        "meterLabel": "Compteur électrique",
         "operatorLabel": "Continuer si le prix est",
         "valueLabel": "Seuil (par kWh)",
         "valuePlaceholder": "0.20",
@@ -4748,9 +4757,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "Ce déclencheur s'active quand le prix actuel du kWh (ou la tranche tarifaire) du contrat sélectionné change, par exemple au passage des heures creuses aux heures pleines.",
-        "contractLabel": "Contrat d'énergie",
-        "anyContract": "Tous les contrats",
+        "description": "Ce déclencheur s'active quand le prix actuel du kWh (ou la tranche tarifaire) du compteur sélectionné change, par exemple au passage des heures creuses aux heures pleines. Il suit le contrat actif du compteur : lors d'un changement de tarif, la scène continue de fonctionner sans modification.",
+        "meterLabel": "Compteur électrique",
         "error": "Impossible de charger les contrats d'énergie."
       }
     },
