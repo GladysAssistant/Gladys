@@ -108,7 +108,28 @@ describe('thermostat presence: findAbsence', () => {
     expect(findAbsence(features, ['salon-motion', 'kitchen-motion'], 30, vacatedAt, NOW)).to.equal(null);
   });
 
-  // A sensor on a flat battery must not leave the house on eco for good.
+  // A motion sensor dies on `0`: weighed for ever, a flat battery left the room
+  // on the absence preset for good.
+  it('should leave out a sensor silent for so long that its value is outdated', () => {
+    const dead = sensor('salon-motion', 0, {
+      last_value_changed: new Date(NOW - 72 * 60 * MINUTE),
+      last_value_is_too_old: true,
+    });
+    const vacatedAt = new Map([['salon-motion', NOW - 72 * 60 * MINUTE]]);
+
+    // Alone, the room is never empty, and its record is dropped: its next `0`
+    // starts a new count.
+    expect(findAbsence(read([dead]), ['salon-motion'], 30, vacatedAt, NOW)).to.equal(null);
+    expect(vacatedAt.has('salon-motion')).to.equal(false);
+    expect(findAbsence(read([dead]), ['salon-motion'], 30, null, NOW)).to.equal(null);
+
+    // Beside a live one, the live one decides.
+    const others = new Map([['kitchen-motion', NOW - 40 * MINUTE]]);
+    expect(
+      findAbsence(read([dead, sensor('kitchen-motion', 0)]), ['salon-motion', 'kitchen-motion'], 30, others, NOW),
+    ).to.equal(NOW - 40 * MINUTE);
+  });
+
   it('should never take the room as empty with no sensor that can be read', () => {
     const features = read([sensor('never-reported', null)]);
 
@@ -954,6 +975,19 @@ describe('thermostat presence: onDeviceNewState', () => {
     await report(mod, handler, 'salon-motion', 0);
 
     assert.notCalled(handler.triggerApplySchedules);
+  });
+
+  // Added back days later, the sensor found on `0` would resume that old time
+  // and empty the room at once.
+  it('should drop the record of a sensor no thermostat watches any more', async () => {
+    const mod = loadModule();
+    const handler = buildHandler([thermostat('living-room', ['salon-motion'])]);
+    handler.presenceVacatedAt.set('salon-motion', NOW - 5 * MINUTE);
+    handler.presenceVacatedAt.set('removed-motion', NOW - 3 * 24 * 60 * MINUTE);
+
+    await mod.getWindowSelectors.call(handler);
+
+    expect([...handler.presenceVacatedAt.keys()]).to.deep.equal(['salon-motion']);
   });
 
   it('should rebuild the presence sensors when the caches are dropped', async () => {
