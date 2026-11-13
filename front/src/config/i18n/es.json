@@ -1365,6 +1365,8 @@
         "alreadyCreatedBadge": "Ya añadido",
         "searchPlaceholder": "Buscar dispositivos",
         "noSearchResults": "Ningún dispositivo descubierto coincide con su búsqueda.",
+        "hideExistingDevices": "Ocultar los dispositivos ya añadidos",
+        "allDevicesHidden": "Todos los dispositivos descubiertos ya están en Gladys. Desactiva «Ocultar los dispositivos ya añadidos» para verlos.",
         "error": {
           "networkError": "Gladys no respondió a la solicitud de adición. Compruebe que el servidor Gladys esté en ejecución y accesible, y vuelva a intentarlo.",
           "badRequestError": "Gladys rechazó este dispositivo: los datos publicados por la integración son incorrectos.",

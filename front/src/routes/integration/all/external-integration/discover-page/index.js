@@ -10,11 +10,34 @@ import DiscoverTab from './DiscoverTab';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { stripDeviceStatesForSave } from '../../../../../utils/device';
+import keyValStore from '../../../../../utils/keyValueStore';
 
 // the scan runs inside the integration and ends with a re-publish of the
 // discovered devices (websocket event); an integration that never
 // re-publishes would leave the loader spinning forever without this cap
 const SCAN_MAX_DURATION_MS = 60 * 1000;
+
+// one choice for every external integration, remembered by the browser: it
+// is a display preference, never a setting of the integration
+const HIDE_EXISTING_DEVICES_KEY = 'external_integration_discover_hide_existing';
+
+// the storage can throw (private window, blocked site data): the toggle then
+// simply starts off and is not remembered
+const readHideExistingDevices = () => {
+  try {
+    return keyValStore.get(HIDE_EXISTING_DEVICES_KEY) === 'true';
+  } catch (e) {
+    return false;
+  }
+};
+
+const writeHideExistingDevices = value => {
+  try {
+    keyValStore.set(HIDE_EXISTING_DEVICES_KEY, String(value));
+  } catch (e) {
+    // not remembered, the toggle still applies to this page
+  }
+};
 
 class ExternalIntegrationDiscoverPage extends Component {
   constructor(props) {
@@ -30,10 +53,17 @@ class ExternalIntegrationDiscoverPage extends Component {
     // settling after its scan already ended (60s cap or websocket event)
     // cannot report its error on a later scan or on an ended one
     this.scanToken = 0;
+    this.state = { hideExistingDevices: readHideExistingDevices() };
   }
 
   searchDevices = e => {
     this.setState({ deviceSearch: e.target.value });
+  };
+
+  toggleHideExistingDevices = () => {
+    const hideExistingDevices = !this.state.hideExistingDevices;
+    writeHideExistingDevices(hideExistingDevices);
+    this.setState({ hideExistingDevices });
   };
 
   getIntegration = async () => {
@@ -208,6 +238,7 @@ class ExternalIntegrationDiscoverPage extends Component {
           scan={this.scan}
           createDevice={this.createDevice}
           searchDevices={this.debouncedSearchDevices}
+          toggleHideExistingDevices={this.toggleHideExistingDevices}
         />
       </ExternalIntegrationPage>
     );
