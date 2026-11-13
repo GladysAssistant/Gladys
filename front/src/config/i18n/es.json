@@ -7631,6 +7631,13 @@
       }
     }
   },
+  "feedback": {
+    "integrationLink": "Dar mi opinión",
+    "generalLink": "Dar mi opinión sobre Gladys",
+    "subjectTopicTitle": "Mi opinión sobre la integración {{subject}}",
+    "generalTopicTitle": "Mi opinión sobre Gladys",
+    "topicBody": "<!-- Cuéntenos: qué funciona bien, qué le bloquea, qué le gustaría mejorar. ¡Todas las opiniones son bienvenidas! -->\n\n\n\n---\n_Enviado desde Gladys v{{version}}_"
+  },
   "header": {
     "clockNoticeTitle": "La hora de Gladys es incorrecta",
     "clockNoticeText": "Las escenas programadas, el historial y la energía pueden ser incorrectos.",
