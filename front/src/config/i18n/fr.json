@@ -378,7 +378,7 @@
     "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
-    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur mobile, utilisez les flèches.",
+    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur téléphone, utilisez les flèches, « Déplacer vers… » ou le mode Réorganiser.",
     "editorDashboardSettingsButton": "Réglages du tableau de bord",
     "editorDashboardSettings": "Réglages du tableau de bord",
     "editorMoveSectionUp": "Monter la section",
@@ -526,7 +526,34 @@
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Entrez le nom du widget",
-        "addADeviceLabel": "Ajouter un appareil :"
+        "addADeviceLabel": "Ajouter un appareil :",
+        "listLabel": "Appareils affichés",
+        "emptyList": "Aucun appareil dans ce widget pour le moment.",
+        "addDevicesButton": "Ajouter des appareils",
+        "dragHint": "Glissez la poignée pour réordonner, touchez un appareil pour le renommer.",
+        "backToList": "Appareils",
+        "moveHandle": "Déplacer {{name}}",
+        "displayNameLabel": "Nom affiché dans le widget",
+        "defaultNameHint": "Vide : le widget affiche « {{name}} ».",
+        "useDefaultName": "Revenir au nom par défaut",
+        "position": "Position {{index}} sur {{total}}",
+        "moveUp": "Monter",
+        "moveDown": "Descendre",
+        "removeFromWidget": "Retirer du widget",
+        "done": "OK",
+        "deviceNotFound": "Appareil introuvable",
+        "loadError": "Impossible de charger les appareils. Vérifiez la connexion à Gladys, puis rouvrez le widget.",
+        "removedUndo": "« {{name}} » retiré",
+        "addedCount": {
+          "one": "1 ajouté",
+          "other": "{{count}} ajoutés"
+        },
+        "removedCount": {
+          "one": "1 retiré",
+          "other": "{{count}} retirés"
+        },
+        "undo": "Annuler",
+        "detailTitle": "Renommer"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -979,13 +1006,15 @@
       "energyPrice": {
         "editName": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le dashboard",
-        "editContract": "Contrat d'électricité",
+        "editMeter": "Compteur électrique",
+        "editMeterHelp": "Le widget affiche le prix du contrat actif sur ce compteur : lors d'un changement de tarif, créez le nouveau contrat et le widget le suivra automatiquement.",
         "noContract": "Aucun contrat d'électricité pour le moment.",
         "noContractLink": "Créez-en un dans l'intégration de suivi énergétique.",
-        "notConfigured": "Sélectionnez un contrat dans les réglages du widget.",
+        "noActiveContract": "Aucun contrat actif sur {{meter}} en ce moment.",
+        "manageContractsLink": "Gérer les contrats",
         "until": "Jusqu'à {{time}}",
         "unknownPrice": "Prix inconnu",
-        "error": "Impossible de charger le prix de l'électricité. Vérifiez que le contrat existe toujours.",
+        "error": "Impossible de charger le prix de l'électricité. Vérifiez que le compteur et ses contrats existent toujours.",
         "cumulativeToday": "Aujourd'hui : {{kwh}} kWh"
       }
     },
@@ -1022,7 +1051,42 @@
       "scenesText": "Lumières au coucher du soleil, routines du matin : votre maison agit pour vous.",
       "usersTitle": "Invitez votre foyer",
       "usersText": "Créez un compte pour chaque membre de la famille."
-    }
+    },
+    "editPanelClose": "Fermer",
+    "editPanelExpand": "Agrandir le panneau",
+    "editPanelCollapse": "Réduire le panneau",
+    "editDashboardDeleteThisDashboard": "Supprimer ce tableau de bord",
+    "editDashboardDeleteForever": "Supprimer définitivement",
+    "editorAddColumnShort": "Colonne",
+    "editorAddWidgetHere": "Ajouter un widget ici",
+    "editorDeleteColumn": "Supprimer la colonne {{index}}",
+    "editorExplanationDismiss": "Masquer cette aide",
+    "editorMobileOrderColumns": "Par colonne",
+    "editorMobileOrderRows": "Par rangée",
+    "editorMobileOrderHelp": "Sur téléphone, les colonnes s’empilent : afficher les widgets colonne par colonne, ou rangée par rangée (le premier widget de chaque colonne, puis le deuxième…)",
+    "editorMoveCurrentColumn": "Colonne actuelle",
+    "editorMoveWidgetCount": {
+      "zero": "Vide",
+      "one": "1 widget",
+      "other": "{{count}} widgets"
+    },
+    "editorMoveWidgetUp": "Monter",
+    "editorMoveWidgetDown": "Descendre",
+    "editorMoveWidgetTo": "Déplacer vers…",
+    "editorMoveWidgetTitle": "Déplacer le widget",
+    "editorMoveWidgetHint": "Choisissez la colonne où placer le widget : il est ajouté à la fin.",
+    "editorRemoveWidget": "Supprimer le widget",
+    "editorWidgetSettings": "Réglages du widget",
+    "editorReorganize": "Réorganiser",
+    "editorReorganizeDone": "Vue complète",
+    "leaveConfirmTitle": "Quitter sans enregistrer ?",
+    "leaveConfirmText": "Les modifications de ce tableau de bord seront perdues.",
+    "leaveConfirmLeave": "Quitter sans enregistrer",
+    "leaveConfirmStay": "Continuer l’édition",
+    "selectBoxTypePopularSection": "Les plus utilisés",
+    "selectBoxTypeAllSection": "Tous les widgets",
+    "widgetRemoved": "widget supprimé",
+    "editorDashboardSettingsShort": "Réglages"
   },
   "newDashboard": {
     "cardTitle": "Créer un tableau de bord",
@@ -1489,6 +1553,13 @@
       "description": "Suivez votre consommation d'électricité dans Gladys",
       "myDevicesTab": "Mes appareils",
       "energyPriceTab": "Tarifs d'énergie",
+      "meterSelect": {
+        "mainMeter": "Compteur principal",
+        "mainMeterNamed": "Compteur principal ({{name}})",
+        "anyMeter": "Tous les compteurs",
+        "noActiveContract": "aucun contrat actif",
+        "deletedContract": "Le contrat utilisé par ce réglage n'existe plus : choisissez un compteur."
+      },
       "documentation": "Documentation",
       "wizard": {
         "basics": "Informations",
@@ -2144,7 +2215,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Type d'adaptateur",
               "unknownDongle": "Non défini",
-              "tcpPort": "Port TCP"
+              "tcpPort": "Port TCP",
+              "ezspDriver": "Firmware ancien : Gladys utilise le pilote de compatibilité <code>ezsp</code>, car le pilote <code>ember</code> exige un firmware 7.4 ou supérieur. Zigbee2mqtt fonctionne ainsi, mais ce pilote est en fin de vie. Pour revenir à <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">mettez à jour le firmware</a>, puis choisissez le modèle sans « (legacy ezsp) » (ou le type <code>ember</code> pour un coordinateur réseau)."
             },
             "externalMqtt": {
               "title": "Connexion pour outils externes",
@@ -2154,7 +2226,10 @@
               "copied": "Copié"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Attention : Le firmware de votre coordinateur Ember est obsolète. La version 7.4.x ou supérieure est requise. Vous pouvez suivre ce <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guide</a> pour le mettre à jour. Dans le cas contraire, sélectionner le dongle (legacy ezsp) dans la configuration.",
+              "EZSP_PROTOCOL_VERSION": "Le firmware de votre coordinateur est trop ancien pour le pilote <code>ember</code>, qui exige la version 7.4 ou supérieure, et ce modèle n'a pas de pilote de compatibilité. Mettez-le à jour en suivant ce <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guide</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT ne reçoit pas de réponse de votre coordinateur Zigbee. Vérifiez que le modèle choisi dans la configuration est bien le vôtre (il détermine le pilote utilisé) et qu'aucun autre logiciel (Home Assistant, un autre Zigbee2MQTT…) n'utilise le coordinateur, puis débranchez et rebranchez votre clé, ou redémarrez votre coordinateur réseau.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT n'arrive pas à joindre votre coordinateur réseau. Vérifiez qu'il est allumé et connecté au réseau, et que son adresse dans la configuration (tcp://adresse:port) est la bonne.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT refuse de démarrer, car sa configuration (fichier configuration.yaml) n'est pas valide. Si vous l'avez modifiée à la main, corrigez-la ; sinon, signalez-le sur le <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">forum de Gladys</a>. Réglages refusés :",
               "unknownErrorPrefix": "Erreur du conteneur Zigbee2MQTT : "
             }
           },
@@ -3595,6 +3670,23 @@
         "nodeDetailsLabel": "Détails du nœud",
         "actionsLabel": "Actions",
         "decommissionButton": "Décommissionner",
+        "decommission": {
+          "confirmMessage": "<b>Décommissionner ce nœud ?</b> L'appareil quittera le réseau Matter de Gladys et devra être appairé à nouveau pour être utilisé dans Gladys.",
+          "linkedDevices": "Appareils Gladys créés à partir de ce nœud :",
+          "deleteDevicesLabel": "Supprimer aussi ces appareils de Gladys",
+          "deleteDevicesHelp": "Leur historique est supprimé, et les scènes et tableaux de bord qui les utilisent devront être mis à jour. Laissez cette case décochée pour les conserver : ils ne sont plus mis à jour jusqu'à ce que l'appareil soit appairé à nouveau, et l'onglet « Appareils » proposera alors de les mettre à jour, ce qui conserve leur historique, leurs scènes et leurs tableaux de bord.",
+          "confirmButton": "Oui, décommissionner",
+          "cancelButton": "Annuler",
+          "error": "Une erreur est survenue lors de la décommission du nœud « {{name}} », il n'a pas été retiré.",
+          "noResponse": "Pas de réponse de Gladys lors de la décommission du nœud « {{name}} » (connexion perdue ou trop lente). Il a peut-être quand même été retiré : la liste des nœuds ci-dessous a été rechargée.",
+          "success": "Le nœud « {{name}} » a été décommissionné.",
+          "devicesDeleted": {
+            "singular": "{{count}} appareil Gladys a été supprimé.",
+            "plural": "{{count}} appareils Gladys ont été supprimés."
+          },
+          "forcedWarning": "L'appareil « {{name}} » était injoignable : il a été retiré du réseau Matter de Gladys, mais il n'en a pas été informé. Réinitialisez-le aux paramètres d'usine avant de l'appairer à nouveau.",
+          "devicesNotDeleted": "Ces appareils Gladys n'ont pas pu être supprimés, probablement parce que leur historique est trop volumineux. Gladys est en train de le nettoyer : réessayez plus tard depuis l'onglet « Appareils »."
+        },
         "noNodesFound": "Aucun nœud Matter trouvé. Vous pouvez ajouter un appareil Matter en allant sur l'onglet \"Ajouter un appareil\".",
         "disabledWarning": "Matter n'est pas activé, veuillez l'activer dans <a href=\"/dashboard/integration/device/matter/settings\">Paramètres</a> pour commencer à utiliser l'intégration.",
         "disabledWarningSettings": "Matter n'est pas activé, veuillez cliquer sur le bouton ci-dessous pour l'activer.",
@@ -3730,9 +3822,13 @@
         "pilotWireFeatureLabel": "Fil pilote (actionneur)",
         "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie un ordre (confort, éco, hors-gel, arrêt…) au lieu de couper son alimentation. Désactivez d’abord le programme propre au module.",
         "pilotWireProgrammeWarning": "Désactivez le programme ou le mode thermostat propre au module (planning Heatzy, programme Tuya…) avant de le piloter depuis Gladys. Sinon, chaque ordre écrit par ce programme est pris pour un changement fait sur le module, et le module et Gladys écrivent l’ordre à tour de rôle.",
+        "pilotWireStandbyOrderLabel": "Ordre une fois la consigne atteinte",
+        "pilotWireStandbyForceLabel": "Forcer un autre ordre que hors-gel au repos",
+        "pilotWireStandbyForceHelp": "Par défaut, Gladys envoie hors-gel une fois la consigne atteinte. Certains radiateurs bloquent alors leurs propres fonctions, comme le boost d’un sèche-serviettes, car hors-gel et arrêt sont des ordres prioritaires : forcez éco pour les garder.",
+        "pilotWireStandbyOrderWarning": "Éco : le radiateur régule alors lui-même sur sa consigne éco, environ 3,5 °C sous son confort ; une consigne Gladys plus basse (nuit) n’est pas atteinte tant qu’éco est envoyé. Arrêt : le radiateur est coupé, sans protection hors-gel si Gladys s’arrête. Les presets hors-gel et absence, comme une fenêtre ouverte, restent sur hors-gel ; un module qui n’accepte pas l’ordre choisi reçoit le plus bas qu’il accepte : hors-gel, arrêt, puis éco.",
         "pilotWireRegulationHelp": {
           "heater": "Chaque preset envoie l’ordre choisi dans le tableau des presets (éco → éco, absence → hors-gel…). Le capteur d’ambiance, s’il y en a un, sert seulement à l’affichage.",
-          "gladys": "Gladys mesure la pièce avec le capteur d’ambiance et se sert du fil pilote comme d’un interrupteur — confort pour chauffer, hors-gel une fois la consigne du preset atteinte. Réglez la consigne confort du radiateur lui-même assez haut (24 °C par exemple) : il obéit alors à Gladys plutôt qu’à son propre thermomètre, et cette valeur reste un plafond de sécurité si Gladys s’arrête. Pour que le radiateur régule seul, choisissez le type « Radiateur à fil pilote »."
+          "gladys": "Gladys mesure la pièce avec le capteur d’ambiance et se sert du fil pilote comme d’un interrupteur — confort pour chauffer et, une fois la consigne du preset atteinte, un ordre de repos : hors-gel, ou sur un module qui ne l’accepte pas arrêt, puis éco, sauf si un autre est forcé. Réglez la consigne confort du radiateur lui-même assez haut (24 °C par exemple) : il obéit alors à Gladys plutôt qu’à son propre thermomètre, et cette valeur reste un plafond de sécurité si Gladys s’arrête. Pour que le radiateur régule seul, choisissez le type « Radiateur à fil pilote »."
         },
         "windowFeatureLabel": "Capteurs d'ouverture de fenêtre",
         "windowFeatureHelp": {
@@ -3779,6 +3875,7 @@
         "incompleteVirtualError": "Un thermostat virtuel a besoin d’un capteur de température et d’un actionneur (commutateur ou fil pilote) : c’est en lisant l’un et en actionnant l’autre qu’il régule.",
         "incompleteExternalError": "Un thermostat existant a besoin de la consigne du thermostat à piloter.",
         "incompletePilotWireError": "Un radiateur à fil pilote a besoin du fil pilote à commander.",
+        "pilotWireUnreadError": "Le fil pilote choisi n'a pas pu être lu, l'ordre de repos ne peut donc pas être vérifié : rechargez la page et choisissez-le à nouveau.",
         "activeScheduleLabel": "Planning actif",
         "activeScheduleHelp": "Sélectionnez le planning à appliquer automatiquement à ce thermostat.",
         "noActiveSchedule": "Aucun planning (contrôle manuel)",
@@ -3910,6 +4007,7 @@
     "newCondition": "Nouvelle condition",
     "selectActionType": "Sélectionnez un type d'action",
     "selectConditionType": "Sélectionner un type de condition",
+    "conditionAndText": "ET",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
@@ -4233,8 +4331,8 @@
         "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       },
       "energyCurrentPrice": {
-        "description": "La scène ne continuera que si le prix actuel du kWh du contrat sélectionné respecte la condition ci-dessous.",
-        "contractLabel": "Contrat d'énergie",
+        "description": "La scène ne continuera que si le prix actuel du kWh du contrat actif sur le compteur sélectionné respecte la condition ci-dessous. Sans contrat actif, la scène s'arrête.",
+        "meterLabel": "Compteur électrique",
         "operatorLabel": "Continuer si le prix est",
         "valueLabel": "Seuil (par kWh)",
         "valuePlaceholder": "0.20",
@@ -4749,9 +4847,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "Ce déclencheur s'active quand le prix actuel du kWh (ou la tranche tarifaire) du contrat sélectionné change, par exemple au passage des heures creuses aux heures pleines.",
-        "contractLabel": "Contrat d'énergie",
-        "anyContract": "Tous les contrats",
+        "description": "Ce déclencheur s'active quand le prix actuel du kWh (ou la tranche tarifaire) du compteur sélectionné change, par exemple au passage des heures creuses aux heures pleines. Il suit le contrat actif du compteur : lors d'un changement de tarif, la scène continue de fonctionner sans modification.",
+        "meterLabel": "Compteur électrique",
         "error": "Impossible de charger les contrats d'énergie."
       }
     },
@@ -7600,5 +7697,23 @@
     "closed": "Fermé",
     "on": "Allumé",
     "off": "Éteint"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Annuler",
+    "searchPlaceholder": "Pièce, appareil, mesure…",
+    "searchLabel": "Rechercher un appareil",
+    "clearSearch": "Effacer la recherche",
+    "allRooms": "Toutes",
+    "selectedFilter": "Sélectionnés",
+    "roomsLabel": "Filtrer par pièce",
+    "noResult": "Aucun appareil ne correspond à « {{search}} ».",
+    "noSelection": "Aucun appareil sélectionné pour le moment.",
+    "noDevice": "Aucun appareil pour l'instant : ajoutez d'abord vos appareils depuis une intégration.",
+    "selectedCount": {
+      "one": "1 sélectionné",
+      "other": "{{count}} sélectionnés"
+    },
+    "validate": "Valider",
+    "title": "Choisir"
   }
 }

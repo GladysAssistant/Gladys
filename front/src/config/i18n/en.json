@@ -378,7 +378,7 @@
     "editDashboardAddSectionButton": "Add a section",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
-    "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it, use the + buttons to add widgets, columns or sections. Drag widgets to move them — on mobile, use the arrows.",
+    "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it, use the + buttons to add widgets, columns or sections. Drag widgets to move them — on a phone, use the arrows, “Move to…” or the Reorganize mode.",
     "editorDashboardSettingsButton": "Dashboard settings",
     "editorDashboardSettings": "Dashboard settings",
     "editorMoveSectionUp": "Move the section up",
@@ -526,7 +526,34 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Enter the name of the widget",
-        "addADeviceLabel": "Add a device:"
+        "addADeviceLabel": "Add a device:",
+        "listLabel": "Displayed devices",
+        "emptyList": "No device in this widget yet.",
+        "addDevicesButton": "Add devices",
+        "dragHint": "Drag the handle to reorder, tap a device to rename it.",
+        "backToList": "Devices",
+        "moveHandle": "Move {{name}}",
+        "displayNameLabel": "Name shown in the widget",
+        "defaultNameHint": "Empty: the widget shows “{{name}}”.",
+        "useDefaultName": "Use the default name",
+        "position": "Position {{index}} of {{total}}",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "removeFromWidget": "Remove from widget",
+        "done": "Done",
+        "deviceNotFound": "Device not found",
+        "loadError": "The devices could not be loaded. Check the connection to Gladys, then reopen the widget.",
+        "removedUndo": "“{{name}}” removed",
+        "addedCount": {
+          "one": "1 added",
+          "other": "{{count}} added"
+        },
+        "removedCount": {
+          "one": "1 removed",
+          "other": "{{count}} removed"
+        },
+        "undo": "Undo",
+        "detailTitle": "Rename"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -920,13 +947,15 @@
       "energyPrice": {
         "editName": "Widget name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
-        "editContract": "Electricity contract",
+        "editMeter": "Electric meter",
+        "editMeterHelp": "The widget shows the price of the contract active on this meter: when your tariff changes, create the new contract and the widget follows it.",
         "noContract": "No electricity contract yet.",
         "noContractLink": "Create one in the energy monitoring integration.",
-        "notConfigured": "Select a contract in the widget settings.",
+        "noActiveContract": "No active contract on {{meter}} right now.",
+        "manageContractsLink": "Manage the contracts",
         "until": "Until {{time}}",
         "unknownPrice": "Price unknown",
-        "error": "Unable to load the electricity price. Check that the contract still exists.",
+        "error": "Unable to load the electricity price. Check that the meter and its contracts still exist.",
         "cumulativeToday": "Today: {{kwh}} kWh"
       },
       "thermostat": {
@@ -1022,7 +1051,42 @@
       "scenesText": "Lights at sunset, morning routines: your home acts for you.",
       "usersTitle": "Invite your household",
       "usersText": "Create an account for everyone in the family."
-    }
+    },
+    "editPanelClose": "Close",
+    "editPanelExpand": "Expand the panel",
+    "editPanelCollapse": "Reduce the panel",
+    "editDashboardDeleteThisDashboard": "Delete this dashboard",
+    "editDashboardDeleteForever": "Delete permanently",
+    "editorAddColumnShort": "Column",
+    "editorAddWidgetHere": "Add a widget here",
+    "editorDeleteColumn": "Delete column {{index}}",
+    "editorExplanationDismiss": "Hide this help",
+    "editorMobileOrderColumns": "By column",
+    "editorMobileOrderRows": "By row",
+    "editorMobileOrderHelp": "On a phone the columns stack: show the widgets column by column, or row by row (the first widget of every column, then the second…)",
+    "editorMoveCurrentColumn": "Current column",
+    "editorMoveWidgetCount": {
+      "zero": "Empty",
+      "one": "1 widget",
+      "other": "{{count}} widgets"
+    },
+    "editorMoveWidgetUp": "Move up",
+    "editorMoveWidgetDown": "Move down",
+    "editorMoveWidgetTo": "Move to…",
+    "editorMoveWidgetTitle": "Move the widget",
+    "editorMoveWidgetHint": "Choose the column the widget goes to: it is placed at the end of it.",
+    "editorRemoveWidget": "Remove the widget",
+    "editorWidgetSettings": "Widget settings",
+    "editorReorganize": "Reorganize",
+    "editorReorganizeDone": "Full view",
+    "leaveConfirmTitle": "Leave without saving?",
+    "leaveConfirmText": "The changes made to this dashboard will be lost.",
+    "leaveConfirmLeave": "Leave without saving",
+    "leaveConfirmStay": "Keep editing",
+    "selectBoxTypePopularSection": "Most used",
+    "selectBoxTypeAllSection": "All widgets",
+    "widgetRemoved": "widget removed",
+    "editorDashboardSettingsShort": "Settings"
   },
   "newDashboard": {
     "cardTitle": "Create a new dashboard",
@@ -1820,7 +1884,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Adapter type",
               "unknownDongle": "Not defined",
-              "tcpPort": "TCP Port"
+              "tcpPort": "TCP Port",
+              "ezspDriver": "Old firmware: Gladys uses the <code>ezsp</code> compatibility driver, because the <code>ember</code> driver requires firmware 7.4 or later. Zigbee2mqtt works this way, but this driver is deprecated. To go back to <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">update the firmware</a>, then choose the model without \"(legacy ezsp)\" (or the <code>ember</code> type for a network coordinator)."
             },
             "externalMqtt": {
               "title": "External tools connection",
@@ -1830,7 +1895,10 @@
               "copied": "Copied"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Warning: Your Ember coordinator firmware is outdated. Firmware version 7.4.x or higher is required. Please follow the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a> to update it. Otherwise, select the dongle (legacy ezsp) in the configuration.",
+              "EZSP_PROTOCOL_VERSION": "Your coordinator firmware is too old for the <code>ember</code> driver, which requires version 7.4 or later, and this model has no compatibility driver. Update it by following the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT gets no answer from your Zigbee coordinator. Check that the model selected in the configuration is yours (it sets the driver used) and that no other software (Home Assistant, another Zigbee2MQTT…) uses the coordinator, then unplug and plug your dongle back in, or restart your network coordinator.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT cannot reach your network coordinator. Check that it is powered on and connected to the network, and that its address in the configuration (tcp://address:port) is the right one.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT refuses to start because its configuration (configuration.yaml file) is not valid. If you edited it by hand, fix it; otherwise, report it on the <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys forum</a>. Refused settings:",
               "unknownErrorPrefix": "Zigbee2MQTT container error: "
             }
           },
@@ -2966,6 +3034,13 @@
       "description": "Track your electricity consumption in Gladys",
       "myDevicesTab": "My Devices",
       "energyPriceTab": "Energy Rates",
+      "meterSelect": {
+        "mainMeter": "Main meter",
+        "mainMeterNamed": "Main meter ({{name}})",
+        "anyMeter": "Any meter",
+        "noActiveContract": "no active contract",
+        "deletedContract": "The contract this setting was bound to no longer exists: choose a meter."
+      },
       "documentation": "Documentation",
       "wizard": {
         "basics": "Information",
@@ -3552,6 +3627,23 @@
         "nodeDetailsLabel": "Node Details",
         "actionsLabel": "Actions",
         "decommissionButton": "Decommission",
+        "decommission": {
+          "confirmMessage": "<b>Decommission this node?</b> The appliance will leave the Gladys Matter network and will have to be paired again to be used in Gladys.",
+          "linkedDevices": "Gladys devices created from this node:",
+          "deleteDevicesLabel": "Also delete these devices from Gladys",
+          "deleteDevicesHelp": "Their history is deleted, and the scenes and dashboards using them will have to be updated. Leave this box unchecked to keep them: they are no longer updated until the appliance is paired again, and the \"Devices\" tab will then offer to update them, which keeps their history, scenes and dashboards.",
+          "confirmButton": "Yes, decommission",
+          "cancelButton": "Cancel",
+          "error": "An error occurred while decommissioning the node \"{{name}}\", it has not been removed.",
+          "noResponse": "No answer from Gladys while decommissioning the node \"{{name}}\" (connection lost or too slow). It may have been removed anyway: the list of nodes below has been reloaded.",
+          "success": "The node \"{{name}}\" has been decommissioned.",
+          "devicesDeleted": {
+            "singular": "{{count}} Gladys device has been deleted.",
+            "plural": "{{count}} Gladys devices have been deleted."
+          },
+          "forcedWarning": "The appliance \"{{name}}\" could not be reached: it has been removed from the Gladys Matter network, but it has not been told. Factory reset it before pairing it again.",
+          "devicesNotDeleted": "These Gladys devices could not be deleted, most likely because their history is too large. Gladys is cleaning it: try again later from the \"Devices\" tab."
+        },
         "noNodesFound": "No Matter nodes found. You can add a Matter device by going to the \"Add Device\" tab.",
         "disabledWarning": "Matter is not activated. Please activate it in <a href=\"/dashboard/integration/device/matter/settings\">Settings</a> before using the integration",
         "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",
@@ -3730,9 +3822,13 @@
         "pilotWireFeatureLabel": "Pilot wire (actuator)",
         "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off…) instead of cutting its supply. Turn the module’s own programme off first.",
         "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
+        "pilotWireStandbyOrderLabel": "Order once the setpoint is reached",
+        "pilotWireStandbyForceLabel": "Force another order than frost protection at rest",
+        "pilotWireStandbyForceHelp": "By default, Gladys sends frost protection once the setpoint is reached. Some heaters then lock their own functions out, like a towel rail’s boost, because frost protection and off are priority orders: force eco to keep them.",
+        "pilotWireStandbyOrderWarning": "Eco: the heater then regulates on its own eco setpoint, about 3.5 °C below its comfort; a lower Gladys setpoint (night) is not reached while eco is sent. Off: the heater is cut, with no frost protection should Gladys stop. The frost and away presets, like an open window, still rest on frost protection; a module that does not take the order chosen gets the lowest it takes: frost protection, off, then eco.",
         "pilotWireRegulationHelp": {
           "heater": "Each preset sends the order picked in the presets table (eco → eco, away → frost protection…). The room sensor, if any, is only displayed.",
-          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat, frost protection once the preset’s setpoint is reached. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
+          "gladys": "Gladys reads the room on the room sensor and uses the pilot wire as a switch — comfort to heat and, once the preset’s setpoint is reached, a rest order: frost protection, or on a module that does not take it off, then eco, unless another is forced. Set the comfort setpoint on the heater itself high enough (24 °C for instance): it then obeys Gladys rather than its own thermometer, and that value remains a safety ceiling should Gladys stop. For the heater to regulate on its own, pick the “Pilot-wire heater” type."
         },
         "windowFeatureLabel": "Window opening sensors",
         "windowFeatureHelp": {
@@ -3779,6 +3875,7 @@
         "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and an actuator (a switch or a pilot wire): reading one and actuating the other is how it regulates.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
         "incompletePilotWireError": "A pilot-wire heater needs the pilot wire to drive.",
+        "pilotWireUnreadError": "The pilot wire picked could not be read, so the order it rests on cannot be checked: reload the page and pick it again.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
         "noActiveSchedule": "No schedule (manual control)",
@@ -3910,6 +4007,7 @@
     "newCondition": "New condition",
     "selectActionType": "Select an action type",
     "selectConditionType": "Select a condition type",
+    "conditionAndText": "AND",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
@@ -4233,8 +4331,8 @@
         "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
       },
       "energyCurrentPrice": {
-        "description": "The scene will continue only if the current price per kWh of the selected contract meets the condition below.",
-        "contractLabel": "Energy contract",
+        "description": "The scene will continue only if the current price per kWh of the contract active on the selected meter meets the condition below. Without an active contract, the scene stops.",
+        "meterLabel": "Electric meter",
         "operatorLabel": "Continue if the price is",
         "valueLabel": "Threshold (per kWh)",
         "valuePlaceholder": "0.20",
@@ -4749,9 +4847,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "This will trigger when the current price per kWh (or the tariff tier) of the selected contract changes, for example when switching from off-peak to peak hours.",
-        "contractLabel": "Energy contract",
-        "anyContract": "Any contract",
+        "description": "This will trigger when the current price per kWh (or the tariff tier) of the selected meter changes, for example when switching from off-peak to peak hours. It follows the meter's active contract: when your tariff changes, the scene keeps working without any change.",
+        "meterLabel": "Electric meter",
         "error": "Unable to load the energy contracts."
       }
     },
@@ -7600,5 +7697,23 @@
     "closed": "Closed",
     "on": "On",
     "off": "Off"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Cancel",
+    "searchPlaceholder": "Room, device, measurement…",
+    "searchLabel": "Search a device",
+    "clearSearch": "Clear the search",
+    "allRooms": "All",
+    "selectedFilter": "Selected",
+    "roomsLabel": "Filter by room",
+    "noResult": "No device matches “{{search}}”.",
+    "noSelection": "No device selected yet.",
+    "noDevice": "No device yet: add your devices from an integration first.",
+    "selectedCount": {
+      "one": "1 selected",
+      "other": "{{count}} selected"
+    },
+    "validate": "Done",
+    "title": "Choose devices"
   }
 }

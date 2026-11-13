@@ -378,7 +378,7 @@
     "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
-    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, nutze die +-Buttons für Widgets, Spalten oder Abschnitte. Ziehe Widgets zum Verschieben — auf dem Handy nutze die Pfeile.",
+    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, und nutze die +-Schaltflächen, um Widgets, Spalten oder Abschnitte hinzuzufügen. Ziehe Widgets, um sie zu verschieben – auf dem Telefon nutze die Pfeile, „Verschieben nach…“ oder den Modus „Neu anordnen“.",
     "editorDashboardSettingsButton": "Dashboard-Einstellungen",
     "editorDashboardSettings": "Dashboard-Einstellungen",
     "editorMoveSectionUp": "Abschnitt nach oben verschieben",
@@ -526,7 +526,34 @@
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Gib den Namen des Widgets ein",
-        "addADeviceLabel": "Füge ein Gerät hinzu:"
+        "addADeviceLabel": "Füge ein Gerät hinzu:",
+        "listLabel": "Angezeigte Geräte",
+        "emptyList": "Noch kein Gerät in diesem Widget.",
+        "addDevicesButton": "Geräte hinzufügen",
+        "dragHint": "Ziehe den Griff zum Sortieren, tippe auf ein Gerät, um es umzubenennen.",
+        "backToList": "Geräte",
+        "moveHandle": "{{name}} verschieben",
+        "displayNameLabel": "Im Widget angezeigter Name",
+        "defaultNameHint": "Leer: Das Widget zeigt „{{name}}“.",
+        "useDefaultName": "Standardnamen verwenden",
+        "position": "Position {{index}} von {{total}}",
+        "moveUp": "Nach oben",
+        "moveDown": "Nach unten",
+        "removeFromWidget": "Aus dem Widget entfernen",
+        "done": "Fertig",
+        "deviceNotFound": "Gerät nicht gefunden",
+        "loadError": "Die Geräte konnten nicht geladen werden. Prüfe die Verbindung zu Gladys und öffne das Widget erneut.",
+        "removedUndo": "„{{name}}“ entfernt",
+        "addedCount": {
+          "one": "1 hinzugefügt",
+          "other": "{{count}} hinzugefügt"
+        },
+        "removedCount": {
+          "one": "1 entfernt",
+          "other": "{{count}} entfernt"
+        },
+        "undo": "Rückgängig",
+        "detailTitle": "Umbenennen"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -979,13 +1006,15 @@
       "energyPrice": {
         "editName": "Widget-Name (optional)",
         "editNamePlaceholder": "Auf dem Dashboard angezeigter Name",
-        "editContract": "Stromvertrag",
+        "editMeter": "Stromzähler",
+        "editMeterHelp": "Das Widget zeigt den Preis des auf diesem Zähler aktiven Vertrags: Legen Sie bei einer Tarifänderung den neuen Vertrag an, das Widget folgt ihm automatisch.",
         "noContract": "Noch kein Stromvertrag vorhanden.",
         "noContractLink": "Legen Sie einen in der Energieüberwachungs-Integration an.",
-        "notConfigured": "Wählen Sie in den Widget-Einstellungen einen Vertrag aus.",
+        "noActiveContract": "Derzeit kein aktiver Vertrag für {{meter}}.",
+        "manageContractsLink": "Verträge verwalten",
         "until": "Bis {{time}}",
         "unknownPrice": "Preis unbekannt",
-        "error": "Der Strompreis konnte nicht geladen werden. Prüfen Sie, ob der Vertrag noch existiert.",
+        "error": "Der Strompreis konnte nicht geladen werden. Prüfen Sie, ob der Zähler und seine Verträge noch existieren.",
         "cumulativeToday": "Heute: {{kwh}} kWh"
       }
     },
@@ -1022,7 +1051,42 @@
       "scenesText": "Licht bei Sonnenuntergang, Morgenroutinen: Dein Zuhause handelt für dich.",
       "usersTitle": "Lade deinen Haushalt ein",
       "usersText": "Erstelle ein Konto für jedes Familienmitglied."
-    }
+    },
+    "editPanelClose": "Schließen",
+    "editPanelExpand": "Bereich vergrößern",
+    "editPanelCollapse": "Bereich verkleinern",
+    "editDashboardDeleteThisDashboard": "Dieses Dashboard löschen",
+    "editDashboardDeleteForever": "Endgültig löschen",
+    "editorAddColumnShort": "Spalte",
+    "editorAddWidgetHere": "Hier ein Widget hinzufügen",
+    "editorDeleteColumn": "Spalte {{index}} löschen",
+    "editorExplanationDismiss": "Diese Hilfe ausblenden",
+    "editorMobileOrderColumns": "Nach Spalte",
+    "editorMobileOrderRows": "Nach Zeile",
+    "editorMobileOrderHelp": "Auf dem Telefon werden die Spalten gestapelt: Widgets Spalte für Spalte oder Zeile für Zeile anzeigen (das erste Widget jeder Spalte, dann das zweite…)",
+    "editorMoveCurrentColumn": "Aktuelle Spalte",
+    "editorMoveWidgetCount": {
+      "zero": "Leer",
+      "one": "1 Widget",
+      "other": "{{count}} Widgets"
+    },
+    "editorMoveWidgetUp": "Nach oben",
+    "editorMoveWidgetDown": "Nach unten",
+    "editorMoveWidgetTo": "Verschieben nach…",
+    "editorMoveWidgetTitle": "Widget verschieben",
+    "editorMoveWidgetHint": "Wähle die Spalte für das Widget: Es wird an ihrem Ende eingefügt.",
+    "editorRemoveWidget": "Widget entfernen",
+    "editorWidgetSettings": "Widget-Einstellungen",
+    "editorReorganize": "Neu anordnen",
+    "editorReorganizeDone": "Vollansicht",
+    "leaveConfirmTitle": "Ohne Speichern verlassen?",
+    "leaveConfirmText": "Die Änderungen an diesem Dashboard gehen verloren.",
+    "leaveConfirmLeave": "Ohne Speichern verlassen",
+    "leaveConfirmStay": "Weiter bearbeiten",
+    "selectBoxTypePopularSection": "Am häufigsten verwendet",
+    "selectBoxTypeAllSection": "Alle Widgets",
+    "widgetRemoved": "Widget entfernt",
+    "editorDashboardSettingsShort": "Einstellungen"
   },
   "newDashboard": {
     "cardTitle": "Ein neues Dashboard hinzufügen",
@@ -1605,6 +1669,13 @@
       "description": "Verfolgen Sie Ihren Stromverbrauch in Gladys",
       "myDevicesTab": "Meine Geräte",
       "energyPriceTab": "Energietarife",
+      "meterSelect": {
+        "mainMeter": "Hauptzähler",
+        "mainMeterNamed": "Hauptzähler ({{name}})",
+        "anyMeter": "Jeder Zähler",
+        "noActiveContract": "kein aktiver Vertrag",
+        "deletedContract": "Der Vertrag dieser Einstellung existiert nicht mehr: Wählen Sie einen Zähler aus."
+      },
       "documentation": "Dokumentation",
       "wizard": {
         "basics": "Informationen",
@@ -2011,7 +2082,8 @@
               "dongleName": "Dongle",
               "networkAdapterType": "Adaptertyp",
               "unknownDongle": "Nicht definiert",
-              "tcpPort": "TCP-Port"
+              "tcpPort": "TCP-Port",
+              "ezspDriver": "Alte Firmware: Gladys verwendet den Kompatibilitätstreiber <code>ezsp</code>, da der Treiber <code>ember</code> Firmware 7.4 oder höher erfordert. Zigbee2mqtt funktioniert so, aber dieser Treiber ist veraltet. Um zu <code>ember</code> zurückzukehren, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">aktualisieren Sie die Firmware</a> und wählen Sie dann das Modell ohne „(legacy ezsp)“ (oder den Typ <code>ember</code> für einen Netzwerk-Koordinator)."
             },
             "externalMqtt": {
               "title": "Verbindung für externe Tools",
@@ -2021,7 +2093,10 @@
               "copied": "Kopiert"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Warnung: Die Firmware Ihres Ember-Koordinators ist veraltet. Version 7.4.x oder höher ist erforderlich. Bitte folgen Sie der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>, um sie zu aktualisieren. Wählen Sie andernfalls den Dongle (legacy ezsp) in der Konfiguration aus.",
+              "EZSP_PROTOCOL_VERSION": "Die Firmware Ihres Koordinators ist zu alt für den Treiber <code>ember</code>, der Version 7.4 oder höher erfordert, und für dieses Modell gibt es keinen Kompatibilitätstreiber. Aktualisieren Sie sie mit der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT erhält keine Antwort von Ihrem Zigbee-Koordinator. Überprüfen Sie, ob das in der Konfiguration gewählte Modell Ihrem entspricht (es bestimmt den verwendeten Treiber) und ob keine andere Software (Home Assistant, ein anderes Zigbee2MQTT…) den Koordinator verwendet. Ziehen Sie dann Ihren Stick ab und stecken Sie ihn wieder ein, oder starten Sie Ihren Netzwerk-Koordinator neu.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT kann Ihren Netzwerk-Koordinator nicht erreichen. Überprüfen Sie, ob er eingeschaltet und mit dem Netzwerk verbunden ist und ob seine Adresse in der Konfiguration (tcp://adresse:port) korrekt ist.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT verweigert den Start, weil seine Konfiguration (Datei configuration.yaml) ungültig ist. Wenn Sie sie von Hand geändert haben, korrigieren Sie sie; andernfalls melden Sie es im <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys-Forum</a>. Abgelehnte Einstellungen:",
               "unknownErrorPrefix": "Zigbee2MQTT-Containerfehler: "
             }
           },
@@ -3552,6 +3627,23 @@
         "nodeDetailsLabel": "Knotendetails",
         "actionsLabel": "Aktionen",
         "decommissionButton": "Stilllegen",
+        "decommission": {
+          "confirmMessage": "<b>Diesen Knoten stilllegen?</b> Das Gerät verlässt das Matter-Netzwerk von Gladys und muss erneut gekoppelt werden, um in Gladys verwendet zu werden.",
+          "linkedDevices": "Aus diesem Knoten erstellte Gladys-Geräte:",
+          "deleteDevicesLabel": "Diese Geräte auch aus Gladys löschen",
+          "deleteDevicesHelp": "Ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, müssen angepasst werden. Lassen Sie dieses Kästchen deaktiviert, um sie zu behalten: Sie werden nicht mehr aktualisiert, bis das Gerät erneut gekoppelt wird, und der Tab „Geräte“ bietet dann an, sie zu aktualisieren, wobei ihr Verlauf, ihre Szenen und Dashboards erhalten bleiben.",
+          "confirmButton": "Ja, stilllegen",
+          "cancelButton": "Abbrechen",
+          "error": "Beim Stilllegen des Knotens „{{name}}“ ist ein Fehler aufgetreten, er wurde nicht entfernt.",
+          "noResponse": "Keine Antwort von Gladys beim Stilllegen des Knotens „{{name}}“ (Verbindung verloren oder zu langsam). Er wurde möglicherweise trotzdem entfernt: Die Liste der Knoten unten wurde neu geladen.",
+          "success": "Der Knoten „{{name}}“ wurde stillgelegt.",
+          "devicesDeleted": {
+            "singular": "{{count}} Gladys-Gerät wurde gelöscht.",
+            "plural": "{{count}} Gladys-Geräte wurden gelöscht."
+          },
+          "forcedWarning": "Das Gerät „{{name}}“ war nicht erreichbar: Es wurde aus dem Matter-Netzwerk von Gladys entfernt, aber nicht darüber informiert. Setzen Sie es auf die Werkseinstellungen zurück, bevor Sie es erneut koppeln.",
+          "devicesNotDeleted": "Diese Gladys-Geräte konnten nicht gelöscht werden, vermutlich weil ihr Verlauf zu groß ist. Gladys bereinigt ihn gerade: Versuchen Sie es später im Tab „Geräte“ erneut."
+        },
         "noNodesFound": "Keine Matter-Knoten gefunden. Du kannst ein Matter-Gerät hinzufügen, indem du auf der Registerkarte \"Gerät hinzufügen\" gehst.",
         "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es in <a href=\"/dashboard/integration/device/matter/settings\">Einstellungen</a> bevor du die Integration verwendest.",
         "disabledWarningSettings": "Matter ist nicht aktiviert, bitte klicke auf den Button unten, um es zu aktivieren.",
@@ -3730,9 +3822,13 @@
         "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
         "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus…), statt die Stromzufuhr zu unterbrechen. Schalten Sie zuerst das eigene Programm des Moduls aus.",
         "pilotWireProgrammeWarning": "Schalten Sie das eigene Programm oder den Thermostatmodus des Moduls aus (Heatzy-Zeitplan, Tuya-Programm…), bevor Sie es mit Gladys steuern. Sonst wird jeder vom Programm geschriebene Befehl als Änderung am Modul gewertet, und Modul und Gladys schreiben den Befehl abwechselnd.",
+        "pilotWireStandbyOrderLabel": "Befehl nach Erreichen des Sollwerts",
+        "pilotWireStandbyForceLabel": "Einen anderen Ruhebefehl als Frostschutz erzwingen",
+        "pilotWireStandbyForceHelp": "Standardmäßig sendet Gladys Frostschutz, sobald der Sollwert erreicht ist. Manche Heizkörper sperren dann ihre eigenen Funktionen, etwa den Boost eines Handtuchheizkörpers, weil Frostschutz und Aus Vorrangbefehle sind: Erzwingen Sie Eco, um sie zu behalten.",
+        "pilotWireStandbyOrderWarning": "Eco: Der Heizkörper regelt dann selbst auf seinen Eco-Sollwert, etwa 3,5 °C unter seinem Komfort; ein niedrigerer Gladys-Sollwert (Nacht) wird nicht erreicht, solange Eco gesendet wird. Aus: Der Heizkörper ist abgeschaltet, ohne Frostschutz, falls Gladys ausfällt. Die Voreinstellungen Frostschutz und Abwesend bleiben, wie ein offenes Fenster, auf Frostschutz; ein Modul, das den gewählten Befehl nicht annimmt, erhält den niedrigsten, den es annimmt: Frostschutz, Aus, dann Eco.",
         "pilotWireRegulationHelp": {
           "heater": "Jede Voreinstellung sendet den in der Tabelle der Voreinstellungen gewählten Befehl (Eco → Eco, Abwesend → Frostschutz…). Der Raumsensor, falls vorhanden, dient nur der Anzeige.",
-          "gladys": "Gladys misst den Raum mit dem Raumsensor und nutzt die Steuerleitung als Schalter — Komfort zum Heizen, Frostschutz, sobald der Sollwert der Voreinstellung erreicht ist. Stellen Sie den Komfort-Sollwert am Heizkörper selbst hoch genug ein (zum Beispiel 24 °C): Er gehorcht dann Gladys statt seinem eigenen Thermometer, und dieser Wert bleibt eine Sicherheitsobergrenze, falls Gladys ausfällt. Damit der Heizkörper selbst regelt, wählen Sie den Typ „Heizkörper mit Steuerleitung“."
+          "gladys": "Gladys misst den Raum mit dem Raumsensor und nutzt die Steuerleitung als Schalter — Komfort zum Heizen und, sobald der Sollwert der Voreinstellung erreicht ist, ein Ruhebefehl: Frostschutz oder, bei einem Modul, das ihn nicht annimmt, Aus, dann Eco, sofern kein anderer erzwungen wird. Stellen Sie den Komfort-Sollwert am Heizkörper selbst hoch genug ein (zum Beispiel 24 °C): Er gehorcht dann Gladys statt seinem eigenen Thermometer, und dieser Wert bleibt eine Sicherheitsobergrenze, falls Gladys ausfällt. Damit der Heizkörper selbst regelt, wählen Sie den Typ „Heizkörper mit Steuerleitung“."
         },
         "windowFeatureLabel": "Fensterkontakte",
         "windowFeatureHelp": {
@@ -3779,6 +3875,7 @@
         "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Aktor (Schalter oder Steuerleitung): Er regelt, indem er den einen liest und den anderen schaltet.",
         "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
         "incompletePilotWireError": "Ein Heizkörper mit Steuerleitung braucht die zu steuernde Steuerleitung.",
+        "pilotWireUnreadError": "Die gewählte Steuerleitung konnte nicht gelesen werden, daher kann der Ruhebefehl nicht geprüft werden: Seite neu laden und sie erneut auswählen.",
         "activeScheduleLabel": "Aktiver Zeitplan",
         "activeScheduleHelp": "Wähle den Zeitplan, der automatisch auf dieses Thermostat angewendet wird.",
         "noActiveSchedule": "Kein Zeitplan (manuelle Steuerung)",
@@ -3910,6 +4007,7 @@
     "newCondition": "Neue Bedingung",
     "selectActionType": "Wähle einen Aktionstyp aus",
     "selectConditionType": "Wähle eine Bedingungstyp aus",
+    "conditionAndText": "UND",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
@@ -4233,8 +4331,8 @@
         "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
       },
       "energyCurrentPrice": {
-        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des ausgewählten Vertrags die folgende Bedingung erfüllt.",
-        "contractLabel": "Energievertrag",
+        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des auf dem ausgewählten Zähler aktiven Vertrags die folgende Bedingung erfüllt. Ohne aktiven Vertrag wird die Szene angehalten.",
+        "meterLabel": "Stromzähler",
         "operatorLabel": "Fortfahren, wenn der Preis",
         "valueLabel": "Schwellenwert (pro kWh)",
         "valuePlaceholder": "0.20",
@@ -4749,9 +4847,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "Dieser Auslöser wird aktiviert, wenn sich der aktuelle kWh-Preis (oder die Tarifstufe) des ausgewählten Vertrags ändert, zum Beispiel beim Wechsel von Niedertarif zu Hochtarif.",
-        "contractLabel": "Energievertrag",
-        "anyContract": "Jeder Vertrag",
+        "description": "Dieser Auslöser wird aktiviert, wenn sich der aktuelle kWh-Preis (oder die Tarifstufe) des ausgewählten Zählers ändert, zum Beispiel beim Wechsel von Niedertarif zu Hochtarif. Er folgt dem aktiven Vertrag des Zählers: Bei einer Tarifänderung funktioniert die Szene ohne Anpassung weiter.",
+        "meterLabel": "Stromzähler",
         "error": "Die Energieverträge konnten nicht geladen werden."
       }
     },
@@ -7600,5 +7697,23 @@
     "closed": "Geschlossen",
     "on": "An",
     "off": "Aus"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Abbrechen",
+    "searchPlaceholder": "Raum, Gerät, Messwert…",
+    "searchLabel": "Gerät suchen",
+    "clearSearch": "Suche löschen",
+    "allRooms": "Alle",
+    "selectedFilter": "Ausgewählt",
+    "roomsLabel": "Nach Raum filtern",
+    "noResult": "Kein Gerät entspricht „{{search}}“.",
+    "noSelection": "Noch kein Gerät ausgewählt.",
+    "noDevice": "Noch keine Geräte: Füge deine Geräte zuerst über eine Integration hinzu.",
+    "selectedCount": {
+      "one": "1 ausgewählt",
+      "other": "{{count}} ausgewählt"
+    },
+    "validate": "Fertig",
+    "title": "Geräte wählen"
   }
 }

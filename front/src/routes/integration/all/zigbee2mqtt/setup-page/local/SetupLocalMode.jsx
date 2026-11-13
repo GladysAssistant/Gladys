@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import get from 'get-value';
 
 import { RequestStatus } from '../../../../../../utils/consts';
 import { ADAPTER_MODE } from '../constants';
@@ -43,6 +44,10 @@ class SetupLocalMode extends Component {
     const { setupZigee2mqttStatus } = nextProps;
 
     if (setupZigee2mqttStatus === RequestStatus.Success && setupZigee2mqttStatus !== this.props.setupZigee2mqttStatus) {
+      this.setState({ editionMode: false });
+    }
+    // Gladys switched to the ezsp driver: the form still holds the previous model, saving it would undo the switch
+    if (get(nextProps, 'zigbee2mqttStatus.ezspFallback') && !get(this.props, 'zigbee2mqttStatus.ezspFallback')) {
       this.setState({ editionMode: false });
     }
   }

@@ -1,0 +1,19 @@
+Starting Zigbee2MQTT without watchdog.
+[2026-11-06 18:52:40] [32minfo[39m: 	z2m: Logging to console, file (filename: log.log)
+[2026-11-06 18:52:40] [32minfo[39m: 	z2m: Starting Zigbee2MQTT version 2.14.2 (commit #5c0c1c60078e1737c5dee5f8217583bca7610e66
+)
+[2026-11-06 18:52:40] [32minfo[39m: 	z2m: Starting zigbee-herdsman (10.10.0)
+[2026-11-06 18:52:40] [32minfo[39m: 	zh:zstack:znp: Opening TCP socket with 127.0.0.1:6639
+[2026-11-06 18:52:40] [31merror[39m: 	zh:zstack:znp: Socket error Error: connect ECONNREFUSED 127.0.0.1:6639
+[2026-11-06 18:52:40] [31merror[39m: 	z2m: Error while starting zigbee-herdsman
+[2026-11-06 18:52:40] [31merror[39m: 	z2m: Failed to start zigbee-herdsman
+[2026-11-06 18:52:40] [31merror[39m: 	z2m: Check https://www.zigbee2mqtt.io/guide/installation/20_zigbee2mqtt-fails-to-start_crashes-runtime.html for possible solutions
+[2026-11-06 18:52:40] [31merror[39m: 	z2m: Exiting...
+[2026-11-06 18:52:40] [31merror[39m: 	z2m: Error: Error while opening socket
+    at Socket.<anonymous> (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/z-stack/znp/znp.ts:160:24)
+    at Socket.emit (node:events:521:24)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+[2026-11-06 18:52:40] [32minfo[39m: 	zh:zstack:znp: Port closed
+NodeError: write after end

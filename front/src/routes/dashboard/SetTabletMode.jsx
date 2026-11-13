@@ -149,9 +149,12 @@ class SetTabletMode extends Component {
                   <p>
                     <Text id="dashboard.tabletMode.howToDisable" />
                   </p>
-                  <p>
+                  {/* a div, not a p: MarkupText renders block markup, and a
+                      block inside a <p> is invalid HTML (console warning on
+                      every dashboard render) */}
+                  <div class="mb-3">
                     <MarkupText id="dashboard.tabletMode.fullScreenForce" />
-                  </p>
+                  </div>
                   {selectedHouse && (
                     <div className="form-group">
                       <p>

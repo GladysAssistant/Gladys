@@ -2423,6 +2423,14 @@ const DASHBOARD_WIDTH = {
   FULL: 'full',
 };
 
+// Order of a section's widgets on a phone, where its columns stack: column
+// by column (the historic order, the default) or row by row (the first
+// widget of every column, then the second of every column…)
+const DASHBOARD_SECTION_MOBILE_ORDER = {
+  COLUMNS: 'columns',
+  ROWS: 'rows',
+};
+
 // Built-in CSS background scenes of the Horizon theme (no external images:
 // they weigh nothing, stay crisp at any resolution and work offline)
 const DASHBOARD_BACKGROUND_SCENE = {
@@ -2674,6 +2682,7 @@ const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_VISIBILITY_LIST = createList(DASHBOARD_VISIBILITY);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 const DASHBOARD_WIDTH_LIST = createList(DASHBOARD_WIDTH);
+const DASHBOARD_SECTION_MOBILE_ORDER_LIST = createList(DASHBOARD_SECTION_MOBILE_ORDER);
 const DASHBOARD_BACKGROUND_SCENE_LIST = createList(DASHBOARD_BACKGROUND_SCENE);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
 const JOB_TYPES_LIST = createList(JOB_TYPES);
@@ -2788,6 +2797,8 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 module.exports.DASHBOARD_WIDTH = DASHBOARD_WIDTH;
 module.exports.DASHBOARD_WIDTH_LIST = DASHBOARD_WIDTH_LIST;
+module.exports.DASHBOARD_SECTION_MOBILE_ORDER = DASHBOARD_SECTION_MOBILE_ORDER;
+module.exports.DASHBOARD_SECTION_MOBILE_ORDER_LIST = DASHBOARD_SECTION_MOBILE_ORDER_LIST;
 module.exports.DASHBOARD_BACKGROUND_SCENE = DASHBOARD_BACKGROUND_SCENE;
 module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST;
 

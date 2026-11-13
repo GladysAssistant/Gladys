@@ -378,7 +378,7 @@
     "editDashboardAddSectionButton": "Agregar una sección",
     "editDashboardBoxNotEmpty": "No puede eliminar esta columna porque contiene widgets.",
     "editDashboardMyDashboards": "Mis paneles",
-    "editDashboardExplanation": "Este es su panel real: toque un widget para editarlo y use los botones + para agregar widgets, columnas o secciones. Arrastre los widgets para moverlos; en el móvil, use las flechas.",
+    "editDashboardExplanation": "Este es tu panel real: toca un widget para editarlo y usa los botones + para agregar widgets, columnas o secciones. Arrastra los widgets para moverlos; en el teléfono, usa las flechas, «Mover a…» o el modo Reorganizar.",
     "editorDashboardSettingsButton": "Configuración del panel",
     "editorDashboardSettings": "Configuración del panel",
     "editorMoveSectionUp": "Mover la sección hacia arriba",
@@ -526,7 +526,34 @@
         "editDeviceFeaturesLabel": "Seleccione los dispositivos que desea mostrar:",
         "editNameLabel": "Nombre del widget (opcional)",
         "editNamePlaceholder": "Ingrese el nombre del widget",
-        "addADeviceLabel": "Agregar un dispositivo:"
+        "addADeviceLabel": "Agregar un dispositivo:",
+        "listLabel": "Dispositivos mostrados",
+        "emptyList": "Todavía no hay ningún dispositivo en este widget.",
+        "addDevicesButton": "Agregar dispositivos",
+        "dragHint": "Arrastra el asa para reordenar, toca un dispositivo para renombrarlo.",
+        "backToList": "Dispositivos",
+        "moveHandle": "Mover {{name}}",
+        "displayNameLabel": "Nombre mostrado en el widget",
+        "defaultNameHint": "Vacío: el widget muestra «{{name}}».",
+        "useDefaultName": "Usar el nombre predeterminado",
+        "position": "Posición {{index}} de {{total}}",
+        "moveUp": "Subir",
+        "moveDown": "Bajar",
+        "removeFromWidget": "Quitar del widget",
+        "done": "Listo",
+        "deviceNotFound": "Dispositivo no encontrado",
+        "loadError": "No se pudieron cargar los dispositivos. Comprueba la conexión con Gladys y vuelve a abrir el widget.",
+        "removedUndo": "«{{name}}» quitado",
+        "addedCount": {
+          "one": "1 agregado",
+          "other": "{{count}} agregados"
+        },
+        "removedCount": {
+          "one": "1 quitado",
+          "other": "{{count}} quitados"
+        },
+        "undo": "Deshacer",
+        "detailTitle": "Renombrar"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Seleccione la habitación que desea mostrar aquí.",
@@ -920,13 +947,15 @@
       "energyPrice": {
         "editName": "Nombre del widget (opcional)",
         "editNamePlaceholder": "Nombre mostrado en el panel",
-        "editContract": "Contrato de electricidad",
+        "editMeter": "Contador eléctrico",
+        "editMeterHelp": "El widget muestra el precio del contrato activo en este contador: cuando cambie su tarifa, cree el nuevo contrato y el widget lo seguirá automáticamente.",
         "noContract": "Todavía no hay ningún contrato de electricidad.",
         "noContractLink": "Cree uno en la integración de seguimiento energético.",
-        "notConfigured": "Seleccione un contrato en los ajustes del widget.",
+        "noActiveContract": "Ningún contrato activo en {{meter}} en este momento.",
+        "manageContractsLink": "Gestionar los contratos",
         "until": "Hasta las {{time}}",
         "unknownPrice": "Precio desconocido",
-        "error": "No se pudo cargar el precio de la electricidad. Compruebe que el contrato sigue existiendo.",
+        "error": "No se pudo cargar el precio de la electricidad. Compruebe que el contador y sus contratos siguen existiendo.",
         "cumulativeToday": "Hoy: {{kwh}} kWh"
       },
       "thermostat": {
@@ -1022,7 +1051,42 @@
       "scenesText": "Luces al atardecer, rutinas matutinas: su hogar actúa por usted.",
       "usersTitle": "Invite a su familia",
       "usersText": "Cree una cuenta para cada miembro de la familia."
-    }
+    },
+    "editPanelClose": "Cerrar",
+    "editPanelExpand": "Ampliar el panel",
+    "editPanelCollapse": "Reducir el panel",
+    "editDashboardDeleteThisDashboard": "Eliminar este panel",
+    "editDashboardDeleteForever": "Eliminar definitivamente",
+    "editorAddColumnShort": "Columna",
+    "editorAddWidgetHere": "Agregar un widget aquí",
+    "editorDeleteColumn": "Eliminar la columna {{index}}",
+    "editorExplanationDismiss": "Ocultar esta ayuda",
+    "editorMobileOrderColumns": "Por columna",
+    "editorMobileOrderRows": "Por fila",
+    "editorMobileOrderHelp": "En el teléfono las columnas se apilan: mostrar los widgets columna por columna, o fila por fila (el primer widget de cada columna, luego el segundo…)",
+    "editorMoveCurrentColumn": "Columna actual",
+    "editorMoveWidgetCount": {
+      "zero": "Vacía",
+      "one": "1 widget",
+      "other": "{{count}} widgets"
+    },
+    "editorMoveWidgetUp": "Subir",
+    "editorMoveWidgetDown": "Bajar",
+    "editorMoveWidgetTo": "Mover a…",
+    "editorMoveWidgetTitle": "Mover el widget",
+    "editorMoveWidgetHint": "Elige la columna para el widget: se coloca al final.",
+    "editorRemoveWidget": "Eliminar el widget",
+    "editorWidgetSettings": "Ajustes del widget",
+    "editorReorganize": "Reorganizar",
+    "editorReorganizeDone": "Vista completa",
+    "leaveConfirmTitle": "¿Salir sin guardar?",
+    "leaveConfirmText": "Se perderán los cambios de este panel.",
+    "leaveConfirmLeave": "Salir sin guardar",
+    "leaveConfirmStay": "Seguir editando",
+    "selectBoxTypePopularSection": "Los más usados",
+    "selectBoxTypeAllSection": "Todos los widgets",
+    "widgetRemoved": "widget eliminado",
+    "editorDashboardSettingsShort": "Ajustes"
   },
   "newDashboard": {
     "cardTitle": "Crear un nuevo panel",
@@ -1820,7 +1884,8 @@
               "dongleName": "Adaptador",
               "networkAdapterType": "Tipo de adaptador",
               "unknownDongle": "No definido",
-              "tcpPort": "Puerto TCP"
+              "tcpPort": "Puerto TCP",
+              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2mqtt funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
             },
             "externalMqtt": {
               "title": "Conexión de herramientas externas",
@@ -1830,7 +1895,10 @@
               "copied": "Copiado"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Advertencia: el firmware de su coordinador Ember está desactualizado. Se requiere la versión de firmware 7.4.x o superior. Siga la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a> para actualizarlo. En caso contrario, seleccione el adaptador (ezsp heredado) en la configuración.",
+              "EZSP_PROTOCOL_VERSION": "El firmware de su coordinador es demasiado antiguo para el controlador <code>ember</code>, que requiere la versión 7.4 o superior, y este modelo no tiene controlador de compatibilidad. Actualícelo siguiendo la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a>.",
+              "ADAPTER_NO_RESPONSE": "Zigbee2MQTT no recibe respuesta de su coordinador Zigbee. Compruebe que el modelo elegido en la configuración es el suyo (determina el controlador utilizado) y que ningún otro software (Home Assistant, otro Zigbee2MQTT…) usa el coordinador; después desconecte y vuelva a conectar su adaptador, o reinicie su coordinador de red.",
+              "ADAPTER_UNREACHABLE": "Zigbee2MQTT no consigue conectar con su coordinador de red. Compruebe que está encendido y conectado a la red, y que su dirección en la configuración (tcp://dirección:puerto) es la correcta.",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT se niega a arrancar porque su configuración (archivo configuration.yaml) no es válida. Si la ha modificado a mano, corríjala; si no, avíselo en el <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">foro de Gladys</a>. Ajustes rechazados:",
               "unknownErrorPrefix": "Error del contenedor de Zigbee2MQTT: "
             }
           },
@@ -2966,6 +3034,13 @@
       "description": "Realice un seguimiento de su consumo eléctrico en Gladys",
       "myDevicesTab": "Mis dispositivos",
       "energyPriceTab": "Tarifas de energía",
+      "meterSelect": {
+        "mainMeter": "Contador principal",
+        "mainMeterNamed": "Contador principal ({{name}})",
+        "anyMeter": "Cualquier contador",
+        "noActiveContract": "sin contrato activo",
+        "deletedContract": "El contrato de este ajuste ya no existe: elija un contador."
+      },
       "documentation": "Documentación",
       "wizard": {
         "basics": "Información",
@@ -3552,6 +3627,23 @@
         "nodeDetailsLabel": "Detalles del nodo",
         "actionsLabel": "Acciones",
         "decommissionButton": "Retirar",
+        "decommission": {
+          "confirmMessage": "<b>¿Retirar este nodo?</b> El dispositivo saldrá de la red Matter de Gladys y tendrá que emparejarse de nuevo para usarse en Gladys.",
+          "linkedDevices": "Dispositivos de Gladys creados a partir de este nodo:",
+          "deleteDevicesLabel": "Eliminar también estos dispositivos de Gladys",
+          "deleteDevicesHelp": "Su historial se elimina, y las escenas y los paneles que los utilizan tendrán que actualizarse. Deje esta casilla sin marcar para conservarlos: ya no se actualizarán hasta que el dispositivo se empareje de nuevo, y la pestaña «Dispositivos» ofrecerá entonces actualizarlos, lo que conserva su historial, sus escenas y sus paneles.",
+          "confirmButton": "Sí, retirar",
+          "cancelButton": "Cancelar",
+          "error": "Se produjo un error al retirar el nodo «{{name}}», no se ha eliminado.",
+          "noResponse": "Gladys no respondió al retirar el nodo «{{name}}» (conexión perdida o demasiado lenta). Es posible que se haya eliminado de todos modos: la lista de nodos de abajo se ha recargado.",
+          "success": "El nodo «{{name}}» ha sido retirado.",
+          "devicesDeleted": {
+            "singular": "Se ha eliminado {{count}} dispositivo de Gladys.",
+            "plural": "Se han eliminado {{count}} dispositivos de Gladys."
+          },
+          "forcedWarning": "No se pudo contactar con el dispositivo «{{name}}»: se ha retirado de la red Matter de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
+          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar, probablemente porque su historial es demasiado grande. Gladys lo está limpiando: inténtelo más tarde desde la pestaña «Dispositivos»."
+        },
         "noNodesFound": "No se encontró ningún nodo Matter. Puede añadir un dispositivo Matter yendo a la pestaña \"Añadir dispositivo\".",
         "disabledWarning": "Matter no está activado. Actívelo en <a href=\"/dashboard/integration/device/matter/settings\">Configuración</a> antes de utilizar la integración",
         "disabledWarningSettings": "Matter no está activado; haga clic en el botón de abajo para activarlo.",
@@ -3730,9 +3822,13 @@
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
         "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado…) en lugar de cortar su alimentación. Desactive primero el programa propio del módulo.",
         "pilotWireProgrammeWarning": "Desactive el programa o el modo termostato propio del módulo (programación de Heatzy, programa de Tuya…) antes de controlarlo desde Gladys. Si no, cada orden que escribe ese programa se toma por un cambio hecho en el módulo, y el módulo y Gladys escriben la orden por turnos.",
+        "pilotWireStandbyOrderLabel": "Orden una vez alcanzada la consigna",
+        "pilotWireStandbyForceLabel": "Forzar otra orden que antihielo en reposo",
+        "pilotWireStandbyForceHelp": "Por defecto, Gladys envía antihielo una vez alcanzada la consigna. Algunos radiadores bloquean entonces sus propias funciones, como el boost de un toallero, porque antihielo y apagado son órdenes prioritarias: fuerce eco para conservarlas.",
+        "pilotWireStandbyOrderWarning": "Eco: el radiador regula entonces él mismo sobre su consigna eco, unos 3,5 °C por debajo de su confort; una consigna de Gladys más baja (noche) no se alcanza mientras se envía eco. Apagado: el radiador se corta, sin protección antihielo si Gladys se detiene. Los preajustes antihielo y ausencia, como una ventana abierta, siguen en antihielo; un módulo que no acepta la orden elegida recibe la más baja que acepta: antihielo, apagado y luego eco.",
         "pilotWireRegulationHelp": {
           "heater": "Cada preajuste envía la orden elegida en la tabla de preajustes (eco → eco, ausencia → antihielo…). El sensor de ambiente, si lo hay, solo sirve para mostrar la temperatura.",
-          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar, antihielo una vez alcanzada la consigna del preajuste. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
+          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar y, una vez alcanzada la consigna del preajuste, una orden de reposo: antihielo o, en un módulo que no la acepta, apagado y luego eco, salvo que se fuerce otra. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
         },
         "windowFeatureLabel": "Sensores de apertura de ventana",
         "windowFeatureHelp": {
@@ -3779,6 +3875,7 @@
         "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un actuador (conmutador o hilo piloto): regula leyendo uno y accionando el otro.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
         "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
+        "pilotWireUnreadError": "No se ha podido leer el hilo piloto elegido, así que no se puede comprobar la orden de reposo: recarga la página y vuelve a elegirlo.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",
         "noActiveSchedule": "Sin programación (control manual)",
@@ -3910,6 +4007,7 @@
     "newCondition": "Nueva condición",
     "selectActionType": "Seleccione un tipo de acción",
     "selectConditionType": "Seleccione un tipo de condición",
+    "conditionAndText": "Y",
     "noTriggersYet": "Todavía no se ha añadido ningún activador. No es obligatorio tener un activador en una escena.",
     "addNewTriggerButton": "Añadir activador",
     "saveSceneError": "Se produjo un error al guardar su escena. Compruebe que todas las acciones/activadores estén completos y sean correctos.",
@@ -4233,8 +4331,8 @@
         "variablesExplanation": "Para insertar una variable, escriba \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
       },
       "energyCurrentPrice": {
-        "description": "La escena solo continuará si el precio actual del kWh del contrato seleccionado cumple la condición siguiente.",
-        "contractLabel": "Contrato de energía",
+        "description": "La escena solo continuará si el precio actual del kWh del contrato activo en el contador seleccionado cumple la condición siguiente. Sin contrato activo, la escena se detiene.",
+        "meterLabel": "Contador eléctrico",
         "operatorLabel": "Continuar si el precio es",
         "valueLabel": "Umbral (por kWh)",
         "valuePlaceholder": "0.20",
@@ -4749,9 +4847,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "Se activa cuando cambia el precio actual del kWh (o el tramo tarifario) del contrato seleccionado, por ejemplo al pasar de horas valle a horas punta.",
-        "contractLabel": "Contrato de energía",
-        "anyContract": "Cualquier contrato",
+        "description": "Se activa cuando cambia el precio actual del kWh (o el tramo tarifario) del contador seleccionado, por ejemplo al pasar de horas valle a horas punta. Sigue el contrato activo del contador: cuando cambia la tarifa, la escena sigue funcionando sin modificaciones.",
+        "meterLabel": "Contador eléctrico",
         "error": "No se pudieron cargar los contratos de energía."
       }
     },
@@ -7600,5 +7697,23 @@
     "closed": "Cerrado",
     "on": "Encendido",
     "off": "Apagado"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Cancelar",
+    "searchPlaceholder": "Habitación, dispositivo, medida…",
+    "searchLabel": "Buscar un dispositivo",
+    "clearSearch": "Borrar la búsqueda",
+    "allRooms": "Todas",
+    "selectedFilter": "Seleccionados",
+    "roomsLabel": "Filtrar por habitación",
+    "noResult": "Ningún dispositivo coincide con «{{search}}».",
+    "noSelection": "Todavía no hay ningún dispositivo seleccionado.",
+    "noDevice": "Todavía no hay dispositivos: primero agrega tus dispositivos desde una integración.",
+    "selectedCount": {
+      "one": "1 seleccionado",
+      "other": "{{count}} seleccionados"
+    },
+    "validate": "Listo",
+    "title": "Elegir"
   }
 }

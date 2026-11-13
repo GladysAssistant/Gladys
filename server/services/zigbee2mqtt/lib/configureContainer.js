@@ -3,6 +3,7 @@ const { constants } = require('fs');
 const path = require('path');
 const yaml = require('yaml');
 const portfinder = require('portfinder');
+const cloneDeep = require('lodash.clonedeep');
 
 const logger = require('../../../utils/logger');
 const { DEFAULT, ADAPTER_MODE } = require('./constants');
@@ -48,7 +49,19 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
 
   // Check for changes
   const fileContent = await fs.readFile(configFilepath);
-  const loadedConfig = yaml.parse(fileContent.toString());
+  let loadedConfig = yaml.parse(fileContent.toString());
+  // Started without configuration file (its data folder removed while its container ran), Zigbee2mqtt writes its
+  // own, flagged "onboarding", and waits at every start for the user to fill its onboarding page, never shown by
+  // Gladys. Never completed, this file holds nothing to keep: it is replaced as if there was none. Its network key
+  // still "GENERATE" (replaced by Zigbee2mqtt once its network started) tells it from a used file, left untouched.
+  // The keys "GENERATE" are not kept: Zigbee2mqtt would draw new ones, and lose the network of the Gladys
+  // installations, which run with its default keys.
+  if (loadedConfig.onboarding && (loadedConfig.advanced || {}).network_key === 'GENERATE') {
+    logger.info('Z2M configuration file waits for an onboarding, writing default Z2M configuration...');
+    await fs.writeFile(configFilepath, yaml.stringify(DEFAULT.CONFIGURATION_CONTENT));
+    loadedConfig = cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
+    configCreated = true;
+  }
   const { mqtt = {} } = loadedConfig;
 
   let configChanged = false;

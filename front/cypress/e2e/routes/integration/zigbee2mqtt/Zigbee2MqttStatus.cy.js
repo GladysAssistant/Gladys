@@ -55,6 +55,43 @@ describe('Zigbee2mqtt status', () => {
     cy.get('[data-cy=z2m-status-alert-error]').should('contain', 'error: Error: Resource busy');
   });
 
+  it('should explain a known startup error with the action to take', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      { body: { ...notOnlineStatus, z2mContainerError: { code: 'ADAPTER_NO_RESPONSE', message: null } } }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-alert-error]').i18n(
+      'integration.zigbee2mqtt.setup.modes.local.containerErrors.ADAPTER_NO_RESPONSE'
+    );
+    cy.get('[data-cy=z2m-container-error-details]').should('not.exist');
+  });
+
+  it('should list the settings refused by Zigbee2mqtt', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      {
+        body: {
+          ...notOnlineStatus,
+          z2mContainerError: {
+            code: 'INVALID_CONFIGURATION',
+            message: 'serial/adapter must be equal to one of the allowed values'
+          }
+        }
+      }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-alert-error]').should('contain', 'configuration.yaml');
+    cy.get('[data-cy=z2m-container-error-details]').should(
+      'have.text',
+      'serial/adapter must be equal to one of the allowed values'
+    );
+  });
+
   it('should tell that Zigbee2mqtt does not answer with an external broker, without container', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(

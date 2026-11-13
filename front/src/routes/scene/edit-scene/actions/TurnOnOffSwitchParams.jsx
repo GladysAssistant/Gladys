@@ -2,25 +2,32 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Select from '../../../../components/form/Select';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { getDeviceFeatureName } from '../../../../utils/device';
 
-import { ACTIONS } from '../../../../../../server/utils/constants';
+import { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 class TurnOnOffSwitch extends Component {
   getOptions = async () => {
     try {
       const devices = await this.props.httpClient.get('/api/v1/device', {
-        device_feature_category: 'switch',
-        device_feature_type: 'binary'
+        device_feature_category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        device_feature_type: DEVICE_FEATURE_TYPES.SWITCH.BINARY
       });
-      // keep only write switches, not read only
-      const devicesFiltered = devices.filter(device => {
-        const writeSwitch = device.features.find(f => f.read_only === false);
-        return writeSwitch !== undefined;
+      // One option per writable switch, so each switch of a multi-switch device can be picked
+      // (the features are already filtered on the switch category and type by the API)
+      const deviceOptions = [];
+      devices.forEach(device => {
+        const switches = device.features.filter(f => f.read_only === false);
+        switches.forEach((feature, index) => {
+          deviceOptions.push({
+            value: feature.selector,
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
+            deviceSelector: device.selector,
+            isFirstSwitchOfDevice: index === 0
+          });
+        });
       });
-      const deviceOptions = devicesFiltered.map(device => ({
-        value: device.selector,
-        label: device.name
-      }));
       await this.setState({ deviceOptions });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
@@ -29,23 +36,28 @@ class TurnOnOffSwitch extends Component {
     }
   };
   handleChange = selectedOptions => {
-    if (selectedOptions) {
-      const switches = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.path, 'devices', switches);
-    } else {
-      this.props.updateActionProperty(this.props.path, 'devices', []);
+    const deviceFeatures = selectedOptions ? selectedOptions.map(selectedOption => selectedOption.value) : [];
+    this.props.updateActionProperty(this.props.path, 'device_features', deviceFeatures);
+    // Scenes saved before the switches could be picked one by one store devices, shown
+    // as their first switch selected: the selection now lives in device_features only
+    if (this.props.action.devices) {
+      this.props.updateActionProperty(this.props.path, 'devices', undefined);
     }
   };
   refreshSelectedOptions = nextProps => {
-    const selectedOptions = [];
-    if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(switches => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === switches);
-        if (deviceOption) {
-          selectedOptions.push(deviceOption);
-        }
-      });
-    }
+    const { device_features: deviceFeatures = [], devices = [] } = nextProps.action;
+    const deviceOptions = this.state.deviceOptions || [];
+    // Same rule as the execution: the devices are only a fallback when no switch is selected,
+    // and drive their first writable switch. The selection keeps the stored order, which
+    // react-select emits back on the next change.
+    const selectedOptions =
+      deviceFeatures.length > 0
+        ? deviceOptions
+            .filter(deviceOption => deviceFeatures.includes(deviceOption.value))
+            .sort((a, b) => deviceFeatures.indexOf(a.value) - deviceFeatures.indexOf(b.value))
+        : deviceOptions
+            .filter(deviceOption => deviceOption.isFirstSwitchOfDevice && devices.includes(deviceOption.deviceSelector))
+            .sort((a, b) => devices.indexOf(a.deviceSelector) - devices.indexOf(b.deviceSelector));
     this.setState({ selectedOptions });
   };
   constructor(props) {
@@ -90,4 +102,4 @@ class TurnOnOffSwitch extends Component {
   }
 }
 
-export default connect('httpClient', {})(TurnOnOffSwitch);
+export default connect('httpClient', {})(withIntlAsProp(TurnOnOffSwitch));

@@ -66,20 +66,36 @@ const DashboardListItem = ({ children, ...props }) => {
   };
 
   const openEditPage = () => {
-    route(`/dashboard/${props.selector}/edit`);
+    const url = `/dashboard/${props.selector}/edit`;
+    // through the editor's guard: switching dashboards with pending changes asks first
+    if (props.requestNavigation) {
+      props.requestNavigation(url);
+    } else {
+      route(url);
+    }
   };
+
+  // the grab handle drags; a tap on it must not also open the dashboard
+  const stopClick = event => event.stopPropagation();
 
   return (
     <li
       ref={ref}
       onClick={openEditPage}
       data-dashboard-list-drop
+      data-active={props.isSelected ? 'true' : undefined}
       data-drop-index={index}
       class={cx(style.dashboardListItem, {
         [style.dashboardListItemActive]: props.isSelected
       })}
     >
-      <span class={style.listDragHandle} data-cy={`reorder-dashboard-${index}`} onPointerDown={onHandlePointerDown}>
+      <span
+        class={style.listDragHandle}
+        data-cy={`reorder-dashboard-${index}`}
+        onPointerDown={onHandlePointerDown}
+        onClick={stopClick}
+        aria-hidden="true"
+      >
         <i class="fe fe-menu" />
       </span>
       <span class={style.dashboardListItemName}>{wrapEmojisJSX(props.name)}</span>
@@ -100,9 +116,37 @@ class RedorderDashboardList extends Component {
     this.props.updateDashboardList(newDashboards);
   };
 
+  // On a phone the pills scroll sideways: center the dashboard being edited,
+  // like the viewer's dock, or it may sit half off-screen
+  revealActive = () => {
+    const list = this.listElement;
+    const active = list && list.querySelector('[data-active]');
+    if (!active || list.scrollWidth <= list.clientWidth) {
+      return;
+    }
+    const maxScroll = list.scrollWidth - list.clientWidth;
+    list.scrollLeft = Math.max(0, Math.min(active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2, maxScroll));
+  };
+
+  setListElement = element => {
+    this.listElement = element;
+  };
+
+  componentDidMount() {
+    this.revealActive();
+  }
+
+  componentDidUpdate(previousProps) {
+    const previousId = previousProps.currentDashboard && previousProps.currentDashboard.id;
+    const currentId = this.props.currentDashboard && this.props.currentDashboard.id;
+    if (previousId !== currentId || previousProps.dashboards !== this.props.dashboards) {
+      this.revealActive();
+    }
+  }
+
   render({ dashboards, currentDashboard, openNewDashboard }, {}) {
     return (
-      <ul class={style.dashboardList} data-dashboard-list>
+      <ul class={style.dashboardList} data-dashboard-list ref={this.setListElement}>
         {dashboards &&
           dashboards.map((dashboard, index) => (
             <DashboardListItem
@@ -112,6 +156,7 @@ class RedorderDashboardList extends Component {
               selector={dashboard.selector}
               isSelected={dashboard.id === currentDashboard.id}
               insertAtPosition={this.insertAtPosition}
+              requestNavigation={this.props.requestNavigation}
             />
           ))}
         <li class={style.newDashboardItem}>

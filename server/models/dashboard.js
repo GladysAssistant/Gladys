@@ -8,6 +8,7 @@ const {
   DASHBOARD_VISIBILITY_LIST,
   DASHBOARD_WIDTH_LIST,
   DASHBOARD_BACKGROUND_SCENE_LIST,
+  DASHBOARD_SECTION_MOBILE_ORDER_LIST,
 } = require('../utils/constants');
 const {
   WIDGET_KEY_REGEX,
@@ -65,7 +66,10 @@ const boxSchema = Joi.object().keys({
   gauge_color_high: Joi.string(),
   colors: Joi.array().items(Joi.string()),
   show_subscription_prices: Joi.boolean(),
-  // energy-price box: the selector of the contract whose current price is shown
+  // energy-price box: the device selector of the meter whose active contract's price is shown
+  // (empty: the main meter); `energy_contract` is the contract selector of a box saved before
+  // the meter targeting, read as the meter of that contract
+  electric_meter: Joi.string().allow(''),
   energy_contract: Joi.string(),
   period_start_day: Joi.number()
     .integer()
@@ -185,7 +189,9 @@ const boxSchema = Joi.object().keys({
 // to this shape in a beforeValidate hook, so validation only sees sections.
 // widths holds one integer weight per column (1 = normal, 2 = wide); the
 // beforeValidate hook aligns it to the columns and drops it when every
-// column has the default weight, so it is optional here.
+// column has the default weight, so it is optional here. mobile_order is the
+// order of the section's widgets on a phone, where its columns stack
+// (columns by default, or rows): optional, absent means columns.
 const boxesSchema = Joi.array().items(
   Joi.object().keys({
     columns: Joi.array()
@@ -200,6 +206,7 @@ const boxesSchema = Joi.array().items(
           .max(MAX_COLUMN_WIDTH),
       )
       .max(MAX_COLUMNS_PER_SECTION),
+    mobile_order: Joi.string().valid(...DASHBOARD_SECTION_MOBILE_ORDER_LIST),
   }),
 );
 

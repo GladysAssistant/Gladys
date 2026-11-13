@@ -118,8 +118,17 @@ describe('models/scene', () => {
   });
 
   it('should validate an energy contract price trigger and condition', async () => {
+    // they target a meter (its device selector), an empty one meaning any meter / the main meter
+    await buildScene({ type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, electric_meter: 'linky' }).validate();
+    await buildScene({ type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, electric_meter: '' }).validate();
+    await buildSceneWithActions([
+      [{ type: ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE, electric_meter: 'linky', operator: '<', value: 0.2 }],
+    ]).validate();
+    await buildSceneWithActions([
+      [{ type: ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE, electric_meter: '', operator: '<', value: 0.2 }],
+    ]).validate();
+    // a trigger or a condition saved before the meter targeting names a contract
     await buildScene({ type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, energy_contract: 'edf-tempo' }).validate();
-    // an empty selector means "any contract"
     await buildScene({ type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, energy_contract: '' }).validate();
     await buildSceneWithActions([
       [{ type: ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE, energy_contract: 'edf-tempo', operator: '<', value: 0.2 }],

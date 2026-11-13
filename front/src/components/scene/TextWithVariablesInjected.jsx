@@ -25,7 +25,10 @@ class TextWithVariablesInjected extends Component {
       enforceWhitelist: true,
       tagTextProp: 'text',
       dropdown: {
-        enabled: 1,
+        // Minimum number of characters typed after the pattern ('{{') before the
+        // list of variables shows up: 0 opens it as soon as '{{' is typed, as the
+        // help text of the fields says. In mix mode, Tagify never opens it on focus.
+        enabled: 0,
         position: 'text',
         mapValueTo: 'title',
         maxItems: 200

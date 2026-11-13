@@ -52,6 +52,7 @@ describe('zigbee2mqtt status', () => {
     expect(result.z2mEnabled).that.equal(true);
     expect(result.coordinatorFirmware).that.equal(null);
     expect(result.z2mContainerError).that.equal(null);
+    expect(result.ezspFallback).that.equal(false);
     expect(result.mqttConnectionError).that.equal(null);
   });
 
