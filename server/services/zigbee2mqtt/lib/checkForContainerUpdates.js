@@ -6,10 +6,13 @@ const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.jso
 const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
 /**
- * @description Checks if version is the latest for this service, if not, it removes existing containers.
+ * @description Checks if version is the latest for this service, if not, it removes existing containers. Called once
+ * the images of the new versions are downloaded (see init).
  * @param {object} config - Service configuration properties.
+ * @returns {Promise<Array<string>>} Resolve with the images of the removed containers, removed by init once the new
+ * containers exist.
  * @example
- * await z2m.checkForContainerUpdates(config);
+ * const replacedImages = await z2m.checkForContainerUpdates(config);
  */
 async function checkForContainerUpdates(config) {
   logger.info('Checking for current installed versions and required updates...');
@@ -31,6 +34,7 @@ async function checkForContainerUpdates(config) {
     throw e;
   }
 
+  const replacedImages = [];
   // Check for MQTT container version
   if (mqttUpdateRequired) {
     logger.info(`MQTT container: update #${DEFAULT.DOCKER_MQTT_VERSION} of the container required...`);
@@ -41,6 +45,7 @@ async function checkForContainerUpdates(config) {
       // The init process will create it again
       // With its anonymous volumes (/mosquitto/data and /mosquitto/log of the image, unused), left behind otherwise
       await this.gladys.system.removeContainer(mqttContainer.id, { force: true, v: true });
+      replacedImages.push(mqttContainer.image);
     }
 
     // Update to last version
@@ -57,12 +62,15 @@ async function checkForContainerUpdates(config) {
       // If container is present, we remove it
       // The init process will create it again
       await this.gladys.system.removeContainer(z2mContainer.id, { force: true });
+      replacedImages.push(z2mContainer.image);
     }
 
     // Update to last version
     config.dockerZ2mVersion = DEFAULT.DOCKER_Z2M_VERSION;
     logger.info(`Z2M container: update #${DEFAULT.DOCKER_Z2M_VERSION} of the container done`);
   }
+
+  return replacedImages;
 }
 
 module.exports = {

@@ -31,7 +31,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         body: {}
       }
     );
-    // Nothing configured: the page asks the server to download the images
+    // Nothing configured: the page asks the server to download the images once a dongle is chosen
     cy.intercept(
       {
         method: 'POST',
@@ -310,7 +310,7 @@ describe('Zigbee2Mqtt setup wizard local mode with a recognized dongle', () => {
         body: {}
       }
     );
-    // Nothing configured: the page asks the server to download the images
+    // Nothing configured: the page asks the server to download the images once a dongle is chosen
     cy.intercept(
       {
         method: 'POST',

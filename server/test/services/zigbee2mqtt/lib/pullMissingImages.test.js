@@ -64,30 +64,26 @@ describe('zigbee2mqtt pullMissingImages', () => {
     await expect(zigbee2mqttManager.pullMissingImages()).to.be.rejectedWith('docker fail pull');
   });
 
-  it('should keep the error of each failed download, for the containers to create (see pullImage)', async () => {
+  it('should keep the error of each failed download in the table of init, for the containers to create', async () => {
     // PREPARE
     const error = new Error('docker fail pull');
     zigbee2mqttManager.pullImage = fake((image) =>
       image === 'eclipse-mosquitto:2.0.15' ? Promise.reject(error) : Promise.resolve(),
     );
+    const failures = {};
     // EXECUTE
-    await expect(zigbee2mqttManager.pullMissingImages()).to.be.rejectedWith(error);
+    await expect(zigbee2mqttManager.pullMissingImages(failures)).to.be.rejectedWith(error);
     // ASSERT
-    expect(zigbee2mqttManager.imagePullFailures).to.deep.equal({ 'eclipse-mosquitto:2.0.15': error });
+    expect(failures).to.deep.equal({ 'eclipse-mosquitto:2.0.15': error });
   });
 
-  it('should forget the failures of the previous call, and download again', async () => {
+  it('should leave no failure behind without a table, as the prefetch calls it', async () => {
     // PREPARE
-    zigbee2mqttManager.imagePullFailures = { 'eclipse-mosquitto:2.0.15': new Error('docker fail pull') };
-    // The failures known by each download as it starts, which would fail it at once otherwise
-    const failuresSeen = [];
-    zigbee2mqttManager.pullImage = fake(async () => {
-      failuresSeen.push({ ...zigbee2mqttManager.imagePullFailures });
-    });
+    zigbee2mqttManager.pullImage = fake.rejects(new Error('docker fail pull'));
     // EXECUTE
-    await zigbee2mqttManager.pullMissingImages();
+    await expect(zigbee2mqttManager.pullMissingImages()).to.be.rejectedWith('docker fail pull');
     // ASSERT
-    expect(failuresSeen).to.deep.equal([{}, {}]);
+    // A container created later downloads again (see pullImage)
     expect(zigbee2mqttManager.imagePullFailures).to.deep.equal({});
   });
 });

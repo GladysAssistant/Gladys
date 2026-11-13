@@ -46,9 +46,9 @@ async function downloadImages(manager) {
 
 /**
  * @description Download the images missing from the machine ahead of the installation, which then does not wait for
- * them: the setup page starts it as it opens, while the user prepares the coordinator. Nothing is downloaded when the
- * images do not fit in the free disk space, as a full disk would break Gladys itself. Started once: a running or done
- * prefetch is left as is, a failed one starts again.
+ * them: the setup page starts it once a coordinator is chosen, while the user finishes the setup. Nothing is
+ * downloaded when the images do not fit in the free disk space, as a full disk would break Gladys itself. Started
+ * once: a running or done prefetch is left as is, a failed one starts again.
  * @returns {Promise<object>} Resolve with the state of the prefetch once the disk space is checked, without waiting for
  * the downloads: the setup page follows them like an installation (see emitInstallProgress).
  * @example

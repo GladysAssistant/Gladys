@@ -97,8 +97,9 @@ class Zigbee2mqttSetupPage extends Component {
   };
 
   // Nothing configured yet: the images are downloaded in the background, so that the installation does not wait for them.
-  // Asked once, as soon as the page knows it can: on a Gladys that just restarted, the server tells that it runs in
-  // Docker with the host network only once it started the integration, after the page opened.
+  // Asked by the local mode form once a coordinator is chosen (a dongle preselected counts), not as the page opens: an
+  // external broker, or an admin who only looks, downloads nothing. Asked once, when the server tells that it runs in
+  // Docker with the host network.
   prefetchImages = async () => {
     const { loadZigbee2mqttStatus, loadZigbee2mqttConfig, configuration, zigbee2mqttStatus } = this.state;
     const { dockerBased, networkModeValid, installation } = zigbee2mqttStatus;
@@ -235,7 +236,6 @@ class Zigbee2mqttSetupPage extends Component {
     if (previousInstallationState === 'running' && (installationState === 'done' || installationState === 'failed')) {
       this.handleInstallationEnd();
     }
-    this.prefetchImages();
   }
 
   componentWillUnmount() {
@@ -259,6 +259,7 @@ class Zigbee2mqttSetupPage extends Component {
           saveConfiguration={this.saveConfiguration}
           toggleZ2M={this.toggleZ2M}
           resetZ2M={this.resetZ2M}
+          prefetchImages={this.prefetchImages}
         />
       </Zigbee2mqttPage>
     );

@@ -5,8 +5,9 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 const MIN_INTERVAL_IN_MS = 500;
 
 /**
- * @description Send the progress of the installation and of the prefetch to the setup page, at most twice a second.
- * A call within the interval is sent once it is over, with the state of that time: the last state is always sent.
+ * @description Send the progress of the installation and of the prefetch to the setup page, at most twice a second,
+ * and only when it changed: it goes to every connected user, and through Gladys Plus. A call within the interval is
+ * sent once it is over, with the state of that time: the last state is always sent.
  * @param {boolean} [immediate] - Send at once, in place of a send left waiting: when the integration is disabled or
  * reset, no timer outlives it.
  * @example
@@ -28,8 +29,14 @@ function emitInstallProgress(immediate = false) {
     }
     return;
   }
-  this.installProgressSentAt = Date.now();
   const { installation, prefetch } = this;
+  // Docker reports a download many times a second, most often without a new percentage
+  const sentPayload = JSON.stringify({ installation, prefetch });
+  if (sentPayload === this.installProgressSentPayload) {
+    return;
+  }
+  this.installProgressSentPayload = sentPayload;
+  this.installProgressSentAt = Date.now();
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS,
     payload: { installation, prefetch },

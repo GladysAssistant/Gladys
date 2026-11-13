@@ -64,7 +64,10 @@ class SetupPanel extends Component {
     }
   }
 
-  render({ zigbee2mqttStatus = {}, httpClient, disabled, setupZigee2mqttStatus }, { setupMode, configuration }) {
+  render(
+    { zigbee2mqttStatus = {}, httpClient, disabled, setupZigee2mqttStatus, prefetchImages },
+    { setupMode, configuration }
+  ) {
     const { dockerBased, networkModeValid, usbConfigured, networkAdapterConfigured } = zigbee2mqttStatus;
 
     return (
@@ -91,6 +94,7 @@ class SetupPanel extends Component {
               resetConfiguration={this.resetConfiguration}
               disabled={disabled}
               zigbee2mqttStatus={zigbee2mqttStatus}
+              prefetchImages={prefetchImages}
             />
           </li>
         )}

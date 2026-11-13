@@ -15,6 +15,8 @@ const ownContainer = (options) =>
     {
       id: 'container-id',
       name: `/${options.filters.name[0]}`,
+      // Created from the image of an older version
+      image: options.filters.name[0] === 'gladys-z2m-mqtt' ? 'eclipse-mosquitto:2.0.11' : 'koenkk/zigbee2mqtt:1.40.0',
       labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
     },
   ]);
@@ -56,7 +58,7 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
       dockerZ2mVersion: 'BAD_REVISION',
     };
     // EXECUTE
-    await zigbee2mqttManager.checkForContainerUpdates(config);
+    const replacedImages = await zigbee2mqttManager.checkForContainerUpdates(config);
     // ASSERT
     assert.calledTwice(gladys.system.getContainers);
     assert.calledWithExactly(gladys.system.getContainers, {
@@ -68,6 +70,7 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
       filters: { name: ['gladys-z2m-zigbee2mqtt'] },
     });
     assert.notCalled(gladys.system.removeContainer);
+    expect(replacedImages).to.deep.equal([]);
 
     expect(config).deep.equal({
       dockerMqttVersion: DEFAULT.DOCKER_MQTT_VERSION,
@@ -83,7 +86,7 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
       dockerZ2mVersion: 'BAD_REVISION',
     };
     // EXECUTE
-    await zigbee2mqttManager.checkForContainerUpdates(config);
+    const replacedImages = await zigbee2mqttManager.checkForContainerUpdates(config);
     // ASSERT
     assert.calledTwice(gladys.system.getContainers);
     assert.calledWithExactly(gladys.system.getContainers, {
@@ -99,6 +102,8 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
     // The broker with its anonymous volumes
     assert.calledWithExactly(gladys.system.removeContainer, 'container-id', { force: true, v: true });
     assert.calledWithExactly(gladys.system.removeContainer, 'container-id', { force: true });
+    // Their old images, removed by init once the new containers exist
+    expect(replacedImages).to.deep.equal(['eclipse-mosquitto:2.0.11', 'koenkk/zigbee2mqtt:1.40.0']);
 
     expect(config).deep.equal({
       dockerMqttVersion: DEFAULT.DOCKER_MQTT_VERSION,
