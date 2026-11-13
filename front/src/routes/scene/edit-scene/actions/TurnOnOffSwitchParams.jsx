@@ -48,11 +48,6 @@ class TurnOnOffSwitch extends Component {
   // on a phone the switches are picked in the device picker sheet, by room: one row per writable
   // switch, as the options of the select
   handlePickerChange = deviceFeatures => {
-    // a picker validated as it was changes nothing: a scene still storing devices keeps them
-    const current = this.state.selectedOptions.map(option => option.value);
-    if (current.length === deviceFeatures.length && current.every((value, index) => value === deviceFeatures[index])) {
-      return;
-    }
     this.handleChange(deviceFeatures.map(value => ({ value })));
   };
   isWritableSwitch = feature => feature.read_only === false;
@@ -76,7 +71,8 @@ class TurnOnOffSwitch extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
-      devices: [],
+      // null while loading: the picker field of a phone waits for the list
+      devices: null,
       selectedOptions: []
     };
   }
@@ -103,7 +99,13 @@ class TurnOnOffSwitch extends Component {
         )}
         <DevicePickerField
           devices={devices}
-          selected={selectedOptions.map(option => option.value)}
+          selected={
+            // the stored switches, one whose device is gone included ("Device not found"); a scene
+            // still storing devices shows the first switch of each
+            Array.isArray(props.action.device_features) && props.action.device_features.length > 0
+              ? props.action.device_features
+              : selectedOptions.map(option => option.value)
+          }
           onChange={this.handlePickerChange}
           filterFeature={this.isWritableSwitch}
         >

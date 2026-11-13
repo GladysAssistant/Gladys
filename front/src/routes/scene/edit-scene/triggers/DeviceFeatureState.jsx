@@ -50,7 +50,9 @@ class TurnOnLight extends Component {
     return this.props.trigger.device_feature ? [this.props.trigger.device_feature] : [];
   };
 
-  onDeviceFeaturesChange = (deviceFeatures, devices, isUserChange) => {
+  // selectors: given by the picker sheet of a phone — the whole selection, the selectors of
+  // devices that no longer exist included (they stay until the user removes their row)
+  onDeviceFeaturesChange = (deviceFeatures, devices, isUserChange, selectors) => {
     const previousFeature = this.state.selectedDeviceFeature;
     // all selected features share the same category/type, the first one drives the condition widget
     const firstFeature = deviceFeatures.length > 0 ? deviceFeatures[0] : null;
@@ -66,7 +68,7 @@ class TurnOnLight extends Component {
     this.props.updateTriggerProperty(
       this.props.index,
       'device_features',
-      deviceFeatures.map(feature => feature.selector)
+      selectors || deviceFeatures.map(feature => feature.selector)
     );
     // migrate away from the legacy single-feature format when the user edits the selection
     if (this.props.trigger.device_feature) {

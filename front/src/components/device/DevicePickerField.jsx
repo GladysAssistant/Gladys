@@ -53,6 +53,14 @@ class DevicePickerField extends Component {
 
   validatePicker = selected => {
     this.setState({ pickerOpen: false });
+    // A picker validated as it was changes nothing: tapping the device already selected (a
+    // single field has no other way to close on a choice) or "Done" on an untouched list must
+    // not run what a form does on a change — clearing the media of a player, rewriting an
+    // older scene in the current format.
+    const current = this.props.selected || [];
+    if (current.length === selected.length && current.every(selector => selected.includes(selector))) {
+      return;
+    }
     this.props.onChange(selected);
   };
 

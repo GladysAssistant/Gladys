@@ -138,11 +138,26 @@ class SelectDeviceFeature extends Component {
   // The picker sheet of a phone hands back selectors: they go through the same path as the
   // options of the select
   handlePickerChange = selectors => {
-    const { deviceFeaturesDictionnary } = this.state;
-    const options = selectors
-      .filter(selector => deviceFeaturesDictionnary[selector])
-      .map(selector => ({ value: selector }));
-    this.handleChange(this.props.isMulti ? options : options[0] || null);
+    const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;
+    const known = selectors.filter(selector => deviceFeaturesDictionnary[selector]);
+    if (this.props.isMulti) {
+      // A selector whose device no longer exists keeps its row in the field and is only dropped
+      // when the user removes that row: the whole selection is handed back, in its order, next
+      // to the features that could be resolved (docs/specs/scene-editor-mobile.md, E.10).
+      this.props.onDeviceFeaturesChange(
+        known.map(selector => deviceFeaturesDictionnary[selector]),
+        known.map(selector => deviceDictionnary[selector]),
+        true,
+        selectors
+      );
+      return;
+    }
+    if (known.length > 0) {
+      this.handleChange({ value: known[0] });
+    } else if (selectors.length === 0) {
+      this.handleChange(null);
+    }
+    // otherwise the only selector is the unknown one already stored: nothing to change
   };
   // the features the picker may list: the ones the select offers
   isFeatureSelectable = feature => {
@@ -281,11 +296,13 @@ class SelectDeviceFeature extends Component {
     // room; anywhere else the select below is rendered as before. Several features share one
     // condition, so they must be of the same kind; a single one is picked in one tap.
     if (props.mobilePicker) {
+      // the stored selectors, resolved or not: one whose device is gone shows as "Device not
+      // found" instead of vanishing from the field
       let selected = [];
       if (props.isMulti) {
-        selected = selectedOptions.map(option => option.value);
-      } else if (selectedOption) {
-        selected = [selectedOption.value];
+        selected = Array.isArray(props.value) ? props.value : [];
+      } else if (props.value) {
+        selected = [props.value];
       }
       return (
         <DevicePickerField

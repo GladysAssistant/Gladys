@@ -407,7 +407,13 @@ single one (`single`): its other callers — the dashboard widgets — keep the 
 that select something else than a device (a user, a house, a calendar, a schedule, the variable
 of a condition) keep their select too. A selector whose device no longer
 exists keeps its row in the field ("Device not found", removable), and is never dropped by a
-validation of the picker. No data contract changes: the forms write the same `devices` /
+validation of the picker: every field hands the picker the **stored** selectors, resolved or not,
+and writes back the whole selection (a device state trigger receives it next to the features
+that could be resolved). **A picker validated as it was changes nothing** — "Done" on an untouched
+list, or a tap on the device already selected in a single field: a form never runs what it does
+on a change (clearing the media of a player, rewriting an older scene in the current format) for
+a selection that did not move. A field waits for its list (`devices` null) before it lets the
+picker open. No data contract changes: the forms write the same `devices` /
 `device_features` arrays.
 
 ### E.11 Forms dressed for a phone
@@ -491,7 +497,9 @@ From 768 px the forms are untouched.
 - Cypress, phone viewport, `SceneMobileDevicePicker.cy.js`: the features of a device state
   trigger picked in the sheet (only the features of the selected kind are listed), removed from
   the field, the lights of an action picked as devices, a closed picker keeping the selection,
-  the saved payload, a single device replaced in one tap (no confirmation, no remove button);
+  the saved payload, a single device replaced in one tap (no confirmation, no remove button),
+  a feature whose device is gone kept in the field and in the saved trigger, an untouched
+  picker and a tap on the device already selected changing nothing;
   and the select kept on a wider screen.
 - Cypress, phone viewport, `SceneMobileGestures.cy.js`: summaries naming the user and the house,
   the system "back" closing the sheet on top then leaving the editor in one press, a sheet

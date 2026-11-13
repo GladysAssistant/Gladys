@@ -158,6 +158,74 @@ describe('Scene device picker on a phone', () => {
     });
   });
 
+  it('Should keep a device that no longer exists, and change nothing when a picker is left as it was', () => {
+    cy.intercept('PATCH', `${serverUrl}/api/v1/scene/*`).as('saveScene');
+    cy.request({
+      method: 'POST',
+      url: `${serverUrl}/api/v1/scene`,
+      body: {
+        name: 'Picker gone scene',
+        icon: 'zap',
+        tags: [],
+        triggers: [
+          {
+            type: 'device.new-state',
+            device_features: ['picker-motion-1-motion', 'picker-gone-motion'],
+            operator: '=',
+            value: 1
+          }
+        ],
+        actions: [[{ type: 'device.get-value', device_feature: 'picker-motion-1-motion' }]]
+      }
+    }).then(res => {
+      const goneSceneSelector = res.body.selector;
+      cy.visit(`/dashboard/scene/${goneSceneSelector}`);
+      cy.get('[data-cy="scene-step-row-0.0"]').should('be.visible');
+      // the forms have settled: whatever follows is the user's
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000);
+
+      // the feature whose device is gone keeps its row
+      cy.get('[data-cy="scene-trigger-row-0"]').click();
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy^="device-picker-item-"]').should('have.length', 2);
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy="device-picker-item-picker-gone-motion"]').should(
+        'be.visible'
+      );
+      // a picker validated as it was changes nothing
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy="device-picker-open"]').click();
+      cy.get('[data-cy="picker-validate"]').click();
+      cy.get('[data-cy="device-picker-sheet"]').should('not.exist');
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy^="device-picker-item-"]').should('have.length', 2);
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy=sheet-ok]').click();
+      cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
+
+      // nor does tapping the device already selected in a single field
+      cy.get('[data-cy="scene-step-row-0.0"]').click();
+      cy.get('[data-cy="scene-step-sheet-0.0"] [data-cy="device-picker-open"]').click();
+      cy.get('[data-cy="picker-feature-picker-motion-1-motion"]').click();
+      cy.get('[data-cy="device-picker-sheet"]').should('not.exist');
+      cy.get('[data-cy="scene-step-sheet-0.0"] [data-cy=sheet-ok]').click();
+      cy.get('[data-cy=scene-unsaved-label]').should('not.exist');
+
+      // a sensor added next to the gone one: the gone one is still saved
+      cy.get('[data-cy="scene-trigger-row-0"]').click();
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy="device-picker-open"]').click();
+      cy.get('[data-cy="picker-feature-picker-motion-2-motion"]').click();
+      cy.get('[data-cy="picker-validate"]').click();
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy^="device-picker-item-"]').should('have.length', 3);
+      cy.get('[data-cy="scene-trigger-sheet-0"] [data-cy=sheet-ok]').click();
+      cy.get('[data-cy=scene-save-button]').click();
+      cy.wait('@saveScene').then(({ request }) => {
+        expect(request.body.triggers[0].device_features).to.deep.equal([
+          'picker-motion-1-motion',
+          'picker-gone-motion',
+          'picker-motion-2-motion'
+        ]);
+      });
+      cy.request({ method: 'DELETE', url: `${serverUrl}/api/v1/scene/${goneSceneSelector}` });
+    });
+  });
+
   it('Should keep the select on a wider screen', () => {
     cy.viewport(1280, 800);
     cy.then(() => cy.visit(`/dashboard/scene/${sceneSelector}`));

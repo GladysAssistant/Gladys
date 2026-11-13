@@ -382,6 +382,11 @@ class BottomSheet extends Component {
     if (!open && !leaving && !keepMounted) {
       return null;
     }
+    // a sheet whose content is only rendered while it is open keeps it as it slides out
+    if (open) {
+      this.lastChildren = children;
+    }
+    const content = !open && leaving && !keepMounted ? this.lastChildren : children;
     return createPortal(
       <div
         class={cx('glass-theme', style.overlay, {
@@ -441,7 +446,7 @@ class BottomSheet extends Component {
               </div>
             </div>
           </div>
-          <div class={style.body}>{children}</div>
+          <div class={style.body}>{content}</div>
           {footer && <div class={style.footer}>{footer}</div>}
         </div>
       </div>,
