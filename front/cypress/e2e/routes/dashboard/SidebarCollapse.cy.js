@@ -67,10 +67,13 @@ describe('Collapsible sidebar', () => {
     cy.get('[data-cy="sidebar-collapse-button"]').should('not.be.visible');
     pagePaddingLeft().should('equal', 0);
 
-    // the burger still opens the drawer, and Escape closes it
+    // the burger still opens the drawer, and Escape closes it — handing the
+    // focus back to the burger, not leaving it on a link of the hidden drawer
     cy.get('[data-cy="sidebar-toggler"]').click();
     cy.get('[data-cy="sidebar-nav"]').should('be.visible');
-    cy.get('body').type('{esc}');
+    cy.get('[data-cy="sidebar-nav"] a[href="/dashboard/scene"]').focus();
+    cy.get('[data-cy="sidebar-nav"] a[href="/dashboard/scene"]').type('{esc}');
     cy.get('[data-cy="sidebar-nav"]').should('not.be.visible');
+    cy.get('[data-cy="sidebar-toggler"]').should('have.focus');
   });
 });

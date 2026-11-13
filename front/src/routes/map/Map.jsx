@@ -170,8 +170,27 @@ class MapComponent extends Component {
     this.updateDimensions();
   }
 
+  // Leaflet caches the size of its container and only re-reads it when the
+  // window is resized. The container also changes width with the window
+  // untouched — the navigation rail being collapsed or expanded beside it
+  // (components/header) — and a stale size leaves the map zooming around the
+  // center of a box it no longer has. Observe the container itself, and
+  // resize the way Leaflet does for the window: the center stays the center.
+  observeMapSize = () => {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.leafletMap) {
+        this.leafletMap.invalidateSize({ debounceMoveend: true });
+      }
+    });
+    this.resizeObserver.observe(this.map);
+  };
+
   componentDidMount() {
     this.initMap();
+    this.observeMapSize();
     window.addEventListener('resize', this.updateDimensions);
   }
 
@@ -194,6 +213,9 @@ class MapComponent extends Component {
   }
 
   componentWillUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
     if (this.leafletMap) {
       this.leafletMap.remove();
     }

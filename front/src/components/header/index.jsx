@@ -131,6 +131,8 @@ const prefersReducedMotion = () =>
 class Header extends Component {
   dropdownRef = createRef(null);
 
+  mobileTogglerRef = createRef(null);
+
   collapseButtonRef = createRef(null);
 
   expandButtonRef = createRef(null);
@@ -158,6 +160,11 @@ class Header extends Component {
     }
     if (this.props.showCollapsedMenu) {
       this.props.closeCollapsedMenu();
+      // the drawer is hidden with whatever had the focus inside it: hand the
+      // keyboard back to the button that opened it, not to a hidden link
+      if (this.mobileTogglerRef.current) {
+        this.mobileTogglerRef.current.focus();
+      }
     }
   };
 
@@ -278,6 +285,7 @@ class Header extends Component {
               type="button"
               class={style.mobileToggler}
               onClick={props.toggleCollapsedMenu}
+              ref={this.mobileTogglerRef}
               data-cy="sidebar-toggler"
               aria-label={<Text id={props.showCollapsedMenu ? 'header.closeMenu' : 'header.openMenu'} />}
               aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
