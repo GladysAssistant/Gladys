@@ -39,11 +39,12 @@ class SetupTab extends Component {
       loadZigbee2mqttStatus,
       loadZigbee2mqttConfig,
       setupZigee2mqttStatus,
+      setupZigee2mqttError,
       toggleZigee2mqttStatus,
       resetZigbee2mqttStatus,
       configuration = {}
     } = props;
-    const { z2mContainerError, mqttConnectionError, installation, zigbee2mqttConnected } =
+    const { z2mContainerError, mqttConnectionError, installation, zigbee2mqttConnected, dongleMissing } =
       props.zigbee2mqttStatus || {};
     const loading = loadZigbee2mqttStatus === RequestStatus.Getting || loadZigbee2mqttConfig === RequestStatus.Getting;
     const error = loadZigbee2mqttStatus === RequestStatus.Error || loadZigbee2mqttConfig === RequestStatus.Error;
@@ -95,7 +96,11 @@ class SetupTab extends Component {
                 {setupZigee2mqttStatus === RequestStatus.Error && (
                   <li class="list-group-item">
                     <div class="alert alert-danger my-3" data-cy="z2m-setup-save-error">
-                      <Text id="integration.zigbee2mqtt.setup.saveError" />
+                      {setupZigee2mqttError === 'DONGLE_NOT_FOUND' ? (
+                        <Text id="integration.zigbee2mqtt.setup.saveDongleNotFound" />
+                      ) : (
+                        <Text id="integration.zigbee2mqtt.setup.saveError" />
+                      )}
                     </div>
                   </li>
                 )}
@@ -120,6 +125,13 @@ class SetupTab extends Component {
                         url: props.z2mUrl
                       }}
                     />
+                  </li>
+                )}
+                {dongleMissing && (
+                  <li class="list-group-item">
+                    <div class="alert alert-warning my-3" data-cy="z2m-dongle-missing">
+                      <Text id="integration.zigbee2mqtt.setup.dongleMissing" />
+                    </div>
                   </li>
                 )}
                 {z2mContainerError && !isShownAbove(z2mContainerError) && (

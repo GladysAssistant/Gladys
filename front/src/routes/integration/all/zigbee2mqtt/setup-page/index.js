@@ -146,7 +146,8 @@ class Zigbee2mqttSetupPage extends Component {
 
   saveConfiguration = async nextConfiguration => {
     this.setState({
-      setupZigee2mqttStatus: RequestStatus.Getting
+      setupZigee2mqttStatus: RequestStatus.Getting,
+      setupZigee2mqttError: null
     });
     try {
       const mapping = {};
@@ -163,9 +164,14 @@ class Zigbee2mqttSetupPage extends Component {
       });
     } catch (e) {
       console.error(e);
+      if (this.unmounted) {
+        return;
+      }
       this.setState({
         // An installation is already running
-        setupZigee2mqttStatus: get(e, 'response.status') === 409 ? RequestStatus.ConflictError : RequestStatus.Error
+        setupZigee2mqttStatus: get(e, 'response.status') === 409 ? RequestStatus.ConflictError : RequestStatus.Error,
+        // Refused before saving anything, such as a USB dongle that is not plugged in (DONGLE_NOT_FOUND)
+        setupZigee2mqttError: get(e, 'response.status') === 400 ? get(e, 'response.data.message') : null
       });
     }
   };

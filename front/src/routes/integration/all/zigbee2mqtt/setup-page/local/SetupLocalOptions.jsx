@@ -8,6 +8,16 @@ import Select from 'react-select';
 import SubmitConfiguration from '../components/SubmitConfiguration';
 import PrefetchStatus from '../components/PrefetchStatus';
 
+// The ports are listed again this often while the form is shown: a dongle plugged in shows up by itself
+const USB_PORTS_REFRESH_INTERVAL_IN_MS = 3000;
+
+// The path to store for a port: its /dev/serial/by-id/ link when it has one, which follows the dongle to another port
+const getPortPath = usbPort => usbPort.stablePath || usbPort.path;
+
+// The configured dongle, stored by its port or by its link
+const isConfiguredPort = (usbPort, z2mDriverPath) =>
+  Boolean(z2mDriverPath) && (usbPort.path === z2mDriverPath || usbPort.stablePath === z2mDriverPath);
+
 class SetupLocalOptions extends Component {
   updateAdapterMode = e => {
     const z2mAdapterMode = e.target.value;
@@ -40,11 +50,11 @@ class SetupLocalOptions extends Component {
       // The only recognized dongle plugged in is the one to use
       const detectedPorts = usbPorts.filter(usbPort => usbPort.adapter);
       if (detectedPorts.length === 1) {
-        this.setState({ z2mDriverPath: detectedPorts[0].path, z2mDongleName: detectedPorts[0].adapter });
+        this.setState({ z2mDriverPath: getPortPath(detectedPorts[0]), z2mDongleName: detectedPorts[0].adapter });
       }
     } else if (!z2mDongleName) {
       // A port configured without model: suggest the model recognized on it
-      const usbPort = usbPorts.find(port => port.path === z2mDriverPath);
+      const usbPort = usbPorts.find(port => isConfiguredPort(port, z2mDriverPath));
       if (usbPort && usbPort.adapter) {
         this.setState({ z2mDongleName: usbPort.adapter });
       }
@@ -119,13 +129,22 @@ class SetupLocalOptions extends Component {
     this.props.resetConfiguration();
   };
 
-  loadUsbPorts = async () => {
-    this.setState({
-      loadUsbPortsStatus: RequestStatus.Getting
-    });
+  loadUsbPorts = async (refresh = false) => {
+    this.usbPortsRequests += 1;
+    const usbPortsRequest = this.usbPortsRequests;
+    // A refresh in the background shows no loading
+    if (!refresh) {
+      this.setState({
+        loadUsbPortsStatus: RequestStatus.Getting
+      });
+    }
 
     try {
       const rawUsbPorts = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/usb/port');
+      // Answered after a more recent request, or after the form is gone
+      if (this.unmounted || usbPortsRequest !== this.usbPortsRequests) {
+        return;
+      }
       // Remove duplicated (dupe /dev/ttyUSB0 seen with Synology systems)
       const usbPortsMap = {};
       rawUsbPorts.forEach(usbPort => {
@@ -138,10 +157,33 @@ class SetupLocalOptions extends Component {
       });
     } catch (e) {
       console.error('Failed to load USB ports', e);
+      if (this.unmounted || usbPortsRequest !== this.usbPortsRequests) {
+        return;
+      }
       this.setState({
         loadUsbPortsStatus: RequestStatus.Error
       });
     }
+  };
+
+  refreshUsbPortsInBackground = async () => {
+    // Left to the list asked from the refresh button, while it loads
+    if (this.state.z2mAdapterMode === ADAPTER_MODE.NETWORK || this.state.loadUsbPortsStatus === RequestStatus.Getting) {
+      return;
+    }
+    await this.loadUsbPorts(true);
+    if (!this.unmounted) {
+      this.preselectDetectedDongle();
+    }
+  };
+
+  scheduleUsbPortsRefresh = () => {
+    this.usbPortsTimer = setTimeout(async () => {
+      await this.refreshUsbPortsInBackground();
+      if (!this.unmounted) {
+        this.scheduleUsbPortsRefresh();
+      }
+    }, USB_PORTS_REFRESH_INTERVAL_IN_MS);
   };
 
   loadZigbeeAdapters = async () => {
@@ -184,7 +226,7 @@ class SetupLocalOptions extends Component {
 
   buildUsbPortOption = usbPort => ({
     label: usbPort.name ? `${usbPort.name} (${usbPort.path})` : usbPort.path,
-    value: usbPort.path,
+    value: getPortPath(usbPort),
     adapter: usbPort.adapter
   });
 
@@ -201,6 +243,9 @@ class SetupLocalOptions extends Component {
       z2mNetworkAdapterType
     } = configuration;
 
+    // Numbers the requests of the USB ports, to keep only the answer of the last one
+    this.usbPortsRequests = 0;
+    this.usbPortsTimer = null;
     this.state = {
       z2mDriverPath,
       usbPorts: [],
@@ -220,7 +265,17 @@ class SetupLocalOptions extends Component {
 
   async componentDidMount() {
     await Promise.all([this.loadUsbPorts(), this.loadZigbeeAdapters()]);
+    if (this.unmounted) {
+      return;
+    }
     this.preselectDetectedDongle();
+    this.scheduleUsbPortsRefresh();
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
+    clearTimeout(this.usbPortsTimer);
+    this.usbPortsTimer = null;
   }
 
   componentDidUpdate() {
@@ -259,7 +314,7 @@ class SetupLocalOptions extends Component {
     // (machine without udev, such as some NAS)
     const hideMachinePorts = !showAllUsbPorts && usbPorts.some(usbPort => usbPort.pnpId);
     const visibleUsbPorts = hideMachinePorts ? usbPorts.filter(usbPort => usbPort.pnpId) : usbPorts;
-    const selectedUsbPort = usbPorts.find(usbPort => usbPort.path === z2mDriverPath);
+    const selectedUsbPort = usbPorts.find(usbPort => isConfiguredPort(usbPort, z2mDriverPath));
     const selectedUsbPortOption = selectedUsbPort
       ? this.buildUsbPortOption(selectedUsbPort)
       : this.buildSelectOption(z2mDriverPath);
