@@ -24,6 +24,24 @@ function extractAssistantText(apiResponse) {
   return typeof content === 'string' ? content.trim() : '';
 }
 
+// the digest data is JSON, where numbers always use a period: the AI is told
+// which separator to write instead of copying the JSON numbers as they are
+/**
+ * @description Get the decimal separator of a language (comma in French, period in English).
+ * @param {string} language - User language, like fr or en.
+ * @returns {string} Decimal separator, a period when the language is unknown.
+ * @example
+ * getDecimalSeparator('fr'); // ','
+ */
+function getDecimalSeparator(language) {
+  try {
+    const decimalPart = new Intl.NumberFormat(language).formatToParts(1.5).find((part) => part.type === 'decimal');
+    return decimalPart.value;
+  } catch (e) {
+    return '.';
+  }
+}
+
 /**
  * @description Send the weekly smart home digest to admin users.
  * @param {object} [options] - Options.
@@ -75,12 +93,19 @@ async function sendWeeklyDigest({ force = false } = {}) {
   // the admins' digests never compete with each other nor with the chat
   await Promise.mapSeries(admins, async (admin) => {
     try {
+      const userContent = [
+        `Language: ${admin.language}`,
+        `Decimal separator: "${getDecimalSeparator(admin.language)}"`,
+        '',
+        'Home data JSON:',
+        JSON.stringify(digestData),
+      ].join('\n');
       const apiResponse = await this.aiChat({
         messages: [
           { role: 'system', content: WEEKLY_DIGEST_PROMPT },
           {
             role: 'user',
-            content: `Language: ${admin.language}\n\nHome data JSON:\n${JSON.stringify(digestData)}`,
+            content: userContent,
           },
         ],
         max_tokens: 800,
@@ -110,4 +135,5 @@ async function sendWeeklyDigest({ force = false } = {}) {
 module.exports = {
   sendWeeklyDigest,
   extractAssistantText,
+  getDecimalSeparator,
 };
