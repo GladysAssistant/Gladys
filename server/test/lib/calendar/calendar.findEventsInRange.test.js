@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 
 const Calendar = require('../../../lib/calendar');
+const { getFullDayDate } = require('../../../lib/calendar/calendar.findEventsInRange');
 
 describe('calendar.findEventsInRange', () => {
   const calendar = new Calendar();
@@ -49,7 +50,7 @@ describe('calendar.findEventsInRange', () => {
     expect(events[0]).to.have.property('name', 'Event starting exactly at the beginning of the range');
     expect(events[1]).to.have.property('name', 'Event starting exactly at the end of the range');
   });
-  it('should match full-day events on the dedicated range when one is given', async () => {
+  it('should match full-day events stored at midnight UTC on their date when a day range is given', async () => {
     // Range of a local day in a timezone west of UTC: the full-day events of that day are
     // stored at midnight UTC, before the beginning of the local range.
     const localFrom = new Date('2025-03-11T04:00:00.000Z');
@@ -71,10 +72,68 @@ describe('calendar.findEventsInRange', () => {
       start: new Date('2025-03-11T14:00:00.000Z'),
       end: new Date('2025-03-11T15:00:00.000Z'),
     });
-    const events = await calendar.findEventsInRange(['test-calendar'], localFrom, localTo, from, to);
+    const events = await calendar.findEventsInRange(['test-calendar'], localFrom, localTo, {
+      from: '2025-03-11',
+      to: '2025-03-11',
+      timezone: 'America/New_York',
+    });
     expect(events).to.have.lengthOf(2);
     expect(events[0]).to.have.property('name', 'Full-day event of the day');
     expect(events[1]).to.have.property('name', 'Event of the day');
+  });
+  it('should match full-day events stored at a local midnight on their date when a day range is given', async () => {
+    // CalDAV sync on a server running with TZ=Europe/Paris: the full-day event of a day is
+    // stored at 23:00 UTC the day before (22:00 UTC in summer).
+    const localFrom = new Date('2025-03-10T23:00:00.000Z');
+    const localTo = new Date('2025-03-11T22:59:59.999Z');
+    await calendar.createEvent('test-calendar', {
+      name: 'Full-day event of the previous day',
+      start: new Date('2025-03-09T23:00:00.000Z'),
+      end: new Date('2025-03-10T23:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Full-day event of the day',
+      start: new Date('2025-03-10T23:00:00.000Z'),
+      end: new Date('2025-03-11T23:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Full-day event of the next day',
+      start: new Date('2025-03-11T23:00:00.000Z'),
+      end: new Date('2025-03-12T23:00:00.000Z'),
+      full_day: true,
+    });
+    const events = await calendar.findEventsInRange(['test-calendar'], localFrom, localTo, {
+      from: '2025-03-11',
+      to: '2025-03-11',
+      timezone: 'Europe/Paris',
+    });
+    expect(events).to.have.lengthOf(1);
+    expect(events[0]).to.have.property('name', 'Full-day event of the day');
+  });
+  it('should match full-day events stored at a summer local midnight on their date', async () => {
+    const localFrom = new Date('2025-07-14T22:00:00.000Z');
+    const localTo = new Date('2025-07-15T21:59:59.999Z');
+    await calendar.createEvent('test-calendar', {
+      name: 'Full-day event of the day',
+      start: new Date('2025-07-14T22:00:00.000Z'),
+      end: new Date('2025-07-15T22:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Full-day event of the next day',
+      start: new Date('2025-07-15T22:00:00.000Z'),
+      end: new Date('2025-07-16T22:00:00.000Z'),
+      full_day: true,
+    });
+    const events = await calendar.findEventsInRange(['test-calendar'], localFrom, localTo, {
+      from: '2025-07-15',
+      to: '2025-07-15',
+      timezone: 'Europe/Paris',
+    });
+    expect(events).to.have.lengthOf(1);
+    expect(events[0]).to.have.property('name', 'Full-day event of the day');
   });
   it('should not return events of a calendar which is not shared', async () => {
     const privateCalendar = await calendar.create({
@@ -99,5 +158,23 @@ describe('calendar.findEventsInRange', () => {
     });
     const events = await calendar.findEventsInRange(['another-calendar'], from, to);
     expect(events).to.have.lengthOf(0);
+  });
+});
+
+describe('calendar.getFullDayDate', () => {
+  it('should return the UTC date of a full-day event stored at midnight UTC', () => {
+    expect(getFullDayDate(new Date('2025-03-11T00:00:00.000Z'), 'Europe/Paris')).to.equal('2025-03-11');
+    expect(getFullDayDate(new Date('2025-03-11T00:00:00.000Z'), 'America/New_York')).to.equal('2025-03-11');
+  });
+  it('should return the date of the local midnight a full-day event is stored at', () => {
+    expect(getFullDayDate(new Date('2025-03-10T23:00:00.000Z'), 'Europe/Paris')).to.equal('2025-03-11');
+    expect(getFullDayDate(new Date('2025-07-14T22:00:00.000Z'), 'Europe/Paris')).to.equal('2025-07-15');
+    expect(getFullDayDate(new Date('2025-03-11T04:00:00.000Z'), 'America/New_York')).to.equal('2025-03-11');
+  });
+  it('should return the date of the nearest local midnight when stored at the midnight of another timezone', () => {
+    // Midnight in Paris is 6pm the day before in New York: the nearest midnight is the next one.
+    expect(getFullDayDate(new Date('2025-03-10T23:00:00.000Z'), 'America/New_York')).to.equal('2025-03-11');
+    // Midnight in New York is 5am in Paris: the nearest midnight is the previous one.
+    expect(getFullDayDate(new Date('2025-03-11T04:00:00.000Z'), 'Europe/Paris')).to.equal('2025-03-11');
   });
 });

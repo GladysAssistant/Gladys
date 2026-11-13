@@ -765,27 +765,16 @@ const actionsFunc = {
       throw new AbortScene('INVALID_TIME_RANGE');
     }
 
-    // Full-day events are stored at midnight UTC, so on a calendar day range they are
-    // matched on the UTC days covered by the range instead of its local bounds. Otherwise
-    // a full-day event of the day is missed in the timezones west of UTC (and the one of
-    // the next day returned instead).
-    let fullDayFrom;
-    let fullDayTo;
-    if (dayRange) {
-      fullDayFrom = dayjs.utc(from.format('YYYY-MM-DD')).toDate();
-      fullDayTo = dayjs
-        .utc(to.format('YYYY-MM-DD'))
-        .endOf('day')
-        .toDate();
-    }
+    // Full-day events are stored at midnight UTC or at the midnight of a local timezone
+    // (the one of the server process for CalDAV), so on a calendar day range they are
+    // matched on the date they stand for instead of the local bounds of the range.
+    // Otherwise the full-day event of the day can be missed and the one of the next day
+    // returned instead.
+    const fullDayRange = dayRange
+      ? { from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), timezone: self.timezone }
+      : undefined;
 
-    const events = await self.calendar.findEventsInRange(
-      action.calendars,
-      from.toDate(),
-      to.toDate(),
-      fullDayFrom,
-      fullDayTo,
-    );
+    const events = await self.calendar.findEventsInRange(action.calendars, from.toDate(), to.toDate(), fullDayRange);
 
     if (events.length === 0 && action.stop_scene_if_no_events === true) {
       throw new AbortScene('NO_EVENTS_FOUND');
