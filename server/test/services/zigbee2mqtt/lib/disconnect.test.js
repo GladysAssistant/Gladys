@@ -73,6 +73,7 @@ describe('zigbee2mqtt disconnect', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -109,6 +110,7 @@ describe('zigbee2mqtt disconnect', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -164,6 +166,7 @@ describe('zigbee2mqtt disconnect', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -178,6 +181,25 @@ describe('zigbee2mqtt disconnect', () => {
         prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
+  });
+
+  it('should stop watching the USB dongle, so that Zigbee2mqtt is not started again when it comes back', async () => {
+    // PREPARE
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    zigbee2MqttManager.findDongle = fake.resolves(null);
+    zigbee2MqttManager.watchDongle('/dev/ttyUSB0');
+    zigbee2MqttManager.dongleMissing = true;
+    try {
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      await clock.tickAsync(10000);
+    } finally {
+      clock.restore();
+    }
+    // ASSERT
+    assert.notCalled(zigbee2MqttManager.findDongle);
+    expect(zigbee2MqttManager.dongleWatchTimer).to.equal(null);
+    expect(zigbee2MqttManager.dongleMissing).to.equal(false);
   });
 
   it('should end a pending startup and forget the removed containers', async () => {

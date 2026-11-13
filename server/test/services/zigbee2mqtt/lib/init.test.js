@@ -1,3 +1,4 @@
+const fs = require('fs');
 const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 
@@ -267,6 +268,114 @@ describe('zigbee2mqtt init', () => {
     }
     // ASSERT
     assert.calledWithExactly(infoStub, 'Zigbee2mqtt: containers installed and started in 1 min 42 s');
+  });
+
+  describe('USB dongle', () => {
+    const LINK = 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0';
+    const BY_ID_PATH = `/dev/serial/by-id/${LINK}`;
+    const ZBDONGLE_P = 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P';
+    const zbDongleP = {
+      path: '/dev/ttyUSB0',
+      serialNumber: 'd65fba180f86ec11bfdf571719c2d21c',
+      pnpId: LINK,
+      vendorId: '10c4',
+      productId: 'ea60',
+    };
+    let access;
+
+    const listPorts = (ports) => {
+      gladys.service.getService = fake.returns({ list: fake.resolves(ports) });
+    };
+    const installedDriverPath = () => zigbee2mqttManager.installZ2mContainer.firstCall.args[0].z2mDriverPath;
+
+    beforeEach(() => {
+      access = sinon.stub(fs.promises, 'access').resolves();
+    });
+
+    afterEach(() => {
+      access.restore();
+      zigbee2mqttManager.stopWatchingDongle();
+    });
+
+    it('should store a recognized dongle by its /dev/serial/by-id/ link from now on', async () => {
+      listPorts([zbDongleP]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', z2mDongleName: ZBDONGLE_P });
+      await zigbee2mqttManager.init();
+      assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH', BY_ID_PATH);
+      // Its container is created again on the link
+      expect(installedDriverPath()).to.equal(BY_ID_PATH);
+      expect(zigbee2mqttManager.usbConfigured).to.equal(true);
+      expect(zigbee2mqttManager.dongleWatch).to.deep.equal({ driverPath: BY_ID_PATH });
+    });
+
+    it('should keep the port of a dongle of another driver, which may have taken the number of the configured one', async () => {
+      listPorts([zbDongleP]);
+      zigbee2mqttManager.getConfiguration.resolves({
+        z2mDriverPath: '/dev/ttyUSB0',
+        z2mDongleName: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"',
+      });
+      await zigbee2mqttManager.init();
+      assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH');
+      expect(installedDriverPath()).to.equal('/dev/ttyUSB0');
+    });
+
+    it('should keep the port of a device it does not recognize', async () => {
+      listPorts([{ path: '/dev/ttyACM0', pnpId: 'usb-Arduino_0043_85735313932351F0E1C1-if00' }]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyACM0', z2mDongleName: ZBDONGLE_P });
+      await zigbee2mqttManager.init();
+      assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH');
+      expect(installedDriverPath()).to.equal('/dev/ttyACM0');
+    });
+
+    it('should keep the link of a dongle moved to another port', async () => {
+      listPorts([{ ...zbDongleP, path: '/dev/ttyUSB1' }]);
+      // Not even checked from Gladys
+      access.rejects(new Error('ENOENT'));
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: BY_ID_PATH, z2mDongleName: ZBDONGLE_P });
+      await zigbee2mqttManager.init();
+      assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH');
+      expect(installedDriverPath()).to.equal(BY_ID_PATH);
+      expect(zigbee2mqttManager.usbConfigured).to.equal(true);
+    });
+
+    it('should store the new link of a dongle found by its serial number', async () => {
+      const newLink = `usb-Silicon_Labs_CP2102N_${zbDongleP.serialNumber}-if00-port0`;
+      listPorts([{ ...zbDongleP, pnpId: newLink }]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: BY_ID_PATH, z2mDongleName: ZBDONGLE_P });
+      await zigbee2mqttManager.init();
+      assert.calledWithExactly(
+        zigbee2mqttManager.saveOrDestroyVariable,
+        'ZIGBEE2MQTT_DRIVER_PATH',
+        `/dev/serial/by-id/${newLink}`,
+      );
+    });
+
+    it('should tell that the dongle is missing, and watch for it', async () => {
+      listPorts([]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: BY_ID_PATH, mqttMode: 'local' });
+      await zigbee2mqttManager.init();
+      expect(zigbee2mqttManager.dongleMissing).to.equal(true);
+      expect(zigbee2mqttManager.usbConfigured).to.equal(false);
+      assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+      expect(zigbee2mqttManager.dongleWatch).to.deep.equal({ driverPath: BY_ID_PATH });
+    });
+
+    it('should not watch the dongle with an external broker', async () => {
+      listPorts([]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: BY_ID_PATH, mqttMode: 'external' });
+      await zigbee2mqttManager.init();
+      expect(zigbee2mqttManager.dongleWatch).to.equal(null);
+    });
+
+    it('should stop the previous watch, and forget a missing dongle', async () => {
+      zigbee2mqttManager.watchDongle(BY_ID_PATH);
+      zigbee2mqttManager.dongleMissing = true;
+      zigbee2mqttManager.getConfiguration.resolves({ z2mAdapterMode: 'network', z2mNetworkAdapterUrl: null });
+      await zigbee2mqttManager.init();
+      expect(zigbee2mqttManager.dongleWatch).to.equal(null);
+      expect(zigbee2mqttManager.dongleWatchTimer).to.equal(null);
+      expect(zigbee2mqttManager.dongleMissing).to.equal(false);
+    });
   });
 
   it('should not install containers, network coordinator not configured', async () => {

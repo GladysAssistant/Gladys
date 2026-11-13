@@ -1,10 +1,11 @@
+const fs = require('fs');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
 const Zigbee2MqttManager = require('../../../../services/zigbee2mqtt/lib');
-const { ConflictError } = require('../../../../utils/coreErrors');
+const { ConflictError, BadParameters } = require('../../../../utils/coreErrors');
 
 const mqttLibrary = {};
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -30,6 +31,9 @@ describe('zigbee2mqtt setup', () => {
         getValue: fake.resolves(null),
         setValue: fake.resolves('fake'),
         destroy: fake.resolves(null),
+      },
+      service: {
+        getService: fake.returns({ list: fake.resolves([{ path: 'usb0' }, { path: 'usb1' }]) }),
       },
     };
 
@@ -294,6 +298,118 @@ describe('zigbee2mqtt setup', () => {
     });
     // ASSERT
     expect(zigbee2MqttManager.installation).to.include({ state: 'running', error: null });
+  });
+
+  describe('USB dongle', () => {
+    const LINK = 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0';
+    const BY_ID_PATH = `/dev/serial/by-id/${LINK}`;
+    const ZBDONGLE_P = 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P';
+    let access;
+
+    beforeEach(() => {
+      access = sinon.stub(fs.promises, 'access').resolves();
+      gladys.service.getService = fake.returns({
+        list: fake.resolves([{ path: '/dev/ttyUSB0', pnpId: LINK }, { path: '/dev/ttyS0' }]),
+      });
+    });
+
+    afterEach(() => {
+      access.restore();
+    });
+
+    it('should store the dongle chosen by its port as its /dev/serial/by-id/ link', async () => {
+      await zigbee2MqttManager.setup({
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
+      });
+      assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', BY_ID_PATH, serviceId);
+      assert.calledOnce(zigbee2MqttManager.runInstallation);
+    });
+
+    it('should refuse a dongle that is not plugged in, and keep the stored setup', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({ z2mAdapterMode: 'usb', z2mDriverPath: BY_ID_PATH });
+      const promise = zigbee2MqttManager.setup({
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB1',
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
+      });
+      await expect(promise).to.be.rejectedWith(BadParameters, 'DONGLE_NOT_FOUND');
+      assert.notCalled(gladys.variable.setValue);
+      assert.notCalled(zigbee2MqttManager.runInstallation);
+      expect(zigbee2MqttManager.installation.state).to.equal('idle');
+    });
+
+    it('should refuse another setting while the stored dongle is unplugged', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({ z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB1' });
+      const promise = zigbee2MqttManager.setup({ Z2M_TCP_PORT: '8081' });
+      await expect(promise).to.be.rejectedWith(BadParameters, 'DONGLE_NOT_FOUND');
+      assert.notCalled(gladys.variable.setValue);
+    });
+
+    it('should keep the stored path of the dongle when only another setting changes', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({ z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB0' });
+      await zigbee2MqttManager.setup({ Z2M_TCP_PORT: '8081' });
+      // The migration to the link is left to init (see getDriverPathToStore)
+      assert.calledOnceWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', '8081', serviceId);
+      expect(zigbee2MqttManager.installation.kind).to.equal('install');
+    });
+
+    it('should install again, not switch, for the stored dongle saved again by its port', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({ z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB0' });
+      await zigbee2MqttManager.setup({
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
+      });
+      assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', BY_ID_PATH, serviceId);
+      expect(zigbee2MqttManager.installation.kind).to.equal('install');
+    });
+
+    it('should switch from a stored dongle that is no longer plugged in', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({ z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB1' });
+      await zigbee2MqttManager.setup({
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
+      });
+      expect(zigbee2MqttManager.installation.kind).to.equal('switch');
+    });
+
+    it('should switch to another dongle', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({ z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyS0' });
+      await zigbee2MqttManager.setup({
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
+      });
+      expect(zigbee2MqttManager.installation.kind).to.equal('switch');
+    });
+
+    it('should not look for a dongle with an external broker', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({ mqttMode: 'external', z2mDriverPath: '/dev/ttyUSB1' });
+      await zigbee2MqttManager.setup({ Z2M_MQTT_URL: 'mqtt://192.168.1.10' });
+      assert.calledOnce(zigbee2MqttManager.runInstallation);
+    });
+
+    it('should refuse a setup while busy before looking for the dongle', async () => {
+      zigbee2MqttManager.runningOperations = 1;
+      const promise = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB1' });
+      await expect(promise).to.be.rejectedWith(ConflictError);
+      assert.notCalled(gladys.service.getService);
+    });
+
+    it('should refuse a setup when an operation started while it looked for the dongle', async () => {
+      gladys.service.getService = fake.returns({
+        list: fake(async () => {
+          zigbee2MqttManager.runningOperations = 1;
+          return [{ path: '/dev/ttyUSB0' }];
+        }),
+      });
+      const promise = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0' });
+      await expect(promise).to.be.rejectedWith(ConflictError);
+      assert.notCalled(gladys.variable.setValue);
+    });
   });
 
   it('should keep the outcome told by a failed installation', async () => {

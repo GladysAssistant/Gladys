@@ -13,6 +13,8 @@ const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { findOwnContainer } = require('../../../utils/dockerContainers');
 const { formatDuration } = require('../utils/formatDuration');
+const { isSameAdapterFamily } = require('../utils/donglePorts');
+const { findAdapter } = require('./getUsbPorts');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -65,6 +67,31 @@ async function removeReplacedImages(system, images) {
 }
 
 /**
+ * @description Get the path to store for the configured USB dongle, found plugged in: the same one, or its
+ * /dev/serial/by-id/ link when it was found under another link (by its serial number), or when its stored port is a
+ * dongle of the configured driver family (the migration of the installations stored by port: a port shared with
+ * another USB-serial adapter, which took its number at this start, keeps it).
+ * @param {object} dongle - The dongle found, see findDongle.
+ * @param {object} dongle.port - Its serial port.
+ * @param {string} dongle.stablePath - Its /dev/serial/by-id/ link, or its port when it has none.
+ * @param {string} driverPath - Its stored path.
+ * @param {string} dongleName - Configured coordinator model.
+ * @returns {string} The path to store.
+ * @example
+ * const newDriverPath = getDriverPathToStore(dongle, '/dev/ttyUSB0', 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P');
+ */
+function getDriverPathToStore({ port, stablePath }, driverPath, dongleName) {
+  if (port.path === driverPath) {
+    return isSameAdapterFamily(findAdapter(port), dongleName) ? stablePath : driverPath;
+  }
+  // Found by its link: kept, even when the link cannot be checked from Gladys
+  if (driverPath.endsWith(`/${port.pnpId}`)) {
+    return driverPath;
+  }
+  return stablePath;
+}
+
+/**
  * @description Tell the outcome of an update once Zigbee2mqtt answers, or fails to.
  * @param {object} manager - Zigbee2mqtt manager.
  * @returns {Promise} Resolve once the outcome is told, never rejects: nobody waits for it.
@@ -93,6 +120,8 @@ async function initialize(setupMode) {
   const startedAt = Date.now();
   // Reset status
   this.usbConfigured = false;
+  this.dongleMissing = false;
+  this.stopWatchingDongle();
   this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
@@ -157,16 +186,27 @@ async function initialize(setupMode) {
   } else if (!z2mDriverPath) {
     logger.info(`Zigbee2mqtt USB dongle not attached`);
   } else {
-    const usb = this.gladys.service.getService('usb');
-    const usbList = await usb.list();
-    const usbPort = usbList.find((usbDriver) => usbDriver.path === z2mDriverPath);
+    const dongle = await this.findDongle(z2mDriverPath);
 
-    if (usbPort) {
-      logger.info(`Zigbee2mqtt USB dongle attached to ${z2mDriverPath}`);
+    if (dongle) {
+      const driverPath = getDriverPathToStore(dongle, z2mDriverPath, configuration.z2mDongleName);
+      // installZ2mContainer creates the container again on the new path, with the same data
+      if (driverPath !== z2mDriverPath) {
+        logger.info(`Zigbee2mqtt USB dongle on ${z2mDriverPath} stored as ${driverPath} from now on`);
+        await this.saveOrDestroyVariable(CONFIGURATION.Z2M_DRIVER_PATH, driverPath);
+        configuration.z2mDriverPath = driverPath;
+      }
+      logger.info(`Zigbee2mqtt USB dongle attached to ${configuration.z2mDriverPath}`);
       this.usbConfigured = true;
     } else {
       logger.warn(`Zigbee2mqtt USB dongle detached to ${z2mDriverPath}`);
       this.usbConfigured = false;
+      this.dongleMissing = true;
+    }
+    // Zigbee2mqtt is started again once its dongle is plugged back, which Docker does not do. Not with an external
+    // broker, Gladys runs no Zigbee2mqtt then; an older installation without broker mode runs the broker of Gladys
+    if (mqttMode !== MQTT_MODE.EXTERNAL) {
+      this.watchDongle(configuration.z2mDriverPath);
     }
   }
 
