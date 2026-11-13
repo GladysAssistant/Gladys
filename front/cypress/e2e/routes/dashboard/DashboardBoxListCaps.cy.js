@@ -38,6 +38,10 @@ const BOXES = [
 
 const message = (box, key, max) => Cypress.env('i18n').dashboard.boxes[box][key].replace('{{max}}', max);
 
+// The editors translate their aria-labels: select on the prefix of the active
+// locale ("Pin " in English, "Épingle " in French), not on English text.
+const labelPrefix = (box, key) => Cypress.env('i18n').dashboard.boxes[box][key].replace('{{index}}', '');
+
 // The edit panel is a fixed, scrolling sheet: the message can sit below its
 // fold (the entry just added pushes it down), so scroll to it first.
 const shouldShowMessage = text => {
@@ -78,7 +82,10 @@ describe('Dashboard editor list caps', () => {
   });
 
   it('stops placing house-view pins at the maximum and says why', () => {
-    const pinMarkers = '[data-cy="edit-panel"] span[role="button"][aria-label^="Pin "]';
+    const pinMarkers = `[data-cy="edit-panel"] span[role="button"][aria-label^="${labelPrefix(
+      'house-view',
+      'editPinLabel'
+    )}"]`;
     const maxPinsMessage = message('house-view', 'maxPinsReached', MAX_PINS);
 
     cy.get('[data-cy="edit-box-0-0"]').click();
@@ -117,7 +124,10 @@ describe('Dashboard editor list caps', () => {
     cy.contains('[data-cy="edit-panel"] button', 'dashboard.boxes.chips.addChipButton')
       .should('not.be.disabled')
       .click();
-    cy.get('[data-cy="edit-panel"] button[aria-label^="Remove chip "]').should('have.length', MAX_CHIPS);
+    cy.get(`[data-cy="edit-panel"] button[aria-label^="${labelPrefix('chips', 'removeChipButton')}"]`).should(
+      'have.length',
+      MAX_CHIPS
+    );
     cy.contains('[data-cy="edit-panel"] button', 'dashboard.boxes.chips.addChipButton').should('be.disabled');
     shouldShowMessage(maxChipsMessage);
   });
@@ -129,7 +139,10 @@ describe('Dashboard editor list caps', () => {
     cy.contains('[data-cy="edit-panel"] button', 'dashboard.boxes.actions.addActionButton')
       .should('not.be.disabled')
       .click();
-    cy.get('[data-cy="edit-panel"] button[aria-label^="Remove action "]').should('have.length', MAX_ACTIONS);
+    cy.get(`[data-cy="edit-panel"] button[aria-label^="${labelPrefix('actions', 'removeActionButton')}"]`).should(
+      'have.length',
+      MAX_ACTIONS
+    );
     cy.contains('[data-cy="edit-panel"] button', 'dashboard.boxes.actions.addActionButton').should('be.disabled');
     shouldShowMessage(maxActionsMessage);
   });
