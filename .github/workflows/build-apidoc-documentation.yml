@@ -38,4 +38,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_PUBLISH_TO_PAGES_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.162.0'
           command: pages deploy ./apidoc --project-name=gladysassistant-apidoc --branch=main
