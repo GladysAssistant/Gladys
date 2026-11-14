@@ -264,7 +264,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
       .onSecondCall()
       .resolves([containerStopped]);
     gladys.system.getContainers = getContainersStub;
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -287,7 +286,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
       .onSecondCall()
       .resolves([containerStopped]);
     gladys.system.getContainers = getContainersStub;
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -308,7 +306,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
       .onSecondCall()
       .resolves([containerStopped]);
     gladys.system.getContainers = getContainersStub;
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -320,7 +317,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
   it('should recreate the z2m container when switching from USB to a network coordinator', async () => {
     // PREPARE
     const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -362,7 +358,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
         Devices: undefined,
       },
     });
-    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -509,6 +504,26 @@ describe('zigbee2mqtt installz2mContainer', () => {
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
     assert.notCalled(gladys.system.updateContainer);
+  });
+
+  it('it should show why the configuration file cannot be written, without starting z2m container', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const message = 'Zigbee2mqtt: coordinator_backup.json does not hold the settings of the Zigbee network';
+    zigbee2mqttManager.configureContainer = fake.rejects(new Error(message));
+    // EXECUTE
+    try {
+      await zigbee2mqttManager.installZ2mContainer(config);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal(message);
+    }
+    // ASSERT
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message });
+    assert.calledWithMatch(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+    });
+    assert.notCalled(gladys.system.restartContainer);
   });
 
   it('it should fail to start z2m container', async () => {

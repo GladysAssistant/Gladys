@@ -32,12 +32,34 @@ async function restoreZ2mBackup(containerPath) {
     const zip = new JSZip();
     const { files } = await zip.loadAsync(z2mBackup, { base64: true });
 
-    await Promise.all(
-      Object.values(files).map(async (file) => {
-        const content = await file.async('arraybuffer');
-        return fsPromises.writeFile(path.join(containerPath, file.name), Buffer.from(content));
-      }),
+    // The folders of the backup (such as external converters) are created with their files. The names of the entries
+    // are sanitized by JSZip (no "..")
+    const results = await Promise.allSettled(
+      Object.values(files)
+        .filter((file) => !file.dir)
+        .map(async (file) => {
+          const filePath = path.join(containerPath, file.name);
+          await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
+          const content = await file.async('arraybuffer');
+          // Without configuration file, the files left in the folder (such as a database written since the backup) are
+          // newer than those of the backup: they are kept, even when created while restoring
+          try {
+            await fsPromises.writeFile(filePath, Buffer.from(content), { flag: 'wx' });
+          } catch (e) {
+            if (e.code === 'EEXIST') {
+              return;
+            }
+            // Created by this write: cut short (disk full), it would be kept by the next restore
+            await fsPromises.rm(filePath, { force: true });
+            throw e;
+          }
+        }),
     );
+    // Thrown once every write has ended: a file still being written would be created after its caller removed it
+    const failure = results.find((result) => result.status === 'rejected');
+    if (failure) {
+      throw failure.reason;
+    }
   } else {
     logger.info('No zigbee2mqtt backup avaiable');
   }

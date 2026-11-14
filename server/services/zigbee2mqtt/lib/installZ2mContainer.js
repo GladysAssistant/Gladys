@@ -116,9 +116,7 @@ async function installZ2mContainer(config, setupMode = false) {
   const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
   const containerPath = `${basePathOnHost}/zigbee2mqtt/z2m`;
   if (!container || creationNeeded) {
-    // Restore backup only in case of new installation
-    await this.restoreZ2mBackup(containerPath);
-
+    // The Z2M backup is restored by configureContainer, when there is no configuration file to keep
     try {
       logger.info('Zigbee2mqtt is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
@@ -146,7 +144,17 @@ async function installZ2mContainer(config, setupMode = false) {
     }
   }
 
-  const { configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode);
+  let configChanged;
+  let adapterChanged;
+  try {
+    ({ configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode));
+  } catch (e) {
+    // Zigbee2mqtt is not started without its configuration file: shown as is by the setup page
+    this.z2mContainerError = { code: null, message: e.message };
+    logger.error('Zigbee2mqtt: failed to write its configuration file:', e);
+    this.emitStatusEvent();
+    throw e;
+  }
 
   try {
     container = await findManagedContainer(this.gladys.system, containerDescriptor);

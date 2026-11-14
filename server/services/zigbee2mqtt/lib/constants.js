@@ -18,6 +18,8 @@ const CONFIGURATION = {
   DOCKER_MQTT_VERSION: 'DOCKER_MQTT_VERSION', // Variable to identify last version of MQTT docker file is installed
   DOCKER_Z2M_VERSION: 'DOCKER_Z2M_VERSION', // Variable to identify last version of Z2M docker file is installed
   Z2M_FRONTEND_URL: 'Z2M_FRONTEND_URL',
+  // Saved when Gladys asks Zigbee2mqtt to draw the settings of its network
+  Z2M_NETWORK_GENERATED: 'Z2M_NETWORK_GENERATED',
 };
 
 const MQTT_MODE = {
@@ -95,6 +97,13 @@ const DEFAULT = {
           },
         },
       },
+    },
+    // Drawn by Zigbee2mqtt when it forms its network, and written in place of these values, as in the files it
+    // creates itself
+    advanced: {
+      network_key: 'GENERATE',
+      pan_id: 'GENERATE',
+      ext_pan_id: 'GENERATE',
     },
   },
   CONFIGURATION_PORTS: {

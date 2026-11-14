@@ -1,8 +1,10 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
+const proxyquire = require('proxyquire').noCallThru();
 
 const { assert } = sinon;
 const fs = require('fs');
+const fsPromises = require('fs/promises');
 const path = require('path');
 
 const { fake } = sinon;
@@ -66,5 +68,77 @@ describe('zigbee2mqtt restoreZ2mBackup', () => {
     expect(fs.existsSync(path.join(outputPath, 'coordinator_backup.json'))).equals(true);
     expect(fs.existsSync(path.join(outputPath, 'database.db'))).equals(true);
     expect(fs.existsSync(path.join(outputPath, 'state.json'))).equals(true);
+  });
+
+  it('should keep the files already in the folder', async () => {
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+    // Written since the backup
+    fs.mkdirSync(outputPath);
+    fs.writeFileSync(path.join(outputPath, 'database.db'), 'newer database');
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath);
+
+    expect(fs.readFileSync(path.join(outputPath, 'database.db'), 'utf8')).equals('newer database');
+    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
+    expect(fs.existsSync(path.join(outputPath, 'coordinator_backup.json'))).equals(true);
+  });
+
+  it('should restore the folders of the backup', async () => {
+    // Holds external_converters/my-device.js
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-subfolder.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath);
+
+    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
+    expect(fs.readFileSync(path.join(outputPath, 'external_converters', 'my-device.js'), 'utf8')).equals(
+      'module.exports = [];\n',
+    );
+  });
+
+  it('should keep the entries of the backup in its folder', async () => {
+    // Holds an entry named ../escaped.txt
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-parent-path.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath);
+
+    expect(fs.existsSync(path.join(outputPath, 'escaped.txt'))).equals(true);
+    expect(fs.existsSync(path.join(backupPath, 'escaped.txt'))).equals(false);
+  });
+
+  it('should fail, without the files cut short, when the files of the backup cannot be written', async () => {
+    const writeError = new Error('ENOSPC: no space left on device');
+    writeError.code = 'ENOSPC';
+    // The disk is full: each file is created, then cut short
+    const writeFile = fake(async (filePath) => {
+      await fsPromises.writeFile(filePath, 'cut');
+      throw writeError;
+    });
+    const { restoreZ2mBackup } = proxyquire('../../../../services/zigbee2mqtt/lib/restoreZ2mBackup', {
+      'fs/promises': { ...fsPromises, writeFile },
+    });
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64.backup'));
+    const manager = { gladys: { variable: { getValue: fake.resolves(base64Zip.toString()) } }, serviceId };
+
+    await expect(restoreZ2mBackup.call(manager, outputPath)).to.be.rejectedWith('ENOSPC');
+
+    // Not kept by the next restore as newer than the backup
+    expect(fs.readdirSync(outputPath)).deep.equals([]);
+  });
+
+  it('should end every write of the backup before failing', async () => {
+    // Holds configuration.yaml and external_converters/my-device.js
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-subfolder.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+    // A file in place of the folder of the external converters: creating it fails at once
+    fs.mkdirSync(outputPath);
+    fs.writeFileSync(path.join(outputPath, 'external_converters'), 'not a folder');
+
+    await expect(zigbee2MqttService.restoreZ2mBackup(outputPath)).to.be.rejected;
+
+    // Already written when the error is thrown: not created after its caller removed it
+    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
   });
 });
