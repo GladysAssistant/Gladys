@@ -36,7 +36,7 @@ jobs:
     environment: production
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           # The checkout fetches no tag by default: the existence check below
