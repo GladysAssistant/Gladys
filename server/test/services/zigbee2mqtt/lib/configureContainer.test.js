@@ -324,6 +324,24 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(fs.readdirSync(configFolder)).to.deep.equal(['configuration.yaml']);
   });
 
+  // Restricted by the user, or opened to a group (wider than the umask)
+  ['600', '664'].forEach((permissions) => {
+    it(`it should keep the permissions ${permissions} of the configuration file when it writes it again`, async () => {
+      // PREPARE
+      fs.copyFileSync(mqttConfigFilePath, configFilePath);
+      fs.chmodSync(configFilePath, Number.parseInt(permissions, 8));
+      const config = {
+        mqttUsername: 'other-username',
+        mqttPassword: 'other-password',
+      };
+      // EXECUTE
+      await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+      // ASSERT
+      expect(fs.readFileSync(configFilePath, 'utf8')).to.include('user: other-username');
+      expect(fs.statSync(configFilePath).mode.toString(8)).to.match(new RegExp(`${permissions}$`));
+    });
+  });
+
   it('it should write the configuration file of two calls at once', async () => {
     // PREPARE
     fs.copyFileSync(mqttConfigFilePath, configFilePath);

@@ -67,8 +67,15 @@ async function readConfigFile(configFilepath) {
 async function writeConfigFile(configFilepath, config) {
   // One per write, not to rename the file of another write
   const temporaryFilepath = `${configFilepath}.${randomUUID()}.tmp`;
+  // Given the permissions of the file it replaces, which a write in place keeps: never wider when created, then
+  // exactly them (the creation is limited by the umask)
+  const currentFile = await fs.stat(configFilepath).catch(() => null);
+  const options = currentFile ? { mode: currentFile.mode } : {};
   try {
-    await fs.writeFile(temporaryFilepath, yaml.stringify(config, YAML_CONFIG));
+    await fs.writeFile(temporaryFilepath, yaml.stringify(config, YAML_CONFIG), options);
+    if (currentFile) {
+      await fs.chmod(temporaryFilepath, currentFile.mode);
+    }
     await fs.rename(temporaryFilepath, configFilepath);
   } catch (e) {
     await fs.rm(temporaryFilepath, { force: true });
