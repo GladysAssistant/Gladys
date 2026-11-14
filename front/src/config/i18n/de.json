@@ -1365,6 +1365,8 @@
         "alreadyCreatedBadge": "Bereits hinzugefügt",
         "searchPlaceholder": "Geräte suchen",
         "noSearchResults": "Kein entdecktes Gerät entspricht deiner Suche.",
+        "hideExistingDevices": "Bereits hinzugefügte Geräte ausblenden",
+        "allDevicesHidden": "Alle gefundenen Geräte sind bereits in Gladys. Deaktiviere „Bereits hinzugefügte Geräte ausblenden“, um sie zu sehen.",
         "error": {
           "networkError": "Gladys hat auf die Hinzufügen-Anfrage nicht geantwortet. Prüfe, ob der Gladys-Server läuft und erreichbar ist, und versuche es erneut.",
           "badRequestError": "Gladys hat dieses Gerät abgelehnt: Die von der Integration veröffentlichten Daten sind fehlerhaft.",

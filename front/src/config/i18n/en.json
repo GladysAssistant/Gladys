@@ -1365,6 +1365,8 @@
         "alreadyCreatedBadge": "Already added",
         "searchPlaceholder": "Search devices",
         "noSearchResults": "No discovered device matches your search.",
+        "hideExistingDevices": "Hide devices already added",
+        "allDevicesHidden": "Every discovered device is already in Gladys. Turn off \"Hide devices already added\" to see them.",
         "error": {
           "networkError": "Gladys did not answer the add request. Check that the Gladys server is running and reachable, then try again.",
           "badRequestError": "Gladys rejected this device: the data published by the integration is incorrect.",

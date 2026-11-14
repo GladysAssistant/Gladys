@@ -12,12 +12,18 @@ import { RequestStatus } from '../../../../../utils/consts';
 const matchesSearch = (device, search) =>
   device.name.toLowerCase().includes(search) || device.external_id.toLowerCase().includes(search);
 
+// an added device stays listed while it waits for its "Update" (re-published
+// with a different structure): hiding it would hide the only way to apply it
+const isAddedAndUpToDate = device => device.created && !device.structure_changed;
+
 const DiscoverTab = ({
   selector,
   integration,
   discoveredDevices,
   deviceSearch,
   searchDevices,
+  hideExistingDevices,
+  toggleHideExistingDevices,
   getDiscoveredDevicesStatus,
   scanStatus,
   scanError,
@@ -25,8 +31,12 @@ const DiscoverTab = ({
   createDevice
 }) => {
   const search = (deviceSearch || '').trim().toLowerCase();
+  const visibleDevices =
+    discoveredDevices && hideExistingDevices
+      ? discoveredDevices.filter(device => !isAddedAndUpToDate(device))
+      : discoveredDevices;
   const filteredDevices =
-    discoveredDevices && search ? discoveredDevices.filter(device => matchesSearch(device, search)) : discoveredDevices;
+    visibleDevices && search ? visibleDevices.filter(device => matchesSearch(device, search)) : visibleDevices;
   const scanning = scanStatus === RequestStatus.Getting;
   return (
     <div class="card">
@@ -58,6 +68,22 @@ const DiscoverTab = ({
           </button>
         </div>
       </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <label class="custom-switch">
+            <input
+              type="checkbox"
+              class="custom-switch-input"
+              checked={!!hideExistingDevices}
+              onClick={toggleHideExistingDevices}
+            />
+            <span class="custom-switch-indicator mr-1" />
+            <span class="custom-switch-description">
+              <Text id="integration.externalIntegration.discover.hideExistingDevices" />
+            </span>
+          </label>
+        </li>
+      </ul>
       <div class="card-body">
         {scanError && (
           <div class="alert alert-danger">
@@ -104,7 +130,12 @@ const DiscoverTab = ({
                 )}
               </div>
             )}
-            {discoveredDevices && discoveredDevices.length > 0 && filteredDevices.length === 0 && (
+            {discoveredDevices && discoveredDevices.length > 0 && visibleDevices.length === 0 && (
+              <div class="text-center text-muted py-5">
+                <Text id="integration.externalIntegration.discover.allDevicesHidden" />
+              </div>
+            )}
+            {visibleDevices && visibleDevices.length > 0 && filteredDevices.length === 0 && (
               <div class="text-center text-muted py-5">
                 <Text id="integration.externalIntegration.discover.noSearchResults" />
               </div>
