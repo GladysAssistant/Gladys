@@ -1,6 +1,6 @@
 // The Discovery screen of an external integration lists every device the
 // integration publishes, the ones already added included. The "Hide devices
-// already added" toggle hides them, except a device waiting for its "Update"
+// already added" toggle, on by default, hides them, except a device waiting for its "Update"
 // (re-published with a different structure): hiding it would hide the only
 // way to apply the new definition. The integration is stubbed (it would need
 // an installed Docker container).
@@ -62,16 +62,13 @@ describe('External integration - discovery, hide devices already added', () => {
     );
   });
 
-  it('hides the added devices up to date, keeps the ones to update, and remembers the choice', () => {
+  it('hides the added devices up to date by default, keeps the ones to update, and remembers turning it off', () => {
     cy.visit(DISCOVER_PAGE_URL, {
       onBeforeLoad: win => win.localStorage.removeItem(HIDE_EXISTING_KEY)
     });
     cy.wait(['@getIntegration', '@getDiscoveredDevices']);
 
-    // off by default: every published device is listed
-    cardTitles().should('have.length', 3);
-
-    cy.contains('label', 'integration.externalIntegration.discover.hideExistingDevices').click();
+    // on by default: the added device is hidden, the one to update stays
     cardTitles().should('have.length', 2);
     cardTitles()
       .eq(0)
@@ -79,12 +76,20 @@ describe('External integration - discovery, hide devices already added', () => {
     cardTitles()
       .eq(1)
       .should('contain', 'Changed plug');
-    cy.window().then(win => expect(win.localStorage.getItem(HIDE_EXISTING_KEY)).to.equal('true'));
 
-    // remembered on the next visit
+    // turned off: every published device is listed, and the choice is kept
+    cy.contains('label', 'integration.externalIntegration.discover.hideExistingDevices').click();
+    cardTitles().should('have.length', 3);
+    cy.window().then(win => expect(win.localStorage.getItem(HIDE_EXISTING_KEY)).to.equal('false'));
+
     cy.reload();
     cy.wait(['@getIntegration', '@getDiscoveredDevices']);
+    cardTitles().should('have.length', 3);
+
+    // turned back on
+    cy.contains('label', 'integration.externalIntegration.discover.hideExistingDevices').click();
     cardTitles().should('have.length', 2);
+    cy.window().then(win => expect(win.localStorage.getItem(HIDE_EXISTING_KEY)).to.equal('true'));
   });
 
   it('says so when every discovered device is hidden', () => {
@@ -92,7 +97,7 @@ describe('External integration - discovery, hide devices already added', () => {
       'getOnlyAdded'
     );
     cy.visit(DISCOVER_PAGE_URL, {
-      onBeforeLoad: win => win.localStorage.setItem(HIDE_EXISTING_KEY, 'true')
+      onBeforeLoad: win => win.localStorage.removeItem(HIDE_EXISTING_KEY)
     });
     cy.wait(['@getIntegration', '@getOnlyAdded']);
     cardTitles().should('have.length', 0);

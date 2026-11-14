@@ -18,16 +18,19 @@ import keyValStore from '../../../../../utils/keyValueStore';
 const SCAN_MAX_DURATION_MS = 60 * 1000;
 
 // one choice for every external integration, remembered by the browser: it
-// is a display preference, never a setting of the integration
+// is a display preference, never a setting of the integration. On by default,
+// like the Zigbee2mqtt, MQTT and LAN manager screens: with a large fleet the
+// new devices are what the user comes for
 const HIDE_EXISTING_DEVICES_KEY = 'external_integration_discover_hide_existing';
 
-// the storage can throw (private window, blocked site data): the toggle then
-// simply starts off and is not remembered
+// only an explicit "off" turns it off; the storage can throw (private window,
+// blocked site data): the toggle then simply keeps its default and is not
+// remembered
 const readHideExistingDevices = () => {
   try {
-    return keyValStore.get(HIDE_EXISTING_DEVICES_KEY) === 'true';
+    return keyValStore.get(HIDE_EXISTING_DEVICES_KEY) !== 'false';
   } catch (e) {
-    return false;
+    return true;
   }
 };
 
