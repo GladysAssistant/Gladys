@@ -63,6 +63,16 @@ const buildFakeWs = () => {
 
 const seedActionsService = (overrides = {}) => seedExternalService({ manifest: TEST_ACTIONS_MANIFEST, ...overrides });
 
+// the NOT NULL columns of t_device_feature a published feature must carry
+const withColumns = (feature) => ({
+  name: 'Feature',
+  read_only: false,
+  has_feedback: false,
+  min: 0,
+  max: 1,
+  ...feature,
+});
+
 describe('externalIntegration.runAction', () => {
   it('should validate the form, relay with the per-action timeout and return the message', async () => {
     const service = await seedActionsService();
@@ -318,13 +328,15 @@ describe('externalIntegration params upsert on re-publish', () => {
     const { externalIntegration, stateManager } = buildSupervisor();
     const createdDevice = await seedCreatedDevice(service, stateManager);
     createdDevice.features = [
-      { external_id: `ext:${service.selector}:plug-1:power`, category: 'switch', type: 'binary' },
+      withColumns({ external_id: `ext:${service.selector}:plug-1:power`, category: 'switch', type: 'binary' }),
     ];
     // same structure -> no update proposed
     await externalIntegration.setDiscoveredDevices(service, [
       {
         ...buildPublishedDevice(service, []),
-        features: [{ external_id: `ext:${service.selector}:plug-1:power`, category: 'switch', type: 'binary' }],
+        features: [
+          withColumns({ external_id: `ext:${service.selector}:plug-1:power`, category: 'switch', type: 'binary' }),
+        ],
       },
     ]);
     let devices = await externalIntegration.getDiscoveredDevices(service.selector);
@@ -334,15 +346,15 @@ describe('externalIntegration params upsert on re-publish', () => {
       {
         ...buildPublishedDevice(service, []),
         features: [
-          { external_id: `ext:${service.selector}:plug-1:power`, category: 'switch', type: 'binary' },
-          {
+          withColumns({ external_id: `ext:${service.selector}:plug-1:power`, category: 'switch', type: 'binary' }),
+          withColumns({
             external_id: `ext:${service.selector}:plug-1:energy`,
             category: 'energy-sensor',
             type: 'power',
             unit: 'watt',
             min: 0,
             max: 10000,
-          },
+          }),
         ],
       },
     ]);
@@ -354,7 +366,7 @@ describe('externalIntegration params upsert on re-publish', () => {
     const service = await seedExternalService();
     const { externalIntegration, stateManager } = buildSupervisor();
     const createdDevice = await seedCreatedDevice(service, stateManager);
-    const createdFeature = {
+    const createdFeature = withColumns({
       external_id: `ext:${service.selector}:plug-1:setpoint`,
       category: 'air-conditioning',
       type: 'target-temperature',
@@ -362,7 +374,7 @@ describe('externalIntegration params upsert on re-publish', () => {
       min: 16,
       max: 31,
       step: null,
-    };
+    });
     createdDevice.features = [createdFeature];
     const publish = (step) =>
       externalIntegration.setDiscoveredDevices(service, [

@@ -122,6 +122,31 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await expectBadParameters([wrongUnit], 'unknown unit');
   });
 
+  it('should reject a feature missing a column the device creation requires', async () => {
+    const withFeature = (patch) => {
+      const device = buildDiscoveredDevice(service.selector);
+      device.features[0] = { ...device.features[0], ...patch };
+      return device;
+    };
+    await expectBadParameters([withFeature({ name: '' })], 'features[0].name: must be a non-empty string');
+    await expectBadParameters([withFeature({ read_only: undefined })], 'features[0].read_only: must be a boolean');
+    await expectBadParameters([withFeature({ has_feedback: 'no' })], 'features[0].has_feedback: must be a boolean');
+    // the text feature of an integration forgetting its range: 422 on "Add" before
+    await expectBadParameters(
+      [withFeature({ category: 'text', type: 'text', unit: undefined, min: undefined, max: undefined })],
+      'features[0].min: must be a number (0 for a feature without a range)',
+    );
+    await expectBadParameters([withFeature({ max: null })], 'features[0].max: must be a number');
+    await expectBadParameters([withFeature({ min: Number.NaN })], 'features[0].min: must be a number');
+    await expectBadParameters([withFeature({ max: '60' })], 'features[0].max: must be a number');
+  });
+
+  it('should accept a text feature with a 0 / 0 range', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0] = { ...device.features[0], category: 'text', type: 'text', unit: undefined, min: 0, max: 0 };
+    expect(await externalIntegration.setDiscoveredDevices(service, [device])).to.equal(1);
+  });
+
   it('should reject a non-positive or non-numeric step', async () => {
     const zeroStep = buildDiscoveredDevice(service.selector);
     zeroStep.features[0].step = 0;
@@ -216,6 +241,8 @@ describe('externalIntegration.setDiscoveredDevices', () => {
       read_only: false,
       has_feedback: false,
       keep_history: false,
+      min: 0,
+      max: 0,
       supported_options: [
         { value: 'netflix', label: 'Netflix' },
         { value: 'youtube.leanback.v4', label: 'YouTube' },

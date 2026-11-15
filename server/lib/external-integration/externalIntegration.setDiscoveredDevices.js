@@ -20,6 +20,10 @@ const {
 const { validateTransportMessage } = require('./externalIntegration.setDeviceTransports');
 const { normalizeSupportedOptions } = require('../../utils/normalizeSupportedOptions');
 
+// NOT NULL columns of t_device_feature without a default value
+const REQUIRED_BOOLEAN_FEATURE_FIELDS = ['read_only', 'has_feedback'];
+const REQUIRED_NUMBER_FEATURE_FIELDS = ['min', 'max'];
+
 /**
  * @description Store the complete list of discovered devices published by an
  * integration (replaces the previous one). The list is kept in memory only
@@ -78,6 +82,24 @@ async function setDiscoveredDevices(service, devices) {
       if (feature.unit !== undefined && feature.unit !== null && !DEVICE_FEATURE_UNITS_LIST.includes(feature.unit)) {
         throw new BadParameters(`${featurePath}.unit: unknown unit`);
       }
+      // the columns t_device_feature declares NOT NULL without a default:
+      // accepted here, a missing one only surfaced when the user clicked
+      // "Add" on the Discovery screen (POST /api/v1/device → 422), far from
+      // the integration's code. A text feature has no range: 0 / 0, like the
+      // internal integrations
+      if (typeof feature.name !== 'string' || feature.name.length === 0) {
+        throw new BadParameters(`${featurePath}.name: must be a non-empty string`);
+      }
+      REQUIRED_BOOLEAN_FEATURE_FIELDS.forEach((field) => {
+        if (typeof feature[field] !== 'boolean') {
+          throw new BadParameters(`${featurePath}.${field}: must be a boolean`);
+        }
+      });
+      REQUIRED_NUMBER_FEATURE_FIELDS.forEach((field) => {
+        if (typeof feature[field] !== 'number' || !Number.isFinite(feature[field])) {
+          throw new BadParameters(`${featurePath}.${field}: must be a number (0 for a feature without a range)`);
+        }
+      });
       if (
         feature.step !== undefined &&
         feature.step !== null &&
