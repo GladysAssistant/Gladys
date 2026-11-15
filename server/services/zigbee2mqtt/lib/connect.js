@@ -20,6 +20,8 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
     this.mqttClient.removeAllListeners();
     this.mqttClient = null;
   }
+  // Values of another broker, or of a previous run, are not saved when a device is created
+  this.lastReceivedStates = {};
 
   const externalBroker = mqttMode === 'external';
 

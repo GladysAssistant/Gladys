@@ -400,6 +400,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   describe('device with "/" in its friendly name', () => {
     const lightDevice = {
       friendly_name: 'salon/lampe',
+      ieee_address: '0x0017880104e45517',
       supported: true,
       definition: {
         exposes: [
@@ -476,6 +477,68 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       // ASSERT
       assert.calledOnceWithExactly(warnStub, 'Zigbee2mqtt device salon/lampe not configured in Gladys.');
       assert.notCalled(gladys.event.emit);
+    });
+
+    describe('last values received', () => {
+      let clock;
+
+      beforeEach(() => {
+        clock = sinon.useFakeTimers(new Date('2026-11-15T09:00:00.000Z'));
+      });
+
+      afterEach(() => {
+        clock.restore();
+      });
+
+      it('should keep the last value of each property of a device not configured in Gladys, with its date', async () => {
+        // PREPARE
+        zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
+        // EXECUTE
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"state":"OFF","linkquality":120}`);
+        clock.tick(60 * 1000);
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"linkquality":90}`);
+        // ASSERT
+        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({
+          '0x0017880104e45517': {
+            state: { value: 'OFF', receivedAt: '2026-11-15T09:00:00.000Z' },
+            linkquality: { value: 90, receivedAt: '2026-11-15T09:01:00.000Z' },
+          },
+        });
+      });
+
+      it('should also keep the last values of a device already configured in Gladys', async () => {
+        // EXECUTE
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"state":"ON"}`);
+        // ASSERT
+        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({
+          '0x0017880104e45517': { state: { value: 'ON', receivedAt: '2026-11-15T09:00:00.000Z' } },
+        });
+      });
+
+      ['not json', 'null', '"ON"'].forEach((message) => {
+        it(`should ignore a message that is not a state: ${message}`, async () => {
+          // PREPARE
+          const warnStub = sinon.stub(logger, 'warn');
+          // EXECUTE
+          await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', message);
+          // ASSERT
+          assert.calledOnceWithExactly(
+            warnStub,
+            `Zigbee2mqtt device salon/lampe sent a message that is not a state: ${message}`,
+          );
+          assert.notCalled(gladys.event.emit);
+          expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+        });
+      });
+
+      it('should not keep the values of a device unknown by Zigbee2mqtt', async () => {
+        // PREPARE
+        zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
+        // EXECUTE
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe/availability', `{"state":"online"}`);
+        // ASSERT
+        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+      });
     });
   });
 
