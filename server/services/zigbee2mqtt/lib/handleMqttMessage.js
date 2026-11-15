@@ -161,7 +161,7 @@ async function handleMqttMessage(topic, message) {
         incomingFeatures = null;
       }
       // A device state is a JSON object of its properties
-      if (incomingFeatures === null || typeof incomingFeatures !== 'object') {
+      if (incomingFeatures === null || typeof incomingFeatures !== 'object' || Array.isArray(incomingFeatures)) {
         logger.warn(`Zigbee2mqtt device ${deviceName} sent a message that is not a state: ${message}`);
         break;
       }

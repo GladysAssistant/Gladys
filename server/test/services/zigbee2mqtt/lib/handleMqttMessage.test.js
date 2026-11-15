@@ -515,7 +515,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         });
       });
 
-      ['not json', 'null', '"ON"'].forEach((message) => {
+      ['not json', 'null', '"ON"', '[{"state":"ON"}]'].forEach((message) => {
         it(`should ignore a message that is not a state: ${message}`, async () => {
           // PREPARE
           const warnStub = sinon.stub(logger, 'warn');
