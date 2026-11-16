@@ -284,8 +284,8 @@ from its first line.
 | stop of the service (Settings > Services)                                       | waits for its end                                 | waits for their end                   |
 | update at start-up                                                              | not started: the installation follows this init   | —                                     |
 
-- `refuseWhileInstalling` refuses with `Zigbee2mqtt: cannot <action> while an installation is
-  running` or `… while the integration is busy`: the setup page reads these endings (J).
+- `refuseWhileInstalling` refuses with a message that ends with `while an installation is running`
+  or `while the integration is busy`: the setup page reads these endings (J).
 - `refuseWhileInstalling` is called with no `await` between the check and what it guards
   (`startInstallation`, or the operation that counts itself): two requests cannot both pass.
   `startInstallation` refuses a second running installation as a last guard.
