@@ -194,7 +194,8 @@ installation. A job that fails to start fails the installation with its error. A
   free space is unknown (no `df`). The space is measured on the disk of the Gladys container, not
   always the one where Docker stores its images.
 - **Other versions removed when the space lacks.** Before refusing, the other tags of the same
-  repository (`koenkk/zigbee2mqtt:*`, `eclipse-mosquitto:*`) are removed with
+  repository (`koenkk/zigbee2mqtt:*`, `eclipse-mosquitto:*`, compared without the Docker Hub
+  prefixes `docker.io/` and `library/` that a runtime may add) are removed with
   `system.removeImage`, never forced, then the space is measured again: Gladys kept the image of
   every earlier version. An image that a container uses, running or stopped (the version in place,
   a container of the user), stays: Docker declines to remove it, or only removes one of its tags

@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { getImageRepository } = require('../../../utils/dockerContainers');
 const {
   INSTALLATION_PHASE_STATE,
   INSTALLATION_ERROR,
@@ -25,11 +26,14 @@ const PULL_STALL_TIMEOUT_IN_MS = 5 * 60 * 1000;
  * await removeOtherVersions(this.gladys.system, 'koenkk/zigbee2mqtt:2.14.2');
  */
 async function removeOtherVersions(system, image) {
-  const repository = image.slice(0, image.lastIndexOf(':'));
+  const repository = getImageRepository(image);
   try {
     const images = await system.listImages({ filters: { reference: [repository] } });
-    // Missing, the image to download is not among them
-    const tags = images.flatMap(({ tags: imageTags }) => imageTags).filter((tag) => tag.startsWith(`${repository}:`));
+    // Missing, the image to download is not among them. A runtime may spell a tag with the Docker Hub prefixes
+    // (docker.io/library/eclipse-mosquitto:2.0.14), compared without them
+    const tags = images
+      .flatMap(({ tags: imageTags }) => imageTags)
+      .filter((tag) => getImageRepository(tag) === repository);
     await Promise.all(
       tags.map(async (tag) => {
         if (await system.removeImage(tag)) {

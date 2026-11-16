@@ -233,8 +233,10 @@ describe('zigbee2mqtt pullImage', () => {
       gladys.system.listImages = fake.resolves([
         { id: 'sha256:old', tags: ['koenkk/zigbee2mqtt:1.42.0', 'koenkk/zigbee2mqtt:latest'] },
         { id: 'sha256:in-place', tags: ['koenkk/zigbee2mqtt:2.6.0'] },
+        // Spelled with the Docker Hub prefix by a runtime, like the Docker API of Podman
+        { id: 'sha256:older', tags: ['docker.io/koenkk/zigbee2mqtt:1.30.0'] },
         // Not of this repository, whatever Docker matches
-        { id: 'sha256:other', tags: ['koenkk/zigbee2mqtt-proxy:1.0.0'] },
+        { id: 'sha256:other', tags: ['koenkk/zigbee2mqtt-proxy:1.0.0', 'docker.io/someone/zigbee2mqtt:1.0.0'] },
       ]);
       // Docker declines to remove the image of the container in place
       gladys.system.removeImage = fake((tag) => Promise.resolve(tag !== 'koenkk/zigbee2mqtt:2.6.0'));
@@ -249,10 +251,15 @@ describe('zigbee2mqtt pullImage', () => {
         'koenkk/zigbee2mqtt:1.42.0',
         'koenkk/zigbee2mqtt:latest',
         'koenkk/zigbee2mqtt:2.6.0',
+        'docker.io/koenkk/zigbee2mqtt:1.30.0',
       ]);
       assert.calledWithExactly(
         infoStub,
         'Zigbee2mqtt: image koenkk/zigbee2mqtt:1.42.0 removed to download koenkk/zigbee2mqtt:2.14.2',
+      );
+      assert.calledWithExactly(
+        infoStub,
+        'Zigbee2mqtt: image docker.io/koenkk/zigbee2mqtt:1.30.0 removed to download koenkk/zigbee2mqtt:2.14.2',
       );
       assert.neverCalledWith(
         infoStub,
@@ -260,6 +267,30 @@ describe('zigbee2mqtt pullImage', () => {
       );
       assert.calledTwice(gladys.system.getDiskSpace);
       assert.callOrder(gladys.system.removeImage, gladys.system.pull);
+      assert.calledOnce(gladys.system.pull);
+    });
+
+    it('should remove the other versions of an official image spelled with the Docker Hub library prefix', async () => {
+      // PREPARE
+      sinon.stub(logger, 'info');
+      // The MQTT broker image (22 MB) and the margin (500 MB) fit once the other version is removed
+      gladys.system.getDiskSpace = sinon
+        .stub()
+        .onFirstCall()
+        .resolves(diskSpace(500000000))
+        .onSecondCall()
+        .resolves(diskSpace(800000000));
+      gladys.system.listImages = fake.resolves([
+        { id: 'sha256:old', tags: ['docker.io/library/eclipse-mosquitto:2.0.14'] },
+      ]);
+      // EXECUTE
+      const promise = zigbee2mqttManager.pullImage(MQTT_IMAGE);
+      await waitForPull();
+      pulls[0].resolve([]);
+      await promise;
+      // ASSERT
+      assert.calledOnceWithExactly(gladys.system.listImages, { filters: { reference: ['eclipse-mosquitto'] } });
+      assert.calledOnceWithExactly(gladys.system.removeImage, 'docker.io/library/eclipse-mosquitto:2.0.14');
       assert.calledOnce(gladys.system.pull);
     });
 
