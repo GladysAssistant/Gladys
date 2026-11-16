@@ -66,7 +66,8 @@ class MobileServicesPage extends Component {
     openSelector: null,
     sheetOpen: false,
     changing: false,
-    actionError: false
+    // the selector of the service whose start or stop failed: the error is shown in its sheet only
+    actionErrorSelector: null
   };
 
   componentWillUnmount() {
@@ -76,7 +77,8 @@ class MobileServicesPage extends Component {
   updateSearch = e => this.setState({ search: e.target.value });
   selectFilter = filter => () => this.setState({ filter });
 
-  openService = service => () => this.setState({ openSelector: service.selector, sheetOpen: true, actionError: false });
+  openService = service => () =>
+    this.setState({ openSelector: service.selector, sheetOpen: true, actionErrorSelector: null });
   closeService = () => this.setState({ sheetOpen: false });
 
   getName = service => {
@@ -89,7 +91,7 @@ class MobileServicesPage extends Component {
       return;
     }
     const action = STARTED_STATUS.includes(service.status) ? 'stop' : 'start';
-    this.setState({ changing: true, actionError: false });
+    this.setState({ changing: true, actionErrorSelector: null });
     try {
       await this.props.actionOnService(service.selector, action);
       if (!this.unmounted) {
@@ -98,7 +100,7 @@ class MobileServicesPage extends Component {
     } catch (e) {
       console.error(e);
       if (!this.unmounted) {
-        this.setState({ changing: false, actionError: true });
+        this.setState({ changing: false, actionErrorSelector: service.selector });
       }
     }
   };
@@ -115,7 +117,7 @@ class MobileServicesPage extends Component {
     </MobilePill>
   );
 
-  render(props, { search, filter, openSelector, sheetOpen, changing, actionError }) {
+  render(props, { search, filter, openSelector, sheetOpen, changing, actionErrorSelector }) {
     const { intl } = props;
     const services = props.services || [];
     const query = normalize(search.trim());
@@ -212,7 +214,7 @@ class MobileServicesPage extends Component {
               >
                 <Text id={`servicesSettings.status.${openService.status}.detail`}>{openService.status}</Text>
               </MobileNotice>
-              {actionError && (
+              {actionErrorSelector === openSelector && actionErrorSelector !== null && (
                 <MobileNotice tone="danger" icon="alert-circle">
                   <Text id="servicesSettings.mobile.actionError" />
                 </MobileNotice>
