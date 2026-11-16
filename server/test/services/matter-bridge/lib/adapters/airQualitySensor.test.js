@@ -38,10 +38,17 @@ describe('Matter bridge air quality adapter', () => {
   });
 
   it('should forward a concentration with the air quality it leads to', () => {
-    const endpointState = { carbonDioxideConcentrationMeasurement: { measuredValue: 3000 } };
-    expect(airQualitySensor.toMatter('pm25', 10, { co2, pm25 }, endpointState)).to.deep.equal({
-      pm25ConcentrationMeasurement: { measuredValue: 10 },
-      airQuality: { airQuality: AIR_QUALITY.GOOD },
+    // The air quality is the worst of the PM2.5 pushed and of the CO2 the endpoint already reports.
+    const endpointState = { carbonDioxideConcentrationMeasurement: { measuredValue: 1800 } };
+    expect(airQualitySensor.toMatter('pm25', 12, { co2, pm25 }, endpointState)).to.deep.equal({
+      pm25ConcentrationMeasurement: { measuredValue: 12 },
+      airQuality: { airQuality: AIR_QUALITY.POOR },
+    });
+    expect(
+      airQualitySensor.toMatter('co2', 600, { co2, pm25 }, { pm25ConcentrationMeasurement: { measuredValue: 60 } }),
+    ).to.deep.equal({
+      carbonDioxideConcentrationMeasurement: { measuredValue: 600 },
+      airQuality: { airQuality: AIR_QUALITY.VERY_POOR },
     });
     expect(airQualitySensor.toMatter('co2', 1200, { co2 }, {})).to.deep.equal({
       carbonDioxideConcentrationMeasurement: { measuredValue: 1200 },

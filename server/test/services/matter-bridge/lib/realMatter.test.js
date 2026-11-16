@@ -5,7 +5,7 @@ const { expect } = require('chai');
 
 const { loadMatter } = require('../../../../services/matter-bridge/lib/loadMatter');
 const { planDevice } = require('../../../../services/matter-bridge/lib/planDevice');
-const { buildEndpoints } = require('../../../../services/matter-bridge/lib/buildEndpoints');
+const { buildEndpoints, endpointNumbers } = require('../../../../services/matter-bridge/lib/buildEndpoints');
 const { Bindings, isRemoteChange } = require('../../../../services/matter-bridge/lib/Bindings');
 const { AIR_QUALITY, EXPRESSED_STATE } = require('../../../../services/matter-bridge/lib/constants');
 const { feature, createContext } = require('../fakes');
@@ -115,6 +115,25 @@ describe('Matter bridge on the real matter.js', function realMatter() {
   let logLevel;
   const built = new Map();
 
+  /**
+   * @description Build the endpoints of a device and put them on the aggregator, as the bridge does.
+   * @param {object} gladysDevice - Gladys device.
+   * @returns {Promise<object>} The endpoints of the device, from buildEndpoints.
+   * @example
+   * const endpoints = await expose(DEVICES[0]);
+   */
+  async function expose(gladysDevice) {
+    const ctx = { ...createContext(VALUES), command: () => null };
+    const endpoints = buildEndpoints(matter, gladysDevice, planDevice(gladysDevice), ctx);
+    await aggregator.add(endpoints.root);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const child of endpoints.children) {
+      // eslint-disable-next-line no-await-in-loop
+      await endpoints.root.add(child);
+    }
+    return endpoints;
+  }
+
   before(async () => {
     matter = loadMatter();
     const { Environment, ServerNode, Endpoint, Logger, LogLevel } = matter.main;
@@ -139,18 +158,10 @@ describe('Matter bridge on the real matter.js', function realMatter() {
     aggregator = new Endpoint(matter.endpoints.AggregatorEndpoint, { id: 'aggregator' });
     await server.add(aggregator);
 
-    const ctx = { ...createContext(VALUES), command: () => null };
     // eslint-disable-next-line no-restricted-syntax
     for (const gladysDevice of DEVICES) {
-      const endpoints = buildEndpoints(matter, gladysDevice, planDevice(gladysDevice), ctx);
       // eslint-disable-next-line no-await-in-loop
-      await aggregator.add(endpoints.root);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const child of endpoints.children) {
-        // eslint-disable-next-line no-await-in-loop
-        await endpoints.root.add(child);
-      }
-      built.set(gladysDevice.id, endpoints);
+      built.set(gladysDevice.id, await expose(gladysDevice));
     }
   });
 
@@ -252,5 +263,27 @@ describe('Matter bridge on the real matter.js', function realMatter() {
     ]);
     expect(alarm.state.smokeCoAlarm.expressedState).to.equal(EXPRESSED_STATE.SMOKE_ALARM);
     bindings.clear();
+  });
+
+  it('should keep the endpoint numbers of a closed device, and forget those of a deleted one', async () => {
+    const climate = DEVICES.find(({ id }) => id === 'climate');
+    const numbers = endpointNumbers(built.get('climate'));
+    expect(Object.keys(numbers)).to.have.lengthOf(4);
+
+    // A device taken off the bridge is closed: it leaves the aggregator, and matter.js keeps its
+    // numbers for the day it returns.
+    await built.get('climate').root.close();
+    expect(Array.from(aggregator.parts).map(({ id }) => id)).to.not.include('climate');
+    const returned = await expose(climate);
+    expect(Array.from(aggregator.parts).map(({ id }) => id)).to.include('climate');
+    expect(endpointNumbers(returned)).to.deep.equal(numbers);
+
+    // A device deleted from Gladys is deleted: matter.js forgets its numbers.
+    await returned.root.delete();
+    const recreated = await expose(climate);
+    Object.entries(endpointNumbers(recreated)).forEach(([id, number]) => {
+      expect(number, id).to.not.equal(numbers[id]);
+    });
+    built.set('climate', recreated);
   });
 });

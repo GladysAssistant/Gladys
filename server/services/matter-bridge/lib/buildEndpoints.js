@@ -1,4 +1,4 @@
-const { MAX_LABEL_LENGTH } = require('./constants');
+const { MAX_LABEL_BYTES } = require('./constants');
 const { uniqueIdOf } = require('./config');
 const { mergeState } = require('./adapters/helpers');
 const { BATTERY_ADAPTER } = require('./adapters');
@@ -16,15 +16,31 @@ function endpointId(selector) {
   return selector.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
 }
 
+// Splits a string into the characters a user sees: an emoji made of several code points, or a
+// letter followed by a combining accent, is one of them.
+const graphemes = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+
 /**
- * @description Cut a string to the length Matter allows for basic information strings.
+ * @description Cut a string to the size Matter allows for basic information strings. The limit is
+ * in UTF-8 bytes, not in characters, and a character is never cut in half: the one that does not
+ * fit is left out whole.
  * @param {string} value - String to cut.
- * @returns {string} The string, at most 32 characters long.
+ * @returns {string} The string, at most 32 bytes long once encoded in UTF-8.
  * @example
  * truncate('A very long device name that does not fit');
  */
 function truncate(value) {
-  return String(value || '').slice(0, MAX_LABEL_LENGTH);
+  let kept = '';
+  let bytes = 0;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const { segment } of graphemes.segment(String(value || ''))) {
+    bytes += Buffer.byteLength(segment);
+    if (bytes > MAX_LABEL_BYTES) {
+      break;
+    }
+    kept += segment;
+  }
+  return kept.trimEnd();
 }
 
 /**

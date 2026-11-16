@@ -105,8 +105,13 @@ describe('Matter bridge converters', () => {
     expect(converters.toBattery(150).batPercentRemaining).to.equal(200);
   });
 
-  it('should derive the air quality, PM2.5 first', () => {
-    expect(converters.airQualityOf({ pm25: 10, co2: 3000 })).to.equal(AIR_QUALITY.GOOD);
+  it('should derive the air quality from the worst concentration', () => {
+    // Clean of particles but full of CO2: the CO2 level wins.
+    expect(converters.airQualityOf({ pm25: 12, co2: 1800 })).to.equal(AIR_QUALITY.POOR);
+    expect(converters.airQualityOf({ pm25: 10, co2: 3000 })).to.equal(AIR_QUALITY.VERY_POOR);
+    // Full of particles with little CO2: the PM2.5 level wins.
+    expect(converters.airQualityOf({ pm25: 60, co2: 600 })).to.equal(AIR_QUALITY.VERY_POOR);
+    expect(converters.airQualityOf({ pm25: 10, co2: 600 })).to.equal(AIR_QUALITY.GOOD);
     expect(converters.airQualityOf({ pm25: 100 })).to.equal(AIR_QUALITY.EXTREMELY_POOR);
     expect(converters.airQualityOf({ co2: 1200 })).to.equal(AIR_QUALITY.MODERATE);
     expect(converters.airQualityOf({ pm25: null, co2: null })).to.equal(AIR_QUALITY.UNKNOWN);

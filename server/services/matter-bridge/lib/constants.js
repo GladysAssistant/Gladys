@@ -55,8 +55,9 @@ const INVALID_PASSCODES = [
 const MAX_PASSCODE = 99999998;
 const MAX_DISCRIMINATOR = 4095;
 
-// Matter BridgedDeviceBasicInformation strings are limited to 32 characters.
-const MAX_LABEL_LENGTH = 32;
+// Matter BridgedDeviceBasicInformation strings are limited to 32 bytes once encoded in UTF-8: an
+// accented letter takes two of them, an emoji four or more.
+const MAX_LABEL_BYTES = 32;
 
 // A level or colour change made from a Matter app arrives as a series of attribute changes (a
 // slider being dragged, a transition). Only the last one is forwarded to the Gladys device.
@@ -154,7 +155,7 @@ module.exports = {
   INVALID_PASSCODES,
   MAX_PASSCODE,
   MAX_DISCRIMINATOR,
-  MAX_LABEL_LENGTH,
+  MAX_LABEL_BYTES,
   COMMAND_DEBOUNCE_MS,
   COLOR_MODE,
   MOVEMENT_TYPE,

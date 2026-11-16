@@ -319,7 +319,8 @@ function levelOf(value, levels) {
 /**
  * @description Derive the Matter air quality from the concentrations the device measures. Matter
  * apps show the AirQuality attribute first, and Gladys sensors only carry concentrations.
- * PM2.5 wins over CO2 when both are known: it is the health indicator.
+ * When several are known, the worst level wins: a room full of CO2 is not reported as good
+ * because its air carries few particles.
  * @param {object} concentrations - Known concentrations.
  * @param {number} [concentrations.pm25] - PM2.5 in µg/m³.
  * @param {number} [concentrations.co2] - CO2 in ppm.
@@ -328,13 +329,11 @@ function levelOf(value, levels) {
  * airQualityOf({ co2: 600 }); // AIR_QUALITY.GOOD
  */
 function airQualityOf({ pm25, co2 }) {
-  if (isNumber(pm25)) {
-    return levelOf(pm25, PM25_LEVELS);
-  }
-  if (isNumber(co2)) {
-    return levelOf(co2, CO2_LEVELS);
-  }
-  return AIR_QUALITY.UNKNOWN;
+  // The levels of AIR_QUALITY grow as the air gets worse, and UNKNOWN is the lowest.
+  return Math.max(
+    isNumber(pm25) ? levelOf(pm25, PM25_LEVELS) : AIR_QUALITY.UNKNOWN,
+    isNumber(co2) ? levelOf(co2, CO2_LEVELS) : AIR_QUALITY.UNKNOWN,
+  );
 }
 
 module.exports = {

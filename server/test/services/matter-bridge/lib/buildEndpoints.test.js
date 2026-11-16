@@ -18,7 +18,38 @@ describe('Matter bridge buildEndpoints', () => {
   it('should build stable endpoint ids and short labels', () => {
     expect(endpointId('Kitchen.Light_1')).to.equal('kitchen-light_1');
     expect(truncate('x'.repeat(40))).to.have.lengthOf(32);
+    expect(truncate('Kitchen light')).to.equal('Kitchen light');
     expect(truncate(undefined)).to.equal('');
+  });
+
+  it('should cut a label at 32 bytes, not 32 characters', () => {
+    // 32 characters, but 35 bytes: each accented letter takes two.
+    const label = truncate('Lampe du grand salon côté fenêtr');
+    expect(label).to.equal('Lampe du grand salon côté fen');
+    expect(Buffer.byteLength(label)).to.be.at.most(32);
+    // A label of exactly 32 bytes is kept whole.
+    expect(truncate(`${'x'.repeat(30)}é`)).to.equal(`${'x'.repeat(30)}é`);
+    expect(truncate(`${'x'.repeat(31)}é`)).to.equal('x'.repeat(31));
+  });
+
+  it('should never cut a character in half', () => {
+    // The name of the review: the emoji was cut into an invalid character.
+    const label = truncate('Lumière entrée principale maiso💡');
+    expect(label).to.equal('Lumière entrée principale mais');
+    expect(Buffer.byteLength(label)).to.equal(32);
+    // An emoji takes four bytes: it is kept whole, or left out whole.
+    expect(truncate(`${'x'.repeat(28)}💡`)).to.equal(`${'x'.repeat(28)}💡`);
+    expect(truncate(`${'x'.repeat(30)}💡`)).to.equal('x'.repeat(30));
+    // An emoji made of several code points is one character.
+    expect(truncate(`${'x'.repeat(7)}👨‍👩‍👧`)).to.equal(`${'x'.repeat(7)}👨‍👩‍👧`);
+    expect(truncate(`${'x'.repeat(28)}👨‍👩‍👧`)).to.equal('x'.repeat(28));
+    // So is a letter followed by a combining accent.
+    expect(truncate(`${'x'.repeat(29)}e\u0301`)).to.equal(`${'x'.repeat(29)}e\u0301`);
+    expect(truncate(`${'x'.repeat(30)}e\u0301`)).to.equal('x'.repeat(30));
+  });
+
+  it('should not end a cut label with a space', () => {
+    expect(truncate(`${'x'.repeat(31)} and more`)).to.equal('x'.repeat(31));
   });
 
   it('should build a single function device as a bridged node with one child', () => {

@@ -370,7 +370,9 @@ describe('MatterBridge', () => {
       });
       const rebuilt = bridge.devices.get('light-id').built;
       expect(rebuilt.root).to.not.equal(endpoint);
+      // Deleted, not closed: nothing of the former endpoints is left in the storage.
       expect(endpoint.deleted).to.equal(true);
+      expect(endpoint.closed).to.equal(false);
       expect(rebuilt.root.number).to.equal(endpoint.number);
       expect(rebuilt.children[0].id).to.equal(children[0].id);
       expect(rebuilt.children[0].number).to.equal(children[0].number);
@@ -389,28 +391,79 @@ describe('MatterBridge', () => {
       expect(rebuilt[1].number).to.not.equal(lightEndpoint.number);
     });
 
-    it('should remove a device that has nothing to expose anymore', async () => {
+    it('should remove a device that has nothing to expose anymore, and keep its endpoint numbers', async () => {
+      const { root } = bridge.devices.get('light-id').built;
       await bridge.onDeviceChange({ ...light, features: [] });
       expect(bridge.devices.has('light-id')).to.equal(false);
+      expect(root.closed).to.equal(true);
+      expect(root.deleted).to.equal(false);
     });
 
-    it('should remove a device taken out of the selection', async () => {
+    it('should remove a device taken out of the selection, and keep its endpoint numbers', async () => {
+      const { root } = bridge.devices.get('light-id').built;
       variables[VARIABLES.EXPOSURE_MODE] = 'selection';
       variables[VARIABLES.EXPOSED_DEVICES] = '["sensor"]';
       await bridge.onDeviceChange(light);
       expect(bridge.devices.has('light-id')).to.equal(false);
+      expect(root.closed).to.equal(true);
+      expect(root.deleted).to.equal(false);
     });
 
-    it('should remove a deleted device', async () => {
+    it('should give a device put back in the selection the endpoint numbers it had', async () => {
+      const numbers = (id) => {
+        const { root, children } = bridge.devices.get(id).built;
+        return [root, ...children].map(({ number }) => number);
+      };
+      const lightNumbers = numbers('light-id');
+      const sensorNumbers = numbers('sensor-id');
+      expect(sensorNumbers).to.have.lengthOf(3);
+
+      await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['light'] });
+      expect(Array.from(bridge.devices.keys())).to.deep.equal(['light-id']);
+      // A device added while the sensor is away does not take its numbers.
+      const plug = {
+        id: 'plug-id',
+        name: 'Plug',
+        selector: 'plug',
+        features: [feature('plug-on', 'switch', 'binary')],
+      };
+      devices = [light, sensor, plug];
+      await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['light', 'plug'] });
+      await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['light', 'plug', 'sensor'] });
+
+      expect(numbers('sensor-id')).to.deep.equal(sensorNumbers);
+      expect(numbers('light-id')).to.deep.equal(lightNumbers);
+      expect(sensorNumbers).to.not.include.members(numbers('plug-id'));
+    });
+
+    it('should forget the endpoint numbers of a deleted device', async () => {
+      const { root } = bridge.devices.get('light-id').built;
       await bridge.onDeviceDelete(light);
       expect(bridge.devices.has('light-id')).to.equal(false);
+      expect(root.deleted).to.equal(true);
+      expect(root.closed).to.equal(false);
       await bridge.onDeviceDelete(unsupported);
     });
 
+    it('should forget the endpoint numbers of a device that left Gladys while syncing', async () => {
+      const lightRoot = bridge.devices.get('light-id').built.root;
+      const sensorRoot = bridge.devices.get('sensor-id').built.root;
+      // The light is gone from Gladys, the sensor is only taken out of the selection.
+      devices = [sensor];
+      await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: [] });
+      expect(bridge.devices.size).to.equal(0);
+      expect(lightRoot.deleted).to.equal(true);
+      expect(sensorRoot.closed).to.equal(true);
+      expect(sensorRoot.deleted).to.equal(false);
+    });
+
     it('should survive an endpoint failing to be removed', async () => {
-      sinon.stub(bridge.devices.get('light-id').built.root, 'delete').rejects(new Error('busy'));
+      sinon.stub(bridge.devices.get('light-id').built.root, 'close').rejects(new Error('busy'));
       await bridge.removeDevice('light-id');
       expect(bridge.devices.has('light-id')).to.equal(false);
+      sinon.stub(bridge.devices.get('sensor-id').built.root, 'delete').rejects(new Error('busy'));
+      await bridge.removeDevice('sensor-id', { forget: true });
+      expect(bridge.devices.has('sensor-id')).to.equal(false);
     });
 
     it('should ignore device changes once stopped', async () => {

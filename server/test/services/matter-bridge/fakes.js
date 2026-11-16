@@ -64,6 +64,10 @@ function createBehavior(name) {
 }
 
 let nextNumber = 2;
+// Like the storage of matter.js: the numbers of the endpoints that were closed, by endpoint id. An
+// endpoint created under the id of a closed one takes its number back; a deleted endpoint leaves
+// nothing behind.
+let closedNumbers = new Map();
 
 /**
  * @description Fake matter.js Endpoint: keeps its state, exposes $Changed observables for each
@@ -78,11 +82,19 @@ function FakeEndpoint(type, options) {
   this.type = type;
   this.options = options;
   this.id = id;
-  this.number = number === undefined ? nextNumber : number;
-  nextNumber += 1;
+  if (number !== undefined) {
+    this.number = number;
+  } else if (closedNumbers.has(id)) {
+    this.number = closedNumbers.get(id);
+  } else {
+    this.number = nextNumber;
+    nextNumber += 1;
+  }
+  closedNumbers.delete(id);
   this.state = JSON.parse(JSON.stringify(state));
   this.children = [];
   this.deleted = false;
+  this.closed = false;
   this.events = {};
   Object.entries(state).forEach(([cluster, attributes]) => {
     this.events[cluster] = {};
@@ -113,6 +125,11 @@ FakeEndpoint.prototype.add = async function add(child) {
   this.children.push(child);
 };
 
+FakeEndpoint.prototype.close = async function close() {
+  [this, ...this.children].forEach(({ id, number }) => closedNumbers.set(id, number));
+  this.closed = true;
+};
+
 FakeEndpoint.prototype.delete = async function deleteEndpoint() {
   this.deleted = true;
 };
@@ -124,6 +141,8 @@ FakeEndpoint.prototype.delete = async function deleteEndpoint() {
  * const matter = createMatter();
  */
 function createMatter() {
+  // A new set of modules starts from an empty storage.
+  closedNumbers = new Map();
   const vars = new Map();
   const server = {
     added: [],
