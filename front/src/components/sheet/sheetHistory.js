@@ -14,10 +14,18 @@
 //
 // The history is synchronized after the sheets settle, not on each open / close: a sheet replacing
 // another one (the menu, then the settings) keeps the same entry.
+//
+// The same entry guards an edit page (docs/specs/mobile-pages/README.md, C.4): while a page that
+// registered a leave guard has unsaved changes, the entry is kept on top even with no sheet open,
+// and a "back" that pops it asks the page — which opens its leave sheet — instead of being passed
+// on. One entry for both: a "back" closes the sheet on top first, then asks the guard, and no
+// second entry is left behind to cost a press.
 const ENTRY_KEY = 'gladysSheet';
 const BASE_KEY = 'gladysSheetBase';
 
 let getOpenSheets = () => [];
+// the leave guard of the page on screen: { isDirty(): boolean, onBack(): void }, or null
+let leaveGuard = null;
 let syncTimer = null;
 // the id of the sheet entry the history is on, null on any other entry: what a "popstate" cannot
 // tell by itself, the entry that was just left
@@ -33,9 +41,11 @@ const readEntryId = () => (hasHistory() && window.history.state && window.histor
 // lands on this page once, not twice.
 const isSheetEntryOnTop = () => readEntryId() !== null;
 
+const hasUnsavedChanges = () => Boolean(leaveGuard) && Boolean(leaveGuard.isDirty());
+
 const sync = () => {
   syncTimer = null;
-  if (!hasHistory() || getOpenSheets().length === 0 || isSheetEntryOnTop()) {
+  if (!hasHistory() || (getOpenSheets().length === 0 && !hasUnsavedChanges()) || isSheetEntryOnTop()) {
     return;
   }
   // the page entry is marked with the id of the entry pushed above it: a "back" from one to the
@@ -65,6 +75,11 @@ const onPopState = () => {
     openSheets[openSheets.length - 1].props.onClose();
     // sheets still open get their entry back
     scheduleSync();
+  } else if (hasUnsavedChanges()) {
+    // the page has unsaved changes: it asks (its leave sheet), and the entry comes back so the
+    // next "back" is caught too
+    leaveGuard.onBack();
+    scheduleSync();
   } else {
     // the entry was a leftover: the user asked to leave the page
     window.history.back();
@@ -76,6 +91,25 @@ const sheetsChanged = openSheetsGetter => {
   getOpenSheets = openSheetsGetter;
   scheduleSync();
 };
+
+// Called by an edit page while it is shown: `guard.isDirty()` tells whether leaving would lose
+// something, `guard.onBack()` is called on a system "back" that would. One page at a time.
+const setLeaveGuard = guard => {
+  leaveGuard = guard;
+  scheduleSync();
+};
+
+// Called with the guard that was set: a page that unmounts after the next one mounted must not
+// remove the guard of that next page
+const clearLeaveGuard = guard => {
+  if (leaveGuard === guard) {
+    leaveGuard = null;
+  }
+};
+
+// Called when the unsaved state of the page may have changed: the entry is pushed as soon as
+// there is something to lose
+const leaveGuardChanged = () => scheduleSync();
 
 if (hasHistory()) {
   currentEntryId = readEntryId();
@@ -93,4 +127,4 @@ if (hasHistory()) {
   });
 }
 
-export { isSheetEntryOnTop, sheetsChanged };
+export { isSheetEntryOnTop, sheetsChanged, setLeaveGuard, clearLeaveGuard, leaveGuardChanged };

@@ -95,7 +95,8 @@ presentation and keeps what was typed.
   to lose — a new contract whose template (or manual entry) was chosen, an edited contract that
   differs from what was loaded: **Leave without saving** (destructive) / **Keep editing**. There
   is no "Save and leave": a contract is saved from its preview. Before that the back control
-  leaves at once. `beforeunload` is registered meanwhile.
+  leaves at once. `beforeunload` is registered meanwhile, and the system "back" goes through the
+  same guard (README C.4): it asks instead of leaving the wizard, whatever the step.
 - A saved contract goes back to the list.
 
 ### D.3 The steps
@@ -180,7 +181,7 @@ merge exactly as two neighboring buttons do.
   and its floating button; a manual contract created step by step (the focus page, the meter as
   a radio row, 16 px fields, the billing sheet and its summary, the preview, the saved payload,
   the row under its meter); a template picked after a search, its time ranges added, merged and
-  removed from the sheet, and the inputs sent to the preview; the leave guard (nothing asked
+  removed from the sheet, and the inputs sent to the preview; the leave guard, on the back control and on the system "back" (nothing asked
   before a template is chosen, keep editing, leave); a refused save shown in the bottom bar; a
   contract opened from its row and renamed; the meter of a device chosen in a sheet; a contract
   deleted from its actions once confirmed; a recalculation confirmed before it starts, the

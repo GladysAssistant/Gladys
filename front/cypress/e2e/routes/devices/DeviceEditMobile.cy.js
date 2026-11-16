@@ -146,6 +146,33 @@ describe('Device edit on a phone', () => {
     cy.location('pathname').should('eq', '/dashboard/settings/system');
   });
 
+  it('should ask before leaving through the system back with unsaved changes', () => {
+    cy.visit(editUrl);
+    cy.get('[data-cy=device-name]').clear();
+    cy.get('[data-cy=device-name]').type('Iron');
+    cy.get('[data-cy=device-save]').should('not.be.disabled');
+    cy.go('back');
+    cy.get('[data-cy=device-leave-confirm]').should('be.visible');
+    cy.location('pathname').should('eq', editUrl);
+    // a second "back" closes the sheet, like "Keep editing": the page and its changes stay
+    cy.go('back');
+    cy.get('[data-cy=device-leave-confirm]').should('not.exist');
+    cy.get('[data-cy=device-name]').should('have.value', 'Iron');
+    cy.get('[data-cy=device-edit-bottom-bar]').i18n('mobileKit.unsavedChanges');
+    // a sheet open on top is closed first, then the guard asks
+    cy.get('[data-cy=device-feature-row]')
+      .first()
+      .click();
+    cy.get('[data-cy=device-feature-sheet]').should('be.visible');
+    cy.go('back');
+    cy.get('[data-cy=device-feature-sheet]').should('not.exist');
+    cy.get('[data-cy=device-leave-confirm]').should('not.exist');
+    cy.go('back');
+    cy.get('[data-cy=device-leave-confirm]').should('be.visible');
+    cy.get('[data-cy=device-leave-discard]').click();
+    cy.location('pathname').should('eq', '/dashboard/integration/device/zigbee2mqtt');
+  });
+
   it('should keep the changes unsaved when the layout changes and comes back', () => {
     cy.visit(editUrl);
     cy.get('[data-cy=device-name]').clear();

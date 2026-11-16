@@ -17,6 +17,7 @@ import {
   fieldClass,
   BigButton,
   ConfirmSheet,
+  SystemBackGuard,
   kitStyle
 } from '../../components/mobile';
 import MobileAreaMap from './MobileAreaMap';
@@ -120,6 +121,9 @@ class MobileNewArea extends Component {
       this.leave();
     }
   };
+
+  // the system "back" with unsaved changes (SystemBackGuard): the same sheet as the back control
+  openLeave = () => this.setState({ leaveOpen: true });
 
   closeLeave = () => this.setState({ leaveOpen: false });
 
@@ -344,6 +348,7 @@ class MobileNewArea extends Component {
       <FocusPage>
         <div class="page">
           <div class={cx('page-main', 'glass-theme', mapStyle.mapPage, style.zonePage)} data-cy="zone-mobile">
+            <SystemBackGuard dirty={dirty} onBack={this.openLeave} />
             <MobileNavBar
               title={title}
               onBack={this.onBack}

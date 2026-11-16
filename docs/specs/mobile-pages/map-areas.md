@@ -140,7 +140,8 @@ until none is: nothing is sent that the server would refuse for a missing field.
 
 - **Leave guard** (README C.4): "‹ Map" with unsaved changes opens the confirmation — **Save and
   leave** (not offered while the zone cannot be saved), **Leave without saving**, **Keep
-  editing** — and the page registers `beforeunload` meanwhile. "Changed" compares the name, the
+  editing** — the system "back" opens the same confirmation, and the page registers
+  `beforeunload` meanwhile. "Changed" compares the name, the
   color, the radius and the center with the zone as loaded (or with an empty new zone).
 - **Deleting** an existing zone is confirmed in a sheet (README C.5) that names it and says that
   the scenes it triggers will no longer run; then the page goes back to the map. A failed
@@ -168,7 +169,7 @@ until none is: nothing is sent that the server would refuse for a missing field.
   in the lower half of the map page, the zone page as a focus page with the map and the save both
   on screen and a 16 px field; what is missing said in turn (center, radius, name) with the save
   disabled, a tap placing the zone, the radius typed then stepped and written on the map, the name
-  and the color in their sheet, the created payload; the leave guard (keep editing, leave without
+  and the color in their sheet, the created payload; the leave guard, on the back control and on the system "back" (keep editing, leave without
   saving) and a zone that did not change left at once; a zone edited (name, color, radius from the
   slider and its upper bound, place) and the updated payload; a deletion cancelled then confirmed;
   the card form kept on a wider screen.

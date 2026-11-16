@@ -117,6 +117,22 @@ cards**, the pattern of the devices list.
   confirmation sheet: **Save and leave** / **Leave without saving** (destructive) / **Keep
   editing** (`mobileKit.leave*`). While there are unsaved changes the page also registers a
   `beforeunload` handler.
+- **The system "back" goes through the same guard** (the Android button, the iOS edge swipe, the
+  browser button): `SystemBackGuard`, rendered by the phone layout of an edit page with its
+  `dirty` state and the handler that opens its leave sheet.
+  - It shares the history entry of the sheets (`components/sheet/sheetHistory.js`): while the
+    page has unsaved changes, **one** entry of the same URL sits above the page's one, with or
+    without a sheet open. A "back" that pops it closes the sheet on top if there is one;
+    otherwise it asks the guard, the leave sheet opens and the entry is put back, so the next
+    "back" is caught too. A second "back" therefore closes the leave sheet, like "Keep editing".
+  - With nothing to lose the "back" leaves in **one** press, also right after a save (the entry
+    left behind is passed on at once, as for the sheets).
+  - Leaving from the sheet leads where the back control of the page leads, with
+    `route(url, isSheetEntryOnTop())`: the navigation replaces the entry of the guard.
+  - It is a phone behavior: from 768 px the pages keep what they did (the desktop cards have no
+    leave guard). The houses editor, which is not a route of its own, keeps its own entry
+    (`house-and-rooms.md` B); the scene editor relies on its local draft
+    (`scene-editor-mobile.md` C.2).
 
 ### C.5 Sheets and confirmations
 

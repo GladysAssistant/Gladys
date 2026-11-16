@@ -35,8 +35,8 @@ room**, and **choose which features keep their history**.
   from the device as loaded or last saved. A failed save (error, or conflict on the external
   ids) shows in the bar; a successful one shows the "Saved" toast, and what the server returned
   becomes the saved version.
-- **Leave guard** (README C.4) on the back control, and `beforeunload` while there are unsaved
-  changes. "Save and leave" leaves once the save went through; a failed save stays on the page.
+- **Leave guard** (README C.4) on the back control and on the system "back", and `beforeunload`
+  while there are unsaved changes. "Save and leave" leaves once the save went through; a failed save stays on the page.
 - A device that does not exist (or belongs to another integration) shows "Device not found"; the
   back control still works.
 
@@ -84,7 +84,8 @@ minimum and maximum, an editable external id and "Delete the feature", and the p
 Cypress, phone viewport, `front/cypress/e2e/routes/devices/DeviceEditMobile.cy.js`: the fields
 and the feature rows with nothing to save, the chrome of the integration hidden, 16 px fields; a
 feature renamed and its history turned off from its sheet, the bottom bar switching to unsaved,
-the saved payload and the toast; the leave guard (keep editing, leave without saving); save and
+the saved payload and the toast; the leave guard (keep editing, leave without saving), also through the system "back" (the
+leave sheet, a second "back" closing it, a sheet on top closed first); save and
 leave back to the devices list with `?from=devices`; a link of the page going through the leave
 guard; the changes still unsaved after the layout changed and came back; the cards kept on a
 wider screen.

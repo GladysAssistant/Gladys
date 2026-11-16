@@ -122,7 +122,11 @@ describe('Map zones on a phone', () => {
     cy.get('[data-cy=zone-leave-confirm]').should('not.exist');
     cy.location('pathname').should('eq', editUrl);
 
-    cy.get('[data-cy=mobile-nav-back]').click();
+    // the system "back" goes through the same guard: the page stays and asks
+    cy.go('back');
+    cy.get('[data-cy=zone-leave-confirm]').should('be.visible');
+    cy.location('pathname').should('eq', editUrl);
+    cy.get('[data-cy=zone-radius]').should('have.value', '250');
     cy.get('[data-cy=zone-leave-discard]').click();
     cy.location('pathname').should('eq', '/dashboard/maps');
   });

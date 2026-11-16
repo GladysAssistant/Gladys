@@ -21,6 +21,7 @@ import {
   BigButton,
   DirtyLabel,
   MobileToast,
+  SystemBackGuard,
   kitStyle
 } from '../mobile';
 import FeatureHistorySize from './FeatureHistorySize';
@@ -134,6 +135,12 @@ class MobileUpdateDevice extends Component {
   // "back" from the next page then lands on this page once
   leave = () => route(this.leaveHref || this.props.backHref, isSheetEntryOnTop());
 
+  // the system "back" with unsaved changes (SystemBackGuard): the same sheet as the back control
+  onSystemBack = () => {
+    this.leaveHref = null;
+    this.setState({ leaveOpen: true });
+  };
+
   onBack = () => {
     this.leaveHref = null;
     if (this.isDirty()) {
@@ -236,6 +243,7 @@ class MobileUpdateDevice extends Component {
     return (
       <FocusPage>
         <div class={kitStyle.page} data-cy="device-edit-mobile">
+          <SystemBackGuard dirty={dirty} onBack={this.onSystemBack} />
           <MobileNavBar
             title={(device && device.name) || <Text id="editDeviceForm.noName" />}
             onBack={this.onBack}

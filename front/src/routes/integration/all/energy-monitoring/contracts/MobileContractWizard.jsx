@@ -10,6 +10,7 @@ import {
   MobileBottomBar,
   BigButton,
   ConfirmSheet,
+  SystemBackGuard,
   kitStyle
 } from '../../../../../components/mobile';
 import { MeterStep, TemplateStep, ParametersStep, PreviewStep } from './MobileWizardSteps';
@@ -62,6 +63,9 @@ class MobileContractWizard extends Component {
       this.props.cancel();
     }
   };
+
+  // the system "back" with unsaved changes (SystemBackGuard): the same sheet as the back control
+  openLeave = () => this.setState({ leaveOpen: true });
 
   closeLeave = () => this.setState({ leaveOpen: false });
 
@@ -181,6 +185,7 @@ class MobileContractWizard extends Component {
     return (
       <FocusPage>
         <div class={kitStyle.page} data-cy="energy-contract-wizard-mobile">
+          <SystemBackGuard dirty={props.isDirty()} onBack={this.openLeave} />
           <MobileNavBar
             title={
               <Text

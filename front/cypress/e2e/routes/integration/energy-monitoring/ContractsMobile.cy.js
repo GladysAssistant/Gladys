@@ -246,6 +246,15 @@ describe('Energy monitoring on a phone', () => {
     cy.get('[data-cy=energy-contract-leave-confirm]').should('not.exist');
     cy.get('[data-cy=energy-contract-name]').should('have.value', 'Never saved');
 
+    // the system "back" goes through the same guard: the wizard stays and asks
+    cy.go('back');
+    cy.get('[data-cy=energy-contract-leave-confirm]').should('be.visible');
+    cy.get('[data-cy=energy-contract-name]').should('have.value', 'Never saved');
+    // …and a second "back" closes the sheet, like "Keep editing"
+    cy.go('back');
+    cy.get('[data-cy=energy-contract-leave-confirm]').should('not.exist');
+    cy.get('[data-cy=energy-contract-name]').should('have.value', 'Never saved');
+
     cy.get('[data-cy=mobile-nav-back]').click();
     cy.get('[data-cy=confirm-sheet-confirm]').click();
     cy.location('pathname').should('eq', `${BASE}/contracts`);

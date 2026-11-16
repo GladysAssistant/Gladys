@@ -19,6 +19,7 @@ import MobileSteps from './MobileSteps';
 import MobileBottomBar, { BigButton, DirtyLabel } from './MobileBottomBar';
 import MobileToast from './MobileToast';
 import ConfirmSheet from './ConfirmSheet';
+import SystemBackGuard from './SystemBackGuard';
 import kitStyle from './kit.css';
 
 export {
@@ -42,5 +43,6 @@ export {
   DirtyLabel,
   MobileToast,
   ConfirmSheet,
+  SystemBackGuard,
   kitStyle
 };
