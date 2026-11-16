@@ -44,6 +44,23 @@
     "loading": "Lädt...",
     "preview": "Vorschau"
   },
+  "mobileKit": {
+    "back": "Zurück",
+    "close": "Schließen",
+    "done": "Fertig",
+    "more": "Weitere Aktionen",
+    "undo": "Rückgängig",
+    "retry": "Erneut versuchen",
+    "saved": "Gespeichert",
+    "unsavedChanges": "Nicht gespeicherte Änderungen",
+    "stepOf": "Schritt {{current}} von {{total}}",
+    "leaveTitle": "Nicht gespeicherte Änderungen",
+    "leaveText": "Ihre Änderungen sind noch nicht gespeichert.",
+    "saveAndLeave": "Speichern und verlassen",
+    "leaveWithoutSaving": "Ohne Speichern verlassen",
+    "keepEditing": "Weiter bearbeiten",
+    "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden."
+  },
   "errorBoundary": {
     "message": "Beim Anzeigen ist ein Fehler aufgetreten. Lade die Seite neu und überprüfe die Konfiguration, falls es erneut auftritt."
   },
@@ -187,6 +204,21 @@
     "tooManyRequests": "Bitte warte {{count}} Minuten, bevor du es erneut versuchst."
   },
   "signup": {
+    "mobile": {
+      "welcomeLead": "Gladys ist ein Assistent für Ihr Zuhause, der Ihre Privatsphäre respektiert. Die Einrichtung dauert etwa zwei Minuten.",
+      "restoreHint": "Bereits Gladys-Plus-Nutzer? Stellen Sie eine frühere Installation wieder her.",
+      "togglePassword": "Passwort anzeigen oder verbergen",
+      "distanceKilometers": "Kilometer",
+      "distanceMiles": "Meilen",
+      "historyHelp": "Wie lange Gladys die Werte Ihrer Sensoren aufbewahrt. Sie können es später in den Einstellungen ändern.",
+      "roomsHelp": "Tippen Sie auf die Räume Ihres Hauses. Sie können sie später ändern.",
+      "saveHouseError": "Das Haus konnte nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "savePreferencesError": "Ihre Einstellungen konnten nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "restoreTitle": "Backup wiederherstellen",
+      "restoreConfirmTitle": "Dieses Backup wiederherstellen?",
+      "restoreConfirmText": "Gladys startet mit den Daten dieses Backups neu. Das kann einige Minuten dauern.",
+      "backupKeyHelp": "Der Schlüssel, den Sie bei der Einrichtung von Gladys Plus auf Ihrer früheren Installation erhalten haben."
+    },
     "welcome": {
       "title": "Willkommen bei Gladys!",
       "introSentence": "Zunächst einmal vielen Dank, dass du dich für mich entschieden hast. Ich bin Gladys, ein datenschutzfreundlicher Heimassistent für dein Zuhause.",
@@ -1688,6 +1720,52 @@
       "rotation27O": "270°"
     },
     "energyMonitoring": {
+      "mobile": {
+        "meterTitle": "Welchen Zähler rechnet dieser Vertrag ab?",
+        "createMeter": "Neuen Zähler erstellen",
+        "createMeterHelp": "Ein MQTT-Gerät wird erstellt: Senden Sie ihm die Stände Ihres Zählers.",
+        "templateTitle": "Wählen Sie Ihren Vertrag",
+        "manualHelp": "Geben Sie den Tarif selbst ein. Er existiert nur in Ihrem Gladys.",
+        "proposeTitle": "Der Community vorschlagen",
+        "proposeHelp": "Damit ihn alle in dieser Liste finden.",
+        "parametersTitle": "Ihr Vertrag",
+        "billingRow": "Währung und Abrechnung",
+        "billingDay": "Abrechnung ab dem {{day}}.",
+        "timezoneHelp": "Leer lassen, um die Zeitzone von Gladys zu verwenden. Beispiel: Europe/Paris.",
+        "powerUnit": "Einheit der Anschlussleistung",
+        "advanced": "Erweitert",
+        "jsonMode": "Tarif als JSON bearbeiten",
+        "jsonModeHelp": "Um eine vollständige Tarifdefinition einzugeben oder einzufügen.",
+        "exportHelp": "Eine Datei für die Community-Liste oder eine Integration.",
+        "samplesTitle": "Beispielintervalle",
+        "showAllSamples": "Alle {{count}} Intervalle anzeigen",
+        "noRange": "Noch kein Zeitraum.",
+        "addRange": "Zeitraum hinzufügen",
+        "rangeSheetTitle": "Zeitraum",
+        "rangeStart": "Von",
+        "rangeEnd": "Bis",
+        "rangeNextDay": "am Folgetag",
+        "rangeNextDayHelp": "Dieser Zeitraum endet am Folgetag.",
+        "rangeHelp": "Zeiträume, die sich berühren oder überschneiden, werden zusammengeführt.",
+        "rangeInvalid": "Der Zeitraum muss zu einer anderen Uhrzeit enden, als er beginnt.",
+        "rangeAdd": "Diesen Zeitraum hinzufügen",
+        "rangeUpdate": "Diesen Zeitraum ändern",
+        "rangeRemove": "Zeitraum entfernen",
+        "leaveTitle": "Ohne Speichern verlassen?",
+        "leaveText": "Dieser Vertrag ist nicht gespeichert: Ihre Eingaben gehen verloren.",
+        "deleteTitle": "Diesen Vertrag löschen?",
+        "contractDeleted": "Vertrag gelöscht",
+        "deviceAttached": "{{device}} wird jetzt über {{meter}} abgerechnet",
+        "previewComponents": {
+          "energy": "Energie",
+          "subscription": "Grundpreis"
+        },
+        "meterOf": "Zähler von {{name}}",
+        "meterSheetHelp": "Das Gerät wird über den Vertrag seines Zählers abgerechnet.",
+        "recalculations": "Neuberechnungen",
+        "startCalculation": "Berechnung starten",
+        "recalculateTitle": "Kosten neu berechnen"
+      },
       "title": "Energieüberwachung",
       "description": "Verfolgen Sie Ihren Stromverbrauch in Gladys",
       "myDevicesTab": "Meine Geräte",
@@ -5152,6 +5230,56 @@
       "rooms": "Räume",
       "noRoomYet": "Noch kein Raum. Füge unten einen hinzu."
     },
+    "mobile": {
+      "subtitle": "Ein Haus enthält Räume, und jedes Gerät gehört zu einem Raum. Tippen Sie auf ein Haus, um es zu bearbeiten.",
+      "useMyLocation": "Meinen aktuellen Standort verwenden",
+      "locationError": {
+        "insecure": "Ihr Browser gibt Ihren Standort nur über eine sichere Verbindung frei (HTTPS, zum Beispiel über Gladys Plus). Suchen Sie stattdessen Ihre Adresse oder platzieren Sie das Haus auf der Karte.",
+        "denied": "Der Zugriff auf Ihren Standort wurde verweigert. Erlauben Sie ihn in den Einstellungen Ihres Browsers oder suchen Sie stattdessen Ihre Adresse.",
+        "unavailable": "Ihr Standort konnte nicht ermittelt werden. Suchen Sie stattdessen Ihre Adresse oder platzieren Sie das Haus auf der Karte."
+      },
+      "placeOnMap": "Auf der Karte platzieren",
+      "adjustOnMap": "Auf der Karte anpassen",
+      "positionSet": "Die Position des Hauses ist festgelegt.",
+      "positionNotSet": "Noch keine Position.",
+      "locationHelp": "Optional. Wird für das Wetter, Sonnenauf- und -untergang und für die Anwesenheitserkennung verwendet.",
+      "mapSheetTitle": "Position des Hauses",
+      "mapSheetHint": "Tippen Sie auf die Karte, wo das Haus steht. Mit zwei Fingern verschieben und zoomen.",
+      "addRooms": "Hinzufügen",
+      "addFirstRoom": "Die Räume des Hauses hinzufügen",
+      "roomsHint": "Tippen Sie auf einen Raum, um ihn umzubenennen oder zu löschen.",
+      "addRoomsTitle": "Räume hinzufügen",
+      "newRoomPlaceholder": "Name eines Raums",
+      "roomSuggestionsTitle": "Häufige Räume",
+      "roomSuggestionsLabel": "Häufige Räume, zum Hinzufügen oder Entfernen tippen",
+      "roomSuggestions": {
+        "livingRoom": "Wohnzimmer",
+        "kitchen": "Küche",
+        "bedroom": "Schlafzimmer",
+        "bathroom": "Badezimmer",
+        "entrance": "Flur",
+        "office": "Büro",
+        "diningRoom": "Esszimmer",
+        "kidsRoom": "Kinderzimmer",
+        "toilet": "WC",
+        "garage": "Garage",
+        "laundryRoom": "Waschküche",
+        "garden": "Garten"
+      },
+      "roomSheetTitle": "Raum",
+      "roomNameLabel": "Name des Raums",
+      "roomNameRequired": "Ein Raum braucht einen Namen.",
+      "roomNameTaken": "Dieses Haus hat bereits einen Raum mit diesem Namen.",
+      "roomNameTakenElsewhere": "Ein anderes Haus hat bereits einen Raum mit diesem Namen. Fügen Sie den Namen des Hauses hinzu, um sie zu unterscheiden.",
+      "roomNameReserved": "Ein umbenannter Raum verwendet diesen Namen intern noch. Wählen Sie einen anderen Namen.",
+      "deleteRoom": "Raum löschen",
+      "deleteRoomHint": "Der Raum wird beim Speichern des Hauses gelöscht. Seine Geräte bleiben erhalten, ohne Raum.",
+      "roomDeleted": "„{{name}}“ gelöscht",
+      "houseDeleted": "Haus gelöscht",
+      "alarmCodePlaceholder": "4 bis 8 Ziffern",
+      "alarmCodeHelp": "Der Code, der den Alarm dieses Hauses deaktiviert. Leer lassen, wenn Sie den Alarm nicht nutzen.",
+      "alarmDelayHelp": "Gilt nur, wenn der Alarm von Hand scharf geschaltet wird, nicht aus einer Szene."
+    },
     "empty": {
       "title": "Noch kein Zuhause",
       "description": "Erstelle dein erstes Zuhause, um Räume hinzuzufügen und deine Geräte zu organisieren.",
@@ -5297,7 +5425,22 @@
     "session": "Sitzung",
     "revoke": "Widerrufen",
     "unknowDevice": "Unbekanntes Gerät",
-    "apiKey": "API-Schlüssel"
+    "apiKey": "API-Schlüssel",
+    "mobile": {
+      "thisDevice": "Dieses Gerät",
+      "thisDeviceTitle": "Dieses Gerät",
+      "otherDevicesTitle": "Andere Geräte",
+      "noOtherDevice": "Kein anderes Gerät ist angemeldet.",
+      "apiKeysTitle": "API-Schlüssel",
+      "hint": "Widerrufen Sie eine Sitzung, um ihr Gerät von Gladys abzumelden.",
+      "loadError": "Die Sitzungen konnten nicht geladen werden. Versuchen Sie es erneut.",
+      "revokeTitle": "Diese Sitzung widerrufen?",
+      "revokeText": "dieses Gerät wird von Gladys abgemeldet.",
+      "revokeCurrentText": "dies ist die Sitzung des Geräts, das Sie gerade verwenden: Sie werden abgemeldet.",
+      "revokeApiKeyText": "was diesen API-Schlüssel verwendet, kann Gladys nicht mehr erreichen.",
+      "revokeError": "Die Sitzung konnte nicht widerrufen werden. Versuchen Sie es erneut.",
+      "revoked": "Sitzung widerrufen"
+    }
   },
   "servicesSettings": {
     "title": "Dienste",
@@ -5334,7 +5477,24 @@
         "detail": "Dienst konnte nicht gestartet werden"
       }
     },
-    "action": "Aktion"
+    "action": "Aktion",
+    "mobile": {
+      "searchPlaceholder": "Dienst suchen",
+      "filters": {
+        "all": "Alle",
+        "running": "Gestartet",
+        "error": "Fehlerhaft",
+        "stopped": "Gestoppt"
+      },
+      "noResult": "Kein Dienst entspricht der Suche.",
+      "actionError": "Der Status des Dienstes konnte nicht geändert werden. Versuchen Sie es erneut.",
+      "started": "Dienst ausführen",
+      "startedHelp": "Gestoppt funktioniert die Integration nicht mehr, bis sie wieder gestartet wird.",
+      "starting": "Wird gestartet…",
+      "stopping": "Wird gestoppt…",
+      "internalName": "Interner Name",
+      "openIntegration": "Integration öffnen"
+    }
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -5448,6 +5608,12 @@
     "jobStatuses": {
       "success": "Erfolgreich",
       "failed": "Fehlgeschlagen"
+    },
+    "mobile": {
+      "description": "Was Gladys im Hintergrund ausführt, das Neueste zuerst. Schauen Sie hier nach, wenn etwas nicht stimmt.",
+      "empty": "Noch keine Hintergrundaufgabe.",
+      "showMore": "Ganzen Fehler anzeigen",
+      "showLess": "Weniger anzeigen"
     }
   },
   "systemSettings": {
@@ -5532,6 +5698,7 @@
     "vacuumDatabaseButton": "Datenbankreinigung starten",
     "vacuumDatabaseStarted": "Die Datenbankreinigung wurde gestartet. Gladys wird erst wieder verfügbar sein, wenn dieser Vorgang abgeschlossen ist.",
     "vacuumDatabaseFinished": "Die Datenbankreinigung wurde abgeschlossen. Gladys ist wieder verfügbar. Zeit für die Reinigung: {{duration}}.",
+    "vacuumDatabaseError": "Die Datenbankbereinigung konnte nicht gestartet werden. Versuchen Sie es erneut.",
     "hostPowerTitle": "Host neu starten / herunterfahren",
     "hostPowerDescription": "Starten Sie den Rechner, auf dem Gladys läuft (z. B. Ihren Raspberry Pi), neu oder fahren Sie ihn herunter. Dies verwendet systemd-logind über DBus: Bei einer Docker-Installation nutzt Gladys einen kurzlebigen Helfer-Container, der über den Docker-Socket gestartet wird, sodass am Gladys-Container selbst nichts eingehängt werden muss. Gladys und alle Ihre Automatisierungen werden angehalten, bis der Rechner wieder eingeschaltet wird.",
     "hostRebootButton": "Host neu starten",
@@ -5574,7 +5741,18 @@
     "downloadLogsProgress": "Lade {{downloaded}} von {{total}} herunter...",
     "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut.",
     "cpuTemperature": "CPU-Temp.",
-    "cpuTemperatureValue": "{{value}} °C"
+    "cpuTemperatureValue": "{{value}} °C",
+    "mobile": {
+      "statusTitle": "Status",
+      "updatesTitle": "Updates",
+      "preferencesTitle": "Einstellungen",
+      "maintenanceTitle": "Wartung",
+      "checkForUpdatesText": "Gladys sucht automatisch nach neuen Versionen.",
+      "updateTitle": "Gladys aktualisieren?",
+      "updateText": "Gladys startet während des Updates neu und ist einige Minuten nicht erreichbar.",
+      "vacuumTitle": "Datenbank bereinigen?",
+      "vacuumText": "Gladys ist bis zum Ende der Bereinigung nicht erreichbar. Es werden keine Daten gelöscht."
+    }
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",
@@ -5592,7 +5770,36 @@
     "deleteButton": "Zone löschen",
     "createAreaError": "Diese Zone kann nicht erstellt werden. Bist du sicher, dass du jedes Feld ausgefüllt und auf die Karte geklickt hast, um einen Standort für die Zone auszuwählen?",
     "getAreaError": "Daten dieser Zone können nicht abgerufen werden. Bitte aktualisiere diese Seite, um es erneut zu versuchen.",
-    "deleteAreaError": "Diese Zone kann nicht gelöscht werden. Bitte aktualisiere diese Seite und versuche es erneut."
+    "deleteAreaError": "Diese Zone kann nicht gelöscht werden. Bitte aktualisiere diese Seite und versuche es erneut.",
+    "mobile": {
+      "backLabel": "Karte",
+      "newTitle": "Neue Zone",
+      "nameAndColor": "Name und Farbe",
+      "nameMissing": "Zone benennen",
+      "namePlaceholder": "z. B. Arbeit",
+      "radius": "Radius",
+      "radiusUnit": "m",
+      "radiusSlider": "Radius der Zone",
+      "decreaseRadius": "Radius verkleinern",
+      "increaseRadius": "Radius vergrößern",
+      "missing": {
+        "center": "Tippen Sie auf die Karte, um die Zone zu platzieren.",
+        "radius": "Geben Sie den Radius der Zone ein, von 10 m bis 50 km.",
+        "name": "Geben Sie der Zone einen Namen, um sie zu speichern."
+      },
+      "gesturesHint": "Ziehen Sie die Zone, um sie zu verschieben, und den Griff an ihrem Rand, um ihre Größe zu ändern.",
+      "moveHandle": "Zone verschieben",
+      "resizeHandle": "Größe der Zone ändern",
+      "placeAtMyPosition": "Zone an meinem Standort platzieren",
+      "placeAtHouse": "Zone auf mein Haus setzen",
+      "placedAtPosition": "Zone an Ihrem Standort platziert.",
+      "placedAtHouse": "Zone auf „{{name}}“ gesetzt.",
+      "positionDenied": "Ihr Standort ist nicht verfügbar: Erlauben Sie dieser Website den Zugriff auf Ihren Standort (nur über HTTPS möglich) oder tippen Sie auf die Karte.",
+      "positionUnavailable": "Ihr Standort konnte nicht ermittelt werden. Tippen Sie auf die Karte, um die Zone zu platzieren.",
+      "saveError": "Die Zone konnte nicht gespeichert werden. Prüfen Sie, dass keine andere Zone diesen Namen trägt, und versuchen Sie es erneut.",
+      "deleteTitle": "„{{name}}“ löschen?",
+      "deleteText": "Die von dieser Zone ausgelösten Szenen werden nicht mehr gestartet. Dies kann nicht rückgängig gemacht werden."
+    }
   },
   "iconSelector": {
     "searchPlaceholder": "Symbol suchen (Zuhause, Schloss, Wetter...)",
@@ -5981,6 +6188,19 @@
       "noSuccessYet": "Auf dieser Instanz ist noch kein Backup gelungen.",
       "lastError": "Letzter Fehler: {{error}}",
       "retry": "Gladys versucht es jede Nacht und einige Minuten nach jedem Start erneut. Die Administratoren werden ab der zweiten fehlgeschlagenen Nacht im Chat gewarnt, danach einmal pro Woche, solange es fehlschlägt; einmal gewarnt, erfahren sie es, sobald ein Backup wieder gelingt. Details im Tab \"Aufgaben\"."
+    },
+    "mobile": {
+      "backupError": "Die Sicherung konnte nicht gestartet werden. Versuchen Sie es erneut.",
+      "loadError": "Die Sicherungen konnten nicht geladen werden. Versuchen Sie es erneut.",
+      "backupsTitle": {
+        "one": "1 Sicherung",
+        "other": "{{count}} Sicherungen"
+      },
+      "restoreHint": "Tippen Sie auf eine Sicherung, um sie wiederherzustellen.",
+      "empty": "Noch keine Sicherung. Gladys erstellt alle 24 Stunden eine.",
+      "restoreTitle": "Diese Sicherung wiederherstellen?",
+      "restoreText": "Gladys kehrt zum Stand vom {{date}} zurück und startet neu. Alle Änderungen seitdem gehen verloren.",
+      "restoreError": "Die Wiederherstellung konnte nicht gestartet werden. Versuchen Sie es erneut."
     }
   },
   "alarmModes": {
@@ -7791,6 +8011,19 @@
     "saveError": "Fehler beim Speichern oder Löschen des Geräts",
     "saveConflictError": "Konflikt: Bist du sicher, dass alle externen IDs eindeutig sind?",
     "notFound": "Angefordertes Gerät nicht gefunden.",
+    "mobile": {
+      "noRoom": "Kein Raum",
+      "featuresTitle": {
+        "zero": "Funktionen",
+        "one": "1 Funktion",
+        "other": "{{count}} Funktionen"
+      },
+      "featuresHint": "Tippen Sie auf eine Funktion, um sie umzubenennen, ihre Einheit zu ändern oder festzulegen, ob ihr Verlauf gespeichert wird. Wie lange der Verlauf aufbewahrt wird, stellen Sie auf der Seite <a href=\"/dashboard/settings/system\">System</a> ein.",
+      "historyKept": "Verlauf wird gespeichert",
+      "historyNotKept": "Verlauf wird nicht gespeichert",
+      "keepHistory": "Verlauf speichern",
+      "featureType": "Art der Funktion"
+    },
     "pollFrequency": {
       "label": "Aktualisierungsfrequenz",
       "everyMinutes": "Jede Minute",
@@ -7879,7 +8112,31 @@
     "registered": "Registriert",
     "keyNameLabel": "Name:",
     "registeredLabel": "Registriert:",
-    "neverUsed": "Nie"
+    "neverUsed": "Nie",
+    "mobile": {
+      "createButton": "API-Schlüssel erstellen",
+      "createTitle": "Neuer API-Schlüssel",
+      "keyTitle": "Ihr API-Schlüssel",
+      "namePlaceholder": "z. B. Kurzbefehl auf dem Handy",
+      "nameHelp": "Ein Name, um zu erkennen, was diesen Schlüssel verwendet.",
+      "nameRequired": "Geben Sie dem Schlüssel einen Namen.",
+      "createError": "Der Schlüssel konnte nicht erstellt werden. Versuchen Sie es erneut.",
+      "copy": "Schlüssel kopieren",
+      "copied": "Schlüssel kopiert",
+      "selected": "Schlüssel markiert: kopieren Sie ihn",
+      "keysTitle": {
+        "one": "1 Schlüssel",
+        "other": "{{count}} Schlüssel"
+      },
+      "empty": "Noch kein API-Schlüssel.",
+      "created": "Erstellt am {{date}}",
+      "lastUsed": "Zuletzt verwendet am {{date}}",
+      "neverUsed": "Nie verwendet",
+      "revokeTitle": "Diesen Schlüssel widerrufen?",
+      "revokeText": "„{{name}}“ funktioniert sofort nicht mehr: was ihn verwendet, erreicht Gladys nicht mehr.",
+      "revokeError": "Der Schlüssel konnte nicht widerrufen werden. Versuchen Sie es erneut.",
+      "revoked": "Schlüssel widerrufen"
+    }
   },
   "twoFactorApps": {
     "description": "Jede App, die 6-stellige Codes erzeugt, funktioniert. Falls du noch keine hast, hier ein paar kostenlose Apps, die einfach zu installieren sind:"

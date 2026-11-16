@@ -3,6 +3,8 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { withMobileViewport } from '../../../../components/mobile';
+import MobileMyDevices from './MobileMyDevices';
 import { getAttachmentFeatures } from '../../../../../../server/utils/energyHierarchy';
 import { ENERGY_CONTRACT_DIRECTIONS } from '../../../../../../server/utils/constants';
 
@@ -61,8 +63,10 @@ class MyDevices extends Component {
         electric_meter_device_id: meterDeviceId
       });
       await this.props.loadDevices();
+      return true;
     } catch (e) {
       this.setState({ error: device.id });
+      return false;
     } finally {
       this.setState({ attaching: null });
     }
@@ -148,6 +152,25 @@ class MyDevices extends Component {
         }
       });
 
+    // on a phone the same hierarchy is rows, and the meter of a device is chosen in a sheet
+    // (docs/specs/mobile-pages/energy.md, B)
+    if (this.props.isMobile) {
+      return (
+        <MobileMyDevices
+          meters={meters}
+          devicesByMeter={devicesByMeter}
+          unattached={unattached}
+          loading={loading}
+          error={error}
+          contractsError={contractsError}
+          attaching={this.state.attaching}
+          attachError={this.state.error}
+          attachDevice={this.attachDevice}
+          intl={this.props.intl}
+        />
+      );
+    }
+
     return (
       <div class="card">
         <div class="card-body">
@@ -216,4 +239,4 @@ class MyDevices extends Component {
   }
 }
 
-export default withIntlAsProp(MyDevices);
+export default withIntlAsProp(withMobileViewport(MyDevices));

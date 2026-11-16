@@ -1,0 +1,205 @@
+/* Houses and rooms on a phone (docs/specs/mobile-pages/house-and-rooms.md): what the kit
+   (components/mobile/kit.css) does not already carry. Shared with the house step of the
+   onboarding. Light colors only: dark mode is the app-wide inversion. */
+
+.locateMe {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.addressSearch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+/* the type="search" field of the kit group: no native clear button nor magnifier */
+.addressSearch input[type='search']::-webkit-search-decoration,
+.addressSearch input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ---------- the map ---------- */
+
+/* the preview: a map that shows, under one button that opens the real one */
+.mapPreview {
+  position: relative;
+  height: 11rem;
+  margin: 0 0 6px;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #eef3fb;
+  /* a stacking context: the panes of Leaflet (z-index 200 to 1000) stay under the bars */
+  isolation: isolate;
+}
+
+.mapPreviewMap {
+  width: 100%;
+  height: 100%;
+  /* the preview takes no gesture: the page scrolls under the finger */
+  pointer-events: none;
+}
+
+.mapPreviewTarget {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1001;
+  display: flex;
+  /* at the top: the attribution of the map keeps the bottom */
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.mapPreviewTarget:focus {
+  outline: none;
+}
+
+.mapPreviewTarget:focus-visible .mapPreviewPill {
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.45);
+}
+
+.mapPreviewPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background-color: #fff;
+  color: #2f5bd8;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(16, 22, 38, 0.22);
+}
+
+/* the map of the sheet: all the room the sheet has */
+.mapSheetMap {
+  height: calc(92vh - 13rem);
+  height: calc(92dvh - 13rem);
+  min-height: 14rem;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #eef3fb;
+  isolation: isolate;
+}
+
+.mapSheetMapInner {
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 576px) {
+  .mapSheetMap {
+    height: 24rem;
+  }
+}
+
+@media (max-height: 500px) {
+  .mapSheetMap {
+    height: calc(100vh - 9rem);
+    height: calc(100dvh - 9rem);
+    min-height: 9rem;
+  }
+}
+
+/* ---------- rooms ---------- */
+
+.roomChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+/* names its chips for a screen reader only */
+.roomChipsLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.roomChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.roomChip :global(.fe) {
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: #2f5bd8;
+}
+
+.roomChip[aria-pressed='true'] :global(.fe) {
+  color: inherit;
+}
+
+/* a field and its "Add" button, side by side */
+.addRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.addRowField {
+  flex: 1 1 0;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.addRowButton {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 48px;
+}
+
+.sectionAction {
+  min-width: 44px;
+}
+
+/* a sentence between the title of a section and its content */
+.sectionLead {
+  margin: -2px 4px 10px;
+}
+
+.deleteBlock {
+  margin: 28px 0 0;
+}
+
+.loadingBlock {
+  min-height: 12rem;
+}
+
+/* ---------- Dark mode ---------- */
+
+/* a selected room must stand out among the others: inverted with the page it is a light chip
+   on the dark sheet (kept dark, as the kit does for a filter, it would sit among black chips) */
+:global(.dark-mode) .roomChip[aria-pressed='true'] {
+  filter: none;
+}
+
+/* the icons of these surfaces follow them, wherever the page puts them */
+:global(.dark-mode) .mapPreviewPill :global(.fe),
+:global(.dark-mode) .roomChip :global(.fe) {
+  filter: none;
+}

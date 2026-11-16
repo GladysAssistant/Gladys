@@ -76,7 +76,9 @@ export function getDeviceIntegration(device) {
     i18nKey: `integration.${integration.key}.title`,
     name: service.name,
     url,
-    deviceUrl: buildDeviceLink ? buildDeviceLink(device.selector) : url
+    // "from=devices": the page of the device then goes back to the devices list, not to its
+    // integration (components/device/UpdateDevice.jsx)
+    deviceUrl: buildDeviceLink ? `${buildDeviceLink(device.selector)}?from=devices` : url
   };
 }
 

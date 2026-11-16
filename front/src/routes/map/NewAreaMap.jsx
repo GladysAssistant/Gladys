@@ -1,10 +1,12 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
 import { connect } from 'unistore/preact';
-import { addMapTileLayer } from '../../utils/mapTileLayer';
+import { addMapTileLayer, removeMapWhenSettled } from '../../utils/mapTileLayer';
 import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
+
+const isSet = value => value !== null && value !== undefined && value !== '';
 
 class MapComponent extends Component {
   initMap = (options = {}) => {
@@ -64,7 +66,8 @@ class MapComponent extends Component {
         if (this.houseMarkers[house.id]) {
           this.houseMarkers[house.id].remove();
         }
-        if (house.latitude && house.longitude) {
+        // latitude 0 and longitude 0 are coordinates
+        if (isSet(house.latitude) && isSet(house.longitude)) {
           this.houseMarkers[house.id] = leaflet
             .marker([house.latitude, house.longitude], {
               icon: leaflet.icon({
@@ -154,9 +157,10 @@ class MapComponent extends Component {
   }
 
   componentWillUnmount() {
-    if (this.leafletMap) {
-      this.leafletMap.remove();
-    }
+    // once the frames queued by the basemap layer have run (utils/mapTileLayer.js): the page
+    // may be switching to its phone layout in the middle of a resize
+    removeMapWhenSettled(this.leafletMap);
+    this.leafletMap = null;
   }
 
   render() {

@@ -4,6 +4,8 @@ import { Link } from 'preact-router/match';
 import { route } from 'preact-router';
 import cx from 'classnames';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+import { withMobileViewport } from '../../../../../components/mobile';
+import MobileContracts from './MobileContracts';
 import { CONTRACT_STATUS_BADGE, PROVIDER_BADGE, errorMessage } from './contractUtils';
 
 // The Contracts tab: one contract object per meter and period (docs/specs/energy-contracts.md 8.2)
@@ -36,12 +38,20 @@ class ContractsPage extends Component {
     if (!window.confirm(dictionary.confirmDelete)) {
       return;
     }
+    await this.removeContract(contract);
+  };
+
+  // the deletion itself, once confirmed (a dialog of the browser above, a sheet on a phone):
+  // true when the contract is gone
+  removeContract = async contract => {
     try {
       this.setState({ loading: true, error: null });
       await this.props.httpClient.delete(`/api/v1/energy_contract/${contract.selector}`);
       await this.loadContracts();
+      return true;
     } catch (e) {
       this.setState({ error: errorMessage(e), loading: false });
+      return false;
     }
   };
 
@@ -118,6 +128,22 @@ class ContractsPage extends Component {
       }
       byMeter.get(contract.electric_meter_device_id).push(contract);
     });
+    // on a phone the list is rows (docs/specs/mobile-pages/energy.md, C): same contracts, same
+    // requests
+    if (props.isMobile) {
+      return (
+        <MobileContracts
+          contractsByMeter={Array.from(byMeter.entries())}
+          contracts={contracts}
+          loading={loading}
+          error={error}
+          getMeterName={this.getMeterName}
+          removeContract={this.removeContract}
+          user={props.user}
+          intl={props.intl}
+        />
+      );
+    }
     return (
       <div class="card">
         <div class="card-header">
@@ -168,4 +194,4 @@ class ContractsPage extends Component {
   }
 }
 
-export default withIntlAsProp(ContractsPage);
+export default withIntlAsProp(withMobileViewport(ContractsPage));

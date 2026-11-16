@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import Select from 'react-select';
 
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import { AREA_COLORS } from './areaColors';
 
 function hexToRgb(hex) {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -65,38 +66,12 @@ const colourStyles = {
 
 class ColorPicker extends Component {
   initValue = props => {
-    const colorOptions = [
-      {
-        value: '#3498db',
-        label: this.props.intl.dictionary.color.blue,
-        contrast: 'white'
-      },
-      {
-        value: '#e74c3c',
-        label: this.props.intl.dictionary.color.red,
-        contrast: 'white'
-      },
-      {
-        value: '#2ecc71',
-        label: this.props.intl.dictionary.color.green,
-        contrast: 'white'
-      },
-      {
-        value: '#2c3e50',
-        label: this.props.intl.dictionary.color.black,
-        contrast: 'white'
-      },
-      {
-        value: '#f1c40f',
-        label: this.props.intl.dictionary.color.yellow,
-        contrast: 'black'
-      },
-      {
-        value: '#8e44ad',
-        label: this.props.intl.dictionary.color.purple,
-        contrast: 'white'
-      }
-    ];
+    // the list is shared with the swatches of the phone layout (areaColors.js)
+    const colorOptions = AREA_COLORS.map(color => ({
+      value: color.value,
+      label: this.props.intl.dictionary.color[color.labelKey],
+      contrast: color.contrast
+    }));
 
     this.setState({ colorOptions });
 

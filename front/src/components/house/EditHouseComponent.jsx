@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 
 import EditHouse from './EditHouse';
+import MobileEditHouse from './MobileEditHouse';
 import { RequestStatus } from '../../utils/consts';
 
 class EditHouseComponent extends Component {
@@ -45,6 +46,11 @@ class EditHouseComponent extends Component {
     this.setState({
       newRoomName: ''
     });
+  };
+  // a room added by its name, without going through the field of the desktop form (the
+  // suggestions and the sheet of the phone layout)
+  addRoomNamed = name => {
+    this.props.addRoom(name, this.props.houseIndex);
   };
   removeRoom = roomIndex => {
     this.props.removeRoom(this.props.houseIndex, roomIndex);
@@ -136,8 +142,11 @@ class EditHouseComponent extends Component {
 
   render(props, { newRoomName, wantToDeleteHouse, loading, showAlarmCode, justSaved }) {
     const errors = this.getErrors();
+    // On a phone the house is edited in its own layout
+    // (docs/specs/mobile-pages/house-and-rooms.md): same state, same callbacks
+    const View = props.mobile ? MobileEditHouse : EditHouse;
     return (
-      <EditHouse
+      <View
         {...props}
         setMapRef={this.setMapRef}
         updateHouseName={this.updateHouseName}
@@ -147,6 +156,7 @@ class EditHouseComponent extends Component {
         selectHouseLocation={this.selectHouseLocation}
         newRoomName={newRoomName}
         addRoom={this.addRoom}
+        addRoomNamed={this.addRoomNamed}
         removeRoom={this.removeRoom}
         editRoom={this.editRoom}
         saveHouse={this.saveHouse}

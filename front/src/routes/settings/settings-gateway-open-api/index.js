@@ -3,6 +3,8 @@ import { connect } from 'unistore/preact';
 import SettingsLayout from '../SettingsLayout';
 import update from 'immutability-helper';
 import OpenApi from './OpenApi';
+import MobileOpenApi from './MobileOpenApi';
+import { withMobileViewport } from '../../../components/mobile';
 import linkState from 'linkstate';
 
 class SettingsGatewayOpenApi extends Component {
@@ -43,10 +45,13 @@ class SettingsGatewayOpenApi extends Component {
     this.getApiKeys();
   }
 
-  render({ user }, state) {
+  // On a phone the keys are rows, and a key is created in a sheet
+  // (docs/specs/mobile-pages/settings-pages.md, G): same state, same requests
+  render({ user, isMobile }, state) {
+    const Page = isMobile ? MobileOpenApi : OpenApi;
     return (
       <SettingsLayout>
-        <OpenApi
+        <Page
           {...state}
           user={user}
           createApiKey={this.createApiKey}
@@ -58,4 +63,4 @@ class SettingsGatewayOpenApi extends Component {
   }
 }
 
-export default connect('session,user', {})(SettingsGatewayOpenApi);
+export default connect('session,user', {})(withMobileViewport(SettingsGatewayOpenApi));

@@ -53,8 +53,18 @@ function createActions(store) {
           signupNewHouseLongitude: e.latlng.lng
         });
       });
+      // The marker of the map this one replaces (another theme, or back from the phone layout)
+      // went with it: the pin is put back from the stored position, or forgotten.
+      const { signupNewHouseLatitude: latitude, signupNewHouseLongitude: longitude } = store.getState();
+      const located = latitude !== null && latitude !== undefined && longitude !== null && longitude !== undefined;
+      let marker = null;
+      if (located) {
+        marker = leaflet.marker([latitude, longitude], { icon }).addTo(leafletMap);
+        leafletMap.setView([latitude, longitude], 16);
+      }
       store.setState({
-        signupHouseLeafletMap: leafletMap
+        signupHouseLeafletMap: leafletMap,
+        signupNewHouseMarker: marker
       });
     },
     selectHouseLocation(state, latitude, longitude) {
@@ -77,6 +87,25 @@ function createActions(store) {
         signupNewHouseMarker: marker,
         signupNewHouseLatitude: latitude,
         signupNewHouseLongitude: longitude
+      });
+    },
+    // The location of the house, set without the map of the desktop step (the phone step has its
+    // own map component, docs/specs/mobile-pages/onboarding.md C.4)
+    setHouseLocation(state, latitude, longitude) {
+      store.setState({
+        signupNewHouseLatitude: latitude,
+        signupNewHouseLongitude: longitude
+      });
+    },
+    // A room added by its name, without going through the field (the suggestions of the phone
+    // step). Same rules as addRoom: no empty name, no room twice.
+    addRoomNamed(state, name) {
+      const rooms = state.signupRooms || [];
+      if (!name || name.length === 0 || rooms.indexOf(name) !== -1) {
+        return;
+      }
+      store.setState({
+        signupRooms: [...rooms, name]
       });
     },
     onKeyPressRoomInput(state, e) {

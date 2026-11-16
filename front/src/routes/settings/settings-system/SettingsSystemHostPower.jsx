@@ -1,6 +1,15 @@
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
+import get from 'get-value';
+
+import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { withMobileViewport, ConfirmSheet } from '../../../components/mobile';
+
+const POWER_ACTION_TEXTS = {
+  reboot: { button: 'systemSettings.hostRebootButton', confirm: 'systemSettings.hostRebootConfirm' },
+  shutdown: { button: 'systemSettings.hostShutdownButton', confirm: 'systemSettings.hostShutdownConfirm' }
+};
 
 class SettingsSystemHostPower extends Component {
   constructor(props) {
@@ -19,16 +28,25 @@ class SettingsSystemHostPower extends Component {
 
   askConfirmation = action => e => {
     e.preventDefault();
+    this.lastPendingAction = action;
     this.setState({ pendingAction: action, error: false, errorDetail: null });
   };
 
+  // the confirmation sheet of the phone layout also cancels without an event (backdrop, "back")
   cancel = e => {
-    e.preventDefault();
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    if (this.submitting) {
+      return;
+    }
     this.setState({ pendingAction: null });
   };
 
   confirm = async e => {
-    e.preventDefault();
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     // Bail out synchronously if a request is already in flight.
     if (this.submitting) {
       return;
@@ -61,12 +79,14 @@ class SettingsSystemHostPower extends Component {
     }
   };
 
-  render({ systemInfos }, { pendingAction, actionSent, error, errorDetail, submitting }) {
+  render({ systemInfos, isMobile, intl }, { pendingAction, actionSent, error, errorDetail, submitting }) {
     // Fail closed and per action: a host may allow reboot but refuse power-off
     // (or the reverse), so each button is gated by its own capability.
     const rebootAvailable = systemInfos && systemInfos.host_power_reboot_available === true;
     const shutdownAvailable = systemInfos && systemInfos.host_power_shutdown_available === true;
     const anyAvailable = rebootAvailable || shutdownAvailable;
+    // the sheet of the phone layout keeps its texts while it slides out
+    const shownAction = pendingAction || this.lastPendingAction || 'reboot';
 
     return (
       <div class="card">
@@ -106,7 +126,8 @@ class SettingsSystemHostPower extends Component {
             </div>
           )}
 
-          {pendingAction ? (
+          {/* on a phone the confirmation is a sheet (below): the buttons stay where they are */}
+          {pendingAction && !isMobile ? (
             <div>
               <div class="alert alert-warning">
                 <Text
@@ -149,9 +170,22 @@ class SettingsSystemHostPower extends Component {
             </Localizer>
           )}
         </div>
+        {isMobile && (
+          <ConfirmSheet
+            open={Boolean(pendingAction)}
+            title={get(intl.dictionary, POWER_ACTION_TEXTS[shownAction].button)}
+            text={<Text id={POWER_ACTION_TEXTS[shownAction].confirm} />}
+            confirmLabel={<Text id={POWER_ACTION_TEXTS[shownAction].button} />}
+            destructive
+            loading={submitting}
+            onConfirm={this.confirm}
+            onCancel={this.cancel}
+            dataCy="system-host-power-confirm"
+          />
+        )}
       </div>
     );
   }
 }
 
-export default connect('httpClient', null)(SettingsSystemHostPower);
+export default connect('httpClient', null)(withMobileViewport(withIntlAsProp(SettingsSystemHostPower)));
