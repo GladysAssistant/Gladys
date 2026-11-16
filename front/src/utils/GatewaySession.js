@@ -16,6 +16,13 @@ const GATEWAY_RSA_PUBLIC_KEY_FINGERPRINT = 'gateway_rsa_public_key_fingerprint';
 const GATEWAY_ECDSA_PUBLIC_KEY_FINGERPRINT = 'gateway_ecdsa_public_key_fingerprint';
 const GATEWAY_TWO_FACTOR_ACCESS_TOKEN = 'gateway_two_factor_access_token';
 
+// A phone freezes the web app while it is in the background and kills its socket, sometimes
+// without the socket noticing before its next ping (up to 45 seconds later). Coming back
+// after at least this long in the background, the connection is checked right away.
+const BACKGROUND_DURATION_BEFORE_CHECK_MS = 5 * 1000;
+// How long the Gateway has to answer that check
+const CONNECTION_CHECK_TIMEOUT_MS = 5 * 1000;
+
 class GatewaySession {
   constructor() {
     this.user = null;
@@ -24,12 +31,20 @@ class GatewaySession {
     this.dispatcher = new Dispatcher();
     this.websocketConnected = false;
     this.connected = false;
+    // true while the socket is connected AND authenticated on the Gateway: the only time an
+    // API call can be sent (see GatewayHttpClient)
     this.ready = false;
+    this.disconnectionCount = 0;
+    this.hiddenSince = null;
+    // the check of the connection in progress, if any (see checkConnection)
+    this.connectionCheck = null;
+    this.stopWaitingForAnswer = null;
     this.gladysGatewayApiUrl = config.gladysGatewayApiUrl;
     this.gatewayClient = new GladysGatewayClient({
       serverUrl: config.gladysGatewayApiUrl,
       cryptoLib: window.crypto
     });
+    document.addEventListener('visibilitychange', this.onVisibilityChange.bind(this));
   }
 
   async init() {
@@ -64,14 +79,105 @@ class GatewaySession {
         }
         if (type === 'websocket.connected' && message.connected) {
           this.websocketConnected = true;
+          this.ready = true;
           this.dispatcher.dispatch('websocket.connected', { connected: true });
         }
         if (type === 'websocket.connected' && !message.connected) {
           this.websocketConnected = false;
+          // until the socket is authenticated again, API calls wait instead of being sent
+          // on a socket that cannot carry them
+          this.ready = false;
+          this.disconnectionCount += 1;
+          if (this.stopWaitingForAnswer) {
+            this.stopWaitingForAnswer();
+          }
           this.dispatcher.dispatch('websocket.connected', { connected: false });
         }
       });
-      this.ready = true;
+      // userConnect returns at once when the socket already exists, whatever its state
+      this.ready = this.websocketConnected;
+    }
+  }
+
+  onVisibilityChange() {
+    if (document.hidden) {
+      this.hiddenSince = Date.now();
+      return;
+    }
+    const hiddenSince = this.hiddenSince;
+    this.hiddenSince = null;
+    if (hiddenSince !== null && Date.now() - hiddenSince >= BACKGROUND_DURATION_BEFORE_CHECK_MS) {
+      this.checkConnection();
+    }
+  }
+
+  // Checks that the Gateway still answers on the socket, and reconnects when it does not.
+  // Resolves with whether the connection is usable, and never rejects. Nothing has to be
+  // refreshed after a successful check: a socket that is still alive delivered every event
+  // sent in the meantime, and a reconnection dispatches 'websocket.connected', which is what
+  // the components showing live data listen to in order to reload.
+  async checkConnection() {
+    // one check at a time, shared by everyone asking for it
+    if (!this.connectionCheck) {
+      this.connectionCheck = this.checkConnectionOnce();
+    }
+    const connectionCheck = this.connectionCheck;
+    try {
+      return await connectionCheck;
+    } catch (e) {
+      console.error(e);
+      return false;
+    } finally {
+      if (this.connectionCheck === connectionCheck) {
+        this.connectionCheck = null;
+      }
+    }
+  }
+
+  async checkConnectionOnce() {
+    const { socket } = this.gatewayClient;
+    // Nothing to check on a session that is not logged in, or that was closed (a logout
+    // leaves it behind with its socket). And a socket that is not connected is already
+    // being reconnected by socket.io.
+    if (!this.connected || !socket || !socket.connected) {
+      return false;
+    }
+    if (this.ready) {
+      const disconnectionCount = this.disconnectionCount;
+      if (await this.isGatewayAnswering()) {
+        return true;
+      }
+      if (disconnectionCount !== this.disconnectionCount) {
+        // the socket noticed by itself in the meantime, and is reconnecting or already has
+        return this.ready;
+      }
+    }
+    // Here the socket is either dead without knowing it, or connected without being
+    // authenticated: authenticating failed (the access token is fetched over HTTP) and
+    // nothing tries again before the next connection. Closing the socket ends the calls
+    // waiting for an answer (GatewayHttpClient), opening it again authenticates from scratch.
+    socket.disconnect();
+    socket.connect();
+    return false;
+  }
+
+  // Resolves with false when the Gateway has not answered within the timeout, or as soon as
+  // the socket closes: it will not answer either
+  async isGatewayAnswering() {
+    let timeout = null;
+    const answer = async () => {
+      await this.gatewayClient.calculateLatency();
+      return true;
+    };
+    const noAnswer = new Promise(resolve => {
+      timeout = setTimeout(resolve, CONNECTION_CHECK_TIMEOUT_MS, false);
+      this.stopWaitingForAnswer = () => resolve(false);
+    });
+    try {
+      return await Promise.race([answer(), noAnswer]);
+    } finally {
+      clearTimeout(timeout);
+      this.stopWaitingForAnswer = null;
     }
   }
 
