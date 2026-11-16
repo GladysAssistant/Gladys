@@ -72,7 +72,14 @@
     "time": "Hora",
     "event": "Evento",
     "noEventsInRange": "No hay eventos en este período.",
-    "noCalendarsConnected": "No hay calendarios conectados. Para conectar un calendario externo, vaya a la página de integraciones o pida a un usuario de su instancia de Gladys que le comparta sus calendarios."
+    "noCalendarsConnected": {
+      "title": "Todavía no hay ningún calendario conectado",
+      "installIntegration": "Los calendarios llegan a Gladys a través de integraciones de tipo «calendario» (servidor CalDAV, feed ICS…). Instale una desde el catálogo de integraciones y luego actívela para su cuenta en su sección «Mis calendarios».",
+      "enableInstalled": "Estas integraciones de calendario están instaladas: abra una y actívela para su cuenta en su sección «Mis calendarios» para ver sus eventos aquí.",
+      "askAdmin": "Los calendarios llegan a Gladys a través de integraciones de tipo «calendario». Pida a un administrador de esta instancia de Gladys que instale una y luego actívela para su cuenta.",
+      "browseCatalog": "Ver las integraciones de calendario",
+      "sharedCalendars": "Otro miembro del hogar también puede compartir uno de sus calendarios: aparecerá entonces aquí."
+    }
   },
   "device": {
     "searchPlaceHolder": "Buscar dispositivos",

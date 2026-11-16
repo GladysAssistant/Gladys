@@ -63,6 +63,22 @@ function createActions(store) {
           DeviceGetStatus: CalendarGetEventsStatus.Error
         });
       }
+    },
+    // the installed external integrations of type "calendar": when the user
+    // has no calendar yet, the page points them at the integration to enable
+    // for their account instead of a vague "go to the integrations"
+    async getCalendarIntegrations(state) {
+      try {
+        const integrations = await state.httpClient.get('/api/v1/external_integration');
+        store.setState({
+          calendarIntegrations: (integrations || []).filter(
+            integration => integration.manifest && integration.manifest.type === 'calendar'
+          )
+        });
+      } catch (e) {
+        // without the list the notice still points at the catalog
+        store.setState({ calendarIntegrations: [] });
+      }
     }
   };
   return actions;
