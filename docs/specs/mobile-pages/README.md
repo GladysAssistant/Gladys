@@ -25,8 +25,8 @@ the scene audit had measured:
    bottom of; a successful save shows nothing.
 
 The goal: **Gladys is usable from a phone as if it were a native app, end to end** — installing
-it (onboarding), configuring the house, renaming a device, checking the system, drawing a zone,
-setting up an energy contract.
+it (onboarding), signing in, configuring the house, renaming a device, checking the system,
+drawing a zone, setting up an energy contract.
 
 ## B. Scope and principles
 
@@ -95,6 +95,10 @@ cards**, the pattern of the devices list.
   16 px text, the same border, radius (14 px) and focus ring; a select shows the same chevron; a
   field and its unit or its reveal button are one control (`fieldClass.group` + `.addon`). An
   invalid control keeps its red border in dark mode (`fieldClass.invalid`, `.groupInvalid`).
+- `MobilePasswordField`: a password and its **reveal button** in one control (`aria-pressed`,
+  named by `mobileKit.togglePassword`), without capitals nor correction. `autocomplete` is
+  "current-password" (the phone fills the saved one) or "new-password" (it proposes a strong
+  one). A form that shows two passwords together drives both (`revealed` / `onToggleReveal`).
 - The right keyboard for each field: `inputmode`, `autocomplete`, `autocapitalize`,
   `enterkeyhint`, and the native field of the system for a date or a time.
 - `MobileSwitch` (52 × 32 px in a 60 × 44 px target, `role="switch"`), `MobileSegmented` (two to
@@ -181,6 +185,7 @@ Each file owns the phone behavior of its pages.
 | [`energy.md`](energy.md) | Energy monitoring: consumption, "My devices", contracts and the contract wizard |
 | [`map-areas.md`](map-areas.md) | Zones of the map (`routes/map/NewArea.jsx`, `NewAreaMap.jsx`) |
 | [`onboarding.md`](onboarding.md) | Onboarding (`routes/signup`), the five steps |
+| [`auth.md`](auth.md) | The logged-out pages: sign-in, password recovery, keypad of an armed house, and the Gladys Plus sign-in, two-factor, e-mail and account pages |
 
 ## E. Tests
 

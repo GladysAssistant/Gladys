@@ -9,3 +9,118 @@
 .lockedDeleteButton {
   width: 4rem;
 }
+
+/* ==================================================================
+   The keypad on a phone (docs/specs/mobile-pages/auth.md, C.4).
+   Light colors only: dark mode is the app-wide inversion.
+   ================================================================== */
+
+/* the code as it is typed: dots, centered, as large as the keys they come from */
+:global(.auth-page) input.mobileCode {
+  min-height: 56px;
+  font-size: 1.75rem;
+  letter-spacing: 0.3em;
+  text-align: center;
+}
+
+:global(.auth-page) input.mobileCode::placeholder {
+  font-size: 1rem;
+  letter-spacing: normal;
+}
+
+.mobileKeypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 22rem;
+  margin: 0 auto;
+}
+
+/* the keys share the height the title and the bars leave: generous on a tall screen, never
+   below a touch target on a short one — the keypad is typed on without scrolling */
+.mobileKey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  min-height: clamp(44px, calc((100dvh - 410px) / 4), 72px);
+  padding: 0;
+  border: 1px solid #e4e8ef;
+  border-radius: 18px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 1.625rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  /* a code is typed fast: no double-tap zoom, no text selection, no gray flash */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobileKey:active {
+  background-color: #e3ebfb;
+  border-color: #c5d3f5;
+}
+
+.mobileKey:focus {
+  outline: none;
+}
+
+.mobileKey:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+.mobileKeyDelete {
+  border-color: transparent;
+  background-color: transparent;
+  color: #4f5866;
+  font-size: 1.5rem;
+}
+
+.mobileKeyDelete:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* a short screen (an iPhone SE): the title and the gaps give their room to the keys */
+@media (max-height: 620px) and (orientation: portrait) {
+  .mobileLocked h1 {
+    font-size: 1.625rem;
+  }
+
+  .mobileLockedIntro > div {
+    margin-bottom: 10px;
+  }
+
+  .mobileKeypad {
+    gap: 8px;
+  }
+}
+
+/* a phone in landscape, a small wall panel: the code on the left, the keypad on the right,
+   nothing to scroll */
+@media (max-height: 500px) and (orientation: landscape) {
+  .mobileLocked {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
+  }
+
+  .mobileKeypad {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .mobileKey {
+    min-height: 44px;
+    min-height: clamp(44px, calc((100dvh - 172px) / 4), 72px);
+    font-size: 1.375rem;
+    border-radius: 14px;
+  }
+}

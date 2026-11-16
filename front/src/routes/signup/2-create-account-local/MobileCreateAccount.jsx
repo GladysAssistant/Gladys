@@ -4,8 +4,14 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../utils/withIntlAsProp';
-import { MobileField, fieldClass, MobileBottomBar, BigButton, kitStyle } from '../../../components/mobile';
-import style from '../style.css';
+import {
+  MobileField,
+  MobilePasswordField,
+  fieldClass,
+  MobileBottomBar,
+  BigButton,
+  kitStyle
+} from '../../../components/mobile';
 
 const LANGUAGES = [
   { value: 'en', textId: 'profile.english' },
@@ -65,43 +71,22 @@ class MobileCreateAccount extends Component {
     setTimeout(this.revealFirstError, 0);
   };
 
-  renderPasswordField({ id, labelId, errorId, value, onInput, invalid, valid, placeholderId, help }) {
-    const { showPassword } = this.state;
+  renderPasswordField({ id, labelId, errorId, value, onInput, invalid, placeholderId }) {
     return (
-      <MobileField label={<Text id={labelId} />} htmlFor={id} error={invalid && <Text id={errorId} />} help={help}>
-        <div class={cx(fieldClass.group, { [style.mobileGroupInvalid]: invalid })}>
-          <Localizer>
-            <input
-              id={id}
-              type={showPassword ? 'text' : 'password'}
-              class={fieldClass.input}
-              value={value || ''}
-              onInput={onInput}
-              placeholder={<Text id={placeholderId} />}
-              autocomplete="new-password"
-              autocapitalize="off"
-              autocorrect="off"
-              spellcheck={false}
-              aria-required="true"
-              aria-invalid={invalid ? 'true' : 'false'}
-              data-valid={valid ? 'true' : undefined}
-              data-cy={`signup-${id}`}
-            />
-          </Localizer>
-          <Localizer>
-            <button
-              type="button"
-              class={fieldClass.addon}
-              onClick={this.togglePassword}
-              aria-pressed={showPassword ? 'true' : 'false'}
-              aria-label={<Text id="signup.mobile.togglePassword" />}
-              data-cy={`signup-${id}-reveal`}
-            >
-              <i class={cx('fe', showPassword ? 'fe-eye-off' : 'fe-eye')} aria-hidden="true" />
-            </button>
-          </Localizer>
-        </div>
-      </MobileField>
+      <MobilePasswordField
+        id={id}
+        label={<Text id={labelId} />}
+        error={invalid && <Text id={errorId} />}
+        value={value}
+        onInput={onInput}
+        placeholder={<Text id={placeholderId} />}
+        autocomplete="new-password"
+        required
+        // one button shows or hides both passwords
+        revealed={this.state.showPassword}
+        onToggleReveal={this.togglePassword}
+        dataCy={`signup-${id}`}
+      />
     );
   }
 

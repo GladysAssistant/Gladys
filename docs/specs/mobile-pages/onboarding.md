@@ -22,7 +22,8 @@ card that wraps:
 ## B. The shell (< 768 px)
 
 `routes/signup/layout.jsx` renders, below the phone breakpoint, `MobileSignupLayout` instead of
-the card:
+the card. It is the shell of every logged-out page (`components/auth/MobileAuthLayout.jsx`,
+[`auth.md`](auth.md) B) with the progress of the flow above the content:
 
 - the **navigation bar** of the kit, with the logo and "Gladys Assistant" as its title, and the
   way back only where going back makes sense (the account step goes back to the welcome; once
@@ -62,8 +63,8 @@ profile and user pages, is not touched.
 | Language | the native list of the system |
 | Password, repeated | `autocomplete="new-password"` (the phone proposes and keeps a strong password), no capitals, no correction |
 
-- Each password field has a **reveal button** in the same control (`aria-pressed`); it shows or
-  hides both.
+- Each password field has a **reveal button** in the same control (`MobilePasswordField`,
+  README C.3); it shows or hides both.
 - The validation is the one of the container (first name, last name, a valid e-mail, 8
   characters, the same password twice). **The error of a field is next to it** (`role="alert"`),
   and submitting brings **the first refused field into view and focuses it**: it may be a screen
@@ -119,8 +120,11 @@ line, and **Go to dashboard** in the bottom bar.
 The same four screens as on desktop, in the shell of section B (titled "Restore a backup",
 without the five-step progress, with the way back to the welcome):
 
-1. the **Gladys Plus sign-in** — the shared form (`GatewayLoginForm`), with fields of 16 px and
-   targets of a phone inside this shell;
+1. the **Gladys Plus sign-in** — its phone form (`MobileGatewayLoginForm`, [`auth.md`](auth.md)
+   D.1): the account, then the code of the two-factor app or a recovery code, the action in the
+   bottom bar. The page gives it the state of the recovery code
+   (`gatewayLoginUseRecoveryCode`, `gatewayLoginRecoveryCode`), which it did not read before:
+   "Use a recovery code" did nothing in this path, on any screen size;
 2. the **backup key**: one field (no capitals, no correction: a key is pasted or typed as it
    is), its help, **Save** in the bottom bar;
 3. the **backups** as rows — the date of the backup, then how long ago and its size — with "Change
@@ -136,7 +140,8 @@ On screens 2 and 3, "Create a local account" is a row leading to the account ste
   (`0-signup/SignUp.cy.js`) passes unchanged.
 - The requests and their payloads, the route of each step, the confetti of the last one.
 - The existing translations are reused; the new ones are under `signup.mobile` (and
-  `housesSettings.mobile` for the pieces shared with the house settings).
+  `housesSettings.mobile` for the pieces shared with the house settings, `mobileKit` for the
+  reveal button of a password).
 
 ## F. Tests
 
@@ -151,8 +156,9 @@ On screens 2 and 3, "Create a local account" is a row leading to the account ste
   the `POST /signup` body, the preferences picked with the segmented controls and their two
   requests, the house refused without a name, located from an address then from the phone, its
   rooms toggled and typed, the `POST /house` body and one `POST …/room` per room, the last
-  screen; the restore path (the key, the backups as rows, the confirmation that can be
-  cancelled, the way to a local account); the card kept on a wider screen.
+  screen; the restore path (the Gladys Plus sign-in and its second factor, the key, the backups
+  as rows, the confirmation that can be cancelled, the way to a local account); the card kept on
+  a wider screen.
 - Phone emulation with a real touch screen (Playwright, 390 px and 320 px, light and dark), **on
   a fresh instance, without stubs**: the five steps end to end — the account, the preferences,
   the house located with the position of the phone and its rooms created on the server — then

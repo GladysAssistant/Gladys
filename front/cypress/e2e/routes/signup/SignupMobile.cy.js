@@ -266,6 +266,67 @@ describe('Onboarding on a phone', () => {
     cy.location('pathname').should('eq', '/signup/create-account-local');
   });
 
+  it('should sign in to Gladys Plus before the restore: the account, then the second factor', () => {
+    cy.intercept(
+      { method: 'POST', url: `${serverUrl}/api/v1/gateway/login` },
+      { body: { two_factor_token: 'two-factor-token' } }
+    ).as('gatewayLogin');
+    cy.intercept(
+      { method: 'POST', url: `${serverUrl}/api/v1/gateway/login-two-factor` },
+      { statusCode: 403, body: {} }
+    ).as('gatewayLoginTwoFactor');
+
+    cy.visit('/signup/create-account-gladys-gateway');
+    cy.get('[data-cy=gateway-login-mobile]').should('be.visible');
+    cy.get('[data-cy=gateway-login-email]')
+      .should('have.attr', 'autocomplete', 'username')
+      .and('have.css', 'font-size', '16px');
+    cy.get('[data-cy=gateway-login-password]').should('have.attr', 'autocomplete', 'current-password');
+    cy.get('[data-cy=gateway-login-forgot-password]').should(
+      'have.attr',
+      'href',
+      'https://plus.gladysassistant.com/forgot-password'
+    );
+
+    // not an e-mail address: said next to the field, nothing is sent
+    cy.get('[data-cy=gateway-login-submit]').click();
+    cy.get('[data-cy=gateway-login-mobile] [role=alert]').i18n('gatewayLogin.invalidEmail');
+    cy.get('@gatewayLogin.all').should('have.length', 0);
+
+    cy.get('[data-cy=gateway-login-email]').type(user.email);
+    cy.get('[data-cy=gateway-login-password]').type('my-gladys-plus-password');
+    cy.get('[data-cy=gateway-login-submit]').click();
+    cy.wait('@gatewayLogin')
+      .its('request.body')
+      .should('deep.equal', { email: user.email, password: 'my-gladys-plus-password' });
+
+    // the second factor: the numeric keyboard, the code proposed by the phone
+    cy.get('[data-cy=gateway-login-two-factor-code]')
+      .should('have.attr', 'autocomplete', 'one-time-code')
+      .and('have.attr', 'inputmode', 'numeric');
+    // the six digits are sent as soon as they are typed
+    cy.get('[data-cy=gateway-login-two-factor-code]').type('123456');
+    cy.wait('@gatewayLoginTwoFactor')
+      .its('request.body')
+      .should('include', { two_factor_token: 'two-factor-token', two_factor_code: '123456' });
+
+    // lost the app: a recovery code instead, and back
+    cy.get('[data-cy=lost-two-factor-use-recovery-code]').click();
+    cy.get('[data-cy=gateway-login-two-factor-code]').should('not.exist');
+    cy.get('[data-cy=gateway-login-recovery-code]').type('my-recovery-code');
+    cy.get('[data-cy=gateway-login-submit]').click();
+    cy.wait('@gatewayLoginTwoFactor')
+      .its('request.body')
+      .should('include', { two_factor_token: 'two-factor-token', two_factor_recovery_code: 'my-recovery-code' });
+    cy.get('[data-cy=lost-two-factor-use-app-code]').click();
+    cy.get('[data-cy=gateway-login-two-factor-code]').should('be.visible');
+    // the reset by e-mail is a Gladys Plus page: not offered from an instance
+    cy.get('[data-cy=lost-two-factor-reset]').should('not.exist');
+    cy.document().then(doc => {
+      expect(doc.documentElement.scrollWidth).to.be.at.most(doc.documentElement.clientWidth);
+    });
+  });
+
   it('should keep the card and the step pills on a wider screen', () => {
     cy.viewport(1280, 800);
     cy.visit('/signup');

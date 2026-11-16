@@ -2,6 +2,8 @@ import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../utils/consts';
 import AuthLayout from '../../components/auth/AuthLayout';
+import MobileLinkGatewayUser from './MobileLinkGatewayUser';
+import { withMobileViewport } from '../../components/mobile';
 import style from './style.css';
 
 const NOT_ACCEPTED_LOCALLY_TEXTS = {
@@ -74,7 +76,7 @@ const UserNotAcceptedLocally = props => {
   );
 };
 
-const LinkGatewayUser = ({ children, ...props }) => (
+const DesktopLinkGatewayUser = ({ children, ...props }) => (
   <AuthLayout size="medium">
     <div class="card">
       <div class="card-header">
@@ -189,4 +191,7 @@ const LinkGatewayUser = ({ children, ...props }) => (
   </AuthLayout>
 );
 
-export default LinkGatewayUser;
+const LinkGatewayUser = ({ isMobile, ...props }) =>
+  isMobile ? <MobileLinkGatewayUser {...props} /> : <DesktopLinkGatewayUser {...props} />;
+
+export default withMobileViewport(LinkGatewayUser);

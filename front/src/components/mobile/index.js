@@ -14,6 +14,7 @@ import {
 } from './MobileList';
 import MobileSwitch from './MobileSwitch';
 import MobileField, { fieldClass } from './MobileField';
+import MobilePasswordField from './MobilePasswordField';
 import MobileSegmented from './MobileSegmented';
 import MobileSteps from './MobileSteps';
 import MobileBottomBar, { BigButton, DirtyLabel } from './MobileBottomBar';
@@ -35,6 +36,7 @@ export {
   MobileEmptyState,
   MobileSwitch,
   MobileField,
+  MobilePasswordField,
   fieldClass,
   MobileSegmented,
   MobileSteps,
