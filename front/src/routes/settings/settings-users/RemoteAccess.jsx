@@ -353,6 +353,11 @@ class RemoteAccess extends Component {
                 <Text id={`usersSettings.plus.statusText.${status}`} fields={{ date: invitedOn }} />
               )}
             </p>
+            {status === REMOTE_STATUS.INVITED && !unknown && (
+              <p class={style.remoteHint}>
+                <i class="fe fe-inbox" /> <Text id="usersSettings.plus.invitedNotReceived" />
+              </p>
+            )}
             {(plusEmail || account || (remote && remote.keys && remote.keys.connected)) && !unknown && (
               <div class={style.remoteMeta}>
                 {plusEmail && <span>{remote.email}</span>}

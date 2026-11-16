@@ -5161,6 +5161,7 @@
         "none": "Kein Gladys-Plus-Konto: Dieser Benutzer kann Gladys nur von zu Hause aus nutzen."
       },
       "statusUnavailable": "Der Fernzugriff kann nicht geprüft werden, solange deine Instanz nicht mit Gladys Plus verbunden ist.",
+      "invitedNotReceived": "Nicht angekommen? Bitte die Person, ihre Ordner Spam, Werbung und Soziale Netzwerke zu prüfen.",
       "memberSince": "Bei Gladys Plus seit {{date}}",
       "online": "Gerade verbunden",
       "plusRole": {
