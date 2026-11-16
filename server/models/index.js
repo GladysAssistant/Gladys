@@ -1,3 +1,4 @@
+const fs = require('fs');
 const os = require('os');
 const Sequelize = require('sequelize');
 const { DuckDBInstance, DuckDBTimestampValue } = require('@duckdb/node-api');
@@ -10,6 +11,10 @@ const logger = require('../utils/logger');
 const { formatDateInUTC } = require('../utils/date');
 
 const config = getConfig();
+
+// Sequelize creates the folder of the SQLite database when it connects, with this very call,
+// but DuckDB is opened before that and does not create it. No-op when the folder exists.
+fs.mkdirSync(path.dirname(config.storage), { recursive: true });
 
 // SQLite
 const sequelize = new Sequelize('mainDB', null, null, config);
