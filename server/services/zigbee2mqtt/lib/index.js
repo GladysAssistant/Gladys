@@ -7,9 +7,11 @@ const { handleMqttMessage } = require('./handleMqttMessage');
 const { publish } = require('./publish');
 const { getDiscoveredDevices } = require('./getDiscoveredDevices');
 const { syncRenamedDevices } = require('./syncRenamedDevices');
+const { postCreate } = require('./postCreate');
 const { postDelete } = require('./postDelete');
 const { findMatchingExpose } = require('./findMatchingExpose');
 const { readValue } = require('./readValue');
+const { emitDeviceState } = require('./emitDeviceState');
 const { setValue } = require('./setValue');
 const { status } = require('./status');
 const { isEnabled } = require('./isEnabled');
@@ -52,6 +54,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.mqttClient = null;
 
   this.discoveredDevices = {};
+  // Last value of each property received from each device not created in Gladys yet, by IEEE address,
+  // saved when the device is created
+  this.lastReceivedStates = {};
   this.syncRenamedDevicesRunning = false;
   this.pendingSyncRenamedDevices = null;
   this.lastBridgeDevices = null;
@@ -97,9 +102,11 @@ Zigbee2mqttManager.prototype.handleMqttMessage = handleMqttMessage;
 Zigbee2mqttManager.prototype.publish = publish;
 Zigbee2mqttManager.prototype.getDiscoveredDevices = getDiscoveredDevices;
 Zigbee2mqttManager.prototype.syncRenamedDevices = syncRenamedDevices;
+Zigbee2mqttManager.prototype.postCreate = postCreate;
 Zigbee2mqttManager.prototype.postDelete = postDelete;
 Zigbee2mqttManager.prototype.findMatchingExpose = findMatchingExpose;
 Zigbee2mqttManager.prototype.readValue = readValue;
+Zigbee2mqttManager.prototype.emitDeviceState = emitDeviceState;
 Zigbee2mqttManager.prototype.setValue = setValue;
 Zigbee2mqttManager.prototype.status = status;
 Zigbee2mqttManager.prototype.isEnabled = isEnabled;

@@ -303,6 +303,20 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
+  it('should forget the last values of the devices that left the network', async () => {
+    // PREPARE
+    zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
+    const stillThere = { temperature: { value: 19.5, receivedAt: '2026-11-15T09:00:00.000Z' } };
+    zigbee2mqttManager.lastReceivedStates = {
+      '0x00158d00033e88d5': stillThere,
+      '0x00158d0000000000': { temperature: { value: 21, receivedAt: '2026-11-15T09:00:00.000Z' } },
+    };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
+    // ASSERT
+    expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({ '0x00158d00033e88d5': stillThere });
+  });
+
   it('should get permit join from config', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config', `{"permit_join": true}`);
@@ -400,6 +414,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   describe('device with "/" in its friendly name', () => {
     const lightDevice = {
       friendly_name: 'salon/lampe',
+      ieee_address: '0x0017880104e45517',
       supported: true,
       definition: {
         exposes: [
@@ -476,6 +491,67 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       // ASSERT
       assert.calledOnceWithExactly(warnStub, 'Zigbee2mqtt device salon/lampe not configured in Gladys.');
       assert.notCalled(gladys.event.emit);
+    });
+
+    describe('last values received', () => {
+      let clock;
+
+      beforeEach(() => {
+        clock = sinon.useFakeTimers(new Date('2026-11-15T09:00:00.000Z'));
+      });
+
+      afterEach(() => {
+        clock.restore();
+      });
+
+      it('should keep the last value of each property of a device not configured in Gladys, with its date', async () => {
+        // PREPARE
+        zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
+        // EXECUTE
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"state":"OFF","linkquality":120}`);
+        clock.tick(60 * 1000);
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"linkquality":90}`);
+        // ASSERT
+        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({
+          '0x0017880104e45517': {
+            state: { value: 'OFF', receivedAt: '2026-11-15T09:00:00.000Z' },
+            linkquality: { value: 90, receivedAt: '2026-11-15T09:01:00.000Z' },
+          },
+        });
+      });
+
+      it('should not keep the values of a device configured in Gladys, as they are saved right away', async () => {
+        // EXECUTE
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"state":"ON"}`);
+        // ASSERT
+        assert.calledOnce(gladys.event.emit);
+        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+      });
+
+      ['not json', 'null', '"ON"', '[{"state":"ON"}]'].forEach((message) => {
+        it(`should ignore a message that is not a state: ${message}`, async () => {
+          // PREPARE
+          const warnStub = sinon.stub(logger, 'warn');
+          // EXECUTE
+          await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', message);
+          // ASSERT
+          assert.calledOnceWithExactly(
+            warnStub,
+            `Zigbee2mqtt device salon/lampe sent a message that is not a state: ${message}`,
+          );
+          assert.notCalled(gladys.event.emit);
+          expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+        });
+      });
+
+      it('should not keep the values of a device unknown by Zigbee2mqtt', async () => {
+        // PREPARE
+        zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
+        // EXECUTE
+        await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe/availability', `{"state":"online"}`);
+        // ASSERT
+        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+      });
     });
   });
 

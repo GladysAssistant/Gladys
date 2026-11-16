@@ -124,6 +124,17 @@ describe('zigbee2mqtt disconnect', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
   });
 
+  it('should forget the values received, not to save them when a device is created later', async () => {
+    // PREPARE
+    zigbee2MqttManager.lastReceivedStates = {
+      '0x00158d00033e88d5': { battery: { value: 59, receivedAt: '2026-11-15T09:00:00.000Z' } },
+    };
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    expect(zigbee2MqttManager.lastReceivedStates).to.deep.equal({});
+  });
+
   it('clear backup interval', async () => {
     // PREPARE
     zigbee2MqttManager.backupScheduledJob = {

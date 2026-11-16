@@ -69,6 +69,19 @@ describe('zigbee2mqtt connect', () => {
     expect(zigbee2mqttManager.mqttClient).to.eq(null);
   });
 
+  it('should forget the values received from the previous broker', async () => {
+    // PREPARE
+    zigbee2mqttManager.mqttRunning = false;
+    zigbee2mqttManager.mqttClient = mqttClient;
+    zigbee2mqttManager.lastReceivedStates = {
+      '0x00158d00033e88d5': { battery: { value: 59, receivedAt: '2026-11-15T09:00:00.000Z' } },
+    };
+    // EXECUTE
+    await zigbee2mqttManager.connect(configuration);
+    // ASSERT
+    expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+  });
+
   it('it should not try to connect to mqtt', async () => {
     // PREPARE
     zigbee2mqttManager.mqttRunning = false;

@@ -42,6 +42,8 @@ async function disconnect() {
   }
   this.gladysConnected = false;
   this.mqttConnectionError = null;
+  // Values of another broker, or of a previous run, are not saved when a device is created
+  this.lastReceivedStates = {};
   clearTimeout(this.healthCheckTimer);
   this.healthCheckTimer = null;
   this.emitStatusEvent();
