@@ -5271,7 +5271,22 @@
     "session": "Session",
     "revoke": "Révoquer",
     "unknowDevice": "Appareil inconnu",
-    "apiKey": "Clé API"
+    "apiKey": "Clé API",
+    "mobile": {
+      "thisDevice": "Cet appareil",
+      "thisDeviceTitle": "Cet appareil",
+      "otherDevicesTitle": "Autres appareils",
+      "noOtherDevice": "Aucun autre appareil n'est connecté.",
+      "apiKeysTitle": "Clés d'API",
+      "hint": "Révoquez une session pour déconnecter son appareil de Gladys.",
+      "loadError": "Impossible de charger les sessions. Réessayez.",
+      "revokeTitle": "Révoquer cette session ?",
+      "revokeText": "cet appareil sera déconnecté de Gladys.",
+      "revokeCurrentText": "c'est la session de l'appareil que vous utilisez : vous serez déconnecté.",
+      "revokeApiKeyText": "ce qui utilise cette clé d'API ne pourra plus joindre Gladys.",
+      "revokeError": "Impossible de révoquer la session. Réessayez.",
+      "revoked": "Session révoquée"
+    }
   },
   "servicesSettings": {
     "title": "Services",
@@ -5308,7 +5323,24 @@
         "detail": "Service en erreur lors du démarrage."
       }
     },
-    "action": "Action"
+    "action": "Action",
+    "mobile": {
+      "searchPlaceholder": "Chercher un service",
+      "filters": {
+        "all": "Tous",
+        "running": "Démarrés",
+        "error": "En erreur",
+        "stopped": "Arrêtés"
+      },
+      "noResult": "Aucun service ne correspond.",
+      "actionError": "Impossible de changer l'état du service. Réessayez.",
+      "started": "Service démarré",
+      "startedHelp": "Arrêté, l'intégration ne fonctionne plus jusqu'à son redémarrage.",
+      "starting": "Démarrage…",
+      "stopping": "Arrêt…",
+      "internalName": "Nom interne",
+      "openIntegration": "Ouvrir l'intégration"
+    }
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -5421,6 +5453,12 @@
     "jobStatuses": {
       "success": "Succès",
       "failed": "Echec"
+    },
+    "mobile": {
+      "description": "Ce que Gladys exécute en arrière-plan, du plus récent au plus ancien. À consulter quand quelque chose semble anormal.",
+      "empty": "Aucune tâche en arrière-plan pour l'instant.",
+      "showMore": "Afficher toute l'erreur",
+      "showLess": "Réduire"
     }
   },
   "systemSettings": {
@@ -5547,7 +5585,18 @@
     "downloadLogsProgress": "Téléchargement {{downloaded}} sur {{total}}...",
     "downloadLogsError": "Impossible de télécharger les logs. Vérifiez que Gladys est lancée via Docker, puis réessayez.",
     "cpuTemperature": "T° CPU",
-    "cpuTemperatureValue": "{{value}} °C"
+    "cpuTemperatureValue": "{{value}} °C",
+    "mobile": {
+      "statusTitle": "État",
+      "updatesTitle": "Mises à jour",
+      "preferencesTitle": "Préférences",
+      "maintenanceTitle": "Maintenance",
+      "checkForUpdatesText": "Gladys vérifie automatiquement si une nouvelle version est disponible.",
+      "updateTitle": "Mettre à jour Gladys ?",
+      "updateText": "Gladys redémarre pendant la mise à jour et reste indisponible quelques minutes.",
+      "vacuumTitle": "Nettoyer la base de données ?",
+      "vacuumText": "Gladys est indisponible jusqu'à la fin du nettoyage. Aucune donnée n'est supprimée."
+    }
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
@@ -5954,6 +6003,19 @@
       "noSuccessYet": "Aucune sauvegarde n'a encore réussi sur cette instance.",
       "lastError": "Dernière erreur : {{error}}",
       "retry": "Gladys réessaie chaque nuit et quelques minutes après chaque démarrage. Les administrateurs sont prévenus dans la conversation à partir de la deuxième nuit d'échec, puis une fois par semaine tant que ça échoue ; une fois prévenus, ils sont informés dès qu'une sauvegarde réussit à nouveau. Détails dans l'onglet \"Tâches\"."
+    },
+    "mobile": {
+      "backupError": "Impossible de lancer la sauvegarde. Réessayez.",
+      "loadError": "Impossible de charger les sauvegardes. Réessayez.",
+      "backupsTitle": {
+        "one": "1 sauvegarde",
+        "other": "{{count}} sauvegardes"
+      },
+      "restoreHint": "Touchez une sauvegarde pour la restaurer.",
+      "empty": "Aucune sauvegarde pour l'instant. Gladys en crée une toutes les 24 heures.",
+      "restoreTitle": "Restaurer cette sauvegarde ?",
+      "restoreText": "Gladys reviendra à son état du {{date}} et redémarrera. Tout ce qui a changé depuis sera perdu.",
+      "restoreError": "Impossible de lancer la restauration. Réessayez."
     }
   },
   "alarmModes": {
@@ -7865,7 +7927,31 @@
     "registered": "Enregistré le",
     "keyNameLabel": "Clé :",
     "registeredLabel": "Enregistré le :",
-    "neverUsed": "Jamais"
+    "neverUsed": "Jamais",
+    "mobile": {
+      "createButton": "Créer une clé d'API",
+      "createTitle": "Nouvelle clé d'API",
+      "keyTitle": "Votre clé d'API",
+      "namePlaceholder": "ex. Raccourci du téléphone",
+      "nameHelp": "Un nom pour reconnaître ce qui utilise cette clé.",
+      "nameRequired": "Donnez un nom à la clé.",
+      "createError": "Impossible de créer la clé. Réessayez.",
+      "copy": "Copier la clé",
+      "copied": "Clé copiée",
+      "selected": "Clé sélectionnée : copiez-la",
+      "keysTitle": {
+        "one": "1 clé",
+        "other": "{{count}} clés"
+      },
+      "empty": "Aucune clé d'API pour l'instant.",
+      "created": "Créée le {{date}}",
+      "lastUsed": "Dernière utilisation le {{date}}",
+      "neverUsed": "Jamais utilisée",
+      "revokeTitle": "Révoquer cette clé ?",
+      "revokeText": "« {{name}} » cessera de fonctionner immédiatement : ce qui l'utilise ne pourra plus joindre Gladys.",
+      "revokeError": "Impossible de révoquer la clé. Réessayez.",
+      "revoked": "Clé révoquée"
+    }
   },
   "twoFactorApps": {
     "description": "N'importe quelle application générant des codes à 6 chiffres fonctionne. Si vous n'en avez pas encore, voici quelques applications gratuites et simples à installer :"

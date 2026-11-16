@@ -5271,7 +5271,22 @@
     "session": "Sesión",
     "revoke": "Revocar",
     "unknowDevice": "Dispositivo desconocido",
-    "apiKey": "Clave de API"
+    "apiKey": "Clave de API",
+    "mobile": {
+      "thisDevice": "Este dispositivo",
+      "thisDeviceTitle": "Este dispositivo",
+      "otherDevicesTitle": "Otros dispositivos",
+      "noOtherDevice": "Ningún otro dispositivo ha iniciado sesión.",
+      "apiKeysTitle": "Claves de API",
+      "hint": "Revoca una sesión para cerrar la sesión de su dispositivo en Gladys.",
+      "loadError": "No se pudieron cargar las sesiones. Inténtalo de nuevo.",
+      "revokeTitle": "¿Revocar esta sesión?",
+      "revokeText": "se cerrará la sesión de este dispositivo en Gladys.",
+      "revokeCurrentText": "es la sesión del dispositivo que estás usando: se cerrará tu sesión.",
+      "revokeApiKeyText": "lo que use esta clave de API ya no podrá acceder a Gladys.",
+      "revokeError": "No se pudo revocar la sesión. Inténtalo de nuevo.",
+      "revoked": "Sesión revocada"
+    }
   },
   "servicesSettings": {
     "title": "Servicios",
@@ -5308,7 +5323,24 @@
         "detail": "El servicio no se pudo iniciar."
       }
     },
-    "action": "Acción"
+    "action": "Acción",
+    "mobile": {
+      "searchPlaceholder": "Buscar un servicio",
+      "filters": {
+        "all": "Todos",
+        "running": "Iniciados",
+        "error": "Con error",
+        "stopped": "Detenidos"
+      },
+      "noResult": "Ningún servicio coincide.",
+      "actionError": "No se pudo cambiar el estado del servicio. Inténtalo de nuevo.",
+      "started": "Servicio iniciado",
+      "startedHelp": "Detenido, la integración deja de funcionar hasta que se vuelva a iniciar.",
+      "starting": "Iniciando…",
+      "stopping": "Deteniendo…",
+      "internalName": "Nombre interno",
+      "openIntegration": "Abrir la integración"
+    }
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -5421,6 +5453,12 @@
     "jobStatuses": {
       "success": "Éxito",
       "failed": "Fallo"
+    },
+    "mobile": {
+      "description": "Lo que Gladys ejecuta en segundo plano, lo más reciente primero. Consúltalo cuando algo parezca ir mal.",
+      "empty": "Todavía no hay ninguna tarea en segundo plano.",
+      "showMore": "Mostrar todo el error",
+      "showLess": "Mostrar menos"
     }
   },
   "systemSettings": {
@@ -5547,7 +5585,18 @@
     "downloadLogsProgress": "Descargando {{downloaded}} de {{total}}...",
     "downloadLogsError": "No se pudieron descargar los registros. Asegúrese de que Gladys se esté ejecutando en Docker y vuelva a intentarlo.",
     "cpuTemperature": "Temperatura de la CPU",
-    "cpuTemperatureValue": "{{value}} °C"
+    "cpuTemperatureValue": "{{value}} °C",
+    "mobile": {
+      "statusTitle": "Estado",
+      "updatesTitle": "Actualizaciones",
+      "preferencesTitle": "Preferencias",
+      "maintenanceTitle": "Mantenimiento",
+      "checkForUpdatesText": "Gladys comprueba automáticamente si hay nuevas versiones.",
+      "updateTitle": "¿Actualizar Gladys?",
+      "updateText": "Gladys se reinicia durante la actualización y no está disponible durante unos minutos.",
+      "vacuumTitle": "¿Limpiar la base de datos?",
+      "vacuumText": "Gladys no estará disponible hasta que termine la limpieza. No se elimina ningún dato."
+    }
   },
   "newArea": {
     "createNewZoneButton": "Crear nueva zona",
@@ -5954,6 +6003,19 @@
       "noSuccessYet": "Ninguna copia de seguridad ha tenido éxito todavía en esta instancia.",
       "lastError": "Último error: {{error}}",
       "retry": "Gladys lo reintenta cada noche y unos minutos después de cada inicio. Los administradores reciben un aviso en la conversación a partir de la segunda noche fallida, luego una vez por semana mientras siga fallando; una vez avisados, se les informa en cuanto una copia vuelve a funcionar. Detalles en la pestaña \"Tareas\"."
+    },
+    "mobile": {
+      "backupError": "No se pudo iniciar la copia de seguridad. Inténtalo de nuevo.",
+      "loadError": "No se pudieron cargar las copias de seguridad. Inténtalo de nuevo.",
+      "backupsTitle": {
+        "one": "1 copia de seguridad",
+        "other": "{{count}} copias de seguridad"
+      },
+      "restoreHint": "Toca una copia de seguridad para restaurarla.",
+      "empty": "Todavía no hay ninguna copia de seguridad. Gladys crea una cada 24 horas.",
+      "restoreTitle": "¿Restaurar esta copia de seguridad?",
+      "restoreText": "Gladys volverá a su estado del {{date}} y se reiniciará. Todo lo que haya cambiado desde entonces se perderá.",
+      "restoreError": "No se pudo iniciar la restauración. Inténtalo de nuevo."
     }
   },
   "alarmModes": {
@@ -7865,7 +7927,31 @@
     "registered": "Registrada",
     "keyNameLabel": "Nombre:",
     "registeredLabel": "Registrada:",
-    "neverUsed": "Nunca"
+    "neverUsed": "Nunca",
+    "mobile": {
+      "createButton": "Crear una clave de API",
+      "createTitle": "Nueva clave de API",
+      "keyTitle": "Tu clave de API",
+      "namePlaceholder": "p. ej. Atajo del teléfono",
+      "nameHelp": "Un nombre para reconocer qué usa esta clave.",
+      "nameRequired": "Ponle un nombre a la clave.",
+      "createError": "No se pudo crear la clave. Inténtalo de nuevo.",
+      "copy": "Copiar la clave",
+      "copied": "Clave copiada",
+      "selected": "Clave seleccionada: cópiala",
+      "keysTitle": {
+        "one": "1 clave",
+        "other": "{{count}} claves"
+      },
+      "empty": "Todavía no hay ninguna clave de API.",
+      "created": "Creada el {{date}}",
+      "lastUsed": "Último uso el {{date}}",
+      "neverUsed": "Nunca usada",
+      "revokeTitle": "¿Revocar esta clave?",
+      "revokeText": "«{{name}}» dejará de funcionar de inmediato: lo que la use ya no podrá acceder a Gladys.",
+      "revokeError": "No se pudo revocar la clave. Inténtalo de nuevo.",
+      "revoked": "Clave revocada"
+    }
   },
   "twoFactorApps": {
     "description": "Cualquier aplicación que genere códigos de 6 dígitos funciona. Si todavía no tiene una, aquí tiene algunas aplicaciones gratuitas y sencillas de instalar:"

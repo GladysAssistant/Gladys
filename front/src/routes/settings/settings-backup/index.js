@@ -53,6 +53,6 @@ class SettingsGateway extends Component {
 }
 
 export default connect(
-  'user,session,gatewayStatus,gatewayBackups,gatewayRestoreInProgress,gatewayCreateBackupStatus,gatewayRestoreErrored,gatewayGladysRestarting',
+  'user,session,gatewayStatus,gatewayBackups,gatewayGetBackupsStatus,gatewayRestoreInProgress,gatewayRestoreBackupStatus,gatewayCreateBackupStatus,gatewayRestoreErrored,gatewayGladysRestarting',
   actions
 )(SettingsGateway);

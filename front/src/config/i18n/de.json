@@ -5271,7 +5271,22 @@
     "session": "Sitzung",
     "revoke": "Widerrufen",
     "unknowDevice": "Unbekanntes Gerät",
-    "apiKey": "API-Schlüssel"
+    "apiKey": "API-Schlüssel",
+    "mobile": {
+      "thisDevice": "Dieses Gerät",
+      "thisDeviceTitle": "Dieses Gerät",
+      "otherDevicesTitle": "Andere Geräte",
+      "noOtherDevice": "Kein anderes Gerät ist angemeldet.",
+      "apiKeysTitle": "API-Schlüssel",
+      "hint": "Widerrufen Sie eine Sitzung, um ihr Gerät von Gladys abzumelden.",
+      "loadError": "Die Sitzungen konnten nicht geladen werden. Versuchen Sie es erneut.",
+      "revokeTitle": "Diese Sitzung widerrufen?",
+      "revokeText": "dieses Gerät wird von Gladys abgemeldet.",
+      "revokeCurrentText": "dies ist die Sitzung des Geräts, das Sie gerade verwenden: Sie werden abgemeldet.",
+      "revokeApiKeyText": "was diesen API-Schlüssel verwendet, kann Gladys nicht mehr erreichen.",
+      "revokeError": "Die Sitzung konnte nicht widerrufen werden. Versuchen Sie es erneut.",
+      "revoked": "Sitzung widerrufen"
+    }
   },
   "servicesSettings": {
     "title": "Dienste",
@@ -5308,7 +5323,24 @@
         "detail": "Dienst konnte nicht gestartet werden"
       }
     },
-    "action": "Aktion"
+    "action": "Aktion",
+    "mobile": {
+      "searchPlaceholder": "Dienst suchen",
+      "filters": {
+        "all": "Alle",
+        "running": "Gestartet",
+        "error": "Fehlerhaft",
+        "stopped": "Gestoppt"
+      },
+      "noResult": "Kein Dienst entspricht der Suche.",
+      "actionError": "Der Status des Dienstes konnte nicht geändert werden. Versuchen Sie es erneut.",
+      "started": "Dienst gestartet",
+      "startedHelp": "Gestoppt funktioniert die Integration nicht mehr, bis sie wieder gestartet wird.",
+      "starting": "Wird gestartet…",
+      "stopping": "Wird gestoppt…",
+      "internalName": "Interner Name",
+      "openIntegration": "Integration öffnen"
+    }
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -5421,6 +5453,12 @@
     "jobStatuses": {
       "success": "Erfolgreich",
       "failed": "Fehlgeschlagen"
+    },
+    "mobile": {
+      "description": "Was Gladys im Hintergrund ausführt, das Neueste zuerst. Schauen Sie hier nach, wenn etwas nicht stimmt.",
+      "empty": "Noch keine Hintergrundaufgabe.",
+      "showMore": "Ganzen Fehler anzeigen",
+      "showLess": "Weniger anzeigen"
     }
   },
   "systemSettings": {
@@ -5547,7 +5585,18 @@
     "downloadLogsProgress": "Lade {{downloaded}} von {{total}} herunter...",
     "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut.",
     "cpuTemperature": "CPU-Temp.",
-    "cpuTemperatureValue": "{{value}} °C"
+    "cpuTemperatureValue": "{{value}} °C",
+    "mobile": {
+      "statusTitle": "Status",
+      "updatesTitle": "Updates",
+      "preferencesTitle": "Einstellungen",
+      "maintenanceTitle": "Wartung",
+      "checkForUpdatesText": "Gladys sucht automatisch nach neuen Versionen.",
+      "updateTitle": "Gladys aktualisieren?",
+      "updateText": "Gladys startet während des Updates neu und ist einige Minuten nicht erreichbar.",
+      "vacuumTitle": "Datenbank bereinigen?",
+      "vacuumText": "Gladys ist bis zum Ende der Bereinigung nicht erreichbar. Es werden keine Daten gelöscht."
+    }
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",
@@ -5954,6 +6003,19 @@
       "noSuccessYet": "Auf dieser Instanz ist noch kein Backup gelungen.",
       "lastError": "Letzter Fehler: {{error}}",
       "retry": "Gladys versucht es jede Nacht und einige Minuten nach jedem Start erneut. Die Administratoren werden ab der zweiten fehlgeschlagenen Nacht im Chat gewarnt, danach einmal pro Woche, solange es fehlschlägt; einmal gewarnt, erfahren sie es, sobald ein Backup wieder gelingt. Details im Tab \"Aufgaben\"."
+    },
+    "mobile": {
+      "backupError": "Die Sicherung konnte nicht gestartet werden. Versuchen Sie es erneut.",
+      "loadError": "Die Sicherungen konnten nicht geladen werden. Versuchen Sie es erneut.",
+      "backupsTitle": {
+        "one": "1 Sicherung",
+        "other": "{{count}} Sicherungen"
+      },
+      "restoreHint": "Tippen Sie auf eine Sicherung, um sie wiederherzustellen.",
+      "empty": "Noch keine Sicherung. Gladys erstellt alle 24 Stunden eine.",
+      "restoreTitle": "Diese Sicherung wiederherstellen?",
+      "restoreText": "Gladys kehrt zum Stand vom {{date}} zurück und startet neu. Alle Änderungen seitdem gehen verloren.",
+      "restoreError": "Die Wiederherstellung konnte nicht gestartet werden. Versuchen Sie es erneut."
     }
   },
   "alarmModes": {
@@ -7865,7 +7927,31 @@
     "registered": "Registriert",
     "keyNameLabel": "Name:",
     "registeredLabel": "Registriert:",
-    "neverUsed": "Nie"
+    "neverUsed": "Nie",
+    "mobile": {
+      "createButton": "API-Schlüssel erstellen",
+      "createTitle": "Neuer API-Schlüssel",
+      "keyTitle": "Ihr API-Schlüssel",
+      "namePlaceholder": "z. B. Kurzbefehl auf dem Handy",
+      "nameHelp": "Ein Name, um zu erkennen, was diesen Schlüssel verwendet.",
+      "nameRequired": "Geben Sie dem Schlüssel einen Namen.",
+      "createError": "Der Schlüssel konnte nicht erstellt werden. Versuchen Sie es erneut.",
+      "copy": "Schlüssel kopieren",
+      "copied": "Schlüssel kopiert",
+      "selected": "Schlüssel markiert: kopieren Sie ihn",
+      "keysTitle": {
+        "one": "1 Schlüssel",
+        "other": "{{count}} Schlüssel"
+      },
+      "empty": "Noch kein API-Schlüssel.",
+      "created": "Erstellt am {{date}}",
+      "lastUsed": "Zuletzt verwendet am {{date}}",
+      "neverUsed": "Nie verwendet",
+      "revokeTitle": "Diesen Schlüssel widerrufen?",
+      "revokeText": "„{{name}}“ funktioniert sofort nicht mehr: was ihn verwendet, erreicht Gladys nicht mehr.",
+      "revokeError": "Der Schlüssel konnte nicht widerrufen werden. Versuchen Sie es erneut.",
+      "revoked": "Schlüssel widerrufen"
+    }
   },
   "twoFactorApps": {
     "description": "Jede App, die 6-stellige Codes erzeugt, funktioniert. Falls du noch keine hast, hier ein paar kostenlose Apps, die einfach zu installieren sind:"
