@@ -5565,7 +5565,36 @@
     "deleteButton": "Zone löschen",
     "createAreaError": "Diese Zone kann nicht erstellt werden. Bist du sicher, dass du jedes Feld ausgefüllt und auf die Karte geklickt hast, um einen Standort für die Zone auszuwählen?",
     "getAreaError": "Daten dieser Zone können nicht abgerufen werden. Bitte aktualisiere diese Seite, um es erneut zu versuchen.",
-    "deleteAreaError": "Diese Zone kann nicht gelöscht werden. Bitte aktualisiere diese Seite und versuche es erneut."
+    "deleteAreaError": "Diese Zone kann nicht gelöscht werden. Bitte aktualisiere diese Seite und versuche es erneut.",
+    "mobile": {
+      "backLabel": "Karte",
+      "newTitle": "Neue Zone",
+      "nameAndColor": "Name und Farbe",
+      "nameMissing": "Zone benennen",
+      "namePlaceholder": "z. B. Arbeit",
+      "radius": "Radius",
+      "radiusUnit": "m",
+      "radiusSlider": "Radius der Zone",
+      "decreaseRadius": "Radius verkleinern",
+      "increaseRadius": "Radius vergrößern",
+      "missing": {
+        "center": "Tippen Sie auf die Karte, um die Zone zu platzieren.",
+        "radius": "Geben Sie den Radius der Zone ein, von 10 m bis 50 km.",
+        "name": "Geben Sie der Zone einen Namen, um sie zu speichern."
+      },
+      "gesturesHint": "Ziehen Sie die Zone, um sie zu verschieben, und den Griff an ihrem Rand, um ihre Größe zu ändern.",
+      "moveHandle": "Zone verschieben",
+      "resizeHandle": "Größe der Zone ändern",
+      "placeAtMyPosition": "Zone an meinem Standort platzieren",
+      "placeAtHouse": "Zone auf mein Haus setzen",
+      "placedAtPosition": "Zone an Ihrem Standort platziert.",
+      "placedAtHouse": "Zone auf „{{name}}“ gesetzt.",
+      "positionDenied": "Ihr Standort ist nicht verfügbar: Erlauben Sie dieser Website den Zugriff auf Ihren Standort (nur über HTTPS möglich) oder tippen Sie auf die Karte.",
+      "positionUnavailable": "Ihr Standort konnte nicht ermittelt werden. Tippen Sie auf die Karte, um die Zone zu platzieren.",
+      "saveError": "Die Zone konnte nicht gespeichert werden. Prüfen Sie, dass keine andere Zone diesen Namen trägt, und versuchen Sie es erneut.",
+      "deleteTitle": "„{{name}}“ löschen?",
+      "deleteText": "Die von dieser Zone ausgelösten Szenen werden nicht mehr gestartet. Dies kann nicht rückgängig gemacht werden."
+    }
   },
   "iconSelector": {
     "searchPlaceholder": "Symbol suchen (Zuhause, Schloss, Wetter...)",

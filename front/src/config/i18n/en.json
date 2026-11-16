@@ -5565,7 +5565,36 @@
     "deleteButton": "Delete zone",
     "createAreaError": "Unable to create this zone: are you sure you filled every field and clicked on the map to select your zone location?",
     "getAreaError": "Unable to get data from this zone. Please refresh this page to retry.",
-    "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
+    "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry.",
+    "mobile": {
+      "backLabel": "Map",
+      "newTitle": "New zone",
+      "nameAndColor": "Name and color",
+      "nameMissing": "Name the zone",
+      "namePlaceholder": "e.g. Work",
+      "radius": "Radius",
+      "radiusUnit": "m",
+      "radiusSlider": "Radius of the zone",
+      "decreaseRadius": "Reduce the radius",
+      "increaseRadius": "Increase the radius",
+      "missing": {
+        "center": "Tap the map to place the zone.",
+        "radius": "Enter the radius of the zone, from 10 m to 50 km.",
+        "name": "Give the zone a name to save it."
+      },
+      "gesturesHint": "Drag the zone to move it, and the handle on its edge to resize it.",
+      "moveHandle": "Move the zone",
+      "resizeHandle": "Resize the zone",
+      "placeAtMyPosition": "Place the zone at my position",
+      "placeAtHouse": "Place the zone at my house",
+      "placedAtPosition": "Zone placed at your position.",
+      "placedAtHouse": "Zone placed at “{{name}}”.",
+      "positionDenied": "Your position is not available: allow this site to use your location (it only works over HTTPS), or tap the map.",
+      "positionUnavailable": "Your position could not be found. Tap the map to place the zone.",
+      "saveError": "The zone could not be saved. Check that no other zone has this name, then try again.",
+      "deleteTitle": "Delete “{{name}}”?",
+      "deleteText": "The scenes triggered by this zone will no longer run. This cannot be undone."
+    }
   },
   "iconSelector": {
     "searchPlaceholder": "Search an icon (home, lock, weather...)",
