@@ -54,7 +54,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.mqttClient = null;
 
   this.discoveredDevices = {};
-  // Last value of each property received from each device, by IEEE address, saved when the device is created
+  // Last value of each property received from each device not created in Gladys yet, by IEEE address,
+  // saved when the device is created
   this.lastReceivedStates = {};
   this.syncRenamedDevicesRunning = false;
   this.pendingSyncRenamedDevices = null;

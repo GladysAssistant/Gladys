@@ -303,6 +303,20 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
+  it('should forget the last values of the devices that left the network', async () => {
+    // PREPARE
+    zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
+    const stillThere = { temperature: { value: 19.5, receivedAt: '2026-11-15T09:00:00.000Z' } };
+    zigbee2mqttManager.lastReceivedStates = {
+      '0x00158d00033e88d5': stillThere,
+      '0x00158d0000000000': { temperature: { value: 21, receivedAt: '2026-11-15T09:00:00.000Z' } },
+    };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
+    // ASSERT
+    expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({ '0x00158d00033e88d5': stillThere });
+  });
+
   it('should get permit join from config', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config', `{"permit_join": true}`);
@@ -506,13 +520,12 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         });
       });
 
-      it('should also keep the last values of a device already configured in Gladys', async () => {
+      it('should not keep the values of a device configured in Gladys, as they are saved right away', async () => {
         // EXECUTE
         await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/salon/lampe', `{"state":"ON"}`);
         // ASSERT
-        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({
-          '0x0017880104e45517': { state: { value: 'ON', receivedAt: '2026-11-15T09:00:00.000Z' } },
-        });
+        assert.calledOnce(gladys.event.emit);
+        expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
       });
 
       ['not json', 'null', '"ON"', '[{"state":"ON"}]'].forEach((message) => {

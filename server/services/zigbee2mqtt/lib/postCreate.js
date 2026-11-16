@@ -21,14 +21,15 @@ function postCreate(device) {
   }
 
   const lastStates = this.lastReceivedStates[discoveredDevice.ieee_address] || {};
+  // From now on, the values of the device are saved as they come
+  delete this.lastReceivedStates[discoveredDevice.ieee_address];
   Object.keys(lastStates).forEach((property) => {
     const { value, receivedAt } = lastStates[property];
     this.emitDeviceState(device, deviceName, property, value, receivedAt);
   });
 
   const { type, power_source: powerSource } = discoveredDevice;
-  const alwaysListening =
-    type === 'Router' || (powerSource !== undefined && !SLEEPING_POWER_SOURCES.includes(powerSource));
+  const alwaysListening = type === 'Router' || (!!powerSource && !SLEEPING_POWER_SOURCES.includes(powerSource));
   // Without broker, the device is asked nothing: its values come with its next report
   if (!alwaysListening || !this.mqttClient) {
     return;

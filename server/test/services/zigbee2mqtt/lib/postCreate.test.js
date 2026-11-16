@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
@@ -93,6 +94,17 @@ describe('zigbee2mqtt postCreate', () => {
     });
   });
 
+  it('should forget the last values once saved, as the next ones are saved as they come', () => {
+    // PREPARE
+    zigbee2mqttManager.lastReceivedStates[sensor.ieee_address] = {
+      temperature: { value: 19.5, receivedAt: '2026-11-15T09:00:00.000Z' },
+    };
+    // EXECUTE
+    zigbee2mqttManager.postCreate(sensorDevice);
+    // ASSERT
+    expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+  });
+
   it('should not ask a battery device for its values, as it sleeps and would not answer', () => {
     // EXECUTE
     zigbee2mqttManager.postCreate(sensorDevice);
@@ -145,6 +157,7 @@ describe('zigbee2mqtt postCreate', () => {
   [
     ['an unknown power source', 'Unknown'],
     ['no power source', undefined],
+    ['a null power source', null],
   ].forEach(([label, powerSource]) => {
     it(`should not ask an end device with ${label}, as it may sleep`, () => {
       // PREPARE

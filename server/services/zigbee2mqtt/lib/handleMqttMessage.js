@@ -63,6 +63,14 @@ async function handleMqttMessage(topic, message) {
           this.discoveredDevices[device.friendly_name] = device;
         });
 
+      // Forget the last values of the devices that left the network
+      const discoveredAddresses = Object.values(this.discoveredDevices).map((d) => d.ieee_address);
+      Object.keys(this.lastReceivedStates).forEach((ieeeAddress) => {
+        if (!discoveredAddresses.includes(ieeeAddress)) {
+          delete this.lastReceivedStates[ieeeAddress];
+        }
+      });
+
       // Re-attach Gladys devices renamed in Zigbee2mqtt (matched by IEEE address)
       // before publishing the discovered devices, so they merge with the right device.
       await this.syncRenamedDevices(devices);
@@ -165,7 +173,11 @@ async function handleMqttMessage(topic, message) {
         logger.warn(`Zigbee2mqtt device ${deviceName} sent a message that is not a state: ${message}`);
         break;
       }
-      if (discoveredDevice) {
+      if (device) {
+        Object.keys(incomingFeatures).forEach((property) => {
+          this.emitDeviceState(device, deviceName, property, incomingFeatures[property]);
+        });
+      } else {
         // Keep the last value of each property, replayed when the device is created in Gladys (see postCreate):
         // the device may not report again for hours. By IEEE address, which survives a rename and changes when
         // another device takes the name.
@@ -175,12 +187,6 @@ async function handleMqttMessage(topic, message) {
           lastStates[property] = { value: incomingFeatures[property], receivedAt };
         });
         this.lastReceivedStates[discoveredDevice.ieee_address] = lastStates;
-      }
-      if (device) {
-        Object.keys(incomingFeatures).forEach((property) => {
-          this.emitDeviceState(device, deviceName, property, incomingFeatures[property]);
-        });
-      } else {
         logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
       }
     }

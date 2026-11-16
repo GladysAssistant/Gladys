@@ -68,6 +68,33 @@ describe('zigbee2mqtt postDelete', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should forget the last values kept for the device, as it gets only the next ones once added again', async () => {
+    // PREPARE: a state received while the device was renamed in Gladys
+    zigbee2mqttManager.discoveredDevices.lamp = { friendly_name: 'lamp', ieee_address: '0xaaa' };
+    const otherDeviceStates = { state: { value: 'ON', receivedAt: '2026-11-15T09:00:00.000Z' } };
+    zigbee2mqttManager.lastReceivedStates = {
+      '0xaaa': { state: { value: 'OFF', receivedAt: '2026-11-15T09:00:00.000Z' } },
+      '0xbbb': otherDeviceStates,
+    };
+    // EXECUTE
+    await zigbee2mqttManager.postDelete(buildGladysDevice('device-id', 'lamp', '0xaaa'));
+    // ASSERT
+    expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({ '0xbbb': otherDeviceStates });
+  });
+
+  it('should leave the last values untouched when the device is unknown by Zigbee2mqtt', async () => {
+    // PREPARE
+    zigbee2mqttManager.lastReceivedStates = {
+      '0xaaa': { state: { value: 'OFF', receivedAt: '2026-11-15T09:00:00.000Z' } },
+    };
+    // EXECUTE
+    await zigbee2mqttManager.postDelete(buildGladysDevice('device-id', 'lamp', '0xaaa'));
+    // ASSERT
+    expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({
+      '0xaaa': { state: { value: 'OFF', receivedAt: '2026-11-15T09:00:00.000Z' } },
+    });
+  });
+
   it('should leave the device list publication to the running synchronization', async () => {
     const inventory = [{ friendly_name: 'outlet', ieee_address: '0xbbb', type: 'EndDevice' }];
     zigbee2mqttManager.lastBridgeDevices = inventory;
