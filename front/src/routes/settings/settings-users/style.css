@@ -237,6 +237,13 @@
   max-width: 44rem;
 }
 
+.remoteHint {
+  margin: 0.3rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  max-width: 44rem;
+}
+
 .remoteMeta {
   display: flex;
   flex-wrap: wrap;

@@ -5161,6 +5161,7 @@
         "none": "Pas de compte Gladys Plus : cet utilisateur ne peut utiliser Gladys que depuis la maison."
       },
       "statusUnavailable": "L'accès à distance ne peut pas être vérifié tant que votre instance n'est pas connectée à Gladys Plus.",
+      "invitedNotReceived": "Pas reçu ? Demandez-lui de vérifier ses dossiers Spam, Promotions et Réseaux sociaux.",
       "memberSince": "Sur Gladys Plus depuis le {{date}}",
       "online": "Connecté en ce moment",
       "plusRole": {

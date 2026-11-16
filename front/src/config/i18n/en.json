@@ -5161,6 +5161,7 @@
         "none": "No Gladys Plus account: this user can only use Gladys from home."
       },
       "statusUnavailable": "Remote access cannot be checked while your instance is not connected to Gladys Plus.",
+      "invitedNotReceived": "Not received? Ask them to check their Spam, Promotions and Social folders.",
       "memberSince": "On Gladys Plus since {{date}}",
       "online": "Connected right now",
       "plusRole": {
