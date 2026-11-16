@@ -32,10 +32,12 @@ describe('Calendar - no calendar connected', () => {
     cy.intercept('GET', '**/api/v1/external_integration', [deviceIntegration]);
     cy.visit('/dashboard/calendar');
 
-    cy.get(NOTICE)
-      .should('contain', 'calendar.noCalendarsConnected.title')
-      .and('contain', 'calendar.noCalendarsConnected.installIntegration')
-      .and('contain', 'calendar.noCalendarsConnected.sharedCalendars');
+    // the overwritten cy.contains translates the i18n keys
+    cy.get(NOTICE).within(() => {
+      cy.contains('calendar.noCalendarsConnected.title').should('exist');
+      cy.contains('calendar.noCalendarsConnected.installIntegration').should('exist');
+      cy.contains('calendar.noCalendarsConnected.sharedCalendars').should('exist');
+    });
     cy.get('[data-cy=calendar-integration-link]').should('not.exist');
     cy.get('[data-cy=calendar-catalog-link]').click();
     cy.location('pathname').should('eq', '/dashboard/integration');
@@ -47,7 +49,9 @@ describe('Calendar - no calendar connected', () => {
     cy.intercept('GET', '**/api/v1/external_integration', [deviceIntegration, calendarIntegration]);
     cy.visit('/dashboard/calendar');
 
-    cy.get(NOTICE).should('contain', 'calendar.noCalendarsConnected.enableInstalled');
+    cy.get(NOTICE).within(() => {
+      cy.contains('calendar.noCalendarsConnected.enableInstalled').should('exist');
+    });
     cy.get('[data-cy=calendar-integration-link]')
       .should('have.length', 1)
       .and('contain', 'Holidays')
