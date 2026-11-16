@@ -755,11 +755,13 @@ button.inputAddon {
 
 /* ---------- chips (filters) ---------- */
 
+/* the row bleeds to the edges of the screen: --kit-gutter is the gutter of the page it sits in
+   (16px in a kit page; a page with another container sets it) */
 .chips {
   display: flex;
   gap: 8px;
-  margin: 0 -16px 12px;
-  padding: 2px 16px;
+  margin: 0 calc(-1 * var(--kit-gutter, 16px)) 12px;
+  padding: 2px var(--kit-gutter, 16px);
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
