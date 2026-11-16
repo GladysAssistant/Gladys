@@ -44,6 +44,23 @@
     "loading": "Cargando...",
     "preview": "Vista previa"
   },
+  "mobileKit": {
+    "back": "Atrás",
+    "close": "Cerrar",
+    "done": "Listo",
+    "more": "Más acciones",
+    "undo": "Deshacer",
+    "retry": "Reintentar",
+    "saved": "Guardado",
+    "unsavedChanges": "Cambios sin guardar",
+    "stepOf": "Paso {{current}} de {{total}}",
+    "leaveTitle": "Cambios sin guardar",
+    "leaveText": "Tus cambios aún no se han guardado.",
+    "saveAndLeave": "Guardar y salir",
+    "leaveWithoutSaving": "Salir sin guardar",
+    "keepEditing": "Seguir editando",
+    "cannotBeUndone": "Esta acción no se puede deshacer."
+  },
   "errorBoundary": {
     "message": "Ocurrió un problema al mostrar esto. Vuelva a cargar la página y revise la configuración si sucede de nuevo."
   },
@@ -7747,6 +7764,19 @@
     "saveError": "Error al guardar o eliminar el dispositivo",
     "saveConflictError": "Conflicto: ¿está seguro de que todos los ID externos de las funciones del dispositivo son únicos?",
     "notFound": "No se encontró el dispositivo solicitado.",
+    "mobile": {
+      "noRoom": "Ninguna habitación",
+      "featuresTitle": {
+        "zero": "Funciones",
+        "one": "1 función",
+        "other": "{{count}} funciones"
+      },
+      "featuresHint": "Toca una función para cambiarle el nombre, cambiar su unidad o elegir si se conserva su historial. La duración de conservación se configura en la página <a href=\"/dashboard/settings/system\">Sistema</a>.",
+      "historyKept": "Historial conservado",
+      "historyNotKept": "Historial no conservado",
+      "keepHistory": "Conservar el historial",
+      "featureType": "Tipo de función"
+    },
     "pollFrequency": {
       "label": "Frecuencia de actualización",
       "everyMinutes": "Cada minuto",

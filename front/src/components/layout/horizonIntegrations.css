@@ -602,3 +602,24 @@
   color: var(--gl-ink);
   text-decoration: none;
 }
+
+/* A focus page on a phone (docs/specs/mobile-pages/README.md, C.1 — a device being edited, the
+   contract wizard): the page brings its own navigation bar and fills the screen, so the chrome
+   of the integration (back to the catalog, title, tabs) and the gutters of its container give
+   way. Same media query as utils/mobileViewport.js. */
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  body.gladys-focus-page .glass-theme .page .hz-subpage-chrome {
+    display: none;
+  }
+
+  body.gladys-focus-page .glass-theme .page > .page-main > .my-3 {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  body.gladys-focus-page .glass-theme .page > .page-main > .my-3 > .container {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

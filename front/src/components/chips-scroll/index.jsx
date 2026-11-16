@@ -67,9 +67,22 @@ const ChipsScroll = ({
 
     el.addEventListener('wheel', onWheel, { passive: false });
 
+    // Measured on the next frame, not in the observer callback: showing or hiding an arrow
+    // changes the padding of the scroller, so a state change made inside the callback resizes the
+    // observed box again in the same frame — which the browser reports as a "ResizeObserver loop"
+    // error (a row hidden by a focus page on a phone goes through it every time)
     let resizeObserver;
+    let resizeFrame = null;
     if (typeof ResizeObserver === 'function') {
-      resizeObserver = new ResizeObserver(updateScrollState);
+      resizeObserver = new ResizeObserver(() => {
+        if (resizeFrame !== null) {
+          return;
+        }
+        resizeFrame = requestAnimationFrame(() => {
+          resizeFrame = null;
+          updateScrollState();
+        });
+      });
       resizeObserver.observe(el);
     }
 
@@ -93,6 +106,9 @@ const ChipsScroll = ({
       el.removeEventListener('wheel', onWheel);
       if (resizeObserver) {
         resizeObserver.disconnect();
+      }
+      if (resizeFrame !== null) {
+        cancelAnimationFrame(resizeFrame);
       }
     };
   }, [updateScrollState]);

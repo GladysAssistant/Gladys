@@ -44,6 +44,23 @@
     "loading": "Chargement...",
     "preview": "Aperçu"
   },
+  "mobileKit": {
+    "back": "Retour",
+    "close": "Fermer",
+    "done": "Terminé",
+    "more": "Plus d’actions",
+    "undo": "Annuler",
+    "retry": "Réessayer",
+    "saved": "Enregistré",
+    "unsavedChanges": "Modifications non enregistrées",
+    "stepOf": "Étape {{current}} sur {{total}}",
+    "leaveTitle": "Modifications non enregistrées",
+    "leaveText": "Vos modifications ne sont pas encore enregistrées.",
+    "saveAndLeave": "Enregistrer et quitter",
+    "leaveWithoutSaving": "Quitter sans enregistrer",
+    "keepEditing": "Continuer la modification",
+    "cannotBeUndone": "Cette action est irréversible."
+  },
   "errorBoundary": {
     "message": "Une erreur est survenue à l'affichage. Rechargez la page, et vérifiez la configuration si cela se reproduit."
   },
@@ -7747,6 +7764,19 @@
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
     "saveConflictError": "Conflit : Êtes-vous certains que toutes les fonctionnalités ont un ID externe unique ?",
     "notFound": "Appareil recherché introuvable.",
+    "mobile": {
+      "noRoom": "Aucune pièce",
+      "featuresTitle": {
+        "zero": "Fonctionnalités",
+        "one": "1 fonctionnalité",
+        "other": "{{count}} fonctionnalités"
+      },
+      "featuresHint": "Touchez une fonctionnalité pour la renommer, changer son unité ou choisir si son historique est conservé. La durée de conservation se règle sur la page <a href=\"/dashboard/settings/system\">Système</a>.",
+      "historyKept": "Historique conservé",
+      "historyNotKept": "Historique non conservé",
+      "keepHistory": "Conserver l'historique",
+      "featureType": "Type de fonctionnalité"
+    },
     "pollFrequency": {
       "label": "Fréquence de rafraîchissement",
       "everyMinutes": "Toutes les minutes (recommandé)",

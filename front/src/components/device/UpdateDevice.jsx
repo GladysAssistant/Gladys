@@ -4,10 +4,19 @@ import { DEVICE_FEATURE_CATEGORIES_LIST } from '../../../../server/utils/constan
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import UpdateDeviceFeature from './UpdateDeviceFeature';
 import UpdateDeviceForm from './UpdateDeviceForm';
+import MobileUpdateDevice from './MobileUpdateDevice';
+import { withMobileViewport } from '../mobile';
 import cx from 'classnames';
 import get from 'get-value';
 
-const UpdateDevice = ({ children, ...props }) => (
+const DEVICES_LIST_PATH = '/dashboard/devices';
+
+// A device opened from the devices list goes back to it (the list links here with
+// "?from=devices"), otherwise to the page of its integration
+const cameFromDevicesList = () =>
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'devices';
+
+const UpdateDeviceDesktop = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <Link href={props.previousPage}>
@@ -104,4 +113,21 @@ const UpdateDevice = ({ children, ...props }) => (
   </div>
 );
 
-export default UpdateDevice;
+// On a phone the device is edited in its own layout (docs/specs/mobile-pages/device-edit.md):
+// same props, same container.
+const UpdateDevice = ({ isMobile, ...props }) => {
+  const fromDevicesList = cameFromDevicesList();
+  const previousPage = fromDevicesList ? DEVICES_LIST_PATH : props.previousPage;
+  if (isMobile) {
+    return (
+      <MobileUpdateDevice
+        {...props}
+        backHref={previousPage}
+        backLabel={fromDevicesList ? <Text id="devicesList.title" /> : null}
+      />
+    );
+  }
+  return <UpdateDeviceDesktop {...props} previousPage={previousPage} />;
+};
+
+export default withMobileViewport(UpdateDevice);

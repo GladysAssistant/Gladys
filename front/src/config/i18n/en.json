@@ -44,6 +44,23 @@
     "loading": "Loading...",
     "preview": "Preview"
   },
+  "mobileKit": {
+    "back": "Back",
+    "close": "Close",
+    "done": "Done",
+    "more": "More actions",
+    "undo": "Undo",
+    "retry": "Try again",
+    "saved": "Saved",
+    "unsavedChanges": "Unsaved changes",
+    "stepOf": "Step {{current}} of {{total}}",
+    "leaveTitle": "Unsaved changes",
+    "leaveText": "Your changes are not saved yet.",
+    "saveAndLeave": "Save and leave",
+    "leaveWithoutSaving": "Leave without saving",
+    "keepEditing": "Keep editing",
+    "cannotBeUndone": "This cannot be undone."
+  },
   "errorBoundary": {
     "message": "Something went wrong while displaying this. Reload the page, and check the configuration if it happens again."
   },
@@ -7747,6 +7764,19 @@
     "saveError": "Error saving or deleting device",
     "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
     "notFound": "Requested device not found.",
+    "mobile": {
+      "noRoom": "No room",
+      "featuresTitle": {
+        "zero": "Features",
+        "one": "1 feature",
+        "other": "{{count}} features"
+      },
+      "featuresHint": "Tap a feature to rename it, change its unit or choose whether its history is kept. How long the history is kept is set on the <a href=\"/dashboard/settings/system\">System</a> page.",
+      "historyKept": "History kept",
+      "historyNotKept": "History not kept",
+      "keepHistory": "Keep the history",
+      "featureType": "Type of feature"
+    },
     "pollFrequency": {
       "label": "Refresh frequency",
       "everyMinutes": "Every minutes",

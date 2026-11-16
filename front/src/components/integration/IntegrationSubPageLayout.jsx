@@ -35,28 +35,32 @@ const IntegrationSubPageLayout = ({ title, tabs, children }) => (
     <div class="page-main">
       <div class="my-3 my-md-5">
         <div class="container">
-          <div class="d-flex flex-wrap align-items-start justify-content-between">
-            <BackToIntegrationsLink />
-            <FeedbackLink subject={title} className="hz-feedback-link mb-4" dataCy="integration-feedback-link">
-              <i class="fe fe-message-circle mr-1" />
-              <Text id="feedback.link" />
-            </FeedbackLink>
+          {/* hz-subpage-chrome: what a focus page hides on a phone (an edit page brings its own
+              navigation bar, docs/specs/mobile-pages/README.md C.1) */}
+          <div class="hz-subpage-chrome">
+            <div class="d-flex flex-wrap align-items-start justify-content-between">
+              <BackToIntegrationsLink />
+              <FeedbackLink subject={title} className="hz-feedback-link mb-4" dataCy="integration-feedback-link">
+                <i class="fe fe-message-circle mr-1" />
+                <Text id="feedback.link" />
+              </FeedbackLink>
+            </div>
+            <h3 class="page-title mb-3">{title}</h3>
+            {tabs && (
+              <ChipsScroll
+                wrapperClass="hz-tabs-wrapper"
+                scrollerClass="hz-tabs"
+                leftButtonClass="hz-tabs-scroll-btn hz-tabs-scroll-btn-left"
+                rightButtonClass="hz-tabs-scroll-btn hz-tabs-scroll-btn-right"
+                scrollLeftLabel={<Text id="integration.menuScrollLeft" />}
+                scrollRightLabel={<Text id="integration.menuScrollRight" />}
+                activeSelector=".hz-tab-link.active"
+                activeKey={getActiveKey()}
+              >
+                {tabs}
+              </ChipsScroll>
+            )}
           </div>
-          <h3 class="page-title mb-3">{title}</h3>
-          {tabs && (
-            <ChipsScroll
-              wrapperClass="hz-tabs-wrapper"
-              scrollerClass="hz-tabs"
-              leftButtonClass="hz-tabs-scroll-btn hz-tabs-scroll-btn-left"
-              rightButtonClass="hz-tabs-scroll-btn hz-tabs-scroll-btn-right"
-              scrollLeftLabel={<Text id="integration.menuScrollLeft" />}
-              scrollRightLabel={<Text id="integration.menuScrollRight" />}
-              activeSelector=".hz-tab-link.active"
-              activeKey={getActiveKey()}
-            >
-              {tabs}
-            </ChipsScroll>
-          )}
           {children}
         </div>
       </div>

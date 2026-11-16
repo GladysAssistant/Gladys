@@ -44,6 +44,23 @@
     "loading": "Lädt...",
     "preview": "Vorschau"
   },
+  "mobileKit": {
+    "back": "Zurück",
+    "close": "Schließen",
+    "done": "Fertig",
+    "more": "Weitere Aktionen",
+    "undo": "Rückgängig",
+    "retry": "Erneut versuchen",
+    "saved": "Gespeichert",
+    "unsavedChanges": "Nicht gespeicherte Änderungen",
+    "stepOf": "Schritt {{current}} von {{total}}",
+    "leaveTitle": "Nicht gespeicherte Änderungen",
+    "leaveText": "Ihre Änderungen sind noch nicht gespeichert.",
+    "saveAndLeave": "Speichern und verlassen",
+    "leaveWithoutSaving": "Ohne Speichern verlassen",
+    "keepEditing": "Weiter bearbeiten",
+    "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden."
+  },
   "errorBoundary": {
     "message": "Beim Anzeigen ist ein Fehler aufgetreten. Lade die Seite neu und überprüfe die Konfiguration, falls es erneut auftritt."
   },
@@ -7747,6 +7764,19 @@
     "saveError": "Fehler beim Speichern oder Löschen des Geräts",
     "saveConflictError": "Konflikt: Bist du sicher, dass alle externen IDs eindeutig sind?",
     "notFound": "Angefordertes Gerät nicht gefunden.",
+    "mobile": {
+      "noRoom": "Kein Raum",
+      "featuresTitle": {
+        "zero": "Funktionen",
+        "one": "1 Funktion",
+        "other": "{{count}} Funktionen"
+      },
+      "featuresHint": "Tippen Sie auf eine Funktion, um sie umzubenennen, ihre Einheit zu ändern oder festzulegen, ob ihr Verlauf gespeichert wird. Wie lange der Verlauf aufbewahrt wird, stellen Sie auf der Seite <a href=\"/dashboard/settings/system\">System</a> ein.",
+      "historyKept": "Verlauf wird gespeichert",
+      "historyNotKept": "Verlauf wird nicht gespeichert",
+      "keepHistory": "Verlauf speichern",
+      "featureType": "Art der Funktion"
+    },
     "pollFrequency": {
       "label": "Aktualisierungsfrequenz",
       "everyMinutes": "Jede Minute",
