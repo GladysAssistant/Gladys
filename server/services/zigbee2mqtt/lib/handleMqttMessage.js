@@ -65,6 +65,13 @@ async function handleMqttMessage(topic, message) {
 
       this.discoveredDevices = {};
 
+      // Told by the status only when it changes
+      const deviceCount = devices.filter((d) => d.type !== 'Coordinator').length;
+      if (deviceCount !== this.deviceCount) {
+        this.deviceCount = deviceCount;
+        this.emitStatusEvent();
+      }
+
       devices
         // Remove Coordinator
         .filter((d) => d.type !== 'Coordinator')
@@ -140,6 +147,7 @@ async function handleMqttMessage(topic, message) {
           `Zigbee2mqtt ${version} does not answer the health check, Gladys needs Zigbee2mqtt ${HEALTH_CHECK_MIN_MAJOR}.${HEALTH_CHECK_MIN_MINOR} or later`,
         );
       }
+      this.z2mVersion = version || null;
       if (coordinator && coordinator.meta) {
         this.coordinatorFirmware = {
           ...coordinator.meta,

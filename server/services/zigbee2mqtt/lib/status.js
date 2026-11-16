@@ -23,6 +23,8 @@ function status() {
     dockerBased: this.dockerBased,
     networkModeValid: this.networkModeValid,
     coordinatorFirmware: this.coordinatorFirmware,
+    z2mVersion: this.z2mVersion,
+    deviceCount: this.deviceCount,
     z2mContainerError: this.z2mContainerError,
     ezspFallback: this.ezspFallback,
     mqttConnectionError: this.mqttConnectionError,

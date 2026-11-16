@@ -59,6 +59,17 @@ describe('zigbee2mqtt disconnect', () => {
     sinon.reset();
   });
 
+  it('should forget the version of Zigbee2mqtt and the number of devices of its network', async () => {
+    // PREPARE
+    zigbee2MqttManager.z2mVersion = '2.14.2';
+    zigbee2MqttManager.deviceCount = 12;
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    expect(zigbee2MqttManager.z2mVersion).to.equal(null);
+    expect(zigbee2MqttManager.deviceCount).to.equal(null);
+  });
+
   it('mqtt not connected', async () => {
     // EXECUTE
     await zigbee2MqttManager.disconnect();
@@ -81,6 +92,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -118,6 +131,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -174,6 +189,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,

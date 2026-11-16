@@ -72,4 +72,34 @@ describe('zigbee2mqtt setPermitJoin', () => {
     });
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
   });
+
+  it('should allow joining when asked to, even when already allowed', async () => {
+    // PREPARE
+    zigbee2MqttManager.z2mPermitJoin = true;
+    // EXECUTE
+    await zigbee2MqttManager.setPermitJoin(true);
+    // ASSERT
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/bridge/request/permit_join',
+      JSON.stringify({ time: 254 }),
+    );
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: true,
+    });
+    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(true);
+  });
+
+  it('should forbid joining when asked to, even when already forbidden', async () => {
+    // EXECUTE
+    await zigbee2MqttManager.setPermitJoin(false);
+    // ASSERT
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/bridge/request/permit_join',
+      JSON.stringify({ time: 0 }),
+    );
+    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
+  });
 });

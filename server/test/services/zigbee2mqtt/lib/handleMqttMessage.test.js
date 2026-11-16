@@ -235,6 +235,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -343,6 +345,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       .returns(null);
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
+    // The same number of devices as before: the status does not change
+    zigbee2mqttManager.deviceCount = 7;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
     // ASSERT
@@ -352,6 +356,19 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
     assert.calledOnce(zigbee2mqttManager.syncRenamedDevices);
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
+  });
+
+  it('should tell the number of devices in the network, unsupported ones included, coordinator excluded', async () => {
+    // PREPARE
+    zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
+    // ASSERT
+    expect(zigbee2mqttManager.deviceCount).to.equal(7);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: sinon.match({ deviceCount: 7 }),
+    });
   });
 
   it('should forget the last values of the devices that left the network', async () => {
@@ -709,6 +726,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   it('should parse firmware from bridge/info', async () => {
     // PREPARE
     const bridgeInfo = {
+      version: '2.14.2',
       coordinator: {
         type: 'EmberZNet',
         meta: {
@@ -752,6 +770,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
           revision: 74100,
           type: 'EmberZNet',
         },
+        z2mVersion: '2.14.2',
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -772,10 +792,12 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify(bridgeInfo));
     // ASSERT
     expect(zigbee2mqttManager.coordinatorFirmware).to.equal(null);
+    expect(zigbee2mqttManager.z2mVersion).to.equal(null);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: sinon.match({
         coordinatorFirmware: null,
+        z2mVersion: null,
       }),
     });
   });

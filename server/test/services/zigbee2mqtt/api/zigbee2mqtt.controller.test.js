@@ -254,8 +254,33 @@ describe('zigbee2mqtt API', () => {
     };
 
     await controller['post /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res);
-    assert.calledOnce(zigbee2mqttManager.setPermitJoin);
+    assert.calledOnceWithExactly(zigbee2mqttManager.setPermitJoin, undefined);
     assert.calledWith(res.json, { success: true });
+  });
+
+  it('post /api/v1/service/zigbee2mqtt/permit_join with a value', async () => {
+    const req = { body: { value: true } };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.setPermitJoin, true);
+    assert.calledWith(res.json, { success: true });
+  });
+
+  it('post /api/v1/service/zigbee2mqtt/permit_join refuses a value that is not a boolean', async () => {
+    const req = { body: { value: 'yes' } };
+    const res = {
+      json: fake.returns(null),
+    };
+    const next = fake();
+
+    await controller['post /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res, next);
+    assert.notCalled(zigbee2mqttManager.setPermitJoin);
+    assert.notCalled(res.json);
+    const [error] = next.firstCall.args;
+    expect(error).to.be.instanceOf(BadParameters);
   });
 
   it('get /api/v1/service/zigbee2mqtt/permit_join', async () => {

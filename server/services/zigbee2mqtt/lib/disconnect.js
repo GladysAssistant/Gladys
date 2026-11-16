@@ -79,6 +79,8 @@ async function disconnectContainers() {
   this.startingTimer = null;
   this.zigbee2mqttStarting = false;
   this.coordinatorFirmware = null;
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   this.emitStatusEvent();
 }

@@ -159,13 +159,18 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
-   * @api {post} /api/v1/service/zigbee2mqtt/permit_join Toggle permit_join Zigbee devices
+   * @api {post} /api/v1/service/zigbee2mqtt/permit_join Allow, forbid or toggle permit_join Zigbee devices
    * @apiName togglePermitJoin
    * @apiGroup Zigbee2mqtt
+   * @apiBody {boolean} [value] true to allow, false to forbid; toggles when absent
    */
   async function togglePermitJoin(req, res) {
-    logger.debug('Toggle permit_join');
-    await zigbee2mqttManager.setPermitJoin();
+    const { value } = req.body || {};
+    if (value !== undefined && typeof value !== 'boolean') {
+      throw new BadParameters('Zigbee2mqtt: permit_join value must be a boolean');
+    }
+    logger.debug('Set permit_join', value);
+    await zigbee2mqttManager.setPermitJoin(value);
     res.json({
       success: true,
     });

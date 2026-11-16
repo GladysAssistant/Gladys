@@ -2,12 +2,13 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 /**
- * @description Prepares service and starts connection with broker.
+ * @description Allow or forbid new devices to join the Zigbee network (for 254 s when allowed).
+ * @param {boolean} [value] - True to allow, false to forbid; toggles when absent.
  * @example
- * init();
+ * setPermitJoin(true);
  */
-async function setPermitJoin() {
-  this.z2mPermitJoin = !this.z2mPermitJoin;
+async function setPermitJoin(value) {
+  this.z2mPermitJoin = typeof value === 'boolean' ? value : !this.z2mPermitJoin;
   // Send message to Zigbee2mqtt topics
   this.mqttClient.publish(
     `zigbee2mqtt/bridge/request/permit_join`,

@@ -101,6 +101,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.healthCheckTimer = null;
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
+  // Version of Zigbee2mqtt and number of devices in its network (coordinator excluded), as it tells them
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   // Gladys switched Zigbee2mqtt to the ezsp driver since the last init: the setup page loads the new model
   this.ezspFallback = false;

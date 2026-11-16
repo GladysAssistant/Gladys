@@ -63,6 +63,8 @@ async function resetIntegration() {
   this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.coordinatorFirmware = null;
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   this.mqttConnectionError = null;
   // Done by disconnect already, unless an installation finished since
