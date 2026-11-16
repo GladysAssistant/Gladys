@@ -3,7 +3,7 @@ const path = require('path');
 // This file is loaded first via mocha --require (see package.json "test" scripts).
 // It must run before any module that reads getConfig() / models (e.g. bootstrap.test.js).
 
-const DEV_DB = path.resolve(__dirname, '../gladys-development.db');
+const DEV_DB = path.resolve(__dirname, '../gladys-data/gladys-development.db');
 
 if (process.env.NODE_ENV !== 'test') {
   throw new Error(

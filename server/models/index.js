@@ -6,10 +6,14 @@ const Promise = require('bluebird');
 const chunk = require('lodash.chunk');
 const path = require('path');
 const getConfig = require('../utils/getConfig');
+const { prepareDataFolder } = require('../utils/prepareDataFolder');
 const logger = require('../utils/logger');
 const { formatDateInUTC } = require('../utils/date');
 
 const config = getConfig();
+
+// The folder of the databases must exist before SQLite and DuckDB open them
+prepareDataFolder(config);
 
 // SQLite
 const sequelize = new Sequelize('mainDB', null, null, config);
