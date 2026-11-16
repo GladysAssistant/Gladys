@@ -21,6 +21,7 @@ const MAX_ATTEMPTS = 3;
 const GATEWAY_CONNECTION_LOST = 'GATEWAY_CONNECTION_LOST';
 const GATEWAY_CONNECTION_TIMEOUT = 'GATEWAY_CONNECTION_TIMEOUT';
 const GATEWAY_REQUEST_TIMEOUT = 'GATEWAY_REQUEST_TIMEOUT';
+const GATEWAY_SESSION_CLOSED = 'GATEWAY_SESSION_CLOSED';
 
 class GatewayConnectionLostError extends Error {
   constructor(requestSent) {
@@ -104,7 +105,12 @@ export class GatewayHttpClient {
 
   // Sends one call, and settles when it is answered, when the connection closes, or after
   // the timeout: it never stays pending
-  sendRequest(func, url, data) {
+  sendRequest(func, url, data, resetCount) {
+    if (resetCount !== this.session.resetCount) {
+      // The session was closed since this call was made (logout, session refused by the
+      // instance): it must not run under the next login
+      return Promise.reject(new Error(GATEWAY_SESSION_CLOSED));
+    }
     if (!this.session.ready) {
       // the connection closed while this call was waiting for its slot in the limiter
       return Promise.reject(new GatewayConnectionLostError(false));
@@ -129,13 +135,13 @@ export class GatewayHttpClient {
     });
   }
 
-  async callApi(func, url, data, attempt = 1) {
+  async callApi(func, url, data, attempt = 1, resetCount = this.session.resetCount) {
     try {
       await this.waitForConnection();
       const result = await this.limiter(async () => {
         // a check may have started while this call was waiting for its slot
         await this.waitForConnectionCheck();
-        return this.sendRequest(func, url, data);
+        return this.sendRequest(func, url, data, resetCount);
       });
       return result;
     } catch (e) {
@@ -144,7 +150,7 @@ export class GatewayHttpClient {
       // A POST / PATCH / DELETE that was sent may have been executed, so it fails instead.
       const canBeSentAgain = func === 'sendRequestGet' || e.requestSent === false;
       if (e instanceof GatewayConnectionLostError && canBeSentAgain && attempt < MAX_ATTEMPTS) {
-        return this.callApi(func, url, data, attempt + 1);
+        return this.callApi(func, url, data, attempt + 1, resetCount);
       }
       const error = {
         response: {

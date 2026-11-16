@@ -39,18 +39,37 @@ class GatewaySession {
     // the check of the connection in progress, if any (see checkConnection)
     this.connectionCheck = null;
     this.stopWaitingForAnswer = null;
-    this.watchedSocket = null;
+    // how many times the session was closed: a call made before must not run after
+    this.resetCount = 0;
     this.onVisibilityChange = this.onVisibilityChange.bind(this);
-    this.dropBufferedPackets = this.dropBufferedPackets.bind(this);
     this.gladysGatewayApiUrl = config.gladysGatewayApiUrl;
     this.gatewayClient = this.createGatewayClient();
   }
 
   createGatewayClient() {
-    return new GladysGatewayClient({
+    const gatewayClient = new GladysGatewayClient({
       serverUrl: config.gladysGatewayApiUrl,
       cryptoLib: window.crypto
     });
+    this.guardEncryption(gatewayClient);
+    return gatewayClient;
+  }
+
+  // The Gateway client encrypts an API call, then emits it whatever happened to the socket
+  // in the meantime. A call still being encrypted when the socket closes has already been
+  // reported as lost (GatewayHttpClient): it must not leave afterwards, neither into the
+  // buffer of the closed socket nor on the next connection, or the user would run it a
+  // second time. Failing the encryption is what stops the client before it emits.
+  guardEncryption(gatewayClient) {
+    const { encryptMessage } = gatewayClient.crypto;
+    gatewayClient.crypto.encryptMessage = async (...args) => {
+      const disconnectionCount = this.disconnectionCount;
+      const encryptedMessage = await encryptMessage(...args);
+      if (disconnectionCount !== this.disconnectionCount) {
+        throw new Error('GATEWAY_CONNECTION_LOST');
+      }
+      return encryptedMessage;
+    };
   }
 
   async init() {
@@ -66,6 +85,7 @@ class GatewaySession {
     // writing its local draft on unmount) must not see it as open
     this.connected = false;
     this.ready = false;
+    this.resetCount += 1;
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
     // A closed session keeps nothing open: its socket would stay authenticated on the
     // Gateway. Closing it also ends the calls still waiting for an answer, and the next
@@ -94,7 +114,6 @@ class GatewaySession {
         if (type === 'websocket.connected' && message.connected) {
           this.websocketConnected = true;
           this.ready = true;
-          this.watchSocket();
           this.dispatcher.dispatch('websocket.connected', { connected: true });
         }
         if (type === 'websocket.connected' && !message.connected) {
@@ -115,25 +134,15 @@ class GatewaySession {
     }
   }
 
-  // socket.io keeps what is emitted on a socket that is closed, or whose ping has expired
-  // (the first thing to run when a frozen page thaws), and sends it by itself on the next
-  // connection. No API call may leave that way: by then GatewayHttpClient has either sent
-  // it again or reported it as failed, so the user would run it a second time. Nothing else
-  // is worth keeping either, authentication is emitted again on every connection.
+  // socket.io keeps what is emitted on a socket whose ping has expired (the first thing to
+  // run when a frozen page thaws), and sends it by itself on the next connection. No API
+  // call may leave that way: by then GatewayHttpClient has either sent it again or reported
+  // it as failed, so the user would run it a second time. Nothing else is worth keeping
+  // either, authentication is emitted again on every connection.
   dropBufferedPackets() {
     const { socket } = this.gatewayClient;
     if (socket) {
       socket.sendBuffer = [];
-    }
-  }
-
-  // Dropped when the socket closes, and again when the next connection opens, for what was
-  // emitted in between (a call being encrypted when the socket closed)
-  watchSocket() {
-    const { socket } = this.gatewayClient;
-    if (this.watchedSocket !== socket) {
-      this.watchedSocket = socket;
-      socket.io.on('open', this.dropBufferedPackets);
     }
   }
 
