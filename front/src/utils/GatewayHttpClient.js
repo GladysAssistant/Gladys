@@ -67,9 +67,11 @@ export class GatewayHttpClient {
   }
 
   getCacheKey(url, query) {
-    // Create a unique key based on the URL and query parameters
+    // Create a unique key based on the URL and query parameters. A GET made before the
+    // session was closed fails once the session logs in again: a GET made after must not
+    // share its promise.
     const queryKey = query ? JSON.stringify(query) : '';
-    return `${url}?${queryKey}`;
+    return `${this.session.resetCount}:${url}?${queryKey}`;
   }
 
   // A call sent on a dead socket is lost. So a call waits for the verdict when the connection
@@ -195,8 +197,10 @@ export class GatewayHttpClient {
    * @returns {Promise<object>} Parsed JSON response.
    */
   async postBinary(url, body, contentType = 'application/octet-stream') {
+    // read before the encoding, during which the session can be closed
+    const { resetCount } = this.session;
     const gatewayBody = await encodeGatewayBinaryBody(body, contentType);
-    return this.callApi('sendRequestPost', url, gatewayBody);
+    return this.callApi('sendRequestPost', url, gatewayBody, 1, resetCount);
   }
 
   async patch(url, body) {
