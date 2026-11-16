@@ -71,13 +71,18 @@ export class GatewayHttpClient {
     return `${url}?${queryKey}`;
   }
 
-  // Resolves as soon as the session is connected and authenticated on the Gateway
-  async waitForConnection() {
-    if (this.session.connectionCheck) {
-      // The connection is being checked, typically because the app is back from the
-      // background: a call sent now could leave on a dead socket and be lost
+  // A call sent on a dead socket is lost. So a call waits for the verdict when the connection
+  // is being checked (the app is back from the background), and asks for a check when the
+  // page is still in the background, where its socket may have been killed unnoticed.
+  async waitForConnectionCheck() {
+    if (this.session.connectionCheck || this.session.connectionMayBeDead()) {
       await this.session.checkConnection();
     }
+  }
+
+  // Resolves as soon as the session is connected and authenticated on the Gateway
+  async waitForConnection() {
+    await this.waitForConnectionCheck();
     if (this.session.ready) {
       return;
     }
@@ -127,7 +132,11 @@ export class GatewayHttpClient {
   async callApi(func, url, data, attempt = 1) {
     try {
       await this.waitForConnection();
-      const result = await this.limiter(() => this.sendRequest(func, url, data));
+      const result = await this.limiter(async () => {
+        // a check may have started while this call was waiting for its slot
+        await this.waitForConnectionCheck();
+        return this.sendRequest(func, url, data);
+      });
       return result;
     } catch (e) {
       // A call lost with its connection is sent again once the connection is back, but only

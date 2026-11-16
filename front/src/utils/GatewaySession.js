@@ -39,12 +39,18 @@ class GatewaySession {
     // the check of the connection in progress, if any (see checkConnection)
     this.connectionCheck = null;
     this.stopWaitingForAnswer = null;
+    this.watchedSocket = null;
+    this.onVisibilityChange = this.onVisibilityChange.bind(this);
+    this.dropBufferedPackets = this.dropBufferedPackets.bind(this);
     this.gladysGatewayApiUrl = config.gladysGatewayApiUrl;
-    this.gatewayClient = new GladysGatewayClient({
+    this.gatewayClient = this.createGatewayClient();
+  }
+
+  createGatewayClient() {
+    return new GladysGatewayClient({
       serverUrl: config.gladysGatewayApiUrl,
       cryptoLib: window.crypto
     });
-    document.addEventListener('visibilitychange', this.onVisibilityChange.bind(this));
   }
 
   async init() {
@@ -60,6 +66,12 @@ class GatewaySession {
     // writing its local draft on unmount) must not see it as open
     this.connected = false;
     this.ready = false;
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    // A closed session keeps nothing open: its socket would stay authenticated on the
+    // Gateway. Closing it also ends the calls still waiting for an answer, and the next
+    // login starts from a client that knows nothing of this one.
+    this.gatewayClient.disconnect();
+    this.gatewayClient = this.createGatewayClient();
     keyValueStore.clear();
   }
 
@@ -73,6 +85,8 @@ class GatewaySession {
 
     if (refreshToken && serializedKeys) {
       this.connected = true;
+      // adding the same listener twice is a no-op
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
       await this.gatewayClient.userConnect(refreshToken, serializedKeys, (type, message) => {
         if (type === 'message') {
           this.dispatcher.dispatch(message.event, message.data);
@@ -80,6 +94,7 @@ class GatewaySession {
         if (type === 'websocket.connected' && message.connected) {
           this.websocketConnected = true;
           this.ready = true;
+          this.watchSocket();
           this.dispatcher.dispatch('websocket.connected', { connected: true });
         }
         if (type === 'websocket.connected' && !message.connected) {
@@ -91,6 +106,7 @@ class GatewaySession {
           if (this.stopWaitingForAnswer) {
             this.stopWaitingForAnswer();
           }
+          this.dropBufferedPackets();
           this.dispatcher.dispatch('websocket.connected', { connected: false });
         }
       });
@@ -99,16 +115,46 @@ class GatewaySession {
     }
   }
 
+  // socket.io keeps what is emitted on a socket that is closed, or whose ping has expired
+  // (the first thing to run when a frozen page thaws), and sends it by itself on the next
+  // connection. No API call may leave that way: by then GatewayHttpClient has either sent
+  // it again or reported it as failed, so the user would run it a second time. Nothing else
+  // is worth keeping either, authentication is emitted again on every connection.
+  dropBufferedPackets() {
+    const { socket } = this.gatewayClient;
+    if (socket) {
+      socket.sendBuffer = [];
+    }
+  }
+
+  // Dropped when the socket closes, and again when the next connection opens, for what was
+  // emitted in between (a call being encrypted when the socket closed)
+  watchSocket() {
+    const { socket } = this.gatewayClient;
+    if (this.watchedSocket !== socket) {
+      this.watchedSocket = socket;
+      socket.io.on('open', this.dropBufferedPackets);
+    }
+  }
+
   onVisibilityChange() {
     if (document.hidden) {
       this.hiddenSince = Date.now();
       return;
     }
-    const hiddenSince = this.hiddenSince;
+    const connectionMayBeDead = this.connectionMayBeDead();
     this.hiddenSince = null;
-    if (hiddenSince !== null && Date.now() - hiddenSince >= BACKGROUND_DURATION_BEFORE_CHECK_MS) {
+    if (connectionMayBeDead) {
       this.checkConnection();
     }
+  }
+
+  // True while the page is in the background, and has been for long enough to have been
+  // frozen and its socket killed. Code can run in that state: in a background tab of a
+  // computer, or when a frozen page thaws, where a timer may fire before the page is told
+  // that it is visible again. GatewayHttpClient checks the connection before sending then.
+  connectionMayBeDead() {
+    return this.hiddenSince !== null && Date.now() - this.hiddenSince >= BACKGROUND_DURATION_BEFORE_CHECK_MS;
   }
 
   // Checks that the Gateway still answers on the socket, and reconnects when it does not.
@@ -147,8 +193,9 @@ class GatewaySession {
       if (await this.isGatewayAnswering()) {
         return true;
       }
-      if (disconnectionCount !== this.disconnectionCount) {
-        // the socket noticed by itself in the meantime, and is reconnecting or already has
+      if (disconnectionCount !== this.disconnectionCount || !this.connected) {
+        // the socket noticed by itself in the meantime, and is reconnecting or already
+        // has, or the session was closed
         return this.ready;
       }
     }
