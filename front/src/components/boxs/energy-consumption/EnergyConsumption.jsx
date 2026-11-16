@@ -69,6 +69,10 @@ const findDeviceFeatureBySelector = (devices, selector) => {
   return null;
 };
 
+// Labels appended by the energy-monitoring integration to the name of the
+// features it derives (see server/services/energy-monitoring/utils/addEnergyFeatures.js)
+const DERIVED_FEATURE_LABELS = ['consumption', 'cost', 'production'];
+
 // The legend names a series after its device first: several devices of the
 // same integration often expose energy features with identical (technical)
 // names, so the feature names alone can't tell the series apart (#3377).
@@ -96,12 +100,14 @@ const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
       visited.add(current.id);
       const parent = current.energy_parent_id ? featureById.get(current.energy_parent_id) : null;
       // Derived features are named "<parent name> (consumption)" / "(cost)":
-      // skip names that only repeat their parent's one.
+      // skip names that only repeat their parent's one. Any other suffix may
+      // tell sibling features apart (e.g. "Panel (Floor 1)"), so it is kept.
       const repeatsParent =
         parent &&
         parent.name &&
         current.name &&
-        (current.name === parent.name || current.name.startsWith(`${parent.name} (`));
+        (current.name === parent.name ||
+          DERIVED_FEATURE_LABELS.some(label => current.name === `${parent.name} (${label})`));
       if (current.name && !repeatsParent && current.name !== device.name) {
         pathNames.unshift(current.name);
       }
@@ -157,6 +163,26 @@ class EnergyConsumption extends Component {
     this.refreshData();
   }
 
+  // The devices (with all their features) are needed to name the series after
+  // their device and energy hierarchy. They are fetched once per widget, in
+  // parallel with the first consumption request; on error the legend falls
+  // back to "<device name> - <feature name>".
+  getDevices = () => {
+    if (!this.devicesPromise) {
+      this.devicesPromise = this.fetchDevices();
+    }
+    return this.devicesPromise;
+  };
+
+  fetchDevices = async () => {
+    try {
+      return await this.props.httpClient.get('/api/v1/device');
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  };
+
   componentDidUpdate(prevProps) {
     if (
       prevProps.box.device_features !== this.props.box.device_features ||
@@ -182,14 +208,17 @@ class EnergyConsumption extends Component {
       const { startDate, endDate } = this.getDateRange();
       const deviceFeatures = this.props.box.device_features;
 
-      const data = await this.props.httpClient.get(`/api/v1/device_feature/energy_consumption`, {
-        device_features: deviceFeatures.join(','),
-        from: startDate.toISOString(),
-        to: endDate.toISOString(),
-        group_by: this.getGroupBy(),
-        display_mode: this.state.displayMode,
-        period_start_day: getPeriodStartDay(this.props.box)
-      });
+      const [data, devices] = await Promise.all([
+        this.props.httpClient.get(`/api/v1/device_feature/energy_consumption`, {
+          device_features: deviceFeatures.join(','),
+          from: startDate.toISOString(),
+          to: endDate.toISOString(),
+          group_by: this.getGroupBy(),
+          display_mode: this.state.displayMode,
+          period_start_day: getPeriodStartDay(this.props.box)
+        }),
+        this.getDevices()
+      ]);
 
       let emptySeries = true;
       let totalConsumption = 0;
@@ -255,7 +284,7 @@ class EnergyConsumption extends Component {
         }));
 
         pendingSeries.push({
-          displayName: getEnergyFeatureDisplayName(this.props.devices, selector, deviceData),
+          displayName: getEnergyFeatureDisplayName(devices, selector, deviceData),
           seriesData,
           isSubscription
         });
@@ -632,4 +661,4 @@ class EnergyConsumption extends Component {
   }
 }
 
-export default connect('user,session,httpClient,houses,devices,deviceFeatures', {})(withIntlAsProp(EnergyConsumption));
+export default connect('user,session,httpClient,houses,deviceFeatures', {})(withIntlAsProp(EnergyConsumption));
