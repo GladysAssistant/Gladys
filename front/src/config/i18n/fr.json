@@ -5224,6 +5224,7 @@
       "roomNameLabel": "Nom de la pièce",
       "roomNameRequired": "Une pièce a besoin d'un nom.",
       "roomNameTaken": "Cette maison a déjà une pièce de ce nom.",
+      "roomNameTakenElsewhere": "Une autre maison a déjà une pièce de ce nom. Ajoutez le nom de la maison pour les distinguer.",
       "deleteRoom": "Supprimer la pièce",
       "deleteRoomHint": "La pièce est supprimée à l'enregistrement de la maison. Ses appareils sont conservés, sans pièce.",
       "roomDeleted": "« {{name}} » supprimée",

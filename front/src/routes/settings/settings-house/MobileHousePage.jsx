@@ -221,6 +221,10 @@ class MobileHousePage extends Component {
   renderEditor(props, { openHouseId, leaveRequestKey }) {
     const houseIndex = props.houses.findIndex(house => house.id === openHouseId);
     const house = props.houses[houseIndex];
+    // the rooms of the other houses: the name of a room is unique in the whole instance
+    const otherRoomNames = props.houses
+      .filter(otherHouse => otherHouse.id !== house.id)
+      .reduce((names, otherHouse) => names.concat((otherHouse.rooms || []).map(room => room.name)), []);
     return (
       <div class="page">
         <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
@@ -231,6 +235,7 @@ class MobileHousePage extends Component {
               key={house.id}
               house={house}
               houseIndex={houseIndex}
+              otherRoomNames={otherRoomNames}
               dirty={Boolean(get(props.dirtyHouses, house.id))}
               houseUpdateStatus={get(props.houseUpdateStatus, house.id)}
               deleteHouse={this.deleteHouse}

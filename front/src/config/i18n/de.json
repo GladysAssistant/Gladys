@@ -5224,6 +5224,7 @@
       "roomNameLabel": "Name des Raums",
       "roomNameRequired": "Ein Raum braucht einen Namen.",
       "roomNameTaken": "Dieses Haus hat bereits einen Raum mit diesem Namen.",
+      "roomNameTakenElsewhere": "Ein anderes Haus hat bereits einen Raum mit diesem Namen. Fügen Sie den Namen des Hauses hinzu, um sie zu unterscheiden.",
       "deleteRoom": "Raum löschen",
       "deleteRoomHint": "Der Raum wird beim Speichern des Hauses gelöscht. Seine Geräte bleiben erhalten, ohne Raum.",
       "roomDeleted": "„{{name}}“ gelöscht",

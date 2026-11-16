@@ -142,6 +142,21 @@ class MobileEditHouse extends Component {
   isNameTaken = (name, exceptIndex) =>
     this.visibleRooms().some(({ room, index }) => index !== exceptIndex && sameName(room.name, name));
 
+  // The name of a room is unique in the whole instance, not only in its house (the server
+  // refuses the save otherwise): a name another house uses is refused next to the field
+  isNameTakenElsewhere = name => (this.props.otherRoomNames || []).some(otherName => sameName(otherName, name));
+
+  // The error of a room name, or null when the name can be used
+  getNameError = (name, exceptIndex) => {
+    if (this.isNameTaken(name, exceptIndex)) {
+      return 'roomNameTaken';
+    }
+    if (this.isNameTakenElsewhere(name)) {
+      return 'roomNameTakenElsewhere';
+    }
+    return null;
+  };
+
   // ---------- one room ----------
 
   openRoom = index => () =>
@@ -170,8 +185,9 @@ class MobileEditHouse extends Component {
       this.setState({ roomError: 'roomNameRequired' });
       return;
     }
-    if (this.isNameTaken(name, roomIndex)) {
-      this.setState({ roomError: 'roomNameTaken' });
+    const roomError = this.getNameError(name, roomIndex);
+    if (roomError) {
+      this.setState({ roomError });
       return;
     }
     this.props.editRoom(roomIndex, 'name', name);
@@ -229,8 +245,9 @@ class MobileEditHouse extends Component {
     if (name.length === 0) {
       return;
     }
-    if (this.isNameTaken(name)) {
-      this.setState({ newRoomError: 'roomNameTaken' });
+    const newRoomError = this.getNameError(name);
+    if (newRoomError) {
+      this.setState({ newRoomError });
       return;
     }
     this.props.addRoomNamed(name);
@@ -543,7 +560,8 @@ class MobileEditHouse extends Component {
           <MobileSectionHeader title={<Text id="housesSettings.mobile.roomSuggestionsTitle" />} />
           <RoomSuggestions
             selectedNames={rooms.map(({ room }) => room.name)}
-            excludedNames={savedRoomNames}
+            // a room of another house cannot be suggested: its name is taken
+            excludedNames={[...savedRoomNames, ...(props.otherRoomNames || [])]}
             extraNames={unsavedRoomNames}
             onToggle={this.toggleSuggestion}
           />

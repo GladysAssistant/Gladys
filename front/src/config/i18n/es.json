@@ -5224,6 +5224,7 @@
       "roomNameLabel": "Nombre de la habitación",
       "roomNameRequired": "Una habitación necesita un nombre.",
       "roomNameTaken": "Esta casa ya tiene una habitación con este nombre.",
+      "roomNameTakenElsewhere": "Otra casa ya tiene una habitación con este nombre. Añade el nombre de la casa para distinguirlas.",
       "deleteRoom": "Eliminar la habitación",
       "deleteRoomHint": "La habitación se elimina al guardar la casa. Sus dispositivos se conservan, sin habitación.",
       "roomDeleted": "«{{name}}» eliminada",

@@ -5,6 +5,9 @@ describe('Houses on a phone', () => {
   const houseSelector = 'phone-house';
   const newHouseName = 'Cabin By The Lake';
   const newHouseSelector = 'cabin-by-the-lake';
+  // another house, whose room name cannot be used again: a room name is unique in the instance
+  const otherHouseName = 'Phone Other House';
+  const otherHouseSelector = 'phone-other-house';
 
   const deleteHouse = selector =>
     cy.request({ method: 'DELETE', url: `${serverUrl}/api/v1/house/${selector}`, failOnStatusCode: false });
@@ -36,10 +39,21 @@ describe('Houses on a phone', () => {
     cy.login();
     deleteHouse(houseSelector);
     deleteHouse(newHouseSelector);
+    deleteHouse(otherHouseSelector);
     cy.request({
       method: 'POST',
       url: `${serverUrl}/api/v1/house`,
       body: { name: houseName }
+    });
+    cy.request({
+      method: 'POST',
+      url: `${serverUrl}/api/v1/house`,
+      body: { name: otherHouseName }
+    });
+    cy.request({
+      method: 'POST',
+      url: `${serverUrl}/api/v1/house/${otherHouseSelector}/room`,
+      body: { name: 'Laundry room' }
     });
     ['Kitchen', 'Office'].forEach(name =>
       cy.request({ method: 'POST', url: `${serverUrl}/api/v1/house/${houseSelector}/room`, body: { name } })
@@ -55,6 +69,7 @@ describe('Houses on a phone', () => {
     cy.login();
     deleteHouse(houseSelector);
     deleteHouse(newHouseSelector);
+    deleteHouse(otherHouseSelector);
   });
 
   it('should list the houses as rows and open one in a focus view', () => {
@@ -119,8 +134,14 @@ describe('Houses on a phone', () => {
     // add: a suggestion in one tap, and a room by its name
     cy.get('[data-cy=house-add-room]').click();
     cy.get('[data-cy=house-add-room-sheet]').should('be.visible');
-    cy.contains('[data-cy=room-suggestion]', 'Living room').click();
-    cy.contains('[data-cy=room-suggestion]', 'Living room').should('have.attr', 'aria-pressed', 'true');
+    cy.contains('[data-cy=room-suggestion]', 'Dining room').click();
+    cy.contains('[data-cy=room-suggestion]', 'Dining room').should('have.attr', 'aria-pressed', 'true');
+    // the room of another house is not offered, and its name is refused next to the field
+    cy.contains('[data-cy=room-suggestion]', 'Laundry room').should('not.exist');
+    cy.get('[data-cy=house-new-room-name]').type('laundry room');
+    cy.get('[data-cy=house-new-room-add]').click();
+    cy.get('[data-cy=house-add-room-sheet]').i18n('housesSettings.mobile.roomNameTakenElsewhere');
+    cy.get('[data-cy=house-new-room-name]').clear();
     cy.contains('[data-cy=room-suggestion]', 'Garage').click();
     // a suggestion is a toggle
     cy.contains('[data-cy=room-suggestion]', 'Garage').click();
@@ -153,7 +174,7 @@ describe('Houses on a phone', () => {
 
     cy.request({ method: 'GET', url: `${serverUrl}/api/v1/house?expand=rooms` }).then(res => {
       const house = res.body.find(candidate => candidate.selector === houseSelector);
-      expect(house.rooms.map(room => room.name).sort()).to.deep.equal(['Living room', 'Study', 'Workshop']);
+      expect(house.rooms.map(room => room.name).sort()).to.deep.equal(['Dining room', 'Study', 'Workshop']);
     });
   });
 

@@ -5224,6 +5224,7 @@
       "roomNameLabel": "Name of the room",
       "roomNameRequired": "A room needs a name.",
       "roomNameTaken": "This house already has a room with this name.",
+      "roomNameTakenElsewhere": "Another house already has a room with this name. Add the name of the house to tell them apart.",
       "deleteRoom": "Delete the room",
       "deleteRoomHint": "The room is deleted when you save the house. Its devices are kept, without a room.",
       "roomDeleted": "“{{name}}” deleted",

@@ -97,16 +97,20 @@ the very resize that queued that frame.
 - **Tapping a room** opens its sheet: its name in a field, and "Delete the room". The new name is
   applied when the sheet is validated (**OK**, or the keyboard's key): an empty name or the name
   of another room of the house is refused with a message, and never reaches the house.
+- **The name of a room is unique in the whole instance**, not only in its house (the room model
+  on the server): the name of a room of **another house** is refused the same way, next to the
+  field ("Another house already has a room with this name…"), instead of failing the save of
+  the house with a conflict. The comparison ignores case and surrounding spaces.
 - **Deleting a room** is local until the house is saved (as on desktop: a saved room is flagged,
   a new one is dropped), so it needs no confirmation: a toast "“Kitchen” deleted" offers **Undo**
   for 5 seconds. A footnote in the sheet says what the deletion does to the devices of the room.
 - **Add** opens a sheet that stays open while several rooms are added:
-  - a field and its "Add" button (the keyboard's key adds too); a name already in the house is
-    refused with a message;
+  - a field and its "Add" button (the keyboard's key adds too); a name already in the house, or
+    in another house, is refused with a message;
   - **Common rooms** (`RoomSuggestions`): living room, kitchen, bedroom, bathroom, entrance,
     office, dining room, kids' room, toilet, garage, laundry room, garden — in the language of
     the user (`housesSettings.mobile.roomSuggestions`), without the ones the house already has
-    saved. A chip is a **toggle** (`aria-pressed`): a tap adds the room, another tap removes the
+    saved nor the ones another house holds (their name is taken). A chip is a **toggle** (`aria-pressed`): a tap adds the room, another tap removes the
     room it just added. The rooms typed in the field join the chips, selected.
 
 ### C.4 Alarm
