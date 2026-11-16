@@ -401,6 +401,19 @@ describe('zigbee2mqtt installz2mContainer', () => {
       expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
     });
 
+    it('should update the restart policy of the container kept on the same dongle', async () => {
+      realpath.withArgs(BY_ID_PATH).resolves('/dev/ttyUSB0');
+      gladys.system.inspectContainer = fake.resolves({
+        ...containerDescription,
+        HostConfig: { ...containerDescription.HostConfig, RestartPolicy: { Name: 'no' } },
+      });
+      await zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: BY_ID_PATH });
+      assert.notCalled(gladys.system.removeContainer);
+      assert.calledOnceWithExactly(gladys.system.updateContainer, containerStopped.id, {
+        RestartPolicy: { Name: 'always' },
+      });
+    });
+
     it('should not keep the container of another dongle', async () => {
       realpath.withArgs(BY_ID_PATH).resolves('/dev/ttyUSB1');
       const promise = zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: BY_ID_PATH });

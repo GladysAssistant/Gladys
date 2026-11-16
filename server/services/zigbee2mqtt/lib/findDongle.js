@@ -16,7 +16,7 @@ async function findDongle(driverPath) {
     throw new ServiceNotConfiguredError('USB service is not available');
   }
   const ports = await usb.list();
-  const port = findConfiguredPort(ports, driverPath);
+  const port = await findConfiguredPort(ports, driverPath);
   if (!port) {
     return null;
   }

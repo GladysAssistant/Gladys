@@ -340,6 +340,17 @@ describe('zigbee2mqtt setup', () => {
       expect(zigbee2MqttManager.installation.state).to.equal('idle');
     });
 
+    it('should refuse the USB mode without a dongle, and keep the stored network coordinator', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({
+        z2mAdapterMode: 'network',
+        z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638',
+      });
+      const promise = zigbee2MqttManager.setup({ Z2M_ADAPTER_MODE: 'usb', ZIGBEE_DONGLE_NAME: ZBDONGLE_P });
+      await expect(promise).to.be.rejectedWith(BadParameters, 'DONGLE_NOT_FOUND');
+      assert.notCalled(gladys.variable.setValue);
+      assert.notCalled(zigbee2MqttManager.runInstallation);
+    });
+
     it('should refuse another setting while the stored dongle is unplugged', async () => {
       zigbee2MqttManager.getConfiguration = fake.resolves({ z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB1' });
       const promise = zigbee2MqttManager.setup({ Z2M_TCP_PORT: '8081' });

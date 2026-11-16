@@ -24,51 +24,86 @@ const teleinfo = {
 
 describe('zigbee2mqtt donglePorts', () => {
   describe('findConfiguredPort', () => {
-    it('should find nothing without a stored path', () => {
-      expect(findConfiguredPort([zbDongleP], null)).to.equal(null);
+    it('should find nothing without a stored path', async () => {
+      expect(await findConfiguredPort([zbDongleP], null)).to.equal(null);
     });
 
-    it('should find the dongle stored by its port', () => {
-      expect(findConfiguredPort([teleinfo, zbDongleP], '/dev/ttyUSB0')).to.equal(zbDongleP);
+    it('should find the dongle stored by its port', async () => {
+      expect(await findConfiguredPort([teleinfo, zbDongleP], '/dev/ttyUSB0')).to.equal(zbDongleP);
     });
 
-    it('should not find a port that is no longer there', () => {
-      expect(findConfiguredPort([teleinfo], '/dev/ttyUSB0')).to.equal(null);
+    it('should not find a port that is no longer there', async () => {
+      expect(await findConfiguredPort([teleinfo], '/dev/ttyUSB0')).to.equal(null);
     });
 
-    it('should find the dongle stored by its /dev/serial/by-id/ link, whatever its port', () => {
+    it('should find the dongle stored by its /dev/serial/by-id/ link, whatever its port', async () => {
       const moved = { ...zbDongleP, path: '/dev/ttyUSB3' };
-      expect(findConfiguredPort([teleinfo, moved], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(moved);
+      expect(await findConfiguredPort([teleinfo, moved], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(moved);
     });
 
-    it('should find the dongle by its serial number when its link got another name', () => {
+    it('should find the dongle by its serial number when its link got another name', async () => {
       const renamed = { ...zbDongleP, pnpId: `usb-Silicon_Labs_CP2102N_${zbDongleP.serialNumber}-if00-port0` };
-      expect(findConfiguredPort([teleinfo, renamed], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(renamed);
+      expect(await findConfiguredPort([teleinfo, renamed], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(renamed);
     });
 
-    it('should not take another interface of the same device', () => {
+    it('should not take another interface of the same device', async () => {
       const otherInterface = { ...zbDongleP, pnpId: ZBDONGLE_P_LINK.replace('-if00-', '-if01-') };
-      expect(findConfiguredPort([otherInterface], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(null);
+      expect(await findConfiguredPort([otherInterface], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(null);
     });
 
-    it('should not take a device by a short serial number, shared by a whole series', () => {
+    it('should not take a device by a short serial number, shared by a whole series', async () => {
       const storedLink = '/dev/serial/by-id/usb-Silicon_Labs_Zigbee_Stick_0001-if00-port0';
-      expect(findConfiguredPort([teleinfo], storedLink)).to.equal(null);
+      expect(await findConfiguredPort([teleinfo], storedLink)).to.equal(null);
     });
 
-    it('should not take a device when two have the serial number', () => {
+    it('should not take a device when two have the serial number', async () => {
       const twin = { ...zbDongleP, path: '/dev/ttyUSB2', pnpId: `usb-Other_${zbDongleP.serialNumber}-if00-port0` };
       const renamed = { ...zbDongleP, pnpId: `usb-Renamed_${zbDongleP.serialNumber}-if00-port0` };
-      expect(findConfiguredPort([twin, renamed], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(null);
+      expect(await findConfiguredPort([twin, renamed], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(null);
     });
 
-    it('should not look for a serial number in a link without interface', () => {
-      expect(findConfiguredPort([zbDongleP], '/dev/serial/by-id/usb-Unknown_device')).to.equal(null);
+    it('should not look for a serial number in a link without interface', async () => {
+      expect(await findConfiguredPort([zbDongleP], '/dev/serial/by-id/usb-Unknown_device')).to.equal(null);
     });
 
-    it('should not take a device without serial number nor USB device name', () => {
+    it('should not take a device without serial number nor USB device name', async () => {
       const machinePort = { path: '/dev/ttyS0' };
-      expect(findConfiguredPort([machinePort], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(null);
+      expect(await findConfiguredPort([machinePort], `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(null);
+    });
+
+    describe('link shared by two identical adapters without serial number', () => {
+      const LINK = 'usb-1a86_USB_Serial-if00-port0';
+      const first = { path: '/dev/ttyUSB0', pnpId: LINK };
+      const second = { path: '/dev/ttyUSB1', pnpId: LINK };
+      let realpath;
+
+      beforeEach(() => {
+        realpath = sinon.stub(fs.promises, 'realpath');
+      });
+
+      afterEach(() => {
+        realpath.restore();
+      });
+
+      it('should take the adapter the link leads to, which Docker uses', async () => {
+        realpath.resolves('/dev/ttyUSB1');
+        expect(await findConfiguredPort([first, second], `/dev/serial/by-id/${LINK}`)).to.equal(second);
+      });
+
+      it('should take none when the link leads to a port not listed', async () => {
+        realpath.resolves('/dev/ttyUSB2');
+        expect(await findConfiguredPort([first, second], `/dev/serial/by-id/${LINK}`)).to.equal(null);
+      });
+
+      it('should take none when the link cannot be read', async () => {
+        realpath.rejects(new Error('ENOENT'));
+        expect(await findConfiguredPort([first, second], `/dev/serial/by-id/${LINK}`)).to.equal(null);
+      });
+
+      it('should take the port listed twice under the same path, without reading the link', async () => {
+        expect(await findConfiguredPort([first, { ...first }], `/dev/serial/by-id/${LINK}`)).to.equal(first);
+        sinon.assert.notCalled(realpath);
+      });
     });
   });
 

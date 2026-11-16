@@ -46,14 +46,14 @@ async function setup(config) {
   const savedAdapterMode = getSavedValue(CONFIGURATION.Z2M_ADAPTER_MODE, z2mAdapterMode);
   const savedDriverPath = getSavedValue(CONFIGURATION.Z2M_DRIVER_PATH, z2mDriverPath);
   // The USB dongle given by the setup, or kept from the stored one, must be plugged in: saved, a dongle that is not
-  // there would replace a configuration that works, for an installation that fails at once
+  // there would replace a configuration that works, for an installation that fails at once. So would no dongle at all,
+  // which the setup page never sends.
   let storedDriverPath = z2mDriverPath;
   if (
     savedAdapterMode !== ADAPTER_MODE.NETWORK &&
-    getSavedValue(CONFIGURATION.Z2M_MQTT_MODE, mqttMode) !== MQTT_MODE.EXTERNAL &&
-    savedDriverPath
+    getSavedValue(CONFIGURATION.Z2M_MQTT_MODE, mqttMode) !== MQTT_MODE.EXTERNAL
   ) {
-    const dongle = await this.findDongle(savedDriverPath);
+    const dongle = savedDriverPath ? await this.findDongle(savedDriverPath) : null;
     if (!dongle) {
       throw new BadParameters(INSTALLATION_ERROR.DONGLE_NOT_FOUND);
     }

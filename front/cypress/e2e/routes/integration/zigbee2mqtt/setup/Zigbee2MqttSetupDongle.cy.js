@@ -25,9 +25,12 @@ describe('Zigbee2mqtt USB dongle', () => {
     adapter: ZBDONGLE_E
   };
 
-  const visitSetup = (status, setup = {}) => {
+  const visitSetup = (status, setup = {}, { statusDelay = 0 } = {}) => {
     const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: status });
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      { body: status, delay: statusDelay }
+    ).as('status');
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: setup });
     cy.intercept(
       { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch` },
@@ -174,6 +177,29 @@ describe('Zigbee2mqtt USB dongle', () => {
         ZIGBEE_DONGLE_NAME: ZBDONGLE_E
       }
     );
+
+    cy.get('[data-cy=z2m-dongle-missing]').i18n('integration.zigbee2mqtt.setup.dongleMissing');
+  });
+
+  it('should keep the missing dongle told while the status was being read', () => {
+    listPorts([machinePort]);
+    const configuredStatus = { ...readyToSetupStatus, mqttExist: true, mqttRunning: true, z2mEnabled: true };
+    visitSetup(
+      configuredStatus,
+      {
+        Z2M_MQTT_MODE: 'local',
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: `/dev/serial/by-id/${LINK}`,
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_E
+      },
+      // Long enough for the message to come before the answer
+      { statusDelay: 5000 }
+    );
+    cy.waitForWebSocket();
+    cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: { ...configuredStatus, dongleMissing: true } });
+    cy.wait('@status');
+    // Shown once the answer to the status, then the configuration, are applied
+    cy.get('[data-cy=z2m-setup-local-summary]').should('exist');
 
     cy.get('[data-cy=z2m-dongle-missing]').i18n('integration.zigbee2mqtt.setup.dongleMissing');
   });

@@ -105,7 +105,10 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
       creationNeeded = true;
-    } else {
+    }
+    // A container kept, on the same dongle without its image too: the watch of the dongle starts again only a
+    // container that Docker failed to start (K.3), which a container that Docker does not restart never is
+    if (!creationNeeded) {
       // An existing container never gets its HostConfig reconciled with the current descriptor,
       // so a container whose restart policy differs from the descriptor keeps it forever.
       // Enforce the expected restart policy so the container self-heals after a Zigbee

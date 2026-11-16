@@ -14,11 +14,12 @@ const MIN_SERIAL_NUMBER_LENGTH = 8;
  * /dev/serial/by-id/ link, or else the only device with the same serial number and interface (a link renamed).
  * @param {Array} ports - Serial ports, as listed by the serialport library.
  * @param {string} driverPath - Stored path of the dongle: /dev/ttyUSB0, or /dev/serial/by-id/<pnpId>.
- * @returns {object|null} The port, or null when the dongle is not plugged in.
+ * @returns {Promise<object|null>} The port, or null when the dongle is not plugged in.
  * @example
- * const port = findConfiguredPort(ports, '/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_1-if00-port0');
+ * const link = '/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_1-if00-port0';
+ * const port = await findConfiguredPort(ports, link);
  */
-function findConfiguredPort(ports, driverPath) {
+async function findConfiguredPort(ports, driverPath) {
   if (!driverPath) {
     return null;
   }
@@ -27,9 +28,19 @@ function findConfiguredPort(ports, driverPath) {
     return port || null;
   }
   const linkName = driverPath.slice(BY_ID_DIR.length);
-  const linkedPort = ports.find(({ pnpId }) => pnpId === linkName);
-  if (linkedPort) {
-    return linkedPort;
+  const linkedPorts = ports.filter(({ pnpId }) => pnpId === linkName);
+  // Two identical adapters without serial number share the link, which udev points at one of them: the one it leads
+  // to, which Docker gives to Zigbee2mqtt (some NAS list a port twice, under the same path)
+  if (new Set(linkedPorts.map(({ path }) => path)).size > 1) {
+    try {
+      const device = await fs.promises.realpath(driverPath);
+      return linkedPorts.find(({ path }) => path === device) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+  if (linkedPorts.length > 0) {
+    return linkedPorts[0];
   }
   // udev names the link usb-<vendor>_<product>_<serial number>-if<interface>[-port<n>]
   const interfaceMatch = linkName.match(/-if\d+(-port\d+)?$/);

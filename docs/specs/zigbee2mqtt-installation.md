@@ -7,7 +7,7 @@
 > its check on save and its watch (K). **Rule: any PR that changes one of these behaviors or contracts
 > modifies this file in the same diff.**
 >
-> Status: **implemented** (PR #3351; USB dongle, K: the next PR). The setup wizard and the
+> Status: **implemented** (PR #3351; USB dongle, K: PR #3395). The setup wizard and the
 > Zigbee2mqtt dashboard of the next PRs build on sections B to F and K.
 
 ## A. Context
@@ -350,7 +350,9 @@ audit).
   and the `serial.port` of `configuration.yaml` stay `/dev/ttyACM0`.
 - The stored dongle is found among the ports listed (`findConfiguredPort`): the port at its path,
   the port whose `pnpId` is the name of its link, or else the only port with the same serial number
-  (8 characters or more) and the same interface (`-ifNN[-portN]`): a link renamed.
+  (8 characters or more) and the same interface (`-ifNN[-portN]`): a link renamed. When several
+  ports carry the name of the link (an identical adapter plugged in after the link was stored), the
+  port the link leads to, which Docker uses; none when the link cannot be read.
 - **Migration, at each init.** A dongle stored by its port moves to its link when its USB fingerprint
   is the only dongle plugged in of the configured driver family (ember and ezsp count as one); a
   dongle found by its serial number moves to its new link. The variable is saved and the container
@@ -359,7 +361,8 @@ audit).
   USB-serial adapter, or that dongle, may have taken its number at this start).
 - The same dongle under a new path is not a new coordinator (G): without the image to create the
   container again (an update postponed), the container in place keeps running when both paths lead
-  to the same device, and a later init creates it again.
+  to the same device, its restart policy set to `always` as for any container kept (K.3 relies on
+  it), and a later init creates it again.
 - Going back to a version without this section: it does not know the link, sees the dongle as
   detached and does not connect to the broker (Zigbee2mqtt keeps running); saving the dongle again
   on its setup page fixes it.
@@ -367,7 +370,8 @@ audit).
 ### K.2 Check on save
 
 `POST /setup` in USB mode with the local broker: the dongle given by the setup, or the stored one
-when the setup gives none, must be plugged in, else
+when the setup gives none, must be plugged in (with none at all, which the setup page never sends,
+the same), else
 `400 { status: 400, code: 'BAD_REQUEST', message: 'DONGLE_NOT_FOUND' }`: nothing is saved nor
 started, a configuration that works stays in place. Checked after a first 409 check and before the
 second one (I). A dongle chosen by its port is saved by its `stablePath`; the stored dongle saved
