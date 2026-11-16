@@ -95,4 +95,28 @@ const addMapTileLayer = async (leafletMap, isDarkMode) => {
   }
 };
 
-export { addMapTileLayer };
+/**
+ * @description Remove a Leaflet map whose component unmounts. The basemap layer
+ * (maplibre-gl-leaflet) settles a resize or a zoom on the next animation frame
+ * without checking that its map is still there: a page that switches between its
+ * phone and desktop layouts unmounts its map in the very resize that queued such
+ * a frame (and a sheet may close during a zoom), which threw "Cannot read
+ * properties of null (reading 'getZoom')". The map is removed once those frames
+ * have run. Only for an unmount: a map rebuilt in the same container must be
+ * removed at once.
+ * @param {object} leafletMap - The Leaflet map to remove.
+ * @example
+ * removeMapWhenSettled(this.leafletMap);
+ */
+const removeMapWhenSettled = leafletMap => {
+  if (!leafletMap) {
+    return;
+  }
+  if (typeof window.requestAnimationFrame === 'function') {
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => leafletMap.remove()));
+  } else {
+    leafletMap.remove();
+  }
+};
+
+export { addMapTileLayer, removeMapWhenSettled };

@@ -195,6 +195,7 @@
 
 .sectionAction {
   flex-shrink: 0;
+  min-width: 44px;
   min-height: 44px;
   margin: -12px -6px -12px 0;
   padding: 0 6px;
@@ -600,6 +601,12 @@ a.row:active {
   box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.18);
 }
 
+.inputGroupInvalid,
+.inputGroupInvalid:focus-within {
+  border-color: #c23434;
+  box-shadow: 0 0 0 3px rgba(194, 52, 52, 0.14);
+}
+
 .inputGroup .input,
 .inputGroup .select {
   flex: 1;
@@ -725,7 +732,7 @@ button.inputAddon {
 .segment {
   flex: 1 1 0;
   min-width: 0;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 8px;
   border: 0;
   border-radius: 10px;
@@ -1256,7 +1263,6 @@ a.bigButtonGhost:focus {
 :global(.dark-mode) .bigButtonPrimary,
 :global(.dark-mode) .bigButtonDanger,
 :global(.dark-mode) .fab,
-:global(.dark-mode) .chipSelected,
 :global(.dark-mode) .stepsSegmentDone {
   filter: invert(100%) hue-rotate(180deg);
 }
@@ -1265,8 +1271,13 @@ a.bigButtonGhost:focus {
    icons back, which would invert them a third time */
 :global(.dark-mode) .bigButtonPrimary :global(.fe),
 :global(.dark-mode) .bigButtonDanger :global(.fe),
-:global(.dark-mode) .fab :global(.fe),
-:global(.dark-mode) .chipSelected :global(.fe) {
+:global(.dark-mode) .fab :global(.fe) {
+  filter: none;
+}
+
+/* a selected chip is the ink on the page: inverted with it, it is the light chip among the dark
+   ones (inverted back, it would be a dark chip among dark chips) */
+:global(.dark-mode) .chip :global(.fe) {
   filter: none;
 }
 
@@ -1311,6 +1322,12 @@ a.bigButtonGhost:focus {
 :global(.dark-mode) select.select:focus,
 :global(.dark-mode) textarea.textarea:focus {
   border-color: #2f5bd8 !important;
+}
+
+:global(.dark-mode) input.input.inputInvalid,
+:global(.dark-mode) select.select.inputInvalid,
+:global(.dark-mode) textarea.textarea.inputInvalid {
+  border-color: #c23434 !important;
 }
 
 :global(.dark-mode) input.input:disabled,

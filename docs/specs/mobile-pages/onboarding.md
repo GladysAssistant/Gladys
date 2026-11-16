@@ -116,7 +116,7 @@ without the five-step progress, with the way back to the welcome):
    targets of a phone inside this shell;
 2. the **backup key**: one field (no capitals, no correction: a key is pasted or typed as it
    is), its help, **Save** in the bottom bar;
-3. the **backups** as rows — when the backup was made, its date and its size — with "Change
+3. the **backups** as rows — the date of the backup, then how long ago and its size — with "Change
    backup key" and "Refresh" under them. **Tapping a backup opens a confirmation** (`ConfirmSheet`)
    naming it: the restore replaces the instance, it never starts on a single tap;
 4. the **restore in progress**, or its failure with the two ways out.

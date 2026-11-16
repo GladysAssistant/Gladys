@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import leaflet from 'leaflet';
-import { addMapTileLayer } from '../../utils/mapTileLayer';
+import { addMapTileLayer, removeMapWhenSettled } from '../../utils/mapTileLayer';
 import 'leaflet/dist/leaflet.css';
 
 const icon = leaflet.icon({
@@ -107,15 +107,8 @@ class MapComponent extends Component {
     const leafletMap = this.leafletMap;
     this.leafletMap = null;
     leafletMap.off('click', this.onClickOnMap);
-    // The basemap layer (maplibre-gl-leaflet) settles a resize or a zoom on the next animation
-    // frame, without checking that its map is still there. A page switching between its phone
-    // and desktop layouts unmounts this map in the very resize that queued such a frame, and a
-    // sheet may close during a zoom: the map is removed once those frames have run.
-    if (typeof window.requestAnimationFrame === 'function') {
-      window.requestAnimationFrame(() => window.requestAnimationFrame(() => leafletMap.remove()));
-    } else {
-      leafletMap.remove();
-    }
+    // once the frames queued by the basemap layer have run (utils/mapTileLayer.js)
+    removeMapWhenSettled(leafletMap);
   }
 
   componentDidUpdate(prevProps) {

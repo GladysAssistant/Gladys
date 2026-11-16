@@ -3,7 +3,7 @@ import leaflet from 'leaflet';
 import { connect } from 'unistore/preact';
 
 import 'leaflet/dist/leaflet.css';
-import { addMapTileLayer } from '../../utils/mapTileLayer';
+import { addMapTileLayer, removeMapWhenSettled } from '../../utils/mapTileLayer';
 import mapStyle from './style.css';
 import style from './mobileArea.css';
 import { clampRadius, roundRadius, parseRadius, formatRadius } from './areaRadius';
@@ -147,10 +147,10 @@ class MobileAreaMap extends Component {
       this.resizeObserver.disconnect();
     }
     this.removeArea();
-    if (this.leafletMap) {
-      this.leafletMap.remove();
-      this.leafletMap = null;
-    }
+    // once the frames queued by the basemap layer have run (utils/mapTileLayer.js): the page
+    // may be switching to its desktop layout in the middle of a resize
+    removeMapWhenSettled(this.leafletMap);
+    this.leafletMap = null;
   }
 
   setMapRef = element => {

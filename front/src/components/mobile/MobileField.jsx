@@ -31,6 +31,7 @@ const fieldClass = {
   textarea: style.textarea,
   invalid: style.inputInvalid,
   group: style.inputGroup,
+  groupInvalid: style.inputGroupInvalid,
   addon: style.inputAddon
 };
 

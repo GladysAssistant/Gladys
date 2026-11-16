@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
 import { connect } from 'unistore/preact';
-import { addMapTileLayer } from '../../utils/mapTileLayer';
+import { addMapTileLayer, removeMapWhenSettled } from '../../utils/mapTileLayer';
 import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
@@ -154,9 +154,10 @@ class MapComponent extends Component {
   }
 
   componentWillUnmount() {
-    if (this.leafletMap) {
-      this.leafletMap.remove();
-    }
+    // once the frames queued by the basemap layer have run (utils/mapTileLayer.js): the page
+    // may be switching to its phone layout in the middle of a resize
+    removeMapWhenSettled(this.leafletMap);
+    this.leafletMap = null;
   }
 
   render() {

@@ -86,8 +86,8 @@ class MobileRestoreBackup extends Component {
                   <MobileRow
                     key={item.id}
                     icon="database"
-                    title={relative}
-                    subtitle={`${date} · ${size}`}
+                    title={date}
+                    subtitle={`${relative} · ${size}`}
                     onClick={this.askConfirmation(item)}
                     dataCy="signup-restore-backup-row"
                   />
