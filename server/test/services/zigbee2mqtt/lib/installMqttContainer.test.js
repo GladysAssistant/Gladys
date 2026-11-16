@@ -2,10 +2,13 @@ const crypto = require('crypto');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const { promises: fs } = require('fs');
+const path = require('path');
 
 const { assert, fake } = sinon;
 
 const proxyquire = require('proxyquire').noCallThru();
+// The copy of the service, which has its own dependencies
+const fse = require('../../../../services/zigbee2mqtt/node_modules/fs-extra');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ConflictError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
@@ -358,6 +361,57 @@ describe('zigbee2mqtt installMqttContainer', () => {
     const [gladysUsername, gladysHashedPassword] = gladysAccount.split(':');
     expect(gladysUsername).to.equal('gladys');
     expect(matchesMosquittoHash(gladysHashedPassword, 'gladys-password')).to.equal(true);
+  });
+
+  it('should write the password file readable by its owner only, over the file of an earlier broker too', async () => {
+    // PREPARE
+    gladys.system.getContainers = sinon
+      .stub()
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([container]);
+    gladys.system.createContainer = fake.resolves({ id: container.id });
+    // Left by the broker replaced by an update, readable by everyone
+    await fs.mkdir(`${TEMP_GLADYS_FOLDER}/zigbee2mqtt/mqtt`, { recursive: true });
+    await fs.writeFile(mosquittoPwdPath, 'gladys:old-hash\n', { mode: 0o644 });
+    await fs.chmod(mosquittoPwdPath, 0o644);
+    // EXECUTE
+    await zigbee2mqttManager.installMqttContainer({ ...credentials });
+    // ASSERT
+    // eslint-disable-next-line no-bitwise
+    expect((await fs.stat(mosquittoPwdPath)).mode & 0o777).to.equal(0o600);
+    expect(await fs.readFile(mosquittoPwdPath, 'utf-8')).to.contain('z2m:$7$101$');
+  });
+
+  it('should create the broker when the disk refuses to restrict the access to its password file', async () => {
+    // PREPARE
+    const warnStub = sinon.stub(logger, 'warn');
+    gladys.system.getContainers = sinon
+      .stub()
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([container]);
+    gladys.system.createContainer = fake.resolves({ id: container.id });
+    // A disk without Unix permissions (vfat, exFAT)
+    const chmodError = new Error('EPERM: operation not permitted');
+    const chmodStub = sinon.stub(fse, 'chmod').rejects(chmodError);
+    try {
+      // EXECUTE
+      await zigbee2mqttManager.installMqttContainer({ ...credentials });
+    } finally {
+      chmodStub.restore();
+      warnStub.restore();
+    }
+    // ASSERT
+    assert.calledOnce(gladys.system.createContainer);
+    assert.calledWithExactly(
+      warnStub,
+      `Unable to restrict the access to ${path.join(TEMP_GLADYS_FOLDER, 'zigbee2mqtt', 'mqtt', 'mosquitto.passwd')}:`,
+      chmodError,
+    );
+    expect(zigbee2mqttManager.mqttRunning).to.equal(true);
   });
 
   it('should log how long each step of the installation takes', async () => {

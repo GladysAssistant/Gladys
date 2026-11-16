@@ -193,6 +193,17 @@ installation. A job that fails to start fails the installation with its error. A
   `DISK_SPACE_MARGIN_IN_BYTES` (500 MB kept for the databases of Gladys). Downloaded anyway when the
   free space is unknown (no `df`). The space is measured on the disk of the Gladys container, not
   always the one where Docker stores its images.
+- **Other versions removed when the space lacks.** Before refusing, the other tags of the same
+  repository (`koenkk/zigbee2mqtt:*`, `eclipse-mosquitto:*`) are removed with
+  `system.removeImage`, never forced, then the space is measured again: Gladys kept the image of
+  every earlier version. An image that a container uses, running or stopped (the version in place,
+  a container of the user), stays: Docker declines to remove it, or only removes one of its tags
+  when it has several. Best effort: a failure to list or remove leaves the refusal as it was. An unused image of these repositories pulled by the user goes too. The
+  prefetch only measures (C): its warning stays, the installation removes them as it downloads. Its
+  warning gives the figures only when they show the lack of space (not when the disk filled up
+  during the download).
+- **Disk filled during the download.** A download that fails on Docker's `no space left on device`
+  fails with `NOT_ENOUGH_DISK_SPACE`, like the check.
 - **Stall timeout.** Given up after 5 min without progress; an event that repeats the same position
   (containerd image store) is no progress.
 - Its phase is `done` on success, `failed` on failure.
@@ -219,7 +230,10 @@ An init with a usable coordinator (which forces the local broker) runs, in order
    ones and the update is tried again on the next start. An `update` ends `failed` at once, the
    containers in place are kept and Gladys connects to them. In an installation launched by the
    setup, the failed pull phases go back to `pending` and the installation goes on: a container to
-   create fails on the kept error, a container in place is kept.
+   create fails on the kept error, a container in place is kept. Either way, `configureContainer`
+   then writes the `configuration.yaml` of the new code for the old image: it must stay compatible
+   with the previous image, or be skipped when the new images are not downloaded (to decide at the
+   next bump that changes both the image and the configuration format, like 1.x to 2.x).
 4. **Replace.** `checkForContainerUpdates()` removes the outdated containers (the broker with its
    anonymous volumes), stores the new versions and returns the images of the removed containers.
 5. **Install.** Broker then Zigbee2mqtt (H); Gladys connects once the broker runs. Then the images of
@@ -244,7 +258,9 @@ the container in place is restarted first, so that it runs the new adapter on it
   `mosquitto.passwd` are written in `<base path>/zigbee2mqtt/mqtt`, both accounts hashed in Node in
   the Mosquitto 2 format (`$7$101$<salt>$<hash>`, PBKDF2-SHA512, `utils/hashMosquittoPassword.js`).
   The container is created, then started once: no `mosquitto_passwd` exec, no restart, no fixed
-  wait. An existing broker is neither recreated nor given a new password file.
+  wait. An existing broker is neither recreated nor given a new password file. `mosquitto.passwd`
+  is readable by its owner only (`0600`, set again over the file of a replaced broker): the
+  entrypoint of the image gives the folder to the `mosquitto` user as it starts (`chown`).
 - **Ready when it answers.** `waitForBroker` tries an MQTT connection every 250 ms (2 s per attempt)
   for up to 30 s; any answer, even a refusal of the credentials, means ready. Without one, an
   `install` or a `switch` fails on `start_mqtt`; at start-up or during an update, Gladys goes on and
@@ -267,6 +283,8 @@ from its first line.
 | stop of the service (Settings > Services)                                       | waits for its end                                 | waits for their end                   |
 | update at start-up                                                              | not started: the installation follows this init   | —                                     |
 
+- `refuseWhileInstalling` refuses with `Zigbee2mqtt: cannot <action> while an installation is
+  running` or `… while the integration is busy`: the setup page reads these endings (J).
 - `refuseWhileInstalling` is called with no `await` between the check and what it guards
   (`startInstallation`, or the operation that counts itself): two requests cannot both pass.
   `startInstallation` refuses a second running installation as a last guard.
@@ -283,10 +301,20 @@ from its first line.
 next PR replaces it):
 
 - `InstallationProgress.jsx`, while `running` or `failed`: title by kind, bar, current phase (the
-  next pending one between two), "you can leave this page"; on failure, the failed phase and the
-  error unless the status already shows it. A failure is hidden once `zigbee2mqttConnected`.
-- The controls are disabled while an installation runs. A 409 on save shows that an installation
-  runs or the integration is busy. At the end of an installation, the configuration is read again
+  next pending one between two), "you can leave this page"; on failure, the failed phase and its
+  error, which the `z2mContainerError` / `mqttConnectionError` alerts of the page then do not
+  repeat (an error of the status that differs is still shown). A failure is hidden once
+  `zigbee2mqttConnected`. An installation that the page followed until `done` ends with a success
+  alert by kind and its `durationMs` ("Zigbee2MQTT installed in 23 s"), until the page is left or
+  the installation is cleared.
+- The controls are disabled while an installation runs. In local mode, the link to the Zigbee2mqtt
+  interface is hidden until its port is saved: the first installation that succeeds chooses it (an
+  existing installation keeps its port), the default `8080` would be wrong meanwhile. A 409 on save
+  shows that an installation runs or the integration is busy. On the enable switch or the reset,
+  only a refusal of `refuseWhileInstalling` (its message ends with "while an installation is
+  running" or "while the integration is busy", I) says that the integration is busy, to try again
+  once it ends; another 409, like a container of the user carrying our name, shows the generic
+  error. These warnings go at the end of an installation, when the configuration is read again
   (port of the interface, generated accounts).
 - **Prefetch trigger.** `POST /prefetch` is sent on the first local-mode choice, a USB dongle
   selected (a detected dongle that the page preselects counts) or a network coordinator URL entered,

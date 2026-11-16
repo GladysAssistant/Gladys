@@ -9,6 +9,12 @@ import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import { MQTT_MODE } from './constants';
 import SetupTab from './SetupTab';
 
+// Refused while an installation or another operation on the integration runs (see refuseWhileInstalling on the
+// server), not because of a container of the user carrying the name of ours, which waiting does not solve
+const isBusyRefusal = e =>
+  get(e, 'response.status') === 409 &&
+  / while (an installation is running|the integration is busy)$/.test(get(e, 'response.data.error'));
+
 const VARIABLE_MAP = {
   ZIGBEE2MQTT_DRIVER_PATH: 'z2mDriverPath',
   ZIGBEE_DONGLE_NAME: 'z2mDongleName',
@@ -43,11 +49,18 @@ class Zigbee2mqttSetupPage extends Component {
 
   // The setup answered before the server saved the port of the interface and the generated MQTT credentials, and
   // the configuration can be saved again
-  handleInstallationEnd = () => {
+  handleInstallationEnd = installationState => {
     this.loadZ2MConfig();
-    if (this.state.setupZigee2mqttStatus === RequestStatus.ConflictError) {
-      this.setState({ setupZigee2mqttStatus: null });
+    // Told until the page is left, or another outcome comes
+    if (installationState === 'done') {
+      this.setState({ installationFollowedToSuccess: true });
     }
+    // The installation that refused them is over
+    ['setupZigee2mqttStatus', 'toggleZigee2mqttStatus', 'resetZigbee2mqttStatus'].forEach(requestStatus => {
+      if (this.state[requestStatus] === RequestStatus.ConflictError) {
+        this.setState({ [requestStatus]: null });
+      }
+    });
   };
 
   loadZ2MStatus = async () => {
@@ -177,7 +190,7 @@ class Zigbee2mqttSetupPage extends Component {
     } catch (e) {
       console.error(e);
       this.setState({
-        toggleZigee2mqttStatus: RequestStatus.Error
+        toggleZigee2mqttStatus: isBusyRefusal(e) ? RequestStatus.ConflictError : RequestStatus.Error
       });
     }
   };
@@ -198,7 +211,7 @@ class Zigbee2mqttSetupPage extends Component {
     } catch (e) {
       console.error(e);
       this.setState({
-        resetZigbee2mqttStatus: RequestStatus.Error
+        resetZigbee2mqttStatus: isBusyRefusal(e) ? RequestStatus.ConflictError : RequestStatus.Error
       });
     }
   };
@@ -234,7 +247,7 @@ class Zigbee2mqttSetupPage extends Component {
     const previousInstallationState = get(previousState, 'zigbee2mqttStatus.installation.state');
     const installationState = get(this.state, 'zigbee2mqttStatus.installation.state');
     if (previousInstallationState === 'running' && (installationState === 'done' || installationState === 'failed')) {
-      this.handleInstallationEnd();
+      this.handleInstallationEnd(installationState);
     }
   }
 

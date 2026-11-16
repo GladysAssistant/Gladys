@@ -9,7 +9,7 @@ import SetupPanel from './SetupPanel';
 import EnableStatus from './status/EnableStatus';
 import RunningStatus from './status/RunningStatus';
 import MqttExternalCredentials from './local/MqttExternalCredentials';
-import InstallationProgress from './components/InstallationProgress';
+import InstallationProgress, { getShownInstallationError } from './components/InstallationProgress';
 import ContainerError from '../commons/ContainerError';
 import MqttConnectionError from '../commons/MqttConnectionError';
 
@@ -57,6 +57,12 @@ class SetupTab extends Component {
     const disabled = loading || saving || installing;
     const isLocalMode = configuration.mqttMode === MQTT_MODE.LOCAL;
     const { mqttRunning = false } = props.zigbee2mqttStatus || {};
+    // Shown with the failed step of the installation, not repeated below
+    const installationError = getShownInstallationError(installation, zigbee2mqttConnected);
+    const isShownAbove = statusError =>
+      Boolean(installationError) &&
+      statusError.code === installationError.code &&
+      statusError.message === installationError.message;
 
     return (
       <div class="card" data-cy="z2m-setup-wizard">
@@ -83,7 +89,7 @@ class SetupTab extends Component {
                 <InstallationProgress
                   installation={installation}
                   zigbee2mqttConnected={zigbee2mqttConnected}
-                  statusErrors={[z2mContainerError, mqttConnectionError]}
+                  followedToSuccess={props.installationFollowedToSuccess}
                 />
                 {success && <SetupPanel {...props} disabled={disabled} />}
                 {setupZigee2mqttStatus === RequestStatus.Error && (
@@ -105,8 +111,9 @@ class SetupTab extends Component {
                   <EnableStatus {...props} disabled={disabled} />
                 </li>
 
-                {props.z2mUrl && (
-                  <li class="list-group-item">
+                {/* Its port is chosen, then saved, by the first installation that succeeds: the default one is wrong */}
+                {props.z2mUrl && (!isLocalMode || configuration.z2mTcpPort) && (
+                  <li class="list-group-item" data-cy="z2m-connection-url">
                     <MarkupText
                       id="integration.zigbee2mqtt.setup.connectionUrl"
                       fields={{
@@ -115,20 +122,22 @@ class SetupTab extends Component {
                     />
                   </li>
                 )}
-                {z2mContainerError && (
+                {z2mContainerError && !isShownAbove(z2mContainerError) && (
                   <li class="list-group-item">
-                    <div class="alert alert-warning my-3">
+                    <div class="alert alert-warning my-3" data-cy="z2m-container-error">
                       <ContainerError error={z2mContainerError} />
                     </div>
                   </li>
                 )}
-                {mqttConnectionError && (mqttConnectionError.code || mqttConnectionError.message) && (
-                  <li class="list-group-item">
-                    <div class="alert alert-danger my-3" data-cy="z2m-mqtt-connection-error">
-                      <MqttConnectionError error={mqttConnectionError} />
-                    </div>
-                  </li>
-                )}
+                {mqttConnectionError &&
+                  (mqttConnectionError.code || mqttConnectionError.message) &&
+                  !isShownAbove(mqttConnectionError) && (
+                    <li class="list-group-item">
+                      <div class="alert alert-danger my-3" data-cy="z2m-mqtt-connection-error">
+                        <MqttConnectionError error={mqttConnectionError} />
+                      </div>
+                    </li>
+                  )}
                 <li class="list-group-item" data-cy="z2m-running-status">
                   <RunningStatus {...props} disabled={disabled} />
                 </li>
@@ -152,6 +161,11 @@ class SetupTab extends Component {
                     {resetZigbee2mqttStatus === RequestStatus.Error && (
                       <div class="alert alert-danger my-3" data-cy="z2m-reset-error">
                         <Text id="integration.zigbee2mqtt.setup.reset.error" />
+                      </div>
+                    )}
+                    {resetZigbee2mqttStatus === RequestStatus.ConflictError && (
+                      <div class="alert alert-warning my-3" data-cy="z2m-reset-conflict">
+                        <Text id="integration.zigbee2mqtt.setup.installation.busy" />
                       </div>
                     )}
                     {!showConfirmReset && (

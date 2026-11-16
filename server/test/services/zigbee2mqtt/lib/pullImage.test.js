@@ -34,6 +34,8 @@ describe('zigbee2mqtt pullImage', () => {
         imageExists: fake.resolves(false),
         // Unknown without df
         getDiskSpace: fake.resolves(null),
+        listImages: fake.resolves([]),
+        removeImage: fake.resolves(true),
         pull: fake(
           (image, onProgress, { abortSignal }) =>
             new Promise((resolve, reject) => {
@@ -218,6 +220,93 @@ describe('zigbee2mqtt pullImage', () => {
       expect(zigbee2mqttManager.installation.error).to.deep.equal({ code: 'NOT_ENOUGH_DISK_SPACE', message: null });
     });
 
+    it('should remove the other versions no container uses when the image does not fit, then download it', async () => {
+      // PREPARE
+      const infoStub = sinon.stub(logger, 'info');
+      // Fits once the image of an earlier version is removed
+      gladys.system.getDiskSpace = sinon
+        .stub()
+        .onFirstCall()
+        .resolves(diskSpace(600000000))
+        .onSecondCall()
+        .resolves(diskSpace(800000000));
+      gladys.system.listImages = fake.resolves([
+        { id: 'sha256:old', tags: ['koenkk/zigbee2mqtt:1.42.0', 'koenkk/zigbee2mqtt:latest'] },
+        { id: 'sha256:in-place', tags: ['koenkk/zigbee2mqtt:2.6.0'] },
+        // Not of this repository, whatever Docker matches
+        { id: 'sha256:other', tags: ['koenkk/zigbee2mqtt-proxy:1.0.0'] },
+      ]);
+      // Docker declines to remove the image of the container in place
+      gladys.system.removeImage = fake((tag) => Promise.resolve(tag !== 'koenkk/zigbee2mqtt:2.6.0'));
+      // EXECUTE
+      const promise = zigbee2mqttManager.pullImage(Z2M_IMAGE);
+      await waitForPull();
+      pulls[0].resolve([]);
+      await promise;
+      // ASSERT
+      assert.calledOnceWithExactly(gladys.system.listImages, { filters: { reference: ['koenkk/zigbee2mqtt'] } });
+      expect(gladys.system.removeImage.args.map(([tag]) => tag)).to.deep.equal([
+        'koenkk/zigbee2mqtt:1.42.0',
+        'koenkk/zigbee2mqtt:latest',
+        'koenkk/zigbee2mqtt:2.6.0',
+      ]);
+      assert.calledWithExactly(
+        infoStub,
+        'Zigbee2mqtt: image koenkk/zigbee2mqtt:1.42.0 removed to download koenkk/zigbee2mqtt:2.14.2',
+      );
+      assert.neverCalledWith(
+        infoStub,
+        'Zigbee2mqtt: image koenkk/zigbee2mqtt:2.6.0 removed to download koenkk/zigbee2mqtt:2.14.2',
+      );
+      assert.calledTwice(gladys.system.getDiskSpace);
+      assert.callOrder(gladys.system.removeImage, gladys.system.pull);
+      assert.calledOnce(gladys.system.pull);
+    });
+
+    it('should not download an image that still does not fit once the other versions are removed', async () => {
+      // PREPARE
+      gladys.system.getDiskSpace = fake.resolves(diskSpace(600000000));
+      gladys.system.listImages = fake.resolves([{ id: 'sha256:in-place', tags: ['koenkk/zigbee2mqtt:2.6.0'] }]);
+      gladys.system.removeImage = fake.resolves(false);
+      zigbee2mqttManager.startInstallation('install');
+      // EXECUTE
+      const error = await zigbee2mqttManager.pullImage(Z2M_IMAGE).catch((e) => e);
+      // ASSERT
+      expect(error.installationError).to.deep.equal({ code: 'NOT_ENOUGH_DISK_SPACE', message: null });
+      assert.calledTwice(gladys.system.getDiskSpace);
+      assert.notCalled(gladys.system.pull);
+      expect(phase('pull_z2m').state).to.equal('failed');
+    });
+
+    it('should tell the lack of disk space when the other versions cannot be listed', async () => {
+      // PREPARE
+      const warnStub = sinon.stub(logger, 'warn');
+      const listError = new Error('docker fail list');
+      gladys.system.getDiskSpace = fake.resolves(diskSpace(600000000));
+      gladys.system.listImages = fake.rejects(listError);
+      // EXECUTE
+      const error = await zigbee2mqttManager.pullImage(Z2M_IMAGE).catch((e) => e);
+      // ASSERT
+      expect(error.installationError).to.deep.equal({ code: 'NOT_ENOUGH_DISK_SPACE', message: null });
+      assert.calledWithExactly(warnStub, 'Zigbee2mqtt: other versions of koenkk/zigbee2mqtt not removed:', listError);
+      assert.notCalled(gladys.system.removeImage);
+      assert.notCalled(gladys.system.pull);
+    });
+
+    it('should not remove any image when the image fits', async () => {
+      // PREPARE
+      gladys.system.getDiskSpace = fake.resolves(diskSpace(714000000));
+      // EXECUTE
+      const promise = zigbee2mqttManager.pullImage(Z2M_IMAGE);
+      await waitForPull();
+      pulls[0].resolve([]);
+      await promise;
+      // ASSERT
+      assert.notCalled(gladys.system.listImages);
+      assert.notCalled(gladys.system.removeImage);
+      assert.calledOnce(gladys.system.getDiskSpace);
+    });
+
     it('should download an image that fits with the margin left free', async () => {
       // PREPARE
       gladys.system.getDiskSpace = fake.resolves(diskSpace(522400000));
@@ -238,6 +327,36 @@ describe('zigbee2mqtt pullImage', () => {
       await zigbee2mqttManager.pullImage(MQTT_IMAGE);
       // ASSERT
       assert.notCalled(gladys.system.getDiskSpace);
+    });
+  });
+
+  it('should tell the lack of disk space when the disk fills up during the download', async () => {
+    // PREPARE
+    zigbee2mqttManager.startInstallation('install');
+    const promise = zigbee2mqttManager.pullImage(Z2M_IMAGE).catch((e) => e);
+    await waitForPull();
+    // EXECUTE
+    pulls[0].reject(new Error('failed to register layer: write layer.tar: no space left on device'));
+    const error = await promise;
+    // ASSERT
+    expect(phase('pull_z2m').state).to.equal('failed');
+    zigbee2mqttManager.finishInstallation(error);
+    expect(zigbee2mqttManager.installation.error).to.deep.equal({ code: 'NOT_ENOUGH_DISK_SPACE', message: null });
+  });
+
+  it('should keep the raw message of another failed download', async () => {
+    // PREPARE
+    zigbee2mqttManager.startInstallation('install');
+    const promise = zigbee2mqttManager.pullImage(Z2M_IMAGE).catch((e) => e);
+    await waitForPull();
+    // EXECUTE
+    pulls[0].reject(new Error('getaddrinfo EAI_AGAIN registry-1.docker.io'));
+    const error = await promise;
+    // ASSERT
+    zigbee2mqttManager.finishInstallation(error);
+    expect(zigbee2mqttManager.installation.error).to.deep.equal({
+      code: null,
+      message: 'getaddrinfo EAI_AGAIN registry-1.docker.io',
     });
   });
 

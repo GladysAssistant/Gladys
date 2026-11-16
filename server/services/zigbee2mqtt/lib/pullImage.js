@@ -14,9 +14,39 @@ const { addPullEvent, getPullProgress } = require('../utils/getPullProgress');
 const PULL_STALL_TIMEOUT_IN_MS = 5 * 60 * 1000;
 
 /**
+ * @description Remove the other versions of an image that no container uses: Gladys kept the image of each earlier
+ * version of Zigbee2mqtt, about the size of the one to download. Never forced: an image that a container uses, running
+ * or stopped (the container of the version in place, or one of the user), stays. Docker declines to remove it, or only
+ * removes one of its tags when it has several. Best effort.
+ * @param {object} system - Gladys system module.
+ * @param {string} image - Image to download.
+ * @returns {Promise} Resolve once each other version is removed, or left.
+ * @example
+ * await removeOtherVersions(this.gladys.system, 'koenkk/zigbee2mqtt:2.14.2');
+ */
+async function removeOtherVersions(system, image) {
+  const repository = image.slice(0, image.lastIndexOf(':'));
+  try {
+    const images = await system.listImages({ filters: { reference: [repository] } });
+    // Missing, the image to download is not among them
+    const tags = images.flatMap(({ tags: imageTags }) => imageTags).filter((tag) => tag.startsWith(`${repository}:`));
+    await Promise.all(
+      tags.map(async (tag) => {
+        if (await system.removeImage(tag)) {
+          logger.info(`Zigbee2mqtt: image ${tag} removed to download ${image}`);
+        }
+      }),
+    );
+  } catch (e) {
+    logger.warn(`Zigbee2mqtt: other versions of ${repository} not removed:`, e);
+  }
+}
+
+/**
  * @description Refuse to download an image that does not fit in the free disk space, with the margin left for the rest
  * of Gladys: its databases write on the same disk, a download that fills it would break them. Checked before each
- * download, not only by the prefetch: the installation and the update at start-up download as much.
+ * download, not only by the prefetch: the installation and the update at start-up download as much. When it does not
+ * fit, the other versions of the image that no container uses are removed first, then the space is measured again.
  * @param {object} system - Gladys system module.
  * @param {string} image - Image of a container descriptor.
  * @returns {Promise} Resolve when the image fits, or when the free space is unknown (without df): downloaded anyway.
@@ -24,8 +54,12 @@ const PULL_STALL_TIMEOUT_IN_MS = 5 * 60 * 1000;
  * await checkDiskSpace(this.gladys.system, 'eclipse-mosquitto:2.0.15');
  */
 async function checkDiskSpace(system, image) {
-  const diskSpace = await system.getDiskSpace();
+  let diskSpace = await system.getDiskSpace();
   const neededBytes = IMAGE_SIZE_IN_BYTES[image] + DISK_SPACE_MARGIN_IN_BYTES;
+  if (diskSpace && diskSpace.available < neededBytes) {
+    await removeOtherVersions(system, image);
+    diskSpace = await system.getDiskSpace();
+  }
   if (diskSpace && diskSpace.available < neededBytes) {
     const error = new Error(
       `Not enough disk space to download ${image}: ${neededBytes} bytes needed, ${diskSpace.available} bytes free`,
@@ -114,6 +148,11 @@ async function downloadImage(manager, image) {
     await checkDiskSpace(manager.gladys.system, image);
     await pull(manager, image, phase);
   } catch (e) {
+    // The disk filled up during the download (another write meanwhile, or Docker storing its images on another disk
+    // than the one measured): told like the check
+    if (!e.installationError && /no space left on device/i.test(e.message)) {
+      e.installationError = { code: INSTALLATION_ERROR.NOT_ENOUGH_DISK_SPACE, message: null };
+    }
     // This download failed, not another one running alongside it (see finishInstallation)
     manager.updateInstallationPhase(phase, { state: INSTALLATION_PHASE_STATE.FAILED });
     throw e;

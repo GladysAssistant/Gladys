@@ -5,7 +5,8 @@ const { INSTALLATION_STATE } = require('./constants');
  * @description Refuse a request that an installation or an operation in progress would undo or run into: an init, a
  * disconnect, a reset or an ezsp fallback create or remove the containers, and save or destroy the configuration.
  * Called by the routes and the setup, with no wait between this check and what they start, rather than by these
- * operations, which call one another and stop and start the service too.
+ * operations, which call one another and stop and start the service too. The setup page reads the end of the two
+ * messages to tell the user to wait, rather than another 409 (see the spec, section J): keep them.
  * @param {string} action - What the request does, told in the error.
  * @example
  * this.refuseWhileInstalling('reset');

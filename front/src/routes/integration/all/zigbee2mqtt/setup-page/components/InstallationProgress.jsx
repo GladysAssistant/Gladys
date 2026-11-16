@@ -29,21 +29,40 @@ const InstallationError = ({ error }) => {
   return <ContainerError error={error} />;
 };
 
-// Same failure as one of the errors of the status, already shown below the setup
-const isShownBelow = (error, statusErrors) =>
-  statusErrors.some(
-    statusError => statusError && statusError.code === error.code && statusError.message === error.message
-  );
+// Zigbee2mqtt answered after the failure (restarted by Docker, slow machine, update postponed with the old containers
+// still running): the failure no longer matters
+const isFailureShown = (installation, zigbee2mqttConnected) =>
+  Boolean(installation) && installation.state === 'failed' && !zigbee2mqttConnected;
 
-// Progress of the installation launched by saving the configuration, or of its failure
-const InstallationProgress = ({ installation, zigbee2mqttConnected, statusErrors = [] }) => {
-  if (!installation || (installation.state !== 'running' && installation.state !== 'failed')) {
-    return null;
+// The error shown with the failed step: the setup page does not repeat it below (see SetupTab)
+export const getShownInstallationError = (installation, zigbee2mqttConnected) =>
+  isFailureShown(installation, zigbee2mqttConnected) ? installation.error : null;
+
+// 23 s, 1 min 42 s
+const formatDuration = durationMs => {
+  const totalSeconds = Math.round(durationMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes > 0 ? `${minutes} min ${seconds} s` : `${seconds} s`;
+};
+
+// Progress of the installation launched by saving the configuration, or of its failure. Its success is told when the
+// page followed it until its end.
+const InstallationProgress = ({ installation, zigbee2mqttConnected, followedToSuccess }) => {
+  if (installation && installation.state === 'done' && followedToSuccess) {
+    return (
+      <li class="list-group-item">
+        <div class="alert alert-success my-3" data-cy="z2m-installation-success">
+          <Text
+            id={`integration.zigbee2mqtt.setup.installation.success.${installation.kind}`}
+            fields={{ duration: formatDuration(installation.durationMs) }}
+          />
+        </div>
+      </li>
+    );
   }
-  const failed = installation.state === 'failed';
-  // Zigbee2mqtt answered after the failure (restarted by Docker, slow machine, update postponed with the old
-  // containers still running): the failure no longer matters
-  if (failed && zigbee2mqttConnected) {
+  const failed = isFailureShown(installation, zigbee2mqttConnected);
+  if (!failed && (!installation || installation.state !== 'running')) {
     return null;
   }
   const findPhase = phaseState => installation.phases.find(({ state }) => state === phaseState);
@@ -63,7 +82,7 @@ const InstallationProgress = ({ installation, zigbee2mqttConnected, statusErrors
               <Text id={`integration.zigbee2mqtt.setup.installation.phases.${phase.key}`} />
             </div>
           )}
-          {installation.error && !isShownBelow(installation.error, statusErrors) && (
+          {installation.error && (
             <div data-cy="z2m-installation-error-message">
               <InstallationError error={installation.error} />
             </div>

@@ -92,7 +92,19 @@ async function installMqttContainer(config) {
         `${z2mMqttUsername}:${hashMosquittoPassword(z2mMqttPassword)}`,
         `${mqttUsername}:${hashMosquittoPassword(mqttPassword)}`,
       ].join('\n');
-      await fse.writeFile(mosquittoPasswordFilePath, `${mosquittoPasswordContent}\n`, 'utf-8');
+      // Readable by its owner only, the broker: the entrypoint of its image gives it the folder as it starts (chown).
+      // Set again on the file of an earlier broker (replaced by an update), whose mode writeFile keeps
+      await fse.writeFile(mosquittoPasswordFilePath, `${mosquittoPasswordContent}\n`, {
+        encoding: 'utf-8',
+        mode: 0o600,
+      });
+      try {
+        await fse.chmod(mosquittoPasswordFilePath, 0o600);
+      } catch (e) {
+        // Hardening only: a folder on a disk without Unix permissions (vfat, exFAT) refuses it, the broker reads the
+        // file all the same
+        logger.warn(`Unable to restrict the access to ${mosquittoPasswordFilePath}:`, e);
+      }
 
       await containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
 

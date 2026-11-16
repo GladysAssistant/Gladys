@@ -30,9 +30,12 @@ const PrefetchStatus = ({ configuration, zigbee2mqttStatus = {} }) => {
 
   if (prefetch.state === 'failed' && get(prefetch, 'error.code') === 'NOT_ENOUGH_DISK_SPACE') {
     const { freeBytes, neededBytes } = prefetch;
+    // Measured before the download, which then filled the disk (another write meanwhile, or Docker storing its images
+    // on another disk): the figures would contradict the warning
+    const figuresExplain = Number.isFinite(freeBytes) && Number.isFinite(neededBytes) && freeBytes < neededBytes;
     return (
       <div class="alert alert-warning" data-cy="z2m-prefetch-disk-space">
-        {Number.isFinite(freeBytes) && Number.isFinite(neededBytes) ? (
+        {figuresExplain ? (
           <Text
             id="integration.zigbee2mqtt.setup.prefetch.notEnoughDiskSpace"
             fields={{ free: toMegabytes(freeBytes), needed: toMegabytes(neededBytes) }}
