@@ -1,0 +1,490 @@
+/* Zigbee2mqtt setup wizard (docs/specs/zigbee2mqtt-installation.md, M). Light colors only: dark mode is
+   the app-wide inversion filter, which also turns the photos back. */
+
+.wizard {
+  color: #1c2334;
+}
+
+/* ---------- stepper ---------- */
+
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.stepperItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6e7687;
+  font-weight: 600;
+}
+
+.stepperItem:not(:last-child)::after {
+  content: '';
+  width: 28px;
+  height: 2px;
+  margin-left: 2px;
+  background: #dfe3ea;
+}
+
+.stepperCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid #c9ced8;
+  background: #fff;
+  font-size: 14px;
+}
+
+.stepperCurrent {
+  color: #1c2334;
+}
+
+.stepperCurrent .stepperCircle {
+  border-color: #3563e9;
+  background: #3563e9;
+  color: #fff;
+}
+
+.stepperDone .stepperCircle {
+  border-color: #2f9e5b;
+  background: #2f9e5b;
+  color: #fff;
+}
+
+/* ---------- step 1: the dongle ---------- */
+
+.linkButton {
+  padding-left: 0;
+  padding-right: 0;
+  font-weight: 600;
+}
+
+.otherChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 22px;
+  margin-top: 0.75rem;
+}
+
+.keyCard {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.75rem;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 2px solid #e4e8ef;
+  background: rgba(255, 255, 255, 0.7);
+  text-align: left;
+  color: inherit;
+}
+
+button.keyCard {
+  cursor: pointer;
+}
+
+.keyCardSelected {
+  border-color: #3563e9;
+  background: rgba(61, 109, 240, 0.06);
+}
+
+.keyCardText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.keyCardName {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.radio {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-right: 14px;
+  border-radius: 999px;
+  border: 2px solid #c9ced8;
+}
+
+.radioChecked {
+  border: 6px solid #3563e9;
+}
+
+.keyPhoto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: #fff;
+  color: #2f5bd7;
+  overflow: hidden;
+}
+
+.keyPhotoRound {
+  border-radius: 999px;
+}
+
+.keyPhoto img {
+  object-fit: contain;
+}
+
+.waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.waitingIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 1rem;
+  border-radius: 26px;
+  background: #dde9fb;
+  color: #2f5bd7;
+  font-size: 38px;
+  animation: pulse 1.8s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(53, 99, 233, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgba(53, 99, 233, 0);
+  }
+}
+
+.loader {
+  margin: 2rem auto;
+}
+
+.tip {
+  max-width: 560px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(28, 35, 52, 0.05);
+  text-align: left;
+}
+
+.elsewhere {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 1px solid #e4e8ef;
+}
+
+.modelPicker {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid #e4e8ef;
+  background: #fff;
+}
+
+.modelGroup + .modelGroup {
+  margin-top: 6px;
+}
+
+.modelBrand {
+  padding: 8px 10px 4px;
+  color: #6e7687;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modelOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.modelOption:hover,
+.modelOption:focus-visible {
+  background: rgba(28, 35, 52, 0.05);
+}
+
+.modelOptionSelected {
+  background: rgba(61, 109, 240, 0.1);
+}
+
+.modelOptionText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.modelOptionName {
+  font-weight: 600;
+}
+
+.modelOptionCode {
+  color: #6e7687;
+  font-size: 13px;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecf1;
+}
+
+.footerStatus {
+  flex: 1;
+  min-width: 0;
+}
+
+.footerStatus :global(p),
+.footerStatus :global(.alert) {
+  margin-bottom: 0;
+}
+
+.footer :global(.btn) {
+  margin-left: auto;
+}
+
+/* ---------- step 2: the installation ---------- */
+
+.keyChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+  padding: 6px 18px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid #e4e8ef;
+  background: #fff;
+  text-align: left;
+}
+
+.keyChipText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 1rem;
+}
+
+.progress {
+  flex: 1;
+  height: 10px;
+  margin: 0;
+}
+
+.progressValue {
+  min-width: 48px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.phases {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 4px 18px;
+  border-radius: 16px;
+  border: 1px solid #e4e8ef;
+}
+
+.phase {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.phase + .phase {
+  border-top: 1px solid #eef0f4;
+}
+
+.phasePending {
+  color: #8a91a0;
+}
+
+.phaseFailed {
+  color: #a83a25;
+  font-weight: 600;
+}
+
+.phaseIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.phaseDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 2px solid #c9ced8;
+}
+
+.phaseLabel {
+  flex: 1;
+}
+
+.phaseDetail {
+  color: #6e7687;
+  font-size: 14px;
+  text-align: right;
+}
+
+.spin {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- steps 3 and 4 ---------- */
+
+.ready {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.readyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 1rem;
+  border-radius: 22px;
+  background: #def0e2;
+  color: #1f6e43;
+  font-size: 34px;
+}
+
+.summary {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 0 1rem;
+  padding: 4px 18px;
+  border-radius: 16px;
+  border: 1px solid #e4e8ef;
+  text-align: left;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.summaryRow + .summaryRow {
+  border-top: 1px solid #eef0f4;
+}
+
+.summaryRow dt {
+  color: #6e7687;
+  font-weight: 400;
+}
+
+.summaryRow dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+
+.readyNote {
+  max-width: 560px;
+  text-align: left;
+}
+
+.tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.tipCard {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 220px;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #e4e8ef;
+}
+
+.tipNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #1c2334;
+  color: #fff;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waitingIcon,
+  .spin {
+    animation: none;
+  }
+}

@@ -2102,6 +2102,171 @@
           "done": "Download complete: the installation will be quick.",
           "notEnoughDiskSpace": "Not enough disk space: {{free}} MB free, {{needed}} MB needed to install Zigbee2MQTT. Free up some space before installing.",
           "notEnoughDiskSpaceNoFigures": "Not enough disk space to install Zigbee2MQTT. Free up some space before installing."
+        },
+        "wizard": {
+          "titleInstall": "Install Zigbee2MQTT",
+          "titleConnect": "Connect Zigbee2MQTT",
+          "stepsLabel": "Steps",
+          "steps": {
+            "key": "Dongle",
+            "install": "Installation",
+            "network": "Network",
+            "device": "First device",
+            "connection": "Connection",
+            "check": "Check"
+          },
+          "install": "Install",
+          "connect": "Connect",
+          "saveDongleNotFound": "Your Zigbee dongle is not plugged in (or no longer on this port): nothing was saved. Plug it in, then choose it again.",
+          "key": {
+            "detectedTitle": "Zigbee dongle detected",
+            "detectedText": "Gladys recognized your dongle and its model: you have nothing to choose.",
+            "justPlugged": "Dongle just plugged in: Gladys detected it without reloading the page.",
+            "recognized": "Recognized",
+            "modelAndUsb": "Model {{code}} · plugged in via USB",
+            "usb": "Plugged in via USB",
+            "severalTitle": "{{count}} Zigbee dongles detected",
+            "severalText": "Choose the one Gladys should use.",
+            "unknownTitle": "Gladys did not recognize your dongle",
+            "unknownText": "A USB dongle is plugged in, but its model is not in the list of Gladys. Choose it below.",
+            "manualTitle": "Choose the dongle manually",
+            "manualText": "Tell the port and the model of your dongle.",
+            "portLabel": "Port",
+            "choosePort": "Choose the port",
+            "showAllPorts": "Show the other serial ports (HAT/GPIO board, ports of the machine)",
+            "modelLabel": "Model",
+            "modelHint": "The model is written on the dongle or on its box. It sets how Zigbee2MQTT talks to it.",
+            "searchPlaceholder": "Search: dongle-e, sonoff p, conbee, skyconnect…",
+            "searchLabel": "Search a model",
+            "noModel": "No model matches your search.",
+            "otherBrands": "Others",
+            "noneTitle": "Plug in your Zigbee dongle",
+            "noneText": "Gladys detects it as soon as it is plugged in, without reloading the page.",
+            "waiting": "Waiting for a dongle…",
+            "tip": "<strong>Tip:</strong> plug the dongle at the end of a USB extension cable, away from USB 3 ports and from the Wi-Fi router. The Zigbee signal will only be better.",
+            "linkManualWrong": "Not the right dongle? Choose manually",
+            "linkManualSeveral": "None of these dongles? Choose manually",
+            "linkManualNone": "My dongle is plugged in but does not show up",
+            "linkNetwork": "Network coordinator (SLZB-06…)?",
+            "linkExternal": "I already have a Zigbee2MQTT",
+            "backToDetected": "← Back to the detected dongle",
+            "backToUsb": "← Back to the USB dongle",
+            "back": "← Back",
+            "portsError": "Gladys could not list the ports of the machine.",
+            "adaptersError": "Gladys could not load the list of models."
+          },
+          "network": {
+            "title": "Network coordinator",
+            "text": "For an Ethernet or Wi-Fi coordinator (SLZB-06, SLZB-07…) connected to your local network.",
+            "urlLabel": "Coordinator address",
+            "urlHint": "Shown in the web interface of the coordinator.",
+            "typeLabel": "Coordinator type",
+            "chooseType": "Choose the type",
+            "types": {
+              "ember": "Silicon Labs chip (SLZB-06M, SLZB-07…)",
+              "zstack": "Texas Instruments chip (SLZB-06, SLZB-06P7…)",
+              "deconz": "dresden elektronik (ConBee, RaspBee)"
+            }
+          },
+          "external": {
+            "title": "Use my Zigbee2MQTT",
+            "text": "Zigbee2MQTT already runs elsewhere (Home Assistant, another machine…): Gladys connects to its MQTT broker. Nothing is installed.",
+            "urlLabel": "MQTT broker address",
+            "usernameLabel": "User",
+            "passwordLabel": "Password",
+            "frontendUrlLabel": "Zigbee2MQTT interface address",
+            "optional": "(optional)"
+          },
+          "incompatible": {
+            "title": "Gladys cannot install Zigbee2MQTT on this machine",
+            "text": "Gladys must run in Docker, with the \"host\" network. <a href=\"https://gladysassistant.com/docs/installation/docker/\" target=\"_blank\" rel=\"noopener noreferrer\">See the installation command of Gladys</a>",
+            "elsewhereTitle": "Zigbee2MQTT already runs elsewhere?",
+            "elsewhereText": "Gladys can connect to its MQTT broker, without installing anything.",
+            "useExternal": "Use my Zigbee2MQTT"
+          },
+          "progress": {
+            "titleInstall": "Installing Zigbee2MQTT",
+            "titleConnect": "Connecting to your Zigbee2MQTT",
+            "leavePage": "You can leave this page: Gladys goes on, and you will find the progress in the Setup tab.",
+            "phases": {
+              "connectUsb": "Connection to the dongle",
+              "connectNetwork": "Connection to the coordinator",
+              "connectExternal": "Connection to the MQTT broker"
+            },
+            "alreadyDownloaded": "Already downloaded",
+            "ezspSwitching": "Old firmware: switching to ezsp…",
+            "ezspDriver": "Compatibility driver (ezsp)",
+            "ezspNote": "<strong>Old firmware detected.</strong> The ember driver requires firmware 7.4 or later: Gladys switches to the compatibility driver (ezsp) and restarts Zigbee2MQTT. Nothing to do on your side."
+          },
+          "failure": {
+            "titles": {
+              "NO_ANSWER": "Zigbee2MQTT does not answer",
+              "DONGLE_NOT_FOUND": "Zigbee dongle not found",
+              "NOT_ENOUGH_DISK_SPACE": "Not enough disk space",
+              "EZSP_PROTOCOL_VERSION": "Dongle firmware too old",
+              "ADAPTER_UNREACHABLE": "Network coordinator unreachable",
+              "ADAPTER_NO_RESPONSE": "The Zigbee coordinator does not answer",
+              "INVALID_CONFIGURATION": "Zigbee2MQTT configuration refused",
+              "BAD_CREDENTIALS": "MQTT credentials refused",
+              "NOT_AUTHORIZED": "MQTT connection refused",
+              "BROKER_UNREACHABLE": "MQTT broker unreachable",
+              "SYSTEM_NOT_RUNNING_DOCKER": "Installation impossible on this machine",
+              "DOCKER_BAD_NETWORK": "Installation impossible on this machine",
+              "unknown": "An error occurred"
+            },
+            "texts": {
+              "NO_ANSWER": "Zigbee2MQTT did not answer Gladys within 2 minutes of starting, without telling why. Check that the selected model is the one of your coordinator, unplug and plug your dongle back in or restart your network coordinator, then try again.",
+              "DONGLE_NOT_FOUND": "Your Zigbee dongle is not plugged in (or no longer on the selected port): Zigbee2MQTT could not start. Plug it in, then try again, or choose it again.",
+              "NOT_ENOUGH_DISK_SPACE": "There is not enough disk space to download Zigbee2MQTT. Free up some space, then try again.",
+              "unknown": "Gladys stopped on an error it cannot explain. Try again; if it comes back, the technical details help find its cause."
+            },
+            "details": "Technical details",
+            "retry": "Try again",
+            "changeKey": "Change dongle or model",
+            "changeConnection": "Change the connection"
+          },
+          "ready": {
+            "title": "Your Zigbee network is ready",
+            "textUsb": "Zigbee2MQTT runs and talks to your dongle.",
+            "textNetwork": "Zigbee2MQTT runs and talks to your coordinator.",
+            "textExternal": "Gladys receives the messages of your Zigbee2MQTT.",
+            "networkCoordinator": "Network coordinator",
+            "driver": "Driver",
+            "firmware": "Firmware",
+            "duration": "Installed in",
+            "broker": "MQTT broker",
+            "version": "Zigbee2MQTT",
+            "devices": "Devices already paired",
+            "unknown": "—",
+            "ezspDriver": "ezsp (compatibility)",
+            "ezspNote": "<strong>Old firmware:</strong> Gladys uses the ezsp compatibility driver. Everything works, but this driver is deprecated: consider updating the firmware of the dongle. <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">How?</a>",
+            "pair": "Pair my first device",
+            "later": "Later"
+          },
+          "pair": {
+            "title": "Pair your first device",
+            "text": "Bulb, plug, sensor… Gladys permits joining for 4 minutes.",
+            "tips": {
+              "approach": {
+                "title": "Bring the device closer",
+                "text": "Within 2 meters of the dongle, while it pairs."
+              },
+              "mode": {
+                "title": "Put it in pairing mode",
+                "text": "Often a long press (5 s) on its button. A bulb: switch it on and off 5 to 6 times in a row."
+              },
+              "add": {
+                "title": "Add it to Gladys",
+                "text": "It shows up in the Discover tab: give it a name and a room."
+              }
+            },
+            "allow": "Permit joining",
+            "allowed": "<strong>Joining permitted for 4 minutes.</strong> Put your device in pairing mode: it will show up in the Discover tab as soon as it has joined the network.",
+            "allowError": "Gladys could not permit joining. Try again.",
+            "goToDiscover": "Go to Discover",
+            "finish": "Finish",
+            "finishWithoutPairing": "Finish without pairing"
+          }
         }
       },
       "device": {

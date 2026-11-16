@@ -39,7 +39,7 @@ export const getShownInstallationError = (installation, zigbee2mqttConnected) =>
   isFailureShown(installation, zigbee2mqttConnected) ? installation.error : null;
 
 // 23 s, 1 min 42 s
-const formatDuration = durationMs => {
+export const formatDuration = durationMs => {
   const totalSeconds = Math.round(durationMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;

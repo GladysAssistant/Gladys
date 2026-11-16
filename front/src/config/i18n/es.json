@@ -2102,6 +2102,171 @@
           "done": "Descarga completada: la instalación será rápida.",
           "notEnoughDiskSpace": "Espacio en disco insuficiente: {{free}} MB libres, {{needed}} MB necesarios para instalar Zigbee2MQTT. Libere espacio antes de instalar.",
           "notEnoughDiskSpaceNoFigures": "Espacio en disco insuficiente para instalar Zigbee2MQTT. Libere espacio antes de instalar."
+        },
+        "wizard": {
+          "titleInstall": "Instalar Zigbee2MQTT",
+          "titleConnect": "Conectar Zigbee2MQTT",
+          "stepsLabel": "Pasos",
+          "steps": {
+            "key": "Llave",
+            "install": "Instalación",
+            "network": "Red",
+            "device": "Primer dispositivo",
+            "connection": "Conexión",
+            "check": "Verificación"
+          },
+          "install": "Instalar",
+          "connect": "Conectar",
+          "saveDongleNotFound": "Tu llave Zigbee no está conectada (o ya no está en este puerto): no se ha guardado nada. Conéctala y vuelve a elegirla.",
+          "key": {
+            "detectedTitle": "Llave Zigbee detectada",
+            "detectedText": "Gladys ha reconocido tu llave y su modelo: no tienes nada que elegir.",
+            "justPlugged": "Llave conectada hace un momento: Gladys la ha detectado sin recargar la página.",
+            "recognized": "Reconocida",
+            "modelAndUsb": "Modelo {{code}} · conectada por USB",
+            "usb": "Conectada por USB",
+            "severalTitle": "{{count}} llaves Zigbee detectadas",
+            "severalText": "Elige la que Gladys debe usar.",
+            "unknownTitle": "Gladys no ha reconocido tu llave",
+            "unknownText": "Hay una llave USB conectada, pero su modelo no está en la lista de Gladys. Elígelo a continuación.",
+            "manualTitle": "Elegir la llave a mano",
+            "manualText": "Indica el puerto y el modelo de tu llave.",
+            "portLabel": "Puerto",
+            "choosePort": "Elige el puerto",
+            "showAllPorts": "Mostrar los demás puertos serie (placa HAT/GPIO, puertos de la máquina)",
+            "modelLabel": "Modelo",
+            "modelHint": "El modelo está escrito en la llave o en su caja. Determina cómo Zigbee2MQTT se comunica con ella.",
+            "searchPlaceholder": "Buscar: dongle-e, sonoff p, conbee, skyconnect…",
+            "searchLabel": "Buscar un modelo",
+            "noModel": "Ningún modelo corresponde a tu búsqueda.",
+            "otherBrands": "Otros",
+            "noneTitle": "Conecta tu llave Zigbee",
+            "noneText": "Gladys la detecta en cuanto está conectada, sin recargar la página.",
+            "waiting": "Esperando una llave…",
+            "tip": "<strong>Consejo:</strong> conecta la llave al final de un alargador USB, lejos de los puertos USB 3 y del router Wi-Fi. La señal Zigbee será mejor.",
+            "linkManualWrong": "¿No es la llave correcta? Elegir a mano",
+            "linkManualSeveral": "¿Ninguna de estas llaves? Elegir a mano",
+            "linkManualNone": "Mi llave está conectada pero no aparece",
+            "linkNetwork": "¿Coordinador de red (SLZB-06…)?",
+            "linkExternal": "Ya tengo un Zigbee2MQTT",
+            "backToDetected": "← Volver a la llave detectada",
+            "backToUsb": "← Volver a la llave USB",
+            "back": "← Volver",
+            "portsError": "Gladys no ha podido listar los puertos de la máquina.",
+            "adaptersError": "Gladys no ha podido cargar la lista de modelos."
+          },
+          "network": {
+            "title": "Coordinador de red",
+            "text": "Para un coordinador Ethernet o Wi-Fi (SLZB-06, SLZB-07…) conectado a tu red local.",
+            "urlLabel": "Dirección del coordinador",
+            "urlHint": "Indicada en la interfaz web del coordinador.",
+            "typeLabel": "Tipo de coordinador",
+            "chooseType": "Elige el tipo",
+            "types": {
+              "ember": "Chip Silicon Labs (SLZB-06M, SLZB-07…)",
+              "zstack": "Chip Texas Instruments (SLZB-06, SLZB-06P7…)",
+              "deconz": "dresden elektronik (ConBee, RaspBee)"
+            }
+          },
+          "external": {
+            "title": "Usar mi Zigbee2MQTT",
+            "text": "Zigbee2MQTT ya funciona en otro lugar (Home Assistant, otra máquina…): Gladys se conecta a su broker MQTT. No se instala nada.",
+            "urlLabel": "Dirección del broker MQTT",
+            "usernameLabel": "Usuario",
+            "passwordLabel": "Contraseña",
+            "frontendUrlLabel": "Dirección de la interfaz de Zigbee2MQTT",
+            "optional": "(opcional)"
+          },
+          "incompatible": {
+            "title": "Gladys no puede instalar Zigbee2MQTT en esta máquina",
+            "text": "Gladys debe ejecutarse en Docker, con la red \"host\". <a href=\"https://gladysassistant.com/docs/installation/docker/\" target=\"_blank\" rel=\"noopener noreferrer\">Ver el comando de instalación de Gladys</a>",
+            "elsewhereTitle": "¿Zigbee2MQTT ya funciona en otro lugar?",
+            "elsewhereText": "Gladys puede conectarse a su broker MQTT, sin instalar nada.",
+            "useExternal": "Usar mi Zigbee2MQTT"
+          },
+          "progress": {
+            "titleInstall": "Instalación de Zigbee2MQTT",
+            "titleConnect": "Conexión a tu Zigbee2MQTT",
+            "leavePage": "Puedes salir de esta página: Gladys continúa, y encontrarás el progreso en la pestaña Configuración.",
+            "phases": {
+              "connectUsb": "Conexión a la llave",
+              "connectNetwork": "Conexión al coordinador",
+              "connectExternal": "Conexión al broker MQTT"
+            },
+            "alreadyDownloaded": "Ya descargado",
+            "ezspSwitching": "Firmware antiguo: cambio a ezsp…",
+            "ezspDriver": "Controlador de compatibilidad (ezsp)",
+            "ezspNote": "<strong>Firmware antiguo detectado.</strong> El controlador ember requiere un firmware 7.4 o posterior: Gladys cambia al controlador de compatibilidad (ezsp) y reinicia Zigbee2MQTT. No tienes nada que hacer."
+          },
+          "failure": {
+            "titles": {
+              "NO_ANSWER": "Zigbee2MQTT no responde",
+              "DONGLE_NOT_FOUND": "Llave Zigbee no encontrada",
+              "NOT_ENOUGH_DISK_SPACE": "Espacio en disco insuficiente",
+              "EZSP_PROTOCOL_VERSION": "Firmware de la llave demasiado antiguo",
+              "ADAPTER_UNREACHABLE": "Coordinador de red inaccesible",
+              "ADAPTER_NO_RESPONSE": "El coordinador Zigbee no responde",
+              "INVALID_CONFIGURATION": "Configuración de Zigbee2MQTT rechazada",
+              "BAD_CREDENTIALS": "Credenciales MQTT rechazadas",
+              "NOT_AUTHORIZED": "Conexión MQTT rechazada",
+              "BROKER_UNREACHABLE": "Broker MQTT inaccesible",
+              "SYSTEM_NOT_RUNNING_DOCKER": "Instalación imposible en esta máquina",
+              "DOCKER_BAD_NETWORK": "Instalación imposible en esta máquina",
+              "unknown": "Se ha producido un error"
+            },
+            "texts": {
+              "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos siguientes a su arranque, sin indicar por qué. Comprueba que el modelo elegido es el de tu coordinador, desconecta y vuelve a conectar tu llave o reinicia tu coordinador de red, y vuelve a intentarlo.",
+              "DONGLE_NOT_FOUND": "Tu llave Zigbee no está conectada (o ya no está en el puerto elegido): Zigbee2MQTT no ha podido arrancar. Conéctala y vuelve a intentarlo, o vuelve a elegirla.",
+              "NOT_ENOUGH_DISK_SPACE": "No hay suficiente espacio en disco para descargar Zigbee2MQTT. Libera espacio y vuelve a intentarlo.",
+              "unknown": "Gladys se ha detenido por un error que no sabe explicar. Vuelve a intentarlo; si se repite, los detalles técnicos ayudan a encontrar la causa."
+            },
+            "details": "Detalles técnicos",
+            "retry": "Reintentar",
+            "changeKey": "Cambiar de llave o de modelo",
+            "changeConnection": "Modificar la conexión"
+          },
+          "ready": {
+            "title": "Tu red Zigbee está lista",
+            "textUsb": "Zigbee2MQTT funciona y se comunica con tu llave.",
+            "textNetwork": "Zigbee2MQTT funciona y se comunica con tu coordinador.",
+            "textExternal": "Gladys recibe los mensajes de tu Zigbee2MQTT.",
+            "networkCoordinator": "Coordinador de red",
+            "driver": "Controlador",
+            "firmware": "Firmware",
+            "duration": "Instalado en",
+            "broker": "Broker MQTT",
+            "version": "Zigbee2MQTT",
+            "devices": "Dispositivos ya emparejados",
+            "unknown": "—",
+            "ezspDriver": "ezsp (compatibilidad)",
+            "ezspNote": "<strong>Firmware antiguo:</strong> Gladys usa el controlador de compatibilidad ezsp. Todo funciona, pero este controlador está obsoleto: considera actualizar el firmware de la llave. <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">¿Cómo?</a>",
+            "pair": "Emparejar mi primer dispositivo",
+            "later": "Más tarde"
+          },
+          "pair": {
+            "title": "Empareja tu primer dispositivo",
+            "text": "Bombilla, enchufe, sensor… Gladys permite la incorporación durante 4 minutos.",
+            "tips": {
+              "approach": {
+                "title": "Acerca el dispositivo",
+                "text": "A menos de 2 metros de la llave, durante el emparejamiento."
+              },
+              "mode": {
+                "title": "Ponlo en modo de emparejamiento",
+                "text": "A menudo una pulsación larga (5 s) en su botón. Una bombilla: enciéndela y apágala 5 o 6 veces seguidas."
+              },
+              "add": {
+                "title": "Añádelo a Gladys",
+                "text": "Aparece en la pestaña Descubrir: dale un nombre y una habitación."
+              }
+            },
+            "allow": "Permitir la incorporación",
+            "allowed": "<strong>Incorporación permitida durante 4 minutos.</strong> Pon tu dispositivo en modo de emparejamiento: aparecerá en la pestaña Descubrir en cuanto se haya unido a la red.",
+            "allowError": "Gladys no ha podido permitir la incorporación. Vuelve a intentarlo.",
+            "goToDiscover": "Ir a Descubrir",
+            "finish": "Terminar",
+            "finishWithoutPairing": "Terminar sin emparejar"
+          }
         }
       },
       "device": {

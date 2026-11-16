@@ -2346,6 +2346,171 @@
           "done": "Download abgeschlossen: Die Installation geht schnell.",
           "notEnoughDiskSpace": "Nicht genügend Speicherplatz: {{free}} MB frei, {{needed}} MB für die Installation von Zigbee2MQTT benötigt. Geben Sie vor der Installation Speicherplatz frei.",
           "notEnoughDiskSpaceNoFigures": "Nicht genügend Speicherplatz für die Installation von Zigbee2MQTT. Geben Sie vor der Installation Speicherplatz frei."
+        },
+        "wizard": {
+          "titleInstall": "Zigbee2MQTT installieren",
+          "titleConnect": "Zigbee2MQTT verbinden",
+          "stepsLabel": "Schritte",
+          "steps": {
+            "key": "Stick",
+            "install": "Installation",
+            "network": "Netzwerk",
+            "device": "Erstes Gerät",
+            "connection": "Verbindung",
+            "check": "Prüfung"
+          },
+          "install": "Installieren",
+          "connect": "Verbinden",
+          "saveDongleNotFound": "Dein Zigbee-Stick ist nicht eingesteckt (oder nicht mehr an diesem Port): Es wurde nichts gespeichert. Stecke ihn ein und wähle ihn erneut aus.",
+          "key": {
+            "detectedTitle": "Zigbee-Stick erkannt",
+            "detectedText": "Gladys hat deinen Stick und sein Modell erkannt: Du musst nichts auswählen.",
+            "justPlugged": "Stick gerade eingesteckt: Gladys hat ihn erkannt, ohne die Seite neu zu laden.",
+            "recognized": "Erkannt",
+            "modelAndUsb": "Modell {{code}} · per USB eingesteckt",
+            "usb": "Per USB eingesteckt",
+            "severalTitle": "{{count}} Zigbee-Sticks erkannt",
+            "severalText": "Wähle den Stick, den Gladys verwenden soll.",
+            "unknownTitle": "Gladys hat deinen Stick nicht erkannt",
+            "unknownText": "Ein USB-Stick ist eingesteckt, aber sein Modell steht nicht in der Liste von Gladys. Wähle es unten aus.",
+            "manualTitle": "Stick manuell auswählen",
+            "manualText": "Gib den Port und das Modell deines Sticks an.",
+            "portLabel": "Port",
+            "choosePort": "Port auswählen",
+            "showAllPorts": "Weitere serielle Ports anzeigen (HAT/GPIO-Platine, Ports des Rechners)",
+            "modelLabel": "Modell",
+            "modelHint": "Das Modell steht auf dem Stick oder auf seiner Verpackung. Es bestimmt, wie Zigbee2MQTT mit ihm spricht.",
+            "searchPlaceholder": "Suchen: dongle-e, sonoff p, conbee, skyconnect…",
+            "searchLabel": "Modell suchen",
+            "noModel": "Kein Modell entspricht deiner Suche.",
+            "otherBrands": "Andere",
+            "noneTitle": "Stecke deinen Zigbee-Stick ein",
+            "noneText": "Gladys erkennt ihn, sobald er eingesteckt ist, ohne die Seite neu zu laden.",
+            "waiting": "Warte auf einen Stick…",
+            "tip": "<strong>Tipp:</strong> Stecke den Stick an ein USB-Verlängerungskabel, fern von USB-3-Ports und vom WLAN-Router. Das Zigbee-Signal wird dadurch besser.",
+            "linkManualWrong": "Nicht der richtige Stick? Manuell auswählen",
+            "linkManualSeveral": "Keiner dieser Sticks? Manuell auswählen",
+            "linkManualNone": "Mein Stick ist eingesteckt, erscheint aber nicht",
+            "linkNetwork": "Netzwerk-Koordinator (SLZB-06…)?",
+            "linkExternal": "Ich habe bereits ein Zigbee2MQTT",
+            "backToDetected": "← Zurück zum erkannten Stick",
+            "backToUsb": "← Zurück zum USB-Stick",
+            "back": "← Zurück",
+            "portsError": "Gladys konnte die Ports des Rechners nicht auflisten.",
+            "adaptersError": "Gladys konnte die Liste der Modelle nicht laden."
+          },
+          "network": {
+            "title": "Netzwerk-Koordinator",
+            "text": "Für einen Ethernet- oder WLAN-Koordinator (SLZB-06, SLZB-07…) in deinem lokalen Netzwerk.",
+            "urlLabel": "Adresse des Koordinators",
+            "urlHint": "Steht in der Weboberfläche des Koordinators.",
+            "typeLabel": "Typ des Koordinators",
+            "chooseType": "Typ auswählen",
+            "types": {
+              "ember": "Silicon-Labs-Chip (SLZB-06M, SLZB-07…)",
+              "zstack": "Texas-Instruments-Chip (SLZB-06, SLZB-06P7…)",
+              "deconz": "dresden elektronik (ConBee, RaspBee)"
+            }
+          },
+          "external": {
+            "title": "Mein Zigbee2MQTT verwenden",
+            "text": "Zigbee2MQTT läuft bereits woanders (Home Assistant, ein anderer Rechner…): Gladys verbindet sich mit seinem MQTT-Broker. Es wird nichts installiert.",
+            "urlLabel": "Adresse des MQTT-Brokers",
+            "usernameLabel": "Benutzer",
+            "passwordLabel": "Passwort",
+            "frontendUrlLabel": "Adresse der Zigbee2MQTT-Oberfläche",
+            "optional": "(optional)"
+          },
+          "incompatible": {
+            "title": "Gladys kann Zigbee2MQTT auf diesem Rechner nicht installieren",
+            "text": "Gladys muss in Docker laufen, mit dem Netzwerk \"host\". <a href=\"https://gladysassistant.com/docs/installation/docker/\" target=\"_blank\" rel=\"noopener noreferrer\">Installationsbefehl von Gladys ansehen</a>",
+            "elsewhereTitle": "Zigbee2MQTT läuft bereits woanders?",
+            "elsewhereText": "Gladys kann sich mit seinem MQTT-Broker verbinden, ohne etwas zu installieren.",
+            "useExternal": "Mein Zigbee2MQTT verwenden"
+          },
+          "progress": {
+            "titleInstall": "Installation von Zigbee2MQTT",
+            "titleConnect": "Verbindung mit deinem Zigbee2MQTT",
+            "leavePage": "Du kannst diese Seite verlassen: Gladys macht weiter, den Fortschritt findest du im Tab Konfiguration.",
+            "phases": {
+              "connectUsb": "Verbindung mit dem Stick",
+              "connectNetwork": "Verbindung mit dem Koordinator",
+              "connectExternal": "Verbindung mit dem MQTT-Broker"
+            },
+            "alreadyDownloaded": "Bereits heruntergeladen",
+            "ezspSwitching": "Alte Firmware: Wechsel zu ezsp…",
+            "ezspDriver": "Kompatibilitätstreiber (ezsp)",
+            "ezspNote": "<strong>Alte Firmware erkannt.</strong> Der ember-Treiber benötigt Firmware 7.4 oder neuer: Gladys wechselt zum Kompatibilitätstreiber (ezsp) und startet Zigbee2MQTT neu. Du musst nichts tun."
+          },
+          "failure": {
+            "titles": {
+              "NO_ANSWER": "Zigbee2MQTT antwortet nicht",
+              "DONGLE_NOT_FOUND": "Zigbee-Stick nicht gefunden",
+              "NOT_ENOUGH_DISK_SPACE": "Nicht genug Speicherplatz",
+              "EZSP_PROTOCOL_VERSION": "Firmware des Sticks zu alt",
+              "ADAPTER_UNREACHABLE": "Netzwerk-Koordinator nicht erreichbar",
+              "ADAPTER_NO_RESPONSE": "Der Zigbee-Koordinator antwortet nicht",
+              "INVALID_CONFIGURATION": "Konfiguration von Zigbee2MQTT abgelehnt",
+              "BAD_CREDENTIALS": "MQTT-Zugangsdaten abgelehnt",
+              "NOT_AUTHORIZED": "MQTT-Verbindung abgelehnt",
+              "BROKER_UNREACHABLE": "MQTT-Broker nicht erreichbar",
+              "SYSTEM_NOT_RUNNING_DOCKER": "Installation auf diesem Rechner nicht möglich",
+              "DOCKER_BAD_NETWORK": "Installation auf diesem Rechner nicht möglich",
+              "unknown": "Ein Fehler ist aufgetreten"
+            },
+            "texts": {
+              "NO_ANSWER": "Zigbee2MQTT hat Gladys innerhalb von 2 Minuten nach dem Start nicht geantwortet, ohne einen Grund zu nennen. Prüfe, ob das gewählte Modell dem deines Koordinators entspricht, stecke deinen Stick aus und wieder ein oder starte deinen Netzwerk-Koordinator neu, und versuche es dann erneut.",
+              "DONGLE_NOT_FOUND": "Dein Zigbee-Stick ist nicht eingesteckt (oder nicht mehr am gewählten Port): Zigbee2MQTT konnte nicht starten. Stecke ihn ein und versuche es erneut, oder wähle ihn erneut aus.",
+              "NOT_ENOUGH_DISK_SPACE": "Es gibt nicht genug Speicherplatz, um Zigbee2MQTT herunterzuladen. Schaffe Platz und versuche es dann erneut.",
+              "unknown": "Gladys wurde durch einen Fehler gestoppt, den es nicht erklären kann. Versuche es erneut; tritt er wieder auf, helfen die technischen Details, die Ursache zu finden."
+            },
+            "details": "Technische Details",
+            "retry": "Erneut versuchen",
+            "changeKey": "Stick oder Modell ändern",
+            "changeConnection": "Verbindung ändern"
+          },
+          "ready": {
+            "title": "Dein Zigbee-Netzwerk ist bereit",
+            "textUsb": "Zigbee2MQTT läuft und spricht mit deinem Stick.",
+            "textNetwork": "Zigbee2MQTT läuft und spricht mit deinem Koordinator.",
+            "textExternal": "Gladys empfängt die Nachrichten deines Zigbee2MQTT.",
+            "networkCoordinator": "Netzwerk-Koordinator",
+            "driver": "Treiber",
+            "firmware": "Firmware",
+            "duration": "Installiert in",
+            "broker": "MQTT-Broker",
+            "version": "Zigbee2MQTT",
+            "devices": "Bereits angelernte Geräte",
+            "unknown": "—",
+            "ezspDriver": "ezsp (Kompatibilität)",
+            "ezspNote": "<strong>Alte Firmware:</strong> Gladys verwendet den Kompatibilitätstreiber ezsp. Alles funktioniert, aber dieser Treiber wird nicht mehr weiterentwickelt: Aktualisiere die Firmware des Sticks. <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Wie?</a>",
+            "pair": "Mein erstes Gerät anlernen",
+            "later": "Später"
+          },
+          "pair": {
+            "title": "Lerne dein erstes Gerät an",
+            "text": "Lampe, Steckdose, Sensor… Gladys aktiviert das Anlernen für 4 Minuten.",
+            "tips": {
+              "approach": {
+                "title": "Bringe das Gerät näher",
+                "text": "Weniger als 2 Meter vom Stick entfernt, während des Anlernens."
+              },
+              "mode": {
+                "title": "Versetze es in den Anlernmodus",
+                "text": "Oft ein langer Druck (5 s) auf seine Taste. Eine Lampe: 5- bis 6-mal hintereinander ein- und ausschalten."
+              },
+              "add": {
+                "title": "Füge es zu Gladys hinzu",
+                "text": "Es erscheint im Tab Entdecken: Gib ihm einen Namen und einen Raum."
+              }
+            },
+            "allow": "Anlernen aktivieren",
+            "allowed": "<strong>Anlernen für 4 Minuten aktiviert.</strong> Versetze dein Gerät in den Anlernmodus: Es erscheint im Tab Entdecken, sobald es dem Netzwerk beigetreten ist.",
+            "allowError": "Gladys konnte das Anlernen nicht aktivieren. Versuche es erneut.",
+            "goToDiscover": "Zu Entdecken",
+            "finish": "Fertig",
+            "finishWithoutPairing": "Ohne Anlernen beenden"
+          }
         }
       },
       "device": {
