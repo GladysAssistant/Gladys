@@ -126,10 +126,12 @@ the very resize that queued that frame.
   next to the field ("A room that was renamed still holds this name internally…") and does not
   suggest it — for the saved rooms of the house that are not being deleted, and for the rooms
   of the other houses.
+- **A room deleted since the last save and added again comes back**: the deletion is only a
+  flag until the save, so adding a room of that name (typed) lifts the flag — the same room,
+  with its devices — instead of deleting one room and creating another.
 - **The rooms are saved in three passes** — deletions, then renames, then creations
   (`saveHouse`, `actions/house.js`, at every width) — and not all at once: the name a deletion
-  or a rename frees is free when a new room asks for it (a room deleted then added again in the
-  same save).
+  or a rename frees is free when another room asks for it.
 
 ### C.4 Alarm
 

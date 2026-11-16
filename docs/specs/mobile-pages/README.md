@@ -164,7 +164,10 @@ bottom bar on a page that has one (`aboveBar`).
 A window resized across the breakpoint swaps the two presentations of a page, with its container
 and its state kept. A Leaflet map unmounted by that swap is removed with `removeMapWhenSettled`
 (`utils/mapTileLayer.js`): the basemap layer settles a resize on the next animation frame without
-checking that its map is still there, and a map removed at once made that frame throw.
+checking that its map is still there, and a map removed at once made that frame throw. The same
+helper ends a zoom animation still running before it removes the map: Leaflet finishes it from a
+timer that would otherwise throw on the removed map (a zone page left right after its map was
+fitted).
 
 ## D. Pages
 

@@ -142,7 +142,10 @@ describe('Energy monitoring on a phone', () => {
     cy.get('[data-cy=mobile-steps-label]').i18n('integration.energyMonitoring.contracts.wizard.preview');
     cy.get('[data-cy=energy-contract-preview-result]').should('exist');
     cy.get('[data-cy=energy-contract-preview-total]').should('not.be.empty');
-    cy.get('[data-cy=energy-contract-preview-components]').should('contain', 'subscription');
+    // the usual components are named in the language of the user
+    cy.get('[data-cy=energy-contract-preview-components]').i18n(
+      'integration.energyMonitoring.mobile.previewComponents.subscription'
+    );
     cy.get('[data-cy=energy-contract-save]').click();
     cy.wait('@createContract').then(({ request, response }) => {
       expect(response.statusCode).to.eq(201);

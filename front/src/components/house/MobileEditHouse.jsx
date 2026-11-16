@@ -280,9 +280,25 @@ class MobileEditHouse extends Component {
       this.setState({ newRoomError });
       return;
     }
-    this.props.addRoomNamed(name);
+    this.addOrRestoreRoom(name);
     // the sheet stays open: several rooms are added in a row
     this.setState({ newRoomName: '', newRoomError: null });
+  };
+
+  // A saved room deleted since the last save is still in the house, flagged: adding a room of
+  // that name brings the same room back (with its devices) instead of deleting one room and
+  // creating another — which the store refuses anyway, the name being still there.
+  addOrRestoreRoom = name => {
+    const deletedIndex = (this.props.house.rooms || []).findIndex(
+      room => room.id && room.to_delete === true && sameName(room.name, name)
+    );
+    if (deletedIndex >= 0) {
+      this.props.editRoom(deletedIndex, 'to_delete', false);
+      // the Undo of that deletion has nothing left to undo
+      this.closeUndo();
+      return;
+    }
+    this.props.addRoomNamed(name);
   };
 
   onNewRoomKeyDown = e => {
