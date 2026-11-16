@@ -5161,7 +5161,7 @@
         "none": "Sin cuenta de Gladys Plus: este usuario solo puede usar Gladys desde casa."
       },
       "statusUnavailable": "El acceso remoto no se puede comprobar mientras su instancia no esté conectada a Gladys Plus.",
-      "invitedNotReceived": "¿No la ha recibido? Pídale que revise sus carpetas de Spam, Promociones y Redes sociales.",
+      "invitedNotReceived": "¿No la ha recibido? Pídale que revise sus carpetas Spam, Promociones y Social.",
       "memberSince": "En Gladys Plus desde el {{date}}",
       "online": "Conectado ahora mismo",
       "plusRole": {
