@@ -305,7 +305,7 @@ describe('zigbee2mqtt init', () => {
       // Its container is created again on the link
       expect(installedDriverPath()).to.equal(BY_ID_PATH);
       expect(zigbee2mqttManager.usbConfigured).to.equal(true);
-      expect(zigbee2mqttManager.dongleWatch).to.deep.equal({ driverPath: BY_ID_PATH });
+      expect(zigbee2mqttManager.dongleWatch).to.deep.equal({ driverPath: BY_ID_PATH, pnpId: LINK });
     });
 
     it('should keep the port of a dongle of another driver, which may have taken the number of the configured one', async () => {
@@ -317,6 +317,23 @@ describe('zigbee2mqtt init', () => {
       await zigbee2mqttManager.init();
       assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH');
       expect(installedDriverPath()).to.equal('/dev/ttyUSB0');
+    });
+
+    it('should keep the port when a second dongle of the same driver may have taken the number of the configured one', async () => {
+      const otherSerialNumber = '6a1c3e8b4c2aed11a0ab1d3c5e7f9a1b';
+      const otherLink = LINK.replace(zbDongleP.serialNumber, otherSerialNumber);
+      listPorts([zbDongleP, { ...zbDongleP, path: '/dev/ttyUSB1', serialNumber: otherSerialNumber, pnpId: otherLink }]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', z2mDongleName: ZBDONGLE_P });
+      await zigbee2mqttManager.init();
+      assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH');
+      expect(installedDriverPath()).to.equal('/dev/ttyUSB0');
+    });
+
+    it('should store by its link a dongle listed twice under the same port (some NAS)', async () => {
+      listPorts([zbDongleP, { ...zbDongleP }]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0', z2mDongleName: ZBDONGLE_P });
+      await zigbee2mqttManager.init();
+      assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH', BY_ID_PATH);
     });
 
     it('should keep the port of a device it does not recognize', async () => {
@@ -357,14 +374,16 @@ describe('zigbee2mqtt init', () => {
       expect(zigbee2mqttManager.dongleMissing).to.equal(true);
       expect(zigbee2mqttManager.usbConfigured).to.equal(false);
       assert.notCalled(zigbee2mqttManager.installZ2mContainer);
-      expect(zigbee2mqttManager.dongleWatch).to.deep.equal({ driverPath: BY_ID_PATH });
+      // No dongle found to tell from another device
+      expect(zigbee2mqttManager.dongleWatch).to.deep.equal({ driverPath: BY_ID_PATH, pnpId: undefined });
     });
 
-    it('should not watch the dongle with an external broker', async () => {
+    it('should neither watch the dongle nor tell it missing with an external broker, which runs no Zigbee2mqtt', async () => {
       listPorts([]);
       zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: BY_ID_PATH, mqttMode: 'external' });
       await zigbee2mqttManager.init();
       expect(zigbee2mqttManager.dongleWatch).to.equal(null);
+      expect(zigbee2mqttManager.dongleMissing).to.equal(false);
     });
 
     it('should stop the previous watch, and forget a missing dongle', async () => {

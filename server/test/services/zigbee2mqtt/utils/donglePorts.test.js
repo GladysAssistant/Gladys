@@ -6,6 +6,7 @@ const {
   findConfiguredPort,
   getStablePath,
   isSameAdapterFamily,
+  isSameDevice,
 } = require('../../../../services/zigbee2mqtt/utils/donglePorts');
 
 const ZBDONGLE_P_LINK = 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0';
@@ -84,18 +85,62 @@ describe('zigbee2mqtt donglePorts', () => {
 
     it('should give the /dev/serial/by-id/ link of the device', async () => {
       access.resolves();
-      expect(await getStablePath(zbDongleP)).to.equal(`/dev/serial/by-id/${ZBDONGLE_P_LINK}`);
+      expect(await getStablePath(zbDongleP, [zbDongleP, teleinfo])).to.equal(`/dev/serial/by-id/${ZBDONGLE_P_LINK}`);
       sinon.assert.calledOnceWithExactly(access, `/dev/serial/by-id/${ZBDONGLE_P_LINK}`);
+    });
+
+    it('should give the link of a device listed twice under the same port (some NAS)', async () => {
+      access.resolves();
+      expect(await getStablePath(zbDongleP, [zbDongleP, { ...zbDongleP }])).to.equal(
+        `/dev/serial/by-id/${ZBDONGLE_P_LINK}`,
+      );
     });
 
     it('should give the port when the link is not on the disk of Gladys', async () => {
       access.rejects(new Error('ENOENT'));
-      expect(await getStablePath(zbDongleP)).to.equal('/dev/ttyUSB0');
+      expect(await getStablePath(zbDongleP, [zbDongleP])).to.equal('/dev/ttyUSB0');
     });
 
     it('should give the port of a device without USB device name', async () => {
-      expect(await getStablePath({ path: '/dev/ttyAMA0' })).to.equal('/dev/ttyAMA0');
+      expect(await getStablePath({ path: '/dev/ttyAMA0' }, [])).to.equal('/dev/ttyAMA0');
       sinon.assert.notCalled(access);
+    });
+
+    it('should give the port of two identical adapters without serial number, sharing a single link', async () => {
+      access.resolves();
+      const pnpId = 'usb-1a86_USB_Serial-if00-port0';
+      const ports = [
+        { path: '/dev/ttyUSB0', pnpId },
+        { path: '/dev/ttyUSB1', pnpId },
+      ];
+      expect(await getStablePath(ports[0], ports)).to.equal('/dev/ttyUSB0');
+      expect(await getStablePath(ports[1], ports)).to.equal('/dev/ttyUSB1');
+      sinon.assert.notCalled(access);
+    });
+  });
+
+  describe('isSameDevice', () => {
+    let realpath;
+
+    beforeEach(() => {
+      realpath = sinon.stub(fs.promises, 'realpath');
+      realpath.withArgs(`/dev/serial/by-id/${ZBDONGLE_P_LINK}`).resolves('/dev/ttyUSB0');
+      realpath.withArgs('/dev/ttyUSB0').resolves('/dev/ttyUSB0');
+      realpath.withArgs('/dev/ttyUSB1').resolves('/dev/ttyUSB1');
+      realpath.rejects(new Error('ENOENT'));
+    });
+
+    afterEach(() => {
+      realpath.restore();
+    });
+
+    it('should tell a port and its link apart from another port', async () => {
+      expect(await isSameDevice('/dev/ttyUSB0', `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(true);
+      expect(await isSameDevice('/dev/ttyUSB1', `/dev/serial/by-id/${ZBDONGLE_P_LINK}`)).to.equal(false);
+    });
+
+    it('should not tell the same device when a path is not on the disk', async () => {
+      expect(await isSameDevice('/dev/ttyUSB0', '/dev/serial/by-id/gone')).to.equal(false);
     });
   });
 

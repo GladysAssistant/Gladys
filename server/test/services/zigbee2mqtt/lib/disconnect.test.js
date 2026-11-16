@@ -189,6 +189,7 @@ describe('zigbee2mqtt disconnect', () => {
     zigbee2MqttManager.findDongle = fake.resolves(null);
     zigbee2MqttManager.watchDongle('/dev/ttyUSB0');
     zigbee2MqttManager.dongleMissing = true;
+    zigbee2MqttManager.dongleRestarts = { count: 5, lastAt: 1000 };
     try {
       // EXECUTE
       await zigbee2MqttManager.disconnect();
@@ -200,6 +201,8 @@ describe('zigbee2mqtt disconnect', () => {
     assert.notCalled(zigbee2MqttManager.findDongle);
     expect(zigbee2MqttManager.dongleWatchTimer).to.equal(null);
     expect(zigbee2MqttManager.dongleMissing).to.equal(false);
+    // Enabled again, the watch may start Zigbee2mqtt at once
+    expect(zigbee2MqttManager.dongleRestarts).to.deep.equal({ count: 0, lastAt: null });
   });
 
   it('should end a pending startup and forget the removed containers', async () => {

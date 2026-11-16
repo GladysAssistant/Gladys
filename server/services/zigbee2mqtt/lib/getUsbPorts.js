@@ -69,7 +69,7 @@ async function getUsbPorts() {
   return Promise.all(
     ports.map(async (port) => ({
       path: port.path,
-      stablePath: await getStablePath(port),
+      stablePath: await getStablePath(port, ports),
       name: getDeviceName(port),
       pnpId: port.pnpId,
       adapter: findAdapter(port),

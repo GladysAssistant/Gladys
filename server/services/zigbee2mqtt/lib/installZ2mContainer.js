@@ -4,6 +4,7 @@ const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { ADAPTER_MODE, INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
 const { formatDuration } = require('../utils/formatDuration');
+const { isSameDevice } = require('../utils/donglePorts');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
@@ -82,7 +83,18 @@ async function installZ2mContainer(config, setupMode = false) {
     const containerDescription = await this.gladys.system.inspectContainer(container.id);
     const [currentDevice] = containerDescription.HostConfig.Devices || [];
     const currentDevicePath = currentDevice ? currentDevice.PathOnHost : null;
-    if (currentDevicePath !== expectedDevicePath) {
+    // The same dongle under another name, its port before its /dev/serial/by-id/ link: without the image to create the
+    // container again (an update postponed for want of Internet or disk space), the container in place keeps running
+    // on the same dongle, and a later init creates it again on the new path
+    const keptWithoutImage =
+      currentDevicePath !== expectedDevicePath &&
+      Boolean(this.imagePullFailures[containerDescriptor.Image]) &&
+      (await isSameDevice(currentDevicePath, expectedDevicePath));
+    if (keptWithoutImage) {
+      logger.warn(
+        `Zigbee2mqtt container kept on ${currentDevicePath}, the same USB dongle as ${expectedDevicePath}, until its image is downloaded`,
+      );
+    } else if (currentDevicePath !== expectedDevicePath) {
       const newCoordinator = networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath;
       logger.info(
         `Zigbee2mqtt container with USB dongle path ${currentDevicePath} should be removed (new Zigbee coordinator ${newCoordinator} configured)...`,

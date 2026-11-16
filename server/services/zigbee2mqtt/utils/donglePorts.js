@@ -54,12 +54,20 @@ function findConfiguredPort(ports, driverPath) {
  * @param {object} port - Serial port, as listed by the serialport library.
  * @param {string} port.path - Path of the port, /dev/ttyUSB0.
  * @param {string} [port.pnpId] - USB device name, the name of its /dev/serial/by-id/ link.
- * @returns {Promise<string>} The link, when it exists, or the path of the port.
+ * @param {Array} ports - All the serial ports listed with it.
+ * @returns {Promise<string>} The link, when it exists and names this device only, or the path of the port.
  * @example
- * const driverPath = await getStablePath({ path: '/dev/ttyUSB0', pnpId: 'usb-Silicon_Labs_CP2102N_1-if00-port0' });
+ * const port = { path: '/dev/ttyUSB0', pnpId: 'usb-Silicon_Labs_CP2102N_1-if00-port0' };
+ * const driverPath = await getStablePath(port, [port]);
  */
-async function getStablePath({ path, pnpId }) {
+async function getStablePath({ path, pnpId }, ports) {
   if (!pnpId) {
+    return path;
+  }
+  // Two identical adapters without serial number share their USB device name: udev keeps a single link, which leads
+  // to one of them, maybe the other one after a restart (some NAS list a port twice, under the same path)
+  const pathsOfDevice = new Set(ports.filter((port) => port.pnpId === pnpId).map((port) => port.path));
+  if (pathsOfDevice.size > 1) {
     return path;
   }
   const link = `${BY_ID_DIR}${pnpId}`;
@@ -101,9 +109,27 @@ function isSameAdapterFamily(model, otherModel) {
   return family !== null && family === getAdapterFamily(otherModel);
 }
 
+/**
+ * @description Tell whether two paths lead to the same device: a port and its /dev/serial/by-id/ link.
+ * @param {string} path - A path of a device.
+ * @param {string} otherPath - Another one.
+ * @returns {Promise<boolean>} True when both lead to the same device; false when one of them is not on the disk.
+ * @example
+ * await isSameDevice('/dev/ttyUSB0', '/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_1-if00-port0');
+ */
+async function isSameDevice(path, otherPath) {
+  try {
+    const [device, otherDevice] = await Promise.all([fs.promises.realpath(path), fs.promises.realpath(otherPath)]);
+    return device === otherDevice;
+  } catch (e) {
+    return false;
+  }
+}
+
 module.exports = {
   BY_ID_DIR,
   findConfiguredPort,
   getStablePath,
   isSameAdapterFamily,
+  isSameDevice,
 };

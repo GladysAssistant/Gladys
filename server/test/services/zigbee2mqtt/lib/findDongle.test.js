@@ -32,6 +32,7 @@ describe('zigbee2mqtt findDongle', () => {
     expect(dongle).to.deep.equal({
       port: { path: '/dev/ttyUSB1', pnpId: LINK },
       stablePath: `/dev/serial/by-id/${LINK}`,
+      ports: [{ path: '/dev/ttyS0' }, { path: '/dev/ttyUSB1', pnpId: LINK }],
     });
   });
 

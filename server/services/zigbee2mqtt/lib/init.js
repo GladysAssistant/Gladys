@@ -68,21 +68,27 @@ async function removeReplacedImages(system, images) {
 
 /**
  * @description Get the path to store for the configured USB dongle, found plugged in: the same one, or its
- * /dev/serial/by-id/ link when it was found under another link (by its serial number), or when its stored port is a
- * dongle of the configured driver family (the migration of the installations stored by port: a port shared with
- * another USB-serial adapter, which took its number at this start, keeps it).
+ * /dev/serial/by-id/ link when it was found under another link (by its serial number), or when its stored port is the
+ * only dongle of the configured driver family plugged in (the migration of the installations stored by port: a port
+ * shared with another USB-serial adapter, or with a second dongle of the same family, which took its number at this
+ * start, keeps it).
  * @param {object} dongle - The dongle found, see findDongle.
  * @param {object} dongle.port - Its serial port.
  * @param {string} dongle.stablePath - Its /dev/serial/by-id/ link, or its port when it has none.
+ * @param {Array} dongle.ports - All the serial ports plugged in.
  * @param {string} driverPath - Its stored path.
  * @param {string} dongleName - Configured coordinator model.
  * @returns {string} The path to store.
  * @example
  * const newDriverPath = getDriverPathToStore(dongle, '/dev/ttyUSB0', 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P');
  */
-function getDriverPathToStore({ port, stablePath }, driverPath, dongleName) {
+function getDriverPathToStore({ port, stablePath, ports }, driverPath, dongleName) {
   if (port.path === driverPath) {
-    return isSameAdapterFamily(findAdapter(port), dongleName) ? stablePath : driverPath;
+    // Some NAS list a port twice, under the same path
+    const sameFamilyPaths = new Set(
+      ports.filter((usbPort) => isSameAdapterFamily(findAdapter(usbPort), dongleName)).map((usbPort) => usbPort.path),
+    );
+    return sameFamilyPaths.size === 1 && sameFamilyPaths.has(port.path) ? stablePath : driverPath;
   }
   // Found by its link: kept, even when the link cannot be checked from Gladys
   if (driverPath.endsWith(`/${port.pnpId}`)) {
@@ -201,12 +207,12 @@ async function initialize(setupMode) {
     } else {
       logger.warn(`Zigbee2mqtt USB dongle detached to ${z2mDriverPath}`);
       this.usbConfigured = false;
-      this.dongleMissing = true;
     }
     // Zigbee2mqtt is started again once its dongle is plugged back, which Docker does not do. Not with an external
     // broker, Gladys runs no Zigbee2mqtt then; an older installation without broker mode runs the broker of Gladys
     if (mqttMode !== MQTT_MODE.EXTERNAL) {
-      this.watchDongle(configuration.z2mDriverPath);
+      this.dongleMissing = !dongle;
+      this.watchDongle(configuration.z2mDriverPath, dongle ? dongle.port.pnpId : undefined);
     }
   }
 

@@ -4,8 +4,8 @@ const { findConfiguredPort, getStablePath } = require('../utils/donglePorts');
 /**
  * @description Find the configured USB dongle among the serial ports plugged in.
  * @param {string} driverPath - Stored path of the dongle: /dev/ttyUSB0, or /dev/serial/by-id/<pnpId>.
- * @returns {Promise<object|null>} Its port, as listed by the serialport library, and the path to store for it (see
- * getStablePath); null when it is not plugged in.
+ * @returns {Promise<object|null>} Its port, as listed by the serialport library, the path to store for it (see
+ * getStablePath) and all the ports listed; null when it is not plugged in.
  * @example
  * const dongle = await this.findDongle('/dev/ttyUSB0');
  */
@@ -20,7 +20,7 @@ async function findDongle(driverPath) {
   if (!port) {
     return null;
   }
-  return { port, stablePath: await getStablePath(port) };
+  return { port, stablePath: await getStablePath(port, ports), ports };
 }
 
 module.exports = {

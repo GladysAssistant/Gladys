@@ -117,6 +117,34 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.get('[data-cy=z2m-setup-local-dongle-detected]').should('exist');
   });
 
+  it('should keep the model when the configured dongle, stored by its port, is chosen again', () => {
+    // Not recognized: its model was chosen by hand
+    listPorts([{ ...zbDongleE, name: 'Unknown dongle', adapter: null }]);
+    visitSetup(
+      { ...readyToSetupStatus, usbConfigured: true, z2mEnabled: true },
+      {
+        Z2M_MQTT_MODE: 'local',
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_E
+      }
+    );
+    cy.get('[data-cy=z2m-setup-local-summary]')
+      .find('button')
+      .click();
+    cy.wait('@usbPorts');
+
+    // Offered by its link, the same dongle
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .click();
+    cy.get('.react-select__option')
+      .contains('Unknown dongle')
+      .click();
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', ZBDONGLE_E);
+    cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
+  });
+
   it('should tell that the dongle is not plugged in when saving, and that nothing was saved', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
@@ -135,7 +163,7 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.get('[data-cy=z2m-setup-save-error]').i18n('integration.zigbee2mqtt.setup.saveDongleNotFound');
   });
 
-  it('should tell that the configured dongle is unplugged', () => {
+  it('should tell that the configured dongle cannot be found', () => {
     listPorts([machinePort]);
     visitSetup(
       { ...readyToSetupStatus, mqttExist: true, mqttRunning: true, z2mEnabled: true, dongleMissing: true },

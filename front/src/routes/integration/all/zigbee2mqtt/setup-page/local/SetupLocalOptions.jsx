@@ -29,6 +29,11 @@ class SetupLocalOptions extends Component {
     if (z2mDriverPath === this.state.z2mDriverPath) {
       return;
     }
+    // The dongle already chosen, stored by its port and offered by its link: its model stays
+    const usbPort = this.state.usbPorts.find(port => getPortPath(port) === z2mDriverPath);
+    if (usbPort && isConfiguredPort(usbPort, this.state.z2mDriverPath)) {
+      return;
+    }
     // The model follows the dongle of the new port: the recognized one, or none to choose, so that the model
     // of another dongle never stays selected for an unrecognized one
     this.setState({ z2mDriverPath, z2mDongleName: get(option, 'adapter') || null });
