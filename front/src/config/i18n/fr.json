@@ -1633,6 +1633,10 @@
         "deleteTitle": "Supprimer ce contrat ?",
         "contractDeleted": "Contrat supprimé",
         "deviceAttached": "{{device}} est maintenant facturé par {{meter}}",
+        "previewComponents": {
+          "energy": "Énergie",
+          "subscription": "Abonnement"
+        },
         "meterOf": "Compteur de {{name}}",
         "meterSheetHelp": "L'appareil est facturé par le contrat de son compteur.",
         "recalculations": "Recalculs",
@@ -5225,6 +5229,7 @@
       "roomNameRequired": "Une pièce a besoin d'un nom.",
       "roomNameTaken": "Cette maison a déjà une pièce de ce nom.",
       "roomNameTakenElsewhere": "Une autre maison a déjà une pièce de ce nom. Ajoutez le nom de la maison pour les distinguer.",
+      "roomNameReserved": "Une pièce renommée utilise encore ce nom en interne. Choisissez un autre nom.",
       "deleteRoom": "Supprimer la pièce",
       "deleteRoomHint": "La pièce est supprimée à l'enregistrement de la maison. Ses appareils sont conservés, sans pièce.",
       "roomDeleted": "« {{name}} » supprimée",
@@ -5440,7 +5445,7 @@
       },
       "noResult": "Aucun service ne correspond.",
       "actionError": "Impossible de changer l'état du service. Réessayez.",
-      "started": "Service démarré",
+      "started": "Exécuter le service",
       "startedHelp": "Arrêté, l'intégration ne fonctionne plus jusqu'à son redémarrage.",
       "starting": "Démarrage…",
       "stopping": "Arrêt…",

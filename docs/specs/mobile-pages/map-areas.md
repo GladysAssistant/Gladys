@@ -47,7 +47,8 @@ to "Update zone", deleting on a single tap.
   ignore taps and gestures until it is there, so nothing typed or placed is overwritten by the
   zone that arrives — and the same holds while the zone is being saved or deleted, since the page
   leaves for the map once the request is through. "Save and leave" is disabled meanwhile, and a
-  save is never started twice.
+  save is never started twice. The block is `inert` (no focus, no keyboard) on top of taking no
+  pointer, and a position asked from the phone that arrives during the request is dropped.
 
 ## C. Drawing the zone with a finger (`MobileAreaMap.jsx`)
 
@@ -106,6 +107,15 @@ until none is: nothing is sent that the server would refuse for a missing field.
 - A value set from the page is told apart from the echo of a gesture by a marker that is
   consumed once acknowledged: an Undo that brings the zone back to where a gesture had put it
   still recenters the map on it.
+
+- **The map is fitted once the values settle.** A radius typed digit by digit, the − / +
+  buttons pressed in a row and the slider under a finger send several values in a row, and
+  Leaflet drops a view asked for while a zoom animation runs: the fit waits 150 ms after the
+  last value, and runs again at the end of an animation it could not interrupt — the zone never
+  stays framed for a radius it no longer has.
+- **A zone shrunk until only its center shows brings the map closer.** At the end of a resize
+  gesture, a circle smaller on screen than what its edge handle needs (26 px) is fitted like a
+  zone that left the view: the circle and its handle come back.
 
 ## D. Name, color and radius
 

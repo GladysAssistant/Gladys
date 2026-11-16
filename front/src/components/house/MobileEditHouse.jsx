@@ -21,6 +21,7 @@ import {
 } from '../mobile';
 import MobileLocationField from './MobileLocationField';
 import RoomSuggestions, { sameName } from './RoomSuggestions';
+import slugify from '../../utils/slugify';
 import style from './mobileHouse.css';
 
 const ALARM_DELAYS = ['0', '5', '10', '15', '30', '60'];
@@ -155,13 +156,33 @@ class MobileEditHouse extends Component {
   // refuses the save otherwise): a name another house uses is refused next to the field
   isNameTakenElsewhere = name => (this.props.otherRoomNames || []).some(otherName => sameName(otherName, name));
 
-  // The error of a room name, or null when the name can be used
+  // A saved room keeps the selector made from the name it was created with, whatever it is
+  // renamed to, and a new room asks for the selector made from its own name: the server refuses
+  // a new room whose name was the first name of a room that still exists ("Bedroom" renamed
+  // "Main bedroom", then a new "Bedroom"). The selectors held by the saved rooms of this house
+  // that are not being deleted, and by the rooms of the other houses.
+  getHeldSelectors = () =>
+    this.visibleRooms()
+      .filter(({ room }) => room.id && room.selector)
+      .map(({ room }) => room.selector)
+      .concat(this.props.otherRoomSelectors || []);
+
+  isSelectorHeld = name => this.getHeldSelectors().includes(slugify(name));
+
+  // The error of a room name, or null when the name can be used. `exceptIndex`: the room being
+  // renamed (a new name otherwise).
   getNameError = (name, exceptIndex) => {
     if (this.isNameTaken(name, exceptIndex)) {
       return 'roomNameTaken';
     }
     if (this.isNameTakenElsewhere(name)) {
       return 'roomNameTakenElsewhere';
+    }
+    // a saved room keeps its selector when it is renamed: only a room to create asks for one
+    const room = exceptIndex !== undefined ? this.props.house.rooms[exceptIndex] : null;
+    const toCreate = !room || !room.id;
+    if (toCreate && this.isSelectorHeld(name)) {
+      return 'roomNameReserved';
     }
     return null;
   };
@@ -571,6 +592,8 @@ class MobileEditHouse extends Component {
             selectedNames={rooms.map(({ room }) => room.name)}
             // a room of another house cannot be suggested: its name is taken
             excludedNames={[...savedRoomNames, ...(props.otherRoomNames || [])]}
+            // nor the first name of a room renamed since: its selector is still held
+            isExcluded={this.isSelectorHeld}
             extraNames={unsavedRoomNames}
             onToggle={this.toggleSuggestion}
           />

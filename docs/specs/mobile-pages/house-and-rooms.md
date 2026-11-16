@@ -120,6 +120,17 @@ the very resize that queued that frame.
 - **Undo ends when a save starts.** A save sends the house as it is at that moment: the toast is
   dismissed then, so an Undo cannot bring back on screen a room that save deletes.
 
+- **A room keeps its selector when it is renamed**, and a new room asks for the selector made
+  from its own name: a room named like the *first* name of a room that still exists ("Bedroom"
+  renamed "Main bedroom", then a new "Bedroom") is refused by the server. The editor refuses it
+  next to the field ("A room that was renamed still holds this name internally…") and does not
+  suggest it — for the saved rooms of the house that are not being deleted, and for the rooms
+  of the other houses.
+- **The rooms are saved in three passes** — deletions, then renames, then creations
+  (`saveHouse`, `actions/house.js`, at every width) — and not all at once: the name a deletion
+  or a rename frees is free when a new room asks for it (a room deleted then added again in the
+  same save).
+
 ### C.4 Alarm
 
 - The **alarm code**: a numeric keypad (`inputmode="numeric"`), hidden like a password, with a

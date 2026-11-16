@@ -6,6 +6,8 @@ import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
+const isSet = value => value !== null && value !== undefined && value !== '';
+
 class MapComponent extends Component {
   initMap = (options = {}) => {
     // Prepare center coordinates - can be array [lat, lng] or LatLng object
@@ -64,7 +66,8 @@ class MapComponent extends Component {
         if (this.houseMarkers[house.id]) {
           this.houseMarkers[house.id].remove();
         }
-        if (house.latitude && house.longitude) {
+        // latitude 0 and longitude 0 are coordinates
+        if (isSet(house.latitude) && isSet(house.longitude)) {
           this.houseMarkers[house.id] = leaflet
             .marker([house.latitude, house.longitude], {
               icon: leaflet.icon({

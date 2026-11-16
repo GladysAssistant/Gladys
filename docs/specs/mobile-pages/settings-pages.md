@@ -54,6 +54,9 @@ that were there.
   the service has a page. The switch calls the same `actionOnService`; while the request runs it
   is disabled and the row says "Starting…" / "Stopping…"; a failure says so in the sheet.
 
+- The switch of the sheet is named by what it does ("Run the service"), not by a state it may
+  not be in.
+
 ## D. Background jobs (`settings-background-jobs`)
 
 - A one-line lead instead of the paragraph of the card.
@@ -114,6 +117,10 @@ One column, in this order:
   update, the database cleaning). A database cleaning that could not start says so and gives its
   button back (it used to stay disabled until a reload, waiting for a "finished" message that
   would never come) — at every width for the message.
+
+- The cards that keep their component take the surface of the rows above them: a white card
+  with 16 px corners and a hairline, tight padding, the text at 15 px (the frosted cards of the
+  desktop page read as another page next to the rows).
 
 ## G. Open API keys (`settings-gateway-open-api`, Gladys Plus)
 

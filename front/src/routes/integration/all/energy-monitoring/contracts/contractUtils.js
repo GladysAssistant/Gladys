@@ -78,12 +78,13 @@ export const localize = (text, language) => {
   return text[language] || text.en || Object.values(text)[0] || '';
 };
 
-export const formatMoney = (value, currency, digits = 4) => {
+// `locale`: the language the amount is written in (the one of the browser when omitted)
+export const formatMoney = (value, currency, digits = 4, locale = undefined) => {
   if (value === null || value === undefined || Number.isNaN(Number(value))) {
     return '—';
   }
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency,
       minimumFractionDigits: 2,

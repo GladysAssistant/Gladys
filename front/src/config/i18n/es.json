@@ -3114,6 +3114,10 @@
         "deleteTitle": "¿Eliminar este contrato?",
         "contractDeleted": "Contrato eliminado",
         "deviceAttached": "{{device}} ahora se factura con {{meter}}",
+        "previewComponents": {
+          "energy": "Energía",
+          "subscription": "Cuota fija"
+        },
         "meterOf": "Contador de {{name}}",
         "meterSheetHelp": "El dispositivo se factura con el contrato de su contador.",
         "recalculations": "Recálculos",
@@ -5225,6 +5229,7 @@
       "roomNameRequired": "Una habitación necesita un nombre.",
       "roomNameTaken": "Esta casa ya tiene una habitación con este nombre.",
       "roomNameTakenElsewhere": "Otra casa ya tiene una habitación con este nombre. Añade el nombre de la casa para distinguirlas.",
+      "roomNameReserved": "Una habitación renombrada sigue usando este nombre internamente. Elige otro nombre.",
       "deleteRoom": "Eliminar la habitación",
       "deleteRoomHint": "La habitación se elimina al guardar la casa. Sus dispositivos se conservan, sin habitación.",
       "roomDeleted": "«{{name}}» eliminada",
@@ -5440,7 +5445,7 @@
       },
       "noResult": "Ningún servicio coincide.",
       "actionError": "No se pudo cambiar el estado del servicio. Inténtalo de nuevo.",
-      "started": "Servicio iniciado",
+      "started": "Ejecutar el servicio",
       "startedHelp": "Detenido, la integración deja de funcionar hasta que se vuelva a iniciar.",
       "starting": "Iniciando…",
       "stopping": "Deteniendo…",

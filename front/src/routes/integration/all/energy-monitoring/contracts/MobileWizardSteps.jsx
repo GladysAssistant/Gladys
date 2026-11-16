@@ -609,6 +609,8 @@ export class PreviewStep extends Component {
       );
     }
     const samples = (preview && preview.samples) || [];
+    // quantities are written like the amounts next to them, in the language of the user
+    const formatNumber = (value, digits) => Number(value).toLocaleString(language, { maximumFractionDigits: digits });
     const shownSamples = showAllSamples ? samples : samples.slice(0, SAMPLES_SHOWN);
     return (
       <div data-cy="energy-contract-step-preview">
@@ -630,10 +632,10 @@ export class PreviewStep extends Component {
                 <Text id="integration.energyMonitoring.contracts.previewTotal" />
               </span>
               <span class={style.totalValue} data-cy="energy-contract-preview-total">
-                {formatMoney(preview.total, form.currency, 2)}
+                {formatMoney(preview.total, form.currency, 2, language)}
               </span>
               <span class={style.totalSub}>
-                {Math.round(preview.kwh * 100) / 100} kWh · {preview.intervals}{' '}
+                {formatNumber(preview.kwh, 2)} kWh · {formatNumber(preview.intervals, 0)}{' '}
                 <Text id="integration.energyMonitoring.contracts.intervals" />
               </span>
             </div>
@@ -642,9 +644,16 @@ export class PreviewStep extends Component {
                 {Object.keys(preview.components).map(key => (
                   <MobileRow
                     key={key}
-                    title={<span class={style.code}>{key}</span>}
+                    // the usual components are named; another key of the tariff is shown as it is
+                    title={
+                      <Text id={`integration.energyMonitoring.mobile.previewComponents.${key}`}>
+                        <span class={style.code}>{key}</span>
+                      </Text>
+                    }
                     trailing={
-                      <span class={style.amount}>{formatMoney(preview.components[key], form.currency, 2)}</span>
+                      <span class={style.amount}>
+                        {formatMoney(preview.components[key], form.currency, 2, language)}
+                      </span>
                     }
                   />
                 ))}
@@ -676,11 +685,14 @@ export class PreviewStep extends Component {
                       })}
                       subtitle={
                         <span>
-                          {Math.round(sample.kwh * 1000) / 1000} kWh × {formatMoney(sample.unit_price, form.currency)}
+                          {formatNumber(sample.kwh, 3)} kWh ×{' '}
+                          {formatMoney(sample.unit_price, form.currency, 4, language)}
                           {sample.label ? ` · ${sample.label}` : ''}
                         </span>
                       }
-                      trailing={<span class={style.amount}>{formatMoney(sample.cost, form.currency)}</span>}
+                      trailing={
+                        <span class={style.amount}>{formatMoney(sample.cost, form.currency, 4, language)}</span>
+                      }
                     />
                   ))}
                 </MobileGroup>

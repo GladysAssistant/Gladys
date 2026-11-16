@@ -146,6 +146,11 @@ merge exactly as two neighboring buttons do.
   and it can be picked and validated in the sheet. Only two identical ends ("12:00 → 12:00") are
   an empty range, which cannot be validated.
 
+- **Preview**: the usual components of a tariff are named in the language of the user
+  (`mobile.previewComponents`: energy, subscription); another key is shown as the tariff writes
+  it. Quantities (kWh, number of intervals) and amounts are written in the language of the
+  user, with the same separators. The label of a rate comes from the tariff itself.
+
 ## E. Settings (`MobileEnergySettings.jsx`, `contracts/MobileCalendars.jsx`)
 
 - **Recalculations**: "Recalculate consumption" and "Calculate cost from the beginning" are two

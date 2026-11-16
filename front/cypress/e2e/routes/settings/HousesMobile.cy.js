@@ -145,6 +145,16 @@ describe('Houses on a phone', () => {
     cy.get('[data-cy=house-new-room-add]').click();
     cy.get('[data-cy=house-add-room-sheet]').i18n('housesSettings.mobile.roomNameTakenElsewhere');
     cy.get('[data-cy=house-new-room-name]').clear();
+    // "Office" was renamed "Study" and keeps its selector: a new "Office" would be refused by
+    // the server, it is refused here
+    cy.get('[data-cy=house-new-room-name]').type('Office');
+    cy.get('[data-cy=house-new-room-add]').click();
+    cy.get('[data-cy=house-add-room-sheet]').i18n('housesSettings.mobile.roomNameReserved');
+    cy.get('[data-cy=house-new-room-name]').clear();
+    // "Kitchen" is being deleted: its name is free again, the save deletes before it creates
+    cy.get('[data-cy=house-new-room-name]').type('Kitchen');
+    cy.get('[data-cy=house-new-room-add]').click();
+    cy.get('[data-cy=house-new-room-name]').should('have.value', '');
     cy.contains('[data-cy=room-suggestion]', suggestions.garage).click();
     // a suggestion is a toggle
     cy.contains('[data-cy=room-suggestion]', suggestions.garage).click();
@@ -157,7 +167,7 @@ describe('Houses on a phone', () => {
     cy.get('[data-cy=house-new-room-add]').click();
     cy.get('[data-cy=house-new-room-name]').should('have.value', '');
     cy.get('[data-cy=house-add-room-sheet] [data-cy=sheet-ok]').click();
-    cy.get('[data-cy=house-room-row]').should('have.length', 3);
+    cy.get('[data-cy=house-room-row]').should('have.length', 4);
 
     cy.get('[data-cy=house-edit-bottom-bar]').i18n('mobileKit.unsavedChanges');
     cy.get('[data-cy=house-save]').click();
@@ -172,13 +182,14 @@ describe('Houses on a phone', () => {
       .should('eq', 200);
     cy.wait('@createRoom');
     cy.wait('@createRoom');
+    cy.wait('@createRoom');
     cy.get('[data-cy=houses-toast]').i18n('mobileKit.saved');
     cy.get('[data-cy=house-save]').should('be.disabled');
 
     cy.request({ method: 'GET', url: `${serverUrl}/api/v1/house?expand=rooms` }).then(res => {
       const house = res.body.find(candidate => candidate.selector === houseSelector);
       expect(house.rooms.map(room => room.name).sort()).to.deep.equal(
-        [suggestions.diningRoom, 'Study', 'Workshop'].sort()
+        [suggestions.diningRoom, 'Kitchen', 'Study', 'Workshop'].sort()
       );
     });
   });
@@ -274,7 +285,7 @@ describe('Houses on a phone', () => {
     cy.get('[data-cy=house-save]').should('be.disabled');
     cy.get('[data-cy=house-name]').type(newHouseName);
     cy.get('[data-cy=house-add-first-room]').click();
-    cy.contains('[data-cy=room-suggestion]', suggestions.kitchen).click();
+    cy.contains('[data-cy=room-suggestion]', suggestions.bathroom).click();
     cy.get('[data-cy=house-add-room-sheet] [data-cy=sheet-ok]').click();
     cy.get('[data-cy=house-save]').click();
     cy.wait('@createHouse')

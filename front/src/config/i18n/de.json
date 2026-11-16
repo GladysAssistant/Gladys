@@ -1749,6 +1749,10 @@
         "deleteTitle": "Diesen Vertrag löschen?",
         "contractDeleted": "Vertrag gelöscht",
         "deviceAttached": "{{device}} wird jetzt über {{meter}} abgerechnet",
+        "previewComponents": {
+          "energy": "Energie",
+          "subscription": "Grundpreis"
+        },
         "meterOf": "Zähler von {{name}}",
         "meterSheetHelp": "Das Gerät wird über den Vertrag seines Zählers abgerechnet.",
         "recalculations": "Neuberechnungen",
@@ -5225,6 +5229,7 @@
       "roomNameRequired": "Ein Raum braucht einen Namen.",
       "roomNameTaken": "Dieses Haus hat bereits einen Raum mit diesem Namen.",
       "roomNameTakenElsewhere": "Ein anderes Haus hat bereits einen Raum mit diesem Namen. Fügen Sie den Namen des Hauses hinzu, um sie zu unterscheiden.",
+      "roomNameReserved": "Ein umbenannter Raum verwendet diesen Namen intern noch. Wählen Sie einen anderen Namen.",
       "deleteRoom": "Raum löschen",
       "deleteRoomHint": "Der Raum wird beim Speichern des Hauses gelöscht. Seine Geräte bleiben erhalten, ohne Raum.",
       "roomDeleted": "„{{name}}“ gelöscht",
@@ -5440,7 +5445,7 @@
       },
       "noResult": "Kein Dienst entspricht der Suche.",
       "actionError": "Der Status des Dienstes konnte nicht geändert werden. Versuchen Sie es erneut.",
-      "started": "Dienst gestartet",
+      "started": "Dienst ausführen",
       "startedHelp": "Gestoppt funktioniert die Integration nicht mehr, bis sie wieder gestartet wird.",
       "starting": "Wird gestartet…",
       "stopping": "Wird gestoppt…",

@@ -241,9 +241,12 @@ class MobileHousePage extends Component {
     const houseIndex = props.houses.findIndex(house => house.id === openHouseId);
     const house = props.houses[houseIndex];
     // the rooms of the other houses: the name of a room is unique in the whole instance
-    const otherRoomNames = (props.housesSearch && everyHouse ? everyHouse : props.houses)
+    const otherRooms = (props.housesSearch && everyHouse ? everyHouse : props.houses)
       .filter(otherHouse => otherHouse.id !== house.id)
-      .reduce((names, otherHouse) => names.concat((otherHouse.rooms || []).map(room => room.name)), []);
+      .reduce((rooms, otherHouse) => rooms.concat(otherHouse.rooms || []), []);
+    const otherRoomNames = otherRooms.map(room => room.name);
+    // and so is its selector, which a room keeps when it is renamed
+    const otherRoomSelectors = otherRooms.map(room => room.selector).filter(Boolean);
     return (
       <div class="page">
         <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
@@ -255,6 +258,7 @@ class MobileHousePage extends Component {
               house={house}
               houseIndex={houseIndex}
               otherRoomNames={otherRoomNames}
+              otherRoomSelectors={otherRoomSelectors}
               dirty={Boolean(get(props.dirtyHouses, house.id))}
               houseUpdateStatus={get(props.houseUpdateStatus, house.id)}
               deleteHouse={this.deleteHouse}

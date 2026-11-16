@@ -75,6 +75,10 @@ minimum and maximum, an editable external id and "Delete the feature", and the p
   itself, the payload of the save and the rules on the external id: the phone layout calls the
   same `updateDeviceProperty` / `updateFeatureProperty` / `saveDevice`.
 
+- **MQTT is not covered.** The MQTT integration has its own device editor
+  (`routes/integration/all/mqtt/device-page/setup/`: feature catalog, topics, previews) and does
+  not render `UpdateDevice`: on a phone it keeps its desktop layout for now.
+
 ## E. Tests
 
 Cypress, phone viewport, `front/cypress/e2e/routes/devices/DeviceEditMobile.cy.js`: the fields

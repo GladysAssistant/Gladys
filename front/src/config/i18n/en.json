@@ -3114,6 +3114,10 @@
         "deleteTitle": "Delete this contract?",
         "contractDeleted": "Contract deleted",
         "deviceAttached": "{{device}} is now priced by {{meter}}",
+        "previewComponents": {
+          "energy": "Energy",
+          "subscription": "Subscription"
+        },
         "meterOf": "Meter of {{name}}",
         "meterSheetHelp": "The device is priced by the contract of its meter.",
         "recalculations": "Recalculations",
@@ -5225,6 +5229,7 @@
       "roomNameRequired": "A room needs a name.",
       "roomNameTaken": "This house already has a room with this name.",
       "roomNameTakenElsewhere": "Another house already has a room with this name. Add the name of the house to tell them apart.",
+      "roomNameReserved": "A room that was renamed still holds this name internally. Choose another name.",
       "deleteRoom": "Delete the room",
       "deleteRoomHint": "The room is deleted when you save the house. Its devices are kept, without a room.",
       "roomDeleted": "“{{name}}” deleted",
@@ -5440,7 +5445,7 @@
       },
       "noResult": "No service matches.",
       "actionError": "The state of the service could not be changed. Try again.",
-      "started": "Service started",
+      "started": "Run the service",
       "startedHelp": "Stopped, the integration no longer works until it is started again.",
       "starting": "Starting…",
       "stopping": "Stopping…",

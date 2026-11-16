@@ -235,6 +235,45 @@
   margin-bottom: 12px;
 }
 
+/* …and the surface of the rows above them: a white card with 16px corners and a hairline, its
+   title a micro-title, its text the size of a footnote. The large frosted cards of the desktop
+   page next to the rows read as two different pages. (In dark mode the card keeps the surface
+   style/dark-mode.css gives every card.) */
+.page .cards :global(.card) {
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:global(html:not(.dark-mode)) .page .cards :global(.card) {
+  background: #fff;
+}
+
+.page .cards :global(.card-header) {
+  min-height: 0;
+  padding: 14px 14px 0;
+  border: 0;
+}
+
+.page .cards :global(.card-body) {
+  padding: 10px 14px 14px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.page .cards :global(.card-body) p {
+  margin-bottom: 10px;
+}
+
+.page .cards :global(.alert) {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+}
+
 .cards :global(.form-control),
 .cards :global(.custom-select),
 .cards select,

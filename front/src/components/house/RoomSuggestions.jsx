@@ -36,13 +36,16 @@ const sameName = (a, b) =>
  * common rooms as toggles, plus the rooms the user added by name (`extraNames`).
  *
  * selectedNames: the rooms the house holds. excludedNames: suggestions not to offer (the rooms
- * the house already had, which this list must not remove). onToggle(name, selected): the chip
+ * the house already had, which this list must not remove). isExcluded(name): another reason not
+ * to offer a suggestion. onToggle(name, selected): the chip
  * of `name` was tapped while `selected`.
  */
-const RoomSuggestions = ({ selectedNames = [], excludedNames = [], extraNames = [], onToggle, intl }) => {
+const RoomSuggestions = ({ selectedNames = [], excludedNames = [], isExcluded, extraNames = [], onToggle, intl }) => {
   const suggestions = ROOM_SUGGESTION_KEYS.map(key =>
     get(intl.dictionary, `housesSettings.mobile.roomSuggestions.${key}`)
-  ).filter(name => name && !excludedNames.some(excluded => sameName(excluded, name)));
+  ).filter(
+    name => name && !excludedNames.some(excluded => sameName(excluded, name)) && !(isExcluded && isExcluded(name))
+  );
   const names = [...suggestions, ...extraNames.filter(extra => !suggestions.some(name => sameName(name, extra)))];
   if (names.length === 0) {
     return null;

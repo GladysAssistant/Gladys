@@ -21,6 +21,8 @@ const HOUSES_MAX_ZOOM = 15;
 // below this size on screen the resize handle would sit on the center one: it is hidden, the
 // radius is then set from the panel
 const MIN_RESIZE_HANDLE_RADIUS_PX = 26;
+// how long the values set from the page settle before the map is fitted to the zone
+const FIT_DELAY_MS = 150;
 // a zone placed from far away is approached by steps: a tap on a map of the world is not precise
 const TAP_ZOOM_STEP = 4;
 // a press that moves less than this is a tap, not a drag of the circle
@@ -151,7 +153,7 @@ class MobileAreaMap extends Component {
       const fromThePage = (centerChanged && !centerFromGesture) || (radiusChanged && !radiusFromGesture);
       this.drawArea();
       if (fromThePage && !this.resizing) {
-        this.fitArea(Boolean(this.areaWasDrawn));
+        this.scheduleFit(Boolean(this.areaWasDrawn));
       } else if (this.tapped) {
         // a tap placed a zone larger than what the map shows
         this.keepAreaInView();
@@ -165,6 +167,7 @@ class MobileAreaMap extends Component {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    clearTimeout(this.fitTimer);
     this.removeArea();
     // once the frames queued by the basemap layer have run (utils/mapTileLayer.js): the page
     // may be switching to its desktop layout in the middle of a resize
@@ -188,7 +191,8 @@ class MobileAreaMap extends Component {
     this.leafletMap.attributionControl.setPrefix(false);
     addMapTileLayer(this.leafletMap, this.props.darkMode);
     this.leafletMap.on('click', this.onMapClick);
-    this.leafletMap.on('zoomend', this.syncResizeHandle);
+    this.leafletMap.on('zoomstart', this.onZoomStart);
+    this.leafletMap.on('zoomend', this.onZoomEnd);
     this.displayHouses();
     this.drawArea();
     if (view.keepView) {
@@ -207,7 +211,7 @@ class MobileAreaMap extends Component {
   displayHouses = () => {
     this.houseMarkers.forEach(marker => marker.remove());
     this.houseMarkers = (this.props.houses || [])
-      .filter(house => house.latitude && house.longitude)
+      .filter(house => hasCenter(house))
       .map(house =>
         leaflet
           .marker([house.latitude, house.longitude], {
@@ -377,9 +381,54 @@ class MobileAreaMap extends Component {
     });
   };
 
-  // After a gesture the view is the user's: it only moves when the zone left it
+  // Values set from the page may come in a row (a radius typed digit by digit, the slider under
+  // a finger), and Leaflet drops a view asked for while a zoom animation runs: the map is fitted
+  // once the values settle, and again when an animation ends before the last fit could start —
+  // otherwise the zone stays framed for a radius it no longer has.
+  scheduleFit = animate => {
+    clearTimeout(this.fitTimer);
+    this.fitTimer = setTimeout(() => {
+      if (!this.leafletMap) {
+        return;
+      }
+      if (this.zoomAnimating) {
+        this.fitAfterZoom = true;
+        return;
+      }
+      this.fitArea(animate);
+    }, FIT_DELAY_MS);
+  };
+
+  onZoomStart = () => {
+    this.zoomAnimating = true;
+  };
+
+  onZoomEnd = () => {
+    this.zoomAnimating = false;
+    this.syncResizeHandle();
+    if (this.fitAfterZoom) {
+      this.fitAfterZoom = false;
+      this.fitArea();
+    }
+  };
+
+  // A zone too small on screen to be taken by its edge (its handle is hidden then)
+  isAreaTooSmall = () => {
+    if (!this.circle) {
+      return false;
+    }
+    const center = this.circle.getLatLng();
+    const radiusInPixels = this.circle.getRadius() / this.metersPerPixel(center.lat);
+    return radiusInPixels < MIN_RESIZE_HANDLE_RADIUS_PX;
+  };
+
+  // After a gesture the view is the user's: it only moves when the zone left it, or when the
+  // zone was shrunk until only its center is left to see — the map then comes closer
   keepAreaInView = () => {
-    if (this.circle && !this.leafletMap.getBounds().contains(this.circle.getBounds())) {
+    if (!this.circle) {
+      return;
+    }
+    if (!this.leafletMap.getBounds().contains(this.circle.getBounds()) || this.isAreaTooSmall()) {
       this.fitArea();
     }
   };

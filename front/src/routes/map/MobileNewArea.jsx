@@ -257,6 +257,11 @@ class MobileNewArea extends Component {
           return;
         }
         this.setState({ locating: false });
+        // the position arrives while the zone is being saved or deleted: it is not placed there
+        // anymore, the request has left with the zone as it was
+        if (this.props.loading) {
+          return;
+        }
         this.placeArea(position.coords.latitude, position.coords.longitude, 'newArea.mobile.placedAtPosition');
       },
       error => {
@@ -358,7 +363,12 @@ class MobileNewArea extends Component {
             {/* while the zone loads, saves or is deleted, the map and the panel take no input: an
                 edit made then would be overwritten by the zone that arrives, or lost with the page
                 that leaves once the request is through */}
-            <div class={cx(style.zoneBody, { [style.zoneBodyBusy]: loading })} aria-busy={loading ? 'true' : 'false'}>
+            <div
+              class={cx(style.zoneBody, { [style.zoneBodyBusy]: loading })}
+              aria-busy={loading ? 'true' : 'false'}
+              // "inert" takes the keyboard and the focus away too, which pointer-events does not
+              inert={loading}
+            >
               <div class={style.mapArea}>
                 <MobileAreaMap
                   latitude={props.latitude}
