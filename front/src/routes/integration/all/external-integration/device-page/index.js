@@ -7,6 +7,7 @@ import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DeviceTab from './DeviceTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { stripDeviceStatesForSave } from '../../../../../utils/device';
@@ -50,30 +51,34 @@ class ExternalIntegrationDevicePage extends Component {
     }
   };
 
+  // from the previous state: two changes in a row (the phone sheet undoing a name, a room and a
+  // history switch) must not overwrite each other
   updateDeviceField = (index, field, value) => {
-    const devices = update(this.state.devices, {
-      [index]: {
-        [field]: {
-          $set: value
+    this.setState(prevState => ({
+      devices: update(prevState.devices, {
+        [index]: {
+          [field]: {
+            $set: value
+          }
         }
-      }
-    });
-    this.setState({ devices });
+      })
+    }));
   };
 
   updateFeatureProperty = (deviceIndex, featureIndex, property, value) => {
-    const devices = update(this.state.devices, {
-      [deviceIndex]: {
-        features: {
-          [featureIndex]: {
-            [property]: {
-              $set: value
+    this.setState(prevState => ({
+      devices: update(prevState.devices, {
+        [deviceIndex]: {
+          features: {
+            [featureIndex]: {
+              [property]: {
+                $set: value
+              }
             }
           }
         }
-      }
-    });
-    this.setState({ devices });
+      })
+    }));
   };
 
   saveDevice = async index => {
@@ -164,6 +169,7 @@ class ExternalIntegrationDevicePage extends Component {
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
         <DeviceTab
           {...state}
+          isMobile={props.isMobile}
           selector={props.selector}
           language={(props.user && props.user.language) || 'en'}
           getDevices={this.getDevices}
@@ -177,4 +183,4 @@ class ExternalIntegrationDevicePage extends Component {
   }
 }
 
-export default connect('user,session,httpClient')(ExternalIntegrationDevicePage);
+export default connect('user,session,httpClient')(withMobileViewport(ExternalIntegrationDevicePage));

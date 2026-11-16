@@ -6,22 +6,30 @@ import get from 'get-value';
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { PARAMS } from '../../../../../../../server/services/lan-manager/lib/lan-manager.constants';
+import { MobileDeviceItem } from '../../../../../components/integration/mobile';
 
 class LANManagerDevice extends Component {
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({ loading: true });
+    let saved = true;
     try {
       await this.props.saveDevice(this.props.deviceIndex);
     } catch (e) {
       this.setState({ error: RequestStatus.Error });
+      saved = false;
     }
     this.setState({ loading: false });
+    return saved;
   };
+  // resolves to false when the device could not be deleted
   deleteDevice = async () => {
     this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
+    let deleted = true;
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
+      deleted = false;
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
@@ -32,6 +40,7 @@ class LANManagerDevice extends Component {
       }
     }
     this.setState({ loading: false });
+    return deleted;
   };
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
@@ -40,10 +49,46 @@ class LANManagerDevice extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  render({ device, houses }, { loading, tooMuchStatesError, statesNumber }) {
+  render({ device, houses, isMobile }, { loading, tooMuchStatesError, statesNumber }) {
     const manufacturer = device.params.find(param => param.name === PARAMS.MANUFACTURER);
     const macAddress = device.params.find(param => param.name === PARAMS.MAC);
     const orginalName = device.params.find(param => param.name === PARAMS.NAME);
+
+    // On a phone: a row and its sheet, fed by the handlers of the card
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (isMobile) {
+      return (
+        <MobileDeviceItem
+          device={device}
+          houses={houses}
+          onNameChange={this.updateName}
+          onRoomChange={this.updateRoom}
+          details={[
+            {
+              label: <Text id="integration.lanManager.device.manufacturerLabel" />,
+              value: get(manufacturer, 'value')
+            },
+            {
+              label: <Text id="integration.lanManager.device.macAddressLabel" />,
+              value: get(macAddress, 'value'),
+              mono: true
+            },
+            {
+              label: <Text id="integration.lanManager.device.originalNameLabel" />,
+              value: get(orginalName, 'value')
+            }
+          ]}
+          onSave={this.saveDevice}
+          onDelete={this.deleteDevice}
+          deleteError={
+            tooMuchStatesError ? (
+              <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+            ) : null
+          }
+          dataCy="lan-manager-device-row"
+        />
+      );
+    }
 
     return (
       <div class="col-md-6">

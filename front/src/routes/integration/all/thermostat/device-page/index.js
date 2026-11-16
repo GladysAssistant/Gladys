@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import ThermostatPage from '../ThermostatPage';
 import DeviceTab from './DeviceTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 
 class ThermostatDevicePage extends Component {
   componentWillMount() {
@@ -23,4 +24,4 @@ class ThermostatDevicePage extends Component {
 export default connect(
   'user,houses,thermostatDevices,getThermostatDevicesStatus,thermostatDeviceSearch,getThermostatDeviceOrderDir,thermostatSchedules',
   actions
-)(ThermostatDevicePage);
+)(withMobileViewport(ThermostatDevicePage));

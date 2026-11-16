@@ -7,6 +7,7 @@ import debounce from 'debounce';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DiscoverTab from './DiscoverTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { stripDeviceStatesForSave } from '../../../../../utils/device';
@@ -204,6 +205,7 @@ class ExternalIntegrationDiscoverPage extends Component {
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
         <DiscoverTab
           {...state}
+          isMobile={props.isMobile}
           selector={props.selector}
           scan={this.scan}
           createDevice={this.createDevice}
@@ -214,4 +216,4 @@ class ExternalIntegrationDiscoverPage extends Component {
   }
 }
 
-export default connect('user,session,httpClient')(ExternalIntegrationDiscoverPage);
+export default connect('user,session,httpClient')(withMobileViewport(ExternalIntegrationDiscoverPage));

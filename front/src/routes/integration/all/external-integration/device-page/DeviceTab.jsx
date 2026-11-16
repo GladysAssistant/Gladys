@@ -6,6 +6,25 @@ import DeviceBox from './DeviceBox';
 import TransportBadge from '../components/TransportBadge';
 import { getDeviceTransport, isDeviceTransportDegraded } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import {
+  MobileSectionHeader,
+  MobileGroup,
+  MobileNotice,
+  MobilePill,
+  MobileEmptyState,
+  kitStyle
+} from '../../../../../components/mobile';
+import {
+  MobileIntegrationTab,
+  MobileListLoader,
+  integrationMobileStyle
+} from '../../../../../components/integration/mobile';
+
+const TRANSPORT_TONES = {
+  local: 'success',
+  cloud: 'accent',
+  unreachable: 'danger'
+};
 
 // global summary of the per-device transports ("12 local · 3 cloud ·
 // 1 unreachable · 1 degraded"), only counting devices that report one
@@ -31,7 +50,8 @@ const DeviceTab = ({
   updateDeviceField,
   updateFeatureProperty,
   saveDevice,
-  deleteDevice
+  deleteDevice,
+  isMobile
 }) => {
   // first-run guidance: an integration with settings probably needs them
   // filled before anything shows up here
@@ -39,6 +59,80 @@ const DeviceTab = ({
   const transportCounts = getTransportCounts(devices);
   const reportedTransports = ['local', 'cloud', 'unreachable'].filter(transport => transportCounts[transport]);
   const degradedCount = (devices || []).filter(isDeviceTransportDegraded).length;
+  // On a phone: one row per device opening its sheet
+  // (docs/specs/mobile-pages/integration-devices.md)
+  if (isMobile) {
+    const list = devices || [];
+    const loading = getDevicesStatus === RequestStatus.Getting;
+    return (
+      <MobileIntegrationTab dataCy="external-devices-mobile">
+        {getDevicesStatus === RequestStatus.Error && (
+          <MobileNotice tone="danger" icon="alert-circle" role="alert">
+            <Text id="integration.externalIntegration.device.loadError" />
+          </MobileNotice>
+        )}
+        <MobileSectionHeader
+          title={<Text id="mobileDeviceList.deviceCount" plural={list.length} fields={{ count: list.length }} />}
+          action={
+            <button
+              type="button"
+              class={kitStyle.sectionAction}
+              onClick={getDevices}
+              data-cy="external-devices-refresh"
+            >
+              <Text id="integration.externalIntegration.device.refreshButton" />
+            </button>
+          }
+        />
+        {(reportedTransports.length > 0 || degradedCount > 0) && (
+          <div class={integrationMobileStyle.sheetPills} data-cy="external-devices-transports">
+            {reportedTransports.map(transport => (
+              <MobilePill tone={TRANSPORT_TONES[transport]}>
+                {transportCounts[transport]} <Text id={`integration.externalIntegration.transport.${transport}Badge`} />
+              </MobilePill>
+            ))}
+            {degradedCount > 0 && (
+              <MobilePill tone="warning">
+                {degradedCount} <Text id="integration.externalIntegration.transport.degradedBadge" />
+              </MobilePill>
+            )}
+          </div>
+        )}
+        <MobileListLoader loading={loading} empty={list.length === 0}>
+          {list.length > 0 && (
+            <MobileGroup>
+              {list.map((device, index) => (
+                <DeviceBox
+                  key={device.id || device.external_id}
+                  isMobile
+                  device={device}
+                  deviceIndex={index}
+                  houses={houses}
+                  language={language}
+                  updateDeviceField={updateDeviceField}
+                  updateFeatureProperty={updateFeatureProperty}
+                  saveDevice={saveDevice}
+                  deleteDevice={deleteDevice}
+                />
+              ))}
+            </MobileGroup>
+          )}
+          {devices && list.length === 0 && !loading && (
+            <MobileEmptyState icon="box" text={<Text id="integration.externalIntegration.device.noDevices" />}>
+              {hasConfigSchema && (
+                <div class={kitStyle.footnote}>
+                  <MarkupText
+                    id="integration.externalIntegration.device.noDevicesConfigureFirst"
+                    fields={{ configUrl: `/dashboard/integration/device/external/${selector}/config` }}
+                  />
+                </div>
+              )}
+            </MobileEmptyState>
+          )}
+        </MobileListLoader>
+      </MobileIntegrationTab>
+    );
+  }
   return (
     <div class="card">
       <div class="card-header">

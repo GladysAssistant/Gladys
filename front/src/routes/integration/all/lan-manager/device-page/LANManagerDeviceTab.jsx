@@ -6,6 +6,68 @@ import { RequestStatus } from '../../../../../utils/consts';
 import LANManagerDevice from './LANManagerDevice';
 import EmptyState from '../EmptyState';
 import style from '../style.css';
+import { MobileSectionHeader, MobileGroup, MobileNotice, MobileEmptyState } from '../../../../../components/mobile';
+import {
+  MobileIntegrationTab,
+  MobileListToolbar,
+  MobileListLoader,
+  integrationMobileStyle
+} from '../../../../../components/integration/mobile';
+
+// The devices on a phone (docs/specs/mobile-pages/integration-devices.md): one row per device,
+// opening the sheet that holds what its card holds. Same props as the card below.
+const MobileLANManagerDeviceTab = ({ getLANManagerDevicesStatus, lanManagerDevices, ...props }) => {
+  const loading = getLANManagerDevicesStatus === RequestStatus.Getting;
+  const devices = lanManagerDevices || [];
+  return (
+    <MobileIntegrationTab dataCy="lan-manager-devices-mobile">
+      <MobileListToolbar
+        onSearch={props.debouncedSearch}
+        searchPlaceholderId="integration.lanManager.device.search"
+        orderDir={props.getLANManagerDeviceOrderDir}
+        onOrderChange={props.changeOrderDir}
+      />
+      <MobileListLoader loading={loading} empty={devices.length === 0}>
+        {devices.length > 0 && (
+          <div>
+            <MobileSectionHeader
+              title={
+                <Text id="mobileDeviceList.deviceCount" plural={devices.length} fields={{ count: devices.length }} />
+              }
+            />
+            <MobileGroup>
+              {devices.map((lanManagerDevice, index) => (
+                <LANManagerDevice
+                  key={lanManagerDevice.selector}
+                  isMobile
+                  device={lanManagerDevice}
+                  deviceIndex={index}
+                  houses={props.houses}
+                  updateDeviceProperty={props.updateDeviceProperty}
+                  saveDevice={props.saveDevice}
+                  deleteDevice={props.deleteDevice}
+                />
+              ))}
+            </MobileGroup>
+          </div>
+        )}
+        {devices.length === 0 && !loading && (
+          <MobileEmptyState icon="wifi" text={<Text id="integration.lanManager.device.noDevices" />} />
+        )}
+      </MobileListLoader>
+      {/* what the integration is for comes after the devices, which are what one comes for */}
+      <div class={integrationMobileStyle.afterList}>
+        <MobileNotice icon="info">
+          <Text id="integration.lanManager.device.explanation" />
+          <br />
+          <strong>
+            <Text id="integration.lanManager.device.iosWarning" />
+          </strong>
+        </MobileNotice>
+      </div>
+    </MobileIntegrationTab>
+  );
+};
 
 const LANManagerDeviceTab = ({ children, getLANManagerDevicesStatus, lanManagerDevices, ...props }) => (
   <div class="card">
@@ -75,4 +137,7 @@ const LANManagerDeviceTab = ({ children, getLANManagerDevicesStatus, lanManagerD
   </div>
 );
 
-export default LANManagerDeviceTab;
+const ResponsiveLANManagerDeviceTab = props =>
+  props.isMobile ? <MobileLANManagerDeviceTab {...props} /> : <LANManagerDeviceTab {...props} />;
+
+export default ResponsiveLANManagerDeviceTab;

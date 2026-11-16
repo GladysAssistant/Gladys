@@ -61,6 +61,39 @@
     "keepEditing": "Continuer la modification",
     "cannotBeUndone": "Cette action est irréversible."
   },
+  "mobileDeviceList": {
+    "noName": "Appareil sans nom",
+    "deviceCount": {
+      "zero": "Appareils",
+      "one": "1 appareil",
+      "other": "{{count}} appareils"
+    },
+    "foundCount": {
+      "zero": "Appareils détectés",
+      "one": "1 appareil détecté",
+      "other": "{{count}} appareils détectés"
+    },
+    "showDetails": "Afficher les détails",
+    "hideDetails": "Masquer les détails",
+    "refresh": "Actualiser",
+    "saveError": "Gladys n'a pas pu enregistrer cet appareil. Réessayez.",
+    "saveAndClose": "Enregistrer et fermer",
+    "closeWithoutSaving": "Fermer sans enregistrer",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer cet appareil ?",
+    "deleteText": "« {{name}} » sera retiré de Gladys avec son historique. Les scènes et les tableaux de bord qui l'utilisent ne fonctionneront plus avec lui.",
+    "deleteConfirm": "Supprimer l'appareil",
+    "deleteError": "Gladys n'a pas pu supprimer cet appareil. Réessayez.",
+    "deleted": "Appareil supprimé",
+    "added": "Appareil ajouté à Gladys",
+    "updated": "Appareil mis à jour",
+    "updateAvailable": "Mise à jour",
+    "inGladys": "Dans Gladys",
+    "notSupported": "Non géré",
+    "noResult": "Aucun appareil ne correspond.",
+    "stopScan": "Arrêter le scan",
+    "scanning": "Scan en cours… La liste se remplit à mesure que les appareils sont trouvés."
+  },
   "errorBoundary": {
     "message": "Une erreur est survenue à l'affichage. Rechargez la page, et vérifiez la configuration si cela se reproduit."
   },
@@ -2595,7 +2628,11 @@
         "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponibles en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
         "saveButton": "Enregistrer",
         "deleteButton": "Supprimer",
-        "recreateButton": "Mettre à jour"
+        "recreateButton": "Mettre à jour",
+        "mobile": {
+          "lastSync": "Dernière synchronisation",
+          "numberOfStates": "États synchronisés"
+        }
       }
     },
     "alexa": {

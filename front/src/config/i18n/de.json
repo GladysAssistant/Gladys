@@ -61,6 +61,39 @@
     "keepEditing": "Weiter bearbeiten",
     "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden."
   },
+  "mobileDeviceList": {
+    "noName": "Unbenanntes Gerät",
+    "deviceCount": {
+      "zero": "Geräte",
+      "one": "1 Gerät",
+      "other": "{{count}} Geräte"
+    },
+    "foundCount": {
+      "zero": "Gefundene Geräte",
+      "one": "1 Gerät gefunden",
+      "other": "{{count}} Geräte gefunden"
+    },
+    "showDetails": "Details anzeigen",
+    "hideDetails": "Details ausblenden",
+    "refresh": "Aktualisieren",
+    "saveError": "Gladys konnte dieses Gerät nicht speichern. Versuche es erneut.",
+    "saveAndClose": "Speichern und schließen",
+    "closeWithoutSaving": "Ohne Speichern schließen",
+    "delete": "Löschen",
+    "deleteTitle": "Dieses Gerät löschen?",
+    "deleteText": "„{{name}}“ wird mit seinem Verlauf aus Gladys entfernt. Die Szenen und Dashboards, die es verwenden, funktionieren damit nicht mehr.",
+    "deleteConfirm": "Gerät löschen",
+    "deleteError": "Gladys konnte dieses Gerät nicht löschen. Versuche es erneut.",
+    "deleted": "Gerät gelöscht",
+    "added": "Gerät zu Gladys hinzugefügt",
+    "updated": "Gerät aktualisiert",
+    "updateAvailable": "Aktualisierung",
+    "inGladys": "In Gladys",
+    "notSupported": "Nicht unterstützt",
+    "noResult": "Kein Gerät passt.",
+    "stopScan": "Scan stoppen",
+    "scanning": "Scan läuft… Die Liste füllt sich, sobald Geräte gefunden werden."
+  },
   "errorBoundary": {
     "message": "Beim Anzeigen ist ein Fehler aufgetreten. Lade die Seite neu und überprüfe die Konfiguration, falls es erneut auftritt."
   },
@@ -2480,7 +2513,11 @@
         "explanation": "Die Synchronisierung zwischen Gladys Plus und Enedis erfolgt automatisch täglich zwischen 8:30 Uhr und 11:30 Uhr. Es ist möglich, dass an einigen Tagen die Daten erst spät verfügbar sind. Auf der Gladys-Seite synchronisiert sich Gladys jede Stunde automatisch mit Gladys Plus.",
         "saveButton": "Sichern",
         "deleteButton": "Löschen",
-        "recreateButton": "Aktualisieren"
+        "recreateButton": "Aktualisieren",
+        "mobile": {
+          "lastSync": "Letzte Synchronisierung",
+          "numberOfStates": "Synchronisierte Zustände"
+        }
       }
     },
     "homekit": {

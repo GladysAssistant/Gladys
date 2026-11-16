@@ -5,16 +5,21 @@ import cx from 'classnames';
 import get from 'get-value';
 import { THERMOSTAT_MODE } from '../../../../../../../server/utils/constants';
 import style from './style.css';
+import { MobileDeviceItem, integrationMobileStyle } from '../../../../../components/integration/mobile';
 
 class ThermostatDeviceBox extends Component {
+  // resolves to false when the thermostat could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({ saving: true, saveError: false });
+    let saved = true;
     try {
       await this.props.saveDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
       this.setState({ saveError: true });
+      saved = false;
     }
     this.setState({ saving: false });
+    return saved;
   };
 
   askDelete = () => this.setState({ confirmDelete: true });
@@ -29,9 +34,11 @@ class ThermostatDeviceBox extends Component {
       statesNumber: undefined,
       deleteError: false
     });
+    let deleted = true;
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
+      deleted = false;
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
@@ -42,6 +49,7 @@ class ThermostatDeviceBox extends Component {
       }
     }
     this.setState({ deleting: false });
+    return deleted;
   };
 
   updateName = e => {
@@ -107,6 +115,78 @@ class ThermostatDeviceBox extends Component {
     // device would otherwise display its 70 as 70 °C.
     const featureUnit = setpointFeature && setpointFeature.unit;
     const tempUnitValue = featureUnit === 'fahrenheit' ? 'F' : (unitParam && unitParam.value) || 'C';
+
+    // what the thermostat is doing, in the words of the summary of the card
+    let stateValue;
+    if (isStopped) {
+      stateValue = <Text id="integration.thermostat.device.stoppedState" />;
+    } else if (heaterRegulated) {
+      stateValue = <Text id="integration.thermostat.device.heaterRegulates" />;
+    } else if (setpoint === null) {
+      stateValue = <Text id="integration.thermostat.device.noSetpoint" />;
+    } else {
+      stateValue = `${setpoint} °${tempUnitValue}`;
+    }
+    const stateLabel = (
+      <Text
+        id={
+          heaterRegulated
+            ? 'integration.thermostat.device.regulationLabel'
+            : 'integration.thermostat.device.setpointLabel'
+        }
+      />
+    );
+
+    // On a phone: a row saying what the thermostat is set to, and its sheet — the name, the
+    // room, the same summary, and a confirmation sheet instead of the inline one
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (props.isMobile) {
+      let deleteErrorMessage = null;
+      if (tooMuchStatesError) {
+        deleteErrorMessage = <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />;
+      } else if (deleteError) {
+        deleteErrorMessage = <Text id="integration.thermostat.device.deleteError" />;
+      }
+      return (
+        <MobileDeviceItem
+          device={device}
+          houses={props.houses}
+          icon="thermometer"
+          title={device.name || <Text id="integration.thermostat.device.noNameLabel" />}
+          pills={
+            <span class={integrationMobileStyle.rowNote} data-cy="thermostat-device-summary">
+              {stateValue}
+              {' · '}
+              {scheduleName || <Text id="integration.thermostat.device.noSchedule" />}
+            </span>
+          }
+          sheetPills={null}
+          onNameChange={this.updateName}
+          onRoomChange={this.updateRoom}
+          showFeatures={false}
+          details={[
+            { label: stateLabel, value: stateValue },
+            {
+              label: <Text id="integration.thermostat.device.activeScheduleLabel" />,
+              value: scheduleName || <Text id="integration.thermostat.device.noSchedule" />
+            }
+          ]}
+          onSave={this.saveDevice}
+          saveError={saveError && <Text id="integration.thermostat.device.saveError" />}
+          actions={[
+            {
+              label: <Text id="integration.thermostat.device.editButton" />,
+              icon: 'edit-2',
+              href: `/dashboard/integration/device/thermostat/edit/${device.selector}`,
+              dataCy: 'thermostat-device-edit'
+            }
+          ]}
+          onDelete={this.deleteDevice}
+          deleteError={deleteErrorMessage}
+          dataCy="thermostat-device-row"
+        />
+      );
+    }
 
     return (
       <div class="col-md-6">

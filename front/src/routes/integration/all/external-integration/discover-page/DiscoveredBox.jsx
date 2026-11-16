@@ -4,22 +4,90 @@ import cx from 'classnames';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import DeviceParams from '../components/DeviceParams';
-import DeviceCreateErrorAlert from '../components/DeviceCreateErrorAlert';
+import DeviceCreateErrorAlert, { DeviceCreateErrorContent } from '../components/DeviceCreateErrorAlert';
+import { MobilePill } from '../../../../../components/mobile';
+import { MobileDeviceItem } from '../../../../../components/integration/mobile';
+
+// the technical params of the sheet: the transport ones are not shown as such
+const INTERNAL_PARAMS = ['GLADYS_TRANSPORT', 'GLADYS_TRANSPORT_DEGRADED', 'GLADYS_TRANSPORT_MESSAGE'];
 import { getDiscoveredDeviceCreateError } from '../../../../../utils/formatErrors';
 
 class DiscoveredBox extends Component {
+  // resolves to false when the device could not be created (the phone sheet then stays open)
   createDevice = async () => {
     this.setState({ loading: true, errorMessage: null, errorDetail: null, validationErrors: [], isKnownError: true });
+    let created = true;
     try {
       await this.props.createDevice(this.props.device.external_id);
     } catch (e) {
       console.error(e);
       this.setState(getDiscoveredDeviceCreateError(e));
+      created = false;
     }
     this.setState({ loading: false });
+    return created;
   };
 
-  render({ device }, { loading, errorMessage, errorDetail, validationErrors, isKnownError }) {
+  render({ device, isMobile }, { loading, errorMessage, errorDetail, validationErrors, isKnownError }) {
+    // On a phone: a row and its sheet, fed by the handler of the card
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (isMobile) {
+      const update = Boolean(device.created && device.structure_changed);
+      const featureCount = (device.features || []).length;
+      let status = null;
+      if (update) {
+        status = (
+          <MobilePill tone="accent">
+            <Text id="mobileDeviceList.updateAvailable" />
+          </MobilePill>
+        );
+      } else if (device.created) {
+        status = (
+          <MobilePill tone="success">
+            <Text id="integration.externalIntegration.discover.alreadyCreatedBadge" />
+          </MobilePill>
+        );
+      }
+      return (
+        <MobileDeviceItem
+          device={device}
+          subtitle={
+            <Text id="editDeviceForm.mobile.featuresTitle" plural={featureCount} fields={{ count: featureCount }} />
+          }
+          status={status}
+          details={(device.params || [])
+            .filter(param => !INTERNAL_PARAMS.includes(param.name))
+            .map(param => ({ label: param.name, value: param.value, mono: true }))}
+          detailsFolded
+          saveError={
+            errorMessage && (
+              <DeviceCreateErrorContent
+                errorMessage={errorMessage}
+                errorDetail={errorDetail}
+                validationErrors={validationErrors}
+                isKnownError={isKnownError}
+              />
+            )
+          }
+          primaryAction={
+            update
+              ? {
+                  label: <Text id="integration.externalIntegration.discover.updateButton" />,
+                  icon: 'refresh-cw',
+                  onClick: this.createDevice,
+                  toast: <Text id="mobileDeviceList.updated" />
+                }
+              : {
+                  label: <Text id="integration.externalIntegration.discover.createButton" />,
+                  onClick: this.createDevice,
+                  disabled: Boolean(device.created),
+                  toast: <Text id="mobileDeviceList.added" />
+                }
+          }
+          dataCy="external-discovered-row"
+        />
+      );
+    }
     return (
       <div class="col-md-6">
         <div class="card">

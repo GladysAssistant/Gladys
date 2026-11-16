@@ -5,6 +5,8 @@ import get from 'get-value';
 
 import { connect } from 'unistore/preact';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import { MobilePill } from '../../../../components/mobile';
+import { MobileDeviceItem } from '../../../../components/integration/mobile';
 
 class AirplayDeviceBox extends Component {
   componentWillMount() {
@@ -14,34 +16,45 @@ class AirplayDeviceBox extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      device: nextProps.device
-    });
+    // only when the list brings another version of the device: a parent that merely renders
+    // again (the router on a system "back" closing a sheet) must not drop what is being typed
+    if (nextProps.device !== this.props.device) {
+      this.setState({
+        device: nextProps.device
+      });
+    }
   }
 
+  // from the previous state: two changes in a row (the phone sheet undoing a name and a room)
+  // must not overwrite each other
   updateName = e => {
-    this.setState({
+    const name = e.target.value;
+    this.setState(prevState => ({
       device: {
-        ...this.state.device,
-        name: e.target.value
+        ...prevState.device,
+        name
       }
-    });
+    }));
   };
 
   updateRoom = e => {
-    this.setState({
+    const roomId = e.target.value;
+    this.setState(prevState => ({
       device: {
-        ...this.state.device,
-        room_id: e.target.value
+        ...prevState.device,
+        room_id: roomId
       }
-    });
+    }));
   };
 
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
+      errorOrigin: null
     });
+    let saved = true;
     try {
       let deviceDidNotExist = this.state.device.id === undefined;
       const savedDevice = await this.props.httpClient.post(
@@ -60,27 +73,34 @@ class AirplayDeviceBox extends Component {
         errorMessage = 'integration.airplay.error.conflictError';
       }
       this.setState({
-        errorMessage
+        errorMessage,
+        errorOrigin: 'save'
       });
+      saved = false;
     }
     this.setState({
       loading: false
     });
+    return saved;
   };
 
+  // resolves to false when the device could not be deleted
   deleteDevice = async () => {
     this.setState({
       loading: true,
       errorMessage: null,
+      errorOrigin: null,
       tooMuchStatesError: false,
       statesNumber: undefined
     });
+    let deleted = true;
     try {
       if (this.state.device.created_at) {
         await this.props.httpClient.delete(`/api/v1/device/${this.state.device.selector}`);
       }
       this.props.getAirplayDevices();
     } catch (e) {
+      deleted = false;
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
@@ -88,20 +108,86 @@ class AirplayDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.airplay.error.defaultDeletionError'
+          errorMessage: 'integration.airplay.error.defaultDeletionError',
+          errorOrigin: 'delete'
         });
       }
     }
     this.setState({
       loading: false
     });
+    return deleted;
   };
 
+  // The device on a phone (docs/specs/mobile-pages/integration-devices.md): a row and its sheet,
+  // fed by the state and the handlers of the card below. A discovered device (its card has no
+  // editable field) is added with the same "Save"; one that is already in Gladys says so.
+  renderMobile(
+    { editable, deleteButton, housesWithRooms, discovered },
+    { device, errorMessage, errorOrigin, tooMuchStatesError, statesNumber },
+    validModel
+  ) {
+    let deleteError = null;
+    if (tooMuchStatesError) {
+      deleteError = <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />;
+    } else if (errorMessage && errorOrigin === 'delete') {
+      deleteError = <Text id={errorMessage} />;
+    }
+    const saveError = errorMessage && errorOrigin === 'save' && <Text id={errorMessage} />;
+    if (discovered) {
+      return (
+        <MobileDeviceItem
+          device={device}
+          icon="speaker"
+          subtitle={null}
+          status={
+            device.alreadyExist && (
+              <MobilePill tone="success">
+                <Text id="mobileDeviceList.inGladys" />
+              </MobilePill>
+            )
+          }
+          saveError={saveError}
+          primaryAction={
+            device.alreadyExist
+              ? { label: <Text id="integration.airplay.alreadyCreatedButton" />, disabled: true }
+              : {
+                  label: <Text id="integration.airplay.saveButton" />,
+                  onClick: this.saveDevice,
+                  toast: <Text id="mobileDeviceList.added" />
+                }
+          }
+          dataCy="airplay-discovered-row"
+        />
+      );
+    }
+    return (
+      <MobileDeviceItem
+        device={device}
+        icon="speaker"
+        houses={housesWithRooms}
+        onNameChange={this.updateName}
+        onRoomChange={this.updateRoom}
+        namePlaceholderId="integration.airplay.namePlaceholder"
+        fieldsDisabled={!editable || !validModel}
+        onSave={device.alreadyExist ? undefined : this.saveDevice}
+        saveError={saveError}
+        onDelete={deleteButton ? this.deleteDevice : undefined}
+        deleteError={deleteError}
+        dataCy="airplay-device-row"
+      />
+    );
+  }
+
   render(
-    { deviceIndex, editable, deleteButton, housesWithRooms },
+    { deviceIndex, editable, deleteButton, housesWithRooms, isMobile },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
+
+    if (isMobile) {
+      return this.renderMobile(this.props, this.state, validModel);
+    }
 
     return (
       <div class="col-md-6">

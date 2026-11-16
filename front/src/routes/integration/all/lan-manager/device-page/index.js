@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import LANManagerPage from '../LANManagerPage';
 import LANManagerDeviceTab from './LANManagerDeviceTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 
 class LANManagerDevicePage extends Component {
   componentWillMount() {
@@ -22,4 +23,4 @@ class LANManagerDevicePage extends Component {
 export default connect(
   'session,httpClient,user,lanManagerDevices,houses,getLANManagerDevicesStatus,getLANManagerDeviceOrderDir',
   actions
-)(LANManagerDevicePage);
+)(withMobileViewport(LANManagerDevicePage));

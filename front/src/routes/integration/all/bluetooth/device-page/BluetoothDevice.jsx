@@ -8,6 +8,7 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import { RequestStatus } from '../../../../../utils/consts';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import { MobileDeviceItem, BatteryPill } from '../../../../../components/integration/mobile';
 
 class BluetoothDevice extends Component {
   refreshDeviceProperty = () => {
@@ -22,20 +23,27 @@ class BluetoothDevice extends Component {
       batteryLevel
     });
   };
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({ loading: true });
+    let saved = true;
     try {
       await this.props.saveDevice(this.props.device);
     } catch (e) {
       this.setState({ error: RequestStatus.Error });
+      saved = false;
     }
     this.setState({ loading: false });
+    return saved;
   };
+  // resolves to false when the device could not be deleted
   deleteDevice = async () => {
     this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
+    let deleted = true;
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
+      deleted = false;
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
@@ -46,6 +54,7 @@ class BluetoothDevice extends Component {
       }
     }
     this.setState({ loading: false });
+    return deleted;
   };
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
@@ -61,7 +70,37 @@ class BluetoothDevice extends Component {
     this.refreshDeviceProperty();
   }
 
-  render({ device, houses }, { batteryLevel, loading, tooMuchStatesError, statesNumber }) {
+  render({ device, houses, isMobile }, { batteryLevel, loading, tooMuchStatesError, statesNumber }) {
+    // On a phone: a row and its sheet, fed by the handlers of the card
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (isMobile) {
+      return (
+        <MobileDeviceItem
+          device={device}
+          houses={houses}
+          pills={batteryLevel ? <BatteryPill level={batteryLevel} /> : null}
+          onNameChange={this.updateName}
+          onRoomChange={this.updateRoom}
+          namePlaceholderId="integration.bluetooth.device.namePlaceholder"
+          onSave={this.saveDevice}
+          actions={[
+            {
+              label: <Text id="integration.bluetooth.device.editButton" />,
+              icon: 'edit-2',
+              href: `/dashboard/integration/device/bluetooth/${device.selector}`,
+              dataCy: 'bluetooth-device-edit'
+            }
+          ]}
+          onDelete={this.deleteDevice}
+          deleteError={
+            tooMuchStatesError ? (
+              <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+            ) : null
+          }
+          dataCy="bluetooth-device-row"
+        />
+      );
+    }
     return (
       <div class="col-md-6">
         <div class="card">

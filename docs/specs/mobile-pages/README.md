@@ -181,6 +181,7 @@ Each file owns the phone behavior of its pages.
 | [`energy.md`](energy.md) | Energy monitoring: consumption, "My devices", contracts and the contract wizard |
 | [`map-areas.md`](map-areas.md) | Zones of the map (`routes/map/NewArea.jsx`, `NewAreaMap.jsx`) |
 | [`onboarding.md`](onboarding.md) | Onboarding (`routes/signup`), the five steps |
+| [`integration-devices.md`](integration-devices.md) | The "Devices" and "Discovery" tabs of the integrations (`components/integration/mobile/`): Matter, MQTT, Bluetooth, Airplay, LAN Manager, Enedis, Thermostat, external integrations |
 
 ## E. Tests
 

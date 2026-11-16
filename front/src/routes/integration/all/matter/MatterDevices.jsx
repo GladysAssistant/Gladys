@@ -9,6 +9,8 @@ import { RequestStatus } from '../../../../utils/consts';
 import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
 import CardFilter from '../../../../components/layout/CardFilter';
 import MatterDeviceBox from './MatterDeviceBox';
+import MobileMatterDevices from './MobileMatterDevices';
+import { withMobileViewport } from '../../../../components/mobile';
 import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
@@ -238,6 +240,7 @@ class MatterDevices extends Component {
     });
   };
 
+  // resolves to false when the device could not be added (the phone sheet then stays open)
   addDeviceToGladys = async device => {
     const { external_id: externalId } = device;
     this.setPairedDeviceLoading(externalId, true);
@@ -246,9 +249,11 @@ class MatterDevices extends Component {
       await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       await this.getMatterDevices();
       await this.getPairedDevices();
+      return true;
     } catch (e) {
       console.error(e);
       this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
+      return false;
     } finally {
       this.setPairedDeviceLoading(externalId, false);
     }
@@ -271,7 +276,7 @@ class MatterDevices extends Component {
           errorDetail: null,
           isKnownError: true
         });
-        return;
+        return false;
       }
 
       // We'll update the external_id of the existing device
@@ -313,9 +318,11 @@ class MatterDevices extends Component {
       await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       await this.getMatterDevices();
       await this.getPairedDevices();
+      return true;
     } catch (e) {
       console.error(e);
       this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
+      return false;
     } finally {
       this.setPairedDeviceLoading(externalId, false);
     }
@@ -401,6 +408,42 @@ class MatterDevices extends Component {
         return nameB.localeCompare(nameA);
       }
     });
+
+    // On a phone the same lists are rows opening a sheet
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (props.isMobile) {
+      return (
+        <MatterPage user={props.user}>
+          <MobileMatterDevices
+            orderDir={orderDir}
+            search={search}
+            onSearch={this.search}
+            onOrderChange={this.changeOrderDir}
+            refresh={this.init}
+            getGladysDevicesLoading={getGladysDevicesLoading}
+            getPairedDevicesLoading={getPairedDevicesLoading}
+            error={error}
+            matterEnabled={matterEnabled}
+            matterDevices={matterDevices}
+            pairedItems={sortedPairedDevices.map(device => {
+              const isNodeIdChanged = devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id);
+              return {
+                device,
+                pairedError: pairedDeviceErrors.get(device.external_id),
+                isNodeIdChanged,
+                isUpdate: Boolean(findGladysDeviceByExternalId(matterDevices, device.external_id)) && !isNodeIdChanged,
+                nodeIsDisconnected: nodesIsConnected.get(device.external_id.split(':')[1]) === false
+              };
+            })}
+            hasPairedDevices={pairedDevices.length > 0}
+            housesWithRooms={housesWithRooms}
+            nodesIsConnected={nodesIsConnected}
+            addDeviceToGladys={this.addDeviceToGladys}
+            replaceGladysDevice={this.replaceGladysDevice}
+          />
+        </MatterPage>
+      );
+    }
 
     return (
       <MatterPage user={props.user}>
@@ -589,4 +632,4 @@ class MatterDevices extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(MatterDevices);
+export default connect('httpClient,user', {})(withMobileViewport(MatterDevices));
