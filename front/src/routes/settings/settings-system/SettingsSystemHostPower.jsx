@@ -6,6 +6,11 @@ import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { withMobileViewport, ConfirmSheet } from '../../../components/mobile';
 
+const POWER_ACTION_TEXTS = {
+  reboot: { button: 'systemSettings.hostRebootButton', confirm: 'systemSettings.hostRebootConfirm' },
+  shutdown: { button: 'systemSettings.hostShutdownButton', confirm: 'systemSettings.hostShutdownConfirm' }
+};
+
 class SettingsSystemHostPower extends Component {
   constructor(props) {
     super(props);
@@ -80,6 +85,8 @@ class SettingsSystemHostPower extends Component {
     const rebootAvailable = systemInfos && systemInfos.host_power_reboot_available === true;
     const shutdownAvailable = systemInfos && systemInfos.host_power_shutdown_available === true;
     const anyAvailable = rebootAvailable || shutdownAvailable;
+    // the sheet of the phone layout keeps its texts while it slides out
+    const shownAction = pendingAction || this.lastPendingAction || 'reboot';
 
     return (
       <div class="card">
@@ -166,23 +173,9 @@ class SettingsSystemHostPower extends Component {
         {isMobile && (
           <ConfirmSheet
             open={Boolean(pendingAction)}
-            title={get(
-              intl.dictionary,
-              // the sheet keeps its title while it slides out
-              pendingAction === 'shutdown' || (!pendingAction && this.lastPendingAction === 'shutdown')
-                ? 'systemSettings.hostShutdownButton'
-                : 'systemSettings.hostRebootButton'
-            )}
-            text={
-              <Text
-                id={
-                  (pendingAction || this.lastPendingAction) === 'shutdown'
-                    ? 'systemSettings.hostShutdownConfirm'
-                    : 'systemSettings.hostRebootConfirm'
-                }
-              />
-            }
-            confirmLabel={<Text id="systemSettings.confirm" />}
+            title={get(intl.dictionary, POWER_ACTION_TEXTS[shownAction].button)}
+            text={<Text id={POWER_ACTION_TEXTS[shownAction].confirm} />}
+            confirmLabel={<Text id={POWER_ACTION_TEXTS[shownAction].button} />}
             destructive
             loading={submitting}
             onConfirm={this.confirm}

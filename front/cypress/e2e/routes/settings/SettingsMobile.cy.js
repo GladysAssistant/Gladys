@@ -24,6 +24,7 @@ describe('Settings on a phone', () => {
     cy.sendWebSocket(message);
     cy.get('body').then(body => {
       if (body.find(selector).length === 0 && attempt < 30) {
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(500);
         sendUntilShown(message, selector, attempt + 1);
       }
