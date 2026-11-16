@@ -67,7 +67,33 @@ function coerceGladysVersion(gladysVersion) {
   return coercedVersion ? coercedVersion.version : null;
 }
 
+/**
+ * @description The `gladys_version` range of a manifest when the running
+ * Gladys does not satisfy it: the version described by that manifest needs a
+ * newer (or older) Gladys and cannot be installed here. Null when the range is
+ * satisfied, when the running version is unknown (same rule as the
+ * `compatible` flag of the catalog) or when the range is malformed — a
+ * malformed manifest is validateManifest's business, not a version
+ * requirement to show to the user.
+ * @param {object} manifest - The manifest (external data, not validated yet).
+ * @param {string|null} gladysVersion - The current Gladys version (coerced semver), or null.
+ * @returns {string|null} The unsatisfied range, or null.
+ * @example
+ * const requiredGladysVersion = getUnsatisfiedGladysVersion(manifest, '5.2.1'); // '>=5.3.0'
+ */
+function getUnsatisfiedGladysVersion(manifest, gladysVersion) {
+  if (gladysVersion === null || typeof manifest.gladys_version !== 'string') {
+    return null;
+  }
+  const gladysVersionRange = semver.validRange(manifest.gladys_version);
+  if (gladysVersionRange === null || semver.satisfies(gladysVersion, gladysVersionRange)) {
+    return null;
+  }
+  return manifest.gladys_version;
+}
+
 module.exports = {
   buildCatalogEntry,
   coerceGladysVersion,
+  getUnsatisfiedGladysVersion,
 };

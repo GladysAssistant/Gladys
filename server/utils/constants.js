@@ -2277,6 +2277,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
+    // the progress of an installation, sent at most twice a second
+    INSTALL_PROGRESS: 'zigbee2mqtt.install-progress',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
@@ -2423,6 +2425,14 @@ const DASHBOARD_WIDTH = {
   FULL: 'full',
 };
 
+// Order of a section's widgets on a phone, where its columns stack: column
+// by column (the historic order, the default) or row by row (the first
+// widget of every column, then the second of every column…)
+const DASHBOARD_SECTION_MOBILE_ORDER = {
+  COLUMNS: 'columns',
+  ROWS: 'rows',
+};
+
 // Built-in CSS background scenes of the Horizon theme (no external images:
 // they weigh nothing, stay crisp at any resolution and work offline)
 const DASHBOARD_BACKGROUND_SCENE = {
@@ -2434,6 +2444,18 @@ const DASHBOARD_BACKGROUND_SCENE = {
   SAND: 'sand',
   LAVENDER: 'lavender',
   MIST: 'mist',
+};
+
+// Maximum number of entries in the list fields of a dashboard box. Shared by
+// the box schema (server/models/dashboard.js) and the box editors, which stop
+// adding entries at the cap and say so, instead of letting the save fail
+// (docs/specs/dashboard-flexible-layout-and-widgets.md).
+const DASHBOARD_BOX_MAX_ITEMS = {
+  // house-view: a whole house is easily one temperature + one humidity + one
+  // opening per room, so the pins get more room than the compact bars
+  HOUSE_VIEW_PINS: 50,
+  CHIPS: 20,
+  ACTIONS: 20,
 };
 
 const ERROR_MESSAGES = {
@@ -2514,6 +2536,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES: 'device-state-purge-orphaned-duckdb-states',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
+  SERVICE_ZIGBEE2MQTT_INSTALL: 'service-zigbee2mqtt-install',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
@@ -2674,6 +2697,7 @@ const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_VISIBILITY_LIST = createList(DASHBOARD_VISIBILITY);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 const DASHBOARD_WIDTH_LIST = createList(DASHBOARD_WIDTH);
+const DASHBOARD_SECTION_MOBILE_ORDER_LIST = createList(DASHBOARD_SECTION_MOBILE_ORDER);
 const DASHBOARD_BACKGROUND_SCENE_LIST = createList(DASHBOARD_BACKGROUND_SCENE);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
 const JOB_TYPES_LIST = createList(JOB_TYPES);
@@ -2788,8 +2812,11 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 module.exports.DASHBOARD_WIDTH = DASHBOARD_WIDTH;
 module.exports.DASHBOARD_WIDTH_LIST = DASHBOARD_WIDTH_LIST;
+module.exports.DASHBOARD_SECTION_MOBILE_ORDER = DASHBOARD_SECTION_MOBILE_ORDER;
+module.exports.DASHBOARD_SECTION_MOBILE_ORDER_LIST = DASHBOARD_SECTION_MOBILE_ORDER_LIST;
 module.exports.DASHBOARD_BACKGROUND_SCENE = DASHBOARD_BACKGROUND_SCENE;
 module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST;
+module.exports.DASHBOARD_BOX_MAX_ITEMS = DASHBOARD_BOX_MAX_ITEMS;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
 

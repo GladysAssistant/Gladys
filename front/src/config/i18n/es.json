@@ -44,6 +44,23 @@
     "loading": "Cargando...",
     "preview": "Vista previa"
   },
+  "mobileKit": {
+    "back": "Atrás",
+    "close": "Cerrar",
+    "done": "Listo",
+    "more": "Más acciones",
+    "undo": "Deshacer",
+    "retry": "Reintentar",
+    "saved": "Guardado",
+    "unsavedChanges": "Cambios sin guardar",
+    "stepOf": "Paso {{current}} de {{total}}",
+    "leaveTitle": "Cambios sin guardar",
+    "leaveText": "Tus cambios aún no se han guardado.",
+    "saveAndLeave": "Guardar y salir",
+    "leaveWithoutSaving": "Salir sin guardar",
+    "keepEditing": "Seguir editando",
+    "cannotBeUndone": "Esta acción no se puede deshacer."
+  },
   "errorBoundary": {
     "message": "Ocurrió un problema al mostrar esto. Vuelva a cargar la página y revise la configuración si sucede de nuevo."
   },
@@ -72,7 +89,14 @@
     "time": "Hora",
     "event": "Evento",
     "noEventsInRange": "No hay eventos en este período.",
-    "noCalendarsConnected": "No hay calendarios conectados. Para conectar un calendario externo, vaya a la página de integraciones o pida a un usuario de su instancia de Gladys que le comparta sus calendarios."
+    "noCalendarsConnected": {
+      "title": "Todavía no hay ningún calendario conectado",
+      "installIntegration": "Los calendarios llegan a Gladys a través de integraciones de tipo «calendario» (servidor CalDAV, feed ICS…). Instale una desde el catálogo de integraciones y luego actívela para su cuenta en su sección «Mis calendarios».",
+      "enableInstalled": "Estas integraciones de calendario están instaladas: abra una y actívela para su cuenta en su sección «Mis calendarios» para ver sus eventos aquí.",
+      "askAdmin": "Los calendarios llegan a Gladys a través de integraciones de tipo «calendario». Pida a un administrador de esta instancia de Gladys que instale una y luego actívela para su cuenta.",
+      "browseCatalog": "Ver las integraciones de calendario",
+      "sharedCalendars": "Otro miembro del hogar también puede compartir uno de sus calendarios: aparecerá entonces aquí."
+    }
   },
   "device": {
     "searchPlaceHolder": "Buscar dispositivos",
@@ -180,6 +204,21 @@
     "tooManyRequests": "Espere {{count}} minutos antes de volver a intentarlo."
   },
   "signup": {
+    "mobile": {
+      "welcomeLead": "Gladys es un asistente para tu hogar que respeta tu privacidad. La instalación lleva unos dos minutos.",
+      "restoreHint": "¿Ya usas Gladys Plus? Recupera una instalación anterior.",
+      "togglePassword": "Mostrar u ocultar la contraseña",
+      "distanceKilometers": "Kilómetros",
+      "distanceMiles": "Millas",
+      "historyHelp": "Cuánto tiempo conserva Gladys los valores de tus sensores. Podrás cambiarlo más tarde en los ajustes.",
+      "roomsHelp": "Toca las habitaciones de tu casa. Podrás cambiarlas más tarde.",
+      "saveHouseError": "No se ha podido guardar la casa. Comprueba tu conexión e inténtalo de nuevo.",
+      "savePreferencesError": "No se han podido guardar tus preferencias. Comprueba tu conexión e inténtalo de nuevo.",
+      "restoreTitle": "Restaurar una copia de seguridad",
+      "restoreConfirmTitle": "¿Restaurar esta copia de seguridad?",
+      "restoreConfirmText": "Gladys se reiniciará con los datos de esta copia. Puede tardar unos minutos.",
+      "backupKeyHelp": "La clave que recibiste al configurar Gladys Plus en tu instalación anterior."
+    },
     "welcome": {
       "title": "¡Bienvenido a Gladys!",
       "introSentence": "Antes que nada, gracias por elegirme. Soy Gladys, un asistente para el hogar que respeta su privacidad.",
@@ -350,6 +389,9 @@
       "description": "El modo tableta se utiliza para la función de alarma. Si activa la alarma, todas las tabletas de la casa se bloquearán y mostrarán un teclado virtual para desactivarla.",
       "currentBrowserOnly": "<strong>Esta configuración solo se aplica a este dispositivo.</strong> Al guardar, usted declara que el navegador que está usando actualmente pertenece a una tableta. Cada dispositivo se configura por separado: active el modo tableta únicamente en los dispositivos que esté dispuesto a ver bloqueados cuando la alarma esté activada.",
       "fullScreenForce": "Si desea forzar a una tableta a permanecer en modo de pantalla completa, puede agregar <code>?fullscreen=force</code> a la URL.",
+      "tabletModeForce": "Para que una tableta de pared se abra directamente en modo tableta para esta casa, apúntela a esta URL:",
+      "copyUrl": "Copiar",
+      "urlCopied": "¡Copiado!",
       "houseLabel": "Casa de esta tableta",
       "howToDisable": "Para desactivar el modo tableta en un dispositivo, abra este menú desde ese dispositivo y seleccione \"Modo tableta desactivado\".",
       "tabletModeDisabled": "Modo tableta desactivado"
@@ -359,6 +401,8 @@
     "editDashboardSavedButton": "Guardado",
     "editDashboardDoneButton": "Listo",
     "gatewayInstanceNotFoundError": "Su instancia de Gladys no está conectada a Gladys Gateway",
+    "tabletModeParamError": "No se pudo activar el modo tableta: ninguna casa coincide con «{{value}}» en el parámetro de URL ?tablet_mode_house=. Utilice la URL que se muestra en el menú Modo tableta.",
+    "tabletModeActivationError": "No se pudo activar el modo tableta debido a un error de red o del servidor. Recargue la página para volver a intentarlo.",
     "gatewayRecoveryCodesMissing": "Su cuenta de Gladys Plus no tiene códigos de recuperación: si pierde el acceso a su aplicación de doble factor, ya no podrá iniciar sesión. Genérelos y guárdelos en un lugar seguro.",
     "gatewayRecoveryCodesMissingButton": "Obtener mis códigos de recuperación",
     "editDashboardNameLabel": "Nombre",
@@ -373,7 +417,7 @@
     "editDashboardAddSectionButton": "Agregar una sección",
     "editDashboardBoxNotEmpty": "No puede eliminar esta columna porque contiene widgets.",
     "editDashboardMyDashboards": "Mis paneles",
-    "editDashboardExplanation": "Este es su panel real: toque un widget para editarlo y use los botones + para agregar widgets, columnas o secciones. Arrastre los widgets para moverlos; en el móvil, use las flechas.",
+    "editDashboardExplanation": "Este es tu panel real: toca un widget para editarlo y usa los botones + para agregar widgets, columnas o secciones. Arrastra los widgets para moverlos; en el teléfono, usa las flechas, «Mover a…» o el modo Reorganizar.",
     "editorDashboardSettingsButton": "Configuración del panel",
     "editorDashboardSettings": "Configuración del panel",
     "editorMoveSectionUp": "Mover la sección hacia arriba",
@@ -521,7 +565,34 @@
         "editDeviceFeaturesLabel": "Seleccione los dispositivos que desea mostrar:",
         "editNameLabel": "Nombre del widget (opcional)",
         "editNamePlaceholder": "Ingrese el nombre del widget",
-        "addADeviceLabel": "Agregar un dispositivo:"
+        "addADeviceLabel": "Agregar un dispositivo:",
+        "listLabel": "Dispositivos mostrados",
+        "emptyList": "Todavía no hay ningún dispositivo en este widget.",
+        "addDevicesButton": "Agregar dispositivos",
+        "dragHint": "Arrastra el asa para reordenar, toca un dispositivo para renombrarlo.",
+        "backToList": "Dispositivos",
+        "moveHandle": "Mover {{name}}",
+        "displayNameLabel": "Nombre mostrado en el widget",
+        "defaultNameHint": "Vacío: el widget muestra «{{name}}».",
+        "useDefaultName": "Usar el nombre predeterminado",
+        "position": "Posición {{index}} de {{total}}",
+        "moveUp": "Subir",
+        "moveDown": "Bajar",
+        "removeFromWidget": "Quitar del widget",
+        "done": "Listo",
+        "deviceNotFound": "Dispositivo no encontrado",
+        "loadError": "No se pudieron cargar los dispositivos. Comprueba la conexión con Gladys y vuelve a abrir el widget.",
+        "removedUndo": "«{{name}}» quitado",
+        "addedCount": {
+          "one": "1 agregado",
+          "other": "{{count}} agregados"
+        },
+        "removedCount": {
+          "one": "1 quitado",
+          "other": "{{count}} quitados"
+        },
+        "undo": "Deshacer",
+        "detailTitle": "Renombrar"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Seleccione la habitación que desea mostrar aquí.",
@@ -837,6 +908,7 @@
         "editLabelLabel": "Etiqueta (opcional)",
         "editLabelPlaceholder": "ej.: Garaje",
         "addChipButton": "Agregar un chip",
+        "maxChipsReached": "Esta barra admite como máximo {{max}} chips: quite uno para agregar un chip nuevo.",
         "openings": "{{count}} abierta(s)",
         "allClosed": "Todo cerrado",
         "noEvent": "Sin próximos eventos",
@@ -869,6 +941,7 @@
         "labelLabel": "Etiqueta del botón (opcional)",
         "labelPlaceholder": "Abrir planta baja…",
         "addActionButton": "Agregar una acción",
+        "maxActionsReached": "Este widget admite como máximo {{max}} acciones: quite una para agregar una acción nueva.",
         "noActions": "Aún no hay acciones configuradas. Edite el panel para agregar algunas."
       },
       "house-view": {
@@ -885,6 +958,7 @@
         "editPinFeatureLabel": "Función del dispositivo",
         "editPinLabelLabel": "Etiqueta (opcional)",
         "editPinLabelPlaceholder": "ej.: Solar",
+        "maxPinsReached": "Este widget admite como máximo {{max}} pines: quite uno para colocar un pin nuevo.",
         "noImage": "Elija una ilustración en la configuración del widget.",
         "error": "No se pudo cargar la imagen."
       },
@@ -915,13 +989,15 @@
       "energyPrice": {
         "editName": "Nombre del widget (opcional)",
         "editNamePlaceholder": "Nombre mostrado en el panel",
-        "editContract": "Contrato de electricidad",
+        "editMeter": "Contador eléctrico",
+        "editMeterHelp": "El widget muestra el precio del contrato activo en este contador: cuando cambie su tarifa, cree el nuevo contrato y el widget lo seguirá automáticamente.",
         "noContract": "Todavía no hay ningún contrato de electricidad.",
         "noContractLink": "Cree uno en la integración de seguimiento energético.",
-        "notConfigured": "Seleccione un contrato en los ajustes del widget.",
+        "noActiveContract": "Ningún contrato activo en {{meter}} en este momento.",
+        "manageContractsLink": "Gestionar los contratos",
         "until": "Hasta las {{time}}",
         "unknownPrice": "Precio desconocido",
-        "error": "No se pudo cargar el precio de la electricidad. Compruebe que el contrato sigue existiendo.",
+        "error": "No se pudo cargar el precio de la electricidad. Compruebe que el contador y sus contratos siguen existiendo.",
         "cumulativeToday": "Hoy: {{kwh}} kWh"
       },
       "thermostat": {
@@ -1017,7 +1093,42 @@
       "scenesText": "Luces al atardecer, rutinas matutinas: su hogar actúa por usted.",
       "usersTitle": "Invite a su familia",
       "usersText": "Cree una cuenta para cada miembro de la familia."
-    }
+    },
+    "editPanelClose": "Cerrar",
+    "editPanelExpand": "Ampliar el panel",
+    "editPanelCollapse": "Reducir el panel",
+    "editDashboardDeleteThisDashboard": "Eliminar este panel",
+    "editDashboardDeleteForever": "Eliminar definitivamente",
+    "editorAddColumnShort": "Columna",
+    "editorAddWidgetHere": "Agregar un widget aquí",
+    "editorDeleteColumn": "Eliminar la columna {{index}}",
+    "editorExplanationDismiss": "Ocultar esta ayuda",
+    "editorMobileOrderColumns": "Por columna",
+    "editorMobileOrderRows": "Por fila",
+    "editorMobileOrderHelp": "En el teléfono las columnas se apilan: mostrar los widgets columna por columna, o fila por fila (el primer widget de cada columna, luego el segundo…)",
+    "editorMoveCurrentColumn": "Columna actual",
+    "editorMoveWidgetCount": {
+      "zero": "Vacía",
+      "one": "1 widget",
+      "other": "{{count}} widgets"
+    },
+    "editorMoveWidgetUp": "Subir",
+    "editorMoveWidgetDown": "Bajar",
+    "editorMoveWidgetTo": "Mover a…",
+    "editorMoveWidgetTitle": "Mover el widget",
+    "editorMoveWidgetHint": "Elige la columna para el widget: se coloca al final.",
+    "editorRemoveWidget": "Eliminar el widget",
+    "editorWidgetSettings": "Ajustes del widget",
+    "editorReorganize": "Reorganizar",
+    "editorReorganizeDone": "Vista completa",
+    "leaveConfirmTitle": "¿Salir sin guardar?",
+    "leaveConfirmText": "Se perderán los cambios de este panel.",
+    "leaveConfirmLeave": "Salir sin guardar",
+    "leaveConfirmStay": "Seguir editando",
+    "selectBoxTypePopularSection": "Los más usados",
+    "selectBoxTypeAllSection": "Todos los widgets",
+    "widgetRemoved": "widget eliminado",
+    "editorDashboardSettingsShort": "Ajustes"
   },
   "newDashboard": {
     "cardTitle": "Crear un nuevo panel",
@@ -1059,6 +1170,12 @@
       "updateRetryButton": "Reintentar",
       "updateError": "La actualización ha fallado. Revise los registros de la integración y vuelva a intentarlo.",
       "updatedTo": "Actualizado a v{{version}}",
+      "updateRequiresGladys": "Esta versión requiere Gladys {{gladysVersion}}: actualice Gladys primero.",
+      "updateSkipped": {
+        "GLADYS_VERSION": "La v{{skippedVersion}} requiere Gladys {{gladysVersion}}: actualice Gladys primero. La v{{version}} está instalada.",
+        "INVALID_MANIFEST": "No se pudo instalar la v{{skippedVersion}}: esta versión de Gladys no acepta su manifiesto (consulte los logs de Gladys). La v{{version}} está instalada.",
+        "IMAGE_UNAVAILABLE": "La imagen de la v{{skippedVersion}} aún no se puede descargar: inténtelo más tarde. La v{{version}} está instalada."
+      },
       "noInstalledIntegrations": "Aún no hay ninguna integración de la comunidad instalada en esta instancia.",
       "installedSummary": {
         "title": {
@@ -1227,6 +1344,13 @@
         "updateAvailableVersionText": "Hay una nueva versión de esta integración disponible: v{{latestVersion}} (instalada: v{{currentVersion}}).",
         "updateSuccessText": "Integración actualizada a la versión {{version}}.",
         "alreadyUpToDateText": "La integración ya está actualizada (versión {{version}}): se volvió a descargar la imagen Docker y se recreó el contenedor.",
+        "updateRequiresGladysText": "La versión {{latestVersion}} de esta integración está disponible, pero requiere Gladys {{gladysVersion}} (instalada: v{{currentVersion}}). Actualice Gladys primero y luego actualice esta integración.",
+        "updateKeptVersionText": "La versión {{version}} sigue instalada: se volvió a descargar su imagen Docker y se recreó el contenedor.",
+        "updateSkipped": {
+          "GLADYS_VERSION": "La versión {{skippedVersion}} no se instaló: requiere Gladys {{gladysVersion}}. Actualice Gladys primero y luego vuelva a actualizar esta integración.",
+          "INVALID_MANIFEST": "La versión {{skippedVersion}} no se instaló: esta versión de Gladys no acepta su manifiesto (detalles en los logs de Gladys). Actualizar Gladys puede solucionarlo.",
+          "IMAGE_UNAVAILABLE": "La versión {{skippedVersion}} no se instaló: su imagen Docker aún no se puede descargar (puede que todavía se esté publicando). Inténtelo de nuevo en unos minutos."
+        },
         "statusLabel": "Estado",
         "versionLabel": "Versión",
         "changelogTitle": "Consultar el registro de cambios de esta versión",
@@ -1815,7 +1939,8 @@
               "dongleName": "Adaptador",
               "networkAdapterType": "Tipo de adaptador",
               "unknownDongle": "No definido",
-              "tcpPort": "Puerto TCP"
+              "tcpPort": "Puerto TCP",
+              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2mqtt funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
             },
             "externalMqtt": {
               "title": "Conexión de herramientas externas",
@@ -1825,7 +1950,7 @@
               "copied": "Copiado"
             },
             "containerErrors": {
-              "EZSP_PROTOCOL_VERSION": "Advertencia: el firmware de su coordinador Ember está desactualizado. Se requiere la versión de firmware 7.4.x o superior. Siga la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a> para actualizarlo. En caso contrario, seleccione el adaptador (ezsp heredado) en la configuración.",
+              "EZSP_PROTOCOL_VERSION": "El firmware de su coordinador es demasiado antiguo para el controlador <code>ember</code>, que requiere la versión 7.4 o superior, y este modelo no tiene controlador de compatibilidad. Actualícelo siguiendo la <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guía de actualización de firmware</a>.",
               "ADAPTER_NO_RESPONSE": "Zigbee2MQTT no recibe respuesta de su coordinador Zigbee. Compruebe que el modelo elegido en la configuración es el suyo (determina el controlador utilizado) y que ningún otro software (Home Assistant, otro Zigbee2MQTT…) usa el coordinador; después desconecte y vuelva a conectar su adaptador, o reinicie su coordinador de red.",
               "ADAPTER_UNREACHABLE": "Zigbee2MQTT no consigue conectar con su coordinador de red. Compruebe que está encendido y conectado a la red, y que su dirección en la configuración (tcp://dirección:puerto) es la correcta.",
               "INVALID_CONFIGURATION": "Zigbee2MQTT se niega a arrancar porque su configuración (archivo configuration.yaml) no es válida. Si la ha modificado a mano, corríjala; si no, avíselo en el <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">foro de Gladys</a>. Ajustes rechazados:",
@@ -1892,6 +2017,41 @@
           "confirmButton": "Sí, restablecer todo",
           "cancelButton": "Cancelar",
           "error": "Se produjo un error al restablecer la integración."
+        },
+        "installation": {
+          "titles": {
+            "install": "Instalación de Zigbee2MQTT",
+            "update": "Actualización de Zigbee2MQTT",
+            "switch": "Cambio de coordinador Zigbee"
+          },
+          "phases": {
+            "pull_z2m": "Descarga de Zigbee2MQTT",
+            "pull_mqtt": "Descarga del broker MQTT",
+            "start_mqtt": "Inicio del broker MQTT",
+            "start_z2m": "Inicio de Zigbee2MQTT",
+            "connect_adapter": "Conexión con el coordinador Zigbee"
+          },
+          "leavePage": "Puede salir de esta página: la instalación continúa.",
+          "failedPhase": "Paso fallido:",
+          "alreadyRunning": "Hay una instalación en curso o la integración está ocupada (inicio, parada o restablecimiento): espere a que termine antes de guardar de nuevo la configuración.",
+          "busy": "Hay una instalación en curso o la integración está ocupada (inicio, parada o restablecimiento): espere a que termine y vuelva a intentarlo.",
+          "success": {
+            "install": "Zigbee2MQTT instalado en {{duration}}.",
+            "update": "Zigbee2MQTT actualizado en {{duration}}.",
+            "switch": "Coordinador Zigbee cambiado en {{duration}}."
+          },
+          "errors": {
+            "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos posteriores a su inicio, sin indicar por qué. Compruebe que el modelo elegido es el de su coordinador, desconecte y vuelva a conectar su adaptador o reinicie su coordinador de red, y después guarde de nuevo la configuración.",
+            "DONGLE_NOT_FOUND": "Su adaptador Zigbee no está conectado (o no en el puerto elegido): Zigbee2MQTT no ha podido iniciarse. Conéctelo, compruebe el puerto elegido y después guarde de nuevo la configuración.",
+            "NOT_ENOUGH_DISK_SPACE": "No hay suficiente espacio en disco para descargar Zigbee2MQTT. Libere espacio y después guarde de nuevo la configuración.",
+            "unknownErrorPrefix": "Error durante la instalación: "
+          }
+        },
+        "prefetch": {
+          "running": "Preparando la instalación en segundo plano · {{progress}} %",
+          "done": "Descarga completada: la instalación será rápida.",
+          "notEnoughDiskSpace": "Espacio en disco insuficiente: {{free}} MB libres, {{needed}} MB necesarios para instalar Zigbee2MQTT. Libere espacio antes de instalar.",
+          "notEnoughDiskSpaceNoFigures": "Espacio en disco insuficiente para instalar Zigbee2MQTT. Libere espacio antes de instalar."
         }
       },
       "device": {
@@ -3017,10 +3177,63 @@
       }
     },
     "energyMonitoring": {
+      "mobile": {
+        "meterTitle": "¿Qué contador factura este contrato?",
+        "createMeter": "Crear un nuevo contador",
+        "createMeterHelp": "Se crea un dispositivo MQTT: envíale las lecturas de tu contador.",
+        "templateTitle": "Elige tu contrato",
+        "manualHelp": "Introduce la tarifa tú mismo. Solo existe en tu Gladys.",
+        "proposeTitle": "Proponerlo a la comunidad",
+        "proposeHelp": "Para que todos lo encuentren en esta lista.",
+        "parametersTitle": "Tu contrato",
+        "billingRow": "Moneda y facturación",
+        "billingDay": "facturado desde el día {{day}}",
+        "timezoneHelp": "Déjalo vacío para usar la zona horaria de Gladys. Ejemplo: Europe/Paris.",
+        "powerUnit": "Unidad de la potencia contratada",
+        "advanced": "Avanzado",
+        "jsonMode": "Editar la tarifa en JSON",
+        "jsonModeHelp": "Para escribir o pegar una definición completa de la tarifa.",
+        "exportHelp": "Un archivo listo para la lista de la comunidad o una integración.",
+        "samplesTitle": "Intervalos de ejemplo",
+        "showAllSamples": "Mostrar los {{count}} intervalos",
+        "noRange": "Todavía no hay ninguna franja horaria.",
+        "addRange": "Añadir una franja horaria",
+        "rangeSheetTitle": "Franja horaria",
+        "rangeStart": "Desde",
+        "rangeEnd": "Hasta",
+        "rangeNextDay": "al día siguiente",
+        "rangeNextDayHelp": "Esta franja termina al día siguiente.",
+        "rangeHelp": "Las franjas que se tocan o se solapan se fusionan.",
+        "rangeInvalid": "La franja debe terminar a una hora distinta de la de inicio.",
+        "rangeAdd": "Añadir esta franja",
+        "rangeUpdate": "Modificar esta franja",
+        "rangeRemove": "Quitar la franja",
+        "leaveTitle": "¿Salir sin guardar?",
+        "leaveText": "Este contrato no está guardado: lo que has introducido se perderá.",
+        "deleteTitle": "¿Eliminar este contrato?",
+        "contractDeleted": "Contrato eliminado",
+        "deviceAttached": "{{device}} ahora se factura con {{meter}}",
+        "previewComponents": {
+          "energy": "Energía",
+          "subscription": "Cuota fija"
+        },
+        "meterOf": "Contador de {{name}}",
+        "meterSheetHelp": "El dispositivo se factura con el contrato de su contador.",
+        "recalculations": "Recálculos",
+        "startCalculation": "Iniciar el cálculo",
+        "recalculateTitle": "Recalcular los costes"
+      },
       "title": "Supervisión de energía",
       "description": "Realice un seguimiento de su consumo eléctrico en Gladys",
       "myDevicesTab": "Mis dispositivos",
       "energyPriceTab": "Tarifas de energía",
+      "meterSelect": {
+        "mainMeter": "Contador principal",
+        "mainMeterNamed": "Contador principal ({{name}})",
+        "anyMeter": "Cualquier contador",
+        "noActiveContract": "sin contrato activo",
+        "deletedContract": "El contrato de este ajuste ya no existe: elija un contador."
+      },
       "documentation": "Documentación",
       "wizard": {
         "basics": "Información",
@@ -3607,6 +3820,23 @@
         "nodeDetailsLabel": "Detalles del nodo",
         "actionsLabel": "Acciones",
         "decommissionButton": "Retirar",
+        "decommission": {
+          "confirmMessage": "<b>¿Retirar este nodo?</b> El dispositivo saldrá de la red Matter de Gladys y tendrá que emparejarse de nuevo para usarse en Gladys.",
+          "linkedDevices": "Dispositivos de Gladys creados a partir de este nodo:",
+          "deleteDevicesLabel": "Eliminar también estos dispositivos de Gladys",
+          "deleteDevicesHelp": "Su historial se elimina, y las escenas y los paneles que los utilizan tendrán que actualizarse. Deje esta casilla sin marcar para conservarlos: ya no se actualizarán hasta que el dispositivo se empareje de nuevo, y la pestaña «Dispositivos» ofrecerá entonces actualizarlos, lo que conserva su historial, sus escenas y sus paneles.",
+          "confirmButton": "Sí, retirar",
+          "cancelButton": "Cancelar",
+          "error": "Se produjo un error al retirar el nodo «{{name}}», no se ha eliminado.",
+          "noResponse": "Gladys no respondió al retirar el nodo «{{name}}» (conexión perdida o demasiado lenta). Es posible que se haya eliminado de todos modos: la lista de nodos de abajo se ha recargado.",
+          "success": "El nodo «{{name}}» ha sido retirado.",
+          "devicesDeleted": {
+            "singular": "Se ha eliminado {{count}} dispositivo de Gladys.",
+            "plural": "Se han eliminado {{count}} dispositivos de Gladys."
+          },
+          "forcedWarning": "No se pudo contactar con el dispositivo «{{name}}»: se ha retirado de la red Matter de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
+          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar, probablemente porque su historial es demasiado grande. Gladys lo está limpiando: inténtelo más tarde desde la pestaña «Dispositivos»."
+        },
         "noNodesFound": "No se encontró ningún nodo Matter. Puede añadir un dispositivo Matter yendo a la pestaña \"Añadir dispositivo\".",
         "disabledWarning": "Matter no está activado. Actívelo en <a href=\"/dashboard/integration/device/matter/settings\">Configuración</a> antes de utilizar la integración",
         "disabledWarningSettings": "Matter no está activado; haga clic en el botón de abajo para activarlo.",
@@ -3785,9 +4015,13 @@
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
         "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado…) en lugar de cortar su alimentación. Desactive primero el programa propio del módulo.",
         "pilotWireProgrammeWarning": "Desactive el programa o el modo termostato propio del módulo (programación de Heatzy, programa de Tuya…) antes de controlarlo desde Gladys. Si no, cada orden que escribe ese programa se toma por un cambio hecho en el módulo, y el módulo y Gladys escriben la orden por turnos.",
+        "pilotWireStandbyOrderLabel": "Orden una vez alcanzada la consigna",
+        "pilotWireStandbyForceLabel": "Forzar otra orden que antihielo en reposo",
+        "pilotWireStandbyForceHelp": "Por defecto, Gladys envía antihielo una vez alcanzada la consigna. Algunos radiadores bloquean entonces sus propias funciones, como el boost de un toallero, porque antihielo y apagado son órdenes prioritarias: fuerce eco para conservarlas.",
+        "pilotWireStandbyOrderWarning": "Eco: el radiador regula entonces él mismo sobre su consigna eco, unos 3,5 °C por debajo de su confort; una consigna de Gladys más baja (noche) no se alcanza mientras se envía eco. Apagado: el radiador se corta, sin protección antihielo si Gladys se detiene. Los preajustes antihielo y ausencia, como una ventana abierta, siguen en antihielo; un módulo que no acepta la orden elegida recibe la más baja que acepta: antihielo, apagado y luego eco.",
         "pilotWireRegulationHelp": {
           "heater": "Cada preajuste envía la orden elegida en la tabla de preajustes (eco → eco, ausencia → antihielo…). El sensor de ambiente, si lo hay, solo sirve para mostrar la temperatura.",
-          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar, antihielo una vez alcanzada la consigna del preajuste. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
+          "gladys": "Gladys mide la habitación con el sensor de ambiente y usa el hilo piloto como un interruptor: confort para calentar y, una vez alcanzada la consigna del preajuste, una orden de reposo: antihielo o, en un módulo que no la acepta, apagado y luego eco, salvo que se fuerce otra. Ajuste la consigna de confort del propio radiador lo bastante alta (24 °C por ejemplo): así obedece a Gladys y no a su propio termómetro, y ese valor sigue siendo un tope de seguridad si Gladys se detiene. Para que el radiador regule solo, elija el tipo «Radiador con hilo piloto»."
         },
         "windowFeatureLabel": "Sensores de apertura de ventana",
         "windowFeatureHelp": {
@@ -3834,6 +4068,7 @@
         "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un actuador (conmutador o hilo piloto): regula leyendo uno y accionando el otro.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
         "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
+        "pilotWireUnreadError": "No se ha podido leer el hilo piloto elegido, así que no se puede comprobar la orden de reposo: recarga la página y vuelve a elegirlo.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",
         "noActiveSchedule": "Sin programación (control manual)",
@@ -3965,6 +4200,7 @@
     "newCondition": "Nueva condición",
     "selectActionType": "Seleccione un tipo de acción",
     "selectConditionType": "Seleccione un tipo de condición",
+    "conditionAndText": "Y",
     "noTriggersYet": "Todavía no se ha añadido ningún activador. No es obligatorio tener un activador en una escena.",
     "addNewTriggerButton": "Añadir activador",
     "saveSceneError": "Se produjo un error al guardar su escena. Compruebe que todas las acciones/activadores estén completos y sean correctos.",
@@ -4094,7 +4330,9 @@
         "textExplanationText": "Introduzca aquí el texto que se enviará a su dispositivo. Para insertar una variable de la escena en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Dispositivo o variable",
+        "sourceDevice": "Dispositivo",
+        "sourceVariable": "Variable",
         "operatorLabel": "Operador",
         "valueLabel": "Valor",
         "removeLabel": "Eliminar",
@@ -4103,7 +4341,7 @@
         "useCustomValue": "Introducir un valor personalizado",
         "useValueList": "Elegir de la lista de valores",
         "logicExplanationText": "Las condiciones de este bloque se combinan con un O: el bloque se cumple en cuanto se cumple una de ellas. Para hacer un Y, añada varios bloques \"Condición sobre variables\": entonces todos deberán cumplirse.",
-        "explanationText": "En lugar de un valor fijo, puede introducir aquí un cálculo basado en una variable de la escena. Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "explanationText": "Elija qué comparar: el estado actual de un dispositivo, leído cuando la escena llega a este bloque, o una variable establecida por una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" situada antes de esta. Como valor, introduzca un valor fijo o un cálculo basado en una variable de la escena: para insertar una variable, pulse \"{{\"."
       },
       "conditionIfThenElse": {
         "conditions": "Condiciones",
@@ -4288,8 +4526,8 @@
         "variablesExplanation": "Para insertar una variable, escriba \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
       },
       "energyCurrentPrice": {
-        "description": "La escena solo continuará si el precio actual del kWh del contrato seleccionado cumple la condición siguiente.",
-        "contractLabel": "Contrato de energía",
+        "description": "La escena solo continuará si el precio actual del kWh del contrato activo en el contador seleccionado cumple la condición siguiente. Sin contrato activo, la escena se detiene.",
+        "meterLabel": "Contador eléctrico",
         "operatorLabel": "Continuar si el precio es",
         "valueLabel": "Umbral (por kWh)",
         "valuePlaceholder": "0.20",
@@ -4804,9 +5042,8 @@
         }
       },
       "energyPriceChanged": {
-        "description": "Se activa cuando cambia el precio actual del kWh (o el tramo tarifario) del contrato seleccionado, por ejemplo al pasar de horas valle a horas punta.",
-        "contractLabel": "Contrato de energía",
-        "anyContract": "Cualquier contrato",
+        "description": "Se activa cuando cambia el precio actual del kWh (o el tramo tarifario) del contador seleccionado, por ejemplo al pasar de horas valle a horas punta. Sigue el contrato activo del contador: cuando cambia la tarifa, la escena sigue funcionando sin modificaciones.",
+        "meterLabel": "Contador eléctrico",
         "error": "No se pudieron cargar los contratos de energía."
       }
     },
@@ -4849,6 +5086,103 @@
       "outputsAvailable": "Resultados disponibles para los pasos siguientes:",
       "variablesHint": "Escriba '{{' para insertar información de la escena, como los datos transmitidos por el activador.",
       "requiredFieldError": "El campo \"{{field}}\" de \"{{title}}\" es obligatorio: no puede dejarse vacío."
+    },
+    "searchConditionsPlaceholder": "Buscar una condición…",
+    "conditionsDescriptions": {
+      "condition": {
+        "check-time": "La hora o el día coinciden",
+        "only-continue-if": "Comparar variables o valores de dispositivos",
+        "in-time-range": "Estamos dentro de una de las franjas horarias del disparador"
+      },
+      "edf-tempo": {
+        "condition": "El color del día de EDF Tempo coincide (Francia)"
+      },
+      "alarm": {
+        "check-alarm-mode": "La alarma está en un modo determinado"
+      },
+      "calendar": {
+        "is-event-running": "Un evento del calendario está en curso",
+        "get-events": "Obtener eventos del calendario para compararlos"
+      },
+      "ecowatt": {
+        "condition": "La señal Ecowatt de la red eléctrica francesa coincide"
+      },
+      "energy-contract": {
+        "current-price": "El precio actual de un contrato de energía cumple un umbral"
+      },
+      "house": {
+        "is-empty": "No hay nadie en casa",
+        "is-not-empty": "Hay alguien en casa"
+      },
+      "device": {
+        "get-value": "Obtener el valor de un sensor antes de compararlo"
+      }
+    },
+    "mobile": {
+      "ok": "OK",
+      "close": "Cerrar",
+      "savedToast": "Escena guardada",
+      "stepDeleted": "Paso eliminado",
+      "conditionDeleted": "Condición eliminada",
+      "triggerDeleted": "Disparador eliminado",
+      "undo": "Deshacer",
+      "leaveTitle": "Cambios sin guardar",
+      "leaveText": "Tienes cambios sin guardar en «{{name}}».",
+      "saveAndLeave": "Guardar y salir",
+      "leaveWithoutSaving": "Salir sin guardar",
+      "keepEditing": "Seguir editando",
+      "draftFound": "Cambios sin guardar encontrados ·",
+      "restoreDraft": "Restaurar",
+      "discardDraft": "Descartar",
+      "noCondition": "Ninguna condición",
+      "delete": "Eliminar",
+      "addSimultaneousAction": "Añadir una acción simultánea",
+      "insertStepAfter": "Insertar un paso después",
+      "deleteStep": "Eliminar el paso",
+      "deleteCondition": "Eliminar la condición",
+      "deleteTrigger": "Eliminar el disparador",
+      "noActionInBranch": "Ninguna acción",
+      "addTo": {
+        "then": "Añadir en «Entonces»",
+        "else": "Añadir en «Si no»"
+      },
+      "then": "Entonces",
+      "else": "Si no",
+      "repeat": "Repetir",
+      "conditionsTitle": "Condiciones",
+      "addCondition": "Añadir una condición",
+      "conditionsAllRequired": "Se deben cumplir todas las condiciones. Toca una condición para cambiarla.",
+      "atTheSameTime": "Al mismo tiempo",
+      "simultaneousAction": "Acción simultánea",
+      "reorderTitle": "Reordenar",
+      "reorderHint": "Mueve los pasos con las flechas. Lo que hace cada paso no cambia.",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "done": "Listo",
+      "changes": {
+        "zero": "Ningún cambio",
+        "one": "1 cambio",
+        "other": "{{count}} cambios"
+      },
+      "test": "Probar",
+      "runScene": "Ejecutar la escena",
+      "moreActions": "Más acciones",
+      "sceneActive": "Escena activa",
+      "sceneDisabled": "Escena desactivada",
+      "lastRun": "Última ejecución",
+      "neverRun": "Nunca ejecutada",
+      "whenSubtitle": "basta con uno de estos eventos",
+      "chooseTrigger": "Elegir un disparador",
+      "orWhen": "O cuando…",
+      "thenSubtitle": "en orden, de arriba abajo",
+      "addFirstStep": "Añadir un primer paso",
+      "swipeHint": "Toca una fila para cambiarla. Deslízala a la izquierda para eliminarla. Mantén pulsado un paso para moverlo.",
+      "settingsMenu": "Nombre, icono y etiquetas",
+      "reorderMenu": "Reordenar los pasos",
+      "deleteScene": "Eliminar la escena",
+      "deleteSceneTitle": "¿Eliminar la escena?",
+      "deleteSceneText": "«{{name}}» y sus disparadores se eliminarán. Esta acción es definitiva.",
+      "deleteForever": "Eliminar definitivamente"
     }
   },
   "profile": {
@@ -4953,6 +5287,56 @@
       "rooms": "Habitaciones",
       "noRoomYet": "Todavía no hay ninguna habitación. Añada una a continuación."
     },
+    "mobile": {
+      "subtitle": "Una casa contiene habitaciones, y cada dispositivo pertenece a una habitación. Toca una casa para editarla.",
+      "useMyLocation": "Usar mi ubicación actual",
+      "locationError": {
+        "insecure": "Tu navegador solo comparte tu ubicación en una conexión segura (HTTPS, por ejemplo a través de Gladys Plus). Busca tu dirección o coloca la casa en el mapa.",
+        "denied": "Se ha denegado el acceso a tu ubicación. Permítelo en los ajustes de tu navegador o busca tu dirección.",
+        "unavailable": "No se ha podido encontrar tu ubicación. Busca tu dirección o coloca la casa en el mapa."
+      },
+      "placeOnMap": "Colocar en el mapa",
+      "adjustOnMap": "Ajustar en el mapa",
+      "positionSet": "La ubicación de la casa está definida.",
+      "positionNotSet": "Aún sin ubicación.",
+      "locationHelp": "Opcional. Se usa para el tiempo, el amanecer y el atardecer, y para saber cuándo estás en casa.",
+      "mapSheetTitle": "Ubicación de la casa",
+      "mapSheetHint": "Toca el mapa donde está la casa. Mueve y amplía con dos dedos.",
+      "addRooms": "Añadir",
+      "addFirstRoom": "Añadir las habitaciones de la casa",
+      "roomsHint": "Toca una habitación para cambiarle el nombre o eliminarla.",
+      "addRoomsTitle": "Añadir habitaciones",
+      "newRoomPlaceholder": "Nombre de una habitación",
+      "roomSuggestionsTitle": "Habitaciones habituales",
+      "roomSuggestionsLabel": "Habitaciones habituales, toca para añadir o quitar",
+      "roomSuggestions": {
+        "livingRoom": "Salón",
+        "kitchen": "Cocina",
+        "bedroom": "Dormitorio",
+        "bathroom": "Baño",
+        "entrance": "Entrada",
+        "office": "Despacho",
+        "diningRoom": "Comedor",
+        "kidsRoom": "Habitación infantil",
+        "toilet": "Aseo",
+        "garage": "Garaje",
+        "laundryRoom": "Lavadero",
+        "garden": "Jardín"
+      },
+      "roomSheetTitle": "Habitación",
+      "roomNameLabel": "Nombre de la habitación",
+      "roomNameRequired": "Una habitación necesita un nombre.",
+      "roomNameTaken": "Esta casa ya tiene una habitación con este nombre.",
+      "roomNameTakenElsewhere": "Otra casa ya tiene una habitación con este nombre. Añade el nombre de la casa para distinguirlas.",
+      "roomNameReserved": "Una habitación renombrada sigue usando este nombre internamente. Elige otro nombre.",
+      "deleteRoom": "Eliminar la habitación",
+      "deleteRoomHint": "La habitación se elimina al guardar la casa. Sus dispositivos se conservan, sin habitación.",
+      "roomDeleted": "«{{name}}» eliminada",
+      "houseDeleted": "Casa eliminada",
+      "alarmCodePlaceholder": "De 4 a 8 dígitos",
+      "alarmCodeHelp": "El código que desarma la alarma de esta casa. Déjalo vacío si no usas la alarma.",
+      "alarmDelayHelp": "Solo se aplica cuando la alarma se arma a mano, no desde una escena."
+    },
     "empty": {
       "title": "Todavía no hay ninguna vivienda",
       "description": "Cree su primera vivienda para añadirle habitaciones y organizar sus dispositivos.",
@@ -5004,6 +5388,7 @@
         "none": "Sin cuenta de Gladys Plus: este usuario solo puede usar Gladys desde casa."
       },
       "statusUnavailable": "El acceso remoto no se puede comprobar mientras su instancia no esté conectada a Gladys Plus.",
+      "invitedNotReceived": "¿No la ha recibido? Pídale que revise sus carpetas Spam, Promociones y Social.",
       "memberSince": "En Gladys Plus desde el {{date}}",
       "online": "Conectado ahora mismo",
       "plusRole": {
@@ -5097,7 +5482,22 @@
     "session": "Sesión",
     "revoke": "Revocar",
     "unknowDevice": "Dispositivo desconocido",
-    "apiKey": "Clave de API"
+    "apiKey": "Clave de API",
+    "mobile": {
+      "thisDevice": "Este dispositivo",
+      "thisDeviceTitle": "Este dispositivo",
+      "otherDevicesTitle": "Otros dispositivos",
+      "noOtherDevice": "Ningún otro dispositivo ha iniciado sesión.",
+      "apiKeysTitle": "Claves de API",
+      "hint": "Revoca una sesión para cerrar la sesión de su dispositivo en Gladys.",
+      "loadError": "No se pudieron cargar las sesiones. Inténtalo de nuevo.",
+      "revokeTitle": "¿Revocar esta sesión?",
+      "revokeText": "se cerrará la sesión de este dispositivo en Gladys.",
+      "revokeCurrentText": "es la sesión del dispositivo que estás usando: se cerrará tu sesión.",
+      "revokeApiKeyText": "lo que use esta clave de API ya no podrá acceder a Gladys.",
+      "revokeError": "No se pudo revocar la sesión. Inténtalo de nuevo.",
+      "revoked": "Sesión revocada"
+    }
   },
   "servicesSettings": {
     "title": "Servicios",
@@ -5134,7 +5534,24 @@
         "detail": "El servicio no se pudo iniciar."
       }
     },
-    "action": "Acción"
+    "action": "Acción",
+    "mobile": {
+      "searchPlaceholder": "Buscar un servicio",
+      "filters": {
+        "all": "Todos",
+        "running": "Iniciados",
+        "error": "Con error",
+        "stopped": "Detenidos"
+      },
+      "noResult": "Ningún servicio coincide.",
+      "actionError": "No se pudo cambiar el estado del servicio. Inténtalo de nuevo.",
+      "started": "Ejecutar el servicio",
+      "startedHelp": "Detenido, la integración deja de funcionar hasta que se vuelva a iniciar.",
+      "starting": "Iniciando…",
+      "stopping": "Deteniendo…",
+      "internalName": "Nombre interno",
+      "openIntegration": "Abrir la integración"
+    }
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -5224,6 +5641,7 @@
       "device-state-purge-single-feature": "Limpieza de estados de una sola función",
       "vacuum": "Limpieza de la base de datos",
       "service-zigbee2mqtt-backup": "Copia de seguridad de Zigbee2MQTT",
+      "service-zigbee2mqtt-install": "Instalación de Zigbee2MQTT",
       "migrate-sqlite-to-duckdb": "Migración a DuckDB",
       "device-state-purge-all-sqlite-states": "Purgar todos los estados de SQLite",
       "device-state-purge-orphaned-duckdb-states": "Purgar estados huérfanos de DuckDB",
@@ -5247,9 +5665,31 @@
     "jobStatuses": {
       "success": "Éxito",
       "failed": "Fallo"
+    },
+    "mobile": {
+      "description": "Lo que Gladys ejecuta en segundo plano, lo más reciente primero. Consúltalo cuando algo parezca ir mal.",
+      "empty": "Todavía no hay ninguna tarea en segundo plano.",
+      "showMore": "Mostrar todo el error",
+      "showLess": "Mostrar menos"
     }
   },
   "systemSettings": {
+    "clockTitle": "Reloj",
+    "clockDescription": "Gladys utiliza el reloj de la máquina en la que se ejecuta para las escenas programadas, el historial y la energía. Aquí se compara con el reloj del dispositivo que estás usando.",
+    "clockOnTime": "El reloj de Gladys está en hora.",
+    "clockOffsetConsequences": "Las escenas programadas se ejecutan a una hora incorrecta y los estados se guardan con una fecha incorrecta.",
+    "clockMeasureError": "No se puede leer el reloj de Gladys.",
+    "clockSyncUnavailable": "Gladys no puede leer la configuración de sincronización horaria de la máquina (systemd-timedated no es accesible). Compruébala directamente en la máquina, por ejemplo con el comando \"timedatectl\".",
+    "clockSyncOk": "La máquina mantiene su reloj en hora automáticamente (sincronización horaria por red).",
+    "clockSyncOkDeviceOff": "Como la máquina está sincronizada, probablemente es el reloj del dispositivo que estás usando el que es incorrecto.",
+    "clockSyncNotSynchronized": "La sincronización horaria automática está activada, pero la máquina aún no está sincronizada. Si esto continúa, comprueba que tiene acceso a Internet (NTP, puerto UDP 123).",
+    "clockSyncEnabled": "Se ha activado la sincronización horaria automática: el reloj debería corregirse en unos minutos.",
+    "clockSyncDisabled": "La sincronización horaria automática de la máquina está desactivada: su reloj se desvía y nunca se corrige.",
+    "clockSyncEnableButton": "Activar la sincronización horaria automática",
+    "clockSyncEnableError": "No se puede activar la sincronización horaria automática.",
+    "clockSyncNoService": "No hay ningún servicio de sincronización horaria instalado en la máquina: su reloj se desvía y nunca se corrige. Instala uno (por ejemplo systemd-timesyncd).",
+    "clockRestartHint": "Una vez corregido el reloj, reinicia Gladys para que las escenas programadas se vuelvan a calcular con la hora correcta.",
+    "clockCheckAgain": "Comprobar de nuevo",
     "connected": "Conectado",
     "ping": "{{time}} ms de ping",
     "disk": "Disco",
@@ -5315,6 +5755,7 @@
     "vacuumDatabaseButton": "Iniciar limpieza de la base de datos",
     "vacuumDatabaseStarted": "La limpieza de la base de datos ha comenzado... Gladys no estará disponible hasta que finalice esta tarea.",
     "vacuumDatabaseFinished": "La limpieza de la base de datos ha finalizado. Gladys ha vuelto a estar disponible. Tiempo de limpieza: {{duration}}.",
+    "vacuumDatabaseError": "No se pudo iniciar la limpieza de la base de datos. Inténtalo de nuevo.",
     "hostPowerTitle": "Reiniciar/Apagar el host",
     "hostPowerDescription": "Reinicie o apague la máquina que aloja Gladys (por ejemplo, su Raspberry Pi). Esto utiliza systemd-logind a través de DBus: en una instalación Docker, Gladys pasa por un contenedor auxiliar de corta duración iniciado con el socket de Docker, por lo que no es necesario montar nada en el propio contenedor de Gladys. Gladys y todas sus automatizaciones se detendrán hasta que la máquina se vuelva a encender.",
     "hostRebootButton": "Reiniciar el host",
@@ -5357,7 +5798,18 @@
     "downloadLogsProgress": "Descargando {{downloaded}} de {{total}}...",
     "downloadLogsError": "No se pudieron descargar los registros. Asegúrese de que Gladys se esté ejecutando en Docker y vuelva a intentarlo.",
     "cpuTemperature": "Temperatura de la CPU",
-    "cpuTemperatureValue": "{{value}} °C"
+    "cpuTemperatureValue": "{{value}} °C",
+    "mobile": {
+      "statusTitle": "Estado",
+      "updatesTitle": "Actualizaciones",
+      "preferencesTitle": "Preferencias",
+      "maintenanceTitle": "Mantenimiento",
+      "checkForUpdatesText": "Gladys comprueba automáticamente si hay nuevas versiones.",
+      "updateTitle": "¿Actualizar Gladys?",
+      "updateText": "Gladys se reinicia durante la actualización y no está disponible durante unos minutos.",
+      "vacuumTitle": "¿Limpiar la base de datos?",
+      "vacuumText": "Gladys no estará disponible hasta que termine la limpieza. No se elimina ningún dato."
+    }
   },
   "newArea": {
     "createNewZoneButton": "Crear nueva zona",
@@ -5375,7 +5827,36 @@
     "deleteButton": "Eliminar zona",
     "createAreaError": "No se pudo crear esta zona: ¿está seguro de haber completado todos los campos y hecho clic en el mapa para seleccionar la ubicación de su zona?",
     "getAreaError": "No se pudieron obtener los datos de esta zona. Actualice esta página para volver a intentarlo.",
-    "deleteAreaError": "No se pudo eliminar esta zona. Actualice esta página y vuelva a intentarlo."
+    "deleteAreaError": "No se pudo eliminar esta zona. Actualice esta página y vuelva a intentarlo.",
+    "mobile": {
+      "backLabel": "Mapa",
+      "newTitle": "Nueva zona",
+      "nameAndColor": "Nombre y color",
+      "nameMissing": "Poner nombre a la zona",
+      "namePlaceholder": "p. ej. Trabajo",
+      "radius": "Radio",
+      "radiusUnit": "m",
+      "radiusSlider": "Radio de la zona",
+      "decreaseRadius": "Reducir el radio",
+      "increaseRadius": "Aumentar el radio",
+      "missing": {
+        "center": "Toca el mapa para colocar la zona.",
+        "radius": "Introduce el radio de la zona, de 10 m a 50 km.",
+        "name": "Dale un nombre a la zona para guardarla."
+      },
+      "gesturesHint": "Arrastra la zona para moverla y el tirador de su borde para cambiar su tamaño.",
+      "moveHandle": "Mover la zona",
+      "resizeHandle": "Cambiar el tamaño de la zona",
+      "placeAtMyPosition": "Colocar la zona en mi posición",
+      "placeAtHouse": "Colocar la zona en mi casa",
+      "placedAtPosition": "Zona colocada en tu posición.",
+      "placedAtHouse": "Zona colocada en «{{name}}».",
+      "positionDenied": "Tu posición no está disponible: permite que este sitio use tu ubicación (solo funciona con HTTPS) o toca el mapa.",
+      "positionUnavailable": "No se ha podido encontrar tu posición. Toca el mapa para colocar la zona.",
+      "saveError": "No se ha podido guardar la zona. Comprueba que ninguna otra zona tenga este nombre e inténtalo de nuevo.",
+      "deleteTitle": "¿Eliminar «{{name}}»?",
+      "deleteText": "Las escenas activadas por esta zona dejarán de ejecutarse. Esta acción no se puede deshacer."
+    }
   },
   "iconSelector": {
     "searchPlaceholder": "Buscar un icono (casa, cerradura, clima...)",
@@ -5421,7 +5902,20 @@
     "filterTagsName": "Filtrar por etiquetas",
     "unselectTags": "Deseleccionar todas las etiquetas",
     "running": "En ejecución",
-    "stopButton": "Detener"
+    "stopButton": "Detener",
+    "mobile": {
+      "newSceneTitle": "Nueva escena",
+      "newScenePlaceholder": "p. ej. Buenas noches",
+      "createError": "No se pudo crear la escena. Inténtalo de nuevo.",
+      "iconGuessed": "Icono elegido a partir del nombre, se puede cambiar después.",
+      "createAndChooseTrigger": "Crear y elegir un disparador",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "disabled": "Desactivada",
+      "runScene": "Ejecutar «{{name}}»",
+      "allTags": "Todas",
+      "swipeHint": "Consejo: desliza una escena a la izquierda para desactivarla o duplicarla."
+    }
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -5751,6 +6245,19 @@
       "noSuccessYet": "Ninguna copia de seguridad ha tenido éxito todavía en esta instancia.",
       "lastError": "Último error: {{error}}",
       "retry": "Gladys lo reintenta cada noche y unos minutos después de cada inicio. Los administradores reciben un aviso en la conversación a partir de la segunda noche fallida, luego una vez por semana mientras siga fallando; una vez avisados, se les informa en cuanto una copia vuelve a funcionar. Detalles en la pestaña \"Tareas\"."
+    },
+    "mobile": {
+      "backupError": "No se pudo iniciar la copia de seguridad. Inténtalo de nuevo.",
+      "loadError": "No se pudieron cargar las copias de seguridad. Inténtalo de nuevo.",
+      "backupsTitle": {
+        "one": "1 copia de seguridad",
+        "other": "{{count}} copias de seguridad"
+      },
+      "restoreHint": "Toca una copia de seguridad para restaurarla.",
+      "empty": "Todavía no hay ninguna copia de seguridad. Gladys crea una cada 24 horas.",
+      "restoreTitle": "¿Restaurar esta copia de seguridad?",
+      "restoreText": "Gladys volverá a su estado del {{date}} y se reiniciará. Todo lo que haya cambiado desde entonces se perderá.",
+      "restoreError": "No se pudo iniciar la restauración. Inténtalo de nuevo."
     }
   },
   "alarmModes": {
@@ -7414,7 +7921,55 @@
       }
     }
   },
+  "clock": {
+    "ahead": {
+      "seconds": {
+        "one": "El reloj de Gladys va 1 segundo adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} segundos adelantado respecto a este dispositivo."
+      },
+      "minutes": {
+        "one": "El reloj de Gladys va 1 minuto adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} minutos adelantado respecto a este dispositivo."
+      },
+      "hours": {
+        "one": "El reloj de Gladys va 1 hora adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} horas adelantado respecto a este dispositivo."
+      },
+      "days": {
+        "one": "El reloj de Gladys va 1 día adelantado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} días adelantado respecto a este dispositivo."
+      }
+    },
+    "behind": {
+      "seconds": {
+        "one": "El reloj de Gladys va 1 segundo atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} segundos atrasado respecto a este dispositivo."
+      },
+      "minutes": {
+        "one": "El reloj de Gladys va 1 minuto atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} minutos atrasado respecto a este dispositivo."
+      },
+      "hours": {
+        "one": "El reloj de Gladys va 1 hora atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} horas atrasado respecto a este dispositivo."
+      },
+      "days": {
+        "one": "El reloj de Gladys va 1 día atrasado respecto a este dispositivo.",
+        "other": "El reloj de Gladys va {{count}} días atrasado respecto a este dispositivo."
+      }
+    }
+  },
+  "feedback": {
+    "link": "Dar mi opinión",
+    "subjectTopicTitle": "Mi opinión sobre la integración {{subject}}",
+    "generalTopicTitle": "Mi opinión sobre Gladys",
+    "topicBody": "**Lo que funciona bien:**\n\n\n**Lo que se podría mejorar:**\n\n\n---\n_Enviado desde Gladys v{{version}}_"
+  },
   "header": {
+    "clockNoticeTitle": "La hora de Gladys es incorrecta",
+    "clockNoticeText": "Las escenas programadas, el historial y la energía pueden ser incorrectos.",
+    "clockNoticeButton": "Comprobar el reloj",
+    "clockNoticeContactAdmin": "Avisa al administrador de tu casa.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Inicio",
     "chat": "Chat",
@@ -7443,6 +7998,10 @@
     "instanceUpdateNoticeButton": "Actualizar mi instancia",
     "instanceUpdateNoticeDismiss": "Ocultar este mensaje",
     "needHelp": "¿Necesita ayuda?",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú",
+    "collapseMenu": "Ocultar el menú",
+    "expandMenu": "Mostrar el menú",
     "signOut": "Cerrar sesión"
   },
   "gatewayLinkUser": {
@@ -7509,6 +8068,19 @@
     "saveError": "Error al guardar o eliminar el dispositivo",
     "saveConflictError": "Conflicto: ¿está seguro de que todos los ID externos de las funciones del dispositivo son únicos?",
     "notFound": "No se encontró el dispositivo solicitado.",
+    "mobile": {
+      "noRoom": "Ninguna habitación",
+      "featuresTitle": {
+        "zero": "Funciones",
+        "one": "1 función",
+        "other": "{{count}} funciones"
+      },
+      "featuresHint": "Toca una función para cambiarle el nombre, cambiar su unidad o elegir si se conserva su historial. La duración de conservación se configura en la página <a href=\"/dashboard/settings/system\">Sistema</a>.",
+      "historyKept": "Historial conservado",
+      "historyNotKept": "Historial no conservado",
+      "keepHistory": "Conservar el historial",
+      "featureType": "Tipo de función"
+    },
     "pollFrequency": {
       "label": "Frecuencia de actualización",
       "everyMinutes": "Cada minuto",
@@ -7597,7 +8169,31 @@
     "registered": "Registrada",
     "keyNameLabel": "Nombre:",
     "registeredLabel": "Registrada:",
-    "neverUsed": "Nunca"
+    "neverUsed": "Nunca",
+    "mobile": {
+      "createButton": "Crear una clave de API",
+      "createTitle": "Nueva clave de API",
+      "keyTitle": "Tu clave de API",
+      "namePlaceholder": "p. ej. Atajo del teléfono",
+      "nameHelp": "Un nombre para reconocer qué usa esta clave.",
+      "nameRequired": "Ponle un nombre a la clave.",
+      "createError": "No se pudo crear la clave. Inténtalo de nuevo.",
+      "copy": "Copiar la clave",
+      "copied": "Clave copiada",
+      "selected": "Clave seleccionada: cópiala",
+      "keysTitle": {
+        "one": "1 clave",
+        "other": "{{count}} claves"
+      },
+      "empty": "Todavía no hay ninguna clave de API.",
+      "created": "Creada el {{date}}",
+      "lastUsed": "Último uso el {{date}}",
+      "neverUsed": "Nunca usada",
+      "revokeTitle": "¿Revocar esta clave?",
+      "revokeText": "«{{name}}» dejará de funcionar de inmediato: lo que la use ya no podrá acceder a Gladys.",
+      "revokeError": "No se pudo revocar la clave. Inténtalo de nuevo.",
+      "revoked": "Clave revocada"
+    }
   },
   "twoFactorApps": {
     "description": "Cualquier aplicación que genere códigos de 6 dígitos funciona. Si todavía no tiene una, aquí tiene algunas aplicaciones gratuitas y sencillas de instalar:"
@@ -7655,5 +8251,35 @@
     "closed": "Cerrado",
     "on": "Encendido",
     "off": "Apagado"
+  },
+  "deviceFeaturePicker": {
+    "cancel": "Cancelar",
+    "searchPlaceholder": "Habitación, dispositivo, medida…",
+    "searchLabel": "Buscar un dispositivo",
+    "clearSearch": "Borrar la búsqueda",
+    "allRooms": "Todas",
+    "selectedFilter": "Seleccionados",
+    "roomsLabel": "Filtrar por habitación",
+    "noResult": "Ningún dispositivo coincide con «{{search}}».",
+    "noSelection": "Todavía no hay ningún dispositivo seleccionado.",
+    "noDevice": "Todavía no hay dispositivos: primero agrega tus dispositivos desde una integración.",
+    "selectedCount": {
+      "one": "1 seleccionado",
+      "other": "{{count}} seleccionados"
+    },
+    "validate": "Listo",
+    "title": "Elegir",
+    "sameKindHint": "Solo se muestran los dispositivos del mismo tipo: comparten una única condición."
+  },
+  "devicePickerField": {
+    "title": "Elegir dispositivos",
+    "choose": "Elegir dispositivos",
+    "edit": "Añadir o quitar dispositivos",
+    "titleOne": "Elegir un dispositivo",
+    "chooseOne": "Elegir un dispositivo",
+    "changeOne": "Cambiar de dispositivo",
+    "empty": "Ningún dispositivo seleccionado.",
+    "remove": "Quitar {{name}}",
+    "notFound": "Dispositivo no encontrado"
   }
 }

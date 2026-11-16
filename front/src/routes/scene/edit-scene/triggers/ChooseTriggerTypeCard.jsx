@@ -54,6 +54,8 @@ class ChooseTriggerType extends Component {
             descriptionPrefix="editScene.triggersDescriptions"
             categoryPrefix="editScene.triggerCategories"
             searchPlaceholderId="editScene.searchTriggersPlaceholder"
+            autoFocusSearch={props.autoFocusSearch}
+            fill={props.fill}
             onSelect={this.selectTriggerType}
           />
         </div>

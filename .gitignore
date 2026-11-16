@@ -29,4 +29,5 @@ size-plugin.json
 .tmp
 .DS_Store
 matter-controller-data
-/server/matter-bridge/
+# Development data of the server (database, backups, Matter storage...): see server/config/config.js
+/server/gladys-data/

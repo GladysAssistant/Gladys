@@ -1,6 +1,7 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { convertFeature } = require('../utils/convertFeature');
+const { formatDuration } = require('../utils/formatDuration');
+const { INSTALLATION_STATE } = require('./constants');
 
 // Zigbee2mqtt answers bridge/request/health_check since 1.21
 const HEALTH_CHECK_MIN_MAJOR = 1;
@@ -35,6 +36,10 @@ async function handleMqttMessage(topic, message) {
     case 'zigbee2mqtt/bridge/response/health_check': {
       // Only Zigbee2mqtt answers on this topic: any answer, even an error, proves that it runs and listens
       logger.debug('Zigbee2mqtt answered the health check');
+      if (this.zigbee2mqttStarting) {
+        const answeredIn = formatDuration(Date.now() - this.zigbee2mqttStartingSince);
+        logger.info(`Zigbee2mqtt answered ${answeredIn} after the restart of its container`);
+      }
       clearTimeout(this.healthCheckTimer);
       this.healthCheckTimer = null;
       this.zigbee2mqttConnected = true;
@@ -47,6 +52,11 @@ async function handleMqttMessage(topic, message) {
       // An error read in the logs of the container did not prevent Zigbee2mqtt from running
       this.z2mContainerError = null;
       this.emitStatusEvent();
+      // Nor did the failure of the last installation, which no longer describes Zigbee2mqtt: the setup page stops
+      // showing it. A running installation ends on this answer (see waitForZigbee2mqtt).
+      if (this.installation.state === INSTALLATION_STATE.FAILED) {
+        this.clearInstallation();
+      }
       break;
     }
     case 'zigbee2mqtt/bridge/devices': {
@@ -63,6 +73,14 @@ async function handleMqttMessage(topic, message) {
         .forEach((device) => {
           this.discoveredDevices[device.friendly_name] = device;
         });
+
+      // Forget the last values of the devices that left the network
+      const discoveredAddresses = Object.values(this.discoveredDevices).map((d) => d.ieee_address);
+      Object.keys(this.lastReceivedStates).forEach((ieeeAddress) => {
+        if (!discoveredAddresses.includes(ieeeAddress)) {
+          delete this.lastReceivedStates[ieeeAddress];
+        }
+      });
 
       // Re-attach Gladys devices renamed in Zigbee2mqtt (matched by IEEE address)
       // before publishing the discovered devices, so they merge with the right device.
@@ -150,30 +168,37 @@ async function handleMqttMessage(topic, message) {
       }
       // Fetch device from name
       const device = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${deviceName}`);
-      if (device) {
-        const incomingFeatures = JSON.parse(message);
-        Object.keys(incomingFeatures).forEach((zigbeeFeatureField) => {
-          // Find the feature regarding the field name
-          const value = incomingFeatures[zigbeeFeatureField];
-          const feature = convertFeature(device.features, zigbeeFeatureField, value);
-          if (feature) {
-            try {
-              const newState = {
-                device_feature_external_id: `${feature.external_id}`,
-                state: this.readValue(deviceName, zigbeeFeatureField, value),
-              };
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
-            } catch (e) {
-              logger.error(`Failed to convert value for device ${deviceName}:`, e);
-            }
-          } else {
-            logger.debug(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
-          }
-        });
-      } else if (this.discoveredDevices[deviceName]) {
-        logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
-      } else {
+      const discoveredDevice = this.discoveredDevices[deviceName];
+      if (!device && !discoveredDevice) {
         logger.debug(`Zigbee2mqtt topic ${topic} not handled.`);
+        break;
+      }
+      let incomingFeatures;
+      try {
+        incomingFeatures = JSON.parse(message);
+      } catch (e) {
+        incomingFeatures = null;
+      }
+      // A device state is a JSON object of its properties
+      if (incomingFeatures === null || typeof incomingFeatures !== 'object' || Array.isArray(incomingFeatures)) {
+        logger.warn(`Zigbee2mqtt device ${deviceName} sent a message that is not a state: ${message}`);
+        break;
+      }
+      if (device) {
+        Object.keys(incomingFeatures).forEach((property) => {
+          this.emitDeviceState(device, deviceName, property, incomingFeatures[property]);
+        });
+      } else {
+        // Keep the last value of each property, replayed when the device is created in Gladys (see postCreate):
+        // the device may not report again for hours. By IEEE address, which survives a rename and changes when
+        // another device takes the name.
+        const receivedAt = new Date().toISOString();
+        const lastStates = this.lastReceivedStates[discoveredDevice.ieee_address] || {};
+        Object.keys(incomingFeatures).forEach((property) => {
+          lastStates[property] = { value: incomingFeatures[property], receivedAt };
+        });
+        this.lastReceivedStates[discoveredDevice.ieee_address] = lastStates;
+        logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
       }
     }
   }

@@ -5,7 +5,11 @@ const { fake, assert } = sinon;
 
 const { Error429 } = require('../../../utils/httpErrors');
 const { USER_ROLE, AI_CHAT_PURPOSES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
-const { sendWeeklyDigest, extractAssistantText } = require('../../../lib/gateway/gateway.sendWeeklyDigest');
+const {
+  sendWeeklyDigest,
+  extractAssistantText,
+  getDecimalSeparator,
+} = require('../../../lib/gateway/gateway.sendWeeklyDigest');
 
 describe('gateway.sendWeeklyDigest', () => {
   let gateway;
@@ -124,6 +128,27 @@ describe('gateway.sendWeeklyDigest', () => {
     });
   });
 
+  it('should tell the AI the decimal separator of each admin language', async () => {
+    // the digest data is JSON, where numbers always use a period: a French
+    // admin must read 111,34 kWh, an English one 111.34 kWh
+    gateway.user.getByRole = fake.resolves([
+      { id: 'user-1', selector: 'tony', language: 'fr' },
+      { id: 'user-2', selector: 'john', language: 'en' },
+    ]);
+
+    const result = await sendWeeklyDigest.call(gateway);
+
+    expect(result).to.deep.equal({ sent: 2 });
+    const frenchRequest = gateway.aiChat.getCall(0).args[0].messages[1].content;
+    const englishRequest = gateway.aiChat.getCall(1).args[0].messages[1].content;
+    expect(frenchRequest).to.equal(
+      'Language: fr\nDecimal separator: ","\n\nHome data JSON:\n{"summary":{"device_count":2}}',
+    );
+    expect(englishRequest).to.equal(
+      'Language: en\nDecimal separator: "."\n\nHome data JSON:\n{"summary":{"device_count":2}}',
+    );
+  });
+
   it('should force send when requested', async () => {
     gateway.variable.getValue = fake.resolves('0');
 
@@ -193,6 +218,22 @@ describe('gateway.sendWeeklyDigest', () => {
     assert.calledOnceWithExactly(gateway.message.sendSystemMessage, 'pierre', 'Digest OK', null, {
       messageType: 'notification',
     });
+  });
+});
+
+describe('getDecimalSeparator', () => {
+  it('should return a comma for French, Spanish and German', () => {
+    expect(getDecimalSeparator('fr')).to.equal(',');
+    expect(getDecimalSeparator('es')).to.equal(',');
+    expect(getDecimalSeparator('de')).to.equal(',');
+  });
+
+  it('should return a period for English', () => {
+    expect(getDecimalSeparator('en')).to.equal('.');
+  });
+
+  it('should fall back on a period when the language is invalid', () => {
+    expect(getDecimalSeparator('')).to.equal('.');
   });
 });
 

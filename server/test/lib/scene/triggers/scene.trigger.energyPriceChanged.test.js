@@ -51,7 +51,7 @@ describe('Scene.triggers.energyPriceChanged', () => {
     sinon.reset();
   });
 
-  it('should execute the scene when the price of the selected contract changes', async () => {
+  it('should execute the scene when the price of the selected meter changes', async () => {
     await sceneManager.addScene({
       selector: 'energy-price-scene',
       active: true,
@@ -66,13 +66,15 @@ describe('Scene.triggers.energyPriceChanged', () => {
       triggers: [
         {
           type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED,
-          energy_contract: 'edf-tempo',
+          electric_meter: 'linky',
         },
       ],
     });
     sceneManager.checkTrigger({
       type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED,
+      electric_meter: 'linky',
       contract: 'edf-tempo',
+      meter_contracts: ['edf-tempo'],
       price: 0.7562,
       previous_price: 0.1568,
       label: 'Red peak',
@@ -91,24 +93,40 @@ describe('Scene.triggers.energyPriceChanged', () => {
     });
   });
 
-  it('should match any contract when the trigger has no contract selector, and only the selected one otherwise', () => {
+  it('should match any meter when the trigger has no meter, and only the selected meter otherwise', () => {
     const match = triggersFunc[EVENTS.ENERGY_CONTRACT.PRICE_CHANGED];
-    const priceEvent = { type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, contract: 'edf-tempo', price: 0.2 };
-    expect(match(sceneManager, 'scene', priceEvent, { type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED })).to.equal(true);
+    const type = EVENTS.ENERGY_CONTRACT.PRICE_CHANGED;
+    const priceEvent = {
+      type,
+      electric_meter: 'linky',
+      contract: 'edf-tempo-2026',
+      meter_contracts: ['edf-tempo-2026', 'edf-tempo-2025'],
+      price: 0.2,
+    };
+    expect(match(sceneManager, 'scene', priceEvent, { type })).to.equal(true);
+    expect(match(sceneManager, 'scene', priceEvent, { type, electric_meter: '' })).to.equal(true);
+    expect(match(sceneManager, 'scene', priceEvent, { type, electric_meter: 'linky' })).to.equal(true);
+    expect(match(sceneManager, 'scene', priceEvent, { type, electric_meter: 'solar-meter' })).to.equal(false);
+    // the meter wins over a contract selector left by an older save
     expect(
-      match(sceneManager, 'scene', priceEvent, { type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, energy_contract: '' }),
+      match(sceneManager, 'scene', priceEvent, { type, electric_meter: 'linky', energy_contract: 'other-contract' }),
     ).to.equal(true);
-    expect(
-      match(sceneManager, 'scene', priceEvent, {
-        type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED,
-        energy_contract: 'edf-tempo',
-      }),
-    ).to.equal(true);
-    expect(
-      match(sceneManager, 'scene', priceEvent, {
-        type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED,
-        energy_contract: 'other-contract',
-      }),
-    ).to.equal(false);
+  });
+
+  it('should read the contract selector of a trigger saved before the meter targeting as the meter of that contract', () => {
+    const match = triggersFunc[EVENTS.ENERGY_CONTRACT.PRICE_CHANGED];
+    const type = EVENTS.ENERGY_CONTRACT.PRICE_CHANGED;
+    // the trigger names the expired contract; its successor on the same meter is active
+    const priceEvent = {
+      type,
+      electric_meter: 'linky',
+      contract: 'edf-tempo-2026',
+      meter_contracts: ['edf-tempo-2026', 'edf-tempo-2025'],
+      price: 0.2,
+    };
+    expect(match(sceneManager, 'scene', priceEvent, { type, energy_contract: '' })).to.equal(true);
+    expect(match(sceneManager, 'scene', priceEvent, { type, energy_contract: 'edf-tempo-2025' })).to.equal(true);
+    expect(match(sceneManager, 'scene', priceEvent, { type, energy_contract: 'edf-tempo-2026' })).to.equal(true);
+    expect(match(sceneManager, 'scene', priceEvent, { type, energy_contract: 'other-meter-contract' })).to.equal(false);
   });
 });

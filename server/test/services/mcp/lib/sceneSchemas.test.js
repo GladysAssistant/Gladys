@@ -354,6 +354,70 @@ describe('sceneSchemas device.new-state trigger', () => {
   });
 });
 
+describe('sceneSchemas condition.only-continue-if conditions', () => {
+  // deviceFeatureSelectors is the 7th argument of the factory
+  const schema = createSceneCreateInputSchema([], [], [], [], [], [], ['mqtt-temperature', 'mqtt-humidity']);
+  const parseCondition = (condition) =>
+    schema.safeParse({
+      name: 'My scene',
+      icon: 'bell',
+      triggers: [{ type: EVENTS.SYSTEM.START }],
+      actions: [[{ type: ACTIONS.CONDITION.ONLY_CONTINUE_IF, conditions: [condition] }]],
+    });
+
+  it('should accept a condition on a variable', () => {
+    expect(parseCondition({ variable: '0.0.last_value', operator: '>', value: 20 }).success).to.equal(true);
+  });
+
+  it('should accept a condition on the current state of a device feature', () => {
+    expect(parseCondition({ device_feature: 'mqtt-temperature', operator: '>', value: 20 }).success).to.equal(true);
+    expect(
+      parseCondition({ device_feature: 'mqtt-temperature', operator: '>', evaluate_value: '{{0.0.last_value}} + 2' })
+        .success,
+    ).to.equal(true);
+  });
+
+  it('should reject a condition on a device feature that does not exist', () => {
+    expect(parseCondition({ device_feature: 'unknown-feature', operator: '>', value: 20 }).success).to.equal(false);
+    expect(parseCondition({ device_feature: '', operator: '>', value: 20 }).success).to.equal(false);
+  });
+
+  it('should reject a condition with neither a variable nor a device feature', () => {
+    expect(parseCondition({ operator: '>', value: 20 }).success).to.equal(false);
+  });
+
+  it('should reject a condition with both a variable and a device feature', () => {
+    expect(
+      parseCondition({ variable: '0.0.last_value', device_feature: 'mqtt-temperature', operator: '>', value: 20 })
+        .success,
+    ).to.equal(false);
+  });
+
+  it('should accept the condition inside the "if" list of a block', () => {
+    const result = schema.safeParse({
+      name: 'My scene',
+      icon: 'bell',
+      triggers: [{ type: EVENTS.SYSTEM.START }],
+      actions: [
+        [
+          {
+            type: ACTIONS.CONDITION.IF_THEN_ELSE,
+            if: [
+              {
+                type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+                conditions: [{ device_feature: 'mqtt-humidity', operator: '<', value: 40 }],
+              },
+            ],
+            then: [[{ type: ACTIONS.TIME.DELAY, unit: 'seconds', value: 1 }]],
+            else: [],
+          },
+        ],
+      ],
+    });
+    expect(result.success).to.equal(true);
+  });
+});
+
 describe('createSceneCreateInputSchema selectors', () => {
   it('should leave empty and duplicated selectors out of the enums', () => {
     const schema = createSceneCreateInputSchema([], [], [], [], ['switch-a', '', 'switch-b', 'switch-a', null]);
@@ -377,6 +441,40 @@ describe('createSceneCreateInputSchema selectors', () => {
         actions: [[{ type: 'switch.turn-on', devices: [''] }]],
       }).success,
     ).to.equal(false);
+  });
+
+  it('should accept the switch features picked one by one in a switch action', () => {
+    const schema = createSceneCreateInputSchema(
+      [],
+      [],
+      [],
+      [],
+      ['power-strip'],
+      [],
+      ['socket-1', 'socket-2', 'power-strip-sensor'],
+      [],
+      [],
+      [],
+      [],
+      ['socket-1', 'socket-2'],
+    );
+    const sceneWithSwitchFeatures = (deviceFeatures) => ({
+      name: 'My scene',
+      icon: 'lightbulb',
+      triggers: [{ type: 'system.start' }],
+      actions: [
+        [
+          { type: 'switch.turn-on', devices: [], device_features: deviceFeatures },
+          { type: 'switch.turn-off', devices: [], device_features: deviceFeatures },
+          { type: 'switch.toggle', devices: [], device_features: deviceFeatures },
+        ],
+      ],
+    });
+
+    const result = schema.safeParse(sceneWithSwitchFeatures(['socket-2']));
+    expect(result.success).to.equal(true);
+    expect(result.data.actions[0][0].device_features).to.deep.equal(['socket-2']);
+    expect(schema.safeParse(sceneWithSwitchFeatures(['power-strip-sensor'])).success).to.equal(false);
   });
 
   it('should accept any selector when all the known selectors are empty', () => {

@@ -23,7 +23,10 @@ function status() {
     networkModeValid: this.networkModeValid,
     coordinatorFirmware: this.coordinatorFirmware,
     z2mContainerError: this.z2mContainerError,
+    ezspFallback: this.ezspFallback,
     mqttConnectionError: this.mqttConnectionError,
+    installation: this.installation,
+    prefetch: this.prefetch,
   };
   return zigbee2mqttStatus;
 }

@@ -1,4 +1,7 @@
 import Select from '../../../../components/form/Select';
+import DayPills from '../../../../components/scene/DayPills';
+import PhoneNativeField from '../../../../components/scene/PhoneNativeField';
+import { isMobileViewport } from '../../../../utils/mobileViewport';
 import { Component } from 'preact';
 import DatePicker from 'react-datepicker';
 import { connect } from 'unistore/preact';
@@ -24,6 +27,16 @@ class CheckTime extends Component {
   handleBeforeAfterChange = time => {
     const timeFormatted = time ? format(time, 'HH:mm') : undefined;
     this.props.updateActionProperty(this.props.path, 'after', timeFormatted);
+  };
+  // the native fields of a phone give the stored format directly; an emptied one clears the bound
+  setAfter = time => {
+    this.props.updateActionProperty(this.props.path, 'after', time);
+  };
+  setBefore = time => {
+    this.props.updateActionProperty(this.props.path, 'before', time);
+  };
+  setDaysOfTheWeek = days => {
+    this.props.updateActionProperty(this.props.path, 'days_of_the_week', days.length > 0 ? days : undefined);
   };
   handleDayOfTheWeekChange = options => {
     const values = options ? options.map(option => option.value) : undefined;
@@ -62,24 +75,26 @@ class CheckTime extends Component {
               <div class="form-label">
                 <Text id="editScene.actionsCard.checkTime.afterLabel" />
               </div>
-              <Localizer>
-                <DatePicker
-                  selected={after}
-                  className="form-control"
-                  popperClassName={datePickerStyle.datePickerPopper}
-                  portalId="scene-editor-datepicker"
-                  clearButtonClassName={style.clearButtonCustom}
-                  locale={localeSet}
-                  onChange={this.handleBeforeAfterChange}
-                  placeholderText={<Text id="editScene.actionsCard.checkTime.afterLabel" />}
-                  showTimeSelect
-                  showTimeSelectOnly
-                  isClearable
-                  timeIntervals={5}
-                  timeCaption={<Text id="editScene.actionsCard.checkTime.afterLabel" />}
-                  dateFormat="HH:mm"
-                />
-              </Localizer>
+              <PhoneNativeField type="time" value={this.props.action.after} onChange={this.setAfter} clearable>
+                <Localizer>
+                  <DatePicker
+                    selected={after}
+                    className="form-control"
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="scene-editor-datepicker"
+                    clearButtonClassName={style.clearButtonCustom}
+                    locale={localeSet}
+                    onChange={this.handleBeforeAfterChange}
+                    placeholderText={<Text id="editScene.actionsCard.checkTime.afterLabel" />}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    isClearable
+                    timeIntervals={5}
+                    timeCaption={<Text id="editScene.actionsCard.checkTime.afterLabel" />}
+                    dateFormat="HH:mm"
+                  />
+                </Localizer>
+              </PhoneNativeField>
             </div>
           </div>
           <div class="col">
@@ -87,24 +102,26 @@ class CheckTime extends Component {
               <div class="form-label">
                 <Text id="editScene.actionsCard.checkTime.beforeLabel" />
               </div>
-              <Localizer>
-                <DatePicker
-                  selected={before}
-                  className="form-control"
-                  popperClassName={datePickerStyle.datePickerPopper}
-                  portalId="scene-editor-datepicker"
-                  clearButtonClassName={style.clearButtonCustom}
-                  locale={localeSet}
-                  onChange={this.handleBeforeTimeChange}
-                  placeholderText={<Text id="editScene.actionsCard.checkTime.beforeLabel" />}
-                  showTimeSelect
-                  showTimeSelectOnly
-                  isClearable
-                  timeIntervals={5}
-                  timeCaption={<Text id="editScene.actionsCard.checkTime.beforeLabel" />}
-                  dateFormat="HH:mm"
-                />
-              </Localizer>
+              <PhoneNativeField type="time" value={this.props.action.before} onChange={this.setBefore} clearable>
+                <Localizer>
+                  <DatePicker
+                    selected={before}
+                    className="form-control"
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="scene-editor-datepicker"
+                    clearButtonClassName={style.clearButtonCustom}
+                    locale={localeSet}
+                    onChange={this.handleBeforeTimeChange}
+                    placeholderText={<Text id="editScene.actionsCard.checkTime.beforeLabel" />}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    isClearable
+                    timeIntervals={5}
+                    timeCaption={<Text id="editScene.actionsCard.checkTime.beforeLabel" />}
+                    dateFormat="HH:mm"
+                  />
+                </Localizer>
+              </PhoneNativeField>
             </div>
           </div>
         </div>
@@ -112,15 +129,19 @@ class CheckTime extends Component {
           <div class="form-label">
             <Text id="editScene.actionsCard.checkTime.daysOfTheWeekLabel" />
           </div>
-          <Select
-            defaultValue={[]}
-            isMulti
-            value={selectedWeekDaysOptions}
-            onChange={this.handleDayOfTheWeekChange}
-            options={daysOfTheWeekOptions}
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+          {isMobileViewport() ? (
+            <DayPills value={this.props.action.days_of_the_week} onChange={this.setDaysOfTheWeek} language={language} />
+          ) : (
+            <Select
+              defaultValue={[]}
+              isMulti
+              value={selectedWeekDaysOptions}
+              onChange={this.handleDayOfTheWeekChange}
+              options={daysOfTheWeekOptions}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          )}
         </div>
       </div>
     );

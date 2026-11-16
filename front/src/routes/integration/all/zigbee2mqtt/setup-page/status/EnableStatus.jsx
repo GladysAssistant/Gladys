@@ -65,6 +65,11 @@ class EnableStatus extends Component {
               <Text id="integration.zigbee2mqtt.setup.toggleError" />
             </div>
           )}
+          {toggleZigee2mqttStatus === RequestStatus.ConflictError && (
+            <div class="alert alert-warning my-3" data-cy="z2m-toggle-conflict">
+              <Text id="integration.zigbee2mqtt.setup.installation.busy" />
+            </div>
+          )}
         </div>
       </Fragment>
     );

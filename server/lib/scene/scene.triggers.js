@@ -251,10 +251,18 @@ const triggersFunc = {
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
-  // energy contract price change (spec 8.2): a trigger without a contract selector
-  // matches every contract, one with a selector only that contract
-  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: (self, sceneSelector, event, trigger) =>
-    !trigger.energy_contract || event.contract === trigger.energy_contract,
+  // energy price change of a meter (spec 8.2): a trigger with a meter matches that meter; one
+  // saved before the meter targeting names a contract and is read as the meter of that contract,
+  // whichever of its contracts is active now; a trigger with neither matches every meter
+  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: (self, sceneSelector, event, trigger) => {
+    if (trigger.electric_meter) {
+      return event.electric_meter === trigger.electric_meter;
+    }
+    if (trigger.energy_contract) {
+      return event.meter_contracts.includes(trigger.energy_contract);
+    }
+    return true;
+  },
   [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: matchExternalIntegrationSceneEvent,
 };
 

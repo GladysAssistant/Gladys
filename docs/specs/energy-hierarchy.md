@@ -173,9 +173,17 @@ the new parent would close a cycle (as before).
 - no contract at all: a message pointing to the contracts tab;
 - the free parent selects, the circular dependency banner and the "Fix" button are removed.
 
+On a phone (below 768 px, or a phone in landscape) the same hierarchy is shown as rows — one
+group per meter, then the unattached devices — and the "Meter" select becomes a sheet listing
+the electric meters, opened by a tap on the device; it sends the same request (`D.1`). That
+presentation is owned by [`mobile-pages/energy.md`](mobile-pages/energy.md), section B.
+
 ## F. Integrations
 
 - Zigbee2mqtt, Tasmota, MQTT, Enedis and the external integrations keep their derivation.
+- **Zigbee2mqtt** also derives the 30-minute production of every production index
+  (`addProductionFeatures`, `<index>_production`, filled by the production job), never attached to
+  a meter, and keeps it on rediscovery.
 - **Matter** derives the energy features of a published cumulative index at discovery (the
   paired devices of `GET /api/v1/service/matter/paired-device`), like Zigbee2mqtt: the features
   already in Gladys keep their id and their parent — **a root included**: `addEnergyFeatures`
@@ -208,4 +216,6 @@ the new parent would close a cycle (as before).
   uniqueness, nothing written on a sound hierarchy.
 - Matter: derived features added, ids and parents of existing features kept, derived features
   re-injected, no bogus selector.
-- Front: Cypress spec of the page (meters, unattached devices, meter select).
+- Zigbee2mqtt: the production features derived and kept on rediscovery.
+- Front: Cypress spec of the page (meters, unattached devices, meter select), and of its phone
+  presentation (the meter chosen in a sheet, `ContractsMobile.cy.js`).

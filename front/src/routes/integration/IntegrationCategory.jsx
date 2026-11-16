@@ -100,6 +100,20 @@ const FavoriteButton = ({ integration, toggleFavorite }) => {
   );
 };
 
+// the installed and offered versions of the update footer. The latest version
+// is unknown until the store index has been read: the button alone still says
+// there is something to install
+const UpdateVersions = ({ integration }) => (
+  <span class="flex-fill text-muted small">
+    {integration.version && integration.latestVersion && (
+      <span>
+        v{integration.version} <i class="fe fe-arrow-right" />{' '}
+        <strong class="text-body">v{integration.latestVersion}</strong>
+      </span>
+    )}
+  </span>
+);
+
 // the update is started from the card itself: going to the Supervision tab of
 // each integration, one after the other, was the only way before. The footer
 // stays after the update to say how it went — the card would otherwise just
@@ -108,39 +122,74 @@ const FavoriteButton = ({ integration, toggleFavorite }) => {
 // across a row of cards whatever the length of their description
 const UpdateFooter = ({ integration, updateIntegration, bordered }) => {
   const { updateState } = integration;
-  if (!updateIntegration || !integration.selector || !(integration.updateAvailable || updateState)) {
+  if (
+    !updateIntegration ||
+    !integration.selector ||
+    !(integration.updateAvailable || updateState || integration.requiredGladysVersion)
+  ) {
     return null;
   }
-  // only a version newer than the one just installed brings the button back:
-  // a list that could not be reloaded still carries the flag of the update
-  // that just ran
+  const footerClass = bordered ? 'mt-auto pt-3' : `mt-2 ${style.integrationListUpdate}`;
+  if (!integration.updateAvailable && !updateState) {
+    // a newer version this Gladys cannot run (its gladys_version): not an
+    // update to click, the admin updates Gladys first. Offered, the button
+    // re-pulled the running image and reported a success
+    return (
+      <div class={footerClass}>
+        <div class={cx({ 'border-top pt-3': bordered })}>
+          <div class="d-flex align-items-center">
+            <UpdateVersions integration={integration} />
+          </div>
+          <div class="text-warning small mt-2">
+            <i class="fe fe-alert-triangle mr-1" />
+            <Text
+              id="integration.root.updateRequiresGladys"
+              fields={{ gladysVersion: integration.requiredGladysVersion }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // the version the last update could not apply, and why (skipped_update of
+  // the update response): the update went through, but not to that version
+  const skipped = updateState && updateState.status === RequestStatus.Success ? updateState.skipped : null;
+  // only a version newer than the one just installed — and than the one it
+  // just could not apply — brings the button back: a list that could not be
+  // reloaded still carries the flag of the update that just ran
   const newerVersionOffered =
     integration.updateAvailable &&
     !!integration.latestVersion &&
-    integration.latestVersion !== (updateState || {}).version;
+    integration.latestVersion !== (updateState || {}).version &&
+    integration.latestVersion !== (skipped || {}).version;
   const succeeded = !!updateState && updateState.status === RequestStatus.Success && !newerVersionOffered;
   const updating = !!updateState && updateState.status === RequestStatus.Getting;
   const failed = !!updateState && updateState.status === RequestStatus.Error;
   return (
-    <div class={bordered ? 'mt-auto pt-3' : `mt-2 ${style.integrationListUpdate}`}>
+    <div class={footerClass}>
       <div class={cx({ 'border-top pt-3': bordered })}>
-        {succeeded ? (
+        {succeeded && skipped && (
+          <div class="text-warning small">
+            <i class="fe fe-alert-triangle mr-1" />
+            <Text
+              id={`integration.root.updateSkipped.${skipped.reason}`}
+              fields={{
+                skippedVersion: skipped.version,
+                gladysVersion: skipped.gladys_version,
+                version: updateState.version
+              }}
+            />
+          </div>
+        )}
+        {succeeded && !skipped && (
           <div class="text-success small">
             <i class="fe fe-check-circle mr-1" />
             <Text id="integration.root.updatedTo" fields={{ version: updateState.version }} />
           </div>
-        ) : (
+        )}
+        {!succeeded && (
           <div class="d-flex align-items-center">
-            {/* the latest version is unknown until the store index has been
-                read: the button alone still says there is something to install */}
-            <span class="flex-fill text-muted small">
-              {integration.version && integration.latestVersion && (
-                <span>
-                  v{integration.version} <i class="fe fe-arrow-right" />{' '}
-                  <strong class="text-body">v{integration.latestVersion}</strong>
-                </span>
-              )}
-            </span>
+            <UpdateVersions integration={integration} />
             {/* flex: the theme sizes a button icon to 1rem, above the text of a
                 small button, so baseline alignment pushed the label down */}
             <button

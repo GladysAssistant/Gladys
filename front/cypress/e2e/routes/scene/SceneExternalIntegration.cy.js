@@ -143,7 +143,16 @@ describe('Scene - external integration triggers and actions', () => {
       .select(CAMERA_EXTERNAL_ID);
     cy.get(`select#config_house option[value="${house.selector}"]`).should('contain', house.name);
     cy.get('select#config_house').select(house.selector);
-    cy.get('.tagify__input').type('Visitor detected');
+    // typing '{{' alone opens the list of the information available, as the
+    // help text of the field says (no third character needed), and picking
+    // an entry inserts it by label
+    cy.get('.tagify__input').type('{{}{{}');
+    cy.get('.tagify__dropdown')
+      .should('be.visible')
+      .contains('.tagify__dropdown__item', 'Object type')
+      .click();
+    cy.get('.tagify__input .tagify__tag').should('contain', 'Object type');
+    cy.get('.tagify__input').type(' detected');
     cy.contains('editScene.externalIntegration.outputsAvailable').should('exist');
     cy.contains('.badge', 'Clip identifier').should('exist');
 
@@ -160,7 +169,7 @@ describe('Scene - external integration triggers and actions', () => {
       expect(action.fields).to.include({
         camera: CAMERA_EXTERNAL_ID,
         house: house.selector,
-        caption: 'Visitor detected'
+        caption: '{{triggerEvent.data.label}} detected'
       });
     });
   });

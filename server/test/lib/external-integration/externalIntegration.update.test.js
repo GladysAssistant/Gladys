@@ -36,6 +36,8 @@ describe('externalIntegration.update', () => {
     expect(integration).to.have.property('version', '2.0.0');
     expect(integration).to.have.property('docker_image', 'ghcr.io/john/demo:2.0.0');
     expect(integration.manifest.version).to.equal('2.0.0');
+    // the latest known version was installed: nothing to report
+    expect(integration).to.have.property('skipped_update', null);
     // container recreated: old token invalidated
     expect(integration.token_version).to.equal(2);
     sinonAssert.calledWith(system.pull, 'ghcr.io/john/demo:2.0.0');
@@ -130,6 +132,10 @@ describe('externalIntegration.update', () => {
     expect(integration.version).to.equal('1.3.0');
     expect(integration.docker_image).to.equal('ghcr.io/john/gladys-open-meteo-demo:1.3.0');
     sinonAssert.calledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:1.3.0');
+    // validated by the update itself, after its gladys_version is checked
+    sinonAssert.calledWith(externalIntegration.fetchManifestFromRepo, 'john/gladys-open-meteo-demo', {
+      validate: false,
+    });
     // the cache read by isUpdateAvailable follows: no banner left over
     expect(externalIntegration.repoManifests.get('john/gladys-open-meteo-demo').version).to.equal('1.3.0');
     externalIntegration.clearTimers(service.id);
@@ -160,6 +166,12 @@ describe('externalIntegration.update', () => {
     sinonAssert.calledWith(pullStub, 'ghcr.io/john/gladys-open-meteo-demo:1.4.0');
     sinonAssert.calledWith(pullStub, 'ghcr.io/john/gladys-open-meteo-demo:1.3.0');
     expect(externalIntegration.repoManifests.has('john/gladys-open-meteo-demo')).to.equal(false);
+    // updated, but not to the latest version: the admin is told which one, and why
+    expect(integration.skipped_update).to.deep.equal({
+      version: '1.4.0',
+      reason: 'IMAGE_UNAVAILABLE',
+      gladys_version: null,
+    });
     externalIntegration.clearTimers(service.id);
   });
 
@@ -179,6 +191,203 @@ describe('externalIntegration.update', () => {
     expect(integration.version).to.equal('1.2.0');
     expect(integration.docker_image).to.equal(TEST_MANIFEST.docker_image);
     expect(externalIntegration.repoManifests.has('john/gladys-open-meteo-demo')).to.equal(false);
+    // the version did not change: not a silent success
+    expect(integration.skipped_update).to.deep.equal({
+      version: '1.4.0',
+      reason: 'IMAGE_UNAVAILABLE',
+      gladys_version: null,
+    });
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should not apply a version the running Gladys does not satisfy, and say what it requires', async () => {
+    // the field case: the latest release requires a newer Gladys and declares
+    // manifest fields this Gladys does not know yet. Both the repo and the
+    // index advertise it; the running image is re-pulled as a last resort and
+    // the response says why the version did not change — "requires Gladys
+    // >=99.0.0", not "unknown field"
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration, system } = buildSupervisor();
+    const newerManifest = {
+      ...TEST_MANIFEST,
+      version: '1.6.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.6.0',
+      gladys_version: '>=99.0.0',
+      field_of_a_newer_gladys: true,
+    };
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: newerManifest,
+    });
+    externalIntegration.fetchManifestFromRepo = fake.resolves(newerManifest);
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.2.0');
+    sinonAssert.neverCalledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:1.6.0');
+    sinonAssert.calledWith(system.pull, TEST_MANIFEST.docker_image);
+    expect(integration.skipped_update).to.deep.equal({
+      version: '1.6.0',
+      reason: 'GLADYS_VERSION',
+      gladys_version: '>=99.0.0',
+    });
+    // kept: it feeds the "update Gladys first" notice, never the update badge
+    expect(externalIntegration.repoManifests.get('john/gladys-open-meteo-demo')).to.equal(newerManifest);
+    expect(externalIntegration.isUpdateAvailable(integration)).to.equal(false);
+    expect(externalIntegration.getRequiredGladysVersion(integration)).to.equal('>=99.0.0');
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should apply the most recent version the running Gladys satisfies', async () => {
+    // the repo is ahead with a release requiring a newer Gladys, the index
+    // still carries one this Gladys runs: the index release is installed, and
+    // the repo one is reported
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '1.3.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0' },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '1.4.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.4.0',
+      gladys_version: '>=99.0.0',
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.3.0');
+    expect(integration.skipped_update).to.deep.equal({
+      version: '1.4.0',
+      reason: 'GLADYS_VERSION',
+      gladys_version: '>=99.0.0',
+    });
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should report the most recent of several versions it could not apply', async () => {
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const pullStub = sinon.stub();
+    pullStub.withArgs('ghcr.io/john/gladys-open-meteo-demo:1.5.0').rejects(new Error('NO_MATCHING_MANIFEST'));
+    pullStub.resolves(true);
+    const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: {
+        ...TEST_MANIFEST,
+        version: '1.3.0',
+        docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0',
+        gladys_version: '>=99.0.0',
+      },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '1.5.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.5.0',
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.2.0');
+    expect(integration.skipped_update).to.deep.equal({
+      version: '1.5.0',
+      reason: 'IMAGE_UNAVAILABLE',
+      gladys_version: null,
+    });
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should not report a version older than the one it installed', async () => {
+    // the index still requires another Gladys for an older release than the
+    // one the repo publishes and this Gladys runs: nothing was missed
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: {
+        ...TEST_MANIFEST,
+        version: '1.3.0',
+        docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0',
+        gladys_version: '>=99.0.0',
+      },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '1.4.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.4.0',
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.4.0');
+    expect(integration.skipped_update).to.equal(null);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should never downgrade to an older version still advertised by the index', async () => {
+    // a release installed from the repo before the indexer caught up: the
+    // repo now advertises a version requiring a newer Gladys, the index still
+    // the previous release. Dropping the repo version must not hand the
+    // update to the older index one — the running image is re-pulled
+    const installedManifest = {
+      ...TEST_MANIFEST,
+      version: '2.0.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:2.0.0',
+    };
+    const service = await seedExternalService({
+      store_slug: 'john/gladys-open-meteo-demo',
+      version: '2.0.0',
+      docker_image: installedManifest.docker_image,
+      manifest: installedManifest,
+    });
+    const { externalIntegration, system } = buildSupervisor();
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '1.9.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.9.0' },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '2.1.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:2.1.0',
+      gladys_version: '>=99.0.0',
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('2.0.0');
+    sinonAssert.neverCalledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:1.9.0');
+    sinonAssert.calledWith(system.pull, 'ghcr.io/john/gladys-open-meteo-demo:2.0.0');
+    expect(integration.skipped_update).to.deep.equal({
+      version: '2.1.0',
+      reason: 'GLADYS_VERSION',
+      gladys_version: '>=99.0.0',
+    });
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should keep the remote candidates when the installed version is not semver', async () => {
+    // nothing to compare against: the downgrade guard cannot apply
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: 'dev' });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getStoreEntry = fake.resolves({
+      store_slug: 'john/gladys-open-meteo-demo',
+      manifest: { ...TEST_MANIFEST, version: '1.3.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0' },
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.3.0');
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should report a newer version whose manifest this Gladys refuses', async () => {
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getStoreEntry = fake.resolves(null);
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '1.3.0',
+      field_of_a_newer_gladys: true,
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.2.0');
+    expect(integration.skipped_update).to.deep.equal({
+      version: '1.3.0',
+      reason: 'INVALID_MANIFEST',
+      gladys_version: null,
+    });
+    // an invalid repo version must never drive update detection
+    expect(externalIntegration.repoManifests.has('john/gladys-open-meteo-demo')).to.equal(false);
     externalIntegration.clearTimers(service.id);
   });
 
@@ -194,6 +403,8 @@ describe('externalIntegration.update', () => {
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
     const integration = await externalIntegration.update(service.selector);
     expect(integration.version).to.equal('1.2.0');
+    // a version that is not semver cannot be said to be newer
+    expect(integration.skipped_update).to.equal(null);
     externalIntegration.clearTimers(service.id);
   });
 

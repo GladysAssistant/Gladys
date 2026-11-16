@@ -7,9 +7,14 @@ import cx from 'classnames';
 import 'leaflet/dist/leaflet.css';
 import { addMapTileLayer } from '../../utils/mapTileLayer';
 import style from './style.css';
+import mobileStyle from './mobileArea.css';
+import { withMobileViewport } from '../../components/mobile';
 import { route } from 'preact-router';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
+// On a phone a zone is opened with a thumb: an invisible disc gives its handle a 44px target
+// (docs/specs/mobile-pages/map-areas.md, F)
+const MOBILE_AREA_TARGET_RADIUS_PX = 22;
 
 class MapComponent extends Component {
   initMap = (view = { center: DEFAULT_COORDS, zoom: 2 }) => {
@@ -127,10 +132,22 @@ class MapComponent extends Component {
           fillOpacity: 0.4,
           pane: 'areaHandles'
         });
-        this.areaMarkers[area.id] = leaflet.featureGroup([areaCircle, areaHandle]).addTo(this.leafletMap);
+        const layers = [areaCircle, areaHandle];
+        if (props.isMobile) {
+          layers.push(
+            leaflet.circleMarker([area.latitude, area.longitude], {
+              radius: MOBILE_AREA_TARGET_RADIUS_PX,
+              stroke: false,
+              fillOpacity: 0,
+              pane: 'areaHandles'
+            })
+          );
+        }
+        this.areaMarkers[area.id] = leaflet.featureGroup(layers).addTo(this.leafletMap);
         this.markerArray.push(this.areaMarkers[area.id]);
 
-        areaHandle.bindTooltip(area.name, { permanent: true });
+        // on a phone the name of the zone opens it too: it is the largest thing to aim at
+        areaHandle.bindTooltip(area.name, { permanent: true, interactive: Boolean(props.isMobile) });
 
         this.areaMarkers[area.id].on('click', () => {
           route(`/dashboard/maps/area/edit/${area.selector}`);
@@ -170,8 +187,27 @@ class MapComponent extends Component {
     this.updateDimensions();
   }
 
+  // Leaflet caches the size of its container and only re-reads it when the
+  // window is resized. The container also changes width with the window
+  // untouched — the navigation rail being collapsed or expanded beside it
+  // (components/header) — and a stale size leaves the map zooming around the
+  // center of a box it no longer has. Observe the container itself, and
+  // resize the way Leaflet does for the window: the center stays the center.
+  observeMapSize = () => {
+    // feature-tested: without it (old wall tablets) the map behaves as before
+    if (typeof ResizeObserver === 'function') {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.leafletMap) {
+          this.leafletMap.invalidateSize({ debounceMoveend: true });
+        }
+      });
+      this.resizeObserver.observe(this.map);
+    }
+  };
+
   componentDidMount() {
     this.initMap();
+    this.observeMapSize();
     window.addEventListener('resize', this.updateDimensions);
   }
 
@@ -184,7 +220,8 @@ class MapComponent extends Component {
       prevProps.users !== this.props.users ||
       prevProps.houses !== this.props.houses ||
       prevProps.areas !== this.props.areas ||
-      prevProps.loaded !== this.props.loaded
+      prevProps.loaded !== this.props.loaded ||
+      prevProps.isMobile !== this.props.isMobile
     ) {
       this.displayAll(this.props);
     }
@@ -194,6 +231,9 @@ class MapComponent extends Component {
   }
 
   componentWillUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
@@ -203,12 +243,17 @@ class MapComponent extends Component {
   render(props, { height }) {
     return (
       <div ref={this.setMapRef} style={{ height: `${height}px` }}>
-        <div class="leaflet-top leaflet-right">
+        {/* on a phone the action comes down where a thumb reaches it, above the attribution */}
+        <div class={props.isMobile ? 'leaflet-bottom leaflet-right' : 'leaflet-top leaflet-right'}>
           {/* .leaflet-control restores pointer events and the corner margins;
               btn-primary stays for behavior and the e2e tests, the Horizon
               frosted pill wins the styling */}
-          <div class="leaflet-control">
-            <button class={cx('btn', 'btn-primary', style.pillButton)} onClick={this.openNewAreaView}>
+          <div class={cx('leaflet-control', { [mobileStyle.createZoneMobile]: props.isMobile })}>
+            <button
+              class={cx('btn', 'btn-primary', style.pillButton)}
+              onClick={this.openNewAreaView}
+              data-cy="map-create-zone"
+            >
               <i class="fe fe-plus" />
               <Text id="newArea.createNewZoneButton" />
             </button>
@@ -219,4 +264,4 @@ class MapComponent extends Component {
   }
 }
 
-export default connect('httpClient,darkMode', {})(MapComponent);
+export default connect('httpClient,darkMode', {})(withMobileViewport(MapComponent));

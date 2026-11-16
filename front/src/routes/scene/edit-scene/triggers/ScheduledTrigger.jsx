@@ -5,6 +5,9 @@ import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { format } from 'date-fns';
 import Select from '../../../../components/form/Select';
+import DayPills from '../../../../components/scene/DayPills';
+import PhoneNativeField from '../../../../components/scene/PhoneNativeField';
+import { isMobileViewport } from '../../../../utils/mobileViewport';
 
 import { fr, de, es } from 'date-fns/locale';
 
@@ -68,6 +71,16 @@ class TurnOnLight extends Component {
       this.props.updateTriggerProperty(this.props.index, 'time_ranges', [{ start: '', end: '' }]);
       this.props.updateTriggerProperty(this.props.index, 'resume_on_startup', false);
     }
+  };
+  // the native fields of a phone give the stored formats directly
+  setTime = time => {
+    this.props.updateTriggerProperty(this.props.index, 'time', time);
+  };
+  setDate = date => {
+    this.props.updateTriggerProperty(this.props.index, 'date', date);
+  };
+  setDaysOfTheWeek = days => {
+    this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', days);
   };
   handleDateChange = date => {
     this.props.updateTriggerProperty(this.props.index, 'date', format(date, 'yyyy-MM-dd'));
@@ -145,18 +158,20 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.dateLabel" />
                 </div>
-                <Localizer>
-                  <DatePicker
-                    selected={date}
-                    className="form-control"
-                    popperClassName={datePickerStyle.datePickerPopper}
-                    portalId="scene-editor-datepicker"
-                    placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.dateLabel" />}
-                    locale={localeSet}
-                    onChange={this.handleDateChange}
-                    dateFormat={<Text id="editScene.triggersCard.scheduledTrigger.dateFormat" />}
-                  />
-                </Localizer>
+                <PhoneNativeField type="date" value={this.props.trigger.date} onChange={this.setDate}>
+                  <Localizer>
+                    <DatePicker
+                      selected={date}
+                      className="form-control"
+                      popperClassName={datePickerStyle.datePickerPopper}
+                      portalId="scene-editor-datepicker"
+                      placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.dateLabel" />}
+                      locale={localeSet}
+                      onChange={this.handleDateChange}
+                      dateFormat={<Text id="editScene.triggersCard.scheduledTrigger.dateFormat" />}
+                    />
+                  </Localizer>
+                </PhoneNativeField>
               </div>
             </div>
           )}
@@ -166,22 +181,24 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.timeLabel" />
                 </div>
-                <Localizer>
-                  <DatePicker
-                    selected={time}
-                    className="form-control"
-                    popperClassName={datePickerStyle.datePickerPopper}
-                    portalId="scene-editor-datepicker"
-                    locale={localeSet}
-                    onChange={this.handleTimeChange}
-                    placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={5}
-                    timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    dateFormat="HH:mm"
-                  />
-                </Localizer>
+                <PhoneNativeField type="time" value={this.props.trigger.time} onChange={this.setTime}>
+                  <Localizer>
+                    <DatePicker
+                      selected={time}
+                      className="form-control"
+                      popperClassName={datePickerStyle.datePickerPopper}
+                      portalId="scene-editor-datepicker"
+                      locale={localeSet}
+                      onChange={this.handleTimeChange}
+                      placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      showTimeSelect
+                      showTimeSelectOnly
+                      timeIntervals={5}
+                      timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      dateFormat="HH:mm"
+                    />
+                  </Localizer>
+                </PhoneNativeField>
               </div>
             </div>
           )}
@@ -229,22 +246,24 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.timeLabel" />
                 </div>
-                <Localizer>
-                  <DatePicker
-                    selected={time}
-                    className="form-control"
-                    popperClassName={datePickerStyle.datePickerPopper}
-                    portalId="scene-editor-datepicker"
-                    locale={localeSet}
-                    onChange={this.handleTimeChange}
-                    placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={5}
-                    timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    dateFormat="HH:mm"
-                  />
-                </Localizer>
+                <PhoneNativeField type="time" value={this.props.trigger.time} onChange={this.setTime}>
+                  <Localizer>
+                    <DatePicker
+                      selected={time}
+                      className="form-control"
+                      popperClassName={datePickerStyle.datePickerPopper}
+                      portalId="scene-editor-datepicker"
+                      locale={localeSet}
+                      onChange={this.handleTimeChange}
+                      placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      showTimeSelect
+                      showTimeSelectOnly
+                      timeIntervals={5}
+                      timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      dateFormat="HH:mm"
+                    />
+                  </Localizer>
+                </PhoneNativeField>
               </div>
             </div>
           )}
@@ -254,44 +273,52 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeekLabel" />
                 </div>
-                <Select
-                  defaultValue={[]}
-                  isMulti
-                  value={selectedWeekDaysOptions}
-                  onChange={this.handleDayOfTheWeekChange}
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  options={[
-                    {
-                      value: 'monday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />
-                    },
-                    {
-                      value: 'tuesday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />
-                    },
-                    {
-                      value: 'wednesday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />
-                    },
-                    {
-                      value: 'thursday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />
-                    },
-                    {
-                      value: 'friday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />
-                    },
-                    {
-                      value: 'saturday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />
-                    },
-                    {
-                      value: 'sunday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
-                    }
-                  ]}
-                />
+                {isMobileViewport() ? (
+                  <DayPills
+                    value={this.props.trigger.days_of_the_week}
+                    onChange={this.setDaysOfTheWeek}
+                    language={language}
+                  />
+                ) : (
+                  <Select
+                    defaultValue={[]}
+                    isMulti
+                    value={selectedWeekDaysOptions}
+                    onChange={this.handleDayOfTheWeekChange}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    options={[
+                      {
+                        value: 'monday',
+                        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />
+                      },
+                      {
+                        value: 'tuesday',
+                        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />
+                      },
+                      {
+                        value: 'wednesday',
+                        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />
+                      },
+                      {
+                        value: 'thursday',
+                        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />
+                      },
+                      {
+                        value: 'friday',
+                        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />
+                      },
+                      {
+                        value: 'saturday',
+                        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />
+                      },
+                      {
+                        value: 'sunday',
+                        label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
+                      }
+                    ]}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -301,22 +328,24 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.timeLabel" />
                 </div>
-                <Localizer>
-                  <DatePicker
-                    selected={time}
-                    className="form-control"
-                    popperClassName={datePickerStyle.datePickerPopper}
-                    portalId="scene-editor-datepicker"
-                    locale={localeSet}
-                    onChange={this.handleTimeChange}
-                    placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={5}
-                    timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    dateFormat="HH:mm"
-                  />
-                </Localizer>
+                <PhoneNativeField type="time" value={this.props.trigger.time} onChange={this.setTime}>
+                  <Localizer>
+                    <DatePicker
+                      selected={time}
+                      className="form-control"
+                      popperClassName={datePickerStyle.datePickerPopper}
+                      portalId="scene-editor-datepicker"
+                      locale={localeSet}
+                      onChange={this.handleTimeChange}
+                      placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      showTimeSelect
+                      showTimeSelectOnly
+                      timeIntervals={5}
+                      timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      dateFormat="HH:mm"
+                    />
+                  </Localizer>
+                </PhoneNativeField>
               </div>
             </div>
           )}
@@ -344,22 +373,24 @@ class TurnOnLight extends Component {
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.timeLabel" />
                 </div>
-                <Localizer>
-                  <DatePicker
-                    selected={time}
-                    className="form-control"
-                    popperClassName={datePickerStyle.datePickerPopper}
-                    portalId="scene-editor-datepicker"
-                    locale={localeSet}
-                    onChange={this.handleTimeChange}
-                    placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={5}
-                    timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
-                    dateFormat="HH:mm"
-                  />
-                </Localizer>
+                <PhoneNativeField type="time" value={this.props.trigger.time} onChange={this.setTime}>
+                  <Localizer>
+                    <DatePicker
+                      selected={time}
+                      className="form-control"
+                      popperClassName={datePickerStyle.datePickerPopper}
+                      portalId="scene-editor-datepicker"
+                      locale={localeSet}
+                      onChange={this.handleTimeChange}
+                      placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      showTimeSelect
+                      showTimeSelectOnly
+                      timeIntervals={5}
+                      timeCaption={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
+                      dateFormat="HH:mm"
+                    />
+                  </Localizer>
+                </PhoneNativeField>
               </div>
             </div>
           )}
@@ -369,6 +400,7 @@ class TurnOnLight extends Component {
             trigger={this.props.trigger}
             index={this.props.index}
             updateTriggerProperty={this.props.updateTriggerProperty}
+            language={language}
           />
         )}
       </div>

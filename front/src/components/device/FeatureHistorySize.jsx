@@ -77,9 +77,16 @@ class FeatureHistorySize extends Component {
     if (!statesSize) {
       return null;
     }
+    // hideEmpty: an empty history is not worth a mention where the size is a detail of a row
+    if (props.hideEmpty && !(statesSize.states > 0)) {
+      return null;
+    }
     const language = props.user && props.user.language;
+    // inline: the size continues a line of text (a row of the phone layout) instead of being a
+    // block of its own
+    const Tag = props.inline ? 'span' : 'small';
     return (
-      <small class={cx('d-block', 'text-muted', props.class)}>
+      <Tag class={props.inline ? props.class : cx('d-block', 'text-muted', props.class)}>
         {statesSize.states > 0 ? (
           <Text
             id="deviceFeatureHistorySize.size"
@@ -92,7 +99,7 @@ class FeatureHistorySize extends Component {
         ) : (
           <Text id="deviceFeatureHistorySize.empty" />
         )}
-      </small>
+      </Tag>
     );
   }
 }

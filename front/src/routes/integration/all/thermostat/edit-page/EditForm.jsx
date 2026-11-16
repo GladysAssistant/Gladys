@@ -11,7 +11,11 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
-  MAX_WINDOW_DELAY_SECONDS
+  PILOT_WIRE_STANDBY_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  MAX_WINDOW_DELAY_SECONDS,
+  parsePilotWireStandbyOrder,
+  supportedStandbyOrder
 } from '../../../../../../../server/utils/thermostatConstants';
 
 // The help text of each thermostat type, keyed by its value.
@@ -104,6 +108,7 @@ const SaveError = ({ status, reason }) =>
       {reason === 'incompleteVirtual' && <Text id="integration.thermostat.edit.incompleteVirtualError" />}
       {reason === 'incompleteExternal' && <Text id="integration.thermostat.edit.incompleteExternalError" />}
       {reason === 'incompletePilotWire' && <Text id="integration.thermostat.edit.incompletePilotWireError" />}
+      {reason === 'pilotWireUnread' && <Text id="integration.thermostat.edit.pilotWireUnreadError" />}
       {!reason && <Text id="integration.thermostat.edit.saveError" />}
     </div>
   );
@@ -215,6 +220,31 @@ const EditForm = ({ ...props }) => {
     pickedPilotWire && pickedPilotWire.supportedOrders && pickedPilotWire.supportedOrders.length > 0
       ? pickedPilotWire.supportedOrders
       : null;
+  // The order the server actually sends, with the server's own fallback: a
+  // stored eco on a module that refuses it rests on frost protection, or on off
+  // when the module takes only off. The form shows that one, and saving stores
+  // that same one (actions.js). Null when the module takes none.
+  const standbyOrder = supportedStandbyOrder(
+    parsePilotWireStandbyOrder(props.thermostatEditPilotWireStandbyOrder),
+    supportedOrders && supportedOrders.map(value => ({ value }))
+  );
+  // Forced, the standby order is eco or off, among the orders the module takes.
+  const standbyForced = standbyOrder !== null && standbyOrder !== DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+  const forcedStandbyOptions = PILOT_WIRE_ORDER_OPTIONS.filter(
+    ([value]) =>
+      PILOT_WIRE_STANDBY_ORDERS.includes(value) &&
+      value !== DEFAULT_PILOT_WIRE_STANDBY_ORDER &&
+      (!supportedOrders || supportedOrders.includes(value))
+  ).sort(([a], [b]) => b - a);
+  // The switch forces "another order than frost protection": it only means
+  // something on a module that takes frost protection. On one that does not,
+  // unchecking it stored frost protection, which resolves back to off or eco,
+  // and the switch checked itself again. Such a module is offered the choice
+  // between eco and off directly when it takes both, and nothing to pick when
+  // its standby order can only be one.
+  const frostProtectionTaken = !supportedOrders || supportedOrders.includes(DEFAULT_PILOT_WIRE_STANDBY_ORDER);
+  const showStandbySwitch = frostProtectionTaken && forcedStandbyOptions.length > 0;
+  const showStandbySelect = showStandbySwitch ? standbyForced : forcedStandbyOptions.length > 1;
   const orderOptionsFor = key =>
     PILOT_WIRE_ORDER_OPTIONS.filter(
       ([value]) => !supportedOrders || supportedOrders.includes(value) || value === pilotWireOrders[key]
@@ -241,6 +271,62 @@ const EditForm = ({ ...props }) => {
           id={`integration.thermostat.edit.pilotWireRegulationHelp.${isPilotWireThermostat ? 'heater' : 'gladys'}`}
         />
       </small>
+      {/* The order a heater Gladys regulates rests on once the room is warm
+          enough (spec C.1.1). Frost protection unless forced: some heaters lock
+          their own functions out under it, a towel rail's boost among them. */}
+      {/* Not offered when the module leaves no choice of standby order. */}
+      {isVirtualThermostat && props.thermostatEditPilotWireFeature && (showStandbySwitch || showStandbySelect) && (
+        <div class="mt-2">
+          {showStandbySwitch && (
+            <label class="custom-switch">
+              <input
+                type="checkbox"
+                class="custom-switch-input"
+                checked={standbyForced}
+                onChange={e =>
+                  props.updateThermostatField(
+                    'thermostatEditPilotWireStandbyOrder',
+                    e.target.checked ? forcedStandbyOptions[0][0] : DEFAULT_PILOT_WIRE_STANDBY_ORDER
+                  )
+                }
+              />
+              <span class="custom-switch-indicator" />
+              <span class="custom-switch-description">
+                <Text id="integration.thermostat.edit.pilotWireStandbyForceLabel" />
+              </span>
+            </label>
+          )}
+          {showStandbySwitch && (
+            <small class="form-text text-muted">
+              <Text id="integration.thermostat.edit.pilotWireStandbyForceHelp" />
+            </small>
+          )}
+          {showStandbySelect && (
+            <div class="mt-2">
+              <label class="form-label" htmlFor="thermostat-pilot-wire-standby-order">
+                <Text id="integration.thermostat.edit.pilotWireStandbyOrderLabel" />
+              </label>
+              <select
+                id="thermostat-pilot-wire-standby-order"
+                class="form-control"
+                value={standbyOrder}
+                onChange={e =>
+                  props.updateThermostatField('thermostatEditPilotWireStandbyOrder', Number(e.target.value))
+                }
+              >
+                {forcedStandbyOptions.map(([value, orderKey]) => (
+                  <option value={value} selected={value === standbyOrder}>
+                    <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+                  </option>
+                ))}
+              </select>
+              <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
+                <Text id="integration.thermostat.edit.pilotWireStandbyOrderWarning" />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       {/* Promised by the spec (G): a module that keeps its own programme
           writes orders that are taken as presses of its button, and Gladys
           and the programme take turns. */}

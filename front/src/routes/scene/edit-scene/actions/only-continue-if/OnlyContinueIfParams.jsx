@@ -6,12 +6,81 @@ import get from 'get-value';
 
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import FormulaFunctionsHelp from '../../../../../components/scene/FormulaFunctionsHelp';
+import { getDeviceFeatureName } from '../../../../../utils/device';
+import { normalizeSearchString } from '../../../../../utils/searchOptions';
 
 import { isVariableAvailableAtThisPath, convertPathToText } from '../../sceneUtils';
 
 import Condition from './Condition';
 
+const sortByLabel = (a, b) => a.label.localeCompare(b.label);
+
+// The features of the house as options of the condition select, grouped by room (the devices
+// without a room last). They come from the devices the editor loaded when it opened
+// (deviceFeatures: selector -> { device, feature }), so a condition box costs no request.
+const buildDeviceFeatureOptions = (deviceFeatures, dictionary) => {
+  const noRoomLabel = get(dictionary, 'device.noRoom');
+  const rooms = new Map();
+  const noRoomOptions = [];
+  Object.keys(deviceFeatures || {}).forEach(selector => {
+    const { device, feature } = deviceFeatures[selector];
+    const label = getDeviceFeatureName(dictionary, device, feature);
+    const roomName = device.room ? device.room.name : noRoomLabel;
+    const option = {
+      value: selector,
+      label,
+      // the room is only the header of the group: searchable through this field
+      searchText: normalizeSearchString(`${roomName} ${label}`),
+      isDeviceFeature: true,
+      // same shape as the variable of a "get device value" step: the condition offers the
+      // list of values of the feature when it has one
+      data: { device, deviceFeature: feature }
+    };
+    if (!device.room) {
+      noRoomOptions.push(option);
+      return;
+    }
+    if (!rooms.has(device.room.id)) {
+      rooms.set(device.room.id, { label: roomName, options: [] });
+    }
+    rooms.get(device.room.id).options.push(option);
+  });
+  const groups = Array.from(rooms.values()).sort(sortByLabel);
+  if (noRoomOptions.length > 0) {
+    groups.push({ label: noRoomLabel, options: noRoomOptions });
+  }
+  groups.forEach(group => group.options.sort(sortByLabel));
+  return groups;
+};
+
+// The same devices for the device picker of a phone: each one once, with its room and its
+// features. Null while the editor has not loaded them: the picker waits for its list.
+const buildPickerDevices = deviceFeatures => {
+  if (!deviceFeatures) {
+    return null;
+  }
+  const devices = new Map();
+  Object.keys(deviceFeatures).forEach(selector => {
+    const { device } = deviceFeatures[selector];
+    devices.set(device.selector, device);
+  });
+  return Array.from(devices.values());
+};
+
 class OnlyContinueIf extends Component {
+  // Rebuilt only when the devices of the editor change, not on every keystroke in the box
+  getDevices = () => {
+    const { deviceFeatures, intl } = this.props;
+    if (this.devicesSource !== deviceFeatures || !this.devices) {
+      this.devicesSource = deviceFeatures;
+      this.devices = {
+        deviceFeatureOptions: buildDeviceFeatureOptions(deviceFeatures, intl.dictionary),
+        pickerDevices: buildPickerDevices(deviceFeatures)
+      };
+    }
+    return this.devices;
+  };
+
   handleConditionChange = (conditionIndex, condition) => {
     const newConditions = update(this.props.action.conditions, {
       [conditionIndex]: {
@@ -21,10 +90,32 @@ class OnlyContinueIf extends Component {
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
+  // A row keeps a state of its own (a value typed instead of picked in the list, what was put
+  // aside when switching between a device and a variable on a phone), and a condition has no
+  // identifier: each row gets a key, and the keys follow the conditions when one is added or
+  // deleted here. Without them the rows are matched by position, and deleting a condition hands
+  // its state to the next one. A list that changed from the outside (an undo, a restored draft)
+  // no longer matches the keys: every row then starts afresh.
+  conditionKeys = [];
+  lastConditionKey = 0;
+
+  newConditionKey = () => {
+    this.lastConditionKey += 1;
+    return this.lastConditionKey;
+  };
+
+  getConditionKeys = conditions => {
+    if (this.conditionKeys.length !== conditions.length) {
+      this.conditionKeys = conditions.map(this.newConditionKey);
+    }
+    return this.conditionKeys;
+  };
+
   addCondition = () => {
     const newConditions = update(this.props.action.conditions, {
       $push: [{}]
     });
+    this.conditionKeys = this.getConditionKeys(this.props.action.conditions).concat(this.newConditionKey());
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
@@ -32,6 +123,9 @@ class OnlyContinueIf extends Component {
     const newConditions = update(this.props.action.conditions, {
       $splice: [[conditionIndex, 1]]
     });
+    this.conditionKeys = this.getConditionKeys(this.props.action.conditions).filter(
+      (key, index) => index !== conditionIndex
+    );
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
@@ -48,8 +142,10 @@ class OnlyContinueIf extends Component {
       // If the variable is defined before the current path, we can use it
       if (isVariableAvailableAtThisPath(variablePath, props.path)) {
         const action = get(props.allActions, variablePath);
-        // If we find an action at this path
-        if (action) {
+        // If we find an action at this path, and if it exposes variables: a step without any
+        // (a delay, another condition) is not a group of the list, and must not make a phone
+        // offer a "Variable" side with nothing in it
+        if (action && props.variables[variablePath].length > 0) {
           variableOptions.push({
             label: `${convertPathToText(variablePath, this.props.intl.dictionary)} ${get(
               this,
@@ -65,6 +161,10 @@ class OnlyContinueIf extends Component {
         }
       }
     });
+
+    // Next to the variables of the previous steps, every device of the house: its state is read
+    // when the condition runs, no "get device value" step needed before
+    const { deviceFeatureOptions, pickerDevices } = this.getDevices();
 
     return (
       <div>
@@ -82,9 +182,12 @@ class OnlyContinueIf extends Component {
         {props.action.conditions &&
           props.action.conditions.map((condition, index) => (
             <Condition
+              key={this.getConditionKeys(props.action.conditions)[index]}
               condition={condition}
               index={index}
               variableOptions={variableOptions}
+              deviceFeatureOptions={deviceFeatureOptions}
+              pickerDevices={pickerDevices}
               handleConditionChange={this.handleConditionChange}
               addCondition={this.addCondition}
               deleteCondition={this.deleteCondition}

@@ -6,8 +6,11 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   MAX_WINDOW_DELAY_SECONDS,
-  defaultPresetTemps
+  defaultPresetTemps,
+  parsePilotWireStandbyOrder,
+  supportedStandbyOrder
 } from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
@@ -244,6 +247,10 @@ function createActions(store) {
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
           thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
           thermostatEditPilotWireOrders: readPilotWireOrders(getParam),
+          // The order a heater Gladys regulates rests on (spec C.1.1).
+          thermostatEditPilotWireStandbyOrder: parsePilotWireStandbyOrder(
+            getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER')
+          ),
           // A real thermostat given a pilot wire was how a heater regulating
           // itself was saved before it had a type of its own: it is shown as one.
           thermostatEditType:
@@ -443,6 +450,27 @@ function createActions(store) {
           return;
         }
 
+        // The standby order is saved as the form shows it: the one this module
+        // is actually sent (spec C.1.1). An eco stored on a module that refuses
+        // it would otherwise wake up as eco on the next module, unasked.
+        const storedStandbyOrder = parsePilotWireStandbyOrder(state.thermostatEditPilotWireStandbyOrder);
+        const pickedPilotWire = (state.pilotWireFeatures || []).find(feature => feature.selector === pilotWireFeature);
+        // Only a module that was read can say which order it takes: with the
+        // list not loaded, or the module gone from it, the order would be saved
+        // unchecked, and an eco or an off the module refuses would wake up on
+        // the next module, unasked. A module that declares no orders takes any.
+        if (thermostatType === 'virtual' && pilotWireFeature && !pickedPilotWire) {
+          store.setState({
+            thermostatCreateStatus: RequestStatus.Error,
+            thermostatEditError: 'pilotWireUnread'
+          });
+          return;
+        }
+        const sentStandbyOrder = supportedStandbyOrder(
+          storedStandbyOrder,
+          pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
+        );
+
         const device = {
           name,
           external_id: isEdit ? state.thermostatEditDevice.external_id : newExternalId,
@@ -493,6 +521,15 @@ function createActions(store) {
               name: PILOT_WIRE_ORDER_PARAM(preset),
               value: isPilotWireThermostat ? String(pilotWireOrders[preset]) : ''
             })),
+            // The order a heater Gladys regulates rests on: a virtual
+            // thermostat with a pilot wire only, cleared otherwise.
+            {
+              name: 'THERMOSTAT_PILOT_WIRE_STANDBY_ORDER',
+              value:
+                thermostatType === 'virtual' && pilotWireFeature
+                  ? String(sentStandbyOrder !== null ? sentStandbyOrder : storedStandbyOrder)
+                  : ''
+            },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on a real thermostat, and cleared otherwise so
             // switching a device to another type cannot leave it driving a real
@@ -578,6 +615,7 @@ function createActions(store) {
           thermostatEditSwitchFeature: '',
           thermostatEditPilotWireFeature: '',
           thermostatEditPilotWireOrders: DEFAULT_PILOT_WIRE_ORDERS,
+          thermostatEditPilotWireStandbyOrder: DEFAULT_PILOT_WIRE_STANDBY_ORDER,
           thermostatEditType: 'virtual',
           thermostatEditTargetFeature: '',
           thermostatEditStateFeature: '',

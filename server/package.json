@@ -38,8 +38,7 @@
     "ignore": [
       "test/*",
       "persist/*",
-      "matter-controller-data/*",
-      "./matter-bridge/**"
+      "./gladys-data/**"
     ]
   },
   "c8": {

@@ -8,7 +8,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
-const { getDeviceFeature } = require('../../utils/device');
+const { getDeviceFeature, isStringStateFeature } = require('../../utils/device');
 const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
@@ -63,6 +63,58 @@ function warnIfInvalidJsonMessage(actionName, topic, message) {
         `It's usually the sign of a variable which could not be resolved. Message sent: ${message}`,
     );
   }
+}
+
+/**
+ * @description Set the value of the switches of a switch action: each selected switch
+ * (device_features), or, when none is selected, the first writable switch of each selected
+ * device (devices, the format of the scenes saved before the switches of a multi-switch device
+ * could be picked one by one, and of the scenes created through MCP without device_features).
+ * @param {object} self - Reference to the SceneManager.
+ * @param {object} action - The switch action.
+ * @param {Function} getValue - Returns the value to set, given the switch feature.
+ * @returns {Promise} Resolves when every switch was handled.
+ * @example
+ * await setSwitchesValue(self, { device_features: ['plug-socket-1'] }, () => 1);
+ */
+async function setSwitchesValue(self, action, getValue) {
+  const isWritableSwitch = (feature) =>
+    feature.category === DEVICE_FEATURE_CATEGORIES.SWITCH &&
+    feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
+    !feature.read_only;
+  const switches = [];
+  const deviceFeatureSelectors = action.device_features || [];
+  deviceFeatureSelectors.forEach((deviceFeatureSelector) => {
+    const deviceFeature = self.stateManager.get('deviceFeature', deviceFeatureSelector);
+    if (!deviceFeature || !isWritableSwitch(deviceFeature)) {
+      logger.warn(`Switch action: "${deviceFeatureSelector}" is not a writable switch`);
+      return;
+    }
+    const device = self.stateManager.get('deviceById', deviceFeature.device_id);
+    if (!device) {
+      logger.warn(`Switch action: device of "${deviceFeatureSelector}" not found`);
+      return;
+    }
+    switches.push({ device, deviceFeature });
+  });
+  // The devices are only a fallback: when switches are selected, the selection lives in device_features
+  const deviceSelectors = deviceFeatureSelectors.length > 0 ? [] : action.devices || [];
+  deviceSelectors.forEach((deviceSelector) => {
+    const device = self.stateManager.get('device', deviceSelector);
+    const deviceFeature = get(device, 'features', { default: [] }).find(isWritableSwitch);
+    if (!deviceFeature) {
+      logger.warn(`Switch action: no writable switch found on device "${deviceSelector}"`);
+      return;
+    }
+    switches.push({ device, deviceFeature });
+  });
+  await Promise.map(switches, async ({ device, deviceFeature }) => {
+    try {
+      await self.device.setValue(device, deviceFeature, getValue(deviceFeature));
+    } catch (e) {
+      logger.warn(e);
+    }
+  });
 }
 
 const actionsFunc = {
@@ -219,50 +271,15 @@ const actionsFunc = {
       }
     });
   },
-  [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
-      try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
-        await self.device.setValue(device, deviceFeature, 1);
-      } catch (e) {
-        logger.warn(e);
-      }
-    });
+  [ACTIONS.SWITCH.TURN_ON]: async (self, action) => {
+    await setSwitchesValue(self, action, () => 1);
   },
-  [ACTIONS.SWITCH.TURN_OFF]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
-      try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
-        await self.device.setValue(device, deviceFeature, 0);
-      } catch (e) {
-        logger.warn(e);
-      }
-    });
+  [ACTIONS.SWITCH.TURN_OFF]: async (self, action) => {
+    await setSwitchesValue(self, action, () => 0);
   },
-  [ACTIONS.SWITCH.TOGGLE]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
-      try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
-        await self.device.setValue(device, deviceFeature, deviceFeature.last_value === 0 ? 1 : 0);
-      } catch (e) {
-        logger.warn(e);
-      }
-    });
+  [ACTIONS.SWITCH.TOGGLE]: async (self, action) => {
+    // A switch which never reported its state (last_value null) is turned on
+    await setSwitchesValue(self, action, (deviceFeature) => (deviceFeature.last_value ? 0 : 1));
   },
   [ACTIONS.TIME.DELAY]: async (self, action, scope) => {
     let { value } = action;
@@ -525,15 +542,36 @@ const actionsFunc = {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
 
-      // removing brackets
-      const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
-      const conditionVerified = compare(condition.operator, get(scope, variableWithoutBrackets), value);
+      let currentValue;
+      let currentValueKnown = true;
+      // A condition compares either the current state of a device feature, read when the
+      // condition runs, or a variable of the scene. The scene model accepts exactly one of the
+      // two: "defined" is tested rather than "truthy", so that a selector resolving to nothing
+      // aborts below instead of being read as a missing variable.
+      if (condition.device_feature !== undefined) {
+        const deviceFeature = self.stateManager.get('deviceFeature', condition.device_feature);
+        // The feature was deleted since the scene was saved: the condition cannot be
+        // evaluated, so the scene stops instead of comparing against nothing.
+        if (!deviceFeature) {
+          throw new AbortScene('DEVICE_FEATURE_NOT_FOUND');
+        }
+        // Same value as the variable the "get device value" action exposes for this feature
+        currentValue = isStringStateFeature(deviceFeature) ? deviceFeature.last_value_string : deviceFeature.last_value;
+        // A feature that never reported its state holds null. JavaScript would compare it as
+        // a zero (`null < 20` is true) and as a value different from any other (`null !== 1`):
+        // a state that is not known verifies no condition, whatever the operator — like the
+        // price that is not known in the energy price condition.
+        currentValueKnown = currentValue !== null && currentValue !== undefined;
+      } else {
+        // removing brackets
+        const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
+        currentValue = get(scope, variableWithoutBrackets);
+      }
+      const conditionVerified = currentValueKnown && compare(condition.operator, currentValue, value);
       if (conditionVerified) {
         oneConditionVerified = true;
       } else {
-        logger.debug(
-          `Condition not verified. Condition: "${get(scope, variableWithoutBrackets)} ${condition.operator} ${value}"`,
-        );
+        logger.debug(`Condition not verified. Condition: "${currentValue} ${condition.operator} ${value}"`);
       }
     });
     if (oneConditionVerified === false) {
@@ -748,27 +786,16 @@ const actionsFunc = {
       throw new AbortScene('INVALID_TIME_RANGE');
     }
 
-    // Full-day events are stored at midnight UTC, so on a calendar day range they are
-    // matched on the UTC days covered by the range instead of its local bounds. Otherwise
-    // a full-day event of the day is missed in the timezones west of UTC (and the one of
-    // the next day returned instead).
-    let fullDayFrom;
-    let fullDayTo;
-    if (dayRange) {
-      fullDayFrom = dayjs.utc(from.format('YYYY-MM-DD')).toDate();
-      fullDayTo = dayjs
-        .utc(to.format('YYYY-MM-DD'))
-        .endOf('day')
-        .toDate();
-    }
+    // Full-day events are stored at midnight UTC or at the midnight of a local timezone
+    // (the one of the server process for CalDAV), so on a calendar day range they are
+    // matched on the date they stand for instead of the local bounds of the range.
+    // Otherwise the full-day event of the day can be missed and the one of the next day
+    // returned instead.
+    const fullDayRange = dayRange
+      ? { from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), timezone: self.timezone }
+      : undefined;
 
-    const events = await self.calendar.findEventsInRange(
-      action.calendars,
-      from.toDate(),
-      to.toDate(),
-      fullDayFrom,
-      fullDayTo,
-    );
+    const events = await self.calendar.findEventsInRange(action.calendars, from.toDate(), to.toDate(), fullDayRange);
 
     if (events.length === 0 && action.stop_scene_if_no_events === true) {
       throw new AbortScene('NO_EVENTS_FOUND');
@@ -886,18 +913,26 @@ const actionsFunc = {
     }
   },
   [ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE]: async (self, action) => {
-    // current unit price of the contract (spec 8.2) compared with the threshold; an
-    // unknown price (null, spec 7.7) never validates the condition
+    // current unit price of the meter's active contract (spec 8.2) compared with the threshold:
+    // the meter of the condition, else the meter of the contract a condition saved before the
+    // meter targeting names, else the main meter; no active contract or an unknown price
+    // (null, spec 7.7) never validates the condition
     const threshold = parseFloat(action.value);
     if (Number.isNaN(threshold)) {
       throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
     }
     let current;
     try {
-      current = await self.energyContract.getCurrent(action.energy_contract);
+      current = await self.energyContract.getMeterCurrent({
+        electric_meter: action.electric_meter,
+        energy_contract: action.energy_contract,
+      });
     } catch (e) {
-      // a contract that cannot be read (deleted, integration down) never validates
+      // a meter or a contract that cannot be read (deleted, integration down) never validates
       throw new AbortScene(e.message);
+    }
+    if (current.contract === null) {
+      throw new AbortScene('NO_ACTIVE_ENERGY_CONTRACT');
     }
     if (current.price === null || !compare(action.operator, current.price, threshold)) {
       throw new AbortScene('ENERGY_PRICE_CONDITION_NOT_MET');

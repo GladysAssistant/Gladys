@@ -13,6 +13,12 @@ import {
   getSectionOffsets,
   findSectionIndex
 } from '../../../utils/dashboardSections';
+import { DASHBOARD_SECTION_MOBILE_ORDER } from '../../../../../server/utils/constants';
+
+const UNDO_REMOVAL_MS = 6000;
+// pseudo destination of a leave confirmation asked by the browser's back
+// gesture / button (see armHistoryGuard)
+const HISTORY_BACK = '__history_back__';
 
 class EditDashboard extends Component {
   getDashboards = async () => {
@@ -61,11 +67,13 @@ class EditDashboard extends Component {
       // The editor works on a flat list of columns so drag & drop coordinates
       // stay global, the section sizes and column widths are kept aside and
       // reassembled on save
-      const { columns, sectionSizes, columnWidths } = flattenSections(currentDashboard.boxes);
+      const { columns, sectionSizes, columnWidths, sectionMobileOrders } = flattenSections(currentDashboard.boxes);
       this.setState({
         currentDashboard: { ...currentDashboard, boxes: columns },
         sectionSizes,
         columnWidths,
+        sectionMobileOrders,
+        undoRemoval: null,
         loading: false,
         hasUnsavedChanges: false
       });
@@ -73,6 +81,22 @@ class EditDashboard extends Component {
       this.setState({
         loading: false
       });
+      console.error(e);
+    }
+  };
+
+  // Room names, for the title of the widgets that are only told apart by
+  // their room ("Temperature in room"): a convenience, so a failure leaves
+  // the titles as they were
+  getRoomNames = async () => {
+    try {
+      const rooms = await this.props.httpClient.get('/api/v1/room');
+      const roomNames = {};
+      rooms.forEach(room => {
+        roomNames[room.selector] = room.name;
+      });
+      this.setState({ roomNames });
+    } catch (e) {
       console.error(e);
     }
   };
@@ -85,7 +109,138 @@ class EditDashboard extends Component {
   };
 
   cancelDashboardEdit = async () => {
-    route(`/dashboard/${this.state.currentDashboardSelector}`);
+    this.requestNavigation(`/dashboard/${this.state.currentDashboardSelector}`);
+  };
+
+  // ------------------------------------------------------------ leaving with unsaved changes
+  // Every way out of the editor goes through requestNavigation: Cancel, the
+  // dashboard pills, dashboard creation, any in-app link (captured on the
+  // document), the browser's back gesture (history guard) — and a reload or
+  // a closed tab (beforeunload). With unsaved changes it asks first.
+  requestNavigation = url => {
+    if (this.state.hasUnsavedChanges) {
+      this.askBeforeLeaving(url);
+      return;
+    }
+    this.navigateAway(url);
+  };
+
+  // The question can come from the app's mobile menu (a link of its drawer)
+  // or while it is open (back gesture): the menu closes, so staying brings
+  // the user back to the editor, not to a menu left open over it
+  askBeforeLeaving = destination => {
+    this.props.closeMenus();
+    this.setState({ leaveConfirm: destination });
+  };
+
+  // While the history guard is armed, the current history entry is the
+  // guard's copy of the editor URL: leaving replaces it, so the history
+  // keeps a single editor entry
+  navigateAway = url => {
+    if (this.historyGuardArmed) {
+      this.historyGuardArmed = false;
+      route(url, true);
+      return;
+    }
+    route(url);
+  };
+
+  // An action that leaves the editor after a server write (creating a
+  // dashboard from the panel) asks before the write: staying must leave
+  // nothing behind on the server. The action ends with leaveTo.
+  requestLeaveAction = action => {
+    if (this.state.hasUnsavedChanges) {
+      this.askBeforeLeaving(action);
+      return;
+    }
+    action();
+  };
+
+  leaveTo = url => {
+    this.setState({ hasUnsavedChanges: false });
+    this.navigateAway(url);
+  };
+
+  confirmLeave = () => {
+    const url = this.state.leaveConfirm;
+    if (typeof url === 'function') {
+      // the action may still fail (a name already taken): the pending
+      // changes stay pending until it really leaves
+      this.setState({ leaveConfirm: null });
+      url();
+      return;
+    }
+    this.setState({ leaveConfirm: null, hasUnsavedChanges: false });
+    if (url === HISTORY_BACK) {
+      window.history.back();
+      return;
+    }
+    this.navigateAway(url);
+  };
+
+  cancelLeave = () => {
+    const fromHistory = this.state.leaveConfirm === HISTORY_BACK;
+    this.setState({ leaveConfirm: null });
+    if (fromHistory) {
+      this.armHistoryGuard();
+    }
+  };
+
+  // The back gesture of iOS Safari (and the back button) cannot be cancelled,
+  // so the editor keeps a spare copy of its own URL on top of the history
+  // once something changed: going back pops that copy (same URL, nothing
+  // re-renders) and the editor asks before really leaving
+  armHistoryGuard = () => {
+    if (this.historyGuardArmed) {
+      return;
+    }
+    window.history.pushState({ gladysEditorGuard: true }, '', window.location.href);
+    this.historyGuardArmed = true;
+  };
+
+  handlePopState = () => {
+    if (!this.historyGuardArmed) {
+      return;
+    }
+    this.historyGuardArmed = false;
+    if (this.state.hasUnsavedChanges) {
+      this.askBeforeLeaving(HISTORY_BACK);
+    } else {
+      window.history.back();
+    }
+  };
+
+  handleBeforeUnload = event => {
+    if (this.state.hasUnsavedChanges) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  };
+
+  // in-app links (navigation rail, mobile menu…) are caught before their own
+  // handler while something is pending
+  handleDocumentClick = event => {
+    if (!this.state.hasUnsavedChanges && !this.historyGuardArmed) {
+      return;
+    }
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) {
+      return;
+    }
+    const link = event.target.closest ? event.target.closest('a[href]') : null;
+    if (!link || link.target === '_blank' || link.hasAttribute('download')) {
+      return;
+    }
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin) {
+      return;
+    }
+    const path = `${url.pathname}${url.search}${url.hash}`;
+    if (path === `${window.location.pathname}${window.location.search}`) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    this.requestNavigation(path);
   };
 
   moveCard = async (originalX, originalY, destX, destY) => {
@@ -118,7 +273,49 @@ class EditDashboard extends Component {
       }
     });
     // any structural change closes the edit panel so it never points at a stale position
-    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
+    await this.setState({
+      ...newState,
+      boxNotEmptyError: false,
+      editingBoxPosition: null,
+      movingBoxPosition: null,
+      hasUnsavedChanges: true
+    });
+  };
+
+  // "Move to…": the touch alternative to dragging a widget to another column
+  // or section — it lands at the end of the chosen column
+  openMoveBox = (x, y) => {
+    this.setState({
+      movingBoxPosition: { x, y },
+      editingBoxPosition: null,
+      dashboardSettingsOpen: false,
+      newDashboardOpen: false
+    });
+  };
+
+  moveBoxTo = async (x, y, destX) => {
+    if (destX === x) {
+      this.closeEditPanel();
+      return;
+    }
+    const destY = this.state.currentDashboard.boxes[destX].length;
+    await this.moveCard(x, y, destX, destY);
+    this.flashWidget(destX, destY);
+  };
+
+  // bring a widget that just moved into view and mark it for a moment, so
+  // the user sees where it went
+  flashWidget = (x, y) => {
+    requestAnimationFrame(() => {
+      const widget = document.querySelector(`[data-widget-wrapper][data-x="${x}"][data-y="${y}"]`);
+      if (!widget) {
+        return;
+      }
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      widget.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+      widget.classList.add('gladys-widget-flash');
+      setTimeout(() => widget.classList.remove('gladys-widget-flash'), 1600);
+    });
   };
 
   moveBoxUp = (x, y) => {
@@ -134,15 +331,53 @@ class EditDashboard extends Component {
   };
 
   openDashboardSettings = () => {
-    this.setState({ dashboardSettingsOpen: true, editingBoxPosition: null, newDashboardOpen: false });
+    this.setState({
+      dashboardSettingsOpen: true,
+      editingBoxPosition: null,
+      movingBoxPosition: null,
+      newDashboardOpen: false
+    });
   };
 
   openNewDashboard = () => {
-    this.setState({ newDashboardOpen: true, editingBoxPosition: null, dashboardSettingsOpen: false });
+    this.setState({
+      newDashboardOpen: true,
+      editingBoxPosition: null,
+      movingBoxPosition: null,
+      dashboardSettingsOpen: false
+    });
   };
 
   closeEditPanel = () => {
-    this.setState({ editingBoxPosition: null, dashboardSettingsOpen: false, newDashboardOpen: false });
+    this.setState({
+      editingBoxPosition: null,
+      movingBoxPosition: null,
+      dashboardSettingsOpen: false,
+      newDashboardOpen: false
+    });
+  };
+
+  toggleReorganize = () => {
+    this.setState(prevState => ({
+      reorganizing: !prevState.reorganizing,
+      editingBoxPosition: null,
+      movingBoxPosition: null
+    }));
+  };
+
+  // Sections whose columns stack on a phone: column by column, or row by row
+  toggleSectionMobileOrder = sectionIndex => {
+    const current = this.state.sectionMobileOrders[sectionIndex];
+    const next =
+      current === DASHBOARD_SECTION_MOBILE_ORDER.ROWS
+        ? DASHBOARD_SECTION_MOBILE_ORDER.COLUMNS
+        : DASHBOARD_SECTION_MOBILE_ORDER.ROWS;
+    const newState = update(this.state, {
+      sectionMobileOrders: {
+        [sectionIndex]: { $set: next }
+      }
+    });
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   addBoxAndEdit = x => {
@@ -185,6 +420,13 @@ class EditDashboard extends Component {
   };
 
   removeBox = async (x, y) => {
+    const removedBox = this.state.currentDashboard.boxes[x][y];
+    const snapshot = {
+      boxes: this.state.currentDashboard.boxes,
+      sectionSizes: this.state.sectionSizes,
+      columnWidths: this.state.columnWidths,
+      sectionMobileOrders: this.state.sectionMobileOrders
+    };
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
@@ -194,7 +436,63 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
+    // removing asks nothing: an "Undo" toast restores the widget, as long as
+    // nothing else changed the canvas meanwhile (getPendingUndoRemoval)
+    clearTimeout(this.undoRemovalTimeout);
+    await this.setState({
+      ...newState,
+      boxNotEmptyError: false,
+      editingBoxPosition: null,
+      movingBoxPosition: null,
+      hasUnsavedChanges: true,
+      undoRemoval:
+        removedBox && removedBox.type
+          ? {
+              snapshot,
+              type: removedBox.type,
+              // the canvas the removal left: every layout array Undo writes back
+              layoutRefs: [
+                newState.currentDashboard.boxes,
+                newState.sectionSizes,
+                newState.columnWidths,
+                newState.sectionMobileOrders
+              ]
+            }
+          : null
+    });
+    this.undoRemovalTimeout = setTimeout(() => this.setState({ undoRemoval: null }), UNDO_REMOVAL_MS);
+  };
+
+  // The toast restores a snapshot of the canvas: it only stands while the
+  // canvas is still the one the removal left — any other change to it (move,
+  // add, column, column width, phone order…) withdraws the offer, or Undo
+  // would revert that too. Every edit replaces the array it touches, so
+  // comparing references is enough.
+  getPendingUndoRemoval = () => {
+    const { undoRemoval, currentDashboard, sectionSizes, columnWidths, sectionMobileOrders } = this.state;
+    if (!undoRemoval || !currentDashboard) {
+      return null;
+    }
+    const current = [currentDashboard.boxes, sectionSizes, columnWidths, sectionMobileOrders];
+    return undoRemoval.layoutRefs.every((ref, i) => ref === current[i]) ? undoRemoval : null;
+  };
+
+  undoRemoveBox = () => {
+    const undoRemoval = this.getPendingUndoRemoval();
+    const { currentDashboard } = this.state;
+    if (!undoRemoval) {
+      return;
+    }
+    clearTimeout(this.undoRemovalTimeout);
+    const { snapshot } = undoRemoval;
+    this.setState({
+      currentDashboard: { ...currentDashboard, boxes: snapshot.boxes },
+      sectionSizes: snapshot.sectionSizes,
+      columnWidths: snapshot.columnWidths,
+      sectionMobileOrders: snapshot.sectionMobileOrders,
+      undoRemoval: null,
+      hasUnsavedChanges: true
+    });
   };
 
   updateCurrentDashboardName = e => {
@@ -328,12 +626,18 @@ class EditDashboard extends Component {
       // We purge all empty boxes
       await this.removeEmptyBoxes();
 
-      const { currentDashboard: selectedDashboard, dashboards, sectionSizes, columnWidths } = this.state;
+      const {
+        currentDashboard: selectedDashboard,
+        dashboards,
+        sectionSizes,
+        columnWidths,
+        sectionMobileOrders
+      } = this.state;
       const { selector } = selectedDashboard;
 
       const currentDashboard = await this.props.httpClient.patch(`/api/v1/dashboard/${selector}`, {
         ...selectedDashboard,
-        boxes: buildSections(selectedDashboard.boxes, sectionSizes, columnWidths)
+        boxes: buildSections(selectedDashboard.boxes, sectionSizes, columnWidths, sectionMobileOrders)
       });
 
       const currentDashboardIndex = dashboards.findIndex(d => d.selector === selector);
@@ -343,13 +647,17 @@ class EditDashboard extends Component {
         }
       });
 
-      const { columns, sectionSizes: newSectionSizes, columnWidths: newColumnWidths } = flattenSections(
-        currentDashboard.boxes
-      );
+      const {
+        columns,
+        sectionSizes: newSectionSizes,
+        columnWidths: newColumnWidths,
+        sectionMobileOrders: newSectionMobileOrders
+      } = flattenSections(currentDashboard.boxes);
       await this.setState({
         currentDashboard: { ...currentDashboard, boxes: columns },
         sectionSizes: newSectionSizes,
         columnWidths: newColumnWidths,
+        sectionMobileOrders: newSectionMobileOrders,
         loading: false,
         dashboards: updatedDashboards,
         justSaved: true,
@@ -405,7 +713,14 @@ class EditDashboard extends Component {
         $splice: [[insertAt, 0, DEFAULT_COLUMN_WIDTH]]
       }
     });
-    this.setState({ ...newState, boxNotEmptyError: false, hasUnsavedChanges: true });
+    // global column coordinates shifted: never point the panel at a stale box
+    this.setState({
+      ...newState,
+      boxNotEmptyError: false,
+      editingBoxPosition: null,
+      movingBoxPosition: null,
+      hasUnsavedChanges: true
+    });
   };
 
   // A column is either normal (1) or wide (2): one toggle, no free resize
@@ -424,21 +739,28 @@ class EditDashboard extends Component {
   // Sections reorder with one-step arrows — dragging a whole section
   // across the canvas would be miserable, especially on mobile
   moveSection = (sectionIndex, direction) => {
-    const { sectionSizes, columnWidths, currentDashboard } = this.state;
+    const { sectionSizes, columnWidths, sectionMobileOrders, currentDashboard } = this.state;
     const target = sectionIndex + direction;
     if (target < 0 || target >= sectionSizes.length) {
       return;
     }
-    const sections = buildSections(currentDashboard.boxes, sectionSizes, columnWidths);
+    const sections = buildSections(currentDashboard.boxes, sectionSizes, columnWidths, sectionMobileOrders);
     [sections[sectionIndex], sections[target]] = [sections[target], sections[sectionIndex]];
-    const { columns, sectionSizes: newSectionSizes, columnWidths: newColumnWidths } = flattenSections(sections);
+    const {
+      columns,
+      sectionSizes: newSectionSizes,
+      columnWidths: newColumnWidths,
+      sectionMobileOrders: newSectionMobileOrders
+    } = flattenSections(sections);
     this.setState({
       currentDashboard: { ...currentDashboard, boxes: columns },
       sectionSizes: newSectionSizes,
       columnWidths: newColumnWidths,
+      sectionMobileOrders: newSectionMobileOrders,
       boxNotEmptyError: false,
       // global column coordinates shifted: never point the panel at a stale box
       editingBoxPosition: null,
+      movingBoxPosition: null,
       hasUnsavedChanges: true
     });
   };
@@ -455,9 +777,18 @@ class EditDashboard extends Component {
       },
       columnWidths: {
         $push: [DEFAULT_COLUMN_WIDTH]
+      },
+      sectionMobileOrders: {
+        $push: [DASHBOARD_SECTION_MOBILE_ORDER.COLUMNS]
       }
     });
-    this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
+    this.setState({
+      ...newState,
+      boxNotEmptyError: false,
+      editingBoxPosition: null,
+      movingBoxPosition: null,
+      hasUnsavedChanges: true
+    });
   };
 
   deleteCurrentColumn = async x => {
@@ -482,9 +813,16 @@ class EditDashboard extends Component {
               },
         columnWidths: {
           $splice: [[x, 1]]
-        }
+        },
+        sectionMobileOrders: newSectionSize === 0 ? { $splice: [[sectionIndex, 1]] } : {}
       });
-      await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
+      await this.setState({
+        ...newState,
+        boxNotEmptyError: false,
+        editingBoxPosition: null,
+        movingBoxPosition: null,
+        hasUnsavedChanges: true
+      });
     } else {
       this.setState({
         boxNotEmptyError: true,
@@ -516,10 +854,12 @@ class EditDashboard extends Component {
       await this.setState({
         askDeleteDashboard: false
       });
+      // the dashboard is gone: nothing left to protect
+      this.setState({ hasUnsavedChanges: false });
       if (currentDashboard === null) {
-        route('/dashboard');
+        this.navigateAway('/dashboard');
       } else {
-        route(`/dashboard/${currentDashboard.selector}/edit`);
+        this.navigateAway(`/dashboard/${currentDashboard.selector}/edit`);
       }
     } catch (e) {
       console.error(e);
@@ -542,10 +882,6 @@ class EditDashboard extends Component {
     });
   };
 
-  toggleMobileReorder = () => {
-    this.setState(prevState => ({ ...prevState, isMobileReordering: !prevState.isMobileReordering }));
-  };
-
   constructor(props) {
     super(props);
     this.props = props;
@@ -553,12 +889,17 @@ class EditDashboard extends Component {
       dashboards: [],
       sectionSizes: [],
       columnWidths: [],
+      sectionMobileOrders: [],
+      roomNames: {},
+      undoRemoval: null,
+      reorganizing: false,
+      leaveConfirm: null,
       newSelectedBoxType: {},
       askDeleteDashboard: false,
       boxNotEmptyError: false,
       columnBoxNotEmptyError: null,
-      isMobileReordering: false,
       editingBoxPosition: null,
+      movingBoxPosition: null,
       dashboardSettingsOpen: false,
       newDashboardOpen: false,
       justSaved: false,
@@ -568,15 +909,26 @@ class EditDashboard extends Component {
 
   componentDidMount() {
     this.init();
+    this.getRoomNames();
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
+    window.addEventListener('popstate', this.handlePopState);
+    document.addEventListener('click', this.handleDocumentClick, true);
   }
 
   componentWillUnmount() {
     clearTimeout(this.justSavedTimeout);
+    clearTimeout(this.undoRemovalTimeout);
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    window.removeEventListener('popstate', this.handlePopState);
+    document.removeEventListener('click', this.handleDocumentClick, true);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (prevProps.currentUrl !== this.props.currentUrl) {
       this.init();
+    }
+    if (this.state.hasUnsavedChanges && !prevState.hasUnsavedChanges) {
+      this.armHistoryGuard();
     }
   }
 
@@ -595,12 +947,16 @@ class EditDashboard extends Component {
       boxNotEmptyError,
       columnBoxNotEmptyError,
       savingNewDashboardList,
-      isMobileReordering,
       editingBoxPosition,
+      movingBoxPosition,
       dashboardSettingsOpen,
       newDashboardOpen,
       justSaved,
-      hasUnsavedChanges
+      hasUnsavedChanges,
+      sectionMobileOrders,
+      roomNames,
+      reorganizing,
+      leaveConfirm
     }
   ) {
     return (
@@ -645,8 +1001,22 @@ class EditDashboard extends Component {
         askDeleteDashboard={askDeleteDashboard}
         updateDashboardList={this.updateDashboardList}
         savingNewDashboardList={savingNewDashboardList}
-        toggleMobileReorder={this.toggleMobileReorder}
-        isMobileReordering={isMobileReordering}
+        movingBoxPosition={movingBoxPosition}
+        openMoveBox={this.openMoveBox}
+        moveBoxTo={this.moveBoxTo}
+        sectionMobileOrders={sectionMobileOrders}
+        roomNames={roomNames}
+        toggleSectionMobileOrder={this.toggleSectionMobileOrder}
+        undoRemoval={this.getPendingUndoRemoval()}
+        undoRemoveBox={this.undoRemoveBox}
+        reorganizing={reorganizing}
+        toggleReorganize={this.toggleReorganize}
+        leaveConfirm={leaveConfirm}
+        confirmLeave={this.confirmLeave}
+        cancelLeave={this.cancelLeave}
+        requestNavigation={this.requestNavigation}
+        requestLeaveAction={this.requestLeaveAction}
+        leaveTo={this.leaveTo}
         addColumn={this.addColumn}
         addSection={this.addSection}
         moveSection={this.moveSection}
@@ -661,4 +1031,6 @@ class EditDashboard extends Component {
   }
 }
 
-export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {})(EditDashboard);
+export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {
+  closeMenus: () => ({ showCollapsedMenu: false, showDropDown: false })
+})(EditDashboard);

@@ -1,4 +1,6 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const { BadParameters, ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const { Error500 } = require('../../../utils/httpErrors');
 
 module.exports = function MatterController(matterHandler) {
   /**
@@ -31,9 +33,15 @@ module.exports = function MatterController(matterHandler) {
    * @api {get} /api/v1/service/matter/node Get nodes
    * @apiName getNodes
    * @apiGroup Matter
+   * @apiQuery {boolean} [with_gladys_devices] - Also list the Gladys devices created from each node.
    */
   async function getNodes(req, res) {
-    const nodes = await matterHandler.getNodes();
+    const nodes = await matterHandler.getNodes({
+      // a string through the local API, a boolean through Gladys Plus (the query object is forwarded as is)
+      withGladysDevices: Boolean(
+        req.query && (req.query.with_gladys_devices === 'true' || req.query.with_gladys_devices === true),
+      ),
+    });
     res.json(nodes);
   }
 
@@ -54,10 +62,31 @@ module.exports = function MatterController(matterHandler) {
    * @api {post} /api/v1/service/matter/node/:node_id/decommission Decommission a node
    * @apiName decommissionNode
    * @apiGroup Matter
+   * @apiBody {string[]} [gladys_device_selectors] - The Gladys devices of this node to delete too.
    */
   async function decommissionNode(req, res) {
-    await matterHandler.decommission(BigInt(req.params.node_id));
-    res.json({ success: true });
+    if (!/^\d+$/.test(req.params.node_id)) {
+      throw new BadParameters('node_id must be a number');
+    }
+    const gladysDeviceSelectors = (req.body && req.body.gladys_device_selectors) || [];
+    if (
+      !Array.isArray(gladysDeviceSelectors) ||
+      gladysDeviceSelectors.some((selector) => typeof selector !== 'string')
+    ) {
+      throw new BadParameters('gladys_device_selectors must be an array of selectors');
+    }
+    try {
+      const result = await matterHandler.decommission(BigInt(req.params.node_id), { gladysDeviceSelectors });
+      res.json({ success: true, ...result });
+    } catch (e) {
+      // typed errors keep their status (400) through the error middleware
+      if (e instanceof BadParameters || e instanceof ServiceNotConfiguredError) {
+        throw e;
+      }
+      // the cause is shown to the user: the error middleware would send an Error object, which
+      // serializes to {}. The status is in the body, Gladys Plus ignores res.status()
+      throw new Error500(e.message);
+    }
   }
 
   /**
@@ -89,6 +118,7 @@ module.exports = function MatterController(matterHandler) {
     },
     'post /api/v1/service/matter/node/:node_id/decommission': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(decommissionNode),
     },
     'post /api/v1/service/matter/reset': {

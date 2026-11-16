@@ -1,22 +1,17 @@
 import { Component } from 'preact';
-import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../../utils/consts';
 import { MQTT_MODE, ADAPTER_MODE } from '../constants';
 import Select from 'react-select';
 import SubmitConfiguration from '../components/SubmitConfiguration';
+import PrefetchStatus from '../components/PrefetchStatus';
 
 class SetupLocalOptions extends Component {
   updateAdapterMode = e => {
     const z2mAdapterMode = e.target.value;
     this.setState({ z2mAdapterMode });
-  };
-
-  getDongleState = z2mDongleName => {
-    const adapter = this.state.zigbeeAdapters.find(zigbeeAdapter => zigbeeAdapter.value === z2mDongleName);
-    const z2mDongleConfigKey = get(adapter, 'configKey') || null;
-    return { z2mDongleName, z2mDongleConfigKey };
   };
 
   updateZigbeeDriverPath = option => {
@@ -26,13 +21,12 @@ class SetupLocalOptions extends Component {
     }
     // The model follows the dongle of the new port: the recognized one, or none to choose, so that the model
     // of another dongle never stays selected for an unrecognized one
-    this.setState({ z2mDriverPath, ...this.getDongleState(get(option, 'adapter') || null) });
+    this.setState({ z2mDriverPath, z2mDongleName: get(option, 'adapter') || null });
   };
 
   updateZigbeeDongleName = option => {
     const z2mDongleName = get(option, 'value');
-    const z2mDongleConfigKey = get(option, 'configKey') || null;
-    this.setState({ z2mDongleName, z2mDongleConfigKey });
+    this.setState({ z2mDongleName });
   };
 
   showAllUsbPorts = () => {
@@ -46,13 +40,13 @@ class SetupLocalOptions extends Component {
       // The only recognized dongle plugged in is the one to use
       const detectedPorts = usbPorts.filter(usbPort => usbPort.adapter);
       if (detectedPorts.length === 1) {
-        this.setState({ z2mDriverPath: detectedPorts[0].path, ...this.getDongleState(detectedPorts[0].adapter) });
+        this.setState({ z2mDriverPath: detectedPorts[0].path, z2mDongleName: detectedPorts[0].adapter });
       }
     } else if (!z2mDongleName) {
       // A port configured without model: suggest the model recognized on it
       const usbPort = usbPorts.find(port => port.path === z2mDriverPath);
       if (usbPort && usbPort.adapter) {
-        this.setState(this.getDongleState(usbPort.adapter));
+        this.setState({ z2mDongleName: usbPort.adapter });
       }
     }
   };
@@ -120,8 +114,7 @@ class SetupLocalOptions extends Component {
       z2mTcpPort,
       z2mAdapterMode: z2mAdapterMode || ADAPTER_MODE.USB,
       z2mNetworkAdapterUrl,
-      z2mNetworkAdapterType,
-      z2mDongleConfigKey: null
+      z2mNetworkAdapterType
     });
     this.props.resetConfiguration();
   };
@@ -167,13 +160,10 @@ class SetupLocalOptions extends Component {
       const networkAdapterTypes = [...new Set(adapters.map(adapter => adapter.configKey))]
         .sort()
         .map(configKey => ({ label: configKey, value: configKey }));
-      // The adapter of the model already selected (configured, or preselected before the list arrived)
-      const selectedAdapter = zigbeeAdapters.find(adapter => adapter.value === this.state.z2mDongleName);
 
       this.setState({
         zigbeeAdapters,
         networkAdapterTypes,
-        z2mDongleConfigKey: get(selectedAdapter, 'configKey') || null,
         loadZigbeeAdaptersStatus: RequestStatus.Success
       });
     } catch (e) {
@@ -182,26 +172,6 @@ class SetupLocalOptions extends Component {
         loadZigbeeAdaptersStatus: RequestStatus.Error
       });
     }
-  };
-
-  isEmberFirmwareTooOld = () => {
-    const { zigbee2mqttStatus = {} } = this.props;
-    const { coordinatorFirmware } = zigbee2mqttStatus;
-    const { z2mAdapterMode, z2mDongleConfigKey, z2mNetworkAdapterType } = this.state;
-
-    // In network mode the USB dongle model is not selected, the adapter type is chosen directly
-    const adapterConfigKey = z2mAdapterMode === ADAPTER_MODE.NETWORK ? z2mNetworkAdapterType : z2mDongleConfigKey;
-
-    if (adapterConfigKey !== 'ember' || !coordinatorFirmware) {
-      return false;
-    }
-
-    const { majorrel, minorrel } = coordinatorFirmware;
-    if (majorrel === undefined || minorrel === undefined) {
-      return false;
-    }
-
-    return majorrel < 7 || (majorrel === 7 && minorrel < 4);
   };
 
   buildSelectOption = value => {
@@ -237,7 +207,6 @@ class SetupLocalOptions extends Component {
       showAllUsbPorts: false,
       loadUsbPortsStatus: RequestStatus.Getting,
       z2mDongleName,
-      z2mDongleConfigKey: null,
       zigbeeAdapters: [],
       networkAdapterTypes: [],
       loadZigbeeAdaptersStatus: RequestStatus.Getting,
@@ -254,8 +223,18 @@ class SetupLocalOptions extends Component {
     this.preselectDetectedDongle();
   }
 
+  componentDidUpdate() {
+    // A coordinator chosen, or the dongle preselected: Zigbee2mqtt is set up on this Gladys, its images can be downloaded
+    // ahead. Asked again on each update, as the page waits for the server to tell it runs in Docker (see prefetchImages).
+    const { z2mAdapterMode, z2mDriverPath, z2mNetworkAdapterUrl } = this.state;
+    const coordinator = z2mAdapterMode === ADAPTER_MODE.NETWORK ? z2mNetworkAdapterUrl : z2mDriverPath;
+    if (coordinator) {
+      this.props.prefetchImages();
+    }
+  }
+
   render(
-    { disabled },
+    { disabled, configuration, zigbee2mqttStatus },
     {
       z2mDriverPath,
       usbPorts,
@@ -271,7 +250,6 @@ class SetupLocalOptions extends Component {
       z2mNetworkAdapterType
     }
   ) {
-    const emberFirmwareTooOld = this.isEmberFirmwareTooOld();
     const networkMode = z2mAdapterMode === ADAPTER_MODE.NETWORK;
     const saveDisabled = networkMode
       ? !z2mNetworkAdapterUrl || !z2mNetworkAdapterType
@@ -285,13 +263,25 @@ class SetupLocalOptions extends Component {
     const selectedUsbPortOption = selectedUsbPort
       ? this.buildUsbPortOption(selectedUsbPort)
       : this.buildSelectOption(z2mDriverPath);
-    // The model chosen contradicts the recognized dongle, except its "(legacy ezsp)" variant, a deliberate choice
+    // The model chosen contradicts the recognized dongle, except its "(legacy ezsp)" variant, for an old firmware
     const recognizedAdapter = get(selectedUsbPort, 'adapter');
     const dongleNameMismatch =
       recognizedAdapter &&
       z2mDongleName &&
       z2mDongleName !== recognizedAdapter &&
       z2mDongleName !== `${recognizedAdapter} (legacy ezsp)`;
+    // The ezsp driver only runs a firmware older than 7.4, and Gladys switches to it by itself when the ember driver
+    // refuses one: hidden, unless already configured, or the variant of the recognized dongle, kept by hand in case
+    // the fallback does not happen
+    const dongleOptions = zigbeeAdapters.filter(
+      adapter =>
+        adapter.configKey !== 'ezsp' ||
+        adapter.value === configuration.z2mDongleName ||
+        adapter.value === `${recognizedAdapter} (legacy ezsp)`
+    );
+    const networkAdapterTypeOptions = networkAdapterTypes.filter(
+      adapterType => adapterType.value !== 'ezsp' || adapterType.value === configuration.z2mNetworkAdapterType
+    );
 
     return (
       <div>
@@ -387,7 +377,7 @@ class SetupLocalOptions extends Component {
                 <Select
                   value={this.buildSelectOption(z2mDongleName)}
                   onChange={this.updateZigbeeDongleName}
-                  options={zigbeeAdapters}
+                  options={dongleOptions}
                   isLoading={loadZigbeeAdaptersStatus === RequestStatus.Getting}
                   placeholder={<Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleNamePlaceholder" />}
                   className="react-select-container"
@@ -459,7 +449,7 @@ class SetupLocalOptions extends Component {
                 <Select
                   value={this.buildSelectOption(z2mNetworkAdapterType)}
                   onChange={this.updateNetworkAdapterType}
-                  options={networkAdapterTypes}
+                  options={networkAdapterTypeOptions}
                   isLoading={loadZigbeeAdaptersStatus === RequestStatus.Getting}
                   placeholder={<Text id="integration.zigbee2mqtt.setup.modes.local.networkAdapterTypePlaceholder" />}
                   className="react-select-container"
@@ -470,11 +460,6 @@ class SetupLocalOptions extends Component {
             <small class="form-text text-muted">
               <Text id="integration.zigbee2mqtt.setup.modes.local.networkAdapterTypeDescription" />
             </small>
-          </div>
-        )}
-        {emberFirmwareTooOld && (
-          <div class="alert alert-warning" data-cy="z2m-setup-local-ember-firmware-warning">
-            <MarkupText id="integration.zigbee2mqtt.setup.modes.local.containerErrors.EZSP_PROTOCOL_VERSION" />
           </div>
         )}
         <div class="form-group">
@@ -498,6 +483,7 @@ class SetupLocalOptions extends Component {
             <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortDescription" />
           </small>
         </div>
+        <PrefetchStatus configuration={configuration} zigbee2mqttStatus={zigbee2mqttStatus} />
         <SubmitConfiguration
           saveDisabled={saveDisabled}
           disabled={disabled}

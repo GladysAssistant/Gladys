@@ -2,8 +2,10 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import style from '../style.css';
 import Profile from '../../../components/user/profile';
+import { withMobileViewport } from '../../../components/mobile';
+import MobileCreateAccount from './MobileCreateAccount';
 
-const CreateLocalGladysAccount = ({ children, ...props }) => (
+const DesktopCreateLocalGladysAccount = ({ children, ...props }) => (
   <div>
     <div class="row">
       <div class="col mb-4">
@@ -31,4 +33,9 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
   </div>
 );
 
-export default CreateLocalGladysAccount;
+// On a phone the form has its own layout (docs/specs/mobile-pages/onboarding.md, C.2), on the
+// same handlers
+const CreateLocalGladysAccount = ({ isMobile, ...props }) =>
+  isMobile ? <MobileCreateAccount {...props} /> : <DesktopCreateLocalGladysAccount {...props} />;
+
+export default withMobileViewport(CreateLocalGladysAccount);

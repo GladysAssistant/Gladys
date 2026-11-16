@@ -4,6 +4,8 @@ import get from 'get-value';
 
 import SettingsLayout from '../SettingsLayout';
 import HouseCard from './HouseCard';
+import MobileHousePage from './MobileHousePage';
+import { withMobileViewport } from '../../../components/mobile';
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../utils/consts';
 import CardFilter from '../../../components/layout/CardFilter';
@@ -20,7 +22,7 @@ const roomCountTextId = count => {
 const countRooms = houses =>
   (houses || []).reduce((total, house) => total + (house.rooms || []).filter(room => !room.to_delete).length, 0);
 
-const HousePage = ({ children, ...props }) => {
+const DesktopHousePage = ({ children, ...props }) => {
   const houses = props.houses || [];
   const roomCount = countRooms(houses);
   const loading = props.housesGetStatus === RequestStatus.Getting;
@@ -96,4 +98,9 @@ const HousePage = ({ children, ...props }) => {
   );
 };
 
-export default HousePage;
+// On a phone the houses are a list of rows, and a house is edited in a focus view
+// (docs/specs/mobile-pages/house-and-rooms.md): same props, same container.
+const HousePage = ({ isMobile, ...props }) =>
+  isMobile ? <MobileHousePage {...props} /> : <DesktopHousePage {...props} />;
+
+export default withMobileViewport(HousePage);
