@@ -19,6 +19,8 @@ class Preferences extends Component {
             updateUserPreferences={props.updateUserPreferences}
             updateSystemPreferences={props.updateSystemPreferences}
             savePreferences={props.savePreferences}
+            signupSaveUserPreferences={props.signupSaveUserPreferences}
+            signupSaveSystemPreferences={props.signupSaveSystemPreferences}
           />
         )}
       </SignupLayout>
@@ -26,4 +28,7 @@ class Preferences extends Component {
   }
 }
 
-export default connect('signupUserPreferences,signupSystemPreferences', actions)(Preferences);
+export default connect(
+  'signupUserPreferences,signupSystemPreferences,signupSaveUserPreferences,signupSaveSystemPreferences',
+  actions
+)(Preferences);

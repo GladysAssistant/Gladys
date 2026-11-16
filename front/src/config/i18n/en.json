@@ -197,6 +197,21 @@
     "tooManyRequests": "Please wait {{count}} minutes before trying again."
   },
   "signup": {
+    "mobile": {
+      "welcomeLead": "Gladys is a privacy-first assistant for your home. Setting it up takes about two minutes.",
+      "restoreHint": "Already a Gladys Plus user? Bring a previous installation back.",
+      "togglePassword": "Show or hide the password",
+      "distanceKilometers": "Kilometers",
+      "distanceMiles": "Miles",
+      "historyHelp": "How long Gladys keeps the values of your sensors. You can change it later in the settings.",
+      "roomsHelp": "Tap the rooms your house has. You can change them later.",
+      "saveHouseError": "The house could not be saved. Check your connection and try again.",
+      "savePreferencesError": "Your preferences could not be saved. Check your connection and try again.",
+      "restoreTitle": "Restore a backup",
+      "restoreConfirmTitle": "Restore this backup?",
+      "restoreConfirmText": "Gladys will restart with the data of this backup. This can take a few minutes.",
+      "backupKeyHelp": "The key you were given when Gladys Plus was set up on your previous installation."
+    },
     "welcome": {
       "title": "Welcome to Gladys!",
       "introSentence": "First, thank you for choosing me. I'm Gladys, a privacy-friendly home assistant for your house.",
@@ -5168,6 +5183,54 @@
       "location": "Location",
       "rooms": "Rooms",
       "noRoomYet": "No room yet. Add one below."
+    },
+    "mobile": {
+      "subtitle": "A house contains rooms, and every device belongs to a room. Tap a house to edit it.",
+      "useMyLocation": "Use my current location",
+      "locationError": {
+        "insecure": "Your browser only shares your position on a secure connection (HTTPS, for example through Gladys Plus). Search for your address or place the house on the map instead.",
+        "denied": "The access to your position was refused. Allow it in the settings of your browser, or search for your address instead.",
+        "unavailable": "Your position could not be found. Search for your address or place the house on the map instead."
+      },
+      "placeOnMap": "Place on the map",
+      "adjustOnMap": "Adjust on the map",
+      "positionSet": "The position of the house is set.",
+      "positionNotSet": "No position yet.",
+      "locationHelp": "Optional. Used for the weather, the sunrise and sunset, and to know when you are home.",
+      "mapSheetTitle": "Position of the house",
+      "mapSheetHint": "Tap the map where the house is. Move and zoom with two fingers.",
+      "addRooms": "Add",
+      "addFirstRoom": "Add the rooms of the house",
+      "roomsHint": "Tap a room to rename or delete it.",
+      "addRoomsTitle": "Add rooms",
+      "newRoomPlaceholder": "Name of a room",
+      "roomSuggestionsTitle": "Common rooms",
+      "roomSuggestionsLabel": "Common rooms, tap to add or remove",
+      "roomSuggestions": {
+        "livingRoom": "Living room",
+        "kitchen": "Kitchen",
+        "bedroom": "Bedroom",
+        "bathroom": "Bathroom",
+        "entrance": "Entrance",
+        "office": "Office",
+        "diningRoom": "Dining room",
+        "kidsRoom": "Kids' room",
+        "toilet": "Toilet",
+        "garage": "Garage",
+        "laundryRoom": "Laundry room",
+        "garden": "Garden"
+      },
+      "roomSheetTitle": "Room",
+      "roomNameLabel": "Name of the room",
+      "roomNameRequired": "A room needs a name.",
+      "roomNameTaken": "This house already has a room with this name.",
+      "deleteRoom": "Delete the room",
+      "deleteRoomHint": "The room is deleted when you save the house. Its devices are kept, without a room.",
+      "roomDeleted": "“{{name}}” deleted",
+      "houseDeleted": "House deleted",
+      "alarmCodePlaceholder": "4 to 8 digits",
+      "alarmCodeHelp": "The code that disarms the alarm of this house. Leave it empty if you do not use the alarm.",
+      "alarmDelayHelp": "Only applies when the alarm is armed by hand, not from a scene."
     },
     "empty": {
       "title": "No house yet",
