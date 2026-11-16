@@ -6,6 +6,7 @@ const portfinder = require('portfinder');
 const cloneDeep = require('lodash.clonedeep');
 
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { CONFIGURATION, DEFAULT, ADAPTER_MODE } = require('./constants');
 const {
   DEFAULT_KEY,
@@ -15,17 +16,20 @@ const {
   MANAGED_SERIAL_OPTION_KEYS,
 } = require('../adapters');
 
+const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
+
 const YAML_CONFIG = { singleQuote: true };
+const CONFIGURATION_FILE = path.basename(DEFAULT.CONFIGURATION_PATH);
+const COORDINATOR_BACKUP_FILE = 'coordinator_backup.json';
 
 /**
- * @description Read the Z2M configuration file. A file that is not a YAML mapping (a write cut short, a file zeroed
- * by a power cut) is set aside, as configuration.yaml.invalid-<date>, for the user to get back what it held. A file
- * Gladys cannot read is not one to replace: its error is thrown.
+ * @description Read the Z2M configuration file. A file Gladys cannot read is not one to replace: its error is thrown.
  * @param {string} configFilepath - Path of the configuration file.
- * @returns {Promise<object>} The configuration, null when there is none to keep: no file, an empty one, or one set
- * aside.
+ * @returns {Promise<object>} The configuration (`config`), null when there is none to keep: no file, an empty one, or
+ * one zeroed by a power cut. `invalid` tells a file that is not a YAML mapping (an edit by hand, a write cut short),
+ * whose content may still be the only copy of the network settings.
  * @example
- * const loadedConfig = await readConfigFile('/var/lib/gladysassistant/zigbee2mqtt/z2m/configuration.yaml');
+ * const { config, invalid } = await readConfigFile('/var/lib/gladysassistant/zigbee2mqtt/z2m/configuration.yaml');
  */
 async function readConfigFile(configFilepath) {
   let fileContent;
@@ -33,27 +37,24 @@ async function readConfigFile(configFilepath) {
     fileContent = await fs.readFile(configFilepath);
   } catch (e) {
     if (e.code === 'ENOENT') {
-      return null;
+      return { config: null, invalid: false };
     }
     throw e;
   }
-  let loadedConfig;
+  if (fileContent.every((byte) => byte === 0)) {
+    return { config: null, invalid: false };
+  }
+  let config;
   try {
-    loadedConfig = yaml.parse(fileContent.toString());
+    config = yaml.parse(fileContent.toString());
   } catch (e) {
-    loadedConfig = undefined;
+    config = undefined;
   }
-  if (loadedConfig === null) {
-    return null;
+  // A file without settings (comments only) is read as null, nothing to keep
+  if (typeof config !== 'object' || Array.isArray(config)) {
+    return { config: null, invalid: true };
   }
-  if (typeof loadedConfig !== 'object' || Array.isArray(loadedConfig)) {
-    // Dated, not to replace a file set aside before
-    const invalidFilepath = `${configFilepath}.invalid-${new Date().toISOString().replace(/:/g, '-')}`;
-    logger.warn(`Z2M configuration file is not a YAML mapping, set aside as ${path.basename(invalidFilepath)}`);
-    await fs.rename(configFilepath, invalidFilepath);
-    return null;
-  }
-  return loadedConfig;
+  return { config, invalid: false };
 }
 
 /**
@@ -79,6 +80,42 @@ async function writeConfigFile(configFilepath, config) {
     await fs.rename(temporaryFilepath, configFilepath);
   } catch (e) {
     await fs.rm(temporaryFilepath, { force: true });
+    throw e;
+  }
+}
+
+/**
+ * @description Tell if a configuration is the one Zigbee2mqtt writes when started without configuration file (its
+ * data folder removed while its container ran), flagged "onboarding": it waits at every start for the user to fill its
+ * onboarding page, never shown by Gladys. Never completed, it holds nothing to keep. Its network key still "GENERATE"
+ * (replaced by Zigbee2mqtt once its network started) tells it from a used file.
+ * @param {object} config - The configuration, null without one.
+ * @returns {boolean} True for such a configuration.
+ * @example
+ * const toReplace = waitsForOnboarding(loadedConfig);
+ */
+function waitsForOnboarding(config) {
+  return config !== null && Boolean(config.onboarding) && (config.advanced || {}).network_key === 'GENERATE';
+}
+
+/**
+ * @description Tell if a file is there but does not hold JSON, as a write cut short (a disk full) leaves it.
+ * @param {string} filepath - Path of the file.
+ * @returns {Promise<boolean>} True for such a file, false without file.
+ * @example
+ * const cutShort = await holdsNoJson('/app/data/coordinator_backup.json');
+ */
+async function holdsNoJson(filepath) {
+  try {
+    JSON.parse((await fs.readFile(filepath)).toString());
+    return false;
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      return true;
+    }
+    if (e.code === 'ENOENT') {
+      return false;
+    }
     throw e;
   }
 }
@@ -150,6 +187,79 @@ async function isNetworkFormedBeforeDrawnSettings(gladys, serviceId) {
 }
 
 /**
+ * @description Write the Z2M configuration file again when there is none to keep: from the Z2M backup saved by Gladys,
+ * with the network settings of the coordinator backup left by Zigbee2mqtt, which describe the network the coordinator
+ * carries. A file that is not a YAML mapping is only replaced by the one of the Z2M backup: without it, the error is
+ * thrown and the file left in place, for the user to fix it, as it may hold the only copy of the network settings.
+ * @param {object} manager - Zigbee2mqtt manager.
+ * @param {string} configFilepath - Path of the configuration file.
+ * @param {boolean} configInvalid - Is the file in place not a YAML mapping?
+ * @returns {Promise<object>} The configuration written.
+ * @example
+ * const loadedConfig = await recoverConfigFile(this, configFilepath, false);
+ */
+async function recoverConfigFile(manager, configFilepath, configInvalid) {
+  const configFolder = path.dirname(configFilepath);
+  // Restarted by Docker meanwhile, Zigbee2mqtt would write its onboarding file in place of a file removed, or start
+  // on a restored file not given the coordinator settings yet
+  const container = await findManagedContainer(manager.gladys.system, containerDescriptor);
+  if (container) {
+    await manager.gladys.system.stopContainer(container.id);
+  }
+
+  const filesToReplace = [];
+  if (configInvalid) {
+    logger.warn('Z2M configuration file is not valid YAML, only its backup can replace it');
+    filesToReplace.push(CONFIGURATION_FILE);
+  } else {
+    // A file left in place would stop the restore
+    await fs.rm(configFilepath, { force: true });
+  }
+  const coordinatorBackupFilepath = path.join(configFolder, COORDINATOR_BACKUP_FILE);
+  if (await holdsNoJson(coordinatorBackupFilepath)) {
+    // Cut short with the configuration file (a disk full): the one of the Z2M backup takes its place
+    filesToReplace.push(COORDINATOR_BACKUP_FILE);
+  }
+  // A network already formed gets back its settings, and its devices, whether the container was created again or not
+  await manager.restoreZ2mBackup(configFolder, filesToReplace);
+
+  const { config: restoredConfig, invalid } = await readConfigFile(configFilepath);
+  if (invalid) {
+    // Zigbee2mqtt stays stopped until the next configuration
+    throw new Error(`Zigbee2mqtt: ${configFilepath} is not valid YAML, fix it then restart Gladys`);
+  }
+  try {
+    if (waitsForOnboarding(restoredConfig)) {
+      // Started by a concurrent call: Zigbee2mqtt would wait for its onboarding at every start
+      throw new Error('Zigbee2mqtt: Zigbee2mqtt wrote its onboarding file while its backup was restored');
+    }
+    // Newer than those of a restored file, the settings of the coordinator backup win: other settings would make
+    // Zigbee2mqtt leave this network (ember) or stop on "configuration-adapter mismatch" (z-stack)
+    const networkSettings = await readCoordinatorBackup(coordinatorBackupFilepath);
+    const loadedConfig = restoredConfig || cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
+    if (networkSettings) {
+      loadedConfig.advanced = { ...loadedConfig.advanced, ...networkSettings };
+    } else if (!restoredConfig && (await isNetworkFormedBeforeDrawnSettings(manager.gladys, manager.serviceId))) {
+      // Without network settings in its file, Zigbee2mqtt comes back on this network, as it did before
+      logger.info('Writing default Z2M configuration, without network settings, for its existing network...');
+      delete loadedConfig.advanced;
+    } else if (!restoredConfig) {
+      // A first installation, or one reset: Zigbee2mqtt draws the settings of a new network. Saved before the file is
+      // written, so that a network drawn is never taken for one formed before
+      logger.info('Writing default Z2M configuration...');
+      await manager.gladys.variable.setValue(CONFIGURATION.Z2M_NETWORK_GENERATED, 'true', manager.serviceId);
+    }
+    await writeConfigFile(configFilepath, loadedConfig);
+    return loadedConfig;
+  } catch (e) {
+    // A file restored but not given the coordinator settings would be kept as is by the next call: it is removed, for
+    // the next call to do it all again
+    await fs.rm(configFilepath, { force: true });
+    throw e;
+  }
+}
+
+/**
  * @description Configure Z2M container.
  * @param {string} basePathOnContainer - Zigbee2mqtt base path.
  * @param {object} config - Gladys Z2M stored configuration.
@@ -163,55 +273,19 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
 
   // Create configuration path (if not exists)
   const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
-  const configFolder = path.dirname(configFilepath);
-  await fs.mkdir(configFolder, {
+  await fs.mkdir(path.dirname(configFilepath), {
     recursive: true,
   });
 
-  let loadedConfig = await readConfigFile(configFilepath);
-  // Started without configuration file (its data folder removed while its container ran), Zigbee2mqtt writes its
-  // own, flagged "onboarding", and waits at every start for the user to fill its onboarding page, never shown by
-  // Gladys. Never completed, this file holds nothing to keep: it is handled as if there was none, like an empty file
-  // (a write cut short). Its network key still "GENERATE" (replaced by Zigbee2mqtt once its network started) tells
-  // it from a used file, left untouched.
-  const waitsForOnboarding =
-    loadedConfig !== null && loadedConfig.onboarding && (loadedConfig.advanced || {}).network_key === 'GENERATE';
+  const { config: configInPlace, invalid } = await readConfigFile(configFilepath);
+  let loadedConfig = configInPlace;
 
   let configCreated = false;
-  if (loadedConfig !== null && !waitsForOnboarding) {
+  if (loadedConfig !== null && !waitsForOnboarding(loadedConfig)) {
     logger.info('Z2M configuration file already exists.');
   } else {
-    // A network already formed gets back its settings, and its devices, from the Z2M backup saved by Gladys, whether
-    // the container was created again or not. A file left in place would stop the restore.
     logger.info('No Z2M configuration file to keep, restoring its backup...');
-    await fs.rm(configFilepath, { force: true });
-    try {
-      await this.restoreZ2mBackup(configFolder);
-      const restoredConfig = await readConfigFile(configFilepath);
-      // The coordinator backup left by Zigbee2mqtt in its folder holds the settings of the network the coordinator
-      // carries, newer than those of a restored file: they win, as other settings would make Zigbee2mqtt leave this
-      // network (ember) or stop on "configuration-adapter mismatch" (z-stack).
-      const networkSettings = await readCoordinatorBackup(path.join(configFolder, 'coordinator_backup.json'));
-      loadedConfig = restoredConfig || cloneDeep(DEFAULT.CONFIGURATION_CONTENT);
-      if (networkSettings) {
-        loadedConfig.advanced = { ...loadedConfig.advanced, ...networkSettings };
-      } else if (!restoredConfig && (await isNetworkFormedBeforeDrawnSettings(this.gladys, this.serviceId))) {
-        // Without network settings in its file, Zigbee2mqtt comes back on this network, as it did before
-        logger.info('Writing default Z2M configuration, without network settings, for its existing network...');
-        delete loadedConfig.advanced;
-      } else if (!restoredConfig) {
-        // A first installation, or one reset: Zigbee2mqtt draws the settings of a new network. Saved before the file is
-        // written, so that a network drawn is never taken for one formed before
-        logger.info('Writing default Z2M configuration...');
-        await this.gladys.variable.setValue(CONFIGURATION.Z2M_NETWORK_GENERATED, 'true', this.serviceId);
-      }
-      await writeConfigFile(configFilepath, loadedConfig);
-    } catch (e) {
-      // A file restored but not given the coordinator settings, or written in part, would be kept as is by the next
-      // call: it is removed, for the next call to do it all again. It can only be the file written above.
-      await fs.rm(configFilepath, { force: true });
-      throw e;
-    }
+    loadedConfig = await recoverConfigFile(this, configFilepath, invalid);
     configCreated = true;
   }
   const { mqtt = {} } = loadedConfig;

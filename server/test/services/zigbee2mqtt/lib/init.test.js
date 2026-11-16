@@ -4,6 +4,7 @@ const { expect } = require('chai');
 const { assert, fake } = sinon;
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
+const { CONFIGURATION, DEFAULT } = require('../../../../services/zigbee2mqtt/lib/constants');
 
 const container = {
   id: 'docker-test',
@@ -209,6 +210,35 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
+  });
+
+  it('should save the version of the Zigbee2mqtt container only once Zigbee2mqtt is installed', async () => {
+    // PREPARE
+    // A first installation, with the stored configuration read and saved for real
+    const variables = { [CONFIGURATION.Z2M_DRIVER_PATH]: '/dev/ttyUSB0' };
+    gladys.variable = {
+      getValue: fake((key) => Promise.resolve(variables[key] || null)),
+      setValue: fake((key, value) => {
+        variables[key] = value;
+        return Promise.resolve();
+      }),
+      destroy: fake.resolves(null),
+    };
+    delete zigbee2mqttManager.getConfiguration;
+    delete zigbee2mqttManager.checkForContainerUpdates;
+    delete zigbee2mqttManager.saveConfiguration;
+    let versionWhenInstalled;
+    zigbee2mqttManager.installZ2mContainer = fake(() => {
+      versionWhenInstalled = variables.DOCKER_Z2M_VERSION;
+    });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+    // Read by configureContainer: saved before, it would take a new installation for a network formed before
+    // Gladys asked Zigbee2mqtt to draw its settings
+    expect(versionWhenInstalled).to.equal(undefined);
+    expect(variables.DOCKER_Z2M_VERSION).to.equal(DEFAULT.DOCKER_Z2M_VERSION);
   });
 
   it('should not install containers, network coordinator not configured', async () => {

@@ -128,7 +128,7 @@ describe('zigbee2mqtt restoreZ2mBackup', () => {
     expect(fs.readdirSync(outputPath)).deep.equals([]);
   });
 
-  it('should end every write of the backup before failing', async () => {
+  it('should not write the configuration file when another file of the backup cannot be written', async () => {
     // Holds configuration.yaml and external_converters/my-device.js
     const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-subfolder.backup'));
     gladys.variable.getValue = fake.resolves(base64Zip.toString());
@@ -138,7 +138,88 @@ describe('zigbee2mqtt restoreZ2mBackup', () => {
 
     await expect(zigbee2MqttService.restoreZ2mBackup(outputPath)).to.be.rejected;
 
-    // Already written when the error is thrown: not created after its caller removed it
-    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(true);
+    // Kept as is by the next start: the backup is restored again instead
+    expect(fs.existsSync(path.join(outputPath, 'configuration.yaml'))).equals(false);
+  });
+
+  it('should restore a backup without configuration file', async () => {
+    // Holds database.db only
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-without-configuration.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath);
+
+    expect(fs.readdirSync(outputPath)).deep.equals(['database.db']);
+  });
+
+  it('should replace the files to replace, and set them aside', async () => {
+    // Holds configuration.yaml, coordinator_backup.json and database.db
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-replace.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+    // Cut short
+    fs.mkdirSync(outputPath);
+    fs.writeFileSync(path.join(outputPath, 'configuration.yaml'), 'homeassistant: false\nmqtt: [');
+    fs.writeFileSync(path.join(outputPath, 'coordinator_backup.json'), '');
+    fs.writeFileSync(path.join(outputPath, 'database.db'), 'newer database');
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath, ['configuration.yaml', 'coordinator_backup.json']);
+
+    expect(fs.readFileSync(path.join(outputPath, 'configuration.yaml'), 'utf8')).equals('homeassistant: false\n');
+    expect(fs.readFileSync(path.join(outputPath, 'coordinator_backup.json'), 'utf8')).equals('{"version":1}\n');
+    expect(fs.readFileSync(path.join(outputPath, 'database.db'), 'utf8')).equals('newer database');
+    const setAside = fs.readdirSync(outputPath).filter((file) => file.includes('.invalid-'));
+    expect(setAside).to.have.lengthOf(2);
+    const setAsideConfiguration = setAside.find((file) => file.startsWith('configuration.yaml.invalid-'));
+    expect(fs.readFileSync(path.join(outputPath, setAsideConfiguration), 'utf8')).equals(
+      'homeassistant: false\nmqtt: [',
+    );
+    const setAsideCoordinatorBackup = setAside.find((file) => file.startsWith('coordinator_backup.json.invalid-'));
+    expect(fs.readFileSync(path.join(outputPath, setAsideCoordinatorBackup), 'utf8')).equals('');
+  });
+
+  it('should keep a file set aside before when it sets aside another one', async () => {
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-replace.backup'));
+    gladys.variable.getValue = fake.resolves(base64Zip.toString());
+    const earlierSetAside = 'configuration.yaml.invalid-2026-11-01T00-00-00.000Z';
+    fs.mkdirSync(outputPath);
+    fs.writeFileSync(path.join(outputPath, earlierSetAside), 'earlier');
+    fs.writeFileSync(path.join(outputPath, 'configuration.yaml'), 'mqtt: [');
+
+    await zigbee2MqttService.restoreZ2mBackup(outputPath, ['configuration.yaml']);
+
+    const setAside = fs.readdirSync(outputPath).filter((file) => file.startsWith('configuration.yaml.invalid-'));
+    expect(setAside).to.have.lengthOf(2);
+    expect(fs.readFileSync(path.join(outputPath, earlierSetAside), 'utf8')).equals('earlier');
+  });
+
+  it('should leave a file to replace whole when the one of the backup cannot be written', async () => {
+    const writeError = new Error('ENOSPC: no space left on device');
+    writeError.code = 'ENOSPC';
+    // The disk is full once the other files are written: the file that replaces the configuration file is cut short
+    const writeFile = fake(async (filePath, content, options) => {
+      if (!filePath.endsWith('.tmp')) {
+        await fsPromises.writeFile(filePath, content, options);
+        return;
+      }
+      await fsPromises.writeFile(filePath, 'cut');
+      throw writeError;
+    });
+    const { restoreZ2mBackup } = proxyquire('../../../../services/zigbee2mqtt/lib/restoreZ2mBackup', {
+      'fs/promises': { ...fsPromises, writeFile },
+    });
+    const base64Zip = fs.readFileSync(path.join(backupPath, 'base64-replace.backup'));
+    const manager = { gladys: { variable: { getValue: fake.resolves(base64Zip.toString()) } }, serviceId };
+    fs.mkdirSync(outputPath);
+    fs.writeFileSync(path.join(outputPath, 'configuration.yaml'), 'mqtt: [');
+
+    await expect(restoreZ2mBackup.call(manager, outputPath, ['configuration.yaml'])).to.be.rejectedWith('ENOSPC');
+
+    expect(fs.readFileSync(path.join(outputPath, 'configuration.yaml'), 'utf8')).equals('mqtt: [');
+    // Nothing left behind
+    expect(fs.readdirSync(outputPath).sort()).deep.equals([
+      'configuration.yaml',
+      'coordinator_backup.json',
+      'database.db',
+    ]);
   });
 });

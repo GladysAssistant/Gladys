@@ -46,8 +46,6 @@ const coordinatorBackup = {
   channel: 15,
   network_key: { key: '181b15952df956b87a22e8560fb15b98', sequence_number: 0, frame_counter: 1234 },
 };
-const setAsideFiles = () =>
-  fs.readdirSync(configFolder).filter((file) => file.startsWith('configuration.yaml.invalid-'));
 
 describe('zigbee2mqtt configureContainer', () => {
   // PREPARE
@@ -67,6 +65,11 @@ describe('zigbee2mqtt configureContainer', () => {
         // By default, a first installation
         getValue: fake.resolves(null),
         setValue: fake.resolves(null),
+      },
+      system: {
+        // By default, no container yet
+        getContainers: fake.resolves([]),
+        stopContainer: fake.resolves(null),
       },
     };
 
@@ -96,7 +99,7 @@ describe('zigbee2mqtt configureContainer', () => {
     assert.calledOnce(portfinderMock.getPortPromise);
     // Asking Zigbee2mqtt to draw the network settings, after looking for a backup
     expect(resultContent).to.include('network_key: GENERATE');
-    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder, []);
     assert.calledOnceWithExactly(gladys.variable.setValue, 'Z2M_NETWORK_GENERATED', 'true', serviceId);
   });
 
@@ -149,7 +152,7 @@ describe('zigbee2mqtt configureContainer', () => {
     const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
-    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder, []);
   });
 
   it('it should take the network settings of the coordinator backup over those of the restored Z2M backup', async () => {
@@ -177,7 +180,7 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
   });
 
-  it('it should restore the Z2M backup again, with the coordinator settings, after the coordinator backup could not be read', async () => {
+  it('it should write the configuration file, with the coordinator settings, once the coordinator backup can be read again', async () => {
     // PREPARE
     // Not a file: reading it fails, as for a file without read permission
     fs.mkdirSync(coordinatorBackupFilePath);
@@ -196,7 +199,7 @@ describe('zigbee2mqtt configureContainer', () => {
     const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
     await expect(promise).to.be.rejectedWith('EISDIR');
-    // Not kept without the coordinator settings
+    assert.notCalled(zigbee2mqttManager.restoreZ2mBackup);
     expect(fs.existsSync(configFilePath)).to.equal(false);
 
     // PREPARE
@@ -206,21 +209,17 @@ describe('zigbee2mqtt configureContainer', () => {
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
-    assert.calledTwice(zigbee2mqttManager.restoreZ2mBackup);
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
     const expectedContent = fs.readFileSync(coordinatorBackupConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
   });
 
-  it('it should not keep the configuration file of a Z2M backup restored in part', async () => {
+  it('it should not keep a restored configuration file that the coordinator settings were not given', async () => {
     // PREPARE
-    // The configuration file is written, another file of the backup is not (disk full)
-    const writeError = new Error('ENOSPC: no space left on device');
-    writeError.code = 'ENOSPC';
+    fs.writeFileSync(coordinatorBackupFilePath, JSON.stringify({ ...coordinatorBackup, channel: 27 }));
     zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
       fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
-      throw writeError;
     });
     const config = {
       mqttUsername: 'mqtt-username',
@@ -229,14 +228,65 @@ describe('zigbee2mqtt configureContainer', () => {
     // EXECUTE
     const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
-    await expect(promise).to.be.rejectedWith('ENOSPC');
+    await expect(promise).to.be.rejectedWith('does not hold the settings of the Zigbee network');
+    // Restored again by the next start
     expect(fs.existsSync(configFilePath)).to.equal(false);
   });
 
-  it('it should set aside a configuration file zeroed by a power cut, and restore the Z2M backup in its place', async () => {
+  it('it should not keep a restored configuration file when the restored coordinator backup cannot be read', async () => {
     // PREPARE
-    // Read by YAML as a string
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+      // Not a file: reading it fails, as for a file restored without read permission
+      fs.mkdirSync(path.join(folder, 'coordinator_backup.json'));
+    });
+    const config = {};
+    // EXECUTE
+    const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith('EISDIR');
+    expect(fs.existsSync(configFilePath)).to.equal(false);
+  });
+
+  it('it should not keep the onboarding file written by Zigbee2mqtt while its backup was restored', async () => {
+    // PREPARE
+    // Started by a concurrent call, Zigbee2mqtt writes its onboarding file before the configuration file of the backup
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
+      fs.copyFileSync(onboardingConfigFilePath, path.join(folder, 'configuration.yaml'));
+    });
+    const config = {};
+    // EXECUTE
+    const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith('Zigbee2mqtt wrote its onboarding file while its backup was restored');
+    // Restored again by the next start
+    expect(fs.existsSync(configFilePath)).to.equal(false);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
+  it('it should stop Zigbee2mqtt before restoring its backup', async () => {
+    // PREPARE
+    // Restarted in a loop by Docker on a configuration file it cannot read
+    gladys.system.getContainers = fake.resolves([
+      {
+        id: 'z2m-container-id',
+        name: '/gladys-z2m-zigbee2mqtt',
+        state: 'restarting',
+        labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
+      },
+    ]);
+    const config = {};
+    // EXECUTE
+    await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.system.stopContainer, 'z2m-container-id');
+    assert.callOrder(gladys.system.stopContainer, zigbee2mqttManager.restoreZ2mBackup);
+  });
+
+  it('it should restore the Z2M backup in place of a configuration file zeroed by a power cut', async () => {
+    // PREPARE
     fs.writeFileSync(configFilePath, Buffer.alloc(16));
+    // Skips the restore when a configuration file is there
     zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
       if (!fs.existsSync(path.join(folder, 'configuration.yaml'))) {
         fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
@@ -249,22 +299,24 @@ describe('zigbee2mqtt configureContainer', () => {
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
-    expect(setAsideFiles()).to.have.lengthOf(1);
-    expect(fs.readFileSync(path.join(configFolder, setAsideFiles()[0]))).to.deep.equal(Buffer.alloc(16));
+    // Holds nothing to keep
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder, []);
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
     const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
   });
 
-  it('it should set aside a configuration file that is not YAML, and restore the Z2M backup in its place', async () => {
+  it('it should replace a configuration file that is not YAML with the one of the Z2M backup', async () => {
     // PREPARE
     // Left by a write cut short in a quoted value
     const invalidContent =
       "homeassistant: false\nmap_options:\n  graphviz:\n    colors:\n      fill:\n        enddevice: '#fff8";
     fs.writeFileSync(configFilePath, invalidContent);
-    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder) => {
-      fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder, filesToReplace) => {
+      if (filesToReplace.includes('configuration.yaml')) {
+        fs.copyFileSync(restoredConfigFilePath, path.join(folder, 'configuration.yaml'));
+      }
     });
     const config = {
       mqttUsername: 'mqtt-username',
@@ -273,25 +325,76 @@ describe('zigbee2mqtt configureContainer', () => {
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
-    expect(setAsideFiles()).to.have.lengthOf(1);
-    expect(fs.readFileSync(path.join(configFolder, setAsideFiles()[0]), 'utf8')).to.equal(invalidContent);
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder, ['configuration.yaml']);
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
     const expectedContent = fs.readFileSync(restoredConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: false });
   });
 
-  it('it should keep a configuration file set aside before when it sets aside another one', async () => {
+  // Edited by hand, the file may hold the only copy of the network settings
+  const recoveriesWithoutZ2mBackup = {
+    'for a network drawn by Zigbee2mqtt': () => {
+      gladys.variable.getValue = fake((key) =>
+        Promise.resolve({ DOCKER_Z2M_VERSION: '13', Z2M_NETWORK_GENERATED: 'true' }[key] || null),
+      );
+    },
+    'with a coordinator backup': () => {
+      fs.writeFileSync(coordinatorBackupFilePath, JSON.stringify(coordinatorBackup));
+    },
+  };
+  Object.entries(recoveriesWithoutZ2mBackup).forEach(([description, prepare]) => {
+    it(`it should leave a configuration file that is not YAML in place without Z2M backup, ${description}`, async () => {
+      // PREPARE
+      prepare();
+      const invalidContent = 'homeassistant: false\nadvanced:\n  network_key: [1, 3\n';
+      fs.writeFileSync(configFilePath, invalidContent);
+      const config = {};
+      // EXECUTE
+      const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+      // ASSERT
+      await expect(promise).to.be.rejectedWith('configuration.yaml is not valid YAML, fix it then restart Gladys');
+      expect(fs.readFileSync(configFilePath, 'utf8')).to.equal(invalidContent);
+      assert.notCalled(gladys.variable.setValue);
+    });
+  });
+
+  it('it should leave a configuration file that is not YAML in place when the Z2M backup cannot be restored', async () => {
     // PREPARE
-    const earlierSetAside = 'configuration.yaml.invalid-2026-11-01T00-00-00.000Z';
-    fs.writeFileSync(path.join(configFolder, earlierSetAside), 'earlier');
-    fs.writeFileSync(configFilePath, Buffer.alloc(16));
+    const invalidContent = 'homeassistant: false\nmqtt: [';
+    fs.writeFileSync(configFilePath, invalidContent);
+    const writeError = new Error('ENOSPC: no space left on device');
+    writeError.code = 'ENOSPC';
+    zigbee2mqttManager.restoreZ2mBackup = fake.rejects(writeError);
     const config = {};
     // EXECUTE
-    await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    const promise = zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
-    expect(setAsideFiles()).to.have.lengthOf(2);
-    expect(fs.readFileSync(path.join(configFolder, earlierSetAside), 'utf8')).to.equal('earlier');
+    await expect(promise).to.be.rejectedWith('ENOSPC');
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.equal(invalidContent);
+  });
+
+  it('it should replace a coordinator backup cut short with the one of the Z2M backup', async () => {
+    // PREPARE
+    // Zeroed with the configuration file (a disk full)
+    fs.writeFileSync(coordinatorBackupFilePath, '');
+    zigbee2mqttManager.restoreZ2mBackup = fake(async (folder, filesToReplace) => {
+      if (filesToReplace.includes('coordinator_backup.json')) {
+        fs.writeFileSync(path.join(folder, 'coordinator_backup.json'), JSON.stringify(coordinatorBackup));
+      }
+    });
+    const config = {
+      mqttUsername: 'mqtt-username',
+      mqttPassword: 'mqtt-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder, ['coordinator_backup.json']);
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(coordinatorBackupConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
   });
 
   it('it should leave the configuration file whole when it cannot be written again', async () => {
@@ -338,7 +441,10 @@ describe('zigbee2mqtt configureContainer', () => {
       await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
       // ASSERT
       expect(fs.readFileSync(configFilePath, 'utf8')).to.include('user: other-username');
-      expect(fs.statSync(configFilePath).mode.toString(8)).to.match(new RegExp(`${permissions}$`));
+      // Windows only keeps the write permission
+      if (process.platform !== 'win32') {
+        expect(fs.statSync(configFilePath).mode.toString(8)).to.match(new RegExp(`${permissions}$`));
+      }
     });
   });
 
@@ -436,7 +542,7 @@ describe('zigbee2mqtt configureContainer', () => {
     const expectedContent = fs.readFileSync(mqttConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
-    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder);
+    assert.calledOnceWithExactly(zigbee2mqttManager.restoreZ2mBackup, configFolder, []);
   });
 
   it('it should keep the network settings of the coordinator backup left by Zigbee2mqtt, without Z2M backup', async () => {
@@ -456,7 +562,9 @@ describe('zigbee2mqtt configureContainer', () => {
   });
 
   const unusableCoordinatorBackups = {
+    // Not replaced without Z2M backup
     'not JSON': '{',
+    'cut short': '',
     'without network key': JSON.stringify({ ...coordinatorBackup, network_key: null }),
     'with a short network key': JSON.stringify({ ...coordinatorBackup, network_key: { key: '0103' } }),
     'with a short extended PAN ID': JSON.stringify({ ...coordinatorBackup, extended_pan_id: '' }),
@@ -565,6 +673,7 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
     assert.notCalled(zigbee2mqttManager.restoreZ2mBackup);
+    assert.notCalled(gladys.system.stopContainer);
   });
 
   it('it should override mqtt credentials', async () => {
