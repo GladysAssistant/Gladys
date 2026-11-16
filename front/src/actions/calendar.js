@@ -68,6 +68,10 @@ function createActions(store) {
     // has no calendar yet, the page points them at the integration to enable
     // for their account instead of a vague "go to the integrations"
     async getCalendarIntegrations(state) {
+      // cleared first: the list kept from a previous visit (an integration
+      // installed since, from the catalog link) would show outdated advice
+      // until the new list arrives
+      store.setState({ calendarIntegrations: undefined });
       try {
         const integrations = await state.httpClient.get('/api/v1/external_integration');
         store.setState({

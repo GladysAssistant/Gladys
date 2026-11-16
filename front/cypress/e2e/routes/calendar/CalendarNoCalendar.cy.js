@@ -32,12 +32,10 @@ describe('Calendar - no calendar connected', () => {
     cy.intercept('GET', '**/api/v1/external_integration', [deviceIntegration]);
     cy.visit('/dashboard/calendar');
 
-    // the overwritten cy.contains translates the i18n keys
-    cy.get(NOTICE).within(() => {
-      cy.contains('calendar.noCalendarsConnected.title').should('exist');
-      cy.contains('calendar.noCalendarsConnected.installIntegration').should('exist');
-      cy.contains('calendar.noCalendarsConnected.sharedCalendars').should('exist');
-    });
+    cy.get(NOTICE)
+      .i18n('calendar.noCalendarsConnected.title')
+      .i18n('calendar.noCalendarsConnected.installIntegration')
+      .i18n('calendar.noCalendarsConnected.sharedCalendars');
     cy.get('[data-cy=calendar-integration-link]').should('not.exist');
     cy.get('[data-cy=calendar-catalog-link]').click();
     cy.location('pathname').should('eq', '/dashboard/integration');
@@ -49,9 +47,7 @@ describe('Calendar - no calendar connected', () => {
     cy.intercept('GET', '**/api/v1/external_integration', [deviceIntegration, calendarIntegration]);
     cy.visit('/dashboard/calendar');
 
-    cy.get(NOTICE).within(() => {
-      cy.contains('calendar.noCalendarsConnected.enableInstalled').should('exist');
-    });
+    cy.get(NOTICE).i18n('calendar.noCalendarsConnected.enableInstalled');
     cy.get('[data-cy=calendar-integration-link]')
       .should('have.length', 1)
       .and('contain', 'Holidays')
@@ -60,13 +56,28 @@ describe('Calendar - no calendar connected', () => {
   });
 
   it('shows no notice once the user has a calendar', () => {
-    cy.intercept('GET', '**/api/v1/calendar', [
-      { id: 'a1b2c3d4-0000-4000-8000-000000000001', name: 'Personal', selector: 'personal', color: '#3366ff' }
+    const calendarId = 'a1b2c3d4-0000-4000-8000-000000000001';
+    const now = new Date();
+    cy.intercept('GET', '**/api/v1/calendar/event*', [
+      {
+        name: 'Dentist',
+        calendar_id: calendarId,
+        start: now.toISOString(),
+        end: new Date(now.getTime() + 60 * 60 * 1000).toISOString(),
+        full_day: false
+      }
     ]);
-    cy.intercept('GET', '**/api/v1/external_integration', [calendarIntegration]);
+    cy.intercept('GET', '**/api/v1/calendar', [
+      { id: calendarId, name: 'Personal', selector: 'personal', color: '#3366ff' }
+    ]).as('getCalendars');
+    cy.intercept('GET', '**/api/v1/external_integration', [calendarIntegration]).as('getIntegrations');
     cy.visit('/dashboard/calendar');
 
-    cy.get('.rbc-calendar').should('exist');
+    // the calendar grid renders before its requests answer: wait for both,
+    // then for the event, stored with the calendars in the same update, so
+    // the absence of the notice is checked on the loaded page
+    cy.wait(['@getCalendars', '@getIntegrations']);
+    cy.contains('.rbc-event', 'Dentist').should('exist');
     cy.get(NOTICE).should('not.exist');
   });
 });
