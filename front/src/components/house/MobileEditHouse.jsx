@@ -91,7 +91,8 @@ class MobileEditHouse extends Component {
   isUnsaved = () => Boolean(this.props.dirty) || !this.props.house.created_at;
 
   onBeforeUnload = event => {
-    if (this.isUnsaved()) {
+    // the user chose to leave without saving: nothing holds the page back
+    if (this.isUnsaved() && !this.discarding) {
       event.preventDefault();
       event.returnValue = '';
     }
@@ -125,6 +126,7 @@ class MobileEditHouse extends Component {
   };
 
   leaveWithoutSaving = () => {
+    this.discarding = true;
     this.setState({ leaveOpen: false });
     this.props.onDiscard();
   };

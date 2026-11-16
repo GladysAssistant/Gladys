@@ -9,8 +9,23 @@ describe('Houses on a phone', () => {
   const deleteHouse = selector =>
     cy.request({ method: 'DELETE', url: `${serverUrl}/api/v1/house/${selector}`, failOnStatusCode: false });
 
+  // Each visit gets its own URL: a test may end with the editor open, which holds an entry of the
+  // same URL in the history, and the next test must start from a page loaded anew.
+  let visits = 0;
+  const visitHouses = options => {
+    visits += 1;
+    cy.visit(`/dashboard/settings/house?visit=${visits}`, options);
+    cy.get('[data-cy=houses-mobile], [aria-controls^=house-panel]').should('exist');
+  };
+
+  // The position of the phone, answered by the test: a plain replacement on the window of the
+  // page (nothing to restore when the test ends, the window is gone)
+  const stubGeolocation = getCurrentPosition => win => {
+    Object.defineProperty(win.navigator, 'geolocation', { value: { getCurrentPosition }, configurable: true });
+  };
+
   const openHouse = () => {
-    cy.visit('/dashboard/settings/house');
+    visitHouses();
     cy.contains('[data-cy=house-row]', houseName).click();
     cy.get('[data-cy=house-edit-mobile]').should('be.visible');
   };
@@ -43,7 +58,7 @@ describe('Houses on a phone', () => {
   });
 
   it('should list the houses as rows and open one in a focus view', () => {
-    cy.visit('/dashboard/settings/house');
+    visitHouses();
     cy.get('[data-cy=houses-mobile]').should('be.visible');
     cy.contains('[data-cy=house-row]', houseName)
       .should('contain', '2 rooms')
@@ -148,12 +163,8 @@ describe('Houses on a phone', () => {
       { method: 'GET', url: 'https://nominatim.openstreetmap.org/search*' },
       { body: [{ place_id: 42, display_name: '10 Main Street, Springfield', lat: '39.7817', lon: '-89.6501' }] }
     ).as('searchAddress');
-    cy.visit('/dashboard/settings/house', {
-      onBeforeLoad(win) {
-        cy.stub(win.navigator.geolocation, 'getCurrentPosition').callsFake(onSuccess =>
-          onSuccess({ coords: { latitude: 48.8583, longitude: 2.2945 } })
-        );
-      }
+    visitHouses({
+      onBeforeLoad: stubGeolocation(onSuccess => onSuccess({ coords: { latitude: 48.8583, longitude: 2.2945 } }))
     });
     cy.contains('[data-cy=house-row]', houseName).click();
     cy.get('[data-cy=house-location-status]').i18n('housesSettings.mobile.positionNotSet');
@@ -182,13 +193,7 @@ describe('Houses on a phone', () => {
   });
 
   it('should tell why the position of the phone cannot be used', () => {
-    cy.visit('/dashboard/settings/house', {
-      onBeforeLoad(win) {
-        cy.stub(win.navigator.geolocation, 'getCurrentPosition').callsFake((onSuccess, onError) =>
-          onError({ code: 1 })
-        );
-      }
-    });
+    visitHouses({ onBeforeLoad: stubGeolocation((onSuccess, onError) => onError({ code: 1 })) });
     cy.contains('[data-cy=house-row]', houseName).click();
     cy.get('[data-cy=house-locate-me]').click();
     cy.get('[data-cy=house-locate-me-error]').i18n('housesSettings.mobile.locationError.denied');
@@ -234,7 +239,7 @@ describe('Houses on a phone', () => {
   it('should create a house from the "+" and delete it after a confirmation', () => {
     cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/house` }).as('createHouse');
     cy.intercept({ method: 'DELETE', url: `${serverUrl}/api/v1/house/${newHouseSelector}` }).as('deleteHouse');
-    cy.visit('/dashboard/settings/house');
+    visitHouses();
     cy.get('[data-cy=house-row]').should('exist');
     cy.get('[data-cy=houses-add]').click();
     cy.get('[data-cy=house-edit-mobile]').should('be.visible');
@@ -274,7 +279,7 @@ describe('Houses on a phone', () => {
 
   it('should keep the accordion on a wider screen', () => {
     cy.viewport(1280, 800);
-    cy.visit('/dashboard/settings/house');
+    visitHouses();
     cy.get('[aria-controls^=house-panel]').should('exist');
     cy.get('[data-cy=houses-mobile]').should('not.exist');
     cy.get('[data-cy=house-edit-mobile]').should('not.exist');

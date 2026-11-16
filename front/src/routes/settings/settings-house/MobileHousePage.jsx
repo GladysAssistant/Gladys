@@ -22,10 +22,15 @@ import style from './style.css';
 import dashboardStyle from '../../dashboard/style.css';
 
 // The entry the open editor holds in the history: the system "back" (the Android button, the iOS
-// edge swipe) leaves it, which closes the editor instead of leaving the settings
+// edge swipe) leaves it, which closes the editor instead of leaving the settings. Its value is
+// the id of the editor it belongs to: an entry that survived a reload of the page is not taken
+// for the one of the editor now open.
 const EDITOR_ENTRY_KEY = 'gladysHouseEditor';
 
-const isEditorEntryOnTop = () => Boolean(window.history.state && window.history.state[EDITOR_ENTRY_KEY]);
+// how long a programmatic close waits for the history before closing anyway
+const CLOSE_FALLBACK_MS = 400;
+
+const readEditorEntryId = () => (window.history.state && window.history.state[EDITOR_ENTRY_KEY]) || null;
 
 const countRooms = house => (house.rooms || []).filter(room => room.to_delete !== true).length;
 
@@ -67,6 +72,14 @@ class MobileHousePage extends Component {
 
   componentDidMount() {
     window.addEventListener('popstate', this.onPopState);
+    // the page was reloaded while an editor was open: its entry is still the current one, with
+    // nothing to close. It becomes an ordinary entry of the page (no traversal: going back from
+    // a freshly loaded page may load it again).
+    if (readEditorEntryId() !== null) {
+      const state = { ...window.history.state };
+      delete state[EDITOR_ENTRY_KEY];
+      window.history.replaceState(state, '');
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -111,6 +124,7 @@ class MobileHousePage extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('popstate', this.onPopState);
+    clearTimeout(this.closeTimer);
   }
 
   showToast = textId => this.setState(prevState => ({ toast: textId, toastKey: prevState.toastKey + 1 }));
@@ -124,42 +138,65 @@ class MobileHousePage extends Component {
   openHouse = houseId => {
     this.listScrollY = window.scrollY;
     this.closing = false;
-    window.history.pushState({ [EDITOR_ENTRY_KEY]: true }, '');
+    this.pushEditorEntry();
     this.setState({ openHouseId: houseId });
   };
 
+  pushEditorEntry = () => {
+    this.editorEntryId = `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    window.history.pushState({ [EDITOR_ENTRY_KEY]: this.editorEntryId }, '');
+  };
+
+  isEditorEntryOnTop = () => this.editorEntryId !== undefined && readEditorEntryId() === this.editorEntryId;
+
   // Closing the editor leaves its history entry (and the entry a sheet may have left above it):
-  // the editor is hidden when the history lands back on the list
+  // the editor is hidden when the history lands back on the list. A traversal that does not
+  // happen (the browser refused it, the entries are not the expected ones) still closes it.
   closeEditor = () => {
     if (this.state.openHouseId === null || this.closing) {
       return;
     }
-    if (isEditorEntryOnTop()) {
+    if (this.isEditorEntryOnTop()) {
       this.closing = true;
       window.history.back();
     } else if (isSheetEntryOnTop()) {
       this.closing = true;
       window.history.go(-2);
-    } else {
-      this.setState({ openHouseId: null });
     }
+    if (this.closing) {
+      this.closeTimer = setTimeout(this.finishClosing, CLOSE_FALLBACK_MS);
+    } else {
+      this.finishClosing();
+    }
+  };
+
+  finishClosing = () => {
+    clearTimeout(this.closeTimer);
+    this.closing = false;
+    this.setState({ openHouseId: null });
   };
 
   onPopState = () => {
     if (this.state.openHouseId === null) {
       return;
     }
-    // still on the editor: the history came back from the entry of a sheet
-    if (isEditorEntryOnTop() || isSheetEntryOnTop()) {
+    // the editor asked to be closed: wherever the history landed
+    if (this.closing) {
+      this.finishClosing();
       return;
     }
-    if (this.closing || !this.isOpenHouseUnsaved()) {
-      this.closing = false;
-      this.setState({ openHouseId: null });
+    // still on the editor: the history came back from the entry of a sheet
+    if (this.isEditorEntryOnTop() || isSheetEntryOnTop()) {
+      return;
+    }
+    if (!this.isOpenHouseUnsaved()) {
+      this.finishClosing();
       return;
     }
     // the system "back" with unsaved changes: the editor stays, and asks
-    window.history.pushState({ [EDITOR_ENTRY_KEY]: true }, '');
+    this.pushEditorEntry();
     this.setState(prevState => ({ leaveRequestKey: prevState.leaveRequestKey + 1 }));
   };
 

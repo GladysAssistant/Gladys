@@ -104,9 +104,18 @@ class MapComponent extends Component {
 
   componentWillUnmount() {
     clearTimeout(this.resizeTimer);
-    this.leafletMap.off('click', this.onClickOnMap);
-    this.leafletMap.remove();
+    const leafletMap = this.leafletMap;
     this.leafletMap = null;
+    leafletMap.off('click', this.onClickOnMap);
+    // The basemap layer (maplibre-gl-leaflet) settles a resize or a zoom on the next animation
+    // frame, without checking that its map is still there. A page switching between its phone
+    // and desktop layouts unmounts this map in the very resize that queued such a frame, and a
+    // sheet may close during a zoom: the map is removed once those frames have run.
+    if (typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => leafletMap.remove()));
+    } else {
+      leafletMap.remove();
+    }
   }
 
   componentDidUpdate(prevProps) {
