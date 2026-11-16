@@ -18,18 +18,109 @@ describe('Settings on a phone', () => {
     cy.login();
   });
 
-  // A websocket message only reaches the app once its socket is open and authenticated, which
-  // nothing in the page tells: the message is sent again until what it must show is there
-  const sendUntilShown = (message, selector, attempt = 0) => {
-    cy.sendWebSocket(message);
-    cy.get('body').then(body => {
-      if (body.find(selector).length === 0 && attempt < 30) {
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(500);
-        sendUntilShown(message, selector, attempt + 1);
-      }
+  // First in the file: its update test receives a websocket message, and the sockets of the pages
+  // loaded earlier in a spec stay open in the Cypress browser — past about fifteen page loads the
+  // socket of a new page no longer connects, so a message sent then reaches nothing.
+  describe('System', () => {
+    const systemInfos = {
+      hostname: 'gladys',
+      type: 'Linux',
+      platform: 'linux',
+      arch: 'arm64',
+      uptime: 86400,
+      nodejs_version: 'v24.0.0',
+      gladys_version: 'v5.3.3',
+      latest_gladys_version: 'v5.4.0',
+      new_release_available: true,
+      is_docker: true,
+      docker_image_pinned: false,
+      local_ip: '192.168.1.42',
+      cpu_temperature: 51,
+      host_power_reboot_available: true,
+      host_power_shutdown_available: true
+    };
+    const containers = [
+      { id: 'cy-c1', name: '/gladys', state: 'running', created_at: Math.round(Date.now() / 1000) - 86400 },
+      { id: 'cy-c2', name: '/watchtower', state: 'exited', created_at: Math.round(Date.now() / 1000) - 3600 }
+    ];
+
+    beforeEach(() => {
+      cy.intercept({ method: 'GET', url: api('/system/info') }, { body: systemInfos }).as('getInfos');
+      cy.intercept({ method: 'GET', url: api('/system/container') }, { body: containers }).as('getContainers');
+      cy.intercept({ method: 'POST', url: api('/system/upgrade') }, { body: { success: true } }).as('upgrade');
+      cy.intercept({ method: 'POST', url: api('/system/vacuum') }, { body: { success: true } }).as('vacuum');
+      cy.intercept({ method: 'POST', url: api('/system/reboot') }, { body: { success: true } }).as('reboot');
     });
-  };
+
+    it('should show the state of the instance and its containers as rows', () => {
+      cy.visit('/dashboard/settings/system');
+      cy.wait('@getInfos');
+      cy.get('[data-cy=system-mobile]').should('exist');
+      cy.get('[data-cy=system-status]')
+        .should('contain', '192.168.1.42')
+        .and('contain', 'v5.3.3')
+        .and('contain', '51');
+      cy.get('[data-cy=system-containers]')
+        .should('contain', '/gladys')
+        .and('contain', '/watchtower');
+      cy.get('[data-cy=system-containers]').i18n('systemSettings.containerState.exited');
+      // the fields of the cards do not trigger the iOS zoom
+      cy.get('[data-cy=system-preferences] input[type=text], [data-cy=system-preferences] select').each(field => {
+        expect(parseFloat(field.css('font-size'))).to.be.gte(16);
+      });
+      // nothing scrolls sideways
+      cy.document().then(doc => expect(doc.documentElement.scrollWidth).to.be.lte(doc.documentElement.clientWidth));
+    });
+
+    it('should update Gladys only once confirmed', () => {
+      cy.visit('/dashboard/settings/system');
+      cy.wait('@getInfos');
+      cy.get('[data-cy=system-operations]').should('contain', 'v5.4.0');
+      cy.get('[data-cy=system-update-now]').click();
+      cy.get('[data-cy=system-update-confirm]').should('be.visible');
+      cy.get('[data-cy=system-update-confirm] [data-cy=confirm-sheet-cancel]').click();
+      cy.get('[data-cy=system-update-confirm]').should('not.exist');
+      cy.get('@upgrade.all').should('have.length', 0);
+
+      cy.get('[data-cy=system-update-now]').click();
+      cy.get('[data-cy=system-update-confirm] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@upgrade');
+      cy.get('[data-cy=system-upgrade-in-progress]').i18n('systemSettings.upgradeInProgress');
+      cy.get('[data-cy=system-update-now]').should('be.disabled');
+
+      // the messages of the update are readable in the page
+      cy.sendWebSocket({ type: 'system.watchtower-log', payload: { message: 'Found new gladys image' } });
+      cy.get('[data-cy=system-upgrade-logs]').should('contain', 'Found new gladys image');
+    });
+
+    it('should clean the database and reboot the host only once confirmed', () => {
+      cy.visit('/dashboard/settings/system');
+      cy.wait('@getInfos');
+      cy.get('[data-cy=system-vacuum]').click();
+      cy.get('[data-cy=system-vacuum-confirm]').should('be.visible');
+      cy.get('@vacuum.all').should('have.length', 0);
+      cy.get('[data-cy=system-vacuum-confirm] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@vacuum');
+      cy.get('[data-cy=system-maintenance]').i18n('systemSettings.vacuumDatabaseStarted');
+
+      cy.contains('[data-cy=system-maintenance] button', 'systemSettings.hostRebootButton').click();
+      cy.get('[data-cy=system-host-power-confirm]')
+        .should('be.visible')
+        .i18n('systemSettings.hostRebootConfirm');
+      cy.get('@reboot.all').should('have.length', 0);
+      cy.get('[data-cy=system-host-power-confirm] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@reboot');
+      cy.get('[data-cy=system-maintenance]').i18n('systemSettings.hostRebootSent');
+    });
+
+    it('should keep the tiles and the cards on a wider screen', () => {
+      cy.viewport(...DESKTOP);
+      cy.visit('/dashboard/settings/system');
+      cy.wait('@getInfos');
+      cy.get('.stamp').should('have.length.gte', 5);
+      cy.get('[data-cy=system-mobile]').should('not.exist');
+    });
+  });
 
   describe('Sessions', () => {
     const CURRENT_SESSION_ID = 'cy-current-session';
@@ -407,110 +498,6 @@ describe('Settings on a phone', () => {
       cy.wait('@getBackups');
       cy.get('table tbody tr').should('have.length', 2);
       cy.get('[data-cy=backups-mobile]').should('not.exist');
-    });
-  });
-
-  describe('System', () => {
-    const systemInfos = {
-      hostname: 'gladys',
-      type: 'Linux',
-      platform: 'linux',
-      arch: 'arm64',
-      uptime: 86400,
-      nodejs_version: 'v24.0.0',
-      gladys_version: 'v5.3.3',
-      latest_gladys_version: 'v5.4.0',
-      new_release_available: true,
-      is_docker: true,
-      docker_image_pinned: false,
-      local_ip: '192.168.1.42',
-      cpu_temperature: 51,
-      host_power_reboot_available: true,
-      host_power_shutdown_available: true
-    };
-    const containers = [
-      { id: 'cy-c1', name: '/gladys', state: 'running', created_at: Math.round(Date.now() / 1000) - 86400 },
-      { id: 'cy-c2', name: '/watchtower', state: 'exited', created_at: Math.round(Date.now() / 1000) - 3600 }
-    ];
-
-    beforeEach(() => {
-      cy.intercept({ method: 'GET', url: api('/system/info') }, { body: systemInfos }).as('getInfos');
-      cy.intercept({ method: 'GET', url: api('/system/container') }, { body: containers }).as('getContainers');
-      cy.intercept({ method: 'POST', url: api('/system/upgrade') }, { body: { success: true } }).as('upgrade');
-      cy.intercept({ method: 'POST', url: api('/system/vacuum') }, { body: { success: true } }).as('vacuum');
-      cy.intercept({ method: 'POST', url: api('/system/reboot') }, { body: { success: true } }).as('reboot');
-    });
-
-    it('should show the state of the instance and its containers as rows', () => {
-      cy.visit('/dashboard/settings/system');
-      cy.wait('@getInfos');
-      cy.get('[data-cy=system-mobile]').should('exist');
-      cy.get('[data-cy=system-status]')
-        .should('contain', '192.168.1.42')
-        .and('contain', 'v5.3.3')
-        .and('contain', '51');
-      cy.get('[data-cy=system-containers]')
-        .should('contain', '/gladys')
-        .and('contain', '/watchtower');
-      cy.get('[data-cy=system-containers]').i18n('systemSettings.containerState.exited');
-      // the fields of the cards do not trigger the iOS zoom
-      cy.get('[data-cy=system-preferences] input[type=text], [data-cy=system-preferences] select').each(field => {
-        expect(parseFloat(field.css('font-size'))).to.be.gte(16);
-      });
-      // nothing scrolls sideways
-      cy.document().then(doc => expect(doc.documentElement.scrollWidth).to.be.lte(doc.documentElement.clientWidth));
-    });
-
-    it('should update Gladys only once confirmed', () => {
-      cy.visit('/dashboard/settings/system');
-      cy.wait('@getInfos');
-      cy.get('[data-cy=system-operations]').should('contain', 'v5.4.0');
-      cy.get('[data-cy=system-update-now]').click();
-      cy.get('[data-cy=system-update-confirm]').should('be.visible');
-      cy.get('[data-cy=system-update-confirm] [data-cy=confirm-sheet-cancel]').click();
-      cy.get('[data-cy=system-update-confirm]').should('not.exist');
-      cy.get('@upgrade.all').should('have.length', 0);
-
-      cy.get('[data-cy=system-update-now]').click();
-      cy.get('[data-cy=system-update-confirm] [data-cy=confirm-sheet-confirm]').click();
-      cy.wait('@upgrade');
-      cy.get('[data-cy=system-upgrade-in-progress]').i18n('systemSettings.upgradeInProgress');
-      cy.get('[data-cy=system-update-now]').should('be.disabled');
-
-      // the messages of the update are readable in the page
-      sendUntilShown(
-        { type: 'system.watchtower-log', payload: { message: 'Found new gladys image' } },
-        '[data-cy=system-upgrade-logs]'
-      );
-      cy.get('[data-cy=system-upgrade-logs]').should('contain', 'Found new gladys image');
-    });
-
-    it('should clean the database and reboot the host only once confirmed', () => {
-      cy.visit('/dashboard/settings/system');
-      cy.wait('@getInfos');
-      cy.get('[data-cy=system-vacuum]').click();
-      cy.get('[data-cy=system-vacuum-confirm]').should('be.visible');
-      cy.get('@vacuum.all').should('have.length', 0);
-      cy.get('[data-cy=system-vacuum-confirm] [data-cy=confirm-sheet-confirm]').click();
-      cy.wait('@vacuum');
-      cy.get('[data-cy=system-maintenance]').i18n('systemSettings.vacuumDatabaseStarted');
-
-      cy.contains('[data-cy=system-maintenance] button', 'systemSettings.hostRebootButton').click();
-      cy.get('[data-cy=system-host-power-confirm]')
-        .should('be.visible')
-        .i18n('systemSettings.hostRebootConfirm');
-      cy.get('@reboot.all').should('have.length', 0);
-      cy.get('[data-cy=system-host-power-confirm] [data-cy=confirm-sheet-confirm]').click();
-      cy.wait('@reboot');
-      cy.get('[data-cy=system-maintenance]').i18n('systemSettings.hostRebootSent');
-    });
-
-    it('should keep the tiles and the cards on a wider screen', () => {
-      cy.viewport(...DESKTOP);
-      cy.visit('/dashboard/settings/system');
-      cy.wait('@getInfos');
-      cy.get('.stamp').should('have.length.gte', 5);
-      cy.get('[data-cy=system-mobile]').should('not.exist');
     });
   });
 });
