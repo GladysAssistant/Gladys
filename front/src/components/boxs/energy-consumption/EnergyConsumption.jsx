@@ -69,6 +69,9 @@ const findDeviceFeatureBySelector = (devices, selector) => {
   return null;
 };
 
+// The legend names a series after its device first: several devices of the
+// same integration often expose energy features with identical (technical)
+// names, so the feature names alone can't tell the series apart (#3377).
 const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
   if (deviceData.deviceFeature.is_subscription) {
     return `${deviceData.device.name} - ${deviceData.deviceFeature.name}`;
@@ -77,22 +80,35 @@ const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
   const found = findDeviceFeatureBySelector(devices, selector);
   if (found) {
     const { device, feature } = found;
-    const featureById = new Map((device.features || []).map(f => [f.id, f]));
+    const features = device.features || [];
+    // When the device has a single feature of this kind, its name is enough
+    const sameKindCount = features.filter(f => f.category === feature.category && f.type === feature.type).length;
+    if (sameKindCount <= 1) {
+      return device.name;
+    }
+
+    const featureById = new Map(features.map(f => [f.id, f]));
     const pathNames = [];
     let current = feature;
     const visited = new Set();
 
     while (current && !visited.has(current.id)) {
       visited.add(current.id);
-      if (current.name) {
+      const parent = current.energy_parent_id ? featureById.get(current.energy_parent_id) : null;
+      // Derived features are named "<parent name> (consumption)" / "(cost)":
+      // skip names that only repeat their parent's one.
+      const repeatsParent =
+        parent &&
+        parent.name &&
+        current.name &&
+        (current.name === parent.name || current.name.startsWith(`${parent.name} (`));
+      if (current.name && !repeatsParent && current.name !== device.name) {
         pathNames.unshift(current.name);
       }
-      current = current.energy_parent_id ? featureById.get(current.energy_parent_id) : null;
+      current = parent;
     }
 
-    if (pathNames.length > 0) {
-      return pathNames.join(' - ');
-    }
+    return pathNames.length > 0 ? `${device.name} - ${pathNames.join(' - ')}` : device.name;
   }
 
   return deviceData.deviceFeature.name
