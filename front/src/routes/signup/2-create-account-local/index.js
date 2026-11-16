@@ -195,7 +195,7 @@ class CreateAccountLocal extends Component {
 
   render(props, { user, signupErrors, createLocalAccountStatus, createLocalAccountError }) {
     return (
-      <SignupLayout currentUrl="/signup/create-account-local">
+      <SignupLayout currentUrl="/signup/create-account-local" backHref="/signup">
         <CreateAccountLocalTab
           newUser={user}
           errors={signupErrors}
@@ -206,6 +206,7 @@ class CreateAccountLocal extends Component {
           updatePassword={this.updatePassword}
           updatePasswordRepeat={this.updatePasswordRepeat}
           createUser={this.createUser}
+          creating={createLocalAccountStatus === RequestStatus.Getting}
           networkError={createLocalAccountStatus === RequestStatus.NetworkError}
           emailAlreadyExistError={
             createLocalAccountStatus === RequestStatus.ConflictError &&

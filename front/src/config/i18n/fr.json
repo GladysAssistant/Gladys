@@ -197,8 +197,23 @@
     "validateButton": "Valider"
   },
   "signup": {
+    "mobile": {
+      "welcomeLead": "Gladys est un assistant pour votre maison, respectueux de votre vie privée. L'installation prend environ deux minutes.",
+      "restoreHint": "Déjà utilisateur de Gladys Plus ? Retrouvez une installation précédente.",
+      "togglePassword": "Afficher ou masquer le mot de passe",
+      "distanceKilometers": "Kilomètres",
+      "distanceMiles": "Miles",
+      "historyHelp": "Combien de temps Gladys conserve les valeurs de vos capteurs. Vous pourrez le changer plus tard dans les paramètres.",
+      "roomsHelp": "Touchez les pièces de votre maison. Vous pourrez les modifier plus tard.",
+      "saveHouseError": "La maison n'a pas pu être enregistrée. Vérifiez votre connexion et réessayez.",
+      "savePreferencesError": "Vos préférences n'ont pas pu être enregistrées. Vérifiez votre connexion et réessayez.",
+      "restoreTitle": "Restaurer une sauvegarde",
+      "restoreConfirmTitle": "Restaurer cette sauvegarde ?",
+      "restoreConfirmText": "Gladys redémarrera avec les données de cette sauvegarde. Cela peut prendre quelques minutes.",
+      "backupKeyHelp": "La clé qui vous a été donnée lors de la configuration de Gladys Plus sur votre installation précédente."
+    },
     "welcome": {
-      "title": "Bienvenue dans Gladys !",
+      "title": "Bienvenue dans Gladys !",
       "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, un logiciel de domotique open-source qui respecte votre vie privée.",
       "introTimeToCreateAccount": "Il est temps de créer un compte local pour votre installation Gladys.",
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
@@ -339,7 +354,7 @@
       }
     },
     "success": {
-      "title": "Bienvenue dans Gladys !",
+      "title": "Bienvenue dans Gladys !",
       "subtitle": "Votre assistant est prêt. Tout fonctionne chez vous, et vos données restent chez vous.",
       "integrationsTitle": "Connectez toute votre maison",
       "integrationsText": "Zigbee, Matter, Z-Wave, MQTT, Philips Hue, Sonos… Gladys est compatible avec des milliers d'appareils, et grâce aux intégrations externes, de nouvelles intégrations arrivent en continu, sans attendre une nouvelle version de Gladys.",
@@ -5126,6 +5141,54 @@
       "location": "Localisation",
       "rooms": "Pièces",
       "noRoomYet": "Aucune pièce pour l'instant. Ajoutez-en une ci-dessous."
+    },
+    "mobile": {
+      "subtitle": "Une maison contient des pièces, et chaque appareil est rangé dans une pièce. Touchez une maison pour la modifier.",
+      "useMyLocation": "Utiliser ma position actuelle",
+      "locationError": {
+        "insecure": "Votre navigateur ne partage votre position que sur une connexion sécurisée (HTTPS, par exemple via Gladys Plus). Recherchez plutôt votre adresse, ou placez la maison sur la carte.",
+        "denied": "L'accès à votre position a été refusé. Autorisez-le dans les réglages de votre navigateur, ou recherchez plutôt votre adresse.",
+        "unavailable": "Votre position n'a pas pu être trouvée. Recherchez plutôt votre adresse, ou placez la maison sur la carte."
+      },
+      "placeOnMap": "Placer sur la carte",
+      "adjustOnMap": "Ajuster sur la carte",
+      "positionSet": "La position de la maison est définie.",
+      "positionNotSet": "Pas encore de position.",
+      "locationHelp": "Facultatif. Sert à la météo, au lever et au coucher du soleil, et à savoir quand vous êtes à la maison.",
+      "mapSheetTitle": "Position de la maison",
+      "mapSheetHint": "Touchez la carte à l'endroit de la maison. Déplacez et zoomez avec deux doigts.",
+      "addRooms": "Ajouter",
+      "addFirstRoom": "Ajouter les pièces de la maison",
+      "roomsHint": "Touchez une pièce pour la renommer ou la supprimer.",
+      "addRoomsTitle": "Ajouter des pièces",
+      "newRoomPlaceholder": "Nom d'une pièce",
+      "roomSuggestionsTitle": "Pièces courantes",
+      "roomSuggestionsLabel": "Pièces courantes, touchez pour ajouter ou retirer",
+      "roomSuggestions": {
+        "livingRoom": "Salon",
+        "kitchen": "Cuisine",
+        "bedroom": "Chambre",
+        "bathroom": "Salle de bain",
+        "entrance": "Entrée",
+        "office": "Bureau",
+        "diningRoom": "Salle à manger",
+        "kidsRoom": "Chambre d'enfant",
+        "toilet": "Toilettes",
+        "garage": "Garage",
+        "laundryRoom": "Buanderie",
+        "garden": "Jardin"
+      },
+      "roomSheetTitle": "Pièce",
+      "roomNameLabel": "Nom de la pièce",
+      "roomNameRequired": "Une pièce a besoin d'un nom.",
+      "roomNameTaken": "Cette maison a déjà une pièce de ce nom.",
+      "deleteRoom": "Supprimer la pièce",
+      "deleteRoomHint": "La pièce est supprimée à l'enregistrement de la maison. Ses appareils sont conservés, sans pièce.",
+      "roomDeleted": "« {{name}} » supprimée",
+      "houseDeleted": "Maison supprimée",
+      "alarmCodePlaceholder": "4 à 8 chiffres",
+      "alarmCodeHelp": "Le code qui désarme l'alarme de cette maison. Laissez vide si vous n'utilisez pas l'alarme.",
+      "alarmDelayHelp": "S'applique uniquement quand l'alarme est armée à la main, pas depuis une scène."
     },
     "empty": {
       "title": "Aucune maison",

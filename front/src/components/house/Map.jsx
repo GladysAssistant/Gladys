@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import leaflet from 'leaflet';
 import { addMapTileLayer } from '../../utils/mapTileLayer';
+import 'leaflet/dist/leaflet.css';
 
 const icon = leaflet.icon({
   iconUrl: '/assets/leaflet/marker-icon.png',
@@ -15,6 +16,20 @@ const icon = leaflet.icon({
 });
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
+const WORLD_ZOOM = 2;
+const LOCATED_ZOOM = 16;
+
+// A map that only shows where the house is (the preview of the phone layout): no gesture is
+// taken from the page it sits in
+const STATIC_MAP_OPTIONS = {
+  dragging: false,
+  touchZoom: false,
+  doubleClickZoom: false,
+  scrollWheelZoom: false,
+  boxZoom: false,
+  keyboard: false,
+  zoomControl: false
+};
 
 class MapComponent extends Component {
   initMap = () => {
@@ -28,11 +43,23 @@ class MapComponent extends Component {
     } else {
       coordinates = DEFAULT_COORDS;
     }
-    this.leafletMap = leaflet.map(this.map).setView(coordinates, 2);
+    const located = coordinates !== DEFAULT_COORDS;
+    const interactive = this.props.interactive !== false;
+    // `zoom`: how close a located house is shown when the map opens (the world, as always,
+    // when the caller does not say)
+    const zoom = located && this.props.zoom ? this.props.zoom : WORLD_ZOOM;
+    this.leafletMap = leaflet.map(this.map, interactive ? {} : STATIC_MAP_OPTIONS).setView(coordinates, zoom);
 
     // Use the global dark mode state from props
     addMapTileLayer(this.leafletMap, this.props.darkMode);
-    this.leafletMap.on('click', this.onClickOnMap);
+    if (interactive) {
+      this.leafletMap.on('click', this.onClickOnMap);
+    }
+    // a map sized by a class may be measured before its container settles (a sheet sliding in)
+    if (this.props.class) {
+      clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(() => this.leafletMap && this.leafletMap.invalidateSize(), 320);
+    }
 
     // add house pin
     if (this.props.house.latitude && this.props.house.longitude) {
@@ -76,8 +103,10 @@ class MapComponent extends Component {
   }
 
   componentWillUnmount() {
+    clearTimeout(this.resizeTimer);
     this.leafletMap.off('click', this.onClickOnMap);
     this.leafletMap.remove();
+    this.leafletMap = null;
   }
 
   componentDidUpdate(prevProps) {
@@ -98,12 +127,16 @@ class MapComponent extends Component {
       const markerAlreadyThere = markerPosition && markerPosition.lat === latitude && markerPosition.lng === longitude;
       if (!markerAlreadyThere) {
         this.setPinMap(latitude, longitude);
-        this.leafletMap.setView([latitude, longitude], 16);
+        this.leafletMap.setView([latitude, longitude], LOCATED_ZOOM);
       }
     }
   }
 
-  render() {
+  render(props) {
+    // the phone layouts size the map with a class (a preview, the map of a sheet)
+    if (props.class) {
+      return <div ref={this.setMapRef} class={props.class} />;
+    }
     return <div ref={this.setMapRef} style="width: 100%; height: 300px;" />;
   }
 }

@@ -197,6 +197,21 @@
     "tooManyRequests": "Bitte warte {{count}} Minuten, bevor du es erneut versuchst."
   },
   "signup": {
+    "mobile": {
+      "welcomeLead": "Gladys ist ein Assistent für Ihr Zuhause, der Ihre Privatsphäre respektiert. Die Einrichtung dauert etwa zwei Minuten.",
+      "restoreHint": "Bereits Gladys-Plus-Nutzer? Stellen Sie eine frühere Installation wieder her.",
+      "togglePassword": "Passwort anzeigen oder verbergen",
+      "distanceKilometers": "Kilometer",
+      "distanceMiles": "Meilen",
+      "historyHelp": "Wie lange Gladys die Werte Ihrer Sensoren aufbewahrt. Sie können es später in den Einstellungen ändern.",
+      "roomsHelp": "Tippen Sie auf die Räume Ihres Hauses. Sie können sie später ändern.",
+      "saveHouseError": "Das Haus konnte nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "savePreferencesError": "Ihre Einstellungen konnten nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "restoreTitle": "Backup wiederherstellen",
+      "restoreConfirmTitle": "Dieses Backup wiederherstellen?",
+      "restoreConfirmText": "Gladys startet mit den Daten dieses Backups neu. Das kann einige Minuten dauern.",
+      "backupKeyHelp": "Der Schlüssel, den Sie bei der Einrichtung von Gladys Plus auf Ihrer früheren Installation erhalten haben."
+    },
     "welcome": {
       "title": "Willkommen bei Gladys!",
       "introSentence": "Zunächst einmal vielen Dank, dass du dich für mich entschieden hast. Ich bin Gladys, ein datenschutzfreundlicher Heimassistent für dein Zuhause.",
@@ -5126,6 +5141,54 @@
       "location": "Standort",
       "rooms": "Räume",
       "noRoomYet": "Noch kein Raum. Füge unten einen hinzu."
+    },
+    "mobile": {
+      "subtitle": "Ein Haus enthält Räume, und jedes Gerät gehört zu einem Raum. Tippen Sie auf ein Haus, um es zu bearbeiten.",
+      "useMyLocation": "Meinen aktuellen Standort verwenden",
+      "locationError": {
+        "insecure": "Ihr Browser gibt Ihren Standort nur über eine sichere Verbindung frei (HTTPS, zum Beispiel über Gladys Plus). Suchen Sie stattdessen Ihre Adresse oder platzieren Sie das Haus auf der Karte.",
+        "denied": "Der Zugriff auf Ihren Standort wurde verweigert. Erlauben Sie ihn in den Einstellungen Ihres Browsers oder suchen Sie stattdessen Ihre Adresse.",
+        "unavailable": "Ihr Standort konnte nicht ermittelt werden. Suchen Sie stattdessen Ihre Adresse oder platzieren Sie das Haus auf der Karte."
+      },
+      "placeOnMap": "Auf der Karte platzieren",
+      "adjustOnMap": "Auf der Karte anpassen",
+      "positionSet": "Die Position des Hauses ist festgelegt.",
+      "positionNotSet": "Noch keine Position.",
+      "locationHelp": "Optional. Wird für das Wetter, Sonnenauf- und -untergang und für die Anwesenheitserkennung verwendet.",
+      "mapSheetTitle": "Position des Hauses",
+      "mapSheetHint": "Tippen Sie auf die Karte, wo das Haus steht. Mit zwei Fingern verschieben und zoomen.",
+      "addRooms": "Hinzufügen",
+      "addFirstRoom": "Die Räume des Hauses hinzufügen",
+      "roomsHint": "Tippen Sie auf einen Raum, um ihn umzubenennen oder zu löschen.",
+      "addRoomsTitle": "Räume hinzufügen",
+      "newRoomPlaceholder": "Name eines Raums",
+      "roomSuggestionsTitle": "Häufige Räume",
+      "roomSuggestionsLabel": "Häufige Räume, zum Hinzufügen oder Entfernen tippen",
+      "roomSuggestions": {
+        "livingRoom": "Wohnzimmer",
+        "kitchen": "Küche",
+        "bedroom": "Schlafzimmer",
+        "bathroom": "Badezimmer",
+        "entrance": "Flur",
+        "office": "Büro",
+        "diningRoom": "Esszimmer",
+        "kidsRoom": "Kinderzimmer",
+        "toilet": "WC",
+        "garage": "Garage",
+        "laundryRoom": "Waschküche",
+        "garden": "Garten"
+      },
+      "roomSheetTitle": "Raum",
+      "roomNameLabel": "Name des Raums",
+      "roomNameRequired": "Ein Raum braucht einen Namen.",
+      "roomNameTaken": "Dieses Haus hat bereits einen Raum mit diesem Namen.",
+      "deleteRoom": "Raum löschen",
+      "deleteRoomHint": "Der Raum wird beim Speichern des Hauses gelöscht. Seine Geräte bleiben erhalten, ohne Raum.",
+      "roomDeleted": "„{{name}}“ gelöscht",
+      "houseDeleted": "Haus gelöscht",
+      "alarmCodePlaceholder": "4 bis 8 Ziffern",
+      "alarmCodeHelp": "Der Code, der den Alarm dieses Hauses deaktiviert. Leer lassen, wenn Sie den Alarm nicht nutzen.",
+      "alarmDelayHelp": "Gilt nur, wenn der Alarm von Hand scharf geschaltet wird, nicht aus einer Szene."
     },
     "empty": {
       "title": "Noch kein Zuhause",

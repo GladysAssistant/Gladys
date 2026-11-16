@@ -197,6 +197,21 @@
     "tooManyRequests": "Espere {{count}} minutos antes de volver a intentarlo."
   },
   "signup": {
+    "mobile": {
+      "welcomeLead": "Gladys es un asistente para tu hogar que respeta tu privacidad. La instalación lleva unos dos minutos.",
+      "restoreHint": "¿Ya usas Gladys Plus? Recupera una instalación anterior.",
+      "togglePassword": "Mostrar u ocultar la contraseña",
+      "distanceKilometers": "Kilómetros",
+      "distanceMiles": "Millas",
+      "historyHelp": "Cuánto tiempo conserva Gladys los valores de tus sensores. Podrás cambiarlo más tarde en los ajustes.",
+      "roomsHelp": "Toca las habitaciones de tu casa. Podrás cambiarlas más tarde.",
+      "saveHouseError": "No se ha podido guardar la casa. Comprueba tu conexión e inténtalo de nuevo.",
+      "savePreferencesError": "No se han podido guardar tus preferencias. Comprueba tu conexión e inténtalo de nuevo.",
+      "restoreTitle": "Restaurar una copia de seguridad",
+      "restoreConfirmTitle": "¿Restaurar esta copia de seguridad?",
+      "restoreConfirmText": "Gladys se reiniciará con los datos de esta copia. Puede tardar unos minutos.",
+      "backupKeyHelp": "La clave que recibiste al configurar Gladys Plus en tu instalación anterior."
+    },
     "welcome": {
       "title": "¡Bienvenido a Gladys!",
       "introSentence": "Antes que nada, gracias por elegirme. Soy Gladys, un asistente para el hogar que respeta su privacidad.",
@@ -5126,6 +5141,54 @@
       "location": "Ubicación",
       "rooms": "Habitaciones",
       "noRoomYet": "Todavía no hay ninguna habitación. Añada una a continuación."
+    },
+    "mobile": {
+      "subtitle": "Una casa contiene habitaciones, y cada dispositivo pertenece a una habitación. Toca una casa para editarla.",
+      "useMyLocation": "Usar mi ubicación actual",
+      "locationError": {
+        "insecure": "Tu navegador solo comparte tu ubicación en una conexión segura (HTTPS, por ejemplo a través de Gladys Plus). Busca tu dirección o coloca la casa en el mapa.",
+        "denied": "Se ha denegado el acceso a tu ubicación. Permítelo en los ajustes de tu navegador o busca tu dirección.",
+        "unavailable": "No se ha podido encontrar tu ubicación. Busca tu dirección o coloca la casa en el mapa."
+      },
+      "placeOnMap": "Colocar en el mapa",
+      "adjustOnMap": "Ajustar en el mapa",
+      "positionSet": "La ubicación de la casa está definida.",
+      "positionNotSet": "Aún sin ubicación.",
+      "locationHelp": "Opcional. Se usa para el tiempo, el amanecer y el atardecer, y para saber cuándo estás en casa.",
+      "mapSheetTitle": "Ubicación de la casa",
+      "mapSheetHint": "Toca el mapa donde está la casa. Mueve y amplía con dos dedos.",
+      "addRooms": "Añadir",
+      "addFirstRoom": "Añadir las habitaciones de la casa",
+      "roomsHint": "Toca una habitación para cambiarle el nombre o eliminarla.",
+      "addRoomsTitle": "Añadir habitaciones",
+      "newRoomPlaceholder": "Nombre de una habitación",
+      "roomSuggestionsTitle": "Habitaciones habituales",
+      "roomSuggestionsLabel": "Habitaciones habituales, toca para añadir o quitar",
+      "roomSuggestions": {
+        "livingRoom": "Salón",
+        "kitchen": "Cocina",
+        "bedroom": "Dormitorio",
+        "bathroom": "Baño",
+        "entrance": "Entrada",
+        "office": "Despacho",
+        "diningRoom": "Comedor",
+        "kidsRoom": "Habitación infantil",
+        "toilet": "Aseo",
+        "garage": "Garaje",
+        "laundryRoom": "Lavadero",
+        "garden": "Jardín"
+      },
+      "roomSheetTitle": "Habitación",
+      "roomNameLabel": "Nombre de la habitación",
+      "roomNameRequired": "Una habitación necesita un nombre.",
+      "roomNameTaken": "Esta casa ya tiene una habitación con este nombre.",
+      "deleteRoom": "Eliminar la habitación",
+      "deleteRoomHint": "La habitación se elimina al guardar la casa. Sus dispositivos se conservan, sin habitación.",
+      "roomDeleted": "«{{name}}» eliminada",
+      "houseDeleted": "Casa eliminada",
+      "alarmCodePlaceholder": "De 4 a 8 dígitos",
+      "alarmCodeHelp": "El código que desarma la alarma de esta casa. Déjalo vacío si no usas la alarma.",
+      "alarmDelayHelp": "Solo se aplica cuando la alarma se arma a mano, no desde una escena."
     },
     "empty": {
       "title": "Todavía no hay ninguna vivienda",

@@ -79,6 +79,25 @@ function createActions(store) {
         signupNewHouseLongitude: longitude
       });
     },
+    // The location of the house, set without the map of the desktop step (the phone step has its
+    // own map component, docs/specs/mobile-pages/onboarding.md C.4)
+    setHouseLocation(state, latitude, longitude) {
+      store.setState({
+        signupNewHouseLatitude: latitude,
+        signupNewHouseLongitude: longitude
+      });
+    },
+    // A room added by its name, without going through the field (the suggestions of the phone
+    // step). Same rules as addRoom: no empty name, no room twice.
+    addRoomNamed(state, name) {
+      const rooms = state.signupRooms || [];
+      if (!name || name.length === 0 || rooms.indexOf(name) !== -1) {
+        return;
+      }
+      store.setState({
+        signupRooms: [...rooms, name]
+      });
+    },
     onKeyPressRoomInput(state, e) {
       if (e.keyCode === 13) {
         actions.addRoom(state);
