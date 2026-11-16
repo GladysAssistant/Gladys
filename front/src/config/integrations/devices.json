@@ -88,6 +88,7 @@
     "whiteBackground": true,
     "local": true,
     "cloud": true,
+    "deprecated": true,
     "categories": ["security"]
   },
   {
