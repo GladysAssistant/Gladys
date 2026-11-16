@@ -764,7 +764,7 @@ button.inputAddon {
 
 .chip {
   flex-shrink: 0;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 14px;
   border: 1px solid #d7dce5;
   border-radius: 999px;

@@ -103,8 +103,8 @@ const MobileRow = ({
  * @description A status pill ("Running", "Failed"). tone: 'success' | 'warning' | 'danger' |
  * 'accent', neutral when omitted.
  */
-const MobilePill = ({ tone, children, ...props }) => (
-  <span class={cx(style.pill, { [style[`pill-${tone}`]]: tone })} {...props}>
+const MobilePill = ({ tone, children, class: className, ...props }) => (
+  <span class={cx(style.pill, className, { [style[`pill-${tone}`]]: tone })} {...props}>
     {children}
   </span>
 );
@@ -127,8 +127,8 @@ const MobileRowButton = ({ icon, label, danger, ...props }) => (
  * @description A notice of a phone page. tone: 'warning' | 'danger' | 'success', informative
  * when omitted.
  */
-const MobileNotice = ({ tone, icon, children, ...props }) => (
-  <div class={cx(style.notice, { [style[`notice-${tone}`]]: tone })} {...props}>
+const MobileNotice = ({ tone, icon, children, class: className, ...props }) => (
+  <div class={cx(style.notice, className, { [style[`notice-${tone}`]]: tone })} {...props}>
     {icon && <i class={`fe fe-${icon}`} aria-hidden="true" />}
     <div class={style.noticeBody}>{children}</div>
   </div>
