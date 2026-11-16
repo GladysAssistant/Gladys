@@ -286,3 +286,44 @@ button.mobileLink {
   font-weight: 600;
   text-decoration: none;
 }
+
+/* ---------- the glass of the logged-out pages ----------
+   Under the shell's `gladys-mobile-glass` class (kit.css, "Glass variant") the blocks of these
+   pages are Horizon glass too: the card holding the fields of a form, the cards of a screen,
+   the brand. Outside it (the Gladys Plus sign-in inside the onboarding) the form card is a
+   plain wrapper. */
+
+:global(.gladys-mobile-glass) .mobileFormCard,
+:global(.gladys-mobile-glass) .mobileCard {
+  background: var(--gl-card-bg);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  box-shadow: var(--gl-shadow);
+  color: var(--gl-ink);
+}
+
+:global(.gladys-mobile-glass) .mobileFormCard {
+  margin: 0 0 16px;
+  padding: 18px 16px 2px;
+  border-radius: 24px;
+}
+
+:global(.gladys-mobile-glass) .mobileCard {
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+/* the links under the fields close the card */
+:global(.gladys-mobile-glass) .mobileFormCard .mobileLinks {
+  margin: -6px 0 6px;
+}
+
+/* the logo floats on the wallpaper, as above the desktop card */
+:global(.gladys-mobile-glass) .mobileBrand img {
+  filter: drop-shadow(0 4px 10px rgba(44, 62, 118, 0.28));
+}
+
+:global(.gladys-mobile-glass) .mobileStatusIcon {
+  box-shadow: var(--gl-shadow-soft);
+}

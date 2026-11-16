@@ -27,6 +27,7 @@ class StartAtTop extends Component {
  * title: replaces the brand. titleId: the name next to the logo ("Gladys Assistant" when
  * omitted). backHref / onBack / backLabel: the back control of the navigation bar.
  * bottomBar: false when the page has no bottom bar (the content then ends with the page).
+ * glass: false keeps the opaque surfaces of the kit (the onboarding).
  * screen: which screen of the page is shown, for a page that has several (the steps of a flow,
  * a form then its answer) — a new screen starts at the top, like a new page.
  */
@@ -39,6 +40,7 @@ const MobileAuthLayout = ({
   backLabel,
   bottomBar = true,
   screen,
+  glass = true,
   dataCy
 }) => (
   <div
@@ -47,7 +49,9 @@ const MobileAuthLayout = ({
       'settings-page',
       'auth-page',
       dashboardStyle.dashboardBackground,
-      dashboardStyle.glassScene
+      dashboardStyle.glassScene,
+      // the surfaces of the kit are the frosted glass of the theme (kit.css, "Glass variant")
+      { 'gladys-mobile-glass': glass }
     )}
     data-cy={dataCy}
   >

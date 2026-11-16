@@ -5,7 +5,7 @@ import ResetPasswordForm from './ResetPasswordForm';
 import ResetPasswordSuccess from './ResetPasswordSuccess';
 import AuthLayout from '../../components/auth/AuthLayout';
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
-import { MobileAuthTitle, MobileAuthForm, MobileAuthBar } from '../../components/auth/mobile';
+import { MobileAuthTitle, MobileAuthCard, MobileAuthForm, MobileAuthBar } from '../../components/auth/mobile';
 import { withMobileViewport, MobilePasswordField, MobileNotice, BigButton, kitStyle } from '../../components/mobile';
 
 const DesktopResetPasswordPage = ({ children, ...props }) => (
@@ -51,32 +51,34 @@ const MobileResetPasswordPage = props => {
           </MobileNotice>
         )}
         {!success && !props.errored && (
-          <MobilePasswordField
-            id="reset-password"
-            label={<Text id="resetPassword.passwordLabel" />}
-            placeholder={<Text id="resetPassword.passwordPlaceholder" />}
-            value={props.resetPasswordPassword}
-            onInput={props.updatePassword}
-            error={get(props, 'resetPasswordErrors.password') && <Text id="resetPassword.passwordTooShort" />}
-            autocomplete="new-password"
-            enterkeyhint="next"
-            required
-            dataCy="reset-password-password"
-          />
-        )}
-        {!success && !props.errored && (
-          <MobilePasswordField
-            id="reset-password-repeat"
-            label={<Text id="resetPassword.passwordRepeatLabel" />}
-            placeholder={<Text id="resetPassword.passwordRepeatPlaceholder" />}
-            value={props.resetPasswordPasswordRepeat}
-            onInput={props.updatePasswordRepeat}
-            error={get(props, 'resetPasswordErrors.passwordRepeat') && <Text id="resetPassword.passwordRepeatError" />}
-            autocomplete="new-password"
-            enterkeyhint="go"
-            required
-            dataCy="reset-password-password-repeat"
-          />
+          <MobileAuthCard>
+            <MobilePasswordField
+              id="reset-password"
+              label={<Text id="resetPassword.passwordLabel" />}
+              placeholder={<Text id="resetPassword.passwordPlaceholder" />}
+              value={props.resetPasswordPassword}
+              onInput={props.updatePassword}
+              error={get(props, 'resetPasswordErrors.password') && <Text id="resetPassword.passwordTooShort" />}
+              autocomplete="new-password"
+              enterkeyhint="next"
+              required
+              dataCy="reset-password-password"
+            />
+            <MobilePasswordField
+              id="reset-password-repeat"
+              label={<Text id="resetPassword.passwordRepeatLabel" />}
+              placeholder={<Text id="resetPassword.passwordRepeatPlaceholder" />}
+              value={props.resetPasswordPasswordRepeat}
+              onInput={props.updatePasswordRepeat}
+              error={
+                get(props, 'resetPasswordErrors.passwordRepeat') && <Text id="resetPassword.passwordRepeatError" />
+              }
+              autocomplete="new-password"
+              enterkeyhint="go"
+              required
+              dataCy="reset-password-password-repeat"
+            />
+          </MobileAuthCard>
         )}
         <div class={kitStyle.footnote}>
           <MarkupText id="global.needHelpText" />

@@ -6,6 +6,7 @@ import AuthLayout from '../../components/auth/AuthLayout';
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
 import {
   MobileAuthTitle,
+  MobileAuthCard,
   MobileAuthForm,
   MobileAuthBar,
   MobileEmailField,
@@ -41,21 +42,23 @@ const MobileForgotPasswordPage = props => {
           <Text id="forgotPassword.cardTitle" />
         </MobileAuthTitle>
         {!codeSent && (
-          <MobileEmailField
-            id="forgot-password-email"
-            label={<Text id="forgotPassword.emailLabel" />}
-            placeholder={<Text id="forgotPassword.emailPlaceholder" />}
-            value={props.forgotPasswordEmail}
-            onInput={props.updateEmail}
-            error={
-              props.forgotPasswordStatus === ForgotPasswordStatus.WrongEmailError && (
-                <Text id="forgotPassword.wrongEmailError" />
-              )
-            }
-            autocomplete="username"
-            enterkeyhint="send"
-            dataCy="forgot-password-email"
-          />
+          <MobileAuthCard>
+            <MobileEmailField
+              id="forgot-password-email"
+              label={<Text id="forgotPassword.emailLabel" />}
+              placeholder={<Text id="forgotPassword.emailPlaceholder" />}
+              value={props.forgotPasswordEmail}
+              onInput={props.updateEmail}
+              error={
+                props.forgotPasswordStatus === ForgotPasswordStatus.WrongEmailError && (
+                  <Text id="forgotPassword.wrongEmailError" />
+                )
+              }
+              autocomplete="username"
+              enterkeyhint="send"
+              dataCy="forgot-password-email"
+            />
+          </MobileAuthCard>
         )}
         {codeSent && (
           <MobileNotice tone="success" icon="check-circle" role="status" data-cy="forgot-password-sent">
@@ -66,34 +69,34 @@ const MobileForgotPasswordPage = props => {
           </MobileNotice>
         )}
         {codeSent && (
-          <MobileTextField
-            id="forgot-password-code"
-            label={<Text id="forgotPassword.codeLabel" />}
-            placeholder={<Text id="forgotPassword.codePlaceholder" />}
-            value={props.forgotPasswordCode}
-            onInput={props.updateCode}
-            error={
-              props.verifyCodeStatus === ForgotPasswordStatus.InvalidCode && <Text id="forgotPassword.codeInvalid" />
-            }
-            autocomplete="one-time-code"
-            autocapitalize="characters"
-            autocorrect="off"
-            spellcheck={false}
-            enterkeyhint="go"
-            dataCy="forgot-password-code"
-          />
-        )}
-        {codeSent && (
-          <div class={authStyle.mobileLinks}>
-            <button
-              type="button"
-              class={authStyle.mobileLink}
-              onClick={props.forgotPassword}
-              data-cy="forgot-password-send-again"
-            >
-              <Text id="forgotPassword.sendCodeAgain" />
-            </button>
-          </div>
+          <MobileAuthCard>
+            <MobileTextField
+              id="forgot-password-code"
+              label={<Text id="forgotPassword.codeLabel" />}
+              placeholder={<Text id="forgotPassword.codePlaceholder" />}
+              value={props.forgotPasswordCode}
+              onInput={props.updateCode}
+              error={
+                props.verifyCodeStatus === ForgotPasswordStatus.InvalidCode && <Text id="forgotPassword.codeInvalid" />
+              }
+              autocomplete="one-time-code"
+              autocapitalize="characters"
+              autocorrect="off"
+              spellcheck={false}
+              enterkeyhint="go"
+              dataCy="forgot-password-code"
+            />
+            <div class={authStyle.mobileLinks}>
+              <button
+                type="button"
+                class={authStyle.mobileLink}
+                onClick={props.forgotPassword}
+                data-cy="forgot-password-send-again"
+              >
+                <Text id="forgotPassword.sendCodeAgain" />
+              </button>
+            </div>
+          </MobileAuthCard>
         )}
         <div class={kitStyle.footnote}>
           <MarkupText id="global.needHelpText" />

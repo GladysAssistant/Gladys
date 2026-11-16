@@ -28,7 +28,12 @@ Below the phone breakpoint (README B) each page renders, instead of the card,
 `MobileAuthLayout` (`components/auth/MobileAuthLayout.jsx`) — the shell the onboarding already
 uses (`onboarding.md` B builds on it):
 
-- the Horizon wallpaper of the logged-out pages;
+- the Horizon wallpaper of the logged-out pages, and on it **the glass of the desktop card**:
+  the shell sets the glass variant of the kit (README C.9), so the bars, the groups of rows, the
+  fields and the keys of the keypad are frosted glass and the primary action is the ink pill.
+  **The fields of a form sit on one glass card** (`MobileAuthCard`) — the card of the desktop
+  page, without its title; the blocks of a screen (steps, recovery codes) are glass cards too.
+  A glass card never holds the bottom bar, which is fixed to the screen;
 - the **navigation bar** of the kit, with the logo and the name of the product as its title
   ("Gladys Assistant"; "Gladys Plus" on the two-factor setup, the account creation and the user
   link), and the way back only where there is a page to go back to: "‹ Login"

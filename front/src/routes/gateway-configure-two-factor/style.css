@@ -38,3 +38,14 @@
   line-height: 1.4;
   color: #4f5866;
 }
+
+/* inside the card of the secret: the QR code on its own white tile, readable on any wallpaper */
+.mobileQrCode {
+  margin: 0 0 16px;
+}
+
+.mobileQrCode img {
+  padding: 8px;
+  border-radius: 14px;
+  background-color: #fff;
+}

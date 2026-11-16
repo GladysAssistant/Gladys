@@ -2,7 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 
 import { RequestStatus } from '../../utils/consts';
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
-import { MobileAuthTitle, MobileAuthBar } from '../../components/auth/mobile';
+import { MobileAuthTitle, MobileAuthCard, MobileAuthBar } from '../../components/auth/mobile';
 import authStyle from '../../components/auth/style.css';
 import {
   MobileField,
@@ -122,24 +122,26 @@ const MobileLinkGatewayUser = props => {
           <MobileAuthTitle lead={<Text id="gatewayLinkUser.description" />}>
             <Text id="gatewayLinkUser.title" />
           </MobileAuthTitle>
-          <MobileField label={<Text id="gatewayLinkUser.label" />} htmlFor="link-gateway-user">
-            <select
-              id="link-gateway-user"
-              class={fieldClass.select}
-              onChange={props.selectUser}
-              data-cy="link-gateway-user-select-user"
-            >
-              <option>
-                <Text id="global.emptySelectOption" />
-              </option>
-              {props.users &&
-                props.users.map(user => (
-                  <option key={user.id} value={user.id}>
-                    {user.firstname}
-                  </option>
-                ))}
-            </select>
-          </MobileField>
+          <MobileAuthCard>
+            <MobileField label={<Text id="gatewayLinkUser.label" />} htmlFor="link-gateway-user">
+              <select
+                id="link-gateway-user"
+                class={fieldClass.select}
+                onChange={props.selectUser}
+                data-cy="link-gateway-user-select-user"
+              >
+                <option>
+                  <Text id="global.emptySelectOption" />
+                </option>
+                {props.users &&
+                  props.users.map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.firstname}
+                    </option>
+                  ))}
+              </select>
+            </MobileField>
+          </MobileAuthCard>
         </div>
       )}
       <MobileSectionHeader title={<Text id="gatewayLinkUser.mobile.accountTitle" />} />

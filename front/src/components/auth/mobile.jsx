@@ -20,6 +20,18 @@ const MobileAuthTitle = ({ children, lead }) => (
 );
 
 /**
+ * @description The fields of a screen, on one card of frosted glass — the card of the desktop
+ * page, without its title (which is the large title above it). It only holds fields and what
+ * relates to them: never the bottom bar, which is fixed to the screen (a glass surface is the
+ * containing block of what is fixed inside it).
+ */
+const MobileAuthCard = ({ children, dataCy }) => (
+  <div class={style.mobileFormCard} data-cy={dataCy}>
+    {children}
+  </div>
+);
+
+/**
  * @description The form of a logged-out page on a phone. `onSubmit` is the handler of the
  * desktop form (the keyboard's key submits it too); once it ran, the first field the validation
  * refused is brought into view and focused.
@@ -182,4 +194,12 @@ const MobileCodeField = ({ id, label, help, error, value, onInput, placeholder, 
   </MobileField>
 );
 
-export { MobileAuthTitle, MobileAuthForm, MobileAuthBar, MobileEmailField, MobileTextField, MobileCodeField };
+export {
+  MobileAuthTitle,
+  MobileAuthCard,
+  MobileAuthForm,
+  MobileAuthBar,
+  MobileEmailField,
+  MobileTextField,
+  MobileCodeField
+};

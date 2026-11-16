@@ -4,7 +4,13 @@ import * as consts from '../../utils/consts';
 import loginActions from '../../actions/login/login';
 import AuthLayout from '../../components/auth/AuthLayout';
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
-import { MobileAuthTitle, MobileAuthForm, MobileAuthBar, MobileEmailField } from '../../components/auth/mobile';
+import {
+  MobileAuthTitle,
+  MobileAuthCard,
+  MobileAuthForm,
+  MobileAuthBar,
+  MobileEmailField
+} from '../../components/auth/mobile';
 import authStyle from '../../components/auth/style.css';
 import { withMobileViewport, MobilePasswordField, BigButton, kitStyle } from '../../components/mobile';
 
@@ -99,32 +105,34 @@ const MobileLoginPage = ({
       <MobileAuthTitle>
         <Text id="login.cardTitle" />
       </MobileAuthTitle>
-      <MobileEmailField
-        id="login-email"
-        label={<Text id="login.emailLabel" />}
-        placeholder={<Text id="login.emailPlaceholder" />}
-        value={loginFormEmailValue}
-        onInput={onEmailChange}
-        error={loginStatus === consts.LoginStatus.WrongEmailError && <Text id="login.invalidEmail" />}
-        autocomplete="username"
-        enterkeyhint="next"
-        dataCy="login-email"
-      />
-      <MobilePasswordField
-        id="login-password"
-        label={<Text id="login.passwordLabel" />}
-        placeholder={<Text id="login.passwordPlaceholder" />}
-        value={loginFormPasswordValue}
-        onInput={onPasswordChange}
-        autocomplete="current-password"
-        enterkeyhint="go"
-        dataCy="login-password"
-      />
-      <div class={authStyle.mobileLinks}>
-        <a href="/forgot-password" class={authStyle.mobileLink} data-cy="login-forgot-password">
-          <Text id="login.forgotPasswordLabel" />
-        </a>
-      </div>
+      <MobileAuthCard>
+        <MobileEmailField
+          id="login-email"
+          label={<Text id="login.emailLabel" />}
+          placeholder={<Text id="login.emailPlaceholder" />}
+          value={loginFormEmailValue}
+          onInput={onEmailChange}
+          error={loginStatus === consts.LoginStatus.WrongEmailError && <Text id="login.invalidEmail" />}
+          autocomplete="username"
+          enterkeyhint="next"
+          dataCy="login-email"
+        />
+        <MobilePasswordField
+          id="login-password"
+          label={<Text id="login.passwordLabel" />}
+          placeholder={<Text id="login.passwordPlaceholder" />}
+          value={loginFormPasswordValue}
+          onInput={onPasswordChange}
+          autocomplete="current-password"
+          enterkeyhint="go"
+          dataCy="login-password"
+        />
+        <div class={authStyle.mobileLinks}>
+          <a href="/forgot-password" class={authStyle.mobileLink} data-cy="login-forgot-password">
+            <Text id="login.forgotPasswordLabel" />
+          </a>
+        </div>
+      </MobileAuthCard>
       <div class={kitStyle.footnote}>
         <MarkupText id="login.needHelpText" />
       </div>

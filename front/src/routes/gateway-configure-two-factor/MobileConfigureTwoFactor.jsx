@@ -2,7 +2,13 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
-import { MobileAuthTitle, MobileAuthForm, MobileAuthBar, MobileCodeField } from '../../components/auth/mobile';
+import {
+  MobileAuthTitle,
+  MobileAuthCard,
+  MobileAuthForm,
+  MobileAuthBar,
+  MobileCodeField
+} from '../../components/auth/mobile';
 import authStyle from '../../components/auth/style.css';
 import TwoFactorAppList from '../../components/gateway/TwoFactorAppList';
 import {
@@ -97,55 +103,59 @@ class MobileConfigureTwoFactor extends Component {
             </li>
           </ol>
         </div>
-        <MobileField label={<Text id="gatewayTwoFactorAuth.secretLabel" />} htmlFor="configure-two-factor-secret">
-          <div class={fieldClass.group}>
-            <input
-              id="configure-two-factor-secret"
-              type="text"
-              class={`${fieldClass.input} ${style.mobileSecret}`}
-              value={props.secret || ''}
-              // read and copied, never typed: no keyboard opens on it
-              readonly
-              data-cy="configure-two-factor-secret"
-            />
-            <button
-              type="button"
-              class={`${fieldClass.addon} ${style.mobileCopy}`}
-              onClick={this.copySecret}
-              disabled={!props.secret}
-              data-cy="configure-two-factor-copy"
-            >
-              <Text id="gatewayTwoFactorAuth.copy" />
-            </button>
-          </div>
-        </MobileField>
-        {props.dataUrl && (
-          <div class={`${authStyle.mobileCard} ${style.mobileQrCode}`}>
-            <Localizer>
-              <img
-                src={props.dataUrl}
-                alt={<Text id="gatewayTwoFactorAuth.mobile.qrCodeAlt" />}
-                data-cy="configure-two-factor-qr-code"
+        <MobileAuthCard>
+          <MobileField label={<Text id="gatewayTwoFactorAuth.secretLabel" />} htmlFor="configure-two-factor-secret">
+            <div class={fieldClass.group}>
+              <input
+                id="configure-two-factor-secret"
+                type="text"
+                class={`${fieldClass.input} ${style.mobileSecret}`}
+                value={props.secret || ''}
+                // read and copied, never typed: no keyboard opens on it
+                readonly
+                data-cy="configure-two-factor-secret"
               />
-            </Localizer>
-            <p>
-              <Text id="gatewayTwoFactorAuth.mobile.qrCodeHelp" />
-            </p>
-          </div>
-        )}
+              <button
+                type="button"
+                class={`${fieldClass.addon} ${style.mobileCopy}`}
+                onClick={this.copySecret}
+                disabled={!props.secret}
+                data-cy="configure-two-factor-copy"
+              >
+                <Text id="gatewayTwoFactorAuth.copy" />
+              </button>
+            </div>
+          </MobileField>
+          {props.dataUrl && (
+            <div class={style.mobileQrCode}>
+              <Localizer>
+                <img
+                  src={props.dataUrl}
+                  alt={<Text id="gatewayTwoFactorAuth.mobile.qrCodeAlt" />}
+                  data-cy="configure-two-factor-qr-code"
+                />
+              </Localizer>
+              <p>
+                <Text id="gatewayTwoFactorAuth.mobile.qrCodeHelp" />
+              </p>
+            </div>
+          )}
+        </MobileAuthCard>
 
         <MobileSectionHeader title={<Text id="gatewayTwoFactorAuth.confirmCode" />} />
-        <MobileCodeField
-          id="configure-two-factor-code"
-          placeholder={<Text id="gatewayTwoFactorAuth.enterCode" />}
-          value={props.twoFactorCode}
-          onInput={props.updateTwoFactorCode}
-          error={props.errored && <Text id="gatewayTwoFactorAuth.invalidCode" />}
-          maxlength="7"
-          enterkeyhint="go"
-          aria-label={<Text id="gatewayTwoFactorAuth.confirmCode" />}
-          dataCy="configure-two-factor-code"
-        />
+        <MobileAuthCard>
+          <MobileCodeField
+            id="configure-two-factor-code"
+            placeholder={<Text id="gatewayTwoFactorAuth.enterCode" />}
+            value={props.twoFactorCode}
+            onInput={props.updateTwoFactorCode}
+            error={props.errored && <Text id="gatewayTwoFactorAuth.invalidCode" />}
+            maxlength="7"
+            enterkeyhint="go"
+            aria-label={<Text id="gatewayTwoFactorAuth.confirmCode" />}
+            dataCy="configure-two-factor-code"
+          />
+        </MobileAuthCard>
         <MobileAuthBar>
           <BigButton variant="primary" type="submit" data-cy="configure-two-factor-enable">
             <Text id="gatewayTwoFactorAuth.enable" />

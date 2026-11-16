@@ -124,3 +124,26 @@
     border-radius: 14px;
   }
 }
+
+/* the keys are frosted glass on the wallpaper, like the card they replace */
+:global(.gladys-mobile-glass) .mobileKey {
+  border: 1px solid var(--gl-border);
+  background-color: rgba(255, 255, 255, 0.56);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.gladys-mobile-glass) .mobileKey:active {
+  background-color: rgba(255, 255, 255, 0.92);
+  border-color: var(--gl-border);
+}
+
+:global(.gladys-mobile-glass) .mobileKeyDelete,
+:global(.gladys-mobile-glass) .mobileKeyDelete:active {
+  border-color: transparent;
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}

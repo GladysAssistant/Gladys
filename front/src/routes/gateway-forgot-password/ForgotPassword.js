@@ -1,7 +1,13 @@
 import { Text, Localizer } from 'preact-i18n';
 import AuthLayout from '../../components/auth/AuthLayout';
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
-import { MobileAuthTitle, MobileAuthForm, MobileAuthBar, MobileEmailField } from '../../components/auth/mobile';
+import {
+  MobileAuthTitle,
+  MobileAuthCard,
+  MobileAuthForm,
+  MobileAuthBar,
+  MobileEmailField
+} from '../../components/auth/mobile';
 import { withMobileViewport, MobileNotice, BigButton, kitStyle } from '../../components/mobile';
 
 // The Gladys Plus password recovery on a phone (docs/specs/mobile-pages/auth.md, D.5)
@@ -21,16 +27,18 @@ const MobileForgotPassword = props => (
         </MobileNotice>
       )}
       {!props.success && (
-        <MobileEmailField
-          id="gateway-forgot-password-email"
-          label={<Text id="gatewayForgotPassword.emailAddress" />}
-          placeholder={<Text id="gatewayForgotPassword.emailAddressPlaceholder" />}
-          value={props.email}
-          onInput={props.updateEmail}
-          autocomplete="username"
-          enterkeyhint="send"
-          dataCy="gateway-forgot-password-email"
-        />
+        <MobileAuthCard>
+          <MobileEmailField
+            id="gateway-forgot-password-email"
+            label={<Text id="gatewayForgotPassword.emailAddress" />}
+            placeholder={<Text id="gatewayForgotPassword.emailAddressPlaceholder" />}
+            value={props.email}
+            onInput={props.updateEmail}
+            autocomplete="username"
+            enterkeyhint="send"
+            dataCy="gateway-forgot-password-email"
+          />
+        </MobileAuthCard>
       )}
       <div class={kitStyle.footnote}>
         <Text id="gatewayForgotPassword.dontHaveAccount" />{' '}

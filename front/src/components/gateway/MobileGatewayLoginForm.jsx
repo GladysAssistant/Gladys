@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import { RequestStatus, LoginStatus } from '../../utils/consts';
 import {
   MobileAuthTitle,
+  MobileAuthCard,
   MobileAuthForm,
   MobileAuthBar,
   MobileEmailField,
@@ -90,81 +91,83 @@ const MobileGatewayLoginForm = props => {
           <Text id="gatewayLogin.resetTwoFactorEmailSent" />
         </MobileNotice>
       )}
-      {!step2 && (
-        <MobileEmailField
-          id="gateway-login-email"
-          label={<Text id="gatewayLogin.emailLabel" />}
-          placeholder={<Text id="gatewayLogin.emailPlaceholder" />}
-          value={props.gatewayLoginEmail}
-          onInput={props.updateLoginEmail}
-          error={props.gatewayLoginStatus === LoginStatus.WrongEmailError && <Text id="gatewayLogin.invalidEmail" />}
-          autocomplete="username"
-          enterkeyhint="next"
-          dataCy="gateway-login-email"
-        />
-      )}
-      {!step2 && (
-        <MobilePasswordField
-          id="gateway-login-password"
-          label={<Text id="gatewayLogin.passwordLabel" />}
-          placeholder={<Text id="gatewayLogin.passwordPlaceholder" />}
-          value={props.gatewayLoginPassword}
-          onInput={props.updateLoginPassword}
-          autocomplete="current-password"
-          enterkeyhint="go"
-          dataCy="gateway-login-password"
-        />
-      )}
-      {!step2 && (
-        <div class={authStyle.mobileLinks}>
-          <a
-            href={props.external_forgot_password ? EXTERNAL_FORGOT_PASSWORD_LINK : '/forgot-password'}
-            class={authStyle.mobileLink}
-            data-cy="gateway-login-forgot-password"
-          >
-            <Text id="gatewayLogin.forgotPasswordLabel" />
-          </a>
-        </div>
-      )}
-      {useTwoFactorCode && (
-        <MobileCodeField
-          id="gateway-login-two-factor-code"
-          label={<Text id="gatewayLogin.twoFactorCodeLabel" />}
-          placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
-          value={props.gatewayLoginTwoFactorCode}
-          onInput={props.updateLoginTwoFactorCode}
-          error={
-            props.gatewayLoginStatus === LoginStatus.WrongTwoFactorCodeError && (
-              <Text id="gatewayLogin.invalidTwoFactorCode" />
-            )
-          }
-          maxlength="6"
-          enterkeyhint="go"
-          autofocus
-          dataCy="gateway-login-two-factor-code"
-        />
-      )}
-      {useRecoveryCode && (
-        <MobileTextField
-          id="gateway-login-recovery-code"
-          label={<Text id="gatewayLogin.recoveryCodeLabel" />}
-          placeholder={<Text id="gatewayLogin.recoveryCodePlaceholder" />}
-          value={props.gatewayLoginRecoveryCode}
-          onInput={props.updateLoginRecoveryCode}
-          error={
-            props.gatewayLoginStatus === LoginStatus.WrongRecoveryCodeError && (
-              <Text id="gatewayLogin.invalidRecoveryCode" />
-            )
-          }
-          autocomplete="off"
-          autocapitalize="off"
-          autocorrect="off"
-          spellcheck={false}
-          enterkeyhint="go"
-          autofocus
-          dataCy="gateway-login-recovery-code"
-        />
-      )}
+      <MobileAuthCard>
+        {!step2 && (
+          <MobileEmailField
+            id="gateway-login-email"
+            label={<Text id="gatewayLogin.emailLabel" />}
+            placeholder={<Text id="gatewayLogin.emailPlaceholder" />}
+            value={props.gatewayLoginEmail}
+            onInput={props.updateLoginEmail}
+            error={props.gatewayLoginStatus === LoginStatus.WrongEmailError && <Text id="gatewayLogin.invalidEmail" />}
+            autocomplete="username"
+            enterkeyhint="next"
+            dataCy="gateway-login-email"
+          />
+        )}
+        {!step2 && (
+          <MobilePasswordField
+            id="gateway-login-password"
+            label={<Text id="gatewayLogin.passwordLabel" />}
+            placeholder={<Text id="gatewayLogin.passwordPlaceholder" />}
+            value={props.gatewayLoginPassword}
+            onInput={props.updateLoginPassword}
+            autocomplete="current-password"
+            enterkeyhint="go"
+            dataCy="gateway-login-password"
+          />
+        )}
+        {!step2 && (
+          <div class={authStyle.mobileLinks}>
+            <a
+              href={props.external_forgot_password ? EXTERNAL_FORGOT_PASSWORD_LINK : '/forgot-password'}
+              class={authStyle.mobileLink}
+              data-cy="gateway-login-forgot-password"
+            >
+              <Text id="gatewayLogin.forgotPasswordLabel" />
+            </a>
+          </div>
+        )}
+        {useTwoFactorCode && (
+          <MobileCodeField
+            id="gateway-login-two-factor-code"
+            label={<Text id="gatewayLogin.twoFactorCodeLabel" />}
+            placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
+            value={props.gatewayLoginTwoFactorCode}
+            onInput={props.updateLoginTwoFactorCode}
+            error={
+              props.gatewayLoginStatus === LoginStatus.WrongTwoFactorCodeError && (
+                <Text id="gatewayLogin.invalidTwoFactorCode" />
+              )
+            }
+            maxlength="6"
+            enterkeyhint="go"
+            autofocus
+            dataCy="gateway-login-two-factor-code"
+          />
+        )}
+        {useRecoveryCode && (
+          <MobileTextField
+            id="gateway-login-recovery-code"
+            label={<Text id="gatewayLogin.recoveryCodeLabel" />}
+            placeholder={<Text id="gatewayLogin.recoveryCodePlaceholder" />}
+            value={props.gatewayLoginRecoveryCode}
+            onInput={props.updateLoginRecoveryCode}
+            error={
+              props.gatewayLoginStatus === LoginStatus.WrongRecoveryCodeError && (
+                <Text id="gatewayLogin.invalidRecoveryCode" />
+              )
+            }
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck={false}
+            enterkeyhint="go"
+            autofocus
+            dataCy="gateway-login-recovery-code"
+          />
+        )}
+      </MobileAuthCard>
       {step2 && (
         <MobileLostTwoFactor
           useRecoveryCode={useRecoveryCode}

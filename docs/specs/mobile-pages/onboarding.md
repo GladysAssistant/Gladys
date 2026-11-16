@@ -23,7 +23,9 @@ card that wraps:
 
 `routes/signup/layout.jsx` renders, below the phone breakpoint, `MobileSignupLayout` instead of
 the card. It is the shell of every logged-out page (`components/auth/MobileAuthLayout.jsx`,
-[`auth.md`](auth.md) B) with the progress of the flow above the content:
+[`auth.md`](auth.md) B) with the progress of the flow above the content. The onboarding keeps
+the opaque surfaces of the kit (`glass={false}`): the glass variant of README C.9 is the one of
+the sign-in pages for now:
 
 - the **navigation bar** of the kit, with the logo and "Gladys Assistant" as its title, and the
   way back only where going back makes sense (the account step goes back to the welcome; once

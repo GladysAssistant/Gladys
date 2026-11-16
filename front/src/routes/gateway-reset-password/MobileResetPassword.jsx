@@ -4,6 +4,7 @@ import { RequestStatus } from '../../utils/consts';
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
 import {
   MobileAuthTitle,
+  MobileAuthCard,
   MobileAuthForm,
   MobileAuthBar,
   MobileTextField,
@@ -54,60 +55,60 @@ const MobileResetPassword = props => {
           </MobileNotice>
         )}
         {!props.success && (
-          <MobilePasswordField
-            id="gateway-reset-password"
-            label={<Text id="gatewayResetPassword.passwordLabel" />}
-            placeholder={<Text id="gatewayResetPassword.passwordPlaceholder" />}
-            value={props.password}
-            onInput={props.updatePassword}
-            error={props.passwordError && <Text id="gatewayResetPassword.passwordInvalid" />}
-            autocomplete="new-password"
-            enterkeyhint="next"
-            required
-            dataCy="gateway-reset-password-password"
-          />
-        )}
-        {!props.success && (
-          <MobilePasswordField
-            id="gateway-reset-password-repeat"
-            label={<Text id="gatewayResetPassword.repeatPasswordLabel" />}
-            placeholder={<Text id="gatewayResetPassword.passwordPlaceholder" />}
-            value={props.passwordRepeat}
-            onInput={props.updatePasswordRepeat}
-            error={props.passwordNotMatching && <Text id="gatewayResetPassword.passwordNotMatchingLabel" />}
-            autocomplete="new-password"
-            enterkeyhint="go"
-            required
-            dataCy="gateway-reset-password-password-repeat"
-          />
-        )}
-        {!props.success && props.twoFactorEnabled && !props.useRecoveryCode && (
-          <MobileCodeField
-            id="gateway-reset-password-two-factor-code"
-            label={<Text id="gatewayResetPassword.twoFactorCodeLabel" />}
-            placeholder={<Text id="gatewayResetPassword.twoFactorCodePlaceholder" />}
-            value={props.twoFactorCode}
-            onInput={props.updateTwoFactorCode}
-            maxlength="6"
-            enterkeyhint="go"
-            dataCy="gateway-reset-password-two-factor-code"
-          />
-        )}
-        {!props.success && props.twoFactorEnabled && props.useRecoveryCode && (
-          <MobileTextField
-            id="gateway-reset-password-recovery-code"
-            label={<Text id="gatewayResetPassword.recoveryCodeLabel" />}
-            placeholder={<Text id="gatewayResetPassword.recoveryCodePlaceholder" />}
-            value={props.twoFactorRecoveryCode}
-            onInput={props.updateTwoFactorRecoveryCode}
-            error={props.invalidRecoveryCode && <Text id="gatewayResetPassword.invalidRecoveryCodeLabel" />}
-            autocomplete="off"
-            autocapitalize="off"
-            autocorrect="off"
-            spellcheck={false}
-            enterkeyhint="go"
-            dataCy="gateway-reset-password-recovery-code"
-          />
+          <MobileAuthCard>
+            <MobilePasswordField
+              id="gateway-reset-password"
+              label={<Text id="gatewayResetPassword.passwordLabel" />}
+              placeholder={<Text id="gatewayResetPassword.passwordPlaceholder" />}
+              value={props.password}
+              onInput={props.updatePassword}
+              error={props.passwordError && <Text id="gatewayResetPassword.passwordInvalid" />}
+              autocomplete="new-password"
+              enterkeyhint="next"
+              required
+              dataCy="gateway-reset-password-password"
+            />
+            <MobilePasswordField
+              id="gateway-reset-password-repeat"
+              label={<Text id="gatewayResetPassword.repeatPasswordLabel" />}
+              placeholder={<Text id="gatewayResetPassword.passwordPlaceholder" />}
+              value={props.passwordRepeat}
+              onInput={props.updatePasswordRepeat}
+              error={props.passwordNotMatching && <Text id="gatewayResetPassword.passwordNotMatchingLabel" />}
+              autocomplete="new-password"
+              enterkeyhint="go"
+              required
+              dataCy="gateway-reset-password-password-repeat"
+            />
+            {props.twoFactorEnabled && !props.useRecoveryCode && (
+              <MobileCodeField
+                id="gateway-reset-password-two-factor-code"
+                label={<Text id="gatewayResetPassword.twoFactorCodeLabel" />}
+                placeholder={<Text id="gatewayResetPassword.twoFactorCodePlaceholder" />}
+                value={props.twoFactorCode}
+                onInput={props.updateTwoFactorCode}
+                maxlength="6"
+                enterkeyhint="go"
+                dataCy="gateway-reset-password-two-factor-code"
+              />
+            )}
+            {props.twoFactorEnabled && props.useRecoveryCode && (
+              <MobileTextField
+                id="gateway-reset-password-recovery-code"
+                label={<Text id="gatewayResetPassword.recoveryCodeLabel" />}
+                placeholder={<Text id="gatewayResetPassword.recoveryCodePlaceholder" />}
+                value={props.twoFactorRecoveryCode}
+                onInput={props.updateTwoFactorRecoveryCode}
+                error={props.invalidRecoveryCode && <Text id="gatewayResetPassword.invalidRecoveryCodeLabel" />}
+                autocomplete="off"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck={false}
+                enterkeyhint="go"
+                dataCy="gateway-reset-password-recovery-code"
+              />
+            )}
+          </MobileAuthCard>
         )}
         {!props.success && props.twoFactorEnabled && (
           <MobileLostTwoFactor

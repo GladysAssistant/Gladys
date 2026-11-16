@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
 import {
   MobileAuthTitle,
+  MobileAuthCard,
   MobileAuthForm,
   MobileAuthBar,
   MobileEmailField,
@@ -82,49 +83,47 @@ const MobileSignupGateway = props => {
             </MobileNotice>
           )}
           {!blocking && (
-            <MobileTextField
-              id="signup-gateway-name"
-              label={<Text id="gatewaySignUp.usernameLabel" />}
-              placeholder={<Text id="gatewaySignUp.usernamePlaceholder" />}
-              value={props.name}
-              onInput={props.updateName}
-              error={props.fieldsErrored.includes('name') && <Text id="gatewaySignUp.usernameInvalid" />}
-              autocomplete="name"
-              autocapitalize="words"
-              enterkeyhint="next"
-              required
-              dataCy="signup-gateway-name"
-            />
-          )}
-          {!blocking && (
-            <MobileEmailField
-              id="signup-gateway-email"
-              label={<Text id="gatewaySignUp.emailLabel" />}
-              placeholder={<Text id="gatewaySignUp.emailPlaceholder" />}
-              value={props.email}
-              onInput={props.updateEmail}
-              error={props.fieldsErrored.includes('email') && <Text id="gatewaySignUp.emailInvalid" />}
-              // the address of the invitation: it is the account, it cannot be changed here
-              disabled={Boolean(props.token)}
-              autocomplete="username"
-              enterkeyhint="next"
-              required
-              dataCy="signup-gateway-email"
-            />
-          )}
-          {!blocking && (
-            <MobilePasswordField
-              id="signup-gateway-password"
-              label={<Text id="gatewaySignUp.passwordLabel" />}
-              placeholder={<Text id="gatewaySignUp.passwordPlaceholder" />}
-              value={props.password}
-              onInput={props.updatePassword}
-              error={props.fieldsErrored.includes('password') && <Text id="gatewaySignUp.passwordInvalid" />}
-              autocomplete="new-password"
-              enterkeyhint="go"
-              required
-              dataCy="signup-gateway-password"
-            />
+            <MobileAuthCard>
+              <MobileTextField
+                id="signup-gateway-name"
+                label={<Text id="gatewaySignUp.usernameLabel" />}
+                placeholder={<Text id="gatewaySignUp.usernamePlaceholder" />}
+                value={props.name}
+                onInput={props.updateName}
+                error={props.fieldsErrored.includes('name') && <Text id="gatewaySignUp.usernameInvalid" />}
+                autocomplete="name"
+                autocapitalize="words"
+                enterkeyhint="next"
+                required
+                dataCy="signup-gateway-name"
+              />
+              <MobileEmailField
+                id="signup-gateway-email"
+                label={<Text id="gatewaySignUp.emailLabel" />}
+                placeholder={<Text id="gatewaySignUp.emailPlaceholder" />}
+                value={props.email}
+                onInput={props.updateEmail}
+                error={props.fieldsErrored.includes('email') && <Text id="gatewaySignUp.emailInvalid" />}
+                // the address of the invitation: it is the account, it cannot be changed here
+                disabled={Boolean(props.token)}
+                autocomplete="username"
+                enterkeyhint="next"
+                required
+                dataCy="signup-gateway-email"
+              />
+              <MobilePasswordField
+                id="signup-gateway-password"
+                label={<Text id="gatewaySignUp.passwordLabel" />}
+                placeholder={<Text id="gatewaySignUp.passwordPlaceholder" />}
+                value={props.password}
+                onInput={props.updatePassword}
+                error={props.fieldsErrored.includes('password') && <Text id="gatewaySignUp.passwordInvalid" />}
+                autocomplete="new-password"
+                enterkeyhint="go"
+                required
+                dataCy="signup-gateway-password"
+              />
+            </MobileAuthCard>
           )}
           <div class={kitStyle.footnote}>
             <Text id="gatewaySignup.alreadyHaveAccount" />{' '}
