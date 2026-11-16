@@ -1,0 +1,657 @@
+/* ==================================================================
+   A zone drawn on a phone (docs/specs/mobile-pages/map-areas.md): the
+   map fills the screen between the navigation bar and a panel holding
+   the form. What the kit (components/mobile/kit.css) does not carry.
+   Light colors only: dark mode is the app-wide inversion.
+   ================================================================== */
+
+/* ---------- the page: navigation bar / map / panel ---------- */
+
+.zonePage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  color: #1c2334;
+  background-color: #eef3fb;
+}
+
+.zoneBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mapArea {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Leaflet panes go up to z-index 1000: the map is its own stacking context, so they never
+     paint over the navigation bar or a sheet */
+  z-index: 0;
+  isolation: isolate;
+}
+
+.map {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* the panel rounds the bottom edge of the map: the attribution stays above it */
+.mapArea :global(.leaflet-bottom) {
+  bottom: 18px;
+}
+
+/* on a narrow screen the attribution would wrap on two lines over the zone: smaller and without
+   the prefix of Leaflet (MobileAreaMap.jsx), it keeps to one down to 320px */
+.zonePage .mapArea :global(.leaflet-bottom) :global(.leaflet-control-attribution) {
+  margin: 0 8px 8px 0;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.625rem;
+}
+
+/* ---------- controls floating over the map ---------- */
+
+.mapButtons {
+  position: absolute;
+  top: 10px;
+  right: max(10px, env(safe-area-inset-right, 0px));
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mapButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(28, 35, 52, 0.08);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.18);
+  color: #2f5bd8;
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.mapButton:focus {
+  outline: none;
+}
+
+.mapButton:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+.mapButton:disabled {
+  opacity: 0.6;
+}
+
+.mapButtonSpinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: zoneSpin 0.7s linear infinite;
+}
+
+@keyframes zoneSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* a message about the map, just above the panel: it never covers the form (the toast of the kit
+   is fixed at the bottom of the screen, where the Save button is) */
+.mapToast {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 30px;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 30rem;
+  min-height: 48px;
+  margin: 0 auto;
+  padding: 4px 6px 4px 14px;
+  border-radius: 14px;
+  background-color: #1c2334;
+  color: #fff;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  box-shadow: 0 10px 30px rgba(16, 22, 38, 0.3);
+  animation: zoneToastIn 0.22s ease-out;
+}
+
+.mapToastText {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  overflow-wrap: anywhere;
+}
+
+.mapToastButton {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: #a9c0ff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mapToastClose {
+  color: #fff;
+  font-size: 1.125rem;
+}
+
+@keyframes zoneToastIn {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---------- the zone on the map ---------- */
+
+/* the circle is taken with a finger to be moved */
+.zoneCircle {
+  cursor: move;
+  touch-action: none;
+}
+
+/* a handle is a 44px target around a smaller knob */
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  touch-action: none;
+}
+
+.handle:focus {
+  outline: none;
+}
+
+.handle:focus-visible .centerKnob,
+.handle:focus-visible .resizeKnob {
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.5);
+}
+
+.centerKnob {
+  width: 18px;
+  height: 18px;
+  border: 4px solid #3498db;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(16, 22, 38, 0.35);
+}
+
+.resizeKnob {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 3px solid #3498db;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(16, 22, 38, 0.35);
+  color: #1c2334;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* the radius, written above the handle: a finger on the handle does not hide it */
+.zonePage :global(.leaflet-tooltip).radiusLabel {
+  padding: 0.2rem 0.65rem;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(28, 35, 52, 0.1);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- the panel ---------- */
+
+.panel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
+  background-color: #f7f8fb;
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -10px 30px rgba(16, 22, 38, 0.12);
+  /* above the map, whose edge it rounds */
+  position: relative;
+  z-index: 1;
+  margin-top: -18px;
+}
+
+.panelInner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 38rem;
+  margin: 0 auto;
+}
+
+/* no field of the page triggers the iOS zoom on focus */
+.zonePage input,
+.zonePage select,
+.zonePage textarea {
+  font-size: 16px;
+}
+
+/* the name and the color of the zone: one row opening their sheet */
+.zoneRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.zoneRow:focus {
+  outline: none;
+}
+
+.zoneRow:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: -2px;
+}
+
+.zoneSwatch {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 3px solid #3498db;
+  background-color: rgba(52, 152, 219, 0.2);
+}
+
+.zoneRowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zoneRowTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zoneRowTitleMissing {
+  color: #2f5bd8;
+}
+
+.zoneRowSub {
+  font-size: 0.8125rem;
+  color: #4f5866;
+}
+
+.zoneRowChevron {
+  flex-shrink: 0;
+  color: #8b93a1;
+  font-size: 1.125rem;
+}
+
+.radiusHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.radiusLabelText {
+  margin: 0 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* the radius typed as a number: the field and its unit are one control */
+.radiusField {
+  display: flex;
+  align-items: stretch;
+  width: 8.5rem;
+  min-height: 44px;
+  border: 1px solid #d7dce5;
+  border-radius: 14px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.radiusField:focus-within {
+  border-color: #2f5bd8;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.18);
+}
+
+.radiusInput {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0 4px 0 12px;
+  border: 0;
+  background: transparent;
+  color: #1c2334;
+  font: inherit;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  outline: none;
+}
+
+.radiusUnit {
+  display: flex;
+  align-items: center;
+  padding: 0 12px 0 4px;
+  color: #4f5866;
+  font-size: 0.9375rem;
+}
+
+.radiusControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background-color: #e9edf3;
+  color: #1c2334;
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.stepButton:focus {
+  outline: none;
+}
+
+.stepButton:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+.stepButton:disabled {
+  opacity: 0.45;
+}
+
+/* the slider: a 44px high target around a thin track */
+.slider {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: pan-y;
+  cursor: pointer;
+}
+
+.slider:focus {
+  outline: none;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.14);
+}
+
+.slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.14);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 1px 5px rgba(16, 22, 38, 0.4);
+}
+
+.slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 1px 5px rgba(16, 22, 38, 0.4);
+}
+
+.slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.5);
+}
+
+.slider:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.5);
+}
+
+/* what is missing to save, or how the gestures work, above the button. Two lines are kept for
+   it: the panel — and the map above it — does not change height when the message does */
+.panelMessage {
+  min-height: 2.8em;
+  margin: 0 4px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+.panelMessageMissing {
+  color: #8a4a0f;
+  font-weight: 600;
+}
+
+.panelError {
+  margin-bottom: 0;
+}
+
+/* ---------- the sheet of the name and the color ---------- */
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 4px 16px;
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.swatch:focus {
+  outline: none;
+}
+
+.swatch:focus-visible {
+  box-shadow: 0 0 0 2px #f7f8fb, 0 0 0 4px #2f5bd8;
+}
+
+/* the selected color: a ring of its own color, away from the swatch */
+.swatchSelected {
+  box-shadow: 0 0 0 3px #f7f8fb, 0 0 0 6px currentColor;
+}
+
+.swatchCheck {
+  color: #fff;
+}
+
+.swatchCheckDark {
+  color: #1c2334;
+}
+
+/* ---------- a short phone: the map keeps the room ---------- */
+
+@media (max-height: 640px) and (orientation: portrait) {
+  .panel,
+  .panelInner {
+    gap: 8px;
+  }
+
+  .zoneRow {
+    min-height: 52px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  /* how the gestures work is a comfort, what is missing to save is not */
+  .panelHint {
+    display: none;
+  }
+
+  .panelMessage {
+    min-height: 0;
+  }
+}
+
+/* ---------- a phone in landscape: the panel goes beside the map ---------- */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .zoneBody {
+    flex-direction: row;
+  }
+
+  .panel {
+    flex: 0 0 21rem;
+    max-width: 50%;
+    margin-top: 0;
+    padding: 10px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) 12px;
+    border-top: 0;
+    border-left: 1px solid rgba(28, 35, 52, 0.08);
+    border-radius: 0;
+    box-shadow: -10px 0 30px rgba(16, 22, 38, 0.1);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .mapButtons {
+    right: 10px;
+  }
+
+  .mapArea :global(.leaflet-bottom) {
+    bottom: 0;
+  }
+
+  .mapToast {
+    bottom: 12px;
+  }
+
+  .panelMessage {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapToast,
+  .mapButtonSpinner {
+    animation: none;
+  }
+}
+
+/* ---------- Dark mode ----------
+   The page is inverted with the app (style/dark-mode.css). The fields of the page are light
+   surfaces that invert with it: the global rule for inputs paints them a solid dark and inverts
+   them back. The swatches carry the color the zone will have on the map, which is inverted with
+   the page too: they stay as they are, so a swatch always shows the color of its circle. */
+
+:global(.dark-mode) .zonePage input.radiusInput {
+  background-color: transparent !important;
+  color: #1c2334 !important;
+  border: 0 !important;
+  filter: none;
+}
+
+/* the knob of the slider stays the light part of the control, on a track that stays visible */
+:global(.dark-mode) .zonePage .slider::-webkit-slider-thumb {
+  background-color: #2b3340;
+}
+
+:global(.dark-mode) .zonePage .slider::-moz-range-thumb {
+  background-color: #2b3340;
+}
+
+:global(.dark-mode) .zonePage .slider::-webkit-slider-runnable-track {
+  background-color: rgba(28, 35, 52, 0.3);
+}
+
+:global(.dark-mode) .zonePage .slider::-moz-range-track {
+  background-color: rgba(28, 35, 52, 0.3);
+}
+
+/* the icons of the page follow their surface */
+:global(.dark-mode) .zonePage :global(.fe) {
+  filter: none;
+}
+
+/* ---------- the map page on a phone (Map.jsx) ---------- */
+
+/* "Create new zone" comes down where a thumb reaches it, above the attribution — which takes two
+   lines on a narrow screen. (The parent is named to win over Leaflet's own margin of a control.) */
+:global(.leaflet-bottom) .createZoneMobile.createZoneMobile {
+  margin-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+}

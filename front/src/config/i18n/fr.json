@@ -5607,7 +5607,36 @@
     "deleteButton": "Supprimer la zone",
     "createAreaError": "Une erreur est survenue lors de la création de votre zone. Avez-vous bien rempli tous les champs, et cliqué sur la carte pour positionner votre zone ?",
     "deleteAreaError": "Impossible de supprimer cette zone. Rafraichissez cette page et réessayez.",
-    "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
+    "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer.",
+    "mobile": {
+      "backLabel": "Carte",
+      "newTitle": "Nouvelle zone",
+      "nameAndColor": "Nom et couleur",
+      "nameMissing": "Nommer la zone",
+      "namePlaceholder": "ex. Travail",
+      "radius": "Rayon",
+      "radiusUnit": "m",
+      "radiusSlider": "Rayon de la zone",
+      "decreaseRadius": "Réduire le rayon",
+      "increaseRadius": "Augmenter le rayon",
+      "missing": {
+        "center": "Touchez la carte pour placer la zone.",
+        "radius": "Saisissez le rayon de la zone, de 10 m à 50 km.",
+        "name": "Donnez un nom à la zone pour l'enregistrer."
+      },
+      "gesturesHint": "Faites glisser la zone pour la déplacer, et la poignée sur son bord pour la redimensionner.",
+      "moveHandle": "Déplacer la zone",
+      "resizeHandle": "Redimensionner la zone",
+      "placeAtMyPosition": "Placer la zone à ma position",
+      "placeAtHouse": "Placer la zone sur ma maison",
+      "placedAtPosition": "Zone placée à votre position.",
+      "placedAtHouse": "Zone placée sur « {{name}} ».",
+      "positionDenied": "Votre position n'est pas disponible : autorisez ce site à utiliser votre position (uniquement en HTTPS), ou touchez la carte.",
+      "positionUnavailable": "Votre position n'a pas pu être trouvée. Touchez la carte pour placer la zone.",
+      "saveError": "La zone n'a pas pu être enregistrée. Vérifiez qu'aucune autre zone ne porte ce nom, puis réessayez.",
+      "deleteTitle": "Supprimer « {{name}} » ?",
+      "deleteText": "Les scènes déclenchées par cette zone ne se lanceront plus. Cette action est irréversible."
+    }
   },
   "iconSelector": {
     "searchPlaceholder": "Rechercher une icône (maison, cadenas, météo...)",

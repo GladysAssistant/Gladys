@@ -5607,7 +5607,36 @@
     "deleteButton": "Eliminar zona",
     "createAreaError": "No se pudo crear esta zona: ¿está seguro de haber completado todos los campos y hecho clic en el mapa para seleccionar la ubicación de su zona?",
     "getAreaError": "No se pudieron obtener los datos de esta zona. Actualice esta página para volver a intentarlo.",
-    "deleteAreaError": "No se pudo eliminar esta zona. Actualice esta página y vuelva a intentarlo."
+    "deleteAreaError": "No se pudo eliminar esta zona. Actualice esta página y vuelva a intentarlo.",
+    "mobile": {
+      "backLabel": "Mapa",
+      "newTitle": "Nueva zona",
+      "nameAndColor": "Nombre y color",
+      "nameMissing": "Poner nombre a la zona",
+      "namePlaceholder": "p. ej. Trabajo",
+      "radius": "Radio",
+      "radiusUnit": "m",
+      "radiusSlider": "Radio de la zona",
+      "decreaseRadius": "Reducir el radio",
+      "increaseRadius": "Aumentar el radio",
+      "missing": {
+        "center": "Toca el mapa para colocar la zona.",
+        "radius": "Introduce el radio de la zona, de 10 m a 50 km.",
+        "name": "Dale un nombre a la zona para guardarla."
+      },
+      "gesturesHint": "Arrastra la zona para moverla y el tirador de su borde para cambiar su tamaño.",
+      "moveHandle": "Mover la zona",
+      "resizeHandle": "Cambiar el tamaño de la zona",
+      "placeAtMyPosition": "Colocar la zona en mi posición",
+      "placeAtHouse": "Colocar la zona en mi casa",
+      "placedAtPosition": "Zona colocada en tu posición.",
+      "placedAtHouse": "Zona colocada en «{{name}}».",
+      "positionDenied": "Tu posición no está disponible: permite que este sitio use tu ubicación (solo funciona con HTTPS) o toca el mapa.",
+      "positionUnavailable": "No se ha podido encontrar tu posición. Toca el mapa para colocar la zona.",
+      "saveError": "No se ha podido guardar la zona. Comprueba que ninguna otra zona tenga este nombre e inténtalo de nuevo.",
+      "deleteTitle": "¿Eliminar «{{name}}»?",
+      "deleteText": "Las escenas activadas por esta zona dejarán de ejecutarse. Esta acción no se puede deshacer."
+    }
   },
   "iconSelector": {
     "searchPlaceholder": "Buscar un icono (casa, cerradura, clima...)",
