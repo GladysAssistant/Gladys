@@ -91,28 +91,33 @@ const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
       return device.name;
     }
 
+    // The feature and its ancestors on the same device, from the feature up
     const featureById = new Map(features.map(f => [f.id, f]));
-    const pathNames = [];
-    let current = feature;
+    const chain = [];
     const visited = new Set();
-
+    let current = feature;
     while (current && !visited.has(current.id)) {
       visited.add(current.id);
-      const parent = current.energy_parent_id ? featureById.get(current.energy_parent_id) : null;
-      // Derived features are named "<parent name> (consumption)" / "(cost)":
-      // skip names that only repeat their parent's one. Any other suffix may
-      // tell sibling features apart (e.g. "Panel (Floor 1)"), so it is kept.
-      const repeatsParent =
-        parent &&
-        parent.name &&
-        current.name &&
-        (current.name === parent.name ||
-          DERIVED_FEATURE_LABELS.some(label => current.name === `${parent.name} (${label})`));
-      if (current.name && !repeatsParent && current.name !== device.name) {
-        pathNames.unshift(current.name);
-      }
-      current = parent;
+      chain.push(current);
+      current = current.energy_parent_id ? featureById.get(current.energy_parent_id) : null;
     }
+
+    // Derived features are named "<source name> (consumption)" / "(cost)" /
+    // "(production)" after one of their ancestors, not always their direct
+    // parent: a cost is named after the index while its parent is the
+    // consumption. Skip names that only repeat an ancestor's one. Any other
+    // suffix may tell sibling features apart (e.g. "Panel (Floor 1)"), so it
+    // is kept.
+    const repeatsAncestor = (name, ancestors) =>
+      ancestors.some(
+        ancestor =>
+          ancestor.name &&
+          (name === ancestor.name || DERIVED_FEATURE_LABELS.some(label => name === `${ancestor.name} (${label})`))
+      );
+    const pathNames = chain
+      .filter((f, index) => f.name && f.name !== device.name && !repeatsAncestor(f.name, chain.slice(index + 1)))
+      .map(f => f.name)
+      .reverse();
 
     return pathNames.length > 0 ? `${device.name} - ${pathNames.join(' - ')}` : device.name;
   }
