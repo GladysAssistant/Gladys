@@ -203,6 +203,6 @@ class SettingsHouses extends Component {
 }
 
 export default connect(
-  'user,houses,housesSearch,housesGetStatus,houseUpdateStatus,getHousesOrderDir',
+  'user,httpClient,houses,housesSearch,housesGetStatus,houseUpdateStatus,getHousesOrderDir',
   actions
 )(SettingsHouses);

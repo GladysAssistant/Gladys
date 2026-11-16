@@ -43,6 +43,9 @@ A consultation page: it keeps the app's top bar and the tabs of the integration.
   wizard. Contracts that cannot be loaded: the error, and neither the notice nor the unattached
   devices (as on the desktop page).
 
+- One attachment at a time: while a device is being attached, the rows of the other devices do
+  not open their sheet (a sheet opened meanwhile would hold the meter the first device was on).
+
 ## C. Contracts (`contracts/MobileContracts.jsx`)
 
 A consultation page, with the tabs.
@@ -138,6 +141,10 @@ phone instead of the 48 buttons of `HourSlotGrid`:
 The value is unchanged — a list of `["HH:MM", "HH:MM"]` — and goes through the same half-hour
 slots as the grid (`intervalsToSlots` / `slotsToIntervals`), so ranges that touch or overlap
 merge exactly as two neighboring buttons do.
+
+- **The whole day is a range**: "00:00 → 24:00" is what the grid stores when every slot is on,
+  and it can be picked and validated in the sheet. Only two identical ends ("12:00 → 12:00") are
+  an empty range, which cannot be validated.
 
 ## E. Settings (`MobileEnergySettings.jsx`, `contracts/MobileCalendars.jsx`)
 

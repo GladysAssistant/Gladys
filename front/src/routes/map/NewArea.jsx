@@ -244,6 +244,9 @@ class NewArea extends Component {
       ...newArea,
       // a zone being edited gets it once loaded (getArea)
       initialArea: props.areaSelector ? null : newArea,
+      // an existing zone is loading from the first paint: its page must not show, nor take the
+      // edits of, an empty new zone
+      loading: Boolean(props.areaSelector),
       houses: []
     };
   }

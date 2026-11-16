@@ -53,8 +53,18 @@ function createActions(store) {
           signupNewHouseLongitude: e.latlng.lng
         });
       });
+      // The marker of the map this one replaces (another theme, or back from the phone layout)
+      // went with it: the pin is put back from the stored position, or forgotten.
+      const { signupNewHouseLatitude: latitude, signupNewHouseLongitude: longitude } = store.getState();
+      const located = latitude !== null && latitude !== undefined && longitude !== null && longitude !== undefined;
+      let marker = null;
+      if (located) {
+        marker = leaflet.marker([latitude, longitude], { icon }).addTo(leafletMap);
+        leafletMap.setView([latitude, longitude], 16);
+      }
       store.setState({
-        signupHouseLeafletMap: leafletMap
+        signupHouseLeafletMap: leafletMap,
+        signupNewHouseMarker: marker
       });
     },
     selectHouseLocation(state, latitude, longitude) {

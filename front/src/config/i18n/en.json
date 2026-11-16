@@ -5649,6 +5649,7 @@
     "vacuumDatabaseButton": "Start database cleaning",
     "vacuumDatabaseStarted": "Database cleaning has started... Gladys will not be available until this job finishes.",
     "vacuumDatabaseFinished": "Database cleaning has finished. Gladys is back online. Cleaning time: {{duration}}.",
+    "vacuumDatabaseError": "The database cleaning could not be started. Try again.",
     "hostPowerTitle": "Reboot / Shutdown host",
     "hostPowerDescription": "Reboot or shut down the machine hosting Gladys (for example your Raspberry Pi). This uses systemd-logind through DBus: on a Docker install Gladys goes through a short-lived helper container started with the Docker socket, so nothing has to be mounted on the Gladys container itself. Gladys and all your automations will stop until the machine is powered back on.",
     "hostRebootButton": "Reboot host",

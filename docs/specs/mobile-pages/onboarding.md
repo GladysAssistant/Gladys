@@ -72,6 +72,9 @@ profile and user pages, is not touched.
   the bottom bar.
 - The form is a `<form>`: the keyboard's key submits it.
 
+- The fields the account needs (first name, last name, e-mail, both passwords) say so to
+  assistive technologies before any submission (`aria-required`).
+
 ### C.3 Preferences (`/signup/preference`)
 
 - **Temperature unit** and **distance unit** are segmented controls (Celsius / Fahrenheit,
@@ -101,6 +104,10 @@ The desktop step keeps its map, created by a store action on an element of the d
 (`initLeafletMap`); the container only creates it when that layout is the one shown. The phone
 step sets the same store fields through two actions that send nothing: `setHouseLocation` and
 `addRoomNamed` (`actions/signup/signupConfigureHouse.js`).
+
+- The desktop map is rebuilt when the layout comes back from the phone one (and on a change of
+  theme): the pin is put back from the stored position (`initLeafletMap`), instead of keeping a
+  marker of the map that was removed.
 
 ### C.5 Success (`/signup/success`)
 

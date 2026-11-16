@@ -35,8 +35,9 @@ const POLL_FREQUENCIES = [
   { value: DEVICE_POLL_FREQUENCIES.EVERY_SECONDS, textId: 'every1Seconds' }
 ];
 
-// what the device looks like once saved: the comparison that tells whether something changed
-const snapshotOf = device => (device ? JSON.stringify(device) : null);
+// the links of the page and of the sheet of a feature that leave it (the "System" page of the
+// footnotes): they go through the leave guard, like the back control
+const GUARDED_LINKS_SELECTOR = '[data-cy=device-edit-mobile] a[href], [data-cy=device-feature-sheet] a[href]';
 
 /**
  * @description A device being edited, on a phone (docs/specs/mobile-pages/device-edit.md): the
@@ -46,8 +47,6 @@ const snapshotOf = device => (device ? JSON.stringify(device) : null);
  */
 class MobileUpdateDevice extends Component {
   state = {
-    // the device as loaded or last saved, serialized: null until the device is there
-    savedSnapshot: snapshotOf(!this.props.loading ? this.props.device : null),
     // the feature of the sheet: the index stays while the sheet slides out
     featureIndex: null,
     featureOpen: false,
@@ -60,15 +59,13 @@ class MobileUpdateDevice extends Component {
 
   componentDidMount() {
     window.addEventListener('beforeunload', this.onBeforeUnload);
+    // in the capture phase: before the router, which listens on the document too
+    document.addEventListener('click', this.onDocumentClick, true);
   }
 
   componentDidUpdate(prevProps) {
-    // the device just arrived: this is the saved version
-    if (this.state.savedSnapshot === null && this.props.device && !this.props.loading) {
-      this.rebase();
-    }
-    // a save went through: what is on screen is the saved version (the server may have completed
-    // it — selectors, ids)
+    // a save is over: the toast, or its error (the saved version itself is kept by UpdateDevice,
+    // which outlives a change of layout)
     const saveFinished =
       (prevProps.loading && !this.props.loading) ||
       (prevProps.saveStatus !== this.props.saveStatus && !this.props.loading);
@@ -85,15 +82,13 @@ class MobileUpdateDevice extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('beforeunload', this.onBeforeUnload);
+    document.removeEventListener('click', this.onDocumentClick, true);
   }
-
-  rebase = () => this.setState({ savedSnapshot: snapshotOf(this.props.device) });
 
   showError = () => this.setState({ errorClosed: false });
 
   onSaved = () => {
     this.setState(prevState => ({
-      savedSnapshot: snapshotOf(this.props.device),
       toastVisible: true,
       toastKey: prevState.toastKey + 1
     }));
@@ -103,10 +98,24 @@ class MobileUpdateDevice extends Component {
     }
   };
 
-  isDirty = () =>
-    this.state.savedSnapshot !== null &&
-    Boolean(this.props.device) &&
-    snapshotOf(this.props.device) !== this.state.savedSnapshot;
+  isDirty = () => Boolean(this.props.dirty);
+
+  // A link inside the page leaves it without its back control: with unsaved changes it opens the
+  // same guard, which then leads where the link pointed
+  onDocumentClick = event => {
+    if (!this.isDirty() || event.defaultPrevented || event.button || !event.target.closest) {
+      return;
+    }
+    const link = event.target.closest(GUARDED_LINKS_SELECTOR);
+    const href = link && link.getAttribute('href');
+    if (!href || !href.startsWith('/') || link.getAttribute('target') === '_blank') {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    this.leaveHref = href;
+    this.setState({ leaveOpen: true });
+  };
 
   onBeforeUnload = event => {
     if (this.isDirty()) {
@@ -123,9 +132,10 @@ class MobileUpdateDevice extends Component {
 
   // a navigation started while the entry of a sheet is on top of the history replaces it:
   // "back" from the next page then lands on this page once
-  leave = () => route(this.props.backHref, isSheetEntryOnTop());
+  leave = () => route(this.leaveHref || this.props.backHref, isSheetEntryOnTop());
 
   onBack = () => {
+    this.leaveHref = null;
     if (this.isDirty()) {
       this.setState({ leaveOpen: true });
     } else {
@@ -146,6 +156,7 @@ class MobileUpdateDevice extends Component {
 
   closeLeave = () => {
     this.leaveAfterSave = false;
+    this.leaveHref = null;
     this.setState({ leaveOpen: false });
   };
 
@@ -381,6 +392,8 @@ class MobileUpdateDevice extends Component {
             open={leaveOpen}
             title={get(intl.dictionary, 'mobileKit.leaveTitle')}
             onClose={this.closeLeave}
+            // above the sheet of a feature, whose link may have opened it
+            depth={1}
             dataCy="device-leave-confirm"
           >
             <p class={kitStyle.sheetText}>

@@ -82,6 +82,7 @@ class MobileCreateAccount extends Component {
               autocapitalize="off"
               autocorrect="off"
               spellcheck={false}
+              aria-required="true"
               aria-invalid={invalid ? 'true' : 'false'}
               data-valid={valid ? 'true' : undefined}
               data-cy={`signup-${id}`}
@@ -132,6 +133,7 @@ class MobileCreateAccount extends Component {
               autocomplete="given-name"
               autocapitalize="words"
               enterkeyhint="next"
+              aria-required="true"
               aria-invalid={errors.firstname ? 'true' : 'false'}
               data-cy="signup-firstname"
             />
@@ -153,6 +155,7 @@ class MobileCreateAccount extends Component {
               autocomplete="family-name"
               autocapitalize="words"
               enterkeyhint="next"
+              aria-required="true"
               aria-invalid={errors.lastname ? 'true' : 'false'}
               data-cy="signup-lastname"
             />
@@ -178,6 +181,7 @@ class MobileCreateAccount extends Component {
               autocorrect="off"
               spellcheck={false}
               enterkeyhint="next"
+              aria-required="true"
               aria-invalid={errors.email ? 'true' : 'false'}
               data-cy="signup-email"
             />

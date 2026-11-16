@@ -115,6 +115,8 @@ class MobileRestoreBackup extends Component {
             </span>
           }
           confirmLabel={<Text id="gatewayBackup.restoreButton" />}
+          // the restore replaces the instance, wherever this page is opened from
+          destructive
           onConfirm={this.restore}
           onCancel={this.cancelConfirmation}
           dataCy="signup-restore-confirm"

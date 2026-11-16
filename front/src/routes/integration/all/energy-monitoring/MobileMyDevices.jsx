@@ -106,7 +106,9 @@ class MobileMyDevices extends Component {
           ) : null
         }
         onClick={canChoose ? this.openMeters(device, meterId) : undefined}
-        disabled={attaching === device.id}
+        // one attachment at a time: a second one started meanwhile would reopen a sheet that
+        // still holds the meter the first device was on
+        disabled={Boolean(attaching)}
         chevron={canChoose}
         dataCy="energy-device-row"
       />

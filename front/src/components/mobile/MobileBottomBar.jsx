@@ -47,7 +47,7 @@ const DirtyLabel = ({ children }) => (
 /**
  * @description A 52px button of the phone pages. variant: 'primary' | 'danger' | 'dangerSoft' |
  * 'ghost', neutral when omitted. `loading` shows a spinner and disables it; `fit` keeps its
- * natural width in a bottom bar; `href` renders a link.
+ * natural width in a bottom bar; `href` renders a link (a button while disabled or loading).
  */
 const BigButton = ({ variant, loading, fit, href, icon, children, disabled, class: className, ...props }) => {
   const classes = cx(style.bigButton, className, {
@@ -62,7 +62,8 @@ const BigButton = ({ variant, loading, fit, href, icon, children, disabled, clas
     !loading && icon && <i class={`fe fe-${icon}`} aria-hidden="true" />,
     children
   ];
-  if (href) {
+  // a link that is disabled or loading is a disabled button: it leads nowhere meanwhile
+  if (href && !disabled && !loading) {
     return (
       <a href={href} class={classes} {...props}>
         {content}

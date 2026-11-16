@@ -113,6 +113,13 @@ the very resize that queued that frame.
     saved nor the ones another house holds (their name is taken). A chip is a **toggle** (`aria-pressed`): a tap adds the room, another tap removes the
     room it just added. The rooms typed in the field join the chips, selected.
 
+- **The names of the other houses are known whatever the list shows.** The list may be the
+  result of a search: when it is, opening a house asks for every house with its rooms
+  (`GET /api/v1/house?expand=rooms`), so a name held by a house the search hid is still refused
+  and not suggested.
+- **Undo ends when a save starts.** A save sends the house as it is at that moment: the toast is
+  dismissed then, so an Undo cannot bring back on screen a room that save deletes.
+
 ### C.4 Alarm
 
 - The **alarm code**: a numeric keypad (`inputmode="numeric"`), hidden like a password, with a
@@ -135,6 +142,11 @@ the very resize that queued that frame.
 - **Delete house**, at the end of the page, opens a confirmation sheet naming the house
   (`ConfirmSheet`, README C.5). The editor closes when the house is gone; a deletion that failed
   shows its error in the bottom bar.
+
+- **One save at a time.** "Save and leave" pressed while a save is in flight waits for that
+  save instead of starting another one (two saves would each create the new rooms).
+- The maps treat latitude 0 and longitude 0 as coordinates (`components/house/Map.jsx`): a house
+  on the equator or the prime meridian gets its pin, at every width.
 
 ## D. What does not change
 

@@ -1,3 +1,4 @@
+import { Component } from 'preact';
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import { DEVICE_FEATURE_CATEGORIES_LIST } from '../../../../server/utils/constants';
@@ -113,21 +114,63 @@ const UpdateDeviceDesktop = ({ children, ...props }) => (
   </div>
 );
 
-// On a phone the device is edited in its own layout (docs/specs/mobile-pages/device-edit.md):
-// same props, same container.
-const UpdateDevice = ({ isMobile, ...props }) => {
-  const fromDevicesList = cameFromDevicesList();
-  const previousPage = fromDevicesList ? DEVICES_LIST_PATH : props.previousPage;
-  if (isMobile) {
-    return (
-      <MobileUpdateDevice
-        {...props}
-        backHref={previousPage}
-        backLabel={fromDevicesList ? <Text id="devicesList.title" /> : null}
-      />
-    );
+// what the device looks like once saved: the comparison that tells whether something changed
+const snapshotOf = device => (device ? JSON.stringify(device) : null);
+
+/**
+ * @description The page of a device: the card from 768px, its own layout on a phone
+ * (docs/specs/mobile-pages/device-edit.md) — same props, same container. This component outlives
+ * a change of layout (a window resized across the breakpoint, a tablet turned), so it is the one
+ * that remembers the device as loaded or last saved: the unsaved state of the phone layout does
+ * not restart from the edited device when the layout comes back.
+ */
+class UpdateDevice extends Component {
+  state = {
+    // serialized; null until the device is there
+    savedSnapshot: snapshotOf(!this.props.loading ? this.props.device : null)
+  };
+
+  componentDidUpdate(prevProps) {
+    const { device, loading, saveStatus } = this.props;
+    // the device just arrived: this is the saved version
+    if (this.state.savedSnapshot === null && device && !loading) {
+      this.rebase();
+      return;
+    }
+    // a save went through: what is on screen is the saved version (the server may have completed
+    // it — selectors, ids)
+    const saveFinished = (prevProps.loading && !loading) || (prevProps.saveStatus !== saveStatus && !loading);
+    if (saveFinished && this.saving) {
+      this.saving = false;
+      if (saveStatus === RequestStatus.Success) {
+        this.rebase();
+      }
+    }
   }
-  return <UpdateDeviceDesktop {...props} previousPage={previousPage} />;
-};
+
+  rebase = () => this.setState({ savedSnapshot: snapshotOf(this.props.device) });
+
+  saveDevice = () => {
+    this.saving = true;
+    this.props.saveDevice();
+  };
+
+  render({ isMobile, ...props }, { savedSnapshot }) {
+    const fromDevicesList = cameFromDevicesList();
+    const previousPage = fromDevicesList ? DEVICES_LIST_PATH : props.previousPage;
+    if (isMobile) {
+      return (
+        <MobileUpdateDevice
+          {...props}
+          saveDevice={this.saveDevice}
+          dirty={savedSnapshot !== null && Boolean(props.device) && snapshotOf(props.device) !== savedSnapshot}
+          backHref={previousPage}
+          backLabel={fromDevicesList ? <Text id="devicesList.title" /> : null}
+        />
+      );
+    }
+    return <UpdateDeviceDesktop {...props} saveDevice={this.saveDevice} previousPage={previousPage} />;
+  }
+}
 
 export default withMobileViewport(UpdateDevice);

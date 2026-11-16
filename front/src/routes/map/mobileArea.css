@@ -24,6 +24,10 @@
   flex-direction: column;
 }
 
+.zoneBodyBusy {
+  pointer-events: none;
+}
+
 .mapArea {
   position: relative;
   flex: 1 1 auto;

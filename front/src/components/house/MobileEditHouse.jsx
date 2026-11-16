@@ -70,6 +70,11 @@ class MobileEditHouse extends Component {
     if (statusChanged && this.state.errorClosed) {
       this.resetErrorClosed();
     }
+    // a save starts with the house as it is now: an Undo offered after that would bring back, on
+    // screen only, a room this save deletes
+    if (statusChanged && this.props.houseUpdateStatus === RequestStatus.Getting && this.state.undo) {
+      this.closeUndo();
+    }
     // "Save and leave": the page is left once the save went through, and kept when it failed
     if (statusChanged && this.leaveAfterSave && this.props.houseUpdateStatus !== RequestStatus.Getting) {
       this.leaveAfterSave = false;
@@ -122,7 +127,11 @@ class MobileEditHouse extends Component {
       return;
     }
     this.leaveAfterSave = true;
-    this.props.saveHouse();
+    // a save already in flight is the one that is waited for: a second one would create the new
+    // rooms twice
+    if (this.props.houseUpdateStatus !== RequestStatus.Getting) {
+      this.props.saveHouse();
+    }
   };
 
   leaveWithoutSaving = () => {

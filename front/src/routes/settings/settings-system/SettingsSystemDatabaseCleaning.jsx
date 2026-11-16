@@ -35,14 +35,24 @@ class SettingsSystemDatabaseCleaning extends Component {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
+    // one request, however many taps the confirmation gets before it closes
+    if (this.vacuumRequested) {
+      return;
+    }
+    this.vacuumRequested = true;
     this.setState({
       confirmOpen: false,
-      vacuumStarted: true
+      vacuumStarted: true,
+      vacuumFailed: false
     });
     try {
       await this.props.httpClient.post('/api/v1/system/vacuum');
     } catch (e) {
       console.error(e);
+      // the cleaning did not start: no "finished" message will come to give the button back
+      this.setState({ vacuumStarted: false, vacuumFailed: true });
+    } finally {
+      this.vacuumRequested = false;
     }
   };
 
@@ -62,7 +72,7 @@ class SettingsSystemDatabaseCleaning extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.VACUUM_FINISHED, this.vacuumFinished);
   }
 
-  render({ isMobile, intl }, { vacuumStarted, vacuumFinished, vacuumDuration, confirmOpen }) {
+  render({ isMobile, intl }, { vacuumStarted, vacuumFinished, vacuumFailed, vacuumDuration, confirmOpen }) {
     return (
       <div class="card">
         <h4 class="card-header">
@@ -78,6 +88,11 @@ class SettingsSystemDatabaseCleaning extends Component {
               {vacuumStarted && (
                 <div class="alert alert-info">
                   <Text id="systemSettings.vacuumDatabaseStarted" />
+                </div>
+              )}
+              {vacuumFailed && (
+                <div class="alert alert-danger" role="alert" data-cy="system-vacuum-error">
+                  <Text id="systemSettings.vacuumDatabaseError" />
                 </div>
               )}
               {vacuumFinished && (

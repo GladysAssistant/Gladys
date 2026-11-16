@@ -129,6 +129,10 @@ class MobileNewArea extends Component {
   };
 
   save = () => {
+    // one request at a time: a zone being loaded, saved or deleted is not saved again
+    if (this.props.loading) {
+      return;
+    }
     this.setState({ errorClosed: false, leaveOpen: false });
     // the page leaves for the map once the zone is saved
     this.props.saveArea();
@@ -351,7 +355,10 @@ class MobileNewArea extends Component {
                 )
               }
             />
-            <div class={style.zoneBody}>
+            {/* while the zone loads, saves or is deleted, the map and the panel take no input: an
+                edit made then would be overwritten by the zone that arrives, or lost with the page
+                that leaves once the request is through */}
+            <div class={cx(style.zoneBody, { [style.zoneBodyBusy]: loading })} aria-busy={loading ? 'true' : 'false'}>
               <div class={style.mapArea}>
                 <MobileAreaMap
                   latitude={props.latitude}
@@ -638,7 +645,7 @@ class MobileNewArea extends Component {
               <div class={kitStyle.buttons}>
                 {/* a zone that cannot be saved yet is not offered to be */}
                 {!missing && (
-                  <BigButton variant="primary" onClick={this.save} data-cy="zone-leave-save">
+                  <BigButton variant="primary" onClick={this.save} disabled={loading} data-cy="zone-leave-save">
                     <Text id="mobileKit.saveAndLeave" />
                   </BigButton>
                 )}

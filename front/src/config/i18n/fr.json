@@ -5649,6 +5649,7 @@
     "vacuumDatabaseButton": "Lancer le nettoyage",
     "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
     "vacuumDatabaseFinished": "Le nettoyage a terminé. Gladys est de nouveau disponible. Temps de nettoyage : {{duration}}.",
+    "vacuumDatabaseError": "Le nettoyage de la base de données n'a pas pu démarrer. Réessayez.",
     "hostPowerTitle": "Redémarrer / Éteindre l'hôte",
     "hostPowerDescription": "Redémarrez ou éteignez la machine qui héberge Gladys (par exemple votre Raspberry Pi). Cette action utilise systemd-logind via DBus : sur une installation Docker, Gladys passe par un conteneur utilitaire éphémère lancé via le socket Docker, rien n'a besoin d'être monté sur le conteneur Gladys lui-même. Gladys et toutes vos automatisations seront arrêtées jusqu'au redémarrage de la machine.",
     "hostRebootButton": "Redémarrer l'hôte",

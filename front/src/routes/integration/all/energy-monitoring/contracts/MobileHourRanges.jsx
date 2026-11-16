@@ -20,7 +20,9 @@ const DEFAULT_RANGE = ['22:00', '06:00'];
 const START_OPTIONS = Array.from({ length: SLOTS_PER_DAY }, (unused, slot) => slotToLabel(slot));
 const END_OPTIONS = [...START_OPTIONS.slice(1), '24:00'];
 
-const sameTime = (start, end) => labelToMinutes(start) % (24 * 60) === labelToMinutes(end) % (24 * 60);
+// "00:00" → "24:00" is the whole day (what the desktop grid stores when every slot is on), not an
+// empty range: the two ends are compared as they are
+const sameTime = (start, end) => labelToMinutes(start) === labelToMinutes(end);
 const endsNextDay = (start, end) => labelToMinutes(end) <= labelToMinutes(start);
 
 /**

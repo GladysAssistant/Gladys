@@ -40,6 +40,15 @@ room**, and **choose which features keep their history**.
 - A device that does not exist (or belongs to another integration) shows "Device not found"; the
   back control still works.
 
+- **A link of the page leaves it through the same guard.** The footnotes link to the System
+  page: with unsaved changes, a tap on such a link (in the page or in the sheet of a feature)
+  opens the leave sheet, and "Save and leave" / "Leave without saving" then lead where the link
+  pointed.
+- **The saved version outlives a change of layout.** The device as loaded or last saved is kept
+  by `UpdateDevice`, which stays mounted when a window resized across the breakpoint (or a
+  tablet turned) swaps the phone layout and the card: coming back to the phone layout with
+  edits made meanwhile, they are still unsaved changes, with their Save and their leave guard.
+
 ## C. The sheet of a feature
 
 Tapping a row opens the feature in a sheet titled with the label of its type, closed with **OK**
@@ -72,4 +81,6 @@ Cypress, phone viewport, `front/cypress/e2e/routes/devices/DeviceEditMobile.cy.j
 and the feature rows with nothing to save, the chrome of the integration hidden, 16 px fields; a
 feature renamed and its history turned off from its sheet, the bottom bar switching to unsaved,
 the saved payload and the toast; the leave guard (keep editing, leave without saving); save and
-leave back to the devices list with `?from=devices`; the cards kept on a wider screen.
+leave back to the devices list with `?from=devices`; a link of the page going through the leave
+guard; the changes still unsaved after the layout changed and came back; the cards kept on a
+wider screen.

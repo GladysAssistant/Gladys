@@ -83,6 +83,9 @@ that were there.
 - No backup yet, backups that cannot be loaded: each says so. Without Gladys Plus, or with a plan
   without backups, the page is the same card as on a wider screen.
 
+- The error of a restoration belongs to the confirmation that started it: asking for another
+  backup opens a clean sheet.
+
 ## F. System (`settings-system`)
 
 One column, in this order:
@@ -106,6 +109,11 @@ One column, in this order:
 5. **Nothing restarts or stops on a single tap.** Cleaning the database (Gladys is unavailable
    meanwhile) and rebooting or shutting down the host are confirmed in a sheet on a phone; the
    DuckDB migration and purge keep their inline confirmation.
+
+- **A confirmation sends one request**, however many taps it gets before its sheet closes (the
+  update, the database cleaning). A database cleaning that could not start says so and gives its
+  button back (it used to stay disabled until a reload, waiting for a "finished" message that
+  would never come) — at every width for the message.
 
 ## G. Open API keys (`settings-gateway-open-api`, Gladys Plus)
 

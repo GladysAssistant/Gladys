@@ -90,9 +90,17 @@ class MobileSystemOperationsComponent extends Component {
     confirmOpen: false
   };
 
-  askUpgrade = () => this.setState({ confirmOpen: true });
+  askUpgrade = () => {
+    this.upgradeRequested = false;
+    this.setState({ confirmOpen: true });
+  };
   cancelUpgrade = () => this.setState({ confirmOpen: false });
   confirmUpgrade = () => {
+    // one request, however many taps the confirmation gets before it closes
+    if (this.upgradeRequested) {
+      return;
+    }
+    this.upgradeRequested = true;
     this.setState({ confirmOpen: false });
     this.props.upgradeGladys();
   };

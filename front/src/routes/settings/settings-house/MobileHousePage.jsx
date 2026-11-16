@@ -64,6 +64,8 @@ const HouseSummary = ({ house }) => {
 class MobileHousePage extends Component {
   state = {
     openHouseId: null,
+    // every house of the instance with its rooms, when the list is filtered by a search
+    everyHouse: null,
     // bumped to ask the open editor for its leave guard (the system "back")
     leaveRequestKey: 0,
     toast: null,
@@ -140,6 +142,23 @@ class MobileHousePage extends Component {
     this.closing = false;
     this.pushEditorEntry();
     this.setState({ openHouseId: houseId });
+    this.loadEveryHouse();
+  };
+
+  // The list may be the result of a search, and the name of a room is unique in the whole
+  // instance: while a search filters the list, the rooms of every house are asked for, so the
+  // editor knows the names the hidden houses hold.
+  loadEveryHouse = async () => {
+    if (!this.props.housesSearch) {
+      this.setState({ everyHouse: null });
+      return;
+    }
+    try {
+      const everyHouse = await this.props.httpClient.get('/api/v1/house', { expand: 'rooms' });
+      this.setState({ everyHouse });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   pushEditorEntry = () => {
@@ -218,11 +237,11 @@ class MobileHousePage extends Component {
     this.deleting = false;
   };
 
-  renderEditor(props, { openHouseId, leaveRequestKey }) {
+  renderEditor(props, { openHouseId, leaveRequestKey, everyHouse }) {
     const houseIndex = props.houses.findIndex(house => house.id === openHouseId);
     const house = props.houses[houseIndex];
     // the rooms of the other houses: the name of a room is unique in the whole instance
-    const otherRoomNames = props.houses
+    const otherRoomNames = (props.housesSearch && everyHouse ? everyHouse : props.houses)
       .filter(otherHouse => otherHouse.id !== house.id)
       .reduce((names, otherHouse) => names.concat((otherHouse.rooms || []).map(room => room.name)), []);
     return (

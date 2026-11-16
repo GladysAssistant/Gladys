@@ -5649,6 +5649,7 @@
     "vacuumDatabaseButton": "Datenbankreinigung starten",
     "vacuumDatabaseStarted": "Die Datenbankreinigung wurde gestartet. Gladys wird erst wieder verfügbar sein, wenn dieser Vorgang abgeschlossen ist.",
     "vacuumDatabaseFinished": "Die Datenbankreinigung wurde abgeschlossen. Gladys ist wieder verfügbar. Zeit für die Reinigung: {{duration}}.",
+    "vacuumDatabaseError": "Die Datenbankbereinigung konnte nicht gestartet werden. Versuchen Sie es erneut.",
     "hostPowerTitle": "Host neu starten / herunterfahren",
     "hostPowerDescription": "Starten Sie den Rechner, auf dem Gladys läuft (z. B. Ihren Raspberry Pi), neu oder fahren Sie ihn herunter. Dies verwendet systemd-logind über DBus: Bei einer Docker-Installation nutzt Gladys einen kurzlebigen Helfer-Container, der über den Docker-Socket gestartet wird, sodass am Gladys-Container selbst nichts eingehängt werden muss. Gladys und alle Ihre Automatisierungen werden angehalten, bis der Rechner wieder eingeschaltet wird.",
     "hostRebootButton": "Host neu starten",

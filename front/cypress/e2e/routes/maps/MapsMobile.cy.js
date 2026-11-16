@@ -33,7 +33,9 @@ describe('Map zones on a phone', () => {
     cy.get('[data-cy=map-create-zone]')
       .should('be.visible')
       .then($button => {
-        expect($button[0].getBoundingClientRect().top).to.be.greaterThan(Cypress.config('viewportHeight') / 2);
+        // the height of the page as it is shown: cy.viewport() does not change the configured one
+        const viewportHeight = $button[0].ownerDocument.defaultView.innerHeight;
+        expect($button[0].getBoundingClientRect().top).to.be.greaterThan(viewportHeight / 2);
       });
     cy.get('[data-cy=map-create-zone]').click();
 

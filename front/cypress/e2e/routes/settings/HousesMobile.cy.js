@@ -8,6 +8,9 @@ describe('Houses on a phone', () => {
   // another house, whose room name cannot be used again: a room name is unique in the instance
   const otherHouseName = 'Phone Other House';
   const otherHouseSelector = 'phone-other-house';
+  // what the interface writes comes from its dictionary: the spec runs in any language
+  const i18n = Cypress.env('i18n');
+  const suggestions = i18n.housesSettings.mobile.roomSuggestions;
 
   const deleteHouse = selector =>
     cy.request({ method: 'DELETE', url: `${serverUrl}/api/v1/house/${selector}`, failOnStatusCode: false });
@@ -53,7 +56,7 @@ describe('Houses on a phone', () => {
     cy.request({
       method: 'POST',
       url: `${serverUrl}/api/v1/house/${otherHouseSelector}/room`,
-      body: { name: 'Laundry room' }
+      body: { name: suggestions.laundryRoom }
     });
     ['Kitchen', 'Office'].forEach(name =>
       cy.request({ method: 'POST', url: `${serverUrl}/api/v1/house/${houseSelector}/room`, body: { name } })
@@ -76,7 +79,7 @@ describe('Houses on a phone', () => {
     visitHouses();
     cy.get('[data-cy=houses-mobile]').should('be.visible');
     cy.contains('[data-cy=house-row]', houseName)
-      .should('contain', '2 rooms')
+      .should('contain', i18n.housesSettings.summary.rooms.replace('{{count}}', 2))
       .i18n('housesSettings.summary.notLocated');
     cy.get('[data-cy=houses-search]').should('have.css', 'font-size', '16px');
 
@@ -134,18 +137,18 @@ describe('Houses on a phone', () => {
     // add: a suggestion in one tap, and a room by its name
     cy.get('[data-cy=house-add-room]').click();
     cy.get('[data-cy=house-add-room-sheet]').should('be.visible');
-    cy.contains('[data-cy=room-suggestion]', 'Dining room').click();
-    cy.contains('[data-cy=room-suggestion]', 'Dining room').should('have.attr', 'aria-pressed', 'true');
+    cy.contains('[data-cy=room-suggestion]', suggestions.diningRoom).click();
+    cy.contains('[data-cy=room-suggestion]', suggestions.diningRoom).should('have.attr', 'aria-pressed', 'true');
     // the room of another house is not offered, and its name is refused next to the field
-    cy.contains('[data-cy=room-suggestion]', 'Laundry room').should('not.exist');
-    cy.get('[data-cy=house-new-room-name]').type('laundry room');
+    cy.contains('[data-cy=room-suggestion]', suggestions.laundryRoom).should('not.exist');
+    cy.get('[data-cy=house-new-room-name]').type(suggestions.laundryRoom.toLowerCase());
     cy.get('[data-cy=house-new-room-add]').click();
     cy.get('[data-cy=house-add-room-sheet]').i18n('housesSettings.mobile.roomNameTakenElsewhere');
     cy.get('[data-cy=house-new-room-name]').clear();
-    cy.contains('[data-cy=room-suggestion]', 'Garage').click();
+    cy.contains('[data-cy=room-suggestion]', suggestions.garage).click();
     // a suggestion is a toggle
-    cy.contains('[data-cy=room-suggestion]', 'Garage').click();
-    cy.contains('[data-cy=room-suggestion]', 'Garage').should('have.attr', 'aria-pressed', 'false');
+    cy.contains('[data-cy=room-suggestion]', suggestions.garage).click();
+    cy.contains('[data-cy=room-suggestion]', suggestions.garage).should('have.attr', 'aria-pressed', 'false');
     cy.get('[data-cy=house-new-room-name]').type('Study');
     cy.get('[data-cy=house-new-room-add]').click();
     cy.get('[data-cy=house-add-room-sheet]').i18n('housesSettings.mobile.roomNameTaken');
@@ -174,7 +177,9 @@ describe('Houses on a phone', () => {
 
     cy.request({ method: 'GET', url: `${serverUrl}/api/v1/house?expand=rooms` }).then(res => {
       const house = res.body.find(candidate => candidate.selector === houseSelector);
-      expect(house.rooms.map(room => room.name).sort()).to.deep.equal(['Dining room', 'Study', 'Workshop']);
+      expect(house.rooms.map(room => room.name).sort()).to.deep.equal(
+        [suggestions.diningRoom, 'Study', 'Workshop'].sort()
+      );
     });
   });
 
@@ -269,7 +274,7 @@ describe('Houses on a phone', () => {
     cy.get('[data-cy=house-save]').should('be.disabled');
     cy.get('[data-cy=house-name]').type(newHouseName);
     cy.get('[data-cy=house-add-first-room]').click();
-    cy.contains('[data-cy=room-suggestion]', 'Kitchen').click();
+    cy.contains('[data-cy=room-suggestion]', suggestions.kitchen).click();
     cy.get('[data-cy=house-add-room-sheet] [data-cy=sheet-ok]').click();
     cy.get('[data-cy=house-save]').click();
     cy.wait('@createHouse')
@@ -279,7 +284,7 @@ describe('Houses on a phone', () => {
 
     cy.get('[data-cy=mobile-nav-back]').click();
     cy.contains('[data-cy=house-row]', newHouseName)
-      .should('contain', '1 room')
+      .should('contain', i18n.housesSettings.summary.oneRoom.replace('{{count}}', 1))
       .click();
     cy.get('[data-cy=house-delete]').click();
     cy.get('[data-cy=house-delete-confirm]')
@@ -296,6 +301,21 @@ describe('Houses on a phone', () => {
     cy.get('[data-cy=houses-mobile]').should('be.visible');
     cy.get('[data-cy=houses-toast]').i18n('housesSettings.mobile.houseDeleted');
     cy.contains('[data-cy=house-row]', newHouseName).should('not.exist');
+  });
+
+  it('should know the rooms of the houses a search hides', () => {
+    visitHouses();
+    cy.get('[data-cy=houses-search]').type(houseName);
+    cy.get('[data-cy=house-row]').should('have.length', 1);
+    cy.contains('[data-cy=house-row]', houseName).click();
+    cy.get('[data-cy=house-add-room]').click();
+    cy.get('[data-cy=house-add-room-sheet]').should('be.visible');
+    // the room of the other house, which the search left out of the list, is still taken
+    cy.get('[data-cy=room-suggestion]').should('have.length.greaterThan', 0);
+    cy.contains('[data-cy=room-suggestion]', suggestions.laundryRoom).should('not.exist');
+    cy.get('[data-cy=house-new-room-name]').type(suggestions.laundryRoom);
+    cy.get('[data-cy=house-new-room-add]').click();
+    cy.get('[data-cy=house-add-room-sheet]').i18n('housesSettings.mobile.roomNameTakenElsewhere');
   });
 
   it('should keep the accordion on a wider screen', () => {

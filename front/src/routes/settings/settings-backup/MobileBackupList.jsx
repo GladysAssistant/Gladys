@@ -37,7 +37,11 @@ class MobileBackupList extends Component {
     restoreOpen: false
   };
 
-  askRestore = backup => () => this.setState({ restoring: backup, restoreOpen: true });
+  askRestore = backup => () => {
+    // a new confirmation starts clean: the failure of an earlier restoration is not its own
+    this.restoreAsked = false;
+    this.setState({ restoring: backup, restoreOpen: true });
+  };
 
   cancelRestore = () => {
     if (this.props.gatewayRestoreBackupStatus !== RequestStatus.Getting) {
@@ -46,6 +50,10 @@ class MobileBackupList extends Component {
   };
 
   confirmRestore = () => {
+    // one restoration at a time
+    if (this.props.gatewayRestoreBackupStatus === RequestStatus.Getting) {
+      return;
+    }
     this.restoreAsked = true;
     this.props.restoreBackup(this.state.restoring.path);
   };

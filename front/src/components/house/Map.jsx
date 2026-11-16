@@ -16,6 +16,10 @@ const icon = leaflet.icon({
 });
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
+
+// latitude 0 and longitude 0 are valid coordinates: "is the house located?" is a null check
+const isSet = value => value !== null && value !== undefined && value !== '';
+const isLocated = house => isSet(house.latitude) && isSet(house.longitude);
 const WORLD_ZOOM = 2;
 const LOCATED_ZOOM = 16;
 
@@ -38,7 +42,7 @@ class MapComponent extends Component {
       this.houseMarker = null;
     }
     let coordinates;
-    if (this.props.house.latitude && this.props.house.longitude) {
+    if (isLocated(this.props.house)) {
       coordinates = [this.props.house.latitude, this.props.house.longitude];
     } else {
       coordinates = DEFAULT_COORDS;
@@ -62,7 +66,7 @@ class MapComponent extends Component {
     }
 
     // add house pin
-    if (this.props.house.latitude && this.props.house.longitude) {
+    if (isLocated(this.props.house)) {
       this.setPinMap(this.props.house.latitude, this.props.house.longitude);
     }
   };
@@ -122,7 +126,7 @@ class MapComponent extends Component {
     // the marker to this position, so it is skipped here.
     const { latitude, longitude } = this.props.house;
     const locationChanged = prevProps.house.latitude !== latitude || prevProps.house.longitude !== longitude;
-    if (locationChanged && latitude && longitude) {
+    if (locationChanged && isLocated(this.props.house)) {
       // The marker may sit on a repeated copy of the world after a click, so
       // compare wrapped longitudes: the house always holds the wrapped one.
       const markerPosition = this.houseMarker && this.houseMarker.getLatLng().wrap();

@@ -135,6 +135,31 @@ describe('Device edit on a phone', () => {
     cy.location('pathname').should('eq', '/dashboard/devices');
   });
 
+  it('should ask before following a link of the page with unsaved changes', () => {
+    cy.visit(editUrl);
+    cy.get('[data-cy=device-name]').clear();
+    cy.get('[data-cy=device-name]').type('Iron');
+    cy.get('[data-cy=device-edit-mobile] a[href="/dashboard/settings/system"]').click();
+    cy.get('[data-cy=device-leave-confirm]').should('be.visible');
+    cy.location('pathname').should('eq', editUrl);
+    cy.get('[data-cy=device-leave-discard]').click();
+    cy.location('pathname').should('eq', '/dashboard/settings/system');
+  });
+
+  it('should keep the changes unsaved when the layout changes and comes back', () => {
+    cy.visit(editUrl);
+    cy.get('[data-cy=device-name]').clear();
+    cy.get('[data-cy=device-name]').type('Iron');
+    cy.get('[data-cy=device-save]').should('not.be.disabled');
+    // the card of the wider screens, then the phone layout again
+    cy.viewport(1280, 800);
+    cy.get('#deviceName').should('have.value', 'Iron');
+    cy.viewport('iphone-x');
+    cy.get('[data-cy=device-name]').should('have.value', 'Iron');
+    cy.get('[data-cy=device-edit-bottom-bar]').i18n('mobileKit.unsavedChanges');
+    cy.get('[data-cy=device-save]').should('not.be.disabled');
+  });
+
   it('should keep the cards on a wider screen', () => {
     cy.viewport(1280, 800);
     cy.visit(editUrl);

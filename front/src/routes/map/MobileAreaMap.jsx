@@ -66,13 +66,24 @@ const bearingBetween = (from, to) => {
 const hasCenter = props =>
   props.latitude !== null && props.latitude !== undefined && props.longitude !== null && props.longitude !== undefined;
 
-const handleIcon = (knobClass, color, content = '') =>
-  leaflet.divIcon({
+// The knob is built with the DOM, never as an HTML string: the color of a zone is a free string
+// of the API, and a string interpolated into markup would be injected into the page. Set as a
+// style property, a value that is not a color is simply ignored.
+// the left-right arrow of the resize handle
+const RESIZE_GLYPH = '\u2194';
+
+const handleIcon = (knobClass, color, text = '') => {
+  const knob = document.createElement('span');
+  knob.className = knobClass;
+  knob.style.borderColor = color;
+  knob.textContent = text;
+  return leaflet.divIcon({
     className: style.handle,
     iconSize: [HANDLE_SIZE_PX, HANDLE_SIZE_PX],
     iconAnchor: [HANDLE_SIZE_PX / 2, HANDLE_SIZE_PX / 2],
-    html: `<span class="${knobClass}" style="border-color: ${color}">${content}</span>`
+    html: knob
   });
+};
 
 /**
  * @description The map a zone is drawn on with a finger (docs/specs/mobile-pages/map-areas.md,
@@ -129,6 +140,14 @@ class MobileAreaMap extends Component {
         this.sentCenter.latitude === this.props.latitude &&
         this.sentCenter.longitude === this.props.longitude;
       const radiusFromGesture = this.sentRadius !== null && this.sentRadius === this.props.radius;
+      // a marker is the acknowledgment of ONE gesture: kept, a later value set from the page that
+      // happens to equal it (an Undo back to that center) would be taken for the gesture
+      if (centerChanged) {
+        this.sentCenter = null;
+      }
+      if (radiusChanged) {
+        this.sentRadius = null;
+      }
       const fromThePage = (centerChanged && !centerFromGesture) || (radiusChanged && !radiusFromGesture);
       this.drawArea();
       if (fromThePage && !this.resizing) {
@@ -284,7 +303,7 @@ class MobileAreaMap extends Component {
       this.centerMarker.on('drag', this.onCenterDrag);
       this.centerMarker.on('dragend', this.onCenterDragEnd);
       this.resizeMarker = leaflet.marker(destinationPoint(latitude, longitude, radius, this.handleBearing), {
-        icon: handleIcon(style.resizeKnob, color, '&#8596;'),
+        icon: handleIcon(style.resizeKnob, color, RESIZE_GLYPH),
         draggable: true,
         autoPan: false,
         zIndexOffset: 1000,
@@ -311,7 +330,7 @@ class MobileAreaMap extends Component {
       this.shownColor = color;
       this.circle.setStyle({ color, fillColor: color });
       this.centerMarker.setIcon(handleIcon(style.centerKnob, color));
-      this.resizeMarker.setIcon(handleIcon(style.resizeKnob, color, '&#8596;'));
+      this.resizeMarker.setIcon(handleIcon(style.resizeKnob, color, RESIZE_GLYPH));
     }
     this.syncResizeHandle();
   };

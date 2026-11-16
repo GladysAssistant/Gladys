@@ -42,6 +42,13 @@ to "Update zone", deleting on a single tap.
   (smaller, and without the "Leaflet" prefix).
 - A zone that cannot be loaded says so in the panel.
 
+- **While a request is pending the page takes no input.** An existing zone is loading from the
+  first paint (`loading` starts true when the page has a zone to load): the map and the panel
+  ignore taps and gestures until it is there, so nothing typed or placed is overwritten by the
+  zone that arrives — and the same holds while the zone is being saved or deleted, since the page
+  leaves for the map once the request is through. "Save and leave" is disabled meanwhile, and a
+  save is never started twice.
+
 ## C. Drawing the zone with a finger (`MobileAreaMap.jsx`)
 
 - **A tap** on the map places the center under the finger. When the zone would be too small to
@@ -92,6 +99,13 @@ until none is: nothing is sent that the server would refuse for a missing field.
 - Both show a message above the panel ("Zone placed at “Home”."), with **Undo** when the zone
   already had a center: it goes back where it was. Messages about the map are shown at the bottom
   of the map, never over the panel, and go after 5 s.
+
+- **The handles are built with the DOM, never as HTML strings.** The color of a zone is a free
+  string of the API: it is set as a style property of the knob (a value that is not a color is
+  ignored) and the glyph of the resize handle as text.
+- A value set from the page is told apart from the echo of a gesture by a marker that is
+  consumed once acknowledged: an Undo that brings the zone back to where a gesture had put it
+  still recenters the map on it.
 
 ## D. Name, color and radius
 
