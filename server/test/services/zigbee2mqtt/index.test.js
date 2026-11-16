@@ -4,6 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const Zigbee2MqttService = require('../../../services/zigbee2mqtt');
+const logger = require('../../../utils/logger');
 
 const gladys = {
   event: {
@@ -45,6 +46,158 @@ describe('zigbee2mqtt service', () => {
     // ASSERT
     assert.calledOnce(zigbee2MqttService.device.disconnect);
     assert.notCalled(zigbee2MqttService.device.init);
+  });
+  it('should stop service once the containers are removed', async () => {
+    let containersRemoved;
+    zigbee2MqttService.device.disconnect = fake.returns(
+      new Promise((resolve) => {
+        containersRemoved = resolve;
+      }),
+    );
+    // EXECUTE
+    let stopped = false;
+    const stopping = (async () => {
+      await zigbee2MqttService.stop();
+      stopped = true;
+    })();
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    // ASSERT
+    assert.calledOnce(zigbee2MqttService.device.disconnect);
+    expect(stopped).to.equal(false);
+    containersRemoved();
+    await stopping;
+    expect(stopped).to.equal(true);
+  });
+
+  describe('while an installation runs', () => {
+    // Until the promises settled so far have run their callbacks
+    const flushPromises = () =>
+      new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+
+    beforeEach(() => {
+      zigbee2MqttService.device.emitInstallProgress = fake();
+      // Not logged by the end of the installation
+      sinon.stub(logger, 'info');
+      sinon.stub(logger, 'warn');
+      zigbee2MqttService.device.startInstallation('install');
+    });
+
+    afterEach(() => {
+      sinon.restore();
+    });
+
+    it('should not start service, as the installation starts Zigbee2mqtt', async () => {
+      // EXECUTE
+      await zigbee2MqttService.start();
+      // ASSERT
+      assert.notCalled(zigbee2MqttService.device.init);
+    });
+
+    it('should stop service once the installation ended', async () => {
+      // EXECUTE
+      const stopping = zigbee2MqttService.stop();
+      await flushPromises();
+      // ASSERT
+      assert.notCalled(zigbee2MqttService.device.disconnect);
+      zigbee2MqttService.device.finishInstallation(new Error('docker fail pull'));
+      await stopping;
+      assert.calledOnce(zigbee2MqttService.device.disconnect);
+    });
+
+    it('should stop service once when asked again while it waits', async () => {
+      // EXECUTE
+      const stopping = zigbee2MqttService.stop();
+      await flushPromises();
+      // The settings still show the service running
+      const stoppingAgain = zigbee2MqttService.stop();
+      zigbee2MqttService.device.finishInstallation(null);
+      await Promise.all([stopping, stoppingAgain]);
+      // ASSERT
+      assert.calledOnce(zigbee2MqttService.device.disconnect);
+      // A later stop stops it again
+      await zigbee2MqttService.stop();
+      assert.calledTwice(zigbee2MqttService.device.disconnect);
+    });
+
+    it('should wait for an installation started meanwhile too', async () => {
+      // EXECUTE
+      const stopping = zigbee2MqttService.stop();
+      await flushPromises();
+      // A setup sent as the first one ends
+      zigbee2MqttService.device.finishInstallation(null);
+      zigbee2MqttService.device.startInstallation('switch');
+      await flushPromises();
+      // ASSERT
+      assert.notCalled(zigbee2MqttService.device.disconnect);
+      zigbee2MqttService.device.finishInstallation(null);
+      await stopping;
+      assert.calledOnce(zigbee2MqttService.device.disconnect);
+    });
+  });
+
+  describe('while an operation runs', () => {
+    let clock;
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+      zigbee2MqttService.device.emitInstallProgress = fake();
+      sinon.stub(logger, 'info');
+      sinon.stub(logger, 'warn');
+      // An init, a disconnect, a reset or an ezsp fallback
+      zigbee2MqttService.device.runningOperations = 1;
+    });
+
+    afterEach(() => {
+      clock.restore();
+      sinon.restore();
+    });
+
+    it('should stop service once the operation ended', async () => {
+      // EXECUTE
+      const stopping = zigbee2MqttService.stop();
+      await clock.tickAsync(1000);
+      // ASSERT
+      assert.notCalled(zigbee2MqttService.device.disconnect);
+      zigbee2MqttService.device.runningOperations = 0;
+      await clock.tickAsync(250);
+      await stopping;
+      assert.calledOnce(zigbee2MqttService.device.disconnect);
+    });
+
+    it('should stop service once the init of an update whose download failed ended', async () => {
+      // EXECUTE
+      zigbee2MqttService.device.startInstallation('update');
+      const stopping = zigbee2MqttService.stop();
+      await clock.tickAsync(0);
+      // Without the new images, the update ends at once, and its init goes on with the containers in place
+      zigbee2MqttService.device.finishInstallation(new Error('docker fail pull'));
+      await clock.tickAsync(1000);
+      // ASSERT
+      assert.notCalled(zigbee2MqttService.device.disconnect);
+      zigbee2MqttService.device.runningOperations = 0;
+      await clock.tickAsync(250);
+      await stopping;
+      assert.calledOnce(zigbee2MqttService.device.disconnect);
+    });
+
+    it('should wait for an installation started once the operation ended', async () => {
+      // EXECUTE
+      const stopping = zigbee2MqttService.stop();
+      await clock.tickAsync(250);
+      // A setup sent as the operation ends
+      zigbee2MqttService.device.runningOperations = 0;
+      zigbee2MqttService.device.startInstallation('switch');
+      await clock.tickAsync(1000);
+      // ASSERT
+      assert.notCalled(zigbee2MqttService.device.disconnect);
+      zigbee2MqttService.device.finishInstallation(null);
+      await stopping;
+      assert.calledOnce(zigbee2MqttService.device.disconnect);
+    });
   });
   it('isUsed: should return false, service not used', async () => {
     const used = await zigbee2MqttService.isUsed();

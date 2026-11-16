@@ -1,16 +1,96 @@
 const logger = require('../../../utils/logger');
-const { CONFIGURATION, MQTT_MODE, ADAPTER_MODE } = require('./constants');
+const {
+  CONFIGURATION,
+  MQTT_MODE,
+  ADAPTER_MODE,
+  DEFAULT,
+  INSTALLATION_STATE,
+  INSTALLATION_KIND,
+  INSTALLATION_PHASE_STATE,
+  PULL_PHASE_BY_IMAGE,
+} = require('./constants');
 const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { findOwnContainer } = require('../../../utils/dockerContainers');
+const { formatDuration } = require('../utils/formatDuration');
+
+const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
+const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
 /**
- * @description Prepares service and starts connection with broker if needed.
+ * @description Tell whether a container that Gladys runs already is replaced by a new version (see
+ * checkForContainerUpdates): not on a first installation, whose containers do not exist yet.
+ * @param {object} system - Gladys system module.
+ * @param {object} config - Service configuration properties.
+ * @returns {Promise<boolean>} Resolve with true when an existing container is replaced.
+ * @example
+ * const updateRequired = await isUpdateRequired(this.gladys.system, configuration);
+ */
+async function isUpdateRequired(system, config) {
+  const outdatedDescriptors = [];
+  // Without a stored version, a container was left by a first installation that failed (the versions are stored once
+  // init ends): recreated by checkForContainerUpdates, but not shown as an update
+  if (config.dockerMqttVersion && config.dockerMqttVersion !== DEFAULT.DOCKER_MQTT_VERSION) {
+    outdatedDescriptors.push(mqttContainerDescriptor);
+  }
+  if (config.dockerZ2mVersion && config.dockerZ2mVersion !== DEFAULT.DOCKER_Z2M_VERSION) {
+    outdatedDescriptors.push(z2mContainerDescriptor);
+  }
+  // Not ours, a container is not replaced: checkForContainerUpdates fails, and tells why
+  const containers = await Promise.all(outdatedDescriptors.map((descriptor) => findOwnContainer(system, descriptor)));
+  return containers.some((container) => container !== null);
+}
+
+/**
+ * @description Remove the images of the containers replaced by a new version: each version left behind takes the disk
+ * space that the download of the next one needs (see pullImage). Called once the new containers exist: Docker then
+ * declines to remove an image that one of them still uses (a new version that keeps the same image), or a container
+ * of the user. Never forced, best effort: the update goes on without it.
+ * @param {object} system - Gladys system module.
+ * @param {Array<string>} images - Images of the replaced containers.
+ * @returns {Promise} Resolve once each image is removed, or left.
+ * @example
+ * await removeReplacedImages(this.gladys.system, ['koenkk/zigbee2mqtt:2.6.0']);
+ */
+async function removeReplacedImages(system, images) {
+  await Promise.all(
+    images.map(async (image) => {
+      try {
+        await system.removeImage(image);
+      } catch (e) {
+        logger.warn(`Zigbee2mqtt: image ${image} of the replaced container not removed:`, e);
+      }
+    }),
+  );
+}
+
+/**
+ * @description Tell the outcome of an update once Zigbee2mqtt answers, or fails to.
+ * @param {object} manager - Zigbee2mqtt manager.
+ * @returns {Promise} Resolve once the outcome is told, never rejects: nobody waits for it.
+ * @example
+ * finishUpdate(this);
+ */
+async function finishUpdate(manager) {
+  try {
+    await manager.waitForZigbee2mqtt();
+  } catch (e) {
+    logger.error('Zigbee2mqtt: update failed:', e);
+    manager.finishInstallation(e);
+    return;
+  }
+  manager.finishInstallation(null);
+}
+
+/**
+ * @description Prepares service and starts connection with broker if needed, see init.
  * @param {boolean} setupMode - In setup mode.
  * @returns {Promise} Resolve when init finished.
  * @example
- * await z2m.init();
+ * await initialize.call(this, setupMode);
  */
-async function init(setupMode = false) {
+async function initialize(setupMode) {
+  const startedAt = Date.now();
   // Reset status
   this.usbConfigured = false;
   this.networkAdapterConfigured = false;
@@ -25,6 +105,7 @@ async function init(setupMode = false) {
   this.healthCheckTimer = null;
   clearTimeout(this.startingTimer);
   this.startingTimer = null;
+  // Not installProgressTimer: an installation runs this init, its last progress must still be sent
   this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.networkModeValid = false;
@@ -92,6 +173,8 @@ async function init(setupMode = false) {
   this.emitStatusEvent();
 
   if (mqttMode === MQTT_MODE.LOCAL) {
+    // Variables generated below, by key
+    const generatedVariables = {};
     // Check for existing credentials for Gladys
     if (!mqttPassword) {
       configuration.mqttUsername = CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE;
@@ -100,10 +183,13 @@ async function init(setupMode = false) {
         lowercase: true,
         uppercase: true,
       });
+      generatedVariables[CONFIGURATION.GLADYS_MQTT_USERNAME_KEY] = configuration.mqttUsername;
+      generatedVariables[CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY] = configuration.mqttPassword;
     }
     // Verify that mqttUrl is present
     if (!mqttUrl) {
       configuration.mqttUrl = CONFIGURATION.MQTT_URL_VALUE;
+      generatedVariables[CONFIGURATION.MQTT_URL_KEY] = configuration.mqttUrl;
     }
     // Check for existing credentials for Z2M
     if (!configuration.z2mMqttPassword) {
@@ -113,35 +199,118 @@ async function init(setupMode = false) {
         lowercase: true,
         uppercase: true,
       });
+      generatedVariables[CONFIGURATION.Z2M_MQTT_USERNAME_KEY] = configuration.z2mMqttUsername;
+      generatedVariables[CONFIGURATION.Z2M_MQTT_PASSWORD_KEY] = configuration.z2mMqttPassword;
     }
+    // Saved as soon as generated, before the broker is created with these accounts: saved only at the end of init,
+    // they would be lost when the installation fails after the creation of the broker, which would then refuse every
+    // later try (BAD_CREDENTIALS)
+    await Promise.all(Object.entries(generatedVariables).map(([key, value]) => this.saveOrDestroyVariable(key, value)));
   }
 
-  if (this.usbConfigured || this.networkAdapterConfigured) {
-    logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
-    // We force set the mqttMode to local for existing instances
-    configuration.mqttMode = MQTT_MODE.LOCAL;
+  let updating = false;
+  try {
+    if (this.usbConfigured || this.networkAdapterConfigured) {
+      logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
+      // We force set the mqttMode to local for existing instances
+      configuration.mqttMode = MQTT_MODE.LOCAL;
 
-    await this.checkForContainerUpdates(configuration);
-    await this.installMqttContainer(configuration);
-    await this.installZ2mContainer(configuration, setupMode);
-
-    // Connect as soon as the broker runs, without waiting for Zigbee2mqtt to be online: Gladys asks it
-    // through the broker whether it runs (health check).
-    if (this.mqttRunning) {
-      await this.connect(configuration);
-
-      // Schedule reccurent job if not already scheduled
-      if (!this.backupScheduledJob) {
-        this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
+      // The replacement of the containers by a new version is followed by the setup page like an installation, from
+      // the download of the new images. Unless an installation runs: it follows this init already.
+      const updateRequired =
+        this.installation.state !== INSTALLATION_STATE.RUNNING &&
+        (await isUpdateRequired(this.gladys.system, configuration));
+      // Checked again once the containers are found: a setup sent meanwhile started an installation, which would
+      // refuse this one and fail the start of the service
+      if (updateRequired && this.installation.state !== INSTALLATION_STATE.RUNNING) {
+        this.startInstallation(INSTALLATION_KIND.UPDATE);
+        updating = true;
       }
+
+      // Before any container is replaced: a container replaced by a new version keeps running during the download
+      let newImagesPulled = true;
+      // Kept for the containers of this init only (see pullImage): a later call downloads again
+      this.imagePullFailures = {};
+      try {
+        await this.pullMissingImages(this.imagePullFailures);
+      } catch (e) {
+        // Without the new images (no Internet, registry down, disk full), the running containers are kept, whoever runs
+        // this init (a setup too): the update is tried again on the next start, instead of leaving Gladys without
+        // Zigbee until then
+        newImagesPulled = false;
+        if (updating) {
+          logger.warn('Zigbee2mqtt: new images not downloaded, the update is postponed to the next start:', e);
+          this.finishInstallation(e);
+          updating = false;
+        } else {
+          // Only a container to create needs its image, and fails on the same error then (see pullImage): running
+          // containers whose image tag left the machine (removed by hand) keep running, Gladys connects to them
+          logger.warn('Zigbee2mqtt: images not downloaded ahead, going on with the containers in place:', e);
+          // The installation goes on: a failed download is pending again, failed once more when a container to create
+          // needs its image, skipped when none is created
+          const pullPhases = Object.values(PULL_PHASE_BY_IMAGE);
+          this.installation.phases
+            .filter(({ key, state }) => pullPhases.includes(key) && state === INSTALLATION_PHASE_STATE.FAILED)
+            .forEach(({ key }) => this.updateInstallationPhase(key, { state: INSTALLATION_PHASE_STATE.PENDING }));
+        }
+      }
+      // Skipped, the stored versions stay the old ones
+      const replacedImages = newImagesPulled ? await this.checkForContainerUpdates(configuration) : [];
+      await this.installMqttContainer(configuration);
+      await this.installZ2mContainer(configuration, setupMode);
+
+      // Connect as soon as the broker runs, without waiting for Zigbee2mqtt to be online: Gladys asks it
+      // through the broker whether it runs (health check).
+      if (this.mqttRunning) {
+        await this.connect(configuration);
+
+        // Schedule reccurent job if not already scheduled
+        if (!this.backupScheduledJob) {
+          this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
+        }
+      }
+      // Once Gladys is connected: removing an image takes a few seconds on an SD card
+      await removeReplacedImages(this.gladys.system, replacedImages);
+      logger.info(`Zigbee2mqtt: containers installed and started in ${formatDuration(Date.now() - startedAt)}`);
+    } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
+      await this.connect(configuration);
     }
-  } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
-    await this.connect(configuration);
+
+    await this.saveConfiguration(configuration);
+  } catch (e) {
+    if (updating) {
+      logger.error('Zigbee2mqtt: update failed:', e);
+      this.finishInstallation(e);
+    }
+    throw e;
   }
 
-  await this.saveConfiguration(configuration);
+  if (updating) {
+    // Not awaited: the service starts without waiting for Zigbee2mqtt to answer
+    finishUpdate(this);
+  }
 
   return null;
+}
+
+/**
+ * @description Prepares service and starts connection with broker if needed. Counted while it runs, from its first
+ * line: the routes and the setup checked before calling it are refused until it ends (see refuseWhileInstalling).
+ * @param {boolean} setupMode - In setup mode.
+ * @returns {Promise} Resolve when init finished.
+ * @example
+ * await z2m.init();
+ */
+async function init(setupMode = false) {
+  this.runningOperations += 1;
+  try {
+    return await initialize.call(this, setupMode);
+  } finally {
+    this.runningOperations -= 1;
+    // Kept for the containers of this init only: a later call downloads again. A download that fails once init ended
+    // writes in the table of this init, no longer read.
+    this.imagePullFailures = {};
+  }
 }
 
 module.exports = {

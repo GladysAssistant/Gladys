@@ -141,6 +141,8 @@ describe('zigbee2mqtt connect', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledOnceWithExactly(mqttClient.subscribe, 'zigbee2mqtt/#');
@@ -187,6 +189,8 @@ describe('zigbee2mqtt connect', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: { code: null, message: 'mqtt_error' },
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
   });
@@ -288,6 +292,8 @@ describe('zigbee2mqtt connect', () => {
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
   });
