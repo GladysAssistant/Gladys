@@ -93,11 +93,14 @@ cards**, the pattern of the devices list.
   13 px footnote.
 - **One look for every control** (`fieldClass.input` / `.select` / `.textarea`): 48 px high,
   16 px text, the same border, radius (14 px) and focus ring; a select shows the same chevron; a
-  field and its unit or its reveal button are one control (`fieldClass.group` + `.addon`).
+  field and its unit or its reveal button are one control (`fieldClass.group` + `.addon`). An
+  invalid control keeps its red border in dark mode (`fieldClass.invalid`, `.groupInvalid`).
 - The right keyboard for each field: `inputmode`, `autocomplete`, `autocapitalize`,
   `enterkeyhint`, and the native field of the system for a date or a time.
 - `MobileSwitch` (52 × 32 px in a 60 × 44 px target, `role="switch"`), `MobileSegmented` (two to
-  four options that are all visible, `aria-pressed`), filter chips (`kitStyle.chips` / `.chip`).
+  four options that are all visible, 44 px segments, `aria-pressed`), filter chips
+  (`kitStyle.chips` / `.chip`, 44 px): the row scrolls sideways and bleeds to the edges of the
+  screen — a page whose gutter is not 16 px sets `--kit-gutter`.
 - `MobileSteps`: "Step 2 of 4 · Preferences" above a segmented progress bar, for a flow of
   several screens.
 
@@ -139,6 +142,13 @@ bottom bar on a page that has one (`aboveBar`).
   meaning (primary and danger buttons, the floating "+", a selected chip, the switch) are
   inverted back to themselves, and the fields of the kit are light surfaces that invert with
   their card (the global rule for inputs paints them a solid dark and inverts them back).
+
+### C.8 A page that changes layout while it is open
+
+A window resized across the breakpoint swaps the two presentations of a page, with its container
+and its state kept. A Leaflet map unmounted by that swap is removed with `removeMapWhenSettled`
+(`utils/mapTileLayer.js`): the basemap layer settles a resize on the next animation frame without
+checking that its map is still there, and a map removed at once made that frame throw.
 
 ## D. Pages
 
