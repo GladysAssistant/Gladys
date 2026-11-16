@@ -3,6 +3,13 @@
 
 export const SLOTS_PER_DAY = 48;
 
+// the four steps of the contract wizard, in order (their keys name their translations)
+export const WIZARD_STEPS = ['meter', 'template', 'parameters', 'preview'];
+// the value of the meter choice that creates an MQTT meter
+export const CREATE_NEW_METER = 'CREATE_NEW';
+// the template of a contract typed by hand (JSON mode), and of an edited contract
+export const MANUAL_TEMPLATE = { key: '__manual__' };
+
 export const slotToLabel = slot => {
   const minutes = (slot * 30) % (24 * 60);
   const hh = String(Math.floor(minutes / 60)).padStart(2, '0');

@@ -173,6 +173,11 @@ the new parent would close a cycle (as before).
 - no contract at all: a message pointing to the contracts tab;
 - the free parent selects, the circular dependency banner and the "Fix" button are removed.
 
+On a phone (below 768 px, or a phone in landscape) the same hierarchy is shown as rows — one
+group per meter, then the unattached devices — and the "Meter" select becomes a sheet listing
+the electric meters, opened by a tap on the device; it sends the same request (`D.1`). That
+presentation is owned by [`mobile-pages/energy.md`](mobile-pages/energy.md), section B.
+
 ## F. Integrations
 
 - Zigbee2mqtt, Tasmota, MQTT, Enedis and the external integrations keep their derivation.
@@ -212,4 +217,5 @@ the new parent would close a cycle (as before).
 - Matter: derived features added, ids and parents of existing features kept, derived features
   re-injected, no bogus selector.
 - Zigbee2mqtt: the production features derived and kept on rediscovery.
-- Front: Cypress spec of the page (meters, unattached devices, meter select).
+- Front: Cypress spec of the page (meters, unattached devices, meter select), and of its phone
+  presentation (the meter chosen in a sheet, `ContractsMobile.cy.js`).
