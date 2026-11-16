@@ -1,0 +1,312 @@
+/* The settings sub-pages on a phone (docs/specs/mobile-pages/settings-pages.md): what the kit
+   (components/mobile/kit.css) does not already carry. Light colors only: dark mode is the
+   app-wide inversion filter. */
+
+/* the content of a settings page under the chips: the rows of the kit, at the width of a phone */
+.page {
+  max-width: 40rem;
+  margin: 0 auto;
+  color: #1c2334;
+}
+
+/* the lead of a page sits on the wallpaper, not on a card */
+.lead {
+  margin: 0 4px 16px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #3d4656;
+}
+
+.lead a {
+  color: #2f5bd8;
+}
+
+.loading {
+  min-height: 8rem;
+}
+
+/* a block of the page between two groups (a button, a notice) */
+.block {
+  margin: 0 0 16px;
+}
+
+.blockTop {
+  margin-top: 16px;
+}
+
+/* the chips of the kit bleed to the edges of the screen: here the gutter is the one of the
+   settings container, and a chip is a 44px target */
+.page .chipsRow {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.page .chipsRow > button {
+  min-height: 44px;
+}
+
+/* a pill and a text sharing the line under a title */
+.inlineMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+/* the details of a job under its title: the same footnote size, wrapping */
+.rowDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #4f5866;
+  overflow-wrap: anywhere;
+}
+
+.rowDetails :global(.small) {
+  font-size: inherit;
+}
+
+.rowDetails :global(.text-muted) {
+  color: inherit !important;
+}
+
+/* a job: its title and its status on one line, then what it did on the whole width of the row */
+.jobRow {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  cursor: default;
+}
+
+.jobPill {
+  margin-top: 2px;
+}
+
+.jobBody {
+  flex: 0 0 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* the error of a job: readable where it is, wrapped, never wider than the row */
+.errorBlock {
+  display: block;
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background-color: #fdeaea;
+  color: #8c1f1f;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* an error Gladys does not know is shown as it was thrown */
+.errorBlockRaw {
+  font-family: Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+}
+
+.errorBlockFolded {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.moreButton {
+  align-self: flex-start;
+  min-height: 44px;
+  margin: 0 0 -8px -4px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* the progress of a running job, under its details */
+.progress {
+  display: block;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.1);
+  overflow: hidden;
+}
+
+.progressBar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  transition: width 0.3s ease;
+}
+
+/* a value to read, select and copy (an API key, an internal name) */
+.code {
+  padding: 12px 14px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 14px;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #1c2334;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+/* the same value in a row, under its lines */
+.rowCode {
+  display: block;
+  margin-top: 4px;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #1c2334;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+/* previous / next */
+.pagination {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pagination > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* the logs of an upgrade: the whole text, wrapped, in the flow of the page */
+.logs {
+  margin: 0 0 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background-color: #1c2334;
+  color: #e6eaf2;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.spin {
+  animation: mobileSettingsSpin 1s linear infinite;
+}
+
+@keyframes mobileSettingsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+
+  .progressBar {
+    transition: none;
+  }
+}
+
+/* ---------- the cards of the System page, dressed for a thumb ----------
+   The other cards of the page (time zone, clock, local address, battery, history, logs, cleaning,
+   power…) keep their component: one form, two looks. On a phone their fields are 48px high and
+   16px, their buttons 44px and full width, one under the other. */
+
+.cards :global(.card) {
+  margin-bottom: 12px;
+}
+
+.cards :global(.form-control),
+.cards :global(.custom-select),
+.cards select,
+.cards input[type='text'],
+.cards input[type='number'] {
+  min-height: 48px;
+  font-size: 16px;
+}
+
+.cards :global(.input-group-text) {
+  font-size: 16px;
+}
+
+.cards :global(.react-select__control) {
+  min-height: 48px;
+}
+
+.cards :global(.react-select__input-container),
+.cards :global(.react-select__input),
+.cards :global(.react-select__single-value),
+.cards :global(.react-select__placeholder),
+.cards :global(.react-select__option) {
+  font-size: 16px !important;
+}
+
+.cards :global(.react-select__option) {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.cards :global(.btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+/* the buttons of a card stack at full width, one under the other */
+.cards :global(.card-body) :global(.btn) {
+  display: flex;
+  width: 100%;
+  margin: 8px 0 0 !important;
+}
+
+/* a button ending a field group (the local address) goes under the group: the field keeps the
+   width it needs to show what is typed */
+.cards :global(.input-group) {
+  flex-wrap: wrap;
+}
+
+.cards :global(.input-group) > :global(.input-group-append):has(:global(.btn)) {
+  flex: 0 0 100%;
+  margin: 0;
+}
+
+.cards :global(.card-body) :global(.input-group-append) > :global(.btn) {
+  border-radius: 999px;
+}
+
+.cards :global(.custom-switch) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* the logs are a dark block on a light page: they stay dark once the page is inverted */
+:global(.dark-mode) .logs {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+:global(.dark-mode) .progressBar {
+  filter: invert(100%) hue-rotate(180deg);
+}

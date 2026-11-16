@@ -1,6 +1,10 @@
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
+
+import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { withMobileViewport, ConfirmSheet } from '../../../components/mobile';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 const formatDuration = duration => {
@@ -19,9 +23,20 @@ class SettingsSystemDatabaseCleaning extends Component {
     };
   }
 
-  vacuumDatabase = async e => {
+  // On a phone the cleaning is confirmed first: Gladys is unavailable while it runs
+  askVacuumConfirmation = e => {
     e.preventDefault();
+    this.setState({ confirmOpen: true });
+  };
+
+  cancelVacuum = () => this.setState({ confirmOpen: false });
+
+  vacuumDatabase = async e => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     this.setState({
+      confirmOpen: false,
       vacuumStarted: true
     });
     try {
@@ -47,7 +62,7 @@ class SettingsSystemDatabaseCleaning extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.VACUUM_FINISHED, this.vacuumFinished);
   }
 
-  render({}, { vacuumStarted, vacuumFinished, vacuumDuration }) {
+  render({ isMobile, intl }, { vacuumStarted, vacuumFinished, vacuumDuration, confirmOpen }) {
     return (
       <div class="card">
         <h4 class="card-header">
@@ -73,15 +88,31 @@ class SettingsSystemDatabaseCleaning extends Component {
                   />
                 </div>
               )}
-              <button onClick={this.vacuumDatabase} className="btn btn-primary">
+              <button
+                onClick={isMobile ? this.askVacuumConfirmation : this.vacuumDatabase}
+                className="btn btn-primary"
+                disabled={isMobile && vacuumStarted}
+                data-cy="system-vacuum"
+              >
                 <Text id="systemSettings.vacuumDatabaseButton" />
               </button>
             </p>
           </form>
         </div>
+        {isMobile && (
+          <ConfirmSheet
+            open={Boolean(confirmOpen)}
+            title={get(intl.dictionary, 'systemSettings.mobile.vacuumTitle')}
+            text={<Text id="systemSettings.mobile.vacuumText" />}
+            confirmLabel={<Text id="systemSettings.vacuumDatabaseButton" />}
+            onConfirm={this.vacuumDatabase}
+            onCancel={this.cancelVacuum}
+            dataCy="system-vacuum-confirm"
+          />
+        )}
       </div>
     );
   }
 }
 
-export default connect('httpClient,session', null)(SettingsSystemDatabaseCleaning);
+export default connect('httpClient,session', null)(withMobileViewport(withIntlAsProp(SettingsSystemDatabaseCleaning)));

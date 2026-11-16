@@ -5376,7 +5376,22 @@
     "session": "Session",
     "revoke": "Revoke",
     "unknowDevice": "Unknow device",
-    "apiKey": "API Key"
+    "apiKey": "API Key",
+    "mobile": {
+      "thisDevice": "This device",
+      "thisDeviceTitle": "This device",
+      "otherDevicesTitle": "Other devices",
+      "noOtherDevice": "No other device is signed in.",
+      "apiKeysTitle": "API keys",
+      "hint": "Revoke a session to sign its device out of Gladys.",
+      "loadError": "The sessions could not be loaded. Try again.",
+      "revokeTitle": "Revoke this session?",
+      "revokeText": "this device will be signed out of Gladys.",
+      "revokeCurrentText": "this is the session of the device you are using: you will be signed out.",
+      "revokeApiKeyText": "what uses this API key will no longer be able to reach Gladys.",
+      "revokeError": "The session could not be revoked. Try again.",
+      "revoked": "Session revoked"
+    }
   },
   "servicesSettings": {
     "title": "Services",
@@ -5413,7 +5428,24 @@
         "detail": "Service failed to start."
       }
     },
-    "action": "Action"
+    "action": "Action",
+    "mobile": {
+      "searchPlaceholder": "Search for a service",
+      "filters": {
+        "all": "All",
+        "running": "Running",
+        "error": "In error",
+        "stopped": "Stopped"
+      },
+      "noResult": "No service matches.",
+      "actionError": "The state of the service could not be changed. Try again.",
+      "started": "Service started",
+      "startedHelp": "Stopped, the integration no longer works until it is started again.",
+      "starting": "Starting…",
+      "stopping": "Stopping…",
+      "internalName": "Internal name",
+      "openIntegration": "Open the integration"
+    }
   },
   "forgotPassword": {
     "title": "Gladys Assistant",
@@ -5526,6 +5558,12 @@
     "jobStatuses": {
       "success": "Success",
       "failed": "Failure"
+    },
+    "mobile": {
+      "description": "What Gladys runs in the background, most recent first. Come here when something looks wrong.",
+      "empty": "No background task yet.",
+      "showMore": "Show the whole error",
+      "showLess": "Show less"
     }
   },
   "systemSettings": {
@@ -5652,7 +5690,18 @@
     "downloadLogsProgress": "Downloading {{downloaded}} of {{total}}...",
     "downloadLogsError": "Unable to download the logs. Make sure Gladys is running in Docker and try again.",
     "cpuTemperature": "CPU Temp",
-    "cpuTemperatureValue": "{{value}} °C"
+    "cpuTemperatureValue": "{{value}} °C",
+    "mobile": {
+      "statusTitle": "Status",
+      "updatesTitle": "Updates",
+      "preferencesTitle": "Preferences",
+      "maintenanceTitle": "Maintenance",
+      "checkForUpdatesText": "Gladys checks for new versions automatically.",
+      "updateTitle": "Update Gladys?",
+      "updateText": "Gladys restarts during the update and is unavailable for a few minutes.",
+      "vacuumTitle": "Clean the database?",
+      "vacuumText": "Gladys is unavailable until the cleaning is over. No data is deleted."
+    }
   },
   "newArea": {
     "createNewZoneButton": "Create new zone",
@@ -6088,6 +6137,19 @@
       "noSuccessYet": "No backup has succeeded yet on this instance.",
       "lastError": "Last error: {{error}}",
       "retry": "Gladys retries every night and a few minutes after each start-up. The administrators are warned in the chat from the second failed night on, then once a week while it keeps failing; once warned, they are told as soon as a backup succeeds again. Details in the \"Tasks\" tab."
+    },
+    "mobile": {
+      "backupError": "The backup could not be started. Try again.",
+      "loadError": "The backups could not be loaded. Try again.",
+      "backupsTitle": {
+        "one": "1 backup",
+        "other": "{{count}} backups"
+      },
+      "restoreHint": "Tap a backup to restore it.",
+      "empty": "No backup yet. Gladys creates one every 24 hours.",
+      "restoreTitle": "Restore this backup?",
+      "restoreText": "Gladys will go back to its state of {{date}} and restart. Everything changed since then will be lost.",
+      "restoreError": "The restoration could not be started. Try again."
     }
   },
   "alarmModes": {
@@ -7999,7 +8061,31 @@
     "registered": "Registered",
     "keyNameLabel": "Name:",
     "registeredLabel": "Registered:",
-    "neverUsed": "Never"
+    "neverUsed": "Never",
+    "mobile": {
+      "createButton": "Create an API key",
+      "createTitle": "New API key",
+      "keyTitle": "Your API key",
+      "namePlaceholder": "e.g. Phone shortcut",
+      "nameHelp": "A name to recognise what uses this key.",
+      "nameRequired": "Give the key a name.",
+      "createError": "The key could not be created. Try again.",
+      "copy": "Copy the key",
+      "copied": "Key copied",
+      "selected": "Key selected: copy it",
+      "keysTitle": {
+        "one": "1 key",
+        "other": "{{count}} keys"
+      },
+      "empty": "No API key yet.",
+      "created": "Created on {{date}}",
+      "lastUsed": "Last used on {{date}}",
+      "neverUsed": "Never used",
+      "revokeTitle": "Revoke this key?",
+      "revokeText": "“{{name}}” will stop working at once: what uses it will no longer reach Gladys.",
+      "revokeError": "The key could not be revoked. Try again.",
+      "revoked": "Key revoked"
+    }
   },
   "twoFactorApps": {
     "description": "Any app that generates 6-digit codes works. If you don't have one yet, here are a few free apps, simple to install:"
