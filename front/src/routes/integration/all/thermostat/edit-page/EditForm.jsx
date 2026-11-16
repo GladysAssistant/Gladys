@@ -347,7 +347,7 @@ const EditForm = ({ ...props }) => {
                   <Text id="integration.thermostat.edit.pilotWireSwitchOrderLabel" />
                 </th>
                 {[0, 1].map(index => (
-                  <th key={index}>
+                  <th key={index} id={`thermostat-pilot-wire-switch-column-${index}`}>
                     <Text id="integration.thermostat.edit.pilotWireSwitchLabel" fields={{ number: index + 1 }} />
                   </th>
                 ))}
@@ -358,9 +358,11 @@ const EditForm = ({ ...props }) => {
                 .reverse()
                 .map(([order, orderKey]) => (
                   <tr key={order}>
-                    <td class="align-middle">
+                    <td class="align-middle" id={`thermostat-pilot-wire-switch-order-${order}`}>
                       <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
                     </td>
+                    {/* Each box is named after its order and its switch ("Eco
+                        Switch 1"): "On" alone does not say which state it sets. */}
                     {[0, 1].map(index => {
                       const on = String(pilotWireSwitchStates[order])[index] === '1';
                       return (
@@ -370,6 +372,7 @@ const EditForm = ({ ...props }) => {
                               type="checkbox"
                               class="custom-switch-input"
                               checked={on}
+                              aria-labelledby={`thermostat-pilot-wire-switch-order-${order} thermostat-pilot-wire-switch-column-${index}`}
                               onChange={e => props.updateThermostatPilotWireSwitchState(order, index, e.target.checked)}
                             />
                             <span class="custom-switch-indicator" />

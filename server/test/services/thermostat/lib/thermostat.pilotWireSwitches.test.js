@@ -217,6 +217,22 @@ describe('thermostat pilot wire on two switches', () => {
     expect(logger.warn.lastCall.args[0]).to.contain('relay unreachable');
   });
 
+  it('should say nothing of the operating state when only one switch was written', async () => {
+    // Frost protection (off, on) to comfort (off, off) under Gladys, cold room:
+    // switch 2 fails, switch 1 had nothing to do — the wire kept its order.
+    const regulated = { THERMOSTAT_TYPE: 'virtual', THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor' };
+    const untouched = buildGladys({ q1: 0, q2: 1, temp: 18, failing: 'relay-q2' });
+    await regulate(untouched, twoSwitchDevice('comfort', regulated));
+    expect(savedOperatingStates(untouched)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+
+    // Eco (on, on) to comfort (off, off): switch 1 goes off, switch 2 fails —
+    // the wire now carries frost protection, not what either order says.
+    const partial = buildGladys({ q1: 1, q2: 1, temp: 18, failing: 'relay-q2' });
+    await regulate(partial, twoSwitchDevice('comfort', regulated));
+    expect(partial.device.setValue.callCount).to.equal(2);
+    expect(savedOperatingStates(partial)).to.deep.equal([]);
+  });
+
   it('should write nothing when one of the switches is gone', async () => {
     const gladys = buildGladys({ missing: 'relay-q2' });
 

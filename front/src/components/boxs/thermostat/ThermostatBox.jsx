@@ -235,6 +235,8 @@ class ThermostatBox extends Component {
   setPilotWireSwitchReading = (selector, value) => {
     const cfg = this.state.remoteConfig;
     this.pilotWireSwitchReadings = { ...this.pilotWireSwitchReadings, [selector]: value };
+    // The config may have moved to a module while the switches were read.
+    if (!cfg || !cfg.pilot_wire_switches) return;
     const [first, second] = cfg.pilot_wire_switches.map(feature => this.pilotWireSwitchReadings[feature]);
     this.setState({
       pilotWireOrder: pilotWireOrderOfSwitches(cfg.pilot_wire_switch_states, first, second),

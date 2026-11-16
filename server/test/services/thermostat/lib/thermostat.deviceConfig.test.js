@@ -399,22 +399,61 @@ describe('thermostat.deviceConfig - pilot wire on two switches', () => {
     expect(value).to.equal(0);
   });
 
-  it('should write both switches before reporting a failure', async () => {
+  const writeError = async (wire, order) => {
+    try {
+      await wire.write(order);
+    } catch (e) {
+      return e;
+    }
+    return null;
+  };
+
+  it('should write both switches before reporting a failure, and say the write was partial', async () => {
     const gladys = relays(1, 1);
     gladys.device.setValue = fake((device, feature) =>
       feature.selector === 'relay-q1' ? Promise.reject(new Error('relay unreachable')) : Promise.resolve(null),
     );
     const wire = await findPilotWire(gladys, config);
 
-    let error = null;
-    try {
-      await wire.write(PILOT_WIRE_MODE.COMFORT);
-    } catch (e) {
-      error = e;
-    }
+    const error = await writeError(wire, PILOT_WIRE_MODE.COMFORT);
 
     expect(error.message).to.equal('relay unreachable');
+    expect(error.partial).to.equal(true);
     expect(gladys.device.setValue.callCount).to.equal(2);
+  });
+
+  it('should say the write was not partial when no switch moved', async () => {
+    const gladys = relays(1, 1);
+    gladys.device.setValue = fake.rejects(new Error('node dead'));
+    const wire = await findPilotWire(gladys, config);
+
+    const error = await writeError(wire, PILOT_WIRE_MODE.COMFORT);
+
+    expect(error.message).to.equal('node dead');
+    expect(error.partial).to.equal(false);
+  });
+
+  it('should write the two switches one after the other, switch 1 first', async () => {
+    const gladys = relays(0, 0);
+    let pending = 0;
+    let overlapped = false;
+    gladys.device.setValue = fake(async () => {
+      pending += 1;
+      overlapped = overlapped || pending > 1;
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      pending -= 1;
+    });
+    const wire = await findPilotWire(gladys, config);
+
+    await wire.write(PILOT_WIRE_MODE.ECO);
+
+    expect(overlapped).to.equal(false);
+    expect(gladys.device.setValue.getCalls().map((call) => call.args[1].selector)).to.deep.equal([
+      'relay-q1',
+      'relay-q2',
+    ]);
   });
 
   it('should find no pilot wire when one of the switches is gone', async () => {

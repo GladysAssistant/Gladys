@@ -674,6 +674,8 @@ describe('thermostat.createDevice - external', () => {
           { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_COMFORT', value: '00' },
           { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_ECO', value: '00' },
           { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_FROST_PROTECTION', value: '01' },
+          // Complete, so the duplicate is the only fault.
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF', value: '10' },
         ]),
       );
     } catch (e) {

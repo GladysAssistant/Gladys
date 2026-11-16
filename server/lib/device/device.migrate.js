@@ -38,6 +38,8 @@ const FEATURE_LIST_PARAM_NAMES = [
   'THERMOSTAT_WINDOW_FEATURE',
   'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE',
 ];
+// The pair of switches of a pilot wire: two entries, never one (thermostat.md C.1.2).
+const PILOT_WIRE_SWITCH_PAIR_PARAM_NAME = 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE';
 const FEATURE_ARRAY_FIELDS = ['device_features'];
 // `electric_meter`: the meter of the energy-price box and of the energy price trigger / condition
 const DEVICE_STRING_FIELDS = ['device', 'camera', 'electric_meter'];
@@ -451,6 +453,27 @@ async function executeMigration(selector, options, jobId) {
     }
     usedDestinationSelectors.add(destinationFeatureSelector);
     return { sourceFeature, destinationFeature };
+  });
+
+  // The two switches of a pilot wire are a pair (thermostat.md C.1.2): a mapping
+  // that moves one of them onto the other would leave one relay for both, which
+  // the thermostat reads as no pilot wire at all. Refused before any write.
+  // Sensor lists are not concerned: a duplicate there is only dropped (A.1.1).
+  const featureMappingLookup = Object.create(null);
+  Object.keys(featuresMapping).forEach((sourceFeatureSelector) => {
+    featureMappingLookup[sourceFeatureSelector] = featuresMapping[sourceFeatureSelector];
+  });
+  const switchPairParams = await db.DeviceParam.findAll({
+    where: { name: PILOT_WIRE_SWITCH_PAIR_PARAM_NAME },
+  });
+  switchPairParams.forEach((param) => {
+    const pair = parseSelectorList(param.value);
+    const rewritten = pair.map((entry) =>
+      featureMappingLookup[entry] !== undefined ? featureMappingLookup[entry] : entry,
+    );
+    if (pair.length === 2 && rewritten[0] === rewritten[1]) {
+      throw new BadParameters(`Feature ${rewritten[0]} would drive both switches of a pilot wire`);
+    }
   });
 
   // A meter has one contract per date and direction: the merge is refused, before any

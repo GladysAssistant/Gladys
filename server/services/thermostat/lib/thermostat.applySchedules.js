@@ -915,6 +915,12 @@ async function writePilotWireOrder(found, order, logContext, selfWritten) {
       selfWritten.delete(found.key);
     }
     logger.warn(`Thermostat schedule: Failed to write the pilot-wire order: ${e.message}`);
+    // Half of a pair of switches written leaves the wire on an order nobody
+    // asked for, and possibly none at all (C.1.2): unknown, so nothing is said
+    // of the operating state. The next pass reads it again and writes it whole.
+    if (e.partial) {
+      return null;
+    }
     // The heater kept the order it had: that is what it is doing now.
     return found.carried;
   }

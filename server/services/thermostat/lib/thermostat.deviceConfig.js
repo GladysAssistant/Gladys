@@ -208,9 +208,14 @@ async function getFeatureBySelector(gladys, selector) {
  * names; the order they carry is unknown while either has no state, and is
  * then written in full.
  *
- * Writing an order on two switches only actuates the one whose state differs,
- * and both writes are attempted before a failure is reported: a first write
- * that fails must not leave the second undone, on a state neither order names.
+ * Writing an order on two switches only actuates the one whose state differs.
+ * Both values are resolved first, then written one after the other: the two
+ * outputs are often endpoints of one Z-Wave node, which takes two commands in
+ * flight badly, and the order the wire passes through on the way is then
+ * always the same. Both writes are attempted before a failure is reported: a
+ * first write that fails must not leave the second undone. When one went
+ * through and the other did not, the order the wire carries is unknown, and
+ * the error says so (`partial`).
  * @param {object} gladys - Gladys instance.
  * @param {object} config - Thermostat config object.
  * @returns {Promise<{key: string|null, carried: number|null, supportedOptions: Array|null, write: Function}|null>}
@@ -244,15 +249,27 @@ async function findPilotWire(gladys, config) {
     carried: pilotWireOrderOfSwitches(states, switches[0].feature.last_value, switches[1].feature.last_value),
     supportedOptions: PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS,
     write: async (order) => {
-      const results = await Promise.allSettled(
-        switches.map((found, index) => {
-          const value = Number(states[order][index]);
-          return found.feature.last_value === value ? null : gladys.device.setValue(found.device, found.feature, value);
-        }),
-      );
-      const failed = results.find((result) => result.status === 'rejected');
-      if (failed) {
-        throw failed.reason;
+      const values = String(states[order])
+        .split('')
+        .map(Number);
+      let written = 0;
+      let failure = null;
+      // Sequential on purpose, see above: `await` in the loop is the point.
+      /* eslint-disable no-await-in-loop, no-restricted-syntax */
+      for (const [index, found] of switches.entries()) {
+        if (found.feature.last_value !== values[index]) {
+          try {
+            await gladys.device.setValue(found.device, found.feature, values[index]);
+            written += 1;
+          } catch (e) {
+            failure = failure || e;
+          }
+        }
+      }
+      /* eslint-enable no-await-in-loop, no-restricted-syntax */
+      if (failure) {
+        failure.partial = written > 0;
+        throw failure;
       }
     },
   };
