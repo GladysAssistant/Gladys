@@ -383,6 +383,34 @@ describe('Integration devices on a phone', () => {
       cy.contains('[data-cy=lan-manager-discovered-row]', 'Tablet').i18n('mobileDeviceList.inGladys');
     });
 
+    it('should show the query still applied when the devices come back to the phone layout', () => {
+      const printer = {
+        id: 'cy-lan-printer',
+        name: 'Printer',
+        selector: 'lan-manager-112233445566',
+        external_id: 'lan-manager:112233445566',
+        room_id: null,
+        created_at: '2026-01-01T00:00:00.000Z',
+        features: [feature('lan-manager:112233445566', 'Presence', 'presence-sensor', 'push', { max: 1 })],
+        params: [{ name: 'DEVICE_MAC', value: '11:22:33:44:55:66' }]
+      };
+      cy.intercept({ method: 'GET', url: api('/service/lan-manager/device*') }, [printer]).as('getDevices');
+      cy.intercept({ method: 'GET', url: api('/service/lan-manager/device*'), query: { search: 'print' } }, [
+        printer
+      ]).as('searchDevices');
+      cy.visit('/dashboard/integration/device/lan-manager');
+      cy.wait('@getDevices');
+      cy.get('[data-cy=lan-manager-devices-mobile]').should('exist');
+      cy.get('[data-cy=integration-mobile-search]').type('print');
+      cy.wait('@searchDevices');
+      // the search is debounced: the field is not controlled, a wider screen and back remounts it
+      cy.viewport(...DESKTOP);
+      cy.get('[data-cy=lan-manager-devices-mobile]').should('not.exist');
+      cy.viewport('iphone-x');
+      cy.get('[data-cy=lan-manager-devices-mobile]').should('exist');
+      cy.get('[data-cy=integration-mobile-search]').should('have.value', 'print');
+    });
+
     it('should say what the scan button does while a scan runs', () => {
       cy.visit('/dashboard/integration/device/lan-manager/discover');
       cy.wait('@getDiscovered');

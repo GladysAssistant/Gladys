@@ -21,6 +21,6 @@ class LANManagerDevicePage extends Component {
 }
 
 export default connect(
-  'session,httpClient,user,lanManagerDevices,houses,getLANManagerDevicesStatus,getLANManagerDeviceOrderDir',
+  'session,httpClient,user,lanManagerDevices,houses,getLANManagerDevicesStatus,getLANManagerDeviceOrderDir,lanManagerDeviceSearch',
   actions
 )(withMobileViewport(LANManagerDevicePage));

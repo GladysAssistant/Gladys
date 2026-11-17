@@ -46,9 +46,11 @@ The shared components are in `front/src/components/integration/mobile/`:
   ("A - Z" / "Z - A"), then the actions of the list (`ToolButton`, 44 px). They call the handlers
   of the desktop header with the same event: a phone list has no request of its own. The search
   field shows the query the list is filtered on, like the desktop one. Where that query is a
-  debounced state (the discovery of an external integration) the field is not controlled — it
-  would take back the letters typed since the last update — and only starts from the query still
-  applied when it mounts again (`initialSearchValue`).
+  debounced state (the devices of Bluetooth, Airplay and LAN Manager, the discovery of an
+  external integration) the field is not controlled — it would take back the letters typed since
+  the last update — and only starts from the query still applied when it mounts again
+  (`initialSearchValue`). Where the query is stored at once and only the request is debounced
+  (Matter, MQTT, Thermostat) the field is controlled (`searchValue`).
 - `MobileDeviceItem`: the row of a device and its sheet (C and D).
 - `MobileListLoader`, `MobileWaitingNotice`, `MobileTextNotice`, `MobileProgress`, `BatteryPill`:
   the spinner of a list, a notice that waits (a scan running), a long explanation of the desktop

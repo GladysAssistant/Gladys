@@ -23,6 +23,9 @@ const MobileLANManagerDeviceTab = ({ getLANManagerDevicesStatus, lanManagerDevic
     <MobileIntegrationTab dataCy="lan-manager-devices-mobile">
       <MobileListToolbar
         onSearch={props.debouncedSearch}
+        // the search is debounced: the field is not controlled, it only starts from the query
+        // still applied to the list when it mounts again
+        initialSearchValue={props.lanManagerDeviceSearch}
         searchPlaceholderId="integration.lanManager.device.search"
         orderDir={props.getLANManagerDeviceOrderDir}
         onOrderChange={props.changeOrderDir}

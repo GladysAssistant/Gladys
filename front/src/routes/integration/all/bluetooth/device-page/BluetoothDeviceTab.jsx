@@ -22,7 +22,9 @@ const MobileBluetoothDeviceTab = ({ getBluetoothDevicesStatus, bluetoothDevices,
   return (
     <MobileIntegrationTab dataCy="bluetooth-devices-mobile">
       <MobileListToolbar
-        searchValue={props.bluetoothDeviceSearch}
+        // the search is debounced: the field is not controlled, it only starts from the query
+        // still applied to the list when it mounts again
+        initialSearchValue={props.bluetoothDeviceSearch}
         onSearch={props.debouncedSearch}
         orderDir={props.getBluetoothDeviceOrderDir}
         onOrderChange={props.changeOrderDir}

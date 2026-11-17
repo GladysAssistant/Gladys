@@ -99,7 +99,9 @@ class DeviceTab extends Component {
     return (
       <MobileIntegrationTab dataCy="airplay-devices-mobile">
         <MobileListToolbar
-          searchValue={search}
+          // the search is debounced: the field is not controlled, it only starts from the query
+          // still applied to the list when it mounts again
+          initialSearchValue={search}
           onSearch={this.debouncedSearch}
           orderDir={orderDir}
           onOrderChange={this.changeOrderDir}
