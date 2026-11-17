@@ -1,0 +1,215 @@
+import { Text, MarkupText } from 'preact-i18n';
+import { Link } from 'preact-router/match';
+import cx from 'classnames';
+
+import { RequestStatus } from '../../../../../../utils/consts';
+import MqttConnectionError from '../../commons/MqttConnectionError';
+import { formatDuration } from '../wizard/format';
+import { getPhases, getCurrentPhase } from '../wizard/phases';
+import InstallFailure from '../wizard/InstallFailure';
+import { DASHBOARD_STATE, getStartupError, isExternal } from './dashboardState';
+import style from './dashboard.css';
+
+const T = 'integration.zigbee2mqtt.setup.dashboard';
+const DISCOVER_URL = '/dashboard/integration/device/zigbee2mqtt/discover';
+
+const ICONS = {
+  [DASHBOARD_STATE.ONLINE]: 'radio',
+  [DASHBOARD_STATE.INSTALLING]: 'loader',
+  [DASHBOARD_STATE.STARTING]: 'loader',
+  [DASHBOARD_STATE.STOPPED]: 'square',
+  [DASHBOARD_STATE.DONGLE_MISSING]: 'cpu',
+  [DASHBOARD_STATE.FAILED]: 'alert-triangle',
+  [DASHBOARD_STATE.MQTT_ERROR]: 'alert-triangle',
+  [DASHBOARD_STATE.NOT_ANSWERING]: 'alert-circle'
+};
+
+const TONES = {
+  [DASHBOARD_STATE.ONLINE]: style.toneGreen,
+  [DASHBOARD_STATE.INSTALLING]: style.toneBlue,
+  [DASHBOARD_STATE.STARTING]: style.toneBlue,
+  [DASHBOARD_STATE.STOPPED]: style.toneGrey,
+  [DASHBOARD_STATE.DONGLE_MISSING]: style.toneAmber,
+  [DASHBOARD_STATE.FAILED]: style.toneRed,
+  [DASHBOARD_STATE.MQTT_ERROR]: style.toneRed,
+  [DASHBOARD_STATE.NOT_ANSWERING]: style.toneAmber
+};
+
+// "17 nov. 2026, 08:00", in the language of the user
+const formatDate = (isoDate, language) => {
+  try {
+    return new Date(isoDate).toLocaleString(language, { dateStyle: 'medium', timeStyle: 'short' });
+  } catch (e) {
+    return isoDate;
+  }
+};
+
+const Title = ({ view }) => {
+  const { state, status, configuration } = view;
+  if (state === DASHBOARD_STATE.INSTALLING) {
+    return <Text id={`integration.zigbee2mqtt.setup.installation.titles.${status.installation.kind}`} />;
+  }
+  if (state === DASHBOARD_STATE.ONLINE && isExternal(configuration)) {
+    return <Text id={`${T}.states.onlineExternal.title`} />;
+  }
+  return <Text id={`${T}.states.${state}.title`} />;
+};
+
+const Subtitle = ({ view }) => {
+  const { state, status, language } = view;
+  if (state === DASHBOARD_STATE.ONLINE) {
+    return Number.isInteger(status.deviceCount) ? (
+      <Text id={`${T}.states.online.devices`} plural={status.deviceCount} fields={{ count: status.deviceCount }} />
+    ) : null;
+  }
+  if (state === DASHBOARD_STATE.STOPPED) {
+    return <Text id={`${T}.states.stopped.since`} fields={{ date: formatDate(status.stoppedAt, language) }} />;
+  }
+  if (state === DASHBOARD_STATE.INSTALLING) {
+    return <Text id="integration.zigbee2mqtt.setup.installation.leavePage" />;
+  }
+  return <Text id={`${T}.states.${state}.text`} />;
+};
+
+// The progress of an installation run from the dashboard (a start, a change of dongle, an update)
+const Progress = ({ view }) => {
+  const { status, configuration } = view;
+  const { installation } = status;
+  const phases = getPhases(installation, {
+    configuration,
+    external: isExternal(configuration),
+    ezspFallback: Boolean(status.ezspFallback)
+  });
+  const phase = getCurrentPhase(phases);
+  return (
+    <div class={style.progress} data-cy="z2m-dashboard-progress">
+      <div class={cx('progress', style.progressBar)}>
+        <div
+          class="progress-bar bg-primary"
+          style={{ width: `${installation.progress}%` }}
+          role="progressbar"
+          aria-valuenow={installation.progress}
+          aria-valuemin="0"
+          aria-valuemax="100"
+        />
+      </div>
+      <div class={style.progressLine}>
+        <span data-cy="z2m-dashboard-phase">
+          <Text id={phase.detail || phase.label} />
+        </span>
+        <span class={style.progressValue}>{installation.progress} %</span>
+      </div>
+    </div>
+  );
+};
+
+const PRIMARY_LABELS = {
+  pair: `${T}.actions.pair`,
+  start: `${T}.actions.start`,
+  restart: `${T}.actions.restart`
+};
+
+const PRIMARY_ICONS = { pair: 'radio', start: 'play', restart: 'refresh-cw' };
+
+// The state of Zigbee2mqtt, why it does not run, and the action to take
+const StatusCard = ({ view, actions }) => {
+  const { state, status, primaryAction, actionStatus, newDeviceCount } = view;
+  const startupError = state === DASHBOARD_STATE.FAILED ? getStartupError(status) : null;
+  const busy = actionStatus === RequestStatus.Getting;
+  return (
+    <section class={style.card} data-cy="z2m-dashboard-status" data-state={state}>
+      <div class={style.statusHead}>
+        <span class={cx(style.statusIcon, TONES[state])} aria-hidden="true">
+          <i
+            class={cx(`fe fe-${ICONS[state]}`, {
+              [style.spin]: state === DASHBOARD_STATE.INSTALLING || state === DASHBOARD_STATE.STARTING
+            })}
+          />
+        </span>
+        <div class={style.statusText}>
+          <span class={style.statusTitle} role="status" data-cy="z2m-dashboard-title">
+            <Title view={view} />
+          </span>
+          <span class={style.statusSub} data-cy="z2m-dashboard-subtitle">
+            <Subtitle view={view} />
+          </span>
+        </div>
+      </div>
+
+      {state === DASHBOARD_STATE.ONLINE && newDeviceCount > 0 && (
+        <Link href={DISCOVER_URL} class={style.newDevices} data-cy="z2m-dashboard-new-devices">
+          <Text id={`${T}.newDevices`} plural={newDeviceCount} fields={{ count: newDeviceCount }} />
+          <i class="fe fe-chevron-right" aria-hidden="true" />
+        </Link>
+      )}
+      {state === DASHBOARD_STATE.INSTALLING && <Progress view={view} />}
+      {startupError && (
+        <div class="alert alert-danger mb-0" role="alert" data-cy="z2m-dashboard-error">
+          <InstallFailure error={startupError} />
+        </div>
+      )}
+      {state === DASHBOARD_STATE.MQTT_ERROR && (
+        <div class="alert alert-danger mb-0" role="alert" data-cy="z2m-dashboard-mqtt-error">
+          <MqttConnectionError error={status.mqttConnectionError} />
+        </div>
+      )}
+      {view.installationSucceeded && (
+        <div class="alert alert-success mb-0" data-cy="z2m-dashboard-installation-success">
+          <Text
+            id={`integration.zigbee2mqtt.setup.installation.success.${status.installation.kind}`}
+            fields={{ duration: formatDuration(status.installation.durationMs) }}
+          />
+        </div>
+      )}
+      {view.permitJoinAllowed && state === DASHBOARD_STATE.ONLINE && (
+        <div class="alert alert-success mb-0" role="status" data-cy="z2m-dashboard-permit-join-allowed">
+          <MarkupText id={`${T}.pairAllowed`} />
+        </div>
+      )}
+      {status.updatePending && state !== DASHBOARD_STATE.INSTALLING && (
+        <div class="alert alert-info mb-0" data-cy="z2m-dashboard-update-pending">
+          <Text id={`${T}.updatePending`} />
+        </div>
+      )}
+      {view.ezspDriver && (
+        <div class="alert alert-info mb-0" data-cy="z2m-dashboard-ezsp">
+          <MarkupText id="integration.zigbee2mqtt.setup.wizard.ready.ezspNote" />
+        </div>
+      )}
+      {view.actionError && (
+        <div class="alert alert-warning mb-0" role="alert" data-cy="z2m-dashboard-action-error">
+          <Text id={`${T}.actionErrors.${view.actionError}`} />
+        </div>
+      )}
+
+      {(primaryAction || view.canChangeKey) && (
+        <div class={style.buttons}>
+          {primaryAction && (
+            <button
+              type="button"
+              class={cx('btn btn-primary', { 'btn-loading': busy })}
+              disabled={busy}
+              onClick={actions[primaryAction]}
+              data-cy={`z2m-dashboard-${primaryAction}`}
+            >
+              <i class={`fe fe-${PRIMARY_ICONS[primaryAction]} mr-2`} aria-hidden="true" />
+              <Text id={PRIMARY_LABELS[primaryAction]} />
+            </button>
+          )}
+          {view.canChangeKey && state === DASHBOARD_STATE.FAILED && (
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              onClick={actions.changeKey}
+              data-cy="z2m-dashboard-failure-change-key"
+            >
+              <Text id="integration.zigbee2mqtt.setup.wizard.failure.changeKey" />
+            </button>
+          )}
+        </div>
+      )}
+    </section>
+  );
+};
+
+export default StatusCard;

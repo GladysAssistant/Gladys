@@ -106,5 +106,12 @@ export const dedupePorts = usbPorts => {
   return Object.values(byPath);
 };
 
+// The drivers that can take over the network of each other: Silicon Labs (ember, its old ezsp), Texas Instruments,
+// dresden elektronik. Another family forms a new network: the devices must be paired again.
+const DRIVER_FAMILIES = { ember: 'silabs', ezsp: 'silabs', zstack: 'ti', deconz: 'deconz' };
+
+export const isOtherDriverFamily = (currentDriver, nextDriver) =>
+  Boolean(currentDriver && nextDriver) && DRIVER_FAMILIES[currentDriver] !== DRIVER_FAMILIES[nextDriver];
+
 // A device plugged in a USB port, not a serial port of the machine itself (HAT, GPIO)
 export const isPluggedPort = usbPort => Boolean(usbPort.pnpId);

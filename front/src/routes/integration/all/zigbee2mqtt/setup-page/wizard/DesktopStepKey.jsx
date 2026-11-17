@@ -49,8 +49,14 @@ const OtherChoices = ({ manualText, actions, installable }) => (
   </div>
 );
 
+// The dongle the installation uses, when it is changed from the dashboard
+export const isCurrentPort = (usbPort, view) => {
+  const currentPath = view.changeMode && view.savedConfiguration.z2mDriverPath;
+  return Boolean(currentPath) && (usbPort.path === currentPath || usbPort.stablePath === currentPath);
+};
+
 // port: shown when several dongles are offered, which may be of the same model
-const KeyCard = ({ adapter, label, selected, onClick, recognized, port }) => {
+const KeyCard = ({ adapter, label, selected, onClick, recognized, current, port }) => {
   const content = (
     <span class="d-flex align-items-center w-100">
       {onClick && <span class={cx(style.radio, { [style.radioChecked]: selected })} aria-hidden="true" />}
@@ -68,6 +74,11 @@ const KeyCard = ({ adapter, label, selected, onClick, recognized, port }) => {
           {port && <span data-cy="z2m-wizard-key-port"> · {port}</span>}
         </span>
       </span>
+      {current && (
+        <span class="badge badge-secondary ml-2" data-cy="z2m-wizard-current-key">
+          <Text id={`${T}.change.current`} />
+        </span>
+      )}
       {recognized && (
         <span class="badge badge-success ml-2">
           <Text id={`${T}.key.recognized`} />
@@ -214,7 +225,12 @@ const Detected = ({ view, actions }) => {
             <Text id={`${T}.key.justPlugged`} />
           </div>
         )}
-        <KeyCard adapter={findAdapter(adapters, recognized[0].adapter)} label={recognized[0].adapter} recognized />
+        <KeyCard
+          adapter={findAdapter(adapters, recognized[0].adapter)}
+          label={recognized[0].adapter}
+          recognized
+          current={isCurrentPort(recognized[0], view)}
+        />
         <OtherChoices manualText={`${T}.key.linkManualWrong`} actions={actions} installable={installable} />
       </div>
     );
@@ -229,6 +245,7 @@ const Detected = ({ view, actions }) => {
             adapter={findAdapter(adapters, usbPort.adapter)}
             label={usbPort.adapter}
             selected={selectedPort === usbPort}
+            current={isCurrentPort(usbPort, view)}
             onClick={() => actions.pickPort(getPortPath(usbPort))}
             port={usbPort.path}
           />
@@ -405,6 +422,14 @@ const SaveError = ({ view }) => {
   return null;
 };
 
+// What "Install" says: connect to an external broker, or use the chosen dongle when it is changed
+export const getInstallLabel = view => {
+  if (view.external) {
+    return `${T}.connect`;
+  }
+  return view.changeMode ? `${T}.change.use` : `${T}.install`;
+};
+
 // ① The dongle, or another way to get Zigbee2mqtt
 const DesktopStepKey = ({ view, actions }) => {
   const { pane, installable, external } = view;
@@ -425,6 +450,11 @@ const DesktopStepKey = ({ view, actions }) => {
       )}
       {pane === PANE.NETWORK && <NetworkCoordinator view={view} actions={actions} />}
       {pane === PANE.EXTERNAL && <ExternalBroker view={view} actions={actions} />}
+      {view.otherDriverFamily && (
+        <div class="alert alert-warning" data-cy="z2m-wizard-other-family">
+          <Text id={`${T}.change.otherFamily`} />
+        </div>
+      )}
       <SaveError view={view} />
       {showFooter && (
         <div class={style.footer}>
@@ -433,14 +463,19 @@ const DesktopStepKey = ({ view, actions }) => {
               <PrefetchStatus configuration={view.configuration} zigbee2mqttStatus={view.zigbee2mqttStatus} />
             )}
           </div>
+          {view.changeMode && (
+            <button type="button" class="btn btn-link" onClick={actions.cancel} data-cy="z2m-wizard-cancel">
+              <Text id={`${T}.change.cancel`} />
+            </button>
+          )}
           <button
             type="button"
-            class={cx('btn btn-primary', { 'btn-loading': view.saving })}
+            class={cx('btn btn-primary', style.footerPrimary, { 'btn-loading': view.saving })}
             onClick={actions.install}
             disabled={!view.configurationToSave || view.saving}
             data-cy="z2m-wizard-install"
           >
-            <Text id={external ? `${T}.connect` : `${T}.install`} />
+            <Text id={getInstallLabel(view)} />
             <i class="fe fe-arrow-right ml-2" aria-hidden="true" />
           </button>
         </div>

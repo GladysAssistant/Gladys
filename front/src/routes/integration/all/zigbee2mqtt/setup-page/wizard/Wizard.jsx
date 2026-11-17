@@ -6,7 +6,15 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/co
 import { RequestStatus } from '../../../../../../utils/consts';
 import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
 import { MQTT_MODE, ADAPTER_MODE } from '../constants';
-import { LEGACY_EZSP_SUFFIX, dedupePorts, findAdapter, getPortPath, isLegacyEzsp, isPluggedPort } from './adapters';
+import {
+  LEGACY_EZSP_SUFFIX,
+  dedupePorts,
+  findAdapter,
+  getPortPath,
+  isLegacyEzsp,
+  isOtherDriverFamily,
+  isPluggedPort
+} from './adapters';
 import { STEP, PANE, KEY_SCENARIO, INSTALL_VIEW } from './constants';
 import WizardDesktop from './WizardDesktop';
 import WizardMobile from './WizardMobile';
@@ -255,6 +263,11 @@ class Wizard extends Component {
     if (this.unmounted) {
       return;
     }
+    // A change of dongle is followed on the dashboard
+    if (saved && this.props.changeMode) {
+      this.props.onChanged();
+      return;
+    }
     this.setState(saved ? { step: STEP.INSTALL } : { step: STEP.KEY, previousInstallation: undefined });
   };
 
@@ -414,6 +427,20 @@ class Wizard extends Component {
     this.usbPortsTimer = null;
   }
 
+  // The driver of the coordinator saved, and of the one chosen: another family forms a new network
+  isOtherDriverFamily = (savedConfiguration, savedAdapter, selectedAdapter) => {
+    const { pane, networkType } = this.state;
+    if (!this.props.changeMode || pane === PANE.EXTERNAL) {
+      return false;
+    }
+    const currentDriver =
+      savedConfiguration.z2mAdapterMode === ADAPTER_MODE.NETWORK
+        ? savedConfiguration.z2mNetworkAdapterType
+        : get(savedAdapter, 'configKey');
+    const nextDriver = pane === PANE.NETWORK ? networkType : get(selectedAdapter, 'configKey');
+    return isOtherDriverFamily(currentDriver, nextDriver);
+  };
+
   render(props, state) {
     // On the dongle step, the status not read yet, or not readable: what the machine allows is unknown. Not on the next
     // steps, which an init (its status unknown meanwhile) does not interrupt
@@ -439,6 +466,8 @@ class Wizard extends Component {
     }
     const { usbPort, model } = this.getUsbSelection();
     const savedConfiguration = props.configuration || {};
+    const savedAdapter = findAdapter(state.adapters, savedConfiguration.z2mDongleName);
+    const selectedAdapter = findAdapter(state.adapters, model);
     const external =
       state.step === STEP.KEY ? state.pane === PANE.EXTERNAL : savedConfiguration.mqttMode === MQTT_MODE.EXTERNAL;
     const view = {
@@ -450,11 +479,14 @@ class Wizard extends Component {
       keyScenario: this.getKeyScenario(),
       choosablePorts: this.getChoosablePorts(),
       selectedPort: usbPort,
-      selectedAdapter: findAdapter(state.adapters, model),
+      selectedAdapter,
       selectedModel: model,
       choosableAdapters: state.adapters.filter(adapter => !isLegacyEzsp(adapter)),
       // The dongle saved, for the steps after the first one (the ezsp fallback changes its model)
-      savedAdapter: findAdapter(state.adapters, savedConfiguration.z2mDongleName),
+      savedAdapter,
+      // Changing the coordinator of an installation, from the dashboard (only the first step)
+      changeMode: Boolean(props.changeMode),
+      otherDriverFamily: this.isOtherDriverFamily(savedConfiguration, savedAdapter, selectedAdapter),
       savedConfiguration,
       configurationToSave: this.getConfigurationToSave(),
       installView: state.step === STEP.KEY ? null : this.getInstallView(),
@@ -480,7 +512,8 @@ class Wizard extends Component {
       allowJoining: this.allowJoining,
       closeSaveError: this.closeSaveError,
       closePermitJoinError: this.closePermitJoinError,
-      finish: props.finishWizard
+      finish: props.finishWizard,
+      cancel: props.onCancel
     };
     return props.isMobile ? (
       <WizardMobile view={view} actions={actions} />

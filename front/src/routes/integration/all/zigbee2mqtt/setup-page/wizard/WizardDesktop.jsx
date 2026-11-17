@@ -5,7 +5,7 @@ import get from 'get-value';
 
 import { RequestStatus } from '../../../../../../utils/consts';
 import { ADAPTER_MODE } from '../constants';
-import { formatDuration } from '../components/InstallationProgress';
+import { formatDuration } from './format';
 import { STEP, INSTALL_VIEW } from './constants';
 import DesktopStepKey from './DesktopStepKey';
 import DesktopStepInstall from './DesktopStepInstall';
@@ -217,6 +217,14 @@ const StepPair = ({ view, actions }) => {
   );
 };
 
+// The title of the wizard: install, connect to an external broker, or change the coordinator of an installation
+export const getTitle = view => {
+  if (view.changeMode) {
+    return `${T}.change.title`;
+  }
+  return view.connectOnly ? `${T}.titleConnect` : `${T}.titleInstall`;
+};
+
 // The wizard on a large screen: the four steps above the current one, in a card
 const WizardDesktop = ({ view, actions }) => {
   const current = getStepNumber(view);
@@ -224,11 +232,11 @@ const WizardDesktop = ({ view, actions }) => {
     <div class={cx('card', style.wizard)} data-cy="z2m-wizard">
       <div class="card-header">
         <h2 class="card-title">
-          <Text id={view.connectOnly ? `${T}.titleConnect` : `${T}.titleInstall`} />
+          <Text id={getTitle(view)} />
         </h2>
       </div>
       <div class="card-body">
-        <Stepper current={current} external={view.connectOnly} />
+        {!view.changeMode && <Stepper current={current} external={view.connectOnly} />}
         {view.step === STEP.KEY && <DesktopStepKey view={view} actions={actions} />}
         {view.step === STEP.INSTALL && view.installView !== INSTALL_VIEW.READY && (
           <DesktopStepInstall view={view} actions={actions} />

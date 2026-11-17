@@ -3,11 +3,6 @@ const MQTT_MODE = {
   EXTERNAL: 'external'
 };
 
-const SETUP_MODES = {
-  LOCAL: 'local',
-  REMOTE: 'remote'
-};
-
 const ADAPTER_MODE = {
   USB: 'usb',
   NETWORK: 'network'
@@ -20,4 +15,4 @@ const isConfigured = (configuration = {}) =>
     configuration.z2mDriverPath || configuration.z2mNetworkAdapterUrl || configuration.mqttMode === MQTT_MODE.EXTERNAL
   );
 
-export { MQTT_MODE, SETUP_MODES, ADAPTER_MODE, isConfigured };
+export { MQTT_MODE, ADAPTER_MODE, isConfigured };

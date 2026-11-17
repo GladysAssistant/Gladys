@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
 
@@ -7,7 +8,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import getZ2mUrl from '../utils/getZ2mUrl';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import { MQTT_MODE, isConfigured } from './constants';
-import SetupTab from './SetupTab';
+import Dashboard from './dashboard/Dashboard';
 import Wizard from './wizard/Wizard';
 
 // Refused while an installation or another operation on the integration runs (see refuseWhileInstalling on the
@@ -29,6 +30,21 @@ const VARIABLE_MAP = {
   GLADYS_MQTT_PASSWORD: 'mqttPassword',
   Z2M_FRONTEND_URL: 'z2mFrontendUrl'
 };
+
+// Until the status and the configuration are loaded, or when they cannot be
+const SetupLoading = ({ error }) => (
+  <div class="card" data-cy="z2m-setup-loading">
+    <div class="card-body">
+      {error ? (
+        <div class="alert alert-danger mb-0" data-cy="z2m-setup-loading-error">
+          <Text id="integration.zigbee2mqtt.setup.errorLoadingStatesLabel" />
+        </div>
+      ) : (
+        <div class="loader my-5 mx-auto" />
+      )}
+    </div>
+  </div>
+);
 
 class Zigbee2mqttSetupPage extends Component {
   resolveZ2mUrl = configuration => getZ2mUrl(configuration, this.props.session.gatewayClient !== undefined);
@@ -59,7 +75,7 @@ class Zigbee2mqttSetupPage extends Component {
       this.setState({ installationFollowedToSuccess: true });
     }
     // The installation that refused them is over
-    ['setupZigee2mqttStatus', 'toggleZigee2mqttStatus', 'resetZigbee2mqttStatus'].forEach(requestStatus => {
+    ['setupZigee2mqttStatus', 'resetZigbee2mqttStatus'].forEach(requestStatus => {
       if (this.state[requestStatus] === RequestStatus.ConflictError) {
         this.setState({ [requestStatus]: null });
       }
@@ -199,31 +215,6 @@ class Zigbee2mqttSetupPage extends Component {
     this.setState({ wizard: false });
   };
 
-  toggleZ2M = async enable => {
-    this.setState({
-      toggleZigee2mqttStatus: RequestStatus.Getting
-    });
-
-    try {
-      if (enable) {
-        await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/connect');
-      } else {
-        await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/disconnect');
-      }
-      this.setState({
-        toggleZigee2mqttStatus: RequestStatus.Success
-      });
-      if (enable) {
-        await this.loadZ2MConfig();
-      }
-    } catch (e) {
-      console.error(e);
-      this.setState({
-        toggleZigee2mqttStatus: isBusyRefusal(e) ? RequestStatus.ConflictError : RequestStatus.Error
-      });
-    }
-  };
-
   resetZ2M = async () => {
     this.setState({
       resetZigbee2mqttStatus: RequestStatus.Getting
@@ -303,7 +294,14 @@ class Zigbee2mqttSetupPage extends Component {
   render(props, state) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        {state.wizard ? (
+        {state.wizard === null && (
+          <SetupLoading
+            error={
+              state.loadZigbee2mqttStatus === RequestStatus.Error || state.loadZigbee2mqttConfig === RequestStatus.Error
+            }
+          />
+        )}
+        {state.wizard === true && (
           <Wizard
             httpClient={props.httpClient}
             session={props.session}
@@ -316,14 +314,22 @@ class Zigbee2mqttSetupPage extends Component {
             prefetchImages={this.prefetchImages}
             finishWizard={this.finishWizard}
           />
-        ) : (
-          <SetupTab
-            {...props}
-            {...state}
+        )}
+        {state.wizard === false && (
+          <Dashboard
+            user={props.user}
+            session={props.session}
+            httpClient={props.httpClient}
+            zigbee2mqttStatus={state.zigbee2mqttStatus}
+            configuration={state.configuration}
+            z2mUrl={state.z2mUrl}
+            setupZigee2mqttStatus={state.setupZigee2mqttStatus}
+            setupZigee2mqttError={state.setupZigee2mqttError}
+            resetZigbee2mqttStatus={state.resetZigbee2mqttStatus}
+            installationFollowedToSuccess={state.installationFollowedToSuccess}
             saveConfiguration={this.saveConfiguration}
-            toggleZ2M={this.toggleZ2M}
-            resetZ2M={this.resetZ2M}
             prefetchImages={this.prefetchImages}
+            resetZ2M={this.resetZ2M}
           />
         )}
       </Zigbee2mqttPage>

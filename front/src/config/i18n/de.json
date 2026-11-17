@@ -2318,7 +2318,8 @@
           "titles": {
             "install": "Installation von Zigbee2MQTT",
             "update": "Aktualisierung von Zigbee2MQTT",
-            "switch": "Wechsel des Zigbee-Koordinators"
+            "switch": "Wechsel des Zigbee-Koordinators",
+            "start": "Start von Zigbee2MQTT"
           },
           "phases": {
             "pull_z2m": "Herunterladen von Zigbee2MQTT",
@@ -2334,7 +2335,8 @@
           "success": {
             "install": "Zigbee2MQTT in {{duration}} installiert.",
             "update": "Zigbee2MQTT in {{duration}} aktualisiert.",
-            "switch": "Zigbee-Koordinator in {{duration}} gewechselt."
+            "switch": "Zigbee-Koordinator in {{duration}} gewechselt.",
+            "start": "Zigbee2MQTT in {{duration}} gestartet."
           },
           "errors": {
             "NO_ANSWER": "Zigbee2MQTT hat Gladys innerhalb von 2 Minuten nach dem Start nicht geantwortet, ohne einen Grund anzugeben. Überprüfen Sie, ob das gewählte Modell Ihrem Koordinator entspricht, ziehen Sie Ihren Stick ab und stecken Sie ihn wieder ein oder starten Sie Ihren Netzwerk-Koordinator neu, und speichern Sie dann die Konfiguration erneut.",
@@ -2546,7 +2548,116 @@
             "showPhases": "Details anzeigen",
             "back": "Zurück"
           },
+          "change": {
+            "title": "Zigbee-Stick wechseln",
+            "use": "Diesen Stick verwenden",
+            "cancel": "Abbrechen",
+            "current": "Aktueller Stick",
+            "otherFamily": "Dieser Stick verwendet nicht denselben Treiber wie der aktuelle: Zigbee2MQTT kann dein Netzwerk darauf nicht übernehmen, du musst deine Geräte neu anlernen."
+          },
           "statusPending": "Gladys startet die Zigbee2MQTT-Integration… Falls das andauert, prüfe, ob der Dienst Zigbee2MQTT unter Einstellungen › Dienste gestartet ist."
+        },
+        "dashboard": {
+          "states": {
+            "online": {
+              "title": "Zigbee-Netzwerk online",
+              "devices": {
+                "one": "1 Gerät im Netzwerk",
+                "other": "{{count}} Geräte im Netzwerk"
+              }
+            },
+            "onlineExternal": {
+              "title": "Mit deinem Zigbee2MQTT verbunden"
+            },
+            "stopped": {
+              "title": "Zigbee2MQTT ist gestoppt",
+              "since": "Seit {{date}} · es startet nicht mit Gladys neu."
+            },
+            "dongleMissing": {
+              "title": "Zigbee-Stick ausgesteckt",
+              "text": "Zigbee2MQTT startet wieder, sobald er eingesteckt ist, an jedem Port."
+            },
+            "failed": {
+              "title": "Zigbee2MQTT startet nicht",
+              "text": "Deine Zigbee-Geräte reagieren nicht, solange es nicht gestartet ist."
+            },
+            "mqttError": {
+              "title": "Gladys ist nicht mit dem MQTT-Broker verbunden",
+              "text": "Gladys empfängt die Nachrichten von Zigbee2MQTT nicht mehr."
+            },
+            "starting": {
+              "title": "Zigbee2MQTT startet…",
+              "text": "Gladys wartet auf seine Antwort."
+            },
+            "notAnswering": {
+              "title": "Zigbee2MQTT antwortet nicht",
+              "text": "Gladys erhält keine Antwort von Zigbee2MQTT: Deine Zigbee-Geräte reagieren nicht."
+            }
+          },
+          "newDevices": {
+            "one": "1 neues Gerät zu Gladys hinzuzufügen",
+            "other": "{{count}} neue Geräte zu Gladys hinzuzufügen"
+          },
+          "pairAllowed": "<strong>Anlernen für 4 Minuten aktiviert.</strong> Deine Geräte erscheinen im Tab Entdecken.",
+          "updatePending": "Ein Update von Zigbee2MQTT wartet: Seine Images konnten nicht heruntergeladen werden. Es erfolgt beim nächsten Start.",
+          "actionErrors": {
+            "busy": "Eine Installation läuft, oder die Integration ist beschäftigt: Versuche es gleich noch einmal.",
+            "error": "Gladys konnte es nicht tun. Versuche es erneut."
+          },
+          "actions": {
+            "pair": "Gerät anlernen",
+            "start": "Starten",
+            "restart": "Neu starten",
+            "stop": "Stoppen",
+            "interface": "Zigbee2MQTT-Oberfläche",
+            "changeKey": "Ändern"
+          },
+          "facts": {
+            "driver": "Treiber",
+            "firmware": "Firmware",
+            "version": "Zigbee2MQTT",
+            "devices": "Geräte im Netzwerk",
+            "unknown": "—"
+          },
+          "external": {
+            "title": "MQTT-Broker"
+          },
+          "network": {
+            "title": "Netzwerk-Koordinator"
+          },
+          "confirmStop": {
+            "text": "Zigbee2MQTT stoppen? Deine Zigbee-Geräte reagieren nicht mehr, auch nach einem Neustart von Gladys, bis du es startest.",
+            "confirm": "Zigbee2MQTT stoppen",
+            "cancel": "Abbrechen"
+          },
+          "advanced": {
+            "title": "Erweiterte Einstellungen",
+            "interface": {
+              "title": "Zigbee2MQTT-Oberfläche",
+              "port": "Port",
+              "help": "Eine Änderung des Ports erstellt den Zigbee2MQTT-Container neu; seine Daten bleiben erhalten.",
+              "open": "Oberfläche öffnen"
+            },
+            "broker": {
+              "title": "Verbindung zum MQTT-Broker"
+            },
+            "components": {
+              "title": "Komponenten",
+              "gladys": "Gladys ↔ MQTT-Broker",
+              "broker": "MQTT-Broker",
+              "zigbee2mqtt": "Zigbee2MQTT",
+              "connected": "Verbunden",
+              "disconnected": "Getrennt",
+              "running": "Läuft",
+              "stopped": "Gestoppt",
+              "answers": "Antwortet",
+              "silent": "Antwortet nicht"
+            },
+            "reset": {
+              "title": "Integration zurücksetzen",
+              "text": "Entfernt die Container, die Konfiguration und das Zigbee-Netzwerk: Du musst alle deine Geräte neu anlernen."
+            }
+          }
         }
       },
       "device": {

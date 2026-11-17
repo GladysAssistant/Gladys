@@ -23,7 +23,8 @@ import PrefetchStatus from '../components/PrefetchStatus';
 import { findAdapter, getPortPath } from './adapters';
 import { STEP, PANE, KEY_SCENARIO, INSTALL_VIEW, NETWORK_ADAPTER_TYPES } from './constants';
 import { getPhases, getCurrentPhase } from './phases';
-import { DISCOVER_URL, getDriver, getStepNumber, getStepLabels, getSummary } from './WizardDesktop';
+import { DISCOVER_URL, getDriver, getStepNumber, getStepLabels, getSummary, getTitle } from './WizardDesktop';
+import { getInstallLabel, isCurrentPort } from './DesktopStepKey';
 import InstallFailure from './InstallFailure';
 import WaitingText from './WaitingText';
 import KeyPhoto from './KeyPhoto';
@@ -73,6 +74,11 @@ const KeyOne = ({ view, openOther }) => {
         <i class="fe fe-check" aria-hidden="true" />
         <Text id={view.justPlugged ? `${T}.mobile.justPlugged` : `${T}.mobile.recognized`} />
       </span>
+      {isCurrentPort(usbPort, view) && (
+        <span class="text-muted" data-cy="z2m-wizard-current-key">
+          <Text id={`${T}.change.current`} />
+        </span>
+      )}
       <OtherChoicesLink onClick={openOther} />
     </div>
   );
@@ -94,6 +100,7 @@ const KeySeveral = ({ view, actions, openOther }) => {
               tile={<KeyPhoto adapter={adapter} size={44} />}
               title={adapter ? adapter.displayName : usbPort.adapter}
               subtitle={[adapter && adapter.modelCode, usbPort.path].filter(Boolean).join(' · ')}
+              meta={isCurrentPort(usbPort, view) && <Text id={`${T}.change.current`} />}
               trailing={selected && <Selected />}
               chevron={false}
               aria-pressed={selected ? 'true' : 'false'}
@@ -525,7 +532,7 @@ class WizardMobile extends Component {
           onClick={actions.install}
           data-cy="z2m-wizard-install"
         >
-          <Text id={external ? `${T}.connect` : `${T}.install`} />
+          <Text id={getInstallLabel(view)} />
         </BigButton>
       ];
     }
@@ -628,11 +635,19 @@ class WizardMobile extends Component {
     return (
       <FocusPage>
         <div class={kitStyle.page} data-cy="z2m-wizard-mobile">
-          <MobileNavBar
-            title={<Text id={view.connectOnly ? `${T}.titleConnect` : `${T}.titleInstall`} />}
-            backHref={getBackToCatalogUrl()}
-            backLabel={<Text id="header.integrations" />}
-          />
+          {view.changeMode ? (
+            <MobileNavBar
+              title={<Text id={getTitle(view)} />}
+              onBack={actions.cancel}
+              backLabel={<Text id="integration.zigbee2mqtt.setupTab" />}
+            />
+          ) : (
+            <MobileNavBar
+              title={<Text id={getTitle(view)} />}
+              backHref={getBackToCatalogUrl()}
+              backLabel={<Text id="header.integrations" />}
+            />
+          )}
           <div
             class={cx(kitStyle.content, {
               [kitStyle.contentWithBottomBar]: buttons || error,
@@ -640,9 +655,16 @@ class WizardMobile extends Component {
             })}
             data-cy="z2m-wizard"
           >
-            <MobileSteps current={current} total={4} label={<Text id={`${T}.steps.${labels[current - 1]}`} />} />
+            {!view.changeMode && (
+              <MobileSteps current={current} total={4} label={<Text id={`${T}.steps.${labels[current - 1]}`} />} />
+            )}
             <div class={style.mobileStep}>
               {view.step === STEP.KEY && this.renderKey()}
+              {view.step === STEP.KEY && view.otherDriverFamily && (
+                <MobileNotice tone="warning" icon="alert-triangle" data-cy="z2m-wizard-other-family">
+                  <Text id={`${T}.change.otherFamily`} />
+                </MobileNotice>
+              )}
               {view.step === STEP.KEY && view.pane !== PANE.EXTERNAL && (
                 <PrefetchStatus configuration={view.configuration} zigbee2mqttStatus={view.zigbee2mqttStatus} />
               )}

@@ -2074,7 +2074,8 @@
           "titles": {
             "install": "Installing Zigbee2MQTT",
             "update": "Updating Zigbee2MQTT",
-            "switch": "Changing the Zigbee coordinator"
+            "switch": "Changing the Zigbee coordinator",
+            "start": "Starting Zigbee2MQTT"
           },
           "phases": {
             "pull_z2m": "Downloading Zigbee2MQTT",
@@ -2090,7 +2091,8 @@
           "success": {
             "install": "Zigbee2MQTT installed in {{duration}}.",
             "update": "Zigbee2MQTT updated in {{duration}}.",
-            "switch": "Zigbee coordinator changed in {{duration}}."
+            "switch": "Zigbee coordinator changed in {{duration}}.",
+            "start": "Zigbee2MQTT started in {{duration}}."
           },
           "errors": {
             "NO_ANSWER": "Zigbee2MQTT did not answer Gladys within 2 minutes of starting, without telling why. Check that the selected model is the one of your coordinator, unplug and plug your dongle back in or restart your network coordinator, then save the configuration again.",
@@ -2302,7 +2304,116 @@
             "showPhases": "Show the details",
             "back": "Back"
           },
+          "change": {
+            "title": "Change the Zigbee dongle",
+            "use": "Use this dongle",
+            "cancel": "Cancel",
+            "current": "Current dongle",
+            "otherFamily": "This dongle does not use the same driver as the current one: Zigbee2MQTT cannot take your network over on it, you will have to pair your devices again."
+          },
           "statusPending": "Gladys is starting its Zigbee2MQTT integration… If this lasts, check that the Zigbee2MQTT service is started in Settings › Services."
+        },
+        "dashboard": {
+          "states": {
+            "online": {
+              "title": "Zigbee network online",
+              "devices": {
+                "one": "1 device in the network",
+                "other": "{{count}} devices in the network"
+              }
+            },
+            "onlineExternal": {
+              "title": "Connected to your Zigbee2MQTT"
+            },
+            "stopped": {
+              "title": "Zigbee2MQTT is stopped",
+              "since": "Since {{date}} · it does not start again with Gladys."
+            },
+            "dongleMissing": {
+              "title": "Zigbee dongle unplugged",
+              "text": "Zigbee2MQTT starts again as soon as it is plugged back in, on any port."
+            },
+            "failed": {
+              "title": "Zigbee2MQTT does not start",
+              "text": "Your Zigbee devices do not respond until it starts."
+            },
+            "mqttError": {
+              "title": "Gladys is not connected to the MQTT broker",
+              "text": "Gladys no longer receives the messages of Zigbee2MQTT."
+            },
+            "starting": {
+              "title": "Zigbee2MQTT is starting…",
+              "text": "Gladys waits for its answer."
+            },
+            "notAnswering": {
+              "title": "Zigbee2MQTT does not answer",
+              "text": "Gladys gets no answer from Zigbee2MQTT: your Zigbee devices do not respond."
+            }
+          },
+          "newDevices": {
+            "one": "1 new device to add to Gladys",
+            "other": "{{count}} new devices to add to Gladys"
+          },
+          "pairAllowed": "<strong>Joining permitted for 4 minutes.</strong> Your devices will show up in the Discover tab.",
+          "updatePending": "An update of Zigbee2MQTT is waiting: its images could not be downloaded. It will run on the next start.",
+          "actionErrors": {
+            "busy": "An installation is running, or the integration is busy: try again in a moment.",
+            "error": "Gladys could not do it. Try again."
+          },
+          "actions": {
+            "pair": "Pair a device",
+            "start": "Start",
+            "restart": "Restart",
+            "stop": "Stop",
+            "interface": "Zigbee2MQTT interface",
+            "changeKey": "Change"
+          },
+          "facts": {
+            "driver": "Driver",
+            "firmware": "Firmware",
+            "version": "Zigbee2MQTT",
+            "devices": "Devices in the network",
+            "unknown": "—"
+          },
+          "external": {
+            "title": "MQTT broker"
+          },
+          "network": {
+            "title": "Network coordinator"
+          },
+          "confirmStop": {
+            "text": "Stop Zigbee2MQTT? Your Zigbee devices will no longer respond, even after a restart of Gladys, until you start it.",
+            "confirm": "Stop Zigbee2MQTT",
+            "cancel": "Cancel"
+          },
+          "advanced": {
+            "title": "Advanced settings",
+            "interface": {
+              "title": "Zigbee2MQTT interface",
+              "port": "Port",
+              "help": "Changing the port creates the Zigbee2MQTT container again; its data is kept.",
+              "open": "Open the interface"
+            },
+            "broker": {
+              "title": "Connection to the MQTT broker"
+            },
+            "components": {
+              "title": "Components",
+              "gladys": "Gladys ↔ MQTT broker",
+              "broker": "MQTT broker",
+              "zigbee2mqtt": "Zigbee2MQTT",
+              "connected": "Connected",
+              "disconnected": "Disconnected",
+              "running": "Running",
+              "stopped": "Stopped",
+              "answers": "Answers",
+              "silent": "Does not answer"
+            },
+            "reset": {
+              "title": "Reset the integration",
+              "text": "Removes the containers, the configuration and the Zigbee network: you will have to pair all your devices again."
+            }
+          }
         }
       },
       "device": {
