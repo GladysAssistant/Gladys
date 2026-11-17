@@ -86,6 +86,7 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.z2mPermitJoin = true;
     zigbee2MqttManager.coordinatorFirmware = '20240101';
     zigbee2MqttManager.z2mVersion = '2.14.2';
+    zigbee2MqttManager.configured = true;
     zigbee2MqttManager.deviceCount = 12;
     zigbee2MqttManager.z2mContainerError = { message: 'some error' };
     zigbee2MqttManager.mqttConnectionError = { code: 'BAD_CREDENTIALS', message: null };
@@ -145,6 +146,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
     expect(zigbee2MqttManager.coordinatorFirmware).to.equal(null);
     expect(zigbee2MqttManager.z2mVersion).to.equal(null);
+    expect(zigbee2MqttManager.configured).to.equal(false);
     expect(zigbee2MqttManager.deviceCount).to.equal(null);
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
     expect(zigbee2MqttManager.mqttConnectionError).to.equal(null);

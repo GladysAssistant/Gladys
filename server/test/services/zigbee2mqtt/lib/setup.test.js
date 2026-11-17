@@ -62,6 +62,8 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', 'tcpPort', serviceId);
 
     assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    // Set up as soon as saved, before the installation reads it again
+    expect(zigbee2MqttManager.configured).to.equal(true);
   });
 
   it('should store configuration for external broker', async () => {
@@ -89,6 +91,7 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
 
     assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    expect(zigbee2MqttManager.configured).to.equal(true);
   });
 
   it('should store network coordinator configuration, and reload Z2M containers', async () => {

@@ -179,6 +179,8 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
+    // Nothing set up yet: the pages tell that Zigbee2mqtt is not installed
+    expect(zigbee2mqttManager.configured).to.equal(false);
   });
 
   it('should not install containers, usb port not found', async () => {
@@ -197,6 +199,8 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
+    // Set up, its dongle unplugged
+    expect(zigbee2mqttManager.configured).to.equal(true);
   });
 
   it('should install containers, usb port is found', async () => {

@@ -1949,7 +1949,9 @@
         "notRunning": "Zigbee2mqtt no responde: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "mqttNotConnected": "Gladys no está conectada al broker MQTT: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "settingsPageLink": "la página de configuración del adaptador USB",
-        "setupPageLink": "la página de configuración de Zigbee2mqtt"
+        "setupPageLink": "la página de configuración de Zigbee2mqtt",
+        "notInstalled": "Zigbee2MQTT no está instalado: instálalo para añadir y controlar tus dispositivos Zigbee.",
+        "install": "Instalar Zigbee2MQTT"
       },
       "setup": {
         "title": "Configuración del servicio Zigbee2mqtt",

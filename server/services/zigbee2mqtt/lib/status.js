@@ -9,6 +9,7 @@ function status() {
   // whether Zigbee2mqtt answers (see isEnabled), so that a failing Zigbee2mqtt can still be turned off.
   const z2mEnabled = this.zigbee2mqttExist || this.mqttClient !== null;
   const zigbee2mqttStatus = {
+    configured: this.configured,
     usbConfigured: this.usbConfigured,
     dongleMissing: this.dongleMissing,
     networkAdapterConfigured: this.networkAdapterConfigured,

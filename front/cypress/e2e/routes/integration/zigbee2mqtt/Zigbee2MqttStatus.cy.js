@@ -25,7 +25,11 @@ describe('Zigbee2mqtt status', () => {
     // Each test visits its own page: the session stored in localStorage is cleared between tests
     cy.login();
     const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: {} });
+    // Configured: the setup page shows the installation, not the wizard
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` },
+      { body: { Z2M_MQTT_MODE: 'local', Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0' } }
+    );
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/discovered*` }, { body: [] });
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: false });
   });
@@ -42,6 +46,36 @@ describe('Zigbee2mqtt status', () => {
 
     cy.get('[data-cy=z2m-status-alert]').should('not.exist');
     cy.get('#permitJoin').should('not.be.disabled');
+  });
+
+  it('should tell that Zigbee2mqtt is not installed on the discover page, with the way to install it', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      {
+        body: {
+          ...notOnlineStatus,
+          configured: false,
+          usbConfigured: false,
+          mqttExist: false,
+          zigbee2mqttExist: false,
+          gladysConnected: false,
+          z2mEnabled: false
+        }
+      }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-not-installed]').should(
+      'contain',
+      Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.status.notInstalled')
+    );
+    cy.get('[data-cy=z2m-status-alert]').should('not.exist');
+    cy.get('[data-cy=z2m-status-not-installed] a').should(
+      'have.attr',
+      'href',
+      '/dashboard/integration/device/zigbee2mqtt/setup'
+    );
   });
 
   it('should show why Zigbee2mqtt does not start on the discover page', () => {

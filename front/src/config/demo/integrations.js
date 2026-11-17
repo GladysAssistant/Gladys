@@ -609,6 +609,7 @@ const integrations = {
     { label: 'ZigStar ZigiHAT PoE', configKey: 'zstack' }
   ],
   'get /api/v1/service/zigbee2mqtt/status': {
+    configured: true,
     usbConfigured: true,
     networkAdapterConfigured: false,
     mqttExist: true,
@@ -626,7 +627,9 @@ const integrations = {
       maintrel: 1,
       revision: 74100,
       type: 'EmberZNet'
-    }
+    },
+    z2mVersion: '2.14.2',
+    deviceCount: 12
   },
   'get /api/v1/service/nuki': {},
   'get /api/v1/service/nuki/config': {},

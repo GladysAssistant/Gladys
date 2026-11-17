@@ -27,10 +27,32 @@ class CheckStatus extends Component {
     );
   }
 
-  render({ gladysConnected, zigbee2mqttConnected, zigbee2mqttExist, z2mContainerError, mqttConnectionError }) {
+  render({
+    gladysConnected,
+    zigbee2mqttConnected,
+    zigbee2mqttExist,
+    z2mContainerError,
+    mqttConnectionError,
+    z2mConfigured
+  }) {
     // Same condition as the permit join switch: Zigbee2mqtt is usable only once it reported itself online
     if (gladysConnected && zigbee2mqttConnected) {
       return null;
+    }
+
+    // Nothing set up yet (no coordinator, no external broker): the setup page installs it. Unknown before the status
+    // is read, or from a server that does not tell it: the messages below
+    if (z2mConfigured === false) {
+      return (
+        <div class="alert alert-info d-flex flex-wrap align-items-center" data-cy="z2m-status-not-installed">
+          <span class="mr-3 mb-1">
+            <Text id="integration.zigbee2mqtt.status.notInstalled" />
+          </span>
+          <Link href="/dashboard/integration/device/zigbee2mqtt/setup" class="btn btn-primary btn-sm">
+            <Text id="integration.zigbee2mqtt.status.install" />
+          </Link>
+        </div>
+      );
     }
 
     const mqttError =
@@ -67,6 +89,6 @@ class CheckStatus extends Component {
 }
 
 export default connect(
-  'session,gladysConnected,zigbee2mqttConnected,zigbee2mqttExist,z2mContainerError,mqttConnectionError',
+  'session,gladysConnected,zigbee2mqttConnected,zigbee2mqttExist,z2mContainerError,mqttConnectionError,z2mConfigured',
   actions
 )(CheckStatus);

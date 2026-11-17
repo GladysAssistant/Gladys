@@ -2193,7 +2193,9 @@
         "notRunning": "Zigbee2MQTT antwortet nicht: Zigbee-Geräte können weder gekoppelt noch gesteuert werden. Mehr dazu auf der ",
         "mqttNotConnected": "Gladys ist nicht mit dem MQTT-Broker verbunden: Zigbee-Geräte können weder gekoppelt noch gesteuert werden. Mehr dazu auf der ",
         "settingsPageLink": "USB-Dongle-Einstellungen.",
-        "setupPageLink": "Einrichtungseite."
+        "setupPageLink": "Einrichtungseite.",
+        "notInstalled": "Zigbee2MQTT ist nicht installiert: Installiere es, um deine Zigbee-Geräte hinzuzufügen und zu steuern.",
+        "install": "Zigbee2MQTT installieren"
       },
       "setup": {
         "title": "Konfiguration des Zigbee2mqtt-Dienstes",

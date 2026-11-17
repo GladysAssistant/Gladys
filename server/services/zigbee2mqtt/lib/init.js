@@ -14,6 +14,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { findOwnContainer } = require('../../../utils/dockerContainers');
 const { formatDuration } = require('../utils/formatDuration');
 const { getDriverPathToStore, isOfConfiguredFamily } = require('./findDongle');
+const { isConfigured } = require('../utils/isConfigured');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -122,6 +123,7 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   // Load stored configuration
   const configuration = await this.getConfiguration();
   const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl, z2mAdapterMode, z2mNetworkAdapterUrl } = configuration;
+  this.configured = isConfigured(configuration);
 
   try {
     const dockerBased = await this.gladys.system.isDocker();

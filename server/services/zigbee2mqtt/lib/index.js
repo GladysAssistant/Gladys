@@ -78,6 +78,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
+  // A coordinator or an external broker is saved (see isConfigured)
+  this.configured = false;
   // The configured USB dongle was not found, at the start or since (see watchDongle)
   this.dongleMissing = false;
   // Check of the configured USB dongle, while Zigbee2mqtt does not answer (see watchDongle)

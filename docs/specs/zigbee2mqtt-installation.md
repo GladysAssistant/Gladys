@@ -3,12 +3,12 @@
 > **Living specification — source of truth.** This document specifies how Gladys installs and updates
 > the Zigbee2mqtt and MQTT broker containers: the `installation` and `prefetch` of the status, the
 > `zigbee2mqtt.install-progress` WebSocket message, the setup and prefetch routes and their 409, the
-> installation job, the image downloads, the update at start-up, and the USB dongle: its stable path,
-> its check on save and its watch (K). **Rule: any PR that changes one of these behaviors or contracts
-> modifies this file in the same diff.**
+> installation job, the image downloads, the update at start-up, the USB dongle: its stable path,
+> its check on save and its watch (K), and the setup wizard of a first installation (M). **Rule: any
+> PR that changes one of these behaviors or contracts modifies this file in the same diff.**
 >
-> Status: **implemented** (PR #3351; USB dongle, K: PR #3395). The setup wizard and the
-> Zigbee2mqtt dashboard of the next PRs build on sections B to F and K.
+> Status: **implemented** (PR #3351; USB dongle, K: PR #3395; setup wizard, M: PR C1). The
+> Zigbee2mqtt dashboard of the next PR builds on sections B to F, K and M.
 
 ## A. Context
 
@@ -184,7 +184,11 @@ installation. A job that fails to start fails the installation with its error. A
 
 ### E.3 For the wizard and the dashboard
 
-- **Status.** `z2mVersion` is the `version` of the last `bridge/info`, `deviceCount` the number of
+- **Status.** `configured` tells that a USB dongle or a network coordinator is saved, or the broker
+  of a Zigbee2mqtt that runs elsewhere (`utils/isConfigured.js`): set by init from the saved
+  configuration, by `POST /setup` once its variables are saved, false after `reset`; kept by
+  `disconnect` (a disabled installation is still configured). The other tabs tell from it that
+  Zigbee2mqtt is not installed (M.5). `z2mVersion` is the `version` of the last `bridge/info`, `deviceCount` the number of
   devices of the last `bridge/devices` (unsupported ones included, the coordinator excluded); `null`
   until Zigbee2mqtt tells them, and again after `disconnect` or `reset`. A change of `deviceCount`
   sends a status; `bridge/info` sends one anyway (coordinator firmware).
@@ -314,9 +318,10 @@ from its first line.
 - The logs of a replaced installation (another coordinator saved meanwhile) are ignored: they neither
   fail the running installation nor trigger an ezsp fallback.
 
-## J. Setup page (consumer)
+## J. Setup page of a configured installation (consumer)
 
-`front/src/routes/integration/all/zigbee2mqtt/setup-page/`, temporary on purpose (the wizard of the
+`front/src/routes/integration/all/zigbee2mqtt/setup-page/`, shown once a coordinator or an external
+broker is saved (with nothing configured, the wizard of M), temporary on purpose (the dashboard of the
 next PR replaces it):
 
 - `InstallationProgress.jsx`, while `running` or `failed`: title by kind, bar, current phase (the
@@ -335,7 +340,8 @@ next PR replaces it):
   once it ends; another 409, like a container of the user carrying our name, shows the generic
   error. These warnings go at the end of an installation, when the configuration is read again
   (port of the interface, generated accounts).
-- **Prefetch trigger.** `POST /prefetch` is sent on the first local-mode choice, a USB dongle
+- **Prefetch trigger** (since M, reached from the wizard only: the page of a configured installation
+  never prefetches). `POST /prefetch` is sent on the first local-mode choice, a USB dongle
   selected (a detected dongle that the page preselects counts) or a network coordinator URL entered,
   and only while nothing is configured yet, the server runs in Docker with the host network
   (`dockerBased`, `networkModeValid`) and no installation runs. The external broker mode never
@@ -467,4 +473,85 @@ and the container stays `exited`, even once the dongle is plugged back.
   update, the Zigbee network runs but Gladys does not receive its messages yet.
 - **A stop of Zigbee2mqtt that keeps the integration enabled** (dashboard PR): a clean stop, which the
   watch of the dongle leaves stopped (K.3); a stop remembered across a start of Gladys is to design.
-- The setup wizard and the dashboard: next PRs.
+- The dashboard (state, start / stop remembered, restart, change of dongle): next PR. Until then the
+  wizard ends on the page of J.
+
+## M. Setup wizard (first installation)
+
+`setup-page/wizard/` (findings A1 to A3, D1 and X7 of the audit; design `design-lot1.md` of the
+revamp). One container, two presentations (as `docs/specs/mobile-pages/README.md` B): `Wizard.jsx`
+holds the state, the requests and the decisions and builds one view; `WizardDesktop.jsx` and
+`WizardMobile.jsx` show it. Crossing the phone breakpoint keeps what was chosen.
+
+### M.1 When
+
+The page shows the wizard when its configuration, once loaded, has no USB dongle, no network
+coordinator and no external broker (`isConfigured`). The choice is made once (`wizard` in
+`setup-page/index.js`): the wizard saves the configuration on its second step and stays until the user
+leaves it ("Later", "Finish", "Finish without pairing"), for the page of J; a reset chooses the wizard
+again. A user who leaves the page during the installation comes back to the page of J, which shows the
+progress (B). Nothing of the wizard is remembered.
+
+### M.2 Steps
+
+Four steps: ① the dongle, ② the installation, ③ the network ready, ④ the first device (with an
+external broker: connection, check, network, first device).
+
+| Screen                | When                                                                                             | Way forward                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| One dongle recognized | one port with a recognized `adapter` (`GET /usb/port`)                                           | Install                                                                                                  |
+| Several               | two or more recognized                                                                           | Install, once one is chosen (none preselected)                                                           |
+| Not recognized        | USB devices (`pnpId`), none recognized: the only one is preselected                              | Install, once a model is chosen                                                                          |
+| No dongle             | no USB device; ports listed again every 3 s, a dongle plugged in shows up with "just plugged in" | —                                                                                                        |
+| By hand               | port (USB devices, every serial port on demand) and model, started from the detected dongle      | Install                                                                                                  |
+| Network coordinator   | URL, and the type by chip: `ember`, `zstack`, `deconz`                                           | Install                                                                                                  |
+| External Zigbee2mqtt  | broker URL, user, password, interface URL (optional)                                             | Connect                                                                                                  |
+| Not installable       | `dockerBased` or `networkModeValid` false                                                        | Use my Zigbee2mqtt (external) only                                                                       |
+| ② running             | the installation of the status, phases of B.2 (external broker: `connect_adapter` only)          | —                                                                                                        |
+| ② failed              | a short title by error code (B.4), the message, the raw message folded                           | Retry (same configuration) · Change the dongle or model (back to ①, by hand, with what was chosen)       |
+| ③ ready               | the installation `done`, or Zigbee2mqtt answering (Gladys connected, with an external broker)    | Pair my first device · Later                                                                             |
+| ④ first device        | three tips                                                                                       | Permit joining (`POST /permit_join` with `{ value: true }`, never toggled), then Go to Discover · Finish |
+
+- **Models** (0.3b): the list of `GET /adapter` (E.3) without the `(legacy ezsp)` ones, grouped by
+  brand, each by its commercial name, model code and photo (zigbee2mqtt.io, an icon without
+  Internet). The search matches the whole text in one of its names or aliases ("sonoff e",
+  "dongle-e"), or else each of its words.
+- **Install** saves the configuration (`POST /setup`, the USB dongle by its `stablePath`, no port of
+  the interface: the installation chooses it). Refused (400 `DONGLE_NOT_FOUND`, 409 busy, another 400):
+  the wizard stays on ①, says why, nothing is saved.
+- **The previous installation.** Until a new installation shows up in the status, the one it holds
+  is the previous one (a failure, before Retry or a change of dongle): the wizard compares the status
+  with the installation it saw when Install was clicked, and shows ② starting meanwhile. An ended
+  installation never comes back the same (its `durationMs` differs).
+- **Prefetch** (C, J): asked once a coordinator is chosen (a dongle Gladys preselects counts, a
+  network URL entered), never for an external broker nor before the server tells that it can install
+  (`dockerBased`, `networkModeValid`); its progress and the disk space warning show above Install,
+  which stays enabled.
+- ③ sums up the driver (the `configKey` of the saved model, `ezsp` after a fallback, with a notice),
+  the coordinator firmware (`coordinatorFirmware.revision`) and the duration; with an external
+  broker, the broker, `z2mVersion` and `deviceCount`.
+
+### M.3 On a phone
+
+A focus page (mobile-pages C.1): its navigation bar back to the integrations, "Step 1 of 4" above a
+segmented bar, one decision per screen, the way forward in the bottom bar (two actions one above the
+other after ①; none while waiting for a dongle or while the installation runs), where a refused setup
+or a refused joining is told, with a close button. The detected dongle shows in large; the other
+choices (by hand, network coordinator, existing Zigbee2mqtt) open in a sheet, so does the port of a
+dongle chosen by hand; the models are rows with photos, without a scroll area of their own; "Back"
+in the bottom bar returns to the detected dongle. The installation turns a ring around the dongle,
+its phases folded under it. No leave guard: nothing is lost, the installation goes on without the page.
+
+### M.4 Not installed, elsewhere
+
+The Devices and Discover tabs tell "Zigbee2mqtt is not installed" with a button to the setup tab when
+the status says `configured: false` (E.3), instead of the messages of a Zigbee2mqtt that does not
+answer.
+
+### M.5 Tests
+
+Cypress, `front/cypress/e2e/routes/integration/zigbee2mqtt/setup/`: `Zigbee2MqttWizard.cy.js` (every
+screen of M.2, the payloads, the previous installation hidden on Retry, the refusals, the ezsp
+fallback, the downloads in the background) and `Zigbee2MqttWizardMobile.cy.js` (`iphone-x`: the focus
+page, the bottom bar, the sheets, the breakpoint crossed), fixtures in `wizardFixtures.js`;
+`Zigbee2MqttStatus.cy.js` for the not-installed banner.

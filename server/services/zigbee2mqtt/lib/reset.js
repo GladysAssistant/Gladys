@@ -48,6 +48,7 @@ async function resetIntegration() {
   this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
+  this.configured = false;
   this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
