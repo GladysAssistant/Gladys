@@ -44,7 +44,11 @@ The shared components are in `front/src/components/integration/mobile/`:
   integration whose devices are created in a page of their own.
 - `MobileListToolbar`: the **search** (16 px) and the **sort order as one button** that flips it
   ("A - Z" / "Z - A"), then the actions of the list (`ToolButton`, 44 px). They call the handlers
-  of the desktop header with the same event: a phone list has no request of its own.
+  of the desktop header with the same event: a phone list has no request of its own. The search
+  field shows the query the list is filtered on, like the desktop one. Where that query is a
+  debounced state (the discovery of an external integration) the field is not controlled — it
+  would take back the letters typed since the last update — and only starts from the query still
+  applied when it mounts again (`initialSearchValue`).
 - `MobileDeviceItem`: the row of a device and its sheet (C and D).
 - `MobileListLoader`, `MobileWaitingNotice`, `MobileTextNotice`, `MobileProgress`, `BatteryPill`:
   the spinner of a list, a notice that waits (a scan running), a long explanation of the desktop
@@ -56,7 +60,15 @@ state and its handlers and renders a `MobileDeviceItem` instead of its card when
 `isMobile`. Nothing is requested, validated or posted differently. The only changes to that logic
 are what the sheet needs to tell how a request ended and to undo a change:
 
-- the handlers that save, add or delete **resolve to `false` when the request failed**;
+- the handlers that save, add or delete **resolve to `false` when the request failed** — and
+  when nothing was requested: a discovered device that a live update removed from the list
+  between the render and the tap is not added (external integrations return `false`; the MQTT
+  action, which cannot return a value, throws);
+- a deletion refused because the device has too many states is told apart from any other error
+  by every card (Enedis and the external integrations did not), so the confirmation can explain
+  it;
+- replacing a Matter device works on a copy of the paired device: a replacement that fails
+  leaves its row as it was published, not under the name and the ids of the existing device;
 - a handler that changes a field of a device kept in the state of a component builds it **from
   the previous state** (two changes in a row must not overwrite each other);
 - the Matter and Airplay cards keep what is being typed when their parent merely renders again
@@ -111,7 +123,9 @@ From top to bottom:
    - **Edit**, when the integration has an edit page for the device (Bluetooth, MQTT,
      Thermostat).
    - **Delete**, always last.
-   - A button shows a spinner while its request runs, and the other ones are disabled meanwhile.
+   - A button shows a spinner while its request runs, and the other ones are disabled meanwhile
+     — **and so are the fields of the sheet** (name, room, switches): what would be typed after
+     "Save" is not in the request, and would be taken for saved the next time the sheet opens.
 
 **A failure stays where the thumb is**: the sheet stays open and the error shows right above the
 buttons — the sentence of the desktop card when it has one (with its technical detail for Matter
@@ -120,9 +134,11 @@ Bluetooth, LAN Manager and Enedis cards never said that a save had failed).
 
 **Nothing is deleted on a single tap.** "Delete" opens a confirmation sheet naming the device and
 what goes with it (its history; the scenes and the dashboards that use it). Confirming calls the
-handler of the card; a refusal (too many states to delete at once, an error) shows in the
-confirmation, which stays open. A success closes everything and shows "Device deleted". On a wider
-screen the cards keep what they did.
+handler of the card; a refusal shows in the confirmation, which stays open. **A device with too
+many states to delete at once says so** — Gladys purges them in the background, with the link to
+that job — rather than "Try again", which would be refused again; this holds for every
+integration of A. A success closes everything and shows "Device deleted". On a wider screen the
+cards keep what they did.
 
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
 a wider screen. Closing a "Devices" sheet with unsaved changes — by any of the four ways, the
@@ -185,8 +201,10 @@ Only what differs from B, C and D.
 
 ### Enedis — "My meters"
 
-- "Synchronise with Gladys Plus" is the button of the page. One row per meter: its name, its
-  meter id, and "Synchronisation in progress… 42%" while Gladys Plus refreshes it.
+- "Synchronise with Gladys Plus" is the button of the page; its spinner is for the
+  synchronization only (it is disabled, not spinning, while a meter is saved or deleted). One row
+  per meter: its name, its meter id, and "Synchronisation in progress… 42%" while Gladys Plus
+  refreshes it.
 - The sheet: the name, the progress of the synchronization and its explanation, the meter id, the
   last synchronization and the number of states, then "Save", "Update" (a meter that misses its
   features) and "Delete" — confirmed on a phone.
@@ -229,8 +247,10 @@ other layout: an unsaved change there does not survive the swap.
   the rows in place of the cards and the 16 px fields; a device renamed from its sheet, the saved
   payload and the toast; the question asked when a sheet is closed with unsaved changes (keep
   editing, close without saving) and through the system "back"; a deletion confirmed, and
-  cancelled; a refused deletion explained in the confirmation; the search and the sort order sent
-  to the server; a discovered device added; the pairing form; the cards kept on a wider screen.
+  cancelled; a refused deletion explained in the confirmation (Matter, Enedis, external
+  integrations); the fields disabled while a save runs; a failed Matter replacement leaving its
+  row untouched; the search and the sort order sent to the server; a discovered device added; the
+  pairing form; the cards kept on a wider screen.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.

@@ -7,8 +7,9 @@ import { route } from 'preact-router';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 import update from 'immutability-helper';
 
 dayjs.extend(relativeTime);
@@ -44,6 +45,7 @@ const UsagePointDevice = ({
   destroyDevice,
   reCreateUsagePointDevice,
   syncs = [],
+  tooMuchStatesError,
   isMobile
 }) => {
   const usagePointId = device.external_id.split(':')[1];
@@ -116,6 +118,11 @@ const UsagePointDevice = ({
             : []
         }
         onDelete={() => destroyDevice(deviceIndex)}
+        deleteError={
+          tooMuchStatesError && tooMuchStatesError.selector === device.selector ? (
+            <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: tooMuchStatesError.statesNumber }} />
+          ) : null
+        }
         dataCy="enedis-usage-point-row"
       >
         {syncInProgress && (
@@ -259,6 +266,8 @@ const UsagePointDevice = ({
 const MobileEnedisUsagePoints = ({
   errored,
   loading,
+  syncing,
+  tooMuchStatesError,
   usagePointsDevices,
   language,
   updateDeviceName,
@@ -278,7 +287,16 @@ const MobileEnedisUsagePoints = ({
       )}
       {devices.length > 0 && (
         <div class={integrationMobileStyle.block}>
-          <BigButton variant="primary" icon="refresh-cw" onClick={sync} loading={loading} data-cy="enedis-sync">
+          {/* its spinner is for the synchronization only: `loading` also covers a meter being
+              saved or deleted, which the sheet of that meter shows */}
+          <BigButton
+            variant="primary"
+            icon="refresh-cw"
+            onClick={sync}
+            loading={syncing}
+            disabled={loading}
+            data-cy="enedis-sync"
+          >
             <Text id="integration.enedis.usagePoints.refreshLocal" />
           </BigButton>
         </div>
@@ -300,6 +318,7 @@ const MobileEnedisUsagePoints = ({
                   destroyDevice={destroyDevice}
                   reCreateUsagePointDevice={reCreateUsagePointDevice}
                   syncs={syncs}
+                  tooMuchStatesError={tooMuchStatesError}
                 />
               ))}
             </MobileGroup>
@@ -455,14 +474,14 @@ class EnedisWelcomePageComponent extends Component {
     }
   };
   sync = async () => {
-    await this.setState({ loading: true });
+    await this.setState({ loading: true, syncing: true });
     try {
       await this.props.httpClient.post('/api/v1/service/enedis/sync');
       route('/dashboard/settings/jobs');
     } catch (e) {
       console.error(e);
     }
-    await this.setState({ loading: false });
+    await this.setState({ loading: false, syncing: false });
   };
   // saveDevice and destroyDevice resolve to false when the request failed: the phone sheet then
   // says so (the card has no error message for them)
@@ -480,16 +499,25 @@ class EnedisWelcomePageComponent extends Component {
     return saved;
   };
   destroyDevice = async deviceIndex => {
-    await this.setState({ loading: true });
+    await this.setState({ loading: true, tooMuchStatesError: null });
     let deleted = true;
+    const device = this.state.usagePointsDevices[deviceIndex];
     try {
-      const device = this.state.usagePointsDevices[deviceIndex];
       await this.props.httpClient.delete(`/api/v1/device/${device.selector}`);
       await this.getCurrentEnedisUsagePoints();
       await this.getCurrentSync();
     } catch (e) {
       console.error(e);
       deleted = false;
+      // A meter holds years of states: too many to delete at once, Gladys purges them in the
+      // background and trying again right away is refused again. The phone confirmation says
+      // so, with the link to the job.
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        await this.setState({ tooMuchStatesError: { selector: device.selector, statesNumber } });
+      }
     }
     await this.setState({ loading: false });
     return deleted;
@@ -524,12 +552,14 @@ class EnedisWelcomePageComponent extends Component {
   componentWillUnmount() {
     clearInterval(this.refreshInterval);
   }
-  render({ user, isMobile }, { loading, errored, usagePointsDevices, syncs }) {
+  render({ user, isMobile }, { loading, syncing, tooMuchStatesError, errored, usagePointsDevices, syncs }) {
     const UsagePointsView = isMobile ? MobileEnedisUsagePoints : EnedisUsagePoints;
     return (
       <EnedisPage user={this.props.user}>
         <UsagePointsView
           loading={loading}
+          syncing={Boolean(syncing)}
+          tooMuchStatesError={tooMuchStatesError}
           errored={errored}
           usagePointsDevices={usagePointsDevices}
           sync={this.sync}

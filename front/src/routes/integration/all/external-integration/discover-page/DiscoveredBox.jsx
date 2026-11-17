@@ -18,7 +18,8 @@ class DiscoveredBox extends Component {
     this.setState({ loading: true, errorMessage: null, errorDetail: null, validationErrors: [], isKnownError: true });
     let created = true;
     try {
-      await this.props.createDevice(this.props.device.external_id);
+      // false: the device is gone from the list, nothing was posted
+      created = (await this.props.createDevice(this.props.device.external_id)) !== false;
     } catch (e) {
       console.error(e);
       this.setState(getDiscoveredDeviceCreateError(e));

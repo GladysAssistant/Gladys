@@ -247,6 +247,54 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=integration-mobile-sort]').i18n('global.orderDirDesc');
     });
 
+    it('should not let the sheet be edited while its save runs', () => {
+      cy.intercept({ method: 'POST', url: api('/device') }, req => {
+        req.reply({ delay: 1500, body: { ...req.body } });
+      }).as('saveDevice');
+      openPlug();
+      cy.get('[data-cy=integration-device-name]').type(' saved');
+      cy.get('[data-cy=integration-device-save]').click();
+      // what would be typed now is not in the request
+      cy.get('[data-cy=integration-device-fields]').should('be.disabled');
+      cy.get('[data-cy=integration-device-name]').should('be.disabled');
+      cy.get('[data-cy=integration-device-room]').should('be.disabled');
+      cy.wait('@saveDevice').then(({ request }) => {
+        expect(request.body.name).to.equal('Desk plug saved');
+      });
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+    });
+
+    it('should leave a paired device as it was published when its replacement fails', () => {
+      // the same appliance as the plug, paired again under another node
+      const repaired = {
+        name: 'Eve Energy',
+        selector: 'matter-4321-1',
+        external_id: 'matter:4321:1',
+        features: [feature('matter:4321:1', 'Plug', 'switch', 'binary', { read_only: false, max: 1 })],
+        params: [{ name: 'UNIQUE_ID', value: 'A1B2C3D4E5F6' }]
+      };
+      cy.intercept({ method: 'GET', url: api('/service/matter/paired-device') }, [repaired]).as('getPaired');
+      cy.intercept({ method: 'POST', url: api('/device') }, { statusCode: 500, body: { status: 500 } }).as(
+        'saveDevice'
+      );
+      cy.visit(DEVICES_URL);
+      cy.wait('@getPaired');
+      cy.contains('[data-cy=matter-paired-device-row]', 'Eve Energy').click();
+      cy.get('[data-cy=integration-device-primary]')
+        .i18n('integration.matter.device.replaceExisting')
+        .click();
+      cy.wait('@saveDevice').then(({ request }) => {
+        // the request takes over the existing device…
+        expect(request.body.id).to.equal('cy-matter-plug');
+        expect(request.body.name).to.equal('Desk plug');
+        expect(request.body.external_id).to.equal('matter:4321:1');
+      });
+      // …and the row keeps what the appliance published
+      cy.get('[data-cy=integration-device-error]').should('be.visible');
+      cy.get('[data-cy=integration-device-sheet]').should('have.attr', 'aria-label', 'Eve Energy');
+      cy.get('[data-cy=matter-paired-device-row]').should('contain', 'Eve Energy');
+    });
+
     it('should add a paired device from its sheet', () => {
       stubSave();
       cy.visit(DEVICES_URL);
@@ -482,6 +530,25 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=integration-mobile-toast]').i18n('mobileKit.saved');
     });
 
+    it('should explain why a device with too many states is not deleted', () => {
+      cy.intercept(
+        { method: 'DELETE', url: api('/device/ext-cy-mobile-garage-plug') },
+        { statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } }
+      ).as('deleteDevice');
+      cy.visit(`/dashboard/integration/device/external/${SELECTOR}`);
+      cy.wait('@getDevices');
+      cy.get('[data-cy=external-device-row]').click();
+      cy.get('[data-cy=integration-device-delete]').click();
+      cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@deleteDevice');
+      // not "Try again": the states are purged in the background, and the job is one tap away
+      cy.get('[data-cy=integration-device-delete-error]')
+        .should('be.visible')
+        .find('a[href="/dashboard/settings/jobs"]')
+        .should('exist');
+      cy.get('[data-cy=external-device-row]').should('have.length', 1);
+    });
+
     it('should add a discovered device, and not the one already added', () => {
       stubSave();
       cy.visit(`/dashboard/integration/device/external/${SELECTOR}/discover`);
@@ -546,6 +613,47 @@ describe('Integration devices on a phone', () => {
         'equal',
         '/dashboard/integration/device/thermostat/edit/thermostat-cy-living-room'
       );
+    });
+  });
+
+  describe('Enedis', () => {
+    const meter = {
+      id: 'cy-enedis-meter',
+      name: 'Enedis 16401220101758',
+      selector: 'enedis-16401220101758',
+      external_id: 'enedis:16401220101758',
+      created_at: '2026-01-01T00:00:00.000Z',
+      features: [
+        feature('enedis:16401220101758', 'Daily consumption', 'energy-sensor', 'daily-consumption', {
+          unit: 'watt-hour'
+        })
+      ],
+      params: [{ name: 'NUMBER_OF_STATES', value: '17520' }]
+    };
+
+    it('should list the meters as rows and explain why one with too many states is not deleted', () => {
+      cy.intercept({ method: 'GET', url: api('/service/enedis/device') }, [meter]).as('getMeters');
+      cy.intercept(
+        { method: 'DELETE', url: api('/device/enedis-16401220101758') },
+        { statusCode: 400, body: { status: 400, message: '17520 states in DB. Too much states!' } }
+      ).as('deleteDevice');
+      cy.visit('/dashboard/integration/device/enedis/usage-points');
+      cy.wait('@getMeters');
+      cy.get('[data-cy=enedis-usage-points-mobile]').should('exist');
+      cy.get('[data-cy=enedis-usage-point-row]')
+        .should('have.length', 1)
+        .and('contain', '16401220101758')
+        .click();
+      cy.get('[data-cy=integration-device-details]').should('contain', '17520');
+      cy.get('[data-cy=integration-device-delete]').click();
+      cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@deleteDevice');
+      cy.get('[data-cy=integration-device-delete-error]')
+        .should('be.visible')
+        .find('a[href="/dashboard/settings/jobs"]')
+        .should('exist');
+      // the button of the page is not the one that was working
+      cy.get('[data-cy=enedis-sync]').should('not.be.disabled');
     });
   });
 

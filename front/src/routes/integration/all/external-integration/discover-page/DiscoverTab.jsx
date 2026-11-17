@@ -81,6 +81,9 @@ const DiscoverTab = ({
         {all.length > 0 && (
           <MobileListToolbar
             onSearch={searchDevices}
+            // the search is debounced: the field is not controlled, it only starts from the query
+            // still applied to the list when it mounts again
+            initialSearchValue={deviceSearch}
             searchPlaceholderId="integration.externalIntegration.discover.searchPlaceholder"
           />
         )}

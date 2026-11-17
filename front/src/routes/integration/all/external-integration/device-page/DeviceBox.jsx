@@ -82,7 +82,7 @@ class DeviceBox extends Component {
   };
 
   deleteDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
     let deleted = true;
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
@@ -90,6 +90,15 @@ class DeviceBox extends Component {
     } catch (e) {
       console.error(e);
       this.setState({ deleteError: RequestStatus.Error });
+      // Too many states to delete at once: Gladys purges them in the background, and trying
+      // again right away is refused again. The phone confirmation says so, with the link to the
+      // job, as the cards of the native integrations do (this card keeps its generic alert).
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      }
       deleted = false;
     }
     this.setState({ loading: false });
@@ -111,10 +120,16 @@ class DeviceBox extends Component {
   // sheet, a touch screen has no tooltip.
   renderMobile(
     { device, houses = [], language, intl },
-    { saveError, deleteError },
+    { saveError, deleteError, tooMuchStatesError, statesNumber },
     historizableFeatures,
     batteryLevel
   ) {
+    let deleteErrorMessage = null;
+    if (tooMuchStatesError) {
+      deleteErrorMessage = <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />;
+    } else if (deleteError) {
+      deleteErrorMessage = <Text id="integration.externalIntegration.device.deleteError" />;
+    }
     const transport = getDeviceTransport(device);
     const degraded = isDeviceTransportDegraded(device);
     const transportTone = TRANSPORT_TONES[transport];
@@ -171,7 +186,7 @@ class DeviceBox extends Component {
         onSave={this.saveDevice}
         saveError={saveError && <Text id="integration.externalIntegration.device.saveError" />}
         onDelete={this.deleteDevice}
-        deleteError={deleteError && <Text id="integration.externalIntegration.device.deleteError" />}
+        deleteError={deleteErrorMessage}
         dataCy="external-device-row"
       >
         {historizableFeatures.length > 0 && (

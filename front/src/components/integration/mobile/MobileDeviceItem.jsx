@@ -280,48 +280,53 @@ class MobileDeviceItem extends Component {
       <div>
         {sheetPills && <div class={style.sheetPills}>{sheetPills}</div>}
         {notices}
-        {onNameChange && (
-          <MobileField label={<Text id="editDeviceForm.nameLabel" />} htmlFor={`${this.fieldId}-name`}>
-            <Localizer>
-              <input
-                id={`${this.fieldId}-name`}
-                type="text"
-                class={cx(fieldClass.input, { [fieldClass.invalid]: nameInvalid })}
-                value={device.name}
-                onInput={onNameChange}
-                placeholder={<Text id={namePlaceholderId} />}
+        {/* Nothing is edited while a request runs: what is typed after "Save" would not be in
+            the request, and would be taken for saved when the sheet opens again. The fieldset
+            covers what the integration adds to the sheet too (its switches). */}
+        <fieldset class={style.sheetFields} disabled={Boolean(busy)} data-cy="integration-device-fields">
+          {onNameChange && (
+            <MobileField label={<Text id="editDeviceForm.nameLabel" />} htmlFor={`${this.fieldId}-name`}>
+              <Localizer>
+                <input
+                  id={`${this.fieldId}-name`}
+                  type="text"
+                  class={cx(fieldClass.input, { [fieldClass.invalid]: nameInvalid })}
+                  value={device.name}
+                  onInput={onNameChange}
+                  placeholder={<Text id={namePlaceholderId} />}
+                  disabled={fieldsDisabled}
+                  autocomplete="off"
+                  autocapitalize="sentences"
+                  enterkeyhint="done"
+                  data-cy="integration-device-name"
+                />
+              </Localizer>
+            </MobileField>
+          )}
+          {onRoomChange && houses && (
+            <MobileField label={<Text id="editDeviceForm.roomLabel" />} htmlFor={`${this.fieldId}-room`}>
+              <select
+                id={`${this.fieldId}-room`}
+                class={fieldClass.select}
+                onChange={onRoomChange}
                 disabled={fieldsDisabled}
-                autocomplete="off"
-                autocapitalize="sentences"
-                enterkeyhint="done"
-                data-cy="integration-device-name"
-              />
-            </Localizer>
-          </MobileField>
-        )}
-        {onRoomChange && houses && (
-          <MobileField label={<Text id="editDeviceForm.roomLabel" />} htmlFor={`${this.fieldId}-room`}>
-            <select
-              id={`${this.fieldId}-room`}
-              class={fieldClass.select}
-              onChange={onRoomChange}
-              disabled={fieldsDisabled}
-              data-cy="integration-device-room"
-            >
-              <option value="">{get(intl.dictionary, 'device.noRoom')}</option>
-              {houses.map(house => (
-                <optgroup label={house.name}>
-                  {(house.rooms || []).map(room => (
-                    <option selected={room.id === device.room_id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </MobileField>
-        )}
-        {children}
+                data-cy="integration-device-room"
+              >
+                <option value="">{get(intl.dictionary, 'device.noRoom')}</option>
+                {houses.map(house => (
+                  <optgroup label={house.name}>
+                    {(house.rooms || []).map(room => (
+                      <option selected={room.id === device.room_id} value={room.id}>
+                        {room.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </MobileField>
+          )}
+          {children}
+        </fieldset>
         {showFeatures && (
           <div class={cx(style.sheetSection, style.features)} data-cy="integration-device-features">
             <div class={style.sheetLabel}>

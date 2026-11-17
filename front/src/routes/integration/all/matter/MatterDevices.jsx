@@ -283,16 +283,21 @@ class MatterDevices extends Component {
       const newExternalId = device.external_id;
       const oldExternalId = gladysDevice.external_id;
 
+      // On a copy: the paired device of the list stays as it was published until the list is
+      // loaded again. A replacement that fails must not leave its card (or its phone row, whose
+      // sheet stays open on a failure) under the name and the ids of the existing device.
+      const deviceToSave = { ...device, features: device.features.map(f => ({ ...f })) };
+
       // Put back all the attributes of the previous device
-      device.id = gladysDevice.id;
-      device.selector = gladysDevice.selector;
-      device.name = gladysDevice.name;
-      device.room = gladysDevice.room;
+      deviceToSave.id = gladysDevice.id;
+      deviceToSave.selector = gladysDevice.selector;
+      deviceToSave.name = gladysDevice.name;
+      deviceToSave.room = gladysDevice.room;
 
       // the energy features derived by the server point to the ids of the paired features:
       // their parents follow the ids taken over from the existing device
       const replacedFeatureIds = new Map();
-      device.features = device.features.map(f => {
+      deviceToSave.features = deviceToSave.features.map(f => {
         // try to find match feature to replace the external_id
         const gladysFeature = gladysDevice.features.find(gladysF => {
           return gladysF.external_id.replace(oldExternalId, newExternalId) === f.external_id;
@@ -310,12 +315,12 @@ class MatterDevices extends Component {
         }
         return f;
       });
-      device.features.forEach(f => {
+      deviceToSave.features.forEach(f => {
         if (f.energy_parent_id && replacedFeatureIds.has(f.energy_parent_id)) {
           f.energy_parent_id = replacedFeatureIds.get(f.energy_parent_id);
         }
       });
-      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       await this.getMatterDevices();
       await this.getPairedDevices();
       return true;

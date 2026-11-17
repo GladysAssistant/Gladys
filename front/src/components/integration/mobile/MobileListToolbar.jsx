@@ -1,4 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
+import { useEffect, useRef } from 'preact/hooks';
 import cx from 'classnames';
 
 import { kitStyle } from '../../mobile';
@@ -34,6 +35,44 @@ const ToolButton = ({ icon, label, iconOnly, spinning, ...props }) => (
 );
 
 /**
+ * @description The search field of the toolbar. `value` controls it, as the desktop header does.
+ * A list that filters on a debounced state gives `initialValue` instead: the field is left to
+ * the user (a controlled field would take back the letters typed since the last update on any
+ * render in between), and shows the query still applied to the list when it mounts again — the
+ * window crossed the breakpoint and came back.
+ */
+const SearchField = ({ value, initialValue, onSearch, placeholderId }) => {
+  const input = useRef(null);
+  useEffect(() => {
+    if (value === undefined && initialValue && input.current) {
+      input.current.value = initialValue;
+    }
+    // at mount only: afterwards the field belongs to the user
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <label class={kitStyle.search}>
+      <i class="fe fe-search" aria-hidden="true" />
+      <Localizer>
+        <input
+          ref={input}
+          type="search"
+          class={kitStyle.searchInput}
+          value={value}
+          onInput={onSearch}
+          placeholder={<Text id={placeholderId} />}
+          aria-label={<Text id={placeholderId} />}
+          autocomplete="off"
+          autocapitalize="off"
+          enterkeyhint="search"
+          data-cy="integration-mobile-search"
+        />
+      </Localizer>
+    </label>
+  );
+};
+
+/**
  * @description The toolbar above a list of devices on a phone
  * (docs/specs/mobile-pages/integration-devices.md, B): the search (16px, so iOS does not zoom
  * into it), the sort order as one button that flips it, then the actions of the list.
@@ -43,6 +82,7 @@ const ToolButton = ({ icon, label, iconOnly, spinning, ...props }) => (
  */
 const MobileListToolbar = ({
   searchValue,
+  initialSearchValue,
   onSearch,
   searchPlaceholderId = 'device.searchPlaceHolder',
   orderDir = 'asc',
@@ -51,23 +91,12 @@ const MobileListToolbar = ({
 }) => (
   <div class={style.toolbar}>
     {onSearch && (
-      <label class={kitStyle.search}>
-        <i class="fe fe-search" aria-hidden="true" />
-        <Localizer>
-          <input
-            type="search"
-            class={kitStyle.searchInput}
-            value={searchValue}
-            onInput={onSearch}
-            placeholder={<Text id={searchPlaceholderId} />}
-            aria-label={<Text id={searchPlaceholderId} />}
-            autocomplete="off"
-            autocapitalize="off"
-            enterkeyhint="search"
-            data-cy="integration-mobile-search"
-          />
-        </Localizer>
-      </label>
+      <SearchField
+        value={searchValue}
+        initialValue={initialSearchValue}
+        onSearch={onSearch}
+        placeholderId={searchPlaceholderId}
+      />
     )}
     {onOrderChange && (
       <button

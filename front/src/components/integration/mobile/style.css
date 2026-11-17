@@ -142,6 +142,14 @@ a.fabLink:focus {
   margin: 0 0 16px;
 }
 
+/* the fields of a sheet, disabled as a whole while a request runs: a fieldset with no look */
+.sheetFields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
 .sheetLabel {
   margin: 0 4px 6px;
   font-size: 0.875rem;
