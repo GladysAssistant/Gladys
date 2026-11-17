@@ -191,25 +191,6 @@
    Light colors only: dark mode is the app-wide inversion.
    ================================================================== */
 
-/* the brand in the navigation bar */
-.mobileBrand {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.mobileBrand img {
-  width: 26px;
-  height: 26px;
-}
-
-/* a field made of two parts (a password and its reveal button) that the validation refused */
-.mobileGroupInvalid,
-.mobileGroupInvalid:focus-within {
-  border-color: #c23434;
-  box-shadow: 0 0 0 3px rgba(194, 52, 52, 0.14);
-}
-
 /* the segments of a choice are as tall as any other target of the step */
 .mobileSegmented [role='group'] > button {
   min-height: 44px;
@@ -254,27 +235,6 @@
   color: #1c2334;
 }
 
-/* the Gladys Plus sign-in form in the restore path: the fields and the buttons of a phone */
-.mobileRestore :global(.card-body.p-6) {
-  padding: 1.25rem !important;
-}
-
-.mobileRestore :global(.form-control) {
-  min-height: 48px;
-  font-size: 16px;
-}
-
-.mobileRestore :global(.btn) {
-  min-height: 48px;
-}
-
-/* "I forgot my password": a line of text, but a target of its own under the button */
-.mobileRestore :global(a.float-right) {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-}
-
 .mobileActions {
   margin-top: 16px;
 }
@@ -287,4 +247,15 @@
   display: flex;
   justify-content: center;
   padding: 2.5rem 0;
+}
+
+/* on the Horizon wallpaper the panels of the last step are glass, like the cards of the other
+   steps (kit.css, "Glass variant") */
+:global(.gladys-mobile-glass) .mobileFeature {
+  background: var(--gl-card-bg);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow-soft);
 }

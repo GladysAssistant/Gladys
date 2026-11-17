@@ -14,6 +14,8 @@ class Login extends Component {
 }
 
 export default connect(
-  'gatewayLoginStep2,gatewayLoginStatus,gatewayLoginError,gatewayTwoFactorJustEnabled,gatewayLoginUseRecoveryCode,gatewayLoginRecoveryCode,gatewayLoginRecoveryCodes,gatewayLoginRecoveryCodesStatus,gatewayLoginRecoveryCodesTwoFactorCode,gatewayLoginRecoveryCodesWrongTwoFactorCode,gatewayLoginTwoFactorResetStatus,gatewayLoginTwoFactorResetError',
+  // the fields of the phone layout are controlled: the page reads what was typed, or a
+  // re-render (a refusal, a request in flight) would empty them on screen
+  'gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayLoginStep2,gatewayLoginStatus,gatewayLoginError,gatewayTwoFactorJustEnabled,gatewayLoginUseRecoveryCode,gatewayLoginRecoveryCode,gatewayLoginRecoveryCodes,gatewayLoginRecoveryCodesStatus,gatewayLoginRecoveryCodesTwoFactorCode,gatewayLoginRecoveryCodesWrongTwoFactorCode,gatewayLoginTwoFactorResetStatus,gatewayLoginTwoFactorResetError',
   actions
 )(Login);

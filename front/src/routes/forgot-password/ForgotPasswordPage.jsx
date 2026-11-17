@@ -3,8 +3,140 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import { RequestStatus, ForgotPasswordStatus } from '../../utils/consts';
 import AuthLayout from '../../components/auth/AuthLayout';
+import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
+import {
+  MobileAuthTitle,
+  MobileAuthCard,
+  MobileAuthForm,
+  MobileAuthBar,
+  MobileEmailField,
+  MobileTextField
+} from '../../components/auth/mobile';
+import authStyle from '../../components/auth/style.css';
+import { withMobileViewport, MobileNotice, BigButton, kitStyle } from '../../components/mobile';
 
-const ForgotPasswordPage = ({ children, ...props }) => {
+// The refusals of the two requests, shown above the button on a phone
+const REQUEST_ERRORS = {
+  [RequestStatus.NetworkError]: 'forgotPassword.networkError',
+  [ForgotPasswordStatus.UserNotFound]: 'forgotPassword.userNotFound',
+  [RequestStatus.Error]: 'forgotPassword.unknownError',
+  [RequestStatus.RateLimitError]: 'forgotPassword.rateLimitError'
+};
+
+/**
+ * @description The password recovery on a phone (docs/specs/mobile-pages/auth.md, C.2): the
+ * e-mail address, then the one-time code — same handlers as the desktop card.
+ */
+const MobileForgotPasswordPage = props => {
+  // once a code was requested the code screen stays: asking for a new one only shows it is in
+  // flight, it does not send the user back to the e-mail address
+  const codeSent = Boolean(props.codeSent);
+  const sending = props.forgotPasswordStatus === RequestStatus.Getting;
+  const errorId = codeSent
+    ? REQUEST_ERRORS[props.verifyCodeStatus] || REQUEST_ERRORS[props.forgotPasswordStatus]
+    : REQUEST_ERRORS[props.forgotPasswordStatus];
+  return (
+    <MobileAuthLayout
+      backHref="/login"
+      backLabel={<Text id="login.mobile.navBack" />}
+      screen={codeSent ? 'code' : 'email'}
+      dataCy="forgot-password-mobile"
+    >
+      <MobileAuthForm onSubmit={codeSent ? props.verifyCode : props.forgotPassword}>
+        <MobileAuthTitle>
+          <Text id="forgotPassword.cardTitle" />
+        </MobileAuthTitle>
+        {!codeSent && (
+          <MobileAuthCard>
+            <MobileEmailField
+              id="forgot-password-email"
+              label={<Text id="forgotPassword.emailLabel" />}
+              placeholder={<Text id="forgotPassword.emailPlaceholder" />}
+              value={props.forgotPasswordEmail}
+              onInput={props.updateEmail}
+              error={
+                props.forgotPasswordStatus === ForgotPasswordStatus.WrongEmailError && (
+                  <Text id="forgotPassword.wrongEmailError" />
+                )
+              }
+              autocomplete="username"
+              enterkeyhint="send"
+              dataCy="forgot-password-email"
+            />
+          </MobileAuthCard>
+        )}
+        {codeSent && (
+          <MobileNotice tone="success" icon="check-circle" role="status" data-cy="forgot-password-sent">
+            <Text id="forgotPassword.success" />
+            <br />
+            <br />
+            <Text id="forgotPassword.howToAccessLogs" />
+          </MobileNotice>
+        )}
+        {codeSent && (
+          <MobileAuthCard>
+            <MobileTextField
+              id="forgot-password-code"
+              label={<Text id="forgotPassword.codeLabel" />}
+              placeholder={<Text id="forgotPassword.codePlaceholder" />}
+              value={props.forgotPasswordCode}
+              onInput={props.updateCode}
+              error={
+                props.verifyCodeStatus === ForgotPasswordStatus.InvalidCode && <Text id="forgotPassword.codeInvalid" />
+              }
+              autocomplete="one-time-code"
+              autocapitalize="characters"
+              autocorrect="off"
+              spellcheck={false}
+              enterkeyhint="go"
+              dataCy="forgot-password-code"
+            />
+            <div class={authStyle.mobileLinks}>
+              <button
+                type="button"
+                class={authStyle.mobileLink}
+                onClick={props.forgotPassword}
+                disabled={sending}
+                aria-busy={sending ? 'true' : 'false'}
+                data-cy="forgot-password-send-again"
+              >
+                {sending && <span class={kitStyle.buttonSpinner} aria-hidden="true" />}
+                <Text id="forgotPassword.sendCodeAgain" />
+              </button>
+            </div>
+          </MobileAuthCard>
+        )}
+        <div class={kitStyle.footnote}>
+          <MarkupText id="global.needHelpText" />
+        </div>
+        <MobileAuthBar error={errorId && <Text id={errorId} />}>
+          {!codeSent && (
+            <BigButton
+              variant="primary"
+              type="submit"
+              loading={props.forgotPasswordStatus === RequestStatus.Getting}
+              data-cy="forgot-password-submit"
+            >
+              <Text id="forgotPassword.button" />
+            </BigButton>
+          )}
+          {codeSent && (
+            <BigButton
+              variant="primary"
+              type="submit"
+              loading={props.verifyCodeStatus === RequestStatus.Getting}
+              data-cy="forgot-password-code-submit"
+            >
+              <Text id="forgotPassword.codeButton" />
+            </BigButton>
+          )}
+        </MobileAuthBar>
+      </MobileAuthForm>
+    </MobileAuthLayout>
+  );
+};
+
+const DesktopForgotPasswordPage = ({ children, ...props }) => {
   const codeSent = props.forgotPasswordStatus === RequestStatus.Success;
   return (
     <AuthLayout titleId="forgotPassword.title">
@@ -165,4 +297,7 @@ const ForgotPasswordPage = ({ children, ...props }) => {
   );
 };
 
-export default ForgotPasswordPage;
+const ForgotPasswordPage = ({ isMobile, ...props }) =>
+  isMobile ? <MobileForgotPasswordPage {...props} /> : <DesktopForgotPasswordPage {...props} />;
+
+export default withMobileViewport(ForgotPasswordPage);

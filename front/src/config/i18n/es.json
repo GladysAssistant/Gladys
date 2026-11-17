@@ -59,7 +59,8 @@
     "saveAndLeave": "Guardar y salir",
     "leaveWithoutSaving": "Salir sin guardar",
     "keepEditing": "Seguir editando",
-    "cannotBeUndone": "Esta acción no se puede deshacer."
+    "cannotBeUndone": "Esta acción no se puede deshacer.",
+    "togglePassword": "Mostrar u ocultar la contraseña"
   },
   "errorBoundary": {
     "message": "Ocurrió un problema al mostrar esto. Vuelva a cargar la página y revise la configuración si sucede de nuevo."
@@ -192,7 +193,10 @@
     "loginButtonText": "Iniciar sesión",
     "wrongCredentials": "Correo electrónico o contraseña incorrectos.",
     "invalidEmail": "Correo electrónico no válido",
-    "needHelpText": "¿Necesita ayuda? Únase a nosotros en <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
+    "needHelpText": "¿Necesita ayuda? Únase a nosotros en <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
+    "mobile": {
+      "navBack": "Acceso"
+    }
   },
   "locked": {
     "cardTitle": "Casa bloqueada",
@@ -201,13 +205,15 @@
     "error": "Ocurrió un error, inténtelo de nuevo",
     "wrongCodeError": "Código no válido, inténtelo de nuevo",
     "validateButton": "Validar",
-    "tooManyRequests": "Espere {{count}} minutos antes de volver a intentarlo."
+    "tooManyRequests": "Espere {{count}} minutos antes de volver a intentarlo.",
+    "mobile": {
+      "deleteDigit": "Borrar el último dígito"
+    }
   },
   "signup": {
     "mobile": {
       "welcomeLead": "Gladys es un asistente para tu hogar que respeta tu privacidad. La instalación lleva unos dos minutos.",
       "restoreHint": "¿Ya usas Gladys Plus? Recupera una instalación anterior.",
-      "togglePassword": "Mostrar u ocultar la contraseña",
       "distanceKilometers": "Kilómetros",
       "distanceMiles": "Millas",
       "historyHelp": "Cuánto tiempo conserva Gladys los valores de tus sensores. Podrás cambiarlo más tarde en los ajustes.",
@@ -6118,7 +6124,10 @@
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
     "recoveryCodePlaceholder": "Introduzca uno de sus códigos de recuperación",
-    "twoFactorEnabledSuccess": "¡La autenticación de doble factor ya está activada! Introduzca un nuevo código generado por su aplicación para finalizar el inicio de sesión."
+    "twoFactorEnabledSuccess": "¡La autenticación de doble factor ya está activada! Introduzca un nuevo código generado por su aplicación para finalizar el inicio de sesión.",
+    "mobile": {
+      "resetTwoFactorTitle": "Restablecer por correo"
+    }
   },
   "gatewayRecoveryCodes": {
     "cardTitle": "Sus códigos de recuperación",
@@ -7977,7 +7986,10 @@
     "notAcceptedRetryButton": "Mi usuario está autorizado, volver a intentarlo",
     "saveButton": "Guardar",
     "manageBillingLink": "Gestionar mi suscripción y facturas",
-    "logoutButton": "Cerrar sesión"
+    "logoutButton": "Cerrar sesión",
+    "mobile": {
+      "accountTitle": "Mi cuenta de Gladys Plus"
+    }
   },
   "deviceFeatureHistorySize": {
     "size": {
@@ -8157,6 +8169,14 @@
       "open": "Abra su aplicación 2FA",
       "addAccount": "Haga clic en \"Añadir cuenta\"",
       "scanQRCode": "Escanee el código QR de abajo o copie el secreto en su aplicación 2FA."
+    },
+    "mobile": {
+      "addAccountTitle": "En este teléfono",
+      "openApp": "Abrir mi aplicación 2FA",
+      "openAppHelp": "Su aplicación 2FA se abre con su cuenta de Gladys Plus lista para añadirse. ¿No ocurre nada? Instale una de las aplicaciones del paso anterior o añada la cuenta a mano más abajo.",
+      "manualTitle": "A mano, o desde otro dispositivo",
+      "qrCodeAlt": "Código QR para escanear con su aplicación 2FA",
+      "qrCodeHelp": "Para escanear con una aplicación 2FA instalada en otro dispositivo."
     }
   },
   "gatewaySignUp": {
@@ -8172,7 +8192,11 @@
     "passwordLabel": "Contraseña (mín. 8 caracteres)",
     "passwordPlaceholder": "Contraseña",
     "passwordInvalid": "La contraseña debe tener 8 caracteres",
-    "createAccountButton": "Crear nueva cuenta"
+    "createAccountButton": "Crear nueva cuenta",
+    "mobile": {
+      "completeTitle": "Su cuenta está creada",
+      "completeText": "Ya puede iniciar sesión con su dirección de correo y su contraseña."
+    }
   },
   "gatewayBilling": {
     "title": "Facturación",
