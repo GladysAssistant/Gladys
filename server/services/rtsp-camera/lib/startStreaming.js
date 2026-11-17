@@ -13,6 +13,8 @@ const { isCameraEnabled } = require('../../../utils/device');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
+const STDERR_TAIL_MAX_LENGTH = 2000;
+const STDERR_REASON_LINES = 3;
 
 /**
  * @description Start streaming.
@@ -162,19 +164,21 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       indexFilePath,
     ];
 
+    // "-2" keeps the aspect ratio like "-1" but rounds the height to an even number:
+    // the H264 encoder refuses an odd height ("height not divisible by 2").
     let cameraRotationArgs = '';
     switch (cameraRotationParam.value) {
       case DEVICE_ROTATION.DEGREES_90:
-        cameraRotationArgs = 'scale=1920:-1,transpose=1'; // Full HD resolution & Rotate 90
+        cameraRotationArgs = 'scale=1920:-2,transpose=1'; // Full HD resolution & Rotate 90
         break;
       case DEVICE_ROTATION.DEGREES_180:
-        cameraRotationArgs = 'scale=1920:-1,transpose=1,transpose=1'; // Full HD resolution & Rotate 180
+        cameraRotationArgs = 'scale=1920:-2,transpose=1,transpose=1'; // Full HD resolution & Rotate 180
         break;
       case DEVICE_ROTATION.DEGREES_270:
-        cameraRotationArgs = 'scale=1920:-1,transpose=2'; // Full HD resolution & Rotate 270
+        cameraRotationArgs = 'scale=1920:-2,transpose=2'; // Full HD resolution & Rotate 270
         break;
       default:
-        cameraRotationArgs = 'scale=1920:-1'; // Full HD resolution & Rotate 0
+        cameraRotationArgs = 'scale=1920:-2'; // Full HD resolution & Rotate 0
         break;
     }
 
@@ -215,13 +219,33 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       logger.debug(`stdout: ${data}`);
     });
 
+    // We keep the end of what ffmpeg writes on stderr: when it fails, the reason is in its last lines
+    let stderrTail = '';
     liveStreamingProcess.stderr.on('data', (data) => {
       logger.debug(`stderr: ${data}`);
+      stderrTail = `${stderrTail}${data}`.slice(-STDERR_TAIL_MAX_LENGTH);
     });
 
     liveStreamingProcess.on('close', (code) => {
       logger.debug(`child process exited with code ${code}`);
-      streamingReadyEvent.emit('init-error', new Error(`Child process exited with code ${code}`));
+      let message = `Child process exited with code ${code}`;
+      // A non-zero exit code is a failure of ffmpeg (a stopped stream exits with a null code)
+      if (code) {
+        const reason = stderrTail
+          // The camera URL contains the credentials of the camera, it must not end up in the logs
+          .split(cameraUrlParam.value)
+          .join('CAMERA_URL')
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0)
+          .slice(-STDERR_REASON_LINES)
+          .join(' — ');
+        if (reason) {
+          message = `${message}: ${reason}`;
+        }
+        logger.warn(`Camera ${cameraSelector}: ffmpeg live stream failed. ${message}`);
+      }
+      streamingReadyEvent.emit('init-error', new Error(message));
       this.stopStreaming(cameraSelector);
     });
 

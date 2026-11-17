@@ -1,6 +1,7 @@
 // @ts-nocheck
 const { expect, assert } = require('chai');
 const fse = require('fs-extra');
+const Promise = require('bluebird');
 const path = require('path');
 const sinon = require('sinon').createSandbox();
 
@@ -479,8 +480,104 @@ describe('Camera.streaming', () => {
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
     const promise = rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
-    await assert.isRejected(promise, 'Child process exited with code 100');
+    await assert.isRejected(promise, 'Child process exited with code 100: stderr log log');
     expect(rtspCameraManager.liveStreams.size).to.equal(0);
+  });
+  it('should give the reason found in ffmpeg stderr when the stream crashes, without the camera url', async () => {
+    const childProcessMockWithCrash = {
+      spawn: (command, args, options) => {
+        return {
+          stdout: { on: () => {} },
+          stderr: {
+            on: (type, cb) => {
+              cb("Input #0, rtsp, from 'test':\n  Stream #0:0: Video: h264\nStream mapping:\n");
+              cb(Buffer.from('[libx264 @ 0x55] height not divisible by 2 (1920x1097)\r\n\nConversion failed!\n'));
+            },
+          },
+          on: (type, cb) => {
+            setTimeout(() => cb(1), 5);
+          },
+        };
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      gladys,
+      childProcessMockWithCrash,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const promise = rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
+    const error = await assert.isRejected(promise);
+    expect(error.message).to.equal(
+      'Child process exited with code 1: Stream mapping: — [libx264 @ 0x55] height not divisible by 2 (1920x1097) — Conversion failed!',
+    );
+    expect(rtspCameraManager.liveStreams.size).to.equal(0);
+  });
+  it('should hide the camera url in the reason and keep the message short when ffmpeg wrote nothing', async () => {
+    const stderrByCamera = ['test: Connection refused\n', ''];
+    const childProcessMockWithCrash = {
+      spawn: (command, args, options) => {
+        const stderr = stderrByCamera.shift();
+        return {
+          stdout: { on: () => {} },
+          stderr: {
+            on: (type, cb) => {
+              cb(stderr);
+            },
+          },
+          on: (type, cb) => {
+            setTimeout(() => cb(1), 5);
+          },
+        };
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      gladys,
+      childProcessMockWithCrash,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const error = await assert.isRejected(rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1));
+    expect(error.message).to.equal('Child process exited with code 1: CAMERA_URL: Connection refused');
+    const secondError = await assert.isRejected(rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1));
+    expect(secondError.message).to.equal('Child process exited with code 1');
+  });
+  it('should keep the aspect ratio with an even height, whatever the rotation', async () => {
+    const rotations = [
+      [undefined, 'scale=1920:-2'],
+      [DEVICE_ROTATION.DEGREES_90, 'scale=1920:-2,transpose=1'],
+      [DEVICE_ROTATION.DEGREES_180, 'scale=1920:-2,transpose=1,transpose=1'],
+      [DEVICE_ROTATION.DEGREES_270, 'scale=1920:-2,transpose=2'],
+    ];
+    await Promise.each(rotations, async ([rotation, expectedFilter]) => {
+      const spawnedArgs = [];
+      const childProcessMockRecordingArgs = {
+        spawn: (command, args, options) => {
+          spawnedArgs.push(args);
+          return childProcessMock.spawn(command, args, options);
+        },
+      };
+      const gladysWithRotation = {
+        config: gladys.config,
+        device: {
+          getBySelector: fake.resolves({
+            id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+            selector: 'my-camera',
+            params: [
+              { name: 'CAMERA_URL', value: 'test' },
+              { name: 'CAMERA_ROTATION', value: rotation },
+            ],
+          }),
+        },
+      };
+      rtspCameraManager = new RtspCameraManager(
+        gladysWithRotation,
+        childProcessMockRecordingArgs,
+        'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+      );
+      await rtspCameraManager.startStreaming('my-camera', false, 1);
+      await rtspCameraManager.stopStreaming('my-camera');
+      const args = spawnedArgs[0];
+      expect(args[args.indexOf('-vf') + 1]).to.equal(expectedFilter);
+    });
   });
   it('should start streaming and write multiple time the index', async () => {
     const childProcessMockWithCrash = {
