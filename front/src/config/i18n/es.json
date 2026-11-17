@@ -2318,6 +2318,7 @@
             "online": {
               "title": "Red Zigbee en línea",
               "devices": {
+                "zero": "Ningún dispositivo en la red",
                 "one": "1 dispositivo en la red",
                 "other": "{{count}} dispositivos en la red"
               }
@@ -2328,6 +2329,10 @@
             "stopped": {
               "title": "Zigbee2MQTT está detenido",
               "since": "Desde el {{date}} · no se reinicia con Gladys."
+            },
+            "stopping": {
+              "title": "Deteniendo Zigbee2MQTT…",
+              "text": "Tarda unos segundos."
             },
             "dongleMissing": {
               "title": "Llave Zigbee desconectada",

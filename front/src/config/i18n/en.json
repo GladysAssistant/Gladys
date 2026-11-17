@@ -2318,6 +2318,7 @@
             "online": {
               "title": "Zigbee network online",
               "devices": {
+                "zero": "No device in the network",
                 "one": "1 device in the network",
                 "other": "{{count}} devices in the network"
               }
@@ -2328,6 +2329,10 @@
             "stopped": {
               "title": "Zigbee2MQTT is stopped",
               "since": "Since {{date}} · it does not start again with Gladys."
+            },
+            "stopping": {
+              "title": "Stopping Zigbee2MQTT…",
+              "text": "It takes a few seconds."
             },
             "dongleMissing": {
               "title": "Zigbee dongle unplugged",

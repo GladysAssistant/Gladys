@@ -511,6 +511,52 @@ describe('zigbee2mqtt configureContainer', () => {
     assert.notCalled(portfinderMock.getPortPromise);
   });
 
+  it('it should write the port saved on setup over the port of an existing file', async () => {
+    // PREPARE
+    // Installed with the port 12000, then another port saved on the setup page
+    fs.copyFileSync(defaultConfigFilePath, configFilePath);
+    const config = {
+      z2mTcpPort: '12001',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    expect(resultContent).to.include('frontend:\n  port: 12001\n');
+    expect(changed.configChanged).to.equal(true);
+    expect(config.z2mTcpPort).to.equal('12001');
+    assert.notCalled(portfinderMock.getPortPromise);
+  });
+
+  it('it should keep the port of an existing file on start', async () => {
+    // PREPARE
+    // The port changed in the file, by hand, since Gladys saved it
+    fs.copyFileSync(defaultConfigFilePath, configFilePath);
+    const config = {
+      z2mTcpPort: '12001',
+    };
+    // EXECUTE
+    await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    expect(resultContent).to.include('frontend:\n  port: 12000\n');
+    expect(config.z2mTcpPort).to.equal(12000);
+    assert.notCalled(portfinderMock.getPortPromise);
+  });
+
+  it('it should not change the file for the port it already holds, saved as text by Gladys', async () => {
+    // PREPARE
+    const config = {
+      z2mTcpPort: '9999',
+    };
+    await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
+    // ASSERT
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include('frontend:\n  port: 9999\n');
+  });
+
   it('it should only add mqtt credentials', async () => {
     // PREPARE
     const config = {

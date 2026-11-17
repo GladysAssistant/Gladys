@@ -141,7 +141,9 @@ describe('Zigbee2mqtt dashboard', () => {
 
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.dongleMissing.title`);
       cy.get('[data-cy=z2m-dashboard-subtitle]').i18n(`${T}.states.dongleMissing.text`);
-      cy.get('[data-cy=z2m-dashboard-status] [data-cy=z2m-dashboard-restart]').should('not.exist');
+      // Zigbee2mqtt starts again once the dongle is plugged back: nothing to restart
+      cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-stop]').should('exist');
     });
 
     it('should keep the missing dongle told while the status was being read', () => {
@@ -154,10 +156,11 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.dongleMissing.title`);
     });
 
-    it('should tell that an update waits for the next start', () => {
-      visitDashboard({ status: { ...onlineStatus, updatePending: true } });
+    it('should tell that an update waits for the next start, and that the network has no device', () => {
+      visitDashboard({ status: { ...onlineStatus, updatePending: true, deviceCount: 0 } });
 
       cy.get('[data-cy=z2m-dashboard-update-pending]').i18n(`${T}.updatePending`);
+      cy.get('[data-cy=z2m-dashboard-subtitle]').should('have.text', i18nText(`${T}.states.online.devices.zero`));
     });
 
     it('should tell that Gladys runs the dongle with the ezsp driver once it falls back on it', () => {
@@ -217,7 +220,8 @@ describe('Zigbee2mqtt dashboard', () => {
   describe('stop and start', () => {
     it('should stop Zigbee2mqtt once confirmed', () => {
       visitDashboard();
-      answerAction('stop');
+      // Answered once the containers are stopped
+      answerAction('stop', { body: {}, delay: 1000 });
 
       cy.get('[data-cy=z2m-dashboard-stop]').click();
       cy.get('[data-cy=z2m-dashboard-confirm-stop]').i18n(`${T}.confirmStop.text`);
@@ -227,6 +231,16 @@ describe('Zigbee2mqtt dashboard', () => {
 
       cy.get('[data-cy=z2m-dashboard-stop]').click();
       cy.get('[data-cy=z2m-dashboard-confirm-stop-button]').click();
+      // Told stopped by the server before its containers are
+      sendStatus({
+        ...onlineStatus,
+        stopped: true,
+        stoppedAt: '2026-11-17T08:00:00.000Z',
+        zigbee2mqttConnected: false
+      });
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.stopping.title`);
+      cy.get('[data-cy=z2m-dashboard-tiles]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-start]').should('not.exist');
       cy.wait('@stop');
       cy.get('[data-cy=z2m-dashboard-confirm-stop]').should('not.exist');
 
@@ -280,6 +294,24 @@ describe('Zigbee2mqtt dashboard', () => {
       // Until the installation is cleared
       sendProgress({ state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null });
       cy.get('[data-cy=z2m-dashboard-installation-success]').should('not.exist');
+    });
+
+    it('should stop telling the success of an installation once another action runs, until the next one', () => {
+      visitDashboard();
+      answerAction('restart');
+      sendProgress(runningInstallation);
+      cy.get('[data-cy=z2m-dashboard-progress]').should('exist');
+      sendProgress(doneInstallation);
+      cy.get('[data-cy=z2m-dashboard-installation-success]').should('exist');
+
+      cy.get('[data-cy=z2m-dashboard-tiles] [data-cy=z2m-dashboard-restart]').click();
+      cy.wait('@restart');
+      cy.get('[data-cy=z2m-dashboard-installation-success]').should('not.exist');
+
+      sendProgress(runningInstallation);
+      cy.get('[data-cy=z2m-dashboard-progress]').should('exist');
+      sendProgress(doneInstallation);
+      cy.get('[data-cy=z2m-dashboard-installation-success]').should('exist');
     });
 
     it('should not tell the success of an installation ended before the page opened', () => {

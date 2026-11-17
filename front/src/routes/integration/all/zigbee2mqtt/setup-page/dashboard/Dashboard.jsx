@@ -64,36 +64,42 @@ class Dashboard extends Component {
     }
   };
 
-  // POST an action; the status the server sends tells its outcome
-  runAction = async (url, body, onSuccess) => {
-    this.setState({ actionStatus: RequestStatus.Getting, actionError: null });
+  // POST an action; the status the server sends tells its outcome. The success of the last installation is not told
+  // any more: it is the past.
+  runAction = async (action, body, onSuccess) => {
+    this.setState({
+      actionStatus: RequestStatus.Getting,
+      actionError: null,
+      pendingAction: action,
+      installationSuccessDismissed: true
+    });
     try {
-      await this.props.httpClient.post(url, body);
+      await this.props.httpClient.post(`/api/v1/service/zigbee2mqtt/${action}`, body);
       if (this.unmounted) {
         return;
       }
-      this.setState({ actionStatus: RequestStatus.Success, ...(onSuccess || {}) });
+      this.setState({ actionStatus: RequestStatus.Success, pendingAction: null, ...(onSuccess || {}) });
     } catch (e) {
       console.error(e);
       if (!this.unmounted) {
         // Refused while an installation or another operation runs: to try again once it ends
         const busy = get(e, 'response.status') === 409;
-        this.setState({ actionStatus: RequestStatus.Error, actionError: busy ? 'busy' : 'error' });
+        this.setState({ actionStatus: RequestStatus.Error, actionError: busy ? 'busy' : 'error', pendingAction: null });
       }
     }
   };
 
-  pair = () => this.runAction('/api/v1/service/zigbee2mqtt/permit_join', { value: true }, { permitJoinAllowed: true });
+  pair = () => this.runAction('permit_join', { value: true }, { permitJoinAllowed: true });
 
-  start = () => this.runAction('/api/v1/service/zigbee2mqtt/start');
+  start = () => this.runAction('start');
 
-  restart = () => this.runAction('/api/v1/service/zigbee2mqtt/restart');
+  restart = () => this.runAction('restart');
 
   askStop = () => this.setState({ confirmStop: true });
 
   cancelStop = () => this.setState({ confirmStop: false });
 
-  stop = () => this.runAction('/api/v1/service/zigbee2mqtt/stop', undefined, { confirmStop: false });
+  stop = () => this.runAction('stop', undefined, { confirmStop: false });
 
   showMain = () => this.setState({ screen: SCREEN.MAIN });
 
@@ -125,6 +131,9 @@ class Dashboard extends Component {
       actionStatus: null,
       actionError: null,
       confirmStop: false,
+      // The action whose request runs
+      pendingAction: null,
+      installationSuccessDismissed: false,
       permitJoinAllowed: false,
       newDeviceCount: null,
       adapters: []
@@ -149,10 +158,17 @@ class Dashboard extends Component {
     }
   };
 
+  // A new installation runs: its outcome is told
+  followNewInstallation = () => this.setState({ installationSuccessDismissed: false });
+
   componentDidUpdate(previousProps) {
     const wasInstalling = get(previousProps, 'zigbee2mqttStatus.installation.state') === 'running';
-    if (wasInstalling && get(this.props, 'zigbee2mqttStatus.installation.state') !== 'running') {
+    const installing = get(this.props, 'zigbee2mqttStatus.installation.state') === 'running';
+    if (wasInstalling && !installing) {
       this.clearBusyError();
+    }
+    if (installing && !wasInstalling) {
+      this.followNewInstallation();
     }
     // Online again (started, restarted, dongle back): its devices may have changed meanwhile
     if (this.props.zigbee2mqttStatus.zigbee2mqttConnected && !previousProps.zigbee2mqttStatus.zigbee2mqttConnected) {
@@ -188,7 +204,9 @@ class Dashboard extends Component {
         />
       );
     }
-    const dashboardState = getDashboardState(status, configuration);
+    // Told stopped by the server before its containers are: stopping until the request answers
+    const dashboardState =
+      state.pendingAction === 'stop' ? DASHBOARD_STATE.STOPPING : getDashboardState(status, configuration);
     const savedAdapter = findAdapter(state.adapters, configuration.z2mDongleName);
     // In local mode, the port of the interface is chosen, then saved, by the first installation that succeeds: the
     // default one would be wrong until then
@@ -207,7 +225,9 @@ class Dashboard extends Component {
       canChangeKey: !isExternal(configuration),
       ezspDriver: !isExternal(configuration) && getDriver(configuration, savedAdapter) === 'ezsp',
       installationSucceeded:
-        Boolean(props.installationFollowedToSuccess) && get(status, 'installation.state') === 'done',
+        Boolean(props.installationFollowedToSuccess) &&
+        !state.installationSuccessDismissed &&
+        get(status, 'installation.state') === 'done',
       saving: props.setupZigee2mqttStatus === RequestStatus.Getting,
       setupZigee2mqttStatus: props.setupZigee2mqttStatus,
       setupZigee2mqttError: props.setupZigee2mqttError,

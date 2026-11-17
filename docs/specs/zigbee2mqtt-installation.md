@@ -365,8 +365,9 @@ holds what both screens share:
 - **End of an installation.** The configuration is read again (port of the interface, generated MQTT
   accounts), and the 409 warnings of a save or a reset go: the installation that refused them is
   over. An installation that the page followed until `done` ends with a success alert by kind and its
-  `durationMs` ("Zigbee2MQTT installed in 23 s"), until the page is left or the installation is
-  cleared; one already ended when the page opened is not told.
+  `durationMs` ("Zigbee2MQTT installed in 23 s"), until the page is left, the installation is
+  cleared or another action of the dashboard runs (N.2); one already ended when the page opened is
+  not told.
 - **Refusals.** A 409 on save tells that an installation already runs. On the reset, only a refusal of
   `refuseWhileInstalling` (its message ends with "while an installation is running" or "while the
   integration is busy", I) says that the integration is busy, to try again once it ends; another 409,
@@ -609,6 +610,7 @@ The status card shows the first state that applies:
 | State           | When                                                                                                           | Primary action                                                               |
 | --------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `installing`    | `installation.state` is `running`: title by kind (B.1), bar, current phase (B.2)                               | —                                                                            |
+| `stopping`      | the request of a stop runs: the server tells `stopped` before its containers are stopped (about 10 s)          | —                                                                            |
 | `stopped`       | `stopped` (E.4): "since <stoppedAt>, it does not start again with Gladys"                                      | Start                                                                        |
 | `dongleMissing` | `dongleMissing` (K.3): Zigbee2mqtt starts again once it is plugged back, on any port                           | —                                                                            |
 | `failed`        | the error of the last installation if it failed, else `z2mContainerError`; none once Zigbee2mqtt answers       | Restart and "Change the dongle or model" (N.3), none with an external broker |
@@ -620,7 +622,8 @@ The status card shows the first state that applies:
 - **Devices to add.** Online, a link to the Discover tab counts the devices of the network not added
   to Gladys (`GET /discovered` with `filter_existing: false`, those without `id`), counted again on
   each `zigbee2mqtt.discover` message and read again when Zigbee2mqtt answers again; only the answer
-  of the last request counts, and a message is more recent than a request still running.
+  of the last request counts, and a message is more recent than a request still running. "No device in
+  the network" for none.
 - **Pair** sends `POST /permit_join` with `{ value: true }` (never toggled) and tells that joining is
   allowed for 4 minutes, as long as `zigbee2mqtt.permit_join` says so.
 - **Alerts.** An update waiting for its images (`updatePending`, G), the ezsp driver note (the saved
@@ -628,13 +631,15 @@ The status card shows the first state that applies:
 
 ### N.2 Actions
 
-- **Tiles**: Restart (Gladys runs the containers), Stop, and the Zigbee2mqtt interface once its URL is
-  known; none while an installation runs or once stopped. In local mode, the interface is hidden until
+- **Tiles**: Restart (Gladys runs the containers; not without the dongle, Zigbee2mqtt starts again once
+  it is plugged back), Stop, and the Zigbee2mqtt interface once its URL is known; none while an
+  installation runs, during a stop or once stopped. In local mode, the interface is hidden until
   its port is saved: the first installation that succeeds chooses it, the default `8080` would be
   wrong meanwhile.
 - **Stop** asks for a confirmation (Zigbee2mqtt stays stopped, Gladys restart included, until it is
   started again), then sends `POST /stop`. **Start** sends `POST /start`, **Restart** `POST /restart`
-  (E.4). The status sent by the server tells the outcome: the page does not guess it.
+  (E.4). The status sent by the server tells the outcome: the page does not guess it. An action hides
+  the success of the last installation, told again for the next one.
 - **Refusals.** A 409 (`refuseWhileInstalling`, I) tells that an installation runs or the integration
   is busy, until the installation that refused the action ends; another error says that Gladys could
   not do it. A stop that fails keeps its confirmation open.
@@ -649,7 +654,8 @@ The status card shows the first state that applies:
   no steps, the saved dongle marked "current", a warning when the chosen coordinator runs another
   driver family (Silicon Labs `ember` / `ezsp`, Texas Instruments `zstack`, `deconz`: a new network,
   devices to pair again), "Use this dongle" and "Cancel". "Use this dongle" saves as the wizard does
-  (`POST /setup`, refusals told on ①); once saved, the dashboard follows the `switch` installation.
+  (`POST /setup`, refusals told on ①); once saved, the dashboard follows the installation (`switch`
+  for another coordinator, `install` for another model of the same dongle).
   Cancel goes back without saving.
 
 ### N.4 Advanced settings
@@ -658,7 +664,9 @@ A screen of its own, back to the dashboard by "Configuration":
 
 - **Interface port** (local mode): a number from 1 to 65535, saved alone (`POST /setup` with
   `Z2M_TCP_PORT` only: a variable missing from the setup keeps its stored value), which installs again
-  with the new port. The port saved by the end of an installation replaces the field unless the user
+  with the new port. A setup writes the port of Gladys over the one of the Zigbee2mqtt configuration
+  file; a start of Gladys keeps the port of the file (set before Gladys saved one, or changed by
+  hand). The port saved by the end of an installation replaces the field unless the user
   is typing another one. Link to the interface once the port is saved.
 - **External broker**: its form (URL, user, password, interface URL), saved the same way.
 - **MQTT access** for other applications (local mode), the state of each component (Gladys connected

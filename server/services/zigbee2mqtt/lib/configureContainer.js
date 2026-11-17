@@ -341,8 +341,8 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   const { port } = frontend;
 
   const existingPortConfig = !Number.isNaN(Number(port));
-  const generateRandomPort =
-    (setupMode || !existingPortConfig) && (config.z2mTcpPort === null || Number.isNaN(Number(config.z2mTcpPort)));
+  const portConfigured = !(config.z2mTcpPort === null || Number.isNaN(Number(config.z2mTcpPort)));
+  const generateRandomPort = (setupMode || !existingPortConfig) && !portConfigured;
 
   // Only if incoming port
   if (generateRandomPort) {
@@ -358,15 +358,15 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
       logger.error('Unable to get a random port for zigbee2mqtt configuration', e);
       config.z2mTcpPort = defaultPort;
     }
-  } else if (existingPortConfig) {
+  } else if (existingPortConfig && !(setupMode && portConfigured)) {
     // TCP Port is not found in config, but z2m is alrady configured
-    // For upgrade Gladys mode
+    // For upgrade Gladys mode. A setup keeps the port of Gladys: the user may have changed it on the setup page.
     logger.debug('Keep default z2m port...');
     config.z2mTcpPort = port;
   }
 
-  // Check for requested changes
-  if (config.z2mTcpPort !== port) {
+  // Check for requested changes (the port of Gladys is a string, the one of the file a number)
+  if (Number(config.z2mTcpPort) !== port) {
     loadedConfig.frontend = {
       port: Number(config.z2mTcpPort),
     };

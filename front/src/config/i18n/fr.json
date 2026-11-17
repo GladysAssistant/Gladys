@@ -2695,6 +2695,7 @@
             "online": {
               "title": "Réseau Zigbee en ligne",
               "devices": {
+                "zero": "Aucun appareil dans le réseau",
                 "one": "1 appareil dans le réseau",
                 "other": "{{count}} appareils dans le réseau"
               }
@@ -2705,6 +2706,10 @@
             "stopped": {
               "title": "Zigbee2MQTT est arrêté",
               "since": "Depuis le {{date}} · il ne redémarre pas avec Gladys."
+            },
+            "stopping": {
+              "title": "Arrêt de Zigbee2MQTT…",
+              "text": "Cela prend quelques secondes."
             },
             "dongleMissing": {
               "title": "Clé Zigbee débranchée",

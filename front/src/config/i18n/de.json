@@ -2562,6 +2562,7 @@
             "online": {
               "title": "Zigbee-Netzwerk online",
               "devices": {
+                "zero": "Kein Gerät im Netzwerk",
                 "one": "1 Gerät im Netzwerk",
                 "other": "{{count}} Geräte im Netzwerk"
               }
@@ -2572,6 +2573,10 @@
             "stopped": {
               "title": "Zigbee2MQTT ist gestoppt",
               "since": "Seit {{date}} · es startet nicht mit Gladys neu."
+            },
+            "stopping": {
+              "title": "Zigbee2MQTT wird gestoppt…",
+              "text": "Das dauert einige Sekunden."
             },
             "dongleMissing": {
               "title": "Zigbee-Stick ausgesteckt",

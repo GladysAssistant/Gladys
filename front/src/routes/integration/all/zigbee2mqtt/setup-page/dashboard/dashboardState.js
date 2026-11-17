@@ -6,6 +6,7 @@ import { MQTT_MODE, ADAPTER_MODE } from '../constants';
 export const DASHBOARD_STATE = {
   INSTALLING: 'installing',
   STOPPED: 'stopped',
+  STOPPING: 'stopping',
   DONGLE_MISSING: 'dongleMissing',
   FAILED: 'failed',
   MQTT_ERROR: 'mqttError',
@@ -86,13 +87,14 @@ export const getPrimaryAction = (state, configuration) => {
   return null;
 };
 
-// The tiles under the cards: restart, stop, the interface of Zigbee2mqtt; none during an installation or once stopped
+// The tiles under the cards: restart (not without the dongle: Zigbee2mqtt starts again once it is plugged back), stop,
+// the interface of Zigbee2mqtt; none during an installation, a stop, or once stopped
 export const getTiles = (state, configuration, z2mUrl) => {
-  if (state === DASHBOARD_STATE.INSTALLING || state === DASHBOARD_STATE.STOPPED) {
+  if ([DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STOPPING, DASHBOARD_STATE.STOPPED].includes(state)) {
     return [];
   }
   const tiles = [];
-  if (!isExternal(configuration)) {
+  if (!isExternal(configuration) && state !== DASHBOARD_STATE.DONGLE_MISSING) {
     tiles.push('restart');
   }
   tiles.push('stop');

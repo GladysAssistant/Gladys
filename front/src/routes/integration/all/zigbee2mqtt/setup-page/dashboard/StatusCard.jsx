@@ -18,6 +18,7 @@ const ICONS = {
   [DASHBOARD_STATE.INSTALLING]: 'loader',
   [DASHBOARD_STATE.STARTING]: 'loader',
   [DASHBOARD_STATE.STOPPED]: 'square',
+  [DASHBOARD_STATE.STOPPING]: 'loader',
   [DASHBOARD_STATE.DONGLE_MISSING]: 'cpu',
   [DASHBOARD_STATE.FAILED]: 'alert-triangle',
   [DASHBOARD_STATE.MQTT_ERROR]: 'alert-triangle',
@@ -29,6 +30,7 @@ const TONES = {
   [DASHBOARD_STATE.INSTALLING]: style.toneBlue,
   [DASHBOARD_STATE.STARTING]: style.toneBlue,
   [DASHBOARD_STATE.STOPPED]: style.toneGrey,
+  [DASHBOARD_STATE.STOPPING]: style.toneGrey,
   [DASHBOARD_STATE.DONGLE_MISSING]: style.toneAmber,
   [DASHBOARD_STATE.FAILED]: style.toneRed,
   [DASHBOARD_STATE.MQTT_ERROR]: style.toneRed,
@@ -122,7 +124,9 @@ const StatusCard = ({ view, actions }) => {
         <span class={cx(style.statusIcon, TONES[state])} aria-hidden="true">
           <i
             class={cx(`fe fe-${ICONS[state]}`, {
-              [style.spin]: state === DASHBOARD_STATE.INSTALLING || state === DASHBOARD_STATE.STARTING
+              [style.spin]: [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STARTING, DASHBOARD_STATE.STOPPING].includes(
+                state
+              )
             })}
           />
         </span>
