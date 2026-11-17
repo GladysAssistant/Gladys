@@ -2412,7 +2412,9 @@
             "reset": {
               "title": "Reset the integration",
               "text": "Removes the containers, the configuration and the Zigbee network: you will have to pair all your devices again."
-            }
+            },
+            "saveError": "The setting could not be saved. Try again.",
+            "saveDongleNotFound": "Your Zigbee dongle is not plugged in: nothing was saved. Plug it in, then save again."
           }
         }
       },

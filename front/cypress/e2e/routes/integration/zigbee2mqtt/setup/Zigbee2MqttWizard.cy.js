@@ -30,7 +30,7 @@ describe('Zigbee2mqtt setup wizard', () => {
 
   it('should show the configured installation, not the wizard', () => {
     visitWizard({ setup: usbSetup });
-    cy.get('[data-cy=z2m-toggle-status]').should('exist');
+    cy.get('[data-cy=z2m-dashboard]').should('exist');
     cy.get('[data-cy=z2m-wizard]').should('not.exist');
   });
 
@@ -104,7 +104,7 @@ describe('Zigbee2mqtt setup wizard', () => {
     // The wizard is left for the page of the installation
     cy.get('[data-cy=z2m-wizard-finish]').click();
     cy.get('[data-cy=z2m-wizard]').should('not.exist');
-    cy.get('[data-cy=z2m-toggle-status]').should('exist');
+    cy.get('[data-cy=z2m-dashboard]').should('exist');
   });
 
   it('should tell that joining could not be permitted', () => {

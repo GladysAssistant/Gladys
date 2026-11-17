@@ -2789,7 +2789,9 @@
             "reset": {
               "title": "Réinitialiser l'intégration",
               "text": "Supprime les conteneurs, la configuration et le réseau Zigbee : il faudra appairer de nouveau tous vos appareils."
-            }
+            },
+            "saveError": "Le réglage n'a pas pu être enregistré. Réessayez.",
+            "saveDongleNotFound": "Votre clé Zigbee n'est pas branchée : rien n'a été enregistré. Branchez-la, puis enregistrez à nouveau."
           }
         }
       },

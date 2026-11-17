@@ -4,11 +4,12 @@
 > the Zigbee2mqtt and MQTT broker containers: the `installation` and `prefetch` of the status, the
 > `zigbee2mqtt.install-progress` WebSocket message, the setup and prefetch routes and their 409, the
 > installation job, the image downloads, the update at start-up, the USB dongle: its stable path,
-> its check on save and its watch (K), and the setup wizard of a first installation (M). **Rule: any
-> PR that changes one of these behaviors or contracts modifies this file in the same diff.**
+> its check on save and its watch (K), the setup wizard of a first installation (M) and the dashboard
+> of a configured one (N). **Rule: any PR that changes one of these behaviors or contracts modifies
+> this file in the same diff.**
 >
-> Status: **implemented** (PR #3351; USB dongle, K: PR #3395; setup wizard, M: PR #3402). The
-> Zigbee2mqtt dashboard of the next PR builds on sections B to F, K and M.
+> Status: **implemented** (PR #3351; USB dongle, K: PR #3395; setup wizard, M, stop / start /
+> restart, E.4, and dashboard, N: PR #3402).
 
 ## A. Context
 
@@ -351,44 +352,35 @@ from its first line.
 - The logs of a replaced installation (another coordinator saved meanwhile) are ignored: they neither
   fail the running installation nor trigger an ezsp fallback.
 
-## J. Setup page of a configured installation (consumer)
+## J. Setup page (consumer)
 
-`front/src/routes/integration/all/zigbee2mqtt/setup-page/`, shown once a coordinator or an external
-broker is saved (with nothing configured, the wizard of M), temporary on purpose (the dashboard of the
-next PR replaces it):
+`front/src/routes/integration/all/zigbee2mqtt/setup-page/index.js` reads the status, then the
+configuration, and shows the wizard of M when nothing is configured, else the dashboard of N. It
+holds what both screens share:
 
-- `InstallationProgress.jsx`, while `running` or `failed`: title by kind, bar, current phase (the
-  next pending one between two), "you can leave this page"; on failure, the failed phase and its
-  error, which the `z2mContainerError` / `mqttConnectionError` alerts of the page then do not
-  repeat (an error of the status that differs is still shown). A failure is hidden once
-  `zigbee2mqttConnected`. An installation that the page followed until `done` ends with a success
-  alert by kind and its `durationMs` ("Zigbee2MQTT installed in 23 s"), until the page is left or
-  the installation is cleared.
-- The controls are disabled while an installation runs. In local mode, the link to the Zigbee2mqtt
-  interface is hidden until its port is saved: the first installation that succeeds chooses it (an
-  existing installation keeps its port), the default `8080` would be wrong meanwhile. A 409 on save
-  shows that an installation runs or the integration is busy. On the enable switch or the reset,
-  only a refusal of `refuseWhileInstalling` (its message ends with "while an installation is
-  running" or "while the integration is busy", I) says that the integration is busy, to try again
-  once it ends; another 409, like a container of the user carrying our name, shows the generic
-  error. These warnings go at the end of an installation, when the configuration is read again
-  (port of the interface, generated accounts).
-- **Prefetch trigger** (since M, reached from the wizard only: the page of a configured installation
-  never prefetches). `POST /prefetch` is sent on the first local-mode choice, a USB dongle
-  selected (a detected dongle that the page preselects counts) or a network coordinator URL entered,
-  and only while nothing is configured yet, the server runs in Docker with the host network
-  (`dockerBased`, `networkModeValid`) and no installation runs. The external broker mode never
-  prefetches. `PrefetchStatus.jsx` shows its progress, its end or the disk space warning next to the
-  save button, until something is configured or an installation starts.
-- **USB ports.** While the local form is shown in USB mode, `GET /usb/port` is asked again every 3 s,
-  30 s after a failure (only the answer of the last request is kept, none once the form is gone; an
-  unchanged list changes nothing; skipped while a list asked by hand loads, while the page is hidden
-  or while the form is disabled): a dongle plugged in shows up without a click, and the only recognized one is
-  chosen when no dongle is. A port is offered by its `stablePath` (K.1); the stored dongle, by its
-  port or its link, is selected, and choosing it again keeps its model. The 400 `DONGLE_NOT_FOUND`
-  of a save tells that the dongle is not plugged in and that nothing was saved. `dongleMissing`
-  (K.3) shows that the dongle cannot be found, that Zigbee2mqtt starts again once it is plugged
-  back, and to choose it again when it is already plugged into another port.
+- **Freshness.** A status or a progress message received while a request runs is more recent than
+  its answer (a missing dongle, an installation and its prefetch included); only the answer of the
+  last load or save of the configuration is applied. The configuration is read after the status: a
+  status that tells the end of an installation comes with the configuration saved by it.
+- **End of an installation.** The configuration is read again (port of the interface, generated MQTT
+  accounts), and the 409 warnings of a save or a reset go: the installation that refused them is
+  over. An installation that the page followed until `done` ends with a success alert by kind and its
+  `durationMs` ("Zigbee2MQTT installed in 23 s"), until the page is left or the installation is
+  cleared; one already ended when the page opened is not told.
+- **Refusals.** A 409 on save tells that an installation already runs. On the reset, only a refusal of
+  `refuseWhileInstalling` (its message ends with "while an installation is running" or "while the
+  integration is busy", I) says that the integration is busy, to try again once it ends; another 409,
+  like a container of the user carrying our name, shows the generic error. A status that cannot be
+  read shows an error instead of the page.
+- **Prefetch trigger** (reached from the wizard only: a configured installation never prefetches).
+  `POST /prefetch` is sent on the first local-mode choice, a USB dongle selected (a detected dongle
+  that the wizard preselects counts) or a network coordinator URL entered, and only while nothing is
+  configured yet, the server runs in Docker with the host network (`dockerBased`,
+  `networkModeValid`) and no installation runs. The external broker mode never prefetches.
+  `PrefetchStatus.jsx` shows its progress, its end or the disk space warning, until something is
+  configured or an installation starts.
+- **ezsp fallback.** A status that turns `ezspFallback` on reads the configuration again: Gladys saved
+  the `(legacy ezsp)` model.
 
 ## K. USB dongle
 
@@ -503,13 +495,11 @@ and the container stays `exited`, even once the dongle is plugged back.
   request; the page starts Zigbee2mqtt with `POST /start` (E.4).
 - **Gladys connects to the broker only once the containers are in place**: during the download of an
   update, the Zigbee network runs but Gladys does not receive its messages yet.
-- The dashboard (state, start / stop remembered, restart, change of dongle): next PR. Until then the
-  wizard ends on the page of J.
 - **A switch between the local broker and an external one** (B, `POST /setup`) erases the settings
   of the other mode, but leaves the containers: back to the local broker, a broker container created
   by an earlier local installation keeps its former accounts and refuses the ones init generates
   (`BAD_CREDENTIALS` until a reset); switched to an external broker, the local containers keep
-  running. To handle with the change of dongle or mode of the dashboard.
+  running.
 
 ## M. Setup wizard (first installation)
 
@@ -523,9 +513,10 @@ holds the state, the requests and the decisions and builds one view; `WizardDesk
 The page shows the wizard when its configuration, once loaded, has no USB dongle, no network
 coordinator and no external broker (`isConfigured`). The choice is made once (`wizard` in
 `setup-page/index.js`): the wizard saves the configuration on its second step and stays until the user
-leaves it ("Later", "Finish", "Finish without pairing"), for the page of J; a reset chooses the wizard
-again, without the refusal of a setup made on the page of J. A user who leaves the page during the installation comes back to the page of J, which shows the
-progress (B). Nothing of the wizard is remembered.
+leaves it ("Later", "Finish", "Finish without pairing"), for the dashboard (N); a reset chooses the
+wizard again. A user who leaves the page during the installation comes back to the dashboard, which
+shows the progress (B). Nothing of the wizard is remembered. The dashboard reuses step ① to change the
+dongle (N.3).
 
 ### M.2 Steps
 
@@ -602,3 +593,90 @@ closed by Zigbee2mqtt, the status not readable, the downloads in the background)
 wizard in `Zigbee2MqttSetupDongle.cy.js` and `Zigbee2MqttWizardMobile.cy.js` (`iphone-x`: the focus
 page, the bottom bar, the sheets, the breakpoint crossed), fixtures in `wizardFixtures.js`;
 `Zigbee2MqttStatus.cy.js` for the not-installed banner.
+
+## N. Dashboard (configured installation)
+
+`setup-page/dashboard/` (findings 1.9 and 1.10 of the audit; design `design-lot1.md` of the revamp):
+the state of Zigbee2mqtt and the action to take, its coordinator, the actions, and the rare settings on
+a screen of their own. `dashboardState.js` decides from the status and the configuration;
+`Dashboard.jsx` holds the screen and the requests; the cards only show. It replaces the page of the
+previous versions (enable switch, mode cards, configuration form), removed.
+
+### N.1 State
+
+The status card shows the first state that applies:
+
+| State           | When                                                                                                           | Primary action                                                               |
+| --------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `installing`    | `installation.state` is `running`: title by kind (B.1), bar, current phase (B.2)                               | —                                                                            |
+| `stopped`       | `stopped` (E.4): "since <stoppedAt>, it does not start again with Gladys"                                      | Start                                                                        |
+| `dongleMissing` | `dongleMissing` (K.3): Zigbee2mqtt starts again once it is plugged back, on any port                           | —                                                                            |
+| `failed`        | the error of the last installation if it failed, else `z2mContainerError`; none once Zigbee2mqtt answers       | Restart and "Change the dongle or model" (N.3), none with an external broker |
+| `mqttError`     | Gladys not connected to the broker, with `mqttConnectionError` (explained by code, else the raw message)       | Restart (none with an external broker)                                       |
+| `online`        | `zigbee2mqttConnected`; with an external broker, Gladys connected to it: the number of devices (`deviceCount`) | Pair a device                                                                |
+| `starting`      | `zigbee2mqttStarting` (2 min after a start or a restart)                                                       | —                                                                            |
+| `notAnswering`  | none of the above: Gladys gets no answer from Zigbee2mqtt                                                      | Restart (none with an external broker)                                       |
+
+- **Devices to add.** Online, a link to the Discover tab counts the devices of the network not added
+  to Gladys (`GET /discovered` with `filter_existing: false`, those without `id`), counted again on
+  each `zigbee2mqtt.discover` message and read again when Zigbee2mqtt answers again; only the answer
+  of the last request counts, and a message is more recent than a request still running.
+- **Pair** sends `POST /permit_join` with `{ value: true }` (never toggled) and tells that joining is
+  allowed for 4 minutes, as long as `zigbee2mqtt.permit_join` says so.
+- **Alerts.** An update waiting for its images (`updatePending`, G), the ezsp driver note (the saved
+  model runs the `ezsp` driver, after a fallback), the success of an installation followed (J).
+
+### N.2 Actions
+
+- **Tiles**: Restart (Gladys runs the containers), Stop, and the Zigbee2mqtt interface once its URL is
+  known; none while an installation runs or once stopped. In local mode, the interface is hidden until
+  its port is saved: the first installation that succeeds chooses it, the default `8080` would be
+  wrong meanwhile.
+- **Stop** asks for a confirmation (Zigbee2mqtt stays stopped, Gladys restart included, until it is
+  started again), then sends `POST /stop`. **Start** sends `POST /start`, **Restart** `POST /restart`
+  (E.4). The status sent by the server tells the outcome: the page does not guess it.
+- **Refusals.** A 409 (`refuseWhileInstalling`, I) tells that an installation runs or the integration
+  is busy, until the installation that refused the action ends; another error says that Gladys could
+  not do it. A stop that fails keeps its confirmation open.
+
+### N.3 Coordinator and change of dongle
+
+- **The card** shows the dongle by its photo, commercial name and model code (E.3), or the network
+  coordinator by its URL; its driver (`configKey` of the saved model, or the network type; "ezsp"
+  with its note), the coordinator firmware (`coordinatorFirmware.revision`) and `z2mVersion`. With an
+  external broker: the broker URL, `z2mVersion` and `deviceCount`, no change.
+- **Change** (disabled while an installation runs) opens step ① of the wizard (M.2) in change mode:
+  no steps, the saved dongle marked "current", a warning when the chosen coordinator runs another
+  driver family (Silicon Labs `ember` / `ezsp`, Texas Instruments `zstack`, `deconz`: a new network,
+  devices to pair again), "Use this dongle" and "Cancel". "Use this dongle" saves as the wizard does
+  (`POST /setup`, refusals told on ①); once saved, the dashboard follows the `switch` installation.
+  Cancel goes back without saving.
+
+### N.4 Advanced settings
+
+A screen of its own, back to the dashboard by "Configuration":
+
+- **Interface port** (local mode): a number from 1 to 65535, saved alone (`POST /setup` with
+  `Z2M_TCP_PORT` only: a variable missing from the setup keeps its stored value), which installs again
+  with the new port. The port saved by the end of an installation replaces the field unless the user
+  is typing another one. Link to the interface once the port is saved.
+- **External broker**: its form (URL, user, password, interface URL), saved the same way.
+- **MQTT access** for other applications (local mode), the state of each component (Gladys connected
+  to the broker, the broker, Zigbee2mqtt answering).
+- **Reset** of the integration, once confirmed (J for its refusals); the wizard follows.
+- A save refused here is told here (409: an installation already runs; 400 `DONGLE_NOT_FOUND`: the
+  dongle is not plugged in, nothing saved; another error), not a refusal of the wizard.
+
+### N.5 On a phone
+
+Below 992 px the cards stack in one column, state first. The change of dongle is the focus page of the
+wizard (M.3), its navigation bar back to "Configuration" instead of the integrations, without "Step 1
+of 4". The advanced settings stay a screen of their own.
+
+### N.6 Tests
+
+Cypress, `front/cypress/e2e/routes/integration/zigbee2mqtt/setup/`: `Zigbee2MqttDashboard.cy.js` (each
+state, the devices to add, the actions and their refusals, the installations followed),
+`Zigbee2MqttDashboardSettings.cy.js` (change of dongle, advanced settings, external broker; apart: the
+browser of the run stops connecting the websocket of the pages after about thirty tests in one file)
+and `Zigbee2MqttDashboardMobile.cy.js` (`iphone-x`), fixtures in `dashboardFixtures.js`.

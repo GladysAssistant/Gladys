@@ -2412,7 +2412,9 @@
             "reset": {
               "title": "Restablecer la integración",
               "text": "Elimina los contenedores, la configuración y la red Zigbee: tendrás que volver a emparejar todos tus dispositivos."
-            }
+            },
+            "saveError": "No se ha podido guardar el ajuste. Inténtelo de nuevo.",
+            "saveDongleNotFound": "Su llave Zigbee no está conectada: no se ha guardado nada. Conéctela y vuelva a guardar."
           }
         }
       },

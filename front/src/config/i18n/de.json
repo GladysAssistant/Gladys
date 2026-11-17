@@ -2656,7 +2656,9 @@
             "reset": {
               "title": "Integration zurücksetzen",
               "text": "Entfernt die Container, die Konfiguration und das Zigbee-Netzwerk: Du musst alle deine Geräte neu anlernen."
-            }
+            },
+            "saveError": "Die Einstellung konnte nicht gespeichert werden. Versuchen Sie es erneut.",
+            "saveDongleNotFound": "Ihr Zigbee-Stick ist nicht eingesteckt: Es wurde nichts gespeichert. Stecken Sie ihn ein und speichern Sie erneut."
           }
         }
       },

@@ -142,7 +142,18 @@ class Dashboard extends Component {
     }
   }
 
+  // The installation that refused an action is over: it can be tried again
+  clearBusyError = () => {
+    if (this.state.actionError === 'busy') {
+      this.setState({ actionError: null, actionStatus: null });
+    }
+  };
+
   componentDidUpdate(previousProps) {
+    const wasInstalling = get(previousProps, 'zigbee2mqttStatus.installation.state') === 'running';
+    if (wasInstalling && get(this.props, 'zigbee2mqttStatus.installation.state') !== 'running') {
+      this.clearBusyError();
+    }
     // Online again (started, restarted, dongle back): its devices may have changed meanwhile
     if (this.props.zigbee2mqttStatus.zigbee2mqttConnected && !previousProps.zigbee2mqttStatus.zigbee2mqttConnected) {
       this.loadNewDevices();
@@ -179,22 +190,27 @@ class Dashboard extends Component {
     }
     const dashboardState = getDashboardState(status, configuration);
     const savedAdapter = findAdapter(state.adapters, configuration.z2mDongleName);
+    // In local mode, the port of the interface is chosen, then saved, by the first installation that succeeds: the
+    // default one would be wrong until then
+    const z2mUrl = isExternal(configuration) || configuration.z2mTcpPort ? props.z2mUrl : null;
     const view = {
       ...state,
       state: dashboardState,
       status,
       configuration,
       savedAdapter,
-      z2mUrl: props.z2mUrl,
+      z2mUrl,
       language: get(props, 'user.language'),
       installing: dashboardState === DASHBOARD_STATE.INSTALLING,
       primaryAction: getPrimaryAction(dashboardState, configuration),
-      tiles: getTiles(dashboardState, configuration, props.z2mUrl),
+      tiles: getTiles(dashboardState, configuration, z2mUrl),
       canChangeKey: !isExternal(configuration),
       ezspDriver: !isExternal(configuration) && getDriver(configuration, savedAdapter) === 'ezsp',
       installationSucceeded:
         Boolean(props.installationFollowedToSuccess) && get(status, 'installation.state') === 'done',
       saving: props.setupZigee2mqttStatus === RequestStatus.Getting,
+      setupZigee2mqttStatus: props.setupZigee2mqttStatus,
+      setupZigee2mqttError: props.setupZigee2mqttError,
       resetZigbee2mqttStatus: props.resetZigbee2mqttStatus
     };
     const actions = {

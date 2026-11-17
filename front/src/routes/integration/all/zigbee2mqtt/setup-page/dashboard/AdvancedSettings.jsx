@@ -22,12 +22,41 @@ const ComponentRow = ({ name, ok, okText, koText }) => (
   </div>
 );
 
+// Refused before anything was saved: an installation already runs, the dongle is not plugged in, or another error
+const SaveError = ({ view }) => {
+  if (view.setupZigee2mqttStatus === RequestStatus.ConflictError) {
+    return (
+      <div class="alert alert-warning" data-cy="z2m-dashboard-save-conflict">
+        <Text id="integration.zigbee2mqtt.setup.installation.alreadyRunning" />
+      </div>
+    );
+  }
+  if (view.setupZigee2mqttStatus === RequestStatus.Error) {
+    return (
+      <div class="alert alert-danger" data-cy="z2m-dashboard-save-error">
+        <Text
+          id={`${T}.advanced.${view.setupZigee2mqttError === 'DONGLE_NOT_FOUND' ? 'saveDongleNotFound' : 'saveError'}`}
+        />
+      </div>
+    );
+  }
+  return null;
+};
+
 // The rare settings, on a screen of their own: the interface of Zigbee2mqtt, the MQTT access for other applications,
 // the state of each component, the broker of an external Zigbee2mqtt, and the reset of the integration
 class AdvancedSettings extends Component {
   updatePort = e => this.setState({ port: e.target.value });
 
-  savePort = () => this.props.actions.savePort(this.state.port);
+  savePort = () => {
+    this.setState({ saveRequested: true });
+    this.props.actions.savePort(this.state.port);
+  };
+
+  saveBroker = configuration => {
+    this.setState({ saveRequested: true });
+    this.props.actions.saveBroker(configuration);
+  };
 
   showConfirmReset = () => this.setState({ confirmReset: true });
 
@@ -35,10 +64,26 @@ class AdvancedSettings extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { port: props.view.configuration.z2mTcpPort || '', confirmReset: false };
+    // Whether this screen saved: the outcome of a save made elsewhere (the wizard) is not told here
+    this.state = { port: props.view.configuration.z2mTcpPort || '', confirmReset: false, saveRequested: false };
   }
 
-  render({ view, actions }, { port, confirmReset }) {
+  // Saved by the end of an installation: shown unless the user is typing another one
+  showSavedPort = (previousPort, savedPort) => {
+    if (`${this.state.port}` === previousPort) {
+      this.setState({ port: savedPort });
+    }
+  };
+
+  componentDidUpdate(previousProps) {
+    const previousPort = `${previousProps.view.configuration.z2mTcpPort || ''}`;
+    const savedPort = `${this.props.view.configuration.z2mTcpPort || ''}`;
+    if (savedPort !== previousPort) {
+      this.showSavedPort(previousPort, savedPort);
+    }
+  }
+
+  render({ view, actions }, { port, confirmReset, saveRequested }) {
     const { configuration, status, z2mUrl, saving, resetZigbee2mqttStatus } = view;
     const external = isExternal(configuration);
     const portChanged = `${port}` !== `${configuration.z2mTcpPort || ''}`;
@@ -58,6 +103,7 @@ class AdvancedSettings extends Component {
           <Text id={`${T}.advanced.title`} />
         </h2>
 
+        {saveRequested && <SaveError view={view} />}
         <div class={style.grid}>
           <div class={style.column}>
             {!external && (
@@ -108,7 +154,7 @@ class AdvancedSettings extends Component {
                 </h3>
                 <SetupRemoteOptions
                   configuration={configuration}
-                  saveConfiguration={actions.saveBroker}
+                  saveConfiguration={this.saveBroker}
                   resetConfiguration={actions.noop}
                   disabled={saving || view.installing}
                 />
