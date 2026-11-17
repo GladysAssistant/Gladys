@@ -522,7 +522,7 @@ describe('zigbee2mqtt configureContainer', () => {
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    expect(resultContent).to.include('frontend:\n  port: 12001\n');
+    expect(resultContent).to.include('frontend:\n  enabled: true\n  port: 12001\n');
     expect(changed.configChanged).to.equal(true);
     expect(config.z2mTcpPort).to.equal('12001');
     assert.notCalled(portfinderMock.getPortPromise);
@@ -531,7 +531,7 @@ describe('zigbee2mqtt configureContainer', () => {
   it('it should keep the other settings of the interface when its port changes', async () => {
     // PREPARE
     const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
-    fs.writeFileSync(configFilePath, content.replace('frontend:\n', 'frontend:\n  enabled: true\n'));
+    fs.writeFileSync(configFilePath, content.replace('  port: 12000\n', '  port: 12000\n  host: 0.0.0.0\n'));
     const config = {
       z2mTcpPort: '12001',
     };
@@ -539,21 +539,24 @@ describe('zigbee2mqtt configureContainer', () => {
     await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    expect(resultContent).to.include('frontend:\n  enabled: true\n  port: 12001\n');
+    expect(resultContent).to.include('frontend:\n  enabled: true\n  port: 12001\n  host: 0.0.0.0\n');
   });
 
-  it('it should keep the port of an existing file on start', async () => {
+  it('it should enable the interface of a file written before Zigbee2mqtt 2, keeping its port on start', async () => {
     // PREPARE
-    // The port changed in the file, by hand, since Gladys saved it
-    fs.copyFileSync(defaultConfigFilePath, configFilePath);
+    // Written by an earlier Gladys, without enabling the interface; its port changed by hand since Gladys saved it
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(configFilePath, content.replace('  enabled: true\n  port: 12000\n', '  port: 12000\n'));
     const config = {
       z2mTcpPort: '12001',
     };
     // EXECUTE
-    await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    expect(resultContent).to.include('frontend:\n  port: 12000\n');
+    expect(resultContent).to.include('frontend:\n  enabled: true\n  port: 12000\n');
+    // Restarted once to serve its interface
+    expect(changed.configChanged).to.equal(true);
     expect(config.z2mTcpPort).to.equal(12000);
     assert.notCalled(portfinderMock.getPortPromise);
   });
@@ -568,7 +571,7 @@ describe('zigbee2mqtt configureContainer', () => {
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
     // ASSERT
     expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
-    expect(fs.readFileSync(configFilePath, 'utf8')).to.include('frontend:\n  port: 9999\n');
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include('frontend:\n  enabled: true\n  port: 9999\n');
   });
 
   it('it should only add mqtt credentials', async () => {

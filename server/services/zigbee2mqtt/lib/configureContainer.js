@@ -365,12 +365,15 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
     config.z2mTcpPort = port;
   }
 
-  // Check for requested changes (the port of Gladys is a string, the one of the file a number)
-  if (Number(config.z2mTcpPort) !== port) {
-    // The other settings of the interface (enabled, host, auth_token…) are kept
+  // Check for requested changes (the port of Gladys is a string, the one of the file a number). Zigbee2mqtt 2 serves
+  // its interface only once enabled: always, without password for now.
+  if (Number(config.z2mTcpPort) !== port || frontend.enabled !== true) {
+    // The other settings of the interface (host, auth_token…) are kept
+    const { enabled, port: previousPort, ...otherSettings } = frontend;
     loadedConfig.frontend = {
-      ...frontend,
+      enabled: true,
       port: Number(config.z2mTcpPort),
+      ...otherSettings,
     };
     configChanged = true;
   }

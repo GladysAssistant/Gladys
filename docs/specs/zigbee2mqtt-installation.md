@@ -667,7 +667,10 @@ A screen of its own, back to the dashboard by "Configuration":
   with the new port. A setup writes the port of Gladys over the one of the Zigbee2mqtt configuration
   file; a start of Gladys keeps the port of the file (set before Gladys saved one, or changed by
   hand). The port saved by the end of an installation replaces the field unless the user
-  is typing another one. Link to the interface once the port is saved.
+  is typing another one. Link to the interface once the port is saved. The interface is always
+  enabled (`frontend.enabled: true`, without which Zigbee2mqtt 2 does not serve it), without password
+  for now; the other settings of `frontend` are kept. An installation written before gets it at the
+  next start of Gladys, Zigbee2mqtt restarted once.
 - **External broker**: its form (URL, user, password, interface URL), saved the same way.
 - **MQTT access** for other applications (local mode), the state of each component (Gladys connected
   to the broker, the broker, Zigbee2mqtt answering).

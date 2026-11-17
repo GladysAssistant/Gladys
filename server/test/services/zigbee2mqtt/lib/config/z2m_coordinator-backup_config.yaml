@@ -52,4 +52,5 @@ advanced:
     - 34
   channel: 15
 frontend:
+  enabled: true
   port: 12000
