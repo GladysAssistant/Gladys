@@ -115,6 +115,8 @@ class ThermostatBox extends Component {
     isManualMode: false,
     error: false,
     noConfig: false,
+    // The thermostat the box points to was deleted (see initData).
+    missing: false,
     remoteConfig: null,
     featureMin: null,
     featureMax: null,
@@ -1161,7 +1163,13 @@ class ThermostatBox extends Component {
   };
 
   initData = async () => {
-    await this.loadConfig();
+    const remoteConfig = await this.loadConfig();
+    // A thermostat deleted since the box was set: nothing to draw nor to drive.
+    // Without this the card fell back to the default settings and drew a
+    // comfort setpoint for a device that no longer exists.
+    const missing = Boolean(remoteConfig && remoteConfig.missing);
+    this.setState(missing ? { missing, setpoint: null } : { missing });
+    if (missing) return;
     // The schedule before the state that reads it: a thermostat following its
     // programme takes its preset from the point in force, and the banner needs
     // the schedule to exist at all.
@@ -1644,6 +1652,7 @@ class ThermostatBox extends Component {
       activePreset,
       error,
       noConfig,
+      missing,
       isManualMode,
       manualUntil,
       manualSetpointOverride,
@@ -1824,7 +1833,13 @@ class ThermostatBox extends Component {
               <Text id="dashboard.boxes.thermostat.noConfig" />
             </div>
           )}
-          {!error && !noConfig && setpoint !== null && (
+          {missing && !noConfig && (
+            <div class="alert alert-warning">
+              <i class="fe fe-alert-triangle mr-2" />
+              <Text id="dashboard.boxes.thermostat.missing" />
+            </div>
+          )}
+          {!error && !noConfig && !missing && setpoint !== null && (
             <div>
               <div class="d-flex justify-content-center mb-3">
                 <div ref={el => (this.svgRef = el)} class={style.gaugeContainer}>

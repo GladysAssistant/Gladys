@@ -1052,6 +1052,7 @@
         "modeCooling": "Cooling Mode",
         "modeOff": "Off Mode",
         "noConfig": "Please configure the widget by clicking the edit button.",
+        "missing": "This thermostat no longer exists. Edit this widget to select a thermostat.",
         "manualMode": "Manual mode",
         "scheduleLabel": "Schedule:",
         "scheduleUntil": "until",

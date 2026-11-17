@@ -115,6 +115,7 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
   let deviceState = null;
   let deviceSelector = null;
   let deviceName = null;
+  let missing = false;
   try {
     // The config lives on this integration's own device, so it is looked up
     // among this service's thermostats — never by feature selector on
@@ -134,10 +135,16 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
     deviceState = device ? buildStateFromFeatures(device) : null;
     deviceSelector = device ? device.selector : null;
     deviceName = device ? device.name : null;
+    // The box editor only offers this integration's thermostats: a selector none
+    // of them answers to is a thermostat deleted since the box was set.
+    missing = !device;
   } catch (e) {
     paramsConfig = null;
   }
 
+  if (missing) {
+    return { ...DEFAULTS, missing: true };
+  }
   if (!paramsConfig) {
     return { ...DEFAULTS };
   }
