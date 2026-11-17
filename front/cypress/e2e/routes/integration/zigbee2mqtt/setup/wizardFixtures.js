@@ -120,13 +120,20 @@ const answerSetup = (response = { body: usbSetup }) => {
   }
 };
 
-const visitWizard = ({ status = readyToSetupStatus, setup = {}, ports = [[machinePort, zbDongleE]] } = {}) => {
+// prefetchResponse: the answer of POST /prefetch, or a handler of the request
+const visitWizard = ({
+  status = readyToSetupStatus,
+  setup = {},
+  ports = [[machinePort, zbDongleE]],
+  prefetchResponse = prefetch
+} = {}) => {
   const serverUrl = Cypress.env('serverUrl');
   cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: status }).as('status');
   cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: setup });
-  cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch` }, { body: prefetch }).as(
-    'prefetch'
-  );
+  cy.intercept(
+    { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch` },
+    typeof prefetchResponse === 'function' ? prefetchResponse : { body: prefetchResponse }
+  ).as('prefetch');
   listPorts(...ports);
   cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   cy.waitForWebSocket();

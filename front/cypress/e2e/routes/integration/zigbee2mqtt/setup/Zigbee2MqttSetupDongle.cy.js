@@ -49,10 +49,22 @@ describe('Zigbee2mqtt USB dongle', () => {
     }).as('usbPorts');
   };
 
-  const chooseLocalMode = () => {
-    cy.get('[data-cy=z2m-setup-local-panel]').within(() => {
-      cy.get('button').click();
-    });
+  // A first installation goes through the wizard (Zigbee2MqttWizard.cy.js): the form changes a configured dongle
+  const visitConfigured = () =>
+    visitSetup(
+      { ...readyToSetupStatus, usbConfigured: true, z2mEnabled: true },
+      {
+        Z2M_MQTT_MODE: 'local',
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: `/dev/serial/by-id/${LINK}`,
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_E
+      }
+    );
+
+  const openLocalForm = () => {
+    cy.get('[data-cy=z2m-setup-local-summary]')
+      .find('button')
+      .click();
     cy.wait('@usbPorts');
   };
 
@@ -87,33 +99,11 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.login();
   });
 
-  it('should show a dongle plugged in while the form is open, and save it by its stable path', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: {} }).as('setup');
-    listPorts([machinePort], [machinePort, zbDongleE]);
-    visitSetup(readyToSetupStatus);
-    chooseLocalMode();
-
-    // Nothing plugged in yet
-    cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
-
-    // Plugged in: listed again in the background, the dongle and its model are chosen without any click
-    cy.wait('@usbPorts');
-    cy.get('[data-cy=z2m-setup-local-usb-field]').should('contain', 'Itead Sonoff Zigbee 3.0 USB Dongle Plus V2');
-    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', ZBDONGLE_E);
-    cy.get('[data-cy=z2m-setup-save]')
-      .should('not.be.disabled')
-      .click();
-    cy.wait('@setup')
-      .its('request.body')
-      .should('include', { ZIGBEE2MQTT_DRIVER_PATH: `/dev/serial/by-id/${LINK}`, ZIGBEE_DONGLE_NAME: ZBDONGLE_E });
-  });
-
   it('should ask the ports again less often after a failure', () => {
     const requests = countPortRequests({ body: [zbDongleE] }, { statusCode: 500, body: {} });
     cy.clock();
-    visitSetup(readyToSetupStatus);
-    chooseLocalMode();
+    visitConfigured();
+    openLocalForm();
     waitForDonglePreselected();
 
     // The list asked 3 s later fails, the next one is asked 30 s after it, not 3 s
@@ -131,8 +121,8 @@ describe('Zigbee2mqtt USB dongle', () => {
     const installation = { state: 'running', kind: 'install', phases: [], progress: 10, error: null, durationMs: null };
     const requests = countPortRequests({ body: [zbDongleE] });
     cy.clock();
-    visitSetup(readyToSetupStatus);
-    chooseLocalMode();
+    visitConfigured();
+    openLocalForm();
     waitForDonglePreselected();
     cy.waitForWebSocket();
 
@@ -153,8 +143,8 @@ describe('Zigbee2mqtt USB dongle', () => {
   it('should keep the dongle chosen when the ports are listed again', () => {
     const otherDongle = { ...zbDongleE, path: '/dev/ttyUSB1', stablePath: '/dev/ttyUSB1', name: 'Other dongle' };
     listPorts([zbDongleE, otherDongle]);
-    visitSetup(readyToSetupStatus);
-    chooseLocalMode();
+    visitConfigured();
+    openLocalForm();
 
     cy.get('[data-cy=z2m-setup-local-usb-field]')
       .children()
@@ -223,8 +213,8 @@ describe('Zigbee2mqtt USB dongle', () => {
       { statusCode: 400, body: { status: 400, code: 'BAD_REQUEST', message: 'DONGLE_NOT_FOUND' } }
     ).as('setup');
     listPorts([zbDongleE]);
-    visitSetup(readyToSetupStatus);
-    chooseLocalMode();
+    visitConfigured();
+    openLocalForm();
 
     cy.get('[data-cy=z2m-setup-save]')
       .should('not.be.disabled')

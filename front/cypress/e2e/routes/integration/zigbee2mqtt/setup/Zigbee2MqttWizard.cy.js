@@ -312,4 +312,85 @@ describe('Zigbee2mqtt setup wizard', () => {
     sendStatus({ ...readyToSetupStatus, ezspFallback: true, installation: runningInstallation });
     cy.get('[data-cy=z2m-wizard-ezsp-note]').should('exist');
   });
+
+  describe('downloads in the background', () => {
+    const notEnoughDiskSpace = {
+      state: 'failed',
+      progress: 0,
+      freeBytes: 120400000,
+      neededBytes: 236700000,
+      error: { code: 'NOT_ENOUGH_DISK_SPACE', message: 'Not enough disk space' }
+    };
+    const idleInstallation = readyToSetupStatus.installation;
+    const { prefetch } = readyToSetupStatus;
+
+    // Translation with its fields replaced
+    const i18nText = (key, fields) =>
+      Object.keys(fields).reduce(
+        (text, field) => text.replace(`{{${field}}}`, fields[field]),
+        Cypress._.get(Cypress.env('i18n'), key)
+      );
+
+    it('should not download as the page opens without dongle, but once a network coordinator is entered', () => {
+      visitWizard({ ports: [[machinePort]] });
+      cy.get('[data-cy=z2m-wizard-key-none]').should('exist');
+      cy.get('[data-cy=z2m-wizard-show-network]').click();
+      cy.get('@prefetch.all').should('have.length', 0);
+      cy.get('[data-cy=z2m-wizard-network-url]').type('tcp://192.168.1.20:6638');
+      cy.wait('@prefetch');
+    });
+
+    it('should download once the server tells that it runs in Docker, and only once', () => {
+      const askedWhileDocker = [];
+      let docker = false;
+      visitWizard({
+        status: { ...readyToSetupStatus, dockerBased: false, networkModeValid: false },
+        prefetchResponse: req => {
+          askedWhileDocker.push(docker);
+          req.reply({ body: prefetch });
+        }
+      });
+      // Gladys cannot install it yet: nothing is downloaded
+      cy.get('[data-cy=z2m-wizard-incompatible]').should('exist');
+      cy.then(() => {
+        docker = true;
+      });
+      sendStatus({ ...readyToSetupStatus, installation: idleInstallation });
+      cy.get('[data-cy=z2m-wizard-key-one]').should('exist');
+      cy.wait('@prefetch');
+      sendStatus({ ...readyToSetupStatus, installation: idleInstallation });
+      cy.get('[data-cy=z2m-wizard-show-manual]').click();
+      cy.wrap(askedWhileDocker).should('deep.equal', [true]);
+    });
+
+    it('should tell how far the download is, until the installation starts', () => {
+      visitWizard({ prefetchResponse: { ...prefetch, state: 'running', progress: 64 } });
+      cy.wait('@prefetch');
+      cy.get('[data-cy=z2m-prefetch-status]').should(
+        'have.text',
+        i18nText('integration.zigbee2mqtt.setup.prefetch.running', { progress: 64 })
+      );
+      sendProgress(idleInstallation);
+      cy.sendWebSocket({
+        type: 'zigbee2mqtt.install-progress',
+        payload: { installation: idleInstallation, prefetch: { ...prefetch, state: 'done', progress: 100 } }
+      });
+      cy.get('[data-cy=z2m-prefetch-status]').i18n('integration.zigbee2mqtt.setup.prefetch.done');
+
+      answerSetup();
+      cy.get('[data-cy=z2m-wizard-install]').click();
+      cy.wait('@setup');
+      cy.get('[data-cy=z2m-prefetch-status]').should('not.exist');
+    });
+
+    it('should warn that the disk space is missing, without preventing the installation', () => {
+      visitWizard({ prefetchResponse: notEnoughDiskSpace });
+      cy.wait('@prefetch');
+      cy.get('[data-cy=z2m-prefetch-disk-space]').should(
+        'have.text',
+        i18nText('integration.zigbee2mqtt.setup.prefetch.notEnoughDiskSpace', { free: 120, needed: 237 })
+      );
+      cy.get('[data-cy=z2m-wizard-install]').should('not.be.disabled');
+    });
+  });
 });

@@ -56,15 +56,8 @@ describe('Zigbee2mqtt installation progress', () => {
   };
 
   const idleInstallation = { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null };
-  const notEnoughDiskSpace = {
-    state: 'failed',
-    progress: 0,
-    freeBytes: 120400000,
-    neededBytes: 236700000,
-    error: { code: 'NOT_ENOUGH_DISK_SPACE', message: 'Not enough disk space' }
-  };
-
-  const visitSetup = (status, { setup = {}, prefetchResponse = prefetch, statusDelay = 0 } = {}) => {
+  // Configured: the page of the installation (a first installation goes through the wizard, Zigbee2MqttWizard.cy.js)
+  const visitSetup = (status, { setup = localSetup, prefetchResponse = prefetch, statusDelay = 0 } = {}) => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
@@ -79,16 +72,14 @@ describe('Zigbee2mqtt installation progress', () => {
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   };
 
-  // The recognized dongle and its model are preselected
-  const chooseLocalMode = () => {
+  // The form of the configured dongle
+  const openLocalForm = () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port` },
       { fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports_detected.json' }
     ).as('usbPorts');
-    cy.get('[data-cy=z2m-setup-local-panel]').within(() => {
-      cy.get('button').click();
-    });
+    cy.get('[data-cy=z2m-setup-local-summary] button').click();
     cy.wait('@usbPorts');
   };
 
@@ -169,7 +160,7 @@ describe('Zigbee2mqtt installation progress', () => {
     });
 
     // Shown once the status is loaded, like the progress of the installation
-    cy.get('[data-cy=z2m-setup-local-panel]').should('exist');
+    cy.get('[data-cy=z2m-setup-local-summary]').should('exist');
     cy.get('[data-cy=z2m-installation-progress]').should('not.exist');
   });
 
@@ -235,7 +226,7 @@ describe('Zigbee2mqtt installation progress', () => {
     // Loaded after the status, and shown: answered to the page too, not only to the proxy. The HTTP client gives the
     // answer of a GET still running to the same GET asked meanwhile, instead of sending it.
     cy.wait('@config');
-    cy.get('[data-cy=z2m-setup-local-panel]').should('exist');
+    cy.get('[data-cy=z2m-setup-local-summary]').should('exist');
 
     // The load at the end of the installation, read before the save, answers once the save is shown
     let answerReload;
@@ -250,7 +241,7 @@ describe('Zigbee2mqtt installation progress', () => {
       type: 'zigbee2mqtt.install-progress',
       payload: { installation: doneInstallation, prefetch }
     });
-    chooseLocalMode();
+    openLocalForm();
     cy.get('[data-cy=z2m-setup-save]')
       .should('not.be.disabled')
       .click();
@@ -283,63 +274,6 @@ describe('Zigbee2mqtt installation progress', () => {
     cy.get('[data-cy=z2m-reset-button]').should('not.be.disabled');
     cy.get('[data-cy=z2m-setup-local-summary] button').should('not.be.disabled');
     cy.get('[data-cy=z2m-installation-progress]').should('not.exist');
-  });
-
-  it('should download the images in the background for the dongle chosen once the server tells it runs in Docker', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    // Whether the server told it runs in Docker when each download was asked
-    const toldDockerWhenAsked = [];
-    let toldDocker = true;
-    // No dongle recognized: nothing is preselected
-    cy.intercept(
-      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port` },
-      { fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports.json' }
-    ).as('usbPorts');
-    visitSetup(readyToSetupStatus, {
-      prefetchResponse: req => {
-        toldDockerWhenAsked.push(toldDocker);
-        req.reply({ body: prefetch });
-      }
-    });
-    cy.get('[data-cy=z2m-setup-local-panel]').within(() => {
-      cy.get('button').click();
-    });
-    cy.wait('@usbPorts');
-
-    // Gladys restarts while the form is open: its integration has not told yet that it runs in Docker
-    cy.then(() => {
-      toldDocker = false;
-    });
-    cy.sendWebSocket({
-      type: 'zigbee2mqtt.status-change',
-      payload: { ...readyToSetupStatus, dockerBased: false, networkModeValid: false, installation: idleInstallation }
-    });
-    cy.get('[data-cy=z2m-setup-local-usb-field]')
-      .children()
-      .click();
-    cy.get('.react-select__option')
-      .first()
-      .click();
-    cy.get('[data-cy=z2m-setup-local-usb-field]').should('contain', '/dev/ttyUSB0');
-
-    // The form asks again on each update, the page once it can
-    cy.then(() => {
-      toldDocker = true;
-    });
-    cy.sendWebSocket({
-      type: 'zigbee2mqtt.status-change',
-      payload: { ...readyToSetupStatus, installation: idleInstallation, prefetch }
-    });
-    cy.wait('@prefetch');
-    // Asked once
-    cy.sendWebSocket({
-      type: 'zigbee2mqtt.status-change',
-      payload: { ...readyToSetupStatus, installation: idleInstallation, prefetch }
-    });
-    cy.get('[data-cy=z2m-setup-local-usb-refresh]').click();
-    cy.wait('@usbPorts');
-
-    cy.wrap(toldDockerWhenAsked).should('deep.equal', [true]);
   });
 
   it('should tell that the disk space is missing to download Zigbee2mqtt', () => {
@@ -547,7 +481,7 @@ describe('Zigbee2mqtt installation progress', () => {
     );
     visitSetup(readyToSetupStatus);
 
-    chooseLocalMode();
+    openLocalForm();
     cy.get('[data-cy=z2m-setup-save]')
       .should('not.be.disabled')
       .click();
@@ -569,47 +503,6 @@ describe('Zigbee2mqtt installation progress', () => {
     });
     cy.get('[data-cy=z2m-installation-progress]').should('not.exist');
     cy.get('[data-cy=z2m-setup-save-conflict]').should('not.exist');
-  });
-
-  it('should download the images in the background once the recognized dongle is preselected, not as the page opens', () => {
-    visitSetup(readyToSetupStatus);
-    cy.wait(['@status', '@config']);
-    cy.get('[data-cy=z2m-setup-local-panel] button').should('not.be.disabled');
-    cy.get('@prefetch.all').should('have.length', 0);
-
-    chooseLocalMode();
-
-    cy.wait('@prefetch');
-  });
-
-  it('should download the images in the background once a network coordinator is entered', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    // No dongle recognized: nothing is preselected
-    cy.intercept(
-      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port` },
-      { fixture: 'integration/routes/integration/zigbee2mqtt/get_usb_ports.json' }
-    ).as('usbPorts');
-    visitSetup(readyToSetupStatus);
-    cy.get('[data-cy=z2m-setup-local-panel]').within(() => {
-      cy.get('button').click();
-    });
-    cy.wait('@usbPorts');
-    cy.get('[data-cy=z2m-setup-local-adapter-mode-field] input[value=network]').check({ force: true });
-    cy.get('@prefetch.all').should('have.length', 0);
-
-    cy.get('[data-cy=z2m-setup-local-network-url-field] input').type('tcp://192.168.1.20:6638');
-
-    cy.wait('@prefetch');
-  });
-
-  it('should not download the images in the background for an external broker', () => {
-    visitSetup(readyToSetupStatus);
-    cy.get('[data-cy=z2m-setup-remote-panel]').within(() => {
-      cy.get('button').click();
-    });
-
-    cy.get('[data-cy=z2m-setup-remote-broker-url-field]').type('mqtt://192.168.1.10:1883');
-    cy.get('@prefetch.all').should('have.length', 0);
   });
 
   it('should not download the images in the background once a dongle is configured', () => {
@@ -636,66 +529,5 @@ describe('Zigbee2mqtt installation progress', () => {
 
     cy.get('@prefetch.all').should('have.length', 0);
     cy.get('[data-cy=z2m-prefetch-status]').should('not.exist');
-  });
-
-  it('should tell how far the download in the background is, until the installation starts', () => {
-    visitSetup(readyToSetupStatus, { prefetchResponse: { ...prefetch, state: 'running', progress: 64 } });
-    chooseLocalMode();
-    cy.wait('@prefetch');
-
-    cy.get('[data-cy=z2m-prefetch-status]').should(
-      'have.text',
-      i18nText('integration.zigbee2mqtt.setup.prefetch.running', { progress: 64 })
-    );
-
-    cy.sendWebSocket({
-      type: 'zigbee2mqtt.install-progress',
-      payload: { installation: idleInstallation, prefetch: { ...prefetch, state: 'done', progress: 100 } }
-    });
-    cy.get('[data-cy=z2m-prefetch-status]').i18n('integration.zigbee2mqtt.setup.prefetch.done');
-
-    // The progress of the installation takes over
-    cy.sendWebSocket({
-      type: 'zigbee2mqtt.install-progress',
-      payload: { installation: runningInstallation, prefetch: { ...prefetch, state: 'done', progress: 100 } }
-    });
-    cy.get('[data-cy=z2m-installation-progress]').should('exist');
-    cy.get('[data-cy=z2m-prefetch-status]').should('not.exist');
-  });
-
-  it('should warn that the disk space is missing, without preventing the installation', () => {
-    visitSetup(readyToSetupStatus, { prefetchResponse: notEnoughDiskSpace });
-    chooseLocalMode();
-    cy.wait('@prefetch');
-
-    cy.get('[data-cy=z2m-prefetch-disk-space]').should(
-      'have.text',
-      i18nText('integration.zigbee2mqtt.setup.prefetch.notEnoughDiskSpace', { free: 120, needed: 237 })
-    );
-    cy.get('[data-cy=z2m-prefetch-status]').should('not.exist');
-    cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
-
-    // Without the free space, the figures are left out
-    cy.sendWebSocket({
-      type: 'zigbee2mqtt.install-progress',
-      payload: { installation: idleInstallation, prefetch: { ...notEnoughDiskSpace, freeBytes: null } }
-    });
-    cy.get('[data-cy=z2m-prefetch-disk-space]').should(
-      'have.text',
-      i18nText('integration.zigbee2mqtt.setup.prefetch.notEnoughDiskSpaceNoFigures', {})
-    );
-
-    // Nor when they do not show the lack of space: the disk filled up during the download
-    cy.sendWebSocket({
-      type: 'zigbee2mqtt.install-progress',
-      payload: {
-        installation: idleInstallation,
-        prefetch: { ...notEnoughDiskSpace, freeBytes: 800000000, neededBytes: 736000000 }
-      }
-    });
-    cy.get('[data-cy=z2m-prefetch-disk-space]').should(
-      'have.text',
-      i18nText('integration.zigbee2mqtt.setup.prefetch.notEnoughDiskSpaceNoFigures', {})
-    );
   });
 });
