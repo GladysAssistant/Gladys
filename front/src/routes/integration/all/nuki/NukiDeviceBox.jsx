@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 class NukiDeviceBox extends Component {
@@ -238,6 +239,10 @@ class NukiDeviceBox extends Component {
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.nuki.saveButton" />
                     </button>
+                  )}
+
+                  {validModel && deleteButton && (
+                    <MigrateDeviceButton device={device} onMigrated={this.props.getNukiDevices} />
                   )}
 
                   {validModel && deleteButton && (
