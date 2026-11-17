@@ -1555,4 +1555,80 @@ describe('Device', () => {
     expect(firstDevice.features.map((feature) => feature.selector)).to.deep.equal(['volume', 'volume-2']);
     expect(secondDevice.features.map((feature) => feature.selector)).to.deep.equal(['volume-3']);
   });
+  it('should update a device while other writes wait for its transaction', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const concurrentWrites = [];
+    const sequelizeTransaction = db.sequelize.transaction.bind(db.sequelize);
+    // As soon as the device transaction holds the SQLite write lock, other writes
+    // of Gladys start on the default connection and wait for that lock there.
+    // A query of the transaction sent to the default connection would wait behind
+    // them, and the transaction would never commit.
+    const transactionStub = sinon.stub(db.sequelize, 'transaction').callsFake((options, callback) =>
+      sequelizeTransaction(options, async (transaction) => {
+        for (let i = 0; i < 5; i += 1) {
+          concurrentWrites.push(
+            db.Variable.create({ name: `CONCURRENT_WRITE_${concurrentWrites.length}`, value: 'concurrent' }),
+          );
+        }
+        await new Promise((resolve) => {
+          setTimeout(resolve, 50);
+        });
+        return callback(transaction);
+      }),
+    );
+    const deviceToSave = {
+      name: 'RENAMED_DEVICE',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      features: [
+        {
+          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+          name: 'New device feature',
+          external_id: 'hue:binary:1',
+          category: 'temperature',
+          type: 'decimal',
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+      ],
+      params: [
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_PARAM',
+          value: 'UPDATED_VALUE',
+        },
+      ],
+    };
+    try {
+      // once found by id, once by external_id
+      const updatedById = await device.create({
+        ...deviceToSave,
+        id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+        features: deviceToSave.features.map((feature) => ({ ...feature })),
+        params: deviceToSave.params.map((param) => ({ ...param })),
+      });
+      const updatedByExternalId = await device.create({
+        ...deviceToSave,
+        features: deviceToSave.features.map((feature) => ({ ...feature })),
+        params: deviceToSave.params.map((param) => ({ ...param })),
+      });
+      await Promise.all(concurrentWrites);
+      [updatedById, updatedByExternalId].forEach((updatedDevice) => {
+        expect(updatedDevice).to.have.property('id', '7f85c2f8-86cc-4600-84db-6c074dadb4e8');
+        expect(updatedDevice).to.have.property('name', 'RENAMED_DEVICE');
+        expect(updatedDevice.features.map((feature) => feature.id)).to.deep.equal([
+          'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        ]);
+        expect(updatedDevice.params.map((param) => param.value)).to.deep.equal(['UPDATED_VALUE']);
+      });
+      const concurrentVariables = await db.Variable.count({ where: { value: 'concurrent' } });
+      expect(concurrentVariables).to.equal(10);
+    } finally {
+      transactionStub.restore();
+    }
+  });
 });
