@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import MqttPage from '../MqttPage';
 import DeviceTab from './DeviceTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 
 class MqttDevicePage extends Component {
   componentWillMount() {
@@ -23,4 +24,4 @@ class MqttDevicePage extends Component {
 export default connect(
   'session,user,mqttDevices,houses,getMqttDevicesStatus,mqttDeviceSearch,getMqttDeviceOrderDir',
   actions
-)(MqttDevicePage);
+)(withMobileViewport(MqttDevicePage));

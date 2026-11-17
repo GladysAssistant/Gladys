@@ -7,8 +7,9 @@ import { route } from 'preact-router';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 import update from 'immutability-helper';
 
 dayjs.extend(relativeTime);
@@ -18,6 +19,22 @@ import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/devi
 import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 import { buildUsagePointDevicePayload } from './usagePointDeviceBuilder';
+import {
+  withMobileViewport,
+  MobileSectionHeader,
+  MobileGroup,
+  MobileNotice,
+  MobileEmptyState,
+  BigButton,
+  kitStyle
+} from '../../../../components/mobile';
+import {
+  MobileIntegrationTab,
+  MobileDeviceItem,
+  MobileListLoader,
+  MobileProgress,
+  integrationMobileStyle
+} from '../../../../components/integration/mobile';
 
 const UsagePointDevice = ({
   device,
@@ -27,7 +44,9 @@ const UsagePointDevice = ({
   saveDevice,
   destroyDevice,
   reCreateUsagePointDevice,
-  syncs = []
+  syncs = [],
+  tooMuchStatesError,
+  isMobile
 }) => {
   const usagePointId = device.external_id.split(':')[1];
 
@@ -59,9 +78,67 @@ const UsagePointDevice = ({
     destroyDevice(deviceIndex);
   };
 
-  const reCreate = () => {
-    reCreateUsagePointDevice(usagePointId, deviceIndex);
-  };
+  const reCreate = () => reCreateUsagePointDevice(usagePointId, deviceIndex);
+
+  // On a phone: a row and its sheet, fed by the handlers of the card
+  // (docs/specs/mobile-pages/integration-devices.md)
+  if (isMobile) {
+    return (
+      <MobileDeviceItem
+        device={device}
+        icon="zap"
+        subtitle={usagePointId}
+        pills={
+          syncInProgress ? (
+            <span class={cx(integrationMobileStyle.rowNote, integrationMobileStyle.rowNoteAccent)}>
+              <Text id="integration.enedis.usagePoints.gladysPlusRefreshProgressLabel" /> {syncInProgress.progress}%
+            </span>
+          ) : null
+        }
+        sheetPills={null}
+        onNameChange={e => updateDeviceName(deviceIndex, e.target.value)}
+        showFeatures={false}
+        details={[
+          { label: <Text id="integration.enedis.usagePoints.usagePointId" />, value: usagePointId, mono: true },
+          { label: <Text id="integration.enedis.usagePoints.mobile.lastSync" />, value: lastRefreshDate },
+          { label: <Text id="integration.enedis.usagePoints.mobile.numberOfStates" />, value: numberOfStates }
+        ]}
+        onSave={() => saveDevice(deviceIndex)}
+        actions={
+          deviceShouldBeUpdated
+            ? [
+                {
+                  label: <Text id="integration.enedis.usagePoints.recreateButton" />,
+                  icon: 'refresh-cw',
+                  onClick: reCreate,
+                  toast: <Text id="mobileDeviceList.updated" />,
+                  dataCy: 'enedis-usage-point-recreate'
+                }
+              ]
+            : []
+        }
+        onDelete={() => destroyDevice(deviceIndex)}
+        deleteError={
+          tooMuchStatesError && tooMuchStatesError.selector === device.selector ? (
+            <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: tooMuchStatesError.statesNumber }} />
+          ) : null
+        }
+        dataCy="enedis-usage-point-row"
+      >
+        {syncInProgress && (
+          <div class={integrationMobileStyle.sheetSection} data-cy="enedis-usage-point-sync">
+            <div class={integrationMobileStyle.sheetLabel}>
+              <Text id="integration.enedis.usagePoints.gladysPlusRefreshProgressLabel" /> {syncInProgress.progress}%
+            </div>
+            <MobileProgress value={syncInProgress.progress} />
+            <p class={kitStyle.footnote}>
+              <Text id="integration.enedis.usagePoints.gladysPlusRefreshProgressDescription" />
+            </p>
+          </div>
+        )}
+      </MobileDeviceItem>
+    );
+  }
 
   return (
     <div class="col-md-6">
@@ -181,6 +258,88 @@ const UsagePointDevice = ({
         </div>
       </div>
     </div>
+  );
+};
+
+// The meters on a phone (docs/specs/mobile-pages/integration-devices.md): the synchronization as
+// the button of the page, then one row per meter. Same props as the card below.
+const MobileEnedisUsagePoints = ({
+  errored,
+  loading,
+  syncing,
+  tooMuchStatesError,
+  usagePointsDevices,
+  language,
+  updateDeviceName,
+  saveDevice,
+  destroyDevice,
+  reCreateUsagePointDevice,
+  syncs,
+  sync
+}) => {
+  const devices = usagePointsDevices || [];
+  return (
+    <MobileIntegrationTab dataCy="enedis-usage-points-mobile">
+      {errored && (
+        <MobileNotice tone="danger" icon="alert-circle" role="alert">
+          <Text id="integration.enedis.welcome.error" />
+        </MobileNotice>
+      )}
+      {devices.length > 0 && (
+        <div class={integrationMobileStyle.block}>
+          {/* its spinner is for the synchronization only: `loading` also covers a meter being
+              saved or deleted, which the sheet of that meter shows */}
+          <BigButton
+            variant="primary"
+            icon="refresh-cw"
+            onClick={sync}
+            loading={syncing}
+            disabled={loading}
+            data-cy="enedis-sync"
+          >
+            <Text id="integration.enedis.usagePoints.refreshLocal" />
+          </BigButton>
+        </div>
+      )}
+      <MobileListLoader loading={loading} empty={devices.length === 0}>
+        {devices.length > 0 && (
+          <div>
+            <MobileSectionHeader title={<Text id="integration.enedis.usagePoints.title" />} />
+            <MobileGroup>
+              {devices.map((usagePointDevice, index) => (
+                <UsagePointDevice
+                  key={usagePointDevice.external_id}
+                  isMobile
+                  device={usagePointDevice}
+                  language={language}
+                  deviceIndex={index}
+                  updateDeviceName={updateDeviceName}
+                  saveDevice={saveDevice}
+                  destroyDevice={destroyDevice}
+                  reCreateUsagePointDevice={reCreateUsagePointDevice}
+                  syncs={syncs}
+                  tooMuchStatesError={tooMuchStatesError}
+                />
+              ))}
+            </MobileGroup>
+          </div>
+        )}
+        {usagePointsDevices && devices.length === 0 && !loading && (
+          <MobileEmptyState icon="zap" text={<Text id="integration.enedis.usagePoints.emptyState" />}>
+            <BigButton variant="primary" href="/dashboard/integration/device/enedis" data-cy="enedis-connect">
+              <Text id="integration.enedis.welcomeTab" />
+            </BigButton>
+          </MobileEmptyState>
+        )}
+      </MobileListLoader>
+      {devices.length > 0 && (
+        <div class={integrationMobileStyle.afterList}>
+          <MobileNotice icon="info">
+            <Text id="integration.enedis.usagePoints.explanation" />
+          </MobileNotice>
+        </div>
+      )}
+    </MobileIntegrationTab>
   );
 };
 
@@ -315,36 +474,53 @@ class EnedisWelcomePageComponent extends Component {
     }
   };
   sync = async () => {
-    await this.setState({ loading: true });
+    await this.setState({ loading: true, syncing: true });
     try {
       await this.props.httpClient.post('/api/v1/service/enedis/sync');
       route('/dashboard/settings/jobs');
     } catch (e) {
       console.error(e);
     }
-    await this.setState({ loading: false });
+    await this.setState({ loading: false, syncing: false });
   };
+  // saveDevice and destroyDevice resolve to false when the request failed: the phone sheet then
+  // says so (the card has no error message for them)
   saveDevice = async deviceIndex => {
     await this.setState({ loading: true });
+    let saved = true;
     try {
       const device = this.state.usagePointsDevices[deviceIndex];
       await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     } catch (e) {
       console.error(e);
+      saved = false;
     }
     await this.setState({ loading: false });
+    return saved;
   };
   destroyDevice = async deviceIndex => {
-    await this.setState({ loading: true });
+    await this.setState({ loading: true, tooMuchStatesError: null });
+    let deleted = true;
+    const device = this.state.usagePointsDevices[deviceIndex];
     try {
-      const device = this.state.usagePointsDevices[deviceIndex];
       await this.props.httpClient.delete(`/api/v1/device/${device.selector}`);
       await this.getCurrentEnedisUsagePoints();
       await this.getCurrentSync();
     } catch (e) {
       console.error(e);
+      deleted = false;
+      // A meter holds years of states: too many to delete at once, Gladys purges them in the
+      // background and trying again right away is refused again. The phone confirmation says
+      // so, with the link to the job.
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        await this.setState({ tooMuchStatesError: { selector: device.selector, statesNumber } });
+      }
     }
     await this.setState({ loading: false });
+    return deleted;
   };
   reCreateUsagePointDevice = async (usagePointId, deviceIndex) => {
     const existingDevice = this.state.usagePointsDevices[deviceIndex];
@@ -376,11 +552,14 @@ class EnedisWelcomePageComponent extends Component {
   componentWillUnmount() {
     clearInterval(this.refreshInterval);
   }
-  render({ user }, { loading, errored, usagePointsDevices, syncs }) {
+  render({ user, isMobile }, { loading, syncing, tooMuchStatesError, errored, usagePointsDevices, syncs }) {
+    const UsagePointsView = isMobile ? MobileEnedisUsagePoints : EnedisUsagePoints;
     return (
       <EnedisPage user={this.props.user}>
-        <EnedisUsagePoints
+        <UsagePointsView
           loading={loading}
+          syncing={Boolean(syncing)}
+          tooMuchStatesError={tooMuchStatesError}
           errored={errored}
           usagePointsDevices={usagePointsDevices}
           sync={this.sync}
@@ -397,4 +576,4 @@ class EnedisWelcomePageComponent extends Component {
   }
 }
 
-export default connect('user,session,httpClient', {})(withIntlAsProp(EnedisWelcomePageComponent));
+export default connect('user,session,httpClient', {})(withIntlAsProp(withMobileViewport(EnedisWelcomePageComponent)));

@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -6,6 +6,20 @@ import style from './style.css';
 import AirplayDeviceBox from '../AirplayDeviceBox';
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
+import {
+  withMobileViewport,
+  MobileSectionHeader,
+  MobileGroup,
+  MobileNotice,
+  MobileEmptyState,
+  BigButton,
+  kitStyle
+} from '../../../../../components/mobile';
+import {
+  MobileIntegrationTab,
+  MobileListLoader,
+  integrationMobileStyle
+} from '../../../../../components/integration/mobile';
 
 class DiscoverTab extends Component {
   getDiscoveredDevices = async () => {
@@ -37,7 +51,69 @@ class DiscoverTab extends Component {
     this.getDiscoveredDevices();
   }
 
-  render(props, { loading, errorLoading, discoveredDevices }) {
+  // The discovery on a phone (docs/specs/mobile-pages/integration-devices.md): the scan as the
+  // button of the page, then one row per device found
+  renderMobile({ loading, errorLoading, discoveredDevices }) {
+    const devices = discoveredDevices || [];
+    return (
+      <MobileIntegrationTab dataCy="airplay-discover-mobile">
+        <p class={kitStyle.lead}>
+          <Text id="integration.airplay.discover.description" />
+        </p>
+        <div class={integrationMobileStyle.block}>
+          <BigButton
+            variant="primary"
+            icon="radio"
+            onClick={this.getDiscoveredDevices}
+            loading={loading}
+            data-cy="airplay-discover-scan"
+          >
+            <Text id="integration.airplay.discover.scan" />
+          </BigButton>
+        </div>
+        {errorLoading && (
+          <MobileNotice tone="danger" icon="alert-circle" role="alert">
+            <Text id="integration.airplay.discover.errorWhileScanning" />
+          </MobileNotice>
+        )}
+        <MobileListLoader loading={loading} empty={devices.length === 0}>
+          {devices.length > 0 && (
+            <div>
+              <MobileSectionHeader
+                title={
+                  <Text id="mobileDeviceList.foundCount" plural={devices.length} fields={{ count: devices.length }} />
+                }
+              />
+              <MobileGroup>
+                {devices.map((device, index) => (
+                  <AirplayDeviceBox
+                    key={device.external_id}
+                    isMobile
+                    discovered
+                    saveButton
+                    device={device}
+                    deviceIndex={index}
+                  />
+                ))}
+              </MobileGroup>
+            </div>
+          )}
+          {discoveredDevices && devices.length === 0 && !loading && (
+            <MobileEmptyState icon="radio">
+              <div class={kitStyle.emptyText}>
+                <MarkupText id="integration.airplay.discover.noDeviceFound" />
+              </div>
+            </MobileEmptyState>
+          )}
+        </MobileListLoader>
+      </MobileIntegrationTab>
+    );
+  }
+
+  render({ isMobile }, { loading, errorLoading, discoveredDevices }) {
+    if (isMobile) {
+      return this.renderMobile(this.state);
+    }
     return (
       <div class="card">
         <div class="card-header">
@@ -81,4 +157,4 @@ class DiscoverTab extends Component {
   }
 }
 
-export default connect('httpClient', {})(DiscoverTab);
+export default connect('httpClient', {})(withMobileViewport(DiscoverTab));

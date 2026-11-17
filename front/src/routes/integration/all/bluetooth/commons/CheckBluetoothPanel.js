@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import { Text } from 'preact-i18n';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+import { MobileNotice } from '../../../../../components/mobile';
 
 class CheckBluetoothPanel extends Component {
   componentWillMount() {
@@ -14,9 +15,17 @@ class CheckBluetoothPanel extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE, this.props.updateStatus);
   }
 
-  render({ bluetoothStatus }) {
+  render({ bluetoothStatus, isMobile }) {
     if (!bluetoothStatus || bluetoothStatus.ready) {
       return null;
+    }
+
+    if (isMobile) {
+      return (
+        <MobileNotice tone="warning" icon="alert-triangle" data-cy="bluetooth-not-ready">
+          <Text id="integration.bluetooth.bluetoothNotReadyError" />
+        </MobileNotice>
+      );
     }
 
     return (

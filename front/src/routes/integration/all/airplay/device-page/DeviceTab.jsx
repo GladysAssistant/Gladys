@@ -9,6 +9,18 @@ import AirplayDeviceBox from '../AirplayDeviceBox';
 import debounce from 'debounce';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import {
+  withMobileViewport,
+  MobileSectionHeader,
+  MobileGroup,
+  MobileEmptyState,
+  BigButton
+} from '../../../../../components/mobile';
+import {
+  MobileIntegrationTab,
+  MobileListToolbar,
+  MobileListLoader
+} from '../../../../../components/integration/mobile';
 
 class DeviceTab extends Component {
   constructor(props) {
@@ -79,7 +91,67 @@ class DeviceTab extends Component {
     this.getAirplayDevices();
   };
 
-  render({}, { orderDir, search, getAirplayStatus, airplayDevices, housesWithRooms }) {
+  // The devices on a phone (docs/specs/mobile-pages/integration-devices.md): one row per device,
+  // opening the sheet that holds what its card holds
+  renderMobile({ orderDir, search, getAirplayStatus, airplayDevices, housesWithRooms }) {
+    const loading = getAirplayStatus === RequestStatus.Getting;
+    const devices = airplayDevices || [];
+    return (
+      <MobileIntegrationTab dataCy="airplay-devices-mobile">
+        <MobileListToolbar
+          // the search is debounced: the field is not controlled, it only starts from the query
+          // still applied to the list when it mounts again
+          initialSearchValue={search}
+          onSearch={this.debouncedSearch}
+          orderDir={orderDir}
+          onOrderChange={this.changeOrderDir}
+        />
+        <MobileListLoader loading={loading} empty={devices.length === 0}>
+          {devices.length > 0 && (
+            <div>
+              <MobileSectionHeader
+                title={
+                  <Text id="mobileDeviceList.deviceCount" plural={devices.length} fields={{ count: devices.length }} />
+                }
+              />
+              <MobileGroup>
+                {devices.map((device, index) => (
+                  <AirplayDeviceBox
+                    key={device.external_id}
+                    isMobile
+                    editable
+                    saveButton
+                    deleteButton
+                    device={device}
+                    deviceIndex={index}
+                    getAirplayDevices={this.getAirplayDevices}
+                    housesWithRooms={housesWithRooms}
+                  />
+                ))}
+              </MobileGroup>
+            </div>
+          )}
+          {airplayDevices && devices.length === 0 && !loading && (
+            <MobileEmptyState icon="airplay" text={<Text id="integration.airplay.device.noDeviceFound" />}>
+              <BigButton
+                variant="primary"
+                icon="radio"
+                href="/dashboard/integration/device/airplay/discover"
+                data-cy="airplay-devices-discover"
+              >
+                <Text id="integration.airplay.discoverTab" />
+              </BigButton>
+            </MobileEmptyState>
+          )}
+        </MobileListLoader>
+      </MobileIntegrationTab>
+    );
+  }
+
+  render({ isMobile }, { orderDir, search, getAirplayStatus, airplayDevices, housesWithRooms }) {
+    if (isMobile) {
+      return this.renderMobile(this.state);
+    }
     return (
       <div class="card">
         <div class="card-header">
@@ -130,4 +202,4 @@ class DeviceTab extends Component {
   }
 }
 
-export default connect('httpClient', {})(DeviceTab);
+export default connect('httpClient', {})(withMobileViewport(DeviceTab));

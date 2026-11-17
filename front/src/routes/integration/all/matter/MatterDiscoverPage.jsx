@@ -6,6 +6,19 @@ import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
 import style from './style.css';
 import MatterPage from './MatterPage';
+import {
+  withMobileViewport,
+  MobileNotice,
+  MobileField,
+  fieldClass,
+  BigButton,
+  kitStyle
+} from '../../../../components/mobile';
+import { MobileIntegrationTab, MobileWaitingNotice } from '../../../../components/integration/mobile';
+
+// same codes as the desktop field: 11 or 21 digits, with or without their dashes
+const PAIRING_CODE_PATTERN =
+  '([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})|([0-9]{5}-[0-9]{5}-[0-9]{5}-[0-9]{6})|([0-9]{21})';
 
 class MatterDiscoverPage extends Component {
   constructor(props) {
@@ -64,7 +77,81 @@ class MatterDiscoverPage extends Component {
     this.setState({ loading: false });
   };
 
+  updatePairingCode = e => this.setState({ pairingCode: e.target.value });
+
+  // The pairing form on a phone (docs/specs/mobile-pages/integration-devices.md, E): the same
+  // state and the same request, a field that does not make iOS zoom and a full-width button
+  renderMobile() {
+    const { pairingCode, loading, getDataLoading, matterEnabled, error } = this.state;
+    return (
+      <MatterPage user={this.props.user}>
+        <MobileIntegrationTab dataCy="matter-discover-mobile">
+          {matterEnabled === false && !getDataLoading && (
+            <MobileNotice tone="warning" icon="alert-triangle">
+              <MarkupText id="integration.matter.settings.disabledWarning" />
+            </MobileNotice>
+          )}
+          <p class={kitStyle.lead}>
+            <Text id="integration.matter.discover.description" />
+          </p>
+          <MobileNotice tone="warning" icon="alert-triangle">
+            <MarkupText id="integration.matter.discover.borderRouterWarning" />
+          </MobileNotice>
+          <form onSubmit={this.handleSubmit}>
+            <MobileField
+              label={<Text id="integration.matter.discover.pairingCodeLabel" />}
+              help={<Text id="integration.matter.discover.pairingCodeHelp" />}
+              htmlFor="matterPairingCode"
+            >
+              <Localizer>
+                <input
+                  id="matterPairingCode"
+                  type="text"
+                  class={fieldClass.input}
+                  placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
+                  value={pairingCode}
+                  onInput={this.updatePairingCode}
+                  pattern={PAIRING_CODE_PATTERN}
+                  required
+                  disabled={!matterEnabled || loading}
+                  inputmode="numeric"
+                  autocomplete="off"
+                  enterkeyhint="go"
+                  data-cy="matter-pairing-code"
+                />
+              </Localizer>
+            </MobileField>
+            {loading && (
+              <MobileWaitingNotice data-cy="matter-pairing-loading">
+                <Text id="integration.matter.discover.loading" />
+              </MobileWaitingNotice>
+            )}
+            {error && (
+              <MobileNotice tone="danger" icon="alert-circle" role="alert" data-cy="matter-pairing-error">
+                <MarkupText id="integration.matter.discover.error" />
+                {error !== RequestStatus.Error && <div class="mt-2">{error}</div>}
+              </MobileNotice>
+            )}
+            <BigButton
+              type="submit"
+              variant="primary"
+              icon="plus"
+              loading={loading}
+              disabled={!matterEnabled}
+              data-cy="matter-pairing-submit"
+            >
+              <Text id="integration.matter.discover.addButton" />
+            </BigButton>
+          </form>
+        </MobileIntegrationTab>
+      </MatterPage>
+    );
+  }
+
   render() {
+    if (this.props.isMobile) {
+      return this.renderMobile();
+    }
     return (
       <MatterPage user={this.props.user}>
         <div class="card">
@@ -152,4 +239,4 @@ class MatterDiscoverPage extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(MatterDiscoverPage);
+export default connect('httpClient,user', {})(withMobileViewport(MatterDiscoverPage));

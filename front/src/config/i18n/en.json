@@ -62,6 +62,39 @@
     "cannotBeUndone": "This cannot be undone.",
     "togglePassword": "Show or hide the password"
   },
+  "mobileDeviceList": {
+    "noName": "Unnamed device",
+    "deviceCount": {
+      "zero": "Devices",
+      "one": "1 device",
+      "other": "{{count}} devices"
+    },
+    "foundCount": {
+      "zero": "Devices found",
+      "one": "1 device found",
+      "other": "{{count}} devices found"
+    },
+    "showDetails": "Show the details",
+    "hideDetails": "Hide the details",
+    "refresh": "Refresh",
+    "saveError": "Gladys could not save this device. Try again.",
+    "saveAndClose": "Save and close",
+    "closeWithoutSaving": "Close without saving",
+    "delete": "Delete",
+    "deleteTitle": "Delete this device?",
+    "deleteText": "“{{name}}” will be removed from Gladys with its history. The scenes and the dashboards that use it will no longer work with it.",
+    "deleteConfirm": "Delete the device",
+    "deleteError": "Gladys could not delete this device. Try again.",
+    "deleted": "Device deleted",
+    "added": "Device added to Gladys",
+    "updated": "Device updated",
+    "updateAvailable": "Update",
+    "inGladys": "In Gladys",
+    "notSupported": "Not supported",
+    "noResult": "No device matches.",
+    "stopScan": "Stop the scan",
+    "scanning": "Scan in progress… The list fills in as devices are found."
+  },
   "errorBoundary": {
     "message": "Something went wrong while displaying this. Reload the page, and check the configuration if it happens again."
   },
@@ -2242,7 +2275,11 @@
         "explanation": "The synchronization with Enedis is done automatically between Gladys Plus and Enedis every day between 8:30 and 11:30. It is possible that on some days the data may be available late. On the Gladys side, Gladys automatically synchronizes with Gladys Plus every hour.",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "recreateButton": "Update"
+        "recreateButton": "Update",
+        "mobile": {
+          "lastSync": "Last synchronisation",
+          "numberOfStates": "Synchronised states"
+        }
       }
     },
     "homekit": {

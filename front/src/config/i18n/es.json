@@ -62,6 +62,39 @@
     "cannotBeUndone": "Esta acción no se puede deshacer.",
     "togglePassword": "Mostrar u ocultar la contraseña"
   },
+  "mobileDeviceList": {
+    "noName": "Dispositivo sin nombre",
+    "deviceCount": {
+      "zero": "Dispositivos",
+      "one": "1 dispositivo",
+      "other": "{{count}} dispositivos"
+    },
+    "foundCount": {
+      "zero": "Dispositivos detectados",
+      "one": "1 dispositivo detectado",
+      "other": "{{count}} dispositivos detectados"
+    },
+    "showDetails": "Mostrar los detalles",
+    "hideDetails": "Ocultar los detalles",
+    "refresh": "Actualizar",
+    "saveError": "Gladys no pudo guardar este dispositivo. Inténtalo de nuevo.",
+    "saveAndClose": "Guardar y cerrar",
+    "closeWithoutSaving": "Cerrar sin guardar",
+    "delete": "Eliminar",
+    "deleteTitle": "¿Eliminar este dispositivo?",
+    "deleteText": "«{{name}}» se eliminará de Gladys junto con su historial. Las escenas y los paneles que lo usan dejarán de funcionar con él.",
+    "deleteConfirm": "Eliminar el dispositivo",
+    "deleteError": "Gladys no pudo eliminar este dispositivo. Inténtalo de nuevo.",
+    "deleted": "Dispositivo eliminado",
+    "added": "Dispositivo añadido a Gladys",
+    "updated": "Dispositivo actualizado",
+    "updateAvailable": "Actualización",
+    "inGladys": "En Gladys",
+    "notSupported": "No compatible",
+    "noResult": "Ningún dispositivo coincide.",
+    "stopScan": "Detener el escaneo",
+    "scanning": "Escaneo en curso… La lista se completa a medida que se encuentran dispositivos."
+  },
   "errorBoundary": {
     "message": "Ocurrió un problema al mostrar esto. Vuelva a cargar la página y revise la configuración si sucede de nuevo."
   },
@@ -2242,7 +2275,11 @@
         "explanation": "La sincronización con Enedis se realiza automáticamente entre Gladys Plus y Enedis todos los días entre las 8:30 y las 11:30. Es posible que algunos días los datos estén disponibles más tarde. Por su parte, Gladys se sincroniza automáticamente con Gladys Plus cada hora.",
         "saveButton": "Guardar",
         "deleteButton": "Eliminar",
-        "recreateButton": "Actualizar"
+        "recreateButton": "Actualizar",
+        "mobile": {
+          "lastSync": "Última sincronización",
+          "numberOfStates": "Estados sincronizados"
+        }
       }
     },
     "homekit": {

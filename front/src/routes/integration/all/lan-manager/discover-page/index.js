@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import LANManagerPage from '../LANManagerPage';
 import LANManagerDiscoverTab from './LANManagerDiscoverTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 class LANManagerDiscoverPage extends Component {
@@ -30,4 +31,4 @@ class LANManagerDiscoverPage extends Component {
 export default connect(
   'session,user,httpClient,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
   actions
-)(LANManagerDiscoverPage);
+)(withMobileViewport(LANManagerDiscoverPage));
