@@ -7,6 +7,7 @@ import { MobileField, BigButton, fieldClass } from '../../components/mobile';
 import style from './style.css';
 
 const KEYS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const CODE_DOT = '•';
 
 /**
  * @description The keypad of an armed house on a phone (docs/specs/mobile-pages/auth.md, C.4):
@@ -46,12 +47,19 @@ const MobileLocked = ({
           <MobileAuthTitle lead={<Text id="locked.description" />}>
             <Text id="locked.cardTitle" />
           </MobileAuthTitle>
-          <MobileField error={wrongCode && <Text id="locked.wrongCodeError" />}>
+          <MobileField htmlFor="locked-code" error={wrongCode && <Text id="locked.wrongCodeError" />}>
             <Localizer>
               <input
-                type="password"
+                id="locked-code"
+                // not a password field: a password manager would offer to save or fill the code of
+                // the alarm. The field only ever holds one dot per digit typed — the code itself
+                // stays in the state of the page
+                type="text"
                 class={cx(fieldClass.input, style.mobileCode, { [fieldClass.invalid]: wrongCode })}
-                value={currentCode}
+                value={CODE_DOT.repeat(currentCode.length)}
+                data-length={currentCode.length}
+                aria-invalid={wrongCode ? 'true' : 'false'}
+                aria-describedby={wrongCode ? 'locked-code-error' : undefined}
                 // the keypad below is the keyboard: the one of the phone stays closed
                 readonly
                 inputmode="none"

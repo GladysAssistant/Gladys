@@ -127,10 +127,13 @@ const MobileLinkGatewayUser = props => {
               <select
                 id="link-gateway-user"
                 class={fieldClass.select}
+                // the selection the container holds: the list shows what Save will send, also
+                // when the layout changes with the page open
+                value={props.selectedUser || ''}
                 onChange={props.selectUser}
                 data-cy="link-gateway-user-select-user"
               >
-                <option>
+                <option value="">
                   <Text id="global.emptySelectOption" />
                 </option>
                 {props.users &&

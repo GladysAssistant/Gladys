@@ -5,7 +5,8 @@ import style from './kit.css';
 /**
  * @description A labelled field of a phone form (docs/specs/mobile-pages/README.md, C.3): the
  * label above, the control (give it `fieldClass.input` / `.select` / `.textarea`), then the
- * error or the help text as a footnote. `htmlFor` ties the label to the control.
+ * error or the help text as a footnote. `htmlFor` ties the label to the control, and names the
+ * error (`${htmlFor}-error`) so the control can point to it with `aria-describedby`.
  */
 const MobileField = ({ label, help, error, htmlFor, children, class: className, ...props }) => (
   <div class={cx(style.field, className)} {...props}>
@@ -16,7 +17,7 @@ const MobileField = ({ label, help, error, htmlFor, children, class: className, 
     )}
     {children}
     {error && (
-      <div class={style.fieldError} role="alert">
+      <div class={style.fieldError} role="alert" id={htmlFor ? `${htmlFor}-error` : undefined}>
         {error}
       </div>
     )}

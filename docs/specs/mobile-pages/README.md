@@ -89,7 +89,8 @@ cards**, the pattern of the devices list.
 
 ### C.3 Fields
 
-- `MobileField`: the label above, the control, then the error (`role="alert"`) or the help as a
+- `MobileField`: the label above, the control, then the error (`role="alert"`, named
+  `${htmlFor}-error` so the control can point to it with `aria-describedby`) or the help as a
   13 px footnote.
 - **One look for every control** (`fieldClass.input` / `.select` / `.textarea`): 48 px high,
   16 px text, the same border, radius (14 px) and focus ring; a select shows the same chevron; a

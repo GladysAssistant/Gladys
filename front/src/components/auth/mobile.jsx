@@ -33,8 +33,11 @@ const MobileAuthCard = ({ children, dataCy }) => (
 
 /**
  * @description The form of a logged-out page on a phone. `onSubmit` is the handler of the
- * desktop form (the keyboard's key submits it too); once it ran, the first field the validation
- * refused is brought into view and focused.
+ * desktop form (the keyboard's key submits it too); once it ran — and again once it settled,
+ * for what the server refuses — the first refused field is brought into view and focused.
+ *
+ * nativeValidation: the browser checks the fields before the handler runs, for a page whose
+ * container relies on it (it has no validation of its own).
  */
 class MobileAuthForm extends Component {
   setFormRef = element => {
@@ -54,20 +57,23 @@ class MobileAuthForm extends Component {
 
   submit = e => {
     e.preventDefault();
-    if (this.props.onSubmit) {
-      this.props.onSubmit(e);
-    }
+    const result = this.props.onSubmit ? this.props.onSubmit(e) : null;
     // the errors of the validation land with the next render
     setTimeout(this.revealFirstError, 0);
+    // and the ones the server answers (a refused code) once the handler settles
+    if (result && typeof result.then === 'function') {
+      const revealLater = () => setTimeout(this.revealFirstError, 0);
+      result.then(revealLater, revealLater);
+    }
   };
 
   componentWillUnmount() {
     this.form = null;
   }
 
-  render({ children, dataCy }) {
+  render({ children, nativeValidation, dataCy }) {
     return (
-      <form onSubmit={this.submit} ref={this.setFormRef} novalidate data-cy={dataCy}>
+      <form onSubmit={this.submit} ref={this.setFormRef} novalidate={!nativeValidation} data-cy={dataCy}>
         {children}
       </form>
     );
@@ -137,6 +143,7 @@ const MobileEmailField = ({
         disabled={disabled}
         aria-required={required ? 'true' : undefined}
         aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error && id ? `${id}-error` : undefined}
         data-cy={dataCy}
       />
     </Localizer>
@@ -159,6 +166,7 @@ const MobileTextField = ({ id, label, help, error, value, onInput, placeholder, 
         placeholder={placeholder}
         aria-required={required ? 'true' : undefined}
         aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error && id ? `${id}-error` : undefined}
         data-cy={dataCy}
         {...props}
       />
@@ -187,6 +195,7 @@ const MobileCodeField = ({ id, label, help, error, value, onInput, placeholder, 
         spellcheck={false}
         autofocus={autofocus}
         aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error && id ? `${id}-error` : undefined}
         data-cy={dataCy}
         {...props}
       />

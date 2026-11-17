@@ -55,11 +55,16 @@ What the forms share (`components/auth/mobile.jsx`):
   `withMobileViewport` and gives the phone layout the props and the handlers of the card: the
   validation, the requests and their payloads are the ones of the desktop page (README B).
 - The form is a `<form>` (`MobileAuthForm`): the keyboard's key submits it (`enterkeyhint` says
-  "go", "next" or "send"). Once the handler ran, **the first field the validation refused is
-  brought into view and focused**.
-- **The error of a field is next to it** (`role="alert"`, `aria-invalid`); **the refusal of a
-  request is in the bottom bar**, above the button, and can be closed — a new attempt shows it
-  again.
+  "go", "next" or "send"). Once the handler ran — and again once it settled, for what the server
+  refuses (a wrong one-time code) — **the first refused field is brought into view and
+  focused**. A page whose container has no validation of its own keeps the one of the browser
+  (`nativeValidation`).
+- **The error of a field is next to it** (`role="alert"`) and tied to its control
+  (`aria-invalid`, and `aria-describedby` pointing to the error, named `${id}-error` by
+  `MobileField`); **the refusal of a request is in the bottom bar**, above the button, and can
+  be closed — a new attempt shows it again.
+- **What was typed stays on screen.** The fields are controlled: a page reads from its store or
+  its state every value it shows.
 - The right keyboard for each field:
 
   | Field | Keyboard and autofill |
@@ -98,9 +103,16 @@ Two screens of the same page, with "‹ Login" as the way back:
    **one-time code** field, "Send a new code" under it, and **Continue** in the bottom bar. A
    valid code leads to the new password (C.3).
 
+**Asking for a new code keeps the code screen** (`codeSent`, kept by the container once a code
+was requested): "Send a new code" shows a spinner while its request is in flight, the code
+already typed stays, and a refusal of the resend shows in the bottom bar. A new code cannot be
+asked for while one is being checked (the code is single use: on every screen size).
+
 An address that is not an e-mail and an empty or refused code show next to their field; a
 refusal of the server (network, unknown account, too many attempts, unknown) shows in the bottom
-bar.
+bar. A code the instance refuses is its 401 — or the 400 the http client gets when, without a
+session, it answers that 401 by refreshing a token it does not have: both are "This code is
+invalid or has expired", on every screen size (the 400 used to show as an unknown error).
 
 ### C.3 New password (`/reset-password`, `routes/reset-password`)
 
@@ -121,7 +133,9 @@ tablet in portrait.
 
 - "Locked House", the sentence, then **the code as it is typed**: dots, centered. The field is
   read-only with `inputmode="none"`: the keypad is the keyboard, the one of the phone stays
-  closed.
+  closed. **It is not a password field**: a password manager would offer to save or fill the
+  code of the alarm. It is a text field that only ever holds one dot per digit typed
+  (`data-length`); the code itself stays in the state of the page.
 - **Twelve positions, three columns**: the digits 1 to 9, then 0 in the middle with the
   **correction key** on its right (disabled while there is nothing to correct, named for
   assistive technologies by `locked.mobile.deleteDigit`). Keys are at least 44 px and share the
@@ -146,7 +160,9 @@ question per screen:
 1. **the account**: e-mail, password, "I forgot my password", **Log in**;
 2. **the second factor**: the code of the two-factor app. It is sent as soon as its six digits
    are typed (the store action does it, as on desktop); **Finalize Login** stays in the bottom
-   bar for a pasted code. A refused code shows next to the field.
+   bar for a pasted code. While a code is checked the field cannot be edited (`readonly`: a
+   second code would start a second request). A refused code shows next to the field, and stays
+   in it.
    Under the field, **"Lost access to your two-factor app?"** is a group of rows
    (`MobileLostTwoFactor`):
    - **Use a recovery code** swaps the field for the recovery code one — and the row for "Use a
@@ -173,8 +189,9 @@ The component keeps its logic (copy, download, retry); with `mobile` it renders 
 layout: the title and what the codes are for, the warning that they are shown once, **the codes
 in two columns on a card**, **Download** and **Copy** side by side ("Copied!" replaces the label
 once done), and **Continue** in the bottom bar. When the generation failed: the reason, the
-field for a fresh code of the two-factor app when the caller collects one, and **Try again** in
-the bottom bar, disabled until six digits are typed. The settings pages keep the card.
+field for a fresh code of the two-factor app when the caller collects one (a refused code is
+also said next to it), and **Try again** in the bottom bar, disabled until six digits are
+typed. The settings pages keep the card.
 
 ### D.3 Two-factor setup (`/gateway-configure-two-factor`)
 
@@ -210,7 +227,9 @@ on desktop) — or the refusal as a notice with the two sentences of the desktop
 ### D.5 Forgotten password (`/forgot-password`, `routes/gateway-forgot-password`)
 
 The e-mail address and **Send reset password email**; then the same neutral answer as on
-desktop ("If this account exist…") as a notice, with **Log in** in the bottom bar. "‹ Login" is
+desktop ("If this account exist…") as a notice, with **Log in** in the bottom bar. The container
+has no validation of its own: as on the desktop form, the browser refuses an address that is
+not one before any request (`nativeValidation`). "‹ Login" is
 the way back; "Don't have an account yet?" is a footnote.
 
 ### D.6 New password (`/reset-password`, `routes/gateway-reset-password`)
@@ -254,7 +273,9 @@ One of the three screens of the desktop card, each with its action in the bottom
   fingerprints of the keys to compare (two rows, each fingerprint on its own lines), and **My
   user is authorized, try again** — "Your user is still not authorized" shows above the button
   when the retry changes nothing;
-- **the user to link**: the native list of the Gladys users and **Save**.
+- **the user to link**: the native list of the Gladys users and **Save**. The list shows the
+  selection the container holds (`selectedUser`), on both layouts: what Save sends is what is
+  shown, also when the layout changes with the page open.
 
 Under each of them, "My Gladys Plus account" groups two rows: **Manage my subscription and
 invoices** and **Log out**.
@@ -264,8 +285,11 @@ invoices** and **Log out**.
 - From 768 px (a phone in landscape excepted): the card of each page, as before — the desktop
   spec (`login/Login.cy.js`) passes unchanged.
 - The requests and their payloads, the routes, the store actions and the containers. The two
-  containers touched only gained display state: `validating` (keypad), `otpauthUrl` /
-  `previousStep` (two-factor setup), and the clean start of an attempt (D.8).
+  containers touched only gained display state — `validating` (keypad), `otpauthUrl` /
+  `previousStep` (two-factor setup), `codeSent` (password recovery), `selectedUser` given to the
+  list (user link) — the values the Gladys Plus sign-in shows (its page now reads them from the
+  store), the clean start of an attempt (D.8) and the guard against a resend while a code is
+  checked (C.2).
 - The existing translations are reused; the new ones are under the `mobile` key of their page
   (`login.mobile`, `locked.mobile`, `gatewayLogin.mobile`, `gatewayTwoFactorAuth.mobile`,
   `gatewaySignUp.mobile`, `gatewayLinkUser.mobile`), and `mobileKit.togglePassword` for the

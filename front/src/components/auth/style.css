@@ -109,6 +109,7 @@ a.mobileLink:focus,
 button.mobileLink {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   min-height: 44px;
   padding: 0 4px;
   border: 0;
@@ -124,6 +125,12 @@ button.mobileLink {
 
 .mobileLink:focus {
   outline: none;
+}
+
+/* its request is in flight */
+button.mobileLink:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .mobileLink:focus-visible {

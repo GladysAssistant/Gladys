@@ -55,7 +55,10 @@ describe('Logged-out pages on a phone', () => {
       cy.get('[data-cy=login-mobile] [role=alert]')
         .should('have.length', 1)
         .i18n('login.invalidEmail');
-      cy.focused().should('have.attr', 'data-cy', 'login-email');
+      cy.focused()
+        .should('have.attr', 'data-cy', 'login-email')
+        .and('have.attr', 'aria-describedby', 'login-email-error');
+      cy.get('#login-email-error').i18n('login.invalidEmail');
       cy.get('@login.all').should('have.length', 0);
 
       // the password can be read while it is typed
@@ -144,7 +147,41 @@ describe('Logged-out pages on a phone', () => {
       cy.get('@verifyCode.all').should('have.length', 0);
       expectNoSidewaysScroll();
 
+      // a code the server refuses: said next to its field, which takes the focus once the answer
+      // is there
+      cy.intercept(
+        { method: 'POST', url: `${serverUrl}/api/v1/forgot_password/code` },
+        { statusCode: 401, body: {} }
+      ).as('refusedCode');
+      // no session: the token refresh the http client tries after a 401 is refused, as it is by
+      // the instance — that refusal is what the page gets
+      cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/access_token` }, { statusCode: 400, body: {} });
+      cy.get('[data-cy=forgot-password-code]').type('WRONG');
+      cy.get('[data-cy=forgot-password-code-submit]').click();
+      cy.wait('@refusedCode');
+      cy.get('[data-cy=forgot-password-mobile] [role=alert]').i18n('forgotPassword.codeInvalid');
+      cy.focused().should('have.attr', 'data-cy', 'forgot-password-code');
+      cy.get('[data-cy=forgot-password-code]').clear();
+      cy.intercept(
+        { method: 'POST', url: `${serverUrl}/api/v1/forgot_password/code` },
+        { body: { access_token: 'reset-token' } }
+      ).as('verifyCode');
+
+      // asking for a new code keeps the code screen, and what was typed on it
       cy.get('[data-cy=forgot-password-code]').type('ABCD-1234');
+      cy.intercept(
+        { method: 'POST', url: `${serverUrl}/api/v1/forgot_password` },
+        { body: { success: true }, delay: 400 }
+      ).as('resend');
+      cy.get('[data-cy=forgot-password-send-again]').click();
+      cy.get('[data-cy=forgot-password-send-again]').should('be.disabled');
+      cy.get('[data-cy=forgot-password-code]')
+        .should('be.visible')
+        .and('have.value', 'ABCD-1234');
+      cy.get('[data-cy=forgot-password-email]').should('not.exist');
+      cy.wait('@resend');
+      cy.get('[data-cy=forgot-password-send-again]').should('not.be.disabled');
+
       cy.get('[data-cy=forgot-password-code-submit]').click();
       cy.wait('@verifyCode')
         .its('request.body')
@@ -249,17 +286,23 @@ describe('Logged-out pages on a phone', () => {
         expect($key.outerHeight()).to.be.at.least(44);
         expect($key.outerWidth()).to.be.at.least(44);
       });
+      // not a password field (a password manager would offer to save the code of the alarm), and
+      // no keyboard of the phone
       cy.get('[data-cy=locked-code]')
-        .should('have.attr', 'inputmode', 'none')
+        .should('have.attr', 'type', 'text')
+        .and('have.attr', 'inputmode', 'none')
         .and('have.attr', 'readonly');
       cy.get('[data-cy=locked-key-delete]').should('be.disabled');
 
       cy.get('[data-cy=locked-key-1]').click();
       cy.get('[data-cy=locked-key-0]').click();
       cy.get('[data-cy=locked-key-9]').click();
-      cy.get('[data-cy=locked-code]').should('have.value', '109');
+      // one dot per digit: the code itself is never in the page
+      cy.get('[data-cy=locked-code]')
+        .should('have.value', '•••')
+        .and('have.attr', 'data-length', '3');
       cy.get('[data-cy=locked-key-delete]').click();
-      cy.get('[data-cy=locked-code]').should('have.value', '10');
+      cy.get('[data-cy=locked-code]').should('have.value', '••');
       // the whole keypad is on the screen: nothing to scroll, in either direction
       cy.document().then(doc => {
         expect(doc.documentElement.scrollWidth).to.be.at.most(doc.documentElement.clientWidth);
@@ -283,8 +326,11 @@ describe('Logged-out pages on a phone', () => {
       cy.get('[data-cy=locked-mobile] [role=alert]')
         .should('be.visible')
         .i18n('locked.wrongCodeError');
-      // the code starts again
-      cy.get('[data-cy=locked-code]').should('have.value', '');
+      // the code starts again, and its field points to the error
+      cy.get('[data-cy=locked-code]')
+        .should('have.value', '')
+        .and('have.attr', 'aria-invalid', 'true')
+        .and('have.attr', 'aria-describedby', 'locked-code-error');
 
       cy.intercept(
         { method: 'POST', url: `${serverUrl}/api/v1/house/my-house/disarm_with_code` },

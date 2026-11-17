@@ -295,6 +295,8 @@ describe('Onboarding on a phone', () => {
 
     cy.get('[data-cy=gateway-login-email]').type(user.email);
     cy.get('[data-cy=gateway-login-password]').type('my-gladys-plus-password');
+    // what was typed stays on screen through the renders of the page
+    cy.get('[data-cy=gateway-login-email]').should('have.value', user.email);
     cy.get('[data-cy=gateway-login-submit]').click();
     cy.wait('@gatewayLogin')
       .its('request.body')
@@ -309,6 +311,10 @@ describe('Onboarding on a phone', () => {
     cy.wait('@gatewayLoginTwoFactor')
       .its('request.body')
       .should('include', { two_factor_token: 'two-factor-token', two_factor_code: '123456' });
+    // the refused code stays in its field, next to its error
+    cy.get('[data-cy=gateway-login-two-factor-code]')
+      .should('have.value', '123456')
+      .and('have.attr', 'aria-invalid', 'true');
 
     // lost the app: a recovery code instead, and back
     cy.get('[data-cy=lost-two-factor-use-recovery-code]').click();

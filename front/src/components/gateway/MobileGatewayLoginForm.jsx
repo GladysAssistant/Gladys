@@ -52,7 +52,12 @@ const getBarError = props => {
       return <Text id="gatewayLogin.unknownError" />;
     default:
   }
-  if (props.gatewayLoginTwoFactorResetStatus === RequestStatus.Error) {
+  // not while a login is in flight: the bar must see the error go, to show the next one even
+  // if this one was closed
+  if (
+    props.gatewayLoginTwoFactorResetStatus === RequestStatus.Error &&
+    props.gatewayLoginStatus !== RequestStatus.Getting
+  ) {
     const errorId = RESET_ERRORS[props.gatewayLoginTwoFactorResetError];
     return errorId ? <Text id={errorId} /> : null;
   }
@@ -143,6 +148,8 @@ const MobileGatewayLoginForm = props => {
             maxlength="6"
             enterkeyhint="go"
             autofocus
+            // six digits are sent as soon as they are typed: no other code while that one is checked
+            readonly={loading}
             dataCy="gateway-login-two-factor-code"
           />
         )}

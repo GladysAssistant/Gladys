@@ -65,6 +65,7 @@ class GatewayRecoveryCodes extends Component {
             label={<Text id="gatewayLogin.twoFactorCodeLabel" />}
             placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
             help={<Text id="gatewayRecoveryCodes.twoFactorCodeRequired" />}
+            error={wrongTwoFactorCode && <Text id="gatewayLogin.invalidTwoFactorCode" />}
             value={twoFactorCode}
             onInput={onTwoFactorCodeChange}
             maxlength="6"

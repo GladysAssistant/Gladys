@@ -17,7 +17,9 @@ const MobileForgotPassword = props => (
     backLabel={<Text id="login.mobile.navBack" />}
     dataCy="gateway-forgot-password-mobile"
   >
-    <MobileAuthForm onSubmit={props.sendResetPasswordLink}>
+    {/* the container has no validation of its own: the browser refuses an address that is not
+        one before the request, as on the desktop form */}
+    <MobileAuthForm onSubmit={props.sendResetPasswordLink} nativeValidation>
       <MobileAuthTitle>
         <Text id="gatewayForgotPassword.formTitle" />
       </MobileAuthTitle>

@@ -68,6 +68,7 @@ class MobilePasswordField extends Component {
               disabled={disabled}
               aria-required={required ? 'true' : undefined}
               aria-invalid={error ? 'true' : 'false'}
+              aria-describedby={error && id ? `${id}-error` : undefined}
               data-cy={dataCy}
             />
           </Localizer>

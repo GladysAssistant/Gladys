@@ -152,8 +152,8 @@ const DesktopLinkGatewayUser = ({ children, ...props }) => (
                   <label>
                     <Text id="gatewayLinkUser.label" />
                   </label>
-                  <select class="form-control" onChange={props.selectUser}>
-                    <option>
+                  <select class="form-control" value={props.selectedUser || ''} onChange={props.selectUser}>
+                    <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
                     {props.users &&

@@ -28,8 +28,13 @@ const REQUEST_ERRORS = {
  * e-mail address, then the one-time code — same handlers as the desktop card.
  */
 const MobileForgotPasswordPage = props => {
-  const codeSent = props.forgotPasswordStatus === RequestStatus.Success;
-  const errorId = codeSent ? REQUEST_ERRORS[props.verifyCodeStatus] : REQUEST_ERRORS[props.forgotPasswordStatus];
+  // once a code was requested the code screen stays: asking for a new one only shows it is in
+  // flight, it does not send the user back to the e-mail address
+  const codeSent = Boolean(props.codeSent);
+  const sending = props.forgotPasswordStatus === RequestStatus.Getting;
+  const errorId = codeSent
+    ? REQUEST_ERRORS[props.verifyCodeStatus] || REQUEST_ERRORS[props.forgotPasswordStatus]
+    : REQUEST_ERRORS[props.forgotPasswordStatus];
   return (
     <MobileAuthLayout
       backHref="/login"
@@ -91,8 +96,11 @@ const MobileForgotPasswordPage = props => {
                 type="button"
                 class={authStyle.mobileLink}
                 onClick={props.forgotPassword}
+                disabled={sending}
+                aria-busy={sending ? 'true' : 'false'}
                 data-cy="forgot-password-send-again"
               >
+                {sending && <span class={kitStyle.buttonSpinner} aria-hidden="true" />}
                 <Text id="forgotPassword.sendCodeAgain" />
               </button>
             </div>
