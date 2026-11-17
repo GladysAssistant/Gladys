@@ -23,9 +23,9 @@ card that wraps:
 
 `routes/signup/layout.jsx` renders, below the phone breakpoint, `MobileSignupLayout` instead of
 the card. It is the shell of every logged-out page (`components/auth/MobileAuthLayout.jsx`,
-[`auth.md`](auth.md) B) with the progress of the flow above the content. The onboarding keeps
-the opaque surfaces of the kit (`glass={false}`): the glass variant of README C.9 is the one of
-the sign-in pages for now:
+[`auth.md`](auth.md) B) with the progress of the flow above the content — and, like them, it is
+**Horizon glass** (the glass variant of the kit, README C.9): frosted bars, the ink pill as the
+primary action, and **the fields of a step on glass cards** (`MobileAuthCard`):
 
 - the **navigation bar** of the kit, with the logo and "Gladys Assistant" as its title, and the
   way back only where going back makes sense (the account step goes back to the welcome; once
@@ -37,6 +37,14 @@ the sign-in pages for now:
   bottom of the previous one would open on its end);
 - **one primary action per step, in the bottom bar** (README C.4), with a spinner while its
   request is in flight and its error above it.
+
+Where the glass is, step by step: the restore row of the welcome is a glass card; the account
+and the preferences are one card of fields each; the house has three — its name, its location
+(the position of the phone, the address search with its results as nested glass, the preview
+map) and its rooms (the chips and the field to add one) — under the titles of their sections,
+which stay on the wallpaper; the three panels of the last step are glass cards; in the restore
+path the backup key is a card of fields and the backups a glass group. The map sheet and the
+restore confirmation are sheets: opaque, above the page.
 
 Each step file exports a component that picks its layout with `withMobileViewport`; the
 containers (`index.js` of each step) and the store actions (`actions/signup/*`) are the ones of

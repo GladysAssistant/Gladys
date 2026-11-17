@@ -54,7 +54,7 @@ const DesktopSignupLayout = ({ children, ...props }) => (
 const MobileSignupLayout = ({ children, currentUrl, backHref, title }) => {
   const stepIndex = STEPS.findIndex(step => step.href === currentUrl);
   return (
-    <MobileAuthLayout title={title} backHref={backHref} glass={false} dataCy="signup-mobile">
+    <MobileAuthLayout title={title} backHref={backHref} dataCy="signup-mobile">
       {stepIndex >= 0 && (
         <MobileSteps current={stepIndex + 1} total={STEPS.length} label={<Text id={STEPS[stepIndex].textId} />} />
       )}

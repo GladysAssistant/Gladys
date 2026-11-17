@@ -305,8 +305,13 @@ button.mobileLink {
 
 :global(.gladys-mobile-glass) .mobileFormCard {
   margin: 0 0 16px;
-  padding: 18px 16px 2px;
+  padding: 16px;
   border-radius: 24px;
+}
+
+/* the last block of a card ends with the padding of the card, whatever its own margin */
+:global(.gladys-mobile-glass) .mobileFormCard > :last-child {
+  margin-bottom: 0;
 }
 
 :global(.gladys-mobile-glass) .mobileCard {
@@ -314,9 +319,9 @@ button.mobileLink {
   box-shadow: var(--gl-shadow-soft);
 }
 
-/* the links under the fields close the card */
-:global(.gladys-mobile-glass) .mobileFormCard .mobileLinks {
-  margin: -6px 0 6px;
+/* the links under the fields close the card: their 44px of target is their own room */
+:global(.gladys-mobile-glass) .mobileFormCard > .mobileLinks {
+  margin: -6px 0 -10px;
 }
 
 /* the logo floats on the wallpaper, as above the desktop card */

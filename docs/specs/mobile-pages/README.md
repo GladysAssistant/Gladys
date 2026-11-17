@@ -176,17 +176,24 @@ fitted).
 ### C.9 Glass variant
 
 The kit is made of opaque white surfaces, for pages that sit on the gray of the app. A page that
-sits on the **Horizon wallpaper** (the logged-out pages, [`auth.md`](auth.md)) sets the global
+sits on the **Horizon wallpaper** (the logged-out pages: [`auth.md`](auth.md) and the
+onboarding, [`onboarding.md`](onboarding.md)) sets the global
 class `gladys-mobile-glass` on its shell, and the same components are then the **frosted glass
 of the theme** (`kit.css`, "Glass variant", with the `--gl-*` tokens of the glass scene):
 
-- the navigation bar and the bottom bar are frosted — dense enough (82 %) for what scrolls
+- the navigation bar and the bottom bar are frosted — dense enough (88 %) for what scrolls
   under them to stay out of the way where the blur is not rendered;
 - a group and a row card are a glass card (translucent, blurred, the white border and the soft
   shadow of the theme); the rows of a group are part of its glass;
-- the fields are the translucent white of the theme's controls, solid once focused;
+- the fields are the translucent white of the theme's controls, solid once focused; a chip is
+  a translucent control like a field, and a selected chip is the ink of the theme;
+- on a card of fields (`kitStyle.formCard`, the glass card of the page) a group of rows is
+  nested glass: it loses its own blur and shadow;
 - the buttons join the pill family: **the primary action is the ink pill** of the Horizon
   buttons, the others a frosted capsule.
+
+A sheet or a toast is rendered on `<body>`, outside the shell: it keeps the opaque surfaces of
+the kit above the glass page.
 
 Only the material changes: sizes, targets, structure and behaviors are the ones above. In dark
 mode the glass is derived by the app-wide inversion — the ink pill inverts with the theme into a

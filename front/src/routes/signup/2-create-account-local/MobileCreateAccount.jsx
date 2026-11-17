@@ -4,6 +4,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { MobileAuthCard } from '../../../components/auth/mobile';
 import {
   MobileField,
   MobilePasswordField,
@@ -102,107 +103,109 @@ class MobileCreateAccount extends Component {
         <p class={kitStyle.lead}>
           <Text id="signup.createLocalAccount.description" />
         </p>
-        <MobileField
-          label={<Text id="profile.firstnameLabel" />}
-          htmlFor="firstname"
-          error={errors.firstname && <Text id="profile.firstnameError" />}
-        >
-          <Localizer>
-            <input
-              id="firstname"
-              type="text"
-              class={cx(fieldClass.input, { [fieldClass.invalid]: errors.firstname })}
-              value={user.firstname}
-              onInput={props.updateFirstname}
-              placeholder={<Text id="profile.firstnamePlaceholder" />}
-              autocomplete="given-name"
-              autocapitalize="words"
-              enterkeyhint="next"
-              aria-required="true"
-              aria-invalid={errors.firstname ? 'true' : 'false'}
-              data-cy="signup-firstname"
-            />
-          </Localizer>
-        </MobileField>
-        <MobileField
-          label={<Text id="profile.lastnameLabel" />}
-          htmlFor="lastname"
-          error={errors.lastname && <Text id="profile.lastnameError" />}
-        >
-          <Localizer>
-            <input
-              id="lastname"
-              type="text"
-              class={cx(fieldClass.input, { [fieldClass.invalid]: errors.lastname })}
-              value={user.lastname}
-              onInput={props.updateLastname}
-              placeholder={<Text id="profile.lastnamePlaceholder" />}
-              autocomplete="family-name"
-              autocapitalize="words"
-              enterkeyhint="next"
-              aria-required="true"
-              aria-invalid={errors.lastname ? 'true' : 'false'}
-              data-cy="signup-lastname"
-            />
-          </Localizer>
-        </MobileField>
-        <MobileField
-          label={<Text id="profile.emailLabel" />}
-          htmlFor="email"
-          error={errors.email && <Text id="profile.emailError" />}
-          help={<Text id="profile.emailText" />}
-        >
-          <Localizer>
-            <input
-              id="email"
-              type="email"
-              inputmode="email"
-              class={cx(fieldClass.input, { [fieldClass.invalid]: errors.email })}
-              value={user.email}
-              onInput={props.updateEmail}
-              placeholder={<Text id="profile.emailPlaceholder" />}
-              autocomplete="email"
-              autocapitalize="off"
-              autocorrect="off"
-              spellcheck={false}
-              enterkeyhint="next"
-              aria-required="true"
-              aria-invalid={errors.email ? 'true' : 'false'}
-              data-cy="signup-email"
-            />
-          </Localizer>
-        </MobileField>
-        <MobileField label={<Text id="profile.languageLabel" />} htmlFor="language">
-          <select
-            id="language"
-            class={fieldClass.select}
-            value={user.language}
-            onChange={props.updateLanguage}
-            data-cy="signup-language"
+        <MobileAuthCard>
+          <MobileField
+            label={<Text id="profile.firstnameLabel" />}
+            htmlFor="firstname"
+            error={errors.firstname && <Text id="profile.firstnameError" />}
           >
-            {LANGUAGES.map(language => (
-              <option value={language.value}>{get(props.intl.dictionary, language.textId)}</option>
-            ))}
-          </select>
-        </MobileField>
-        {this.renderPasswordField({
-          id: 'password',
-          labelId: 'profile.passwordLabel',
-          errorId: 'profile.passwordError',
-          placeholderId: 'profile.passwordPlaceholder',
-          value: user.password,
-          onInput: props.updatePassword,
-          invalid: errors.password
-        })}
-        {this.renderPasswordField({
-          id: 'passwordRepeat',
-          labelId: 'profile.passwordRepeatLabel',
-          errorId: 'profile.passwordRepeatError',
-          placeholderId: 'profile.passwordRepeatPlaceholder',
-          value: user.passwordRepeat,
-          onInput: props.updatePasswordRepeat,
-          invalid: errors.passwordRepeat
-        })}
+            <Localizer>
+              <input
+                id="firstname"
+                type="text"
+                class={cx(fieldClass.input, { [fieldClass.invalid]: errors.firstname })}
+                value={user.firstname}
+                onInput={props.updateFirstname}
+                placeholder={<Text id="profile.firstnamePlaceholder" />}
+                autocomplete="given-name"
+                autocapitalize="words"
+                enterkeyhint="next"
+                aria-required="true"
+                aria-invalid={errors.firstname ? 'true' : 'false'}
+                data-cy="signup-firstname"
+              />
+            </Localizer>
+          </MobileField>
+          <MobileField
+            label={<Text id="profile.lastnameLabel" />}
+            htmlFor="lastname"
+            error={errors.lastname && <Text id="profile.lastnameError" />}
+          >
+            <Localizer>
+              <input
+                id="lastname"
+                type="text"
+                class={cx(fieldClass.input, { [fieldClass.invalid]: errors.lastname })}
+                value={user.lastname}
+                onInput={props.updateLastname}
+                placeholder={<Text id="profile.lastnamePlaceholder" />}
+                autocomplete="family-name"
+                autocapitalize="words"
+                enterkeyhint="next"
+                aria-required="true"
+                aria-invalid={errors.lastname ? 'true' : 'false'}
+                data-cy="signup-lastname"
+              />
+            </Localizer>
+          </MobileField>
+          <MobileField
+            label={<Text id="profile.emailLabel" />}
+            htmlFor="email"
+            error={errors.email && <Text id="profile.emailError" />}
+            help={<Text id="profile.emailText" />}
+          >
+            <Localizer>
+              <input
+                id="email"
+                type="email"
+                inputmode="email"
+                class={cx(fieldClass.input, { [fieldClass.invalid]: errors.email })}
+                value={user.email}
+                onInput={props.updateEmail}
+                placeholder={<Text id="profile.emailPlaceholder" />}
+                autocomplete="email"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck={false}
+                enterkeyhint="next"
+                aria-required="true"
+                aria-invalid={errors.email ? 'true' : 'false'}
+                data-cy="signup-email"
+              />
+            </Localizer>
+          </MobileField>
+          <MobileField label={<Text id="profile.languageLabel" />} htmlFor="language">
+            <select
+              id="language"
+              class={fieldClass.select}
+              value={user.language}
+              onChange={props.updateLanguage}
+              data-cy="signup-language"
+            >
+              {LANGUAGES.map(language => (
+                <option value={language.value}>{get(props.intl.dictionary, language.textId)}</option>
+              ))}
+            </select>
+          </MobileField>
+          {this.renderPasswordField({
+            id: 'password',
+            labelId: 'profile.passwordLabel',
+            errorId: 'profile.passwordError',
+            placeholderId: 'profile.passwordPlaceholder',
+            value: user.password,
+            onInput: props.updatePassword,
+            invalid: errors.password
+          })}
+          {this.renderPasswordField({
+            id: 'passwordRepeat',
+            labelId: 'profile.passwordRepeatLabel',
+            errorId: 'profile.passwordRepeatError',
+            placeholderId: 'profile.passwordRepeatPlaceholder',
+            value: user.passwordRepeat,
+            onInput: props.updatePasswordRepeat,
+            invalid: errors.passwordRepeat
+          })}
+        </MobileAuthCard>
         <MobileBottomBar
           error={serverError && !errorClosed ? <Text id={serverError.textId} /> : null}
           onCloseError={this.closeError}

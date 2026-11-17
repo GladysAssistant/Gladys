@@ -11,6 +11,7 @@ import {
   BigButton,
   kitStyle
 } from '../../../components/mobile';
+import { MobileAuthCard } from '../../../components/auth/mobile';
 import MobileLocationField from '../../../components/house/MobileLocationField';
 import RoomSuggestions, { sameName } from '../../../components/house/RoomSuggestions';
 import houseStyle from '../../../components/house/mobileHouse.css';
@@ -104,76 +105,82 @@ class MobileConfigureHouse extends Component {
         <p class={kitStyle.lead}>
           <Text id="signup.configureHouse.description" />
         </p>
-        <MobileField
-          label={<Text id="signup.configureHouse.houseNameLabel" />}
-          htmlFor="houseName"
-          error={nameError && <Text id="signup.configureHouse.houseNameError" />}
-        >
-          <Localizer>
-            <input
-              id="houseName"
-              type="text"
-              ref={this.setNameRef}
-              class={cx(fieldClass.input, { [fieldClass.invalid]: nameError })}
-              value={props.signupNewHouseName}
-              onInput={props.updateNewHouseName}
-              placeholder={<Text id="signup.configureHouse.houseNamePlaceHolder" />}
-              autocomplete="off"
-              autocapitalize="sentences"
-              enterkeyhint="done"
-              maxLength={40}
-              aria-invalid={nameError ? 'true' : 'false'}
-              data-cy="signup-house-name"
-            />
-          </Localizer>
-        </MobileField>
+        <MobileAuthCard>
+          <MobileField
+            label={<Text id="signup.configureHouse.houseNameLabel" />}
+            htmlFor="houseName"
+            error={nameError && <Text id="signup.configureHouse.houseNameError" />}
+          >
+            <Localizer>
+              <input
+                id="houseName"
+                type="text"
+                ref={this.setNameRef}
+                class={cx(fieldClass.input, { [fieldClass.invalid]: nameError })}
+                value={props.signupNewHouseName}
+                onInput={props.updateNewHouseName}
+                placeholder={<Text id="signup.configureHouse.houseNamePlaceHolder" />}
+                autocomplete="off"
+                autocapitalize="sentences"
+                enterkeyhint="done"
+                maxLength={40}
+                aria-invalid={nameError ? 'true' : 'false'}
+                data-cy="signup-house-name"
+              />
+            </Localizer>
+          </MobileField>
+        </MobileAuthCard>
 
         <MobileSectionHeader title={<Text id="housesSettings.sections.location" />} />
         <p class={cx(kitStyle.footnote, houseStyle.sectionLead)}>
           <Text id="housesSettings.mobile.locationHelp" />
         </p>
-        <MobileLocationField
-          latitude={props.signupNewHouseLatitude}
-          longitude={props.signupNewHouseLongitude}
-          onChange={props.setHouseLocation}
-        />
+        <MobileAuthCard>
+          <MobileLocationField
+            latitude={props.signupNewHouseLatitude}
+            longitude={props.signupNewHouseLongitude}
+            onChange={props.setHouseLocation}
+          />
+        </MobileAuthCard>
 
         <MobileSectionHeader title={<Text id="housesSettings.sections.rooms" />} />
         <p class={cx(kitStyle.footnote, houseStyle.sectionLead)}>
           <Text id="signup.mobile.roomsHelp" />
         </p>
-        <RoomSuggestions selectedNames={rooms} extraNames={rooms} onToggle={this.toggleRoom} />
-        <div class={houseStyle.addRow}>
-          <MobileField
-            class={houseStyle.addRowField}
-            error={roomError && <Text id="housesSettings.mobile.roomNameTaken" />}
-          >
-            <Localizer>
-              <input
-                type="text"
-                class={cx(fieldClass.input, { [fieldClass.invalid]: roomError })}
-                value={props.signupNewRoomName}
-                onInput={this.updateNewRoomName}
-                onKeyDown={this.onRoomKeyDown}
-                placeholder={<Text id="housesSettings.mobile.newRoomPlaceholder" />}
-                aria-label={<Text id="housesSettings.mobile.roomNameLabel" />}
-                autocomplete="off"
-                autocapitalize="sentences"
-                enterkeyhint="done"
-                maxLength={40}
-                data-cy="signup-new-room-name"
-              />
-            </Localizer>
-          </MobileField>
-          <BigButton
-            class={houseStyle.addRowButton}
-            onClick={this.addTypedRoom}
-            disabled={(props.signupNewRoomName || '').trim().length === 0}
-            data-cy="signup-new-room-add"
-          >
-            <Text id="signup.configureHouse.addRoomButton" />
-          </BigButton>
-        </div>
+        <MobileAuthCard>
+          <RoomSuggestions selectedNames={rooms} extraNames={rooms} onToggle={this.toggleRoom} />
+          <div class={houseStyle.addRow}>
+            <MobileField
+              class={houseStyle.addRowField}
+              error={roomError && <Text id="housesSettings.mobile.roomNameTaken" />}
+            >
+              <Localizer>
+                <input
+                  type="text"
+                  class={cx(fieldClass.input, { [fieldClass.invalid]: roomError })}
+                  value={props.signupNewRoomName}
+                  onInput={this.updateNewRoomName}
+                  onKeyDown={this.onRoomKeyDown}
+                  placeholder={<Text id="housesSettings.mobile.newRoomPlaceholder" />}
+                  aria-label={<Text id="housesSettings.mobile.roomNameLabel" />}
+                  autocomplete="off"
+                  autocapitalize="sentences"
+                  enterkeyhint="done"
+                  maxLength={40}
+                  data-cy="signup-new-room-name"
+                />
+              </Localizer>
+            </MobileField>
+            <BigButton
+              class={houseStyle.addRowButton}
+              onClick={this.addTypedRoom}
+              disabled={(props.signupNewRoomName || '').trim().length === 0}
+              data-cy="signup-new-room-add"
+            >
+              <Text id="signup.configureHouse.addRoomButton" />
+            </BigButton>
+          </div>
+        </MobileAuthCard>
 
         <MobileBottomBar
           error={failed ? <Text id="signup.mobile.saveHouseError" /> : null}

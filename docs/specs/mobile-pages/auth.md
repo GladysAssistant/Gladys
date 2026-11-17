@@ -164,8 +164,8 @@ request show in the bottom bar. On the second step the navigation bar has "‹ L
 the login again (the `init` action — as a reload does).
 
 The same form is the first screen of the backup restore of the onboarding (`onboarding.md` D),
-in the shell of the onboarding and with the props of that page: no reset by e-mail there (the
-page does not offer it), and the password recovery opens on Gladys Plus.
+in the shell of the onboarding — glass too — and with the props of that page: no reset by e-mail
+there (the page does not offer it), and the password recovery opens on Gladys Plus.
 
 ### D.2 Recovery codes (`components/gateway/GatewayRecoveryCodes.jsx`, `mobile`)
 

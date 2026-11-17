@@ -26,7 +26,7 @@ const MobileAuthTitle = ({ children, lead }) => (
  * containing block of what is fixed inside it).
  */
 const MobileAuthCard = ({ children, dataCy }) => (
-  <div class={style.mobileFormCard} data-cy={dataCy}>
+  <div class={cx(style.mobileFormCard, kitStyle.formCard)} data-cy={dataCy}>
     {children}
   </div>
 );

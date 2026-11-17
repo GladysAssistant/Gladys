@@ -248,3 +248,14 @@
   justify-content: center;
   padding: 2.5rem 0;
 }
+
+/* on the Horizon wallpaper the panels of the last step are glass, like the cards of the other
+   steps (kit.css, "Glass variant") */
+:global(.gladys-mobile-glass) .mobileFeature {
+  background: var(--gl-card-bg);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow-soft);
+}

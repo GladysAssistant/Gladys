@@ -1266,14 +1266,14 @@ a.bigButtonGhost:focus {
 :global(.gladys-mobile-glass) .navBar {
   /* frosted, and dense enough for what scrolls under it to stay out of the way of the title
      where the blur is not rendered */
-  background-color: rgba(255, 255, 255, 0.82);
+  background-color: rgba(255, 255, 255, 0.88);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
   backdrop-filter: blur(24px) saturate(1.6);
   border-bottom: 1px solid rgba(255, 255, 255, 0.7);
 }
 
 :global(.gladys-mobile-glass) .bottomBar {
-  background-color: rgba(255, 255, 255, 0.82);
+  background-color: rgba(255, 255, 255, 0.88);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
   backdrop-filter: blur(24px) saturate(1.6);
   border-top: 1px solid rgba(255, 255, 255, 0.7);
@@ -1342,6 +1342,29 @@ a.bigButtonGhost:focus {
 :global(.gladys-mobile-glass) .input:disabled,
 :global(.gladys-mobile-glass) .select:disabled {
   background-color: rgba(28, 35, 52, 0.05);
+}
+
+/* a card of fields (`formCard`, the glass card of the page): what sits on it is nested glass —
+   a group of rows loses its own blur and shadow, a chip is a translucent control like a field */
+.formCard {
+  position: relative;
+}
+
+:global(.gladys-mobile-glass) .formCard .group {
+  background: var(--gl-card-nested-bg, rgba(255, 255, 255, 0.4));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+:global(.gladys-mobile-glass) .chip {
+  border-color: rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+:global(.gladys-mobile-glass) .chipSelected {
+  border-color: var(--gl-ink, #1c2334);
+  background-color: var(--gl-ink, #1c2334);
 }
 
 /* the buttons join the pill family of the theme: the ink pill for the primary action, a

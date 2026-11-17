@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import { MobileAuthCard } from '../../../components/auth/mobile';
 import {
   MobileField,
   MobileNotice,
@@ -30,28 +31,30 @@ const MobileSetRestoreKey = props => (
         <Text id="signup.restoreBackupSetBackupKey.error" />
       </MobileNotice>
     )}
-    <MobileField
-      label={<Text id="signup.restoreBackupSetBackupKey.backupKeyLabel" />}
-      htmlFor="backupKey"
-      help={<Text id="signup.mobile.backupKeyHelp" />}
-    >
-      <Localizer>
-        <input
-          id="backupKey"
-          type="text"
-          class={fieldClass.input}
-          value={props.backupKey}
-          onInput={props.updateBackupKey}
-          placeholder={<Text id="signup.restoreBackupSetBackupKey.backupKeyPlaceholder" />}
-          autocomplete="off"
-          autocapitalize="off"
-          autocorrect="off"
-          spellcheck={false}
-          enterkeyhint="go"
-          data-cy="signup-restore-key"
-        />
-      </Localizer>
-    </MobileField>
+    <MobileAuthCard>
+      <MobileField
+        label={<Text id="signup.restoreBackupSetBackupKey.backupKeyLabel" />}
+        htmlFor="backupKey"
+        help={<Text id="signup.mobile.backupKeyHelp" />}
+      >
+        <Localizer>
+          <input
+            id="backupKey"
+            type="text"
+            class={fieldClass.input}
+            value={props.backupKey}
+            onInput={props.updateBackupKey}
+            placeholder={<Text id="signup.restoreBackupSetBackupKey.backupKeyPlaceholder" />}
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck={false}
+            enterkeyhint="go"
+            data-cy="signup-restore-key"
+          />
+        </Localizer>
+      </MobileField>
+    </MobileAuthCard>
     <MobileBottomBar>
       <BigButton variant="primary" type="submit" loading={props.loading} data-cy="signup-restore-key-save">
         <Text id="signup.restoreBackupSetBackupKey.saveButton" />
