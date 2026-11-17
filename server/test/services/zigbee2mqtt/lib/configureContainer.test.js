@@ -528,6 +528,20 @@ describe('zigbee2mqtt configureContainer', () => {
     assert.notCalled(portfinderMock.getPortPromise);
   });
 
+  it('it should keep the other settings of the interface when its port changes', async () => {
+    // PREPARE
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(configFilePath, content.replace('frontend:\n', 'frontend:\n  enabled: true\n'));
+    const config = {
+      z2mTcpPort: '12001',
+    };
+    // EXECUTE
+    await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    expect(resultContent).to.include('frontend:\n  enabled: true\n  port: 12001\n');
+  });
+
   it('it should keep the port of an existing file on start', async () => {
     // PREPARE
     // The port changed in the file, by hand, since Gladys saved it

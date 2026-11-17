@@ -367,7 +367,9 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
 
   // Check for requested changes (the port of Gladys is a string, the one of the file a number)
   if (Number(config.z2mTcpPort) !== port) {
+    // The other settings of the interface (enabled, host, auth_token…) are kept
     loadedConfig.frontend = {
+      ...frontend,
       port: Number(config.z2mTcpPort),
     };
     configChanged = true;
