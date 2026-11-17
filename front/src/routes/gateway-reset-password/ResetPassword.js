@@ -1,8 +1,10 @@
 import { MarkupText } from 'preact-i18n';
 import ResetPasswordForm from './ResetPasswordForm.js';
 import AuthLayout from '../../components/auth/AuthLayout';
+import MobileResetPassword from './MobileResetPassword';
+import { withMobileViewport } from '../../components/mobile';
 
-const ResetPassword = ({ children, ...props }) => (
+const DesktopResetPassword = ({ children, ...props }) => (
   <AuthLayout titleId="gatewayResetPassword.pageTitle">
     {!props.success && (
       <ResetPasswordForm
@@ -47,4 +49,7 @@ const ResetPassword = ({ children, ...props }) => (
   </AuthLayout>
 );
 
-export default ResetPassword;
+const ResetPassword = ({ isMobile, ...props }) =>
+  isMobile ? <MobileResetPassword {...props} /> : <DesktopResetPassword {...props} />;
+
+export default withMobileViewport(ResetPassword);

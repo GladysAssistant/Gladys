@@ -7,6 +7,8 @@ import get from 'get-value';
 
 import style from './style.css';
 import AuthLayout from '../../components/auth/AuthLayout';
+import { withMobileViewport } from '../../components/mobile';
+import MobileLocked from './MobileLocked';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 
 const BUTTON_ARRAY = [
@@ -116,6 +118,7 @@ class Locked extends Component {
     e.preventDefault();
     try {
       await this.setState({
+        validating: true,
         error: false,
         wrongCode: false,
         tooManyRequests: false,
@@ -127,11 +130,12 @@ class Locked extends Component {
       await this.props.httpClient.post(`/api/v1/house/${houseSelector}/disarm_with_code`, {
         code: this.state.currentCode
       });
+      this.setState({ validating: false });
     } catch (e) {
       console.error(e);
       const message = get(e, 'response.data.message');
       const status = get(e, 'response.status');
-      this.setState({ currentCode: '' });
+      this.setState({ currentCode: '', validating: false });
       if (status === 429) {
         this.setState({
           tooManyRequests: true,
@@ -151,7 +155,28 @@ class Locked extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.disarmed);
   }
-  render({}, { currentCode, error, wrongCode, tooManyRequests, waitTimeInMinute, errorMessage, errorStatus }) {
+  render(
+    { isMobile },
+    { currentCode, error, wrongCode, tooManyRequests, waitTimeInMinute, errorMessage, errorStatus, validating }
+  ) {
+    // the keypad on a phone (docs/specs/mobile-pages/auth.md, C.4): same state, same handlers
+    if (isMobile) {
+      return (
+        <MobileLocked
+          currentCode={currentCode}
+          typeLetter={this.typeLetter}
+          clearPreviousLetter={this.clearPreviousLetter}
+          validateCode={this.validateCode}
+          validating={validating}
+          error={error}
+          errorMessage={errorMessage}
+          errorStatus={errorStatus}
+          wrongCode={wrongCode}
+          tooManyRequests={tooManyRequests}
+          waitTimeInMinute={waitTimeInMinute}
+        />
+      );
+    }
     return (
       <AuthLayout>
         <form class="card">
@@ -202,4 +227,4 @@ class Locked extends Component {
   }
 }
 
-export default connect('httpClient,session', {})(Locked);
+export default connect('httpClient,session', {})(withMobileViewport(Locked));

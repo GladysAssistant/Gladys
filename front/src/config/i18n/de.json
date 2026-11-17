@@ -59,7 +59,8 @@
     "saveAndLeave": "Speichern und verlassen",
     "leaveWithoutSaving": "Ohne Speichern verlassen",
     "keepEditing": "Weiter bearbeiten",
-    "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden."
+    "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden.",
+    "togglePassword": "Passwort anzeigen oder verbergen"
   },
   "mobileDeviceList": {
     "noName": "Unbenanntes Gerät",
@@ -225,7 +226,10 @@
     "loginButtonText": "Einloggen",
     "wrongCredentials": "Die Kombination aus E-Mail-Adresse und Passwort ist falsch.",
     "invalidEmail": "Die E-Mail-Adresse ist ungültig",
-    "needHelpText": "Brauchst du Hilfe? Tritt unserer <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys-Community</a> (Englisch) bei."
+    "needHelpText": "Brauchst du Hilfe? Tritt unserer <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys-Community</a> (Englisch) bei.",
+    "mobile": {
+      "navBack": "Anmeldung"
+    }
   },
   "locked": {
     "cardTitle": "Zuhause gesperrt",
@@ -234,13 +238,15 @@
     "error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
     "wrongCodeError": "Ungültiger Code. Bitte versuche es erneut.",
     "validateButton": "Bestätigen",
-    "tooManyRequests": "Bitte warte {{count}} Minuten, bevor du es erneut versuchst."
+    "tooManyRequests": "Bitte warte {{count}} Minuten, bevor du es erneut versuchst.",
+    "mobile": {
+      "deleteDigit": "Letzte Ziffer löschen"
+    }
   },
   "signup": {
     "mobile": {
       "welcomeLead": "Gladys ist ein Assistent für Ihr Zuhause, der Ihre Privatsphäre respektiert. Die Einrichtung dauert etwa zwei Minuten.",
       "restoreHint": "Bereits Gladys-Plus-Nutzer? Stellen Sie eine frühere Installation wieder her.",
-      "togglePassword": "Passwort anzeigen oder verbergen",
       "distanceKilometers": "Kilometer",
       "distanceMiles": "Meilen",
       "historyHelp": "Wie lange Gladys die Werte Ihrer Sensoren aufbewahrt. Sie können es später in den Einstellungen ändern.",
@@ -6155,7 +6161,10 @@
     "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
     "recoveryCodeLabel": "Wiederherstellungscode",
     "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
-    "twoFactorEnabledSuccess": "Die Zwei-Faktor-Authentifizierung ist jetzt aktiviert! Gib einen neuen Code aus deiner App ein, um den Login abzuschließen."
+    "twoFactorEnabledSuccess": "Die Zwei-Faktor-Authentifizierung ist jetzt aktiviert! Gib einen neuen Code aus deiner App ein, um den Login abzuschließen.",
+    "mobile": {
+      "resetTwoFactorTitle": "Per E-Mail zurücksetzen"
+    }
   },
   "gatewayRecoveryCodes": {
     "cardTitle": "Deine Wiederherstellungscodes",
@@ -8014,7 +8023,10 @@
     "notAcceptedRetryButton": "Mein Benutzer ist autorisiert, erneut versuchen",
     "saveButton": "Speichern",
     "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
-    "logoutButton": "Abmelden"
+    "logoutButton": "Abmelden",
+    "mobile": {
+      "accountTitle": "Mein Gladys-Plus-Account"
+    }
   },
   "deviceFeatureHistorySize": {
     "size": {
@@ -8194,6 +8206,14 @@
       "open": "Öffne deine Zwei-Faktor-App",
       "addAccount": "Klicke auf \"Account hinzufügen\"",
       "scanQRCode": "Scanne den QR-Code unten oder kopiere den Geheimschlüssel in deine Zwei-Faktor-App."
+    },
+    "mobile": {
+      "addAccountTitle": "Auf diesem Telefon",
+      "openApp": "Meine Zwei-Faktor-App öffnen",
+      "openAppHelp": "Deine Zwei-Faktor-App öffnet sich, dein Gladys-Plus-Account kann direkt hinzugefügt werden. Es passiert nichts? Installiere eine der Apps aus dem vorherigen Schritt oder füge den Account unten von Hand hinzu.",
+      "manualTitle": "Von Hand oder von einem anderen Gerät",
+      "qrCodeAlt": "QR-Code zum Scannen mit deiner Zwei-Faktor-App",
+      "qrCodeHelp": "Zum Scannen mit einer Zwei-Faktor-App auf einem anderen Gerät."
     }
   },
   "gatewaySignUp": {
@@ -8209,7 +8229,11 @@
     "passwordLabel": "Passwort (mindestens 8 Zeichen)",
     "passwordPlaceholder": "Passwort",
     "passwordInvalid": "Das Passwort muss 8 Zeichen lang sein",
-    "createAccountButton": "Neues Account erstellen"
+    "createAccountButton": "Neues Account erstellen",
+    "mobile": {
+      "completeTitle": "Dein Account wurde erstellt",
+      "completeText": "Du kannst dich jetzt mit deiner E-Mail-Adresse und deinem Passwort einloggen."
+    }
   },
   "gatewayBilling": {
     "title": "Abrechnung",

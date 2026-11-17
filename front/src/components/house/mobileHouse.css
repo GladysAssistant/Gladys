@@ -190,6 +190,12 @@
   min-height: 12rem;
 }
 
+/* on a glass page (kit.css, "Glass variant") the map sits on a glass card: the border of the
+   theme, not the gray one of a white page */
+:global(.gladys-mobile-glass) .mapPreview {
+  border-color: rgba(28, 35, 52, 0.12);
+}
+
 /* ---------- Dark mode ---------- */
 
 /* a selected room must stand out among the others: inverted with the page it is a light chip
