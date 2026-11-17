@@ -104,7 +104,12 @@ const DesktopStepInstall = ({ view, actions }) => {
               <i class="fe fe-refresh-cw mr-2" aria-hidden="true" />
               <Text id={`${T}.failure.retry`} />
             </button>
-            <button type="button" class="btn btn-secondary" onClick={actions.changeKey} data-cy="z2m-wizard-change-key">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              onClick={actions.changeKey}
+              data-cy="z2m-wizard-change-key"
+            >
               <Text id={external ? `${T}.failure.changeConnection` : `${T}.failure.changeKey`} />
             </button>
           </div>

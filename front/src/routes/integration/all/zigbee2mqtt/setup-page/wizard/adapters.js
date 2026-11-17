@@ -20,7 +20,7 @@ export const getNameInBrand = adapter =>
 const normalize = text =>
   text
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '');
 
@@ -28,8 +28,9 @@ const getSearchedTexts = adapter =>
   [adapter.label, adapter.displayName, adapter.modelCode, adapter.brand, ...(adapter.aliases || [])].filter(Boolean);
 
 /**
- * @description The models matching a search: the whole search found in one of their names or aliases ("sonoff e"),
- * or else each of its words found in their names ("plus dongle").
+ * @description The models matching a search: those whose model code starts or ends with it ("dongle-p", "slzb-06"),
+ * else the whole search found in one of their names or aliases ("sonoff e"), or else each of its words found in their
+ * names ("plus dongle").
  * @param {Array} adapters - Models.
  * @param {string} search - Searched text.
  * @returns {Array} The matching models.
@@ -43,6 +44,16 @@ export const searchAdapters = (adapters, search) => {
     return adapters;
   }
   const whole = words.join('');
+  // A model code typed, or its start: those models only ("dongle-p" is the ZBDongle-P, not the "Dongle Plus-E")
+  if (whole.length >= 4) {
+    const byCode = adapters.filter(adapter => {
+      const code = adapter.modelCode ? normalize(adapter.modelCode) : '';
+      return code !== '' && (code.startsWith(whole) || code.endsWith(whole));
+    });
+    if (byCode.length > 0) {
+      return byCode;
+    }
+  }
   const byWhole = adapters.filter(adapter => getSearchedTexts(adapter).some(text => normalize(text).includes(whole)));
   if (byWhole.length > 0) {
     return byWhole;

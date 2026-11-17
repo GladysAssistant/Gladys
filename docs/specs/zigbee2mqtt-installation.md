@@ -514,8 +514,10 @@ external broker: connection, check, network, first device).
 
 - **Models** (0.3b): the list of `GET /adapter` (E.3) without the `(legacy ezsp)` ones, grouped by
   brand, each by its commercial name, model code and photo (zigbee2mqtt.io, an icon without
-  Internet). The search matches the whole text in one of its names or aliases ("sonoff e",
-  "dongle-e"), or else each of its words.
+  Internet). The search, ignoring case, accents and punctuation, keeps the models whose model
+  code starts or ends with it from 4 characters ("dongle-p": ZBDongle-P, not the Dongle Plus-E;
+  "slzb-06": every SLZB-06), else the whole text found in one of their names or aliases ("sonoff
+  e", "conbee"), or else each of its words.
 - **Install** saves the configuration (`POST /setup`, the USB dongle by its `stablePath`, no port of
   the interface: the installation chooses it). Refused (400 `DONGLE_NOT_FOUND`, 409 busy, another 400):
   the wizard stays on ①, says why, nothing is saved.

@@ -161,6 +161,11 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-model-search]').type('sonoff p');
     cy.get('[data-cy=z2m-wizard-model-option]').should('contain', 'Zigbee 3.0 USB Dongle Plus-P');
     cy.get('[data-cy=z2m-wizard-model-option]').should('not.contain', 'Zigbee 3.0 USB Dongle Plus-E');
+    // The model code, not an alias of another model (bench of 2026-11-17)
+    cy.get('[data-cy=z2m-wizard-model-search]').clear();
+    cy.get('[data-cy=z2m-wizard-model-search]').type('dongle-p');
+    cy.get('[data-cy=z2m-wizard-model-option]').should('contain', 'Zigbee 3.0 USB Dongle Plus-P');
+    cy.get('[data-cy=z2m-wizard-model-option]').should('not.contain', 'Zigbee 3.0 USB Dongle Plus-E');
     cy.get('[data-cy=z2m-wizard-model-search]').clear();
     cy.get('[data-cy=z2m-wizard-model-search]').type('nothing like this');
     cy.get('[data-cy=z2m-wizard-model-none]').should('exist');

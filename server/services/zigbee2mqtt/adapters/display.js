@@ -95,13 +95,13 @@ const DISPLAY_BY_LABEL = {
     displayName: 'SONOFF Zigbee 3.0 USB Dongle Plus-E',
     modelCode: 'ZBDongle-E',
     image: 'ZBDongle-E',
-    aliases: ['sonoff e', 'dongle e', 'dongle plus e', 'plus v2'],
+    aliases: ['sonoff e', 'dongle e', 'plus v2'],
   },
   'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P': {
     displayName: 'SONOFF Zigbee 3.0 USB Dongle Plus-P',
     modelCode: 'ZBDongle-P',
     image: 'ZBDongle-P',
-    aliases: ['sonoff p', 'dongle p', 'dongle plus p'],
+    aliases: ['sonoff p', 'dongle p'],
   },
   'SONOFF Dongle-M': {
     displayName: 'SONOFF Dongle Max',

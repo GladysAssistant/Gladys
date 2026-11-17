@@ -53,7 +53,7 @@ describe('zigbee2mqtt adapters display', () => {
       displayName: 'SONOFF Zigbee 3.0 USB Dongle Plus-E',
       modelCode: 'ZBDongle-E',
       image: 'ZBDongle-E',
-      aliases: ['sonoff e', 'dongle e', 'dongle plus e', 'plus v2'],
+      aliases: ['sonoff e', 'dongle e', 'plus v2'],
     });
   });
 

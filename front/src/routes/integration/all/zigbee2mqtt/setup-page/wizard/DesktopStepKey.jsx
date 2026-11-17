@@ -179,7 +179,7 @@ const Detected = ({ view, actions }) => {
           </div>
           <button
             type="button"
-            class="btn btn-secondary"
+            class="btn btn-outline-primary"
             onClick={actions.showExternal}
             data-cy="z2m-wizard-use-external"
           >
