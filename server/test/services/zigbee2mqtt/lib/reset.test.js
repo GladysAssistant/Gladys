@@ -87,6 +87,9 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.coordinatorFirmware = '20240101';
     zigbee2MqttManager.z2mVersion = '2.14.2';
     zigbee2MqttManager.configured = true;
+    zigbee2MqttManager.stopped = true;
+    zigbee2MqttManager.stoppedAt = '2026-11-17T08:00:00.000Z';
+    zigbee2MqttManager.updatePending = true;
     zigbee2MqttManager.deviceCount = 12;
     zigbee2MqttManager.z2mContainerError = { message: 'some error' };
     zigbee2MqttManager.mqttConnectionError = { code: 'BAD_CREDENTIALS', message: null };
@@ -107,7 +110,7 @@ describe('zigbee2mqtt reset', () => {
     assert.calledTwice(gladys.system.removeContainer);
 
     // Should destroy all 16 configuration variables
-    assert.callCount(gladys.variable.destroy, 16);
+    assert.callCount(gladys.variable.destroy, 17);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_BACKUP', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
@@ -147,6 +150,9 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.coordinatorFirmware).to.equal(null);
     expect(zigbee2MqttManager.z2mVersion).to.equal(null);
     expect(zigbee2MqttManager.configured).to.equal(false);
+    expect(zigbee2MqttManager.stopped).to.equal(false);
+    expect(zigbee2MqttManager.stoppedAt).to.equal(null);
+    expect(zigbee2MqttManager.updatePending).to.equal(false);
     expect(zigbee2MqttManager.deviceCount).to.equal(null);
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
     expect(zigbee2MqttManager.mqttConnectionError).to.equal(null);
@@ -287,7 +293,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
 
     // Should destroy all variables
-    assert.callCount(gladys.variable.destroy, 16);
+    assert.callCount(gladys.variable.destroy, 17);
     assert.calledOnce(fsRmStub);
   });
 
@@ -300,7 +306,7 @@ describe('zigbee2mqtt reset', () => {
     await zigbee2MqttManager.reset();
 
     assert.calledOnce(cancelFake);
-    assert.callCount(gladys.variable.destroy, 16);
+    assert.callCount(gladys.variable.destroy, 17);
     assert.calledOnce(fsRmStub);
   });
 

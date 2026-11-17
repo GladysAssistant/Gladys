@@ -10,6 +10,9 @@ function status() {
   const z2mEnabled = this.zigbee2mqttExist || this.mqttClient !== null;
   const zigbee2mqttStatus = {
     configured: this.configured,
+    stopped: this.stopped,
+    stoppedAt: this.stoppedAt,
+    updatePending: this.updatePending,
     usbConfigured: this.usbConfigured,
     dongleMissing: this.dongleMissing,
     networkAdapterConfigured: this.networkAdapterConfigured,

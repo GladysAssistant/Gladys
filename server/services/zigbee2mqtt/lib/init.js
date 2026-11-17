@@ -156,6 +156,16 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   this.configured = isConfigured(configuration);
   this.emitStatusEvent();
 
+  // Stopped by the user (see stop): nothing is started, nor watched, until the user starts it again. The containers
+  // are kept, stopped.
+  this.stopped = Boolean(configuration.z2mStoppedAt);
+  this.stoppedAt = configuration.z2mStoppedAt || null;
+  if (this.stopped) {
+    logger.info(`Zigbee2mqtt: stopped by the user since ${this.stoppedAt}, not started`);
+    this.emitStatusEvent();
+    return null;
+  }
+
   // Test if the coordinator is usable: a USB dongle is checked against the ports actually plugged in,
   // while a network coordinator is only checked for being configured. Its reachability is not probed
   // here, as a TCP test on every start could hang; if it is down, Zigbee2mqtt will keep restarting.
@@ -290,6 +300,9 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
             .forEach(({ key }) => this.updateInstallationPhase(key, { state: INSTALLATION_PHASE_STATE.PENDING }));
         }
       }
+      // Shown until it is done: without its images, an update is tried again on the next start
+      this.updatePending =
+        !newImagesPulled && (updateRequired || (await isUpdateRequired(this.gladys.system, configuration)));
       // Skipped, the stored versions stay the old ones
       const replacedImages = newImagesPulled ? await this.checkForContainerUpdates(configuration) : [];
       await this.installMqttContainer(configuration);

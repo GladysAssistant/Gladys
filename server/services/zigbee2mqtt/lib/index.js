@@ -48,6 +48,10 @@ const { startPrefetch } = require('./startPrefetch');
 const { updatePrefetchProgress } = require('./updatePrefetchProgress');
 const { refuseWhileInstalling } = require('./refuseWhileInstalling');
 const { clearInstallation } = require('./clearInstallation');
+const { restartZ2mContainer } = require('./restartZ2mContainer');
+const { stop } = require('./stop');
+const { clearStop, start } = require('./start');
+const { restart } = require('./restart');
 const { JOB_TYPES } = require('../../../utils/constants');
 const { getIdleInstallation, getIdlePrefetch } = require('./constants');
 
@@ -81,6 +85,11 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   // A coordinator or an external broker is saved (see isConfigured); unknown (null) until init reads the configuration,
   // which a service stopped in the settings never does: the pages do not tell an installation not installed meanwhile
   this.configured = null;
+  // Stopped by the user, and since when (see stop): nothing starts Zigbee2mqtt until the user starts it again
+  this.stopped = false;
+  this.stoppedAt = null;
+  // An update of the containers waits for its images, not downloaded: tried again on the next start (see init)
+  this.updatePending = false;
   // The configured USB dongle was not found, at the start or since (see watchDongle)
   this.dongleMissing = false;
   // Check of the configured USB dongle, while Zigbee2mqtt does not answer (see watchDongle)
@@ -196,6 +205,11 @@ Zigbee2mqttManager.prototype.updateInstallationPhase = updateInstallationPhase;
 Zigbee2mqttManager.prototype.waitForZigbee2mqtt = waitForZigbee2mqtt;
 Zigbee2mqttManager.prototype.finishInstallation = finishInstallation;
 Zigbee2mqttManager.prototype.runInstallation = runInstallation;
+Zigbee2mqttManager.prototype.restartZ2mContainer = restartZ2mContainer;
+Zigbee2mqttManager.prototype.stop = stop;
+Zigbee2mqttManager.prototype.clearStop = clearStop;
+Zigbee2mqttManager.prototype.start = start;
+Zigbee2mqttManager.prototype.restart = restart;
 Zigbee2mqttManager.prototype.pullImage = pullImage;
 Zigbee2mqttManager.prototype.pullMissingImages = pullMissingImages;
 Zigbee2mqttManager.prototype.startPrefetch = startPrefetch;

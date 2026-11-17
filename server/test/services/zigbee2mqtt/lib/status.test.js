@@ -22,6 +22,9 @@ describe('zigbee2mqtt status', () => {
     zigbee2MqttManager = new Zigbee2MqttManager(gladys, mqtt, serviceId);
     zigbee2MqttManager.usbConfigured = true;
     zigbee2MqttManager.configured = true;
+    zigbee2MqttManager.stopped = true;
+    zigbee2MqttManager.stoppedAt = '2026-11-17T08:00:00.000Z';
+    zigbee2MqttManager.updatePending = true;
     zigbee2MqttManager.networkAdapterConfigured = false;
     zigbee2MqttManager.mqttExist = true;
     zigbee2MqttManager.mqttRunning = true;
@@ -40,6 +43,9 @@ describe('zigbee2mqtt status', () => {
     // ASSERT
     expect(result.usbConfigured).that.equal(true);
     expect(result.configured).that.equal(true);
+    expect(result.stopped).that.equal(true);
+    expect(result.stoppedAt).that.equal('2026-11-17T08:00:00.000Z');
+    expect(result.updatePending).that.equal(true);
     expect(result.networkAdapterConfigured).that.equal(false);
     expect(result.mqttExist).that.equal(true);
     expect(result.mqttRunning).that.equal(true);

@@ -33,14 +33,14 @@ downloads before it removes anything and keeps the running containers when the d
 fields, `installation` and `prefetch` (C). An installation follows one init up to the first answer
 of Zigbee2mqtt. It lives in memory only: `idle` after a restart of Gladys (`getIdleInstallation()`).
 
-| Field        | Type                                      | Meaning                                                  |
-| ------------ | ----------------------------------------- | -------------------------------------------------------- |
-| `state`      | `idle` \| `running` \| `done` \| `failed` | `INSTALLATION_STATE`                                     |
-| `kind`       | `install` \| `switch` \| `update` \| null | `INSTALLATION_KIND`, `null` when idle (B.1)              |
-| `phases`     | `[{ key, state, progress }]`              | the five phases, in order (B.2); `[]` when idle          |
-| `progress`   | integer 0–100                             | weighted progress of the phases (B.2)                    |
-| `error`      | `{ code, message }` \| null               | why it failed (B.4)                                      |
-| `durationMs` | number \| null                            | from its start to its outcome; `null` while idle/running |
+| Field        | Type                                                 | Meaning                                                  |
+| ------------ | ---------------------------------------------------- | -------------------------------------------------------- |
+| `state`      | `idle` \| `running` \| `done` \| `failed`            | `INSTALLATION_STATE`                                     |
+| `kind`       | `install` \| `switch` \| `update` \| `start` \| null | `INSTALLATION_KIND`, `null` when idle (B.1)              |
+| `phases`     | `[{ key, state, progress }]`                         | the five phases, in order (B.2); `[]` when idle          |
+| `progress`   | integer 0–100                                        | weighted progress of the phases (B.2)                    |
+| `error`      | `{ code, message }` \| null                          | why it failed (B.4)                                      |
+| `durationMs` | number \| null                                       | from its start to its outcome; `null` while idle/running |
 
 ### B.1 Kinds
 
@@ -49,8 +49,9 @@ of Zigbee2mqtt. It lives in memory only: `idle` after a restart of Gladys (`getI
 | `switch`  | `POST /setup`                                                                                        | a coordinator is stored and the setup saves another one. The coordinator is the URL in network mode, the USB dongle otherwise (its port and its link are the same dongle, K.2): a change of mode is a switch |
 | `install` | `POST /setup`                                                                                        | any other setup: first one, the same coordinator saved again after a failure, another setting changed                                                                                                        |
 | `update`  | an init outside an installation (start of the service, `POST /connect`, the watch of the dongle K.3) | a container of ours exists whose stored version (`DOCKER_MQTT_VERSION`, `DOCKER_Z2M_VERSION`) is set and differs from `DEFAULT` (G)                                                                          |
+| `start`   | `POST /start`                                                                                        | the user starts Zigbee2mqtt again after a stop (E.4): an init as at the start of Gladys (not in setup mode), an update waiting for its images (G) runs then                                                  |
 
-Only `install` and `switch` run in a job (E.2).
+Only `install`, `switch` and `start` run in a job (E.2).
 
 ### B.2 Phases and progress
 
@@ -167,6 +168,9 @@ Under `/api/v1/service/zigbee2mqtt/`. A refusal answers 409 with the generic bod
 | `POST /prefetch`    | admin         | starts the prefetch (C) and answers it once the disk space is checked. Never refused: a running or done prefetch is answered as is, and the downloads are shared with an installation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `POST /connect`     | authenticated | 409 when busy, then runs init inside the request (L); may start an `update` (G)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `POST /disconnect`  | authenticated | 409 when busy, then disables the integration                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `POST /stop`        | admin         | 409 when busy; stops Zigbee2mqtt until it is started again (E.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `POST /start`       | admin         | 409 when busy, 400 when nothing is set up; forgets the stop and launches a `start` installation without waiting (E.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `POST /restart`     | admin         | 409 when busy, 400 when stopped or without a Zigbee2mqtt container of ours; restarts it (E.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `POST /reset`       | admin         | 409 when busy, then resets the integration                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `POST /mqtt/start`  | authenticated | 409 when busy; 400 when the MQTT accounts were never generated (no setup saved)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `POST /z2m/start`   | authenticated | 409 when busy; 400 when no coordinator of the adapter mode is configured                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -184,7 +188,8 @@ installation. A job that fails to start fails the installation with its error. A
 
 ### E.3 For the wizard and the dashboard
 
-- **Status.** `configured` tells that a USB dongle or a network coordinator is saved, or the broker
+- **Status.** `stopped` and `stoppedAt` tell a stop of the user (E.4); `updatePending` tells an update
+  waiting for its images (G). `configured` tells that a USB dongle or a network coordinator is saved, or the broker
   of a Zigbee2mqtt that runs elsewhere (`utils/isConfigured.js`): set by init from the saved
   configuration, by `POST /setup` once its variables are saved, false after `reset`; kept by
   `disconnect` (a disabled installation is still configured); `null` (unknown) until init checked
@@ -210,6 +215,22 @@ installation. A job that fails to start fails the installation with its error. A
   (searched words). Each label is listed once: a model listed by two drivers (SLZB-Ultima, SMHUB)
   keeps the first, the one `configureContainer` installs it with. A `(legacy ezsp)` model is shown as its base model. `GET /usb/port` does not
   change: the front finds the recognized `adapter` of a port in this list by its label.
+
+### E.4 Stop, start and restart (dashboard)
+
+- **Stop** (`stop.js`). Remembered in the variable `Z2M_STOPPED` (its date, `stoppedAt`), saved first:
+  Gladys disconnects from the broker (nightly backup, watch of the dongle, health check and last
+  installation stopped too, as `disconnect` does), then our containers get the restart policy `no`
+  (Docker starts a container of policy `always` again when the machine restarts, even stopped by
+  hand) and are stopped, Zigbee2mqtt first, and **kept**. With an external broker, Gladys only
+  disconnects. While `Z2M_STOPPED` exists, init (start of Gladys, Settings > Services) starts and
+  watches nothing: it ends once it knows the platform, `stopped: true`.
+- **Start** (`start.js`). Refused when nothing is set up. Forgets the stop (variable destroyed, restart
+  policy `always` again, best effort) and runs a `start` installation (B.1), followed on the page; a
+  setup saved while stopped forgets the stop too. Reset destroys the variable.
+- **Restart** (`restart.js`). Restarts the Zigbee2mqtt container through `restartZ2mContainer`, the
+  same code as an installation: the starting window (`zigbee2mqttStarting`, 2 min) and the logs of
+  the new run (0.2). The broker is restarted first when Gladys is not connected to it.
 
 ## F. Image downloads
 
@@ -260,7 +281,8 @@ An init with a usable coordinator (which forces the local broker) runs, in order
    just before starting, a setup having maybe started an installation meanwhile.
 2. **Download first.** `pullMissingImages()`, the running containers keeping on meanwhile.
 3. **Failed download.** `checkForContainerUpdates()` is skipped: the stored versions stay the old
-   ones and the update is tried again on the next start. An `update` ends `failed` at once, the
+   ones and the update is tried again on the next start; `updatePending` tells it (E.3), until an init
+   downloads the images. An `update` ends `failed` at once, the
    containers in place are kept and Gladys connects to them. In an installation launched by the
    setup, the failed pull phases go back to `pending` and the installation goes on: a container to
    create fails on the kept error, a container in place is kept. Either way, `configureContainer`
@@ -309,13 +331,13 @@ The integration is busy while an installation is `running` or `runningOperations
 inits, disconnects, resets (which run a disconnect) and ezsp fallbacks in progress, each counted
 from its first line.
 
-| Caller                                                                          | While an installation runs                        | While an operation runs               |
-| ------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------- |
-| `POST /setup`, `/connect`, `/disconnect`, `/reset`, `/mqtt/start`, `/z2m/start` | 409                                               | 409                                   |
-| `POST /prefetch`                                                                | accepted                                          | accepted                              |
-| start of the service (Gladys start, Settings > Services)                        | does nothing: the installation starts Zigbee2mqtt | runs init (shared route, not refused) |
-| stop of the service (Settings > Services)                                       | waits for its end                                 | waits for their end                   |
-| update at start-up                                                              | not started: the installation follows this init   | —                                     |
+| Caller                                                                                                         | While an installation runs                        | While an operation runs               |
+| -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------- |
+| `POST /setup`, `/connect`, `/disconnect`, `/reset`, `/mqtt/start`, `/z2m/start`, `/stop`, `/start`, `/restart` | 409                                               | 409                                   |
+| `POST /prefetch`                                                                                               | accepted                                          | accepted                              |
+| start of the service (Gladys start, Settings > Services)                                                       | does nothing: the installation starts Zigbee2mqtt | runs init (shared route, not refused) |
+| stop of the service (Settings > Services)                                                                      | waits for its end                                 | waits for their end                   |
+| update at start-up                                                                                             | not started: the installation follows this init   | —                                     |
 
 - `refuseWhileInstalling` refuses with a message that ends with `while an installation is running`
   or `while the integration is busy`: the setup page reads these endings (J).
@@ -422,7 +444,7 @@ Zigbee2mqtt stops when its dongle is unplugged. Docker starts a crashed containe
 and the container stays `exited`, even once the dongle is plugged back.
 
 - **Lifecycle.** Armed by each init once it checked the dongle (USB mode, broker not external),
-  found or not; replaced by the next init; stopped, its timer cleared, by disconnect and reset.
+  found or not; replaced by the next init; stopped, its timer cleared, by disconnect, reset and a stop of the user (E.4), which no init arms again until the user starts Zigbee2mqtt.
 - **State.** `dongleMissing` (the status); `dongleLost`, held by the watch: the dongle was found
   missing, or the watch was armed by a start of the watch, and Zigbee2mqtt has not answered since; the starts made by
   the watch (count, end of the last one).
@@ -477,13 +499,10 @@ and the container stays `exited`, even once the dongle is plugged back.
 
 ## L. Out of scope / follow-ups
 
-- **Update waiting.** A postponed update ends `failed`, cleared once Zigbee2mqtt answers: no visible
-  "update waiting" status yet (dashboard PR).
-- **`POST /connect`** (enable switch) still runs init inside the request.
+- **`POST /connect`** (enable switch of the API, no longer used by the page) still runs init inside the
+  request; the page starts Zigbee2mqtt with `POST /start` (E.4).
 - **Gladys connects to the broker only once the containers are in place**: during the download of an
   update, the Zigbee network runs but Gladys does not receive its messages yet.
-- **A stop of Zigbee2mqtt that keeps the integration enabled** (dashboard PR): a clean stop, which the
-  watch of the dongle leaves stopped (K.3); a stop remembered across a start of Gladys is to design.
 - The dashboard (state, start / stop remembered, restart, change of dongle): next PR. Until then the
   wizard ends on the page of J.
 - **A switch between the local broker and an external one** (B, `POST /setup`) erases the settings

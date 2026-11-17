@@ -177,6 +177,45 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
+   * @api {post} /api/v1/service/zigbee2mqtt/stop Stop Zigbee2mqtt until it is started again
+   * @apiName stop
+   * @apiGroup Zigbee2mqtt
+   */
+  async function stop(req, res) {
+    logger.debug('Stopping Zigbee2mqtt');
+    await zigbee2mqttManager.stop();
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/service/zigbee2mqtt/start Start Zigbee2mqtt again, in the background
+   * @apiName start
+   * @apiGroup Zigbee2mqtt
+   */
+  async function start(req, res) {
+    logger.debug('Starting Zigbee2mqtt');
+    await zigbee2mqttManager.start();
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/service/zigbee2mqtt/restart Restart Zigbee2mqtt
+   * @apiName restart
+   * @apiGroup Zigbee2mqtt
+   */
+  async function restart(req, res) {
+    logger.debug('Restarting Zigbee2mqtt');
+    await zigbee2mqttManager.restart();
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {post} /api/v1/service/zigbee2mqtt/reset Reset Zigbee2mqtt integration
    * @apiName reset
    * @apiGroup Zigbee2mqtt
@@ -259,6 +298,21 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
     'get /api/v1/service/zigbee2mqtt/permit_join': {
       authenticated: true,
       controller: asyncMiddleware(getPermitJoin),
+    },
+    'post /api/v1/service/zigbee2mqtt/stop': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(stop),
+    },
+    'post /api/v1/service/zigbee2mqtt/start': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(start),
+    },
+    'post /api/v1/service/zigbee2mqtt/restart': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(restart),
     },
     'post /api/v1/service/zigbee2mqtt/reset': {
       authenticated: true,

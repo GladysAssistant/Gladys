@@ -23,6 +23,8 @@ const CONFIGURATION = {
   Z2M_FRONTEND_URL: 'Z2M_FRONTEND_URL',
   // Saved when Gladys asks Zigbee2mqtt to draw the settings of its network
   Z2M_NETWORK_GENERATED: 'Z2M_NETWORK_GENERATED',
+  // Saved, with its date, when the user stops Zigbee2mqtt: nothing starts it again until the user starts it
+  Z2M_STOPPED: 'Z2M_STOPPED',
 };
 
 const MQTT_MODE = {
@@ -63,6 +65,8 @@ const INSTALLATION_KIND = {
   UPDATE: 'update',
   // Another coordinator replaces the configured one
   SWITCH: 'switch',
+  // Started again by the user after a stop
+  START: 'start',
 };
 
 // Phases of an installation, in the order they are shown

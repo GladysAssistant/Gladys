@@ -21,6 +21,7 @@ const ALL_CONFIGURATION_KEYS = [
   CONFIGURATION.DOCKER_MQTT_VERSION,
   CONFIGURATION.DOCKER_Z2M_VERSION,
   CONFIGURATION.Z2M_NETWORK_GENERATED,
+  CONFIGURATION.Z2M_STOPPED,
 ];
 
 /**
@@ -48,6 +49,9 @@ async function resetIntegration() {
   this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
+  this.stopped = false;
+  this.stoppedAt = null;
+  this.updatePending = false;
   this.configured = false;
   this.networkAdapterConfigured = false;
   this.mqttExist = false;

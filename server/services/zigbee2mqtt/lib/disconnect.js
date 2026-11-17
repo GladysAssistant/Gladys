@@ -27,7 +27,14 @@ async function removeOwnContainer(system, descriptor) {
  * @example
  * await disconnectContainers.call(this);
  */
-async function disconnectContainers() {
+/**
+ * @description Disconnect Gladys from the broker, and stop what follows Zigbee2mqtt: its nightly backup, the watch of
+ * its dongle, its health check, the last installation. Shared by disconnect, which then removes the containers, and by
+ * stop, which keeps them.
+ * @example
+ * disconnectFromBroker.call(this);
+ */
+function disconnectFromBroker() {
   // Stop backup reccurent job
   if (this.backupScheduledJob) {
     this.backupScheduledJob.cancel();
@@ -62,6 +69,15 @@ async function disconnectContainers() {
   if (this.installProgressTimer !== null) {
     this.emitInstallProgress(true);
   }
+}
+
+/**
+ * @description Disconnect from the broker, then stop and remove both containers, see disconnect.
+ * @example
+ * await disconnectContainers.call(this);
+ */
+async function disconnectContainers() {
+  disconnectFromBroker.call(this);
 
   // Stop & remove MQTT container
   await removeOwnContainer(this.gladys.system, mqttContainerDescriptor);
@@ -102,5 +118,6 @@ async function disconnect() {
 }
 
 module.exports = {
+  disconnectFromBroker,
   disconnect,
 };

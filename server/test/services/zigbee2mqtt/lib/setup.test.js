@@ -61,9 +61,20 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE_DONGLE_NAME', 'dongle-name', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', 'tcpPort', serviceId);
 
-    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation, true);
     // Set up as soon as saved, before the installation reads it again
     expect(zigbee2MqttManager.configured).to.equal(true);
+  });
+
+  it('should forget the stop of the user once the setup is saved', async () => {
+    // PREPARE
+    zigbee2MqttManager.stopped = true;
+    zigbee2MqttManager.clearStop = fake.resolves(null);
+    // EXECUTE
+    await zigbee2MqttManager.setup({ Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://localhost' });
+    // ASSERT
+    assert.calledOnce(zigbee2MqttManager.clearStop);
+    assert.callOrder(gladys.variable.setValue, zigbee2MqttManager.clearStop, zigbee2MqttManager.runInstallation);
   });
 
   it('should store configuration for external broker', async () => {
@@ -90,7 +101,7 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
 
-    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation, true);
     expect(zigbee2MqttManager.configured).to.equal(true);
   });
 
@@ -159,7 +170,7 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
 
-    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation, true);
   });
 
   it('should not store an invalid network coordinator configuration', async () => {

@@ -30,6 +30,9 @@ const zigbee2mqttManager = {
   setPermitJoin: fake.returns(true),
   getPermitJoin: fake.returns(true),
   reset: fake.resolves(true),
+  stop: fake.resolves(),
+  start: fake.resolves(),
+  restart: fake.resolves(),
   refuseWhileInstalling: fake(),
 };
 
@@ -304,6 +307,28 @@ describe('zigbee2mqtt API', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'reset');
     assert.calledOnce(zigbee2mqttManager.reset);
     assert.calledWith(res.json, { success: true });
+  });
+
+  // Each refuses by itself while the integration is busy (see stop, start, restart)
+  [
+    ['stop', 'stop'],
+    ['start', 'start'],
+    ['restart', 'restart'],
+  ].forEach(([route, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${route}`, async () => {
+      const req = {};
+      const res = {
+        json: fake.returns(null),
+      };
+
+      await controller[`post /api/v1/service/zigbee2mqtt/${route}`].controller(req, res);
+      assert.calledOnceWithExactly(zigbee2mqttManager[method]);
+      assert.calledWith(res.json, { success: true });
+    });
+
+    it(`post /api/v1/service/zigbee2mqtt/${route} is for admins only`, () => {
+      expect(controller[`post /api/v1/service/zigbee2mqtt/${route}`].admin).to.equal(true);
+    });
   });
 
   // An installation or an operation in progress (init, disconnect, reset, ezsp fallback) would undo them (containers

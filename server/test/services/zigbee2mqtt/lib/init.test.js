@@ -72,6 +72,34 @@ describe('zigbee2mqtt init', () => {
     sinon.reset();
   });
 
+  it('should start nothing, nor watch the dongle, while stopped by the user', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({
+      z2mDriverPath: '/dev/ttyUSB0',
+      mqttPassword: 'mqttPassword',
+      mqttMode: 'local',
+      z2mStoppedAt: '2026-11-17T08:00:00.000Z',
+    });
+    zigbee2mqttManager.watchDongle = sinon.stub();
+    // EXECUTE
+    const result = await zigbee2mqttManager.init();
+    // ASSERT
+    expect(result).to.equal(null);
+    expect(zigbee2mqttManager.stopped).to.equal(true);
+    expect(zigbee2mqttManager.stoppedAt).to.equal('2026-11-17T08:00:00.000Z');
+    // Still known as set up and runnable: the page offers to start it
+    expect(zigbee2mqttManager.configured).to.equal(true);
+    expect(zigbee2mqttManager.networkModeValid).to.equal(true);
+    assert.notCalled(gladys.service.getService);
+    assert.notCalled(zigbee2mqttManager.watchDongle);
+    assert.notCalled(zigbee2mqttManager.pullMissingImages);
+    assert.notCalled(zigbee2mqttManager.installMqttContainer);
+    assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+    assert.notCalled(zigbee2mqttManager.connect);
+    assert.notCalled(zigbee2mqttManager.saveConfiguration);
+    assert.called(zigbee2mqttManager.emitStatusEvent);
+  });
+
   it('should fail because not a Docker System', async () => {
     // PREPARE
     gladys.system.isDocker = fake.resolves(false);
@@ -794,6 +822,8 @@ describe('zigbee2mqtt init', () => {
       assert.notCalled(zigbee2mqttManager.finishInstallation);
       // Without a job
       expect(zigbee2mqttManager.installationJobId).to.equal(null);
+      // Downloaded: replaced now
+      expect(zigbee2mqttManager.updatePending).to.equal(false);
       answer();
       expect(await finished).to.equal(null);
     });
@@ -843,6 +873,8 @@ describe('zigbee2mqtt init', () => {
         'Zigbee2mqtt: new images not downloaded, the update is postponed to the next start:',
         error,
       );
+      // Told by the status until it is done
+      expect(zigbee2mqttManager.updatePending).to.equal(true);
     });
 
     it('should show a failed download pending again during an installation, as it goes on without it', async () => {
@@ -891,6 +923,8 @@ describe('zigbee2mqtt init', () => {
         error,
       );
       assert.notCalled(zigbee2mqttManager.finishInstallation);
+      // No container of an older version
+      expect(zigbee2mqttManager.updatePending).to.equal(false);
     });
 
     it('should keep the outdated containers running when a setup runs this init and the new images are not downloaded', async () => {
@@ -923,6 +957,8 @@ describe('zigbee2mqtt init', () => {
       // Tried again on the next start, with the old version still stored
       assert.calledWithMatch(zigbee2mqttManager.saveConfiguration, { dockerZ2mVersion: '12' });
       expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+      // The update waits, though the installation of the setup followed this init
+      expect(zigbee2mqttManager.updatePending).to.equal(true);
     });
 
     it('should follow the update of the broker alone like an installation', async () => {

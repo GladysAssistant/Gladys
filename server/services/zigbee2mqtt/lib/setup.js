@@ -133,6 +133,10 @@ async function setup(config) {
         this.saveOrDestroyVariable(key, validatedConfig[key]),
       ),
     );
+    // Saved to run: no longer stopped by the user (see stop)
+    if (this.stopped) {
+      await this.clearStop();
+    }
   } catch (e) {
     this.finishInstallation(e);
     throw e;
@@ -146,7 +150,7 @@ async function setup(config) {
   const { installation } = this;
   // Reload z2m container with new coordinator configuration, without waiting for it
   // eslint-disable-next-line promise/prefer-await-to-then
-  this.runInstallation().catch((e) => {
+  this.runInstallation(true).catch((e) => {
     // The installation tells its own failure, unless its job failed to start. Only this installation: the job wrapper
     // saves the failure of the job before rejecting, and a setup sent meanwhile may have started another one
     if (this.installation === installation && installation.state === INSTALLATION_STATE.RUNNING) {
