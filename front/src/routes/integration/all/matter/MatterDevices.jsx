@@ -15,47 +15,67 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/device';
 import style from './style.css';
 
-const compareDevices = (deviceA, deviceB) => {
+// Tells if a device already in Gladys is up to date with the device paired in Matter.
+// Only the params the integration provides (the ones of the paired device) are compared: the Gladys
+// device also carries params the integration doesn't manage (e.g. the `ENERGY_INDEX_LAST_PROCESSED_*`
+// watermarks written by energy monitoring), which must not make it look "to update".
+const compareDevices = (gladysDevice, pairedDevice) => {
   // If external_id is different, it's not the same device
-  if (deviceA.external_id !== deviceB.external_id) {
+  if (gladysDevice.external_id !== pairedDevice.external_id) {
     return false;
   }
   // Compare device features
-  if (deviceA.features.length !== deviceB.features.length) {
-    return false;
-  }
-  // Compare device params
-  if (deviceA.params.length !== deviceB.params.length) {
+  if (gladysDevice.features.length !== pairedDevice.features.length) {
     return false;
   }
   // We sort all features by external_id
-  const deviceAFeaturesExternalIdSorted = deviceA.features.map(f => f.external_id).sort();
-  const deviceBFeaturesExternalIdSorted = deviceB.features.map(f => f.external_id).sort();
+  const gladysDeviceFeaturesExternalIdSorted = gladysDevice.features.map(f => f.external_id).sort();
+  const pairedDeviceFeaturesExternalIdSorted = pairedDevice.features.map(f => f.external_id).sort();
   // We compare all features external_id
-  for (let i = 0; i < deviceAFeaturesExternalIdSorted.length; i++) {
-    if (deviceAFeaturesExternalIdSorted[i] !== deviceBFeaturesExternalIdSorted[i]) {
+  for (let i = 0; i < gladysDeviceFeaturesExternalIdSorted.length; i++) {
+    if (gladysDeviceFeaturesExternalIdSorted[i] !== pairedDeviceFeaturesExternalIdSorted[i]) {
       return false;
     }
   }
   // We compare all features unit
-  const deviceAFeaturesUnitSorted = deviceA.features.map(f => f.unit || 'empty').sort();
-  const deviceBFeaturesUnitSorted = deviceB.features.map(f => f.unit || 'empty').sort();
-  for (let i = 0; i < deviceAFeaturesUnitSorted.length; i++) {
-    if (deviceAFeaturesUnitSorted[i] !== deviceBFeaturesUnitSorted[i]) {
+  const gladysDeviceFeaturesUnitSorted = gladysDevice.features.map(f => f.unit || 'empty').sort();
+  const pairedDeviceFeaturesUnitSorted = pairedDevice.features.map(f => f.unit || 'empty').sort();
+  for (let i = 0; i < gladysDeviceFeaturesUnitSorted.length; i++) {
+    if (gladysDeviceFeaturesUnitSorted[i] !== pairedDeviceFeaturesUnitSorted[i]) {
       return false;
     }
   }
-  // We compare all params name & value
-  for (let i = 0; i < deviceA.params.length; i++) {
-    const sameParamInDeviceB = deviceB.params.find(p => p.name === deviceA.params[i].name);
-    if (!sameParamInDeviceB) {
+  // We compare the name & value of all params provided by the integration
+  const gladysParams = gladysDevice.params || [];
+  const pairedParams = pairedDevice.params || [];
+  for (let i = 0; i < pairedParams.length; i++) {
+    const sameParamInGladys = gladysParams.find(p => p.name === pairedParams[i].name);
+    if (!sameParamInGladys) {
       return false;
     }
-    if (deviceA.params[i].value !== sameParamInDeviceB.value) {
+    if (pairedParams[i].value !== sameParamInGladys.value) {
       return false;
     }
   }
   return true;
+};
+
+// Updating a device already in Gladys only refreshes what the integration provides (features and
+// params): the device keeps its id, selector, name and room, and the params the integration doesn't
+// manage. Posting the paired device as-is would rename the device and delete those params.
+const mergePairedDeviceIntoGladysDevice = (gladysDevice, pairedDevice) => {
+  const pairedParams = pairedDevice.params || [];
+  const paramsNotManagedByMatter = (gladysDevice.params || []).filter(
+    gladysParam => !pairedParams.some(pairedParam => pairedParam.name === gladysParam.name)
+  );
+  return {
+    ...pairedDevice,
+    id: gladysDevice.id,
+    selector: gladysDevice.selector,
+    name: gladysDevice.name,
+    room_id: gladysDevice.room_id,
+    params: [...pairedParams, ...paramsNotManagedByMatter]
+  };
 };
 
 const findGladysDeviceByExternalId = (matterDevices, externalId) =>
@@ -243,7 +263,13 @@ class MatterDevices extends Component {
     this.setPairedDeviceLoading(externalId, true);
     this.setPairedDeviceError(externalId, null);
     try {
-      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
+      // A device with this external_id may already be in Gladys ("Update"): the server would then
+      // update it with the posted object, so we only refresh what the integration provides
+      const existingGladysDevice = findGladysDeviceByExternalId(this.state.matterDevices, externalId);
+      const deviceToSave = existingGladysDevice
+        ? mergePairedDeviceIntoGladysDevice(existingGladysDevice, device)
+        : device;
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {
@@ -465,10 +491,11 @@ class MatterDevices extends Component {
                         const isUpdate = existingGladysDevice && !isNodeIdChanged;
 
                         return (
-                          <div key={device.external_id} class="col-md-6">
+                          <div key={device.external_id} class="col-md-6" data-cy="matter-paired-device">
                             <div class="card">
                               <div class="card-header">
-                                {device.name || device.model}
+                                {/* an update card names the Gladys device it applies to */}
+                                {(isUpdate && existingGladysDevice.name) || device.name || device.model}
                                 {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
                                   <div class="page-options d-flex">
                                     <div class="tag tag-danger">
@@ -530,6 +557,7 @@ class MatterDevices extends Component {
                                       <div class="form-group">
                                         <button
                                           onClick={() => this.addDeviceToGladys(device)}
+                                          data-cy="matter-paired-device-save"
                                           class={cx('btn', isUpdate ? 'btn-info' : 'btn-success', {
                                             loading: isPairedDeviceLoading
                                           })}
