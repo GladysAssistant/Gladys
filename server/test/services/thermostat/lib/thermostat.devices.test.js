@@ -602,6 +602,7 @@ describe('thermostat.createDevice - external', () => {
 describe('thermostat.postDelete', () => {
   const buildHandler = () => ({
     invalidateDeviceCaches: fake.returns(null),
+    broadcastConfigUpdated: fake.returns(null),
     postDelete,
   });
 
@@ -614,6 +615,14 @@ describe('thermostat.postDelete', () => {
     await handler.postDelete({ features: [{ selector: 'thermostat-living-room' }] });
 
     assert.calledOnce(handler.invalidateDeviceCaches);
+  });
+
+  it('should tell the open dashboards to reload, so a widget on the deleted thermostat says so', async () => {
+    const handler = buildHandler();
+
+    await handler.postDelete({ features: [{ selector: 'thermostat-living-room' }] });
+
+    assert.calledOnce(handler.broadcastConfigUpdated);
   });
 
   it('should not need the deleted device to carry anything', async () => {

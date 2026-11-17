@@ -307,10 +307,23 @@ class ThermostatBox extends Component {
   };
 
   loadConfig = async () => {
-    const remoteConfig = await loadDeviceConfig(this.props.httpClient, this.props.box.thermostat_feature);
-    if (!remoteConfig) {
+    const thermostatFeature = this.props.box.thermostat_feature;
+    const remoteConfig = await loadDeviceConfig(this.props.httpClient, thermostatFeature);
+    // Another thermostat picked in the editor while this one loaded: its own
+    // load is under way, and this answer would overwrite it.
+    if (this.props.box.thermostat_feature !== thermostatFeature) {
       return null;
     }
+    if (!remoteConfig) {
+      // No thermostat picked: the card asks for one (noConfig), not for another.
+      this.setState({ missing: false });
+      return null;
+    }
+    // A thermostat deleted since the box was set: nothing to draw nor to drive.
+    // Read on every load, not only the first: a config update reloads an open
+    // card, and it fell back on the default settings and drew a comfort
+    // setpoint for a device that no longer exists.
+    const missing = Boolean(remoteConfig.missing);
     await new Promise(resolve =>
       this.setState(prev => {
         // The device carries the mode this card wrote: nothing is pending any more.
@@ -319,7 +332,8 @@ class ThermostatBox extends Component {
           remoteConfig.mode !== null &&
           remoteConfig.mode !== undefined &&
           Number(remoteConfig.mode) === prev.pendingMode;
-        return confirmed ? { remoteConfig, pendingMode: null } : { remoteConfig };
+        const update = missing ? { remoteConfig, missing, setpoint: null } : { remoteConfig, missing };
+        return confirmed ? { ...update, pendingMode: null } : update;
       }, resolve)
     );
     return remoteConfig;
@@ -786,7 +800,8 @@ class ThermostatBox extends Component {
   // that could disagree with the device the regulation loop actually reads.
   handleThermostatConfigUpdated = async () => {
     if (!this.props.box.thermostat_feature) return;
-    await this.loadConfig();
+    const remoteConfig = await this.loadConfig();
+    if (!remoteConfig || remoteConfig.missing) return;
     // The schedule before the state that reads it: a thermostat following its
     // programme takes its preset from the point in force.
     await this.loadSchedule();
@@ -925,7 +940,8 @@ class ThermostatBox extends Component {
     // The schedule first: a thermostat following it takes its preset from the
     // point in force, which loadMode reads out of it.
     await this.loadSchedule();
-    await this.loadConfig();
+    const remoteConfig = await this.loadConfig();
+    if (!remoteConfig || remoteConfig.missing) return;
     const { activePreset, isManualMode } = this.loadMode();
     this.setState({ activePreset, isManualMode });
   };
@@ -1163,13 +1179,13 @@ class ThermostatBox extends Component {
   };
 
   initData = async () => {
+    const thermostatFeature = this.props.box.thermostat_feature;
     const remoteConfig = await this.loadConfig();
-    // A thermostat deleted since the box was set: nothing to draw nor to drive.
-    // Without this the card fell back to the default settings and drew a
-    // comfort setpoint for a device that no longer exists.
-    const missing = Boolean(remoteConfig && remoteConfig.missing);
-    this.setState(missing ? { missing, setpoint: null } : { missing });
-    if (missing) return;
+    // A later pick runs its own initData; a deleted thermostat has nothing more
+    // to load (see loadConfig).
+    if (this.props.box.thermostat_feature !== thermostatFeature || (remoteConfig && remoteConfig.missing)) {
+      return;
+    }
     // The schedule before the state that reads it: a thermostat following its
     // programme takes its preset from the point in force, and the banner needs
     // the schedule to exist at all.
@@ -1259,9 +1275,9 @@ class ThermostatBox extends Component {
   // purely local, nothing is written to the device, so the widget stays a
   // proposal until the user turns the dial or picks a preset.
   applyFallbackSetpoint = () => {
-    const { setpoint, noConfig, error } = this.state;
+    const { setpoint, noConfig, error, missing } = this.state;
     if (setpoint !== null && setpoint !== undefined) return;
-    if (noConfig || error || !this.props.box.thermostat_feature) return;
+    if (noConfig || error || missing || !this.props.box.thermostat_feature) return;
     const cfg = this.getConfig();
     const comfort = numOr(cfg.preset_comfort, defaultPresetTemps(cfg.default_mode).comfort);
     // The comfort preset can sit outside the device's own range, which would
