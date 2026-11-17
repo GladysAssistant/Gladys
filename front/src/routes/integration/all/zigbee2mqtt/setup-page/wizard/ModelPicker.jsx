@@ -10,10 +10,11 @@ import style from './wizard.css';
 class ModelPicker extends Component {
   updateSearch = e => this.setState({ search: e.target.value });
 
-  render({ adapters, value, onPick, withPhotos }, { search = '' }) {
+  // inline: the whole list in the page, without a scroll area of its own (phone)
+  render({ adapters, value, onPick, withPhotos, inline }, { search = '' }) {
     const groups = groupByBrand(searchAdapters(adapters, search));
     return (
-      <div class={style.modelPicker} data-cy="z2m-wizard-model-picker">
+      <div class={cx(style.modelPicker, { [style.modelPickerInline]: inline })} data-cy="z2m-wizard-model-picker">
         <div class="input-icon mb-2">
           <span class="input-icon-addon">
             <i class="fe fe-search" aria-hidden="true" />

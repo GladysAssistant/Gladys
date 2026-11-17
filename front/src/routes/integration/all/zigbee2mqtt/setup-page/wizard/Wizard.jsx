@@ -7,6 +7,7 @@ import { MQTT_MODE, ADAPTER_MODE } from '../constants';
 import { dedupePorts, findAdapter, getPortPath, isLegacyEzsp, isPluggedPort } from './adapters';
 import { STEP, PANE, KEY_SCENARIO, INSTALL_VIEW } from './constants';
 import WizardDesktop from './WizardDesktop';
+import WizardMobile from './WizardMobile';
 
 // The ports are listed again this often while the dongle is chosen: a dongle plugged in shows up by itself
 const USB_PORTS_REFRESH_INTERVAL_IN_MS = 3000;
@@ -200,7 +201,7 @@ class Wizard extends Component {
   startInstallation = async configuration => {
     const { installation } = this.props.zigbee2mqttStatus;
     // Until a new installation shows up, the one in the status is the previous one (failed, before a retry)
-    this.setState({ previousInstallation: JSON.stringify(installation || null) });
+    this.setState({ previousInstallation: JSON.stringify(installation || null), saveErrorClosed: false });
     const saved = await this.props.saveConfiguration(configuration);
     if (this.unmounted) {
       return;
@@ -228,6 +229,10 @@ class Wizard extends Component {
   };
 
   showPairing = () => this.setState({ step: STEP.PAIR });
+
+  closeSaveError = () => this.setState({ saveErrorClosed: true });
+
+  closePermitJoinError = () => this.setState({ permitJoinStatus: null });
 
   allowJoining = async () => {
     this.setState({ permitJoinStatus: RequestStatus.Getting });
@@ -293,7 +298,9 @@ class Wizard extends Component {
       z2mFrontendUrl: '',
       // The installation of the status when "Install" was clicked, until a new one replaces it
       previousInstallation: undefined,
-      permitJoinStatus: null
+      permitJoinStatus: null,
+      // The refusal of the setup, closed from the bottom bar of the phone layout
+      saveErrorClosed: false
     };
     // Numbers the requests of the USB ports, to keep only the answer of the last one
     this.usbPortsRequests = 0;
@@ -365,9 +372,15 @@ class Wizard extends Component {
       changeKey: this.changeKey,
       showPairing: this.showPairing,
       allowJoining: this.allowJoining,
+      closeSaveError: this.closeSaveError,
+      closePermitJoinError: this.closePermitJoinError,
       finish: props.finishWizard
     };
-    return <WizardDesktop view={view} actions={actions} />;
+    return props.isMobile ? (
+      <WizardMobile view={view} actions={actions} />
+    ) : (
+      <WizardDesktop view={view} actions={actions} />
+    );
   }
 }
 

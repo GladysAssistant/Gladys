@@ -2510,6 +2510,32 @@
             "goToDiscover": "Zu Entdecken",
             "finish": "Fertig",
             "finishWithoutPairing": "Ohne Anlernen beenden"
+          },
+          "mobile": {
+            "otherChoices": "Anderer Stick oder andere Installation",
+            "otherTitle": "Andere Auswahl",
+            "other": {
+              "manual": {
+                "title": "Anderen USB-Stick wählen",
+                "text": "Port und Modell manuell"
+              },
+              "network": {
+                "title": "Netzwerk-Koordinator",
+                "text": "SLZB-06, SLZB-07… in deinem lokalen Netzwerk"
+              },
+              "external": {
+                "title": "Ich habe bereits ein Zigbee2MQTT",
+                "text": "Gladys verbindet sich mit seinem MQTT-Broker"
+              }
+            },
+            "modelCode": "Modell {{code}}",
+            "recognized": "Automatisch erkannt",
+            "justPlugged": "Gerade erkannt",
+            "modelTitle": "Welches Modell ist dein Stick?",
+            "modelTextUnknown": "Gladys sieht einen eingesteckten Stick, erkennt ihn aber nicht. Das Modell steht darauf oder auf seiner Verpackung.",
+            "modelTextManual": "Wähle Port und Modell: Es steht auf dem Stick oder auf seiner Verpackung.",
+            "showPhases": "Details anzeigen",
+            "back": "Zurück"
           }
         }
       },

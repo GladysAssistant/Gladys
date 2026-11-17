@@ -2266,6 +2266,32 @@
             "goToDiscover": "Ir a Descubrir",
             "finish": "Terminar",
             "finishWithoutPairing": "Terminar sin emparejar"
+          },
+          "mobile": {
+            "otherChoices": "Otra llave u otra instalación",
+            "otherTitle": "Otra opción",
+            "other": {
+              "manual": {
+                "title": "Elegir otra llave USB",
+                "text": "Puerto y modelo a mano"
+              },
+              "network": {
+                "title": "Coordinador de red",
+                "text": "SLZB-06, SLZB-07… en tu red local"
+              },
+              "external": {
+                "title": "Ya tengo un Zigbee2MQTT",
+                "text": "Gladys se conecta a su broker MQTT"
+              }
+            },
+            "modelCode": "Modelo {{code}}",
+            "recognized": "Reconocida automáticamente",
+            "justPlugged": "Detectada hace un momento",
+            "modelTitle": "¿Cuál es el modelo de tu llave?",
+            "modelTextUnknown": "Gladys ve una llave conectada pero no la reconoce. El modelo está escrito en ella o en su caja.",
+            "modelTextManual": "Elige el puerto y el modelo: está escrito en la llave o en su caja.",
+            "showPhases": "Ver el detalle",
+            "back": "Volver"
           }
         }
       },

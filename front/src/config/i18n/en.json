@@ -2266,6 +2266,32 @@
             "goToDiscover": "Go to Discover",
             "finish": "Finish",
             "finishWithoutPairing": "Finish without pairing"
+          },
+          "mobile": {
+            "otherChoices": "Another dongle or another setup",
+            "otherTitle": "Other choice",
+            "other": {
+              "manual": {
+                "title": "Choose another USB dongle",
+                "text": "Port and model by hand"
+              },
+              "network": {
+                "title": "Network coordinator",
+                "text": "SLZB-06, SLZB-07… on your local network"
+              },
+              "external": {
+                "title": "I already have a Zigbee2MQTT",
+                "text": "Gladys connects to its MQTT broker"
+              }
+            },
+            "modelCode": "Model {{code}}",
+            "recognized": "Recognized automatically",
+            "justPlugged": "Just detected",
+            "modelTitle": "What is the model of your dongle?",
+            "modelTextUnknown": "Gladys sees a dongle plugged in but does not recognize it. The model is written on it or on its box.",
+            "modelTextManual": "Choose the port and the model: it is written on the dongle or on its box.",
+            "showPhases": "Show the details",
+            "back": "Back"
           }
         }
       },
