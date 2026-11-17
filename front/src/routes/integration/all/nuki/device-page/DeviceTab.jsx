@@ -150,6 +150,7 @@ class DeviceTab extends Component {
                   nukiDevices.length > 0 &&
                   nukiDevices.map((device, index) => (
                     <NukiDeviceBox
+                      key={device.selector}
                       editable
                       saveButton
                       deleteButton
