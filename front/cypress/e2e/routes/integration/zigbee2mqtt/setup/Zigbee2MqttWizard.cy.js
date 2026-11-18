@@ -57,6 +57,10 @@ describe('Zigbee2mqtt setup wizard', () => {
     sendProgress(runningInstallation);
     cy.get('[data-cy=z2m-wizard-key-chip]').should('contain', 'SONOFF Zigbee 3.0 USB Dongle Plus-E');
     cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '64 %');
+    // The status of the init the installation runs, before Docker is checked: the progress stays
+    sendStatus({ ...readyToSetupStatus, configured: null, networkModeValid: false, installation: runningInstallation });
+    cy.get('[data-cy=z2m-wizard-status-loading]').should('not.exist');
+    cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '64 %');
     cy.get('[data-cy=z2m-wizard-phase]').should('have.length', 5);
     cy.get('[data-cy=z2m-wizard-phase][data-state=skipped]').i18n(
       'integration.zigbee2mqtt.setup.wizard.progress.alreadyDownloaded'

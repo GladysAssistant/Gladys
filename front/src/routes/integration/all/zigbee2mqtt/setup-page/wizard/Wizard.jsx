@@ -408,8 +408,9 @@ class Wizard extends Component {
   }
 
   render(props, state) {
-    // The status not read yet, or not readable: what the machine allows is unknown
-    if (this.isInstallable() === null) {
+    // On the dongle step, the status not read yet, or not readable: what the machine allows is unknown. Not on the next
+    // steps, which an init (its status unknown meanwhile) does not interrupt
+    if (state.step === STEP.KEY && this.isInstallable() === null) {
       const statusRead = props.zigbee2mqttStatus.dockerBased !== undefined;
       return props.loadZigbee2mqttStatus === RequestStatus.Error && !statusRead ? (
         <div class="alert alert-danger" data-cy="z2m-wizard-status-error">
