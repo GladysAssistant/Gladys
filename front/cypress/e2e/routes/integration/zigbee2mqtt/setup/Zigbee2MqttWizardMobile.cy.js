@@ -143,6 +143,8 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
         Z2M_NETWORK_ADAPTER_URL: 'tcp://192.168.1.20:6638',
         Z2M_NETWORK_ADAPTER_TYPE: 'ember'
       });
+    // The save handled by the page (a configuration loaded before it would be dropped as older)
+    cy.get('[data-cy=z2m-wizard-install-step]').should('exist');
     // Switched to ezsp by Gladys: told once the network is ready
     answerSetup({
       body: {

@@ -403,6 +403,8 @@ describe('Zigbee2mqtt setup wizard', () => {
     answerSetup();
     install();
     cy.wait('@setup');
+    // The save handled by the page (a configuration loaded before it would be dropped as older)
+    cy.get('[data-cy=z2m-wizard-install-step]').should('exist');
     // The saved model changes: the setup page loads it again
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: legacySetup }).as(
       'savedSetup'
