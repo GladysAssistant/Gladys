@@ -425,6 +425,14 @@ describe('Zigbee2mqtt setup wizard', () => {
     });
     cy.get('[data-cy=z2m-wizard-waiting-zigbee2mqtt]').should('contain', '1.20.0');
     cy.get('[data-cy=z2m-wizard-ready]').should('not.exist');
+    // The broker lost meanwhile: told, with why
+    sendStatus({
+      ...readyToSetupStatus,
+      installation: connectedInstallation,
+      gladysConnected: false,
+      mqttConnectionError: { code: 'BROKER_UNREACHABLE', message: 'connect ECONNREFUSED 192.168.1.10:1883' }
+    });
+    cy.get('[data-cy=z2m-wizard-broker-lost]').should('contain', 'ECONNREFUSED');
   });
 
   it('should go back to the dongle, chosen by hand, to change the model after a failure', () => {

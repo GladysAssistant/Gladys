@@ -119,6 +119,8 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   this.ezspFallback = false;
   this.mqttConnectionError = null;
   this.dockerBased = false;
+  // Unknown until Docker is checked below: a status sent meanwhile does not tell the machine incompatible
+  this.configured = null;
   // Told again by the Zigbee2mqtt this init connects to (retained bridge/info and bridge/devices), not the previous one
   this.z2mVersion = null;
   this.deviceCount = null;
@@ -126,7 +128,6 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   // Load stored configuration
   const configuration = await this.getConfiguration();
   const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl, z2mAdapterMode, z2mNetworkAdapterUrl } = configuration;
-  this.configured = isConfigured(configuration);
 
   try {
     const dockerBased = await this.gladys.system.isDocker();
@@ -145,10 +146,14 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   } catch (e) {
     logger.debug(e);
     if (mqttMode !== MQTT_MODE.EXTERNAL) {
+      // Told: the setup page shows that Gladys cannot install Zigbee2mqtt here
+      this.configured = isConfigured(configuration);
+      this.emitStatusEvent();
       throw e;
     }
   }
 
+  this.configured = isConfigured(configuration);
   this.emitStatusEvent();
 
   // Test if the coordinator is usable: a USB dongle is checked against the ports actually plugged in,

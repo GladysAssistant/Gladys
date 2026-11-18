@@ -318,7 +318,7 @@ const Install = ({ view }) => {
       )}
       {waiting && (
         <MobileNotice role="status" data-cy="z2m-wizard-waiting-zigbee2mqtt">
-          <WaitingText version={zigbee2mqttStatus.z2mVersion} />
+          <WaitingText status={zigbee2mqttStatus} />
         </MobileNotice>
       )}
       {ezspFallback && !failed && !external && (

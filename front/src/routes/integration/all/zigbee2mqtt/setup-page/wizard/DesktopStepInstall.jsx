@@ -93,7 +93,7 @@ const DesktopStepInstall = ({ view, actions }) => {
       {waiting && (
         <div>
           <div class="alert alert-info" role="status" data-cy="z2m-wizard-waiting-zigbee2mqtt">
-            <WaitingText version={zigbee2mqttStatus.z2mVersion} />
+            <WaitingText status={zigbee2mqttStatus} />
           </div>
           <div class={style.buttons}>
             <button

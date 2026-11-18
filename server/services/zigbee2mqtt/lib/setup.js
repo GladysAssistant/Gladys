@@ -29,6 +29,22 @@ function getCoordinator(adapterMode, driverPath, networkAdapterUrl) {
   return (adapterMode === ADAPTER_MODE.NETWORK ? networkAdapterUrl : driverPath) || null;
 }
 
+// The settings of the coordinator Gladys installs Zigbee2mqtt for, and those of an external broker: erased when the
+// other mode is saved
+const COORDINATOR_VARIABLES = [
+  CONFIGURATION.Z2M_ADAPTER_MODE,
+  CONFIGURATION.Z2M_DRIVER_PATH,
+  CONFIGURATION.ZIGBEE_DONGLE_NAME,
+  CONFIGURATION.Z2M_NETWORK_ADAPTER_URL,
+  CONFIGURATION.Z2M_NETWORK_ADAPTER_TYPE,
+];
+const EXTERNAL_BROKER_VARIABLES = [
+  CONFIGURATION.MQTT_URL_KEY,
+  CONFIGURATION.GLADYS_MQTT_USERNAME_KEY,
+  CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY,
+  CONFIGURATION.Z2M_FRONTEND_URL,
+];
+
 /**
  * @description Setup Zigbee2mqtt properties, then install Zigbee2mqtt in the background: the setup page follows the
  * installation through its progress, its failure is reported there and in its job. Refused (400 DONGLE_NOT_FOUND)
@@ -94,6 +110,17 @@ async function setup(config) {
   // A switch replaces the configured coordinator: not when the same one is saved again, after a failed installation,
   // or when only another setting changes, like the port of the interface
   const coordinatorSwitched = storedCoordinator !== null && savedCoordinator !== storedCoordinator;
+  // A switch between the local broker and an external one: the settings of the other mode not sent are erased, else
+  // init would use them (the URL of the external broker for a local Zigbee2mqtt, a dongle that brings the local mode
+  // back), and generates the local ones again
+  const external = getSavedValue(CONFIGURATION.Z2M_MQTT_MODE, mqttMode) === MQTT_MODE.EXTERNAL;
+  if (external !== (mqttMode === MQTT_MODE.EXTERNAL)) {
+    (external ? COORDINATOR_VARIABLES : EXTERNAL_BROKER_VARIABLES)
+      .filter((key) => validatedConfig[key] === undefined)
+      .forEach((key) => {
+        validatedConfig[key] = null;
+      });
+  }
   // Refused while an installation runs, as it reads the stored setup, or while an init, a disconnect, a reset or an
   // ezsp fallback runs, which would run alongside the init of the installation or undo it. Started before saving it,
   // with no wait since the check: another setup sent meanwhile is refused too, and the setup page reads the

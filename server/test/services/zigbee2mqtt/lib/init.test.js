@@ -94,7 +94,9 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
-    assert.notCalled(zigbee2mqttManager.emitStatusEvent);
+    // Told, with the configuration read: the setup page shows that Gladys cannot install Zigbee2mqtt here
+    expect(zigbee2mqttManager.configured).to.equal(false);
+    assert.calledOnceWithExactly(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('should end a pending startup and stop asking Zigbee2mqtt whether it runs', async () => {
@@ -169,7 +171,9 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
-    assert.calledOnceWithExactly(zigbee2mqttManager.emitStatusEvent);
+    // Docker told, then the network refused, with the configuration read
+    assert.calledTwice(zigbee2mqttManager.emitStatusEvent);
+    expect(zigbee2mqttManager.configured).to.equal(false);
   });
 
   it('should not install containers, usb is not configured', async () => {
@@ -190,6 +194,19 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
     // Nothing set up yet: the pages tell that Zigbee2mqtt is not installed
+    expect(zigbee2mqttManager.configured).to.equal(false);
+  });
+
+  it('should not tell whether Zigbee2mqtt is configured before Docker is checked', async () => {
+    zigbee2mqttManager.configured = true;
+    let configuredWhileChecked;
+    gladys.system.getNetworkMode = fake(async () => {
+      configuredWhileChecked = zigbee2mqttManager.configured;
+      return 'host';
+    });
+    zigbee2mqttManager.getConfiguration.resolves({ mqttPassword: 'mqttPassword' });
+    await zigbee2mqttManager.init();
+    expect(configuredWhileChecked).to.equal(null);
     expect(zigbee2mqttManager.configured).to.equal(false);
   });
 
