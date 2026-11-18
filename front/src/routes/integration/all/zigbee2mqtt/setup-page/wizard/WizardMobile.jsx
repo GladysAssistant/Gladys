@@ -23,8 +23,9 @@ import PrefetchStatus from '../components/PrefetchStatus';
 import { findAdapter, getPortPath } from './adapters';
 import { STEP, PANE, KEY_SCENARIO, INSTALL_VIEW, NETWORK_ADAPTER_TYPES } from './constants';
 import { getPhases, getCurrentPhase } from './phases';
-import { DISCOVER_URL, getStepNumber, getStepLabels, getSummary } from './WizardDesktop';
+import { DISCOVER_URL, getDriver, getStepNumber, getStepLabels, getSummary } from './WizardDesktop';
 import InstallFailure from './InstallFailure';
+import WaitingText from './WaitingText';
 import KeyPhoto from './KeyPhoto';
 import ModelPicker from './ModelPicker';
 import style from './wizard.css';
@@ -317,7 +318,7 @@ const Install = ({ view }) => {
       )}
       {waiting && (
         <MobileNotice role="status" data-cy="z2m-wizard-waiting-zigbee2mqtt">
-          <MarkupText id={`${T}.progress.waitingZigbee2mqtt`} />
+          <WaitingText version={zigbee2mqttStatus.z2mVersion} />
         </MobileNotice>
       )}
       {ezspFallback && !failed && !external && (
@@ -375,7 +376,7 @@ const Ready = ({ view }) => {
           />
         ))}
       </MobileGroup>
-      {!external && savedAdapter && savedAdapter.configKey === 'ezsp' && (
+      {!external && getDriver(view) === 'ezsp' && (
         <MobileNotice class={style.mobileFull} data-cy="z2m-wizard-ready-ezsp">
           <MarkupText id={`${T}.ready.ezspNote`} />
         </MobileNotice>

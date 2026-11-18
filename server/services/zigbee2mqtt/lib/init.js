@@ -140,6 +140,8 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
     if (networkMode !== 'host') {
       throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
     }
+    // Only when checked: with an external broker, a machine where Gladys cannot install Zigbee2mqtt is still told
+    this.networkModeValid = true;
   } catch (e) {
     logger.debug(e);
     if (mqttMode !== MQTT_MODE.EXTERNAL) {
@@ -147,7 +149,6 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
     }
   }
 
-  this.networkModeValid = true;
   this.emitStatusEvent();
 
   // Test if the coordinator is usable: a USB dongle is checked against the ports actually plugged in,

@@ -783,6 +783,31 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
   });
 
+  it('should tell the joining Zigbee2mqtt closed, from its info', async () => {
+    zigbee2mqttManager.z2mPermitJoin = true;
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/info',
+      JSON.stringify({ version: '2.14.2', permit_join: false }),
+    );
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: false,
+    });
+  });
+
+  it('should not tell the joining again when the info of Zigbee2mqtt does not change it', async () => {
+    zigbee2mqttManager.z2mPermitJoin = false;
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/info',
+      JSON.stringify({ version: '2.14.2', permit_join: false }),
+    );
+    assert.neverCalledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: false,
+    });
+  });
+
   it('should handle bridge/info without coordinator meta gracefully', async () => {
     // PREPARE
     const bridgeInfo = {

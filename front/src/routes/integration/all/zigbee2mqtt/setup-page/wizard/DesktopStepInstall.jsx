@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { INSTALL_VIEW } from './constants';
 import { getPhases } from './phases';
 import InstallFailure from './InstallFailure';
+import WaitingText from './WaitingText';
 import KeyChip from './KeyChip';
 import style from './wizard.css';
 
@@ -92,7 +93,7 @@ const DesktopStepInstall = ({ view, actions }) => {
       {waiting && (
         <div>
           <div class="alert alert-info" role="status" data-cy="z2m-wizard-waiting-zigbee2mqtt">
-            <MarkupText id={`${T}.progress.waitingZigbee2mqtt`} />
+            <WaitingText version={zigbee2mqttStatus.z2mVersion} />
           </div>
           <div class={style.buttons}>
             <button

@@ -148,6 +148,15 @@ async function handleMqttMessage(topic, message) {
         );
       }
       this.z2mVersion = version || null;
+      // Whether joining is permitted: Zigbee2mqtt 2 publishes its info again when joining closes (after 254 s), and
+      // has no other message for it
+      if (typeof info.permit_join === 'boolean' && info.permit_join !== this.z2mPermitJoin) {
+        this.z2mPermitJoin = info.permit_join;
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+          payload: this.z2mPermitJoin,
+        });
+      }
       if (coordinator && coordinator.meta) {
         this.coordinatorFirmware = {
           ...coordinator.meta,

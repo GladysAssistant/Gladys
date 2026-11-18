@@ -133,6 +133,23 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
         Z2M_NETWORK_ADAPTER_URL: 'tcp://192.168.1.20:6638',
         Z2M_NETWORK_ADAPTER_TYPE: 'ember'
       });
+    // Switched to ezsp by Gladys: told once the network is ready
+    answerSetup({
+      body: {
+        Z2M_ADAPTER_MODE: 'network',
+        Z2M_NETWORK_ADAPTER_URL: 'tcp://192.168.1.20:6638',
+        Z2M_NETWORK_ADAPTER_TYPE: 'ezsp'
+      }
+    });
+    sendStatus({ ...readyToSetupStatus, ezspFallback: true, installation: runningInstallation });
+    sendStatus({
+      ...readyToSetupStatus,
+      ezspFallback: true,
+      installation: doneInstallation,
+      zigbee2mqttConnected: true
+    });
+    sendProgress(doneInstallation);
+    cy.get('[data-cy=z2m-wizard-ready-ezsp]').should('exist');
   });
 
   it('should connect to a Zigbee2mqtt that runs elsewhere', () => {

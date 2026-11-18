@@ -398,6 +398,35 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-key-one]').should('exist');
   });
 
+  it('should wait for the integration to start instead of telling the machine incompatible', () => {
+    // Before init read the configuration: Docker not checked yet
+    visitWizard({ status: { ...readyToSetupStatus, configured: null, dockerBased: false, networkModeValid: false } });
+    cy.get('[data-cy=z2m-wizard-status-pending]').i18n('integration.zigbee2mqtt.setup.wizard.statusPending');
+    cy.get('[data-cy=z2m-wizard-incompatible]').should('not.exist');
+    sendStatus({ ...readyToSetupStatus, configured: false });
+    cy.get('[data-cy=z2m-wizard-key-one]').should('exist');
+  });
+
+  it('should tell that a Zigbee2mqtt that runs elsewhere is too old to be followed', () => {
+    visitWizard({ ports: [[machinePort]] });
+    cy.get('[data-cy=z2m-wizard-show-external]').click();
+    cy.get('[data-cy=z2m-wizard-mqttUrl]').type('mqtt://192.168.1.10:1883');
+    answerSetup({ body: { Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://192.168.1.10:1883' } });
+    install();
+    cy.wait('@setup');
+    const connectedInstallation = { ...doneInstallation, phases: phases({ connect_adapter: 'done' }) };
+    sendProgress(connectedInstallation);
+    // It tells its version, but never answers the health check
+    sendStatus({
+      ...readyToSetupStatus,
+      installation: connectedInstallation,
+      gladysConnected: true,
+      z2mVersion: '1.20.0'
+    });
+    cy.get('[data-cy=z2m-wizard-waiting-zigbee2mqtt]').should('contain', '1.20.0');
+    cy.get('[data-cy=z2m-wizard-ready]').should('not.exist');
+  });
+
   it('should go back to the dongle, chosen by hand, to change the model after a failure', () => {
     visitWizard();
     answerSetup();

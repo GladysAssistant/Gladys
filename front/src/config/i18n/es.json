@@ -2199,7 +2199,8 @@
             "ezspSwitching": "Firmware antiguo: cambio a ezsp…",
             "ezspDriver": "Controlador de compatibilidad (ezsp)",
             "ezspNote": "<strong>Firmware antiguo detectado.</strong> El controlador ember requiere un firmware 7.4 o posterior: Gladys cambia al controlador de compatibilidad (ezsp) y reinicia Zigbee2MQTT. No tienes nada que hacer.",
-            "waitingZigbee2mqtt": "<strong>Conectado al broker, esperando a Zigbee2MQTT.</strong> Gladys todavía no recibe nada de Zigbee2MQTT en este broker. Si no llega nada, comprueba que Zigbee2MQTT está en marcha y que su base_topic es <code>zigbee2mqtt</code>."
+            "waitingZigbee2mqtt": "<strong>Conectado al broker, esperando la respuesta de Zigbee2MQTT.</strong> Si no responde, comprueba que Zigbee2MQTT está en marcha y que su base_topic es <code>zigbee2mqtt</code>.",
+            "zigbee2mqttTooOld": "<strong>Zigbee2MQTT {{version}} es demasiado antiguo.</strong> Funciona en este broker, pero Gladys necesita Zigbee2MQTT 1.21 o posterior para seguirlo. Actualízalo: el asistente continúa en cuanto responda."
           },
           "failure": {
             "titles": {
@@ -2297,7 +2298,8 @@
             "modelTextManual": "Elige el puerto y el modelo: está escrito en la llave o en su caja.",
             "showPhases": "Ver el detalle",
             "back": "Volver"
-          }
+          },
+          "statusPending": "Gladys está iniciando su integración Zigbee2MQTT… Si tarda, comprueba que el servicio Zigbee2mqtt está iniciado en Configuración › Servicios."
         }
       },
       "device": {

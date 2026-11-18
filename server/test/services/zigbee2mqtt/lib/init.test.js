@@ -127,6 +127,7 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     expect(zigbee2mqttManager.dockerBased).to.equal(false);
+    expect(zigbee2mqttManager.networkModeValid).to.equal(false);
     assert.calledOnce(zigbee2mqttManager.getConfiguration);
     assert.calledOnce(zigbee2mqttManager.saveConfiguration);
     assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
@@ -135,6 +136,15 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.calledOnce(zigbee2mqttManager.connect);
     assert.called(zigbee2mqttManager.emitStatusEvent);
+  });
+
+  it('should tell that Gladys cannot install Zigbee2mqtt without a host network, with an external broker', async () => {
+    gladys.system.getNetworkMode = fake.resolves('bridge');
+    zigbee2mqttManager.getConfiguration = fake.resolves({ mqttMode: 'external' });
+    await zigbee2mqttManager.init();
+    expect(zigbee2mqttManager.dockerBased).to.equal(true);
+    expect(zigbee2mqttManager.networkModeValid).to.equal(false);
+    assert.calledOnce(zigbee2mqttManager.connect);
   });
 
   it('should fail because not a host network', async () => {

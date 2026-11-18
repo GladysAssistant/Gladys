@@ -2443,7 +2443,8 @@
             "ezspSwitching": "Alte Firmware: Wechsel zu ezsp…",
             "ezspDriver": "Kompatibilitätstreiber (ezsp)",
             "ezspNote": "<strong>Alte Firmware erkannt.</strong> Der ember-Treiber benötigt Firmware 7.4 oder neuer: Gladys wechselt zum Kompatibilitätstreiber (ezsp) und startet Zigbee2MQTT neu. Du musst nichts tun.",
-            "waitingZigbee2mqtt": "<strong>Mit dem Broker verbunden, warte auf Zigbee2MQTT.</strong> Gladys empfängt auf diesem Broker noch nichts von Zigbee2MQTT. Falls nichts kommt, prüfe, ob Zigbee2MQTT läuft und sein Basis-Topic <code>zigbee2mqtt</code> ist."
+            "waitingZigbee2mqtt": "<strong>Mit dem Broker verbunden, warte auf die Antwort von Zigbee2MQTT.</strong> Falls es nicht antwortet, prüfe, ob Zigbee2MQTT läuft und sein Basis-Topic <code>zigbee2mqtt</code> ist.",
+            "zigbee2mqttTooOld": "<strong>Zigbee2MQTT {{version}} ist zu alt.</strong> Es läuft auf diesem Broker, aber Gladys braucht Zigbee2MQTT 1.21 oder neuer, um ihm zu folgen. Aktualisiere es: Der Assistent geht weiter, sobald es antwortet."
           },
           "failure": {
             "titles": {
@@ -2541,7 +2542,8 @@
             "modelTextManual": "Wähle Port und Modell: Es steht auf dem Stick oder auf seiner Verpackung.",
             "showPhases": "Details anzeigen",
             "back": "Zurück"
-          }
+          },
+          "statusPending": "Gladys startet die Zigbee2MQTT-Integration… Falls das andauert, prüfe, ob der Dienst Zigbee2mqtt unter Einstellungen › Dienste gestartet ist."
         }
       },
       "device": {

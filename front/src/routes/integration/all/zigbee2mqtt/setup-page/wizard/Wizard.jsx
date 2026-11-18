@@ -138,10 +138,11 @@ class Wizard extends Component {
       : null;
   };
 
-  // Unknown (null) until the status is read: the machine is not told incompatible meanwhile
+  // Unknown (null) until the status is read, and until init read the configuration (Docker not checked yet, at the
+  // start of Gladys or with the service stopped): the machine is not told incompatible meanwhile
   isInstallable = () => {
-    const { dockerBased, networkModeValid } = this.props.zigbee2mqttStatus;
-    if (dockerBased === undefined) {
+    const { dockerBased, networkModeValid, configured } = this.props.zigbee2mqttStatus;
+    if (dockerBased === undefined || configured === null) {
       return null;
     }
     return Boolean(dockerBased && networkModeValid);
@@ -409,14 +410,22 @@ class Wizard extends Component {
   render(props, state) {
     // The status not read yet, or not readable: what the machine allows is unknown
     if (this.isInstallable() === null) {
-      return props.loadZigbee2mqttStatus === RequestStatus.Error ? (
+      const statusRead = props.zigbee2mqttStatus.dockerBased !== undefined;
+      return props.loadZigbee2mqttStatus === RequestStatus.Error && !statusRead ? (
         <div class="alert alert-danger" data-cy="z2m-wizard-status-error">
           <Text id="integration.zigbee2mqtt.setup.errorLoadingStatesLabel" />
         </div>
       ) : (
-        <div class="dimmer active" data-cy="z2m-wizard-status-loading">
-          <div class="loader" />
-          <div class="dimmer-content py-8" />
+        <div data-cy="z2m-wizard-status-loading">
+          <div class="dimmer active">
+            <div class="loader" />
+            <div class="dimmer-content py-6" />
+          </div>
+          {statusRead && (
+            <p class="text-muted text-center" data-cy="z2m-wizard-status-pending">
+              <Text id="integration.zigbee2mqtt.setup.wizard.statusPending" />
+            </p>
+          )}
         </div>
       );
     }
