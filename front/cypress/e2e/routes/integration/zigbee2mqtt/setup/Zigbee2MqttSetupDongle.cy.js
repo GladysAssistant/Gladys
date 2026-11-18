@@ -79,9 +79,12 @@ describe('Zigbee2mqtt USB dongle', () => {
     return requests;
   };
 
-  // The recognized dongle chosen by the form once loaded, right before it plans to ask the ports again
-  const waitForDonglePreselected = () => {
+  // The form plans to ask the ports again once it loaded them and the models (from the server itself, slower on CI): the
+  // configured dongle is shown before
+  const waitForFormLoaded = () => {
     cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', ZBDONGLE_E);
+    cy.get('[data-cy=z2m-setup-local-usb-field] .react-select__loading-indicator').should('not.exist');
+    cy.get('[data-cy=z2m-setup-local-dongle-field] .react-select__loading-indicator').should('not.exist');
   };
 
   // The clock of the page goes forward a second at a time, one command after the other so that the page answers in
@@ -104,7 +107,7 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.clock();
     visitConfigured();
     openLocalForm();
-    waitForDonglePreselected();
+    waitForFormLoaded();
 
     // The list asked 3 s later fails, the next one is asked 30 s after it, not 3 s
     let failedAt = null;
@@ -123,7 +126,7 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.clock();
     visitConfigured();
     openLocalForm();
-    waitForDonglePreselected();
+    waitForFormLoaded();
     cy.waitForWebSocket();
 
     cy.sendWebSocket({ type: 'zigbee2mqtt.install-progress', payload: { installation, prefetch } });
