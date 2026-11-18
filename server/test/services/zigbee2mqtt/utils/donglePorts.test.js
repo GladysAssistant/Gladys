@@ -7,7 +7,9 @@ const {
   getStablePath,
   isSameAdapterFamily,
   isSameDevice,
+  listSerialPorts,
 } = require('../../../../services/zigbee2mqtt/utils/donglePorts');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const ZBDONGLE_P_LINK = 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0';
 const zbDongleP = {
@@ -23,6 +25,20 @@ const teleinfo = {
 };
 
 describe('zigbee2mqtt donglePorts', () => {
+  describe('listSerialPorts', () => {
+    it('should list the serial ports through the usb service', async () => {
+      const gladys = { service: { getService: sinon.fake.returns({ list: sinon.fake.resolves([zbDongleP]) }) } };
+      expect(await listSerialPorts(gladys)).to.deep.equal([zbDongleP]);
+      sinon.assert.calledOnceWithExactly(gladys.service.getService, 'usb');
+    });
+
+    it('should tell that the usb service is not available', async () => {
+      const gladys = { service: { getService: sinon.fake.returns(undefined) } };
+      const promise = listSerialPorts(gladys);
+      await expect(promise).to.be.rejectedWith(ServiceNotConfiguredError, 'USB service is not available');
+    });
+  });
+
   describe('findConfiguredPort', () => {
     it('should find nothing without a stored path', async () => {
       expect(await findConfiguredPort([zbDongleP], null)).to.equal(null);

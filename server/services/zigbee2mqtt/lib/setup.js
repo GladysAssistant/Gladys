@@ -10,6 +10,8 @@ const {
   INSTALLATION_ERROR,
 } = require('./constants');
 const { validateSetup } = require('../utils/validateSetup');
+const { findConfiguredPort } = require('../utils/donglePorts');
+const { getDriverPathToStore } = require('./findDongle');
 
 /**
  * @description Get the coordinator a configuration points Zigbee2mqtt to: the URL of a network coordinator, or the port
@@ -40,7 +42,13 @@ async function setup(config) {
 
   // At once, before looking for the dongle: checked again below, with no wait before the installation starts
   this.refuseWhileInstalling('save the setup');
-  const { z2mAdapterMode, z2mDriverPath, z2mNetworkAdapterUrl, mqttMode } = await this.getConfiguration();
+  const {
+    z2mAdapterMode,
+    z2mDriverPath,
+    z2mDongleName,
+    z2mNetworkAdapterUrl,
+    mqttMode,
+  } = await this.getConfiguration();
   // As saved below: a variable missing from the setup keeps its stored value
   const getSavedValue = (key, storedValue) => (validatedConfig[key] !== undefined ? validatedConfig[key] : storedValue);
   const savedAdapterMode = getSavedValue(CONFIGURATION.Z2M_ADAPTER_MODE, z2mAdapterMode);
@@ -57,15 +65,21 @@ async function setup(config) {
     if (!dongle) {
       throw new BadParameters(INSTALLATION_ERROR.DONGLE_NOT_FOUND);
     }
-    // Chosen in the form by its port, the dongle is stored by its /dev/serial/by-id/ link, which Docker follows when
-    // the dongle moves to another port
     if (validatedConfig[CONFIGURATION.Z2M_DRIVER_PATH] !== undefined) {
-      validatedConfig[CONFIGURATION.Z2M_DRIVER_PATH] = dongle.stablePath;
-      // The stored dongle is the same one under another path (its port, before its link): not a switch
-      if (z2mDriverPath && z2mDriverPath !== dongle.stablePath) {
-        const storedDongle = await this.findDongle(z2mDriverPath);
-        if (storedDongle && storedDongle.port.path === dongle.port.path) {
-          storedDriverPath = dongle.stablePath;
+      // Chosen in the form by its port, the dongle is stored by its /dev/serial/by-id/ link, which Docker follows when
+      // the dongle moves to another port. The stored path sent back as is changes only where init would change it: a
+      // port that another USB-serial adapter may have taken at this start, or a link kept, stay as they are.
+      const pathToStore =
+        savedDriverPath === z2mDriverPath
+          ? getDriverPathToStore(dongle, z2mDriverPath, getSavedValue(CONFIGURATION.ZIGBEE_DONGLE_NAME, z2mDongleName))
+          : dongle.stablePath;
+      validatedConfig[CONFIGURATION.Z2M_DRIVER_PATH] = pathToStore;
+      // The stored dongle is the same one under another path (its port, before its link): not a switch. Looked up in
+      // the ports listed for the dongle, the same snapshot.
+      if (z2mDriverPath && z2mDriverPath !== pathToStore) {
+        const storedPort = await findConfiguredPort(dongle.ports, z2mDriverPath);
+        if (storedPort && storedPort.path === dongle.port.path) {
+          storedDriverPath = pathToStore;
         }
       }
     }

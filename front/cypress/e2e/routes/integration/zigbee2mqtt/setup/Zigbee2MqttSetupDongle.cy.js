@@ -56,6 +56,33 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.wait('@usbPorts');
   };
 
+  // The ports asked by the form, counted as they come, answered one after the other, the last answer again
+  const countPortRequests = (...replies) => {
+    const serverUrl = Cypress.env('serverUrl');
+    const requests = { count: 0 };
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/usb/port` }, req => {
+      req.reply(replies[Math.min(requests.count, replies.length - 1)]);
+      requests.count += 1;
+    }).as('usbPorts');
+    return requests;
+  };
+
+  // The recognized dongle chosen by the form once loaded, right before it plans to ask the ports again
+  const waitForDonglePreselected = () => {
+    cy.get('[data-cy=z2m-setup-local-dongle-field]').should('contain', ZBDONGLE_E);
+  };
+
+  // The clock of the page goes forward a second at a time, one command after the other so that the page answers in
+  // between, until `done` (given the time gone by), two minutes at most; yields that time
+  const tickUntil = (done, ticked = 0) =>
+    cy.then(() => {
+      if (done(ticked) || ticked >= 120000) {
+        return ticked;
+      }
+      cy.tick(1000);
+      return tickUntil(done, ticked + 1000);
+    });
+
   beforeEach(() => {
     cy.login();
   });
@@ -80,6 +107,47 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.wait('@setup')
       .its('request.body')
       .should('include', { ZIGBEE2MQTT_DRIVER_PATH: `/dev/serial/by-id/${LINK}`, ZIGBEE_DONGLE_NAME: ZBDONGLE_E });
+  });
+
+  it('should ask the ports again less often after a failure', () => {
+    const requests = countPortRequests({ body: [zbDongleE] }, { statusCode: 500, body: {} });
+    cy.clock();
+    visitSetup(readyToSetupStatus);
+    chooseLocalMode();
+    waitForDonglePreselected();
+
+    // The list asked 3 s later fails, the next one is asked 30 s after it, not 3 s
+    let failedAt = null;
+    tickUntil(ticked => {
+      if (requests.count === 2 && failedAt === null) {
+        failedAt = ticked;
+      }
+      return requests.count >= 3;
+    }).then(ticked => expect(ticked - failedAt).to.be.at.least(27000));
+  });
+
+  it('should not ask the ports again while an installation runs', () => {
+    const { prefetch } = readyToSetupStatus;
+    const installation = { state: 'running', kind: 'install', phases: [], progress: 10, error: null, durationMs: null };
+    const requests = countPortRequests({ body: [zbDongleE] });
+    cy.clock();
+    visitSetup(readyToSetupStatus);
+    chooseLocalMode();
+    waitForDonglePreselected();
+    cy.waitForWebSocket();
+
+    cy.sendWebSocket({ type: 'zigbee2mqtt.install-progress', payload: { installation, prefetch } });
+    tickUntil(ticked => ticked >= 10000);
+
+    // Asked again once it ended
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.install-progress',
+      payload: { installation: { ...installation, state: 'failed', error: { code: 'NO_ANSWER' } }, prefetch }
+    });
+    tickUntil(() => requests.count >= 2);
+    // A list asked while it ran is counted by now
+    cy.wait('@usbPorts');
+    cy.then(() => expect(requests.count).to.equal(2));
   });
 
   it('should keep the dongle chosen when the ports are listed again', () => {

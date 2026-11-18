@@ -1,5 +1,6 @@
 const fs = require('fs');
 
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { CONFIG_KEYS, ADAPTERS_BY_CONFIG_KEY } = require('../adapters');
 
 // Links created by udev for each USB serial device, named after it: they follow the device from a port to another
@@ -8,6 +9,22 @@ const BY_ID_DIR = '/dev/serial/by-id/';
 // A serial number this short is often shared by a whole series (0001 on cheap USB-serial chips): it does not tell one
 // device from another
 const MIN_SERIAL_NUMBER_LENGTH = 8;
+
+/**
+ * @description List the serial ports plugged in, through the usb service.
+ * @param {object} gladys - Gladys instance.
+ * @returns {Promise<Array>} Serial ports, as listed by the serialport library.
+ * @example
+ * const ports = await listSerialPorts(this.gladys);
+ */
+async function listSerialPorts(gladys) {
+  const usb = gladys.service.getService('usb');
+  // The usb service is not loaded when its serialport native module failed to load
+  if (!usb) {
+    throw new ServiceNotConfiguredError('USB service is not available');
+  }
+  return usb.list();
+}
 
 /**
  * @description Find the serial port of the configured USB dongle: the port at this path, or the device of this
@@ -143,4 +160,5 @@ module.exports = {
   getStablePath,
   isSameAdapterFamily,
   isSameDevice,
+  listSerialPorts,
 };

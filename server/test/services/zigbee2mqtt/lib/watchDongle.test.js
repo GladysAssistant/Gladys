@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
+const logger = require('../../../../utils/logger');
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -38,7 +39,8 @@ describe('zigbee2mqtt watchDongle', () => {
 
   afterEach(() => {
     manager.stopWatchingDongle();
-    clock.restore();
+    // The fake timers and the stubs of the logger
+    sinon.restore();
   });
 
   it('should tell once that the dongle is not found, while Zigbee2mqtt does not answer', async () => {
@@ -111,10 +113,10 @@ describe('zigbee2mqtt watchDongle', () => {
     sinon.assert.notCalled(manager.emitStatusEvent);
   });
 
-  it('should start Zigbee2mqtt when its container is not there, or was never started', async () => {
+  it('should start Zigbee2mqtt when its container is not there, or was never started, the dongle missing at init', async () => {
     manager.gladys.system.getContainers.resolves([]);
     manager.findDongle.resolves(dongle);
-    manager.watchDongle(DRIVER_PATH);
+    manager.watchDongle(DRIVER_PATH, undefined, true);
     await clock.tickAsync(10000);
     sinon.assert.callCount(manager.init, 1);
     manager.resetDongleRestarts();
@@ -122,6 +124,28 @@ describe('zigbee2mqtt watchDongle', () => {
     await clock.tickAsync(10000);
     sinon.assert.callCount(manager.init, 2);
     sinon.assert.notCalled(manager.gladys.system.inspectContainer);
+  });
+
+  it('should start Zigbee2mqtt when its container is not there, once the dongle is plugged back', async () => {
+    manager.gladys.system.getContainers.resolves([]);
+    manager.watchDongle(DRIVER_PATH);
+    await clock.tickAsync(10000);
+    sinon.assert.notCalled(manager.init);
+    manager.findDongle.resolves(dongle);
+    await clock.tickAsync(10000);
+    sinon.assert.calledOnce(manager.init);
+  });
+
+  it('should leave a container missing to the installation that failed, its dongle never missing', async () => {
+    // An installation failed with the dongle plugged in, its download stalled for instance
+    manager.findDongle.resolves(dongle);
+    manager.gladys.system.getContainers.resolves([]);
+    manager.watchDongle(DRIVER_PATH);
+    await clock.tickAsync(10000);
+    manager.gladys.system.getContainers.resolves([z2mContainer('created')]);
+    await clock.tickAsync(10000);
+    sinon.assert.notCalled(manager.init);
+    expect(manager.dongleMissing).to.equal(false);
   });
 
   it('should leave stopped a container stopped by hand, the dongle being flashed from the host', async () => {
@@ -187,6 +211,7 @@ describe('zigbee2mqtt watchDongle', () => {
   });
 
   it('should space out the starts of Zigbee2mqtt, then give up', async () => {
+    const error = sinon.stub(logger, 'error');
     manager.findDongle.resolves(dongle);
     manager.watchDongle(DRIVER_PATH);
     await clock.tickAsync(10000);
@@ -205,8 +230,46 @@ describe('zigbee2mqtt watchDongle', () => {
     sinon.assert.callCount(manager.init, 4);
     await clock.tickAsync(10000);
     sinon.assert.callCount(manager.init, 5);
+    // Told once a start is still needed after the last one, not as the last one starts
+    sinon.assert.notCalled(error);
     await clock.tickAsync(60 * 60 * 1000);
     sinon.assert.callCount(manager.init, 5);
+    sinon.assert.calledOnceWithExactly(
+      error,
+      'Zigbee2mqtt: started 5 times since its USB dongle is plugged in, given up',
+    );
+  });
+
+  it('should not tell that it gave up when the last start works', async () => {
+    const error = sinon.stub(logger, 'error');
+    manager.findDongle.resolves(dongle);
+    // Four starts made, the last one more than 5 minutes ago
+    manager.dongleRestarts = { count: 4, lastAt: -5 * 60 * 1000 };
+    manager.watchDongle(DRIVER_PATH);
+    await clock.tickAsync(10000);
+    sinon.assert.calledOnce(manager.init);
+    manager.zigbee2mqttConnected = true;
+    await clock.tickAsync(60000);
+    sinon.assert.notCalled(error);
+  });
+
+  it('should count the spacing from the end of the previous start', async () => {
+    manager.findDongle.resolves(dongle);
+    // A start that takes 5 minutes, a download for instance
+    manager.init = sinon.fake(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 5 * 60 * 1000);
+        }),
+    );
+    manager.watchDongle(DRIVER_PATH);
+    await clock.tickAsync(10000);
+    sinon.assert.calledOnce(manager.init);
+    // Ended 5 minutes later: the next start waits 30 s more
+    await clock.tickAsync(5 * 60 * 1000 + 20000);
+    sinon.assert.calledOnce(manager.init);
+    await clock.tickAsync(10000);
+    sinon.assert.calledTwice(manager.init);
   });
 
   it('should start Zigbee2mqtt at once when its dongle is plugged back after a start', async () => {
@@ -221,18 +284,36 @@ describe('zigbee2mqtt watchDongle', () => {
     sinon.assert.callCount(manager.init, 2);
   });
 
-  it('should watch again when the init it started fails before watching', async () => {
+  it('should watch again when the init it started fails before watching, with what it saw', async () => {
     manager.findDongle.resolves(dongle);
+    manager.gladys.system.getContainers.resolves([]);
     manager.init = sinon.fake(async () => {
       manager.stopWatchingDongle();
       throw new Error('Docker not reachable');
     });
-    manager.watchDongle(DRIVER_PATH);
+    manager.watchDongle(DRIVER_PATH, undefined, true);
     await clock.tickAsync(10000);
     sinon.assert.calledOnce(manager.init);
-    expect(manager.dongleWatch).to.deep.equal({ driverPath: DRIVER_PATH, pnpId: undefined });
+    expect(manager.dongleWatch).to.deep.equal({ driverPath: DRIVER_PATH, pnpId: undefined, missingSeen: true });
     expect(clock.countTimers()).to.equal(1);
     // Tried again, later
+    await clock.tickAsync(30000);
+    sinon.assert.calledTwice(manager.init);
+  });
+
+  it('should try again a start that failed after the init it started watched, the dongle once missing', async () => {
+    manager.findDongle.resolves(dongle);
+    manager.gladys.system.getContainers.resolves([]);
+    // As init: the dongle is found, then the image cannot be downloaded
+    manager.init = sinon.fake(async () => {
+      manager.watchDongle(DRIVER_PATH, undefined, false);
+      throw new Error('No internet');
+    });
+    manager.watchDongle(DRIVER_PATH, undefined, true);
+    await clock.tickAsync(10000);
+    sinon.assert.calledOnce(manager.init);
+    expect(manager.dongleWatch.missingSeen).to.equal(true);
+    // 30 s after the end of the first start
     await clock.tickAsync(30000);
     sinon.assert.calledTwice(manager.init);
   });

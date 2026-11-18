@@ -10,6 +10,8 @@ import PrefetchStatus from '../components/PrefetchStatus';
 
 // The ports are listed again this often while the form is shown: a dongle plugged in shows up by itself
 const USB_PORTS_REFRESH_INTERVAL_IN_MS = 3000;
+// After a failure, the server is not asked again as often
+const USB_PORTS_RETRY_INTERVAL_IN_MS = 30000;
 
 // The path to store for a port: its /dev/serial/by-id/ link when it has one, which follows the dongle to another port
 const getPortPath = usbPort => usbPort.stablePath || usbPort.path;
@@ -156,6 +158,15 @@ class SetupLocalOptions extends Component {
         usbPortsMap[usbPort.path] = usbPort;
       });
       const usbPorts = Object.values(usbPortsMap);
+      this.usbPortsFailed = false;
+      // The same list again changes nothing: the open menu of the ports keeps its highlighted option
+      if (
+        refresh &&
+        this.state.loadUsbPortsStatus === RequestStatus.Success &&
+        JSON.stringify(usbPorts) === JSON.stringify(this.state.usbPorts)
+      ) {
+        return;
+      }
       this.setState({
         usbPorts,
         loadUsbPortsStatus: RequestStatus.Success
@@ -165,6 +176,7 @@ class SetupLocalOptions extends Component {
       if (this.unmounted || usbPortsRequest !== this.usbPortsRequests) {
         return;
       }
+      this.usbPortsFailed = true;
       this.setState({
         loadUsbPortsStatus: RequestStatus.Error
       });
@@ -172,8 +184,14 @@ class SetupLocalOptions extends Component {
   };
 
   refreshUsbPortsInBackground = async () => {
-    // Left to the list asked from the refresh button, while it loads
-    if (this.state.z2mAdapterMode === ADAPTER_MODE.NETWORK || this.state.loadUsbPortsStatus === RequestStatus.Getting) {
+    // Left to the list asked from the refresh button, while it loads; not while the page is hidden, nor while the form
+    // is disabled (an installation runs)
+    if (
+      this.state.z2mAdapterMode === ADAPTER_MODE.NETWORK ||
+      this.state.loadUsbPortsStatus === RequestStatus.Getting ||
+      document.hidden ||
+      this.props.disabled
+    ) {
       return;
     }
     await this.loadUsbPorts(true);
@@ -183,12 +201,15 @@ class SetupLocalOptions extends Component {
   };
 
   scheduleUsbPortsRefresh = () => {
-    this.usbPortsTimer = setTimeout(async () => {
-      await this.refreshUsbPortsInBackground();
-      if (!this.unmounted) {
-        this.scheduleUsbPortsRefresh();
-      }
-    }, USB_PORTS_REFRESH_INTERVAL_IN_MS);
+    this.usbPortsTimer = setTimeout(
+      async () => {
+        await this.refreshUsbPortsInBackground();
+        if (!this.unmounted) {
+          this.scheduleUsbPortsRefresh();
+        }
+      },
+      this.usbPortsFailed ? USB_PORTS_RETRY_INTERVAL_IN_MS : USB_PORTS_REFRESH_INTERVAL_IN_MS
+    );
   };
 
   loadZigbeeAdapters = async () => {
@@ -251,6 +272,8 @@ class SetupLocalOptions extends Component {
     // Numbers the requests of the USB ports, to keep only the answer of the last one
     this.usbPortsRequests = 0;
     this.usbPortsTimer = null;
+    // Whether the last list answered failed: asked again later
+    this.usbPortsFailed = false;
     this.state = {
       z2mDriverPath,
       usbPorts: [],

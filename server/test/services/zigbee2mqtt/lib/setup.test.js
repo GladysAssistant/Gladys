@@ -308,8 +308,12 @@ describe('zigbee2mqtt setup', () => {
 
     beforeEach(() => {
       access = sinon.stub(fs.promises, 'access').resolves();
+      // Recognized from its USB fingerprint
       gladys.service.getService = fake.returns({
-        list: fake.resolves([{ path: '/dev/ttyUSB0', pnpId: LINK }, { path: '/dev/ttyS0' }]),
+        list: fake.resolves([
+          { path: '/dev/ttyUSB0', pnpId: LINK, vendorId: '10c4', productId: 'ea60' },
+          { path: '/dev/ttyS0' },
+        ]),
       });
     });
 
@@ -373,6 +377,58 @@ describe('zigbee2mqtt setup', () => {
         ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
         ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
       });
+      assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', BY_ID_PATH, serviceId);
+      expect(zigbee2MqttManager.installation.kind).to.equal('install');
+      // Once: the stored port is looked up in the ports listed for the dongle
+      assert.calledOnce(gladys.service.getService().list);
+    });
+
+    it('should keep the stored port saved again as is, when another USB-serial adapter may have taken it', async () => {
+      // At this start, a teleinfo adapter took the port of the dongle, now on another one
+      gladys.service.getService = fake.returns({
+        list: fake.resolves([
+          { path: '/dev/ttyUSB0', pnpId: 'usb-FTDI_FT232R_USB_UART_A1B2C3D4-if00-port0' },
+          { path: '/dev/ttyUSB1', pnpId: LINK, vendorId: '10c4', productId: 'ea60' },
+        ]),
+      });
+      zigbee2MqttManager.getConfiguration = fake.resolves({
+        z2mAdapterMode: 'usb',
+        z2mDriverPath: '/dev/ttyUSB0',
+        z2mDongleName: ZBDONGLE_P,
+      });
+      await zigbee2MqttManager.setup({
+        Z2M_ADAPTER_MODE: 'usb',
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
+        Z2M_TCP_PORT: '12001',
+      });
+      assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', '/dev/ttyUSB0', serviceId);
+      expect(zigbee2MqttManager.installation.kind).to.equal('install');
+    });
+
+    it('should keep the stored link saved again as is', async () => {
+      zigbee2MqttManager.getConfiguration = fake.resolves({
+        z2mAdapterMode: 'usb',
+        z2mDriverPath: BY_ID_PATH,
+        z2mDongleName: ZBDONGLE_P,
+      });
+      // Two identical adapters without serial number share the link: the port would be stored otherwise
+      gladys.service.getService = fake.returns({
+        list: fake.resolves([
+          { path: '/dev/ttyUSB0', pnpId: LINK, vendorId: '10c4', productId: 'ea60' },
+          { path: '/dev/ttyUSB1', pnpId: LINK, vendorId: '10c4', productId: 'ea60' },
+        ]),
+      });
+      const realpath = sinon.stub(fs.promises, 'realpath').resolves('/dev/ttyUSB0');
+      try {
+        await zigbee2MqttManager.setup({
+          Z2M_ADAPTER_MODE: 'usb',
+          ZIGBEE2MQTT_DRIVER_PATH: BY_ID_PATH,
+          ZIGBEE_DONGLE_NAME: ZBDONGLE_P,
+        });
+      } finally {
+        realpath.restore();
+      }
       assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', BY_ID_PATH, serviceId);
       expect(zigbee2MqttManager.installation.kind).to.equal('install');
     });

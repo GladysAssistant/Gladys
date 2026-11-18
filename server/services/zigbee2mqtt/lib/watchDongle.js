@@ -8,8 +8,8 @@ const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-contain
 // Zigbee2mqtt is back within this delay once its dongle is plugged back
 const DONGLE_CHECK_INTERVAL_IN_MS = 10 * 1000;
 
-// Wait before each start of Zigbee2mqtt by the watch, from the previous one: none for the first, then longer and
-// longer, then no more start until the dongle is found missing, Zigbee2mqtt answers or the integration is disabled
+// Wait before each start of Zigbee2mqtt by the watch, from the end of the previous one: none for the first, then longer
+// and longer, then no more start until the dongle is found missing, Zigbee2mqtt answers or the integration is disabled
 const RESTART_DELAYS_IN_MS = [0, 30 * 1000, 60 * 1000, 2 * 60 * 1000, 5 * 60 * 1000];
 
 // States of a container that ran, or tried to: Docker starts it again by itself (restart policy "always") unless it
@@ -63,10 +63,21 @@ function setDongleMissing(manager, missing) {
  */
 async function restartZigbee2mqtt(watch) {
   const { count, lastAt } = this.dongleRestarts;
-  if (count >= RESTART_DELAYS_IN_MS.length || (lastAt !== null && Date.now() - lastAt < RESTART_DELAYS_IN_MS[count])) {
+  if (count >= RESTART_DELAYS_IN_MS.length) {
+    // Told once, by the check that still finds a start needed after the last one
+    if (!this.dongleRestarts.givenUp) {
+      this.dongleRestarts.givenUp = true;
+      logger.error(
+        `Zigbee2mqtt: started ${RESTART_DELAYS_IN_MS.length} times since its USB dongle is plugged in, given up`,
+      );
+    }
     return;
   }
-  this.dongleRestarts = { count: count + 1, lastAt: Date.now() };
+  if (lastAt !== null && Date.now() - lastAt < RESTART_DELAYS_IN_MS[count]) {
+    return;
+  }
+  const restart = { count: count + 1, lastAt: Date.now() };
+  this.dongleRestarts = restart;
   logger.info(`Zigbee2mqtt USB dongle plugged in on ${watch.driverPath}, starting Zigbee2mqtt again`);
   try {
     await this.init();
@@ -74,13 +85,17 @@ async function restartZigbee2mqtt(watch) {
     logger.warn('Zigbee2mqtt: failed to start again once its USB dongle is plugged in:', e);
     // init stops the watch on its first lines, and watches again only once it checked the dongle
     if (this.dongleWatch === null) {
-      this.watchDongle(watch.driverPath, watch.pnpId);
+      this.watchDongle(watch.driverPath, watch.pnpId, watch.missingSeen);
     }
   }
-  if (this.dongleRestarts.count === RESTART_DELAYS_IN_MS.length) {
-    logger.error(
-      `Zigbee2mqtt: started ${RESTART_DELAYS_IN_MS.length} times since its USB dongle is plugged in, given up`,
-    );
+  // The next start waits from the end of this one: an init that takes long, a download, does not use up the delays
+  if (this.dongleRestarts === restart) {
+    restart.lastAt = Date.now();
+  }
+  // The watch armed by this init finds the dongle: it keeps what this watch saw, so that a start that failed after it
+  // (an image that cannot be downloaded, a container that Docker cannot start) is tried again
+  if (this.dongleWatch !== null && this.dongleWatch !== watch && watch.missingSeen) {
+    this.dongleWatch.missingSeen = true;
   }
 }
 
@@ -98,24 +113,27 @@ function isWatchedDongle(port, watch) {
 }
 
 /**
- * @description Tell whether Zigbee2mqtt is to be started: its container is missing, never started, or Docker failed
- * to start it again (its dongle was missing). A container stopped by hand stays stopped (the dongle flashed from the
- * host), as Docker does, and a container of the user carrying our name is left to init, which tells about it.
+ * @description Tell whether Zigbee2mqtt is to be started: Docker failed to start its container again (its dongle was
+ * missing), or its container is missing or never started while the watch saw the dongle missing (init does not start
+ * Zigbee2mqtt without its dongle). A container missing for another reason is left to the installation that failed. A
+ * container stopped by hand stays stopped (the dongle flashed from the host), as Docker does, and a container of the
+ * user carrying our name is left to init, which tells about it.
  * @param {object} system - Gladys system module.
+ * @param {boolean} missingSeen - True when the watch saw the dongle missing.
  * @returns {Promise<boolean>} True when Zigbee2mqtt is to be started.
  * @example
- * if (await isStartNeeded(this.gladys.system)) { ... }
+ * if (await isStartNeeded(this.gladys.system, watch.missingSeen)) { ... }
  */
-async function isStartNeeded(system) {
+async function isStartNeeded(system, missingSeen) {
   const container = await findContainerByName(system, z2mContainerDescriptor.name);
   if (container === null) {
-    return true;
+    return missingSeen;
   }
   if (!(await isManagedByGladys(system, container, z2mContainerDescriptor))) {
     return false;
   }
   if (container.state === 'created') {
-    return true;
+    return missingSeen;
   }
   if (!STOPPED_CONTAINER_STATES.includes(container.state)) {
     return false;
@@ -154,6 +172,7 @@ async function checkDongle(watch) {
       logger.warn(`Zigbee2mqtt USB dongle not found on ${watch.driverPath}, waiting for it to be plugged in`);
     }
     setDongleMissing(this, true);
+    watch.missingSeen = true;
     // Plugged back, Zigbee2mqtt starts at once
     this.resetDongleRestarts();
     return;
@@ -161,7 +180,7 @@ async function checkDongle(watch) {
   setDongleMissing(this, false);
   // Unplugged and plugged back between two checks, the dongle may never be seen missing: the state of the container
   // tells
-  const startNeeded = await isStartNeeded(this.gladys.system);
+  const startNeeded = await isStartNeeded(this.gladys.system, watch.missingSeen);
   if (this.dongleWatch !== watch || isBusy(this)) {
     return;
   }
@@ -186,12 +205,15 @@ function stopWatchingDongle() {
  * when its dongle is unplugged, and Docker fails to start it again without the device, even once plugged back.
  * @param {string} driverPath - Stored path of the dongle.
  * @param {string} [pnpId] - USB device name of the dongle found by init on this path, undefined when not found.
+ * @param {boolean} [missing] - True when the dongle was found missing: by init, or by the watch that started this
+ * init.
  * @example
  * this.watchDongle('/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_1-if00-port0');
  */
-function watchDongle(driverPath, pnpId) {
+function watchDongle(driverPath, pnpId, missing = false) {
   this.stopWatchingDongle();
-  const watch = { driverPath, pnpId };
+  // missingSeen: the dongle was found missing, by init or by a check
+  const watch = { driverPath, pnpId, missingSeen: missing };
   this.dongleWatch = watch;
   const scheduleCheck = () => {
     this.dongleWatchTimer = setTimeout(async () => {
