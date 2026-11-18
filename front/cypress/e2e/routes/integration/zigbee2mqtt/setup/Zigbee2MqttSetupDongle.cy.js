@@ -128,6 +128,10 @@ describe('Zigbee2mqtt USB dongle', () => {
 
     cy.sendWebSocket({ type: 'zigbee2mqtt.install-progress', payload: { installation, prefetch } });
     tickUntil(ticked => ticked >= 10000);
+    // Counted as the request is sent, not when it is answered
+    cy.wrap(requests)
+      .its('count')
+      .should('equal', 1);
 
     // Asked again once it ended
     cy.sendWebSocket({
@@ -135,9 +139,9 @@ describe('Zigbee2mqtt USB dongle', () => {
       payload: { installation: { ...installation, state: 'failed', error: { code: 'NO_ANSWER' } }, prefetch }
     });
     tickUntil(() => requests.count >= 2);
-    // A list asked while it ran is counted by now
-    cy.wait('@usbPorts');
-    cy.then(() => expect(requests.count).to.equal(2));
+    cy.wrap(requests)
+      .its('count')
+      .should('equal', 2);
   });
 
   it('should keep the dongle chosen when the ports are listed again', () => {

@@ -265,24 +265,27 @@ class Wizard extends Component {
     await this.startInstallation(configuration);
   };
 
-  // The same configuration, with the ezsp driver when Gladys switched to it by itself (the saved configuration): the
-  // retry does not go through the ember failure again
+  // The same configuration, with the ezsp driver when Gladys switched to it by itself: the retry does not go through
+  // the ember failure again. Told by the status at once, by the saved configuration once the page loaded it again.
   retry = () => {
     const installed = this.state.installedConfiguration;
     const saved = this.props.configuration || {};
+    const switched = Boolean(this.props.zigbee2mqttStatus.ezspFallback);
     const configuration = { ...installed };
+    const legacyDongleName = `${installed.z2mDongleName}${LEGACY_EZSP_SUFFIX}`;
     if (
       installed.z2mAdapterMode === ADAPTER_MODE.USB &&
-      saved.z2mDongleName === `${installed.z2mDongleName}${LEGACY_EZSP_SUFFIX}`
+      (saved.z2mDongleName === legacyDongleName ||
+        (switched && findAdapter(this.state.adapters, legacyDongleName) !== null))
     ) {
-      configuration.z2mDongleName = saved.z2mDongleName;
+      configuration.z2mDongleName = legacyDongleName;
     }
     if (
       installed.z2mAdapterMode === ADAPTER_MODE.NETWORK &&
       installed.z2mNetworkAdapterType === 'ember' &&
-      saved.z2mNetworkAdapterType === 'ezsp'
+      (saved.z2mNetworkAdapterType === 'ezsp' || switched)
     ) {
-      configuration.z2mNetworkAdapterType = saved.z2mNetworkAdapterType;
+      configuration.z2mNetworkAdapterType = 'ezsp';
     }
     return this.startInstallation(configuration);
   };
