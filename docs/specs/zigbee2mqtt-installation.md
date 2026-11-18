@@ -389,44 +389,56 @@ Zigbee2mqtt stops when its dongle is unplugged. Docker starts a crashed containe
 and the container stays `exited`, even once the dongle is plugged back.
 
 - **Lifecycle.** Armed by each init once it checked the dongle (USB mode, broker not external),
-  found or not; replaced by the next init; stopped, its timer cleared, by disconnect and reset. A
-  check in progress when it stops, or when an operation starts, has no effect.
-- **Every 10 s**, unless an installation or an operation runs (I):
+  found or not; replaced by the next init; stopped, its timer cleared, by disconnect and reset.
+- **State.** `dongleMissing` (the status); `dongleLost`, held by the watch: the dongle was found
+  missing, or the watch was armed by a start of the watch, and Zigbee2mqtt has not answered since; the starts made by
+  the watch (count, end of the last one).
+- **Events.** A check runs every 10 s. Each line is one transition, tested in
+  `watchDongle.test.js` / `init.test.js`; "—" leaves the value as it is.
 
-  | Zigbee2mqtt answers | Dongle     | Zigbee2mqtt container                            | Then                                                        |
-  | ------------------- | ---------- | ------------------------------------------------ | ----------------------------------------------------------- |
-  | yes                 | not listed | —                                                | `dongleMissing` false, starts forgotten                     |
-  | no                  | not found  | —                                                | `dongleMissing` true, starts forgotten                      |
-  | no                  | found      | `running`, `restarting`, ...                     | `dongleMissing` false; left to Docker and the health check  |
-  | no                  | found      | `exited` or `dead` by hand (`State.Error` empty) | `dongleMissing` false; left stopped                         |
-  | no                  | found      | of the user, carrying our name                   | `dongleMissing` false; left to init, which tells about it   |
-  | no                  | found      | `exited` / `dead` with `State.Error`             | `dongleMissing` false; init, when the spacing allows        |
-  | no                  | found      | none or `created`, the dongle lost               | `dongleMissing` false; init, when the spacing allows        |
-  | no                  | found      | none or `created`, the dongle not lost           | `dongleMissing` false; left to the installation that failed |
+  | Event                                                                   | `dongleMissing` | `dongleLost`                       | Starts    | Zigbee2mqtt                             |
+  | ----------------------------------------------------------------------- | --------------- | ---------------------------------- | --------- | --------------------------------------- |
+  | Init, dongle found                                                      | false           | false; true when the watch runs it | —         | started by init                         |
+  | Init, dongle not found                                                  | true            | true                               | forgotten | not started                             |
+  | Check, Zigbee2mqtt answers (ports not listed)                           | false           | false                              | forgotten | —                                       |
+  | Check, an installation or an operation runs (I)                         | —               | —                                  | —         | left to it                              |
+  | Check, dongle not found, or not the same dongle                         | true            | true                               | forgotten | —                                       |
+  | Check, found; container `running`, `restarting`, ...                    | false           | —                                  | —         | left to Docker and the health check     |
+  | Check, found; container `exited` / `dead` by hand (`State.Error` empty) | false           | —                                  | —         | left stopped                            |
+  | Check, found; container of the user carrying our name                   | false           | —                                  | —         | left to init, which tells about it      |
+  | Check, found; container `exited` / `dead` with `State.Error`            | false           | —                                  | +1        | init, when the spacing allows           |
+  | Check, found; container none or `created`, the dongle lost              | false           | —                                  | +1        | init, when the spacing allows           |
+  | Check, found; container none or `created`, the dongle not lost          | false           | —                                  | —         | left to the installation that failed    |
+  | Check, what it read outdated once read                                  | —               | —                                  | —         | —                                       |
+  | Start by the watch fails before init watched again                      | —               | true                               | —         | watch armed again, same path and dongle |
+  | Start by the watch fails after init watched again                       | —               | true (the watch of that init)      | —         | tried again, when the spacing allows    |
 
+- **Outdated read.** What a check reads (the ports, then the container) is dropped when, once read,
+  the watch was replaced or stopped, an installation or an operation started, or Zigbee2mqtt
+  answered: no missing dongle told from ports listed before Zigbee2mqtt answered, no start of a
+  Zigbee2mqtt that answers.
 - **Failed start.** Docker fills `State.Error` when it fails to start a container ("error gathering
   device information" for a missing device) and clears it on each successful start: a container
   stopped by hand, the dongle flashed from the host for instance, stays stopped, as Docker leaves it.
   A start of Gladys starts it all the same.
-- **Same dongle.** Found by init on a stored port (`/dev/ttyUSBx`), the dongle is remembered by its
-  `pnpId`: another USB-serial adapter that takes its port once it is unplugged counts as the dongle
-  not found; a device recognized as a dongle of the configured driver family counts as the dongle
-  all the same (init may have found another adapter on that port: the dongle unplugged, or plugged
-  elsewhere, at the start of Gladys). Stored by its link, or not found by init, any device at the
-  stored path counts.
-- **Dongle lost.** The watch remembers that the dongle is lost: not found by the init that armed it
-  or by one of its checks, or a start by the watch in progress (the watch of the init it runs keeps
-  it, so that a start that failed after it watched, a container removed and not created again, is
-  tried again). Forgotten once Zigbee2mqtt answers. A container missing or never started is then the
-  init that did not start Zigbee2mqtt without its dongle, or a start that failed half-way; otherwise
-  it is an installation that failed for another reason (a download that stalls), left as it is
-  instead of being run again.
+- **Same dongle.** Stored by its link, or not found by init, any device at the stored path is the
+  dongle. On a stored port (`/dev/ttyUSBx`), which another USB-serial adapter takes once the dongle is
+  unplugged: the device with the `pnpId` init found there; when init did not recognize that device as
+  a dongle of the configured driver family (another adapter held the port at the start of Gladys), a
+  device recognized as such is the dongle too. A second dongle of the same family that takes the port
+  of a dongle init recognized is not.
+- **Dongle lost.** A container missing or never started, the dongle lost, is the init that did not
+  start Zigbee2mqtt without its dongle, or a start by the watch that failed half-way (a container
+  removed and not created again); the dongle not lost, an installation that failed for another reason
+  (a download that stalls), left as it is instead of being run again. Each init run by the watch
+  arms its own watch with the dongle lost, or the watch is armed again lost when that init fails
+  before watching; nothing sets it on a watch already armed, so a Zigbee2mqtt that answered meanwhile
+  is not taken for lost.
 - **Spacing.** The first start is at once, then 30 s, 1, 2 and 5 min after the end of the previous
-  one, then none until the starts are forgotten (dongle not found, Zigbee2mqtt answers, disable): an
-  unplugged dongle plugged back starts Zigbee2mqtt at once, even between two checks where it was
-  never seen missing. "Given up" is logged once, by the check that still finds a start needed after
-  the last one. An init that fails before it watched again leaves the watch armed on the same path,
-  the dongle lost. This init may start an `update` (G).
+  one, then none until the starts are forgotten (dongle not found by a check or by init, Zigbee2mqtt
+  answers, disable): an unplugged dongle plugged back starts Zigbee2mqtt at once, even between two
+  checks where it was never seen missing. "Given up" is logged once, by the check that still finds a
+  start needed after the last one. An init run by the watch may start an `update` (G).
 - **`status.dongleMissing`**, also in `zigbee2mqtt.status-change`: true only when an init or the
   watch did not find the dongle, never with an external broker; the status is sent when it changes.
 

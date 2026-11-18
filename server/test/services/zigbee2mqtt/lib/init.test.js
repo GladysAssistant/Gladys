@@ -308,9 +308,23 @@ describe('zigbee2mqtt init', () => {
       expect(zigbee2mqttManager.dongleWatch).to.deep.equal({
         driverPath: BY_ID_PATH,
         pnpId: LINK,
-        dongleLost: false,
+        recognized: true,
         dongleName: ZBDONGLE_P,
+        dongleLost: false,
       });
+    });
+
+    it('should watch the dongle lost when the watch started this init, even with the dongle found', async () => {
+      listPorts([zbDongleP]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: BY_ID_PATH, z2mDongleName: ZBDONGLE_P });
+      const restarts = { count: 2, lastAt: 1000 };
+      zigbee2mqttManager.dongleRestarts = restarts;
+      await zigbee2mqttManager.init(false, { dongleLost: true });
+      expect(zigbee2mqttManager.dongleMissing).to.equal(false);
+      // Lost until Zigbee2mqtt answers: a start that fails later is tried again
+      expect(zigbee2mqttManager.dongleWatch.dongleLost).to.equal(true);
+      // The starts made by the watch are kept
+      expect(zigbee2mqttManager.dongleRestarts).to.equal(restarts);
     });
 
     it('should keep the port of a dongle of another driver, which may have taken the number of the configured one', async () => {
@@ -347,6 +361,8 @@ describe('zigbee2mqtt init', () => {
       await zigbee2mqttManager.init();
       assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'ZIGBEE2MQTT_DRIVER_PATH');
       expect(installedDriverPath()).to.equal('/dev/ttyACM0');
+      // The watch takes back on this port a dongle of the configured family
+      expect(zigbee2mqttManager.dongleWatch.recognized).to.equal(false);
     });
 
     it('should keep the link of a dongle moved to another port', async () => {
@@ -383,9 +399,19 @@ describe('zigbee2mqtt init', () => {
       expect(zigbee2mqttManager.dongleWatch).to.deep.equal({
         driverPath: BY_ID_PATH,
         pnpId: undefined,
-        dongleLost: true,
+        recognized: false,
         dongleName: undefined,
+        dongleLost: true,
       });
+    });
+
+    it('should forget the starts made by the watch when the dongle is missing, for Zigbee2mqtt to start at once once plugged back', async () => {
+      listPorts([]);
+      zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: BY_ID_PATH, mqttMode: 'local' });
+      // Unplugged during the last start made by the watch
+      zigbee2mqttManager.dongleRestarts = { count: 5, lastAt: 1000 };
+      await zigbee2mqttManager.init(false, { dongleLost: true });
+      expect(zigbee2mqttManager.dongleRestarts).to.deep.equal({ count: 0, lastAt: null });
     });
 
     it('should neither watch the dongle nor tell it missing with an external broker, which runs no Zigbee2mqtt', async () => {

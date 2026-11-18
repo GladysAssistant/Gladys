@@ -13,7 +13,7 @@ const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { findOwnContainer } = require('../../../utils/dockerContainers');
 const { formatDuration } = require('../utils/formatDuration');
-const { getDriverPathToStore } = require('./findDongle');
+const { getDriverPathToStore, isOfConfiguredFamily } = require('./findDongle');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -86,11 +86,13 @@ async function finishUpdate(manager) {
 /**
  * @description Prepares service and starts connection with broker if needed, see init.
  * @param {boolean} setupMode - In setup mode.
+ * @param {object} options - See init.
+ * @param {boolean} [options.dongleLost] - True when the watch of the dongle starts it.
  * @returns {Promise} Resolve when init finished.
  * @example
- * await initialize.call(this, setupMode);
+ * await initialize.call(this, setupMode, {});
  */
-async function initialize(setupMode) {
+async function initialize(setupMode, { dongleLost = false } = {}) {
   const startedAt = Date.now();
   // Reset status
   this.usbConfigured = false;
@@ -180,12 +182,16 @@ async function initialize(setupMode) {
     // broker, Gladys runs no Zigbee2mqtt then; an older installation without broker mode runs the broker of Gladys
     if (mqttMode !== MQTT_MODE.EXTERNAL) {
       this.dongleMissing = !dongle;
-      this.watchDongle(
-        configuration.z2mDriverPath,
-        dongle ? dongle.port.pnpId : undefined,
-        !dongle,
-        configuration.z2mDongleName,
-      );
+      // Found missing: plugged back, Zigbee2mqtt starts at once, as when the watch finds it missing
+      if (!dongle) {
+        this.resetDongleRestarts();
+      }
+      this.watchDongle(configuration.z2mDriverPath, {
+        pnpId: dongle ? dongle.port.pnpId : undefined,
+        recognized: Boolean(dongle) && isOfConfiguredFamily(dongle.port, configuration.z2mDongleName),
+        dongleName: configuration.z2mDongleName,
+        lost: !dongle || dongleLost,
+      });
     }
   }
 
@@ -316,14 +322,17 @@ async function initialize(setupMode) {
  * @description Prepares service and starts connection with broker if needed. Counted while it runs, from its first
  * line: the routes and the setup checked before calling it are refused until it ends (see refuseWhileInstalling).
  * @param {boolean} setupMode - In setup mode.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.dongleLost] - True when the watch of the dongle starts it: the dongle is lost until
+ * Zigbee2mqtt answers (see watchDongle).
  * @returns {Promise} Resolve when init finished.
  * @example
  * await z2m.init();
  */
-async function init(setupMode = false) {
+async function init(setupMode = false, options = {}) {
   this.runningOperations += 1;
   try {
-    return await initialize.call(this, setupMode);
+    return await initialize.call(this, setupMode, options);
   } finally {
     this.runningOperations -= 1;
     // Kept for the containers of this init only: a later call downloads again. A download that fails once init ended

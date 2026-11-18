@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
-const { getDriverPathToStore } = require('../../../../services/zigbee2mqtt/lib/findDongle');
+const { getDriverPathToStore, isOfConfiguredFamily } = require('../../../../services/zigbee2mqtt/lib/findDongle');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -49,6 +49,25 @@ describe('zigbee2mqtt getDriverPathToStore', () => {
         ZBDONGLE_P,
       ),
     ).to.equal(`/dev/serial/by-id/${LINK}`);
+  });
+});
+
+describe('zigbee2mqtt isOfConfiguredFamily', () => {
+  const dongleP = { path: '/dev/ttyUSB0', pnpId: LINK, vendorId: '10c4', productId: 'ea60' };
+
+  it('should recognize a dongle of the driver family of the configured model', () => {
+    expect(isOfConfiguredFamily(dongleP, 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P')).to.equal(true);
+  });
+
+  it('should not recognize a dongle of another driver family', () => {
+    expect(isOfConfiguredFamily(dongleP, 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"')).to.equal(
+      false,
+    );
+  });
+
+  it('should not recognize an adapter without a known USB fingerprint', () => {
+    const teleinfo = { path: '/dev/ttyUSB0', pnpId: 'usb-FTDI_FT232R_USB_UART_A1B2C3D4-if00-port0' };
+    expect(isOfConfiguredFamily(teleinfo, 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P')).to.equal(false);
   });
 });
 

@@ -101,7 +101,8 @@ describe('zigbee2mqtt watchDongle', () => {
     expect(manager.dongleMissing).to.equal(false);
     expect(manager.usbConfigured).to.equal(true);
     sinon.assert.calledOnce(manager.emitStatusEvent);
-    sinon.assert.calledOnceWithExactly(manager.init);
+    // The watch armed by this init holds the dongle lost until Zigbee2mqtt answers
+    sinon.assert.calledOnceWithExactly(manager.init, false, { dongleLost: true });
   });
 
   it('should start Zigbee2mqtt again when the dongle was unplugged and plugged back between two checks', async () => {
@@ -109,14 +110,14 @@ describe('zigbee2mqtt watchDongle', () => {
     manager.findDongle.resolves(dongle);
     manager.watchDongle(DRIVER_PATH);
     await clock.tickAsync(10000);
-    sinon.assert.calledOnceWithExactly(manager.init);
+    sinon.assert.calledOnceWithExactly(manager.init, false, { dongleLost: true });
     sinon.assert.notCalled(manager.emitStatusEvent);
   });
 
   it('should start Zigbee2mqtt when its container is not there, or was never started, the dongle missing at init', async () => {
     manager.gladys.system.getContainers.resolves([]);
     manager.findDongle.resolves(dongle);
-    manager.watchDongle(DRIVER_PATH, undefined, true);
+    manager.watchDongle(DRIVER_PATH, { lost: true });
     await clock.tickAsync(10000);
     sinon.assert.callCount(manager.init, 1);
     manager.resetDongleRestarts();
@@ -170,12 +171,21 @@ describe('zigbee2mqtt watchDongle', () => {
 
   describe('dongle stored by its port', () => {
     const DONGLE_PNP_ID = 'usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00124B0018E2FE91-if00';
+    const ZBDONGLE_P = 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P';
+    const zbDongleP = (serialNumber) => ({
+      path: '/dev/ttyUSB0',
+      pnpId: `usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_${serialNumber}-if00-port0`,
+      vendorId: '10c4',
+      productId: 'ea60',
+    });
+    const configuredDongle = zbDongleP('d65fba180f86ec11bfdf571719c2d21c');
+    const otherDongle = zbDongleP('6a1c3e8b4c2aed11a0ab1d3c5e7f9a1b');
 
     it('should not take another USB-serial adapter that took its port for the dongle', async () => {
       manager.findDongle.resolves({
         port: { path: '/dev/ttyUSB0', pnpId: 'usb-RFXCOM_RFXtrx433_A1XZI13O-if00-port0' },
       });
-      manager.watchDongle('/dev/ttyUSB0', DONGLE_PNP_ID);
+      manager.watchDongle('/dev/ttyUSB0', { pnpId: DONGLE_PNP_ID });
       await clock.tickAsync(10000);
       expect(manager.dongleMissing).to.equal(true);
       sinon.assert.notCalled(manager.init);
@@ -183,35 +193,40 @@ describe('zigbee2mqtt watchDongle', () => {
 
     it('should start Zigbee2mqtt again once the dongle is back on its port', async () => {
       manager.findDongle.resolves({ port: { path: '/dev/ttyUSB0', pnpId: DONGLE_PNP_ID } });
-      manager.watchDongle('/dev/ttyUSB0', DONGLE_PNP_ID);
+      manager.watchDongle('/dev/ttyUSB0', { pnpId: DONGLE_PNP_ID });
       await clock.tickAsync(10000);
       sinon.assert.calledOnce(manager.init);
     });
 
-    it('should take the dongle back on its port, recognized as the configured model, after init found another adapter there', async () => {
+    it('should take the dongle back on its port, recognized as the configured family, after init found another adapter there', async () => {
       // At the start of Gladys, a teleinfo adapter was on the port of the dongle
-      manager.findDongle.resolves({
-        port: {
-          path: '/dev/ttyUSB0',
-          pnpId: 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0',
-          vendorId: '10c4',
-          productId: 'ea60',
-        },
+      manager.findDongle.resolves({ port: configuredDongle });
+      manager.watchDongle('/dev/ttyUSB0', {
+        pnpId: 'usb-FTDI_FT232R_USB_UART_A1B2C3D4-if00-port0',
+        recognized: false,
+        dongleName: ZBDONGLE_P,
       });
-      manager.watchDongle(
-        '/dev/ttyUSB0',
-        'usb-FTDI_FT232R_USB_UART_A1B2C3D4-if00-port0',
-        false,
-        'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
-      );
       await clock.tickAsync(10000);
       expect(manager.dongleMissing).to.equal(false);
       sinon.assert.calledOnce(manager.init);
     });
 
+    it('should not take another dongle of the configured family for the dongle that init recognized on its port', async () => {
+      // Two dongles of the same family: the configured one unplugged, the other one took its port
+      manager.findDongle.resolves({ port: otherDongle });
+      manager.watchDongle('/dev/ttyUSB0', {
+        pnpId: configuredDongle.pnpId,
+        recognized: true,
+        dongleName: ZBDONGLE_P,
+      });
+      await clock.tickAsync(10000);
+      expect(manager.dongleMissing).to.equal(true);
+      sinon.assert.notCalled(manager.init);
+    });
+
     it('should take the device on its port when init did not find the dongle', async () => {
       manager.findDongle.resolves({ port: { path: '/dev/ttyUSB0', pnpId: DONGLE_PNP_ID } });
-      manager.watchDongle('/dev/ttyUSB0', undefined);
+      manager.watchDongle('/dev/ttyUSB0');
       await clock.tickAsync(10000);
       sinon.assert.calledOnce(manager.init);
     });
@@ -312,14 +327,15 @@ describe('zigbee2mqtt watchDongle', () => {
       manager.stopWatchingDongle();
       throw new Error('Docker not reachable');
     });
-    manager.watchDongle(DRIVER_PATH, undefined, true);
+    manager.watchDongle(DRIVER_PATH, { lost: true });
     await clock.tickAsync(10000);
     sinon.assert.calledOnce(manager.init);
     expect(manager.dongleWatch).to.deep.equal({
       driverPath: DRIVER_PATH,
       pnpId: undefined,
-      dongleLost: true,
+      recognized: false,
       dongleName: undefined,
+      dongleLost: true,
     });
     expect(clock.countTimers()).to.equal(1);
     // Tried again, later
@@ -331,11 +347,11 @@ describe('zigbee2mqtt watchDongle', () => {
     manager.findDongle.resolves(dongle);
     manager.gladys.system.getContainers.resolves([]);
     // As init: the dongle is found, then the image cannot be downloaded
-    manager.init = sinon.fake(async () => {
-      manager.watchDongle(DRIVER_PATH, undefined, false);
+    manager.init = sinon.fake(async (setupMode, { dongleLost }) => {
+      manager.watchDongle(DRIVER_PATH, { lost: dongleLost });
       throw new Error('No internet');
     });
-    manager.watchDongle(DRIVER_PATH, undefined, true);
+    manager.watchDongle(DRIVER_PATH, { lost: true });
     await clock.tickAsync(10000);
     sinon.assert.calledOnce(manager.init);
     expect(manager.dongleWatch.dongleLost).to.equal(true);
@@ -347,9 +363,9 @@ describe('zigbee2mqtt watchDongle', () => {
   it('should try again after a short unplug, when the init it started removed the container and failed', async () => {
     // Docker failed to start the container: the dongle was unplugged and plugged back between two checks
     manager.findDongle.resolves(dongle);
-    manager.init = sinon.fake(async () => {
+    manager.init = sinon.fake(async (setupMode, { dongleLost }) => {
       // As init: the dongle is found, the container is removed to be created on its new path, which fails
-      manager.watchDongle(DRIVER_PATH, undefined, false);
+      manager.watchDongle(DRIVER_PATH, { lost: dongleLost });
       manager.gladys.system.getContainers.resolves([]);
       throw new Error('Docker failed to create the container');
     });
@@ -361,10 +377,34 @@ describe('zigbee2mqtt watchDongle', () => {
     sinon.assert.calledTwice(manager.init);
   });
 
+  it('should not hold the dongle lost again once Zigbee2mqtt answered before the end of the start', async () => {
+    manager.findDongle.resolves(dongle);
+    // As init: watches the dongle lost, then Zigbee2mqtt answers before init ends
+    manager.init = sinon.fake(async (setupMode, { dongleLost }) => {
+      manager.watchDongle(DRIVER_PATH, { lost: dongleLost });
+      manager.zigbee2mqttConnected = true;
+      await new Promise((resolve) => {
+        setTimeout(resolve, 15000);
+      });
+    });
+    manager.watchDongle(DRIVER_PATH);
+    // The start at 10 s, a check of its watch at 20 s while init still runs, the end of init at 25 s
+    await clock.tickAsync(25000);
+    sinon.assert.calledOnce(manager.init);
+    expect(manager.dongleWatch.dongleLost).to.equal(false);
+    // Its container removed later, Zigbee2mqtt not answering: left as it is at the next check
+    manager.zigbee2mqttConnected = false;
+    manager.gladys.system.getContainers.resolves([]);
+    await clock.tickAsync(5000);
+    // Checked at 10 s, then at 30 s
+    sinon.assert.calledTwice(manager.findDongle);
+    sinon.assert.calledOnce(manager.init);
+  });
+
   it('should forget the lost dongle once Zigbee2mqtt answers', async () => {
     manager.findDongle.resolves(dongle);
     manager.zigbee2mqttConnected = true;
-    manager.watchDongle(DRIVER_PATH, undefined, true);
+    manager.watchDongle(DRIVER_PATH, { lost: true });
     await clock.tickAsync(10000);
     expect(manager.dongleWatch.dongleLost).to.equal(false);
     // Its container removed later, the dongle plugged in: left as it is
@@ -453,6 +493,43 @@ describe('zigbee2mqtt watchDongle', () => {
     await clock.tickAsync(0);
     expect(manager.dongleMissing).to.equal(false);
     sinon.assert.notCalled(manager.emitStatusEvent);
+  });
+
+  it('should not tell the dongle missing when Zigbee2mqtt answers while the ports are listed', async () => {
+    let listPorts;
+    manager.findDongle = sinon.fake(
+      () =>
+        new Promise((resolve) => {
+          listPorts = resolve;
+        }),
+    );
+    manager.watchDongle(DRIVER_PATH);
+    await clock.tickAsync(10000);
+    manager.zigbee2mqttConnected = true;
+    // Listed before Zigbee2mqtt answered
+    listPorts(null);
+    await clock.tickAsync(0);
+    expect(manager.dongleMissing).to.equal(false);
+    expect(manager.dongleWatch.dongleLost).to.equal(false);
+    sinon.assert.notCalled(manager.emitStatusEvent);
+  });
+
+  it('should not start Zigbee2mqtt when it answers while its container is looked up', async () => {
+    let listContainers;
+    manager.gladys.system.getContainers = sinon.fake(
+      () =>
+        new Promise((resolve) => {
+          listContainers = resolve;
+        }),
+    );
+    manager.findDongle.resolves(dongle);
+    manager.watchDongle(DRIVER_PATH);
+    await clock.tickAsync(10000);
+    manager.zigbee2mqttConnected = true;
+    // Looked up before Docker started it again
+    listContainers([z2mContainer('exited')]);
+    await clock.tickAsync(0);
+    sinon.assert.notCalled(manager.init);
   });
 
   it('should go on watching when a check fails', async () => {

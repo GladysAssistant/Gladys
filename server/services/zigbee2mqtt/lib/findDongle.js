@@ -49,7 +49,21 @@ async function findDongle(driverPath) {
   return { port, stablePath: await getStablePath(port, ports), ports };
 }
 
+/**
+ * @description Tell whether a serial port is recognized, from its USB fingerprint, as a dongle of the driver family of
+ * the configured model.
+ * @param {object} port - Serial port, as listed by the serialport library.
+ * @param {string} dongleName - Configured coordinator model.
+ * @returns {boolean} True when it is.
+ * @example
+ * isOfConfiguredFamily(dongle.port, 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P');
+ */
+function isOfConfiguredFamily(port, dongleName) {
+  return isSameAdapterFamily(findAdapter(port), dongleName);
+}
+
 module.exports = {
   findDongle,
   getDriverPathToStore,
+  isOfConfiguredFamily,
 };
