@@ -93,7 +93,7 @@ const KeySeveral = ({ view, actions, openOther }) => {
               key={usbPort.path}
               tile={<KeyPhoto adapter={adapter} size={44} />}
               title={adapter ? adapter.displayName : usbPort.adapter}
-              subtitle={adapter && adapter.modelCode}
+              subtitle={[adapter && adapter.modelCode, usbPort.path].filter(Boolean).join(' · ')}
               trailing={selected && <Selected />}
               chevron={false}
               aria-pressed={selected ? 'true' : 'false'}

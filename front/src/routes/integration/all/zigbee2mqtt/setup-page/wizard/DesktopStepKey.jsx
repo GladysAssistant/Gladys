@@ -49,7 +49,8 @@ const OtherChoices = ({ manualText, actions, installable }) => (
   </div>
 );
 
-const KeyCard = ({ adapter, label, selected, onClick, recognized }) => {
+// port: shown when several dongles are offered, which may be of the same model
+const KeyCard = ({ adapter, label, selected, onClick, recognized, port }) => {
   const content = (
     <span class="d-flex align-items-center w-100">
       {onClick && <span class={cx(style.radio, { [style.radioChecked]: selected })} aria-hidden="true" />}
@@ -64,6 +65,7 @@ const KeyCard = ({ adapter, label, selected, onClick, recognized }) => {
           ) : (
             <Text id={`${T}.key.usb`} />
           )}
+          {port && <span data-cy="z2m-wizard-key-port"> · {port}</span>}
         </span>
       </span>
       {recognized && (
@@ -228,6 +230,7 @@ const Detected = ({ view, actions }) => {
             label={usbPort.adapter}
             selected={selectedPort === usbPort}
             onClick={() => actions.pickPort(getPortPath(usbPort))}
+            port={usbPort.path}
           />
         ))}
         <OtherChoices manualText={`${T}.key.linkManualSeveral`} actions={actions} installable={installable} />

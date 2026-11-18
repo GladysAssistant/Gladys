@@ -2,6 +2,7 @@ import {
   readyToSetupStatus,
   machinePort,
   zbDongleE,
+  zbDongleP,
   unknownDongle,
   ZBDONGLE_E,
   phases,
@@ -96,6 +97,15 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
     cy.wait('@setup')
       .its('request.body')
       .should('include', { ZIGBEE2MQTT_DRIVER_PATH: unknownDongle.stablePath, ZIGBEE_DONGLE_NAME: ZBDONGLE_E });
+  });
+
+  it('should tell several dongles apart by their port', () => {
+    visitWizard({ ports: [[zbDongleE, zbDongleP]] });
+    cy.get('[data-cy=z2m-wizard-key-several]').should('exist');
+    cy.get('[data-cy=z2m-wizard-key-card]')
+      .should('have.length', 2)
+      .first()
+      .should('contain', zbDongleE.path);
   });
 
   it('should go back to the detected dongle from another choice', () => {

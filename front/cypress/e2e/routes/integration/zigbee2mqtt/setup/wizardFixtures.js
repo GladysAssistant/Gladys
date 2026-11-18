@@ -10,6 +10,7 @@ const readyToSetupStatus = {
   gladysConnected: false,
   zigbee2mqttConnected: false,
   z2mEnabled: false,
+  configured: false,
   dockerBased: true,
   networkModeValid: true,
   ezspFallback: false,
@@ -129,7 +130,9 @@ const visitWizard = ({
 } = {}) => {
   const serverUrl = Cypress.env('serverUrl');
   cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: status }).as('status');
-  cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: setup });
+  cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: setup }).as(
+    'loadedSetup'
+  );
   cy.intercept(
     { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/prefetch` },
     typeof prefetchResponse === 'function' ? prefetchResponse : { body: prefetchResponse }
@@ -137,6 +140,8 @@ const visitWizard = ({
   listPorts(...ports);
   cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   cy.waitForWebSocket();
+  // The page chooses the wizard from this configuration: read before a test answers another one (answerSetup)
+  cy.wait('@loadedSetup');
 };
 
 export {

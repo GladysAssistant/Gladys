@@ -316,12 +316,14 @@ class Wizard extends Component {
     try {
       // Allowed even when it already is, never toggled off
       await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/permit_join', { value: true });
-      if (!this.unmounted) {
+      // Unless Zigbee2mqtt told meanwhile that joining is allowed, or already closed again (see handlePermitJoin)
+      if (!this.unmounted && this.state.permitJoinStatus === RequestStatus.Getting) {
         this.setState({ permitJoinStatus: RequestStatus.Success });
       }
     } catch (e) {
       console.error('Failed to allow devices to join', e);
-      if (!this.unmounted) {
+      // Not when Zigbee2mqtt told meanwhile that joining is allowed: the answer only got lost
+      if (!this.unmounted && this.state.permitJoinStatus !== RequestStatus.Success) {
         this.setState({ permitJoinStatus: RequestStatus.Error });
       }
     }

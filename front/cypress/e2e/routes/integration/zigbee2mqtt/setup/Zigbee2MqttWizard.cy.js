@@ -121,6 +121,30 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
   });
 
+  it('should not take the answer of a slow request for joining over what Zigbee2mqtt told meanwhile', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    sendProgress(doneInstallation);
+    cy.intercept(
+      { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` },
+      { body: {}, delay: 1000 }
+    ).as('permitJoin');
+    cy.get('[data-cy=z2m-wizard-pair]').click();
+    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
+    // Allowed, then closed by Zigbee2mqtt before the request answers
+    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('exist');
+    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
+    cy.wait('@permitJoin');
+    // The answer handled by the page before looking
+    cy.window().then(win => new Cypress.Promise(resolve => win.setTimeout(resolve, 100)));
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
+    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
+  });
+
   it('should wait for a dongle, and show it once plugged in without reloading', () => {
     visitWizard({ ports: [[machinePort], [machinePort, zbDongleE]] });
     cy.get('[data-cy=z2m-wizard-key-none]').should('exist');
@@ -135,6 +159,10 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-key-several]').should('exist');
     cy.get('[data-cy=z2m-wizard-install]').should('be.disabled');
     cy.get('[data-cy=z2m-wizard-key-card]').should('have.length', 2);
+    // Each with its port: two dongles of the same model are told apart
+    cy.get('[data-cy=z2m-wizard-key-port]')
+      .first()
+      .should('contain', zbDongleE.path);
     cy.get('[data-cy=z2m-wizard-key-card]')
       .contains('SONOFF Zigbee 3.0 USB Dongle Plus-P')
       .click();
