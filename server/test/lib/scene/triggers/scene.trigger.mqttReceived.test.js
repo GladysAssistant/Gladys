@@ -163,4 +163,95 @@ describe('Scene.triggers.mqttReceived', () => {
       });
     });
   });
+  const addSceneWithTopic = (topic, message) =>
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.MQTT.RECEIVED,
+          topic,
+          message,
+        },
+      ],
+    });
+
+  const checkSceneExecuted = (calledCount) =>
+    new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.callCount(device.setValue, calledCount);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+
+  it('should execute scene when topic matches a single-level wildcard (+) filter', async () => {
+    await addSceneWithTopic('test/+/button');
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'test/kitchen/button',
+      message: 'pressed',
+    });
+    return checkSceneExecuted(1);
+  });
+
+  it('should execute scene when topic matches a multi-level wildcard (#) filter', async () => {
+    await addSceneWithTopic('test/#', 'ON');
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'test/kitchen/light/state',
+      message: 'ON',
+    });
+    return checkSceneExecuted(1);
+  });
+
+  it('should not execute scene when topic does not match the wildcard filter', async () => {
+    await addSceneWithTopic('test/+/button');
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'test/kitchen/light',
+      message: 'pressed',
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'test/kitchen/sub/button',
+      message: 'pressed',
+    });
+    return checkSceneExecuted(0);
+  });
+
+  it('should not execute scene when topic matches the wildcard filter but message differs', async () => {
+    await addSceneWithTopic('test/#', 'ON');
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'test/kitchen/light',
+      message: 'OFF',
+    });
+    return checkSceneExecuted(0);
+  });
+
+  it('should not execute scene when event or trigger has no topic', async () => {
+    await addSceneWithTopic(undefined);
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'test/kitchen/light',
+      message: 'ON',
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      message: 'ON',
+    });
+    return checkSceneExecuted(0);
+  });
 });

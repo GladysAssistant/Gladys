@@ -7,6 +7,7 @@ const logger = require('../../utils/logger');
 const { EVENTS, ANY_CHANGE_OPERATOR, TIME_RANGE_EVENTS } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
 const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
+const { mqttTopicMatches } = require('../../services/mqtt/lib/mqttTopicMatches');
 
 dayjs.extend(utc);
 dayjs.extend(timezonePlugin);
@@ -247,8 +248,12 @@ const triggersFunc = {
   [EVENTS.ALARM.PANIC]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.SYSTEM.START]: () => true,
+  // the trigger topic is subscribed as a filter, so it can contain "+" and "#" wildcards
   [EVENTS.MQTT.RECEIVED]: (self, sceneSelector, event, trigger) =>
-    event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
+    typeof event.topic === 'string' &&
+    typeof trigger.topic === 'string' &&
+    mqttTopicMatches(trigger.topic, event.topic) &&
+    (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
   // energy price change of a meter (spec 8.2): a trigger with a meter matches that meter; one
