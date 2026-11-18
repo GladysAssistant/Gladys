@@ -188,6 +188,27 @@ describe('zigbee2mqtt watchDongle', () => {
       sinon.assert.calledOnce(manager.init);
     });
 
+    it('should take the dongle back on its port, recognized as the configured model, after init found another adapter there', async () => {
+      // At the start of Gladys, a teleinfo adapter was on the port of the dongle
+      manager.findDongle.resolves({
+        port: {
+          path: '/dev/ttyUSB0',
+          pnpId: 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0',
+          vendorId: '10c4',
+          productId: 'ea60',
+        },
+      });
+      manager.watchDongle(
+        '/dev/ttyUSB0',
+        'usb-FTDI_FT232R_USB_UART_A1B2C3D4-if00-port0',
+        false,
+        'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
+      );
+      await clock.tickAsync(10000);
+      expect(manager.dongleMissing).to.equal(false);
+      sinon.assert.calledOnce(manager.init);
+    });
+
     it('should take the device on its port when init did not find the dongle', async () => {
       manager.findDongle.resolves({ port: { path: '/dev/ttyUSB0', pnpId: DONGLE_PNP_ID } });
       manager.watchDongle('/dev/ttyUSB0', undefined);
@@ -284,7 +305,7 @@ describe('zigbee2mqtt watchDongle', () => {
     sinon.assert.callCount(manager.init, 2);
   });
 
-  it('should watch again when the init it started fails before watching, with what it saw', async () => {
+  it('should watch again, the dongle lost, when the init it started fails before watching', async () => {
     manager.findDongle.resolves(dongle);
     manager.gladys.system.getContainers.resolves([]);
     manager.init = sinon.fake(async () => {
@@ -294,7 +315,12 @@ describe('zigbee2mqtt watchDongle', () => {
     manager.watchDongle(DRIVER_PATH, undefined, true);
     await clock.tickAsync(10000);
     sinon.assert.calledOnce(manager.init);
-    expect(manager.dongleWatch).to.deep.equal({ driverPath: DRIVER_PATH, pnpId: undefined, missingSeen: true });
+    expect(manager.dongleWatch).to.deep.equal({
+      driverPath: DRIVER_PATH,
+      pnpId: undefined,
+      dongleLost: true,
+      dongleName: undefined,
+    });
     expect(clock.countTimers()).to.equal(1);
     // Tried again, later
     await clock.tickAsync(30000);
@@ -312,10 +338,40 @@ describe('zigbee2mqtt watchDongle', () => {
     manager.watchDongle(DRIVER_PATH, undefined, true);
     await clock.tickAsync(10000);
     sinon.assert.calledOnce(manager.init);
-    expect(manager.dongleWatch.missingSeen).to.equal(true);
+    expect(manager.dongleWatch.dongleLost).to.equal(true);
     // 30 s after the end of the first start
     await clock.tickAsync(30000);
     sinon.assert.calledTwice(manager.init);
+  });
+
+  it('should try again after a short unplug, when the init it started removed the container and failed', async () => {
+    // Docker failed to start the container: the dongle was unplugged and plugged back between two checks
+    manager.findDongle.resolves(dongle);
+    manager.init = sinon.fake(async () => {
+      // As init: the dongle is found, the container is removed to be created on its new path, which fails
+      manager.watchDongle(DRIVER_PATH, undefined, false);
+      manager.gladys.system.getContainers.resolves([]);
+      throw new Error('Docker failed to create the container');
+    });
+    manager.watchDongle(DRIVER_PATH);
+    await clock.tickAsync(10000);
+    sinon.assert.calledOnce(manager.init);
+    expect(manager.dongleWatch.dongleLost).to.equal(true);
+    await clock.tickAsync(30000);
+    sinon.assert.calledTwice(manager.init);
+  });
+
+  it('should forget the lost dongle once Zigbee2mqtt answers', async () => {
+    manager.findDongle.resolves(dongle);
+    manager.zigbee2mqttConnected = true;
+    manager.watchDongle(DRIVER_PATH, undefined, true);
+    await clock.tickAsync(10000);
+    expect(manager.dongleWatch.dongleLost).to.equal(false);
+    // Its container removed later, the dongle plugged in: left as it is
+    manager.zigbee2mqttConnected = false;
+    manager.gladys.system.getContainers.resolves([]);
+    await clock.tickAsync(10000);
+    sinon.assert.notCalled(manager.init);
   });
 
   it('should keep the watch of the init it started, when that init fails after watching', async () => {

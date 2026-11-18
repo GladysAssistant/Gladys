@@ -401,8 +401,8 @@ and the container stays `exited`, even once the dongle is plugged back.
   | no                  | found      | `exited` or `dead` by hand (`State.Error` empty) | `dongleMissing` false; left stopped                         |
   | no                  | found      | of the user, carrying our name                   | `dongleMissing` false; left to init, which tells about it   |
   | no                  | found      | `exited` / `dead` with `State.Error`             | `dongleMissing` false; init, when the spacing allows        |
-  | no                  | found      | none or `created`, the dongle once missing       | `dongleMissing` false; init, when the spacing allows        |
-  | no                  | found      | none or `created`, the dongle never missing      | `dongleMissing` false; left to the installation that failed |
+  | no                  | found      | none or `created`, the dongle lost               | `dongleMissing` false; init, when the spacing allows        |
+  | no                  | found      | none or `created`, the dongle not lost           | `dongleMissing` false; left to the installation that failed |
 
 - **Failed start.** Docker fills `State.Error` when it fails to start a container ("error gathering
   device information" for a missing device) and clears it on each successful start: a container
@@ -410,18 +410,23 @@ and the container stays `exited`, even once the dongle is plugged back.
   A start of Gladys starts it all the same.
 - **Same dongle.** Found by init on a stored port (`/dev/ttyUSBx`), the dongle is remembered by its
   `pnpId`: another USB-serial adapter that takes its port once it is unplugged counts as the dongle
-  not found. Stored by its link, or not found by init, any device at the stored path counts.
-- **Once missing.** The watch remembers whether the dongle was missing, for the init that armed it, for
-  one of its checks, or for the watch that started this init (a start that failed after it watched is
-  tried again): a container missing or never started is then the init that did not start
-  Zigbee2mqtt without its dongle; otherwise it is an installation that failed for another reason (a
-  download that stalls), left as it is instead of being run again.
+  not found; a device recognized as a dongle of the configured driver family counts as the dongle
+  all the same (init may have found another adapter on that port: the dongle unplugged, or plugged
+  elsewhere, at the start of Gladys). Stored by its link, or not found by init, any device at the
+  stored path counts.
+- **Dongle lost.** The watch remembers that the dongle is lost: not found by the init that armed it
+  or by one of its checks, or a start by the watch in progress (the watch of the init it runs keeps
+  it, so that a start that failed after it watched, a container removed and not created again, is
+  tried again). Forgotten once Zigbee2mqtt answers. A container missing or never started is then the
+  init that did not start Zigbee2mqtt without its dongle, or a start that failed half-way; otherwise
+  it is an installation that failed for another reason (a download that stalls), left as it is
+  instead of being run again.
 - **Spacing.** The first start is at once, then 30 s, 1, 2 and 5 min after the end of the previous
   one, then none until the starts are forgotten (dongle not found, Zigbee2mqtt answers, disable): an
   unplugged dongle plugged back starts Zigbee2mqtt at once, even between two checks where it was
   never seen missing. "Given up" is logged once, by the check that still finds a start needed after
   the last one. An init that fails before it watched again leaves the watch armed on the same path,
-  with what it saw. This init may start an `update` (G).
+  the dongle lost. This init may start an `update` (G).
 - **`status.dongleMissing`**, also in `zigbee2mqtt.status-change`: true only when an init or the
   watch did not find the dongle, never with an external broker; the status is sent when it changes.
 

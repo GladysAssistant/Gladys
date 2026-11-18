@@ -180,7 +180,12 @@ async function initialize(setupMode) {
     // broker, Gladys runs no Zigbee2mqtt then; an older installation without broker mode runs the broker of Gladys
     if (mqttMode !== MQTT_MODE.EXTERNAL) {
       this.dongleMissing = !dongle;
-      this.watchDongle(configuration.z2mDriverPath, dongle ? dongle.port.pnpId : undefined, !dongle);
+      this.watchDongle(
+        configuration.z2mDriverPath,
+        dongle ? dongle.port.pnpId : undefined,
+        !dongle,
+        configuration.z2mDongleName,
+      );
     }
   }
 
