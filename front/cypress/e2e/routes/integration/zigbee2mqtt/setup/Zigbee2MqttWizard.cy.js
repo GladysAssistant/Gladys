@@ -403,7 +403,7 @@ describe('Zigbee2mqtt setup wizard', () => {
     answerSetup();
     install();
     cy.wait('@setup');
-    // The save handled by the page (a configuration loaded before it would be dropped as older)
+    // The save handled by the page (a fallback told before it is loaded again after it: see the next test)
     cy.get('[data-cy=z2m-wizard-install-step]').should('exist');
     // The saved model changes: the setup page loads it again
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: legacySetup }).as(
@@ -417,6 +417,33 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.wait('@setup')
       .its('request.body')
       .should('include', { ZIGBEE_DONGLE_NAME: `${ZBDONGLE_E} (legacy ezsp)` });
+  });
+
+  it('should load the configuration again when Gladys switched to ezsp before the save answered', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    const legacySetup = { ...usbSetup, ZIGBEE_DONGLE_NAME: `${ZBDONGLE_E} (legacy ezsp)` };
+    const loads = { count: 0 };
+    visitWizard();
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, req => {
+      loads.count += 1;
+      req.reply({ body: legacySetup });
+    });
+    // The server starts the installation before it answers the setup: answered once the fallback was loaded
+    cy.intercept(
+      { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` },
+      req =>
+        new Cypress.Promise(resolve => {
+          const answer = () => (loads.count >= 1 ? resolve(req.reply({ body: usbSetup })) : setTimeout(answer, 50));
+          answer();
+        })
+    ).as('setup');
+    install();
+    sendStatus({ ...readyToSetupStatus, ezspFallback: true, installation: runningInstallation });
+    cy.wait('@setup');
+    // The answer of the save is older than the fallback
+    cy.wrap(loads)
+      .its('count')
+      .should('equal', 2);
   });
 
   it('should not tell the machine incompatible while its status cannot be read', () => {

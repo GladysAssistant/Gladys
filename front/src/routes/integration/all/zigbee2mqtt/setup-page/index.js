@@ -162,8 +162,11 @@ class Zigbee2mqttSetupPage extends Component {
     try {
       const mapping = {};
       Object.keys(VARIABLE_MAP).forEach(key => (mapping[key] = nextConfiguration[VARIABLE_MAP[key]]));
+      const { configRequests } = this;
       const savedConfig = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', mapping);
-      // A load still running read the configuration before the save
+      // Changed by the server while it answered (an ezsp fallback, the end of the installation): loaded again below
+      const changedMeanwhile = configRequests !== this.configRequests;
+      // A load still running may have read the configuration before the save
       this.configRequests += 1;
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
@@ -172,6 +175,9 @@ class Zigbee2mqttSetupPage extends Component {
         z2mUrl: this.resolveZ2mUrl(configuration),
         setupZigee2mqttStatus: RequestStatus.Success
       });
+      if (changedMeanwhile && !this.unmounted) {
+        this.loadZ2MConfig();
+      }
       return true;
     } catch (e) {
       console.error(e);
