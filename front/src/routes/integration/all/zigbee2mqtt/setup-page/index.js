@@ -34,6 +34,7 @@ class Zigbee2mqttSetupPage extends Component {
 
   handleZ2MStatus = zigbee2mqttStatus => {
     this.progressMessages += 1;
+    this.statusMessages += 1;
     // Gladys switched Zigbee2mqtt to the ezsp driver by itself: the saved model changed
     if (zigbee2mqttStatus.ezspFallback && !this.state.zigbee2mqttStatus.ezspFallback) {
       this.loadZ2MConfig();
@@ -64,10 +65,15 @@ class Zigbee2mqttSetupPage extends Component {
   };
 
   loadZ2MStatus = async () => {
-    const { progressMessages } = this;
+    const { progressMessages, statusMessages } = this;
     try {
       const zigbee2mqttStatus = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/status');
       if (this.unmounted) {
+        return;
+      }
+      // A status received during the request is more recent as a whole, a missing dongle told by it included
+      if (statusMessages !== this.statusMessages) {
+        this.setState({ loadZigbee2mqttStatus: RequestStatus.Success });
         return;
       }
       // A message received during the request carried a more recent installation and prefetch
@@ -146,7 +152,8 @@ class Zigbee2mqttSetupPage extends Component {
 
   saveConfiguration = async nextConfiguration => {
     this.setState({
-      setupZigee2mqttStatus: RequestStatus.Getting
+      setupZigee2mqttStatus: RequestStatus.Getting,
+      setupZigee2mqttError: null
     });
     try {
       const mapping = {};
@@ -163,9 +170,14 @@ class Zigbee2mqttSetupPage extends Component {
       });
     } catch (e) {
       console.error(e);
+      if (this.unmounted) {
+        return;
+      }
       this.setState({
         // An installation is already running
-        setupZigee2mqttStatus: get(e, 'response.status') === 409 ? RequestStatus.ConflictError : RequestStatus.Error
+        setupZigee2mqttStatus: get(e, 'response.status') === 409 ? RequestStatus.ConflictError : RequestStatus.Error,
+        // Refused before saving anything, such as a USB dongle that is not plugged in (DONGLE_NOT_FOUND)
+        setupZigee2mqttError: get(e, 'response.status') === 400 ? get(e, 'response.data.message') : null
       });
     }
   };
@@ -227,6 +239,8 @@ class Zigbee2mqttSetupPage extends Component {
     // Websocket messages received with the installation and the prefetch, more recent than an answer to a request
     // sent before them
     this.progressMessages = 0;
+    // Statuses received by websocket, more recent than an answer to a request sent before them
+    this.statusMessages = 0;
     // Loads of the configuration sent, and saves answered: only the answer of the latest is applied
     this.configRequests = 0;
   }

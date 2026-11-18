@@ -31,6 +31,8 @@ const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
 const { getManagedAdapters } = require('./getManagedAdapters');
 const { getUsbPorts } = require('./getUsbPorts');
+const { findDongle } = require('./findDongle');
+const { watchDongle, stopWatchingDongle, resetDongleRestarts } = require('./watchDongle');
 const { readZ2mContainerLogs } = require('./readZ2mContainerLogs');
 const { reset } = require('./reset');
 const { requestHealthCheck } = require('./requestHealthCheck');
@@ -76,6 +78,13 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
+  // The configured USB dongle was not found, at the start or since (see watchDongle)
+  this.dongleMissing = false;
+  // Check of the configured USB dongle, while Zigbee2mqtt does not answer (see watchDongle)
+  this.dongleWatch = null;
+  this.dongleWatchTimer = null;
+  // Starts of Zigbee2mqtt by the watch of its dongle, spaced out (see watchDongle)
+  this.dongleRestarts = { count: 0, lastAt: null };
   this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
@@ -168,6 +177,10 @@ Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
 Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
 Zigbee2mqttManager.prototype.getUsbPorts = getUsbPorts;
+Zigbee2mqttManager.prototype.findDongle = findDongle;
+Zigbee2mqttManager.prototype.watchDongle = watchDongle;
+Zigbee2mqttManager.prototype.stopWatchingDongle = stopWatchingDongle;
+Zigbee2mqttManager.prototype.resetDongleRestarts = resetDongleRestarts;
 Zigbee2mqttManager.prototype.readZ2mContainerLogs = readZ2mContainerLogs;
 Zigbee2mqttManager.prototype.reset = reset;
 Zigbee2mqttManager.prototype.requestHealthCheck = requestHealthCheck;

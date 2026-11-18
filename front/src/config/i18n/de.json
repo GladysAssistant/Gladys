@@ -2262,6 +2262,8 @@
         "resetLabel": "Abbrechen",
         "errorLoadingStatesLabel": "Beim Laden der Informationen des Gladys-Dienstes ist ein Fehler aufgetreten. Stellen Sie sicher, dass Gladys auf dem neuesten Stand ist, andernfalls überprüfen Sie die Protokolle.",
         "saveError": "Die Konfiguration hat den Dienst nicht gestartet, bitte überprüfen Sie diese.",
+        "saveDongleNotFound": "Ihr Zigbee-Stick ist nicht eingesteckt (oder nicht am gewählten Port): Es wurde nichts gespeichert. Stecken Sie ihn ein, wählen Sie ihn in der Liste aus und speichern Sie dann die Konfiguration erneut.",
+        "dongleMissing": "Ihr Zigbee-Stick wurde nicht gefunden: Zigbee2MQTT startet von selbst neu, sobald er wieder eingesteckt ist. Wenn er bereits an einem anderen Port steckt, wählen Sie ihn in der Konfiguration erneut aus.",
         "enableLabel": "Dienst aktivieren oder deaktivieren",
         "enableDescription": "Beim nächsten Neustart von Gladys wird der Dienst wieder gestartet. Abhängig von der Leistung Ihres Computers und der Geschwindigkeit Ihres Netzwerks kann das Starten dieses Dienstes im Modus \"Installation von Gladys aus\" zwischen 2 Minuten und 1 Stunde dauern. Sie können den Dienst dauerhaft von dieser Seite deaktivieren: <a href=\"/dashboard/settings/service\">Einstellungen > Dienste</a>.",
         "toggleError": "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konfiguration des Dienstes.",

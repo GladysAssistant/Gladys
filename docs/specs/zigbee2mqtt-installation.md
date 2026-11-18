@@ -3,11 +3,12 @@
 > **Living specification — source of truth.** This document specifies how Gladys installs and updates
 > the Zigbee2mqtt and MQTT broker containers: the `installation` and `prefetch` of the status, the
 > `zigbee2mqtt.install-progress` WebSocket message, the setup and prefetch routes and their 409, the
-> installation job, the image downloads and the update at start-up. **Rule: any PR that changes one of
-> these behaviors or contracts modifies this file in the same diff.**
+> installation job, the image downloads, the update at start-up, and the USB dongle: its stable path,
+> its check on save and its watch (K). **Rule: any PR that changes one of these behaviors or contracts
+> modifies this file in the same diff.**
 >
-> Status: **implemented** (PR #3351). The setup wizard and the Zigbee2mqtt dashboard of the next PRs
-> build on sections B to F.
+> Status: **implemented** (PR #3351; USB dongle, K: PR #3395). The setup wizard and the
+> Zigbee2mqtt dashboard of the next PRs build on sections B to F and K.
 
 ## A. Context
 
@@ -43,11 +44,11 @@ of Zigbee2mqtt. It lives in memory only: `idle` after a restart of Gladys (`getI
 
 ### B.1 Kinds
 
-| Kind      | Launched by                                                             | When                                                                                                                                                      |
-| --------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `switch`  | `POST /setup`                                                           | a coordinator is stored and the setup saves another one. The coordinator is the URL in network mode, the USB port otherwise: a change of mode is a switch |
-| `install` | `POST /setup`                                                           | any other setup: first one, the same coordinator saved again after a failure, another setting changed                                                     |
-| `update`  | an init outside an installation (start of the service, `POST /connect`) | a container of ours exists whose stored version (`DOCKER_MQTT_VERSION`, `DOCKER_Z2M_VERSION`) is set and differs from `DEFAULT` (G)                       |
+| Kind      | Launched by                                                                                          | When                                                                                                                                                                                                         |
+| --------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `switch`  | `POST /setup`                                                                                        | a coordinator is stored and the setup saves another one. The coordinator is the URL in network mode, the USB dongle otherwise (its port and its link are the same dongle, K.2): a change of mode is a switch |
+| `install` | `POST /setup`                                                                                        | any other setup: first one, the same coordinator saved again after a failure, another setting changed                                                                                                        |
+| `update`  | an init outside an installation (start of the service, `POST /connect`, the watch of the dongle K.3) | a container of ours exists whose stored version (`DOCKER_MQTT_VERSION`, `DOCKER_Z2M_VERSION`) is set and differs from `DEFAULT` (G)                                                                          |
 
 Only `install` and `switch` run in a job (E.2).
 
@@ -96,15 +97,15 @@ update postponed with the old containers running). `clearInstallation()` also fo
 `error` is `{ code, message }`: a known `code` with `message: null`, or `code: null` with the raw
 message. The setup page translates the code.
 
-| `code`                                                                                         | When                                                                                                                                                                          |
-| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NO_ANSWER`                                                                                    | Zigbee2mqtt did not answer within its startup window (`zigbee2mqttStartingTimeoutInMs`, 2 min) and its logs told nothing. An ezsp fallback restarts it and opens a new window |
-| `DONGLE_NOT_FOUND`                                                                             | local broker and no usable coordinator (the configured USB port is not plugged in): nothing is started, the installation fails at once                                        |
-| `NOT_ENOUGH_DISK_SPACE`                                                                        | a missing image does not fit in the free disk space (F)                                                                                                                       |
-| `EZSP_PROTOCOL_VERSION`, `ADAPTER_UNREACHABLE`, `ADAPTER_NO_RESPONSE`, `INVALID_CONFIGURATION` | the logs of the new run of Zigbee2mqtt tell why it does not start (`readZ2mContainerLogs`, #3334); `code: null` with the last logged error otherwise                          |
-| `BAD_CREDENTIALS`, `NOT_AUTHORIZED`, `BROKER_UNREACHABLE`                                      | `MQTT_CONNECTION_ERROR`: the broker refuses Gladys; with an external broker, also out of reach, or Gladys not connected to it by the end of the window                        |
-| `SYSTEM_NOT_RUNNING_DOCKER`, `DOCKER_BAD_NETWORK`                                              | local broker, Gladys not in Docker or not on the host network (`PlatformNotCompatible`)                                                                                       |
-| `null`                                                                                         | anything else, with its message: Docker error, a container name taken by a container that is not ours, broker silent for 30 s (H), stalled download (F), failed save          |
+| `code`                                                                                         | When                                                                                                                                                                                       |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NO_ANSWER`                                                                                    | Zigbee2mqtt did not answer within its startup window (`zigbee2mqttStartingTimeoutInMs`, 2 min) and its logs told nothing. An ezsp fallback restarts it and opens a new window              |
+| `DONGLE_NOT_FOUND`                                                                             | local broker and no usable coordinator (the configured USB dongle is not plugged in): nothing is started, the installation fails at once. `POST /setup` refuses such a dongle before (K.2) |
+| `NOT_ENOUGH_DISK_SPACE`                                                                        | a missing image does not fit in the free disk space (F)                                                                                                                                    |
+| `EZSP_PROTOCOL_VERSION`, `ADAPTER_UNREACHABLE`, `ADAPTER_NO_RESPONSE`, `INVALID_CONFIGURATION` | the logs of the new run of Zigbee2mqtt tell why it does not start (`readZ2mContainerLogs`, #3334); `code: null` with the last logged error otherwise                                       |
+| `BAD_CREDENTIALS`, `NOT_AUTHORIZED`, `BROKER_UNREACHABLE`                                      | `MQTT_CONNECTION_ERROR`: the broker refuses Gladys; with an external broker, also out of reach, or Gladys not connected to it by the end of the window                                     |
+| `SYSTEM_NOT_RUNNING_DOCKER`, `DOCKER_BAD_NETWORK`                                              | local broker, Gladys not in Docker or not on the host network (`PlatformNotCompatible`)                                                                                                    |
+| `null`                                                                                         | anything else, with its message: Docker error, a container name taken by a container that is not ours, broker silent for 30 s (H), stalled download (F), failed save                       |
 
 `INSTALLATION_ERROR` holds the first three, the codes without a source of their own.
 
@@ -160,16 +161,16 @@ Under `/api/v1/service/zigbee2mqtt/`. A refusal answers 409 with the generic bod
 `cannot <action> while an installation is running`, or
 `cannot <action> while the integration is busy`.
 
-| Route              | Access        | Behavior                                                                                                                                                                                                                                   |
-| ------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `POST /setup`      | admin         | validates (400), 409 when busy, starts the installation (`install` or `switch`), saves the variables, launches the job without waiting and answers the saved setup (as `GET /setup`). A failed save fails the installation and the request |
-| `POST /prefetch`   | admin         | starts the prefetch (C) and answers it once the disk space is checked. Never refused: a running or done prefetch is answered as is, and the downloads are shared with an installation                                                      |
-| `POST /connect`    | authenticated | 409 when busy, then runs init inside the request (K); may start an `update` (G)                                                                                                                                                            |
-| `POST /disconnect` | authenticated | 409 when busy, then disables the integration                                                                                                                                                                                               |
-| `POST /reset`      | admin         | 409 when busy, then resets the integration                                                                                                                                                                                                 |
-| `POST /mqtt/start` | authenticated | 409 when busy; 400 when the MQTT accounts were never generated (no setup saved)                                                                                                                                                            |
-| `POST /z2m/start`  | authenticated | 409 when busy; 400 when no coordinator of the adapter mode is configured                                                                                                                                                                   |
-| `GET /status`      | authenticated | carries `installation` and `prefetch`                                                                                                                                                                                                      |
+| Route              | Access        | Behavior                                                                                                                                                                                                                                                                                                                                            |
+| ------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /setup`      | admin         | validates (400), 409 when busy, 400 `DONGLE_NOT_FOUND` when its USB dongle is not plugged in (K.2), starts the installation (`install` or `switch`), saves the variables (the dongle by its stable path, K.1), launches the job without waiting and answers the saved setup (as `GET /setup`). A failed save fails the installation and the request |
+| `POST /prefetch`   | admin         | starts the prefetch (C) and answers it once the disk space is checked. Never refused: a running or done prefetch is answered as is, and the downloads are shared with an installation                                                                                                                                                               |
+| `POST /connect`    | authenticated | 409 when busy, then runs init inside the request (L); may start an `update` (G)                                                                                                                                                                                                                                                                     |
+| `POST /disconnect` | authenticated | 409 when busy, then disables the integration                                                                                                                                                                                                                                                                                                        |
+| `POST /reset`      | admin         | 409 when busy, then resets the integration                                                                                                                                                                                                                                                                                                          |
+| `POST /mqtt/start` | authenticated | 409 when busy; 400 when the MQTT accounts were never generated (no setup saved)                                                                                                                                                                                                                                                                     |
+| `POST /z2m/start`  | authenticated | 409 when busy; 400 when no coordinator of the adapter mode is configured                                                                                                                                                                                                                                                                            |
+| `GET /status`      | authenticated | carries `installation` and `prefetch`                                                                                                                                                                                                                                                                                                               |
 
 ### E.2 Job
 
@@ -246,8 +247,9 @@ An init with a usable coordinator (which forces the local broker) runs, in order
 
 A container recreated for another reason, a new coordinator or a changed adapter type, gets its
 image before the old container is stopped and removed: a missing image fails the installation with
-the old container still in place. On a changed adapter type, whose configuration is already written,
-the container in place is restarted first, so that it runs the new adapter on its image.
+the old container still in place. The same USB dongle under a new path is not a new coordinator: its
+container is kept without the image (K.1). On a changed adapter type, whose configuration is already
+written, the container in place is restarted first, so that it runs the new adapter on its image.
 
 ## H. MQTT broker
 
@@ -323,12 +325,130 @@ next PR replaces it):
   (`dockerBased`, `networkModeValid`) and no installation runs. The external broker mode never
   prefetches. `PrefetchStatus.jsx` shows its progress, its end or the disk space warning next to the
   save button, until something is configured or an installation starts.
+- **USB ports.** While the local form is shown in USB mode, `GET /usb/port` is asked again every 3 s,
+  30 s after a failure (only the answer of the last request is kept, none once the form is gone; an
+  unchanged list changes nothing; skipped while a list asked by hand loads, while the page is hidden
+  or while the form is disabled): a dongle plugged in shows up without a click, and the only recognized one is
+  chosen when no dongle is. A port is offered by its `stablePath` (K.1); the stored dongle, by its
+  port or its link, is selected, and choosing it again keeps its model. The 400 `DONGLE_NOT_FOUND`
+  of a save tells that the dongle is not plugged in and that nothing was saved. `dongleMissing`
+  (K.3) shows that the dongle cannot be found, that Zigbee2mqtt starts again once it is plugged
+  back, and to choose it again when it is already plugged into another port.
 
-## K. Out of scope / follow-ups
+## K. USB dongle
+
+USB mode only; a network coordinator is neither checked nor watched (findings C5, C6, X7, X10 of the
+audit).
+
+### K.1 Stable path
+
+- `GET /usb/port` gives each serial port its `stablePath`: its `/dev/serial/by-id/<pnpId>` link when
+  the link is on the disk of Gladys and no other port carries the same `pnpId` (identical adapters
+  without serial number share one name, and udev points its single link at one of them), its `path`
+  otherwise (serial port of the machine, GPIO or HAT dongle, `/dev` not shared). `path` is unchanged.
+- Docker resolves a `PathOnHost` link each time it starts the container: a dongle that moves to
+  another port (another USB-serial adapter plugged in, a restart) is found again. `PathInContainer`
+  and the `serial.port` of `configuration.yaml` stay `/dev/ttyACM0`.
+- The stored dongle is found among the ports listed (`findConfiguredPort`): the port at its path,
+  the port whose `pnpId` is the name of its link, or else the only port with the same serial number
+  (8 characters or more) and the same interface (`-ifNN[-portN]`): a link renamed. When several
+  ports carry the name of the link (an identical adapter plugged in after the link was stored), the
+  port the link leads to, which Docker uses; none when the link cannot be read.
+- **Migration, at each init.** A dongle stored by its port moves to its link when its USB fingerprint
+  is the only dongle plugged in of the configured driver family (ember and ezsp count as one); a
+  dongle found by its serial number moves to its new link. The variable is saved and the container
+  created again on the new path, data kept (about 16 s of downtime, once). Left on its port: a dongle
+  not recognized, of another family, or next to a second dongle of the same family (another
+  USB-serial adapter, or that dongle, may have taken its number at this start).
+- The same dongle under a new path is not a new coordinator (G): without the image to create the
+  container again (an update postponed), the container in place keeps running when both paths lead
+  to the same device, its restart policy set to `always` as for any container kept (K.3 relies on
+  it), and a later init creates it again.
+- Going back to a version without this section: it does not know the link, sees the dongle as
+  detached and does not connect to the broker (Zigbee2mqtt keeps running); saving the dongle again
+  on its setup page fixes it.
+
+### K.2 Check on save
+
+`POST /setup` in USB mode with the local broker: the dongle given by the setup, or the stored one
+when the setup gives none, must be plugged in (with none at all, which the setup page never sends,
+the same), else
+`400 { status: 400, code: 'BAD_REQUEST', message: 'DONGLE_NOT_FOUND' }`: nothing is saved nor
+started, a configuration that works stays in place. Checked after a first 409 check and before the
+second one (I). A dongle chosen by its port is saved by its `stablePath`; the stored dongle saved
+again under its link is not a `switch` (B.1). Without the `usb` service (its native module failed
+to load): 400 `SERVICE_NOT_CONFIGURED`. The stored path sent back as is follows the rule of the
+migration (K.1): a port that another USB-serial adapter may have taken at this start, or a link
+already stored, is kept; the ports are listed once. The `DONGLE_NOT_FOUND` of the installation (B.4) is left to
+an init.
+
+### K.3 Watch
+
+Zigbee2mqtt stops when its dongle is unplugged. Docker starts a crashed container again by itself
+(restart policy `always`), but not when the start itself fails: the device of the dongle is missing,
+and the container stays `exited`, even once the dongle is plugged back.
+
+- **Lifecycle.** Armed by each init once it checked the dongle (USB mode, broker not external),
+  found or not; replaced by the next init; stopped, its timer cleared, by disconnect and reset.
+- **State.** `dongleMissing` (the status); `dongleLost`, held by the watch: the dongle was found
+  missing, or the watch was armed by a start of the watch, and Zigbee2mqtt has not answered since; the starts made by
+  the watch (count, end of the last one).
+- **Events.** A check runs every 10 s. Each line is one transition, tested in
+  `watchDongle.test.js` / `init.test.js`; "—" leaves the value as it is.
+
+  | Event                                                                   | `dongleMissing` | `dongleLost`                       | Starts    | Zigbee2mqtt                             |
+  | ----------------------------------------------------------------------- | --------------- | ---------------------------------- | --------- | --------------------------------------- |
+  | Init, dongle found                                                      | false           | false; true when the watch runs it | —         | started by init                         |
+  | Init, dongle not found                                                  | true            | true                               | forgotten | not started                             |
+  | Check, Zigbee2mqtt answers (ports not listed)                           | false           | false                              | forgotten | —                                       |
+  | Check, an installation or an operation runs (I)                         | —               | —                                  | —         | left to it                              |
+  | Check, dongle not found, or not the same dongle                         | true            | true                               | forgotten | —                                       |
+  | Check, found; container `running`, `restarting`, ...                    | false           | —                                  | —         | left to Docker and the health check     |
+  | Check, found; container `exited` / `dead` by hand (`State.Error` empty) | false           | —                                  | —         | left stopped                            |
+  | Check, found; container of the user carrying our name                   | false           | —                                  | —         | left to init, which tells about it      |
+  | Check, found; container `exited` / `dead` with `State.Error`            | false           | —                                  | +1        | init, when the spacing allows           |
+  | Check, found; container none or `created`, the dongle lost              | false           | —                                  | +1        | init, when the spacing allows           |
+  | Check, found; container none or `created`, the dongle not lost          | false           | —                                  | —         | left to the installation that failed    |
+  | Check, what it read outdated once read                                  | —               | —                                  | —         | —                                       |
+  | Start by the watch fails before init watched again                      | —               | true                               | —         | watch armed again, same path and dongle |
+  | Start by the watch fails after init watched again                       | —               | true (the watch of that init)      | —         | tried again, when the spacing allows    |
+
+- **Outdated read.** What a check reads (the ports, then the container) is dropped when, once read,
+  the watch was replaced or stopped, an installation or an operation started, or Zigbee2mqtt
+  answered: no missing dongle told from ports listed before Zigbee2mqtt answered, no start of a
+  Zigbee2mqtt that answers.
+- **Failed start.** Docker fills `State.Error` when it fails to start a container ("error gathering
+  device information" for a missing device) and clears it on each successful start: a container
+  stopped by hand, the dongle flashed from the host for instance, stays stopped, as Docker leaves it.
+  A start of Gladys starts it all the same.
+- **Same dongle.** Stored by its link, or not found by init, any device at the stored path is the
+  dongle. On a stored port (`/dev/ttyUSBx`), which another USB-serial adapter takes once the dongle is
+  unplugged: the device with the `pnpId` init found there; when init did not recognize that device as
+  a dongle of the configured driver family (another adapter held the port at the start of Gladys), a
+  device recognized as such is the dongle too. A second dongle of the same family that takes the port
+  of a dongle init recognized is not.
+- **Dongle lost.** A container missing or never started, the dongle lost, is the init that did not
+  start Zigbee2mqtt without its dongle, or a start by the watch that failed half-way (a container
+  removed and not created again); the dongle not lost, an installation that failed for another reason
+  (a download that stalls), left as it is instead of being run again. Each init run by the watch
+  arms its own watch with the dongle lost, or the watch is armed again lost when that init fails
+  before watching; nothing sets it on a watch already armed, so a Zigbee2mqtt that answered meanwhile
+  is not taken for lost.
+- **Spacing.** The first start is at once, then 30 s, 1, 2 and 5 min after the end of the previous
+  one, then none until the starts are forgotten (dongle not found by a check or by init, Zigbee2mqtt
+  answers, disable): an unplugged dongle plugged back starts Zigbee2mqtt at once, even between two
+  checks where it was never seen missing. "Given up" is logged once, by the check that still finds a
+  start needed after the last one. An init run by the watch may start an `update` (G).
+- **`status.dongleMissing`**, also in `zigbee2mqtt.status-change`: true only when an init or the
+  watch did not find the dongle, never with an external broker; the status is sent when it changes.
+
+## L. Out of scope / follow-ups
 
 - **Update waiting.** A postponed update ends `failed`, cleared once Zigbee2mqtt answers: no visible
   "update waiting" status yet (dashboard PR).
 - **`POST /connect`** (enable switch) still runs init inside the request.
 - **Gladys connects to the broker only once the containers are in place**: during the download of an
   update, the Zigbee network runs but Gladys does not receive its messages yet.
-- The setup wizard, the dashboard, the stable path of the dongle and its hot plug: next PRs.
+- **A stop of Zigbee2mqtt that keeps the integration enabled** (dashboard PR): a clean stop, which the
+  watch of the dongle leaves stopped (K.3); a stop remembered across a start of Gladys is to design.
+- The setup wizard and the dashboard: next PRs.

@@ -2018,6 +2018,8 @@
         "resetLabel": "Cancelar",
         "errorLoadingStatesLabel": "Se produjo un error al cargar la información del servicio de Gladys. Asegúrese de que Gladys esté actualizado; en caso contrario, revise los registros.",
         "saveError": "La configuración no permitió iniciar el servicio; verifíquela.",
+        "saveDongleNotFound": "Su adaptador Zigbee no está conectado (o no en el puerto elegido): no se ha guardado nada. Conéctelo, elíjalo en la lista y después guarde de nuevo la configuración.",
+        "dongleMissing": "No se encuentra su adaptador Zigbee: Zigbee2MQTT se iniciará de nuevo por sí solo en cuanto se vuelva a conectar. Si ya está conectado a otro puerto, elíjalo de nuevo en la configuración.",
         "enableLabel": "Activar o desactivar el servicio",
         "enableDescription": "En el próximo reinicio de Gladys, el servicio se volverá a iniciar. Según la potencia de su máquina y la velocidad de su red, iniciar este servicio en modo \"Instalación desde Gladys\" puede tardar entre 2 minutos y 1 hora. Es posible desactivar el servicio de forma permanente desde esta página: <a href=\"/dashboard/settings/service\">Configuración > Servicios</a>.",
         "toggleError": "Se produjo un error. Compruebe la configuración del servicio.",

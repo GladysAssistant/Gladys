@@ -1,6 +1,17 @@
 const logger = require('../../../utils/logger');
-const { CONFIGURATION, SETUP_VARIABLES, ADAPTER_MODE, INSTALLATION_KIND, INSTALLATION_STATE } = require('./constants');
+const { BadParameters } = require('../../../utils/coreErrors');
+const {
+  CONFIGURATION,
+  SETUP_VARIABLES,
+  ADAPTER_MODE,
+  MQTT_MODE,
+  INSTALLATION_KIND,
+  INSTALLATION_STATE,
+  INSTALLATION_ERROR,
+} = require('./constants');
 const { validateSetup } = require('../utils/validateSetup');
+const { findConfiguredPort } = require('../utils/donglePorts');
+const { getDriverPathToStore } = require('./findDongle');
 
 /**
  * @description Get the coordinator a configuration points Zigbee2mqtt to: the URL of a network coordinator, or the port
@@ -19,7 +30,8 @@ function getCoordinator(adapterMode, driverPath, networkAdapterUrl) {
 
 /**
  * @description Setup Zigbee2mqtt properties, then install Zigbee2mqtt in the background: the setup page follows the
- * installation through its progress, its failure is reported there and in its job.
+ * installation through its progress, its failure is reported there and in its job. Refused (400 DONGLE_NOT_FOUND)
+ * when the USB dongle is not plugged in.
  * @param {object} config - Configuration about Zigbee2Mqtt service.
  * @example
  * await this.setup({ ZIGBEE2MQTT_DRIVER_PATH: '/dev/tty0', ZIGBEE_DONGLE_NAME: 'zzh' });
@@ -28,12 +40,53 @@ async function setup(config) {
   logger.debug('Zigbee2mqtt: storing setp...', config);
   const validatedConfig = validateSetup(config);
 
-  const { z2mAdapterMode, z2mDriverPath, z2mNetworkAdapterUrl } = await this.getConfiguration();
+  // At once, before looking for the dongle: checked again below, with no wait before the installation starts
+  this.refuseWhileInstalling('save the setup');
+  const {
+    z2mAdapterMode,
+    z2mDriverPath,
+    z2mDongleName,
+    z2mNetworkAdapterUrl,
+    mqttMode,
+  } = await this.getConfiguration();
   // As saved below: a variable missing from the setup keeps its stored value
   const getSavedValue = (key, storedValue) => (validatedConfig[key] !== undefined ? validatedConfig[key] : storedValue);
-  const storedCoordinator = getCoordinator(z2mAdapterMode, z2mDriverPath, z2mNetworkAdapterUrl);
+  const savedAdapterMode = getSavedValue(CONFIGURATION.Z2M_ADAPTER_MODE, z2mAdapterMode);
+  const savedDriverPath = getSavedValue(CONFIGURATION.Z2M_DRIVER_PATH, z2mDriverPath);
+  // The USB dongle given by the setup, or kept from the stored one, must be plugged in: saved, a dongle that is not
+  // there would replace a configuration that works, for an installation that fails at once. So would no dongle at all,
+  // which the setup page never sends.
+  let storedDriverPath = z2mDriverPath;
+  if (
+    savedAdapterMode !== ADAPTER_MODE.NETWORK &&
+    getSavedValue(CONFIGURATION.Z2M_MQTT_MODE, mqttMode) !== MQTT_MODE.EXTERNAL
+  ) {
+    const dongle = savedDriverPath ? await this.findDongle(savedDriverPath) : null;
+    if (!dongle) {
+      throw new BadParameters(INSTALLATION_ERROR.DONGLE_NOT_FOUND);
+    }
+    if (validatedConfig[CONFIGURATION.Z2M_DRIVER_PATH] !== undefined) {
+      // Chosen in the form by its port, the dongle is stored by its /dev/serial/by-id/ link, which Docker follows when
+      // the dongle moves to another port. The stored path sent back as is changes only where init would change it: a
+      // port that another USB-serial adapter may have taken at this start, or a link kept, stay as they are.
+      const pathToStore =
+        savedDriverPath === z2mDriverPath
+          ? getDriverPathToStore(dongle, z2mDriverPath, getSavedValue(CONFIGURATION.ZIGBEE_DONGLE_NAME, z2mDongleName))
+          : dongle.stablePath;
+      validatedConfig[CONFIGURATION.Z2M_DRIVER_PATH] = pathToStore;
+      // The stored dongle is the same one under another path (its port, before its link): not a switch. Looked up in
+      // the ports listed for the dongle, the same snapshot.
+      if (z2mDriverPath && z2mDriverPath !== pathToStore) {
+        const storedPort = await findConfiguredPort(dongle.ports, z2mDriverPath);
+        if (storedPort && storedPort.path === dongle.port.path) {
+          storedDriverPath = pathToStore;
+        }
+      }
+    }
+  }
+  const storedCoordinator = getCoordinator(z2mAdapterMode, storedDriverPath, z2mNetworkAdapterUrl);
   const savedCoordinator = getCoordinator(
-    getSavedValue(CONFIGURATION.Z2M_ADAPTER_MODE, z2mAdapterMode),
+    savedAdapterMode,
     getSavedValue(CONFIGURATION.Z2M_DRIVER_PATH, z2mDriverPath),
     getSavedValue(CONFIGURATION.Z2M_NETWORK_ADAPTER_URL, z2mNetworkAdapterUrl),
   );
