@@ -114,4 +114,10 @@ describe('zigbee2mqtt status', () => {
     // ASSERT
     expect(result.z2mEnabled).that.equal(false);
   });
+
+  it('should not know whether Zigbee2mqtt is configured before init reads the configuration', async () => {
+    const manager = new Zigbee2MqttManager(gladys, mqtt, serviceId);
+    const result = await manager.status();
+    expect(result.configured).that.equal(null);
+  });
 });

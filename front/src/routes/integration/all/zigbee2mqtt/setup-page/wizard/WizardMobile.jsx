@@ -290,6 +290,7 @@ const Install = ({ view }) => {
   const starting = installView === INSTALL_VIEW.STARTING;
   const installation = starting ? null : zigbee2mqttStatus.installation;
   const failed = installView === INSTALL_VIEW.FAILED;
+  const waiting = installView === INSTALL_VIEW.WAITING;
   const ezspFallback = Boolean(zigbee2mqttStatus.ezspFallback);
   const phases = getPhases(installation, { configuration: savedConfiguration, external, ezspFallback });
   const current = getCurrentPhase(phases);
@@ -313,6 +314,11 @@ const Install = ({ view }) => {
             <Text id={`${T}.progress.leavePage`} />
           </span>
         </div>
+      )}
+      {waiting && (
+        <MobileNotice role="status" data-cy="z2m-wizard-waiting-zigbee2mqtt">
+          <MarkupText id={`${T}.progress.waitingZigbee2mqtt`} />
+        </MobileNotice>
       )}
       {ezspFallback && !failed && !external && (
         <MobileNotice data-cy="z2m-wizard-ezsp-note">
@@ -536,6 +542,13 @@ class WizardMobile extends Component {
             <Text id={external ? `${T}.failure.changeConnection` : `${T}.failure.changeKey`} />
           </BigButton>
         </div>
+      );
+    }
+    if (step === STEP.INSTALL && installView === INSTALL_VIEW.WAITING) {
+      return (
+        <BigButton onClick={actions.changeKey} data-cy="z2m-wizard-change-key">
+          <Text id={`${T}.failure.changeConnection`} />
+        </BigButton>
       );
     }
     if (step === STEP.INSTALL && installView === INSTALL_VIEW.READY) {

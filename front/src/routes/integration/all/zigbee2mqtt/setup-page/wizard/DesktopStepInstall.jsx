@@ -48,6 +48,7 @@ const DesktopStepInstall = ({ view, actions }) => {
   const starting = installView === INSTALL_VIEW.STARTING;
   const installation = starting ? null : zigbee2mqttStatus.installation;
   const failed = installView === INSTALL_VIEW.FAILED;
+  const waiting = installView === INSTALL_VIEW.WAITING;
   const ezspFallback = Boolean(zigbee2mqttStatus.ezspFallback);
   const phases = getPhases(installation, { configuration: savedConfiguration, external, ezspFallback });
   const progress = installation ? installation.progress : 0;
@@ -86,6 +87,23 @@ const DesktopStepInstall = ({ view, actions }) => {
       {ezspFallback && !failed && !external && (
         <div class="alert alert-info" data-cy="z2m-wizard-ezsp-note">
           <MarkupText id={`${T}.progress.ezspNote`} />
+        </div>
+      )}
+      {waiting && (
+        <div>
+          <div class="alert alert-info" role="status" data-cy="z2m-wizard-waiting-zigbee2mqtt">
+            <MarkupText id={`${T}.progress.waitingZigbee2mqtt`} />
+          </div>
+          <div class={style.buttons}>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              onClick={actions.changeKey}
+              data-cy="z2m-wizard-change-key"
+            >
+              <Text id={`${T}.failure.changeConnection`} />
+            </button>
+          </div>
         </div>
       )}
       {failed && (

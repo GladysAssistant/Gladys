@@ -228,8 +228,10 @@ class Zigbee2mqttSetupPage extends Component {
         resetZigbee2mqttStatus: RequestStatus.Success,
         configuration: {},
         z2mUrl: null,
-        // Nothing is configured any more: the wizard installs again
-        wizard: true
+        // Nothing is configured any more: the wizard installs again, without the refusal of a setup made before
+        wizard: true,
+        setupZigee2mqttStatus: null,
+        setupZigee2mqttError: null
       });
       await this.loadZ2MStatus();
       await this.loadZ2MConfig();
@@ -298,7 +300,9 @@ class Zigbee2mqttSetupPage extends Component {
         {state.wizard ? (
           <Wizard
             httpClient={props.httpClient}
+            session={props.session}
             zigbee2mqttStatus={state.zigbee2mqttStatus}
+            loadZigbee2mqttStatus={state.loadZigbee2mqttStatus}
             configuration={state.configuration}
             setupZigee2mqttStatus={state.setupZigee2mqttStatus}
             setupZigee2mqttError={state.setupZigee2mqttError}

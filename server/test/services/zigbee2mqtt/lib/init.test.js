@@ -183,6 +183,15 @@ describe('zigbee2mqtt init', () => {
     expect(zigbee2mqttManager.configured).to.equal(false);
   });
 
+  it('should forget the version and the devices told by the previous Zigbee2mqtt', async () => {
+    zigbee2mqttManager.z2mVersion = '2.1.0';
+    zigbee2mqttManager.deviceCount = 12;
+    zigbee2mqttManager.getConfiguration.resolves({ mqttPassword: 'mqttPassword' });
+    await zigbee2mqttManager.init();
+    expect(zigbee2mqttManager.z2mVersion).to.equal(null);
+    expect(zigbee2mqttManager.deviceCount).to.equal(null);
+  });
+
   it('should not install containers, usb port not found', async () => {
     // PREPARE
     const config = { z2mDriverPath: 'unknown/path', mqttPassword: 'mqttPassword' };

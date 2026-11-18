@@ -1,10 +1,12 @@
 import { Component } from 'preact';
+import { Text } from 'preact-i18n';
 import get from 'get-value';
 
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
 import { RequestStatus } from '../../../../../../utils/consts';
 import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
 import { MQTT_MODE, ADAPTER_MODE } from '../constants';
-import { dedupePorts, findAdapter, getPortPath, isLegacyEzsp, isPluggedPort } from './adapters';
+import { LEGACY_EZSP_SUFFIX, dedupePorts, findAdapter, getPortPath, isLegacyEzsp, isPluggedPort } from './adapters';
 import { STEP, PANE, KEY_SCENARIO, INSTALL_VIEW } from './constants';
 import WizardDesktop from './WizardDesktop';
 import WizardMobile from './WizardMobile';
@@ -13,6 +15,35 @@ import WizardMobile from './WizardMobile';
 const USB_PORTS_REFRESH_INTERVAL_IN_MS = 3000;
 
 const trimmed = value => (value || '').trim();
+
+// Where the installation started by the wizard is
+const computeInstallView = ({ zigbee2mqttStatus }, { installReady, previousInstallation, installedConfiguration }) => {
+  // Kept once reached: Zigbee2mqtt restarting later does not take the wizard back to a failure
+  if (installReady) {
+    return INSTALL_VIEW.READY;
+  }
+  const { installation } = zigbee2mqttStatus;
+  // Until a new installation replaces it, the one of the status is the previous one (failed, before a retry, or the
+  // idle one of a first installation); forgotten as soon as the status shows another one (getDerivedStateFromProps)
+  if (JSON.stringify(installation || null) === previousInstallation) {
+    return INSTALL_VIEW.STARTING;
+  }
+  const state = get(installation, 'state');
+  if (state === 'running') {
+    return INSTALL_VIEW.RUNNING;
+  }
+  // Zigbee2mqtt answers: also once a failure is cleared (restarted by Docker, slower than the window)
+  if (zigbee2mqttStatus.zigbee2mqttConnected) {
+    return INSTALL_VIEW.READY;
+  }
+  if (state === 'done') {
+    // With an external broker, done once Gladys is connected to it: ready once Zigbee2mqtt answers on it
+    const external = get(installedConfiguration, 'mqttMode') === MQTT_MODE.EXTERNAL;
+    return external ? INSTALL_VIEW.WAITING : INSTALL_VIEW.READY;
+  }
+  // Failed, or cleared by a stop or a reset made elsewhere
+  return INSTALL_VIEW.FAILED;
+};
 
 /**
  * @description First installation of Zigbee2mqtt (docs/specs/zigbee2mqtt-installation.md, M): ① the dongle,
@@ -107,8 +138,12 @@ class Wizard extends Component {
       : null;
   };
 
+  // Unknown (null) until the status is read: the machine is not told incompatible meanwhile
   isInstallable = () => {
     const { dockerBased, networkModeValid } = this.props.zigbee2mqttStatus;
+    if (dockerBased === undefined) {
+      return null;
+    }
     return Boolean(dockerBased && networkModeValid);
   };
 
@@ -119,6 +154,13 @@ class Wizard extends Component {
       const usbPorts = dedupePorts(await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/usb/port'));
       // Answered after a more recent request, or after the wizard is gone
       if (this.unmounted || usbPortsRequest !== this.usbPortsRequests) {
+        return;
+      }
+      // The same list: nothing changes, an open list of ports keeps its highlighted option
+      if (
+        this.state.loadUsbPortsStatus === RequestStatus.Success &&
+        JSON.stringify(usbPorts) === JSON.stringify(this.state.usbPorts)
+      ) {
         return;
       }
       const plugged = usbPorts.some(isPluggedPort);
@@ -201,7 +243,11 @@ class Wizard extends Component {
   startInstallation = async configuration => {
     const { installation } = this.props.zigbee2mqttStatus;
     // Until a new installation shows up, the one in the status is the previous one (failed, before a retry)
-    this.setState({ previousInstallation: JSON.stringify(installation || null), saveErrorClosed: false });
+    this.setState({
+      previousInstallation: JSON.stringify(installation || null),
+      installReady: false,
+      saveErrorClosed: false
+    });
     const saved = await this.props.saveConfiguration(configuration);
     if (this.unmounted) {
       return;
@@ -214,11 +260,31 @@ class Wizard extends Component {
     if (!configuration) {
       return;
     }
-    this.installedConfiguration = configuration;
+    this.setState({ installedConfiguration: configuration });
     await this.startInstallation(configuration);
   };
 
-  retry = () => this.startInstallation(this.installedConfiguration);
+  // The same configuration, with the ezsp driver when Gladys switched to it by itself (the saved configuration): the
+  // retry does not go through the ember failure again
+  retry = () => {
+    const installed = this.state.installedConfiguration;
+    const saved = this.props.configuration || {};
+    const configuration = { ...installed };
+    if (
+      installed.z2mAdapterMode === ADAPTER_MODE.USB &&
+      saved.z2mDongleName === `${installed.z2mDongleName}${LEGACY_EZSP_SUFFIX}`
+    ) {
+      configuration.z2mDongleName = saved.z2mDongleName;
+    }
+    if (
+      installed.z2mAdapterMode === ADAPTER_MODE.NETWORK &&
+      installed.z2mNetworkAdapterType === 'ember' &&
+      saved.z2mNetworkAdapterType === 'ezsp'
+    ) {
+      configuration.z2mNetworkAdapterType = saved.z2mNetworkAdapterType;
+    }
+    return this.startInstallation(configuration);
+  };
 
   // Back to the dongle, with what was chosen: a recognized dongle that does not answer is often the wrong model
   changeKey = () => {
@@ -233,6 +299,16 @@ class Wizard extends Component {
   closeSaveError = () => this.setState({ saveErrorClosed: true });
 
   closePermitJoinError = () => this.setState({ permitJoinStatus: null });
+
+  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page)
+  handlePermitJoin = allowed => {
+    const { permitJoinStatus } = this.state;
+    if (allowed && permitJoinStatus !== RequestStatus.Success) {
+      this.setState({ permitJoinStatus: RequestStatus.Success });
+    } else if (!allowed && permitJoinStatus === RequestStatus.Success) {
+      this.setState({ permitJoinStatus: null });
+    }
+  };
 
   allowJoining = async () => {
     this.setState({ permitJoinStatus: RequestStatus.Getting });
@@ -250,31 +326,7 @@ class Wizard extends Component {
     }
   };
 
-  // Where the installation started by the wizard is
-  getInstallView = () => {
-    const { zigbee2mqttStatus } = this.props;
-    const { installation } = zigbee2mqttStatus;
-    // Until a new installation replaces it, the one of the status is the previous one (failed, before a retry). An
-    // ended installation never comes back the same: its duration differs.
-    if (JSON.stringify(installation || null) === this.state.previousInstallation) {
-      return INSTALL_VIEW.STARTING;
-    }
-    const state = get(installation, 'state');
-    if (state === 'running') {
-      return INSTALL_VIEW.RUNNING;
-    }
-    if (state === 'done') {
-      return INSTALL_VIEW.READY;
-    }
-    const external = get(this.installedConfiguration, 'mqttMode') === MQTT_MODE.EXTERNAL;
-    // A failure is cleared once Zigbee2mqtt answers (restarted by Docker, slower than the window)
-    const answered = external ? zigbee2mqttStatus.gladysConnected : zigbee2mqttStatus.zigbee2mqttConnected;
-    if (answered) {
-      return INSTALL_VIEW.READY;
-    }
-    // Failed, or cleared by a stop or a reset made elsewhere
-    return INSTALL_VIEW.FAILED;
-  };
+  getInstallView = () => computeInstallView(this.props, this.state);
 
   constructor(props) {
     super(props);
@@ -296,8 +348,12 @@ class Wizard extends Component {
       mqttUsername: '',
       mqttPassword: '',
       z2mFrontendUrl: '',
+      // What "Install" saved, tried again by "Retry"
+      installedConfiguration: null,
       // The installation of the status when "Install" was clicked, until a new one replaces it
       previousInstallation: undefined,
+      // The network was shown ready
+      installReady: false,
       permitJoinStatus: null,
       // The refusal of the setup, closed from the bottom bar of the phone layout
       saveErrorClosed: false
@@ -305,10 +361,24 @@ class Wizard extends Component {
     // Numbers the requests of the USB ports, to keep only the answer of the last one
     this.usbPortsRequests = 0;
     this.usbPortsTimer = null;
-    this.installedConfiguration = null;
+  }
+
+  // The previous installation forgotten once the status shows another one, the network ready kept once reached
+  static getDerivedStateFromProps(props, state) {
+    const installation = JSON.stringify(get(props, 'zigbee2mqttStatus.installation') || null);
+    const previousInstallation = installation === state.previousInstallation ? state.previousInstallation : undefined;
+    const installReady =
+      state.installReady ||
+      (state.step === STEP.INSTALL &&
+        computeInstallView(props, { ...state, previousInstallation }) === INSTALL_VIEW.READY);
+    if (previousInstallation === state.previousInstallation && installReady === state.installReady) {
+      return null;
+    }
+    return { previousInstallation, installReady };
   }
 
   async componentDidMount() {
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN, this.handlePermitJoin);
     await Promise.all([this.loadUsbPorts(), this.loadAdapters()]);
     if (!this.unmounted) {
       this.scheduleUsbPortsRefresh();
@@ -327,12 +397,29 @@ class Wizard extends Component {
   }
 
   componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      this.handlePermitJoin
+    );
     this.unmounted = true;
     clearTimeout(this.usbPortsTimer);
     this.usbPortsTimer = null;
   }
 
   render(props, state) {
+    // The status not read yet, or not readable: what the machine allows is unknown
+    if (this.isInstallable() === null) {
+      return props.loadZigbee2mqttStatus === RequestStatus.Error ? (
+        <div class="alert alert-danger" data-cy="z2m-wizard-status-error">
+          <Text id="integration.zigbee2mqtt.setup.errorLoadingStatesLabel" />
+        </div>
+      ) : (
+        <div class="dimmer active" data-cy="z2m-wizard-status-loading">
+          <div class="loader" />
+          <div class="dimmer-content py-8" />
+        </div>
+      );
+    }
     const { usbPort, model } = this.getUsbSelection();
     const savedConfiguration = props.configuration || {};
     const external =

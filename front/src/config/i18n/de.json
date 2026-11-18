@@ -2433,7 +2433,7 @@
           "progress": {
             "titleInstall": "Installation von Zigbee2MQTT",
             "titleConnect": "Verbindung mit deinem Zigbee2MQTT",
-            "leavePage": "Du kannst diese Seite verlassen: Gladys macht weiter, den Fortschritt findest du im Tab Konfiguration.",
+            "leavePage": "Du kannst diese Seite verlassen: Gladys macht weiter, den Fortschritt findest du im Tab Einrichtung.",
             "phases": {
               "connectUsb": "Verbindung mit dem Stick",
               "connectNetwork": "Verbindung mit dem Koordinator",
@@ -2442,7 +2442,8 @@
             "alreadyDownloaded": "Bereits heruntergeladen",
             "ezspSwitching": "Alte Firmware: Wechsel zu ezsp…",
             "ezspDriver": "Kompatibilitätstreiber (ezsp)",
-            "ezspNote": "<strong>Alte Firmware erkannt.</strong> Der ember-Treiber benötigt Firmware 7.4 oder neuer: Gladys wechselt zum Kompatibilitätstreiber (ezsp) und startet Zigbee2MQTT neu. Du musst nichts tun."
+            "ezspNote": "<strong>Alte Firmware erkannt.</strong> Der ember-Treiber benötigt Firmware 7.4 oder neuer: Gladys wechselt zum Kompatibilitätstreiber (ezsp) und startet Zigbee2MQTT neu. Du musst nichts tun.",
+            "waitingZigbee2mqtt": "<strong>Mit dem Broker verbunden, warte auf Zigbee2MQTT.</strong> Gladys empfängt auf diesem Broker noch nichts von Zigbee2MQTT. Falls nichts kommt, prüfe, ob Zigbee2MQTT läuft und sein Basis-Topic <code>zigbee2mqtt</code> ist."
           },
           "failure": {
             "titles": {
@@ -2464,7 +2465,9 @@
               "NO_ANSWER": "Zigbee2MQTT hat Gladys innerhalb von 2 Minuten nach dem Start nicht geantwortet, ohne einen Grund zu nennen. Prüfe, ob das gewählte Modell dem deines Koordinators entspricht, stecke deinen Stick aus und wieder ein oder starte deinen Netzwerk-Koordinator neu, und versuche es dann erneut.",
               "DONGLE_NOT_FOUND": "Dein Zigbee-Stick ist nicht eingesteckt (oder nicht mehr am gewählten Port): Zigbee2MQTT konnte nicht starten. Stecke ihn ein und versuche es erneut, oder wähle ihn erneut aus.",
               "NOT_ENOUGH_DISK_SPACE": "Es gibt nicht genug Speicherplatz, um Zigbee2MQTT herunterzuladen. Schaffe Platz und versuche es dann erneut.",
-              "unknown": "Gladys wurde durch einen Fehler gestoppt, den es nicht erklären kann. Versuche es erneut; tritt er wieder auf, helfen die technischen Details, die Ursache zu finden."
+              "unknown": "Gladys wurde durch einen Fehler gestoppt, den es nicht erklären kann. Versuche es erneut; tritt er wieder auf, helfen die technischen Details, die Ursache zu finden.",
+              "BAD_CREDENTIALS": "Gladys konnte sich nicht mit dem MQTT-Broker verbinden: Benutzername oder Passwort ist falsch. Prüfe die Zugangsdaten des MQTT-Brokers und versuche es dann erneut.",
+              "NOT_AUTHORIZED": "Der MQTT-Broker hat die Verbindung abgelehnt: nicht autorisiert. Prüfe Benutzername und Passwort und ob dieser Client sich mit dem Broker verbinden darf, und versuche es dann erneut."
             },
             "details": "Technische Details",
             "retry": "Erneut versuchen",
@@ -2503,13 +2506,13 @@
               },
               "add": {
                 "title": "Füge es zu Gladys hinzu",
-                "text": "Es erscheint im Tab Entdecken: Gib ihm einen Namen und einen Raum."
+                "text": "Es erscheint im Tab Geräte in der Nähe: Gib ihm einen Namen und einen Raum."
               }
             },
             "allow": "Anlernen aktivieren",
-            "allowed": "<strong>Anlernen für 4 Minuten aktiviert.</strong> Versetze dein Gerät in den Anlernmodus: Es erscheint im Tab Entdecken, sobald es dem Netzwerk beigetreten ist.",
+            "allowed": "<strong>Anlernen für 4 Minuten aktiviert.</strong> Versetze dein Gerät in den Anlernmodus: Es erscheint im Tab Geräte in der Nähe, sobald es dem Netzwerk beigetreten ist.",
             "allowError": "Gladys konnte das Anlernen nicht aktivieren. Versuche es erneut.",
-            "goToDiscover": "Zu Entdecken",
+            "goToDiscover": "Geräte in der Nähe öffnen",
             "finish": "Fertig",
             "finishWithoutPairing": "Ohne Anlernen beenden"
           },

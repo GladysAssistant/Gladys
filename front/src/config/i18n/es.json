@@ -2198,7 +2198,8 @@
             "alreadyDownloaded": "Ya descargado",
             "ezspSwitching": "Firmware antiguo: cambio a ezsp…",
             "ezspDriver": "Controlador de compatibilidad (ezsp)",
-            "ezspNote": "<strong>Firmware antiguo detectado.</strong> El controlador ember requiere un firmware 7.4 o posterior: Gladys cambia al controlador de compatibilidad (ezsp) y reinicia Zigbee2MQTT. No tienes nada que hacer."
+            "ezspNote": "<strong>Firmware antiguo detectado.</strong> El controlador ember requiere un firmware 7.4 o posterior: Gladys cambia al controlador de compatibilidad (ezsp) y reinicia Zigbee2MQTT. No tienes nada que hacer.",
+            "waitingZigbee2mqtt": "<strong>Conectado al broker, esperando a Zigbee2MQTT.</strong> Gladys todavía no recibe nada de Zigbee2MQTT en este broker. Si no llega nada, comprueba que Zigbee2MQTT está en marcha y que su base_topic es <code>zigbee2mqtt</code>."
           },
           "failure": {
             "titles": {
@@ -2220,7 +2221,9 @@
               "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos siguientes a su arranque, sin indicar por qué. Comprueba que el modelo elegido es el de tu coordinador, desconecta y vuelve a conectar tu llave o reinicia tu coordinador de red, y vuelve a intentarlo.",
               "DONGLE_NOT_FOUND": "Tu llave Zigbee no está conectada (o ya no está en el puerto elegido): Zigbee2MQTT no ha podido arrancar. Conéctala y vuelve a intentarlo, o vuelve a elegirla.",
               "NOT_ENOUGH_DISK_SPACE": "No hay suficiente espacio en disco para descargar Zigbee2MQTT. Libera espacio y vuelve a intentarlo.",
-              "unknown": "Gladys se ha detenido por un error que no sabe explicar. Vuelve a intentarlo; si se repite, los detalles técnicos ayudan a encontrar la causa."
+              "unknown": "Gladys se ha detenido por un error que no sabe explicar. Vuelve a intentarlo; si se repite, los detalles técnicos ayudan a encontrar la causa.",
+              "BAD_CREDENTIALS": "Gladys no pudo conectarse al broker MQTT: el usuario o la contraseña son incorrectos. Comprueba las credenciales del broker MQTT y vuelve a intentarlo.",
+              "NOT_AUTHORIZED": "El broker MQTT rechazó la conexión: no autorizado. Comprueba el usuario y la contraseña, y que este cliente tiene permiso para conectarse al broker, y vuelve a intentarlo."
             },
             "details": "Detalles técnicos",
             "retry": "Reintentar",

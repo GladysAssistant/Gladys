@@ -89,6 +89,13 @@ describe('Zigbee2mqtt setup wizard', () => {
       'href',
       '/dashboard/integration/device/zigbee2mqtt/discover'
     );
+    // Closed by Zigbee2mqtt after 254 s: joining can be permitted again
+    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
+    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
+    // Permitted from another page: told here too
+    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('exist');
 
     // The wizard is left for the page of the installation
     cy.get('[data-cy=z2m-wizard-finish]').click();
@@ -166,6 +173,17 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-model-search]').type('dongle-p');
     cy.get('[data-cy=z2m-wizard-model-option]').should('contain', 'Zigbee 3.0 USB Dongle Plus-P');
     cy.get('[data-cy=z2m-wizard-model-option]').should('not.contain', 'Zigbee 3.0 USB Dongle Plus-E');
+    // An alias typed in full: the model it names, and the one whose model code it is
+    cy.get('[data-cy=z2m-wizard-model-search]').clear();
+    cy.get('[data-cy=z2m-wizard-model-search]').type('zbt-1');
+    cy.get('[data-cy=z2m-wizard-model-option]').should('have.length', 2);
+    cy.get('[data-cy=z2m-wizard-model-option]').should('contain', 'Connect ZBT-1');
+    cy.get('[data-cy=z2m-wizard-model-option]').should('contain', 'SkyConnect');
+    // The end of a name, without a model code
+    cy.get('[data-cy=z2m-wizard-model-search]').clear();
+    cy.get('[data-cy=z2m-wizard-model-search]').type('mg24');
+    cy.get('[data-cy=z2m-wizard-model-option]').should('contain', 'XIAO MG24');
+    cy.get('[data-cy=z2m-wizard-model-option]').should('contain', 'Dongle Plus MG24');
     cy.get('[data-cy=z2m-wizard-model-search]').clear();
     cy.get('[data-cy=z2m-wizard-model-search]').type('nothing like this');
     cy.get('[data-cy=z2m-wizard-model-none]').should('exist');
@@ -238,7 +256,20 @@ describe('Zigbee2mqtt setup wizard', () => {
       z2mVersion: '2.14.2',
       deviceCount: 12
     });
-    sendProgress({ ...doneInstallation, phases: phases({ connect_adapter: 'done' }) });
+    const connectedInstallation = { ...doneInstallation, phases: phases({ connect_adapter: 'done' }) };
+    sendProgress(connectedInstallation);
+    // Connected to the broker, Zigbee2mqtt not heard on it yet: not ready
+    cy.get('[data-cy=z2m-wizard-waiting-zigbee2mqtt]').should('exist');
+    cy.get('[data-cy=z2m-wizard-ready]').should('not.exist');
+    cy.get('[data-cy=z2m-wizard-change-key]').i18n('integration.zigbee2mqtt.setup.wizard.failure.changeConnection');
+    sendStatus({
+      ...readyToSetupStatus,
+      installation: connectedInstallation,
+      gladysConnected: true,
+      zigbee2mqttConnected: true,
+      z2mVersion: '2.14.2',
+      deviceCount: 12
+    });
     cy.get('[data-cy=z2m-wizard-summary-broker]').should('contain', 'mqtt://192.168.1.10:1883');
     cy.get('[data-cy=z2m-wizard-summary-version]').should('contain', '2.14.2');
     cy.get('[data-cy=z2m-wizard-summary-devices]').should('contain', '12');
@@ -278,6 +309,93 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '0 %');
     sendProgress(runningInstallation);
     cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '64 %');
+  });
+
+  it('should show the network ready when Zigbee2mqtt answers after the installation failed, and keep it', () => {
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    sendProgress(runningInstallation);
+    cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '64 %');
+    sendProgress(failedInstallation);
+    cy.get('[data-cy=z2m-wizard-failure]').should('exist');
+    // Restarted by Docker, Zigbee2mqtt answers: the failure is cleared, the installation idle as before Install
+    sendStatus({ ...readyToSetupStatus, installation: failedInstallation, zigbee2mqttConnected: true });
+    sendProgress(readyToSetupStatus.installation);
+    cy.get('[data-cy=z2m-wizard-ready]').should('exist');
+    // Zigbee2mqtt restarting later does not take the wizard back to a failure
+    sendStatus({ ...readyToSetupStatus, zigbee2mqttConnected: false });
+    cy.get('[data-cy=z2m-wizard-ready]').should('exist');
+    cy.get('[data-cy=z2m-wizard-failure]').should('not.exist');
+  });
+
+  it('should not take a failure cleared elsewhere for the installation it is starting', () => {
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    sendProgress(runningInstallation);
+    cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '64 %');
+    sendProgress(failedInstallation);
+    cy.get('[data-cy=z2m-wizard-failure]').should('exist');
+    // Cleared by a stop made elsewhere: the installation idle as before Install, Zigbee2mqtt not answering
+    sendProgress(readyToSetupStatus.installation);
+    cy.get('[data-cy=z2m-wizard-failure-title]').i18n('integration.zigbee2mqtt.setup.wizard.failure.titles.unknown');
+    cy.get('[data-cy=z2m-wizard-retry]').should('exist');
+  });
+
+  it('should explain refused MQTT credentials, and show the settings Zigbee2mqtt refused in clear', () => {
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    sendProgress({ ...failedInstallation, error: { code: 'BAD_CREDENTIALS', message: 'Connection refused' } });
+    cy.get('[data-cy=z2m-wizard-failure-text]').i18n(
+      'integration.zigbee2mqtt.setup.wizard.failure.texts.BAD_CREDENTIALS'
+    );
+    sendProgress({
+      ...failedInstallation,
+      error: { code: 'INVALID_CONFIGURATION', message: 'serial.adapter must be equal to one of the allowed values' },
+      durationMs: 141000
+    });
+    cy.get('[data-cy=z2m-wizard-failure-details]')
+      .should('be.visible')
+      .and('contain', 'serial.adapter');
+  });
+
+  it('should retry with the ezsp driver Gladys switched to', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    const legacySetup = { ...usbSetup, ZIGBEE_DONGLE_NAME: `${ZBDONGLE_E} (legacy ezsp)` };
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    // The saved model changes: the setup page loads it again
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: legacySetup }).as(
+      'savedSetup'
+    );
+    sendStatus({ ...readyToSetupStatus, ezspFallback: true, installation: runningInstallation });
+    cy.wait('@savedSetup');
+    sendProgress({ ...failedInstallation, error: { code: 'NO_ANSWER', message: null } });
+    answerSetup({ body: legacySetup });
+    cy.get('[data-cy=z2m-wizard-retry]').click();
+    cy.wait('@setup')
+      .its('request.body')
+      .should('include', { ZIGBEE_DONGLE_NAME: `${ZBDONGLE_E} (legacy ezsp)` });
+  });
+
+  it('should not tell the machine incompatible while its status cannot be read', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    visitWizard();
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { statusCode: 500 });
+    cy.reload();
+    cy.get('[data-cy=z2m-wizard-status-error]').i18n('integration.zigbee2mqtt.setup.errorLoadingStatesLabel');
+    cy.get('[data-cy=z2m-wizard-incompatible]').should('not.exist');
+    // Told by the server later: the wizard shows up
+    cy.waitForWebSocket();
+    sendStatus(readyToSetupStatus);
+    cy.get('[data-cy=z2m-wizard-key-one]').should('exist');
   });
 
   it('should go back to the dongle, chosen by hand, to change the model after a failure', () => {

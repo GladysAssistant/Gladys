@@ -1,16 +1,17 @@
 import { Text, MarkupText } from 'preact-i18n';
 
 // Failures whose message tells to "save the configuration again" elsewhere: the wizard tells to retry
-const WIZARD_TEXTS = ['NO_ANSWER', 'DONGLE_NOT_FOUND', 'NOT_ENOUGH_DISK_SPACE'];
+const WIZARD_TEXTS = ['NO_ANSWER', 'DONGLE_NOT_FOUND', 'NOT_ENOUGH_DISK_SPACE', 'BAD_CREDENTIALS', 'NOT_AUTHORIZED'];
 
 // Failures explained by the messages of the setup page
 const SETUP_TEXTS = {
   SYSTEM_NOT_RUNNING_DOCKER: 'integration.zigbee2mqtt.setup.nonDockerEnv',
   DOCKER_BAD_NETWORK: 'integration.zigbee2mqtt.setup.invalidDockerNetwork',
-  BAD_CREDENTIALS: 'integration.zigbee2mqtt.setup.mqttConnectionErrors.BAD_CREDENTIALS',
-  NOT_AUTHORIZED: 'integration.zigbee2mqtt.setup.mqttConnectionErrors.NOT_AUTHORIZED',
   BROKER_UNREACHABLE: 'integration.zigbee2mqtt.setup.mqttConnectionErrors.BROKER_UNREACHABLE'
 };
+
+// Failures whose text ends on the message, which is then shown in clear: the settings Zigbee2mqtt refused
+const MESSAGE_SHOWN = ['INVALID_CONFIGURATION'];
 
 const KNOWN_CODES = [
   ...WIZARD_TEXTS,
@@ -44,7 +45,12 @@ const InstallFailure = ({ error }) => {
       <span data-cy="z2m-wizard-failure-text">
         {code ? <FailureText code={code} /> : <Text id="integration.zigbee2mqtt.setup.wizard.failure.texts.unknown" />}
       </span>
-      {message && (
+      {message && MESSAGE_SHOWN.includes(code) && (
+        <code class="d-block mt-1" data-cy="z2m-wizard-failure-details">
+          {message}
+        </code>
+      )}
+      {message && !MESSAGE_SHOWN.includes(code) && (
         <details class="mt-2">
           <summary>
             <Text id="integration.zigbee2mqtt.setup.wizard.failure.details" />

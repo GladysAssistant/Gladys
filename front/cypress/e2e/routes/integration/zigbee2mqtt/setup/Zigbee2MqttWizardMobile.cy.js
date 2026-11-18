@@ -150,6 +150,13 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
     cy.get('[data-cy=z2m-wizard-current-phase]').i18n(
       'integration.zigbee2mqtt.setup.wizard.progress.phases.connectExternal'
     );
+    // Connected to the broker, Zigbee2mqtt not heard on it yet
+    sendProgress({ ...doneInstallation, phases: phases({ connect_adapter: 'done' }) });
+    cy.get('[data-cy=z2m-wizard-waiting-zigbee2mqtt]').should('exist');
+    cy.get('[data-cy=z2m-wizard-bottom-bar]').within(() => {
+      cy.get('[data-cy=z2m-wizard-change-key]').click();
+    });
+    cy.get('[data-cy=z2m-wizard-mqttUrl]').should('have.value', 'mqtt://192.168.1.10:1883');
   });
 
   it('should only offer a Zigbee2mqtt that runs elsewhere when Gladys cannot install it', () => {

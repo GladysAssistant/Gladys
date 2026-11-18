@@ -119,6 +119,9 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   this.ezspFallback = false;
   this.mqttConnectionError = null;
   this.dockerBased = false;
+  // Told again by the Zigbee2mqtt this init connects to (retained bridge/info and bridge/devices), not the previous one
+  this.z2mVersion = null;
+  this.deviceCount = null;
 
   // Load stored configuration
   const configuration = await this.getConfiguration();

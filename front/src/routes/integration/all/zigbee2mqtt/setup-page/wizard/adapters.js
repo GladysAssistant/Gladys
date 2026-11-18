@@ -1,7 +1,7 @@
 // How the setup wizard shows the coordinator models and the USB ports, from GET /adapter (each model with its brand,
 // commercial name, model code, photo and search aliases) and GET /usb/port.
 
-const LEGACY_EZSP_SUFFIX = ' (legacy ezsp)';
+export const LEGACY_EZSP_SUFFIX = ' (legacy ezsp)';
 const PHOTO_URL = 'https://www.zigbee2mqtt.io/images/devices';
 
 export const isLegacyEzsp = adapter => adapter.label.endsWith(LEGACY_EZSP_SUFFIX);
@@ -28,9 +28,10 @@ const getSearchedTexts = adapter =>
   [adapter.label, adapter.displayName, adapter.modelCode, adapter.brand, ...(adapter.aliases || [])].filter(Boolean);
 
 /**
- * @description The models matching a search: those whose model code starts or ends with it ("dongle-p", "slzb-06"),
- * else the whole search found in one of their names or aliases ("sonoff e"), or else each of its words found in their
- * names ("plus dongle").
+ * @description The models matching a search: those whose model code or one of whose aliases it is ("skyconnect"), or,
+ * for a search with a digit or a dash, whose model code starts or ends with it, or whose name ends with it ("dongle-p",
+ * "slzb-06", "mg24"); else the whole search found in one of their names or aliases ("sonoff e"); or else each of its
+ * words found in their names ("plus dongle").
  * @param {Array} adapters - Models.
  * @param {string} search - Searched text.
  * @returns {Array} The matching models.
@@ -44,15 +45,22 @@ export const searchAdapters = (adapters, search) => {
     return adapters;
   }
   const whole = words.join('');
-  // A model code typed, or its start: those models only ("dongle-p" is the ZBDongle-P, not the "Dongle Plus-E")
-  if (whole.length >= 4) {
-    const byCode = adapters.filter(adapter => {
-      const code = adapter.modelCode ? normalize(adapter.modelCode) : '';
-      return code !== '' && (code.startsWith(whole) || code.endsWith(whole));
-    });
-    if (byCode.length > 0) {
-      return byCode;
-    }
+  // A whole model code or alias typed, or the start or the end of a model code (with a digit or a dash in the search):
+  // those models only ("dongle-p" is the ZBDongle-P, not the "Dongle Plus-E"; "zbt-1" the Connect ZBT-1 and the
+  // SkyConnect)
+  const codeLike = whole.length >= 4 && /[0-9-]/.test(search);
+  const byCode = adapters.filter(adapter => {
+    const code = adapter.modelCode ? normalize(adapter.modelCode) : '';
+    const names = [adapter.displayName, adapter.label].map(normalize);
+    return (
+      code === whole ||
+      (adapter.aliases || []).some(alias => normalize(alias) === whole) ||
+      (codeLike &&
+        ((code !== '' && (code.startsWith(whole) || code.endsWith(whole))) || names.some(name => name.endsWith(whole))))
+    );
+  });
+  if (byCode.length > 0) {
+    return byCode;
   }
   const byWhole = adapters.filter(adapter => getSearchedTexts(adapter).some(text => normalize(text).includes(whole)));
   if (byWhole.length > 0) {

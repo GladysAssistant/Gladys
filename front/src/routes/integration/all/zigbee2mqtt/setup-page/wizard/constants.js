@@ -23,11 +23,13 @@ export const KEY_SCENARIO = {
   NONE: 'none'
 };
 
-// The installation started by the wizard: not shown in the status yet, running, failed, or done
+// The installation started by the wizard: not shown in the status yet, running, failed, connected to an external
+// broker where Zigbee2mqtt does not answer yet, or done
 export const INSTALL_VIEW = {
   STARTING: 'starting',
   RUNNING: 'running',
   FAILED: 'failed',
+  WAITING: 'waiting',
   READY: 'ready'
 };
 

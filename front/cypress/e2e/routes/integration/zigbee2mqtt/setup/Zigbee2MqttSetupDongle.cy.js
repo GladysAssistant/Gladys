@@ -224,6 +224,31 @@ describe('Zigbee2mqtt USB dongle', () => {
     cy.get('[data-cy=z2m-setup-save-error]').i18n('integration.zigbee2mqtt.setup.saveDongleNotFound');
   });
 
+  it('should open the wizard after a reset, without the refusal of a save made before', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` },
+      { statusCode: 400, body: { status: 400, code: 'BAD_REQUEST', message: 'DONGLE_NOT_FOUND' } }
+    ).as('setup');
+    listPorts([zbDongleE]);
+    visitConfigured();
+    openLocalForm();
+    cy.get('[data-cy=z2m-setup-save]')
+      .should('not.be.disabled')
+      .click();
+    cy.wait('@setup');
+    cy.get('[data-cy=z2m-setup-save-error]').should('exist');
+
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/reset` }, { body: {} }).as('reset');
+    // Nothing configured any more
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: {} });
+    cy.get('[data-cy=z2m-reset-button]').click();
+    cy.get('[data-cy=z2m-reset-confirm-button]').click();
+    cy.wait('@reset');
+    cy.get('[data-cy=z2m-wizard]').should('exist');
+    cy.get('[data-cy=z2m-wizard-save-error]').should('not.exist');
+  });
+
   it('should tell that the configured dongle cannot be found', () => {
     listPorts([machinePort]);
     visitSetup(

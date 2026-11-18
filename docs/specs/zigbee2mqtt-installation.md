@@ -187,10 +187,13 @@ installation. A job that fails to start fails the installation with its error. A
 - **Status.** `configured` tells that a USB dongle or a network coordinator is saved, or the broker
   of a Zigbee2mqtt that runs elsewhere (`utils/isConfigured.js`): set by init from the saved
   configuration, by `POST /setup` once its variables are saved, false after `reset`; kept by
-  `disconnect` (a disabled installation is still configured). The other tabs tell from it that
-  Zigbee2mqtt is not installed (M.5). `z2mVersion` is the `version` of the last `bridge/info`, `deviceCount` the number of
+  `disconnect` (a disabled installation is still configured); `null` (unknown) until init reads the
+  configuration: at the start of Gladys, and as long as the service is stopped in the settings. The
+  other tabs tell from it that Zigbee2mqtt is not installed (M.4), only when it is `false`.
+  `z2mVersion` is the `version` of the last `bridge/info`, `deviceCount` the number of
   devices of the last `bridge/devices` (unsupported ones included, the coordinator excluded); `null`
-  until Zigbee2mqtt tells them, and again after `disconnect` or `reset`. A change of `deviceCount`
+  until Zigbee2mqtt tells them, and again after init (the Zigbee2mqtt it connects to tells them
+  again), `disconnect` or `reset`. A change of `deviceCount`
   sends a status; `bridge/info` sends one anyway (coordinator firmware).
 - **Coordinator models** (`adapters/display.js`). `GET /adapter` gives each model of the list
   (`{ label, configKey }`, the label being what the setup stores) its `brand` (every model has one:
@@ -489,7 +492,7 @@ The page shows the wizard when its configuration, once loaded, has no USB dongle
 coordinator and no external broker (`isConfigured`). The choice is made once (`wizard` in
 `setup-page/index.js`): the wizard saves the configuration on its second step and stays until the user
 leaves it ("Later", "Finish", "Finish without pairing"), for the page of J; a reset chooses the wizard
-again. A user who leaves the page during the installation comes back to the page of J, which shows the
+again, without the refusal of a setup made on the page of J. A user who leaves the page during the installation comes back to the page of J, which shows the
 progress (B). Nothing of the wizard is remembered.
 
 ### M.2 Steps
@@ -497,34 +500,39 @@ progress (B). Nothing of the wizard is remembered.
 Four steps: ① the dongle, ② the installation, ③ the network ready, ④ the first device (with an
 external broker: connection, check, network, first device).
 
-| Screen                | When                                                                                             | Way forward                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| One dongle recognized | one port with a recognized `adapter` (`GET /usb/port`)                                           | Install                                                                                                  |
-| Several               | two or more recognized                                                                           | Install, once one is chosen (none preselected)                                                           |
-| Not recognized        | USB devices (`pnpId`), none recognized: the only one is preselected                              | Install, once a model is chosen                                                                          |
-| No dongle             | no USB device; ports listed again every 3 s, a dongle plugged in shows up with "just plugged in" | —                                                                                                        |
-| By hand               | port (USB devices, every serial port on demand) and model, started from the detected dongle      | Install                                                                                                  |
-| Network coordinator   | URL, and the type by chip: `ember`, `zstack`, `deconz`                                           | Install                                                                                                  |
-| External Zigbee2mqtt  | broker URL, user, password, interface URL (optional)                                             | Connect                                                                                                  |
-| Not installable       | `dockerBased` or `networkModeValid` false                                                        | Use my Zigbee2mqtt (external) only                                                                       |
-| ② running             | the installation of the status, phases of B.2 (external broker: `connect_adapter` only)          | —                                                                                                        |
-| ② failed              | a short title by error code (B.4), the message, the raw message folded                           | Retry (same configuration) · Change the dongle or model (back to ①, by hand, with what was chosen)       |
-| ③ ready               | the installation `done`, or Zigbee2mqtt answering (Gladys connected, with an external broker)    | Pair my first device · Later                                                                             |
-| ④ first device        | three tips                                                                                       | Permit joining (`POST /permit_join` with `{ value: true }`, never toggled), then Go to Discover · Finish |
+| Screen                | When                                                                                                                                                                                | Way forward                                                                                                                                                                                                                    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| One dongle recognized | one port with a recognized `adapter` (`GET /usb/port`)                                                                                                                              | Install                                                                                                                                                                                                                        |
+| Several               | two or more recognized                                                                                                                                                              | Install, once one is chosen (none preselected)                                                                                                                                                                                 |
+| Not recognized        | USB devices (`pnpId`), none recognized: the only one is preselected                                                                                                                 | Install, once a model is chosen                                                                                                                                                                                                |
+| No dongle             | no USB device; ports listed again every 3 s (an unchanged list is not set again), a dongle plugged in shows up with "just plugged in"                                               | —                                                                                                                                                                                                                              |
+| By hand               | port (USB devices, every serial port on demand) and model, started from the detected dongle                                                                                         | Install                                                                                                                                                                                                                        |
+| Network coordinator   | URL, and the type by chip: `ember`, `zstack`, `deconz`                                                                                                                              | Install                                                                                                                                                                                                                        |
+| External Zigbee2mqtt  | broker URL, user, password, interface URL (optional)                                                                                                                                | Connect                                                                                                                                                                                                                        |
+| Not installable       | `dockerBased` or `networkModeValid` false                                                                                                                                           | Use my Zigbee2mqtt (external) only                                                                                                                                                                                             |
+| Status unknown        | the status not read yet (a loader), or not readable (the error of the page) until a status message tells it                                                                         | —                                                                                                                                                                                                                              |
+| ② running             | the installation of the status, phases of B.2 (external broker: `connect_adapter` only)                                                                                             | —                                                                                                                                                                                                                              |
+| ② failed              | a short title by error code (B.4), a text of the wizard (no Save button in it), the raw message folded (shown in clear for `INVALID_CONFIGURATION`, the refused settings)           | Retry (same configuration, with the `(legacy ezsp)` model or the `ezsp` type Gladys switched to) · Change the dongle or model (back to ①, by hand, with what was chosen)                                                       |
+| ② waiting             | external broker: Gladys connected to it (the installation `done`), Zigbee2mqtt not heard on it yet: check that it runs and that its base topic is `zigbee2mqtt`; follows the status | Change the connection                                                                                                                                                                                                          |
+| ③ ready               | the installation `done` (local), or Zigbee2mqtt answering (`zigbee2mqttConnected`, also once a failure is cleared); kept once shown                                                 | Pair my first device · Later                                                                                                                                                                                                   |
+| ④ first device        | three tips                                                                                                                                                                          | Permit joining (`POST /permit_join` with `{ value: true }`, never toggled), then Go to Discover · Finish; follows `zigbee2mqtt.permit-join`: allowed while Zigbee2mqtt says so, the button back once it closes joining (254 s) |
 
 - **Models** (0.3b): the list of `GET /adapter` (E.3) without the `(legacy ezsp)` ones, grouped by
   brand, each by its commercial name, model code and photo (zigbee2mqtt.io, an icon without
   Internet). The search, ignoring case, accents and punctuation, keeps the models whose model
-  code starts or ends with it from 4 characters ("dongle-p": ZBDongle-P, not the Dongle Plus-E;
-  "slzb-06": every SLZB-06), else the whole text found in one of their names or aliases ("sonoff
-  e", "conbee"), or else each of its words.
+  code or one of whose aliases it is ("skyconnect": the SkyConnect and the Connect ZBT-1), or, from
+  4 characters with a digit or a dash, whose model code starts or ends with it or whose name ends
+  with it ("dongle-p": ZBDongle-P, not the Dongle Plus-E; "slzb-06": every SLZB-06; "mg24"); else
+  the whole text found in one of their names or aliases ("sonoff e", "conbee"), or else each of its
+  words.
 - **Install** saves the configuration (`POST /setup`, the USB dongle by its `stablePath`, no port of
   the interface: the installation chooses it). Refused (400 `DONGLE_NOT_FOUND`, 409 busy, another 400):
   the wizard stays on ①, says why, nothing is saved.
 - **The previous installation.** Until a new installation shows up in the status, the one it holds
   is the previous one (a failure, before Retry or a change of dongle): the wizard compares the status
-  with the installation it saw when Install was clicked, and shows ② starting meanwhile. An ended
-  installation never comes back the same (its `durationMs` differs).
+  with the installation it saw when Install was clicked, and shows ② starting meanwhile; it forgets
+  it as soon as the status shows another installation (the idle installation of a first one comes
+  back when a failure is cleared).
 - **Prefetch** (C, J): asked once a coordinator is chosen (a dongle Gladys preselects counts, a
   network URL entered), never for an external broker nor before the server tells that it can install
   (`dockerBased`, `networkModeValid`); its progress and the disk space warning show above Install,
@@ -537,8 +545,9 @@ external broker: connection, check, network, first device).
 
 A focus page (mobile-pages C.1): its navigation bar back to the integrations, "Step 1 of 4" above a
 segmented bar, one decision per screen, the way forward in the bottom bar (two actions one above the
-other after ①; none while waiting for a dongle or while the installation runs), where a refused setup
-or a refused joining is told, with a close button. The detected dongle shows in large; the other
+other after ①; none while waiting for a dongle or while the installation runs; the change of
+connection while an external broker waits for Zigbee2mqtt), where a refused setup or a refused
+joining is told, with a close button. The detected dongle shows in large; the other
 choices (by hand, network coordinator, existing Zigbee2mqtt) open in a sheet, so does the port of a
 dongle chosen by hand; the models are rows with photos, without a scroll area of their own; "Back"
 in the bottom bar returns to the detected dongle. The installation turns a ring around the dongle,
@@ -553,7 +562,9 @@ answer.
 ### M.5 Tests
 
 Cypress, `front/cypress/e2e/routes/integration/zigbee2mqtt/setup/`: `Zigbee2MqttWizard.cy.js` (every
-screen of M.2, the payloads, the previous installation hidden on Retry, the refusals, the ezsp
-fallback, the downloads in the background) and `Zigbee2MqttWizardMobile.cy.js` (`iphone-x`: the focus
+screen of M.2, the payloads, the previous installation hidden on Retry and forgotten once cleared,
+the refusals, the ezsp fallback and its Retry, the external broker waiting for Zigbee2mqtt, joining
+closed by Zigbee2mqtt, the status not readable, the downloads in the background), the reset to the
+wizard in `Zigbee2MqttSetupDongle.cy.js` and `Zigbee2MqttWizardMobile.cy.js` (`iphone-x`: the focus
 page, the bottom bar, the sheets, the breakpoint crossed), fixtures in `wizardFixtures.js`;
 `Zigbee2MqttStatus.cy.js` for the not-installed banner.
