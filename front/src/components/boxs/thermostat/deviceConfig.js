@@ -116,6 +116,7 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
   let deviceSelector = null;
   let deviceName = null;
   let missing = false;
+  let failed = false;
   try {
     // The config lives on this integration's own device, so it is looked up
     // among this service's thermostats — never by feature selector on
@@ -140,10 +141,16 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
     missing = !device;
   } catch (e) {
     paramsConfig = null;
+    // Says nothing of whether the thermostat still exists: the card keeps a
+    // deletion it already saw.
+    failed = true;
   }
 
   if (missing) {
     return { ...DEFAULTS, missing: true };
+  }
+  if (failed) {
+    return { ...DEFAULTS, failed: true };
   }
   if (!paramsConfig) {
     return { ...DEFAULTS };
