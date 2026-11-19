@@ -142,7 +142,8 @@ class RtspCameraBox extends Component {
   // fed by the handlers of the card below.
   renderMobile(props, { lastError, testConnectionErrorMessage, tooMuchStatesError, statesNumber }) {
     const { camera, cameraIndex } = props;
-    const isNew = !camera.created_at;
+    // the camera "+" just added, not saved yet: closing its sheet takes it out of the list
+    const isDraft = !camera.created_at && Boolean(props.discardOnClose);
     const url = get(camera, 'cameraUrl.value');
     const rotation = get(camera, 'cameraRotation.value');
     const fieldId = `rtsp-camera-${cameraIndex}`;
@@ -183,8 +184,9 @@ class RtspCameraBox extends Component {
             dataCy: 'rtsp-camera-test'
           }
         ]}
-        // a camera that was never saved has nothing to delete: closing its sheet discards it
-        onDelete={isNew ? undefined : this.deleteCamera}
+        // it needs no "Delete". Any other camera has one, saved or not (one added on a wider
+        // screen and not saved yet keeps its row: nothing is requested to delete it)
+        onDelete={isDraft ? undefined : this.deleteCamera}
         deleteError={
           tooMuchStatesError ? (
             <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
@@ -193,7 +195,7 @@ class RtspCameraBox extends Component {
           )
         }
         autoOpen={props.autoOpen}
-        onDismiss={isNew && props.discardOnClose ? this.discardCamera : undefined}
+        onDismiss={isDraft ? this.discardCamera : undefined}
         dataCy="rtsp-camera-row"
       >
         <MobileField

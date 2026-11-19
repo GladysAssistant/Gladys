@@ -880,6 +880,31 @@ describe('Integration devices on a phone', () => {
         .and('contain', 'Garage camera');
     });
 
+    it('should let a camera added on a wider screen and not saved be deleted from its sheet', () => {
+      cy.viewport(...DESKTOP);
+      cy.visit(CAMERAS_URL);
+      cy.wait('@getCameras');
+      cy.contains('button', 'scene.newButton').click();
+      cy.get('.col-lg-6 .card').should('have.length', 2);
+      cy.viewport('iphone-x');
+      cy.get('[data-cy=rtsp-camera-row]').should('have.length', 2);
+      // it is not the draft of "+": closing its sheet leaves it in the list
+      cy.get('[data-cy=rtsp-camera-row]')
+        .eq(1)
+        .click();
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=rtsp-camera-row]').should('have.length', 2);
+      cy.get('[data-cy=rtsp-camera-row]')
+        .eq(1)
+        .click();
+      cy.get('[data-cy=integration-device-delete]').click();
+      cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=rtsp-camera-row]')
+        .should('have.length', 1)
+        .and('contain', 'Garage camera');
+    });
+
     it('should delete a camera only once confirmed, and explain why one with too many states is not', () => {
       let refuse = true;
       cy.intercept({ method: 'DELETE', url: api('/device/cy-garage-camera') }, req => {

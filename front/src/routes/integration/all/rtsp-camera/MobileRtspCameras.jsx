@@ -19,12 +19,16 @@ class MobileRtspCameras extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const cameras = nextProps.rtspCameras || [];
-    const previousCameras = this.props.rtspCameras || [];
-    // the camera "+" just pushed at the end of the list
-    if (this.adding && cameras.length > previousCameras.length) {
+    if (!this.adding) {
+      return;
+    }
+    // the camera "+" just added: the one that was not in the list and was never saved — a list
+    // that grows meanwhile (a search answered) only brings saved cameras
+    const previousIds = (this.props.rtspCameras || []).map(camera => camera.id);
+    const added = (nextProps.rtspCameras || []).find(camera => !camera.created_at && !previousIds.includes(camera.id));
+    if (added) {
       this.adding = false;
-      this.setState({ newCameraId: cameras[cameras.length - 1].id });
+      this.setState({ newCameraId: added.id });
     }
   }
 

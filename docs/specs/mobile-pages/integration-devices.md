@@ -48,9 +48,9 @@ The shared components are in `front/src/components/integration/mobile/`:
   ("A - Z" / "Z - A"), then the actions of the list (`ToolButton`, 44 px). They call the handlers
   of the desktop header with the same event: a phone list has no request of its own. The search
   field shows the query the list is filtered on, like the desktop one. Where that query is a
-  debounced state (the devices of Bluetooth, Airplay and LAN Manager, the discovery of an
-  external integration) the field is not controlled — it would take back the letters typed since
-  the last update — and only starts from the query still applied when it mounts again
+  debounced state (the devices of Bluetooth, Airplay and LAN Manager, the cameras, the discovery
+  of an external integration) the field is not controlled — it would take back the letters typed
+  since the last update — and only starts from the query still applied when it mounts again
   (`initialSearchValue`). Where the query is stored at once and only the request is debounced
   (Matter, MQTT, Thermostat) the field is controlled (`searchValue`).
 - `MobileDeviceItem`: the row of a device and its sheet (C and D).
@@ -243,7 +243,8 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   That camera only exists in the page until it is saved: its sheet has no "Delete", and closing
   it without saving — after the question of D when something was typed — **takes it out of the
   list**. Saved, it is a camera like the other ones. A camera added on a wider screen and not
-  saved yet keeps its row when the window narrows.
+  saved yet keeps its row when the window narrows: its sheet has "Delete", confirmed, which
+  takes it out of the list without a request, as on its card.
 - The card never said that a deletion had failed: on a phone the confirmation does, and tells a
   camera with too many states apart.
 
@@ -282,8 +283,8 @@ other layout: an unsaved change there does not survive the swap.
   row untouched; the search and the sort order sent to the server; a discovered device added; the
   pairing form; the cards kept on a wider screen. For the cameras: the fields of the sheet, a
   connection test that leaves the sheet open on its image, a failed test, the URL, the frequency
-  and the rotation saved and undone, a camera added with "+" then saved, and one closed without
-  being saved.
+  and the rotation saved and undone, a camera added with "+" then saved, one closed without being
+  saved, and one added on a wider screen deleted from its sheet.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.
