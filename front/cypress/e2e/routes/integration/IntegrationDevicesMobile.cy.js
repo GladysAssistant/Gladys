@@ -696,4 +696,242 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=bluetooth-discover-scan]').should('be.disabled');
     });
   });
+
+  describe('RTSP cameras', () => {
+    const CAMERAS_URL = '/dashboard/integration/device/rtsp-camera';
+    const TEST_IMAGE =
+      'image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const garage = {
+      id: 'cy-camera-garage',
+      name: 'Garage camera',
+      selector: 'cy-garage-camera',
+      external_id: 'cy-camera-garage',
+      service_id: 'cy-rtsp-service',
+      room_id: null,
+      should_poll: true,
+      poll_frequency: 60000,
+      created_at: '2026-01-01T00:00:00.000Z',
+      params: [
+        { name: 'CAMERA_URL', value: 'rtsp://192.168.1.20/stream' },
+        { name: 'CAMERA_ROTATION', value: '0' }
+      ],
+      features: [
+        feature('cy-camera-garage', 'Garage camera', 'camera', 'image', { read_only: false, keep_history: false })
+      ]
+    };
+
+    beforeEach(() => {
+      cy.intercept({ method: 'GET', pathname: '/api/v1/service/rtsp-camera' }, { id: 'cy-rtsp-service' });
+      cy.intercept({ method: 'GET', url: api('/service/rtsp-camera/device*') }, [garage]).as('getCameras');
+    });
+
+    const openGarage = () => {
+      cy.visit(CAMERAS_URL);
+      cy.wait('@getCameras');
+      cy.contains('[data-cy=rtsp-camera-row]', 'Garage camera').click();
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+    };
+
+    it('should list the cameras as rows and hold in a sheet what the card of a camera holds', () => {
+      openGarage();
+      cy.get('[data-cy=rtsp-cameras-mobile]').should('exist');
+      cy.get('.col-lg-6').should('not.exist');
+      cy.get('[data-cy=integration-mobile-search]').should('have.css', 'font-size', '16px');
+      cy.get('[data-cy=integration-device-name]').should('have.value', 'Garage camera');
+      cy.get('[data-cy=rtsp-camera-url]')
+        .should('have.value', 'rtsp://192.168.1.20/stream')
+        .and('have.css', 'font-size', '16px');
+      cy.get('[data-cy=rtsp-camera-poll-frequency]')
+        .should('have.value', '60000')
+        .and('have.css', 'font-size', '16px');
+      cy.get('[data-cy=rtsp-camera-rotation]')
+        .should('have.value', '0')
+        .and('have.css', 'font-size', '16px');
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
+    });
+
+    it('should test the connection from the sheet, which stays open on the image', () => {
+      cy.intercept({ method: 'POST', url: api('/service/rtsp-camera/camera/test') }, { body: TEST_IMAGE }).as(
+        'testConnection'
+      );
+      openGarage();
+      cy.get('[data-cy=rtsp-camera-test]').click();
+      cy.wait('@testConnection').then(({ request }) => {
+        expect(request.body.params).to.deep.include({ name: 'CAMERA_URL', value: 'rtsp://192.168.1.20/stream' });
+      });
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+      cy.get('[data-cy=rtsp-camera-preview]').should('have.attr', 'src', `data:${TEST_IMAGE}`);
+      // a test changes nothing in the camera: there is still nothing to save
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
+    });
+
+    it('should say why a connection test failed, where it was asked', () => {
+      cy.intercept(
+        { method: 'POST', url: api('/service/rtsp-camera/camera/test') },
+        { statusCode: 500, body: { status: 500, error: 'ffmpeg exited with code 1' } }
+      ).as('testConnection');
+      openGarage();
+      cy.get('[data-cy=rtsp-camera-test]').click();
+      cy.wait('@testConnection');
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+      cy.get('[data-cy=integration-device-error]')
+        .should('contain', 'ffmpeg exited with code 1')
+        .i18n('integration.rtspCamera.testConnectionError');
+    });
+
+    it('should save the URL, the frequency and the rotation changed in the sheet', () => {
+      stubSave();
+      openGarage();
+      cy.get('[data-cy=rtsp-camera-url]').clear();
+      cy.get('[data-cy=rtsp-camera-url]').type('rtsp://192.168.1.30/live');
+      cy.get('[data-cy=rtsp-camera-poll-frequency]').select('10000');
+      cy.get('[data-cy=rtsp-camera-rotation]').select('90');
+      cy.get('[data-cy=integration-device-save]')
+        .should('not.be.disabled')
+        .click();
+      cy.wait('@saveDevice').then(({ request }) => {
+        expect(request.body.name).to.equal('Garage camera');
+        expect(request.body.poll_frequency).to.equal(10000);
+        expect(request.body.params).to.deep.include({ name: 'CAMERA_URL', value: 'rtsp://192.168.1.30/live' });
+        expect(request.body.params).to.deep.include({ name: 'CAMERA_ROTATION', value: '90' });
+      });
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-mobile-toast]').i18n('mobileKit.saved');
+    });
+
+    it('should keep the sheet open and say that the save failed', () => {
+      cy.intercept({ method: 'POST', url: api('/device') }, { statusCode: 500, body: { status: 500 } }).as(
+        'saveDevice'
+      );
+      openGarage();
+      cy.get('[data-cy=integration-device-name]').type(' 2');
+      cy.get('[data-cy=integration-device-save]').click();
+      cy.wait('@saveDevice');
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+      cy.get('[data-cy=integration-device-error]').i18n('integration.rtspCamera.saveError');
+    });
+
+    it('should ask before closing with unsaved changes, and undo them', () => {
+      openGarage();
+      cy.get('[data-cy=rtsp-camera-url]').clear();
+      cy.get('[data-cy=rtsp-camera-url]').type('rtsp://10.0.0.1/other');
+      cy.get('[data-cy=rtsp-camera-rotation]').select('180');
+      cy.get('[data-cy=rtsp-camera-poll-frequency]').select('2000');
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-leave-sheet]').should('be.visible');
+      cy.get('[data-cy=integration-device-leave-discard]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+
+      cy.contains('[data-cy=rtsp-camera-row]', 'Garage camera').click();
+      cy.get('[data-cy=rtsp-camera-url]').should('have.value', 'rtsp://192.168.1.20/stream');
+      cy.get('[data-cy=rtsp-camera-rotation]').should('have.value', '0');
+      cy.get('[data-cy=rtsp-camera-poll-frequency]').should('have.value', '60000');
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
+    });
+
+    it('should open the sheet of a camera added with "+", and save it once it has a name', () => {
+      stubSave();
+      cy.visit(CAMERAS_URL);
+      cy.wait('@getCameras');
+      cy.get('[data-cy=rtsp-camera-create]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+      cy.get('[data-cy=integration-device-name]').should('have.value', '');
+      // nothing to delete yet
+      cy.get('[data-cy=integration-device-delete]').should('not.exist');
+      cy.get('[data-cy=rtsp-camera-url]').type('rtsp://192.168.1.21/stream');
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
+      cy.get('[data-cy=integration-device-name]').type('Porch camera');
+      cy.get('[data-cy=integration-device-save]').click();
+      cy.wait('@saveDevice').then(({ request }) => {
+        expect(request.body.name).to.equal('Porch camera');
+        expect(request.body.service_id).to.equal('cy-rtsp-service');
+        expect(request.body.params).to.deep.include({ name: 'CAMERA_URL', value: 'rtsp://192.168.1.21/stream' });
+        const enabledFeature = request.body.features.find(one => one.type === 'enabled');
+        expect(enabledFeature).to.include({ category: 'camera', last_value: 1, name: 'Porch camera' });
+      });
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-mobile-toast]').i18n('mobileKit.saved');
+      cy.get('[data-cy=rtsp-camera-row]').should('have.length', 2);
+      // saved, it is a camera like the other ones: closing its sheet leaves it in the list
+      cy.contains('[data-cy=rtsp-camera-row]', 'Porch camera').click();
+      cy.get('[data-cy=integration-device-delete]').should('exist');
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=rtsp-camera-row]').should('have.length', 2);
+    });
+
+    it('should take a camera that was never saved out of the list when its sheet is closed', () => {
+      cy.visit(CAMERAS_URL);
+      cy.wait('@getCameras');
+      cy.get('[data-cy=rtsp-camera-create]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+      cy.get('[data-cy=rtsp-camera-row]').should('have.length', 2);
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=rtsp-camera-row]').should('have.length', 1);
+
+      // with something typed, the question comes first
+      cy.get('[data-cy=rtsp-camera-create]').click();
+      cy.get('[data-cy=integration-device-name]').type('Draft');
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-leave-discard]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=rtsp-camera-row]')
+        .should('have.length', 1)
+        .and('contain', 'Garage camera');
+    });
+
+    it('should delete a camera only once confirmed, and explain why one with too many states is not', () => {
+      let refuse = true;
+      cy.intercept({ method: 'DELETE', url: api('/device/cy-garage-camera') }, req => {
+        if (refuse) {
+          req.reply({ statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } });
+        } else {
+          req.reply({ success: true });
+        }
+      }).as('deleteDevice');
+      openGarage();
+      cy.get('[data-cy=integration-device-delete]').click();
+      cy.get('[data-cy=integration-device-delete-sheet]')
+        .should('be.visible')
+        .and('contain', 'Garage camera');
+      cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@deleteDevice');
+      cy.get('[data-cy=integration-device-delete-error]')
+        .should('be.visible')
+        .find('a[href="/dashboard/settings/jobs"]')
+        .should('exist')
+        .then(() => {
+          refuse = false;
+        });
+
+      cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@deleteDevice');
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-mobile-toast]').i18n('mobileDeviceList.deleted');
+      cy.get('[data-cy=rtsp-camera-row]').should('not.exist');
+      cy.get('[data-cy=rtsp-camera-create-empty]').should('be.visible');
+    });
+
+    it('should search and sort through the requests of the desktop header', () => {
+      cy.visit(CAMERAS_URL);
+      cy.wait('@getCameras');
+      cy.get('[data-cy=integration-mobile-sort]').click();
+      cy.wait('@getCameras')
+        .its('request.url')
+        .should('contain', 'order_dir=desc');
+      cy.get('[data-cy=integration-mobile-search]').type('garage');
+      cy.wait('@getCameras')
+        .its('request.url')
+        .should('contain', 'search=garage');
+    });
+
+    it('should keep the cards on a wider screen', () => {
+      cy.viewport(...DESKTOP);
+      cy.visit(CAMERAS_URL);
+      cy.wait('@getCameras');
+      cy.get('[data-cy=rtsp-cameras-mobile]').should('not.exist');
+      cy.get('.col-lg-6 .card').should('have.length', 1);
+      cy.contains('button', 'integration.rtspCamera.testConnectionButton').should('exist');
+    });
+  });
 });

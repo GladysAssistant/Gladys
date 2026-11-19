@@ -36,10 +36,15 @@ const getSignature = (device, extraSignature) =>
  *   closing the sheet with unsaved changes asks first;
  * - primaryAction { label, onClick, icon, disabled, toast, dataCy }: the action of a discovered
  *   device ("Add to Gladys");
- * - actions [{ label, href | onClick, icon, toast, dataCy }]: the other ones ("Edit");
+ * - actions [{ label, href | onClick, icon, toast, keepOpen, dataCy }]: the other ones ("Edit");
+ *   with `keepOpen` a success leaves the sheet open (its result shows in it: a connection test);
  * - onDelete: "Delete", confirmed in a sheet.
  * onSave, primaryAction.onClick and onDelete return a promise of `false` when they failed: the
  * sheet then stays open with `saveError` / `deleteError` (or a default sentence).
+ *
+ * A device created in the list itself (a camera): `autoOpen` opens its sheet as soon as it is
+ * true, and `onDismiss` is called when the sheet is closed without a request that succeeded —
+ * the device that was never saved is then taken out of the list by its card.
  */
 class MobileDeviceItem extends Component {
   constructor(props) {
@@ -58,6 +63,18 @@ class MobileDeviceItem extends Component {
       // the last request that failed, until the next one
       failed: null
     };
+  }
+
+  componentDidMount() {
+    if (this.props.autoOpen) {
+      this.open();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.autoOpen && !prevProps.autoOpen && !this.state.open) {
+      this.open();
+    }
   }
 
   componentWillUnmount() {
@@ -83,7 +100,13 @@ class MobileDeviceItem extends Component {
     });
   };
 
-  close = () => this.setState({ open: false, confirmDelete: false, leaveOpen: false });
+  // closed without a request that succeeded (`run` closes the sheet itself after one)
+  close = () => {
+    this.setState({ open: false, confirmDelete: false, leaveOpen: false });
+    if (this.props.onDismiss) {
+      this.props.onDismiss();
+    }
+  };
 
   // where an action of the sheet ("Edit") was leading when it met unsaved changes
   leaveToPendingHref = () => {
@@ -114,11 +137,12 @@ class MobileDeviceItem extends Component {
    * @param {string} kind - 'save' | 'primary' | 'delete' | 'action-<index>'.
    * @param {Function} handler - The handler of the desktop card; resolves to false on a failure.
    * @param {object} toast - The message of the toast on a success.
+   * @param {boolean} keepOpen - A success leaves the sheet open.
    * @returns {Promise<boolean>} True when the request went through.
    * @example
    * this.run('save', this.props.onSave, <Text id="mobileKit.saved" />);
    */
-  run = async (kind, handler, toast) => {
+  run = async (kind, handler, toast, keepOpen) => {
     if (this.state.busy) {
       return false;
     }
@@ -137,7 +161,7 @@ class MobileDeviceItem extends Component {
       this.setState({
         busy: null,
         failed: succeeded ? null : kind,
-        ...(succeeded ? { open: false, confirmDelete: false, leaveOpen: false } : {})
+        ...(succeeded && !keepOpen ? { open: false, confirmDelete: false, leaveOpen: false } : {})
       });
     }
     return succeeded;
@@ -151,7 +175,7 @@ class MobileDeviceItem extends Component {
   };
 
   // another request of the card ("Update" a meter): same feedback as the primary one
-  runAction = (action, index) => () => this.run(`action-${index}`, action.onClick, action.toast);
+  runAction = (action, index) => () => this.run(`action-${index}`, action.onClick, action.toast, action.keepOpen);
 
   askDelete = () => this.setState({ confirmDelete: true, failed: null });
   cancelDelete = () => {
