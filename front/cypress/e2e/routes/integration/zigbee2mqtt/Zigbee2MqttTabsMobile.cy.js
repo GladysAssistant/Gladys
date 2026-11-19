@@ -264,10 +264,8 @@ describe('Zigbee2MQTT tabs on a phone', () => {
       stubStatus(notInstalledStatus);
       cy.visit(DEVICES_URL);
       cy.wait('@getNoDevices');
-      cy.get('[data-cy=z2m-devices-mobile]')
-        .children()
-        .first()
-        .should('have.attr', 'data-cy', 'z2m-status-not-installed');
+      // One query, retried as a whole: the notice shown until the status is read is replaced by another element
+      cy.get('[data-cy=z2m-devices-mobile] > :first-child').should('have.attr', 'data-cy', 'z2m-status-not-installed');
       cy.get('[data-cy=z2m-devices-mobile]').should('contain', i18n('integration.zigbee2mqtt.noDeviceFound'));
       cy.get('[data-cy=z2m-devices-discover]').should('not.exist');
     });
