@@ -3,7 +3,7 @@ const db = require('../../../models');
 
 const { authenticatedRequest } = require('../request.test');
 const DeviceController = require('../../../api/controllers/device.controller');
-const { EVENTS } = require('../../../utils/constants');
+const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../../utils/constants');
 
 const insertStates = async (intervalInMinutes) => {
   const deviceFeatureStateToInsert = [];
@@ -573,6 +573,68 @@ describe('GET /api/v1/device_feature/energy_consumption', () => {
           });
         }
       });
+  });
+});
+
+describe('POST /api/v1/device_feature/:device_feature_selector/value', () => {
+  it('should answer with the pending action, and keep its author with the action to execute', async () => {
+    const emitted = [];
+    const controller = DeviceController({ event: { emit: (...args) => emitted.push(args) } });
+    let body;
+    await controller.setValueFeature(
+      {
+        params: { device_feature_selector: 'test-device-feature' },
+        body: { value: 1 },
+        user: { id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' },
+      },
+      {
+        json: (data) => {
+          body = data;
+        },
+      },
+    );
+    const action = {
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device_feature: 'test-device-feature',
+      value: 1,
+      status: ACTIONS_STATUS.PENDING,
+    };
+    expect(body).to.deep.equal(action);
+    expect(emitted).to.deep.equal([
+      [EVENTS.ACTION.TRIGGERED, { ...action, user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }],
+    ]);
+  });
+});
+
+describe('POST /api/v1/device/:device_selector/:feature_category/:feature_type/value', () => {
+  it('should answer with the pending action, and keep its author with the action to execute', async () => {
+    const emitted = [];
+    const controller = DeviceController({ event: { emit: (...args) => emitted.push(args) } });
+    let body;
+    await controller.setValue(
+      {
+        params: { device_selector: 'test-device', feature_category: 'light', feature_type: 'binary' },
+        body: { value: 0 },
+        user: { id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' },
+      },
+      {
+        json: (data) => {
+          body = data;
+        },
+      },
+    );
+    const action = {
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device: 'test-device',
+      feature_category: 'light',
+      feature_type: 'binary',
+      value: 0,
+      status: ACTIONS_STATUS.PENDING,
+    };
+    expect(body).to.deep.equal(action);
+    expect(emitted).to.deep.equal([
+      [EVENTS.ACTION.TRIGGERED, { ...action, user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }],
+    ]);
   });
 });
 

@@ -133,6 +133,8 @@
     }
   },
   "device": {
+    "setValueError": "Der an „{{name}}“ gesendete Befehl ist fehlgeschlagen. Das Gerät ist möglicherweise nicht erreichbar.",
+    "setValueErrorUnknownDevice": "Der Befehl ist fehlgeschlagen. Das Gerät ist möglicherweise nicht erreichbar.",
     "searchPlaceHolder": "Gerät suchen",
     "noRoom": "Kein Raum",
     "noFeatures": "Keine Funktionen",

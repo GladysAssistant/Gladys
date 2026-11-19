@@ -74,7 +74,9 @@ module.exports = function DeviceController(gladys) {
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
     };
-    gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+    // The action is executed after this answer: its author is kept with it, so a failure
+    // can be reported to them (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR)
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, user_id: req.user.id });
     res.json(action);
   }
 
@@ -90,7 +92,9 @@ module.exports = function DeviceController(gladys) {
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
     };
-    gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+    // The action is executed after this answer: its author is kept with it, so a failure
+    // can be reported to them (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR)
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, user_id: req.user.id });
     res.json(action);
   }
 

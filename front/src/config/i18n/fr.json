@@ -133,6 +133,8 @@
     }
   },
   "device": {
+    "setValueError": "La commande envoyée à « {{name}} » a échoué. L'appareil est peut-être injoignable.",
+    "setValueErrorUnknownDevice": "La commande a échoué. L'appareil est peut-être injoignable.",
     "searchPlaceHolder": "Chercher un appareil",
     "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",

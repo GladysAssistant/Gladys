@@ -25,7 +25,8 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
       if (isTextSelectFeature(feature)) {
         return {
           ...feature,
-          last_value_string: `${lastValue}`,
+          // null: no state at all (a failed first command puts the feature back there)
+          last_value_string: lastValue === null ? null : `${lastValue}`,
           last_value_changed: lastValueChange
         };
       }
@@ -60,6 +61,7 @@ class DevicesComponent extends Component {
       status: RequestStatus.Getting
     };
     this.wasDisconnected = false;
+    this.statesBeforeCommand = new Map();
   }
 
   handleWebsocketConnected = ({ connected }) => {
@@ -178,21 +180,50 @@ class DevicesComponent extends Component {
     });
   };
 
+  // The state displayed before a command, kept until the request is sent: several optimistic
+  // updates may precede one request (a slider is debounced), and the state to go back to is
+  // the one from before the first of them.
+  rememberStateBeforeCommand = deviceFeature => {
+    if (this.statesBeforeCommand.has(deviceFeature.selector)) {
+      return;
+    }
+    const current = this.state.deviceFeatures.find(feature => feature.selector === deviceFeature.selector);
+    this.statesBeforeCommand.set(deviceFeature.selector, current || deviceFeature);
+  };
+
   updateValue = async (deviceFeature, value) => {
+    this.rememberStateBeforeCommand(deviceFeature);
     const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     await this.setState({
       deviceFeatures
     });
     try {
       await this.setValueDevice(deviceFeature, value);
+      this.statesBeforeCommand.delete(deviceFeature.selector);
     } catch (e) {
       console.error(e);
+      // The request never reached Gladys: same failure, for the user, as a device which did
+      // not answer (reported by the server). DeviceCommandError.jsx says so and puts the
+      // widgets back on the previous state.
+      // (no state to go back to when an earlier request for the same feature settled meanwhile)
+      const stateBeforeCommand = this.statesBeforeCommand.get(deviceFeature.selector) || {};
+      this.statesBeforeCommand.delete(deviceFeature.selector);
+      this.props.session.dispatcher.dispatch(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR, {
+        device_feature_selector: deviceFeature.selector,
+        device_feature_name: deviceFeature.name,
+        device_name: get(deviceFeature, 'device.name'),
+        value,
+        last_value: stateBeforeCommand.last_value,
+        last_value_string: stateBeforeCommand.last_value_string,
+        last_value_changed: stateBeforeCommand.last_value_changed
+      });
     }
   };
 
   setValueDeviceDebounce = debounce(this.updateValue.bind(this), 200);
 
   updateValueWithDebounce = async (deviceFeature, value) => {
+    this.rememberStateBeforeCommand(deviceFeature);
     const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     this.setState({
       deviceFeatures

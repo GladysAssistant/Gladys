@@ -133,6 +133,8 @@
     }
   },
   "device": {
+    "setValueError": "The command sent to \"{{name}}\" failed. The device may be unreachable.",
+    "setValueErrorUnknownDevice": "The command failed. The device may be unreachable.",
     "searchPlaceHolder": "Search devices",
     "noRoom": "No room",
     "noFeatures": "No features",

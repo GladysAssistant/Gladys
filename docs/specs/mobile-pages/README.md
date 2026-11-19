@@ -155,6 +155,18 @@ cards**, the pattern of the devices list.
 `<body>` above the sheets, gone after 4 s — 5 s when it carries **Undo**. It sits above the
 bottom bar on a page that has one (`aboveBar`).
 
+One error goes through it, because it has no place of its own: **a device command that failed**
+(`components/device/DeviceCommandError.jsx`, mounted once in the app shell, on every screen
+size). A widget shows the value as soon as it is asked for, and
+`POST /api/v1/device_feature/:selector/value` answers before the device is driven; when the
+device cannot be driven, the server sends `device.set-value-error` to the user who asked (the
+names of the device and of the feature, the value asked for, and the state Gladys really holds:
+`last_value`, `last_value_string`, `last_value_changed`). The toast names the device for 6 s,
+and that state is handed to the widgets as a `device.new-state` / `device.new-string-state`
+flagged `rollback: true`, so every widget goes back to it without knowing about failures (the
+History page ignores a flagged state: nothing happened on the device). A widget whose request
+could not even be sent dispatches the same message locally (the devices widgets do).
+
 ### C.7 Accessibility, motion, dark mode
 
 - Every control is a real `<button>` / `<a>` / `<input>`, named by its text or an `aria-label`.

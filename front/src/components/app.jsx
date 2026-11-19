@@ -14,6 +14,7 @@ import { catalogCategories } from '../config/integrations';
 import { getDefaultState } from '../utils/getDefaultState';
 
 import Header from './header';
+import DeviceCommandError from './device/DeviceCommandError';
 import Layout from './layout';
 import Redirect from './router/Redirect';
 import Login from '../routes/login';
@@ -511,6 +512,7 @@ class MainApp extends Component {
     return (
       <IntlProvider definition={translationDefinition}>
         <AppRouter />
+        <DeviceCommandError />
       </IntlProvider>
     );
   }

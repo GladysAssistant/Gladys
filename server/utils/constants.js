@@ -2208,6 +2208,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
   DEVICE: {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
+    // A value a user asked for could not be set on the device: sent to that user only
+    SET_VALUE_ERROR: 'device.set-value-error',
   },
   JOB: {
     NEW: 'job.new',

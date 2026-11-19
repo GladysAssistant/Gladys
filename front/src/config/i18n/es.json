@@ -133,6 +133,8 @@
     }
   },
   "device": {
+    "setValueError": "El comando enviado a «{{name}}» ha fallado. Es posible que el dispositivo no esté accesible.",
+    "setValueErrorUnknownDevice": "El comando ha fallado. Es posible que el dispositivo no esté accesible.",
     "searchPlaceHolder": "Buscar dispositivos",
     "noRoom": "Sin habitación",
     "noFeatures": "Sin funciones",

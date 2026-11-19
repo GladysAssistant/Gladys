@@ -1,8 +1,16 @@
 const sinon = require('sinon').createSandbox();
 
+const { expect } = require('chai');
+
 const { assert, fake } = sinon;
 const EventEmitter = require('events');
-const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const {
+  ACTIONS,
+  EVENTS,
+  WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+} = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
 
@@ -209,5 +217,181 @@ describe('scene.executeSingleAction multi-switch device', () => {
       device_features: ['orphan-switch', 'power-strip-socket-1'],
     });
     assert.calledOnceWithExactly(device.setValue, powerStrip, socket1, 1);
+  });
+});
+
+describe('scene.executeSingleAction, a value asked by a user which cannot be set', () => {
+  const USER_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
+  const lastValueChanged = new Date('2026-01-01T10:00:00.000Z');
+  const lampFeature = {
+    selector: 'lamp-binary',
+    name: 'On/Off',
+    device_id: 'device-id-1',
+    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+    type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+    last_value: 0,
+    last_value_string: null,
+    last_value_changed: lastValueChanged,
+  };
+  const lamp = {
+    id: 'device-id-1',
+    selector: 'lamp',
+    name: 'Living room lamp',
+    features: [lampFeature],
+  };
+  let stateManager;
+  let eventFake;
+  let device;
+  let sceneManager;
+  // Executing an action also broadcasts its progress: only the messages sent to one user matter here
+  const messagesSentToOneUser = () =>
+    eventFake.emit
+      .getCalls()
+      .filter((call) => call.args[0] === EVENTS.WEBSOCKET.SEND)
+      .map((call) => call.args[1]);
+
+  beforeEach(() => {
+    stateManager = new StateManager();
+    stateManager.setState('device', 'lamp', lamp);
+    stateManager.setState('deviceById', 'device-id-1', lamp);
+    stateManager.setState('deviceFeature', 'lamp-binary', lampFeature);
+    eventFake = { emit: fake.returns(null), on: fake.returns(null) };
+    device = { setValue: fake.rejects(new Error('Device unreachable')) };
+    sceneManager = new SceneManager(stateManager, eventFake, device);
+  });
+
+  it('should tell the user, with the state to go back to (feature selector)', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device_feature: 'lamp-binary',
+      value: 1,
+      user_id: USER_ID,
+    });
+    assert.calledWith(device.setValue, lamp, lampFeature, 1);
+    expect(messagesSentToOneUser()).to.deep.equal([
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR,
+        userId: USER_ID,
+        payload: {
+          device_feature_selector: 'lamp-binary',
+          device_feature_name: 'On/Off',
+          device_selector: 'lamp',
+          device_name: 'Living room lamp',
+          value: 1,
+          last_value: 0,
+          last_value_string: null,
+          last_value_changed: lastValueChanged,
+          error: 'Device unreachable',
+        },
+      },
+    ]);
+  });
+
+  it('should tell the user, with the state to go back to (device, category and type)', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device: 'lamp',
+      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      feature_type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      value: 1,
+      user_id: USER_ID,
+    });
+    expect(messagesSentToOneUser()).to.deep.equal([
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR,
+        userId: USER_ID,
+        payload: {
+          device_feature_selector: 'lamp-binary',
+          device_feature_name: 'On/Off',
+          device_selector: 'lamp',
+          device_name: 'Living room lamp',
+          value: 1,
+          last_value: 0,
+          last_value_string: null,
+          last_value_changed: lastValueChanged,
+          error: 'Device unreachable',
+        },
+      },
+    ]);
+  });
+
+  it('should tell the user when the error says nothing', async () => {
+    device.setValue = fake.rejects(new Error());
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device_feature: 'lamp-binary',
+      value: 1,
+      user_id: USER_ID,
+    });
+    expect(messagesSentToOneUser()).to.have.lengthOf(1);
+    expect(messagesSentToOneUser()[0].payload).to.deep.include({
+      device_feature_selector: 'lamp-binary',
+      last_value: 0,
+      error: null,
+    });
+  });
+
+  it('should tell the user when the feature does not exist', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device_feature: 'unknown-feature',
+      value: 1,
+      user_id: USER_ID,
+    });
+    assert.notCalled(device.setValue);
+    expect(messagesSentToOneUser()).to.have.lengthOf(1);
+    const [message] = messagesSentToOneUser();
+    expect(message.type).to.equal(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR);
+    expect(message.userId).to.equal(USER_ID);
+    expect(message.payload).to.deep.include({
+      device_feature_selector: 'unknown-feature',
+      device_feature_name: null,
+      device_selector: null,
+      device_name: null,
+      value: 1,
+      last_value: null,
+      last_value_string: null,
+      last_value_changed: null,
+    });
+    expect(message.payload.error).to.be.a('string');
+  });
+
+  it('should tell the user when the device does not exist', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device: 'unknown-device',
+      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      feature_type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      value: 1,
+      user_id: USER_ID,
+    });
+    assert.notCalled(device.setValue);
+    expect(messagesSentToOneUser()).to.have.lengthOf(1);
+    const [message] = messagesSentToOneUser();
+    expect(message.payload).to.deep.include({
+      device_feature_selector: null,
+      device_feature_name: null,
+      device_selector: 'unknown-device',
+      device_name: null,
+      last_value: null,
+    });
+  });
+
+  it('should not tell anyone when the value was not asked by a user', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device_feature: 'lamp-binary',
+      value: 1,
+    });
+    assert.calledWith(device.setValue, lamp, lampFeature, 1);
+    expect(messagesSentToOneUser()).to.deep.equal([]);
+  });
+
+  it('should not tell anyone when another type of action fails', async () => {
+    await sceneManager.executeSingleAction({
+      type: 'unknown.action',
+      user_id: USER_ID,
+    });
+    expect(messagesSentToOneUser()).to.deep.equal([]);
   });
 });
