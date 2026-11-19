@@ -120,7 +120,11 @@ class Wizard extends Component {
           }
         : null;
     }
-    const local = { mqttMode: MQTT_MODE.LOCAL, z2mTcpPort: null };
+    // A first installation chooses the port of the interface; a change of dongle keeps the saved one (a key absent from
+    // the setup keeps its stored value)
+    const local = this.props.changeMode
+      ? { mqttMode: MQTT_MODE.LOCAL }
+      : { mqttMode: MQTT_MODE.LOCAL, z2mTcpPort: null };
     if (pane === PANE.NETWORK) {
       return trimmed(networkUrl) && networkType
         ? {
@@ -257,7 +261,8 @@ class Wizard extends Component {
     this.setState({
       previousInstallation: JSON.stringify(installation || null),
       installReady: false,
-      saveErrorClosed: false
+      saveErrorClosed: false,
+      saveRequested: true
     });
     const saved = await this.props.saveConfiguration(configuration);
     if (this.unmounted) {
@@ -377,7 +382,10 @@ class Wizard extends Component {
       installReady: false,
       permitJoinStatus: null,
       // The refusal of the setup, closed from the bottom bar of the phone layout
-      saveErrorClosed: false
+      saveErrorClosed: false,
+      // Whether this wizard saved: the refusal of a save made before it opened (the advanced settings, a change of
+      // dongle cancelled) is not its own
+      saveRequested: false
     };
     // Numbers the requests of the USB ports, to keep only the answer of the last one
     this.usbPortsRequests = 0;
@@ -493,8 +501,8 @@ class Wizard extends Component {
       zigbee2mqttStatus: props.zigbee2mqttStatus,
       configuration: props.configuration,
       saving: props.setupZigee2mqttStatus === RequestStatus.Getting,
-      setupZigee2mqttStatus: props.setupZigee2mqttStatus,
-      setupZigee2mqttError: props.setupZigee2mqttError
+      setupZigee2mqttStatus: state.saveRequested ? props.setupZigee2mqttStatus : null,
+      setupZigee2mqttError: state.saveRequested ? props.setupZigee2mqttError : null
     };
     const actions = {
       showAuto: this.showAuto,

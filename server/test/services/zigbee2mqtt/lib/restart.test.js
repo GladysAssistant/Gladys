@@ -36,6 +36,7 @@ describe('zigbee2mqtt restart', () => {
       },
     };
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
+    zigbee2mqttManager.mqttClient = { publish: fake() };
     zigbee2mqttManager.gladysConnected = true;
     zigbee2mqttManager.restartZ2mContainer = fake.resolves(null);
   });
@@ -76,6 +77,34 @@ describe('zigbee2mqtt restart', () => {
     // ASSERT
     assert.notCalled(gladys.system.restartContainer);
     assert.calledOnce(zigbee2mqttManager.restartZ2mContainer);
+  });
+
+  it('should forget the failure being retried, the new run telling its own', async () => {
+    // PREPARE
+    zigbee2mqttManager.z2mContainerError = { code: 'ADAPTER_NO_RESPONSE', message: 'HOST_FATAL_ERROR' };
+    zigbee2mqttManager.startInstallation('start');
+    zigbee2mqttManager.finishInstallation(new Error('Zigbee2mqtt did not answer'));
+    expect(zigbee2mqttManager.installation.state).to.equal('failed');
+    // EXECUTE
+    await zigbee2mqttManager.restart();
+    // ASSERT
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    expect(zigbee2mqttManager.installation.state).to.equal('idle');
+    assert.calledOnce(zigbee2mqttManager.restartZ2mContainer);
+  });
+
+  it('should start again through an installation when Gladys has no client of the broker', async () => {
+    // PREPARE: the last init failed before connecting
+    zigbee2mqttManager.mqttClient = null;
+    zigbee2mqttManager.gladysConnected = false;
+    zigbee2mqttManager.start = fake.resolves(null);
+    // EXECUTE
+    await zigbee2mqttManager.restart();
+    // ASSERT
+    assert.calledOnce(zigbee2mqttManager.start);
+    assert.notCalled(zigbee2mqttManager.restartZ2mContainer);
+    assert.notCalled(gladys.system.restartContainer);
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
   });
 
   it('should refuse to restart what the user stopped', async () => {

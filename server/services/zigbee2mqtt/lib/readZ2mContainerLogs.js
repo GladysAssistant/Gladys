@@ -61,8 +61,9 @@ const LOGS_READING_TIMEOUT_IN_MS = 5 * 60 * 1000;
  */
 async function readZ2mContainerLogs(containerId, since) {
   // The installation these logs come from: replaced by a newer one (another coordinator saved meanwhile), its error
-  // does not describe the coordinator now configured
-  const { installedConfig } = this;
+  // does not describe the coordinator now configured. The run too: restarted or stopped since, the error of this run
+  // would replace what the new one tells, or show on a Zigbee2mqtt the user stopped
+  const { installedConfig, z2mRun } = this;
   // Why Zigbee2mqtt does not start, null when the logs do not tell
   let containerError = null;
   try {
@@ -167,6 +168,10 @@ async function readZ2mContainerLogs(containerId, since) {
   // would change the coordinator configured since. The reader of the new installation tells what it finds.
   if (this.installedConfig !== installedConfig) {
     logger.info('Zigbee2mqtt: logs of a replaced installation, ignored');
+    return;
+  }
+  if (this.z2mRun !== z2mRun) {
+    logger.info('Zigbee2mqtt: logs of a run restarted or stopped since, ignored');
     return;
   }
 

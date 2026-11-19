@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../../utils/consts';
+import { getStopKeys } from './dashboardState';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
@@ -12,6 +13,7 @@ const ICONS = { restart: 'refresh-cw', stop: 'square', interface: 'external-link
 const ActionTiles = ({ view, actions }) => {
   const { tiles, z2mUrl, actionStatus, confirmStop } = view;
   const busy = actionStatus === RequestStatus.Getting;
+  const stopKeys = getStopKeys(view.configuration);
   if (tiles.length === 0) {
     return null;
   }
@@ -41,7 +43,7 @@ const ActionTiles = ({ view, actions }) => {
               data-cy={`z2m-dashboard-${tile}`}
             >
               <i class={`fe fe-${ICONS[tile]}`} aria-hidden="true" />
-              <Text id={`${T}.actions.${tile}`} />
+              <Text id={tile === 'stop' ? `${T}.${stopKeys.label}` : `${T}.actions.${tile}`} />
             </button>
           )
         )}
@@ -50,9 +52,9 @@ const ActionTiles = ({ view, actions }) => {
         <div class={style.confirm} role="alertdialog" data-cy="z2m-dashboard-confirm-stop">
           <span>
             <strong>
-              <Text id={`${T}.confirmStop.title`} />
+              <Text id={`${T}.${stopKeys.confirm}.title`} />
             </strong>{' '}
-            <Text id={`${T}.confirmStop.text`} />
+            <Text id={`${T}.${stopKeys.confirm}.text`} />
           </span>
           <div class={style.buttons}>
             <button
@@ -62,7 +64,7 @@ const ActionTiles = ({ view, actions }) => {
               onClick={actions.stop}
               data-cy="z2m-dashboard-confirm-stop-button"
             >
-              <Text id={`${T}.confirmStop.confirm`} />
+              <Text id={`${T}.${stopKeys.confirm}.confirm`} />
             </button>
             <button type="button" class="btn btn-link" onClick={actions.cancelStop} data-cy="z2m-dashboard-cancel-stop">
               <Text id={`${T}.confirmStop.cancel`} />

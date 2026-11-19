@@ -163,11 +163,31 @@ class Dashboard extends Component {
   // A new installation runs: its outcome is told
   followNewInstallation = () => this.setState({ installationSuccessDismissed: false });
 
+  // Another state of Zigbee2mqtt: the refusal of an action (an installation or another operation was running) and the
+  // joining allowed while online no longer describe it
+  followNewState = previousState => {
+    const changes = {};
+    if (previousState === DASHBOARD_STATE.ONLINE) {
+      changes.permitJoinAllowed = false;
+    }
+    if (this.state.actionError && this.state.actionStatus !== RequestStatus.Getting) {
+      changes.actionError = null;
+      changes.actionStatus = null;
+    }
+    this.setState(changes);
+  };
+
   componentDidUpdate(previousProps) {
     const wasInstalling = get(previousProps, 'zigbee2mqttStatus.installation.state') === 'running';
     const installing = get(this.props, 'zigbee2mqttStatus.installation.state') === 'running';
     if (wasInstalling && !installing) {
       this.clearBusyError();
+    }
+    const configuration = this.props.configuration || {};
+    const previousState = getDashboardState(previousProps.zigbee2mqttStatus, previousProps.configuration || {});
+    const currentState = getDashboardState(this.props.zigbee2mqttStatus, configuration);
+    if (previousState !== currentState) {
+      this.followNewState(previousState);
     }
     if (installing && !wasInstalling) {
       this.followNewInstallation();
@@ -190,6 +210,14 @@ class Dashboard extends Component {
   render(props, state) {
     const status = props.zigbee2mqttStatus;
     const configuration = props.configuration || {};
+    // The status could not be read: an error instead of a state guessed from nothing (docs/specs/…, J)
+    if (props.loadZigbee2mqttStatus === RequestStatus.Error && status.dockerBased === undefined) {
+      return (
+        <div class="alert alert-danger" data-cy="z2m-dashboard-status-error">
+          <Text id="integration.zigbee2mqtt.setup.errorLoadingStatesLabel" />
+        </div>
+      );
+    }
     if (state.screen === SCREEN.CHANGE) {
       return (
         <Wizard
@@ -224,7 +252,7 @@ class Dashboard extends Component {
       z2mUrl,
       language: get(props, 'user.language'),
       installing: dashboardState === DASHBOARD_STATE.INSTALLING,
-      primaryAction: getPrimaryAction(dashboardState, configuration),
+      primaryAction: getPrimaryAction(dashboardState, configuration, status),
       tiles: getTiles(dashboardState, configuration, z2mUrl),
       canChangeKey: !isExternal(configuration),
       ezspDriver: !isExternal(configuration) && getDriver(configuration, savedAdapter) === 'ezsp',

@@ -136,7 +136,7 @@ class Zigbee2mqttSetupPage extends Component {
   };
 
   // Nothing configured yet: the images are downloaded in the background, so that the installation does not wait for them.
-  // Asked by the local mode form once a coordinator is chosen (a dongle preselected counts), not as the page opens: an
+  // Asked by step ① of the wizard once a coordinator is chosen (a dongle preselected counts), not as the page opens: an
   // external broker, or an admin who only looks, downloads nothing. Asked once, when the server tells that it runs in
   // Docker with the host network.
   prefetchImages = async () => {
@@ -321,6 +321,7 @@ class Zigbee2mqttSetupPage extends Component {
             session={props.session}
             httpClient={props.httpClient}
             zigbee2mqttStatus={state.zigbee2mqttStatus}
+            loadZigbee2mqttStatus={state.loadZigbee2mqttStatus}
             configuration={state.configuration}
             z2mUrl={state.z2mUrl}
             setupZigee2mqttStatus={state.setupZigee2mqttStatus}

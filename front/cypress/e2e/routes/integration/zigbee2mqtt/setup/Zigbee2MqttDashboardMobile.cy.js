@@ -1,4 +1,4 @@
-import { answerSetup } from './wizardFixtures';
+import { answerSetup, runningInstallation, doneInstallation, sendProgress } from './wizardFixtures';
 import { onlineStatus, localSetup, externalSetup, conflict, visitDashboard, answerAction } from './dashboardFixtures';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
@@ -168,6 +168,23 @@ describe('Zigbee2mqtt dashboard on a phone', () => {
         .its('request.body')
         .should('include', { Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://192.168.1.11:1883' });
       cy.get('[data-cy=z2m-dashboard-key]').should('contain', 'mqtt://192.168.1.11:1883');
+    });
+
+    it('should show the broker saved meanwhile in the fields not changed, nothing to save', () => {
+      visitDashboard({ status: { ...onlineStatus, installation: runningInstallation }, setup: externalSetup });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').should('have.value', 'mqtt://192.168.1.10:1883');
+
+      const serverUrl = Cypress.env('serverUrl');
+      cy.intercept(
+        { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` },
+        { body: { ...externalSetup, Z2M_MQTT_URL: 'mqtt://192.168.1.12:1883' } }
+      ).as('configAfterInstallation');
+      sendProgress(doneInstallation);
+      cy.wait('@configAfterInstallation');
+
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').should('have.value', 'mqtt://192.168.1.12:1883');
+      cy.get('[data-cy=z2m-dashboard-bottom-bar]').should('not.exist');
     });
 
     it('should reset the integration once confirmed in a sheet, back to the wizard', () => {

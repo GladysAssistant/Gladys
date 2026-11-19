@@ -41,6 +41,7 @@ describe('zigbee2mqtt API', () => {
 
   beforeEach(() => {
     controller = Zigbee2MqttController(gladys, zigbee2mqttManager, 'de1dd005-092d-456d-93d1-817c9ace4c67');
+    zigbee2mqttManager.stopped = false;
     zigbee2mqttManager.refuseWhileInstalling = fake();
     zigbee2mqttManager.getConfiguration = fake.resolves({
       mqttUrl: 'mqtt://localhost:1884',
@@ -187,6 +188,34 @@ describe('zigbee2mqtt API', () => {
       expect(error).to.be.instanceOf(BadParameters);
       expect(error.message).to.equal('Zigbee2mqtt: the MQTT accounts do not exist yet, save the setup first');
       assert.notCalled(zigbee2mqttManager.installMqttContainer);
+      assert.notCalled(res.json);
+    });
+  });
+
+  [
+    ['mqtt/start', 'installMqttContainer'],
+    ['z2m/start', 'installZ2mContainer'],
+  ].forEach(([route, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused while the user keeps Zigbee2mqtt stopped`, async () => {
+      // PREPARE
+      zigbee2mqttManager.stopped = true;
+      zigbee2mqttManager.getConfiguration = fake.resolves({
+        mqttPassword: 'gladys-password',
+        z2mMqttPassword: 'z2m-password',
+        z2mAdapterMode: 'usb',
+        z2mDriverPath: '/dev/ttyUSB0',
+      });
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller[`post /api/v1/service/zigbee2mqtt/${route}`].controller({}, res, next);
+      // ASSERT
+      const [error] = next.firstCall.args;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Zigbee2mqtt: stopped by the user, start it instead');
+      assert.notCalled(zigbee2mqttManager[method]);
       assert.notCalled(res.json);
     });
   });

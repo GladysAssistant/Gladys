@@ -208,6 +208,42 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-interface]').should('not.exist');
     });
 
+    it('should tell that Zigbee2mqtt is not started, with the way to start it or to open the services', () => {
+      // Neither a container of ours nor a client of the broker: the service was stopped in the settings
+      const inactiveStatus = {
+        ...onlineStatus,
+        z2mEnabled: false,
+        zigbee2mqttExist: false,
+        mqttExist: false,
+        gladysConnected: false,
+        zigbee2mqttConnected: false
+      };
+      visitDashboard({ status: inactiveStatus });
+      answerAction('start');
+
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.inactive.title`);
+      cy.get('[data-cy=z2m-dashboard-services]').should('have.attr', 'href', '/dashboard/settings/service');
+      cy.get('[data-cy=z2m-dashboard-tiles]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-start]').click();
+      cy.wait('@start');
+
+      // Since the start of Gladys: init never read the configuration, only the settings start it
+      sendStatus({ ...inactiveStatus, configured: null });
+      cy.get('[data-cy=z2m-dashboard-start]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-services]').should('exist');
+    });
+
+    it('should tell that the status cannot be loaded instead of a state guessed from nothing', () => {
+      const serverUrl = Cypress.env('serverUrl');
+      cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { statusCode: 500 });
+      cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: localSetup });
+      cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
+
+      cy.get('[data-cy=z2m-dashboard-status-error]').i18n('integration.zigbee2mqtt.setup.errorLoadingStatesLabel');
+      cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+    });
+
     it('should tell that the status cannot be loaded', () => {
       const serverUrl = Cypress.env('serverUrl');
       cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { statusCode: 500 });
@@ -333,6 +369,36 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-progress]').should('exist');
       sendProgress(doneInstallation);
       cy.get('[data-cy=z2m-dashboard-action-error]').should('not.exist');
+    });
+
+    it('should stop telling that the integration was busy once Zigbee2mqtt changed state', () => {
+      visitDashboard({ status: notAnsweringStatus });
+      // Refused by an operation (an init, the watch of the dongle), not by an installation
+      answerAction('restart', conflict('Zigbee2mqtt: cannot restart Zigbee2mqtt while the integration is busy'));
+
+      cy.get('[data-cy=z2m-dashboard-restart]')
+        .first()
+        .click();
+      cy.wait('@restart');
+      cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.busy`);
+
+      sendStatus(onlineStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.online.title`);
+      cy.get('[data-cy=z2m-dashboard-action-error]').should('not.exist');
+    });
+
+    it('should stop telling joining allowed once Zigbee2mqtt went offline', () => {
+      visitDashboard();
+      answerAction('permit_join');
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      cy.wait('@permit_join');
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('exist');
+
+      sendStatus(notAnsweringStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.notAnswering.title`);
+      sendStatus(onlineStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.online.title`);
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('not.exist');
     });
 
     it('should tell that an action failed', () => {

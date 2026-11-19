@@ -19,21 +19,23 @@ import MqttConnectionError from '../../commons/MqttConnectionError';
 import { formatDuration } from '../wizard/format';
 import InstallFailure from '../wizard/InstallFailure';
 import KeyPhoto from '../wizard/KeyPhoto';
-import { DASHBOARD_STATE, getStartupError, isExternal, isNetworkCoordinator } from './dashboardState';
+import { DASHBOARD_STATE, getStartupError, getStopKeys, isExternal, isNetworkCoordinator } from './dashboardState';
 import { getDriver } from './KeyCard';
 import {
   DISCOVER_URL,
+  SERVICES_URL,
   ICONS,
   PRIMARY_ICONS,
-  PRIMARY_LABELS,
   Subtitle,
   Title,
-  getInstallationPhase
+  getInstallationPhase,
+  getPrimaryLabel
 } from './StatusCard';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
 
+// Not listed: neutral (installing, starting, stopped, stopping, inactive)
 const TONES = {
   [DASHBOARD_STATE.ONLINE]: 'success',
   [DASHBOARD_STATE.DONGLE_MISSING]: 'warning',
@@ -126,6 +128,7 @@ class DashboardMobile extends Component {
     const startupError = state === DASHBOARD_STATE.FAILED ? getStartupError(status) : null;
     const busy = actionStatus === RequestStatus.Getting;
     const dictionary = get(intl, 'dictionary');
+    const stopKeys = getStopKeys(view.configuration);
     return (
       <MobileIntegrationTab dataCy="z2m-dashboard">
         <MobileGroup data-cy="z2m-dashboard-status" data-state={state}>
@@ -203,7 +206,9 @@ class DashboardMobile extends Component {
           </MobileNotice>
         )}
 
-        {(primaryAction || (view.canChangeKey && state === DASHBOARD_STATE.FAILED)) && (
+        {(primaryAction ||
+          (view.canChangeKey && state === DASHBOARD_STATE.FAILED) ||
+          state === DASHBOARD_STATE.INACTIVE) && (
           <div class={kitStyle.buttons}>
             {primaryAction && (
               <BigButton
@@ -213,7 +218,12 @@ class DashboardMobile extends Component {
                 onClick={actions[primaryAction]}
                 data-cy={`z2m-dashboard-${primaryAction}`}
               >
-                <Text id={PRIMARY_LABELS[primaryAction]} />
+                <Text id={getPrimaryLabel(primaryAction, view.configuration)} />
+              </BigButton>
+            )}
+            {state === DASHBOARD_STATE.INACTIVE && (
+              <BigButton href={SERVICES_URL} data-cy="z2m-dashboard-services">
+                <Text id={`${T}.actions.services`} />
               </BigButton>
             )}
             {view.canChangeKey && state === DASHBOARD_STATE.FAILED && (
@@ -245,7 +255,7 @@ class DashboardMobile extends Component {
                 icon="square"
                 iconTone="danger"
                 tone="danger"
-                title={<Text id={`${T}.actions.stop`} />}
+                title={<Text id={`${T}.${stopKeys.label}`} />}
                 onClick={actions.askStop}
                 disabled={busy}
                 dataCy="z2m-dashboard-stop"
@@ -284,9 +294,9 @@ class DashboardMobile extends Component {
 
         <ConfirmSheet
           open={view.confirmStop}
-          title={get(dictionary, `${T}.confirmStop.title`)}
-          text={<Text id={`${T}.confirmStop.text`} />}
-          confirmLabel={<Text id={`${T}.confirmStop.confirm`} />}
+          title={get(dictionary, `${T}.${stopKeys.confirm}.title`)}
+          text={<Text id={`${T}.${stopKeys.confirm}.text`} />}
+          confirmLabel={<Text id={`${T}.${stopKeys.confirm}.confirm`} />}
           destructive
           loading={busy}
           onConfirm={actions.stop}

@@ -48,6 +48,27 @@ describe('Zigbee2mqtt status', () => {
     cy.get('#permitJoin').should('not.be.disabled');
   });
 
+  it('should tell that Zigbee2mqtt is stopped, not blame the broker, on the discover page', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    // Stopped from the dashboard: Gladys disconnected from the broker, the containers kept
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      {
+        body: {
+          ...notOnlineStatus,
+          stopped: true,
+          gladysConnected: false,
+          mqttConnectionError: { code: 'BROKER_UNREACHABLE', message: 'connect ECONNREFUSED' }
+        }
+      }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.stopped');
+    cy.get('[data-cy=z2m-status-alert-mqtt-error]').should('not.exist');
+    cy.get('#permitJoin').should('be.disabled');
+  });
+
   it('should tell that Zigbee2mqtt is not installed on the discover page, with the way to install it', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(

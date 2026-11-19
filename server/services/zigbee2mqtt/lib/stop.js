@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { findOwnZ2mContainer } = require('../utils/findOwnZ2mContainer');
 const { CONFIGURATION } = require('./constants');
 const { disconnectFromBroker } = require('./disconnect');
@@ -63,6 +64,22 @@ async function stop() {
     this.stopped = true;
     this.stoppedAt = stoppedAt;
     disconnectFromBroker.call(this);
+    // Gladys no longer hears Zigbee2mqtt, even if a container below fails to stop: what the run told (its starting
+    // window, the error of its logs, joining allowed) no longer describes anything
+    this.zigbee2mqttConnected = false;
+    clearTimeout(this.startingTimer);
+    this.startingTimer = null;
+    this.zigbee2mqttStarting = false;
+    this.z2mContainerError = null;
+    this.z2mRun += 1;
+    if (this.z2mPermitJoin) {
+      this.z2mPermitJoin = false;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+        payload: false,
+      });
+    }
+    this.emitStatusEvent();
 
     // Zigbee2mqtt first: it stops cleanly while its broker still answers
     await stopContainer(this.gladys.system, zigbee2mqttContainerDescriptor);
@@ -70,11 +87,6 @@ async function stop() {
 
     this.mqttRunning = false;
     this.zigbee2mqttRunning = false;
-    this.zigbee2mqttConnected = false;
-    clearTimeout(this.startingTimer);
-    this.startingTimer = null;
-    this.zigbee2mqttStarting = false;
-    this.z2mContainerError = null;
     this.emitStatusEvent();
     logger.info('Zigbee2mqtt: stopped by the user');
   } finally {

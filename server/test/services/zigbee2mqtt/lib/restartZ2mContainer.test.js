@@ -40,6 +40,8 @@ describe('zigbee2mqtt restartZ2mContainer', () => {
     // ASSERT
     assert.calledOnceWithExactly(gladys.system.restartContainer, 'z2m-container');
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(true);
+    // A new run: the reader of the previous one tells nothing any more
+    expect(zigbee2mqttManager.z2mRun).to.equal(1);
     expect(zigbee2mqttManager.zigbee2mqttStartingSince).to.equal(new Date('2026-11-17T08:00:00.000Z').getTime());
     // Read from the second the restart was asked
     assert.calledOnceWithExactly(

@@ -148,11 +148,29 @@ class AdvancedSettings extends Component {
     }
   };
 
+  // The broker saved meanwhile (another page, the end of an installation): each field the user did not change shows it
+  showSavedBroker = (previousConfiguration, configuration) => {
+    const broker = { ...this.state.broker };
+    const changedKeys = BROKER_KEYS.filter(key => {
+      const previous = previousConfiguration[key] || '';
+      return (configuration[key] || '') !== previous && (broker[key] || '') === previous;
+    });
+    if (changedKeys.length > 0) {
+      changedKeys.forEach(key => {
+        broker[key] = configuration[key] || '';
+      });
+      this.setState({ broker });
+    }
+  };
+
   componentDidUpdate(previousProps) {
     const previousPort = `${previousProps.view.configuration.z2mTcpPort || ''}`;
     const savedPort = `${this.props.view.configuration.z2mTcpPort || ''}`;
     if (savedPort !== previousPort) {
       this.showSavedPort(previousPort, savedPort);
+    }
+    if (previousProps.view.configuration !== this.props.view.configuration) {
+      this.showSavedBroker(previousProps.view.configuration, this.props.view.configuration);
     }
   }
 
@@ -277,7 +295,7 @@ class AdvancedSettings extends Component {
                 <Text id={`${T}.advanced.reset.title`} />
               </h3>
               <p class="text-muted">
-                <Text id={`${T}.advanced.reset.text`} />
+                <Text id={external ? `${T}.advanced.reset.textExternal` : `${T}.advanced.reset.text`} />
               </p>
               {resetZigbee2mqttStatus === RequestStatus.Error && (
                 <div class="alert alert-danger" data-cy="z2m-reset-error">
@@ -292,7 +310,13 @@ class AdvancedSettings extends Component {
               {confirmReset ? (
                 <div class={style.confirm} role="alertdialog" data-cy="z2m-dashboard-confirm-reset">
                   <span>
-                    <Text id="integration.zigbee2mqtt.setup.reset.confirmMessage" />
+                    <Text
+                      id={
+                        external
+                          ? `${T}.advanced.reset.confirmExternal`
+                          : 'integration.zigbee2mqtt.setup.reset.confirmMessage'
+                      }
+                    />
                   </span>
                   <div class={style.buttons}>
                     <button

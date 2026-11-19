@@ -2195,7 +2195,8 @@
         "settingsPageLink": "USB-Dongle-Einstellungen.",
         "setupPageLink": "Einrichtungseite.",
         "notInstalled": "Zigbee2MQTT ist nicht installiert: Installiere es, um deine Zigbee-Geräte hinzuzufügen und zu steuern.",
-        "install": "Zigbee2MQTT installieren"
+        "install": "Zigbee2MQTT installieren",
+        "stopped": "Zigbee2MQTT ist gestoppt: Zigbee-Geräte können weder gekoppelt noch gesteuert werden, bis du es wieder startest. Zum Starten geht es auf die "
       },
       "setup": {
         "title": "Konfiguration des Zigbee2MQTT-Dienstes",
@@ -2597,6 +2598,14 @@
             "notAnswering": {
               "title": "Zigbee2MQTT antwortet nicht",
               "text": "Gladys erhält keine Antwort von Zigbee2MQTT: Deine Zigbee-Geräte reagieren nicht."
+            },
+            "stoppedExternal": {
+              "title": "Von deinem Zigbee2MQTT getrennt",
+              "since": "Seit {{date}} · Gladys verbindet sich nicht von selbst wieder. Dein Zigbee2MQTT läuft weiter."
+            },
+            "inactive": {
+              "title": "Zigbee2MQTT ist nicht gestartet",
+              "text": "Gladys hat es nicht gestartet: Prüfe, ob der Zigbee2MQTT-Dienst unter Einstellungen > Dienste läuft."
             }
           },
           "newDevices": {
@@ -2615,7 +2624,10 @@
             "restart": "Neu starten",
             "stop": "Stoppen",
             "interface": "Zigbee2MQTT-Oberfläche",
-            "changeKey": "Ändern"
+            "changeKey": "Ändern",
+            "disconnect": "Trennen",
+            "connect": "Verbinden",
+            "services": "Dienste öffnen"
           },
           "facts": {
             "driver": "Treiber",
@@ -2645,7 +2657,7 @@
             "interface": {
               "title": "Zigbee2MQTT-Oberfläche",
               "port": "Port",
-              "help": "Eine Änderung des Ports erstellt den Zigbee2MQTT-Container neu; seine Daten bleiben erhalten.",
+              "help": "Eine Änderung des Ports startet Zigbee2MQTT neu; seine Daten bleiben erhalten.",
               "open": "Oberfläche öffnen"
             },
             "broker": {
@@ -2665,7 +2677,9 @@
             },
             "reset": {
               "title": "Integration zurücksetzen",
-              "text": "Entfernt die Container, die Konfiguration und das Zigbee-Netzwerk: Du musst alle deine Geräte neu anlernen."
+              "text": "Entfernt die Container, die Konfiguration und das Zigbee-Netzwerk: Du musst alle deine Geräte neu anlernen.",
+              "textExternal": "Vergisst die Verbindung zu deinem Zigbee2MQTT und öffnet den Installationsassistenten erneut. Dein Zigbee2MQTT und sein Netzwerk bleiben unberührt.",
+              "confirmExternal": "Gladys vergisst die Verbindung zu deinem Zigbee2MQTT. Dein Zigbee2MQTT, seine Konfiguration und seine Geräte bleiben auf seiner Seite erhalten."
             },
             "saveError": "Die Einstellung konnte nicht gespeichert werden. Versuchen Sie es erneut.",
             "saveDongleNotFound": "Ihr Zigbee-Stick ist nicht eingesteckt: Es wurde nichts gespeichert. Stecken Sie ihn ein und speichern Sie erneut."
@@ -2674,6 +2688,11 @@
             "keyTitle": "Koordinator",
             "changeKey": "Stick wechseln",
             "copy": "Kopieren"
+          },
+          "confirmStopExternal": {
+            "title": "Von deinem Zigbee2MQTT trennen?",
+            "text": "Gladys steuert deine Zigbee-Geräte nicht mehr, auch nach einem Neustart von Gladys, bis du die Verbindung wiederherstellst. Dein Zigbee2MQTT läuft weiter.",
+            "confirm": "Trennen"
           }
         }
       },

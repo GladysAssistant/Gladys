@@ -301,7 +301,7 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
                 iconTone="danger"
                 tone="danger"
                 title={<Text id="integration.zigbee2mqtt.setup.reset.button" />}
-                subtitle={<Text id={`${T}.advanced.reset.text`} />}
+                subtitle={<Text id={external ? `${T}.advanced.reset.textExternal` : `${T}.advanced.reset.text`} />}
                 onClick={form.showConfirmReset}
                 disabled={view.installing}
                 dataCy="z2m-reset-button"
@@ -333,7 +333,13 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
         <ConfirmSheet
           open={form.confirmReset}
           title={get(dictionary, `${T}.advanced.reset.title`)}
-          text={<Text id="integration.zigbee2mqtt.setup.reset.confirmMessage" />}
+          text={
+            <Text
+              id={
+                external ? `${T}.advanced.reset.confirmExternal` : 'integration.zigbee2mqtt.setup.reset.confirmMessage'
+              }
+            />
+          }
           confirmLabel={<Text id="integration.zigbee2mqtt.setup.reset.confirmButton" />}
           destructive
           loading={resetZigbee2mqttStatus === RequestStatus.Getting}

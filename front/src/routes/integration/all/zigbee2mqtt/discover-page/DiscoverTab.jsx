@@ -33,16 +33,11 @@ import {
 class MobilePermitJoin extends Component {
   state = {
     busy: false,
-    // the sentence of the last toggle that failed, until the next one
-    failedKey: null
+    // the sentence of the last toggle that failed, until the next one, and the state of the joining it failed on: a
+    // newer state, pushed live, makes it outdated
+    failedKey: null,
+    failedOn: null
   };
-
-  componentDidUpdate(prevProps) {
-    // a newer state of the joining, pushed live, makes the last failure outdated
-    if (prevProps.permitJoin !== this.props.permitJoin && this.state.failedKey) {
-      this.setState({ failedKey: null });
-    }
-  }
 
   componentWillUnmount() {
     this.unmounted = true;
@@ -67,12 +62,17 @@ class MobilePermitJoin extends Component {
       failed = true;
     }
     if (!this.unmounted) {
-      this.setState({ busy: false, failedKey: failed ? failedKey : null });
+      this.setState({
+        busy: false,
+        failedKey: failed ? failedKey : null,
+        failedOn: Boolean(this.props.permitJoin)
+      });
     }
   };
 
-  render({ disabled }, { busy, failedKey }) {
+  render({ disabled, permitJoin }, { busy, failedKey: lastFailedKey, failedOn }) {
     const open = this.isOpen();
+    const failedKey = failedOn === Boolean(permitJoin) ? lastFailedKey : null;
     return (
       <div>
         <div class={integrationMobileStyle.block}>

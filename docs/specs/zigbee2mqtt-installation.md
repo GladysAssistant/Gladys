@@ -171,10 +171,10 @@ Under `/api/v1/service/zigbee2mqtt/`. A refusal answers 409 with the generic bod
 | `POST /disconnect`  | authenticated | 409 when busy, then disables the integration                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `POST /stop`        | admin         | 409 when busy; stops Zigbee2mqtt until it is started again (E.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `POST /start`       | admin         | 409 when busy, 400 when nothing is set up; forgets the stop and launches a `start` installation without waiting (E.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `POST /restart`     | admin         | 409 when busy, 400 when stopped or without a Zigbee2mqtt container of ours; restarts it (E.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `POST /restart`     | admin         | 409 when busy, 400 when stopped or without a Zigbee2mqtt container of ours; restarts it, or starts it again (`start`) when Gladys has no client of the broker (E.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `POST /reset`       | admin         | 409 when busy, then resets the integration                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `POST /mqtt/start`  | authenticated | 409 when busy; 400 when the MQTT accounts were never generated (no setup saved)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `POST /z2m/start`   | authenticated | 409 when busy; 400 when no coordinator of the adapter mode is configured                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `POST /mqtt/start`  | authenticated | 409 when busy; 400 while stopped by the user (E.4), or when the MQTT accounts were never generated (no setup saved)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `POST /z2m/start`   | authenticated | 409 when busy; 400 while stopped by the user (E.4), or when no coordinator of the adapter mode is configured                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `GET /status`       | authenticated | carries `installation` and `prefetch`, and `z2mVersion` / `deviceCount` (E.3)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `GET /adapter`      | authenticated | the coordinator models, each with how the wizard shows it (E.3)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `POST /permit_join` | authenticated | body `{ value }` (boolean, optional): `true` allows new devices to join for 254 s, `false` forbids it, no value toggles (Discover tab); another value → 400; without a connection to the broker (not installed, disabled) → 400 `SERVICE_NOT_CONFIGURED`                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -223,15 +223,27 @@ installation. A job that fails to start fails the installation with its error. A
   Gladys disconnects from the broker (nightly backup, watch of the dongle, health check and last
   installation stopped too, as `disconnect` does), then our containers get the restart policy `no`
   (Docker starts a container of policy `always` again when the machine restarts, even stopped by
-  hand) and are stopped, Zigbee2mqtt first, and **kept**. With an external broker, Gladys only
-  disconnects. While `Z2M_STOPPED` exists, init (start of Gladys, Settings > Services) starts and
-  watches nothing: it ends once it knows the platform, `stopped: true`.
+  hand) and are stopped, Zigbee2mqtt first, and **kept**. From the disconnection, whatever happens to
+  the containers next, Gladys no longer tells Zigbee2mqtt answering nor starting, joining is told
+  closed (`zigbee2mqtt.permit-join`), and the logs of the run it stops are ignored (`z2mRun`, below).
+  With an external broker, Gladys only disconnects. While `Z2M_STOPPED` exists, init (start of
+  Gladys, Settings > Services) starts and watches nothing: it ends once it knows the platform,
+  `stopped: true`; `POST /z2m/start` and `POST /mqtt/start` are refused (400), and a command to a
+  device (`setValue`) is refused (400 `SERVICE_NOT_CONFIGURED`) as long as Gladys has no client of the
+  broker.
 - **Start** (`start.js`). Refused when nothing is set up. Forgets the stop (variable destroyed, restart
   policy `always` again, best effort) and runs a `start` installation (B.1), followed on the page; a
   setup saved while stopped forgets the stop too. Reset destroys the variable.
 - **Restart** (`restart.js`). Restarts the Zigbee2mqtt container through `restartZ2mContainer`, the
   same code as an installation: the starting window (`zigbee2mqttStarting`, 2 min) and the logs of
-  the new run (0.2). The broker is restarted first when Gladys is not connected to it.
+  the new run (0.2). The broker is restarted first when Gladys is not connected to it. The failure
+  being retried is forgotten first (`z2mContainerError`, a failed installation): the dashboard shows
+  the new run starting, and its logs tell their own error. Without a client of the broker (the last
+  init failed before connecting), restarting the containers would not connect Gladys again: the
+  restart is a start (an installation `start`) instead.
+- **Runs** (`z2mRun`). Counted by each restart of the container and by a stop: a reader of the logs
+  of an older run (0.2) writes nothing when it ends, so the error of a run replaced or stopped never
+  shows on the new one or on a stopped Zigbee2mqtt.
 - **Without Docker** (an external broker only). Our containers are looked for through
   `utils/findOwnZ2mContainer.js`: on a machine where Gladys does not run in Docker there is none, so a
   stop only disconnects, a start or a reset (`disconnect`) go on without containers, and a restart is
@@ -587,7 +599,8 @@ its phases folded under it. No leave guard: nothing is lost, the installation go
 The Devices and Discover tabs tell "Zigbee2mqtt is not installed" with a button to the setup tab when
 the status says `configured: false` (E.3), instead of the messages of a Zigbee2mqtt that does not
 answer; that banner only (not the warning about the interface URL), and the switch to permit joining
-disabled.
+disabled. Stopped by the user (`stopped`, E.4), they tell that Zigbee2mqtt is stopped, with the link to
+the setup tab where it is started, instead of blaming the broker that Gladys left on purpose.
 
 ### M.5 Tests
 
@@ -611,17 +624,18 @@ previous versions (enable switch, mode cards, configuration form), removed.
 
 The status card shows the first state that applies:
 
-| State           | When                                                                                                           | Primary action                                                               |
-| --------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `installing`    | `installation.state` is `running`: title by kind (B.1), bar, current phase (B.2)                               | —                                                                            |
-| `stopping`      | the request of a stop runs: the server tells `stopped` before its containers are stopped (about 10 s)          | —                                                                            |
-| `stopped`       | `stopped` (E.4): "since <stoppedAt>, it does not start again with Gladys"                                      | Start                                                                        |
-| `dongleMissing` | `dongleMissing` (K.3): Zigbee2mqtt starts again once it is plugged back, on any port                           | —                                                                            |
-| `failed`        | the error of the last installation if it failed, else `z2mContainerError`; none once Zigbee2mqtt answers       | Restart and "Change the dongle or model" (N.3), none with an external broker |
-| `mqttError`     | Gladys not connected to the broker, with `mqttConnectionError` (explained by code, else the raw message)       | Restart (none with an external broker)                                       |
-| `online`        | `zigbee2mqttConnected`; with an external broker, Gladys connected to it: the number of devices (`deviceCount`) | Pair a device                                                                |
-| `starting`      | `zigbee2mqttStarting` (2 min after a start or a restart)                                                       | —                                                                            |
-| `notAnswering`  | none of the above: Gladys gets no answer from Zigbee2mqtt                                                      | Restart (none with an external broker)                                       |
+| State           | When                                                                                                                                                                                     | Primary action                                                                                  |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `installing`    | `installation.state` is `running`: title by kind (B.1), bar, current phase (B.2)                                                                                                         | —                                                                                               |
+| `stopping`      | the request of a stop runs: the server tells `stopped` before its containers are stopped (about 10 s)                                                                                    | —                                                                                               |
+| `stopped`       | `stopped` (E.4): "since <stoppedAt>, it does not start again with Gladys"; with an external broker, "disconnected from your Zigbee2MQTT", which keeps running                            | Start (with an external broker: Connect)                                                        |
+| `dongleMissing` | `dongleMissing` (K.3): Zigbee2mqtt starts again once it is plugged back, on any port                                                                                                     | —                                                                                               |
+| `failed`        | the error of the last installation if it failed, else `z2mContainerError`; none once Zigbee2mqtt answers                                                                                 | Restart and "Change the dongle or model" (N.3), none with an external broker                    |
+| `inactive`      | `z2mEnabled` false: neither a container of ours nor a client of the broker (the service stopped in Settings > Services, which removes the containers, or never started since Gladys did) | Start once init read the configuration (`configured` true), and the link to Settings > Services |
+| `mqttError`     | Gladys not connected to the broker, with `mqttConnectionError` (explained by code, else the raw message)                                                                                 | Restart (none with an external broker)                                                          |
+| `online`        | `zigbee2mqttConnected`; with an external broker, Gladys connected to it: the number of devices (`deviceCount`)                                                                           | Pair a device                                                                                   |
+| `starting`      | `zigbee2mqttStarting` (2 min after a start or a restart)                                                                                                                                 | —                                                                                               |
+| `notAnswering`  | none of the above: Gladys gets no answer from Zigbee2mqtt                                                                                                                                | Restart (none with an external broker)                                                          |
 
 - **Devices to add.** Online, a link to the Discover tab counts the devices of the network not added
   to Gladys (`GET /discovered` with `filter_existing: false`, those without `id`), counted again on
@@ -629,7 +643,8 @@ The status card shows the first state that applies:
   of the last request counts, and a message is more recent than a request still running. "No device in
   the network" for none.
 - **Pair** sends `POST /permit_join` with `{ value: true }` (never toggled) and tells that joining is
-  allowed for 4 minutes, as long as `zigbee2mqtt.permit_join` says so.
+  allowed for 4 minutes, as long as `zigbee2mqtt.permit_join` says so and Zigbee2mqtt stays online.
+- **A status that cannot be read** shows an error instead of a state guessed from an empty status.
 - **Alerts.** An update waiting for its images (`updatePending`, G), the ezsp driver note (the saved
   model runs the `ezsp` driver, after a fallback), the success of an installation followed (J).
 
@@ -637,16 +652,19 @@ The status card shows the first state that applies:
 
 - **Tiles**: Restart (Gladys runs the containers; not without the dongle, Zigbee2mqtt starts again once
   it is plugged back), Stop, and the Zigbee2mqtt interface once its URL is known; none while an
-  installation runs, during a stop or once stopped. In local mode, the interface is hidden until
-  its port is saved: the first installation that succeeds chooses it, the default `8080` would be
-  wrong meanwhile.
+  installation runs, during a stop, once stopped or while nothing is started (`inactive`). In local
+  mode, the interface is hidden until its port is saved: the first installation that succeeds chooses
+  it, the default `8080` would be wrong meanwhile.
 - **Stop** asks for a confirmation (Zigbee2mqtt stays stopped, Gladys restart included, until it is
-  started again), then sends `POST /stop`. **Start** sends `POST /start`, **Restart** `POST /restart`
-  (E.4). The status sent by the server tells the outcome: the page does not guess it. An action hides
-  the success of the last installation, told again for the next one.
+  started again), then sends `POST /stop`. With an external broker it is "Disconnect": only Gladys
+  disconnects, the words of the tile, of the confirmation and of the stopped state say that
+  Zigbee2MQTT keeps running. **Start** sends `POST /start`, **Restart** `POST /restart` (E.4). The
+  status sent by the server tells the outcome: the page does not guess it. An action hides the success
+  of the last installation, told again for the next one.
 - **Refusals.** A 409 (`refuseWhileInstalling`, I) tells that an installation runs or the integration
-  is busy, until the installation that refused the action ends; another error says that Gladys could
-  not do it. A stop that fails keeps its confirmation open.
+  is busy, until the installation that refused the action ends or the state of Zigbee2mqtt changes
+  (an operation, which runs no installation, refused it); another error says that Gladys could not do
+  it. A stop that fails keeps its confirmation open.
 
 ### N.3 Coordinator and change of dongle
 
@@ -658,9 +676,11 @@ The status card shows the first state that applies:
   no steps, the saved dongle marked "current", a warning when the chosen coordinator runs another
   driver family (Silicon Labs `ember` / `ezsp`, Texas Instruments `zstack`, `deconz`: a new network,
   devices to pair again), "Use this dongle" and "Cancel". "Use this dongle" saves as the wizard does
-  (`POST /setup`, refusals told on ①); once saved, the dashboard follows the installation (`switch`
-  for another coordinator, `install` for another model of the same dongle).
-  Cancel goes back without saving.
+  (`POST /setup`, refusals told on ①, never the refusal of a save made before ① opened), without the
+  port of the interface, which keeps its stored value; once saved, the dashboard follows the
+  installation (`switch` for another coordinator, `install` for another model of the same dongle).
+  Cancel goes back without saving. From an external broker, a local installation is reached through
+  the reset (N.4), which opens the wizard again.
 
 ### N.4 Advanced settings
 
@@ -668,17 +688,21 @@ A screen of its own, back to the dashboard by "Configuration":
 
 - **Interface port** (local mode): a number from 1 to 65535, saved alone (`POST /setup` with
   `Z2M_TCP_PORT` only: a variable missing from the setup keeps its stored value), which installs again
-  with the new port. A setup writes the port of Gladys over the one of the Zigbee2mqtt configuration
-  file; a start of Gladys keeps the port of the file (set before Gladys saved one, or changed by
-  hand). The port saved by the end of an installation replaces the field unless the user
-  is typing another one. Link to the interface once the port is saved. The interface is always
-  enabled (`frontend.enabled: true`, without which Zigbee2mqtt 2 does not serve it), without password
-  for now; the other settings of `frontend` are kept. An installation written before gets it at the
-  next start of Gladys, Zigbee2mqtt restarted once.
-- **External broker**: its form (URL, user, password, interface URL), saved the same way.
+  with the new port (Zigbee2mqtt restarted, its container kept). A setup writes the port of Gladys over
+  the one of the Zigbee2mqtt configuration file; a start of Gladys keeps the port of the file (set
+  before Gladys saved one, or changed by hand). The port saved by the end of an installation replaces
+  the field unless the user is typing another one. Link to the interface once the port is saved. The
+  interface is enabled when the file does not say (`frontend.enabled: true`, without which
+  Zigbee2mqtt 2 does not serve it), without password for now; an `enabled: false` set by hand is kept,
+  and the other settings of `frontend` too. An installation written before gets it at the next start
+  of Gladys, Zigbee2mqtt restarted once.
+- **External broker**: its form (URL, user, password, interface URL), saved the same way; a field the
+  user did not change follows a configuration saved meanwhile (the end of an installation).
 - **MQTT access** for other applications (local mode), the state of each component (Gladys connected
   to the broker, the broker, Zigbee2mqtt answering).
-- **Reset** of the integration, once confirmed (J for its refusals); the wizard follows.
+- **Reset** of the integration, once confirmed (J for its refusals); the wizard follows. With an
+  external broker, its words say that it forgets the connection, not the Zigbee2mqtt that runs
+  elsewhere nor its network.
 - A save refused here is told here (409: an installation already runs; 400 `DONGLE_NOT_FOUND`: the
   dongle is not plugged in, nothing saved; another error), not a refusal of the wizard.
 

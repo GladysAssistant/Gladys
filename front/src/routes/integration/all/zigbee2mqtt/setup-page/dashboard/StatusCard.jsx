@@ -21,9 +21,12 @@ export const ICONS = {
   [DASHBOARD_STATE.STOPPING]: 'loader',
   [DASHBOARD_STATE.DONGLE_MISSING]: 'cpu',
   [DASHBOARD_STATE.FAILED]: 'alert-triangle',
+  [DASHBOARD_STATE.INACTIVE]: 'power',
   [DASHBOARD_STATE.MQTT_ERROR]: 'alert-triangle',
   [DASHBOARD_STATE.NOT_ANSWERING]: 'alert-circle'
 };
+
+export const SERVICES_URL = '/dashboard/settings/service';
 
 const TONES = {
   [DASHBOARD_STATE.ONLINE]: style.toneGreen,
@@ -33,6 +36,7 @@ const TONES = {
   [DASHBOARD_STATE.STOPPING]: style.toneGrey,
   [DASHBOARD_STATE.DONGLE_MISSING]: style.toneAmber,
   [DASHBOARD_STATE.FAILED]: style.toneRed,
+  [DASHBOARD_STATE.INACTIVE]: style.toneGrey,
   [DASHBOARD_STATE.MQTT_ERROR]: style.toneRed,
   [DASHBOARD_STATE.NOT_ANSWERING]: style.toneAmber
 };
@@ -54,18 +58,23 @@ export const Title = ({ view }) => {
   if (state === DASHBOARD_STATE.ONLINE && isExternal(configuration)) {
     return <Text id={`${T}.states.onlineExternal.title`} />;
   }
+  // With an external broker, a stop only disconnects Gladys: Zigbee2mqtt runs on
+  if (state === DASHBOARD_STATE.STOPPED && isExternal(configuration)) {
+    return <Text id={`${T}.states.stoppedExternal.title`} />;
+  }
   return <Text id={`${T}.states.${state}.title`} />;
 };
 
 export const Subtitle = ({ view }) => {
-  const { state, status, language } = view;
+  const { state, status, language, configuration } = view;
   if (state === DASHBOARD_STATE.ONLINE) {
     return Number.isInteger(status.deviceCount) ? (
       <Text id={`${T}.states.online.devices`} plural={status.deviceCount} fields={{ count: status.deviceCount }} />
     ) : null;
   }
   if (state === DASHBOARD_STATE.STOPPED) {
-    return <Text id={`${T}.states.stopped.since`} fields={{ date: formatDate(status.stoppedAt, language) }} />;
+    const stopped = isExternal(configuration) ? 'stoppedExternal' : 'stopped';
+    return <Text id={`${T}.states.${stopped}.since`} fields={{ date: formatDate(status.stoppedAt, language) }} />;
   }
   if (state === DASHBOARD_STATE.INSTALLING) {
     return <Text id="integration.zigbee2mqtt.setup.installation.leavePage" />;
@@ -116,6 +125,10 @@ export const PRIMARY_LABELS = {
 };
 
 export const PRIMARY_ICONS = { pair: 'radio', start: 'play', restart: 'refresh-cw' };
+
+// With an external broker, starting is connecting Gladys to it again
+export const getPrimaryLabel = (primaryAction, configuration) =>
+  primaryAction === 'start' && isExternal(configuration) ? `${T}.actions.connect` : PRIMARY_LABELS[primaryAction];
 
 // The state of Zigbee2mqtt, why it does not run, and the action to take
 const StatusCard = ({ view, actions }) => {
@@ -190,7 +203,7 @@ const StatusCard = ({ view, actions }) => {
         </div>
       )}
 
-      {(primaryAction || view.canChangeKey) && (
+      {(primaryAction || view.canChangeKey || state === DASHBOARD_STATE.INACTIVE) && (
         <div class={style.buttons}>
           {primaryAction && (
             <button
@@ -201,8 +214,13 @@ const StatusCard = ({ view, actions }) => {
               data-cy={`z2m-dashboard-${primaryAction}`}
             >
               <i class={`fe fe-${PRIMARY_ICONS[primaryAction]} mr-2`} aria-hidden="true" />
-              <Text id={PRIMARY_LABELS[primaryAction]} />
+              <Text id={getPrimaryLabel(primaryAction, view.configuration)} />
             </button>
+          )}
+          {state === DASHBOARD_STATE.INACTIVE && (
+            <Link href={SERVICES_URL} class="btn btn-outline-primary" data-cy="z2m-dashboard-services">
+              <Text id={`${T}.actions.services`} />
+            </Link>
           )}
           {view.canChangeKey && state === DASHBOARD_STATE.FAILED && (
             <button

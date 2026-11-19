@@ -490,6 +490,13 @@ describe('zigbee2mqtt init', () => {
       expect(zigbee2mqttManager.dongleMissing).to.equal(false);
     });
 
+    it('should forget an update left waiting by the local installation, once switched to an external broker', async () => {
+      zigbee2mqttManager.updatePending = true;
+      zigbee2mqttManager.getConfiguration.resolves({ mqttMode: 'external', mqttUrl: 'mqtt://192.168.1.10:1883' });
+      await zigbee2mqttManager.init();
+      expect(zigbee2mqttManager.updatePending).to.equal(false);
+    });
+
     it('should stop the previous watch, and forget a missing dongle', async () => {
       zigbee2mqttManager.watchDongle(BY_ID_PATH);
       zigbee2mqttManager.dongleMissing = true;

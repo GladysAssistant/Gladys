@@ -122,6 +122,38 @@ describe('zigbee2mqtt stop', () => {
     assert.calledWithMatch(logger.warn, 'Zigbee2mqtt: restart policy of gladys-z2m-zigbee2mqtt not set to "no":');
   });
 
+  it('should tell that joining is closed, and ignore the logs of the run it stops', async () => {
+    // PREPARE
+    zigbee2mqttManager.z2mPermitJoin = true;
+    zigbee2mqttManager.z2mRun = 2;
+    // EXECUTE
+    await zigbee2mqttManager.stop();
+    // ASSERT
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', {
+      type: 'zigbee2mqtt.permit-join',
+      payload: false,
+    });
+    expect(zigbee2mqttManager.z2mRun).to.equal(3);
+  });
+
+  it('should no longer tell Zigbee2mqtt answering when a container fails to stop', async () => {
+    // PREPARE
+    gladys.system.stopContainer = fake((id) =>
+      id === 'gladys-z2m-mqtt' ? Promise.reject(new Error('docker timeout')) : Promise.resolve(null),
+    );
+    // EXECUTE
+    await expect(zigbee2mqttManager.stop()).to.be.rejectedWith('docker timeout');
+    // ASSERT
+    expect(zigbee2mqttManager.stopped).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
+    assert.calledWithMatch(gladys.event.emit, 'websocket.send-all', {
+      payload: { stopped: true, zigbee2mqttConnected: false },
+    });
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
+  });
+
   it('should only disconnect from an external broker, without container', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([]);

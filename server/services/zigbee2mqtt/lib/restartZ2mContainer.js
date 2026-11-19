@@ -27,6 +27,8 @@ async function restartZ2mContainer(containerId) {
   const restartStartedAt = Date.now();
   await this.gladys.system.restartContainer(containerId);
   logger.info(`Zigbee2mqtt container started in ${formatDuration(Date.now() - restartStartedAt)}`);
+  // A new run: a reader still following the previous one ends with it, its outcome ignored (see readZ2mContainerLogs)
+  this.z2mRun += 1;
   // We read the logs in non blocking mode
   this.readZ2mContainerLogs(containerId, restartedAt);
 }

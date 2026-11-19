@@ -561,6 +561,40 @@ describe('zigbee2mqtt configureContainer', () => {
     assert.notCalled(portfinderMock.getPortPromise);
   });
 
+  it('it should keep the interface off when the user turned it off by hand', async () => {
+    // PREPARE
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(
+      configFilePath,
+      content.replace('  enabled: true\n  port: 12000\n', '  enabled: false\n  port: 12000\n'),
+    );
+    const config = {
+      z2mTcpPort: '12000',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    expect(changed.configChanged).to.equal(false);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include('frontend:\n  enabled: false\n  port: 12000\n');
+  });
+
+  it('it should keep the interface off when its port changes', async () => {
+    // PREPARE
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(
+      configFilePath,
+      content.replace('  enabled: true\n  port: 12000\n', '  enabled: false\n  port: 12000\n'),
+    );
+    const config = {
+      z2mTcpPort: '12001',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
+    // ASSERT
+    expect(changed.configChanged).to.equal(true);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include('frontend:\n  enabled: false\n  port: 12001\n');
+  });
+
   it('it should not change the file for the port it already holds, saved as text by Gladys', async () => {
     // PREPARE
     const config = {

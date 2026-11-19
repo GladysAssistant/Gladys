@@ -55,7 +55,9 @@ describe('Zigbee2mqtt dashboard settings', () => {
         .click();
       cy.wait('@setup')
         .its('request.body')
-        .should('include', { ZIGBEE2MQTT_DRIVER_PATH: zbDongleP.stablePath, ZIGBEE_DONGLE_NAME: ZBDONGLE_P });
+        .should('include', { ZIGBEE2MQTT_DRIVER_PATH: zbDongleP.stablePath, ZIGBEE_DONGLE_NAME: ZBDONGLE_P })
+        // The port of the interface is kept: not sent, its stored value stays
+        .and('not.have.property', 'Z2M_TCP_PORT');
 
       // Back on the dashboard, which follows the switch
       cy.get('[data-cy=z2m-wizard]').should('not.exist');
@@ -85,6 +87,22 @@ describe('Zigbee2mqtt dashboard settings', () => {
 
       cy.get('[data-cy=z2m-wizard-save-error]').i18n('integration.zigbee2mqtt.setup.wizard.saveDongleNotFound');
       cy.get('[data-cy=z2m-dashboard]').should('not.exist');
+    });
+
+    it('should not tell the refusal of a save made before the change of dongle opened', () => {
+      visitDashboard();
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      answerSetup(conflict('Zigbee2mqtt: cannot connect while the integration is busy'));
+      cy.get('[data-cy=z2m-dashboard-port-input]').clear();
+      cy.get('[data-cy=z2m-dashboard-port-input]').type('12001');
+      cy.get('[data-cy=z2m-dashboard-port-save]').click();
+      cy.wait('@setup');
+      cy.get('[data-cy=z2m-dashboard-save-conflict]').should('exist');
+
+      cy.get('[data-cy=z2m-dashboard-back]').click();
+      cy.get('[data-cy=z2m-dashboard-change-key]').click();
+      cy.get('[data-cy=z2m-wizard-key-one]').should('exist');
+      cy.get('[data-cy=z2m-wizard-save-conflict]').should('not.exist');
     });
   });
 
@@ -198,14 +216,35 @@ describe('Zigbee2mqtt dashboard settings', () => {
       cy.get('[data-cy=z2m-dashboard-key]').should('contain', 'mqtt://192.168.1.10:1883');
       cy.get('[data-cy=z2m-dashboard-change-key]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-tiles] [data-cy=z2m-dashboard-restart]').should('not.exist');
-      cy.get('[data-cy=z2m-dashboard-stop]').should('exist');
+      // Only Gladys disconnects: Zigbee2mqtt runs on, the words say so
+      cy.get('[data-cy=z2m-dashboard-stop]').i18n(`${T}.actions.disconnect`);
+      cy.get('[data-cy=z2m-dashboard-stop]').click();
+      cy.get('[data-cy=z2m-dashboard-confirm-stop]').i18n(`${T}.confirmStopExternal.text`);
+      cy.get('[data-cy=z2m-dashboard-cancel-stop]').click();
 
       cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
       cy.get('[data-cy=z2m-dashboard-broker]').should('exist');
       cy.get('[data-cy=z2m-dashboard-port]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-component-broker]').should('not.exist');
+      // The reset forgets the connection, it does not touch the Zigbee2mqtt that runs elsewhere
+      cy.get('[data-cy=z2m-dashboard-reset]').i18n(`${T}.advanced.reset.textExternal`);
+      cy.get('[data-cy=z2m-reset-button]').click();
+      cy.get('[data-cy=z2m-dashboard-confirm-reset]').i18n(`${T}.advanced.reset.confirmExternal`);
     });
 
+    it('should tell Gladys disconnected from a Zigbee2mqtt that runs elsewhere, and connect it again', () => {
+      visitDashboard({
+        status: {
+          ...notAnsweringStatus,
+          stopped: true,
+          stoppedAt: '2026-11-17T08:00:00.000Z',
+          gladysConnected: false
+        },
+        setup: externalSetup
+      });
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.stoppedExternal.title`);
+      cy.get('[data-cy=z2m-dashboard-start]').i18n(`${T}.actions.connect`);
+    });
     it('should show why Gladys cannot connect to the broker, a known error explained', () => {
       const brokerError = { ...notAnsweringStatus, gladysConnected: false };
       visitDashboard({

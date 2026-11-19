@@ -2328,7 +2328,8 @@
         "settingsPageLink": "la page de paramétrage du dongle USB",
         "setupPageLink": "la page de configuration de Zigbee2MQTT",
         "notInstalled": "Zigbee2MQTT n'est pas installé : installez-le pour ajouter et piloter vos appareils Zigbee.",
-        "install": "Installer Zigbee2MQTT"
+        "install": "Installer Zigbee2MQTT",
+        "stopped": "Zigbee2MQTT est arrêté : impossible d'associer ou de piloter des appareils Zigbee tant que vous ne le démarrez pas. Pour le démarrer, rendez-vous sur "
       },
       "setup": {
         "title": "Configuration du service Zigbee2MQTT",
@@ -2730,6 +2731,14 @@
             "notAnswering": {
               "title": "Zigbee2MQTT ne répond pas",
               "text": "Gladys n'a pas de réponse de Zigbee2MQTT : vos appareils Zigbee ne répondent pas."
+            },
+            "stoppedExternal": {
+              "title": "Déconnecté de votre Zigbee2MQTT",
+              "since": "Depuis le {{date}} · Gladys ne s'y reconnecte pas d'elle-même. Votre Zigbee2MQTT continue de tourner."
+            },
+            "inactive": {
+              "title": "Zigbee2MQTT n'est pas démarré",
+              "text": "Gladys ne l'a pas démarré : vérifiez que le service Zigbee2MQTT tourne dans Paramètres > Services."
             }
           },
           "newDevices": {
@@ -2748,7 +2757,10 @@
             "restart": "Redémarrer",
             "stop": "Arrêter",
             "interface": "Interface Zigbee2MQTT",
-            "changeKey": "Changer"
+            "changeKey": "Changer",
+            "disconnect": "Déconnecter",
+            "connect": "Se connecter",
+            "services": "Ouvrir les services"
           },
           "facts": {
             "driver": "Pilote",
@@ -2778,7 +2790,7 @@
             "interface": {
               "title": "Interface Zigbee2MQTT",
               "port": "Port",
-              "help": "Changer le port recrée le conteneur de Zigbee2MQTT ; ses données sont gardées.",
+              "help": "Changer le port redémarre Zigbee2MQTT ; ses données sont gardées.",
               "open": "Ouvrir l'interface"
             },
             "broker": {
@@ -2798,7 +2810,9 @@
             },
             "reset": {
               "title": "Réinitialiser l'intégration",
-              "text": "Supprime les conteneurs, la configuration et le réseau Zigbee : il faudra appairer de nouveau tous vos appareils."
+              "text": "Supprime les conteneurs, la configuration et le réseau Zigbee : il faudra appairer de nouveau tous vos appareils.",
+              "textExternal": "Oublie la connexion à votre Zigbee2MQTT et rouvre l'assistant d'installation. Votre Zigbee2MQTT et son réseau ne sont pas touchés.",
+              "confirmExternal": "Gladys oublie la connexion à votre Zigbee2MQTT. Votre Zigbee2MQTT, sa configuration et ses appareils sont gardés de son côté."
             },
             "saveError": "Le réglage n'a pas pu être enregistré. Réessayez.",
             "saveDongleNotFound": "Votre clé Zigbee n'est pas branchée : rien n'a été enregistré. Branchez-la, puis enregistrez à nouveau."
@@ -2807,6 +2821,11 @@
             "keyTitle": "Coordinateur",
             "changeKey": "Changer de clé",
             "copy": "Copier"
+          },
+          "confirmStopExternal": {
+            "title": "Se déconnecter de votre Zigbee2MQTT ?",
+            "text": "Gladys ne pilote plus vos appareils Zigbee, même après un redémarrage de Gladys, jusqu'à ce que vous la reconnectiez. Votre Zigbee2MQTT continue de tourner.",
+            "confirm": "Se déconnecter"
           }
         }
       },

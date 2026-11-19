@@ -120,6 +120,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   // Gladys switched Zigbee2mqtt to the ezsp driver since the last init: the setup page loads the new model
   this.ezspFallback = false;
   this.installedConfig = null;
+  // Counts the runs of the Zigbee2mqtt container that Gladys restarts or stops: a reader of the logs of an older run
+  // tells nothing (see readZ2mContainerLogs)
+  this.z2mRun = 0;
   this.mqttConnectionError = null;
   this.dockerBased = false;
 

@@ -36,6 +36,7 @@ class CheckStatus extends Component {
     z2mContainerError,
     mqttConnectionError,
     z2mConfigured,
+    z2mStopped,
     isMobile
   }) {
     // Same condition as the permit join switch: Zigbee2mqtt is usable only once it reported itself online
@@ -71,11 +72,17 @@ class CheckStatus extends Component {
       );
     }
 
+    // Stopped: the errors of the run before the stop no longer describe anything
     const mqttError =
-      mqttConnectionError && (mqttConnectionError.code || mqttConnectionError.message) ? mqttConnectionError : null;
+      !z2mStopped && mqttConnectionError && (mqttConnectionError.code || mqttConnectionError.message)
+        ? mqttConnectionError
+        : null;
     // An installed Zigbee2mqtt that does not answer is not a disabled one: say so, and why when known
     let messageKey = 'integration.zigbee2mqtt.status.notEnabled';
-    if (gladysConnected) {
+    if (z2mStopped) {
+      // Stopped by the user from the setup page: the cause is known, nothing else to look at
+      messageKey = 'integration.zigbee2mqtt.status.stopped';
+    } else if (gladysConnected) {
       // Gladys hears the broker (with or without container, in external mode), but Zigbee2mqtt does not answer
       messageKey = 'integration.zigbee2mqtt.status.notRunning';
     } else if (zigbee2mqttExist || mqttError) {
@@ -126,6 +133,6 @@ class CheckStatus extends Component {
 }
 
 export default connect(
-  'session,gladysConnected,zigbee2mqttConnected,zigbee2mqttExist,z2mContainerError,mqttConnectionError,z2mConfigured',
+  'session,gladysConnected,zigbee2mqttConnected,zigbee2mqttExist,z2mContainerError,mqttConnectionError,z2mConfigured,z2mStopped',
   actions
 )(CheckStatus);

@@ -124,6 +124,8 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   // Told again by the Zigbee2mqtt this init connects to (retained bridge/info and bridge/devices), not the previous one
   this.z2mVersion = null;
   this.deviceCount = null;
+  // Told again below by the local installation; none with an external broker, which Gladys does not update
+  this.updatePending = false;
 
   // Load stored configuration
   const configuration = await this.getConfiguration();
