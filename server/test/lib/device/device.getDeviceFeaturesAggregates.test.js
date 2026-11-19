@@ -369,6 +369,31 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
     const promise = device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100, null, -60);
     return assert.isRejected(promise, 'Invalid offset parameter');
   });
+  it('should draw a setpoint that has not moved for months over the whole period', async () => {
+    // Set to frost protection six months ago, never changed since
+    const changedAt = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
+    await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 7, changedAt);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'setpoint',
+        read_only: false,
+        last_value: 7,
+        last_value_changed: changedAt,
+      }),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values } = await deviceInstance.getDeviceFeaturesAggregates('setpoint', 24 * 60, 100, null, 60);
+    expect(
+      values.map((value) => [new Date(value.created_at).getTime(), value.value, value.carried_forward]),
+    ).to.deep.equal([
+      [Date.now() - 25 * 60 * 60 * 1000, 7, true],
+      [Date.now() - 60 * 60 * 1000, 7, true],
+    ]);
+  });
   it('should return error, device feature doesnt exist', async () => {
     const variable = {
       getValue: fake.resolves(null),
@@ -473,6 +498,48 @@ describe('Device.getDeviceFeaturesAggregates binary feature', function Describe(
     for (let i = 1; i < values.length; i += 1) {
       expect(values[i].value).to.not.equal(values[i - 1].value);
     }
+  });
+
+  it('should draw a switch left on for days as one segment over the whole period', async () => {
+    const changedAt = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+    await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e5', 1, changedAt);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e5',
+        name: 'switch',
+        type: 'binary',
+        last_value: 1,
+        last_value_changed: changedAt,
+      }),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values } = await deviceInstance.getDeviceFeaturesAggregates('switch', 24 * 60, 300);
+    expect(values).to.have.lengthOf(1);
+    expect(new Date(values[0].created_at).getTime()).to.equal(Date.now() - 24 * 60 * 60 * 1000);
+    expect(values[0]).to.include({ value: 1, end_time: null, carried_forward: true });
+  });
+
+  it('should not carry a button push forward', async () => {
+    const pushedAt = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+    await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e5', 1, pushedAt);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e5',
+        name: 'button',
+        type: 'push',
+        last_value: 1,
+        last_value_changed: pushedAt,
+      }),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values } = await deviceInstance.getDeviceFeaturesAggregates('button', 24 * 60, 300);
+    expect(values).to.deep.equal([]);
   });
 
   it('should return the current unit of the device feature', async () => {

@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { carryForwardAggregates, carryForwardBinaryStates } = require('./device.carryForwardAggregates');
 
 const NON_BINARY_QUERY = `
   WITH intervals AS (
@@ -121,10 +122,15 @@ async function getDeviceFeaturesAggregates(
     throw new BadParameters('Invalid offset parameter. Must be a positive number.');
   }
 
-  const endDate = new Date(Date.now() - offset * 60 * 1000);
+  // Real bounds of the period, for the points returned to the client
+  const realEndDate = new Date(Date.now() - offset * 60 * 1000);
+  const realStartDate = new Date(Date.now() - (offset + interval) * 60 * 1000);
+
+  // Same bounds, shifted the way the DuckDB queries expect them
+  const endDate = new Date(realEndDate.getTime());
   endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
 
-  const startDate = new Date(Date.now() - (offset + interval) * 60 * 1000);
+  const startDate = new Date(realStartDate.getTime());
   startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
 
   let values;
@@ -137,6 +143,17 @@ async function getDeviceFeaturesAggregates(
 
   if (isBinary) {
     values = await db.duckDbReadConnectionAllAsync(BINARY_QUERY, deviceFeature.id, startDate, endDate, maxStates);
+    // A switch left on for days has no state change in the period: start the timeline with the state in force.
+    // A push (a button press) is an event, not a state that lasts, so it is not carried.
+    if (deviceFeature.type === 'binary') {
+      values = await carryForwardBinaryStates({
+        deviceFeature,
+        values,
+        startDate: realStartDate,
+        startDateForQuery: startDate,
+        maxStates,
+      });
+    }
   } else if (groupBy) {
     // Use the grouped query when groupBy is specified
     values = await db.duckDbReadConnectionAllAsync(GROUPED_QUERY, groupBy, deviceFeature.id, startDate, endDate);
@@ -155,6 +172,17 @@ async function getDeviceFeaturesAggregates(
       ...value,
       count_value: Number(value.count_value),
     }));
+    // A value that does not move (a setpoint left as it is for days) has no state in the period:
+    // carry the value in force so the curve is still displayed.
+    values = await carryForwardAggregates({
+      deviceFeature,
+      device,
+      values,
+      startDate: realStartDate,
+      endDate: realEndDate,
+      startDateForQuery: startDate,
+      endDateForQuery: endDate,
+    });
   }
 
   return {
