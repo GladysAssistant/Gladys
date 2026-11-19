@@ -841,6 +841,26 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     );
   });
 
+  ['2.14.2', '2.1.0-dev'].forEach((version) => {
+    it(`should keep the version ${version} of Zigbee2mqtt`, async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify({ version }));
+      // ASSERT
+      expect(zigbee2mqttManager.z2mVersion).to.equal(version);
+    });
+  });
+
+  ['1.0<iframe src="javascript:alert(1)">', '1.0.0<b>', 'latest', 2, undefined].forEach((version) => {
+    it(`should not keep ${JSON.stringify(version)} as the version of Zigbee2mqtt`, async () => {
+      // PREPARE
+      zigbee2mqttManager.z2mVersion = '2.14.2';
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify({ version }));
+      // ASSERT
+      expect(zigbee2mqttManager.z2mVersion).to.equal(null);
+    });
+  });
+
   ['1.21.0', '2.14.2', '2.1.0-dev', undefined].forEach((version) => {
     it(`should not warn about the version of Zigbee2mqtt ${version}`, async () => {
       // PREPARE

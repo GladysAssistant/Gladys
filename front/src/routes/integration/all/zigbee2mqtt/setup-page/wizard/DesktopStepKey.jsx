@@ -255,9 +255,9 @@ const Detected = ({ view, actions }) => {
         <i class={cx('fe fe-loader mr-2', style.spin)} aria-hidden="true" />
         <Text id={`${T}.key.waiting`} />
       </span>
-      <p class={style.tip}>
+      <div class={style.tip}>
         <MarkupText id={`${T}.key.tip`} />
-      </p>
+      </div>
       <OtherChoices manualText={`${T}.key.linkManualNone`} actions={actions} installable={installable} />
     </div>
   );

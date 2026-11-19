@@ -6,6 +6,9 @@ const { INSTALLATION_STATE } = require('./constants');
 // Zigbee2mqtt answers bridge/request/health_check since 1.21
 const HEALTH_CHECK_MIN_MAJOR = 1;
 const HEALTH_CHECK_MIN_MINOR = 21;
+// A version as Zigbee2mqtt publishes it ("2.6.1", "2.6.1-dev"): anything else, from whoever can publish on the broker,
+// is not kept, the setup page shows it
+const VERSION_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -147,7 +150,7 @@ async function handleMqttMessage(topic, message) {
           `Zigbee2mqtt ${version} does not answer the health check, Gladys needs Zigbee2mqtt ${HEALTH_CHECK_MIN_MAJOR}.${HEALTH_CHECK_MIN_MINOR} or later`,
         );
       }
-      this.z2mVersion = version || null;
+      this.z2mVersion = typeof version === 'string' && VERSION_PATTERN.test(version) ? version : null;
       // Whether joining is permitted: Zigbee2mqtt 2 publishes its info again when joining closes (after 254 s), and
       // has no other message for it
       if (typeof info.permit_join === 'boolean' && info.permit_join !== this.z2mPermitJoin) {

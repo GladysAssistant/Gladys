@@ -1938,31 +1938,31 @@
       }
     },
     "zigbee2mqtt": {
-      "title": "Zigbee2mqtt",
-      "description": "Controle sus dispositivos Zigbee con Zigbee2mqtt",
+      "title": "Zigbee2MQTT",
+      "description": "Controle sus dispositivos Zigbee con Zigbee2MQTT",
       "deviceTab": "Dispositivos",
       "discoverTab": "Descubrir",
       "setupTab": "Configuración",
       "status": {
-        "notConfigured": "El adaptador USB de Zigbee2mqtt no está configurado; vaya a ",
-        "notEnabled": "Zigbee2mqtt no está activado; vaya a ",
-        "notRunning": "Zigbee2mqtt no responde: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
+        "notConfigured": "El adaptador USB de Zigbee2MQTT no está configurado; vaya a ",
+        "notEnabled": "Zigbee2MQTT no está activado; vaya a ",
+        "notRunning": "Zigbee2MQTT no responde: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "mqttNotConnected": "Gladys no está conectada al broker MQTT: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "settingsPageLink": "la página de configuración del adaptador USB",
-        "setupPageLink": "la página de configuración de Zigbee2mqtt",
+        "setupPageLink": "la página de configuración de Zigbee2MQTT",
         "notInstalled": "Zigbee2MQTT no está instalado: instálalo para añadir y controlar tus dispositivos Zigbee.",
         "install": "Instalar Zigbee2MQTT"
       },
       "setup": {
-        "title": "Configuración del servicio Zigbee2mqtt",
+        "title": "Configuración del servicio Zigbee2MQTT",
         "modes": {
           "local": {
             "title": "Instalación desde Gladys",
-            "description": "Gladys configurará dos contenedores Docker: MQTT y Zigbee2mqtt.",
+            "description": "Gladys configurará dos contenedores Docker: MQTT y Zigbee2MQTT.",
             "dockerInstallationRequirementLabel": "Gladys debe ejecutarse bajo Docker",
             "dockerNetworkHostRequirementLabel": "El contenedor Docker de Gladys debe iniciarse con la opción \"network=host\"",
             "coordinatorRequirementLabel": "Debe haber un coordinador Zigbee conectado (adaptador USB o pasarela de red)",
-            "detailsDescription": "Para utilizar Zigbee2mqtt con Gladys, se necesita un coordinador Zigbee: ya sea un adaptador USB conectado a esta máquina, o un coordinador de red (SMLIGHT SLZB-06/SLZB-07, ZigStar…) accesible en su red local.",
+            "detailsDescription": "Para utilizar Zigbee2MQTT con Gladys, se necesita un coordinador Zigbee: ya sea un adaptador USB conectado a esta máquina, o un coordinador de red (SMLIGHT SLZB-06/SLZB-07, ZigStar…) accesible en su red local.",
             "adapterModeLabel": "¿Cómo está conectado el coordinador Zigbee?",
             "adapterModeUsbLabel": "Adaptador USB",
             "adapterModeNetworkLabel": "Coordinador de red (Ethernet/Wi-Fi)",
@@ -1977,7 +1977,7 @@
             "networkAdapterUrlLabel": "Introduzca la dirección del coordinador de red",
             "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
             "networkAdapterUrlDescription": "Dirección IP (o nombre de host) y puerto TCP del coordinador, por ejemplo tcp://192.168.1.20:6638. El prefijo \"tcp://\" es opcional.",
-            "networkAdapterTypeLabel": "Seleccione el tipo de adaptador Zigbee2mqtt del coordinador",
+            "networkAdapterTypeLabel": "Seleccione el tipo de adaptador Zigbee2MQTT del coordinador",
             "networkAdapterTypePlaceholder": "Tipo de adaptador",
             "networkAdapterTypeDescription": "Consulte la documentación de su coordinador: el SMLIGHT SLZB-06 utiliza \"zstack\", el SLZB-06M y el SLZB-07 utilizan \"ember\".",
             "z2mTcpPortLabel": "Introduzca el puerto TCP expuesto por la aplicación web de Zigbee2Mqtt",
@@ -1990,7 +1990,7 @@
               "networkAdapterType": "Tipo de adaptador",
               "unknownDongle": "No definido",
               "tcpPort": "Puerto TCP",
-              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2mqtt funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
+              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2MQTT funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
             },
             "externalMqtt": {
               "title": "Conexión de herramientas externas",
@@ -2041,31 +2041,31 @@
           "unknownErrorPrefix": "Error de conexión MQTT: "
         },
         "serviceStatus": "Estado del servicio",
-        "zigbee2mqttStarting": "Zigbee2mqtt se está iniciando: se pondrá en verde en cuanto responda a Gladys.",
-        "zigbee2mqttNotStarting": "Zigbee2mqtt no consigue iniciarse: vea el error de arriba.",
-        "zigbee2mqttNotResponding": "Zigbee2mqtt no responde a Gladys.",
-        "description": "Este servicio utiliza dos contenedores Docker (broker MQTT y Zigbee2mqtt). Active Zigbee2mqtt para desplegar estos contenedores. Para más información, visite la página de documentación de Zigbee2mqtt.",
-        "nonDockerEnv": "Gladys no se está ejecutando actualmente en Docker; es imposible activar Zigbee2mqtt desde Gladys.",
-        "invalidDockerNetwork": "Gladys se basa en una instalación personalizada; para instalar Zigbee2mqtt desde esta página, el contenedor Docker de Gladys debe iniciarse con la opción \"network=host\".",
-        "enableZigbee2mqtt": "Activar Zigbee2mqtt",
-        "containersStatus": "Contenedores relacionados con Zigbee2mqtt",
+        "zigbee2mqttStarting": "Zigbee2MQTT se está iniciando: se pondrá en verde en cuanto responda a Gladys.",
+        "zigbee2mqttNotStarting": "Zigbee2MQTT no consigue iniciarse: vea el error de arriba.",
+        "zigbee2mqttNotResponding": "Zigbee2MQTT no responde a Gladys.",
+        "description": "Este servicio utiliza dos contenedores Docker (broker MQTT y Zigbee2MQTT). Active Zigbee2MQTT para desplegar estos contenedores. Para más información, visite la página de documentación de Zigbee2MQTT.",
+        "nonDockerEnv": "Gladys no se está ejecutando actualmente en Docker; es imposible activar Zigbee2MQTT desde Gladys.",
+        "invalidDockerNetwork": "Gladys se basa en una instalación personalizada; para instalar Zigbee2MQTT desde esta página, el contenedor Docker de Gladys debe iniciarse con la opción \"network=host\".",
+        "enableZigbee2mqtt": "Activar Zigbee2MQTT",
+        "containersStatus": "Contenedores relacionados con Zigbee2MQTT",
         "link": "Enlace",
-        "connected": "Zigbee2mqtt se inició correctamente.",
-        "error": "Se produjo un error al iniciar el servicio Zigbee2mqtt.",
+        "connected": "Zigbee2MQTT se inició correctamente.",
+        "error": "Se produjo un error al iniciar el servicio Zigbee2MQTT.",
         "mqttZigbeeLink": "MQTT - Zigbee",
         "gladysMqttLink": "Gladys - MQTT",
-        "zigbee2Mqtt": "Zigbee2mqtt",
+        "zigbee2Mqtt": "Zigbee2MQTT",
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Estado",
-        "connectionUrl": "URL de la interfaz de Zigbee2mqtt: <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
-        "z2mFrontendUrlLabel": "URL de la interfaz de Zigbee2mqtt",
+        "connectionUrl": "URL de la interfaz de Zigbee2MQTT: <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
+        "z2mFrontendUrlLabel": "URL de la interfaz de Zigbee2MQTT",
         "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080",
         "reset": {
           "title": "Restablecer integración",
-          "description": "Utilice esta opción si desea empezar de nuevo con Zigbee2mqtt. Esto puede ser útil si su configuración está dañada o si desea cambiar su coordinador Zigbee.",
+          "description": "Utilice esta opción si desea empezar de nuevo con Zigbee2MQTT. Esto puede ser útil si su configuración está dañada o si desea cambiar su coordinador Zigbee.",
           "button": "Restablecer",
-          "confirmMessage": "Advertencia: restablecer la integración eliminará todos los archivos de Zigbee2mqtt en el disco y toda la configuración guardada. Todos los dispositivos Zigbee actualmente emparejados con Zigbee2mqtt deberán volver a emparejarse.",
+          "confirmMessage": "Advertencia: restablecer la integración eliminará todos los archivos de Zigbee2MQTT en el disco y toda la configuración guardada. Todos los dispositivos Zigbee actualmente emparejados con Zigbee2MQTT deberán volver a emparejarse.",
           "confirmButton": "Sí, restablecer todo",
           "cancelButton": "Cancelar",
           "error": "Se produjo un error al restablecer la integración."
@@ -2137,6 +2137,7 @@
             "choosePort": "Elige el puerto",
             "showAllPorts": "Mostrar los demás puertos serie (placa HAT/GPIO, puertos de la máquina)",
             "modelLabel": "Modelo",
+            "selectedModel": "Modelo elegido:",
             "modelHint": "El modelo está escrito en la llave o en su caja. Determina cómo Zigbee2MQTT se comunica con ella.",
             "searchPlaceholder": "Buscar: dongle-e, sonoff p, conbee, skyconnect…",
             "searchLabel": "Buscar un modelo",
@@ -2200,7 +2201,8 @@
             "ezspDriver": "Controlador de compatibilidad (ezsp)",
             "ezspNote": "<strong>Firmware antiguo detectado.</strong> El controlador ember requiere un firmware 7.4 o posterior: Gladys cambia al controlador de compatibilidad (ezsp) y reinicia Zigbee2MQTT. No tienes nada que hacer.",
             "waitingZigbee2mqtt": "<strong>Conectado al broker, esperando la respuesta de Zigbee2MQTT.</strong> Si no responde, comprueba que Zigbee2MQTT está en marcha y que su base_topic es <code>zigbee2mqtt</code>.",
-            "zigbee2mqttTooOld": "<strong>Zigbee2MQTT {{version}} es demasiado antiguo.</strong> Funciona en este broker, pero Gladys necesita Zigbee2MQTT 1.21 o posterior para seguirlo. Actualízalo: el asistente continúa en cuanto responda.",
+            "zigbee2mqttTooOldTitle": "Zigbee2MQTT {{version}} es demasiado antiguo.",
+            "zigbee2mqttTooOld": "Funciona en este broker, pero Gladys necesita Zigbee2MQTT 1.21 o posterior para seguirlo. Actualízalo: el asistente continúa en cuanto responda.",
             "brokerLost": "<strong>Gladys perdió la conexión con el broker.</strong> Se vuelve a conectar sola en cuanto el broker responda: comprueba que está en marcha y que es accesible desde Gladys."
           },
           "failure": {
@@ -2300,15 +2302,15 @@
             "showPhases": "Ver el detalle",
             "back": "Volver"
           },
-          "statusPending": "Gladys está iniciando su integración Zigbee2MQTT… Si tarda, comprueba que el servicio Zigbee2mqtt está iniciado en Configuración › Servicios."
+          "statusPending": "Gladys está iniciando su integración Zigbee2MQTT… Si tarda, comprueba que el servicio Zigbee2MQTT está iniciado en Configuración › Servicios."
         }
       },
       "device": {
-        "title": "Dispositivos Zigbee2mqtt",
+        "title": "Dispositivos Zigbee2MQTT",
         "editButton": "Editar"
       },
       "discover": {
-        "title": "Descubrimiento de Zigbee2mqtt",
+        "title": "Descubrimiento de Zigbee2MQTT",
         "permitJoin": "Permitir la incorporación",
         "hideExistingDevices": "Ocultar dispositivos ya añadidos",
         "noDeviceDiscovered": "No se descubrió ningún dispositivo nuevo; haga clic en el botón de búsqueda.",
@@ -2317,22 +2319,22 @@
         "deviceNotHandled": "Este dispositivo aún no es compatible; póngase en contacto con nosotros para ayudarnos a conectarlo en Gladys.",
         "createGithubIssue": "Sugerir este dispositivo"
       },
-      "noDeviceFound": "No se encontró ningún dispositivo Zigbee2mqtt.",
+      "noDeviceFound": "No se encontró ningún dispositivo Zigbee2MQTT.",
       "nameLabel": "Nombre del dispositivo",
       "namePlaceholder": "Introduzca el nombre de su dispositivo",
       "roomLabel": "Habitación",
       "ieeeAddressLabel": "Dirección IEEE",
-      "openInZ2mButton": "Abrir en Zigbee2mqtt",
-      "noZ2mUrlMessage": "La URL de la interfaz de Zigbee2mqtt no está configurada; los enlaces directos a los dispositivos no estarán disponibles. Vaya a la <a href=\"/dashboard/integration/device/zigbee2mqtt/setup\">página de configuración</a> para configurarla.",
+      "openInZ2mButton": "Abrir en Zigbee2MQTT",
+      "noZ2mUrlMessage": "La URL de la interfaz de Zigbee2MQTT no está configurada; los enlaces directos a los dispositivos no estarán disponibles. Vaya a la <a href=\"/dashboard/integration/device/zigbee2mqtt/setup\">página de configuración</a> para configurarla.",
       "topicLabel": "Tema",
-      "topicPlaceholder": "%topic% valor MQTT de Zigbee2mqtt",
+      "topicPlaceholder": "%topic% valor MQTT de Zigbee2MQTT",
       "featuresLabel": "Funciones",
       "saveButton": "Guardar",
       "deleteButton": "Eliminar",
       "updateButton": "Actualizar",
       "alreadyExistsButton": "Ya creado",
       "saveError": "Se produjo un error al guardar el dispositivo.",
-      "documentation": "Documentación de Zigbee2mqtt"
+      "documentation": "Documentación de Zigbee2MQTT"
     },
     "nodeRed": {
       "title": "Node-RED",

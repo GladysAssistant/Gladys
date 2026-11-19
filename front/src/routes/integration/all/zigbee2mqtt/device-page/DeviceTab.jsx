@@ -27,8 +27,9 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
-      {props.showZ2mUrlWarning && (
-        <div class="alert alert-info mb-4">
+      {/* Not installed: the banner of CheckStatus is the only one */}
+      {props.showZ2mUrlWarning && props.z2mConfigured !== false && (
+        <div class="alert alert-info mb-4" data-cy="z2m-url-warning">
           <MarkupText id="integration.zigbee2mqtt.noZ2mUrlMessage" />
         </div>
       )}

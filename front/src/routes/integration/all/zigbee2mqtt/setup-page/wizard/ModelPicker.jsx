@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getNameInBrand, groupByBrand, searchAdapters } from './adapters';
+import { findAdapter, getNameInBrand, groupByBrand, searchAdapters } from './adapters';
 import KeyPhoto from './KeyPhoto';
 import style from './wizard.css';
 
@@ -10,11 +10,39 @@ import style from './wizard.css';
 class ModelPicker extends Component {
   updateSearch = e => this.setState({ search: e.target.value });
 
+  setList = list => {
+    this.list = list;
+  };
+
+  setSelected = option => {
+    this.selected = option;
+  };
+
+  // Opened on a model chosen before ("Change the dongle or model"): its scroll area shows it, not the top of the list
+  componentDidMount() {
+    if (this.list && this.selected && !this.props.inline) {
+      const listBox = this.list.getBoundingClientRect();
+      const optionBox = this.selected.getBoundingClientRect();
+      this.list.scrollTop += optionBox.top - listBox.top - (listBox.height - optionBox.height) / 2;
+    }
+  }
+
   // inline: the whole list in the page, without a scroll area of its own (phone)
   render({ adapters, value, onPick, withPhotos, inline }, { search = '' }) {
     const groups = groupByBrand(searchAdapters(adapters, search));
+    const selectedAdapter = value ? findAdapter(adapters, value) : null;
     return (
-      <div class={cx(style.modelPicker, { [style.modelPickerInline]: inline })} data-cy="z2m-wizard-model-picker">
+      <div
+        ref={this.setList}
+        class={cx(style.modelPicker, { [style.modelPickerInline]: inline })}
+        data-cy="z2m-wizard-model-picker"
+      >
+        {selectedAdapter && (
+          <div class={style.modelCurrent} data-cy="z2m-wizard-model-current">
+            <Text id="integration.zigbee2mqtt.setup.wizard.key.selectedModel" />{' '}
+            <strong>{selectedAdapter.displayName}</strong>
+          </div>
+        )}
         <div class="input-icon mb-2">
           <span class="input-icon-addon">
             <i class="fe fe-search" aria-hidden="true" />
@@ -44,6 +72,7 @@ class ModelPicker extends Component {
             {group.adapters.map(adapter => (
               <button
                 key={adapter.label}
+                ref={adapter.label === value ? this.setSelected : undefined}
                 type="button"
                 class={cx(style.modelOption, { [style.modelOptionSelected]: adapter.label === value })}
                 aria-pressed={adapter.label === value ? 'true' : 'false'}

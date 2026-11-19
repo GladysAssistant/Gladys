@@ -21,7 +21,7 @@ const DiscoverTab = ({ children, ...props }) => (
             class="custom-switch-input"
             checked={props.permitJoin}
             onClick={props.togglePermitJoin}
-            disabled={!props.zigbee2mqttConnected || !props.gladysConnected}
+            disabled={!props.zigbee2mqttConnected || !props.gladysConnected || props.z2mConfigured === false}
           />
           <span class="custom-switch-indicator" />
           <span class="custom-switch-description">
@@ -48,8 +48,9 @@ const DiscoverTab = ({ children, ...props }) => (
       </li>
     </ul>
     <div class="card-body">
-      {props.showZ2mUrlWarning && (
-        <div class="alert alert-info mb-4">
+      {/* Not installed: the banner of CheckStatus is the only one */}
+      {props.showZ2mUrlWarning && props.z2mConfigured !== false && (
+        <div class="alert alert-info mb-4" data-cy="z2m-url-warning">
           <MarkupText id="integration.zigbee2mqtt.noZ2mUrlMessage" />
         </div>
       )}

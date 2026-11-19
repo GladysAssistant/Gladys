@@ -206,8 +206,11 @@ function getAdapterDisplay(label) {
   };
 }
 
-// The list of the setup page, each model with how to show it
-const DISPLAYED_ADAPTERS = ADAPTERS.map((adapter) => ({ ...adapter, ...getAdapterDisplay(adapter.label) }));
+// The list of the setup page, each model once with how to show it. A model listed by two drivers (SLZB-Ultima, SMHUB)
+// keeps the first one, the one configureContainer installs it with
+const DISPLAYED_ADAPTERS = ADAPTERS.filter(
+  (adapter, index) => ADAPTERS.findIndex((other) => other.label === adapter.label) === index,
+).map((adapter) => ({ ...adapter, ...getAdapterDisplay(adapter.label) }));
 
 module.exports = {
   LABELS_BY_BRAND,

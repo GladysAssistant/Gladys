@@ -119,9 +119,9 @@ const KeyNone = ({ openOther }) => (
       <i class={cx('fe fe-loader mr-2', style.spin)} aria-hidden="true" />
       <Text id={`${T}.key.waiting`} />
     </span>
-    <p class={style.tip}>
+    <div class={style.tip}>
       <MarkupText id={`${T}.key.tip`} />
-    </p>
+    </div>
     <OtherChoicesLink onClick={openOther} />
   </div>
 );
@@ -311,9 +311,11 @@ const Install = ({ view }) => {
           <span class="d-block font-weight-bold" data-cy="z2m-wizard-current-phase">
             <Text id={current.detail || current.label} />
           </span>
-          <span class="text-muted">
-            <Text id={`${T}.progress.leavePage`} />
-          </span>
+          {!waiting && (
+            <span class="text-muted" data-cy="z2m-wizard-leave-page">
+              <Text id={`${T}.progress.leavePage`} />
+            </span>
+          )}
         </div>
       )}
       {waiting && (
@@ -609,7 +611,7 @@ class WizardMobile extends Component {
 
   render({ view, actions }, { sheet }) {
     const current = getStepNumber(view);
-    const labels = getStepLabels(view.external);
+    const labels = getStepLabels(view.connectOnly);
     const buttons = this.renderButtons();
     const error = this.renderBarError();
     // Two actions one above the other after the first step: the content stays clear of both
@@ -627,7 +629,7 @@ class WizardMobile extends Component {
       <FocusPage>
         <div class={kitStyle.page} data-cy="z2m-wizard-mobile">
           <MobileNavBar
-            title={<Text id={view.external ? `${T}.titleConnect` : `${T}.titleInstall`} />}
+            title={<Text id={view.connectOnly ? `${T}.titleConnect` : `${T}.titleInstall`} />}
             backHref={getBackToCatalogUrl()}
             backLabel={<Text id="header.integrations" />}
           />

@@ -224,11 +224,11 @@ const WizardDesktop = ({ view, actions }) => {
     <div class={cx('card', style.wizard)} data-cy="z2m-wizard">
       <div class="card-header">
         <h2 class="card-title">
-          <Text id={view.external ? `${T}.titleConnect` : `${T}.titleInstall`} />
+          <Text id={view.connectOnly ? `${T}.titleConnect` : `${T}.titleInstall`} />
         </h2>
       </div>
       <div class="card-body">
-        <Stepper current={current} external={view.external} />
+        <Stepper current={current} external={view.connectOnly} />
         {view.step === STEP.KEY && <DesktopStepKey view={view} actions={actions} />}
         {view.step === STEP.INSTALL && view.installView !== INSTALL_VIEW.READY && (
           <DesktopStepInstall view={view} actions={actions} />

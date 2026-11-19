@@ -317,6 +317,21 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-show-auto]').i18n('integration.zigbee2mqtt.setup.wizard.key.back');
   });
 
+  it('should name the steps of a connection, and stop listing the USB ports, when Gladys cannot install', () => {
+    cy.clock();
+    visitWizard({ status: { ...readyToSetupStatus, dockerBased: false } });
+    cy.get('[data-cy=z2m-wizard-incompatible]').should('exist');
+    cy.get('.card-title').i18n('integration.zigbee2mqtt.setup.wizard.titleConnect');
+    cy.get('[data-cy=z2m-wizard-stepper-item]')
+      .first()
+      .should('contain', Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.setup.wizard.steps.connection'));
+    cy.wait('@usbPorts');
+    cy.tick(3000);
+    cy.tick(3000);
+    cy.get('[data-cy=z2m-wizard-incompatible]').should('exist');
+    cy.get('@usbPorts.all').should('have.length', 1);
+  });
+
   it('should tell why the installation failed, then retry it without showing the previous failure', () => {
     visitWizard();
     answerSetup();
@@ -330,6 +345,8 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-phase][data-state=failed]').i18n(
       'integration.zigbee2mqtt.setup.wizard.progress.phases.connectUsb'
     );
+    // Nothing goes on after a failure
+    cy.get('[data-cy=z2m-wizard-leave-page]').should('not.exist');
 
     answerSetup({ body: usbSetup, delay: 300 });
     cy.get('[data-cy=z2m-wizard-retry]').click();
@@ -486,6 +503,17 @@ describe('Zigbee2mqtt setup wizard', () => {
     });
     cy.get('[data-cy=z2m-wizard-waiting-zigbee2mqtt]').should('contain', '1.20.0');
     cy.get('[data-cy=z2m-wizard-ready]').should('not.exist');
+    // Connected, nothing goes on by itself: the wizard waits for Zigbee2mqtt
+    cy.get('[data-cy=z2m-wizard-leave-page]').should('not.exist');
+    // The version comes from whoever publishes on the broker: shown as a text, never as markup
+    sendStatus({
+      ...readyToSetupStatus,
+      installation: connectedInstallation,
+      gladysConnected: true,
+      z2mVersion: '1.0.0<img src=x data-cy=injected>'
+    });
+    cy.get('[data-cy=z2m-wizard-waiting-zigbee2mqtt]').should('contain', '1.0.0<img src=x data-cy=injected>');
+    cy.get('[data-cy=injected]').should('not.exist');
     // The broker lost meanwhile: told, with why
     sendStatus({
       ...readyToSetupStatus,
@@ -506,6 +534,16 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-manual]').should('exist');
     cy.get('[data-cy=z2m-wizard-port]').should('have.value', zbDongleE.stablePath);
     cy.get('[data-cy=z2m-wizard-model-option][aria-pressed=true]').should('contain', 'Zigbee 3.0 USB Dongle Plus-E');
+    // What "Install" installs, above the list, and the list scrolled to it
+    cy.get('[data-cy=z2m-wizard-model-current]').should('contain', 'Zigbee 3.0 USB Dongle Plus-E');
+    cy.get('[data-cy=z2m-wizard-model-option][aria-pressed=true]').then(([option]) => {
+      const list = option.closest('[data-cy=z2m-wizard-model-picker]');
+      const optionBox = option.getBoundingClientRect();
+      const listBox = list.getBoundingClientRect();
+      expect(list.scrollTop).to.be.greaterThan(0);
+      expect(optionBox.top).to.be.at.least(listBox.top);
+      expect(optionBox.bottom).to.be.at.most(listBox.bottom);
+    });
   });
 
   it('should stay on the dongle and tell that it is not plugged in when the setup refuses it', () => {

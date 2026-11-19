@@ -59,9 +59,11 @@ const DesktopStepInstall = ({ view, actions }) => {
         <h3 class="mb-1">
           <Text id={external ? `${T}.progress.titleConnect` : `${T}.progress.titleInstall`} />
         </h3>
-        <p class="text-muted mb-0">
-          <Text id={`${T}.progress.leavePage`} />
-        </p>
+        {!failed && !waiting && (
+          <p class="text-muted mb-0" data-cy="z2m-wizard-leave-page">
+            <Text id={`${T}.progress.leavePage`} />
+          </p>
+        )}
       </div>
       {!external && <KeyChip adapter={savedAdapter} configuration={savedConfiguration} />}
       <div class={style.progressRow}>

@@ -3,6 +3,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 const { expect } = require('chai');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const Zigbee2MqttService = require('../../../../services/zigbee2mqtt/lib');
 
@@ -38,6 +39,17 @@ describe('zigbee2mqtt setPermitJoin', () => {
 
   afterEach(() => {
     sinon.reset();
+  });
+
+  it('should refuse when Gladys is not connected to the broker of Zigbee2mqtt', async () => {
+    // PREPARE
+    zigbee2MqttManager.mqttClient = null;
+    // EXECUTE
+    const promise = zigbee2MqttManager.setPermitJoin(true);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith(ServiceNotConfiguredError);
+    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
+    assert.notCalled(gladys.event.emit);
   });
 
   it('set permit join to true then false', async () => {

@@ -64,6 +64,10 @@ describe('Zigbee2mqtt status', () => {
         }
       }
     );
+    // Nothing set up: no interface URL to warn about
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: {} }).as(
+      'emptySetup'
+    );
     cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
 
     cy.get('[data-cy=z2m-status-not-installed]').should(
@@ -76,6 +80,10 @@ describe('Zigbee2mqtt status', () => {
       'href',
       '/dashboard/integration/device/zigbee2mqtt/setup'
     );
+    // Its banner only, and nothing to permit joining to
+    cy.wait('@emptySetup');
+    cy.get('[data-cy=z2m-url-warning]').should('not.exist');
+    cy.get('#permitJoin').should('be.disabled');
   });
 
   it('should show why Zigbee2mqtt does not start on the discover page', () => {

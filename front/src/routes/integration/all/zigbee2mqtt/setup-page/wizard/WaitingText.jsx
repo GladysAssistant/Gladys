@@ -1,4 +1,4 @@
-import { MarkupText } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import get from 'get-value';
 
 // Zigbee2mqtt answers the health check Gladys follows it with since 1.21 (see handleMqttMessage on the server)
@@ -22,11 +22,17 @@ const WaitingText = ({ status }) => {
       </div>
     );
   }
+  // The version comes from the broker: a text, never markup
   return isTooOld(status.z2mVersion) ? (
-    <MarkupText
-      id="integration.zigbee2mqtt.setup.wizard.progress.zigbee2mqttTooOld"
-      fields={{ version: status.z2mVersion }}
-    />
+    <span>
+      <strong>
+        <Text
+          id="integration.zigbee2mqtt.setup.wizard.progress.zigbee2mqttTooOldTitle"
+          fields={{ version: status.z2mVersion }}
+        />
+      </strong>{' '}
+      <Text id="integration.zigbee2mqtt.setup.wizard.progress.zigbee2mqttTooOld" />
+    </span>
   ) : (
     <MarkupText id="integration.zigbee2mqtt.setup.wizard.progress.waitingZigbee2mqtt" />
   );

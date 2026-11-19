@@ -186,9 +186,11 @@ class Wizard extends Component {
     }
   };
 
-  // Only while the dongle is chosen
+  // Only while the dongle is chosen, on a machine that can install it
   shouldRefreshUsbPorts = () =>
-    this.state.step === STEP.KEY && (this.state.pane === PANE.AUTO || this.state.pane === PANE.MANUAL);
+    this.state.step === STEP.KEY &&
+    (this.state.pane === PANE.AUTO || this.state.pane === PANE.MANUAL) &&
+    this.isInstallable() !== false;
 
   scheduleUsbPortsRefresh = () => {
     this.usbPortsTimer = setTimeout(async () => {
@@ -443,6 +445,8 @@ class Wizard extends Component {
       ...state,
       external,
       installable: this.isInstallable(),
+      // A machine where Zigbee2mqtt cannot be installed: the steps are those of a connection to an external broker
+      connectOnly: external || this.isInstallable() === false,
       keyScenario: this.getKeyScenario(),
       choosablePorts: this.getChoosablePorts(),
       selectedPort: usbPort,

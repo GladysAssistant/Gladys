@@ -83,8 +83,8 @@ describe('zigbee2mqtt adapters display', () => {
     });
   });
 
-  it('should list every model with how to show it', () => {
-    expect(DISPLAYED_ADAPTERS).to.have.lengthOf(ADAPTERS.length);
+  it('should list every model once, with how to show it', () => {
+    expect(DISPLAYED_ADAPTERS).to.have.lengthOf(new Set(ADAPTERS.map(({ label }) => label)).size);
     expect(DISPLAYED_ADAPTERS.find(({ label }) => label === 'SONOFF Dongle-M')).to.deep.equal({
       label: 'SONOFF Dongle-M',
       configKey: 'ember',
@@ -94,5 +94,13 @@ describe('zigbee2mqtt adapters display', () => {
       image: 'Dongle-M',
       aliases: ['sonoff max', 'sonoff m'],
     });
+  });
+
+  it('should list a model of two drivers once, with the driver it is installed with', () => {
+    const label = 'SMLIGHT SMHUB (Essential/Premium variants)';
+    expect(ADAPTERS.filter((adapter) => adapter.label === label)).to.have.lengthOf(2);
+    const displayed = DISPLAYED_ADAPTERS.filter((adapter) => adapter.label === label);
+    expect(displayed).to.have.lengthOf(1);
+    expect(displayed[0].configKey).to.equal('ember');
   });
 });

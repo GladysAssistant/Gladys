@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 /**
@@ -8,6 +9,10 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  * setPermitJoin(true);
  */
 async function setPermitJoin(value) {
+  // Not installed, or disabled: no broker to send it to
+  if (!this.mqttClient) {
+    throw new ServiceNotConfiguredError('Zigbee2mqtt is not connected to its MQTT broker');
+  }
   this.z2mPermitJoin = typeof value === 'boolean' ? value : !this.z2mPermitJoin;
   // Send message to Zigbee2mqtt topics
   this.mqttClient.publish(

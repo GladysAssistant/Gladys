@@ -191,6 +191,7 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
   it('should only offer a Zigbee2mqtt that runs elsewhere when Gladys cannot install it', () => {
     visitWizard({ status: { ...readyToSetupStatus, networkModeValid: false } });
     cy.get('[data-cy=z2m-wizard-incompatible]').should('exist');
+    cy.get('[data-cy=z2m-wizard-mobile] h1').i18n('integration.zigbee2mqtt.setup.wizard.titleConnect');
     cy.get('[data-cy=z2m-wizard-use-external]').click();
     cy.get('[data-cy=z2m-wizard-external]').should('exist');
   });
@@ -210,6 +211,8 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
     });
     cy.get('[data-cy=z2m-wizard-manual]').should('exist');
     cy.get('[data-cy=z2m-wizard-model-option][aria-pressed=true]').should('contain', 'Zigbee 3.0 USB Dongle Plus-E');
+    // The whole list is in the page: what "Install" installs is recalled above it
+    cy.get('[data-cy=z2m-wizard-model-current]').should('contain', 'Zigbee 3.0 USB Dongle Plus-E');
   });
 
   it('should tell in the bottom bar that the dongle is not plugged in, until closed', () => {
