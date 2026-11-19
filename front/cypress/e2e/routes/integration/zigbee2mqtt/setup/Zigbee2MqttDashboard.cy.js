@@ -232,6 +232,19 @@ describe('Zigbee2mqtt dashboard', () => {
       sendStatus({ ...inactiveStatus, configured: null });
       cy.get('[data-cy=z2m-dashboard-start]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-services]').should('exist');
+      // Step ① needs what init tells of the machine
+      cy.get('[data-cy=z2m-dashboard-change-key]').should('be.disabled');
+    });
+
+    it('should give up a stop not confirmed once the user went to another screen', () => {
+      visitDashboard();
+      cy.get('[data-cy=z2m-dashboard-stop]').click();
+      cy.get('[data-cy=z2m-dashboard-confirm-stop]').should('exist');
+
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-back]').click();
+      cy.get('[data-cy=z2m-dashboard-tiles]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-confirm-stop]').should('not.exist');
     });
 
     it('should tell that the status cannot be loaded instead of a state guessed from nothing', () => {

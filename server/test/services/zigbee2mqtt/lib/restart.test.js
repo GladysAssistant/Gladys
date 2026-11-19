@@ -93,6 +93,25 @@ describe('zigbee2mqtt restart', () => {
     assert.calledOnce(zigbee2mqttManager.restartZ2mContainer);
   });
 
+  it('should keep the failure when Docker refuses the restart, which changed nothing', async () => {
+    // PREPARE
+    const containerError = { code: 'ADAPTER_NO_RESPONSE', message: 'HOST_FATAL_ERROR' };
+    zigbee2mqttManager.z2mContainerError = containerError;
+    zigbee2mqttManager.startInstallation('start');
+    zigbee2mqttManager.finishInstallation(new Error('Zigbee2mqtt did not answer'));
+    zigbee2mqttManager.restartZ2mContainer = fake.rejects(new Error('docker refuses'));
+    // EXECUTE
+    await expect(zigbee2mqttManager.restart()).to.be.rejectedWith('docker refuses');
+    // ASSERT
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(containerError);
+    expect(zigbee2mqttManager.installation.state).to.equal('failed');
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
+    // Told: the status no longer says that it starts
+    assert.calledWithMatch(gladys.event.emit, 'websocket.send-all', {
+      payload: { zigbee2mqttStarting: false, z2mContainerError: containerError },
+    });
+  });
+
   it('should start again through an installation when Gladys has no client of the broker', async () => {
     // PREPARE: the last init failed before connecting
     zigbee2mqttManager.mqttClient = null;

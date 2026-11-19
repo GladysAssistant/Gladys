@@ -51,6 +51,32 @@ describe('zigbee2mqtt restartZ2mContainer', () => {
     );
   });
 
+  it('should count the new run before Docker stops the previous one, whose reader ends meanwhile', async () => {
+    // PREPARE
+    let runWhileRestarting = null;
+    gladys.system.restartContainer = fake(() => {
+      runWhileRestarting = zigbee2mqttManager.z2mRun;
+      return Promise.resolve(null);
+    });
+    // EXECUTE
+    await zigbee2mqttManager.restartZ2mContainer('z2m-container');
+    // ASSERT
+    expect(runWhileRestarting).to.equal(1);
+  });
+
+  it('should not tell that it starts when Docker refuses the restart', async () => {
+    // PREPARE
+    gladys.system.restartContainer = fake.rejects(new Error('error gathering device information'));
+    // EXECUTE
+    await expect(zigbee2mqttManager.restartZ2mContainer('z2m-container')).to.be.rejectedWith(
+      'error gathering device information',
+    );
+    // ASSERT
+    expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
+    expect(zigbee2mqttManager.startingTimer).to.equal(null);
+    assert.notCalled(zigbee2mqttManager.readZ2mContainerLogs);
+  });
+
   it('should stop telling that it starts once the window is over', async () => {
     // PREPARE
     await zigbee2mqttManager.restartZ2mContainer('z2m-container');

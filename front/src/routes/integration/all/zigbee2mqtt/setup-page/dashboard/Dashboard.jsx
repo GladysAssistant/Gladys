@@ -105,9 +105,10 @@ class Dashboard extends Component {
 
   showMain = () => this.setState({ screen: SCREEN.MAIN });
 
-  showAdvanced = () => this.setState({ screen: SCREEN.ADVANCED, actionError: null });
+  // Another screen: a stop not confirmed is given up
+  showAdvanced = () => this.setState({ screen: SCREEN.ADVANCED, actionError: null, confirmStop: false });
 
-  changeKey = () => this.setState({ screen: SCREEN.CHANGE, actionError: null });
+  changeKey = () => this.setState({ screen: SCREEN.CHANGE, actionError: null, confirmStop: false });
 
   // A partial setup: only the port of the interface changes, the installation recreates the container
   savePort = async port => {
@@ -166,7 +167,8 @@ class Dashboard extends Component {
   // Another state of Zigbee2mqtt: the refusal of an action (an installation or another operation was running) and the
   // joining allowed while online no longer describe it
   followNewState = previousState => {
-    const changes = {};
+    // A stop asked on another state: asked again if still wanted
+    const changes = { confirmStop: false };
     if (previousState === DASHBOARD_STATE.ONLINE) {
       changes.permitJoinAllowed = false;
     }
@@ -252,6 +254,8 @@ class Dashboard extends Component {
       z2mUrl,
       language: get(props, 'user.language'),
       installing: dashboardState === DASHBOARD_STATE.INSTALLING,
+      // Step ① needs what init tells of the machine: unknown (null) while the service never started since Gladys did
+      changeKeyDisabled: dashboardState === DASHBOARD_STATE.INSTALLING || status.configured === null,
       primaryAction: getPrimaryAction(dashboardState, configuration, status),
       tiles: getTiles(dashboardState, configuration, z2mUrl),
       canChangeKey: !isExternal(configuration),

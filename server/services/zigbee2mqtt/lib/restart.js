@@ -29,18 +29,24 @@ async function restart() {
     if (!container) {
       throw new BadParameters('Zigbee2mqtt: no container to restart, set it up first');
     }
-    // The failure being retried no longer describes Zigbee2mqtt: the logs of the new run tell their own
-    this.z2mContainerError = null;
-    if (this.installation.state === INSTALLATION_STATE.FAILED) {
-      this.clearInstallation();
-    }
     if (!this.gladysConnected) {
       const broker = await findOwnZ2mContainer(this.gladys.system, mqttContainerDescriptor);
       if (broker) {
         await this.gladys.system.restartContainer(broker.id);
       }
     }
-    await this.restartZ2mContainer(container.id);
+    try {
+      await this.restartZ2mContainer(container.id);
+    } catch (e) {
+      // Refused by Docker: nothing restarted, the failure retried still describes Zigbee2mqtt
+      this.emitStatusEvent();
+      throw e;
+    }
+    // Restarted: the failure retried no longer describes Zigbee2mqtt, the logs of the new run tell their own
+    this.z2mContainerError = null;
+    if (this.installation.state === INSTALLATION_STATE.FAILED) {
+      this.clearInstallation();
+    }
     this.emitStatusEvent();
   } finally {
     this.runningOperations -= 1;

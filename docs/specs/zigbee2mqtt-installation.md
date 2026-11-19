@@ -236,14 +236,15 @@ installation. A job that fails to start fails the installation with its error. A
   setup saved while stopped forgets the stop too. Reset destroys the variable.
 - **Restart** (`restart.js`). Restarts the Zigbee2mqtt container through `restartZ2mContainer`, the
   same code as an installation: the starting window (`zigbee2mqttStarting`, 2 min) and the logs of
-  the new run (0.2). The broker is restarted first when Gladys is not connected to it. The failure
-  being retried is forgotten first (`z2mContainerError`, a failed installation): the dashboard shows
-  the new run starting, and its logs tell their own error. Without a client of the broker (the last
-  init failed before connecting), restarting the containers would not connect Gladys again: the
-  restart is a start (an installation `start`) instead.
-- **Runs** (`z2mRun`). Counted by each restart of the container and by a stop: a reader of the logs
-  of an older run (0.2) writes nothing when it ends, so the error of a run replaced or stopped never
-  shows on the new one or on a stopped Zigbee2mqtt.
+  the new run (0.2). The broker is restarted first when Gladys is not connected to it. Once Docker
+  restarted it, the failure retried is forgotten (`z2mContainerError`, a failed installation): the
+  dashboard shows the new run starting, and its logs tell their own error. A restart that Docker
+  refuses changes nothing: the failure stays, and the starting window is closed at once. Without a
+  client of the broker (the last init failed before connecting), restarting the containers would not
+  connect Gladys again: the restart is a start (an installation `start`) instead.
+- **Runs** (`z2mRun`). Counted by each restart of the container, before Docker stops the previous
+  run, and by a stop: a reader of the logs of an older run (0.2), which ends with it, writes nothing,
+  so the error of a run replaced or stopped never shows on the new one or on a stopped Zigbee2mqtt.
 - **Without Docker** (an external broker only). Our containers are looked for through
   `utils/findOwnZ2mContainer.js`: on a machine where Gladys does not run in Docker there is none, so a
   stop only disconnects, a start or a reset (`disconnect`) go on without containers, and a restart is

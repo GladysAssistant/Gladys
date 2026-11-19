@@ -70,7 +70,7 @@ const KeyCard = ({ view, actions }) => {
           type="button"
           class="btn btn-outline-primary btn-sm"
           onClick={actions.changeKey}
-          disabled={view.installing}
+          disabled={view.changeKeyDisabled}
           data-cy="z2m-dashboard-change-key"
         >
           <Text id={`${T}.actions.changeKey`} />

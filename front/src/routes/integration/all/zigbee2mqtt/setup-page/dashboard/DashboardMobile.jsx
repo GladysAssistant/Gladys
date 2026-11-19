@@ -101,7 +101,7 @@ const Coordinator = ({ view, actions }) => {
         icon="repeat"
         title={<Text id={`${T}.mobile.changeKey`} />}
         onClick={actions.changeKey}
-        disabled={view.installing}
+        disabled={view.changeKeyDisabled}
         dataCy="z2m-dashboard-change-key"
       />
     </MobileGroup>

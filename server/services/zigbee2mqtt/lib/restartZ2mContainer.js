@@ -25,10 +25,19 @@ async function restartZ2mContainer(containerId) {
   // the first lines of the new run
   const restartedAt = Math.floor(Date.now() / 1000);
   const restartStartedAt = Date.now();
-  await this.gladys.system.restartContainer(containerId);
-  logger.info(`Zigbee2mqtt container started in ${formatDuration(Date.now() - restartStartedAt)}`);
-  // A new run: a reader still following the previous one ends with it, its outcome ignored (see readZ2mContainerLogs)
+  // A new run, counted before Docker stops the previous one: its reader ends with it, during the restart, and its
+  // outcome is ignored (see readZ2mContainerLogs)
   this.z2mRun += 1;
+  try {
+    await this.gladys.system.restartContainer(containerId);
+  } catch (e) {
+    // Nothing restarted: nothing starts either. The caller tells the status
+    clearTimeout(this.startingTimer);
+    this.startingTimer = null;
+    this.zigbee2mqttStarting = false;
+    throw e;
+  }
+  logger.info(`Zigbee2mqtt container started in ${formatDuration(Date.now() - restartStartedAt)}`);
   // We read the logs in non blocking mode
   this.readZ2mContainerLogs(containerId, restartedAt);
 }
