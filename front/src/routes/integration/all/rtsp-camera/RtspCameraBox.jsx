@@ -90,9 +90,14 @@ class RtspCameraBox extends Component {
       });
     } catch (e) {
       tested = false;
+      // an error of the API carries its reason in `message` (`error` is then an object); only
+      // a string can be shown
+      const detail = [get(e, 'response.data.error'), get(e, 'response.data.message')].find(
+        value => typeof value === 'string' && value.length > 0
+      );
       this.setState({
         testConnectionError: RequestStatus.Error,
-        testConnectionErrorMessage: get(e, 'response.data.error'),
+        testConnectionErrorMessage: detail,
         lastError: 'test'
       });
     }
@@ -120,7 +125,25 @@ class RtspCameraBox extends Component {
       this.props.updateCameraRotation(cameraIndex, get(saved, 'cameraRotation.value'));
     }
   };
+  // the sheet opens: an error of a previous visit is not about what it shows now
+  forgetErrors = () => {
+    this.setState({
+      lastError: null,
+      tooMuchStatesError: false,
+      statesNumber: undefined,
+      nameTouched: false
+    });
+  };
+  // `autocorrect` is a boolean property of the element where the browser knows it (the string
+  // "off" given as a prop would turn it on) and a plain attribute elsewhere: the attribute is
+  // written as such
+  disableAutocorrect = input => {
+    if (input) {
+      input.setAttribute('autocorrect', 'off');
+    }
+  };
   updateCameraName = e => {
+    this.setState({ nameTouched: true });
     this.props.updateCameraField(this.props.cameraIndex, 'name', e.target.value);
   };
   updatePollFrequency = e => {
@@ -140,10 +163,11 @@ class RtspCameraBox extends Component {
 
   // The camera on a phone (docs/specs/mobile-pages/integration-devices.md): a row and its sheet,
   // fed by the handlers of the card below.
-  renderMobile(props, { lastError, testConnectionErrorMessage, tooMuchStatesError, statesNumber }) {
+  renderMobile(props, { lastError, testConnectionErrorMessage, tooMuchStatesError, statesNumber, nameTouched }) {
     const { camera, cameraIndex } = props;
     // the camera "+" just added, not saved yet: closing its sheet takes it out of the list
-    const isDraft = !camera.created_at && Boolean(props.discardOnClose);
+    const isUnsaved = !camera.created_at;
+    const isDraft = isUnsaved && Boolean(props.discardOnClose);
     const url = get(camera, 'cameraUrl.value');
     const rotation = get(camera, 'cameraRotation.value');
     const fieldId = `rtsp-camera-${cameraIndex}`;
@@ -166,9 +190,17 @@ class RtspCameraBox extends Component {
         onNameChange={this.updateCameraName}
         onRoomChange={this.updateCameraRoom}
         namePlaceholderId="integration.rtspCamera.namePlaceholder"
-        // a camera needs a name to be saved
-        nameInvalid={!camera.name}
+        // a camera that has no name yet is a new one, in the row and in the title of its sheet
+        title={camera.name || <Text id="integration.rtspCamera.newCamera" />}
+        sheetTitle={camera.name || <Text id="integration.rtspCamera.newCamera" />}
+        // a camera needs a name to be saved: the sheet says so, and marks the field once it was
+        // typed in and left empty (or when the camera lost the name it had)
+        nameInvalid={!camera.name && (nameTouched || !isUnsaved)}
+        nameHelp={!camera.name && <Text id="integration.rtspCamera.nameRequired" />}
         saveDisabled={!camera.name}
+        // never saved: there is something to save even when the sheet changed nothing
+        saveAlways={isUnsaved}
+        onOpen={this.forgetErrors}
         extraSignature={[camera.poll_frequency, url || '', rotation]}
         onRevert={this.revertCamera}
         showFeatures={false}
@@ -179,6 +211,8 @@ class RtspCameraBox extends Component {
             label: <Text id="integration.rtspCamera.testConnectionButton" />,
             icon: 'video',
             onClick: this.testConnection,
+            // nothing to test without a URL
+            disabled: !url,
             // the image of the test shows in the sheet
             keepOpen: true,
             dataCy: 'rtsp-camera-test'
@@ -232,7 +266,7 @@ class RtspCameraBox extends Component {
               placeholder={<Text id="integration.rtspCamera.urlPlaceholder" />}
               autocomplete="off"
               autocapitalize="off"
-              autocorrect="off"
+              ref={this.disableAutocorrect}
               spellcheck={false}
               enterkeyhint="done"
               data-cy="rtsp-camera-url"

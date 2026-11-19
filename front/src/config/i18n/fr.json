@@ -2135,6 +2135,8 @@
       "rotation18O": "180°",
       "rotation27O": "270°",
       "rotationLabel": "Rotation de l'image",
+      "newCamera": "Nouvelle caméra",
+      "nameRequired": "Une caméra a besoin d'un nom pour être sauvegardée.",
       "addCamera": "Ajouter une caméra",
       "cameraCount": {
         "zero": "Caméras",

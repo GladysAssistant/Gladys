@@ -765,18 +765,44 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=integration-device-save]').should('be.disabled');
     });
 
-    it('should say why a connection test failed, where it was asked', () => {
+    it('should say why a connection test failed, where it was asked, and forget it once the sheet is closed', () => {
+      // the body of the API for an error that is not an HTTP one (Error500): the reason is in
+      // `message`, `error` is an object
       cy.intercept(
         { method: 'POST', url: api('/service/rtsp-camera/camera/test') },
-        { statusCode: 500, body: { status: 500, error: 'ffmpeg exited with code 1' } }
+        {
+          statusCode: 500,
+          body: {
+            status: 500,
+            code: 'SERVER_ERROR',
+            error: {},
+            message: 'Error: ffmpeg failed (code=1): Connection refused'
+          }
+        }
       ).as('testConnection');
       openGarage();
       cy.get('[data-cy=rtsp-camera-test]').click();
       cy.wait('@testConnection');
       cy.get('[data-cy=integration-device-sheet]').should('be.visible');
       cy.get('[data-cy=integration-device-error]')
-        .should('contain', 'ffmpeg exited with code 1')
+        .should('contain', 'ffmpeg failed (code=1): Connection refused')
         .i18n('integration.rtspCamera.testConnectionError');
+      // the sheet is not stuck on its request
+      cy.get('[data-cy=rtsp-camera-test]').should('not.be.disabled');
+
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.contains('[data-cy=rtsp-camera-row]', 'Garage camera').click();
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+      cy.get('[data-cy=integration-device-error]').should('not.exist');
+    });
+
+    it('should not offer to test a camera that has no URL, nor correct what is typed in it', () => {
+      openGarage();
+      cy.get('[data-cy=rtsp-camera-url]').should('have.attr', 'autocorrect', 'off');
+      cy.get('[data-cy=rtsp-camera-test]').should('not.be.disabled');
+      cy.get('[data-cy=rtsp-camera-url]').clear();
+      cy.get('[data-cy=rtsp-camera-test]').should('be.disabled');
     });
 
     it('should save the URL, the frequency and the rotation changed in the sheet', () => {
@@ -835,7 +861,14 @@ describe('Integration devices on a phone', () => {
       cy.wait('@getCameras');
       cy.get('[data-cy=rtsp-camera-create]').click();
       cy.get('[data-cy=integration-device-sheet]').should('be.visible');
-      cy.get('[data-cy=integration-device-name]').should('have.value', '');
+      cy.get('[data-cy=integration-device-sheet]').i18n('integration.rtspCamera.newCamera');
+      cy.get('[data-cy=integration-device-name]')
+        .should('have.value', '')
+        // nothing was typed yet: the field is not marked, the sheet says what is needed
+        .and('have.attr', 'class')
+        .and('not.match', /inputInvalid/);
+      cy.get('[data-cy=integration-device-sheet]').i18n('integration.rtspCamera.nameRequired');
+      cy.get('[data-cy=rtsp-camera-test]').should('be.disabled');
       // nothing to delete yet
       cy.get('[data-cy=integration-device-delete]').should('not.exist');
       cy.get('[data-cy=rtsp-camera-url]').type('rtsp://192.168.1.21/stream');
@@ -880,6 +913,23 @@ describe('Integration devices on a phone', () => {
         .and('contain', 'Garage camera');
     });
 
+    it('should keep the camera being added when a search answers', () => {
+      cy.visit(CAMERAS_URL);
+      cy.wait('@getCameras');
+      cy.intercept({ method: 'GET', url: api('/service/rtsp-camera/device*') }, req => {
+        req.reply({ delay: 800, body: [] });
+      }).as('searchCameras');
+      cy.get('[data-cy=integration-mobile-search]').type('porch');
+      cy.get('[data-cy=rtsp-camera-create]').click();
+      cy.get('[data-cy=integration-device-name]').type('Porch camera');
+      cy.wait('@searchCameras');
+      cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+      cy.get('[data-cy=integration-device-name]').should('have.value', 'Porch camera');
+      cy.get('[data-cy=rtsp-camera-row]')
+        .should('have.length', 1)
+        .and('contain', 'Porch camera');
+    });
+
     it('should let a camera added on a wider screen and not saved be deleted from its sheet', () => {
       cy.viewport(...DESKTOP);
       cy.visit(CAMERAS_URL);
@@ -892,6 +942,8 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=rtsp-camera-row]')
         .eq(1)
         .click();
+      // never saved: once it has a name it can be saved, whatever the sheet changed
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
       cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
       cy.get('[data-cy=rtsp-camera-row]').should('have.length', 2);
       cy.get('[data-cy=rtsp-camera-row]')
@@ -934,7 +986,9 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=integration-device-sheet]').should('not.exist');
       cy.get('[data-cy=integration-mobile-toast]').i18n('mobileDeviceList.deleted');
       cy.get('[data-cy=rtsp-camera-row]').should('not.exist');
+      // one way to add a camera at a time
       cy.get('[data-cy=rtsp-camera-create-empty]').should('be.visible');
+      cy.get('[data-cy=rtsp-camera-create]').should('not.exist');
     });
 
     it('should search and sort through the requests of the desktop header', () => {

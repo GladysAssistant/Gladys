@@ -228,23 +228,31 @@ Only what differs from B, C and D.
 The integration has one page and no "Discovery": a camera is created by hand, in the list.
 
 - **The list.** The toolbar has the search and the sort order; the count of the cameras heads
-  the rows (a camera icon, the name, the room). An empty list offers "Add a camera".
+  the rows (a camera icon, the name, the room). With no camera at all the page offers "Add a
+  camera" in place of the floating "+"; a search that finds nothing only says so, the "+" stays.
 - **The sheet** holds the fields of the card: name, room, **refresh frequency**, the **URL** of
   the stream (16 px, a URL keyboard, no capital letter and no correction; its explanation under
   the field) and the **rotation** of the image — which gets a label here, the card has none.
   The frequency, the URL and the rotation count in the unsaved changes and are put back by "Close
   without saving". The features are not listed: a camera always has the same ones.
-- **Test connection** is a button of the sheet, under "Save". It posts the camera as the sheet
-  shows it, saved or not, and **the sheet stays open**: the image the camera answered shows right
-  above the buttons. A failed test shows there too, with what the server answered.
-- **A camera needs a name to be saved**: the field is marked and "Save" is disabled until it has
-  one (the card lets the request fail).
-- **"+"** adds a camera to the list, as the "New" button of the card, **and opens its sheet**.
-  That camera only exists in the page until it is saved: its sheet has no "Delete", and closing
-  it without saving — after the question of D when something was typed — **takes it out of the
-  list**. Saved, it is a camera like the other ones. A camera added on a wider screen and not
-  saved yet keeps its row when the window narrows: its sheet has "Delete", confirmed, which
-  takes it out of the list without a request, as on its card.
+- **Test connection** is a button of the sheet, under "Save", disabled while the camera has no
+  URL. It posts the camera as the sheet shows it, saved or not, and **the sheet stays open**: the
+  image the camera answered shows right above the buttons. A failed test shows there too, with
+  the reason the server gave (the `message` of the API error — the card showed an empty alert).
+  The error of a test or of a save is forgotten when the sheet opens again.
+- **A camera needs a name to be saved**: "Save" is disabled until it has one and a line under
+  the field says why (the card lets the request fail). The field is marked once it was typed in
+  and emptied, or when a saved camera lost its name — not on a new camera nothing was typed in.
+- **"+"** adds a camera to the list, as the "New" button of the card, **and opens its sheet**,
+  titled "New camera" until it has a name. That camera only exists in the page until it is
+  saved: its sheet has no "Delete", and closing it without saving — after the question of D when
+  something was typed — **takes it out of the list**. Saved, it is a camera like the other ones.
+- **A camera that was never saved** can be saved as soon as it has a name, whatever the sheet
+  changed. One added on a wider screen keeps its row when the window narrows: its sheet has
+  "Delete", confirmed, which takes it out of the list without a request, as on its card.
+- **A search or another sort order keeps the cameras that were never saved**, at the end of the
+  list it brings (on every screen size: the card of a camera being typed was dropped by the
+  answer of a search). They are not kept when the page is opened again.
 - The card never said that a deletion had failed: on a phone the confirmation does, and tells a
   camera with too many states apart.
 
@@ -282,9 +290,11 @@ other layout: an unsaved change there does not survive the swap.
   integrations); the fields disabled while a save runs; a failed Matter replacement leaving its
   row untouched; the search and the sort order sent to the server; a discovered device added; the
   pairing form; the cards kept on a wider screen. For the cameras: the fields of the sheet, a
-  connection test that leaves the sheet open on its image, a failed test, the URL, the frequency
-  and the rotation saved and undone, a camera added with "+" then saved, one closed without being
-  saved, and one added on a wider screen deleted from its sheet.
+  connection test that leaves the sheet open on its image, a failed test (with the body the API
+  sends) and its error forgotten when the sheet opens again, no test without a URL, the URL, the
+  frequency and the rotation saved and undone, a camera added with "+" then saved, one closed
+  without being saved, one kept when a search answers, and one added on a wider screen deleted
+  from its sheet.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.

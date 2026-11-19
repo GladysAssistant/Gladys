@@ -50,11 +50,18 @@ class MobileRtspCameras extends Component {
     const loading = props.getRtspCameraStatus === RequestStatus.Getting;
     const cameras = rtspCameras || [];
     const addLabel = get(intl.dictionary, 'integration.rtspCamera.addCamera');
+    const searching = Boolean(props.rtspCameraSearch && props.rtspCameraSearch.length);
+    // no camera at all: the empty state offers to add one, the floating "+" would say it twice
+    const showEmptyAdd = Boolean(rtspCameras) && cameras.length === 0 && !searching && !loading;
     return (
       <MobileIntegrationTab
         dataCy="rtsp-cameras-mobile"
         // the list did not load: there is nothing to add a camera to
-        fab={rtspCameras ? { onClick: this.addCamera, label: addLabel, dataCy: 'rtsp-camera-create' } : undefined}
+        fab={
+          rtspCameras && !showEmptyAdd
+            ? { onClick: this.addCamera, label: addLabel, dataCy: 'rtsp-camera-create' }
+            : undefined
+        }
       >
         <MobileListToolbar
           // the search is debounced: the field is not controlled, it only starts from the query
@@ -100,9 +107,11 @@ class MobileRtspCameras extends Component {
           )}
           {rtspCameras && cameras.length === 0 && !loading && (
             <MobileEmptyState icon="camera" text={<Text id="integration.rtspCamera.noCameraFound" />}>
-              <BigButton variant="primary" icon="plus" onClick={this.addCamera} data-cy="rtsp-camera-create-empty">
-                {addLabel}
-              </BigButton>
+              {showEmptyAdd && (
+                <BigButton variant="primary" icon="plus" onClick={this.addCamera} data-cy="rtsp-camera-create-empty">
+                  {addLabel}
+                </BigButton>
+              )}
             </MobileEmptyState>
           )}
         </MobileListLoader>

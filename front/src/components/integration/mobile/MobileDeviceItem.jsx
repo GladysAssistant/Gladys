@@ -32,15 +32,20 @@ const getSignature = (device, extraSignature) =>
  * Sheet — `notices`, the name and the room (when onNameChange / onRoomChange are given: they get
  * the event of the desktop fields), `children`, the features, `details` ([{ label, value, mono }],
  * behind "Show the details" with `detailsFolded`), then the buttons:
- * - onSave: "Save", disabled while nothing changed; with `guard` (the default with onSave),
+ * - onSave: "Save", disabled while nothing changed (unless `saveAlways`: a device that was
+ *   never saved has nothing to differ from); with `guard` (the default with onSave),
  *   closing the sheet with unsaved changes asks first;
  * - primaryAction { label, onClick, icon, disabled, toast, dataCy }: the action of a discovered
  *   device ("Add to Gladys");
- * - actions [{ label, href | onClick, icon, toast, keepOpen, dataCy }]: the other ones ("Edit");
+ * - actions [{ label, href | onClick, icon, toast, keepOpen, disabled, dataCy }]: the other ones
+ *   ("Edit");
  *   with `keepOpen` a success leaves the sheet open (its result shows in it: a connection test);
  * - onDelete: "Delete", confirmed in a sheet.
  * onSave, primaryAction.onClick and onDelete return a promise of `false` when they failed: the
  * sheet then stays open with `saveError` / `deleteError` (or a default sentence).
+ *
+ * `nameHelp` is a footnote under the name (why "Save" is disabled). `onOpen` is called each time
+ * the sheet opens: the card forgets the error of a previous visit.
  *
  * A device created in the list itself (a camera): `autoOpen` opens its sheet as soon as it is
  * true, and `onDismiss` is called when the sheet is closed without a request that succeeded —
@@ -98,6 +103,9 @@ class MobileDeviceItem extends Component {
       leaveOpen: false,
       failed: null
     });
+    if (this.props.onOpen) {
+      this.props.onOpen();
+    }
   };
 
   // closed without a request that succeeded (`run` closes the sheet itself after one)
@@ -309,7 +317,11 @@ class MobileDeviceItem extends Component {
             covers what the integration adds to the sheet too (its switches). */}
         <fieldset class={style.sheetFields} disabled={Boolean(busy)} data-cy="integration-device-fields">
           {onNameChange && (
-            <MobileField label={<Text id="editDeviceForm.nameLabel" />} htmlFor={`${this.fieldId}-name`}>
+            <MobileField
+              label={<Text id="editDeviceForm.nameLabel" />}
+              htmlFor={`${this.fieldId}-name`}
+              help={this.props.nameHelp}
+            >
               <Localizer>
                 <input
                   id={`${this.fieldId}-name`}
@@ -371,7 +383,7 @@ class MobileDeviceItem extends Component {
               variant="primary"
               onClick={this.save}
               loading={busy === 'save'}
-              disabled={Boolean(busy) || saveDisabled || !this.isDirty()}
+              disabled={Boolean(busy) || saveDisabled || !(this.props.saveAlways || this.isDirty())}
               data-cy="integration-device-save"
             >
               {saveLabel || <Text id="global.save" />}
@@ -394,7 +406,7 @@ class MobileDeviceItem extends Component {
               icon={action.icon}
               onClick={action.href ? this.goTo(action.href) : this.runAction(action, index)}
               loading={busy === `action-${index}`}
-              disabled={Boolean(busy)}
+              disabled={Boolean(busy) || action.disabled}
               data-cy={action.dataCy}
             >
               {action.label}
