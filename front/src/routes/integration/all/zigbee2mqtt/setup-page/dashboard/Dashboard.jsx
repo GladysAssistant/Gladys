@@ -195,6 +195,7 @@ class Dashboard extends Component {
           onCancel={this.showMain}
           onChanged={this.showMain}
           httpClient={props.httpClient}
+          session={props.session}
           zigbee2mqttStatus={status}
           configuration={configuration}
           setupZigee2mqttStatus={props.setupZigee2mqttStatus}
