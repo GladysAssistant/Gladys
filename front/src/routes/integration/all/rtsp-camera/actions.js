@@ -42,7 +42,10 @@ function createActions(store) {
       }
       return camera;
     },
-    async getRtspCameraDevices(state) {
+    // `keepUnsaved`: the list is asked again while the page is open (a search, another order). The
+    // cameras added and not saved yet only exist in the page: they stay at the end of the new list,
+    // or the answer of a search would drop the camera being typed, and its sheet on a phone.
+    async getRtspCameraDevices(state, { keepUnsaved = false } = {}) {
       store.setState({
         getRtspCameraStatus: RequestStatus.Getting
       });
@@ -58,8 +61,14 @@ function createActions(store) {
         rtspCameras.forEach(camera => {
           actions.complete(camera);
         });
+        // (one being saved meanwhile may already be in the answer: it is not listed twice)
+        const unsavedCameras = keepUnsaved
+          ? (store.getState().rtspCameras || []).filter(
+              camera => !camera.created_at && !rtspCameras.some(saved => saved.id === camera.id)
+            )
+          : [];
         store.setState({
-          rtspCameras,
+          rtspCameras: [...rtspCameras, ...unsavedCameras],
           getRtspCameraStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -264,13 +273,13 @@ function createActions(store) {
       store.setState({
         rtspCameraSearch: e.target.value
       });
-      await actions.getRtspCameraDevices(store.getState());
+      await actions.getRtspCameraDevices(store.getState(), { keepUnsaved: true });
     },
     async changeOrderDir(state, e) {
       store.setState({
         getRtspCameraOrderDir: e.target.value
       });
-      await actions.getRtspCameraDevices(store.getState());
+      await actions.getRtspCameraDevices(store.getState(), { keepUnsaved: true });
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
