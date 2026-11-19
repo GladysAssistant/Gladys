@@ -654,7 +654,9 @@ The status card shows the first state that applies:
   of the last request counts, and a message is more recent than a request still running. "No device in
   the network" for none.
 - **Pair** sends `POST /permit_join` with `{ value: true }` (never toggled) and tells that joining is
-  allowed for 4 minutes, as long as `zigbee2mqtt.permit_join` says so and Zigbee2mqtt stays online.
+  allowed for 4 minutes, as long as `zigbee2mqtt.permit-join` says so and Zigbee2mqtt stays online;
+  the answer of the request does not replace what `zigbee2mqtt.permit-join` told meanwhile, nor a
+  state other than online reached meanwhile (not answering, stopped, failed, dongle unplugged…).
 - **A status that cannot be read** shows an error instead of a state guessed from an empty status.
 - **Alerts.** An update waiting for its images (`updatePending`, G), the ezsp driver note (the saved
   model runs the `ezsp` driver, after a fallback), the success of an installation followed (J).

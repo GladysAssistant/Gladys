@@ -61,7 +61,12 @@ class Dashboard extends Component {
     this.setState({ newDeviceCount: countNewDevices(devices) });
   };
 
-  handlePermitJoin = permitJoin => this.setState({ permitJoinAllowed: Boolean(permitJoin) });
+  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page)
+  handlePermitJoin = permitJoin => {
+    // More recent than a request to permit joining still running
+    this.permitJoinChanges += 1;
+    this.setState({ permitJoinAllowed: Boolean(permitJoin) });
+  };
 
   loadAdapters = async () => {
     try {
@@ -76,7 +81,7 @@ class Dashboard extends Component {
   };
 
   // POST an action; the status the server sends tells its outcome. The success of the last installation is not told
-  // any more: it is the past.
+  // any more: it is the past. onSuccess: the changes of a success, or a function giving them once the request answers.
   runAction = async (action, body, onSuccess) => {
     this.setState({
       actionStatus: RequestStatus.Getting,
@@ -89,7 +94,8 @@ class Dashboard extends Component {
       if (this.unmounted) {
         return;
       }
-      this.setState({ actionStatus: RequestStatus.Success, pendingAction: null, ...(onSuccess || {}) });
+      const changes = typeof onSuccess === 'function' ? onSuccess() : onSuccess;
+      this.setState({ actionStatus: RequestStatus.Success, pendingAction: null, ...(changes || {}) });
     } catch (e) {
       console.error(e);
       if (!this.unmounted) {
@@ -100,7 +106,13 @@ class Dashboard extends Component {
     }
   };
 
-  pair = () => this.runAction('permit_join', { value: true }, { permitJoinAllowed: true });
+  // Allowed once the request answers, unless Zigbee2mqtt told meanwhile whether joining is allowed, or went offline
+  pair = () => {
+    const permitJoinChanges = this.permitJoinChanges;
+    return this.runAction('permit_join', { value: true }, () =>
+      this.permitJoinChanges === permitJoinChanges ? { permitJoinAllowed: true } : null
+    );
+  };
 
   start = () => this.runAction('start');
 
@@ -152,6 +164,9 @@ class Dashboard extends Component {
     };
     // Numbers the requests of the discovered devices: only the answer of the last one, or a newer message, counts
     this.discoveredRequests = 0;
+    // Counts what told whether joining is allowed (a message of Zigbee2mqtt, offline): the answer of a request to
+    // permit joining does not replace it
+    this.permitJoinChanges = 0;
   }
 
   componentDidMount() {
@@ -180,6 +195,7 @@ class Dashboard extends Component {
     const changes = { confirmStop: false };
     if (previousState === DASHBOARD_STATE.ONLINE) {
       changes.permitJoinAllowed = false;
+      this.permitJoinChanges += 1;
     }
     if (this.state.actionError && this.state.actionStatus !== RequestStatus.Getting) {
       changes.actionError = null;

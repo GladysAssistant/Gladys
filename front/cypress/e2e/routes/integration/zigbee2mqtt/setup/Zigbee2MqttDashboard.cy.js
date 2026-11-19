@@ -81,6 +81,37 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('exist');
     });
 
+    it('should not take the answer of a slow request for joining over what Zigbee2mqtt told meanwhile', () => {
+      visitDashboard();
+      answerAction('permit_join', { body: {}, delay: 1000 });
+
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      // Allowed, then closed from another page before the request answers
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('exist');
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('not.exist');
+      cy.wait('@permit_join');
+      // Enabled again once the page handled the answer
+      cy.get('[data-cy=z2m-dashboard-pair]').should('not.be.disabled');
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('not.exist');
+    });
+
+    it('should not tell joining allowed when Zigbee2mqtt went offline before the request answered', () => {
+      visitDashboard();
+      answerAction('permit_join', { body: {}, delay: 1000 });
+
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      sendStatus(notAnsweringStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.notAnswering.title`);
+      sendStatus(onlineStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.online.title`);
+      cy.wait('@permit_join');
+      // Enabled again once the page handled the answer
+      cy.get('[data-cy=z2m-dashboard-pair]').should('not.be.disabled');
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('not.exist');
+    });
+
     it('should show Zigbee2mqtt as starting, until it is online', () => {
       // Gladys has just (re)started the container, and is not connected to the broker again yet
       visitDashboard({ status: { ...notAnsweringStatus, gladysConnected: false, zigbee2mqttStarting: true } });
