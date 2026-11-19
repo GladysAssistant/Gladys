@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { findOwnContainer } = require('../../../utils/dockerContainers');
+const { findOwnZ2mContainer } = require('../utils/findOwnZ2mContainer');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -13,7 +13,7 @@ const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt
  * await removeOwnContainer(gladys.system, mqttContainerDescriptor);
  */
 async function removeOwnContainer(system, descriptor) {
-  const container = await findOwnContainer(system, descriptor);
+  const container = await findOwnZ2mContainer(system, descriptor);
   if (container) {
     await system.stopContainer(container.id);
     // With its anonymous volumes (/mosquitto/data and /mosquitto/log of the broker image, unused: the broker persists

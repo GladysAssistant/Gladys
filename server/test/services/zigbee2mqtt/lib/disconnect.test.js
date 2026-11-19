@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { ConflictError } = require('../../../../utils/coreErrors');
+const { ConflictError, PlatformNotCompatible } = require('../../../../utils/coreErrors');
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -323,6 +323,18 @@ describe('zigbee2mqtt disconnect', () => {
       expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
       expect(clock.countTimers()).to.equal(0);
     });
+  });
+
+  it('should disconnect without containers when Gladys does not run in Docker (external broker)', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.rejects(new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER'));
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
   });
 
   it('no container -> nothing to stop', async () => {

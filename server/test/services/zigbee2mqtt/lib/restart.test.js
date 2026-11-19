@@ -3,7 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 
-const { BadParameters, ConflictError } = require('../../../../utils/coreErrors');
+const { BadParameters, ConflictError, PlatformNotCompatible } = require('../../../../utils/coreErrors');
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -91,6 +91,15 @@ describe('zigbee2mqtt restart', () => {
   it('should refuse to restart without a Zigbee2mqtt container of ours', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([]);
+    // EXECUTE
+    await expect(zigbee2mqttManager.restart()).to.be.rejectedWith(BadParameters, 'no container to restart');
+    // ASSERT
+    assert.notCalled(zigbee2mqttManager.restartZ2mContainer);
+  });
+
+  it('should refuse to restart when Gladys does not run in Docker, without container of ours', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.rejects(new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER'));
     // EXECUTE
     await expect(zigbee2mqttManager.restart()).to.be.rejectedWith(BadParameters, 'no container to restart');
     // ASSERT

@@ -232,6 +232,10 @@ installation. A job that fails to start fails the installation with its error. A
 - **Restart** (`restart.js`). Restarts the Zigbee2mqtt container through `restartZ2mContainer`, the
   same code as an installation: the starting window (`zigbee2mqttStarting`, 2 min) and the logs of
   the new run (0.2). The broker is restarted first when Gladys is not connected to it.
+- **Without Docker** (an external broker only). Our containers are looked for through
+  `utils/findOwnZ2mContainer.js`: on a machine where Gladys does not run in Docker there is none, so a
+  stop only disconnects, a start or a reset (`disconnect`) go on without containers, and a restart is
+  refused (400, no container) instead of failing on `SYSTEM_NOT_RUNNING_DOCKER`.
 
 ## F. Image downloads
 

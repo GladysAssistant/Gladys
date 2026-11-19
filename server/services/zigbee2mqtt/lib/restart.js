@@ -1,5 +1,5 @@
 const { BadParameters } = require('../../../utils/coreErrors');
-const { findOwnContainer } = require('../../../utils/dockerContainers');
+const { findOwnZ2mContainer } = require('../utils/findOwnZ2mContainer');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -18,12 +18,12 @@ async function restart() {
     if (this.stopped) {
       throw new BadParameters('Zigbee2mqtt: stopped by the user, start it instead');
     }
-    const container = await findOwnContainer(this.gladys.system, zigbee2mqttContainerDescriptor);
+    const container = await findOwnZ2mContainer(this.gladys.system, zigbee2mqttContainerDescriptor);
     if (!container) {
       throw new BadParameters('Zigbee2mqtt: no container to restart, set it up first');
     }
     if (!this.gladysConnected) {
-      const broker = await findOwnContainer(this.gladys.system, mqttContainerDescriptor);
+      const broker = await findOwnZ2mContainer(this.gladys.system, mqttContainerDescriptor);
       if (broker) {
         await this.gladys.system.restartContainer(broker.id);
       }

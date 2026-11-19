@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { findOwnContainer } = require('../../../utils/dockerContainers');
+const { findOwnZ2mContainer } = require('../utils/findOwnZ2mContainer');
 const { CONFIGURATION } = require('./constants');
 const { disconnectFromBroker } = require('./disconnect');
 
@@ -17,7 +17,7 @@ const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt
  * const container = await setRestartPolicy(this.gladys.system, zigbee2mqttContainerDescriptor, 'no');
  */
 async function setRestartPolicy(system, descriptor, name) {
-  const container = await findOwnContainer(system, descriptor);
+  const container = await findOwnZ2mContainer(system, descriptor);
   if (!container) {
     return null;
   }

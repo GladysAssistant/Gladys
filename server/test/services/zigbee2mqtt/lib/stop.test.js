@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const logger = require('../../../../utils/logger');
-const { ConflictError } = require('../../../../utils/coreErrors');
+const { ConflictError, PlatformNotCompatible } = require('../../../../utils/coreErrors');
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -96,6 +96,19 @@ describe('zigbee2mqtt stop', () => {
     assert.calledWithMatch(gladys.event.emit, 'websocket.send-all', {
       payload: { stopped: true, stoppedAt: '2026-11-17T08:00:00.000Z', zigbee2mqttConnected: false },
     });
+  });
+
+  it('should only disconnect from an external broker when Gladys does not run in Docker', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.rejects(new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER'));
+    // EXECUTE
+    await zigbee2mqttManager.stop();
+    // ASSERT
+    expect(zigbee2mqttManager.stopped).to.equal(true);
+    assert.calledOnce(mqttClient.end);
+    assert.notCalled(gladys.system.updateContainer);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.calledWithMatch(gladys.event.emit, 'websocket.send-all', { payload: { stopped: true } });
   });
 
   it('should stop the containers even when Docker refuses their restart policy', async () => {
