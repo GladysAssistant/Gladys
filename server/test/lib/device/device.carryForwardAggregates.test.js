@@ -238,7 +238,6 @@ describe('Device.carryForwardBinaryStates', () => {
       values: [],
       startDate: period.startDate,
       startDateForQuery: period.startDateForQuery,
-      maxStates: 300,
     });
     expect(values).to.deep.equal([{ value: 1, created_at: period.startDate, end_time: null, carried_forward: true }]);
   });
@@ -252,7 +251,6 @@ describe('Device.carryForwardBinaryStates', () => {
       values: [{ value: 0, created_at: offAt, end_time: null }],
       startDate: period.startDate,
       startDateForQuery: period.startDateForQuery,
-      maxStates: 300,
     });
     expect(values).to.deep.equal([
       { value: 1, created_at: period.startDate, end_time: offAt, carried_forward: true },
@@ -273,7 +271,6 @@ describe('Device.carryForwardBinaryStates', () => {
       ],
       startDate: period.startDate,
       startDateForQuery: period.startDateForQuery,
-      maxStates: 300,
     });
     expect(values).to.deep.equal([
       { value: 1, created_at: period.startDate, end_time: offAt },
@@ -281,7 +278,7 @@ describe('Device.carryForwardBinaryStates', () => {
     ]);
   });
 
-  it('should keep the maximum number of segments, dropping the last ones', async () => {
+  it('should keep every change returned by the query, the most recent included', async () => {
     const period = buildPeriod();
     const offAt = new Date(NOW - 10 * ONE_HOUR);
     const onAt = new Date(NOW - 5 * ONE_HOUR);
@@ -293,11 +290,11 @@ describe('Device.carryForwardBinaryStates', () => {
       ],
       startDate: period.startDate,
       startDateForQuery: period.startDateForQuery,
-      maxStates: 2,
     });
     expect(values).to.deep.equal([
       { value: 1, created_at: period.startDate, end_time: offAt, carried_forward: true },
       { value: 0, created_at: offAt, end_time: onAt },
+      { value: 1, created_at: onAt, end_time: null },
     ]);
   });
 
@@ -309,7 +306,6 @@ describe('Device.carryForwardBinaryStates', () => {
       values: [{ value: 1, created_at: onAt, end_time: null }],
       startDate: period.startDate,
       startDateForQuery: period.startDateForQuery,
-      maxStates: 300,
     });
     expect(values).to.deep.equal([{ value: 1, created_at: onAt, end_time: null }]);
   });

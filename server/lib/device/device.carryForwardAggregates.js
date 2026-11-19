@@ -140,12 +140,11 @@ async function carryForwardAggregates({
  * @param {Array} params.values - The state changes of the period, ordered by date.
  * @param {Date} params.startDate - Real start of the period.
  * @param {Date} params.startDateForQuery - Start of the period, shifted the way the aggregate queries expect it.
- * @param {number} params.maxStates - Maximum number of segments: like the query, the last ones are dropped beyond it.
  * @returns {Promise<Array>} The state changes, starting at the start of the period when a state was in force.
  * @example
- * await carryForwardBinaryStates({ deviceFeature, values, startDate, startDateForQuery, maxStates: 300 });
+ * await carryForwardBinaryStates({ deviceFeature, values, startDate, startDateForQuery });
  */
-async function carryForwardBinaryStates({ deviceFeature, values, startDate, startDateForQuery, maxStates }) {
+async function carryForwardBinaryStates({ deviceFeature, values, startDate, startDateForQuery }) {
   const valueAtStart = await getValueInForceAt(deviceFeature, startDate, startDateForQuery);
   if (valueAtStart === null) {
     return values;
@@ -157,11 +156,11 @@ async function carryForwardBinaryStates({ deviceFeature, values, startDate, star
   if (firstValue.value === valueAtStart) {
     return [{ ...firstValue, created_at: startDate }, ...otherValues];
   }
-  const result = [
+  // The query already applied its limit: every change it returned is kept, with one more segment at most.
+  return [
     { value: valueAtStart, created_at: startDate, end_time: firstValue.created_at, carried_forward: true },
     ...values,
   ];
-  return result.slice(0, maxStates);
 }
 
 module.exports = {

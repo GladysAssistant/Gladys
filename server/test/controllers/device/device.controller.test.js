@@ -70,7 +70,9 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
       .expect(200)
       .then((res) => {
         expect(res.body).to.have.lengthOf(1);
-        expect(res.body[0].values).to.have.lengthOf(100);
+        // The 100 changes returned by the query; the state in force before the period may add one segment
+        const changes = res.body[0].values.filter((value) => !value.carried_forward);
+        expect(changes).to.have.lengthOf(100);
       });
   });
   it('should get device aggregated state', async () => {

@@ -482,7 +482,9 @@ describe('Device.getDeviceFeaturesAggregates binary feature', function Describe(
       60,
       100,
     );
-    expect(values).to.have.lengthOf(100);
+    // The 100 changes returned by the query, after the segment of the state in force before the period
+    expect(values).to.have.lengthOf(101);
+    expect(values[0].carried_forward).to.equal(true);
     expect(device).to.have.property('name');
     expect(deviceFeature).to.have.property('name');
   });
@@ -501,7 +503,9 @@ describe('Device.getDeviceFeaturesAggregates binary feature', function Describe(
     };
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const { values } = await device.getDeviceFeaturesAggregates('binary-feature', 24 * 60, 100);
-    expect(values).to.have.lengthOf(100);
+    // The 100 changes returned by the query, after the segment of the state in force before the period
+    expect(values).to.have.lengthOf(101);
+    expect(values[0].carried_forward).to.equal(true);
   });
 
   it('should return last 300 state changes for binary feature', async () => {
@@ -522,7 +526,10 @@ describe('Device.getDeviceFeaturesAggregates binary feature', function Describe(
       24 * 60,
       300,
     );
-    expect(values).to.have.lengthOf(300);
+    // The 300 changes returned by the query are all kept; the state in force before the period may add
+    // one segment at the start, or stretch the first one back when it is the same state.
+    expect(values.filter((value) => !value.carried_forward)).to.have.lengthOf(300);
+    expect(values.length).to.be.oneOf([300, 301]);
     expect(device).to.have.property('name');
     expect(deviceFeature).to.have.property('name');
 

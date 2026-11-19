@@ -151,7 +151,6 @@ async function getDeviceFeaturesAggregates(
         values,
         startDate: realStartDate,
         startDateForQuery: startDate,
-        maxStates,
       });
     }
   } else if (groupBy) {
