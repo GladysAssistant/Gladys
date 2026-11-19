@@ -22,8 +22,7 @@ import {
 const T = 'integration.zigbee2mqtt.setup.dashboard';
 
 // The settings of a configured installation (docs/specs/zigbee2mqtt-installation.md, N): the change of dongle, the
-// advanced settings, an external broker. Apart from Zigbee2MqttDashboard.cy.js: the browser of the run stops
-// connecting the websocket of the pages after about thirty tests in one file.
+// advanced settings, an external broker.
 describe('Zigbee2mqtt dashboard settings', () => {
   beforeEach(() => {
     cy.login();

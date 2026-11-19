@@ -2631,9 +2631,14 @@
             "title": "Netzwerk-Koordinator"
           },
           "confirmStop": {
-            "text": "Zigbee2MQTT stoppen? Deine Zigbee-Geräte reagieren nicht mehr, auch nach einem Neustart von Gladys, bis du es startest.",
+            "title": "Zigbee2MQTT stoppen?",
+            "text": "Deine Zigbee-Geräte reagieren nicht mehr, auch nach einem Neustart von Gladys, bis du es startest.",
             "confirm": "Zigbee2MQTT stoppen",
             "cancel": "Abbrechen"
+          },
+          "confirmRestart": {
+            "title": "Zigbee2MQTT neu starten?",
+            "text": "Deine Zigbee-Geräte antworten während der wenigen Sekunden des Neustarts nicht."
           },
           "advanced": {
             "title": "Erweiterte Einstellungen",
@@ -2664,6 +2669,11 @@
             },
             "saveError": "Die Einstellung konnte nicht gespeichert werden. Versuchen Sie es erneut.",
             "saveDongleNotFound": "Ihr Zigbee-Stick ist nicht eingesteckt: Es wurde nichts gespeichert. Stecken Sie ihn ein und speichern Sie erneut."
+          },
+          "mobile": {
+            "keyTitle": "Koordinator",
+            "changeKey": "Stick wechseln",
+            "copy": "Kopieren"
           }
         }
       },

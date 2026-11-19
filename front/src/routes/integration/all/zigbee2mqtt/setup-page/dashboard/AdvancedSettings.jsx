@@ -3,12 +3,17 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../../utils/consts';
+import { MQTT_MODE } from '../constants';
 import MqttExternalCredentials from '../local/MqttExternalCredentials';
 import SetupRemoteOptions from '../remote/SetupRemoteOptions';
 import { isExternal } from './dashboardState';
+import AdvancedSettingsMobile from './AdvancedSettingsMobile';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
+const BROKER_KEYS = ['mqttUrl', 'mqttUsername', 'mqttPassword', 'z2mFrontendUrl'];
+
+const isValidPort = port => /^\d+$/.test(`${port}`) && Number(port) >= 1 && Number(port) <= 65535;
 
 const ComponentRow = ({ name, ok, okText, koText }) => (
   <div class={style.fact} data-cy={`z2m-dashboard-component-${name}`}>
@@ -21,6 +26,21 @@ const ComponentRow = ({ name, ok, okText, koText }) => (
     </span>
   </div>
 );
+
+// What a refused save says on a phone, in the bottom bar
+const getSaveErrorText = view => {
+  if (view.setupZigee2mqttStatus === RequestStatus.ConflictError) {
+    return <Text id="integration.zigbee2mqtt.setup.installation.alreadyRunning" />;
+  }
+  if (view.setupZigee2mqttStatus === RequestStatus.Error) {
+    return (
+      <Text
+        id={`${T}.advanced.${view.setupZigee2mqttError === 'DONGLE_NOT_FOUND' ? 'saveDongleNotFound' : 'saveError'}`}
+      />
+    );
+  }
+  return null;
+};
 
 // Refused before anything was saved: an installation already runs, the dongle is not plugged in, or another error
 const SaveError = ({ view }) => {
@@ -62,10 +82,63 @@ class AdvancedSettings extends Component {
 
   cancelReset = () => this.setState({ confirmReset: false });
 
+  // The phone layout: the broker of an external Zigbee2mqtt edited in fields of the kit, saved from the bottom bar,
+  // and a leave guard while something is not saved (docs/specs/zigbee2mqtt-installation.md, N.5)
+  updateBroker = (field, value) => this.setState(prevState => ({ broker: { ...prevState.broker, [field]: value } }));
+
+  isDirty = () => {
+    const { configuration } = this.props.view;
+    if (isExternal(configuration)) {
+      return BROKER_KEYS.some(key => (this.state.broker[key] || '') !== (configuration[key] || ''));
+    }
+    return `${this.state.port}` !== `${configuration.z2mTcpPort || ''}`;
+  };
+
+  canSave = () => {
+    const { view } = this.props;
+    if (view.saving || view.installing) {
+      return false;
+    }
+    if (isExternal(view.configuration)) {
+      return Boolean((this.state.broker.mqttUrl || '').trim());
+    }
+    return isValidPort(this.state.port);
+  };
+
+  save = () => {
+    if (isExternal(this.props.view.configuration)) {
+      this.saveBroker({ ...this.state.broker, mqttMode: MQTT_MODE.EXTERNAL });
+    } else {
+      this.savePort();
+    }
+  };
+
+  closeSaveError = () => this.setState({ saveRequested: false });
+
+  openLeave = () => this.setState({ leaveOpen: true });
+
+  closeLeave = () => this.setState({ leaveOpen: false });
+
+  back = () => (this.isDirty() ? this.openLeave() : this.props.actions.showMain());
+
+  saveAndLeave = () => {
+    this.closeLeave();
+    this.save();
+  };
+
+  leaveWithoutSaving = () => this.props.actions.showMain();
+
   constructor(props) {
     super(props);
+    const { configuration } = props.view;
     // Whether this screen saved: the outcome of a save made elsewhere (the wizard) is not told here
-    this.state = { port: props.view.configuration.z2mTcpPort || '', confirmReset: false, saveRequested: false };
+    this.state = {
+      port: configuration.z2mTcpPort || '',
+      broker: BROKER_KEYS.reduce((broker, key) => ({ ...broker, [key]: configuration[key] || '' }), {}),
+      confirmReset: false,
+      saveRequested: false,
+      leaveOpen: false
+    };
   }
 
   // Saved by the end of an installation: shown unless the user is typing another one
@@ -87,7 +160,29 @@ class AdvancedSettings extends Component {
     const { configuration, status, z2mUrl, saving, resetZigbee2mqttStatus } = view;
     const external = isExternal(configuration);
     const portChanged = `${port}` !== `${configuration.z2mTcpPort || ''}`;
-    const validPort = /^\d+$/.test(`${port}`) && Number(port) >= 1 && Number(port) <= 65535;
+    const validPort = isValidPort(port);
+    if (view.isMobile) {
+      const form = {
+        ...this.state,
+        external,
+        validPort,
+        dirty: this.isDirty(),
+        canSave: this.canSave(),
+        saveError: saveRequested ? getSaveErrorText(view) : null,
+        updatePort: this.updatePort,
+        updateBroker: this.updateBroker,
+        save: this.save,
+        closeSaveError: this.closeSaveError,
+        showConfirmReset: this.showConfirmReset,
+        cancelReset: this.cancelReset,
+        back: this.back,
+        openLeave: this.openLeave,
+        closeLeave: this.closeLeave,
+        saveAndLeave: this.saveAndLeave,
+        leaveWithoutSaving: this.leaveWithoutSaving
+      };
+      return <AdvancedSettingsMobile view={view} actions={actions} form={form} />;
+    }
     return (
       <div class={style.advanced} data-cy="z2m-dashboard-advanced">
         <button

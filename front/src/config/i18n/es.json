@@ -2387,9 +2387,14 @@
             "title": "Coordinador de red"
           },
           "confirmStop": {
-            "text": "¿Detener Zigbee2MQTT? Tus dispositivos Zigbee dejarán de responder, incluso tras un reinicio de Gladys, hasta que lo arranques.",
+            "title": "¿Detener Zigbee2MQTT?",
+            "text": "Tus dispositivos Zigbee dejarán de responder, incluso tras un reinicio de Gladys, hasta que lo arranques.",
             "confirm": "Detener Zigbee2MQTT",
             "cancel": "Cancelar"
+          },
+          "confirmRestart": {
+            "title": "¿Reiniciar Zigbee2MQTT?",
+            "text": "Tus dispositivos Zigbee no responden durante los pocos segundos del reinicio."
           },
           "advanced": {
             "title": "Ajustes avanzados",
@@ -2420,6 +2425,11 @@
             },
             "saveError": "No se ha podido guardar el ajuste. Inténtelo de nuevo.",
             "saveDongleNotFound": "Su llave Zigbee no está conectada: no se ha guardado nada. Conéctela y vuelva a guardar."
+          },
+          "mobile": {
+            "keyTitle": "Coordinador",
+            "changeKey": "Cambiar de llave",
+            "copy": "Copiar"
           }
         }
       },

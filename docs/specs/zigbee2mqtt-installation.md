@@ -595,7 +595,7 @@ Cypress, `front/cypress/e2e/routes/integration/zigbee2mqtt/setup/`: `Zigbee2Mqtt
 screen of M.2, the payloads, the previous installation hidden on Retry and forgotten once cleared,
 the refusals, the ezsp fallback and its Retry, the external broker waiting for Zigbee2mqtt, joining
 closed by Zigbee2mqtt, the status not readable, the downloads in the background), the reset to the
-wizard in `Zigbee2MqttSetupDongle.cy.js` and `Zigbee2MqttWizardMobile.cy.js` (`iphone-x`: the focus
+wizard in `Zigbee2MqttDashboardSettings.cy.js` and `Zigbee2MqttWizardMobile.cy.js` (`iphone-x`: the focus
 page, the bottom bar, the sheets, the breakpoint crossed), fixtures in `wizardFixtures.js`;
 `Zigbee2MqttStatus.cy.js` for the not-installed banner.
 
@@ -684,14 +684,31 @@ A screen of its own, back to the dashboard by "Configuration":
 
 ### N.5 On a phone
 
-Below 992 px the cards stack in one column, state first. The change of dongle is the focus page of the
-wizard (M.3), its navigation bar back to "Configuration" instead of the integrations, without "Step 1
-of 4". The advanced settings stay a screen of their own.
+Below 992 px the cards of a large screen stack in one column, state first. **Below 768 px** (the phone
+breakpoint of `docs/specs/mobile-pages/README.md`, B) the dashboard is a list page of the mobile kit
+(`DashboardMobile.jsx`, `AdvancedSettingsMobile.jsx`), with the same view and actions as the large
+screen layout (`Dashboard.jsx` and `AdvancedSettings.jsx` keep the state and the requests):
+
+- **Main screen**: the state as the first row of a group (its tile tinted by state, the devices to add
+  as a row to the Discover tab), the progress of an installation, the alerts as notices, the primary
+  action as a full-width button (with "Change the dongle or model" on a failure); then the coordinator
+  as rows (its facts as values, "Change the dongle" as a row); then Restart, Stop and the interface
+  (opened in another tab) as rows; then "Advanced settings". **Stop and Restart are confirmed in a
+  sheet** (mobile-pages C.5: nothing restarted on a single tap; the primary Restart of a failure is not,
+  nothing runs to interrupt).
+- **Advanced settings**: a focus page, back to "Configuration" from its navigation bar; the port, or
+  the fields of the external broker (the password with its reveal button), saved from the bottom bar
+  shown once something differs, where a refused save is told; the state of each component as pills;
+  the MQTT access as rows, each value copied in one tap and the password revealed for 5 s; the reset
+  as a red row confirmed in a sheet. Leaving with something not saved, by the navigation bar or the
+  system "back", asks first (save and leave, leave without saving, keep editing).
+- **Change of dongle**: the focus page of the wizard (M.3), its navigation bar back to "Configuration"
+  instead of the integrations, without "Step 1 of 4".
 
 ### N.6 Tests
 
 Cypress, `front/cypress/e2e/routes/integration/zigbee2mqtt/setup/`: `Zigbee2MqttDashboard.cy.js` (each
 state, the devices to add, the actions and their refusals, the installations followed),
-`Zigbee2MqttDashboardSettings.cy.js` (change of dongle, advanced settings, external broker; apart: the
-browser of the run stops connecting the websocket of the pages after about thirty tests in one file)
-and `Zigbee2MqttDashboardMobile.cy.js` (`iphone-x`), fixtures in `dashboardFixtures.js`.
+`Zigbee2MqttDashboardSettings.cy.js` (change of dongle, advanced settings, external broker, reset) and
+`Zigbee2MqttDashboardMobile.cy.js` (`iphone-x`: the rows, the confirmations in sheets, the advanced
+settings saved from the bottom bar and their leave guard), fixtures in `dashboardFixtures.js`.

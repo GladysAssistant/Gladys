@@ -2387,9 +2387,14 @@
             "title": "Network coordinator"
           },
           "confirmStop": {
-            "text": "Stop Zigbee2MQTT? Your Zigbee devices will no longer respond, even after a restart of Gladys, until you start it.",
+            "title": "Stop Zigbee2MQTT?",
+            "text": "Your Zigbee devices will no longer respond, even after a restart of Gladys, until you start it.",
             "confirm": "Stop Zigbee2MQTT",
             "cancel": "Cancel"
+          },
+          "confirmRestart": {
+            "title": "Restart Zigbee2MQTT?",
+            "text": "Your Zigbee devices do not respond for the few seconds it restarts."
           },
           "advanced": {
             "title": "Advanced settings",
@@ -2420,6 +2425,11 @@
             },
             "saveError": "The setting could not be saved. Try again.",
             "saveDongleNotFound": "Your Zigbee dongle is not plugged in: nothing was saved. Plug it in, then save again."
+          },
+          "mobile": {
+            "keyTitle": "Coordinator",
+            "changeKey": "Change the dongle",
+            "copy": "Copy"
           }
         }
       },

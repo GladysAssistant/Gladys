@@ -2764,9 +2764,14 @@
             "title": "Coordinateur réseau"
           },
           "confirmStop": {
-            "text": "Arrêter Zigbee2MQTT ? Vos appareils Zigbee ne répondront plus, même après un redémarrage de Gladys, jusqu'à ce que vous le démarriez.",
+            "title": "Arrêter Zigbee2MQTT ?",
+            "text": "Vos appareils Zigbee ne répondront plus, même après un redémarrage de Gladys, jusqu'à ce que vous le démarriez.",
             "confirm": "Arrêter Zigbee2MQTT",
             "cancel": "Annuler"
+          },
+          "confirmRestart": {
+            "title": "Redémarrer Zigbee2MQTT ?",
+            "text": "Vos appareils Zigbee ne répondent plus pendant les quelques secondes du redémarrage."
           },
           "advanced": {
             "title": "Réglages avancés",
@@ -2797,6 +2802,11 @@
             },
             "saveError": "Le réglage n'a pas pu être enregistré. Réessayez.",
             "saveDongleNotFound": "Votre clé Zigbee n'est pas branchée : rien n'a été enregistré. Branchez-la, puis enregistrez à nouveau."
+          },
+          "mobile": {
+            "keyTitle": "Coordinateur",
+            "changeKey": "Changer de clé",
+            "copy": "Copier"
           }
         }
       },

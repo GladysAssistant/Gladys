@@ -49,6 +49,9 @@ const ActionTiles = ({ view, actions }) => {
       {confirmStop && (
         <div class={style.confirm} role="alertdialog" data-cy="z2m-dashboard-confirm-stop">
           <span>
+            <strong>
+              <Text id={`${T}.confirmStop.title`} />
+            </strong>{' '}
             <Text id={`${T}.confirmStop.text`} />
           </span>
           <div class={style.buttons}>

@@ -334,3 +334,25 @@
     animation: none;
   }
 }
+
+/* Phone layout (DashboardMobile, AdvancedSettingsMobile) */
+.mobileProgress {
+  margin: 0 0 16px;
+}
+
+/* Two groups in a row, without a section header between them */
+.mobileSpaced {
+  margin-top: 16px;
+}
+
+.mobileCode {
+  color: inherit;
+  font-size: 14px;
+  word-break: break-all;
+  user-select: all;
+}
+
+.mobileRowButtons {
+  display: flex;
+  gap: 4px;
+}

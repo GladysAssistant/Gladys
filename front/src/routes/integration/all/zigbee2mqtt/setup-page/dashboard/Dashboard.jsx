@@ -4,6 +4,7 @@ import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
 import { RequestStatus } from '../../../../../../utils/consts';
+import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
 import { findAdapter } from '../wizard/adapters';
 import Wizard from '../wizard/Wizard';
 import {
@@ -18,6 +19,7 @@ import StatusCard from './StatusCard';
 import KeyCard, { getDriver } from './KeyCard';
 import ActionTiles from './ActionTiles';
 import AdvancedSettings from './AdvancedSettings';
+import DashboardMobile from './DashboardMobile';
 import style from './dashboard.css';
 
 const SCREEN = { MAIN: 'main', ADVANCED: 'advanced', CHANGE: 'change' };
@@ -214,6 +216,7 @@ class Dashboard extends Component {
     const z2mUrl = isExternal(configuration) || configuration.z2mTcpPort ? props.z2mUrl : null;
     const view = {
       ...state,
+      isMobile: props.isMobile,
       state: dashboardState,
       status,
       configuration,
@@ -252,6 +255,9 @@ class Dashboard extends Component {
     if (state.screen === SCREEN.ADVANCED) {
       return <AdvancedSettings view={view} actions={actions} />;
     }
+    if (props.isMobile) {
+      return <DashboardMobile view={view} actions={actions} />;
+    }
     return (
       <div class={style.dashboard} data-cy="z2m-dashboard">
         <div class={style.grid}>
@@ -280,4 +286,4 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+export default withMobileViewport(Dashboard);

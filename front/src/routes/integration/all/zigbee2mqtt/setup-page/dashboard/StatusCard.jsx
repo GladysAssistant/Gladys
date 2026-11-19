@@ -11,9 +11,9 @@ import { DASHBOARD_STATE, getStartupError, isExternal } from './dashboardState';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
-const DISCOVER_URL = '/dashboard/integration/device/zigbee2mqtt/discover';
+export const DISCOVER_URL = '/dashboard/integration/device/zigbee2mqtt/discover';
 
-const ICONS = {
+export const ICONS = {
   [DASHBOARD_STATE.ONLINE]: 'radio',
   [DASHBOARD_STATE.INSTALLING]: 'loader',
   [DASHBOARD_STATE.STARTING]: 'loader',
@@ -46,7 +46,7 @@ const formatDate = (isoDate, language) => {
   }
 };
 
-const Title = ({ view }) => {
+export const Title = ({ view }) => {
   const { state, status, configuration } = view;
   if (state === DASHBOARD_STATE.INSTALLING) {
     return <Text id={`integration.zigbee2mqtt.setup.installation.titles.${status.installation.kind}`} />;
@@ -57,7 +57,7 @@ const Title = ({ view }) => {
   return <Text id={`${T}.states.${state}.title`} />;
 };
 
-const Subtitle = ({ view }) => {
+export const Subtitle = ({ view }) => {
   const { state, status, language } = view;
   if (state === DASHBOARD_STATE.ONLINE) {
     return Number.isInteger(status.deviceCount) ? (
@@ -73,16 +73,20 @@ const Subtitle = ({ view }) => {
   return <Text id={`${T}.states.${state}.text`} />;
 };
 
-// The progress of an installation run from the dashboard (a start, a change of dongle, an update)
+// The phase of an installation run from the dashboard (a start, a change of dongle, an update)
+export const getInstallationPhase = ({ status, configuration }) =>
+  getCurrentPhase(
+    getPhases(status.installation, {
+      configuration,
+      external: isExternal(configuration),
+      ezspFallback: Boolean(status.ezspFallback)
+    })
+  );
+
+// The progress of an installation run from the dashboard
 const Progress = ({ view }) => {
-  const { status, configuration } = view;
-  const { installation } = status;
-  const phases = getPhases(installation, {
-    configuration,
-    external: isExternal(configuration),
-    ezspFallback: Boolean(status.ezspFallback)
-  });
-  const phase = getCurrentPhase(phases);
+  const { installation } = view.status;
+  const phase = getInstallationPhase(view);
   return (
     <div class={style.progress} data-cy="z2m-dashboard-progress">
       <div class={cx('progress', style.progressBar)}>
@@ -105,13 +109,13 @@ const Progress = ({ view }) => {
   );
 };
 
-const PRIMARY_LABELS = {
+export const PRIMARY_LABELS = {
   pair: `${T}.actions.pair`,
   start: `${T}.actions.start`,
   restart: `${T}.actions.restart`
 };
 
-const PRIMARY_ICONS = { pair: 'radio', start: 'play', restart: 'refresh-cw' };
+export const PRIMARY_ICONS = { pair: 'radio', start: 'play', restart: 'refresh-cw' };
 
 // The state of Zigbee2mqtt, why it does not run, and the action to take
 const StatusCard = ({ view, actions }) => {
