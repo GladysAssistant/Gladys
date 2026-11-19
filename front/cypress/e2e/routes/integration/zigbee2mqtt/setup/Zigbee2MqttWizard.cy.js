@@ -307,6 +307,19 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-summary-devices]').should('contain', '12');
   });
 
+  it('should send to Settings > Services while the service is not started, the setup refused meanwhile', () => {
+    visitWizard({ status: { ...readyToSetupStatus, serviceStarted: false } });
+    cy.get('[data-cy=z2m-wizard-service-not-started]').i18n(
+      'integration.zigbee2mqtt.setup.dashboard.states.inactive.title'
+    );
+    cy.get('[data-cy=z2m-wizard-services]').should('have.attr', 'href', '/dashboard/settings/service');
+    cy.get('[data-cy=z2m-wizard-install]').should('not.exist');
+
+    // Started from the settings: the steps show up
+    sendStatus({ ...readyToSetupStatus, serviceStarted: true });
+    cy.get('[data-cy=z2m-wizard-key-one]').should('exist');
+  });
+
   it('should only offer a Zigbee2mqtt that runs elsewhere when Gladys cannot install it', () => {
     visitWizard({ status: { ...readyToSetupStatus, dockerBased: false } });
     cy.get('[data-cy=z2m-wizard-incompatible]').should('exist');

@@ -2604,12 +2604,8 @@
               "since": "Seit {{date}} · Gladys verbindet sich nicht von selbst wieder. Dein Zigbee2MQTT läuft weiter."
             },
             "inactive": {
-              "title": "Der Zigbee2MQTT-Dienst ist gestoppt",
-              "text": "Er wurde unter Einstellungen > Dienste gestoppt: Deine Zigbee-Geräte antworten nicht, bis er wieder startet."
-            },
-            "pending": {
-              "title": "Zigbee2MQTT ist noch nicht gestartet",
-              "text": "Gladys startet es mit seinen Diensten. Bleibt es so, prüfe, ob der Zigbee2MQTT-Dienst unter Einstellungen > Dienste läuft."
+              "title": "Der Zigbee2MQTT-Dienst ist nicht gestartet",
+              "text": "Gladys startet ihn beim Start mit seinen anderen Diensten. Wurde er unter Einstellungen > Dienste gestoppt, starte ihn dort: Deine Zigbee-Geräte antworten bis dahin nicht."
             }
           },
           "newDevices": {
@@ -2631,7 +2627,7 @@
             "changeKey": "Ändern",
             "disconnect": "Trennen",
             "connect": "Verbinden",
-            "startService": "Dienst starten"
+            "services": "Einstellungen > Dienste öffnen"
           },
           "facts": {
             "driver": "Treiber",

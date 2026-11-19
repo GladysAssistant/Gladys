@@ -22,18 +22,12 @@ export const ICONS = {
   [DASHBOARD_STATE.DONGLE_MISSING]: 'cpu',
   [DASHBOARD_STATE.FAILED]: 'alert-triangle',
   [DASHBOARD_STATE.INACTIVE]: 'power',
-  [DASHBOARD_STATE.PENDING]: 'loader',
   [DASHBOARD_STATE.MQTT_ERROR]: 'alert-triangle',
   [DASHBOARD_STATE.NOT_ANSWERING]: 'alert-circle'
 };
 
 // The states shown with a spinner
-const WORKING_STATES = [
-  DASHBOARD_STATE.INSTALLING,
-  DASHBOARD_STATE.STARTING,
-  DASHBOARD_STATE.STOPPING,
-  DASHBOARD_STATE.PENDING
-];
+const WORKING_STATES = [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STARTING, DASHBOARD_STATE.STOPPING];
 
 const TONES = {
   [DASHBOARD_STATE.ONLINE]: style.toneGreen,
@@ -44,7 +38,6 @@ const TONES = {
   [DASHBOARD_STATE.DONGLE_MISSING]: style.toneAmber,
   [DASHBOARD_STATE.FAILED]: style.toneRed,
   [DASHBOARD_STATE.INACTIVE]: style.toneGrey,
-  [DASHBOARD_STATE.PENDING]: style.toneBlue,
   [DASHBOARD_STATE.MQTT_ERROR]: style.toneRed,
   [DASHBOARD_STATE.NOT_ANSWERING]: style.toneAmber
 };
@@ -129,11 +122,13 @@ const Progress = ({ view }) => {
 export const PRIMARY_LABELS = {
   pair: `${T}.actions.pair`,
   start: `${T}.actions.start`,
-  startService: `${T}.actions.startService`,
   restart: `${T}.actions.restart`
 };
 
-export const PRIMARY_ICONS = { pair: 'radio', start: 'play', startService: 'play', restart: 'refresh-cw' };
+export const PRIMARY_ICONS = { pair: 'radio', start: 'play', restart: 'refresh-cw' };
+
+// Where the service is started
+export const SERVICES_URL = '/dashboard/settings/service';
 
 // With an external broker, starting is connecting Gladys to it again
 export const getPrimaryLabel = (primaryAction, configuration) =>
@@ -210,7 +205,7 @@ const StatusCard = ({ view, actions }) => {
         </div>
       )}
 
-      {(primaryAction || view.canChangeKey) && (
+      {(primaryAction || view.canChangeKey || state === DASHBOARD_STATE.INACTIVE) && (
         <div class={style.buttons}>
           {primaryAction && (
             <button
@@ -223,6 +218,11 @@ const StatusCard = ({ view, actions }) => {
               <i class={`fe fe-${PRIMARY_ICONS[primaryAction]} mr-2`} aria-hidden="true" />
               <Text id={getPrimaryLabel(primaryAction, view.configuration)} />
             </button>
+          )}
+          {state === DASHBOARD_STATE.INACTIVE && (
+            <Link href={SERVICES_URL} class="btn btn-primary" data-cy="z2m-dashboard-services">
+              <Text id={`${T}.actions.services`} />
+            </Link>
           )}
           {view.canChangeKey && state === DASHBOARD_STATE.FAILED && (
             <button

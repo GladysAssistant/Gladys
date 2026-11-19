@@ -17,15 +17,15 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
-   * @description Refuse to install or start anything while the service is stopped in the settings: it would run with
-   * the service saved stopped, and not start again with Gladys. The service is started first (Settings > Services, or
-   * the dashboard through the same route of the core).
+   * @description Refuse to install or start anything until the service is started: not yet while Gladys starts its
+   * services, nor once stopped in the settings, where Zigbee2mqtt would run with the service saved stopped and not
+   * start again with Gladys. Settings > Services starts it.
    * @example
    * refuseWhileServiceStopped();
    */
   function refuseWhileServiceStopped() {
-    if (zigbee2mqttManager.serviceStopped) {
-      throw new BadParameters('Zigbee2mqtt: the service is stopped, start it first');
+    if (!zigbee2mqttManager.serviceStarted) {
+      throw new BadParameters('Zigbee2mqtt: the service is not started, start it in the settings first');
     }
   }
 

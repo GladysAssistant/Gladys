@@ -42,7 +42,7 @@ describe('zigbee2mqtt API', () => {
   beforeEach(() => {
     controller = Zigbee2MqttController(gladys, zigbee2mqttManager, 'de1dd005-092d-456d-93d1-817c9ace4c67');
     zigbee2mqttManager.stopped = false;
-    zigbee2mqttManager.serviceStopped = false;
+    zigbee2mqttManager.serviceStarted = true;
     zigbee2mqttManager.refuseWhileInstalling = fake();
     zigbee2mqttManager.getConfiguration = fake.resolves({
       mqttUrl: 'mqtt://localhost:1884',
@@ -376,9 +376,9 @@ describe('zigbee2mqtt API', () => {
     ['run/start', 'start'],
     ['run/restart', 'restart'],
   ].forEach(([route, method]) => {
-    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused while the service is stopped`, async () => {
+    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused until the service is started`, async () => {
       // PREPARE
-      zigbee2mqttManager.serviceStopped = true;
+      zigbee2mqttManager.serviceStarted = false;
       zigbee2mqttManager.getConfiguration = fake.resolves({
         mqttPassword: 'gladys-password',
         z2mMqttPassword: 'z2m-password',
@@ -394,7 +394,7 @@ describe('zigbee2mqtt API', () => {
       // ASSERT
       const [error] = next.firstCall.args;
       expect(error).to.be.instanceOf(BadParameters);
-      expect(error.message).to.equal('Zigbee2mqtt: the service is stopped, start it first');
+      expect(error.message).to.equal('Zigbee2mqtt: the service is not started, start it in the settings first');
       assert.notCalled(zigbee2mqttManager[method]);
       assert.notCalled(res.json);
     });

@@ -208,52 +208,32 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-interface]').should('not.exist');
     });
 
-    it('should tell that the service is stopped, and start it as Settings > Services does', () => {
-      // Stopped in the settings: the containers removed, Gladys disconnected
-      const serviceStoppedStatus = {
+    it('should send to Settings > Services while the service is not started, then follow it once started', () => {
+      // Stopped in the settings, or not started yet: the containers removed, Gladys disconnected
+      const notStartedStatus = {
         ...onlineStatus,
-        serviceStopped: true,
+        serviceStarted: false,
+        configured: null,
         z2mEnabled: false,
         zigbee2mqttExist: false,
         mqttExist: false,
         gladysConnected: false,
         zigbee2mqttConnected: false
       };
-      visitDashboard({ status: serviceStoppedStatus });
-      answerAction('startService');
+      visitDashboard({ status: notStartedStatus });
 
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.inactive.title`);
+      cy.get('[data-cy=z2m-dashboard-services]').should('have.attr', 'href', '/dashboard/settings/service');
       cy.get('[data-cy=z2m-dashboard-tiles]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-start]').should('not.exist');
       // Nothing installed meanwhile: the server refuses it
       cy.get('[data-cy=z2m-dashboard-change-key]').should('be.disabled');
-      // The route of the core: the service saved running, it starts again with Gladys
-      cy.get('[data-cy=z2m-dashboard-startService]').click();
-      cy.wait('@startService');
-      cy.get('[data-cy=z2m-dashboard-action-error]').should('not.exist');
-    });
 
-    it('should tell that the service did not start, as the core answers it', () => {
-      visitDashboard({ status: { ...onlineStatus, serviceStopped: true, gladysConnected: false } });
-      answerAction('startService', { body: { name: 'zigbee2mqtt', status: 'ERROR' } });
-
-      cy.get('[data-cy=z2m-dashboard-startService]').click();
-      cy.wait('@startService');
-      cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.error`);
-    });
-
-    it('should wait for Gladys to start the service, without a button', () => {
-      // Init has not read the configuration yet: Gladys starts its services one after the other
-      visitDashboard({ status: { ...onlineStatus, configured: null, gladysConnected: false } });
-
-      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.pending.title`);
-      cy.get('[data-cy=z2m-dashboard-startService]').should('not.exist');
-      cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
-      cy.get('[data-cy=z2m-dashboard-tiles]').should('not.exist');
-      cy.get('[data-cy=z2m-dashboard-change-key]').should('be.disabled');
-
-      sendStatus(onlineStatus);
+      // Started from the settings
+      sendStatus({ ...onlineStatus, serviceStarted: true });
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.online.title`);
+      cy.get('[data-cy=z2m-dashboard-change-key]').should('not.be.disabled');
     });
 
     it('should offer to stop again the containers Docker refused to stop', () => {

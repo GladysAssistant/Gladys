@@ -23,6 +23,7 @@ import { DASHBOARD_STATE, getStartupError, getStopKeys, isExternal, isNetworkCoo
 import { getDriver } from './KeyCard';
 import {
   DISCOVER_URL,
+  SERVICES_URL,
   ICONS,
   PRIMARY_ICONS,
   Subtitle,
@@ -43,12 +44,7 @@ const TONES = {
   [DASHBOARD_STATE.NOT_ANSWERING]: 'warning'
 };
 
-const WORKING = [
-  DASHBOARD_STATE.INSTALLING,
-  DASHBOARD_STATE.STARTING,
-  DASHBOARD_STATE.STOPPING,
-  DASHBOARD_STATE.PENDING
-];
+const WORKING = [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STARTING, DASHBOARD_STATE.STOPPING];
 
 const StateTile = ({ state }) => (
   <span class={cx(kitStyle.rowTile, kitStyle[`rowTile-${TONES[state] || 'neutral'}`])} aria-hidden="true">
@@ -210,7 +206,9 @@ class DashboardMobile extends Component {
           </MobileNotice>
         )}
 
-        {(primaryAction || (view.canChangeKey && state === DASHBOARD_STATE.FAILED)) && (
+        {(primaryAction ||
+          (view.canChangeKey && state === DASHBOARD_STATE.FAILED) ||
+          state === DASHBOARD_STATE.INACTIVE) && (
           <div class={kitStyle.buttons}>
             {primaryAction && (
               <BigButton
@@ -221,6 +219,11 @@ class DashboardMobile extends Component {
                 data-cy={`z2m-dashboard-${primaryAction}`}
               >
                 <Text id={getPrimaryLabel(primaryAction, view.configuration)} />
+              </BigButton>
+            )}
+            {state === DASHBOARD_STATE.INACTIVE && (
+              <BigButton variant="primary" href={SERVICES_URL} data-cy="z2m-dashboard-services">
+                <Text id={`${T}.actions.services`} />
               </BigButton>
             )}
             {view.canChangeKey && state === DASHBOARD_STATE.FAILED && (

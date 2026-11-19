@@ -10,7 +10,6 @@ export const DASHBOARD_STATE = {
   DONGLE_MISSING: 'dongleMissing',
   FAILED: 'failed',
   INACTIVE: 'inactive',
-  PENDING: 'pending',
   MQTT_ERROR: 'mqttError',
   ONLINE: 'online',
   STARTING: 'starting',
@@ -40,9 +39,9 @@ export const getStartupError = status => {
 };
 
 /**
- * @description The state the status card shows, the most urgent first: an installation in progress, the service
- * stopped in the settings, the service not started yet, a stop of the user, a missing dongle, a failure, a broker out
- * of reach, then running or not.
+ * @description The state the status card shows, the most urgent first: an installation in progress, the service not
+ * started (Gladys starts its services one after the other, or it was stopped in the settings), a stop of the user, a
+ * missing dongle, a failure, a broker out of reach, then running or not.
  * @param {object} status - Status of the server.
  * @param {object} configuration - Saved configuration.
  * @returns {string} A DASHBOARD_STATE.
@@ -51,13 +50,9 @@ export const getDashboardState = (status, configuration) => {
   if (get(status, 'installation.state') === 'running') {
     return DASHBOARD_STATE.INSTALLING;
   }
-  // The service stopped in the settings: nothing else runs, even a stop of the user waits for it
-  if (status.serviceStopped === true) {
+  // The service not started: nothing else runs, even a stop of the user waits for it. Settings > Services starts it
+  if (status.serviceStarted === false) {
     return DASHBOARD_STATE.INACTIVE;
-  }
-  // Init has not read the configuration: Gladys has not started the service yet (or was started with it stopped)
-  if (status.configured === null) {
-    return DASHBOARD_STATE.PENDING;
   }
   if (status.stopped) {
     return DASHBOARD_STATE.STOPPED;
@@ -81,20 +76,15 @@ export const getDashboardState = (status, configuration) => {
   return DASHBOARD_STATE.NOT_ANSWERING;
 };
 
-// The main action of the status card, by state. The service stopped is started as the settings start it: its status
-// saved too, it starts again with Gladys
+// The main action of the status card, by state. The service not started: started by Settings > Services, only
 export const getPrimaryAction = (state, configuration) => {
   if (state === DASHBOARD_STATE.ONLINE) {
     return 'pair';
   }
-  if (state === DASHBOARD_STATE.INACTIVE) {
-    return 'startService';
-  }
   if (state === DASHBOARD_STATE.STOPPED) {
     return 'start';
   }
-  // Gladys starts it with its services, or the settings do
-  if (state === DASHBOARD_STATE.PENDING) {
+  if (state === DASHBOARD_STATE.INACTIVE) {
     return null;
   }
   if (isExternal(configuration)) {
@@ -114,13 +104,9 @@ export const getTiles = (state, configuration, z2mUrl, status = {}) => {
     return status.zigbee2mqttRunning || status.mqttRunning ? ['stop'] : [];
   }
   if (
-    [
-      DASHBOARD_STATE.INSTALLING,
-      DASHBOARD_STATE.STOPPING,
-      DASHBOARD_STATE.STOPPED,
-      DASHBOARD_STATE.INACTIVE,
-      DASHBOARD_STATE.PENDING
-    ].includes(state)
+    [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STOPPING, DASHBOARD_STATE.STOPPED, DASHBOARD_STATE.INACTIVE].includes(
+      state
+    )
   ) {
     return [];
   }

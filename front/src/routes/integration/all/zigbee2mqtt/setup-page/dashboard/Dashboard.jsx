@@ -24,14 +24,13 @@ import style from './dashboard.css';
 
 const SCREEN = { MAIN: 'main', ADVANCED: 'advanced', CHANGE: 'change' };
 
-// Under /api/v1/service/zigbee2mqtt/: the stop, start and restart of the integration under run/, the start of the
-// service by the route of the core that Settings > Services calls (its status saved, it starts again with Gladys)
+// Under /api/v1/service/zigbee2mqtt/: the stop, start and restart of the integration under run/ (start and stop are
+// the routes of the core that Settings > Services calls)
 const ACTION_PATHS = {
   permit_join: 'permit_join',
   stop: 'run/stop',
   start: 'run/start',
-  restart: 'run/restart',
-  startService: 'start'
+  restart: 'run/restart'
 };
 
 /**
@@ -86,11 +85,7 @@ class Dashboard extends Component {
       installationSuccessDismissed: true
     });
     try {
-      const answer = await this.props.httpClient.post(`/api/v1/service/zigbee2mqtt/${ACTION_PATHS[action]}`, body);
-      // The core answers the service, saved in error when its start failed
-      if (action === 'startService' && get(answer, 'status') === 'ERROR') {
-        throw new Error('Zigbee2mqtt: the service did not start');
-      }
+      await this.props.httpClient.post(`/api/v1/service/zigbee2mqtt/${ACTION_PATHS[action]}`, body);
       if (this.unmounted) {
         return;
       }
@@ -108,8 +103,6 @@ class Dashboard extends Component {
   pair = () => this.runAction('permit_join', { value: true }, { permitJoinAllowed: true });
 
   start = () => this.runAction('start');
-
-  startService = () => this.runAction('startService');
 
   restart = () => this.runAction('restart');
 
@@ -272,9 +265,9 @@ class Dashboard extends Component {
       installing: dashboardState === DASHBOARD_STATE.INSTALLING,
       // Step ① needs what init tells of the machine: unknown (null) while the service never started since Gladys did
       changeKeyDisabled:
-        dashboardState === DASHBOARD_STATE.INSTALLING || status.configured === null || status.serviceStopped === true,
-      // Nothing is saved while the service is stopped: the server refuses it (start the service first)
-      serviceStopped: status.serviceStopped === true,
+        dashboardState === DASHBOARD_STATE.INSTALLING || status.configured === null || status.serviceStarted === false,
+      // Nothing is saved while the service is not started: the server refuses it (Settings > Services starts it)
+      serviceNotStarted: status.serviceStarted === false,
       primaryAction: getPrimaryAction(dashboardState, configuration),
       tiles: getTiles(dashboardState, configuration, z2mUrl, status),
       canChangeKey: !isExternal(configuration),
@@ -291,7 +284,6 @@ class Dashboard extends Component {
     const actions = {
       pair: this.pair,
       start: this.start,
-      startService: this.startService,
       restart: this.restart,
       askStop: this.askStop,
       cancelStop: this.cancelStop,

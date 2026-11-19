@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
@@ -18,6 +19,9 @@ import {
 import { STEP, PANE, KEY_SCENARIO, INSTALL_VIEW } from './constants';
 import WizardDesktop from './WizardDesktop';
 import WizardMobile from './WizardMobile';
+
+// Where the service is started
+const SERVICES_URL = '/dashboard/settings/service';
 
 // The ports are listed again this often while the dongle is chosen: a dongle plugged in shows up by itself
 const USB_PORTS_REFRESH_INTERVAL_IN_MS = 3000;
@@ -450,6 +454,22 @@ class Wizard extends Component {
   };
 
   render(props, state) {
+    // The service not started: the server refuses the setup until Settings > Services starts it
+    if (state.step === STEP.KEY && props.zigbee2mqttStatus.serviceStarted === false) {
+      return (
+        <div class="alert alert-info" data-cy="z2m-wizard-service-not-started">
+          <strong class="d-block mb-1">
+            <Text id="integration.zigbee2mqtt.setup.dashboard.states.inactive.title" />
+          </strong>
+          <Text id="integration.zigbee2mqtt.setup.dashboard.states.inactive.text" />
+          <div class="mt-3">
+            <Link href={SERVICES_URL} class="btn btn-primary" data-cy="z2m-wizard-services">
+              <Text id="integration.zigbee2mqtt.setup.dashboard.actions.services" />
+            </Link>
+          </div>
+        </div>
+      );
+    }
     // On the dongle step, the status not read yet, or not readable: what the machine allows is unknown. Not on the next
     // steps, which an init (its status unknown meanwhile) does not interrupt
     if (state.step === STEP.KEY && this.isInstallable() === null) {

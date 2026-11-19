@@ -96,7 +96,7 @@ class AdvancedSettings extends Component {
 
   canSave = () => {
     const { view } = this.props;
-    if (view.saving || view.installing || view.serviceStopped) {
+    if (view.saving || view.installing || view.serviceNotStarted) {
       return false;
     }
     if (isExternal(view.configuration)) {
@@ -242,7 +242,7 @@ class AdvancedSettings extends Component {
                   <button
                     type="button"
                     class={cx('btn btn-primary', { 'btn-loading': saving })}
-                    disabled={!portChanged || !validPort || saving || view.installing || view.serviceStopped}
+                    disabled={!portChanged || !validPort || saving || view.installing || view.serviceNotStarted}
                     onClick={this.savePort}
                     data-cy="z2m-dashboard-port-save"
                   >
@@ -269,7 +269,7 @@ class AdvancedSettings extends Component {
                   configuration={configuration}
                   saveConfiguration={this.saveBroker}
                   resetConfiguration={actions.noop}
-                  disabled={saving || view.installing || view.serviceStopped}
+                  disabled={saving || view.installing || view.serviceNotStarted}
                 />
               </section>
             )}
