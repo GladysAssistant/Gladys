@@ -900,6 +900,17 @@ describe('Device.migrate', function Describe() {
     await assert.isRejected(promise, 'A migration is already in progress for device migration-destination');
   });
 
+  it('should reject the migration of a device being deleted in the background', async () => {
+    deviceManager.devicesBeingDestroyed.set('another-device-id', { selector: 'another-device' });
+    deviceManager.devicesBeingDestroyed.set(destinationDevice.id, { selector: 'migration-destination' });
+    const promise = deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+    });
+    await assert.isRejected(promise, 'Device migration-destination is being deleted');
+    // refused before the migration takes its locks
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
+  });
+
   it('should reject when the source device does not exist', async () => {
     const promise = deviceManager.migrate('does-not-exist', {
       destination_device_selector: 'migration-destination',

@@ -174,6 +174,7 @@ class AirplayDeviceBox extends Component {
         saveError={saveError}
         onDelete={deleteButton ? this.deleteDevice : undefined}
         deleteError={deleteError}
+        deleteScheduled={Boolean(tooMuchStatesError)}
         dataCy="airplay-device-row"
       />
     );

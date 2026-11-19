@@ -17,6 +17,8 @@ const { addParam } = require('./device.addParam');
 const { create } = require('./device.create');
 const { destroy } = require('./device.destroy');
 const { destroyAfterStatesPurge } = require('./device.destroyAfterStatesPurge');
+const { purgeStatesThenDestroy } = require('./device.purgeStatesThenDestroy');
+const { checkNotBeingDestroyed } = require('./device.checkNotBeingDestroyed');
 const { init } = require('./device.init');
 const { get } = require('./device.get');
 const { getBySelector } = require('./device.getBySelector');
@@ -78,6 +80,9 @@ const DeviceManager = function DeviceManager(
   this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
+  // A device goes on saving states while its history is purged before its deletion: when it
+  // saved more than the limit above meanwhile, they are purged again, at most this many times
+  this.MAX_STATES_PURGES_TO_DELETE_DEVICE = 5;
   this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 200;
   // A CSV export has no size limit, but it is read and written chunk by chunk:
   // this is the most states one chunk can hold, whatever the caller asks. At
@@ -164,9 +169,12 @@ const DeviceManager = function DeviceManager(
   // Selectors of devices with a migration in flight, to reject concurrent
   // migrations of the same source (e.g. a client-timeout retry)
   this.migrationsInProgress = new Set();
-  // Selectors of devices being deleted in the background, once their states are purged
-  // (device.destroyAfterStatesPurge.js)
-  this.devicesBeingDestroyed = new Set();
+  // Devices being deleted in the background, once their states are purged, by device id
+  // (device.destroyAfterStatesPurge.js), and the ids of the devices deleted that way since
+  // Gladys started (device.checkNotBeingDestroyed.js)
+  this.devicesBeingDestroyed = new Map();
+  this.devicesDestroyedInBackground = new Set();
+  this.purgeStatesThenDestroy = this.job.wrapper(JOB_TYPES.DEVICE_DESTROY, this.purgeStatesThenDestroy.bind(this));
 
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
@@ -199,6 +207,8 @@ DeviceManager.prototype.addParam = addParam;
 DeviceManager.prototype.create = create;
 DeviceManager.prototype.destroy = destroy;
 DeviceManager.prototype.destroyAfterStatesPurge = destroyAfterStatesPurge;
+DeviceManager.prototype.purgeStatesThenDestroy = purgeStatesThenDestroy;
+DeviceManager.prototype.checkNotBeingDestroyed = checkNotBeingDestroyed;
 DeviceManager.prototype.init = init;
 DeviceManager.prototype.get = get;
 DeviceManager.prototype.getBySelector = getBySelector;

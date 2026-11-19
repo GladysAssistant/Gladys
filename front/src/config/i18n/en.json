@@ -136,7 +136,7 @@
     "searchPlaceHolder": "Search devices",
     "noRoom": "No room",
     "noFeatures": "No features",
-    "tooMuchStatesToDelete": "This device has {{count}} states in database. To keep your Gladys instance responsive, they are being deleted gradually in the background, then the device will be deleted on its own: there is nothing else to do. This can take a few minutes to a few hours, depending on the speed of your disk. To follow the deletion, <a href=\"/dashboard/settings/jobs\">click here</a>.",
+    "tooMuchStatesToDelete": "This device has {{count}} states in the database. To keep your Gladys instance responsive, Gladys deletes them gradually in the background, then deletes the device on its own. This can take a few minutes to a few hours, depending on the speed of your disk. You can <a href=\"/dashboard/settings/jobs\">follow the deletion</a>. If the device is still listed once it is over (after a restart of Gladys, for instance), reload this page and delete it again.",
     "migrate": {
       "button": "Migrate",
       "modalTitle": "Migrate \"{{name}}\"",
@@ -3823,7 +3823,7 @@
             "plural": "{{count}} Gladys devices have been deleted."
           },
           "forcedWarning": "The appliance \"{{name}}\" could not be reached: it has been removed from the Gladys Matter network, but it has not been told. Factory reset it before pairing it again.",
-          "devicesNotDeleted": "These Gladys devices could not be deleted right away, most likely because their history is too large: Gladys is cleaning it, then will delete them on its own. If they are still there once the cleaning is over, delete them from the \"Devices\" tab."
+          "devicesNotDeleted": "These Gladys devices could not be deleted right away, most likely because their history is too large: Gladys is cleaning it, then will delete them on its own. You can <a href=\"/dashboard/settings/jobs\">follow the deletion</a>; if they are still there once it is over, delete them from the \"Devices\" tab."
         },
         "noNodesFound": "No Matter nodes found. You can add a Matter device by going to the \"Add Device\" tab.",
         "disabledWarning": "Matter is not activated. Please activate it in <a href=\"/dashboard/integration/device/matter/settings\">Settings</a> before using the integration",
@@ -5602,6 +5602,8 @@
       "statesCounts": "States to delete: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
       "statesCountsDone": "States deleted: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
       "migrationTarget": "Migration: {{source}} › {{destination}}",
+      "deviceToDestroy": "Device: {{device}}",
+      "deviceKept": "The device was paired again or replaced in the meantime: it was not deleted.",
       "steps": {
         "waiting_database": "Waiting for the database…",
         "counting": "Counting states…",
@@ -5612,7 +5614,9 @@
         "updating_references": "Updating references…",
         "rewriting_scenes": "Rewriting scenes…",
         "rewriting_dashboards": "Rewriting dashboards…",
-        "deleting_source_device": "Deleting the old device…"
+        "deleting_source_device": "Deleting the old device…",
+        "purging_states": "Deleting the state history…",
+        "deleting_device": "Deleting the device…"
       },
       "statesMigrated": "History states moved: {{count}}",
       "orphanedStates": "Orphaned states: {{count}}",
@@ -5621,6 +5625,7 @@
     },
     "jobTypes": {
       "device-migrate": "Device migration",
+      "device-destroy": "Device deletion",
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation",

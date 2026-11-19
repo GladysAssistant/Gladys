@@ -682,6 +682,14 @@ async function migrate(selector, options, jobId) {
   if (conflictingSelector) {
     throw new ConflictError(`A migration is already in progress for device ${conflictingSelector}`);
   }
+  // A device being deleted in the background is losing its history, and is deleted at the end:
+  // it is neither a source nor a destination
+  const selectorBeingDestroyed = selectorsToLock.find((deviceSelector) =>
+    [...this.devicesBeingDestroyed.values()].some((deletion) => deletion.selector === deviceSelector),
+  );
+  if (selectorBeingDestroyed) {
+    throw new ConflictError(`Device ${selectorBeingDestroyed} is being deleted`);
+  }
   selectorsToLock.forEach((deviceSelector) => this.migrationsInProgress.add(deviceSelector));
   try {
     return await executeMigration.call(this, selector, options, jobId);

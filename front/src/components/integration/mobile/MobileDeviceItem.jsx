@@ -40,6 +40,10 @@ const getSignature = (device, extraSignature) =>
  * - onDelete: "Delete", confirmed in a sheet.
  * onSave, primaryAction.onClick and onDelete return a promise of `false` when they failed: the
  * sheet then stays open with `saveError` / `deleteError` (or a default sentence).
+ * `deleteScheduled`: the deletion was not refused, Gladys does it in the background (a device
+ * with too many states to delete at once). The confirmation closes, `deleteError` — the
+ * explanation — is shown in the sheet as a plain notice, and nothing can be saved or deleted
+ * again on a device that is going away.
  */
 class MobileDeviceItem extends Component {
   constructor(props) {
@@ -60,9 +64,21 @@ class MobileDeviceItem extends Component {
     };
   }
 
+  componentDidUpdate(previousProps) {
+    // the notice takes the place of the confirmation that just closed: it must be on screen,
+    // wherever the sheet was scrolled to
+    if (this.props.deleteScheduled && !previousProps.deleteScheduled && this.deleteScheduledNotice) {
+      this.deleteScheduledNotice.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
   componentWillUnmount() {
     this.unmounted = true;
   }
+
+  setDeleteScheduledNotice = element => {
+    this.deleteScheduledNotice = element;
+  };
 
   isDirty = () => {
     const { snapshot } = this.state;
@@ -272,6 +288,7 @@ class MobileDeviceItem extends Component {
       onDelete
     } = this.props;
     const { busy, failed } = this.state;
+    const { deleteScheduled } = this.props;
     const features = device.features || [];
     const failedSave = Boolean(failed) && failed !== 'delete';
     // the pills of the row head the sheet too, unless the sheet says it another way (`sheetPills`)
@@ -283,7 +300,11 @@ class MobileDeviceItem extends Component {
         {/* Nothing is edited while a request runs: what is typed after "Save" would not be in
             the request, and would be taken for saved when the sheet opens again. The fieldset
             covers what the integration adds to the sheet too (its switches). */}
-        <fieldset class={style.sheetFields} disabled={Boolean(busy)} data-cy="integration-device-fields">
+        <fieldset
+          class={style.sheetFields}
+          disabled={Boolean(busy) || deleteScheduled}
+          data-cy="integration-device-fields"
+        >
           {onNameChange && (
             <MobileField label={<Text id="editDeviceForm.nameLabel" />} htmlFor={`${this.fieldId}-name`}>
               <Localizer>
@@ -341,13 +362,20 @@ class MobileDeviceItem extends Component {
             {saveError || <Text id="mobileDeviceList.saveError" />}
           </MobileNotice>
         )}
+        {deleteScheduled && (
+          <div ref={this.setDeleteScheduledNotice}>
+            <MobileNotice icon="clock" role="status" data-cy="integration-device-delete-scheduled">
+              {this.props.deleteError}
+            </MobileNotice>
+          </div>
+        )}
         <div class={cx(kitStyle.buttons, style.sheetButtons)}>
           {onSave && (
             <BigButton
               variant="primary"
               onClick={this.save}
               loading={busy === 'save'}
-              disabled={Boolean(busy) || saveDisabled || !this.isDirty()}
+              disabled={Boolean(busy) || deleteScheduled || saveDisabled || !this.isDirty()}
               data-cy="integration-device-save"
             >
               {saveLabel || <Text id="global.save" />}
@@ -359,7 +387,7 @@ class MobileDeviceItem extends Component {
               icon={primaryAction.icon}
               onClick={primaryAction.href ? this.goTo(primaryAction.href) : this.runPrimary}
               loading={busy === 'primary'}
-              disabled={Boolean(busy) || primaryAction.disabled}
+              disabled={Boolean(busy) || deleteScheduled || primaryAction.disabled}
               data-cy={primaryAction.dataCy || 'integration-device-primary'}
             >
               {primaryAction.label}
@@ -370,7 +398,7 @@ class MobileDeviceItem extends Component {
               icon={action.icon}
               onClick={action.href ? this.goTo(action.href) : this.runAction(action, index)}
               loading={busy === `action-${index}`}
-              disabled={Boolean(busy)}
+              disabled={Boolean(busy) || deleteScheduled}
               data-cy={action.dataCy}
             >
               {action.label}
@@ -381,7 +409,7 @@ class MobileDeviceItem extends Component {
               variant="dangerSoft"
               icon="trash-2"
               onClick={this.askDelete}
-              disabled={Boolean(busy)}
+              disabled={Boolean(busy) || deleteScheduled}
               data-cy="integration-device-delete"
             >
               <Text id="mobileDeviceList.delete" />
@@ -425,7 +453,7 @@ class MobileDeviceItem extends Component {
       </BottomSheet>,
       props.onDelete && (
         <ConfirmSheet
-          open={open && confirmDelete}
+          open={open && confirmDelete && !props.deleteScheduled}
           depth={1}
           title={get(intl.dictionary, 'mobileDeviceList.deleteTitle')}
           text={props.deleteText || <Text id="mobileDeviceList.deleteText" fields={{ name }} />}

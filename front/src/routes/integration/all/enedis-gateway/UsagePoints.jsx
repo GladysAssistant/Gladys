@@ -123,6 +123,7 @@ const UsagePointDevice = ({
             <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: tooMuchStatesError.statesNumber }} />
           ) : null
         }
+        deleteScheduled={Boolean(tooMuchStatesError) && tooMuchStatesError.selector === device.selector}
         dataCy="enedis-usage-point-row"
       >
         {syncInProgress && (

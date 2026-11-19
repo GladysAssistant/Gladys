@@ -136,7 +136,7 @@
     "searchPlaceHolder": "Buscar dispositivos",
     "noRoom": "Sin habitación",
     "noFeatures": "Sin funciones",
-    "tooMuchStatesToDelete": "Este dispositivo tiene {{count}} estados en la base de datos. Para que su instancia de Gladys siga siendo fluida, se están eliminando gradualmente en segundo plano y, después, el dispositivo se eliminará automáticamente: no tiene que hacer nada más. Esto puede tardar de unos minutos a unas horas, según la velocidad de su disco. Para seguir el progreso de la eliminación, <a href=\"/dashboard/settings/jobs\">haga clic aquí</a>.",
+    "tooMuchStatesToDelete": "Este dispositivo tiene {{count}} estados en la base de datos. Para que su instancia de Gladys siga siendo fluida, Gladys los elimina gradualmente en segundo plano y, después, elimina el dispositivo automáticamente. Esto puede tardar de unos minutos a unas horas, según la velocidad de su disco. Puede <a href=\"/dashboard/settings/jobs\">seguir la eliminación</a>. Si el dispositivo sigue apareciendo cuando termine (por ejemplo, tras un reinicio de Gladys), recargue esta página y vuelva a eliminarlo.",
     "migrate": {
       "button": "Migrar",
       "modalTitle": "Migrar \"{{name}}\"",
@@ -3823,7 +3823,7 @@
             "plural": "Se han eliminado {{count}} dispositivos de Gladys."
           },
           "forcedWarning": "No se pudo contactar con el dispositivo «{{name}}»: se ha retirado de la red Matter de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
-          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar de inmediato, probablemente porque su historial es demasiado grande: Gladys lo está limpiando y después los eliminará automáticamente. Si siguen ahí cuando termine la limpieza, elimínelos desde la pestaña «Dispositivos»."
+          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar de inmediato, probablemente porque su historial es demasiado grande: Gladys lo está limpiando y después los eliminará automáticamente. Puede <a href=\"/dashboard/settings/jobs\">seguir la eliminación</a>; si siguen ahí cuando termine, elimínelos desde la pestaña «Dispositivos»."
         },
         "noNodesFound": "No se encontró ningún nodo Matter. Puede añadir un dispositivo Matter yendo a la pestaña \"Añadir dispositivo\".",
         "disabledWarning": "Matter no está activado. Actívelo en <a href=\"/dashboard/integration/device/matter/settings\">Configuración</a> antes de utilizar la integración",
@@ -5602,6 +5602,8 @@
       "statesCounts": "Estados a eliminar: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agregados",
       "statesCountsDone": "Estados eliminados: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agregados",
       "migrationTarget": "Migración: {{source}} › {{destination}}",
+      "deviceToDestroy": "Dispositivo: {{device}}",
+      "deviceKept": "El dispositivo se volvió a emparejar o se sustituyó mientras tanto: no se ha eliminado.",
       "steps": {
         "waiting_database": "Esperando la base de datos…",
         "counting": "Contando estados…",
@@ -5612,7 +5614,9 @@
         "updating_references": "Actualizando referencias…",
         "rewriting_scenes": "Reescribiendo escenas…",
         "rewriting_dashboards": "Reescribiendo paneles…",
-        "deleting_source_device": "Eliminando el dispositivo antiguo…"
+        "deleting_source_device": "Eliminando el dispositivo antiguo…",
+        "purging_states": "Eliminando el historial de estados…",
+        "deleting_device": "Eliminando el dispositivo…"
       },
       "statesMigrated": "Estados de historial movidos: {{count}}",
       "orphanedStates": "Estados huérfanos: {{count}}",
@@ -5621,6 +5625,7 @@
     },
     "jobTypes": {
       "device-migrate": "Migración de dispositivo",
+      "device-destroy": "Eliminación de un dispositivo",
       "monthly-device-state-aggregate": "Agregación mensual de sensores",
       "daily-device-state-aggregate": "Agregación diaria de sensores",
       "hourly-device-state-aggregate": "Agregación horaria de sensores",

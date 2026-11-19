@@ -136,7 +136,7 @@
     "searchPlaceHolder": "Gerät suchen",
     "noRoom": "Kein Raum",
     "noFeatures": "Keine Funktionen",
-    "tooMuchStatesToDelete": "Dieses Gerät hat {{count}} Zustände in der Datenbank. Damit deine Gladys-Instanz flüssig bleibt, werden sie nach und nach im Hintergrund gelöscht, danach wird das Gerät automatisch gelöscht: Du musst nichts weiter tun. Das kann je nach Geschwindigkeit deiner Festplatte einige Minuten bis einige Stunden dauern. Um den Löschvorgang zu verfolgen, <a href=\"/dashboard/settings/jobs\">klicke hier</a>.",
+    "tooMuchStatesToDelete": "Dieses Gerät hat {{count}} Zustände in der Datenbank. Damit deine Gladys-Instanz flüssig bleibt, löscht Gladys sie nach und nach im Hintergrund und löscht danach das Gerät automatisch. Das kann je nach Geschwindigkeit deiner Festplatte einige Minuten bis einige Stunden dauern. Du kannst <a href=\"/dashboard/settings/jobs\">den Löschvorgang verfolgen</a>. Ist das Gerät danach immer noch vorhanden (zum Beispiel nach einem Neustart von Gladys), lade diese Seite neu und lösche es erneut.",
     "migrate": {
       "button": "Migrieren",
       "modalTitle": "„{{name}}“ migrieren",
@@ -3823,7 +3823,7 @@
             "plural": "{{count}} Gladys-Geräte wurden gelöscht."
           },
           "forcedWarning": "Das Gerät „{{name}}“ war nicht erreichbar: Es wurde aus dem Matter-Netzwerk von Gladys entfernt, aber nicht darüber informiert. Setzen Sie es auf die Werkseinstellungen zurück, bevor Sie es erneut koppeln.",
-          "devicesNotDeleted": "Diese Gladys-Geräte konnten nicht sofort gelöscht werden, vermutlich weil ihr Verlauf zu groß ist: Gladys bereinigt ihn gerade und löscht sie danach automatisch. Sollten sie nach der Bereinigung noch vorhanden sein, löschen Sie sie im Tab „Geräte“."
+          "devicesNotDeleted": "Diese Gladys-Geräte konnten nicht sofort gelöscht werden, vermutlich weil ihr Verlauf zu groß ist: Gladys bereinigt ihn gerade und löscht sie danach automatisch. Sie können <a href=\"/dashboard/settings/jobs\">den Löschvorgang verfolgen</a>; sollten sie danach noch vorhanden sein, löschen Sie sie im Tab „Geräte“."
         },
         "noNodesFound": "Keine Matter-Knoten gefunden. Du kannst ein Matter-Gerät hinzufügen, indem du auf der Registerkarte \"Gerät hinzufügen\" gehst.",
         "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es in <a href=\"/dashboard/integration/device/matter/settings\">Einstellungen</a> bevor du die Integration verwendest.",
@@ -5602,6 +5602,8 @@
       "statesCounts": "Zu löschende Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
       "statesCountsDone": "Gelöschte Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
       "migrationTarget": "Migration: {{source}} › {{destination}}",
+      "deviceToDestroy": "Gerät: {{device}}",
+      "deviceKept": "Das Gerät wurde in der Zwischenzeit erneut gekoppelt oder ersetzt: Es wurde nicht gelöscht.",
       "steps": {
         "waiting_database": "Warten auf die Datenbank…",
         "counting": "Zählen der Zustände…",
@@ -5612,7 +5614,9 @@
         "updating_references": "Aktualisieren der Verweise…",
         "rewriting_scenes": "Umschreiben der Szenen…",
         "rewriting_dashboards": "Umschreiben der Dashboards…",
-        "deleting_source_device": "Löschen des alten Geräts…"
+        "deleting_source_device": "Löschen des alten Geräts…",
+        "purging_states": "Zustandsverlauf wird gelöscht…",
+        "deleting_device": "Gerät wird gelöscht…"
       },
       "statesMigrated": "Verschobene Verlaufszustände: {{count}}",
       "orphanedStates": "Verwaiste Zustände: {{count}}",
@@ -5621,6 +5625,7 @@
     },
     "jobTypes": {
       "device-migrate": "Geräte-Migration",
+      "device-destroy": "Löschen eines Geräts",
       "monthly-device-state-aggregate": "Monatliche Sensorenaggregation",
       "daily-device-state-aggregate": "Tägliche Sensorenaggregation",
       "hourly-device-state-aggregate": "Stündliche Sensorenaggregation",

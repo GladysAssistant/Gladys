@@ -2554,6 +2554,7 @@ const JOB_TYPES = {
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
+  DEVICE_DESTROY: 'device-destroy',
 };
 
 const JOB_STATUS = {
