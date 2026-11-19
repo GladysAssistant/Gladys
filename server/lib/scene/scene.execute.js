@@ -62,8 +62,18 @@ function execute(sceneSelector, scope = {}) {
       ).catch((e) => {
         logger.warn(`Unable to save the last execution of scene ${sceneSelector}`, e);
       });
+      // A stop must end the execution right away, even when the current action is
+      // waiting on something that never answers (a device command, a service...):
+      // the actions are raced against the abort signal. If the pending action returns
+      // later, the check before each action (SceneStopped) keeps the rest of the
+      // scene from running, and its result is ignored.
+      let onAbort;
+      const aborted = new Promise((resolve) => {
+        onAbort = resolve;
+        abortController.signal.addEventListener('abort', onAbort, { once: true });
+      });
       try {
-        await executeActions(this, scene.actions, scope);
+        await Promise.race([executeActions(this, scene.actions, scope), aborted]);
       } catch (e) {
         if (e instanceof AbortScene) {
           logger.debug(e);
@@ -71,6 +81,7 @@ function execute(sceneSelector, scope = {}) {
           logger.error(e);
         }
       } finally {
+        abortController.signal.removeEventListener('abort', onAbort);
         this.runningScenes.delete(executionId);
         this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED,
