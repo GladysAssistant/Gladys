@@ -42,6 +42,7 @@ describe('zigbee2mqtt API', () => {
   beforeEach(() => {
     controller = Zigbee2MqttController(gladys, zigbee2mqttManager, 'de1dd005-092d-456d-93d1-817c9ace4c67');
     zigbee2mqttManager.stopped = false;
+    zigbee2mqttManager.serviceStopped = false;
     zigbee2mqttManager.refuseWhileInstalling = fake();
     zigbee2mqttManager.getConfiguration = fake.resolves({
       mqttUrl: 'mqtt://localhost:1884',
@@ -360,10 +361,43 @@ describe('zigbee2mqtt API', () => {
     });
   });
 
-  it('should leave to the core the routes that start and stop the service (Settings > Services)', () => {
-    // Registered before the routes of the core: one of these would hide post /api/v1/service/:service_name/start
-    expect(controller).to.not.have.property('post /api/v1/service/zigbee2mqtt/start');
-    expect(controller).to.not.have.property('post /api/v1/service/zigbee2mqtt/stop');
+  it('should leave to the core its routes of a service (Settings > Services)', () => {
+    // Registered before the routes of the core: a route of the integration matching one of
+    // /api/v1/service/:service_name, /start, /stop, /device or /variable/:variable_key would hide it
+    const coreRoute = /^(get|post) \/api\/v1\/service\/zigbee2mqtt(\/(start|stop|device|variable\/[^/]+))?$/;
+    expect(Object.keys(controller).filter((route) => coreRoute.test(route))).to.deep.equal([]);
+  });
+
+  [
+    ['setup', 'setup'],
+    ['connect', 'init'],
+    ['mqtt/start', 'installMqttContainer'],
+    ['z2m/start', 'installZ2mContainer'],
+    ['run/start', 'start'],
+    ['run/restart', 'restart'],
+  ].forEach(([route, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused while the service is stopped`, async () => {
+      // PREPARE
+      zigbee2mqttManager.serviceStopped = true;
+      zigbee2mqttManager.getConfiguration = fake.resolves({
+        mqttPassword: 'gladys-password',
+        z2mMqttPassword: 'z2m-password',
+        z2mAdapterMode: 'usb',
+        z2mDriverPath: '/dev/ttyUSB0',
+      });
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller[`post /api/v1/service/zigbee2mqtt/${route}`].controller({ body: {} }, res, next);
+      // ASSERT
+      const [error] = next.firstCall.args;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Zigbee2mqtt: the service is stopped, start it first');
+      assert.notCalled(zigbee2mqttManager[method]);
+      assert.notCalled(res.json);
+    });
   });
 
   // An installation or an operation in progress (init, disconnect, reset, ezsp fallback) would undo them (containers

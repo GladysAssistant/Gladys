@@ -2606,6 +2606,10 @@
             "inactive": {
               "title": "Der Zigbee2MQTT-Dienst ist gestoppt",
               "text": "Er wurde unter Einstellungen > Dienste gestoppt: Deine Zigbee-Geräte antworten nicht, bis er wieder startet."
+            },
+            "pending": {
+              "title": "Zigbee2MQTT ist noch nicht gestartet",
+              "text": "Gladys startet es mit seinen Diensten. Bleibt es so, prüfe, ob der Zigbee2MQTT-Dienst unter Einstellungen > Dienste läuft."
             }
           },
           "newDevices": {

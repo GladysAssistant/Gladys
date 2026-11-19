@@ -2362,6 +2362,10 @@
             "inactive": {
               "title": "El servicio Zigbee2MQTT está detenido",
               "text": "Se detuvo en Ajustes > Servicios: tus dispositivos Zigbee no responden hasta que vuelva a iniciarse."
+            },
+            "pending": {
+              "title": "Zigbee2MQTT aún no está iniciado",
+              "text": "Gladys lo inicia con sus servicios. Si sigue así, comprueba que el servicio Zigbee2MQTT funciona en Ajustes > Servicios."
             }
           },
           "newDevices": {

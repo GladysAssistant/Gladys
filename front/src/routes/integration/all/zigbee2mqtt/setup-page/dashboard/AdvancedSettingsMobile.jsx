@@ -192,7 +192,7 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
                   class={cx(fieldClass.input, { [fieldClass.invalid]: !form.validPort })}
                   value={form.port}
                   onInput={form.updatePort}
-                  disabled={saving || view.installing}
+                  disabled={saving || view.installing || view.serviceStopped}
                   data-cy="z2m-dashboard-port-input"
                 />
               </MobileField>
@@ -235,7 +235,7 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
                     placeholder={placeholder}
                     value={form.broker[field] || ''}
                     onInput={e => form.updateBroker(field, e.target.value)}
-                    disabled={saving || view.installing}
+                    disabled={saving || view.installing || view.serviceStopped}
                     data-cy={`z2m-dashboard-broker-${field}`}
                   />
                 </MobileField>
@@ -246,7 +246,7 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
                 value={form.broker.mqttPassword}
                 onInput={e => form.updateBroker('mqttPassword', e.target.value)}
                 autocomplete="new-password"
-                disabled={saving || view.installing}
+                disabled={saving || view.installing || view.serviceStopped}
                 dataCy="z2m-dashboard-broker-mqttPassword"
               />
               {BROKER_FIELDS.slice(2).map(({ field, label, type, placeholder }) => (
@@ -261,7 +261,7 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
                     placeholder={placeholder}
                     value={form.broker[field] || ''}
                     onInput={e => form.updateBroker(field, e.target.value)}
-                    disabled={saving || view.installing}
+                    disabled={saving || view.installing || view.serviceStopped}
                     data-cy={`z2m-dashboard-broker-${field}`}
                   />
                 </MobileField>

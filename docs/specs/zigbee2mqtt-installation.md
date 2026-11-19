@@ -190,14 +190,19 @@ installation. A job that fails to start fails the installation with its error. A
 ### E.3 For the wizard and the dashboard
 
 - **Status.** `stopped` and `stoppedAt` tell a stop of the user (E.4); `updatePending` tells an update
-  waiting for its images (G); `serviceStopped` tells the service stopped in Settings > Services, or not
-  started yet (true until the start of the service, again once it stops). `configured` tells that a USB dongle or a network coordinator is saved, or the broker
-  of a Zigbee2mqtt that runs elsewhere (`utils/isConfigured.js`): set by init from the saved
-  configuration, by `POST /setup` once its variables are saved, false after `reset`; kept by
-  `disconnect` (a disabled installation is still configured); `null` (unknown) until init checked
-  Docker and read the configuration: at the start of Gladys, during an init, and as long as the
-  service is stopped in the settings. The other tabs tell from it that Zigbee2mqtt is not
-  installed (M.4), only when it is `false`.
+  waiting for its images (G); `serviceStopped` tells the service stopped in Settings > Services while
+  Gladys runs (set by the stop of the service, even when a container could not be removed; cleared by
+  its start). While it is set, `POST /setup`, `/connect`, `/mqtt/start`, `/z2m/start`, `/run/start` and
+  `/run/restart` are refused (400): they would run Zigbee2mqtt with the service saved stopped, which
+  Gladys does not start again. A start of the service while an init runs (the settings or the
+  dashboard while Gladys starts its services) starts no second one. `configured` tells that a USB
+  dongle or a network coordinator is saved, or the broker of a Zigbee2mqtt that runs elsewhere
+  (`utils/isConfigured.js`): set by init from the saved configuration, by `POST /setup` once its
+  variables are saved, false after `reset`; kept by `disconnect` (a disabled installation, a service
+  stopped in the settings, is still configured); `null` (unknown) until init checked Docker and read
+  the configuration: at the start of Gladys until the service starts, during an init, and as long as a
+  service stopped before Gladys started is not started. The other tabs tell from it that Zigbee2mqtt
+  is not installed (M.4), only when it is `false`.
   `z2mVersion` is the `version` of the last `bridge/info` when it is one as Zigbee2mqtt publishes it
   (`2.6.1`, `2.6.1-dev`), `null` otherwise: anyone who can publish on the broker writes it (the
   wizard shows it as a text anyway, never as markup). `deviceCount` is the number of
@@ -626,18 +631,19 @@ previous versions (enable switch, mode cards, configuration form), removed.
 
 The status card shows the first state that applies:
 
-| State           | When                                                                                                                                                           | Primary action                                                                                                                 |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `installing`    | `installation.state` is `running`: title by kind (B.1), bar, current phase (B.2)                                                                               | —                                                                                                                              |
-| `inactive`      | `serviceStopped` (E.3): the service stopped in Settings > Services, which removes the containers, or never started since Gladys did; before a stop of the user | Start the service, by the route of the core that the settings call (`POST /start`): saved running, it starts again with Gladys |
-| `stopping`      | the request of a stop runs: the server tells `stopped` before its containers are stopped (about 10 s)                                                          | —                                                                                                                              |
-| `stopped`       | `stopped` (E.4): "since <stoppedAt>, it does not start again with Gladys"; with an external broker, "disconnected from your Zigbee2MQTT", which keeps running  | Start (with an external broker: Connect)                                                                                       |
-| `dongleMissing` | `dongleMissing` (K.3): Zigbee2mqtt starts again once it is plugged back, on any port                                                                           | —                                                                                                                              |
-| `failed`        | the error of the last installation if it failed, else `z2mContainerError`; none once Zigbee2mqtt answers                                                       | Restart and "Change the dongle or model" (N.3), none with an external broker                                                   |
-| `mqttError`     | Gladys not connected to the broker, with `mqttConnectionError` (explained by code, else the raw message)                                                       | Restart (none with an external broker)                                                                                         |
-| `online`        | `zigbee2mqttConnected`; with an external broker, Gladys connected to it: the number of devices (`deviceCount`)                                                 | Pair a device                                                                                                                  |
-| `starting`      | `zigbee2mqttStarting` (2 min after a start or a restart)                                                                                                       | —                                                                                                                              |
-| `notAnswering`  | none of the above: Gladys gets no answer from Zigbee2mqtt                                                                                                      | Restart (none with an external broker)                                                                                         |
+| State           | When                                                                                                                                                                                                                              | Primary action                                                                                                                 |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `installing`    | `installation.state` is `running`: title by kind (B.1), bar, current phase (B.2)                                                                                                                                                  | —                                                                                                                              |
+| `inactive`      | `serviceStopped` (E.3): the service stopped in Settings > Services while Gladys runs, which removes the containers; before a stop of the user                                                                                     | Start the service, by the route of the core that the settings call (`POST /start`): saved running, it starts again with Gladys |
+| `pending`       | `configured` null: init has not read the configuration, Gladys has not started the service yet (it starts its services one after the other), or it was stopped before Gladys started: "if it stays so, check Settings > Services" | —                                                                                                                              |
+| `stopping`      | the request of a stop runs: the server tells `stopped` before its containers are stopped (about 10 s)                                                                                                                             | —                                                                                                                              |
+| `stopped`       | `stopped` (E.4): "since <stoppedAt>, it does not start again with Gladys"; with an external broker, "disconnected from your Zigbee2MQTT", which keeps running                                                                     | Start (with an external broker: Connect)                                                                                       |
+| `dongleMissing` | `dongleMissing` (K.3): Zigbee2mqtt starts again once it is plugged back, on any port                                                                                                                                              | —                                                                                                                              |
+| `failed`        | the error of the last installation if it failed, else `z2mContainerError`; none once Zigbee2mqtt answers                                                                                                                          | Restart and "Change the dongle or model" (N.3), none with an external broker                                                   |
+| `mqttError`     | Gladys not connected to the broker, with `mqttConnectionError` (explained by code, else the raw message)                                                                                                                          | Restart (none with an external broker)                                                                                         |
+| `online`        | `zigbee2mqttConnected`; with an external broker, Gladys connected to it: the number of devices (`deviceCount`)                                                                                                                    | Pair a device                                                                                                                  |
+| `starting`      | `zigbee2mqttStarting` (2 min after a start or a restart)                                                                                                                                                                          | —                                                                                                                              |
+| `notAnswering`  | none of the above: Gladys gets no answer from Zigbee2mqtt                                                                                                                                                                         | Restart (none with an external broker)                                                                                         |
 
 - **Devices to add.** Online, a link to the Discover tab counts the devices of the network not added
   to Gladys (`GET /discovered` with `filter_existing: false`, those without `id`), counted again on
@@ -654,18 +660,21 @@ The status card shows the first state that applies:
 
 - **Tiles**: Restart (Gladys runs the containers; not without the dongle, Zigbee2mqtt starts again once
   it is plugged back), Stop, and the Zigbee2mqtt interface once its URL is known; none while an
-  installation runs, during a stop, once stopped or while the service is stopped (`inactive`); once
-  stopped, Stop again while a container of ours still runs (Docker refused to stop it). In local
+  installation runs, during a stop, once stopped, or while the service is stopped or not started yet
+  (`inactive`, `pending`); once stopped, Stop again while a container of ours still runs (Docker refused
+  to stop it), until Gladys restarts (its init, stopped, no longer looks at the containers). In local
   mode, the interface is hidden until its port is saved: the first installation that succeeds chooses
-  it, the default `8080` would be wrong meanwhile. "Change" is disabled while an installation runs and
-  while init has not read the configuration (`configured` null): step ① needs what it tells.
+  it, the default `8080` would be wrong meanwhile. "Change" is disabled while an installation runs,
+  while init has not read the configuration (`configured` null: step ① needs what it tells) and
+  while the service is stopped, as the saves of the advanced settings (the server refuses them, E.3).
 - **Stop** asks for a confirmation (Zigbee2mqtt stays stopped, Gladys restart included, until it is
   started again; given up when the user goes to another screen or the state changes), then sends
   `POST /run/stop`. With an external broker it is "Disconnect": only Gladys disconnects, the words of
   the tile, of the confirmation and of the stopped state say that Zigbee2MQTT keeps running. **Start**
-  sends `POST /run/start`, **Restart** `POST /run/restart` (E.4). The
-  status sent by the server tells the outcome: the page does not guess it. An action hides the success
-  of the last installation, told again for the next one.
+  sends `POST /run/start`, **Restart** `POST /run/restart` (E.4). The status sent by the server tells
+  the outcome: the page does not guess it. **Start the service** (`inactive`) sends the route of the
+  core, `POST /start`, which answers the service: saved `ERROR` when its start failed, told as a failed
+  action. An action hides the success of the last installation, told again for the next one.
 - **Refusals.** A 409 (`refuseWhileInstalling`, I) tells that an installation runs or the integration
   is busy, until the installation that refused the action ends or the state of Zigbee2mqtt changes
   (an operation, which runs no installation, refused it); another error says that Gladys could not do

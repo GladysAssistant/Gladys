@@ -22,9 +22,18 @@ export const ICONS = {
   [DASHBOARD_STATE.DONGLE_MISSING]: 'cpu',
   [DASHBOARD_STATE.FAILED]: 'alert-triangle',
   [DASHBOARD_STATE.INACTIVE]: 'power',
+  [DASHBOARD_STATE.PENDING]: 'loader',
   [DASHBOARD_STATE.MQTT_ERROR]: 'alert-triangle',
   [DASHBOARD_STATE.NOT_ANSWERING]: 'alert-circle'
 };
+
+// The states shown with a spinner
+const WORKING_STATES = [
+  DASHBOARD_STATE.INSTALLING,
+  DASHBOARD_STATE.STARTING,
+  DASHBOARD_STATE.STOPPING,
+  DASHBOARD_STATE.PENDING
+];
 
 const TONES = {
   [DASHBOARD_STATE.ONLINE]: style.toneGreen,
@@ -35,6 +44,7 @@ const TONES = {
   [DASHBOARD_STATE.DONGLE_MISSING]: style.toneAmber,
   [DASHBOARD_STATE.FAILED]: style.toneRed,
   [DASHBOARD_STATE.INACTIVE]: style.toneGrey,
+  [DASHBOARD_STATE.PENDING]: style.toneBlue,
   [DASHBOARD_STATE.MQTT_ERROR]: style.toneRed,
   [DASHBOARD_STATE.NOT_ANSWERING]: style.toneAmber
 };
@@ -140,9 +150,7 @@ const StatusCard = ({ view, actions }) => {
         <span class={cx(style.statusIcon, TONES[state])} aria-hidden="true">
           <i
             class={cx(`fe fe-${ICONS[state]}`, {
-              [style.spin]: [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STARTING, DASHBOARD_STATE.STOPPING].includes(
-                state
-              )
+              [style.spin]: WORKING_STATES.includes(state)
             })}
           />
         </span>

@@ -10,6 +10,7 @@ export const DASHBOARD_STATE = {
   DONGLE_MISSING: 'dongleMissing',
   FAILED: 'failed',
   INACTIVE: 'inactive',
+  PENDING: 'pending',
   MQTT_ERROR: 'mqttError',
   ONLINE: 'online',
   STARTING: 'starting',
@@ -40,8 +41,8 @@ export const getStartupError = status => {
 
 /**
  * @description The state the status card shows, the most urgent first: an installation in progress, the service
- * stopped (in the settings, or never started since Gladys did), a stop of the user, a missing dongle, a failure, a
- * broker out of reach, then running or not.
+ * stopped in the settings, the service not started yet, a stop of the user, a missing dongle, a failure, a broker out
+ * of reach, then running or not.
  * @param {object} status - Status of the server.
  * @param {object} configuration - Saved configuration.
  * @returns {string} A DASHBOARD_STATE.
@@ -50,9 +51,13 @@ export const getDashboardState = (status, configuration) => {
   if (get(status, 'installation.state') === 'running') {
     return DASHBOARD_STATE.INSTALLING;
   }
-  // The service stopped: nothing else runs, even a stop of the user waits for it
+  // The service stopped in the settings: nothing else runs, even a stop of the user waits for it
   if (status.serviceStopped === true) {
     return DASHBOARD_STATE.INACTIVE;
+  }
+  // Init has not read the configuration: Gladys has not started the service yet (or was started with it stopped)
+  if (status.configured === null) {
+    return DASHBOARD_STATE.PENDING;
   }
   if (status.stopped) {
     return DASHBOARD_STATE.STOPPED;
@@ -88,6 +93,10 @@ export const getPrimaryAction = (state, configuration) => {
   if (state === DASHBOARD_STATE.STOPPED) {
     return 'start';
   }
+  // Gladys starts it with its services, or the settings do
+  if (state === DASHBOARD_STATE.PENDING) {
+    return null;
+  }
   if (isExternal(configuration)) {
     return null;
   }
@@ -105,9 +114,13 @@ export const getTiles = (state, configuration, z2mUrl, status = {}) => {
     return status.zigbee2mqttRunning || status.mqttRunning ? ['stop'] : [];
   }
   if (
-    [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STOPPING, DASHBOARD_STATE.STOPPED, DASHBOARD_STATE.INACTIVE].includes(
-      state
-    )
+    [
+      DASHBOARD_STATE.INSTALLING,
+      DASHBOARD_STATE.STOPPING,
+      DASHBOARD_STATE.STOPPED,
+      DASHBOARD_STATE.INACTIVE,
+      DASHBOARD_STATE.PENDING
+    ].includes(state)
   ) {
     return [];
   }

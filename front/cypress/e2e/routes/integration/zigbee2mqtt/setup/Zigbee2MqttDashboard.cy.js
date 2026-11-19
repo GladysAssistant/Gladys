@@ -225,14 +225,35 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.inactive.title`);
       cy.get('[data-cy=z2m-dashboard-tiles]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+      // Nothing installed meanwhile: the server refuses it
+      cy.get('[data-cy=z2m-dashboard-change-key]').should('be.disabled');
       // The route of the core: the service saved running, it starts again with Gladys
       cy.get('[data-cy=z2m-dashboard-startService]').click();
       cy.wait('@startService');
+      cy.get('[data-cy=z2m-dashboard-action-error]').should('not.exist');
+    });
 
-      // Stopped since the start of Gladys: init never read the configuration, step ① needs what it tells
-      sendStatus({ ...serviceStoppedStatus, configured: null });
-      cy.get('[data-cy=z2m-dashboard-startService]').should('exist');
+    it('should tell that the service did not start, as the core answers it', () => {
+      visitDashboard({ status: { ...onlineStatus, serviceStopped: true, gladysConnected: false } });
+      answerAction('startService', { body: { name: 'zigbee2mqtt', status: 'ERROR' } });
+
+      cy.get('[data-cy=z2m-dashboard-startService]').click();
+      cy.wait('@startService');
+      cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.error`);
+    });
+
+    it('should wait for Gladys to start the service, without a button', () => {
+      // Init has not read the configuration yet: Gladys starts its services one after the other
+      visitDashboard({ status: { ...onlineStatus, configured: null, gladysConnected: false } });
+
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.pending.title`);
+      cy.get('[data-cy=z2m-dashboard-startService]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-tiles]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-change-key]').should('be.disabled');
+
+      sendStatus(onlineStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.online.title`);
     });
 
     it('should offer to stop again the containers Docker refused to stop', () => {

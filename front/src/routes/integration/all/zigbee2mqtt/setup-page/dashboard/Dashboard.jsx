@@ -86,7 +86,11 @@ class Dashboard extends Component {
       installationSuccessDismissed: true
     });
     try {
-      await this.props.httpClient.post(`/api/v1/service/zigbee2mqtt/${ACTION_PATHS[action]}`, body);
+      const answer = await this.props.httpClient.post(`/api/v1/service/zigbee2mqtt/${ACTION_PATHS[action]}`, body);
+      // The core answers the service, saved in error when its start failed
+      if (action === 'startService' && get(answer, 'status') === 'ERROR') {
+        throw new Error('Zigbee2mqtt: the service did not start');
+      }
       if (this.unmounted) {
         return;
       }
@@ -267,7 +271,10 @@ class Dashboard extends Component {
       language: get(props, 'user.language'),
       installing: dashboardState === DASHBOARD_STATE.INSTALLING,
       // Step ① needs what init tells of the machine: unknown (null) while the service never started since Gladys did
-      changeKeyDisabled: dashboardState === DASHBOARD_STATE.INSTALLING || status.configured === null,
+      changeKeyDisabled:
+        dashboardState === DASHBOARD_STATE.INSTALLING || status.configured === null || status.serviceStopped === true,
+      // Nothing is saved while the service is stopped: the server refuses it (start the service first)
+      serviceStopped: status.serviceStopped === true,
       primaryAction: getPrimaryAction(dashboardState, configuration),
       tiles: getTiles(dashboardState, configuration, z2mUrl, status),
       canChangeKey: !isExternal(configuration),

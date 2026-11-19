@@ -90,9 +90,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.stoppedAt = null;
   // An update of the containers waits for its images, not downloaded: tried again on the next start (see init)
   this.updatePending = false;
-  // The service is stopped in the settings, or not started yet: until Gladys starts it (see the start of the service,
-  // which a service stopped in the settings never gets at the start of Gladys)
-  this.serviceStopped = true;
+  // The service was stopped in the settings while Gladys runs (see the stop of the service), until it starts again. A
+  // service not started yet tells it otherwise: init never read the configuration (`configured` null)
+  this.serviceStopped = false;
   // The configured USB dongle was not found, at the start or since (see watchDongle)
   this.dongleMissing = false;
   // Check of the configured USB dongle, while Zigbee2mqtt does not answer (see watchDongle)
