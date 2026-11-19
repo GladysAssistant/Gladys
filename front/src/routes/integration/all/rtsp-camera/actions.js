@@ -61,8 +61,11 @@ function createActions(store) {
         rtspCameras.forEach(camera => {
           actions.complete(camera);
         });
+        // (one being saved meanwhile may already be in the answer: it is not listed twice)
         const unsavedCameras = keepUnsaved
-          ? (store.getState().rtspCameras || []).filter(camera => !camera.created_at)
+          ? (store.getState().rtspCameras || []).filter(
+              camera => !camera.created_at && !rtspCameras.some(saved => saved.id === camera.id)
+            )
           : [];
         store.setState({
           rtspCameras: [...rtspCameras, ...unsavedCameras],
