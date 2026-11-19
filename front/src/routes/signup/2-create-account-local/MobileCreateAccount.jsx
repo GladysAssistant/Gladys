@@ -165,7 +165,7 @@ class MobileCreateAccount extends Component {
                 placeholder={<Text id="profile.emailPlaceholder" />}
                 autocomplete="email"
                 autocapitalize="off"
-                autocorrect="off"
+                autocorrect={false}
                 spellcheck={false}
                 enterkeyhint="next"
                 aria-required="true"

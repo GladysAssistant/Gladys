@@ -102,7 +102,7 @@ const MobileResetPassword = props => {
                 error={props.invalidRecoveryCode && <Text id="gatewayResetPassword.invalidRecoveryCodeLabel" />}
                 autocomplete="off"
                 autocapitalize="off"
-                autocorrect="off"
+                autocorrect={false}
                 spellcheck={false}
                 enterkeyhint="go"
                 dataCy="gateway-reset-password-recovery-code"

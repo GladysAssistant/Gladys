@@ -47,7 +47,7 @@ const MobileSetRestoreKey = props => (
             placeholder={<Text id="signup.restoreBackupSetBackupKey.backupKeyPlaceholder" />}
             autocomplete="off"
             autocapitalize="off"
-            autocorrect="off"
+            autocorrect={false}
             spellcheck={false}
             enterkeyhint="go"
             data-cy="signup-restore-key"
