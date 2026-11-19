@@ -10,6 +10,7 @@ export const DASHBOARD_STATE = {
   DONGLE_MISSING: 'dongleMissing',
   FAILED: 'failed',
   INACTIVE: 'inactive',
+  PENDING: 'pending',
   MQTT_ERROR: 'mqttError',
   ONLINE: 'online',
   STARTING: 'starting',
@@ -40,8 +41,8 @@ export const getStartupError = status => {
 
 /**
  * @description The state the status card shows, the most urgent first: an installation in progress, the service not
- * started (Gladys starts its services one after the other, or it was stopped in the settings), a stop of the user, a
- * missing dongle, a failure, a broker out of reach, then running or not.
+ * started (Gladys starts its services one after the other, or it was stopped in the settings), its configuration not
+ * read yet, a stop of the user, a missing dongle, a failure, a broker out of reach, then running or not.
  * @param {object} status - Status of the server.
  * @param {object} configuration - Saved configuration.
  * @returns {string} A DASHBOARD_STATE.
@@ -53,6 +54,10 @@ export const getDashboardState = (status, configuration) => {
   // The service not started: nothing else runs, even a stop of the user waits for it. Settings > Services starts it
   if (status.serviceStarted === false) {
     return DASHBOARD_STATE.INACTIVE;
+  }
+  // Started, but init has not read the configuration yet: what it tells (a stop, a failure) is not known meanwhile
+  if (status.configured === null) {
+    return DASHBOARD_STATE.PENDING;
   }
   if (status.stopped) {
     return DASHBOARD_STATE.STOPPED;
@@ -84,7 +89,7 @@ export const getPrimaryAction = (state, configuration) => {
   if (state === DASHBOARD_STATE.STOPPED) {
     return 'start';
   }
-  if (state === DASHBOARD_STATE.INACTIVE) {
+  if ([DASHBOARD_STATE.INACTIVE, DASHBOARD_STATE.PENDING].includes(state)) {
     return null;
   }
   if (isExternal(configuration)) {
@@ -97,16 +102,21 @@ export const getPrimaryAction = (state, configuration) => {
 };
 
 // The tiles under the cards: restart (not without the dongle: Zigbee2mqtt starts again once it is plugged back), stop,
-// the interface of Zigbee2mqtt; none during an installation, a stop, or once stopped, except the stop again while a
-// container of ours still runs (Docker refused to stop it)
+// the interface of Zigbee2mqtt; none during an installation, a stop, once stopped, or while the service is not started
+// or its configuration not read yet, except the stop again while a container of ours still runs (Docker refused to
+// stop it)
 export const getTiles = (state, configuration, z2mUrl, status = {}) => {
   if (state === DASHBOARD_STATE.STOPPED && !isExternal(configuration)) {
     return status.zigbee2mqttRunning || status.mqttRunning ? ['stop'] : [];
   }
   if (
-    [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STOPPING, DASHBOARD_STATE.STOPPED, DASHBOARD_STATE.INACTIVE].includes(
-      state
-    )
+    [
+      DASHBOARD_STATE.INSTALLING,
+      DASHBOARD_STATE.STOPPING,
+      DASHBOARD_STATE.STOPPED,
+      DASHBOARD_STATE.INACTIVE,
+      DASHBOARD_STATE.PENDING
+    ].includes(state)
   ) {
     return [];
   }

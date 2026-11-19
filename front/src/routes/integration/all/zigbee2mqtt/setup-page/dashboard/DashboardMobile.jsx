@@ -44,7 +44,12 @@ const TONES = {
   [DASHBOARD_STATE.NOT_ANSWERING]: 'warning'
 };
 
-const WORKING = [DASHBOARD_STATE.INSTALLING, DASHBOARD_STATE.STARTING, DASHBOARD_STATE.STOPPING];
+const WORKING = [
+  DASHBOARD_STATE.INSTALLING,
+  DASHBOARD_STATE.STARTING,
+  DASHBOARD_STATE.STOPPING,
+  DASHBOARD_STATE.PENDING
+];
 
 const StateTile = ({ state }) => (
   <span class={cx(kitStyle.rowTile, kitStyle[`rowTile-${TONES[state] || 'neutral'}`])} aria-hidden="true">

@@ -195,7 +195,9 @@ installation. A job that fails to start fails the installation with its error. A
   once it is stopped in Settings > Services, the only place that starts it. Until it is set,
   `POST /setup`, `/connect`, `/mqtt/start`, `/z2m/start`, `/run/start` and `/run/restart` are refused
   (400): they would run Zigbee2mqtt with the service saved stopped, which Gladys does not start again;
-  the wizard and the dashboard send the user to Settings > Services instead. `configured` tells that a USB
+  the wizard and the dashboard send the user to Settings > Services instead. A start of the service while an
+  init runs (Settings > Services while Gladys starts its services, the service shown not running yet)
+  starts no second one. `configured` tells that a USB
   dongle or a network coordinator is saved, or the broker of a Zigbee2mqtt that runs elsewhere
   (`utils/isConfigured.js`): set by init from the saved configuration, by `POST /setup` once its
   variables are saved, false after `reset`; kept by `disconnect` (a disabled installation, a service
@@ -636,6 +638,7 @@ The status card shows the first state that applies:
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `installing`    | `installation.state` is `running`: title by kind (B.1), bar, current phase (B.2)                                                                                                                                     | —                                                                              |
 | `inactive`      | `serviceStarted` false (E.3): Gladys has not started the service yet (it starts its services one after the other), or it was stopped in Settings > Services, which removes the containers; before a stop of the user | Open Settings > Services, the only place that starts it (no start button here) |
+| `pending`       | started, but `configured` null: init has not read the configuration yet (what it tells, a stop or a failure, is not known meanwhile), or failed before: "if it stays so, check the service in Settings > Services"   | —                                                                              |
 | `stopping`      | the request of a stop runs: the server tells `stopped` before its containers are stopped (about 10 s)                                                                                                                | —                                                                              |
 | `stopped`       | `stopped` (E.4): "since <stoppedAt>, it does not start again with Gladys"; with an external broker, "disconnected from your Zigbee2MQTT", which keeps running                                                        | Start (with an external broker: Connect)                                       |
 | `dongleMissing` | `dongleMissing` (K.3): Zigbee2mqtt starts again once it is plugged back, on any port                                                                                                                                 | —                                                                              |
@@ -660,9 +663,9 @@ The status card shows the first state that applies:
 
 - **Tiles**: Restart (Gladys runs the containers; not without the dongle, Zigbee2mqtt starts again once
   it is plugged back), Stop, and the Zigbee2mqtt interface once its URL is known; none while an
-  installation runs, during a stop, once stopped, or while the service is not started (`inactive`);
-  once stopped, Stop again while a container of ours still runs (Docker refused
-  to stop it), until Gladys restarts (its init, stopped, no longer looks at the containers). In local
+  installation runs, during a stop, once stopped, or while the service is not started or its
+  configuration not read yet (`inactive`, `pending`); once stopped, Stop again while a container of
+  ours still runs (Docker refused to stop it), until Gladys restarts (its init, stopped, no longer looks at the containers). In local
   mode, the interface is hidden until its port is saved: the first installation that succeeds chooses
   it, the default `8080` would be wrong meanwhile. "Change" is disabled while an installation runs,
   while init has not read the configuration (`configured` null: step ① needs what it tells) and

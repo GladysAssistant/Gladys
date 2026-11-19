@@ -236,6 +236,22 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-change-key]').should('not.be.disabled');
     });
 
+    it('should wait for init to read the configuration, without an action', () => {
+      // Started, the configuration not read yet: Zigbee2mqtt not answering is not a failure meanwhile
+      visitDashboard({
+        status: { ...onlineStatus, configured: null, gladysConnected: false, zigbee2mqttConnected: false }
+      });
+
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.pending.title`);
+      cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-tiles]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-services]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-change-key]').should('be.disabled');
+
+      sendStatus(onlineStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.online.title`);
+    });
+
     it('should offer to stop again the containers Docker refused to stop', () => {
       visitDashboard({
         status: {

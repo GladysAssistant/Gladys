@@ -43,6 +43,18 @@ describe('zigbee2mqtt service', () => {
     assert.notCalled(zigbee2MqttService.device.disconnect);
     expect(zigbee2MqttService.device.serviceStarted).to.equal(true);
   });
+  it('should not start a second init when asked again while one runs', async () => {
+    // PREPARE: started by Settings > Services while Gladys starts its services, its init running
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(false);
+    zigbee2MqttService.device.runningOperations = 1;
+    zigbee2MqttService.device.emitStatusEvent = fake();
+    // EXECUTE
+    await zigbee2MqttService.start();
+    // ASSERT
+    assert.notCalled(zigbee2MqttService.device.init);
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(true);
+    assert.calledOnce(zigbee2MqttService.device.emitStatusEvent);
+  });
   it('should stop service', async () => {
     // PREPARE
     zigbee2MqttService.device.serviceStarted = true;

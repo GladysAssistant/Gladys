@@ -2362,6 +2362,10 @@
             "inactive": {
               "title": "The Zigbee2MQTT service is not started",
               "text": "Gladys starts it with its other services when it starts. If it was stopped in Settings > Services, start it there: your Zigbee devices do not respond until then."
+            },
+            "pending": {
+              "title": "Gladys is loading Zigbee2MQTT",
+              "text": "It reads the configuration and checks Docker. If it stays so, check the Zigbee2MQTT service in Settings > Services."
             }
           },
           "newDevices": {
