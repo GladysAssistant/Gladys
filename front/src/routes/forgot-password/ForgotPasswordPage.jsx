@@ -86,7 +86,7 @@ const MobileForgotPasswordPage = props => {
               }
               autocomplete="one-time-code"
               autocapitalize="characters"
-              autocorrect="off"
+              autocorrect={false}
               spellcheck={false}
               enterkeyhint="go"
               dataCy="forgot-password-code"

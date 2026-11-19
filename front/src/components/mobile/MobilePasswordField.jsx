@@ -62,7 +62,7 @@ class MobilePasswordField extends Component {
               placeholder={placeholder}
               autocomplete={autocomplete}
               autocapitalize="off"
-              autocorrect="off"
+              autocorrect={false}
               spellcheck={false}
               enterkeyhint={enterkeyhint}
               disabled={disabled}

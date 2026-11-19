@@ -167,7 +167,7 @@ const MobileGatewayLoginForm = props => {
             }
             autocomplete="off"
             autocapitalize="off"
-            autocorrect="off"
+            autocorrect={false}
             spellcheck={false}
             enterkeyhint="go"
             autofocus
