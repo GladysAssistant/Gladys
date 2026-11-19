@@ -2099,6 +2099,27 @@ class EditScene extends Component {
     this.showToast('editScene.mobile.triggerDeleted', true);
   };
 
+  // The desktop cards (docs/specs/scene-editor-mobile.md, C.7): their "x" deletes at once, so the
+  // deletion can be undone like on a phone. A card that still has no type (the type picker of a
+  // step or a trigger just added) holds nothing to bring back: it goes without a toast.
+  deleteActionFromCard = path => {
+    const action = this.getActionByPath(path);
+    if (action && action.type === null) {
+      this.deleteAction(path);
+      return;
+    }
+    this.deleteActionWithUndo(path);
+  };
+
+  deleteTriggerFromCard = index => {
+    const trigger = this.state.scene.triggers[index];
+    if (trigger && trigger.type === null) {
+      this.deleteTrigger(index);
+      return;
+    }
+    this.deleteTriggerWithUndo(index);
+  };
+
   // A sheet closed while its step still has no type: nothing half-created stays in the scene
   cancelEmptyAction = path => {
     const action = this.getActionByPath(path);
@@ -2346,7 +2367,14 @@ class EditScene extends Component {
             saveAndStartScene={this.saveAndStartScene}
           />
         ) : (
-          <EditScenePage {...pageProps} />
+          <EditScenePage
+            {...pageProps}
+            deleteAction={this.deleteActionFromCard}
+            deleteActionGroup={this.deleteActionGroupWithUndo}
+            deleteTrigger={this.deleteTriggerFromCard}
+            toast={toast}
+            undo={this.undo}
+          />
         )}
         <LeaveConfirmSheet
           open={leaveConfirmOpen}

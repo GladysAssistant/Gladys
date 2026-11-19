@@ -6,9 +6,10 @@ import SessionDeviceLabel from './SessionDeviceLabel';
 dayjs.extend(relativeTime);
 
 const SessionDevice = ({ children, ...props }) => {
-  let revokeSession = e => {
+  // the revocation is confirmed by the page (docs/specs/mobile-pages/settings-pages.md, B)
+  const askRevoke = e => {
     e.preventDefault();
-    props.revokeSession(props.session.id, props.index);
+    props.askRevoke(props.session);
   };
 
   return (
@@ -30,8 +31,9 @@ const SessionDevice = ({ children, ...props }) => {
           style={{
             cursor: 'pointer'
           }}
-          onClick={revokeSession}
+          onClick={askRevoke}
           class="fe fe-trash-2"
+          data-cy="session-revoke"
         />
       </td>
     </tr>

@@ -7,6 +7,7 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import MigrateDeviceButton from '../../../../../components/device/migrate/MigrateDeviceButton';
 import { RequestStatus } from '../../../../../utils/consts';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class DeviceBox extends Component {
   saveDevice = async () => {
@@ -147,9 +148,9 @@ class DeviceBox extends Component {
                     <Text id="integration.broadlink.device.saveButton" />
                   </button>
                   <MigrateDeviceButton device={device} onMigrated={this.props.getBroadlinkRemotes} />
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.broadlink.device.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
 
                   <Link href={`/dashboard/integration/device/broadlink/edit/${device.selector}`}>
                     <button class="btn btn-secondary float-right">

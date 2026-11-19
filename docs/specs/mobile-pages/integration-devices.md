@@ -139,8 +139,18 @@ what goes with it (its history; the scenes and the dashboards that use it). Conf
 handler of the card; a refusal shows in the confirmation, which stays open. **A device with too
 many states to delete at once says so** — Gladys purges them in the background, with the link to
 that job — rather than "Try again", which would be refused again; this holds for every
-integration of A. A success closes everything and shows "Device deleted". On a wider screen the
-cards keep what they did.
+integration of A. A success closes everything and shows "Device deleted".
+
+**On a wider screen too, and in every integration.** The "Delete" button of a device card is a
+`DeleteDeviceButton` (`front/src/components/device/DeleteDeviceButton.jsx`) — in the integrations
+of A and in the ones that keep their desktop grid on a phone (Zigbee2mqtt, Tasmota, Z-Wave JS UI,
+Philips Hue, Tuya, Netatmo, the cameras…): it opens the same confirmation, with the same texts,
+as a centered dialog (the sheet of the kit below 576 px). Confirming closes the dialog and calls
+the delete handler of the card, which keeps its own loader and its own messages — the "too many
+states" notice, the error of the card. Cancel, Escape and the backdrop delete nothing. A card
+whose device was never saved (no `created_at`: a camera being filled in) holds no history and
+nothing uses it: it is removed without a question. Thermostat keeps the inline question of its
+card.
 
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
 a wider screen. Closing a "Devices" sheet with unsaved changes — by any of the four ways, the
@@ -209,7 +219,7 @@ Only what differs from B, C and D.
   refreshes it.
 - The sheet: the name, the progress of the synchronization and its explanation, the meter id, the
   last synchronization and the number of states, then "Save", "Update" (a meter that misses its
-  features) and "Delete" — confirmed on a phone.
+  features) and "Delete" — confirmed, on every screen size.
 
 ### Thermostat
 
@@ -230,7 +240,8 @@ Only what differs from B, C and D.
 
 ## F. What does not change
 
-- From 768 px (a tablet, a desktop): the cards, as before.
+- From 768 px (a tablet, a desktop): the cards, as before — except that their "Delete" asks
+  first (D).
 - The containers, the requests and their payloads, the websocket updates.
 - The pages these tabs lead to: the MQTT device editor, the Bluetooth peripheral configuration
   and the thermostat form keep their layout; the Bluetooth device page is the phone page of
@@ -253,6 +264,9 @@ other layout: an unsaved change there does not survive the swap.
   integrations); the fields disabled while a save runs; a failed Matter replacement leaving its
   row untouched; the search and the sort order sent to the server; a discovered device added; the
   pairing form; the cards kept on a wider screen.
+- Cypress, desktop viewport, `front/cypress/e2e/routes/integration/DeviceDeleteConfirm.cy.js`:
+  the "Delete" of a card naming the device, cancelled (no request, the card kept), confirmed (the
+  request, the card gone); a confirmed deletion that fails said on the card.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.

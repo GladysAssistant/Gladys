@@ -9,6 +9,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { MobileDeviceItem, BatteryPill } from '../../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class BluetoothDevice extends Component {
   refreshDeviceProperty = () => {
@@ -169,9 +170,9 @@ class BluetoothDevice extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.bluetooth.device.saveButton" />
                   </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.bluetooth.device.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                   <Link href={`/dashboard/integration/device/bluetooth/${device.selector}`}>
                     <button class="btn btn-secondary float-right">
                       <Text id="integration.bluetooth.device.editButton" />

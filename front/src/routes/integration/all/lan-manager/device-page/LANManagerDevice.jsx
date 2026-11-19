@@ -7,6 +7,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { PARAMS } from '../../../../../../../server/services/lan-manager/lib/lan-manager.constants';
 import { MobileDeviceItem } from '../../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class LANManagerDevice extends Component {
   // resolves to false when the device could not be saved (the phone sheet then stays open)
@@ -175,9 +176,9 @@ class LANManagerDevice extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="editDeviceForm.saveButton" />
                   </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                     <Text id="editDeviceForm.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                 </div>
               </div>
             </div>

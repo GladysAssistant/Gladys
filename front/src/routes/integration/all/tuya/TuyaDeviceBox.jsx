@@ -19,6 +19,7 @@ import {
 import TuyaLocalPollSection from './TuyaLocalPollSection';
 import TuyaGithubIssueSection from './discover-page/TuyaGithubIssueSection';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 const LOCAL_POLL_FREQUENCY = 10 * 1000;
 const CLOUD_POLL_FREQUENCY = 30 * 1000;
@@ -503,9 +504,9 @@ class TuyaDeviceBox extends Component {
                       )}
 
                       {validModel && deleteButton && (
-                        <button onClick={this.deleteDevice} class="btn btn-danger">
+                        <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                           <Text id="integration.tuya.deleteButton" />
-                        </button>
+                        </DeleteDeviceButton>
                       )}
                     </div>
                   </div>

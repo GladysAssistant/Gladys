@@ -5,6 +5,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import DeviceForm from './DeviceForm';
 import MigrateDeviceButton from '../../../../../components/device/migrate/MigrateDeviceButton';
 import get from 'get-value';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class PhilipsHueDeviceBox extends Component {
   saveDevice = async () => {
@@ -59,9 +60,9 @@ class PhilipsHueDeviceBox extends Component {
                     <Text id="integration.mqtt.device.saveButton" />
                   </button>
                   <MigrateDeviceButton device={props.device} onMigrated={props.getPhilipsHueDevices} />
-                  <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
+                  <DeleteDeviceButton device={props.device} onDelete={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.mqtt.device.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                 </div>
               </div>
             </div>

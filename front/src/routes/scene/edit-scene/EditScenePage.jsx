@@ -8,6 +8,7 @@ import style from './style.css';
 import Settings from './Settings';
 import EditActions from './EditActions';
 import DraftBanner from './DraftBanner';
+import MobileToast from '../../../components/mobile/MobileToast';
 import dashboardStyle from '../../dashboard/style.css';
 import { Localizer, Text } from 'preact-i18n';
 
@@ -234,6 +235,16 @@ const EditScenePage = ({ children, ...props }) => {
               ))}
             </div>
             <EditActions {...props} />
+            {/* the toast of the editor (docs/specs/scene-editor-mobile.md, C.7): "Scene saved", and
+                the deletion of a step or a trigger with its "Undo". Above the fixed footer. */}
+            <MobileToast
+              message={props.toast ? <Text id={props.toast.textId} /> : null}
+              toastKey={props.toast ? props.toast.id : null}
+              actionLabel={props.toast && props.toast.withUndo ? <Text id="editScene.mobile.undo" /> : null}
+              onAction={props.undo}
+              aboveBar
+              dataCy="scene-toast"
+            />
           </div>
         </div>
       </div>

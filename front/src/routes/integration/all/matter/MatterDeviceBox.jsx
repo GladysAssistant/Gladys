@@ -11,6 +11,7 @@ import style from './style.css';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
 import { MobileNotice, MobilePill } from '../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class MatterDeviceBox extends Component {
   constructor(props) {
@@ -353,9 +354,9 @@ class MatterDeviceBox extends Component {
                   )}
 
                   {deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.matter.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
                 </div>
               </div>

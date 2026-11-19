@@ -10,6 +10,7 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { MobileDeviceItem, BatteryPill } from '../../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class DeviceListItem extends Component {
   // resolves to false when the device could not be deleted (the phone sheet then says so)
@@ -112,9 +113,14 @@ class DeviceListItem extends Component {
           >
             <Text id="integration.mqtt.device.editButton" />
           </Link>
-          <button onClick={this.deleteDevice} class="btn btn-outline-danger btn-sm" disabled={loading}>
+          <DeleteDeviceButton
+            device={props.device}
+            onDelete={this.deleteDevice}
+            class="btn btn-outline-danger btn-sm"
+            disabled={loading}
+          >
             <Text id="integration.mqtt.device.deleteButton" />
-          </button>
+          </DeleteDeviceButton>
         </div>
 
         {tooMuchStatesError && (

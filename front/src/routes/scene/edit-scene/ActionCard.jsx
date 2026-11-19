@@ -162,6 +162,7 @@ const ActionCard = ({ children, ...props }) => {
                 type="button"
                 onClick={handleDelete}
                 class={cx('card-options-remove mr-4', style.cardOptionButton)}
+                data-cy={`delete-step-${path}`}
                 aria-label={
                   <Text id={isCondition ? 'editScene.deleteConditionButton' : 'editScene.deleteActionButton'} />
                 }

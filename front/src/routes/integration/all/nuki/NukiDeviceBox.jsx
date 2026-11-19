@@ -7,6 +7,7 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class NukiDeviceBox extends Component {
   componentWillMount() {
@@ -246,9 +247,9 @@ class NukiDeviceBox extends Component {
                   )}
 
                   {validModel && deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.nuki.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
 
                   {!validModel && (

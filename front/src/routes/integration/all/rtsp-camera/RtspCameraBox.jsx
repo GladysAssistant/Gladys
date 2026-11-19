@@ -4,6 +4,7 @@ import get from 'get-value';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import { DEVICE_POLL_FREQUENCIES, DEVICE_ROTATION } from '../../../../../../server/utils/constants';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class RtspCameraBox extends Component {
   saveCamera = async () => {
@@ -205,9 +206,13 @@ class RtspCameraBox extends Component {
                   <button onClick={this.saveCamera} class="btn btn-success mr-2">
                     <Text id="integration.rtspCamera.saveButton" />
                   </button>
-                  <button onClick={this.deleteCamera} class="btn btn-danger mt-sm-0 mt-md-0 mt-lg-2 mt-xl-0">
+                  <DeleteDeviceButton
+                    device={props.camera}
+                    onDelete={this.deleteCamera}
+                    class="btn btn-danger mt-sm-0 mt-md-0 mt-lg-2 mt-xl-0"
+                  >
                     <Text id="integration.rtspCamera.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                 </div>
               </div>
             </div>

@@ -10,6 +10,7 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -62,7 +63,8 @@ class Zigbee2mqttBox extends Component {
     this.setState({
       loading: true,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
+      deleteError: undefined
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
@@ -97,7 +99,7 @@ class Zigbee2mqttBox extends Component {
     };
   };
 
-  render(props, { loading, saveError, tooMuchStatesError, statesNumber }) {
+  render(props, { loading, saveError, deleteError, tooMuchStatesError, statesNumber }) {
     const { batteryLevel } = this.getDeviceProperty();
     return (
       <div class="col-md-6">
@@ -121,6 +123,11 @@ class Zigbee2mqttBox extends Component {
                 {saveError && (
                   <div class="alert alert-danger">
                     <Text id="integration.zigbee2mqtt.saveError" />
+                  </div>
+                )}
+                {deleteError && (
+                  <div class="alert alert-danger">
+                    <Text id="mobileDeviceList.deleteError" />
                   </div>
                 )}
                 {tooMuchStatesError && (
@@ -202,9 +209,13 @@ class Zigbee2mqttBox extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success flex-fill">
                     <Text id="integration.zigbee2mqtt.saveButton" />
                   </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger flex-fill">
+                  <DeleteDeviceButton
+                    device={props.device}
+                    onDelete={this.deleteDevice}
+                    class="btn btn-danger flex-fill"
+                  >
                     <Text id="integration.zigbee2mqtt.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                   <Link
                     href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`}
                     class="flex-fill"

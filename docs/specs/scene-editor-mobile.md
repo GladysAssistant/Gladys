@@ -2,7 +2,8 @@
 
 > **Living specification — source of truth.** This document specifies how the scene list and the
 > scene editor behave on a phone, and the editor behaviors shared by every screen size (unsaved
-> changes, local draft, save errors, step summaries, what a condition compares). **Rule: any PR
+> changes, local draft, save errors, step summaries, what a condition compares, a deletion that
+> can be undone). **Rule: any PR
 > that changes one of these behaviors modifies this file in the same diff.**
 >
 > Status: **phases 1 and 2 implemented** (sections C to F). Section G lists what is designed but
@@ -209,6 +210,24 @@ it opens (C.1): a condition box sends no request.
   device when it holds nothing. Switching puts aside what was picked and brings back what had
   been picked on the other side: a tap on the wrong side loses nothing.
 
+### C.7 A deletion can be undone
+
+Deleting a step, a condition, a trigger or a whole block (If / Then / Else, While, a group of
+parallel steps) is one tap or one click, never a question — so it can always be taken back. The
+editor shows a toast "Step deleted" / "Condition deleted" / "Trigger deleted" with **Undo** for
+5 seconds; Undo restores the scene and its variables as they were just before the deletion,
+except the active switch and the last run, which keep their current (server) values. One level:
+a second deletion replaces what Undo brings back.
+
+- **On a phone**: E.6.
+- **On a wider screen**: the "x" of a card (`ActionCard`, `TriggerCard`, the group header of
+  `ActionGroup`) goes through the same `delete…WithUndo` handlers of `edit-scene/index.js`, and
+  the toast is the one of the kit (`MobileToast`), above the fixed footer. A card that still has
+  no type — the type picker of a step or a trigger just added — holds nothing to bring back: its
+  "x" removes it without a toast.
+
+The same toast says "Scene saved" after a successful save, on every screen size.
+
 ## D. Mobile scene list (`/dashboard/scene`, < 768 px)
 
 ### D.1 Layout
@@ -361,7 +380,8 @@ its own, and **focuses its search field** when it opens.
   D.3). The sheet's "Delete" button does the same.
 - A deletion shows a toast "Step deleted" / "Trigger deleted" / "Condition deleted" with **Undo**
   for 5 seconds. Undo restores the scene (and its variables) as they were just before the deletion,
-  except the active switch and the last run, which keep their current (server) values.
+  except the active switch and the last run, which keep their current (server) values (C.7: the
+  cards of a wider screen do the same).
 - Deleting a **condition** leaves the sheet of its block open (the user is still working on the
   block's conditions); any other deletion goes back to the timeline. The toast is rendered on
   `<body>`, above the sheets, so Undo stays within reach.
@@ -384,7 +404,7 @@ A frosted bar fixed at the bottom (above the safe area) whose content follows th
   changed setting (name, description, icon, tags), plus one if only the order changed.
 - **Test** saves, then starts the scene: on a phone, starting always runs what is on screen. (The
   desktop "Start" button keeps its current behavior.)
-- A successful save shows a "Scene saved" toast.
+- A successful save shows a "Scene saved" toast (C.7).
 
 ### E.8 "•••" menu
 
@@ -539,6 +559,9 @@ From 768 px the forms are untouched.
 ## H. Tests
 
 - Cypress, desktop viewport (unchanged default): the existing scene specs keep passing.
+- Cypress, desktop viewport, `SceneUndoDesktop.cy.js` (C.7): a step, an If / Then / Else block
+  with its branches and a trigger deleted from their card and brought back by Undo; a step that
+  has no type yet removed without a toast.
 - Cypress, phone viewport (`cy.viewport('iphone-x')`), `front/cypress/e2e/routes/scene/SceneMobile.cy.js`:
   create a scene from the "+" sheet (name only), cancel its trigger picker without being left with
   an unsaved change, add a trigger and a step through the type picker

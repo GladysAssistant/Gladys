@@ -17,6 +17,7 @@ dayjs.extend(localizedFormat);
 
 import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/device';
 import { DEVICE_PARAMS } from './consts';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 import EnedisPage from './EnedisPage';
 import { buildUsagePointDevicePayload } from './usagePointDeviceBuilder';
 import {
@@ -231,9 +232,9 @@ const UsagePointDevice = ({
                 </button>
               </div>
               <div class="col-6 pl-1">
-                <button class="btn btn-danger btn-block" onClick={destroy}>
+                <DeleteDeviceButton device={device} onDelete={destroy} class="btn btn-danger btn-block">
                   <Text id="integration.enedis.usagePoints.deleteButton" />
-                </button>
+                </DeleteDeviceButton>
               </div>
             </div>
             {deviceShouldBeUpdated && (
@@ -246,9 +247,9 @@ const UsagePointDevice = ({
             <button class="btn btn-success" onClick={save}>
               <Text id="integration.enedis.usagePoints.saveButton" />
             </button>
-            <button class="btn btn-danger ml-2" onClick={destroy}>
+            <DeleteDeviceButton device={device} onDelete={destroy} class="btn btn-danger ml-2">
               <Text id="integration.enedis.usagePoints.deleteButton" />
-            </button>
+            </DeleteDeviceButton>
             {deviceShouldBeUpdated && (
               <button class="btn btn-primary ml-2" onClick={reCreate}>
                 <Text id="integration.enedis.usagePoints.recreateButton" />
