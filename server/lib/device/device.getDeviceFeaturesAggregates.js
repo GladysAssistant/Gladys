@@ -172,11 +172,10 @@ async function getDeviceFeaturesAggregates(
       ...value,
       count_value: Number(value.count_value),
     }));
-    // A value that does not move (a setpoint left as it is for days) has no state in the period:
-    // carry the value in force so the curve is still displayed.
+    // A value that is set and does not move (a setpoint left as it is for days) has no state in the
+    // period: carry the value in force so the curve is still displayed.
     values = await carryForwardAggregates({
       deviceFeature,
-      device,
       values,
       startDate: realStartDate,
       endDate: realEndDate,

@@ -295,9 +295,12 @@ class Chartbox extends Component {
 
       const rawData = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, queryParams);
       // The server adds "carried forward" points: the value still in force at the start and at the end
-      // of the period, so a value that does not move (a setpoint) is still drawn. They are not recorded
-      // states, so a sum or a count must ignore them.
-      const ignoreCarriedForward = AGGREGATES_IGNORING_CARRIED_FORWARD.includes(this.props.box.aggregate_function);
+      // of the period, so a value that is set and does not move (a setpoint) is still drawn. They are not
+      // recorded states, so a sum or a count must ignore them. A timeline has no aggregate (a box switched
+      // to a timeline may still keep one): its carried segment is the state at the start of the period.
+      const ignoreCarriedForward =
+        this.props.box.chart_type !== 'timeline' &&
+        AGGREGATES_IGNORING_CARRIED_FORWARD.includes(this.props.box.aggregate_function);
       const data = ignoreCarriedForward
         ? rawData.map(oneFeature => ({
             ...oneFeature,

@@ -59,7 +59,6 @@ describe('Device.carryForwardAggregates', () => {
     const period = buildPeriod();
     const values = await carryForwardAggregates({
       deviceFeature,
-      device: { features: [deviceFeature] },
       values: [],
       ...period,
     });
@@ -99,7 +98,6 @@ describe('Device.carryForwardAggregates', () => {
     const changeDate = new Date(NOW - 2 * ONE_HOUR);
     const values = await carryForwardAggregates({
       deviceFeature,
-      device: { features: [deviceFeature] },
       values: [aggregatedValue(changeDate, 19)],
       ...period,
     });
@@ -125,7 +123,6 @@ describe('Device.carryForwardAggregates', () => {
     const period = buildPeriod(ONE_DAY);
     const values = await carryForwardAggregates({
       deviceFeature,
-      device: { features: [deviceFeature] },
       values: [aggregatedValue(new Date(NOW - 30 * ONE_HOUR), 19)],
       ...period,
     });
@@ -135,55 +132,40 @@ describe('Device.carryForwardAggregates', () => {
     ]);
   });
 
-  it('should carry a measure until the last time its device sent anything', async () => {
+  it('should leave a measure as it is, even with a state recorded before the period', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 21, new Date(NOW - 2 * ONE_DAY));
+    const queryStub = sinon.spy(db, 'duckDbReadConnectionAllAsync');
     const deviceFeature = {
       id: FEATURE_ID,
       read_only: true,
       last_value: 21,
       last_value_changed: new Date(NOW - 2 * ONE_DAY),
     };
-    const otherFeature = {
-      read_only: true,
-      last_value_changed: new Date(NOW - 10 * 60 * 1000),
-    };
+    const middle = new Date(NOW - 12 * ONE_HOUR);
+    const values = await carryForwardAggregates({
+      deviceFeature,
+      values: [aggregatedValue(middle, 21)],
+      ...buildPeriod(),
+    });
+    expect(values).to.deep.equal([aggregatedValue(middle, 21)]);
+    expect(queryStub.called).to.equal(false);
+  });
+
+  it('should leave a feature as it is when it does not say whether it is set', async () => {
+    const deviceFeature = { id: FEATURE_ID, last_value: 21, last_value_changed: new Date(NOW - 2 * ONE_DAY) };
+    const values = await carryForwardAggregates({ deviceFeature, values: [], ...buildPeriod() });
+    expect(values).to.deep.equal([]);
+  });
+
+  it('should read the history when the date of the last change is not valid', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 7, new Date(NOW - 3 * ONE_DAY));
+    const deviceFeature = { id: FEATURE_ID, read_only: false, last_value: 7, last_value_changed: 'not a date' };
     const period = buildPeriod();
-    const values = await carryForwardAggregates({
-      deviceFeature,
-      device: { features: [{ last_value_changed: null }, deviceFeature, otherFeature] },
-      values: [],
-      ...period,
-    });
+    const values = await carryForwardAggregates({ deviceFeature, values: [], ...period });
     expect(values.map((value) => [value.created_at.getTime(), value.value])).to.deep.equal([
-      [period.startDate.getTime(), 21],
-      [NOW - 10 * 60 * 1000, 21],
+      [period.startDate.getTime(), 7],
+      [period.endDate.getTime(), 7],
     ]);
-  });
-
-  it('should not draw a measure whose device was silent during the whole period', async () => {
-    const deviceFeature = {
-      id: FEATURE_ID,
-      read_only: true,
-      last_value: 21,
-      last_value_changed: new Date(NOW - 3 * ONE_DAY),
-    };
-    const values = await carryForwardAggregates({
-      deviceFeature,
-      device: { features: [deviceFeature] },
-      values: [],
-      ...buildPeriod(),
-    });
-    expect(values).to.deep.equal([]);
-  });
-
-  it('should not draw a measure whose device never sent anything', async () => {
-    const deviceFeature = { id: FEATURE_ID, last_value_changed: 'not a date' };
-    const values = await carryForwardAggregates({
-      deviceFeature,
-      device: undefined,
-      values: [],
-      ...buildPeriod(),
-    });
-    expect(values).to.deep.equal([]);
   });
 
   it('should not add any point when no state was ever recorded', async () => {
@@ -195,7 +177,6 @@ describe('Device.carryForwardAggregates', () => {
     };
     const values = await carryForwardAggregates({
       deviceFeature,
-      device: { features: [deviceFeature] },
       values: [],
       ...buildPeriod(),
     });
@@ -212,7 +193,6 @@ describe('Device.carryForwardAggregates', () => {
     const period = buildPeriod();
     const values = await carryForwardAggregates({
       deviceFeature,
-      device: { features: [deviceFeature] },
       values: [aggregatedValue(period.endDate, 19)],
       ...period,
     });
@@ -232,7 +212,6 @@ describe('Device.carryForwardAggregates', () => {
     const middle = new Date(NOW - 12 * ONE_HOUR);
     const values = await carryForwardAggregates({
       deviceFeature,
-      device: { features: [deviceFeature] },
       values: [aggregatedValue(middle, 19)],
       ...period,
     });

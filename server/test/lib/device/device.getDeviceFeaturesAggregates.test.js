@@ -369,6 +369,48 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
     const promise = device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100, null, -60);
     return assert.isRejected(promise, 'Invalid offset parameter');
   });
+  it('should leave a dense measure curve as it is', async () => {
+    await insertStates(120);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'temperature',
+        read_only: true,
+        last_value: 1999,
+        last_value_changed: new Date(Date.now() - 4000),
+      }),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values } = await deviceInstance.getDeviceFeaturesAggregates('temperature', 60, 100);
+    expect(values).to.have.lengthOf(100);
+    expect(values.some((value) => value.carried_forward)).to.equal(false);
+  });
+  it('should end a dense setpoint curve on its last recorded state, not on the last average', async () => {
+    await insertStates(120);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'setpoint',
+        read_only: false,
+        last_value: 1999,
+        last_value_changed: new Date(Date.now() - 4000),
+      }),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values } = await deviceInstance.getDeviceFeaturesAggregates('setpoint', 60, 100);
+    expect(values).to.have.lengthOf(102);
+    expect(values.filter((value) => value.carried_forward)).to.have.lengthOf(2);
+    expect(values[0].carried_forward).to.equal(true);
+    expect(values[0].value).to.be.closeTo(1000, 1);
+    expect(values[101]).to.include({ value: 1999, carried_forward: true });
+    expect(new Date(values[101].created_at).getTime()).to.equal(Date.now());
+  });
   it('should draw a setpoint that has not moved for months over the whole period', async () => {
     // Set to frost protection six months ago, never changed since
     const changedAt = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);

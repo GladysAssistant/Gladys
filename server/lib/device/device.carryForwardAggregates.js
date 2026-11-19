@@ -74,35 +74,15 @@ async function getValueInForceAt(deviceFeature, date, dateForQuery) {
 }
 
 /**
- * @description Get the last time a device sent anything: the most recent change among all its features.
- * @param {object} device - The device, with its features.
- * @param {object} deviceFeature - The feature displayed, used when the device has no features list.
- * @returns {number|null} The timestamp, or null when the device never sent anything.
- * @example
- * getDeviceLastActivity(device, deviceFeature);
- */
-function getDeviceLastActivity(device, deviceFeature) {
-  const features = device && Array.isArray(device.features) ? device.features : [deviceFeature];
-  return features.reduce((lastActivity, feature) => {
-    const lastValueChanged = toTimestamp(feature.last_value_changed);
-    if (lastValueChanged === null) {
-      return lastActivity;
-    }
-    return lastActivity === null ? lastValueChanged : Math.max(lastActivity, lastValueChanged);
-  }, null);
-}
-
-/**
- * @description Show a value that does not move: a value set before the period is still in force during it.
+ * @description Show a value that is set and does not move (a setpoint, a mode): a value set before the
+ * period is still in force during it, until someone changes it.
  * - At the start of the period, a point carries the value in force at that time.
- * - At the end, the last value is carried until the end of the period for a feature that is set
- * (a setpoint, a mode: read_only false), which stays valid until someone changes it. For a measure
- * (read_only true), it is carried only until the last time the device sent anything, so a device that
- * is no longer connected does not look like it still measures the same value.
+ * - At the end, the last state recorded (not the last bucket average) is carried until the end of the period.
+ * Only a feature that is set (read_only false) is carried: a measure (read_only true) is left as it is,
+ * as nothing tells whether it would still measure the same value.
  * The points added are flagged "carried_forward" and count no state.
  * @param {object} params - Parameters.
  * @param {object} params.deviceFeature - The device feature.
- * @param {object} params.device - The device of this feature.
  * @param {Array} params.values - The aggregated values of the period, ordered by date.
  * @param {Date} params.startDate - Real start of the period.
  * @param {Date} params.endDate - Real end of the period.
@@ -110,27 +90,17 @@ function getDeviceLastActivity(device, deviceFeature) {
  * @param {Date} params.endDateForQuery - End of the period, shifted the way the aggregate queries expect it.
  * @returns {Promise<Array>} The values, with the carried forward points.
  * @example
- * await carryForwardAggregates({ deviceFeature, device, values, ...period });
+ * await carryForwardAggregates({ deviceFeature, values, ...period });
  */
 async function carryForwardAggregates({
   deviceFeature,
-  device,
   values,
   startDate,
   endDate,
   startDateForQuery,
   endDateForQuery,
 }) {
-  let carryUntil = endDate.getTime();
   if (deviceFeature.read_only !== false) {
-    const deviceLastActivity = getDeviceLastActivity(device, deviceFeature);
-    if (deviceLastActivity === null) {
-      return values;
-    }
-    carryUntil = Math.min(carryUntil, deviceLastActivity);
-  }
-  // A measure whose device was silent during the whole period has nothing to show.
-  if (carryUntil <= startDate.getTime()) {
     return values;
   }
 
@@ -147,12 +117,12 @@ async function carryForwardAggregates({
   }
 
   const lastPointTime = toTimestamp(result[result.length - 1].created_at);
-  if (carryUntil > lastPointTime) {
+  if (endDate.getTime() > lastPointTime) {
     // The last aggregated point is an average: carry the last state actually recorded instead.
     const valueAtEnd =
       values.length === 0 ? valueAtStart : await getValueInForceAt(deviceFeature, endDate, endDateForQuery);
     if (valueAtEnd !== null) {
-      result.push(buildCarriedForwardPoint(new Date(carryUntil), valueAtEnd));
+      result.push(buildCarriedForwardPoint(endDate, valueAtEnd));
     }
   }
 
