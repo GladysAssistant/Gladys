@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { MATTER_NODE_CONNECTION_TIMEOUT_MS } = require('./constants');
+const { MATTER_NODE_CONNECTION_TIMEOUT_MS, MATTER_NODE_STATE_CONNECTED } = require('./constants');
 
 /**
  * @description Format a node label for log messages.
@@ -15,7 +15,9 @@ function formatNodeLabel(nodeId) {
 }
 
 /**
- * @description Ensure a Matter node is connected before reading attributes or subscribing.
+ * @description Ensure a Matter node is connected before reading attributes, subscribing or sending a command.
+ * The wait is based on the connection state of the node (`events.stateChanged` → Connected), not on
+ * `events.initialized`, which matter.js only emits once per node lifetime.
  * @param {object} node - The Matter node.
  * @param {object} [options] - Connection options.
  * @param {number} [options.timeoutMs] - Connection timeout in milliseconds.
@@ -35,14 +37,26 @@ async function ensureNodeConnected(node, options = {}) {
   logger.info(`Matter: Connecting ${nodeLabel}...`);
 
   let timeoutId;
+  let stateObserver;
   try {
+    const connected = new Promise((resolve) => {
+      stateObserver = (state) => {
+        if (state === MATTER_NODE_STATE_CONNECTED) {
+          resolve();
+        }
+      };
+      node.events.stateChanged.on(stateObserver);
+    });
     node.connect();
-    await Promise.race([
-      node.events.initialized,
-      new Promise((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error('Connection timeout')), timeoutMs);
-      }),
-    ]);
+    // The node may have connected synchronously, before any state change could be observed
+    if (!node.isConnected) {
+      await Promise.race([
+        connected,
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('Connection timeout')), timeoutMs);
+        }),
+      ]);
+    }
     logger.info(`Matter: ${nodeLabel} connected.`);
     return true;
   } catch (error) {
@@ -52,6 +66,7 @@ async function ensureNodeConnected(node, options = {}) {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
+    node.events.stateChanged.off(stateObserver);
   }
 }
 
