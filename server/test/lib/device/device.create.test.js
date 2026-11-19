@@ -39,6 +39,71 @@ describe('Device', () => {
       transactionSpy.restore();
     }
   });
+  it('should run every query through its transaction while holding the SQLite write lock', async () => {
+    // The IMMEDIATE transaction takes the SQLite write lock at BEGIN. A query sent on
+    // the main connection meanwhile waits behind the writes queued there, and those
+    // writes wait for the lock the transaction holds: a read outside the transaction
+    // deadlocks the whole instance (every write, then every request) until the
+    // incoming writes stop.
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const { connectionManager } = db.sequelize;
+    const originalTransaction = db.sequelize.transaction.bind(db.sequelize);
+    const originalGetConnection = connectionManager.getConnection.bind(connectionManager);
+    let holdingWriteLock = false;
+    const queriesOnMainConnection = [];
+    const transactionStub = sinon.stub(db.sequelize, 'transaction').callsFake((options, callback) =>
+      originalTransaction(options, async (transaction) => {
+        holdingWriteLock = true;
+        try {
+          return await callback(transaction);
+        } finally {
+          holdingWriteLock = false;
+        }
+      }),
+    );
+    const getConnectionStub = sinon.stub(connectionManager, 'getConnection').callsFake((options = {}) => {
+      if (holdingWriteLock && (!options.uuid || options.uuid === 'default')) {
+        queriesOnMainConnection.push(`${options.type} ${options.model ? options.model.name : ''}`.trim());
+      }
+      return originalGetConnection(options);
+    });
+    try {
+      // an existing device with a feature and a param: the update path reads all three
+      await device.create({
+        id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+        name: 'Test device',
+        external_id: 'test-device-external',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+        features: [
+          {
+            id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+            name: 'Test device feature',
+            external_id: 'hue:binary:1',
+            category: 'temperature',
+            type: 'decimal',
+            read_only: false,
+            has_feedback: false,
+            min: 0,
+            max: 100,
+          },
+        ],
+        params: [
+          {
+            id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+            name: 'TEST_PARAM',
+            value: 'UPDATED_VALUE',
+          },
+        ],
+      });
+    } finally {
+      transactionStub.restore();
+      getConnectionStub.restore();
+    }
+    expect(queriesOnMainConnection).to.deep.equal([]);
+  });
   it('should create device alone', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
