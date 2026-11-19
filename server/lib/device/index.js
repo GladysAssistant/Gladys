@@ -16,6 +16,7 @@ const { addFeature } = require('./device.addFeature');
 const { addParam } = require('./device.addParam');
 const { create } = require('./device.create');
 const { destroy } = require('./device.destroy');
+const { destroyAfterStatesPurge } = require('./device.destroyAfterStatesPurge');
 const { init } = require('./device.init');
 const { get } = require('./device.get');
 const { getBySelector } = require('./device.getBySelector');
@@ -163,6 +164,9 @@ const DeviceManager = function DeviceManager(
   // Selectors of devices with a migration in flight, to reject concurrent
   // migrations of the same source (e.g. a client-timeout retry)
   this.migrationsInProgress = new Set();
+  // Selectors of devices being deleted in the background, once their states are purged
+  // (device.destroyAfterStatesPurge.js)
+  this.devicesBeingDestroyed = new Set();
 
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
@@ -194,6 +198,7 @@ DeviceManager.prototype.addFeature = addFeature;
 DeviceManager.prototype.addParam = addParam;
 DeviceManager.prototype.create = create;
 DeviceManager.prototype.destroy = destroy;
+DeviceManager.prototype.destroyAfterStatesPurge = destroyAfterStatesPurge;
 DeviceManager.prototype.init = init;
 DeviceManager.prototype.get = get;
 DeviceManager.prototype.getBySelector = getBySelector;

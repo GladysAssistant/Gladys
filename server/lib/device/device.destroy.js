@@ -8,11 +8,14 @@ const logger = require('../../utils/logger');
 /**
  * @description Destroy a device.
  * @param {string} selector - Device selector.
+ * @param {object} [options] - Options of the deletion.
+ * @param {boolean} [options.skipStatesGuard] - Delete the device whatever its number of states:
+ * only for a caller which has just purged them (see device.destroyAfterStatesPurge.js).
  * @returns {Promise} Resolve when device is destroyed.
  * @example
  * device.destroy('test-device');
  */
-async function destroy(selector) {
+async function destroy(selector, options = {}) {
   const device = await db.Device.findOne({
     include: [
       {
@@ -31,8 +34,9 @@ async function destroy(selector) {
 
   // Deleting a device cascade delete its device features and device feature states
   // This is a blocking operation that takes a lot of time
-  // So if the device has too much states, we don't allow the user to delete the device
-  // and ask him to come back later.
+  // So if the device has too much states, it is not deleted right away: its states are
+  // purged in the background first, then the device is deleted, without the user having
+  // to come back (see device.destroyAfterStatesPurge.js).
   // States live in DuckDB since the migration; the SQLite tables below only hold
   // leftovers of installations that have not run the migration yet.
   const deviceStatesCount = await db.sequelize.query(
@@ -73,11 +77,11 @@ async function destroy(selector) {
 
   const totalNumberOfStates = deviceStatesCount[0].count + deviceStatesCount[1].count + duckDbStatesCount;
   logger.info(`Deleting device ${selector}, device has ${totalNumberOfStates} states in DB`);
-  if (totalNumberOfStates > this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE) {
+  if (totalNumberOfStates > this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE && !options.skipStatesGuard) {
     logger.info(`Deleting device ${selector}, device has too much states. Cleaning states first.`);
-    device.features.forEach((deviceFeature) => {
-      this.eventManager.emit(EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE, deviceFeature.id);
-    });
+    // Not awaited: the purge can take minutes, and the caller is told right away that the
+    // deletion goes on in the background. This function never rejects.
+    this.destroyAfterStatesPurge(device);
     throw new BadParameters(`${totalNumberOfStates} states in DB. Too much states!`);
   }
 

@@ -8,7 +8,6 @@ const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const db = require('../../../models');
-const { EVENTS } = require('../../../utils/constants');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -34,20 +33,12 @@ describe('Device.destroy', () => {
     );
     expect(res).to.have.lengthOf(0);
   });
-  it('should destroy device that has too much states', async () => {
-    const eventFake = {
-      emit: fake.returns(0),
-      on: fake.returns(0),
-    };
+  it('should not destroy at once a device that has too much states, and hand it over to the background deletion', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(eventFake, {}, stateManager, serviceManager, {}, {}, job);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 2;
-    device.devicesByPollFrequency[60000] = [
-      {
-        selector: 'test-device',
-      },
-    ];
+    device.destroyAfterStatesPurge = fake.resolves(null);
     // SQLite leftovers (installation which has not run the DuckDB migration yet)
     await db.DeviceFeatureState.create({
       value: 10,
@@ -70,31 +61,32 @@ describe('Device.destroy', () => {
     ]);
     const promise = device.destroy('test-device');
     await assert.isRejected(promise, '5 states in DB. Too much states!');
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
+    // the device is still there, and its deletion goes on in the background
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+    sinonAssert.calledOnce(device.destroyAfterStatesPurge);
+    const [deviceToDestroy] = device.destroyAfterStatesPurge.firstCall.args;
+    expect(deviceToDestroy).to.have.property('selector', 'test-device');
+    expect(deviceToDestroy.features.map((feature) => feature.id)).to.include('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4');
+  });
+  it('should destroy a device that has too much states when the guard is skipped', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 2;
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date() },
+      { value: 0, created_at: new Date() },
+      { value: 1, created_at: new Date() },
+    ]);
+    await device.destroy('test-device', { skipStatesGuard: true });
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).to.equal(null);
+    const res = await db.duckDbReadConnectionAllAsync(
+      'SELECT * FROM t_device_feature_state WHERE device_feature_id = ?',
       'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
     );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      'ce9dc798-b09f-4e51-8c16-311cdebf97cd',
-    );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      'bb1af3b9-f87d-4d9c-b5be-958cd9d28900',
-    );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      'f07c5b27-9301-4482-a059-9f91329d30e7',
-    );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      '3b5b4870-145d-4584-bf0e-d97fdcf908b5',
-    );
+    expect(res).to.have.lengthOf(0);
+    sinonAssert.notCalled(device.destroyAfterStatesPurge);
   });
   it('should destroy a device without features', async () => {
     const stateManager = new StateManager(event);

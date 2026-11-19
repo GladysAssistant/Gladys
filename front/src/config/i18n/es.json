@@ -136,7 +136,7 @@
     "searchPlaceHolder": "Buscar dispositivos",
     "noRoom": "Sin habitación",
     "noFeatures": "Sin funciones",
-    "tooMuchStatesToDelete": "Este dispositivo tiene {{count}} estados en la base de datos. Para evitar que su instancia de Gladys se vuelva lenta al eliminarlos, hemos iniciado una eliminación gradual de esos estados en segundo plano. Podrá volver a eliminar este dispositivo más adelante, cuando ya no tenga ningún estado. Para seguir el progreso de la eliminación, <a href=\"/dashboard/settings/jobs\">haga clic aquí</a>.",
+    "tooMuchStatesToDelete": "Este dispositivo tiene {{count}} estados en la base de datos. Para que su instancia de Gladys siga siendo fluida, se están eliminando gradualmente en segundo plano y, después, el dispositivo se eliminará automáticamente: no tiene que hacer nada más. Esto puede tardar de unos minutos a unas horas, según la velocidad de su disco. Para seguir el progreso de la eliminación, <a href=\"/dashboard/settings/jobs\">haga clic aquí</a>.",
     "migrate": {
       "button": "Migrar",
       "modalTitle": "Migrar \"{{name}}\"",
@@ -3823,7 +3823,7 @@
             "plural": "Se han eliminado {{count}} dispositivos de Gladys."
           },
           "forcedWarning": "No se pudo contactar con el dispositivo «{{name}}»: se ha retirado de la red Matter de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
-          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar, probablemente porque su historial es demasiado grande. Gladys lo está limpiando: inténtelo más tarde desde la pestaña «Dispositivos»."
+          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar de inmediato, probablemente porque su historial es demasiado grande: Gladys lo está limpiando y después los eliminará automáticamente. Si siguen ahí cuando termine la limpieza, elimínelos desde la pestaña «Dispositivos»."
         },
         "noNodesFound": "No se encontró ningún nodo Matter. Puede añadir un dispositivo Matter yendo a la pestaña \"Añadir dispositivo\".",
         "disabledWarning": "Matter no está activado. Actívelo en <a href=\"/dashboard/integration/device/matter/settings\">Configuración</a> antes de utilizar la integración",

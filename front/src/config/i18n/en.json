@@ -136,7 +136,7 @@
     "searchPlaceHolder": "Search devices",
     "noRoom": "No room",
     "noFeatures": "No features",
-    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>.",
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To keep your Gladys instance responsive, they are being deleted gradually in the background, then the device will be deleted on its own: there is nothing else to do. This can take a few minutes to a few hours, depending on the speed of your disk. To follow the deletion, <a href=\"/dashboard/settings/jobs\">click here</a>.",
     "migrate": {
       "button": "Migrate",
       "modalTitle": "Migrate \"{{name}}\"",
@@ -3823,7 +3823,7 @@
             "plural": "{{count}} Gladys devices have been deleted."
           },
           "forcedWarning": "The appliance \"{{name}}\" could not be reached: it has been removed from the Gladys Matter network, but it has not been told. Factory reset it before pairing it again.",
-          "devicesNotDeleted": "These Gladys devices could not be deleted, most likely because their history is too large. Gladys is cleaning it: try again later from the \"Devices\" tab."
+          "devicesNotDeleted": "These Gladys devices could not be deleted right away, most likely because their history is too large: Gladys is cleaning it, then will delete them on its own. If they are still there once the cleaning is over, delete them from the \"Devices\" tab."
         },
         "noNodesFound": "No Matter nodes found. You can add a Matter device by going to the \"Add Device\" tab.",
         "disabledWarning": "Matter is not activated. Please activate it in <a href=\"/dashboard/integration/device/matter/settings\">Settings</a> before using the integration",

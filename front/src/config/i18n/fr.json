@@ -136,7 +136,7 @@
     "searchPlaceHolder": "Chercher un appareil",
     "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes ou quelques heures (selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\">ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données. Pour que Gladys reste fluide, ils sont supprimés progressivement en arrière-plan, puis l'appareil sera supprimé automatiquement : vous n'avez rien d'autre à faire. Cela peut durer quelques minutes ou quelques heures (selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\">ici</a>.",
     "migrate": {
       "button": "Migrer",
       "modalTitle": "Migrer « {{name}} »",
@@ -3866,7 +3866,7 @@
             "plural": "{{count}} appareils Gladys ont été supprimés."
           },
           "forcedWarning": "L'appareil « {{name}} » était injoignable : il a été retiré du réseau Matter de Gladys, mais il n'en a pas été informé. Réinitialisez-le aux paramètres d'usine avant de l'appairer à nouveau.",
-          "devicesNotDeleted": "Ces appareils Gladys n'ont pas pu être supprimés, probablement parce que leur historique est trop volumineux. Gladys est en train de le nettoyer : réessayez plus tard depuis l'onglet « Appareils »."
+          "devicesNotDeleted": "Ces appareils Gladys n'ont pas pu être supprimés immédiatement, probablement parce que leur historique est trop volumineux : Gladys est en train de le nettoyer, puis les supprimera automatiquement. S'ils sont toujours là une fois le nettoyage terminé, supprimez-les depuis l'onglet « Appareils »."
         },
         "noNodesFound": "Aucun nœud Matter trouvé. Vous pouvez ajouter un appareil Matter en allant sur l'onglet \"Ajouter un appareil\".",
         "disabledWarning": "Matter n'est pas activé, veuillez l'activer dans <a href=\"/dashboard/integration/device/matter/settings\">Paramètres</a> pour commencer à utiliser l'intégration.",

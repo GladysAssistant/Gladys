@@ -138,8 +138,9 @@ Bluetooth, LAN Manager and Enedis cards never said that a save had failed).
 what goes with it (its history; the scenes and the dashboards that use it). Confirming calls the
 handler of the card; a refusal shows in the confirmation, which stays open. **A device with too
 many states to delete at once says so** — Gladys purges them in the background, with the link to
-that job — rather than "Try again", which would be refused again; this holds for every
-integration of A. A success closes everything and shows "Device deleted". On a wider screen the
+that job, then deletes the device on its own (`device.destroyAfterStatesPurge`): the user has
+nothing to come back for — rather than "Try again", which would be refused again; this holds
+for every integration of A. A success closes everything and shows "Device deleted". On a wider screen the
 cards keep what they did.
 
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
