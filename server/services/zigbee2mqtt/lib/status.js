@@ -13,6 +13,7 @@ function status() {
     stopped: this.stopped,
     stoppedAt: this.stoppedAt,
     updatePending: this.updatePending,
+    serviceStopped: this.serviceStopped,
     usbConfigured: this.usbConfigured,
     dongleMissing: this.dongleMissing,
     networkAdapterConfigured: this.networkAdapterConfigured,

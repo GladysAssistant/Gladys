@@ -23,7 +23,6 @@ import { DASHBOARD_STATE, getStartupError, getStopKeys, isExternal, isNetworkCoo
 import { getDriver } from './KeyCard';
 import {
   DISCOVER_URL,
-  SERVICES_URL,
   ICONS,
   PRIMARY_ICONS,
   Subtitle,
@@ -206,9 +205,7 @@ class DashboardMobile extends Component {
           </MobileNotice>
         )}
 
-        {(primaryAction ||
-          (view.canChangeKey && state === DASHBOARD_STATE.FAILED) ||
-          state === DASHBOARD_STATE.INACTIVE) && (
+        {(primaryAction || (view.canChangeKey && state === DASHBOARD_STATE.FAILED)) && (
           <div class={kitStyle.buttons}>
             {primaryAction && (
               <BigButton
@@ -219,11 +216,6 @@ class DashboardMobile extends Component {
                 data-cy={`z2m-dashboard-${primaryAction}`}
               >
                 <Text id={getPrimaryLabel(primaryAction, view.configuration)} />
-              </BigButton>
-            )}
-            {state === DASHBOARD_STATE.INACTIVE && (
-              <BigButton href={SERVICES_URL} data-cy="z2m-dashboard-services">
-                <Text id={`${T}.actions.services`} />
               </BigButton>
             )}
             {view.canChangeKey && state === DASHBOARD_STATE.FAILED && (

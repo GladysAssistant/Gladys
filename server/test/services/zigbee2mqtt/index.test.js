@@ -34,18 +34,27 @@ describe('zigbee2mqtt service', () => {
   });
 
   it('should start service', async () => {
+    // Not started yet: told stopped
+    expect(zigbee2MqttService.device.serviceStopped).to.equal(true);
     // EXECUTE
     await zigbee2MqttService.start();
     // ASSERT
     assert.calledOnce(zigbee2MqttService.device.init);
     assert.notCalled(zigbee2MqttService.device.disconnect);
+    expect(zigbee2MqttService.device.serviceStopped).to.equal(false);
   });
   it('should stop service', async () => {
+    // PREPARE
+    zigbee2MqttService.device.serviceStopped = false;
+    zigbee2MqttService.device.emitStatusEvent = fake();
     // EXECUTE
     await zigbee2MqttService.stop();
     // ASSERT
     assert.calledOnce(zigbee2MqttService.device.disconnect);
     assert.notCalled(zigbee2MqttService.device.init);
+    // Told to the dashboard, which starts the service again from there
+    expect(zigbee2MqttService.device.serviceStopped).to.equal(true);
+    assert.calledOnce(zigbee2MqttService.device.emitStatusEvent);
   });
   it('should stop service once the containers are removed', async () => {
     let containersRemoved;

@@ -2737,8 +2737,8 @@
               "since": "Depuis le {{date}} · Gladys ne s'y reconnecte pas d'elle-même. Votre Zigbee2MQTT continue de tourner."
             },
             "inactive": {
-              "title": "Zigbee2MQTT n'est pas démarré",
-              "text": "Gladys ne l'a pas démarré : vérifiez que le service Zigbee2MQTT tourne dans Paramètres > Services."
+              "title": "Le service Zigbee2MQTT est arrêté",
+              "text": "Il a été arrêté dans Paramètres > Services : vos appareils Zigbee ne répondent plus jusqu'à son redémarrage."
             }
           },
           "newDevices": {
@@ -2760,7 +2760,7 @@
             "changeKey": "Changer",
             "disconnect": "Déconnecter",
             "connect": "Se connecter",
-            "services": "Ouvrir les services"
+            "startService": "Démarrer le service"
           },
           "facts": {
             "driver": "Pilote",

@@ -16,6 +16,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
    */
   async function start() {
     logger.log('Starting Zigbee2mqtt service');
+    zigbee2mqttManager.serviceStopped = false;
     if (zigbee2mqttManager.installation.state === INSTALLATION_STATE.RUNNING) {
       logger.info('Zigbee2mqtt: an installation is running, it starts Zigbee2mqtt');
       return;
@@ -78,6 +79,9 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
     }
     // Shown stopped once the containers are removed: started again meanwhile, they would be created as they are removed
     await zigbee2mqttManager.disconnect();
+    // The dashboard tells it, and starts the service again from there (see serviceStopped)
+    zigbee2mqttManager.serviceStopped = true;
+    zigbee2mqttManager.emitStatusEvent();
   }
 
   /**

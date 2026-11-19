@@ -24,6 +24,16 @@ import style from './dashboard.css';
 
 const SCREEN = { MAIN: 'main', ADVANCED: 'advanced', CHANGE: 'change' };
 
+// Under /api/v1/service/zigbee2mqtt/: the stop, start and restart of the integration under run/, the start of the
+// service by the route of the core that Settings > Services calls (its status saved, it starts again with Gladys)
+const ACTION_PATHS = {
+  permit_join: 'permit_join',
+  stop: 'run/stop',
+  start: 'run/start',
+  restart: 'run/restart',
+  startService: 'start'
+};
+
 /**
  * @description The setup page of a configured installation (docs/specs/zigbee2mqtt-installation.md, N): its state and
  * the action to take, its coordinator, restart / stop / start, and the advanced settings on a screen of their own. A
@@ -76,7 +86,7 @@ class Dashboard extends Component {
       installationSuccessDismissed: true
     });
     try {
-      await this.props.httpClient.post(`/api/v1/service/zigbee2mqtt/${action}`, body);
+      await this.props.httpClient.post(`/api/v1/service/zigbee2mqtt/${ACTION_PATHS[action]}`, body);
       if (this.unmounted) {
         return;
       }
@@ -94,6 +104,8 @@ class Dashboard extends Component {
   pair = () => this.runAction('permit_join', { value: true }, { permitJoinAllowed: true });
 
   start = () => this.runAction('start');
+
+  startService = () => this.runAction('startService');
 
   restart = () => this.runAction('restart');
 
@@ -256,8 +268,8 @@ class Dashboard extends Component {
       installing: dashboardState === DASHBOARD_STATE.INSTALLING,
       // Step ① needs what init tells of the machine: unknown (null) while the service never started since Gladys did
       changeKeyDisabled: dashboardState === DASHBOARD_STATE.INSTALLING || status.configured === null,
-      primaryAction: getPrimaryAction(dashboardState, configuration, status),
-      tiles: getTiles(dashboardState, configuration, z2mUrl),
+      primaryAction: getPrimaryAction(dashboardState, configuration),
+      tiles: getTiles(dashboardState, configuration, z2mUrl, status),
       canChangeKey: !isExternal(configuration),
       ezspDriver: !isExternal(configuration) && getDriver(configuration, savedAdapter) === 'ezsp',
       installationSucceeded:
@@ -272,6 +284,7 @@ class Dashboard extends Component {
     const actions = {
       pair: this.pair,
       start: this.start,
+      startService: this.startService,
       restart: this.restart,
       askStop: this.askStop,
       cancelStop: this.cancelStop,

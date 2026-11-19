@@ -340,9 +340,9 @@ describe('zigbee2mqtt API', () => {
 
   // Each refuses by itself while the integration is busy (see stop, start, restart)
   [
-    ['stop', 'stop'],
-    ['start', 'start'],
-    ['restart', 'restart'],
+    ['run/stop', 'stop'],
+    ['run/start', 'start'],
+    ['run/restart', 'restart'],
   ].forEach(([route, method]) => {
     it(`post /api/v1/service/zigbee2mqtt/${route}`, async () => {
       const req = {};
@@ -358,6 +358,12 @@ describe('zigbee2mqtt API', () => {
     it(`post /api/v1/service/zigbee2mqtt/${route} is for admins only`, () => {
       expect(controller[`post /api/v1/service/zigbee2mqtt/${route}`].admin).to.equal(true);
     });
+  });
+
+  it('should leave to the core the routes that start and stop the service (Settings > Services)', () => {
+    // Registered before the routes of the core: one of these would hide post /api/v1/service/:service_name/start
+    expect(controller).to.not.have.property('post /api/v1/service/zigbee2mqtt/start');
+    expect(controller).to.not.have.property('post /api/v1/service/zigbee2mqtt/stop');
   });
 
   // An installation or an operation in progress (init, disconnect, reset, ezsp fallback) would undo them (containers

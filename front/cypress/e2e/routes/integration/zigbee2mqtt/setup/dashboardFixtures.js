@@ -81,10 +81,14 @@ const visitDashboard = ({
   cy.waitForWebSocket();
 };
 
-// The POST of an action, answered with `response`
+// The route of each action under /api/v1/service/zigbee2mqtt/ (the start of the service is the route of the core)
+const ACTION_PATHS = { stop: 'run/stop', start: 'run/start', restart: 'run/restart', startService: 'start' };
+
+// The POST of an action, answered with `response`, aliased by the name of the action
 const answerAction = (action, response = { body: {} }) => {
   const serverUrl = Cypress.env('serverUrl');
-  cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/${action}` }, response).as(action);
+  const path = ACTION_PATHS[action] || action;
+  cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/${path}` }, response).as(action);
 };
 
 export {
