@@ -89,8 +89,10 @@ class MobileRtspCameras extends Component {
                   <RtspCameraBox
                     key={camera.id}
                     isMobile
-                    autoOpen={camera.id === newCameraId}
-                    discardOnClose={camera.id === newCameraId}
+                    // only while it was never saved: once saved, its row mounting again (a search
+                    // cleared) must not open its sheet
+                    autoOpen={camera.id === newCameraId && !camera.created_at}
+                    discardOnClose={camera.id === newCameraId && !camera.created_at}
                     camera={camera}
                     cameraIndex={index}
                     housesWithRooms={housesWithRooms}
