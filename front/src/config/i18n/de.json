@@ -2684,8 +2684,13 @@
       "discover": {
         "title": "Geräte in der Nähe",
         "permitJoin": "Anlernen aktivieren",
+        "stopPermitJoin": "Anlernen beenden",
+        "permitJoinOpen": "Das Anlernen ist aktiviert: Versetze dein Gerät in den Anlernmodus, es erscheint unten, sobald es dem Netzwerk beigetreten ist.",
+        "permitJoinError": "Gladys konnte das Anlernen nicht aktivieren. Versuche es erneut.",
+        "stopPermitJoinError": "Gladys konnte das Anlernen nicht beenden. Versuche es erneut.",
         "hideExistingDevices": "Bereits hinzugefügte Geräte ausblenden",
         "noDeviceDiscovered": "Es wurden keine Geräte in der Nähe gefunden. Bitte aktiviere das Anlernen.",
+        "noNewDevice": "Keine neuen Geräte gefunden.",
         "serverNoResponse": "Gladys-Server ist nicht verfügbar.",
         "serverNoResponseWebSocker": "Gladys-Server ist nicht verfügbar. Bitte aktualisiere die Seite.",
         "deviceNotHandled": "Gerät wurde noch nicht verarbeitet. Bitte kontaktiere uns, um bei der Verbindung in Gladys zu helfen!",

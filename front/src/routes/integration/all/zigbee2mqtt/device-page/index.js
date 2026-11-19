@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import DeviceTab from './DeviceTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 
 class Zigbee2mqttIntegration extends Component {
   componentWillMount() {
@@ -24,4 +25,4 @@ class Zigbee2mqttIntegration extends Component {
 export default connect(
   'user,zigbee2mqttDevices,houses,getZigbee2mqttStatus,zigbee2mqttSearch,getZigbee2mqttOrderDir,z2mUrl,showZ2mUrlWarning,z2mConfigured',
   actions
-)(Zigbee2mqttIntegration);
+)(withMobileViewport(Zigbee2mqttIntegration));

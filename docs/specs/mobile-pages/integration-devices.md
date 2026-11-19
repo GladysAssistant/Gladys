@@ -30,6 +30,7 @@ they are moved to the same layout, **with the components of section B**.
 | Thermostat | `thermostat/device-page` | — |
 | External integrations | `external-integration/device-page` | `external-integration/discover-page` |
 | RTSP cameras | `rtsp-camera/RtspCamera.jsx` (one page, no tab) | — |
+| Zigbee2MQTT | `zigbee2mqtt/device-page` | `zigbee2mqtt/discover-page` (permit joining) |
 
 ## B. The pattern (< 768 px)
 
@@ -52,7 +53,7 @@ The shared components are in `front/src/components/integration/mobile/`:
   of an external integration) the field is not controlled — it would take back the letters typed
   since the last update — and only starts from the query still applied when it mounts again
   (`initialSearchValue`). Where the query is stored at once and only the request is debounced
-  (Matter, MQTT, Thermostat) the field is controlled (`searchValue`).
+  (Matter, MQTT, Thermostat, Zigbee2MQTT) the field is controlled (`searchValue`).
 - `MobileDeviceItem`: the row of a device and its sheet (C and D).
 - `MobileListLoader`, `MobileWaitingNotice`, `MobileTextNotice`, `MobileProgress`, `BatteryPill`:
   the spinner of a list, a notice that waits (a scan running), a long explanation of the desktop
@@ -265,13 +266,37 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   the notice of the card); the search filters the list as on the card. The error of a device that
   could not be created is the one of the card, with the rejected fields.
 
+### Zigbee2MQTT
+
+- **Both tabs.** The state of Zigbee2MQTT comes first, with the words of the desktop banner: a
+  warning when it does not answer or when Gladys does not reach the broker (with why it does not
+  start, and the link to the setup page). **Not installed**, it is a notice and "Install
+  Zigbee2MQTT" as a full-width button — the only banner then. The notice that the address of the
+  Zigbee2MQTT interface is not set comes **after the list**: it only takes away the links of the
+  sheets, it blocks nothing on the tab.
+- **Devices.** The battery of a device is a pill. The sheet shows the IEEE address in its
+  details and, when the address of the interface is known, "Open in Zigbee2MQTT" (a new tab).
+  "Edit" leads to the device page (`device-edit.md`). An empty list leads to the Discover tab,
+  unless Zigbee2MQTT is not installed.
+- **Discover.** **Permitting joining is the button of the page** — the switch of the desktop
+  header, with the same request (it toggles): "Permit joining"; **while joining is open a
+  waiting notice says so and the button says "Stop joining"**. It is disabled when the switch
+  is (Zigbee2MQTT does not answer, Gladys does not reach the broker, or it is not installed), and
+  shows a spinner while its request runs — a second tap would close what the first one opened. A
+  request that fails says so under the button, until the next one or until the state of the
+  joining changes. "Hide already added devices" is a switch row. A device is added with "Save"
+  or updated with "Update", as on the card; its sheet shows the topic and the IEEE address, and
+  "Open in Zigbee2MQTT" as on the "Devices" tab. A device that exposes nothing besides a battery
+  is "Not supported": its sheet says so and holds "Suggest this device" (a GitHub issue, in a new
+  tab). The empty list says "No new device found." — the button above it is the next step.
+
 ## F. What does not change
 
 - From 768 px (a tablet, a desktop): the cards, as before.
 - The containers, the requests and their payloads, the websocket updates.
 - The pages these tabs lead to: the MQTT device editor, the Bluetooth peripheral configuration
-  and the thermostat form keep their layout; the Bluetooth device page is the phone page of
-  `device-edit.md`.
+  and the thermostat form keep their layout; the Bluetooth and Zigbee2MQTT device pages are the
+  phone page of `device-edit.md`.
 - The other tabs of these integrations (settings, setup, debug, schedules…).
 
 A window resized across the breakpoint (a tablet turned) swaps the rows and the cards without a
@@ -295,6 +320,13 @@ other layout: an unsaved change there does not survive the swap.
   frequency and the rotation saved and undone, a camera added with "+" then saved, one closed
   without being saved, one kept when a search answers, and one added on a wider screen deleted
   from its sheet.
+- Cypress, phone viewport,
+  `front/cypress/e2e/routes/integration/zigbee2mqtt/Zigbee2MqttTabsMobile.cy.js`: the status of
+  Zigbee2MQTT first (not answering, not installed); a device renamed and saved, a failed save
+  kept in the sheet, a deletion confirmed, a refused one explained; a discovered device added,
+  an unsupported one; the permit joining button — its request, the open state, a failure, and
+  disabled while Zigbee2MQTT does not answer or is not installed; the "hide already added
+  devices" switch; the cards and the switch kept on a wider screen.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.

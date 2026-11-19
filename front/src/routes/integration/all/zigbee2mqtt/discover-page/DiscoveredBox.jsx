@@ -7,6 +7,8 @@ import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
 import style from './style.css';
+import { MobileNotice, MobilePill, BigButton, kitStyle } from '../../../../../components/mobile';
+import { MobileDeviceItem } from '../../../../../components/integration/mobile';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
@@ -25,10 +27,12 @@ class DiscoveredBox extends Component {
     this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({
       loading: true
     });
+    let saved = true;
     try {
       await this.props.saveDevice(this.props.deviceIndex);
       this.setState({
@@ -38,18 +42,127 @@ class DiscoveredBox extends Component {
       this.setState({
         saveError: RequestStatus.Error
       });
+      saved = false;
     }
     this.setState({
       loading: false
     });
+    return saved;
   };
 
-  render({ device = {}, deviceIndex, houses = [], z2mUrl }, { loading, saveError }) {
+  // On a phone: a row and its sheet, fed by the handlers of the card
+  // (docs/specs/mobile-pages/integration-devices.md)
+  renderMobile({ device, houses, z2mUrl, supportedDevice, enableUpdateButton, alreadyExistsButton, saveError }) {
+    const ieeeAddress = device.ieee_address;
+    let status = null;
+    let primaryAction;
+    if (!supportedDevice) {
+      status = (
+        <MobilePill>
+          <Text id="mobileDeviceList.notSupported" />
+        </MobilePill>
+      );
+    } else if (enableUpdateButton) {
+      status = (
+        <MobilePill tone="accent">
+          <Text id="mobileDeviceList.updateAvailable" />
+        </MobilePill>
+      );
+      primaryAction = {
+        label: <Text id="integration.zigbee2mqtt.updateButton" />,
+        onClick: this.saveDevice,
+        toast: <Text id="mobileDeviceList.updated" />
+      };
+    } else if (alreadyExistsButton) {
+      status = (
+        <MobilePill tone="success">
+          <Text id="mobileDeviceList.inGladys" />
+        </MobilePill>
+      );
+      primaryAction = { label: <Text id="integration.zigbee2mqtt.alreadyExistsButton" />, disabled: true };
+    } else {
+      primaryAction = {
+        label: <Text id="integration.zigbee2mqtt.saveButton" />,
+        onClick: this.saveDevice,
+        toast: <Text id="mobileDeviceList.added" />
+      };
+    }
+    return (
+      <MobileDeviceItem
+        device={device}
+        houses={houses}
+        subtitle={device.model || device.external_id}
+        status={status}
+        notices={
+          !supportedDevice && (
+            <MobileNotice tone="warning" icon="alert-triangle">
+              <Text id="integration.zigbee2mqtt.discover.deviceNotHandled" />
+            </MobileNotice>
+          )
+        }
+        onNameChange={this.updateName}
+        onRoomChange={supportedDevice ? this.updateRoom : undefined}
+        namePlaceholderId="integration.zigbee2mqtt.namePlaceholder"
+        fieldsDisabled={!supportedDevice}
+        guard={false}
+        showFeatures={supportedDevice}
+        details={
+          supportedDevice
+            ? [
+                { label: <Text id="integration.zigbee2mqtt.topicLabel" />, value: device.external_id, mono: true },
+                { label: <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />, value: ieeeAddress, mono: true }
+              ]
+            : []
+        }
+        saveError={saveError && <Text id="integration.zigbee2mqtt.saveError" />}
+        primaryAction={primaryAction}
+        dataCy="z2m-discovered-row"
+      >
+        {supportedDevice && z2mUrl && ieeeAddress && (
+          <a
+            href={`${z2mUrl}/#/device/0/${ieeeAddress}/info`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={kitStyle.linkButton}
+            data-cy="z2m-device-open-in-z2m"
+          >
+            <img src={logoZigbee2mqtt} alt="" class={style.z2mDeviceLinkLogo} />
+            <Text id="integration.zigbee2mqtt.openInZ2mButton" />
+          </a>
+        )}
+        {!supportedDevice && (
+          <BigButton
+            icon="github"
+            href={createGithubUrl(device)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cy="z2m-discovered-suggest"
+          >
+            <Text id="integration.zigbee2mqtt.discover.createGithubIssue" />
+          </BigButton>
+        )}
+      </MobileDeviceItem>
+    );
+  }
+
+  render({ device = {}, deviceIndex, houses = [], z2mUrl, isMobile }, { loading, saveError }) {
     const { features = [], ieee_address = null } = device;
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
     const supportedDevice = features.findIndex(f => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY) >= 0;
     const alreadyExistsButton = supportedDevice && !enableSaveButton && !enableUpdateButton;
+
+    if (isMobile) {
+      return this.renderMobile({
+        device,
+        houses,
+        z2mUrl,
+        supportedDevice,
+        enableUpdateButton,
+        alreadyExistsButton,
+        saveError
+      });
+    }
 
     return (
       <div class="col-md-6">

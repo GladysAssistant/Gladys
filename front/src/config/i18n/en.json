@@ -2440,8 +2440,13 @@
       "discover": {
         "title": "Zigbee2MQTT discover",
         "permitJoin": "Permit joining",
+        "stopPermitJoin": "Stop joining",
+        "permitJoinOpen": "Joining is open: put your device in pairing mode, it shows up below as soon as it has joined the network.",
+        "permitJoinError": "Gladys could not permit joining. Try again.",
+        "stopPermitJoinError": "Gladys could not stop joining. Try again.",
         "hideExistingDevices": "Hide already added devices",
         "noDeviceDiscovered": "No new device discovered, please click on scan button.",
+        "noNewDevice": "No new device found.",
         "serverNoResponse": "Gladys server is not available.",
         "serverNoResponseWebSocker": "Gladys server is not available. Please refresh the page.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
