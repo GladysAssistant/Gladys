@@ -89,7 +89,18 @@ What the forms share (`components/auth/mobile.jsx`):
 help as a footnote, **Log in** in the bottom bar.
 
 - An address that is not an e-mail is refused next to the field, before anything is sent.
-- "Wrong email/password." shows in the bottom bar.
+- The refusal of the sign-in shows in the bottom bar (above the card on a wider screen,
+  `data-cy=login-error`), **in the words of what happened** — on every screen size
+  (`actions/login/login.js`, `utils/connectionError.js`):
+  - "Wrong email/password." only when Gladys refused the credentials (a 4xx other than 429);
+  - "Gladys is unreachable. Check that Gladys is running and that this device is connected to
+    the network, then try again." when the request got no answer, or the 502 / 503 / 504 of a
+    reverse proxy in front of a stopped Gladys;
+  - "Too many attempts. Wait a few minutes before trying again." on the 429 of the rate limit;
+  - "Gladys returned an error. Try again in a moment." on any other 5xx.
+
+  Every failure used to read "Wrong email/password.", which sent the user retyping a password
+  that was right while Gladys was restarting.
 - Same store actions as the card (`actions/login/login.js`): the same `POST /api/v1/login`, the
   same redirection to `return_url`.
 
@@ -283,7 +294,8 @@ invoices** and **Log out**.
 ## E. What does not change
 
 - From 768 px (a phone in landscape excepted): the card of each page, as before — the desktop
-  spec (`login/Login.cy.js`) passes unchanged.
+  spec (`login/Login.cy.js`) passes unchanged (it gained the cases of C.1: unreachable, proxy
+  error, too many attempts, server error).
 - The requests and their payloads, the routes, the store actions and the containers. The two
   containers touched only gained display state — `validating` (keypad), `otpauthUrl` /
   `previousStep` (two-factor setup), `codeSent` (password recovery), `selectedUser` given to the
@@ -301,7 +313,8 @@ invoices** and **Log out**.
   - the **sign-in against the instance**: the attributes of the fields, 16 px, an address that
     is not an e-mail refused next to its field and focused with nothing sent, the reveal button,
     the form submitted by the keyboard, the refusal in the bottom bar closed and shown again, a
-    login that leads to `return_url`, the card kept on a wider screen;
+    Gladys that does not answer said as such and not as a wrong password (stubbed), a login
+    that leads to `return_url`, the card kept on a wider screen;
   - the **password recovery and the new password, stubbed** (their requests are rate limited
     and send messages): the two screens and their request bodies, the refusals next to the
     fields and in the bottom bar, the token of the code given to the new password, the dead

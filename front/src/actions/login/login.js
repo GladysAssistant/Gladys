@@ -3,6 +3,7 @@ import { validateEmail, cleanEmail } from '../../utils/validator';
 import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
 import { isSafeReturnUrl } from '../../utils/url';
+import { isUnreachableError, isServerError, isTooManyRequestsError } from '../../utils/connectionError';
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
@@ -48,8 +49,21 @@ function createActions(store) {
         // redirect to the page the user asked for, or to the dashboard
         route(state.loginReturnUrl || '/dashboard');
       } catch (e) {
+        // Only a refusal of Gladys is a wrong email or password: a Gladys that does not
+        // answer, that asks to wait or that fails says so, or the user retypes a password
+        // that was right all along
+        let loginStatus = LoginStatus.WrongCredentialsError;
+        if (isUnreachableError(e)) {
+          loginStatus = LoginStatus.NetworkError;
+        } else if (isTooManyRequestsError(e)) {
+          loginStatus = LoginStatus.TooManyRequestsError;
+        } else if (isServerError(e) || !e.response) {
+          // no response and no request either: the page itself failed
+          console.error(e);
+          loginStatus = LoginStatus.UnknownError;
+        }
         store.setState({
-          loginStatus: LoginStatus.WrongCredentialsError
+          loginStatus
         });
       }
     },

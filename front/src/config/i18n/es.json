@@ -226,6 +226,9 @@
     "loginButtonText": "Iniciar sesión",
     "wrongCredentials": "Correo electrónico o contraseña incorrectos.",
     "invalidEmail": "Correo electrónico no válido",
+    "unreachable": "No se puede contactar con Gladys. Comprueba que Gladys está en marcha y que este dispositivo está conectado a la red, y vuelve a intentarlo.",
+    "tooManyRequests": "Demasiados intentos. Espera unos minutos antes de volver a intentarlo.",
+    "serverError": "Gladys ha devuelto un error. Vuelve a intentarlo en un momento.",
     "needHelpText": "¿Necesita ayuda? Únase a nosotros en <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "mobile": {
       "navBack": "Acceso"
@@ -7961,6 +7964,11 @@
     "clockNoticeText": "Las escenas programadas, el historial y la energía pueden ser incorrectos.",
     "clockNoticeButton": "Comprobar el reloj",
     "clockNoticeContactAdmin": "Avisa al administrador de tu casa.",
+    "connectionNoticeTitle": "No se puede contactar con Gladys",
+    "connectionNoticeText": "Lo que se muestra puede no estar actualizado.",
+    "connectionNoticeRetry": "Reintentar",
+    "connectionNoticeChecking": "Comprobando…",
+    "connectionNoticeStillUnreachable": "Gladys sigue sin responder.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Inicio",
     "chat": "Chat",

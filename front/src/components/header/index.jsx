@@ -15,7 +15,7 @@ import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/inst
 import sidebarActions from '../../actions/sidebar';
 import style from './style.css';
 
-const PAGES_WITHOUT_HEADER = [
+export const PAGES_WITHOUT_HEADER = [
   '/login',
   '/signup',
   '/signup/create-account-local',

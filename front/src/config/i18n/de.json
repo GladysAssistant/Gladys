@@ -226,6 +226,9 @@
     "loginButtonText": "Einloggen",
     "wrongCredentials": "Die Kombination aus E-Mail-Adresse und Passwort ist falsch.",
     "invalidEmail": "Die E-Mail-Adresse ist ungültig",
+    "unreachable": "Gladys ist nicht erreichbar. Prüfe, ob Gladys läuft und dieses Gerät mit dem Netzwerk verbunden ist, und versuche es dann erneut.",
+    "tooManyRequests": "Zu viele Versuche. Warte ein paar Minuten, bevor du es erneut versuchst.",
+    "serverError": "Gladys hat einen Fehler gemeldet. Versuche es gleich noch einmal.",
     "needHelpText": "Brauchst du Hilfe? Tritt unserer <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys-Community</a> (Englisch) bei.",
     "mobile": {
       "navBack": "Anmeldung"
@@ -7961,6 +7964,11 @@
     "clockNoticeText": "Geplante Szenen, Verlauf und Energie können falsch sein.",
     "clockNoticeButton": "Uhr prüfen",
     "clockNoticeContactAdmin": "Bitte informiere den Administrator deines Hauses.",
+    "connectionNoticeTitle": "Gladys ist nicht erreichbar",
+    "connectionNoticeText": "Die Anzeige ist möglicherweise nicht mehr aktuell.",
+    "connectionNoticeRetry": "Erneut versuchen",
+    "connectionNoticeChecking": "Wird geprüft…",
+    "connectionNoticeStillUnreachable": "Gladys antwortet immer noch nicht.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Startseite",
     "chat": "Chat",

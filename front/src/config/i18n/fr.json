@@ -226,6 +226,9 @@
     "loginButtonText": "Connexion",
     "wrongCredentials": "Adresse e-mail ou mot de passe invalide",
     "invalidEmail": "E-mail invalide",
+    "unreachable": "Gladys est injoignable. Vérifiez que le serveur Gladys est bien démarré et que cet appareil est connecté au réseau, puis réessayez.",
+    "tooManyRequests": "Trop de tentatives. Patientez quelques minutes avant de réessayer.",
+    "serverError": "Gladys a rencontré une erreur. Réessayez dans un instant.",
     "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "mobile": {
       "navBack": "Connexion"
@@ -7961,6 +7964,11 @@
     "clockNoticeText": "Les scènes planifiées, l'historique et l'énergie peuvent être faux.",
     "clockNoticeButton": "Vérifier l'horloge",
     "clockNoticeContactAdmin": "Prévenez l'administrateur de votre maison.",
+    "connectionNoticeTitle": "Gladys est injoignable",
+    "connectionNoticeText": "Ce qui est affiché n'est peut-être plus à jour.",
+    "connectionNoticeRetry": "Réessayer",
+    "connectionNoticeChecking": "Vérification…",
+    "connectionNoticeStillUnreachable": "Gladys ne répond toujours pas.",
     "gladysAssistant": "Gladys Assistant",
     "home": "Accueil",
     "chat": "Discussion",

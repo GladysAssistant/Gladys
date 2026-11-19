@@ -48,6 +48,10 @@ drawing a zone, setting up an energy contract.
   control (C.4).
 - **Feedback where the thumb is.** A successful action shows a toast; an error shows in the
   bottom bar or in the sheet the user is in, never only at the top of the page.
+- **A Gladys that is unreachable is said once, by the shell.** The "Gladys is unreachable"
+  notice floats under the app's top bar on every signed-in page, and under an open navigation
+  drawer (`components/header/ConnectionLostNotice.jsx`; its behavior is specified with the app
+  navigation, `../dashboard-flexible-layout-and-widgets.md`, H2). A page does not build its own.
 
 ## C. The kit (`front/src/components/mobile/`)
 

@@ -7,6 +7,7 @@ import get from 'get-value';
 import config from '../config';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../server/utils/constants';
 import { isUrlInArray } from '../utils/url';
+import { isUnreachableError, isServerError } from '../utils/connectionError';
 import {
   isInstanceBehindFront,
   isInstanceVersionCheckSettled,
@@ -27,6 +28,9 @@ const INSTANCE_VERSION_REFRESH_INTERVAL_MS = 60 * 1000;
 // A server clock does not drift in minutes: re-checking it at most every 5
 // minutes (on tab focus, while the notice is displayed) is plenty.
 const CLOCK_OFFSET_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+
+// How long signing out waits for Gladys to revoke the session before going on without it
+const LOGOUT_REVOKE_TIMEOUT_MS = 5 * 1000;
 
 let lastGatewayTrialRefresh = 0;
 let lastInstanceVersionRefresh = 0;
@@ -129,7 +133,10 @@ function createActions(store) {
         ];
         const [user] = await Promise.all(tasks);
         store.setState({
-          user
+          user,
+          // Gladys answered: a previous check that got no answer no longer holds (the
+          // check is run again when the connection comes back, see ConnectionLostNotice)
+          gladysUnreachable: false
         });
         // the "integrations to update" counter is displayed in the header, on
         // every page: it is loaded once the user (and their role) is known,
@@ -177,6 +184,15 @@ function createActions(store) {
           route('/link-gateway-user');
         } else {
           console.error(e);
+          // Gladys did not answer (stopped, restarting, network down) or answered with an
+          // error of its own: the page is left with whatever it could not load, so the
+          // shell says why (components/header/ConnectionLostNotice.jsx). Only for the
+          // session this check was started for: a logout in the meantime owns the state.
+          if ((isUnreachableError(e) || isServerError(e)) && store.getState().session === state.session) {
+            store.setState({
+              gladysUnreachable: true
+            });
+          }
         }
       }
     },
@@ -361,7 +377,18 @@ function createActions(store) {
       e.preventDefault();
       const user = state.session.getUser();
       if (user && user.session_id) {
-        await state.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
+        // Signing out must always sign out: when the session cannot be revoked (Gladys is
+        // unreachable, the session is already gone), this device still forgets it, and it
+        // does not wait for a request that may never be answered. A session left on the
+        // server expires by itself, and can be revoked from the sessions page.
+        const revoke = async () => {
+          try {
+            await state.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
+          } catch (err) {
+            console.error(err);
+          }
+        };
+        await Promise.race([revoke(), new Promise(resolve => setTimeout(resolve, LOGOUT_REVOKE_TIMEOUT_MS))]);
       }
       state.session.reset();
       // a pending "integrations to update" request must not write the count of

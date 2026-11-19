@@ -11,7 +11,9 @@ export const LoginStatus = {
   WrongTwoFactorCodeError: 'WrongTwoFactorCodeError',
   WrongRecoveryCodeError: 'WrongRecoveryCodeError',
   LoginSuccess: 'LoginSuccess',
-  UnknownError: 'UnknownError'
+  UnknownError: 'UnknownError',
+  NetworkError: 'NetworkError',
+  TooManyRequestsError: 'TooManyRequestsError'
 };
 
 export const CreateUserErrors = {

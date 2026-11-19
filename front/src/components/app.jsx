@@ -14,6 +14,7 @@ import { catalogCategories } from '../config/integrations';
 import { getDefaultState } from '../utils/getDefaultState';
 
 import Header from './header';
+import ConnectionLostNotice from './header/ConnectionLostNotice';
 import Layout from './layout';
 import Redirect from './router/Redirect';
 import Login from '../routes/login';
@@ -220,7 +221,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset,httpClient,gladysUnreachable',
   actions
 )(props => (
   <div id="app">
@@ -253,6 +254,15 @@ const AppRouter = connect(
       refreshInstanceVersionState={props.refreshInstanceVersionState}
       clockOffset={props.clockOffset}
       refreshClockOffsetState={props.refreshClockOffsetState}
+    />
+    {/* Outside the Header: that one renders nothing on a full-screen dashboard,
+        where a wall tablet most needs to be told that Gladys is unreachable. */}
+    <ConnectionLostNotice
+      currentUrl={props.currentUrl}
+      session={props.session}
+      httpClient={props.httpClient}
+      gladysUnreachable={props.gladysUnreachable}
+      checkSession={props.checkSession}
     />
     <Layout currentUrl={props.currentUrl}>
       <Router onChange={props.handleRoute}>

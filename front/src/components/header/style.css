@@ -238,6 +238,109 @@
   opacity: 1;
 }
 
+/* Gladys unreachable (see ConnectionLostNotice): same red as the suspended
+   subscription — the app is not doing its job until this is over — but the one
+   notice that cannot live in the rail. It floats above every signed-in page,
+   the full-screen dashboard included, over an opaque surface since anything
+   may scroll under it. Above the modals and the toast of the phone kit
+   (1200): nothing they offer will work either. */
+.connectionNotice {
+  position: fixed;
+  top: calc(0.75rem + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1250;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: max-content;
+  max-width: min(30rem, calc(100vw - 1.5rem));
+  padding: 0.5rem 0.5rem 0.5rem 0.8rem;
+  border-radius: 14px;
+  background-color: #fdeeed;
+  border: 1px solid rgba(205, 32, 31, 0.22);
+  box-shadow: 0 10px 30px rgba(16, 22, 38, 0.18);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: #1c2334;
+  animation: connectionNoticeIn 0.22s ease-out;
+}
+
+.connectionNoticeIcon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  color: #c0392b;
+}
+
+.connectionNoticeBody {
+  min-width: 0;
+}
+
+.connectionNoticeTitle {
+  font-weight: 600;
+}
+
+.connectionNoticeText {
+  color: rgba(28, 35, 52, 0.72);
+}
+
+.connectionNoticeButton {
+  flex-shrink: 0;
+  min-height: 2rem;
+  padding: 0 0.8rem;
+  border: 1px solid rgba(28, 35, 52, 0.14);
+  border-radius: 999px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.connectionNoticeButton:hover:not(:disabled) {
+  background-color: #f4f6fb;
+}
+
+.connectionNoticeButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@keyframes connectionNoticeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Below the top bar of the phone layout (3.25rem): the burger and the bars of
+   a page stay reachable, the notice only covers the top of the content. And
+   under the navigation drawer and its backdrop (1050): an open drawer covers
+   the notice, which would otherwise sit on its first links for as long as
+   Gladys is away. */
+@media (max-width: 991.98px) {
+  .connectionNotice {
+    top: calc(3.75rem + env(safe-area-inset-top, 0px));
+    z-index: 1045;
+  }
+}
+
+@media (pointer: coarse) {
+  .connectionNoticeButton {
+    min-height: 2.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connectionNotice {
+    animation: none;
+  }
+}
+
 /* Footer: profile row opening a dropup menu, dark-mode toggle beside it */
 .sidebarFooter {
   position: relative;
@@ -574,6 +677,7 @@
    like their labels (same exception the glass theme carries). */
 :global(.dark-mode) .sidebar :global(.fe),
 :global(.dark-mode) .mobileTopBar :global(.fe),
-:global(.dark-mode) .expandButton :global(.fe) {
+:global(.dark-mode) .expandButton :global(.fe),
+:global(.dark-mode) .connectionNotice :global(.fe) {
   filter: none;
 }
