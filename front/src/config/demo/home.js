@@ -33,7 +33,10 @@ import { translate } from './i18n';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS
+  DEVICE_FEATURE_UNITS,
+  VACUUM_CLEANER_CLEAN_MODE,
+  VACUUM_CLEANER_MODE,
+  VACUUM_CLEANER_STATE
 } from '../../../../server/utils/constants';
 
 /**
@@ -226,6 +229,73 @@ const ROOMS = [
           motion('Motion', 'living-room-motion', 1, { updated: 1 }),
           lightSensor('Luminosity', 'living-room-luminosity', 312, { updated: 3 }),
           battery('Battery', 'living-room-sensor-battery', 87, { updated: 240 })
+        ]
+      },
+      {
+        // Cleaning while the demo is visited: its row in the devices widget shows a live state, and
+        // its panel the start / stop and dock buttons next to its clean mode and maintenance.
+        name: 'Robot vacuum',
+        selector: 'living-room-robot-vacuum',
+        model: 'Matter Robotic Vacuum Cleaner',
+        service: MATTER,
+        features: [
+          feature({
+            name: 'State',
+            selector: 'living-room-robot-vacuum-state',
+            category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+            type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE,
+            min: VACUUM_CLEANER_STATE.STOPPED,
+            max: VACUUM_CLEANER_STATE.DOCKED,
+            read_only: true,
+            keep_history: false,
+            last_value: VACUUM_CLEANER_STATE.RUNNING,
+            updated: 12
+          }),
+          feature({
+            name: 'Run mode',
+            selector: 'living-room-robot-vacuum-run-mode',
+            category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+            type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE,
+            min: VACUUM_CLEANER_MODE.IDLE,
+            max: VACUUM_CLEANER_MODE.MAPPING,
+            keep_history: false,
+            last_value: VACUUM_CLEANER_MODE.CLEANING,
+            updated: 12
+          }),
+          feature({
+            name: 'Return to dock',
+            selector: 'living-room-robot-vacuum-dock',
+            category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+            type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+            min: 0,
+            max: 1,
+            keep_history: false,
+            has_feedback: false,
+            last_value: 0,
+            updated: 12
+          }),
+          feature({
+            name: 'Clean mode',
+            selector: 'living-room-robot-vacuum-clean-mode',
+            category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+            type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE,
+            min: VACUUM_CLEANER_CLEAN_MODE.AUTO,
+            max: VACUUM_CLEANER_CLEAN_MODE.MOP,
+            keep_history: false,
+            last_value: VACUUM_CLEANER_CLEAN_MODE.AUTO,
+            updated: 600
+          }),
+          battery('Battery', 'living-room-robot-vacuum-battery', 72, { updated: 2 }),
+          feature({
+            name: 'Main brush',
+            selector: 'living-room-robot-vacuum-main-brush',
+            category: DEVICE_FEATURE_CATEGORIES.MAINTENANCE,
+            type: DEVICE_FEATURE_TYPES.MAINTENANCE.LIFE_REMAINING,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            read_only: true,
+            last_value: 64,
+            updated: 600
+          })
         ]
       }
     ]

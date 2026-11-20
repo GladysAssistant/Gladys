@@ -1,0 +1,79 @@
+/* Robot vacuums in the devices widget: one row per robot, and a panel holding its everyday buttons
+   and every other feature the widget shows for it. The row and the sheet borrow the chrome of the
+   light row and panel (light/style.css); only what is specific to a robot lives here.
+   Authored light only, like the whole Horizon theme — dark mode comes from the global inversion
+   filter (style/dark-mode.css), except the state color, inverted back at the bottom of this file. */
+
+/* The start / stop button of a robot that cleans: a quiet pressed look, the icon (stop) saying the
+   rest. A neutral tint, so the global inversion of dark mode keeps it neutral too. */
+.rowButtonActive,
+.actionActive {
+  background-color: rgba(28, 35, 52, 0.16);
+}
+
+/* ============================================================
+   The head of the panel: state and battery
+   ============================================================ */
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.75rem 0 1rem;
+}
+
+.statusIcon {
+  font-size: 2.25rem;
+  color: rgba(28, 35, 52, 0.4);
+}
+
+.statusBattery {
+  display: flex;
+  flex-direction: column;
+}
+
+.statusValue {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.statusLabel {
+  margin-top: 0.2rem;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+/* ============================================================
+   The everyday buttons, then the other features of the robot
+   ============================================================ */
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.5rem;
+}
+
+/* The regular rows of the devices widget, inside the sheet. The Horizon restyle applies through the
+   glass-theme gate the sheet carries; its rows take here the quiet tint of the sheet's own buttons
+   instead of the nested-card surface — inverted by dark mode, that surface read as black pills on
+   the sheet — and line up with the buttons above. Three classes, to out-weigh the two of the
+   restyle (routes/dashboard/style.css) whatever the order the two files load in. */
+:global(.glass-theme) .features:global(.device-widget-table) {
+  --gl-card-nested-bg: rgba(28, 35, 52, 0.05);
+  --gl-border: transparent;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+/* ============================================================
+   Dark mode: the app inverts globally, so the state color of the robot is inverted back —
+   otherwise a robot in error would turn cyan and a cleaning one purple.
+   ============================================================ */
+
+/* It has to out-weigh `.dark-mode .glass-theme .fe { filter: none }`, like the light icon. Only set
+   when the state calls for a color. */
+:global(.dark-mode) .rowStateIcon {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
