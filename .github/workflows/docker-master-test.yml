@@ -12,11 +12,11 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -47,11 +47,11 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -65,7 +65,7 @@ jobs:
         run: |
           npm run build
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: static
           path: front/build
@@ -78,11 +78,11 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'
@@ -116,12 +116,12 @@ jobs:
       contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 2
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'
@@ -142,7 +142,7 @@ jobs:
         run: |
           npm run coverage
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           fail_ci_if_error: true
           token: 08cd0d46-0291-42ed-b352-50924cb6cca6
