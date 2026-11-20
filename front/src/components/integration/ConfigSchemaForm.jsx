@@ -10,6 +10,7 @@ import {
 import { RequestStatus } from '../../utils/consts';
 import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../utils/oauth';
 import { ACCOUNT_FIELD_TYPES } from '../../../../server/lib/external-integration/constants';
+import { getVisibleFields } from '../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import integrationText from '../../routes/integration/all/external-integration/integrationText.css';
 
 // The form engine of the manifest `config_schema` grammar, shared by the
@@ -393,7 +394,11 @@ const ConfigSchemaForm = ({
 }) => {
   // sections are presentational and the account fields have their own Connect
   // button: a schema made only of those has nothing to save, hide the save button
-  const hasSavableField = schema.some(field => field.type !== 'section' && !ACCOUNT_FIELD_TYPES.includes(field.type));
+  // a field hidden by its visible_if condition is neither rendered nor saved
+  const visibleSchema = getVisibleFields(schema, values);
+  const hasSavableField = visibleSchema.some(
+    field => field.type !== 'section' && !ACCOUNT_FIELD_TYPES.includes(field.type)
+  );
   return (
     <form onSubmit={saveConfig}>
       {saveConfigStatus === RequestStatus.Success && (
@@ -406,7 +411,7 @@ const ConfigSchemaForm = ({
           <Text id="integration.externalIntegration.config.saveError" />
         </div>
       )}
-      {schema.map(field => (
+      {visibleSchema.map(field => (
         <ConfigField
           key={field.key}
           field={field}

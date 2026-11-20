@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { ConfigField } from '../../../../../components/integration/ConfigSchemaForm';
+import { getVisibleFields } from '../../../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import { RequestStatus } from '../../../../../utils/consts';
 
 // Send-only notification channels (messaging.receive false): no inbound
@@ -47,7 +48,7 @@ const ContactProfileCard = ({
           </div>
         )}
         <form onSubmit={onSave}>
-          {contactSchema.map(field => (
+          {getVisibleFields(contactSchema, values || {}).map(field => (
             <ConfigField
               key={field.key}
               field={field}

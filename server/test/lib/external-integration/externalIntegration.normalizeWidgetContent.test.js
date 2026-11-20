@@ -544,6 +544,25 @@ describe('externalIntegration.normalizeWidgetContent', () => {
         expect(warned('fields[0].source: not allowed')).to.equal(true);
         expect(warned('fields[0].default: must be at most 1000 characters')).to.equal(true);
       });
+
+      it('should keep a valid visible_if and drop the button on a malformed one', () => {
+        const warn = sinon.stub(logger, 'warn');
+        const paid = { key: 'paid', type: 'boolean', label: { en: 'Paid' } };
+        const note = (visibleIf) => ({ key: 'note', type: 'string', label: { en: 'Note' }, visible_if: visibleIf });
+        const valid = [paid, note({ field: 'paid', in: [true] })];
+        expect(normalize([withFields(valid)])[0].action.fields).to.deep.equal(valid);
+        expect(
+          normalize([
+            withFields([paid, note({ field: 'paid', in: 'true' })]),
+            withFields([paid, note('paid')]),
+            withFields([note({ field: 'paid', in: [true] }), paid]),
+          ]),
+        ).to.deep.equal([]);
+        const warned = (text) => warn.getCalls().some((call) => call.args[0].includes(text));
+        expect(warned('fields[1].visible_if.in: must be a non-empty list of values')).to.equal(true);
+        expect(warned('fields[1].visible_if: must be an object { field, in }')).to.equal(true);
+        expect(warned('fields[0].visible_if.field: must be the key of an earlier field')).to.equal(true);
+      });
     });
   });
 

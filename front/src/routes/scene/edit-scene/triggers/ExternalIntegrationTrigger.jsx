@@ -4,6 +4,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { ConfigField } from '../../../../components/integration/ConfigSchemaForm';
+import { getVisibleFields } from '../../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import { hasDynamicSource, fetchDynamicOptions } from '../../../../components/integration/dynamicOptions';
 import ExternalIntegrationDeclarationState from '../ExternalIntegrationDeclarationState';
 import { getLocalizedText } from '../../../../utils/getLocalizedText';
@@ -122,7 +123,7 @@ class ExternalIntegrationTrigger extends Component {
             <p class="text-muted small">
               <Text id="editScene.externalIntegration.wildcardHint" />
             </p>
-            {fields.map(field => (
+            {getVisibleFields(fields, props.trigger.fields || {}).map(field => (
               <ConfigField
                 key={field.key}
                 field={field}

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 
+import { getVisibleFields } from '../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import { getLocalizedText } from '../../../routes/integration/all/external-integration/utils';
 
 dayjs.extend(localizedFormat);
@@ -107,9 +108,10 @@ export const getUrlDomain = url => (url || '').split('/')[2] || '';
 
 // The values of a widget action form as the core validates them (spec
 // section 7): a number typed as text becomes a number, an empty input is not
-// sent at all — the declared default or the required check applies core-side
+// sent at all — the declared default or the required check applies core-side.
+// A field hidden by its visible_if condition is not sent either.
 export const toActionValues = (fields, rawValues) =>
-  fields.reduce((values, field) => {
+  getVisibleFields(fields, rawValues).reduce((values, field) => {
     const value = rawValues[field.key];
     if (field.type === 'boolean') {
       values[field.key] = !!value;
