@@ -248,10 +248,13 @@ const triggersFunc = {
   [EVENTS.ALARM.PANIC]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.SYSTEM.START]: () => true,
-  // the trigger topic is subscribed as a filter, so it can contain "+" and "#" wildcards
+  // the trigger topic is subscribed as a filter, so it can contain "+" and "#" wildcards.
+  // An event coming from a subscription names its filter (topic_filter): only the
+  // triggers on that filter match, so overlapping filters do not run a scene twice.
   [EVENTS.MQTT.RECEIVED]: (self, sceneSelector, event, trigger) =>
     typeof event.topic === 'string' &&
     typeof trigger.topic === 'string' &&
+    (event.topic_filter === undefined || event.topic_filter === trigger.topic) &&
     mqttTopicMatches(trigger.topic, event.topic) &&
     (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,

@@ -241,11 +241,16 @@ async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
         const mqttService = this.service.getService('mqtt');
 
         if (mqttService) {
+          // The MQTT service calls every subscription whose filter matches the
+          // received topic: with overlapping filters ("test/+/button" and
+          // "test/#"), one message calls several callbacks. Each check names the
+          // filter it comes from, so only the triggers on that filter run.
           trigger.mqttCallback = (topic, message) => {
             this.event.emit(EVENTS.TRIGGERS.CHECK, {
               type: EVENTS.MQTT.RECEIVED,
               topic,
               message,
+              topic_filter: trigger.topic,
             });
           };
 

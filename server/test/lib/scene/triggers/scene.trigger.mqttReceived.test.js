@@ -5,6 +5,7 @@ const { assert, fake } = sinon;
 const EventEmitter = require('events');
 const StateManager = require('../../../../lib/state');
 const SceneManager = require('../../../../lib/scene');
+const MqttHandler = require('../../../../services/mqtt/lib');
 const { ACTIONS, EVENTS } = require('../../../../utils/constants');
 
 const event = new EventEmitter();
@@ -253,5 +254,62 @@ describe('Scene.triggers.mqttReceived', () => {
       message: 'ON',
     });
     return checkSceneExecuted(0);
+  });
+
+  it('should not execute scene when the event comes from the subscription of another filter', async () => {
+    await addSceneWithTopic('test/+/button');
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'test/kitchen/button',
+      message: 'pressed',
+      topic_filter: 'test/#',
+    });
+    return checkSceneExecuted(0);
+  });
+
+  it('should execute each scene once when a message matches overlapping subscriptions', async () => {
+    // A real MQTT handler and its own event bus, so that the message goes through
+    // handleNewMessage, which calls every subscription matching the topic.
+    const mqttEvent = new EventEmitter();
+    const mqttHandler = new MqttHandler({ event: mqttEvent }, null, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+    const mqttSceneManager = new SceneManager(
+      new StateManager(),
+      mqttEvent,
+      device,
+      {},
+      {},
+      { get: fake.resolves([]) },
+      {},
+      {},
+      {},
+      { scheduleJob: () => ({ cancel: () => {} }) },
+      brain,
+      { getService: () => ({ device: mqttHandler }) },
+    );
+    const addMqttScene = (selector, topic) =>
+      mqttSceneManager.addScene({
+        selector,
+        active: true,
+        actions: [[{ type: ACTIONS.LIGHT.TURN_OFF, devices: ['light-1'] }]],
+        triggers: [{ type: EVENTS.MQTT.RECEIVED, topic }],
+      });
+    await addMqttScene('scene-plus', 'test/+/button');
+    await addMqttScene('scene-plus-same-filter', 'test/+/button');
+    await addMqttScene('scene-hash', 'test/#');
+    await addMqttScene('scene-other', 'other/topic');
+
+    mqttHandler.handleNewMessage('test/kitchen/button', 'pressed');
+
+    return new Promise((resolve, reject) => {
+      mqttSceneManager.queue.start(() => {
+        try {
+          // 3 matching scenes, each run once (6 runs if each subscription checked every scene)
+          assert.callCount(device.setValue, 3);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
   });
 });
