@@ -12,6 +12,7 @@ import {
   formatNumber,
   formatDate,
   getUrlDomain,
+  escapeHtml,
   CHART_INTERVAL_MINUTES,
   findRefusedField
 } from './widgetContentUtils';
@@ -467,7 +468,7 @@ export class WidgetChart extends Component {
     const generation = this.seriesGeneration;
     if (component.series) {
       const series = component.series.map((oneSeries, index) => ({
-        name: text(oneSeries.name, language) || `${index + 1}`,
+        name: escapeHtml(text(oneSeries.name, language) || `${index + 1}`),
         data: oneSeries.points.map(point => [new Date(point.t).getTime(), point.v])
       }));
       this.setSeries(series, seriesTimeRange(series).minutes);
@@ -490,11 +491,12 @@ export class WidgetChart extends Component {
       const seriesNames = component.series_names || [];
       this.setSeries(
         data.map((oneFeature, index) => ({
-          name:
+          name: escapeHtml(
             text(seriesNames[index], language) ||
-            get(oneFeature, 'deviceFeature.name') ||
-            deviceNamesBySelector[component.device_feature_selectors[index]] ||
-            `${index + 1}`,
+              get(oneFeature, 'deviceFeature.name') ||
+              deviceNamesBySelector[component.device_feature_selectors[index]] ||
+              `${index + 1}`
+          ),
           data: (oneFeature.values || []).map(point => [new Date(point.created_at).getTime(), point.value])
         })),
         interval

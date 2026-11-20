@@ -178,6 +178,73 @@ describe('Dashboard integration widget box', () => {
     });
   });
 
+  it('shows markup in series names as plain text, on both chart forms', () => {
+    const keys = [WIDGET_KEY, 'inline_chart'];
+    cy.intercept(
+      'GET',
+      '**/api/v1/external_integration/widget',
+      keys.map(key => ({ ...buildWidget('RUNNING'), key }))
+    );
+    cy.intercept('GET', CONTENT_URL, {
+      ...CONTENT,
+      content: {
+        version: 1,
+        components: [
+          {
+            type: 'chart',
+            device_features: ['ext:room', 'ext:target'],
+            device_feature_selectors: ['widget-room', 'widget-target'],
+            interval: 'last-day',
+            series_names: ['<b>Room</b>', 'Setpoint & co']
+          }
+        ]
+      }
+    });
+    const now = Date.now();
+    const points = [
+      { t: new Date(now - 60 * 60 * 1000).toISOString(), v: 1 },
+      { t: new Date(now).toISOString(), v: 2 }
+    ];
+    cy.intercept('GET', `**/api/v1/external_integration/${SELECTOR}/widget/inline_chart/content*`, {
+      ...CONTENT,
+      content: {
+        version: 1,
+        components: [
+          {
+            type: 'chart',
+            series: [
+              { name: '<img src=x>', points },
+              { name: 'Plain', points }
+            ]
+          }
+        ]
+      }
+    });
+    cy.intercept('GET', '**/api/v1/device?device_feature_selectors=*', [
+      { name: 'Living room', features: [{ selector: 'widget-room' }, { selector: 'widget-target' }] }
+    ]);
+    const values = points.map(point => ({ created_at: point.t, value: point.v }));
+    cy.intercept('GET', '**/api/v1/device_feature/aggregated_states*', [
+      { deviceFeature: { name: 'Room temperature' }, values },
+      { deviceFeature: { name: 'Temperature' }, values }
+    ]).as('getStates');
+    createDashboard(keys.map(widget => ({ type: 'external-widget', integration: SELECTOR, widget }))).then(selector => {
+      dashboardSelector = selector;
+      cy.visit(`/dashboard/${selector}`);
+    });
+    cy.wait('@getStates');
+    cy.get('[data-cy="external-widget-box"] .apexcharts-legend-text').should($texts => {
+      expect($texts.toArray().map(element => element.textContent)).to.have.members([
+        '<b>Room</b>',
+        'Setpoint & co',
+        '<img src=x>',
+        'Plain'
+      ]);
+      // shown as text, never parsed into elements
+      expect($texts.find('b, img')).to.have.length(0);
+    });
+  });
+
   it('keeps danger and active button icons in their semantic colors in light and dark mode', () => {
     const components = [
       ...CONTENT.content.components.filter(component => component.type === 'button'),
