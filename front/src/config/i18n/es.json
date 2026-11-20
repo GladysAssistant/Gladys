@@ -1066,6 +1066,7 @@
         "modeCooling": "Modo refrigeración",
         "modeOff": "Modo apagado",
         "noConfig": "Configura el widget haciendo clic en el botón de edición.",
+        "missing": "Este termostato ya no existe. Edita este widget para seleccionar un termostato.",
         "manualMode": "Modo manual",
         "scheduleLabel": "Programación:",
         "scheduleUntil": "hasta",

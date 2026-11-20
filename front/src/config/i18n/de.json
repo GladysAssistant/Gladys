@@ -912,6 +912,7 @@
         "modeCooling": "Kühlmodus",
         "modeOff": "Aus-Modus",
         "noConfig": "Bitte konfiguriere das Widget über den Bearbeiten-Button.",
+        "missing": "Dieses Thermostat existiert nicht mehr. Bearbeite dieses Widget, um ein Thermostat auszuwählen.",
         "manualMode": "Manueller Modus",
         "scheduleLabel": "Zeitplan:",
         "scheduleUntil": "bis",

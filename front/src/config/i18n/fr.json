@@ -912,6 +912,7 @@
         "modeCooling": "Mode Climatisation",
         "modeOff": "Mode Arrêt",
         "noConfig": "Veuillez configurer le widget en cliquant sur le bouton d'édition.",
+        "missing": "Ce thermostat n'existe plus. Éditez ce widget pour sélectionner un thermostat.",
         "manualMode": "Mode manuel",
         "scheduleLabel": "Planning :",
         "scheduleUntil": "jusqu'à",

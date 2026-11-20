@@ -107,6 +107,9 @@ const numOr = (value, fallback) => {
 };
 
 class ThermostatBox extends Component {
+  // Config loads started so far: only the latest is committed (see loadConfig).
+  configLoads = 0;
+
   state = {
     setpoint: null,
     currentTemp: null,
@@ -115,6 +118,8 @@ class ThermostatBox extends Component {
     isManualMode: false,
     error: false,
     noConfig: false,
+    // The thermostat the box points to was deleted (see loadConfig).
+    missing: false,
     remoteConfig: null,
     featureMin: null,
     featureMax: null,
@@ -364,10 +369,28 @@ class ThermostatBox extends Component {
   };
 
   loadConfig = async () => {
+    // Only the latest load is committed. Loads overlap — a config update while
+    // the card loads, another thermostat picked in the editor — and the answers
+    // come back in any order: an older one would overwrite the newer, bring a
+    // deleted thermostat's controls back, or flag a new pick as deleted.
+    this.configLoads += 1;
+    const load = this.configLoads;
     const remoteConfig = await loadDeviceConfig(this.props.httpClient, this.props.box.thermostat_feature);
-    if (!remoteConfig) {
+    if (load !== this.configLoads) {
       return null;
     }
+    if (!remoteConfig) {
+      // No thermostat picked: the card asks for one (noConfig), not for another.
+      this.setState({ missing: false });
+      return null;
+    }
+    // A thermostat deleted since the box was set: nothing to draw nor to drive.
+    // Read on every load, not only the first: a config update reloads an open
+    // card, and it fell back on the default settings and drew a comfort
+    // setpoint for a device that no longer exists. A failed request proves
+    // nothing either way, so a deletion already seen stands until a load finds
+    // the thermostat.
+    const missing = Boolean(remoteConfig.missing || (remoteConfig.failed && this.state.missing));
     await new Promise(resolve =>
       this.setState(prev => {
         // The device carries the mode this card wrote: nothing is pending any more.
@@ -376,7 +399,8 @@ class ThermostatBox extends Component {
           remoteConfig.mode !== null &&
           remoteConfig.mode !== undefined &&
           Number(remoteConfig.mode) === prev.pendingMode;
-        return confirmed ? { remoteConfig, pendingMode: null } : { remoteConfig };
+        const update = missing ? { remoteConfig, missing, setpoint: null } : { remoteConfig, missing };
+        return confirmed ? { ...update, pendingMode: null } : update;
       }, resolve)
     );
     return remoteConfig;
@@ -866,7 +890,8 @@ class ThermostatBox extends Component {
   // that could disagree with the device the regulation loop actually reads.
   handleThermostatConfigUpdated = async () => {
     if (!this.props.box.thermostat_feature) return;
-    await this.loadConfig();
+    const remoteConfig = await this.loadConfig();
+    if (!remoteConfig || this.state.missing) return;
     // The schedule before the state that reads it: a thermostat following its
     // programme takes its preset from the point in force.
     await this.loadSchedule();
@@ -1005,7 +1030,8 @@ class ThermostatBox extends Component {
     // The schedule first: a thermostat following it takes its preset from the
     // point in force, which loadMode reads out of it.
     await this.loadSchedule();
-    await this.loadConfig();
+    const remoteConfig = await this.loadConfig();
+    if (!remoteConfig || this.state.missing) return;
     const { activePreset, isManualMode } = this.loadMode();
     this.setState({ activePreset, isManualMode });
   };
@@ -1243,7 +1269,13 @@ class ThermostatBox extends Component {
   };
 
   initData = async () => {
+    const thermostatFeature = this.props.box.thermostat_feature;
     await this.loadConfig();
+    // A later pick runs its own initData; a deleted thermostat has nothing more
+    // to load (see loadConfig).
+    if (this.props.box.thermostat_feature !== thermostatFeature || this.state.missing) {
+      return;
+    }
     // The schedule before the state that reads it: a thermostat following its
     // programme takes its preset from the point in force, and the banner needs
     // the schedule to exist at all.
@@ -1333,9 +1365,9 @@ class ThermostatBox extends Component {
   // purely local, nothing is written to the device, so the widget stays a
   // proposal until the user turns the dial or picks a preset.
   applyFallbackSetpoint = () => {
-    const { setpoint, noConfig, error } = this.state;
+    const { setpoint, noConfig, error, missing } = this.state;
     if (setpoint !== null && setpoint !== undefined) return;
-    if (noConfig || error || !this.props.box.thermostat_feature) return;
+    if (noConfig || error || missing || !this.props.box.thermostat_feature) return;
     const cfg = this.getConfig();
     const comfort = numOr(cfg.preset_comfort, defaultPresetTemps(cfg.default_mode).comfort);
     // The comfort preset can sit outside the device's own range, which would
@@ -1735,6 +1767,7 @@ class ThermostatBox extends Component {
       activePreset,
       error,
       noConfig,
+      missing,
       isManualMode,
       manualUntil,
       manualSetpointOverride,
@@ -1914,7 +1947,13 @@ class ThermostatBox extends Component {
               <Text id="dashboard.boxes.thermostat.noConfig" />
             </div>
           )}
-          {!error && !noConfig && setpoint !== null && (
+          {missing && !noConfig && (
+            <div class="alert alert-warning">
+              <i class="fe fe-alert-triangle mr-2" />
+              <Text id="dashboard.boxes.thermostat.missing" />
+            </div>
+          )}
+          {!error && !noConfig && !missing && setpoint !== null && (
             <div>
               <div class="d-flex justify-content-center mb-3">
                 <div ref={el => (this.svgRef = el)} class={style.gaugeContainer}>
