@@ -23,11 +23,6 @@ async function removeOwnContainer(system, descriptor) {
 }
 
 /**
- * @description Disconnect service from dependent containers, see disconnect.
- * @example
- * await disconnectContainers.call(this);
- */
-/**
  * @description Disconnect Gladys from the broker, and stop what follows Zigbee2mqtt: its nightly backup, the watch of
  * its dongle, its health check, the last installation. Shared by disconnect, which then removes the containers, and by
  * stop, which keeps them.

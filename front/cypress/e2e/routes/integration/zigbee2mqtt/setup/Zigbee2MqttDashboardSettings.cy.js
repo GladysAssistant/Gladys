@@ -4,6 +4,7 @@ import {
   zbDongleP,
   ZBDONGLE_P,
   runningInstallation,
+  failedInstallation,
   doneInstallation,
   sendProgress,
   sendStatus,
@@ -15,6 +16,7 @@ import {
   localSetup,
   externalSetup,
   conflict,
+  i18nText,
   visitDashboard,
   answerAction
 } from './dashboardFixtures';
@@ -99,7 +101,9 @@ describe('Zigbee2mqtt dashboard settings', () => {
       cy.wait('@setup');
       cy.get('[data-cy=z2m-dashboard-save-conflict]').should('exist');
 
+      // The port refused is still not saved: left without it
       cy.get('[data-cy=z2m-dashboard-back]').click();
+      cy.get('[data-cy=z2m-dashboard-leave-discard]').click();
       cy.get('[data-cy=z2m-dashboard-change-key]').click();
       cy.get('[data-cy=z2m-wizard-key-one]').should('exist');
       cy.get('[data-cy=z2m-wizard-save-conflict]').should('not.exist');
@@ -210,9 +214,10 @@ describe('Zigbee2mqtt dashboard settings', () => {
 
   describe('external broker', () => {
     it('should show Gladys connected to the broker of a Zigbee2mqtt that runs elsewhere', () => {
-      visitDashboard({ status: { ...notAnsweringStatus, z2mVersion: null, deviceCount: null }, setup: externalSetup });
+      visitDashboard({ status: onlineStatus, setup: externalSetup });
 
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.onlineExternal.title`);
+      cy.get('[data-cy=z2m-dashboard-pair]').should('exist');
       cy.get('[data-cy=z2m-dashboard-key]').should('contain', 'mqtt://192.168.1.10:1883');
       cy.get('[data-cy=z2m-dashboard-change-key]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-tiles] [data-cy=z2m-dashboard-restart]').should('not.exist');
@@ -230,6 +235,64 @@ describe('Zigbee2mqtt dashboard settings', () => {
       cy.get('[data-cy=z2m-dashboard-reset]').i18n(`${T}.advanced.reset.textExternal`);
       cy.get('[data-cy=z2m-reset-button]').click();
       cy.get('[data-cy=z2m-dashboard-confirm-reset]').i18n(`${T}.advanced.reset.confirmExternal`);
+    });
+
+    it('should tell that Zigbee2mqtt does not answer on the broker Gladys is connected to, as the wizard does', () => {
+      visitDashboard({ status: { ...notAnsweringStatus, z2mVersion: null, deviceCount: null }, setup: externalSetup });
+
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.notAnsweringExternal.title`);
+      cy.get('[data-cy=z2m-dashboard-subtitle]').should('contain', 'base_topic');
+      // Nothing would receive a request to permit joining
+      cy.get('[data-cy=z2m-dashboard-pair]').should('not.exist');
+      // Gladys is connected to the broker: it can disconnect
+      cy.get('[data-cy=z2m-dashboard-stop]').i18n(`${T}.actions.disconnect`);
+
+      // Older than the health check: it never answers
+      sendStatus({ ...notAnsweringStatus, z2mVersion: '1.20.0' });
+      cy.get('[data-cy=z2m-dashboard-status]').should(
+        'contain',
+        i18nText('integration.zigbee2mqtt.setup.wizard.progress.zigbee2mqttTooOldTitle', { version: '1.20.0' })
+      );
+
+      sendStatus(onlineStatus);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.onlineExternal.title`);
+    });
+
+    it('should not tell an installation success for a connection to an external broker', () => {
+      visitDashboard({ status: { ...onlineStatus, installation: runningInstallation }, setup: externalSetup });
+      cy.get('[data-cy=z2m-dashboard-progress]').should('exist');
+      sendProgress(doneInstallation);
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.onlineExternal.title`);
+      cy.get('[data-cy=z2m-dashboard-installation-success]').should('not.exist');
+    });
+
+    it('should tell the broker out of reach, with the way to edit the connection and nothing to disconnect', () => {
+      visitDashboard({
+        status: {
+          ...notAnsweringStatus,
+          gladysConnected: false,
+          mqttConnectionError: null,
+          installation: {
+            ...failedInstallation,
+            error: { code: 'BROKER_UNREACHABLE', message: 'connect ECONNREFUSED 192.168.1.10:1883' }
+          }
+        },
+        setup: externalSetup
+      });
+
+      cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.mqttError.title`);
+      // Told by the installation that tried to connect
+      cy.get('[data-cy=z2m-dashboard-mqtt-error]').i18n(
+        'integration.zigbee2mqtt.setup.mqttConnectionErrors.BROKER_UNREACHABLE'
+      );
+      cy.get('[data-cy=z2m-dashboard-stop]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-restart]').should('not.exist');
+
+      cy.get('[data-cy=z2m-dashboard-editConnection]')
+        .i18n('integration.zigbee2mqtt.setup.wizard.failure.changeConnection')
+        .click();
+      cy.get('[data-cy=z2m-dashboard-advanced]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').should('have.value', 'mqtt://192.168.1.10:1883');
     });
 
     it('should tell Gladys disconnected from a Zigbee2mqtt that runs elsewhere, and connect it again', () => {
@@ -264,22 +327,85 @@ describe('Zigbee2mqtt dashboard settings', () => {
         .i18n('integration.zigbee2mqtt.setup.mqttConnectionErrors.unknownErrorPrefix')
         .should('contain', 'client disconnecting');
 
+      // A code without a text of its own: shown as an unknown error, not as an empty alert
+      sendStatus({ ...brokerError, mqttConnectionError: { code: 'ECONNRESET', message: 'read ECONNRESET' } });
+      cy.get('[data-cy=z2m-dashboard-mqtt-error]')
+        .should(
+          'contain',
+          Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.setup.mqttConnectionErrors.unknownErrorPrefix')
+        )
+        .and('contain', 'read ECONNRESET');
+
       sendStatus({ ...notAnsweringStatus, mqttConnectionError: null });
       cy.get('[data-cy=z2m-dashboard-mqtt-error]').should('not.exist');
     });
 
-    it('should save the broker from the advanced settings', () => {
-      visitDashboard({ setup: externalSetup });
+    it('should save the broker from the advanced settings as the wizard saves it', () => {
+      visitDashboard({ setup: { ...externalSetup, Z2M_FRONTEND_URL: 'http://192.168.1.10:8080' } });
       cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
       answerSetup({ body: { ...externalSetup, Z2M_MQTT_URL: 'mqtt://192.168.1.11:1883' } });
 
-      cy.get('[data-cy=z2m-setup-remote-broker-url-field]').clear();
-      cy.get('[data-cy=z2m-setup-remote-broker-url-field]').type('mqtt://192.168.1.11:1883');
-      cy.get('[data-cy=z2m-setup-save]').click();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').should('have.value', 'mqtt://192.168.1.10:1883');
+      cy.get('[data-cy=z2m-dashboard-broker-save]').should('be.disabled');
+      cy.get('[data-cy=z2m-dashboard-broker-cancel]').should('not.exist');
+
+      // Cancel: the fields back to what is saved
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').type('mqtt://typo');
+      cy.get('[data-cy=z2m-dashboard-broker-cancel]').click();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').should('have.value', 'mqtt://192.168.1.10:1883');
+
+      // An anonymous broker: the fields left empty are erased, the URL trimmed
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').type('  mqtt://192.168.1.11:1883  ');
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUsername]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttPassword]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-z2mFrontendUrl]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-save]').click();
       cy.wait('@setup')
         .its('request.body')
-        .should('include', { Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://192.168.1.11:1883' });
+        .should('deep.equal', {
+          Z2M_MQTT_MODE: 'external',
+          Z2M_MQTT_URL: 'mqtt://192.168.1.11:1883',
+          GLADYS_MQTT_USERNAME: null,
+          GLADYS_MQTT_PASSWORD: null,
+          Z2M_FRONTEND_URL: null
+        });
       cy.get('[data-cy=z2m-dashboard-key]').should('contain', 'mqtt://192.168.1.11:1883');
+    });
+
+    it('should ask before leaving the advanced settings with a broker not saved', () => {
+      visitDashboard({ setup: externalSetup });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').type('mqtt://192.168.1.11:1883');
+
+      cy.get('[data-cy=z2m-dashboard-back]').click();
+      cy.get('[data-cy=z2m-dashboard-leave-confirm]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-leave-keep-editing]').click();
+      cy.get('[data-cy=z2m-dashboard-leave-confirm]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUrl]').should('have.value', 'mqtt://192.168.1.11:1883');
+
+      // Saved, then back on the dashboard
+      answerSetup({ body: { ...externalSetup, Z2M_MQTT_URL: 'mqtt://192.168.1.11:1883' } });
+      cy.get('[data-cy=z2m-dashboard-back]').click();
+      cy.get('[data-cy=z2m-dashboard-leave-save]').click();
+      cy.wait('@setup')
+        .its('request.body')
+        .should('include', { Z2M_MQTT_URL: 'mqtt://192.168.1.11:1883', GLADYS_MQTT_USERNAME: 'gladys' });
+      cy.get('[data-cy=z2m-dashboard]').should('exist');
+    });
+
+    it('should leave the advanced settings without saving once asked', () => {
+      visitDashboard();
+      answerSetup({ body: localSetup });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-port-input]').clear();
+      cy.get('[data-cy=z2m-dashboard-port-input]').type('12001');
+      cy.get('[data-cy=z2m-dashboard-back]').click();
+      cy.get('[data-cy=z2m-dashboard-leave-discard]').click();
+      cy.get('[data-cy=z2m-dashboard]').should('exist');
+      cy.get('@setup.all').should('have.length', 0);
     });
   });
 });

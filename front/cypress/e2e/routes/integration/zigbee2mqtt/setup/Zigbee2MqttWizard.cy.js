@@ -87,6 +87,10 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.wait('@permitJoin')
       .its('request.body')
       .should('deep.equal', { value: true });
+    // Sent: allowed once Zigbee2mqtt tells so
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
+    cy.get('[data-cy=z2m-wizard-allow-joining]').should('be.disabled');
+    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
     cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('exist');
     cy.get('[data-cy=z2m-wizard-go-to-discover]').should(
       'have.attr',
@@ -118,6 +122,46 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-pair]').click();
     cy.get('[data-cy=z2m-wizard-allow-joining]').click();
     cy.get('[data-cy=z2m-wizard-permit-join-error]').i18n('integration.zigbee2mqtt.setup.wizard.pair.allowError');
+    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
+  });
+
+  it('should tell that joining could not be permitted when Zigbee2mqtt does not confirm it in time', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    sendProgress(doneInstallation);
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} }).as(
+      'permitJoin'
+    );
+    cy.get('[data-cy=z2m-wizard-pair]').click();
+    cy.clock();
+    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
+    cy.wait('@permitJoin');
+    cy.get('[data-cy=z2m-wizard-allow-joining]').should('be.disabled');
+    cy.tick(10000);
+    cy.get('[data-cy=z2m-wizard-permit-join-error]').i18n('integration.zigbee2mqtt.setup.wizard.pair.allowError');
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
+    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
+  });
+
+  it('should tell that joining could not be permitted when Zigbee2mqtt refuses it', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    sendProgress(doneInstallation);
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} }).as(
+      'permitJoin'
+    );
+    cy.get('[data-cy=z2m-wizard-pair]').click();
+    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
+    cy.wait('@permitJoin');
+    cy.get('[data-cy=z2m-wizard-allow-joining]').should('be.disabled');
+    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
+    cy.get('[data-cy=z2m-wizard-permit-join-error]').should('exist');
     cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
   });
 
@@ -252,6 +296,11 @@ describe('Zigbee2mqtt setup wizard', () => {
         Z2M_NETWORK_ADAPTER_TYPE: 'ember',
         ZIGBEE2MQTT_DRIVER_PATH: null
       });
+    // The coordinator does not answer: what to do with a network coordinator
+    sendProgress(failedInstallation);
+    cy.get('[data-cy=z2m-wizard-failure-text]').i18n(
+      'integration.zigbee2mqtt.setup.wizard.failure.texts.ADAPTER_NO_RESPONSE.network'
+    );
   });
 
   it('should connect to a Zigbee2mqtt that runs elsewhere, and sum up what it tells', () => {
@@ -330,7 +379,7 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-show-auto]').i18n('integration.zigbee2mqtt.setup.wizard.key.back');
   });
 
-  it('should name the steps of a connection, and stop listing the USB ports, when Gladys cannot install', () => {
+  it('should name the steps of a connection, and never list the USB ports, when Gladys cannot install', () => {
     cy.clock();
     visitWizard({ status: { ...readyToSetupStatus, dockerBased: false } });
     cy.get('[data-cy=z2m-wizard-incompatible]').should('exist');
@@ -338,11 +387,11 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-stepper-item]')
       .first()
       .should('contain', Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.setup.wizard.steps.connection'));
-    cy.wait('@usbPorts');
     cy.tick(3000);
     cy.tick(3000);
     cy.get('[data-cy=z2m-wizard-incompatible]').should('exist');
-    cy.get('@usbPorts.all').should('have.length', 1);
+    // Not even once as the wizard opens: there is no port to list on this machine
+    cy.get('@usbPorts.all').should('have.length', 0);
   });
 
   it('should tell why the installation failed, then retry it without showing the previous failure', () => {
@@ -354,10 +403,19 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-failure-title]').i18n(
       'integration.zigbee2mqtt.setup.wizard.failure.titles.ADAPTER_NO_RESPONSE'
     );
+    // What to do with the USB dongle chosen
+    cy.get('[data-cy=z2m-wizard-failure-text]').i18n(
+      'integration.zigbee2mqtt.setup.wizard.failure.texts.ADAPTER_NO_RESPONSE.usb'
+    );
     cy.get('[data-cy=z2m-wizard-failure-details]').should('contain', 'HOST_FATAL_ERROR');
     cy.get('[data-cy=z2m-wizard-phase][data-state=failed]').i18n(
       'integration.zigbee2mqtt.setup.wizard.progress.phases.connectUsb'
     );
+    // The step of the installation shows that it failed
+    cy.get('[data-cy=z2m-wizard-stepper-item]')
+      .eq(1)
+      .should('have.attr', 'class')
+      .and('contain', 'stepperFailed');
     // Nothing goes on after a failure
     cy.get('[data-cy=z2m-wizard-leave-page]').should('not.exist');
 
@@ -371,6 +429,10 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '0 %');
     sendProgress(runningInstallation);
     cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '64 %');
+    cy.get('[data-cy=z2m-wizard-stepper-item]')
+      .eq(1)
+      .should('have.attr', 'class')
+      .and('not.contain', 'stepperFailed');
   });
 
   it('should show the network ready when Zigbee2mqtt answers after the installation failed, and keep it', () => {
@@ -583,6 +645,77 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.wait('@setup');
     sendStatus({ ...readyToSetupStatus, ezspFallback: true, installation: runningInstallation });
     cy.get('[data-cy=z2m-wizard-ezsp-note]').should('exist');
+  });
+
+  describe('a first installation not finished', () => {
+    const externalSetup = {
+      Z2M_MQTT_MODE: 'external',
+      Z2M_MQTT_URL: 'mqtt://192.168.1.10:1883',
+      GLADYS_MQTT_USERNAME: 'gladys',
+      GLADYS_MQTT_PASSWORD: 'secret'
+    };
+    // Saved by the setup, Zigbee2mqtt never answered since
+    const pendingStatus = { ...readyToSetupStatus, configured: true, setupPending: true };
+
+    it('should resume on the failure of the installation, and retry what was saved', () => {
+      visitWizard({ status: { ...pendingStatus, installation: failedInstallation }, setup: usbSetup });
+      cy.get('[data-cy=z2m-dashboard]').should('not.exist');
+      cy.get('[data-cy=z2m-wizard-install-step]').should('exist');
+      cy.get('[data-cy=z2m-wizard-failure-title]').i18n(
+        'integration.zigbee2mqtt.setup.wizard.failure.titles.ADAPTER_NO_RESPONSE'
+      );
+
+      answerSetup();
+      cy.get('[data-cy=z2m-wizard-retry]').click();
+      cy.wait('@setup')
+        .its('request.body')
+        .should('include', {
+          Z2M_MQTT_MODE: 'local',
+          Z2M_ADAPTER_MODE: 'usb',
+          ZIGBEE2MQTT_DRIVER_PATH: zbDongleE.stablePath,
+          ZIGBEE_DONGLE_NAME: ZBDONGLE_E
+        })
+        // The port of the interface saved is kept
+        .and('not.have.property', 'Z2M_TCP_PORT');
+    });
+
+    it('should resume on the installation that runs', () => {
+      visitWizard({ status: { ...pendingStatus, installation: runningInstallation }, setup: usbSetup });
+      cy.get('[data-cy=z2m-wizard-progress]').should('have.text', '64 %');
+      sendProgress(doneInstallation);
+      sendStatus({ ...pendingStatus, installation: doneInstallation, zigbee2mqttConnected: true });
+      cy.get('[data-cy=z2m-wizard-ready]').should('exist');
+    });
+
+    it('should resume on the first step with the saved choice when nothing is followed any more', () => {
+      // Gladys restarted since: the installation is idle
+      visitWizard({ status: pendingStatus, setup: externalSetup });
+      cy.get('[data-cy=z2m-wizard-external]').should('exist');
+      cy.get('[data-cy=z2m-wizard-mqttUrl]').should('have.value', 'mqtt://192.168.1.10:1883');
+      cy.get('[data-cy=z2m-wizard-mqttUsername]').should('have.value', 'gladys');
+
+      answerSetup({ body: externalSetup });
+      install();
+      cy.wait('@setup')
+        .its('request.body')
+        .should('include', { Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://192.168.1.10:1883' });
+    });
+
+    it('should show the dashboard, which starts it, when the user stopped it since', () => {
+      visitWizard({
+        status: { ...pendingStatus, stopped: true, stoppedAt: '2026-11-17T08:00:00.000Z' },
+        setup: usbSetup
+      });
+      cy.get('[data-cy=z2m-dashboard]').should('exist');
+      cy.get('[data-cy=z2m-wizard]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-start]').should('exist');
+    });
+
+    it('should show the dashboard once the first installation is finished', () => {
+      visitWizard({ status: { ...pendingStatus, setupPending: false }, setup: usbSetup });
+      cy.get('[data-cy=z2m-dashboard]').should('exist');
+      cy.get('[data-cy=z2m-wizard]').should('not.exist');
+    });
   });
 
   describe('downloads in the background', () => {

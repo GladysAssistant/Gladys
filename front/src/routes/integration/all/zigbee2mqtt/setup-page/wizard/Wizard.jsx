@@ -4,9 +4,10 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
+import config from '../../../../../../config';
 import { RequestStatus } from '../../../../../../utils/consts';
 import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
-import { MQTT_MODE, ADAPTER_MODE } from '../constants';
+import { MQTT_MODE, ADAPTER_MODE, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS } from '../constants';
 import {
   LEGACY_EZSP_SUFFIX,
   dedupePorts,
@@ -27,6 +28,66 @@ const SERVICES_URL = '/dashboard/settings/service';
 const USB_PORTS_REFRESH_INTERVAL_IN_MS = 3000;
 
 const trimmed = value => (value || '').trim();
+
+// The setup saved by a first installation not finished (left after a failure, the page reloaded): what "Retry" saves
+// again. The port of the interface is not sent, the saved one is kept.
+const getSavedSetup = saved => {
+  if (saved.mqttMode === MQTT_MODE.EXTERNAL) {
+    return {
+      mqttMode: MQTT_MODE.EXTERNAL,
+      mqttUrl: saved.mqttUrl,
+      mqttUsername: saved.mqttUsername || null,
+      mqttPassword: saved.mqttPassword || null,
+      z2mFrontendUrl: saved.z2mFrontendUrl || null
+    };
+  }
+  if (saved.z2mAdapterMode === ADAPTER_MODE.NETWORK) {
+    return {
+      mqttMode: MQTT_MODE.LOCAL,
+      z2mAdapterMode: ADAPTER_MODE.NETWORK,
+      z2mNetworkAdapterUrl: saved.z2mNetworkAdapterUrl,
+      z2mNetworkAdapterType: saved.z2mNetworkAdapterType,
+      z2mDriverPath: null,
+      z2mDongleName: null
+    };
+  }
+  return {
+    mqttMode: MQTT_MODE.LOCAL,
+    z2mAdapterMode: ADAPTER_MODE.USB,
+    z2mDriverPath: saved.z2mDriverPath,
+    z2mDongleName: saved.z2mDongleName,
+    z2mNetworkAdapterUrl: null,
+    z2mNetworkAdapterType: null
+  };
+};
+
+/**
+ * @description Where a first installation not finished resumes (docs/specs/zigbee2mqtt-installation.md, M.1): on the
+ * installation that the status follows (running, failed, done), with what was saved, or on the first step with the
+ * saved choice filled in when Gladys restarted since (nothing followed any more).
+ * @param {object} saved - The saved configuration.
+ * @param {object} status - The status of the server.
+ * @returns {object} The state of the wizard to start from.
+ */
+const getResumedState = (saved, status) => {
+  const external = saved.mqttMode === MQTT_MODE.EXTERNAL;
+  const network = !external && saved.z2mAdapterMode === ADAPTER_MODE.NETWORK;
+  const installationState = get(status, 'installation.state');
+  const followed = status.zigbee2mqttConnected || ['running', 'failed', 'done'].includes(installationState);
+  return {
+    step: followed ? STEP.INSTALL : STEP.KEY,
+    pane: (external && PANE.EXTERNAL) || (network && PANE.NETWORK) || PANE.AUTO,
+    pickedPath: network || external ? null : saved.z2mDriverPath || null,
+    pickedModel: network || external ? null : saved.z2mDongleName || null,
+    networkUrl: (network && saved.z2mNetworkAdapterUrl) || '',
+    networkType: (network && saved.z2mNetworkAdapterType) || null,
+    mqttUrl: (external && saved.mqttUrl) || '',
+    mqttUsername: (external && saved.mqttUsername) || '',
+    mqttPassword: (external && saved.mqttPassword) || '',
+    z2mFrontendUrl: (external && saved.z2mFrontendUrl) || '',
+    installedConfiguration: followed ? getSavedSetup(saved) : null
+  };
+};
 
 // Where the installation started by the wizard is
 const computeInstallView = ({ zigbee2mqttStatus }, { installReady, previousInstallation, installedConfiguration }) => {
@@ -328,27 +389,49 @@ class Wizard extends Component {
 
   closePermitJoinError = () => this.setState({ permitJoinStatus: null });
 
-  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page)
+  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page). Refused while
+  // the wizard waits for it (the request sent), failed.
   handlePermitJoin = allowed => {
     const { permitJoinStatus } = this.state;
+    const waited = this.permitJoinTimer !== null;
+    this.stopPermitJoinWait();
     if (allowed && permitJoinStatus !== RequestStatus.Success) {
       this.setState({ permitJoinStatus: RequestStatus.Success });
     } else if (!allowed && permitJoinStatus === RequestStatus.Success) {
       this.setState({ permitJoinStatus: null });
+    } else if (!allowed && waited) {
+      this.setState({ permitJoinStatus: RequestStatus.Error });
     }
   };
 
+  stopPermitJoinWait = () => {
+    clearTimeout(this.permitJoinTimer);
+    this.permitJoinTimer = null;
+  };
+
+  // Zigbee2mqtt did not tell in time that joining is allowed: failed, to try again
+  permitJoinNotConfirmed = () => {
+    this.permitJoinTimer = null;
+    if (!this.unmounted && this.state.permitJoinStatus === RequestStatus.Getting) {
+      this.setState({ permitJoinStatus: RequestStatus.Error });
+    }
+  };
+
+  // Allowed once Zigbee2mqtt tells so (see handlePermitJoin), waited for from the click: its answer may come before the
+  // one of the request. In the demo nothing answers: the request is enough.
   allowJoining = async () => {
+    this.stopPermitJoinWait();
+    this.permitJoinTimer = setTimeout(this.permitJoinNotConfirmed, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS);
     this.setState({ permitJoinStatus: RequestStatus.Getting });
     try {
       // Allowed even when it already is, never toggled off
       await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/permit_join', { value: true });
-      // Unless Zigbee2mqtt told meanwhile that joining is allowed, or already closed again (see handlePermitJoin)
-      if (!this.unmounted && this.state.permitJoinStatus === RequestStatus.Getting) {
-        this.setState({ permitJoinStatus: RequestStatus.Success });
+      if (config.demoMode && !this.unmounted && this.state.permitJoinStatus === RequestStatus.Getting) {
+        this.handlePermitJoin(true);
       }
     } catch (e) {
       console.error('Failed to allow devices to join', e);
+      this.stopPermitJoinWait();
       // Not when Zigbee2mqtt told meanwhile that joining is allowed: the answer only got lost
       if (!this.unmounted && this.state.permitJoinStatus !== RequestStatus.Success) {
         this.setState({ permitJoinStatus: RequestStatus.Error });
@@ -389,11 +472,15 @@ class Wizard extends Component {
       saveErrorClosed: false,
       // Whether this wizard saved: the refusal of a save made before it opened (the advanced settings, a change of
       // dongle cancelled) is not its own
-      saveRequested: false
+      saveRequested: false,
+      // A first installation not finished, the page reloaded: resumed where it is
+      ...(props.resume ? getResumedState(props.configuration || {}, props.zigbee2mqttStatus) : {})
     };
     // Numbers the requests of the USB ports, to keep only the answer of the last one
     this.usbPortsRequests = 0;
     this.usbPortsTimer = null;
+    // "Allow joining" sent, until Zigbee2mqtt tells that it is allowed
+    this.permitJoinTimer = null;
   }
 
   // The previous installation forgotten once the status shows another one, the network ready kept once reached
@@ -412,7 +499,8 @@ class Wizard extends Component {
 
   async componentDidMount() {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN, this.handlePermitJoin);
-    await Promise.all([this.loadUsbPorts(), this.loadAdapters()]);
+    // No port to list on a machine where Zigbee2mqtt cannot be installed
+    await Promise.all([this.isInstallable() !== false && this.loadUsbPorts(), this.loadAdapters()]);
     if (!this.unmounted) {
       this.scheduleUsbPortsRefresh();
     }
@@ -437,6 +525,7 @@ class Wizard extends Component {
     this.unmounted = true;
     clearTimeout(this.usbPortsTimer);
     this.usbPortsTimer = null;
+    this.stopPermitJoinWait();
   }
 
   // The driver of the coordinator saved, and of the one chosen: another family forms a new network

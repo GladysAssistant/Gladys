@@ -270,12 +270,12 @@ const Incompatible = () => (
   </div>
 );
 
-// The progress around the photo of the dongle (m05, m06)
+// The progress around the photo of the dongle (m05, m06); smaller on a failure, which needs the room
 const Ring = ({ progress, failed, adapter }) => {
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
   return (
-    <span class={style.ring}>
+    <span class={cx(style.ring, { [style.ringSmall]: failed })}>
       <svg viewBox="0 0 160 160" aria-hidden="true">
         <circle class={style.ringTrack} cx="80" cy="80" r={radius} />
         <circle
@@ -287,7 +287,7 @@ const Ring = ({ progress, failed, adapter }) => {
           stroke-dashoffset={circumference * (1 - progress / 100)}
         />
       </svg>
-      <KeyPhoto adapter={adapter} size={108} round />
+      <KeyPhoto adapter={adapter} size={failed ? 64 : 108} round />
     </span>
   );
 };
@@ -308,7 +308,10 @@ const Install = ({ view }) => {
       <Ring progress={failed ? 100 : progress} failed={failed} adapter={external ? null : savedAdapter} />
       {failed ? (
         <div class={style.mobileFailure} role="alert">
-          <InstallFailure error={zigbee2mqttStatus.installation && zigbee2mqttStatus.installation.error} />
+          <InstallFailure
+            error={zigbee2mqttStatus.installation && zigbee2mqttStatus.installation.error}
+            networkCoordinator={savedConfiguration.z2mAdapterMode === 'network'}
+          />
         </div>
       ) : (
         <div class={style.mobileCenter}>
@@ -405,6 +408,12 @@ const Pair = ({ view }) => (
     <p class={kitStyle.lead}>
       <Text id={`${T}.pair.text`} />
     </p>
+    {/* Above the tips: the outcome of the button of the bottom bar stays in sight */}
+    {view.permitJoinStatus === RequestStatus.Success && (
+      <MobileNotice tone="success" icon="check" role="status" data-cy="z2m-wizard-permit-join-allowed">
+        <MarkupText id={`${T}.pair.allowed`} />
+      </MobileNotice>
+    )}
     <MobileGroup>
       {TIPS.map((tip, index) => (
         <MobileRow
@@ -415,11 +424,6 @@ const Pair = ({ view }) => (
         />
       ))}
     </MobileGroup>
-    {view.permitJoinStatus === RequestStatus.Success && (
-      <MobileNotice tone="success" icon="check" role="status" data-cy="z2m-wizard-permit-join-allowed">
-        <MarkupText id={`${T}.pair.allowed`} />
-      </MobileNotice>
-    )}
   </div>
 );
 

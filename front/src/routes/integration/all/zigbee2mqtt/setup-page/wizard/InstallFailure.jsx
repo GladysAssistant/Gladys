@@ -22,7 +22,17 @@ const KNOWN_CODES = [
   'INVALID_CONFIGURATION'
 ];
 
-const FailureText = ({ code }) => {
+const FailureText = ({ code, networkCoordinator }) => {
+  // What to do depends on the coordinator chosen: a USB dongle plugged again, a network coordinator restarted
+  if (code === 'ADAPTER_NO_RESPONSE') {
+    return (
+      <Text
+        id={`integration.zigbee2mqtt.setup.wizard.failure.texts.ADAPTER_NO_RESPONSE.${
+          networkCoordinator ? 'network' : 'usb'
+        }`}
+      />
+    );
+  }
   if (WIZARD_TEXTS.includes(code)) {
     return <Text id={`integration.zigbee2mqtt.setup.wizard.failure.texts.${code}`} />;
   }
@@ -34,7 +44,7 @@ const FailureText = ({ code }) => {
 };
 
 // Why the installation failed: a short title, what to do, and the technical details folded
-const InstallFailure = ({ error }) => {
+const InstallFailure = ({ error, networkCoordinator }) => {
   const code = error && KNOWN_CODES.includes(error.code) ? error.code : null;
   const message = error && error.message;
   return (
@@ -43,7 +53,11 @@ const InstallFailure = ({ error }) => {
         <Text id={`integration.zigbee2mqtt.setup.wizard.failure.titles.${code || 'unknown'}`} />
       </strong>
       <span data-cy="z2m-wizard-failure-text">
-        {code ? <FailureText code={code} /> : <Text id="integration.zigbee2mqtt.setup.wizard.failure.texts.unknown" />}
+        {code ? (
+          <FailureText code={code} networkCoordinator={networkCoordinator} />
+        ) : (
+          <Text id="integration.zigbee2mqtt.setup.wizard.failure.texts.unknown" />
+        )}
       </span>
       {message && MESSAGE_SHOWN.includes(code) && (
         <code class="d-block mt-1" data-cy="z2m-wizard-failure-details">

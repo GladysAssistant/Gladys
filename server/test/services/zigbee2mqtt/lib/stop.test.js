@@ -36,6 +36,7 @@ describe('zigbee2mqtt stop', () => {
       },
       variable: {
         setValue: fake.resolves(null),
+        getValue: fake.resolves('local'),
       },
       system: {
         getContainers: fake(ownContainers),
@@ -164,6 +165,32 @@ describe('zigbee2mqtt stop', () => {
     assert.notCalled(gladys.system.updateContainer);
     assert.notCalled(gladys.system.stopContainer);
     expect(zigbee2mqttManager.stopped).to.equal(true);
+  });
+
+  it('should only disconnect from an external broker, leaving the containers of ours running', async () => {
+    // PREPARE: a former local installation left them (see the spec, L)
+    gladys.variable.getValue = fake.resolves('external');
+    // EXECUTE
+    await zigbee2mqttManager.stop();
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.variable.getValue, 'Z2M_MQTT_MODE', serviceId);
+    assert.calledOnce(mqttClient.end);
+    assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.system.updateContainer);
+    assert.notCalled(gladys.system.stopContainer);
+    expect(zigbee2mqttManager.stopped).to.equal(true);
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
+  });
+
+  it('should fail the stop when Docker cannot list the containers, which may still run', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.rejects(new Error('docker down'));
+    // EXECUTE
+    await expect(zigbee2mqttManager.stop()).to.be.rejectedWith('docker down');
+    // ASSERT
+    assert.notCalled(gladys.system.stopContainer);
+    expect(zigbee2mqttManager.stopped).to.equal(true);
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
   });
 
   it('should refuse to stop while an installation runs, and remember nothing', async () => {

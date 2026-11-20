@@ -54,6 +54,11 @@
   color: #fff;
 }
 
+.stepperFailed .stepperCircle {
+  border-color: #c0392b;
+  background: #c0392b;
+}
+
 .stepperDone .stepperCircle {
   border-color: #2f9e5b;
   background: #2f9e5b;
@@ -622,6 +627,11 @@ button.keyCard {
   justify-content: center;
   width: 160px;
   height: 160px;
+}
+
+.ringSmall {
+  width: 96px;
+  height: 96px;
 }
 
 .ring svg {

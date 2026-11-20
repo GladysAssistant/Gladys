@@ -19,7 +19,14 @@ import MqttConnectionError from '../../commons/MqttConnectionError';
 import { formatDuration } from '../wizard/format';
 import InstallFailure from '../wizard/InstallFailure';
 import KeyPhoto from '../wizard/KeyPhoto';
-import { DASHBOARD_STATE, getStartupError, getStopKeys, isExternal, isNetworkCoordinator } from './dashboardState';
+import {
+  DASHBOARD_STATE,
+  getBrokerError,
+  getStartupError,
+  getStopKeys,
+  isExternal,
+  isNetworkCoordinator
+} from './dashboardState';
 import { getDriver } from './KeyCard';
 import {
   DISCOVER_URL,
@@ -28,6 +35,7 @@ import {
   PRIMARY_ICONS,
   Subtitle,
   Title,
+  TooOldNotice,
   getInstallationPhase,
   getPrimaryLabel
 } from './StatusCard';
@@ -131,7 +139,10 @@ class DashboardMobile extends Component {
   render({ view, actions, intl }, { confirmRestart }) {
     const { state, status, primaryAction, actionStatus, newDeviceCount, tiles, z2mUrl } = view;
     const startupError = state === DASHBOARD_STATE.FAILED ? getStartupError(status) : null;
-    const busy = actionStatus === RequestStatus.Getting;
+    const brokerError = state === DASHBOARD_STATE.MQTT_ERROR ? getBrokerError(status) : null;
+    // Until Zigbee2mqtt tells that joining is allowed
+    const busy = actionStatus === RequestStatus.Getting || view.permitJoinWaiting;
+    const tooOld = TooOldNotice({ view });
     const dictionary = get(intl, 'dictionary');
     const stopKeys = getStopKeys(view.configuration);
     return (
@@ -174,12 +185,17 @@ class DashboardMobile extends Component {
         )}
         {startupError && (
           <MobileNotice tone="danger" icon="alert-triangle" role="alert" data-cy="z2m-dashboard-error">
-            <InstallFailure error={startupError} />
+            <InstallFailure error={startupError} networkCoordinator={isNetworkCoordinator(view.configuration)} />
           </MobileNotice>
         )}
-        {state === DASHBOARD_STATE.MQTT_ERROR && (
+        {brokerError && (
           <MobileNotice tone="danger" icon="alert-triangle" role="alert" data-cy="z2m-dashboard-mqtt-error">
-            <MqttConnectionError error={status.mqttConnectionError} />
+            <MqttConnectionError error={brokerError} />
+          </MobileNotice>
+        )}
+        {tooOld && (
+          <MobileNotice tone="warning" icon="alert-circle" data-cy="z2m-dashboard-too-old">
+            {tooOld}
           </MobileNotice>
         )}
         {view.installationSucceeded && (

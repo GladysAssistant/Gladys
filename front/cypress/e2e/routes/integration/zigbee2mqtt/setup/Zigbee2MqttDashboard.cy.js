@@ -78,7 +78,52 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.wait('@permit_join')
         .its('request.body')
         .should('deep.equal', { value: true });
+      // Sent to Zigbee2mqtt: allowed once it tells so
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-pair]').should('be.disabled');
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
       cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-pair]').should('not.be.disabled');
+    });
+
+    it('should tell that joining failed when Zigbee2mqtt does not confirm it in time', () => {
+      visitDashboard();
+      answerAction('permit_join');
+      cy.clock();
+
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      cy.wait('@permit_join');
+      cy.get('[data-cy=z2m-dashboard-pair]').should('be.disabled');
+      cy.tick(10000);
+      cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.error`);
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-pair]').should('not.be.disabled');
+    });
+
+    it('should tell that joining failed when Zigbee2mqtt refuses it before the request answers', () => {
+      visitDashboard();
+      answerAction('permit_join', { body: {}, delay: 1000 });
+
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      // Waited for from the click: the answer of Zigbee2mqtt may come first
+      cy.get('[data-cy=z2m-dashboard-pair]').should('be.disabled');
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
+      cy.wait('@permit_join');
+      cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.error`);
+      cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-pair]').should('not.be.disabled');
+    });
+
+    it('should tell that joining failed when Zigbee2mqtt refuses it', () => {
+      visitDashboard();
+      answerAction('permit_join');
+
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      cy.wait('@permit_join');
+      cy.get('[data-cy=z2m-dashboard-pair]').should('be.disabled');
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
+      cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.error`);
+      cy.get('[data-cy=z2m-dashboard-pair]').should('not.be.disabled');
     });
 
     it('should not take the answer of a slow request for joining over what Zigbee2mqtt told meanwhile', () => {
@@ -133,9 +178,9 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.notAnswering.title`);
       cy.get('[data-cy=z2m-dashboard-subtitle]').i18n(`${T}.states.notAnswering.text`);
       cy.get('[data-cy=z2m-dashboard-new-devices]').should('not.exist');
-      cy.get('[data-cy=z2m-dashboard-restart]')
-        .first()
-        .click();
+      // The main action, not a tile again
+      cy.get('[data-cy=z2m-dashboard-tiles] [data-cy=z2m-dashboard-restart]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-status] [data-cy=z2m-dashboard-restart]').click();
       cy.wait('@restart');
       cy.get('[data-cy=z2m-dashboard-action-error]').should('not.exist');
     });
@@ -148,6 +193,7 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.failed.title`);
       cy.get('[data-cy=z2m-dashboard-error] [data-cy=z2m-wizard-failure]').should('exist');
       cy.get('[data-cy=z2m-dashboard-status] [data-cy=z2m-dashboard-restart]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-tiles] [data-cy=z2m-dashboard-restart]').should('not.exist');
 
       cy.get('[data-cy=z2m-dashboard-failure-change-key]').click();
       cy.get('[data-cy=z2m-wizard-cancel]').should('exist');
@@ -159,6 +205,9 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.failed.title`);
       cy.get('[data-cy=z2m-wizard-failure-title]').i18n(
         'integration.zigbee2mqtt.setup.wizard.failure.titles.ADAPTER_NO_RESPONSE'
+      );
+      cy.get('[data-cy=z2m-wizard-failure-text]').i18n(
+        'integration.zigbee2mqtt.setup.wizard.failure.texts.ADAPTER_NO_RESPONSE.usb'
       );
 
       // Restarted by Docker after the failure
@@ -226,6 +275,12 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-key-name]').i18n(`${T}.network.title`);
       cy.get('[data-cy=z2m-dashboard-key]').should('contain', 'tcp://192.168.1.20:6638');
       cy.get('[data-cy=z2m-dashboard-fact-driver]').should('contain', 'zstack');
+
+      // It does not answer: what to do with a network coordinator
+      sendStatus({ ...notAnsweringStatus, installation: failedInstallation });
+      cy.get('[data-cy=z2m-wizard-failure-text]').i18n(
+        'integration.zigbee2mqtt.setup.wizard.failure.texts.ADAPTER_NO_RESPONSE.network'
+      );
     });
 
     it('should hide the link to the Zigbee2mqtt interface until its port is saved', () => {
@@ -436,7 +491,7 @@ describe('Zigbee2mqtt dashboard', () => {
       visitDashboard({ status: notAnsweringStatus });
       answerAction('restart', conflict('Zigbee2mqtt: cannot restart Zigbee2mqtt while an installation is running'));
 
-      cy.get('[data-cy=z2m-dashboard-tiles] [data-cy=z2m-dashboard-restart]').click();
+      cy.get('[data-cy=z2m-dashboard-status] [data-cy=z2m-dashboard-restart]').click();
       cy.wait('@restart');
       cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.busy`);
 
@@ -451,9 +506,7 @@ describe('Zigbee2mqtt dashboard', () => {
       // Refused by an operation (an init, the watch of the dongle), not by an installation
       answerAction('restart', conflict('Zigbee2mqtt: cannot restart Zigbee2mqtt while the integration is busy'));
 
-      cy.get('[data-cy=z2m-dashboard-restart]')
-        .first()
-        .click();
+      cy.get('[data-cy=z2m-dashboard-status] [data-cy=z2m-dashboard-restart]').click();
       cy.wait('@restart');
       cy.get('[data-cy=z2m-dashboard-action-error]').i18n(`${T}.actionErrors.busy`);
 
@@ -467,6 +520,7 @@ describe('Zigbee2mqtt dashboard', () => {
       answerAction('permit_join');
       cy.get('[data-cy=z2m-dashboard-pair]').click();
       cy.wait('@permit_join');
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
       cy.get('[data-cy=z2m-dashboard-permit-join-allowed]').should('exist');
 
       sendStatus(notAnsweringStatus);

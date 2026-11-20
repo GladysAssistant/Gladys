@@ -3,8 +3,10 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
+import config from '../../../../../../config';
 import { RequestStatus } from '../../../../../../utils/consts';
 import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
+import { PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS } from '../constants';
 import { findAdapter } from '../wizard/adapters';
 import Wizard from '../wizard/Wizard';
 import {
@@ -61,11 +63,31 @@ class Dashboard extends Component {
     this.setState({ newDeviceCount: countNewDevices(devices) });
   };
 
-  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page)
+  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page): what "Pair"
+  // waits for. Refused by Zigbee2mqtt while waited for, the request failed.
   handlePermitJoin = permitJoin => {
-    // More recent than a request to permit joining still running
-    this.permitJoinChanges += 1;
-    this.setState({ permitJoinAllowed: Boolean(permitJoin) });
+    const changes = { permitJoinAllowed: Boolean(permitJoin) };
+    if (this.state.permitJoinWaiting) {
+      this.stopPermitJoinWait();
+      changes.permitJoinWaiting = false;
+      if (!permitJoin) {
+        changes.actionError = 'error';
+      }
+    }
+    this.setState(changes);
+  };
+
+  stopPermitJoinWait = () => {
+    clearTimeout(this.permitJoinTimer);
+    this.permitJoinTimer = null;
+  };
+
+  // Zigbee2mqtt did not tell that joining is allowed in time: told as a failure, the button can be tried again
+  permitJoinNotConfirmed = () => {
+    this.permitJoinTimer = null;
+    if (!this.unmounted) {
+      this.setState({ permitJoinWaiting: false, actionError: 'error' });
+    }
   };
 
   loadAdapters = async () => {
@@ -106,12 +128,22 @@ class Dashboard extends Component {
     }
   };
 
-  // Allowed once the request answers, unless Zigbee2mqtt told meanwhile whether joining is allowed, or went offline
-  pair = () => {
-    const permitJoinChanges = this.permitJoinChanges;
-    return this.runAction('permit_join', { value: true }, () =>
-      this.permitJoinChanges === permitJoinChanges ? { permitJoinAllowed: true } : null
-    );
+  // Allowed once Zigbee2mqtt tells so (see handlePermitJoin), waited for from the click: its answer may come before the
+  // one of the request. In the demo nothing answers: the request is enough.
+  pair = async () => {
+    this.stopPermitJoinWait();
+    this.permitJoinTimer = setTimeout(this.permitJoinNotConfirmed, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS);
+    this.setState({ permitJoinWaiting: true });
+    await this.runAction('permit_join', { value: true });
+    if (this.unmounted || !this.state.permitJoinWaiting) {
+      return;
+    }
+    if (this.state.actionStatus === RequestStatus.Error) {
+      this.stopPermitJoinWait();
+      this.setState({ permitJoinWaiting: false });
+    } else if (config.demoMode) {
+      this.handlePermitJoin(true);
+    }
   };
 
   start = () => this.runAction('start');
@@ -125,6 +157,9 @@ class Dashboard extends Component {
   stop = () => this.runAction('stop', undefined, { confirmStop: false });
 
   showMain = () => this.setState({ screen: SCREEN.MAIN });
+
+  // The connection to an external broker out of reach: its fields are in the advanced settings
+  editConnection = () => this.showAdvanced();
 
   // Another screen: a stop not confirmed is given up
   showAdvanced = () => this.setState({ screen: SCREEN.ADVANCED, actionError: null, confirmStop: false });
@@ -146,8 +181,6 @@ class Dashboard extends Component {
     }
   };
 
-  noop = () => {};
-
   constructor(props) {
     super(props);
     this.state = {
@@ -159,14 +192,15 @@ class Dashboard extends Component {
       pendingAction: null,
       installationSuccessDismissed: false,
       permitJoinAllowed: false,
+      // "Pair" sent, until Zigbee2mqtt tells that joining is allowed
+      permitJoinWaiting: false,
       newDeviceCount: null,
       adapters: []
     };
     // Numbers the requests of the discovered devices: only the answer of the last one, or a newer message, counts
     this.discoveredRequests = 0;
-    // Counts what told whether joining is allowed (a message of Zigbee2mqtt, offline): the answer of a request to
-    // permit joining does not replace it
-    this.permitJoinChanges = 0;
+    // "Pair" clicked, until Zigbee2mqtt tells that joining is allowed
+    this.permitJoinTimer = null;
   }
 
   componentDidMount() {
@@ -195,7 +229,8 @@ class Dashboard extends Component {
     const changes = { confirmStop: false };
     if (previousState === DASHBOARD_STATE.ONLINE) {
       changes.permitJoinAllowed = false;
-      this.permitJoinChanges += 1;
+      changes.permitJoinWaiting = false;
+      this.stopPermitJoinWait();
     }
     if (this.state.actionError && this.state.actionStatus !== RequestStatus.Getting) {
       changes.actionError = null;
@@ -227,6 +262,7 @@ class Dashboard extends Component {
 
   componentWillUnmount() {
     this.unmounted = true;
+    this.stopPermitJoinWait();
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER, this.handleDiscover);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
@@ -288,7 +324,9 @@ class Dashboard extends Component {
       tiles: getTiles(dashboardState, configuration, z2mUrl, status),
       canChangeKey: !isExternal(configuration),
       ezspDriver: !isExternal(configuration) && getDriver(configuration, savedAdapter) === 'ezsp',
+      // Nothing is installed with an external broker: its state tells that Gladys is connected
       installationSucceeded:
+        !isExternal(configuration) &&
         Boolean(props.installationFollowedToSuccess) &&
         !state.installationSuccessDismissed &&
         get(status, 'installation.state') === 'done',
@@ -299,6 +337,7 @@ class Dashboard extends Component {
     };
     const actions = {
       pair: this.pair,
+      editConnection: this.editConnection,
       start: this.start,
       restart: this.restart,
       askStop: this.askStop,
@@ -309,8 +348,7 @@ class Dashboard extends Component {
       showAdvanced: this.showAdvanced,
       savePort: this.savePort,
       saveBroker: this.saveBroker,
-      reset: props.resetZ2M,
-      noop: this.noop
+      reset: props.resetZ2M
     };
     if (state.screen === SCREEN.ADVANCED) {
       return <AdvancedSettings view={view} actions={actions} />;

@@ -39,6 +39,8 @@ async function getConfiguration() {
   const dockerZ2mVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_Z2M_VERSION, this.serviceId);
   // Stopped by the user, since this date
   const z2mStoppedAt = await this.gladys.variable.getValue(CONFIGURATION.Z2M_STOPPED, this.serviceId);
+  // A first setup that never reached Zigbee2mqtt answering
+  const z2mSetupPending = await this.gladys.variable.getValue(CONFIGURATION.Z2M_SETUP_PENDING, this.serviceId);
   // Gladys params
   const timezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
@@ -59,6 +61,7 @@ async function getConfiguration() {
     dockerMqttVersion,
     dockerZ2mVersion,
     z2mStoppedAt,
+    z2mSetupPending,
     timezone,
   };
 }

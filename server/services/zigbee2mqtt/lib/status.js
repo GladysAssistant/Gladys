@@ -12,6 +12,7 @@ function status() {
     configured: this.configured,
     stopped: this.stopped,
     stoppedAt: this.stoppedAt,
+    setupPending: this.setupPending,
     updatePending: this.updatePending,
     serviceStarted: this.serviceStarted,
     usbConfigured: this.usbConfigured,

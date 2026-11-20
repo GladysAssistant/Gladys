@@ -66,17 +66,22 @@ describe('zigbee2mqtt restart', () => {
     assert.callOrder(gladys.system.restartContainer, zigbee2mqttManager.restartZ2mContainer);
   });
 
-  it('should restart Zigbee2mqtt alone when there is no broker of ours', async () => {
-    // PREPARE
+  it('should start again through an installation when the broker of ours is missing', async () => {
+    // PREPARE: Gladys lost its broker, whose container is gone
     zigbee2mqttManager.gladysConnected = false;
     gladys.system.getContainers = fake((options) =>
       options.filters.name[0] === 'gladys-z2m-mqtt' ? Promise.resolve([]) : ownContainers(options),
     );
+    zigbee2mqttManager.start = fake(async () => {
+      // Free again: start refuses while an operation runs
+      expect(zigbee2mqttManager.runningOperations).to.equal(0);
+    });
     // EXECUTE
     await zigbee2mqttManager.restart();
     // ASSERT
+    assert.calledOnce(zigbee2mqttManager.start);
     assert.notCalled(gladys.system.restartContainer);
-    assert.calledOnce(zigbee2mqttManager.restartZ2mContainer);
+    assert.notCalled(zigbee2mqttManager.restartZ2mContainer);
   });
 
   it('should forget the failure being retried, the new run telling its own', async () => {
@@ -136,22 +141,37 @@ describe('zigbee2mqtt restart', () => {
     expect(zigbee2mqttManager.runningOperations).to.equal(0);
   });
 
-  it('should refuse to restart without a Zigbee2mqtt container of ours', async () => {
-    // PREPARE
+  it('should start again through an installation when the Zigbee2mqtt container is missing', async () => {
+    // PREPARE: a change of dongle removed it, and its installation failed
     gladys.system.getContainers = fake.resolves([]);
+    zigbee2mqttManager.start = fake.resolves(null);
     // EXECUTE
-    await expect(zigbee2mqttManager.restart()).to.be.rejectedWith(BadParameters, 'no container to restart');
+    await zigbee2mqttManager.restart();
     // ASSERT
+    assert.calledOnce(zigbee2mqttManager.start);
+    assert.notCalled(zigbee2mqttManager.restartZ2mContainer);
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
+  });
+
+  it('should start again through an installation when Gladys does not run in Docker', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.rejects(new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER'));
+    zigbee2mqttManager.start = fake.resolves(null);
+    // EXECUTE
+    await zigbee2mqttManager.restart();
+    // ASSERT
+    assert.calledOnce(zigbee2mqttManager.start);
     assert.notCalled(zigbee2mqttManager.restartZ2mContainer);
   });
 
-  it('should refuse to restart when Gladys does not run in Docker, without container of ours', async () => {
+  it('should leave the integration free when Docker cannot list the containers', async () => {
     // PREPARE
-    gladys.system.getContainers = fake.rejects(new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER'));
+    gladys.system.getContainers = fake.rejects(new Error('docker down'));
     // EXECUTE
-    await expect(zigbee2mqttManager.restart()).to.be.rejectedWith(BadParameters, 'no container to restart');
+    await expect(zigbee2mqttManager.restart()).to.be.rejectedWith('docker down');
     // ASSERT
     assert.notCalled(zigbee2mqttManager.restartZ2mContainer);
+    expect(zigbee2mqttManager.runningOperations).to.equal(0);
   });
 
   it('should refuse to restart while an installation runs', async () => {

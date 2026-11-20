@@ -82,7 +82,7 @@ class DiscoveredBox extends Component {
       primaryAction = { label: <Text id="integration.zigbee2mqtt.alreadyExistsButton" />, disabled: true };
     } else {
       primaryAction = {
-        label: <Text id="integration.zigbee2mqtt.saveButton" />,
+        label: <Text id="integration.zigbee2mqtt.discover.addToGladys" />,
         onClick: this.saveDevice,
         toast: <Text id="mobileDeviceList.added" />
       };

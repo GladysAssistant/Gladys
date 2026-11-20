@@ -33,6 +33,7 @@ describe('zigbee2mqtt start', () => {
       },
       variable: {
         destroy: fake.resolves(null),
+        getValue: fake.resolves('local'),
       },
       system: {
         getContainers: fake(ownContainers),
@@ -87,6 +88,53 @@ describe('zigbee2mqtt start', () => {
     // ASSERT
     assert.notCalled(gladys.variable.destroy);
     expect(zigbee2mqttManager.stopped).to.equal(true);
+  });
+
+  it('should tell an init running as busy, not as nothing set up', async () => {
+    // PREPARE: init resets configured until it read the configuration
+    zigbee2mqttManager.configured = null;
+    zigbee2mqttManager.runningOperations = 1;
+    // EXECUTE
+    await expect(zigbee2mqttManager.start()).to.be.rejectedWith(ConflictError);
+    // ASSERT
+    assert.notCalled(gladys.variable.destroy);
+  });
+
+  it('should forget the stop even when Docker cannot list the containers', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.rejects(new Error('docker down'));
+    sinon.stub(logger, 'warn');
+    // EXECUTE
+    await zigbee2mqttManager.start();
+    // ASSERT
+    expect(zigbee2mqttManager.stopped).to.equal(false);
+    expect(zigbee2mqttManager.installation.state).to.equal('running');
+    assert.calledOnce(zigbee2mqttManager.runInstallation);
+    assert.calledWithMatch(logger.warn, 'Zigbee2mqtt: restart policy of gladys-z2m-zigbee2mqtt not set to "always":');
+  });
+
+  it('should leave the containers of ours alone with an external broker', async () => {
+    // PREPARE: a former local installation left them, stopped
+    gladys.variable.getValue = fake.resolves('external');
+    // EXECUTE
+    await zigbee2mqttManager.start();
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.variable.getValue, 'Z2M_MQTT_MODE', serviceId);
+    assert.notCalled(gladys.system.updateContainer);
+    expect(zigbee2mqttManager.stopped).to.equal(false);
+    assert.calledOnce(zigbee2mqttManager.runInstallation);
+  });
+
+  it('should say stopped no longer once forgotten, even when the restart policy then fails', async () => {
+    // PREPARE
+    const error = new Error('database locked');
+    gladys.variable.getValue = fake.rejects(error);
+    zigbee2mqttManager.finishInstallation = fake();
+    // EXECUTE
+    await expect(zigbee2mqttManager.start()).to.be.rejectedWith(error);
+    // ASSERT: the variable is gone, the next start of Gladys starts Zigbee2mqtt
+    expect(zigbee2mqttManager.stopped).to.equal(false);
+    expect(zigbee2mqttManager.stoppedAt).to.equal(null);
   });
 
   it('should end the installation when the stop cannot be forgotten', async () => {

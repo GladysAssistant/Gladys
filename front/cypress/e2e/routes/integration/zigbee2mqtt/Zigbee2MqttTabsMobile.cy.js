@@ -362,7 +362,7 @@ describe('Zigbee2MQTT tabs on a phone', () => {
       cy.get('[data-cy=integration-device-name]').clear();
       cy.get('[data-cy=integration-device-name]').type('Hall light');
       cy.get('[data-cy=integration-device-primary]')
-        .i18n('integration.zigbee2mqtt.saveButton')
+        .i18n('integration.zigbee2mqtt.discover.addToGladys')
         .click();
       cy.wait('@saveDevice').then(({ request }) => {
         expect(request.body.name).to.equal('Hall light');

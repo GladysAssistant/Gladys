@@ -2225,7 +2225,6 @@
             "networkAdapterTypeLabel": "Wählen Sie den Zigbee2MQTT-Adaptertyp des Koordinators",
             "networkAdapterTypePlaceholder": "Adaptertyp",
             "networkAdapterTypeDescription": "Siehe die Dokumentation Ihres Koordinators: Der SMLIGHT SLZB-06 verwendet \"zstack\", der SLZB-06M und der SLZB-07 verwenden \"ember\".",
-            "z2mTcpPortLabel": "Geben Sie den vom Zigbee2Mqtt-Webanwendungsport freigegebenen TCP-Port ein",
             "z2mTcpPortDescription": "Wenn leer gelassen, wird ein zufälliger Port verwendet.",
             "summary": {
               "title": "Konfiguration",
@@ -2255,9 +2254,6 @@
           "remote": {
             "title": "Verbindung zu einer vorhandenen Installation",
             "description": "Gladys wird über MQTT mit einer vorhandenen externen Installation verbunden.",
-            "z2mInstallationRequirementLabel": "Eine eigenständige Zigbee2Mqtt-Anwendung",
-            "mqttBrokerRequirementLabel": "Ein MQTT-Broker, der mit der Zigbee2Mqtt-Anwendung verbunden ist",
-            "detailsDescription": "Mit diesem Konfigurationsmodus ist es möglich, sich mit einer externen Zigbee2Mqtt-Installation mit ihrem MQTT-Broker zu verbinden.",
             "mqttModeLabel": "Wählen Sie den MQTT-Broker aus",
             "external": {
               "modeLabel": "Externer MQTT"
@@ -2271,7 +2267,6 @@
         "requirementsLabel": "<u>Bedingungen</u>:",
         "selectInstallationMode": "Auswählen",
         "changeButtonLabel": "Ändern",
-        "resetLabel": "Abbrechen",
         "errorLoadingStatesLabel": "Beim Laden der Informationen des Gladys-Dienstes ist ein Fehler aufgetreten. Stellen Sie sicher, dass Gladys auf dem neuesten Stand ist, andernfalls überprüfen Sie die Protokolle.",
         "saveError": "Die Konfiguration hat den Dienst nicht gestartet, bitte überprüfen Sie diese.",
         "saveDongleNotFound": "Ihr Zigbee-Stick ist nicht eingesteckt (oder nicht am gewählten Port): Es wurde nichts gespeichert. Stecken Sie ihn ein, wählen Sie ihn in der Liste aus und speichern Sie dann die Konfiguration erneut.",
@@ -2305,7 +2300,6 @@
         "status": "Status",
         "connectionUrl": "URL der Zigbee2MQTT-Schnittstelle: <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
         "z2mFrontendUrlLabel": "URL der Zigbee2MQTT-Schnittstelle",
-        "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080",
         "reset": {
           "title": "Integration zurücksetzen",
           "description": "Verwenden Sie diese Option, wenn Sie mit Zigbee2MQTT von vorne beginnen möchten. Dies kann nützlich sein, wenn Ihre Konfiguration beschädigt ist oder wenn Sie Ihren Zigbee-Koordinator wechseln möchten.",
@@ -2474,7 +2468,11 @@
               "NOT_ENOUGH_DISK_SPACE": "Es gibt nicht genug Speicherplatz, um Zigbee2MQTT herunterzuladen. Schaffe Platz und versuche es dann erneut.",
               "unknown": "Gladys wurde durch einen Fehler gestoppt, den es nicht erklären kann. Versuche es erneut; tritt er wieder auf, helfen die technischen Details, die Ursache zu finden.",
               "BAD_CREDENTIALS": "Gladys konnte sich nicht mit dem MQTT-Broker verbinden: Benutzername oder Passwort ist falsch. Prüfe die Zugangsdaten des MQTT-Brokers und versuche es dann erneut.",
-              "NOT_AUTHORIZED": "Der MQTT-Broker hat die Verbindung abgelehnt: nicht autorisiert. Prüfe Benutzername und Passwort und ob dieser Client sich mit dem Broker verbinden darf, und versuche es dann erneut."
+              "NOT_AUTHORIZED": "Der MQTT-Broker hat die Verbindung abgelehnt: nicht autorisiert. Prüfe Benutzername und Passwort und ob dieser Client sich mit dem Broker verbinden darf, und versuche es dann erneut.",
+              "ADAPTER_NO_RESPONSE": {
+                "usb": "Zieh den Stick ab, steck ihn wieder ein und versuche es erneut. Wenn es wieder passiert, prüfe, ob es das richtige Modell ist und ob keine andere Software (Home Assistant, ein anderes Zigbee2MQTT…) ihn verwendet.",
+                "network": "Starte deinen Netzwerk-Koordinator neu und versuche es erneut. Wenn es wieder passiert, prüfe seine Adresse und seinen Typ und ob keine andere Software (Home Assistant, ein anderes Zigbee2MQTT…) ihn verwendet."
+              }
             },
             "details": "Technische Details",
             "retry": "Erneut versuchen",
@@ -2599,6 +2597,10 @@
               "title": "Zigbee2MQTT antwortet nicht",
               "text": "Gladys erhält keine Antwort von Zigbee2MQTT: Deine Zigbee-Geräte reagieren nicht."
             },
+            "notAnsweringExternal": {
+              "title": "Zigbee2MQTT antwortet nicht über den Broker",
+              "text": "Gladys ist mit dem MQTT-Broker verbunden, aber Zigbee2MQTT antwortet dort nicht: Prüfe, ob es läuft und ob sein base_topic <code>zigbee2mqtt</code> ist."
+            },
             "stoppedExternal": {
               "title": "Von deinem Zigbee2MQTT getrennt",
               "since": "Seit {{date}} · Gladys verbindet sich nicht von selbst wieder. Dein Zigbee2MQTT läuft weiter."
@@ -2717,7 +2719,8 @@
         "serverNoResponse": "Gladys-Server ist nicht verfügbar.",
         "serverNoResponseWebSocker": "Gladys-Server ist nicht verfügbar. Bitte aktualisiere die Seite.",
         "deviceNotHandled": "Gerät wurde noch nicht verarbeitet. Bitte kontaktiere uns, um bei der Verbindung in Gladys zu helfen!",
-        "createGithubIssue": "Dieses Gerät vorschlagen"
+        "createGithubIssue": "Dieses Gerät vorschlagen",
+        "addToGladys": "Zu Gladys hinzufügen"
       },
       "noDeviceFound": "Du hast noch keine Zigbee2MQTT-Geräte hinzugefügt.",
       "nameLabel": "Gerätename",

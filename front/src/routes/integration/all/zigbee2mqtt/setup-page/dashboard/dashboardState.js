@@ -40,9 +40,27 @@ export const getStartupError = status => {
 };
 
 /**
+ * @description Why Gladys is not connected to the broker: the error of its MQTT client, else (an external broker) the
+ * failure of the installation that tried to connect to it.
+ * @param {object} status - Status of the server.
+ * @returns {object|null} `{ code, message }`, or null.
+ */
+export const getBrokerError = status => {
+  if (hasError(status.mqttConnectionError)) {
+    return status.mqttConnectionError;
+  }
+  if (get(status, 'installation.state') === 'failed' && hasError(status.installation.error)) {
+    return status.installation.error;
+  }
+  return null;
+};
+
+/**
  * @description The state the status card shows, the most urgent first: an installation in progress, the service not
  * started (Gladys starts its services one after the other, or it was stopped in the settings), its configuration not
- * read yet, a stop of the user, a missing dongle, a failure, a broker out of reach, then running or not.
+ * read yet, a stop of the user, a missing dongle, a failure, a broker out of reach, then running or not. With an
+ * external broker, Gladys runs nothing: the broker out of reach (whatever the last connection told), then Zigbee2mqtt
+ * answering on it or not, as the wizard tells it.
  * @param {object} status - Status of the server.
  * @param {object} configuration - Saved configuration.
  * @returns {string} A DASHBOARD_STATE.
@@ -62,6 +80,12 @@ export const getDashboardState = (status, configuration) => {
   if (status.stopped) {
     return DASHBOARD_STATE.STOPPED;
   }
+  if (isExternal(configuration)) {
+    if (!status.gladysConnected) {
+      return DASHBOARD_STATE.MQTT_ERROR;
+    }
+    return status.zigbee2mqttConnected ? DASHBOARD_STATE.ONLINE : DASHBOARD_STATE.NOT_ANSWERING;
+  }
   if (status.dongleMissing) {
     return DASHBOARD_STATE.DONGLE_MISSING;
   }
@@ -71,8 +95,7 @@ export const getDashboardState = (status, configuration) => {
   if (!status.gladysConnected && hasError(status.mqttConnectionError)) {
     return DASHBOARD_STATE.MQTT_ERROR;
   }
-  // With an external broker, Gladys connected is what Gladys runs; Zigbee2mqtt answers or not on its side
-  if (status.zigbee2mqttConnected || (isExternal(configuration) && status.gladysConnected)) {
+  if (status.zigbee2mqttConnected) {
     return DASHBOARD_STATE.ONLINE;
   }
   if (status.zigbee2mqttStarting) {
@@ -81,7 +104,8 @@ export const getDashboardState = (status, configuration) => {
   return DASHBOARD_STATE.NOT_ANSWERING;
 };
 
-// The main action of the status card, by state. The service not started: started by Settings > Services, only
+// The main action of the status card, by state. The service not started: started by Settings > Services, only. With
+// an external broker out of reach, its connection is edited (the advanced settings)
 export const getPrimaryAction = (state, configuration) => {
   if (state === DASHBOARD_STATE.ONLINE) {
     return 'pair';
@@ -93,7 +117,7 @@ export const getPrimaryAction = (state, configuration) => {
     return null;
   }
   if (isExternal(configuration)) {
-    return null;
+    return state === DASHBOARD_STATE.MQTT_ERROR ? 'editConnection' : null;
   }
   if ([DASHBOARD_STATE.FAILED, DASHBOARD_STATE.MQTT_ERROR, DASHBOARD_STATE.NOT_ANSWERING].includes(state)) {
     return 'restart';
@@ -101,10 +125,11 @@ export const getPrimaryAction = (state, configuration) => {
   return null;
 };
 
-// The tiles under the cards: restart (not without the dongle: Zigbee2mqtt starts again once it is plugged back), stop,
-// the interface of Zigbee2mqtt; none during an installation, a stop, once stopped, or while the service is not started
-// or its configuration not read yet, except the stop again while a container of ours still runs (Docker refused to
-// stop it)
+// The tiles under the cards: restart (not without the dongle: Zigbee2mqtt starts again once it is plugged back, nor
+// when it is already the main action), stop, the interface of Zigbee2mqtt; none during an installation, a stop, once
+// stopped, or while the service is not started or its configuration not read yet, except the stop again while a
+// container of ours still runs (Docker refused to stop it). With an external broker out of reach, nothing to
+// disconnect
 export const getTiles = (state, configuration, z2mUrl, status = {}) => {
   if (state === DASHBOARD_STATE.STOPPED && !isExternal(configuration)) {
     return status.zigbee2mqttRunning || status.mqttRunning ? ['stop'] : [];
@@ -121,10 +146,13 @@ export const getTiles = (state, configuration, z2mUrl, status = {}) => {
     return [];
   }
   const tiles = [];
-  if (!isExternal(configuration) && state !== DASHBOARD_STATE.DONGLE_MISSING) {
+  const external = isExternal(configuration);
+  if (!external && state !== DASHBOARD_STATE.DONGLE_MISSING && getPrimaryAction(state, configuration) !== 'restart') {
     tiles.push('restart');
   }
-  tiles.push('stop');
+  if (!external || state !== DASHBOARD_STATE.MQTT_ERROR) {
+    tiles.push('stop');
+  }
   if (z2mUrl) {
     tiles.push('interface');
   }

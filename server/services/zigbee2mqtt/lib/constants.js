@@ -25,6 +25,8 @@ const CONFIGURATION = {
   Z2M_NETWORK_GENERATED: 'Z2M_NETWORK_GENERATED',
   // Saved, with its date, when the user stops Zigbee2mqtt: nothing starts it again until the user starts it
   Z2M_STOPPED: 'Z2M_STOPPED',
+  // Saved by the first setup, destroyed once Zigbee2mqtt answers: until then the setup page opens the wizard again
+  Z2M_SETUP_PENDING: 'Z2M_SETUP_PENDING',
 };
 
 const MQTT_MODE = {

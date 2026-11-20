@@ -79,12 +79,15 @@ describe('zigbee2mqtt init', () => {
       mqttPassword: 'mqttPassword',
       mqttMode: 'local',
       z2mStoppedAt: '2026-11-17T08:00:00.000Z',
+      z2mSetupPending: 'true',
     });
     zigbee2mqttManager.watchDongle = sinon.stub();
     // EXECUTE
     const result = await zigbee2mqttManager.init();
     // ASSERT
     expect(result).to.equal(null);
+    // A first setup stopped before Zigbee2mqtt answered: the wizard still opens
+    expect(zigbee2mqttManager.setupPending).to.equal(true);
     expect(zigbee2mqttManager.stopped).to.equal(true);
     expect(zigbee2mqttManager.stoppedAt).to.equal('2026-11-17T08:00:00.000Z');
     // Still known as set up and runnable: the page offers to start it

@@ -130,6 +130,7 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   // Load stored configuration
   const configuration = await this.getConfiguration();
   const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl, z2mAdapterMode, z2mNetworkAdapterUrl } = configuration;
+  this.setupPending = Boolean(configuration.z2mSetupPending);
 
   try {
     const dockerBased = await this.gladys.system.isDocker();

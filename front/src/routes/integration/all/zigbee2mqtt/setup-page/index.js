@@ -120,12 +120,18 @@ class Zigbee2mqttSetupPage extends Component {
       }
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
+      // A first installation saved but not finished (Zigbee2mqtt never answered): the wizard resumes it, unless the user
+      // stopped it since (the dashboard tells it stopped, and starts it)
+      const { setupPending, stopped } = this.state.zigbee2mqttStatus;
+      const resume = isConfigured(configuration) && setupPending === true && !stopped;
+      const chosen = this.state.wizard !== null;
       this.setState({
         configuration,
         z2mUrl: this.resolveZ2mUrl(configuration),
         loadZigbee2mqttConfig: RequestStatus.Success,
         // Chosen once: the wizard saves the configuration on its second step and stays until the user leaves it
-        wizard: this.state.wizard === null ? !isConfigured(configuration) : this.state.wizard
+        wizard: chosen ? this.state.wizard : !isConfigured(configuration) || resume,
+        wizardResume: chosen ? this.state.wizardResume : resume
       });
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service config', e);
@@ -227,6 +233,7 @@ class Zigbee2mqttSetupPage extends Component {
         z2mUrl: null,
         // Nothing is configured any more: the wizard installs again, without the refusal of a setup made before
         wizard: true,
+        wizardResume: false,
         setupZigee2mqttStatus: null,
         setupZigee2mqttError: null
       });
@@ -248,7 +255,9 @@ class Zigbee2mqttSetupPage extends Component {
       loadZigbee2mqttStatus: RequestStatus.Getting,
       loadZigbee2mqttConfig: RequestStatus.Getting,
       // Whether the wizard is shown, chosen once the configuration is loaded (null before)
-      wizard: null
+      wizard: null,
+      // Whether it resumes a first installation not finished
+      wizardResume: false
     };
     // Websocket messages received with the installation and the prefetch, more recent than an answer to a request
     // sent before them
@@ -313,6 +322,7 @@ class Zigbee2mqttSetupPage extends Component {
             saveConfiguration={this.saveConfiguration}
             prefetchImages={this.prefetchImages}
             finishWizard={this.finishWizard}
+            resume={state.wizardResume}
           />
         )}
         {state.wizard === false && (

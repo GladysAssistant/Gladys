@@ -88,6 +88,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   // Stopped by the user, and since when (see stop): nothing starts Zigbee2mqtt until the user starts it again
   this.stopped = false;
   this.stoppedAt = null;
+  // The first setup did not reach Zigbee2mqtt answering yet (see setup): the setup page opens the wizard again
+  this.setupPending = false;
   // An update of the containers waits for its images, not downloaded: tried again on the next start (see init)
   this.updatePending = false;
   // The service is started (see the start and the stop of the service): not yet while Gladys starts its services, nor

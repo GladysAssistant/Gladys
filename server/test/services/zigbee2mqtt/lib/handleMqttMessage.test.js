@@ -229,6 +229,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         configured: null,
         stopped: false,
         stoppedAt: null,
+        setupPending: false,
         updatePending: false,
         serviceStarted: false,
         usbConfigured: false,
@@ -251,6 +252,37 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
     expect(zigbee2mqttManager.startingTimer).to.equal(null);
+  });
+
+  it('should end the first setup once Zigbee2mqtt answers, the wizard no longer opened', async () => {
+    // PREPARE
+    gladys.variable = { destroy: fake.resolves(null) };
+    zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.setupPending = true;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    // ASSERT
+    expect(zigbee2mqttManager.setupPending).to.equal(false);
+    assert.calledOnceWithExactly(gladys.variable.destroy, 'Z2M_SETUP_PENDING', serviceId);
+    assert.calledWithMatch(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, { payload: { setupPending: false } });
+  });
+
+  it('should only log the end of the first setup it could not save', async () => {
+    // PREPARE
+    const error = new Error('database locked');
+    let logged;
+    const warned = new Promise((resolve) => {
+      logged = resolve;
+    });
+    gladys.variable = { destroy: fake.rejects(error) };
+    sinon.stub(logger, 'warn').callsFake(() => logged());
+    zigbee2mqttManager.setupPending = true;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    await warned;
+    // ASSERT
+    expect(zigbee2mqttManager.setupPending).to.equal(false);
+    assert.calledOnceWithExactly(logger.warn, 'Zigbee2mqtt: end of the first setup not saved:', error);
   });
 
   it('should forget the failure of the last installation once Zigbee2mqtt answers, and tell the setup page', async () => {
@@ -763,6 +795,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         configured: null,
         stopped: false,
         stoppedAt: null,
+        setupPending: false,
         updatePending: false,
         serviceStarted: false,
         usbConfigured: false,

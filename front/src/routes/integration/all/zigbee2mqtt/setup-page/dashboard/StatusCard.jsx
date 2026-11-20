@@ -7,7 +7,8 @@ import MqttConnectionError from '../../commons/MqttConnectionError';
 import { formatDuration } from '../wizard/format';
 import { getPhases, getCurrentPhase } from '../wizard/phases';
 import InstallFailure from '../wizard/InstallFailure';
-import { DASHBOARD_STATE, getStartupError, isExternal } from './dashboardState';
+import { isTooOld } from '../wizard/WaitingText';
+import { DASHBOARD_STATE, getBrokerError, getStartupError, isExternal, isNetworkCoordinator } from './dashboardState';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
@@ -66,6 +67,10 @@ export const Title = ({ view }) => {
   if (state === DASHBOARD_STATE.ONLINE && isExternal(configuration)) {
     return <Text id={`${T}.states.onlineExternal.title`} />;
   }
+  // Gladys reaches the broker, Zigbee2mqtt does not answer on it (as the wizard waits for it)
+  if (state === DASHBOARD_STATE.NOT_ANSWERING && isExternal(configuration)) {
+    return <Text id={`${T}.states.notAnsweringExternal.title`} />;
+  }
   // With an external broker, a stop only disconnects Gladys: Zigbee2mqtt runs on
   if (state === DASHBOARD_STATE.STOPPED && isExternal(configuration)) {
     return <Text id={`${T}.states.stoppedExternal.title`} />;
@@ -87,6 +92,9 @@ export const Subtitle = ({ view }) => {
   if (state === DASHBOARD_STATE.INSTALLING) {
     return <Text id="integration.zigbee2mqtt.setup.installation.leavePage" />;
   }
+  if (state === DASHBOARD_STATE.NOT_ANSWERING && isExternal(configuration)) {
+    return <MarkupText id={`${T}.states.notAnsweringExternal.text`} />;
+  }
   return <Text id={`${T}.states.${state}.text`} />;
 };
 
@@ -99,6 +107,21 @@ export const getInstallationPhase = ({ status, configuration }) =>
       ezspFallback: Boolean(status.ezspFallback)
     })
   );
+
+// An external Zigbee2mqtt that does not answer because it is older than the health check (the version comes from the
+// broker: a text, never markup)
+export const TooOldNotice = ({ view }) =>
+  view.state === DASHBOARD_STATE.NOT_ANSWERING && isExternal(view.configuration) && isTooOld(view.status.z2mVersion) ? (
+    <span>
+      <strong>
+        <Text
+          id="integration.zigbee2mqtt.setup.wizard.progress.zigbee2mqttTooOldTitle"
+          fields={{ version: view.status.z2mVersion }}
+        />
+      </strong>{' '}
+      <Text id="integration.zigbee2mqtt.setup.wizard.progress.zigbee2mqttTooOld" />
+    </span>
+  ) : null;
 
 // The progress of an installation run from the dashboard
 const Progress = ({ view }) => {
@@ -129,10 +152,11 @@ const Progress = ({ view }) => {
 export const PRIMARY_LABELS = {
   pair: `${T}.actions.pair`,
   start: `${T}.actions.start`,
-  restart: `${T}.actions.restart`
+  restart: `${T}.actions.restart`,
+  editConnection: 'integration.zigbee2mqtt.setup.wizard.failure.changeConnection'
 };
 
-export const PRIMARY_ICONS = { pair: 'radio', start: 'play', restart: 'refresh-cw' };
+export const PRIMARY_ICONS = { pair: 'radio', start: 'play', restart: 'refresh-cw', editConnection: 'edit-2' };
 
 // Where the service is started
 export const SERVICES_URL = '/dashboard/settings/service';
@@ -145,7 +169,9 @@ export const getPrimaryLabel = (primaryAction, configuration) =>
 const StatusCard = ({ view, actions }) => {
   const { state, status, primaryAction, actionStatus, newDeviceCount } = view;
   const startupError = state === DASHBOARD_STATE.FAILED ? getStartupError(status) : null;
-  const busy = actionStatus === RequestStatus.Getting;
+  const brokerError = state === DASHBOARD_STATE.MQTT_ERROR ? getBrokerError(status) : null;
+  // Until Zigbee2mqtt tells that joining is allowed
+  const busy = actionStatus === RequestStatus.Getting || view.permitJoinWaiting;
   return (
     <section class={style.card} data-cy="z2m-dashboard-status" data-state={state}>
       <div class={style.statusHead}>
@@ -175,14 +201,15 @@ const StatusCard = ({ view, actions }) => {
       {state === DASHBOARD_STATE.INSTALLING && <Progress view={view} />}
       {startupError && (
         <div class="alert alert-danger mb-0" role="alert" data-cy="z2m-dashboard-error">
-          <InstallFailure error={startupError} />
+          <InstallFailure error={startupError} networkCoordinator={isNetworkCoordinator(view.configuration)} />
         </div>
       )}
-      {state === DASHBOARD_STATE.MQTT_ERROR && (
+      {brokerError && (
         <div class="alert alert-danger mb-0" role="alert" data-cy="z2m-dashboard-mqtt-error">
-          <MqttConnectionError error={status.mqttConnectionError} />
+          <MqttConnectionError error={brokerError} />
         </div>
       )}
+      <TooOldNotice view={view} />
       {view.installationSucceeded && (
         <div class="alert alert-success mb-0" data-cy="z2m-dashboard-installation-success">
           <Text

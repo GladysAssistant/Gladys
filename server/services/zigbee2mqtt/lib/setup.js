@@ -121,6 +121,8 @@ async function setup(config) {
         validatedConfig[key] = null;
       });
   }
+  // Nothing configured before: a first setup, followed by the wizard until Zigbee2mqtt answers, even after a reload
+  const firstSetup = !isConfigured({ z2mDriverPath, z2mNetworkAdapterUrl, mqttMode });
   // Refused while an installation runs, as it reads the stored setup, or while an init, a disconnect, a reset or an
   // ezsp fallback runs, which would run alongside the init of the installation or undo it. Started before saving it,
   // with no wait since the check: another setup sent meanwhile is refused too, and the setup page reads the
@@ -133,6 +135,10 @@ async function setup(config) {
         this.saveOrDestroyVariable(key, validatedConfig[key]),
       ),
     );
+    if (firstSetup) {
+      await this.gladys.variable.setValue(CONFIGURATION.Z2M_SETUP_PENDING, 'true', this.serviceId);
+      this.setupPending = true;
+    }
     // Saved to run: no longer stopped by the user (see stop)
     if (this.stopped) {
       await this.clearStop();

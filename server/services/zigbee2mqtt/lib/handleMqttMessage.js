@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { formatDuration } = require('../utils/formatDuration');
-const { INSTALLATION_STATE } = require('./constants');
+const { CONFIGURATION, INSTALLATION_STATE } = require('./constants');
 
 // Zigbee2mqtt answers bridge/request/health_check since 1.21
 const HEALTH_CHECK_MIN_MAJOR = 1;
@@ -54,6 +54,14 @@ async function handleMqttMessage(topic, message) {
       this.zigbee2mqttStarting = false;
       // An error read in the logs of the container did not prevent Zigbee2mqtt from running
       this.z2mContainerError = null;
+      // The first setup reached its end: the setup page no longer opens the wizard
+      if (this.setupPending) {
+        this.setupPending = false;
+        // eslint-disable-next-line promise/prefer-await-to-then
+        this.gladys.variable.destroy(CONFIGURATION.Z2M_SETUP_PENDING, this.serviceId).catch((e) => {
+          logger.warn('Zigbee2mqtt: end of the first setup not saved:', e);
+        });
+      }
       this.emitStatusEvent();
       // Nor did the failure of the last installation, which no longer describes Zigbee2mqtt: the setup page stops
       // showing it. A running installation ends on this answer (see waitForZigbee2mqtt).

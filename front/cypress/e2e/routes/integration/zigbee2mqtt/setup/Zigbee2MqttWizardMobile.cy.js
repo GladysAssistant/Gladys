@@ -68,7 +68,15 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
     cy.wait('@permitJoin')
       .its('request.body')
       .should('deep.equal', { value: true });
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('exist');
+    // Allowed once Zigbee2mqtt tells so, told above the tips: in sight with the bottom bar
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
+    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('be.visible');
+    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').then(([notice]) => {
+      cy.get('[data-cy=z2m-wizard-bottom-bar]').should(([bar]) => {
+        expect(notice.getBoundingClientRect().bottom).to.be.at.most(bar.getBoundingClientRect().top);
+      });
+    });
     cy.get('[data-cy=z2m-wizard-go-to-discover]').should(
       'have.attr',
       'href',

@@ -5,13 +5,26 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../../../utils/consts';
 import { MQTT_MODE } from '../constants';
 import MqttExternalCredentials from '../local/MqttExternalCredentials';
-import SetupRemoteOptions from '../remote/SetupRemoteOptions';
 import { isExternal } from './dashboardState';
 import AdvancedSettingsMobile from './AdvancedSettingsMobile';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
 const BROKER_KEYS = ['mqttUrl', 'mqttUsername', 'mqttPassword', 'z2mFrontendUrl'];
+
+const trimmed = value => (value || '').trim();
+
+// The broker of an external Zigbee2mqtt to save, as the wizard saves it: a field left empty is erased (null)
+export const getBrokerToSave = broker => ({
+  mqttMode: MQTT_MODE.EXTERNAL,
+  mqttUrl: trimmed(broker.mqttUrl),
+  mqttUsername: trimmed(broker.mqttUsername) || null,
+  mqttPassword: broker.mqttPassword || null,
+  z2mFrontendUrl: trimmed(broker.z2mFrontendUrl) || null
+});
+
+const getSavedBroker = configuration =>
+  BROKER_KEYS.reduce((broker, key) => ({ ...broker, [key]: configuration[key] || '' }), {});
 
 const isValidPort = port => /^\d+$/.test(`${port}`) && Number(port) >= 1 && Number(port) <= 65535;
 
@@ -63,6 +76,116 @@ const SaveError = ({ view }) => {
   return null;
 };
 
+const BROKER_LABELS = {
+  mqttUrl: 'urlLabel',
+  mqttUsername: 'usernameLabel',
+  mqttPassword: 'passwordLabel',
+  z2mFrontendUrl: 'frontendUrlLabel'
+};
+
+// A field of the broker of an external Zigbee2mqtt, worded as in the wizard
+const BrokerField = ({ field, type = 'text', placeholder, optional, form, disabled }) => (
+  <div class="form-group">
+    <label class="form-label" for={`z2mDashboard-${field}`}>
+      <Text id={`integration.zigbee2mqtt.setup.wizard.external.${BROKER_LABELS[field]}`} />
+      {optional && (
+        <span class="text-muted ml-1">
+          <Text id="integration.zigbee2mqtt.setup.wizard.external.optional" />
+        </span>
+      )}
+    </label>
+    <input
+      id={`z2mDashboard-${field}`}
+      type={type}
+      class="form-control"
+      placeholder={placeholder}
+      value={form.broker[field] || ''}
+      onInput={e => form.updateBroker(field, e.target.value)}
+      autocomplete={type === 'password' ? 'new-password' : 'off'}
+      disabled={disabled}
+      data-cy={`z2m-dashboard-broker-${field}`}
+    />
+  </div>
+);
+
+// The broker of an external Zigbee2mqtt, its fields in the order of the wizard
+const BrokerForm = ({ view, form }) => {
+  const disabled = view.saving || view.installing || view.serviceNotStarted;
+  return (
+    <section class={style.card} data-cy="z2m-dashboard-broker">
+      <h3 class={style.sectionTitle}>
+        <Text id={`${T}.advanced.broker.title`} />
+      </h3>
+      <BrokerField field="mqttUrl" placeholder="mqtt://192.168.1.10:1883" form={form} disabled={disabled} />
+      <div class="row">
+        <div class="col-md-6">
+          <BrokerField field="mqttUsername" form={form} disabled={disabled} />
+        </div>
+        <div class="col-md-6">
+          <BrokerField field="mqttPassword" type="password" form={form} disabled={disabled} />
+        </div>
+      </div>
+      <BrokerField
+        field="z2mFrontendUrl"
+        placeholder="http://192.168.1.10:8080"
+        optional
+        form={form}
+        disabled={disabled}
+      />
+      <div class={style.buttons}>
+        <button
+          type="button"
+          class={cx('btn btn-primary', { 'btn-loading': view.saving })}
+          disabled={!form.dirty || !form.canSave}
+          onClick={form.save}
+          data-cy="z2m-dashboard-broker-save"
+        >
+          <Text id="global.save" />
+        </button>
+        {form.dirty && (
+          <button type="button" class="btn btn-link" onClick={form.cancel} data-cy="z2m-dashboard-broker-cancel">
+            <Text id="global.cancel" />
+          </button>
+        )}
+      </div>
+    </section>
+  );
+};
+
+// Leaving with changes not saved (the button back to the dashboard): saved, dropped, or kept on the screen
+const LeaveConfirm = ({ form }) => (
+  <div class={cx(style.confirm, 'mb-3')} role="alertdialog" data-cy="z2m-dashboard-leave-confirm">
+    <strong>
+      <Text id="mobileKit.leaveTitle" />
+    </strong>
+    <span>
+      <Text id="mobileKit.leaveText" />
+    </span>
+    <div class={style.buttons}>
+      <button
+        type="button"
+        class="btn btn-primary"
+        disabled={!form.canSave}
+        onClick={form.saveAndLeave}
+        data-cy="z2m-dashboard-leave-save"
+      >
+        <Text id="mobileKit.saveAndLeave" />
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-danger"
+        onClick={form.leaveWithoutSaving}
+        data-cy="z2m-dashboard-leave-discard"
+      >
+        <Text id="mobileKit.leaveWithoutSaving" />
+      </button>
+      <button type="button" class="btn btn-link" onClick={form.closeLeave} data-cy="z2m-dashboard-leave-keep-editing">
+        <Text id="mobileKit.keepEditing" />
+      </button>
+    </div>
+  </div>
+);
+
 // The rare settings, on a screen of their own: the interface of Zigbee2mqtt, the MQTT access for other applications,
 // the state of each component, the broker of an external Zigbee2mqtt, and the reset of the integration
 class AdvancedSettings extends Component {
@@ -73,10 +196,13 @@ class AdvancedSettings extends Component {
     this.props.actions.savePort(this.state.port);
   };
 
-  saveBroker = configuration => {
+  saveBroker = () => {
     this.setState({ saveRequested: true });
-    this.props.actions.saveBroker(configuration);
+    this.props.actions.saveBroker(getBrokerToSave(this.state.broker));
   };
+
+  // The fields back to what is saved
+  cancelBroker = () => this.setState({ broker: getSavedBroker(this.props.view.configuration) });
 
   showConfirmReset = () => this.setState({ confirmReset: true });
 
@@ -100,14 +226,14 @@ class AdvancedSettings extends Component {
       return false;
     }
     if (isExternal(view.configuration)) {
-      return Boolean((this.state.broker.mqttUrl || '').trim());
+      return Boolean(trimmed(this.state.broker.mqttUrl));
     }
     return isValidPort(this.state.port);
   };
 
   save = () => {
     if (isExternal(this.props.view.configuration)) {
-      this.saveBroker({ ...this.state.broker, mqttMode: MQTT_MODE.EXTERNAL });
+      this.saveBroker();
     } else {
       this.savePort();
     }
@@ -134,7 +260,7 @@ class AdvancedSettings extends Component {
     // Whether this screen saved: the outcome of a save made elsewhere (the wizard) is not told here
     this.state = {
       port: configuration.z2mTcpPort || '',
-      broker: BROKER_KEYS.reduce((broker, key) => ({ ...broker, [key]: configuration[key] || '' }), {}),
+      broker: getSavedBroker(configuration),
       confirmReset: false,
       saveRequested: false,
       leaveOpen: false
@@ -174,44 +300,41 @@ class AdvancedSettings extends Component {
     }
   }
 
-  render({ view, actions }, { port, confirmReset, saveRequested }) {
+  render({ view, actions }, { port, confirmReset, saveRequested, leaveOpen }) {
     const { configuration, status, z2mUrl, saving, resetZigbee2mqttStatus } = view;
     const external = isExternal(configuration);
     const portChanged = `${port}` !== `${configuration.z2mTcpPort || ''}`;
     const validPort = isValidPort(port);
+    const form = {
+      ...this.state,
+      external,
+      validPort,
+      dirty: this.isDirty(),
+      canSave: this.canSave(),
+      saveError: saveRequested ? getSaveErrorText(view) : null,
+      updatePort: this.updatePort,
+      updateBroker: this.updateBroker,
+      save: this.save,
+      cancel: this.cancelBroker,
+      closeSaveError: this.closeSaveError,
+      showConfirmReset: this.showConfirmReset,
+      cancelReset: this.cancelReset,
+      back: this.back,
+      openLeave: this.openLeave,
+      closeLeave: this.closeLeave,
+      saveAndLeave: this.saveAndLeave,
+      leaveWithoutSaving: this.leaveWithoutSaving
+    };
     if (view.isMobile) {
-      const form = {
-        ...this.state,
-        external,
-        validPort,
-        dirty: this.isDirty(),
-        canSave: this.canSave(),
-        saveError: saveRequested ? getSaveErrorText(view) : null,
-        updatePort: this.updatePort,
-        updateBroker: this.updateBroker,
-        save: this.save,
-        closeSaveError: this.closeSaveError,
-        showConfirmReset: this.showConfirmReset,
-        cancelReset: this.cancelReset,
-        back: this.back,
-        openLeave: this.openLeave,
-        closeLeave: this.closeLeave,
-        saveAndLeave: this.saveAndLeave,
-        leaveWithoutSaving: this.leaveWithoutSaving
-      };
       return <AdvancedSettingsMobile view={view} actions={actions} form={form} />;
     }
     return (
       <div class={style.advanced} data-cy="z2m-dashboard-advanced">
-        <button
-          type="button"
-          class={cx('btn btn-link', style.back)}
-          onClick={actions.showMain}
-          data-cy="z2m-dashboard-back"
-        >
+        <button type="button" class={cx('btn btn-link', style.back)} onClick={this.back} data-cy="z2m-dashboard-back">
           <i class="fe fe-arrow-left mr-1" aria-hidden="true" />
           <Text id="integration.zigbee2mqtt.setupTab" />
         </button>
+        {leaveOpen && <LeaveConfirm form={form} />}
         <h2 class={style.advancedTitle}>
           <Text id={`${T}.advanced.title`} />
         </h2>
@@ -260,19 +383,7 @@ class AdvancedSettings extends Component {
                 )}
               </section>
             )}
-            {external && (
-              <section class={style.card} data-cy="z2m-dashboard-broker">
-                <h3 class={style.sectionTitle}>
-                  <Text id={`${T}.advanced.broker.title`} />
-                </h3>
-                <SetupRemoteOptions
-                  configuration={configuration}
-                  saveConfiguration={this.saveBroker}
-                  resetConfiguration={actions.noop}
-                  disabled={saving || view.installing || view.serviceNotStarted}
-                />
-              </section>
-            )}
+            {external && <BrokerForm view={view} form={form} />}
             <section class={style.card} data-cy="z2m-dashboard-components">
               <h3 class={style.sectionTitle}>
                 <Text id={`${T}.advanced.components.title`} />
@@ -287,7 +398,11 @@ class AdvancedSettings extends Component {
           <div class={style.column}>
             {!external && (
               <section class={style.card} data-cy="z2m-dashboard-mqtt-access">
-                <MqttExternalCredentials configuration={configuration} mqttRunning={status.mqttRunning} />
+                <MqttExternalCredentials
+                  configuration={configuration}
+                  mqttRunning={status.mqttRunning}
+                  titleClass={cx(style.sectionTitle, 'mb-2')}
+                />
               </section>
             )}
             <section class={style.card} data-cy="z2m-dashboard-reset">

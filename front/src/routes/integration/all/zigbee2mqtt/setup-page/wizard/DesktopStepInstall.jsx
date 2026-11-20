@@ -112,7 +112,10 @@ const DesktopStepInstall = ({ view, actions }) => {
       {failed && (
         <div>
           <div class="alert alert-danger" role="alert">
-            <InstallFailure error={zigbee2mqttStatus.installation && zigbee2mqttStatus.installation.error} />
+            <InstallFailure
+              error={zigbee2mqttStatus.installation && zigbee2mqttStatus.installation.error}
+              networkCoordinator={savedConfiguration.z2mAdapterMode === 'network'}
+            />
           </div>
           <div class={style.buttons}>
             <button

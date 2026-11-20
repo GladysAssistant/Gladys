@@ -2,7 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 import get from 'get-value';
 
 // Zigbee2mqtt answers the health check Gladys follows it with since 1.21 (see handleMqttMessage on the server)
-const isTooOld = version => {
+export const isTooOld = version => {
   if (!version) {
     return false;
   }

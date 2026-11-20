@@ -29,7 +29,7 @@ export const getStepNumber = view => {
 export const getStepLabels = external =>
   external ? ['connection', 'check', 'network', 'device'] : ['key', 'install', 'network', 'device'];
 
-const Stepper = ({ current, external }) => (
+const Stepper = ({ current, external, failed }) => (
   <Localizer>
     <ol class={style.stepper} aria-label={<Text id={`${T}.stepsLabel`} />}>
       {getStepLabels(external).map((label, index) => {
@@ -39,7 +39,8 @@ const Stepper = ({ current, external }) => (
             key={label}
             class={cx(style.stepperItem, {
               [style.stepperDone]: number < current,
-              [style.stepperCurrent]: number === current
+              [style.stepperCurrent]: number === current,
+              [style.stepperFailed]: failed && number === current
             })}
             aria-current={number === current ? 'step' : undefined}
             data-cy="z2m-wizard-stepper-item"
@@ -236,7 +237,13 @@ const WizardDesktop = ({ view, actions }) => {
         </h2>
       </div>
       <div class="card-body">
-        {!view.changeMode && <Stepper current={current} external={view.connectOnly} />}
+        {!view.changeMode && (
+          <Stepper
+            current={current}
+            external={view.connectOnly}
+            failed={view.step === STEP.INSTALL && view.installView === INSTALL_VIEW.FAILED}
+          />
+        )}
         {view.step === STEP.KEY && <DesktopStepKey view={view} actions={actions} />}
         {view.step === STEP.INSTALL && view.installView !== INSTALL_VIEW.READY && (
           <DesktopStepInstall view={view} actions={actions} />

@@ -56,14 +56,27 @@ describe('zigbee2mqtt setup', () => {
     // EXECUTE
     await zigbee2MqttManager.setup(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 3);
+    assert.callCount(gladys.variable.setValue, 4);
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', 'usb0', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE_DONGLE_NAME', 'dongle-name', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', 'tcpPort', serviceId);
+    // A first setup: the wizard opens again until Zigbee2mqtt answers
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_SETUP_PENDING', 'true', serviceId);
+    expect(zigbee2MqttManager.setupPending).to.equal(true);
 
     assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation, true);
     // Set up as soon as saved, before the installation reads it again
     expect(zigbee2MqttManager.configured).to.equal(true);
+  });
+
+  it('should not take an installation already set up back to its first setup', async () => {
+    // PREPARE: an external broker is saved
+    gladys.variable.getValue = fake((key) => Promise.resolve(key === 'Z2M_MQTT_MODE' ? 'external' : null));
+    // EXECUTE
+    await zigbee2MqttManager.setup({ Z2M_MQTT_URL: 'mqtt://192.168.1.10' });
+    // ASSERT
+    assert.neverCalledWith(gladys.variable.setValue, 'Z2M_SETUP_PENDING');
+    expect(zigbee2MqttManager.setupPending).to.equal(false);
   });
 
   it('should forget the stop of the user once the setup is saved', async () => {
@@ -91,7 +104,8 @@ describe('zigbee2mqtt setup', () => {
     // EXECUTE
     await zigbee2MqttManager.setup(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 4);
+    assert.callCount(gladys.variable.setValue, 5);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_SETUP_PENDING', 'true', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_URL', 'mqtt://localhost', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'GLADYS_MQTT_USERNAME', '', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'GLADYS_MQTT_PASSWORD', 'password', serviceId);
@@ -161,7 +175,8 @@ describe('zigbee2mqtt setup', () => {
     // EXECUTE
     await zigbee2MqttManager.setup(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 3);
+    assert.callCount(gladys.variable.setValue, 4);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_SETUP_PENDING', 'true', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_ADAPTER_MODE', 'network', serviceId);
     // The URL has been normalized
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_NETWORK_ADAPTER_URL', 'tcp://192.168.1.20:6638', serviceId);

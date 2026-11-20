@@ -1,5 +1,13 @@
 import { answerSetup, runningInstallation, doneInstallation, sendProgress } from './wizardFixtures';
-import { onlineStatus, localSetup, externalSetup, conflict, visitDashboard, answerAction } from './dashboardFixtures';
+import {
+  onlineStatus,
+  notAnsweringStatus,
+  localSetup,
+  externalSetup,
+  conflict,
+  visitDashboard,
+  answerAction
+} from './dashboardFixtures';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
 
@@ -67,6 +75,31 @@ describe('Zigbee2mqtt dashboard on a phone', () => {
     cy.get('[data-cy=z2m-dashboard-confirm-restart] [data-cy=confirm-sheet-confirm]').click();
     cy.wait('@restart');
     cy.get('[data-cy=z2m-dashboard-confirm-restart]').should('not.exist');
+  });
+
+  it('should tell that an external Zigbee2mqtt too old to answer does not answer, without Pair', () => {
+    visitDashboard({ status: { ...notAnsweringStatus, z2mVersion: '1.20.0' }, setup: externalSetup });
+
+    cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.notAnsweringExternal.title`);
+    cy.get('[data-cy=z2m-dashboard-too-old]').should('contain', '1.20.0');
+    cy.get('[data-cy=z2m-dashboard-pair]').should('not.exist');
+    fitsTheScreen();
+  });
+
+  it('should edit the connection to an external broker out of reach', () => {
+    visitDashboard({
+      status: {
+        ...notAnsweringStatus,
+        gladysConnected: false,
+        mqttConnectionError: { code: 'BROKER_UNREACHABLE', message: null }
+      },
+      setup: externalSetup
+    });
+
+    cy.get('[data-cy=z2m-dashboard-title]').i18n(`${T}.states.mqttError.title`);
+    cy.get('[data-cy=z2m-dashboard-stop]').should('not.exist');
+    cy.get('[data-cy=z2m-dashboard-editConnection]').click();
+    cy.get('[data-cy=z2m-dashboard-advanced]').should('exist');
   });
 
   it('should change the dongle in the phone wizard, and go back to the dashboard from its bar', () => {
@@ -168,6 +201,27 @@ describe('Zigbee2mqtt dashboard on a phone', () => {
         .its('request.body')
         .should('include', { Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://192.168.1.11:1883' });
       cy.get('[data-cy=z2m-dashboard-key]').should('contain', 'mqtt://192.168.1.11:1883');
+    });
+
+    it('should save an anonymous broker as the large screen and the wizard save it', () => {
+      visitDashboard({ setup: externalSetup });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      answerSetup({ body: { ...externalSetup, GLADYS_MQTT_USERNAME: null, GLADYS_MQTT_PASSWORD: null } });
+
+      cy.get('[data-cy=z2m-dashboard-broker-mqttUsername]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-mqttPassword]').clear();
+      cy.get('[data-cy=z2m-dashboard-broker-z2mFrontendUrl]').type('  http://192.168.1.10:8080  ');
+      cy.get('[data-cy=z2m-dashboard-save]').click();
+      // The fields left empty are erased (null), not saved as empty texts
+      cy.wait('@setup')
+        .its('request.body')
+        .should('deep.equal', {
+          Z2M_MQTT_MODE: 'external',
+          Z2M_MQTT_URL: 'mqtt://192.168.1.10:1883',
+          GLADYS_MQTT_USERNAME: null,
+          GLADYS_MQTT_PASSWORD: null,
+          Z2M_FRONTEND_URL: 'http://192.168.1.10:8080'
+        });
     });
 
     it('should show the broker saved meanwhile in the fields not changed, nothing to save', () => {
