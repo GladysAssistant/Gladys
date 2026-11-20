@@ -615,12 +615,16 @@ function getRoutes(gladys) {
       admin: true,
       controller: serviceController.stop,
     },
-    // ⚠️ the literal `message` route must be declared BEFORE `:service_name`
-    // (setupRoutes registers routes in declaration order), otherwise it would
-    // be swallowed and read as a service named "message".
+    // ⚠️ the literal `message` and `startup` routes must be declared BEFORE `:service_name`
+    // (setupRoutes registers routes in declaration order), otherwise they would
+    // be swallowed and read as a service named "message" or "startup".
     'get /api/v1/service/message': {
       authenticated: true,
       controller: serviceController.getMessageServices,
+    },
+    'get /api/v1/service/startup': {
+      authenticated: true,
+      controller: serviceController.getStartupState,
     },
     'get /api/v1/service/:service_name': {
       authenticated: true,

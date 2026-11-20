@@ -2250,6 +2250,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
+    SERVICES_STARTUP: 'system.services-startup',
     WATCHTOWER_LOG: 'system.watchtower-log',
     UPGRADE_ERROR: 'system.upgrade-error',
   },
@@ -2468,6 +2469,9 @@ const DEVICE_SET_VALUE_ERROR_CAUSES = {
   UNREACHABLE: 'unreachable',
   // the integration of the device is not configured, or not connected
   NOT_CONFIGURED: 'not-configured',
+  // the integration is not ready yet to drive its devices: Gladys is still starting it, or it has
+  // not received what it needs from its bridge (ServiceNotReadyError)
+  NOT_READY: 'not-ready',
   // the device, its feature or its integration no longer exists
   NOT_FOUND: 'not-found',
   // the value was refused before anything was sent to the device

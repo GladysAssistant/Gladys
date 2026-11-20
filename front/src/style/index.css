@@ -594,12 +594,18 @@ body .apexcharts-tooltip {
   body.gladys-sidebar-nav #app > .page {
     padding-top: 3.25rem;
   }
+  /* room for the "Gladys is starting" strip below the top bar (see
+     ServicesStartupMobileStrip), only while the integrations start */
+  body.gladys-sidebar-nav.gladys-services-starting #app > .page {
+    padding-top: 5.25rem;
+  }
 }
 
 /* A focus page (the scene editor on a phone, docs/specs/scene-editor-mobile.md E.1) brings its
    own navigation bar: the app's mobile top bar gives way */
 @media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
-  body.gladys-focus-page .gladys-mobile-top-bar {
+  body.gladys-focus-page .gladys-mobile-top-bar,
+  body.gladys-focus-page .gladys-services-startup-strip {
     display: none !important;
   }
 

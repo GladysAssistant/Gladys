@@ -1,6 +1,7 @@
 import { Component, createRef } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 import { Link } from 'preact-router/match';
 import { connect } from 'unistore/preact';
 import { isUrlInArray } from '../../utils/url';
@@ -9,6 +10,7 @@ import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
 import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
+import ServicesStartupNotice, { ServicesStartupMobileStrip } from './ServicesStartupNotice';
 import ClockOffsetNotice from './ClockOffsetNotice';
 import FeedbackLink from '../feedback/FeedbackLink';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
@@ -191,6 +193,8 @@ class Header extends Component {
       // same for the server clock: a client-side login never runs the
       // session check that measures it (throttled, so almost always a no-op)
       this.props.refreshClockOffsetState();
+      // and for the integrations still starting (only the first call of a session asks Gladys)
+      this.props.refreshServicesStartupStateIfNeeded();
     }
   };
 
@@ -271,9 +275,11 @@ class Header extends Component {
     const showInstanceUpdateNotice =
       isInstanceBehindFront(props.instanceGladysVersion) && !isUpdateNoticeDismissed(props.instanceGladysVersion);
     const showClockOffsetNotice = Number.isFinite(props.clockOffset);
+    const showServicesStartupNotice = get(props, 'servicesStartup.in_progress') === true;
     // a notice waiting in a menu that is closed — the mobile drawer, or the
     // rail collapsed on desktop — is echoed by a dot on the button opening it
-    const showTogglerDot = showInstanceUpdateNotice || props.gatewayPaymentRequired || showClockOffsetNotice;
+    const showTogglerDot =
+      showInstanceUpdateNotice || props.gatewayPaymentRequired || showClockOffsetNotice || showServicesStartupNotice;
 
     return (
       <div>
@@ -306,6 +312,13 @@ class Header extends Component {
           </a>
           <DarkModeToggle />
         </div>
+        {showServicesStartupNotice && (
+          <ServicesStartupMobileStrip
+            servicesStartup={props.servicesStartup}
+            onClick={props.toggleCollapsedMenu}
+            menuOpen={props.showCollapsedMenu}
+          />
+        )}
         {/* Collapsed rail on desktop: this floating button, alone in the slim
             gutter the page keeps on the left, expands it back — into the
             docked rail, never an overlay. No top bar up here: a full-width
@@ -383,6 +396,7 @@ class Header extends Component {
               </li>
             ))}
           </ul>
+          {showServicesStartupNotice && <ServicesStartupNotice servicesStartup={props.servicesStartup} />}
           {showInstanceUpdateNotice && (
             <InstanceUpdateNotice
               instanceVersion={props.instanceGladysVersion}

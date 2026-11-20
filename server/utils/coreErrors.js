@@ -81,6 +81,15 @@ class ExternalIntegrationUnavailableError extends Error {
   }
 }
 
+// An integration cannot answer yet: it is still starting (typically while Gladys boots and starts
+// its integrations one after the other), or it has not received what it needs from its bridge
+class ServiceNotReadyError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 module.exports = {
   PasswordNotMatchingError,
   NotFoundError,
@@ -94,4 +103,5 @@ module.exports = {
   ForbiddenError,
   TooManyRequests,
   ExternalIntegrationUnavailableError,
+  ServiceNotReadyError,
 };

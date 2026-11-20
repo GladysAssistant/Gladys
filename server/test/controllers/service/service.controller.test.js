@@ -74,3 +74,18 @@ describe('GET /api/v1/service/message', () => {
       });
   });
 });
+
+describe('GET /api/v1/service/startup', () => {
+  it('should get the startup state of the services', async () => {
+    await authenticatedRequest
+      .get('/api/v1/service/startup')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('in_progress');
+        expect(res.body).to.have.property('total');
+        expect(res.body).to.have.property('done');
+        expect(res.body).to.have.property('waiting');
+      });
+  });
+});

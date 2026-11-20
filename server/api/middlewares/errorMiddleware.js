@@ -8,6 +8,7 @@ const {
   Error422,
   Error500,
   Error429,
+  Error503,
 } = require('../../utils/httpErrors');
 const {
   PasswordNotMatchingError,
@@ -18,6 +19,7 @@ const {
   ForbiddenError,
   TooManyRequests,
   ExternalIntegrationUnavailableError,
+  ServiceNotReadyError,
 } = require('../../utils/coreErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
@@ -79,6 +81,8 @@ module.exports = function errorMiddleware(error, req, res, next) {
     responseError = new Error429({ time_before_next: error.timeBeforeNext });
   } else if (error instanceof ExternalIntegrationUnavailableError) {
     responseError = new Error400(error.message);
+  } else if (error instanceof ServiceNotReadyError) {
+    responseError = new Error503(error.message);
   } else {
     logger.warn(error);
     responseError = new Error500(error);

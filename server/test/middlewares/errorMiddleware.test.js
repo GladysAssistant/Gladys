@@ -4,7 +4,7 @@ const { fake, assert } = sinon;
 const { expect } = require('chai');
 const MockExpressRequest = require('mock-express-request');
 
-const { ConflictError, ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
+const { ConflictError, ExternalIntegrationUnavailableError, ServiceNotReadyError } = require('../../utils/coreErrors');
 const errorMiddleware = require('../../api/middlewares/errorMiddleware');
 
 const send = fake.returns(null);
@@ -43,6 +43,20 @@ describe('errorMiddleware', () => {
     });
     assert.calledWith(res.status, 400);
     assert.calledOnce(send);
+  });
+  it('should return 503 when an integration is not ready yet', async () => {
+    // @ts-ignore
+    const req = new MockExpressRequest({
+      method: 'POST',
+    });
+    const error = new ServiceNotReadyError('Zigbee2mqtt is not ready yet');
+
+    errorMiddleware(error, req, res, () => {
+      throw new Error('next should not be called');
+    });
+    assert.calledWith(res.status, 503);
+    assert.calledOnce(send);
+    expect(send.firstCall.args[0].message).to.equal('Zigbee2mqtt is not ready yet');
   });
   it('should return 413 when body-parser rejected an oversized payload', async () => {
     // @ts-ignore

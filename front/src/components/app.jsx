@@ -223,7 +223,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset,gladysUnreachable,loggingOut',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,servicesStartup,clockOffset,gladysUnreachable,loggingOut',
   actions
 )(props => (
   <div id="app">
@@ -253,10 +253,12 @@ const AppRouter = connect(
       gatewayTrialStripePortalKey={props.gatewayTrialStripePortalKey}
       refreshGatewayTrialState={props.refreshGatewayTrialState}
       gatewayPaymentRequired={props.gatewayPaymentRequired}
+      servicesStartup={props.servicesStartup}
       instanceGladysVersion={props.instanceGladysVersion}
       refreshInstanceVersionState={props.refreshInstanceVersionState}
       clockOffset={props.clockOffset}
       refreshClockOffsetState={props.refreshClockOffsetState}
+      refreshServicesStartupStateIfNeeded={props.refreshServicesStartupStateIfNeeded}
     />
     {/* Outside the Header: that one renders nothing on a full-screen dashboard,
         where a wall tablet most needs to be told that Gladys is unreachable. */}

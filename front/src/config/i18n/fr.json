@@ -136,6 +136,7 @@
     "setValueError": {
       "unreachable": "La commande envoyée à « {{name}} » a échoué. L'appareil est peut-être injoignable.",
       "notConfigured": "La commande n'a pas été envoyée à « {{name}} » : son intégration n'est pas configurée ou pas connectée.",
+      "notReady": "La commande n'a pas été envoyée à « {{name}} » : son intégration n'est pas encore prête. Gladys est peut-être encore en train de la démarrer, ou elle n'est pas connectée.",
       "refused": "La commande envoyée à « {{name}} » a été refusée.",
       "notFound": "La commande n'a pas été envoyée : cet appareil, ou son intégration, n'existe plus dans Gladys.",
       "gladysUnreachable": "Gladys est injoignable : la commande n'a peut-être pas été envoyée.",
@@ -8386,6 +8387,15 @@
     "subscriptionNoticeButton": "Mettre à jour mon moyen de paiement",
     "subscriptionNoticeCheck": "Vérifier l'abonnement",
     "subscriptionNoticeContactAdmin": "Merci de contacter l'administrateur de votre compte Gladys Plus.",
+    "servicesStartupNoticeTitle": "Gladys démarre",
+    "servicesStartupNoticeText": "Démarrage des intégrations : {{done}}/{{total}}. Les appareils des intégrations pas encore démarrées ne peuvent pas être contrôlés pour l'instant.",
+    "servicesStartupNoticeProgress": "{{done}}/{{total}} intégrations",
+    "servicesStartupNoticeCurrent": "En cours :",
+    "servicesStartupNoticeWaiting": "En attente :",
+    "servicesStartupNoticeWaitingMore": {
+      "one": "et 1 autre",
+      "other": "et {{count}} autres"
+    },
     "instanceUpdateNoticeTitle": "Mise à jour disponible",
     "instanceUpdateNoticeText": "Gladys Plus a été mis à jour en {{latestVersion}}, mais votre instance est encore en {{instanceVersion}}. Certaines fonctionnalités peuvent mal fonctionner tant que votre instance n'est pas à jour.",
     "instanceUpdateNoticeButton": "Mettre à jour mon instance",
