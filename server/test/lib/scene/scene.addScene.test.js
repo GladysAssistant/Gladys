@@ -341,6 +341,7 @@ describe('SceneManager.addScene', () => {
       type: EVENTS.MQTT.RECEIVED,
       topic: 'my/topic',
       message: 'message',
+      topic_filter: 'my/topic',
     });
   });
   it('should add a scene with a time-range trigger, scheduling 2 jobs per range', async () => {
