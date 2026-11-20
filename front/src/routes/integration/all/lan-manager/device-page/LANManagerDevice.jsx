@@ -25,7 +25,7 @@ class LANManagerDevice extends Component {
   };
   // resolves to false when the device could not be deleted
   deleteDevice = async () => {
-    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
+    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined, deleteError: false });
     let deleted = true;
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
@@ -37,7 +37,8 @@ class LANManagerDevice extends Component {
         const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
-        this.setState({ error: RequestStatus.Error });
+        // said on the card: after the confirmation, a failure must not look like nothing happened
+        this.setState({ deleteError: true });
       }
     }
     this.setState({ loading: false });
@@ -50,7 +51,7 @@ class LANManagerDevice extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  render({ device, houses, isMobile }, { loading, tooMuchStatesError, statesNumber }) {
+  render({ device, houses, isMobile }, { loading, tooMuchStatesError, statesNumber, deleteError }) {
     const manufacturer = device.params.find(param => param.name === PARAMS.MANUFACTURER);
     const macAddress = device.params.find(param => param.name === PARAMS.MAC);
     const orginalName = device.params.find(param => param.name === PARAMS.NAME);
@@ -103,6 +104,11 @@ class LANManagerDevice extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+                {deleteError && (
+                  <div class="alert alert-danger" data-cy="device-delete-error">
+                    <Text id="mobileDeviceList.deleteError" />
+                  </div>
+                )}
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
                     <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />

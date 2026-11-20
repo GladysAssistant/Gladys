@@ -5929,6 +5929,7 @@
     "disconnectButton": "Déconnecter",
     "disconnectConfirmTitle": "Déconnecter Gladys Plus ?",
     "disconnectConfirmText": "Ce Gladys ne sera plus accessible à distance et ses sauvegardes s'arrêteront, comme tout ce qui passe par Gladys Plus. Les clés qui le relient à votre compte sont supprimées de cette instance : pour utiliser à nouveau Gladys Plus, il faudra vous reconnecter à votre compte ici.",
+    "disconnectConfirmBackupKey": "Votre clé de sauvegarde est elle aussi supprimée de cette instance. Enregistrez-la ailleurs avant : sans elle, les sauvegardes déjà stockées sur Gladys Plus ne pourront plus être restaurées.",
     "disconnectError": "Gladys Plus n'a pas pu être déconnecté. Réessayez.",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
     "gatewayConnectedSuccessDescription": "Votre instance de Gladys s'est connectée avec succès.",

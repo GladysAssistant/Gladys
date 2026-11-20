@@ -6,22 +6,38 @@ import get from 'get-value';
 import { RequestStatus } from '../../../utils/consts';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ConfirmSheet from '../../../components/mobile/ConfirmSheet';
+import kitStyle from '../../../components/mobile/kit.css';
 
-// Disconnecting deletes the keys that link the instance to the Gladys Plus account: it is asked
-// first, and a failure is said (docs/specs/mobile-pages/settings-pages.md, J)
+// Disconnecting deletes the keys that link the instance to the Gladys Plus account, the backup
+// key included: it is asked first, saying so, and a failure is said
+// (docs/specs/mobile-pages/settings-pages.md, J)
 class GatewayDisconnect extends Component {
-  state = { confirmOpen: false };
+  // `attempted`: the status of the request lives in the store and outlives this page. An error
+  // is only shown for a disconnection asked from this visit, not for one that failed last time.
+  state = { confirmOpen: false, attempted: false };
 
   ask = () => this.setState({ confirmOpen: true });
 
   cancel = () => this.setState({ confirmOpen: false });
 
-  confirm = () => {
-    this.setState({ confirmOpen: false });
-    this.props.disconnect();
+  // Not in the state: two clicks on the confirming button land before the dialog is gone
+  disconnecting = false;
+
+  confirm = async () => {
+    // one confirmation, one request
+    if (this.disconnecting) {
+      return;
+    }
+    this.disconnecting = true;
+    this.setState({ confirmOpen: false, attempted: true });
+    try {
+      await this.props.disconnect();
+    } finally {
+      this.disconnecting = false;
+    }
   };
 
-  render({ gatewayDisconnectStatus, intl }, { confirmOpen }) {
+  render({ gatewayDisconnectStatus, intl }, { confirmOpen, attempted }) {
     return (
       <div class="card">
         <div class="card-header">
@@ -37,7 +53,7 @@ class GatewayDisconnect extends Component {
           <div class="loader" />
           <div class="dimmer-content">
             <div class="card-body">
-              {gatewayDisconnectStatus === RequestStatus.Error && (
+              {attempted && gatewayDisconnectStatus === RequestStatus.Error && (
                 <div class="alert alert-danger" role="alert" data-cy="gateway-disconnect-error">
                   <Text id="gateway.disconnectError" />
                 </div>
@@ -57,7 +73,13 @@ class GatewayDisconnect extends Component {
           onConfirm={this.confirm}
           onCancel={this.cancel}
           dataCy="gateway-disconnect-confirm"
-        />
+        >
+          <p class={kitStyle.sheetText} data-cy="gateway-disconnect-backup-key">
+            <strong>
+              <Text id="gateway.disconnectConfirmBackupKey" />
+            </strong>
+          </p>
+        </ConfirmSheet>
       </div>
     );
   }

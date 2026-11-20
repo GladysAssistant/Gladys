@@ -44,7 +44,7 @@ class XiaomiDeviceBox extends Component {
     this.setState({ loading: false });
   };
   deleteDevice = async () => {
-    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
+    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined, deleteError: false });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
@@ -54,7 +54,8 @@ class XiaomiDeviceBox extends Component {
         const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
-        this.setState({ error: RequestStatus.Error });
+        // said on the card: after the confirmation, a failure must not look like nothing happened
+        this.setState({ deleteError: true });
       }
     }
     this.setState({ loading: false });
@@ -73,7 +74,7 @@ class XiaomiDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, loading, tooMuchStatesError, statesNumber }) {
+  render(props, { batteryLevel, loading, tooMuchStatesError, statesNumber, deleteError }) {
     return (
       <div class="col-md-4">
         <div class="card">
@@ -93,6 +94,11 @@ class XiaomiDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+                {deleteError && (
+                  <div class="alert alert-danger" data-cy="device-delete-error">
+                    <Text id="mobileDeviceList.deleteError" />
+                  </div>
+                )}
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
                     <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />

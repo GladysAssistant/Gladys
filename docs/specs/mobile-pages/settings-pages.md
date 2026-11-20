@@ -36,9 +36,10 @@ that were there.
   same `revokeSession` action; the button shows a spinner while the request runs. A success closes
   the sheet, removes the row and shows a "Session revoked" toast; a failure says so in the sheet
   and keeps the row.
-- **On a wider screen too.** The trash icon of a row of the table opens the same confirmation as
-  a centered dialog — same texts, same `revokeSession` action, the failure said in the dialog.
-  The table shows no toast: the row leaving it is the answer.
+- **On a wider screen too.** The trash of a row of the table — a real button, named "Revoke",
+  that the keyboard reaches — opens the same confirmation as a centered dialog: same texts, same
+  `revokeSession` action, the failure said in the dialog. The table shows no toast: the row
+  leaving it is the answer.
 
 ## C. Services (`settings-service`)
 
@@ -140,7 +141,8 @@ One column, in this order:
 
 ## H. What does not change
 
-- From 768 px: every page as before, except that revoking a session is confirmed (B).
+- From 768 px: every page as before, except that revoking a session (B) and disconnecting
+  Gladys Plus (J) are confirmed.
 - The containers, the store actions and the requests: `revokeSession`, `actionOnService`,
   `getJobs`, `createBackup` / `restoreBackup`, the system requests, the gateway client calls. The
   only additions are read-only: the sessions page also reads the session and the status of a
@@ -183,6 +185,17 @@ The page keeps its cards on every screen size. One of them cannot be taken back 
 **"Disconnect" is confirmed.** It deletes from the instance the keys that link it to the Gladys
 Plus account (remote access, backups and everything that goes through Gladys Plus stop, and
 coming back means signing in to the account again), so the button opens a confirmation — a sheet
-on a phone, a centered dialog from 576 px — that says so. Confirming calls the same `disconnect`
-action; **a disconnection that fails says so on the card** ("Gladys Plus could not be
-disconnected. Try again."), where it used to end silently.
+on a phone, a centered dialog from 576 px — that says so.
+
+**The confirmation names the one loss that cannot be made up for: the backup key.**
+`gateway.disconnect` deletes `GLADYS_GATEWAY_BACKUP_KEY` with the other keys, and the next sign-in
+generates a new, random one: a user who never copied the key shown on this page can no longer
+restore the backups already stored on Gladys Plus. The dialog says it in a sentence of its own,
+in bold — "Your backup key is deleted from this instance too. Save it somewhere else first:
+without it, the backups already stored on Gladys Plus can no longer be restored."
+
+Confirming calls the same `disconnect` action, once: a second click on the confirming button
+sends nothing. **A disconnection that fails says so on the card** ("Gladys Plus could not be
+disconnected. Try again."), where it used to end silently — for the attempt just made only: the
+status of the request lives in the store, and the card does not show the failure of an earlier
+visit.

@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import SessionDeviceLabel from './SessionDeviceLabel';
@@ -7,10 +7,7 @@ dayjs.extend(relativeTime);
 
 const SessionDevice = ({ children, ...props }) => {
   // the revocation is confirmed by the page (docs/specs/mobile-pages/settings-pages.md, B)
-  const askRevoke = e => {
-    e.preventDefault();
-    props.askRevoke(props.session);
-  };
+  const askRevoke = () => props.askRevoke(props.session);
 
   return (
     <tr>
@@ -27,14 +24,19 @@ const SessionDevice = ({ children, ...props }) => {
         </div>
       </td>
       <td>
-        <i
-          style={{
-            cursor: 'pointer'
-          }}
-          onClick={askRevoke}
-          class="fe fe-trash-2"
-          data-cy="session-revoke"
-        />
+        {/* a real button: the keyboard reaches it, and a screen reader names it */}
+        <Localizer>
+          <button
+            type="button"
+            class="btn btn-link p-0 text-reset"
+            onClick={askRevoke}
+            aria-label={<Text id="sessionsSettings.revoke" />}
+            title={<Text id="sessionsSettings.revoke" />}
+            data-cy="session-revoke"
+          >
+            <i class="fe fe-trash-2" />
+          </button>
+        </Localizer>
       </td>
     </tr>
   );

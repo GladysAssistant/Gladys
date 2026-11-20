@@ -61,6 +61,7 @@ const RtspCameraPage = ({ children, ...props }) => (
               {props.rtspCameras &&
                 props.rtspCameras.map((camera, index) => (
                   <RtspCameraBox
+                    key={camera.external_id}
                     camera={camera}
                     cameraIndex={index}
                     housesWithRooms={props.housesWithRooms}

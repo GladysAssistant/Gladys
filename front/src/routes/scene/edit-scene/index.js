@@ -1949,18 +1949,58 @@ class EditScene extends Component {
 
   showToast = (textId, withUndo = false) => {
     clearTimeout(this.toastTimer);
+    this.stopWatchingEditsAfterDeletion();
     this.setState(prevState => ({
       toast: { id: (prevState.toast ? prevState.toast.id : 0) + 1, textId, withUndo }
     }));
-    this.toastTimer = setTimeout(
-      () => this.setState({ toast: null }),
-      withUndo ? UNDO_TOAST_DURATION_MS : TOAST_DURATION_MS
-    );
+    this.toastDuration = withUndo ? UNDO_TOAST_DURATION_MS : TOAST_DURATION_MS;
+    this.toastTimer = setTimeout(this.hideToast, this.toastDuration);
+    if (withUndo && !this.state.isMobile) {
+      this.watchEditsAfterDeletion();
+    }
   };
 
   hideToast = () => {
     clearTimeout(this.toastTimer);
+    this.stopWatchingEditsAfterDeletion();
     this.setState({ toast: null });
+  };
+
+  // The pointer is over the toast, or the keyboard is on its "Undo": it does not leave under
+  // the user's hand (docs/specs/scene-editor-mobile.md, C.7)
+  holdToast = () => {
+    clearTimeout(this.toastTimer);
+  };
+
+  releaseToast = () => {
+    clearTimeout(this.toastTimer);
+    if (this.state.toast) {
+      this.toastTimer = setTimeout(this.hideToast, this.toastDuration);
+    }
+  };
+
+  // On a wide screen the whole editor stays usable while "Undo" is offered, and undoing puts
+  // back the scene as it was before the deletion: whatever the user did since would go with it.
+  // So the first edit made after a deletion withdraws the "Undo" — the deletion stands, and
+  // nothing typed afterwards is ever taken back. (On a phone the toast sits on the timeline,
+  // where the next action is another sheet.)
+  watchEditsAfterDeletion = () => {
+    EDIT_EVENTS.forEach(type => document.addEventListener(type, this.onEditAfterDeletion, true));
+  };
+
+  stopWatchingEditsAfterDeletion = () => {
+    EDIT_EVENTS.forEach(type => document.removeEventListener(type, this.onEditAfterDeletion, true));
+  };
+
+  onEditAfterDeletion = event => {
+    const { target } = event;
+    // the toast itself ("Undo" clicked, or reached with the keyboard) is not an edit
+    const inToast = target && typeof target.closest === 'function' && target.closest('[data-cy="scene-toast"]');
+    if (inToast || isNotAnEdit(event)) {
+      return;
+    }
+    this.undoSnapshot = null;
+    this.hideToast();
   };
 
   // Snapshot of what a deletion changes, taken before it (some mutations rewrite the variable
@@ -2237,6 +2277,7 @@ class EditScene extends Component {
     // a "Save and leave" still in flight must not navigate away from wherever the user went
     this.pendingLeave = null;
     clearTimeout(this.toastTimer);
+    this.stopWatchingEditsAfterDeletion();
     document.removeEventListener('click', this.closeEdition, true);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
@@ -2374,6 +2415,8 @@ class EditScene extends Component {
             deleteTrigger={this.deleteTriggerFromCard}
             toast={toast}
             undo={this.undo}
+            holdToast={this.holdToast}
+            releaseToast={this.releaseToast}
           />
         )}
         <LeaveConfirmSheet

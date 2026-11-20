@@ -27,14 +27,23 @@ class RtspCameraBox extends Component {
   };
   deleteCamera = async () => {
     this.setState({
-      loading: true
+      loading: true,
+      deleteError: false,
+      tooMuchStatesError: false,
+      statesNumber: undefined
     });
     try {
-      await this.props.deleteCamera(this.props.cameraIndex);
+      await this.props.deleteCamera(this.props.camera);
     } catch (e) {
-      this.setState({
-        error: RequestStatus.Error
-      });
+      // said on the card: after the confirmation, a failure must not look like nothing happened
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({ deleteError: true });
+      }
     }
     this.setState({
       loading: false
@@ -78,7 +87,18 @@ class RtspCameraBox extends Component {
   };
   componentWillMount() {}
 
-  render(props, { loading, saveError, testConnectionError, testConnectionErrorMessage }) {
+  render(
+    props,
+    {
+      loading,
+      saveError,
+      testConnectionError,
+      testConnectionErrorMessage,
+      deleteError,
+      tooMuchStatesError,
+      statesNumber
+    }
+  ) {
     return (
       <div class="col-lg-6">
         <div class="card">
@@ -96,6 +116,16 @@ class RtspCameraBox extends Component {
                 {saveError && (
                   <div class="alert alert-danger">
                     <Text id="integration.rtspCamera.saveError" />
+                  </div>
+                )}
+                {deleteError && (
+                  <div class="alert alert-danger" data-cy="device-delete-error">
+                    <Text id="mobileDeviceList.deleteError" />
+                  </div>
+                )}
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 {testConnectionError && (

@@ -5929,6 +5929,7 @@
     "disconnectButton": "Trennen",
     "disconnectConfirmTitle": "Gladys Plus trennen?",
     "disconnectConfirmText": "Dieses Gladys ist dann nicht mehr aus der Ferne erreichbar und seine Backups werden gestoppt, ebenso alles, was über Gladys Plus läuft. Die Schlüssel, die es mit deinem Account verbinden, werden von dieser Instanz gelöscht: Um Gladys Plus wieder zu nutzen, musst du dich hier erneut bei deinem Account anmelden.",
+    "disconnectConfirmBackupKey": "Auch dein Backup-Schlüssel wird von dieser Instanz gelöscht. Bewahre ihn vorher an einem anderen Ort auf: Ohne ihn können die bereits bei Gladys Plus gespeicherten Backups nicht mehr wiederhergestellt werden.",
     "disconnectError": "Gladys Plus konnte nicht getrennt werden. Versuche es erneut.",
     "gatewayConnectedSuccessTitle": "Erfolgreich mit Gladys Plus verbunden!",
     "gatewayConnectedSuccessDescription": "Dein Gladys wurde erfolgreich verbunden.",

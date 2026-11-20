@@ -153,7 +153,11 @@ cards**, the pattern of the devices list.
 
 `MobileToast`: a short message at the bottom of the screen (`role="status"`), rendered on
 `<body>` above the sheets, gone after 4 s — 5 s when it carries **Undo**. It sits above the
-bottom bar on a page that has one (`aboveBar`).
+bottom bar on a page that has one (`aboveBar`). It does not leave under the user's hand: the
+delay stops while a mouse is over it or the keyboard is on its action, and starts again
+afterwards; a page whose deletion took the focused element away moves the focus to the action
+(`focusAction`: the scene editor of a wide screen). Beside the navigation rail of a wide screen
+it is centred on the page, not on the viewport.
 
 ### C.7 Accessibility, motion, dark mode
 

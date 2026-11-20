@@ -125,11 +125,10 @@ function createActions(store) {
       if (device.created_at) {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
-      const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
-        $splice: [[index, 1]]
-      });
+      // by identity, in the list as it is now: a search, a sort or another deletion may have
+      // replaced the list while this request was pending
       store.setState({
-        zigbee2mqttDevices
+        zigbee2mqttDevices: store.getState().zigbee2mqttDevices.filter(d => d.external_id !== device.external_id)
       });
     },
     async search(state, e) {

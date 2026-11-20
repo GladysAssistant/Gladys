@@ -51,6 +51,11 @@ describe('Settings confirmations on a wide screen', () => {
       cy.wait('@getSessions');
       cy.get('table tbody tr').should('have.length', 3);
 
+      // a real button, that the keyboard reaches and a screen reader names
+      cy.get('[data-cy=session-revoke]')
+        .eq(1)
+        .should('match', 'button')
+        .and('have.attr', 'aria-label', Cypress.env('i18n').sessionsSettings.revoke);
       cy.get('[data-cy=session-revoke]')
         .eq(1)
         .click();
@@ -114,14 +119,20 @@ describe('Settings confirmations on a wide screen', () => {
       cy.get('[data-cy=gateway-disconnect-confirm]')
         .should('be.visible')
         .i18n('gateway.disconnectConfirmText');
+      // the one loss that cannot be made up for is named
+      cy.get('[data-cy=gateway-disconnect-backup-key]')
+        .should('be.visible')
+        .i18n('gateway.disconnectConfirmBackupKey');
       cy.get('[data-cy=gateway-disconnect-confirm] [data-cy=confirm-sheet-cancel]').click();
       cy.get('[data-cy=gateway-disconnect-confirm]').should('not.exist');
       cy.get('@disconnect.all').should('have.length', 0);
 
       cy.get('[data-cy=gateway-disconnect]').click();
-      cy.get('[data-cy=gateway-disconnect-confirm] [data-cy=confirm-sheet-confirm]').click();
+      cy.get('[data-cy=gateway-disconnect-confirm] [data-cy=confirm-sheet-confirm]').dblclick();
       cy.wait('@disconnect');
       cy.get('[data-cy=gateway-disconnect-confirm]').should('not.exist');
+      // two clicks on the confirming button, one request
+      cy.get('@disconnect.all').should('have.length', 1);
     });
 
     it('should say when the account could not be disconnected', () => {
@@ -135,6 +146,18 @@ describe('Settings confirmations on a wide screen', () => {
       cy.get('[data-cy=gateway-disconnect-error]')
         .should('be.visible')
         .i18n('gateway.disconnectError');
+
+      // the failure belongs to that attempt: it is not there again on the next visit
+      cy.get('a[href="/dashboard/settings/session"]')
+        .first()
+        .click({ force: true });
+      cy.location('pathname').should('eq', '/dashboard/settings/session');
+      cy.get('a[href="/dashboard/settings/gateway"]')
+        .first()
+        .click({ force: true });
+      cy.wait('@getStatus');
+      cy.get('[data-cy=gateway-disconnect]').should('be.visible');
+      cy.get('[data-cy=gateway-disconnect-error]').should('not.exist');
     });
   });
 });

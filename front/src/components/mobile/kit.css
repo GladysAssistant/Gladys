@@ -1197,6 +1197,14 @@ a.bigButtonGhost:focus {
   bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
+/* Beside the navigation rail of a wide screen, a toast is centred on the page it talks about,
+   not on the viewport (--gladys-sidebar-offset: style/index.css; nothing where there is no rail) */
+@media (min-width: 992px) {
+  .toast {
+    left: calc(var(--gladys-sidebar-offset, 0px) + 16px);
+  }
+}
+
 .toastText {
   flex: 1;
   min-width: 0;

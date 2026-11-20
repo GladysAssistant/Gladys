@@ -47,6 +47,7 @@ const UsagePointDevice = ({
   reCreateUsagePointDevice,
   syncs = [],
   tooMuchStatesError,
+  deleteErrorSelector,
   isMobile
 }) => {
   const usagePointId = device.external_id.split(':')[1];
@@ -150,6 +151,16 @@ const UsagePointDevice = ({
           </h3>
         </div>
         <div class="card-body">
+          {deleteErrorSelector === device.selector && (
+            <div class="alert alert-danger" data-cy="device-delete-error">
+              <Text id="mobileDeviceList.deleteError" />
+            </div>
+          )}
+          {tooMuchStatesError && tooMuchStatesError.selector === device.selector && (
+            <div class="alert alert-warning">
+              <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: tooMuchStatesError.statesNumber }} />
+            </div>
+          )}
           <div class="form-group">
             <label for={`name_${deviceIndex}`}>
               <Text id="integration.enedis.usagePoints.usagePointDeviceName" />
@@ -347,6 +358,8 @@ const MobileEnedisUsagePoints = ({
 const EnedisUsagePoints = ({
   errored,
   loading,
+  tooMuchStatesError,
+  deleteErrorSelector,
   usagePointsDevices,
   updateDeviceName,
   updateDeviceParam,
@@ -402,8 +415,11 @@ const EnedisUsagePoints = ({
             {usagePointsDevices &&
               usagePointsDevices.map((usagePointDevice, index) => (
                 <UsagePointDevice
+                  key={usagePointDevice.external_id}
                   device={usagePointDevice}
                   deviceIndex={index}
+                  tooMuchStatesError={tooMuchStatesError}
+                  deleteErrorSelector={deleteErrorSelector}
                   updateDeviceName={updateDeviceName}
                   updateDeviceParam={updateDeviceParam}
                   saveDevice={saveDevice}
@@ -500,7 +516,7 @@ class EnedisWelcomePageComponent extends Component {
     return saved;
   };
   destroyDevice = async deviceIndex => {
-    await this.setState({ loading: true, tooMuchStatesError: null });
+    await this.setState({ loading: true, tooMuchStatesError: null, deleteErrorSelector: null });
     let deleted = true;
     const device = this.state.usagePointsDevices[deviceIndex];
     try {
@@ -518,6 +534,9 @@ class EnedisWelcomePageComponent extends Component {
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
         const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
         await this.setState({ tooMuchStatesError: { selector: device.selector, statesNumber } });
+      } else {
+        // the card of a wide screen says it itself (the phone confirmation already does)
+        await this.setState({ deleteErrorSelector: device.selector });
       }
     }
     await this.setState({ loading: false });
@@ -553,7 +572,10 @@ class EnedisWelcomePageComponent extends Component {
   componentWillUnmount() {
     clearInterval(this.refreshInterval);
   }
-  render({ user, isMobile }, { loading, syncing, tooMuchStatesError, errored, usagePointsDevices, syncs }) {
+  render(
+    { user, isMobile },
+    { loading, syncing, tooMuchStatesError, deleteErrorSelector, errored, usagePointsDevices, syncs }
+  ) {
     const UsagePointsView = isMobile ? MobileEnedisUsagePoints : EnedisUsagePoints;
     return (
       <EnedisPage user={this.props.user}>
@@ -561,6 +583,7 @@ class EnedisWelcomePageComponent extends Component {
           loading={loading}
           syncing={Boolean(syncing)}
           tooMuchStatesError={tooMuchStatesError}
+          deleteErrorSelector={deleteErrorSelector}
           errored={errored}
           usagePointsDevices={usagePointsDevices}
           sync={this.sync}

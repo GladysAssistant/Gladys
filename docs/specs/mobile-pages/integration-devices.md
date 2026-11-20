@@ -146,11 +146,26 @@ integration of A. A success closes everything and shows "Device deleted".
 of A and in the ones that keep their desktop grid on a phone (Zigbee2mqtt, Tasmota, Z-Wave JS UI,
 Philips Hue, Tuya, Netatmo, the cameras…): it opens the same confirmation, with the same texts,
 as a centered dialog (the sheet of the kit below 576 px). Confirming closes the dialog and calls
-the delete handler of the card, which keeps its own loader and its own messages — the "too many
-states" notice, the error of the card. Cancel, Escape and the backdrop delete nothing. A card
-whose device was never saved (no `created_at`: a camera being filled in) holds no history and
-nothing uses it: it is removed without a question. Thermostat keeps the inline question of its
-card.
+the delete handler of the card, which keeps its own loader and **says a failure itself, on the
+card**: the "too many states" notice, or the sentence of the card ("Gladys could not delete this
+device. Try again." where the card had none: Bluetooth, Broadlink, LAN Manager, Philips Hue,
+Xiaomi, the cameras, the Enedis meters) — after a confirmation, a deletion that fails never looks
+like nothing happened. Cancel, Escape and the backdrop delete nothing. A card whose device was
+never saved (no `created_at`: a camera being filled in) holds no history and nothing uses it: it
+is removed without a question. Thermostat keeps the inline question of its card.
+
+The question is about one device, and one confirmation is one deletion:
+
+- every list of device cards gives its cards a **stable key** (the `external_id` or the
+  `selector` of the device), so a card, its dialog and its messages stay with their device when
+  the list changes (a search, a sort, a neighbour deleted, a reload);
+- `DeleteDeviceButton` remembers which device it asked about: handed another one while the
+  dialog is open, it closes the dialog instead of confirming for a device the user never looked
+  at;
+- while the handler runs, the button is disabled and a second click on "Delete the device" does
+  nothing;
+- the cameras and Zigbee2mqtt remove the deleted device from their list by its identity, in the
+  list as it is when the request ends, not by the index it had when the request left.
 
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
 a wider screen. Closing a "Devices" sheet with unsaved changes — by any of the four ways, the
@@ -265,8 +280,11 @@ other layout: an unsaved change there does not survive the swap.
   row untouched; the search and the sort order sent to the server; a discovered device added; the
   pairing form; the cards kept on a wider screen.
 - Cypress, desktop viewport, `front/cypress/e2e/routes/integration/DeviceDeleteConfirm.cy.js`:
-  the "Delete" of a card naming the device, cancelled (no request, the card kept), confirmed (the
-  request, the card gone); a confirmed deletion that fails said on the card.
+  the "Delete" of a card naming the device, cancelled by "Cancel", by Escape and by the backdrop
+  (no request, the card kept), confirmed (the request, the card gone, and only one request for
+  two clicks on the confirming button); a confirmed deletion that fails said on the card
+  (Zigbee2mqtt and a card that had no sentence for it); a dialog left open while its device
+  leaves the list closes instead of confirming for the next one.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.
