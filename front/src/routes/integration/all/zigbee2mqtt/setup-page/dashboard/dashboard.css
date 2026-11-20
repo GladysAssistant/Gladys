@@ -38,6 +38,16 @@
   background: rgba(255, 255, 255, 0.85);
 }
 
+/* ---------- pairing (docs/specs/zigbee2mqtt-pairing.md, D) ---------- */
+
+.pairingHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 /* ---------- status ---------- */
 
 .statusHead {

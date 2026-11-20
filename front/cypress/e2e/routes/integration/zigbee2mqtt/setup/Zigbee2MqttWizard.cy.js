@@ -16,6 +16,7 @@ import {
   answerSetup,
   visitWizard
 } from './wizardFixtures';
+import { answerPairing, sendPermitJoin } from './pairingFixtures';
 
 describe('Zigbee2mqtt setup wizard', () => {
   const install = () => {
@@ -34,8 +35,7 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard]').should('not.exist');
   });
 
-  it('should install the recognized dongle, then permit joining for the first device', () => {
-    const serverUrl = Cypress.env('serverUrl');
+  it('should install the recognized dongle, then open the pairing window for the first device', () => {
     visitWizard();
     cy.get('[data-cy=z2m-wizard-key-one]').within(() => {
       cy.get('[data-cy=z2m-wizard-key-title]').i18n('integration.zigbee2mqtt.setup.wizard.key.detectedTitle');
@@ -78,115 +78,21 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-wizard-summary-firmware]').should('contain', '7.4.4.0');
     cy.get('[data-cy=z2m-wizard-summary-duration]').should('contain', '1 min 42 s');
 
-    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} }).as(
-      'permitJoin'
-    );
+    answerPairing();
     cy.get('[data-cy=z2m-wizard-pair]').click();
-    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
-    // Allowed, never toggled: an association already allowed stays allowed
+    // Step ④ is the pairing window, which asks for joining as it opens (docs/specs/zigbee2mqtt-pairing.md, D): its
+    // behaviors are in Zigbee2MqttPairing.cy.js
+    cy.get('[data-cy=z2m-wizard-pair-step] [data-cy=z2m-pairing]').should('exist');
     cy.wait('@permitJoin')
       .its('request.body')
       .should('deep.equal', { value: true });
-    // Sent: allowed once Zigbee2mqtt tells so
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('be.disabled');
-    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('exist');
-    cy.get('[data-cy=z2m-wizard-go-to-discover]').should(
-      'have.attr',
-      'href',
-      '/dashboard/integration/device/zigbee2mqtt/discover'
-    );
-    // Closed by Zigbee2mqtt after 254 s: joining can be permitted again
-    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
-    // Permitted from another page: told here too
-    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('exist');
+    sendPermitJoin({ allowed: true, remainingSeconds: 254 });
+    cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
 
     // The wizard is left for the page of the installation
     cy.get('[data-cy=z2m-wizard-finish]').click();
     cy.get('[data-cy=z2m-wizard]').should('not.exist');
     cy.get('[data-cy=z2m-dashboard]').should('exist');
-  });
-
-  it('should tell that joining could not be permitted', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    visitWizard();
-    answerSetup();
-    install();
-    cy.wait('@setup');
-    sendProgress(doneInstallation);
-    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { statusCode: 500 });
-    cy.get('[data-cy=z2m-wizard-pair]').click();
-    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
-    cy.get('[data-cy=z2m-wizard-permit-join-error]').i18n('integration.zigbee2mqtt.setup.wizard.pair.allowError');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
-  });
-
-  it('should tell that joining could not be permitted when Zigbee2mqtt does not confirm it in time', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    visitWizard();
-    answerSetup();
-    install();
-    cy.wait('@setup');
-    sendProgress(doneInstallation);
-    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} }).as(
-      'permitJoin'
-    );
-    cy.get('[data-cy=z2m-wizard-pair]').click();
-    cy.clock();
-    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
-    cy.wait('@permitJoin');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('be.disabled');
-    cy.tick(10000);
-    cy.get('[data-cy=z2m-wizard-permit-join-error]').i18n('integration.zigbee2mqtt.setup.wizard.pair.allowError');
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
-  });
-
-  it('should tell that joining could not be permitted when Zigbee2mqtt refuses it', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    visitWizard();
-    answerSetup();
-    install();
-    cy.wait('@setup');
-    sendProgress(doneInstallation);
-    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} }).as(
-      'permitJoin'
-    );
-    cy.get('[data-cy=z2m-wizard-pair]').click();
-    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
-    cy.wait('@permitJoin');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('be.disabled');
-    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
-    cy.get('[data-cy=z2m-wizard-permit-join-error]').should('exist');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
-  });
-
-  it('should not take the answer of a slow request for joining over what Zigbee2mqtt told meanwhile', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    visitWizard();
-    answerSetup();
-    install();
-    cy.wait('@setup');
-    sendProgress(doneInstallation);
-    cy.intercept(
-      { method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` },
-      { body: {}, delay: 1000 }
-    ).as('permitJoin');
-    cy.get('[data-cy=z2m-wizard-pair]').click();
-    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
-    // Allowed, then closed by Zigbee2mqtt before the request answers
-    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('exist');
-    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
-    cy.wait('@permitJoin');
-    // The answer handled by the page before looking
-    cy.window().then(win => new Cypress.Promise(resolve => win.setTimeout(resolve, 100)));
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
-    cy.get('[data-cy=z2m-wizard-allow-joining]').should('not.be.disabled');
   });
 
   it('should wait for a dongle, and show it once plugged in without reloading', () => {

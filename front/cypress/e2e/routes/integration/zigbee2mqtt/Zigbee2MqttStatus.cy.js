@@ -31,7 +31,10 @@ describe('Zigbee2mqtt status', () => {
       { body: { Z2M_MQTT_MODE: 'local', Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0' } }
     );
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/discovered*` }, { body: [] });
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: false });
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` },
+      { body: { allowed: false, remainingSeconds: null } }
+    );
   });
 
   it('should tell that Zigbee2mqtt does not answer on the discover page, until it is online', () => {

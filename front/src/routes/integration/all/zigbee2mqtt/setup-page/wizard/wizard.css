@@ -482,37 +482,6 @@ button.keyCard {
   text-align: left;
 }
 
-.tips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  list-style: none;
-  margin: 0 0 1rem;
-  padding: 0;
-}
-
-.tipCard {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 220px;
-  gap: 6px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  border: 1px solid #e4e8ef;
-}
-
-.tipNumber {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background: #1c2334;
-  color: #fff;
-  font-weight: 700;
-}
-
 /* ---------- phone (WizardMobile, kit of docs/specs/mobile-pages) ---------- */
 
 .mobileStep {

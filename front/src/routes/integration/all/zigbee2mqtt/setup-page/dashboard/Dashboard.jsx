@@ -3,12 +3,11 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
-import config from '../../../../../../config';
 import { RequestStatus } from '../../../../../../utils/consts';
 import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
-import { PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS } from '../constants';
 import { findAdapter } from '../wizard/adapters';
 import Wizard from '../wizard/Wizard';
+import PairingScreen from './PairingScreen';
 import {
   DASHBOARD_STATE,
   countNewDevices,
@@ -24,12 +23,11 @@ import AdvancedSettings from './AdvancedSettings';
 import DashboardMobile from './DashboardMobile';
 import style from './dashboard.css';
 
-const SCREEN = { MAIN: 'main', ADVANCED: 'advanced', CHANGE: 'change' };
+const SCREEN = { MAIN: 'main', ADVANCED: 'advanced', CHANGE: 'change', PAIR: 'pair' };
 
 // Under /api/v1/service/zigbee2mqtt/: the stop, start and restart of the integration under run/ (start and stop are
 // the routes of the core that Settings > Services calls)
 const ACTION_PATHS = {
-  permit_join: 'permit_join',
   stop: 'run/stop',
   start: 'run/start',
   restart: 'run/restart'
@@ -61,33 +59,6 @@ class Dashboard extends Component {
     // More recent than a request still running
     this.discoveredRequests += 1;
     this.setState({ newDeviceCount: countNewDevices(devices) });
-  };
-
-  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page): what "Pair"
-  // waits for. Refused by Zigbee2mqtt while waited for, the request failed.
-  handlePermitJoin = permitJoin => {
-    const changes = { permitJoinAllowed: Boolean(permitJoin) };
-    if (this.state.permitJoinWaiting) {
-      this.stopPermitJoinWait();
-      changes.permitJoinWaiting = false;
-      if (!permitJoin) {
-        changes.actionError = 'error';
-      }
-    }
-    this.setState(changes);
-  };
-
-  stopPermitJoinWait = () => {
-    clearTimeout(this.permitJoinTimer);
-    this.permitJoinTimer = null;
-  };
-
-  // Zigbee2mqtt did not tell that joining is allowed in time: told as a failure, the button can be tried again
-  permitJoinNotConfirmed = () => {
-    this.permitJoinTimer = null;
-    if (!this.unmounted) {
-      this.setState({ permitJoinWaiting: false, actionError: 'error' });
-    }
   };
 
   loadAdapters = async () => {
@@ -128,23 +99,8 @@ class Dashboard extends Component {
     }
   };
 
-  // Allowed once Zigbee2mqtt tells so (see handlePermitJoin), waited for from the click: its answer may come before the
-  // one of the request. In the demo nothing answers: the request is enough.
-  pair = async () => {
-    this.stopPermitJoinWait();
-    this.permitJoinTimer = setTimeout(this.permitJoinNotConfirmed, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS);
-    this.setState({ permitJoinWaiting: true });
-    await this.runAction('permit_join', { value: true });
-    if (this.unmounted || !this.state.permitJoinWaiting) {
-      return;
-    }
-    if (this.state.actionStatus === RequestStatus.Error) {
-      this.stopPermitJoinWait();
-      this.setState({ permitJoinWaiting: false });
-    } else if (config.demoMode) {
-      this.handlePermitJoin(true);
-    }
-  };
+  // The pairing window, which asks Zigbee2mqtt to permit joining (docs/specs/zigbee2mqtt-pairing.md, D)
+  pair = () => this.setState({ screen: SCREEN.PAIR, actionError: null, confirmStop: false });
 
   start = () => this.runAction('start');
 
@@ -191,21 +147,15 @@ class Dashboard extends Component {
       // The action whose request runs
       pendingAction: null,
       installationSuccessDismissed: false,
-      permitJoinAllowed: false,
-      // "Pair" sent, until Zigbee2mqtt tells that joining is allowed
-      permitJoinWaiting: false,
       newDeviceCount: null,
       adapters: []
     };
     // Numbers the requests of the discovered devices: only the answer of the last one, or a newer message, counts
     this.discoveredRequests = 0;
-    // "Pair" clicked, until Zigbee2mqtt tells that joining is allowed
-    this.permitJoinTimer = null;
   }
 
   componentDidMount() {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER, this.handleDiscover);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN, this.handlePermitJoin);
     this.loadAdapters();
     if (this.props.zigbee2mqttStatus.zigbee2mqttConnected) {
       this.loadNewDevices();
@@ -222,16 +172,11 @@ class Dashboard extends Component {
   // A new installation runs: its outcome is told
   followNewInstallation = () => this.setState({ installationSuccessDismissed: false });
 
-  // Another state of Zigbee2mqtt: the refusal of an action (an installation or another operation was running) and the
-  // joining allowed while online no longer describe it
-  followNewState = previousState => {
+  // Another state of Zigbee2mqtt: the refusal of an action (an installation or another operation was running) no longer
+  // describes it
+  followNewState = () => {
     // A stop asked on another state: asked again if still wanted
     const changes = { confirmStop: false };
-    if (previousState === DASHBOARD_STATE.ONLINE) {
-      changes.permitJoinAllowed = false;
-      changes.permitJoinWaiting = false;
-      this.stopPermitJoinWait();
-    }
     if (this.state.actionError && this.state.actionStatus !== RequestStatus.Getting) {
       changes.actionError = null;
       changes.actionStatus = null;
@@ -249,7 +194,7 @@ class Dashboard extends Component {
     const previousState = getDashboardState(previousProps.zigbee2mqttStatus, previousProps.configuration || {});
     const currentState = getDashboardState(this.props.zigbee2mqttStatus, configuration);
     if (previousState !== currentState) {
-      this.followNewState(previousState);
+      this.followNewState();
     }
     if (installing && !wasInstalling) {
       this.followNewInstallation();
@@ -262,12 +207,7 @@ class Dashboard extends Component {
 
   componentWillUnmount() {
     this.unmounted = true;
-    this.stopPermitJoinWait();
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER, this.handleDiscover);
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      this.handlePermitJoin
-    );
   }
 
   render(props, state) {
@@ -295,6 +235,17 @@ class Dashboard extends Component {
           setupZigee2mqttError={props.setupZigee2mqttError}
           saveConfiguration={props.saveConfiguration}
           prefetchImages={props.prefetchImages}
+        />
+      );
+    }
+    if (state.screen === SCREEN.PAIR) {
+      return (
+        <PairingScreen
+          isMobile={props.isMobile}
+          httpClient={props.httpClient}
+          session={props.session}
+          online={Boolean(status.zigbee2mqttConnected)}
+          onClose={this.showMain}
         />
       );
     }

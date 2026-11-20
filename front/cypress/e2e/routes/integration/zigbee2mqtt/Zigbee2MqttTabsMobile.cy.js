@@ -76,7 +76,10 @@ describe('Zigbee2MQTT tabs on a phone', () => {
       { method: 'GET', url: api('/service/zigbee2mqtt/setup') },
       { body: { Z2M_MQTT_MODE: 'local', Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0' } }
     ).as('getSetup');
-    cy.intercept({ method: 'GET', url: api('/service/zigbee2mqtt/permit_join') }, { body: false });
+    cy.intercept(
+      { method: 'GET', url: api('/service/zigbee2mqtt/permit_join') },
+      { body: { allowed: false, remainingSeconds: null } }
+    );
   });
 
   describe('Devices', () => {
@@ -409,14 +412,14 @@ describe('Zigbee2MQTT tabs on a phone', () => {
 
       // the state of the joining comes back live
       cy.waitForWebSocket();
-      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: { allowed: true, remainingSeconds: 254 } });
       cy.get('[data-cy=z2m-discover-permit-join-open]').i18n('integration.zigbee2mqtt.discover.permitJoinOpen');
       cy.get('[data-cy=z2m-discover-permit-join]')
         .i18n('integration.zigbee2mqtt.discover.stopPermitJoin')
         .click();
       cy.wait('@permitJoin');
 
-      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: false });
+      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: { allowed: false, remainingSeconds: null } });
       cy.get('[data-cy=z2m-discover-permit-join-open]').should('not.exist');
       cy.get('[data-cy=z2m-discover-permit-join]').i18n('integration.zigbee2mqtt.discover.permitJoin');
       cy.get('@permitJoin.all').should('have.length', 2);

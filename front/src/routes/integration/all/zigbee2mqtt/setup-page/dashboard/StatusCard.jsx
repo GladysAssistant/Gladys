@@ -170,8 +170,7 @@ const StatusCard = ({ view, actions }) => {
   const { state, status, primaryAction, actionStatus, newDeviceCount } = view;
   const startupError = state === DASHBOARD_STATE.FAILED ? getStartupError(status) : null;
   const brokerError = state === DASHBOARD_STATE.MQTT_ERROR ? getBrokerError(status) : null;
-  // Until Zigbee2mqtt tells that joining is allowed
-  const busy = actionStatus === RequestStatus.Getting || view.permitJoinWaiting;
+  const busy = actionStatus === RequestStatus.Getting;
   return (
     <section class={style.card} data-cy="z2m-dashboard-status" data-state={state}>
       <div class={style.statusHead}>
@@ -216,11 +215,6 @@ const StatusCard = ({ view, actions }) => {
             id={`integration.zigbee2mqtt.setup.installation.success.${status.installation.kind}`}
             fields={{ duration: formatDuration(status.installation.durationMs) }}
           />
-        </div>
-      )}
-      {view.permitJoinAllowed && state === DASHBOARD_STATE.ONLINE && (
-        <div class="alert alert-success mb-0" role="status" data-cy="z2m-dashboard-permit-join-allowed">
-          <MarkupText id={`${T}.pairAllowed`} />
         </div>
       )}
       {status.updatePending && state !== DASHBOARD_STATE.INSTALLING && (

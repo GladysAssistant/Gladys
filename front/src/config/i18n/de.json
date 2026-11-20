@@ -2515,26 +2515,7 @@
           "pair": {
             "title": "Lerne dein erstes Gerät an",
             "text": "Lampe, Steckdose, Sensor… Gladys aktiviert das Anlernen für 4 Minuten.",
-            "tips": {
-              "approach": {
-                "title": "Bringe das Gerät näher",
-                "text": "Weniger als 2 Meter vom Stick entfernt, während des Anlernens."
-              },
-              "mode": {
-                "title": "Versetze es in den Anlernmodus",
-                "text": "Oft ein langer Druck (5 s) auf seine Taste. Eine Lampe: 5- bis 6-mal hintereinander ein- und ausschalten."
-              },
-              "add": {
-                "title": "Füge es zu Gladys hinzu",
-                "text": "Es erscheint im Tab Geräte in der Nähe: Gib ihm einen Namen und einen Raum."
-              }
-            },
-            "allow": "Anlernen aktivieren",
-            "allowed": "<strong>Anlernen für 4 Minuten aktiviert.</strong> Versetze dein Gerät in den Anlernmodus: Es erscheint im Tab Geräte in der Nähe, sobald es dem Netzwerk beigetreten ist.",
-            "allowError": "Gladys konnte das Anlernen nicht aktivieren. Versuche es erneut.",
-            "goToDiscover": "Geräte in der Nähe öffnen",
-            "finish": "Fertig",
-            "finishWithoutPairing": "Ohne Anlernen beenden"
+            "finish": "Fertig"
           },
           "mobile": {
             "otherChoices": "Anderer Stick oder andere Installation",
@@ -2633,7 +2614,6 @@
             "one": "1 neues Gerät zu Gladys hinzuzufügen",
             "other": "{{count}} neue Geräte zu Gladys hinzuzufügen"
           },
-          "pairAllowed": "<strong>Anlernen für 4 Minuten aktiviert.</strong> Deine Geräte erscheinen im Tab Entdecken.",
           "updatePending": "Ein Update von Zigbee2MQTT wartet: Seine Images konnten nicht heruntergeladen werden. Es erfolgt beim nächsten Start.",
           "actionErrors": {
             "busy": "Eine Installation läuft, oder die Integration ist beschäftigt: Versuche es gleich noch einmal.",
@@ -2752,7 +2732,46 @@
       "updateButton": "Aktualisieren",
       "alreadyExistsButton": "Bereits erstellt",
       "saveError": "Beim Sichern des Geräts ist ein Fehler aufgetreten.",
-      "documentation": "Zigbee2MQTT-Dokumentation"
+      "documentation": "Zigbee2MQTT-Dokumentation",
+      "pairing": {
+        "open": "Anlernen erlaubt",
+        "closed": "Anlernen geschlossen",
+        "notAnswering": "Zigbee2MQTT antwortet nicht: Anlernen kann nicht erlaubt werden",
+        "allow": "Anlernen erlauben",
+        "extend": "Verlängern",
+        "stop": "Beenden",
+        "close": "Schließen",
+        "allowError": "Gladys konnte das Anlernen nicht erlauben. Versuche es erneut.",
+        "stopError": "Gladys konnte das Anlernen nicht beenden. Versuche es erneut.",
+        "loadError": "Gladys konnte die Geräte im Anlernvorgang nicht lesen.",
+        "tips": {
+          "approach": {
+            "title": "Gerät näher bringen",
+            "text": "Höchstens 2 Meter vom Stick entfernt, während des Anlernens."
+          },
+          "mode": {
+            "title": "In den Anlernmodus versetzen",
+            "text": "Oft ein langer Druck (5 s) auf die Taste. Eine Lampe: 5 bis 6 Mal hintereinander ein- und ausschalten."
+          },
+          "add": {
+            "title": "Zu Gladys hinzufügen",
+            "text": "Es erscheint hier: gib ihm einen Namen und einen Raum."
+          }
+        },
+        "steps": {
+          "joined": "Beigetreten",
+          "interview": "Interview",
+          "ready": "Bereit"
+        },
+        "preparing": "Gerät wird vorbereitet…",
+        "unsupportedText": "Zigbee2MQTT unterstützt dieses Modell nicht: Gladys kann es nicht hinzufügen.",
+        "failedText": "Das Interview ist fehlgeschlagen. Bring das Gerät näher an den Stick oder an ein Gerät mit Netzanschluss und versetze es erneut in den Anlernmodus.",
+        "add": "Zu Gladys hinzufügen",
+        "addError": "Gladys konnte das Gerät nicht hinzufügen. Versuche es erneut.",
+        "added": "Zu Gladys hinzugefügt",
+        "alreadyInGladys": "Bereits in Gladys",
+        "openDevice": "Gerät öffnen"
+      }
     },
     "nodeRed": {
       "title": "Node-RED",

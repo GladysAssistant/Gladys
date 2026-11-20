@@ -7,7 +7,7 @@
 > dashboard (D). **Rule: any PR that changes one of these behaviors or contracts modifies this file in
 > the same diff.**
 >
-> Status: **draft** (lot 2 of the Zigbee2mqtt revamp). The setup wizard and the dashboard themselves
+> Status: **implemented** (lot 2 of the Zigbee2mqtt revamp, PR to come). The setup wizard and the dashboard themselves
 > are specified in [zigbee2mqtt-installation.md](./zigbee2mqtt-installation.md) (M, N).
 
 ## A. Context
@@ -120,17 +120,22 @@ opened:
 
 ### D.1 Where (D57)
 
-One component (desktop and phone) shown at step ④ of the setup wizard and opened by **Pair** on the
-dashboard (instead of the 4-minute notice of N.2). The Discover tab is unchanged; it reads the new
-`zigbee2mqtt.permit-join` object.
+One component (`setup-page/pairing/PairingWindow.jsx`, desktop and phone) shown at step ④ of the
+setup wizard and by **Pair** on the dashboard, on a screen of its own (`PairingScreen.jsx`, the
+4-minute notice of the dashboard removed). The window asks Zigbee2mqtt to permit joining as it opens
+(when Zigbee2mqtt answers): the user came to pair. The Discover tab is unchanged; its switch reads
+`allowed` from the new `zigbee2mqtt.permit-join` object.
 
 ### D.2 Content
 
-- **Header**: "Joining open — 3:52" counting down from `remainingSeconds`, **Extend** (`POST
+- **Header**: "Joining permitted 3:52" counting down from `remainingSeconds`, **Extend** (`POST
   /permit_join` `{ value: true }`) and **Stop** (`{ value: false }`); closed: "Joining closed" and
-  **Allow joining** again. Opening waits for Zigbee2mqtt as today (10 s, installation spec N.2).
-  Without a known end, no countdown, only "Joining open".
-- **Tips** (the three tips of step ④) while the registry is empty.
+  **Permit joining** again. A request waits for Zigbee2mqtt to tell its outcome through
+  `zigbee2mqtt.permit-join`, from the click (its answer may come before the one of the request): not
+  told within 10 s, refused (500), or joining told closed while asked to open, it failed (an error
+  under the header, the button back). A stop not confirmed while joining is already closed failed in
+  nothing. In the demo, the answer of the request is enough. Without a known end, no countdown.
+- **Tips** (approach, pairing mode, add it here) while the registry is empty.
 - **One row per entry**, a timeline "Joined → Interview → Ready":
   - `joined`, `interviewing`: the step running, the friendly name (an IEEE address until the device
     has a name);
@@ -143,6 +148,8 @@ dashboard (instead of the 4-minute notice of N.2). The Discover tab is unchanged
     (Gladys cannot create its features); no Add;
   - `failed` (D59): "Interview failed" and the advice: "Bring the device closer to the dongle or to a
     mains-powered device, then put it in pairing mode again"; the row starts over if it joins again.
+- A device whose photo, name or row once ready is shown is never created without the click on **Add**
+  (D6). A name typed by the user is kept when the registry comes again.
 - **Finish** (wizard) / **Close** (dashboard). Closing the window does not close joining (it closes by
   itself); the registry stays on the server.
 - On a phone, the ready card is the sheet of the Discover tab (`MobileDeviceItem`, `primaryAction`
@@ -177,11 +184,15 @@ Zigbee2mqtt.
 
 ## E. Tests
 
-- Server, at mirrored paths: B.1 sources and forgetting, B.2 bounds and "only on change" (fake timers),
-  each transition of C.2, `GET /pairing`.
-- Cypress: wizard step ④ and dashboard Pair, desktop and phone: countdown, a device going joined →
-  ready → added, unsupported, failed, left, page reloaded during pairing, joining closed by Zigbee2mqtt,
-  Extend; demo mode.
+- Server, at mirrored paths (`getPermitJoin`, `updatePermitJoin`, `pairingDevices`,
+  `handleMqttMessage`, `stop`, the controller): B.1 sources and forgetting, B.2 bounds and "only on
+  change" (fake timers), each transition of C.2, `GET /pairing`.
+- Cypress (`setup/Zigbee2MqttPairing.cy.js`, `…PairingMobile.cy.js`, step ④ in `…Wizard*.cy.js`,
+  Pair in `…Dashboard.cy.js`): countdown, Extend, Stop, the three failures of a request, a slow
+  answer after a message, Zigbee2mqtt not answering; a device going joined → interviewing → ready →
+  added (suggested name suffixed, room, request body), a typed name kept, an Add that fails, already
+  in Gladys, unsupported, failed, left, the icon when the photo does not load, a message more recent
+  than the list read at opening, the list not readable; the sheet of a ready device on a phone.
 
 ## F. Out of scope
 

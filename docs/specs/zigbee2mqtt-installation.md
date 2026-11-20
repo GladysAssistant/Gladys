@@ -216,7 +216,8 @@ installation. A job that fails to start fails the installation with its error. A
   network of Docker: with an external broker, a machine where Gladys cannot install Zigbee2mqtt is
   still told. `bridge/info` also tells whether joining is permitted (Zigbee2mqtt 2 publishes it
   again when joining closes, and has no other message for it): a change sends
-  `zigbee2mqtt.permit-join`. A change of `deviceCount`
+  `zigbee2mqtt.permit-join` (`{ allowed, remainingSeconds }`, [zigbee2mqtt-pairing.md](./zigbee2mqtt-pairing.md),
+  B). A change of `deviceCount`
   sends a status; `bridge/info` sends one anyway (coordinator firmware).
 - **Coordinator models** (`adapters/display.js`). `GET /adapter` gives each model of the list
   (`{ label, configKey }`, the label being what the setup stores) its `brand` (every model has one:
@@ -582,7 +583,7 @@ external broker: connection, check, network, first device).
 | ② failed              | a short title by error code (B.4), a text of the wizard (no Save button in it; `ADAPTER_NO_RESPONSE`: unplug the dongle, or restart the network coordinator, as chosen), the raw message folded (shown in clear for `INVALID_CONFIGURATION`, the refused settings); step ② of the stepper marked failed (large screens), the ring smaller on a phone         | Retry (same configuration, with the `(legacy ezsp)` model or the `ezsp` type Gladys switched to) · Change the dongle or model (back to ①, by hand, with what was chosen)                                                                                                                                   |
 | ② waiting             | external broker: Gladys connected to it (the installation `done`), Zigbee2mqtt not answering yet: check that it runs and that its base topic is `zigbee2mqtt`, or, when its `bridge/info` tells a version older than 1.21 (no health check), that it is too old; the broker lost meanwhile (Gladys disconnected from it), with its error; follows the status | Change the connection                                                                                                                                                                                                                                                                                      |
 | ③ ready               | the installation `done` (local), or Zigbee2mqtt answering (`zigbee2mqttConnected`, also once a failure is cleared); kept once shown                                                                                                                                                                                                                          | Pair my first device · Later                                                                                                                                                                                                                                                                               |
-| ④ first device        | three tips; joining told allowed once Zigbee2mqtt says so (as Pair, N.1), the notice above the tips on a phone                                                                                                                                                                                                                                               | Permit joining (`POST /permit_join` with `{ value: true }`, never toggled), then Go to Discover · Finish; follows `zigbee2mqtt.permit-join`: allowed while Zigbee2mqtt says so, the button back once it closes joining (254 s); the answer of the request does not replace what Zigbee2mqtt told meanwhile |
+| ④ first device        | the pairing window ([zigbee2mqtt-pairing.md](./zigbee2mqtt-pairing.md), D), which asks for joining as the step opens: countdown, tips while no device joined, one row per device, a ready one added from there                                                                                                                                              | Finish                                                                                                                                                                                                                                                                                                     |
 
 - **Models** (0.3b): the list of `GET /adapter` (E.3) without the `(legacy ezsp)` ones, grouped by
   brand, each by its commercial name, model code and photo (zigbee2mqtt.io, an icon without
@@ -670,15 +671,9 @@ The status card shows the first state that applies:
   each `zigbee2mqtt.discover` message and read again when Zigbee2mqtt answers again; only the answer
   of the last request counts, and a message is more recent than a request still running. "No device in
   the network" for none.
-- **Pair** sends `POST /permit_join` with `{ value: true }` (never toggled), then waits (the button
-  busy, from the click: the answer of Zigbee2mqtt may come before the one of the request) for
-  Zigbee2mqtt to tell through `zigbee2mqtt.permit-join` that joining is allowed (in the demo, the
-  answer of the request is enough: nothing sends the message): then it
-  tells so for 4 minutes, as long as `zigbee2mqtt.permit-join` says so and Zigbee2mqtt stays online.
-  Not told within 10 s, or told forbidden while waited for, the action failed (try again). The answer
-  of the request does not replace what `zigbee2mqtt.permit-join` told meanwhile, nor a state other
-  than online reached meanwhile (not answering, stopped, failed, dongle unplugged…). Step ④ of the
-  wizard waits the same way.
+- **Pair** opens the pairing window on a screen of its own ([zigbee2mqtt-pairing.md](./zigbee2mqtt-pairing.md),
+  D), which asks for joining as it opens; Close leads back to the dashboard, joining going on by
+  itself. Step ④ of the wizard shows the same window.
 - **A status that cannot be read** shows an error instead of a state guessed from an empty status.
 - **Alerts.** An update waiting for its images (`updatePending`, G), the ezsp driver note (the saved
   model runs the `ezsp` driver, after a fallback), the success of an installation followed (J), not

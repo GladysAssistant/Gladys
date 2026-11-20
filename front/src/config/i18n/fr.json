@@ -2648,26 +2648,7 @@
           "pair": {
             "title": "Appairez votre premier appareil",
             "text": "Ampoule, prise, capteur… Gladys autorise l'association pendant 4 minutes.",
-            "tips": {
-              "approach": {
-                "title": "Approchez l'appareil",
-                "text": "À moins de 2 mètres de la clé, le temps de l'appairage."
-              },
-              "mode": {
-                "title": "Mettez-le en mode appairage",
-                "text": "Souvent un appui long (5 s) sur son bouton. Une ampoule : allumez-la et éteignez-la 5 à 6 fois de suite."
-              },
-              "add": {
-                "title": "Ajoutez-le à Gladys",
-                "text": "Il apparaît dans l'onglet Découverte : donnez-lui un nom et une pièce."
-              }
-            },
-            "allow": "Autoriser l'association",
-            "allowed": "<strong>Association autorisée pendant 4 minutes.</strong> Mettez votre appareil en mode appairage : il apparaîtra dans l'onglet Découverte dès qu'il aura rejoint le réseau.",
-            "allowError": "Gladys n'a pas pu autoriser l'association. Réessayez.",
-            "goToDiscover": "Aller à Découverte",
-            "finish": "Terminer",
-            "finishWithoutPairing": "Terminer sans appairer"
+            "finish": "Terminer"
           },
           "mobile": {
             "otherChoices": "Autre clé ou autre installation",
@@ -2766,7 +2747,6 @@
             "one": "1 nouvel appareil à ajouter dans Gladys",
             "other": "{{count}} nouveaux appareils à ajouter dans Gladys"
           },
-          "pairAllowed": "<strong>Association autorisée pendant 4 minutes.</strong> Vos appareils apparaîtront dans l'onglet Découverte.",
           "updatePending": "Une mise à jour de Zigbee2MQTT attend : ses images n'ont pas pu être téléchargées. Elle sera faite au prochain démarrage.",
           "actionErrors": {
             "busy": "Une installation est en cours, ou l'intégration est occupée : réessayez dans un instant.",
@@ -2885,7 +2865,46 @@
       "updateButton": "Mettre à jour",
       "alreadyExistsButton": "Déjà créé",
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
-      "documentation": "Documentation Zigbee2MQTT"
+      "documentation": "Documentation Zigbee2MQTT",
+      "pairing": {
+        "open": "Association autorisée",
+        "closed": "Association fermée",
+        "notAnswering": "Zigbee2MQTT ne répond pas : l'association ne peut pas être autorisée",
+        "allow": "Autoriser l'association",
+        "extend": "Prolonger",
+        "stop": "Arrêter",
+        "close": "Fermer",
+        "allowError": "Gladys n'a pas pu autoriser l'association. Réessayez.",
+        "stopError": "Gladys n'a pas pu arrêter l'association. Réessayez.",
+        "loadError": "Gladys n'a pas pu lire les appareils en cours d'appairage.",
+        "tips": {
+          "approach": {
+            "title": "Approchez l'appareil",
+            "text": "À moins de 2 mètres de la clé, le temps de l'appairage."
+          },
+          "mode": {
+            "title": "Mettez-le en mode appairage",
+            "text": "Souvent un appui long (5 s) sur son bouton. Une ampoule : allumez-la et éteignez-la 5 à 6 fois de suite."
+          },
+          "add": {
+            "title": "Ajoutez-le à Gladys",
+            "text": "Il apparaît ici : donnez-lui un nom et une pièce."
+          }
+        },
+        "steps": {
+          "joined": "Rejoint",
+          "interview": "Interview",
+          "ready": "Prêt"
+        },
+        "preparing": "Préparation de l'appareil…",
+        "unsupportedText": "Zigbee2MQTT ne prend pas en charge ce modèle : Gladys ne peut pas l'ajouter.",
+        "failedText": "L'interview a échoué. Rapprochez l'appareil de la clé ou d'un appareil branché sur secteur, puis remettez-le en mode appairage.",
+        "add": "Ajouter à Gladys",
+        "addError": "Gladys n'a pas pu ajouter l'appareil. Réessayez.",
+        "added": "Ajouté à Gladys",
+        "alreadyInGladys": "Déjà dans Gladys",
+        "openDevice": "Ouvrir l'appareil"
+      }
     },
     "nodeRed": {
       "title": "Node-RED",
