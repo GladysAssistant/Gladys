@@ -63,7 +63,9 @@ const forgetReload = () => {
 //   tablet nobody is in front of) is reloaded by the notice itself, once.
 //
 // It only listens to the session, which owns the reconnection: `websocket.connected` with
-// `connected: true` removes the notice whatever it was saying.
+// `connected: true` removes the notice whatever it was saying, when the lost connection was
+// its only cause. A session check that got no answer stays until the page is reloaded or a
+// check succeeds: the live connection coming back does not bring what the page failed to load.
 //
 // Unlike the other notices of the header it does not live in the navigation rail: the rail
 // is a closed drawer on a phone and does not exist on a full-screen dashboard, the two
@@ -162,16 +164,18 @@ class ConnectionLostNotice extends Component {
       // the reload re-reads everything: the pages that do not refresh on a reconnection
       // too. "checking" is left on, the button stays disabled until the page is replaced.
       if (!byUser && !rememberReload()) {
-        this.setState({ reachable, checking: false });
+        this.setState({ reachable });
         return;
       }
       window.location.reload();
       return;
     }
-    // "still not answering" stays for as long as it is true, whoever asks next
-    this.setState(({ stillUnreachable }) => ({
+    // "still not answering" stays for as long as it is true, whoever asks next. Only the
+    // press that is waiting ends its wait: the timer answering first leaves the button
+    // waiting, or a second press would start a second question.
+    this.setState(({ stillUnreachable, checking }) => ({
       reachable,
-      checking: false,
+      checking: byUser ? false : checking,
       stillUnreachable: !reachable && (byUser || stillUnreachable)
     }));
   };
@@ -192,6 +196,7 @@ class ConnectionLostNotice extends Component {
   retry = () => this.check({ byUser: true });
 
   startChecking = () => {
+    clearInterval(this.checkInterval);
     this.reachableSince = null;
     this.check();
     this.checkInterval = setInterval(this.check, CHECK_INTERVAL_MS);
@@ -240,7 +245,9 @@ class ConnectionLostNotice extends Component {
     const isActive = this.isActive();
     if (isActive && !wasActive) {
       this.startChecking();
-    } else if (!isActive && wasActive) {
+    } else if (!isActive && this.checkInterval) {
+      // on the interval it owns, not on the previous props: signing out empties the
+      // session object in place, so the previous props already read as inactive
       this.stopChecking();
     }
     this.forgetReloadIfHealthy();

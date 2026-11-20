@@ -361,4 +361,36 @@ describe('Connection lost notice', () => {
       forgetTheSessionOfTheRun();
     });
   });
+
+  describe('when a dashboard cannot be loaded', () => {
+    it('says so, and stops saying it once another dashboard is loaded', () => {
+      const dashboards = [
+        { id: 'connection-test-a', selector: 'connection-test-a', name: 'Dashboard A', type: 'main' },
+        { id: 'connection-test-b', selector: 'connection-test-b', name: 'Dashboard B', type: 'main' }
+      ];
+      cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/dashboard` }, dashboards).as('dashboards');
+      cy.intercept(
+        { method: 'GET', url: `${serverUrl}/api/v1/dashboard/connection-test-a` },
+        { statusCode: 500, body: { status: 500, code: 'SERVER_ERROR' } }
+      ).as('dashboardA');
+      cy.intercept(
+        { method: 'GET', url: `${serverUrl}/api/v1/dashboard/connection-test-b` },
+        { ...dashboards[1], boxes: [[]] }
+      ).as('dashboardB');
+      cy.visit('/dashboard/connection-test-a');
+      cy.wait('@dashboardA');
+      cy.get('[data-cy=dashboard-load-error]').should('be.visible');
+      cy.window().then(win => {
+        win.pageBeforeSwitch = true;
+      });
+
+      // switching is done by the page itself, which is not loaded again
+      cy.get('a[data-dashboard-pill][href="/dashboard/connection-test-b"]').click();
+      cy.location('pathname').should('eq', '/dashboard/connection-test-b');
+      cy.window()
+        .its('pageBeforeSwitch')
+        .should('eq', true);
+      cy.get('[data-cy=dashboard-load-error]').should('not.exist');
+    });
+  });
 });

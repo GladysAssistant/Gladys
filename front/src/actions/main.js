@@ -137,8 +137,9 @@ function createActions(store) {
         const [user] = await Promise.all(tasks);
         store.setState({
           user,
-          // Gladys answered: a previous check that got no answer no longer holds
-          gladysUnreachable: false
+          // Gladys answered: a previous check that got no answer no longer holds — for the
+          // session this check was started for only, like in the catch below
+          ...(store.getState().session === state.session ? { gladysUnreachable: false } : {})
         });
         // the "integrations to update" counter is displayed in the header, on
         // every page: it is loaded once the user (and their role) is known,

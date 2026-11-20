@@ -73,12 +73,14 @@ export const isServerError = e => {
 export const isTooManyRequestsError = e => getStatus(e) === 429;
 
 // A request that gives up: on a host that is powered off behind a routed path, packets are
-// dropped rather than refused, and the browser would wait for minutes.
-const fetchWithTimeout = async (url, options) => {
+// dropped rather than refused, and the browser would wait for minutes. The deadline also
+// covers `read`, which reads the answer: headers can come back and the body never follow.
+const fetchWithTimeout = async (url, options, read) => {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REACHABLE_TIMEOUT_MS);
   try {
-    return await fetch(url, { ...options, cache: 'no-store', signal: controller.signal });
+    const response = await fetch(url, { ...options, cache: 'no-store', signal: controller.signal });
+    return await read(response);
   } finally {
     clearTimeout(timeout);
   }
@@ -97,16 +99,17 @@ export const isGladysReachable = async () => {
       if (navigator.onLine === false) {
         return false;
       }
-      await fetchWithTimeout(`${window.location.origin}/`, { method: 'HEAD' });
-      return true;
+      // a site that answers with an error would be reloaded into that error
+      return await fetchWithTimeout(`${window.location.origin}/`, { method: 'HEAD' }, response => response.ok);
     }
-    const response = await fetchWithTimeout(`${config.localApiUrl}/api/v1/ping`, { method: 'GET' });
-    if (!response.ok) {
-      return false;
-    }
-    // the maintenance page of a proxy answers 200 too: only Gladys answers this
-    const body = await response.json();
-    return body.status === 200;
+    return await fetchWithTimeout(`${config.localApiUrl}/api/v1/ping`, { method: 'GET' }, async response => {
+      if (!response.ok) {
+        return false;
+      }
+      // the maintenance page of a proxy answers 200 too: only Gladys answers this
+      const body = await response.json();
+      return body.status === 200;
+    });
   } catch (e) {
     return false;
   }

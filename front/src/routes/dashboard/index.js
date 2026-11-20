@@ -418,12 +418,16 @@ class Dashboard extends Component {
       // (device_features arrays…), so swapping in an equal-but-fresh object
       // would make every widget refetch and flash its loader a second time
       // right after the instant cached render
-      if (
-        currentDashboard &&
-        this.state.currentDashboardSelector === selector &&
-        JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard)
-      ) {
-        this.setState({ currentDashboard });
+      if (currentDashboard && this.state.currentDashboardSelector === selector) {
+        const changed = JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard);
+        // the dashboard displayed now was loaded: a previous one that failed no longer
+        // says "could not be loaded"
+        if (changed || this.state.currentDashboardLoadFailed) {
+          this.setState({
+            ...(changed ? { currentDashboard } : {}),
+            currentDashboardLoadFailed: false
+          });
+        }
       }
     } catch (e) {
       console.error(e);
