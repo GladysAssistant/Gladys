@@ -136,6 +136,7 @@
     "setValueError": {
       "unreachable": "Der an „{{name}}“ gesendete Befehl ist fehlgeschlagen. Das Gerät ist möglicherweise nicht erreichbar.",
       "notConfigured": "Der Befehl wurde nicht an „{{name}}“ gesendet: Die Integration ist nicht konfiguriert oder nicht verbunden.",
+      "notReady": "Der Befehl wurde nicht an „{{name}}“ gesendet: Die Integration ist noch nicht bereit. Gladys startet sie möglicherweise noch, oder sie ist nicht verbunden.",
       "refused": "Der an „{{name}}“ gesendete Befehl wurde abgelehnt.",
       "notFound": "Der Befehl wurde nicht gesendet: Dieses Gerät oder seine Integration existiert in Gladys nicht mehr.",
       "gladysUnreachable": "Gladys ist nicht erreichbar: Der Befehl wurde möglicherweise nicht gesendet.",

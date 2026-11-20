@@ -136,6 +136,7 @@
     "setValueError": {
       "unreachable": "The command sent to “{{name}}” failed. The device may be unreachable.",
       "notConfigured": "The command was not sent to “{{name}}”: its integration is not configured or not connected.",
+      "notReady": "The command was not sent to “{{name}}”: its integration is not ready yet. Gladys may still be starting it, or it is not connected.",
       "refused": "The command sent to “{{name}}” was refused.",
       "notFound": "The command was not sent: this device, or its integration, no longer exists in Gladys.",
       "gladysUnreachable": "Gladys could not be reached: the command may not have been sent.",

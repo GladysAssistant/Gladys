@@ -14,7 +14,13 @@ const {
 } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
-const { NotFoundError, ServiceNotConfiguredError, BadParameters, AbortScene } = require('../../../utils/coreErrors');
+const {
+  NotFoundError,
+  ServiceNotConfiguredError,
+  ServiceNotReadyError,
+  BadParameters,
+  AbortScene,
+} = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 
@@ -330,6 +336,7 @@ describe('scene.executeSingleAction, a value asked by a user which cannot be set
 
   [
     { error: new ServiceNotConfiguredError('MQTT'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.NOT_CONFIGURED },
+    { error: new ServiceNotReadyError('Zigbee2mqtt'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.NOT_READY },
     { error: new NotFoundError('Service mqtt was not found.'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.NOT_FOUND },
     { error: new BadParameters('Value refused'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED },
     { error: new AbortScene('ACTION_VALUE_EMPTY'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED },
