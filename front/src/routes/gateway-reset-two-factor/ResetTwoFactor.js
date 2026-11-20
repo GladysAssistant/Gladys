@@ -16,15 +16,21 @@ const RESET_ERRORS = {
 const MobileResetTwoFactor = props => {
   const errorId = props.status === RequestStatus.Error ? RESET_ERRORS[props.error] : null;
   const canReset = !props.success && !props.tokenMissing;
+  const descriptionId = props.resetPasswordUrl
+    ? 'gatewayResetTwoFactor.descriptionFromPasswordReset'
+    : 'gatewayResetTwoFactor.description';
+  const successId = props.resetPasswordUrl
+    ? 'gatewayResetTwoFactor.successFromPasswordReset'
+    : 'gatewayResetTwoFactor.success';
   return (
     <MobileAuthLayout backHref="/login" backLabel={<Text id="login.mobile.navBack" />} dataCy="reset-two-factor-mobile">
       <MobileAuthForm onSubmit={props.resetTwoFactor}>
-        <MobileAuthTitle lead={canReset && <Text id="gatewayResetTwoFactor.description" />}>
+        <MobileAuthTitle lead={canReset && <Text id={descriptionId} />}>
           <Text id="gatewayResetTwoFactor.formTitle" />
         </MobileAuthTitle>
         {props.success && (
           <MobileNotice tone="success" icon="check-circle" role="status" data-cy="reset-two-factor-success">
-            <Text id="gatewayResetTwoFactor.success" />
+            <Text id={successId} />
           </MobileNotice>
         )}
         {props.tokenMissing && (
@@ -43,7 +49,12 @@ const MobileResetTwoFactor = props => {
               <Text id="gatewayResetTwoFactor.button" />
             </BigButton>
           )}
-          {!canReset && (
+          {props.success && props.resetPasswordUrl && (
+            <BigButton variant="primary" href={props.resetPasswordUrl} data-cy="reset-two-factor-new-password">
+              <Text id="gatewayResetTwoFactor.newPasswordLink" />
+            </BigButton>
+          )}
+          {!canReset && !(props.success && props.resetPasswordUrl) && (
             <BigButton variant="primary" href="/login" data-cy="reset-two-factor-login">
               <Text id="gatewayResetTwoFactor.loginLink" />
             </BigButton>
@@ -63,7 +74,20 @@ const DesktopResetTwoFactor = ({ children, ...props }) => (
         </div>
         {props.success && (
           <div class="alert alert-success" role="alert">
-            <Text id="gatewayResetTwoFactor.success" />
+            <Text
+              id={
+                props.resetPasswordUrl
+                  ? 'gatewayResetTwoFactor.successFromPasswordReset'
+                  : 'gatewayResetTwoFactor.success'
+              }
+            />
+          </div>
+        )}
+        {props.success && props.resetPasswordUrl && (
+          <div class="form-footer">
+            <a href={props.resetPasswordUrl} class="btn btn-primary btn-block" data-cy="reset-two-factor-new-password">
+              <Text id="gatewayResetTwoFactor.newPasswordLink" />
+            </a>
           </div>
         )}
         {(props.tokenMissing || (props.status === RequestStatus.Error && props.error === 'LINK')) && (
@@ -84,7 +108,13 @@ const DesktopResetTwoFactor = ({ children, ...props }) => (
         {!props.success && !props.tokenMissing && (
           <div>
             <p>
-              <Text id="gatewayResetTwoFactor.description" />
+              <Text
+                id={
+                  props.resetPasswordUrl
+                    ? 'gatewayResetTwoFactor.descriptionFromPasswordReset'
+                    : 'gatewayResetTwoFactor.description'
+                }
+              />
             </p>
             <div class="form-footer">
               <button type="submit" class="btn btn-primary btn-block" disabled={props.resetInProgress}>
@@ -95,11 +125,13 @@ const DesktopResetTwoFactor = ({ children, ...props }) => (
         )}
       </div>
     </form>
-    <div class="text-center text-muted">
-      <a href="/login">
-        <Text id="gatewayResetTwoFactor.loginLink" />
-      </a>
-    </div>
+    {!(props.success && props.resetPasswordUrl) && (
+      <div class="text-center text-muted">
+        <a href="/login">
+          <Text id="gatewayResetTwoFactor.loginLink" />
+        </a>
+      </div>
+    )}
   </AuthLayout>
 );
 

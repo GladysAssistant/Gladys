@@ -29,7 +29,18 @@ const RESET_TWO_FACTOR_ERRORS = {
 const MobileResetPassword = props => {
   let barError = null;
   if (props.errorLink) {
-    barError = <Text id="gatewayResetPassword.errorLinkLabel" />;
+    barError = (
+      <span>
+        <Text id="gatewayResetPassword.errorLinkLabel" />{' '}
+        <a href="/forgot-password" data-cy="gateway-reset-password-new-link">
+          <Text id="gatewayResetPassword.requestNewLink" />
+        </a>
+      </span>
+    );
+  } else if (props.errorUnknown) {
+    barError = <Text id="gatewayResetPassword.errorUnknownLabel" />;
+  } else if (props.tooManyTwoFactorAttempts) {
+    barError = <Text id="gatewayResetPassword.tooManyTwoFactorAttemptsLabel" />;
   } else if (props.twoFactorResetStatus === RequestStatus.Error && RESET_TWO_FACTOR_ERRORS[props.twoFactorResetError]) {
     barError = <Text id={RESET_TWO_FACTOR_ERRORS[props.twoFactorResetError]} />;
   }
@@ -48,7 +59,17 @@ const MobileResetPassword = props => {
             <MarkupText id="resetPassword.resetSuccess" />
           </MobileNotice>
         )}
-        {!props.success && props.twoFactorResetStatus === RequestStatus.Success && (
+        {!props.success && props.twoFactorResetDone && (
+          <MobileNotice
+            tone="success"
+            icon="check-circle"
+            role="status"
+            data-cy="gateway-reset-password-two-factor-reset-done"
+          >
+            <Text id="gatewayResetPassword.twoFactorResetDone" />
+          </MobileNotice>
+        )}
+        {!props.success && !props.twoFactorResetDone && props.twoFactorResetStatus === RequestStatus.Success && (
           <MobileNotice tone="success" icon="mail" role="status" data-cy="gateway-reset-password-reset-sent">
             <Text id="gatewayLogin.resetTwoFactorEmailSent" />{' '}
             <Text id="gatewayResetPassword.resetTwoFactorThenComeBack" />
@@ -87,6 +108,7 @@ const MobileResetPassword = props => {
                 placeholder={<Text id="gatewayResetPassword.twoFactorCodePlaceholder" />}
                 value={props.twoFactorCode}
                 onInput={props.updateTwoFactorCode}
+                error={props.invalidTwoFactorCode && <Text id="gatewayResetPassword.invalidTwoFactorCodeLabel" />}
                 maxlength="6"
                 enterkeyhint="go"
                 dataCy="gateway-reset-password-two-factor-code"
@@ -128,6 +150,7 @@ const MobileResetPassword = props => {
               variant="primary"
               type="submit"
               loading={props.resetInProgress}
+              disabled={props.loading}
               data-cy="gateway-reset-password-submit"
             >
               <Text id="gatewayResetPassword.resetPasswordButton" />
