@@ -422,18 +422,21 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({ '0x00158d00033e88d5': stillThere });
   });
 
-  it('should get permit join from config', async () => {
+  it('should no longer read the legacy permit join topics of Zigbee2mqtt 1', async () => {
+    // No Gladys device of that name
+    gladys.stateManager.get = fake.returns(null);
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config', `{"permit_join": true}`);
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config/permit_join', `true`);
     // ASSERT
-    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    assert.neverCalledWithMatch(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: true,
     });
-    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
   });
 
-  it('should get permit join from response/permit_join with time 254', async () => {
+  it('should get permit join from response/permit_join with time 254, its end estimated', async () => {
+    const clock = sinon.useFakeTimers(new Date('2026-11-20T10:00:00.000Z'));
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage(
       'zigbee2mqtt/bridge/response/permit_join',
@@ -442,12 +445,15 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // ASSERT
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: true,
+      payload: { allowed: true, remainingSeconds: 254 },
     });
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(Date.now() + 254000);
+    clock.restore();
   });
 
   it('should get permit join from response/permit_join with time 0', async () => {
+    zigbee2mqttManager.z2mPermitJoin = true;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage(
       'zigbee2mqtt/bridge/response/permit_join',
@@ -456,20 +462,50 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // ASSERT
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: false,
+      payload: { allowed: false, remainingSeconds: null },
     });
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
   });
 
-  it('it should get permit join from config/permit_join', async () => {
+  it('should not change permit join on a refused response/permit_join', async () => {
+    zigbee2mqttManager.z2mPermitJoin = true;
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config/permit_join', `true`);
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{},"status":"error","error":"Device 'bulb' does not exist"}`,
+    );
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/permit_join', `{"status":"ok"}`);
+    // ASSERT: the second one, without data, closes
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    assert.calledOnce(gladys.event.emit);
+  });
+
+  it('should follow a device joining from bridge/event', async () => {
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/event',
+      JSON.stringify({ type: 'device_joined', data: { friendly_name: '0x01', ieee_address: '0x01' } }),
+    );
     // ASSERT
-    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: true,
+    expect(zigbee2mqttManager.pairingDevices['0x01'].status).to.equal('joined');
+    assert.calledWithMatch(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PAIRING,
     });
-    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
+  });
+
+  it('should forget joining allowed when Zigbee2mqtt announces another run', async () => {
+    zigbee2mqttManager.z2mPermitJoin = true;
+    zigbee2mqttManager.z2mPermitJoinEnd = Date.now() + 10000;
+    zigbee2mqttManager.requestHealthCheck = fake();
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', 'online');
+    // ASSERT
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(null);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: { allowed: false, remainingSeconds: null },
+    });
   });
 
   it('it should get empty message', async () => {
@@ -833,8 +869,22 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: false,
+      payload: { allowed: false, remainingSeconds: null },
     });
+  });
+
+  it('should tell the joining Zigbee2mqtt opened and its end, from its info', async () => {
+    const clock = sinon.useFakeTimers(new Date('2026-11-20T10:00:00.000Z'));
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/info',
+      JSON.stringify({ version: '2.14.2', permit_join: true, permit_join_end: Date.now() + 200000 }),
+    );
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(Date.now() + 200000);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: { allowed: true, remainingSeconds: 200 },
+    });
+    clock.restore();
   });
 
   it('should not tell the joining again when the info of Zigbee2mqtt does not change it', async () => {
@@ -843,9 +893,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       'zigbee2mqtt/bridge/info',
       JSON.stringify({ version: '2.14.2', permit_join: false }),
     );
-    assert.neverCalledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.neverCalledWithMatch(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: false,
     });
   });
 

@@ -62,6 +62,18 @@ const INSTALLATION_STATE = {
   FAILED: 'failed',
 };
 
+// Where a device that joins the network stands (docs/specs/zigbee2mqtt-pairing.md, C)
+const PAIRING_STATUS = {
+  JOINED: 'joined',
+  INTERVIEWING: 'interviewing',
+  READY: 'ready',
+  UNSUPPORTED: 'unsupported',
+  FAILED: 'failed',
+};
+
+// Longest joining window Zigbee2mqtt opens, in seconds
+const PERMIT_JOIN_MAX_SECONDS = 254;
+
 const INSTALLATION_KIND = {
   INSTALL: 'install',
   UPDATE: 'update',
@@ -228,6 +240,8 @@ module.exports = {
   MQTT_CONNECTION_ERROR,
   ADAPTER_MODE,
   INSTALLATION_STATE,
+  PAIRING_STATUS,
+  PERMIT_JOIN_MAX_SECONDS,
   INSTALLATION_KIND,
   INSTALLATION_PHASE,
   INSTALLATION_PHASE_STATE,

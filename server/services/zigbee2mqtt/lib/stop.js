@@ -1,5 +1,4 @@
 const logger = require('../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { findOwnZ2mContainer } = require('../utils/findOwnZ2mContainer');
 const { CONFIGURATION, MQTT_MODE } = require('./constants');
 const { disconnectFromBroker } = require('./disconnect');
@@ -106,13 +105,6 @@ async function stop() {
     this.zigbee2mqttStarting = false;
     this.z2mContainerError = null;
     this.z2mRun += 1;
-    if (this.z2mPermitJoin) {
-      this.z2mPermitJoin = false;
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-        payload: false,
-      });
-    }
     this.emitStatusEvent();
 
     if (!external) {
