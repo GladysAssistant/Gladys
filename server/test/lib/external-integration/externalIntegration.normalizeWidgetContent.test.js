@@ -256,6 +256,44 @@ describe('externalIntegration.normalizeWidgetContent', () => {
       expect(normalizeOne({ type: 'chart', device_features: [] })).to.deep.equal([]);
     });
 
+    it('should keep the legend names of live device_features, in their order', () => {
+      const [component] = normalize([
+        {
+          type: 'chart',
+          device_features: ['ext:a', 'ext:b', 'ext:c', 'ext:d', 'ext:e'],
+          series_names: [
+            { en: 'Living room temp.', fr: 'Temp. salon' },
+            // not a text: that series keeps the feature name
+            42,
+            'Setpoint of the living room unit',
+            { fr: 'Sans anglais' },
+            'Beyond the features',
+          ],
+        },
+      ]);
+      expect(component.series_names).to.deep.equal([
+        { en: 'Living room temp.', fr: 'Temp. salon' },
+        null,
+        // bounded to 24 characters, like an inline series name
+        'Setpoint of the living …',
+        null,
+      ]);
+      // fewer names than features: the others keep their feature name
+      const [short] = normalize([{ type: 'chart', device_features: ['ext:a', 'ext:b'], series_names: ['Room'] }]);
+      expect(short.series_names).to.deep.equal(['Room']);
+    });
+
+    it('should drop legend names that are not a list, none valid, or on inline series', () => {
+      const points = [{ t: '2026-09-19T00:00:00Z', v: 3.2 }];
+      const [notArray] = normalize([{ type: 'chart', device_features: ['ext:a'], series_names: 'Room' }]);
+      expect(notArray).to.not.have.property('series_names');
+      const [noneValid] = normalize([{ type: 'chart', device_features: ['ext:a'], series_names: [null, ''] }]);
+      expect(noneValid).to.not.have.property('series_names');
+      // an inline series carries its own name
+      const [inline] = normalize([{ type: 'chart', series: [{ points }], series_names: ['Room'] }]);
+      expect(inline).to.not.have.property('series_names');
+    });
+
     it('should normalize annotations and the now marker on both chart forms', () => {
       const points = [{ t: '2026-09-19T00:00:00Z', v: 3.2 }];
       const annotations = Array.from({ length: 9 }, (value, index) => ({

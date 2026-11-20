@@ -432,7 +432,12 @@ describe('externalIntegration widgets — content path', () => {
           { type: 'button', label: 'Dock', device_feature: dock.external_id, value: 1 },
           { type: 'button', label: 'Too high', device_feature: dock.external_id, value: 5 },
           { type: 'button', label: 'Read only', device_feature: battery.external_id, value: 1 },
-          { type: 'chart', device_features: [battery.external_id, dock.external_id], interval: 'last-week' },
+          {
+            type: 'chart',
+            device_features: [battery.external_id, dock.external_id],
+            interval: 'last-week',
+            series_names: [{ en: 'Battery', fr: 'Batterie' }],
+          },
           { type: 'chart', device_features: [battery.external_id, foreign.dock.external_id] },
         ],
       });
@@ -476,6 +481,8 @@ describe('externalIntegration widgets — content path', () => {
           chart_type: 'line',
           device_features: [battery.external_id, dock.external_id],
           interval: 'last-week',
+          // the legend names travel with their features through the resolution
+          series_names: [{ en: 'Battery', fr: 'Batterie' }],
           device_feature_selectors: ['roborock-s7-battery', 'roborock-s7-dock'],
         },
       ]);
