@@ -291,10 +291,10 @@ class Session {
     }
     const { resetCount } = this;
     try {
-      // the current access token is kept until a new one arrives: the close may not have been a
-      // refusal (a network that dropped while the socket authenticated), and a renewal that
-      // fails leaves the requests of the page with the token they had. Gets a new access token,
-      // then calls connect().
+      // the current access token is kept until a new one arrives, or until Gladys refuses the
+      // renewal (below): the close may not have been a refusal (a network that dropped while the
+      // socket authenticated), and a renewal that times out leaves the requests of the page with
+      // the token they had. Gets a new access token, then calls connect().
       await this.refreshAccessToken();
     } catch (e) {
       console.error(e);
@@ -311,6 +311,13 @@ class Session {
         // good. The app is told, and takes the user to the sign-in page or to the keypad,
         // which closes this session or connects it again. Should the app not get that far
         // (Gladys gone again in the meantime), the next attempt asks once more, later.
+        // The access token goes first: Gladys may still accept it for a while (a session that
+        // has expired), and the session check would then stay where it is. Without it, the check
+        // asks for a renewal itself and gets the same refusal, which it routes: TABLET_IS_LOCKED
+        // to the keypad (a locked tablet's token gets a 403 the check does not route), anything
+        // else to the sign-in page.
+        delete this.user.access_token;
+        this.saveUser(this.user);
         this.scheduleReconnect({ afterRefusedRenewal: true });
         this.dispatch(SESSION_REFUSED_EVENT);
         return;

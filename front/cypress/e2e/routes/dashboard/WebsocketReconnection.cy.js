@@ -258,11 +258,9 @@ describe('Websocket reconnection', () => {
       { method: 'POST', url: `${serverUrl}/api/v1/access_token` },
       { statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'Session was revoked' } }
     ).as('renewal');
-    // ...and the access token the page still holds (Gladys restarted since)
-    cy.intercept(
-      { method: 'GET', url: `${serverUrl}/api/v1/me` },
-      { statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'Unauthorized' } }
-    ).as('sessionCheck');
+    // The access token the page holds is still accepted by Gladys here (as for a session that has
+    // expired): the session check is refused only because the refused renewal dropped it
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/me` }).as('sessionCheck');
     freezeTimeAndJitter();
     closeSocket(0, { code: 4000, reason: 'INVALID_ACCESS_TOKEN' });
     // a refused token is renewed at once
@@ -355,11 +353,6 @@ describe('Websocket reconnection', () => {
         req.reply({ statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'TABLET_IS_LOCKED' } });
       }
     }).as('renewal');
-    // ...and refuses the token of the dashboard the page still holds
-    cy.intercept(
-      { method: 'GET', url: `${serverUrl}/api/v1/me` },
-      { statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'TABLET_IS_LOCKED' } }
-    );
     closeSocket(0, { code: 4000, reason: 'INVALID_ACCESS_TOKEN' });
     cy.location('pathname').should('eq', '/locked');
     // the keypad asks for its own token, and the session connects again with it: the keypad
