@@ -100,12 +100,14 @@ describe('Undoing a deletion in the scene editor, on a wide screen', () => {
     // a drag ends with no click (the drag engine swallows it): the move itself is the edit
     cy.window().then(win => {
       const firstSlot = win.document.querySelector('[data-cy="delete-step-0.0"]').closest('[data-step-slot]');
-      firstSlot.scrollIntoView({ block: 'start' });
+      firstSlot.scrollIntoView({ block: 'center' });
       const handle = win.document.querySelector('[data-cy="drag-step-1.0"]');
       const handleRect = handle.getBoundingClientRect();
       const x = handleRect.left + handleRect.width / 2;
       const startY = handleRect.top + handleRect.height / 2;
-      const dropY = firstSlot.getBoundingClientRect().top + 4;
+      const firstRect = firstSlot.getBoundingClientRect();
+      // the upper quarter of the first step: the insertion point before it
+      const dropY = firstRect.top + firstRect.height / 4;
       const pointer = (type, clientY) =>
         new win.PointerEvent(type, {
           pointerId: 7,
@@ -122,9 +124,9 @@ describe('Undoing a deletion in the scene editor, on a wide screen', () => {
       win.dispatchEvent(pointer('pointermove', dropY));
       win.dispatchEvent(pointer('pointerup', dropY));
     });
-    cy.get('[data-cy=scene-toast]').should('not.exist');
     stepLabel('0.0').i18n('editScene.actions.condition.if-then-else');
     stepLabel('1.0').i18n('editScene.actions.delay');
+    cy.get('[data-cy=scene-toast]').should('not.exist');
     cy.get('[data-cy=delete-trigger-0]').should('not.exist');
   });
 

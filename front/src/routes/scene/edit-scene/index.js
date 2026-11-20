@@ -1616,9 +1616,10 @@ class EditScene extends Component {
     const newState = update(newStateWithoutElement, addUpdateObject);
 
     await this.setState(newState);
-    this.withdrawUndoAfterMove();
     await this.addEmptyActionGroupIfNeeded();
     await this.cleanUpEmptyGroupAfterMove(originalPath);
+    // last: the steps above set a copy of the state that still holds the toast
+    this.withdrawUndoAfterMove();
   };
 
   moveCardGroup = async (sourcePath, destPath) => {
@@ -1676,9 +1677,10 @@ class EditScene extends Component {
         ...newState,
         variables: newVariables
       });
-      this.withdrawUndoAfterMove();
 
       await this.addEmptyActionGroupIfNeeded();
+      // last: the step above sets a copy of the state that still holds the toast
+      this.withdrawUndoAfterMove();
     } catch (error) {
       console.error('Error moving card group:', error);
       return null;
