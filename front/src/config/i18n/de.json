@@ -8121,9 +8121,12 @@
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Zwei-Faktor-Authentifizierung zurücksetzen",
     "description": "Du hast das Zurücksetzen der Zwei-Faktor-Authentifizierung deines Gladys-Plus-Kontos angefordert. Danach funktionieren deine Authentifizierungs-App und deine Wiederherstellungscodes nicht mehr: Bei deiner nächsten Anmeldung bittet dich Gladys Plus, eine neue App einzurichten und neue Wiederherstellungscodes zu speichern.",
+    "descriptionFromPasswordReset": "Du hast das Zurücksetzen der Zwei-Faktor-Authentifizierung deines Gladys-Plus-Kontos auf der Seite zum Zurücksetzen deines Passworts angefordert. Danach funktionieren deine Authentifizierungs-App und deine Wiederherstellungscodes nicht mehr: Du wählst anschließend dein neues Passwort, und bei deiner nächsten Anmeldung bittet dich Gladys Plus, eine neue App einzurichten.",
     "button": "Meine Zwei-Faktor-Authentifizierung zurücksetzen",
     "success": "Deine Zwei-Faktor-Authentifizierung wurde zurückgesetzt. Melde dich mit deinem Passwort an: Gladys Plus bittet dich, eine neue Authentifizierungs-App einzurichten.",
+    "successFromPasswordReset": "Deine Zwei-Faktor-Authentifizierung wurde zurückgesetzt. Wähle jetzt dein neues Passwort: Gladys Plus bittet dich danach, eine neue Authentifizierungs-App einzurichten.",
     "loginLink": "Anmelden",
+    "newPasswordLink": "Mein neues Passwort wählen",
     "errorLink": "Dieser Link ist ungültig, bereits verwendet oder abgelaufen. Fordere auf der Anmeldeseite einen neuen an.",
     "instanceConnected": "Deine Gladys ist wieder mit Gladys Plus verbunden: Ein Administrator deiner Gladys kann stattdessen unter Einstellungen › Benutzer neue Wiederherstellungscodes erzeugen. Dieser Link bleibt gültig, solange keine Gladys verbunden ist.",
     "error": "Deine Zwei-Faktor-Authentifizierung konnte nicht zurückgesetzt werden. Bitte versuche es später erneut."
@@ -8134,6 +8137,8 @@
     "incompatibleBrowserLabel": "Dein Browser ist leider nicht mit dem Gladys Gateway kompatibel. Dein Browser muss die WebCrypto-API sowie IndexedDB-Datenbanken unterstützen.",
     "errorLinkLabel": "Wir können deinen Link zum Zurücksetzen des Passworts nicht abrufen. Vielleicht wurde er bereits verwendet oder ist abgelaufen.",
     "invalidRecoveryCodeLabel": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet. Dein Link zum Zurücksetzen des Passworts ist weiterhin gültig, versuche es mit einem anderen Wiederherstellungscode.",
+    "invalidTwoFactorCodeLabel": "Dieser 2FA-Code ist ungültig. Dein Link zum Zurücksetzen ist weiterhin gültig: Versuche es mit einem neuen Code aus deiner App erneut.",
+    "tooManyTwoFactorAttemptsLabel": "Zu viele ungültige 2FA-Codes: Warte ein paar Minuten, bevor du es erneut versuchst. Dein Link zum Zurücksetzen ist weiterhin gültig.",
     "passwordNotMatchingLabel": "Passwörter stimmen nicht überein.",
     "passwordLabel": "Passwort (mindestens 8 Zeichen)",
     "passwordPlaceholder": "Passwort",
@@ -8147,7 +8152,8 @@
     "recoveryCodeLabel": "Wiederherstellungscode",
     "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
     "resetPasswordButton": "Passwort zurücksetzen",
-    "resetTwoFactorThenComeBack": "Sobald deine Zwei-Faktor-Authentifizierung zurückgesetzt ist, komm auf diese Seite zurück: Dein Link zum Zurücksetzen des Passworts bleibt zwei Stunden gültig."
+    "resetTwoFactorThenComeBack": "Sobald deine Zwei-Faktor-Authentifizierung zurückgesetzt ist, bringt dich der Link dieser E-Mail auf diese Seite zurück, um dein neues Passwort zu wählen (er bleibt zwei Stunden gültig).",
+    "twoFactorResetDone": "Deine Zwei-Faktor-Authentifizierung wurde zurückgesetzt: Wähle dein neues Passwort."
   },
   "gatewayOpenApi": {
     "title": "Offene API",

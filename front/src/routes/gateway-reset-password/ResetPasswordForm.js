@@ -23,12 +23,27 @@ const ResetPassworFrom = ({ children, ...props }) => (
           <Text id="gatewayResetPassword.invalidRecoveryCodeLabel" />
         </div>
       )}
+      {props.invalidTwoFactorCode && (
+        <div class="alert alert-danger" role="alert">
+          <Text id="gatewayResetPassword.invalidTwoFactorCodeLabel" />
+        </div>
+      )}
+      {props.tooManyTwoFactorAttempts && (
+        <div class="alert alert-danger" role="alert">
+          <Text id="gatewayResetPassword.tooManyTwoFactorAttemptsLabel" />
+        </div>
+      )}
+      {props.twoFactorResetDone && (
+        <div class="alert alert-success" role="alert">
+          <Text id="gatewayResetPassword.twoFactorResetDone" />
+        </div>
+      )}
       {props.passwordNotMatching && (
         <div class="alert alert-warning" role="alert">
           <Text id="gatewayResetPassword.passwordNotMatchingLabel" />
         </div>
       )}
-      {props.twoFactorResetStatus === RequestStatus.Success && (
+      {props.twoFactorResetStatus === RequestStatus.Success && !props.twoFactorResetDone && (
         <div class="alert alert-success" role="alert">
           <Text id="gatewayLogin.resetTwoFactorEmailSent" />{' '}
           <Text id="gatewayResetPassword.resetTwoFactorThenComeBack" />
@@ -144,7 +159,7 @@ const ResetPassworFrom = ({ children, ...props }) => (
         </div>
       )}
       <div className="form-footer">
-        <button type="submit" className="btn btn-primary btn-block" disabled={props.resetInProgress}>
+        <button type="submit" className="btn btn-primary btn-block" disabled={props.resetInProgress || props.loading}>
           <Text id="gatewayResetPassword.resetPasswordButton" />
         </button>
       </div>

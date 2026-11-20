@@ -9,12 +9,57 @@ class ResetPasswordPage extends Component {
   state = {
     password: '',
     passwordRepeat: '',
+    // null until the reset link is read: the fields of the second factor show from the start,
+    // not after a first submit that looked like it saved the password
     twoFactorEnabled: null,
+    twoFactorResetDone: false,
     useRecoveryCode: false,
     success: false,
     resetInProgress: false,
     twoFactorResetStatus: null,
     twoFactorResetError: null
+  };
+
+  componentDidMount() {
+    this.loadResetPasswordUser();
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  loadResetPasswordUser = async () => {
+    if (!this.props.token) {
+      this.setState({ errorLink: true });
+      return;
+    }
+    try {
+      const user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
+      this.setState({ twoFactorEnabled: user.two_factor_enabled === true });
+    } catch (e) {
+      this.setState({ errorLink: true });
+    }
+  };
+
+  // Back on this tab after resetting the two-factor authentication from the emailed link:
+  // the code is no longer asked, the user only chooses the new password
+  onVisibilityChange = async () => {
+    if (
+      document.visibilityState !== 'visible' ||
+      this.state.twoFactorResetStatus !== RequestStatus.Success ||
+      this.state.twoFactorEnabled !== true
+    ) {
+      return;
+    }
+    try {
+      const user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
+      if (user.two_factor_enabled !== true) {
+        this.setState({ twoFactorEnabled: false, twoFactorResetDone: true, useRecoveryCode: false });
+      }
+    } catch (e) {
+      // the submit tells the user if the link is dead
+    }
   };
 
   // The user forgot their password AND lost their two-factor app and recovery codes,
@@ -75,29 +120,39 @@ class ResetPasswordPage extends Component {
       passwordNotMatching: false,
       errorLink: false,
       invalidRecoveryCode: false,
+      invalidTwoFactorCode: false,
+      tooManyTwoFactorAttempts: false,
       resetInProgress: true
     });
 
     try {
-      let user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
-      if (user.two_factor_enabled === true && this.state.twoFactorEnabled === null) {
-        this.setState({ twoFactorEnabled: true, resetInProgress: false });
+      const user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
+      const twoFactorEnabled = user.two_factor_enabled === true;
+      if (twoFactorEnabled && this.state.twoFactorEnabled !== true) {
+        // the code was not asked yet (two-factor enabled since the page was loaded)
+        this.setState({ twoFactorEnabled: true, twoFactorResetDone: false, resetInProgress: false });
       } else {
+        const useRecoveryCode = twoFactorEnabled && this.state.useRecoveryCode;
         await this.props.session.gatewayClient.resetPassword(
           user.email,
           this.state.password,
           this.props.token,
-          this.state.useRecoveryCode ? undefined : this.state.twoFactorCode,
-          this.state.useRecoveryCode ? this.state.twoFactorRecoveryCode : undefined
+          twoFactorEnabled && !useRecoveryCode ? this.state.twoFactorCode : undefined,
+          useRecoveryCode ? this.state.twoFactorRecoveryCode : undefined
         );
         this.setState({ success: true, resetInProgress: false });
       }
     } catch (e) {
-      // A wrong or already used recovery code is rejected by the gateway with a 4xx:
-      // it doesn't mean the reset link itself is dead.
+      // A wrong code of the app, or a wrong or already used recovery code, is refused with a 403
+      // (429 after too many wrong codes): the reset link itself is still valid. Only a 404 means
+      // the link is dead — telling a user who mistyped a code to ask for a new link loops them.
       const status = get(e, 'response.status');
-      if (this.state.useRecoveryCode && status >= 400 && status < 500) {
+      if (this.state.twoFactorEnabled && this.state.useRecoveryCode && (status === 403 || status === 429)) {
         this.setState({ invalidRecoveryCode: true, resetInProgress: false });
+      } else if (this.state.twoFactorEnabled && status === 403) {
+        this.setState({ invalidTwoFactorCode: true, resetInProgress: false });
+      } else if (this.state.twoFactorEnabled && status === 429) {
+        this.setState({ tooManyTwoFactorAttempts: true, resetInProgress: false });
       } else {
         this.setState({ errorLink: true, resetInProgress: false });
       }
@@ -111,7 +166,10 @@ class ResetPasswordPage extends Component {
       success,
       errorLink,
       invalidRecoveryCode,
+      invalidTwoFactorCode,
+      tooManyTwoFactorAttempts,
       twoFactorEnabled,
+      twoFactorResetDone,
       passwordRepeat,
       twoFactorCode,
       useRecoveryCode,
@@ -131,9 +189,13 @@ class ResetPasswordPage extends Component {
         success={success}
         errorLink={errorLink}
         invalidRecoveryCode={invalidRecoveryCode}
+        invalidTwoFactorCode={invalidTwoFactorCode}
+        tooManyTwoFactorAttempts={tooManyTwoFactorAttempts}
         passwordError={passwordError}
         passwordNotMatching={passwordNotMatching}
         twoFactorEnabled={twoFactorEnabled}
+        twoFactorResetDone={twoFactorResetDone}
+        loading={twoFactorEnabled === null && !errorLink}
         twoFactorCode={twoFactorCode}
         updateTwoFactorCode={linkState(this, 'twoFactorCode')}
         useRecoveryCode={useRecoveryCode}

@@ -26,6 +26,10 @@ const DesktopResetPassword = ({ children, ...props }) => (
         success={props.success}
         errorLink={props.errorLink}
         invalidRecoveryCode={props.invalidRecoveryCode}
+        invalidTwoFactorCode={props.invalidTwoFactorCode}
+        tooManyTwoFactorAttempts={props.tooManyTwoFactorAttempts}
+        twoFactorResetDone={props.twoFactorResetDone}
+        loading={props.loading}
         resetInProgress={props.resetInProgress}
         requestTwoFactorReset={props.requestTwoFactorReset}
         twoFactorResetStatus={props.twoFactorResetStatus}

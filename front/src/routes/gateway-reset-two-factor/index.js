@@ -7,6 +7,8 @@ import { RequestStatus } from '../../utils/consts';
 // Landing page of the link emailed by Gladys Plus to reset the two-factor authentication
 // of a user who lost their app and their recovery codes, with no Gladys connected.
 // The reset only happens on click: an email client prefetching the link must not do it.
+// Asked from a reset password page (the user forgot their password too), the link carries the
+// reset password token: once reset, the page leads straight back to choosing the new password.
 class ResetTwoFactorPage extends Component {
   state = {
     status: null,
@@ -39,10 +41,11 @@ class ResetTwoFactorPage extends Component {
     }
   };
 
-  render({ token }, { status, error }) {
+  render({ token, reset_password_token: resetPasswordToken }, { status, error }) {
     return (
       <ResetTwoFactor
         tokenMissing={!token}
+        resetPasswordUrl={resetPasswordToken ? `/reset-password?token=${encodeURIComponent(resetPasswordToken)}` : null}
         status={status}
         error={error}
         resetTwoFactor={this.resetTwoFactor}

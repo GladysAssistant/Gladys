@@ -8121,9 +8121,12 @@
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Restablecer la doble autenticación",
     "description": "Ha solicitado restablecer la doble autenticación de su cuenta Gladys Plus. Una vez restablecida, su aplicación de autenticación y sus códigos de recuperación dejan de funcionar: en su próximo inicio de sesión, Gladys Plus le pedirá configurar una nueva aplicación y guardar nuevos códigos de recuperación.",
+    "descriptionFromPasswordReset": "Ha solicitado restablecer la doble autenticación de su cuenta Gladys Plus desde la página de restablecimiento de su contraseña. Una vez restablecida, su aplicación de autenticación y sus códigos de recuperación dejan de funcionar: luego elegirá su nueva contraseña, y Gladys Plus le pedirá configurar una nueva aplicación en su próximo inicio de sesión.",
     "button": "Restablecer mi doble autenticación",
     "success": "Su doble autenticación ha sido restablecida. Inicie sesión con su contraseña: Gladys Plus le pedirá configurar una nueva aplicación de autenticación.",
+    "successFromPasswordReset": "Su doble autenticación ha sido restablecida. Elija ahora su nueva contraseña: Gladys Plus le pedirá después configurar una nueva aplicación de autenticación.",
     "loginLink": "Iniciar sesión",
+    "newPasswordLink": "Elegir mi nueva contraseña",
     "errorLink": "Este enlace no es válido, ya se ha utilizado o ha caducado. Solicite uno nuevo desde la página de inicio de sesión.",
     "instanceConnected": "Su Gladys vuelve a estar conectada a Gladys Plus: un administrador de su Gladys puede generar nuevos códigos de recuperación desde Ajustes › Usuarios. Este enlace sigue siendo válido mientras ninguna Gladys esté conectada.",
     "error": "No se ha podido restablecer su doble autenticación. Inténtelo de nuevo más tarde."
@@ -8134,6 +8137,8 @@
     "incompatibleBrowserLabel": "Lo sentimos, su navegador no es compatible con Gladys Gateway. Su navegador debe admitir la API WebCrypto y las bases de datos IndexedDB.",
     "errorLinkLabel": "No podemos recuperar su enlace de restablecimiento de contraseña. Es posible que ya se haya utilizado o que haya caducado.",
     "invalidRecoveryCodeLabel": "Este código de recuperación no es válido o ya se ha utilizado. Su enlace de restablecimiento de contraseña sigue siendo válido; vuelva a intentarlo con otro código de recuperación.",
+    "invalidTwoFactorCodeLabel": "Este código 2FA no es válido. Su enlace de restablecimiento sigue siendo válido: inténtelo de nuevo con un nuevo código generado por su aplicación.",
+    "tooManyTwoFactorAttemptsLabel": "Demasiados códigos 2FA no válidos: espere unos minutos antes de volver a intentarlo. Su enlace de restablecimiento sigue siendo válido.",
     "passwordNotMatchingLabel": "Las contraseñas no coinciden.",
     "passwordLabel": "Contraseña (mín. 8 caracteres)",
     "passwordPlaceholder": "Contraseña",
@@ -8147,7 +8152,8 @@
     "recoveryCodeLabel": "Código de recuperación",
     "recoveryCodePlaceholder": "Introduzca uno de sus códigos de recuperación",
     "resetPasswordButton": "Restablecer contraseña",
-    "resetTwoFactorThenComeBack": "Una vez restablecida su doble autenticación, vuelva a esta página: su enlace de restablecimiento de contraseña sigue siendo válido durante dos horas."
+    "resetTwoFactorThenComeBack": "Una vez restablecida su doble autenticación, el enlace de este correo le devuelve a esta página para elegir su nueva contraseña (sigue siendo válido durante dos horas).",
+    "twoFactorResetDone": "Su doble autenticación ha sido restablecida: elija su nueva contraseña."
   },
   "gatewayOpenApi": {
     "title": "Open API",

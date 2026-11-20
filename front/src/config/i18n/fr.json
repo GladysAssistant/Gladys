@@ -8121,9 +8121,12 @@
     "pageTitle": "Gladys Assistant",
     "formTitle": "Gladys Plus - Réinitialiser la double authentification",
     "description": "Vous avez demandé à réinitialiser la double authentification de votre compte Gladys Plus. Une fois réinitialisée, votre application d'authentification et vos codes de récupération ne fonctionnent plus : à votre prochaine connexion, Gladys Plus vous demandera de configurer une nouvelle application, puis d'enregistrer de nouveaux codes de récupération.",
+    "descriptionFromPasswordReset": "Vous avez demandé à réinitialiser la double authentification de votre compte Gladys Plus, depuis la page de réinitialisation de votre mot de passe. Une fois réinitialisée, votre application d'authentification et vos codes de récupération ne fonctionnent plus : vous choisirez ensuite votre nouveau mot de passe, puis Gladys Plus vous demandera de configurer une nouvelle application à votre prochaine connexion.",
     "button": "Réinitialiser ma double authentification",
     "success": "Votre double authentification a été réinitialisée. Connectez-vous avec votre mot de passe : Gladys Plus vous demandera de configurer une nouvelle application d'authentification.",
+    "successFromPasswordReset": "Votre double authentification a été réinitialisée. Choisissez maintenant votre nouveau mot de passe : Gladys Plus vous demandera ensuite de configurer une nouvelle application d'authentification.",
     "loginLink": "Se connecter",
+    "newPasswordLink": "Choisir mon nouveau mot de passe",
     "errorLink": "Ce lien est invalide, déjà utilisé ou expiré. Demandez-en un nouveau depuis la page de connexion.",
     "instanceConnected": "Votre Gladys est de nouveau connectée à Gladys Plus : un administrateur de votre Gladys peut plutôt générer de nouveaux codes de récupération depuis Paramètres › Utilisateurs. Ce lien reste valable tant qu'aucune Gladys n'est connectée.",
     "error": "Impossible de réinitialiser votre double authentification. Réessayez plus tard."
@@ -8134,6 +8137,8 @@
     "incompatibleBrowserLabel": "Désolé, votre navigateur n'est pas compatible avec la passerelle Gladys. Votre navigateur doit prendre en charge l'API WebCrypto ainsi que la base de données IndexedDB.",
     "errorLinkLabel": "Nous ne pouvons pas récupérer votre lien pour la réinitialisation de votre mot de passe. Peut-être qu'il a déjà été utilisé ou a expiré !",
     "invalidRecoveryCodeLabel": "Ce code de récupération est invalide ou a déjà été utilisé. Votre lien de réinitialisation est toujours valide, réessayez avec un autre code de récupération.",
+    "invalidTwoFactorCodeLabel": "Ce code 2FA n'est pas valide. Votre lien de réinitialisation est toujours valide : réessayez avec un nouveau code généré par votre application.",
+    "tooManyTwoFactorAttemptsLabel": "Trop de codes 2FA invalides : patientez quelques minutes avant de réessayer. Votre lien de réinitialisation est toujours valide.",
     "passwordNotMatchingLabel": "Le mot de passe ne correspond pas.",
     "passwordLabel": "Mot de passe (min 8 caractères)",
     "passwordPlaceholder": "Mot de passe",
@@ -8147,7 +8152,8 @@
     "recoveryCodeLabel": "Code de récupération",
     "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
     "resetPasswordButton": "Réinitialiser le mot de passe",
-    "resetTwoFactorThenComeBack": "Une fois votre double authentification réinitialisée, revenez sur cette page : votre lien de réinitialisation de mot de passe reste valable deux heures."
+    "resetTwoFactorThenComeBack": "Une fois votre double authentification réinitialisée, le lien de cet email vous ramène sur cette page pour choisir votre nouveau mot de passe (il reste valable deux heures).",
+    "twoFactorResetDone": "Votre double authentification a été réinitialisée : choisissez votre nouveau mot de passe."
   },
   "gatewayOpenApi": {
     "title": "Open API",
