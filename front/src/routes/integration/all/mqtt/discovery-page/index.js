@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import MqttPage from '../MqttPage';
 import DiscoverTab from './DiscoverTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 class MqttDiscoveryPage extends Component {
@@ -34,4 +35,4 @@ class MqttDiscoveryPage extends Component {
 export default connect(
   'user,session,houses,mqttDiscoveredDevices,mqttDiscoveryLoading,mqttDiscoveryError,mqttDiscoveryFilterExisting',
   actions
-)(MqttDiscoveryPage);
+)(withMobileViewport(MqttDiscoveryPage));

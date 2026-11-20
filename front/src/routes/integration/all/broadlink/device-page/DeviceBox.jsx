@@ -7,6 +7,7 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import MigrateDeviceButton from '../../../../../components/device/migrate/MigrateDeviceButton';
 import { RequestStatus } from '../../../../../utils/consts';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class DeviceBox extends Component {
   saveDevice = async () => {
@@ -32,7 +33,8 @@ class DeviceBox extends Component {
     this.setState({
       loading: true,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
+      deleteError: false
     });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
@@ -47,7 +49,8 @@ class DeviceBox extends Component {
         const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
-        this.setState({ error: RequestStatus.Error });
+        // said on the card: after the confirmation, a failure must not look like nothing happened
+        this.setState({ deleteError: true });
       }
     }
     this.setState({
@@ -63,7 +66,10 @@ class DeviceBox extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  render({ deviceIndex, device, housesWithRooms = [] }, { loading, saveError, tooMuchStatesError, statesNumber }) {
+  render(
+    { deviceIndex, device, housesWithRooms = [] },
+    { loading, saveError, tooMuchStatesError, statesNumber, deleteError }
+  ) {
     return (
       <div class="col-md-6">
         <div class="card" data-cy="device-card">
@@ -79,6 +85,11 @@ class DeviceBox extends Component {
                 {saveError && (
                   <div class="alert alert-danger">
                     <Text id="integration.broadlink.device.saveError" />
+                  </div>
+                )}
+                {deleteError && (
+                  <div class="alert alert-danger" data-cy="device-delete-error">
+                    <Text id="mobileDeviceList.deleteError" />
                   </div>
                 )}
                 {tooMuchStatesError && (
@@ -147,9 +158,9 @@ class DeviceBox extends Component {
                     <Text id="integration.broadlink.device.saveButton" />
                   </button>
                   <MigrateDeviceButton device={device} onMigrated={this.props.getBroadlinkRemotes} />
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.broadlink.device.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
 
                   <Link href={`/dashboard/integration/device/broadlink/edit/${device.selector}`}>
                     <button class="btn btn-secondary float-right">

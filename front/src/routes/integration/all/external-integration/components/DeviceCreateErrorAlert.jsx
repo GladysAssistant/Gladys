@@ -2,15 +2,12 @@ import { Text } from 'preact-i18n';
 
 const PREFIX = 'integration.externalIntegration.discover.error';
 
-const DeviceCreateErrorAlert = ({ errorMessage, errorDetail, validationErrors, isKnownError = true }) => {
-  if (!errorMessage) {
-    return null;
-  }
-
+// what the alert says, without its frame: the phone sheet shows it in a notice of the kit
+const DeviceCreateErrorContent = ({ errorMessage, errorDetail, validationErrors, isKnownError = true }) => {
   const hasValidationErrors = validationErrors && validationErrors.length > 0;
 
   return (
-    <div class="alert alert-danger" role="alert">
+    <div>
       <Text id={errorMessage} />
       {hasValidationErrors && (
         <div class="mt-2">
@@ -62,4 +59,22 @@ const DeviceCreateErrorAlert = ({ errorMessage, errorDetail, validationErrors, i
   );
 };
 
+const DeviceCreateErrorAlert = ({ errorMessage, errorDetail, validationErrors, isKnownError = true }) => {
+  if (!errorMessage) {
+    return null;
+  }
+
+  return (
+    <div class="alert alert-danger" role="alert">
+      <DeviceCreateErrorContent
+        errorMessage={errorMessage}
+        errorDetail={errorDetail}
+        validationErrors={validationErrors}
+        isKnownError={isKnownError}
+      />
+    </div>
+  );
+};
+
+export { DeviceCreateErrorContent };
 export default DeviceCreateErrorAlert;

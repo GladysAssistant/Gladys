@@ -2208,6 +2208,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   DEVICE: {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
+    // A value a user asked for could not be set on the device: sent to that user only,
+    // with one of DEVICE_SET_VALUE_ERROR_CAUSES
+    SET_VALUE_ERROR: 'device.set-value-error',
   },
   JOB: {
     NEW: 'job.new',
@@ -2458,6 +2461,19 @@ const DASHBOARD_BOX_MAX_ITEMS = {
   ACTIONS: 20,
 };
 
+// Why a value asked by a user could not be set (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR):
+// the front picks its sentence from it, the raw error never leaves the server
+const DEVICE_SET_VALUE_ERROR_CAUSES = {
+  // the integration could not drive the device (no answer, error of the device or of its cloud)
+  UNREACHABLE: 'unreachable',
+  // the integration of the device is not configured, or not connected
+  NOT_CONFIGURED: 'not-configured',
+  // the device, its feature or its integration no longer exists
+  NOT_FOUND: 'not-found',
+  // the value was refused before anything was sent to the device
+  REFUSED: 'refused',
+};
+
 const ERROR_MESSAGES = {
   HOUSE_HAS_NO_COORDINATES: 'HOUSE_HAS_NO_COORDINATES',
   SERVICE_NOT_CONFIGURED: 'SERVICE_NOT_CONFIGURED',
@@ -2554,6 +2570,7 @@ const JOB_TYPES = {
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
+  DEVICE_DESTROY: 'device-destroy',
 };
 
 const JOB_STATUS = {
@@ -2819,6 +2836,7 @@ module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST
 module.exports.DASHBOARD_BOX_MAX_ITEMS = DASHBOARD_BOX_MAX_ITEMS;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+module.exports.DEVICE_SET_VALUE_ERROR_CAUSES = DEVICE_SET_VALUE_ERROR_CAUSES;
 
 module.exports.WEATHER_UNITS = WEATHER_UNITS;
 

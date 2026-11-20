@@ -8,6 +8,8 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import { RequestStatus } from '../../../../../utils/consts';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import { MobileDeviceItem, BatteryPill } from '../../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 class BluetoothDevice extends Component {
   refreshDeviceProperty = () => {
@@ -22,30 +24,39 @@ class BluetoothDevice extends Component {
       batteryLevel
     });
   };
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({ loading: true });
+    let saved = true;
     try {
       await this.props.saveDevice(this.props.device);
     } catch (e) {
       this.setState({ error: RequestStatus.Error });
+      saved = false;
     }
     this.setState({ loading: false });
+    return saved;
   };
+  // resolves to false when the device could not be deleted
   deleteDevice = async () => {
-    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
+    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined, deleteError: false });
+    let deleted = true;
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
+      deleted = false;
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
         const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
-        this.setState({ error: RequestStatus.Error });
+        // said on the card: after the confirmation, a failure must not look like nothing happened
+        this.setState({ deleteError: true });
       }
     }
     this.setState({ loading: false });
+    return deleted;
   };
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
@@ -61,7 +72,38 @@ class BluetoothDevice extends Component {
     this.refreshDeviceProperty();
   }
 
-  render({ device, houses }, { batteryLevel, loading, tooMuchStatesError, statesNumber }) {
+  render({ device, houses, isMobile }, { batteryLevel, loading, tooMuchStatesError, statesNumber, deleteError }) {
+    // On a phone: a row and its sheet, fed by the handlers of the card
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (isMobile) {
+      return (
+        <MobileDeviceItem
+          device={device}
+          houses={houses}
+          pills={batteryLevel ? <BatteryPill level={batteryLevel} /> : null}
+          onNameChange={this.updateName}
+          onRoomChange={this.updateRoom}
+          namePlaceholderId="integration.bluetooth.device.namePlaceholder"
+          onSave={this.saveDevice}
+          actions={[
+            {
+              label: <Text id="integration.bluetooth.device.editButton" />,
+              icon: 'edit-2',
+              href: `/dashboard/integration/device/bluetooth/${device.selector}`,
+              dataCy: 'bluetooth-device-edit'
+            }
+          ]}
+          onDelete={this.deleteDevice}
+          deleteError={
+            tooMuchStatesError ? (
+              <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+            ) : null
+          }
+          deleteScheduled={Boolean(tooMuchStatesError)}
+          dataCy="bluetooth-device-row"
+        />
+      );
+    }
     return (
       <div class="col-md-6">
         <div class="card">
@@ -81,6 +123,11 @@ class BluetoothDevice extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+                {deleteError && (
+                  <div class="alert alert-danger" data-cy="device-delete-error">
+                    <Text id="mobileDeviceList.deleteError" />
+                  </div>
+                )}
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
                     <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
@@ -130,9 +177,9 @@ class BluetoothDevice extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.bluetooth.device.saveButton" />
                   </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                     <Text id="integration.bluetooth.device.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                   <Link href={`/dashboard/integration/device/bluetooth/${device.selector}`}>
                     <button class="btn btn-secondary float-right">
                       <Text id="integration.bluetooth.device.editButton" />

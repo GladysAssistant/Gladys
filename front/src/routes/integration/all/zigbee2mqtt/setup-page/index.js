@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
 
@@ -6,8 +7,9 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 import { RequestStatus } from '../../../../../utils/consts';
 import getZ2mUrl from '../utils/getZ2mUrl';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
-import { MQTT_MODE } from './constants';
-import SetupTab from './SetupTab';
+import { MQTT_MODE, isConfigured } from './constants';
+import Dashboard from './dashboard/Dashboard';
+import Wizard from './wizard/Wizard';
 
 // Refused while an installation or another operation on the integration runs (see refuseWhileInstalling on the
 // server), not because of a container of the user carrying the name of ours, which waiting does not solve
@@ -29,11 +31,27 @@ const VARIABLE_MAP = {
   Z2M_FRONTEND_URL: 'z2mFrontendUrl'
 };
 
+// Until the status and the configuration are loaded, or when they cannot be
+const SetupLoading = ({ error }) => (
+  <div class="card" data-cy="z2m-setup-loading">
+    <div class="card-body">
+      {error ? (
+        <div class="alert alert-danger mb-0" data-cy="z2m-setup-loading-error">
+          <Text id="integration.zigbee2mqtt.setup.errorLoadingStatesLabel" />
+        </div>
+      ) : (
+        <div class="loader my-5 mx-auto" />
+      )}
+    </div>
+  </div>
+);
+
 class Zigbee2mqttSetupPage extends Component {
   resolveZ2mUrl = configuration => getZ2mUrl(configuration, this.props.session.gatewayClient !== undefined);
 
   handleZ2MStatus = zigbee2mqttStatus => {
     this.progressMessages += 1;
+    this.statusMessages += 1;
     // Gladys switched Zigbee2mqtt to the ezsp driver by itself: the saved model changed
     if (zigbee2mqttStatus.ezspFallback && !this.state.zigbee2mqttStatus.ezspFallback) {
       this.loadZ2MConfig();
@@ -44,7 +62,8 @@ class Zigbee2mqttSetupPage extends Component {
   // Sent apart from the status, which carries them too, to follow an installation without flooding the status
   handleInstallProgress = ({ installation, prefetch }) => {
     this.progressMessages += 1;
-    this.setState({ zigbee2mqttStatus: { ...this.state.zigbee2mqttStatus, installation, prefetch } });
+    // From the state with the status received just before, which this.state may not hold yet
+    this.setState(state => ({ zigbee2mqttStatus: { ...state.zigbee2mqttStatus, installation, prefetch } }));
   };
 
   // The setup answered before the server saved the port of the interface and the generated MQTT credentials, and
@@ -56,7 +75,7 @@ class Zigbee2mqttSetupPage extends Component {
       this.setState({ installationFollowedToSuccess: true });
     }
     // The installation that refused them is over
-    ['setupZigee2mqttStatus', 'toggleZigee2mqttStatus', 'resetZigbee2mqttStatus'].forEach(requestStatus => {
+    ['setupZigee2mqttStatus', 'resetZigbee2mqttStatus'].forEach(requestStatus => {
       if (this.state[requestStatus] === RequestStatus.ConflictError) {
         this.setState({ [requestStatus]: null });
       }
@@ -64,10 +83,15 @@ class Zigbee2mqttSetupPage extends Component {
   };
 
   loadZ2MStatus = async () => {
-    const { progressMessages } = this;
+    const { progressMessages, statusMessages } = this;
     try {
       const zigbee2mqttStatus = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/status');
       if (this.unmounted) {
+        return;
+      }
+      // A status received during the request is more recent as a whole, a missing dongle told by it included
+      if (statusMessages !== this.statusMessages) {
+        this.setState({ loadZigbee2mqttStatus: RequestStatus.Success });
         return;
       }
       // A message received during the request carried a more recent installation and prefetch
@@ -96,10 +120,18 @@ class Zigbee2mqttSetupPage extends Component {
       }
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
+      // A first installation saved but not finished (Zigbee2mqtt never answered): the wizard resumes it, unless the user
+      // stopped it since (the dashboard tells it stopped, and starts it)
+      const { setupPending, stopped } = this.state.zigbee2mqttStatus;
+      const resume = isConfigured(configuration) && setupPending === true && !stopped;
+      const chosen = this.state.wizard !== null;
       this.setState({
         configuration,
         z2mUrl: this.resolveZ2mUrl(configuration),
-        loadZigbee2mqttConfig: RequestStatus.Success
+        loadZigbee2mqttConfig: RequestStatus.Success,
+        // Chosen once: the wizard saves the configuration on its second step and stays until the user leaves it
+        wizard: chosen ? this.state.wizard : !isConfigured(configuration) || resume,
+        wizardResume: chosen ? this.state.wizardResume : resume
       });
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service config', e);
@@ -110,7 +142,7 @@ class Zigbee2mqttSetupPage extends Component {
   };
 
   // Nothing configured yet: the images are downloaded in the background, so that the installation does not wait for them.
-  // Asked by the local mode form once a coordinator is chosen (a dongle preselected counts), not as the page opens: an
+  // Asked by step ① of the wizard once a coordinator is chosen (a dongle preselected counts), not as the page opens: an
   // external broker, or an admin who only looks, downloads nothing. Asked once, when the server tells that it runs in
   // Docker with the host network.
   prefetchImages = async () => {
@@ -146,13 +178,17 @@ class Zigbee2mqttSetupPage extends Component {
 
   saveConfiguration = async nextConfiguration => {
     this.setState({
-      setupZigee2mqttStatus: RequestStatus.Getting
+      setupZigee2mqttStatus: RequestStatus.Getting,
+      setupZigee2mqttError: null
     });
     try {
       const mapping = {};
       Object.keys(VARIABLE_MAP).forEach(key => (mapping[key] = nextConfiguration[VARIABLE_MAP[key]]));
+      const { configRequests } = this;
       const savedConfig = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', mapping);
-      // A load still running read the configuration before the save
+      // Changed by the server while it answered (an ezsp fallback, the end of the installation): loaded again below
+      const changedMeanwhile = configRequests !== this.configRequests;
+      // A load still running may have read the configuration before the save
       this.configRequests += 1;
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
@@ -161,38 +197,28 @@ class Zigbee2mqttSetupPage extends Component {
         z2mUrl: this.resolveZ2mUrl(configuration),
         setupZigee2mqttStatus: RequestStatus.Success
       });
+      if (changedMeanwhile && !this.unmounted) {
+        this.loadZ2MConfig();
+      }
+      return true;
     } catch (e) {
       console.error(e);
+      if (this.unmounted) {
+        return false;
+      }
       this.setState({
         // An installation is already running
-        setupZigee2mqttStatus: get(e, 'response.status') === 409 ? RequestStatus.ConflictError : RequestStatus.Error
+        setupZigee2mqttStatus: get(e, 'response.status') === 409 ? RequestStatus.ConflictError : RequestStatus.Error,
+        // Refused before saving anything, such as a USB dongle that is not plugged in (DONGLE_NOT_FOUND)
+        setupZigee2mqttError: get(e, 'response.status') === 400 ? get(e, 'response.data.message') : null
       });
+      return false;
     }
   };
 
-  toggleZ2M = async enable => {
-    this.setState({
-      toggleZigee2mqttStatus: RequestStatus.Getting
-    });
-
-    try {
-      if (enable) {
-        await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/connect');
-      } else {
-        await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/disconnect');
-      }
-      this.setState({
-        toggleZigee2mqttStatus: RequestStatus.Success
-      });
-      if (enable) {
-        await this.loadZ2MConfig();
-      }
-    } catch (e) {
-      console.error(e);
-      this.setState({
-        toggleZigee2mqttStatus: isBusyRefusal(e) ? RequestStatus.ConflictError : RequestStatus.Error
-      });
-    }
+  // The wizard is left for the page of the installation
+  finishWizard = () => {
+    this.setState({ wizard: false });
   };
 
   resetZ2M = async () => {
@@ -204,7 +230,12 @@ class Zigbee2mqttSetupPage extends Component {
       this.setState({
         resetZigbee2mqttStatus: RequestStatus.Success,
         configuration: {},
-        z2mUrl: null
+        z2mUrl: null,
+        // Nothing is configured any more: the wizard installs again, without the refusal of a setup made before
+        wizard: true,
+        wizardResume: false,
+        setupZigee2mqttStatus: null,
+        setupZigee2mqttError: null
       });
       await this.loadZ2MStatus();
       await this.loadZ2MConfig();
@@ -222,11 +253,17 @@ class Zigbee2mqttSetupPage extends Component {
     this.state = {
       zigbee2mqttStatus: {},
       loadZigbee2mqttStatus: RequestStatus.Getting,
-      loadZigbee2mqttConfig: RequestStatus.Getting
+      loadZigbee2mqttConfig: RequestStatus.Getting,
+      // Whether the wizard is shown, chosen once the configuration is loaded (null before)
+      wizard: null,
+      // Whether it resumes a first installation not finished
+      wizardResume: false
     };
     // Websocket messages received with the installation and the prefetch, more recent than an answer to a request
     // sent before them
     this.progressMessages = 0;
+    // Statuses received by websocket, more recent than an answer to a request sent before them
+    this.statusMessages = 0;
     // Loads of the configuration sent, and saves answered: only the answer of the latest is applied
     this.configRequests = 0;
   }
@@ -266,14 +303,46 @@ class Zigbee2mqttSetupPage extends Component {
   render(props, state) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        <SetupTab
-          {...props}
-          {...state}
-          saveConfiguration={this.saveConfiguration}
-          toggleZ2M={this.toggleZ2M}
-          resetZ2M={this.resetZ2M}
-          prefetchImages={this.prefetchImages}
-        />
+        {state.wizard === null && (
+          <SetupLoading
+            error={
+              state.loadZigbee2mqttStatus === RequestStatus.Error || state.loadZigbee2mqttConfig === RequestStatus.Error
+            }
+          />
+        )}
+        {state.wizard === true && (
+          <Wizard
+            httpClient={props.httpClient}
+            session={props.session}
+            zigbee2mqttStatus={state.zigbee2mqttStatus}
+            loadZigbee2mqttStatus={state.loadZigbee2mqttStatus}
+            configuration={state.configuration}
+            setupZigee2mqttStatus={state.setupZigee2mqttStatus}
+            setupZigee2mqttError={state.setupZigee2mqttError}
+            saveConfiguration={this.saveConfiguration}
+            prefetchImages={this.prefetchImages}
+            finishWizard={this.finishWizard}
+            resume={state.wizardResume}
+          />
+        )}
+        {state.wizard === false && (
+          <Dashboard
+            user={props.user}
+            session={props.session}
+            httpClient={props.httpClient}
+            zigbee2mqttStatus={state.zigbee2mqttStatus}
+            loadZigbee2mqttStatus={state.loadZigbee2mqttStatus}
+            configuration={state.configuration}
+            z2mUrl={state.z2mUrl}
+            setupZigee2mqttStatus={state.setupZigee2mqttStatus}
+            setupZigee2mqttError={state.setupZigee2mqttError}
+            resetZigbee2mqttStatus={state.resetZigbee2mqttStatus}
+            installationFollowedToSuccess={state.installationFollowedToSuccess}
+            saveConfiguration={this.saveConfiguration}
+            prefetchImages={this.prefetchImages}
+            resetZ2M={this.resetZ2M}
+          />
+        )}
       </Zigbee2mqttPage>
     );
   }

@@ -30,7 +30,9 @@ Cypress.on('window:before:load', window => {
   const lang = Cypress.env('language');
   Object.defineProperty(window.navigator, 'language', { value: lang });
 
-  // The sockets of the page left, or of a previous test, are not the ones of the page loading
+  // The sockets of the page left, or of a previous test, are not the ones of the page loading. Closed: left open, they
+  // add up over the tests of a spec until the browser opens no other one to the server (the 30th test of a spec)
+  cypressWebSockets.forEach(ws => ws.close());
   cypressWebSockets.length = 0;
 
   // Track every WebSocket the app opens so tests can push fake messages with cy.sendWebSocket.

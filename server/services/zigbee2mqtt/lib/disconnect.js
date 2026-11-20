@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { findOwnContainer } = require('../../../utils/dockerContainers');
+const { findOwnZ2mContainer } = require('../utils/findOwnZ2mContainer');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -13,7 +13,7 @@ const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt
  * await removeOwnContainer(gladys.system, mqttContainerDescriptor);
  */
 async function removeOwnContainer(system, descriptor) {
-  const container = await findOwnContainer(system, descriptor);
+  const container = await findOwnZ2mContainer(system, descriptor);
   if (container) {
     await system.stopContainer(container.id);
     // With its anonymous volumes (/mosquitto/data and /mosquitto/log of the broker image, unused: the broker persists
@@ -23,11 +23,13 @@ async function removeOwnContainer(system, descriptor) {
 }
 
 /**
- * @description Disconnect service from dependent containers, see disconnect.
+ * @description Disconnect Gladys from the broker, and stop what follows Zigbee2mqtt: its nightly backup, the watch of
+ * its dongle, its health check, the last installation. Shared by disconnect, which then removes the containers, and by
+ * stop, which keeps them.
  * @example
- * await disconnectContainers.call(this);
+ * disconnectFromBroker.call(this);
  */
-async function disconnectContainers() {
+function disconnectFromBroker() {
   // Stop backup reccurent job
   if (this.backupScheduledJob) {
     this.backupScheduledJob.cancel();
@@ -50,6 +52,10 @@ async function disconnectContainers() {
   this.lastReceivedStates = {};
   clearTimeout(this.healthCheckTimer);
   this.healthCheckTimer = null;
+  // Disabled, Zigbee2mqtt is not started again when its dongle comes back
+  this.stopWatchingDongle();
+  this.resetDongleRestarts();
+  this.dongleMissing = false;
   this.emitStatusEvent();
 
   // Disabled: the outcome of the last installation no longer describes Zigbee2mqtt
@@ -58,6 +64,15 @@ async function disconnectContainers() {
   if (this.installProgressTimer !== null) {
     this.emitInstallProgress(true);
   }
+}
+
+/**
+ * @description Disconnect from the broker, then stop and remove both containers, see disconnect.
+ * @example
+ * await disconnectContainers.call(this);
+ */
+async function disconnectContainers() {
+  disconnectFromBroker.call(this);
 
   // Stop & remove MQTT container
   await removeOwnContainer(this.gladys.system, mqttContainerDescriptor);
@@ -75,6 +90,8 @@ async function disconnectContainers() {
   this.startingTimer = null;
   this.zigbee2mqttStarting = false;
   this.coordinatorFirmware = null;
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   this.emitStatusEvent();
 }
@@ -96,5 +113,6 @@ async function disconnect() {
 }
 
 module.exports = {
+  disconnectFromBroker,
   disconnect,
 };

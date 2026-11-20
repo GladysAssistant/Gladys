@@ -68,3 +68,274 @@
 :global(.dark-mode .auth-page .btn-outline-success) {
   filter: none;
 }
+
+/* ==================================================================
+   The logged-out pages on a phone (docs/specs/mobile-pages/auth.md):
+   what the kit (components/mobile/kit.css) does not already carry.
+   Light colors only: dark mode is the app-wide inversion.
+   ================================================================== */
+
+/* the brand in the navigation bar (MobileAuthLayout) */
+.mobileBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobileBrand img {
+  width: 26px;
+  height: 26px;
+}
+
+/* the title of a screen may be a sentence ("Login to your Gladys Plus account"): it wraps on
+   whole words and never widens the page */
+.mobileHeading {
+  margin: 0 0 18px;
+}
+
+.mobileHeading h1 {
+  margin: 4px 0 0;
+  overflow-wrap: break-word;
+}
+
+.mobileHeading p {
+  margin: 8px 0 0;
+}
+
+/* a link that is a target of its own under a field or a button ("I forgot my password") */
+a.mobileLink,
+a.mobileLink:hover,
+a.mobileLink:focus,
+button.mobileLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mobileLink:focus {
+  outline: none;
+}
+
+/* its request is in flight */
+button.mobileLink:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.mobileLink:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: -4px 0 8px;
+}
+
+/* the footnotes that close a screen (help, "Already have an account?") */
+.mobileFootnotes {
+  margin-top: 20px;
+}
+
+/* the six digits of a two-factor app: large, evenly spaced, as in the app they are read from */
+:global(.auth-page) input.mobileCode {
+  min-height: 56px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+:global(.auth-page) input.mobileCode::placeholder {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+/* a block of the page that is a white card of its own (recovery codes, a QR code, steps) */
+.mobileCard {
+  margin: 0 0 16px;
+  padding: 14px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  color: #1c2334;
+}
+
+/* "what is going on" when the page only waits (keys being generated, an e-mail being confirmed) */
+.mobileStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 8px 24px;
+  text-align: center;
+}
+
+.mobileStatus h1 {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1c2334;
+}
+
+.mobileStatus p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f5866;
+}
+
+.mobileStatusIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background-color: #def0e2;
+  color: #23764a;
+  font-size: 1.75rem;
+}
+
+/* numbered steps ("Open your 2FA app", …) */
+.mobileStepList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: auth-step;
+}
+
+.mobileStepList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  counter-increment: auth-step;
+}
+
+.mobileStepList li + li {
+  margin-top: 10px;
+}
+
+.mobileStepList li::before {
+  content: counter(auth-step);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background-color: #e3ebfb;
+  color: #2449b5;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.mobileStepList li > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* the recovery codes: two columns of codes that can be read and compared */
+.mobileCodes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 8px;
+  padding: 16px 12px;
+  list-style: none;
+  text-align: center;
+}
+
+.mobileCodes code {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+/* "iOS" and "Android" at the end of a row: two targets of 44px */
+.mobileStoreLinks {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 4px;
+  margin-right: -6px;
+}
+
+.mobileStoreLinks a,
+.mobileStoreLinks a:hover,
+.mobileStoreLinks a:focus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: 12px;
+  color: #2f5bd8;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ---------- the glass of the logged-out pages ----------
+   Under the shell's `gladys-mobile-glass` class (kit.css, "Glass variant") the blocks of these
+   pages are Horizon glass too: the card holding the fields of a form, the cards of a screen,
+   the brand. Outside it (the Gladys Plus sign-in inside the onboarding) the form card is a
+   plain wrapper. */
+
+:global(.gladys-mobile-glass) .mobileFormCard,
+:global(.gladys-mobile-glass) .mobileCard {
+  background: var(--gl-card-bg);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  box-shadow: var(--gl-shadow);
+  color: var(--gl-ink);
+}
+
+:global(.gladys-mobile-glass) .mobileFormCard {
+  margin: 0 0 16px;
+  padding: 16px;
+  border-radius: 24px;
+}
+
+/* the last block of a card ends with the padding of the card, whatever its own margin */
+:global(.gladys-mobile-glass) .mobileFormCard > :last-child {
+  margin-bottom: 0;
+}
+
+:global(.gladys-mobile-glass) .mobileCard {
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+/* the links under the fields close the card: their 44px of target is their own room */
+:global(.gladys-mobile-glass) .mobileFormCard > .mobileLinks {
+  margin: -6px 0 -10px;
+}
+
+/* the logo floats on the wallpaper, as above the desktop card */
+:global(.gladys-mobile-glass) .mobileBrand img {
+  filter: drop-shadow(0 4px 10px rgba(44, 62, 118, 0.28));
+}
+
+:global(.gladys-mobile-glass) .mobileStatusIcon {
+  box-shadow: var(--gl-shadow-soft);
+}

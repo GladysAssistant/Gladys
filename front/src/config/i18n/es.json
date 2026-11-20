@@ -59,7 +59,41 @@
     "saveAndLeave": "Guardar y salir",
     "leaveWithoutSaving": "Salir sin guardar",
     "keepEditing": "Seguir editando",
-    "cannotBeUndone": "Esta acción no se puede deshacer."
+    "cannotBeUndone": "Esta acción no se puede deshacer.",
+    "togglePassword": "Mostrar u ocultar la contraseña"
+  },
+  "mobileDeviceList": {
+    "noName": "Dispositivo sin nombre",
+    "deviceCount": {
+      "zero": "Dispositivos",
+      "one": "1 dispositivo",
+      "other": "{{count}} dispositivos"
+    },
+    "foundCount": {
+      "zero": "Dispositivos detectados",
+      "one": "1 dispositivo detectado",
+      "other": "{{count}} dispositivos detectados"
+    },
+    "showDetails": "Mostrar los detalles",
+    "hideDetails": "Ocultar los detalles",
+    "refresh": "Actualizar",
+    "saveError": "Gladys no pudo guardar este dispositivo. Inténtalo de nuevo.",
+    "saveAndClose": "Guardar y cerrar",
+    "closeWithoutSaving": "Cerrar sin guardar",
+    "delete": "Eliminar",
+    "deleteTitle": "¿Eliminar este dispositivo?",
+    "deleteText": "«{{name}}» se eliminará de Gladys junto con su historial. Las escenas y los paneles que lo usan dejarán de funcionar con él.",
+    "deleteConfirm": "Eliminar el dispositivo",
+    "deleteError": "Gladys no pudo eliminar este dispositivo. Inténtalo de nuevo.",
+    "deleted": "Dispositivo eliminado",
+    "added": "Dispositivo añadido a Gladys",
+    "updated": "Dispositivo actualizado",
+    "updateAvailable": "Actualización",
+    "inGladys": "En Gladys",
+    "notSupported": "No compatible",
+    "noResult": "Ningún dispositivo coincide.",
+    "stopScan": "Detener el escaneo",
+    "scanning": "Escaneo en curso… La lista se completa a medida que se encuentran dispositivos."
   },
   "errorBoundary": {
     "message": "Ocurrió un problema al mostrar esto. Vuelva a cargar la página y revise la configuración si sucede de nuevo."
@@ -99,10 +133,20 @@
     }
   },
   "device": {
+    "setValueError": {
+      "unreachable": "El comando enviado a «{{name}}» ha fallado. Es posible que el dispositivo no esté accesible.",
+      "notConfigured": "El comando no se ha enviado a «{{name}}»: su integración no está configurada o no está conectada.",
+      "refused": "El comando enviado a «{{name}}» ha sido rechazado.",
+      "notFound": "El comando no se ha enviado: este dispositivo, o su integración, ya no existe en Gladys.",
+      "gladysUnreachable": "No se puede acceder a Gladys: es posible que el comando no se haya enviado.",
+      "gladysUnreachableSeveral": "No se puede acceder a Gladys: es posible que los comandos no se hayan enviado.",
+      "several": "Los comandos enviados a {{count}} dispositivos han fallado.",
+      "unknownDevice": "El comando ha fallado. Es posible que el dispositivo no esté accesible."
+    },
     "searchPlaceHolder": "Buscar dispositivos",
     "noRoom": "Sin habitación",
     "noFeatures": "Sin funciones",
-    "tooMuchStatesToDelete": "Este dispositivo tiene {{count}} estados en la base de datos. Para evitar que su instancia de Gladys se vuelva lenta al eliminarlos, hemos iniciado una eliminación gradual de esos estados en segundo plano. Podrá volver a eliminar este dispositivo más adelante, cuando ya no tenga ningún estado. Para seguir el progreso de la eliminación, <a href=\"/dashboard/settings/jobs\">haga clic aquí</a>.",
+    "tooMuchStatesToDelete": "Este dispositivo tiene {{count}} estados en la base de datos. Para que su instancia de Gladys siga siendo fluida, Gladys los elimina gradualmente en segundo plano y, después, elimina el dispositivo automáticamente. Esto puede tardar de unos minutos a unas horas, según la velocidad de su disco. Puede <a href=\"/dashboard/settings/jobs\">seguir la eliminación</a>. Si el dispositivo sigue apareciendo cuando termine (por ejemplo, tras un reinicio de Gladys), recargue esta página y vuelva a eliminarlo.",
     "migrate": {
       "button": "Migrar",
       "modalTitle": "Migrar \"{{name}}\"",
@@ -192,7 +236,13 @@
     "loginButtonText": "Iniciar sesión",
     "wrongCredentials": "Correo electrónico o contraseña incorrectos.",
     "invalidEmail": "Correo electrónico no válido",
-    "needHelpText": "¿Necesita ayuda? Únase a nosotros en <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
+    "unreachable": "No se puede contactar con Gladys. Comprueba que Gladys está en marcha y que este dispositivo está conectado a la red, y vuelve a intentarlo.",
+    "tooManyRequests": "Demasiados intentos. Espera unos minutos antes de volver a intentarlo.",
+    "serverError": "Gladys ha devuelto un error. Vuelve a intentarlo en un momento.",
+    "needHelpText": "¿Necesita ayuda? Únase a nosotros en <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
+    "mobile": {
+      "navBack": "Acceso"
+    }
   },
   "locked": {
     "cardTitle": "Casa bloqueada",
@@ -201,13 +251,15 @@
     "error": "Ocurrió un error, inténtelo de nuevo",
     "wrongCodeError": "Código no válido, inténtelo de nuevo",
     "validateButton": "Validar",
-    "tooManyRequests": "Espere {{count}} minutos antes de volver a intentarlo."
+    "tooManyRequests": "Espere {{count}} minutos antes de volver a intentarlo.",
+    "mobile": {
+      "deleteDigit": "Borrar el último dígito"
+    }
   },
   "signup": {
     "mobile": {
       "welcomeLead": "Gladys es un asistente para tu hogar que respeta tu privacidad. La instalación lleva unos dos minutos.",
       "restoreHint": "¿Ya usas Gladys Plus? Recupera una instalación anterior.",
-      "togglePassword": "Mostrar u ocultar la contraseña",
       "distanceKilometers": "Kilómetros",
       "distanceMiles": "Millas",
       "historyHelp": "Cuánto tiempo conserva Gladys los valores de tus sensores. Podrás cambiarlo más tarde en los ajustes.",
@@ -401,6 +453,7 @@
     "editDashboardSavedButton": "Guardado",
     "editDashboardDoneButton": "Listo",
     "gatewayInstanceNotFoundError": "Su instancia de Gladys no está conectada a Gladys Gateway",
+    "loadError": "No se pudo cargar el panel.",
     "tabletModeParamError": "No se pudo activar el modo tableta: ninguna casa coincide con «{{value}}» en el parámetro de URL ?tablet_mode_house=. Utilice la URL que se muestra en el menú Modo tableta.",
     "tabletModeActivationError": "No se pudo activar el modo tableta debido a un error de red o del servidor. Recargue la página para volver a intentarlo.",
     "gatewayRecoveryCodesMissing": "Su cuenta de Gladys Plus no tiene códigos de recuperación: si pierde el acceso a su aplicación de doble factor, ya no podrá iniciar sesión. Genérelos y guárdelos en un lugar seguro.",
@@ -1717,7 +1770,16 @@
       "rotationO": "Sin rotación",
       "rotation90": "90°",
       "rotation18O": "180°",
-      "rotation27O": "270°"
+      "rotation27O": "270°",
+      "rotationLabel": "Rotación de la imagen",
+      "newCamera": "Nueva cámara",
+      "nameRequired": "Una cámara necesita un nombre para guardarse.",
+      "addCamera": "Añadir una cámara",
+      "cameraCount": {
+        "zero": "Cámaras",
+        "one": "1 cámara",
+        "other": "{{count}} cámaras"
+      }
     },
     "netatmo": {
       "title": "Netatmo",
@@ -1890,29 +1952,32 @@
       }
     },
     "zigbee2mqtt": {
-      "title": "Zigbee2mqtt",
-      "description": "Controle sus dispositivos Zigbee con Zigbee2mqtt",
+      "title": "Zigbee2MQTT",
+      "description": "Controle sus dispositivos Zigbee con Zigbee2MQTT",
       "deviceTab": "Dispositivos",
       "discoverTab": "Descubrir",
       "setupTab": "Configuración",
       "status": {
-        "notConfigured": "El adaptador USB de Zigbee2mqtt no está configurado; vaya a ",
-        "notEnabled": "Zigbee2mqtt no está activado; vaya a ",
-        "notRunning": "Zigbee2mqtt no responde: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
+        "notConfigured": "El adaptador USB de Zigbee2MQTT no está configurado; vaya a ",
+        "notEnabled": "Zigbee2MQTT no está activado; vaya a ",
+        "notRunning": "Zigbee2MQTT no responde: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "mqttNotConnected": "Gladys no está conectada al broker MQTT: no se pueden emparejar ni controlar dispositivos Zigbee. Para saber más, vaya a ",
         "settingsPageLink": "la página de configuración del adaptador USB",
-        "setupPageLink": "la página de configuración de Zigbee2mqtt"
+        "setupPageLink": "la página de configuración de Zigbee2MQTT",
+        "notInstalled": "Zigbee2MQTT no está instalado: instálalo para añadir y controlar tus dispositivos Zigbee.",
+        "install": "Instalar Zigbee2MQTT",
+        "stopped": "Zigbee2MQTT está detenido: no se pueden emparejar ni controlar dispositivos Zigbee hasta que lo vuelvas a iniciar. Para iniciarlo, vaya a "
       },
       "setup": {
-        "title": "Configuración del servicio Zigbee2mqtt",
+        "title": "Configuración del servicio Zigbee2MQTT",
         "modes": {
           "local": {
             "title": "Instalación desde Gladys",
-            "description": "Gladys configurará dos contenedores Docker: MQTT y Zigbee2mqtt.",
+            "description": "Gladys configurará dos contenedores Docker: MQTT y Zigbee2MQTT.",
             "dockerInstallationRequirementLabel": "Gladys debe ejecutarse bajo Docker",
             "dockerNetworkHostRequirementLabel": "El contenedor Docker de Gladys debe iniciarse con la opción \"network=host\"",
             "coordinatorRequirementLabel": "Debe haber un coordinador Zigbee conectado (adaptador USB o pasarela de red)",
-            "detailsDescription": "Para utilizar Zigbee2mqtt con Gladys, se necesita un coordinador Zigbee: ya sea un adaptador USB conectado a esta máquina, o un coordinador de red (SMLIGHT SLZB-06/SLZB-07, ZigStar…) accesible en su red local.",
+            "detailsDescription": "Para utilizar Zigbee2MQTT con Gladys, se necesita un coordinador Zigbee: ya sea un adaptador USB conectado a esta máquina, o un coordinador de red (SMLIGHT SLZB-06/SLZB-07, ZigStar…) accesible en su red local.",
             "adapterModeLabel": "¿Cómo está conectado el coordinador Zigbee?",
             "adapterModeUsbLabel": "Adaptador USB",
             "adapterModeNetworkLabel": "Coordinador de red (Ethernet/Wi-Fi)",
@@ -1927,10 +1992,9 @@
             "networkAdapterUrlLabel": "Introduzca la dirección del coordinador de red",
             "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
             "networkAdapterUrlDescription": "Dirección IP (o nombre de host) y puerto TCP del coordinador, por ejemplo tcp://192.168.1.20:6638. El prefijo \"tcp://\" es opcional.",
-            "networkAdapterTypeLabel": "Seleccione el tipo de adaptador Zigbee2mqtt del coordinador",
+            "networkAdapterTypeLabel": "Seleccione el tipo de adaptador Zigbee2MQTT del coordinador",
             "networkAdapterTypePlaceholder": "Tipo de adaptador",
             "networkAdapterTypeDescription": "Consulte la documentación de su coordinador: el SMLIGHT SLZB-06 utiliza \"zstack\", el SLZB-06M y el SLZB-07 utilizan \"ember\".",
-            "z2mTcpPortLabel": "Introduzca el puerto TCP expuesto por la aplicación web de Zigbee2Mqtt",
             "z2mTcpPortDescription": "Si se deja vacío, se utilizará un puerto aleatorio.",
             "summary": {
               "title": "Configuración",
@@ -1940,7 +2004,7 @@
               "networkAdapterType": "Tipo de adaptador",
               "unknownDongle": "No definido",
               "tcpPort": "Puerto TCP",
-              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2mqtt funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
+              "ezspDriver": "Firmware antiguo: Gladys usa el controlador de compatibilidad <code>ezsp</code>, porque el controlador <code>ember</code> requiere un firmware 7.4 o superior. Zigbee2MQTT funciona así, pero este controlador está obsoleto. Para volver a <code>ember</code>, <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">actualice el firmware</a> y luego elija el modelo sin «(legacy ezsp)» (o el tipo <code>ember</code> para un coordinador de red)."
             },
             "externalMqtt": {
               "title": "Conexión de herramientas externas",
@@ -1960,9 +2024,6 @@
           "remote": {
             "title": "Conectar a una instalación existente",
             "description": "Gladys se conectará a una instalación externa existente a través de MQTT.",
-            "z2mInstallationRequirementLabel": "Una aplicación Zigbee2Mqtt independiente",
-            "mqttBrokerRequirementLabel": "Un broker MQTT conectado a la aplicación Zigbee2Mqtt",
-            "detailsDescription": "Con este modo de configuración, es posible conectarse a una instalación externa de Zigbee2Mqtt con su broker MQTT.",
             "mqttModeLabel": "Elegir broker MQTT",
             "external": {
               "modeLabel": "MQTT externo"
@@ -1976,9 +2037,10 @@
         "requirementsLabel": "<u>Condiciones</u>:",
         "selectInstallationMode": "Elegir",
         "changeButtonLabel": "Cambiar",
-        "resetLabel": "Cancelar",
         "errorLoadingStatesLabel": "Se produjo un error al cargar la información del servicio de Gladys. Asegúrese de que Gladys esté actualizado; en caso contrario, revise los registros.",
         "saveError": "La configuración no permitió iniciar el servicio; verifíquela.",
+        "saveDongleNotFound": "Su adaptador Zigbee no está conectado (o no en el puerto elegido): no se ha guardado nada. Conéctelo, elíjalo en la lista y después guarde de nuevo la configuración.",
+        "dongleMissing": "No se encuentra su adaptador Zigbee: Zigbee2MQTT se iniciará de nuevo por sí solo en cuanto se vuelva a conectar. Si ya está conectado a otro puerto, elíjalo de nuevo en la configuración.",
         "enableLabel": "Activar o desactivar el servicio",
         "enableDescription": "En el próximo reinicio de Gladys, el servicio se volverá a iniciar. Según la potencia de su máquina y la velocidad de su red, iniciar este servicio en modo \"Instalación desde Gladys\" puede tardar entre 2 minutos y 1 hora. Es posible desactivar el servicio de forma permanente desde esta página: <a href=\"/dashboard/settings/service\">Configuración > Servicios</a>.",
         "toggleError": "Se produjo un error. Compruebe la configuración del servicio.",
@@ -1989,31 +2051,30 @@
           "unknownErrorPrefix": "Error de conexión MQTT: "
         },
         "serviceStatus": "Estado del servicio",
-        "zigbee2mqttStarting": "Zigbee2mqtt se está iniciando: se pondrá en verde en cuanto responda a Gladys.",
-        "zigbee2mqttNotStarting": "Zigbee2mqtt no consigue iniciarse: vea el error de arriba.",
-        "zigbee2mqttNotResponding": "Zigbee2mqtt no responde a Gladys.",
-        "description": "Este servicio utiliza dos contenedores Docker (broker MQTT y Zigbee2mqtt). Active Zigbee2mqtt para desplegar estos contenedores. Para más información, visite la página de documentación de Zigbee2mqtt.",
-        "nonDockerEnv": "Gladys no se está ejecutando actualmente en Docker; es imposible activar Zigbee2mqtt desde Gladys.",
-        "invalidDockerNetwork": "Gladys se basa en una instalación personalizada; para instalar Zigbee2mqtt desde esta página, el contenedor Docker de Gladys debe iniciarse con la opción \"network=host\".",
-        "enableZigbee2mqtt": "Activar Zigbee2mqtt",
-        "containersStatus": "Contenedores relacionados con Zigbee2mqtt",
+        "zigbee2mqttStarting": "Zigbee2MQTT se está iniciando: se pondrá en verde en cuanto responda a Gladys.",
+        "zigbee2mqttNotStarting": "Zigbee2MQTT no consigue iniciarse: vea el error de arriba.",
+        "zigbee2mqttNotResponding": "Zigbee2MQTT no responde a Gladys.",
+        "description": "Este servicio utiliza dos contenedores Docker (broker MQTT y Zigbee2MQTT). Active Zigbee2MQTT para desplegar estos contenedores. Para más información, visite la página de documentación de Zigbee2MQTT.",
+        "nonDockerEnv": "Gladys no se está ejecutando actualmente en Docker; es imposible activar Zigbee2MQTT desde Gladys.",
+        "invalidDockerNetwork": "Gladys se basa en una instalación personalizada; para instalar Zigbee2MQTT desde esta página, el contenedor Docker de Gladys debe iniciarse con la opción \"network=host\".",
+        "enableZigbee2mqtt": "Activar Zigbee2MQTT",
+        "containersStatus": "Contenedores relacionados con Zigbee2MQTT",
         "link": "Enlace",
-        "connected": "Zigbee2mqtt se inició correctamente.",
-        "error": "Se produjo un error al iniciar el servicio Zigbee2mqtt.",
+        "connected": "Zigbee2MQTT se inició correctamente.",
+        "error": "Se produjo un error al iniciar el servicio Zigbee2MQTT.",
         "mqttZigbeeLink": "MQTT - Zigbee",
         "gladysMqttLink": "Gladys - MQTT",
-        "zigbee2Mqtt": "Zigbee2mqtt",
+        "zigbee2Mqtt": "Zigbee2MQTT",
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Estado",
-        "connectionUrl": "URL de la interfaz de Zigbee2mqtt: <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
-        "z2mFrontendUrlLabel": "URL de la interfaz de Zigbee2mqtt",
-        "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080",
+        "connectionUrl": "URL de la interfaz de Zigbee2MQTT: <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
+        "z2mFrontendUrlLabel": "URL de la interfaz de Zigbee2MQTT",
         "reset": {
           "title": "Restablecer integración",
-          "description": "Utilice esta opción si desea empezar de nuevo con Zigbee2mqtt. Esto puede ser útil si su configuración está dañada o si desea cambiar su coordinador Zigbee.",
+          "description": "Utilice esta opción si desea empezar de nuevo con Zigbee2MQTT. Esto puede ser útil si su configuración está dañada o si desea cambiar su coordinador Zigbee.",
           "button": "Restablecer",
-          "confirmMessage": "Advertencia: restablecer la integración eliminará todos los archivos de Zigbee2mqtt en el disco y toda la configuración guardada. Todos los dispositivos Zigbee actualmente emparejados con Zigbee2mqtt deberán volver a emparejarse.",
+          "confirmMessage": "Advertencia: restablecer la integración eliminará todos los archivos de Zigbee2MQTT en el disco y toda la configuración guardada. Todos los dispositivos Zigbee actualmente emparejados con Zigbee2MQTT deberán volver a emparejarse.",
           "confirmButton": "Sí, restablecer todo",
           "cancelButton": "Cancelar",
           "error": "Se produjo un error al restablecer la integración."
@@ -2022,7 +2083,8 @@
           "titles": {
             "install": "Instalación de Zigbee2MQTT",
             "update": "Actualización de Zigbee2MQTT",
-            "switch": "Cambio de coordinador Zigbee"
+            "switch": "Cambio de coordinador Zigbee",
+            "start": "Arranque de Zigbee2MQTT"
           },
           "phases": {
             "pull_z2m": "Descarga de Zigbee2MQTT",
@@ -2038,7 +2100,8 @@
           "success": {
             "install": "Zigbee2MQTT instalado en {{duration}}.",
             "update": "Zigbee2MQTT actualizado en {{duration}}.",
-            "switch": "Coordinador Zigbee cambiado en {{duration}}."
+            "switch": "Coordinador Zigbee cambiado en {{duration}}.",
+            "start": "Zigbee2MQTT arrancado en {{duration}}."
           },
           "errors": {
             "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos posteriores a su inicio, sin indicar por qué. Compruebe que el modelo elegido es el de su coordinador, desconecte y vuelva a conectar su adaptador o reinicie su coordinador de red, y después guarde de nuevo la configuración.",
@@ -2052,38 +2115,399 @@
           "done": "Descarga completada: la instalación será rápida.",
           "notEnoughDiskSpace": "Espacio en disco insuficiente: {{free}} MB libres, {{needed}} MB necesarios para instalar Zigbee2MQTT. Libere espacio antes de instalar.",
           "notEnoughDiskSpaceNoFigures": "Espacio en disco insuficiente para instalar Zigbee2MQTT. Libere espacio antes de instalar."
+        },
+        "wizard": {
+          "titleInstall": "Instalar Zigbee2MQTT",
+          "titleConnect": "Conectar Zigbee2MQTT",
+          "stepsLabel": "Pasos",
+          "steps": {
+            "key": "Llave",
+            "install": "Instalación",
+            "network": "Red",
+            "device": "Primer dispositivo",
+            "connection": "Conexión",
+            "check": "Verificación"
+          },
+          "install": "Instalar",
+          "connect": "Conectar",
+          "saveDongleNotFound": "Tu llave Zigbee no está conectada (o ya no está en este puerto): no se ha guardado nada. Conéctala y vuelve a elegirla.",
+          "key": {
+            "detectedTitle": "Llave Zigbee detectada",
+            "detectedText": "Gladys ha reconocido tu llave y su modelo: no tienes nada que elegir.",
+            "justPlugged": "Llave conectada hace un momento: Gladys la ha detectado sin recargar la página.",
+            "recognized": "Reconocida",
+            "modelAndUsb": "Modelo {{code}} · conectada por USB",
+            "usb": "Conectada por USB",
+            "severalTitle": "{{count}} llaves Zigbee detectadas",
+            "severalText": "Elige la que Gladys debe usar.",
+            "unknownTitle": "Gladys no ha reconocido tu llave",
+            "unknownText": "Hay una llave USB conectada, pero su modelo no está en la lista de Gladys. Elígelo a continuación.",
+            "manualTitle": "Elegir la llave a mano",
+            "manualText": "Indica el puerto y el modelo de tu llave.",
+            "portLabel": "Puerto",
+            "choosePort": "Elige el puerto",
+            "showAllPorts": "Mostrar los demás puertos serie (placa HAT/GPIO, puertos de la máquina)",
+            "modelLabel": "Modelo",
+            "selectedModel": "Modelo elegido:",
+            "modelHint": "El modelo está escrito en la llave o en su caja. Determina cómo Zigbee2MQTT se comunica con ella.",
+            "searchPlaceholder": "Buscar: dongle-e, sonoff p, conbee, skyconnect…",
+            "searchLabel": "Buscar un modelo",
+            "noModel": "Ningún modelo corresponde a tu búsqueda.",
+            "otherBrands": "Otros",
+            "noneTitle": "Conecta tu llave Zigbee",
+            "noneText": "Gladys la detecta en cuanto está conectada, sin recargar la página.",
+            "waiting": "Esperando una llave…",
+            "tip": "<strong>Consejo:</strong> conecta la llave al final de un alargador USB, lejos de los puertos USB 3 y del router Wi-Fi. La señal Zigbee será mejor.",
+            "linkManualWrong": "¿No es la llave correcta? Elegir a mano",
+            "linkManualSeveral": "¿Ninguna de estas llaves? Elegir a mano",
+            "linkManualNone": "Mi llave está conectada pero no aparece",
+            "linkNetwork": "¿Coordinador de red (SLZB-06…)?",
+            "linkExternal": "Ya tengo un Zigbee2MQTT",
+            "backToDetected": "← Volver a la llave detectada",
+            "backToUsb": "← Volver a la llave USB",
+            "back": "← Volver",
+            "portsError": "Gladys no ha podido listar los puertos de la máquina.",
+            "adaptersError": "Gladys no ha podido cargar la lista de modelos."
+          },
+          "network": {
+            "title": "Coordinador de red",
+            "text": "Para un coordinador Ethernet o Wi-Fi (SLZB-06, SLZB-07…) conectado a tu red local.",
+            "urlLabel": "Dirección del coordinador",
+            "urlHint": "Indicada en la interfaz web del coordinador.",
+            "typeLabel": "Tipo de coordinador",
+            "chooseType": "Elige el tipo",
+            "types": {
+              "ember": "Chip Silicon Labs (SLZB-06M, SLZB-07…)",
+              "zstack": "Chip Texas Instruments (SLZB-06, SLZB-06P7…)",
+              "deconz": "dresden elektronik (ConBee, RaspBee)"
+            }
+          },
+          "external": {
+            "title": "Usar mi Zigbee2MQTT",
+            "text": "Zigbee2MQTT ya funciona en otro lugar (Home Assistant, otra máquina…): Gladys se conecta a su broker MQTT. No se instala nada.",
+            "urlLabel": "Dirección del broker MQTT",
+            "usernameLabel": "Usuario",
+            "passwordLabel": "Contraseña",
+            "frontendUrlLabel": "Dirección de la interfaz de Zigbee2MQTT",
+            "optional": "(opcional)"
+          },
+          "incompatible": {
+            "title": "Gladys no puede instalar Zigbee2MQTT en esta máquina",
+            "text": "Gladys debe ejecutarse en Docker, con la red \"host\". <a href=\"https://gladysassistant.com/docs/installation/docker/\" target=\"_blank\" rel=\"noopener noreferrer\">Ver el comando de instalación de Gladys</a>",
+            "elsewhereTitle": "¿Zigbee2MQTT ya funciona en otro lugar?",
+            "elsewhereText": "Gladys puede conectarse a su broker MQTT, sin instalar nada.",
+            "useExternal": "Usar mi Zigbee2MQTT"
+          },
+          "progress": {
+            "titleInstall": "Instalación de Zigbee2MQTT",
+            "titleConnect": "Conexión a tu Zigbee2MQTT",
+            "leavePage": "Puedes salir de esta página: Gladys continúa, y encontrarás el progreso en la pestaña Configuración.",
+            "phases": {
+              "connectUsb": "Conexión a la llave",
+              "connectNetwork": "Conexión al coordinador",
+              "connectExternal": "Conexión al broker MQTT"
+            },
+            "alreadyDownloaded": "Ya descargado",
+            "ezspSwitching": "Firmware antiguo: cambio a ezsp…",
+            "ezspDriver": "Controlador de compatibilidad (ezsp)",
+            "ezspNote": "<strong>Firmware antiguo detectado.</strong> El controlador ember requiere un firmware 7.4 o posterior: Gladys cambia al controlador de compatibilidad (ezsp) y reinicia Zigbee2MQTT. No tienes nada que hacer.",
+            "waitingZigbee2mqtt": "<strong>Conectado al broker, esperando la respuesta de Zigbee2MQTT.</strong> Si no responde, comprueba que Zigbee2MQTT está en marcha y que su base_topic es <code>zigbee2mqtt</code>.",
+            "zigbee2mqttTooOldTitle": "Zigbee2MQTT {{version}} es demasiado antiguo.",
+            "zigbee2mqttTooOld": "Funciona en este broker, pero Gladys necesita Zigbee2MQTT 1.21 o posterior para seguirlo. Actualízalo: el asistente continúa en cuanto responda.",
+            "brokerLost": "<strong>Gladys perdió la conexión con el broker.</strong> Se vuelve a conectar sola en cuanto el broker responda: comprueba que está en marcha y que es accesible desde Gladys."
+          },
+          "failure": {
+            "titles": {
+              "NO_ANSWER": "Zigbee2MQTT no responde",
+              "DONGLE_NOT_FOUND": "Llave Zigbee no encontrada",
+              "NOT_ENOUGH_DISK_SPACE": "Espacio en disco insuficiente",
+              "EZSP_PROTOCOL_VERSION": "Firmware de la llave demasiado antiguo",
+              "ADAPTER_UNREACHABLE": "Coordinador de red inaccesible",
+              "ADAPTER_NO_RESPONSE": "El coordinador Zigbee no responde",
+              "INVALID_CONFIGURATION": "Configuración de Zigbee2MQTT rechazada",
+              "BAD_CREDENTIALS": "Credenciales MQTT rechazadas",
+              "NOT_AUTHORIZED": "Conexión MQTT rechazada",
+              "BROKER_UNREACHABLE": "Broker MQTT inaccesible",
+              "SYSTEM_NOT_RUNNING_DOCKER": "Instalación imposible en esta máquina",
+              "DOCKER_BAD_NETWORK": "Instalación imposible en esta máquina",
+              "unknown": "Se ha producido un error"
+            },
+            "texts": {
+              "NO_ANSWER": "Zigbee2MQTT no ha respondido a Gladys en los 2 minutos siguientes a su arranque, sin indicar por qué. Comprueba que el modelo elegido es el de tu coordinador, desconecta y vuelve a conectar tu llave o reinicia tu coordinador de red, y vuelve a intentarlo.",
+              "DONGLE_NOT_FOUND": "Tu llave Zigbee no está conectada (o ya no está en el puerto elegido): Zigbee2MQTT no ha podido arrancar. Conéctala y vuelve a intentarlo, o vuelve a elegirla.",
+              "NOT_ENOUGH_DISK_SPACE": "No hay suficiente espacio en disco para descargar Zigbee2MQTT. Libera espacio y vuelve a intentarlo.",
+              "unknown": "Gladys se ha detenido por un error que no sabe explicar. Vuelve a intentarlo; si se repite, los detalles técnicos ayudan a encontrar la causa.",
+              "BAD_CREDENTIALS": "Gladys no pudo conectarse al broker MQTT: el usuario o la contraseña son incorrectos. Comprueba las credenciales del broker MQTT y vuelve a intentarlo.",
+              "NOT_AUTHORIZED": "El broker MQTT rechazó la conexión: no autorizado. Comprueba el usuario y la contraseña, y que este cliente tiene permiso para conectarse al broker, y vuelve a intentarlo.",
+              "ADAPTER_NO_RESPONSE": {
+                "usb": "Desconecta la llave, vuelve a conectarla y vuelve a intentarlo. Si vuelve a pasar, comprueba que es el modelo correcto y que ningún otro programa (Home Assistant, otro Zigbee2MQTT…) la usa.",
+                "network": "Reinicia tu coordinador de red y vuelve a intentarlo. Si vuelve a pasar, comprueba su dirección y su tipo, y que ningún otro programa (Home Assistant, otro Zigbee2MQTT…) lo usa."
+              }
+            },
+            "details": "Detalles técnicos",
+            "retry": "Reintentar",
+            "changeKey": "Cambiar de llave o de modelo",
+            "changeConnection": "Modificar la conexión"
+          },
+          "ready": {
+            "title": "Tu red Zigbee está lista",
+            "textUsb": "Zigbee2MQTT funciona y se comunica con tu llave.",
+            "textNetwork": "Zigbee2MQTT funciona y se comunica con tu coordinador.",
+            "textExternal": "Gladys recibe los mensajes de tu Zigbee2MQTT.",
+            "networkCoordinator": "Coordinador de red",
+            "driver": "Controlador",
+            "firmware": "Firmware",
+            "duration": "Instalado en",
+            "broker": "Broker MQTT",
+            "version": "Zigbee2MQTT",
+            "devices": "Dispositivos ya emparejados",
+            "unknown": "—",
+            "ezspDriver": "ezsp (compatibilidad)",
+            "ezspNote": "<strong>Firmware antiguo:</strong> Gladys usa el controlador de compatibilidad ezsp. Todo funciona, pero este controlador está obsoleto: considera actualizar el firmware de la llave. <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">¿Cómo?</a>",
+            "pair": "Emparejar mi primer dispositivo",
+            "later": "Más tarde"
+          },
+          "pair": {
+            "title": "Empareja tu primer dispositivo",
+            "text": "Bombilla, enchufe, sensor… Gladys permite la incorporación durante 4 minutos.",
+            "tips": {
+              "approach": {
+                "title": "Acerca el dispositivo",
+                "text": "A menos de 2 metros de la llave, durante el emparejamiento."
+              },
+              "mode": {
+                "title": "Ponlo en modo de emparejamiento",
+                "text": "A menudo una pulsación larga (5 s) en su botón. Una bombilla: enciéndela y apágala 5 o 6 veces seguidas."
+              },
+              "add": {
+                "title": "Añádelo a Gladys",
+                "text": "Aparece en la pestaña Descubrir: dale un nombre y una habitación."
+              }
+            },
+            "allow": "Permitir la incorporación",
+            "allowed": "<strong>Incorporación permitida durante 4 minutos.</strong> Pon tu dispositivo en modo de emparejamiento: aparecerá en la pestaña Descubrir en cuanto se haya unido a la red.",
+            "allowError": "Gladys no ha podido permitir la incorporación. Vuelve a intentarlo.",
+            "goToDiscover": "Ir a Descubrir",
+            "finish": "Terminar",
+            "finishWithoutPairing": "Terminar sin emparejar"
+          },
+          "mobile": {
+            "otherChoices": "Otra llave u otra instalación",
+            "otherTitle": "Otra opción",
+            "other": {
+              "manual": {
+                "title": "Elegir otra llave USB",
+                "text": "Puerto y modelo a mano"
+              },
+              "network": {
+                "title": "Coordinador de red",
+                "text": "SLZB-06, SLZB-07… en tu red local"
+              },
+              "external": {
+                "title": "Ya tengo un Zigbee2MQTT",
+                "text": "Gladys se conecta a su broker MQTT"
+              }
+            },
+            "modelCode": "Modelo {{code}}",
+            "recognized": "Reconocida automáticamente",
+            "justPlugged": "Detectada hace un momento",
+            "modelTitle": "¿Cuál es el modelo de tu llave?",
+            "modelTextUnknown": "Gladys ve una llave conectada pero no la reconoce. El modelo está escrito en ella o en su caja.",
+            "modelTextManual": "Elige el puerto y el modelo: está escrito en la llave o en su caja.",
+            "showPhases": "Ver el detalle",
+            "back": "Volver"
+          },
+          "change": {
+            "title": "Cambiar de llave Zigbee",
+            "use": "Usar esta llave",
+            "cancel": "Cancelar",
+            "current": "Llave actual",
+            "otherFamily": "Esta llave no usa el mismo controlador que la actual: Zigbee2MQTT no podrá retomar tu red en ella, tendrás que volver a emparejar tus dispositivos."
+          },
+          "statusPending": "Gladys está iniciando su integración Zigbee2MQTT… Si tarda, comprueba que el servicio Zigbee2MQTT está iniciado en Configuración › Servicios."
+        },
+        "dashboard": {
+          "states": {
+            "online": {
+              "title": "Red Zigbee en línea",
+              "devices": {
+                "zero": "Ningún dispositivo en la red",
+                "one": "1 dispositivo en la red",
+                "other": "{{count}} dispositivos en la red"
+              }
+            },
+            "onlineExternal": {
+              "title": "Conectado a tu Zigbee2MQTT"
+            },
+            "stopped": {
+              "title": "Zigbee2MQTT está detenido",
+              "since": "Desde el {{date}} · no se reinicia con Gladys."
+            },
+            "stopping": {
+              "title": "Deteniendo Zigbee2MQTT…",
+              "text": "Tarda unos segundos."
+            },
+            "dongleMissing": {
+              "title": "Llave Zigbee desconectada",
+              "text": "Zigbee2MQTT se reinicia en cuanto se vuelve a conectar, en cualquier puerto."
+            },
+            "failed": {
+              "title": "Zigbee2MQTT no arranca",
+              "text": "Tus dispositivos Zigbee no responden hasta que arranque."
+            },
+            "mqttError": {
+              "title": "Gladys no está conectado al broker MQTT",
+              "text": "Gladys ya no recibe los mensajes de Zigbee2MQTT."
+            },
+            "starting": {
+              "title": "Zigbee2MQTT está arrancando…",
+              "text": "Gladys espera su respuesta."
+            },
+            "notAnswering": {
+              "title": "Zigbee2MQTT no responde",
+              "text": "Gladys no recibe respuesta de Zigbee2MQTT: tus dispositivos Zigbee no responden."
+            },
+            "notAnsweringExternal": {
+              "title": "Zigbee2MQTT no responde en el broker",
+              "text": "Gladys está conectada al broker MQTT, pero Zigbee2MQTT no responde en él: comprueba que está en marcha y que su base_topic es <code>zigbee2mqtt</code>."
+            },
+            "stoppedExternal": {
+              "title": "Desconectado de tu Zigbee2MQTT",
+              "since": "Desde el {{date}} · Gladys no vuelve a conectarse por sí sola. Tu Zigbee2MQTT sigue funcionando."
+            },
+            "inactive": {
+              "title": "El servicio Zigbee2MQTT no está iniciado",
+              "text": "Gladys lo inicia con sus demás servicios al arrancar. Si se detuvo en Ajustes > Servicios, inícialo allí: tus dispositivos Zigbee no responden hasta entonces."
+            },
+            "pending": {
+              "title": "Gladys está cargando Zigbee2MQTT",
+              "text": "Se lee la configuración y se comprueba Docker. Si sigue así, revisa el servicio Zigbee2MQTT en Ajustes > Servicios."
+            }
+          },
+          "newDevices": {
+            "one": "1 nuevo dispositivo para añadir a Gladys",
+            "other": "{{count}} nuevos dispositivos para añadir a Gladys"
+          },
+          "pairAllowed": "<strong>Incorporación permitida durante 4 minutos.</strong> Tus dispositivos aparecerán en la pestaña Descubrir.",
+          "updatePending": "Una actualización de Zigbee2MQTT espera: sus imágenes no se pudieron descargar. Se hará en el próximo arranque.",
+          "actionErrors": {
+            "busy": "Hay una instalación en curso, o la integración está ocupada: vuelve a intentarlo en un momento.",
+            "error": "Gladys no ha podido hacerlo. Vuelve a intentarlo."
+          },
+          "actions": {
+            "pair": "Emparejar un dispositivo",
+            "start": "Arrancar",
+            "restart": "Reiniciar",
+            "stop": "Detener",
+            "interface": "Interfaz de Zigbee2MQTT",
+            "changeKey": "Cambiar",
+            "disconnect": "Desconectar",
+            "connect": "Conectar",
+            "services": "Abrir Ajustes > Servicios"
+          },
+          "facts": {
+            "driver": "Controlador",
+            "firmware": "Firmware",
+            "version": "Zigbee2MQTT",
+            "devices": "Dispositivos en la red",
+            "unknown": "—"
+          },
+          "external": {
+            "title": "Broker MQTT"
+          },
+          "network": {
+            "title": "Coordinador de red"
+          },
+          "confirmStop": {
+            "title": "¿Detener Zigbee2MQTT?",
+            "text": "Tus dispositivos Zigbee dejarán de responder, incluso tras un reinicio de Gladys, hasta que lo arranques.",
+            "confirm": "Detener Zigbee2MQTT",
+            "cancel": "Cancelar"
+          },
+          "confirmRestart": {
+            "title": "¿Reiniciar Zigbee2MQTT?",
+            "text": "Tus dispositivos Zigbee no responden durante los pocos segundos del reinicio."
+          },
+          "advanced": {
+            "title": "Ajustes avanzados",
+            "interface": {
+              "title": "Interfaz de Zigbee2MQTT",
+              "port": "Puerto",
+              "help": "Cambiar el puerto reinicia Zigbee2MQTT; sus datos se conservan.",
+              "open": "Abrir la interfaz"
+            },
+            "broker": {
+              "title": "Conexión al broker MQTT"
+            },
+            "components": {
+              "title": "Componentes",
+              "gladys": "Gladys ↔ broker MQTT",
+              "broker": "Broker MQTT",
+              "zigbee2mqtt": "Zigbee2MQTT",
+              "connected": "Conectado",
+              "disconnected": "Desconectado",
+              "running": "En marcha",
+              "stopped": "Detenido",
+              "answers": "Responde",
+              "silent": "No responde"
+            },
+            "reset": {
+              "title": "Restablecer la integración",
+              "text": "Elimina los contenedores, la configuración y la red Zigbee: tendrás que volver a emparejar todos tus dispositivos.",
+              "textExternal": "Olvida la conexión con tu Zigbee2MQTT y vuelve a abrir el asistente de instalación. Tu Zigbee2MQTT y su red no se tocan.",
+              "confirmExternal": "Gladys olvida la conexión con tu Zigbee2MQTT. Tu Zigbee2MQTT, su configuración y sus dispositivos se conservan de su lado."
+            },
+            "saveError": "No se ha podido guardar el ajuste. Inténtelo de nuevo.",
+            "saveDongleNotFound": "Su llave Zigbee no está conectada: no se ha guardado nada. Conéctela y vuelva a guardar."
+          },
+          "mobile": {
+            "keyTitle": "Coordinador",
+            "changeKey": "Cambiar de llave",
+            "copy": "Copiar"
+          },
+          "confirmStopExternal": {
+            "title": "¿Desconectarse de tu Zigbee2MQTT?",
+            "text": "Gladys deja de controlar tus dispositivos Zigbee, incluso tras un reinicio de Gladys, hasta que vuelvas a conectarla. Tu Zigbee2MQTT sigue funcionando.",
+            "confirm": "Desconectar"
+          }
         }
       },
       "device": {
-        "title": "Dispositivos Zigbee2mqtt",
+        "title": "Dispositivos Zigbee2MQTT",
         "editButton": "Editar"
       },
       "discover": {
-        "title": "Descubrimiento de Zigbee2mqtt",
+        "title": "Descubrimiento de Zigbee2MQTT",
         "permitJoin": "Permitir la incorporación",
+        "stopPermitJoin": "Detener la incorporación",
+        "permitJoinOpen": "La incorporación está abierta: pon tu dispositivo en modo de emparejamiento, aparecerá abajo en cuanto se haya unido a la red.",
+        "permitJoinError": "Gladys no ha podido permitir la incorporación. Vuelve a intentarlo.",
+        "stopPermitJoinError": "Gladys no ha podido detener la incorporación. Vuelve a intentarlo.",
         "hideExistingDevices": "Ocultar dispositivos ya añadidos",
         "noDeviceDiscovered": "No se descubrió ningún dispositivo nuevo; haga clic en el botón de búsqueda.",
+        "noNewDevice": "No se encontró ningún dispositivo nuevo.",
         "serverNoResponse": "El servidor Gladys no está disponible.",
         "serverNoResponseWebSocker": "El servidor Gladys no está disponible. Actualice la página.",
         "deviceNotHandled": "Este dispositivo aún no es compatible; póngase en contacto con nosotros para ayudarnos a conectarlo en Gladys.",
-        "createGithubIssue": "Sugerir este dispositivo"
+        "createGithubIssue": "Sugerir este dispositivo",
+        "addToGladys": "Añadir a Gladys"
       },
-      "noDeviceFound": "No se encontró ningún dispositivo Zigbee2mqtt.",
+      "noDeviceFound": "No se encontró ningún dispositivo Zigbee2MQTT.",
       "nameLabel": "Nombre del dispositivo",
       "namePlaceholder": "Introduzca el nombre de su dispositivo",
       "roomLabel": "Habitación",
       "ieeeAddressLabel": "Dirección IEEE",
-      "openInZ2mButton": "Abrir en Zigbee2mqtt",
-      "noZ2mUrlMessage": "La URL de la interfaz de Zigbee2mqtt no está configurada; los enlaces directos a los dispositivos no estarán disponibles. Vaya a la <a href=\"/dashboard/integration/device/zigbee2mqtt/setup\">página de configuración</a> para configurarla.",
+      "openInZ2mButton": "Abrir en Zigbee2MQTT",
+      "noZ2mUrlMessage": "La URL de la interfaz de Zigbee2MQTT no está configurada; los enlaces directos a los dispositivos no estarán disponibles. Vaya a la <a href=\"/dashboard/integration/device/zigbee2mqtt/setup\">página de configuración</a> para configurarla.",
       "topicLabel": "Tema",
-      "topicPlaceholder": "%topic% valor MQTT de Zigbee2mqtt",
+      "topicPlaceholder": "%topic% valor MQTT de Zigbee2MQTT",
       "featuresLabel": "Funciones",
       "saveButton": "Guardar",
       "deleteButton": "Eliminar",
       "updateButton": "Actualizar",
       "alreadyExistsButton": "Ya creado",
       "saveError": "Se produjo un error al guardar el dispositivo.",
-      "documentation": "Documentación de Zigbee2mqtt"
+      "documentation": "Documentación de Zigbee2MQTT"
     },
     "nodeRed": {
       "title": "Node-RED",
@@ -2236,7 +2660,11 @@
         "explanation": "La sincronización con Enedis se realiza automáticamente entre Gladys Plus y Enedis todos los días entre las 8:30 y las 11:30. Es posible que algunos días los datos estén disponibles más tarde. Por su parte, Gladys se sincroniza automáticamente con Gladys Plus cada hora.",
         "saveButton": "Guardar",
         "deleteButton": "Eliminar",
-        "recreateButton": "Actualizar"
+        "recreateButton": "Actualizar",
+        "mobile": {
+          "lastSync": "Última sincronización",
+          "numberOfStates": "Estados sincronizados"
+        }
       }
     },
     "homekit": {
@@ -3778,7 +4206,7 @@
             "plural": "Se han eliminado {{count}} dispositivos de Gladys."
           },
           "forcedWarning": "No se pudo contactar con el dispositivo «{{name}}»: se ha retirado de la red Matter de Gladys, pero no ha sido informado. Restablézcalo a los valores de fábrica antes de emparejarlo de nuevo.",
-          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar, probablemente porque su historial es demasiado grande. Gladys lo está limpiando: inténtelo más tarde desde la pestaña «Dispositivos»."
+          "devicesNotDeleted": "Estos dispositivos de Gladys no se pudieron eliminar de inmediato, probablemente porque su historial es demasiado grande: Gladys lo está limpiando y después los eliminará automáticamente. Puede <a href=\"/dashboard/settings/jobs\">seguir la eliminación</a>; si siguen ahí cuando termine, elimínelos desde la pestaña «Dispositivos»."
         },
         "noNodesFound": "No se encontró ningún nodo Matter. Puede añadir un dispositivo Matter yendo a la pestaña \"Añadir dispositivo\".",
         "disabledWarning": "Matter no está activado. Actívelo en <a href=\"/dashboard/integration/device/matter/settings\">Configuración</a> antes de utilizar la integración",
@@ -5557,6 +5985,8 @@
       "statesCounts": "Estados a eliminar: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agregados",
       "statesCountsDone": "Estados eliminados: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agregados",
       "migrationTarget": "Migración: {{source}} › {{destination}}",
+      "deviceToDestroy": "Dispositivo: {{device}}",
+      "deviceKept": "El dispositivo se volvió a emparejar o se sustituyó mientras tanto: no se ha eliminado.",
       "steps": {
         "waiting_database": "Esperando la base de datos…",
         "counting": "Contando estados…",
@@ -5567,7 +5997,9 @@
         "updating_references": "Actualizando referencias…",
         "rewriting_scenes": "Reescribiendo escenas…",
         "rewriting_dashboards": "Reescribiendo paneles…",
-        "deleting_source_device": "Eliminando el dispositivo antiguo…"
+        "deleting_source_device": "Eliminando el dispositivo antiguo…",
+        "purging_states": "Eliminando el historial de estados…",
+        "deleting_device": "Eliminando el dispositivo…"
       },
       "statesMigrated": "Estados de historial movidos: {{count}}",
       "orphanedStates": "Estados huérfanos: {{count}}",
@@ -5576,6 +6008,7 @@
     },
     "jobTypes": {
       "device-migrate": "Migración de dispositivo",
+      "device-destroy": "Eliminación de un dispositivo",
       "monthly-device-state-aggregate": "Agregación mensual de sensores",
       "daily-device-state-aggregate": "Agregación diaria de sensores",
       "hourly-device-state-aggregate": "Agregación horaria de sensores",
@@ -5882,6 +6315,10 @@
     "remoteUsersManageButton": "Gestionar usuarios",
     "disconnectTitle": "Desconectar su cuenta Plus",
     "disconnectButton": "Desconectar",
+    "disconnectConfirmTitle": "¿Desconectar Gladys Plus?",
+    "disconnectConfirmText": "Este Gladys dejará de ser accesible a distancia y sus copias de seguridad se detendrán, al igual que todo lo que pasa por Gladys Plus. Las claves que lo vinculan a su cuenta se eliminan de esta instancia: para volver a usar Gladys Plus, tendrá que iniciar sesión de nuevo en su cuenta aquí.",
+    "disconnectConfirmBackupKey": "Su clave de copia de seguridad también se elimina de esta instancia. Guárdela antes en otro lugar: sin ella, las copias de seguridad ya almacenadas en Gladys Plus no se podrán restaurar.",
+    "disconnectError": "No se pudo desconectar Gladys Plus. Inténtelo de nuevo.",
     "gatewayConnectedSuccessTitle": "¡Gladys Plus conectado correctamente!",
     "gatewayConnectedSuccessDescription": "Su instancia de Gladys se conectó correctamente.",
     "gatewayConnectedSuccessBackupKey": "Se realizará una copia de seguridad automática todos los días, cifrada con la siguiente clave. Para poder restaurar su instancia más adelante, guarde esta clave de cifrado en algún lugar fuera de Gladys. Sin esta clave, no podrá restaurar Gladys.",
@@ -6118,7 +6555,10 @@
     "useTwoFactorCodeLink": "Utilizar en su lugar un código de su aplicación de doble factor",
     "recoveryCodeLabel": "Código de recuperación",
     "recoveryCodePlaceholder": "Introduzca uno de sus códigos de recuperación",
-    "twoFactorEnabledSuccess": "¡La autenticación de doble factor ya está activada! Introduzca un nuevo código generado por su aplicación para finalizar el inicio de sesión."
+    "twoFactorEnabledSuccess": "¡La autenticación de doble factor ya está activada! Introduzca un nuevo código generado por su aplicación para finalizar el inicio de sesión.",
+    "mobile": {
+      "resetTwoFactorTitle": "Restablecer por correo"
+    }
   },
   "gatewayRecoveryCodes": {
     "cardTitle": "Sus códigos de recuperación",
@@ -7913,6 +8353,14 @@
     "clockNoticeText": "Las escenas programadas, el historial y la energía pueden ser incorrectos.",
     "clockNoticeButton": "Comprobar el reloj",
     "clockNoticeContactAdmin": "Avisa al administrador de tu casa.",
+    "connectionNoticeTitle": "No se puede contactar con Gladys",
+    "connectionNoticeText": "Lo que se muestra puede no estar actualizado.",
+    "connectionNoticeRetry": "Reintentar",
+    "connectionNoticeChecking": "Comprobando…",
+    "connectionNoticeStillUnreachable": "Gladys sigue sin responder.",
+    "connectionNoticeInterruptedTitle": "Las actualizaciones en directo están interrumpidas",
+    "connectionNoticeInterruptedText": "Gladys responde: recarga la página para recuperarlas.",
+    "connectionNoticeReload": "Recargar",
     "gladysAssistant": "Gladys Assistant",
     "home": "Inicio",
     "chat": "Chat",
@@ -7945,7 +8393,8 @@
     "closeMenu": "Cerrar el menú",
     "collapseMenu": "Ocultar el menú",
     "expandMenu": "Mostrar el menú",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…"
   },
   "gatewayLinkUser": {
     "title": "Configurar Gladys Plus",
@@ -7977,7 +8426,10 @@
     "notAcceptedRetryButton": "Mi usuario está autorizado, volver a intentarlo",
     "saveButton": "Guardar",
     "manageBillingLink": "Gestionar mi suscripción y facturas",
-    "logoutButton": "Cerrar sesión"
+    "logoutButton": "Cerrar sesión",
+    "mobile": {
+      "accountTitle": "Mi cuenta de Gladys Plus"
+    }
   },
   "deviceFeatureHistorySize": {
     "size": {
@@ -8157,6 +8609,14 @@
       "open": "Abra su aplicación 2FA",
       "addAccount": "Haga clic en \"Añadir cuenta\"",
       "scanQRCode": "Escanee el código QR de abajo o copie el secreto en su aplicación 2FA."
+    },
+    "mobile": {
+      "addAccountTitle": "En este teléfono",
+      "openApp": "Abrir mi aplicación 2FA",
+      "openAppHelp": "Su aplicación 2FA se abre con su cuenta de Gladys Plus lista para añadirse. ¿No ocurre nada? Instale una de las aplicaciones del paso anterior o añada la cuenta a mano más abajo.",
+      "manualTitle": "A mano, o desde otro dispositivo",
+      "qrCodeAlt": "Código QR para escanear con su aplicación 2FA",
+      "qrCodeHelp": "Para escanear con una aplicación 2FA instalada en otro dispositivo."
     }
   },
   "gatewaySignUp": {
@@ -8172,7 +8632,11 @@
     "passwordLabel": "Contraseña (mín. 8 caracteres)",
     "passwordPlaceholder": "Contraseña",
     "passwordInvalid": "La contraseña debe tener 8 caracteres",
-    "createAccountButton": "Crear nueva cuenta"
+    "createAccountButton": "Crear nueva cuenta",
+    "mobile": {
+      "completeTitle": "Su cuenta está creada",
+      "completeText": "Ya puede iniciar sesión con su dirección de correo y su contraseña."
+    }
   },
   "gatewayBilling": {
     "title": "Facturación",

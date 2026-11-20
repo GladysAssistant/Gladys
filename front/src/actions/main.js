@@ -7,6 +7,7 @@ import get from 'get-value';
 import config from '../config';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../server/utils/constants';
 import { isUrlInArray } from '../utils/url';
+import { isUnreachableError, isServerError } from '../utils/connectionError';
 import {
   isInstanceBehindFront,
   isInstanceVersionCheckSettled,
@@ -27,6 +28,12 @@ const INSTANCE_VERSION_REFRESH_INTERVAL_MS = 60 * 1000;
 // A server clock does not drift in minutes: re-checking it at most every 5
 // minutes (on tab focus, while the notice is displayed) is plenty.
 const CLOCK_OFFSET_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+
+// How long signing out waits for Gladys to revoke the session before going on without it
+const LOGOUT_REVOKE_TIMEOUT_MS = 5 * 1000;
+
+// A sign-out is waiting for Gladys to revoke the session
+let logoutInProgress = false;
 
 let lastGatewayTrialRefresh = 0;
 let lastInstanceVersionRefresh = 0;
@@ -129,7 +136,10 @@ function createActions(store) {
         ];
         const [user] = await Promise.all(tasks);
         store.setState({
-          user
+          user,
+          // Gladys answered: a previous check that got no answer no longer holds — for the
+          // session this check was started for only, like in the catch below
+          ...(store.getState().session === state.session ? { gladysUnreachable: false } : {})
         });
         // the "integrations to update" counter is displayed in the header, on
         // every page: it is loaded once the user (and their role) is known,
@@ -164,6 +174,10 @@ function createActions(store) {
         const error = get(e, 'response.data.error');
         const gatewayErrorMessage = get(e, 'response.data.error_message');
         const errorMessageOtherFormat = get(e, 'response.data.message');
+        // Only for the session this check was started for: a logout in the meantime owns
+        // the state
+        const sameSession = store.getState().session === state.session;
+        let gladysUnreachable = false;
         if (status === 401 && errorMessageOtherFormat === 'TABLET_IS_LOCKED') {
           route(`/locked${window.location.search}`);
         } else if (status === 401) {
@@ -177,6 +191,18 @@ function createActions(store) {
           route('/link-gateway-user');
         } else {
           console.error(e);
+          // Gladys did not answer (stopped, restarting, network down) or answered with an
+          // error of its own: the page is left with whatever it could not load, so the
+          // shell says why (components/header/ConnectionLostNotice.jsx).
+          gladysUnreachable = isUnreachableError(e) || isServerError(e);
+        }
+        // Every other ending is an answer of Gladys: it is there, whatever a previous check
+        // concluded. Left set, the notice would follow the user to the page they are sent
+        // to, and stay after they signed in again.
+        if (sameSession) {
+          store.setState({
+            gladysUnreachable
+          });
         }
       }
     },
@@ -359,21 +385,61 @@ function createActions(store) {
     },
     async logout(state, e) {
       e.preventDefault();
-      const user = state.session.getUser();
-      if (user && user.session_id) {
-        await state.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
+      // a second tap while the first one waits for Gladys must not sign out twice
+      if (logoutInProgress) {
+        return;
       }
-      state.session.reset();
-      // a pending "integrations to update" request must not write the count of
-      // the session being closed into the fresh state
-      actionsExternalIntegrationUpdates.invalidateExternalIntegrationsToUpdate();
-      // and the instance version throttle must not carry over: logging back
-      // in right away gets a fresh check, not a 60s silence
-      lastInstanceVersionRefresh = 0;
-      lastClockOffsetRefresh = 0;
-      route('/login', true);
-      const defaultState = getDefaultState();
-      store.setState(defaultState, true);
+      logoutInProgress = true;
+      store.setState({ loggingOut: true });
+      const closedSession = state.session;
+      try {
+        const user = closedSession.getUser();
+        if (user && user.session_id) {
+          // Signing out must always sign out: when the session cannot be revoked (Gladys is
+          // unreachable, the session is already gone), this device still forgets it, and it
+          // does not wait for a request that may never be answered. A session left on the
+          // server expires by itself, and can be revoked from the sessions page.
+          const revoke = async () => {
+            try {
+              await state.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
+            } catch (err) {
+              console.error(err);
+            }
+          };
+          let timeout = null;
+          const giveUp = new Promise(resolve => {
+            timeout = setTimeout(resolve, LOGOUT_REVOKE_TIMEOUT_MS);
+          });
+          await Promise.race([revoke(), giveUp]);
+          clearTimeout(timeout);
+        }
+        closedSession.reset();
+        if (!config.gatewayMode) {
+          // The request this sign-out stopped waiting for is still out there. If it ends
+          // with a refused token, the HTTP client renews the token and hands it to this
+          // session, which would write the user back to the storage and connect again:
+          // the next load of the page would be signed in. A closed session keeps nothing.
+          // (The Gladys Plus session drops by itself what was started before it closed.)
+          closedSession.saveUser = () => {};
+          closedSession.connect = () => {};
+        }
+        // a pending "integrations to update" request must not write the count of
+        // the session being closed into the fresh state
+        actionsExternalIntegrationUpdates.invalidateExternalIntegrationsToUpdate();
+        // and the instance version throttle must not carry over: logging back
+        // in right away gets a fresh check, not a 60s silence
+        lastInstanceVersionRefresh = 0;
+        lastClockOffsetRefresh = 0;
+        route('/login', true);
+        const defaultState = getDefaultState();
+        store.setState(defaultState, true);
+      } finally {
+        logoutInProgress = false;
+        // (a sign-out that went through replaced the whole state, this flag included)
+        if (store.getState().loggingOut) {
+          store.setState({ loggingOut: false });
+        }
+      }
     }
   };
 

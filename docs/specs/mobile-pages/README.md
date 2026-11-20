@@ -25,8 +25,8 @@ the scene audit had measured:
    bottom of; a successful save shows nothing.
 
 The goal: **Gladys is usable from a phone as if it were a native app, end to end** — installing
-it (onboarding), configuring the house, renaming a device, checking the system, drawing a zone,
-setting up an energy contract.
+it (onboarding), signing in, configuring the house, renaming a device, checking the system,
+drawing a zone, setting up an energy contract.
 
 ## B. Scope and principles
 
@@ -48,6 +48,15 @@ setting up an energy contract.
   control (C.4).
 - **Feedback where the thumb is.** A successful action shows a toast; an error shows in the
   bottom bar or in the sheet the user is in, never only at the top of the page.
+- **A Gladys that is unreachable is said once, by the shell.** The "Gladys is unreachable"
+  notice floats under the app's top bar on every signed-in page, and under an open navigation
+  drawer (`components/header/ConnectionLostNotice.jsx`; its behavior is specified with the app
+  navigation, `../dashboard-flexible-layout-and-widgets.md`, H2). A page does not build its own.
+  **It is at the top on purpose, the one exception to "feedback where the thumb is"**: it is
+  not the feedback of something the user just did but a state of the app, which lasts; on a
+  phone the bottom is where everything is operated (the dashboard dock, the bottom bar, the
+  floating "+", the toast) and a card that stays for minutes must not sit on any of it. Its
+  button is a convenience — the notice leaves, or reloads a dashboard, by itself.
 
 ## C. The kit (`front/src/components/mobile/`)
 
@@ -89,12 +98,17 @@ cards**, the pattern of the devices list.
 
 ### C.3 Fields
 
-- `MobileField`: the label above, the control, then the error (`role="alert"`) or the help as a
+- `MobileField`: the label above, the control, then the error (`role="alert"`, named
+  `${htmlFor}-error` so the control can point to it with `aria-describedby`) or the help as a
   13 px footnote.
 - **One look for every control** (`fieldClass.input` / `.select` / `.textarea`): 48 px high,
   16 px text, the same border, radius (14 px) and focus ring; a select shows the same chevron; a
   field and its unit or its reveal button are one control (`fieldClass.group` + `.addon`). An
   invalid control keeps its red border in dark mode (`fieldClass.invalid`, `.groupInvalid`).
+- `MobilePasswordField`: a password and its **reveal button** in one control (`aria-pressed`,
+  named by `mobileKit.togglePassword`), without capitals nor correction. `autocomplete` is
+  "current-password" (the phone fills the saved one) or "new-password" (it proposes a strong
+  one). A form that shows two passwords together drives both (`revealed` / `onToggleReveal`).
 - The right keyboard for each field: `inputmode`, `autocomplete`, `autocapitalize`,
   `enterkeyhint`, and the native field of the system for a date or a time.
 - `MobileSwitch` (52 × 32 px in a 60 × 44 px target, `role="switch"`), `MobileSegmented` (two to
@@ -148,7 +162,24 @@ cards**, the pattern of the devices list.
 
 `MobileToast`: a short message at the bottom of the screen (`role="status"`), rendered on
 `<body>` above the sheets, gone after 4 s — 5 s when it carries **Undo**. It sits above the
-bottom bar on a page that has one (`aboveBar`).
+bottom bar on a page that has one (`aboveBar`). It does not leave under the user's hand: the
+delay stops while a mouse is over it or the keyboard is on its action, and starts again once
+neither holds it (the two holds are tracked apart: the mouse leaving does not restart the delay
+while the keyboard is still on the action, nor the reverse, and a new message shown meanwhile
+does not restart it either; a toast that leaves while held — its message gone, or the toast
+unmounted — ends its holds and tells a caller that runs the delay itself, `onRelease`); a page
+whose deletion took the focused element away moves the focus to the action (`focusAction`: the
+scene editor of a wide screen). Beside the navigation rail of a wide screen it is centred on the
+page, not on the viewport.
+
+One error goes through it, because it has no place of its own: **a device command that failed**
+(`components/device/DeviceCommandError.jsx`, mounted once in the app shell, on every screen
+size; the contract is `dashboard-flexible-layout-and-widgets.md`, section K). For that toast
+`MobileToast` takes three more props, none of which changes the default: `role="alert"` (an
+error is announced at once), `dismissable` (a close button ×, a real `<button>` named "Close",
+C.7) and `aboveDock` — below 992px the shell cannot know what the page pins to the bottom of
+the screen (the dock of the dashboard, a bottom bar), so the toast always sits above where they
+are, and follows `--dock-lift`, which `DashboardPage` mirrors on `<html>`. It stays 6 s.
 
 ### C.7 Accessibility, motion, dark mode
 
@@ -169,6 +200,32 @@ helper ends a zoom animation still running before it removes the map: Leaflet fi
 timer that would otherwise throw on the removed map (a zone page left right after its map was
 fitted).
 
+### C.9 Glass variant
+
+The kit is made of opaque white surfaces, for pages that sit on the gray of the app. A page that
+sits on the **Horizon wallpaper** (the logged-out pages: [`auth.md`](auth.md) and the
+onboarding, [`onboarding.md`](onboarding.md)) sets the global
+class `gladys-mobile-glass` on its shell, and the same components are then the **frosted glass
+of the theme** (`kit.css`, "Glass variant", with the `--gl-*` tokens of the glass scene):
+
+- the navigation bar and the bottom bar are frosted — dense enough (88 %) for what scrolls
+  under them to stay out of the way where the blur is not rendered;
+- a group and a row card are a glass card (translucent, blurred, the white border and the soft
+  shadow of the theme); the rows of a group are part of its glass;
+- the fields are the translucent white of the theme's controls, solid once focused; a chip is
+  a translucent control like a field, and a selected chip is the ink of the theme;
+- on a card of fields (`kitStyle.formCard`, the glass card of the page) a group of rows is
+  nested glass: it loses its own blur and shadow;
+- the buttons join the pill family: **the primary action is the ink pill** of the Horizon
+  buttons, the others a frosted capsule.
+
+A sheet or a toast is rendered on `<body>`, outside the shell: it keeps the opaque surfaces of
+the kit above the glass page.
+
+Only the material changes: sizes, targets, structure and behaviors are the ones above. In dark
+mode the glass is derived by the app-wide inversion — the ink pill inverts with the theme into a
+light pill, like the Horizon primary buttons.
+
 ## D. Pages
 
 Each file owns the phone behavior of its pages.
@@ -181,6 +238,9 @@ Each file owns the phone behavior of its pages.
 | [`energy.md`](energy.md) | Energy monitoring: consumption, "My devices", contracts and the contract wizard |
 | [`map-areas.md`](map-areas.md) | Zones of the map (`routes/map/NewArea.jsx`, `NewAreaMap.jsx`) |
 | [`onboarding.md`](onboarding.md) | Onboarding (`routes/signup`), the five steps |
+| [`auth.md`](auth.md) | The logged-out pages: sign-in, password recovery, keypad of an armed house, and the Gladys Plus sign-in, two-factor, e-mail and account pages |
+| [`integration-devices.md`](integration-devices.md) | The "Devices" and "Discovery" tabs of the integrations (`components/integration/mobile/`): Matter, MQTT, Bluetooth, Airplay, LAN Manager, Enedis, Thermostat, external integrations, RTSP cameras, Zigbee2MQTT |
+| [`zigbee2mqtt-installation.md`](../zigbee2mqtt-installation.md) M.3 and N.5 | The setup tab of Zigbee2MQTT: its installation wizard, its dashboard and their advanced settings |
 
 ## E. Tests
 

@@ -1197,6 +1197,24 @@ a.bigButtonGhost:focus {
   bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
+/* Beside the navigation rail of a wide screen, a toast is centred on the page it talks about,
+   not on the viewport (--gladys-sidebar-offset: style/index.css; nothing where there is no rail) */
+@media (min-width: 992px) {
+  .toast {
+    left: calc(var(--gladys-sidebar-offset, 0px) + 16px);
+  }
+}
+
+/* A toast of the app shell (toastAboveDock): below the desktop breakpoint a page may pin
+   something to the bottom of the screen — the dock of the dashboard (which follows
+   --dock-lift, mirrored on <html> by DashboardPage), a bottom bar — and the shell cannot
+   know which. It always sits above where they are. */
+@media (max-width: 991.98px) {
+  .toastAboveDock {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px) + var(--dock-lift, 0px));
+  }
+}
+
 .toastText {
   flex: 1;
   min-width: 0;
@@ -1214,6 +1232,14 @@ a.bigButtonGhost:focus {
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+/* the close button (×) of a toast which can be dismissed */
+.toastClose {
+  min-width: 44px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.125rem;
 }
 
 @keyframes kitToastIn {
@@ -1253,6 +1279,155 @@ a.bigButtonGhost:focus {
   .contentWithBottomBar {
     padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   }
+}
+
+/* ---------- Glass variant ----------
+   A page that sits on the Horizon wallpaper (the logged-out pages: docs/specs/mobile-pages/
+   auth.md, B) sets the global class `gladys-mobile-glass` on its shell: the surfaces of the kit
+   are then the frosted glass of the theme instead of opaque white — the bars, the groups and
+   their rows, the fields — and the primary action is the ink pill of the Horizon buttons.
+   The tokens (--gl-*) come from the glass scene the shell is in. Sizes, targets and structure do
+   not change: only the material does. */
+
+:global(.gladys-mobile-glass) .navBar {
+  /* frosted, and dense enough for what scrolls under it to stay out of the way of the title
+     where the blur is not rendered */
+  background-color: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+:global(.gladys-mobile-glass) .bottomBar {
+  background-color: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+:global(.gladys-mobile-glass) .group,
+:global(.gladys-mobile-glass) .rowCard,
+:global(.gladys-mobile-glass) a.rowCard {
+  background: var(--gl-card-bg, rgba(255, 255, 255, 0.52));
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  border-radius: var(--gl-radius-md, 18px);
+  box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
+}
+
+/* the rows of a group are part of its glass */
+:global(.gladys-mobile-glass) .group > .row,
+:global(.gladys-mobile-glass) .group > a.row {
+  background-color: transparent;
+}
+
+:global(.gladys-mobile-glass) .group > button.row:active,
+:global(.gladys-mobile-glass) .group > a.row:active {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+:global(.gladys-mobile-glass) .group > * + *,
+:global(.gladys-mobile-glass) .group > .row + .row,
+:global(.gladys-mobile-glass) .group > * + .row {
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+/* the fields: the translucent white of the theme's controls, solid once focused */
+:global(.gladys-mobile-glass) .input,
+:global(.gladys-mobile-glass) .select,
+:global(.gladys-mobile-glass) .textarea,
+:global(.gladys-mobile-glass) .inputGroup {
+  border-color: rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+:global(.gladys-mobile-glass) .input:focus,
+:global(.gladys-mobile-glass) .select:focus,
+:global(.gladys-mobile-glass) .textarea:focus,
+:global(.gladys-mobile-glass) .inputGroup:focus-within {
+  border-color: var(--gl-accent, #3d6df0);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+:global(.gladys-mobile-glass) .inputInvalid,
+:global(.gladys-mobile-glass) .inputInvalid:focus,
+:global(.gladys-mobile-glass) .inputGroupInvalid,
+:global(.gladys-mobile-glass) .inputGroupInvalid:focus-within {
+  border-color: #c23434;
+  box-shadow: 0 0 0 3px rgba(194, 52, 52, 0.14);
+}
+
+:global(.gladys-mobile-glass) .inputGroup .input,
+:global(.gladys-mobile-glass) .inputGroup .input:focus {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+:global(.gladys-mobile-glass) .input:disabled,
+:global(.gladys-mobile-glass) .select:disabled {
+  background-color: rgba(28, 35, 52, 0.05);
+}
+
+/* a card of fields (`formCard`, the glass card of the page): what sits on it is nested glass —
+   a group of rows loses its own blur and shadow, a chip is a translucent control like a field */
+.formCard {
+  position: relative;
+}
+
+:global(.gladys-mobile-glass) .formCard .group {
+  background: var(--gl-card-nested-bg, rgba(255, 255, 255, 0.4));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+:global(.gladys-mobile-glass) .chip {
+  border-color: rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+:global(.gladys-mobile-glass) .chipSelected {
+  border-color: var(--gl-ink, #1c2334);
+  background-color: var(--gl-ink, #1c2334);
+}
+
+/* the buttons join the pill family of the theme: the ink pill for the primary action, a
+   frosted capsule for the others */
+:global(.gladys-mobile-glass) .bigButton,
+:global(.gladys-mobile-glass) a.bigButton {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
+}
+
+:global(.gladys-mobile-glass) .bigButtonPrimary,
+:global(.gladys-mobile-glass) a.bigButtonPrimary,
+:global(.gladys-mobile-glass) a.bigButtonPrimary:hover,
+:global(.gladys-mobile-glass) a.bigButtonPrimary:focus {
+  border-color: transparent;
+  background-color: var(--gl-ink, #1c2334);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(28, 35, 52, 0.22);
+}
+
+:global(.gladys-mobile-glass) .bigButtonPrimary:active {
+  background-color: #2a3550;
+}
+
+:global(.gladys-mobile-glass) .bigButtonPrimary:focus-visible {
+  outline-color: var(--gl-ink, #1c2334);
+}
+
+:global(.gladys-mobile-glass) .errorBanner {
+  border: 1px solid rgba(194, 52, 52, 0.14);
+  border-radius: 16px;
+}
+
+:global(.gladys-mobile-glass) .notice {
+  border-radius: var(--gl-radius-md, 18px);
 }
 
 /* ---------- Dark mode ----------
@@ -1374,4 +1549,39 @@ a.bigButtonGhost:focus {
 :global(.dark-mode) .segmentSelected {
   background-color: #c9d1de;
   box-shadow: none;
+}
+
+/* the glass variant: the ink pill inverts WITH the theme into a light pill (like the Horizon
+   primary buttons), and the fields keep the translucent surface the inversion derives from */
+:global(.dark-mode .gladys-mobile-glass) .bigButtonPrimary {
+  filter: none;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input,
+:global(.dark-mode .gladys-mobile-glass) select.select,
+:global(.dark-mode .gladys-mobile-glass) textarea.textarea {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(28, 35, 52, 0.12) !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input:focus,
+:global(.dark-mode .gladys-mobile-glass) select.select:focus {
+  background-color: #fff !important;
+  border-color: #3d6df0 !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input.inputInvalid,
+:global(.dark-mode .gladys-mobile-glass) select.select.inputInvalid {
+  border-color: #c23434 !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) .inputGroup input.input,
+:global(.dark-mode .gladys-mobile-glass) .inputGroup input.input:focus {
+  background-color: transparent !important;
+  border: 0 !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input:disabled,
+:global(.dark-mode .gladys-mobile-glass) select.select:disabled {
+  background-color: rgba(28, 35, 52, 0.05) !important;
 }

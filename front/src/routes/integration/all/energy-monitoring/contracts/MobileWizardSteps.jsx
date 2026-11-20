@@ -490,7 +490,7 @@ export class ParametersStep extends Component {
               onInput={props.onTariffJsonChange}
               autocomplete="off"
               autocapitalize="off"
-              autocorrect="off"
+              autocorrect={false}
               spellcheck={false}
               data-cy="energy-contract-tariff-json"
             />

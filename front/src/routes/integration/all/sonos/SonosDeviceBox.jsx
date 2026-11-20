@@ -6,6 +6,7 @@ import get from 'get-value';
 import { connect } from 'unistore/preact';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class SonosDeviceBox extends Component {
   componentWillMount() {
@@ -189,9 +190,9 @@ class SonosDeviceBox extends Component {
                   )}
 
                   {deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.sonos.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
                 </div>
               </div>

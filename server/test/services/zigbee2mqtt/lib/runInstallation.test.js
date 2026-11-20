@@ -35,7 +35,7 @@ describe('zigbee2mqtt runInstallation', () => {
 
   it('should install Zigbee2mqtt with the stored setup, then wait for it to answer', async () => {
     // EXECUTE
-    await zigbee2mqttManager.runInstallation();
+    await zigbee2mqttManager.runInstallation(true);
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.init, true);
     assert.calledOnceWithExactly(zigbee2mqttManager.waitForZigbee2mqtt);
@@ -51,7 +51,7 @@ describe('zigbee2mqtt runInstallation', () => {
     const error = new Error('docker fail pull');
     zigbee2mqttManager.init = fake.rejects(error);
     // EXECUTE
-    const promise = zigbee2mqttManager.runInstallation();
+    const promise = zigbee2mqttManager.runInstallation(true);
     // ASSERT
     await expect(promise).to.be.rejectedWith(error);
     assert.notCalled(zigbee2mqttManager.waitForZigbee2mqtt);
@@ -65,7 +65,7 @@ describe('zigbee2mqtt runInstallation', () => {
     const error = new Error('Zigbee2mqtt failed to start: NO_ANSWER');
     zigbee2mqttManager.waitForZigbee2mqtt = fake.rejects(error);
     // EXECUTE
-    const promise = zigbee2mqttManager.runInstallation();
+    const promise = zigbee2mqttManager.runInstallation(true);
     // ASSERT
     await expect(promise).to.be.rejectedWith(error);
     assert.calledOnceWithExactly(zigbee2mqttManager.finishInstallation, error);

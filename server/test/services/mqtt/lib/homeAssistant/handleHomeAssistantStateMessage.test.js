@@ -164,6 +164,32 @@ describe('mqttHandler.handleHomeAssistantStateMessage', () => {
       expect(parseHomeAssistantIncomingState(binding, 'unknown')).to.equal(undefined);
     });
 
+    it('should keep falsy custom payloads of a binary sensor (0 / false)', () => {
+      const binding = {
+        component: 'binary_sensor',
+        property: 'state',
+        config: { payload_on: 1, payload_off: 0, value_template: '{{ value_json.occupancy }}' },
+      };
+      expect(parseHomeAssistantIncomingState(binding, '{"occupancy": 1}')).to.equal(STATE.ON);
+      expect(parseHomeAssistantIncomingState(binding, '{"occupancy": 0}')).to.equal(STATE.OFF);
+      const booleanBinding = {
+        component: 'binary_sensor',
+        property: 'state',
+        config: { payload_on: true, payload_off: false, value_template: '{{ value_json.presence }}' },
+      };
+      expect(parseHomeAssistantIncomingState(booleanBinding, '{"presence": true}')).to.equal(STATE.ON);
+      expect(parseHomeAssistantIncomingState(booleanBinding, '{"presence": false}')).to.equal(STATE.OFF);
+    });
+
+    it('should keep falsy custom payloads of a switch and of a light (0)', () => {
+      const switchBinding = { component: 'switch', property: 'state', config: { state_on: 1, state_off: 0 } };
+      expect(parseHomeAssistantIncomingState(switchBinding, '1')).to.equal(STATE.ON);
+      expect(parseHomeAssistantIncomingState(switchBinding, '0')).to.equal(STATE.OFF);
+      const lightBinding = { component: 'light', property: 'state', config: { payload_on: 1, payload_off: 0 } };
+      expect(parseHomeAssistantIncomingState(lightBinding, '1')).to.equal(STATE.ON);
+      expect(parseHomeAssistantIncomingState(lightBinding, '0')).to.equal(STATE.OFF);
+    });
+
     it('should reverse a door binary sensor, Home Assistant "on" meaning open', () => {
       const binding = { component: 'binary_sensor', property: 'state', config: { device_class: 'door' } };
       expect(parseHomeAssistantIncomingState(binding, 'ON')).to.equal(STATE.OFF);

@@ -564,7 +564,8 @@
   color: #2e8f5b;
 }
 
-:global(.glass-theme .card .alert a) {
+/* not a link styled as a button: it keeps its own colors */
+:global(.glass-theme .card .alert a:not(.btn)) {
   color: inherit;
   text-decoration: underline;
   font-weight: 600;

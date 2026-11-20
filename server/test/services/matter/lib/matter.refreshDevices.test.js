@@ -151,7 +151,10 @@ describe('Matter.refreshDevices', () => {
         isConnected: false,
         connect: fake(),
         events: {
-          initialized: new Promise(() => {}),
+          stateChanged: {
+            on: fake(),
+            off: fake(),
+          },
         },
         getDevices: fake.returns([
           {

@@ -1,0 +1,299 @@
+/* The "Devices" and "Discovery" tabs of an integration on a phone
+   (docs/specs/mobile-pages/integration-devices.md): what the kit (components/mobile/kit.css)
+   does not already carry. Light colors only: dark mode is the app-wide inversion filter. */
+
+/* the content of a tab under the chips of the integration: the rows of the kit, at the width of
+   a phone, on the wallpaper (no card around the list) */
+.page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding-bottom: 16px;
+  color: #1c2334;
+}
+
+/* room for the floating "+" under the last row */
+.pageWithFab {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+/* the floating "+" is a link here: the creation is a page of its own */
+a.fabLink,
+a.fabLink:hover,
+a.fabLink:focus {
+  color: #fff;
+  text-decoration: none;
+}
+
+.block {
+  margin: 0 0 16px;
+}
+
+.loading {
+  min-height: 8rem;
+}
+
+/* a permanent explanation of the integration, under the list it is about */
+.afterList {
+  margin-top: 20px;
+}
+
+/* ---------- toolbar: the search, then the sort order and the actions of the list ---------- */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.toolbar > label {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+}
+
+/* a 44px control next to the search: the same quiet pill */
+.toolButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background-color: rgba(28, 35, 52, 0.07);
+  color: #1c2334;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.toolButton:focus {
+  outline: none;
+}
+
+.toolButton:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+.toolButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.toolButton svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.toolButton :global(.fe) {
+  font-size: 1.0625rem;
+}
+
+.spinning {
+  animation: integrationMobileSpin 0.9s linear infinite;
+}
+
+@keyframes integrationMobileSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinning {
+    animation: none;
+  }
+}
+
+/* ---------- rows ---------- */
+
+/* the pills of a device under its name (battery, disconnected, transport): they wrap */
+.pillLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin-top: 4px;
+}
+
+/* a sentence in that line (a synchronization running, what a thermostat is set to): it wraps */
+.rowNote {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #4f5866;
+  overflow-wrap: anywhere;
+}
+
+.rowNoteAccent {
+  font-weight: 600;
+  color: #2449b5;
+}
+
+/* ---------- the sheet of a device ---------- */
+
+.sheetSection {
+  margin: 0 0 16px;
+}
+
+/* the fields of a sheet, disabled as a whole while a request runs: a fieldset with no look */
+.sheetFields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sheetLabel {
+  margin: 0 4px 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1c2334;
+}
+
+.sheetPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+/* the features of a device are read here, not edited: the tags of the desktop card */
+.features :global(.tags) {
+  margin-bottom: -0.5rem;
+}
+
+.features :global(.tag) {
+  max-width: 100%;
+}
+
+/* what the integration knows about the device (address, model, identifier): a label over its
+   value, never a disabled field — the value wraps and can be selected */
+.details {
+  margin: 0;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.detail {
+  padding: 10px 14px;
+}
+
+.detail + .detail {
+  border-top: 1px solid #edf0f5;
+}
+
+.detailLabel {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #4f5866;
+}
+
+.detailValue {
+  margin: 2px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: #1c2334;
+  overflow-wrap: anywhere;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.detailValueMono {
+  font-family: Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+}
+
+/* "Show the details": the technical parameters stay folded until asked for */
+.detailsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: -6px 0 2px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.detailsToggle:focus {
+  outline: none;
+}
+
+.detailsToggle:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+/* the buttons of a sheet come last, clear of what is above */
+.sheetButtons {
+  margin-top: 20px;
+}
+
+/* a progress (a synchronization running) inside a row or a sheet */
+.progress {
+  display: block;
+  width: 100%;
+  height: 6px;
+  margin-top: 6px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #e4e8ef;
+  color: #2f5bd8;
+  overflow: hidden;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.progress::-webkit-progress-bar {
+  background-color: #e4e8ef;
+}
+
+.progress::-webkit-progress-value {
+  border-radius: 999px;
+  background-color: #2f5bd8;
+}
+
+.progress::-moz-progress-bar {
+  border-radius: 999px;
+  background-color: #2f5bd8;
+}
+
+/* a notice that waits (a scan running): its spinner in place of the icon */
+.noticeSpinner {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: integrationMobileSpin 0.7s linear infinite;
+}
+
+/* a text block of the desktop page reused as is (an alert with links) inside a notice */
+.noticeText :global(p):last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- dark mode: the page is inverted as a whole (see the end of kit.css) ---------- */
+
+/* the icons of these controls are part of their surface, like the ones of the kit */
+:global(.dark-mode) .toolButton :global(.fe),
+:global(.dark-mode) .detailsToggle :global(.fe) {
+  filter: none;
+}

@@ -39,6 +39,7 @@ const DeviceTab = ({ children, ...props }) => (
               props.tasmotaDevices.map((device, index) => (
                 <TasmotaDeviceBox
                   {...props}
+                  key={device.external_id}
                   editable
                   saveButton
                   deleteButton

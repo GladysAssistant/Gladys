@@ -185,6 +185,10 @@ the instance was offline is refused, and kept, if the instance came back online 
   `gatewayResetTwoFactor.*`.
 - `gatewayLogin.noRecoveryCode` and the `password_reset` email no longer ask the user to write
   to support: they point to the instance (section B) and to the reset by email.
+- On a phone these three screens have their phone layout (`mobile-pages/auth.md` D.1, D.6,
+  D.7): the link is a **"Reset by email"** row under "Lost access to your two-factor app?"
+  (`MobileLostTwoFactor`), rendered on the same condition, until its email is sent. Same
+  requests, same strings for every state; the reset still only happens on the tap of the button.
 
 ## F. Replacing the two-factor app with a recovery code
 

@@ -6,3 +6,20 @@
 .rtspCameraListBody {
   min-height: 200px;
 }
+
+/* ---------- the cameras on a phone (docs/specs/mobile-pages/integration-devices.md) ---------- */
+
+/* the image of the last "Test connection", right above the buttons of the sheet */
+.mobilePreview {
+  display: block;
+  width: 100%;
+  margin: 0 0 16px;
+  border-radius: 16px;
+}
+
+/* what the server answered to a failed test, under the sentence of the error */
+.mobileErrorDetail {
+  margin-top: 4px;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}

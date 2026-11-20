@@ -5,11 +5,18 @@
  * status();
  */
 function status() {
-  // The enable switch of the setup page: Gladys runs the Zigbee2mqtt container, or uses an external broker. Not
-  // whether Zigbee2mqtt answers (see isEnabled), so that a failing Zigbee2mqtt can still be turned off.
+  // Gladys runs the Zigbee2mqtt container, or uses an external broker. Not whether Zigbee2mqtt answers (see
+  // isEnabled): false once the service is stopped in the settings, which removes the containers (see disconnect).
   const z2mEnabled = this.zigbee2mqttExist || this.mqttClient !== null;
   const zigbee2mqttStatus = {
+    configured: this.configured,
+    stopped: this.stopped,
+    stoppedAt: this.stoppedAt,
+    setupPending: this.setupPending,
+    updatePending: this.updatePending,
+    serviceStarted: this.serviceStarted,
     usbConfigured: this.usbConfigured,
+    dongleMissing: this.dongleMissing,
     networkAdapterConfigured: this.networkAdapterConfigured,
     mqttExist: this.mqttExist,
     mqttRunning: this.mqttRunning,
@@ -22,6 +29,8 @@ function status() {
     dockerBased: this.dockerBased,
     networkModeValid: this.networkModeValid,
     coordinatorFirmware: this.coordinatorFirmware,
+    z2mVersion: this.z2mVersion,
+    deviceCount: this.deviceCount,
     z2mContainerError: this.z2mContainerError,
     ezspFallback: this.ezspFallback,
     mqttConnectionError: this.mqttConnectionError,

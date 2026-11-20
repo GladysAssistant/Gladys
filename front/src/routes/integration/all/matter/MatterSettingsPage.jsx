@@ -181,7 +181,10 @@ const DecommissionFeedback = ({ feedback, onDismiss }) => {
       )}
       {feedback.failedDevices.length > 0 && (
         <div class="alert alert-warning">
-          <Text id="integration.matter.settings.decommission.devicesNotDeleted" fields={{ name: feedback.name }} />
+          <MarkupText
+            id="integration.matter.settings.decommission.devicesNotDeleted"
+            fields={{ name: feedback.name }}
+          />
           <ul class="mb-0">
             {feedback.failedDevices.map(device => (
               <li key={device.selector}>{device.name}</li>

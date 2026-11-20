@@ -51,4 +51,5 @@ advanced:
     - 178
     - 34
 frontend:
+  enabled: true
   port: 12000

@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
+const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
@@ -162,7 +163,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -170,6 +178,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -219,7 +229,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -227,6 +244,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -372,6 +391,54 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.notCalled(zigbee2mqttManager.restoreZ2mBackup);
   });
 
+  describe('dongle stored by its /dev/serial/by-id/ link, the container on its port', () => {
+    const BY_ID_PATH = '/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_1234567890-if00-port0';
+    let realpath;
+
+    beforeEach(() => {
+      realpath = sinon.stub(fs.promises, 'realpath');
+      realpath.withArgs('/dev/ttyUSB0').resolves('/dev/ttyUSB0');
+      // An update postponed for want of Internet or disk space, the new image is missing (see init)
+      zigbee2mqttManager.imagePullFailures = { [z2mContainerDescriptor.Image]: new Error('docker fail pull') };
+    });
+
+    afterEach(() => {
+      realpath.restore();
+    });
+
+    it('should keep the container running on the same dongle until its image is downloaded', async () => {
+      realpath.withArgs(BY_ID_PATH).resolves('/dev/ttyUSB0');
+      await zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: BY_ID_PATH });
+      assert.notCalled(gladys.system.stopContainer);
+      assert.notCalled(gladys.system.removeContainer);
+      assert.notCalled(gladys.system.createContainer);
+      // Stopped, started again as is
+      assert.calledOnceWithExactly(gladys.system.restartContainer, containerStopped.id);
+      expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+    });
+
+    it('should update the restart policy of the container kept on the same dongle', async () => {
+      realpath.withArgs(BY_ID_PATH).resolves('/dev/ttyUSB0');
+      gladys.system.inspectContainer = fake.resolves({
+        ...containerDescription,
+        HostConfig: { ...containerDescription.HostConfig, RestartPolicy: { Name: 'no' } },
+      });
+      await zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: BY_ID_PATH });
+      assert.notCalled(gladys.system.removeContainer);
+      assert.calledOnceWithExactly(gladys.system.updateContainer, containerStopped.id, {
+        RestartPolicy: { Name: 'always' },
+      });
+    });
+
+    it('should not keep the container of another dongle', async () => {
+      realpath.withArgs(BY_ID_PATH).resolves('/dev/ttyUSB1');
+      const promise = zigbee2mqttManager.installZ2mContainer({ z2mDriverPath: BY_ID_PATH });
+      await expect(promise).to.be.rejectedWith('docker fail pull');
+      assert.notCalled(gladys.system.stopContainer);
+      assert.notCalled(gladys.system.removeContainer);
+    });
+  });
+
   it('should keep the z2m container of an already configured network coordinator', async () => {
     // PREPARE
     const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
@@ -429,7 +496,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -437,6 +511,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -595,7 +671,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -603,6 +686,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -638,7 +723,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -646,6 +738,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -681,7 +775,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -689,6 +790,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -704,7 +807,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -712,6 +822,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,

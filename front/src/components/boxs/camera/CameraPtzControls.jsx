@@ -5,6 +5,7 @@ import { Localizer, Text } from 'preact-i18n';
 import { CAMERA_MOVE } from '../../../../../server/utils/constants';
 import { CAMERA_MOVE_OPTIONS, getSupportedMoves } from '../../../utils/cameraMove';
 import style from './style.css';
+import { sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 
 const ZOOM_VALUES = [CAMERA_MOVE.ZOOM_IN, CAMERA_MOVE.ZOOM_OUT];
 
@@ -33,7 +34,7 @@ class CameraPtzControls extends Component {
   pendingStop = null;
 
   sendValue = async (deviceFeature, value) => {
-    await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, { value });
+    await sendDeviceFeatureValue(this.props.httpClient, deviceFeature.selector, value);
   };
 
   sendStop = async deviceFeature => {

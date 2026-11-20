@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { ConflictError } = require('../../../../utils/coreErrors');
+const { ConflictError, PlatformNotCompatible } = require('../../../../utils/coreErrors');
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -59,6 +59,17 @@ describe('zigbee2mqtt disconnect', () => {
     sinon.reset();
   });
 
+  it('should forget the version of Zigbee2mqtt and the number of devices of its network', async () => {
+    // PREPARE
+    zigbee2MqttManager.z2mVersion = '2.14.2';
+    zigbee2MqttManager.deviceCount = 12;
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    expect(zigbee2MqttManager.z2mVersion).to.equal(null);
+    expect(zigbee2MqttManager.deviceCount).to.equal(null);
+  });
+
   it('mqtt not connected', async () => {
     // EXECUTE
     await zigbee2MqttManager.disconnect();
@@ -72,7 +83,14 @@ describe('zigbee2mqtt disconnect', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -80,6 +98,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -108,7 +128,14 @@ describe('zigbee2mqtt disconnect', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -116,6 +143,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -163,7 +192,14 @@ describe('zigbee2mqtt disconnect', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
@@ -171,6 +207,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -178,6 +216,28 @@ describe('zigbee2mqtt disconnect', () => {
         prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
+  });
+
+  it('should stop watching the USB dongle, so that Zigbee2mqtt is not started again when it comes back', async () => {
+    // PREPARE
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    zigbee2MqttManager.findDongle = fake.resolves(null);
+    zigbee2MqttManager.watchDongle('/dev/ttyUSB0');
+    zigbee2MqttManager.dongleMissing = true;
+    zigbee2MqttManager.dongleRestarts = { count: 5, lastAt: 1000 };
+    try {
+      // EXECUTE
+      await zigbee2MqttManager.disconnect();
+      await clock.tickAsync(10000);
+    } finally {
+      clock.restore();
+    }
+    // ASSERT
+    assert.notCalled(zigbee2MqttManager.findDongle);
+    expect(zigbee2MqttManager.dongleWatchTimer).to.equal(null);
+    expect(zigbee2MqttManager.dongleMissing).to.equal(false);
+    // Enabled again, the watch may start Zigbee2mqtt at once
+    expect(zigbee2MqttManager.dongleRestarts).to.deep.equal({ count: 0, lastAt: null });
   });
 
   it('should end a pending startup and forget the removed containers', async () => {
@@ -269,6 +329,18 @@ describe('zigbee2mqtt disconnect', () => {
       expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
       expect(clock.countTimers()).to.equal(0);
     });
+  });
+
+  it('should disconnect without containers when Gladys does not run in Docker (external broker)', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.rejects(new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER'));
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
   });
 
   it('no container -> nothing to stop', async () => {

@@ -4,6 +4,7 @@ import style from '../style.css';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
 import { RequestStatus } from '../../../utils/consts';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { MobileAuthCard } from '../../../components/auth/mobile';
 import {
   withMobileViewport,
   MobileField,
@@ -136,62 +137,64 @@ const MobilePreferences = withIntlAsProp(({ intl, ...props }) => {
       <p class={kitStyle.lead}>
         <Text id="signup.preferences.description" />
       </p>
-      <MobileField label={<Text id="signup.preferences.temperatureUnitsLabel" />}>
-        <MobileSegmented
-          label={get(dictionary, 'signup.preferences.temperatureUnitsLabel')}
-          value={props.signupUserPreferences.temperature_unit_preference}
-          onChange={value => props.updateUserPreferences('temperature_unit_preference', value)}
-          options={[
-            {
-              value: 'celsius',
-              label: get(dictionary, 'signup.preferences.temperatureUnitsCelsius'),
-              dataCy: 'signup-unit-celsius'
-            },
-            {
-              value: 'fahrenheit',
-              label: get(dictionary, 'signup.preferences.temperatureUnitsFahrenheit'),
-              dataCy: 'signup-unit-fahrenheit'
-            }
-          ]}
-        />
-      </MobileField>
-      <MobileField label={<Text id="signup.preferences.distanceUnit" />}>
-        <MobileSegmented
-          label={get(dictionary, 'signup.preferences.distanceUnit')}
-          value={props.signupUserPreferences.distance_unit_preference}
-          onChange={value => props.updateUserPreferences('distance_unit_preference', value)}
-          options={[
-            {
-              value: 'metric',
-              label: get(dictionary, 'signup.mobile.distanceKilometers'),
-              dataCy: 'signup-unit-metric'
-            },
-            { value: 'us', label: get(dictionary, 'signup.mobile.distanceMiles'), dataCy: 'signup-unit-us' }
-          ]}
-        />
-      </MobileField>
-      <MobileField
-        label={<Text id="signup.preferences.deviceStateHistoryDuration.title" />}
-        htmlFor="historyDuration"
-        help={<Text id="signup.mobile.historyHelp" />}
-      >
-        <select
-          id="historyDuration"
-          class={fieldClass.select}
-          value={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]}
-          onChange={updateSystemProperty(
-            SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
-            props.updateSystemPreferences
-          )}
-          data-cy="signup-history-duration"
+      <MobileAuthCard>
+        <MobileField label={<Text id="signup.preferences.temperatureUnitsLabel" />}>
+          <MobileSegmented
+            label={get(dictionary, 'signup.preferences.temperatureUnitsLabel')}
+            value={props.signupUserPreferences.temperature_unit_preference}
+            onChange={value => props.updateUserPreferences('temperature_unit_preference', value)}
+            options={[
+              {
+                value: 'celsius',
+                label: get(dictionary, 'signup.preferences.temperatureUnitsCelsius'),
+                dataCy: 'signup-unit-celsius'
+              },
+              {
+                value: 'fahrenheit',
+                label: get(dictionary, 'signup.preferences.temperatureUnitsFahrenheit'),
+                dataCy: 'signup-unit-fahrenheit'
+              }
+            ]}
+          />
+        </MobileField>
+        <MobileField label={<Text id="signup.preferences.distanceUnit" />}>
+          <MobileSegmented
+            label={get(dictionary, 'signup.preferences.distanceUnit')}
+            value={props.signupUserPreferences.distance_unit_preference}
+            onChange={value => props.updateUserPreferences('distance_unit_preference', value)}
+            options={[
+              {
+                value: 'metric',
+                label: get(dictionary, 'signup.mobile.distanceKilometers'),
+                dataCy: 'signup-unit-metric'
+              },
+              { value: 'us', label: get(dictionary, 'signup.mobile.distanceMiles'), dataCy: 'signup-unit-us' }
+            ]}
+          />
+        </MobileField>
+        <MobileField
+          label={<Text id="signup.preferences.deviceStateHistoryDuration.title" />}
+          htmlFor="historyDuration"
+          help={<Text id="signup.mobile.historyHelp" />}
         >
-          {HISTORY_DURATIONS.map(duration => (
-            <option value={duration.value}>
-              {get(dictionary, `signup.preferences.deviceStateHistoryDuration.${duration.textId}`)}
-            </option>
-          ))}
-        </select>
-      </MobileField>
+          <select
+            id="historyDuration"
+            class={fieldClass.select}
+            value={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]}
+            onChange={updateSystemProperty(
+              SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
+              props.updateSystemPreferences
+            )}
+            data-cy="signup-history-duration"
+          >
+            {HISTORY_DURATIONS.map(duration => (
+              <option value={duration.value}>
+                {get(dictionary, `signup.preferences.deviceStateHistoryDuration.${duration.textId}`)}
+              </option>
+            ))}
+          </select>
+        </MobileField>
+      </MobileAuthCard>
       <MobileBottomBar error={failed ? <Text id="signup.mobile.savePreferencesError" /> : null}>
         <BigButton variant="primary" onClick={props.savePreferences} loading={saving} data-cy="signup-save-preferences">
           <Text id="signup.preferences.saveSettingsButton" />

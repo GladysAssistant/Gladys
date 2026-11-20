@@ -1,5 +1,5 @@
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { USB_FINGERPRINTS } = require('../adapters/usbFingerprints');
+const { getStablePath, listSerialPorts } = require('../utils/donglePorts');
 
 /**
  * @description Find the coordinator model of a serial port from its USB fingerprint.
@@ -52,26 +52,26 @@ function getDeviceName({ pnpId, serialNumber, manufacturer }) {
 /**
  * @description List the serial ports of the machine, with the name of the device plugged in each, and the
  * coordinator model recognized from its USB fingerprint.
- * @returns {Promise<Array>} Serial ports: path, name, pnpId (USB device name, absent for the serial ports
- * of the machine itself), adapter (recognized model, or null).
+ * @returns {Promise<Array>} Serial ports: path, stablePath (its /dev/serial/by-id/ link when it has one, the path
+ * stored by the setup), name, pnpId (USB device name, absent for the serial ports of the machine itself), adapter
+ * (recognized model, or null).
  * @example
  * const ports = await this.getUsbPorts();
  */
 async function getUsbPorts() {
-  const usb = this.gladys.service.getService('usb');
-  // The usb service is not loaded when its serialport native module failed to load
-  if (!usb) {
-    throw new ServiceNotConfiguredError('USB service is not available');
-  }
-  const ports = await usb.list();
-  return ports.map((port) => ({
-    path: port.path,
-    name: getDeviceName(port),
-    pnpId: port.pnpId,
-    adapter: findAdapter(port),
-  }));
+  const ports = await listSerialPorts(this.gladys);
+  return Promise.all(
+    ports.map(async (port) => ({
+      path: port.path,
+      stablePath: await getStablePath(port, ports),
+      name: getDeviceName(port),
+      pnpId: port.pnpId,
+      adapter: findAdapter(port),
+    })),
+  );
 }
 
 module.exports = {
+  findAdapter,
   getUsbPorts,
 };

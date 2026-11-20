@@ -471,7 +471,8 @@
   color: #2e8f5b;
 }
 
-.glass-theme .page .alert a,
+/* not a link styled as a button: it keeps its own colors */
+.glass-theme .page .alert a:not(.btn),
 .glass-theme .page .alert .alert-link {
   color: inherit;
   text-decoration: underline;

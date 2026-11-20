@@ -9,6 +9,8 @@ import { RequestStatus } from '../../../../utils/consts';
 import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
 import CardFilter from '../../../../components/layout/CardFilter';
 import MatterDeviceBox from './MatterDeviceBox';
+import MobileMatterDevices from './MobileMatterDevices';
+import { withMobileViewport } from '../../../../components/mobile';
 import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
@@ -307,6 +309,7 @@ class MatterDevices extends Component {
     });
   };
 
+  // resolves to false when the device could not be added (the phone sheet then stays open)
   addDeviceToGladys = async device => {
     const { external_id: externalId } = device;
     this.setPairedDeviceLoading(externalId, true);
@@ -324,9 +327,11 @@ class MatterDevices extends Component {
       await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       await this.getMatterDevices();
       await this.getPairedDevices();
+      return true;
     } catch (e) {
       console.error(e);
       this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
+      return false;
     } finally {
       this.setPairedDeviceLoading(externalId, false);
     }
@@ -350,16 +355,21 @@ class MatterDevices extends Component {
           errorDetail: null,
           isKnownError: true
         });
-        return;
+        return false;
       }
 
+      // On a copy: the paired device of the list stays as it was published until the list is
+      // loaded again. A replacement that fails must not leave its card (or its phone row, whose
+      // sheet stays open on a failure) under the name and the ids of the existing device.
       const deviceToSave = replaceGladysDeviceWithPairedDevice(gladysDevice, device);
       await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       await this.getMatterDevices();
       await this.getPairedDevices();
+      return true;
     } catch (e) {
       console.error(e);
       this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
+      return false;
     } finally {
       this.setPairedDeviceLoading(externalId, false);
     }
@@ -455,6 +465,44 @@ class MatterDevices extends Component {
         return nameB.localeCompare(nameA);
       }
     });
+
+    // On a phone the same lists are rows opening a sheet
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (props.isMobile) {
+      return (
+        <MatterPage user={props.user}>
+          <MobileMatterDevices
+            orderDir={orderDir}
+            search={search}
+            onSearch={this.search}
+            onOrderChange={this.changeOrderDir}
+            refresh={this.init}
+            getGladysDevicesLoading={getGladysDevicesLoading}
+            getPairedDevicesLoading={getPairedDevicesLoading}
+            error={error}
+            matterEnabled={matterEnabled}
+            matterDevices={matterDevices}
+            pairedItems={sortedPairedDevices.map(device => {
+              const isNodeIdChanged = devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id);
+              return {
+                device,
+                pairedError: pairedDeviceErrors.get(device.external_id),
+                isNodeIdChanged,
+                // like the desktop card: looked up whatever the search, and named after the Gladys device
+                isUpdate: Boolean(getDeviceToUpdate(device)),
+                title: getPairedDeviceTitle(device),
+                nodeIsDisconnected: nodesIsConnected.get(device.external_id.split(':')[1]) === false
+              };
+            })}
+            hasPairedDevices={pairedDevices.length > 0}
+            housesWithRooms={housesWithRooms}
+            nodesIsConnected={nodesIsConnected}
+            addDeviceToGladys={this.addDeviceToGladys}
+            replaceGladysDevice={this.replaceGladysDevice}
+          />
+        </MatterPage>
+      );
+    }
 
     return (
       <MatterPage user={props.user}>
@@ -622,6 +670,7 @@ class MatterDevices extends Component {
                     matterDevices.length > 0 &&
                     matterDevices.map((device, index) => (
                       <MatterDeviceBox
+                        key={device.external_id}
                         editable
                         saveButton
                         deleteButton
@@ -645,4 +694,4 @@ class MatterDevices extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(MatterDevices);
+export default connect('httpClient,user', {})(withMobileViewport(MatterDevices));

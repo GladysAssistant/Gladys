@@ -1,11 +1,14 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { formatDuration } = require('../utils/formatDuration');
-const { INSTALLATION_STATE } = require('./constants');
+const { CONFIGURATION, INSTALLATION_STATE } = require('./constants');
 
 // Zigbee2mqtt answers bridge/request/health_check since 1.21
 const HEALTH_CHECK_MIN_MAJOR = 1;
 const HEALTH_CHECK_MIN_MINOR = 21;
+// A version as Zigbee2mqtt publishes it ("2.6.1", "2.6.1-dev"): anything else, from whoever can publish on the broker,
+// is not kept, the setup page shows it
+const VERSION_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -51,6 +54,14 @@ async function handleMqttMessage(topic, message) {
       this.zigbee2mqttStarting = false;
       // An error read in the logs of the container did not prevent Zigbee2mqtt from running
       this.z2mContainerError = null;
+      // The first setup reached its end: the setup page no longer opens the wizard
+      if (this.setupPending) {
+        this.setupPending = false;
+        // eslint-disable-next-line promise/prefer-await-to-then
+        this.gladys.variable.destroy(CONFIGURATION.Z2M_SETUP_PENDING, this.serviceId).catch((e) => {
+          logger.warn('Zigbee2mqtt: end of the first setup not saved:', e);
+        });
+      }
       this.emitStatusEvent();
       // Nor did the failure of the last installation, which no longer describes Zigbee2mqtt: the setup page stops
       // showing it. A running installation ends on this answer (see waitForZigbee2mqtt).
@@ -64,6 +75,13 @@ async function handleMqttMessage(topic, message) {
       const devices = JSON.parse(message);
 
       this.discoveredDevices = {};
+
+      // Told by the status only when it changes
+      const deviceCount = devices.filter((d) => d.type !== 'Coordinator').length;
+      if (deviceCount !== this.deviceCount) {
+        this.deviceCount = deviceCount;
+        this.emitStatusEvent();
+      }
 
       devices
         // Remove Coordinator
@@ -139,6 +157,16 @@ async function handleMqttMessage(topic, message) {
         logger.warn(
           `Zigbee2mqtt ${version} does not answer the health check, Gladys needs Zigbee2mqtt ${HEALTH_CHECK_MIN_MAJOR}.${HEALTH_CHECK_MIN_MINOR} or later`,
         );
+      }
+      this.z2mVersion = typeof version === 'string' && VERSION_PATTERN.test(version) ? version : null;
+      // Whether joining is permitted: Zigbee2mqtt 2 publishes its info again when joining closes (after 254 s), and
+      // has no other message for it
+      if (typeof info.permit_join === 'boolean' && info.permit_join !== this.z2mPermitJoin) {
+        this.z2mPermitJoin = info.permit_join;
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+          payload: this.z2mPermitJoin,
+        });
       }
       if (coordinator && coordinator.meta) {
         this.coordinatorFirmware = {

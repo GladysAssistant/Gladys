@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 import actions from '../../../actions/gateway';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
+import MobileGatewayLoginForm from '../../../components/gateway/MobileGatewayLoginForm';
 import AuthLayout from '../../../components/auth/AuthLayout';
 import RestoreBackup from './RestoreBackup';
 import SetRestoreKey from './SetRestoreKey';
@@ -13,7 +14,6 @@ import LocalAccountAlternative from './LocalAccountAlternative';
 import linkState from 'linkstate';
 import { withMobileViewport } from '../../../components/mobile';
 import { MobileSignupLayout } from '../layout';
-import style from '../style.css';
 
 class CreateAccountGladysGateway extends Component {
   state = {
@@ -106,8 +106,8 @@ class CreateAccountGladysGateway extends Component {
     const { step, backupKey, loading, error, gatewayRestoreErrored } = this.state;
     return (
       <MobileSignupLayout title={<Text id="signup.mobile.restoreTitle" />} backHref={step === 4 ? null : '/signup'}>
-        <div class={style.mobileRestore} data-cy="signup-restore-mobile">
-          {step === 1 && <GatewayLoginForm {...this.props} external_forgot_password />}
+        <div data-cy="signup-restore-mobile">
+          {step === 1 && <MobileGatewayLoginForm {...this.props} external_forgot_password />}
           {step === 2 && (
             <SetRestoreKey
               {...this.props}
@@ -202,7 +202,7 @@ class CreateAccountGladysGateway extends Component {
 
 export default withMobileViewport(
   connect(
-    'user,session,httpClient,gatewayBackups,gatewayGetBackupsStatus,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
+    'user,session,httpClient,gatewayBackups,gatewayGetBackupsStatus,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayLoginUseRecoveryCode,gatewayLoginRecoveryCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
     actions
   )(CreateAccountGladysGateway)
 );

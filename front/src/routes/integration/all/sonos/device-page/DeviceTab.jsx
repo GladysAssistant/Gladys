@@ -111,6 +111,7 @@ class DeviceTab extends Component {
                   sonosDevices.length > 0 &&
                   sonosDevices.map((device, index) => (
                     <SonosDeviceBox
+                      key={device.external_id}
                       editable
                       saveButton
                       deleteButton

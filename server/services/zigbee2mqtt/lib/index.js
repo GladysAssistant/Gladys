@@ -31,6 +31,8 @@ const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
 const { getManagedAdapters } = require('./getManagedAdapters');
 const { getUsbPorts } = require('./getUsbPorts');
+const { findDongle } = require('./findDongle');
+const { watchDongle, stopWatchingDongle, resetDongleRestarts } = require('./watchDongle');
 const { readZ2mContainerLogs } = require('./readZ2mContainerLogs');
 const { reset } = require('./reset');
 const { requestHealthCheck } = require('./requestHealthCheck');
@@ -46,6 +48,10 @@ const { startPrefetch } = require('./startPrefetch');
 const { updatePrefetchProgress } = require('./updatePrefetchProgress');
 const { refuseWhileInstalling } = require('./refuseWhileInstalling');
 const { clearInstallation } = require('./clearInstallation');
+const { restartZ2mContainer } = require('./restartZ2mContainer');
+const { stop } = require('./stop');
+const { clearStop, start } = require('./start');
+const { restart } = require('./restart');
 const { JOB_TYPES } = require('../../../utils/constants');
 const { getIdleInstallation, getIdlePrefetch } = require('./constants');
 
@@ -76,6 +82,26 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
+  // A coordinator or an external broker is saved (see isConfigured); unknown (null) until init reads the configuration,
+  // which a service stopped in the settings never does: the pages do not tell an installation not installed meanwhile
+  this.configured = null;
+  // Stopped by the user, and since when (see stop): nothing starts Zigbee2mqtt until the user starts it again
+  this.stopped = false;
+  this.stoppedAt = null;
+  // The first setup did not reach Zigbee2mqtt answering yet (see setup): the setup page opens the wizard again
+  this.setupPending = false;
+  // An update of the containers waits for its images, not downloaded: tried again on the next start (see init)
+  this.updatePending = false;
+  // The service is started (see the start and the stop of the service): not yet while Gladys starts its services, nor
+  // once stopped in Settings > Services, the only place that starts it again
+  this.serviceStarted = false;
+  // The configured USB dongle was not found, at the start or since (see watchDongle)
+  this.dongleMissing = false;
+  // Check of the configured USB dongle, while Zigbee2mqtt does not answer (see watchDongle)
+  this.dongleWatch = null;
+  this.dongleWatchTimer = null;
+  // Starts of Zigbee2mqtt by the watch of its dongle, spaced out (see watchDongle)
+  this.dongleRestarts = { count: 0, lastAt: null };
   this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
@@ -92,10 +118,16 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.healthCheckTimer = null;
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
+  // Version of Zigbee2mqtt and number of devices in its network (coordinator excluded), as it tells them
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   // Gladys switched Zigbee2mqtt to the ezsp driver since the last init: the setup page loads the new model
   this.ezspFallback = false;
   this.installedConfig = null;
+  // Counts the runs of the Zigbee2mqtt container that Gladys restarts or stops: a reader of the logs of an older run
+  // tells nothing (see readZ2mContainerLogs)
+  this.z2mRun = 0;
   this.mqttConnectionError = null;
   this.dockerBased = false;
 
@@ -168,6 +200,10 @@ Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
 Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
 Zigbee2mqttManager.prototype.getUsbPorts = getUsbPorts;
+Zigbee2mqttManager.prototype.findDongle = findDongle;
+Zigbee2mqttManager.prototype.watchDongle = watchDongle;
+Zigbee2mqttManager.prototype.stopWatchingDongle = stopWatchingDongle;
+Zigbee2mqttManager.prototype.resetDongleRestarts = resetDongleRestarts;
 Zigbee2mqttManager.prototype.readZ2mContainerLogs = readZ2mContainerLogs;
 Zigbee2mqttManager.prototype.reset = reset;
 Zigbee2mqttManager.prototype.requestHealthCheck = requestHealthCheck;
@@ -177,6 +213,11 @@ Zigbee2mqttManager.prototype.updateInstallationPhase = updateInstallationPhase;
 Zigbee2mqttManager.prototype.waitForZigbee2mqtt = waitForZigbee2mqtt;
 Zigbee2mqttManager.prototype.finishInstallation = finishInstallation;
 Zigbee2mqttManager.prototype.runInstallation = runInstallation;
+Zigbee2mqttManager.prototype.restartZ2mContainer = restartZ2mContainer;
+Zigbee2mqttManager.prototype.stop = stop;
+Zigbee2mqttManager.prototype.clearStop = clearStop;
+Zigbee2mqttManager.prototype.start = start;
+Zigbee2mqttManager.prototype.restart = restart;
 Zigbee2mqttManager.prototype.pullImage = pullImage;
 Zigbee2mqttManager.prototype.pullMissingImages = pullMissingImages;
 Zigbee2mqttManager.prototype.startPrefetch = startPrefetch;

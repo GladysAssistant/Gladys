@@ -6,6 +6,7 @@ import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class TasmotaDeviceBox extends Component {
   updateName = e => {
@@ -342,9 +343,9 @@ class TasmotaDeviceBox extends Component {
                   )}
 
                   {validModel && props.deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.tasmota.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
 
                   {!validModel && (

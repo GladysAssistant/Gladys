@@ -9,15 +9,23 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts service. Nothing to do while an installation runs: it starts Zigbee2mqtt, a
+   * @description This function starts service. Nothing to do while an installation or an init runs (asked twice: by
+   * Settings > Services while Gladys starts its services, the service shown not running yet): it starts Zigbee2mqtt, a
    * second init alongside it would create the same containers.
    * @example
    * gladys.services.zigbee2mqtt.start();
    */
   async function start() {
     logger.log('Starting Zigbee2mqtt service');
+    // The dashboard and the wizard install and start Zigbee2mqtt only once the service is started (see serviceStarted)
+    zigbee2mqttManager.serviceStarted = true;
     if (zigbee2mqttManager.installation.state === INSTALLATION_STATE.RUNNING) {
       logger.info('Zigbee2mqtt: an installation is running, it starts Zigbee2mqtt');
+      return;
+    }
+    if (zigbee2mqttManager.runningOperations > 0) {
+      logger.info('Zigbee2mqtt: an init or another operation is running, nothing to start');
+      zigbee2mqttManager.emitStatusEvent();
       return;
     }
     await zigbee2mqttManager.init();
@@ -77,7 +85,14 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
       idleWait = null;
     }
     // Shown stopped once the containers are removed: started again meanwhile, they would be created as they are removed
-    await zigbee2mqttManager.disconnect();
+    try {
+      await zigbee2mqttManager.disconnect();
+    } finally {
+      // Saved stopped by the core even when a container could not be removed: the dashboard and the wizard send the
+      // user to Settings > Services, where it starts again (see serviceStarted)
+      zigbee2mqttManager.serviceStarted = false;
+      zigbee2mqttManager.emitStatusEvent();
+    }
   }
 
   /**

@@ -191,4 +191,32 @@ describe('Matter devices', () => {
       .find('.card-header')
       .should('contain', 'GRILLPLATS');
   });
+
+  it('should name the existing device on the phone row of an update, and merge it when updating', () => {
+    cy.viewport('iphone-x');
+    visitWithPairedDevice({ ...pairedDevice, features: [indexFeature, powerFeature] });
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, req => {
+      req.reply(req.body);
+    }).as('saveDevice');
+
+    // the search only matches the Matter name: the row is still an update of the Gladys device
+    cy.get('[data-cy=integration-mobile-search]').type('GRILLPLATS');
+    cy.get('[data-cy=matter-paired-device-row]')
+      .should('have.length', 1)
+      .and('contain', 'Washing machine plug')
+      .and('not.contain', 'GRILLPLATS')
+      .click();
+    cy.get('[data-cy=integration-device-sheet]').should('contain', 'Washing machine plug');
+    cy.get('[data-cy=integration-device-primary]')
+      .i18n('integration.matter.device.updateInGladys')
+      .click();
+
+    cy.wait('@saveDevice').then(({ request }) => {
+      const { body } = request;
+      expect(body).to.have.property('id', 'device-id');
+      expect(body).to.have.property('name', 'Washing machine plug');
+      expect(body).to.have.property('room_id', 'room-id');
+      expect(body.params.map(p => p.name)).to.include('ENERGY_INDEX_LAST_PROCESSED_feature-index-id');
+    });
+  });
 });

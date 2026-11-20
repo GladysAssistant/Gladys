@@ -8,6 +8,7 @@ import dashboardActions from '../../actions/dashboard';
 import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
+import { declareReloadablePage } from '../../utils/reloadablePage';
 
 // dashboard actions plus the shared setTabletMode (main.js), used by the
 // ?tablet_mode_house=<house_selector> URL param below to activate tablet mode
@@ -130,9 +131,10 @@ class Dashboard extends Component {
         loading: false
       });
     } catch (e) {
+      // a failure of a dashboard the user already left says nothing about the one displayed
       this.setState({
         loading: false,
-        currentDashboardLoadFailed: true
+        ...(this.state.currentDashboardSelector === selector ? { currentDashboardLoadFailed: true } : {})
       });
       console.error(e);
     }
@@ -372,6 +374,9 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
+    // A dashboard is only looked at: it can be reloaded by itself when Gladys is back
+    // after an outage (utils/reloadablePage.js)
+    this.pageIsNoLongerReloadable = declareReloadablePage();
     this.init();
     this.getGatewayRecoveryCodesState();
     document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
@@ -414,14 +419,22 @@ class Dashboard extends Component {
       // (device_features arrays…), so swapping in an equal-but-fresh object
       // would make every widget refetch and flash its loader a second time
       // right after the instant cached render
-      if (
-        currentDashboard &&
-        this.state.currentDashboardSelector === selector &&
-        JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard)
-      ) {
-        this.setState({ currentDashboard });
+      if (currentDashboard && this.state.currentDashboardSelector === selector) {
+        const changed = JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard);
+        // the dashboard displayed now was loaded: a previous one that failed no longer
+        // says "could not be loaded"
+        if (changed || this.state.currentDashboardLoadFailed) {
+          this.setState({
+            ...(changed ? { currentDashboard } : {}),
+            currentDashboardLoadFailed: false
+          });
+        }
       }
     } catch (e) {
+      // the dashboard asked for could not be loaded: said on it, not on another one
+      if (this.state.currentDashboardSelector === selector) {
+        this.setState({ currentDashboardLoadFailed: true });
+      }
       console.error(e);
     }
   };
@@ -433,6 +446,7 @@ class Dashboard extends Component {
   }
 
   componentWillUnmount() {
+    this.pageIsNoLongerReloadable();
     document.removeEventListener('fullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
@@ -460,6 +474,7 @@ class Dashboard extends Component {
       gatewayInstanceNotFound,
       gatewayRecoveryCodesMissing,
       loading,
+      getDashboardsError,
       currentDashboardLoadFailed,
       browserFullScreenCompatible,
       duckDbMigrationJob,
@@ -482,7 +497,11 @@ class Dashboard extends Component {
     // or failed).
     const currentDashboardResolved =
       !loading && (dashboardListEmpty || Boolean(currentDashboard) || currentDashboardLoadFailed);
-    const dashboardNotConfigured = currentDashboardResolved && !dashboardConfigured;
+    // A list or a dashboard that could not be loaded is not a dashboard without widget:
+    // the first-run checklist ("0 of 4, connect your devices") would tell a user whose
+    // Gladys is restarting that their home is empty
+    const dashboardLoadFailed = !loading && Boolean(getDashboardsError || currentDashboardLoadFailed);
+    const dashboardNotConfigured = currentDashboardResolved && !dashboardConfigured && !dashboardLoadFailed;
     if (props.gatewayAccountExpired === true) {
       return <GatewayAccountExpired />;
     }
@@ -501,6 +520,7 @@ class Dashboard extends Component {
         gatewayRecoveryCodesMissing={gatewayRecoveryCodesMissing}
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
+        dashboardLoadFailed={dashboardLoadFailed}
         browserFullScreenCompatible={browserFullScreenCompatible}
         toggleDashboardDropdown={this.toggleDashboardDropdown}
         redirectToDashboard={this.redirectToDashboard}
