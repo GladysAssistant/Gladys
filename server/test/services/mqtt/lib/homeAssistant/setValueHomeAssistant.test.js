@@ -229,6 +229,27 @@ describe('mqttHandler.setValueHomeAssistant', () => {
       });
     });
 
+    it('should keep falsy switch and light payloads (0 / false)', () => {
+      const switchConfig = { command_topic: 'set', payload_on: 1, payload_off: 0 };
+      expect(buildHomeAssistantCommand('switch', switchConfig, 'state', 1)).to.deep.equal({
+        topic: 'set',
+        payload: '1',
+      });
+      expect(buildHomeAssistantCommand('switch', switchConfig, 'state', 0)).to.deep.equal({
+        topic: 'set',
+        payload: '0',
+      });
+      const lightConfig = { command_topic: 'set', payload_on: true, payload_off: false };
+      expect(buildHomeAssistantCommand('light', lightConfig, 'state', 1)).to.deep.equal({
+        topic: 'set',
+        payload: 'true',
+      });
+      expect(buildHomeAssistantCommand('light', lightConfig, 'state', 0)).to.deep.equal({
+        topic: 'set',
+        payload: 'false',
+      });
+    });
+
     it('should return no topic for unsupported components', () => {
       expect(buildHomeAssistantCommand('vacuum', {}, 'state', 1)).to.deep.equal({
         topic: undefined,
