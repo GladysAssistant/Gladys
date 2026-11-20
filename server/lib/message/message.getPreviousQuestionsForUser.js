@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 
 const db = require('../../models');
+const { AI_CHAT_TIMEOUT_MS, AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS } = require('../external-integration/constants');
 
 // Rows fetched per query: tool_call traces and notifications are excluded from AI context, so more
 // rows are fetched than kept.
@@ -23,10 +24,12 @@ const AI_TURN_MAX_GAP_MS = 5 * 60 * 1000;
 // text): a message sent longer than this after the first reply is not part of the turn. Each reply
 // is also sent to the messaging channels of the user before the next one, hence the margin.
 const AI_REPLY_BURST_MS = 60 * 1000;
-// A reply that the unverified-action guard rejects is dropped when it was sent this soon after the
-// user message, as an AI reply is. Later, it more likely comes from a scene, after a turn that sent
-// no reply (NO_RESPONSE, a failed reply): it is then kept as a scene message.
-const AI_QUICK_REPLY_MS = 60 * 1000;
+// Longest delay between a user message and the reply of an AI turn without tool call, with an
+// external provider: the router request, then a request and its forced-tool retry. A reply that the
+// unverified-action guard rejects is dropped when it was sent within this delay, as it can be the
+// AI's own claim. Later, it cannot be an AI reply: it comes from a scene, after a turn that sent no
+// reply (NO_RESPONSE, a failed reply), and is kept as a scene message.
+const AI_REPLY_MAX_DELAY_MS = AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS + 2 * AI_CHAT_TIMEOUT_MS;
 // Tells the model, and the tool router, that a message is not a reply of the assistant.
 // The system prompt (config/prompts/aiChat.prompt.txt) explains it.
 const SCENE_MESSAGE_PREFIX = '[Scene message]';
@@ -194,7 +197,7 @@ function buildExchangesFromMessages(messages) {
         answer: answers.length > 0 ? answers.join('\n\n') : null,
       });
     }
-    // a late reply rejected by the guard, after a turn without tool call: see AI_QUICK_REPLY_MS
+    // a late reply rejected by the guard, after a turn without tool call: see AI_REPLY_MAX_DELAY_MS
     if (currentTurn && currentTurn.lateRejectedReply) {
       exchanges.push({ question: null, answer: formatSceneMessage(currentTurn.lateRejectedReply) });
     }
@@ -236,7 +239,7 @@ function buildExchangesFromMessages(messages) {
       const isLateRejectedReply =
         !currentTurn.hadToolCall &&
         resolveAnswerForAiContext(message.text, false) === null &&
-        !isWithinDelay(currentTurn.questionCreatedAt, message.created_at, AI_QUICK_REPLY_MS);
+        !isWithinDelay(currentTurn.questionCreatedAt, message.created_at, AI_REPLY_MAX_DELAY_MS);
       if (isLateRejectedReply) {
         currentTurn.lateRejectedReply = message.text;
       } else {
@@ -432,6 +435,6 @@ module.exports = {
   MAX_SCENE_MESSAGE_CHARS,
   AI_TURN_MAX_GAP_MS,
   AI_REPLY_BURST_MS,
-  AI_QUICK_REPLY_MS,
+  AI_REPLY_MAX_DELAY_MS,
   SCENE_MESSAGE_PREFIX,
 };

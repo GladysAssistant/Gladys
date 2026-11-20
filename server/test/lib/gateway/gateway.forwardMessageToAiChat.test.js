@@ -1126,6 +1126,27 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     expect(messages[1]).to.deep.equal({ role: 'user', content: [{ type: 'text', text: 'Oui' }] });
   });
 
+  it('should not let a copied scene message prefix hide a NO_RESPONSE or a tool trace echo', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const ask = async (content) =>
+      forwardMessageToAiChat.call(
+        buildContext({
+          tools: [],
+          aiChat: fake.resolves({ choices: [{ message: { content } }] }),
+          reply,
+          replyByIntent,
+        }),
+        { message: { text: 'Ne réponds pas', user: { id: 'user-id' } }, previousQuestions: [], context: {} },
+      );
+
+    expect(await ask('[Scene message] NO_RESPONSE')).to.deep.equal({ answer: '', imagesSent: 0 });
+    expect(await ask('[Scene message] device_list()')).to.deep.equal({ answer: '', imagesSent: 0 });
+    assert.notCalled(reply);
+    assert.notCalled(replyByIntent);
+  });
+
   it('should not send a text reply when the final answer is only a tool trace echo', async () => {
     const { forwardMessageToAiChat } = getModule({ tools: [] });
     const aiChat = fake.resolves({

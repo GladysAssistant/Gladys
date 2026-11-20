@@ -27,7 +27,7 @@ const {
   MAX_SCENE_MESSAGE_CHARS,
   AI_TURN_MAX_GAP_MS,
   AI_REPLY_BURST_MS,
-  AI_QUICK_REPLY_MS,
+  AI_REPLY_MAX_DELAY_MS,
   SCENE_MESSAGE_PREFIX,
 } = proxyquire('../../../lib/message/message.getPreviousQuestionsForUser', {
   '../../models': {
@@ -604,6 +604,19 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
     ]);
   });
 
+  it('should wait as long as a slow AI reply can take before keeping a rejected message as a scene message', () => {
+    // router request, then a request to an external provider and its forced-tool retry
+    expect(AI_REPLY_MAX_DELAY_MS).to.equal((20 + 2 * 120) * 1000);
+    // otherwise no reply rejected by the guard could come late enough to be kept as a scene message
+    expect(AI_REPLY_MAX_DELAY_MS).to.be.below(AI_TURN_MAX_GAP_MS);
+    expect(
+      buildExchangesFromMessages([
+        { sender_id: 'user-1', text: 'Ferme les volets', message_type: 'chat', created_at: '2026-11-20T08:00:00Z' },
+        { sender_id: null, text: "J'ai fermé les volets.", message_type: 'chat', created_at: '2026-11-20T08:01:30Z' },
+      ]),
+    ).to.deep.equal([{ question: 'Ferme les volets', answer: null }]);
+  });
+
   it('should keep as a scene message a late message that the guard rejects after a turn without reply', () => {
     const questionAt = new Date('2026-11-20T08:00:00.000Z').getTime();
     expect(
@@ -613,14 +626,14 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
           sender_id: null,
           text: 'La porte du garage a été ouverte, faut-il la fermer ?',
           message_type: 'chat',
-          created_at: new Date(questionAt + AI_QUICK_REPLY_MS + 1),
+          created_at: new Date(questionAt + AI_REPLY_MAX_DELAY_MS + 1),
         },
       ]),
     ).to.deep.equal([
       { question: 'Ne réponds pas', answer: null },
       { question: null, answer: '[Scene message] La porte du garage a été ouverte, faut-il la fermer ?' },
     ]);
-    // sent as soon as an AI reply, it is taken as the reply and dropped by the guard
+    // sent while it can still be an AI reply, even from a slow provider, it is dropped by the guard
     expect(
       buildExchangesFromMessages([
         { sender_id: 'user-1', text: 'Ferme les volets', message_type: 'chat', created_at: new Date(questionAt) },
@@ -628,7 +641,7 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
           sender_id: null,
           text: 'La porte a été fermée.',
           message_type: 'chat',
-          created_at: new Date(questionAt + AI_QUICK_REPLY_MS),
+          created_at: new Date(questionAt + AI_REPLY_MAX_DELAY_MS),
         },
       ]),
     ).to.deep.equal([{ question: 'Ferme les volets', answer: null }]);

@@ -717,16 +717,17 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       }
     }
 
-    const assistantContent = assistantMessage?.content;
-    let finalAnswer = typeof assistantContent === 'string' ? assistantContent.trim() : '';
+    // the history marks the messages sent by scenes with a prefix: a model copying it must neither show
+    // it to the user (chat, messaging channels, voice) nor hide a NO_RESPONSE or a tool trace behind it
+    const assistantContent =
+      typeof assistantMessage?.content === 'string' ? stripSceneMessagePrefix(assistantMessage.content.trim()) : '';
+    let finalAnswer = assistantContent;
     const rawFinalAnswer = finalAnswer;
     if (isNoResponseSentinel(finalAnswer)) {
       logger.info('[AI_CHAT] Assistant returned NO_RESPONSE sentinel');
       finalAnswer = '';
     }
-    // the history marks the messages sent by scenes with a prefix: a model copying it must not show
-    // it to the user (chat, messaging channels, voice)
-    finalAnswer = stripSceneMessagePrefix(stripToolTraceEchoFromAnswer(finalAnswer));
+    finalAnswer = stripToolTraceEchoFromAnswer(finalAnswer);
     if (rawFinalAnswer && !finalAnswer) {
       logger.info(
         `[AI_CHAT] Final answer emptied after stripping tool traces. raw=${debugPreview(rawFinalAnswer, 150)}`,
@@ -750,9 +751,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       logger.debug(`[AI_CHAT] Using scene_create error as final answer: ${debugPreview(finalAnswer, 400)}`);
     }
 
-    const rawAssistantContent = assistantMessage?.content;
-    const wasNoResponseSentinel =
-      typeof rawAssistantContent === 'string' && isNoResponseSentinel(rawAssistantContent.trim());
+    const wasNoResponseSentinel = isNoResponseSentinel(assistantContent);
     const shouldSendText = Boolean(
       finalAnswer && shouldSendAssistantTextReply(finalAnswer, imagesSentToUser.length > 0),
     );
