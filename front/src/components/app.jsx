@@ -8,6 +8,7 @@ import AsyncRoute from 'preact-async-route';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
 import actions from '../actions/main';
+import { SESSION_REFUSED_EVENT } from '../utils/Session';
 import { EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS } from '../actions/externalIntegrationUpdates';
 import { catalogCategories } from '../config/integrations';
 
@@ -479,8 +480,37 @@ const AppRouter = connect(
 
 class MainApp extends Component {
   componentWillMount() {
+    this.listenToSession(this.props.session);
     this.props.checkSession();
   }
+
+  componentDidUpdate(previousProps) {
+    // signing out puts a new session in the store
+    if (previousProps.session !== this.props.session) {
+      this.stopListeningToSession(previousProps.session);
+      this.listenToSession(this.props.session);
+    }
+  }
+
+  // Gladys refused to renew the access token while the session was reconnecting: the session
+  // was revoked or has expired, or the tablet was locked. The session check gets the same
+  // refusal, and knows where it leads: the sign-in page, or the keypad. Without it the page
+  // would stay as it is, with values that no longer move.
+  handleSessionRefused = () => {
+    this.props.checkSession();
+  };
+
+  listenToSession = session => {
+    if (session && session.dispatcher) {
+      session.dispatcher.addListener(SESSION_REFUSED_EVENT, this.handleSessionRefused);
+    }
+  };
+
+  stopListeningToSession = session => {
+    if (session && session.dispatcher) {
+      session.dispatcher.removeListener(SESSION_REFUSED_EVENT, this.handleSessionRefused);
+    }
+  };
 
   componentDidMount() {
     // Listen for system preference change
@@ -499,6 +529,7 @@ class MainApp extends Component {
     // Remove event listener to prevent memory leaks
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
     clearInterval(this.externalIntegrationUpdatesInterval);
+    this.stopListeningToSession(this.props.session);
   }
 
   handleSystemPreferenceChange = () => {
@@ -516,7 +547,7 @@ class MainApp extends Component {
   }
 }
 
-const MainAppConnected = connect('user', actions)(MainApp);
+const MainAppConnected = connect('user,session', actions)(MainApp);
 
 const App = () => (
   <Provider store={store}>

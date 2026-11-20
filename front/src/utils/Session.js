@@ -5,12 +5,30 @@ import { hasPasswordFields, omitPasswordFields } from './omitPasswordFields';
 
 // Delay before the first reconnection attempt, doubled after each failed attempt
 const RECONNECT_FIRST_DELAY_MS = 1000;
-// ...up to this cap: a Gladys that takes minutes to come back (update, reboot of the machine)
-// is found again within half a minute, without hammering the network in the meantime
-const RECONNECT_MAX_DELAY_MS = 30 * 1000;
+// ...up to this cap. It is what a page waits, at most, once Gladys answers again after a long
+// stop (an update, a reboot of the machine): for a client next to its server an attempt that
+// fails is one refused connection, so it can stay short.
+const RECONNECT_MAX_DELAY_MS = 10 * 1000;
+// Every delay is spread by this share, more or less: all the screens of a house lose Gladys at
+// the same instant, and would otherwise come back, renew their token and reload their widgets
+// in the same second, on a machine that has just started.
+const RECONNECT_JITTER = 0.2;
+// After Gladys refused to renew the access token, the next attempt waits this long: the app
+// has been told, and is taking the user where they have to go (see SESSION_REFUSED_EVENT)
+const RECONNECT_AFTER_REFUSAL_DELAY_MS = 30 * 1000;
 // A connection that is still not open after this long is given up and tried again: on a
 // machine that is rebooting nothing answers, and the browser would wait far longer by itself
 const CONNECTION_TIMEOUT_MS = 10 * 1000;
+// The close code of a socket whose access token was refused (server/api/websockets/index.js)
+const INVALID_ACCESS_TOKEN_CLOSE_CODE = 4000;
+
+// Dispatched when Gladys refuses to renew the access token: the session was revoked or has
+// expired, or the tablet is locked. The app answers by running its session check again, which
+// sends the user to the sign-in page or to the keypad (components/app.jsx).
+const SESSION_REFUSED_EVENT = 'session.refused';
+// Dispatched when the session is closed on purpose (sign-out, session refused): its connection
+// is not lost, and will not come back by itself. For what displays the state of the connection.
+const SESSION_CLOSED_EVENT = 'session.closed';
 
 class Session {
   constructor() {
@@ -26,6 +44,8 @@ class Session {
     this.ws = null;
     // the access token the current socket authenticates with
     this.wsAccessToken = null;
+    // true once the current socket has sent its access token
+    this.wsAuthenticationSent = false;
     // number of reconnection attempts since the last authenticated connection
     this.reconnectAttempts = 0;
     this.reconnectTimer = null;
@@ -66,11 +86,27 @@ class Session {
     this.reconnectAttempts = 0;
     this.accessTokenRefused = false;
     this.accessTokenRefusals = 0;
+    // what was started before (a renewal of the access token waiting for its answer, above
+    // all) compares this count, and leaves the session alone when it has changed: a session
+    // that was closed must not get a token back, nor a socket
     this.resetCount += 1;
     this.user = null;
     this.profilePicture = null;
     this.initialized = false;
     localStorage.clear();
+    // the same session object may be signed in again later (the session check resets it
+    // without replacing it): whoever displays a lost connection must forget it
+    this.dispatch(SESSION_CLOSED_EVENT);
+  }
+
+  // A listener that throws must never stop what the session was doing — the reconnection
+  // above all, which would leave the page without live data for good
+  dispatch(event, details) {
+    try {
+      this.dispatcher.dispatch(event, details);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   isConnected() {
@@ -106,6 +142,7 @@ class Session {
     const ws = new WebSocket(websocketUrl);
     this.ws = ws;
     this.wsAccessToken = accessToken;
+    this.wsAuthenticationSent = false;
     this.connectionTimer = setTimeout(() => {
       // still not open: give this attempt up, as if the socket had closed by itself
       this.onSocketClosed(ws, {});
@@ -124,6 +161,7 @@ class Session {
           }
         })
       );
+      this.wsAuthenticationSent = true;
     };
     ws.onmessage = e => {
       if (ws !== this.ws) {
@@ -137,7 +175,7 @@ class Session {
         this.connectionLost = false;
         this.reconnectAttempts = 0;
         this.accessTokenRefusals = 0;
-        this.dispatcher.dispatch('websocket.connected', { connected: true });
+        this.dispatch('websocket.connected', { connected: true });
       }
       this.dispatcher.dispatch(type, payload);
     };
@@ -157,10 +195,21 @@ class Session {
       return;
     }
     console.error(e);
+    // Gladys closes a socket whose access token it refuses with a code and a reason of its
+    // own. Something on the way (a reverse proxy, the browser) may drop them: a socket that
+    // closes after it sent its token, and before Gladys accepted it, is taken for a refusal
+    // too. If it was not one, renewing the token costs one request, and fails by itself when
+    // Gladys is simply gone. Without this the same dead token would be sent again forever.
+    const closedWhileAuthenticating = this.wsAuthenticationSent && !this.websocketConnected;
+    this.accessTokenRefused =
+      e.reason === ERROR_MESSAGES.INVALID_ACCESS_TOKEN ||
+      e.code === INVALID_ACCESS_TOKEN_CLOSE_CODE ||
+      closedWhileAuthenticating;
     this.closeSocket();
-    this.accessTokenRefused = e.reason === ERROR_MESSAGES.INVALID_ACCESS_TOKEN;
-    this.markConnectionLost();
+    // the next attempt is planned before anyone is told: whatever a listener does, the
+    // reconnection goes on
     this.scheduleReconnect();
+    this.markConnectionLost();
   }
 
   // Lets go of the current socket, if any, so that nothing it does afterwards (its closing
@@ -171,6 +220,7 @@ class Session {
     const ws = this.ws;
     this.ws = null;
     this.wsAccessToken = null;
+    this.wsAuthenticationSent = false;
     this.websocketConnected = false;
     if (ws && ws.close) {
       ws.close();
@@ -183,7 +233,7 @@ class Session {
     this.websocketConnected = false;
     if (!this.connectionLost) {
       this.connectionLost = true;
-      this.dispatcher.dispatch('websocket.connected', { connected: false });
+      this.dispatch('websocket.connected', { connected: false });
     }
   }
 
@@ -192,18 +242,26 @@ class Session {
     this.reconnectTimer = null;
   }
 
-  // Plans the next attempt: after 1 second, then 2, 4... up to 30 seconds, for as long as it
-  // takes.
-  scheduleReconnect() {
+  // Plans the next attempt: after about 1 second, then 2, 4, 8 and every 10 seconds, for as
+  // long as it takes. afterRefusedRenewal: Gladys has just refused to renew the access token.
+  scheduleReconnect({ afterRefusedRenewal = false } = {}) {
     this.clearReconnectTimer();
-    let delay = Math.min(RECONNECT_FIRST_DELAY_MS * 2 ** Math.min(this.reconnectAttempts, 10), RECONNECT_MAX_DELAY_MS);
-    if (this.accessTokenRefused) {
+    let delay;
+    if (afterRefusedRenewal) {
+      delay = RECONNECT_AFTER_REFUSAL_DELAY_MS;
+    } else if (this.accessTokenRefused && this.accessTokenRefusals === 0) {
       // Gladys is there and answers: the token is the usual expired one, or one from before a
       // restart, and it is renewed right away. Refused again with a new token, it waits like
       // any other attempt.
-      if (this.accessTokenRefusals === 0) {
-        delay = 0;
-      }
+      delay = 0;
+    } else {
+      const backoff = Math.min(
+        RECONNECT_FIRST_DELAY_MS * 2 ** Math.min(this.reconnectAttempts, 10),
+        RECONNECT_MAX_DELAY_MS
+      );
+      delay = Math.round(backoff * (1 - RECONNECT_JITTER + 2 * RECONNECT_JITTER * Math.random()));
+    }
+    if (this.accessTokenRefused) {
       this.accessTokenRefusals += 1;
     }
     this.reconnectAttempts += 1;
@@ -222,6 +280,11 @@ class Session {
     }
     const { resetCount } = this;
     try {
+      // without a refresh token there is nothing to renew the access token with: Gladys could
+      // only refuse
+      if (!this.getRefreshToken()) {
+        throw Object.assign(new Error('NO_REFRESH_TOKEN'), { response: { status: 401 } });
+      }
       delete this.user.access_token;
       this.saveUser(this.user);
       // gets a new access token, then calls connect()
@@ -234,11 +297,15 @@ class Session {
         return;
       }
       const status = e && e.response && e.response.status;
-      if (status === 401 || status === 403) {
-        // Gladys refuses to renew the token (session revoked or expired, tablet locked):
-        // trying again would get the same answer. The next API call fails the same way and
-        // sends the user where they have to go (login, locked page), and connect() is called
-        // again once a token is there.
+      if (status === 400 || status === 401 || status === 403) {
+        // Gladys answers, and refuses to renew the token: the session was revoked or has
+        // expired, or the tablet is locked. Trying again at once would get the same answer,
+        // and nothing else tells the page: without a word it would stay as it is, frozen, for
+        // good. The app is told, and takes the user to the sign-in page or to the keypad,
+        // which closes this session or connects it again. Should the app not get that far
+        // (Gladys gone again in the meantime), the next attempt asks once more, later.
+        this.scheduleReconnect({ afterRefusedRenewal: true });
+        this.dispatch(SESSION_REFUSED_EVENT);
         return;
       }
       // Gladys could not be reached (no answer, or the error page of a reverse proxy whose
@@ -251,6 +318,14 @@ class Session {
   // the end of the current delay to try again
   reconnectNow() {
     if (this.reconnectTimer) {
+      this.reconnect();
+      return;
+    }
+    if (this.ws && !this.websocketConnected) {
+      // an attempt is under way, and may be hanging on a network that was not there (it would
+      // only be given up after CONNECTION_TIMEOUT_MS): a new one is started on the network
+      // that has just come back
+      this.closeSocket();
       this.reconnect();
     }
   }
@@ -318,6 +393,10 @@ class Session {
   }
 
   setAccessToken(accessToken) {
+    // a session that was closed has no user: a renewal answered too late must not create one
+    if (!this.user) {
+      return;
+    }
     const newUser = Object.assign({}, this.user, {
       access_token: accessToken
     });
@@ -348,4 +427,4 @@ class Session {
   }
 }
 
-export { Session };
+export { Session, SESSION_REFUSED_EVENT, SESSION_CLOSED_EVENT };

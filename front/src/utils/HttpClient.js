@@ -30,6 +30,7 @@ export class HttpClient {
   }
 
   async refreshAccessToken() {
+    const { resetCount } = this.session;
     const { data } = await axios({
       baseURL: this.localApiUrl,
       url: '/api/v1/access_token',
@@ -39,6 +40,12 @@ export class HttpClient {
         scope: this.apiScopes
       }
     });
+    // The session was closed while the token was being renewed (sign-out, session refused):
+    // nothing of this answer is kept. Saving the token would bring back, in the storage of the
+    // browser and on a live socket, the session the user has just left.
+    if (this.session.resetCount !== resetCount) {
+      throw new Error('SESSION_CLOSED');
+    }
     this.session.setAccessToken(data.access_token);
     // reconnect websocket
     this.session.connect();
