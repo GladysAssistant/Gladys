@@ -105,3 +105,40 @@ describe('constants DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR / DEVICE_FEATUR
     ]);
   });
 });
+
+describe('constants DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR / DEVICE_FEATURE_TYPES.THERMAL_ENERGY_SENSOR', () => {
+  it('should expose the thermal energy category', () => {
+    expect(DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR).to.equal('thermal-energy-sensor');
+  });
+
+  it('should expose the thermal power and the heat index', () => {
+    expect(DEVICE_FEATURE_TYPES.THERMAL_ENERGY_SENSOR).to.deep.equal({
+      POWER: 'power',
+      INDEX: 'index',
+    });
+  });
+
+  it('should stay distinct from the electricity categories', () => {
+    expect(DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR).to.not.equal(DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR);
+    expect(DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR).to.not.equal(
+      DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    );
+  });
+
+  it('should scope the unit of each type: power units for the power, energy units for the index', () => {
+    const unitsByType = DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE[DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR];
+    expect(unitsByType[DEVICE_FEATURE_TYPES.THERMAL_ENERGY_SENSOR.POWER]).to.deep.equal([
+      DEVICE_FEATURE_UNITS.WATT,
+      DEVICE_FEATURE_UNITS.KILOWATT,
+    ]);
+    expect(unitsByType[DEVICE_FEATURE_TYPES.THERMAL_ENERGY_SENSOR.INDEX]).to.deep.equal([
+      DEVICE_FEATURE_UNITS.WATT_HOUR,
+      DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
+    ]);
+    const categoryUnits = DEVICE_FEATURE_UNITS_BY_CATEGORY[DEVICE_FEATURE_CATEGORIES.THERMAL_ENERGY_SENSOR];
+    Object.values(unitsByType)
+      .flat()
+      .forEach((unit) => expect(categoryUnits).to.include(unit));
+  });
+});
