@@ -291,7 +291,11 @@ describe('message.getPreviousQuestionsForUser', () => {
   it('should stop fetching once the messages hold enough user messages, or after the last batch', async () => {
     const fullBatchWithUserMessages = [];
     for (let i = 0; i < FETCH_MESSAGE_LIMIT; i += 1) {
-      fullBatchWithUserMessages.push({ sender_id: i % 2 === 0 ? 'user-1' : null, text: `message ${i}`, message_type: 'chat' });
+      fullBatchWithUserMessages.push({
+        sender_id: i % 2 === 0 ? 'user-1' : null,
+        text: `message ${i}`,
+        message_type: 'chat',
+      });
     }
     messageFindAll.resolves(fullBatchWithUserMessages);
     await getPreviousQuestionsForUser('user-1');
@@ -438,8 +442,18 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
           message_type: 'tool_call',
           created_at: '2026-11-20T08:03:30.000Z',
         },
-        { sender_id: null, text: 'La lampe a été allumée.', message_type: 'chat', created_at: '2026-11-20T08:03:40.000Z' },
-        { sender_id: null, text: 'Gladys was upgraded', message_type: 'notification', created_at: '2026-11-20T08:04:00.000Z' },
+        {
+          sender_id: null,
+          text: 'La lampe a été allumée.',
+          message_type: 'chat',
+          created_at: '2026-11-20T08:03:40.000Z',
+        },
+        {
+          sender_id: null,
+          text: 'Gladys was upgraded',
+          message_type: 'notification',
+          created_at: '2026-11-20T08:04:00.000Z',
+        },
       ]),
     ).to.deep.equal([
       { question: 'Bonjour', answer: 'Bonjour !' },
@@ -452,7 +466,12 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
     expect(
       buildExchangesFromMessages([
         { sender_id: 'user-1', text: 'Ferme les volets', message_type: 'chat', created_at: '2026-11-20T08:00:00.000Z' },
-        { sender_id: null, text: "J'ai fermé les volets.", message_type: 'chat', created_at: '2026-11-20T08:00:05.000Z' },
+        {
+          sender_id: null,
+          text: "J'ai fermé les volets.",
+          message_type: 'chat',
+          created_at: '2026-11-20T08:00:05.000Z',
+        },
       ]),
     ).to.deep.equal([{ question: 'Ferme les volets', answer: null }]);
   });
@@ -463,7 +482,12 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
     expect(
       buildExchangesFromMessages([
         { sender_id: 'user-1', text: 'Éteins tout', message_type: 'chat', created_at: at(0) },
-        { sender_id: null, text: 'device_turn_on_off({})', message_type: 'tool_call', created_at: at(AI_TURN_MAX_GAP_MS) },
+        {
+          sender_id: null,
+          text: 'device_turn_on_off({})',
+          message_type: 'tool_call',
+          created_at: at(AI_TURN_MAX_GAP_MS),
+        },
         { sender_id: null, text: 'Tout est éteint.', message_type: 'chat', created_at: at(2 * AI_TURN_MAX_GAP_MS) },
         { sender_id: null, text: 'Bonne nuit !', message_type: 'chat', created_at: at(3 * AI_TURN_MAX_GAP_MS + 1) },
       ]),
