@@ -3,6 +3,10 @@ import config from '../config';
 
 const MAX_RETRY = 3;
 const DEFAULT_API_SCOPES = ['dashboard:read', 'dashboard:write'];
+// A renewal of the access token that gets no answer (a network that changed while it was sent)
+// is given up after this long: the reconnection of the websocket waits for it, and would
+// otherwise wait for good (axios has no timeout by default)
+const REFRESH_ACCESS_TOKEN_TIMEOUT_MS = 10 * 1000;
 
 export class HttpClient {
   constructor(session, apiScopes = DEFAULT_API_SCOPES) {
@@ -30,15 +34,23 @@ export class HttpClient {
   }
 
   async refreshAccessToken() {
+    const { resetCount } = this.session;
     const { data } = await axios({
       baseURL: this.localApiUrl,
       url: '/api/v1/access_token',
       method: 'post',
+      timeout: REFRESH_ACCESS_TOKEN_TIMEOUT_MS,
       data: {
         refresh_token: this.session.getRefreshToken(),
         scope: this.apiScopes
       }
     });
+    // The session was closed while the token was being renewed (sign-out, session refused):
+    // nothing of this answer is kept. Saving the token would bring back, in the storage of the
+    // browser and on a live socket, the session the user has just left.
+    if (this.session.resetCount !== resetCount) {
+      throw new Error('SESSION_CLOSED');
+    }
     this.session.setAccessToken(data.access_token);
     // reconnect websocket
     this.session.connect();
