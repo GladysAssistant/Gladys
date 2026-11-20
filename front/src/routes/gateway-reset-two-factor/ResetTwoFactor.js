@@ -125,11 +125,13 @@ const DesktopResetTwoFactor = ({ children, ...props }) => (
         )}
       </div>
     </form>
-    <div class="text-center text-muted">
-      <a href="/login">
-        <Text id="gatewayResetTwoFactor.loginLink" />
-      </a>
-    </div>
+    {!(props.success && props.resetPasswordUrl) && (
+      <div class="text-center text-muted">
+        <a href="/login">
+          <Text id="gatewayResetTwoFactor.loginLink" />
+        </a>
+      </div>
+    )}
   </AuthLayout>
 );
 

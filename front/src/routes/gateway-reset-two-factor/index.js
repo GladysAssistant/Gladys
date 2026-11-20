@@ -3,16 +3,19 @@ import { connect } from 'unistore/preact';
 import get from 'get-value';
 import ResetTwoFactor from './ResetTwoFactor';
 import { RequestStatus } from '../../utils/consts';
+import { getPendingPasswordReset } from '../../utils/pendingPasswordReset';
 
 // Landing page of the link emailed by Gladys Plus to reset the two-factor authentication
 // of a user who lost their app and their recovery codes, with no Gladys connected.
 // The reset only happens on click: an email client prefetching the link must not do it.
-// Asked from a reset password page (the user forgot their password too), the link carries the
-// reset password token: once reset, the page leads straight back to choosing the new password.
+// Asked from a reset password page (the user forgot their password too) in this browser, that
+// page kept its link: once reset, this page leads straight back to choosing the new password.
+// The emailed link never carries it (a leaked link alone would then take the account).
 class ResetTwoFactorPage extends Component {
   state = {
     status: null,
-    error: null
+    error: null,
+    resetPasswordToken: getPendingPasswordReset()
   };
 
   resetTwoFactor = async e => {
@@ -41,7 +44,7 @@ class ResetTwoFactorPage extends Component {
     }
   };
 
-  render({ token, reset_password_token: resetPasswordToken }, { status, error }) {
+  render({ token }, { status, error, resetPasswordToken }) {
     return (
       <ResetTwoFactor
         tokenMissing={!token}

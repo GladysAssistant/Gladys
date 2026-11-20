@@ -4,6 +4,17 @@ import linkState from 'linkstate';
 import get from 'get-value';
 import ResetPassword from './ResetPassword';
 import { RequestStatus } from '../../utils/consts';
+import { savePendingPasswordReset, clearPendingPasswordReset } from '../../utils/pendingPasswordReset';
+
+// The errors of the second factor and of the link, cleared together: an old one must never stay
+// on screen next to a new state
+const NO_ERROR = {
+  errorLink: false,
+  errorUnknown: false,
+  invalidRecoveryCode: false,
+  invalidTwoFactorCode: false,
+  tooManyTwoFactorAttempts: false
+};
 
 class ResetPasswordPage extends Component {
   state = {
@@ -38,7 +49,13 @@ class ResetPasswordPage extends Component {
       const user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
       this.setState({ twoFactorEnabled: user.two_factor_enabled === true });
     } catch (e) {
-      this.setState({ errorLink: true });
+      // only a 404 means the link is dead: a network error or a 5xx must not send the user to
+      // ask for a new link. The form stays usable: the submit reads the link again.
+      if (get(e, 'response.status') === 404) {
+        this.setState({ errorLink: true });
+      } else {
+        this.setState({ errorUnknown: true, linkNotRead: true });
+      }
     }
   };
 
@@ -55,7 +72,7 @@ class ResetPasswordPage extends Component {
     try {
       const user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
       if (user.two_factor_enabled !== true) {
-        this.setState({ twoFactorEnabled: false, twoFactorResetDone: true, useRecoveryCode: false });
+        this.setState({ ...NO_ERROR, twoFactorEnabled: false, twoFactorResetDone: true, useRecoveryCode: false });
       }
     } catch (e) {
       // the submit tells the user if the link is dead
@@ -76,6 +93,8 @@ class ResetPasswordPage extends Component {
     this.setState({ twoFactorResetStatus: RequestStatus.Getting, twoFactorResetError: null });
     try {
       await this.props.session.gatewayClient.requestTwoFactorResetFromPasswordReset(this.props.token);
+      // the landing page of the emailed link, opened in this browser, leads back to this link
+      savePendingPasswordReset(this.props.token);
       this.setState({ twoFactorResetStatus: RequestStatus.Success });
     } catch (e) {
       const status = get(e, 'response.status');
@@ -96,12 +115,12 @@ class ResetPasswordPage extends Component {
 
   showRecoveryCode = e => {
     e.preventDefault();
-    this.setState({ useRecoveryCode: true, invalidRecoveryCode: false });
+    this.setState({ ...NO_ERROR, useRecoveryCode: true });
   };
 
   showTwoFactorCode = e => {
     e.preventDefault();
-    this.setState({ useRecoveryCode: false, invalidRecoveryCode: false });
+    this.setState({ ...NO_ERROR, useRecoveryCode: false });
   };
 
   resetPassword = async e => {
@@ -118,46 +137,59 @@ class ResetPasswordPage extends Component {
     this.setState({
       passwordError: false,
       passwordNotMatching: false,
-      errorLink: false,
-      invalidRecoveryCode: false,
-      invalidTwoFactorCode: false,
-      tooManyTwoFactorAttempts: false,
+      ...NO_ERROR,
       resetInProgress: true
     });
 
+    let user;
     try {
-      const user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
-      const twoFactorEnabled = user.two_factor_enabled === true;
-      if (twoFactorEnabled && this.state.twoFactorEnabled !== true) {
-        // the code was not asked yet (two-factor enabled since the page was loaded)
-        this.setState({ twoFactorEnabled: true, twoFactorResetDone: false, resetInProgress: false });
-      } else {
-        const useRecoveryCode = twoFactorEnabled && this.state.useRecoveryCode;
-        await this.props.session.gatewayClient.resetPassword(
-          user.email,
-          this.state.password,
-          this.props.token,
-          twoFactorEnabled && !useRecoveryCode ? this.state.twoFactorCode : undefined,
-          useRecoveryCode ? this.state.twoFactorRecoveryCode : undefined
-        );
-        this.setState({ success: true, resetInProgress: false });
-      }
+      user = await this.props.session.gatewayClient.getResetPasswordEmail(this.props.token);
     } catch (e) {
-      // A wrong code of the app, or a wrong or already used recovery code, is refused with a 403
-      // (429 after too many wrong codes): the reset link itself is still valid. Only a 404 means
-      // the link is dead — telling a user who mistyped a code to ask for a new link loops them.
+      // reading the link: a 403 or 429 here is not about a code
+      this.setState({ ...this.linkErrorState(e), resetInProgress: false });
+      return;
+    }
+
+    const twoFactorEnabled = user.two_factor_enabled === true;
+    if (twoFactorEnabled && this.state.twoFactorEnabled !== true) {
+      // the code was not asked yet (link not read on load, or two-factor enabled since)
+      this.setState({ twoFactorEnabled: true, twoFactorResetDone: false, linkNotRead: false, resetInProgress: false });
+      return;
+    }
+
+    // captured now: the tab refresh may change the state while the request runs
+    const useRecoveryCode = twoFactorEnabled && this.state.useRecoveryCode;
+    try {
+      await this.props.session.gatewayClient.resetPassword(
+        user.email,
+        this.state.password,
+        this.props.token,
+        twoFactorEnabled && !useRecoveryCode ? this.state.twoFactorCode : undefined,
+        useRecoveryCode ? this.state.twoFactorRecoveryCode : undefined
+      );
+      clearPendingPasswordReset();
+      this.setState({ success: true, resetInProgress: false });
+    } catch (e) {
       const status = get(e, 'response.status');
-      if (this.state.twoFactorEnabled && this.state.useRecoveryCode && (status === 403 || status === 429)) {
-        this.setState({ invalidRecoveryCode: true, resetInProgress: false });
-      } else if (this.state.twoFactorEnabled && status === 403) {
-        this.setState({ invalidTwoFactorCode: true, resetInProgress: false });
-      } else if (this.state.twoFactorEnabled && status === 429) {
+      if (twoFactorEnabled && status === 429) {
+        // too many wrong codes, whatever the kind: the user has to wait, not to try other codes
         this.setState({ tooManyTwoFactorAttempts: true, resetInProgress: false });
+      } else if (twoFactorEnabled && status === 403) {
+        // a wrong code of the app, or a wrong or used recovery code: the link is still valid
+        this.setState({
+          invalidRecoveryCode: useRecoveryCode,
+          invalidTwoFactorCode: !useRecoveryCode,
+          resetInProgress: false
+        });
       } else {
-        this.setState({ errorLink: true, resetInProgress: false });
+        this.setState({ ...this.linkErrorState(e), resetInProgress: false });
       }
     }
   };
+
+  // Only a 404 means the link is dead (used, expired, unknown): anything else (network, 5xx)
+  // must not send the user to ask for a new link
+  linkErrorState = e => (get(e, 'response.status') === 404 ? { errorLink: true } : { errorUnknown: true });
 
   render(
     {},
@@ -165,6 +197,8 @@ class ResetPasswordPage extends Component {
       password,
       success,
       errorLink,
+      errorUnknown,
+      linkNotRead,
       invalidRecoveryCode,
       invalidTwoFactorCode,
       tooManyTwoFactorAttempts,
@@ -188,6 +222,7 @@ class ResetPasswordPage extends Component {
         resetPassword={this.resetPassword}
         success={success}
         errorLink={errorLink}
+        errorUnknown={errorUnknown}
         invalidRecoveryCode={invalidRecoveryCode}
         invalidTwoFactorCode={invalidTwoFactorCode}
         tooManyTwoFactorAttempts={tooManyTwoFactorAttempts}
@@ -195,7 +230,7 @@ class ResetPasswordPage extends Component {
         passwordNotMatching={passwordNotMatching}
         twoFactorEnabled={twoFactorEnabled}
         twoFactorResetDone={twoFactorResetDone}
-        loading={twoFactorEnabled === null && !errorLink}
+        loading={twoFactorEnabled === null && !errorLink && !linkNotRead}
         twoFactorCode={twoFactorCode}
         updateTwoFactorCode={linkState(this, 'twoFactorCode')}
         useRecoveryCode={useRecoveryCode}

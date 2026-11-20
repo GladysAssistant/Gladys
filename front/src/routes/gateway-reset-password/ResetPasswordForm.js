@@ -15,7 +15,15 @@ const ResetPassworFrom = ({ children, ...props }) => (
       )}
       {props.errorLink && (
         <div class="alert alert-danger" role="alert">
-          <Text id="gatewayResetPassword.errorLinkLabel" />
+          <Text id="gatewayResetPassword.errorLinkLabel" />{' '}
+          <a href="/forgot-password">
+            <Text id="gatewayResetPassword.requestNewLink" />
+          </a>
+        </div>
+      )}
+      {props.errorUnknown && (
+        <div class="alert alert-danger" role="alert">
+          <Text id="gatewayResetPassword.errorUnknownLabel" />
         </div>
       )}
       {props.invalidRecoveryCode && (

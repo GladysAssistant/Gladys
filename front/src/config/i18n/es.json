@@ -8136,6 +8136,8 @@
     "formTitle": "Gladys Plus - Restablecer contraseña",
     "incompatibleBrowserLabel": "Lo sentimos, su navegador no es compatible con Gladys Gateway. Su navegador debe admitir la API WebCrypto y las bases de datos IndexedDB.",
     "errorLinkLabel": "No podemos recuperar su enlace de restablecimiento de contraseña. Es posible que ya se haya utilizado o que haya caducado.",
+    "requestNewLink": "Solicitar un nuevo enlace",
+    "errorUnknownLabel": "No se pudo contactar con Gladys Plus. Compruebe su conexión e inténtelo de nuevo: su enlace de restablecimiento puede seguir siendo válido.",
     "invalidRecoveryCodeLabel": "Este código de recuperación no es válido o ya se ha utilizado. Su enlace de restablecimiento de contraseña sigue siendo válido; vuelva a intentarlo con otro código de recuperación.",
     "invalidTwoFactorCodeLabel": "Este código 2FA no es válido. Su enlace de restablecimiento sigue siendo válido: inténtelo de nuevo con un nuevo código generado por su aplicación.",
     "tooManyTwoFactorAttemptsLabel": "Demasiados códigos 2FA no válidos: espere unos minutos antes de volver a intentarlo. Su enlace de restablecimiento sigue siendo válido.",

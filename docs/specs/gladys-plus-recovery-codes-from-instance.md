@@ -137,11 +137,16 @@ the instance was offline is refused, and kept, if the instance came back online 
    your password" danger tile).
 3. The link opens `GLADYS_PLUS_FRONTEND_URL/reset-two-factor?token=…`: the reset happens **on
    click** of a button, never on page load (email clients prefetch links). Requested from the
-   reset password page, the link also carries that page's token
-   (`&reset_password_token=…`): once the reset is done, the page leads to **Choose my new
-   password** (`/reset-password?token=…`) instead of the sign-in, so a user who lost both the
-   password and the app is never sent to sign in with a password they never saved. Both links
-   land in the same mailbox: carrying one in the other exposes nothing new.
+   reset password page, that page keeps its own link **in the browser** (`localStorage`, at most
+   two hours, dropped once the password is changed): opened in the same browser, the landing
+   page leads to **Choose my new password** (`/reset-password?token=…`) instead of the sign-in,
+   so a user who lost both the password and the app is never sent to sign in with a password
+   they never saved. The emailed link **never carries the reset password token**: with both
+   tokens in one URL, a single leaked link (browser history, `Referer`, access logs, a reply
+   quoting the email) would disable the second factor and then set a new password. Opened
+   elsewhere, the email tells the user to go back to the reset password page; if that link has
+   expired meanwhile (it is valid two hours after its own email, the two-factor link one hour
+   after its request), the page offers to request a new one, which no longer asks for a code.
 4. The Gateway disables two-factor on the account: `two_factor_enabled = false`, secret and
    recovery codes removed, failed attempts counter cleared, token deleted. The user is emailed
    (`two_factor_reset_done`). At the next login the Gateway returns an access token with the
@@ -157,9 +162,9 @@ the instance was offline is refused, and kept, if the instance came back online 
   `{ firstname, twoFactorResetUrlGladys4, fromPasswordReset: false }`.
 - `POST /users/reset-password/:token/two-factor/reset-request` — no auth, rate limited; `:token`
   is an unused, unexpired reset password token (`404` otherwise). Same behaviour and errors.
-  The reset password link stays usable afterwards. The emailed link is
-  `/reset-two-factor?token=…&reset_password_token=<:token>` and the scope says
-  `fromPasswordReset: true` (the email then announces the new password step).
+  The reset password link stays usable afterwards. The scope says
+  `fromPasswordReset: true` (the email then announces the new password step). The link is the
+  same `/reset-two-factor?token=…` as from the login: it never carries the reset password token.
 - `POST /users/two-factor/reset` — no auth, rate limited; body `{ token }`. `200
   { two_factor_enabled: false }`. `404 TOKEN_NOT_FOUND` (unknown, used, expired or malformed),
   `403 INSTANCE_CONNECTED` (link kept). Email `two_factor_reset_done` with `{ firstname }`; a
@@ -192,15 +197,19 @@ the instance was offline is refused, and kept, if the instance came back online 
   a first submit that looked like it saved the password. Back on the tab after the reset (page
   visible again, email sent), it reads the link again: two-factor gone, the code is no longer
   asked ("Your two-factor authentication was reset: choose your new password"). A wrong code
-  of the app (`403`) or too many wrong codes (`429`) say so and that the link is still valid;
-  only a `404` says the link is dead.
-- `routes/gateway-reset-two-factor` (`/reset-two-factor?token=&reset_password_token=`): one
-  button, states under `gatewayResetTwoFactor.*`; with a `reset_password_token`, the
+  of the app or recovery code (`403` on the reset itself) and too many wrong codes (`429`, for
+  either kind) say so and that the link is still valid; **only a `404` says the link is dead**,
+  with a way to request a new one (`/forgot-password`). Any other failure (network, `5xx`, a
+  refusal while reading the link) says Gladys Plus could not be reached, and the form stays
+  usable. Requesting the reset by email stores the reset password token in the browser
+  (`utils/pendingPasswordReset.js`).
+- `routes/gateway-reset-two-factor` (`/reset-two-factor?token=`): one button, states under
+  `gatewayResetTwoFactor.*`; when this browser holds a pending reset password link, the
   description and the success say the new password comes next, and the success leads to
-  `/reset-password?token=<reset_password_token>`.
+  `/reset-password?token=<that token>` (the sign-in link is then hidden).
 - `gatewayLogin.noRecoveryCode`, the `password_reset` and the `welcome_back` emails no longer
   ask the user to write to support: they point to the instance (section B, Settings › Users)
-  and to the reset by email. `welcome_back` (an account re-linked to a new subscription, whose
+  and to the reset by email, without quoting labels of the front. `welcome_back` (an account re-linked to a new subscription, whose
   user rarely remembers the old password) also links to the forgot password page
   (`forgotPasswordUrl`).
 - On a phone these three screens have their phone layout (`mobile-pages/auth.md` D.1, D.6,

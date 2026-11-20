@@ -8136,6 +8136,8 @@
     "formTitle": "Gladys Plus - Passwort zurücksetzen",
     "incompatibleBrowserLabel": "Dein Browser ist leider nicht mit dem Gladys Gateway kompatibel. Dein Browser muss die WebCrypto-API sowie IndexedDB-Datenbanken unterstützen.",
     "errorLinkLabel": "Wir können deinen Link zum Zurücksetzen des Passworts nicht abrufen. Vielleicht wurde er bereits verwendet oder ist abgelaufen.",
+    "requestNewLink": "Neuen Link anfordern",
+    "errorUnknownLabel": "Gladys Plus ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut: Dein Link zum Zurücksetzen ist vielleicht noch gültig.",
     "invalidRecoveryCodeLabel": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet. Dein Link zum Zurücksetzen des Passworts ist weiterhin gültig, versuche es mit einem anderen Wiederherstellungscode.",
     "invalidTwoFactorCodeLabel": "Dieser 2FA-Code ist ungültig. Dein Link zum Zurücksetzen ist weiterhin gültig: Versuche es mit einem neuen Code aus deiner App erneut.",
     "tooManyTwoFactorAttemptsLabel": "Zu viele ungültige 2FA-Codes: Warte ein paar Minuten, bevor du es erneut versuchst. Dein Link zum Zurücksetzen ist weiterhin gültig.",

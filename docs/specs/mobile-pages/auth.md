@@ -239,7 +239,8 @@ second), then — when the account has two-factor authentication — the code of
 recovery code, with the rows of D.1 under it (the reset by e-mail goes through the reset
 password token here). Whether the code is asked is known when the page opens: the button waits
 for it. A refused recovery code or code of the app shows next to its field; a dead link, too
-many wrong codes and a refused reset request show in the bottom bar. Back on the page once the
+many wrong codes, Gladys Plus out of reach and a refused reset request show in the bottom bar
+(a dead link with **Request a new link**). Back on the page once the
 two-factor authentication was reset from the e-mail, the code field goes away and a notice says
 to choose the new password. Once the password is changed: a success notice and **Log in** in the
 bottom bar.
@@ -250,7 +251,7 @@ The landing page of the reset e-mail: what the reset does, and **Reset my two-fa
 authentication** in the bottom bar — **nothing is reset before that button is tapped**, as on
 desktop (an e-mail client prefetching the link must not do it). Then the success as a notice
 with **Log in** in the bottom bar — or **Choose my new password** when the reset was asked from
-the new password page (D.6); a refusal (dead link, instance connected again, unknown)
+the new password page (D.6) in this browser; a refusal (dead link, instance connected again, unknown)
 shows above the button; a link without a token only shows the refusal and the way to the
 sign-in.
 

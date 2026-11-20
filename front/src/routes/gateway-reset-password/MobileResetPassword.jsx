@@ -29,7 +29,16 @@ const RESET_TWO_FACTOR_ERRORS = {
 const MobileResetPassword = props => {
   let barError = null;
   if (props.errorLink) {
-    barError = <Text id="gatewayResetPassword.errorLinkLabel" />;
+    barError = (
+      <span>
+        <Text id="gatewayResetPassword.errorLinkLabel" />{' '}
+        <a href="/forgot-password" data-cy="gateway-reset-password-new-link">
+          <Text id="gatewayResetPassword.requestNewLink" />
+        </a>
+      </span>
+    );
+  } else if (props.errorUnknown) {
+    barError = <Text id="gatewayResetPassword.errorUnknownLabel" />;
   } else if (props.tooManyTwoFactorAttempts) {
     barError = <Text id="gatewayResetPassword.tooManyTwoFactorAttemptsLabel" />;
   } else if (props.twoFactorResetStatus === RequestStatus.Error && RESET_TWO_FACTOR_ERRORS[props.twoFactorResetError]) {
