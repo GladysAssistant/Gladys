@@ -144,13 +144,14 @@ describe('message.create', () => {
       is_read: true,
       created_at: new Date('2023-02-09T09:58:05.766Z'),
     });
-    // sent by a scene long after the AI turn of "Question 2": kept in the history, as a scene message
+    // sent by a scene after the answer to "Question 2" (an AI turn without tool call sends a single
+    // message): kept in the history, as a scene message
     await db.Message.create({
       text: 'Spontaneous message 3',
       sender_id: null,
       receiver_id: userId,
       is_read: true,
-      created_at: new Date('2023-02-09T10:30:05.766Z'),
+      created_at: new Date('2023-02-09T10:00:05.766Z'),
     });
     const messageHandler = new MessageHandler(event, brain, service, {}, variable);
     const message = {

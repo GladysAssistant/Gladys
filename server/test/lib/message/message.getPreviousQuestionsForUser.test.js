@@ -11,14 +11,20 @@ const {
   buildExchangesFromMessages,
   limitExchanges,
   exchangesToApiMessages,
+  buildChatApiMessages,
   isChatHistoryMessage,
+  isWithinAiTurnGap,
   isPartOfAiTurn,
   isUnverifiedActionConfirmation,
   resolveAnswerForAiContext,
+  formatSceneMessage,
+  stripSceneMessagePrefix,
   FETCH_MESSAGE_LIMIT,
+  MAX_FETCH_BATCHES,
   EXCHANGE_LIMIT,
   SCENE_MESSAGE_LIMIT,
-  AI_TURN_MAX_DURATION_MS,
+  MAX_SCENE_MESSAGE_CHARS,
+  AI_TURN_MAX_GAP_MS,
   SCENE_MESSAGE_PREFIX,
 } = proxyquire('../../../lib/message/message.getPreviousQuestionsForUser', {
   '../../models': {
@@ -30,7 +36,7 @@ const {
 
 describe('message.getPreviousQuestionsForUser', () => {
   beforeEach(() => {
-    messageFindAll.resetHistory();
+    messageFindAll.reset();
     messageFindAll.resolves([]);
   });
 
@@ -176,13 +182,19 @@ describe('message.getPreviousQuestionsForUser', () => {
       { question: null, answer: '[Scene message] Le cycle de séchage est terminé.' },
       { question: null, answer: '[Scene message] Faut-il éteindre le sèche-linge ?' },
     ]);
+    // one assistant message: some chat templates require the roles to alternate
     expect(exchangesToApiMessages(exchanges)).to.deep.equal([
       { role: 'user', content: 'Peux-tu refaire la scène pour Livine et pour Noam ?' },
-      { role: 'assistant', content: 'Les deux scènes ont été créées avec succès.' },
-      { role: 'assistant', content: '[Scene message] Le cycle de lavage est terminé.' },
-      { role: 'assistant', content: '[Scene message] Faut-il éteindre la machine à laver ?' },
-      { role: 'assistant', content: '[Scene message] Le cycle de séchage est terminé.' },
-      { role: 'assistant', content: '[Scene message] Faut-il éteindre le sèche-linge ?' },
+      {
+        role: 'assistant',
+        content: [
+          'Les deux scènes ont été créées avec succès.',
+          '[Scene message] Le cycle de lavage est terminé.',
+          '[Scene message] Faut-il éteindre la machine à laver ?',
+          '[Scene message] Le cycle de séchage est terminé.',
+          '[Scene message] Faut-il éteindre le sèche-linge ?',
+        ].join('\n\n'),
+      },
     ]);
   });
 
@@ -243,7 +255,58 @@ describe('message.getPreviousQuestionsForUser', () => {
 
     assert.calledOnce(messageFindAll);
     expect(messageFindAll.firstCall.args[0].limit).to.equal(FETCH_MESSAGE_LIMIT);
+    expect(messageFindAll.firstCall.args[0].offset).to.equal(0);
     expect(messageFindAll.firstCall.args[0].attributes).to.include('created_at');
+  });
+
+  it('should fetch older messages when the recent ones hold too few user messages', async () => {
+    const sceneMessages = [];
+    for (let i = 0; i < FETCH_MESSAGE_LIMIT; i += 1) {
+      sceneMessages.push({
+        sender_id: null,
+        text: `scene ${FETCH_MESSAGE_LIMIT - i}`,
+        message_type: 'chat',
+        created_at: new Date(Date.UTC(2026, 10, 20, 12, FETCH_MESSAGE_LIMIT - i)),
+      });
+    }
+    messageFindAll.onFirstCall().resolves(sceneMessages);
+    messageFindAll.onSecondCall().resolves([
+      { sender_id: null, text: 'answer', message_type: 'chat', created_at: new Date('2026-11-20T08:00:10.000Z') },
+      { sender_id: 'user-1', text: 'question', message_type: 'chat', created_at: new Date('2026-11-20T08:00:00.000Z') },
+    ]);
+
+    const exchanges = await getPreviousQuestionsForUser('user-1');
+
+    assert.calledTwice(messageFindAll);
+    expect(messageFindAll.secondCall.args[0].offset).to.equal(FETCH_MESSAGE_LIMIT);
+    expect(exchanges[0]).to.deep.equal({ question: 'question', answer: 'answer' });
+    expect(exchanges.slice(1).map((exchange) => exchange.answer)).to.deep.equal(
+      sceneMessages
+        .slice(0, SCENE_MESSAGE_LIMIT)
+        .reverse()
+        .map((message) => `[Scene message] ${message.text}`),
+    );
+  });
+
+  it('should stop fetching once the messages hold enough user messages, or after the last batch', async () => {
+    const fullBatchWithUserMessages = [];
+    for (let i = 0; i < FETCH_MESSAGE_LIMIT; i += 1) {
+      fullBatchWithUserMessages.push({ sender_id: i % 2 === 0 ? 'user-1' : null, text: `message ${i}`, message_type: 'chat' });
+    }
+    messageFindAll.resolves(fullBatchWithUserMessages);
+    await getPreviousQuestionsForUser('user-1');
+    assert.calledOnce(messageFindAll);
+
+    messageFindAll.resetHistory();
+    const fullBatchOfNotifications = Array.from({ length: FETCH_MESSAGE_LIMIT }, () => ({
+      sender_id: null,
+      text: 'Weekly digest',
+      message_type: 'notification',
+    }));
+    messageFindAll.resolves(fullBatchOfNotifications);
+    const exchanges = await getPreviousQuestionsForUser('user-1');
+    expect(messageFindAll.callCount).to.equal(MAX_FETCH_BATCHES);
+    expect(exchanges).to.deep.equal([]);
   });
 
   it('should exclude tool_call traces from AI context', async () => {
@@ -338,48 +401,75 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
     ).to.deep.equal([{ question: 'Ferme mes volets', answer: null }]);
   });
 
-  it('should join the assistant chat replies sent during the AI turn of a user message', () => {
+  it('should join the replies of an AI turn with tool calls', () => {
     expect(
       buildExchangesFromMessages([
-        { sender_id: 'user-1', text: 'question', message_type: 'chat' },
-        { sender_id: null, text: 'first answer', message_type: 'chat' },
-        { sender_id: null, text: '', message_type: 'chat' },
-        { sender_id: null, text: 'second answer', message_type: 'chat' },
-      ]),
-    ).to.deep.equal([{ question: 'question', answer: 'first answer\n\nsecond answer' }]);
-  });
-
-  it('should only omit the unverified action confirmations among the replies of an AI turn', () => {
-    expect(
-      buildExchangesFromMessages([
-        { sender_id: 'user-1', text: 'Montre-moi le jardin et ferme les volets', message_type: 'chat' },
+        { sender_id: 'user-1', text: 'Montre-moi le jardin', message_type: 'chat' },
+        { sender_id: null, text: 'camera_get_image({"camera":"Jardin"})', message_type: 'tool_call' },
         { sender_id: null, text: "Voici l'image de la caméra.", message_type: 'chat' },
-        { sender_id: null, text: "J'ai fermé les volets.", message_type: 'chat' },
+        { sender_id: null, text: '', message_type: 'chat' },
+        { sender_id: null, text: 'On voit une voiture devant le garage.', message_type: 'chat' },
       ]),
-    ).to.deep.equal([{ question: 'Montre-moi le jardin et ferme les volets', answer: "Voici l'image de la caméra." }]);
+    ).to.deep.equal([
+      {
+        question: 'Montre-moi le jardin',
+        answer: "Voici l'image de la caméra.\n\nOn voit une voiture devant le garage.",
+      },
+    ]);
   });
 
-  it('should tell the messages sent by scenes from the AI turn by their date', () => {
-    const questionDate = new Date('2026-11-20T08:00:00.000Z');
-    const lastAiTurnDate = new Date(questionDate.getTime() + AI_TURN_MAX_DURATION_MS);
-    const afterAiTurnDate = new Date(lastAiTurnDate.getTime() + 1000);
+  it('should end an AI turn without tool call at its only reply, whatever comes next', () => {
+    // the AI answers without any tool, then a scene writes a few minutes later: the scene message must
+    // neither be merged into the answer nor dropped by the unverified-action guard
     expect(
       buildExchangesFromMessages([
-        { sender_id: 'user-1', text: 'Ferme les volets', message_type: 'chat', created_at: questionDate },
-        { sender_id: null, text: "J'ai fermé les volets.", message_type: 'chat', created_at: lastAiTurnDate },
+        { sender_id: 'user-1', text: 'Bonjour', message_type: 'chat', created_at: '2026-11-20T08:00:00.000Z' },
+        { sender_id: null, text: 'Bonjour !', message_type: 'chat', created_at: '2026-11-20T08:00:05.000Z' },
+        {
+          sender_id: null,
+          text: 'La porte du garage a été ouverte il y a 10 min. Faut-il la fermer ?',
+          message_type: 'chat',
+          created_at: '2026-11-20T08:03:00.000Z',
+        },
         // an "ask the AI" scene action: its tool calls do not belong to the user message above
         {
           sender_id: null,
           text: 'device_turn_on_off({"device":"Lampe"})',
           message_type: 'tool_call',
-          created_at: afterAiTurnDate,
+          created_at: '2026-11-20T08:03:30.000Z',
         },
-        { sender_id: null, text: 'La lampe a été allumée.', message_type: 'chat', created_at: afterAiTurnDate },
-        { sender_id: null, text: 'Gladys was upgraded', message_type: 'notification', created_at: afterAiTurnDate },
+        { sender_id: null, text: 'La lampe a été allumée.', message_type: 'chat', created_at: '2026-11-20T08:03:40.000Z' },
+        { sender_id: null, text: 'Gladys was upgraded', message_type: 'notification', created_at: '2026-11-20T08:04:00.000Z' },
       ]),
     ).to.deep.equal([
-      { question: 'Ferme les volets', answer: null },
+      { question: 'Bonjour', answer: 'Bonjour !' },
+      { question: null, answer: '[Scene message] La porte du garage a été ouverte il y a 10 min. Faut-il la fermer ?' },
       { question: null, answer: `${SCENE_MESSAGE_PREFIX} La lampe a été allumée.` },
+    ]);
+  });
+
+  it('should still omit an unverified action claimed by an AI turn without tool call', () => {
+    expect(
+      buildExchangesFromMessages([
+        { sender_id: 'user-1', text: 'Ferme les volets', message_type: 'chat', created_at: '2026-11-20T08:00:00.000Z' },
+        { sender_id: null, text: "J'ai fermé les volets.", message_type: 'chat', created_at: '2026-11-20T08:00:05.000Z' },
+      ]),
+    ).to.deep.equal([{ question: 'Ferme les volets', answer: null }]);
+  });
+
+  it('should keep a long AI turn with tool calls as long as its messages follow each other closely', () => {
+    const start = new Date('2026-11-20T08:00:00.000Z').getTime();
+    const at = (delay) => new Date(start + delay);
+    expect(
+      buildExchangesFromMessages([
+        { sender_id: 'user-1', text: 'Éteins tout', message_type: 'chat', created_at: at(0) },
+        { sender_id: null, text: 'device_turn_on_off({})', message_type: 'tool_call', created_at: at(AI_TURN_MAX_GAP_MS) },
+        { sender_id: null, text: 'Tout est éteint.', message_type: 'chat', created_at: at(2 * AI_TURN_MAX_GAP_MS) },
+        { sender_id: null, text: 'Bonne nuit !', message_type: 'chat', created_at: at(3 * AI_TURN_MAX_GAP_MS + 1) },
+      ]),
+    ).to.deep.equal([
+      { question: 'Éteins tout', answer: 'Tout est éteint.' },
+      { question: null, answer: '[Scene message] Bonne nuit !' },
     ]);
   });
 
@@ -393,11 +483,40 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
     ).to.deep.equal([{ question: null, answer: '[Scene message] scene' }]);
   });
 
-  it('should keep a Gladys message with the user message before it when a date is missing', () => {
-    expect(isPartOfAiTurn('2026-11-20T08:00:00.000Z', '2026-11-20T08:04:59.000Z')).to.equal(true);
-    expect(isPartOfAiTurn('2026-11-20T08:00:00.000Z', '2026-11-20T08:05:01.000Z')).to.equal(false);
-    expect(isPartOfAiTurn(undefined, '2026-11-20T08:05:01.000Z')).to.equal(true);
-    expect(isPartOfAiTurn('2026-11-20T08:00:00.000Z', undefined)).to.equal(true);
+  it('should keep a Gladys message in the AI turn when a date is missing', () => {
+    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', '2026-11-20T08:04:59.000Z')).to.equal(true);
+    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', '2026-11-20T08:05:01.000Z')).to.equal(false);
+    expect(isWithinAiTurnGap(undefined, '2026-11-20T08:05:01.000Z')).to.equal(true);
+    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', undefined)).to.equal(true);
+    expect(isWithinAiTurnGap(null, '2026-11-20T08:05:01.000Z')).to.equal(true);
+    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', null)).to.equal(true);
+    expect(isWithinAiTurnGap('not a date', '2026-11-20T08:05:01.000Z')).to.equal(true);
+  });
+
+  it('should tell whether a Gladys message belongs to an AI turn', () => {
+    const lastMessageAt = '2026-11-20T08:00:00.000Z';
+    const message = { created_at: '2026-11-20T08:01:00.000Z' };
+    expect(isPartOfAiTurn({ lastMessageAt, answers: [], hadToolCall: false }, message)).to.equal(true);
+    expect(isPartOfAiTurn({ lastMessageAt, answers: ['Bonjour !'], hadToolCall: false }, message)).to.equal(false);
+    expect(isPartOfAiTurn({ lastMessageAt, answers: ['Voici'], hadToolCall: true }, message)).to.equal(true);
+    expect(
+      isPartOfAiTurn({ lastMessageAt, answers: [], hadToolCall: true }, { created_at: '2026-11-20T08:06:00.000Z' }),
+    ).to.equal(false);
+  });
+
+  it('should truncate long scene messages and strip a copied prefix', () => {
+    expect(formatSceneMessage('Lavage terminé.')).to.equal('[Scene message] Lavage terminé.');
+    expect(formatSceneMessage('x'.repeat(MAX_SCENE_MESSAGE_CHARS))).to.equal(
+      `[Scene message] ${'x'.repeat(MAX_SCENE_MESSAGE_CHARS)}`,
+    );
+    expect(formatSceneMessage('x'.repeat(MAX_SCENE_MESSAGE_CHARS + 1))).to.equal(
+      `[Scene message] ${'x'.repeat(MAX_SCENE_MESSAGE_CHARS)}…`,
+    );
+    expect(stripSceneMessagePrefix(`${SCENE_MESSAGE_PREFIX} Le sèche-linge est éteint.`)).to.equal(
+      'Le sèche-linge est éteint.',
+    );
+    expect(stripSceneMessagePrefix('[Scene message] [Scene message]  Éteint.')).to.equal('Éteint.');
+    expect(stripSceneMessagePrefix('Le [Scene message] reste.')).to.equal('Le [Scene message] reste.');
   });
 
   it('should count user exchanges only and cap the messages sent by scenes', () => {
@@ -436,11 +555,71 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
       { question: null, answer: '[Scene message] scene b' },
     ]);
     expect(limitExchanges([])).to.deep.equal([]);
+    expect(
+      limitExchanges(
+        [
+          { question: 'question 1', answer: 'answer 1' },
+          { question: 'question 2', answer: 'answer 2' },
+          { question: null, answer: '[Scene message] scene a' },
+          { question: null, answer: '[Scene message] scene b' },
+        ],
+        { exchangeLimit: 1, sceneMessageLimit: 1 },
+      ),
+    ).to.deep.equal([
+      { question: 'question 2', answer: 'answer 2' },
+      { question: null, answer: '[Scene message] scene b' },
+    ]);
   });
 
   it('should skip exchanges without a user question when converting to API messages', () => {
     expect(exchangesToApiMessages([{ question: null, answer: 'Bonjour' }])).to.deep.equal([
       { role: 'assistant', content: 'Bonjour' },
     ]);
+  });
+
+  it('should merge assistant messages in a row, but not user messages', () => {
+    expect(
+      exchangesToApiMessages([
+        { question: 'Ferme les volets', answer: null },
+        { question: 'Quelle heure est-il ?', answer: 'Il est 8 h.' },
+        { question: null, answer: '[Scene message] Lavage terminé.' },
+        { question: 'Merci', answer: null },
+      ]),
+    ).to.deep.equal([
+      { role: 'user', content: 'Ferme les volets' },
+      { role: 'user', content: 'Quelle heure est-il ?' },
+      { role: 'assistant', content: 'Il est 8 h.\n\n[Scene message] Lavage terminé.' },
+      { role: 'user', content: 'Merci' },
+    ]);
+  });
+
+  it('should move the scene messages sent before the first user message to the system message', () => {
+    expect(
+      buildChatApiMessages('System prompt', [
+        { question: null, answer: '[Scene message] Lavage terminé.' },
+        { question: null, answer: '[Scene message] Faut-il éteindre la machine ?' },
+        { question: 'Oui', answer: "C'est éteint." },
+      ]),
+    ).to.deep.equal([
+      {
+        role: 'system',
+        content: [
+          'System prompt',
+          '',
+          'Messages sent to the user by their scenes before the conversation below:',
+          '[Scene message] Lavage terminé.',
+          '',
+          '[Scene message] Faut-il éteindre la machine ?',
+        ].join('\n'),
+      },
+      { role: 'user', content: 'Oui' },
+      { role: 'assistant', content: "C'est éteint." },
+    ]);
+    expect(buildChatApiMessages('System prompt', [{ question: 'Hi', answer: 'Hello' }])).to.deep.equal([
+      { role: 'system', content: 'System prompt' },
+      { role: 'user', content: 'Hi' },
+      { role: 'assistant', content: 'Hello' },
+    ]);
+    expect(buildChatApiMessages('System prompt', null)).to.deep.equal([{ role: 'system', content: 'System prompt' }]);
   });
 });

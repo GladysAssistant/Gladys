@@ -16,7 +16,7 @@ const {
 const { Error402, Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
-const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
+const { buildChatApiMessages, stripSceneMessagePrefix } = require('../message/message.getPreviousQuestionsForUser');
 const { resolveAiChatModel } = require('../../utils/aiChatModels');
 const { filterMcpToolsByCategories } = require('./gateway.classifyAiChatToolCategories');
 const { describeAiChatError } = require('./gateway.aiChat');
@@ -519,10 +519,10 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     logger.debug(`[AI_CHAT] Using timezone=${timezoneName}`);
 
     // Build a compact conversation for the model.
-    const messagesForApi = [
-      { role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName, new Date(), { includeSceneRules }) },
-    ];
-    messagesForApi.push(...exchangesToApiMessages(previousQuestions));
+    const messagesForApi = buildChatApiMessages(
+      buildSystemPromptWithCurrentTime(timezoneName, new Date(), { includeSceneRules }),
+      previousQuestions,
+    );
 
     const userContent = [];
     if (message.text) {
@@ -724,7 +724,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       logger.info('[AI_CHAT] Assistant returned NO_RESPONSE sentinel');
       finalAnswer = '';
     }
-    finalAnswer = stripToolTraceEchoFromAnswer(finalAnswer);
+    // the history marks the messages sent by scenes with a prefix: a model copying it must not show
+    // it to the user (chat, messaging channels, voice)
+    finalAnswer = stripSceneMessagePrefix(stripToolTraceEchoFromAnswer(finalAnswer));
     if (rawFinalAnswer && !finalAnswer) {
       logger.info(
         `[AI_CHAT] Final answer emptied after stripping tool traces. raw=${debugPreview(rawFinalAnswer, 150)}`,

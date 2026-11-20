@@ -200,8 +200,9 @@ module.exports = function UserController(gladys) {
     // Try to send the link or the code to the user if he has configured an external service like Telegram.
     // One message: a channel like email sends each message on its own, and a mail holding nothing
     // but a link is easily dropped as spam, leaving the user with the text and no link.
+    // A notification: a chat message would be replayed to the AI provider in the conversation history.
     try {
-      await gladys.message.sendToUser(user.selector, `${text}\n${secret}`);
+      await gladys.message.sendToUser(user.selector, `${text}\n${secret}`, null, { messageType: 'notification' });
     } catch (e) {
       logger.error(`Error while sending forgot password message to user ${user.email}:`, e);
     }

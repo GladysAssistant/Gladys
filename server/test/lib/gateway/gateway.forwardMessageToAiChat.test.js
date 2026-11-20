@@ -1100,6 +1100,32 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     });
   });
 
+  it('should strip a copied scene message prefix and move earlier scene messages to the system message', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [{ message: { content: '[Scene message] Le sèche-linge est éteint.' } }],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'Oui', user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [{ question: null, answer: '[Scene message] Faut-il éteindre le sèche-linge ?' }],
+      context: {},
+    });
+
+    expect(result).to.deep.equal({ answer: 'Le sèche-linge est éteint.', imagesSent: 0 });
+    assert.calledOnceWithExactly(reply, message, 'Le sèche-linge est éteint.');
+    const { messages } = aiChat.getCall(0).args[0];
+    expect(messages).to.have.lengthOf(2);
+    expect(messages[0].role).to.equal('system');
+    expect(messages[0].content).to.include(
+      'Messages sent to the user by their scenes before the conversation below:\n[Scene message] Faut-il éteindre le sèche-linge ?',
+    );
+    expect(messages[1]).to.deep.equal({ role: 'user', content: [{ type: 'text', text: 'Oui' }] });
+  });
+
   it('should not send a text reply when the final answer is only a tool trace echo', async () => {
     const { forwardMessageToAiChat } = getModule({ tools: [] });
     const aiChat = fake.resolves({
