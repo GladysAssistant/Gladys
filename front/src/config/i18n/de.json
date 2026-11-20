@@ -133,6 +133,16 @@
     }
   },
   "device": {
+    "setValueError": {
+      "unreachable": "Der an „{{name}}“ gesendete Befehl ist fehlgeschlagen. Das Gerät ist möglicherweise nicht erreichbar.",
+      "notConfigured": "Der Befehl wurde nicht an „{{name}}“ gesendet: Die Integration ist nicht konfiguriert oder nicht verbunden.",
+      "refused": "Der an „{{name}}“ gesendete Befehl wurde abgelehnt.",
+      "notFound": "Der Befehl wurde nicht gesendet: Dieses Gerät oder seine Integration existiert in Gladys nicht mehr.",
+      "gladysUnreachable": "Gladys ist nicht erreichbar: Der Befehl wurde möglicherweise nicht gesendet.",
+      "gladysUnreachableSeveral": "Gladys ist nicht erreichbar: Die Befehle wurden möglicherweise nicht gesendet.",
+      "several": "Die an {{count}} Geräte gesendeten Befehle sind fehlgeschlagen.",
+      "unknownDevice": "Der Befehl ist fehlgeschlagen. Das Gerät ist möglicherweise nicht erreichbar."
+    },
     "searchPlaceHolder": "Gerät suchen",
     "noRoom": "Kein Raum",
     "noFeatures": "Keine Funktionen",
