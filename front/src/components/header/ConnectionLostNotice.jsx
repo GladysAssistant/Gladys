@@ -5,6 +5,7 @@ import config from '../../config';
 import { isUrlInArray } from '../../utils/url';
 import { isGladysReachable } from '../../utils/connectionError';
 import { isPageReloadable } from '../../utils/reloadablePage';
+import { setConnectionNoticeShown } from '../../utils/connectionNotice';
 import { PAGES_WITHOUT_HEADER } from './index';
 import style from './style.css';
 
@@ -146,13 +147,29 @@ class ConnectionLostNotice extends Component {
     } else {
       this.checkInProgress = true;
     }
-    const { session } = this.props;
+    // a press and the timer may ask at the same time: only the last question asked is
+    // answered, an older answer would bring back what a newer one already said
+    this.probeCount = (this.probeCount || 0) + 1;
+    const probe = this.probeCount;
+    const { session, currentUrl } = this.props;
     const reachable = await isGladysReachable();
     if (!byUser) {
       this.checkInProgress = false;
     }
     // the notice left, or belongs to another session, while Gladys was being asked
     if (this.unmounted || session !== this.props.session || !this.isActive()) {
+      return;
+    }
+    if (probe !== this.probeCount) {
+      if (byUser) {
+        this.setState({ checking: false });
+      }
+      return;
+    }
+    // "Retry" reloads the page it was pressed on: after a move to another page meanwhile,
+    // reloading would lose what was typed there
+    if (byUser && reachable && currentUrl !== this.props.currentUrl) {
+      this.setState({ reachable, checking: false, stillUnreachable: false });
       return;
     }
     if (reachable && this.reachableSince === null) {
@@ -222,6 +239,7 @@ class ConnectionLostNotice extends Component {
 
   componentDidMount() {
     this.listenTo(this.props.session);
+    setConnectionNoticeShown(this.isActive());
     if (this.isActive()) {
       this.startChecking();
     }
@@ -243,6 +261,7 @@ class ConnectionLostNotice extends Component {
   componentDidUpdate(previousProps, previousState) {
     const wasActive = this.isActive(previousProps, previousState);
     const isActive = this.isActive();
+    setConnectionNoticeShown(isActive);
     if (isActive && !wasActive) {
       this.startChecking();
     } else if (!isActive && this.checkInterval) {
@@ -255,6 +274,7 @@ class ConnectionLostNotice extends Component {
 
   componentWillUnmount() {
     this.unmounted = true;
+    setConnectionNoticeShown(false);
     this.stopListeningTo(this.props.session);
     clearTimeout(this.graceTimer);
     clearInterval(this.checkInterval);

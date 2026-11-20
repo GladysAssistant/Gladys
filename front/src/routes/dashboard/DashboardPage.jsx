@@ -180,11 +180,14 @@ const DashboardPage = ({ children, ...props }) => {
                     <Text id="dashboard.gatewayInstanceNotFoundError" />
                   </div>
                 )}
-                {props.dashboardLoadFailed && (
-                  <div class="alert alert-warning" data-cy="dashboard-load-error">
-                    <Text id="dashboard.loadError" />
-                  </div>
-                )}
+                {/* a live region that is always there: a failure after the page mounted is read */}
+                <div aria-live="polite">
+                  {props.dashboardLoadFailed && (
+                    <div class="alert alert-warning" data-cy="dashboard-load-error">
+                      <Text id="dashboard.loadError" />
+                    </div>
+                  )}
+                </div>
                 {props.tabletModeParamError && (
                   <div class="alert alert-danger" data-cy="tablet-mode-param-error">
                     <Text id="dashboard.tabletModeParamError" fields={{ value: props.tabletModeParamError }} />

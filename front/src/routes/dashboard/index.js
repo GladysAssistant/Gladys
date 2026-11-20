@@ -131,9 +131,10 @@ class Dashboard extends Component {
         loading: false
       });
     } catch (e) {
+      // a failure of a dashboard the user already left says nothing about the one displayed
       this.setState({
         loading: false,
-        currentDashboardLoadFailed: true
+        ...(this.state.currentDashboardSelector === selector ? { currentDashboardLoadFailed: true } : {})
       });
       console.error(e);
     }
@@ -430,6 +431,10 @@ class Dashboard extends Component {
         }
       }
     } catch (e) {
+      // the dashboard asked for could not be loaded: said on it, not on another one
+      if (this.state.currentDashboardSelector === selector) {
+        this.setState({ currentDashboardLoadFailed: true });
+      }
       console.error(e);
     }
   };

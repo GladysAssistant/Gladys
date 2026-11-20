@@ -4,6 +4,7 @@ import { Text } from 'preact-i18n';
 
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_SET_VALUE_ERROR_CAUSES } from '../../../../server/utils/constants';
 import { COMMAND_CLIENT_ID, GLADYS_UNREACHABLE_CAUSE } from '../../utils/deviceCommand';
+import { isConnectionNoticeShown } from '../../utils/connectionNotice';
 import MobileToast from '../mobile/MobileToast';
 
 const TOAST_DURATION_MS = 6000;
@@ -73,6 +74,11 @@ class DeviceCommandError extends Component {
   onSetValueError = payload => {
     this.rollback(payload);
     if (payload.client_id !== COMMAND_CLIENT_ID) {
+      return;
+    }
+    // the notice of the app shell already says that Gladys is away: the widget goes back to
+    // its state, and nothing is added on top of the notice
+    if (payload.cause === GLADYS_UNREACHABLE_CAUSE && isConnectionNoticeShown()) {
       return;
     }
     const failure = {
