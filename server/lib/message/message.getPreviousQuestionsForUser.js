@@ -15,9 +15,18 @@ const EXCHANGE_LIMIT = 4;
 const SCENE_MESSAGE_LIMIT = 6;
 // Longest scene message replayed: an "ask the AI" answer, such as a daily summary, can be long.
 const MAX_SCENE_MESSAGE_CHARS = 1000;
-// Longest delay between two messages of the same AI turn: with an external provider, one model
-// request takes up to 120 s, and can be followed by a retry and by the execution of a tool.
+// Longest delay between two messages of an AI turn before its first reply (user message, tool_call
+// traces): with an external provider, one model request takes up to 120 s, and can be followed by a
+// retry and by the execution of a tool.
 const AI_TURN_MAX_GAP_MS = 5 * 60 * 1000;
+// The AI sends all its replies at the end of its turn, one after the other (camera images, then
+// text): a message sent longer than this after the first reply is not part of the turn. Each reply
+// is also sent to the messaging channels of the user before the next one, hence the margin.
+const AI_REPLY_BURST_MS = 60 * 1000;
+// A reply that the unverified-action guard rejects is dropped when it was sent this soon after the
+// user message, as an AI reply is. Later, it more likely comes from a scene, after a turn that sent
+// no reply (NO_RESPONSE, a failed reply): it is then kept as a scene message.
+const AI_QUICK_REPLY_MS = 60 * 1000;
 // Tells the model, and the tool router, that a message is not a reply of the assistant.
 // The system prompt (config/prompts/aiChat.prompt.txt) explains it.
 const SCENE_MESSAGE_PREFIX = '[Scene message]';
@@ -27,8 +36,8 @@ const SCENE_MESSAGE_PREFIX_PATTERN = /^(?:\s*\[Scene message\])+\s*/;
 const EARLIER_SCENE_MESSAGES_NOTE = 'Messages sent to the user by their scenes before the conversation below:';
 
 const UNVERIFIED_ACTION_CLAIM_PATTERNS = [
-  /^j['’]ai\s+(ouvert|ouverts|ferm|éteint|allum|enregistr|mis)/i,
-  /\best en train de s['’](ouvrir|fermer)/i,
+  /^j['\u2019]ai\s+(ouvert|ouverts|ferm|éteint|allum|enregistr|mis)/i,
+  /\best en train de s['\u2019](ouvrir|fermer)/i,
   /\bsont en train de se fermer/i,
   /\ba été (enregistr|éteint|allum|ferm|ouvert)/i,
   /^i('ve| have) (opened|closed|turned off|turned on|recorded|saved|set)/i,
@@ -58,7 +67,7 @@ function isUnverifiedActionConfirmation(text) {
   if (!text || typeof text !== 'string') {
     return false;
   }
-  const normalized = text.trim().replace(/’/g, "'");
+  const normalized = text.trim().replace(/\u2019/g, "'");
   return UNVERIFIED_ACTION_CLAIM_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
@@ -84,44 +93,50 @@ function resolveAnswerForAiContext(answer, hadToolCall) {
 }
 
 /**
- * @description Whether a message was sent soon enough after the previous message of an AI turn to
- * belong to it. When a date is missing or invalid, the message is kept in the turn, as it follows it.
- * @param {Date|string|null} previousCreatedAt - Creation date of the previous message of the turn.
+ * @description Whether a message was sent at most a given delay after an earlier one. When a date is
+ * missing or invalid, the answer is yes: both messages are taken as part of the same AI turn.
+ * @param {Date|string|null} earlierCreatedAt - Creation date of the earlier message.
  * @param {Date|string|null} createdAt - Creation date of the message.
- * @returns {boolean} True when the delay between both messages fits in an AI turn.
+ * @param {number} maxDelayMs - Longest delay accepted.
+ * @returns {boolean} True when the message was sent within the delay.
  * @example
- * isWithinAiTurnGap('2026-11-19T08:00:00.000Z', '2026-11-19T08:00:05.000Z');
+ * isWithinDelay('2026-11-19T08:00:00.000Z', '2026-11-19T08:00:05.000Z', 60000);
  */
-function isWithinAiTurnGap(previousCreatedAt, createdAt) {
-  if (previousCreatedAt == null || createdAt == null) {
+function isWithinDelay(earlierCreatedAt, createdAt, maxDelayMs) {
+  if (earlierCreatedAt == null || createdAt == null) {
     return true;
   }
-  const delay = new Date(createdAt).getTime() - new Date(previousCreatedAt).getTime();
+  const delay = new Date(createdAt).getTime() - new Date(earlierCreatedAt).getTime();
   if (Number.isNaN(delay)) {
     return true;
   }
-  return delay <= AI_TURN_MAX_GAP_MS;
+  return delay <= maxDelayMs;
 }
 
 /**
- * @description Whether a Gladys message belongs to the AI turn answering a user message.
- * Without a tool call, the AI sends a single message (its answer or an error): any later message of
- * Gladys comes from a scene. With tool calls, the AI can send several (camera image, then text):
- * the messages that follow each other within AI_TURN_MAX_GAP_MS belong to the turn.
+ * @description Whether a Gladys message (not a notification) belongs to the AI turn answering a user
+ * message. Before its first reply, the turn lasts as long as its messages (tool_call traces) follow
+ * each other within AI_TURN_MAX_GAP_MS. The AI then sends all its replies in a row: without a tool
+ * call, a single one (its answer or an error), so any later message comes from a scene; with tool
+ * calls, maybe several (camera images, then text), sent within AI_REPLY_BURST_MS of the first one.
  * @param {object} turn - Current AI turn.
  * @param {Date|string|null} turn.lastMessageAt - Creation date of the last message of the turn.
- * @param {Array<string>} turn.answers - Text replies of the turn so far.
+ * @param {Date|string|null} [turn.firstReplyAt] - Creation date of the first reply of the turn.
+ * @param {boolean} turn.hasReply - Whether the turn already has a reply.
  * @param {boolean} turn.hadToolCall - Whether a tool_call trace belongs to the turn.
  * @param {object} message - Stored Gladys message, after the last message of the turn.
  * @returns {boolean} True when the message belongs to the turn.
  * @example
- * isPartOfAiTurn({ lastMessageAt: new Date(), answers: [], hadToolCall: false }, message);
+ * isPartOfAiTurn({ lastMessageAt: new Date(), hasReply: false, hadToolCall: false }, message);
  */
 function isPartOfAiTurn(turn, message) {
-  if (!turn.hadToolCall && turn.answers.length > 0) {
+  if (!turn.hasReply) {
+    return isWithinDelay(turn.lastMessageAt, message.created_at, AI_TURN_MAX_GAP_MS);
+  }
+  if (!turn.hadToolCall) {
     return false;
   }
-  return isWithinAiTurnGap(turn.lastMessageAt, message.created_at);
+  return isWithinDelay(turn.firstReplyAt, message.created_at, AI_REPLY_BURST_MS);
 }
 
 /**
@@ -179,16 +194,28 @@ function buildExchangesFromMessages(messages) {
         answer: answers.length > 0 ? answers.join('\n\n') : null,
       });
     }
+    // a late reply rejected by the guard, after a turn without tool call: see AI_QUICK_REPLY_MS
+    if (currentTurn && currentTurn.lateRejectedReply) {
+      exchanges.push({ question: null, answer: formatSceneMessage(currentTurn.lateRejectedReply) });
+    }
     currentTurn = null;
   };
 
   messages.forEach((message) => {
+    // notifications are left out, and take no part in telling an AI turn from scene messages
+    if (message.message_type === 'notification') {
+      return;
+    }
     if (message.sender_id !== null) {
       closeCurrentTurn();
       currentTurn = {
         question: message.text,
+        questionCreatedAt: message.created_at,
         lastMessageAt: message.created_at,
+        firstReplyAt: null,
+        hasReply: false,
         answers: [],
+        lateRejectedReply: null,
         hadToolCall: false,
       };
       return;
@@ -197,7 +224,22 @@ function buildExchangesFromMessages(messages) {
       currentTurn.lastMessageAt = message.created_at;
       if (message.message_type === 'tool_call') {
         currentTurn.hadToolCall = true;
-      } else if (isChatHistoryMessage(message) && message.text) {
+        return;
+      }
+      if (!currentTurn.hasReply) {
+        currentTurn.hasReply = true;
+        currentTurn.firstReplyAt = message.created_at;
+      }
+      if (!message.text) {
+        return;
+      }
+      const isLateRejectedReply =
+        !currentTurn.hadToolCall &&
+        resolveAnswerForAiContext(message.text, false) === null &&
+        !isWithinDelay(currentTurn.questionCreatedAt, message.created_at, AI_QUICK_REPLY_MS);
+      if (isLateRejectedReply) {
+        currentTurn.lateRejectedReply = message.text;
+      } else {
         currentTurn.answers.push(message.text);
       }
       return;
@@ -317,6 +359,8 @@ function buildChatApiMessages(systemPrompt, exchanges) {
 /**
  * @description Fetch the recent messages of a user, newest first, by batches of FETCH_MESSAGE_LIMIT
  * rows until they hold EXCHANGE_LIMIT user messages, no row remains or MAX_FETCH_BATCHES is reached.
+ * Each batch starts at the oldest date of the previous one (not at an offset, which a message
+ * inserted meanwhile would shift), and the rows already read at that date are skipped.
  * @param {string} userId - Gladys user id.
  * @returns {Promise<Array<object>>} Stored messages, newest first.
  * @example
@@ -324,22 +368,33 @@ function buildChatApiMessages(systemPrompt, exchanges) {
  */
 async function fetchRecentMessages(userId) {
   const messages = [];
+  const readMessageIds = new Set();
+  let oldestCreatedAt = null;
   for (let batch = 0; batch < MAX_FETCH_BATCHES; batch += 1) {
+    const where = {
+      [Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
+    };
+    if (oldestCreatedAt !== null) {
+      where.created_at = { [Op.lte]: oldestCreatedAt };
+    }
     // eslint-disable-next-line no-await-in-loop
     const batchMessages = await db.Message.findAll({
-      where: {
-        [Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
-      },
-      attributes: ['sender_id', 'text', 'message_type', 'created_at'],
+      where,
+      attributes: ['id', 'sender_id', 'text', 'message_type', 'created_at'],
       order: [['created_at', 'desc']],
       limit: FETCH_MESSAGE_LIMIT,
-      offset: batch * FETCH_MESSAGE_LIMIT,
     });
-    messages.push(...batchMessages);
+    batchMessages
+      .filter((message) => !readMessageIds.has(message.id))
+      .forEach((message) => {
+        readMessageIds.add(message.id);
+        messages.push(message);
+      });
     const userMessageCount = messages.filter((message) => message.sender_id !== null).length;
     if (batchMessages.length < FETCH_MESSAGE_LIMIT || userMessageCount >= EXCHANGE_LIMIT) {
       break;
     }
+    oldestCreatedAt = batchMessages[batchMessages.length - 1].created_at;
   }
   return messages;
 }
@@ -364,7 +419,7 @@ module.exports = {
   exchangesToApiMessages,
   buildChatApiMessages,
   isChatHistoryMessage,
-  isWithinAiTurnGap,
+  isWithinDelay,
   isPartOfAiTurn,
   isUnverifiedActionConfirmation,
   resolveAnswerForAiContext,
@@ -376,5 +431,7 @@ module.exports = {
   SCENE_MESSAGE_LIMIT,
   MAX_SCENE_MESSAGE_CHARS,
   AI_TURN_MAX_GAP_MS,
+  AI_REPLY_BURST_MS,
+  AI_QUICK_REPLY_MS,
   SCENE_MESSAGE_PREFIX,
 };

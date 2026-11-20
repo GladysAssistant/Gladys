@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { Op } = require('sequelize');
 const sinon = require('sinon').createSandbox();
 
 const { assert } = sinon;
@@ -13,7 +14,7 @@ const {
   exchangesToApiMessages,
   buildChatApiMessages,
   isChatHistoryMessage,
-  isWithinAiTurnGap,
+  isWithinDelay,
   isPartOfAiTurn,
   isUnverifiedActionConfirmation,
   resolveAnswerForAiContext,
@@ -25,6 +26,8 @@ const {
   SCENE_MESSAGE_LIMIT,
   MAX_SCENE_MESSAGE_CHARS,
   AI_TURN_MAX_GAP_MS,
+  AI_REPLY_BURST_MS,
+  AI_QUICK_REPLY_MS,
   SCENE_MESSAGE_PREFIX,
 } = proxyquire('../../../lib/message/message.getPreviousQuestionsForUser', {
   '../../models': {
@@ -255,14 +258,15 @@ describe('message.getPreviousQuestionsForUser', () => {
 
     assert.calledOnce(messageFindAll);
     expect(messageFindAll.firstCall.args[0].limit).to.equal(FETCH_MESSAGE_LIMIT);
-    expect(messageFindAll.firstCall.args[0].offset).to.equal(0);
-    expect(messageFindAll.firstCall.args[0].attributes).to.include('created_at');
+    expect(messageFindAll.firstCall.args[0].where).to.not.have.property('created_at');
+    expect(messageFindAll.firstCall.args[0].attributes).to.include.members(['id', 'created_at']);
   });
 
   it('should fetch older messages when the recent ones hold too few user messages', async () => {
     const sceneMessages = [];
     for (let i = 0; i < FETCH_MESSAGE_LIMIT; i += 1) {
       sceneMessages.push({
+        id: `scene-${FETCH_MESSAGE_LIMIT - i}`,
         sender_id: null,
         text: `scene ${FETCH_MESSAGE_LIMIT - i}`,
         message_type: 'chat',
@@ -270,15 +274,32 @@ describe('message.getPreviousQuestionsForUser', () => {
       });
     }
     messageFindAll.onFirstCall().resolves(sceneMessages);
+    const oldestSceneMessage = sceneMessages[FETCH_MESSAGE_LIMIT - 1];
+    // the next batch starts at the oldest date read: the row read at that date comes back, and is skipped
     messageFindAll.onSecondCall().resolves([
-      { sender_id: null, text: 'answer', message_type: 'chat', created_at: new Date('2026-11-20T08:00:10.000Z') },
-      { sender_id: 'user-1', text: 'question', message_type: 'chat', created_at: new Date('2026-11-20T08:00:00.000Z') },
+      oldestSceneMessage,
+      {
+        id: 'answer',
+        sender_id: null,
+        text: 'answer',
+        message_type: 'chat',
+        created_at: new Date('2026-11-20T08:00:10.000Z'),
+      },
+      {
+        id: 'question',
+        sender_id: 'user-1',
+        text: 'question',
+        message_type: 'chat',
+        created_at: new Date('2026-11-20T08:00:00.000Z'),
+      },
     ]);
 
     const exchanges = await getPreviousQuestionsForUser('user-1');
 
     assert.calledTwice(messageFindAll);
-    expect(messageFindAll.secondCall.args[0].offset).to.equal(FETCH_MESSAGE_LIMIT);
+    expect(messageFindAll.secondCall.args[0].where.created_at).to.deep.equal({
+      [Op.lte]: oldestSceneMessage.created_at,
+    });
     expect(exchanges[0]).to.deep.equal({ question: 'question', answer: 'answer' });
     expect(exchanges.slice(1).map((exchange) => exchange.answer)).to.deep.equal(
       sceneMessages
@@ -508,24 +529,109 @@ describe('message.getPreviousQuestionsForUser helpers', () => {
   });
 
   it('should keep a Gladys message in the AI turn when a date is missing', () => {
-    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', '2026-11-20T08:04:59.000Z')).to.equal(true);
-    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', '2026-11-20T08:05:01.000Z')).to.equal(false);
-    expect(isWithinAiTurnGap(undefined, '2026-11-20T08:05:01.000Z')).to.equal(true);
-    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', undefined)).to.equal(true);
-    expect(isWithinAiTurnGap(null, '2026-11-20T08:05:01.000Z')).to.equal(true);
-    expect(isWithinAiTurnGap('2026-11-20T08:00:00.000Z', null)).to.equal(true);
-    expect(isWithinAiTurnGap('not a date', '2026-11-20T08:05:01.000Z')).to.equal(true);
+    const fiveMinutes = 5 * 60 * 1000;
+    expect(isWithinDelay('2026-11-20T08:00:00.000Z', '2026-11-20T08:04:59.000Z', fiveMinutes)).to.equal(true);
+    expect(isWithinDelay('2026-11-20T08:00:00.000Z', '2026-11-20T08:05:01.000Z', fiveMinutes)).to.equal(false);
+    expect(isWithinDelay(undefined, '2026-11-20T08:05:01.000Z', fiveMinutes)).to.equal(true);
+    expect(isWithinDelay('2026-11-20T08:00:00.000Z', undefined, fiveMinutes)).to.equal(true);
+    expect(isWithinDelay(null, '2026-11-20T08:05:01.000Z', fiveMinutes)).to.equal(true);
+    expect(isWithinDelay('2026-11-20T08:00:00.000Z', null, fiveMinutes)).to.equal(true);
+    expect(isWithinDelay('not a date', '2026-11-20T08:05:01.000Z', fiveMinutes)).to.equal(true);
   });
 
   it('should tell whether a Gladys message belongs to an AI turn', () => {
-    const lastMessageAt = '2026-11-20T08:00:00.000Z';
-    const message = { created_at: '2026-11-20T08:01:00.000Z' };
-    expect(isPartOfAiTurn({ lastMessageAt, answers: [], hadToolCall: false }, message)).to.equal(true);
-    expect(isPartOfAiTurn({ lastMessageAt, answers: ['Bonjour !'], hadToolCall: false }, message)).to.equal(false);
-    expect(isPartOfAiTurn({ lastMessageAt, answers: ['Voici'], hadToolCall: true }, message)).to.equal(true);
+    const startedAt = new Date('2026-11-20T08:00:00.000Z').getTime();
+    const at = (delay) => ({ created_at: new Date(startedAt + delay) });
+    const lastMessageAt = new Date(startedAt);
+    const firstReplyAt = new Date(startedAt);
+    // before the first reply: the gap since the last message of the turn
+    const waiting = { lastMessageAt, firstReplyAt: null, hasReply: false, hadToolCall: true };
+    expect(isPartOfAiTurn(waiting, at(AI_TURN_MAX_GAP_MS))).to.equal(true);
+    expect(isPartOfAiTurn(waiting, at(AI_TURN_MAX_GAP_MS + 1))).to.equal(false);
+    // a turn without tool call ends with its reply
+    expect(isPartOfAiTurn({ lastMessageAt, firstReplyAt, hasReply: true, hadToolCall: false }, at(1))).to.equal(false);
+    // a turn with tool calls: its replies come in a row after the first one
+    const replying = { lastMessageAt, firstReplyAt, hasReply: true, hadToolCall: true };
+    expect(isPartOfAiTurn(replying, at(AI_REPLY_BURST_MS))).to.equal(true);
+    expect(isPartOfAiTurn(replying, at(AI_REPLY_BURST_MS + 1))).to.equal(false);
+  });
+
+  it('should end an AI turn with tool calls once its replies have been sent', () => {
+    // scene messages sent every few minutes after the reply are not merged into it
     expect(
-      isPartOfAiTurn({ lastMessageAt, answers: [], hadToolCall: true }, { created_at: '2026-11-20T08:06:00.000Z' }),
-    ).to.equal(false);
+      buildExchangesFromMessages([
+        {
+          sender_id: 'user-1',
+          text: 'Lance la machine à laver',
+          message_type: 'chat',
+          created_at: '2026-11-20T08:00:00Z',
+        },
+        {
+          sender_id: null,
+          text: 'device_turn_on_off({})',
+          message_type: 'tool_call',
+          created_at: '2026-11-20T08:00:05Z',
+        },
+        { sender_id: null, text: 'La machine est lancée.', message_type: 'chat', created_at: '2026-11-20T08:00:10Z' },
+        { sender_id: null, text: 'Puissance 2000 W', message_type: 'chat', created_at: '2026-11-20T08:04:00Z' },
+        { sender_id: null, text: 'Puissance 1800 W', message_type: 'chat', created_at: '2026-11-20T08:08:00Z' },
+        { sender_id: null, text: 'Cycle terminé.', message_type: 'chat', created_at: '2026-11-20T08:12:00Z' },
+      ]),
+    ).to.deep.equal([
+      { question: 'Lance la machine à laver', answer: 'La machine est lancée.' },
+      { question: null, answer: '[Scene message] Puissance 2000 W' },
+      { question: null, answer: '[Scene message] Puissance 1800 W' },
+      { question: null, answer: '[Scene message] Cycle terminé.' },
+    ]);
+  });
+
+  it('should not let a notification extend an AI turn', () => {
+    expect(
+      buildExchangesFromMessages([
+        { sender_id: 'user-1', text: 'Éteins tout', message_type: 'chat', created_at: '2026-11-20T08:00:00Z' },
+        {
+          sender_id: null,
+          text: 'device_turn_on_off({})',
+          message_type: 'tool_call',
+          created_at: '2026-11-20T08:00:05Z',
+        },
+        { sender_id: null, text: 'Weekly digest', message_type: 'notification', created_at: '2026-11-20T08:03:00Z' },
+        { sender_id: null, text: 'Bonne nuit !', message_type: 'chat', created_at: '2026-11-20T08:06:00Z' },
+      ]),
+    ).to.deep.equal([
+      { question: 'Éteins tout', answer: null },
+      { question: null, answer: '[Scene message] Bonne nuit !' },
+    ]);
+  });
+
+  it('should keep as a scene message a late message that the guard rejects after a turn without reply', () => {
+    const questionAt = new Date('2026-11-20T08:00:00.000Z').getTime();
+    expect(
+      buildExchangesFromMessages([
+        { sender_id: 'user-1', text: 'Ne réponds pas', message_type: 'chat', created_at: new Date(questionAt) },
+        {
+          sender_id: null,
+          text: 'La porte du garage a été ouverte, faut-il la fermer ?',
+          message_type: 'chat',
+          created_at: new Date(questionAt + AI_QUICK_REPLY_MS + 1),
+        },
+      ]),
+    ).to.deep.equal([
+      { question: 'Ne réponds pas', answer: null },
+      { question: null, answer: '[Scene message] La porte du garage a été ouverte, faut-il la fermer ?' },
+    ]);
+    // sent as soon as an AI reply, it is taken as the reply and dropped by the guard
+    expect(
+      buildExchangesFromMessages([
+        { sender_id: 'user-1', text: 'Ferme les volets', message_type: 'chat', created_at: new Date(questionAt) },
+        {
+          sender_id: null,
+          text: 'La porte a été fermée.',
+          message_type: 'chat',
+          created_at: new Date(questionAt + AI_QUICK_REPLY_MS),
+        },
+      ]),
+    ).to.deep.equal([{ question: 'Ferme les volets', answer: null }]);
   });
 
   it('should truncate long scene messages and strip a copied prefix', () => {
