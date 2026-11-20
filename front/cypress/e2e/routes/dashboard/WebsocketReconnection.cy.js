@@ -258,7 +258,11 @@ describe('Websocket reconnection', () => {
       { method: 'POST', url: `${serverUrl}/api/v1/access_token` },
       { statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'Session was revoked' } }
     ).as('renewal');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/me` }).as('sessionCheck');
+    // ...and the access token the page still holds (Gladys restarted since)
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/me` },
+      { statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'Unauthorized' } }
+    ).as('sessionCheck');
     freezeTimeAndJitter();
     closeSocket(0, { code: 4000, reason: 'INVALID_ACCESS_TOKEN' });
     // a refused token is renewed at once
@@ -321,6 +325,12 @@ describe('Websocket reconnection', () => {
     cy.wrap(null).should(() => {
       expect(renewals).to.equal(1);
     });
+    // the access token is kept while it is being renewed: the page goes on using it
+    cy.task('loadVariable', 'tony').then(tony => {
+      cy.window().then(win => {
+        expect(JSON.parse(win.localStorage.getItem('user')).access_token).to.equal(tony.access_token);
+      });
+    });
     // the renewal is given up after 10 seconds (time of the browser, not of the test)...
     cy.wait(10 * 1000 + 500);
     // ...then tried again after the next delay, and this time Gladys answers
@@ -345,6 +355,11 @@ describe('Websocket reconnection', () => {
         req.reply({ statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'TABLET_IS_LOCKED' } });
       }
     }).as('renewal');
+    // ...and refuses the token of the dashboard the page still holds
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/me` },
+      { statusCode: 401, body: { status: 401, code: 'UNAUTHORIZED', message: 'TABLET_IS_LOCKED' } }
+    );
     closeSocket(0, { code: 4000, reason: 'INVALID_ACCESS_TOKEN' });
     cy.location('pathname').should('eq', '/locked');
     // the keypad asks for its own token, and the session connects again with it: the keypad

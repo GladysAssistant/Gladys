@@ -170,7 +170,9 @@ class Session {
       const { data } = e;
       const { type, payload } = JSON.parse(data);
       // Only dispatch connected websocket message in case we are authenticated
-      if (type === WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.CONNECTED) {
+      // Gladys sends it to every socket of the user each time one of them authenticates (another
+      // tab, another device): only the first one for this socket means it is connected
+      if (type === WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.CONNECTED && !this.websocketConnected) {
         this.websocketConnected = true;
         this.connectionLost = false;
         this.reconnectAttempts = 0;
@@ -289,9 +291,10 @@ class Session {
     }
     const { resetCount } = this;
     try {
-      delete this.user.access_token;
-      this.saveUser(this.user);
-      // gets a new access token, then calls connect()
+      // the current access token is kept until a new one arrives: the close may not have been a
+      // refusal (a network that dropped while the socket authenticated), and a renewal that
+      // fails leaves the requests of the page with the token they had. Gets a new access token,
+      // then calls connect().
       await this.refreshAccessToken();
     } catch (e) {
       console.error(e);
