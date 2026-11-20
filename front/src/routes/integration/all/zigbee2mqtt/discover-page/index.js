@@ -5,6 +5,7 @@ import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+import { withMobileViewport } from '../../../../../components/mobile';
 
 class Zigbee2mqttIntegration extends Component {
   componentWillMount() {
@@ -48,7 +49,7 @@ class Zigbee2mqttIntegration extends Component {
 
 export default withIntlAsProp(
   connect(
-    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting,z2mUrl,showZ2mUrlWarning',
+    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting,z2mUrl,showZ2mUrlWarning,z2mConfigured',
     actions
-  )(Zigbee2mqttIntegration)
+  )(withMobileViewport(Zigbee2mqttIntegration))
 );

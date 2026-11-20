@@ -14,6 +14,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { findOwnContainer } = require('../../../utils/dockerContainers');
 const { formatDuration } = require('../utils/formatDuration');
 const { getDriverPathToStore, isOfConfiguredFamily } = require('./findDongle');
+const { isConfigured } = require('../utils/isConfigured');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -118,10 +119,18 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   this.ezspFallback = false;
   this.mqttConnectionError = null;
   this.dockerBased = false;
+  // Unknown until Docker is checked below: a status sent meanwhile does not tell the machine incompatible
+  this.configured = null;
+  // Told again by the Zigbee2mqtt this init connects to (retained bridge/info and bridge/devices), not the previous one
+  this.z2mVersion = null;
+  this.deviceCount = null;
+  // Told again below by the local installation; none with an external broker, which Gladys does not update
+  this.updatePending = false;
 
   // Load stored configuration
   const configuration = await this.getConfiguration();
   const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl, z2mAdapterMode, z2mNetworkAdapterUrl } = configuration;
+  this.setupPending = Boolean(configuration.z2mSetupPending);
 
   try {
     const dockerBased = await this.gladys.system.isDocker();
@@ -135,15 +144,30 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
     if (networkMode !== 'host') {
       throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
     }
+    // Only when checked: with an external broker, a machine where Gladys cannot install Zigbee2mqtt is still told
+    this.networkModeValid = true;
   } catch (e) {
     logger.debug(e);
     if (mqttMode !== MQTT_MODE.EXTERNAL) {
+      // Told: the setup page shows that Gladys cannot install Zigbee2mqtt here
+      this.configured = isConfigured(configuration);
+      this.emitStatusEvent();
       throw e;
     }
   }
 
-  this.networkModeValid = true;
+  this.configured = isConfigured(configuration);
   this.emitStatusEvent();
+
+  // Stopped by the user (see stop): nothing is started, nor watched, until the user starts it again. The containers
+  // are kept, stopped.
+  this.stopped = Boolean(configuration.z2mStoppedAt);
+  this.stoppedAt = configuration.z2mStoppedAt || null;
+  if (this.stopped) {
+    logger.info(`Zigbee2mqtt: stopped by the user since ${this.stoppedAt}, not started`);
+    this.emitStatusEvent();
+    return null;
+  }
 
   // Test if the coordinator is usable: a USB dongle is checked against the ports actually plugged in,
   // while a network coordinator is only checked for being configured. Its reachability is not probed
@@ -279,6 +303,9 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
             .forEach(({ key }) => this.updateInstallationPhase(key, { state: INSTALLATION_PHASE_STATE.PENDING }));
         }
       }
+      // Shown until it is done: without its images, an update is tried again on the next start
+      this.updatePending =
+        !newImagesPulled && (updateRequired || (await isUpdateRequired(this.gladys.system, configuration)));
       // Skipped, the stored versions stay the old ones
       const replacedImages = newImagesPulled ? await this.checkForContainerUpdates(configuration) : [];
       await this.installMqttContainer(configuration);

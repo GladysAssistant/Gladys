@@ -1,0 +1,358 @@
+/* Zigbee2mqtt dashboard (docs/specs/zigbee2mqtt-installation.md, N): one code for every width, one column on a phone,
+   two from about 992px (state and coordinator on the left, actions and settings on the right). Light colors only: dark
+   mode is the app-wide inversion filter, which also turns the photos back. */
+
+.dashboard,
+.advanced {
+  color: #1c2334;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 992px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.card,
+.tilesCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #e4e8ef;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- status ---------- */
+
+.statusHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.statusIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  font-size: 22px;
+}
+
+.toneGreen {
+  background: #def0e2;
+  color: #1f6e43;
+}
+
+.toneBlue {
+  background: #dde9fb;
+  color: #2f5bd7;
+}
+
+.toneGrey {
+  background: #eceef3;
+  color: #4a5163;
+}
+
+.toneAmber {
+  background: #fbefd8;
+  color: #8a5a07;
+}
+
+.toneRed {
+  background: #fbe3de;
+  color: #a83a25;
+}
+
+.statusText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.statusTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.statusSub {
+  color: #5c6375;
+}
+
+.newDevices {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: #e5ecfd;
+  color: #2f5bd7;
+  font-weight: 600;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progressBar {
+  height: 10px;
+  margin: 0;
+}
+
+.progressLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.progressValue {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- coordinator ---------- */
+
+.keyHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.keyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: #dde9fb;
+  color: #2f5bd7;
+  font-size: 24px;
+}
+
+.keyName {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+}
+
+.fact {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.fact + .fact {
+  border-top: 1px solid #eef0f4;
+}
+
+.factName {
+  color: #5c6375;
+}
+
+.factValue {
+  font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- actions ---------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 10px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 76px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid #e4e8ef;
+  background: #fff;
+  color: #1c2334;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.tile:hover,
+.tile:focus-visible {
+  border-color: #3563e9;
+  color: #2f5bd7;
+  text-decoration: none;
+}
+
+.tile:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.tile i {
+  font-size: 20px;
+}
+
+.tileActive {
+  border-color: #a83a25;
+  color: #a83a25;
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #fbe3de;
+  color: #8a2c1a;
+}
+
+.advancedRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0 20px;
+  border-radius: 20px;
+  border: 1px solid #e4e8ef;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1c2334;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.advancedRow:hover,
+.advancedRow:focus-visible {
+  border-color: #3563e9;
+}
+
+/* ---------- advanced settings ---------- */
+
+.back {
+  padding-left: 0;
+  font-weight: 600;
+}
+
+.advancedTitle {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.portRow {
+  display: flex;
+  gap: 10px;
+}
+
+.portRow :global(.form-control) {
+  max-width: 160px;
+}
+
+.componentState {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.componentDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.componentOk .componentDot {
+  background: #2f9e5b;
+}
+
+.componentKo .componentDot {
+  background: #c0392b;
+}
+
+.spin {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+/* Phone layout (DashboardMobile, AdvancedSettingsMobile) */
+.mobileProgress {
+  margin: 0 0 16px;
+}
+
+/* Two groups in a row, without a section header between them */
+.mobileSpaced {
+  margin-top: 16px;
+}
+
+.mobileCode {
+  color: inherit;
+  font-size: 14px;
+  word-break: break-all;
+  user-select: all;
+}
+
+.mobileRowButtons {
+  display: flex;
+  gap: 4px;
+}

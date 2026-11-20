@@ -10,6 +10,8 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
+import { kitStyle } from '../../../../../components/mobile';
+import { MobileDeviceItem, BatteryPill } from '../../../../../components/integration/mobile';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -39,10 +41,12 @@ class Zigbee2mqttBox extends Component {
     //    this.props.updateDeviceField(this.props.deviceIndex, 'features', models[selectedModel]);
   };
 
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({
       loading: true
     });
+    let saved = true;
     try {
       await this.props.saveDevice(this.props.deviceIndex);
       this.setState({
@@ -52,21 +56,26 @@ class Zigbee2mqttBox extends Component {
       this.setState({
         saveError: RequestStatus.Error
       });
+      saved = false;
     }
     this.setState({
       loading: false
     });
+    return saved;
   };
 
+  // resolves to false when the device could not be deleted
   deleteDevice = async () => {
     this.setState({
       loading: true,
       tooMuchStatesError: false,
       statesNumber: undefined
     });
+    let deleted = true;
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
+      deleted = false;
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
@@ -81,6 +90,7 @@ class Zigbee2mqttBox extends Component {
     this.setState({
       loading: false
     });
+    return deleted;
   };
 
   getDeviceProperty = () => {
@@ -99,6 +109,59 @@ class Zigbee2mqttBox extends Component {
 
   render(props, { loading, saveError, tooMuchStatesError, statesNumber }) {
     const { batteryLevel } = this.getDeviceProperty();
+
+    // On a phone: a row and its sheet, fed by the handlers of the card
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (props.isMobile) {
+      return (
+        <MobileDeviceItem
+          device={props.device}
+          houses={props.houses}
+          pills={batteryLevel ? <BatteryPill level={batteryLevel} /> : null}
+          onNameChange={this.updateName}
+          onRoomChange={this.updateRoom}
+          namePlaceholderId="integration.zigbee2mqtt.namePlaceholder"
+          details={[
+            {
+              label: <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />,
+              value: props.device.ieee_address,
+              mono: true
+            }
+          ]}
+          onSave={this.saveDevice}
+          saveError={saveError && <Text id="integration.zigbee2mqtt.saveError" />}
+          actions={[
+            {
+              label: <Text id="integration.zigbee2mqtt.device.editButton" />,
+              icon: 'edit-2',
+              href: `/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`,
+              dataCy: 'z2m-device-edit'
+            }
+          ]}
+          onDelete={this.deleteDevice}
+          deleteError={
+            tooMuchStatesError ? (
+              <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+            ) : null
+          }
+          dataCy="z2m-device-row"
+        >
+          {props.z2mUrl && props.device.ieee_address && (
+            <a
+              href={`${props.z2mUrl}/#/device/0/${props.device.ieee_address}/info`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={kitStyle.linkButton}
+              data-cy="z2m-device-open-in-z2m"
+            >
+              <img src={logoZigbee2mqtt} alt="" class={style.z2mDeviceLinkLogo} />
+              <Text id="integration.zigbee2mqtt.openInZ2mButton" />
+            </a>
+          )}
+        </MobileDeviceItem>
+      );
+    }
+
     return (
       <div class="col-md-6">
         <div class="card">

@@ -26,4 +26,5 @@ advanced:
   pan_id: GENERATE
   ext_pan_id: GENERATE
 frontend:
+  enabled: true
   port: 12000

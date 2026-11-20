@@ -2,7 +2,7 @@ const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const { expect } = require('chai');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { BadParameters, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const Zigbee2MqttService = require('../../../../services/zigbee2mqtt/lib');
 
@@ -34,42 +34,81 @@ describe('zigbee2mqtt setPermitJoin', () => {
     zigbee2MqttManager = new Zigbee2MqttService(gladys, {}, serviceId);
     zigbee2MqttManager.z2mPermitJoin = false;
     zigbee2MqttManager.mqttClient = mqttClient;
+    zigbee2MqttManager.zigbee2mqttConnected = true;
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('set permit join to true then false', async () => {
+  it('should refuse when Gladys is not connected to the broker of Zigbee2mqtt', async () => {
+    // PREPARE
+    zigbee2MqttManager.mqttClient = null;
+    // EXECUTE
+    const promise = zigbee2MqttManager.setPermitJoin(true);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith(ServiceNotConfiguredError);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should refuse when Zigbee2mqtt does not answer on its broker', async () => {
+    // PREPARE
+    zigbee2MqttManager.zigbee2mqttConnected = false;
+    // EXECUTE
+    const promise = zigbee2MqttManager.setPermitJoin(true);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith(BadParameters, 'ZIGBEE2MQTT_NOT_ANSWERING');
+    assert.notCalled(mqttClient.publish);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should ask to allow, then to forbid, from what Zigbee2mqtt told when toggled', async () => {
     // EXECUTE
     await zigbee2MqttManager.setPermitJoin();
     // ASSERT
-    assert.calledWith(
+    assert.calledOnceWithExactly(
       mqttClient.publish,
       'zigbee2mqtt/bridge/request/permit_join',
-      JSON.stringify({
-        time: 254,
-      }),
+      JSON.stringify({ value: true, time: 254 }),
     );
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: true,
-    });
-    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(true);
-    // EXECUTE
-    await zigbee2MqttManager.setPermitJoin();
-    // ASSERT
-    assert.calledWith(
-      mqttClient.publish,
-      'zigbee2mqtt/bridge/request/permit_join',
-      JSON.stringify({
-        time: 0,
-      }),
-    );
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: false,
-    });
+    // Told by Zigbee2mqtt only, once it answers
+    assert.notCalled(gladys.event.emit);
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
+    // PREPARE: Zigbee2mqtt answered that joining is allowed
+    zigbee2MqttManager.z2mPermitJoin = true;
+    // EXECUTE
+    await zigbee2MqttManager.setPermitJoin();
+    // ASSERT
+    assert.calledWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/bridge/request/permit_join',
+      JSON.stringify({ value: false, time: 0 }),
+    );
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should allow joining when asked to, even when already allowed', async () => {
+    // PREPARE
+    zigbee2MqttManager.z2mPermitJoin = true;
+    // EXECUTE
+    await zigbee2MqttManager.setPermitJoin(true);
+    // ASSERT
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/bridge/request/permit_join',
+      JSON.stringify({ value: true, time: 254 }),
+    );
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should forbid joining when asked to, even when already forbidden', async () => {
+    // EXECUTE
+    await zigbee2MqttManager.setPermitJoin(false);
+    // ASSERT
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/bridge/request/permit_join',
+      JSON.stringify({ value: false, time: 0 }),
+    );
   });
 });

@@ -72,6 +72,37 @@ describe('zigbee2mqtt init', () => {
     sinon.reset();
   });
 
+  it('should start nothing, nor watch the dongle, while stopped by the user', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({
+      z2mDriverPath: '/dev/ttyUSB0',
+      mqttPassword: 'mqttPassword',
+      mqttMode: 'local',
+      z2mStoppedAt: '2026-11-17T08:00:00.000Z',
+      z2mSetupPending: 'true',
+    });
+    zigbee2mqttManager.watchDongle = sinon.stub();
+    // EXECUTE
+    const result = await zigbee2mqttManager.init();
+    // ASSERT
+    expect(result).to.equal(null);
+    // A first setup stopped before Zigbee2mqtt answered: the wizard still opens
+    expect(zigbee2mqttManager.setupPending).to.equal(true);
+    expect(zigbee2mqttManager.stopped).to.equal(true);
+    expect(zigbee2mqttManager.stoppedAt).to.equal('2026-11-17T08:00:00.000Z');
+    // Still known as set up and runnable: the page offers to start it
+    expect(zigbee2mqttManager.configured).to.equal(true);
+    expect(zigbee2mqttManager.networkModeValid).to.equal(true);
+    assert.notCalled(gladys.service.getService);
+    assert.notCalled(zigbee2mqttManager.watchDongle);
+    assert.notCalled(zigbee2mqttManager.pullMissingImages);
+    assert.notCalled(zigbee2mqttManager.installMqttContainer);
+    assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+    assert.notCalled(zigbee2mqttManager.connect);
+    assert.notCalled(zigbee2mqttManager.saveConfiguration);
+    assert.called(zigbee2mqttManager.emitStatusEvent);
+  });
+
   it('should fail because not a Docker System', async () => {
     // PREPARE
     gladys.system.isDocker = fake.resolves(false);
@@ -94,7 +125,9 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
-    assert.notCalled(zigbee2mqttManager.emitStatusEvent);
+    // Told, with the configuration read: the setup page shows that Gladys cannot install Zigbee2mqtt here
+    expect(zigbee2mqttManager.configured).to.equal(false);
+    assert.calledOnceWithExactly(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('should end a pending startup and stop asking Zigbee2mqtt whether it runs', async () => {
@@ -127,6 +160,7 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     expect(zigbee2mqttManager.dockerBased).to.equal(false);
+    expect(zigbee2mqttManager.networkModeValid).to.equal(false);
     assert.calledOnce(zigbee2mqttManager.getConfiguration);
     assert.calledOnce(zigbee2mqttManager.saveConfiguration);
     assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
@@ -135,6 +169,15 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.calledOnce(zigbee2mqttManager.connect);
     assert.called(zigbee2mqttManager.emitStatusEvent);
+  });
+
+  it('should tell that Gladys cannot install Zigbee2mqtt without a host network, with an external broker', async () => {
+    gladys.system.getNetworkMode = fake.resolves('bridge');
+    zigbee2mqttManager.getConfiguration = fake.resolves({ mqttMode: 'external' });
+    await zigbee2mqttManager.init();
+    expect(zigbee2mqttManager.dockerBased).to.equal(true);
+    expect(zigbee2mqttManager.networkModeValid).to.equal(false);
+    assert.calledOnce(zigbee2mqttManager.connect);
   });
 
   it('should fail because not a host network', async () => {
@@ -159,7 +202,9 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
-    assert.calledOnceWithExactly(zigbee2mqttManager.emitStatusEvent);
+    // Docker told, then the network refused, with the configuration read
+    assert.calledTwice(zigbee2mqttManager.emitStatusEvent);
+    expect(zigbee2mqttManager.configured).to.equal(false);
   });
 
   it('should not install containers, usb is not configured', async () => {
@@ -179,6 +224,30 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
+    // Nothing set up yet: the pages tell that Zigbee2mqtt is not installed
+    expect(zigbee2mqttManager.configured).to.equal(false);
+  });
+
+  it('should not tell whether Zigbee2mqtt is configured before Docker is checked', async () => {
+    zigbee2mqttManager.configured = true;
+    let configuredWhileChecked;
+    gladys.system.getNetworkMode = fake(async () => {
+      configuredWhileChecked = zigbee2mqttManager.configured;
+      return 'host';
+    });
+    zigbee2mqttManager.getConfiguration.resolves({ mqttPassword: 'mqttPassword' });
+    await zigbee2mqttManager.init();
+    expect(configuredWhileChecked).to.equal(null);
+    expect(zigbee2mqttManager.configured).to.equal(false);
+  });
+
+  it('should forget the version and the devices told by the previous Zigbee2mqtt', async () => {
+    zigbee2mqttManager.z2mVersion = '2.1.0';
+    zigbee2mqttManager.deviceCount = 12;
+    zigbee2mqttManager.getConfiguration.resolves({ mqttPassword: 'mqttPassword' });
+    await zigbee2mqttManager.init();
+    expect(zigbee2mqttManager.z2mVersion).to.equal(null);
+    expect(zigbee2mqttManager.deviceCount).to.equal(null);
   });
 
   it('should not install containers, usb port not found', async () => {
@@ -197,6 +266,8 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
+    // Set up, its dongle unplugged
+    expect(zigbee2mqttManager.configured).to.equal(true);
   });
 
   it('should install containers, usb port is found', async () => {
@@ -420,6 +491,13 @@ describe('zigbee2mqtt init', () => {
       await zigbee2mqttManager.init();
       expect(zigbee2mqttManager.dongleWatch).to.equal(null);
       expect(zigbee2mqttManager.dongleMissing).to.equal(false);
+    });
+
+    it('should forget an update left waiting by the local installation, once switched to an external broker', async () => {
+      zigbee2mqttManager.updatePending = true;
+      zigbee2mqttManager.getConfiguration.resolves({ mqttMode: 'external', mqttUrl: 'mqtt://192.168.1.10:1883' });
+      await zigbee2mqttManager.init();
+      expect(zigbee2mqttManager.updatePending).to.equal(false);
     });
 
     it('should stop the previous watch, and forget a missing dongle', async () => {
@@ -754,6 +832,8 @@ describe('zigbee2mqtt init', () => {
       assert.notCalled(zigbee2mqttManager.finishInstallation);
       // Without a job
       expect(zigbee2mqttManager.installationJobId).to.equal(null);
+      // Downloaded: replaced now
+      expect(zigbee2mqttManager.updatePending).to.equal(false);
       answer();
       expect(await finished).to.equal(null);
     });
@@ -803,6 +883,8 @@ describe('zigbee2mqtt init', () => {
         'Zigbee2mqtt: new images not downloaded, the update is postponed to the next start:',
         error,
       );
+      // Told by the status until it is done
+      expect(zigbee2mqttManager.updatePending).to.equal(true);
     });
 
     it('should show a failed download pending again during an installation, as it goes on without it', async () => {
@@ -851,6 +933,8 @@ describe('zigbee2mqtt init', () => {
         error,
       );
       assert.notCalled(zigbee2mqttManager.finishInstallation);
+      // No container of an older version
+      expect(zigbee2mqttManager.updatePending).to.equal(false);
     });
 
     it('should keep the outdated containers running when a setup runs this init and the new images are not downloaded', async () => {
@@ -883,6 +967,8 @@ describe('zigbee2mqtt init', () => {
       // Tried again on the next start, with the old version still stored
       assert.calledWithMatch(zigbee2mqttManager.saveConfiguration, { dockerZ2mVersion: '12' });
       expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+      // The update waits, though the installation of the setup followed this init
+      expect(zigbee2mqttManager.updatePending).to.equal(true);
     });
 
     it('should follow the update of the broker alone like an installation', async () => {

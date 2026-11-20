@@ -1,6 +1,8 @@
 // The status fields read by the Zigbee2mqtt pages, kept in the store so that the status banner and
 // the permit join switch always show the same state
 const toStoreState = zigbee2mqttStatus => ({
+  z2mConfigured: zigbee2mqttStatus.configured,
+  z2mStopped: zigbee2mqttStatus.stopped,
   usbConfigured: zigbee2mqttStatus.usbConfigured,
   z2mEnabled: zigbee2mqttStatus.z2mEnabled,
   gladysConnected: zigbee2mqttStatus.gladysConnected,
