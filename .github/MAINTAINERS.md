@@ -163,7 +163,11 @@ Then:
 3. The pull request is merged through the merge queue. The "Create release
    tag" workflow pushes the `vX.Y.Z` tag with a deploy key, and that push
    starts the production images, the demo website and the API
-   documentation builds. If one of them fails, re-run it on the tag from
+   documentation builds. Once the images are pushed, the same workflow
+   builds the Gladys Plus front from the tag and deploys it to its
+   Cloudflare Worker (`front/wrangler.gladys-plus.toml`); the "Publish
+   Gladys Plus front to production" workflow does the same by hand, on
+   `master` or on a tag. If one of them fails, re-run it on the tag from
    the Actions tab.
 4. Once the production images are pushed, the "Release Gladys Production
    Images" workflow creates the GitHub release of the tag, with the notes
@@ -241,10 +245,13 @@ without having read it.
 
 ### Deployment secrets: the `production` environment
 
-The credentials that publish a release (Docker Hub, Cloudflare Pages, the
-Gladys Plus deploy hook and version API, the deploy key that pushes the
-release tag) are not repository secrets: they live in the `production`
-environment, together with the `DOCKERHUB_REPO` variable. A secret is never displayed by GitHub, to anyone; the only way to
+The credentials that publish a release (Docker Hub, Cloudflare Pages for the
+demo and the API documentation, the Cloudflare token of the Gladys Plus
+Worker, the Gladys Plus version API, the deploy key that pushes the release
+tag) are not repository secrets: they live in the `production` environment,
+together with the `DOCKERHUB_REPO` variable and the optional
+`GLADYS_PLUS_FRONT_INDEX_APPEND` variable (a snippet appended to the
+`index.html` of the production Gladys Plus front only). A secret is never displayed by GitHub, to anyone; the only way to
 read one is to run a job that receives it. Only the jobs that declare
 `environment: production` receive these, and the environment's deployment
 policy only lets a job run on the `master` branch or on a `v*` tag. A
@@ -263,6 +270,36 @@ the environment. It is not needed for the secrets' safety, it only adds a
 manual click on every release, demo and documentation build. If it is
 enabled, the reviewers must include the `release` team, otherwise no patch
 release can ship without the lead maintainer.
+
+### Gladys Plus previews: the `gladys-plus-preview` environment
+
+Every pull request opened from a branch of this repository that touches the
+front gets a Gladys Plus preview, uploaded as a preview version of the
+`gladys-plus` Cloudflare Worker (never deployed to production) and commented
+on the pull request: `pr-<number>-gladys-plus.<subdomain>.workers.dev`
+always serves its last commit. Pull requests from forks get none.
+
+It takes two workflows so that the code of the pull request never runs next
+to the Cloudflare token: "Gladys Plus preview build" builds the front on
+`pull_request` without any secret and uploads it as an artifact, then
+"Gladys Plus preview deploy" runs on `workflow_run`, which always executes
+the file as it is on `master`, downloads the artifact and uploads it with
+Wrangler (static files only, no Worker script is run). Its token
+(`CLOUDFLARE_WORKERS_GLADYS_PLUS_API_TOKEN`, with `CLOUDFLARE_ACCOUNT_ID`)
+lives in the `gladys-plus-preview` environment, whose deployment policy
+only accepts `master`. Never move the upload into the `pull_request`
+workflow, and never check out the pull request in the deploy workflow.
+
+A preview version can only be uploaded to a Worker that exists: until the
+"Publish Gladys Plus front to production" workflow has run once (it creates
+the `gladys-plus` Worker), every preview fails. A re-run of the build of an
+older commit is skipped, so the alias of a pull request never goes back.
+
+The same Worker token is used in both environments. It only needs the
+"Workers Scripts: Edit" permission on the Gladys account: the custom domain
+`plus.gladysassistant.com` is attached to the Worker in the Cloudflare
+dashboard, not in the Wrangler configuration, and `wrangler deploy` leaves it
+untouched.
 
 ### Review and fix bots
 

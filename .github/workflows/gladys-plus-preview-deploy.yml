@@ -1,0 +1,119 @@
+name: Gladys Plus preview deploy
+run-name: Gladys Plus preview deploy ${{ github.event.workflow_run.head_branch }}
+
+# Second half of the Gladys Plus pull request previews (the first half is
+# gladys-plus-preview-build.yml). `workflow_run` always runs this file as it is
+# on master, never the version of the pull request, so it can safely receive
+# the Cloudflare token: it only uploads the static files built by the first
+# half (assets only, no Worker script is ever run from them) as a preview
+# version of the Gladys Plus Worker. Production is never touched: a preview
+# version is uploaded, not deployed.
+
+on:
+  workflow_run:
+    workflows: ['Gladys Plus preview build']
+    types: [completed]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Upload Gladys Plus preview
+    # Only a successful build of a pull request opened from a branch of this
+    # repository (pull_requests is empty for the pull requests of forks).
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.pull_requests[0] != null
+    runs-on: ubuntu-latest
+    permissions:
+      # Download the artifact of the build run.
+      actions: read
+      contents: read
+      # Comment the preview URL on the pull request.
+      pull-requests: write
+    # The Cloudflare secrets of the previews live in their own environment,
+    # restricted to master (the ref `workflow_run` runs on), see
+    # .github/MAINTAINERS.md.
+    environment:
+      name: gladys-plus-preview
+      url: ${{ steps.upload.outputs.alias_url }}
+    steps:
+      - name: ⬇️ Checkout code (master)
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: ↙️ Download the Gladys Plus front built by the pull request
+        uses: actions/download-artifact@v4
+        with:
+          name: gladys-plus-front
+          path: front/build
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'front/package.json'
+      - name: 🚀 Upload the preview version
+        id: upload
+        working-directory: ./front
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_GLADYS_PLUS_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: false
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Both come from GitHub, but are checked before reaching a command line.
+          [[ "${PR_NUMBER}" =~ ^[0-9]+$ ]] || { echo "Invalid pull request number"; exit 1; }
+          [[ "${HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]] || { echo "Invalid commit"; exit 1; }
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
+            echo "::error::The CLOUDFLARE_WORKERS_GLADYS_PLUS_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets of the gladys-plus-preview environment are required."
+            exit 1
+          fi
+          # A re-run of the build of an older commit must not move the alias
+          # of the pull request back: only the current head is uploaded.
+          CURRENT_HEAD=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq '.head.sha')
+          if [ "${CURRENT_HEAD}" != "${HEAD_SHA}" ]; then
+            echo "Commit ${HEAD_SHA} is no longer the head of #${PR_NUMBER} (${CURRENT_HEAD}): preview skipped."
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          OUTPUT_FILE="${RUNNER_TEMP}/wrangler-output.json"
+          # One alias per pull request: pr-<number>-gladys-plus.<subdomain>.workers.dev
+          # always serves the last commit of the pull request.
+          WRANGLER_OUTPUT_FILE_PATH="${OUTPUT_FILE}" npx --yes wrangler@4.156.0 versions upload \
+            --config wrangler.gladys-plus.toml \
+            --preview-alias "pr-${PR_NUMBER}" \
+            --tag "${HEAD_SHA:0:7}" \
+            --message "Pull request #${PR_NUMBER}, commit ${HEAD_SHA}"
+          VERSION_URL=$(jq -r 'select(.type == "version-upload") | .preview_url // empty' "${OUTPUT_FILE}")
+          ALIAS_URL=$(jq -r 'select(.type == "version-upload") | .preview_alias_url // empty' "${OUTPUT_FILE}")
+          if [ -z "${VERSION_URL}" ] || [ -z "${ALIAS_URL}" ]; then
+            echo "No preview URL returned by Cloudflare: are the workers.dev subdomain and the preview URLs enabled on the Worker?"
+            exit 1
+          fi
+          echo "version_url=${VERSION_URL}" >> "$GITHUB_OUTPUT"
+          echo "alias_url=${ALIAS_URL}" >> "$GITHUB_OUTPUT"
+          echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "Gladys Plus preview of #${PR_NUMBER}: ${ALIAS_URL} (this commit: ${VERSION_URL})" >> "$GITHUB_STEP_SUMMARY"
+      - name: 💬 Comment the preview on the pull request
+        if: steps.upload.outputs.skipped != 'true'
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405 # v2.9.4
+        with:
+          header: gladys-plus-preview
+          number: ${{ steps.upload.outputs.pr_number }}
+          message: |
+            ☁️ **Gladys Plus preview deployed on Cloudflare Workers.**
+
+            | | |
+            | --- | --- |
+            | Pull request (always the last commit) | ${{ steps.upload.outputs.alias_url }} |
+            | This commit (`${{ github.event.workflow_run.head_sha }}`) | ${{ steps.upload.outputs.version_url }} |
+
+            The preview uses the production Gladys Plus API: log in with a real Gladys Plus account.

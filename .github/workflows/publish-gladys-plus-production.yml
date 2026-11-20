@@ -1,19 +1,60 @@
 name: Publish Gladys Plus front to production
 
-on: workflow_dispatch
+on:
+  # Called by the release workflow (docker-release-build.yml) once the
+  # production images are pushed: the front is then built from the release tag.
+  workflow_call:
+  # Manual re-run (a failed publication, or a publication from master). The
+  # `production` environment only accepts master and the v* tags.
+  workflow_dispatch:
 
 jobs:
-  build:
+  publish:
+    name: Build and deploy the Gladys Plus Worker
     runs-on: ubuntu-latest
     permissions:
       contents: read
     # The deployment secrets live in the `production` environment, which only
     # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
-    environment: production
+    environment:
+      name: production
+      url: https://plus.gladysassistant.com
     steps:
-      - name: Run Cloudflare Pages deploy hook
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🏗️ Build Gladys Plus front
+        working-directory: ./front
         env:
-          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}
-        # --fail-with-body turns an error answer of Cloudflare (an invalid or
-        # deleted hook, for instance) into a failed job instead of a green one.
-        run: curl --silent --show-error --fail-with-body -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${DEPLOY_HOOK}"
+          GATEWAY_MODE: true
+          # Optional snippet appended to index.html (front/cli/inject-index-tail.js),
+          # production only: the pull request previews never get it.
+          GLADYS_FRONT_INDEX_APPEND: ${{ vars.GLADYS_PLUS_FRONT_INDEX_APPEND }}
+        run: |
+          npm run build
+      # The Cloudflare token is only given to this step, never to the install
+      # or the build.
+      - name: 🚀 Deploy the Worker
+        working-directory: ./front
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_GLADYS_PLUS_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: false
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
+            echo "::error::The CLOUDFLARE_WORKERS_GLADYS_PLUS_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets of the production environment are required to deploy Gladys Plus."
+            exit 1
+          fi
+          npx --yes wrangler@4.156.0 deploy --config wrangler.gladys-plus.toml
