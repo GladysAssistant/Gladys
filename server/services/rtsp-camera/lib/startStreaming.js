@@ -10,11 +10,10 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_ROTATION } = require('../../../utils/constants');
 const { isCameraEnabled } = require('../../../utils/device');
+const { createFfmpegStderrTail } = require('../utils/ffmpegStderrTail');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
-const STDERR_TAIL_MAX_LENGTH = 2000;
-const STDERR_REASON_LINES = 3;
 
 /**
  * @description Start streaming.
@@ -219,33 +218,24 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       logger.debug(`stdout: ${data}`);
     });
 
-    // We keep the end of what ffmpeg writes on stderr: when it fails, the reason is in its last lines
-    let stderrTail = '';
+    // We keep the last lines ffmpeg writes on stderr: when it fails, the reason is in them.
+    // The camera URL contains the credentials of the camera: every line is redacted before it is logged.
+    const stderrTail = createFfmpegStderrTail(cameraUrlParam.value);
     liveStreamingProcess.stderr.on('data', (data) => {
-      logger.debug(`stderr: ${data}`);
-      stderrTail = `${stderrTail}${data}`.slice(-STDERR_TAIL_MAX_LENGTH);
+      stderrTail.push(data).forEach((line) => logger.debug(`stderr: ${line}`));
     });
 
     liveStreamingProcess.on('close', (code) => {
       logger.debug(`child process exited with code ${code}`);
-      let message = `Child process exited with code ${code}`;
-      // A non-zero exit code is a failure of ffmpeg (a stopped stream exits with a null code)
+      // A non-zero exit code is a failure of ffmpeg (a stopped stream exits with a null code).
+      // The reason is only logged: the error below goes back to the API, without ffmpeg output.
       if (code) {
-        const reason = stderrTail
-          // The camera URL contains the credentials of the camera, it must not end up in the logs
-          .split(cameraUrlParam.value)
-          .join('CAMERA_URL')
-          .split(/\r?\n/)
-          .map((line) => line.trim())
-          .filter((line) => line.length > 0)
-          .slice(-STDERR_REASON_LINES)
-          .join(' — ');
-        if (reason) {
-          message = `${message}: ${reason}`;
-        }
-        logger.warn(`Camera ${cameraSelector}: ffmpeg live stream failed. ${message}`);
+        const reason = stderrTail.getReason();
+        logger.warn(
+          `Camera ${cameraSelector}: ffmpeg live stream failed with code ${code}${reason ? `: ${reason}` : ''}`,
+        );
       }
-      streamingReadyEvent.emit('init-error', new Error(message));
+      streamingReadyEvent.emit('init-error', new Error(`Child process exited with code ${code}`));
       this.stopStreaming(cameraSelector);
     });
 

@@ -7,6 +7,7 @@ const sinon = require('sinon').createSandbox();
 
 const { fake, assert: fakeAssert } = sinon;
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
+const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_ROTATION, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
@@ -77,6 +78,7 @@ describe('Camera.streaming', () => {
     rtspCameraManager = new RtspCameraManager(gladys, childProcessMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   });
   afterEach(() => {
+    sinon.restore();
     // remove interval
     if (rtspCameraManager.checkIfLiveActiveInterval) {
       clearInterval(rtspCameraManager.checkIfLiveActiveInterval);
@@ -480,10 +482,11 @@ describe('Camera.streaming', () => {
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
     const promise = rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
-    await assert.isRejected(promise, 'Child process exited with code 100: stderr log log');
+    await assert.isRejected(promise, 'Child process exited with code 100');
     expect(rtspCameraManager.liveStreams.size).to.equal(0);
   });
-  it('should give the reason found in ffmpeg stderr when the stream crashes, without the camera url', async () => {
+  it('should log the reason found in ffmpeg stderr when the stream crashes, but not return it', async () => {
+    const warn = sinon.stub(logger, 'warn');
     const childProcessMockWithCrash = {
       spawn: (command, args, options) => {
         return {
@@ -491,7 +494,7 @@ describe('Camera.streaming', () => {
           stderr: {
             on: (type, cb) => {
               cb("Input #0, rtsp, from 'test':\n  Stream #0:0: Video: h264\nStream mapping:\n");
-              cb(Buffer.from('[libx264 @ 0x55] height not divisible by 2 (1920x1097)\r\n\nConversion failed!\n'));
+              cb(Buffer.from('[libx264 @ 0x55] height not divisible by 2 (1920x1097)\r\n\nConversion failed!'));
             },
           },
           on: (type, cb) => {
@@ -507,21 +510,42 @@ describe('Camera.streaming', () => {
     );
     const promise = rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
     const error = await assert.isRejected(promise);
-    expect(error.message).to.equal(
-      'Child process exited with code 1: Stream mapping: — [libx264 @ 0x55] height not divisible by 2 (1920x1097) — Conversion failed!',
+    expect(error.message).to.equal('Child process exited with code 1');
+    fakeAssert.calledOnceWithExactly(
+      warn,
+      'Camera my-camera: ffmpeg live stream failed with code 1: Stream mapping: — [libx264 @ 0x55] height not divisible by 2 (1920x1097) — Conversion failed!',
     );
     expect(rtspCameraManager.liveStreams.size).to.equal(0);
   });
-  it('should hide the camera url in the reason and keep the message short when ffmpeg wrote nothing', async () => {
-    const stderrByCamera = ['test: Connection refused\n', ''];
+  it('should hide the camera credentials in the logs and log no reason when ffmpeg wrote nothing', async () => {
+    const warn = sinon.stub(logger, 'warn');
+    const debug = sinon.stub(logger, 'debug');
+    const cameraUrl = 'rtsp://admin:s3cr%40t@192.168.1.10/live';
+    const gladysWithCredentials = {
+      ...gladys,
+      device: {
+        ...gladys.device,
+        getBySelector: fake.resolves({
+          ...device,
+          params: [
+            { name: 'CAMERA_URL', value: cameraUrl },
+            { name: 'CAMERA_ROTATION', value: '0' },
+          ],
+        }),
+      },
+    };
+    const stderrByCamera = [
+      [`[rtsp @ 0x55] ${cameraUrl.slice(0, 20)}`, `${cameraUrl.slice(20)}: Connection refused\n`, 'password s3cr@t'],
+      [''],
+    ];
     const childProcessMockWithCrash = {
       spawn: (command, args, options) => {
-        const stderr = stderrByCamera.shift();
+        const chunks = stderrByCamera.shift();
         return {
           stdout: { on: () => {} },
           stderr: {
             on: (type, cb) => {
-              cb(stderr);
+              chunks.forEach((chunk) => cb(chunk));
             },
           },
           on: (type, cb) => {
@@ -531,14 +555,21 @@ describe('Camera.streaming', () => {
       },
     };
     rtspCameraManager = new RtspCameraManager(
-      gladys,
+      gladysWithCredentials,
       childProcessMockWithCrash,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
     const error = await assert.isRejected(rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1));
-    expect(error.message).to.equal('Child process exited with code 1: CAMERA_URL: Connection refused');
+    expect(error.message).to.equal('Child process exited with code 1');
+    fakeAssert.calledOnceWithExactly(
+      warn,
+      'Camera my-camera: ffmpeg live stream failed with code 1: [rtsp @ 0x55] CAMERA_URL: Connection refused — password ***',
+    );
+    fakeAssert.calledWithExactly(debug, 'stderr: [rtsp @ 0x55] CAMERA_URL: Connection refused');
+    debug.getCalls().forEach((call) => expect(String(call.args[0])).to.not.include('s3cr'));
     const secondError = await assert.isRejected(rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1));
     expect(secondError.message).to.equal('Child process exited with code 1');
+    expect(warn.secondCall.args).to.deep.equal(['Camera my-camera: ffmpeg live stream failed with code 1']);
   });
   it('should keep the aspect ratio with an even height, whatever the rotation', async () => {
     const rotations = [
