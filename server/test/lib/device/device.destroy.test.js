@@ -9,7 +9,7 @@ const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const db = require('../../../models');
 const { isTooMuchStatesError } = require('../../../lib/device/device.destroy');
-const { BadParameters } = require('../../../utils/coreErrors');
+const { BadParameters, ConflictError } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -69,6 +69,22 @@ describe('Device.destroy', () => {
     const [deviceToDestroy, statesCount] = device.destroyAfterStatesPurge.firstCall.args;
     expect(deviceToDestroy).to.have.property('selector', 'test-device');
     expect(statesCount).to.equal(5);
+  });
+  it('should not purge in the background the history of a device being migrated', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 1;
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    device.migrationsInProgress.add('test-device');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date() },
+      { value: 0, created_at: new Date() },
+    ]);
+    const promise = device.destroy('test-device');
+    await assert.isRejected(promise, ConflictError, 'A migration is already in progress for device test-device');
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+    sinonAssert.notCalled(device.destroyAfterStatesPurge);
   });
   it('should give the same answer, without counting again, while the device is deleted in the background', async () => {
     const stateManager = new StateManager(event);

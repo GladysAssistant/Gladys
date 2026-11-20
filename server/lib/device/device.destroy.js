@@ -1,6 +1,6 @@
 const { QueryTypes } = require('sequelize');
 const Promise = require('bluebird');
-const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters, ConflictError } = require('../../utils/coreErrors');
 const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../utils/constants');
 const db = require('../../models');
 const logger = require('../../utils/logger');
@@ -108,6 +108,11 @@ async function destroy(selector, options = {}) {
   if (totalNumberOfStates > this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE) {
     logger.info(`Deleting device ${selector}, device has too much states. Cleaning states first.`);
     if (!scheduledDeletion) {
+      // A migration of this device (as its source or its destination) is moving its history:
+      // purging it now would lose states on the way. Same answer as a second migration.
+      if (this.migrationsInProgress.has(device.selector)) {
+        throw new ConflictError(`A migration is already in progress for device ${device.selector}`);
+      }
       // Not awaited: the purge can take minutes, and the caller is told right away that the
       // deletion goes on in the background. This function never rejects.
       this.destroyAfterStatesPurge(device, totalNumberOfStates);

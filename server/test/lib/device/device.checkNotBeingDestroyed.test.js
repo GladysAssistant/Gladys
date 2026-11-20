@@ -19,7 +19,7 @@ describe('Device.checkNotBeingDestroyed', () => {
   });
 
   it('should refuse a device being deleted in the background', () => {
-    device.devicesBeingDestroyed.set('device-id', { selector: 'device' });
+    device.devicesBeingDestroyed.set('device-id', { id: 'device-id', selector: 'device', external_id: 'mqtt:device' });
     expect(() => device.checkNotBeingDestroyed({ id: 'device-id' })).to.throw(
       ConflictError,
       'Device device-id is being deleted',
@@ -34,10 +34,23 @@ describe('Device.checkNotBeingDestroyed', () => {
     );
   });
 
+  it('should refuse a device being deleted in the background, saved without its id', () => {
+    device.devicesBeingDestroyed.set('device-id', { id: 'device-id', selector: 'device', external_id: 'mqtt:device' });
+    expect(() => device.checkNotBeingDestroyed({ external_id: 'mqtt:device' })).to.throw(
+      ConflictError,
+      'Device device-id is being deleted',
+    );
+    // an id that is not in the database: `create` falls back on the external_id
+    expect(() => device.checkNotBeingDestroyed({ id: 'unknown-id', external_id: 'mqtt:device' })).to.throw(
+      ConflictError,
+      'Device device-id is being deleted',
+    );
+  });
+
   it('should let any other device through, with or without an id', () => {
-    device.devicesBeingDestroyed.set('device-id', { selector: 'device' });
+    device.devicesBeingDestroyed.set('device-id', { id: 'device-id', selector: 'device', external_id: 'mqtt:device' });
     device.devicesDestroyedInBackground.add('deleted-device-id');
-    device.checkNotBeingDestroyed({ id: 'another-device-id' });
-    device.checkNotBeingDestroyed({ name: 'A new device' });
+    device.checkNotBeingDestroyed({ id: 'another-device-id', external_id: 'mqtt:another-device' });
+    device.checkNotBeingDestroyed({ name: 'A new device', external_id: 'mqtt:new-device' });
   });
 });

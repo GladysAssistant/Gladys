@@ -12,6 +12,11 @@ const logger = require('../../utils/logger');
  * device.destroyAfterStatesPurge(device, 12000);
  */
 async function destroyAfterStatesPurge(device, statesCount) {
+  // Two requests that both counted the states before either scheduled the deletion: the first
+  // one owns it, the second one only gets the same answer
+  if (this.devicesBeingDestroyed.has(device.id)) {
+    return;
+  }
   // The deletion is bound to the device the user asked to delete: its id, and the
   // external_id it had then. A device re-paired in place keeps its id but not its
   // external_id, and must not be deleted hours later.

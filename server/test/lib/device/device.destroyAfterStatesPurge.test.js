@@ -50,6 +50,17 @@ describe('Device.destroyAfterStatesPurge', () => {
     expect(device.devicesBeingDestroyed.size).to.equal(0);
   });
 
+  it('should not start a second deletion of a device already being deleted', async () => {
+    const deviceToDestroy = await findTestDevice();
+    const firstDeletion = { id: deviceToDestroy.id, selector: 'test-device', statesCount: 12000 };
+    device.devicesBeingDestroyed.set(deviceToDestroy.id, firstDeletion);
+    device.purgeStatesThenDestroy = fake.resolves(null);
+    await device.destroyAfterStatesPurge(deviceToDestroy, 13000);
+    sinonAssert.notCalled(device.purgeStatesThenDestroy);
+    // the deletion that runs keeps its entry
+    expect(device.devicesBeingDestroyed.get(deviceToDestroy.id)).to.equal(firstDeletion);
+  });
+
   it('should never reject, and let the device be deleted again, when the deletion fails', async () => {
     const deviceToDestroy = await findTestDevice();
     device.purgeStatesThenDestroy = fake.rejects(new Error('purge failed'));

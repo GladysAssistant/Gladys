@@ -147,6 +147,12 @@ class MobileDeviceItem extends Component {
     }
     this.pendingHref = null;
     if (this.hasGuard() && this.isDirty()) {
+      // a device that is going away has nothing left to save: its changes are dropped, without
+      // offering "Save and close"
+      if (this.props.deleteScheduled) {
+        this.closeWithoutSaving();
+        return;
+      }
       this.setState({ leaveOpen: true });
       return;
     }

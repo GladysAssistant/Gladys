@@ -584,6 +584,29 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=external-device-row]').should('have.length', 1);
     });
 
+    it('should drop the unsaved changes of a device whose deletion is scheduled, without offering to save them', () => {
+      cy.intercept({ method: 'POST', url: api('/device') }, cy.spy().as('saveDevice'));
+      cy.intercept(
+        { method: 'DELETE', url: api('/device/ext-cy-mobile-garage-plug') },
+        { statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } }
+      ).as('deleteDevice');
+      cy.visit(`/dashboard/integration/device/external/${SELECTOR}`);
+      cy.wait('@getDevices');
+      cy.get('[data-cy=external-device-row]').click();
+      cy.get('[data-cy=integration-device-name]').type(' renamed');
+      cy.get('[data-cy=integration-device-delete]').click();
+      cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@deleteDevice');
+      cy.get('[data-cy=integration-device-delete-scheduled]').should('be.visible');
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-leave-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=external-device-row]')
+        .should('contain', 'Garage plug')
+        .and('not.contain', 'renamed');
+      cy.get('@saveDevice').should('not.have.been.called');
+    });
+
     it('should add a discovered device, and not the one already added', () => {
       stubSave();
       cy.visit(`/dashboard/integration/device/external/${SELECTOR}/discover`);
