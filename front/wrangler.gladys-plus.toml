@@ -1,0 +1,30 @@
+# Cloudflare Worker serving the Gladys Plus front (https://plus.gladysassistant.com).
+#
+# The front is built by GitHub Actions with GATEWAY_MODE=true, then uploaded
+# as the static assets of this Worker (no Worker script, assets only):
+# - production: `wrangler deploy`, from the release workflow and from the
+#   "Publish Gladys Plus front to production" workflow
+#   (.github/workflows/publish-gladys-plus-production.yml);
+# - pull requests: `wrangler versions upload --preview-alias pr-<number>`,
+#   which never touches production (.github/workflows/gladys-plus-preview-*.yml).
+#
+# Both deploy jobs read this file from the trusted ref (the release tag, or
+# master for the previews), never from the pull request.
+
+name = "gladys-plus"
+compatibility_date = "2026-10-01"
+
+# Production is only served on the custom domain below...
+workers_dev = false
+# ...but every uploaded version (and every pull request alias) gets its own
+# preview URL on workers.dev.
+preview_urls = true
+
+routes = [{ pattern = "plus.gladysassistant.com", custom_domain = true }]
+
+[assets]
+directory = "./build"
+# The front is a single page application: any path that is not a file serves
+# index.html, and the client router takes over (like the "/* -> /index.html"
+# rewrite of Cloudflare Pages).
+not_found_handling = "single-page-application"
