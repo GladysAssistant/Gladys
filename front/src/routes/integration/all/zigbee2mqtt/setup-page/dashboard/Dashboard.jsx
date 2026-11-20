@@ -7,7 +7,7 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
 import { findAdapter } from '../wizard/adapters';
 import Wizard from '../wizard/Wizard';
-import PairingScreen from './PairingScreen';
+import PairingScreen from '../pairing/PairingScreen';
 import {
   DASHBOARD_STATE,
   countNewDevices,
@@ -246,6 +246,7 @@ class Dashboard extends Component {
           session={props.session}
           online={Boolean(status.zigbee2mqttConnected)}
           onClose={this.showMain}
+          backLabelId="integration.zigbee2mqtt.setupTab"
         />
       );
     }

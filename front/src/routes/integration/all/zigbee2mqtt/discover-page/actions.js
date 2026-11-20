@@ -64,21 +64,6 @@ function createActions(store) {
         discoverZigbee2mqttError: null
       });
     },
-    // { allowed, remainingSeconds } (docs/specs/zigbee2mqtt-pairing.md, B.2): the switch only needs whether it is allowed
-    async getPermitJoin(state) {
-      const value = await state.httpClient.get('/api/v1/service/zigbee2mqtt/permit_join');
-      store.setState({
-        permitJoin: Boolean(value && value.allowed)
-      });
-    },
-    async togglePermitJoin(state) {
-      await state.httpClient.post('/api/v1/service/zigbee2mqtt/permit_join');
-    },
-    updatePermitJoin(state, value) {
-      store.setState({
-        permitJoin: Boolean(value && value.allowed)
-      });
-    },
     updateDeviceField(state, index, field, value) {
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
         [index]: {

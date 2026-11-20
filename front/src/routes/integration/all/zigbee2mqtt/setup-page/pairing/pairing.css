@@ -5,6 +5,27 @@
   color: #1c2334;
 }
 
+/* ---------- the screen of the window (dashboard, Discover tab) ---------- */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #e4e8ef;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1c2334;
+}
+
+.screenHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 /* ---------- joining and its countdown ---------- */
 
 .header {

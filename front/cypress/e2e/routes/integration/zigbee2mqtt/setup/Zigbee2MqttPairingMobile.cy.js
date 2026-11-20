@@ -22,7 +22,7 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     visitDashboard();
     answerPairing();
     cy.get('[data-cy=z2m-dashboard-pair]').click();
-    cy.get('[data-cy=z2m-dashboard-pairing]').should('be.visible');
+    cy.get('[data-cy=z2m-pairing-screen]').should('be.visible');
     cy.wait('@permitJoin');
     sendPermitJoin({ allowed: true, remainingSeconds: 254 });
     cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
@@ -60,7 +60,7 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     );
 
     cy.get('[data-cy=z2m-pairing-close]').click();
-    cy.get('[data-cy=z2m-dashboard-pairing]').should('not.exist');
+    cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
     cy.get('[data-cy=z2m-dashboard-pair]').should('exist');
   });
 });

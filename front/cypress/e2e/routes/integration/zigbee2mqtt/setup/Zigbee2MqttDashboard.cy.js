@@ -76,7 +76,7 @@ describe('Zigbee2mqtt dashboard', () => {
 
       cy.get('[data-cy=z2m-dashboard-pair]').click();
       // The window asks Zigbee2mqtt to permit joining as it opens (docs/specs/zigbee2mqtt-pairing.md, D)
-      cy.get('[data-cy=z2m-dashboard-pairing]').should('exist');
+      cy.get('[data-cy=z2m-pairing-screen]').should('exist');
       cy.wait('@permitJoin')
         .its('request.body')
         .should('deep.equal', { value: true });
@@ -85,7 +85,7 @@ describe('Zigbee2mqtt dashboard', () => {
 
       // Joining goes on by itself: nothing is sent when the window closes
       cy.get('[data-cy=z2m-pairing-close]').click();
-      cy.get('[data-cy=z2m-dashboard-pairing]').should('not.exist');
+      cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-status]').should('have.attr', 'data-state', 'online');
       cy.get('@permitJoin.all').should('have.length', 1);
     });

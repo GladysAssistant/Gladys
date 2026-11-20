@@ -120,11 +120,15 @@ opened:
 
 ### D.1 Where (D57)
 
-One component (`setup-page/pairing/PairingWindow.jsx`, desktop and phone) shown at step ④ of the
-setup wizard and by **Pair** on the dashboard, on a screen of its own (`PairingScreen.jsx`, the
-4-minute notice of the dashboard removed). The window asks Zigbee2mqtt to permit joining as it opens
-(when Zigbee2mqtt answers): the user came to pair. The Discover tab is unchanged; its switch reads
-`allowed` from the new `zigbee2mqtt.permit-join` object.
+One component (`setup-page/pairing/PairingWindow.jsx`, desktop and phone), the only way to pair
+from Gladys: shown at step ④ of the setup wizard, and on a screen of its own
+(`setup-page/pairing/PairingScreen.jsx`) opened by **Pair a device** on the dashboard (the 4-minute
+notice removed) and on the Discover tab (D61: the switch "Permit joining" replaced, its texts
+removed), closed back to where it was opened. The window asks Zigbee2mqtt to permit joining as it
+opens (when Zigbee2mqtt answers): the user came to pair. The Discover tab keeps what the window does
+not cover: the devices of the network not in Gladys yet (a former pairing, the Zigbee2mqtt
+interface, an installation taken over) and those to update; its empty list points to "Pair a
+device".
 
 ### D.2 Content
 

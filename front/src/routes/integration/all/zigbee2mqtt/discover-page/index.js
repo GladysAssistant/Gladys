@@ -6,20 +6,23 @@ import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import { withMobileViewport } from '../../../../../components/mobile';
+import PairingScreen from '../setup-page/pairing/PairingScreen';
 
 class Zigbee2mqttIntegration extends Component {
+  state = { pairing: false };
+
+  // "Pair a device": the pairing window (docs/specs/zigbee2mqtt-pairing.md, D.1), back to the list once closed
+  openPairing = () => this.setState({ pairing: true });
+
+  closePairing = () => this.setState({ pairing: false });
+
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
       this.props.setDiscoveredDevices
     );
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      this.props.updatePermitJoin
-    );
 
-    // The Zigbee2mqtt status (permit join switch, banner) is loaded and followed by CheckStatus
-    this.props.getPermitJoin();
+    // The Zigbee2mqtt status ("Pair a device", banner) is loaded and followed by CheckStatus
     this.props.setDiscoveredDevices(undefined);
     this.props.getHouses();
     this.props.getIntegrationByName('zigbee2mqtt');
@@ -32,16 +35,23 @@ class Zigbee2mqttIntegration extends Component {
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
       this.props.setDiscoveredDevices
     );
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      this.props.updatePermitJoin
-    );
   }
 
-  render(props) {
+  render(props, { pairing }) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        <DiscoverTab {...props} dictionary={this.props.intl.dictionary} />
+        {pairing ? (
+          <PairingScreen
+            isMobile={props.isMobile}
+            httpClient={props.httpClient}
+            session={props.session}
+            online={Boolean(props.zigbee2mqttConnected)}
+            onClose={this.closePairing}
+            backLabelId="integration.zigbee2mqtt.discoverTab"
+          />
+        ) : (
+          <DiscoverTab {...props} dictionary={this.props.intl.dictionary} openPairing={this.openPairing} />
+        )}
       </Zigbee2mqttPage>
     );
   }
@@ -49,7 +59,7 @@ class Zigbee2mqttIntegration extends Component {
 
 export default withIntlAsProp(
   connect(
-    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting,z2mUrl,showZ2mUrlWarning,z2mConfigured',
+    'user,session,httpClient,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting,z2mUrl,showZ2mUrlWarning,z2mConfigured',
     actions
   )(withMobileViewport(Zigbee2mqttIntegration))
 );

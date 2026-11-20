@@ -399,45 +399,26 @@ describe('Zigbee2MQTT tabs on a phone', () => {
         .and('include', 'github.com/GladysAssistant/Gladys/issues/new');
     });
 
-    it('should permit joining from the button of the page, and stop it', () => {
+    it('should open the pairing window from the button of the page, and come back to the list', () => {
       stubStatus(onlineStatus);
+      cy.intercept({ method: 'GET', url: api('/service/zigbee2mqtt/pairing') }, { body: [] });
       visitDiscover();
-      cy.get('[data-cy=z2m-discover-permit-join]')
+      cy.get('[data-cy=z2m-discover-pair]')
         .should('not.be.disabled')
-        .i18n('integration.zigbee2mqtt.discover.permitJoin')
+        .i18n('integration.zigbee2mqtt.setup.dashboard.actions.pair')
         .click();
-      // the request of the desktop switch
-      cy.wait('@permitJoin');
-      cy.get('[data-cy=z2m-discover-permit-join-open]').should('not.exist');
-
-      // the state of the joining comes back live
-      cy.waitForWebSocket();
-      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: { allowed: true, remainingSeconds: 254 } });
-      cy.get('[data-cy=z2m-discover-permit-join-open]').i18n('integration.zigbee2mqtt.discover.permitJoinOpen');
-      cy.get('[data-cy=z2m-discover-permit-join]')
-        .i18n('integration.zigbee2mqtt.discover.stopPermitJoin')
-        .click();
-      cy.wait('@permitJoin');
-
-      cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: { allowed: false, remainingSeconds: null } });
-      cy.get('[data-cy=z2m-discover-permit-join-open]').should('not.exist');
-      cy.get('[data-cy=z2m-discover-permit-join]').i18n('integration.zigbee2mqtt.discover.permitJoin');
-      cy.get('@permitJoin.all').should('have.length', 2);
+      // The window asks for joining as it opens (docs/specs/zigbee2mqtt-pairing.md, D.1)
+      cy.get('[data-cy=z2m-pairing-screen]').should('be.visible');
+      cy.wait('@permitJoin')
+        .its('request.body')
+        .should('deep.equal', { value: true });
+      cy.get('[data-cy=mobile-nav-back]').should('contain', i18n('integration.zigbee2mqtt.discoverTab'));
+      cy.get('[data-cy=z2m-pairing-close]').click();
+      cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
+      cy.get('[data-cy=z2m-discovered-row]').should('have.length', 4);
     });
 
-    it('should say so under the button when joining could not be permitted', () => {
-      stubStatus(onlineStatus);
-      cy.intercept({ method: 'POST', url: api('/service/zigbee2mqtt/permit_join') }, { statusCode: 500, body: {} }).as(
-        'permitJoinFailed'
-      );
-      visitDiscover();
-      cy.get('[data-cy=z2m-discover-permit-join]').click();
-      cy.wait('@permitJoinFailed');
-      cy.get('[data-cy=z2m-discover-permit-join-error]').i18n('integration.zigbee2mqtt.discover.permitJoinError');
-      cy.get('[data-cy=z2m-discover-permit-join]').should('not.be.disabled');
-    });
-
-    it('should not permit joining while Zigbee2MQTT does not answer, until it is online', () => {
+    it('should not pair while Zigbee2MQTT does not answer, until it is online', () => {
       stubStatus(notOnlineStatus);
       visitDiscover();
       cy.get('[data-cy=z2m-discover-mobile]')
@@ -445,15 +426,15 @@ describe('Zigbee2MQTT tabs on a phone', () => {
         .first()
         .should('have.attr', 'data-cy', 'z2m-status-alert')
         .and('contain', i18n('integration.zigbee2mqtt.status.notRunning'));
-      cy.get('[data-cy=z2m-discover-permit-join]').should('be.disabled');
+      cy.get('[data-cy=z2m-discover-pair]').should('be.disabled');
 
       cy.waitForWebSocket();
       cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: onlineStatus });
       cy.get('[data-cy=z2m-status-alert]').should('not.exist');
-      cy.get('[data-cy=z2m-discover-permit-join]').should('not.be.disabled');
+      cy.get('[data-cy=z2m-discover-pair]').should('not.be.disabled');
     });
 
-    it('should not permit joining while Zigbee2MQTT is not installed, and lead to its installation', () => {
+    it('should not pair while Zigbee2MQTT is not installed, and lead to its installation', () => {
       stubStatus(notInstalledStatus);
       // Nothing set up: no interface address to warn about
       cy.intercept({ method: 'GET', url: api('/service/zigbee2mqtt/setup') }, { body: {} }).as('emptySetup');
@@ -463,7 +444,7 @@ describe('Zigbee2MQTT tabs on a phone', () => {
         i18n('integration.zigbee2mqtt.status.notInstalled')
       );
       cy.get('[data-cy=z2m-status-alert]').should('not.exist');
-      cy.get('[data-cy=z2m-discover-permit-join]').should('be.disabled');
+      cy.get('[data-cy=z2m-discover-pair]').should('be.disabled');
       // its banner only
       cy.wait('@emptySetup');
       cy.get('[data-cy=z2m-url-warning]').should('not.exist');
@@ -487,14 +468,14 @@ describe('Zigbee2MQTT tabs on a phone', () => {
       cy.get('[data-cy=z2m-discovered-row]').should('have.length', 5);
     });
 
-    it('should keep the cards and the switch on a wider screen', () => {
+    it('should keep the cards and the pairing button on a wider screen', () => {
       stubStatus(onlineStatus);
       cy.viewport(...DESKTOP);
       cy.visit(DISCOVER_URL);
       cy.wait('@getDiscovered');
       cy.get('[data-cy=z2m-discover-mobile]').should('not.exist');
       cy.get('.col-md-6').should('have.length', 4);
-      cy.get('#permitJoin').should('not.be.disabled');
+      cy.get('[data-cy=z2m-discover-pair]').should('not.be.disabled');
     });
   });
 });
