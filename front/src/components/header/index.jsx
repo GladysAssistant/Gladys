@@ -193,6 +193,8 @@ class Header extends Component {
       // same for the server clock: a client-side login never runs the
       // session check that measures it (throttled, so almost always a no-op)
       this.props.refreshClockOffsetState();
+      // and for the integrations still starting (only the first call of a session asks Gladys)
+      this.props.refreshServicesStartupStateIfNeeded();
     }
   };
 
@@ -311,7 +313,11 @@ class Header extends Component {
           <DarkModeToggle />
         </div>
         {showServicesStartupNotice && (
-          <ServicesStartupMobileStrip servicesStartup={props.servicesStartup} onClick={props.toggleCollapsedMenu} />
+          <ServicesStartupMobileStrip
+            servicesStartup={props.servicesStartup}
+            onClick={props.toggleCollapsedMenu}
+            menuOpen={props.showCollapsedMenu}
+          />
         )}
         {/* Collapsed rail on desktop: this floating button, alone in the slim
             gutter the page keeps on the left, expands it back — into the

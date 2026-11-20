@@ -8386,7 +8386,7 @@
     "subscriptionNoticeCheck": "Check the subscription",
     "subscriptionNoticeContactAdmin": "Please contact the administrator of your Gladys Plus account.",
     "servicesStartupNoticeTitle": "Gladys is starting",
-    "servicesStartupNoticeText": "{{done}}/{{total}} integrations started. Devices of integrations not started yet cannot be controlled for now.",
+    "servicesStartupNoticeText": "Starting the integrations: {{done}}/{{total}}. Devices of integrations not started yet cannot be controlled for now.",
     "servicesStartupNoticeProgress": "{{done}}/{{total}} integrations",
     "servicesStartupNoticeCurrent": "Starting:",
     "servicesStartupNoticeWaiting": "Waiting:",

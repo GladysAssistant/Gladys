@@ -258,6 +258,7 @@ const AppRouter = connect(
       refreshInstanceVersionState={props.refreshInstanceVersionState}
       clockOffset={props.clockOffset}
       refreshClockOffsetState={props.refreshClockOffsetState}
+      refreshServicesStartupStateIfNeeded={props.refreshServicesStartupStateIfNeeded}
     />
     {/* Outside the Header: that one renders nothing on a full-screen dashboard,
         where a wall tablet most needs to be told that Gladys is unreachable. */}

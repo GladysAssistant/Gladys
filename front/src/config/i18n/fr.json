@@ -8386,7 +8386,7 @@
     "subscriptionNoticeCheck": "Vérifier l'abonnement",
     "subscriptionNoticeContactAdmin": "Merci de contacter l'administrateur de votre compte Gladys Plus.",
     "servicesStartupNoticeTitle": "Gladys démarre",
-    "servicesStartupNoticeText": "{{done}}/{{total}} intégrations démarrées. Les appareils des intégrations pas encore démarrées ne peuvent pas être contrôlés pour l'instant.",
+    "servicesStartupNoticeText": "Démarrage des intégrations : {{done}}/{{total}}. Les appareils des intégrations pas encore démarrées ne peuvent pas être contrôlés pour l'instant.",
     "servicesStartupNoticeProgress": "{{done}}/{{total}} intégrations",
     "servicesStartupNoticeCurrent": "En cours :",
     "servicesStartupNoticeWaiting": "En attente :",

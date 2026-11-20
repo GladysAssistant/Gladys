@@ -49,6 +49,9 @@ let servicesStartupListeners = null;
 // bumped by every progress received through the websocket: a state loaded over
 // HTTP meanwhile is older than it, and must not replace it
 let servicesStartupEventCount = 0;
+// Each GET of the startup state is numbered: only the answer to the latest one is kept, an older
+// one that arrives last would put back a state that is already stale
+let servicesStartupRequestCount = 0;
 
 const OPEN_PAGES = [
   '/signup',
@@ -371,15 +374,29 @@ function createActions(store) {
         requestSession.dispatcher.addListener('websocket.connected', servicesStartupListeners.onConnected);
       }
       const eventCountBeforeRequest = servicesStartupEventCount;
+      servicesStartupRequestCount += 1;
+      const requestNumber = servicesStartupRequestCount;
       try {
         const servicesStartup = await state.httpClient.get('/api/v1/service/startup');
-        if (store.getState().session !== requestSession || servicesStartupEventCount !== eventCountBeforeRequest) {
+        if (
+          store.getState().session !== requestSession ||
+          servicesStartupEventCount !== eventCountBeforeRequest ||
+          servicesStartupRequestCount !== requestNumber
+        ) {
           return;
         }
         store.setState({ servicesStartup });
       } catch (e) {
         // state unknown: better no notice than a wrong one
         console.error(e);
+      }
+    },
+    // A client-side sign-in never runs the session check that loads the startup state (/login is
+    // an open page): the header asks for it once it renders for a signed-in user. Only the first
+    // call of a session does something, the websocket keeps the state up to date afterwards.
+    refreshServicesStartupStateIfNeeded(state) {
+      if (state.session && servicesStartupListenerSession !== state.session) {
+        actions.refreshServicesStartupState(state);
       }
     },
     // On Gladys Plus the front redeploys at release time while the local

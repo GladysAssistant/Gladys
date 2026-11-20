@@ -73,7 +73,10 @@ async function startAll() {
       { concurrency: 1 },
     );
   } finally {
-    this.setStartupState({ in_progress: false, total, done: total, current: null, waiting: [] });
+    // The startup is over, also when it was cut short by an error (the database, not a service
+    // that fails to start: that one is caught by `start`): the count and the list of services
+    // never started stay as they are, so they are not reported as handled.
+    this.setStartupState({ in_progress: false, total, done, current: null, waiting });
   }
 }
 

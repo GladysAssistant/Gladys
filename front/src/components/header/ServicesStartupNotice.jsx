@@ -119,7 +119,7 @@ export class ServicesStartupMobileStrip extends Component {
     document.body.classList.remove(MOBILE_STRIP_BODY_CLASS);
   }
 
-  render({ servicesStartup, onClick }) {
+  render({ servicesStartup, onClick, menuOpen }) {
     const { done, total } = servicesStartup;
     return (
       <button
@@ -128,12 +128,13 @@ export class ServicesStartupMobileStrip extends Component {
         onClick={onClick}
         data-cy="services-startup-mobile-strip"
         aria-controls="sidebar-navigation"
+        aria-expanded={menuOpen ? 'true' : 'false'}
       >
         <i class={cx('fe fe-loader', style.startupNoticeIcon)} />
-        <span class={style.startupMobileStripTitle}>
+        <span class={cx(style.startupMobileStripText, style.startupMobileStripTitle)}>
           <Text id="header.servicesStartupNoticeTitle" />
         </span>
-        <span>
+        <span class={style.startupMobileStripText}>
           <Text id="header.servicesStartupNoticeProgress" fields={{ done, total }} />
         </span>
       </button>

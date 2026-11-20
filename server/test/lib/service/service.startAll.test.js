@@ -153,6 +153,37 @@ describe('service.startAll', () => {
     });
   });
 
+  it('should keep the services never started out of the count when starting the services failed', async () => {
+    const otherServiceName = 'ext-fake-integration-never-started';
+    stateManager.setState('service', otherServiceName, { name: otherServiceName });
+    await db.Service.create({
+      name: otherServiceName,
+      selector: otherServiceName,
+      version: '1.0.0',
+      status: SERVICE_STATUS.RUNNING,
+      type: 'external',
+      manifest: { name: 'Never started' },
+    });
+    service.start = fake.rejects(new Error('database error'));
+
+    let error;
+    try {
+      await service.startAll();
+    } catch (e) {
+      error = e;
+    } finally {
+      await db.Service.destroy({ where: { name: otherServiceName } });
+    }
+
+    expect(error).to.be.instanceOf(Error);
+    // the first service failed, the map stopped there: the other one is still waiting
+    assert.calledOnce(service.start);
+    const startupState = service.getStartupState();
+    expect(startupState).to.include({ in_progress: false, total: 2, done: 1, current: null });
+    expect(startupState.waiting).to.have.lengthOf(1);
+    expect(startupState.waiting[0].name).to.not.equal(service.start.firstCall.args[0]);
+  });
+
   it('should start all services error (status === UNKNOWN)', async () => {
     serviceImpl.start = fake.rejects(null);
 
