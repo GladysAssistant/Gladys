@@ -357,6 +357,8 @@ A widget shows a value as soon as it is asked for, and `POST /api/v1/device_feat
 
 **Not covered:** a command the integration accepts and the device never executes (a Zigbee device out of range: the MQTT publish succeeds). That needs a "no confirmation received" deadline per integration; the music box has its own (`external-integrations/capabilities/music.md`, section 6).
 
+**Known exception, for now:** the thermostat setpoint (`ThermostatBox.sendSetpoint`) and the camera PTZ controls only log a request Gladys did not answer: they dispatch no local failure, so a dragged setpoint whose write got no answer stays on screen until the next state of the device or the next load of the card. They do get the failures reported by the server like every widget (the thermostat drops its setpoint holds on a rollback). Restoring the setpoint shown before the drag is the follow-up.
+
 ## Phases
 
 Ordering principle, decided with the maintainer: **plumbing first, showcase widgets last.** The layout engine, the density widgets, the asset storage, and the appearance layer are what unlock every future dashboard; the flashy visualizations come once that foundation is in place.
