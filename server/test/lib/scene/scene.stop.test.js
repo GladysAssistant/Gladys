@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const { fake } = require('sinon').createSandbox();
+const sinonSandbox = require('sinon').createSandbox();
+
+const { fake } = sinonSandbox;
 const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
@@ -22,6 +24,7 @@ describe('scene.stop', () => {
   });
 
   afterEach(() => {
+    sinonSandbox.restore();
     // Abort any execution still running so its long delay timer does not keep
     // the Node process alive between tests.
     sceneManager.runningScenes.forEach((runningScene) => runningScene.abortController.abort());
@@ -263,6 +266,101 @@ describe('scene.stop', () => {
 
     expect(sceneManager.getRunning()).to.have.lengthOf(0);
     expect(device.setValue.called).to.equal(false);
+  });
+
+  it('should stop a scene immediately while an action is waiting on something that never answers', async () => {
+    // An action blocked forever (e.g. a device command to an offline node)
+    let resolvePendingAction;
+    const pendingAction = sinonSandbox.stub().returns(
+      new Promise((resolve) => {
+        resolvePendingAction = resolve;
+      }),
+    );
+    const nextAction = sinonSandbox.stub().resolves();
+    sinonSandbox.replace(actionsFunc, ACTIONS.LIGHT.TURN_ON, pendingAction);
+    sinonSandbox.replace(actionsFunc, ACTIONS.LIGHT.TURN_OFF, nextAction);
+    const scene = {
+      selector: 'my-scene',
+      name: 'My scene',
+      icon: 'zap',
+      triggers: [],
+      actions: [
+        [{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }],
+        [{ type: ACTIONS.LIGHT.TURN_OFF, devices: ['light-1'] }],
+      ],
+    };
+    await sceneManager.addScene(scene);
+
+    const stoppedMessages = [];
+    const listener = (message) => {
+      if (message.type === WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED) {
+        stoppedMessages.push(message);
+      }
+    };
+    event.on(EVENTS.WEBSOCKET.SEND_ALL, listener);
+
+    const started = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED);
+    sceneManager.execute('my-scene');
+    const { executionId } = (await started).payload;
+    // Let the first action start (and block)
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    expect(pendingAction.calledOnce).to.equal(true);
+
+    const stopped = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED);
+    expect(sceneManager.stop(executionId)).to.equal(true);
+    await stopped;
+    // The execution ended although the action is still pending
+    expect(sceneManager.getRunning()).to.have.lengthOf(0);
+
+    // The pending action finally returns: the rest of the scene does not run,
+    // and the execution is not reported as stopped a second time.
+    resolvePendingAction();
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    event.removeListener(EVENTS.WEBSOCKET.SEND_ALL, listener);
+    expect(nextAction.called).to.equal(false);
+    expect(stoppedMessages).to.have.lengthOf(1);
+    expect(stoppedMessages[0].payload).to.deep.equal({ executionId, sceneSelector: 'my-scene' });
+  });
+
+  it('should ignore an action failing after its scene was stopped', async () => {
+    let rejectPendingAction;
+    const pendingAction = sinonSandbox.stub().returns(
+      new Promise((resolve, reject) => {
+        rejectPendingAction = reject;
+      }),
+    );
+    sinonSandbox.replace(actionsFunc, ACTIONS.LIGHT.TURN_ON, pendingAction);
+    const scene = {
+      selector: 'my-scene',
+      name: 'My scene',
+      icon: 'zap',
+      triggers: [],
+      actions: [[{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }]],
+    };
+    await sceneManager.addScene(scene);
+
+    const started = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED);
+    sceneManager.execute('my-scene');
+    const { executionId } = (await started).payload;
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+
+    const stopped = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED);
+    sceneManager.stop(executionId);
+    await stopped;
+    expect(sceneManager.getRunning()).to.have.lengthOf(0);
+
+    // A late failure of the action is caught (no unhandled rejection)
+    rejectPendingAction(new Error('Node unreachable'));
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    expect(sceneManager.getRunning()).to.have.lengthOf(0);
   });
 
   it('should wait normally when no abort signal is provided', async () => {
