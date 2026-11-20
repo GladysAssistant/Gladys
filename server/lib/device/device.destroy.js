@@ -26,6 +26,9 @@ function isTooMuchStatesError(error) {
  * @param {object} [options.scheduledDeletion] - Only for the background deletion of a device
  * (device.purgeStatesThenDestroy.js): the device it was asked to delete, `{ id, external_id }`.
  * Another device found under this selector is not deleted.
+ * @param {boolean} [options.migration] - Only for the last step of a migration of this device
+ * (device.migrate.js), which holds the migration lock: its history was moved already, so a
+ * device back over the limit is handed over to the background deletion like any other.
  * @returns {Promise} Resolve when device is destroyed.
  * @example
  * device.destroy('test-device');
@@ -105,12 +108,19 @@ async function destroy(selector, options = {}) {
 
   const totalNumberOfStates = deviceStatesCount[0].count + deviceStatesCount[1].count + duckDbStatesCount;
   logger.info(`Deleting device ${selector}, device has ${totalNumberOfStates} states in DB`);
+  // Counting awaits: another "Delete" of the same device may have started its background
+  // deletion in the meantime. Then this call must neither start a second one nor delete the
+  // device under the purge, which may already have brought it under the limit.
+  if (!scheduledDeletion && this.devicesBeingDestroyed.has(device.id)) {
+    const { statesCount } = this.devicesBeingDestroyed.get(device.id);
+    throw new BadParameters(`${statesCount} states in DB. ${TOO_MUCH_STATES_MESSAGE}`);
+  }
   if (totalNumberOfStates > this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE) {
     logger.info(`Deleting device ${selector}, device has too much states. Cleaning states first.`);
     if (!scheduledDeletion) {
       // A migration of this device (as its source or its destination) is moving its history:
       // purging it now would lose states on the way. Same answer as a second migration.
-      if (this.migrationsInProgress.has(device.selector)) {
+      if (!options.migration && this.migrationsInProgress.has(device.selector)) {
         throw new ConflictError(`A migration is already in progress for device ${device.selector}`);
       }
       // Not awaited: the purge can take minutes, and the caller is told right away that the

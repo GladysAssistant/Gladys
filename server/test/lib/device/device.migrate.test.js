@@ -656,6 +656,49 @@ describe('Device.migrate', function Describe() {
     expect(await db.Device.findOne({ where: { selector: 'migration-source' } })).to.equal(null);
   });
 
+  it('should succeed and hand the source over to the background deletion when it saved too many states meanwhile', async () => {
+    deviceManager.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 0;
+    deviceManager.destroyAfterStatesPurge = fake.resolves(null);
+    // the source keeps publishing while scenes and dashboards are rewritten, after its
+    // history was swept
+    const realUpdateProgress = deviceManager.job.updateProgress.bind(deviceManager.job);
+    deviceManager.job.updateProgress = async (...args) => {
+      const returnedValue = await realUpdateProgress(...args);
+      if (args[2] && args[2].step === 'deleting_source_device') {
+        await db.duckDbBatchInsertState(sourceTempFeature.id, [{ value: 30, created_at: new Date() }]);
+      }
+      return returnedValue;
+    };
+    let result;
+    try {
+      result = await deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+    } finally {
+      deviceManager.job.updateProgress = realUpdateProgress;
+    }
+    expect(result.success).to.equal(true);
+    sinonAssert.calledOnce(deviceManager.destroyAfterStatesPurge);
+    expect(deviceManager.destroyAfterStatesPurge.firstCall.args[0]).to.have.property('selector', 'migration-source');
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
+  });
+
+  it('should fail when deleting the source fails for another reason', async () => {
+    const realDestroy = deviceManager.destroy;
+    deviceManager.destroy = fake.rejects(new Error('database is locked'));
+    try {
+      const promise = deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+      await assert.isRejected(promise, 'database is locked');
+    } finally {
+      deviceManager.destroy = realDestroy;
+    }
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
+  });
+
   it('should delete the whole history when nothing is mapped', async () => {
     // "Migrate without history": the user maps no feature at all, the source history is
     // dropped rather than moved, and no UPDATE is ever built.

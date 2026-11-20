@@ -100,6 +100,47 @@ describe('Device.destroy', () => {
     expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
     sinonAssert.notCalled(device.destroyAfterStatesPurge);
   });
+  it('should not delete the device under a background deletion started while it was counting', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    const testDevice = await db.Device.findOne({ where: { selector: 'test-device' } });
+    // another "Delete" schedules the background deletion while this one counts the states,
+    // and the purge already brought the device under the limit
+    const realQuery = db.sequelize.query.bind(db.sequelize);
+    const query = sinon.stub(db.sequelize, 'query').callsFake(async (...args) => {
+      const result = await realQuery(...args);
+      // only once the states are counted: the lookup of the device goes through here too
+      if (String(args[0]).includes('t_device_feature_state_aggregate')) {
+        device.devicesBeingDestroyed.set(testDevice.id, { statesCount: 12000 });
+      }
+      return result;
+    });
+    try {
+      const promise = device.destroy('test-device');
+      await assert.isRejected(promise, '12000 states in DB. Too much states!');
+    } finally {
+      query.restore();
+    }
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+    sinonAssert.notCalled(device.destroyAfterStatesPurge);
+  });
+  it('should hand over to the background deletion a device the migration holding its lock deletes', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 1;
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    device.migrationsInProgress.add('test-device');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date() },
+      { value: 0, created_at: new Date() },
+    ]);
+    const promise = device.destroy('test-device', { migration: true });
+    await assert.isRejected(promise, BadParameters, '2 states in DB. Too much states!');
+    sinonAssert.calledOnce(device.destroyAfterStatesPurge);
+  });
   it('should destroy the device for its background deletion', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
