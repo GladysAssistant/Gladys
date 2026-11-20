@@ -8,6 +8,7 @@ import dashboardActions from '../../actions/dashboard';
 import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
+import { declareReloadablePage } from '../../utils/reloadablePage';
 
 // dashboard actions plus the shared setTabletMode (main.js), used by the
 // ?tablet_mode_house=<house_selector> URL param below to activate tablet mode
@@ -372,6 +373,9 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
+    // A dashboard is only looked at: it can be reloaded by itself when Gladys is back
+    // after an outage (utils/reloadablePage.js)
+    this.pageIsNoLongerReloadable = declareReloadablePage();
     this.init();
     this.getGatewayRecoveryCodesState();
     document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
@@ -433,6 +437,7 @@ class Dashboard extends Component {
   }
 
   componentWillUnmount() {
+    this.pageIsNoLongerReloadable();
     document.removeEventListener('fullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
@@ -460,6 +465,7 @@ class Dashboard extends Component {
       gatewayInstanceNotFound,
       gatewayRecoveryCodesMissing,
       loading,
+      getDashboardsError,
       currentDashboardLoadFailed,
       browserFullScreenCompatible,
       duckDbMigrationJob,
@@ -482,7 +488,11 @@ class Dashboard extends Component {
     // or failed).
     const currentDashboardResolved =
       !loading && (dashboardListEmpty || Boolean(currentDashboard) || currentDashboardLoadFailed);
-    const dashboardNotConfigured = currentDashboardResolved && !dashboardConfigured;
+    // A list or a dashboard that could not be loaded is not a dashboard without widget:
+    // the first-run checklist ("0 of 4, connect your devices") would tell a user whose
+    // Gladys is restarting that their home is empty
+    const dashboardLoadFailed = !loading && Boolean(getDashboardsError || currentDashboardLoadFailed);
+    const dashboardNotConfigured = currentDashboardResolved && !dashboardConfigured && !dashboardLoadFailed;
     if (props.gatewayAccountExpired === true) {
       return <GatewayAccountExpired />;
     }
@@ -501,6 +511,7 @@ class Dashboard extends Component {
         gatewayRecoveryCodesMissing={gatewayRecoveryCodesMissing}
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
+        dashboardLoadFailed={dashboardLoadFailed}
         browserFullScreenCompatible={browserFullScreenCompatible}
         toggleDashboardDropdown={this.toggleDashboardDropdown}
         redirectToDashboard={this.redirectToDashboard}

@@ -409,7 +409,12 @@ class Header extends Component {
             />
           )}
           <div class={cx('dropdown', style.sidebarFooter, { show: props.showDropDown })} ref={this.dropdownRef}>
-            <a onClick={props.toggleDropDown} class={style.profileButton} data-toggle="dropdown">
+            <a
+              onClick={props.toggleDropDown}
+              class={style.profileButton}
+              data-toggle="dropdown"
+              data-cy="sidebar-profile"
+            >
               <span class="avatar" style={`background-image: url(${props.profilePicture})`} />
               <span class={style.profileName}>
                 <span>{props.user.firstname}</span>
@@ -458,8 +463,17 @@ class Header extends Component {
               <FeedbackLink className="dropdown-item" dataCy="header-feedback-link">
                 <i class="dropdown-icon fe fe-message-circle" /> <Text id="feedback.link" />
               </FeedbackLink>
-              <a class="dropdown-item" href="" onClick={props.logout}>
-                <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />
+              {/* Signing out waits a few seconds for Gladys to revoke the session: the entry
+                  says so, and a second tap does nothing (actions/main.js) */}
+              <a
+                class={cx('dropdown-item', { disabled: props.loggingOut })}
+                href=""
+                onClick={props.logout}
+                aria-disabled={props.loggingOut ? 'true' : 'false'}
+                data-cy="header-sign-out"
+              >
+                <i class="dropdown-icon fe fe-log-out" />{' '}
+                <Text id={props.loggingOut ? 'header.signingOut' : 'header.signOut'} />
               </a>
             </div>
           </div>

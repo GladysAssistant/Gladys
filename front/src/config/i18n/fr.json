@@ -443,6 +443,7 @@
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
+    "loadError": "Le tableau de bord n'a pas pu être chargé.",
     "tabletModeParamError": "Le mode tablette n'a pas pu être activé : aucune maison ne correspond à « {{value}} » dans le paramètre d'URL ?tablet_mode_house=. Utilisez l'URL affichée dans le menu Mode tablette.",
     "tabletModeActivationError": "Le mode tablette n'a pas pu être activé en raison d'une erreur réseau ou serveur. Rechargez la page pour réessayer.",
     "gatewayRecoveryCodesMissing": "Votre compte Gladys Plus n'a pas de codes de récupération : si vous perdez l'accès à votre application 2FA, vous ne pourrez plus vous connecter. Générez-les et conservez-les en lieu sûr.",
@@ -7969,6 +7970,9 @@
     "connectionNoticeRetry": "Réessayer",
     "connectionNoticeChecking": "Vérification…",
     "connectionNoticeStillUnreachable": "Gladys ne répond toujours pas.",
+    "connectionNoticeInterruptedTitle": "Les mises à jour en direct sont interrompues",
+    "connectionNoticeInterruptedText": "Gladys répond : rechargez la page pour les retrouver.",
+    "connectionNoticeReload": "Recharger",
     "gladysAssistant": "Gladys Assistant",
     "home": "Accueil",
     "chat": "Discussion",
@@ -8001,7 +8005,8 @@
     "closeMenu": "Fermer le menu",
     "collapseMenu": "Masquer le menu",
     "expandMenu": "Afficher le menu",
-    "signOut": "Déconnexion"
+    "signOut": "Déconnexion",
+    "signingOut": "Déconnexion en cours…"
   },
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",

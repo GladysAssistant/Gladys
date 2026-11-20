@@ -221,7 +221,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset,httpClient,gladysUnreachable',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset,gladysUnreachable,loggingOut',
   actions
 )(props => (
   <div id="app">
@@ -244,6 +244,7 @@ const AppRouter = connect(
       closeCollapsedMenu={props.closeCollapsedMenu}
       showCollapsedMenu={props.showCollapsedMenu}
       logout={props.logout}
+      loggingOut={props.loggingOut}
       session={props.session}
       gatewayTrialDaysLeft={props.gatewayTrialDaysLeft}
       gatewayTrialHasPaymentMethod={props.gatewayTrialHasPaymentMethod}
@@ -260,9 +261,8 @@ const AppRouter = connect(
     <ConnectionLostNotice
       currentUrl={props.currentUrl}
       session={props.session}
-      httpClient={props.httpClient}
+      user={props.user}
       gladysUnreachable={props.gladysUnreachable}
-      checkSession={props.checkSession}
     />
     <Layout currentUrl={props.currentUrl}>
       <Router onChange={props.handleRoute}>

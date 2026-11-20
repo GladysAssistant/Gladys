@@ -242,19 +242,31 @@
    subscription — the app is not doing its job until this is over — but the one
    notice that cannot live in the rail. It floats above every signed-in page,
    the full-screen dashboard included, over an opaque surface since anything
-   may scroll under it. Above the modals and the toast of the phone kit
-   (1200): nothing they offer will work either. */
+   may scroll under it.
+
+   Where it floats is where nothing is operated (spec H2, "Gladys unreachable"):
+
+   - from 992px (desktop, wall tablet in landscape): at the bottom, centred on
+     the content column. The top of a page is its controls — the dashboard
+     switcher is sticky up there, the scenes have their filters — the bottom
+     is content. Lifted above the footer of a page that has one, and under the
+     toast of the kit (1200), which only passes;
+   - below 992px (phone, tablet in portrait): at the top, under the top bar.
+     Down there the bottom is where everything is operated: the dashboard
+     dock, the bars and the floating buttons of the phone pages, the toast. */
 .connectionNotice {
   position: fixed;
-  top: calc(0.75rem + env(safe-area-inset-top, 0px));
-  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  /* the middle of what is left of the viewport beside the rail (no rail, no
+     offset: full-screen dashboard) */
+  left: calc(50% + var(--gladys-sidebar-offset, 0px) / 2);
   transform: translateX(-50%);
-  z-index: 1250;
+  z-index: 1190;
   display: flex;
   align-items: center;
   gap: 0.7rem;
   width: max-content;
-  max-width: min(30rem, calc(100vw - 1.5rem));
+  max-width: min(30rem, calc(100vw - var(--gladys-sidebar-offset, 0px) - 1.5rem));
   padding: 0.5rem 0.5rem 0.5rem 0.8rem;
   border-radius: 14px;
   background-color: #fdeeed;
@@ -266,10 +278,27 @@
   animation: connectionNoticeIn 0.22s ease-out;
 }
 
+/* A page with a footer (scene editor, dashboard editor): above it, its
+   buttons stay reachable. */
+:global(body:has(.fixed-bottom)) .connectionNotice {
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Gladys answers again and the page has to be reloaded: no longer an alarm,
+   the amber of the notices that ask for something. */
+.connectionNoticeInterrupted {
+  background-color: #fdf6e3;
+  border-color: rgba(190, 130, 20, 0.3);
+}
+
 .connectionNoticeIcon {
   flex-shrink: 0;
   font-size: 1.05rem;
   color: #c0392b;
+}
+
+.connectionNoticeInterrupted .connectionNoticeIcon {
+  color: #9a6700;
 }
 
 .connectionNoticeBody {
@@ -297,11 +326,11 @@
   cursor: pointer;
 }
 
-.connectionNoticeButton:hover:not(:disabled) {
+.connectionNoticeButton:hover:not([aria-disabled='true']) {
   background-color: #f4f6fb;
 }
 
-.connectionNoticeButton:disabled {
+.connectionNoticeButton[aria-disabled='true'] {
   opacity: 0.6;
   cursor: default;
 }
@@ -309,7 +338,7 @@
 @keyframes connectionNoticeIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -8px);
+    transform: translate(-50%, 8px);
   }
   to {
     opacity: 1;
@@ -317,15 +346,37 @@
   }
 }
 
-/* Below the top bar of the phone layout (3.25rem): the burger and the bars of
-   a page stay reachable, the notice only covers the top of the content. And
-   under the navigation drawer and its backdrop (1050): an open drawer covers
+/* Below 992px: at the top. Under the top bar of the phone layout (3.25rem)
+   when there is one — the burger stays reachable, the notice only covers the
+   top of the content — and at the top edge when there is none (full-screen
+   dashboard: the Header renders nothing, and takes its body class with it).
+   Under the navigation drawer and its backdrop (1050): an open drawer covers
    the notice, which would otherwise sit on its first links for as long as
    Gladys is away. */
 @media (max-width: 991.98px) {
-  .connectionNotice {
-    top: calc(3.75rem + env(safe-area-inset-top, 0px));
+  .connectionNotice,
+  :global(body:has(.fixed-bottom)) .connectionNotice {
+    top: calc(0.75rem + env(safe-area-inset-top, 0px));
+    bottom: auto;
+    left: 50%;
+    max-width: min(30rem, calc(100vw - 1.5rem));
     z-index: 1045;
+    animation-name: connectionNoticeInFromTop;
+  }
+
+  :global(body.gladys-sidebar-nav) .connectionNotice {
+    top: calc(3.75rem + env(safe-area-inset-top, 0px));
+  }
+}
+
+@keyframes connectionNoticeInFromTop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 }
 

@@ -42,6 +42,8 @@ function createActions(store) {
         store.setState({
           user,
           loginStatus: LoginStatus.LoginSuccess,
+          // Gladys answers: whatever a session check concluded before this sign-in
+          gladysUnreachable: false,
           loginFormEmailValue: '',
           loginFormPasswordValue: ''
         });

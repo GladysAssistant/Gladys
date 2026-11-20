@@ -92,10 +92,14 @@ help as a footnote, **Log in** in the bottom bar.
 - The refusal of the sign-in shows in the bottom bar (above the card on a wider screen,
   `data-cy=login-error`), **in the words of what happened** — on every screen size
   (`actions/login/login.js`, `utils/connectionError.js`):
-  - "Wrong email/password." only when Gladys refused the credentials (a 4xx other than 429);
+  - "Wrong email/password." only when **Gladys** refused the credentials: a 4xx other than
+    429 whose body is an error of Gladys (a JSON object with a `code` — 403 for a wrong
+    password, 404 for an unknown email);
   - "Gladys is unreachable. Check that Gladys is running and that this device is connected to
-    the network, then try again." when the request got no answer, or the 502 / 503 / 504 of a
-    reverse proxy in front of a stopped Gladys;
+    the network, then try again." when the request got no answer, on a 502 / 503 / 504, and on
+    any error status whose body Gladys did not write — the `404 page not found` of a reverse
+    proxy whose route went away with the container, the 52x / 530 page of a tunnel whose
+    origin is down;
   - "Too many attempts. Wait a few minutes before trying again." on the 429 of the rate limit;
   - "Gladys returned an error. Try again in a moment." on any other 5xx.
 
