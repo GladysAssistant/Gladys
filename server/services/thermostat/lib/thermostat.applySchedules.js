@@ -1670,6 +1670,7 @@ async function applySchedules() {
 
 module.exports = {
   applySchedules,
+  clamp,
   DEFAULT_TIMEZONE,
   getThermostatFeature,
   writeExternalSetpoint,

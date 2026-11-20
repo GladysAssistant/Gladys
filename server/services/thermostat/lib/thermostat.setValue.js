@@ -1,6 +1,11 @@
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES, THERMOSTAT_MODE } = require('../../../utils/constants');
-const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
+const {
+  DEFAULT_MANUAL_DURATION_MINUTES,
+  THERMOSTAT_TYPES,
+  PILOT_WIRE_REGULATIONS,
+  defaultTempRange,
+} = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const {
   startExternalThermostat,
@@ -9,6 +14,7 @@ const {
   unitFeature,
   getSetpointForPreset,
   convertSetpointToFeatureUnit,
+  clamp,
   DEFAULT_TIMEZONE,
 } = require('./thermostat.applySchedules');
 const {
@@ -160,6 +166,40 @@ async function holdExpiry(device) {
 }
 
 /**
+ * @description The range a setpoint set by hand on a virtual thermostat is
+ * bounded to, or null when this service does not bound it.
+ *
+ * Only a virtual thermostat's own `target-temperature` comes through here: the
+ * core routes a write on the service owning the feature, so on an external
+ * thermostat a scene, the API, HomeKit and the widget's dial all write the real
+ * device's feature (Matter, Netatmo...) and never reach this service. There the
+ * dial is bounded by the widget (F). A heater that regulates itself is left
+ * alone too, whatever the thermostat's type — a `pilot-wire` one, or a virtual
+ * one driving a pilot wire with no room sensor: it takes no range, and a
+ * setpoint from a scene picks the nearest preset (C.1.1) — bounded, 7 °C would
+ * become Comfort rather than Frost.
+ *
+ * The config already carries the shared default range, in the thermostat's
+ * unit, for missing params and for an inverted range an older device may still
+ * carry: the widget reads the same, so the dial and a scene agree.
+ * @param {object} config - The thermostat's params config.
+ * @returns {{min: number, max: number}|null} The range, or null.
+ * @example
+ * manualRange(config); // { min: 8, max: 25 }
+ */
+function manualRange(config) {
+  const heaterRegulates =
+    config.thermostat_type === THERMOSTAT_TYPES.PILOT_WIRE ||
+    (!!config.pilot_wire_feature && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.HEATER);
+  if (isExternal(config) || heaterRegulates) {
+    return null;
+  }
+  // A thermostat with no params at all has no config: the default range.
+  const defaults = defaultTempRange(config.temp_unit);
+  return { min: toNumber(config.temp_min, defaults.min), max: toNumber(config.temp_max, defaults.max) };
+}
+
+/**
  * @description Set a value on one of a thermostat's features. This is the
  * single write path: `device.set-value` in a scene, the generic device API and
  * the widget all land here, and each intent is a value on its own feature.
@@ -248,7 +288,20 @@ async function setValue(device, deviceFeature, value, manual = true) {
     return;
   }
 
-  await writeSetpoint.call(this, device, deviceFeature, value);
+  // A setpoint set by hand on a virtual thermostat stays within its range; a
+  // scheduled one is written as the programme says (E.3). Only a number, or a
+  // text holding one as a scene sends it, is bounded: Number() turns '', a blank,
+  // null or false into 0, which would be held as the bottom of the range. Any
+  // other value goes through untouched, as before the range was enforced.
+  const numeric = typeof value === 'number' || (typeof value === 'string' && value.trim() !== '');
+  const asked = Number(value);
+  const range = manual && numeric && Number.isFinite(asked) ? manualRange(buildParamsConfig(device) || {}) : null;
+  const setpoint = range ? clamp(asked, range.min, range.max) : value;
+  if (range && setpoint !== asked) {
+    logger.info(`Thermostat: setpoint ${value} outside the range of ${device.selector}, clamped to ${setpoint}`);
+  }
+
+  await writeSetpoint.call(this, device, deviceFeature, setpoint);
 
   if (!manual) {
     // Returning to the schedule: the caller has already cleared the hold, and
@@ -260,13 +313,13 @@ async function setValue(device, deviceFeature, value, manual = true) {
   }
 
   const until = await holdExpiry.call(this, device);
-  await setManualHold.call(this, device, value, until);
+  await setManualHold.call(this, device, setpoint, until);
 
   logger.info(
-    `Thermostat: setValue on ${deviceFeature.selector} held as manual setpoint ${value}` +
+    `Thermostat: setValue on ${deviceFeature.selector} held as manual setpoint ${setpoint}` +
       `${until ? ` until ${new Date(until).toISOString()}` : ' (no schedule, no expiry)'}`,
   );
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint };
+module.exports = { setValue, writeSetpoint, holdExpiry, nextPointTimestamp, presetHoldSetpoint, manualRange };
