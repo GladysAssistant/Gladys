@@ -125,7 +125,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.z2mPermitJoin = false;
   // When joining closes (epoch in ms of the Zigbee2mqtt host), null when closed or unknown (see updatePermitJoin)
   this.z2mPermitJoinEnd = null;
-  // End of the last window seen open, kept when Gladys forgets joining: the same window told again is not a new one
+  // A window seen open that Zigbee2mqtt has not told closed since, and its end: kept when Gladys forgets joining (init),
+  // the same window told again is not a new one (see updatePermitJoin)
+  this.permitJoinWindowSeen = false;
   this.lastPermitJoinEnd = null;
   // The devices seen joining since joining last opened, by IEEE address (see pairingDevices)
   this.pairingDevices = {};

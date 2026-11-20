@@ -54,11 +54,11 @@ and zigbee-herdsman `controller.ts`):
   `bridge/info`). `bridge/state` changes nothing: retained, it is replayed at each reconnection and
   proves no new run; a new run tells joining closed in its own `bridge/info`, a crash is told by the
   health check.
-- `lastPermitJoinEnd`, the end of the last window seen open, survives the forgetting of an `init`, and
-  is cleared when Zigbee2mqtt tells joining closed (or Gladys disconnects). Joining told open again is
-  the same window when its end is within 5 s of it, or when it comes without a usable end while that
-  window still runs (it then takes its end back): the retained `bridge/info` told again after a
-  reconnection or an init is not a new window (C.2).
+- A window seen open stays the same window until Zigbee2mqtt tells joining closed (or Gladys
+  disconnects): the forgetting of an `init` does not end it. Joining told open again meanwhile — the
+  retained `bridge/info` replayed after a reconnection or an init — is that window, whatever its end
+  says (another clock, none with Zigbee2mqtt 1), and takes back its end while it runs (C.2). Limit: a
+  window closed then opened again while Gladys was not connected is taken for the same one.
 
 ### B.2 `zigbee2mqtt.permit-join` and `GET /permit_join`
 

@@ -132,13 +132,37 @@ describe('zigbee2mqtt updatePermitJoin', () => {
     expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
   });
 
-  it('should take a window told without an end once the last one is over for a new one', () => {
+  it('should keep the window not told closed, without its end once passed, when told again without an end', () => {
     zigbee2MqttManager.updatePermitJoin(true, NOW + 1000);
     zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
     zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
     sinon.clock.tick(5000);
     zigbee2MqttManager.updatePermitJoin(true, undefined);
     expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(null);
+    expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
+  });
+
+  it('should keep the devices seen joining when the window of another clock is told again after an init', () => {
+    // An external Zigbee2mqtt 30 s behind: its info, then the estimate of the response, too far to be the same end
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 224000);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000, { estimated: true });
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 224000);
+    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(true);
+    expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
+  });
+
+  it('should keep the devices seen joining when a window without any end is told again after an init (Zigbee2mqtt 1)', () => {
+    zigbee2MqttManager.updatePermitJoin(true, undefined);
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
+    zigbee2MqttManager.updatePermitJoin(true, undefined);
+    expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
+    // Told closed after the init (the window ended meanwhile): the next one is new
+    zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
+    zigbee2MqttManager.updatePermitJoin(false);
+    zigbee2MqttManager.updatePermitJoin(true, undefined);
     expect(zigbee2MqttManager.pairingDevices).to.deep.equal({});
   });
 

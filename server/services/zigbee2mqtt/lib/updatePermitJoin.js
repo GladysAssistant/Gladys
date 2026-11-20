@@ -32,24 +32,22 @@ function isSameEnd(end, otherEnd) {
 /**
  * @description Keep whether joining is allowed and until when, as Zigbee2mqtt tells them (or as Gladys forgets them),
  * and broadcast a change (docs/specs/zigbee2mqtt-pairing.md, B and C.2). A window that opens starts a new pairing
- * session: the devices seen joining before are forgotten. Not the window Gladys saw open already, told again once Gladys
- * forgot it (the retained bridge/info replayed after a reconnection or an init).
+ * session: the devices seen joining before are forgotten. Not the window Gladys saw open and Zigbee2mqtt has not told
+ * closed since, told again once Gladys forgot it (the retained bridge/info replayed after a reconnection or an init),
+ * whatever its end says (another clock, none with Zigbee2mqtt 1).
  * @param {boolean} allowed - Whether joining is allowed.
  * @param {number} [end] - When joining closes, epoch in ms; ignored when not allowed. Without a usable one (Zigbee2mqtt
  * 1, another clock), the end already known for the window is kept.
  * @param {object} [options] - `estimated`: the end is the estimate of a response, the exact one told by bridge/info is
- * kept; `forgotten`: Gladys forgets joining (init, disconnection), Zigbee2mqtt did not close it.
+ * kept; `forgotten`: Gladys forgets joining (init), Zigbee2mqtt did not close it.
  * @example
  * updatePermitJoin(true, Date.now() + 254000);
  */
 function updatePermitJoin(allowed, end, options = {}) {
   const { estimated = false, forgotten = false } = options;
   const usableEnd = isPlausibleEnd(end) ? end : null;
-  // The last window seen open, still running: the same one when told again without an end, or with one this close
+  const sameWindow = this.permitJoinWindowSeen;
   const lastWindowRunning = this.lastPermitJoinEnd !== null && this.lastPermitJoinEnd > Date.now();
-  const sameWindow =
-    this.lastPermitJoinEnd !== null &&
-    (usableEnd === null ? lastWindowRunning : isSameEnd(usableEnd, this.lastPermitJoinEnd));
   let permitJoinEnd = null;
   if (
     allowed &&
@@ -59,12 +57,16 @@ function updatePermitJoin(allowed, end, options = {}) {
     permitJoinEnd = usableEnd;
   } else if (allowed && this.z2mPermitJoin) {
     permitJoinEnd = this.z2mPermitJoinEnd;
-  } else if (allowed && sameWindow) {
+  } else if (allowed && sameWindow && lastWindowRunning) {
     permitJoinEnd = this.lastPermitJoinEnd;
   }
-  // Closed by Zigbee2mqtt: the next window is a new one
+  // Closed by Zigbee2mqtt (or Gladys gone): the next window is a new one
   if (!allowed && !forgotten) {
+    this.permitJoinWindowSeen = false;
     this.lastPermitJoinEnd = null;
+  }
+  if (allowed) {
+    this.permitJoinWindowSeen = true;
   }
   if (allowed === this.z2mPermitJoin && permitJoinEnd === this.z2mPermitJoinEnd) {
     return;
