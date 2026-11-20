@@ -290,6 +290,11 @@ lives in the `gladys-plus-preview` environment, whose deployment policy
 only accepts `master`. Never move the upload into the `pull_request`
 workflow, and never check out the pull request in the deploy workflow.
 
+A preview version can only be uploaded to a Worker that exists: until the
+"Publish Gladys Plus front to production" workflow has run once (it creates
+the `gladys-plus` Worker), every preview fails. A re-run of the build of an
+older commit is skipped, so the alias of a pull request never goes back.
+
 The same Worker token is used in both environments. It only needs the
 "Workers Scripts: Edit" permission on the Gladys account: the custom domain
 `plus.gladysassistant.com` is attached to the Worker in the Cloudflare

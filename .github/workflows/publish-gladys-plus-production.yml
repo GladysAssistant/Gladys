@@ -52,4 +52,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           WRANGLER_SEND_METRICS: false
         run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
+            echo "::error::The CLOUDFLARE_WORKERS_GLADYS_PLUS_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets of the production environment are required to deploy Gladys Plus."
+            exit 1
+          fi
           npx --yes wrangler@4.156.0 deploy --config wrangler.gladys-plus.toml

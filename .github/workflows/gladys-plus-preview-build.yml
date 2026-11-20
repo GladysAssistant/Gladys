@@ -10,7 +10,9 @@ run-name: Gladys Plus preview build ${{ github.head_ref }}
 
 on:
   pull_request:
-    branches: [master]
+    # claude/** gives stacked pull requests (based on a feature branch
+    # instead of master) a preview too, like docker-pr-build.yml.
+    branches: [master, 'claude/**']
     paths:
       - 'front/**'
       # The version of the root package.json is baked into the front.
