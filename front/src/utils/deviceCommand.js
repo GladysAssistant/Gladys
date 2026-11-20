@@ -38,35 +38,43 @@ export const sendDeviceFeatureValue = (httpClient, deviceFeatureSelector, value)
 
 /**
  * @description The state to go back to when a command cannot be sent, for a widget which
- * displays its value before the request leaves. It is the state displayed before the command,
- * unless Gladys sends a newer one while the request is on its way (another screen, the device
- * itself): that one is the truth. One entry per request, so two requests on the same feature
- * never share or take each other's state.
+ * displays its value before the request leaves. It is kept per feature, while requests for it
+ * are on their way: the state displayed before the first of them (never the optimistic value of
+ * another one: two controls can drive the same feature), unless Gladys sends a newer one
+ * meanwhile (another screen, the device itself), which is the truth. Each request has its own
+ * token, and the state is dropped once the last of them has settled.
  * @example
  * const command = statesToGoBackTo.start('lamp-binary', { last_value: 0 });
  * statesToGoBackTo.keepStateFromGladys('lamp-binary', { last_value: 1 });
  * statesToGoBackTo.finish(command); // { last_value: 1 }
  */
 export class StatesToGoBackTo {
-  commands = new Set();
+  features = new Map();
 
-  start(selector, state) {
-    const command = { selector, state: { ...state } };
-    this.commands.add(command);
-    return command;
+  start(selector, displayedState) {
+    let feature = this.features.get(selector);
+    if (!feature) {
+      feature = { state: { ...displayedState }, requests: 0 };
+      this.features.set(selector, feature);
+    }
+    feature.requests += 1;
+    return { selector };
   }
 
   keepStateFromGladys(selector, state) {
-    this.commands.forEach(command => {
-      if (command.selector === selector) {
-        command.state = { ...command.state, ...state };
-      }
-    });
+    const feature = this.features.get(selector);
+    if (feature) {
+      feature.state = { ...feature.state, ...state };
+    }
   }
 
   // the request has settled: the state to go back to if it failed
   finish(command) {
-    this.commands.delete(command);
-    return command.state;
+    const feature = this.features.get(command.selector);
+    feature.requests -= 1;
+    if (feature.requests === 0) {
+      this.features.delete(command.selector);
+    }
+    return feature.state;
   }
 }
