@@ -77,6 +77,54 @@ describe('Device', () => {
     sinonAssert.calledWith(device.saveState, deviceFeature, 1);
     sinonAssert.notCalled(device.saveStringState);
   });
+  it('should say that the device was driven when only the record of its new state fails', async () => {
+    const stateManager = new StateManager(event);
+    const serviceSetValue = fake.resolves(null);
+    const service = {
+      getService: () => ({
+        device: {
+          setValue: serviceSetValue,
+        },
+      }),
+    };
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    device.saveState = fake.rejects(new Error('SQLITE_BUSY'));
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      has_feedback: false,
+    };
+    let error;
+    try {
+      await device.setValue({ service: { name: 'my-service' } }, deviceFeature, 1);
+    } catch (e) {
+      error = e;
+    }
+    sinonAssert.calledOnce(serviceSetValue);
+    assert.equal(error.message, 'SQLITE_BUSY');
+    assert.equal(error.deviceDriven, true);
+  });
+  it('should not say that the device was driven when the integration could not drive it', async () => {
+    const stateManager = new StateManager(event);
+    const service = {
+      getService: () => ({
+        device: {
+          setValue: fake.rejects(new Error('Device unreachable')),
+        },
+      }),
+    };
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    device.saveState = fake.resolves(null);
+    let error;
+    try {
+      await device.setValue({ service: { name: 'my-service' } }, { has_feedback: false }, 1);
+    } catch (e) {
+      error = e;
+    }
+    assert.equal(error.message, 'Device unreachable');
+    assert.equal(error.deviceDriven, undefined);
+    sinonAssert.notCalled(device.saveState);
+  });
   it('should save string state when setting a text value on a text feature', async () => {
     const stateManager = new StateManager(event);
     const serviceSetValue = fake.resolves(null);

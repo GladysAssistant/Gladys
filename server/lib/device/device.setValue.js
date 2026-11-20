@@ -30,23 +30,31 @@ async function setValue(device, deviceFeature, value, options = {}) {
     throw new BadParameters(`Playback state ${MUSIC_PLAYBACK_STATE.BUFFERING} (buffering) cannot be written`);
   }
   await service.device.setValue(device, deviceFeature, value, options);
-  // If device has feedback, the feedback will be sent and saved
-  // @ts-ignore
-  const valueIsString = typeof value === 'string' || value instanceof String;
-  if (!deviceFeature.has_feedback) {
-    if (isStringStateFeature(deviceFeature)) {
-      // A text, select or music string feature holds its state as a string: a select state is
-      // always its string form, even when the selected option value looks numeric (select
-      // features have no numeric state, and no state history)
-      const text = normalizeStringState(deviceFeature, value);
-      if (text !== null) {
-        await this.saveStringState(device, deviceFeature, text);
+  try {
+    // If device has feedback, the feedback will be sent and saved
+    // @ts-ignore
+    const valueIsString = typeof value === 'string' || value instanceof String;
+    if (!deviceFeature.has_feedback) {
+      if (isStringStateFeature(deviceFeature)) {
+        // A text, select or music string feature holds its state as a string: a select state is
+        // always its string form, even when the selected option value looks numeric (select
+        // features have no numeric state, and no state history)
+        const text = normalizeStringState(deviceFeature, value);
+        if (text !== null) {
+          await this.saveStringState(device, deviceFeature, text);
+        }
+      } else if (!valueIsString) {
+        await this.saveState(deviceFeature, value);
       }
-    } else if (!valueIsString) {
-      await this.saveState(deviceFeature, value);
+      // A string on any other feature is a one-shot command (a music notification URL for
+      // example): nothing to save
     }
-    // A string on any other feature is a one-shot command (a music notification URL for
-    // example): nothing to save
+  } catch (e) {
+    // The device was driven: what failed is the record of its new state. The error says so,
+    // so a caller which reports failed commands (scene.executeSingleAction) does not report
+    // this one, whose value did reach the device.
+    e.deviceDriven = true;
+    throw e;
   }
 }
 

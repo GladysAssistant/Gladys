@@ -155,6 +155,15 @@ cards**, the pattern of the devices list.
 `<body>` above the sheets, gone after 4 s — 5 s when it carries **Undo**. It sits above the
 bottom bar on a page that has one (`aboveBar`).
 
+One error goes through it, because it has no place of its own: **a device command that failed**
+(`components/device/DeviceCommandError.jsx`, mounted once in the app shell, on every screen
+size; the contract is `dashboard-flexible-layout-and-widgets.md`, section K). For that toast
+`MobileToast` takes three more props, none of which changes the default: `role="alert"` (an
+error is announced at once), `dismissable` (a close button ×, a real `<button>` named "Close",
+C.7) and `aboveDock` — below 992px the shell cannot know what the page pins to the bottom of
+the screen (the dock of the dashboard, a bottom bar), so the toast always sits above where they
+are, and follows `--dock-lift`, which `DashboardPage` mirrors on `<html>`. It stays 6 s.
+
 ### C.7 Accessibility, motion, dark mode
 
 - Every control is a real `<button>` / `<a>` / `<input>`, named by its text or an `aria-label`.

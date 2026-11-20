@@ -56,7 +56,9 @@ const BinaryDeviceType = ({ children, ...props }) => {
               name={`box-${props.x}-${props.y}-${props.deviceFeature.id}`}
               value="1"
               class="custom-switch-input"
-              checked={lastValue}
+              // a boolean, never null: a feature put back on "no value yet" (a first command
+              // which failed) would otherwise leave the input as the tap left it
+              checked={Boolean(lastValue)}
               onClick={updateValue}
             />
             <span class="custom-switch-indicator" />
