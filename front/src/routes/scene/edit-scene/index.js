@@ -1616,6 +1616,7 @@ class EditScene extends Component {
     const newState = update(newStateWithoutElement, addUpdateObject);
 
     await this.setState(newState);
+    this.withdrawUndoAfterMove();
     await this.addEmptyActionGroupIfNeeded();
     await this.cleanUpEmptyGroupAfterMove(originalPath);
   };
@@ -1675,6 +1676,7 @@ class EditScene extends Component {
         ...newState,
         variables: newVariables
       });
+      this.withdrawUndoAfterMove();
 
       await this.addEmptyActionGroupIfNeeded();
     } catch (error) {
@@ -1954,7 +1956,9 @@ class EditScene extends Component {
       toast: { id: (prevState.toast ? prevState.toast.id : 0) + 1, textId, withUndo }
     }));
     this.toastDuration = withUndo ? UNDO_TOAST_DURATION_MS : TOAST_DURATION_MS;
-    this.toastTimer = setTimeout(this.hideToast, this.toastDuration);
+    if (!this.toastHeld) {
+      this.toastTimer = setTimeout(this.hideToast, this.toastDuration);
+    }
     if (withUndo && !this.state.isMobile) {
       this.watchEditsAfterDeletion();
     }
@@ -1962,6 +1966,7 @@ class EditScene extends Component {
 
   hideToast = () => {
     clearTimeout(this.toastTimer);
+    this.toastHeld = false;
     this.stopWatchingEditsAfterDeletion();
     this.setState({ toast: null });
   };
@@ -1969,10 +1974,12 @@ class EditScene extends Component {
   // The pointer is over the toast, or the keyboard is on its "Undo": it does not leave under
   // the user's hand (docs/specs/scene-editor-mobile.md, C.7)
   holdToast = () => {
+    this.toastHeld = true;
     clearTimeout(this.toastTimer);
   };
 
   releaseToast = () => {
+    this.toastHeld = false;
     clearTimeout(this.toastTimer);
     if (this.state.toast) {
       this.toastTimer = setTimeout(this.hideToast, this.toastDuration);
@@ -1985,10 +1992,12 @@ class EditScene extends Component {
   // nothing typed afterwards is ever taken back. (On a phone the toast sits on the timeline,
   // where the next action is another sheet.)
   watchEditsAfterDeletion = () => {
+    this.watchingEditsAfterDeletion = true;
     EDIT_EVENTS.forEach(type => document.addEventListener(type, this.onEditAfterDeletion, true));
   };
 
   stopWatchingEditsAfterDeletion = () => {
+    this.watchingEditsAfterDeletion = false;
     EDIT_EVENTS.forEach(type => document.removeEventListener(type, this.onEditAfterDeletion, true));
   };
 
@@ -1999,8 +2008,20 @@ class EditScene extends Component {
     if (inToast || isNotAnEdit(event)) {
       return;
     }
+    this.withdrawUndo();
+  };
+
+  withdrawUndo = () => {
     this.undoSnapshot = null;
     this.hideToast();
+  };
+
+  // A step or a condition dragged with the pointer is an edit that ends with no click (the drag
+  // engine swallows it): the move itself withdraws the "Undo" while it is watched for
+  withdrawUndoAfterMove = () => {
+    if (this.watchingEditsAfterDeletion) {
+      this.withdrawUndo();
+    }
   };
 
   // Snapshot of what a deletion changes, taken before it (some mutations rewrite the variable

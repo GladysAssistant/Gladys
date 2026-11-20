@@ -156,16 +156,18 @@ is removed without a question. Thermostat keeps the inline question of its card.
 
 The question is about one device, and one confirmation is one deletion:
 
-- every list of device cards gives its cards a **stable key** (the `external_id` or the
-  `selector` of the device), so a card, its dialog and its messages stay with their device when
+- every list of device cards gives its cards a **stable key** (the `id`, the `external_id` or
+  the `selector` of the device — the `id` where a card not saved yet has no `external_id`), so a card, its dialog and its messages stay with their device when
   the list changes (a search, a sort, a neighbour deleted, a reload);
 - `DeleteDeviceButton` remembers which device it asked about: handed another one while the
   dialog is open, it closes the dialog instead of confirming for a device the user never looked
   at;
 - while the handler runs, the button is disabled and a second click on "Delete the device" does
-  nothing;
+  nothing (the handler returns its request, so "runs" lasts until it ends);
 - the cameras and Zigbee2mqtt remove the deleted device from their list by its identity, in the
-  list as it is when the request ends, not by the index it had when the request left.
+  list as it is when the request ends, not by the index it had when the request left — a saved
+  device by its `external_id`, a card not saved yet by the `id` the page gave it, so two such
+  cards never go together.
 
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
 a wider screen. Closing a "Devices" sheet with unsaved changes — by any of the four ways, the

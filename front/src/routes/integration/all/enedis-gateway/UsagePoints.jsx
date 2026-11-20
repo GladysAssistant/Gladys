@@ -76,9 +76,8 @@ const UsagePointDevice = ({
     saveDevice(deviceIndex);
   };
 
-  const destroy = () => {
-    destroyDevice(deviceIndex);
-  };
+  // returns the request: the delete button stays disabled until it ends
+  const destroy = () => destroyDevice(deviceIndex);
 
   const reCreate = () => reCreateUsagePointDevice(usagePointId, deviceIndex);
 

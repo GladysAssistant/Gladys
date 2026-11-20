@@ -234,12 +234,14 @@ back.
     **the first edit made after a deletion withdraws the "Undo"** (the toast leaves, the deletion
     stands). "Edit" is what the leave guard already calls one (`isNotAnEdit`): a click, an input
     or a key in the editor — not scrolling, not opening or closing a card, not the keys that only
-    move the focus, and nothing in the toast itself. Deleting a second card is such an edit: its
-    own "Undo" replaces the first, as on a phone.
+    move the focus, and nothing in the toast itself. A step or a condition dragged with the
+    pointer is one too, though the drag ends with no click: the move itself (`moveCard` /
+    `moveCardGroup`) withdraws the "Undo". Deleting a second card is such an edit: its own
+    "Undo" replaces the first, as on a phone.
   - **The keyboard reaches "Undo" before it leaves.** The "x" that had the focus is gone with
     its card, so the focus moves to "Undo"; the 5 seconds stop while the keyboard is on it (a
     focus the browser shows, `:focus-visible` — not the focus put there after a mouse click) or
-    the mouse is over the toast, and start again afterwards.
+    the mouse is over the toast, and start again only once neither holds it.
 
 "Scene saved" after a successful save is a toast on a phone only: on a wider screen the footer
 already says "Saved" next to its buttons, and the same sentence twice would be noise.
@@ -577,8 +579,8 @@ From 768 px the forms are untouched.
 - Cypress, desktop viewport (unchanged default): the existing scene specs keep passing.
 - Cypress, desktop viewport, `SceneUndoDesktop.cy.js` (C.7): a step, an If / Then / Else block
   with its branches and a trigger deleted from their card and brought back by Undo, at the place
-  and with the content they had; the focus on "Undo"; an edit made after a deletion withdrawing
-  the "Undo" and kept; no "Scene saved" toast after a save; a step that has no type yet removed
+  and with the content they had; the focus on "Undo"; an edit made after a deletion — a step
+  dragged with the pointer included — withdrawing the "Undo" and kept; no "Scene saved" toast after a save; a step that has no type yet removed
   without a toast.
 - Cypress, phone viewport (`cy.viewport('iphone-x')`), `front/cypress/e2e/routes/scene/SceneMobile.cy.js`:
   create a scene from the "+" sheet (name only), cancel its trigger picker without being left with

@@ -21,12 +21,24 @@ const DEFAULT_DURATION_MS = 4000;
  * shows — for a page where what had the focus is gone with the deletion the toast is about.
  */
 class MobileToast extends Component {
+  // the pointer over the toast, the keyboard on its action: two holds, tracked apart, and the
+  // delay starts again only once neither is left
+  hovered = false;
+  focused = false;
+
+  isHeld = () => this.hovered || this.focused;
+
   componentDidMount() {
     this.schedule();
     this.focusActionIfAsked();
   }
 
   componentDidUpdate(prevProps) {
+    if (prevProps.message && !this.props.message) {
+      // gone from under the pointer or the keyboard: no leave or blur will come to end the holds
+      this.hovered = false;
+      this.focused = false;
+    }
     if (prevProps.message !== this.props.message || prevProps.toastKey !== this.props.toastKey) {
       this.schedule();
     }
@@ -41,7 +53,7 @@ class MobileToast extends Component {
 
   schedule = () => {
     clearTimeout(this.timer);
-    if (this.props.message && this.props.onClose) {
+    if (this.props.message && this.props.onClose && !this.isHeld()) {
       this.timer = setTimeout(this.props.onClose, this.props.duration || DEFAULT_DURATION_MS);
     }
   };
@@ -56,14 +68,23 @@ class MobileToast extends Component {
     }
   };
 
-  hold = () => {
+  hold = kind => {
+    const wasHeld = this.isHeld();
+    this[kind] = true;
     clearTimeout(this.timer);
-    if (this.props.onHold) {
+    if (!wasHeld && this.props.onHold) {
       this.props.onHold();
     }
   };
 
-  release = () => {
+  release = kind => {
+    if (!this[kind]) {
+      return;
+    }
+    this[kind] = false;
+    if (this.isHeld()) {
+      return;
+    }
     this.schedule();
     if (this.props.onRelease) {
       this.props.onRelease();
@@ -73,15 +94,17 @@ class MobileToast extends Component {
   // hovering is a mouse thing: a finger that taps the toast is not holding it
   holdOnHover = e => {
     if (e.pointerType === 'mouse') {
-      this.hold();
+      this.hold('hovered');
     }
   };
 
   releaseOnHover = e => {
     if (e.pointerType === 'mouse') {
-      this.release();
+      this.release('hovered');
     }
   };
+
+  releaseOnBlur = () => this.release('focused');
 
   // Focus put on the action by the page after a click is not the user reaching for it: only a
   // focus the browser shows (the keyboard) holds the toast
@@ -93,7 +116,7 @@ class MobileToast extends Component {
       // a browser without :focus-visible: any focus holds
     }
     if (visible) {
-      this.hold();
+      this.hold('focused');
     }
   };
 
@@ -123,7 +146,7 @@ class MobileToast extends Component {
             class={style.toastButton}
             onClick={this.runAction}
             onFocus={this.holdOnKeyboardFocus}
-            onBlur={this.release}
+            onBlur={this.releaseOnBlur}
             ref={this.setActionRef}
             data-cy="mobile-toast-action"
           >
