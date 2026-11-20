@@ -14,8 +14,9 @@ const MobileIntegrationToastContext = createContext(() => {});
  * (docs/specs/mobile-pages/integration-devices.md, B): a column at the width of a phone under
  * the chips of the integration, which owns the toast of the tab and its floating "+".
  *
- * fab: { href, label (a string), dataCy } — the creation of a device when the integration has
- * a page for it.
+ * fab: { href | onClick, label (a string), dataCy } — the creation of a device: a link when the
+ * integration has a page for it, a button when the device is created in the list itself (its
+ * sheet then opens: `autoOpen` of MobileDeviceItem).
  */
 class MobileIntegrationTab extends Component {
   state = {
@@ -32,7 +33,18 @@ class MobileIntegrationTab extends Component {
       <MobileIntegrationToastContext.Provider value={this.showToast}>
         <div class={cx(style.page, { [style.pageWithFab]: fab })} data-cy={dataCy}>
           {children}
-          {fab && (
+          {fab && fab.onClick && (
+            <button
+              type="button"
+              class={kitStyle.fab}
+              onClick={fab.onClick}
+              aria-label={fab.label}
+              data-cy={fab.dataCy || 'integration-mobile-create'}
+            >
+              <i class="fe fe-plus" aria-hidden="true" />
+            </button>
+          )}
+          {fab && !fab.onClick && (
             <Link
               href={fab.href}
               class={cx(kitStyle.fab, style.fabLink)}
