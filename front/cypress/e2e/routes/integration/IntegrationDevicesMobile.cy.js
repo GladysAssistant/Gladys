@@ -989,15 +989,11 @@ describe('Integration devices on a phone', () => {
         .and('contain', 'Garage camera');
     });
 
-    it('should delete a camera only once confirmed, and explain why one with too many states is not', () => {
-      let refuse = true;
-      cy.intercept({ method: 'DELETE', url: api('/device/cy-garage-camera') }, req => {
-        if (refuse) {
-          req.reply({ statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } });
-        } else {
-          req.reply({ success: true });
-        }
-      }).as('deleteDevice');
+    it('should delete a camera only once confirmed, and say that one with too many states is deleted in the background', () => {
+      cy.intercept(
+        { method: 'DELETE', url: api('/device/cy-garage-camera') },
+        { statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } }
+      ).as('deleteDevice');
       openGarage();
       cy.get('[data-cy=integration-device-delete]').click();
       cy.get('[data-cy=integration-device-delete-sheet]')
@@ -1005,14 +1001,27 @@ describe('Integration devices on a phone', () => {
         .and('contain', 'Garage camera');
       cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
       cy.wait('@deleteDevice');
-      cy.get('[data-cy=integration-device-delete-error]')
+      // not a refusal: the confirmation closes, and the sheet says that Gladys deletes the camera
+      // on its own, with the job one tap away
+      cy.get('[data-cy=integration-device-delete-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-device-delete-scheduled]')
         .should('be.visible')
         .find('a[href="/dashboard/settings/jobs"]')
-        .should('exist')
-        .then(() => {
-          refuse = false;
-        });
+        .should('exist');
+      cy.get('[data-cy=integration-device-delete]').should('be.disabled');
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
+      // still so when the sheet opens again
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.contains('[data-cy=rtsp-camera-row]', 'Garage camera').click();
+      cy.get('[data-cy=integration-device-delete-scheduled]').should('be.visible');
+      cy.get('[data-cy=integration-device-delete]').should('be.disabled');
+    });
 
+    it('should delete a camera once confirmed', () => {
+      cy.intercept({ method: 'DELETE', url: api('/device/cy-garage-camera') }, { success: true }).as('deleteDevice');
+      openGarage();
+      cy.get('[data-cy=integration-device-delete]').click();
       cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
       cy.wait('@deleteDevice');
       cy.get('[data-cy=integration-device-sheet]').should('not.exist');
