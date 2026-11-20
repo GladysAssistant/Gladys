@@ -326,7 +326,7 @@ function normalize(value, currentMin, currentMax, newRangeMin, newRangeMax) {
  * @example isNumeric(12)
  */
 function isNumeric(n) {
-  return !Number.isNaN(parseFloat(n)) && Number.isFinite(n);
+  return !Number.isNaN(parseFloat(n)) && Number.isFinite(Number(n));
 }
 
 module.exports = {
