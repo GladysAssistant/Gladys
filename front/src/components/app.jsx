@@ -15,6 +15,7 @@ import { catalogCategories } from '../config/integrations';
 import { getDefaultState } from '../utils/getDefaultState';
 
 import Header from './header';
+import ConnectionLostNotice from './header/ConnectionLostNotice';
 import DeviceCommandError from './device/DeviceCommandError';
 import Layout from './layout';
 import Redirect from './router/Redirect';
@@ -222,7 +223,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset,gladysUnreachable,loggingOut',
   actions
 )(props => (
   <div id="app">
@@ -245,6 +246,7 @@ const AppRouter = connect(
       closeCollapsedMenu={props.closeCollapsedMenu}
       showCollapsedMenu={props.showCollapsedMenu}
       logout={props.logout}
+      loggingOut={props.loggingOut}
       session={props.session}
       gatewayTrialDaysLeft={props.gatewayTrialDaysLeft}
       gatewayTrialHasPaymentMethod={props.gatewayTrialHasPaymentMethod}
@@ -255,6 +257,14 @@ const AppRouter = connect(
       refreshInstanceVersionState={props.refreshInstanceVersionState}
       clockOffset={props.clockOffset}
       refreshClockOffsetState={props.refreshClockOffsetState}
+    />
+    {/* Outside the Header: that one renders nothing on a full-screen dashboard,
+        where a wall tablet most needs to be told that Gladys is unreachable. */}
+    <ConnectionLostNotice
+      currentUrl={props.currentUrl}
+      session={props.session}
+      user={props.user}
+      gladysUnreachable={props.gladysUnreachable}
     />
     <Layout currentUrl={props.currentUrl}>
       <Router onChange={props.handleRoute}>

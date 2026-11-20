@@ -236,6 +236,9 @@
     "loginButtonText": "Log in",
     "wrongCredentials": "Wrong email/password.",
     "invalidEmail": "Invalid email",
+    "unreachable": "Gladys is unreachable. Check that Gladys is running and that this device is connected to the network, then try again.",
+    "tooManyRequests": "Too many attempts. Wait a few minutes before trying again.",
+    "serverError": "Gladys returned an error. Try again in a moment.",
     "needHelpText": "Need help? Join us on <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "mobile": {
       "navBack": "Login"
@@ -450,6 +453,7 @@
     "editDashboardSavedButton": "Saved",
     "editDashboardDoneButton": "Done",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
+    "loadError": "The dashboard could not be loaded.",
     "tabletModeParamError": "Tablet mode could not be activated: no house matches \"{{value}}\" in the ?tablet_mode_house= URL parameter. Use the URL shown in the Tablet Mode menu.",
     "tabletModeActivationError": "Tablet mode could not be activated because of a network or server error. Reload the page to try again.",
     "gatewayRecoveryCodesMissing": "Your Gladys Plus account has no recovery codes: if you lose access to your two-factor app, you will no longer be able to log in. Generate them and keep them in a safe place.",
@@ -8349,6 +8353,14 @@
     "clockNoticeText": "Scheduled scenes, history and energy may be wrong.",
     "clockNoticeButton": "Check the clock",
     "clockNoticeContactAdmin": "Please tell the administrator of your house.",
+    "connectionNoticeTitle": "Gladys is unreachable",
+    "connectionNoticeText": "What is displayed may be out of date.",
+    "connectionNoticeRetry": "Retry",
+    "connectionNoticeChecking": "Checking…",
+    "connectionNoticeStillUnreachable": "Gladys is still not answering.",
+    "connectionNoticeInterruptedTitle": "Live updates are interrupted",
+    "connectionNoticeInterruptedText": "Gladys answers: reload the page to get them back.",
+    "connectionNoticeReload": "Reload",
     "gladysAssistant": "Gladys Assistant",
     "home": "Home",
     "chat": "Chat",
@@ -8381,7 +8393,8 @@
     "closeMenu": "Close the menu",
     "collapseMenu": "Hide the menu",
     "expandMenu": "Show the menu",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "signingOut": "Signing out…"
   },
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",

@@ -48,6 +48,15 @@ drawing a zone, setting up an energy contract.
   control (C.4).
 - **Feedback where the thumb is.** A successful action shows a toast; an error shows in the
   bottom bar or in the sheet the user is in, never only at the top of the page.
+- **A Gladys that is unreachable is said once, by the shell.** The "Gladys is unreachable"
+  notice floats under the app's top bar on every signed-in page, and under an open navigation
+  drawer (`components/header/ConnectionLostNotice.jsx`; its behavior is specified with the app
+  navigation, `../dashboard-flexible-layout-and-widgets.md`, H2). A page does not build its own.
+  **It is at the top on purpose, the one exception to "feedback where the thumb is"**: it is
+  not the feedback of something the user just did but a state of the app, which lasts; on a
+  phone the bottom is where everything is operated (the dashboard dock, the bottom bar, the
+  floating "+", the toast) and a card that stays for minutes must not sit on any of it. Its
+  button is a convenience — the notice leaves, or reloads a dashboard, by itself.
 
 ## C. The kit (`front/src/components/mobile/`)
 

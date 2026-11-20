@@ -88,6 +88,20 @@ describe('Logged-out pages on a phone', () => {
       cy.get('[data-cy=mobile-bottom-bar-error]').should('be.visible');
     });
 
+    it('should say that Gladys is unreachable, not that the password is wrong', () => {
+      const { tony } = Cypress.env('users');
+      cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/login` }, { forceNetworkError: true }).as('login');
+      cy.visit('/login');
+      cy.get('[data-cy=login-email]').type(tony.email);
+      cy.get('[data-cy=login-password]').type(tony.password);
+      cy.get('[data-cy=login-submit]').click();
+      cy.wait('@login');
+      cy.get('[data-cy=mobile-bottom-bar-error]')
+        .should('be.visible')
+        .i18n('login.unreachable');
+      expectNoSidewaysScroll();
+    });
+
     it('should log in and go to the page that was asked for', () => {
       const { tony } = Cypress.env('users');
       cy.visit(`/login?return_url=${encodeURIComponent('/dashboard/chat')}`);

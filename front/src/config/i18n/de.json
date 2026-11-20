@@ -236,6 +236,9 @@
     "loginButtonText": "Einloggen",
     "wrongCredentials": "Die Kombination aus E-Mail-Adresse und Passwort ist falsch.",
     "invalidEmail": "Die E-Mail-Adresse ist ungültig",
+    "unreachable": "Gladys ist nicht erreichbar. Prüfe, ob Gladys läuft und dieses Gerät mit dem Netzwerk verbunden ist, und versuche es dann erneut.",
+    "tooManyRequests": "Zu viele Versuche. Warte ein paar Minuten, bevor du es erneut versuchst.",
+    "serverError": "Gladys hat einen Fehler gemeldet. Versuche es gleich noch einmal.",
     "needHelpText": "Brauchst du Hilfe? Tritt unserer <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys-Community</a> (Englisch) bei.",
     "mobile": {
       "navBack": "Anmeldung"
@@ -450,6 +453,7 @@
     "editDashboardSavedButton": "Gesichert",
     "editDashboardDoneButton": "Fertig",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
+    "loadError": "Das Dashboard konnte nicht geladen werden.",
     "tabletModeParamError": "Der Tablet-Modus konnte nicht aktiviert werden: Kein Zuhause entspricht „{{value}}“ im URL-Parameter ?tablet_mode_house=. Verwende die im Menü „Tablet-Modus“ angezeigte URL.",
     "tabletModeActivationError": "Der Tablet-Modus konnte wegen eines Netzwerk- oder Serverfehlers nicht aktiviert werden. Lade die Seite neu, um es erneut zu versuchen.",
     "gatewayRecoveryCodesMissing": "Dein Gladys Plus Konto hat keine Wiederherstellungscodes: Wenn du den Zugriff auf deine Zwei-Faktor-App verlierst, kannst du dich nicht mehr anmelden. Erzeuge sie und bewahre sie an einem sicheren Ort auf.",
@@ -8349,6 +8353,14 @@
     "clockNoticeText": "Geplante Szenen, Verlauf und Energie können falsch sein.",
     "clockNoticeButton": "Uhr prüfen",
     "clockNoticeContactAdmin": "Bitte informiere den Administrator deines Hauses.",
+    "connectionNoticeTitle": "Gladys ist nicht erreichbar",
+    "connectionNoticeText": "Die Anzeige ist möglicherweise nicht mehr aktuell.",
+    "connectionNoticeRetry": "Erneut versuchen",
+    "connectionNoticeChecking": "Wird geprüft…",
+    "connectionNoticeStillUnreachable": "Gladys antwortet immer noch nicht.",
+    "connectionNoticeInterruptedTitle": "Die Live-Aktualisierungen sind unterbrochen",
+    "connectionNoticeInterruptedText": "Gladys antwortet: Lade die Seite neu, um sie wiederherzustellen.",
+    "connectionNoticeReload": "Neu laden",
     "gladysAssistant": "Gladys Assistant",
     "home": "Startseite",
     "chat": "Chat",
@@ -8381,7 +8393,8 @@
     "closeMenu": "Menü schließen",
     "collapseMenu": "Menü ausblenden",
     "expandMenu": "Menü anzeigen",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "signingOut": "Abmeldung läuft…"
   },
   "gatewayLinkUser": {
     "title": "Gladys Plus konfigurieren",

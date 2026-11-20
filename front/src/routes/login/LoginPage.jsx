@@ -14,6 +14,15 @@ import {
 import authStyle from '../../components/auth/style.css';
 import { withMobileViewport, MobilePasswordField, BigButton, kitStyle } from '../../components/mobile';
 
+// Why the sign-in was refused, in the words of what happened: only a refusal of Gladys is a
+// wrong email or password (actions/login/login.js)
+const LOGIN_ERROR_KEYS = {
+  [consts.LoginStatus.WrongCredentialsError]: 'login.wrongCredentials',
+  [consts.LoginStatus.NetworkError]: 'login.unreachable',
+  [consts.LoginStatus.TooManyRequestsError]: 'login.tooManyRequests',
+  [consts.LoginStatus.UnknownError]: 'login.serverError'
+};
+
 const DesktopLoginPage = ({
   loginFormEmailValue,
   loginFormPasswordValue,
@@ -29,9 +38,9 @@ const DesktopLoginPage = ({
           <Text id="login.cardTitle" />
         </div>
 
-        {loginStatus === consts.LoginStatus.WrongCredentialsError && (
-          <div class="alert alert-danger" role="alert">
-            <Text id="login.wrongCredentials" />
+        {LOGIN_ERROR_KEYS[loginStatus] && (
+          <div class="alert alert-danger" role="alert" data-cy="login-error">
+            <Text id={LOGIN_ERROR_KEYS[loginStatus]} />
           </div>
         )}
 
@@ -136,9 +145,7 @@ const MobileLoginPage = ({
       <div class={kitStyle.footnote}>
         <MarkupText id="login.needHelpText" />
       </div>
-      <MobileAuthBar
-        error={loginStatus === consts.LoginStatus.WrongCredentialsError && <Text id="login.wrongCredentials" />}
-      >
+      <MobileAuthBar error={LOGIN_ERROR_KEYS[loginStatus] && <Text id={LOGIN_ERROR_KEYS[loginStatus]} />}>
         <BigButton
           variant="primary"
           type="submit"
