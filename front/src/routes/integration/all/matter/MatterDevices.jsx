@@ -81,6 +81,44 @@ const mergePairedDeviceIntoGladysDevice = (gladysDevice, pairedDevice) => {
 const findGladysDeviceByExternalId = (matterDevices, externalId) =>
   matterDevices.find(device => device.external_id === externalId);
 
+// A re-paired device (new node id) replaces the existing Gladys device: on top of the merge, every
+// matched feature takes over the id, the selector and the energy parent of the existing feature.
+// The paired device is not mutated, so a failed save leaves its card as it was.
+const replaceGladysDeviceWithPairedDevice = (gladysDevice, pairedDevice) => {
+  const oldExternalId = gladysDevice.external_id;
+  const newExternalId = pairedDevice.external_id;
+  const deviceToSave = mergePairedDeviceIntoGladysDevice(gladysDevice, pairedDevice);
+
+  // the energy features derived by the server point to the ids of the paired features:
+  // their parents follow the ids taken over from the existing device
+  const replacedFeatureIds = new Map();
+  deviceToSave.features = (pairedDevice.features || []).map(pairedFeature => {
+    const feature = { ...pairedFeature };
+    // try to find match feature to replace the external_id
+    const gladysFeature = gladysDevice.features.find(gladysF => {
+      return gladysF.external_id.replace(oldExternalId, newExternalId) === feature.external_id;
+    });
+    // If a matching feature is found, give the id of the feature
+    if (gladysFeature) {
+      if (feature.id) {
+        replacedFeatureIds.set(feature.id, gladysFeature.id);
+      }
+      feature.id = gladysFeature.id;
+      feature.selector = gladysFeature.selector;
+      // the server could not see the existing device (new node id): its index fell back on the
+      // main meter, the meter the user chose (or none, for a root) is kept
+      feature.energy_parent_id = gladysFeature.energy_parent_id || null;
+    }
+    return feature;
+  });
+  deviceToSave.features.forEach(feature => {
+    if (feature.energy_parent_id && replacedFeatureIds.has(feature.energy_parent_id)) {
+      feature.energy_parent_id = replacedFeatureIds.get(feature.energy_parent_id);
+    }
+  });
+  return deviceToSave;
+};
+
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
@@ -88,6 +126,8 @@ class MatterDevices extends Component {
       search: '',
       orderDir: 'asc',
       matterDevices: [],
+      // every Matter device of Gladys, whatever the search: the paired devices are compared with them
+      allMatterDevices: [],
       pairedDevices: [],
       getGladysDevicesLoading: true,
       getPairedDevicesLoading: true,
@@ -132,6 +172,13 @@ class MatterDevices extends Component {
     this.init();
   }
 
+  // The search only filters the list of devices shown on the page: a paired device is compared with,
+  // and merged into, the device of Gladys that has its external_id, whatever its name
+  getAllGladysMatterDevices = () =>
+    this.props.httpClient.get('/api/v1/service/matter/device', {
+      order_dir: this.state.orderDir || 'asc'
+    });
+
   getMatterDevices = async () => {
     try {
       await this.setState({ getGladysDevicesLoading: true });
@@ -143,8 +190,10 @@ class MatterDevices extends Component {
       }
 
       const matterDevices = await this.props.httpClient.get('/api/v1/service/matter/device', options);
+      const allMatterDevices = options.search ? await this.getAllGladysMatterDevices() : matterDevices;
       this.setState({
         matterDevices,
+        allMatterDevices,
         error: null,
         getGladysDevicesLoading: false
       });
@@ -166,7 +215,7 @@ class MatterDevices extends Component {
       // Filter out devices that are already in Gladys
       const filteredPairedDevices = pairedDevices.filter(
         // We compare all devices by external_id and features external_id
-        pairedDevice => !this.state.matterDevices.some(gladysDevice => compareDevices(gladysDevice, pairedDevice))
+        pairedDevice => !this.state.allMatterDevices.some(gladysDevice => compareDevices(gladysDevice, pairedDevice))
       );
 
       const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
@@ -184,7 +233,7 @@ class MatterDevices extends Component {
 
       // We index all devices already in Gladys by `<unique_id>::<device_path>`
       const existingDevicesByUniqueIdAndPath = new Map();
-      this.state.matterDevices.forEach(device => {
+      this.state.allMatterDevices.forEach(device => {
         const deviceUniqueId = getDeviceParam(device, 'UNIQUE_ID');
         if (!deviceUniqueId) {
           return;
@@ -264,8 +313,11 @@ class MatterDevices extends Component {
     this.setPairedDeviceError(externalId, null);
     try {
       // A device with this external_id may already be in Gladys ("Update"): the server would then
-      // update it with the posted object, so we only refresh what the integration provides
-      const existingGladysDevice = findGladysDeviceByExternalId(this.state.matterDevices, externalId);
+      // update it with the posted object, so we only refresh what the integration provides.
+      // The devices are read again: the list of the page is filtered by the search, and the params
+      // the core writes (energy watermarks) may have moved since the page was loaded
+      const allGladysDevices = await this.getAllGladysMatterDevices();
+      const existingGladysDevice = findGladysDeviceByExternalId(allGladysDevices, externalId);
       const deviceToSave = existingGladysDevice
         ? mergePairedDeviceIntoGladysDevice(existingGladysDevice, device)
         : device;
@@ -285,11 +337,12 @@ class MatterDevices extends Component {
     this.setPairedDeviceLoading(externalId, true);
     this.setPairedDeviceError(externalId, null);
     try {
-      const gladysDevice = this.state.matterDevices.find(gladysDevice => {
-        return (
-          gladysDevice.external_id === this.state.devicesThatAlreadyExistButWithDifferentNodeId.get(device.external_id)
-        );
-      });
+      // read again, like an update: not filtered by the search, and with the latest core params
+      const allGladysDevices = await this.getAllGladysMatterDevices();
+      const gladysDevice = findGladysDeviceByExternalId(
+        allGladysDevices,
+        this.state.devicesThatAlreadyExistButWithDifferentNodeId.get(externalId)
+      );
 
       if (!gladysDevice) {
         this.setPairedDeviceError(externalId, {
@@ -300,43 +353,8 @@ class MatterDevices extends Component {
         return;
       }
 
-      // We'll update the external_id of the existing device
-      const newExternalId = device.external_id;
-      const oldExternalId = gladysDevice.external_id;
-
-      // Put back all the attributes of the previous device
-      device.id = gladysDevice.id;
-      device.selector = gladysDevice.selector;
-      device.name = gladysDevice.name;
-      device.room = gladysDevice.room;
-
-      // the energy features derived by the server point to the ids of the paired features:
-      // their parents follow the ids taken over from the existing device
-      const replacedFeatureIds = new Map();
-      device.features = device.features.map(f => {
-        // try to find match feature to replace the external_id
-        const gladysFeature = gladysDevice.features.find(gladysF => {
-          return gladysF.external_id.replace(oldExternalId, newExternalId) === f.external_id;
-        });
-        // If a matching feature is found, give the id of the feature
-        if (gladysFeature) {
-          if (f.id) {
-            replacedFeatureIds.set(f.id, gladysFeature.id);
-          }
-          f.id = gladysFeature.id;
-          f.selector = gladysFeature.selector;
-          // the server could not see the existing device (new node id): its index fell back on the
-          // main meter, the meter the user chose (or none, for a root) is kept
-          f.energy_parent_id = gladysFeature.energy_parent_id || null;
-        }
-        return f;
-      });
-      device.features.forEach(f => {
-        if (f.energy_parent_id && replacedFeatureIds.has(f.energy_parent_id)) {
-          f.energy_parent_id = replacedFeatureIds.get(f.energy_parent_id);
-        }
-      });
-      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
+      const deviceToSave = replaceGladysDeviceWithPairedDevice(gladysDevice, device);
+      await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {
@@ -392,6 +410,7 @@ class MatterDevices extends Component {
       getPairedDevicesLoading,
       error,
       matterDevices,
+      allMatterDevices,
       pairedDevices,
       housesWithRooms,
       devicesThatAlreadyExistButWithDifferentNodeId,
@@ -401,6 +420,16 @@ class MatterDevices extends Component {
       pairedDeviceLoading
     }
   ) {
+    // A paired device that updates a device of Gladys is shown under the name of that device
+    const getDeviceToUpdate = device =>
+      devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id)
+        ? undefined
+        : findGladysDeviceByExternalId(allMatterDevices, device.external_id);
+    const getPairedDeviceTitle = device => {
+      const deviceToUpdate = getDeviceToUpdate(device);
+      return (deviceToUpdate && deviceToUpdate.name) || device.name || device.model;
+    };
+
     // Apply client-side filtering to paired devices
     const filteredPairedDevices = pairedDevices.filter(device => {
       // If no search term, include all devices
@@ -408,18 +437,17 @@ class MatterDevices extends Component {
         return true;
       }
 
-      // Search in name, model, and external_id
+      // Search in the name shown on the card, the name and the model published by Matter
       const searchLower = search.toLowerCase();
-      return (
-        (device.name && device.name.toLowerCase().includes(searchLower)) ||
-        (device.model && device.model.toLowerCase().includes(searchLower))
+      return [getPairedDeviceTitle(device), device.name, device.model].some(
+        value => value && value.toLowerCase().includes(searchLower)
       );
     });
 
     // Apply client-side sorting to paired devices
     const sortedPairedDevices = [...filteredPairedDevices].sort((a, b) => {
-      const nameA = (a.name || a.model || '').toLowerCase();
-      const nameB = (b.name || b.model || '').toLowerCase();
+      const nameA = (getPairedDeviceTitle(a) || '').toLowerCase();
+      const nameB = (getPairedDeviceTitle(b) || '').toLowerCase();
 
       if (orderDir === 'asc') {
         return nameA.localeCompare(nameB);
@@ -487,15 +515,14 @@ class MatterDevices extends Component {
                         const pairedError = pairedDeviceErrors.get(device.external_id);
                         const isPairedDeviceLoading = pairedDeviceLoading.get(device.external_id);
                         const isNodeIdChanged = devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id);
-                        const existingGladysDevice = findGladysDeviceByExternalId(matterDevices, device.external_id);
-                        const isUpdate = existingGladysDevice && !isNodeIdChanged;
+                        const isUpdate = !!getDeviceToUpdate(device);
 
                         return (
                           <div key={device.external_id} class="col-md-6" data-cy="matter-paired-device">
                             <div class="card">
                               <div class="card-header">
                                 {/* an update card names the Gladys device it applies to */}
-                                {(isUpdate && existingGladysDevice.name) || device.name || device.model}
+                                {getPairedDeviceTitle(device)}
                                 {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
                                   <div class="page-options d-flex">
                                     <div class="tag tag-danger">
@@ -544,6 +571,7 @@ class MatterDevices extends Component {
                                       <div class="form-group">
                                         <button
                                           onClick={() => this.replaceGladysDevice(device)}
+                                          data-cy="matter-paired-device-replace"
                                           class={cx('btn btn-info', {
                                             loading: isPairedDeviceLoading
                                           })}

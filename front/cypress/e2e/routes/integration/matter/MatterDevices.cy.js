@@ -48,7 +48,12 @@ describe('Matter devices', () => {
       { method: 'GET', url: `${serverUrl}/api/v1/service/matter/variable/MATTER_ENABLED` },
       { body: { value: 'true' } }
     );
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/device*` }, { body: [gladysDevice] });
+    // like the server, the search only matches the name of the Gladys device (and its external_id)
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/device*` }, req => {
+      const { search } = req.query;
+      const matches = !search || gladysDevice.name.toLowerCase().includes(String(search).toLowerCase());
+      req.reply({ body: matches ? [gladysDevice] : [] });
+    });
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/node` }, { body: [] });
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/paired-device` }, { body: [device] }).as(
       'getPairedDevices'
@@ -112,5 +117,78 @@ describe('Matter devices', () => {
         { id: 'param-3', name: 'ENERGY_INDEX_LAST_PROCESSED_feature-index-id', value: '2026-11-15T13:00:00.000Z' }
       ]);
     });
+  });
+
+  it('should keep updating the existing device when the search only matches the Matter name', () => {
+    visitWithPairedDevice({ ...pairedDevice, features: [indexFeature, powerFeature] });
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, req => {
+      req.reply(req.body);
+    }).as('saveDevice');
+
+    // the search hides the Gladys device from the list, not from the paired device it updates
+    cy.get('.page-options input[type=text]').type('GRILLPLATS');
+    // only the update card still names it
+    cy.get('.card-header')
+      .filter(':contains("Washing machine plug")')
+      .should('have.length', 1);
+    cy.get('[data-cy=matter-paired-device-save]')
+      .i18n('integration.matter.device.updateInGladys')
+      .click();
+
+    cy.wait('@saveDevice').then(({ request }) => {
+      const { body } = request;
+      expect(body).to.have.property('id', 'device-id');
+      expect(body).to.have.property('name', 'Washing machine plug');
+      expect(body).to.have.property('room_id', 'room-id');
+      expect(body.params.map(p => p.name)).to.include('ENERGY_INDEX_LAST_PROCESSED_feature-index-id');
+    });
+  });
+
+  it('should find an update card by the name of the Gladys device', () => {
+    visitWithPairedDevice({ ...pairedDevice, features: [indexFeature, powerFeature] });
+
+    cy.get('.page-options input[type=text]').type('Washing');
+    cy.get('[data-cy=matter-paired-device]')
+      .should('have.length', 1)
+      .find('.card-header')
+      .should('contain', 'Washing machine plug');
+  });
+
+  it('should keep the name, the room and the core params of the device a re-paired device replaces', () => {
+    const NEW_EXTERNAL_ID = 'matter:5678:2';
+    const rePairedIndexFeature = {
+      ...indexFeature,
+      id: 'paired-index-id',
+      external_id: `${NEW_EXTERNAL_ID}:index`,
+      selector: 'paired-index'
+    };
+    visitWithPairedDevice({
+      ...pairedDevice,
+      external_id: NEW_EXTERNAL_ID,
+      features: [rePairedIndexFeature]
+    });
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, { statusCode: 500, body: {} }).as('saveDevice');
+
+    cy.get('[data-cy=matter-paired-device-replace]').click();
+
+    cy.wait('@saveDevice').then(({ request }) => {
+      const { body } = request;
+      expect(body).to.have.property('id', 'device-id');
+      expect(body).to.have.property('selector', 'washing-machine-plug');
+      expect(body).to.have.property('name', 'Washing machine plug');
+      expect(body).to.have.property('room_id', 'room-id');
+      expect(body).to.have.property('external_id', NEW_EXTERNAL_ID);
+      // the feature takes over the id of the existing one, so the watermark named after it stays valid
+      expect(body.features.map(f => f.id)).to.deep.equal(['feature-index-id']);
+      expect(body.params).to.deep.equal([
+        { name: 'UNIQUE_ID', value: 'unique-id' },
+        { name: 'SERIAL_NUMBER', value: 'serial-number' },
+        { id: 'param-3', name: 'ENERGY_INDEX_LAST_PROCESSED_feature-index-id', value: '2026-11-15T13:00:00.000Z' }
+      ]);
+    });
+    // the save failed: the card still shows the paired device as Matter publishes it
+    cy.get('[data-cy=matter-paired-device]')
+      .find('.card-header')
+      .should('contain', 'GRILLPLATS');
   });
 });
