@@ -133,6 +133,16 @@
     }
   },
   "device": {
+    "setValueError": {
+      "unreachable": "La commande envoyée à « {{name}} » a échoué. L'appareil est peut-être injoignable.",
+      "notConfigured": "La commande n'a pas été envoyée à « {{name}} » : son intégration n'est pas configurée ou pas connectée.",
+      "refused": "La commande envoyée à « {{name}} » a été refusée.",
+      "notFound": "La commande n'a pas été envoyée : cet appareil, ou son intégration, n'existe plus dans Gladys.",
+      "gladysUnreachable": "Gladys est injoignable : la commande n'a peut-être pas été envoyée.",
+      "gladysUnreachableSeveral": "Gladys est injoignable : les commandes n'ont peut-être pas été envoyées.",
+      "several": "Les commandes envoyées à {{count}} appareils ont échoué.",
+      "unknownDevice": "La commande a échoué. L'appareil est peut-être injoignable."
+    },
     "searchPlaceHolder": "Chercher un appareil",
     "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",

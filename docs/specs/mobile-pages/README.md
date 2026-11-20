@@ -158,9 +158,18 @@ delay stops while a mouse is over it or the keyboard is on its action, and start
 neither holds it (the two holds are tracked apart: the mouse leaving does not restart the delay
 while the keyboard is still on the action, nor the reverse, and a new message shown meanwhile
 does not restart it either; a toast that leaves while held ends its holds and tells a caller
-that runs the delay itself, `onRelease`); a page whose deletion took the focused element away moves the focus to the action
-(`focusAction`: the scene editor of a wide screen). Beside the navigation rail of a wide screen
+that runs the delay itself, `onRelease`); a page whose deletion took the focused element away
+moves the focus to the action (`focusAction`: the scene editor of a wide screen). Beside the navigation rail of a wide screen
 it is centred on the page, not on the viewport.
+
+One error goes through it, because it has no place of its own: **a device command that failed**
+(`components/device/DeviceCommandError.jsx`, mounted once in the app shell, on every screen
+size; the contract is `dashboard-flexible-layout-and-widgets.md`, section K). For that toast
+`MobileToast` takes three more props, none of which changes the default: `role="alert"` (an
+error is announced at once), `dismissable` (a close button ×, a real `<button>` named "Close",
+C.7) and `aboveDock` — below 992px the shell cannot know what the page pins to the bottom of
+the screen (the dock of the dashboard, a bottom bar), so the toast always sits above where they
+are, and follows `--dock-lift`, which `DashboardPage` mirrors on `<html>`. It stays 6 s.
 
 ### C.7 Accessibility, motion, dark mode
 
