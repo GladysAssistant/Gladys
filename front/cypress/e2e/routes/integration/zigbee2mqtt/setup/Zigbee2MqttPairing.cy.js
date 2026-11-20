@@ -203,7 +203,14 @@ describe('Zigbee2mqtt pairing window', () => {
         ieee_address: '0x01',
         device: { ...readyBulb.device, id: 'a1', selector: 'kitchen-bulb', name: 'Kitchen bulb' }
       };
-      const unsupported = { ...atStep(readyBulb, 'unsupported'), ieee_address: '0x02', model: 'lumi.unknown' };
+      // As Zigbee2mqtt 2 tells a model it does not support: a generated definition
+      const unsupported = {
+        ...atStep(readyBulb, 'unsupported'),
+        ieee_address: '0x02',
+        vendor: 'Tuya',
+        model: 'TS0601_unknown',
+        description: 'Automatically generated definition'
+      };
       const failed = { ...atStep(readyBulb, 'failed'), ieee_address: '0x03' };
       openPairing({ pairing: [inGladys, unsupported, failed] });
 
@@ -223,6 +230,10 @@ describe('Zigbee2mqtt pairing window', () => {
         .eq(1)
         .should('have.attr', 'data-status', 'unsupported')
         .within(() => {
+          // Its model, not the description Zigbee2mqtt generated
+          cy.root()
+            .should('contain', 'Tuya TS0601_unknown')
+            .and('not.contain', 'Automatically generated definition');
           cy.get('[data-cy=z2m-pairing-unsupported]').i18n(`${T}.unsupportedText`);
           cy.get('[data-cy=z2m-pairing-add]').should('not.exist');
         });

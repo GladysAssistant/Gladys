@@ -575,7 +575,12 @@ class PairingWindow extends Component {
   // The name of a device in its row: its card name once ready, the name Zigbee2mqtt gave it otherwise
   getTitle = (entry, card) => (card && card.name) || get(entry, 'device.name') || entry.friendly_name;
 
-  getSubtitle = entry => entry.description || [entry.vendor, entry.model].filter(Boolean).join(' ') || null;
+  // Not supported, its description is the one Zigbee2mqtt generates ("Automatically generated definition"): its model
+  // tells more
+  getSubtitle = entry => {
+    const model = [entry.vendor, entry.model].filter(Boolean).join(' ') || null;
+    return entry.status === PAIRING_STATUS.UNSUPPORTED ? model : entry.description || model;
+  };
 
   renderDesktopRow = entry => {
     const card = this.state.cards[entry.ieee_address];
