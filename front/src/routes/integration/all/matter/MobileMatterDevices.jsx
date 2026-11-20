@@ -29,7 +29,7 @@ const DisconnectedPill = () => (
 // A device paired with the Matter controller that Gladys does not have yet, or has differently:
 // what its desktop card says and does, behind a row
 const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
-  const { device, pairedError, isNodeIdChanged, isUpdate, nodeIsDisconnected } = item;
+  const { device, title, pairedError, isNodeIdChanged, isUpdate, nodeIsDisconnected } = item;
   const hasFeatures = Boolean(device.features) && device.features.length > 0;
   let primaryAction;
   if (isNodeIdChanged) {
@@ -50,8 +50,8 @@ const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
   return (
     <MobileDeviceItem
       device={device}
-      title={device.name || device.model}
-      sheetTitle={device.name || device.model}
+      title={title}
+      sheetTitle={title}
       subtitle={
         <Text
           id="editDeviceForm.mobile.featuresTitle"

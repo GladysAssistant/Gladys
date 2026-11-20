@@ -193,7 +193,17 @@ presentation is owned by [`mobile-pages/energy.md`](mobile-pages/energy.md), sec
   falls back on the main meter). When a re-paired device replaces an existing one (new node id),
   the server cannot see the existing device: the front gives every matched feature the id and the
   parent of the existing one (the meter the user chose, or a root), and remaps the parents of the
-  newly derived features onto those ids.
+  newly derived features onto those ids. When a paired device updates the device that already
+  has its `external_id` ("Update"), or replaces it (new node id), the front posts the paired
+  features and params merged into the existing device — its `id`, `selector`, `name`, `room_id`
+  and the params Matter does not provide are kept — so that the
+  `ENERGY_INDEX_LAST_PROCESSED_<featureId>` watermark of the consumption job survives (on a
+  replacement, the features take over the existing ids, so the watermark still names its index),
+  and that watermark never makes the device look "to update" (only the params of the paired
+  device are compared). The existing device is looked up among all the Matter devices of Gladys,
+  never in the list filtered by the search of the page, and read again on the click, so the
+  watermark posted is the latest one; the card of an update is titled, and found by the search,
+  with the name of that device.
 - The `<index>_consumption` / `<index>_cost` naming is owned by `addEnergyFeatures.js`
   (`DERIVED_CONSUMPTION_SUFFIX`, `DERIVED_COST_SUFFIX`, with `CONSUMPTION_COST_TYPES`): the repair
   and Matter import it.
@@ -215,7 +225,10 @@ presentation is owned by [`mobile-pages/energy.md`](mobile-pages/energy.md), sec
 - `repairHierarchy`: cycle cut, meter made root, derived links restored by name and by
   uniqueness, nothing written on a sound hierarchy.
 - Matter: derived features added, ids and parents of existing features kept, derived features
-  re-injected, no bogus selector.
+  re-injected, no bogus selector; Cypress spec of the devices page (`MatterDevices.cy.js`): a
+  device only differing by a core param is not proposed, "Update" keeps the name and that param,
+  also while a search only matches the Matter name, the update card is found by the Gladys name,
+  and "Replace" keeps the name, the room, the feature ids and the core param.
 - Zigbee2mqtt: the production features derived and kept on rediscovery.
 - Front: Cypress spec of the page (meters, unattached devices, meter select), and of its phone
   presentation (the meter chosen in a sheet, `ContractsMobile.cy.js`).

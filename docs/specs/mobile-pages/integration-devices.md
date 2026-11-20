@@ -202,7 +202,9 @@ Only what differs from B, C and D.
 - **Devices.** The toolbar has the search, the sort order and "Refresh". "Paired devices not
   added to Gladys" comes first, as on the card: one row per device, whose sheet says why it is
   there ("already exists under another node", "has updates") and holds "Add to Gladys", "Update in
-  Gladys" or "Replace the existing device". While the paired devices load, a waiting notice says
+  Gladys" or "Replace the existing device". The row of an update and its sheet are titled with
+  the name of the Gladys device it updates, like the card (`energy-hierarchy.md`, F, Matter), and
+  the search finds it by that name too. While the paired devices load, a waiting notice says
   so. A disconnected node shows "Disconnected" on its devices.
 - **Add a device.** The pairing form: the explanation as a lead, the Thread border router warning
   as a notice, the pairing code (16 px, numeric keyboard, the same pattern), and "Add to Gladys"
