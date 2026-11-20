@@ -474,10 +474,56 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       'zigbee2mqtt/bridge/response/permit_join',
       `{"data":{},"status":"error","error":"Device 'bulb' does not exist"}`,
     );
+    // ASSERT
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should not change permit join on a response/permit_join that tells nothing', async () => {
+    zigbee2mqttManager.z2mPermitJoin = true;
+    // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/permit_join', `{"status":"ok"}`);
-    // ASSERT: the second one, without data, closes
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/permit_join', `{"data":{},"status":"ok"}`);
+    // ASSERT
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should read the value of a response/permit_join of Zigbee2mqtt 1 asked without time', async () => {
+    // EXECUTE: asked by another client
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{"value":true},"status":"ok"}`,
+    );
+    // ASSERT: open, its end unknown
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(null);
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{"value":false},"status":"ok"}`,
+    );
+    // ASSERT
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
-    assert.calledOnce(gladys.event.emit);
+  });
+
+  it('should keep the exact end told by bridge/info before the response/permit_join', async () => {
+    const clock = sinon.useFakeTimers(new Date('2026-11-20T10:00:00.000Z'));
+    const end = Date.now() + 253600;
+    // EXECUTE: as Zigbee2mqtt 2 publishes them
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/info',
+      JSON.stringify({ version: '2.14.2', permit_join: true, permit_join_end: end }),
+    );
+    clock.tick(300);
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{"time":254},"status":"ok"}`,
+    );
+    // ASSERT
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(end);
+    expect(zigbee2mqttManager.lastPermitJoinEnd).to.equal(end);
+    clock.restore();
   });
 
   it('should follow a device joining from bridge/event', async () => {

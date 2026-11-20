@@ -39,10 +39,13 @@ and zigbee-herdsman `controller.ts`):
 ### B.1 State kept by the server
 
 - `z2mPermitJoin` (boolean) and `z2mPermitJoinEnd` (epoch ms, or `null`), from `bridge/info`
-  (`permit_join`, `permit_join_end`) and `bridge/response/permit_join` with `status: ok` (allowed when
-  `data.time > 0`, its end estimated as now + `time` until the `bridge/info` that follows tells the
-  exact one; a refused request changes nothing). Nothing else changes them: the branches of the legacy
-  API of Zigbee2mqtt 1 (`bridge/config`, `bridge/config/permit_join`) are removed.
+  (`permit_join`, `permit_join_end`) and `bridge/response/permit_join` with `status: ok` (open when
+  `data.time > 0`, or, without `time`, when `data.value` is true — Zigbee2mqtt 1 asked by another
+  client; closed when `time` is 0 or `value` false; a refused request, or an answer telling neither,
+  changes nothing). The end of a response is an estimate, now + `time`: Zigbee2mqtt 2 publishes
+  `bridge/info` before or after its answer (before, on the test bench), and the exact end it tells is
+  kept over an estimate within 5 s of it. Nothing else changes them: the branches of the legacy API of
+  Zigbee2mqtt 1 (`bridge/config`, `bridge/config/permit_join`) are removed.
 - An end is taken only when it falls between now − 2 s and now + 256 s by the clock of Gladys: the end of
   an external Zigbee2mqtt whose host clock differs is not, nor the missing one of Zigbee2mqtt 1. The
   open window then keeps the end it had (the estimate of the response), or none.
@@ -51,9 +54,11 @@ and zigbee-herdsman `controller.ts`):
   `bridge/info`). `bridge/state` changes nothing: retained, it is replayed at each reconnection and
   proves no new run; a new run tells joining closed in its own `bridge/info`, a crash is told by the
   health check.
-- `lastPermitJoinEnd`, the end of the last window seen open, survives this forgetting: the retained
-  `bridge/info` of the same window, told again after a reconnection or an init, is not a new window
-  (C.2).
+- `lastPermitJoinEnd`, the end of the last window seen open, survives the forgetting of an `init`, and
+  is cleared when Zigbee2mqtt tells joining closed (or Gladys disconnects). Joining told open again is
+  the same window when its end is within 5 s of it, or when it comes without a usable end while that
+  window still runs (it then takes its end back): the retained `bridge/info` told again after a
+  reconnection or an init is not a new window (C.2).
 
 ### B.2 `zigbee2mqtt.permit-join` and `GET /permit_join`
 
@@ -103,7 +108,7 @@ opened:
 | `device_interview` `failed`                   | create `failed`         | `failed`                  | `failed` (a late failure of an earlier interview after `ready` is applied: Zigbee2mqtt says the last word) |
 | `device_leave`                                | —                       | removed                   | removed                            |
 | `bridge/devices`                              | —                       | name updated              | name updated; `device` computed again (`ready`) |
-| a new window opens (`allowed` false → true, end ≠ `lastPermitJoinEnd`) | registry emptied | emptied | emptied |
+| a new window opens (`allowed` false → true, not the same window, B.1) | registry emptied | emptied | emptied |
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
 - `device_announce` is ignored: every known device announces itself when it powers up.

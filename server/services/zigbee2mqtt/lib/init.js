@@ -113,8 +113,8 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
   this.startingTimer = null;
   // Not installProgressTimer: an installation runs this init, its last progress must still be sent
   this.zigbee2mqttStarting = false;
-  // Told again by the Zigbee2mqtt this init connects to; the devices seen joining are kept
-  this.updatePermitJoin(false);
+  // Told again by the Zigbee2mqtt this init connects to; the devices seen joining are kept, and so is the window
+  this.updatePermitJoin(false, null, { forgotten: true });
   this.networkModeValid = false;
   this.z2mContainerError = null;
   this.ezspFallback = false;

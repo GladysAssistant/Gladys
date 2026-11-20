@@ -94,14 +94,51 @@ describe('zigbee2mqtt updatePermitJoin', () => {
   it('should keep the devices seen joining when the window Gladys forgot is told again (reconnection, init)', () => {
     zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
     zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
-    // Gladys forgets joining (a new connection), then the retained info of the same window comes again
-    zigbee2MqttManager.updatePermitJoin(false);
+    // Gladys forgets joining (an init), then the retained info of the same window comes again
+    zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
+    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
     zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(true);
     expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
-    // Another window, later
+    // Closed by Zigbee2mqtt, then another window
     zigbee2MqttManager.updatePermitJoin(false);
-    zigbee2MqttManager.updatePermitJoin(true, NOW + 200000);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
+    expect(zigbee2MqttManager.pairingDevices).to.deep.equal({});
+  });
+
+  it('should take the exact end told before the estimate of the response for the window told again after an init', () => {
+    // bridge/info first, then the response 300 ms later
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 253600);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000, { estimated: true });
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(NOW + 253600);
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 253600);
+    expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
+  });
+
+  it('should take the estimate of the response until bridge/info tells the exact end', () => {
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000, { estimated: true });
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 253600);
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(NOW + 253600);
+  });
+
+  it('should keep the window and its end when told again without an end after an init (Zigbee2mqtt 1)', () => {
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000, { estimated: true });
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
+    zigbee2MqttManager.updatePermitJoin(true, undefined);
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(NOW + 254000);
+    expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
+  });
+
+  it('should take a window told without an end once the last one is over for a new one', () => {
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 1000);
+    zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    sinon.clock.tick(5000);
+    zigbee2MqttManager.updatePermitJoin(true, undefined);
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(null);
     expect(zigbee2MqttManager.pairingDevices).to.deep.equal({});
   });
 
