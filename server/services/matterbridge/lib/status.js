@@ -10,6 +10,8 @@ async function status() {
     matterbridgeExist: this.matterbridgeExist,
     matterbridgeRunning: this.matterbridgeRunning,
     matterbridgeEnabled,
+    // Matterbridge cannot be turned on while the Matter bridge of Gladys is
+    matterBridgeEnabled: await this.isMatterBridgeEnabled(),
     dockerBased: this.dockerBased,
     networkModeValid: this.networkModeValid,
   };

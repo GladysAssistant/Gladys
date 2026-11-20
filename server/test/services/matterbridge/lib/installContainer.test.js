@@ -52,6 +52,10 @@ describe('Matterbridge installContainer', () => {
       },
       variable: {
         getValue: fake.resolves('1'),
+        setValue: fake.resolves(null),
+      },
+      service: {
+        getService: fake.returns(null),
       },
     };
 
@@ -64,6 +68,22 @@ describe('Matterbridge installContainer', () => {
 
   afterEach(() => {
     sinon.reset();
+  });
+
+  it('should not install the container while the Matter bridge of Gladys is turned on', async () => {
+    gladys.service.getService = fake.returns({ bridge: { isEnabled: fake.resolves(true) } });
+
+    try {
+      await matterbridgeManager.installContainer(config);
+      assert.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(ConflictError);
+      expect(e.message).to.equal('MATTER_BRIDGE_ENABLED');
+    }
+
+    assert.calledOnceWithExactly(gladys.variable.setValue, 'MATTERBRIDGE_ENABLED', '0', serviceId);
+    assert.notCalled(gladys.system.pull);
+    assert.notCalled(gladys.system.createContainer);
   });
 
   it('should create container', async function Test() {

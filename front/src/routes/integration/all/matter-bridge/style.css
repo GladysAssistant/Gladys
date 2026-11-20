@@ -1,0 +1,13 @@
+.qrCode {
+  max-width: 220px;
+}
+
+.pairingCode {
+  font-family: monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.1rem;
+}
+
+.resetConfirm {
+  row-gap: 1em;
+}

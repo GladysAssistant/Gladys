@@ -24,6 +24,9 @@ async function installContainer(config) {
     return;
   }
 
+  // The Matter bridge of Gladys listens on the Matter port Matterbridge needs
+  await this.checkMatterBridgeConflict();
+
   const dockerBased = await this.gladys.system.isDocker();
   if (!dockerBased) {
     this.dockerBased = false;

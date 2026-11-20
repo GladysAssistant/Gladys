@@ -4,6 +4,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 /**
  * @description Prepares service and starts connection with Matterbridge if needed.
  * @returns {Promise} Resolve when init finished.
+ * @throws {Error} MATTER_BRIDGE_ENABLED (ConflictError) when the Matter bridge of Gladys is turned on.
  * @example
  * await matterbridge.init();
  */
@@ -12,6 +13,9 @@ async function init() {
     logger.info('Matterbridge: is not enabled, skipping...');
     return;
   }
+
+  // The Matter bridge of Gladys listens on the Matter port Matterbridge needs
+  await this.checkMatterBridgeConflict();
 
   const dockerBased = await this.gladys.system.isDocker();
   if (!dockerBased) {
