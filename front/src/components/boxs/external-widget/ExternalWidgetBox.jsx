@@ -21,6 +21,7 @@ import {
   WidgetButtons,
   WidgetActionForm
 } from './WidgetComponents';
+import { sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 import style from './style.css';
 
 // Integration statuses and what the card does with them (spec section 12):
@@ -375,16 +376,28 @@ class ExternalWidgetBox extends Component {
       return;
     }
     this.setPending(index, true);
+    // Displayed before the request leaves: the answer to it comes before the device is
+    // driven, and a failure reported by Gladys (a state flagged `rollback`, see
+    // DeviceCommandError.jsx) can come back first — applied after the request, the optimistic
+    // value would overwrite the real state it had just been given.
+    const previous = this.state.featuresBySelector[component.device_feature_selector];
+    this.onDeviceNewState({
+      device_feature_selector: component.device_feature_selector,
+      last_value: component.value,
+      last_value_changed: new Date()
+    });
     try {
-      await this.props.httpClient.post(`/api/v1/device_feature/${component.device_feature_selector}/value`, {
-        value: component.value
-      });
-      this.onDeviceNewState({
-        device_feature_selector: component.device_feature_selector,
-        last_value: component.value
-      });
+      await sendDeviceFeatureValue(this.props.httpClient, component.device_feature_selector, component.value);
     } catch (e) {
       console.error(e);
+      // the command never left: back to what was displayed
+      if (previous) {
+        this.onDeviceNewState({
+          device_feature_selector: component.device_feature_selector,
+          last_value: previous.last_value,
+          last_value_changed: previous.last_value_changed
+        });
+      }
       this.showActionMessage({ error: true, text: null });
     }
     this.setPending(index, false);

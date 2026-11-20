@@ -33,6 +33,7 @@ import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
 import { loadDeviceConfig } from './deviceConfig';
 import { isRunningFromStateFeature } from './operatingState';
+import { sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 
 const PRESET_ICONS = {
   off: 'fe-power',
@@ -477,7 +478,7 @@ class ThermostatBox extends Component {
   writeFeature = async (feature, value) => {
     if (!feature) return false;
     try {
-      await this.props.httpClient.post(`/api/v1/device_feature/${feature.selector}/value`, { value });
+      await sendDeviceFeatureValue(this.props.httpClient, feature.selector, value);
       return true;
     } catch (e) {
       console.error('Failed to write a thermostat feature:', e);
@@ -693,9 +694,32 @@ class ThermostatBox extends Component {
     }
   };
 
+  // The features this card writes: the setpoint, the preset and the mode
+  getWrittenFeatureSelectors = () => {
+    const cfg = this.state.remoteConfig;
+    return [
+      this.props.box.thermostat_feature,
+      cfg && cfg.presetFeature && cfg.presetFeature.selector,
+      cfg && cfg.modeFeature && cfg.modeFeature.selector
+    ].filter(Boolean);
+  };
+
   handleWebsocketMessage = payload => {
     const { box } = this.props;
     const thermostatFeature = box.thermostat_feature;
+    // A state flagged `rollback` is Gladys saying that a write failed, and giving the real
+    // state back (components/device/DeviceCommandError.jsx). Everything the card holds since
+    // the tap — the setpoint held as manual, the value it waits for, the mode it expects —
+    // is what would drop that state, and none of it landed. The card is rebuilt the way a
+    // reload builds it, from the device: a failed write may have been one of several (a start
+    // from a stop writes the mode, the preset and the setpoint).
+    if (payload.rollback && this.getWrittenFeatureSelectors().includes(payload.device_feature_selector)) {
+      this.releaseSetpointHold();
+      this.forgetExpectedMode();
+      this.setState({ pendingMode: null });
+      this.initData();
+      return;
+    }
     const humidityFeature = (this.state.remoteConfig && this.state.remoteConfig.humidity_feature) || null;
     if (thermostatFeature && payload.device_feature_selector === thermostatFeature) {
       // Don't overwrite a setpoint the user is holding here. `isManualMode` is
@@ -1360,7 +1384,7 @@ class ThermostatBox extends Component {
     const { box } = this.props;
     if (!box.thermostat_feature) return;
     try {
-      await this.props.httpClient.post(`/api/v1/device_feature/${box.thermostat_feature}/value`, { value });
+      await sendDeviceFeatureValue(this.props.httpClient, box.thermostat_feature, value);
     } catch (e) {
       console.error(e);
     }

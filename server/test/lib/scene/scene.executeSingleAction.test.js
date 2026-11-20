@@ -8,11 +8,13 @@ const {
   ACTIONS,
   EVENTS,
   WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_SET_VALUE_ERROR_CAUSES,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
+const { NotFoundError, ServiceNotConfiguredError, BadParameters, AbortScene } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 
@@ -222,6 +224,7 @@ describe('scene.executeSingleAction multi-switch device', () => {
 
 describe('scene.executeSingleAction, a value asked by a user which cannot be set', () => {
   const USER_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
+  const CLIENT_ID = 'd9a4bfd4-1c0e-4a3a-9c0f-6f1f0a6a2a11';
   const lastValueChanged = new Date('2026-01-01T10:00:00.000Z');
   const lampFeature = {
     selector: 'lamp-binary',
@@ -238,6 +241,18 @@ describe('scene.executeSingleAction, a value asked by a user which cannot be set
     selector: 'lamp',
     name: 'Living room lamp',
     features: [lampFeature],
+  };
+  const lampPayload = {
+    client_id: CLIENT_ID,
+    cause: DEVICE_SET_VALUE_ERROR_CAUSES.UNREACHABLE,
+    device_feature_selector: 'lamp-binary',
+    device_feature_name: 'On/Off',
+    device_selector: 'lamp',
+    device_name: 'Living room lamp',
+    value: 1,
+    last_value: 0,
+    last_value_string: null,
+    last_value_changed: lastValueChanged,
   };
   let stateManager;
   let eventFake;
@@ -266,23 +281,14 @@ describe('scene.executeSingleAction, a value asked by a user which cannot be set
       device_feature: 'lamp-binary',
       value: 1,
       user_id: USER_ID,
+      client_id: CLIENT_ID,
     });
     assert.calledWith(device.setValue, lamp, lampFeature, 1);
     expect(messagesSentToOneUser()).to.deep.equal([
       {
         type: WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR,
         userId: USER_ID,
-        payload: {
-          device_feature_selector: 'lamp-binary',
-          device_feature_name: 'On/Off',
-          device_selector: 'lamp',
-          device_name: 'Living room lamp',
-          value: 1,
-          last_value: 0,
-          last_value_string: null,
-          last_value_changed: lastValueChanged,
-          error: 'Device unreachable',
-        },
+        payload: lampPayload,
       },
     ]);
   });
@@ -295,39 +301,54 @@ describe('scene.executeSingleAction, a value asked by a user which cannot be set
       feature_type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       value: 1,
       user_id: USER_ID,
+      client_id: CLIENT_ID,
     });
     expect(messagesSentToOneUser()).to.deep.equal([
       {
         type: WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR,
         userId: USER_ID,
-        payload: {
-          device_feature_selector: 'lamp-binary',
-          device_feature_name: 'On/Off',
-          device_selector: 'lamp',
-          device_name: 'Living room lamp',
-          value: 1,
-          last_value: 0,
-          last_value_string: null,
-          last_value_changed: lastValueChanged,
-          error: 'Device unreachable',
-        },
+        payload: lampPayload,
       },
     ]);
   });
 
-  it('should tell the user when the error says nothing', async () => {
-    device.setValue = fake.rejects(new Error());
+  it('should tell every screen of a user whose command names no screen (a script, an API key)', async () => {
     await sceneManager.executeSingleAction({
       type: ACTIONS.DEVICE.SET_VALUE,
       device_feature: 'lamp-binary',
       value: 1,
       user_id: USER_ID,
     });
-    expect(messagesSentToOneUser()).to.have.lengthOf(1);
-    expect(messagesSentToOneUser()[0].payload).to.deep.include({
-      device_feature_selector: 'lamp-binary',
-      last_value: 0,
-      error: null,
+    expect(messagesSentToOneUser()).to.deep.equal([
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR,
+        userId: USER_ID,
+        payload: { ...lampPayload, client_id: null },
+      },
+    ]);
+  });
+
+  [
+    { error: new ServiceNotConfiguredError('MQTT'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.NOT_CONFIGURED },
+    { error: new NotFoundError('Service mqtt was not found.'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.NOT_FOUND },
+    { error: new BadParameters('Value refused'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED },
+    { error: new AbortScene('ACTION_VALUE_EMPTY'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED },
+    { error: new Error(), cause: DEVICE_SET_VALUE_ERROR_CAUSES.UNREACHABLE },
+  ].forEach(({ error, cause }) => {
+    it(`should say why: ${error.constructor.name} is "${cause}"`, async () => {
+      device.setValue = fake.rejects(error);
+      await sceneManager.executeSingleAction({
+        type: ACTIONS.DEVICE.SET_VALUE,
+        device_feature: 'lamp-binary',
+        value: 1,
+        user_id: USER_ID,
+        client_id: CLIENT_ID,
+      });
+      expect(messagesSentToOneUser()).to.have.lengthOf(1);
+      const [{ payload }] = messagesSentToOneUser();
+      expect(payload).to.deep.equal({ ...lampPayload, cause });
+      // the message of the error stays on the server
+      expect(payload).not.to.have.property('error');
     });
   });
 
@@ -337,23 +358,27 @@ describe('scene.executeSingleAction, a value asked by a user which cannot be set
       device_feature: 'unknown-feature',
       value: 1,
       user_id: USER_ID,
+      client_id: CLIENT_ID,
     });
     assert.notCalled(device.setValue);
-    expect(messagesSentToOneUser()).to.have.lengthOf(1);
-    const [message] = messagesSentToOneUser();
-    expect(message.type).to.equal(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR);
-    expect(message.userId).to.equal(USER_ID);
-    expect(message.payload).to.deep.include({
-      device_feature_selector: 'unknown-feature',
-      device_feature_name: null,
-      device_selector: null,
-      device_name: null,
-      value: 1,
-      last_value: null,
-      last_value_string: null,
-      last_value_changed: null,
-    });
-    expect(message.payload.error).to.be.a('string');
+    expect(messagesSentToOneUser()).to.deep.equal([
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR,
+        userId: USER_ID,
+        payload: {
+          client_id: CLIENT_ID,
+          cause: DEVICE_SET_VALUE_ERROR_CAUSES.NOT_FOUND,
+          device_feature_selector: 'unknown-feature',
+          device_feature_name: null,
+          device_selector: null,
+          device_name: null,
+          value: 1,
+          last_value: null,
+          last_value_string: null,
+          last_value_changed: null,
+        },
+      },
+    ]);
   });
 
   it('should tell the user when the device does not exist', async () => {
@@ -364,17 +389,33 @@ describe('scene.executeSingleAction, a value asked by a user which cannot be set
       feature_type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       value: 1,
       user_id: USER_ID,
+      client_id: CLIENT_ID,
     });
     assert.notCalled(device.setValue);
     expect(messagesSentToOneUser()).to.have.lengthOf(1);
-    const [message] = messagesSentToOneUser();
-    expect(message.payload).to.deep.include({
+    expect(messagesSentToOneUser()[0].payload).to.deep.include({
+      cause: DEVICE_SET_VALUE_ERROR_CAUSES.NOT_FOUND,
       device_feature_selector: null,
       device_feature_name: null,
       device_selector: 'unknown-device',
       device_name: null,
       last_value: null,
     });
+  });
+
+  it('should not report a command which reached the device, when only its new state could not be recorded', async () => {
+    const error = new Error('SQLITE_BUSY');
+    error.deviceDriven = true;
+    device.setValue = fake.rejects(error);
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device_feature: 'lamp-binary',
+      value: 1,
+      user_id: USER_ID,
+      client_id: CLIENT_ID,
+    });
+    assert.calledWith(device.setValue, lamp, lampFeature, 1);
+    expect(messagesSentToOneUser()).to.deep.equal([]);
   });
 
   it('should not tell anyone when the value was not asked by a user', async () => {

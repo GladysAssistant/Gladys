@@ -1,5 +1,6 @@
 import { DeviceGetByRoomStatus } from '../utils/consts';
 import update from 'immutability-helper';
+import { sendDeviceFeatureValue } from '../utils/deviceCommand';
 
 function createActions(store) {
   const actions = {
@@ -33,16 +34,12 @@ function createActions(store) {
       store.setState(newState);
     },
     async setValue(state, deviceFeatureSelector, value) {
-      await state.httpClient.post(`/api/v1/device_feature/${deviceFeatureSelector}/value`, {
-        value
-      });
+      await sendDeviceFeatureValue(state.httpClient, deviceFeatureSelector, value);
     },
     async updateValue(state, device, deviceFeature, roomIndex, deviceIndex, deviceFeatureIndex, value) {
       actions.updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value);
       if (deviceFeature.category === 'light' && deviceFeature.type === 'binary') {
-        await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-          value
-        });
+        await sendDeviceFeatureValue(state.httpClient, deviceFeature.selector, value);
       }
     },
     updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value) {

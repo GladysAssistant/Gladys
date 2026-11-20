@@ -38,6 +38,9 @@ const DashboardPage = ({ children, ...props }) => {
       // a pinch-zoom also shrinks the visual viewport, but overlays nothing
       const lift = viewport.scale > 1.01 ? 0 : Math.max(0, Math.round(overlaid));
       dockRef.current.style.setProperty('--dock-lift', `${lift}px`);
+      // mirrored on <html>: what the app shell renders on <body> above the dock (the toast of
+      // a failed device command) has to follow it
+      document.documentElement.style.setProperty('--dock-lift', `${lift}px`);
     };
     viewport.addEventListener('resize', updateDockLift);
     viewport.addEventListener('scroll', updateDockLift);
@@ -45,6 +48,7 @@ const DashboardPage = ({ children, ...props }) => {
     return () => {
       viewport.removeEventListener('resize', updateDockLift);
       viewport.removeEventListener('scroll', updateDockLift);
+      document.documentElement.style.removeProperty('--dock-lift');
     };
   }, []);
 

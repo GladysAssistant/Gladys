@@ -1197,6 +1197,20 @@ a.bigButtonGhost:focus {
   bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
+/* A toast of the app shell (toastAboveDock): below the desktop breakpoint a page may pin
+   something to the bottom of the screen — the dock of the dashboard (which follows
+   --dock-lift, mirrored on <html> by DashboardPage), a bottom bar — and the shell cannot
+   know which. It always sits above where they are. */
+@media (max-width: 991.98px) {
+  .toastAboveDock {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px) + var(--dock-lift, 0px));
+  }
+}
+
+.toastDismissable {
+  cursor: pointer;
+}
+
 .toastText {
   flex: 1;
   min-width: 0;

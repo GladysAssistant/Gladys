@@ -577,44 +577,59 @@ describe('GET /api/v1/device_feature/energy_consumption', () => {
 });
 
 describe('POST /api/v1/device_feature/:device_feature_selector/value', () => {
-  it('should answer with the pending action, and keep its author with the action to execute', async () => {
+  const USER_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
+  const send = async (body) => {
     const emitted = [];
     const controller = DeviceController({ event: { emit: (...args) => emitted.push(args) } });
-    let body;
+    let answer;
     await controller.setValueFeature(
-      {
-        params: { device_feature_selector: 'test-device-feature' },
-        body: { value: 1 },
-        user: { id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' },
-      },
+      { params: { device_feature_selector: 'test-device-feature' }, body, user: { id: USER_ID } },
       {
         json: (data) => {
-          body = data;
+          answer = data;
         },
       },
     );
-    const action = {
-      type: ACTIONS.DEVICE.SET_VALUE,
-      device_feature: 'test-device-feature',
-      value: 1,
-      status: ACTIONS_STATUS.PENDING,
-    };
-    expect(body).to.deep.equal(action);
+    return { answer, emitted };
+  };
+  const action = {
+    type: ACTIONS.DEVICE.SET_VALUE,
+    device_feature: 'test-device-feature',
+    value: 1,
+    status: ACTIONS_STATUS.PENDING,
+  };
+
+  it('should answer with the pending action, and keep its author and their screen with the action to execute', async () => {
+    const { answer, emitted } = await send({ value: 1, client_id: 'd9a4bfd4-1c0e-4a3a-9c0f-6f1f0a6a2a11' });
+    expect(answer).to.deep.equal(action);
     expect(emitted).to.deep.equal([
-      [EVENTS.ACTION.TRIGGERED, { ...action, user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }],
+      [EVENTS.ACTION.TRIGGERED, { ...action, user_id: USER_ID, client_id: 'd9a4bfd4-1c0e-4a3a-9c0f-6f1f0a6a2a11' }],
     ]);
+  });
+
+  it('should keep no screen for a caller which names none', async () => {
+    const { answer, emitted } = await send({ value: 1 });
+    expect(answer).to.deep.equal(action);
+    expect(emitted).to.deep.equal([[EVENTS.ACTION.TRIGGERED, { ...action, user_id: USER_ID, client_id: null }]]);
+  });
+
+  it('should ignore a client id which is not a string, and shorten one which is too long', async () => {
+    const notAString = await send({ value: 1, client_id: { $ne: null } });
+    expect(notAString.emitted[0][1].client_id).to.equal(null);
+    const tooLong = await send({ value: 1, client_id: 'a'.repeat(200) });
+    expect(tooLong.emitted[0][1].client_id).to.equal('a'.repeat(64));
   });
 });
 
 describe('POST /api/v1/device/:device_selector/:feature_category/:feature_type/value', () => {
-  it('should answer with the pending action, and keep its author with the action to execute', async () => {
+  it('should answer with the pending action, and keep its author and their screen with the action to execute', async () => {
     const emitted = [];
     const controller = DeviceController({ event: { emit: (...args) => emitted.push(args) } });
     let body;
     await controller.setValue(
       {
         params: { device_selector: 'test-device', feature_category: 'light', feature_type: 'binary' },
-        body: { value: 0 },
+        body: { value: 0, client_id: 'd9a4bfd4-1c0e-4a3a-9c0f-6f1f0a6a2a11' },
         user: { id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' },
       },
       {
@@ -633,7 +648,14 @@ describe('POST /api/v1/device/:device_selector/:feature_category/:feature_type/v
     };
     expect(body).to.deep.equal(action);
     expect(emitted).to.deep.equal([
-      [EVENTS.ACTION.TRIGGERED, { ...action, user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }],
+      [
+        EVENTS.ACTION.TRIGGERED,
+        {
+          ...action,
+          user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          client_id: 'd9a4bfd4-1c0e-4a3a-9c0f-6f1f0a6a2a11',
+        },
+      ],
     ]);
   });
 });

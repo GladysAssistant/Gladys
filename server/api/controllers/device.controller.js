@@ -3,6 +3,9 @@ const { EVENTS, ACTIONS, ACTIONS_STATUS, SYSTEM_VARIABLE_NAMES } = require('../.
 const { BadParameters } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
 
+// A client id is echoed to the screens of its user: it has no reason to be long
+const MAX_CLIENT_ID_LENGTH = 64;
+
 module.exports = function DeviceController(gladys) {
   /**
    * @api {get} /api/v1/device/:device_selector getBySelector
@@ -61,6 +64,26 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @description Who asked for a value. The action is executed after the answer to the request:
+   * its author is kept with it, so a failure can be reported to them
+   * (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR). `client_id` is an opaque id the front
+   * sends with its commands, one per open page: it comes back with the failure, so only the
+   * page which sent the command says so. A caller which sends none (a script, an API key)
+   * gets the state back on its screens, and no message.
+   * @param {object} req - The request.
+   * @returns {object} The author to attach to the action.
+   * @example
+   * getActionAuthor(req);
+   */
+  function getActionAuthor(req) {
+    const clientId = req.body.client_id;
+    return {
+      user_id: req.user.id,
+      client_id: typeof clientId === 'string' ? clientId.slice(0, MAX_CLIENT_ID_LENGTH) : null,
+    };
+  }
+
+  /**
    * @api {post} /api/v1/device/:device_selector/:feature_category/:feature_type/value setValue
    * @apiName setValue
    * @apiGroup Device
@@ -74,9 +97,7 @@ module.exports = function DeviceController(gladys) {
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
     };
-    // The action is executed after this answer: its author is kept with it, so a failure
-    // can be reported to them (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR)
-    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, user_id: req.user.id });
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, ...getActionAuthor(req) });
     res.json(action);
   }
 
@@ -92,9 +113,7 @@ module.exports = function DeviceController(gladys) {
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
     };
-    // The action is executed after this answer: its author is kept with it, so a failure
-    // can be reported to them (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR)
-    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, user_id: req.user.id });
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, ...getActionAuthor(req) });
     res.json(action);
   }
 

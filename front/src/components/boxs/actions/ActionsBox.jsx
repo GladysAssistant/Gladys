@@ -8,6 +8,7 @@ import { WEBSOCKET_MESSAGE_TYPES, COVER_STATE } from '../../../../../server/util
 import { DeviceFeatureCategoriesIcon } from '../../../utils/consts';
 import { isCoverStateFeature, isToggleableBinaryFeature } from './actionableFeatures';
 import style from './style.css';
+import { COMMAND_CLIENT_ID, getCommandNotSentCause, sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 
 const SCENE_START_FEEDBACK_MS = 1200;
 
@@ -91,8 +92,28 @@ class ActionsBox extends Component {
           value = feature.last_value === 1 ? 0 : 1;
         }
         if (value !== null) {
-          await this.props.httpClient.post(`/api/v1/device_feature/${action.device_feature}/value`, { value });
+          // Displayed before the request leaves: the answer to it comes before the device
+          // is driven, and a failure reported by Gladys (a state flagged `rollback`, see
+          // DeviceCommandError.jsx) can come back first — applied after the request, the
+          // optimistic value would overwrite the real state it had just been given.
+          const previousValue = feature.last_value;
           this.updateDeviceStateWebsocket({ device_feature_selector: action.device_feature, last_value: value });
+          try {
+            await sendDeviceFeatureValue(this.props.httpClient, action.device_feature, value);
+          } catch (e) {
+            // The command never left: back to what was displayed, and said like a device
+            // Gladys could not drive, with its own cause (DeviceCommandError.jsx)
+            this.props.session.dispatcher.dispatch(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR, {
+              client_id: COMMAND_CLIENT_ID,
+              cause: getCommandNotSentCause(e),
+              device_feature_selector: action.device_feature,
+              // the name the user reads on the button
+              device_name: this.getActionLabel(action),
+              value,
+              last_value: previousValue
+            });
+            throw e;
+          }
         }
       }
     } catch (e) {

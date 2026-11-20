@@ -14,6 +14,7 @@ import {
 } from '../../../../../server/utils/constants';
 import { resolveFeatureOptions } from '../../../utils/supportedOptions';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 import LazyArtwork from './LazyArtwork';
 import MediaItemList from './MediaItemList';
 import MediaBrowser from './MediaBrowser';
@@ -153,15 +154,23 @@ class MusicComponent extends Component {
   // feature with feedback (the player confirms it by publishing its new state) therefore waits
   // for that state: without it in time, the optimistic state is replaced by the confirmed one and
   // a short notice says the player did not respond.
+  //
+  // A command the integration refuses outright does come back, and at once: as a state flagged
+  // `rollback` (components/device/DeviceCommandError.jsx, which also says so in its toast). It
+  // can land before the value route answers, so it is remembered: no confirmation is awaited
+  // for a command already known to have failed, or the box would say, 15 s after the toast,
+  // that the player did not respond.
   setValueDevice = async (deviceFeature, value, { expectConfirmation = false } = {}) => {
+    this.failedCommands.delete(deviceFeature.selector);
     try {
-      await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-        value
-      });
+      await sendDeviceFeatureValue(this.props.httpClient, deviceFeature.selector, value);
     } catch (e) {
       console.error(e);
       this.showCommandError('commandFailed');
       this.getDevice();
+      return;
+    }
+    if (this.failedCommands.delete(deviceFeature.selector)) {
       return;
     }
     // the deadline starts once the core took the command
@@ -169,6 +178,9 @@ class MusicComponent extends Component {
       this.awaitConfirmation(deviceFeature.selector);
     }
   };
+
+  // selectors of the features whose last command Gladys reported as failed
+  failedCommands = new Set();
 
   awaitConfirmation = selector => {
     this.clearConfirmation(selector);
@@ -375,6 +387,10 @@ class MusicComponent extends Component {
     }
     // the player answered: whatever the value, it is the truth now
     this.clearConfirmation(payload.device_feature_selector);
+    if (payload.rollback) {
+      // not the player: Gladys, saying that the command failed and giving the real state back
+      this.failedCommands.add(payload.device_feature_selector);
+    }
     const value = numberOrNull(payload.last_value);
     this.updateFeatureValue(type, value, payload.last_value_changed);
     if (type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {

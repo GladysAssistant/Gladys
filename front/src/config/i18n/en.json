@@ -133,8 +133,16 @@
     }
   },
   "device": {
-    "setValueError": "The command sent to \"{{name}}\" failed. The device may be unreachable.",
-    "setValueErrorUnknownDevice": "The command failed. The device may be unreachable.",
+    "setValueError": {
+      "unreachable": "The command sent to “{{name}}” failed. The device may be unreachable.",
+      "notConfigured": "The command was not sent to “{{name}}”: its integration is not configured or not connected.",
+      "refused": "The command sent to “{{name}}” was refused.",
+      "notFound": "The command was not sent: this device, or its integration, no longer exists in Gladys.",
+      "gladysUnreachable": "Gladys could not be reached: the command was not sent.",
+      "gladysUnreachableSeveral": "Gladys could not be reached: the commands were not sent.",
+      "several": "The commands sent to {{count}} devices failed.",
+      "unknownDevice": "The command failed. The device may be unreachable."
+    },
     "searchPlaceHolder": "Search devices",
     "noRoom": "No room",
     "noFeatures": "No features",

@@ -14,6 +14,11 @@ const DEFAULT_DURATION_MS = 4000;
  *
  * actionLabel / onAction: one action ("Undo"). aboveBar: the page has a bottom bar, the toast
  * sits above it.
+ *
+ * For a toast shown from the app shell, which cannot know the page under it: aboveDock keeps it
+ * clear, below 992px, of whatever a page pins to the bottom of the screen (the dock of the
+ * dashboard, a bottom bar), and dismissOnTap lets a tap on it close it. role: "alert" for the
+ * one error that goes through a toast (C.6), "status" otherwise.
  */
 class MobileToast extends Component {
   componentDidMount() {
@@ -44,14 +49,20 @@ class MobileToast extends Component {
     }
   };
 
-  render({ message, actionLabel, onAction, aboveBar, dataCy }) {
+  render({ message, actionLabel, onAction, aboveBar, aboveDock, dismissOnTap, onClose, role, dataCy }) {
     if (!message) {
       return null;
     }
+    const dismissable = Boolean(dismissOnTap && onClose);
     return createPortal(
       <div
-        class={cx(style.toast, { [style.toastAboveBar]: aboveBar })}
-        role="status"
+        class={cx(style.toast, {
+          [style.toastAboveBar]: aboveBar,
+          [style.toastAboveDock]: aboveDock,
+          [style.toastDismissable]: dismissable
+        })}
+        role={role || 'status'}
+        onClick={dismissable ? onClose : undefined}
         data-cy={dataCy || 'mobile-toast'}
       >
         <span class={style.toastText}>{message}</span>
