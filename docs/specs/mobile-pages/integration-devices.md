@@ -29,6 +29,7 @@ they are moved to the same layout, **with the components of section B**.
 | Enedis | `enedis-gateway/UsagePoints.jsx` ("My meters") | — |
 | Thermostat | `thermostat/device-page` | — |
 | External integrations | `external-integration/device-page` | `external-integration/discover-page` |
+| RTSP cameras | `rtsp-camera/RtspCamera.jsx` (one page, no tab) | — |
 
 ## B. The pattern (< 768 px)
 
@@ -41,14 +42,15 @@ The shared components are in `front/src/components/integration/mobile/`:
 - `MobileIntegrationTab`: the content of a tab — a column at most 40 rem wide, on the wallpaper
   (no card around the list). It owns the **toast** of the tab (a row that just deleted or added
   its device is gone from the list when its request is over) and the floating "+" of an
-  integration whose devices are created in a page of their own.
+  integration whose devices are not discovered: a link when they are created in a page of their
+  own (MQTT, Thermostat), a button when they are created in the list itself (cameras).
 - `MobileListToolbar`: the **search** (16 px) and the **sort order as one button** that flips it
   ("A - Z" / "Z - A"), then the actions of the list (`ToolButton`, 44 px). They call the handlers
   of the desktop header with the same event: a phone list has no request of its own. The search
   field shows the query the list is filtered on, like the desktop one. Where that query is a
-  debounced state (the devices of Bluetooth, Airplay and LAN Manager, the discovery of an
-  external integration) the field is not controlled — it would take back the letters typed since
-  the last update — and only starts from the query still applied when it mounts again
+  debounced state (the devices of Bluetooth, Airplay and LAN Manager, the cameras, the discovery
+  of an external integration) the field is not controlled — it would take back the letters typed
+  since the last update — and only starts from the query still applied when it mounts again
   (`initialSearchValue`). Where the query is stored at once and only the request is debounced
   (Matter, MQTT, Thermostat) the field is controlled (`searchValue`).
 - `MobileDeviceItem`: the row of a device and its sheet (C and D).
@@ -124,6 +126,8 @@ From top to bottom:
      that cannot be added says why on a disabled button ("Already created", "Managed by … service").
    - **Edit**, when the integration has an edit page for the device (Bluetooth, MQTT,
      Thermostat).
+   - **another request of the card** ("Update" a meter, "Test connection" of a camera). A success
+     closes the sheet, unless its result shows in the sheet (the image of a connection test).
    - **Delete**, always last.
    - A button shows a spinner while its request runs, and the other ones are disabled meanwhile
      — **and so are the fields of the sheet** (name, room, switches): what would be typed after
@@ -224,6 +228,39 @@ Only what differs from B, C and D.
   whose confirmation is the sheet of D instead of the inline question of the card. The creation is
   the floating "+".
 
+### RTSP cameras
+
+The integration has one page and no "Discovery": a camera is created by hand, in the list.
+
+- **The list.** The toolbar has the search and the sort order; the count of the cameras heads
+  the rows (a camera icon, the name, the room). With no camera at all the page offers "Add a
+  camera" in place of the floating "+"; a search that finds nothing only says so, the "+" stays.
+- **The sheet** holds the fields of the card: name, room, **refresh frequency**, the **URL** of
+  the stream (16 px, a URL keyboard, no capital letter and no correction; its explanation under
+  the field) and the **rotation** of the image — which gets a label here, the card has none.
+  The frequency, the URL and the rotation count in the unsaved changes and are put back by "Close
+  without saving". The features are not listed: a camera always has the same ones.
+- **Test connection** is a button of the sheet, under "Save", disabled while the camera has no
+  URL. It posts the camera as the sheet shows it, saved or not, and **the sheet stays open**: the
+  image the camera answered shows right above the buttons. A failed test shows there too, with
+  the reason the server gave (the `message` of the API error — the card showed an empty alert).
+  The error of a test or of a save is forgotten when the sheet opens again.
+- **A camera needs a name to be saved**: "Save" is disabled until it has one and a line under
+  the field says why (the card lets the request fail). The field is marked once it was typed in
+  and emptied, or when a saved camera lost its name — not on a new camera nothing was typed in.
+- **"+"** adds a camera to the list, as the "New" button of the card, **and opens its sheet**,
+  titled "New camera" until it has a name. That camera only exists in the page until it is
+  saved: its sheet has no "Delete", and closing it without saving — after the question of D when
+  something was typed — **takes it out of the list**. Saved, it is a camera like the other ones.
+- **A camera that was never saved** can be saved as soon as it has a name, whatever the sheet
+  changed. One added on a wider screen keeps its row when the window narrows: its sheet has
+  "Delete", confirmed, which takes it out of the list without a request, as on its card.
+- **A search or another sort order keeps the cameras that were never saved**, at the end of the
+  list it brings (on every screen size: the card of a camera being typed was dropped by the
+  answer of a search). They are not kept when the page is opened again.
+- The card never said that a deletion had failed: on a phone the confirmation does, and tells a
+  camera with too many states apart.
+
 ### External integrations
 
 - **Devices.** The count of the devices heads the list, with "Refresh" on its right and the
@@ -257,7 +294,12 @@ other layout: an unsaved change there does not survive the swap.
   cancelled; a refused deletion explained in the confirmation (Matter, Enedis, external
   integrations); the fields disabled while a save runs; a failed Matter replacement leaving its
   row untouched; the search and the sort order sent to the server; a discovered device added; the
-  pairing form; the cards kept on a wider screen.
+  pairing form; the cards kept on a wider screen. For the cameras: the fields of the sheet, a
+  connection test that leaves the sheet open on its image, a failed test (with the body the API
+  sends) and its error forgotten when the sheet opens again, no test without a URL, the URL, the
+  frequency and the rotation saved and undone, a camera added with "+" then saved, one closed
+  without being saved, one kept when a search answers, and one added on a wider screen deleted
+  from its sheet.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.
