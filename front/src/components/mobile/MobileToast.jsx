@@ -60,6 +60,13 @@ class MobileToast extends Component {
 
   componentWillUnmount() {
     clearTimeout(this.timer);
+    // unmounted while held (the page swapped its layout under the pointer): same as a message
+    // that leaves, a caller that runs the delay itself must not keep waiting for a release
+    if (this.isHeld() && this.props.onRelease) {
+      this.hovered = false;
+      this.focused = false;
+      this.props.onRelease();
+    }
   }
 
   schedule = () => {
