@@ -485,9 +485,13 @@ export class WidgetChart extends Component {
       if (this.unmounted || generation !== this.seriesGeneration) {
         return;
       }
+      // the legend: the name the widget gives the series, in the user's
+      // language, else the feature's own name
+      const seriesNames = component.series_names || [];
       this.setSeries(
         data.map((oneFeature, index) => ({
           name:
+            text(seriesNames[index], language) ||
             get(oneFeature, 'deviceFeature.name') ||
             deviceNamesBySelector[component.device_feature_selectors[index]] ||
             `${index + 1}`,

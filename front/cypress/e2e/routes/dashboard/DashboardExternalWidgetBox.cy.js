@@ -127,6 +127,57 @@ describe('Dashboard integration widget box', () => {
       });
   });
 
+  it('names the series of a device-bound chart as the widget asks, else as the feature', () => {
+    cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('RUNNING')]);
+    cy.intercept('GET', CONTENT_URL, {
+      ...CONTENT,
+      content: {
+        version: 1,
+        components: [
+          {
+            type: 'chart',
+            device_features: ['ext:room', 'ext:target', 'ext:fan'],
+            device_feature_selectors: ['widget-room', 'widget-target', 'widget-fan'],
+            interval: 'last-day',
+            // no name for the third series: it keeps the feature's
+            series_names: [
+              { en: 'Living room temp.', fr: 'Temp. salon' },
+              { en: 'Setpoint', fr: 'Consigne' }
+            ]
+          }
+        ]
+      }
+    }).as('getContent');
+    cy.intercept('GET', '**/api/v1/device?device_feature_selectors=*', [
+      {
+        name: 'Living room',
+        features: [{ selector: 'widget-room' }, { selector: 'widget-target' }, { selector: 'widget-fan' }]
+      }
+    ]);
+    const now = Date.now();
+    const values = [
+      { created_at: new Date(now - 60 * 60 * 1000).toISOString(), value: 19 },
+      { created_at: new Date(now).toISOString(), value: 19.5 }
+    ];
+    cy.intercept('GET', '**/api/v1/device_feature/aggregated_states*', [
+      { device: { name: 'Living room' }, deviceFeature: { name: 'Room temperature' }, values },
+      { device: { name: 'Living room' }, deviceFeature: { name: 'Temperature' }, values },
+      { device: { name: 'Living room' }, deviceFeature: { name: 'Fan speed' }, values }
+    ]).as('getStates');
+    createDashboard([{ type: 'external-widget', integration: SELECTOR, widget: WIDGET_KEY }]).then(selector => {
+      dashboardSelector = selector;
+      cy.visit(`/dashboard/${selector}`);
+    });
+    cy.wait('@getStates');
+    cy.get('[data-cy="external-widget-box"] .apexcharts-legend-text').should($texts => {
+      expect($texts.toArray().map(element => element.textContent)).to.deep.equal([
+        'Living room temp.',
+        'Setpoint',
+        'Fan speed'
+      ]);
+    });
+  });
+
   it('keeps danger and active button icons in their semantic colors in light and dark mode', () => {
     const components = [
       ...CONTENT.content.components.filter(component => component.type === 'button'),
