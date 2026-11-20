@@ -5,6 +5,10 @@ const db = require('../../models');
 
 /**
  * @description Send a message to a user.
+ * A 'chat' message is part of the conversation replayed to the AI provider
+ * (message.getPreviousQuestionsForUser), as a message sent by a scene: anything
+ * that must not reach the provider (a secret, a system message) is sent as a
+ * 'notification', which is displayed the same way.
  * @param {string} userSelector - The selector of the user.
  * @param {string} text - The answer to send.
  * @param {string} [file] - An optional file sent with the message.

@@ -3,10 +3,7 @@ const { Op } = require('sequelize');
 const db = require('../../models');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { mcpToolsToChatApiFormat } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
-const {
-  buildExchangesFromMessages,
-  exchangesToApiMessages,
-} = require('../message/message.getPreviousQuestionsForUser');
+const { buildExchangesFromMessages, buildChatApiMessages } = require('../message/message.getPreviousQuestionsForUser');
 const { buildSystemPromptWithCurrentTime } = require('./gateway.forwardMessageToAiChat');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
@@ -168,10 +165,7 @@ async function getAiChatDebugContext(userId) {
   const chronologicalMessages = plainMessages.reverse();
   const exchanges = buildExchangesFromMessages(chronologicalMessages);
   const conversationHistory = buildConversationHistoryForDebug(chronologicalMessages, userId);
-  const messagesForApi = [
-    { role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) },
-    ...exchangesToApiMessages(exchanges),
-  ];
+  const messagesForApi = buildChatApiMessages(buildSystemPromptWithCurrentTime(timezoneName), exchanges);
 
   return {
     messages: messagesForApi,
