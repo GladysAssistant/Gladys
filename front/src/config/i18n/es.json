@@ -1760,7 +1760,16 @@
       "rotationO": "Sin rotación",
       "rotation90": "90°",
       "rotation18O": "180°",
-      "rotation27O": "270°"
+      "rotation27O": "270°",
+      "rotationLabel": "Rotación de la imagen",
+      "newCamera": "Nueva cámara",
+      "nameRequired": "Una cámara necesita un nombre para guardarse.",
+      "addCamera": "Añadir una cámara",
+      "cameraCount": {
+        "zero": "Cámaras",
+        "one": "1 cámara",
+        "other": "{{count}} cámaras"
+      }
     },
     "netatmo": {
       "title": "Netatmo",

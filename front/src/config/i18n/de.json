@@ -1760,7 +1760,16 @@
       "rotationO": "Keine Rotation",
       "rotation90": "90°",
       "rotation18O": "180°",
-      "rotation27O": "270°"
+      "rotation27O": "270°",
+      "rotationLabel": "Bilddrehung",
+      "newCamera": "Neue Kamera",
+      "nameRequired": "Eine Kamera braucht einen Namen, um gespeichert zu werden.",
+      "addCamera": "Kamera hinzufügen",
+      "cameraCount": {
+        "zero": "Kameras",
+        "one": "1 Kamera",
+        "other": "{{count}} Kameras"
+      }
     },
     "energyMonitoring": {
       "mobile": {
