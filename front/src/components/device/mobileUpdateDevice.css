@@ -1,0 +1,45 @@
+/* A device being edited on a phone (docs/specs/mobile-pages/device-edit.md): what the kit
+   (components/mobile/kit.css) does not already carry. */
+
+.loadingBlock {
+  min-height: 12rem;
+}
+
+/* "History kept · 1 204 states (≈ 56 kB)": the size follows the state on the same line */
+.historySize::before {
+  content: ' · ';
+}
+
+.sheetBlock {
+  margin: 0 0 16px;
+}
+
+.halfField {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* the external id cannot be changed: a value to read and to select, not a disabled field */
+.externalId {
+  padding: 10px 14px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.externalIdLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #4f5866;
+}
+
+.externalIdValue {
+  margin-top: 2px;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #1c2334;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
+}

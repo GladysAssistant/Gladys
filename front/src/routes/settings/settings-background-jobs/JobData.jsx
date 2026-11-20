@@ -74,6 +74,24 @@ const DeviceMigrateJobData = ({ job, user }) => (
   </Fragment>
 );
 
+// Background deletion of a device with too many states to delete at once: the device, the
+// current step, and why the device is still there when it was not deleted
+const DeviceDestroyJobData = ({ job }) => (
+  <Fragment>
+    {job.data.device_name && (
+      <div class="text-muted small">
+        <Text id="jobsSettings.jobData.deviceToDestroy" fields={{ device: job.data.device_name }} />
+      </div>
+    )}
+    <JobStep job={job} />
+    {job.data.device_kept && (
+      <div class="text-muted small">
+        <Text id="jobsSettings.jobData.deviceKept" />
+      </div>
+    )}
+  </Fragment>
+);
+
 const PurgeOrphanedJobData = ({ job, user }) => (
   <Fragment>
     <JobStep job={job} />
@@ -107,6 +125,7 @@ const JOB_DATA_RENDERERS = {
   [JOB_TYPES.DEVICE_STATES_PURGE_ALL_SQLITE_STATES]: PurgeAllSqliteJobData,
   [JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES]: PurgeOrphanedJobData,
   [JOB_TYPES.DEVICE_MIGRATE]: DeviceMigrateJobData,
+  [JOB_TYPES.DEVICE_DESTROY]: DeviceDestroyJobData,
   [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES]: EnergyCostJobData,
   [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_YESTERDAY]: EnergyCostJobData,
   [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING]: EnergyCostJobData,

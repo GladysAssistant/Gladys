@@ -5,12 +5,15 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 import actions from '../../../actions/gateway';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
+import MobileGatewayLoginForm from '../../../components/gateway/MobileGatewayLoginForm';
 import AuthLayout from '../../../components/auth/AuthLayout';
 import RestoreBackup from './RestoreBackup';
 import SetRestoreKey from './SetRestoreKey';
 import RestoreInProgress from './RestoreInProgress';
 import LocalAccountAlternative from './LocalAccountAlternative';
 import linkState from 'linkstate';
+import { withMobileViewport } from '../../../components/mobile';
+import { MobileSignupLayout } from '../layout';
 
 class CreateAccountGladysGateway extends Component {
   state = {
@@ -97,8 +100,51 @@ class CreateAccountGladysGateway extends Component {
       this.changeStepToUpdateRestoreKey();
     }
   }
+  // The restore on a phone (docs/specs/mobile-pages/onboarding.md, D): the same four screens
+  // in the shell of the onboarding, each with its phone layout
+  renderMobile() {
+    const { step, backupKey, loading, error, gatewayRestoreErrored } = this.state;
+    return (
+      <MobileSignupLayout title={<Text id="signup.mobile.restoreTitle" />} backHref={step === 4 ? null : '/signup'}>
+        <div data-cy="signup-restore-mobile">
+          {step === 1 && <MobileGatewayLoginForm {...this.props} external_forgot_password />}
+          {step === 2 && (
+            <SetRestoreKey
+              {...this.props}
+              mobile
+              backupKey={backupKey}
+              loading={loading}
+              error={error}
+              updateBackupKey={linkState(this, 'backupKey')}
+              saveBackupKey={this.saveBackupKey}
+            />
+          )}
+          {step === 3 && !this.props.gatewayRestoreInProgress && (
+            <RestoreBackup
+              {...this.props}
+              mobile
+              restoreBackup={this.restoreBackup}
+              changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
+            />
+          )}
+          {step === 4 && (
+            <RestoreInProgress
+              mobile
+              gatewayRestoreErrored={gatewayRestoreErrored}
+              changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
+            />
+          )}
+          {(step === 2 || step === 3) && <LocalAccountAlternative mobile />}
+        </div>
+      </MobileSignupLayout>
+    );
+  }
+
   render() {
     const { step, backupKey, loading, error, gatewayRestoreErrored } = this.state;
+    if (this.props.isMobile) {
+      return this.renderMobile();
+    }
     return (
       <AuthLayout size={step === 3 ? 'medium' : undefined}>
         {step === 1 && (
@@ -154,7 +200,9 @@ class CreateAccountGladysGateway extends Component {
   }
 }
 
-export default connect(
-  'user,session,httpClient,gatewayBackups,gatewayGetBackupsStatus,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
-  actions
-)(CreateAccountGladysGateway);
+export default withMobileViewport(
+  connect(
+    'user,session,httpClient,gatewayBackups,gatewayGetBackupsStatus,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayLoginUseRecoveryCode,gatewayLoginRecoveryCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
+    actions
+  )(CreateAccountGladysGateway)
+);

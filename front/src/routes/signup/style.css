@@ -184,3 +184,78 @@
   display: flex;
   gap: 6px;
 }
+
+/* ==================================================================
+   The onboarding on a phone (docs/specs/mobile-pages/onboarding.md):
+   what the kit (components/mobile/kit.css) does not already carry.
+   Light colors only: dark mode is the app-wide inversion.
+   ================================================================== */
+
+/* the segments of a choice are as tall as any other target of the step */
+.mobileSegmented [role='group'] > button {
+  min-height: 44px;
+}
+
+/* the panels of the last step: an icon, a title, a paragraph */
+.mobileFeature {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+.mobileFeatureIcon {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.mobileFeatureText {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f5866;
+}
+
+.mobileFeatureText h2 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1c2334;
+}
+
+.mobileClosing {
+  margin: 20px 4px 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  text-align: center;
+  color: #1c2334;
+}
+
+.mobileActions {
+  margin-top: 16px;
+}
+
+.mobileAlternative {
+  margin-top: 24px;
+}
+
+.mobileSpinner {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 0;
+}
+
+/* on the Horizon wallpaper the panels of the last step are glass, like the cards of the other
+   steps (kit.css, "Glass variant") */
+:global(.gladys-mobile-glass) .mobileFeature {
+  background: var(--gl-card-bg);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow-soft);
+}

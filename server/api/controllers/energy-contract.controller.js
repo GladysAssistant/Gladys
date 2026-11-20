@@ -95,12 +95,27 @@ module.exports = function EnergyContractController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/energy_contract/current getMeterCurrent
+   * @apiName getMeterCurrent
+   * @apiGroup EnergyContract
+   * @apiDescription Current price of a meter: the price of its contract active now,
+   * `contract: null` and `price: null` when it has none (docs/specs/energy-contracts.md, 8.1).
+   * @apiParam {string} [electric_meter] Device selector of the meter, the main meter by default.
+   */
+  async function getMeterCurrent(req, res) {
+    const current = await gladys.energyContract.getMeterCurrent({ electric_meter: req.query.electric_meter });
+    res.json(current);
+  }
+
+  /**
    * @api {get} /api/v1/energy_contract/:selector/current getCurrent
    * @apiName getCurrent
    * @apiGroup EnergyContract
+   * @apiDescription Current price of the meter of this contract (kept for the widgets saved
+   * before the meter targeting): the price of the meter's contract active now.
    */
   async function getCurrent(req, res) {
-    const current = await gladys.energyContract.getCurrent(req.params.selector);
+    const current = await gladys.energyContract.getMeterCurrent({ energy_contract: req.params.selector });
     res.json(current);
   }
 
@@ -173,6 +188,7 @@ module.exports = function EnergyContractController(gladys) {
     recalculate: asyncMiddleware(recalculate),
     getTemplates: asyncMiddleware(getTemplates),
     getTemplate: asyncMiddleware(getTemplate),
+    getMeterCurrent: asyncMiddleware(getMeterCurrent),
     getCurrent: asyncMiddleware(getCurrent),
     getBySelector: asyncMiddleware(getBySelector),
     getCalendars: asyncMiddleware(getCalendars),

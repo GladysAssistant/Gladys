@@ -45,6 +45,10 @@ const BOX_TYPE_ICONS = {
 
 import BaseEditBox from './baseEditBox';
 
+// The widgets most dashboards are made of, offered first (no search typed):
+// on a phone the full alphabetical grid is several screens long
+const POPULAR_BOX_TYPES = ['devices', 'scene', 'weather', 'chips', 'actions', 'chart'];
+
 class SelectBoxType extends Component {
   state = { search: '', externalWidgets: [] };
 
@@ -107,6 +111,8 @@ class SelectBoxType extends Component {
     // the two families are told apart with a heading each, as soon as an
     // installed integration brings widgets of its own
     const showSections = (externalWidgets || []).length > 0;
+    const popularBoxTypes =
+      searchTerm.length === 0 ? POPULAR_BOX_TYPES.filter(type => DASHBOARD_BOX_TYPE_LIST_FILTERED.includes(type)) : [];
     return (
       <BaseEditBox {...props} titleKey="dashboard.selectBoxType">
         <div class="form-group">
@@ -128,7 +134,33 @@ class SelectBoxType extends Component {
             </Localizer>
           </div>
           <div class={style.boxTypeGrid} data-cy="select-box-type">
-            {showSections && boxTypes.length > 0 && (
+            {popularBoxTypes.length > 0 && (
+              <div class={cx('text-muted', style.boxTypeSection)} data-cy="select-box-type-popular">
+                <i class="fe fe-star" />
+                <Text id="dashboard.selectBoxTypePopularSection" />
+              </div>
+            )}
+            {popularBoxTypes.map(type => (
+              <button
+                type="button"
+                key={`popular-${type}`}
+                data-cy={`box-type-popular-${type}`}
+                class={style.boxTypeTile}
+                onClick={() => this.selectType(type)}
+              >
+                <i class={cx(`fe fe-${BOX_TYPE_ICONS[type] || 'square'}`, style.boxTypeIcon)} />
+                <span class={style.boxTypeLabel}>
+                  <Text id={`dashboard.boxTitle.${type}`} />
+                </span>
+              </button>
+            ))}
+            {popularBoxTypes.length > 0 && boxTypes.length > 0 && (
+              <div class={cx('text-muted', style.boxTypeSection)}>
+                <i class="fe fe-grid" />
+                <Text id="dashboard.selectBoxTypeAllSection" />
+              </div>
+            )}
+            {popularBoxTypes.length === 0 && showSections && boxTypes.length > 0 && (
               <div class={cx('text-muted', style.boxTypeSection)}>
                 <i class="fe fe-grid" />
                 <Text id="dashboard.selectBoxTypeCoreSection" />

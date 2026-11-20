@@ -1,4 +1,4 @@
-const { BadParameters, ServiceNotReadyError } = require('../../../utils/coreErrors');
+const { BadParameters, ServiceNotConfiguredError, ServiceNotReadyError } = require('../../../utils/coreErrors');
 const exposesMap = require('../exposes');
 
 /**
@@ -48,6 +48,10 @@ function setValue(device, deviceFeature, value) {
   const zigbeeValue = exposesMap[expose.type].writeValue(expose, value, featureIndex);
   // Send message to Zigbee2mqtt topics
   const mqttPayload = JSON.stringify({ [property]: zigbeeValue });
+  // Stopped by the user, disabled, or not connected yet: no broker to send it to
+  if (!this.mqttClient) {
+    throw new ServiceNotConfiguredError('Zigbee2mqtt is not connected to its MQTT broker');
+  }
   this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, mqttPayload);
 }
 

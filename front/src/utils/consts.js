@@ -11,7 +11,9 @@ export const LoginStatus = {
   WrongTwoFactorCodeError: 'WrongTwoFactorCodeError',
   WrongRecoveryCodeError: 'WrongRecoveryCodeError',
   LoginSuccess: 'LoginSuccess',
-  UnknownError: 'UnknownError'
+  UnknownError: 'UnknownError',
+  NetworkError: 'NetworkError',
+  TooManyRequestsError: 'TooManyRequestsError'
 };
 
 export const CreateUserErrors = {
@@ -492,6 +494,9 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.CURRENCY]: {
     [DEVICE_FEATURE_TYPES.CURRENCY.DECIMAL]: 'dollar-sign'
+  },
+  [DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.FLOW_SENSOR.DECIMAL]: 'droplet'
   },
   [DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR]: {
     [DEVICE_FEATURE_TYPES.VOLUME_SENSOR.DECIMAL]: 'package',

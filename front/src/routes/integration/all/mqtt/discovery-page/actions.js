@@ -77,8 +77,11 @@ function createActions(store) {
     },
     async saveDevice(state, externalId) {
       const device = state.mqttDiscoveredDevices.find(d => d.external_id === externalId);
+      // The list was replaced by a live update and the device is gone from it: nothing is saved.
+      // It is an error for the card that asked (a bound action cannot return a value): its
+      // phone sheet would otherwise announce a device added.
       if (!device) {
-        return;
+        throw new Error('MQTT_DISCOVERED_DEVICE_NOT_FOUND');
       }
       const savedDevice = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
       // Discovery updates are pushed live over websocket, so the list may have been replaced

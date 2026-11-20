@@ -111,7 +111,32 @@ const SupervisionCard = ({
                 <Text id="integration.externalIntegration.supervision.uninstallError" />
               </div>
             )}
-            {updateResult && (
+            {updateResult && updateResult.skipped && (
+              // a newer version was not applied: "already up to date" would be a lie,
+              // the banner says which version, why, and what is installed now
+              <div class="alert alert-warning">
+                <VersionSentence
+                  id={`integration.externalIntegration.supervision.updateSkipped.${updateResult.skipped.reason}`}
+                  fields={{
+                    skippedVersion: updateResult.skipped.version,
+                    gladysVersion: updateResult.skipped.gladys_version
+                  }}
+                  storeSlug={integration.store_slug}
+                  version={updateResult.skipped.version}
+                />{' '}
+                <VersionSentence
+                  id={
+                    updateResult.upToDate
+                      ? 'integration.externalIntegration.supervision.updateKeptVersionText'
+                      : 'integration.externalIntegration.supervision.updateSuccessText'
+                  }
+                  fields={{ version: updateResult.version }}
+                  storeSlug={integration.store_slug}
+                  version={updateResult.version}
+                />
+              </div>
+            )}
+            {updateResult && !updateResult.skipped && (
               <div class={cx('alert', updateResult.upToDate ? 'alert-info' : 'alert-success')}>
                 <VersionSentence
                   id={
@@ -142,6 +167,22 @@ const SupervisionCard = ({
                 ) : (
                   <Text id="integration.externalIntegration.supervision.updateAvailableText" />
                 )}
+              </div>
+            )}
+            {!integration.update_available && integration.update_requires_gladys_version && (
+              // a newer version this Gladys cannot run: not offered as an update (the button stays
+              // "Force update", which re-pulls the running image), the admin updates Gladys first
+              <div class="alert alert-warning">
+                <VersionSentence
+                  id="integration.externalIntegration.supervision.updateRequiresGladysText"
+                  fields={{
+                    latestVersion: integration.latest_version,
+                    gladysVersion: integration.update_requires_gladys_version,
+                    currentVersion: integration.version
+                  }}
+                  storeSlug={integration.store_slug}
+                  version={integration.latest_version}
+                />
               </div>
             )}
             <dl class="row">

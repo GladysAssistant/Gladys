@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import BluetoothPage from '../BluetoothPage';
 import BluetoothPeripheralTab from './BluetoothPeripheralTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 class BluetoothSetupPage extends Component {
@@ -29,4 +30,4 @@ class BluetoothSetupPage extends Component {
 export default connect(
   'user,session,bluetoothPeripheralUuids,bluetoothPeripherals,bluetoothStatus,currentIntegration',
   actions
-)(BluetoothSetupPage);
+)(withMobileViewport(BluetoothSetupPage));

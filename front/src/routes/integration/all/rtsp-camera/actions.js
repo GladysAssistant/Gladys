@@ -42,7 +42,10 @@ function createActions(store) {
       }
       return camera;
     },
-    async getRtspCameraDevices(state) {
+    // `keepUnsaved`: the list is asked again while the page is open (a search, another order). The
+    // cameras added and not saved yet only exist in the page: they stay at the end of the new list,
+    // or the answer of a search would drop the camera being typed, and its sheet on a phone.
+    async getRtspCameraDevices(state, { keepUnsaved = false } = {}) {
       store.setState({
         getRtspCameraStatus: RequestStatus.Getting
       });
@@ -58,8 +61,14 @@ function createActions(store) {
         rtspCameras.forEach(camera => {
           actions.complete(camera);
         });
+        // (one being saved meanwhile may already be in the answer: it is not listed twice)
+        const unsavedCameras = keepUnsaved
+          ? (store.getState().rtspCameras || []).filter(
+              camera => !camera.created_at && !rtspCameras.some(saved => saved.id === camera.id)
+            )
+          : [];
         store.setState({
-          rtspCameras,
+          rtspCameras: [...rtspCameras, ...unsavedCameras],
           getRtspCameraStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -231,16 +240,14 @@ function createActions(store) {
         rtspCameras
       });
     },
-    async deleteCamera(state, index) {
-      const camera = state.rtspCameras[index];
+    async deleteCamera(state, camera) {
       if (camera.created_at) {
         await state.httpClient.delete(`/api/v1/device/${camera.selector}`);
       }
-      const rtspCameras = update(state.rtspCameras, {
-        $splice: [[index, 1]]
-      });
+      // by identity, in the list as it is now: another camera may have been removed while this
+      // request was pending, and the index this one had is then the index of a neighbour
       store.setState({
-        rtspCameras
+        rtspCameras: store.getState().rtspCameras.filter(c => c.external_id !== camera.external_id)
       });
     },
     async testConnection(state, index) {
@@ -264,13 +271,13 @@ function createActions(store) {
       store.setState({
         rtspCameraSearch: e.target.value
       });
-      await actions.getRtspCameraDevices(store.getState());
+      await actions.getRtspCameraDevices(store.getState(), { keepUnsaved: true });
     },
     async changeOrderDir(state, e) {
       store.setState({
         getRtspCameraOrderDir: e.target.value
       });
-      await actions.getRtspCameraDevices(store.getState());
+      await actions.getRtspCameraDevices(store.getState(), { keepUnsaved: true });
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);

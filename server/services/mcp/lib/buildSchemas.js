@@ -458,6 +458,14 @@ async function getAllTools(userId) {
   const switchDeviceSelectors = switchableDevices
     .filter((device) => device.features.some((feature) => feature.category === 'switch' && feature.type === 'binary'))
     .map((device) => device.selector);
+  // The switches a switch action can pick one by one: the writable ones only, the others are skipped
+  const switchFeatureSelectors = allDevices
+    .map((device) =>
+      device.features
+        .filter((feature) => feature.category === 'switch' && feature.type === 'binary' && !feature.read_only)
+        .map((feature) => feature.selector),
+    )
+    .flat();
   const musicNotificationDeviceSelectors = allDevices
     .filter((device) =>
       device.features.some((feature) => feature.category === 'music' && feature.type === 'play_notification'),
@@ -481,6 +489,7 @@ async function getAllTools(userId) {
     areas.map(({ selector }) => selector),
     thermostatDeviceSelectors,
     thermostatScheduleSelectors,
+    switchFeatureSelectors,
   );
 
   const historyDevices = allDevices

@@ -1,4 +1,4 @@
-import { DASHBOARD_BOX_TYPE } from '../../../server/utils/constants';
+import { DASHBOARD_BOX_TYPE, DASHBOARD_SECTION_MOBILE_ORDER } from '../../../server/utils/constants';
 
 // Maximum number of columns a dashboard section can hold
 export const MAX_COLUMNS_PER_SECTION = 6;
@@ -84,27 +84,40 @@ export const canBoxStretchInColumn = (box, column, isLastInColumn) =>
 // The editor works on a flat list of columns (so drag & drop coordinates stay
 // global) plus the number of columns of each section. Column widths flatten
 // the same way, into one weight per global column index.
+// The phone order of a section (DASHBOARD_SECTION_MOBILE_ORDER): rows when
+// explicitly asked, columns otherwise (the historic order)
+export const getSectionMobileOrder = section =>
+  section && section.mobile_order === DASHBOARD_SECTION_MOBILE_ORDER.ROWS
+    ? DASHBOARD_SECTION_MOBILE_ORDER.ROWS
+    : DASHBOARD_SECTION_MOBILE_ORDER.COLUMNS;
+
 export const flattenSections = sections => {
   const columns = [];
   const sectionSizes = [];
   const columnWidths = [];
+  const sectionMobileOrders = [];
   sections.forEach(section => {
     section.columns.forEach(column => columns.push(column));
     sectionSizes.push(section.columns.length);
     columnWidths.push(...getSectionWidths(section));
+    sectionMobileOrders.push(getSectionMobileOrder(section));
   });
-  return { columns, sectionSizes, columnWidths };
+  return { columns, sectionSizes, columnWidths, sectionMobileOrders };
 };
 
-export const buildSections = (columns, sectionSizes, columnWidths = []) => {
+export const buildSections = (columns, sectionSizes, columnWidths = [], sectionMobileOrders = []) => {
   const sections = [];
   let offset = 0;
-  sectionSizes.forEach(size => {
+  sectionSizes.forEach((size, sectionIndex) => {
     const section = { columns: columns.slice(offset, offset + size) };
     const widths = section.columns.map((column, i) => normalizeColumnWidth(columnWidths[offset + i]));
     // all-default widths stay implicit, matching the server normalization
     if (widths.some(width => width !== DEFAULT_COLUMN_WIDTH)) {
       section.widths = widths;
+    }
+    // same for the phone order: only the non-default value is stored
+    if (sectionMobileOrders[sectionIndex] === DASHBOARD_SECTION_MOBILE_ORDER.ROWS) {
+      section.mobile_order = DASHBOARD_SECTION_MOBILE_ORDER.ROWS;
     }
     sections.push(section);
     offset += size;

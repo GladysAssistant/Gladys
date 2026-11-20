@@ -1,6 +1,8 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 
+import DayPills from '../../../../components/scene/DayPills';
+import { isMobileViewport } from '../../../../utils/mobileViewport';
 import style from './style.css';
 
 const DAYS_OF_THE_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -109,6 +111,13 @@ class TimeRangesTrigger extends Component {
     this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', newDays);
   };
 
+  // the day toggles of a phone: the last day stays locked, as with the checkboxes
+  setDays = days => {
+    if (days.length > 0) {
+      this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', days);
+    }
+  };
+
   handleCheckboxChange = (property, e) => {
     this.props.updateTriggerProperty(this.props.index, property, e.target.checked);
   };
@@ -124,21 +133,25 @@ class TimeRangesTrigger extends Component {
           <div class="form-label">
             <Text id="editScene.triggersCard.scheduledTrigger.rangeDays" />
           </div>
-          <div class={style.timeRangeDays}>
-            {DAYS_OF_THE_WEEK.map(day => (
-              <label key={day} class={`custom-control custom-checkbox ${style.timeRangeDay}`}>
-                <input
-                  type="checkbox"
-                  class="custom-control-input"
-                  checked={selectedDays.includes(day)}
-                  onChange={() => this.toggleDay(day)}
-                />
-                <span class="custom-control-label">
-                  <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeekShort.${day}`} />
-                </span>
-              </label>
-            ))}
-          </div>
+          {isMobileViewport() ? (
+            <DayPills value={selectedDays} onChange={this.setDays} language={props.language} />
+          ) : (
+            <div class={style.timeRangeDays}>
+              {DAYS_OF_THE_WEEK.map(day => (
+                <label key={day} class={`custom-control custom-checkbox ${style.timeRangeDay}`}>
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    checked={selectedDays.includes(day)}
+                    onChange={() => this.toggleDay(day)}
+                  />
+                  <span class="custom-control-label">
+                    <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeekShort.${day}`} />
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
           {selectedDays.length === 1 && (
             <div class="mt-2 text-muted">
               <small>

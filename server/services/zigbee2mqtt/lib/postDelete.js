@@ -1,5 +1,7 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
+const EXTERNAL_ID_PREFIX = 'zigbee2mqtt:';
+
 /**
  * @description Called by Gladys once a Zigbee2mqtt device is deleted. A rename is skipped while
  * another Gladys device still owns the new name (a duplicate left by the old rename behavior, or a
@@ -7,12 +9,18 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  * frees the name, so the last inventory received from Zigbee2mqtt is reconciled again right away:
  * waiting for the next "bridge/devices" message could mean waiting for the next restart, and in
  * the meantime the discover page would offer the renamed device as a new one.
+ * The last values kept for the device are forgotten: added again, it gets only the values received from now on.
  * @param {object} device - The deleted Gladys device.
  * @returns {Promise} Resolve when renamed devices are synchronized.
  * @example
  * await zigbee2mqttManager.postDelete(device);
  */
 async function postDelete(device) {
+  // A state received while the device was renamed in Gladys may have been kept, and never replayed
+  const discoveredDevice = this.discoveredDevices[device.external_id.substring(EXTERNAL_ID_PREFIX.length)];
+  if (discoveredDevice) {
+    delete this.lastReceivedStates[discoveredDevice.ieee_address];
+  }
   if (!this.lastBridgeDevices) {
     return;
   }

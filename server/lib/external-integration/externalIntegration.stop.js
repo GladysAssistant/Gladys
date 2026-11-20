@@ -14,6 +14,7 @@ const { SERVICE_STATUS } = require('../../utils/constants');
 async function stop(selector) {
   const service = await this.getBySelector(selector);
   this.clearTimers(service.id);
+  this.abortImagePull(service.id);
   const connection = this.connections.get(service.id);
   if (connection) {
     try {

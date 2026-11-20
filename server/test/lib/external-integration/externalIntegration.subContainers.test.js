@@ -200,6 +200,49 @@ describe('externalIntegration.startSubContainer', () => {
     assert.calledWith(system.restartContainer, 'sub-1');
   });
 
+  it('should pull the missing sub-container image before creating it (backup restored on a new machine)', async () => {
+    const { externalIntegration, system } = buildSupervisor({
+      system: { createContainer: fake.resolves({ id: 'sub-1' }), imageExists: fake.resolves(false) },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    await externalIntegration.startSubContainer(service, entry);
+    assert.calledWith(system.imageExists, 'eclipse-mosquitto:2.0.18');
+    assert.calledWith(system.pull, 'eclipse-mosquitto:2.0.18');
+    assert.callOrder(system.pull, system.createContainer);
+    assert.calledWith(system.restartContainer, 'sub-1');
+  });
+
+  it('should not pull a sub-container image already present when creating it', async () => {
+    const { externalIntegration, system } = buildSupervisor({
+      system: { createContainer: fake.resolves({ id: 'sub-1' }), imageExists: fake.resolves(true) },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    await externalIntegration.startSubContainer(service, entry);
+    assert.notCalled(system.pull);
+    assert.calledOnce(system.createContainer);
+  });
+
+  it('should fail with the explicit pull error when the missing sub-container image cannot be pulled', async () => {
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        imageExists: fake.resolves(false),
+        pull: fake.rejects(new Error('no matching manifest for linux/arm64')),
+      },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    try {
+      await externalIntegration.startSubContainer(service, entry);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
+    assert.notCalled(system.createContainer);
+  });
+
   it('should just start an existing container when the env is unchanged', async () => {
     const { externalIntegration, system, variable } = buildSupervisor({
       system: { getContainers: fake.resolves([{ id: 'sub-1' }]) },

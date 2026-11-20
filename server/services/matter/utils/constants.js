@@ -5,9 +5,12 @@ const VARIABLES = {
 
 const MATTER_NODE_CONNECTION_TIMEOUT_MS = 15000;
 const MATTER_NODE_REFRESH_CONCURRENCY = 3;
+// Value of NodeStates.Connected in matter.js (PairedNode connection state)
+const MATTER_NODE_STATE_CONNECTED = 0;
 
 module.exports = {
   VARIABLES,
   MATTER_NODE_CONNECTION_TIMEOUT_MS,
   MATTER_NODE_REFRESH_CONCURRENCY,
+  MATTER_NODE_STATE_CONNECTED,
 };

@@ -170,9 +170,37 @@ describe('Device.migrate', function Describe() {
         [
           {
             type: 'condition.if-then-else',
-            if: [{ type: 'device.get-value', device_feature: 'migration-source-temp' }],
+            if: [
+              { type: 'device.get-value', device_feature: 'migration-source-temp' },
+              // a condition of the block comparing the current state of a feature
+              {
+                type: 'condition.only-continue-if',
+                conditions: [{ device_feature: 'migration-source-temp', operator: '<', value: 30 }],
+              },
+            ],
             then: [[{ type: 'light.turn-on', devices: ['migration-source'] }]],
             else: [[{ type: 'message.send-camera', camera: 'migration-source', user: 'john' }]],
+          },
+        ],
+        // a condition names a feature when it compares its current state, a variable otherwise
+        [
+          {
+            type: 'condition.only-continue-if',
+            conditions: [
+              { device_feature: 'migration-source-temp', operator: '>', value: 20 },
+              { variable: '0.0.last_value', operator: '<', value: 30 },
+            ],
+          },
+        ],
+        // the energy price condition names its meter; a former save names a contract instead,
+        // which the migration re-points itself
+        [
+          { type: 'energy-contract.current-price', electric_meter: 'migration-source', operator: '<', value: 0.2 },
+          {
+            type: 'energy-contract.current-price',
+            energy_contract: 'migration-energy-contract',
+            operator: '<',
+            value: 0.2,
           },
         ],
       ],
@@ -184,13 +212,26 @@ describe('Device.migrate', function Describe() {
           operator: '=',
           value: 20,
         },
+        { type: 'energy-contract.price-changed', electric_meter: 'migration-source' },
+        { type: 'energy-contract.price-changed', energy_contract: 'migration-energy-contract' },
       ],
     });
     await db.Scene.create({
       name: 'Migration scene untouched',
       selector: 'migration-scene-untouched',
       icon: 'fe fe-bell',
-      actions: [[{ type: 'light.turn-on', devices: ['some-other-device'] }]],
+      actions: [
+        [{ type: 'light.turn-on', devices: ['some-other-device'] }],
+        // selectors named like members of Object are selectors like any other: not mapped,
+        // so left as they are
+        [
+          { type: 'light.turn-on', devices: ['toString'] },
+          {
+            type: 'condition.only-continue-if',
+            conditions: [{ device_feature: 'constructor', operator: '=', value: 1 }],
+          },
+        ],
+      ],
       triggers: null,
     });
     const dashboard = await db.Dashboard.create({
@@ -229,6 +270,9 @@ describe('Device.migrate', function Describe() {
             actions: [{ action_type: 'device-feature', device_feature: 'migration-source-temp', value: 1 }],
           },
           { type: 'thermostat', thermostat_feature: 'migration-source-temp' },
+          // the energy-price box names its meter; a former save names a contract instead
+          { type: 'energy-price', electric_meter: 'migration-source' },
+          { type: 'energy-price', energy_contract: 'migration-energy-contract' },
         ],
       ],
     });
@@ -279,9 +323,39 @@ describe('Device.migrate', function Describe() {
         [
           {
             type: 'condition.if-then-else',
-            if: [{ type: 'device.get-value', device_feature: 'migration-destination-temp' }],
+            if: [
+              { type: 'device.get-value', device_feature: 'migration-destination-temp' },
+              // a condition of the block comparing the current state of a feature
+              {
+                type: 'condition.only-continue-if',
+                conditions: [{ device_feature: 'migration-destination-temp', operator: '<', value: 30 }],
+              },
+            ],
             then: [[{ type: 'light.turn-on', devices: ['migration-destination'] }]],
             else: [[{ type: 'message.send-camera', camera: 'migration-destination', user: 'john' }]],
+          },
+        ],
+        [
+          {
+            type: 'condition.only-continue-if',
+            conditions: [
+              { device_feature: 'migration-destination-temp', operator: '>', value: 20 },
+              { variable: '0.0.last_value', operator: '<', value: 30 },
+            ],
+          },
+        ],
+        [
+          {
+            type: 'energy-contract.current-price',
+            electric_meter: 'migration-destination',
+            operator: '<',
+            value: 0.2,
+          },
+          {
+            type: 'energy-contract.current-price',
+            energy_contract: 'migration-energy-contract',
+            operator: '<',
+            value: 0.2,
           },
         ],
       ],
@@ -293,6 +367,8 @@ describe('Device.migrate', function Describe() {
           operator: '=',
           value: 20,
         },
+        { type: 'energy-contract.price-changed', electric_meter: 'migration-destination' },
+        { type: 'energy-contract.price-changed', energy_contract: 'migration-energy-contract' },
       ],
     });
     // Dashboard rewritten in DB inside the normalized section shape,
@@ -331,6 +407,9 @@ describe('Device.migrate', function Describe() {
             // the migrated feature, otherwise the widget and the regulation loop
             // keep pointing at a selector that no longer exists.
             { type: 'thermostat', thermostat_feature: 'migration-destination-temp' },
+            // electric_meter is a device-referencing box field (device-migration.md B.3)
+            { type: 'energy-price', electric_meter: 'migration-destination' },
+            { type: 'energy-price', energy_contract: 'migration-energy-contract' },
           ],
         ],
       },
@@ -577,6 +656,49 @@ describe('Device.migrate', function Describe() {
     expect(await db.Device.findOne({ where: { selector: 'migration-source' } })).to.equal(null);
   });
 
+  it('should succeed and hand the source over to the background deletion when it saved too many states meanwhile', async () => {
+    deviceManager.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 0;
+    deviceManager.destroyAfterStatesPurge = fake.resolves(null);
+    // the source keeps publishing while scenes and dashboards are rewritten, after its
+    // history was swept
+    const realUpdateProgress = deviceManager.job.updateProgress.bind(deviceManager.job);
+    deviceManager.job.updateProgress = async (...args) => {
+      const returnedValue = await realUpdateProgress(...args);
+      if (args[2] && args[2].step === 'deleting_source_device') {
+        await db.duckDbBatchInsertState(sourceTempFeature.id, [{ value: 30, created_at: new Date() }]);
+      }
+      return returnedValue;
+    };
+    let result;
+    try {
+      result = await deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+    } finally {
+      deviceManager.job.updateProgress = realUpdateProgress;
+    }
+    expect(result.success).to.equal(true);
+    sinonAssert.calledOnce(deviceManager.destroyAfterStatesPurge);
+    expect(deviceManager.destroyAfterStatesPurge.firstCall.args[0]).to.have.property('selector', 'migration-source');
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
+  });
+
+  it('should fail when deleting the source fails for another reason', async () => {
+    const realDestroy = deviceManager.destroy;
+    deviceManager.destroy = fake.rejects(new Error('database is locked'));
+    try {
+      const promise = deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+      await assert.isRejected(promise, 'database is locked');
+    } finally {
+      deviceManager.destroy = realDestroy;
+    }
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
+  });
+
   it('should delete the whole history when nothing is mapped', async () => {
     // "Migrate without history": the user maps no feature at all, the source history is
     // dropped rather than moved, and no UPDATE is ever built.
@@ -819,6 +941,17 @@ describe('Device.migrate', function Describe() {
       destination_device_selector: 'migration-destination',
     });
     await assert.isRejected(promise, 'A migration is already in progress for device migration-destination');
+  });
+
+  it('should reject the migration of a device being deleted in the background', async () => {
+    deviceManager.devicesBeingDestroyed.set('another-device-id', { selector: 'another-device' });
+    deviceManager.devicesBeingDestroyed.set(destinationDevice.id, { selector: 'migration-destination' });
+    const promise = deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+    });
+    await assert.isRejected(promise, 'Device migration-destination is being deleted');
+    // refused before the migration takes its locks
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
   });
 
   it('should reject when the source device does not exist', async () => {

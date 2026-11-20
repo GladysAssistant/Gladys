@@ -128,6 +128,7 @@ const externalIntegrations = services
     version: '1.2.0',
     latest_version: '1.2.0',
     update_available: false,
+    update_requires_gladys_version: null,
     started_at: hoursAgo(52),
     containers: []
   }));
@@ -201,6 +202,7 @@ const installFromStore = async ({ store_slug: storeSlug }) => {
     version,
     latest_version: version,
     update_available: false,
+    update_requires_gladys_version: null,
     started_at: new Date().toISOString(),
     containers: []
   };

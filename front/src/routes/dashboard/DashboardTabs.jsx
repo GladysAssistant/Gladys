@@ -13,8 +13,9 @@ import style from './style.css';
 // the name instead — a leading emoji — so translate it to the matching
 // icon of the icon set (the emoji itself is never used as the icon: its
 // rendering depends on the viewer's platform) and take it out of the pill
-// name so the mark doesn't show twice. An emoji with no match keeps the
-// generic house and the full name.
+// name so the mark doesn't show twice. A dashboard with neither an icon nor
+// a mapped emoji shows the first letter of its name: the generic house the
+// dock used to give all of them made them indistinguishable icon dots.
 const getTabAppearance = dashboard => {
   if (dashboard.icon) {
     return { icon: dashboard.icon, name: dashboard.name };
@@ -27,8 +28,21 @@ const getTabAppearance = dashboard => {
     // would be worse than the doubled mark.
     return { icon, name: rest || dashboard.name };
   }
-  return { icon: 'home', name: dashboard.name };
+  const trimmed = (dashboard.name || '').trim();
+  // first grapheme, so a name starting with an accented letter or an
+  // unmapped emoji is not cut in half
+  const letter = trimmed ? Array.from(trimmed)[0].toUpperCase() : '?';
+  return { icon: null, letter, name: dashboard.name };
 };
+
+const TabIcon = ({ appearance, iconClass }) =>
+  appearance.icon ? (
+    <i class={cx(`fe fe-${appearance.icon}`, iconClass)} />
+  ) : (
+    <span class={cx(style.dashboardTabLetter, iconClass)} aria-hidden="true">
+      {appearance.letter}
+    </span>
+  );
 
 // The breakpoint below which the switcher is the bottom dock (style.css):
 // there the bar scrolls sideways instead of collapsing behind "…"
@@ -304,7 +318,7 @@ class DashboardTabs extends Component {
         })}
         title={dashboard.name}
       >
-        <i class={`fe fe-${appearance.icon}`} />
+        <TabIcon appearance={appearance} />
         {!this.props.tabletMode && appearance.name && (
           <span class={style.dashboardTabName}>{wrapEmojisJSX(appearance.name)}</span>
         )}
@@ -324,7 +338,7 @@ class DashboardTabs extends Component {
             href={`/dashboard/${dashboard.selector}`}
             onClick={this.selectDashboard}
           >
-            <i class={cx(`fe fe-${appearance.icon}`, style.dashboardTabsMenuIcon)} />
+            <TabIcon appearance={appearance} iconClass={style.dashboardTabsMenuIcon} />
             {wrapEmojisJSX(appearance.name)}
           </Link>
         );
@@ -403,7 +417,7 @@ class DashboardTabs extends Component {
             >
               {activeCollapsed && activeDashboard ? (
                 <>
-                  <i class={`fe fe-${activeAppearance.icon}`} />
+                  <TabIcon appearance={activeAppearance} />
                   {!tabletMode && activeAppearance.name && (
                     <span class={style.dashboardTabName}>{wrapEmojisJSX(activeAppearance.name)}</span>
                   )}

@@ -1,0 +1,43 @@
+Starting Zigbee2MQTT without watchdog.
+[2026-11-06 18:56:56] [32minfo[39m: 	z2m: Logging to console, file (filename: log.log)
+[2026-11-06 18:56:56] [32minfo[39m: 	z2m: Starting Zigbee2MQTT version 2.14.2 (commit #5c0c1c60078e1737c5dee5f8217583bca7610e66
+)
+[2026-11-06 18:56:56] [32minfo[39m: 	z2m: Starting zigbee-herdsman (10.10.0)
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember: Using default stack config.
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember: ======== Ember Adapter Starting ========
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:ezsp: ======== EZSP starting ========
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash: ======== ASH Adapter reset ========
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash: ASH COUNTERS since last clear:
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Total frames: RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Cancelled   : RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   DATA frames : RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   DATA bytes  : RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Retry frames: RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   ACK frames  : RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   NAK frames  : RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   nRdy frames : RX=0, TX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   CRC errors      : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Comm errors     : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Length < minimum: RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Length > maximum: RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Bad controls    : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Bad lengths     : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Bad ACK numbers : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Out of buffers  : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Retry dupes     : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   Out of sequence : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash:   ACK timeouts    : RX=0
+[2026-11-06 18:56:56] [32minfo[39m: 	zh:ember:uart:ash: ======== ASH stopped ========
+[2026-11-06 18:56:56] [31merror[39m: 	zh:ember:uart:ash: Failed to init port with error Error: getaddrinfo ENOTFOUND coordinateur.invalid
+[2026-11-06 18:56:56] [31merror[39m: 	z2m: Error while starting zigbee-herdsman
+[2026-11-06 18:56:56] [31merror[39m: 	z2m: Failed to start zigbee-herdsman
+[2026-11-06 18:56:56] [31merror[39m: 	z2m: Check https://www.zigbee2mqtt.io/guide/installation/20_zigbee2mqtt-fails-to-start_crashes-runtime.html for possible solutions
+[2026-11-06 18:56:56] [31merror[39m: 	z2m: Exiting...
+[2026-11-06 18:56:56] [31merror[39m: 	z2m: Error: Failed to start EZSP layer with status=HOST_FATAL_ERROR.
+    at EmberAdapter.initEzsp (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ember/adapter/emberAdapter.ts:677:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async EmberAdapter.start (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ember/adapter/emberAdapter.ts:1558:24)
+    at async Controller.start (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/controller/controller.ts:146:29)
+    at async Zigbee.start (/app/lib/zigbee.ts:70:27)
+    at async Controller.start (/app/lib/controller.ts:117:29)
+    at async start (/app/index.js:156:5)

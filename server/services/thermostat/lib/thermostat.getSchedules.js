@@ -149,6 +149,21 @@ async function getScheduleBySelector(selector) {
 }
 
 /**
+ * @description The point in force among transitions already read, in the
+ * Gladys timezone: what `getCurrentPoint` resolves, for a caller that loaded the
+ * schedule with its transitions and need not read them a second time.
+ * @param {Array} transitions - The schedule's points.
+ * @returns {Promise<object|null>} The point in force, or null with no point.
+ * @example
+ * await pointInForce(schedule.transitions); // { day_of_week: 1, time: '22:00', preset: 'off' }
+ */
+async function pointInForce(transitions) {
+  const timezone = await getTimezone();
+  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
+  return findCurrentTransition(transitions, dayOfWeek, currentMinutes);
+}
+
+/**
  * @description The point in force on a schedule now, resolved in the Gladys
  * timezone like the `current` getSchedules returns — but from the points alone,
  * without loading the thermostats, their devices and their rooms.
@@ -158,18 +173,14 @@ async function getScheduleBySelector(selector) {
  * await getCurrentPoint(schedule.id); // { day_of_week: 1, time: '06:30', preset: 'comfort' }
  */
 async function getCurrentPoint(scheduleId) {
-  const [transitions, timezone] = await Promise.all([
-    db.ThermostatScheduleTransition.findAll({ where: { schedule_id: scheduleId }, raw: true }),
-    getTimezone(),
-  ]);
-  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
-  return findCurrentTransition(transitions, dayOfWeek, currentMinutes);
+  return pointInForce(await db.ThermostatScheduleTransition.findAll({ where: { schedule_id: scheduleId }, raw: true }));
 }
 
 module.exports = {
   getSchedules,
   getScheduleBySelector,
   getCurrentPoint,
+  pointInForce,
   formatSchedule,
   SCHEDULE_INCLUDE,
   TRANSITION_ORDER,

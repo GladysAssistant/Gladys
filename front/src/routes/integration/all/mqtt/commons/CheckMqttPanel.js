@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import { Text } from 'preact-i18n';
+import { MobileNotice } from '../../../../../components/mobile';
 
 class CheckMqttPanel extends Component {
   componentWillMount() {
@@ -21,6 +22,17 @@ class CheckMqttPanel extends Component {
 
     if (!props.mqttStatusLoaded) {
       return null;
+    }
+
+    if (props.isMobile) {
+      return (
+        <MobileNotice tone="warning" icon="alert-triangle" data-cy="mqtt-status-notice">
+          <Text id={messageKey} />
+          <Link href="/dashboard/integration/device/mqtt/setup">
+            <Text id="integration.mqtt.status.setupPageLink" />
+          </Link>
+        </MobileNotice>
+      );
     }
 
     return (

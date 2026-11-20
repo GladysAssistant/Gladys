@@ -1034,6 +1034,13 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   FAN: 'fan',
+  // Volumetric flow rate of a fluid measured by a standalone sensor: a pipe flow meter, a pump, or
+  // a river hydrometry station (Hub'Eau, Vigicrues...). Mirrors the Matter Flow Sensor device type
+  // (Flow Measurement cluster 0x0404) and the Zigbee Flow Measurement cluster. `water-valve` / `flow`
+  // pre-dates it and holds the same quantity: a known legacy exception
+  // (docs/specs/device-feature-categories.md), kept for existing devices, never a precedent for a new
+  // mapping. The volume that went through (an index) is not a flow: it goes to `volume-sensor`.
+  FLOW_SENSOR: 'flow-sensor',
   // Carbon content of the electricity DELIVERED BY THE GRID of a zone, as published by a grid data
   // provider (national TSO, Electricity Maps, WattTime...) or broadcast in the premises by a device
   // implementing the Matter Electrical Grid Conditions cluster. It describes the electricity, not
@@ -1248,6 +1255,11 @@ const DEVICE_FEATURE_TYPES = {
     AIRFLOW_DIRECTION: 'airflow-direction',
     ROCK_SETTING: 'rock-setting',
     WIND_SETTING: 'wind-setting',
+  },
+  // Value convention: a flow is >= 0, like the Matter MeasuredValue (unsigned). Matter and Zigbee
+  // report it in m³/h; river flows are published in m³/s.
+  FLOW_SENSOR: {
+    DECIMAL: 'decimal',
   },
   HEATER: {
     PILOT_WIRE_MODE: 'pilot-wire-mode',
@@ -1753,6 +1765,8 @@ const DEVICE_FEATURE_UNITS = {
   CUBIC_METER: 'cubicmeter',
   // Flow units
   CUBIC_METER_PER_HOUR: 'cubic-meter-per-hour',
+  // SI unit of volumetric flow (1 m³/s = 3600 m³/h), the unit of river flows
+  CUBIC_METER_PER_SECOND: 'cubic-meter-per-second',
   // Currency units
   EURO: 'euro',
   DOLLAR: 'dollar',
@@ -1894,6 +1908,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR]: [
+    DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+    DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
   ],
   [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: [
     DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
@@ -2114,7 +2132,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: [],
-    [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+      DEVICE_FEATURE_UNITS.CUBIC_METER_PER_SECOND,
+    ],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_DURATION]: [DEVICE_FEATURE_UNITS.SECONDS],
@@ -2187,6 +2208,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   DEVICE: {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
+    // A value a user asked for could not be set on the device: sent to that user only,
+    // with one of DEVICE_SET_VALUE_ERROR_CAUSES
+    SET_VALUE_ERROR: 'device.set-value-error',
   },
   JOB: {
     NEW: 'job.new',
@@ -2257,6 +2281,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
+    // the progress of an installation, sent at most twice a second
+    INSTALL_PROGRESS: 'zigbee2mqtt.install-progress',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
@@ -2403,6 +2429,14 @@ const DASHBOARD_WIDTH = {
   FULL: 'full',
 };
 
+// Order of a section's widgets on a phone, where its columns stack: column
+// by column (the historic order, the default) or row by row (the first
+// widget of every column, then the second of every column…)
+const DASHBOARD_SECTION_MOBILE_ORDER = {
+  COLUMNS: 'columns',
+  ROWS: 'rows',
+};
+
 // Built-in CSS background scenes of the Horizon theme (no external images:
 // they weigh nothing, stay crisp at any resolution and work offline)
 const DASHBOARD_BACKGROUND_SCENE = {
@@ -2414,6 +2448,31 @@ const DASHBOARD_BACKGROUND_SCENE = {
   SAND: 'sand',
   LAVENDER: 'lavender',
   MIST: 'mist',
+};
+
+// Maximum number of entries in the list fields of a dashboard box. Shared by
+// the box schema (server/models/dashboard.js) and the box editors, which stop
+// adding entries at the cap and say so, instead of letting the save fail
+// (docs/specs/dashboard-flexible-layout-and-widgets.md).
+const DASHBOARD_BOX_MAX_ITEMS = {
+  // house-view: a whole house is easily one temperature + one humidity + one
+  // opening per room, so the pins get more room than the compact bars
+  HOUSE_VIEW_PINS: 50,
+  CHIPS: 20,
+  ACTIONS: 20,
+};
+
+// Why a value asked by a user could not be set (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR):
+// the front picks its sentence from it, the raw error never leaves the server
+const DEVICE_SET_VALUE_ERROR_CAUSES = {
+  // the integration could not drive the device (no answer, error of the device or of its cloud)
+  UNREACHABLE: 'unreachable',
+  // the integration of the device is not configured, or not connected
+  NOT_CONFIGURED: 'not-configured',
+  // the device, its feature or its integration no longer exists
+  NOT_FOUND: 'not-found',
+  // the value was refused before anything was sent to the device
+  REFUSED: 'refused',
 };
 
 const ERROR_MESSAGES = {
@@ -2494,6 +2553,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES: 'device-state-purge-orphaned-duckdb-states',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
+  SERVICE_ZIGBEE2MQTT_INSTALL: 'service-zigbee2mqtt-install',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
@@ -2511,6 +2571,7 @@ const JOB_TYPES = {
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
+  DEVICE_DESTROY: 'device-destroy',
 };
 
 const JOB_STATUS = {
@@ -2654,6 +2715,7 @@ const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_VISIBILITY_LIST = createList(DASHBOARD_VISIBILITY);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 const DASHBOARD_WIDTH_LIST = createList(DASHBOARD_WIDTH);
+const DASHBOARD_SECTION_MOBILE_ORDER_LIST = createList(DASHBOARD_SECTION_MOBILE_ORDER);
 const DASHBOARD_BACKGROUND_SCENE_LIST = createList(DASHBOARD_BACKGROUND_SCENE);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
 const JOB_TYPES_LIST = createList(JOB_TYPES);
@@ -2768,10 +2830,14 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 module.exports.DASHBOARD_WIDTH = DASHBOARD_WIDTH;
 module.exports.DASHBOARD_WIDTH_LIST = DASHBOARD_WIDTH_LIST;
+module.exports.DASHBOARD_SECTION_MOBILE_ORDER = DASHBOARD_SECTION_MOBILE_ORDER;
+module.exports.DASHBOARD_SECTION_MOBILE_ORDER_LIST = DASHBOARD_SECTION_MOBILE_ORDER_LIST;
 module.exports.DASHBOARD_BACKGROUND_SCENE = DASHBOARD_BACKGROUND_SCENE;
 module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST;
+module.exports.DASHBOARD_BOX_MAX_ITEMS = DASHBOARD_BOX_MAX_ITEMS;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+module.exports.DEVICE_SET_VALUE_ERROR_CAUSES = DEVICE_SET_VALUE_ERROR_CAUSES;
 
 module.exports.WEATHER_UNITS = WEATHER_UNITS;
 

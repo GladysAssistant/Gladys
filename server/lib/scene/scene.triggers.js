@@ -7,6 +7,7 @@ const logger = require('../../utils/logger');
 const { EVENTS, ANY_CHANGE_OPERATOR, TIME_RANGE_EVENTS } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
 const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
+const { mqttTopicMatches } = require('../../services/mqtt/lib/mqttTopicMatches');
 
 dayjs.extend(utc);
 dayjs.extend(timezonePlugin);
@@ -247,14 +248,29 @@ const triggersFunc = {
   [EVENTS.ALARM.PANIC]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.SYSTEM.START]: () => true,
+  // the trigger topic is subscribed as a filter, so it can contain "+" and "#" wildcards.
+  // An event coming from a subscription names its filter (topic_filter): only the
+  // triggers on that filter match, so overlapping filters do not run a scene twice.
   [EVENTS.MQTT.RECEIVED]: (self, sceneSelector, event, trigger) =>
-    event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
+    typeof event.topic === 'string' &&
+    typeof trigger.topic === 'string' &&
+    (event.topic_filter === undefined || event.topic_filter === trigger.topic) &&
+    mqttTopicMatches(trigger.topic, event.topic) &&
+    (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
-  // energy contract price change (spec 8.2): a trigger without a contract selector
-  // matches every contract, one with a selector only that contract
-  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: (self, sceneSelector, event, trigger) =>
-    !trigger.energy_contract || event.contract === trigger.energy_contract,
+  // energy price change of a meter (spec 8.2): a trigger with a meter matches that meter; one
+  // saved before the meter targeting names a contract and is read as the meter of that contract,
+  // whichever of its contracts is active now; a trigger with neither matches every meter
+  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: (self, sceneSelector, event, trigger) => {
+    if (trigger.electric_meter) {
+      return event.electric_meter === trigger.electric_meter;
+    }
+    if (trigger.energy_contract) {
+      return event.meter_contracts.includes(trigger.energy_contract);
+    }
+    return true;
+  },
   [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: matchExternalIntegrationSceneEvent,
 };
 

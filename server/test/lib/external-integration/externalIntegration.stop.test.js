@@ -20,6 +20,16 @@ describe('externalIntegration.stop', () => {
     expect(externalIntegration.connections.has(service.id)).to.equal(false);
   });
 
+  it('should abort an in-flight pull of the images (restore case)', async () => {
+    const service = await seedExternalService({ container_id: null, status: SERVICE_STATUS.LOADING });
+    const { externalIntegration } = buildSupervisor();
+    const controller = new AbortController();
+    externalIntegration.imagePulls.set(service.id, controller);
+    const integration = await externalIntegration.stop(service.selector);
+    expect(integration.status).to.equal(SERVICE_STATUS.STOPPED);
+    expect(controller.signal.aborted).to.equal(true);
+  });
+
   it('should still set STOPPED when the websocket cannot be terminated', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor();

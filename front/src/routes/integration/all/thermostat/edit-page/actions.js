@@ -6,8 +6,12 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   MAX_WINDOW_DELAY_SECONDS,
-  defaultPresetTemps
+  defaultPresetTemps,
+  parsePilotWireStandbyOrder,
+  supportedStandbyOrder,
+  defaultTempRange
 } from '../../../../../../../server/utils/thermostatConstants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
@@ -228,14 +232,17 @@ function createActions(store) {
           activeSchedule = '';
         }
         const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE'));
+        // Bounds never saved default in the thermostat's unit: 5-35 shown on a
+        // Fahrenheit one was saved as 5-35 °F.
+        const rangeDefaults = defaultTempRange(getParam('THERMOSTAT_TEMP_UNIT'));
         store.setState({
           thermostatEditActiveSchedule: activeSchedule,
           thermostatEditDeviceSchedule: activeSchedule,
           thermostatEditDevice: device,
           thermostatEditName: device.name,
           thermostatEditMode: getParam('THERMOSTAT_MODE') || 'heating',
-          thermostatEditMinTemp: getParam('THERMOSTAT_MIN_TEMP') || '5',
-          thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || '35',
+          thermostatEditMinTemp: getParam('THERMOSTAT_MIN_TEMP') || String(rangeDefaults.min),
+          thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || String(rangeDefaults.max),
           thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C',
           thermostatEditControlType: getParam('THERMOSTAT_CONTROL_TYPE') || 'hysteresis',
           // One sensor or several (spec A.1.1).
@@ -244,6 +251,10 @@ function createActions(store) {
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
           thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
           thermostatEditPilotWireOrders: readPilotWireOrders(getParam),
+          // The order a heater Gladys regulates rests on (spec C.1.1).
+          thermostatEditPilotWireStandbyOrder: parsePilotWireStandbyOrder(
+            getParam('THERMOSTAT_PILOT_WIRE_STANDBY_ORDER')
+          ),
           // A real thermostat given a pilot wire was how a heater regulating
           // itself was saved before it had a type of its own: it is shown as one.
           thermostatEditType:
@@ -366,9 +377,10 @@ function createActions(store) {
 
         const name = state.thermostatEditName || 'Thermostat';
         const mode = state.thermostatEditMode || 'heating';
-        const minTemp = toNumber(state.thermostatEditMinTemp, 5);
-        const maxTemp = toNumber(state.thermostatEditMaxTemp, 35);
         const tempUnit = state.thermostatEditTempUnit || 'C';
+        const rangeDefaults = defaultTempRange(tempUnit);
+        const minTemp = toNumber(state.thermostatEditMinTemp, rangeDefaults.min);
+        const maxTemp = toNumber(state.thermostatEditMaxTemp, rangeDefaults.max);
         const temperatureFeature = serializeSelectorList(state.thermostatEditTemperatureFeatures);
         const humidityFeature = state.thermostatEditHumidityFeature || '';
         // Three types (spec A.1, C.1.1): `virtual`, regulated by Gladys through a
@@ -443,6 +455,35 @@ function createActions(store) {
           return;
         }
 
+        // The standby order is saved as the form shows it: the one this module
+        // is actually sent (spec C.1.1). An eco stored on a module that refuses
+        // it would otherwise wake up as eco on the next module, unasked.
+        const storedStandbyOrder = parsePilotWireStandbyOrder(state.thermostatEditPilotWireStandbyOrder);
+        const pickedPilotWire = (state.pilotWireFeatures || []).find(feature => feature.selector === pilotWireFeature);
+        // Only a module that was read can say which order it takes: with the
+        // list not loaded, or the module gone from it, the order would be saved
+        // unchecked, and an eco or an off the module refuses would wake up on
+        // the next module, unasked. A module that declares no orders takes any.
+        if (thermostatType === 'virtual' && pilotWireFeature && !pickedPilotWire) {
+          store.setState({
+            thermostatCreateStatus: RequestStatus.Error,
+            thermostatEditError: 'pilotWireUnread'
+          });
+          return;
+        }
+        const sentStandbyOrder = supportedStandbyOrder(
+          storedStandbyOrder,
+          pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
+        );
+        // An inverted range bounds nothing anyone could mean, and one with no
+        // width (20-20) pins the dial to a single value: refused here, and by
+        // the server for a client writing the params directly (spec D.0). A
+        // heater regulating itself takes no range, and its fields are hidden.
+        if (!isPilotWireThermostat && minTemp >= maxTemp) {
+          store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'invertedRange' });
+          return;
+        }
+
         const device = {
           name,
           external_id: isEdit ? state.thermostatEditDevice.external_id : newExternalId,
@@ -467,7 +508,9 @@ function createActions(store) {
                   type: 'target-temperature',
                   read_only: false,
                   keep_history: true,
-                  has_feedback: false,
+                  // Saved by the thermostat service itself, clamped to the range:
+                  // without feedback the core saved the requested value after it.
+                  has_feedback: true,
                   min: minTemp,
                   max: maxTemp,
                   unit: tempUnit === 'F' ? 'fahrenheit' : 'celsius'
@@ -493,6 +536,15 @@ function createActions(store) {
               name: PILOT_WIRE_ORDER_PARAM(preset),
               value: isPilotWireThermostat ? String(pilotWireOrders[preset]) : ''
             })),
+            // The order a heater Gladys regulates rests on: a virtual
+            // thermostat with a pilot wire only, cleared otherwise.
+            {
+              name: 'THERMOSTAT_PILOT_WIRE_STANDBY_ORDER',
+              value:
+                thermostatType === 'virtual' && pilotWireFeature
+                  ? String(sentStandbyOrder !== null ? sentStandbyOrder : storedStandbyOrder)
+                  : ''
+            },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on a real thermostat, and cleared otherwise so
             // switching a device to another type cannot leave it driving a real
@@ -569,8 +621,8 @@ function createActions(store) {
           thermostatEditDevice: null,
           thermostatEditName: '',
           thermostatEditMode: 'heating',
-          thermostatEditMinTemp: '5',
-          thermostatEditMaxTemp: '35',
+          thermostatEditMinTemp: String(defaultTempRange('C').min),
+          thermostatEditMaxTemp: String(defaultTempRange('C').max),
           thermostatEditTempUnit: 'C',
           thermostatEditControlType: 'hysteresis',
           thermostatEditTemperatureFeatures: [],
@@ -578,6 +630,7 @@ function createActions(store) {
           thermostatEditSwitchFeature: '',
           thermostatEditPilotWireFeature: '',
           thermostatEditPilotWireOrders: DEFAULT_PILOT_WIRE_ORDERS,
+          thermostatEditPilotWireStandbyOrder: DEFAULT_PILOT_WIRE_STANDBY_ORDER,
           thermostatEditType: 'virtual',
           thermostatEditTargetFeature: '',
           thermostatEditStateFeature: '',

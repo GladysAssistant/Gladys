@@ -270,6 +270,12 @@
   padding: 0 0.5rem;
 }
 
+/* In a mobile sheet the picker is the sheet's content: the sheet scrolls, never a box inside it */
+.typePickerListFill {
+  max-height: none;
+  overflow-y: visible;
+}
+
 .typePickerCategory {
   margin-bottom: 0.75rem;
 }
@@ -787,5 +793,11 @@
 /* while a step drag is live, the in-between "+" buttons fade out of the
    way (opacity only: no reflow) so the indicator line reads clearly */
 :global(body.gladys-scene-step-dragging) .stepInsertButton {
+  opacity: 0.15;
+}
+
+/* likewise, while a condition drag is live, the "AND" written between two
+   condition boxes fades out: the indicator line is drawn in the gap it sits in */
+:global(body.gladys-scene-condition-dragging) .conditionAndSeparator {
   opacity: 0.15;
 }

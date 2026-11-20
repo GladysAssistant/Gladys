@@ -4,9 +4,17 @@ import { route } from 'preact-router';
 
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
-import actions from '../../actions/dashboard';
+import dashboardActions from '../../actions/dashboard';
+import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
+import { declareReloadablePage } from '../../utils/reloadablePage';
+
+// dashboard actions plus the shared setTabletMode (main.js), used by the
+// ?tablet_mode_house=<house_selector> URL param below to activate tablet mode
+// the same way the "Tablet Mode" menu (SetTabletMode.jsx) does. Only that one
+// action is pulled in, not the whole main factory.
+const actions = store => ({ ...dashboardActions(store), setTabletMode: mainActions(store).setTabletMode });
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
@@ -123,9 +131,10 @@ class Dashboard extends Component {
         loading: false
       });
     } catch (e) {
+      // a failure of a dashboard the user already left says nothing about the one displayed
       this.setState({
         loading: false,
-        currentDashboardLoadFailed: true
+        ...(this.state.currentDashboardSelector === selector ? { currentDashboardLoadFailed: true } : {})
       });
       console.error(e);
     }
@@ -193,6 +202,56 @@ class Dashboard extends Component {
         this.switchToFullScreen();
       } catch (e) {
         console.error(e);
+      }
+    }
+  };
+
+  // Mirrors checkIfFullScreenParameterIsHere: ?tablet_mode_house=<house_selector>
+  // in the URL activates tablet mode for that house directly, the same way the
+  // "Tablet Mode" menu (SetTabletMode.jsx) does, without going through its UI.
+  // The value is the house selector (a URL-safe slug, already unique) and is
+  // validated server-side - not the house name, which can carry spaces, accents
+  // or quotes that make a fragile URL, and could even collide with another
+  // house's selector. The menu builds this exact URL for the selected house
+  // behind a copy button, so nobody has to type or know a selector. Unlike
+  // ?fullscreen=force, this persists server-side on the session, so it is
+  // ignored wherever the "Tablet Mode" menu - the only UI to turn tablet mode
+  // back off - is not reachable: on Gladys Plus (the menu is hidden, isGladysPlus
+  // in DashboardPage.jsx) and below the md breakpoint (the menu button is
+  // d-md-inline-flex), which would otherwise leave a phone locked by the house
+  // alarm with no way out.
+  checkIfTabletModeParameterIsHere = async () => {
+    const houseSelector = this.props.tablet_mode_house;
+    if (!houseSelector || this.state.isGladysPlus) {
+      return;
+    }
+    if (window.matchMedia && !window.matchMedia('(min-width: 768px)').matches) {
+      return;
+    }
+    try {
+      // A wall tablet keeps this parameter in its URL for good (/locked and the
+      // login return_url both preserve window.location.search), so this runs on
+      // every reload and every lock/unlock cycle. Read the authoritative session
+      // state - the tabletMode store flag is still undefined on a fresh mount,
+      // before App.checkSession has refreshed it - and skip the POST and the
+      // session DB write when it already is in tablet mode for this house. The
+      // house selector is kept client-side (localStorage), so no house fetch.
+      const currentSession = await this.props.httpClient.get('/api/v1/session/tablet_mode');
+      if (currentSession.tablet_mode && this.props.session.getTabletModeCurrentHouseSelector() === houseSelector) {
+        return;
+      }
+      await this.props.setTabletMode(houseSelector);
+    } catch (e) {
+      // The installer never opens the console, so a failure must show on screen,
+      // never a silent no-op that leaves the tablet looking normal but NOT in
+      // tablet mode (so unlocked when the alarm arms). The server validates the
+      // selector: an unknown house is a 404 ("no house matches"); anything else
+      // is a network/server error, with its own message.
+      console.error(e);
+      if (get(e, 'response.status') === 404) {
+        this.setState({ tabletModeParamError: houseSelector });
+      } else {
+        this.setState({ tabletModeActivationFailed: true });
       }
     }
   };
@@ -306,11 +365,18 @@ class Dashboard extends Component {
       dashboards: [],
       dashboardConfigsBySelector: {},
       newSelectedBoxType: {},
-      askDeleteDashboard: false
+      askDeleteDashboard: false,
+      // the ?tablet_mode_house= selector that matched no house, surfaced on screen
+      tabletModeParamError: null,
+      // a network/server error while activating tablet mode from the URL param
+      tabletModeActivationFailed: false
     };
   }
 
   componentDidMount() {
+    // A dashboard is only looked at: it can be reloaded by itself when Gladys is back
+    // after an outage (utils/reloadablePage.js)
+    this.pageIsNoLongerReloadable = declareReloadablePage();
     this.init();
     this.getGatewayRecoveryCodesState();
     document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
@@ -325,6 +391,7 @@ class Dashboard extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
     this.checkIfFullScreenParameterIsHere();
+    this.checkIfTabletModeParameterIsHere();
   }
 
   // Client-side dashboard switch: the dashboard list is already loaded, and
@@ -352,14 +419,22 @@ class Dashboard extends Component {
       // (device_features arrays…), so swapping in an equal-but-fresh object
       // would make every widget refetch and flash its loader a second time
       // right after the instant cached render
-      if (
-        currentDashboard &&
-        this.state.currentDashboardSelector === selector &&
-        JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard)
-      ) {
-        this.setState({ currentDashboard });
+      if (currentDashboard && this.state.currentDashboardSelector === selector) {
+        const changed = JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard);
+        // the dashboard displayed now was loaded: a previous one that failed no longer
+        // says "could not be loaded"
+        if (changed || this.state.currentDashboardLoadFailed) {
+          this.setState({
+            ...(changed ? { currentDashboard } : {}),
+            currentDashboardLoadFailed: false
+          });
+        }
       }
     } catch (e) {
+      // the dashboard asked for could not be loaded: said on it, not on another one
+      if (this.state.currentDashboardSelector === selector) {
+        this.setState({ currentDashboardLoadFailed: true });
+      }
       console.error(e);
     }
   };
@@ -371,6 +446,7 @@ class Dashboard extends Component {
   }
 
   componentWillUnmount() {
+    this.pageIsNoLongerReloadable();
     document.removeEventListener('fullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
@@ -398,9 +474,12 @@ class Dashboard extends Component {
       gatewayInstanceNotFound,
       gatewayRecoveryCodesMissing,
       loading,
+      getDashboardsError,
       currentDashboardLoadFailed,
       browserFullScreenCompatible,
-      duckDbMigrationJob
+      duckDbMigrationJob,
+      tabletModeParamError,
+      tabletModeActivationFailed
     }
   ) {
     const dashboardConfigured =
@@ -418,7 +497,11 @@ class Dashboard extends Component {
     // or failed).
     const currentDashboardResolved =
       !loading && (dashboardListEmpty || Boolean(currentDashboard) || currentDashboardLoadFailed);
-    const dashboardNotConfigured = currentDashboardResolved && !dashboardConfigured;
+    // A list or a dashboard that could not be loaded is not a dashboard without widget:
+    // the first-run checklist ("0 of 4, connect your devices") would tell a user whose
+    // Gladys is restarting that their home is empty
+    const dashboardLoadFailed = !loading && Boolean(getDashboardsError || currentDashboardLoadFailed);
+    const dashboardNotConfigured = currentDashboardResolved && !dashboardConfigured && !dashboardLoadFailed;
     if (props.gatewayAccountExpired === true) {
       return <GatewayAccountExpired />;
     }
@@ -437,6 +520,7 @@ class Dashboard extends Component {
         gatewayRecoveryCodesMissing={gatewayRecoveryCodesMissing}
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
+        dashboardLoadFailed={dashboardLoadFailed}
         browserFullScreenCompatible={browserFullScreenCompatible}
         toggleDashboardDropdown={this.toggleDashboardDropdown}
         redirectToDashboard={this.redirectToDashboard}
@@ -447,6 +531,8 @@ class Dashboard extends Component {
         hideExitFullScreenButton={props.fullscreen === 'force'}
         isGladysPlus={isGladysPlus}
         duckDbMigrationJob={duckDbMigrationJob}
+        tabletModeParamError={tabletModeParamError}
+        tabletModeActivationFailed={tabletModeActivationFailed}
       />
     );
   }

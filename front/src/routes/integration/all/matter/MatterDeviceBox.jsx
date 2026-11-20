@@ -6,9 +6,12 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
-import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
+import MatterDeviceSaveErrorAlert, { MatterDeviceSaveErrorContent } from './MatterDeviceSaveErrorAlert';
 import style from './style.css';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import { MobileNotice, MobilePill } from '../../../../components/mobile';
+import { MobileDeviceItem } from '../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class MatterDeviceBox extends Component {
   constructor(props) {
@@ -20,36 +23,47 @@ class MatterDeviceBox extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      device: nextProps.device
-    });
+    // only when the list brings another version of the device: a parent that merely renders
+    // again (the router on a system "back" closing a sheet) must not drop what is being typed
+    if (nextProps.device !== this.props.device) {
+      this.setState({
+        device: nextProps.device
+      });
+    }
   }
 
+  // from the previous state: two changes in a row (the phone sheet undoing a name and a room)
+  // must not overwrite each other
   updateName = e => {
-    this.setState({
+    const name = e.target.value;
+    this.setState(prevState => ({
       device: {
-        ...this.state.device,
-        name: e.target.value
+        ...prevState.device,
+        name
       }
-    });
+    }));
   };
 
   updateRoom = e => {
-    this.setState({
+    const roomId = e.target.value;
+    this.setState(prevState => ({
       device: {
-        ...this.state.device,
-        room_id: e.target.value
+        ...prevState.device,
+        room_id: roomId
       }
-    });
+    }));
   };
 
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({
       loading: true,
       errorMessage: null,
       errorDetail: null,
-      isKnownError: true
+      isKnownError: true,
+      errorOrigin: null
     });
+    let saved = true;
     try {
       const deviceDidNotExist = this.state.device.id === undefined;
       const savedDevice = await this.props.httpClient.post(
@@ -64,20 +78,25 @@ class MatterDeviceBox extends Component {
       });
     } catch (e) {
       console.error(e);
-      this.setState(getMatterDeviceSaveError(e));
+      this.setState({ ...getMatterDeviceSaveError(e), errorOrigin: 'save' });
+      saved = false;
     }
     this.setState({
       loading: false
     });
+    return saved;
   };
 
+  // resolves to false when the device could not be deleted
   deleteDevice = async () => {
     this.setState({
       loading: true,
       errorMessage: null,
+      errorOrigin: null,
       tooMuchStatesError: false,
       statesNumber: undefined
     });
+    let deleted = true;
     try {
       if (this.state.device.created_at) {
         await this.props.httpClient.delete(`/api/v1/device/${this.state.device.selector}`);
@@ -85,6 +104,7 @@ class MatterDeviceBox extends Component {
       this.props.refreshMatterDevices();
     } catch (e) {
       console.error(e);
+      deleted = false;
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
@@ -92,13 +112,15 @@ class MatterDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.matter.error.defaultDeletionError'
+          errorMessage: 'integration.matter.error.defaultDeletionError',
+          errorOrigin: 'delete'
         });
       }
     }
     this.setState({
       loading: false
     });
+    return deleted;
   };
 
   toggleParams = () => {
@@ -107,13 +129,79 @@ class MatterDeviceBox extends Component {
     });
   };
 
+  // The device on a phone (docs/specs/mobile-pages/integration-devices.md): a row and its sheet,
+  // fed by the state and the handlers of the card below
+  renderMobile(
+    { editable, deleteButton, housesWithRooms },
+    { device, errorMessage, errorDetail, isKnownError, errorOrigin, tooMuchStatesError, statesNumber },
+    { validModel, nodeIsDisconnected }
+  ) {
+    let deleteError = null;
+    if (tooMuchStatesError) {
+      deleteError = <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />;
+    } else if (errorMessage && errorOrigin === 'delete') {
+      deleteError = <Text id={errorMessage} />;
+    }
+    return (
+      <MobileDeviceItem
+        device={device}
+        houses={housesWithRooms}
+        pills={
+          nodeIsDisconnected ? (
+            <MobilePill tone="danger" data-cy="matter-device-disconnected">
+              <i class="fe fe-wifi-off" aria-hidden="true" />
+              <Text id="integration.matter.device.nodeDisconnected" />
+            </MobilePill>
+          ) : null
+        }
+        notices={
+          !validModel && (
+            <MobileNotice tone="warning" icon="alert-triangle">
+              <Text id="integration.matter.noFeaturesHandled" />
+            </MobileNotice>
+          )
+        }
+        onNameChange={this.updateName}
+        onRoomChange={this.updateRoom}
+        namePlaceholderId="integration.matter.namePlaceholder"
+        fieldsDisabled={!editable || !validModel}
+        showFeatures={validModel}
+        details={(device.params || []).map(param => ({
+          label: <Text id={`integration.matter.matterParamsNames.${param.name}`}>{param.name}</Text>,
+          value: param.value,
+          mono: true
+        }))}
+        detailsFolded
+        onSave={device.alreadyExist ? undefined : this.saveDevice}
+        saveError={
+          errorMessage &&
+          errorOrigin === 'save' && (
+            <MatterDeviceSaveErrorContent
+              errorMessage={errorMessage}
+              errorDetail={errorDetail}
+              isKnownError={isKnownError !== false}
+            />
+          )
+        }
+        onDelete={deleteButton ? this.deleteDevice : undefined}
+        deleteError={deleteError}
+        deleteScheduled={Boolean(tooMuchStatesError)}
+        dataCy="matter-device-row"
+      />
+    );
+  }
+
   render(
-    { deviceIndex, editable, deleteButton, housesWithRooms, nodesIsConnected },
+    { deviceIndex, editable, deleteButton, housesWithRooms, nodesIsConnected, isMobile },
     { device, loading, errorMessage, errorDetail, isKnownError, tooMuchStatesError, statesNumber, showParams }
   ) {
     const validModel = device.features && device.features.length > 0;
     const nodeId = device.external_id.split(':')[1];
     const nodeIsDisconnected = nodesIsConnected.get(nodeId) === false;
+
+    if (isMobile) {
+      return this.renderMobile(this.props, this.state, { validModel, nodeIsDisconnected });
+    }
 
     return (
       <div class="col-md-6">
@@ -267,9 +355,9 @@ class MatterDeviceBox extends Component {
                   )}
 
                   {deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.matter.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
                 </div>
               </div>

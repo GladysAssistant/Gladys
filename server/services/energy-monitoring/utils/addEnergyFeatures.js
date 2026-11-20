@@ -1,12 +1,59 @@
 const uuid = require('uuid');
 
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
-const { ENERGY_INDEX_FEATURE_TYPES } = require('./constants');
+const { ENERGY_INDEX_FEATURE_TYPES, PRODUCTION_INDEX_FEATURE_TYPES } = require('./constants');
 
 // The deterministic naming of the features derived from a source feature: `<index>_consumption`
-// and `<index>_cost` for an index, `<consumption>_cost` for a consumption fed by a service.
+// and `<index>_cost` for an index, `<consumption>_cost` for a consumption fed by a service,
+// `<production index>_production` for a production index.
 const DERIVED_CONSUMPTION_SUFFIX = '_consumption';
 const DERIVED_COST_SUFFIX = '_cost';
+const DERIVED_PRODUCTION_SUFFIX = '_production';
+
+/**
+ * @description Find the feature of a device derived from a source feature, by its deterministic
+ * category, type and external_id.
+ * @param {object} device - The device, its features included.
+ * @param {string} category - Category of the derived feature.
+ * @param {string} type - Type of the derived feature.
+ * @param {string} externalId - External id of the derived feature.
+ * @returns {object|undefined} The derived feature, if the device has it.
+ * @example
+ * findDerivedFeature(device, 'energy-sensor', 'thirty-minutes-consumption', 'zigbee2mqtt:plug:energy_consumption');
+ */
+const findDerivedFeature = (device, category, type, externalId) =>
+  device.features.find((f) => f.category === category && f.type === type && f.external_id === externalId);
+
+/**
+ * @description Build a feature derived from a source feature: `<source external_id><suffix>`,
+ * named `<source name> (<label>)`, read-only and historized, hanging off `parentId`.
+ * @param {object} sourceFeature - The feature the derived one is named after.
+ * @param {object} options - The derived feature.
+ * @param {string} options.category - Its category.
+ * @param {string} options.type - Its type.
+ * @param {string} options.suffix - The suffix of its external_id and selector.
+ * @param {string} options.unit - Its unit.
+ * @param {string} options.label - The label appended to its name.
+ * @param {string} options.parentId - Its energy parent id.
+ * @returns {object} The derived feature.
+ * @example
+ * buildDerivedFeature(indexFeature, { category, type, suffix: '_cost', unit: 'euro', label: 'cost', parentId });
+ */
+const buildDerivedFeature = (sourceFeature, { category, type, suffix, unit, label, parentId }) => ({
+  id: uuid.v4(),
+  category,
+  type,
+  energy_parent_id: parentId,
+  unit,
+  keep_history: true,
+  has_feedback: false,
+  read_only: true,
+  min: 0,
+  max: 100000000000,
+  external_id: `${sourceFeature.external_id}${suffix}`,
+  name: `${sourceFeature.name} (${label})`,
+  ...(sourceFeature.selector ? { selector: `${sourceFeature.selector}${suffix}` } : {}),
+});
 
 const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
   const featuresToAdd = [];
@@ -26,63 +73,90 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
       indexFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
     }
 
-    const consumptionFeatureExternalId = `${indexFeature.external_id}${DERIVED_CONSUMPTION_SUFFIX}`;
-    const consumptionFeature = device.features.find(
-      (f) =>
-        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION &&
-        f.external_id === consumptionFeatureExternalId,
+    let consumptionFeature = findDerivedFeature(
+      device,
+      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      `${indexFeature.external_id}${DERIVED_CONSUMPTION_SUFFIX}`,
     );
-
-    let consumptionFeatureId = null;
-
     if (!consumptionFeature) {
-      consumptionFeatureId = uuid.v4();
-      featuresToAdd.push({
-        id: consumptionFeatureId,
+      consumptionFeature = buildDerivedFeature(indexFeature, {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-        energy_parent_id: indexFeature.id,
+        suffix: DERIVED_CONSUMPTION_SUFFIX,
         unit: indexFeature.unit,
-        keep_history: true,
-        has_feedback: false,
-        read_only: true,
-        min: 0,
-        max: 100000000000,
-        external_id: consumptionFeatureExternalId,
-        name: `${indexFeature.name} (consumption)`,
-        selector: `${indexFeature.selector}${DERIVED_CONSUMPTION_SUFFIX}`,
+        label: 'consumption',
+        parentId: indexFeature.id,
       });
-    } else {
-      consumptionFeatureId = consumptionFeature.id;
+      featuresToAdd.push(consumptionFeature);
     }
 
-    const costFeatureExternalId = `${indexFeature.external_id}${DERIVED_COST_SUFFIX}`;
-    const costFeature = device.features.find(
-      (f) =>
-        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST &&
-        f.external_id === costFeatureExternalId,
+    const costFeature = findDerivedFeature(
+      device,
+      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+      `${indexFeature.external_id}${DERIVED_COST_SUFFIX}`,
     );
-
     if (!costFeature) {
-      featuresToAdd.push({
-        id: uuid.v4(),
-        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-        energy_parent_id: consumptionFeatureId,
-        unit: DEVICE_FEATURE_UNITS.EURO,
-        keep_history: true,
-        has_feedback: false,
-        read_only: true,
-        min: 0,
-        max: 100000000000,
-        external_id: costFeatureExternalId,
-        name: `${indexFeature.name} (cost)`,
-        selector: `${indexFeature.selector}${DERIVED_COST_SUFFIX}`,
-      });
+      featuresToAdd.push(
+        buildDerivedFeature(indexFeature, {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          suffix: DERIVED_COST_SUFFIX,
+          unit: DEVICE_FEATURE_UNITS.EURO,
+          label: 'cost',
+          parentId: consumptionFeature.id,
+        }),
+      );
     }
   });
+
+  device.features = [...device.features, ...featuresToAdd];
+
+  return device;
+};
+
+/**
+ * @description Add the 30-minute production feature of every production index of a device
+ * (PRODUCTION_INDEX_FEATURE_TYPES): a `<index external_id>_production` feature hanging off the
+ * index (`energy_parent_id`), which the production job fills from the index deltas. The production
+ * index is never attached to the main electric meter: production is not priced by a consumption
+ * contract. Idempotent: an existing production feature (matched on its external_id) is kept.
+ * @param {object} device - The device, its features included.
+ * @returns {object} The device, with its production features added.
+ * @example
+ * addProductionFeatures(device);
+ */
+const addProductionFeatures = (device) => {
+  const featuresToAdd = [];
+  device.features
+    .filter(
+      (f) => PRODUCTION_INDEX_FEATURE_TYPES[f.category] && PRODUCTION_INDEX_FEATURE_TYPES[f.category].includes(f.type),
+    )
+    .forEach((indexFeature) => {
+      if (!indexFeature.id) {
+        indexFeature.id = uuid.v4();
+      }
+      const productionFeature = findDerivedFeature(
+        device,
+        DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+        DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+        `${indexFeature.external_id}${DERIVED_PRODUCTION_SUFFIX}`,
+      );
+      if (productionFeature) {
+        return;
+      }
+      featuresToAdd.push(
+        buildDerivedFeature(indexFeature, {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+          suffix: DERIVED_PRODUCTION_SUFFIX,
+          unit: indexFeature.unit,
+          label: 'production',
+          parentId: indexFeature.id,
+        }),
+      );
+    });
 
   device.features = [...device.features, ...featuresToAdd];
 
@@ -151,31 +225,25 @@ const addConsumptionCostFeatures = (device, defaultElectricMeterDeviceFeatureId)
       consumptionFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
     }
     const costType = CONSUMPTION_COST_TYPES[consumptionFeature.type];
-    const costFeatureExternalId = `${consumptionFeature.external_id}${DERIVED_COST_SUFFIX}`;
-    const existingCostFeature = device.features.find(
-      (f) =>
-        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-        f.type === costType &&
-        f.external_id === costFeatureExternalId,
+    const existingCostFeature = findDerivedFeature(
+      device,
+      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      costType,
+      `${consumptionFeature.external_id}${DERIVED_COST_SUFFIX}`,
     );
     if (existingCostFeature) {
       return;
     }
-    featuresToAdd.push({
-      id: uuid.v4(),
-      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-      type: costType,
-      energy_parent_id: consumptionFeature.id,
-      unit: DEVICE_FEATURE_UNITS.EURO,
-      keep_history: true,
-      has_feedback: false,
-      read_only: true,
-      min: 0,
-      max: 100000000000,
-      external_id: costFeatureExternalId,
-      name: `${consumptionFeature.name} (cost)`,
-      ...(consumptionFeature.selector ? { selector: `${consumptionFeature.selector}${DERIVED_COST_SUFFIX}` } : {}),
-    });
+    featuresToAdd.push(
+      buildDerivedFeature(consumptionFeature, {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: costType,
+        suffix: DERIVED_COST_SUFFIX,
+        unit: DEVICE_FEATURE_UNITS.EURO,
+        label: 'cost',
+        parentId: consumptionFeature.id,
+      }),
+    );
   });
 
   device.features = [...device.features, ...featuresToAdd];
@@ -185,6 +253,7 @@ const addConsumptionCostFeatures = (device, defaultElectricMeterDeviceFeatureId)
 
 module.exports = {
   addEnergyFeatures,
+  addProductionFeatures,
   addConsumptionCostFeatures,
   isConsumptionFeature,
   CONSUMPTION_COST_TYPES,

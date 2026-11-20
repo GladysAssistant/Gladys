@@ -356,6 +356,52 @@ describe('SceneManager', () => {
     await assert.isRejected(promise);
   });
 
+  describe('conditions of a condition.only-continue-if action', () => {
+    const createSceneWithCondition = (condition) =>
+      sceneManager.create({
+        name: 'Only continue if scene',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: ACTIONS.CONDITION.ONLY_CONTINUE_IF, conditions: [condition] }]],
+        tags: [],
+      });
+
+    it('should create a scene with a condition on a variable', async () => {
+      const scene = await createSceneWithCondition({ variable: '0.0.last_value', operator: '>', value: 20 });
+      expect(scene.actions[0][0].conditions).to.deep.equal([{ variable: '0.0.last_value', operator: '>', value: 20 }]);
+    });
+
+    it('should create a scene with a condition on the current state of a device feature', async () => {
+      const scene = await createSceneWithCondition({ device_feature: 'mqtt-temperature', operator: '>', value: 20 });
+      expect(scene.actions[0][0].conditions).to.deep.equal([
+        { device_feature: 'mqtt-temperature', operator: '>', value: 20 },
+      ]);
+    });
+
+    it('should return validation error when a condition has neither a variable nor a device feature', async () => {
+      await assert.isRejected(
+        createSceneWithCondition({ operator: '>', value: 20 }),
+        /must contain at least one of \[variable, device_feature\]/,
+      );
+    });
+
+    it('should return validation error when a condition has both a variable and a device feature', async () => {
+      await assert.isRejected(
+        createSceneWithCondition({
+          variable: '0.0.last_value',
+          device_feature: 'mqtt-temperature',
+          operator: '>',
+          value: 20,
+        }),
+        /conflict between exclusive peers \[variable, device_feature\]/,
+      );
+    });
+
+    it('should return validation error when the device feature of a condition is empty', async () => {
+      await assert.isRejected(createSceneWithCondition({ device_feature: '', operator: '>', value: 20 }));
+    });
+  });
+
   it('should format joi error fallback when details are absent', () => {
     expect(sceneModel.formatJoiValidationError()).to.equal('Invalid schema');
     expect(sceneModel.formatJoiValidationError({ message: 'Validation failed' })).to.equal('Validation failed');

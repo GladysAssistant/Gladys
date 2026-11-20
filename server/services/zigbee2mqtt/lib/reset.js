@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 
 const logger = require('../../../utils/logger');
-const { CONFIGURATION } = require('./constants');
+const { CONFIGURATION, INSTALLATION_STATE, getIdlePrefetch } = require('./constants');
 
 const ALL_CONFIGURATION_KEYS = [
   CONFIGURATION.Z2M_DRIVER_PATH,
@@ -20,14 +20,17 @@ const ALL_CONFIGURATION_KEYS = [
   CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY,
   CONFIGURATION.DOCKER_MQTT_VERSION,
   CONFIGURATION.DOCKER_Z2M_VERSION,
+  CONFIGURATION.Z2M_NETWORK_GENERATED,
+  CONFIGURATION.Z2M_STOPPED,
+  CONFIGURATION.Z2M_SETUP_PENDING,
 ];
 
 /**
- * @description Reset Zigbee2mqtt integration to factory defaults.
+ * @description Reset Zigbee2mqtt integration to factory defaults, see reset.
  * @example
- * await this.reset();
+ * await resetIntegration.call(this);
  */
-async function reset() {
+async function resetIntegration() {
   logger.info('Zigbee2mqtt: resetting integration...');
 
   // 1. Disconnect (stop containers + disconnect MQTT)
@@ -47,6 +50,11 @@ async function reset() {
   this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
+  this.stopped = false;
+  this.stoppedAt = null;
+  this.updatePending = false;
+  this.setupPending = false;
+  this.configured = false;
   this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
@@ -55,15 +63,51 @@ async function reset() {
   this.zigbee2mqttRunning = false;
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
+  clearTimeout(this.healthCheckTimer);
+  this.healthCheckTimer = null;
+  clearTimeout(this.startingTimer);
+  this.startingTimer = null;
+  this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.coordinatorFirmware = null;
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   this.mqttConnectionError = null;
+  // Done by disconnect already, unless an installation finished since
+  this.clearInstallation();
+  // A running prefetch goes on, and tells its own outcome
+  const { state: prefetchState } = this.prefetch;
+  if (prefetchState === INSTALLATION_STATE.DONE || prefetchState === INSTALLATION_STATE.FAILED) {
+    this.prefetch = getIdlePrefetch();
+    this.emitInstallProgress();
+  }
 
   // 5. Emit status event
   this.emitStatusEvent();
+  // A send left waiting goes at once: its timer would outlive the reset
+  if (this.installProgressTimer !== null) {
+    this.emitInstallProgress(true);
+  }
 
   logger.info('Zigbee2mqtt: integration reset complete');
+}
+
+/**
+ * @description Reset Zigbee2mqtt integration to factory defaults. Counted while it runs, from its first line, the
+ * disconnect it runs being counted too: the routes and the setup checked before calling it are refused until it ends,
+ * as it would destroy the configuration and the folder that an installation started meanwhile writes (see
+ * refuseWhileInstalling).
+ * @example
+ * await this.reset();
+ */
+async function reset() {
+  this.runningOperations += 1;
+  try {
+    await resetIntegration.call(this);
+  } finally {
+    this.runningOperations -= 1;
+  }
 }
 
 module.exports = {

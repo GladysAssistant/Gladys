@@ -363,6 +363,7 @@ const PREFERRED_DEFAULT_UNIT_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
   [DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR]: DEVICE_FEATURE_UNITS.LITER,
+  [DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR]: DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
   [DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR]: DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR,
   [DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR]: DEVICE_FEATURE_UNITS.DECIBEL,
   [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR]: DEVICE_FEATURE_UNITS.DEGREE,
@@ -703,6 +704,16 @@ export const getFeatureDefaultValues = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
     // max follows the highest preset value, kept in sync when the preset list is edited
     return { ...defaults, min: 0, max: 0, read_only: false, keep_history: false };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR) {
+    // A pipe flow meter reports a few m³/h, a large river several thousand m³/s
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR) {
+    // Water meter indexes in liters grow for years: 10 000 m³ is 10 000 000 L
+    return applyDefaultUnit({ ...defaults, min: 0, max: 10000000 }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
@@ -1409,6 +1420,10 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR) {
     return 52;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.FLOW_SENSOR) {
+    return 3.6;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.TELEINFORMATION) {

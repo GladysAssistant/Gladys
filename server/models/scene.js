@@ -104,8 +104,10 @@ const actionSchema = Joi.object()
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
-    // energy-contract.current-price condition: the contract selector, the comparison
-    // operator and the threshold (`value`, above)
+    // energy-contract.current-price condition: the meter's device selector (empty: the main
+    // meter), the comparison operator and the threshold (`value`, above); `energy_contract` is
+    // the contract selector of a condition saved before the meter targeting, read as its meter
+    electric_meter: Joi.string().allow(''),
     energy_contract: Joi.string(),
     operator: Joi.string().valid(...COMPARISON_OPERATORS),
     headers: Joi.alternatives().conditional('type', {
@@ -120,14 +122,23 @@ const actionSchema = Joi.object()
         .required(),
       otherwise: Joi.forbidden(),
     }),
-    conditions: Joi.array().items({
-      variable: Joi.string().required(),
-      operator: Joi.string()
-        .valid('=', '!=', '>', '>=', '<', '<=')
-        .required(),
-      value: Joi.alternatives().try(Joi.number(), Joi.string()),
-      evaluate_value: Joi.string(),
-    }),
+    // A condition compares either a variable of the scene or the current state of a device
+    // feature (no "get device value" action needed before it): exactly one of the two.
+    // `device_feature` is a device reference like any other: device.migrate rewrites it
+    // (docs/specs/device-migration.md, B.3).
+    conditions: Joi.array().items(
+      Joi.object()
+        .keys({
+          variable: Joi.string(),
+          device_feature: Joi.string(),
+          operator: Joi.string()
+            .valid('=', '!=', '>', '>=', '<', '<=')
+            .required(),
+          value: Joi.alternatives().try(Joi.number(), Joi.string()),
+          evaluate_value: Joi.string(),
+        })
+        .xor('variable', 'device_feature'),
+    ),
     alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
     // music.play-media: the media reference picked from the player's catalog (the id is
     // what plays, the title is display only) and the play mode
@@ -272,7 +283,10 @@ const triggerSchema = Joi.object()
     integration: Joi.string(),
     trigger_key: sceneDeclarationKeySchema,
     fields: sceneDeclarationFieldsSchema,
-    // energy-contract.price-changed trigger: the contract selector, empty for any contract
+    // energy-contract.price-changed trigger: the meter's device selector, empty for any meter;
+    // `energy_contract` is the contract selector of a trigger saved before the meter targeting,
+    // read as the meter of that contract
+    electric_meter: Joi.string().allow(''),
     energy_contract: Joi.string().allow(''),
   })
   // A "changed" trigger fires on `last_value !== previous_value`: it matches no value, and

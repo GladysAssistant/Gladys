@@ -7,6 +7,7 @@ import get from 'get-value';
 import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class EweLinkDeviceBox extends Component {
   updateName = e => {
@@ -195,9 +196,9 @@ class EweLinkDeviceBox extends Component {
                   )}
 
                   {validModel && props.deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.eWeLink.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
 
                   {!validModel && (

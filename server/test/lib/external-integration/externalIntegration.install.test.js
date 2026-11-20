@@ -156,6 +156,8 @@ describe('externalIntegration.install', () => {
     const { externalIntegration } = buildSupervisor({
       system: {
         pull: fake.rejects(new Error('no matching manifest for linux/arm64')),
+        // nothing local to fall back on
+        imageExists: fake.resolves(false),
       },
     });
     try {
@@ -330,7 +332,7 @@ describe('externalIntegration.install', () => {
     const pull = sinon.stub();
     pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('NO_MATCHING_MANIFEST'));
     pull.resolves(true);
-    const { externalIntegration } = buildSupervisor({ system: { pull } });
+    const { externalIntegration } = buildSupervisor({ system: { pull, imageExists: fake.resolves(false) } });
     try {
       await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST });
       throw new Error('should have thrown');

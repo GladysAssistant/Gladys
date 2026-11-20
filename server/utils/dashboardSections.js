@@ -1,3 +1,5 @@
+const { DASHBOARD_SECTION_MOBILE_ORDER } = require('./constants');
+
 // A column width is a small integer weight (1 = normal, 2 = wide), not a
 // free ratio: the editor only toggles between these two values.
 const DEFAULT_COLUMN_WIDTH = 1;
@@ -35,13 +37,33 @@ function normalizeSectionWidths(section) {
 }
 
 /**
+ * @description Normalize the optional phone order of a section.
+ * Column by column is the default order: like default widths, its canonical
+ * form is the key absent, so a section has a single representation whether
+ * the client sent the default explicitly or not.
+ * @param {object} section - A section in the { columns, mobile_order } shape.
+ * @returns {object} The section without a default mobile_order, or unchanged.
+ * @example
+ * normalizeSectionMobileOrder({ columns: [[]], mobile_order: 'columns' });
+ * // => { columns: [[]] }
+ */
+function normalizeSectionMobileOrder(section) {
+  if (section.mobile_order !== DASHBOARD_SECTION_MOBILE_ORDER.COLUMNS) {
+    return section;
+  }
+  const { mobile_order: droppedMobileOrder, ...rest } = section;
+  return rest;
+}
+
+/**
  * @description Normalize dashboard boxes to the section-based shape.
  * Dashboards historically stored an array of columns (each column being an
  * array of boxes). The current shape is an array of sections, each section
  * holding its own columns: [{ columns: [[box]] }]. A legacy value is wrapped
  * into a single section so existing dashboards keep working unchanged.
  * A section may carry a widths array (one weight per column); it is aligned
- * to the columns and dropped when every column has the default weight.
+ * to the columns and dropped when every column has the default weight. A
+ * default phone order (mobile_order: 'columns') is dropped too.
  * @param {Array} boxes - Dashboard boxes, in legacy or section shape.
  * @returns {Array} Boxes in section shape.
  * @example
@@ -57,7 +79,7 @@ function normalizeDashboardBoxes(boxes) {
     return [{ columns: boxes }];
   }
   const normalized = boxes.map((section) =>
-    section && typeof section === 'object' ? normalizeSectionWidths(section) : section,
+    section && typeof section === 'object' ? normalizeSectionMobileOrder(normalizeSectionWidths(section)) : section,
   );
   // keep the original reference when nothing changed, so unchanged values
   // stay strictly equal for callers (and Sequelize change detection)

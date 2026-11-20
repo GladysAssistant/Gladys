@@ -5,7 +5,8 @@ const db = require('../../models');
 const logger = require('../../utils/logger');
 const { BadParameters, PlatformNotCompatible } = require('../../utils/coreErrors');
 const { Error422 } = require('../../utils/httpErrors');
-const { MANIFEST_IMAGE_LABEL } = require('./constants');
+const { MANIFEST_IMAGE_LABEL, UPDATE_SKIP_REASONS } = require('./constants');
+const { coerceGladysVersion, getUnsatisfiedGladysVersion } = require('./store/store.buildCatalogEntry');
 
 const MANIFEST_SOURCE_REPO = 'repo';
 const MANIFEST_SOURCE_INDEX = 'index';
@@ -17,19 +18,30 @@ const MANIFEST_SOURCE_INSTALLED = 'installed';
  * winning ties, it is the source the indexer mirrors), then the manifest
  * already installed as a last resort — re-pulling the running image is what
  * "force update" did before, and it must stay possible when both remote
- * sources are unusable. Manifests refused by validateManifest are dropped
- * rather than raised: the index is unmoderated external data, one bad entry
- * must not make the button fail. Deduplicated by image, so a source
- * advertising the image already installed is not pulled twice.
+ * sources are unusable. A manifest whose `gladys_version` the running Gladys
+ * does not satisfy is dropped first — checked before validateManifest, since
+ * a manifest written for a newer Gladys usually also declares fields this one
+ * does not know, and the version requirement is the reason the admin must be
+ * given. Manifests refused by validateManifest are dropped rather than
+ * raised: the index is unmoderated external data, one bad entry must not
+ * make the button fail. A version older than the installed one is dropped
+ * too: an update never downgrades. Every incompatible or invalid manifest is
+ * recorded in `skipped`, so
+ * the update can say which version it did not apply, and why. Deduplicated
+ * by image, so a source advertising the image already installed is not
+ * pulled twice.
  * @param {object} supervisor - The external integration service.
  * @param {object} service - The installed integration (plain object).
  * @param {object|null} indexManifest - The manifest of the store index entry.
- * @param {object|null} repoManifest - The manifest read from the repo.
- * @returns {Array} The candidates, each { manifest, image, source }.
+ * @param {object|null} repoManifest - The manifest read from the repo (not validated yet).
+ * @returns {object} { candidates, skipped }: the candidates, each { manifest, image, source },
+ * and the dropped manifests, each { version, source, reason, gladys_version }.
  * @example
- * const candidates = buildUpdateCandidates(this, service, indexManifest, repoManifest);
+ * const { candidates, skipped } = buildUpdateCandidates(this, service, indexManifest, repoManifest);
  */
 function buildUpdateCandidates(supervisor, service, indexManifest, repoManifest) {
+  const gladysVersion = coerceGladysVersion(supervisor.system.gladysVersion);
+  const skipped = [];
   const remoteCandidates = [
     { manifest: repoManifest, source: MANIFEST_SOURCE_REPO },
     { manifest: indexManifest, source: MANIFEST_SOURCE_INDEX },
@@ -38,20 +50,45 @@ function buildUpdateCandidates(supervisor, service, indexManifest, repoManifest)
       if (!manifest) {
         return false;
       }
+      const requiredGladysVersion = getUnsatisfiedGladysVersion(manifest, gladysVersion);
+      if (requiredGladysVersion !== null) {
+        logger.info(
+          `Ignoring the ${source} manifest of ${service.store_slug}: version ${manifest.version} requires Gladys ${requiredGladysVersion}`,
+        );
+        skipped.push({
+          version: manifest.version,
+          source,
+          reason: UPDATE_SKIP_REASONS.GLADYS_VERSION,
+          gladys_version: requiredGladysVersion,
+        });
+        return false;
+      }
       try {
         supervisor.validateManifest(manifest);
         return true;
       } catch (e) {
         logger.warn(`Ignoring the invalid ${source} manifest of ${service.store_slug}`, e);
+        skipped.push({
+          version: manifest.version,
+          source,
+          reason: UPDATE_SKIP_REASONS.INVALID_MANIFEST,
+          gladys_version: null,
+        });
         return false;
       }
     })
+    // an update never downgrades: a source still advertising a version older
+    // than the installed one (an index lagging behind a release installed
+    // from the repo) must not win over the running image once the newer
+    // source is dropped. The installed version itself stays a candidate
+    // (force update re-pull)
+    .filter(({ manifest }) => semver.valid(service.version) === null || !semver.lt(manifest.version, service.version))
     // Array.prototype.sort is stable: equal versions keep the repo first
     .sort((first, second) => semver.compare(second.manifest.version, first.manifest.version))
     // validateManifest guarantees a usable docker_image reference
     .map((candidate) => ({ ...candidate, image: candidate.manifest.docker_image }));
   const seenImages = new Set();
-  return remoteCandidates
+  const candidates = remoteCandidates
     .concat([
       // the installed tag, never the released image of the stored manifest:
       // a dev install runs a :dev tag the manifest does not declare
@@ -64,6 +101,7 @@ function buildUpdateCandidates(supervisor, service, indexManifest, repoManifest)
       seenImages.add(candidate.image);
       return true;
     });
+  return { candidates, skipped };
 }
 
 /**
@@ -80,27 +118,57 @@ function buildUpdateCandidates(supervisor, service, indexManifest, repoManifest)
  * @param {Array} candidates - The candidates built by buildUpdateCandidates.
  * @param {object} options - Options.
  * @param {boolean} options.allowLocal - Local fallback (dev installs only).
- * @returns {Promise<object|null>} The applied candidate, null if none is available.
+ * @returns {Promise<object>} { applied, unavailable }: the applied candidate (null
+ * if none is available) and the candidates whose image could not be pulled.
  * @example
- * const applied = await pullFirstAvailable(this, candidates, { allowLocal: false });
+ * const { applied, unavailable } = await pullFirstAvailable(this, candidates, { allowLocal: false });
  */
 async function pullFirstAvailable(supervisor, candidates, { allowLocal }) {
-  return Promise.reduce(
+  const unavailable = [];
+  const applied = await Promise.reduce(
     candidates,
-    async (applied, candidate) => {
-      if (applied !== null) {
-        return applied;
+    async (appliedCandidate, candidate) => {
+      if (appliedCandidate !== null) {
+        return appliedCandidate;
       }
       try {
         await supervisor.ensureImage(candidate.image, { allowLocal });
         return candidate;
       } catch (e) {
         logger.warn(`Unable to get image ${candidate.image}`, e);
+        unavailable.push(candidate);
         return null;
       }
     },
     null,
   );
+  return { applied, unavailable };
+}
+
+/**
+ * @description The version the update did not apply although it is newer
+ * than the one it installed: the most recent of the skipped manifests (a
+ * `gladys_version` the running Gladys does not satisfy, an invalid manifest,
+ * an image that could not be pulled). Without it, an update falling back on
+ * the running image is a silent success: the version does not change and
+ * nothing says why.
+ * @param {Array} skipped - The skipped manifests, each { version, source, reason, gladys_version }.
+ * @param {string} appliedVersion - The version the update installed.
+ * @returns {object|null} { version, reason, gladys_version }, null when the
+ * latest known version was installed.
+ * @example
+ * const skippedUpdate = getSkippedUpdate(skipped, '3.5.0');
+ */
+function getSkippedUpdate(skipped, appliedVersion) {
+  const newerSkipped = skipped
+    .filter((entry) => semver.valid(entry.version) !== null && semver.gt(entry.version, appliedVersion))
+    // Array.prototype.sort is stable: equal versions keep the first recorded
+    .sort((first, second) => semver.compare(second.version, first.version));
+  if (newerSkipped.length === 0) {
+    return null;
+  }
+  const { version, reason, gladys_version: gladysVersion } = newerSkipped[0];
+  return { version, reason, gladys_version: gladysVersion };
 }
 
 /**
@@ -114,10 +182,12 @@ async function pullFirstAvailable(supervisor, candidates, { allowLocal }) {
  * store — and the manifest is refreshed from the labels of the new image.
  * Once the new containers have started, the images the previous version left
  * behind are removed — an integration updated a dozen times used to cost a
- * dozen images.
+ * dozen images. The result carries `skipped_update`: the most recent version
+ * newer than the one installed that could not be applied, and why (see
+ * getSkippedUpdate), null when the latest known version was installed.
  * Updates are an explicit admin gesture — no auto-update in v1.
  * @param {string} selector - The selector of the external integration.
- * @returns {Promise<object>} Resolve with the updated integration.
+ * @returns {Promise<object>} Resolve with the updated integration and its `skipped_update`.
  * @example
  * await gladys.externalIntegration.update('ext-john-gladys-open-meteo-demo');
  */
@@ -145,17 +215,27 @@ async function update(selector) {
       logger.warn(`Unable to refresh the store index before updating ${service.store_slug}`, e);
     }
     try {
-      repoManifest = await this.fetchManifestFromRepo(service.store_slug);
+      // not validated there: buildUpdateCandidates checks its gladys_version
+      // first, then validates it
+      repoManifest = await this.fetchManifestFromRepo(service.store_slug, { validate: false });
     } catch (e) {
       logger.warn(`Unable to fetch the latest manifest of ${service.store_slug} from its repository`, e);
     }
   }
-  const candidates = buildUpdateCandidates(this, service, indexManifest, repoManifest);
+  const { candidates, skipped } = buildUpdateCandidates(this, service, indexManifest, repoManifest);
   const allowLocal = !service.store_slug;
-  const applied = await pullFirstAvailable(this, candidates, { allowLocal });
+  const { applied, unavailable } = await pullFirstAvailable(this, candidates, { allowLocal });
   if (applied === null) {
     throw new BadParameters(`UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`);
   }
+  unavailable.forEach((candidate) => {
+    skipped.push({
+      version: candidate.manifest.version,
+      source: candidate.source,
+      reason: UPDATE_SKIP_REASONS.IMAGE_UNAVAILABLE,
+      gladys_version: null,
+    });
+  });
   let { manifest } = applied;
   const { image } = applied;
   if (service.store_slug) {
@@ -163,6 +243,16 @@ async function update(selector) {
       // the cache read by isUpdateAvailable follows, so the "update
       // available" banner reflects the version we just resolved
       this.repoManifests.set(service.store_slug, manifest);
+    } else if (
+      skipped.some(
+        (entry) => entry.source === MANIFEST_SOURCE_REPO && entry.reason === UPDATE_SKIP_REASONS.GLADYS_VERSION,
+      )
+    ) {
+      // a repo version requiring another Gladys never turns the badge on
+      // (isUpdateAvailable), it feeds the "update Gladys first" notice
+      // (getRequiredGladysVersion): kept, that notice says what this update
+      // just said, even while the index has not caught up with the repo
+      this.repoManifests.set(service.store_slug, repoManifest);
     } else {
       // a repo version we could not pull must never drive update detection:
       // it would keep the badge on and send every later force update back to
@@ -196,6 +286,9 @@ async function update(selector) {
       logger.warn(`Unable to read the image labels of ${image}, keeping the stored manifest`, e);
     }
   }
+  // computed before anything is stopped: should it throw, the running
+  // version is left untouched
+  const skippedUpdate = getSkippedUpdate(skipped, manifest.version);
   await Promise.each((manifest && manifest.containers) || [], async (entry) => {
     await this.ensureImage(entry.docker_image, { allowLocal });
   });
@@ -239,7 +332,7 @@ async function update(selector) {
   // Keeping the cleanup after start() is still what we want: a start that
   // throws (no image, no network, Docker down) skips it entirely.
   await this.removeImages(previousImages);
-  return started;
+  return { ...started, skipped_update: skippedUpdate };
 }
 
 module.exports = {

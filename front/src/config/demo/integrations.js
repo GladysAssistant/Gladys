@@ -89,18 +89,6 @@ const integrations = {
       neighbors: [1]
     }
   ],
-  'get /api/v1/service/usb/port': [
-    {
-      comPath: '/dev/ttyUSB0',
-      comVID: '0658',
-      comName: '0200'
-    },
-    {
-      comPath: '/dev/ttyUSB1',
-      comVID: '0478',
-      comName: '0910'
-    }
-  ],
   'get /api/v1/service/zwave/device': [
     {
       id: 'fbedb47f-4d25-4381-8923-2633b23192a0',
@@ -574,34 +562,259 @@ const integrations = {
     Z2M_TCP_PORT: '12000',
     Z2M_ADAPTER_MODE: 'usb'
   },
-  'get /api/v1/service/zigbee2mqtt/adapter': [
-    { label: 'ConBee', configKey: 'deconz' },
-    { label: 'ConBee II', configKey: 'deconz' },
-    { label: 'ConBee III', configKey: 'deconz' },
-    { label: 'RaspBee', configKey: 'deconz' },
-    { label: 'RaspBee II', configKey: 'deconz' },
-    { label: 'Home Assistant Connect ZBT-2', configKey: 'ember' },
-    { label: 'Home Assistant SkyConnect (by Nabu Casa)', configKey: 'ember' },
-    { label: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"', configKey: 'ember' },
-    { label: 'SONOFF Dongle-M', configKey: 'ember' },
-    { label: 'TubesZB Zigbee EFR32 pro ethernet/USB serial coordinator', configKey: 'ember' },
-    { label: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P', configKey: 'zstack' },
-    { label: "Slaesh's CC2652RB stick", configKey: 'zstack' },
-    { label: 'SMLIGHT CC2652P Zigbee USB Adapter SLZB-02', configKey: 'zstack' },
-    { label: 'SMLIGHT SLZB-06 Zigbee ethernet USB POE WiFi LAN adapter', configKey: 'zstack' },
-    { label: 'SMLIGHT SLZB-07p7 Zigbee USB CC2652P7 adapter', configKey: 'zstack' },
-    { label: 'SMLIGHT Zigbee LAN Adapter CC2652P Model SLZB-05', configKey: 'zstack' },
-    { label: 'Vision CC2538+CC2592 Dongle(VS203)', configKey: 'zstack' },
-    { label: 'Vision CC2652 dongle', configKey: 'zstack' },
-    { label: 'XGG Gateway', configKey: 'zstack' },
-    { label: 'XGG 52PZ2MGateway', configKey: 'zstack' },
-    { label: 'ZigStar LAN Coordinator', configKey: 'zstack' },
-    { label: 'ZigStar PoE Coordinator', configKey: 'zstack' },
-    { label: 'ZigStar Stick v4', configKey: 'zstack' },
-    { label: 'ZigStar UZG-01 - Universal Zigbee Gateway', configKey: 'zstack' },
-    { label: 'ZigStar ZigiHAT PoE', configKey: 'zstack' }
+  'get /api/v1/service/zigbee2mqtt/usb/port': [
+    {
+      path: '/dev/ttyUSB0',
+      name: 'Electrolama zig-a-zig-ah zzh',
+      pnpId: 'usb-Electrolama_zig-a-zig-ah__zzh__4C0E1AB2-if00-port0',
+      adapter: 'Electrolama zig-a-zig-ah! (zzh!)'
+    },
+    {
+      path: '/dev/ttyUSB1',
+      name: 'Itead Sonoff Zigbee 3.0 USB Dongle Plus V2',
+      pnpId: 'usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_8e73883472d9ee11-if00-port0',
+      adapter: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"'
+    },
+    {
+      path: '/dev/ttyS0',
+      name: null,
+      adapter: null
+    }
   ],
+  // As the server answers: each model with how the setup wizard shows it (see adapters/display.js of the service)
+  'get /api/v1/service/zigbee2mqtt/adapter': [
+    {
+      label: 'ConBee',
+      configKey: 'deconz',
+      brand: 'dresden elektronik',
+      displayName: 'dresden elektronik ConBee',
+      modelCode: null,
+      image: null,
+      aliases: ['deconz']
+    },
+    {
+      label: 'ConBee II',
+      configKey: 'deconz',
+      brand: 'dresden elektronik',
+      displayName: 'dresden elektronik ConBee II',
+      modelCode: null,
+      image: null,
+      aliases: ['conbee 2', 'deconz']
+    },
+    {
+      label: 'ConBee III',
+      configKey: 'deconz',
+      brand: 'dresden elektronik',
+      displayName: 'dresden elektronik ConBee III',
+      modelCode: null,
+      image: null,
+      aliases: ['conbee 3', 'deconz']
+    },
+    {
+      label: 'RaspBee',
+      configKey: 'deconz',
+      brand: 'dresden elektronik',
+      displayName: 'dresden elektronik RaspBee',
+      modelCode: null,
+      image: null,
+      aliases: ['deconz']
+    },
+    {
+      label: 'RaspBee II',
+      configKey: 'deconz',
+      brand: 'dresden elektronik',
+      displayName: 'dresden elektronik RaspBee II',
+      modelCode: null,
+      image: null,
+      aliases: ['raspbee 2', 'deconz']
+    },
+    {
+      label: 'Home Assistant Connect ZBT-2',
+      configKey: 'ember',
+      brand: 'Home Assistant',
+      displayName: 'Home Assistant Connect ZBT-2',
+      modelCode: 'ZBT-2',
+      image: 'ZBT-2',
+      aliases: ['nabu casa']
+    },
+    {
+      label: 'Home Assistant SkyConnect (by Nabu Casa)',
+      configKey: 'ember',
+      brand: 'Home Assistant',
+      displayName: 'Home Assistant SkyConnect',
+      modelCode: 'SkyConnect',
+      image: null,
+      aliases: ['zbt-1', 'nabu casa']
+    },
+    {
+      label: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"',
+      configKey: 'ember',
+      brand: 'SONOFF',
+      displayName: 'SONOFF Zigbee 3.0 USB Dongle Plus-E',
+      modelCode: 'ZBDongle-E',
+      image: 'ZBDongle-E',
+      aliases: ['sonoff e', 'dongle e', 'plus v2']
+    },
+    {
+      label: 'SONOFF Dongle-M',
+      configKey: 'ember',
+      brand: 'SONOFF',
+      displayName: 'SONOFF Dongle Max',
+      modelCode: 'Dongle-M',
+      image: 'Dongle-M',
+      aliases: ['sonoff max', 'sonoff m']
+    },
+    {
+      label: 'TubesZB Zigbee EFR32 pro ethernet/USB serial coordinator',
+      configKey: 'ember',
+      brand: 'TubesZB',
+      displayName: 'TubesZB Zigbee EFR32 pro ethernet/USB serial coordinator',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
+      configKey: 'zstack',
+      brand: 'SONOFF',
+      displayName: 'SONOFF Zigbee 3.0 USB Dongle Plus-P',
+      modelCode: 'ZBDongle-P',
+      image: 'ZBDongle-P',
+      aliases: ['sonoff p', 'dongle p']
+    },
+    {
+      label: "Slaesh's CC2652RB stick",
+      configKey: 'zstack',
+      brand: 'Slaesh',
+      displayName: "Slaesh's CC2652RB stick",
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'SMLIGHT CC2652P Zigbee USB Adapter SLZB-02',
+      configKey: 'zstack',
+      brand: 'SMLIGHT',
+      displayName: 'SMLIGHT SLZB-02',
+      modelCode: 'SLZB-02',
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'SMLIGHT SLZB-06 Zigbee ethernet USB POE WiFi LAN adapter',
+      configKey: 'zstack',
+      brand: 'SMLIGHT',
+      displayName: 'SMLIGHT SLZB-06',
+      modelCode: 'SLZB-06',
+      image: 'SLZB-06',
+      aliases: []
+    },
+    {
+      label: 'SMLIGHT SLZB-07p7 Zigbee USB CC2652P7 adapter',
+      configKey: 'zstack',
+      brand: 'SMLIGHT',
+      displayName: 'SMLIGHT SLZB-07p7',
+      modelCode: 'SLZB-07p7',
+      image: 'SLZB-07P7',
+      aliases: []
+    },
+    {
+      label: 'SMLIGHT Zigbee LAN Adapter CC2652P Model SLZB-05',
+      configKey: 'zstack',
+      brand: 'SMLIGHT',
+      displayName: 'SMLIGHT SLZB-05',
+      modelCode: 'SLZB-05',
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'Vision CC2538+CC2592 Dongle(VS203)',
+      configKey: 'zstack',
+      brand: 'Vision',
+      displayName: 'Vision CC2538+CC2592 Dongle(VS203)',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'Vision CC2652 dongle',
+      configKey: 'zstack',
+      brand: 'Vision',
+      displayName: 'Vision CC2652 dongle',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'XGG Gateway',
+      configKey: 'zstack',
+      brand: 'XGG',
+      displayName: 'XGG Gateway',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'XGG 52PZ2MGateway',
+      configKey: 'zstack',
+      brand: 'XGG',
+      displayName: 'XGG 52PZ2MGateway',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'ZigStar LAN Coordinator',
+      configKey: 'zstack',
+      brand: 'ZigStar',
+      displayName: 'ZigStar LAN Coordinator',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'ZigStar PoE Coordinator',
+      configKey: 'zstack',
+      brand: 'ZigStar',
+      displayName: 'ZigStar PoE Coordinator',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'ZigStar Stick v4',
+      configKey: 'zstack',
+      brand: 'ZigStar',
+      displayName: 'ZigStar Stick v4',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'ZigStar UZG-01 - Universal Zigbee Gateway',
+      configKey: 'zstack',
+      brand: 'ZigStar',
+      displayName: 'ZigStar UZG-01 - Universal Zigbee Gateway',
+      modelCode: null,
+      image: null,
+      aliases: []
+    },
+    {
+      label: 'ZigStar ZigiHAT PoE',
+      configKey: 'zstack',
+      brand: 'ZigStar',
+      displayName: 'ZigStar ZigiHAT PoE',
+      modelCode: null,
+      image: null,
+      aliases: []
+    }
+  ],
+  'post /api/v1/service/zigbee2mqtt/permit_join': { success: true },
+  'post /api/v1/service/zigbee2mqtt/run/stop': { success: true },
+  'post /api/v1/service/zigbee2mqtt/run/start': { success: true },
+  'post /api/v1/service/zigbee2mqtt/run/restart': { success: true },
   'get /api/v1/service/zigbee2mqtt/status': {
+    configured: true,
     usbConfigured: true,
     networkAdapterConfigured: false,
     mqttExist: true,
@@ -619,7 +832,9 @@ const integrations = {
       maintrel: 1,
       revision: 74100,
       type: 'EmberZNet'
-    }
+    },
+    z2mVersion: '2.14.2',
+    deviceCount: 12
   },
   'get /api/v1/service/nuki': {},
   'get /api/v1/service/nuki/config': {},
@@ -1901,6 +2116,7 @@ const integrations = {
       selector: 'edf-tempo-9-kva',
       name: 'EDF Tempo 9 kVA',
       electric_meter_device_id: uuid('electric-meter'),
+      electric_meter_device: { id: uuid('electric-meter'), selector: 'electric-meter', name: 'Electric meter' },
       valid_from: '2025-02-01',
       valid_to: null,
       currency: 'EUR',
@@ -1939,7 +2155,8 @@ const integrations = {
         ]
       },
       inputs: null,
-      migration_warning: null
+      migration_warning: null,
+      created_at: '2025-01-20T10:00:00.000Z'
     }
   ],
   'post /api/v1/energy_contract': { success: true },
@@ -1976,9 +2193,10 @@ const integrations = {
     { starts_at: '2026-09-21T04:00:00.000Z', value: 'blue' },
     { starts_at: '2026-09-22T04:00:00.000Z', value: 'blue' }
   ],
-  // Current price of the demo contract, as the electricity price widget asks
-  // for it: a Tempo blue day, peak hours until 22:00 UTC
-  'get /api/v1/energy_contract/edf-tempo-9-kva/current': {
+  // Current price of the demo meter, as the electricity price widget asks for it
+  // (the price of the contract active on the meter): a Tempo blue day, peak
+  // hours until 22:00 UTC
+  'get /api/v1/energy_contract/current': {
     price: 0.1609,
     currency: 'EUR',
     unit: 'kWh',
@@ -1987,7 +2205,8 @@ const integrations = {
     next_price: 0.1296,
     next_label: 'Blue off-peak',
     cumulative: { day: 6.2, month: 154, billing_period: 154 },
-    contract: { id: 'contract-1', selector: 'edf-tempo-9-kva', name: 'EDF Tempo 9 kVA' }
+    contract: { id: 'contract-1', selector: 'edf-tempo-9-kva', name: 'EDF Tempo 9 kVA' },
+    electric_meter: { id: uuid('electric-meter'), selector: 'electric-meter', name: 'Electric meter' }
   },
   // Gladys Plus AI quota, one bucket for text and one for images
   'get /api/v1/gateway/aichat/quota': {

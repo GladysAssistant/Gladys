@@ -29,3 +29,5 @@ size-plugin.json
 .tmp
 .DS_Store
 matter-controller-data
+# Development data of the server (database, backups, Matter storage...): see server/config/config.js
+/server/gladys-data/

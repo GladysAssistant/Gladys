@@ -1,6 +1,5 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import dayjs from 'dayjs';
 import actions from '../../actions/calendar';
@@ -12,6 +11,7 @@ import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
+import NoCalendarConnected from './NoCalendarConnected';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -38,7 +38,13 @@ class CalendarPage extends Component {
         .toDate();
     } else {
       from = dayjs(range.start).toDate();
-      to = dayjs(range.end).toDate();
+      // `to` is exclusive: ask up to the midnight after the last visible day,
+      // which the month (end of the week) and agenda (end of the day) views
+      // still display
+      to = dayjs(range.end)
+        .add(1, 'day')
+        .startOf('day')
+        .toDate();
     }
     // remembered so a calendar.updated push can refetch the displayed range
     this.currentRange = { from, to };
@@ -103,6 +109,7 @@ class CalendarPage extends Component {
     }
     this.currentRange = { from, to };
     this.props.getEventsInRange(from, to);
+    this.props.getCalendarIntegrations();
   }
 
   componentDidMount() {
@@ -118,7 +125,9 @@ class CalendarPage extends Component {
   }
 
   render(props, {}) {
-    const noCalendarConnected = props.calendars && props.calendars.length === 0;
+    // waits for the calendar integrations too, so the notice does not swap
+    // its advice once they arrive
+    const noCalendarConnected = props.calendars && props.calendars.length === 0 && props.calendarIntegrations;
     return (
       <div class="page">
         {/* Same Horizon glass scene as the dashboard — the calendar lives in
@@ -132,9 +141,7 @@ class CalendarPage extends Component {
                     <div class="card-body">
                       {/* inside the card so it renders as the theme's quiet tinted notice */}
                       {noCalendarConnected && (
-                        <div class="alert alert-warning">
-                          <Text id="calendar.noCalendarsConnected" />
-                        </div>
+                        <NoCalendarConnected user={props.user} calendarIntegrations={props.calendarIntegrations} />
                       )}
                       <Calendar
                         className={style.horizonCalendar}
@@ -163,4 +170,8 @@ class CalendarPage extends Component {
   }
 }
 
-export default connect('eventsFormated,calendars,user,session', actions, dayjs)(withIntlAsProp(CalendarPage));
+export default connect(
+  'eventsFormated,calendars,calendarIntegrations,user,session',
+  actions,
+  dayjs
+)(withIntlAsProp(CalendarPage));

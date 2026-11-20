@@ -4,6 +4,7 @@
 // regulation applied another.
 
 const { PILOT_WIRE_MODE } = require('./constants');
+const { celsiusToFahrenheit } = require('./units');
 
 const DEFAULT_PRESET_TEMPS = {
   frost: 7,
@@ -59,6 +60,21 @@ const DEFAULT_CONTROL_TYPE = 'hysteresis';
 const DEFAULT_MIN_TEMP = 5;
 const DEFAULT_MAX_TEMP = 35;
 const DEFAULT_TEMP_UNIT = 'C';
+
+/**
+ * @description The range a thermostat gets when its bounds are missing or
+ * inverted, in its own unit: the defaults are in Celsius, and taken as they are
+ * on a Fahrenheit thermostat they clamped a 70 °F setpoint to 35 °F — and made
+ * 35 °F its cooling stop setpoint. Rounded to whole degrees, 41-95 °F.
+ * @param {string} [unit] - The thermostat's unit, 'C' or 'F'.
+ * @returns {{min: number, max: number}} The default range.
+ * @example
+ * defaultTempRange('F'); // { min: 41, max: 95 }
+ */
+const defaultTempRange = (unit) =>
+  unit === 'F'
+    ? { min: Math.round(celsiusToFahrenheit(DEFAULT_MIN_TEMP)), max: Math.round(celsiusToFahrenheit(DEFAULT_MAX_TEMP)) }
+    : { min: DEFAULT_MIN_TEMP, max: DEFAULT_MAX_TEMP };
 
 // How long a manual setpoint (widget dial or scene) holds before the schedule
 // takes over again. Configurable per device through THERMOSTAT_MANUAL_DURATION,
@@ -141,6 +157,13 @@ const DEFAULT_PILOT_WIRE_ORDERS = {
 
 const COMFORT_ORDERS = [PILOT_WIRE_MODE.COMFORT, PILOT_WIRE_MODE.COMFORT_1, PILOT_WIRE_MODE.COMFORT_2];
 
+// The order a heater Gladys regulates is sent when the room is warm enough
+// (C.1.1), set per thermostat by THERMOSTAT_PILOT_WIRE_STANDBY_ORDER. Frost
+// protection by default; eco or off on a heater whose own functions — the boost
+// of a towel rail — frost protection locks out.
+const PILOT_WIRE_STANDBY_ORDERS = [PILOT_WIRE_MODE.FROST_PROTECTION, PILOT_WIRE_MODE.ECO, PILOT_WIRE_MODE.OFF];
+const DEFAULT_PILOT_WIRE_STANDBY_ORDER = PILOT_WIRE_MODE.FROST_PROTECTION;
+
 /**
  * @description The order a module can actually be sent, from the options its
  * feature declares. A 4-order module rejects comfort -1 and -2: written anyway,
@@ -171,6 +194,46 @@ function supportedPilotWireOrder(order, supportedOptions) {
   return null;
 }
 
+/**
+ * @description Read a stored THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: a whole
+ * number among the standby orders, frost protection otherwise. `2garbage` read
+ * as 2 would send eco in place of the default, and a comfort is no rest. Shared
+ * by the server and the edit form, so both read the same value.
+ * @param {string|number|null|undefined} value - The stored param, or the form's value.
+ * @returns {number} A PILOT_WIRE_STANDBY_ORDERS value.
+ * @example
+ * parsePilotWireStandbyOrder('2'); // 2
+ */
+function parsePilotWireStandbyOrder(value) {
+  const order = /^\d+$/.test(String(value)) ? Number(value) : null;
+  return PILOT_WIRE_STANDBY_ORDERS.includes(order) ? order : DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+}
+
+/**
+ * @description The standby order a module can be sent: the one chosen when it
+ * takes it, frost protection — or off — otherwise, and eco on a module that
+ * takes neither. Never nothing: an order left unsent keeps the heater on the
+ * comfort it carries, heating above the setpoint. Eco is the lowest order such
+ * a module takes, and already one of the standby orders.
+ * @param {number} order - The chosen standby order.
+ * @param {Array} [supportedOptions] - The feature's `supported_options`.
+ * @returns {number|null} The order to send, or null when the module takes no
+ * standby order at all (none of frost protection, off or eco).
+ * @example
+ * supportedStandbyOrder(PILOT_WIRE_MODE.ECO, [{ value: 0 }, { value: 5 }]); // 0
+ */
+function supportedStandbyOrder(order, supportedOptions) {
+  const supported = (supportedOptions || []).map((option) => option.value);
+  if (supported.length === 0 || supported.includes(order)) {
+    return order;
+  }
+  const fallback = supportedPilotWireOrder(PILOT_WIRE_MODE.FROST_PROTECTION, supportedOptions);
+  if (fallback !== null) {
+    return fallback;
+  }
+  return supported.includes(PILOT_WIRE_MODE.ECO) ? PILOT_WIRE_MODE.ECO : null;
+}
+
 module.exports = {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_COOLING_PRESET_TEMPS,
@@ -189,6 +252,7 @@ module.exports = {
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
   DEFAULT_TEMP_UNIT,
+  defaultTempRange,
   DEFAULT_MANUAL_DURATION_MINUTES,
   MANUAL_DURATION_MS,
   DEFAULT_WINDOW_DELAY_SECONDS,
@@ -200,4 +264,8 @@ module.exports = {
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
   supportedPilotWireOrder,
+  PILOT_WIRE_STANDBY_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  parsePilotWireStandbyOrder,
+  supportedStandbyOrder,
 };

@@ -173,9 +173,17 @@ the new parent would close a cycle (as before).
 - no contract at all: a message pointing to the contracts tab;
 - the free parent selects, the circular dependency banner and the "Fix" button are removed.
 
+On a phone (below 768 px, or a phone in landscape) the same hierarchy is shown as rows — one
+group per meter, then the unattached devices — and the "Meter" select becomes a sheet listing
+the electric meters, opened by a tap on the device; it sends the same request (`D.1`). That
+presentation is owned by [`mobile-pages/energy.md`](mobile-pages/energy.md), section B.
+
 ## F. Integrations
 
 - Zigbee2mqtt, Tasmota, MQTT, Enedis and the external integrations keep their derivation.
+- **Zigbee2mqtt** also derives the 30-minute production of every production index
+  (`addProductionFeatures`, `<index>_production`, filled by the production job), never attached to
+  a meter, and keeps it on rediscovery.
 - **Matter** derives the energy features of a published cumulative index at discovery (the
   paired devices of `GET /api/v1/service/matter/paired-device`), like Zigbee2mqtt: the features
   already in Gladys keep their id and their parent — **a root included**: `addEnergyFeatures`
@@ -185,7 +193,17 @@ the new parent would close a cycle (as before).
   falls back on the main meter). When a re-paired device replaces an existing one (new node id),
   the server cannot see the existing device: the front gives every matched feature the id and the
   parent of the existing one (the meter the user chose, or a root), and remaps the parents of the
-  newly derived features onto those ids.
+  newly derived features onto those ids. When a paired device updates the device that already
+  has its `external_id` ("Update"), or replaces it (new node id), the front posts the paired
+  features and params merged into the existing device — its `id`, `selector`, `name`, `room_id`
+  and the params Matter does not provide are kept — so that the
+  `ENERGY_INDEX_LAST_PROCESSED_<featureId>` watermark of the consumption job survives (on a
+  replacement, the features take over the existing ids, so the watermark still names its index),
+  and that watermark never makes the device look "to update" (only the params of the paired
+  device are compared). The existing device is looked up among all the Matter devices of Gladys,
+  never in the list filtered by the search of the page, and read again on the click, so the
+  watermark posted is the latest one; the card of an update is titled, and found by the search,
+  with the name of that device.
 - The `<index>_consumption` / `<index>_cost` naming is owned by `addEnergyFeatures.js`
   (`DERIVED_CONSUMPTION_SUFFIX`, `DERIVED_COST_SUFFIX`, with `CONSUMPTION_COST_TYPES`): the repair
   and Matter import it.
@@ -207,5 +225,10 @@ the new parent would close a cycle (as before).
 - `repairHierarchy`: cycle cut, meter made root, derived links restored by name and by
   uniqueness, nothing written on a sound hierarchy.
 - Matter: derived features added, ids and parents of existing features kept, derived features
-  re-injected, no bogus selector.
-- Front: Cypress spec of the page (meters, unattached devices, meter select).
+  re-injected, no bogus selector; Cypress spec of the devices page (`MatterDevices.cy.js`): a
+  device only differing by a core param is not proposed, "Update" keeps the name and that param,
+  also while a search only matches the Matter name, the update card is found by the Gladys name,
+  and "Replace" keeps the name, the room, the feature ids and the core param.
+- Zigbee2mqtt: the production features derived and kept on rediscovery.
+- Front: Cypress spec of the page (meters, unattached devices, meter select), and of its phone
+  presentation (the meter chosen in a sheet, `ContractsMobile.cy.js`).

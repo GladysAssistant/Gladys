@@ -1,12 +1,14 @@
 import update from 'immutability-helper';
 import cx from 'classnames';
-import { useState } from 'preact/hooks';
+import { useState, useEffect, useRef } from 'preact/hooks';
 
 import ActionGroup from './ActionGroup';
 import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 import Settings from './Settings';
 import EditActions from './EditActions';
+import DraftBanner from './DraftBanner';
+import MobileToast from '../../../components/mobile/MobileToast';
 import dashboardStyle from '../../dashboard/style.css';
 import { Localizer, Text } from 'preact-i18n';
 
@@ -15,6 +17,14 @@ const EditScenePage = ({ children, ...props }) => {
   // and open on demand from the header, to keep the scene visible right away
   const [settingsOpen, setSettingsOpen] = useState(false);
   const openSettings = () => setSettingsOpen(true);
+  // a failed save brings its alert into view: the Save button is at the bottom of the page
+  // (docs/specs/scene-editor-mobile.md, C.3)
+  const errorRef = useRef(null);
+  useEffect(() => {
+    if (props.errorNonce && errorRef.current && errorRef.current.scrollIntoView) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [props.errorNonce]);
   const closeSettings = () => setSettingsOpen(false);
 
   // Inserting a step between two existing steps = inserting a new action group,
@@ -41,6 +51,7 @@ const EditScenePage = ({ children, ...props }) => {
                     <Localizer>
                       <button
                         onClick={props.goBack}
+                        data-not-an-edit
                         class={cx('btn btn-secondary btn-sm', style.backButton)}
                         aria-label={<Text id="editScene.backButton" />}
                       >
@@ -55,7 +66,7 @@ const EditScenePage = ({ children, ...props }) => {
                     <span class={style.sceneName}>{props.scene.name}</span>
 
                     {/* The active flag is patched on its own: keep it from racing a full save */}
-                    <label className="custom-switch m-0 ml-3 ml-md-4">
+                    <label className="custom-switch m-0 ml-3 ml-md-4" data-not-an-edit>
                       <input
                         type="checkbox"
                         name="active"
@@ -76,6 +87,7 @@ const EditScenePage = ({ children, ...props }) => {
                       <button
                         onClick={settingsOpen ? closeSettings : openSettings}
                         data-cy="edit-scene-settings-button"
+                        data-not-an-edit
                         aria-label={<Text id="editScene.settings" />}
                         className={cx('btn mb-0', style.headerActionBtn, {
                           'btn-secondary': settingsOpen,
@@ -94,8 +106,9 @@ const EditScenePage = ({ children, ...props }) => {
               </div>
             </div>
             <div>
+              <DraftBanner draft={props.draftToRestore} onRestore={props.restoreDraft} onDiscard={props.discardDraft} />
               {props.error && (
-                <div class="alert alert-danger">
+                <div class="alert alert-danger" ref={errorRef}>
                   <Text id="editScene.saveSceneError" />
                   {props.errorMessage && (
                     <div class="mt-2">
@@ -148,6 +161,8 @@ const EditScenePage = ({ children, ...props }) => {
                   variables={props.variables}
                   setVariablesTrigger={props.setVariablesTrigger}
                   sceneIntegrations={props.sceneIntegrations}
+                  deviceFeatures={props.deviceFeatures}
+                  names={props.names}
                 />
               </div>
               <div class="row">
@@ -196,6 +211,7 @@ const EditScenePage = ({ children, ...props }) => {
                       sceneIntegrations={props.sceneIntegrations}
                       deviceFeatures={props.deviceFeatures}
                       thermostatSchedules={props.thermostatSchedules}
+                      names={props.names}
                     />
                   </div>
 
@@ -219,6 +235,22 @@ const EditScenePage = ({ children, ...props }) => {
               ))}
             </div>
             <EditActions {...props} />
+            {/* the toast of the editor on a wide screen (docs/specs/scene-editor-mobile.md, C.7):
+                the deletion of a step or a trigger, with its "Undo". Above the fixed footer, whose
+                own indicator already says "Saved": the "Scene saved" toast is for the phone. The
+                keyboard lands on "Undo" (the "×" that had the focus is gone with its card), and
+                the toast stays while it is hovered or focused. */}
+            <MobileToast
+              message={props.toast && props.toast.withUndo ? <Text id={props.toast.textId} /> : null}
+              toastKey={props.toast ? props.toast.id : null}
+              actionLabel={<Text id="editScene.mobile.undo" />}
+              onAction={props.undo}
+              onHold={props.holdToast}
+              onRelease={props.releaseToast}
+              focusAction
+              aboveBar
+              dataCy="scene-toast"
+            />
           </div>
         </div>
       </div>

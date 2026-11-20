@@ -69,6 +69,13 @@ const findDeviceFeatureBySelector = (devices, selector) => {
   return null;
 };
 
+// Labels appended by the energy-monitoring integration to the name of the
+// features it derives (see server/services/energy-monitoring/utils/addEnergyFeatures.js)
+const DERIVED_FEATURE_LABELS = ['consumption', 'cost', 'production'];
+
+// The legend names a series after its device first: several devices of the
+// same integration often expose energy features with identical (technical)
+// names, so the feature names alone can't tell the series apart (#3377).
 const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
   if (deviceData.deviceFeature.is_subscription) {
     return `${deviceData.device.name} - ${deviceData.deviceFeature.name}`;
@@ -77,22 +84,42 @@ const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
   const found = findDeviceFeatureBySelector(devices, selector);
   if (found) {
     const { device, feature } = found;
-    const featureById = new Map((device.features || []).map(f => [f.id, f]));
-    const pathNames = [];
-    let current = feature;
-    const visited = new Set();
+    const features = device.features || [];
+    // When the device has a single feature of this kind, its name is enough
+    const sameKindCount = features.filter(f => f.category === feature.category && f.type === feature.type).length;
+    if (sameKindCount <= 1) {
+      return device.name;
+    }
 
+    // The feature and its ancestors on the same device, from the feature up
+    const featureById = new Map(features.map(f => [f.id, f]));
+    const chain = [];
+    const visited = new Set();
+    let current = feature;
     while (current && !visited.has(current.id)) {
       visited.add(current.id);
-      if (current.name) {
-        pathNames.unshift(current.name);
-      }
+      chain.push(current);
       current = current.energy_parent_id ? featureById.get(current.energy_parent_id) : null;
     }
 
-    if (pathNames.length > 0) {
-      return pathNames.join(' - ');
-    }
+    // Derived features are named "<source name> (consumption)" / "(cost)" /
+    // "(production)" after one of their ancestors, not always their direct
+    // parent: a cost is named after the index while its parent is the
+    // consumption. Skip names that only repeat an ancestor's one. Any other
+    // suffix may tell sibling features apart (e.g. "Panel (Floor 1)"), so it
+    // is kept.
+    const repeatsAncestor = (name, ancestors) =>
+      ancestors.some(
+        ancestor =>
+          ancestor.name &&
+          (name === ancestor.name || DERIVED_FEATURE_LABELS.some(label => name === `${ancestor.name} (${label})`))
+      );
+    const pathNames = chain
+      .filter((f, index) => f.name && f.name !== device.name && !repeatsAncestor(f.name, chain.slice(index + 1)))
+      .map(f => f.name)
+      .reverse();
+
+    return pathNames.length > 0 ? `${device.name} - ${pathNames.join(' - ')}` : device.name;
   }
 
   return deviceData.deviceFeature.name
@@ -141,6 +168,26 @@ class EnergyConsumption extends Component {
     this.refreshData();
   }
 
+  // The devices (with all their features) are needed to name the series after
+  // their device and energy hierarchy. They are fetched once per widget, in
+  // parallel with the first consumption request; on error the legend falls
+  // back to "<device name> - <feature name>".
+  getDevices = () => {
+    if (!this.devicesPromise) {
+      this.devicesPromise = this.fetchDevices();
+    }
+    return this.devicesPromise;
+  };
+
+  fetchDevices = async () => {
+    try {
+      return await this.props.httpClient.get('/api/v1/device');
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  };
+
   componentDidUpdate(prevProps) {
     if (
       prevProps.box.device_features !== this.props.box.device_features ||
@@ -166,14 +213,17 @@ class EnergyConsumption extends Component {
       const { startDate, endDate } = this.getDateRange();
       const deviceFeatures = this.props.box.device_features;
 
-      const data = await this.props.httpClient.get(`/api/v1/device_feature/energy_consumption`, {
-        device_features: deviceFeatures.join(','),
-        from: startDate.toISOString(),
-        to: endDate.toISOString(),
-        group_by: this.getGroupBy(),
-        display_mode: this.state.displayMode,
-        period_start_day: getPeriodStartDay(this.props.box)
-      });
+      const [data, devices] = await Promise.all([
+        this.props.httpClient.get(`/api/v1/device_feature/energy_consumption`, {
+          device_features: deviceFeatures.join(','),
+          from: startDate.toISOString(),
+          to: endDate.toISOString(),
+          group_by: this.getGroupBy(),
+          display_mode: this.state.displayMode,
+          period_start_day: getPeriodStartDay(this.props.box)
+        }),
+        this.getDevices()
+      ]);
 
       let emptySeries = true;
       let totalConsumption = 0;
@@ -239,7 +289,7 @@ class EnergyConsumption extends Component {
         }));
 
         pendingSeries.push({
-          displayName: getEnergyFeatureDisplayName(this.props.devices, selector, deviceData),
+          displayName: getEnergyFeatureDisplayName(devices, selector, deviceData),
           seriesData,
           isSubscription
         });
@@ -616,4 +666,4 @@ class EnergyConsumption extends Component {
   }
 }
 
-export default connect('user,session,httpClient,houses,devices,deviceFeatures', {})(withIntlAsProp(EnergyConsumption));
+export default connect('user,session,httpClient,houses,deviceFeatures', {})(withIntlAsProp(EnergyConsumption));

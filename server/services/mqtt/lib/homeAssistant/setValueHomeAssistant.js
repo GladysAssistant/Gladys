@@ -56,8 +56,8 @@ function buildLightCommand(config, property, value) {
       return {
         topic: config.command_topic,
         payload: value
-          ? config.payload_on || DEFAULT_PAYLOADS.PAYLOAD_ON
-          : config.payload_off || DEFAULT_PAYLOADS.PAYLOAD_OFF,
+          ? String(config.payload_on ?? DEFAULT_PAYLOADS.PAYLOAD_ON)
+          : String(config.payload_off ?? DEFAULT_PAYLOADS.PAYLOAD_OFF),
       };
   }
 }
@@ -120,8 +120,8 @@ function buildHomeAssistantCommand(component, config, property, value) {
       return {
         topic: config.command_topic,
         payload: value
-          ? config.payload_on || DEFAULT_PAYLOADS.PAYLOAD_ON
-          : config.payload_off || DEFAULT_PAYLOADS.PAYLOAD_OFF,
+          ? String(config.payload_on ?? DEFAULT_PAYLOADS.PAYLOAD_ON)
+          : String(config.payload_off ?? DEFAULT_PAYLOADS.PAYLOAD_OFF),
       };
     default:
       return { topic: undefined, payload: undefined };

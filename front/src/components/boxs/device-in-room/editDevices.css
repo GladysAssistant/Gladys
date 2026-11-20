@@ -1,0 +1,396 @@
+/* Settings form of the "devices" widget (A.3.1 of docs/specs/dashboard-
+   flexible-layout-and-widgets.md), inside the editor panel and its Horizon
+   glass theme: colors from the --gl-* tokens, with fallbacks. Rows and
+   buttons are sized for fingers at every width (44px+), and every input is
+   16px: below that, iOS Safari zooms the page on focus. */
+
+.editDevices {
+  color: var(--gl-ink, #1c2334);
+}
+
+.sectionLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0.25rem 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gl-muted, #7c8396);
+}
+
+.sectionCount {
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 60px;
+  padding: 0 0.25rem 0 0.75rem;
+  border-radius: 16px;
+  border: 1px solid rgba(44, 62, 118, 0.07);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(44, 62, 118, 0.05);
+}
+
+.rowDragging {
+  opacity: 0.4;
+}
+
+.badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+}
+
+.badgeLarge {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  font-size: 1.125rem;
+}
+
+.rowMain {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.375rem 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* up to two lines: on a narrow phone the name shares its row with the
+   value and the handle, and one line cut "Multi sensor (Temperature)" to
+   "Multi sens…" */
+.rowName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.rowSub {
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* a number and its unit fit on one line; a longer text ("No value") wraps
+   on two rather than being cut and taking the room of the name */
+.rowValue {
+  flex: 0 0 auto;
+  max-width: 30%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--gl-muted, #7c8396);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow: hidden;
+}
+
+/* a touch on the handle must drag, never scroll the panel */
+.handle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--gl-muted, #7c8396);
+  cursor: grab;
+  touch-action: none;
+}
+
+.handle:hover,
+.handle:active {
+  color: var(--gl-ink, #1c2334);
+}
+
+.gripIcon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* pointer-drag engine ghost + insertion line (utils/pointerDrag.js) */
+.dragGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: #1c2334;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
+  margin-top: 10px;
+  /* the handle sits at the right edge of the panel: the pill hangs to the
+     LEFT of the finger, or it would run off the screen. The engine drives
+     transform, so the offset goes through the independent translate
+     property (engines without it keep the pill right of the finger) */
+  translate: calc(-100% + 14px) 0;
+}
+
+.dropIndicator {
+  border-radius: 999px;
+  background: #3d6df0;
+  box-shadow: 0 0 8px rgba(61, 109, 240, 0.6);
+}
+
+.empty {
+  padding: 1.25rem 0.5rem;
+  text-align: center;
+  color: var(--gl-muted, #7c8396);
+}
+
+.hint {
+  display: block;
+  margin: 0.625rem 0.125rem 0;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+/* Pinned to the bottom of the panel's scrolling body, like the picker's
+   footer. The body has padding (EditPanel .editPanelBody: 1.25rem 1.375rem
+   1.5rem): the negative margins stretch the bar over it */
+.stickyFooter {
+  position: sticky;
+  bottom: -1.5rem;
+  z-index: 2;
+  margin: 1rem -1.375rem -1.5rem;
+  padding: 0.75rem 1.375rem 1rem;
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+  background: var(--gl-surface-strong, rgba(255, 255, 255, 0.94));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.primaryButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gl-ink, #1c2334);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.3);
+  cursor: pointer;
+}
+
+.primaryButton:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: default;
+}
+
+.titleField {
+  margin-top: 1.5rem;
+}
+
+/* beats the panel's .settings-page .form-control grammar (0,2,0) */
+:global(.settings-page) input.input,
+input.input {
+  min-height: 46px;
+  font-size: 16px;
+}
+
+.backRow {
+  margin: -0.5rem 0 0.5rem -0.5rem;
+}
+
+.backButton,
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.linkButton {
+  padding: 0;
+  margin-top: 0.25rem;
+}
+
+.deviceCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  margin-bottom: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid rgba(44, 62, 118, 0.07);
+  background: #fff;
+}
+
+.deviceCardText {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.deviceCardName {
+  font-weight: 700;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.deviceCardValue {
+  flex: 0 0 auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+
+.softButton,
+.removeButton {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 46px;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(28, 35, 52, 0.07);
+  color: var(--gl-ink, #1c2334);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.softButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.removeButton {
+  width: 100%;
+  background: #fbe3de;
+  color: #c4472f;
+}
+
+/* a tap leaves the focus on the button: no ring for the pointer, the
+   keyboard keeps its :focus-visible one */
+.rowMain:focus:not(:focus-visible),
+.handle:focus:not(:focus-visible),
+.softButton:focus:not(:focus-visible),
+.removeButton:focus:not(:focus-visible),
+.primaryButton:focus:not(:focus-visible),
+.backButton:focus:not(:focus-visible),
+.linkButton:focus:not(:focus-visible),
+.undoButton:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* "Removed · Undo": the alternative to a confirmation, at the top of the list */
+.undoBar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 52px;
+  margin-bottom: 0.875rem;
+  padding: 0.375rem 0.375rem 0.375rem 1rem;
+  border-radius: 16px;
+  background: var(--gl-ink, #1c2334);
+  color: #fff;
+}
+
+.undoMessage {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.undoButton {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 0.875rem;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* The row being edited in the detail view, outlined in the widget's live
+   preview on the canvas (a <tr> of DeviceCard, tagged by EditDevices) */
+:global(tr.gladys-editing-device-row) > :global(td) {
+  background-color: rgba(61, 109, 240, 0.12) !important;
+}
+
+:global(tr.gladys-editing-device-row) {
+  outline: 2px solid var(--gl-accent, #3d6df0);
+  outline-offset: -1px;
+  border-radius: 14px;
+}
+
+/* devices that could not be loaded: rows are shown, not editable */
+.rowMain:disabled {
+  cursor: default;
+}
+
+/* A phone in landscape leaves the sheet about 250px: pinned, the footer
+   (plus the panel header) left less than one row of the list visible. It
+   goes back into the flow, at the end of the form. */
+@media (max-height: 480px) {
+  .stickyFooter {
+    position: static;
+  }
+}

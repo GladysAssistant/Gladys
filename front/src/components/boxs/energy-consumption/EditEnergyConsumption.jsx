@@ -60,8 +60,7 @@ class EditEnergyConsumption extends Component {
     super(props);
     this.state = {
       loading: true,
-      devices: [],
-      deviceFeatures: []
+      devices: []
     };
   }
 
@@ -140,16 +139,24 @@ class EditEnergyConsumption extends Component {
       return [];
     }
     return this.props.box.device_features.map(deviceFeatureSelector => {
-      const deviceFeature = this.state.deviceFeatures.find(d => d.selector === deviceFeatureSelector);
-      if (!deviceFeature) {
+      let selectedDevice;
+      let selectedFeature;
+      this.state.devices.forEach(device => {
+        const feature = device.features.find(f => f.selector === deviceFeatureSelector);
+        if (feature) {
+          selectedDevice = device;
+          selectedFeature = feature;
+        }
+      });
+      if (!selectedFeature) {
         return {
           label: deviceFeatureSelector,
           value: deviceFeatureSelector
         };
       }
       return {
-        label: getDeviceFeatureName(this.state.devices, this.state.deviceFeatures, deviceFeature),
-        value: deviceFeature.selector
+        label: getDeviceFeatureName(this.props.intl.dictionary, selectedDevice, selectedFeature),
+        value: selectedFeature.selector
       };
     });
   };

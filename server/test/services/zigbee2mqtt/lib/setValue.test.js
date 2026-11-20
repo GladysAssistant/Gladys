@@ -3,7 +3,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 const { expect } = require('chai');
 const { BUTTON_PUSH } = require('../../../../utils/constants');
-const { BadParameters, ServiceNotReadyError } = require('../../../../utils/coreErrors');
+const { BadParameters, ServiceNotConfiguredError, ServiceNotReadyError } = require('../../../../utils/coreErrors');
 
 const Zigbee2MqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -203,6 +203,16 @@ describe('zigbee2mqtt setValue', () => {
       `zigbee2mqtt/0x00158d00045b2740/set`,
       JSON.stringify({ alarm: true }),
     );
+  });
+
+  it('should refuse with a clear error when Gladys is not connected to the broker (Zigbee2mqtt stopped)', async () => {
+    // PREPARE
+    zigbee2MqttManager.mqttClient = null;
+    // EXECUTE
+    const call = () => zigbee2MqttManager.setValue(null, featureBinary, 1);
+    // ASSERT
+    expect(call).to.throw(ServiceNotConfiguredError);
+    assert.notCalled(mqttClient.publish);
   });
 
   it('set value good topic OFF', async () => {

@@ -2,8 +2,9 @@ const db = require('../../models');
 const { SERVICE_TYPES } = require('../../utils/constants');
 
 /**
- * @description Get all external integrations, with the "update available" flag
- * and the latest version known for each of them.
+ * @description Get all external integrations, with the "update available" flag,
+ * the latest version known for each of them and, when that version requires
+ * a Gladys the running one does not satisfy, its `gladys_version` range.
  * @returns {Promise<Array>} Resolve with the list of external integrations.
  * @example
  * const integrations = await gladys.externalIntegration.get();
@@ -22,6 +23,7 @@ async function get() {
       ...plainService,
       update_available: this.isUpdateAvailable(plainService),
       latest_version: this.getLatestVersion(plainService),
+      update_requires_gladys_version: this.getRequiredGladysVersion(plainService),
     };
   });
 }

@@ -19,6 +19,12 @@ class ForgotPassword extends Component {
       return null;
     }
 
+    // a code is being checked: a new one now would clear that request's guard and let a second
+    // check start on a code that is single use
+    if (this.state.verifyCodeStatus === RequestStatus.Getting) {
+      return null;
+    }
+
     if (!validateEmail(forgotPasswordEmail)) {
       return this.setState({
         forgotPasswordStatus: ForgotPasswordStatus.WrongEmailError
@@ -40,7 +46,9 @@ class ForgotPassword extends Component {
       });
 
       this.setState({
-        forgotPasswordStatus: RequestStatus.Success
+        forgotPasswordStatus: RequestStatus.Success,
+        // kept once a code was requested: on a phone, asking for a new one keeps the code screen
+        codeSent: true
       });
     } catch (e) {
       const status = get(e, 'response.status');
@@ -102,7 +110,10 @@ class ForgotPassword extends Component {
         this.setState({
           verifyCodeStatus: RequestStatus.NetworkError
         });
-      } else if (status === 401) {
+      } else if (status === 401 || status === 400) {
+        // a refused code is a 401, but it rarely comes back as one: without a session the http
+        // client answers a 401 by refreshing a token it does not have, and it is the refusal of
+        // that refresh (a 400) that is thrown. Both mean the same here: this code does not work
         this.setState({
           verifyCodeStatus: ForgotPasswordStatus.InvalidCode
         });

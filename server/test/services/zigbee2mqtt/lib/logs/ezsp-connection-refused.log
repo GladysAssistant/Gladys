@@ -1,0 +1,23 @@
+Starting Zigbee2MQTT without watchdog.
+[2026-11-06 18:56:55] [32minfo[39m: 	z2m: Logging to console, file (filename: log.log)
+[2026-11-06 18:56:55] [32minfo[39m: 	z2m: Starting Zigbee2MQTT version 2.14.2 (commit #5c0c1c60078e1737c5dee5f8217583bca7610e66
+)
+[2026-11-06 18:56:55] [32minfo[39m: 	z2m: Starting zigbee-herdsman (10.10.0)
+[2026-11-06 18:56:55] [33mwarning[39m: 	zh:ezsp: 'ezsp' driver is deprecated and will only remain to provide support for older firmware (pre 7.4.x). Migration to 'ember' is recommended. If using Zigbee2MQTT see https://github.com/Koenkk/zigbee2mqtt/discussions/21462
+[2026-11-06 18:56:55] [31merror[39m: 	zh:ezsp:ezsp: Connection attempt 1 error: Error: connect ECONNREFUSED 127.0.0.1:6639
+[2026-11-06 18:57:00] [31merror[39m: 	zh:ezsp:ezsp: Connection attempt 2 error: Error: connect ECONNREFUSED 127.0.0.1:6639
+[2026-11-06 18:57:10] [31merror[39m: 	zh:ezsp:ezsp: Connection attempt 3 error: Error: connect ECONNREFUSED 127.0.0.1:6639
+[2026-11-06 18:57:25] [31merror[39m: 	zh:ezsp:ezsp: Connection attempt 4 error: Error: connect ECONNREFUSED 127.0.0.1:6639
+[2026-11-06 18:57:25] [31merror[39m: 	z2m: Error while starting zigbee-herdsman
+[2026-11-06 18:57:25] [31merror[39m: 	z2m: Failed to start zigbee-herdsman
+[2026-11-06 18:57:25] [31merror[39m: 	z2m: Check https://www.zigbee2mqtt.io/guide/installation/20_zigbee2mqtt-fails-to-start_crashes-runtime.html for possible solutions
+[2026-11-06 18:57:25] [31merror[39m: 	z2m: Exiting...
+[2026-11-06 18:57:25] [31merror[39m: 	z2m: Error: Failure to connect
+    at Ezsp.connect (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ezsp/driver/ezsp.ts:366:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Driver.startup (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ezsp/driver/driver.ts:186:13)
+    at async EZSPAdapter.start (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/ezsp/adapter/ezspAdapter.ts:153:16)
+    at async Controller.start (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/controller/controller.ts:146:29)
+    at async Zigbee.start (/app/lib/zigbee.ts:70:27)
+    at async Controller.start (/app/lib/controller.ts:117:29)
+    at async start (/app/index.js:156:5)

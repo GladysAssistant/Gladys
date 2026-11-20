@@ -12,6 +12,9 @@ import SettingsSystemDatabaseCleaning from './SettingsSystemDatabaseCleaning';
 import SettingsSystemDuckDbMigration from './SettingsSystemDuckDbMigration';
 import SettingsSystemDownloadLogs from './SettingsSystemDownloadLogs';
 import SettingsSystemHostPower from './SettingsSystemHostPower';
+import SettingsSystemClock from './SettingsSystemClock';
+import MobileSystemPage from './MobileSystemPage';
+import { withMobileViewport } from '../../../components/mobile';
 
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
@@ -158,6 +161,7 @@ const SystemPage = ({ children, ...props }) => (
       </div>
       <div class="col-lg-6">
         <SettingsSystemTimezone />
+        <SettingsSystemClock />
         <SettingsSystemMdns systemInfos={props.systemInfos} />
         <SettingsSystemBatteryLevelWarning />
         <SettingsSystemMessageService />
@@ -168,4 +172,9 @@ const SystemPage = ({ children, ...props }) => (
   </SettingsLayout>
 );
 
-export default SystemPage;
+// On a phone the page is one column of rows and cards dressed for a thumb
+// (docs/specs/mobile-pages/settings-pages.md, F): same props, same card components
+const ResponsiveSystemPage = ({ isMobile, ...props }) =>
+  isMobile ? <MobileSystemPage {...props} /> : <SystemPage {...props} />;
+
+export default withMobileViewport(ResponsiveSystemPage);

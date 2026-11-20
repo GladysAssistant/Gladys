@@ -5,7 +5,7 @@ import update from 'immutability-helper';
 
 import BaseEditBox from '../baseEditBox';
 import SelectDeviceFeature from '../../device/SelectDeviceFeature';
-import { COVER_STATE } from '../../../../../server/utils/constants';
+import { COVER_STATE, DASHBOARD_BOX_MAX_ITEMS } from '../../../../../server/utils/constants';
 import { isCoverStateFeature, isActionableFeature } from './actionableFeatures';
 
 const ACTION_TYPES = ['scene', 'device-feature'];
@@ -15,6 +15,9 @@ const COVER_COMMAND_KEYS = {
   [COVER_STATE.STOP]: 'stop',
   [COVER_STATE.CLOSE]: 'close'
 };
+// The server refuses a widget holding more actions than this: the editor stops
+// adding actions at the cap and says so, instead of failing on save.
+const MAX_ACTIONS = DASHBOARD_BOX_MAX_ITEMS.ACTIONS;
 
 class EditActionsBox extends Component {
   updateActions = actions => {
@@ -23,6 +26,9 @@ class EditActionsBox extends Component {
 
   addAction = () => {
     const actions = this.props.box.actions || [];
+    if (actions.length >= MAX_ACTIONS) {
+      return;
+    }
     this.updateActions([...actions, { action_type: 'scene' }]);
   };
 
@@ -90,6 +96,7 @@ class EditActionsBox extends Component {
 
   render(props, { scenes, featuresBySelector }) {
     const actions = props.box.actions || [];
+    const maxActionsReached = actions.length >= MAX_ACTIONS;
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.actions">
         <div class="form-group">
@@ -205,7 +212,12 @@ class EditActionsBox extends Component {
             </div>
           );
         })}
-        <button class="btn btn-outline-primary btn-block" onClick={this.addAction}>
+        {maxActionsReached && (
+          <div class="alert alert-info mb-2">
+            <Text id="dashboard.boxes.actions.maxActionsReached" fields={{ max: MAX_ACTIONS }} />
+          </div>
+        )}
+        <button class="btn btn-outline-primary btn-block" onClick={this.addAction} disabled={maxActionsReached}>
           <Text id="dashboard.boxes.actions.addActionButton" /> <i class="fe fe-plus" />
         </button>
       </BaseEditBox>

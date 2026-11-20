@@ -18,7 +18,8 @@ class ConfigureTwoFactorPage extends Component {
     const url = new URL(data.otpauth_url);
     const secret = url.searchParams.get('secret');
     QRCode.toDataURL(data.otpauth_url, (err, dataUrl) => {
-      this.setState({ dataUrl, secret });
+      // otpauthUrl: on a phone, the link that adds the account to the two-factor app of that phone
+      this.setState({ dataUrl, secret, otpauthUrl: data.otpauth_url });
     });
   };
 
@@ -26,12 +27,19 @@ class ConfigureTwoFactorPage extends Component {
     this.setState({ step: this.state.step + 1 });
   };
 
-  copySecret = () => {
+  previousStep = () => {
+    this.setState({ step: 1, errored: false });
+  };
+
+  // resolves with true once the secret is in the clipboard (the phone layout says so)
+  copySecret = async () => {
     try {
       const { secret } = this.state;
-      navigator.clipboard.writeText(secret);
+      await navigator.clipboard.writeText(secret);
+      return true;
     } catch (e) {
       console.error(e);
+      return false;
     }
   };
 
@@ -84,11 +92,13 @@ class ConfigureTwoFactorPage extends Component {
     this.getOtpAuthUrl();
   };
 
-  render({}, { dataUrl, step, twoFactorCode, errored, secret }) {
+  render({}, { dataUrl, step, twoFactorCode, errored, secret, otpauthUrl }) {
     return (
       <ConfigureTwoFactorForm
         dataUrl={dataUrl}
         secret={secret}
+        otpauthUrl={otpauthUrl}
+        previousStep={this.previousStep}
         errored={errored}
         nextStep={this.nextStep}
         twoFactorCode={twoFactorCode}

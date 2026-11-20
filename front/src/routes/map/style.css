@@ -86,6 +86,28 @@
   background: #eef3fb;
 }
 
+/* Collapsed navigation rail (components/header): the page keeps a slim
+   gutter on the left for the floating expand button, which on every other
+   page shows the scene behind it — here it would be a blank band beside the
+   tiles. The map slides back under it (--gladys-sidebar-offset,
+   style/index.css) and its top-left controls step aside for the button. Only
+   while collapsed: under the expanded rail the map would be centered 7.5rem
+   off what the user sees. And only the full-page map (.mapFullPage): the
+   zone form shares .mapPage but is a regular wallpaper page. */
+@media (min-width: 992px) {
+  :global(body.gladys-sidebar-collapsed) .mapFullPage {
+    margin-left: calc(-1 * var(--gladys-sidebar-offset));
+  }
+
+  :global(body.gladys-sidebar-collapsed) .mapFullPage :global(.leaflet-top.leaflet-left) {
+    left: var(--gladys-sidebar-offset);
+  }
+
+  :global(body.gladys-sidebar-animating) .mapFullPage {
+    transition: margin-left 0.22s ease;
+  }
+}
+
 /* zoom control: a vertical frosted capsule (the .leaflet-touch variant is
    repeated so this wins over Leaflet's own touch styles by specificity).
    No overflow: hidden — it would clip the keyboard focus ring of the zoom

@@ -1,7 +1,22 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
-const { authenticatedRequest } = require('../request.test');
+const db = require('../../../models');
+const { USER_ROLE } = require('../../../utils/constants');
+const { authenticatedRequest, nonAdminRequest, NON_ADMIN_USER_ID } = require('../request.test');
+
+const seedNonAdminUser = () =>
+  db.User.create({
+    id: NON_ADMIN_USER_ID,
+    firstname: 'Pepper',
+    lastname: 'Potts',
+    selector: 'pepper-habitant',
+    email: 'pepper-habitant@pots.com',
+    password: 'mysuperpassword',
+    role: USER_ROLE.HABITANT,
+    language: 'en',
+    birthdate: '1990-12-12',
+  });
 
 describe('GET /api/v1/system/info', () => {
   it('should return system infos', async () => {
@@ -13,6 +28,81 @@ describe('GET /api/v1/system/info', () => {
         expect(res.body).to.have.property('platform');
         expect(res.body).to.have.property('nodejs_version');
       });
+  });
+});
+
+describe('GET /api/v1/system/clock', () => {
+  it('should return the current time of the server', async () => {
+    const before = Date.now();
+    await authenticatedRequest
+      .get('/api/v1/system/clock')
+      .expect('Content-Type', /json/)
+      .expect('Cache-Control', 'no-store')
+      .expect(200)
+      .then((res) => {
+        const serverTime = Date.parse(res.body.server_time);
+        expect(serverTime).to.be.at.least(before);
+        expect(serverTime).to.be.at.most(Date.now());
+      });
+  });
+});
+
+describe('GET /api/v1/system/clock/sync', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should return the network time synchronization status of the host', async () => {
+    const status = { available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false };
+    const getTimeSyncStatus = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'getTimeSyncStatus').resolves(status);
+    await authenticatedRequest
+      .get('/api/v1/system/clock/sync')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal(status);
+      });
+    sinon.assert.calledOnceWithExactly(getTimeSyncStatus, { refresh: false });
+  });
+
+  it('should read the status again when asked to refresh it', async () => {
+    const status = { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: true };
+    const getTimeSyncStatus = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'getTimeSyncStatus').resolves(status);
+    await authenticatedRequest.get('/api/v1/system/clock/sync?refresh=true').expect(200);
+    sinon.assert.calledOnceWithExactly(getTimeSyncStatus, { refresh: true });
+  });
+
+  it('should be reserved to admins', async () => {
+    await seedNonAdminUser();
+    const getTimeSyncStatus = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'getTimeSyncStatus');
+    await nonAdminRequest.get('/api/v1/system/clock/sync').expect(403);
+    sinon.assert.notCalled(getTimeSyncStatus);
+  });
+});
+
+describe('POST /api/v1/system/clock/sync', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should turn on the network time synchronization of the host', async () => {
+    const status = { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: false };
+    const enableTimeSync = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'enableTimeSync').resolves(status);
+    await authenticatedRequest
+      .post('/api/v1/system/clock/sync')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal(status);
+      });
+    sinon.assert.calledOnce(enableTimeSync);
+  });
+
+  it('should be reserved to admins', async () => {
+    await seedNonAdminUser();
+    const enableTimeSync = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'enableTimeSync');
+    await nonAdminRequest.post('/api/v1/system/clock/sync').expect(403);
+    sinon.assert.notCalled(enableTimeSync);
   });
 });
 

@@ -56,7 +56,6 @@ describe('Mqtt.listenToCustomMqttTopicIfNeeded', () => {
     expect(mqttHandler.deviceFeatureCustomMqttTopics).to.deep.equal([
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: null,
       },
@@ -87,7 +86,6 @@ describe('Mqtt.listenToCustomMqttTopicIfNeeded', () => {
     expect(mqttHandler.deviceFeatureCustomMqttTopics).to.deep.equal([
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'data.temperature',
       },
@@ -137,7 +135,6 @@ describe('Mqtt.listenToCustomMqttTopicIfNeeded', () => {
     expect(notConnectedMqttHandler.deviceFeatureCustomMqttTopics).to.deep.equal([
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: null,
       },
@@ -197,13 +194,11 @@ describe('Mqtt.listenToCustomMqttTopicIfNeeded', () => {
     expect(mqttHandler.deviceFeatureCustomMqttTopics).to.deep.equal([
       {
         device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'data.temperature',
       },
       {
         device_feature_id: 'a6dd0aef-9432-4ed4-a313-5d4800acdcfb',
-        regex_key: 'custom_mqtt_topic/test/test',
         topic: 'custom_mqtt_topic/test/test',
         object_path: 'data.co2',
       },

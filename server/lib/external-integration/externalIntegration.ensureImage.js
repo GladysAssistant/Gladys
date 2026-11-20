@@ -16,13 +16,15 @@ const { BadParameters } = require('../../utils/coreErrors');
  * @param {object} [options] - Options.
  * @param {boolean} [options.allowLocal] - Fall back on a locally present
  * image when the pull fails (dev installs only).
+ * @param {AbortSignal} [options.abortSignal] - Aborting it stops the download
+ * (the pull then fails like any other).
  * @returns {Promise} Resolves when the image is available on the machine.
  * @example
  * await gladys.externalIntegration.ensureImage('my-integration:dev', { allowLocal: true });
  */
-async function ensureImage(image, { allowLocal = false } = {}) {
+async function ensureImage(image, { allowLocal = false, abortSignal } = {}) {
   try {
-    await this.system.pull(image);
+    await this.system.pull(image, undefined, { abortSignal });
     return;
   } catch (e) {
     let existsLocally = false;

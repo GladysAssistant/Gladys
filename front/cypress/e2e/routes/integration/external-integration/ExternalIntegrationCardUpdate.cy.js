@@ -128,6 +128,69 @@ describe('External integration - update from the catalog card', () => {
     });
   });
 
+  it('does not offer a version that requires a newer Gladys, and says so', () => {
+    // its update could only re-pull the running image: no button, no count,
+    // the card tells the admin to update Gladys first
+    const zigbee = {
+      ...buildIntegration('ext-zigbee', 'Zigbee Bridge', '1.0.0', '2.0.0'),
+      update_available: false,
+      update_requires_gladys_version: '>=99.0.0'
+    };
+    cy.intercept('GET', '**/api/v1/external_integration', [zigbee, LINKY]).as('getInstalledIncompatible');
+    cy.visit('/dashboard/integration/installed');
+    cy.wait('@getInstalledIncompatible');
+
+    getCard('Zigbee Bridge').within(() => {
+      cy.contains('v1.0.0').should('exist');
+      cy.contains('v2.0.0').should('exist');
+      cy.get('.text-warning').should('contain', '>=99.0.0');
+      cy.contains('button', 'integration.root.updateButton').should('not.exist');
+    });
+    // the card of an update this Gladys can apply is left untouched
+    getCard('Linky Teleinfo').within(() => {
+      cy.contains('button', 'integration.root.updateButton').should('be.visible');
+    });
+
+    // only the update this Gladys can apply is to update
+    cy.get('.col-lg-3')
+      .contains('a', 'integration.root.menu.updates')
+      .click();
+    getCard('Linky Teleinfo').should('exist');
+    getCard('Zigbee Bridge').should('not.exist');
+  });
+
+  it('says which version an update could not apply instead of "Updated"', () => {
+    cy.visit('/dashboard/integration/installed');
+    cy.wait('@getInstalled');
+    getCard('Daikin Onecta').within(() => {
+      cy.contains('button', 'integration.root.updateButton').should('be.visible');
+    });
+
+    // the image of the new version is not published yet: the running one was
+    // re-pulled, the version did not change and the flag is still up
+    cy.intercept('POST', `**/api/v1/external_integration/${DAIKIN.selector}/update`, {
+      ...DAIKIN,
+      update_available: undefined,
+      latest_version: undefined,
+      skipped_update: { version: '1.0.0', reason: 'IMAGE_UNAVAILABLE', gladys_version: null }
+    }).as('updateDaikinSkipped');
+    cy.intercept('GET', '**/api/v1/external_integration', [DAIKIN, LINKY]).as('getInstalledAfterSkip');
+    getCard('Daikin Onecta').within(() => {
+      cy.contains('button', 'integration.root.updateButton').click();
+    });
+    cy.wait('@updateDaikinSkipped');
+    cy.wait('@getInstalledAfterSkip');
+
+    getCard('Daikin Onecta').within(() => {
+      cy.get('.text-warning')
+        .should('contain', 'v1.0.0')
+        .and('contain', 'v0.9.1');
+      cy.get('.text-success').should('not.exist');
+      // retrying right away would end the same way
+      cy.contains('button', 'integration.root.updateButton').should('not.exist');
+    });
+  });
+
   it('keeps an updated card in "To update" only until the user leaves the view', () => {
     cy.visit('/dashboard/integration/updates');
     cy.wait('@getInstalled');

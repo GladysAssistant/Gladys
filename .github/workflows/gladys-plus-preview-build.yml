@@ -1,0 +1,62 @@
+name: Gladys Plus preview build
+run-name: Gladys Plus preview build ${{ github.head_ref }}
+
+# First half of the Gladys Plus pull request previews: builds the front in
+# Gladys Plus mode, WITHOUT any secret, and uploads it as an artifact. The
+# second half (gladys-plus-preview-deploy.yml) runs from master on
+# `workflow_run`, uploads that artifact as a preview version of the Gladys Plus
+# Worker and comments its URL. The code of the pull request therefore never
+# runs next to the Cloudflare token.
+
+on:
+  pull_request:
+    # claude/** gives stacked pull requests (based on a feature branch
+    # instead of master) a preview too, like docker-pr-build.yml.
+    branches: [master, 'claude/**']
+    paths:
+      - 'front/**'
+      # The version of the root package.json is baked into the front.
+      - 'package.json'
+      - '.github/workflows/gladys-plus-preview-*.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Gladys Plus front
+    # Like Cloudflare Pages before, no preview for pull requests coming from
+    # forks: they would publish any content on the Gladys Plus preview URLs.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🏗️ Build Gladys Plus front
+        working-directory: ./front
+        env:
+          GATEWAY_MODE: true
+        run: |
+          npm run build
+      - name: ↗️ Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gladys-plus-front
+          path: front/build
+          retention-days: 3
+          if-no-files-found: error

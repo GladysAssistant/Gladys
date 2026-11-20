@@ -1,4 +1,5 @@
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Localizer, Text } from 'preact-i18n';
@@ -39,7 +40,7 @@ class AskAI extends Component {
       if (this.props.action.camera) {
         selectedCameraOption = cameraOptions.find(option => option.value === this.props.action.camera) || '';
       }
-      this.setState({ userOptions, cameraOptions, selectedUserOption, selectedCameraOption }, () => {
+      this.setState({ userOptions, cameraOptions, cameras, selectedUserOption, selectedCameraOption }, () => {
         actionUpdates.forEach(([key, value]) => this.props.updateActionProperty(this.props.path, key, value));
       });
       return userOptions;
@@ -64,6 +65,8 @@ class AskAI extends Component {
       this.props.updateActionProperty(this.props.path, 'camera', undefined);
     }
   };
+  // on a phone the camera is picked in the device picker sheet
+  handleCameraPickerChange = ([camera]) => this.handleCameraChange(camera ? { value: camera } : null);
 
   refreshSelectedOptions = nextProps => {
     let selectedUserOption = '';
@@ -135,6 +138,7 @@ class AskAI extends Component {
       userOptions,
       selectedCameraOption,
       cameraOptions,
+      cameras,
       externalProviderActive,
       externalProviderName
     }
@@ -214,18 +218,28 @@ class AskAI extends Component {
           <label className="form-label">
             <Text id="editScene.actionsCard.askAi.cameraLabel" />
           </label>
-          <Select
-            styles={{
-              // Fixes the overlapping problem of the component
-              menu: provided => ({ ...provided, zIndex: 2 })
-            }}
-            options={cameraOptions}
-            value={selectedCameraOption}
-            onChange={this.handleCameraChange}
-            isClearable
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+          <DevicePickerField
+            devices={cameras || null}
+            selected={props.action.camera ? [props.action.camera] : []}
+            onChange={this.handleCameraPickerChange}
+            pickDevices
+            single
+            clearable
+            defaultIcon="camera"
+          >
+            <Select
+              styles={{
+                // Fixes the overlapping problem of the component
+                menu: provided => ({ ...provided, zIndex: 2 })
+              }}
+              options={cameraOptions}
+              value={selectedCameraOption}
+              onChange={this.handleCameraChange}
+              isClearable
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </DevicePickerField>
         </div>
       </div>
     );

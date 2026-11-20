@@ -232,7 +232,7 @@ function createActions(store) {
           houseCreatedOrUpdated = await state.httpClient.post(`/api/v1/house`, house);
         }
 
-        const promises = house.rooms.map(async room => {
+        const saveRoom = room => {
           if (room.to_delete) {
             return state.httpClient.delete(`/api/v1/room/${room.selector}`);
           }
@@ -242,9 +242,24 @@ function createActions(store) {
             return state.httpClient.patch(`/api/v1/room/${room.selector}`, { name: room.name });
           }
           return room;
-        });
-
-        const rooms = await Promise.all(promises);
+        };
+        // The rooms are saved in three passes — deletions, then renames, then creations — and
+        // not all at once: the name of a room is unique, and the one a deletion or a rename
+        // frees must be free when a new room (or another rename) asks for it.
+        const isDeletion = room => Boolean(room.to_delete);
+        const isCreation = room => !room.to_delete && !room.id;
+        const rooms = new Array(house.rooms.length);
+        const savePass = keep =>
+          Promise.all(
+            house.rooms.map(async (room, index) => {
+              if (keep(room)) {
+                rooms[index] = await saveRoom(room);
+              }
+            })
+          );
+        await savePass(isDeletion);
+        await savePass(room => !isDeletion(room) && !isCreation(room));
+        await savePass(isCreation);
         const roomsWithoutDeleted = rooms.filter(room => room.selector !== undefined);
 
         // the state may have moved while the request was in flight (another

@@ -1,4 +1,5 @@
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
@@ -16,6 +17,7 @@ import style from '../../../../components/boxs/music/MusicBox.css';
 class PlayMedia extends Component {
   state = {
     devicesOptions: null,
+    devices: null,
     selectedDeviceOption: '',
     // the on-demand operations of the selected player; null while unknown, false when the player
     // has no catalog (an internal service's player, or an integration without `music`)
@@ -32,7 +34,7 @@ class PlayMedia extends Component {
         value: device.selector,
         label: device.name
       }));
-      await this.setState({ devicesOptions });
+      await this.setState({ devicesOptions, devices });
       this.refreshSelectedOptions(this.props);
     } catch (e) {
       console.error(e);
@@ -73,6 +75,9 @@ class PlayMedia extends Component {
     this.getCapabilities(device);
   };
 
+  // on a phone the player is picked in the device picker sheet
+  handlePickerChange = ([device]) => this.handleDeviceChange(device ? { value: device } : null);
+
   pickMedia = item => {
     this.props.updateActionProperty(this.props.path, 'media', { id: item.id, type: item.type, title: item.title });
     this.setState({ picking: false });
@@ -109,7 +114,7 @@ class PlayMedia extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { devicesOptions, selectedDeviceOption, capabilities, picking }) {
+  render(props, { devicesOptions, devices, selectedDeviceOption, capabilities, picking }) {
     const { media, device, mode } = props.action;
     const canEnqueue = Boolean(capabilities && capabilities.append);
     return (
@@ -124,17 +129,26 @@ class PlayMedia extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select
-            styles={{
-              // Fixes the overlapping problem of the component
-              menu: provided => ({ ...provided, zIndex: 2 })
-            }}
-            options={devicesOptions}
-            value={selectedDeviceOption}
-            onChange={this.handleDeviceChange}
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+          <DevicePickerField
+            devices={devices}
+            selected={props.action.device ? [props.action.device] : []}
+            onChange={this.handlePickerChange}
+            pickDevices
+            single
+            defaultIcon="speaker"
+          >
+            <Select
+              styles={{
+                // Fixes the overlapping problem of the component
+                menu: provided => ({ ...provided, zIndex: 2 })
+              }}
+              options={devicesOptions}
+              value={selectedDeviceOption}
+              onChange={this.handleDeviceChange}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </DevicePickerField>
         </div>
         {device && capabilities === false && (
           <p class="text-muted small">

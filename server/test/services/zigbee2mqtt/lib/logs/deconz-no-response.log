@@ -1,0 +1,13 @@
+Starting Zigbee2MQTT without watchdog.
+[2026-11-06 18:53:24] [32minfo[39m: 	z2m: Logging to console, file (filename: log.log)
+[2026-11-06 18:53:24] [32minfo[39m: 	z2m: Starting Zigbee2MQTT version 2.14.2 (commit #5c0c1c60078e1737c5dee5f8217583bca7610e66
+)
+[2026-11-06 18:53:24] [32minfo[39m: 	z2m: Starting zigbee-herdsman (10.10.0)
+[2026-11-06 18:53:44] [31merror[39m: 	z2m: Error while starting zigbee-herdsman
+[2026-11-06 18:53:44] [31merror[39m: 	z2m: Failed to start zigbee-herdsman
+[2026-11-06 18:53:44] [31merror[39m: 	z2m: Check https://www.zigbee2mqtt.io/guide/installation/20_zigbee2mqtt-fails-to-start_crashes-runtime.html for possible solutions
+[2026-11-06 18:53:44] [31merror[39m: 	z2m: Exiting...
+[2026-11-06 18:53:44] [31merror[39m: 	z2m: Error: failed to start adapter connection to firmware
+    at Timeout.<anonymous> (/app/node_modules/.pnpm/zigbee-herdsman@10.10.0_supports-color@7.2.0/node_modules/zigbee-herdsman/src/adapter/deconz/adapter/deconzAdapter.ts:107:28)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)

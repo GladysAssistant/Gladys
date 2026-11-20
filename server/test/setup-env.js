@@ -3,7 +3,12 @@ const path = require('path');
 // This file is loaded first via mocha --require (see package.json "test" scripts).
 // It must run before any module that reads getConfig() / models (e.g. bootstrap.test.js).
 
-const DEV_DB = path.resolve(__dirname, '../gladys-development.db');
+// The development database is in the data folder, or still at the root of server/ on a
+// checkout that predates the data folder (see utils/getDevelopmentDataPaths.js).
+const DEV_DBS = [
+  path.resolve(__dirname, '../gladys-data/gladys-development.db'),
+  path.resolve(__dirname, '../gladys-development.db'),
+];
 
 if (process.env.NODE_ENV !== 'test') {
   throw new Error(
@@ -120,7 +125,7 @@ process.on('exit', () => {
 
 const resolvedDb = path.resolve(process.env.SQLITE_FILE_PATH);
 
-if (resolvedDb === DEV_DB) {
+if (DEV_DBS.includes(resolvedDb)) {
   throw new Error(
     'Refusing to run tests against gladys-development.db. Unset SQLITE_FILE_PATH or use ./gladys-test.db (npm test sets this automatically).',
   );

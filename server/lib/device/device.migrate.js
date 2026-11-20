@@ -6,6 +6,7 @@ const { NotFoundError, BadParameters, ConflictError } = require('../../utils/cor
 const { EVENTS } = require('../../utils/constants');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const { parseSelectorList, serializeSelectorList } = require('../../utils/thermostatSelectorList');
+const { isTooMuchStatesError } = require('./device.destroy');
 
 // Fields carrying selectors in scene actions/triggers and dashboard boxes.
 // This list is a contract with the Joi schemas of models/scene.js and
@@ -32,7 +33,8 @@ const FEATURE_PARAM_NAMES = [
 // (docs/specs/thermostat.md A.1.1): several windows, several temperature probes.
 const FEATURE_LIST_PARAM_NAMES = ['THERMOSTAT_TEMPERATURE_FEATURE', 'THERMOSTAT_WINDOW_FEATURE'];
 const FEATURE_ARRAY_FIELDS = ['device_features'];
-const DEVICE_STRING_FIELDS = ['device', 'camera'];
+// `electric_meter`: the meter of the energy-price box and of the energy price trigger / condition
+const DEVICE_STRING_FIELDS = ['device', 'camera', 'electric_meter'];
 const DEVICE_ARRAY_FIELDS = ['devices'];
 
 // Progress range of the DuckDB history move, spread over the slices below so a
@@ -91,7 +93,9 @@ function rewriteReferences(item, featureReplacements, deviceReplacements) {
  * @description Replace selectors in scene actions/triggers or dashboard boxes. Handles both
  * flat arrays (triggers) and arrays of arrays (actions, boxes), and recurses into the nested
  * actions of condition.if-then-else (`if` is a flat list, `then`/`else` are arrays of arrays)
- * and of condition.while (`if` is a flat list, `then` is an array of arrays, no `else`).
+ * and of condition.while (`if` is a flat list, `then` is an array of arrays, no `else`), and
+ * into the `conditions` of condition.only-continue-if (a flat list of condition objects, each
+ * naming a feature in `device_feature` when it compares the current state of a device).
  * @param {Array} items - Array of items (or of arrays of items), mutated in place.
  * @param {object} featureReplacements - Map of source feature selector to destination feature selector.
  * @param {object} deviceReplacements - Map of source device selector to destination device selector.
@@ -109,6 +113,9 @@ function rewriteItems(items, featureReplacements, deviceReplacements) {
       return;
     }
     if (rewriteReferences(item, featureReplacements, deviceReplacements)) {
+      changed = true;
+    }
+    if (Array.isArray(item.conditions) && rewriteItems(item.conditions, featureReplacements, deviceReplacements)) {
       changed = true;
     }
     if (Array.isArray(item.if) && rewriteItems(item.if, featureReplacements, deviceReplacements)) {
@@ -521,7 +528,10 @@ async function executeMigration(selector, options, jobId) {
   // Device params naming a mapped feature (B.3) are re-pointed like the scenes
   // and the dashboards below; the devices carrying them are refreshed with the
   // others and notified, so their service drops what it cached from them.
-  const featureReplacements = {};
+  // The replacement maps are looked up with selectors read from scenes, dashboards and params,
+  // which are free text: without a prototype, a selector named like a member of Object
+  // ("constructor", "toString") finds nothing instead of finding that member.
+  const featureReplacements = Object.create(null);
   pairs.forEach(({ sourceFeature, destinationFeature }) => {
     featureReplacements[sourceFeature.selector] = destinationFeature.selector;
   });
@@ -590,7 +600,8 @@ async function executeMigration(selector, options, jobId) {
   await this.job.updateProgress(jobId, 70, { step: 'rewriting_scenes' });
 
   // Rewrite scenes then dashboards with the selector replacement maps.
-  const deviceReplacements = { [source.selector]: destination.selector };
+  const deviceReplacements = Object.create(null);
+  deviceReplacements[source.selector] = destination.selector;
 
   const scenesUpdated = [];
   const scenes = await db.Scene.findAll();
@@ -631,7 +642,17 @@ async function executeMigration(selector, options, jobId) {
 
   await this.job.updateProgress(jobId, 95, { step: 'deleting_source_device' });
 
-  await this.destroy(source.selector);
+  try {
+    await this.destroy(source.selector, { migration: true });
+  } catch (e) {
+    // The source saved states again while scenes and dashboards were rewritten, and went back
+    // over the limit: its history is purged in the background, then it is deleted on its own.
+    // The migration itself is done.
+    if (!isTooMuchStatesError(e)) {
+      throw e;
+    }
+    logger.info(`Migrated device ${selector}: the source device is deleted in the background (${e.message})`);
+  }
 
   logger.info(
     `Migrated device ${selector} to ${destinationSelector}: ${duckDbStatesMigrated} states moved,` +
@@ -671,6 +692,14 @@ async function migrate(selector, options, jobId) {
   const conflictingSelector = selectorsToLock.find((deviceSelector) => this.migrationsInProgress.has(deviceSelector));
   if (conflictingSelector) {
     throw new ConflictError(`A migration is already in progress for device ${conflictingSelector}`);
+  }
+  // A device being deleted in the background is losing its history, and is deleted at the end:
+  // it is neither a source nor a destination
+  const selectorBeingDestroyed = selectorsToLock.find((deviceSelector) =>
+    [...this.devicesBeingDestroyed.values()].some((deletion) => deletion.selector === deviceSelector),
+  );
+  if (selectorBeingDestroyed) {
+    throw new ConflictError(`Device ${selectorBeingDestroyed} is being deleted`);
   }
   selectorsToLock.forEach((deviceSelector) => this.migrationsInProgress.add(deviceSelector));
   try {

@@ -6,18 +6,76 @@ import get from 'get-value';
 import { PARAMS } from '../../../../../../../server/services/bluetooth/lib/utils/bluetooth.constants';
 
 import BluetoothPeripheralFeatures from './BluetoothPeripheralFeatures';
+import { MobilePill } from '../../../../../components/mobile';
+import { MobileDeviceItem } from '../../../../../components/integration/mobile';
 
 class BluetoothPeripheral extends Component {
   scan = () => {
     this.props.scan(this.props.peripheral.selector);
   };
 
-  render({ peripheral, currentIntegration }) {
+  render({ peripheral, currentIntegration, isMobile }) {
     const params = peripheral.params || [];
     const manufacturerParam = params.find(p => p.name === PARAMS.MANUFACTURER);
     const manufacturerValue = (manufacturerParam || { value: null }).value;
     const peripheralService = get(peripheral, 'service_id');
     const bluetoothDevice = !peripheralService || peripheralService === currentIntegration.id;
+
+    // On a phone: a row and its sheet (docs/specs/mobile-pages/integration-devices.md). The
+    // button of the card leads to the same configuration page.
+    if (isMobile) {
+      let primaryAction;
+      if (!bluetoothDevice) {
+        primaryAction = {
+          label: (
+            <Text
+              id="integration.bluetooth.discover.notManagedByBluteoothButton"
+              fields={{ service: get(peripheral, 'service.name') }}
+            />
+          ),
+          disabled: true
+        };
+      } else {
+        primaryAction = {
+          label: (
+            <Text
+              id={
+                peripheralService
+                  ? 'integration.bluetooth.discover.updateDeviceInGladys'
+                  : 'integration.bluetooth.discover.createDeviceInGladys'
+              }
+            />
+          ),
+          href: `/dashboard/integration/device/bluetooth/setup/${peripheral.selector}`,
+          dataCy: 'bluetooth-peripheral-configure'
+        };
+      }
+      return (
+        <MobileDeviceItem
+          device={peripheral}
+          icon="bluetooth"
+          subtitle={[manufacturerValue, peripheral.model].filter(Boolean).join(' · ') || peripheral.external_id}
+          status={
+            peripheralService && (
+              <MobilePill tone={bluetoothDevice ? 'success' : undefined}>
+                {bluetoothDevice ? <Text id="mobileDeviceList.inGladys" /> : get(peripheral, 'service.name')}
+              </MobilePill>
+            )
+          }
+          details={[
+            {
+              label: <Text id="integration.bluetooth.device.externalIdLabel" />,
+              value: peripheral.external_id,
+              mono: true
+            },
+            { label: <Text id="integration.bluetooth.device.manufacturerLabel" />, value: manufacturerValue },
+            { label: <Text id="integration.bluetooth.device.modelLabel" />, value: peripheral.model }
+          ]}
+          primaryAction={primaryAction}
+          dataCy="bluetooth-peripheral-row"
+        />
+      );
+    }
 
     return (
       <div class="col-md-6">

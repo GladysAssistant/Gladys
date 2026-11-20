@@ -1,0 +1,34 @@
+/* The days of the week as seven toggles (docs/specs/scene-editor-mobile.md, E.11): each one a
+   44px target, the seven on one line down to a 320px screen */
+.days {
+  display: flex;
+  gap: 4px;
+}
+
+.day {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 2px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #3d4656;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  background-color: #eef1f6;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.daySelected {
+  color: #fff;
+  background-color: #2f5bd8;
+}
+
+.day:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}

@@ -124,7 +124,7 @@ export class ServicesStartupMobileStrip extends Component {
     return (
       <button
         type="button"
-        class={cx(style.startupMobileStrip, 'd-lg-none')}
+        class={cx(style.startupMobileStrip, 'd-lg-none', 'gladys-services-startup-strip')}
         onClick={onClick}
         data-cy="services-startup-mobile-strip"
         aria-controls="sidebar-navigation"

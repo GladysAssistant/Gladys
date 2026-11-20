@@ -78,26 +78,6 @@ function createActions(store) {
         permitJoin: value
       });
     },
-    async checkStatus(state) {
-      let zigbee2mqttStatus = {
-        usbConfigured: false,
-        mqttExist: false,
-        mqttRunning: false,
-        zigbee2mqttExist: false,
-        zigbee2mqttRunning: false,
-        gladysConnected: false,
-        zigbee2mqttConnected: false,
-        z2mEnabled: false
-      };
-      try {
-        zigbee2mqttStatus = await state.httpClient.get('/api/v1/service/zigbee2mqtt/status');
-      } finally {
-        store.setState({
-          gladysConnected: zigbee2mqttStatus.gladysConnected,
-          zigbee2mqttConnected: zigbee2mqttStatus.zigbee2mqttConnected
-        });
-      }
-    },
     updateDeviceField(state, index, field, value) {
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
         [index]: {
