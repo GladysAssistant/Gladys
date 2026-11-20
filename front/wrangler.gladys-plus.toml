@@ -14,13 +14,14 @@
 name = "gladys-plus"
 compatibility_date = "2026-10-01"
 
-# Production is only served on the custom domain below...
+# Production is only served on the custom domain plus.gladysassistant.com,
+# attached to the Worker in the Cloudflare dashboard (Settings > Domains &
+# Routes), not here: with no `routes` in this file, `wrangler deploy` leaves the
+# domains of the Worker untouched.
 workers_dev = false
-# ...but every uploaded version (and every pull request alias) gets its own
+# Every uploaded version (and every pull request alias) still gets its own
 # preview URL on workers.dev.
 preview_urls = true
-
-routes = [{ pattern = "plus.gladysassistant.com", custom_domain = true }]
 
 [assets]
 directory = "./build"

@@ -290,11 +290,11 @@ lives in the `gladys-plus-preview` environment, whose deployment policy
 only accepts `master`. Never move the upload into the `pull_request`
 workflow, and never check out the pull request in the deploy workflow.
 
-The same Worker token is used in both environments. It is created from the
-"Edit Cloudflare Workers" template of Cloudflare, restricted to the Gladys
-account and to the `gladysassistant.com` zone: the production deploy also
-attaches the custom domain `plus.gladysassistant.com`, declared in the
-Wrangler configuration.
+The same Worker token is used in both environments. It only needs the
+"Workers Scripts: Edit" permission on the Gladys account: the custom domain
+`plus.gladysassistant.com` is attached to the Worker in the Cloudflare
+dashboard, not in the Wrangler configuration, and `wrangler deploy` leaves it
+untouched.
 
 ### Review and fix bots
 
