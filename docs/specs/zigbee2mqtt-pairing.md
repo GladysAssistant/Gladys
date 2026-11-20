@@ -43,9 +43,17 @@ and zigbee-herdsman `controller.ts`):
   `data.time > 0`, its end estimated as now + `time` until the `bridge/info` that follows tells the
   exact one; a refused request changes nothing). Nothing else changes them: the branches of the legacy
   API of Zigbee2mqtt 1 (`bridge/config`, `bridge/config/permit_join`) are removed.
-- Forgotten (`false`, `null`) when Gladys disconnects from the broker (Stop, `disconnect`, `reset`),
-  and when `bridge/state` announces another run (a restarted Zigbee2mqtt starts with joining closed;
-  its `bridge/info` tells otherwise if needed).
+- An end is taken only when it falls between now − 2 s and now + 256 s by the clock of Gladys: the end of
+  an external Zigbee2mqtt whose host clock differs is not, nor the missing one of Zigbee2mqtt 1. The
+  open window then keeps the end it had (the estimate of the response), or none.
+- Forgotten (`false`, `null`, sent) when Gladys disconnects from the broker (Stop, `disconnect`,
+  `reset`) and at each `init`: the Zigbee2mqtt it connects to tells joining again (its retained
+  `bridge/info`). `bridge/state` changes nothing: retained, it is replayed at each reconnection and
+  proves no new run; a new run tells joining closed in its own `bridge/info`, a crash is told by the
+  health check.
+- `lastPermitJoinEnd`, the end of the last window seen open, survives this forgetting: the retained
+  `bridge/info` of the same window, told again after a reconnection or an init, is not a new window
+  (C.2).
 
 ### B.2 `zigbee2mqtt.permit-join` and `GET /permit_join`
 
@@ -95,12 +103,13 @@ opened:
 | `device_interview` `failed`                   | create `failed`         | `failed`                  | `failed` (a late failure of an earlier interview after `ready` is applied: Zigbee2mqtt says the last word) |
 | `device_leave`                                | —                       | removed                   | removed                            |
 | `bridge/devices`                              | —                       | name updated              | name updated; `device` computed again (`ready`) |
-| joining opens (`allowed` false → true)        | registry emptied        | emptied                   | emptied                            |
+| a new window opens (`allowed` false → true, end ≠ `lastPermitJoinEnd`) | registry emptied | emptied | emptied |
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
 - `device_announce` is ignored: every known device announces itself when it powers up.
 - Closing joining keeps the registry: an interview often ends after the window, and the user may add
-  the ready devices later. A new run of Zigbee2mqtt keeps it too.
+  the ready devices later. A new run of Zigbee2mqtt keeps it too, and so does the same window told again
+  after a reconnection or an init (B.1).
 - An event arriving while joining is closed (a device joining through the Zigbee2mqtt interface) is
   applied all the same.
 - `device` is read when the entry is sent, not stored: the `successful` event and the `bridge/devices`
@@ -136,17 +145,20 @@ device".
   /permit_join` `{ value: true }`) and **Stop** (`{ value: false }`); closed: "Joining closed" and
   **Permit joining** again. A request waits for Zigbee2mqtt to tell its outcome through
   `zigbee2mqtt.permit-join`, from the click (its answer may come before the one of the request): not
-  told within 10 s, refused (500), or joining told closed while asked to open, it failed (an error
-  under the header, the button back). A stop not confirmed while joining is already closed failed in
-  nothing. In the demo, the answer of the request is enough. Without a known end, no countdown.
+  told within 10 s, or refused by the server, it failed (an error under the header, the button back).
+  Joining told closed while asked to open is not a refusal (the end of the previous window): still
+  waited for. What was asked, told later, ends the request and clears its failure. A stop not
+  confirmed while joining is already closed failed in nothing. In the demo, the answer of the request
+  is enough. Without a known end, no countdown.
 - **Tips** (approach, pairing mode, add it here) while the registry is empty.
 - **One row per entry**, a timeline "Joined → Interview → Ready":
   - `joined`, `interviewing`: the step running, the friendly name (an IEEE address until the device
     has a name);
   - `ready`, `device` known, not in Gladys: a card — photo (D.3), suggested name (D.4, editable),
     room (optional, as in the Discover tab), **Add** (the request of the Discover tab:
-    `POST /api/v1/device` with the feature names of the dictionary and the states stripped). Added: "In
-    Gladys" with a link to the device;
+    `POST /api/v1/device` with the feature names of the dictionary and the states stripped, the device
+    read again from `GET /pairing`, which attaches its energy features to the main electric meter; the
+    message does not). Added: "In Gladys" with a link to the device;
   - `ready`, already in Gladys (`device.id`): "Already in Gladys" with a link (a device paired again);
   - `unsupported` (D60): "Not supported by Zigbee2MQTT" with the model when known and an explanation
     (Gladys cannot create its features); no Add;
@@ -154,8 +166,9 @@ device".
     mains-powered device, then put it in pairing mode again"; the row starts over if it joins again.
 - A device whose photo, name or row once ready is shown is never created without the click on **Add**
   (D6). A name typed by the user is kept when the registry comes again.
-- **Finish** (wizard) / **Close** (dashboard). Closing the window does not close joining (it closes by
-  itself); the registry stays on the server.
+- **Finish** (wizard) / **Close** (dashboard, Discover tab). Closing the window does not close joining
+  (it closes by itself); the registry stays on the server. Back on the dashboard or the Discover tab,
+  the devices of the network not in Gladys are read again: the ones just added are no longer new.
 - On a phone, the ready card is the sheet of the Discover tab (`MobileDeviceItem`, `primaryAction`
   "Add to Gladys"), opened from the row.
 
@@ -178,13 +191,16 @@ Zigbee2mqtt.
 
 - The window reads `GET /permit_join` and `GET /pairing` when it opens, and listens to both messages;
   a message is more recent than a request still running (request numbered, answer dropped if a message
-  came meanwhile).
+  came meanwhile). A `zigbee2mqtt.pairing` message clears the failure to read the list.
+- Opened while Zigbee2mqtt does not answer, the window asks for joining once it answers again, unless
+  the user asked something meanwhile.
 - The countdown is a timer of the component, stopped on unmount and when joining closes; it shows 0:00
   until Zigbee2mqtt tells joining closed.
 - An Add in flight keeps its card busy; its answer is applied only if the component is still mounted;
   a failure stays visible on the card.
-- Zigbee2mqtt no longer online (status): the header says that Zigbee2mqtt does not answer, Extend /
-  Allow are disabled; the rows stay.
+- Zigbee2mqtt no longer online (status): the header says that Zigbee2mqtt does not answer, or that
+  Gladys is not connected to the MQTT broker when that is the cause (`gladysConnected` false); no
+  button; the rows stay.
 
 ## E. Tests
 

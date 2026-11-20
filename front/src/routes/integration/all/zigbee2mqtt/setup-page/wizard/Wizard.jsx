@@ -556,6 +556,7 @@ class Wizard extends Component {
           httpClient={props.httpClient}
           session={props.session}
           online={Boolean(props.zigbee2mqttStatus.zigbee2mqttConnected)}
+          brokerConnected={props.zigbee2mqttStatus.gladysConnected}
           isMobile={props.isMobile}
         />
       )

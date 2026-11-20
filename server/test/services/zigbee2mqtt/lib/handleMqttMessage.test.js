@@ -493,18 +493,20 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
   });
 
-  it('should forget joining allowed when Zigbee2mqtt announces another run', async () => {
+  it('should keep joining and the devices seen joining when the bridge state is told again', async () => {
+    const end = Date.now() + 10000;
     zigbee2mqttManager.z2mPermitJoin = true;
-    zigbee2mqttManager.z2mPermitJoinEnd = Date.now() + 10000;
+    zigbee2mqttManager.z2mPermitJoinEnd = end;
+    zigbee2mqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'joined' } };
     zigbee2mqttManager.requestHealthCheck = fake();
-    // EXECUTE
+    // EXECUTE: the retained announcement, replayed when Gladys connects to the broker again
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/state', 'online');
     // ASSERT
-    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
-    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(null);
-    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(end);
+    expect(zigbee2mqttManager.pairingDevices).to.have.property('0x01');
+    assert.neverCalledWithMatch(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      payload: { allowed: false, remainingSeconds: null },
     });
   });
 

@@ -14,7 +14,11 @@ class Zigbee2mqttIntegration extends Component {
   // "Pair a device": the pairing window (docs/specs/zigbee2mqtt-pairing.md, D.1), back to the list once closed
   openPairing = () => this.setState({ pairing: true });
 
-  closePairing = () => this.setState({ pairing: false });
+  // The devices added from the window are no longer new: the list is read again
+  closePairing = () => {
+    this.setState({ pairing: false });
+    this.props.getDiscoveredDevices();
+  };
 
   componentWillMount() {
     this.props.session.dispatcher.addListener(
@@ -46,6 +50,7 @@ class Zigbee2mqttIntegration extends Component {
             httpClient={props.httpClient}
             session={props.session}
             online={Boolean(props.zigbee2mqttConnected)}
+            brokerConnected={props.gladysConnected}
             onClose={this.closePairing}
             backLabelId="integration.zigbee2mqtt.discoverTab"
           />

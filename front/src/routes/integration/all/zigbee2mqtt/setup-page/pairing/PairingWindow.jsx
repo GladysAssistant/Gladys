@@ -79,24 +79,30 @@ class PairingWindow extends Component {
     this.setState({ allowed, endsAt, now: Date.now() });
   };
 
-  // A message is more recent than a request still running: it is applied, the answer of the request is not
+  // A message is more recent than a request still running: it is applied, the answer of the request is not. What was
+  // asked happening ends the request, and clears its failure told before (a confirmation later than the 10 s). A close
+  // while asked to open is not a refusal (the end of the previous window): still waited for.
   handlePermitJoin = permitJoin => {
     this.permitJoinRequests += 1;
     this.applyPermitJoin(permitJoin);
     const allowed = Boolean(permitJoin && permitJoin.allowed);
-    const { request } = this.state;
-    if (request === REQUEST.ALLOW) {
+    const done = allowed ? REQUEST.ALLOW : REQUEST.STOP;
+    const { request, requestError } = this.state;
+    const changes = {};
+    if (request === done) {
       this.stopWaiting();
-      // Closed while asked to open: refused
-      this.setState({ request: null, requestError: allowed ? null : REQUEST.ALLOW });
-    } else if (request === REQUEST.STOP && !allowed) {
-      this.stopWaiting();
-      this.setState({ request: null, requestError: null });
+      changes.request = null;
     }
+    if (requestError === done) {
+      changes.requestError = null;
+    }
+    this.setState(changes);
   };
 
+  // Newer than the list read when the window opened, which could not be read perhaps
   handlePairing = entries => {
     this.pairingRequests += 1;
+    this.setState({ loadError: false });
     this.setEntries(entries || []);
   };
 
@@ -187,6 +193,20 @@ class PairingWindow extends Component {
 
   updateRoom = ieeeAddress => e => this.updateCard(ieeeAddress, { roomId: e.target.value });
 
+  // The device as GET /pairing gives it: attached to the main electric meter, which the message does not carry (C.3)
+  readDevice = async entry => {
+    try {
+      const entries = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/pairing');
+      const read = entries.find(candidate => candidate.ieee_address === entry.ieee_address);
+      if (read && read.device) {
+        return read.device;
+      }
+    } catch (e) {
+      console.error('Failed to read the device to add', e);
+    }
+    return entry.device;
+  };
+
   // The request of the Discover tab (feature names from the dictionary, states stripped). Resolves to false when it
   // failed: the phone sheet then stays open.
   add = async entry => {
@@ -195,17 +215,20 @@ class PairingWindow extends Component {
     if (!card || card.saving) {
       return false;
     }
+    this.updateCard(ieeeAddress, { saving: true, error: false });
     const dictionary = get(this.props, 'intl.dictionary');
+    const read = await this.readDevice(entry);
+    const { cards } = this.state;
+    const typed = cards[ieeeAddress] || card;
     const device = {
-      ...entry.device,
-      name: card.name.trim() || entry.friendly_name,
-      room_id: card.roomId || null,
-      features: (entry.device.features || []).map(feature => {
+      ...read,
+      name: typed.name.trim() || entry.friendly_name,
+      room_id: typed.roomId || null,
+      features: (read.features || []).map(feature => {
         const featureName = get(dictionary, `deviceFeatureCategory.${feature.category}.${feature.type}`);
         return featureName ? { ...feature, name: featureName } : feature;
       })
     };
-    this.updateCard(ieeeAddress, { saving: true, error: false });
     try {
       const saved = await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       if (!this.unmounted) {
@@ -241,6 +264,7 @@ class PairingWindow extends Component {
   // request. In the demo nothing answers: the request is enough.
   sendPermitJoin = async value => {
     const request = value ? REQUEST.ALLOW : REQUEST.STOP;
+    this.joiningAsked = true;
     this.stopWaiting();
     this.requestTimer = setTimeout(this.notConfirmed, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS);
     this.setState({ request, requestError: null });
@@ -307,6 +331,13 @@ class PairingWindow extends Component {
     }
   }
 
+  // Opened while Zigbee2mqtt did not answer: joining asked once it does, unless the user asked something meanwhile
+  componentDidUpdate(previousProps) {
+    if (this.props.online && !previousProps.online && !this.joiningAsked) {
+      this.allow();
+    }
+  }
+
   componentWillUnmount() {
     this.unmounted = true;
     const { dispatcher } = this.props.session;
@@ -318,11 +349,15 @@ class PairingWindow extends Component {
   }
 
   renderHeader() {
-    const { online, isMobile } = this.props;
+    const { online, isMobile, brokerConnected } = this.props;
     const { allowed, endsAt, now, request, requestError } = this.state;
     const remaining = allowed && endsAt !== null ? formatCountdown((endsAt - now) / 1000) : null;
+    // Gladys without its broker hears nothing of Zigbee2mqtt: the broker is said, not Zigbee2mqtt
+    const brokerLost = !online && brokerConnected === false;
     let title;
-    if (!online) {
+    if (brokerLost) {
+      title = <Text id={`${T}.brokerLost`} />;
+    } else if (!online) {
       title = <Text id={`${T}.notAnswering`} />;
     } else if (allowed) {
       title = <Text id={`${T}.open`} />;
@@ -405,7 +440,9 @@ class PairingWindow extends Component {
         ];
     const error = online && requestError && <Text id={`${T}.${requestError}Error`} />;
     let headerState = 'closed';
-    if (!online) {
+    if (brokerLost) {
+      headerState = 'broker-lost';
+    } else if (!online) {
       headerState = 'not-answering';
     } else if (allowed) {
       headerState = 'open';

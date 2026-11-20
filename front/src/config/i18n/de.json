@@ -2731,6 +2731,7 @@
       "pairing": {
         "open": "Anlernen erlaubt",
         "closed": "Anlernen geschlossen",
+        "brokerLost": "Gladys ist nicht mit dem MQTT-Broker verbunden: Anlernen kann nicht erlaubt werden",
         "notAnswering": "Zigbee2MQTT antwortet nicht: Anlernen kann nicht erlaubt werden",
         "allow": "Anlernen erlauben",
         "extend": "Verlängern",

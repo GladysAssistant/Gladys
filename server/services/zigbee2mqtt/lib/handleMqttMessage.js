@@ -33,8 +33,8 @@ async function handleMqttMessage(topic, message) {
         this.zigbee2mqttRunning = false;
         this.emitStatusEvent();
       }
-      // A new run starts with joining closed: its info tells otherwise
-      this.updatePermitJoin(false);
+      // Joining is left as it is: replayed on each reconnection, the announcement proves no new run, and a new run
+      // tells joining closed in its own bridge/info
       this.requestHealthCheck();
       break;
     }

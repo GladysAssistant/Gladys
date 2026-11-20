@@ -46,7 +46,10 @@ describe('zigbee2mqtt pairingDevices', () => {
 
   describe('handleBridgeEvent', () => {
     it('should follow a device that joins', () => {
-      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: IEEE, ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_joined',
+        data: { friendly_name: IEEE, ieee_address: IEEE },
+      });
       expect(lastSent()).to.deep.equal([
         {
           ieee_address: IEEE,
@@ -63,7 +66,10 @@ describe('zigbee2mqtt pairingDevices', () => {
     });
 
     it('should follow a device through its interview until it is ready', () => {
-      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: IEEE, ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_joined',
+        data: { friendly_name: IEEE, ieee_address: IEEE },
+      });
       zigbee2MqttManager.handleBridgeEvent({
         type: 'device_interview',
         data: { friendly_name: IEEE, ieee_address: IEEE, status: 'started' },

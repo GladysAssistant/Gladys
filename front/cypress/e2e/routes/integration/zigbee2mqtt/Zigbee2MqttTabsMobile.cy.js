@@ -414,6 +414,8 @@ describe('Zigbee2MQTT tabs on a phone', () => {
         .should('deep.equal', { value: true });
       cy.get('[data-cy=mobile-nav-back]').should('contain', i18n('integration.zigbee2mqtt.discoverTab'));
       cy.get('[data-cy=z2m-pairing-close]').click();
+      // The devices added from the window are no longer new: the list is read again
+      cy.get('@getDiscovered.all').should('have.length', 2);
       cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
       cy.get('[data-cy=z2m-discovered-row]').should('have.length', 4);
     });

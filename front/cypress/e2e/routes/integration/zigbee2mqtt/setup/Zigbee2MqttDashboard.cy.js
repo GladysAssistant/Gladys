@@ -84,7 +84,14 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
 
       // Joining goes on by itself: nothing is sent when the window closes
+      cy.get('@discovered.all').then(calls => {
+        cy.wrap(calls.length).as('discoveredBefore');
+      });
       cy.get('[data-cy=z2m-pairing-close]').click();
+      // The devices added from the window are no longer to add: read again
+      cy.get('@discoveredBefore').then(before => {
+        cy.get('@discovered.all').should('have.length', before + 1);
+      });
       cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-status]').should('have.attr', 'data-state', 'online');
       cy.get('@permitJoin.all').should('have.length', 1);

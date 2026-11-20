@@ -177,7 +177,7 @@ Under `/api/v1/service/zigbee2mqtt/`. A refusal answers 409 with the generic bod
 | `POST /z2m/start`   | authenticated | 409 when busy; 400 while stopped by the user (E.4), or when no coordinator of the adapter mode is configured                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `GET /status`       | authenticated | carries `installation` and `prefetch`, and `z2mVersion` / `deviceCount` (E.3)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `GET /adapter`      | authenticated | the coordinator models, each with how the wizard shows it (E.3)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `POST /permit_join` | authenticated | body `{ value }` (boolean, optional): `true` allows new devices to join for 254 s, `false` forbids it, no value toggles (Discover tab, from what Zigbee2mqtt last told); another value → 400; without a connection to the broker (not installed, disabled) → 400 `SERVICE_NOT_CONFIGURED`; Zigbee2mqtt not answering the health check → 400 `ZIGBEE2MQTT_NOT_ANSWERING`. Only publishes the request (`{ value, time }`: Zigbee2mqtt 1 needs `value`, 2 reads `time`): what Zigbee2mqtt answers (`bridge/response/permit_join`, `bridge/info`) is broadcast as `zigbee2mqtt.permit-join`, never the request itself                                                                              |
+| `POST /permit_join` | authenticated | body `{ value }` (boolean, optional): `true` allows new devices to join for 254 s, `false` forbids it, no value toggles (from what Zigbee2mqtt last told; the front always sends a value); another value → 400; without a connection to the broker (not installed, disabled) → 400 `SERVICE_NOT_CONFIGURED`; Zigbee2mqtt not answering the health check → 400 `ZIGBEE2MQTT_NOT_ANSWERING`. Only publishes the request (`{ value, time }`: Zigbee2mqtt 1 needs `value`, 2 reads `time`): what Zigbee2mqtt answers (`bridge/response/permit_join`, `bridge/info`) is broadcast as `zigbee2mqtt.permit-join`, never the request itself                                                                              |
 
 ### E.2 Job
 
@@ -549,7 +549,7 @@ holds the state, the requests and the decisions and builds one view; `WizardDesk
 The page shows the wizard when its configuration, once loaded, has no USB dongle, no network
 coordinator and no external broker (`isConfigured`). The choice is made once (`wizard` in
 `setup-page/index.js`): the wizard saves the configuration on its second step and stays until the user
-leaves it ("Later", "Finish", "Finish without pairing"), for the dashboard (N); a reset chooses the
+leaves it ("Later", "Finish"), for the dashboard (N); a reset chooses the
 wizard again. A first installation not finished (`setupPending`, E.3: saved, Zigbee2mqtt never
 answered) opens the wizard again when the page loads, even with a configuration: on step ② when the
 status follows an installation (running, failed with its Retry, done and waiting for an external
@@ -615,8 +615,8 @@ external broker: connection, check, network, first device).
 A focus page (mobile-pages C.1): its navigation bar back to the integrations, "Step 1 of 4" above a
 segmented bar, one decision per screen, the way forward in the bottom bar (two actions one above the
 other after ①; none while waiting for a dongle or while the installation runs; the change of
-connection while an external broker waits for Zigbee2mqtt), where a refused setup or a refused
-joining is told, with a close button. The detected dongle shows in large; the other
+connection while an external broker waits for Zigbee2mqtt; "Finish" at ④), where a refused setup is
+told, with a close button; a refused joining is told under the header of the pairing window. The detected dongle shows in large; the other
 choices (by hand, network coordinator, existing Zigbee2mqtt) open in a sheet, so does the port of a
 dongle chosen by hand; the models are rows with photos, without a scroll area of their own; "Back"
 in the bottom bar returns to the detected dongle. The installation turns a ring around the dongle,
@@ -626,16 +626,17 @@ its phases folded under it. No leave guard: nothing is lost, the installation go
 
 The Devices and Discover tabs tell "Zigbee2mqtt is not installed" with a button to the setup tab when
 the status says `configured: false` (E.3), instead of the messages of a Zigbee2mqtt that does not
-answer; that banner only (not the warning about the interface URL), and the switch to permit joining
-disabled. Stopped by the user (`stopped`, E.4), they tell that Zigbee2mqtt is stopped, with the link to
+answer; that banner only (not the warning about the interface URL), and "Pair a device" of the
+Discover tab disabled. Stopped by the user (`stopped`, E.4), they tell that Zigbee2mqtt is stopped, with the link to
 the setup tab where it is started, instead of blaming the broker that Gladys left on purpose.
 
 ### M.5 Tests
 
 Cypress, `front/cypress/e2e/routes/integration/zigbee2mqtt/setup/`: `Zigbee2MqttWizard.cy.js` (every
 screen of M.2, the payloads, the previous installation hidden on Retry and forgotten once cleared,
-the refusals, the ezsp fallback and its Retry, the external broker waiting for Zigbee2mqtt, joining
-closed by Zigbee2mqtt, the status not readable, the downloads in the background), the reset to the
+the refusals, the ezsp fallback and its Retry, the external broker waiting for Zigbee2mqtt, step ④
+showing the pairing window, the status not readable, the downloads in the background; the window
+itself in `Zigbee2MqttPairing.cy.js`), the reset to the
 wizard in `Zigbee2MqttDashboardSettings.cy.js` and `Zigbee2MqttWizardMobile.cy.js` (`iphone-x`: the focus
 page, the bottom bar, the sheets, the breakpoint crossed), fixtures in `wizardFixtures.js`;
 `Zigbee2MqttStatus.cy.js` for the not-installed banner.

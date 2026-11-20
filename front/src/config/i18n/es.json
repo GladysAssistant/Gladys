@@ -2487,6 +2487,7 @@
       "pairing": {
         "open": "Incorporación permitida",
         "closed": "Incorporación cerrada",
+        "brokerLost": "Gladys no está conectada al broker MQTT: no se puede permitir la incorporación",
         "notAnswering": "Zigbee2MQTT no responde: no se puede permitir la incorporación",
         "allow": "Permitir la incorporación",
         "extend": "Prolongar",

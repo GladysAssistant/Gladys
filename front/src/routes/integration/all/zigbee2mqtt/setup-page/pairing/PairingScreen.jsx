@@ -13,8 +13,16 @@ import style from './pairing.css';
  * @example
  * <PairingScreen httpClient={httpClient} session={session} online onClose={close} backLabelId="…" />
  */
-const PairingScreen = ({ isMobile, httpClient, session, online, onClose, backLabelId }) => {
-  const window = <PairingWindow httpClient={httpClient} session={session} online={online} isMobile={isMobile} />;
+const PairingScreen = ({ isMobile, httpClient, session, online, brokerConnected, onClose, backLabelId }) => {
+  const window = (
+    <PairingWindow
+      httpClient={httpClient}
+      session={session}
+      online={online}
+      brokerConnected={brokerConnected}
+      isMobile={isMobile}
+    />
+  );
   const title = <Text id="integration.zigbee2mqtt.setup.dashboard.actions.pair" />;
   if (isMobile) {
     return (

@@ -2864,6 +2864,7 @@
       "pairing": {
         "open": "Association autorisée",
         "closed": "Association fermée",
+        "brokerLost": "Gladys n'est pas connectée au broker MQTT : l'association ne peut pas être autorisée",
         "notAnswering": "Zigbee2MQTT ne répond pas : l'association ne peut pas être autorisée",
         "allow": "Autoriser l'association",
         "extend": "Prolonger",

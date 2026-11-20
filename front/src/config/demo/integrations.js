@@ -464,6 +464,8 @@ const integrations = {
   ],
   'get /api/v1/service/zigbee2mqtt': {},
   'get /api/v1/service/zigbee2mqtt/permit_join': { allowed: false, remainingSeconds: null },
+  // The Zigbee2mqtt devices of Gladys: the names the pairing window does not suggest again
+  'get /api/v1/service/zigbee2mqtt/device': [],
   // docs/specs/zigbee2mqtt-pairing.md, C.3: a device ready to add, one in its interview
   'get /api/v1/service/zigbee2mqtt/pairing': [
     {

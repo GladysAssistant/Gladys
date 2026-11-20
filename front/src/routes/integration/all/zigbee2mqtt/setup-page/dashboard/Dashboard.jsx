@@ -114,6 +114,14 @@ class Dashboard extends Component {
 
   showMain = () => this.setState({ screen: SCREEN.MAIN });
 
+  // Back from the pairing window: the devices it added are no longer to add
+  closePairing = () => {
+    this.showMain();
+    if (this.props.zigbee2mqttStatus.zigbee2mqttConnected) {
+      this.loadNewDevices();
+    }
+  };
+
   // The connection to an external broker out of reach: its fields are in the advanced settings
   editConnection = () => this.showAdvanced();
 
@@ -245,7 +253,8 @@ class Dashboard extends Component {
           httpClient={props.httpClient}
           session={props.session}
           online={Boolean(status.zigbee2mqttConnected)}
-          onClose={this.showMain}
+          brokerConnected={status.gladysConnected}
+          onClose={this.closePairing}
           backLabelId="integration.zigbee2mqtt.setupTab"
         />
       );

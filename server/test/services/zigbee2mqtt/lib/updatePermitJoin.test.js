@@ -90,4 +90,34 @@ describe('zigbee2mqtt updatePermitJoin', () => {
       payload: [],
     });
   });
+
+  it('should keep the devices seen joining when the window Gladys forgot is told again (reconnection, init)', () => {
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    // Gladys forgets joining (a new connection), then the retained info of the same window comes again
+    zigbee2MqttManager.updatePermitJoin(false);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
+    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(true);
+    expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
+    // Another window, later
+    zigbee2MqttManager.updatePermitJoin(false);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 200000);
+    expect(zigbee2MqttManager.pairingDevices).to.deep.equal({});
+  });
+
+  it('should keep the end of the open window when Zigbee2mqtt tells none (Zigbee2mqtt 1)', () => {
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
+    gladys.event.emit = fake();
+    zigbee2MqttManager.updatePermitJoin(true, undefined);
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(NOW + 254000);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should not take an end from another clock (external Zigbee2mqtt), past or too far', () => {
+    zigbee2MqttManager.updatePermitJoin(true, NOW - 300000);
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(null);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 600000);
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(NOW + 254000);
+  });
 });

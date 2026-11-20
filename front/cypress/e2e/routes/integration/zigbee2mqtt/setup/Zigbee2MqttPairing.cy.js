@@ -89,10 +89,37 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-allow]').should('not.be.disabled');
     });
 
-    it('should tell that joining could not be permitted when Zigbee2mqtt refuses it', () => {
+    it('should not take a close told while asked to open for a refusal, and keep waiting', () => {
       openPairing();
+      // The end of the previous window
       sendPermitJoin({ allowed: false, remainingSeconds: null });
+      cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'closed');
+      cy.get('[data-cy=z2m-pairing-request-error]').should('not.exist');
+      cy.get('[data-cy=z2m-pairing-allow]').should('be.disabled');
+      sendPermitJoin({ allowed: true, remainingSeconds: 254 });
+      cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
+      cy.get('[data-cy=z2m-pairing-request-error]').should('not.exist');
+    });
+
+    it('should clear the failure of a request once Zigbee2mqtt tells, late, what was asked', () => {
+      visitDashboard();
+      answerPairing();
+      cy.clock();
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      cy.wait('@permitJoin');
+      cy.tick(10000);
       cy.get('[data-cy=z2m-pairing-request-error]').i18n(`${T}.allowError`);
+      sendPermitJoin({ allowed: true, remainingSeconds: 240 });
+      cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
+      cy.get('[data-cy=z2m-pairing-request-error]').should('not.exist');
+    });
+
+    it('should say that Gladys lost the broker, not that Zigbee2mqtt does not answer', () => {
+      openPairing();
+      sendStatus({ ...onlineStatus, gladysConnected: false, zigbee2mqttConnected: false });
+      cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'broker-lost');
+      cy.get('[data-cy=z2m-pairing-header]').should('contain', Cypress._.get(Cypress.env('i18n'), `${T}.brokerLost`));
+      cy.get('[data-cy=z2m-pairing-allow]').should('not.exist');
     });
 
     it('should not take the answer of a slow request over what Zigbee2mqtt told meanwhile', () => {
@@ -153,11 +180,21 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-name]').should('have.value', 'Light IKEA 2');
       cy.get('[data-cy=z2m-pairing-room]').select('Kitchen');
 
+      // The device read again before it is added: attached to the main electric meter, which the message is not
+      const attached = {
+        ...readyBulb.device,
+        features: readyBulb.device.features.map(feature => ({ ...feature, energy_parent_id: 'main-meter' }))
+      };
+      cy.intercept(
+        { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` },
+        { body: [{ ...readyBulb, device: attached }] }
+      ).as('readAgain');
       cy.intercept(
         { method: 'POST', url: `${serverUrl}/api/v1/device` },
         { body: { name: 'Light IKEA 2', selector: 'light-ikea-2' } }
       ).as('addDevice');
       cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.wait('@readAgain');
       cy.wait('@addDevice')
         .its('request.body')
         .should(body => {
@@ -166,6 +203,7 @@ describe('Zigbee2mqtt pairing window', () => {
           expect(body.external_id).to.equal('zigbee2mqtt:0x000b57fffec6a5b2');
           // The name of the feature from the dictionary, as in the Discover tab
           expect(body.features[0].name).to.not.equal('state');
+          expect(body.features[0].energy_parent_id).to.equal('main-meter');
         });
       cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
       cy.get('[data-cy=z2m-pairing-open-device]').should(
@@ -277,6 +315,10 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` }, { statusCode: 500 });
       cy.get('[data-cy=z2m-dashboard-pair]').click();
       cy.get('[data-cy=z2m-pairing-load-error]').i18n(`${T}.loadError`);
+      // A message brings the list: the failure no longer holds
+      sendPairing([atStep(readyBulb, 'joined')]);
+      cy.get('[data-cy=z2m-pairing-row]').should('have.length', 1);
+      cy.get('[data-cy=z2m-pairing-load-error]').should('not.exist');
     });
   });
 });

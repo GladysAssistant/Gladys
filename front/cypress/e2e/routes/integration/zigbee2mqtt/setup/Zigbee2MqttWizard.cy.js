@@ -95,6 +95,26 @@ describe('Zigbee2mqtt setup wizard', () => {
     cy.get('[data-cy=z2m-dashboard]').should('exist');
   });
 
+  it('should ask for joining at step 4 once Zigbee2mqtt answers again', () => {
+    visitWizard();
+    answerSetup();
+    install();
+    cy.wait('@setup');
+    sendStatus({ ...readyToSetupStatus, zigbee2mqttConnected: true, gladysConnected: true });
+    sendProgress(doneInstallation);
+    cy.get('[data-cy=z2m-wizard-ready]').should('exist');
+    // Zigbee2mqtt restarts as the user goes to step 4: nothing to ask yet
+    sendStatus({ ...readyToSetupStatus, zigbee2mqttConnected: false, gladysConnected: true });
+    answerPairing();
+    cy.get('[data-cy=z2m-wizard-pair]').click();
+    cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'not-answering');
+    cy.get('@permitJoin.all').should('have.length', 0);
+    sendStatus({ ...readyToSetupStatus, zigbee2mqttConnected: true, gladysConnected: true });
+    cy.wait('@permitJoin')
+      .its('request.body')
+      .should('deep.equal', { value: true });
+  });
+
   it('should wait for a dongle, and show it once plugged in without reloading', () => {
     visitWizard({ ports: [[machinePort], [machinePort, zbDongleE]] });
     cy.get('[data-cy=z2m-wizard-key-none]').should('exist');

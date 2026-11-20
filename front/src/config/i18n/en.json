@@ -2487,6 +2487,7 @@
       "pairing": {
         "open": "Joining permitted",
         "closed": "Joining closed",
+        "brokerLost": "Gladys is not connected to the MQTT broker: joining cannot be permitted",
         "notAnswering": "Zigbee2MQTT does not answer: joining cannot be permitted",
         "allow": "Permit joining",
         "extend": "Extend",
