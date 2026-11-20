@@ -64,20 +64,6 @@ function createActions(store) {
         discoverZigbee2mqttError: null
       });
     },
-    async getPermitJoin(state) {
-      const value = await state.httpClient.get('/api/v1/service/zigbee2mqtt/permit_join');
-      store.setState({
-        permitJoin: value
-      });
-    },
-    async togglePermitJoin(state) {
-      await state.httpClient.post('/api/v1/service/zigbee2mqtt/permit_join');
-    },
-    updatePermitJoin(state, value) {
-      store.setState({
-        permitJoin: value
-      });
-    },
     updateDeviceField(state, index, field, value) {
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
         [index]: {

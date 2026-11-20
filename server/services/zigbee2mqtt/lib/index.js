@@ -26,6 +26,15 @@ const { getSetup } = require('./getSetup');
 const { saveOrDestroyVariable } = require('./saveOrDestroyVariable');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
+const { updatePermitJoin } = require('./updatePermitJoin');
+const {
+  handleBridgeEvent,
+  getPairingDevices,
+  emitPairingDevices,
+  emitPairingDevicesAfterList,
+  clearPairingDevices,
+  updatePairingNames,
+} = require('./pairingDevices');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
 const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
@@ -115,6 +124,14 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   // When Gladys (re)started it, to log how long Zigbee2mqtt took to answer
   this.zigbee2mqttStartingSince = null;
   this.z2mPermitJoin = false;
+  // When joining closes (epoch in ms of the Zigbee2mqtt host), null when closed or unknown (see updatePermitJoin)
+  this.z2mPermitJoinEnd = null;
+  // A window seen open that Zigbee2mqtt has not told closed since, and its end: kept when Gladys forgets joining
+  // (init), the same window told again is not a new one (see updatePermitJoin)
+  this.permitJoinWindowSeen = false;
+  this.lastPermitJoinEnd = null;
+  // The devices seen joining since joining last opened, by IEEE address (see pairingDevices)
+  this.pairingDevices = {};
   this.healthCheckTimer = null;
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
@@ -195,6 +212,13 @@ Zigbee2mqttManager.prototype.getSetup = getSetup;
 Zigbee2mqttManager.prototype.saveOrDestroyVariable = saveOrDestroyVariable;
 Zigbee2mqttManager.prototype.setPermitJoin = setPermitJoin;
 Zigbee2mqttManager.prototype.getPermitJoin = getPermitJoin;
+Zigbee2mqttManager.prototype.updatePermitJoin = updatePermitJoin;
+Zigbee2mqttManager.prototype.handleBridgeEvent = handleBridgeEvent;
+Zigbee2mqttManager.prototype.getPairingDevices = getPairingDevices;
+Zigbee2mqttManager.prototype.emitPairingDevices = emitPairingDevices;
+Zigbee2mqttManager.prototype.emitPairingDevicesAfterList = emitPairingDevicesAfterList;
+Zigbee2mqttManager.prototype.clearPairingDevices = clearPairingDevices;
+Zigbee2mqttManager.prototype.updatePairingNames = updatePairingNames;
 Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;

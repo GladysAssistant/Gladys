@@ -33,6 +33,8 @@ async function handleMqttMessage(topic, message) {
         this.zigbee2mqttRunning = false;
         this.emitStatusEvent();
       }
+      // Joining is left as it is: replayed on each reconnection, the announcement proves no new run, and a new run
+      // tells joining closed in its own bridge/info
       this.requestHealthCheck();
       break;
     }
@@ -100,6 +102,9 @@ async function handleMqttMessage(topic, message) {
         }
       });
 
+      // The names of the devices being paired, before the await: a name told meanwhile is more recent
+      const pairingNamesChanged = this.updatePairingNames(devices);
+
       // Re-attach Gladys devices renamed in Zigbee2mqtt (matched by IEEE address)
       // before publishing the discovered devices, so they merge with the right device.
       await this.syncRenamedDevices(devices);
@@ -108,44 +113,24 @@ async function handleMqttMessage(topic, message) {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
         payload: this.getDiscoveredDevices(),
       });
+      this.emitPairingDevicesAfterList(pairingNamesChanged);
       break;
     }
-    case 'zigbee2mqtt/bridge/config': {
-      // Keep only "permit_join" value
-      const config = JSON.parse(message);
-      this.z2mPermitJoin = config.permit_join;
-
-      logger.debug('Getting config from Zigbee2mqtt : permit_joint =', this.z2mPermitJoin);
-
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-        payload: this.z2mPermitJoin,
-      });
+    case 'zigbee2mqtt/bridge/event': {
+      this.handleBridgeEvent(JSON.parse(message));
       break;
     }
     case 'zigbee2mqtt/bridge/response/permit_join': {
-      const config = JSON.parse(message);
-      // If time is 0, permit join is disabled
-      this.z2mPermitJoin = config.data.time !== undefined && config.data.time > 0;
-
-      logger.debug('Getting permit_joint :', this.z2mPermitJoin);
-
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-        payload: this.z2mPermitJoin,
-      });
-      break;
-    }
-    case 'zigbee2mqtt/bridge/config/permit_join': {
-      const config = JSON.parse(message);
-      this.z2mPermitJoin = config;
-
-      logger.debug('Getting permit_joint :', this.z2mPermitJoin);
-
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-        payload: this.z2mPermitJoin,
-      });
+      const response = JSON.parse(message);
+      // A refused request changes nothing, nor an answer that tells nothing
+      const { time, value } = (response.status === 'ok' && response.data) || {};
+      // `time` for Zigbee2mqtt 2, `value` alone for Zigbee2mqtt 1 asked by another client (its interface)
+      if (typeof time === 'number' ? time > 0 : value === true) {
+        // An estimate: the end bridge/info tells (before or after this answer) is the exact one, and kept
+        this.updatePermitJoin(true, typeof time === 'number' ? Date.now() + time * 1000 : null, { estimated: true });
+      } else if (typeof time === 'number' || value === false) {
+        this.updatePermitJoin(false);
+      }
       break;
     }
     case 'zigbee2mqtt/bridge/info': {
@@ -159,14 +144,10 @@ async function handleMqttMessage(topic, message) {
         );
       }
       this.z2mVersion = typeof version === 'string' && VERSION_PATTERN.test(version) ? version : null;
-      // Whether joining is permitted: Zigbee2mqtt 2 publishes its info again when joining closes (after 254 s), and
-      // has no other message for it
-      if (typeof info.permit_join === 'boolean' && info.permit_join !== this.z2mPermitJoin) {
-        this.z2mPermitJoin = info.permit_join;
-        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-          payload: this.z2mPermitJoin,
-        });
+      // Whether joining is permitted and until when: Zigbee2mqtt 2 publishes its info again when joining opens and
+      // when it closes (after 254 s), and has no other message for the closing
+      if (typeof info.permit_join === 'boolean') {
+        this.updatePermitJoin(info.permit_join, info.permit_join_end);
       }
       if (coordinator && coordinator.meta) {
         this.coordinatorFirmware = {

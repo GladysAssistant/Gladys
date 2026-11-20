@@ -3,11 +3,10 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import get from 'get-value';
 
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/constants';
-import config from '../../../../../../config';
 import { RequestStatus } from '../../../../../../utils/consts';
 import withMobileViewport from '../../../../../../components/mobile/MobileViewport';
-import { MQTT_MODE, ADAPTER_MODE, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS } from '../constants';
+import { MQTT_MODE, ADAPTER_MODE } from '../constants';
+import PairingWindow from '../pairing/PairingWindow';
 import {
   LEGACY_EZSP_SUFFIX,
   dedupePorts,
@@ -387,58 +386,6 @@ class Wizard extends Component {
 
   closeSaveError = () => this.setState({ saveErrorClosed: true });
 
-  closePermitJoinError = () => this.setState({ permitJoinStatus: null });
-
-  // Zigbee2mqtt tells when joining is allowed, and when it closes it (after 254 s, or from another page). Refused while
-  // the wizard waits for it (the request sent), failed.
-  handlePermitJoin = allowed => {
-    const { permitJoinStatus } = this.state;
-    const waited = this.permitJoinTimer !== null;
-    this.stopPermitJoinWait();
-    if (allowed && permitJoinStatus !== RequestStatus.Success) {
-      this.setState({ permitJoinStatus: RequestStatus.Success });
-    } else if (!allowed && permitJoinStatus === RequestStatus.Success) {
-      this.setState({ permitJoinStatus: null });
-    } else if (!allowed && waited) {
-      this.setState({ permitJoinStatus: RequestStatus.Error });
-    }
-  };
-
-  stopPermitJoinWait = () => {
-    clearTimeout(this.permitJoinTimer);
-    this.permitJoinTimer = null;
-  };
-
-  // Zigbee2mqtt did not tell in time that joining is allowed: failed, to try again
-  permitJoinNotConfirmed = () => {
-    this.permitJoinTimer = null;
-    if (!this.unmounted && this.state.permitJoinStatus === RequestStatus.Getting) {
-      this.setState({ permitJoinStatus: RequestStatus.Error });
-    }
-  };
-
-  // Allowed once Zigbee2mqtt tells so (see handlePermitJoin), waited for from the click: its answer may come before the
-  // one of the request. In the demo nothing answers: the request is enough.
-  allowJoining = async () => {
-    this.stopPermitJoinWait();
-    this.permitJoinTimer = setTimeout(this.permitJoinNotConfirmed, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS);
-    this.setState({ permitJoinStatus: RequestStatus.Getting });
-    try {
-      // Allowed even when it already is, never toggled off
-      await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/permit_join', { value: true });
-      if (config.demoMode && !this.unmounted && this.state.permitJoinStatus === RequestStatus.Getting) {
-        this.handlePermitJoin(true);
-      }
-    } catch (e) {
-      console.error('Failed to allow devices to join', e);
-      this.stopPermitJoinWait();
-      // Not when Zigbee2mqtt told meanwhile that joining is allowed: the answer only got lost
-      if (!this.unmounted && this.state.permitJoinStatus !== RequestStatus.Success) {
-        this.setState({ permitJoinStatus: RequestStatus.Error });
-      }
-    }
-  };
-
   getInstallView = () => computeInstallView(this.props, this.state);
 
   constructor(props) {
@@ -467,7 +414,6 @@ class Wizard extends Component {
       previousInstallation: undefined,
       // The network was shown ready
       installReady: false,
-      permitJoinStatus: null,
       // The refusal of the setup, closed from the bottom bar of the phone layout
       saveErrorClosed: false,
       // Whether this wizard saved: the refusal of a save made before it opened (the advanced settings, a change of
@@ -479,8 +425,6 @@ class Wizard extends Component {
     // Numbers the requests of the USB ports, to keep only the answer of the last one
     this.usbPortsRequests = 0;
     this.usbPortsTimer = null;
-    // "Allow joining" sent, until Zigbee2mqtt tells that it is allowed
-    this.permitJoinTimer = null;
   }
 
   // The previous installation forgotten once the status shows another one, the network ready kept once reached
@@ -498,7 +442,6 @@ class Wizard extends Component {
   }
 
   async componentDidMount() {
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN, this.handlePermitJoin);
     // No port to list on a machine where Zigbee2mqtt cannot be installed
     await Promise.all([this.isInstallable() !== false && this.loadUsbPorts(), this.loadAdapters()]);
     if (!this.unmounted) {
@@ -518,14 +461,9 @@ class Wizard extends Component {
   }
 
   componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      this.handlePermitJoin
-    );
     this.unmounted = true;
     clearTimeout(this.usbPortsTimer);
     this.usbPortsTimer = null;
-    this.stopPermitJoinWait();
   }
 
   // The driver of the coordinator saved, and of the one chosen: another family forms a new network
@@ -611,7 +549,17 @@ class Wizard extends Component {
       configuration: props.configuration,
       saving: props.setupZigee2mqttStatus === RequestStatus.Getting,
       setupZigee2mqttStatus: state.saveRequested ? props.setupZigee2mqttStatus : null,
-      setupZigee2mqttError: state.saveRequested ? props.setupZigee2mqttError : null
+      setupZigee2mqttError: state.saveRequested ? props.setupZigee2mqttError : null,
+      // Step ④: joining asked as it opens (docs/specs/zigbee2mqtt-pairing.md, D)
+      pairingWindow: state.step === STEP.PAIR && (
+        <PairingWindow
+          httpClient={props.httpClient}
+          session={props.session}
+          online={Boolean(props.zigbee2mqttStatus.zigbee2mqttConnected)}
+          brokerConnected={props.zigbee2mqttStatus.gladysConnected}
+          isMobile={props.isMobile}
+        />
+      )
     };
     const actions = {
       showAuto: this.showAuto,
@@ -626,9 +574,7 @@ class Wizard extends Component {
       retry: this.retry,
       changeKey: this.changeKey,
       showPairing: this.showPairing,
-      allowJoining: this.allowJoining,
       closeSaveError: this.closeSaveError,
-      closePermitJoinError: this.closePermitJoinError,
       finish: props.finishWizard,
       cancel: props.onCancel
     };

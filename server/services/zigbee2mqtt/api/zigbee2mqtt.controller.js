@@ -274,6 +274,16 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
     res.json(response);
   }
 
+  /**
+   * @api {get} /api/v1/service/zigbee2mqtt/pairing Get the devices seen joining since joining last opened
+   * @apiName getPairingDevices
+   * @apiGroup Zigbee2mqtt
+   */
+  async function getPairingDevices(req, res) {
+    const defaultElectricMeterDeviceFeatureId = await gladys.energyPrice.getDefaultElectricMeterFeatureId();
+    res.json(zigbee2mqttManager.getPairingDevices(defaultElectricMeterDeviceFeatureId));
+  }
+
   return {
     'get /api/v1/service/zigbee2mqtt/discovered': {
       authenticated: true,
@@ -332,6 +342,10 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
     'get /api/v1/service/zigbee2mqtt/permit_join': {
       authenticated: true,
       controller: asyncMiddleware(getPermitJoin),
+    },
+    'get /api/v1/service/zigbee2mqtt/pairing': {
+      authenticated: true,
+      controller: asyncMiddleware(getPairingDevices),
     },
     // Under run/: /api/v1/service/zigbee2mqtt/start and /stop are the routes of the core that start and stop the
     // service (Settings > Services), which a route of the integration registered first would hide

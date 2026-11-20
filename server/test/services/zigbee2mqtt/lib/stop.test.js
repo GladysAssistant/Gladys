@@ -123,17 +123,25 @@ describe('zigbee2mqtt stop', () => {
     assert.calledWithMatch(logger.warn, 'Zigbee2mqtt: restart policy of gladys-z2m-zigbee2mqtt not set to "no":');
   });
 
-  it('should tell that joining is closed, and ignore the logs of the run it stops', async () => {
+  it('should tell that joining is closed, forget the devices seen joining, and ignore the logs of the run it stops', async () => {
     // PREPARE
     zigbee2mqttManager.z2mPermitJoin = true;
+    zigbee2mqttManager.z2mPermitJoinEnd = Date.now() + 10000;
+    zigbee2mqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'joined' } };
     zigbee2mqttManager.z2mRun = 2;
     // EXECUTE
     await zigbee2mqttManager.stop();
     // ASSERT
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(null);
+    expect(zigbee2mqttManager.pairingDevices).to.deep.equal({});
     assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', {
       type: 'zigbee2mqtt.permit-join',
-      payload: false,
+      payload: { allowed: false, remainingSeconds: null },
+    });
+    assert.calledWithExactly(gladys.event.emit, 'websocket.send-all', {
+      type: 'zigbee2mqtt.pairing',
+      payload: [],
     });
     expect(zigbee2mqttManager.z2mRun).to.equal(3);
   });

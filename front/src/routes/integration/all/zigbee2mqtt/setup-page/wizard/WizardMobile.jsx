@@ -23,7 +23,7 @@ import PrefetchStatus from '../components/PrefetchStatus';
 import { findAdapter, getPortPath } from './adapters';
 import { STEP, PANE, KEY_SCENARIO, INSTALL_VIEW, NETWORK_ADAPTER_TYPES } from './constants';
 import { getPhases, getCurrentPhase } from './phases';
-import { DISCOVER_URL, getDriver, getStepNumber, getStepLabels, getSummary, getTitle } from './WizardDesktop';
+import { getDriver, getStepNumber, getStepLabels, getSummary, getTitle } from './WizardDesktop';
 import { getInstallLabel, isCurrentPort } from './DesktopStepKey';
 import InstallFailure from './InstallFailure';
 import WaitingText from './WaitingText';
@@ -397,9 +397,7 @@ const Ready = ({ view }) => {
   );
 };
 
-const TIPS = ['approach', 'mode', 'add'];
-
-// ④ The first device
+// ④ The first device: the pairing window (docs/specs/zigbee2mqtt-pairing.md, D)
 const Pair = ({ view }) => (
   <div data-cy="z2m-wizard-pair-step">
     <h2 class={style.mobileTitle}>
@@ -408,22 +406,7 @@ const Pair = ({ view }) => (
     <p class={kitStyle.lead}>
       <Text id={`${T}.pair.text`} />
     </p>
-    {/* Above the tips: the outcome of the button of the bottom bar stays in sight */}
-    {view.permitJoinStatus === RequestStatus.Success && (
-      <MobileNotice tone="success" icon="check" role="status" data-cy="z2m-wizard-permit-join-allowed">
-        <MarkupText id={`${T}.pair.allowed`} />
-      </MobileNotice>
-    )}
-    <MobileGroup>
-      {TIPS.map((tip, index) => (
-        <MobileRow
-          key={tip}
-          tile={<span class={style.tipNumber}>{index + 1}</span>}
-          title={<Text id={`${T}.pair.tips.${tip}.title`} />}
-          subtitle={<Text id={`${T}.pair.tips.${tip}.text`} />}
-        />
-      ))}
-    </MobileGroup>
+    {view.pairingWindow}
   </div>
 );
 
@@ -509,7 +492,7 @@ class WizardMobile extends Component {
   // The way forward of each screen, and the way back to the detected dongle from another choice
   renderButtons() {
     const { view, actions } = this.props;
-    const { step, pane, installView, installable, external, saving, permitJoinStatus } = view;
+    const { step, pane, installView, installable, external, saving } = view;
     if (step === STEP.KEY) {
       if (pane === PANE.AUTO && !installable) {
         return (
@@ -578,30 +561,10 @@ class WizardMobile extends Component {
       );
     }
     if (step === STEP.PAIR) {
-      return permitJoinStatus === RequestStatus.Success ? (
-        <div class={style.mobileBarStack}>
-          <BigButton variant="primary" href={DISCOVER_URL} data-cy="z2m-wizard-go-to-discover">
-            <Text id={`${T}.pair.goToDiscover`} />
-          </BigButton>
-          <BigButton variant="ghost" onClick={actions.finish} data-cy="z2m-wizard-finish">
-            <Text id={`${T}.pair.finish`} />
-          </BigButton>
-        </div>
-      ) : (
-        <div class={style.mobileBarStack}>
-          <BigButton
-            variant="primary"
-            icon="radio"
-            loading={permitJoinStatus === RequestStatus.Getting}
-            onClick={actions.allowJoining}
-            data-cy="z2m-wizard-allow-joining"
-          >
-            <Text id={`${T}.pair.allow`} />
-          </BigButton>
-          <BigButton variant="ghost" onClick={actions.finish} data-cy="z2m-wizard-finish">
-            <Text id={`${T}.pair.finishWithoutPairing`} />
-          </BigButton>
-        </div>
+      return (
+        <BigButton variant="primary" onClick={actions.finish} data-cy="z2m-wizard-finish">
+          <Text id={`${T}.pair.finish`} />
+        </BigButton>
       );
     }
     // The installation goes on without the page: nothing to do meanwhile
@@ -613,9 +576,6 @@ class WizardMobile extends Component {
     if (view.step === STEP.KEY) {
       const error = getSaveError(view);
       return error && { message: error, close: actions.closeSaveError };
-    }
-    if (view.step === STEP.PAIR && view.permitJoinStatus === RequestStatus.Error) {
-      return { message: <Text id={`${T}.pair.allowError`} />, close: actions.closePermitJoinError };
     }
     return null;
   }
