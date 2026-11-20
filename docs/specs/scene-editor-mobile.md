@@ -237,7 +237,8 @@ back.
     move the focus, and nothing in the toast itself. A step or a condition dragged with the
     pointer is one too, though the drag ends with no click: the move itself (`moveCard` /
     `moveCardGroup`) withdraws the "Undo". Deleting a second card is such an edit: its own
-    "Undo" replaces the first, as on a phone.
+    "Undo" replaces the first, as on a phone. An "Undo" still up when the window crosses the
+    breakpoint follows the rule of the layout it lands on.
   - **The keyboard reaches "Undo" before it leaves.** The "x" that had the focus is gone with
     its card, so the focus moves to "Undo"; the 5 seconds stop while the keyboard is on it (a
     focus the browser shows, `:focus-visible` — not the focus put there after a mouse click) or

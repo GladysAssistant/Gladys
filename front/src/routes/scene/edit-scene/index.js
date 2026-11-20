@@ -2230,6 +2230,15 @@ class EditScene extends Component {
 
   onViewportChange = isMobile => {
     this.setState({ isMobile });
+    // an "Undo" offered on one layout and still up on the other follows the rule of the new one:
+    // withdrawn by the next edit on a wide screen, not on a phone (spec C.7)
+    if (this.state.toast && this.state.toast.withUndo) {
+      if (isMobile) {
+        this.stopWatchingEditsAfterDeletion();
+      } else {
+        this.watchEditsAfterDeletion();
+      }
+    }
   };
 
   constructor(props) {

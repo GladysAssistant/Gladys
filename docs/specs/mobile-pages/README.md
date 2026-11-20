@@ -157,7 +157,8 @@ bottom bar on a page that has one (`aboveBar`). It does not leave under the user
 delay stops while a mouse is over it or the keyboard is on its action, and starts again once
 neither holds it (the two holds are tracked apart: the mouse leaving does not restart the delay
 while the keyboard is still on the action, nor the reverse, and a new message shown meanwhile
-does not restart it either); a page whose deletion took the focused element away moves the focus to the action
+does not restart it either; a toast that leaves while held ends its holds and tells a caller
+that runs the delay itself, `onRelease`); a page whose deletion took the focused element away moves the focus to the action
 (`focusAction`: the scene editor of a wide screen). Beside the navigation rail of a wide screen
 it is centred on the page, not on the viewport.
 

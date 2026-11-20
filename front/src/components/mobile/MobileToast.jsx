@@ -35,9 +35,14 @@ class MobileToast extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.message && !this.props.message) {
-      // gone from under the pointer or the keyboard: no leave or blur will come to end the holds
+      // gone from under the pointer or the keyboard: no leave or blur will come to end the holds,
+      // so they end here, and a caller that runs the delay itself is told
+      const wasHeld = this.isHeld();
       this.hovered = false;
       this.focused = false;
+      if (wasHeld && this.props.onRelease) {
+        this.props.onRelease();
+      }
     }
     if (prevProps.message !== this.props.message || prevProps.toastKey !== this.props.toastKey) {
       this.schedule();
