@@ -77,6 +77,7 @@ class DeviceListItem extends Component {
           }}
           onDelete={this.deleteDevice}
           deleteError={deleteError}
+          deleteScheduled={Boolean(tooMuchStatesError)}
           dataCy="mqtt-device-row"
         />
       );

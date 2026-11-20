@@ -90,9 +90,9 @@ class DeviceBox extends Component {
     } catch (e) {
       console.error(e);
       this.setState({ deleteError: RequestStatus.Error });
-      // Too many states to delete at once: Gladys purges them in the background, and trying
-      // again right away is refused again. The phone confirmation says so, with the link to the
-      // job, as the cards of the native integrations do (this card keeps its generic alert).
+      // Too many states to delete at once: Gladys purges them in the background, then deletes
+      // the device on its own. The card and the phone sheet say so, with the link to the job,
+      // as the cards of the native integrations do.
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
@@ -187,6 +187,7 @@ class DeviceBox extends Component {
         saveError={saveError && <Text id="integration.externalIntegration.device.saveError" />}
         onDelete={this.deleteDevice}
         deleteError={deleteErrorMessage}
+        deleteScheduled={Boolean(tooMuchStatesError)}
         dataCy="external-device-row"
       >
         {historizableFeatures.length > 0 && (
@@ -220,7 +221,10 @@ class DeviceBox extends Component {
     );
   }
 
-  render({ device, deviceIndex, houses = [], language }, { loading, saveError, deleteError }) {
+  render(
+    { device, deviceIndex, houses = [], language },
+    { loading, saveError, deleteError, tooMuchStatesError, statesNumber }
+  ) {
     // the index kept here is the one in device.features: it is what the
     // save posts back, the text features filtered out would shift it
     const historizableFeatures = (device.features || [])
@@ -265,7 +269,12 @@ class DeviceBox extends Component {
                     <Text id="integration.externalIntegration.device.saveError" />
                   </div>
                 )}
-                {deleteError && (
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning" data-cy="external-device-delete-scheduled">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                  </div>
+                )}
+                {deleteError && !tooMuchStatesError && (
                   <div class="alert alert-danger">
                     <Text id="integration.externalIntegration.device.deleteError" />
                   </div>

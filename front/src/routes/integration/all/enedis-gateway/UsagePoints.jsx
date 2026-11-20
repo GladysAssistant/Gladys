@@ -54,6 +54,8 @@ const UsagePointDevice = ({
   const numberOfStates = getDeviceParam(device, DEVICE_PARAMS.NUMBER_OF_STATES);
   const mySyncs = syncs.filter(sync => sync.usage_point_id === usagePointId);
   const deviceShouldBeUpdated = device.features.length < 3;
+  // set when the deletion of this meter goes on in the background (one entry per meter)
+  const scheduledDeletionStatesNumber = tooMuchStatesError && tooMuchStatesError[device.selector];
 
   let syncInProgress;
   if (mySyncs.length > 0) {
@@ -119,10 +121,11 @@ const UsagePointDevice = ({
         }
         onDelete={() => destroyDevice(deviceIndex)}
         deleteError={
-          tooMuchStatesError && tooMuchStatesError.selector === device.selector ? (
-            <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: tooMuchStatesError.statesNumber }} />
+          scheduledDeletionStatesNumber ? (
+            <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: scheduledDeletionStatesNumber }} />
           ) : null
         }
+        deleteScheduled={Boolean(scheduledDeletionStatesNumber)}
         dataCy="enedis-usage-point-row"
       >
         {syncInProgress && (
@@ -499,7 +502,7 @@ class EnedisWelcomePageComponent extends Component {
     return saved;
   };
   destroyDevice = async deviceIndex => {
-    await this.setState({ loading: true, tooMuchStatesError: null });
+    await this.setState({ loading: true });
     let deleted = true;
     const device = this.state.usagePointsDevices[deviceIndex];
     try {
@@ -510,13 +513,15 @@ class EnedisWelcomePageComponent extends Component {
       console.error(e);
       deleted = false;
       // A meter holds years of states: too many to delete at once, Gladys purges them in the
-      // background and trying again right away is refused again. The phone confirmation says
-      // so, with the link to the job.
+      // background, then deletes the meter on its own. Its sheet says so, with the link to the
+      // job. Kept by meter: deleting another meter meanwhile does not hide it.
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
         const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
-        await this.setState({ tooMuchStatesError: { selector: device.selector, statesNumber } });
+        await this.setState(prevState => ({
+          tooMuchStatesError: { ...prevState.tooMuchStatesError, [device.selector]: statesNumber }
+        }));
       }
     }
     await this.setState({ loading: false });

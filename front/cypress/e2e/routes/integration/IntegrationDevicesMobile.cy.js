@@ -192,7 +192,7 @@ describe('Integration devices on a phone', () => {
       let refuse = true;
       cy.intercept({ method: 'DELETE', url: api('/device/matter-cy-desk-plug') }, req => {
         if (refuse) {
-          req.reply({ statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } });
+          req.reply({ statusCode: 500, body: { status: 500, code: 'SERVER_ERROR' } });
         } else {
           req.reply({ success: true });
         }
@@ -558,7 +558,7 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=integration-mobile-toast]').i18n('mobileKit.saved');
     });
 
-    it('should explain why a device with too many states is not deleted', () => {
+    it('should say that a device with too many states is deleted in the background', () => {
       cy.intercept(
         { method: 'DELETE', url: api('/device/ext-cy-mobile-garage-plug') },
         { statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } }
@@ -569,12 +569,42 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=integration-device-delete]').click();
       cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
       cy.wait('@deleteDevice');
-      // not "Try again": the states are purged in the background, and the job is one tap away
-      cy.get('[data-cy=integration-device-delete-error]')
+      // not a refusal: the confirmation closes, and the sheet says that Gladys deletes the
+      // device on its own, with the job one tap away
+      cy.get('[data-cy=integration-device-delete-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-device-delete-error]').should('not.exist');
+      cy.get('[data-cy=integration-device-delete-scheduled]')
         .should('be.visible')
         .find('a[href="/dashboard/settings/jobs"]')
         .should('exist');
+      // nothing to save or to delete again on a device that is going away
+      cy.get('[data-cy=integration-device-delete]').should('be.disabled');
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
+      cy.get('[data-cy=integration-device-fields]').should('be.disabled');
       cy.get('[data-cy=external-device-row]').should('have.length', 1);
+    });
+
+    it('should drop the unsaved changes of a device whose deletion is scheduled, without offering to save them', () => {
+      cy.intercept({ method: 'POST', url: api('/device') }, cy.spy().as('saveDevice'));
+      cy.intercept(
+        { method: 'DELETE', url: api('/device/ext-cy-mobile-garage-plug') },
+        { statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } }
+      ).as('deleteDevice');
+      cy.visit(`/dashboard/integration/device/external/${SELECTOR}`);
+      cy.wait('@getDevices');
+      cy.get('[data-cy=external-device-row]').click();
+      cy.get('[data-cy=integration-device-name]').type(' renamed');
+      cy.get('[data-cy=integration-device-delete]').click();
+      cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@deleteDevice');
+      cy.get('[data-cy=integration-device-delete-scheduled]').should('be.visible');
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-leave-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.get('[data-cy=external-device-row]')
+        .should('contain', 'Garage plug')
+        .and('not.contain', 'renamed');
+      cy.get('@saveDevice').should('not.have.been.called');
     });
 
     it('should add a discovered device, and not the one already added', () => {
@@ -659,7 +689,7 @@ describe('Integration devices on a phone', () => {
       params: [{ name: 'NUMBER_OF_STATES', value: '17520' }]
     };
 
-    it('should list the meters as rows and explain why one with too many states is not deleted', () => {
+    it('should list the meters as rows and say that one with too many states is deleted in the background', () => {
       cy.intercept({ method: 'GET', url: api('/service/enedis/device') }, [meter]).as('getMeters');
       cy.intercept(
         { method: 'DELETE', url: api('/device/enedis-16401220101758') },
@@ -676,10 +706,12 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=integration-device-delete]').click();
       cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
       cy.wait('@deleteDevice');
-      cy.get('[data-cy=integration-device-delete-error]')
+      cy.get('[data-cy=integration-device-delete-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-device-delete-scheduled]')
         .should('be.visible')
         .find('a[href="/dashboard/settings/jobs"]')
         .should('exist');
+      cy.get('[data-cy=integration-device-delete]').should('be.disabled');
       // the button of the page is not the one that was working
       cy.get('[data-cy=enedis-sync]').should('not.be.disabled');
     });
@@ -957,15 +989,11 @@ describe('Integration devices on a phone', () => {
         .and('contain', 'Garage camera');
     });
 
-    it('should delete a camera only once confirmed, and explain why one with too many states is not', () => {
-      let refuse = true;
-      cy.intercept({ method: 'DELETE', url: api('/device/cy-garage-camera') }, req => {
-        if (refuse) {
-          req.reply({ statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } });
-        } else {
-          req.reply({ success: true });
-        }
-      }).as('deleteDevice');
+    it('should delete a camera only once confirmed, and say that one with too many states is deleted in the background', () => {
+      cy.intercept(
+        { method: 'DELETE', url: api('/device/cy-garage-camera') },
+        { statusCode: 400, body: { status: 400, message: '5000000 states in DB. Too much states!' } }
+      ).as('deleteDevice');
       openGarage();
       cy.get('[data-cy=integration-device-delete]').click();
       cy.get('[data-cy=integration-device-delete-sheet]')
@@ -973,14 +1001,27 @@ describe('Integration devices on a phone', () => {
         .and('contain', 'Garage camera');
       cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
       cy.wait('@deleteDevice');
-      cy.get('[data-cy=integration-device-delete-error]')
+      // not a refusal: the confirmation closes, and the sheet says that Gladys deletes the camera
+      // on its own, with the job one tap away
+      cy.get('[data-cy=integration-device-delete-sheet]').should('not.exist');
+      cy.get('[data-cy=integration-device-delete-scheduled]')
         .should('be.visible')
         .find('a[href="/dashboard/settings/jobs"]')
-        .should('exist')
-        .then(() => {
-          refuse = false;
-        });
+        .should('exist');
+      cy.get('[data-cy=integration-device-delete]').should('be.disabled');
+      cy.get('[data-cy=integration-device-save]').should('be.disabled');
+      // still so when the sheet opens again
+      cy.get('[data-cy=integration-device-sheet] [data-cy=sheet-close]').click();
+      cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+      cy.contains('[data-cy=rtsp-camera-row]', 'Garage camera').click();
+      cy.get('[data-cy=integration-device-delete-scheduled]').should('be.visible');
+      cy.get('[data-cy=integration-device-delete]').should('be.disabled');
+    });
 
+    it('should delete a camera once confirmed', () => {
+      cy.intercept({ method: 'DELETE', url: api('/device/cy-garage-camera') }, { success: true }).as('deleteDevice');
+      openGarage();
+      cy.get('[data-cy=integration-device-delete]').click();
       cy.get('[data-cy=integration-device-delete-sheet] [data-cy=confirm-sheet-confirm]').click();
       cy.wait('@deleteDevice');
       cy.get('[data-cy=integration-device-sheet]').should('not.exist');

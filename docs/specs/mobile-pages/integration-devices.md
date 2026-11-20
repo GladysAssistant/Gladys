@@ -68,9 +68,9 @@ are what the sheet needs to tell how a request ended and to undo a change:
   when nothing was requested: a discovered device that a live update removed from the list
   between the render and the tap is not added (external integrations return `false`; the MQTT
   action, which cannot return a value, throws);
-- a deletion refused because the device has too many states is told apart from any other error
-  by every card (Enedis and the external integrations did not), so the confirmation can explain
-  it;
+- a device with too many states to delete at once is told apart from an error by every card
+  (Enedis and the external integrations did not), and passed to the sheet as `deleteScheduled`,
+  so the sheet can say what happens instead of a failure;
 - replacing a Matter device works on a copy of the paired device: a replacement that fails
   leaves its row as it was published, not under the name and the ids of the existing device;
 - a handler that changes a field of a device kept in the state of a component builds it **from
@@ -141,15 +141,23 @@ Bluetooth, LAN Manager and Enedis cards never said that a save had failed).
 **Nothing is deleted on a single tap.** "Delete" opens a confirmation sheet naming the device and
 what goes with it (its history; the scenes and the dashboards that use it). Confirming calls the
 handler of the card; a refusal shows in the confirmation, which stays open. **A device with too
-many states to delete at once says so** — Gladys purges them in the background, with the link to
-that job — rather than "Try again", which would be refused again; this holds for every
-integration of A. A success closes everything and shows "Device deleted". On a wider screen the
+many states to delete at once is not a refusal** — Gladys purges its history in the background,
+then deletes the device on its own, in one "Device deletion" job (`device.destroyAfterStatesPurge`):
+the confirmation closes and the sheet says so in a plain notice, with the link to the jobs, its
+fields and its buttons disabled — nothing is saved or deleted again on a device that is going
+away (closing it then drops the unsaved changes without asking, see below). Each card keeps that
+state per device: deleting another device of the same list does not clear it. This holds for every integration of A. The deletion is bound to the device as it was when
+asked (a device paired again in place meanwhile is kept), and is kept in memory: a restart of
+Gladys drops it, and the row stays in the list until the page is loaded again — the notice says
+what to do then. A success closes everything and shows "Device deleted". On a wider screen the
 cards keep what they did.
 
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
 a wider screen. Closing a "Devices" sheet with unsaved changes — by any of the four ways, the
 system "back" included — asks: **Save and close** / **Close without saving** (the name, the room
-and the switches go back to what they were) / **Keep editing**. "Edit" asks the same question
+and the switches go back to what they were) / **Keep editing** — except on a device whose
+deletion is scheduled, which has nothing left to save: its changes are dropped as by "Close
+without saving". "Edit" asks the same question
 before it leads to the edit page. A second system "back" closes the question, like "Keep
 editing". A discovery sheet does not ask: what was typed stays with the device in the list, as on
 the card, until it is added.

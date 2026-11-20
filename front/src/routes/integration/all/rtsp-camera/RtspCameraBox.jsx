@@ -125,12 +125,11 @@ class RtspCameraBox extends Component {
       this.props.updateCameraRotation(cameraIndex, get(saved, 'cameraRotation.value'));
     }
   };
-  // the sheet opens: an error of a previous visit is not about what it shows now
+  // the sheet opens: an error of a previous visit is not about what it shows now (a deletion
+  // that goes on in the background is not an error, and still is)
   forgetErrors = () => {
     this.setState({
       lastError: null,
-      tooMuchStatesError: false,
-      statesNumber: undefined,
       nameTouched: false
     });
   };
@@ -228,6 +227,7 @@ class RtspCameraBox extends Component {
             undefined
           )
         }
+        deleteScheduled={Boolean(tooMuchStatesError)}
         autoOpen={props.autoOpen}
         onDismiss={isDraft ? this.discardCamera : undefined}
         dataCy="rtsp-camera-row"

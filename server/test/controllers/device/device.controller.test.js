@@ -39,6 +39,29 @@ describe('POST /api/v1/device', () => {
   });
 });
 
+describe('POST /api/v1/device (device being deleted in the background)', () => {
+  it('should not save a device being deleted in the background', async () => {
+    const error = new Error('Device is being deleted');
+    let created = false;
+    const controller = DeviceController({
+      device: {
+        checkNotBeingDestroyed: () => {
+          throw error;
+        },
+        create: async () => {
+          created = true;
+        },
+      },
+    });
+    let errorGivenToNext;
+    await controller.create({ body: { id: 'device-id' } }, {}, (e) => {
+      errorGivenToNext = e;
+    });
+    expect(errorGivenToNext).to.equal(error);
+    expect(created).to.equal(false);
+  });
+});
+
 describe('GET /api/v1/device/:device_selector', () => {
   it('should get device by selector', async () => {
     await authenticatedRequest
