@@ -122,7 +122,7 @@ const DeviceTab = ({ children, ...props }) => (
           <div class="row">
             {props.zigbee2mqttDevices &&
               props.zigbee2mqttDevices.map((device, index) => (
-                <Zigbee2mqttBox {...props} device={device} deviceIndex={index} />
+                <Zigbee2mqttBox {...props} key={device.id || device.external_id} device={device} deviceIndex={index} />
               ))}
             {props.zigbee2mqttDevices && props.zigbee2mqttDevices.length === 0 && <EmptyState />}
           </div>

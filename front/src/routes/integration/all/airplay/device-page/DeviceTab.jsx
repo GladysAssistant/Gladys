@@ -183,6 +183,7 @@ class DeviceTab extends Component {
                   airplayDevices.length > 0 &&
                   airplayDevices.map((device, index) => (
                     <AirplayDeviceBox
+                      key={device.external_id}
                       editable
                       saveButton
                       deleteButton

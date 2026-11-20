@@ -614,6 +614,7 @@ class MatterDevices extends Component {
                     matterDevices.length > 0 &&
                     matterDevices.map((device, index) => (
                       <MatterDeviceBox
+                        key={device.external_id}
                         editable
                         saveButton
                         deleteButton

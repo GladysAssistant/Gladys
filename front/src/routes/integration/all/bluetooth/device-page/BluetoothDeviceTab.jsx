@@ -109,6 +109,7 @@ const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevi
             {bluetoothDevices &&
               bluetoothDevices.map((bluetoothDevice, index) => (
                 <BluetoothDevice
+                  key={bluetoothDevice.selector}
                   device={bluetoothDevice}
                   deviceIndex={index}
                   houses={props.houses}

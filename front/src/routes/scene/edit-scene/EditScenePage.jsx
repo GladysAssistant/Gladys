@@ -8,6 +8,7 @@ import style from './style.css';
 import Settings from './Settings';
 import EditActions from './EditActions';
 import DraftBanner from './DraftBanner';
+import MobileToast from '../../../components/mobile/MobileToast';
 import dashboardStyle from '../../dashboard/style.css';
 import { Localizer, Text } from 'preact-i18n';
 
@@ -234,6 +235,22 @@ const EditScenePage = ({ children, ...props }) => {
               ))}
             </div>
             <EditActions {...props} />
+            {/* the toast of the editor on a wide screen (docs/specs/scene-editor-mobile.md, C.7):
+                the deletion of a step or a trigger, with its "Undo". Above the fixed footer, whose
+                own indicator already says "Saved": the "Scene saved" toast is for the phone. The
+                keyboard lands on "Undo" (the "×" that had the focus is gone with its card), and
+                the toast stays while it is hovered or focused. */}
+            <MobileToast
+              message={props.toast && props.toast.withUndo ? <Text id={props.toast.textId} /> : null}
+              toastKey={props.toast ? props.toast.id : null}
+              actionLabel={<Text id="editScene.mobile.undo" />}
+              onAction={props.undo}
+              onHold={props.holdToast}
+              onRelease={props.releaseToast}
+              focusAction
+              aboveBar
+              dataCy="scene-toast"
+            />
           </div>
         </div>
       </div>

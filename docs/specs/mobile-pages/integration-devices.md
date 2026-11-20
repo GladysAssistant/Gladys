@@ -19,18 +19,18 @@ What people come to do there: **find a device, rename it or move it to another r
 This file covers the integrations below. The other ones keep their desktop grid on a phone until
 they are moved to the same layout, **with the components of section B**.
 
-| Integration | Devices | Discovery |
-| --- | --- | --- |
-| Matter | `matter/MatterDevices.jsx` | `matter/MatterDiscoverPage.jsx` (pairing code) |
-| MQTT | `mqtt/device-page` | `mqtt/discovery-page` |
-| Bluetooth | `bluetooth/device-page` | `bluetooth/setup-page` |
-| Airplay | `airplay/device-page` | `airplay/discover-page` |
-| LAN Manager | `lan-manager/device-page` | `lan-manager/discover-page` |
-| Enedis | `enedis-gateway/UsagePoints.jsx` ("My meters") | — |
-| Thermostat | `thermostat/device-page` | — |
-| External integrations | `external-integration/device-page` | `external-integration/discover-page` |
-| RTSP cameras | `rtsp-camera/RtspCamera.jsx` (one page, no tab) | — |
-| Zigbee2MQTT | `zigbee2mqtt/device-page` | `zigbee2mqtt/discover-page` (permit joining) |
+| Integration           | Devices                                         | Discovery                                      |
+| --------------------- | ----------------------------------------------- | ---------------------------------------------- |
+| Matter                | `matter/MatterDevices.jsx`                      | `matter/MatterDiscoverPage.jsx` (pairing code) |
+| MQTT                  | `mqtt/device-page`                              | `mqtt/discovery-page`                          |
+| Bluetooth             | `bluetooth/device-page`                         | `bluetooth/setup-page`                         |
+| Airplay               | `airplay/device-page`                           | `airplay/discover-page`                        |
+| LAN Manager           | `lan-manager/device-page`                       | `lan-manager/discover-page`                    |
+| Enedis                | `enedis-gateway/UsagePoints.jsx` ("My meters")  | —                                              |
+| Thermostat            | `thermostat/device-page`                        | —                                              |
+| External integrations | `external-integration/device-page`              | `external-integration/discover-page`           |
+| RTSP cameras          | `rtsp-camera/RtspCamera.jsx` (one page, no tab) | —                                              |
+| Zigbee2MQTT           | `zigbee2mqtt/device-page`                       | `zigbee2mqtt/discover-page` (permit joining)   |
 
 ## B. The pattern (< 768 px)
 
@@ -150,8 +150,35 @@ away (closing it then drops the unsaved changes without asking, see below). Each
 state per device: deleting another device of the same list does not clear it. This holds for every integration of A. The deletion is bound to the device as it was when
 asked (a device paired again in place meanwhile is kept), and is kept in memory: a restart of
 Gladys drops it, and the row stays in the list until the page is loaded again — the notice says
-what to do then. A success closes everything and shows "Device deleted". On a wider screen the
-cards keep what they did.
+what to do then. A success closes everything and shows "Device deleted".
+
+**On a wider screen too, and in every integration.** The "Delete" button of a device card is a
+`DeleteDeviceButton` (`front/src/components/device/DeleteDeviceButton.jsx`) — in the integrations
+of A and in the ones that keep their desktop grid on a phone (Tasmota, Z-Wave JS UI,
+Philips Hue, Tuya, Netatmo, the cameras…): it opens the same confirmation, with the same texts,
+as a centered dialog (the sheet of the kit below 576 px). Confirming closes the dialog and calls
+the delete handler of the card, which keeps its own loader and **says the outcome itself, on the
+card**: the notice of a deletion that goes on in the background, or the sentence of the card ("Gladys could not delete this
+device. Try again." where the card had none: Bluetooth, Broadlink, LAN Manager, Philips Hue,
+Xiaomi, the cameras, the Enedis meters) — after a confirmation, a deletion that fails never looks
+like nothing happened. Cancel, Escape and the backdrop delete nothing. A card whose device was
+never saved (no `created_at`: a camera being filled in) holds no history and nothing uses it: it
+is removed without a question. Thermostat keeps the inline question of its card.
+
+The question is about one device, and one confirmation is one deletion:
+
+- every list of device cards gives its cards a **stable key** (the `id`, the `external_id` or
+  the `selector` of the device — the `id` where a card not saved yet has no `external_id`), so a card, its dialog and its messages stay with their device when
+  the list changes (a search, a sort, a neighbour deleted, a reload);
+- `DeleteDeviceButton` remembers which device it asked about: handed another one while the
+  dialog is open, it closes the dialog instead of confirming for a device the user never looked
+  at;
+- while the handler runs, the button is disabled and a second click on "Delete the device" does
+  nothing (the handler returns its request, so "runs" lasts until it ends);
+- the cameras and Zigbee2mqtt remove the deleted device from their list by its identity, in the
+  list as it is when the request ends, not by the index it had when the request left — a saved
+  device by its `external_id`, a card not saved yet by the `id` the page gave it, so two such
+  cards never go together.
 
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
 a wider screen. Closing a "Devices" sheet with unsaved changes — by any of the four ways, the
@@ -222,7 +249,7 @@ Only what differs from B, C and D.
   refreshes it.
 - The sheet: the name, the progress of the synchronization and its explanation, the meter id, the
   last synchronization and the number of states, then "Save", "Update" (a meter that misses its
-  features) and "Delete" — confirmed on a phone.
+  features) and "Delete" — confirmed, on every screen size.
 
 ### Thermostat
 
@@ -262,8 +289,9 @@ The integration has one page and no "Discovery": a camera is created by hand, in
 - **A search or another sort order keeps the cameras that were never saved**, at the end of the
   list it brings (on every screen size: the card of a camera being typed was dropped by the
   answer of a search). They are not kept when the page is opened again.
-- The card never said that a deletion had failed: on a phone the confirmation does, and tells a
-  camera with too many states apart.
+- A failed deletion is said: on a phone in the confirmation, on a wider screen on the card (D),
+  and both tell a camera with too many states apart. Both remove the camera from the list by its
+  identity (D), and a camera that was never saved goes without a request.
 
 ### External integrations
 
@@ -300,7 +328,8 @@ The integration has one page and no "Discovery": a camera is created by hand, in
 
 ## F. What does not change
 
-- From 768 px (a tablet, a desktop): the cards, as before.
+- From 768 px (a tablet, a desktop): the cards, as before — except that their "Delete" asks
+  first (D).
 - The containers, the requests and their payloads, the websocket updates.
 - The pages these tabs lead to: the MQTT device editor, the Bluetooth peripheral configuration
   and the thermostat form keep their layout; the Bluetooth and Zigbee2MQTT device pages are the
@@ -328,6 +357,12 @@ other layout: an unsaved change there does not survive the swap.
   frequency and the rotation saved and undone, a camera added with "+" then saved, one closed
   without being saved, one kept when a search answers, and one added on a wider screen deleted
   from its sheet.
+- Cypress, desktop viewport, `front/cypress/e2e/routes/integration/DeviceDeleteConfirm.cy.js`:
+  the "Delete" of a card naming the device, cancelled by "Cancel", by Escape and by the backdrop
+  (no request, the card kept), confirmed (the request, the card gone, and only one request for
+  two clicks on the confirming button); a confirmed deletion that fails said on the card
+  (Zigbee2mqtt and a card that had no sentence for it); a dialog left open while its device
+  leaves the list closes instead of confirming for the next one.
 - Cypress, phone viewport,
   `front/cypress/e2e/routes/integration/zigbee2mqtt/Zigbee2MqttTabsMobile.cy.js`: the status of
   Zigbee2MQTT first (not answering, not installed); a device renamed and saved, a failed save

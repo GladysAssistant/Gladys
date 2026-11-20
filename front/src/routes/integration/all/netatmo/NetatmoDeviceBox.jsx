@@ -15,6 +15,7 @@ import {
 } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import styles from './style.css';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 const createGithubUrl = device => {
   const title = encodeURIComponent(`Netatmo: Add device ${device.model}`);
@@ -391,9 +392,9 @@ class NetatmoDeviceBox extends Component {
                   )}
 
                   {validModel && deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.netatmo.device.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
 
                   {!validModel && (

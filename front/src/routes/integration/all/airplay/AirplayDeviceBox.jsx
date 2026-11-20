@@ -7,6 +7,7 @@ import { connect } from 'unistore/preact';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
 import { MobilePill } from '../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class AirplayDeviceBox extends Component {
   componentWillMount() {
@@ -271,9 +272,9 @@ class AirplayDeviceBox extends Component {
                   )}
 
                   {deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.airplay.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
                 </div>
               </div>

@@ -1197,6 +1197,14 @@ a.bigButtonGhost:focus {
   bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
+/* Beside the navigation rail of a wide screen, a toast is centred on the page it talks about,
+   not on the viewport (--gladys-sidebar-offset: style/index.css; nothing where there is no rail) */
+@media (min-width: 992px) {
+  .toast {
+    left: calc(var(--gladys-sidebar-offset, 0px) + 16px);
+  }
+}
+
 /* A toast of the app shell (toastAboveDock): below the desktop breakpoint a page may pin
    something to the bottom of the screen — the dock of the dashboard (which follows
    --dock-lift, mirrored on <html> by DashboardPage), a bottom bar — and the shell cannot
@@ -1206,7 +1214,6 @@ a.bigButtonGhost:focus {
     bottom: calc(96px + env(safe-area-inset-bottom, 0px) + var(--dock-lift, 0px));
   }
 }
-
 
 .toastText {
   flex: 1;

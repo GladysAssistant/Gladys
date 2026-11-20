@@ -22,6 +22,7 @@ import {
   kitStyle
 } from '../../../../../components/mobile';
 import { MobileDeviceItem, BatteryPill, integrationMobileStyle } from '../../../../../components/integration/mobile';
+import DeleteDeviceButton from '../../../../../components/device/DeleteDeviceButton';
 
 // the technical params of the sheet: the transport ones are shown as pills and as a sentence
 const INTERNAL_PARAMS = ['GLADYS_TRANSPORT', 'GLADYS_TRANSPORT_DEGRADED', 'GLADYS_TRANSPORT_MESSAGE'];
@@ -351,9 +352,9 @@ class DeviceBox extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2 flex-fill">
                     <Text id="integration.externalIntegration.device.saveButton" />
                   </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger flex-fill">
+                  <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger flex-fill">
                     <Text id="integration.externalIntegration.device.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                 </div>
               </div>
             </div>

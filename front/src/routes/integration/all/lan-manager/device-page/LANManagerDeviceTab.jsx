@@ -122,6 +122,7 @@ const LANManagerDeviceTab = ({ children, getLANManagerDevicesStatus, lanManagerD
             {lanManagerDevices &&
               lanManagerDevices.map((lanManagerDevice, index) => (
                 <LANManagerDevice
+                  key={lanManagerDevice.selector}
                   device={lanManagerDevice}
                   deviceIndex={index}
                   houses={props.houses}

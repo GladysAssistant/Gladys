@@ -240,16 +240,14 @@ function createActions(store) {
         rtspCameras
       });
     },
-    async deleteCamera(state, index) {
-      const camera = state.rtspCameras[index];
+    async deleteCamera(state, camera) {
       if (camera.created_at) {
         await state.httpClient.delete(`/api/v1/device/${camera.selector}`);
       }
-      const rtspCameras = update(state.rtspCameras, {
-        $splice: [[index, 1]]
-      });
+      // by identity, in the list as it is now: another camera may have been removed while this
+      // request was pending, and the index this one had is then the index of a neighbour
       store.setState({
-        rtspCameras
+        rtspCameras: store.getState().rtspCameras.filter(c => c.external_id !== camera.external_id)
       });
     },
     async testConnection(state, index) {

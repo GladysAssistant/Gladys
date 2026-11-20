@@ -111,6 +111,7 @@ class DeviceTab extends Component {
                   tuyaDevices.length > 0 &&
                   tuyaDevices.map((device, index) => (
                     <TuyaDeviceBox
+                      key={device.external_id}
                       editable
                       saveButton
                       deleteButton

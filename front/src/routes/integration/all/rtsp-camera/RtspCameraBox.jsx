@@ -4,6 +4,7 @@ import get from 'get-value';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import { DEVICE_POLL_FREQUENCIES, DEVICE_ROTATION } from '../../../../../../server/utils/constants';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 import { MobileField, fieldClass } from '../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../components/integration/mobile';
 import style from './style.css';
@@ -53,23 +54,24 @@ class RtspCameraBox extends Component {
   deleteCamera = async () => {
     this.setState({
       loading: true,
+      deleteError: false,
       tooMuchStatesError: false,
       statesNumber: undefined
     });
     let deleted = true;
     try {
-      await this.props.deleteCamera(this.props.cameraIndex);
+      await this.props.deleteCamera(this.props.camera);
     } catch (e) {
       deleted = false;
+      // said on the card: after the confirmation, a failure must not look like nothing happened
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
         const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
         this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({ deleteError: true });
       }
-      this.setState({
-        error: RequestStatus.Error
-      });
     }
     this.setState({
       loading: false
@@ -109,7 +111,7 @@ class RtspCameraBox extends Component {
   // the sheet of a camera that was never saved, closed without saving it: the camera leaves the
   // list (nothing is requested, it only exists in the page)
   discardCamera = () => {
-    this.props.deleteCamera(this.props.cameraIndex);
+    this.props.deleteCamera(this.props.camera);
   };
   // "Close without saving": back to the frequency, the URL and the rotation the sheet opened on
   // (the name and the room are undone by the sheet itself)
@@ -130,6 +132,7 @@ class RtspCameraBox extends Component {
   forgetErrors = () => {
     this.setState({
       lastError: null,
+      deleteError: false,
       nameTouched: false
     });
   };
@@ -300,7 +303,18 @@ class RtspCameraBox extends Component {
     );
   }
 
-  render(props, { loading, saveError, testConnectionError, testConnectionErrorMessage }) {
+  render(
+    props,
+    {
+      loading,
+      saveError,
+      testConnectionError,
+      testConnectionErrorMessage,
+      deleteError,
+      tooMuchStatesError,
+      statesNumber
+    }
+  ) {
     if (props.isMobile) {
       return this.renderMobile(props, this.state);
     }
@@ -321,6 +335,16 @@ class RtspCameraBox extends Component {
                 {saveError && (
                   <div class="alert alert-danger">
                     <Text id="integration.rtspCamera.saveError" />
+                  </div>
+                )}
+                {deleteError && (
+                  <div class="alert alert-danger" data-cy="device-delete-error">
+                    <Text id="mobileDeviceList.deleteError" />
+                  </div>
+                )}
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 {testConnectionError && (
@@ -431,9 +455,13 @@ class RtspCameraBox extends Component {
                   <button onClick={this.saveCamera} class="btn btn-success mr-2">
                     <Text id="integration.rtspCamera.saveButton" />
                   </button>
-                  <button onClick={this.deleteCamera} class="btn btn-danger mt-sm-0 mt-md-0 mt-lg-2 mt-xl-0">
+                  <DeleteDeviceButton
+                    device={props.camera}
+                    onDelete={this.deleteCamera}
+                    class="btn btn-danger mt-sm-0 mt-md-0 mt-lg-2 mt-xl-0"
+                  >
                     <Text id="integration.rtspCamera.deleteButton" />
-                  </button>
+                  </DeleteDeviceButton>
                 </div>
               </div>
             </div>

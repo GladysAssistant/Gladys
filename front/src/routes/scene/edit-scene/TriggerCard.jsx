@@ -61,6 +61,7 @@ const TriggerCard = ({ children, ...props }) => {
               type="button"
               onClick={deleteTriggerFromList(props.deleteTrigger, props.index)}
               class={cx('card-options-remove mr-4', style.cardOptionButton)}
+              data-cy={`delete-trigger-${props.index}`}
               aria-label={<Text id="editScene.deleteTriggerButton" />}
             >
               <i class="fe fe-x" />

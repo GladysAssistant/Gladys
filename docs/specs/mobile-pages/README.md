@@ -153,7 +153,15 @@ cards**, the pattern of the devices list.
 
 `MobileToast`: a short message at the bottom of the screen (`role="status"`), rendered on
 `<body>` above the sheets, gone after 4 s — 5 s when it carries **Undo**. It sits above the
-bottom bar on a page that has one (`aboveBar`).
+bottom bar on a page that has one (`aboveBar`). It does not leave under the user's hand: the
+delay stops while a mouse is over it or the keyboard is on its action, and starts again once
+neither holds it (the two holds are tracked apart: the mouse leaving does not restart the delay
+while the keyboard is still on the action, nor the reverse, and a new message shown meanwhile
+does not restart it either; a toast that leaves while held — its message gone, or the toast
+unmounted — ends its holds and tells a caller that runs the delay itself, `onRelease`); a page
+whose deletion took the focused element away moves the focus to the action (`focusAction`: the
+scene editor of a wide screen). Beside the navigation rail of a wide screen it is centred on the
+page, not on the viewport.
 
 One error goes through it, because it has no place of its own: **a device command that failed**
 (`components/device/DeviceCommandError.jsx`, mounted once in the app shell, on every screen
