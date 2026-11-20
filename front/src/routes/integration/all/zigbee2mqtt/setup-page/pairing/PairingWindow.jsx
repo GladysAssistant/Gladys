@@ -60,6 +60,11 @@ const Timeline = ({ status }) => (
       <li key={index} class={cx(style.timelineStep, style[`timeline-${step}`])}>
         <span class={style.timelineDot} aria-hidden="true" />
         <Text id={`${T}.steps.${['joined', 'interview', 'ready'][index]}`} />
+        {/* What the dot and the colours tell, for a screen reader */}
+        <span class="sr-only">
+          {' '}
+          <Text id={`${T}.stepStates.${step}`} />
+        </span>
       </li>
     ))}
   </ol>
@@ -193,22 +198,21 @@ class PairingWindow extends Component {
 
   updateRoom = ieeeAddress => e => this.updateCard(ieeeAddress, { roomId: e.target.value });
 
-  // The device as GET /pairing gives it: attached to the main electric meter, which the message does not carry (C.3)
-  readDevice = async entry => {
-    try {
-      const entries = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/pairing');
-      const read = entries.find(candidate => candidate.ieee_address === entry.ieee_address);
-      if (read && read.device) {
-        return read.device;
-      }
-    } catch (e) {
-      console.error('Failed to read the device to add', e);
+  // The device as GET /pairing gives it: attached to the main electric meter, which the message does not carry (C.3).
+  // Not the one of the message when it cannot be read: saved without its meter, it would stay out of the energy
+  // monitoring.
+  readDevice = async ieeeAddress => {
+    const entries = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/pairing');
+    const read = entries.find(candidate => candidate.ieee_address === ieeeAddress);
+    if (!read || !read.device) {
+      throw new Error(`Device ${ieeeAddress} is no longer ready to be added`);
     }
-    return entry.device;
+    return read.device;
   };
 
   // The request of the Discover tab (feature names from the dictionary, states stripped). Resolves to false when it
-  // failed: the phone sheet then stays open.
+  // failed (the device not read again included): the phone sheet then stays open. Also false, without the toast "added",
+  // for a device found already in Gladys: its row then is no longer the sheet.
   add = async entry => {
     const ieeeAddress = entry.ieee_address;
     const card = this.state.cards[ieeeAddress];
@@ -217,19 +221,34 @@ class PairingWindow extends Component {
     }
     this.updateCard(ieeeAddress, { saving: true, error: false });
     const dictionary = get(this.props, 'intl.dictionary');
-    const read = await this.readDevice(entry);
-    const { cards } = this.state;
-    const typed = cards[ieeeAddress] || card;
-    const device = {
-      ...read,
-      name: typed.name.trim() || entry.friendly_name,
-      room_id: typed.roomId || null,
-      features: (read.features || []).map(feature => {
-        const featureName = get(dictionary, `deviceFeatureCategory.${feature.category}.${feature.type}`);
-        return featureName ? { ...feature, name: featureName } : feature;
-      })
-    };
     try {
+      const read = await this.readDevice(ieeeAddress);
+      // Added to Gladys meanwhile (another window, the Discover tab): not saved over, told already in Gladys under the
+      // name it has there
+      if (read.id !== undefined) {
+        if (!this.unmounted) {
+          this.takenNames.push(read.name);
+          this.updateCard(ieeeAddress, {
+            saving: false,
+            added: true,
+            existing: true,
+            name: read.name,
+            selector: read.selector
+          });
+        }
+        return false;
+      }
+      const { cards } = this.state;
+      const typed = cards[ieeeAddress] || card;
+      const device = {
+        ...read,
+        name: typed.name.trim() || entry.friendly_name,
+        room_id: typed.roomId || null,
+        features: (read.features || []).map(feature => {
+          const featureName = get(dictionary, `deviceFeatureCategory.${feature.category}.${feature.type}`);
+          return featureName ? { ...feature, name: featureName } : feature;
+        })
+      };
       const saved = await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
       if (!this.unmounted) {
         this.takenNames.push(saved.name);
@@ -262,21 +281,26 @@ class PairingWindow extends Component {
 
   // Told by Zigbee2mqtt (see handlePermitJoin), waited for from the click: its answer may come before the one of the
   // request. In the demo nothing answers: the request is enough.
+  // Each click is an attempt: the answer of an earlier one (still running after its 10 s, then clicked again) touches
+  // neither the timer nor the outcome of the last.
   sendPermitJoin = async value => {
     const request = value ? REQUEST.ALLOW : REQUEST.STOP;
+    this.permitJoinAttempts += 1;
+    const attempt = this.permitJoinAttempts;
+    const isCurrent = () => !this.unmounted && attempt === this.permitJoinAttempts && this.state.request === request;
     this.joiningAsked = true;
     this.stopWaiting();
     this.requestTimer = setTimeout(this.notConfirmed, PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS);
     this.setState({ request, requestError: null });
     try {
       await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/permit_join', { value });
-      if (config.demoMode && !this.unmounted && this.state.request === request) {
+      if (config.demoMode && isCurrent()) {
         this.handlePermitJoin({ allowed: value, remainingSeconds: value ? 254 : null });
       }
     } catch (e) {
       console.error('Failed to change whether joining is permitted', e);
       // Not when Zigbee2mqtt told the outcome meanwhile: the answer only got lost
-      if (!this.unmounted && this.state.request === request) {
+      if (isCurrent()) {
         this.stopWaiting();
         this.setState({ request: null, requestError: request });
       }
@@ -305,13 +329,15 @@ class PairingWindow extends Component {
       requestError: null,
       entries: [],
       loadError: false,
-      // By IEEE address: { name, edited, roomId, saving, error, added, selector }
+      // By IEEE address: { name, edited, roomId, saving, error, added, existing, selector }; existing: found already in
+      // Gladys when added (added meanwhile elsewhere), not saved over
       cards: {},
       houses: []
     };
     // Number the requests: only the answer of the last one counts, and a message is more recent than any of them
     this.permitJoinRequests = 0;
     this.pairingRequests = 0;
+    this.permitJoinAttempts = 0;
     this.requestTimer = null;
     this.takenNames = [];
   }
@@ -534,7 +560,7 @@ class PairingWindow extends Component {
       return (
         <div class={style.inGladys} data-cy="z2m-pairing-in-gladys">
           <span class="badge badge-success">
-            <Text id={card && card.added ? `${T}.added` : `${T}.alreadyInGladys`} />
+            <Text id={card && card.added && !card.existing ? `${T}.added` : `${T}.alreadyInGladys`} />
           </span>
           {selector && (
             <Link href={`${EDIT_URL}/${selector}`} data-cy="z2m-pairing-open-device">
@@ -702,7 +728,7 @@ class PairingWindow extends Component {
     }
     return (
       <MobilePill tone="success" data-cy="z2m-pairing-in-gladys">
-        <Text id={card && card.added ? `${T}.added` : `${T}.alreadyInGladys`} />
+        <Text id={card && card.added && !card.existing ? `${T}.added` : `${T}.alreadyInGladys`} />
       </MobilePill>
     );
   }

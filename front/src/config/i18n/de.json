@@ -2759,6 +2759,13 @@
           "interview": "Interview",
           "ready": "Bereit"
         },
+        "stepStates": {
+          "done": "(erledigt)",
+          "running": "(läuft)",
+          "failed": "(fehlgeschlagen)",
+          "warning": "(nicht unterstützt)",
+          "todo": "(ausstehend)"
+        },
         "preparing": "Gerät wird vorbereitet…",
         "unsupportedText": "Zigbee2MQTT unterstützt dieses Modell nicht: Gladys kann es nicht hinzufügen.",
         "failedText": "Das Interview ist fehlgeschlagen. Bring das Gerät näher an den Stick oder an ein Gerät mit Netzanschluss und versetze es erneut in den Anlernmodus.",

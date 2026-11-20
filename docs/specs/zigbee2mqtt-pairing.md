@@ -79,7 +79,7 @@ Both carry the same object:
 
 Unchanged (installation spec, E.1): `{ value: true }` asks for 254 s, `{ value: false }` closes,
 400 `ZIGBEE2MQTT_NOT_ANSWERING` when Zigbee2mqtt does not answer. Asking again while joining is open
-starts a new window of 254 s ("Extend", D).
+renews the current window for 254 s ("Extend", D): the same window (B.1), the registry kept.
 
 ## C. Pairing registry
 
@@ -112,6 +112,8 @@ opened:
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
 - `device_announce` is ignored: every known device announces itself when it powers up.
+- The names of a `bridge/devices` are taken as it arrives, before the Gladys devices renamed in
+  Zigbee2mqtt are re-attached (an await): a name told meanwhile, more recent, is not replaced by them.
 - Closing joining keeps the registry: an interview often ends after the window, and the user may add
   the ready devices later. A new run of Zigbee2mqtt keeps it too, and so does the same window told again
   after a reconnection or an init (B.1).
@@ -153,17 +155,22 @@ device".
   told within 10 s, or refused by the server, it failed (an error under the header, the button back).
   Joining told closed while asked to open is not a refusal (the end of the previous window): still
   waited for. What was asked, told later, ends the request and clears its failure. A stop not
-  confirmed while joining is already closed failed in nothing. In the demo, the answer of the request
-  is enough. Without a known end, no countdown.
+  confirmed while joining is already closed failed in nothing. Each click is an attempt: the answer of
+  an earlier one, still running after its 10 s, touches neither the wait nor the outcome of the last.
+  In the demo, the answer of the request is enough. Without a known end, no countdown.
 - **Tips** (approach, pairing mode, add it here) while the registry is empty.
-- **One row per entry**, a timeline "Joined → Interview → Ready":
+- **One row per entry**, a timeline "Joined → Interview → Ready" (each step also tells its state —
+  done, in progress, failed, not supported, to come — in a text for screen readers):
   - `joined`, `interviewing`: the step running, the friendly name (an IEEE address until the device
     has a name);
   - `ready`, `device` known, not in Gladys: a card — photo (D.3), suggested name (D.4, editable),
     room (optional, as in the Discover tab), **Add** (the request of the Discover tab:
     `POST /api/v1/device` with the feature names of the dictionary and the states stripped, the device
     read again from `GET /pairing`, which attaches its energy features to the main electric meter; the
-    message does not). Added: "In Gladys" with a link to the device;
+    message does not). Not read again (the request fails, the device is no longer ready): not added,
+    the error of the card — never the device of the message, saved without its meter. Read again with an
+    `id` (added meanwhile from another window or the Discover tab): not saved over, "Already in Gladys".
+    Added: "In Gladys" with a link to the device;
   - `ready`, already in Gladys (`device.id`): "Already in Gladys" with a link (a device paired again);
   - `unsupported` (D60): "Not supported by Zigbee2MQTT" with the model when known and an explanation
     (Gladys cannot create its features); no Add;

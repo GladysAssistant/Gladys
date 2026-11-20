@@ -204,15 +204,32 @@ describe('zigbee2mqtt pairingDevices', () => {
   });
 
   describe('updatePairingNames', () => {
-    it('should follow a rename in Zigbee2mqtt', () => {
+    it('should follow a rename in Zigbee2mqtt, and leave telling it to the caller', () => {
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { ieee_address: IEEE } });
       gladys.event.emit = fake();
-      zigbee2MqttManager.updatePairingNames([
+      const changed = zigbee2MqttManager.updatePairingNames([
         { ieee_address: IEEE, friendly_name: 'kitchen bulb' },
         { ieee_address: '0x99', friendly_name: 'other' },
         { ieee_address: '0x98' },
       ]);
-      expect(lastSent()[0].friendly_name).to.equal('kitchen bulb');
+      expect(changed).to.equal(true);
+      expect(zigbee2MqttManager.pairingDevices[IEEE].friendly_name).to.equal('kitchen bulb');
+      assert.notCalled(gladys.event.emit);
+    });
+
+    it('should tell that no name changed', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
+      const changed = zigbee2MqttManager.updatePairingNames([{ ieee_address: IEEE, friendly_name: 'a' }]);
+      expect(changed).to.equal(false);
+    });
+  });
+
+  describe('emitPairingDevicesAfterList', () => {
+    it('should tell the registry when a name changed', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
+      gladys.event.emit = fake();
+      zigbee2MqttManager.emitPairingDevicesAfterList(true);
+      assert.calledOnce(gladys.event.emit);
     });
 
     it('should tell the ready devices again, their Gladys device may only now be known', () => {
@@ -221,14 +238,14 @@ describe('zigbee2mqtt pairingDevices', () => {
         data: { friendly_name: 'kitchen bulb', ieee_address: IEEE, status: 'successful', supported: true, definition },
       });
       gladys.event.emit = fake();
-      zigbee2MqttManager.updatePairingNames([{ ieee_address: IEEE, friendly_name: 'kitchen bulb' }]);
+      zigbee2MqttManager.emitPairingDevicesAfterList(false);
       assert.calledOnce(gladys.event.emit);
     });
 
     it('should tell nothing when no name changed and no device is ready', () => {
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
       gladys.event.emit = fake();
-      zigbee2MqttManager.updatePairingNames([{ ieee_address: IEEE, friendly_name: 'a' }]);
+      zigbee2MqttManager.emitPairingDevicesAfterList(false);
       assert.notCalled(gladys.event.emit);
     });
   });

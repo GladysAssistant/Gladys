@@ -43,6 +43,8 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=integration-device-sheet]').should('be.visible');
     cy.get('[data-cy=integration-device-name]').should('have.value', 'Light IKEA');
     cy.get('[data-cy=integration-device-room]').select('Kitchen');
+    // The device is read again from the server before it is added
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` }, { body: [readyBulb] });
     cy.intercept(
       { method: 'POST', url: `${serverUrl}/api/v1/device` },
       { body: { name: 'Light IKEA', selector: 'light-ikea' } }
@@ -62,5 +64,33 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=z2m-pairing-close]').click();
     cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
     cy.get('[data-cy=z2m-dashboard-pair]').should('exist');
+  });
+
+  it('should not save over a device added to Gladys while its sheet was open', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    visitDashboard();
+    answerPairing({ pairing: [readyBulb] });
+    cy.get('[data-cy=z2m-dashboard-pair]').click();
+    cy.wait('@permitJoin');
+    cy.get('[data-cy=z2m-pairing-row]')
+      .should('contain', 'Light IKEA')
+      .click();
+    cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+    // Added from another window or the Discover tab meanwhile
+    const added = { ...readyBulb.device, id: 'a1', selector: 'kitchen-bulb', name: 'Kitchen bulb' };
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` },
+      { body: [{ ...readyBulb, device: added }] }
+    ).as('readAgain');
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, { body: {} }).as('addDevice');
+    cy.get('[data-cy=z2m-pairing-add]').click();
+    cy.wait('@readAgain');
+    cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+    cy.get('[data-cy=integration-mobile-toast]').should('not.exist');
+    cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.alreadyInGladys`);
+    cy.get('[data-cy=z2m-pairing-row]')
+      .should('contain', 'Kitchen bulb')
+      .and('have.attr', 'href', '/dashboard/integration/device/zigbee2mqtt/edit/kitchen-bulb');
+    cy.get('@addDevice.all').should('have.length', 0);
   });
 });

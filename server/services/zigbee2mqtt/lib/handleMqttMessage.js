@@ -102,6 +102,9 @@ async function handleMqttMessage(topic, message) {
         }
       });
 
+      // The names of the devices being paired, before the await: a name told meanwhile is more recent
+      const pairingNamesChanged = this.updatePairingNames(devices);
+
       // Re-attach Gladys devices renamed in Zigbee2mqtt (matched by IEEE address)
       // before publishing the discovered devices, so they merge with the right device.
       await this.syncRenamedDevices(devices);
@@ -110,7 +113,7 @@ async function handleMqttMessage(topic, message) {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
         payload: this.getDiscoveredDevices(),
       });
-      this.updatePairingNames(devices);
+      this.emitPairingDevicesAfterList(pairingNamesChanged);
       break;
     }
     case 'zigbee2mqtt/bridge/event': {

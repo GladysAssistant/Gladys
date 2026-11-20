@@ -121,9 +121,11 @@ function handleBridgeEvent(event) {
 }
 
 /**
- * @description Follow the device list of Zigbee2mqtt (`bridge/devices`): the names of the devices being paired, and
- * the Gladys device of the ready ones, which may only now be known.
+ * @description Follow the device list of Zigbee2mqtt (`bridge/devices`): the names of the devices being paired. Called
+ * as soon as the list arrives, so that a list told before cannot replace a name told after it; the caller tells the
+ * registry once the Gladys devices are known (see emitPairingDevicesAfterList).
  * @param {Array} devices - The devices Zigbee2mqtt lists.
+ * @returns {boolean} Whether a name changed.
  * @example
  * updatePairingNames([{ ieee_address: '0x00158d0001', friendly_name: 'kitchen/bulb' }]);
  */
@@ -136,8 +138,18 @@ function updatePairingNames(devices) {
       changed = true;
     }
   });
-  const anyReady = Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY);
-  if (changed || anyReady) {
+  return changed;
+}
+
+/**
+ * @description Tell the registry once a device list of Zigbee2mqtt (`bridge/devices`) is handled: when a name changed,
+ * and while a device is ready, whose Gladys device may only now be known (one may have become ready meanwhile).
+ * @param {boolean} namesChanged - Whether updatePairingNames changed a name.
+ * @example
+ * emitPairingDevicesAfterList(true);
+ */
+function emitPairingDevicesAfterList(namesChanged) {
+  if (namesChanged || Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY)) {
     this.emitPairingDevices();
   }
 }
@@ -146,6 +158,7 @@ module.exports = {
   handleBridgeEvent,
   getPairingDevices,
   emitPairingDevices,
+  emitPairingDevicesAfterList,
   clearPairingDevices,
   updatePairingNames,
 };

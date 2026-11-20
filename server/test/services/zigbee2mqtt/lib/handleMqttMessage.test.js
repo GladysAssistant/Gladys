@@ -422,6 +422,80 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({ '0x00158d00033e88d5': stillThere });
   });
 
+  it('should keep a pairing name told while the device list was being handled', async () => {
+    // PREPARE
+    const ieeeAddress = '0x00124b0023a1b2c3';
+    zigbee2mqttManager.handleBridgeEvent({
+      type: 'device_joined',
+      data: { ieee_address: ieeeAddress, friendly_name: ieeeAddress },
+    });
+    // A rename told by Zigbee2mqtt while Gladys re-attaches the renamed devices
+    zigbee2mqttManager.syncRenamedDevices = fake(async () => {
+      zigbee2mqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: ieeeAddress, friendly_name: 'garden siren', status: 'started' },
+      });
+    });
+    gladys.event.emit = fake();
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
+    // ASSERT
+    expect(zigbee2mqttManager.pairingDevices[ieeeAddress].friendly_name).to.equal('garden siren');
+    const pairingMessages = gladys.event.emit.args.filter(
+      ([, message]) => message.type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PAIRING,
+    );
+    // The interview, then the registry once the list is handled
+    expect(pairingMessages).to.have.lengthOf(2);
+    expect(pairingMessages[1][1].payload[0].friendly_name).to.equal('garden siren');
+  });
+
+  it('should tell again a device that became ready while the device list was being handled', async () => {
+    // PREPARE
+    const ieeeAddress = '0x00158d00033e88d5';
+    zigbee2mqttManager.handleBridgeEvent({
+      type: 'device_interview',
+      data: { ieee_address: ieeeAddress, friendly_name: ieeeAddress, status: 'started' },
+    });
+    // Its interview ends while Gladys re-attaches the renamed devices
+    zigbee2mqttManager.syncRenamedDevices = fake(async () => {
+      zigbee2mqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: {
+          ieee_address: ieeeAddress,
+          friendly_name: ieeeAddress,
+          status: 'successful',
+          supported: true,
+          definition: { model: 'WSDCGQ11LM', vendor: 'Xiaomi', description: 'Sensor' },
+        },
+      });
+    });
+    gladys.event.emit = fake();
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
+    // ASSERT
+    const pairingMessages = gladys.event.emit.args.filter(
+      ([, message]) => message.type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PAIRING,
+    );
+    // The end of the interview, then the registry once the Gladys devices are known
+    expect(pairingMessages).to.have.lengthOf(2);
+    expect(pairingMessages[1][1].payload[0].status).to.equal('ready');
+  });
+
+  it('should not tell the registry again when the device list changes nothing of it', async () => {
+    // PREPARE
+    zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
+    // ASSERT
+    assert.neverCalledWith(
+      gladys.event.emit,
+      EVENTS.WEBSOCKET.SEND_ALL,
+      sinon.match({
+        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PAIRING,
+      }),
+    );
+  });
+
   it('should no longer read the legacy permit join topics of Zigbee2mqtt 1', async () => {
     // No Gladys device of that name
     gladys.stateManager.get = fake.returns(null);

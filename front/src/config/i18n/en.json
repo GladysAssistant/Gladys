@@ -2515,6 +2515,13 @@
           "interview": "Interview",
           "ready": "Ready"
         },
+        "stepStates": {
+          "done": "(done)",
+          "running": "(in progress)",
+          "failed": "(failed)",
+          "warning": "(not supported)",
+          "todo": "(to come)"
+        },
         "preparing": "Getting the device ready…",
         "unsupportedText": "Zigbee2MQTT does not support this model: Gladys cannot add it.",
         "failedText": "The interview failed. Bring the device closer to the dongle or to a mains-powered device, then put it in pairing mode again.",

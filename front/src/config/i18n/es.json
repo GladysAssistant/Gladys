@@ -2515,6 +2515,13 @@
           "interview": "Entrevista",
           "ready": "Listo"
         },
+        "stepStates": {
+          "done": "(completado)",
+          "running": "(en curso)",
+          "failed": "(fallido)",
+          "warning": "(no compatible)",
+          "todo": "(pendiente)"
+        },
         "preparing": "Preparando el dispositivo…",
         "unsupportedText": "Zigbee2MQTT no admite este modelo: Gladys no puede añadirlo.",
         "failedText": "La entrevista ha fallado. Acerca el dispositivo a la llave o a un dispositivo conectado a la red eléctrica y vuelve a ponerlo en modo emparejamiento.",

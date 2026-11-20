@@ -114,6 +114,40 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-request-error]').should('not.exist');
     });
 
+    it('should not let the late failure of an earlier attempt touch the attempt that followed it', () => {
+      visitDashboard();
+      answerPairing();
+      const serverUrl = Cypress.env('serverUrl');
+      let attempts = 0;
+      let releaseFirst;
+      const firstHeld = new Cypress.Promise(resolve => {
+        releaseFirst = resolve;
+      });
+      cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, req => {
+        attempts += 1;
+        if (attempts === 1) {
+          // Held until the user asked again: the first attempt fails after its 10 s and after the second one
+          return firstHeld.then(() => req.reply({ statusCode: 500, body: {} }));
+        }
+        return req.reply({ body: {} });
+      }).as('permitJoin');
+      cy.clock();
+      cy.get('[data-cy=z2m-dashboard-pair]').click();
+      cy.tick(10000);
+      cy.get('[data-cy=z2m-pairing-request-error]').i18n(`${T}.allowError`);
+      cy.get('[data-cy=z2m-pairing-allow]').click();
+      cy.get('[data-cy=z2m-pairing-allow]').should('be.disabled');
+      cy.then(() => releaseFirst());
+      cy.wait('@permitJoin');
+      cy.wait('@permitJoin');
+      // The last attempt still waits for Zigbee2mqtt
+      cy.get('[data-cy=z2m-pairing-request-error]').should('not.exist');
+      cy.get('[data-cy=z2m-pairing-allow]').should('be.disabled');
+      // ... with its own 10 s
+      cy.tick(10000);
+      cy.get('[data-cy=z2m-pairing-request-error]').i18n(`${T}.allowError`);
+    });
+
     it('should say that Gladys lost the broker, not that Zigbee2mqtt does not answer', () => {
       openPairing();
       sendStatus({ ...onlineStatus, gladysConnected: false, zigbee2mqttConnected: false });
@@ -235,6 +269,49 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-add]').should('not.be.disabled');
     });
 
+    it('should not add the device of the message when the device cannot be read again', () => {
+      const serverUrl = Cypress.env('serverUrl');
+      openPairing({ pairing: [readyBulb] });
+      cy.get('[data-cy=z2m-pairing-card]').should('exist');
+      cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` }, { statusCode: 500 }).as(
+        'readAgain'
+      );
+      cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, { body: {} }).as('addDevice');
+      cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.wait('@readAgain');
+      // Saved from the message, the device would have no main meter
+      cy.get('[data-cy=z2m-pairing-add-error]').i18n(`${T}.addError`);
+      cy.get('[data-cy=z2m-pairing-add]').should('not.be.disabled');
+      cy.get('@addDevice.all').should('have.length', 0);
+    });
+
+    it('should not save over a device added to Gladys meanwhile', () => {
+      const serverUrl = Cypress.env('serverUrl');
+      openPairing({ pairing: [readyBulb] });
+      cy.get('[data-cy=z2m-pairing-card]').should('exist');
+      // Added from another window or the Discover tab while the card was open
+      const added = { ...readyBulb.device, id: 'a1', selector: 'kitchen-bulb', name: 'Kitchen bulb' };
+      cy.intercept(
+        { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` },
+        { body: [{ ...readyBulb, device: added }] }
+      ).as('readAgain');
+      cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, { body: {} }).as('addDevice');
+      cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.wait('@readAgain');
+      cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.alreadyInGladys`);
+      // Under the name it has in Gladys, not the one suggested
+      cy.get('[data-cy=z2m-pairing-row]')
+        .should('contain', 'Kitchen bulb')
+        .and('not.contain', 'Light IKEA');
+      cy.get('[data-cy=z2m-pairing-open-device]').should(
+        'have.attr',
+        'href',
+        '/dashboard/integration/device/zigbee2mqtt/edit/kitchen-bulb'
+      );
+      cy.get('[data-cy=z2m-pairing-card]').should('not.exist');
+      cy.get('@addDevice.all').should('have.length', 0);
+    });
+
     it('should tell a device already in Gladys, a device not supported and a failed interview', () => {
       const inGladys = {
         ...readyBulb,
@@ -280,6 +357,10 @@ describe('Zigbee2mqtt pairing window', () => {
         .within(() => {
           cy.get('[data-cy=z2m-pairing-failed]').i18n(`${T}.failedText`);
           cy.get('[data-cy=z2m-pairing-add]').should('not.exist');
+          // The failed step, told to a screen reader too
+          cy.get('[data-cy=z2m-pairing-timeline] .sr-only')
+            .eq(1)
+            .i18n(`${T}.stepStates.failed`);
         });
 
       // The failed device left the network
