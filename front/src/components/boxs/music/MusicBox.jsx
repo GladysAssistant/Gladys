@@ -157,11 +157,13 @@ class MusicComponent extends Component {
   //
   // A command the integration refuses outright does come back, and at once: as a state flagged
   // `rollback` (components/device/DeviceCommandError.jsx, which also says so in its toast). It
-  // can land before the value route answers, so it is remembered: no confirmation is awaited
-  // for a command already known to have failed, or the box would say, 15 s after the toast,
-  // that the player did not respond.
+  // can land before the value route answers, so it marks every request of that feature still
+  // on its way: no confirmation is awaited for a command which may be the one that failed, or
+  // the box would say, 15 s after the toast, that the player did not respond. The rollback
+  // carries the real state; a later state of the player still lands as usual.
   setValueDevice = async (deviceFeature, value, { expectConfirmation = false } = {}) => {
-    this.failedCommands.delete(deviceFeature.selector);
+    const command = { selector: deviceFeature.selector, failed: false };
+    this.commandsOnTheirWay.add(command);
     try {
       await sendDeviceFeatureValue(this.props.httpClient, deviceFeature.selector, value);
     } catch (e) {
@@ -169,8 +171,10 @@ class MusicComponent extends Component {
       this.showCommandError('commandFailed');
       this.getDevice();
       return;
+    } finally {
+      this.commandsOnTheirWay.delete(command);
     }
-    if (this.failedCommands.delete(deviceFeature.selector)) {
+    if (command.failed) {
       return;
     }
     // the deadline starts once the core took the command
@@ -179,8 +183,9 @@ class MusicComponent extends Component {
     }
   };
 
-  // selectors of the features whose last command Gladys reported as failed
-  failedCommands = new Set();
+  // the requests not answered yet, each marked `failed` when Gladys reports a failure of its
+  // feature meanwhile: one entry per request, so a request never takes another one's mark
+  commandsOnTheirWay = new Set();
 
   awaitConfirmation = selector => {
     this.clearConfirmation(selector);
@@ -389,7 +394,11 @@ class MusicComponent extends Component {
     this.clearConfirmation(payload.device_feature_selector);
     if (payload.rollback) {
       // not the player: Gladys, saying that the command failed and giving the real state back
-      this.failedCommands.add(payload.device_feature_selector);
+      this.commandsOnTheirWay.forEach(command => {
+        if (command.selector === payload.device_feature_selector) {
+          command.failed = true;
+        }
+      });
     }
     const value = numberOrNull(payload.last_value);
     this.updateFeatureValue(type, value, payload.last_value_changed);

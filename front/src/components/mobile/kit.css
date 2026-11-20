@@ -1207,9 +1207,6 @@ a.bigButtonGhost:focus {
   }
 }
 
-.toastDismissable {
-  cursor: pointer;
-}
 
 .toastText {
   flex: 1;
@@ -1228,6 +1225,14 @@ a.bigButtonGhost:focus {
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+/* the close button (×) of a toast which can be dismissed */
+.toastClose {
+  min-width: 44px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.125rem;
 }
 
 @keyframes kitToastIn {

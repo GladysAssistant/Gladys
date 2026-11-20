@@ -138,8 +138,8 @@
       "notConfigured": "El comando no se ha enviado a «{{name}}»: su integración no está configurada o no está conectada.",
       "refused": "El comando enviado a «{{name}}» ha sido rechazado.",
       "notFound": "El comando no se ha enviado: este dispositivo, o su integración, ya no existe en Gladys.",
-      "gladysUnreachable": "No se puede acceder a Gladys: el comando no se ha enviado.",
-      "gladysUnreachableSeveral": "No se puede acceder a Gladys: los comandos no se han enviado.",
+      "gladysUnreachable": "No se puede acceder a Gladys: es posible que el comando no se haya enviado.",
+      "gladysUnreachableSeveral": "No se puede acceder a Gladys: es posible que los comandos no se hayan enviado.",
       "several": "Los comandos enviados a {{count}} dispositivos han fallado.",
       "unknownDevice": "El comando ha fallado. Es posible que el dispositivo no esté accesible."
     },

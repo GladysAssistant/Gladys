@@ -138,8 +138,8 @@
       "notConfigured": "The command was not sent to “{{name}}”: its integration is not configured or not connected.",
       "refused": "The command sent to “{{name}}” was refused.",
       "notFound": "The command was not sent: this device, or its integration, no longer exists in Gladys.",
-      "gladysUnreachable": "Gladys could not be reached: the command was not sent.",
-      "gladysUnreachableSeveral": "Gladys could not be reached: the commands were not sent.",
+      "gladysUnreachable": "Gladys could not be reached: the command may not have been sent.",
+      "gladysUnreachableSeveral": "Gladys could not be reached: the commands may not have been sent.",
       "several": "The commands sent to {{count}} devices failed.",
       "unknownDevice": "The command failed. The device may be unreachable."
     },

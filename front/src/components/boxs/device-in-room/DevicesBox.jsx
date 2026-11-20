@@ -230,9 +230,9 @@ class DevicesComponent extends Component {
       await this.setValueDevice(deviceFeature, value);
     } catch (e) {
       console.error(e);
-      // The request did not go through: the command was never sent. Same message as a device
-      // Gladys could not drive, with its own cause: DeviceCommandError.jsx says so and puts the
-      // widgets back on the state below.
+      // The request did not go through: the command may not have been sent. Same message as a
+      // device Gladys could not drive, with its own cause: DeviceCommandError.jsx says so and
+      // puts the widgets back on the state below.
       this.props.session.dispatcher.dispatch(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR, {
         client_id: COMMAND_CLIENT_ID,
         cause: getCommandNotSentCause(e),

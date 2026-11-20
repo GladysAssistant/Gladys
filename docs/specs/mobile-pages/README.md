@@ -159,10 +159,10 @@ One error goes through it, because it has no place of its own: **a device comman
 (`components/device/DeviceCommandError.jsx`, mounted once in the app shell, on every screen
 size; the contract is `dashboard-flexible-layout-and-widgets.md`, section K). For that toast
 `MobileToast` takes three more props, none of which changes the default: `role="alert"` (an
-error is announced at once), `dismissOnTap` (a tap closes it) and `aboveDock` — below 992px the
-shell cannot know what the page pins to the bottom of the screen (the dock of the dashboard, a
-bottom bar), so the toast always sits above where they are, and follows `--dock-lift`, which
-`DashboardPage` mirrors on `<html>`. It stays 6 s.
+error is announced at once), `dismissable` (a close button ×, a real `<button>` named "Close",
+C.7) and `aboveDock` — below 992px the shell cannot know what the page pins to the bottom of
+the screen (the dock of the dashboard, a bottom bar), so the toast always sits above where they
+are, and follows `--dock-lift`, which `DashboardPage` mirrors on `<html>`. It stays 6 s.
 
 ### C.7 Accessibility, motion, dark mode
 

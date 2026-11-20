@@ -145,7 +145,7 @@ class DeviceCommandError extends Component {
         onClose={this.closeToast}
         role="alert"
         aboveDock
-        dismissOnTap
+        dismissable
         dataCy="device-command-error"
       />
     );

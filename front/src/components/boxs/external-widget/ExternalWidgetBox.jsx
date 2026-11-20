@@ -21,7 +21,7 @@ import {
   WidgetButtons,
   WidgetActionForm
 } from './WidgetComponents';
-import { sendDeviceFeatureValue } from '../../../utils/deviceCommand';
+import { sendDeviceFeatureValue, StatesToGoBackTo } from '../../../utils/deviceCommand';
 import style from './style.css';
 
 // Integration statuses and what the card does with them (spec section 12):
@@ -228,6 +228,18 @@ class ExternalWidgetBox extends Component {
     }
   };
 
+  // the state each command on its way goes back to if it cannot be sent
+  statesToGoBackTo = new StatesToGoBackTo();
+
+  // A state from Gladys (the websocket, or a rollback of DeviceCommandError.jsx)
+  onDeviceNewStateFromGladys = payload => {
+    this.statesToGoBackTo.keepStateFromGladys(payload.device_feature_selector, {
+      last_value: payload.last_value,
+      last_value_changed: payload.last_value_changed
+    });
+    this.onDeviceNewState(payload);
+  };
+
   onDeviceNewState = payload => {
     if (!this.state.featuresBySelector[payload.device_feature_selector]) {
       return;
@@ -380,24 +392,28 @@ class ExternalWidgetBox extends Component {
     // driven, and a failure reported by Gladys (a state flagged `rollback`, see
     // DeviceCommandError.jsx) can come back first — applied after the request, the optimistic
     // value would overwrite the real state it had just been given.
-    const previous = this.state.featuresBySelector[component.device_feature_selector];
+    const selector = component.device_feature_selector;
+    const previous = this.state.featuresBySelector[selector];
+    const command = this.statesToGoBackTo.start(selector, {
+      last_value: previous ? previous.last_value : undefined,
+      last_value_changed: previous ? previous.last_value_changed : undefined
+    });
     this.onDeviceNewState({
-      device_feature_selector: component.device_feature_selector,
+      device_feature_selector: selector,
       last_value: component.value,
       last_value_changed: new Date()
     });
+    let failure = null;
     try {
-      await sendDeviceFeatureValue(this.props.httpClient, component.device_feature_selector, component.value);
+      await sendDeviceFeatureValue(this.props.httpClient, selector, component.value);
     } catch (e) {
-      console.error(e);
-      // the command never left: back to what was displayed
-      if (previous) {
-        this.onDeviceNewState({
-          device_feature_selector: component.device_feature_selector,
-          last_value: previous.last_value,
-          last_value_changed: previous.last_value_changed
-        });
-      }
+      failure = e;
+    }
+    const stateToGoBackTo = this.statesToGoBackTo.finish(command);
+    if (failure) {
+      console.error(failure);
+      // the request failed: back to the last state known (a feature not loaded is ignored)
+      this.onDeviceNewState({ device_feature_selector: selector, ...stateToGoBackTo });
       this.showActionMessage({ error: true, text: null });
     }
     this.setPending(index, false);
@@ -410,7 +426,7 @@ class ExternalWidgetBox extends Component {
     const { dispatcher } = this.props.session;
     dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED, this.onStatusChanged);
     dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_UPDATED, this.onWidgetUpdated);
-    dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onDeviceNewState);
+    dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onDeviceNewStateFromGladys);
     dispatcher.addListener('websocket.connected', this.onWebsocketConnected);
   }
 
@@ -439,7 +455,7 @@ class ExternalWidgetBox extends Component {
     const { dispatcher } = this.props.session;
     dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED, this.onStatusChanged);
     dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_UPDATED, this.onWidgetUpdated);
-    dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onDeviceNewState);
+    dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onDeviceNewStateFromGladys);
     dispatcher.removeListener('websocket.connected', this.onWebsocketConnected);
   }
 

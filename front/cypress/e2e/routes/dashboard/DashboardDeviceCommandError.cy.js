@@ -93,8 +93,11 @@ describe('Dashboard: a device command which fails', () => {
       .should('have.attr', 'role', 'alert')
       .and('contain', i18n.setValueError.gladysUnreachable);
     switchOf(0).should('not.be.checked');
-    // a tap dismisses it
-    cy.get(toast).click();
+    // its close button dismisses it
+    cy.get(toast)
+      .find('[data-cy="mobile-toast-close"]')
+      .should('have.attr', 'aria-label', 'Close')
+      .click();
     cy.get(toast).should('not.exist');
   });
 

@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { createPortal } from 'preact/compat';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './kit.css';
@@ -17,8 +18,8 @@ const DEFAULT_DURATION_MS = 4000;
  *
  * For a toast shown from the app shell, which cannot know the page under it: aboveDock keeps it
  * clear, below 992px, of whatever a page pins to the bottom of the screen (the dock of the
- * dashboard, a bottom bar), and dismissOnTap lets a tap on it close it. role: "alert" for the
- * one error that goes through a toast (C.6), "status" otherwise.
+ * dashboard, a bottom bar), and dismissable adds a close button (×) to it. role: "alert" for
+ * the one error that goes through a toast (C.6), "status" otherwise.
  */
 class MobileToast extends Component {
   componentDidMount() {
@@ -49,20 +50,17 @@ class MobileToast extends Component {
     }
   };
 
-  render({ message, actionLabel, onAction, aboveBar, aboveDock, dismissOnTap, onClose, role, dataCy }) {
+  render({ message, actionLabel, onAction, aboveBar, aboveDock, dismissable, onClose, role, dataCy }) {
     if (!message) {
       return null;
     }
-    const dismissable = Boolean(dismissOnTap && onClose);
     return createPortal(
       <div
         class={cx(style.toast, {
           [style.toastAboveBar]: aboveBar,
-          [style.toastAboveDock]: aboveDock,
-          [style.toastDismissable]: dismissable
+          [style.toastAboveDock]: aboveDock
         })}
         role={role || 'status'}
-        onClick={dismissable ? onClose : undefined}
         data-cy={dataCy || 'mobile-toast'}
       >
         <span class={style.toastText}>{message}</span>
@@ -70,6 +68,19 @@ class MobileToast extends Component {
           <button type="button" class={style.toastButton} onClick={this.runAction} data-cy="mobile-toast-action">
             {actionLabel}
           </button>
+        )}
+        {dismissable && onClose && (
+          <Localizer>
+            <button
+              type="button"
+              class={cx(style.toastButton, style.toastClose)}
+              onClick={onClose}
+              aria-label={<Text id="mobileKit.close" />}
+              data-cy="mobile-toast-close"
+            >
+              <i class="fe fe-x" aria-hidden="true" />
+            </button>
+          </Localizer>
         )}
       </div>,
       document.body
