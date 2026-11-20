@@ -135,6 +135,10 @@ class ConnectionLostNotice extends Component {
     return !isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER) && Boolean(session) && session.isConnected();
   };
 
+  // Painted: active, and with something to say — a lost live connection is not shown until
+  // the first answer to "is Gladys there?" came back (see render)
+  isShown = () => this.isActive() && (this.state.reachable !== null || Boolean(this.props.gladysUnreachable));
+
   // Asks Gladys whether it is there, and acts on the answer. `byUser` is "Retry" / "Reload".
   check = async ({ byUser = false } = {}) => {
     // one question at a time for the timer; a press on the button always gets its own
@@ -239,7 +243,7 @@ class ConnectionLostNotice extends Component {
 
   componentDidMount() {
     this.listenTo(this.props.session);
-    setConnectionNoticeShown(this.isActive());
+    setConnectionNoticeShown(this.isShown());
     if (this.isActive()) {
       this.startChecking();
     }
@@ -261,7 +265,7 @@ class ConnectionLostNotice extends Component {
   componentDidUpdate(previousProps, previousState) {
     const wasActive = this.isActive(previousProps, previousState);
     const isActive = this.isActive();
-    setConnectionNoticeShown(isActive);
+    setConnectionNoticeShown(this.isShown());
     if (isActive && !wasActive) {
       this.startChecking();
     } else if (!isActive && this.checkInterval) {
