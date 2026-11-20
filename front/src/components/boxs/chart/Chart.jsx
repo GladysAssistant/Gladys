@@ -54,6 +54,8 @@ const notNullNotUndefined = value => {
 
 const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
 
+const AGGREGATES_IGNORING_CARRIED_FORWARD = ['sum', 'count'];
+
 const getDeviceValueByAggregateFunction = (value, aggregateFunction) => {
   if (aggregateFunction === 'min') {
     return value.min_value;
@@ -291,7 +293,20 @@ class Chartbox extends Component {
         queryParams.offset = this.state.offset;
       }
 
-      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, queryParams);
+      const rawData = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, queryParams);
+      // The server adds "carried forward" points: the value still in force at the start and at the end
+      // of the period, so a value that is set and does not move (a setpoint) is still drawn. They are not
+      // recorded states, so a sum or a count must ignore them. A timeline has no aggregate (a box switched
+      // to a timeline may still keep one): its carried segment is the state at the start of the period.
+      const ignoreCarriedForward =
+        this.props.box.chart_type !== 'timeline' &&
+        AGGREGATES_IGNORING_CARRIED_FORWARD.includes(this.props.box.aggregate_function);
+      const data = ignoreCarriedForward
+        ? rawData.map(oneFeature => ({
+            ...oneFeature,
+            values: oneFeature.values.filter(value => !value.carried_forward)
+          }))
+        : rawData;
 
       let emptySeries = true;
 
