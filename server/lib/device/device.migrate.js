@@ -6,6 +6,7 @@ const { NotFoundError, BadParameters, ConflictError } = require('../../utils/cor
 const { EVENTS } = require('../../utils/constants');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const { parseSelectorList, serializeSelectorList } = require('../../utils/thermostatSelectorList');
+const { isTooMuchStatesError } = require('./device.destroy');
 
 // Fields carrying selectors in scene actions/triggers and dashboard boxes.
 // This list is a contract with the Joi schemas of models/scene.js and
@@ -641,7 +642,17 @@ async function executeMigration(selector, options, jobId) {
 
   await this.job.updateProgress(jobId, 95, { step: 'deleting_source_device' });
 
-  await this.destroy(source.selector);
+  try {
+    await this.destroy(source.selector, { migration: true });
+  } catch (e) {
+    // The source saved states again while scenes and dashboards were rewritten, and went back
+    // over the limit: its history is purged in the background, then it is deleted on its own.
+    // The migration itself is done.
+    if (!isTooMuchStatesError(e)) {
+      throw e;
+    }
+    logger.info(`Migrated device ${selector}: the source device is deleted in the background (${e.message})`);
+  }
 
   logger.info(
     `Migrated device ${selector} to ${destinationSelector}: ${duckDbStatesMigrated} states moved,` +
@@ -681,6 +692,14 @@ async function migrate(selector, options, jobId) {
   const conflictingSelector = selectorsToLock.find((deviceSelector) => this.migrationsInProgress.has(deviceSelector));
   if (conflictingSelector) {
     throw new ConflictError(`A migration is already in progress for device ${conflictingSelector}`);
+  }
+  // A device being deleted in the background is losing its history, and is deleted at the end:
+  // it is neither a source nor a destination
+  const selectorBeingDestroyed = selectorsToLock.find((deviceSelector) =>
+    [...this.devicesBeingDestroyed.values()].some((deletion) => deletion.selector === deviceSelector),
+  );
+  if (selectorBeingDestroyed) {
+    throw new ConflictError(`Device ${selectorBeingDestroyed} is being deleted`);
   }
   selectorsToLock.forEach((deviceSelector) => this.migrationsInProgress.add(deviceSelector));
   try {

@@ -34,18 +34,50 @@ describe('zigbee2mqtt service', () => {
   });
 
   it('should start service', async () => {
+    // Not started yet: Gladys starts its services one after the other
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(false);
     // EXECUTE
     await zigbee2MqttService.start();
     // ASSERT
     assert.calledOnce(zigbee2MqttService.device.init);
     assert.notCalled(zigbee2MqttService.device.disconnect);
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(true);
+  });
+  it('should not start a second init when asked again while one runs', async () => {
+    // PREPARE: started by Settings > Services while Gladys starts its services, its init running
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(false);
+    zigbee2MqttService.device.runningOperations = 1;
+    zigbee2MqttService.device.emitStatusEvent = fake();
+    // EXECUTE
+    await zigbee2MqttService.start();
+    // ASSERT
+    assert.notCalled(zigbee2MqttService.device.init);
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(true);
+    assert.calledOnce(zigbee2MqttService.device.emitStatusEvent);
   });
   it('should stop service', async () => {
+    // PREPARE
+    zigbee2MqttService.device.serviceStarted = true;
+    zigbee2MqttService.device.emitStatusEvent = fake();
     // EXECUTE
     await zigbee2MqttService.stop();
     // ASSERT
     assert.calledOnce(zigbee2MqttService.device.disconnect);
     assert.notCalled(zigbee2MqttService.device.init);
+    // Told to the dashboard and the wizard, which send to Settings > Services
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(false);
+    assert.calledOnce(zigbee2MqttService.device.emitStatusEvent);
+  });
+  it('should tell the service stopped even when a container could not be removed', async () => {
+    // PREPARE: the core saves the service stopped anyway
+    zigbee2MqttService.device.serviceStarted = true;
+    zigbee2MqttService.device.disconnect = fake.rejects(new Error('docker refuses'));
+    zigbee2MqttService.device.emitStatusEvent = fake();
+    // EXECUTE
+    await expect(zigbee2MqttService.stop()).to.be.rejectedWith('docker refuses');
+    // ASSERT
+    expect(zigbee2MqttService.device.serviceStarted).to.equal(false);
+    assert.calledOnce(zigbee2MqttService.device.emitStatusEvent);
   });
   it('should stop service once the containers are removed', async () => {
     let containersRemoved;

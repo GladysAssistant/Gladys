@@ -87,6 +87,7 @@ class LANManagerDevice extends Component {
               <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
             ) : null
           }
+          deleteScheduled={Boolean(tooMuchStatesError)}
           dataCy="lan-manager-device-row"
         />
       );

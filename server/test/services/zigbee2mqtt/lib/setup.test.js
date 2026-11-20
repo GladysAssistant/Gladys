@@ -56,12 +56,38 @@ describe('zigbee2mqtt setup', () => {
     // EXECUTE
     await zigbee2MqttManager.setup(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 3);
+    assert.callCount(gladys.variable.setValue, 4);
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', 'usb0', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE_DONGLE_NAME', 'dongle-name', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', 'tcpPort', serviceId);
+    // A first setup: the wizard opens again until Zigbee2mqtt answers
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_SETUP_PENDING', 'true', serviceId);
+    expect(zigbee2MqttManager.setupPending).to.equal(true);
 
-    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation, true);
+    // Set up as soon as saved, before the installation reads it again
+    expect(zigbee2MqttManager.configured).to.equal(true);
+  });
+
+  it('should not take an installation already set up back to its first setup', async () => {
+    // PREPARE: an external broker is saved
+    gladys.variable.getValue = fake((key) => Promise.resolve(key === 'Z2M_MQTT_MODE' ? 'external' : null));
+    // EXECUTE
+    await zigbee2MqttManager.setup({ Z2M_MQTT_URL: 'mqtt://192.168.1.10' });
+    // ASSERT
+    assert.neverCalledWith(gladys.variable.setValue, 'Z2M_SETUP_PENDING');
+    expect(zigbee2MqttManager.setupPending).to.equal(false);
+  });
+
+  it('should forget the stop of the user once the setup is saved', async () => {
+    // PREPARE
+    zigbee2MqttManager.stopped = true;
+    zigbee2MqttManager.clearStop = fake.resolves(null);
+    // EXECUTE
+    await zigbee2MqttManager.setup({ Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://localhost' });
+    // ASSERT
+    assert.calledOnce(zigbee2MqttManager.clearStop);
+    assert.callOrder(gladys.variable.setValue, zigbee2MqttManager.clearStop, zigbee2MqttManager.runInstallation);
   });
 
   it('should store configuration for external broker', async () => {
@@ -78,7 +104,8 @@ describe('zigbee2mqtt setup', () => {
     // EXECUTE
     await zigbee2MqttManager.setup(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 4);
+    assert.callCount(gladys.variable.setValue, 5);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_SETUP_PENDING', 'true', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_URL', 'mqtt://localhost', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'GLADYS_MQTT_USERNAME', '', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'GLADYS_MQTT_PASSWORD', 'password', serviceId);
@@ -88,7 +115,52 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
 
-    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation, true);
+    expect(zigbee2MqttManager.configured).to.equal(true);
+  });
+
+  it('should erase the dongle when an external broker replaces the local one', async () => {
+    zigbee2MqttManager.getConfiguration = fake.resolves({
+      mqttMode: 'local',
+      z2mAdapterMode: 'usb',
+      z2mDriverPath: '/dev/ttyUSB0',
+      z2mDongleName: 'dongle-name',
+    });
+    await zigbee2MqttManager.setup({ Z2M_MQTT_MODE: 'external', Z2M_MQTT_URL: 'mqtt://192.168.1.10' });
+    // Else init would find the dongle and install Zigbee2mqtt locally again
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_ADAPTER_MODE', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_URL', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_TYPE', serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_URL', 'mqtt://192.168.1.10', serviceId);
+  });
+
+  it('should erase the external broker when the local one replaces it, for init to generate its settings', async () => {
+    zigbee2MqttManager.getConfiguration = fake.resolves({
+      mqttMode: 'external',
+      mqttUrl: 'mqtt://192.168.1.10',
+      mqttUsername: 'gladys',
+      mqttPassword: 'secret',
+      z2mFrontendUrl: 'http://192.168.1.10:8080',
+    });
+    zigbee2MqttManager.findDongle = fake.resolves({ port: { path: '/dev/ttyUSB0' }, stablePath: '/dev/ttyUSB0' });
+    await zigbee2MqttManager.setup({
+      Z2M_MQTT_MODE: 'local',
+      Z2M_ADAPTER_MODE: 'usb',
+      ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+      ZIGBEE_DONGLE_NAME: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
+    });
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_URL', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'GLADYS_MQTT_USERNAME', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'GLADYS_MQTT_PASSWORD', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_URL', serviceId);
+  });
+
+  it('should keep the settings of the other mode when the mode does not change', async () => {
+    zigbee2MqttManager.getConfiguration = fake.resolves({ mqttMode: 'external', mqttUrl: 'mqtt://192.168.1.10' });
+    await zigbee2MqttManager.setup({ Z2M_MQTT_MODE: 'external', Z2M_FRONTEND_URL: 'http://192.168.1.10:8080' });
+    assert.notCalled(gladys.variable.destroy);
   });
 
   it('should store network coordinator configuration, and reload Z2M containers', async () => {
@@ -103,7 +175,8 @@ describe('zigbee2mqtt setup', () => {
     // EXECUTE
     await zigbee2MqttManager.setup(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 3);
+    assert.callCount(gladys.variable.setValue, 4);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_SETUP_PENDING', 'true', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_ADAPTER_MODE', 'network', serviceId);
     // The URL has been normalized
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_NETWORK_ADAPTER_URL', 'tcp://192.168.1.20:6638', serviceId);
@@ -112,7 +185,7 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
 
-    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation);
+    assert.calledOnceWithExactly(zigbee2MqttManager.runInstallation, true);
   });
 
   it('should not store an invalid network coordinator configuration', async () => {

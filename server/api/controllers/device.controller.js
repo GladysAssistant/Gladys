@@ -47,6 +47,9 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function create(req, res) {
+    // only here: the integrations which save their devices by themselves are not users looking
+    // at a stale card
+    gladys.device.checkNotBeingDestroyed(req.body);
     const device = await gladys.device.create(req.body);
     res.json(device);
   }

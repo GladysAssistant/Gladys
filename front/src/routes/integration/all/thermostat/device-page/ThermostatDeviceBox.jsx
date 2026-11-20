@@ -183,6 +183,7 @@ class ThermostatDeviceBox extends Component {
           ]}
           onDelete={this.deleteDevice}
           deleteError={deleteErrorMessage}
+          deleteScheduled={Boolean(tooMuchStatesError)}
           dataCy="thermostat-device-row"
         />
       );

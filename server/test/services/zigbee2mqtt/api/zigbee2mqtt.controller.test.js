@@ -30,6 +30,9 @@ const zigbee2mqttManager = {
   setPermitJoin: fake.returns(true),
   getPermitJoin: fake.returns(true),
   reset: fake.resolves(true),
+  stop: fake.resolves(),
+  start: fake.resolves(),
+  restart: fake.resolves(),
   refuseWhileInstalling: fake(),
 };
 
@@ -38,6 +41,8 @@ describe('zigbee2mqtt API', () => {
 
   beforeEach(() => {
     controller = Zigbee2MqttController(gladys, zigbee2mqttManager, 'de1dd005-092d-456d-93d1-817c9ace4c67');
+    zigbee2mqttManager.stopped = false;
+    zigbee2mqttManager.serviceStarted = true;
     zigbee2mqttManager.refuseWhileInstalling = fake();
     zigbee2mqttManager.getConfiguration = fake.resolves({
       mqttUrl: 'mqtt://localhost:1884',
@@ -189,6 +194,34 @@ describe('zigbee2mqtt API', () => {
   });
 
   [
+    ['mqtt/start', 'installMqttContainer'],
+    ['z2m/start', 'installZ2mContainer'],
+  ].forEach(([route, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused while the user keeps Zigbee2mqtt stopped`, async () => {
+      // PREPARE
+      zigbee2mqttManager.stopped = true;
+      zigbee2mqttManager.getConfiguration = fake.resolves({
+        mqttPassword: 'gladys-password',
+        z2mMqttPassword: 'z2m-password',
+        z2mAdapterMode: 'usb',
+        z2mDriverPath: '/dev/ttyUSB0',
+      });
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller[`post /api/v1/service/zigbee2mqtt/${route}`].controller({}, res, next);
+      // ASSERT
+      const [error] = next.firstCall.args;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Zigbee2mqtt: stopped by the user, start it instead');
+      assert.notCalled(zigbee2mqttManager[method]);
+      assert.notCalled(res.json);
+    });
+  });
+
+  [
     ['a USB dongle', { z2mAdapterMode: 'usb', z2mDriverPath: '/dev/ttyUSB0', z2mMqttPassword: 'z2m-password' }],
     ['a USB dongle of an old installation without adapter mode', { z2mDriverPath: '/dev/ttyUSB0' }],
     ['a network coordinator', { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' }],
@@ -254,8 +287,33 @@ describe('zigbee2mqtt API', () => {
     };
 
     await controller['post /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res);
-    assert.calledOnce(zigbee2mqttManager.setPermitJoin);
+    assert.calledOnceWithExactly(zigbee2mqttManager.setPermitJoin, undefined);
     assert.calledWith(res.json, { success: true });
+  });
+
+  it('post /api/v1/service/zigbee2mqtt/permit_join with a value', async () => {
+    const req = { body: { value: true } };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.setPermitJoin, true);
+    assert.calledWith(res.json, { success: true });
+  });
+
+  it('post /api/v1/service/zigbee2mqtt/permit_join refuses a value that is not a boolean', async () => {
+    const req = { body: { value: 'yes' } };
+    const res = {
+      json: fake.returns(null),
+    };
+    const next = fake();
+
+    await controller['post /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res, next);
+    assert.notCalled(zigbee2mqttManager.setPermitJoin);
+    assert.notCalled(res.json);
+    const [error] = next.firstCall.args;
+    expect(error).to.be.instanceOf(BadParameters);
   });
 
   it('get /api/v1/service/zigbee2mqtt/permit_join', async () => {
@@ -279,6 +337,67 @@ describe('zigbee2mqtt API', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.refuseWhileInstalling, 'reset');
     assert.calledOnce(zigbee2mqttManager.reset);
     assert.calledWith(res.json, { success: true });
+  });
+
+  // Each refuses by itself while the integration is busy (see stop, start, restart)
+  [
+    ['run/stop', 'stop'],
+    ['run/start', 'start'],
+    ['run/restart', 'restart'],
+  ].forEach(([route, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${route}`, async () => {
+      const req = {};
+      const res = {
+        json: fake.returns(null),
+      };
+
+      await controller[`post /api/v1/service/zigbee2mqtt/${route}`].controller(req, res);
+      assert.calledOnceWithExactly(zigbee2mqttManager[method]);
+      assert.calledWith(res.json, { success: true });
+    });
+
+    it(`post /api/v1/service/zigbee2mqtt/${route} is for admins only`, () => {
+      expect(controller[`post /api/v1/service/zigbee2mqtt/${route}`].admin).to.equal(true);
+    });
+  });
+
+  it('should leave to the core its routes of a service (Settings > Services)', () => {
+    // Registered before the routes of the core: a route of the integration matching one of
+    // /api/v1/service/:service_name, /start, /stop, /device or /variable/:variable_key would hide it
+    const coreRoute = /^(get|post) \/api\/v1\/service\/zigbee2mqtt(\/(start|stop|device|variable\/[^/]+))?$/;
+    expect(Object.keys(controller).filter((route) => coreRoute.test(route))).to.deep.equal([]);
+  });
+
+  [
+    ['setup', 'setup'],
+    ['connect', 'init'],
+    ['mqtt/start', 'installMqttContainer'],
+    ['z2m/start', 'installZ2mContainer'],
+    ['run/start', 'start'],
+    ['run/restart', 'restart'],
+  ].forEach(([route, method]) => {
+    it(`post /api/v1/service/zigbee2mqtt/${route} should be refused until the service is started`, async () => {
+      // PREPARE
+      zigbee2mqttManager.serviceStarted = false;
+      zigbee2mqttManager.getConfiguration = fake.resolves({
+        mqttPassword: 'gladys-password',
+        z2mMqttPassword: 'z2m-password',
+        z2mAdapterMode: 'usb',
+        z2mDriverPath: '/dev/ttyUSB0',
+      });
+      const res = {
+        json: fake.returns(null),
+      };
+      const next = fake();
+      // EXECUTE
+      await controller[`post /api/v1/service/zigbee2mqtt/${route}`].controller({ body: {} }, res, next);
+      // ASSERT
+      const [error] = next.firstCall.args;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Zigbee2mqtt: the service is not started, start it in the settings first');
+      assert.notCalled(zigbee2mqttManager[method]);
+      assert.notCalled(res.json);
+    });
   });
 
   // An installation or an operation in progress (init, disconnect, reset, ezsp fallback) would undo them (containers

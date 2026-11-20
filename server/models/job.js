@@ -59,6 +59,13 @@ const dataKeysByJobType = {
     destination_device_name: Joi.string(),
     states_migrated: countKey(),
   },
+  // Background deletion of a device which has too many states (device.purgeStatesThenDestroy.js).
+  // device_kept: the device was taken over by another appliance meanwhile, and was not deleted.
+  [JOB_TYPES.DEVICE_DESTROY]: {
+    step: Joi.string().valid('purging_states', 'deleting_device'),
+    device_name: Joi.string(),
+    device_kept: Joi.boolean(),
+  },
 };
 
 const defaultDataSchema = Joi.object().keys(baseDataKeys);

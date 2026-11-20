@@ -21,6 +21,8 @@ const ALL_CONFIGURATION_KEYS = [
   CONFIGURATION.DOCKER_MQTT_VERSION,
   CONFIGURATION.DOCKER_Z2M_VERSION,
   CONFIGURATION.Z2M_NETWORK_GENERATED,
+  CONFIGURATION.Z2M_STOPPED,
+  CONFIGURATION.Z2M_SETUP_PENDING,
 ];
 
 /**
@@ -48,6 +50,11 @@ async function resetIntegration() {
   this.lastBridgeDevices = null;
   this.topicBinds = {};
   this.usbConfigured = false;
+  this.stopped = false;
+  this.stoppedAt = null;
+  this.updatePending = false;
+  this.setupPending = false;
+  this.configured = false;
   this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
@@ -63,6 +70,8 @@ async function resetIntegration() {
   this.zigbee2mqttStarting = false;
   this.z2mPermitJoin = false;
   this.coordinatorFirmware = null;
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   this.mqttConnectionError = null;
   // Done by disconnect already, unless an installation finished since

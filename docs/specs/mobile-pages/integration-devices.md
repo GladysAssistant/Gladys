@@ -19,17 +19,18 @@ What people come to do there: **find a device, rename it or move it to another r
 This file covers the integrations below. The other ones keep their desktop grid on a phone until
 they are moved to the same layout, **with the components of section B**.
 
-| Integration | Devices | Discovery |
-| --- | --- | --- |
-| Matter | `matter/MatterDevices.jsx` | `matter/MatterDiscoverPage.jsx` (pairing code) |
-| MQTT | `mqtt/device-page` | `mqtt/discovery-page` |
-| Bluetooth | `bluetooth/device-page` | `bluetooth/setup-page` |
-| Airplay | `airplay/device-page` | `airplay/discover-page` |
-| LAN Manager | `lan-manager/device-page` | `lan-manager/discover-page` |
-| Enedis | `enedis-gateway/UsagePoints.jsx` ("My meters") | — |
-| Thermostat | `thermostat/device-page` | — |
-| External integrations | `external-integration/device-page` | `external-integration/discover-page` |
-| RTSP cameras | `rtsp-camera/RtspCamera.jsx` (one page, no tab) | — |
+| Integration           | Devices                                         | Discovery                                      |
+| --------------------- | ----------------------------------------------- | ---------------------------------------------- |
+| Matter                | `matter/MatterDevices.jsx`                      | `matter/MatterDiscoverPage.jsx` (pairing code) |
+| MQTT                  | `mqtt/device-page`                              | `mqtt/discovery-page`                          |
+| Bluetooth             | `bluetooth/device-page`                         | `bluetooth/setup-page`                         |
+| Airplay               | `airplay/device-page`                           | `airplay/discover-page`                        |
+| LAN Manager           | `lan-manager/device-page`                       | `lan-manager/discover-page`                    |
+| Enedis                | `enedis-gateway/UsagePoints.jsx` ("My meters")  | —                                              |
+| Thermostat            | `thermostat/device-page`                        | —                                              |
+| External integrations | `external-integration/device-page`              | `external-integration/discover-page`           |
+| RTSP cameras          | `rtsp-camera/RtspCamera.jsx` (one page, no tab) | —                                              |
+| Zigbee2MQTT           | `zigbee2mqtt/device-page`                       | `zigbee2mqtt/discover-page` (permit joining)   |
 
 ## B. The pattern (< 768 px)
 
@@ -52,7 +53,7 @@ The shared components are in `front/src/components/integration/mobile/`:
   of an external integration) the field is not controlled — it would take back the letters typed
   since the last update — and only starts from the query still applied when it mounts again
   (`initialSearchValue`). Where the query is stored at once and only the request is debounced
-  (Matter, MQTT, Thermostat) the field is controlled (`searchValue`).
+  (Matter, MQTT, Thermostat, Zigbee2MQTT) the field is controlled (`searchValue`).
 - `MobileDeviceItem`: the row of a device and its sheet (C and D).
 - `MobileListLoader`, `MobileWaitingNotice`, `MobileTextNotice`, `MobileProgress`, `BatteryPill`:
   the spinner of a list, a notice that waits (a scan running), a long explanation of the desktop
@@ -68,9 +69,9 @@ are what the sheet needs to tell how a request ended and to undo a change:
   when nothing was requested: a discovered device that a live update removed from the list
   between the render and the tap is not added (external integrations return `false`; the MQTT
   action, which cannot return a value, throws);
-- a deletion refused because the device has too many states is told apart from any other error
-  by every card (Enedis and the external integrations did not), so the confirmation can explain
-  it;
+- a device with too many states to delete at once is told apart from an error by every card
+  (Enedis and the external integrations did not), and passed to the sheet as `deleteScheduled`,
+  so the sheet can say what happens instead of a failure;
 - replacing a Matter device works on a copy of the paired device: a replacement that fails
   leaves its row as it was published, not under the name and the ids of the existing device;
 - a handler that changes a field of a device kept in the state of a component builds it **from
@@ -141,17 +142,23 @@ Bluetooth, LAN Manager and Enedis cards never said that a save had failed).
 **Nothing is deleted on a single tap.** "Delete" opens a confirmation sheet naming the device and
 what goes with it (its history; the scenes and the dashboards that use it). Confirming calls the
 handler of the card; a refusal shows in the confirmation, which stays open. **A device with too
-many states to delete at once says so** — Gladys purges them in the background, with the link to
-that job — rather than "Try again", which would be refused again; this holds for every
-integration of A. A success closes everything and shows "Device deleted".
+many states to delete at once is not a refusal** — Gladys purges its history in the background,
+then deletes the device on its own, in one "Device deletion" job (`device.destroyAfterStatesPurge`):
+the confirmation closes and the sheet says so in a plain notice, with the link to the jobs, its
+fields and its buttons disabled — nothing is saved or deleted again on a device that is going
+away (closing it then drops the unsaved changes without asking, see below). Each card keeps that
+state per device: deleting another device of the same list does not clear it. This holds for every integration of A. The deletion is bound to the device as it was when
+asked (a device paired again in place meanwhile is kept), and is kept in memory: a restart of
+Gladys drops it, and the row stays in the list until the page is loaded again — the notice says
+what to do then. A success closes everything and shows "Device deleted".
 
 **On a wider screen too, and in every integration.** The "Delete" button of a device card is a
 `DeleteDeviceButton` (`front/src/components/device/DeleteDeviceButton.jsx`) — in the integrations
-of A and in the ones that keep their desktop grid on a phone (Zigbee2mqtt, Tasmota, Z-Wave JS UI,
+of A and in the ones that keep their desktop grid on a phone (Tasmota, Z-Wave JS UI,
 Philips Hue, Tuya, Netatmo, the cameras…): it opens the same confirmation, with the same texts,
 as a centered dialog (the sheet of the kit below 576 px). Confirming closes the dialog and calls
-the delete handler of the card, which keeps its own loader and **says a failure itself, on the
-card**: the "too many states" notice, or the sentence of the card ("Gladys could not delete this
+the delete handler of the card, which keeps its own loader and **says the outcome itself, on the
+card**: the notice of a deletion that goes on in the background, or the sentence of the card ("Gladys could not delete this
 device. Try again." where the card had none: Bluetooth, Broadlink, LAN Manager, Philips Hue,
 Xiaomi, the cameras, the Enedis meters) — after a confirmation, a deletion that fails never looks
 like nothing happened. Cancel, Escape and the backdrop delete nothing. A card whose device was
@@ -176,7 +183,9 @@ The question is about one device, and one confirmation is one deletion:
 **Nothing is lost silently.** The changes made in the sheet live in the state of the card, as on
 a wider screen. Closing a "Devices" sheet with unsaved changes — by any of the four ways, the
 system "back" included — asks: **Save and close** / **Close without saving** (the name, the room
-and the switches go back to what they were) / **Keep editing**. "Edit" asks the same question
+and the switches go back to what they were) / **Keep editing** — except on a device whose
+deletion is scheduled, which has nothing left to save: its changes are dropped as by "Close
+without saving". "Edit" asks the same question
 before it leads to the edit page. A second system "back" closes the question, like "Keep
 editing". A discovery sheet does not ask: what was typed stays with the device in the list, as on
 the card, until it is added.
@@ -293,14 +302,38 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   the notice of the card); the search filters the list as on the card. The error of a device that
   could not be created is the one of the card, with the rejected fields.
 
+### Zigbee2MQTT
+
+- **Both tabs.** The state of Zigbee2MQTT comes first, with the words of the desktop banner: a
+  warning when it does not answer or when Gladys does not reach the broker (with why it does not
+  start, and the link to the setup page). **Not installed**, it is a notice and "Install
+  Zigbee2MQTT" as a full-width button — the only banner then. The notice that the address of the
+  Zigbee2MQTT interface is not set comes **after the list**: it only takes away the links of the
+  sheets, it blocks nothing on the tab.
+- **Devices.** The battery of a device is a pill. The sheet shows the IEEE address in its
+  details and, when the address of the interface is known, "Open in Zigbee2MQTT" (a new tab).
+  "Edit" leads to the device page (`device-edit.md`). An empty list leads to the Discover tab,
+  unless Zigbee2MQTT is not installed.
+- **Discover.** **Permitting joining is the button of the page** — the switch of the desktop
+  header, with the same request (it toggles): "Permit joining"; **while joining is open a
+  waiting notice says so and the button says "Stop joining"**. It is disabled when the switch
+  is (Zigbee2MQTT does not answer, Gladys does not reach the broker, or it is not installed), and
+  shows a spinner while its request runs — a second tap would close what the first one opened. A
+  request that fails says so under the button, until the next one or until the state of the
+  joining changes. "Hide already added devices" is a switch row. A device is added with "Save"
+  or updated with "Update", as on the card; its sheet shows the topic and the IEEE address, and
+  "Open in Zigbee2MQTT" as on the "Devices" tab. A device that exposes nothing besides a battery
+  is "Not supported": its sheet says so and holds "Suggest this device" (a GitHub issue, in a new
+  tab). The empty list says "No new device found." — the button above it is the next step.
+
 ## F. What does not change
 
 - From 768 px (a tablet, a desktop): the cards, as before — except that their "Delete" asks
   first (D).
 - The containers, the requests and their payloads, the websocket updates.
 - The pages these tabs lead to: the MQTT device editor, the Bluetooth peripheral configuration
-  and the thermostat form keep their layout; the Bluetooth device page is the phone page of
-  `device-edit.md`.
+  and the thermostat form keep their layout; the Bluetooth and Zigbee2MQTT device pages are the
+  phone page of `device-edit.md`.
 - The other tabs of these integrations (settings, setup, debug, schedules…).
 
 A window resized across the breakpoint (a tablet turned) swaps the rows and the cards without a
@@ -330,6 +363,13 @@ other layout: an unsaved change there does not survive the swap.
   two clicks on the confirming button); a confirmed deletion that fails said on the card
   (Zigbee2mqtt and a card that had no sentence for it); a dialog left open while its device
   leaves the list closes instead of confirming for the next one.
+- Cypress, phone viewport,
+  `front/cypress/e2e/routes/integration/zigbee2mqtt/Zigbee2MqttTabsMobile.cy.js`: the status of
+  Zigbee2MQTT first (not answering, not installed); a device renamed and saved, a failed save
+  kept in the sheet, a deletion confirmed, a refused one explained; a discovered device added,
+  an unsupported one; the permit joining button — its request, the open state, a failure, and
+  disabled while Zigbee2MQTT does not answer or is not installed; the "hide already added
+  devices" switch; the cards and the switch kept on a wider screen.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.

@@ -230,7 +230,8 @@ Each file owns the phone behavior of its pages.
 | [`map-areas.md`](map-areas.md) | Zones of the map (`routes/map/NewArea.jsx`, `NewAreaMap.jsx`) |
 | [`onboarding.md`](onboarding.md) | Onboarding (`routes/signup`), the five steps |
 | [`auth.md`](auth.md) | The logged-out pages: sign-in, password recovery, keypad of an armed house, and the Gladys Plus sign-in, two-factor, e-mail and account pages |
-| [`integration-devices.md`](integration-devices.md) | The "Devices" and "Discovery" tabs of the integrations (`components/integration/mobile/`): Matter, MQTT, Bluetooth, Airplay, LAN Manager, Enedis, Thermostat, external integrations, RTSP cameras |
+| [`integration-devices.md`](integration-devices.md) | The "Devices" and "Discovery" tabs of the integrations (`components/integration/mobile/`): Matter, MQTT, Bluetooth, Airplay, LAN Manager, Enedis, Thermostat, external integrations, RTSP cameras, Zigbee2MQTT |
+| [`zigbee2mqtt-installation.md`](../zigbee2mqtt-installation.md) M.3 and N.5 | The setup tab of Zigbee2MQTT: its installation wizard, its dashboard and their advanced settings |
 
 ## E. Tests
 

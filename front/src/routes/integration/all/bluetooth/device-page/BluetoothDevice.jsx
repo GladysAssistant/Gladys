@@ -99,6 +99,7 @@ class BluetoothDevice extends Component {
               <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
             ) : null
           }
+          deleteScheduled={Boolean(tooMuchStatesError)}
           dataCy="bluetooth-device-row"
         />
       );

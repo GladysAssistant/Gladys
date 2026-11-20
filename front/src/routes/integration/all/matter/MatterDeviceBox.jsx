@@ -185,6 +185,7 @@ class MatterDeviceBox extends Component {
         }
         onDelete={deleteButton ? this.deleteDevice : undefined}
         deleteError={deleteError}
+        deleteScheduled={Boolean(tooMuchStatesError)}
         dataCy="matter-device-row"
       />
     );

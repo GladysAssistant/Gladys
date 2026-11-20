@@ -226,6 +226,12 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
         dongleMissing: false,
         networkAdapterConfigured: false,
@@ -235,6 +241,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
@@ -244,6 +252,37 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
     expect(zigbee2mqttManager.zigbee2mqttStarting).to.equal(false);
     expect(zigbee2mqttManager.startingTimer).to.equal(null);
+  });
+
+  it('should end the first setup once Zigbee2mqtt answers, the wizard no longer opened', async () => {
+    // PREPARE
+    gladys.variable = { destroy: fake.resolves(null) };
+    zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.setupPending = true;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    // ASSERT
+    expect(zigbee2mqttManager.setupPending).to.equal(false);
+    assert.calledOnceWithExactly(gladys.variable.destroy, 'Z2M_SETUP_PENDING', serviceId);
+    assert.calledWithMatch(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, { payload: { setupPending: false } });
+  });
+
+  it('should only log the end of the first setup it could not save', async () => {
+    // PREPARE
+    const error = new Error('database locked');
+    let logged;
+    const warned = new Promise((resolve) => {
+      logged = resolve;
+    });
+    gladys.variable = { destroy: fake.rejects(error) };
+    sinon.stub(logger, 'warn').callsFake(() => logged());
+    zigbee2mqttManager.setupPending = true;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/health_check', '{}');
+    await warned;
+    // ASSERT
+    expect(zigbee2mqttManager.setupPending).to.equal(false);
+    assert.calledOnceWithExactly(logger.warn, 'Zigbee2mqtt: end of the first setup not saved:', error);
   });
 
   it('should forget the failure of the last installation once Zigbee2mqtt answers, and tell the setup page', async () => {
@@ -343,6 +382,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       .returns(null);
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
+    // The same number of devices as before: the status does not change
+    zigbee2mqttManager.deviceCount = 7;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
     // ASSERT
@@ -352,6 +393,19 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
     assert.calledOnce(zigbee2mqttManager.syncRenamedDevices);
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
+  });
+
+  it('should tell the number of devices in the network, unsupported ones included, coordinator excluded', async () => {
+    // PREPARE
+    zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
+    // ASSERT
+    expect(zigbee2mqttManager.deviceCount).to.equal(7);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: sinon.match({ deviceCount: 7 }),
+    });
   });
 
   it('should forget the last values of the devices that left the network', async () => {
@@ -709,6 +763,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   it('should parse firmware from bridge/info', async () => {
     // PREPARE
     const bridgeInfo = {
+      version: '2.14.2',
       coordinator: {
         type: 'EmberZNet',
         meta: {
@@ -737,6 +792,12 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         mqttExist: false,
         mqttRunning: false,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
         dongleMissing: false,
         networkAdapterConfigured: false,
@@ -752,12 +813,39 @@ describe('zigbee2mqtt handleMqttMessage', () => {
           revision: 74100,
           type: 'EmberZNet',
         },
+        z2mVersion: '2.14.2',
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
         installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
         prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
+    });
+  });
+
+  it('should tell the joining Zigbee2mqtt closed, from its info', async () => {
+    zigbee2mqttManager.z2mPermitJoin = true;
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/info',
+      JSON.stringify({ version: '2.14.2', permit_join: false }),
+    );
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: false,
+    });
+  });
+
+  it('should not tell the joining again when the info of Zigbee2mqtt does not change it', async () => {
+    zigbee2mqttManager.z2mPermitJoin = false;
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/info',
+      JSON.stringify({ version: '2.14.2', permit_join: false }),
+    );
+    assert.neverCalledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: false,
     });
   });
 
@@ -772,10 +860,12 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify(bridgeInfo));
     // ASSERT
     expect(zigbee2mqttManager.coordinatorFirmware).to.equal(null);
+    expect(zigbee2mqttManager.z2mVersion).to.equal(null);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: sinon.match({
         coordinatorFirmware: null,
+        z2mVersion: null,
       }),
     });
   });
@@ -790,6 +880,26 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       warnStub,
       'Zigbee2mqtt 1.20.0 does not answer the health check, Gladys needs Zigbee2mqtt 1.21 or later',
     );
+  });
+
+  ['2.14.2', '2.1.0-dev'].forEach((version) => {
+    it(`should keep the version ${version} of Zigbee2mqtt`, async () => {
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify({ version }));
+      // ASSERT
+      expect(zigbee2mqttManager.z2mVersion).to.equal(version);
+    });
+  });
+
+  ['1.0<iframe src="javascript:alert(1)">', '1.0.0<b>', 'latest', 2, undefined].forEach((version) => {
+    it(`should not keep ${JSON.stringify(version)} as the version of Zigbee2mqtt`, async () => {
+      // PREPARE
+      zigbee2mqttManager.z2mVersion = '2.14.2';
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify({ version }));
+      // ASSERT
+      expect(zigbee2mqttManager.z2mVersion).to.equal(null);
+    });
   });
 
   ['1.21.0', '2.14.2', '2.1.0-dev', undefined].forEach((version) => {

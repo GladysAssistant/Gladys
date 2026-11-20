@@ -191,6 +191,24 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should not tell the error of a run restarted or stopped since', async () => {
+    // A reader of a run that ends once the user restarted or stopped it
+    zigbee2mqttManager.z2mRun = 3;
+    const stream = new EventEmitter();
+    stream.destroy = sinon.fake();
+    gladys.system.getContainerLogs = fake.resolves(stream);
+    setImmediate(() => {
+      zigbee2mqttManager.z2mRun = 4;
+      stream.emit('data', withDockerPrefix('[2026-11-06 10:00:00] error: z2m: Failed to connect to the adapter\n'));
+    });
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc', 1700000000);
+
+    // The new run, or the stop, tells its own state
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should set z2mContainerError to null when no error is found in logs', async () => {
     const normalLog = 'Zigbee2mqtt started successfully';
     gladys.system.getContainerLogs = fake.resolves(buildLogStream(normalLog));
