@@ -278,13 +278,17 @@ class Session {
       this.connect();
       return;
     }
+    // Without a refresh token there is nothing to renew the access token with, now or later:
+    // this session is over. It is closed, and the app, told, finds no user and sends them to
+    // the sign-in page. Asking Gladys would only get a 400, which the session check does not
+    // route anywhere.
+    if (!this.getRefreshToken()) {
+      this.reset();
+      this.dispatch(SESSION_REFUSED_EVENT);
+      return;
+    }
     const { resetCount } = this;
     try {
-      // without a refresh token there is nothing to renew the access token with: Gladys could
-      // only refuse
-      if (!this.getRefreshToken()) {
-        throw Object.assign(new Error('NO_REFRESH_TOKEN'), { response: { status: 401 } });
-      }
       delete this.user.access_token;
       this.saveUser(this.user);
       // gets a new access token, then calls connect()
@@ -392,11 +396,10 @@ class Session {
     return null;
   }
 
+  // Also called without a signed-in user: the reset password page authenticates with the token
+  // of its link. A renewal answered after the session was closed never gets here
+  // (HttpClient.refreshAccessToken drops it).
   setAccessToken(accessToken) {
-    // a session that was closed has no user: a renewal answered too late must not create one
-    if (!this.user) {
-      return;
-    }
     const newUser = Object.assign({}, this.user, {
       access_token: accessToken
     });

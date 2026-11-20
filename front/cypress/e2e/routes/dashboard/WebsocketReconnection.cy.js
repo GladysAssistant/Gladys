@@ -63,8 +63,14 @@ describe('Websocket reconnection', () => {
     socketAt(index).then(socket => socket.onclose(event));
   };
 
-  const visitDashboard = () => {
-    cy.visit(`/dashboard/${dashboardSelector}`, { onBeforeLoad: installFakeWebSocket });
+  // beforeLoad: what else to prepare in the page before the app starts
+  const visitDashboard = (beforeLoad = () => {}) => {
+    cy.visit(`/dashboard/${dashboardSelector}`, {
+      onBeforeLoad: win => {
+        installFakeWebSocket(win);
+        beforeLoad(win);
+      }
+    });
     cy.get('[data-cy=sidebar-nav]').should('exist');
     socketCountShouldBe(1);
     socketAt(0)
@@ -271,6 +277,61 @@ describe('Websocket reconnection', () => {
       cy.tick(5 * 60 * 1000);
       socketCountShouldBe(1);
       cy.get('@renewal.all').should('have.length', renewals.length);
+    });
+  });
+
+  it('sends the user to the sign-in page when there is no refresh token to renew the token with', () => {
+    // a stored session without its refresh token: its access token can never be renewed
+    visitDashboard(win => {
+      const user = JSON.parse(win.localStorage.getItem('user'));
+      delete user.refresh_token;
+      win.localStorage.setItem('user', JSON.stringify(user));
+    });
+    freezeTimeAndJitter();
+    closeSocket(0, { code: 4000, reason: 'INVALID_ACCESS_TOKEN' });
+    cy.tick(1);
+    cy.location('pathname').should('eq', '/login');
+    // the session is closed: nothing is kept, and nothing tries again
+    cy.window().then(win => {
+      expect(win.localStorage.getItem('user')).to.equal(null);
+    });
+    cy.tick(5 * 60 * 1000);
+    socketCountShouldBe(1);
+  });
+
+  it('gives up a renewal of the token that gets no answer, and tries again', () => {
+    let renewals = 0;
+    // the page has finished loading: a request sent while the token is being renewed would
+    // ask for a renewal of its own
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/user*` }).as('usersPresence');
+    visitDashboard();
+    cy.wait('@usersPresence');
+    // the first renewal is lost on the way: no answer comes before the session has given up
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/access_token` }, req => {
+      renewals += 1;
+      if (renewals === 1) {
+        req.reply({ delay: 30 * 1000, body: { access_token: 'lost-access-token' } });
+      } else {
+        req.reply({ access_token: 'renewed-access-token' });
+      }
+    }).as('renewal');
+    freezeTimeAndJitter();
+    closeSocket(0, { code: 4000, reason: 'INVALID_ACCESS_TOKEN' });
+    cy.tick(1);
+    cy.wrap(null).should(() => {
+      expect(renewals).to.equal(1);
+    });
+    // the renewal is given up after 10 seconds (time of the browser, not of the test)...
+    cy.wait(10 * 1000 + 500);
+    // ...then tried again after the next delay, and this time Gladys answers
+    cy.tick(2000);
+    socketCountShouldBe(2);
+    cy.then(() => {
+      expect(renewals).to.equal(2);
+    });
+    socketAt(1).then(socket => {
+      socket.onopen();
+      expect(socket.sent[0].payload.accessToken).to.equal('renewed-access-token');
     });
   });
 
