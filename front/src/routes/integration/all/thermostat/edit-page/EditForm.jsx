@@ -424,8 +424,14 @@ const EditForm = ({ ...props }) => {
     if (reversible) {
       const coolingMin = formBound(props.thermostatEditCoolingMinTemp, formMin);
       const coolingMax = formBound(props.thermostatEditCoolingMaxTemp, formMax);
-      props.updateThermostatField('thermostatEditCoolingMinTemp', String(Math.max(coolingMin, Number(targetRange.min))));
-      props.updateThermostatField('thermostatEditCoolingMaxTemp', String(Math.min(coolingMax, Number(targetRange.max))));
+      props.updateThermostatField(
+        'thermostatEditCoolingMinTemp',
+        String(Math.max(coolingMin, Number(targetRange.min)))
+      );
+      props.updateThermostatField(
+        'thermostatEditCoolingMaxTemp',
+        String(Math.min(coolingMax, Number(targetRange.max)))
+      );
     }
   };
 

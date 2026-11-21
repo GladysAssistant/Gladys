@@ -103,10 +103,12 @@ const reversibleFields = (state, reversible) => {
     });
   } else if (reversible) {
     // A cooling range still on the form's defaults starts from the range in
-    // force, which the appliance's own may have filled.
+    // force, which the appliance's own may have filled. The defaults of the
+    // form's unit: 5-35 never matched a Fahrenheit form, which shows 41-95.
+    const rangeDefaults = defaultTempRange(state.thermostatEditTempUnit || 'C');
     if (
-      String(state.thermostatEditCoolingMinTemp || '5') === '5' &&
-      String(state.thermostatEditCoolingMaxTemp || '35') === '35'
+      String(state.thermostatEditCoolingMinTemp || rangeDefaults.min) === String(rangeDefaults.min) &&
+      String(state.thermostatEditCoolingMaxTemp || rangeDefaults.max) === String(rangeDefaults.max)
     ) {
       next.thermostatEditCoolingMinTemp = state.thermostatEditMinTemp;
       next.thermostatEditCoolingMaxTemp = state.thermostatEditMaxTemp;
@@ -617,6 +619,15 @@ function createActions(store) {
         // the server for a client writing the params directly (spec D.0). A
         // heater regulating itself takes no range, and its fields are hidden.
         if (!isPilotWireThermostat && minTemp >= maxTemp) {
+          store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'invertedRange' });
+          return;
+        }
+        // The cooling range of a reversible heat pump too, each bound standing
+        // for the heating one when it is left empty, as it is saved.
+        if (
+          reversible &&
+          toNumber(state.thermostatEditCoolingMinTemp, minTemp) >= toNumber(state.thermostatEditCoolingMaxTemp, maxTemp)
+        ) {
           store.setState({ thermostatCreateStatus: RequestStatus.Error, thermostatEditError: 'invertedRange' });
           return;
         }

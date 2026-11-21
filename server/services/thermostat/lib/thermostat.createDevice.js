@@ -316,11 +316,11 @@ async function createDevice(device) {
   // a minimum of 40 saved alone was compared with the default maximum of 35 by
   // the clamp and the widget, and dropped for the default range without a word.
   // A heater regulating itself takes no range, and the form hides the fields.
+  const paramValue = (name) => {
+    const param = params.find((candidate) => candidate.name === name);
+    return param ? param.value : undefined;
+  };
   if (!heaterRegulates) {
-    const paramValue = (name) => {
-      const param = params.find((candidate) => candidate.name === name);
-      return param ? param.value : undefined;
-    };
     const defaults = defaultTempRange(paramValue('THERMOSTAT_TEMP_UNIT'));
     const min = toNumber(paramValue('THERMOSTAT_MIN_TEMP'), defaults.min);
     const max = toNumber(paramValue('THERMOSTAT_MAX_TEMP'), defaults.max);
@@ -338,6 +338,19 @@ async function createDevice(device) {
     reversibleParam.value = '';
   }
   const reversible = Boolean(reversibleParam && reversibleParam.value === 'true');
+  // The cooling range of a reversible heat pump is held to the same rule, each
+  // bound falling back on the heating one as its readers do (A.4): saved
+  // inverted, it was dropped for the heating range without a word.
+  if (reversible) {
+    const defaults = defaultTempRange(paramValue('THERMOSTAT_TEMP_UNIT'));
+    const heatingMin = toNumber(paramValue('THERMOSTAT_MIN_TEMP'), defaults.min);
+    const heatingMax = toNumber(paramValue('THERMOSTAT_MAX_TEMP'), defaults.max);
+    const min = toNumber(paramValue('THERMOSTAT_COOLING_MIN_TEMP'), heatingMin);
+    const max = toNumber(paramValue('THERMOSTAT_COOLING_MAX_TEMP'), heatingMax);
+    if (min >= max) {
+      throw new BadParameters(`Thermostat: the minimum cooling temperature ${min} is not below the maximum ${max}`);
+    }
+  }
   // A real one is refused rather than saved as not reversible: the form has
   // already split its presets into a heating and a cooling set, and saved as
   // not reversible, a thermostat set to cool would read the heating ones. It

@@ -948,6 +948,51 @@ describe('thermostat: reversible heat pump', () => {
       expect(reversibleParam(created)).to.equal('true');
     });
 
+    // Saved inverted, the cooling range was dropped for the heating one without
+    // a word, as the single range was before the save refused it.
+    const saveCoolingRange = (handler, min, max) =>
+      createDevice.call(handler, {
+        name: 'Heat pump',
+        external_id: 'thermostat:heat-pump',
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'ac-mode' },
+          { name: 'THERMOSTAT_REVERSIBLE', value: 'true' },
+          { name: 'THERMOSTAT_MIN_TEMP', value: '7' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '22' },
+          { name: 'THERMOSTAT_COOLING_MIN_TEMP', value: min },
+          { name: 'THERMOSTAT_COOLING_MAX_TEMP', value: max },
+        ],
+      });
+
+    it('should refuse an inverted cooling range', async () => {
+      const handler = buildCreateHandler();
+      let error = null;
+      try {
+        await saveCoolingRange(handler, '30', '24');
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error.message).to.equal('Thermostat: the minimum cooling temperature 30 is not below the maximum 24');
+      expect(handler.gladys.device.create.called).to.equal(false);
+    });
+
+    it('should hold a cooling bound left empty to the heating one', async () => {
+      // 24 to the heating maximum of 22: no width left.
+      let error = null;
+      try {
+        await saveCoolingRange(buildCreateHandler(), '24', '');
+      } catch (e) {
+        error = e;
+      }
+      expect(error.message).to.equal('Thermostat: the minimum cooling temperature 24 is not below the maximum 22');
+
+      const created = await saveCoolingRange(buildCreateHandler(), '', '30');
+      expect(created.name).to.equal('Heat pump');
+    });
+
     // The write is clamped to the mode's maximum: a heating-only mode would keep
     // the unit heating under the cooling presets.
     const saveWithMode = (unitMode) => {
