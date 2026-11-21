@@ -50,7 +50,7 @@ describe('Matterbridge init', () => {
   });
 
   it('should not start while the Matter bridge of Gladys is turned on', async () => {
-    gladys.service.getService = fake.returns({ bridge: { isEnabled: fake.resolves(true) } });
+    gladys.service.getService = fake.returns({ bridge: { holdsMatterPort: fake.resolves(true) } });
 
     try {
       await matterbridgeManager.init();
@@ -68,7 +68,7 @@ describe('Matterbridge init', () => {
   });
 
   it('should start while the Matter bridge of Gladys is turned off', async () => {
-    gladys.service.getService = fake.returns({ bridge: { isEnabled: fake.resolves(false) } });
+    gladys.service.getService = fake.returns({ bridge: { holdsMatterPort: fake.resolves(false) } });
 
     await matterbridgeManager.init();
 

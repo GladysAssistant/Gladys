@@ -146,11 +146,18 @@ function createMatter() {
   const vars = new Map();
   // Like the DeviceCommissioner of matter.js: the commissioning window the node opened.
   class DeviceCommissioner {}
+  class FabricManager {}
   const commissioner = { windowStatus: 1, isFailsafeArmed: false };
-  const services = new Map([[DeviceCommissioner, commissioner]]);
+  const fabricManager = { fabrics: [] };
+  const services = new Map([
+    [DeviceCommissioner, commissioner],
+    [FabricManager, fabricManager],
+  ]);
   const server = {
     commissioner,
-    lifecycle: { online: createObservable(), decommissioned: createObservable() },
+    fabricManager,
+    lifecycle: { isOnline: true, online: createObservable(), decommissioned: createObservable() },
+    events: { commissioning: { fabricsChanged: createObservable() } },
     env: { has: (type) => services.has(type), get: (type) => services.get(type), services },
     agent: { commissioning: { enterCommissionableMode: async () => {} } },
     act: async (action) => action(server.agent),
@@ -232,7 +239,7 @@ function createMatter() {
       BridgedNodeEndpoint: createType('BridgedNodeEndpoint'),
     },
     behaviors,
-    protocol: { DeviceCommissioner },
+    protocol: { DeviceCommissioner, FabricManager },
   };
 }
 

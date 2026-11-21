@@ -231,6 +231,9 @@ describe('Matter bridge on the real matter.js', function realMatter() {
     expect(server.state.commissioning.commissioned).to.equal(false);
     expect(server.lifecycle.online.on).to.be.a('function');
     expect(server.lifecycle.decommissioned.on).to.be.a('function');
+    expect(server.lifecycle.isOnline).to.equal(false);
+    expect(server.events.commissioning.fabricsChanged.on).to.be.a('function');
+    expect(server.env.get(matter.protocol.FabricManager).fabrics).to.deep.equal([]);
   });
 
   it('should expose every adapter as a valid Matter endpoint', () => {

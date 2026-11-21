@@ -40,7 +40,7 @@ describe('Matterbridge status', () => {
   });
 
   it('should tell the Matter bridge of Gladys is turned on', async () => {
-    gladys.service.getService = fake.returns({ bridge: { isEnabled: fake.resolves(true) } });
+    gladys.service.getService = fake.returns({ bridge: { holdsMatterPort: fake.resolves(true) } });
     const result = await matterbridgeManager.status();
     expect(result.matterBridgeEnabled).that.equal(true);
     gladys.service.getService = fake.returns(null);

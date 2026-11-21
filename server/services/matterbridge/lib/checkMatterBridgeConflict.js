@@ -3,10 +3,10 @@ const { ConflictError } = require('../../../utils/coreErrors');
 const { CONFIGURATION, ERRORS } = require('./constants');
 
 /**
- * @description Tell if the Matter bridge of Gladys (the `matter-bridge` service) is turned on. It
- * listens on the standard Matter port, 5540, which the Matterbridge container needs as well, on
- * the host network: both cannot run.
- * @returns {Promise<boolean>} True when the Matter bridge is turned on.
+ * @description Tell if the Matter bridge of Gladys (the `matter-bridge` service) is turned on on
+ * the standard Matter port, 5540, which the Matterbridge container needs as well, on the host
+ * network: both cannot run. A Matter bridge moved to another port is not in the way.
+ * @returns {Promise<boolean>} True when the Matter bridge is turned on and holds port 5540.
  * @example
  * await matterbridge.isMatterBridgeEnabled();
  */
@@ -15,7 +15,7 @@ async function isMatterBridgeEnabled() {
   if (!matterBridge || !matterBridge.bridge) {
     return false;
   }
-  return matterBridge.bridge.isEnabled();
+  return matterBridge.bridge.holdsMatterPort();
 }
 
 /**

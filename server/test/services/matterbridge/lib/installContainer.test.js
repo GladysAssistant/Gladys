@@ -71,7 +71,7 @@ describe('Matterbridge installContainer', () => {
   });
 
   it('should not install the container while the Matter bridge of Gladys is turned on', async () => {
-    gladys.service.getService = fake.returns({ bridge: { isEnabled: fake.resolves(true) } });
+    gladys.service.getService = fake.returns({ bridge: { holdsMatterPort: fake.resolves(true) } });
 
     try {
       await matterbridgeManager.installContainer(config);

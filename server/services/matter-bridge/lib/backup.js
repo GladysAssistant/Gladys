@@ -2,7 +2,42 @@ const { promisify } = require('util');
 const execFile = promisify(require('child_process').execFile);
 const fse = require('fs-extra');
 
+const path = require('path');
+
 const TAR_TIMEOUT_MS = 60 * 1000;
+
+// Left out of a backup: files matter.js is writing (it writes each value to a .tmp file, then
+// renames it over the old one), and the lock of the running process.
+const EXCLUDED = (name) => name.endsWith('.tmp') || name === 'matter.lock' || name === 'matter.pid';
+
+/**
+ * @description Copy the storage folder while matter.js runs. Each value is a file that matter.js
+ * replaces in one rename, so every file copied is whole; a file removed meanwhile is skipped.
+ * @param {string} source - Storage folder.
+ * @param {string} target - Snapshot folder.
+ * @returns {Promise} Resolves once copied.
+ * @example
+ * await copySnapshot('/var/lib/gladysassistant/matter-bridge', '/tmp/snapshot');
+ */
+async function copySnapshot(source, target) {
+  await fse.ensureDir(target);
+  const entries = await fse.readdir(source, { withFileTypes: true });
+  // eslint-disable-next-line no-restricted-syntax
+  for (const entry of entries) {
+    if (!EXCLUDED(entry.name)) {
+      const from = path.join(source, entry.name);
+      const to = path.join(target, entry.name);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await (entry.isDirectory() ? copySnapshot(from, to) : fse.copyFile(from, to));
+      } catch (e) {
+        if (e.code !== 'ENOENT') {
+          throw e;
+        }
+      }
+    }
+  }
+}
 
 /**
  * @description Path of the archive made while backing up or restoring a storage folder, next to it.
@@ -30,7 +65,8 @@ async function isStorageEmpty(storagePath) {
 }
 
 /**
- * @description Make a gzipped tar of the content of the storage folder.
+ * @description Make a gzipped tar of the content of the storage folder, without stopping the
+ * bridge: a snapshot of the folder is archived, not the folder matter.js keeps writing to.
  * @param {string} storagePath - Storage folder of the bridge.
  * @returns {Promise<string>} The archive, in base64.
  * @example
@@ -38,12 +74,16 @@ async function isStorageEmpty(storagePath) {
  */
 async function createBackup(storagePath) {
   const archivePath = archivePathOf(storagePath);
+  const snapshotPath = `${storagePath}-snapshot`;
   try {
+    await fse.remove(snapshotPath);
+    await copySnapshot(storagePath, snapshotPath);
     // The content of the folder, not the folder itself: it is restored into the storage folder of
     // the day, whatever its name.
-    await execFile('tar', ['-czf', archivePath, '-C', storagePath, '.'], { timeout: TAR_TIMEOUT_MS });
+    await execFile('tar', ['-czf', archivePath, '-C', snapshotPath, '.'], { timeout: TAR_TIMEOUT_MS });
     return await fse.readFile(archivePath, 'base64');
   } finally {
+    await fse.remove(snapshotPath);
     await fse.remove(archivePath);
   }
 }

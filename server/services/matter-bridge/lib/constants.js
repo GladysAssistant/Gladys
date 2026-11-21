@@ -17,8 +17,16 @@ const BACKUP_RULE = '0 20 4 * * *';
 // and each time the settings page reads the status, and opened again when closed.
 const COMMISSIONING_CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
+// matter.js closes the window after too many failed pairing attempts, against brute force: the
+// bridge opens it again at most this often, so that the lockout still slows an attacker down.
+const COMMISSIONING_REOPEN_MIN_INTERVAL_MS = 15 * 60 * 1000;
+
 // AdministratorCommissioning.CommissioningWindowStatus.WindowNotOpen
 const COMMISSIONING_WINDOW_NOT_OPEN = 0;
+
+// The pairings are backed up this long after an ecosystem was added or removed, once the
+// ecosystem is done setting the bridge up.
+const BACKUP_AFTER_PAIRING_DELAY_MS = 60 * 1000;
 
 // Which devices the bridge exposes: every compatible one, or only those the user picked.
 const EXPOSURE_MODES = {
@@ -164,6 +172,8 @@ module.exports = {
   BACKUP_RULE,
   COMMISSIONING_CHECK_INTERVAL_MS,
   COMMISSIONING_WINDOW_NOT_OPEN,
+  COMMISSIONING_REOPEN_MIN_INTERVAL_MS,
+  BACKUP_AFTER_PAIRING_DELAY_MS,
   EXPOSURE_MODES,
   MATTER_BRIDGE_PORT,
   ERROR_CODES,

@@ -296,7 +296,8 @@ describe('MatterBridge', () => {
       expect(bridge.online).to.equal(false);
       expect(bridge.lastError).to.equal('Unable to reset: read-only');
       expect(bridge.lastErrorCode).to.equal(null);
-      sinon.assert.notCalled(gladys.variable.destroy);
+      // The backup goes first; the pairing code stays, as the pairings do.
+      sinon.assert.calledOnceWithExactly(gladys.variable.destroy, VARIABLES.BACKUP, SERVICE_ID);
     });
   });
 
@@ -722,6 +723,17 @@ describe('MatterBridge', () => {
       expect(matter.server.options.network).to.deep.equal({ port: 5550 });
       expect((await bridge.getStatus()).port).to.equal(5550);
     });
+
+    it('should leave Matterbridge alone once moved to another port', async () => {
+      matterbridgeEnabled = true;
+      expect(await bridge.holdsMatterPort()).to.equal(true);
+      expect(await bridge.isMatterbridgeEnabled()).to.equal(true);
+      process.env.MATTER_BRIDGE_PORT = '5550';
+      expect(await bridge.holdsMatterPort()).to.equal(false);
+      expect(await bridge.isMatterbridgeEnabled()).to.equal(false);
+      await bridge.setEnabled(true);
+      expect(bridge.online).to.equal(true);
+    });
   });
 
   describe('backup', () => {
@@ -754,26 +766,27 @@ describe('MatterBridge', () => {
       expect(bridge.lastError).to.equal('corrupted archive');
     });
 
-    it('should back up the storage of a paired bridge, and bring it back online', async () => {
+    it('should back up the storage of a paired bridge, while it keeps running', async () => {
       await bridge.start();
       await bridge.backup();
       sinon.assert.calledOnceWithExactly(backup.createBackup, '/var/lib/gladysassistant/matter-bridge');
       expect(variables[VARIABLES.BACKUP]).to.equal('YmFja3Vw');
-      expect(matter.server.closed).to.equal(true);
+      expect(matter.server.closed).to.equal(false);
       expect(bridge.online).to.equal(true);
-      expect(bridge.devices.size).to.equal(2);
     });
 
-    it('should not back up a bridge that is not running or not paired', async () => {
+    it('should not back up a bridge that is not running, not paired or being paired', async () => {
       await bridge.backup();
       await bridge.start();
+      matter.server.commissioner.isFailsafeArmed = true;
+      await bridge.backup();
+      matter.server.env.services.clear();
       matter.server.state.commissioning.commissioned = false;
       await bridge.backup();
       sinon.assert.notCalled(backup.createBackup);
-      expect(matter.server.closed).to.equal(false);
     });
 
-    it('should report a failed backup and bring the bridge back online all the same', async () => {
+    it('should report a failed backup, and keep the bridge running', async () => {
       await bridge.start();
       backup.createBackup.rejects(new Error('disk full'));
       let error;
@@ -787,11 +800,46 @@ describe('MatterBridge', () => {
       expect(bridge.online).to.equal(true);
     });
 
-    it('should forget the backup on reset', async () => {
+    it('should forget the backup on reset, before the storage', async () => {
       variables[VARIABLES.BACKUP] = 'YmFja3Vw';
       await bridge.start();
       await bridge.reset();
       expect(variables[VARIABLES.BACKUP]).to.equal(undefined);
+      sinon.assert.callOrder(gladys.variable.destroy.withArgs(VARIABLES.BACKUP), fse.remove);
+    });
+
+    it('should forget the backup once the last ecosystem removed the bridge', async () => {
+      variables[VARIABLES.BACKUP] = 'YmFja3Vw';
+      await bridge.start();
+      matter.server.lifecycle.decommissioned.emit({});
+      await bridge.queue;
+      expect(variables[VARIABLES.BACKUP]).to.equal(undefined);
+    });
+
+    it('should back the pairings up a minute after an ecosystem was added or removed', async () => {
+      const clock = sinon.useFakeTimers();
+      try {
+        await bridge.start();
+        const backupStub = sinon.stub(bridge, 'backup').resolves();
+        matter.server.events.commissioning.fabricsChanged.emit(2, 'added');
+        clock.tick(30 * 1000);
+        matter.server.events.commissioning.fabricsChanged.emit(2, 'updated');
+        clock.tick(59 * 1000);
+        sinon.assert.notCalled(backupStub);
+        clock.tick(1000);
+        sinon.assert.calledOnce(backupStub);
+        backupStub.rejects(new Error('disk full'));
+        matter.server.events.commissioning.fabricsChanged.emit(3, 'added');
+        clock.tick(60 * 1000);
+        await Promise.resolve();
+        sinon.assert.calledTwice(backupStub);
+        matter.server.events.commissioning.fabricsChanged.emit(3, 'deleted');
+        await bridge.stop();
+        clock.tick(60 * 1000);
+        sinon.assert.calledTwice(backupStub);
+      } finally {
+        clock.restore();
+      }
     });
   });
 
@@ -829,6 +877,37 @@ describe('MatterBridge', () => {
       sinon.assert.notCalled(enterCommissionableMode);
     });
 
+    it('should leave a node being factory-reset, or just paired, alone', async () => {
+      matter.server.lifecycle.isOnline = false;
+      await bridge.ensureCommissionable();
+      matter.server.lifecycle.isOnline = true;
+      matter.server.fabricManager.fabrics = [{ fabricIndex: 1 }];
+      await bridge.ensureCommissionable();
+      sinon.assert.notCalled(enterCommissionableMode);
+    });
+
+    it('should not open the window again sooner than every 15 minutes', async () => {
+      const clock = sinon.useFakeTimers({ now: Date.now(), toFake: ['Date'] });
+      try {
+        await bridge.ensureCommissionable();
+        await bridge.ensureCommissionable();
+        sinon.assert.calledOnce(enterCommissionableMode);
+        clock.tick(15 * 60 * 1000);
+        await bridge.ensureCommissionable();
+        sinon.assert.calledTwice(enterCommissionableMode);
+      } finally {
+        clock.restore();
+      }
+    });
+
+    it('should describe a bridge stopped while its window was checked', async () => {
+      enterCommissionableMode.callsFake(async () => {
+        await bridge.stopNow();
+      });
+      const status = await bridge.getStatus();
+      expect(status).to.include({ running: false, manualPairingCode: null });
+    });
+
     it('should leave a stopped bridge alone', async () => {
       await bridge.stop();
       await bridge.ensureCommissionable();
@@ -839,6 +918,14 @@ describe('MatterBridge', () => {
       enterCommissionableMode.rejects(new Error('administrator window open'));
       await bridge.ensureCommissionable();
       sinon.assert.calledOnce(enterCommissionableMode);
+    });
+
+    it('should survive a node closing while its window is checked', async () => {
+      matter.server.env.has = () => {
+        throw new Error('environment closed');
+      };
+      await bridge.ensureCommissionable();
+      sinon.assert.notCalled(enterCommissionableMode);
     });
 
     it('should check the window every hour while the bridge runs', async () => {
