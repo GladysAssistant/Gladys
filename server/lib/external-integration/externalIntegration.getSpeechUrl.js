@@ -74,7 +74,9 @@ async function getSpeechUrl(service, body) {
   try {
     result = await this.tts.getSpeechUrl({ text, language });
   } catch (e) {
-    logger.warn(`TTS speech URL requested by integration ${service.selector} failed: ${e && e.message}`);
+    // an HTTP error such as the Gladys Plus 429 carries a code, no message
+    const cause = (e && (e.message || e.code)) || String(e);
+    logger.warn(`TTS speech URL requested by integration ${service.selector} failed: ${cause}`);
     throw new Error503('TTS_UNAVAILABLE');
   }
   // Gladys Plus can answer without a URL: nothing to hand to a player

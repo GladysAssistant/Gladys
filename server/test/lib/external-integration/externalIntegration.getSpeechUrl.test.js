@@ -164,6 +164,17 @@ describe('externalIntegration.getSpeechUrl', () => {
     });
   });
 
+  it('should answer 503 when the voice fails with a bare value, not an Error', async () => {
+    const { externalIntegration, stateManager, variable } = buildSpeakingSupervisor();
+    await variable.setValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER, 'ext-piper-tts');
+    // eslint-disable-next-line prefer-promise-reject-errors
+    stateManager.setState('service', 'ext-piper-tts', { tts: { synthesize: () => Promise.reject('boom') } });
+    await expect503(externalIntegration.getSpeechUrl(caller, { text: 'Bonjour !' }));
+    // eslint-disable-next-line prefer-promise-reject-errors
+    stateManager.setState('service', 'ext-piper-tts', { tts: { synthesize: () => Promise.reject(null) } });
+    await expect503(externalIntegration.getSpeechUrl(caller, { text: 'Bonjour !' }));
+  });
+
   it('should answer 503 when no tts manager is attached', async () => {
     const { externalIntegration } = buildSupervisor();
     await expect503(externalIntegration.getSpeechUrl(caller, { text: 'Bonjour !' }));
