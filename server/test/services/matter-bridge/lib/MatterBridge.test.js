@@ -9,9 +9,15 @@ const { createMatter, feature } = require('../fakes');
 
 const fse = { ensureDir: sinon.stub().resolves(), remove: sinon.stub().resolves() };
 const checkIpv6 = sinon.stub().returns({ hasIpv6: true, ipv6Interfaces: [] });
+const backup = {
+  isStorageEmpty: sinon.stub().resolves(false),
+  createBackup: sinon.stub().resolves('YmFja3Vw'),
+  restoreBackup: sinon.stub().resolves(),
+};
 const MatterBridge = proxyquire('../../../../services/matter-bridge/lib/MatterBridge', {
   'fs-extra': fse,
   '../../../utils/checkIpv6': { checkIpv6 },
+  './backup': backup,
 });
 
 const SERVICE_ID = 'a810b8db-6d04-4697-bed3-c4b72c996279';
@@ -73,6 +79,13 @@ describe('MatterBridge', () => {
     sinon.resetHistory();
     fse.remove.resetBehavior();
     fse.remove.resolves();
+    backup.isStorageEmpty.resetBehavior();
+    backup.isStorageEmpty.resolves(false);
+    backup.createBackup.resetBehavior();
+    backup.createBackup.resolves('YmFja3Vw');
+    backup.restoreBackup.resetBehavior();
+    backup.restoreBackup.resolves();
+    delete process.env.MATTER_BRIDGE_PORT;
   });
 
   describe('start', () => {
@@ -699,6 +712,188 @@ describe('MatterBridge', () => {
       const status = await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['sensor'] });
       expect(Array.from(bridge.devices.keys())).to.deep.equal(['sensor-id']);
       expect(status.exposedCount).to.equal(1);
+    });
+  });
+
+  describe('port', () => {
+    it('should listen on the port the environment gives', async () => {
+      process.env.MATTER_BRIDGE_PORT = '5550';
+      await bridge.start();
+      expect(matter.server.options.network).to.deep.equal({ port: 5550 });
+      expect((await bridge.getStatus()).port).to.equal(5550);
+    });
+  });
+
+  describe('backup', () => {
+    it('should restore the last backup into an empty storage before starting', async () => {
+      backup.isStorageEmpty.resolves(true);
+      variables[VARIABLES.BACKUP] = 'YmFja3Vw';
+      await bridge.start();
+      sinon.assert.calledOnceWithExactly(backup.restoreBackup, '/var/lib/gladysassistant/matter-bridge', 'YmFja3Vw');
+      sinon.assert.callOrder(backup.restoreBackup, fse.ensureDir);
+      expect(bridge.online).to.equal(true);
+    });
+
+    it('should not restore anything without a backup, or into a storage that is not empty', async () => {
+      backup.isStorageEmpty.resolves(true);
+      await bridge.start();
+      await bridge.stop();
+      backup.isStorageEmpty.resolves(false);
+      variables[VARIABLES.BACKUP] = 'YmFja3Vw';
+      await bridge.start();
+      sinon.assert.notCalled(backup.restoreBackup);
+      expect(bridge.online).to.equal(true);
+    });
+
+    it('should not start from a backup that cannot be restored', async () => {
+      backup.isStorageEmpty.resolves(true);
+      backup.restoreBackup.rejects(new Error('corrupted archive'));
+      variables[VARIABLES.BACKUP] = 'YmFja3Vw';
+      await bridge.start();
+      expect(bridge.server).to.equal(null);
+      expect(bridge.lastError).to.equal('corrupted archive');
+    });
+
+    it('should back up the storage of a paired bridge, and bring it back online', async () => {
+      await bridge.start();
+      await bridge.backup();
+      sinon.assert.calledOnceWithExactly(backup.createBackup, '/var/lib/gladysassistant/matter-bridge');
+      expect(variables[VARIABLES.BACKUP]).to.equal('YmFja3Vw');
+      expect(matter.server.closed).to.equal(true);
+      expect(bridge.online).to.equal(true);
+      expect(bridge.devices.size).to.equal(2);
+    });
+
+    it('should not back up a bridge that is not running or not paired', async () => {
+      await bridge.backup();
+      await bridge.start();
+      matter.server.state.commissioning.commissioned = false;
+      await bridge.backup();
+      sinon.assert.notCalled(backup.createBackup);
+      expect(matter.server.closed).to.equal(false);
+    });
+
+    it('should report a failed backup and bring the bridge back online all the same', async () => {
+      await bridge.start();
+      backup.createBackup.rejects(new Error('disk full'));
+      let error;
+      try {
+        await bridge.backup();
+      } catch (e) {
+        error = e;
+      }
+      expect(error.message).to.equal('disk full');
+      expect(variables[VARIABLES.BACKUP]).to.equal(undefined);
+      expect(bridge.online).to.equal(true);
+    });
+
+    it('should forget the backup on reset', async () => {
+      variables[VARIABLES.BACKUP] = 'YmFja3Vw';
+      await bridge.start();
+      await bridge.reset();
+      expect(variables[VARIABLES.BACKUP]).to.equal(undefined);
+    });
+  });
+
+  describe('commissioning window', () => {
+    let enterCommissionableMode;
+
+    beforeEach(async () => {
+      await bridge.start();
+      matter.server.state.commissioning.commissioned = false;
+      matter.server.commissioner.windowStatus = 0;
+      enterCommissionableMode = sinon.stub(matter.server.agent.commissioning, 'enterCommissionableMode').resolves();
+    });
+
+    it('should open the window again when the page reads the status of a bridge waiting for a pairing', async () => {
+      const status = await bridge.getStatus();
+      sinon.assert.calledOnce(enterCommissionableMode);
+      expect(status.manualPairingCode).to.equal('12345678901');
+    });
+
+    it('should open the window when the node has no commissioner yet', async () => {
+      matter.server.env.services.clear();
+      await bridge.ensureCommissionable();
+      sinon.assert.calledOnce(enterCommissionableMode);
+    });
+
+    it('should leave an open window, a pairing in progress and a paired bridge alone', async () => {
+      matter.server.commissioner.windowStatus = 1;
+      await bridge.ensureCommissionable();
+      matter.server.commissioner.windowStatus = 0;
+      matter.server.commissioner.isFailsafeArmed = true;
+      await bridge.ensureCommissionable();
+      matter.server.commissioner.isFailsafeArmed = false;
+      matter.server.state.commissioning.commissioned = true;
+      await bridge.ensureCommissionable();
+      sinon.assert.notCalled(enterCommissionableMode);
+    });
+
+    it('should leave a stopped bridge alone', async () => {
+      await bridge.stop();
+      await bridge.ensureCommissionable();
+      sinon.assert.notCalled(enterCommissionableMode);
+    });
+
+    it('should survive a window that cannot be opened', async () => {
+      enterCommissionableMode.rejects(new Error('administrator window open'));
+      await bridge.ensureCommissionable();
+      sinon.assert.calledOnce(enterCommissionableMode);
+    });
+
+    it('should check the window every hour while the bridge runs', async () => {
+      await bridge.stop();
+      const clock = sinon.useFakeTimers();
+      try {
+        await bridge.start();
+        matter.server.state.commissioning.commissioned = false;
+        const ensureCommissionable = sinon.stub(bridge, 'ensureCommissionable').resolves();
+        clock.tick(60 * 60 * 1000);
+        sinon.assert.calledOnce(ensureCommissionable);
+        await bridge.stop();
+        clock.tick(60 * 60 * 1000);
+        sinon.assert.calledOnce(ensureCommissionable);
+      } finally {
+        clock.restore();
+      }
+    });
+  });
+
+  describe('factory reset by matter.js', () => {
+    beforeEach(async () => {
+      await bridge.start();
+    });
+
+    it('should rebuild every device once the node removed from its last ecosystem is online again', async () => {
+      const before = bridge.devices.get('light-id').built;
+      matter.server.lifecycle.decommissioned.emit({});
+      matter.server.lifecycle.online.emit({});
+      await bridge.queue;
+      const after = bridge.devices.get('light-id').built;
+      expect(after).to.not.equal(before);
+      expect(before.root.deleted).to.equal(true);
+      expect(bridge.devices.size).to.equal(2);
+      // The new endpoints are bound: Gladys states reach them.
+      await bridge.onTriggerCheck({ type: EVENTS.DEVICE.NEW_STATE, device_feature: 'light-binary', last_value: 0 });
+      expect(after.children[0].state.onOff.onOff).to.equal(false);
+    });
+
+    it('should not rebuild anything when the node goes online without a reset', async () => {
+      const before = bridge.devices.get('light-id').built;
+      matter.server.lifecycle.online.emit({});
+      await bridge.queue;
+      expect(bridge.devices.get('light-id').built).to.equal(before);
+    });
+
+    it('should not rebuild the devices of a node that was stopped meanwhile', async () => {
+      const { server } = bridge;
+      const syncAll = sinon.spy(bridge, 'syncAll');
+      await bridge.rebuildAll({});
+      await bridge.stop();
+      await bridge.rebuildAll(server);
+      sinon.assert.notCalled(syncAll);
+      expect(server.lifecycle.online.handlers.size).to.equal(0);
+      expect(server.lifecycle.decommissioned.handlers.size).to.equal(0);
     });
   });
 });

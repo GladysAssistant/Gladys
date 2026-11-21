@@ -175,9 +175,11 @@ Bindings.prototype.clear = function clear() {
  * await bindings.push({ device_feature: 'light-binary', last_value: 1 });
  */
 Bindings.prototype.push = function push(event) {
-  // pushNow never rejects: a failing endpoint is logged and the next pushes still run.
+  // pushNow logs what fails rather than reject, and the chain goes on after a rejection anyway: one
+  // failing push must never stop the next ones.
+  const run = () => this.pushNow(event);
   // eslint-disable-next-line promise/prefer-await-to-then
-  this.pushes = this.pushes.then(() => this.pushNow(event));
+  this.pushes = this.pushes.then(run, run);
   return this.pushes;
 };
 
@@ -197,14 +199,16 @@ Bindings.prototype.pushNow = async function pushNow(event) {
   }
   // eslint-disable-next-line no-restricted-syntax
   for (const { adapter, roles, role, endpoint } of bindings) {
-    const patch = adapter.toMatter(role, event.last_value, roles, endpoint.state);
-    if (patch) {
-      try {
+    // Reading endpoint.state can throw too, on an endpoint being reset or closed: the whole push of
+    // an endpoint is guarded, so the next endpoints and the next pushes still run.
+    try {
+      const patch = adapter.toMatter(role, event.last_value, roles, endpoint.state);
+      if (patch) {
         // eslint-disable-next-line no-await-in-loop
         await endpoint.set(patch);
-      } catch (e) {
-        logger.warn(`Matter bridge: unable to forward the state of ${event.device_feature}: ${e.message}`);
       }
+    } catch (e) {
+      logger.warn(`Matter bridge: unable to forward the state of ${event.device_feature}: ${e.message}`);
     }
   }
 };

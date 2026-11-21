@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const path = require('path');
 
-const { VARIABLES, INVALID_PASSCODES, MAX_PASSCODE, MAX_DISCRIMINATOR } = require('./constants');
+const { VARIABLES, INVALID_PASSCODES, MAX_PASSCODE, MAX_DISCRIMINATOR, MATTER_BRIDGE_PORT } = require('./constants');
 
 /**
  * @description Folder where matter.js keeps the bridge: its fabrics, its endpoint numbers. It is
@@ -14,6 +14,18 @@ const { VARIABLES, INVALID_PASSCODES, MAX_PASSCODE, MAX_DISCRIMINATOR } = requir
  */
 function getStoragePath(gladys) {
   return process.env.MATTER_BRIDGE_FOLDER_PATH || path.join(path.dirname(gladys.config.storage), 'matter-bridge');
+}
+
+/**
+ * @description UDP port the bridge listens on: the standard Matter port, unless the
+ * MATTER_BRIDGE_PORT environment variable gives another valid one.
+ * @returns {number} Port.
+ * @example
+ * getPort(); // 5540
+ */
+function getPort() {
+  const port = Number(process.env.MATTER_BRIDGE_PORT);
+  return Number.isInteger(port) && port > 0 && port <= 65535 ? port : MATTER_BRIDGE_PORT;
 }
 
 /**
@@ -133,6 +145,7 @@ module.exports = {
   softwareVersionOf,
   uniqueIdOf,
   getStoragePath,
+  getPort,
   isValidPasscode,
   generatePasscode,
   getPairingConfig,

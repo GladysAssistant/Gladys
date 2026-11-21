@@ -3,17 +3,26 @@ const path = require('path');
 const fse = require('fs-extra');
 const { expect } = require('chai');
 
-const { loadMatter } = require('../../../../services/matter-bridge/lib/loadMatter');
+const sinon = require('sinon').createSandbox();
+
+const logger = require('../../../../utils/logger');
+const { loadMatter, MATTER_LOG_LEVEL } = require('../../../../services/matter-bridge/lib/loadMatter');
 const { planDevice } = require('../../../../services/matter-bridge/lib/planDevice');
 const { buildEndpoints, endpointNumbers } = require('../../../../services/matter-bridge/lib/buildEndpoints');
 const { Bindings, isRemoteChange } = require('../../../../services/matter-bridge/lib/Bindings');
-const { AIR_QUALITY, EXPRESSED_STATE } = require('../../../../services/matter-bridge/lib/constants');
+const {
+  AIR_QUALITY,
+  EXPRESSED_STATE,
+  COMMISSIONING_WINDOW_NOT_OPEN,
+} = require('../../../../services/matter-bridge/lib/constants');
 const { feature, createContext } = require('../fakes');
 
 // matter.js is a dependency of the service only: it is resolved from the service folder.
 const SERVICE_PATH = path.join(__dirname, '../../../../services/matter-bridge');
 // eslint-disable-next-line import/no-dynamic-require
 const { MdnsService } = require(require.resolve('@matter/main/protocol', { paths: [SERVICE_PATH] }));
+// eslint-disable-next-line import/no-dynamic-require
+const { AdministratorCommissioning } = require(require.resolve('@matter/main/clusters', { paths: [SERVICE_PATH] }));
 
 // Every other test of the bridge runs on fakes of matter.js. This one builds the endpoints of each
 // adapter on the real matter.js, on a node that never goes online: it checks what the fakes
@@ -112,7 +121,7 @@ describe('Matter bridge on the real matter.js', function realMatter() {
   let storagePath;
   let server;
   let aggregator;
-  let logLevel;
+  let levelAfterLoad;
   const built = new Map();
 
   /**
@@ -136,9 +145,10 @@ describe('Matter bridge on the real matter.js', function realMatter() {
 
   before(async () => {
     matter = loadMatter();
-    const { Environment, ServerNode, Endpoint, Logger, LogLevel } = matter.main;
-    logLevel = Logger.level;
-    Logger.level = LogLevel.ERROR;
+    const { Environment, ServerNode, Endpoint, Logger } = matter.main;
+    levelAfterLoad = Logger.level;
+    // Quieter than the bridge for the test run.
+    Environment.default.vars.set('log.level', 'error');
 
     // The node never goes online, but matter.js loads its mDNS service as the node is built: a
     // stand-in keeps the test off the network.
@@ -171,7 +181,7 @@ describe('Matter bridge on the real matter.js', function realMatter() {
     }
     if (matter) {
       matter.main.Environment.default.delete(MdnsService, mdnsService);
-      matter.main.Logger.level = logLevel;
+      matter.main.Environment.default.vars.set('log.level', MATTER_LOG_LEVEL);
     }
     if (storagePath) {
       await fse.remove(storagePath);
@@ -183,6 +193,44 @@ describe('Matter bridge on the real matter.js', function realMatter() {
     expect(matter.devices.OnOffLightDevice).to.be.an('object');
     expect(matter.endpoints.BridgedNodeEndpoint).to.be.an('object');
     expect(matter.behaviors.WindowCoveringServer).to.be.a('function');
+  });
+
+  it('should keep only the warnings and errors of matter.js, in the Gladys logs', () => {
+    const { Environment, Logger, LogLevel } = matter.main;
+    expect(levelAfterLoad).to.equal(LogLevel.WARN);
+    Environment.default.vars.set('log.level', MATTER_LOG_LEVEL);
+    const warn = sinon.stub(logger, 'warn');
+    const error = sinon.stub(logger, 'error');
+    try {
+      // Setting a variable, as the bridge does for its storage, keeps the level.
+      Environment.default.vars.set('storage.path', storagePath);
+      expect(Logger.level).to.equal(LogLevel.WARN);
+      const matterLogger = Logger.get('CommissioningServer');
+      matterLogger.notice('is uncommissioned', { passcode: 20202021 });
+      matterLogger.info('info');
+      matterLogger.warn('a warning');
+      matterLogger.error('an error');
+      sinon.assert.calledOnce(warn);
+      sinon.assert.calledWithMatch(warn, /^Matter bridge \(matter\.js\): .*a warning/);
+      sinon.assert.calledOnce(error);
+      sinon.assert.calledWithMatch(error, /^Matter bridge \(matter\.js\): .*an error/);
+    } finally {
+      sinon.restore();
+      Environment.default.vars.set('log.level', 'error');
+    }
+  });
+
+  it('should offer what the bridge needs to open the commissioning window again', () => {
+    expect(AdministratorCommissioning.CommissioningWindowStatus.WindowNotOpen).to.equal(COMMISSIONING_WINDOW_NOT_OPEN);
+    const { prototype } = matter.protocol.DeviceCommissioner;
+    expect(Object.getOwnPropertyDescriptor(prototype, 'windowStatus').get).to.be.a('function');
+    expect(Object.getOwnPropertyDescriptor(prototype, 'isFailsafeArmed').get).to.be.a('function');
+    expect(matter.main.CommissioningServer.prototype.enterCommissionableMode).to.be.a('function');
+    expect(server.env.has).to.be.a('function');
+    expect(server.act).to.be.a('function');
+    expect(server.state.commissioning.commissioned).to.equal(false);
+    expect(server.lifecycle.online.on).to.be.a('function');
+    expect(server.lifecycle.decommissioned.on).to.be.a('function');
   });
 
   it('should expose every adapter as a valid Matter endpoint', () => {

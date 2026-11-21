@@ -7,18 +7,20 @@ const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 const {
   VARIABLES,
   EXPOSURE_MODES,
-  MATTER_BRIDGE_PORT,
   ERROR_CODES,
   NODE_ID,
+  COMMISSIONING_CHECK_INTERVAL_MS,
+  COMMISSIONING_WINDOW_NOT_OPEN,
   AGGREGATOR_ID,
   VENDOR_ID,
   PRODUCT_ID,
 } = require('./constants');
-const { getStoragePath, getPairingConfig, softwareVersionOf, uniqueIdOf } = require('./config');
+const { getStoragePath, getPort, getPairingConfig, softwareVersionOf, uniqueIdOf } = require('./config');
 const { readExposure, isExposed } = require('./exposure');
 const { planDevice, planSignature } = require('./planDevice');
 const { buildEndpoints, endpointNumbers, truncate } = require('./buildEndpoints');
 const { Bindings } = require('./Bindings');
+const { isStorageEmpty, createBackup, restoreBackup } = require('./backup');
 const { checkIpv6 } = require('../../../utils/checkIpv6');
 
 /**
@@ -42,6 +44,8 @@ function MatterBridge(gladys, serviceId, loadMatter) {
   this.online = false;
   this.lastError = null;
   this.lastErrorCode = null;
+  // Detaches the observers of the node, and stops the check of its commissioning window.
+  this.unwatchNode = null;
   // Device id -> { selector, name, signature, built }
   this.devices = new Map();
   this.bindings = new Bindings(gladys);
@@ -167,7 +171,7 @@ MatterBridge.prototype.startNow = async function startNow() {
   }
   if (await this.isMatterbridgeEnabled()) {
     this.setError(
-      `The Matterbridge integration is enabled and uses port ${MATTER_BRIDGE_PORT}`,
+      `The Matterbridge integration is enabled and uses port ${getPort()}`,
       ERROR_CODES.MATTERBRIDGE_ENABLED,
     );
     logger.warn(`Matter bridge: not started: ${this.lastError}`);
@@ -178,10 +182,10 @@ MatterBridge.prototype.startNow = async function startNow() {
     await this.startNode();
     this.online = true;
     this.setError(null);
-    logger.info(`Matter bridge: online on port ${MATTER_BRIDGE_PORT}, ${this.devices.size} device(s) exposed`);
+    logger.info(`Matter bridge: online on port ${getPort()}, ${this.devices.size} device(s) exposed`);
   } catch (e) {
     if (this.isPortInUse(e)) {
-      this.setError(`Port ${MATTER_BRIDGE_PORT} is already in use by another program`, ERROR_CODES.PORT_IN_USE);
+      this.setError(`Port ${getPort()} is already in use by another program`, ERROR_CODES.PORT_IN_USE);
     } else {
       this.setError(e.message);
     }
@@ -201,7 +205,7 @@ MatterBridge.prototype.startNode = async function startNode() {
   const { AggregatorEndpoint } = this.matter.endpoints;
 
   const storagePath = getStoragePath(this.gladys);
-  await fse.ensureDir(storagePath);
+  await this.restoreIfEmpty(storagePath);
   // This copy of matter.js belongs to this service only, so its default environment is not shared
   // with the Matter controller of the `matter` service.
   Environment.default.vars.set('storage.path', storagePath);
@@ -211,7 +215,7 @@ MatterBridge.prototype.startNode = async function startNode() {
 
   this.server = await ServerNode.create({
     id: NODE_ID,
-    network: { port: MATTER_BRIDGE_PORT },
+    network: { port: getPort() },
     commissioning: { passcode, discriminator },
     productDescription: { name: 'Gladys', deviceType: AggregatorEndpoint.deviceType },
     basicInformation: {
@@ -239,6 +243,110 @@ MatterBridge.prototype.startNode = async function startNode() {
   this.gladys.event.on(EVENTS.DEVICE.DELETE, this.onDeviceDelete);
 
   await this.server.start();
+  this.watchNode(this.server);
+};
+
+/**
+ * @description Put the last backup back when the storage folder is empty: Gladys was restored
+ * from a backup on a new machine, and its database brought the pairing code back but not the
+ * pairings. The ecosystems then find the bridge they paired, and nothing has to be paired again.
+ * @param {string} storagePath - Storage folder of the bridge.
+ * @returns {Promise} Resolves once the folder is ready.
+ * @example
+ * await bridge.restoreIfEmpty(storagePath);
+ */
+MatterBridge.prototype.restoreIfEmpty = async function restoreIfEmpty(storagePath) {
+  if (await isStorageEmpty(storagePath)) {
+    const backup = await this.gladys.variable.getValue(VARIABLES.BACKUP, this.serviceId);
+    if (backup) {
+      logger.info('Matter bridge: empty storage, restoring the pairings from the last backup');
+      await restoreBackup(storagePath, backup);
+    }
+  }
+  await fse.ensureDir(storagePath);
+};
+
+/**
+ * @description Follow the node once it is online: check its commissioning window every hour, and
+ * rebuild the devices after matter.js factory-reset the node, which it does on its own when the
+ * last ecosystem removes the bridge.
+ * @param {object} server - The matter.js ServerNode.
+ * @example
+ * bridge.watchNode(server);
+ */
+MatterBridge.prototype.watchNode = function watchNode(server) {
+  const { lifecycle } = server;
+  let erased = false;
+  const onDecommissioned = () => {
+    erased = true;
+  };
+  // A factory reset takes the node offline, erases its storage, resets its endpoints to the
+  // state they were built with and brings it online again: the bindings, their observers and the
+  // states would be those of before. Every device is rebuilt from the current Gladys states.
+  const onOnline = () => {
+    if (erased && this.server === server) {
+      erased = false;
+      this.enqueue(() => this.rebuildAll(server));
+    }
+  };
+  lifecycle.decommissioned.on(onDecommissioned);
+  lifecycle.online.on(onOnline);
+  const timer = setInterval(() => this.ensureCommissionable(), COMMISSIONING_CHECK_INTERVAL_MS);
+  this.unwatchNode = () => {
+    lifecycle.decommissioned.off(onDecommissioned);
+    lifecycle.online.off(onOnline);
+    clearInterval(timer);
+  };
+};
+
+/**
+ * @description Rebuild every exposed device, after a factory reset of the node: only to be called
+ * from a queued change.
+ * @param {object} server - The node that was reset.
+ * @returns {Promise} Resolves once the devices are rebuilt.
+ * @example
+ * await bridge.enqueue(() => bridge.rebuildAll(server));
+ */
+MatterBridge.prototype.rebuildAll = async function rebuildAll(server) {
+  if (this.server !== server) {
+    return;
+  }
+  logger.info('Matter bridge: removed from its last ecosystem and reset, its devices are rebuilt');
+  // No ecosystem knows the endpoints any more: their numbers do not have to be kept.
+  // eslint-disable-next-line no-restricted-syntax
+  for (const deviceId of Array.from(this.devices.keys())) {
+    // eslint-disable-next-line no-await-in-loop
+    await this.removeDevice(deviceId, { forget: true });
+  }
+  await this.syncAll();
+};
+
+/**
+ * @description Open the commissioning window again when the bridge waits for its first pairing
+ * and the window is closed: matter.js closes it 48 hours after the node went online, or after too
+ * many failed pairing attempts, and the pairing code the page shows would no longer work.
+ * @returns {Promise} Resolves once the window is open, or nothing had to be done.
+ * @example
+ * await bridge.ensureCommissionable();
+ */
+MatterBridge.prototype.ensureCommissionable = async function ensureCommissionable() {
+  const { server } = this;
+  if (!this.online || !server || server.state.commissioning.commissioned) {
+    return;
+  }
+  const { DeviceCommissioner } = this.matter.protocol;
+  if (server.env.has(DeviceCommissioner)) {
+    const commissioner = server.env.get(DeviceCommissioner);
+    if (commissioner.windowStatus !== COMMISSIONING_WINDOW_NOT_OPEN || commissioner.isFailsafeArmed) {
+      return;
+    }
+  }
+  try {
+    await server.act((agent) => agent.commissioning.enterCommissionableMode());
+    logger.info('Matter bridge: commissioning window opened again');
+  } catch (e) {
+    logger.warn(`Matter bridge: unable to open the commissioning window again: ${e.message}`);
+  }
 };
 
 /**
@@ -259,6 +367,10 @@ MatterBridge.prototype.stop = function stop() {
  * await bridge.enqueue(() => bridge.stopNow());
  */
 MatterBridge.prototype.stopNow = async function stopNow() {
+  if (this.unwatchNode) {
+    this.unwatchNode();
+    this.unwatchNode = null;
+  }
   this.gladys.event.removeListener(EVENTS.TRIGGERS.CHECK, this.onTriggerCheck);
   this.gladys.event.removeListener(EVENTS.DEVICE.CREATE, this.onDeviceChange);
   this.gladys.event.removeListener(EVENTS.DEVICE.UPDATE, this.onDeviceChange);
@@ -292,6 +404,7 @@ MatterBridge.prototype.reset = function reset() {
       await fse.remove(getStoragePath(this.gladys));
       await this.gladys.variable.destroy(VARIABLES.PASSCODE, this.serviceId);
       await this.gladys.variable.destroy(VARIABLES.DISCRIMINATOR, this.serviceId);
+      await this.gladys.variable.destroy(VARIABLES.BACKUP, this.serviceId);
     } catch (e) {
       // The bridge is left stopped: the settings page keeps offering the reset, to try it again.
       this.setError(`Unable to reset: ${e.message}`);
@@ -300,6 +413,53 @@ MatterBridge.prototype.reset = function reset() {
     }
     await this.startNow();
   });
+};
+
+/**
+ * @description Back the storage folder up into a variable, so that the pairings are part of the
+ * Gladys backups. The node is taken offline for the time of the archive, as the Matter
+ * controller does, so that the archive is consistent. A bridge that is not running, or not paired
+ * with any ecosystem, has nothing worth saving and is left alone.
+ * @returns {Promise} Resolves once the backup is saved.
+ * @throws {Error} When the backup could not be made; the bridge is started again all the same.
+ * @example
+ * await bridge.backup();
+ */
+MatterBridge.prototype.backup = async function backup() {
+  let failure = null;
+  await this.enqueue(async () => {
+    try {
+      await this.backupNow();
+    } catch (e) {
+      failure = e;
+      throw e;
+    }
+  });
+  if (failure) {
+    throw failure;
+  }
+};
+
+/**
+ * @description Back the storage folder up at once: only to be called from a queued change.
+ * @returns {Promise} Resolves once the backup is saved.
+ * @example
+ * await bridge.enqueue(() => bridge.backupNow());
+ */
+MatterBridge.prototype.backupNow = async function backupNow() {
+  if (!this.online || !this.server.state.commissioning.commissioned) {
+    logger.debug('Matter bridge: not running or not paired, nothing to back up');
+    return;
+  }
+  logger.info('Matter bridge: backing up the pairings');
+  await this.stopNow();
+  try {
+    const content = await createBackup(getStoragePath(this.gladys));
+    await this.gladys.variable.setValue(VARIABLES.BACKUP, content, this.serviceId);
+    logger.info(`Matter bridge: pairings backed up (${content.length} bytes)`);
+  } finally {
+    await this.startNow();
+  }
 };
 
 /**
@@ -512,7 +672,7 @@ MatterBridge.prototype.getStatus = async function getStatus() {
     enabled: await this.isEnabled(),
     hasIpv6: checkIpv6(undefined, { allowLinkLocal: true }).hasIpv6,
     matterbridgeEnabled: await this.isMatterbridgeEnabled(),
-    port: MATTER_BRIDGE_PORT,
+    port: getPort(),
     running: this.online,
     error: this.lastError,
     errorCode: this.lastErrorCode,
@@ -525,6 +685,7 @@ MatterBridge.prototype.getStatus = async function getStatus() {
     fabrics: [],
   };
   if (this.online) {
+    await this.ensureCommissionable();
     const { commissioning, operationalCredentials } = this.server.state;
     const pairingCodes = commissioning.pairingCodes || {};
     status.commissioned = commissioning.commissioned;
@@ -551,7 +712,7 @@ MatterBridge.prototype.getStatus = async function getStatus() {
  */
 MatterBridge.prototype.setEnabled = async function setEnabled(enabled) {
   if (enabled && (await this.isMatterbridgeEnabled())) {
-    throw new ConflictError(`The Matterbridge integration is enabled and uses port ${MATTER_BRIDGE_PORT}`);
+    throw new ConflictError(`The Matterbridge integration is enabled and uses port ${getPort()}`);
   }
   await this.gladys.variable.setValue(VARIABLES.ENABLED, String(enabled), this.serviceId);
   if (enabled) {

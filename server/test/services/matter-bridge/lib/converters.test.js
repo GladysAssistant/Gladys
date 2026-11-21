@@ -34,6 +34,25 @@ describe('Matter bridge converters', () => {
     expect(converters.fromMireds(153, { min: 0, max: 100 })).to.equal(0);
   });
 
+  it('should convert colour temperatures in kelvin to and from mireds, warm to warm', () => {
+    const kelvin = { min: 2000, max: 6535 };
+    expect(converters.isKelvin(kelvin)).to.equal(true);
+    expect(converters.isKelvin({ min: 150, max: 500 })).to.equal(false);
+    expect(converters.isKelvin({ unit: 'kelvin', min: 0, max: 100 })).to.equal(true);
+    expect(converters.isKelvin({})).to.equal(false);
+    // The low end of a kelvin range is the warmest white: the most mireds.
+    expect(converters.toMireds(2000, kelvin)).to.equal(500);
+    expect(converters.toMireds(6535, kelvin)).to.equal(153);
+    expect(converters.toMireds(4000, kelvin)).to.equal(250);
+    expect(converters.toMireds(0, kelvin)).to.equal(153);
+    expect(converters.fromMireds(500, kelvin)).to.equal(2000);
+    expect(converters.fromMireds(153, kelvin)).to.equal(6535);
+    expect(converters.fromMireds(250, kelvin)).to.equal(4000);
+    expect(converters.fromMireds(converters.toMireds(2700, kelvin), kelvin)).to.equal(2703);
+    // A temperature beyond what the lamp accepts is sent as its warmest or coldest white.
+    expect(converters.fromMireds(500, { min: 2700, max: 6500 })).to.equal(2700);
+  });
+
   it('should convert colours to and from hue and saturation', () => {
     expect(converters.colorToHueSaturation(0xff0000)).to.deep.equal({ currentHue: 0, currentSaturation: 254 });
     expect(converters.colorToHueSaturation(0x00ff00)).to.deep.equal({ currentHue: 85, currentSaturation: 254 });

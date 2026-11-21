@@ -5,7 +5,20 @@ const VARIABLES = {
   SERIAL_NUMBER: 'MATTER_BRIDGE_SERIAL_NUMBER',
   EXPOSURE_MODE: 'MATTER_BRIDGE_EXPOSURE_MODE',
   EXPOSED_DEVICES: 'MATTER_BRIDGE_EXPOSED_DEVICES',
+  // Gzipped tar of the storage folder, in base64: the pairings are part of the Gladys backups.
+  BACKUP: 'MATTER_BRIDGE_BACKUP',
 };
+
+// The storage folder is backed up every night, after the Matter controller (04:00).
+const BACKUP_RULE = '0 20 4 * * *';
+
+// A node that is not commissioned only accepts a pairing while its commissioning window is open,
+// and matter.js closes it after 48 hours or too many failed attempts: it is checked every hour,
+// and each time the settings page reads the status, and opened again when closed.
+const COMMISSIONING_CHECK_INTERVAL_MS = 60 * 60 * 1000;
+
+// AdministratorCommissioning.CommissioningWindowStatus.WindowNotOpen
+const COMMISSIONING_WINDOW_NOT_OPEN = 0;
 
 // Which devices the bridge exposes: every compatible one, or only those the user picked.
 const EXPOSURE_MODES = {
@@ -19,6 +32,9 @@ const EXPOSURE_MODES = {
 // matter.js, which then picks a random one. The Matterbridge container of the `matterbridge`
 // service does, as it runs on the host network and listens on 5540 too: only one of them can run,
 // and each one refuses to start while the other is turned on.
+// The MATTER_BRIDGE_PORT environment variable can move the bridge to another port, for a machine
+// that already runs another Matter bridge (a standalone Matterbridge, Home Assistant Matter Hub...):
+// Alexa then no longer finds it.
 const MATTER_BRIDGE_PORT = 5540;
 
 // Why the bridge is not running, for the settings page to explain it.
@@ -145,6 +161,9 @@ const AIR_QUALITY = {
 
 module.exports = {
   VARIABLES,
+  BACKUP_RULE,
+  COMMISSIONING_CHECK_INTERVAL_MS,
+  COMMISSIONING_WINDOW_NOT_OPEN,
   EXPOSURE_MODES,
   MATTER_BRIDGE_PORT,
   ERROR_CODES,

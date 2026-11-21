@@ -6,6 +6,7 @@ const loadMatter = () => ({});
 const MatterBridgeMock = sinon.stub();
 MatterBridgeMock.prototype.start = sinon.stub().resolves();
 MatterBridgeMock.prototype.stop = sinon.stub().resolves();
+MatterBridgeMock.prototype.backup = sinon.stub().resolves();
 
 const MatterBridgeService = proxyquire('../../../services/matter-bridge/index', {
   './lib/MatterBridge': MatterBridgeMock,
@@ -13,8 +14,15 @@ const MatterBridgeService = proxyquire('../../../services/matter-bridge/index', 
 });
 
 describe('MatterBridgeService', () => {
-  const gladys = {};
+  const scheduledJob = { cancel: sinon.stub() };
+  const gladys = {
+    // Like the Gladys job wrapper: runs the function, reports a failure by rejecting.
+    job: { wrapper: sinon.stub().callsFake((type, func) => (...args) => func(...args, 'job-id')) },
+    scheduler: { scheduleJob: sinon.stub().returns(scheduledJob) },
+  };
   const service = MatterBridgeService(gladys, 'service-id');
+  const [backupJobType] = gladys.job.wrapper.firstCall.args;
+  let scheduled;
 
   afterEach(() => {
     sinon.resetHistory();
@@ -25,13 +33,29 @@ describe('MatterBridgeService', () => {
     expect(service.controllers).to.have.property('get /api/v1/service/matter-bridge/status');
   });
 
-  it('should start the bridge', async () => {
+  it('should start the bridge and schedule its nightly backup once', async () => {
     await service.start();
-    sinon.assert.calledOnce(service.bridge.start);
+    await service.start();
+    sinon.assert.calledTwice(service.bridge.start);
+    sinon.assert.calledOnceWithExactly(gladys.scheduler.scheduleJob, '0 20 4 * * *', sinon.match.func);
+    expect(backupJobType).to.equal('service-matter-bridge-backup');
+    [, scheduled] = gladys.scheduler.scheduleJob.firstCall.args;
   });
 
-  it('should stop the bridge', async () => {
+  it('should back up the bridge from the scheduled job, and log a failed backup', async () => {
+    await scheduled();
+    sinon.assert.calledOnce(service.bridge.backup);
+    service.bridge.backup.rejects(new Error('disk full'));
+    await scheduled();
+    sinon.assert.calledTwice(service.bridge.backup);
+    service.bridge.backup.resolves();
+  });
+
+  it('should stop the bridge and cancel its backup', async () => {
     await service.stop();
     sinon.assert.calledOnce(service.bridge.stop);
+    sinon.assert.calledOnce(scheduledJob.cancel);
+    await service.stop();
+    sinon.assert.calledOnce(scheduledJob.cancel);
   });
 });

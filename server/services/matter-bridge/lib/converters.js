@@ -100,16 +100,39 @@ function fromLevel(level, feature) {
   return Math.round(normalize(level, LEVEL_MIN, LEVEL_MAX, min, max));
 }
 
+// Colour temperatures in mireds stay far below this value (1000 mireds is a 1000 K candle light),
+// those in kelvin far above it (2000 K for the warmest white bulbs).
+const KELVIN_THRESHOLD = 1000;
+
 /**
- * @description Convert a Gladys colour temperature to Matter mireds. The low end of the Gladys
- * range is the coldest white, as for the HomeKit bridge.
+ * @description Tell if a Gladys colour temperature feature is in kelvin. Most integrations give a
+ * mired range (zigbee2mqtt, Philips Hue, Tasmota) or a percentage, but some give kelvin (MQTT Home
+ * Assistant discovery lights with color_temp_kelvin), without always declaring the unit: a range
+ * going over 1000 can only be kelvin.
+ * @param {object} feature - Gladys colour temperature feature.
+ * @returns {boolean} True when the feature is in kelvin.
+ * @example
+ * isKelvin({ min: 2000, max: 6535 }); // true
+ */
+function isKelvin(feature) {
+  return feature.unit === DEVICE_FEATURE_UNITS.KELVIN || (isNumber(feature.max) && feature.max > KELVIN_THRESHOLD);
+}
+
+/**
+ * @description Convert a Gladys colour temperature to Matter mireds. In kelvin, the low end of the
+ * range is the warmest white and the value is converted exactly. Otherwise the low end of the Gladys
+ * range is the coldest white, as for mireds and as for the HomeKit bridge.
  * @param {number} value - Gladys colour temperature.
  * @param {object} feature - Gladys colour temperature feature.
  * @returns {number} Mireds, 153 to 500.
  * @example
  * toMireds(0, { min: 0, max: 100 }); // 153
+ * toMireds(2000, { min: 2000, max: 6535 }); // 500
  */
 function toMireds(value, feature) {
+  if (isKelvin(feature)) {
+    return value > 0 ? clamp(Math.round(1e6 / value), MIREDS_MIN, MIREDS_MAX) : MIREDS_MIN;
+  }
   const [min, max] = featureRange(feature);
   return Math.round(normalize(value, min, max, MIREDS_MIN, MIREDS_MAX));
 }
@@ -121,9 +144,13 @@ function toMireds(value, feature) {
  * @returns {number} Gladys colour temperature.
  * @example
  * fromMireds(500, { min: 0, max: 100 }); // 100
+ * fromMireds(500, { min: 2000, max: 6535 }); // 2000
  */
 function fromMireds(mireds, feature) {
   const [min, max] = featureRange(feature);
+  if (isKelvin(feature)) {
+    return clamp(Math.round(1e6 / clamp(mireds, MIREDS_MIN, MIREDS_MAX)), min, max);
+  }
   return Math.round(normalize(mireds, MIREDS_MIN, MIREDS_MAX, min, max));
 }
 
@@ -337,6 +364,7 @@ function airQualityOf({ pm25, co2 }) {
 }
 
 module.exports = {
+  isKelvin,
   isNumber,
   clamp,
   toLevel,

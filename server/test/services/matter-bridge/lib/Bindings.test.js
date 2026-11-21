@@ -170,6 +170,39 @@ describe('Matter bridge Bindings', () => {
     expect(built.children[0].state.onOff.onOff).to.equal(false);
   });
 
+  it('should keep pushing states after the state of an endpoint could not be read', async () => {
+    const [endpoint] = built.children;
+    const { state } = endpoint;
+    let reads = 0;
+    // Like an endpoint being reset: reading its state throws once.
+    Object.defineProperty(endpoint, 'state', {
+      configurable: true,
+      get: () => {
+        reads += 1;
+        if (reads === 1) {
+          throw new Error('endpoint is resetting');
+        }
+        return state;
+      },
+    });
+    await Promise.all([
+      bindings.push({ device_feature: 'light-binary', last_value: 1 }),
+      bindings.push({ device_feature: 'light-binary', last_value: 0 }),
+    ]);
+    expect(state.onOff.onOff).to.equal(false);
+  });
+
+  it('should keep pushing states after a push rejected', async () => {
+    sinon
+      .stub(bindings, 'pushNow')
+      .onFirstCall()
+      .rejects(new Error('unexpected'))
+      .callThrough();
+    await bindings.push({ device_feature: 'light-binary', last_value: 1 }).catch(() => null);
+    await bindings.push({ device_feature: 'light-binary', last_value: 0 });
+    expect(built.children[0].state.onOff.onOff).to.equal(false);
+  });
+
   it('should forget a device, its listeners and pending commands', () => {
     built.children[0].events.levelControl.currentLevel$Changed.emit(1, 50, REMOTE);
     bindings.remove('light-id');

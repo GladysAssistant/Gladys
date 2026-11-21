@@ -144,7 +144,16 @@ function createMatter() {
   // A new set of modules starts from an empty storage.
   closedNumbers = new Map();
   const vars = new Map();
+  // Like the DeviceCommissioner of matter.js: the commissioning window the node opened.
+  class DeviceCommissioner {}
+  const commissioner = { windowStatus: 1, isFailsafeArmed: false };
+  const services = new Map([[DeviceCommissioner, commissioner]]);
   const server = {
+    commissioner,
+    lifecycle: { online: createObservable(), decommissioned: createObservable() },
+    env: { has: (type) => services.has(type), get: (type) => services.get(type), services },
+    agent: { commissioning: { enterCommissionableMode: async () => {} } },
+    act: async (action) => action(server.agent),
     added: [],
     started: false,
     closed: false,
@@ -223,6 +232,7 @@ function createMatter() {
       BridgedNodeEndpoint: createType('BridgedNodeEndpoint'),
     },
     behaviors,
+    protocol: { DeviceCommissioner },
   };
 }
 

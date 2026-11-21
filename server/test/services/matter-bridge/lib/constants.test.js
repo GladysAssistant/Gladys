@@ -12,6 +12,7 @@ describe('Matter bridge constants', () => {
       SERIAL_NUMBER: 'MATTER_BRIDGE_SERIAL_NUMBER',
       EXPOSURE_MODE: 'MATTER_BRIDGE_EXPOSURE_MODE',
       EXPOSED_DEVICES: 'MATTER_BRIDGE_EXPOSED_DEVICES',
+      BACKUP: 'MATTER_BRIDGE_BACKUP',
     });
     expect(EXPOSURE_MODES).to.deep.equal({ ALL: 'all', SELECTION: 'selection' });
   });

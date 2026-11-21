@@ -2539,6 +2539,7 @@ const JOB_TYPES = {
   SERVICE_ZIGBEE2MQTT_INSTALL: 'service-zigbee2mqtt-install',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   SERVICE_MATTER_BACKUP: 'service-matter-backup',
+  SERVICE_MATTER_BRIDGE_BACKUP: 'service-matter-bridge-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
   ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES: 'energy-monitoring-cost-calculation-thirty-minutes',
   ENERGY_MONITORING_COST_CALCULATION_YESTERDAY: 'energy-monitoring-cost-calculation-yesterday',

@@ -5646,6 +5646,7 @@
       "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite",
       "device-state-purge-orphaned-duckdb-states": "Purge des états DuckDB orphelins",
       "service-matter-backup": "Sauvegarde Matter",
+      "service-matter-bridge-backup": "Sauvegarde du bridge Matter",
       "energy-monitoring-cost-calculation-thirty-minutes": "Calcul du coût énergétique (30 minutes)",
       "energy-monitoring-cost-calculation-yesterday": "Calcul du coût énergétique (depuis hier)",
       "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",

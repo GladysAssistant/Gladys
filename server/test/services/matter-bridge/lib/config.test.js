@@ -8,6 +8,17 @@ describe('Matter bridge config', () => {
   afterEach(() => {
     sinon.restore();
     delete process.env.MATTER_BRIDGE_FOLDER_PATH;
+    delete process.env.MATTER_BRIDGE_PORT;
+  });
+
+  it('should listen on the standard Matter port, unless told otherwise', () => {
+    expect(config.getPort()).to.equal(5540);
+    process.env.MATTER_BRIDGE_PORT = '5550';
+    expect(config.getPort()).to.equal(5550);
+    ['', 'abc', '0', '70000', '55.5'].forEach((value) => {
+      process.env.MATTER_BRIDGE_PORT = value;
+      expect(config.getPort()).to.equal(5540);
+    });
   });
 
   it('should store the bridge next to the database, unless told otherwise', () => {
