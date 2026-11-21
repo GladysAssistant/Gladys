@@ -440,7 +440,24 @@ function triggerApplySchedules() {
   }, APPLY_DEBOUNCE_MS);
 }
 
+// One counter dates both the mode writes and the mode reports, so a report can
+// tell whether a mark was set before it arrived or after (followModeReport).
+let modeSequence = 0;
+
+/**
+ * @description The next value of the counter that orders the mode writes of this
+ * service and the mode reports of the units (A.4).
+ * @returns {number} A number greater than every one returned before.
+ * @example
+ * const sequence = nextModeSequence();
+ */
+function nextModeSequence() {
+  modeSequence += 1;
+  return modeSequence;
+}
+
 module.exports = {
+  nextModeSequence,
   getFeature,
   isStopped,
   isScheduleStop,

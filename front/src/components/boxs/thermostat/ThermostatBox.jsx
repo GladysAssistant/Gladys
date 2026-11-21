@@ -30,7 +30,7 @@ import {
 } from '../../../utils/thermostatPresetColors';
 import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
-import { loadDeviceConfig } from './deviceConfig';
+import { configForUse, loadDeviceConfig } from './deviceConfig';
 import { isRunningFromStateFeature } from './operatingState';
 import { sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 
@@ -51,6 +51,10 @@ const STANDBY_PRESET_BY_ORDER = {
   [PILOT_WIRE_MODE.FROST_PROTECTION]: 'frost',
   [PILOT_WIRE_MODE.ECO]: 'eco'
 };
+// Frost protection, when cooling: the highest setpoint, kept while nobody is in.
+// A sun, the counterpart of comfort's snowflake, as frost's snowflake is of
+// comfort's flame when heating.
+const PROTECTION_ICON = 'fe-sun';
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
 // A preset the thermostat can be started back on: one that names a temperature.
@@ -144,6 +148,10 @@ class ThermostatBox extends Component {
     // a way out of it shows at once, and a reload already in flight when the
     // user tapped cannot bring the old mode back.
     pendingMode: null,
+    // The use this card switched a stopped heat pump to, until a reload of the
+    // device carries it (see switchUse). Kept apart from pendingMode, which
+    // would read the thermostat as running.
+    pendingUse: null,
     // Whether the first load has settled the setpoint. Until then the gauge
     // jumps rather than glides: on a °F feature under a °C thermostat it is
     // first drawn on the unconverted value, then corrected once the feature's
@@ -171,7 +179,10 @@ class ThermostatBox extends Component {
   // The mode values this card has just written, each with the timer that forgets it.
   expectedModes = new Map();
 
-  getConfig = () => ({ ...this.props.box, ...(this.state.remoteConfig || {}) });
+  // The config in force: the device's, read in the use this card has just
+  // switched to until a reload of the device carries it (getPendingUse), so the
+  // switch, the presets, their names and icons and the dial all show that use.
+  getConfig = () => configForUse({ ...this.props.box, ...(this.state.remoteConfig || {}) }, this.getPendingUse());
 
   // A real thermostat driven by its setpoint. A pilot-wire heater never is (spec
   // C.1.1): it owns its setpoint feature like a virtual thermostat. `external`
@@ -399,8 +410,13 @@ class ThermostatBox extends Component {
           remoteConfig.mode !== null &&
           remoteConfig.mode !== undefined &&
           Number(remoteConfig.mode) === prev.pendingMode;
-        const update = missing ? { remoteConfig, missing, setpoint: null } : { remoteConfig, missing };
-        return confirmed ? { ...update, pendingMode: null } : update;
+        // The same for the use of a stopped heat pump.
+        const useConfirmed = prev.pendingUse !== null && remoteConfig.default_mode === prev.pendingUse;
+        return {
+          ...(missing ? { remoteConfig, missing, setpoint: null } : { remoteConfig, missing }),
+          ...(confirmed ? { pendingMode: null } : {}),
+          ...(useConfirmed ? { pendingUse: null } : {})
+        };
       }, resolve)
     );
     return remoteConfig;
@@ -463,9 +479,50 @@ class ThermostatBox extends Component {
     return Number(mode) === THERMOSTAT_MODE.OFF;
   };
 
+  // The use this card has just switched to and the device does not carry yet: on
+  // a stopped heat pump the pending use, on a running one the heating or cooling
+  // mode it wrote. Null otherwise.
+  getPendingUse = () => {
+    const { pendingUse, pendingMode } = this.state;
+    if (pendingUse) {
+      return pendingUse;
+    }
+    if (pendingMode === THERMOSTAT_MODE.HEATING) {
+      return 'heating';
+    }
+    return pendingMode === THERMOSTAT_MODE.COOLING ? 'cooling' : null;
+  };
+
+  // The use in force, as shown.
+  getUse = () => this.getConfig().default_mode;
+
   // The mode a running thermostat carries, from what it is configured to do.
-  getRunningMode = () =>
-    this.getConfig().default_mode === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
+  getRunningMode = () => (this.getUse() === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING);
+
+  // Heating or cooling on a reversible heat pump (spec A.4) is a mode write, like
+  // a start: the server saves the use and the presets of that use, drops a hold
+  // taken in the other one, and the card reloads them on CONFIG_UPDATED. On a
+  // stopped thermostat it only switches the use and leaves it stopped: the start
+  // stays the power button's, so nothing is held as a pending start here. The
+  // use is held as pending instead, until a reload carries it: a power press
+  // before then wrote the previous use, which the server switched back to.
+  switchUse = async use => {
+    if (this.getUse() === use) {
+      return;
+    }
+    const value = use === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
+    if (this.isStopped()) {
+      const cfg = this.state.remoteConfig;
+      const previousUse = this.state.pendingUse;
+      this.setState({ pendingUse: use });
+      const written = await this.writeFeature(cfg && cfg.modeFeature, value);
+      if (!written) {
+        this.setState({ pendingUse: previousUse });
+      }
+      return;
+    }
+    await this.writeMode(value);
+  };
 
   // Leaving a stop takes a mode write: the regulation loop skips a stopped
   // thermostat, so a setpoint or a preset written alone would be stored and
@@ -482,11 +539,12 @@ class ThermostatBox extends Component {
   // made elsewhere (a scene, the API, a second dashboard), which has to reload
   // the whole card.
   //
-  // It comes back twice: the thermostat service saves the state, and so does the
-  // core, which saves it itself for a feature without feedback. The value is
-  // therefore remembered for a few seconds rather than for one event: the second
-  // echo rebuilt the card from a device read taken before the preset and the
-  // setpoint written next had landed, and the card ended on neither. Every value
+  // It used to come back twice: the thermostat service saves the state, and so
+  // did the core, before the mode feature had feedback — a thermostat not saved
+  // since may still send both. The value is therefore remembered for a few
+  // seconds rather than for one event: the second echo rebuilt the card from a
+  // device read taken before the preset and the setpoint written next had
+  // landed, and the card ended on neither. Every value
   // written is remembered on its own: tapping Off then Comfort before the Off
   // echoes arrived took them for a stop made elsewhere, and the reload they
   // started left the card on Off while the thermostat heated.
@@ -597,14 +655,41 @@ class ThermostatBox extends Component {
     return presetColorForMode(presetKey, cfg.default_mode);
   };
 
+  // A preset's name on the card. Frost protection is named for what it does in
+  // the use in force: "Protection" when cooling.
+  getPresetName = presetKey => {
+    const { intl } = this.props;
+    const names =
+      intl &&
+      intl.dictionary &&
+      intl.dictionary.dashboard &&
+      intl.dictionary.dashboard.boxes &&
+      intl.dictionary.dashboard.boxes.thermostat &&
+      intl.dictionary.dashboard.boxes.thermostat.preset;
+    if (!names) {
+      return presetKey;
+    }
+    const cooling = this.getConfig().default_mode === 'cooling';
+    return (presetKey === 'frost' && cooling && names.frostCooling) || names[presetKey] || presetKey;
+  };
+
   getPresets = () => {
     const cfg = this.getConfig();
     const mode = cfg.default_mode || 'heating';
-    const keys = mode === 'cooling' ? COOLING_PRESETS : HEATING_PRESETS;
+    // A reversible heat pump follows one programme in both uses, so every preset
+    // its points name is offered in summer too, on its cooling setpoint.
+    const keys = mode === 'cooling' && !cfg.reversible ? COOLING_PRESETS : HEATING_PRESETS;
     const defaults = defaultPresetTemps(mode);
     const allPresets = {
       off: { key: 'off', icon: PRESET_ICONS.off, temp: null },
-      frost: { key: 'frost', icon: PRESET_ICONS.frost, temp: numOr(cfg.preset_frost, defaults.frost) },
+      // Frost protection means nothing to a unit cooling: there it keeps the
+      // house from overheating while nobody is in, under a name and an icon of
+      // its own (see getPresetName).
+      frost: {
+        key: 'frost',
+        icon: mode === 'cooling' ? PROTECTION_ICON : PRESET_ICONS.frost,
+        temp: numOr(cfg.preset_frost, defaults.frost)
+      },
       away: { key: 'away', icon: PRESET_ICONS.away, temp: numOr(cfg.preset_away, defaults.away) },
       comfort: {
         key: 'comfort',
@@ -2109,11 +2194,7 @@ class ThermostatBox extends Component {
                     if (matchedPreset) {
                       heldPreset = presets.find(candidate => candidate.key === matchedPreset);
                     }
-                    const i18nHeldPresets =
-                      props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
-                    const label = heldPreset
-                      ? (i18nHeldPresets && i18nHeldPresets[heldPreset.key]) || heldPreset.key
-                      : (t && t.manualMode) || '';
+                    const label = heldPreset ? this.getPresetName(heldPreset.key) : (t && t.manualMode) || '';
                     return (
                       <div
                         class={cx(style.manualBanner, { [style.manualBannerPreset]: !!heldPreset })}
@@ -2142,10 +2223,7 @@ class ThermostatBox extends Component {
                     presets.find(p => p.key === 'comfort') ||
                     presets[0];
                   const presetIcon = activePresetObj ? activePresetObj.icon : 'fe-power';
-                  const i18nPresets =
-                    props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
-                  const presetName =
-                    i18nPresets && i18nPresets[resolvedPresetKey] ? i18nPresets[resolvedPresetKey] : resolvedPresetKey;
+                  const presetName = this.getPresetName(resolvedPresetKey);
                   const bannerColor = this.getPresetColor(resolvedPresetKey);
                   const t2 = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
                   const untilLabel = (t2 && t2.scheduleUntil) || '';
@@ -2238,6 +2316,24 @@ class ThermostatBox extends Component {
                 return (
                   <div>
                     {banner}
+                    {cfg.reversible && (
+                      <div class={style.useSwitch} role="group">
+                        {['heating', 'cooling'].map(use => (
+                          <button
+                            type="button"
+                            key={use}
+                            class={cx(style.useSwitchBtn, {
+                              [style.useSwitchBtnActive]: configMode === use
+                            })}
+                            aria-pressed={configMode === use ? 'true' : 'false'}
+                            onClick={() => this.switchUse(use)}
+                          >
+                            <i class={`fe ${COMFORT_ICON[use]}`} />
+                            <Text id={`dashboard.boxes.thermostat.use.${use}`} />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     {/* Dimmed rather than removed while a window is open: the
                             bar used to disappear, and the card lost 56px of height
                             — every widget beside it on the dashboard shifted, and
@@ -2250,16 +2346,7 @@ class ThermostatBox extends Component {
                       lang={props.user && props.user.language ? props.user.language : undefined}
                     >
                       {presets.map(preset => {
-                        const presetTitle =
-                          props.intl &&
-                          props.intl.dictionary &&
-                          props.intl.dictionary.dashboard &&
-                          props.intl.dictionary.dashboard.boxes &&
-                          props.intl.dictionary.dashboard.boxes.thermostat &&
-                          props.intl.dictionary.dashboard.boxes.thermostat.preset &&
-                          props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                            ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                            : preset.key;
+                        const presetTitle = this.getPresetName(preset.key);
                         const isActive =
                           (resolvedActivePreset === preset.key && !manualSetpointOverride) ||
                           matchedPreset === preset.key;
