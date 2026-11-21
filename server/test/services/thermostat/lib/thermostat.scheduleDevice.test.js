@@ -287,6 +287,7 @@ describe('thermostat schedule <-> device link', () => {
       await followAndDetach(allDay('eco'), async () => {
         await addParam('THERMOSTAT_MANUAL_SETPOINT', '22.5');
         await addParam('THERMOSTAT_MANUAL_UNTIL', String(Date.now() + 3600000));
+        await addParam('THERMOSTAT_MANUAL_SINCE', '1700000000000');
       });
 
       assert.calledWith(
@@ -294,6 +295,13 @@ describe('thermostat schedule <-> device link', () => {
         sinonMatchSelector(thermostat.selector),
         'THERMOSTAT_MANUAL_UNTIL',
         '',
+      );
+      // Still the hold armed then (A.4).
+      assert.calledWith(
+        handler.gladys.device.setParam,
+        sinonMatchSelector(thermostat.selector),
+        'THERMOSTAT_MANUAL_SINCE',
+        '1700000000000',
       );
       assert.notCalled(handler.gladys.device.saveState);
     });
@@ -545,6 +553,20 @@ describe('thermostat schedule <-> device link', () => {
           sinonMatchSelector(thermostat.selector),
           'THERMOSTAT_MANUAL_SETPOINT',
           '21',
+        );
+      });
+
+      // Still the hold armed then: an empty room weighs that time (A.4).
+      it('should keep the time the hold was armed', async () => {
+        const programme = await holdOnProgramme(String(NEXT_MONDAY), { THERMOSTAT_MANUAL_SINCE: String(NOW - 60000) });
+
+        await handler.updateSchedule(programme.selector, { transitions: allDay('comfort') });
+
+        assert.calledWith(
+          handler.gladys.device.setParam,
+          sinonMatchSelector(thermostat.selector),
+          'THERMOSTAT_MANUAL_SINCE',
+          String(NOW - 60000),
         );
       });
 

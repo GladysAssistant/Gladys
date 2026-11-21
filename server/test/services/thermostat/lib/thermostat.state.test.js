@@ -340,11 +340,12 @@ describe('thermostat.state active preset', () => {
 describe('thermostat.state manual hold', () => {
   afterEach(() => sinon.restore());
 
-  const held = (setpoint, until) => ({
+  const held = (setpoint, until, since) => ({
     selector: 'living-room',
     params: [
       { name: 'THERMOSTAT_MANUAL_SETPOINT', value: setpoint },
       ...(until === undefined ? [] : [{ name: 'THERMOSTAT_MANUAL_UNTIL', value: until }]),
+      ...(since === undefined ? [] : [{ name: 'THERMOSTAT_MANUAL_SINCE', value: since }]),
     ],
   });
 
@@ -352,13 +353,21 @@ describe('thermostat.state manual hold', () => {
     expect(state.getManualHold(held('21.5', '1700000000000'))).to.deep.equal({
       setpoint: 21.5,
       until: 1700000000000,
+      since: null,
     });
+  });
+
+  // An empty room only lowers a preset picked before it emptied (A.4).
+  it('should read when a hold was armed, and nothing for a malformed time', () => {
+    expect(state.getManualHold(held('21.5', '1700000000000', '1699998200000')).since).to.equal(1699998200000);
+    expect(state.getManualHold(held('21.5', '1700000000000', '')).since).to.equal(null);
+    expect(state.getManualHold(held('21.5', '1700000000000', 'earlier')).since).to.equal(null);
   });
 
   it('should read a permanent hold', () => {
     // Without a schedule the hold never expires, like on a physical thermostat.
-    expect(state.getManualHold(held('21.5', ''))).to.deep.equal({ setpoint: 21.5, until: null });
-    expect(state.getManualHold(held('21.5'))).to.deep.equal({ setpoint: 21.5, until: null });
+    expect(state.getManualHold(held('21.5', ''))).to.deep.equal({ setpoint: 21.5, until: null, since: null });
+    expect(state.getManualHold(held('21.5'))).to.deep.equal({ setpoint: 21.5, until: null, since: null });
   });
 
   it('should report no hold when none is armed', () => {
@@ -373,10 +382,11 @@ describe('thermostat.state manual hold', () => {
   });
 
   it('should ignore a malformed expiry and treat the hold as permanent', () => {
-    expect(state.getManualHold(held('21', 'soon'))).to.deep.equal({ setpoint: 21, until: null });
+    expect(state.getManualHold(held('21', 'soon'))).to.deep.equal({ setpoint: 21, until: null, since: null });
   });
 
   it('should arm a hold and broadcast it', async () => {
+    sinon.useFakeTimers(1699998200000);
     const handler = buildHandler();
     const device = { selector: 'living-room' };
 
@@ -384,10 +394,24 @@ describe('thermostat.state manual hold', () => {
 
     assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_SETPOINT', '21.5');
     assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_UNTIL', '1700000000000');
+    // Armed now.
+    assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_SINCE', '1699998200000');
     assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-      payload: { device: 'living-room', setpoint: 21.5, until: 1700000000000 },
+      payload: { device: 'living-room', setpoint: 21.5, until: 1700000000000, since: 1699998200000 },
     });
+  });
+
+  // Moving the expiry of a hold keeps the time it was armed.
+  it('should keep the arming time it is given, even unknown', async () => {
+    const handler = buildHandler();
+    const device = { selector: 'living-room' };
+
+    await state.setManualHold.call(handler, device, 21.5, 1700000000000, 1690000000000);
+    assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_SINCE', '1690000000000');
+
+    await state.setManualHold.call(handler, device, 21.5, 1700000000000, null);
+    assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_SINCE', '');
   });
 
   it('should arm a permanent hold with an empty expiry', async () => {
@@ -406,9 +430,10 @@ describe('thermostat.state manual hold', () => {
 
     assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_SETPOINT', '');
     assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_UNTIL', '');
+    assert.calledWith(handler.gladys.device.setParam, device, 'THERMOSTAT_MANUAL_SINCE', '');
     assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-      payload: { device: 'living-room', setpoint: null, until: null },
+      payload: { device: 'living-room', setpoint: null, until: null, since: null },
     });
   });
 });

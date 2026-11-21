@@ -11,8 +11,14 @@ import {
   defaultPresetTemps,
   parsePilotWireStandbyOrder,
   supportedStandbyOrder,
-  defaultTempRange
+  defaultTempRange,
+  DEFAULT_PRESENCE_DELAY_MINUTES,
+  MIN_PRESENCE_DELAY_MINUTES,
+  MAX_PRESENCE_DELAY_MINUTES,
+  DEFAULT_PRESENCE_PRESET,
+  PRESENCE_PRESETS
 } from '../../../../../../../server/utils/thermostatConstants';
+import { isPresenceSensor } from '../../../../../../../server/utils/thermostatPresence';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 import { parseSelectorList, serializeSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
@@ -93,6 +99,7 @@ function createActions(store) {
         const humidityFeatures = [];
         const switchFeatures = [];
         const openingFeatures = [];
+        const presenceFeatures = [];
         const pilotWireFeatures = [];
         const targetFeatures = [];
         const stateFeatures = [];
@@ -161,6 +168,10 @@ function createActions(store) {
             if (OPENING_CATEGORIES.includes(feature.category)) {
               openingFeatures.push(entry);
             }
+            // Someone in the room (spec A.4): the sensors the regulation loop reads.
+            if (isPresenceSensor(feature)) {
+              presenceFeatures.push(entry);
+            }
             if (!isOwnThermostat) {
               if (isTargetFeature(feature) && !feature.read_only) {
                 // Zigbee, Matter and MQTT expose several setpoints on one device
@@ -191,6 +202,7 @@ function createActions(store) {
           switchFeatures,
           pilotWireFeatures,
           openingFeatures,
+          presenceFeatures,
           targetFeatures,
           stateFeatures,
           modeFeatures,
@@ -203,6 +215,7 @@ function createActions(store) {
           switchFeatures: [],
           pilotWireFeatures: [],
           openingFeatures: [],
+          presenceFeatures: [],
           targetFeatures: [],
           stateFeatures: [],
           modeFeatures: [],
@@ -235,6 +248,7 @@ function createActions(store) {
         // Bounds never saved default in the thermostat's unit: 5-35 shown on a
         // Fahrenheit one was saved as 5-35 °F.
         const rangeDefaults = defaultTempRange(getParam('THERMOSTAT_TEMP_UNIT'));
+        const storedPresenceDelay = parseFloat(getParam('THERMOSTAT_PRESENCE_DELAY'));
         store.setState({
           thermostatEditActiveSchedule: activeSchedule,
           thermostatEditDeviceSchedule: activeSchedule,
@@ -269,6 +283,22 @@ function createActions(store) {
           // A thermostat saved before the delay existed has none: the server
           // waits its default minute, which is what the field shows.
           thermostatEditWindowDelay: getParam('THERMOSTAT_WINDOW_DELAY') || '60',
+          thermostatEditPresenceFeatures: parseSelectorList(getParam('THERMOSTAT_PRESENCE_FEATURE')),
+          // The delay the server regulates on: a stored value out of bounds is
+          // shown clamped, and one that is no number as the default.
+          thermostatEditPresenceDelay: String(
+            Math.min(
+              MAX_PRESENCE_DELAY_MINUTES,
+              Math.max(
+                MIN_PRESENCE_DELAY_MINUTES,
+                Number.isFinite(storedPresenceDelay) ? storedPresenceDelay : DEFAULT_PRESENCE_DELAY_MINUTES
+              )
+            )
+          ),
+          // A preset the server would not take is shown as the one it uses instead.
+          thermostatEditPresencePreset: PRESENCE_PRESETS.includes(getParam('THERMOSTAT_PRESENCE_PRESET'))
+            ? getParam('THERMOSTAT_PRESENCE_PRESET')
+            : DEFAULT_PRESENCE_PRESET,
           // A display choice, never saved: every thermostat opens on its own room.
           thermostatEditShowAllRooms: false,
           thermostatEditPresetFrost: getParam('THERMOSTAT_PRESET_FROST') || String(presetDefaults.frost),
@@ -419,6 +449,14 @@ function createActions(store) {
         const manualDuration = toInt(state.thermostatEditManualDuration, 30);
         // There is no form submit, so the input's own bounds never apply.
         const windowDelay = Math.min(MAX_WINDOW_DELAY_SECONDS, Math.max(0, toInt(state.thermostatEditWindowDelay, 60)));
+        const presenceFeature = serializeSelectorList(state.thermostatEditPresenceFeatures);
+        const presenceDelay = Math.min(
+          MAX_PRESENCE_DELAY_MINUTES,
+          Math.max(MIN_PRESENCE_DELAY_MINUTES, toInt(state.thermostatEditPresenceDelay, DEFAULT_PRESENCE_DELAY_MINUTES))
+        );
+        const presencePreset = PRESENCE_PRESETS.includes(state.thermostatEditPresencePreset)
+          ? state.thermostatEditPresencePreset
+          : DEFAULT_PRESENCE_PRESET;
 
         const isEdit = !!(state.thermostatEditDevice && state.thermostatEditDevice.selector);
         const timestamp = Date.now();
@@ -567,6 +605,9 @@ function createActions(store) {
             },
             { name: 'THERMOSTAT_WINDOW_FEATURE', value: windowFeature },
             { name: 'THERMOSTAT_WINDOW_DELAY', value: String(windowDelay) },
+            { name: 'THERMOSTAT_PRESENCE_FEATURE', value: presenceFeature },
+            { name: 'THERMOSTAT_PRESENCE_DELAY', value: String(presenceDelay) },
+            { name: 'THERMOSTAT_PRESENCE_PRESET', value: presencePreset },
             { name: 'THERMOSTAT_PRESET_FROST', value: presetFrost },
             { name: 'THERMOSTAT_PRESET_AWAY', value: presetAway },
             { name: 'THERMOSTAT_PRESET_ECO', value: presetEco },
@@ -638,6 +679,9 @@ function createActions(store) {
           thermostatEditPowerFeature: '',
           thermostatEditWindowFeatures: [],
           thermostatEditWindowDelay: '60',
+          thermostatEditPresenceFeatures: [],
+          thermostatEditPresenceDelay: String(DEFAULT_PRESENCE_DELAY_MINUTES),
+          thermostatEditPresencePreset: DEFAULT_PRESENCE_PRESET,
           thermostatEditShowAllRooms: false,
           thermostatEditActiveSchedule: '',
           thermostatEditPresetFrost: '7',

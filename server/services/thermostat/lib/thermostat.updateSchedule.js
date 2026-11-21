@@ -41,7 +41,7 @@ async function rearmHoldOnNextPoint(device, nextBefore) {
   if (until === hold.until) {
     return;
   }
-  await setManualHold.call(this, device, hold.setpoint, until);
+  await setManualHold.call(this, device, hold.setpoint, until, hold.since);
   logger.info(`Thermostat: "${device.selector}" hold now ends on the new next point, ${new Date(until).toISOString()}`);
 }
 

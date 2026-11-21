@@ -132,7 +132,7 @@ async function releaseFromProgramme(deviceId, current) {
   const hold = getManualHold(device);
   if (hold) {
     if (hold.until) {
-      await setManualHold.call(this, device, hold.setpoint, null);
+      await setManualHold.call(this, device, hold.setpoint, null, hold.since);
     }
     return;
   }
