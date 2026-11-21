@@ -29,12 +29,16 @@ async function setAiProvider(selector) {
   // destroying the row, so re-checking the row after the write guarantees
   // the variable never points to a removed integration whatever the
   // interleaving (a write before the deletion is caught by uninstall, a
-  // write after it is rolled back here)
+  // write after it is rolled back here). The rollback is a single
+  // conditional DELETE on the value written here: a later selection of
+  // another provider that landed in the meantime is never undone
   const stillInstalled = await db.Service.findOne({
     where: { selector: service.selector, type: SERVICE_TYPES.EXTERNAL, pod_id: null },
   });
   if (stillInstalled === null) {
-    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+    await db.Variable.destroy({
+      where: { name: SYSTEM_VARIABLE_NAMES.AI_PROVIDER, value: service.selector, service_id: null, user_id: null },
+    });
     throw new NotFoundError('EXTERNAL_INTEGRATION_NOT_FOUND');
   }
   return service.selector;
