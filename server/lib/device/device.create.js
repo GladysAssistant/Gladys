@@ -9,6 +9,7 @@ const { enforceEnergyHierarchy } = require('../../utils/enforceEnergyHierarchy')
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const logger = require('../../utils/logger');
 const { syncFeatureSupportedOptions } = require('./device.syncFeatureSupportedOptions');
+const { isEnergyCursorParam } = require('../../services/energy-monitoring/utils/constants');
 
 const getById = async (id, transaction) => {
   return db.Device.findOne({
@@ -87,6 +88,7 @@ async function create(device) {
   delete device.params;
 
   let actionEvent = EVENTS.DEVICE.CREATE;
+  let paramsToSave = params;
   let oldPollFrequency = null;
 
   const deviceFeaturesIdsToPurge = [];
@@ -143,9 +145,18 @@ async function create(device) {
         }
       });
 
+      // The cursors of the energy jobs (ENERGY_INDEX_LAST_PROCESSED*) are owned by the core:
+      // a save posting a device read earlier would write back an old watermark and the next
+      // run would count an interval twice. On an existing device, a posted value is ignored
+      // and the stored one is never deleted (docs/specs/energy-hierarchy.md, section C.1).
+      const storedCursorIds = deviceInDb.params
+        .filter((existingParam) => isEnergyCursorParam(existingParam.name))
+        .map((existingParam) => existingParam.id);
+      paramsToSave = params.filter((param) => !isEnergyCursorParam(param.name) && !storedCursorIds.includes(param.id));
+
       // we delete all params which doesn't exist anymore
       await Promise.map(deviceInDb.params, async (existingParam) => {
-        if (!matchParamInList(existingParam, params)) {
+        if (!isEnergyCursorParam(existingParam.name) && !matchParamInList(existingParam, paramsToSave)) {
           await existingParam.destroy({ transaction });
         }
       });
@@ -285,9 +296,10 @@ async function create(device) {
       return savedFeature;
     });
 
-    const newParams = await Promise.map(params, async (param) => {
+    const existingParams = deviceToReturn.params.filter((param) => !isEnergyCursorParam(param.name));
+    const newParams = await Promise.map(paramsToSave, async (param) => {
       // if the param already already exist
-      const matchedParam = matchParamInList(param, deviceToReturn.params);
+      const matchedParam = matchParamInList(param, existingParams);
       if (matchedParam) {
         const deviceParam = await db.DeviceParam.findOne({
           where: {

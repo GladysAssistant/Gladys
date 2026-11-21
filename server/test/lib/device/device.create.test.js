@@ -604,6 +604,94 @@ describe('Device', () => {
     expect(newDevice.params).to.have.lengthOf(0);
     expect(newDevice.features).to.have.lengthOf(0);
   });
+  describe('energy cursor params (ENERGY_INDEX_LAST_PROCESSED*)', () => {
+    const DEVICE_ID = '7f85c2f8-86cc-4600-84db-6c074dadb4e8';
+    const CURSOR_ID = 'f0c1a3e2-6b7d-4f6e-9a3b-1c2d3e4f5a60';
+    const CONSUMPTION_CURSOR = 'ENERGY_INDEX_LAST_PROCESSED_ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+    const PRODUCTION_CURSOR = 'ENERGY_PRODUCTION_INDEX_LAST_PROCESSED';
+    const STORED_WATERMARK = '2026-11-20T10:30:00.000Z';
+    const STALE_WATERMARK = '2026-11-20T08:00:00.000Z';
+    let device;
+    beforeEach(async () => {
+      await db.DeviceParam.create({
+        id: CURSOR_ID,
+        name: CONSUMPTION_CURSOR,
+        value: STORED_WATERMARK,
+        device_id: DEVICE_ID,
+      });
+      const stateManager = new StateManager(event);
+      const serviceManager = new ServiceManager({}, stateManager);
+      device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    });
+    const existingDevicePayload = (params) => ({
+      id: DEVICE_ID,
+      name: 'Test device',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      params,
+    });
+    const getStoredParams = async () =>
+      (await db.DeviceParam.findAll({ where: { device_id: DEVICE_ID }, raw: true })).reduce(
+        (acc, param) => ({ ...acc, [param.name]: param.value }),
+        {},
+      );
+    it('should keep the stored watermark when a stale value is posted', async () => {
+      const newDevice = await device.create(
+        existingDevicePayload([
+          { id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59', name: 'TEST_PARAM', value: 'UPDATED_VALUE' },
+          { id: CURSOR_ID, name: CONSUMPTION_CURSOR, value: STALE_WATERMARK, device_id: DEVICE_ID },
+        ]),
+      );
+      expect(await getStoredParams()).to.deep.equal({
+        TEST_PARAM: 'UPDATED_VALUE',
+        [CONSUMPTION_CURSOR]: STORED_WATERMARK,
+      });
+      const cursor = newDevice.params.find((param) => param.name === CONSUMPTION_CURSOR);
+      expect(cursor).to.have.property('value', STORED_WATERMARK);
+    });
+    it('should not delete the stored watermark when it is missing from the payload', async () => {
+      await device.create(existingDevicePayload([]));
+      expect(await getStoredParams()).to.deep.equal({
+        [CONSUMPTION_CURSOR]: STORED_WATERMARK,
+      });
+    });
+    it('should not create a watermark posted for an existing device', async () => {
+      await device.create(
+        existingDevicePayload([
+          { name: 'TEST_PARAM', value: '10' },
+          { name: PRODUCTION_CURSOR, value: STALE_WATERMARK },
+        ]),
+      );
+      expect(await getStoredParams()).to.deep.equal({
+        TEST_PARAM: '10',
+        [CONSUMPTION_CURSOR]: STORED_WATERMARK,
+      });
+    });
+    it('should not rename a stored watermark matched by its id', async () => {
+      await device.create(
+        existingDevicePayload([
+          { id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59', name: 'TEST_PARAM', value: '10' },
+          { id: CURSOR_ID, name: 'OTHER_PARAM', value: 'OTHER_VALUE' },
+        ]),
+      );
+      expect(await getStoredParams()).to.deep.equal({
+        TEST_PARAM: '10',
+        [CONSUMPTION_CURSOR]: STORED_WATERMARK,
+      });
+    });
+    it('should create a new device with the watermark posted', async () => {
+      const newDevice = await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'New energy device',
+        external_id: 'new-energy-device',
+        params: [{ name: CONSUMPTION_CURSOR, value: STALE_WATERMARK }],
+      });
+      expect(newDevice.params).to.have.lengthOf(1);
+      expect(newDevice.params[0]).to.include({ name: CONSUMPTION_CURSOR, value: STALE_WATERMARK });
+    });
+  });
   it('should create device, one feature and one param', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
