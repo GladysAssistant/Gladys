@@ -8,8 +8,11 @@ const {
   buildParamsConfig,
   getDeviceConfig,
   getFeatureBySelector,
+  findPilotWire,
   isExternal,
 } = require('../../../../services/thermostat/lib/thermostat.deviceConfig');
+
+const { PILOT_WIRE_MODE } = require('../../../../utils/constants');
 
 const deviceWithParams = (params) => ({
   params: Object.entries(params).map(([name, value]) => ({ name, value })),
@@ -321,5 +324,165 @@ describe('thermostat.deviceConfig - getFeatureBySelector', () => {
     const gladys = { device: { get: fake.resolves([{ features: [{ selector: 'other' }] }]) } };
 
     expect(await getFeatureBySelector(gladys, 'heater-switch')).to.equal(null);
+  });
+});
+
+// A pilot wire driven by two switches rather than by a module (C.1.2).
+describe('thermostat.deviceConfig - pilot wire on two switches', () => {
+  const pair = '["relay-q1","relay-q2"]';
+
+  it('should read the pair and the default states', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE: pair }));
+
+    expect(config.pilot_wire_switches).to.deep.equal(['relay-q1', 'relay-q2']);
+    expect(config.pilot_wire_switch_states[PILOT_WIRE_MODE.ECO]).to.equal('11');
+    expect(config.pilot_wire).to.equal(true);
+    expect(config.pilot_wire_feature).to.equal(null);
+  });
+
+  it('should read no pair from a single switch', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE: 'relay-q1' }));
+
+    expect(config.pilot_wire_switches).to.equal(null);
+    expect(config.pilot_wire).to.equal(false);
+  });
+
+  it('should let the feature of a module win over the pair', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({
+        THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire',
+        THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE: pair,
+      }),
+    );
+
+    expect(config.pilot_wire_switches).to.equal(null);
+    expect(config.pilot_wire).to.equal(true);
+  });
+
+  const relays = (first, second) => {
+    const devices = {
+      'relay-q1': { selector: 'relay', features: [{ selector: 'relay-q1', last_value: first }] },
+      'relay-q2': { selector: 'relay', features: [{ selector: 'relay-q2', last_value: second }] },
+    };
+    return {
+      device: {
+        get: fake((query) => Promise.resolve([devices[query.device_feature_selectors]].filter(Boolean))),
+        setValue: fake.resolves(null),
+      },
+    };
+  };
+  const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE: pair }));
+
+  it('should read the order the two switches carry, and the four orders they take', async () => {
+    const wire = await findPilotWire(relays(1, 1), config);
+
+    expect(wire.carried).to.equal(PILOT_WIRE_MODE.ECO);
+    expect(wire.supportedOptions.map((option) => option.value)).to.have.members([
+      PILOT_WIRE_MODE.OFF,
+      PILOT_WIRE_MODE.FROST_PROTECTION,
+      PILOT_WIRE_MODE.ECO,
+      PILOT_WIRE_MODE.COMFORT,
+    ]);
+    expect(wire.key).to.equal(null);
+  });
+
+  it('should only actuate the switch whose state differs', async () => {
+    const gladys = relays(1, 1);
+    const wire = await findPilotWire(gladys, config);
+
+    // Eco (on, on) to off (on, off): the first switch stays as it is.
+    await wire.write(PILOT_WIRE_MODE.OFF);
+
+    expect(gladys.device.setValue.callCount).to.equal(1);
+    const [, feature, value] = gladys.device.setValue.firstCall.args;
+    expect(feature.selector).to.equal('relay-q2');
+    expect(value).to.equal(0);
+  });
+
+  const writeError = async (wire, order) => {
+    try {
+      await wire.write(order);
+    } catch (e) {
+      return e;
+    }
+    return null;
+  };
+
+  it('should write both switches before reporting a failure, and say the write was partial', async () => {
+    const gladys = relays(1, 1);
+    gladys.device.setValue = fake((device, feature) =>
+      feature.selector === 'relay-q1' ? Promise.reject(new Error('relay unreachable')) : Promise.resolve(null),
+    );
+    const wire = await findPilotWire(gladys, config);
+
+    const error = await writeError(wire, PILOT_WIRE_MODE.COMFORT);
+
+    expect(error.message).to.equal('relay unreachable');
+    expect(error.partial).to.equal(true);
+    expect(gladys.device.setValue.callCount).to.equal(2);
+  });
+
+  it('should say the write was not partial when no switch moved', async () => {
+    const gladys = relays(1, 1);
+    gladys.device.setValue = fake.rejects(new Error('node dead'));
+    const wire = await findPilotWire(gladys, config);
+
+    const error = await writeError(wire, PILOT_WIRE_MODE.COMFORT);
+
+    expect(error.message).to.equal('node dead');
+    expect(error.partial).to.equal(false);
+  });
+
+  it('should write the two switches one after the other, switch 1 first', async () => {
+    const gladys = relays(0, 0);
+    let pending = 0;
+    let overlapped = false;
+    gladys.device.setValue = fake(async () => {
+      pending += 1;
+      overlapped = overlapped || pending > 1;
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      pending -= 1;
+    });
+    const wire = await findPilotWire(gladys, config);
+
+    await wire.write(PILOT_WIRE_MODE.ECO);
+
+    expect(overlapped).to.equal(false);
+    expect(gladys.device.setValue.getCalls().map((call) => call.args[1].selector)).to.deep.equal([
+      'relay-q1',
+      'relay-q2',
+    ]);
+  });
+
+  it('should find no pilot wire when one of the switches is gone', async () => {
+    const gladys = relays(1, 1);
+    gladys.device.get = fake((query) =>
+      Promise.resolve(query.device_feature_selectors === 'relay-q1' ? [] : [{ features: [{ selector: 'relay-q2' }] }]),
+    );
+
+    expect(await findPilotWire(gladys, config)).to.equal(null);
+  });
+
+  it('should still read the feature of a module', async () => {
+    const feature = { selector: 'heater-pilot-wire', last_value: PILOT_WIRE_MODE.ECO, supported_options: [] };
+    const heater = { features: [feature] };
+    const gladys = { device: { get: fake.resolves([heater]), setValue: fake.resolves(null) } };
+    const moduleConfig = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }));
+
+    const wire = await findPilotWire(gladys, moduleConfig);
+    await wire.write(PILOT_WIRE_MODE.COMFORT);
+
+    expect(wire.key).to.equal('heater-pilot-wire');
+    expect(wire.carried).to.equal(PILOT_WIRE_MODE.ECO);
+    expect(gladys.device.setValue.firstCall.args).to.deep.equal([heater, feature, PILOT_WIRE_MODE.COMFORT]);
+  });
+
+  it('should find no pilot wire when the feature of the module is gone', async () => {
+    const gladys = { device: { get: fake.resolves([]) } };
+    const moduleConfig = buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire' }));
+
+    expect(await findPilotWire(gladys, moduleConfig)).to.equal(null);
   });
 });

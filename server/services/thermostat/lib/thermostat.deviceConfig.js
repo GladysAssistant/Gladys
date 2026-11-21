@@ -15,6 +15,9 @@ const {
   PILOT_WIRE_REGULATIONS,
   DEFAULT_PILOT_WIRE_ORDERS,
   parsePilotWireStandbyOrder,
+  parsePilotWireSwitchStates,
+  pilotWireOrderOfSwitches,
+  PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS,
 } = require('../../../utils/thermostatConstants');
 const { THERMOSTAT_MODE, PILOT_WIRE_MODE } = require('../../../utils/constants');
 const { parseSelectorList } = require('../../../utils/thermostatSelectorList');
@@ -79,11 +82,21 @@ function buildParamsConfig(device) {
   const savedMin = toNumber(getParam('THERMOSTAT_MIN_TEMP'), defaultRange.min);
   const savedMax = toNumber(getParam('THERMOSTAT_MAX_TEMP'), defaultRange.max);
   const tempRange = savedMin < savedMax ? { min: savedMin, max: savedMax } : defaultRange;
+  const pilotWireFeature = getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || null;
+  // A pilot wire driven by two switches (C.1.2): the pair, in the order the
+  // states are written in. A module's feature wins over it, and half a pair
+  // drives nothing.
+  const switchPair = parseSelectorList(getParam('THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE'));
+  const pilotWireSwitches = !pilotWireFeature && switchPair.length === 2 ? switchPair : null;
   return {
     temperature_features: temperatureFeatures,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
     switch_feature: getParam('THERMOSTAT_SWITCH_FEATURE') || null,
-    pilot_wire_feature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || null,
+    pilot_wire_feature: pilotWireFeature,
+    pilot_wire_switches: pilotWireSwitches,
+    pilot_wire_switch_states: parsePilotWireSwitchStates(getParam),
+    // Whether the heater is driven by an order, whichever way it is carried.
+    pilot_wire: Boolean(pilotWireFeature || pilotWireSwitches),
     // Who regulates the pilot-wire heater (C.1.1): the thermostat type says it.
     // A virtual one is Gladys, on its room sensor — without one there is nothing
     // to regulate on, and the heater regulates instead, as on a `pilot-wire` one.
@@ -186,6 +199,83 @@ async function getFeatureBySelector(gladys, selector) {
 }
 
 /**
+ * @description Look up what carries the orders of a pilot-wire heater (C.1.1,
+ * C.1.2): a module's `pilot-wire-mode` feature, or two switches whose states
+ * together make the order.
+ *
+ * Both read the same way to the regulation pass: the order carried, the orders
+ * taken, and a way to write one. Two switches take the four orders their table
+ * names; the order they carry is unknown while either has no state, and is
+ * then written in full.
+ *
+ * Writing an order on two switches only actuates the one whose state differs.
+ * Both values are resolved first, then written one after the other: the two
+ * outputs are often endpoints of one Z-Wave node, which takes two commands in
+ * flight badly, and the order the wire passes through on the way is then
+ * always the same. Both writes are attempted before a failure is reported: a
+ * first write that fails must not leave the second undone. When one went
+ * through and the other did not, the order the wire carries is unknown, and
+ * the error says so (`partial`).
+ * @param {object} gladys - Gladys instance.
+ * @param {object} config - Thermostat config object.
+ * @returns {Promise<{key: string|null, carried: number|null, supportedOptions: Array|null, write: Function}|null>}
+ * The pilot wire, or null when its feature or one of its switches is gone.
+ * `key` is the selector its reports are followed on, null for two switches.
+ * @example
+ * const wire = await findPilotWire(gladys, config);
+ * await wire.write(PILOT_WIRE_MODE.COMFORT);
+ */
+async function findPilotWire(gladys, config) {
+  if (!config.pilot_wire_switches) {
+    const found = await getFeatureBySelector(gladys, config.pilot_wire_feature);
+    return (
+      found && {
+        key: config.pilot_wire_feature,
+        carried: found.feature.last_value,
+        supportedOptions: found.feature.supported_options,
+        write: (order) => gladys.device.setValue(found.device, found.feature, order),
+      }
+    );
+  }
+  const switches = await Promise.all(
+    config.pilot_wire_switches.map((selector) => getFeatureBySelector(gladys, selector)),
+  );
+  if (switches.some((found) => !found)) {
+    return null;
+  }
+  const states = config.pilot_wire_switch_states;
+  return {
+    key: null,
+    carried: pilotWireOrderOfSwitches(states, switches[0].feature.last_value, switches[1].feature.last_value),
+    supportedOptions: PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS,
+    write: async (order) => {
+      const values = String(states[order])
+        .split('')
+        .map(Number);
+      let written = 0;
+      let failure = null;
+      // Sequential on purpose, see above: `await` in the loop is the point.
+      /* eslint-disable no-await-in-loop, no-restricted-syntax */
+      for (const [index, found] of switches.entries()) {
+        if (found.feature.last_value !== values[index]) {
+          try {
+            await gladys.device.setValue(found.device, found.feature, values[index]);
+            written += 1;
+          } catch (e) {
+            failure = failure || e;
+          }
+        }
+      }
+      /* eslint-enable no-await-in-loop, no-restricted-syntax */
+      if (failure) {
+        failure.partial = written > 0;
+        throw failure;
+      }
+    },
+  };
+}
+
+/**
  * @description The THERMOSTAT_MODE value a running thermostat carries.
  * The thermostat's own `default_mode` param is the intent the user configured
  * ("this device heats" / "this device cools"), and it is what the mode is handed
@@ -206,5 +296,6 @@ module.exports = {
   getRunningMode,
   getDeviceConfig,
   getFeatureBySelector,
+  findPilotWire,
   isExternal,
 };

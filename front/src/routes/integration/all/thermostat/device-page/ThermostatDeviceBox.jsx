@@ -4,6 +4,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 import { THERMOSTAT_MODE } from '../../../../../../../server/utils/constants';
+import { parseSelectorList } from '../../../../../../../server/utils/thermostatSelectorList';
 import style from './style.css';
 import { MobileDeviceItem, integrationMobileStyle } from '../../../../../components/integration/mobile';
 
@@ -106,8 +107,10 @@ class ThermostatDeviceBox extends Component {
       const param = (device.params || []).find(p => p.name === name);
       return param && param.value ? param.value : null;
     };
+    // The wire is a module's feature, or two switches (spec C.1.2).
     const heaterRegulated =
-      !!paramValue('THERMOSTAT_PILOT_WIRE_FEATURE') &&
+      (!!paramValue('THERMOSTAT_PILOT_WIRE_FEATURE') ||
+        parseSelectorList(paramValue('THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE')).length === 2) &&
       !((paramValue('THERMOSTAT_TYPE') || 'virtual') === 'virtual' && paramValue('THERMOSTAT_TEMPERATURE_FEATURE'));
     const unitParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TEMP_UNIT');
     // The real device declares the unit it works in, and it is the one the value

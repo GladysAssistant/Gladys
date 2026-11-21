@@ -632,6 +632,98 @@ describe('thermostat.createDevice - external', () => {
     expect(featureTypes(created)).to.include('target-temperature');
   });
 
+  // A pilot wire driven by two switches rather than by a module (C.1.2).
+  const switchPair = { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE', value: '["relay-q1","relay-q2"]' };
+  const twoSwitchHeater = (extra = [], type = 'pilot-wire') => ({
+    name: 'Bureau',
+    features: [setpointFeature],
+    params: [{ name: 'THERMOSTAT_TYPE', value: type }, switchPair, ...extra],
+  });
+  const paramOf = (created, name) => created.params.find((param) => param.name === name).value;
+
+  it('should save a heater whose pilot wire is two switches', async () => {
+    const created = await buildHandler().createDevice(
+      twoSwitchHeater([
+        { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_COMFORT', value: '11' },
+        { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_ECO', value: '00' },
+        { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_FROST_PROTECTION', value: '10' },
+        { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF', value: '01' },
+        // A pilot wire only heats, on hysteresis, and is the only actuator.
+        { name: 'THERMOSTAT_MODE', value: 'cooling' },
+        { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'heater-switch' },
+      ]),
+    );
+
+    expect(paramOf(created, 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE')).to.equal(switchPair.value);
+    expect(paramOf(created, 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF')).to.equal('01');
+    expect(paramOf(created, 'THERMOSTAT_MODE')).to.equal('heating');
+    expect(paramOf(created, 'THERMOSTAT_SWITCH_FEATURE')).to.equal('');
+  });
+
+  it('should save two switches with no state at all, on the default wiring', async () => {
+    const created = await buildHandler().createDevice(twoSwitchHeater());
+
+    expect(paramOf(created, 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE')).to.equal(switchPair.value);
+  });
+
+  it('should refuse two orders on the same state of the switches', async () => {
+    let error = null;
+    try {
+      await buildHandler().createDevice(
+        twoSwitchHeater([
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_COMFORT', value: '00' },
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_ECO', value: '00' },
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_FROST_PROTECTION', value: '01' },
+          // Complete, so the duplicate is the only fault.
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF', value: '10' },
+        ]),
+      );
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.message).to.equal(
+      'Thermostat: the two switches of a pilot wire need a state of their own for each order',
+    );
+  });
+
+  it('should drop the two switches when a module carries the pilot wire', async () => {
+    const created = await buildHandler().createDevice(
+      pilotWireHeater([switchPair, { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF', value: '01' }]),
+    );
+
+    expect(paramOf(created, 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE')).to.equal('');
+    expect(paramOf(created, 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF')).to.equal('');
+    expect(paramOf(created, 'THERMOSTAT_PILOT_WIRE_FEATURE')).to.equal('heater-pilot-wire');
+  });
+
+  it('should drop the two switches of a real thermostat', async () => {
+    const created = await buildHandler().createDevice(
+      twoSwitchHeater([{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }], 'external'),
+    );
+
+    expect(paramOf(created, 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE')).to.equal('');
+    expect(paramOf(created, 'THERMOSTAT_TYPE')).to.equal('external');
+  });
+
+  it('should refuse a pilot-wire thermostat with half a pair of switches', async () => {
+    let error = null;
+    try {
+      await buildHandler().createDevice({
+        name: 'Bureau',
+        features: [setpointFeature],
+        params: [
+          { name: 'THERMOSTAT_TYPE', value: 'pilot-wire' },
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE', value: 'relay-q1' },
+        ],
+      });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.message).to.contain('THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE');
+  });
+
   it('should refuse a pilot-wire thermostat with no pilot wire', async () => {
     const handler = buildHandler();
 

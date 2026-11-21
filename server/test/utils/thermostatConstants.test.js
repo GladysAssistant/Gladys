@@ -5,6 +5,10 @@ const {
   supportedStandbyOrder,
   parsePilotWireStandbyOrder,
   defaultTempRange,
+  DEFAULT_PILOT_WIRE_SWITCH_STATES,
+  isPilotWireSwitchStates,
+  parsePilotWireSwitchStates,
+  pilotWireOrderOfSwitches,
 } = require('../../utils/thermostatConstants');
 
 describe('thermostatConstants.defaultTempRange', () => {
@@ -92,5 +96,61 @@ describe('thermostatConstants.parsePilotWireStandbyOrder', () => {
     ['5', '2garbage', '2.5', '-1', '', null, undefined].forEach((value) =>
       expect(parsePilotWireStandbyOrder(value), String(value)).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION),
     );
+  });
+});
+
+// A pilot wire driven by two switches (C.1.2).
+describe('thermostatConstants - pilot wire on two switches', () => {
+  const stored = (states) => (name) => (states[name] === undefined ? null : states[name]);
+
+  it('should accept a table giving each order its own state', () => {
+    expect(isPilotWireSwitchStates(DEFAULT_PILOT_WIRE_SWITCH_STATES)).to.equal(true);
+  });
+
+  it('should refuse two orders on the same state, a missing one and a malformed one', () => {
+    const { OFF, FROST_PROTECTION, ECO, COMFORT } = PILOT_WIRE_MODE;
+    expect(isPilotWireSwitchStates({ [OFF]: '10', [FROST_PROTECTION]: '10', [ECO]: '11', [COMFORT]: '00' })).to.equal(
+      false,
+    );
+    expect(isPilotWireSwitchStates({ [OFF]: '10', [ECO]: '11', [COMFORT]: '00' })).to.equal(false);
+    expect(isPilotWireSwitchStates({ [OFF]: '10', [FROST_PROTECTION]: '2', [ECO]: '11', [COMFORT]: '00' })).to.equal(
+      false,
+    );
+    expect(isPilotWireSwitchStates(null)).to.equal(false);
+  });
+
+  it('should read the stored states when each order has its own', () => {
+    const states = parsePilotWireSwitchStates(
+      stored({
+        THERMOSTAT_PILOT_WIRE_SWITCH_STATES_COMFORT: '11',
+        THERMOSTAT_PILOT_WIRE_SWITCH_STATES_ECO: '00',
+        THERMOSTAT_PILOT_WIRE_SWITCH_STATES_FROST_PROTECTION: '10',
+        THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF: '01',
+      }),
+    );
+
+    expect(states[PILOT_WIRE_MODE.COMFORT]).to.equal('11');
+    expect(states[PILOT_WIRE_MODE.OFF]).to.equal('01');
+  });
+
+  it('should fall back on the default table as a whole', () => {
+    // One state stored among defaults could send two orders the same way.
+    expect(parsePilotWireSwitchStates(stored({ THERMOSTAT_PILOT_WIRE_SWITCH_STATES_COMFORT: '11' }))).to.equal(
+      DEFAULT_PILOT_WIRE_SWITCH_STATES,
+    );
+    expect(parsePilotWireSwitchStates(stored({}))).to.equal(DEFAULT_PILOT_WIRE_SWITCH_STATES);
+  });
+
+  it('should name the order the two switches carry', () => {
+    const states = DEFAULT_PILOT_WIRE_SWITCH_STATES;
+    expect(pilotWireOrderOfSwitches(states, 0, 0)).to.equal(PILOT_WIRE_MODE.COMFORT);
+    expect(pilotWireOrderOfSwitches(states, 1, 1)).to.equal(PILOT_WIRE_MODE.ECO);
+    expect(pilotWireOrderOfSwitches(states, 0, 1)).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
+    expect(pilotWireOrderOfSwitches(states, 1, 0)).to.equal(PILOT_WIRE_MODE.OFF);
+  });
+
+  it('should name no order while a switch has no state', () => {
+    expect(pilotWireOrderOfSwitches(DEFAULT_PILOT_WIRE_SWITCH_STATES, null, 1)).to.equal(null);
+    expect(pilotWireOrderOfSwitches(DEFAULT_PILOT_WIRE_SWITCH_STATES, 1, undefined)).to.equal(null);
   });
 });
