@@ -131,6 +131,9 @@ function Gladys(params = {}) {
   // the voice assistant reply (gateway.processVoiceMessage) speaks through
   // the active TTS provider; attached post-construction like gateway.scene
   gateway.tts = tts;
+  // an external integration can ask for a clip of the instance's voice
+  // (POST /api/integration/v1/tts/speech_url); same post-construction attach
+  externalIntegration.tts = tts;
   // the energy-contract.current-price scene condition reads the current price of a
   // contract: the manager is created before the scene manager, attached post-construction
   scene.energyContract = energyContract;

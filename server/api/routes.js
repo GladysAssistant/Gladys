@@ -859,6 +859,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.networkWake,
     },
+    'post /api/integration/v1/tts/speech_url': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getSpeechUrl,
+    },
     'post /api/integration/v1/camera/image': {
       authenticated: false,
       externalIntegrationAuth: true,

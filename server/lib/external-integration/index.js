@@ -162,6 +162,7 @@ const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
+const { getSpeechUrl, assertSpeechUrlAllowed } = require('./externalIntegration.getSpeechUrl');
 const { publishSceneEvent } = require('./externalIntegration.publishSceneEvent');
 const { runSceneAction } = require('./externalIntegration.runSceneAction');
 const { getSceneDeclarations } = require('./externalIntegration.getSceneDeclarations');
@@ -206,6 +207,9 @@ const ExternalIntegration = function ExternalIntegration(
   this.jwtSecret = jwtSecret;
   this.cache = cache;
   this.calendar = calendar;
+  // text-to-speech manager (POST /tts/speech_url, see getSpeechUrl): created
+  // after this manager, attached post-construction in lib/index.js
+  this.tts = null;
   this.available = false;
   // serviceId -> WebSocket connection of the integration
   this.connections = new Map();
@@ -229,6 +233,9 @@ const ExternalIntegration = function ExternalIntegration(
   this.calendarWriteRateLimits = new Map();
   // serviceId -> timestamp of the last Wake-on-LAN emission (1/2s)
   this.networkWakeTimes = new Map();
+  // serviceId -> { count, resetAt } fixed one-minute window rate limit on
+  // POST /tts/speech_url (a clip of the instance's voice, see getSpeechUrl)
+  this.speechUrlRateLimits = new Map();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -459,6 +466,8 @@ ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;
 ExternalIntegration.prototype.installFromStore = installFromStore;
 ExternalIntegration.prototype.installFromRepoUrl = installFromRepoUrl;
 ExternalIntegration.prototype.wakeOnLan = wakeOnLan;
+ExternalIntegration.prototype.getSpeechUrl = getSpeechUrl;
+ExternalIntegration.prototype.assertSpeechUrlAllowed = assertSpeechUrlAllowed;
 ExternalIntegration.prototype.publishSceneEvent = publishSceneEvent;
 ExternalIntegration.prototype.runSceneAction = runSceneAction;
 ExternalIntegration.prototype.getSceneDeclarations = getSceneDeclarations;

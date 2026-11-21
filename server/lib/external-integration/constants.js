@@ -287,6 +287,16 @@ const TTS_AUDIO_CONTENT_TYPES = {
   'audio/ogg': 'ogg',
   'audio/aac': 'aac',
 };
+// An integration asking for a clip of the instance's voice (POST
+// /tts/speech_url, the third consumer of gladys.tts.getSpeechUrl): what it
+// consumes — the Gladys Plus TTS quota shared with the scenes and the voice
+// assistant, or the CPU of a local engine — is bounded per integration.
+// 10 per minute leaves room for a burst of announcements (a morning
+// briefing read in a few sentences) and cuts a runaway loop short.
+const MAX_TTS_SPEECH_URLS_PER_MINUTE = 10;
+// Language hint of that request: a BCP 47-like tag ("fr", "en-US", "pt_BR"),
+// the shape the providers' language maps expect; bounded by construction.
+const TTS_LANGUAGE_REGEX = /^[a-zA-Z]{2,8}([-_][a-zA-Z0-9]{1,8}){0,3}$/;
 // Provider images (B.18 point 6): declared as metadata in the pivot
 // payload, bytes fetched on demand and validated before entering the core.
 const MAX_WEATHER_IMAGES = 3;
@@ -729,6 +739,8 @@ module.exports = {
   MAX_TTS_AUDIO_BASE64_LENGTH,
   MAX_TTS_TEXT_LENGTH,
   TTS_AUDIO_CONTENT_TYPES,
+  MAX_TTS_SPEECH_URLS_PER_MINUTE,
+  TTS_LANGUAGE_REGEX,
   MAX_WEATHER_HOURS,
   MAX_WEATHER_DAYS,
   MAX_WEATHER_ALERTS,

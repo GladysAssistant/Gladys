@@ -169,6 +169,29 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/tts/speech_url getSpeechUrl
+   * @apiName getSpeechUrl
+   * @apiGroup IntegrationHostApi
+   * @apiDescription A clip of the instance's voice (the active TTS
+   * provider) for a text the integration supplies, as a URL its own player
+   * fetches: the LAN http:// URL of a 10-minute RAM clip with an
+   * integration provider, the signed https:// URL with Gladys Plus. Every
+   * integration type may call it; text 1-2000 characters, language
+   * optional (first administrator's language by default), 400 otherwise;
+   * 10 requests per minute per integration (429); any failure of the voice
+   * — no provider running, Gladys Plus not subscribed or over quota — is a
+   * single 503 TTS_UNAVAILABLE.
+   * @apiParamExample {json} Request-Example
+   * { "text": "Bonjour !", "language": "fr" }
+   * @apiSuccessExample {json} Success-Example
+   * { "url": "http://192.168.1.10:80/api/v1/tts/audio/9f0c...e1.mp3" }
+   */
+  async function getSpeechUrl(req, res) {
+    const result = await gladys.externalIntegration.getSpeechUrl(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
    * @api {post} /api/integration/v1/camera/image saveCameraImage
    * @apiName saveCameraImage
    * @apiGroup IntegrationHostApi
@@ -496,6 +519,7 @@ module.exports = function IntegrationHostController(gladys) {
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),
     networkWake: asyncMiddleware(networkWake),
+    getSpeechUrl: asyncMiddleware(getSpeechUrl),
     saveCameraImage: asyncMiddleware(saveCameraImage),
     setDeviceTransports: asyncMiddleware(setDeviceTransports),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
