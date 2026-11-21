@@ -380,6 +380,31 @@ describe('externalIntegration.setAiProvider', () => {
     await expect(externalIntegration.setAiProvider('ext-dev-gone-provider')).to.be.rejectedWith(NotFoundError);
     expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(null);
   });
+
+  it('should not undo a later selection of another provider when rolling back', async () => {
+    // provider A is removed while its selection is being re-checked, and
+    // provider B is selected successfully in the meantime: the rollback of
+    // A must not clear B's selection (#3421)
+    const { externalIntegration, variable } = buildSupervisor();
+    const providerB = await seedAiService();
+    const { getBySelector } = externalIntegration;
+    externalIntegration.getBySelector = async (selector) =>
+      selector === 'ext-dev-gone-provider'
+        ? { selector: 'ext-dev-gone-provider', manifest: { type: 'ai' } }
+        : getBySelector.call(externalIntegration, selector);
+    const { setValue } = variable;
+    let bSelection;
+    variable.setValue = async (...args) => {
+      const result = await setValue.apply(variable, args);
+      if (args[1] === 'ext-dev-gone-provider') {
+        bSelection = await externalIntegration.setAiProvider(providerB.selector);
+      }
+      return result;
+    };
+    await expect(externalIntegration.setAiProvider('ext-dev-gone-provider')).to.be.rejectedWith(NotFoundError);
+    expect(bSelection).to.equal(providerB.selector);
+    expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(providerB.selector);
+  });
 });
 
 describe('externalIntegration.uninstall (ai provider cleanup)', () => {
