@@ -800,8 +800,10 @@
 }
 
 /* On a phone, or in a narrow dashboard column, the six columns are under 57px:
-   a notch smaller keeps more names on one line. The media query stays for the
-   browsers that do not know container queries. */
+   a notch smaller keeps more names on one line. The media query covers the
+   phone viewport whatever the card; a browser that does not know container
+   queries gets the narrowest notch below (10px) in every card, copied by the
+   build (vite-plugins/container-query-fallback.js). */
 @media (max-width: 379px) {
   .segmentBtnLabel {
     font-size: 11px;

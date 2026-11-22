@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { preactCliCssModules } from './vite-plugins/preact-cli-css-modules.js';
 import { preactAsyncRoutes, getRouteChunkName } from './vite-plugins/preact-async-routes.js';
 import { serverCommonjsInterop } from './vite-plugins/server-commonjs-interop.js';
+import { containerQueryFallback } from './vite-plugins/container-query-fallback.js';
 
 const FRONT_ROOT = dirname(fileURLToPath(import.meta.url));
 const SRC_ROOT = resolve(FRONT_ROOT, 'src');
@@ -112,6 +113,13 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       port: 8080
+    },
+    css: {
+      postcss: {
+        // old wall tablets without container queries get the narrow form of
+        // the components that adapt to their card (see the plugin)
+        plugins: [containerQueryFallback()]
+      }
     },
     optimizeDeps: {
       // Injected by the preact-async-routes plugin: the dependency scanner cannot

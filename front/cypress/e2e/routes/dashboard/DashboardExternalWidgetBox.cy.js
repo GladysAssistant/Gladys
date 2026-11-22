@@ -210,6 +210,44 @@ describe('Dashboard integration widget box', () => {
     });
   });
 
+  it('puts the labels of two chart markers close in time on two lines', () => {
+    // an event a minute before the "now" line, on a four-hour curve: both
+    // labels on the top edge, the second covered the first at any card width
+    const now = Date.now();
+    const points = [4, 3, 2, 1, 0].map((hoursAgo, index) => ({
+      t: new Date(now - hoursAgo * 60 * 60 * 1000).toISOString(),
+      v: index
+    }));
+    cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('RUNNING')]).as('getWidgets');
+    cy.intercept('GET', CONTENT_URL, {
+      expires_at: new Date(now + 60 * 60 * 1000).toISOString(),
+      content: {
+        version: 1,
+        components: [
+          {
+            type: 'chart',
+            series: [{ name: 'Sky', points }],
+            annotations: [{ t: new Date(now - 60 * 1000).toISOString(), label: 'Dark sky', color: 'primary' }],
+            now_marker: true
+          }
+        ]
+      }
+    }).as('getContent');
+    createDashboard([{ type: 'external-widget', integration: SELECTOR, widget: WIDGET_KEY }]).then(selector => {
+      dashboardSelector = selector;
+      cy.visit(`/dashboard/${selector}`);
+    });
+    cy.wait('@getContent');
+    cy.get('[data-cy="external-widget-box"] .apexcharts-xaxis-annotations text')
+      .should('have.length', 2)
+      .then($labels => {
+        const [first, second] = [...$labels].map(label => label.getBoundingClientRect());
+        const horizontalOverlap = first.left < second.right && second.left < first.right;
+        const verticalOverlap = first.top < second.bottom && second.top < first.bottom;
+        expect(horizontalOverlap && verticalOverlap).to.equal(false);
+      });
+  });
+
   it('shows a stopped integration as stopped, without fetching any content', () => {
     cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('STOPPED')]).as('getWidgets');
     cy.intercept('GET', CONTENT_URL, cy.spy().as('contentRequest'));

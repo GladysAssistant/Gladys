@@ -382,10 +382,52 @@ const annotationLabel = (label, color, textAnchor = 'middle') => ({
 
 const labelAnchor = (x, { min, max }) => (x > max - (max - min) * 0.08 ? 'end' : 'middle');
 
+// Every vertical marker prints its label on the top edge of the chart: two
+// markers close in time — the "now" line next to an event, two events of the
+// same evening — printed their labels on top of each other, the first one
+// hidden (community topic 11639). A label that would overlap another at the
+// width the chart is drawn at goes down to the first line that has room for
+// it, up to three lines: a fourth would cover the curve, and the last line is
+// then shared by the labels that are left.
+const LABEL_LINE_HEIGHT_PX = 18;
+const MAX_LABEL_LINES = 3;
+const LABEL_GAP_PX = 4;
+// the y axis labels take the left of the card: the plot is that much narrower
+const Y_AXIS_WIDTH_PX = 40;
+// 10px semi-bold text is ~6px per character, plus the 4px side paddings
+const estimateLabelWidth = labelText => labelText.length * 6 + 8;
+
+const stackMarkerLabels = (xaxis, { min, max }, chartWidth) => {
+  const plotWidth = chartWidth - Y_AXIS_WIDTH_PX;
+  if (!(plotWidth > 0) || !(max > min)) {
+    return;
+  }
+  const lineEnds = [];
+  xaxis
+    .filter(annotation => annotation.label)
+    .map(annotation => {
+      const width = estimateLabelWidth(annotation.label.text);
+      const position = ((annotation.x - min) / (max - min)) * plotWidth;
+      const left = annotation.label.textAnchor === 'end' ? position - width : position - width / 2;
+      return { label: annotation.label, left, right: left + width };
+    })
+    .sort((a, b) => a.left - b.left)
+    .forEach(({ label, left, right }) => {
+      let line = lineEnds.findIndex(lineEnd => lineEnd + LABEL_GAP_PX <= left);
+      if (line === -1) {
+        line = lineEnds.length < MAX_LABEL_LINES ? lineEnds.length : lineEnds.indexOf(Math.min(...lineEnds));
+      }
+      lineEnds[line] = right;
+      label.offsetY = line * LABEL_LINE_HEIGHT_PX;
+    });
+};
+
 // The markers of the content, in the ApexCharts `annotations` shape: a time
 // with a value is a dot on the curve, a time alone is a vertical line; the
-// `now_marker` is a dashed line at the current time, when the series spans it
-const buildAnnotations = (component, series, language, nowLabel) => {
+// `now_marker` is a dashed line at the current time, when the series spans it.
+// `chartWidth` is the width the chart is drawn at, which places the labels
+// of the vertical lines (stackMarkerLabels).
+const buildAnnotations = (component, series, language, nowLabel, chartWidth) => {
   const xaxis = [];
   const points = [];
   const range = seriesTimeRange(series);
@@ -429,8 +471,14 @@ const buildAnnotations = (component, series, language, nowLabel) => {
   if (xaxis.length === 0 && points.length === 0) {
     return undefined;
   }
+  stackMarkerLabels(xaxis, range, chartWidth);
   return { xaxis, points };
 };
+
+// the line each marker label sits on: annotations rebuilt for a new width
+// only replace the chart's when a label actually moved
+const labelLinesKey = annotations =>
+  annotations ? annotations.xaxis.map(annotation => (annotation.label ? annotation.label.offsetY : '')).join() : '';
 
 export class WidgetChart extends Component {
   state = { series: null };
@@ -440,10 +488,12 @@ export class WidgetChart extends Component {
   seriesGeneration = 0;
 
   componentDidMount() {
+    this.observeWidth();
     this.loadSeries();
   }
 
   componentDidUpdate(previousProps) {
+    this.observeWidth();
     if (previousProps.component !== this.props.component) {
       this.loadSeries();
     }
@@ -451,14 +501,48 @@ export class WidgetChart extends Component {
 
   componentWillUnmount() {
     this.unmounted = true;
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
-  // series and markers are built once per content: ApexCharts redraws on a
-  // new reference, so the state keeps one for the life of the content
-  setSeries = (series, interval) => {
+  // The labels of the markers are placed for the width the chart is drawn
+  // at, which changes with the card: a rotated tablet, the rail toggled
+  observeWidth = () => {
+    if (typeof ResizeObserver === 'undefined' || !this.base || this.base === this.observedElement) {
+      return;
+    }
+    if (!this.resizeObserver) {
+      this.resizeObserver = new ResizeObserver(this.onResize);
+    } else if (this.observedElement) {
+      this.resizeObserver.unobserve(this.observedElement);
+    }
+    this.observedElement = this.base;
+    this.resizeObserver.observe(this.base);
+  };
+
+  onResize = () => {
+    const { series, annotations } = this.state;
+    if (this.unmounted || !series || !annotations) {
+      return;
+    }
+    const resizedAnnotations = this.annotationsFor(series);
+    if (labelLinesKey(resizedAnnotations) !== labelLinesKey(annotations)) {
+      this.setState({ annotations: resizedAnnotations });
+    }
+  };
+
+  annotationsFor = series => {
     const { component, language, dictionary } = this.props;
     const nowLabel = get(dictionary, 'dashboard.boxes.external-widget.now');
-    this.setState({ series, interval, annotations: buildAnnotations(component, series, language, nowLabel) });
+    return buildAnnotations(component, series, language, nowLabel, this.base ? this.base.clientWidth : 0);
+  };
+
+  // series and markers are built once per content (and the markers again
+  // when a new width moves a label): ApexCharts redraws on a new reference,
+  // so the state keeps one for the life of the content
+  setSeries = (series, interval) => {
+    this.setState({ series, interval, annotations: this.annotationsFor(series) });
   };
 
   loadSeries = async () => {
