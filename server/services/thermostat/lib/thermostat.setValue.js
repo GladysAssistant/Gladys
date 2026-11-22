@@ -175,7 +175,8 @@ async function holdExpiry(device) {
  * device's feature (Matter, Netatmo...) and never reach this service. There the
  * dial is bounded by the widget (F). A heater that regulates itself is left
  * alone too, whatever the thermostat's type — a `pilot-wire` one, or a virtual
- * one driving a pilot wire with no room sensor: it takes no range, and a
+ * one driving a pilot wire with no room sensor, through a module or through two
+ * switches (C.1.2): it takes no range, and a
  * setpoint from a scene picks the nearest preset (C.1.1) — bounded, 7 °C would
  * become Comfort rather than Frost.
  *
@@ -190,7 +191,7 @@ async function holdExpiry(device) {
 function manualRange(config) {
   const heaterRegulates =
     config.thermostat_type === THERMOSTAT_TYPES.PILOT_WIRE ||
-    (!!config.pilot_wire_feature && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.HEATER);
+    (!!config.pilot_wire && config.pilot_wire_regulation === PILOT_WIRE_REGULATIONS.HEATER);
   if (isExternal(config) || heaterRegulates) {
     return null;
   }
