@@ -9,7 +9,7 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature, isStringStateFeature } = require('../../utils/device');
-const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErrors');
+const { AbortScene, SceneStopped, NotFoundError, VoiceUnavailableError } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
@@ -148,6 +148,33 @@ const actionsFunc = {
         throw new AbortScene('ACTION_VALUE_EMPTY');
       }
       return self.device.setValue(device, deviceFeature, String(value));
+    }
+
+    // A text a user sends to a notification (dashboard...) is read out loud with the voice of
+    // Gladys, like the "Talk on a speaker" action: the device receives the URL of the clip, never
+    // the text. A scene has that action for a text: here its value stays a number, even stored as
+    // a string by the editor (an MQTT device playing its own sound).
+    if (
+      deviceFeature.category === DEVICE_FEATURE_CATEGORIES.MUSIC &&
+      deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION &&
+      typeof value === 'string' &&
+      action.user_id
+    ) {
+      if (value.trim() === '') {
+        throw new AbortScene('ACTION_VALUE_EMPTY');
+      }
+      let url = null;
+      try {
+        ({ url } = await self.tts.getSpeechUrl({ text: value }));
+      } catch (e) {
+        logger.warn(e);
+      }
+      // Not a failure of the device: the user is told that the voice is the problem. Gladys Plus
+      // can also answer without a URL.
+      if (!url) {
+        throw new VoiceUnavailableError('The text could not be turned into speech');
+      }
+      return self.device.setValue(device, deviceFeature, url);
     }
 
     if (action.evaluate_value !== undefined) {

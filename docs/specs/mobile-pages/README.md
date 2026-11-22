@@ -154,6 +154,10 @@ cards**, the pattern of the devices list.
   `BottomSheet` of the scene pages (`components/sheet/BottomSheet.jsx`): a bottom sheet on a
   phone, a centered dialog from 576 px, dragged down to close, closed by the system "back",
   stackable. A form sheet shows **OK**, a picker or a menu shows **×**.
+- A short form whose button stands under its field takes `aboveKeyboard` (a text to read out loud,
+  `external-integrations/capabilities/music.md`, section 6): the keyboard of a phone covers the
+  bottom of the page without resizing it, so the sheet goes up by what the visual viewport says is
+  hidden.
 - `ConfirmSheet`: the confirmation of a destructive action — what will happen in one sentence,
   the confirming button (red when destructive, a spinner while it runs), "Cancel". **Nothing is
   deleted, revoked, restored or restarted on a single tap.**

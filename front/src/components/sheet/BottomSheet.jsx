@@ -57,6 +57,9 @@ const FOCUSABLE =
  * needs it: a step form registers its variables when it mounts (docs/specs/scene-editor-mobile.md,
  * E.4).
  *
+ * aboveKeyboard: the sheet stays above the keyboard of a phone, for a short form whose button must
+ * be seen while its field is typed in.
+ *
  * On a phone the sheet follows a finger dragging it down — from its handle and header, or from
  * its content once that content is scrolled back to its top — and closes when released low enough
  * or flicked. It slides out when it closes, and the system "back" closes it (sheetHistory.js).
@@ -104,6 +107,7 @@ class BottomSheet extends Component {
     sheetsChanged(getOpenSheets);
     lockPageScroll();
     document.addEventListener('keydown', this.handleKeyDown);
+    this.followKeyboard();
     // the sheet takes the focus, unless its content already took it (an autofocused search)
     setTimeout(() => {
       if (this.sheet && !this.sheet.contains(document.activeElement)) {
@@ -121,6 +125,7 @@ class BottomSheet extends Component {
     sheetsChanged(getOpenSheets);
     unlockPageScroll();
     document.removeEventListener('keydown', this.handleKeyDown);
+    this.unfollowKeyboard();
     if (this.previousFocus && this.previousFocus.focus && document.body.contains(this.previousFocus)) {
       this.previousFocus.focus({ preventScroll: true });
     }
@@ -172,6 +177,39 @@ class BottomSheet extends Component {
     this.leaveAnimations = null;
     this.leaving = false;
     this.resetDrag();
+  };
+
+  // ---------- keyboard ----------
+
+  followKeyboard = () => {
+    const { visualViewport } = window;
+    if (!this.props.aboveKeyboard || !visualViewport) {
+      return;
+    }
+    visualViewport.addEventListener('resize', this.stayAboveKeyboard);
+    visualViewport.addEventListener('scroll', this.stayAboveKeyboard);
+    this.stayAboveKeyboard();
+  };
+
+  unfollowKeyboard = () => {
+    const { visualViewport } = window;
+    if (visualViewport) {
+      visualViewport.removeEventListener('resize', this.stayAboveKeyboard);
+      visualViewport.removeEventListener('scroll', this.stayAboveKeyboard);
+    }
+  };
+
+  // The keyboard of a phone covers the bottom of the page without resizing it, and the sheet stands
+  // there: the overlay gives up what is hidden, as a border the backdrop is still painted under
+  stayAboveKeyboard = () => {
+    if (!this.overlay || !this.sheet) {
+      return;
+    }
+    const { offsetTop, height, scale } = window.visualViewport;
+    // a page zoomed with two fingers shows less of itself too, with no keyboard
+    const hidden = scale > 1.01 ? 0 : Math.round(this.overlay.getBoundingClientRect().bottom - offsetTop - height);
+    this.overlay.style.borderBottom = hidden > 0 ? `${hidden}px solid transparent` : '';
+    this.sheet.style.maxHeight = hidden > 0 ? '100%' : '';
   };
 
   // ---------- drag to dismiss ----------

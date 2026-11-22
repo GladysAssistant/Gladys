@@ -15,6 +15,7 @@ const SENTENCE_BY_CAUSE = {
   [DEVICE_SET_VALUE_ERROR_CAUSES.NOT_CONFIGURED]: 'notConfigured',
   [DEVICE_SET_VALUE_ERROR_CAUSES.NOT_FOUND]: 'notFound',
   [DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED]: 'refused',
+  [DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_UNAVAILABLE]: 'voiceUnavailable',
   [GLADYS_UNREACHABLE_CAUSE]: 'gladysUnreachable'
 };
 // The sentences which name no device: a device which no longer exists has no name to give, and

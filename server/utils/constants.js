@@ -2472,6 +2472,8 @@ const DEVICE_SET_VALUE_ERROR_CAUSES = {
   NOT_FOUND: 'not-found',
   // the value was refused before anything was sent to the device
   REFUSED: 'refused',
+  // the text could not be turned into speech: the device was not reached for
+  VOICE_UNAVAILABLE: 'voice-unavailable',
 };
 
 const ERROR_MESSAGES = {

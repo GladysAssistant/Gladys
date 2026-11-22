@@ -5,7 +5,13 @@ const executeActionsFactory = require('./scene.executeActions');
 const actionsFunc = require('./scene.actions');
 const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES, DEVICE_SET_VALUE_ERROR_CAUSES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { NotFoundError, ServiceNotConfiguredError, BadParameters, AbortScene } = require('../../utils/coreErrors');
+const {
+  NotFoundError,
+  ServiceNotConfiguredError,
+  BadParameters,
+  AbortScene,
+  VoiceUnavailableError,
+} = require('../../utils/coreErrors');
 
 const { executeAction } = executeActionsFactory(actionsFunc);
 
@@ -27,6 +33,9 @@ function getSetValueErrorCause(error, deviceFeature) {
   }
   if (error instanceof BadParameters || error instanceof AbortScene) {
     return DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED;
+  }
+  if (error instanceof VoiceUnavailableError) {
+    return DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_UNAVAILABLE;
   }
   return DEVICE_SET_VALUE_ERROR_CAUSES.UNREACHABLE;
 }

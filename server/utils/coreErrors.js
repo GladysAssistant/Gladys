@@ -81,6 +81,13 @@ class ExternalIntegrationUnavailableError extends Error {
   }
 }
 
+class VoiceUnavailableError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 module.exports = {
   PasswordNotMatchingError,
   NotFoundError,
@@ -94,4 +101,5 @@ module.exports = {
   ForbiddenError,
   TooManyRequests,
   ExternalIntegrationUnavailableError,
+  VoiceUnavailableError,
 };
