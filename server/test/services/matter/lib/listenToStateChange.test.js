@@ -33,7 +33,15 @@ const { expect } = require('chai');
 
 const { fake, assert } = sinon;
 
-const { EVENTS, STATE, BUTTON_STATUS, FAN_MODE, AC_MODE, LOCK } = require('../../../../utils/constants');
+const {
+  EVENTS,
+  STATE,
+  BUTTON_STATUS,
+  FAN_MODE,
+  AC_MODE,
+  LOCK,
+  THERMOSTAT_MODE,
+} = require('../../../../utils/constants');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -391,6 +399,7 @@ describe('Matter.listenToStateChange', () => {
       addOccupiedHeatingSetpointAttributeListener: (callback) => {
         callback(2000);
       },
+      addSystemModeAttributeListener: fake.returns(null),
     };
     const device = {
       number: 1,
@@ -401,6 +410,69 @@ describe('Matter.listenToStateChange', () => {
       device_feature_external_id: 'matter:1234:1:513:heating',
       state: 20,
     });
+  });
+  it('should ignore a null heating or cooling setpoint', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      supportedFeatures: {
+        heating: true,
+        cooling: true,
+      },
+      getLocalTemperatureAttribute: fake.resolves(null),
+      addLocalTemperatureAttributeListener: fake.returns(null),
+      addOccupiedHeatingSetpointAttributeListener: (callback) => {
+        callback(null);
+      },
+      addOccupiedCoolingSetpointAttributeListener: (callback) => {
+        callback(undefined);
+      },
+      addSystemModeAttributeListener: (callback) => {
+        callback(null);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
+  });
+  it('should listen to the thermostat mode of a heating-only thermostat, Off included', async () => {
+    const systemModeCallbacks = [];
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      supportedFeatures: {
+        heating: true,
+      },
+      getLocalTemperatureAttribute: fake.resolves(null),
+      addLocalTemperatureAttributeListener: fake.returns(null),
+      addOccupiedHeatingSetpointAttributeListener: fake.returns(null),
+      addSystemModeAttributeListener: (callback) => {
+        systemModeCallbacks.push(callback);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    expect(systemModeCallbacks).to.have.lengthOf(1);
+    // Matter SystemMode Off = 0
+    systemModeCallbacks[0](0);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:mode',
+      state: THERMOSTAT_MODE.OFF,
+    });
+    // Matter SystemMode Heat = 4
+    systemModeCallbacks[0](4);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:mode',
+      state: THERMOSTAT_MODE.HEATING,
+    });
+    assert.calledTwice(gladys.event.emit);
+    // Matter SystemMode Dry = 8 has no thermostat mode
+    systemModeCallbacks[0](8);
+    assert.calledTwice(gladys.event.emit);
   });
   it('should listen to state change (Thermostat local temperature)', async () => {
     const clusterClient = {
@@ -486,8 +558,13 @@ describe('Matter.listenToStateChange', () => {
       device_feature_external_id: 'matter:1234:1:513:mode',
       state: AC_MODE.COOLING,
     });
+    // without OnOff cluster, a running SystemMode means the air conditioner is powered on
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:power',
+      state: STATE.ON,
+    });
   });
-  it('should ignore Thermostat systemMode values without a Gladys equivalent', async () => {
+  it('should report Thermostat systemMode Off as the power of an air conditioner without OnOff cluster', async () => {
     const clusterClient = {
       id: Thermostat.Complete.id,
       supportedFeatures: {
@@ -504,6 +581,41 @@ describe('Matter.listenToStateChange', () => {
     const device = {
       number: 1,
       getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    // Off has no air conditioning mode: only the power is reported
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:power',
+      state: STATE.OFF,
+    });
+  });
+  it('should ignore Thermostat systemMode values without a Gladys equivalent', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      supportedFeatures: {
+        cooling: true,
+      },
+      getLocalTemperatureAttribute: fake.resolves(null),
+      addLocalTemperatureAttributeListener: fake.returns(null),
+      addOccupiedCoolingSetpointAttributeListener: fake.returns(null),
+      addSystemModeAttributeListener: (callback) => {
+        // Matter SystemMode Off = 0
+        callback(0);
+      },
+    };
+    // A room air conditioner: its power is the OnOff cluster, already listened to on its own
+    const onOffClusterClient = {
+      id: OnOff.Complete.id,
+      addOnOffAttributeListener: fake.returns(null),
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => {
+        if (id === clusterClient.id) {
+          return clusterClient;
+        }
+        return id === onOffClusterClient.id ? onOffClusterClient : null;
+      },
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.notCalled(gladys.event.emit);

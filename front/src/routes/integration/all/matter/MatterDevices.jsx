@@ -47,6 +47,21 @@ const compareDevices = (gladysDevice, pairedDevice) => {
       return false;
     }
   }
+  // We compare the range of each feature: a device created before Gladys read the real range of a
+  // feature (ex: the setpoint limits of a thermostat) is proposed for an update
+  const isSameBound = (gladysBound, pairedBound) =>
+    gladysBound === null || gladysBound === undefined
+      ? pairedBound === null || pairedBound === undefined
+      : Number(gladysBound) === Number(pairedBound);
+  const hasSameRange = (gladysFeature, pairedFeature) =>
+    isSameBound(gladysFeature.min, pairedFeature.min) && isSameBound(gladysFeature.max, pairedFeature.max);
+  for (let i = 0; i < pairedDevice.features.length; i++) {
+    const pairedFeature = pairedDevice.features[i];
+    const gladysFeature = gladysDevice.features.find(f => f.external_id === pairedFeature.external_id);
+    if (!hasSameRange(gladysFeature, pairedFeature)) {
+      return false;
+    }
+  }
   // We compare the name & value of all params provided by the integration
   const gladysParams = gladysDevice.params || [];
   const pairedParams = pairedDevice.params || [];

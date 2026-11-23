@@ -20,7 +20,12 @@ const {
   gladysWindSettingToMatter,
 } = require('../utils/fanMatterMapping');
 const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
-const { gladysAcModeToMatterSystemMode } = require('../utils/thermostatMatterMapping');
+const {
+  MATTER_SYSTEM_MODE,
+  gladysAcModeToMatterSystemMode,
+  gladysThermostatModeToMatterSystemMode,
+  getAcModeSupportedOptions,
+} = require('../utils/thermostatMatterMapping');
 const { ensureNodeConnected } = require('../utils/ensureNodeConnected');
 
 /**
@@ -103,10 +108,12 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   // Handle binary device (a switch, or the on/off of a light: both are the "binary" type)
-  // Locks share the same "binary" type, but they are controlled through the DoorLock cluster below
+  // Locks and the power of an air conditioner share the same "binary" type, but they are controlled
+  // through the DoorLock and Thermostat clusters below
   if (
     gladysFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
-    gladysFeature.category !== DEVICE_FEATURE_CATEGORIES.LOCK
+    gladysFeature.category !== DEVICE_FEATURE_CATEGORIES.LOCK &&
+    gladysFeature.category !== DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING
   ) {
     const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
 
@@ -241,6 +248,48 @@ async function setValue(gladysDevice, gladysFeature, value) {
       throw new Error('Device does not support Thermostat cluster');
     }
     const matterSystemMode = gladysAcModeToMatterSystemMode(Number(value));
+    logger.debug(`Matter: Setting Thermostat systemMode to ${matterSystemMode} (Gladys value: ${value})`);
+    await thermostat.setSystemModeAttribute(matterSystemMode);
+  }
+
+  // Handle air conditioning power (Off value of the Thermostat cluster SystemMode attribute,
+  // on an endpoint without OnOff cluster)
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY
+  ) {
+    const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
+    if (!thermostat) {
+      throw new Error('Device does not support Thermostat cluster');
+    }
+    let matterSystemMode = MATTER_SYSTEM_MODE.OFF;
+    if (Number(value) === 1) {
+      // Turning on restores the mode of the mode feature, which keeps the last mode
+      // other than Off; without one, the first mode the device supports
+      const modeExternalId = gladysFeature.external_id.replace(/:power$/, ':mode');
+      const modeFeature = (gladysDevice.features || []).find((feature) => feature.external_id === modeExternalId);
+      const lastMode = modeFeature ? modeFeature.last_value : null;
+      if (lastMode !== null && lastMode !== undefined) {
+        matterSystemMode = gladysAcModeToMatterSystemMode(Number(lastMode));
+      } else {
+        const [firstSupportedMode] = getAcModeSupportedOptions(thermostat.supportedFeatures);
+        matterSystemMode = gladysAcModeToMatterSystemMode(firstSupportedMode.value);
+      }
+    }
+    logger.debug(`Matter: Setting Thermostat systemMode to ${matterSystemMode} (Gladys power: ${value})`);
+    await thermostat.setSystemModeAttribute(matterSystemMode);
+  }
+
+  // Handle thermostat mode (Matter Thermostat cluster SystemMode attribute, heating-only devices)
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE
+  ) {
+    const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
+    if (!thermostat) {
+      throw new Error('Device does not support Thermostat cluster');
+    }
+    const matterSystemMode = gladysThermostatModeToMatterSystemMode(Number(value));
     logger.debug(`Matter: Setting Thermostat systemMode to ${matterSystemMode} (Gladys value: ${value})`);
     await thermostat.setSystemModeAttribute(matterSystemMode);
   }

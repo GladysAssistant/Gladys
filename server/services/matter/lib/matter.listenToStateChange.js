@@ -31,7 +31,11 @@ const {
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
 const { matterLockStateToGladys, matterLockStateToGladysBinary } = require('../utils/doorLockMatterMapping');
-const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
+const {
+  MATTER_SYSTEM_MODE,
+  matterSystemModeToGladysAcMode,
+  matterSystemModeToGladysThermostatMode,
+} = require('../utils/thermostatMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
@@ -386,29 +390,53 @@ async function listenToStateChange(nodeId, devicePath, device) {
     if (thermostat.supportedFeatures.heating) {
       thermostat.addOccupiedHeatingSetpointAttributeListener((value) => {
         logger.debug(`Matter: Thermostat heating attribute changed to ${value}`);
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:heating`,
-          state: value / 100,
-        });
+        if (value !== null && value !== undefined) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:heating`,
+            state: value / 100,
+          });
+        }
       });
     }
     if (thermostat.supportedFeatures.cooling) {
       thermostat.addOccupiedCoolingSetpointAttributeListener((value) => {
         logger.debug(`Matter: Thermostat cooling attribute changed to ${value}`);
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:cooling`,
-          state: value / 100,
-        });
+        if (value !== null && value !== undefined) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:cooling`,
+            state: value / 100,
+          });
+        }
       });
+      // Without OnOff cluster, the Off value of SystemMode is the power of the air conditioner
+      const hasPowerFeature = !device.getClusterClientById(OnOff.Complete.id);
       thermostat.addSystemModeAttributeListener((value) => {
         logger.debug(`Matter: Thermostat systemMode attribute changed to ${value}`);
         const gladysAcMode = matterSystemModeToGladysAcMode(value);
         // SystemMode values without a Gladys equivalent (e.g. Off) are ignored,
-        // on/off is handled by the OnOff cluster
+        // on/off is handled by the OnOff cluster or the power feature
         if (gladysAcMode !== null) {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
             state: gladysAcMode,
+          });
+        }
+        if (hasPowerFeature && value !== null && value !== undefined) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:power`,
+            state: value === MATTER_SYSTEM_MODE.OFF ? STATE.OFF : STATE.ON,
+          });
+        }
+      });
+    } else if (thermostat.supportedFeatures.heating) {
+      // Heating-only thermostat: SystemMode is the thermostat mode, Off included
+      thermostat.addSystemModeAttributeListener((value) => {
+        logger.debug(`Matter: Thermostat systemMode attribute changed to ${value}`);
+        const gladysThermostatMode = matterSystemModeToGladysThermostatMode(value);
+        if (gladysThermostatMode !== null) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
+            state: gladysThermostatMode,
           });
         }
       });

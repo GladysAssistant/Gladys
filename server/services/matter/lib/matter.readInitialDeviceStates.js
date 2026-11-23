@@ -30,7 +30,11 @@ const {
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
 const { matterLockStateToGladys, matterLockStateToGladysBinary } = require('../utils/doorLockMatterMapping');
-const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
+const {
+  MATTER_SYSTEM_MODE,
+  matterSystemModeToGladysAcMode,
+  matterSystemModeToGladysThermostatMode,
+} = require('../utils/thermostatMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE } = require('../../../utils/constants');
 const {
@@ -213,21 +217,37 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
     }
     if (thermostat.supportedFeatures.heating) {
       const value = await safeReadAttribute(() => thermostat.getOccupiedHeatingSetpointAttribute());
-      if (value !== undefined) {
+      if (value !== null && value !== undefined) {
         emitState(`matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:heating`, value / 100);
       }
     }
     if (thermostat.supportedFeatures.cooling) {
       const value = await safeReadAttribute(() => thermostat.getOccupiedCoolingSetpointAttribute());
-      if (value !== undefined) {
+      if (value !== null && value !== undefined) {
         emitState(`matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:cooling`, value / 100);
       }
       const systemMode = await safeReadAttribute(() => thermostat.getSystemModeAttribute());
-      if (systemMode !== undefined) {
+      if (systemMode !== null && systemMode !== undefined) {
         // SystemMode values without a Gladys equivalent (e.g. Off) resolve to null and are skipped
         emitState(
           `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
           matterSystemModeToGladysAcMode(systemMode),
+        );
+        // Without OnOff cluster, the Off value of SystemMode is the power of the air conditioner
+        if (!device.getClusterClientById(OnOff.Complete.id)) {
+          emitState(
+            `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:power`,
+            systemMode === MATTER_SYSTEM_MODE.OFF ? STATE.OFF : STATE.ON,
+          );
+        }
+      }
+    } else if (thermostat.supportedFeatures.heating) {
+      // Heating-only thermostat: SystemMode is the thermostat mode, Off included
+      const systemMode = await safeReadAttribute(() => thermostat.getSystemModeAttribute());
+      if (systemMode !== null && systemMode !== undefined) {
+        emitState(
+          `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
+          matterSystemModeToGladysThermostatMode(systemMode),
         );
       }
     }
