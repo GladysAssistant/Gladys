@@ -6,6 +6,12 @@
 //
 // The websocket of the tests delivers no message by itself (support/commands.js): the session of
 // the page is authenticated when a test says so, with `authenticated()`.
+//
+// A socket that closes before it was authenticated is taken for a refused access token
+// (utils/Session.js): the session renews its token before it opens a new socket, with a real
+// request that `cy.tick` does not hurry. A test waits for that new socket, with `reconnected()`,
+// before it authenticates it — sent earlier, `authentication.connected` would reach no socket of
+// the session and be lost.
 describe('Connection lost notice', () => {
   const serverUrl = Cypress.env('serverUrl');
   const AUTO_RELOAD_KEY = 'gladys-connection-notice-reloaded';
@@ -40,7 +46,15 @@ describe('Connection lost notice', () => {
 
   const loseTheLiveConnection = () =>
     cy.window().then(win => {
+      win.lostSocket = win.gladysSocket;
       win.gladysSocket.onclose({ code: 1006, reason: '' });
+    });
+
+  // The session has opened its next socket, the one `authenticated()` speaks to
+  const reconnected = () =>
+    cy.window().should(win => {
+      expect(win.gladysSocket).not.to.equal(win.lostSocket);
+      expect(win.gladysSocket.readyState).to.equal(1);
     });
 
   beforeEach(() => {
@@ -112,15 +126,9 @@ describe('Connection lost notice', () => {
     it('does not restart the delay when the connection is lost again while reconnecting', () => {
       gladysDoesNotAnswer('/api/v1/ping').as('ping');
       loseTheLiveConnection();
-      cy.window().then(win => {
-        win.firstSocket = win.gladysSocket;
-      });
       // the session tries again, and its new socket is lost in turn
       cy.tick(2000);
-      cy.window().should(win => {
-        expect(win.gladysSocket).not.to.equal(win.firstSocket);
-        expect(win.gladysSocket.readyState).to.equal(1);
-      });
+      reconnected();
       loseTheLiveConnection();
       cy.tick(1900);
       cy.get(notice).should('not.exist');
@@ -138,6 +146,7 @@ describe('Connection lost notice', () => {
       cy.get(notice).should('be.visible');
       // the session reconnects: its new socket is authenticated
       cy.tick(2000);
+      reconnected();
       authenticated();
       cy.get(notice).should('not.exist');
       // and Gladys is no longer asked
@@ -152,6 +161,7 @@ describe('Connection lost notice', () => {
       gladysDoesNotAnswer('/api/v1/ping').as('ping');
       loseTheLiveConnection();
       cy.tick(2000);
+      reconnected();
       authenticated();
       cy.tick(10000);
       cy.get(notice).should('not.exist');
