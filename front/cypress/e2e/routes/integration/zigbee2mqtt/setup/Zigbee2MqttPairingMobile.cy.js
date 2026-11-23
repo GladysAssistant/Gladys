@@ -34,6 +34,9 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=z2m-pairing-row]')
       .eq(1)
       .should('contain', Cypress._.get(Cypress.env('i18n'), `${T}.failedText`));
+    // In a button or a link, which holds no list
+    cy.get('[data-cy=z2m-pairing-timeline]').should('have.length', 2);
+    cy.get('[data-cy=z2m-pairing-row] ol, [data-cy=z2m-pairing-row] li').should('not.exist');
     fitsTheScreen();
 
     sendPairing([readyBulb]);

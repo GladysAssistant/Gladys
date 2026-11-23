@@ -54,21 +54,26 @@ const getSteps = status => {
   }
 };
 
-const Timeline = ({ status }) => (
-  <ol class={style.timeline} data-cy="z2m-pairing-timeline">
-    {getSteps(status).map((step, index) => (
-      <li key={index} class={cx(style.timelineStep, style[`timeline-${step}`])}>
-        <span class={style.timelineDot} aria-hidden="true" />
-        <Text id={`${T}.steps.${['joined', 'interview', 'ready'][index]}`} />
-        {/* What the dot and the colours tell, for a screen reader */}
-        <span class="sr-only">
-          {' '}
-          <Text id={`${T}.stepStates.${step}`} />
-        </span>
-      </li>
-    ))}
-  </ol>
-);
+// `inline` on a phone: in the row, a button or a link, which holds no list
+const Timeline = ({ status, inline }) => {
+  const List = inline ? 'span' : 'ol';
+  const Step = inline ? 'span' : 'li';
+  return (
+    <List class={style.timeline} data-cy="z2m-pairing-timeline">
+      {getSteps(status).map((step, index) => (
+        <Step key={index} class={cx(style.timelineStep, style[`timeline-${step}`])}>
+          <span class={style.timelineDot} aria-hidden="true" />
+          <Text id={`${T}.steps.${['joined', 'interview', 'ready'][index]}`} />
+          {/* What the dot and the colours tell, for a screen reader */}
+          <span class="sr-only">
+            {' '}
+            <Text id={`${T}.stepStates.${step}`} />
+          </span>
+        </Step>
+      ))}
+    </List>
+  );
+};
 
 /**
  * @description The pairing window (docs/specs/zigbee2mqtt-pairing.md, D): joining and its countdown, and each device
@@ -674,7 +679,7 @@ class PairingWindow extends Component {
   renderMobileRow = entry => {
     const card = this.state.cards[entry.ieee_address];
     const { device, status } = entry;
-    const timeline = <Timeline status={status} />;
+    const timeline = <Timeline status={status} inline />;
     if (status === PAIRING_STATUS.READY && device && device.id === undefined && card && !card.added) {
       return (
         <MobileDeviceItem
