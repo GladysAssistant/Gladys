@@ -197,6 +197,13 @@ class BottomSheet extends Component {
       visualViewport.removeEventListener('resize', this.stayAboveKeyboard);
       visualViewport.removeEventListener('scroll', this.stayAboveKeyboard);
     }
+    // a sheet kept mounted (keepMounted) does not keep the room the keyboard took
+    if (this.overlay) {
+      this.overlay.style.borderBottom = '';
+    }
+    if (this.sheet) {
+      this.sheet.style.maxHeight = '';
+    }
   };
 
   // The keyboard of a phone covers the bottom of the page without resizing it, and the sheet stands

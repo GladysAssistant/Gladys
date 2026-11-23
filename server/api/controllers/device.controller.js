@@ -87,9 +87,26 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @description How the value is to be used, when the caller says so. `speak: true` asks for a
+   * text to be read out loud on a `music` / `play_notification` feature: the device gets the URL
+   * of a clip of the voice of Gladys, never the text (the "Speak" control of the devices widget).
+   * Without it, a value goes to the device as it is, a string included.
+   * @param {object} req - The request.
+   * @returns {object} The options to attach to the action.
+   * @example
+   * getValueOptions(req);
+   */
+  function getValueOptions(req) {
+    return req.body.speak === true ? { speak: true } : {};
+  }
+
+  /**
    * @api {post} /api/v1/device/:device_selector/:feature_category/:feature_type/value setValue
    * @apiName setValue
    * @apiGroup Device
+   * @apiParam {Any} value The value to set.
+   * @apiParam {Boolean} [speak] `true` to read the value, a text, out loud on a music / play_notification feature.
+   * @apiParam {String} [client_id] Id of the page which sends the command (see getActionAuthor).
    */
   async function setValue(req, res) {
     const action = {
@@ -99,6 +116,7 @@ module.exports = function DeviceController(gladys) {
       feature_type: req.params.feature_type,
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
+      ...getValueOptions(req),
     };
     gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, ...getActionAuthor(req) });
     res.json(action);
@@ -108,6 +126,9 @@ module.exports = function DeviceController(gladys) {
    * @api {post} /api/v1/device_feature/:device_feature_selector/value setValueFeature
    * @apiName setValueFeature
    * @apiGroup Device
+   * @apiParam {Any} value The value to set.
+   * @apiParam {Boolean} [speak] `true` to read the value, a text, out loud on a music / play_notification feature.
+   * @apiParam {String} [client_id] Id of the page which sends the command (see getActionAuthor).
    */
   async function setValueFeature(req, res) {
     const action = {
@@ -115,6 +136,7 @@ module.exports = function DeviceController(gladys) {
       device_feature: req.params.device_feature_selector,
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
+      ...getValueOptions(req),
     };
     gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, ...getActionAuthor(req) });
     res.json(action);

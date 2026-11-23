@@ -81,10 +81,19 @@ class ExternalIntegrationUnavailableError extends Error {
   }
 }
 
+// Why the voice of Gladys gave no clip, when the user can do something about it
+const VOICE_UNAVAILABLE_REASONS = {
+  // Gladys Plus is the voice, with no subscription
+  SUBSCRIPTION_REQUIRED: 'subscription-required',
+  // Gladys Plus is the voice, and its quota is reached
+  QUOTA_REACHED: 'quota-reached',
+};
+
 class VoiceUnavailableError extends Error {
-  constructor(message) {
+  constructor(message, reason = null) {
     super();
     this.message = message;
+    this.reason = reason;
   }
 }
 
@@ -102,4 +111,5 @@ module.exports = {
   TooManyRequests,
   ExternalIntegrationUnavailableError,
   VoiceUnavailableError,
+  VOICE_UNAVAILABLE_REASONS,
 };

@@ -180,8 +180,8 @@ class DevicesComponent extends Component {
     }
   };
 
-  setValueDevice = async (deviceFeature, value) => {
-    await sendDeviceFeatureValue(this.props.httpClient, deviceFeature.selector, value);
+  setValueDevice = async (deviceFeature, value, options) => {
+    await sendDeviceFeatureValue(this.props.httpClient, deviceFeature.selector, value, options);
   };
 
   changeAllLightsStatusRoom = async () => {
@@ -218,16 +218,21 @@ class DevicesComponent extends Component {
     return pendingCommand;
   };
 
-  updateValue = async (deviceFeature, value) => {
+  // Resolves with whether the request went through. `speak`: a text to read out loud, a command
+  // and not a state, which the feature does not show (MusicPlayNotificationDeviceFeature.jsx).
+  updateValue = async (deviceFeature, value, { speak = false } = {}) => {
     const pendingCommand = this.getPendingCommand(deviceFeature);
     pendingCommand.requests += 1;
     pendingCommand.debounced = false;
-    const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
-    await this.setState({
-      deviceFeatures
-    });
+    if (!speak) {
+      const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
+      await this.setState({
+        deviceFeatures
+      });
+    }
     try {
-      await this.setValueDevice(deviceFeature, value);
+      await this.setValueDevice(deviceFeature, value, { speak });
+      return true;
     } catch (e) {
       console.error(e);
       // The request did not go through: the command may not have been sent. Same message as a
@@ -241,8 +246,10 @@ class DevicesComponent extends Component {
         // the name the user reads in the widget
         device_name: deviceFeature.new_label || getDeviceName(deviceFeature.device, deviceFeature),
         value,
+        ...(speak ? { speak: true } : {}),
         ...pendingCommand.stateToGoBackTo
       });
+      return false;
     } finally {
       pendingCommand.requests -= 1;
       if (pendingCommand.requests === 0 && !pendingCommand.debounced) {

@@ -27,11 +27,13 @@ export const getCommandNotSentCause = error => {
   return DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED;
 };
 
-// The one way the front sends a value to a device feature
-export const sendDeviceFeatureValue = (httpClient, deviceFeatureSelector, value) =>
+// The one way the front sends a value to a device feature. `speak`: the value is a text the
+// device reads out loud with the voice of Gladys (a music / play_notification feature).
+export const sendDeviceFeatureValue = (httpClient, deviceFeatureSelector, value, { speak = false } = {}) =>
   httpClient.post(`/api/v1/device_feature/${deviceFeatureSelector}/value`, {
     value,
-    client_id: COMMAND_CLIENT_ID
+    client_id: COMMAND_CLIENT_ID,
+    ...(speak ? { speak: true } : {})
   });
 
 /**

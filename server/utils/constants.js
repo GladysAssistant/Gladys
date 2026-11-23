@@ -2474,6 +2474,10 @@ const DEVICE_SET_VALUE_ERROR_CAUSES = {
   REFUSED: 'refused',
   // the text could not be turned into speech: the device was not reached for
   VOICE_UNAVAILABLE: 'voice-unavailable',
+  // the same, because Gladys Plus is the voice and there is no subscription
+  VOICE_SUBSCRIPTION_REQUIRED: 'voice-subscription-required',
+  // the same, because Gladys Plus is the voice and its quota is reached
+  VOICE_QUOTA_REACHED: 'voice-quota-reached',
 };
 
 const ERROR_MESSAGES = {

@@ -1,19 +1,21 @@
-// A text read out loud by a device from the "devices" widget: a feature
-// music/play_notification is a Speak button, which opens a sheet with the text to
-// say. The server turns it into speech (server/lib/scene/scene.actions.js).
+// An announcement from the "devices" widget: a feature music/play_notification is an
+// "Announce…" button, which opens a sheet with the text to say. The server turns it into
+// speech (server/lib/scene/scene.actions.js).
 describe('Dashboard Devices Box: a text to read out loud', () => {
   const serverUrl = Cypress.env('serverUrl');
   const { device: i18n } = Cypress.env('i18n');
   const speaker = 'speak-speaker';
   const toast = '[data-cy="device-command-error"]';
+  const sentToast = '[data-cy="speak-sent"]';
+  const sentSentence = i18n => i18n.speakSent.replace('{{name}}', 'Rabbit');
+  const { dashboard } = Cypress.env('i18n');
+  const widgetI18n = dashboard.boxes.devicesInRoom;
   const speakButton = () => cy.get('[data-cy="speak-button"]');
   const sheet = () => cy.get('[data-cy="speak-sheet"]');
   const field = () => cy.get('[data-cy="speak-text"]');
   const sendButton = () => cy.get('[data-cy="speak-send"]');
-  // whatever the pointer of the machine running the tests
   const openSheet = () => {
     speakButton().click();
-    field().click();
     field().should('have.focus');
   };
   const setMouse = hasMouse =>
@@ -35,6 +37,7 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
       device_selector: speaker,
       device_name: 'Rabbit',
       value: 'Hello',
+      speak: true,
       last_value: null,
       last_value_string: null,
       last_value_changed: null,
@@ -91,10 +94,12 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
     cy.request({ method: 'DELETE', url: `${serverUrl}/api/v1/dashboard/test` });
   });
 
-  it('Should send the text with the button, then close the sheet', () => {
+  it('Should send the text with the button, then close the sheet and say it is sent', () => {
     sheet().should('not.exist');
+    speakButton().should('have.text', widgetI18n.speakButton);
     openSheet();
-    sheet().should('contain', 'Rabbit');
+    sheet().should('contain', widgetI18n.speakSheetTitle.replace('{{name}}', 'Rabbit'));
+    field().should('have.attr', 'maxlength', '2000');
     sendButton().should('be.disabled');
     field().type('   ');
     sendButton().should('be.disabled');
@@ -103,9 +108,12 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
     cy.wait('@command').then(({ request }) => {
       expect(request.url).to.contain(`/device_feature/${speaker}/value`);
       expect(request.body.value).to.equal("Hi, it's dad!");
+      // the server reads it out loud only when it is asked to
+      expect(request.body.speak).to.equal(true);
       expect(request.body.client_id).to.be.a('string');
     });
     sheet().should('not.exist');
+    cy.get(sentToast).should('contain', sentSentence(widgetI18n));
     cy.get(toast).should('not.exist');
     // the next text starts from an empty field
     openSheet();
@@ -143,16 +151,15 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
     field().should('have.focus');
   });
 
-  it('Should not bring up the keyboard of a touch screen before the field is touched', () => {
+  it('Should be ready to type into on a touch screen too, its keyboard held by a stand-in field', () => {
     setMouse(false);
     speakButton().click();
-    sheet().should('have.focus');
-    // the time the field would take the focus in
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(200);
-    sheet().should('have.focus');
-    field().click();
     field().should('have.focus');
+    // the stand-in only lives for the tap
+    cy.get('[data-cy="speak-keyboard-stand-in"]').should('not.exist');
+    cy.get('[data-cy="sheet-close"]').click();
+    sheet().should('not.exist');
+    cy.get('[data-cy="speak-keyboard-stand-in"]').should('not.exist');
   });
 
   it('Should keep the text and its button above the keyboard of a phone', () => {
@@ -196,10 +203,66 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
       cy.sendWebSocket(failure({ client_id: request.body.client_id, cause: 'voice-unavailable' }));
     });
     cy.get(toast).should('contain', i18n.setValueError.voiceUnavailable.replace('{{name}}', 'Rabbit'));
+    cy.get(toast).should('contain', i18n.setValueError.textKept);
+    cy.get(sentToast).should('not.exist');
     sheet().should('not.exist');
     openSheet();
     field().should('have.value', 'Hello');
     sendButton().should('not.be.disabled');
+  });
+
+  it('Should say what to do when the voice of Gladys Plus needs a subscription or reached its quota', () => {
+    [
+      ['voice-subscription-required', i18n.setValueError.voiceSubscriptionRequired],
+      ['voice-quota-reached', i18n.setValueError.voiceQuotaReached]
+    ].forEach(([cause, sentence]) => {
+      openSheet();
+      field().type('Hello{enter}');
+      cy.wait('@command').then(({ request }) => {
+        cy.sendWebSocket(failure({ client_id: request.body.client_id, cause }));
+      });
+      cy.get(toast).should('contain', sentence.replace('{{name}}', 'Rabbit'));
+      cy.get('[data-cy="mobile-toast-close"]').click({ multiple: true, force: true });
+    });
+  });
+
+  it('Should give the text back when its request fails after a first text was sent', () => {
+    openSheet();
+    field().type('First text{enter}');
+    cy.wait('@command');
+    cy.get(sentToast).should('contain', sentSentence(widgetI18n));
+    // the next request does not go through
+    cy.intercept('POST', '**/api/v1/device_feature/*/value', { statusCode: 500, body: {} }).as('failedCommand');
+    openSheet();
+    field().type('Second text{enter}');
+    cy.wait('@failedCommand');
+    cy.get(toast).should('contain', i18n.setValueError.textKept);
+    cy.get(sentToast).should('not.exist');
+    openSheet();
+    field().should('have.value', 'Second text');
+  });
+
+  it('Should give back only the text which failed, and none from elsewhere', () => {
+    openSheet();
+    field().type('First text{enter}');
+    cy.wait('@command');
+    openSheet();
+    field().type('Second text{enter}');
+    cy.wait('@command').then(({ request }) => {
+      // a text this widget never sent, then a failure of another screen
+      cy.sendWebSocket(failure({ client_id: request.body.client_id, value: 'Older text' }));
+      cy.sendWebSocket(failure({ client_id: 'another-screen', value: 'Second text' }));
+    });
+    openSheet();
+    field().should('have.value', '');
+    cy.get('[data-cy="sheet-close"]').click();
+    // the first text failed after the second one left
+    cy.get('@command').then(({ request }) => {
+      cy.sendWebSocket(failure({ client_id: request.body.client_id, value: 'First text' }));
+    });
+    cy.get(toast).should('contain', i18n.setValueError.textKept);
+    openSheet();
+    field().should('have.value', 'First text');
   });
 
   it('Should not overwrite a text typed before the failure is known', () => {
