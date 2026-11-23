@@ -167,15 +167,17 @@ class PairingWindow extends Component {
   };
 
   // A card for each ready device not in Gladys: its suggested name, kept once the user typed one or added it.
-  // Added, it is told in Gladys only while the device is: deleted from Gladys since, it is to add again, under its name.
-  withCards = (entries, previousCards) => {
+  // Added, it is told in Gladys only while the registry says so: told deleted from Gladys since (a registry received,
+  // `observed`), it is to add again, under its name. Not on names rebuilt from the entries kept, which an Add does not
+  // update.
+  withCards = (entries, previousCards, observed = false) => {
     const dictionary = get(this.props, 'intl.dictionary');
     const cards = {};
     const names = [...this.takenNames];
     entries.forEach(entry => {
       const previous = previousCards[entry.ieee_address];
       const toAdd = entry.status === PAIRING_STATUS.READY && entry.device && entry.device.id === undefined;
-      if (previous && previous.added && toAdd) {
+      if (observed && previous && previous.added && toAdd) {
         cards[entry.ieee_address] = { ...previous, added: false, existing: false, selector: null, edited: true };
         names.push(previous.name);
       } else if (previous && (previous.added || previous.edited)) {
@@ -192,7 +194,7 @@ class PairingWindow extends Component {
     return { entries, cards };
   };
 
-  setEntries = entries => this.setState(state => this.withCards(entries, state.cards));
+  setEntries = entries => this.setState(state => this.withCards(entries, state.cards, true));
 
   updateCard = (ieeeAddress, changes) =>
     this.setState(state => ({

@@ -277,6 +277,23 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-add]').should('not.be.disabled');
     });
 
+    it('should keep a device added before the names of the Gladys devices were read told added', () => {
+      const serverUrl = Cypress.env('serverUrl');
+      // Many devices in Gladys: their names come after the Add
+      openPairing({ pairing: [readyBulb], devicesDelay: 3000 });
+      cy.intercept(
+        { method: 'POST', url: `${serverUrl}/api/v1/device` },
+        { body: { name: 'Light IKEA', selector: 'light-ikea' } }
+      ).as('addDevice');
+      cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.wait('@addDevice');
+      cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
+      cy.wait('@gladysDevices');
+      cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
+      cy.get('[data-cy=z2m-pairing-card]').should('not.exist');
+      cy.get('@addDevice.all').should('have.length', 1);
+    });
+
     it('should keep the card open with an error when the device could not be added', () => {
       const serverUrl = Cypress.env('serverUrl');
       openPairing({ pairing: [readyBulb] });

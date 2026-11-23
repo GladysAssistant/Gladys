@@ -59,6 +59,7 @@ const answerPairing = ({
   pairing = [],
   pairingDelay = 0,
   devices = [],
+  devicesDelay = 0,
   permitJoinResponse = { body: {} }
 } = {}) => {
   const serverUrl = Cypress.env('serverUrl');
@@ -70,9 +71,10 @@ const answerPairing = ({
     { body: pairing, delay: pairingDelay }
   ).as('getPairing');
   cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/house*` }, { body: houses }).as('houses');
-  cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/device*` }, { body: devices }).as(
-    'gladysDevices'
-  );
+  cy.intercept(
+    { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/device*` },
+    { body: devices, delay: devicesDelay }
+  ).as('gladysDevices');
   cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, permitJoinResponse).as(
     'permitJoin'
   );

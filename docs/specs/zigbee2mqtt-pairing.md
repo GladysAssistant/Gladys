@@ -174,7 +174,9 @@ device".
     message does not). Not read again (the request fails, the device is no longer ready): not added,
     the error of the card — never the device of the message, saved without its meter. Read again with an
     `id` (added meanwhile from another window or the Discover tab): not saved over, "Already in Gladys".
-    Added: "In Gladys" with a link to the device;
+    Added: "In Gladys" with a link to the device, until a registry received tells it out of Gladys
+    (deleted since): to add again, under its name. The names of the Gladys devices read after the Add
+    do not undo it;
   - `ready`, already in Gladys (`device.id`): "Already in Gladys" with a link (a device paired again);
   - `unsupported` (D60): "Not supported by Zigbee2MQTT" with the model when known and an explanation
     (Gladys cannot create its features); no Add;
