@@ -38,3 +38,12 @@
 .pairedDeviceLoadingContent {
   height: 5rem;
 }
+
+/* Settings page: the title of a node, followed by its connection status */
+.nodeTitle {
+  gap: 0.5rem;
+}
+
+.nodeInformation {
+  overflow-wrap: break-word;
+}

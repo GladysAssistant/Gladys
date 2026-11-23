@@ -4,6 +4,7 @@ import { RequestStatus } from '../../../../utils/consts';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import MatterPage from './MatterPage';
+import style from './style.css';
 
 const DeviceDisplay = ({
   device,
@@ -19,17 +20,21 @@ const DeviceDisplay = ({
   const level = parentPath.split('-').length - 1;
 
   return (
-    <div class={cx('mb-4', { 'ms-4': level > 0 })}>
+    <div class={cx('mb-4', { 'ml-4': level > 0 })}>
       <div class="d-flex align-items-center cursor-pointer mb-3" onClick={() => toggleDevice(devicePath)}>
         <i
-          class={cx('fe me-2', {
+          class={cx('fe mr-2', {
             'fe-chevron-right': isCollapsed,
             'fe-chevron-down': !isCollapsed
           })}
         />
         <h6 class="mb-0">
-          {level > 0 && <span class="text-muted me-2">Child Endpoint:</span>}
-          Device: {device.name} (Endpoint: {device.number})
+          {level > 0 && (
+            <span class="text-muted mr-2">
+              <Text id="integration.matter.settings.node.childEndpoint" />
+            </span>
+          )}
+          <Text id="integration.matter.settings.node.device" fields={{ name: device.name, number: device.number }} />
         </h6>
       </div>
 
@@ -39,11 +44,21 @@ const DeviceDisplay = ({
             <table class="table table-sm">
               <thead>
                 <tr>
-                  <th>Cluster ID</th>
-                  <th>Cluster Name</th>
-                  <th>Attributes</th>
-                  <th>Commands</th>
-                  <th>Actions</th>
+                  <th>
+                    <Text id="integration.matter.settings.node.clusterId" />
+                  </th>
+                  <th>
+                    <Text id="integration.matter.settings.node.clusterName" />
+                  </th>
+                  <th>
+                    <Text id="integration.matter.settings.node.attributes" />
+                  </th>
+                  <th>
+                    <Text id="integration.matter.settings.node.commands" />
+                  </th>
+                  <th>
+                    <Text id="integration.matter.settings.actionsLabel" />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -76,7 +91,13 @@ const DeviceDisplay = ({
                         </td>
                         <td>
                           <button class="btn btn-outline-secondary btn-sm" onClick={() => toggleKeys(clusterKey)}>
-                            {areKeysVisible ? 'Hide Keys' : 'Show Keys'}
+                            <Text
+                              id={
+                                areKeysVisible
+                                  ? 'integration.matter.settings.node.hideKeys'
+                                  : 'integration.matter.settings.node.showKeys'
+                              }
+                            />
                           </button>
                         </td>
                       </tr>
@@ -84,7 +105,9 @@ const DeviceDisplay = ({
                         <tr>
                           <td colspan="5" class="bg-light">
                             <div class="p-2">
-                              <small class="text-muted">All Keys:</small>
+                              <small class="text-muted">
+                                <Text id="integration.matter.settings.node.allKeys" />
+                              </small>
                               <div class="row mt-2">
                                 {cluster.all_keys.map(key => (
                                   <div class="col-lg-3 col-md-4 col-sm-6">
@@ -134,6 +157,67 @@ const isAnswerFromGladys = e => {
 
 // a node list loaded without its Gladys devices (or by an older server) shows "no linked devices"
 const getLinkedGladysDevices = node => node.gladys_devices || [];
+
+const isFilled = value => typeof value === 'string' && value.trim() !== '';
+
+// The name of a node: its manufacturer and its product, as published by the node (Basic Information
+// cluster). A node that publishes no manufacturer is named after its product only, and a node that
+// publishes neither is named after its node id.
+const getNodeDisplayName = node => {
+  const { vendor_name: vendorName, product_name: productName } = node.node_information;
+  const parts = [vendorName, productName].filter(isFilled);
+  return parts.length > 0 ? parts.join(' - ') : node.node_id;
+};
+
+// The connection state of a node, when the server tells it
+const NodeConnectionStatus = ({ isConnected }) => {
+  if (typeof isConnected !== 'boolean') {
+    return null;
+  }
+  return (
+    <div
+      class={cx('tag', { 'tag-success': isConnected, 'tag-danger': !isConnected })}
+      data-cy="matter-node-connection-status"
+    >
+      <Text
+        id={
+          isConnected ? 'integration.matter.settings.node.connected' : 'integration.matter.settings.node.disconnected'
+        }
+      />
+      <span class="tag-addon">
+        <i class={cx('fe', { 'fe-wifi': isConnected, 'fe-wifi-off': !isConnected })} />
+      </span>
+    </div>
+  );
+};
+
+const NodeInformation = ({ node }) => {
+  const {
+    vendor_name: vendorName,
+    product_name: productName,
+    vendor_id: vendorId,
+    product_id: productId
+  } = node.node_information;
+  return (
+    <small class={cx('text-muted d-block', style.nodeInformation)} data-cy="matter-node-information">
+      <span class="d-block">
+        {isFilled(vendorName) ? (
+          <Text id="integration.matter.settings.node.manufacturer" fields={{ name: vendorName }} />
+        ) : (
+          <Text id="integration.matter.settings.node.unknownManufacturer" />
+        )}
+      </span>
+      {isFilled(productName) && (
+        <span class="d-block">
+          <Text id="integration.matter.settings.node.product" fields={{ name: productName }} />
+        </span>
+      )}
+      <span class="d-block">
+        <Text id="integration.matter.settings.node.ids" fields={{ nodeId: node.node_id, vendorId, productId }} />
+      </span>
+    </small>
+  );
+};
 
 const DecommissionFeedback = ({ feedback, onDismiss }) => {
   const dismissButton = <button type="button" class="close" onClick={onDismiss} />;
@@ -358,7 +442,7 @@ class MatterSettingsPage extends Component {
       return;
     }
     this.decommissionsInProgress.add(nodeId);
-    const name = `${node.node_information.vendor_name} - ${node.node_information.product_name}`;
+    const name = getNodeDisplayName(node);
     // only the devices the user saw in the confirmation are sent: the server deletes nothing else
     const gladysDeviceSelectors = this.state.deleteGladysDevices
       ? getLinkedGladysDevices(node).map(gladysDevice => gladysDevice.selector)
@@ -611,13 +695,11 @@ class MatterSettingsPage extends Component {
                                   <div class="card-header">
                                     <div class="d-flex justify-content-between align-items-start w-100">
                                       <div style="min-width: 0;">
-                                        <h5 class="mb-0">
-                                          {node.node_information.vendor_name} - {node.node_information.product_name}
-                                        </h5>
-                                        <small class="text-muted" style="overflow-wrap: break-word;">
-                                          Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} |
-                                          Product ID: {node.node_information.product_id}
-                                        </small>
+                                        <div class={cx('d-flex flex-wrap align-items-center mb-1', style.nodeTitle)}>
+                                          <h5 class="mb-0">{getNodeDisplayName(node)}</h5>
+                                          <NodeConnectionStatus isConnected={node.is_connected} />
+                                        </div>
+                                        <NodeInformation node={node} />
                                       </div>
                                       {isAdmin && (
                                         <button
