@@ -6,7 +6,14 @@ describe('Survey notice', () => {
   const DISMISSED_KEY = 'gladys_assistant_v1_dismissed_survey_notice';
   const TABLET_MODE_KEY = 'current_house_selector';
 
-  const visitDashboard = ({ tabletMode = false } = {}) => {
+  // The survey closes at the end of 2026: the tests set the date themselves, so
+  // they do not depend on the day they run. Only the date is stubbed: the timers
+  // of the page keep running.
+  const DURING_SURVEY = new Date('2026-12-15T12:00:00+01:00').getTime();
+  const AFTER_SURVEY = new Date('2027-01-02T12:00:00+01:00').getTime();
+
+  const visitDashboard = ({ tabletMode = false, now = DURING_SURVEY } = {}) => {
+    cy.clock(now, ['Date']);
     cy.visit('/dashboard', {
       onBeforeLoad(win) {
         win.localStorage.removeItem(DISMISSED_KEY);
@@ -73,10 +80,19 @@ describe('Survey notice', () => {
     cy.get(notice).should('not.exist');
   });
 
-  it('Should disappear once the survey is closed', () => {
-    // only the date moves forward: the timers of the page keep running
-    cy.clock(new Date('2027-01-02T12:00:00+01:00').getTime(), ['Date']);
+  it('Should still hide itself when the browser refuses to store the dismissal', () => {
     visitDashboard();
+    cy.get(notice).should('be.visible');
+    // a full or disabled storage: the write throws
+    cy.window().then(win => {
+      cy.stub(win.Storage.prototype, 'setItem').throws(new win.DOMException('Quota exceeded', 'QuotaExceededError'));
+    });
+    cy.get('[data-cy=survey-notice-dismiss]').click();
+    cy.get(notice).should('not.exist');
+  });
+
+  it('Should disappear once the survey is closed', () => {
+    visitDashboard({ now: AFTER_SURVEY });
     cy.get(notice).should('not.exist');
   });
 });

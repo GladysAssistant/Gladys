@@ -25,9 +25,20 @@ const DISMISSED_SURVEY_KEY = 'dismissed_survey_notice';
 // apart from those coming from the newsletter, the forum or social networks.
 const getSurveyUrl = language => `${SURVEY.forms[language] || SURVEY.forms.default}?source=app`;
 
-const isSurveyNoticeDismissed = () => keyValStore.get(DISMISSED_SURVEY_KEY) === SURVEY.id;
+// Also kept in memory: a browser that refuses the write (storage full, or
+// disabled) must still hide the notice once closed, at least until the next load.
+let dismissedThisSession = false;
 
-const dismissSurveyNotice = () => keyValStore.set(DISMISSED_SURVEY_KEY, SURVEY.id);
+const isSurveyNoticeDismissed = () => dismissedThisSession || keyValStore.get(DISMISSED_SURVEY_KEY) === SURVEY.id;
+
+const dismissSurveyNotice = () => {
+  dismissedThisSession = true;
+  try {
+    keyValStore.set(DISMISSED_SURVEY_KEY, SURVEY.id);
+  } catch (e) {
+    // the notice comes back on the next load: nothing else to do
+  }
+};
 
 // A browser in tablet mode is a wall tablet: a survey has nothing to do there.
 const isTabletModeBrowser = session =>
