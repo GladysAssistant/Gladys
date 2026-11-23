@@ -571,12 +571,12 @@ describe('Camera.streaming', () => {
     expect(secondError.message).to.equal('Child process exited with code 1');
     expect(warn.secondCall.args).to.deep.equal(['Camera my-camera: ffmpeg live stream failed with code 1']);
   });
-  it('should keep the aspect ratio with an even height, whatever the rotation', async () => {
+  it('should only scale down, keeping the aspect ratio with an even height, whatever the rotation', async () => {
     const rotations = [
-      [undefined, 'scale=1920:-2'],
-      [DEVICE_ROTATION.DEGREES_90, 'scale=1920:-2,transpose=1'],
-      [DEVICE_ROTATION.DEGREES_180, 'scale=1920:-2,transpose=1,transpose=1'],
-      [DEVICE_ROTATION.DEGREES_270, 'scale=1920:-2,transpose=2'],
+      [undefined, "scale='min(1920,iw)':-2"],
+      [DEVICE_ROTATION.DEGREES_90, "scale='min(1920,iw)':-2,transpose=1"],
+      [DEVICE_ROTATION.DEGREES_180, "scale='min(1920,iw)':-2,transpose=1,transpose=1"],
+      [DEVICE_ROTATION.DEGREES_270, "scale='min(1920,iw)':-2,transpose=2"],
     ];
     await Promise.each(rotations, async ([rotation, expectedFilter]) => {
       const spawnedArgs = [];

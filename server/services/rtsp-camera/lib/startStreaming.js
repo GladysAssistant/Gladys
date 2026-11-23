@@ -163,21 +163,25 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       indexFilePath,
     ];
 
+    // Scale down to Full HD at most, never up: "min(1920,iw)" keeps the native width of a
+    // stream narrower than 1920 px (upscaling adds no detail and costs a lot of CPU).
+    // The quotes protect the comma from the filtergraph parser (args are passed without a shell).
     // "-2" keeps the aspect ratio like "-1" but rounds the height to an even number:
     // the H264 encoder refuses an odd height ("height not divisible by 2").
+    const scaleFilter = "scale='min(1920,iw)':-2";
     let cameraRotationArgs = '';
     switch (cameraRotationParam.value) {
       case DEVICE_ROTATION.DEGREES_90:
-        cameraRotationArgs = 'scale=1920:-2,transpose=1'; // Full HD resolution & Rotate 90
+        cameraRotationArgs = `${scaleFilter},transpose=1`; // Rotate 90
         break;
       case DEVICE_ROTATION.DEGREES_180:
-        cameraRotationArgs = 'scale=1920:-2,transpose=1,transpose=1'; // Full HD resolution & Rotate 180
+        cameraRotationArgs = `${scaleFilter},transpose=1,transpose=1`; // Rotate 180
         break;
       case DEVICE_ROTATION.DEGREES_270:
-        cameraRotationArgs = 'scale=1920:-2,transpose=2'; // Full HD resolution & Rotate 270
+        cameraRotationArgs = `${scaleFilter},transpose=2`; // Rotate 270
         break;
       default:
-        cameraRotationArgs = 'scale=1920:-2'; // Full HD resolution & Rotate 0
+        cameraRotationArgs = scaleFilter; // Rotate 0
         break;
     }
 
