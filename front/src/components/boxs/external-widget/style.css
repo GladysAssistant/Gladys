@@ -35,7 +35,12 @@
 /* --- tiles: a grid of value / gauge tiles ---
    The core picks the column count from the tile count (tilesCountN class)
    and from the width of the tile area (a container query on .tilesBox), so a
-   wrapped tile keeps the width of the tile above it instead of stretching. */
+   wrapped tile keeps the width of the tile above it instead of stretching.
+   A browser without container queries (an old wall-tablet WebView) cannot
+   measure the tile area: it gets the narrowest variant of every rule below —
+   rows of 2 from 4 tiles up, the tightest padding and value font — copied by
+   the build (vite-plugins/container-query-fallback.js), so a value is never
+   cut, at worst a notch smaller than needed in a wide card. */
 .tilesBox {
   container-type: inline-size;
   container-name: widget-tiles;
