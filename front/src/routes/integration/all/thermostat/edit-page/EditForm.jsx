@@ -277,13 +277,14 @@ const EditForm = ({ ...props }) => {
   // to the switch, and first thing on a pilot-wire one.
   const pilotWirePicker = (
     <div class="form-group">
-      <label class="form-label">
+      <label class="form-label" htmlFor="thermostat-pilot-wire-kind">
         <Text id="integration.thermostat.edit.pilotWireFeatureLabel" />
       </label>
       {/* What carries the wire: a pilot-wire module, or the two outputs of a
           two-relay module wired to it through diodes, which Gladys only knows
           as two switches (spec C.1.2). */}
       <select
+        id="thermostat-pilot-wire-kind"
         class="form-control mb-2"
         value={usesSwitches ? 'switches' : 'module'}
         onChange={e => props.updateThermostatPilotWireKind(e.target.value)}

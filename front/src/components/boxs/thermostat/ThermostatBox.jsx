@@ -722,6 +722,11 @@ class ThermostatBox extends Component {
       .filter(Boolean)
       .join(',');
     if (!selectors) return;
+    // A pilot-wire report received while the read is on its way is newer than
+    // what the read returns: a save starts a pass that writes the wire, and the
+    // response would put the order back to the one before it.
+    const pilotWireEventsBefore = this.pilotWireEventCount || 0;
+    const reportedDuringRead = selector => ((this.pilotWireEventSeq || {})[selector] || 0) > pilotWireEventsBefore;
     try {
       const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_selectors: selectors
@@ -789,11 +794,12 @@ class ThermostatBox extends Component {
               this.setState({ isSwitchOn: isRunningFromStateFeature(feat, feat.last_value) });
             }
             if (pilotWireSelectors.includes(feat.selector)) {
+              const newer = reportedDuringRead(feat.selector);
               if (pilotWireSwitches.includes(feat.selector)) {
-                this.setPilotWireSwitchReading(feat.selector, feat.last_value);
+                if (!newer) this.setPilotWireSwitchReading(feat.selector, feat.last_value);
               } else {
                 this.setState({
-                  pilotWireOrder: feat.last_value,
+                  ...(newer ? {} : { pilotWireOrder: feat.last_value }),
                   pilotWireSupportedOptions: feat.supported_options || null
                 });
               }
@@ -886,6 +892,11 @@ class ThermostatBox extends Component {
     }
     const remoteConfig = this.state.remoteConfig;
     if (this.getPilotWireSelectors().includes(payload.device_feature_selector)) {
+      this.pilotWireEventCount = (this.pilotWireEventCount || 0) + 1;
+      this.pilotWireEventSeq = {
+        ...this.pilotWireEventSeq,
+        [payload.device_feature_selector]: this.pilotWireEventCount
+      };
       if (remoteConfig.pilot_wire_switches) {
         this.setPilotWireSwitchReading(payload.device_feature_selector, payload.last_value);
       } else {
