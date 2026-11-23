@@ -20,6 +20,10 @@ class Zigbee2mqttIntegration extends Component {
     this.props.getDiscoveredDevices();
   };
 
+  // Its own function: the dispatcher removes the listeners whose source is the same, and the actions bound by
+  // unistore all have the same one (CheckStatus removing its listener would remove this one)
+  followStatus = status => this.props.updateStatus(status);
+
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
@@ -27,10 +31,7 @@ class Zigbee2mqttIntegration extends Component {
     );
     // The Zigbee2mqtt status ("Pair a device", banner) is loaded and followed by CheckStatus, which the pairing screen
     // replaces with the list: followed here too, the screen tells Zigbee2mqtt no longer answering (D.5)
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      this.props.updateStatus
-    );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE, this.followStatus);
 
     this.props.setDiscoveredDevices(undefined);
     this.props.getHouses();
@@ -44,10 +45,7 @@ class Zigbee2mqttIntegration extends Component {
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
       this.props.setDiscoveredDevices
     );
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      this.props.updateStatus
-    );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE, this.followStatus);
   }
 
   render(props, { pairing }) {
