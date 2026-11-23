@@ -51,6 +51,21 @@ describe('Zigbee2mqtt status', () => {
     cy.get('[data-cy=z2m-discover-pair]').should('not.be.disabled');
   });
 
+  it('should tell that Zigbee2mqtt no longer answers on the pairing screen opened from the discover page', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: onlineStatus });
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` }, { body: [] });
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} });
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+    cy.get('[data-cy=z2m-discover-pair]').click();
+    cy.get('[data-cy=z2m-pairing-header]').should('not.have.attr', 'data-state', 'not-answering');
+
+    // The status banner of the list is no longer shown: the screen follows the status all the same
+    cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: notOnlineStatus });
+
+    cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'not-answering');
+  });
+
   it('should tell that Zigbee2mqtt is stopped, not blame the broker, on the discover page', () => {
     const serverUrl = Cypress.env('serverUrl');
     // Stopped from the dashboard: Gladys disconnected from the broker, the containers kept

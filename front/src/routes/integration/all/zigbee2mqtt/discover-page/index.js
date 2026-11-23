@@ -25,8 +25,13 @@ class Zigbee2mqttIntegration extends Component {
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
       this.props.setDiscoveredDevices
     );
+    // The Zigbee2mqtt status ("Pair a device", banner) is loaded and followed by CheckStatus, which the pairing screen
+    // replaces with the list: followed here too, the screen tells Zigbee2mqtt no longer answering (D.5)
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      this.props.updateStatus
+    );
 
-    // The Zigbee2mqtt status ("Pair a device", banner) is loaded and followed by CheckStatus
     this.props.setDiscoveredDevices(undefined);
     this.props.getHouses();
     this.props.getIntegrationByName('zigbee2mqtt');
@@ -38,6 +43,10 @@ class Zigbee2mqttIntegration extends Component {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
       this.props.setDiscoveredDevices
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      this.props.updateStatus
     );
   }
 
