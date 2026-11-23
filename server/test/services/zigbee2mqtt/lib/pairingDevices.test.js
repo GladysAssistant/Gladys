@@ -223,6 +223,19 @@ describe('zigbee2mqtt pairingDevices', () => {
       expect(changed).to.equal(false);
     });
 
+    it('should forget a device no longer listed, removed from Zigbee2mqtt', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_joined',
+        data: { friendly_name: 'b', ieee_address: '0x99' },
+      });
+      gladys.event.emit = fake();
+      const changed = zigbee2MqttManager.updatePairingFromList([{ ieee_address: '0x99', friendly_name: 'b' }]);
+      expect(changed).to.equal(true);
+      expect(Object.keys(zigbee2MqttManager.pairingDevices)).to.deep.equal(['0x99']);
+      assert.notCalled(gladys.event.emit);
+    });
+
     it('should take the end of an interview whose event was missed', () => {
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
       zigbee2MqttManager.handleBridgeEvent({
@@ -294,14 +307,28 @@ describe('zigbee2mqtt pairingDevices', () => {
       assert.calledOnce(gladys.event.emit);
     });
 
-    it('should tell the ready devices again, their Gladys device may only now be known', () => {
+    it('should tell the ready devices again only when their Gladys device changed', () => {
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([]);
       zigbee2MqttManager.handleBridgeEvent({
         type: 'device_interview',
         data: { friendly_name: 'kitchen bulb', ieee_address: IEEE, status: 'successful', supported: true, definition },
       });
+      expect(lastSent()[0].device).to.equal(null);
       gladys.event.emit = fake();
+      // The same list again: nothing to tell
+      zigbee2MqttManager.emitPairingDevicesAfterList(false);
+      assert.notCalled(gladys.event.emit);
+      // Only now known
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([{ name: 'kitchen bulb', ieee_address: IEEE }]);
       zigbee2MqttManager.emitPairingDevicesAfterList(false);
       assert.calledOnce(gladys.event.emit);
+      zigbee2MqttManager.emitPairingDevicesAfterList(false);
+      assert.calledOnce(gladys.event.emit);
+      // Added to Gladys since
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([{ id: 'a1', name: 'kitchen bulb', ieee_address: IEEE }]);
+      zigbee2MqttManager.emitPairingDevicesAfterList(false);
+      assert.calledTwice(gladys.event.emit);
+      expect(lastSent()[0].device.id).to.equal('a1');
     });
 
     it('should tell nothing when no name changed and no device is ready', () => {

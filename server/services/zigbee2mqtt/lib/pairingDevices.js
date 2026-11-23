@@ -52,14 +52,30 @@ function getPairingDevices(defaultElectricMeterDeviceFeatureId) {
 }
 
 /**
+ * @description What the window shows of the Gladys devices of the ready entries: not known yet, to add, or in Gladys.
+ * @param {Array} entries - The entries of the registry, as getPairingDevices gives them.
+ * @returns {string} A key that changes only with one of them.
+ * @example
+ * getReadyDevicesKey([{ ieee_address: '0x01', status: 'ready', device: { id: 'a1' } }]); // '0x01:a1'
+ */
+function getReadyDevicesKey(entries) {
+  return entries
+    .filter((entry) => entry.status === PAIRING_STATUS.READY)
+    .map((entry) => `${entry.ieee_address}:${entry.device ? entry.device.id || 'new' : 'none'}`)
+    .join(',');
+}
+
+/**
  * @description Broadcast the registry (`zigbee2mqtt.pairing`).
+ * @param {Array} [entries] - The entries, as getPairingDevices gives them, when already read.
  * @example
  * emitPairingDevices();
  */
-function emitPairingDevices() {
+function emitPairingDevices(entries = this.getPairingDevices()) {
+  this.sentReadyDevicesKey = getReadyDevicesKey(entries);
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PAIRING,
-    payload: this.getPairingDevices(),
+    payload: entries,
   });
 }
 
@@ -121,10 +137,10 @@ function handleBridgeEvent(event) {
 }
 
 /**
- * @description Follow the device list of Zigbee2mqtt (`bridge/devices`): the names of the devices being paired, and
- * the end of an interview whose event was missed (Gladys reconnecting to the broker meanwhile: `bridge/event` is not
- * retained, the list is), see C.2. Called as soon as the list arrives, so that a list told before cannot replace a
- * name told after it; the caller tells the registry once the Gladys devices are known (see
+ * @description Follow the device list of Zigbee2mqtt (`bridge/devices`): the devices being paired no longer listed,
+ * their names, and the end of an interview whose event was missed (Gladys reconnecting to the broker meanwhile:
+ * `bridge/event` is not retained, the list is), see C.2. Called as soon as the list arrives, so that a list told
+ * before cannot replace a name told after it; the caller tells the registry once the Gladys devices are known (see
  * emitPairingDevicesAfterList).
  * @param {Array} devices - The devices Zigbee2mqtt lists.
  * @returns {boolean} Whether an entry changed.
@@ -133,6 +149,14 @@ function handleBridgeEvent(event) {
  */
 function updatePairingFromList(devices) {
   let changed = false;
+  // Removed from Zigbee2mqtt (its interface, a request): no device_leave is sure to come
+  const listed = new Set(devices.map((device) => device.ieee_address));
+  Object.keys(this.pairingDevices).forEach((ieeeAddress) => {
+    if (!listed.has(ieeeAddress)) {
+      delete this.pairingDevices[ieeeAddress];
+      changed = true;
+    }
+  });
   devices.forEach((device) => {
     const entry = this.pairingDevices[device.ieee_address];
     if (!entry) {
@@ -158,15 +182,23 @@ function updatePairingFromList(devices) {
 
 /**
  * @description Tell the registry once a device list of Zigbee2mqtt (`bridge/devices`) is handled: when an entry
- * changed, and while a device is ready, whose Gladys device may only now be known (one may have become ready
- * meanwhile).
+ * changed, or when the Gladys device of a ready entry did (only now known, added to Gladys or deleted from it since
+ * last sent). Not at each list while an entry is ready: the registry may keep one for weeks.
  * @param {boolean} entriesChanged - Whether updatePairingFromList changed an entry.
  * @example
  * emitPairingDevicesAfterList(true);
  */
 function emitPairingDevicesAfterList(entriesChanged) {
-  if (entriesChanged || Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY)) {
+  if (entriesChanged) {
     this.emitPairingDevices();
+    return;
+  }
+  if (!Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY)) {
+    return;
+  }
+  const entries = this.getPairingDevices();
+  if (getReadyDevicesKey(entries) !== this.sentReadyDevicesKey) {
+    this.emitPairingDevices(entries);
   }
 }
 

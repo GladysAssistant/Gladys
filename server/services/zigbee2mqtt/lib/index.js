@@ -132,6 +132,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.lastPermitJoinEnd = null;
   // The devices seen joining since joining last opened, by IEEE address (see pairingDevices)
   this.pairingDevices = {};
+  // What the last registry sent told of the Gladys devices of its ready entries (see emitPairingDevicesAfterList)
+  this.sentReadyDevicesKey = null;
   this.healthCheckTimer = null;
   this.networkModeValid = false;
   this.coordinatorFirmware = null;

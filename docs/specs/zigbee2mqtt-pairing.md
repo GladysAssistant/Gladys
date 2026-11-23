@@ -72,7 +72,10 @@ Both carry the same object:
   when `allowed` is false or the end is unknown (Zigbee2mqtt 1, `permit_join_end` absent). The browser
   computes the end with its own clock from the moment it receives the value: the clocks of the browser
   and of the server never meet.
-- Sent only when `allowed` or `z2mPermitJoinEnd` changes (not on every `bridge/info`).
+- Sent when `allowed` or `z2mPermitJoinEnd` changes (not on every `bridge/info`), and on each
+  `bridge/response/permit_join` with `status: ok` even when it changes nothing (an Extend whose
+  estimated end falls within 5 s of the known one, with Zigbee2mqtt 1 or another clock): the window
+  waits for the answer of its request (D.2).
 - Formerly a bare boolean: every consumer of the front (wizard, dashboard, Discover tab) reads the object.
 
 ### B.3 `POST /permit_join`
@@ -108,6 +111,7 @@ opened:
 | `device_interview` `failed`                   | create `failed`         | `failed`                  | `failed` (a late failure of an earlier interview after `ready` is applied: Zigbee2mqtt says the last word) |
 | `device_leave`                                | —                       | removed                   | removed                            |
 | `bridge/devices`                              | —                       | name updated; the device listed with its interview finished (`interview_completed`, not `interviewing`): `ready` or `unsupported` as `device_interview` `successful` | name updated; `device` computed again (`ready`) |
+| `bridge/devices` without the device (removed from Zigbee2mqtt) | —      | removed                   | removed                            |
 | a new window opens (`allowed` false → true, not the same window, B.1) | registry emptied | emptied | emptied |
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
@@ -118,6 +122,8 @@ opened:
   the registry kept) misses the events told meanwhile, and gets the list again. A device whose
   interview ended meanwhile is thus taken from the list, not left `joined` / `interviewing`. A failure
   told meanwhile is not in the list: the entry waits for the device to join again.
+- A device removed from Zigbee2mqtt (its interface, `bridge/request/device/remove`) may tell no
+  `device_leave`: its entry is removed when a `bridge/devices` no longer lists it.
 - Closing joining keeps the registry: an interview often ends after the window, and the user may add
   the ready devices later. A new run of Zigbee2mqtt keeps it too, and so does the same window told again
   after a reconnection or an init (B.1).
@@ -131,7 +137,8 @@ opened:
 ### C.3 `zigbee2mqtt.pairing` and `GET /pairing`
 
 - `zigbee2mqtt.pairing`: the whole registry, `[entry]` ordered by first appearance, sent each time an
-  entry changes (and after `bridge/devices` while the registry holds a `ready` entry). The list is
+  entry changes (and after a `bridge/devices` that changes the `device` of a `ready` entry: known, or
+  its `id`). The list is
   small (the devices of one session).
 - `GET /api/v1/service/zigbee2mqtt/pairing` (authenticated): the same list, for a page opened or
   reloaded during pairing.
