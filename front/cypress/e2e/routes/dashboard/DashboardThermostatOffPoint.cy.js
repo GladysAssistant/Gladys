@@ -167,7 +167,9 @@ describe('Dashboard Thermostat Box on an Off point', () => {
   it('Should stop the thermostat on an Off tapped while the banner hands back', () => {
     serve(MODE_HEATING, 0, { slow: PRESET });
     cy.visit('/dashboard/test');
-    cy.get('button:has(i.fe-x)', { timeout: 10000 }).click();
+    // the banner's own cancel button: other buttons of the page (the survey
+    // notice of the rail) carry the same cross icon
+    cy.get('[data-cy=thermostat-manual-banner-cancel]', { timeout: 10000 }).click();
     presetButton('fe-power').click();
     cy.wait(['@write', '@write']);
     // A write that must not happen has no request to wait for.

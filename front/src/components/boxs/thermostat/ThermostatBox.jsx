@@ -2127,7 +2127,12 @@ class ThermostatBox extends Component {
                             {manualUntilLabel} {untilWhen}
                           </span>
                         </span>
-                        <button class={style.manualBannerCancel} onClick={this.cancelManualMode} title={cancelLabel}>
+                        <button
+                          class={style.manualBannerCancel}
+                          onClick={this.cancelManualMode}
+                          title={cancelLabel}
+                          data-cy="thermostat-manual-banner-cancel"
+                        >
                           <i class="fe fe-x" />
                         </button>
                       </div>
