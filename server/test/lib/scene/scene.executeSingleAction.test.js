@@ -502,6 +502,7 @@ describe('scene.executeSingleAction, a text to read out loud on a device', () =>
     };
     sceneManager = new SceneManager(stateManager, eventFake, device);
     sceneManager.tts = tts;
+    sceneManager.gateway = { getStatus: fake.resolves({ configured: true }) };
   });
 
   it('should send the clip of the text, said in the language of its author, to the device (feature selector)', async () => {
@@ -622,6 +623,16 @@ describe('scene.executeSingleAction, a text to read out loud on a device', () =>
       assert.notCalled(device.setValue);
       expect(causesSentToTheUser()).to.deep.equal([cause]);
     });
+  });
+
+  it('should tell the user what to do when Gladys Plus is the voice of an instance not linked to it', async () => {
+    // what the call to Gladys Plus throws without an account
+    tts.getSpeechUrl = fake.rejects(new Error('Request failed with status code 401'));
+    tts.getActiveProvider = fake.resolves('gladys-plus');
+    sceneManager.gateway.getStatus = fake.resolves({ configured: false });
+    await sceneManager.executeSingleAction({ ...command, value: 'Hello' });
+    assert.notCalled(device.setValue);
+    expect(causesSentToTheUser()).to.deep.equal([DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_SUBSCRIPTION_REQUIRED]);
   });
 
   it('should tell the user that the device is unreachable when it could not play the clip', async () => {

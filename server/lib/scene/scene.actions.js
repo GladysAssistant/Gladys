@@ -165,16 +165,18 @@ async function speakOnDevice(self, action, device, deviceFeature) {
     ({ url } = await self.tts.getSpeechUrl({ text: value, language: author ? author.language : null }));
   } catch (e) {
     logger.warn(e);
-    // Gladys Plus refusing is not a broken voice: no subscription (402, 403) or the quota
-    // reached (429), which the user is told. The same codes thrown by a voice integration mean
-    // nothing to them (docs/specs/external-integrations/capabilities/tts-type.md).
-    const refusedByGladysPlus =
-      (e instanceof Error402 || e instanceof Error403 || e instanceof Error429) &&
-      (await self.tts.getActiveProvider()) === GLADYS_PLUS_PROVIDER;
-    if (refusedByGladysPlus) {
+    // Gladys Plus being the voice without a subscription (402, 403, or no Gladys Plus account
+    // linked at all: the voice of a fresh instance) or with its quota reached (429) is not a
+    // broken voice: the user is told what to do. The same codes thrown by a voice integration
+    // mean nothing to them (docs/specs/external-integrations/capabilities/tts-type.md).
+    if ((await self.tts.getActiveProvider()) === GLADYS_PLUS_PROVIDER) {
       const { QUOTA_REACHED, SUBSCRIPTION_REQUIRED } = VOICE_UNAVAILABLE_REASONS;
-      const reason = e instanceof Error429 ? QUOTA_REACHED : SUBSCRIPTION_REQUIRED;
-      throw new VoiceUnavailableError('Gladys Plus refused to turn the text into speech', reason);
+      if (e instanceof Error429) {
+        throw new VoiceUnavailableError('Gladys Plus refused to turn the text into speech', QUOTA_REACHED);
+      }
+      if (e instanceof Error402 || e instanceof Error403 || !(await self.gateway.getStatus()).configured) {
+        throw new VoiceUnavailableError('Gladys Plus refused to turn the text into speech', SUBSCRIPTION_REQUIRED);
+      }
     }
   }
   // Not a failure of the device: the user is told that the voice is the problem. Gladys Plus

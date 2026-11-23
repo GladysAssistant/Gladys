@@ -81,7 +81,17 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
         type: 'test',
         selector: 'test',
         visibility: 'private',
-        boxes: [[{ type: 'devices', name: 'Speakers', device_features: [speaker] }]]
+        // the row name the editor stores: the sheet and the toasts name the device
+        boxes: [
+          [
+            {
+              type: 'devices',
+              name: 'Speakers',
+              device_features: [speaker],
+              device_feature_names: ['Rabbit (Play notification)']
+            }
+          ]
+        ]
       }
     });
     cy.intercept('POST', '**/api/v1/device_feature/*/value', { statusCode: 200, body: {} }).as('command');
@@ -97,8 +107,13 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
   it('Should send the text with the button, then close the sheet and say it is sent', () => {
     sheet().should('not.exist');
     speakButton().should('have.text', widgetI18n.speakButton);
+    cy.contains('tr', 'Rabbit (Play notification)')
+      .find('i.fe')
+      .should('have.class', 'fe-volume-2');
     openSheet();
-    sheet().should('contain', widgetI18n.speakSheetTitle.replace('{{name}}', 'Rabbit'));
+    sheet()
+      .find('h2')
+      .should('have.text', widgetI18n.speakSheetTitle.replace('{{name}}', 'Rabbit'));
     field().should('have.attr', 'maxlength', '2000');
     sendButton().should('be.disabled');
     field().type('   ');

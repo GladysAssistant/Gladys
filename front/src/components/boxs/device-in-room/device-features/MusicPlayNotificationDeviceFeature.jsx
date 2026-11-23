@@ -2,10 +2,12 @@ import { Component, Fragment } from 'preact';
 import { connect } from 'unistore/preact';
 import { Localizer, Text } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
 import { MAX_TTS_TEXT_LENGTH } from '../../../../../../server/lib/external-integration/constants';
 import { COMMAND_CLIENT_ID } from '../../../../utils/deviceCommand';
+import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import BottomSheet from '../../../sheet/BottomSheet';
 import MobileField, { fieldClass } from '../../../mobile/MobileField';
 import { BigButton } from '../../../mobile/MobileBottomBar';
@@ -147,14 +149,15 @@ class MusicPlayNotificationDeviceFeature extends Component {
   }
 
   render({ device, deviceFeature, rowName }, { open, text, sent, toastKey }) {
-    // the name the user gave the row, or the device's: the row name also says the feature
-    const name = deviceFeature.new_label || (device && device.name) || rowName;
+    // the device says the text: its name, as in the toast of a failure. The name of the row is
+    // the editor's "Device (Feature)" unless the user changed it.
+    const name = (device && device.name) || deviceFeature.new_label || rowName;
 
     return (
       <Fragment>
         <tr>
           <td>
-            <i class="fe fe-volume-2" />
+            <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${deviceFeature.category}.${deviceFeature.type}`)}`} />
           </td>
           <td>{rowName}</td>
           <td class="text-right">
