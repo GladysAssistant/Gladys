@@ -34,30 +34,62 @@ const DEFAULT_VALUE_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 55
 };
 
+// The range the device accepts, from the min/max of the feature. A range with no width or an
+// inverted one is ignored rather than pinning the control to a single value.
+const getRange = deviceFeature => {
+  if (isNullOrUndefined(deviceFeature.min) || isNullOrUndefined(deviceFeature.max)) {
+    return null;
+  }
+  const min = Number(deviceFeature.min);
+  const max = Number(deviceFeature.max);
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max) {
+    return null;
+  }
+  return { min, max };
+};
+
+const clampToRange = (value, range) => (range ? Math.min(range.max, Math.max(range.min, value)) : value);
+
 const SetpointDeviceFeature = ({ children, ...props }) => {
   const SETPOINT_STEP = props.deviceFeature.step || SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] || 0.5;
   const DEFAULT_VALUE_IN_CASE_EMPTY = DEFAULT_VALUE_BY_CATEGORY[props.deviceFeature.category] || 0;
+  const range = getRange(props.deviceFeature);
+  const currentValue = isNullOrUndefined(props.deviceFeature.last_value)
+    ? DEFAULT_VALUE_IN_CASE_EMPTY
+    : Number(props.deviceFeature.last_value);
+  // + and − stop at the bounds of the device: a value the device would refuse is never sent.
+  // A value left outside the range (by the device itself) steps into it, not further outside.
+  const canAdd = !range || currentValue < range.max;
+  const canSubstract = !range || currentValue > range.min;
 
   function updateValue(value) {
     props.updateValueWithDebounce(props.deviceFeature, value);
   }
 
   function updateValueEvent(e) {
-    updateValue(e.target.value);
+    const typedValue = Number(e.target.value);
+    if (e.target.value === '' || !Number.isFinite(typedValue)) {
+      updateValue(e.target.value);
+      return;
+    }
+    // a typed value outside the range is brought back to the nearest bound
+    const value = clampToRange(typedValue, range);
+    if (value !== typedValue) {
+      e.target.value = value;
+    }
+    updateValue(value);
   }
 
   function add() {
-    const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
-      ? DEFAULT_VALUE_IN_CASE_EMPTY
-      : props.deviceFeature.last_value;
-    updateValue(addToValue(prevValue, SETPOINT_STEP));
+    if (canAdd) {
+      updateValue(clampToRange(addToValue(currentValue, SETPOINT_STEP), range));
+    }
   }
 
   function substract() {
-    const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
-      ? DEFAULT_VALUE_IN_CASE_EMPTY
-      : props.deviceFeature.last_value;
-    updateValue(addToValue(prevValue, -SETPOINT_STEP));
+    if (canSubstract) {
+      updateValue(clampToRange(addToValue(currentValue, -SETPOINT_STEP), range));
+    }
   }
 
   return (
@@ -82,7 +114,13 @@ const SetpointDeviceFeature = ({ children, ...props }) => {
         <div class="d-flex justify-content-end">
           <div class={cx('input-group', style.setpointHorizontalControls)}>
             <div class="input-group-prepend">
-              <button class="btn btn-outline-secondary" type="button" onClick={substract}>
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onClick={substract}
+                disabled={!canSubstract}
+                data-cy="setpoint-substract"
+              >
                 <Text id="dashboard.boxes.devicesInRoom.substractButton" />
               </button>
             </div>
@@ -91,12 +129,19 @@ const SetpointDeviceFeature = ({ children, ...props }) => {
               value={props.deviceFeature.last_value}
               class={cx('form-control text-center', style.removeNumberArrow, style.setpointValue)}
               onChange={updateValueEvent}
+              data-cy="setpoint-value"
               step={SETPOINT_STEP}
               min={props.deviceFeature.min}
               max={props.deviceFeature.max}
             />
             <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" onClick={add}>
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onClick={add}
+                disabled={!canAdd}
+                data-cy="setpoint-add"
+              >
                 <Text id="dashboard.boxes.devicesInRoom.addButton" />
               </button>
             </div>
