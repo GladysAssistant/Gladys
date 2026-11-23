@@ -166,17 +166,22 @@ class PairingWindow extends Component {
     }
   };
 
-  // A card for each ready device not in Gladys: its suggested name, kept once the user typed one or added it
+  // A card for each ready device not in Gladys: its suggested name, kept once the user typed one or added it.
+  // Added, it is told in Gladys only while the device is: deleted from Gladys since, it is to add again, under its name.
   withCards = (entries, previousCards) => {
     const dictionary = get(this.props, 'intl.dictionary');
     const cards = {};
     const names = [...this.takenNames];
     entries.forEach(entry => {
       const previous = previousCards[entry.ieee_address];
-      if (previous && (previous.added || previous.edited)) {
+      const toAdd = entry.status === PAIRING_STATUS.READY && entry.device && entry.device.id === undefined;
+      if (previous && previous.added && toAdd) {
+        cards[entry.ieee_address] = { ...previous, added: false, existing: false, selector: null, edited: true };
+        names.push(previous.name);
+      } else if (previous && (previous.added || previous.edited)) {
         cards[entry.ieee_address] = previous;
         names.push(previous.name);
-      } else if (entry.status === PAIRING_STATUS.READY && entry.device && entry.device.id === undefined) {
+      } else if (toAdd) {
         const name = suggestName(entry.device, entry, dictionary, names);
         names.push(name);
         cards[entry.ieee_address] = { roomId: '', ...previous, name };

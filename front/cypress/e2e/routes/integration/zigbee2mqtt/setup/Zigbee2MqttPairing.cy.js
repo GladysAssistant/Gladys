@@ -257,6 +257,26 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-name]').should('have.value', 'Living room lamp');
     });
 
+    it('should offer to add again, under its name, a device deleted from Gladys after it was added', () => {
+      const serverUrl = Cypress.env('serverUrl');
+      openPairing({ pairing: [readyBulb] });
+      cy.intercept(
+        { method: 'POST', url: `${serverUrl}/api/v1/device` },
+        { body: { name: 'Light IKEA', selector: 'light-ikea' } }
+      ).as('addDevice');
+      cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.wait('@addDevice');
+      cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
+      // The registry told again, the device in Gladys: still added
+      sendPairing([{ ...readyBulb, device: { ...readyBulb.device, id: 'a1', selector: 'light-ikea' } }]);
+      cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
+      // Deleted from Gladys since
+      sendPairing([readyBulb]);
+      cy.get('[data-cy=z2m-pairing-in-gladys]').should('not.exist');
+      cy.get('[data-cy=z2m-pairing-name]').should('have.value', 'Light IKEA');
+      cy.get('[data-cy=z2m-pairing-add]').should('not.be.disabled');
+    });
+
     it('should keep the card open with an error when the device could not be added', () => {
       const serverUrl = Cypress.env('serverUrl');
       openPairing({ pairing: [readyBulb] });
