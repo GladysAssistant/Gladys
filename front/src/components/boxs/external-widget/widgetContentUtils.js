@@ -105,6 +105,12 @@ export const collectFeatureSelectors = components => {
 // third-party content, the user sees where they click
 export const getUrlDomain = url => (url || '').split('/')[2] || '';
 
+// ApexCharts writes a series name into the legend and the tooltip with
+// innerHTML: the name is encoded, so it shows as plain text like every other
+// integration string, never as markup
+const HTML_ENTITIES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+export const escapeHtml = value => String(value).replace(/[&<>"']/g, character => HTML_ENTITIES[character]);
+
 // The values of a widget action form as the core validates them (spec
 // section 7): a number typed as text becomes a number, an empty input is not
 // sent at all — the declared default or the required check applies core-side

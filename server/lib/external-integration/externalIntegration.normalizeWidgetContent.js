@@ -446,6 +446,24 @@ function normalizeChartSeries(rawSeries) {
 }
 
 /**
+ * @description Normalize the legend names of a device-bound `chart`: one
+ * text per device feature, in the same order. An entry that is not a valid
+ * text becomes null, and the frontend shows that feature's own name.
+ * @param {any} rawNames - The raw `series_names`.
+ * @param {number} count - The number of device features kept.
+ * @returns {Array|null} The names, or null when none survived.
+ * @example
+ * normalizeChartSeriesNames([{ en: 'Setpoint', fr: 'Consigne' }], 2);
+ */
+function normalizeChartSeriesNames(rawNames, count) {
+  if (!Array.isArray(rawNames)) {
+    return null;
+  }
+  const names = rawNames.slice(0, count).map((rawName) => normalizeText(rawName, TEXT_BOUNDS.seriesName));
+  return names.some((name) => name !== null) ? names : null;
+}
+
+/**
  * @description Normalize one annotation of a `chart` component: a point in
  * time the core marks on the chart (high tide at 07:48 and 10.69 m, the
  * peak of a solar forecast, the start of an off-peak tariff slot). The time
@@ -481,8 +499,8 @@ function normalizeChartAnnotation(rawAnnotation) {
 
 /**
  * @description Normalize a `chart` component: inline series, or live device
- * feature references with an interval of the chart box; optional
- * annotations and a "now" marker on either form.
+ * feature references with an interval of the chart box and optional legend
+ * names; optional annotations and a "now" marker on either form.
  * @param {object} raw - The raw component.
  * @returns {object|null} The normalized component, or null to drop it.
  * @example
@@ -500,6 +518,10 @@ function normalizeChartComponent(raw) {
     }
     component.device_features = references;
     component.interval = toEnum(raw.interval, WIDGET_CHART_INTERVALS, DEFAULT_CHART_INTERVAL);
+    const seriesNames = normalizeChartSeriesNames(raw.series_names, references.length);
+    if (seriesNames !== null) {
+      component.series_names = seriesNames;
+    }
   } else {
     if (!Array.isArray(raw.series)) {
       return null;
