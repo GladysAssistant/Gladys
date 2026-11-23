@@ -121,20 +121,35 @@ function handleBridgeEvent(event) {
 }
 
 /**
- * @description Follow the device list of Zigbee2mqtt (`bridge/devices`): the names of the devices being paired. Called
- * as soon as the list arrives, so that a list told before cannot replace a name told after it; the caller tells the
- * registry once the Gladys devices are known (see emitPairingDevicesAfterList).
+ * @description Follow the device list of Zigbee2mqtt (`bridge/devices`): the names of the devices being paired, and
+ * the end of an interview whose event was missed (Gladys reconnecting to the broker meanwhile: `bridge/event` is not
+ * retained, the list is), see C.2. Called as soon as the list arrives, so that a list told before cannot replace a
+ * name told after it; the caller tells the registry once the Gladys devices are known (see
+ * emitPairingDevicesAfterList).
  * @param {Array} devices - The devices Zigbee2mqtt lists.
- * @returns {boolean} Whether a name changed.
+ * @returns {boolean} Whether an entry changed.
  * @example
- * updatePairingNames([{ ieee_address: '0x00158d0001', friendly_name: 'kitchen/bulb' }]);
+ * updatePairingFromList([{ ieee_address: '0x00158d0001', friendly_name: 'kitchen/bulb' }]);
  */
-function updatePairingNames(devices) {
+function updatePairingFromList(devices) {
   let changed = false;
   devices.forEach((device) => {
     const entry = this.pairingDevices[device.ieee_address];
-    if (entry && device.friendly_name && entry.friendly_name !== device.friendly_name) {
+    if (!entry) {
+      return;
+    }
+    if (device.friendly_name && entry.friendly_name !== device.friendly_name) {
       entry.friendly_name = device.friendly_name;
+      changed = true;
+    }
+    const waiting = entry.status === PAIRING_STATUS.JOINED || entry.status === PAIRING_STATUS.INTERVIEWING;
+    if (waiting && device.interview_completed === true && device.interviewing !== true) {
+      const definition = device.definition || {};
+      entry.status = device.supported && device.definition ? PAIRING_STATUS.READY : PAIRING_STATUS.UNSUPPORTED;
+      entry.model = definition.model || null;
+      entry.vendor = definition.vendor || null;
+      entry.description = definition.description || null;
+      entry.updated_at = new Date().toISOString();
       changed = true;
     }
   });
@@ -142,14 +157,15 @@ function updatePairingNames(devices) {
 }
 
 /**
- * @description Tell the registry once a device list of Zigbee2mqtt (`bridge/devices`) is handled: when a name changed,
- * and while a device is ready, whose Gladys device may only now be known (one may have become ready meanwhile).
- * @param {boolean} namesChanged - Whether updatePairingNames changed a name.
+ * @description Tell the registry once a device list of Zigbee2mqtt (`bridge/devices`) is handled: when an entry
+ * changed, and while a device is ready, whose Gladys device may only now be known (one may have become ready
+ * meanwhile).
+ * @param {boolean} entriesChanged - Whether updatePairingFromList changed an entry.
  * @example
  * emitPairingDevicesAfterList(true);
  */
-function emitPairingDevicesAfterList(namesChanged) {
-  if (namesChanged || Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY)) {
+function emitPairingDevicesAfterList(entriesChanged) {
+  if (entriesChanged || Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY)) {
     this.emitPairingDevices();
   }
 }
@@ -160,5 +176,5 @@ module.exports = {
   emitPairingDevices,
   emitPairingDevicesAfterList,
   clearPairingDevices,
-  updatePairingNames,
+  updatePairingFromList,
 };

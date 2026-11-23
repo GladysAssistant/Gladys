@@ -203,11 +203,11 @@ describe('zigbee2mqtt pairingDevices', () => {
     });
   });
 
-  describe('updatePairingNames', () => {
+  describe('updatePairingFromList', () => {
     it('should follow a rename in Zigbee2mqtt, and leave telling it to the caller', () => {
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { ieee_address: IEEE } });
       gladys.event.emit = fake();
-      const changed = zigbee2MqttManager.updatePairingNames([
+      const changed = zigbee2MqttManager.updatePairingFromList([
         { ieee_address: IEEE, friendly_name: 'kitchen bulb' },
         { ieee_address: '0x99', friendly_name: 'other' },
         { ieee_address: '0x98' },
@@ -219,13 +219,75 @@ describe('zigbee2mqtt pairingDevices', () => {
 
     it('should tell that no name changed', () => {
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
-      const changed = zigbee2MqttManager.updatePairingNames([{ ieee_address: IEEE, friendly_name: 'a' }]);
+      const changed = zigbee2MqttManager.updatePairingFromList([{ ieee_address: IEEE, friendly_name: 'a' }]);
       expect(changed).to.equal(false);
+    });
+
+    it('should take the end of an interview whose event was missed', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_joined',
+        data: { friendly_name: 'b', ieee_address: '0x99' },
+      });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { friendly_name: 'c', ieee_address: '0x98', status: 'started' },
+      });
+      sinon.clock.tick(1000);
+      const changed = zigbee2MqttManager.updatePairingFromList([
+        { ieee_address: IEEE, friendly_name: 'a', interview_completed: true, supported: true, definition },
+        {
+          ieee_address: '0x99',
+          friendly_name: 'b',
+          interview_completed: true,
+          supported: false,
+          definition: { model: 'X1' },
+        },
+        { ieee_address: '0x98', friendly_name: 'c', interview_completed: true, supported: false, definition: null },
+      ]);
+      expect(changed).to.equal(true);
+      expect(zigbee2MqttManager.pairingDevices[IEEE]).to.deep.equal({
+        ieee_address: IEEE,
+        friendly_name: 'a',
+        status: 'ready',
+        model: 'LED1545G12',
+        vendor: 'IKEA',
+        description: 'TRADFRI bulb E27',
+        updated_at: '2026-11-20T10:00:01.000Z',
+      });
+      expect(zigbee2MqttManager.pairingDevices['0x99']).to.include({
+        status: 'unsupported',
+        model: 'X1',
+        vendor: null,
+      });
+      expect(zigbee2MqttManager.pairingDevices['0x98']).to.include({ status: 'unsupported', model: null });
+    });
+
+    it('should leave an interview not finished, and an outcome already told', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { friendly_name: 'b', ieee_address: '0x99', status: 'started' },
+      });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { friendly_name: 'c', ieee_address: '0x98', status: 'failed' },
+      });
+      const changed = zigbee2MqttManager.updatePairingFromList([
+        { ieee_address: IEEE, friendly_name: 'a', interview_completed: false, supported: false, definition: null },
+        // Interviewed again: the list still tells the former interview
+        { ieee_address: '0x99', friendly_name: 'b', interview_completed: true, interviewing: true, definition },
+        { ieee_address: '0x98', friendly_name: 'c', interview_completed: true, supported: true, definition },
+      ]);
+      expect(changed).to.equal(false);
+      expect(zigbee2MqttManager.pairingDevices[IEEE].status).to.equal('joined');
+      expect(zigbee2MqttManager.pairingDevices['0x99'].status).to.equal('interviewing');
+      expect(zigbee2MqttManager.pairingDevices['0x98'].status).to.equal('failed');
     });
   });
 
   describe('emitPairingDevicesAfterList', () => {
-    it('should tell the registry when a name changed', () => {
+    it('should tell the registry when an entry changed', () => {
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
       gladys.event.emit = fake();
       zigbee2MqttManager.emitPairingDevicesAfterList(true);

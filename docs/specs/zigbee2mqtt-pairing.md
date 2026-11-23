@@ -107,13 +107,17 @@ opened:
 | `device_interview` `successful`, not supported or no `definition` | create `unsupported` | `unsupported` | `unsupported`             |
 | `device_interview` `failed`                   | create `failed`         | `failed`                  | `failed` (a late failure of an earlier interview after `ready` is applied: Zigbee2mqtt says the last word) |
 | `device_leave`                                | —                       | removed                   | removed                            |
-| `bridge/devices`                              | —                       | name updated              | name updated; `device` computed again (`ready`) |
+| `bridge/devices`                              | —                       | name updated; the device listed with its interview finished (`interview_completed`, not `interviewing`): `ready` or `unsupported` as `device_interview` `successful` | name updated; `device` computed again (`ready`) |
 | a new window opens (`allowed` false → true, not the same window, B.1) | registry emptied | emptied | emptied |
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
 - `device_announce` is ignored: every known device announces itself when it powers up.
 - The names of a `bridge/devices` are taken as it arrives, before the Gladys devices renamed in
   Zigbee2mqtt are re-attached (an await): a name told meanwhile, more recent, is not replaced by them.
+- `bridge/event` is not retained, `bridge/devices` is: Gladys reconnecting to the broker (every 5 s,
+  the registry kept) misses the events told meanwhile, and gets the list again. A device whose
+  interview ended meanwhile is thus taken from the list, not left `joined` / `interviewing`. A failure
+  told meanwhile is not in the list: the entry waits for the device to join again.
 - Closing joining keeps the registry: an interview often ends after the window, and the user may add
   the ready devices later. A new run of Zigbee2mqtt keeps it too, and so does the same window told again
   after a reconnection or an init (B.1).

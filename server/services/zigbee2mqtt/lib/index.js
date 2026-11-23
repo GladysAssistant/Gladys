@@ -33,7 +33,7 @@ const {
   emitPairingDevices,
   emitPairingDevicesAfterList,
   clearPairingDevices,
-  updatePairingNames,
+  updatePairingFromList,
 } = require('./pairingDevices');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
 const { restoreZ2mBackup } = require('./restoreZ2mBackup');
@@ -218,7 +218,7 @@ Zigbee2mqttManager.prototype.getPairingDevices = getPairingDevices;
 Zigbee2mqttManager.prototype.emitPairingDevices = emitPairingDevices;
 Zigbee2mqttManager.prototype.emitPairingDevicesAfterList = emitPairingDevicesAfterList;
 Zigbee2mqttManager.prototype.clearPairingDevices = clearPairingDevices;
-Zigbee2mqttManager.prototype.updatePairingNames = updatePairingNames;
+Zigbee2mqttManager.prototype.updatePairingFromList = updatePairingFromList;
 Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
