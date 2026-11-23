@@ -196,6 +196,18 @@ function getCandidateMechanisms(system) {
 }
 
 /**
+ * @description Tell whether the host is known to be a container, from what was
+ * already read of it, without asking anything.
+ * @param {object} system - The System instance.
+ * @returns {boolean} True if the host is known to be a container.
+ * @example
+ * isKnownContainer(system);
+ */
+function isKnownContainer(system) {
+  return CONTAINER_VIRTUALIZATIONS.includes(system.hostVirtualization);
+}
+
+/**
  * @description Tell whether the host is itself a container (Docker in a Proxmox
  * LXC, for example). It never changes while Gladys runs: it is asked once, and
  * asked again only while it could not be read.
@@ -213,7 +225,7 @@ async function isHostContainer(mechanism) {
       logger.debug(`System: unable to read the virtualization of the host via ${mechanism}: ${e.message}`);
     }
   }
-  return CONTAINER_VIRTUALIZATIONS.includes(this.hostVirtualization);
+  return isKnownContainer(this);
 }
 
 /**
@@ -239,10 +251,11 @@ async function readTimeSyncStatus() {
       if (status) {
         this.timeSyncMechanism = mechanism;
         // only worth a second question (and a helper container) when no time
-        // service of the host plainly keeps the clock on time
+        // service of the host plainly keeps the clock on time; otherwise what
+        // is already known of the host is still reported
         const keptOnTime = status.ntp_enabled && status.ntp_synchronized;
         // eslint-disable-next-line no-await-in-loop
-        const inContainer = !keptOnTime && (await isHostContainer.call(this, mechanism));
+        const inContainer = keptOnTime ? isKnownContainer(this) : await isHostContainer.call(this, mechanism);
         return { available: true, ...status, in_container: inContainer };
       }
       logger.debug(`System: unexpected systemd-timedated answer via ${mechanism}: ${output}`);
@@ -314,7 +327,9 @@ async function enableTimeSync() {
   if (!status.available) {
     throw new PlatformNotCompatible('TIME_SYNC_NOT_AVAILABLE');
   }
-  if (status.in_container) {
+  // the status of a host kept on time does not ask whether it is a container:
+  // asked here before any change (once per process, then known)
+  if (status.in_container || (await isHostContainer.call(this, this.timeSyncMechanism))) {
     throw new PlatformNotCompatible('TIME_SYNC_IN_CONTAINER');
   }
   if (!status.can_ntp) {

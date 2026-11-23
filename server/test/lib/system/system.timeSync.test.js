@@ -236,6 +236,14 @@ describe('system.getTimeSyncStatus', () => {
     };
   };
 
+  it('should report a host already known as a container even when it is kept on time, without asking again', async () => {
+    const runHostDbusCommand = sinon.stub().resolves(buildGetAllOutput());
+    const system = buildSystem(runHostDbusCommand);
+    system.hostVirtualization = 'lxc';
+    expect((await getTimeSyncStatusWithFs.call(system)).in_container).to.equal(true);
+    sinon.assert.calledOnce(runHostDbusCommand);
+  });
+
   it('should report that the host is a container, and ask it only once', async () => {
     const { runHostDbusCommand, virtualization } = stubHostNotKeptOnTime();
     virtualization.resolves(buildVirtualizationOutput('lxc'));
@@ -362,8 +370,9 @@ describe('system.getTimeSyncStatus', () => {
 });
 
 describe('system.enableTimeSync', () => {
-  const buildSystem = (status, newStatus) => ({
+  const buildSystem = (status, newStatus, hostVirtualization = '') => ({
     timeSyncMechanism: 'docker-helper',
+    hostVirtualization,
     timeSyncStatus: status,
     timeSyncStatusReadAt: Date.now(),
     timeSyncStatusInFlight: null,
@@ -422,6 +431,57 @@ describe('system.enableTimeSync', () => {
     await clock.tickAsync(TIME_SYNC_SETTLE_MS);
     expect(await promise).to.deep.equal(notRunning);
     sinon.assert.calledOnce(logger.warn);
+  });
+
+  it('should refuse when the host is known as a container, even if the status does not say so', async () => {
+    const system = buildSystem(
+      { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: true, in_container: false },
+      undefined,
+      'lxc',
+    );
+    let caught;
+    try {
+      await enableTimeSync.call(system);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught.message).to.equal('TIME_SYNC_IN_CONTAINER');
+    sinon.assert.notCalled(system.runHostDbusCommand);
+  });
+
+  it('should ask whether the host is a container before turning on NTP, and refuse in a container', async () => {
+    const system = buildSystem(
+      { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: true, in_container: false },
+      undefined,
+      null,
+    );
+    system.runHostDbusCommand
+      .withArgs(buildVirtualizationArgv(), 'docker-helper', 'host-virtualization')
+      .resolves(buildVirtualizationOutput('lxc'));
+    let caught;
+    try {
+      await enableTimeSync.call(system);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught.message).to.equal('TIME_SYNC_IN_CONTAINER');
+    sinon.assert.neverCalledWith(system.runHostDbusCommand, buildEnableTimeSyncArgv());
+  });
+
+  it('should ask whether the host is a container before turning on NTP, and go on when it is not', async () => {
+    const system = buildSystem(
+      { available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false, in_container: false },
+      undefined,
+      null,
+    );
+    system.runHostDbusCommand
+      .withArgs(buildVirtualizationArgv(), 'docker-helper', 'host-virtualization')
+      .resolves(buildVirtualizationOutput('kvm'));
+    const promise = enableTimeSync.call(system);
+    await clock.tickAsync(TIME_SYNC_SETTLE_MS);
+    await promise;
+    expect(system.hostVirtualization).to.equal('kvm');
+    sinon.assert.calledWith(system.runHostDbusCommand, buildEnableTimeSyncArgv(), 'docker-helper', 'time-sync-enable');
   });
 
   it('should refuse when the host is a container', async () => {
