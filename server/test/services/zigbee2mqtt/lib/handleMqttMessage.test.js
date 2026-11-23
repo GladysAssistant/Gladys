@@ -526,6 +526,27 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     clock.restore();
   });
 
+  it('should tell the answer of an Extend that changes nothing (Zigbee2mqtt 1, another clock)', async () => {
+    const clock = sinon.useFakeTimers(new Date('2026-11-20T10:00:00.000Z'));
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{"time":254},"status":"ok"}`,
+    );
+    clock.tick(2000);
+    gladys.event.emit = fake();
+    // EXECUTE: within 5 s of the end known, no exact end follows
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{"time":254},"status":"ok"}`,
+    );
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: { allowed: true, remainingSeconds: 252 },
+    });
+    clock.restore();
+  });
+
   it('should get permit join from response/permit_join with time 0', async () => {
     zigbee2mqttManager.z2mPermitJoin = true;
     // EXECUTE

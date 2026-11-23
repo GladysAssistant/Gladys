@@ -39,12 +39,13 @@ function isSameEnd(end, otherEnd) {
  * @param {number} [end] - When joining closes, epoch in ms; ignored when not allowed. Without a usable one (Zigbee2mqtt
  * 1, another clock), the end already known for the window is kept.
  * @param {object} [options] - `estimated`: the end is the estimate of a response, the exact one told by bridge/info is
- * kept; `forgotten`: Gladys forgets joining (init), Zigbee2mqtt did not close it.
+ * kept; `forgotten`: Gladys forgets joining (init), Zigbee2mqtt did not close it; `answered`: the answer of a request,
+ * told even when it changes nothing (the pairing window waits for it, B.2).
  * @example
  * updatePermitJoin(true, Date.now() + 254000);
  */
 function updatePermitJoin(allowed, end, options = {}) {
-  const { estimated = false, forgotten = false } = options;
+  const { estimated = false, forgotten = false, answered = false } = options;
   const usableEnd = isPlausibleEnd(end) ? end : null;
   const sameWindow = this.permitJoinWindowSeen;
   const lastWindowRunning = this.lastPermitJoinEnd !== null && this.lastPermitJoinEnd > Date.now();
@@ -68,7 +69,7 @@ function updatePermitJoin(allowed, end, options = {}) {
   if (allowed) {
     this.permitJoinWindowSeen = true;
   }
-  if (allowed === this.z2mPermitJoin && permitJoinEnd === this.z2mPermitJoinEnd) {
+  if (!answered && allowed === this.z2mPermitJoin && permitJoinEnd === this.z2mPermitJoinEnd) {
     return;
   }
   const opened = allowed && !this.z2mPermitJoin && !sameWindow;

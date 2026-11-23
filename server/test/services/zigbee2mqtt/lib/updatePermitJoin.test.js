@@ -166,6 +166,29 @@ describe('zigbee2mqtt updatePermitJoin', () => {
     expect(zigbee2MqttManager.pairingDevices).to.deep.equal({});
   });
 
+  it('should tell the answer of a request even when it changes nothing', () => {
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000, { estimated: true });
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    gladys.event.emit = fake();
+    // Extend within 5 s of the known end (Zigbee2mqtt 1, or another clock: no bridge/info end follows)
+    sinon.clock.tick(2000);
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 256000, { estimated: true, answered: true });
+    expect(zigbee2MqttManager.z2mPermitJoinEnd).to.equal(NOW + 254000);
+    expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: { allowed: true, remainingSeconds: 252 },
+    });
+    // A stop while joining is already closed
+    zigbee2MqttManager.updatePermitJoin(false);
+    gladys.event.emit = fake();
+    zigbee2MqttManager.updatePermitJoin(false, undefined, { answered: true });
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: { allowed: false, remainingSeconds: null },
+    });
+  });
+
   it('should keep the end of the open window when Zigbee2mqtt tells none (Zigbee2mqtt 1)', () => {
     zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
     gladys.event.emit = fake();

@@ -126,10 +126,14 @@ async function handleMqttMessage(topic, message) {
       const { time, value } = (response.status === 'ok' && response.data) || {};
       // `time` for Zigbee2mqtt 2, `value` alone for Zigbee2mqtt 1 asked by another client (its interface)
       if (typeof time === 'number' ? time > 0 : value === true) {
-        // An estimate: the end bridge/info tells (before or after this answer) is the exact one, and kept
-        this.updatePermitJoin(true, typeof time === 'number' ? Date.now() + time * 1000 : null, { estimated: true });
+        // An estimate: the end bridge/info tells (before or after this answer) is the exact one, and kept. Told even
+        // when nothing changes: the window waits for the answer of its request (an Extend within the same end)
+        this.updatePermitJoin(true, typeof time === 'number' ? Date.now() + time * 1000 : null, {
+          estimated: true,
+          answered: true,
+        });
       } else if (typeof time === 'number' || value === false) {
-        this.updatePermitJoin(false);
+        this.updatePermitJoin(false, undefined, { answered: true });
       }
       break;
     }
