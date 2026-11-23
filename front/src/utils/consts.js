@@ -568,7 +568,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.MUSIC.PREVIOUS]: 'rewind',
     [DEVICE_FEATURE_TYPES.MUSIC.NEXT]: 'fast-forward',
     [DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE]: 'bar-chart-2',
-    [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'bell',
+    // a text read out loud by the device (an announcement), not a notification bell
+    [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'volume-2',
     [DEVICE_FEATURE_TYPES.MUSIC.TITLE]: 'music',
     [DEVICE_FEATURE_TYPES.MUSIC.ARTIST]: 'user',
     [DEVICE_FEATURE_TYPES.MUSIC.ALBUM]: 'disc',

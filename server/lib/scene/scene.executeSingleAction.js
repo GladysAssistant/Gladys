@@ -5,9 +5,21 @@ const executeActionsFactory = require('./scene.executeActions');
 const actionsFunc = require('./scene.actions');
 const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES, DEVICE_SET_VALUE_ERROR_CAUSES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { NotFoundError, ServiceNotConfiguredError, BadParameters, AbortScene } = require('../../utils/coreErrors');
+const {
+  NotFoundError,
+  ServiceNotConfiguredError,
+  BadParameters,
+  AbortScene,
+  VoiceUnavailableError,
+  VOICE_UNAVAILABLE_REASONS,
+} = require('../../utils/coreErrors');
 
 const { executeAction } = executeActionsFactory(actionsFunc);
+
+const VOICE_CAUSE_BY_REASON = {
+  [VOICE_UNAVAILABLE_REASONS.SUBSCRIPTION_REQUIRED]: DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_SUBSCRIPTION_REQUIRED,
+  [VOICE_UNAVAILABLE_REASONS.QUOTA_REACHED]: DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_QUOTA_REACHED,
+};
 
 /**
  * @description Why a value could not be set, as one of DEVICE_SET_VALUE_ERROR_CAUSES: the
@@ -27,6 +39,9 @@ function getSetValueErrorCause(error, deviceFeature) {
   }
   if (error instanceof BadParameters || error instanceof AbortScene) {
     return DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED;
+  }
+  if (error instanceof VoiceUnavailableError) {
+    return VOICE_CAUSE_BY_REASON[error.reason] || DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_UNAVAILABLE;
   }
   return DEVICE_SET_VALUE_ERROR_CAUSES.UNREACHABLE;
 }
@@ -63,6 +78,8 @@ function notifySetValueError(self, action, error) {
       device_selector: device ? device.selector : action.device || null,
       device_name: device ? device.name : null,
       value: action.value,
+      // a text which was to be read out loud: the widget keeps it for another try
+      ...(action.speak === true ? { speak: true } : {}),
       // the state to go back to (null when the device or the feature does not exist)
       last_value: deviceFeature ? deviceFeature.last_value : null,
       last_value_string: deviceFeature ? deviceFeature.last_value_string : null,

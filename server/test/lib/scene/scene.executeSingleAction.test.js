@@ -15,6 +15,7 @@ const {
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
 const { NotFoundError, ServiceNotConfiguredError, BadParameters, AbortScene } = require('../../../utils/coreErrors');
+const { Error402, Error403, Error429 } = require('../../../utils/httpErrors');
 
 const event = new EventEmitter();
 
@@ -434,5 +435,240 @@ describe('scene.executeSingleAction, a value asked by a user which cannot be set
       user_id: USER_ID,
     });
     expect(messagesSentToOneUser()).to.deep.equal([]);
+  });
+});
+
+describe('scene.executeSingleAction, a text to read out loud on a device', () => {
+  const USER_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
+  const CLIENT_ID = 'd9a4bfd4-1c0e-4a3a-9c0f-6f1f0a6a2a11';
+  const CLIP_URL = 'http://192.168.1.10:1443/api/v1/tts/audio/token.mp3';
+  const notificationFeature = {
+    selector: 'rabbit-notification',
+    name: 'Play notification',
+    device_id: 'device-id-2',
+    category: DEVICE_FEATURE_CATEGORIES.MUSIC,
+    type: DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
+    last_value: null,
+    last_value_string: null,
+    last_value_changed: null,
+  };
+  const volumeFeature = {
+    selector: 'rabbit-volume',
+    name: 'Volume',
+    device_id: 'device-id-2',
+    category: DEVICE_FEATURE_CATEGORIES.MUSIC,
+    type: DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
+    last_value: 50,
+    last_value_string: null,
+    last_value_changed: null,
+  };
+  const rabbit = {
+    id: 'device-id-2',
+    selector: 'rabbit',
+    name: 'Rabbit',
+    features: [notificationFeature, volumeFeature],
+  };
+  // what the devices widget sends
+  const command = {
+    type: ACTIONS.DEVICE.SET_VALUE,
+    device_feature: 'rabbit-notification',
+    speak: true,
+    user_id: USER_ID,
+    client_id: CLIENT_ID,
+  };
+  let eventFake;
+  let device;
+  let tts;
+  let sceneManager;
+  const errorsSentToTheUser = () =>
+    eventFake.emit
+      .getCalls()
+      .filter((call) => call.args[0] === EVENTS.WEBSOCKET.SEND)
+      .map((call) => call.args[1].payload);
+  const causesSentToTheUser = () => errorsSentToTheUser().map(({ cause }) => cause);
+
+  beforeEach(() => {
+    const stateManager = new StateManager();
+    stateManager.setState('device', 'rabbit', rabbit);
+    stateManager.setState('deviceById', 'device-id-2', rabbit);
+    stateManager.setState('deviceFeature', 'rabbit-notification', notificationFeature);
+    stateManager.setState('deviceFeature', 'rabbit-volume', volumeFeature);
+    stateManager.setState('userById', USER_ID, { id: USER_ID, language: 'fr' });
+    eventFake = { emit: fake.returns(null), on: fake.returns(null) };
+    device = { setValue: fake.resolves(null) };
+    tts = {
+      getSpeechUrl: fake.resolves({ url: CLIP_URL, provider: 'tts-piper' }),
+      getActiveProvider: fake.resolves('tts-piper'),
+    };
+    sceneManager = new SceneManager(stateManager, eventFake, device);
+    sceneManager.tts = tts;
+    sceneManager.gateway = { getStatus: fake.resolves({ configured: true }) };
+  });
+
+  it('should send the clip of the text, said in the language of its author, to the device (feature selector)', async () => {
+    await sceneManager.executeSingleAction({ ...command, value: "Hi, it's dad!" });
+    assert.calledOnceWithExactly(tts.getSpeechUrl, { text: "Hi, it's dad!", language: 'fr' });
+    assert.calledOnceWithExactly(device.setValue, rabbit, notificationFeature, CLIP_URL);
+    expect(errorsSentToTheUser()).to.deep.equal([]);
+  });
+
+  it('should send the clip of the text to the device (device, category and type)', async () => {
+    await sceneManager.executeSingleAction({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      device: 'rabbit',
+      feature_category: DEVICE_FEATURE_CATEGORIES.MUSIC,
+      feature_type: DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
+      value: 'Hello',
+      speak: true,
+      user_id: USER_ID,
+    });
+    assert.calledOnceWithExactly(tts.getSpeechUrl, { text: 'Hello', language: 'fr' });
+    assert.calledOnceWithExactly(device.setValue, rabbit, notificationFeature, CLIP_URL);
+  });
+
+  it('should leave the language to the voice when the author is not known', async () => {
+    await sceneManager.executeSingleAction({ ...command, value: 'Hello', user_id: undefined });
+    assert.calledOnceWithExactly(tts.getSpeechUrl, { text: 'Hello', language: null });
+    await sceneManager.executeSingleAction({ ...command, value: 'Hello', user_id: 'a-user-gone-since' });
+    assert.calledWithExactly(tts.getSpeechUrl.secondCall, { text: 'Hello', language: null });
+    assert.calledTwice(device.setValue);
+  });
+
+  it('should read the text as it is: a number, a URL and braces are only words', async () => {
+    const texts = ['42', 'http://example.com/sound.mp3', '{{0.0.last_value}} {{'];
+    for (let i = 0; i < texts.length; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      await sceneManager.executeSingleAction({ ...command, value: texts[i] });
+    }
+    expect(tts.getSpeechUrl.args.map(([{ text }]) => text)).to.deep.equal(texts);
+    expect(device.setValue.args.map(([, , value]) => value)).to.deep.equal([CLIP_URL, CLIP_URL, CLIP_URL]);
+  });
+
+  it('should take a text of 2000 characters', async () => {
+    await sceneManager.executeSingleAction({ ...command, value: 'a'.repeat(2000) });
+    assert.calledOnce(device.setValue);
+  });
+
+  [
+    { name: 'a blank text', action: { value: '   ' } },
+    { name: 'a text of more than 2000 characters', action: { value: 'a'.repeat(2001) } },
+    { name: 'a value which is not a text', action: { value: 1 } },
+    {
+      name: 'a text for a feature which is not a notification',
+      action: { value: 'Hello', device_feature: 'rabbit-volume' },
+    },
+  ].forEach(({ name, action }) => {
+    it(`should refuse ${name}, without asking the voice`, async () => {
+      await sceneManager.executeSingleAction({ ...command, ...action });
+      assert.notCalled(tts.getSpeechUrl);
+      assert.notCalled(device.setValue);
+      expect(causesSentToTheUser()).to.deep.equal([DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED]);
+    });
+  });
+
+  [
+    {
+      name: 'the voice integration is gone',
+      getSpeechUrl: fake.rejects(new NotFoundError('TTS provider is not available')),
+      activeProvider: 'tts-piper',
+    },
+    {
+      name: 'a voice integration throws what Gladys Plus would',
+      getSpeechUrl: fake.rejects(new Error429('Too many requests')),
+      activeProvider: 'tts-piper',
+    },
+    {
+      name: 'Gladys Plus fails otherwise',
+      getSpeechUrl: fake.rejects(new Error('socket hang up')),
+      activeProvider: 'gladys-plus',
+    },
+    {
+      name: 'Gladys Plus gives no URL',
+      getSpeechUrl: fake.resolves({ url: null, provider: 'gladys-plus' }),
+      activeProvider: 'gladys-plus',
+    },
+  ].forEach(({ name, getSpeechUrl, activeProvider }) => {
+    it(`should tell the user that the voice is not available when ${name}`, async () => {
+      tts.getSpeechUrl = getSpeechUrl;
+      tts.getActiveProvider = fake.resolves(activeProvider);
+      await sceneManager.executeSingleAction({ ...command, value: 'Hello' });
+      assert.notCalled(device.setValue);
+      expect(errorsSentToTheUser()).to.deep.equal([
+        {
+          client_id: CLIENT_ID,
+          cause: DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_UNAVAILABLE,
+          device_feature_selector: 'rabbit-notification',
+          device_feature_name: 'Play notification',
+          device_selector: 'rabbit',
+          device_name: 'Rabbit',
+          value: 'Hello',
+          speak: true,
+          last_value: null,
+          last_value_string: null,
+          last_value_changed: null,
+        },
+      ]);
+    });
+  });
+
+  [
+    { error: new Error402('Payment required'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_SUBSCRIPTION_REQUIRED },
+    { error: new Error403('Forbidden'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_SUBSCRIPTION_REQUIRED },
+    { error: new Error429('Too many requests'), cause: DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_QUOTA_REACHED },
+  ].forEach(({ error, cause }) => {
+    it(`should tell the user what to do when Gladys Plus is the voice and answers ${error.status}`, async () => {
+      tts.getSpeechUrl = fake.rejects(error);
+      tts.getActiveProvider = fake.resolves('gladys-plus');
+      await sceneManager.executeSingleAction({ ...command, value: 'Hello' });
+      assert.notCalled(device.setValue);
+      expect(causesSentToTheUser()).to.deep.equal([cause]);
+    });
+  });
+
+  it('should tell the user what to do when Gladys Plus is the voice of an instance not linked to it', async () => {
+    // what the call to Gladys Plus throws without an account
+    tts.getSpeechUrl = fake.rejects(new Error('Request failed with status code 401'));
+    tts.getActiveProvider = fake.resolves('gladys-plus');
+    sceneManager.gateway.getStatus = fake.resolves({ configured: false });
+    await sceneManager.executeSingleAction({ ...command, value: 'Hello' });
+    assert.notCalled(device.setValue);
+    expect(causesSentToTheUser()).to.deep.equal([DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_SUBSCRIPTION_REQUIRED]);
+  });
+
+  it('should tell the user that the device is unreachable when it could not play the clip', async () => {
+    device.setValue = fake.rejects(new Error('Device not found on network'));
+    await sceneManager.executeSingleAction({ ...command, value: 'Hello' });
+    expect(causesSentToTheUser()).to.deep.equal([DEVICE_SET_VALUE_ERROR_CAUSES.UNREACHABLE]);
+  });
+
+  describe('when the caller does not ask for it', () => {
+    const { speak, ...withoutSpeak } = command;
+
+    it('should send a number as it is, even sent as a string by a user (an MQTT device playing its own sound)', async () => {
+      await sceneManager.executeSingleAction({ ...withoutSpeak, value: 1 });
+      await sceneManager.executeSingleAction({ ...withoutSpeak, value: '1' });
+      assert.notCalled(tts.getSpeechUrl);
+      expect(device.setValue.args).to.deep.equal([
+        [rabbit, notificationFeature, 1],
+        [rabbit, notificationFeature, 1],
+      ]);
+    });
+
+    it('should send a number in a scene, even when the editor stored it as a string', async () => {
+      await sceneManager.executeSingleAction({
+        type: ACTIONS.DEVICE.SET_VALUE,
+        device_feature: 'rabbit-notification',
+        value: '1',
+      });
+      assert.notCalled(tts.getSpeechUrl);
+      assert.calledOnceWithExactly(device.setValue, rabbit, notificationFeature, 1);
+    });
+
+    it('should not read a text out loud: a scene has its own action for it', async () => {
+      await sceneManager.executeSingleAction({ ...withoutSpeak, value: 'Hello' });
+      await sceneManager.executeSingleAction({ ...withoutSpeak, value: 'Hello', speak: 'true' });
+      assert.notCalled(tts.getSpeechUrl);
+      assert.notCalled(device.setValue);
+    });
   });
 });

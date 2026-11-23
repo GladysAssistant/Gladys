@@ -642,6 +642,20 @@ describe('POST /api/v1/device_feature/:device_feature_selector/value', () => {
     const tooLong = await send({ value: 1, client_id: 'a'.repeat(200) });
     expect(tooLong.emitted[0][1].client_id).to.equal('a'.repeat(64));
   });
+
+  it('should keep a text to read out loud, only when the caller says so with true', async () => {
+    const spoken = await send({ value: 'Hello', speak: true });
+    expect(spoken.answer).to.deep.equal({ ...action, value: 'Hello', speak: true });
+    expect(spoken.emitted[0][1]).to.include({ value: 'Hello', speak: true, user_id: USER_ID });
+    // anything but true leaves the value as it is
+    await Promise.all(
+      ['true', 1, {}, false].map(async (speak) => {
+        const { answer, emitted } = await send({ value: 'Hello', speak });
+        expect(answer).to.not.have.property('speak');
+        expect(emitted[0][1]).to.not.have.property('speak');
+      }),
+    );
+  });
 });
 
 describe('POST /api/v1/device/:device_selector/:feature_category/:feature_type/value', () => {
@@ -680,6 +694,20 @@ describe('POST /api/v1/device/:device_selector/:feature_category/:feature_type/v
         },
       ],
     ]);
+  });
+
+  it('should keep a text to read out loud', async () => {
+    const emitted = [];
+    const controller = DeviceController({ event: { emit: (...args) => emitted.push(args) } });
+    await controller.setValue(
+      {
+        params: { device_selector: 'test-device', feature_category: 'music', feature_type: 'play_notification' },
+        body: { value: 'Hello', speak: true },
+        user: { id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' },
+      },
+      { json: () => {} },
+    );
+    expect(emitted[0][1]).to.include({ value: 'Hello', speak: true });
   });
 });
 

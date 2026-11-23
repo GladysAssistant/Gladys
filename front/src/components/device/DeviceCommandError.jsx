@@ -15,6 +15,9 @@ const SENTENCE_BY_CAUSE = {
   [DEVICE_SET_VALUE_ERROR_CAUSES.NOT_CONFIGURED]: 'notConfigured',
   [DEVICE_SET_VALUE_ERROR_CAUSES.NOT_FOUND]: 'notFound',
   [DEVICE_SET_VALUE_ERROR_CAUSES.REFUSED]: 'refused',
+  [DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_UNAVAILABLE]: 'voiceUnavailable',
+  [DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_SUBSCRIPTION_REQUIRED]: 'voiceSubscriptionRequired',
+  [DEVICE_SET_VALUE_ERROR_CAUSES.VOICE_QUOTA_REACHED]: 'voiceQuotaReached',
   [GLADYS_UNREACHABLE_CAUSE]: 'gladysUnreachable'
 };
 // The sentences which name no device: a device which no longer exists has no name to give, and
@@ -85,7 +88,9 @@ class DeviceCommandError extends Component {
       // two failed commands on the same device are one failure to tell
       device: payload.device_selector || payload.device_name || payload.device_feature_selector,
       name: payload.device_name || payload.device_feature_name || null,
-      sentence: SENTENCE_BY_CAUSE[payload.cause] || 'unreachable'
+      sentence: SENTENCE_BY_CAUSE[payload.cause] || 'unreachable',
+      // a text to read out loud waits in its widget for another try
+      textKept: payload.speak === true
     };
     this.setState(({ failures, toastKey }) => ({
       failures: [...failures.filter(({ device }) => device !== failure.device), failure],
@@ -126,7 +131,7 @@ class DeviceCommandError extends Component {
     if (failures.length === 0) {
       return null;
     }
-    const [{ name, sentence }] = failures;
+    const [{ name, sentence, textKept }] = failures;
     const sameCause = failures.every(failure => failure.sentence === sentence);
     if (failures.length > 1) {
       // Gladys unreachable is one cause for all of them; anything else is told by its number
@@ -139,7 +144,15 @@ class DeviceCommandError extends Component {
     if (!name && !SENTENCES_WITHOUT_NAME.includes(sentence)) {
       return <Text id="device.setValueError.unknownDevice" />;
     }
-    return <Text id={`device.setValueError.${sentence}`} fields={{ name }} />;
+    const message = <Text id={`device.setValueError.${sentence}`} fields={{ name }} />;
+    if (!textKept) {
+      return message;
+    }
+    return (
+      <span>
+        {message} <Text id="device.setValueError.textKept" />
+      </span>
+    );
   };
 
   render(props, { failures, toastKey }) {

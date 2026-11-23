@@ -61,13 +61,14 @@ const SUPPORTED_FEATURE_TYPES_BY_CATEGORY = {
   ],
   [DEVICE_FEATURE_CATEGORIES.TEXT]: [DEVICE_FEATURE_TYPES.TEXT.SELECT],
   // The controls of a music player the room widget can render as a row: a play/pause switch,
-  // two on/off toggles and the repeat mode. The seek position and the catalog belong to the
-  // music box (capabilities/music.md, section 6).
+  // two on/off toggles, the repeat mode and a text to read out loud. The seek position and the
+  // catalog belong to the music box (capabilities/music.md, section 6).
   [DEVICE_FEATURE_CATEGORIES.MUSIC]: [
     DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE,
     DEVICE_FEATURE_TYPES.MUSIC.SHUFFLE,
     DEVICE_FEATURE_TYPES.MUSIC.REPEAT,
-    DEVICE_FEATURE_TYPES.MUSIC.MUTE
+    DEVICE_FEATURE_TYPES.MUSIC.MUTE,
+    DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION
   ],
   // Hushing a detector is a control, but scoped to its category: it must never be picked up by
   // the generic switch handling (quick actions, "turn everything off"…)
