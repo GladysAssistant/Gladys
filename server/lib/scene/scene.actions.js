@@ -199,6 +199,12 @@ const actionsFunc = {
       deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
     }
 
+    // A text to read out loud, when the caller says so (the devices widget). Checked first: only
+    // a notification feature reads a text out loud, any other feature refuses it, a text one too.
+    if (action.speak === true) {
+      return speakOnDevice(self, action, device, deviceFeature);
+    }
+
     let { value } = action;
 
     // A text feature (a message displayed on a TV, a text virtual sensor, a select among
@@ -218,11 +224,6 @@ const actionsFunc = {
         throw new AbortScene('ACTION_VALUE_EMPTY');
       }
       return self.device.setValue(device, deviceFeature, String(value));
-    }
-
-    // A text to read out loud, when the caller says so (the devices widget)
-    if (action.speak === true) {
-      return speakOnDevice(self, action, device, deviceFeature);
     }
 
     if (action.evaluate_value !== undefined) {

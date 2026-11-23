@@ -49,9 +49,15 @@ class MusicPlayNotificationDeviceFeature extends Component {
     this.textField = element;
   };
 
+  setButtonRef = element => {
+    this.button = element;
+  };
+
   openSheet = () => {
     // with a mouse, the button that opened the sheet gets the focus back when it closes
     const hasMouse = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+    // the sheet gives the focus back to what had it at the tap: the stand-in, gone by then
+    this.giveFocusBack = !hasMouse;
     if (!hasMouse) {
       this.dropStandIn();
       this.standIn = holdKeyboard();
@@ -141,6 +147,13 @@ class MusicPlayNotificationDeviceFeature extends Component {
       }
       this.dropStandIn();
     }
+    // after the sheet tried (BottomSheet.jsx), whatever closed it: Escape, the cross, a send
+    if (!this.state.open && previousState.open && this.giveFocusBack) {
+      this.giveFocusBack = false;
+      if (this.button) {
+        this.button.focus({ preventScroll: true });
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -162,6 +175,7 @@ class MusicPlayNotificationDeviceFeature extends Component {
           <td>{rowName}</td>
           <td class="text-right">
             <button
+              ref={this.setButtonRef}
               type="button"
               onClick={this.openSheet}
               class="btn btn-outline-success btn-sm"
