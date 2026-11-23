@@ -7,9 +7,12 @@ const {
   getTimeSyncStatus,
   enableTimeSync,
   parseTimeSyncStatus,
+  parseVirtualization,
   buildTimeSyncStatusArgv,
   buildEnableTimeSyncArgv,
+  buildVirtualizationArgv,
   TIME_SYNC_STATUS_CACHE_MS,
+  TIME_SYNC_SETTLE_MS,
 } = require('../../../lib/system/system.timeSync');
 
 // What `dbus-send --print-reply ... Properties.GetAll string:org.freedesktop.timedate1` prints
@@ -29,6 +32,13 @@ const buildGetAllOutput = ({ canNtp = true, ntp = true, ntpSynchronized = true }
   ].join('');
 };
 
+// What `dbus-send --print-reply ... Properties.Get ... string:Virtualization` prints
+const buildVirtualizationOutput = (virtualization) =>
+  [
+    'method return time=1700000000.000000 sender=:1.2 -> destination=:1.43 serial=5 reply_serial=2\n',
+    `   variant       string "${virtualization}"\n`,
+  ].join('');
+
 describe('system.timeSync argv', () => {
   it('should read all the systemd-timedated properties', () => {
     const argv = buildTimeSyncStatusArgv();
@@ -42,6 +52,39 @@ describe('system.timeSync argv', () => {
     const argv = buildEnableTimeSyncArgv();
     expect(argv).to.include('org.freedesktop.timedate1.SetNTP');
     expect(argv.slice(-2)).to.deep.equal(['boolean:true', 'boolean:false']);
+  });
+
+  it('should ask systemd for the virtualization of the host', () => {
+    expect(buildVirtualizationArgv()).to.deep.equal([
+      'dbus-send',
+      '--system',
+      '--print-reply',
+      '--dest=org.freedesktop.systemd1',
+      '/org/freedesktop/systemd1',
+      'org.freedesktop.DBus.Properties.Get',
+      'string:org.freedesktop.systemd1.Manager',
+      'string:Virtualization',
+    ]);
+  });
+});
+
+describe('system.parseVirtualization', () => {
+  it('should parse a container', () => {
+    expect(parseVirtualization(buildVirtualizationOutput('lxc'))).to.equal('lxc');
+  });
+
+  it('should parse a bare-metal host', () => {
+    expect(parseVirtualization(buildVirtualizationOutput(''))).to.equal('');
+  });
+
+  it('should strip the Docker log frame headers', () => {
+    const output = `\u0001\u0000\u0000\u0000\u0000\u0000\u0000\u0080${buildVirtualizationOutput('lxc')}`;
+    expect(parseVirtualization(output)).to.equal('lxc');
+  });
+
+  it('should return null when the output is not an answer of systemd', () => {
+    expect(parseVirtualization('Error org.freedesktop.DBus.Error.ServiceUnknown')).to.equal(null);
+    expect(parseVirtualization(undefined)).to.equal(null);
   });
 });
 
@@ -119,14 +162,22 @@ describe('system.getTimeSyncStatus', () => {
     timeSyncStatus: null,
     timeSyncStatusReadAt: null,
     timeSyncStatusInFlight: null,
+    hostVirtualization: null,
     runHostDbusCommand,
   });
 
   it('should read the status through the Docker helper', async () => {
-    const runHostDbusCommand = sinon.stub().resolves(buildGetAllOutput({ ntp: false, ntpSynchronized: false }));
+    const runHostDbusCommand = sinon.stub().resolves(buildGetAllOutput());
     const system = buildSystem(runHostDbusCommand);
     const status = await getTimeSyncStatusWithFs.call(system);
-    expect(status).to.deep.equal({ available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false });
+    expect(status).to.deep.equal({
+      available: true,
+      can_ntp: true,
+      ntp_enabled: true,
+      ntp_synchronized: true,
+      in_container: false,
+    });
+    // a host plainly kept on time is not asked whether it is a container
     sinon.assert.calledOnceWithExactly(
       runHostDbusCommand,
       buildTimeSyncStatusArgv(),
@@ -163,8 +214,74 @@ describe('system.getTimeSyncStatus', () => {
     const system = buildSystem(runHostDbusCommand);
     system.timeSyncMechanism = 'local';
     const status = await getTimeSyncStatusWithFs.call(system);
-    expect(status).to.deep.equal({ available: false, can_ntp: false, ntp_enabled: false, ntp_synchronized: false });
+    expect(status).to.deep.equal({
+      available: false,
+      can_ntp: false,
+      ntp_enabled: false,
+      ntp_synchronized: false,
+      in_container: false,
+    });
     expect(system.timeSyncMechanism).to.equal(null);
+  });
+
+  // a host whose time service is not running, with the given answers about its virtualization
+  const stubHostNotKeptOnTime = () => {
+    const runHostDbusCommand = sinon.stub();
+    runHostDbusCommand
+      .withArgs(sinon.match.any, sinon.match.any, 'time-sync-status')
+      .resolves(buildGetAllOutput({ ntp: false, ntpSynchronized: true }));
+    return {
+      runHostDbusCommand,
+      virtualization: runHostDbusCommand.withArgs(buildVirtualizationArgv(), 'docker-helper', 'host-virtualization'),
+    };
+  };
+
+  it('should report a host already known as a container even when it is kept on time, without asking again', async () => {
+    const runHostDbusCommand = sinon.stub().resolves(buildGetAllOutput());
+    const system = buildSystem(runHostDbusCommand);
+    system.hostVirtualization = 'lxc';
+    expect((await getTimeSyncStatusWithFs.call(system)).in_container).to.equal(true);
+    sinon.assert.calledOnce(runHostDbusCommand);
+  });
+
+  it('should report that the host is a container, and ask it only once', async () => {
+    const { runHostDbusCommand, virtualization } = stubHostNotKeptOnTime();
+    virtualization.resolves(buildVirtualizationOutput('lxc'));
+    const system = buildSystem(runHostDbusCommand);
+    const status = await getTimeSyncStatusWithFs.call(system);
+    expect(status).to.deep.equal({
+      available: true,
+      can_ntp: true,
+      ntp_enabled: false,
+      ntp_synchronized: true,
+      in_container: true,
+    });
+    expect((await getTimeSyncStatusWithFs.call(system, { refresh: true })).in_container).to.equal(true);
+    sinon.assert.calledOnce(virtualization);
+  });
+
+  ['', 'kvm', 'wsl'].forEach((id) => {
+    it(`should not report a host with the virtualization "${id}" as a container, and ask it only once`, async () => {
+      const { runHostDbusCommand, virtualization } = stubHostNotKeptOnTime();
+      virtualization.resolves(buildVirtualizationOutput(id));
+      const system = buildSystem(runHostDbusCommand);
+      expect((await getTimeSyncStatusWithFs.call(system)).in_container).to.equal(false);
+      expect((await getTimeSyncStatusWithFs.call(system, { refresh: true })).in_container).to.equal(false);
+      sinon.assert.calledOnce(virtualization);
+    });
+  });
+
+  it('should still report the status when the virtualization cannot be read, and ask again next time', async () => {
+    const { runHostDbusCommand, virtualization } = stubHostNotKeptOnTime();
+    virtualization.onFirstCall().rejects(new Error('timeout'));
+    virtualization.onSecondCall().resolves('Error org.freedesktop.DBus.Error.AccessDenied');
+    virtualization.onThirdCall().resolves(buildVirtualizationOutput('lxc'));
+    const system = buildSystem(runHostDbusCommand);
+    const first = await getTimeSyncStatusWithFs.call(system);
+    expect(first.available).to.equal(true);
+    expect(first.in_container).to.equal(false);
+    expect((await getTimeSyncStatusWithFs.call(system, { refresh: true })).in_container).to.equal(false);
+    expect((await getTimeSyncStatusWithFs.call(system, { refresh: true })).in_container).to.equal(true);
   });
 
   it('should report the status as unavailable without any way to reach the host bus', async () => {
@@ -212,22 +329,76 @@ describe('system.getTimeSyncStatus', () => {
     expect((await getTimeSyncStatusWithFs.call(system, { refresh: true })).available).to.equal(true);
     sinon.assert.calledTwice(runHostDbusCommand);
   });
+
+  // a read in flight whose answer the test gives when it wants
+  const stubReadInFlight = () => {
+    let answerFirstRead;
+    const runHostDbusCommand = sinon.stub();
+    runHostDbusCommand.onFirstCall().returns(
+      new Promise((resolve) => {
+        answerFirstRead = resolve;
+      }),
+    );
+    runHostDbusCommand.onSecondCall().resolves(buildGetAllOutput());
+    return { runHostDbusCommand, answerFirstRead: (output) => answerFirstRead(output) };
+  };
+
+  it('should not return a read already in flight when a refresh is asked, but read again after it', async () => {
+    const { runHostDbusCommand, answerFirstRead } = stubReadInFlight();
+    const system = buildSystem(runHostDbusCommand);
+    const before = getTimeSyncStatusWithFs.call(system);
+    const refreshed = getTimeSyncStatusWithFs.call(system, { refresh: true });
+    sinon.assert.calledOnce(runHostDbusCommand);
+    answerFirstRead(buildGetAllOutput({ canNtp: false }));
+    expect((await before).can_ntp).to.equal(false);
+    expect((await refreshed).can_ntp).to.equal(true);
+    sinon.assert.calledTwice(runHostDbusCommand);
+  });
+
+  it('should share one new read between the refreshes waiting for the same read in flight', async () => {
+    const { runHostDbusCommand, answerFirstRead } = stubReadInFlight();
+    const system = buildSystem(runHostDbusCommand);
+    const before = getTimeSyncStatusWithFs.call(system);
+    const first = getTimeSyncStatusWithFs.call(system, { refresh: true });
+    const second = getTimeSyncStatusWithFs.call(system, { refresh: true });
+    answerFirstRead(buildGetAllOutput({ canNtp: false }));
+    await before;
+    expect(await first).to.equal(await second);
+    expect((await first).can_ntp).to.equal(true);
+    sinon.assert.calledTwice(runHostDbusCommand);
+  });
 });
 
 describe('system.enableTimeSync', () => {
-  const buildSystem = (status) => ({
+  const buildSystem = (status, newStatus, hostVirtualization = '') => ({
     timeSyncMechanism: 'docker-helper',
+    hostVirtualization,
     timeSyncStatus: status,
     timeSyncStatusReadAt: Date.now(),
+    timeSyncStatusInFlight: null,
     getTimeSyncStatus: sinon.stub().callsFake(async function getStatus() {
-      return this.timeSyncStatus || { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: false };
+      return (
+        this.timeSyncStatus ||
+        newStatus || { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: false }
+      );
     }),
     runHostDbusCommand: sinon.stub().resolves('method return'),
+  });
+  let clock;
+
+  beforeEach(() => {
+    clock = sinon.useFakeTimers({ toFake: ['setTimeout'] });
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   it('should turn on NTP on the host and return the new status', async () => {
     const system = buildSystem({ available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false });
-    const status = await enableTimeSync.call(system);
+    const promise = enableTimeSync.call(system);
+    await clock.tickAsync(TIME_SYNC_SETTLE_MS);
+    const status = await promise;
     sinon.assert.calledOnceWithExactly(
       system.runHostDbusCommand,
       buildEnableTimeSyncArgv(),
@@ -236,6 +407,99 @@ describe('system.enableTimeSync', () => {
     );
     expect(system.timeSyncStatusReadAt).to.equal(null);
     expect(status).to.deep.equal({ available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: false });
+  });
+
+  it('should leave the time service the time to start before reading the new status', async () => {
+    const system = buildSystem({ available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false });
+    const promise = enableTimeSync.call(system);
+    await clock.tickAsync(TIME_SYNC_SETTLE_MS - 1);
+    sinon.assert.calledOnce(system.getTimeSyncStatus);
+    await clock.tickAsync(1);
+    await promise;
+    sinon.assert.calledTwice(system.getTimeSyncStatus);
+    expect(system.getTimeSyncStatus.secondCall.args).to.deep.equal([{ refresh: true }]);
+  });
+
+  it('should warn when the host accepted the request but its time service is not running', async () => {
+    const logger = { debug: sinon.stub(), info: sinon.stub(), warn: sinon.stub() };
+    const { enableTimeSync: enableTimeSyncWithLogger } = proxyquire('../../../lib/system/system.timeSync', {
+      '../../utils/logger': logger,
+    });
+    const notRunning = { available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false };
+    const system = buildSystem(notRunning, notRunning);
+    const promise = enableTimeSyncWithLogger.call(system);
+    await clock.tickAsync(TIME_SYNC_SETTLE_MS);
+    expect(await promise).to.deep.equal(notRunning);
+    sinon.assert.calledOnce(logger.warn);
+  });
+
+  it('should refuse when the host is known as a container, even if the status does not say so', async () => {
+    const system = buildSystem(
+      { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: true, in_container: false },
+      undefined,
+      'lxc',
+    );
+    let caught;
+    try {
+      await enableTimeSync.call(system);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught.message).to.equal('TIME_SYNC_IN_CONTAINER');
+    sinon.assert.notCalled(system.runHostDbusCommand);
+  });
+
+  it('should ask whether the host is a container before turning on NTP, and refuse in a container', async () => {
+    const system = buildSystem(
+      { available: true, can_ntp: true, ntp_enabled: true, ntp_synchronized: true, in_container: false },
+      undefined,
+      null,
+    );
+    system.runHostDbusCommand
+      .withArgs(buildVirtualizationArgv(), 'docker-helper', 'host-virtualization')
+      .resolves(buildVirtualizationOutput('lxc'));
+    let caught;
+    try {
+      await enableTimeSync.call(system);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught.message).to.equal('TIME_SYNC_IN_CONTAINER');
+    sinon.assert.neverCalledWith(system.runHostDbusCommand, buildEnableTimeSyncArgv());
+  });
+
+  it('should ask whether the host is a container before turning on NTP, and go on when it is not', async () => {
+    const system = buildSystem(
+      { available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false, in_container: false },
+      undefined,
+      null,
+    );
+    system.runHostDbusCommand
+      .withArgs(buildVirtualizationArgv(), 'docker-helper', 'host-virtualization')
+      .resolves(buildVirtualizationOutput('kvm'));
+    const promise = enableTimeSync.call(system);
+    await clock.tickAsync(TIME_SYNC_SETTLE_MS);
+    await promise;
+    expect(system.hostVirtualization).to.equal('kvm');
+    sinon.assert.calledWith(system.runHostDbusCommand, buildEnableTimeSyncArgv(), 'docker-helper', 'time-sync-enable');
+  });
+
+  it('should refuse when the host is a container', async () => {
+    const system = buildSystem({
+      available: true,
+      can_ntp: true,
+      ntp_enabled: false,
+      ntp_synchronized: false,
+      in_container: true,
+    });
+    let caught;
+    try {
+      await enableTimeSync.call(system);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught.message).to.equal('TIME_SYNC_IN_CONTAINER');
+    sinon.assert.notCalled(system.runHostDbusCommand);
   });
 
   it('should refuse when the host time synchronization cannot be reached', async () => {

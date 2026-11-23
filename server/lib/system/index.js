@@ -97,6 +97,9 @@ const System = function System(sequelize, event, config, job, variable, user, me
   this.timeSyncStatus = null;
   this.timeSyncStatusReadAt = null;
   this.timeSyncStatusInFlight = null;
+  // Virtualization the host runs in ("lxc", "kvm", '' on bare-metal...), null
+  // until it is read: a container has no clock of its own.
+  this.hostVirtualization = null;
 };
 
 System.prototype.init = init;
