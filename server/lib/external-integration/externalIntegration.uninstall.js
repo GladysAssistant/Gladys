@@ -83,13 +83,14 @@ async function uninstall(selector) {
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });
   // uninstalling the selected AI provider silently returns the instance to
-  // the Gladys Plus default: no dangling selector in the variable. Read
+  // the Gladys Plus default: no dangling selector in the variable. Run
   // after the row deletion: a selection written while this uninstall was
   // running (setAiProvider validated the row before it went) is caught
   // here, and one written after it is rolled back by setAiProvider's own
-  // re-check of the row — both interleavings end on Gladys Plus. A single
-  // conditional DELETE on this selector: a selection of another provider
-  // is never cleared, even one written while this cleanup runs
+  // re-check of the row — both interleavings end on Gladys Plus. No read
+  // first: a single conditional DELETE on this selector, so a selection of
+  // another provider is never cleared, even one written while this cleanup
+  // runs
   await db.Variable.destroy({
     where: { name: SYSTEM_VARIABLE_NAMES.AI_PROVIDER, value: service.selector, service_id: null, user_id: null },
   });
