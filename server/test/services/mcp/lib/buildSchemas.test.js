@@ -571,7 +571,7 @@ describe('build schemas', () => {
             ],
           }),
           camera: {
-            getImagesInRoom: stub().resolves(['data:image/jpeg;base64,/9j/4AAQ', 'data:image/jpeg;base64,ABCD']),
+            getLiveImagesInRoom: stub().resolves(['data:image/jpeg;base64,/9j/4AAQ', 'data:image/jpeg;base64,ABCD']),
           },
         },
         event: {
@@ -618,7 +618,7 @@ describe('build schemas', () => {
     expect(tools[0].config.description).to.eq('Get image from camera in specific room.');
 
     const cameraResult = await tools[0].cb({ room: 'salon' });
-    expect(mcpHandler.gladys.device.camera.getImagesInRoom.calledWith('room-1')).to.eq(true);
+    expect(mcpHandler.gladys.device.camera.getLiveImagesInRoom.calledWith('room-1')).to.eq(true);
     expect(cameraResult.content).to.be.an('array');
     expect(cameraResult.content.length).to.eq(2);
     expect(cameraResult.content[0]).to.deep.equal({
@@ -1037,7 +1037,7 @@ describe('build schemas', () => {
           }),
           setValue: stub().resolves(),
           camera: {
-            getImagesInRoom: stub().resolves(['data:image/jpeg;base64,/9j/4AAQ']),
+            getLiveImagesInRoom: stub().resolves(['data:image/jpeg;base64,/9j/4AAQ']),
           },
         },
         event: {
@@ -1179,7 +1179,7 @@ describe('build schemas', () => {
             getConsumptionByDates,
           },
           camera: {
-            getImagesInRoom: stub().resolves([]),
+            getLiveImagesInRoom: stub().resolves([]),
           },
         },
         event: {
@@ -1828,7 +1828,7 @@ describe('build schemas', () => {
           get: stub().resolves(devices),
           getBySelector: stub().callsFake((selector) => Promise.resolve(devices.find((d) => d.selector === selector))),
           setValue: stub().resolves(),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -2133,6 +2133,38 @@ describe('build schemas', () => {
     );
   });
 
+  it('should tell camera.get-image when no camera of the room returned an image', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+
+    const tools = await mcpHandler.getAllTools();
+    const cameraTool = tools.find((tool) => tool.intent === 'camera.get-image');
+
+    // No enabled camera in the room, or none could take a picture nor had a recent one:
+    // an empty result would let the model claim that a picture was sent.
+    const result = await cameraTool.cb({ room: 'Cuisine' });
+    expect(mcpHandler.gladys.device.camera.getLiveImagesInRoom.calledOnceWithExactly('room-3')).to.eq(true);
+    expect(result.content).to.deep.equal([
+      {
+        type: 'text',
+        text:
+          'camera.get-image: no camera image available in room "Cuisine". ' +
+          'No picture was sent to the user, do not say that one was taken.',
+      },
+    ]);
+  });
+
+  it('should ask camera.get-image for the cameras of no room when the model passes "No room"', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    mcpHandler.gladys.device.camera.getLiveImagesInRoom = stub().resolves(['image/jpg;base64,NOROOM']);
+
+    const tools = await mcpHandler.getAllTools();
+    const cameraTool = tools.find((tool) => tool.intent === 'camera.get-image');
+
+    const result = await cameraTool.cb({ room: 'No room' });
+    expect(mcpHandler.gladys.device.camera.getLiveImagesInRoom.calledOnceWithExactly(null)).to.eq(true);
+    expect(result.content).to.deep.equal([{ type: 'image', data: 'NOROOM', mimeType: 'image/jpeg' }]);
+  });
+
   it('should not expose device.get-battery-levels without battery powered devices', async () => {
     const mcpHandler = buildBatteryMcpHandler();
     mcpHandler.gladys.device.get = stub().resolves([
@@ -2221,7 +2253,7 @@ describe('build schemas', () => {
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
           camera: {
-            getImagesInRoom: stub().resolves([]),
+            getLiveImagesInRoom: stub().resolves([]),
           },
         },
         event: {
@@ -2304,7 +2336,7 @@ describe('build schemas', () => {
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
           camera: {
-            getImagesInRoom: stub().resolves([]),
+            getLiveImagesInRoom: stub().resolves([]),
           },
         },
         event: { emit: fake() },
@@ -2388,7 +2420,7 @@ describe('build schemas', () => {
         },
         device: {
           get: stub().resolves(devices),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         service: { getService: stub().returns(thermostatService) },
         event: { emit: fake() },
@@ -2508,7 +2540,7 @@ describe('build schemas', () => {
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
           camera: {
-            getImagesInRoom: stub().resolves([]),
+            getLiveImagesInRoom: stub().resolves([]),
           },
         },
         event: { emit: fake() },
@@ -2601,7 +2633,7 @@ describe('build schemas', () => {
           getBySelector: stub().resolves(devices[0]),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -2662,7 +2694,7 @@ describe('build schemas', () => {
           getBySelector: stub().resolves(devices[0]),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -2731,7 +2763,7 @@ describe('build schemas', () => {
           getBySelector: stub().resolves(null),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -3465,7 +3497,7 @@ describe('build schemas', () => {
           getBySelector: stub().resolves(shutterDevice),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -3634,7 +3666,7 @@ describe('build schemas', () => {
           getBySelector: stub().resolves(shutterDevices[0]),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -3729,7 +3761,7 @@ describe('build schemas', () => {
           get: stub().resolves([stateOnlyShutter, positionOnlyShutter]),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -3883,7 +3915,7 @@ describe('build schemas', () => {
           }),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -4094,7 +4126,7 @@ describe('build schemas', () => {
           getBySelector: stub().resolves(lightDevices[0]),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -4198,7 +4230,7 @@ describe('build schemas', () => {
           get: stub().resolves([brightnessOnlyLight, colorOnlyLight]),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -4288,7 +4320,7 @@ describe('build schemas', () => {
           getBySelector: stub().resolves(humiditySensor),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -4371,7 +4403,7 @@ describe('build schemas', () => {
           getBySelector: stub().callsFake(async (selector) => sensors.find((s) => s.selector === selector)),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },
@@ -4473,7 +4505,7 @@ describe('build schemas', () => {
           getBySelector: stub().callsFake(async (selector) => sensors.find((s) => s.selector === selector)),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
-          camera: { getImagesInRoom: stub().resolves([]) },
+          camera: { getLiveImagesInRoom: stub().resolves([]) },
         },
         event: { emit: fake() },
       },

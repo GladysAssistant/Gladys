@@ -553,9 +553,25 @@ async function getAllTools(userId) {
         },
       },
       cb: async ({ room }) => {
-        const { id } = this.findBySimilarity(rooms, room);
+        const { id, name } = this.findBySimilarity(rooms, room);
 
-        const images = await this.gladys.device.camera.getImagesInRoom(id);
+        // A picture taken now by each enabled camera of the room, or its last stored image
+        // (less than one hour old) when the camera cannot take one.
+        const images = await this.gladys.device.camera.getLiveImagesInRoom(id);
+
+        // An empty result would let the model claim that a picture was taken and sent.
+        if (images.length === 0) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `camera.get-image: no camera image available in room "${name}". ` +
+                  'No picture was sent to the user, do not say that one was taken.',
+              },
+            ],
+          };
+        }
 
         return {
           content: images.map((image) => ({
