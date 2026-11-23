@@ -54,12 +54,13 @@ const getSteps = status => {
   }
 };
 
-// `inline` on a phone: in the row, a button or a link, which holds no list
+// `inline` on a phone: in the row, a button or a link, which holds no list. A live region: a step that changes is told
+// to a screen reader (the countdown is not in it)
 const Timeline = ({ status, inline }) => {
   const List = inline ? 'span' : 'ol';
   const Step = inline ? 'span' : 'li';
   return (
-    <List class={style.timeline} data-cy="z2m-pairing-timeline">
+    <List class={style.timeline} aria-live="polite" data-cy="z2m-pairing-timeline">
       {getSteps(status).map((step, index) => (
         <Step key={index} class={cx(style.timelineStep, style[`timeline-${step}`])}>
           <span class={style.timelineDot} aria-hidden="true" />
@@ -489,7 +490,6 @@ class PairingWindow extends Component {
       <div>
         <div
           class={cx(style.header, { [style.headerOpen]: headerState === 'open', [style.headerMobile]: isMobile })}
-          role="status"
           data-cy="z2m-pairing-header"
           data-state={headerState}
         >
@@ -497,7 +497,10 @@ class PairingWindow extends Component {
             <i class={`fe fe-${online ? 'radio' : 'alert-triangle'}`} />
           </span>
           <div class={style.headerText}>
-            <strong>{title}</strong>
+            {/* The title alone is told when it changes, not the countdown at each second */}
+            <strong role="status" data-cy="z2m-pairing-title">
+              {title}
+            </strong>
             {online && remaining && (
               <span class={style.countdown} data-cy="z2m-pairing-countdown">
                 {remaining}

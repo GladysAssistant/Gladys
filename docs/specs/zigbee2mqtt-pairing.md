@@ -171,7 +171,8 @@ device".
   In the demo, the answer of the request is enough. Without a known end, no countdown.
 - **Tips** (approach, pairing mode, add it here) while the registry is empty.
 - **One row per entry**, a timeline "Joined → Interview → Ready" (each step also tells its state —
-  done, in progress, failed, not supported, to come — in a text for screen readers):
+  done, in progress, failed, not supported, to come — in a text for screen readers, told as it changes:
+  a polite live region; in the header, only the title is one, not the countdown):
   - `joined`, `interviewing`: the step running, the friendly name (an IEEE address until the device
     has a name);
   - `ready`, `device` known, not in Gladys: a card — photo (D.3), suggested name (D.4, editable),

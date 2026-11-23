@@ -33,6 +33,12 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
       cy.get('[data-cy=z2m-pairing-header]').should('contain', Cypress._.get(Cypress.env('i18n'), `${T}.open`));
       cy.get('[data-cy=z2m-pairing-countdown]').should('have.text', '3:52');
+      // Told to a screen reader: the title when it changes, not the countdown at each second
+      cy.get('[data-cy=z2m-pairing-title]').should('have.attr', 'role', 'status');
+      cy.get('[data-cy=z2m-pairing-countdown]').should('not.have.attr', 'aria-live');
+      cy.get('[data-cy=z2m-pairing-countdown]')
+        .parents('[role=status], [aria-live]')
+        .should('not.exist');
       cy.tick(2000);
       cy.get('[data-cy=z2m-pairing-countdown]').should('have.text', '3:50');
       // At the end, 0:00 until Zigbee2mqtt tells joining closed
@@ -394,10 +400,11 @@ describe('Zigbee2mqtt pairing window', () => {
         .within(() => {
           cy.get('[data-cy=z2m-pairing-failed]').i18n(`${T}.failedText`);
           cy.get('[data-cy=z2m-pairing-add]').should('not.exist');
-          // The failed step, told to a screen reader too
+          // The failed step, told to a screen reader too, as it changes
           cy.get('[data-cy=z2m-pairing-timeline] .sr-only')
             .eq(1)
             .i18n(`${T}.stepStates.failed`);
+          cy.get('[data-cy=z2m-pairing-timeline]').should('have.attr', 'aria-live', 'polite');
         });
 
       // The failed device left the network
