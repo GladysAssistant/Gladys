@@ -94,6 +94,23 @@ The derivations of the integrations (`addEnergyFeatures`, `addConsumptionCostFea
 "create energy features" button, Enedis) are unchanged: the save enforces the invariants whatever
 they send.
 
+The cursors of the 30-minute jobs — the device params `ENERGY_INDEX_LAST_PROCESSED` /
+`ENERGY_PRODUCTION_INDEX_LAST_PROCESSED`, legacy name or `<name>_<index feature id>`
+(`isEnergyCursorParam`, `energy-monitoring/utils/constants.js`) — are owned by the core. On the
+update path of `device.create` (the device already exists):
+
+- a posted value for one of these params is ignored and the stored value is kept: a save posting a
+  device read earlier (device edit page, "Update" of a discovery, Matter) would otherwise write back
+  a watermark older than the one the job wrote meanwhile, and the next run would count the
+  interval between the two a second time;
+- a stored cursor missing from the payload is not deleted;
+- only the core changes them, through `device.setParam` / `device.destroyParam` (the consumption
+  and production jobs, `calculateEnergyFromIndexFromBeginning` which destroys and rewrites them).
+
+A new device is created with the params it is posted with, cursors included. The integrations
+that re-inject the stored cursors in their payload (external integrations, Zigbee2mqtt, Matter)
+keep doing so harmlessly.
+
 ### C.2 Contract creation and update
 
 When a contract of direction `consumption` is created or updated, the attachment features of its
@@ -215,7 +232,9 @@ presentation is owned by [`mobile-pages/energy.md`](mobile-pages/energy.md), sec
 - Pure helpers: ranks, roles, cycle cut (self-reference, index ↔ consumption, cycle across two
   devices).
 - `device.create`: a payload closing a cycle is cut on the right link; a meter's index sent with
-  a parent on another device is saved as a root; a non-meter keeps its attachment.
+  a parent on another device is saved as a root; a non-meter keeps its attachment; on an existing
+  device a stale posted energy cursor is ignored and a missing one is kept, a new device is
+  created with the cursor posted.
 - `PATCH /device_feature`: each refusal of D.2.
 - `setDeviceElectricMeter`: each refusal of D.1, attachment of every attachment feature, the
   recalculation event with `device_ids`.
