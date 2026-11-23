@@ -1556,10 +1556,10 @@
         "sceneActionPrefix": "Acción:"
       },
       "networkDiscovery": {
-        "udpBroadcastText": "Escuchar los anuncios de red UDP en los puertos {ports}",
-        "udpActiveBroadcastText": "Enviar una solicitud de descubrimiento como difusión UDP en los puertos {ports} y recopilar las respuestas",
-        "mdnsText": "Explorar los servicios mDNS de tipo {service}",
-        "ssdpText": "Búsqueda SSDP de {st}"
+        "udpBroadcastText": "Escuchar los anuncios de red UDP en los puertos {{ports}}",
+        "udpActiveBroadcastText": "Enviar una solicitud de descubrimiento como difusión UDP en los puertos {{ports}} y recopilar las respuestas",
+        "mdnsText": "Explorar los servicios mDNS de tipo {{service}}",
+        "ssdpText": "Búsqueda SSDP de {{st}}"
       },
       "installFromGithub": {
         "cardTitle": "Instalar desde GitHub",
