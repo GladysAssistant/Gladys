@@ -5,6 +5,7 @@ const { expect } = require('chai');
 const { assert, fake } = sinon;
 
 const logger = require('../../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 const { CONFIGURATION, DEFAULT } = require('../../../../services/zigbee2mqtt/lib/constants');
 
@@ -239,6 +240,27 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     expect(configuredWhileChecked).to.equal(null);
     expect(zigbee2mqttManager.configured).to.equal(false);
+  });
+
+  it('should forget joining, keeping the window seen open and the devices seen joining', async () => {
+    gladys.event = { emit: fake() };
+    zigbee2mqttManager.z2mPermitJoin = true;
+    zigbee2mqttManager.z2mPermitJoinEnd = Date.now() + 200000;
+    zigbee2mqttManager.permitJoinWindowSeen = true;
+    zigbee2mqttManager.lastPermitJoinEnd = Date.now() + 200000;
+    zigbee2mqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    zigbee2mqttManager.getConfiguration.resolves({ mqttPassword: 'mqttPassword' });
+    await zigbee2mqttManager.init();
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
+    expect(zigbee2mqttManager.z2mPermitJoinEnd).to.equal(null);
+    // The same window, told again by the Zigbee2mqtt this init connects to, is not a new one
+    expect(zigbee2mqttManager.permitJoinWindowSeen).to.equal(true);
+    expect(zigbee2mqttManager.lastPermitJoinEnd).to.equal(Date.now() + 200000);
+    expect(zigbee2mqttManager.pairingDevices).to.have.property('0x01');
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: { allowed: false, remainingSeconds: null },
+    });
   });
 
   it('should forget the version and the devices told by the previous Zigbee2mqtt', async () => {
