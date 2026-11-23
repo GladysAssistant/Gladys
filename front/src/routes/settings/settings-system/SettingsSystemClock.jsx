@@ -68,7 +68,13 @@ class SettingsSystemClock extends Component {
     this.setState({ enabling: true, enableError: null, enabled: false });
     try {
       const timeSync = await this.props.httpClient.post('/api/v1/system/clock/sync');
-      this.setState({ timeSync, enabled: true, restartAdvised: true });
+      // the restart advice only follows a synchronization that did start: a
+      // service that did not start corrected nothing yet
+      this.setState(prevState => ({
+        timeSync,
+        enabled: true,
+        restartAdvised: prevState.restartAdvised || !!timeSync.ntp_enabled
+      }));
     } catch (e) {
       console.error(e);
       this.setState({
@@ -200,7 +206,12 @@ class SettingsSystemClock extends Component {
                 <Text id="systemSettings.clockRestartHint" />
               </p>
             )}
-            <button type="button" class="btn btn-secondary btn-sm" onClick={this.checkAgain} disabled={loading}>
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              onClick={this.checkAgain}
+              disabled={loading || state.enabling}
+            >
               <Text id="systemSettings.clockCheckAgain" />
             </button>
           </div>

@@ -321,6 +321,44 @@ describe('system.getTimeSyncStatus', () => {
     expect((await getTimeSyncStatusWithFs.call(system, { refresh: true })).available).to.equal(true);
     sinon.assert.calledTwice(runHostDbusCommand);
   });
+
+  // a read in flight whose answer the test gives when it wants
+  const stubReadInFlight = () => {
+    let answerFirstRead;
+    const runHostDbusCommand = sinon.stub();
+    runHostDbusCommand.onFirstCall().returns(
+      new Promise((resolve) => {
+        answerFirstRead = resolve;
+      }),
+    );
+    runHostDbusCommand.onSecondCall().resolves(buildGetAllOutput());
+    return { runHostDbusCommand, answerFirstRead: (output) => answerFirstRead(output) };
+  };
+
+  it('should not return a read already in flight when a refresh is asked, but read again after it', async () => {
+    const { runHostDbusCommand, answerFirstRead } = stubReadInFlight();
+    const system = buildSystem(runHostDbusCommand);
+    const before = getTimeSyncStatusWithFs.call(system);
+    const refreshed = getTimeSyncStatusWithFs.call(system, { refresh: true });
+    sinon.assert.calledOnce(runHostDbusCommand);
+    answerFirstRead(buildGetAllOutput({ canNtp: false }));
+    expect((await before).can_ntp).to.equal(false);
+    expect((await refreshed).can_ntp).to.equal(true);
+    sinon.assert.calledTwice(runHostDbusCommand);
+  });
+
+  it('should share one new read between the refreshes waiting for the same read in flight', async () => {
+    const { runHostDbusCommand, answerFirstRead } = stubReadInFlight();
+    const system = buildSystem(runHostDbusCommand);
+    const before = getTimeSyncStatusWithFs.call(system);
+    const first = getTimeSyncStatusWithFs.call(system, { refresh: true });
+    const second = getTimeSyncStatusWithFs.call(system, { refresh: true });
+    answerFirstRead(buildGetAllOutput({ canNtp: false }));
+    await before;
+    expect(await first).to.equal(await second);
+    expect((await first).can_ntp).to.equal(true);
+    sinon.assert.calledTwice(runHostDbusCommand);
+  });
 });
 
 describe('system.enableTimeSync', () => {
@@ -371,20 +409,6 @@ describe('system.enableTimeSync', () => {
     await promise;
     sinon.assert.calledTwice(system.getTimeSyncStatus);
     expect(system.getTimeSyncStatus.secondCall.args).to.deep.equal([{ refresh: true }]);
-  });
-
-  it('should not return the status of a read started before the change', async () => {
-    const system = buildSystem({ available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false });
-    let endReadInFlight;
-    system.timeSyncStatusInFlight = new Promise((resolve) => {
-      endReadInFlight = resolve;
-    });
-    const promise = enableTimeSync.call(system);
-    await clock.tickAsync(TIME_SYNC_SETTLE_MS);
-    sinon.assert.calledOnce(system.getTimeSyncStatus);
-    endReadInFlight({ available: true, can_ntp: true, ntp_enabled: false, ntp_synchronized: false });
-    expect((await promise).ntp_enabled).to.equal(true);
-    sinon.assert.calledTwice(system.getTimeSyncStatus);
   });
 
   it('should warn when the host accepted the request but its time service is not running', async () => {

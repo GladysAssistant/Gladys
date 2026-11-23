@@ -263,7 +263,8 @@ async function readTimeSyncStatus() {
  * refresh is asked (the "Check again" button), and concurrent callers share
  * one read.
  * @param {object} [options] - Options.
- * @param {boolean} [options.refresh] - Read the status again, even when cached.
+ * @param {boolean} [options.refresh] - Read the status again, even when cached
+ * or while a read is in flight.
  * @returns {Promise<object>} `{ available, can_ntp, ntp_enabled, ntp_synchronized, in_container }`.
  * @example
  * await system.getTimeSyncStatus({ refresh: true });
@@ -276,6 +277,12 @@ async function getTimeSyncStatus({ refresh = false } = {}) {
   if (this.timeSyncStatus && fresh && !refresh) {
     return this.timeSyncStatus;
   }
+  if (this.timeSyncStatusInFlight && refresh) {
+    // a refresh asks for a status read after the request: a read already in
+    // flight may predate a change (the time synchronization just turned on)
+    await this.timeSyncStatusInFlight;
+  }
+  // without a refresh, or started while this refresh was waiting
   if (this.timeSyncStatusInFlight) {
     return this.timeSyncStatusInFlight;
   }
@@ -320,8 +327,7 @@ async function enableTimeSync() {
   await new Promise((resolve) => {
     setTimeout(resolve, TIME_SYNC_SETTLE_MS);
   });
-  // a read already in flight may have started too early to see the outcome
-  await this.timeSyncStatusInFlight;
+  // a refresh never returns a read started before the change
   const newStatus = await this.getTimeSyncStatus({ refresh: true });
   if (!newStatus.ntp_enabled) {
     logger.warn(
