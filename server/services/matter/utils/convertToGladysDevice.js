@@ -50,6 +50,17 @@ const { getBooleanStateFeatureCategoryAndType } = require('./booleanStateMatterM
 const { applyLightCategoryToOnOff } = require('./lightMatterMapping');
 
 /**
+ * @description Tell if a text published by a device is filled (not absent, empty or blank).
+ * @param {any} value - The text.
+ * @returns {boolean} True when the text is filled.
+ * @example
+ * const hasVendorName = isFilled(basicInformation.vendorName);
+ */
+function isFilled(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+/**
  * @description Build a stable Gladys selector from a Matter external_id.
  * @param {string} externalId - Matter external_id.
  * @returns {string} Gladys selector.
@@ -113,12 +124,17 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
     params: [],
   };
   if (nodeDetailDeviceDataBasicInformation) {
-    gladysDevice.name = `${
-      nodeDetailDeviceDataBasicInformation.vendorName
-    } (${nodeDetailDeviceDataBasicInformation.nodeLabel ||
-      nodeDetailDeviceDataBasicInformation.productLabel ||
-      nodeDetailDeviceDataBasicInformation.productName ||
-      device.name})`;
+    const label =
+      [
+        nodeDetailDeviceDataBasicInformation.nodeLabel,
+        nodeDetailDeviceDataBasicInformation.productLabel,
+        nodeDetailDeviceDataBasicInformation.productName,
+      ].find(isFilled) || device.name;
+    // A device that publishes no manufacturer name (empty, or absent on a bridged device) is named
+    // after its label only, instead of " (label)" or "undefined (label)"
+    gladysDevice.name = isFilled(nodeDetailDeviceDataBasicInformation.vendorName)
+      ? `${nodeDetailDeviceDataBasicInformation.vendorName.trim()} (${label})`
+      : label;
     if (nodeDetailDeviceDataBasicInformation.uniqueId) {
       gladysDevice.params.push({
         name: 'UNIQUE_ID',

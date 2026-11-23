@@ -45,6 +45,32 @@ describe('Matter.convertToGladysDevice', () => {
     ...(deviceTypes ? { getDeviceTypes: () => deviceTypes } : {}),
   });
 
+  describe('device name', () => {
+    const nameOf = async (information) =>
+      (await convertToGladysDevice(serviceId, nodeId, buildBooleanStateDevice(), information, '1')).name;
+
+    it('should name the device after its manufacturer and its label, then its endpoint', async () => {
+      expect(await nameOf({ vendorName: 'Acme', nodeLabel: 'Kitchen', productName: 'Sensor' })).to.equal(
+        'Acme (Kitchen) 1',
+      );
+      expect(await nameOf({ vendorName: ' Acme ', productLabel: 'Leak sensor', productName: 'Sensor' })).to.equal(
+        'Acme (Leak sensor) 1',
+      );
+    });
+
+    it('should name the device after its label only when it publishes no manufacturer name', async () => {
+      expect(await nameOf({ vendorName: '', productName: 'Split AC-3' })).to.equal('Split AC-3 1');
+      expect(await nameOf({ vendorName: '   ', nodeLabel: '', productName: 'Split AC-3' })).to.equal('Split AC-3 1');
+      // a bridged device may not publish the attribute at all
+      expect(await nameOf({ vendorName: undefined, productName: 'Bridged lamp' })).to.equal('Bridged lamp 1');
+    });
+
+    it('should fall back on the name of the endpoint when the device publishes no label', async () => {
+      expect(await nameOf({ vendorName: 'Acme', nodeLabel: '', productLabel: ' ' })).to.equal('Acme (Test Device) 1');
+      expect(await nameOf({})).to.equal('Test Device 1');
+    });
+  });
+
   it('should create a read-only binary feature for BooleanState cluster', async () => {
     const device = buildBooleanStateDevice();
 
